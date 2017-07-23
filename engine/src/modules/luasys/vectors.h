@@ -3,173 +3,93 @@
 
 #include "include/luajit/luajit.h"
 
-#include <cetech/celib/vec2f.inl>
-#include <cetech/celib/vec3f.inl>
-#include <cetech/celib/vec4f.inl>
 
 #include <cetech/modules/luasys.h>
+#include <cetech/celib/fpumath.h>
 
-static int _vec2f_add(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-    vec2f_t *b = luasys_to_vec2f(L, 2);
+static int _vec3f_add(lua_State *l) {
+    float a[3];
+    float b[3];
 
-    vec2f_t res = {0};
-    vec2f_add(&res, a, b);
+    luasys_to_vec3f(l, 1, a);
+    luasys_to_vec3f(l, 2, b);
 
-    luasys_push_vec2f(L, res);
+
+    float res[3];
+    celib::vec3_add(res, a, b);
+
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
-static int _vec2f_sub(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-    vec2f_t *b = luasys_to_vec2f(L, 2);
+static int _vec3f_sub(lua_State *l) {
+    float a[3];
+    float b[3];
 
-    vec2f_t res = {0};
-    vec2f_sub(&res, a, b);
+    luasys_to_vec3f(l, 1, a);
+    luasys_to_vec3f(l, 2, b);
 
-    luasys_push_vec2f(L, res);
+
+    float res[3];
+    celib::vec3_sub(res, a, b);
+
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
-static int _vec2f_mul(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-    float b = luasys_to_float(L, 2);
+static int _vec3f_mul(lua_State *l) {
+    float a[3];
+    float b = luasys_to_float(l, 2);
 
-    vec2f_t res = {0};
-    vec2f_mul(&res, a, b);
+    luasys_to_vec3f(l, 1, a);
 
-    luasys_push_vec2f(L, res);
+    float res[3];
+    celib::vec3_mul(res, a, b);
+
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
-static int _vec2f_div(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-    float b = luasys_to_float(L, 2);
+static int _vec3f_div(lua_State *l) {
+    float a[3];
+    float b = luasys_to_float(l, 2);
 
-    vec2f_t res = {0};
-    vec2f_div(&res, a, b);
+    luasys_to_vec3f(l, 1, a);
 
-    luasys_push_vec2f(L, res);
+    float res[3];
+    celib::vec3_mul(res, a, 1.0f / b);
+
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
-static int _vec2f_unm(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
+static int _vec3f_unm(lua_State *l) {
+    float a[3];
 
-    vec2f_t res = {0};
-    vec2f_mul(&res, a, -1.0f);
+    luasys_to_vec3f(l, 1, a);
 
-    luasys_push_vec2f(L, res);
+    float res[3];
+    celib::vec3_mul(res, a, -1.0f);
+
+    luasys_push_vec3f(l, res);
     return 1;
 }
 
-static int _vec2f_index(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-    const char *s = luasys_to_string(L, 2);
+static int _vec3f_index(lua_State *l) {
+    float a[3];
+    const char *s = luasys_to_string(l, 2);
+
+    luasys_to_vec3f(l, 1, a);
 
     switch (s[0]) {
         case 'x':
-            luasys_push_float(L, a->x);
+            luasys_push_float(l, a[0]);
             return 1;
         case 'y':
-            luasys_push_float(L, a->y);
-            return 1;
-        default:
-            ct_log_a0.error("lua", "Vector2 bad index '%c'", s[0]);
-            break;
-    }
-
-    return 0;
-}
-
-static int _vec2f_newindex(lua_State *L) {
-    vec2f_t *a = luasys_to_vec2f(L, 1);
-
-    const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
-
-    switch (s[0]) {
-        case 'x':
-            a->x = value;
-            break;
-        case 'y':
-            a->y = value;
-            break;
-        default:
-            ct_log_a0.error("lua", "Vector2 bad index '%c'", s[0]);
-            break;
-    }
-
-    return 0;
-}
-
-static int _vec3f_add(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-    vec3f_t *b = luasys_to_vec3f(L, 2);
-
-    vec3f_t res = {0};
-    vec3f_add(&res, a, b);
-
-    luasys_push_vec3f(L, res);
-    return 1;
-}
-
-static int _vec3f_sub(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-    vec3f_t *b = luasys_to_vec3f(L, 2);
-
-    vec3f_t res = {0};
-    vec3f_sub(&res, a, b);
-
-    luasys_push_vec3f(L, res);
-    return 1;
-}
-
-static int _vec3f_mul(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-    float b = luasys_to_float(L, 2);
-
-    vec3f_t res = {0};
-    vec3f_mul(&res, a, b);
-
-    luasys_push_vec3f(L, res);
-    return 1;
-}
-
-static int _vec3f_div(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-    float b = luasys_to_float(L, 2);
-
-    vec3f_t res = {0};
-    vec3f_div(&res, a, b);
-
-    luasys_push_vec3f(L, res);
-    return 1;
-}
-
-static int _vec3f_unm(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-
-    vec3f_t res = {0};
-    vec3f_mul(&res, a, -1.0f);
-
-    luasys_push_vec3f(L, res);
-    return 1;
-}
-
-static int _vec3f_index(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
-    const char *s = luasys_to_string(L, 2);
-
-    switch (s[0]) {
-        case 'x':
-            luasys_push_float(L, a->x);
-            return 1;
-        case 'y':
-            luasys_push_float(L, a->y);
+            luasys_push_float(l, a[1]);
             return 1;
         case 'z':
-            luasys_push_float(L, a->z);
+            luasys_push_float(l, a[2]);
             return 1;
         default:
             ct_log_a0.error("lua", "Vector3 bad index '%c'", s[0]);
@@ -179,21 +99,22 @@ static int _vec3f_index(lua_State *L) {
     return 0;
 }
 
-static int _vec3f_newindex(lua_State *L) {
-    vec3f_t *a = luasys_to_vec3f(L, 1);
+static int _vec3f_newindex(lua_State *l) {
+    float a[3];
+    luasys_to_vec3f(l, 1, a);
 
-    const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
+    const char *s = luasys_to_string(l, 2);
+    const float value = luasys_to_float(l, 3);
 
     switch (s[0]) {
         case 'x':
-            a->x = value;
+            a[0] = value;
             break;
         case 'y':
-            a->y = value;
+            a[1] = value;
             break;
         case 'z':
-            a->z = value;
+            a[2] = value;
             break;
         default:
             ct_log_a0.error("lua", "Vector3 bad index '%c'", s[0]);
@@ -203,110 +124,5 @@ static int _vec3f_newindex(lua_State *L) {
     return 0;
 }
 
-static int _vec4f_add(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-    vec4f_t *b = luasys_to_vec4f(L, 2);
-
-    vec4f_t res = {0};
-    vec4f_add(&res, a, b);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
-static int _vec4f_sub(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-    vec4f_t *b = luasys_to_vec4f(L, 2);
-
-    vec4f_t res = {0};
-    vec4f_sub(&res, a, b);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
-static int _vec4f_mul(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-    float b = luasys_to_float(L, 2);
-
-    vec4f_t res = {0};
-    vec4f_mul(&res, a, b);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
-static int _vec4f_div(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-    float b = luasys_to_float(L, 2);
-
-    vec4f_t res = {0};
-    vec4f_div(&res, a, b);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
-static int _vec4f_unm(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-
-    vec4f_t res = {0};
-    vec4f_mul(&res, a, -1.0f);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
-static int _vec4f_index(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-    const char *s = luasys_to_string(L, 2);
-
-    switch (s[0]) {
-        case 'x':
-            luasys_push_float(L, a->x);
-            return 1;
-        case 'y':
-            luasys_push_float(L, a->y);
-            return 1;
-        case 'z':
-            luasys_push_float(L, a->z);
-            return 1;
-        case 'w':
-            luasys_push_float(L, a->w);
-            return 1;
-        default:
-            ct_log_a0.error("lua", "Vector4 bad index '%c'", s[0]);
-            break;
-    }
-
-    return 0;
-}
-
-static int _vec4f_newindex(lua_State *L) {
-    vec4f_t *a = luasys_to_vec4f(L, 1);
-
-    const char *s = luasys_to_string(L, 2);
-    const float value = luasys_to_float(L, 3);
-
-    switch (s[0]) {
-        case 'x':
-            a->x = value;
-            break;
-        case 'y':
-            a->y = value;
-            break;
-        case 'z':
-            a->z = value;
-            break;
-        case 'w':
-            a->w = value;
-            break;
-        default:
-            ct_log_a0.error("lua", "Vector4 bad index '%c'", s[0]);
-            break;
-    }
-
-    return 0;
-}
 
 #endif //CETECH_VECTORS_H

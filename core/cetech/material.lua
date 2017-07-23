@@ -16,14 +16,6 @@ struct ct_material_a0 {
                         const char *slot,
                         uint64_t texture);
 
-    void (*set_vec4f)(struct ct_material material,
-                      const char *slot,
-                      vec4f_t v);
-
-    void (*set_mat33f)(struct ct_material material,
-                       const char *slot,
-                       mat33f_t v);
-
     void (*set_mat44f)(struct ct_material material,
                        const char *slot,
                        mat44f_t v);

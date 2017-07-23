@@ -43,7 +43,7 @@ void resource_register_type(uint64_t type,
                             ct_resource_callbacks_t callbacks);
 
 
-using namespace cetech;
+using namespace celib;
 
 
 namespace resource {
@@ -134,7 +134,7 @@ namespace package_resource {
                  ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
 
         return data;
@@ -142,7 +142,7 @@ namespace package_resource {
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -157,7 +157,7 @@ namespace package_resource {
                    void *old_data,
                    void *new_data,
                    ct_allocator *allocator) {
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
         return new_data;
     }
 

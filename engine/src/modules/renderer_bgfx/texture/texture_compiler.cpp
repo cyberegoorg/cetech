@@ -20,7 +20,7 @@
 #include <cetech/celib/string_stream.h>
 #include "texture_blob.h"
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 CETECH_DECL_API(ct_memory_a0);
@@ -46,7 +46,7 @@ namespace texture_compiler {
                 "texturec");
 
         buffer << texturec;
-        CETECH_FREE(ct_memory_a0.main_allocator(), texturec);
+        CEL_FREE(ct_memory_a0.main_allocator(), texturec);
 
         printf(buffer, " -f %s -o %s", input, output);
 
@@ -81,7 +81,7 @@ namespace texture_compiler {
         int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dirname,
                            ct_path_a0.filename(filename));
 
-        CETECH_FREE(a, tmp_dirname);
+        CEL_FREE(a, tmp_dirname);
 
         return ret;
     }
@@ -139,7 +139,7 @@ namespace texture_compiler {
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
                                                VIO_OPEN_READ);
         char *tmp_data =
-                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, tmp_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -156,9 +156,9 @@ namespace texture_compiler {
 
         compilator_api->add_dependency(filename, input_str);
 
-        CETECH_FREE(a, tmp_data);
-        CETECH_FREE(a, input_path);
-        CETECH_FREE(a, tmp_dir);
+        CEL_FREE(a, tmp_data);
+        CEL_FREE(a, input_path);
+        CEL_FREE(a, tmp_dir);
 
         return 1;
     }

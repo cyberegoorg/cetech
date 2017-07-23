@@ -22,7 +22,7 @@
 #define DIR_DELIM_STR "/"
 #endif
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 //==============================================================================
@@ -80,7 +80,7 @@ void _dir_list(const char *path,
         } else {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
-                    CETECH_ALLOCATE(allocator, char,
+                    CEL_ALLOCATE(allocator, char,
                                     sizeof(char) * size);
 
             if (path[strlen(path) - 1] != '/') {
@@ -104,7 +104,7 @@ void dir_list(const char *path,
 
     _dir_list(path, recursive, tmp_files, allocator);
 
-    char **new_files = CETECH_ALLOCATE(allocator, char*,
+    char **new_files = CEL_ALLOCATE(allocator, char*,
                                        sizeof(char *) * array::size(tmp_files));
 
     memcpy(new_files,
@@ -119,10 +119,10 @@ void dir_list_free(char **files,
                    uint32_t count,
                    struct ct_allocator *allocator) {
     for (int i = 0; i < count; ++i) {
-        CETECH_FREE(allocator, files[i]);
+        CEL_FREE(allocator, files[i]);
     }
 
-    CETECH_FREE(allocator, files);
+    CEL_FREE(allocator, files);
 }
 
 

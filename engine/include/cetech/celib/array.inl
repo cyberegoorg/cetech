@@ -4,8 +4,8 @@
 //==============================================================================
 
 
-#ifndef CETECH_ARRAY2_INL_H
-#define CETECH_ARRAY2_INL_H
+#ifndef CELIB_ARRAY2_INL_H
+#define CELIB_ARRAY2_INL_H
 
 #include <cstring>
 
@@ -14,7 +14,7 @@
 
 #include "container_types.inl"
 
-namespace cetech {
+namespace celib {
     namespace array {
         /// The number of elements in the array.
         template<typename T>
@@ -170,12 +170,12 @@ namespace cetech {
 
             T *new_data = 0;
             if (new_capacity > 0) {
-                new_data = CETECH_ALLOCATE(a._allocator, T,
+                new_data = CEL_ALLOCATE(a._allocator, T,
                                            sizeof(T) * new_capacity);
                 memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
-            CETECH_FREE(a._allocator, a._data);
+            CEL_FREE(a._allocator, a._data);
 
             a._data = new_data;
             a._capacity = new_capacity;
@@ -239,7 +239,7 @@ namespace cetech {
     inline
     void Array<T>::destroy() {
         if (_data) {
-            CETECH_FREE(_allocator, _data);
+            CEL_FREE(_allocator, _data);
         }
 
         _allocator = nullptr;
@@ -252,7 +252,7 @@ namespace cetech {
     template<typename T>
     inline Array<T>::~Array() {
         if (_data) {
-            CETECH_FREE(_allocator, _data);
+            CEL_FREE(_allocator, _data);
         }
 
         _allocator = nullptr;
@@ -290,4 +290,4 @@ namespace cetech {
         return _data[i];
     }
 }
-#endif //CETECH_ARRAY2_INL_H
+#endif //CELIB_ARRAY2_INL_H

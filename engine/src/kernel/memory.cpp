@@ -82,7 +82,7 @@ namespace memory {
 
     char *str_dup(const char *s,
                   ct_allocator *allocator) {
-        char *d = (char *) CETECH_ALLOCATE(allocator, char, strlen(s) + 1);
+        char *d = (char *) CEL_ALLOCATE(allocator, char, strlen(s) + 1);
         CETECH_ASSERT("string", d != NULL);
 
         if (d == NULL) return NULL;

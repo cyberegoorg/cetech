@@ -1,5 +1,5 @@
-#ifndef CETECH_EVENTSTREAM_H
-#define CETECH_EVENTSTREAM_H
+#ifndef CELIB_EVENTSTREAM_H
+#define CELIB_EVENTSTREAM_H
 
 //==============================================================================
 // Includes
@@ -9,7 +9,7 @@
 #include "cetech/kernel/macros.h"
 
 
-namespace cetech {
+namespace celib {
 
     typedef Array<uint8_t> EventStream;
 
@@ -53,4 +53,4 @@ namespace cetech {
 }
 
 
-#endif //CETECH_EVENTSTREAM_H
+#endif //CELIB_EVENTSTREAM_H

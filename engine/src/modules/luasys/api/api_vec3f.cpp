@@ -3,17 +3,21 @@
 
 #include "cetech/modules/transform.h"
 #include "../luasys_private.h"
-#include <cetech/celib/vec3f.inl>
 #include <cetech/kernel/api_system.h>
+#include <cetech/celib/fpumath.h>
 
 #define API_NAME "Vec3f"
+
+#define VEC3F_UNIT_X ((float[3]){1.0f, 0.0f, 0.f})
+#define VEC3F_UNIT_Y ((float[3]){0.0f, 1.0f, 0.f})
+#define VEC3F_UNIT_Z ((float[3]){0.0f, 0.0f, 1.f})
 
 static int _ctor(lua_State *l) {
     float x = luasys_to_float(l, 1);
     float y = luasys_to_float(l, 2);
     float z = luasys_to_float(l, 3);
 
-    luasys_push_vec3f(l, (vec3f_t) {.x=x, .y=y, .z=z});
+    luasys_push_vec3f(l, (float[3]) {x, y, z});
     return 1;
 }
 
@@ -38,57 +42,76 @@ static int _unit_z(lua_State *l) {
 }
 
 static int _length(lua_State *l) {
-    vec3f_t *v = luasys_to_vec3f(l, 1);
-    luasys_push_float(l, vec3f_length(v));
+    float v[3];
+
+    luasys_to_vec3f(l, 1, v);
+    luasys_push_float(l, celib::vec3_length(v));
+
     return 1;
 }
 
 static int _length_squared(lua_State *l) {
-    vec3f_t *v = luasys_to_vec3f(l, 1);
-    luasys_push_float(l, vec3f_length_squared(v));
+    float v[3];
+
+    luasys_to_vec3f(l, 1, v);
+    luasys_push_float(l, celib::vec3_dot(v, v));
+
     return 1;
 }
 
 static int _normalized(lua_State *l) {
-    vec3f_t *v = luasys_to_vec3f(l, 1);
-    vec3f_t res = {0};
+    float v[3];
+    float v_norm[3];
 
-    vec3f_normalized(&res, v);
+    luasys_to_vec3f(l, 1, v);
 
-    luasys_push_vec3f(l, res);
+    celib::vec3_norm(v_norm, v);
+
+    luasys_push_vec3f(l, v_norm);
+
     return 1;
 }
 
 static int _lerp(lua_State *l) {
-    vec3f_t *from = luasys_to_vec3f(l, 1);
-    vec3f_t *to = luasys_to_vec3f(l, 2);
+    float from[3];
+    float to[3];
+
+    luasys_to_vec3f(l, 1, from);
+    luasys_to_vec3f(l, 2, to);
+
     float time = luasys_to_float(l, 3);
 
-    vec3f_t res = {0};
+    float res[3];
 
-    vec3f_lerp(&res, from, to, time);
+    celib::vec3_lerp(res, from, to, time);
 
     luasys_push_vec3f(l, res);
     return 1;
 }
 
 static int _cross(lua_State *l) {
-    vec3f_t *a = luasys_to_vec3f(l, 1);
-    vec3f_t *b = luasys_to_vec3f(l, 2);
+    float a[3];
+    float b[3];
 
-    vec3f_t res = {0};
+    luasys_to_vec3f(l, 1, a);
+    luasys_to_vec3f(l, 2, b);
 
-    vec3f_cross(&res, a, b);
+    float res[3];
+
+    celib::vec3_cross(res, a, b);
 
     luasys_push_vec3f(l, res);
     return 1;
 }
 
 static int _dot(lua_State *l) {
-    vec3f_t *a = luasys_to_vec3f(l, 1);
-    vec3f_t *b = luasys_to_vec3f(l, 2);
+    float a[3];
+    float b[3];
 
-    luasys_push_float(l, vec3f_dot(a, b));
+    luasys_to_vec3f(l, 1, a);
+    luasys_to_vec3f(l, 2, b);
+
+    luasys_push_float(l, celib::vec3_dot(a, b));
     return 1;
 }
 

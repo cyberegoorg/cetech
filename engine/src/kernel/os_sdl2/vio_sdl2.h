@@ -58,7 +58,7 @@ int vio_sdl_close(ct_vio_instance_t *file) {
 struct ct_vio *vio_from_file(const char *path,
                              enum ct_vio_open_mode mode) {
 
-    ct_vio *vio = CETECH_ALLOCATE(core_allocator::get(), ct_vio,
+    ct_vio *vio = CEL_ALLOCATE(core_allocator::get(), ct_vio,
                                   sizeof(ct_vio));
 
     CETECH_ASSERT(LOG_WHERE, vio != NULL);

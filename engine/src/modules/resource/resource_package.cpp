@@ -25,7 +25,7 @@ CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Public interface
@@ -171,13 +171,13 @@ void package_task(void *data) {
                                 package_name_count(package)[j]);
     }
 
-    CETECH_FREE(ct_memory_a0.main_allocator(), task_data);
+    CEL_FREE(ct_memory_a0.main_allocator(), task_data);
 }
 
 void package_load(uint64_t name) {
 
     struct package_task_data *task_data =
-            CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
+            CEL_ALLOCATE(ct_memory_a0.main_allocator(),
                             struct package_task_data,
                             sizeof(struct package_task_data));
 

@@ -19,7 +19,6 @@
 #include <cetech/kernel/yaml.h>
 
 #include <cetech/modules/entity.h>
-#include <cetech/modules/renderer.h>
 
 #include "material_blob.h"
 
@@ -29,7 +28,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 namespace material_compiler {
     namespace {
@@ -68,7 +67,7 @@ namespace material_compiler {
                 ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
                                                          VIO_OPEN_READ);
 
-                CETECH_FREE(a, full_path);
+                CEL_FREE(a, full_path);
 
                 char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
                 memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
@@ -118,11 +117,14 @@ namespace material_compiler {
             yaml_as_string(key, uniform_name,
                            CETECH_ARRAY_LEN(uniform_name) - 1);
 
-            vec4f_t v = yaml_as_vec4f_t(value);
+            float v[4];
+            yaml_as_vec4(value, v);
 
             array::push(output->uniform_names, uniform_name,
                         CETECH_ARRAY_LEN(uniform_name));
-            array::push(output->data, (uint8_t *) &v, sizeof(vec4f_t));
+
+            array::push(output->data, reinterpret_cast<const uint8_t *>(v),
+                        sizeof(float) * 4);
         }
 
         void _forach_mat44f_clb(yaml_node_t key,
@@ -136,29 +138,31 @@ namespace material_compiler {
             yaml_as_string(key, uniform_name,
                            CETECH_ARRAY_LEN(uniform_name) - 1);
 
-            mat44f_t m = yaml_as_mat44f_t(value);
+            float m[16];
+            yaml_as_mat44(value, m);
 
             array::push(output->uniform_names, uniform_name,
                         CETECH_ARRAY_LEN(uniform_name));
-            array::push(output->data, (uint8_t *) &m, sizeof(mat44f_t));
+
+            array::push(output->data, (uint8_t *) m, sizeof(float) * 16);
         }
 
         void _forach_mat33f_clb(yaml_node_t key,
                                 yaml_node_t value,
                                 void *_data) {
-            struct material_compile_output *output = (material_compile_output *) _data;
-
-            output->mat33f_count += 1;
-
-            char uniform_name[32] = {0};
-            yaml_as_string(key, uniform_name,
-                           CETECH_ARRAY_LEN(uniform_name) - 1);
-
-            mat33f_t m = yaml_as_mat33f_t(value);
-
-            array::push(output->uniform_names, uniform_name,
-                        CETECH_ARRAY_LEN(uniform_name));
-            array::push(output->data, (uint8_t *) &m, sizeof(mat33f_t));
+//            struct material_compile_output *output = (material_compile_output *) _data;
+//
+//            output->mat33f_count += 1;
+//
+//            char uniform_name[32] = {0};
+//            yaml_as_string(key, uniform_name,
+//                           CETECH_ARRAY_LEN(uniform_name) - 1);
+//
+//            mat33f_t m = yaml_as_mat33f_t(value);
+//
+//            array::push(output->uniform_names, uniform_name,
+//                        CETECH_ARRAY_LEN(uniform_name));
+//            array::push(output->data, (uint8_t *) &m, sizeof(mat33f_t));
         }
     }
 
@@ -168,7 +172,7 @@ namespace material_compiler {
                  ct_compilator_api *compilator_api) {
 
         char *source_data =
-                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
@@ -214,21 +218,23 @@ namespace material_compiler {
                 .shader_name = ct_hash_a0.id64_from_str(tmp_buffer),
                 .texture_count =output.texture_count,
                 .vec4f_count = output.vec4f_count,
-                .uniforms_count = (uint32_t) (
-                        array::size(output.uniform_names) / 32),
+                .mat33f_count = output.mat33f_count,
+                .mat44f_count = output.mat44f_count,
+                .uniforms_count = (array::size(output.uniform_names) / 32),
         };
 
         build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+
         build_vio->write(build_vio->inst, output.uniform_names._data,
-                         sizeof(char),
-                         array::size(output.uniform_names));
+                         sizeof(char),array::size(output.uniform_names));
+
         build_vio->write(build_vio->inst, output.data._data, sizeof(uint8_t),
                          array::size(output.data));
 
         output.uniform_names.destroy();
         output.data.destroy();
 
-        CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
+        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 

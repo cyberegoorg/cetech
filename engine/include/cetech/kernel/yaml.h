@@ -13,12 +13,7 @@ extern "C" {
 //==============================================================================
 
 #include <stdbool.h>
-#include "cetech/celib/math_types.h"
 
-typedef struct vec3f_s vec3f_t;
-typedef struct vec4f_s vec4f_t;
-typedef struct mat33f_s mat33f_t;
-typedef struct mat44f_s mat44f_t;
 
 //==============================================================================
 // Defines
@@ -107,6 +102,9 @@ void yaml_merge(yaml_node_t root,
 //==============================================================================
 // Define nodes
 //==============================================================================
+void yaml_as_vec3(yaml_node_t node, float* value);
+void yaml_as_vec4(yaml_node_t node, float* value);
+void yaml_as_mat44(yaml_node_t node, float* value);
 
 #define YAML_NODE_AS_DEFN(T, N) T yaml_as_##N(yaml_node_t node)
 #define YAML_NODE_AS_DEF(T) YAML_NODE_AS_DEFN(T, T)
@@ -117,13 +115,6 @@ YAML_NODE_AS_DEF(int);
 
 YAML_NODE_AS_DEF(float);
 
-YAML_NODE_AS_DEF(vec3f_t);
-
-YAML_NODE_AS_DEF(vec4f_t);
-
-YAML_NODE_AS_DEF(mat44f_t);
-
-YAML_NODE_AS_DEF(mat33f_t);
 
 #undef YAML_NODE_AS_DEF
 #undef YAML_NODE_AS_DEFN

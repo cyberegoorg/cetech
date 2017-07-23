@@ -13,7 +13,6 @@ extern "C" {
 
 
 #include "stdint.h"
-#include <cetech/celib/math_types.h>
 
 //==============================================================================
 // Typedefs
@@ -45,46 +44,46 @@ struct ct_scenegprah_a0 {
     //! \param world World
     //! \param node Node
     //! \return Position
-    vec3f_t (*get_position)(struct ct_scene_node node);
+    void (*get_position)(struct ct_scene_node node, float* position);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
-    quatf_t (*get_rotation)(struct ct_scene_node node);
+    void (*get_rotation)(struct ct_scene_node node, float* rotation);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
-    vec3f_t (*get_scale)(struct ct_scene_node node);
+    void (*get_scale)(struct ct_scene_node node, float* scale);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
-    mat44f_t *(*get_world_matrix)(struct ct_scene_node node);
+    void (*get_world_matrix)(struct ct_scene_node node, float* matrix);
 
     //! Set position
     //! \param world World
     //! \param node Node
     //! \param pos Position
     void (*set_position)(struct ct_scene_node node,
-                         vec3f_t pos);
+                         float* pos);
 
     //! Set rotation
     //! \param world World
     //! \param node Node
     //! \param rot Rotation
     void (*set_rotation)(struct ct_scene_node node,
-                         quatf_t rot);
+                         float* rot);
 
     //! Set scale
     //! \param world World
     //! \param node Node
     //! \param scale Scale
     void (*set_scale)(struct ct_scene_node node,
-                      vec3f_t scale);
+                      float* scale);
 
     //! Has entity scene-graph component?
     //! \param world World
@@ -112,7 +111,7 @@ struct ct_scenegprah_a0 {
                                    struct ct_entity entity,
                                    uint64_t *names,
                                    uint32_t *parent,
-                                   mat44f_t *pose,
+                                   float *pose,
                                    uint32_t count);
 
     //! Link two node

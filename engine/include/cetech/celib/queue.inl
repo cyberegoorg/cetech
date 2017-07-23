@@ -3,8 +3,8 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_QUEUE2_INL
-#define CETECH_QUEUE2_INL
+#ifndef CELIB_QUEUE2_INL
+#define CELIB_QUEUE2_INL
 
 #include <cstdint>
 
@@ -13,7 +13,7 @@
 
 #include "allocator.h"
 
-namespace cetech {
+namespace celib {
 
     /***************************************************************************
     **** Queue interface
@@ -280,4 +280,4 @@ namespace cetech {
     }
 }
 
-#endif //CETECH_QUEUE2_INL
+#endif //CELIB_QUEUE2_INL

@@ -127,7 +127,7 @@ void logdb_log(enum ct_log_level level,
     //sqlite3_closeq_v2(_db);
 }
 
-namespace log {
+namespace logsystem {
     int logdb_init_db(const char *log_dir,
                       ct_api_a0 *api) {
         CETECH_GET_API(api, ct_log_a0);

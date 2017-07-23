@@ -12,22 +12,22 @@ struct ct_transform_a0 {
     void (*transform)(struct ct_transform transform,
                       mat44f_t *parent);
 
-    vec3f_t (*get_position)(struct ct_transform transform);
+    void (*get_position)(struct ct_transform transform, float *value);
 
-    quatf_t (*get_rotation)(struct ct_transform transform);
+    void (*get_rotation)(struct ct_transform transform, float *value);
 
-    vec3f_t (*get_scale)(struct ct_transform transform);
+    void (*get_scale)(struct ct_transform transform, float *value);
 
-    mat44f_t *(*get_world_matrix)(struct ct_transform transform);
+    void *(*get_world_matrix)(struct ct_transform transform, float *value);
 
     void (*set_position)(struct ct_transform transform,
-                         vec3f_t pos);
+                         float* pos);
 
     void (*set_rotation)(struct ct_transform transform,
-                         quatf_t rot);
+                         float* rot);
 
     void (*set_scale)(struct ct_transform transform,
-                      vec3f_t scale);
+                      float* scale);
 
     int (*has)(struct ct_world world,
                struct ct_entity entity);
@@ -38,9 +38,9 @@ struct ct_transform_a0 {
     struct ct_transform (*create)(struct ct_world world,
                                   struct ct_entity entity,
                                   struct ct_entity parent,
-                                  vec3f_t position,
-                                  quatf_t rotation,
-                                  vec3f_t scale);
+                                  float* position,
+                                  float* rotation,
+                                  float* scale);
 
     void (*link)(struct ct_world world,
                  struct ct_entity parent,
@@ -82,48 +82,54 @@ end
 --! \param transform lightuserdata Transformation component.
 --! \return cetech.Vec3f Position.
 function Transform.get_position(transform)
-    local p = api.get_position(transform)
+    local p = ffi.new("float[3]")
 
-    return cetech.Vec3f.make(p.x, p.y, p.z)
+    api.get_position(transform, p)
+
+    return cetech.Vec3f.make(p[0], p[1], p[2])
 end
 
 --! Get rotation.
 --! \param transform lightuserdata Transformation component.
 --! \return cetech.Quatf Rotation.
 function Transform.get_rotation(transform)
-    local r = api.get_rotation(transform)
+    local p = ffi.new("float[4]")
 
-    return cetech.Quatf.make(r.x, r.y, r.z, r.w)
+    api.get_rotation(transform, p)
+
+    return cetech.Quatf.make(p[0], p[1], p[2], p[3])
 end
 
 --! Get scale.
 --! \param transform lightuserdata Transformation component.
 --! \return cetech.Vec3f Scale.
 function Transform.get_scale(transform)
-    local s = api.get_scale(transform)
+    local p = ffi.new("float[3]")
 
-    return cetech.Vec3f.make(s.x, s.y, s.z)
+    api.get_scale(transform, p)
+
+    return cetech.Vec3f.make(p[0], p[1], p[2])
 end
 
 --! Get world matrix.
 --! \param transform lightuserdata Transformation component.
 --! \return cetech.Mat44f World matrix.
 function Transform.get_world_matrix(transform)
-    local m = api.get_world_matrix(transform)
+    local p = ffi.new("float[16]")
 
-    local r1 = cetech.Vec4f.make(m.x.x, m.x.y, m.x.z, m.x.w)
-    local r2 = cetech.Vec4f.make(m.y.x, m.y.y, m.y.z, m.y.w)
-    local r3 = cetech.Vec4f.make(m.z.x, m.z.y, m.z.z, m.z.w)
-    local r4 = cetech.Vec4f.make(m.w.x, m.w.y, m.w.z, m.w.w)
+    api.get_world_matrix(transform, p)
 
-    return cetech.Mat44f.make(r1, r2, r3, r4)
+    return cetech.Mat44f.make(p[0], p[1], p[2], p[3],
+                              p[4], p[5], p[6], p[7],
+                              p[8], p[9], p[10], p[11],
+                              p[12], p[13], p[14], p[15])
 end
 
 --! Set position.
 --! \param transform lightuserdata Transformation component.
 --! \param position cetech.Vec3f New position.
 function Transform.set_position(transform, position)
-    local p = ffi.new("struct vec3f_s", { { position.x, position.y, position.z } })
+    local p = ffi.new("float[3]", { position.x, position.y, position.z })
 
     api.set_position(transform, p)
 end
@@ -132,7 +138,7 @@ end
 --! \param transform lightuserdata Transformation component.
 --! \param rotation cetech.Quatf New rotation.
 function Transform.set_rotation(transform, rotation)
-    local r = ffi.new("struct vec4f_s", { { rotation.x, rotation.y, rotation.z, rotation.w } })
+    local r = ffi.new("float[4]", { rotation.x, rotation.y, rotation.z, rotation.w })
 
     api.set_rotation(transform, r)
 end
@@ -141,7 +147,7 @@ end
 --! \param transform lightuserdata Transformation component.
 --! \param scale cetech.Vec3f New scale.
 function Transform.set_scale(transform, scale)
-    local s = ffi.new("struct vec3f_s", { { scale.x, scale.y, scale.z } })
+    local s = ffi.new("float[3]", { scale.x, scale.y, scale.z })
 
     api.set_scale(transform, s)
 end

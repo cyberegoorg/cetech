@@ -6,9 +6,9 @@
 #include <cetech/modules/blob.h>
 
 
-using namespace cetech;
+using namespace celib;
 
-typedef cetech::Array<uint8_t> blob_array;
+typedef celib::Array<uint8_t> blob_array;
 
 namespace blob {
     uint8_t *data(ct_blob_instance_t *inst) {
@@ -29,11 +29,11 @@ namespace blob {
     }
 
     ct_blob *create(ct_allocator *allocator) {
-        blob_array *inst = CETECH_NEW(allocator,
+        blob_array *inst = CEL_NEW(allocator,
                                       blob_array,
                                       allocator);
 
-        ct_blob *blob = CETECH_NEW(allocator,
+        ct_blob *blob = CEL_NEW(allocator,
                                    ct_blob);
         blob->inst = inst;
         blob->push = push;
@@ -47,8 +47,8 @@ namespace blob {
         blob_array *inst = (blob_array *) blob->inst;
         ct_allocator *a = inst->_allocator;
 
-        CETECH_DELETE(a, blob_array, inst);
-        CETECH_DELETE(a, ct_blob, blob);
+        CEL_DELETE(a, blob_array, inst);
+        CEL_DELETE(a, ct_blob, blob);
     }
 
     static ct_blob_a0 api{

@@ -2,7 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/config.h>
 #include <cetech/celib/eventstream.inl>
@@ -31,7 +30,7 @@ CETECH_DECL_API(ct_machine_a0);
 namespace {
     static struct GamepadGlobals {
         int active[GAMEPAD_MAX];
-        vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+        float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
         int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
         int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
     } _G = {0};
@@ -118,12 +117,13 @@ namespace gamepad {
         return 0;
     }
 
-    vec2f_t axis(uint32_t idx,
-                 const uint32_t axis_index) {
+    void axis(uint32_t idx,
+                 const uint32_t axis_index, float *value) {
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
-        return _G.position[idx][axis_index];
+        value[0] = _G.position[idx][axis_index][0];
+        value[1] = _G.position[idx][axis_index][1];
     }
 
     void play_rumble(uint32_t idx,
@@ -153,7 +153,9 @@ namespace gamepad {
                     break;
 
                 case EVENT_GAMEPAD_MOVE:
-                    _G.position[move_event->gamepad_id][move_event->axis] = move_event->position;
+
+                    _G.position[move_event->gamepad_id][move_event->axis][0] = move_event->position[0];
+                    _G.position[move_event->gamepad_id][move_event->axis][1] = move_event->position[1];
                     break;
 
                 case EVENT_GAMEPAD_CONNECT:

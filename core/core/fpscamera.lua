@@ -27,15 +27,15 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local m_world = Transform.get_world_matrix(self.transform)
 
     local x_dir = m_world.x
-    local z_dir = -m_world.z
+    local z_dir = m_world.z
 
     -- Position
     if not self.fly_mode then
         z_dir.y = 0.0
     end
 
-    pos = pos + z_dir * updown * dt
-    pos = pos + x_dir * leftright * dt
+    pos = pos + (z_dir * updown * dt)
+    pos = pos + (x_dir * leftright * dt)
 
     -- Rotation
     local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), -dx * dt * 100)

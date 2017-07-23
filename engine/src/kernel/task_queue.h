@@ -44,10 +44,10 @@ void queue_task_init(struct task_queue *q,
     CETECH_ASSERT("QUEUEMPC", 0 == (capacity & q->_capacityMask));
 
     q->_capacity = capacity;
-    q->_data = CETECH_ALLOCATE(allocator, uint32_t,
+    q->_data = CEL_ALLOCATE(allocator, uint32_t,
                                sizeof(uint32_t) * capacity);
 
-    q->_sequences = CETECH_ALLOCATE(allocator, atomic_int,
+    q->_sequences = CEL_ALLOCATE(allocator, atomic_int,
                                     sizeof(atomic_int) * capacity);
 
     for (uint32_t i = 0; i < capacity; ++i) {
@@ -59,8 +59,8 @@ void queue_task_init(struct task_queue *q,
 }
 
 void queue_task_destroy(struct task_queue *q) {
-    CETECH_FREE(q->allocator, q->_data);
-    CETECH_FREE(q->allocator, q->_sequences);
+    CEL_FREE(q->allocator, q->_data);
+    CEL_FREE(q->allocator, q->_sequences);
 }
 
 uint32_t queue_task_size(struct task_queue *q) {

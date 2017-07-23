@@ -22,7 +22,7 @@
 #include <cetech/celib/string_stream.h>
 #include "shader_blob.h"
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 CETECH_DECL_API(ct_memory_a0)
@@ -51,7 +51,7 @@ namespace shader_compiler {
                 "shaderc");
 
         buffer << shaderc;
-        CETECH_FREE(ct_memory_a0.main_allocator(), shaderc);
+        CEL_FREE(ct_memory_a0.main_allocator(), shaderc);
 
         string_stream::printf(buffer,
                               ""
@@ -90,7 +90,7 @@ namespace shader_compiler {
         int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
                            ct_path_a0.filename(filename));
 
-        CETECH_FREE(a, tmp_dirname);
+        CEL_FREE(a, tmp_dirname);
 
         return ret;
     }
@@ -154,17 +154,17 @@ namespace shader_compiler {
         int result = _shaderc(input_path, output_path, include_dir, "vertex",
                               platform, vs_profile);
 
-        CETECH_FREE(a, input_path);
+        CEL_FREE(a, input_path);
 
         if (result != 0) {
-            CETECH_FREE(a, include_dir);
+            CEL_FREE(a, include_dir);
             return 0;
         }
 
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
                                                VIO_OPEN_READ);
         char *vs_data =
-                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, vs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -184,16 +184,16 @@ namespace shader_compiler {
         result = _shaderc(input_path, output_path, include_dir, "fragment",
                           platform, fs_profile);
 
-        CETECH_FREE(a, input_path);
+        CEL_FREE(a, input_path);
 
         if (result != 0) {
-            CETECH_FREE(a, include_dir);
+            CEL_FREE(a, include_dir);
             return 0;
         }
 
         tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
-                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, fs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
@@ -208,9 +208,9 @@ namespace shader_compiler {
         build_vio->write(build_vio->inst, fs_data, sizeof(char),
                          resource.fs_size);
 
-        CETECH_FREE(a, vs_data);
-        CETECH_FREE(a, fs_data);
-        CETECH_FREE(a, include_dir);
+        CEL_FREE(a, vs_data);
+        CEL_FREE(a, fs_data);
+        CEL_FREE(a, include_dir);
 
         return 1;
     }

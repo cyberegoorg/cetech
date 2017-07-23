@@ -11,7 +11,7 @@
 #include <cetech/modules/resource.h>
 #include <cetech/kernel/api_system.h>
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Defines
@@ -27,7 +27,7 @@ using namespace cetech;
 
 static struct G {
     uint8_t state[MOUSE_BTN_MAX];
-    int position[2];
+    float position[2];
 } _G = {0};
 
 
@@ -73,8 +73,8 @@ void sdl_mouse_process(EventStream &stream) {
         _G.position[1] = window_size[1] - pos[1];
 
         ct_mouse_move_event event;
-        event.pos.x = pos[0];
-        event.pos.y = window_size[1] - pos[1];
+        event.pos[0] = pos[0];
+        event.pos[1] = window_size[1] - pos[1];
 
         eventstream::push(stream, EVENT_MOUSE_MOVE, event);
     }

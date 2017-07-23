@@ -22,7 +22,7 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
 
-using namespace cetech;
+using namespace celib;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_thread_a0);

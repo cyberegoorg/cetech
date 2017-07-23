@@ -22,12 +22,6 @@ struct ct_camera;
 struct ct_world;
 struct ct_entity;
 
-typedef struct mat33f_s mat33f_t;
-typedef struct mat44f_s mat44f_t;
-typedef struct vec2f_s vec2f_t;
-typedef struct vec3f_s vec3f_t;
-typedef struct vec4f_s vec4f_t;
-
 typedef void ct_window_t;
 
 //! Material typedef
@@ -61,29 +55,13 @@ struct ct_material_a0 {
                         const char *slot,
                         uint64_t texture);
 
-    //! Set vec4f value
-    //! \param material Material
-    //! \param slot Variable name
-    //! \param v Value
-    void (*set_vec4f)(struct ct_material material,
-                      const char *slot,
-                      vec4f_t v);
-
-    //! Set mat33f value
-    //! \param material Material
-    //! \param slot Variable name
-    //! \param v Value
-    void (*set_mat33f)(struct ct_material material,
-                       const char *slot,
-                       mat33f_t v);
-
     //! Set mat44f value
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
     void (*set_mat44f)(struct ct_material material,
                        const char *slot,
-                       mat44f_t v);
+                       float* value);
 
     //! Use material for actual render
     void (*use)(struct ct_material material);
@@ -184,7 +162,7 @@ struct ct_renderer_a0 {
 
     //! Get renderer window size
     //! \return Renderer window size
-    vec2f_t (*get_size)();
+    void  (*get_size)(int *width, int *height);
 
     //! Render world
     //! \param world World

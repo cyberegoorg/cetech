@@ -3,83 +3,56 @@
 
 #include "include/luajit/luajit.h"
 
-#include <cetech/celib/quatf.inl>
-
 #include <cetech/modules/luasys.h>
-
-
-static int _quat_add(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
-    quatf_t *b = luasys_to_quat(L, 2);
-
-    quatf_t res = {0};
-    quatf_add(&res, a, b);
-
-    luasys_push_quat(L, res);
-    return 1;
-}
-
-static int _quat_sub(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
-    quatf_t *b = luasys_to_quat(L, 2);
-
-    quatf_t res = {0};
-    quatf_sub(&res, a, b);
-
-    luasys_push_quat(L, res);
-    return 1;
-}
 
 
 //TODO: mul_s
 static int _quat_mul(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
-    quatf_t *b = luasys_to_quat(L, 2);
+    float a[4];
+    float b[4];
 
-    quatf_t res = {0};
-    quatf_mul(&res, a, b);
+    luasys_to_quat(L, 1, a);
+    luasys_to_quat(L, 2, b);
+
+    float res[4];
+
+    celib::quat_mul(res, a, b);
 
     luasys_push_quat(L, res);
     return 1;
 }
 
-static int _quat_div(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
-    float b = luasys_to_float(L, 2);
-
-    quatf_t res = {0};
-    quatf_div_s(&res, a, b);
-
-    luasys_push_vec4f(L, res);
-    return 1;
-}
-
 static int _quat_unm(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
+    float a[4];
 
-    quatf_t res = {0};
-    quatf_invert(&res, a);
+    luasys_to_quat(L, 1, a);
 
-    luasys_push_vec4f(L, res);
+    float res[4];
+
+    celib::quat_invert(res, a);
+
+    luasys_push_quat(L, res);
     return 1;
 }
 
 static int _quat_index(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
+    float a[4];
+    luasys_to_quat(L, 1, a);
+
     const char *s = luasys_to_string(L, 2);
 
     switch (s[0]) {
         case 'x':
-            luasys_push_float(L, a->x);
+            luasys_push_float(L, a[0]);
             return 1;
         case 'y':
-            luasys_push_float(L, a->y);
+            luasys_push_float(L, a[1]);
             return 1;
         case 'z':
-            luasys_push_float(L, a->z);
+            luasys_push_float(L, a[2]);
             return 1;
         case 'w':
-            luasys_push_float(L, a->w);
+            luasys_push_float(L, a[3]);
             return 1;
         default:
             ct_log_a0.error("lua", "Quat bad index '%c'", s[0]);
@@ -90,23 +63,24 @@ static int _quat_index(lua_State *L) {
 }
 
 static int _quat_newindex(lua_State *L) {
-    quatf_t *a = luasys_to_quat(L, 1);
+    float a[4];
+    luasys_to_quat(L, 1, a);
 
     const char *s = luasys_to_string(L, 2);
     const float value = luasys_to_float(L, 3);
 
     switch (s[0]) {
         case 'x':
-            a->x = value;
+            a[0] = value;
             break;
         case 'y':
-            a->y = value;
+            a[1] = value;
             break;
         case 'z':
-            a->z = value;
+            a[2] = value;
             break;
         case 'w':
-            a->w = value;
+            a[3] = value;
             break;
         default:
             ct_log_a0.error("lua", "Quat bad index '%c'", s[0]);

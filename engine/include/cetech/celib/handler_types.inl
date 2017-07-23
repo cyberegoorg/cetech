@@ -1,5 +1,5 @@
-#ifndef CETECH_HANDLERID_TYPES_INL
-#define CETECH_HANDLERID_TYPES_INL
+#ifndef CELIB_HANDLERID_TYPES_INL
+#define CELIB_HANDLERID_TYPES_INL
 
 //==============================================================================
 // Includes
@@ -14,7 +14,7 @@
 
 struct ct_allocator;
 
-namespace cetech {
+namespace celib {
     template<typename T>
     struct Handler {
         Handler();
@@ -30,4 +30,4 @@ namespace cetech {
     };
 }
 
-#endif //CETECH_HANDLERID_TYPES_INL
+#endif //CELIB_HANDLERID_TYPES_INL

@@ -31,7 +31,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_blob_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Globals
@@ -161,7 +161,7 @@ namespace entity_resource_compiler {
 
             prefab_vio->close(prefab_vio->inst);
 
-            CETECH_FREE(a, full_path);
+            CEL_FREE(a, full_path);
         }
     }
 
@@ -284,7 +284,7 @@ namespace entity_resource_compiler {
     ct_entity_compile_output *create_output() {
         ct_allocator *a = ct_memory_a0.main_allocator();
 
-        ct_entity_compile_output *output = CETECH_ALLOCATE(a,
+        ct_entity_compile_output *output = CEL_ALLOCATE(a,
                                                            ct_entity_compile_output,
                                                            sizeof(ct_entity_compile_output));
 
@@ -328,7 +328,7 @@ namespace entity_resource_compiler {
         output->component_body_array.destroy();
 
         ct_allocator *a = ct_memory_a0.main_allocator();
-        CETECH_FREE(a, output);
+        CEL_FREE(a, output);
     }
 
     void compile_entity(ct_entity_compile_output *output,
@@ -449,7 +449,7 @@ namespace entity_resorce {
     void *loader(ct_vio *input,
                  ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
 
         return data;
@@ -457,7 +457,7 @@ namespace entity_resorce {
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
 
@@ -476,7 +476,7 @@ namespace entity_resorce {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -513,7 +513,7 @@ namespace entity {
                              uint32_t *entities_count) {
         struct entity_resource *res = (entity_resource *) resource;
 
-        ct_entity *spawned = CETECH_ALLOCATE(ct_memory_a0.main_allocator(),
+        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
                                              ct_entity, sizeof(ct_entity) *
                                                         res->ent_count);
 
@@ -560,7 +560,7 @@ namespace entity {
 
         ct_entity root = entities[0];
 
-        CETECH_FREE(ct_memory_a0.main_allocator(), entities);
+        CEL_FREE(ct_memory_a0.main_allocator(), entities);
 
         return root;
     }

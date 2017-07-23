@@ -3,7 +3,7 @@
 
 #include <cetech/kernel/log.h>
 
-namespace log {
+namespace logsystem {
     void init();
 
     void shutdown();

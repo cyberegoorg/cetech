@@ -20,7 +20,7 @@
 
 #include "texture_blob.h"
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 
@@ -66,7 +66,7 @@ namespace texture_resource {
                                    ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
 
         return data;
@@ -74,7 +74,7 @@ namespace texture_resource {
 
     void _texture_resource_unloader(void *new_data,
                                     ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void _texture_resource_online(uint64_t name,
@@ -108,7 +108,7 @@ namespace texture_resource {
         _texture_resource_offline(name, old_data);
         _texture_resource_online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         return new_data;
     }

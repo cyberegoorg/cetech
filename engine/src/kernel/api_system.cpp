@@ -10,7 +10,7 @@
 
 CETECH_DECL_API(ct_hash_a0)
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Defines

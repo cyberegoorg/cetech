@@ -189,115 +189,103 @@ extern "C" int yaml_as_bool(yaml_node_t node) {
     YAML_EX_SCOPE({ return nh->nodes[node.idx].as<bool>(); })
 }
 
-vec3f_t yaml_as_vec3f_t(yaml_node_t body) {
+void yaml_as_vec3(yaml_node_t body, float* value) {
     CETECH_ASSERT("yaml", yaml_is_valid(body));
-
-    vec3f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CETECH_ASSERT("yaml", yaml_is_valid(x));
-    v.x = yaml_as_float(x);
+    value[0] = yaml_as_float(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
     CETECH_ASSERT("yaml", yaml_is_valid(y));
-    v.y = yaml_as_float(y);
+    value[1] = yaml_as_float(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
     CETECH_ASSERT("yaml", yaml_is_valid(z));
-    v.z = yaml_as_float(z);
+    value[2] = yaml_as_float(z);
     yaml_node_free(z);
-
-    return v;
 }
 
-vec4f_t yaml_as_vec4f_t(yaml_node_t body) {
+void yaml_as_vec4(yaml_node_t body, float* value) {
     CETECH_ASSERT("yaml", yaml_is_valid(body));
-
-    vec4f_t v = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CETECH_ASSERT("yaml", yaml_is_valid(x));
-    v.x = yaml_as_float(x);
+    value[0] = yaml_as_float(x);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
     CETECH_ASSERT("yaml", yaml_is_valid(y));
-    v.y = yaml_as_float(y);
+    value[1] = yaml_as_float(y);
     yaml_node_free(y);
 
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
     CETECH_ASSERT("yaml", yaml_is_valid(z));
-    v.z = yaml_as_float(z);
+    value[2] = yaml_as_float(z);
     yaml_node_free(z);
 
     yaml_node_t w = yaml_get_seq_node(body, 3);
     CETECH_ASSERT("yaml", yaml_is_valid(w));
-    v.w = yaml_as_float(w);
+    value[3] = yaml_as_float(w);
     yaml_node_free(w);
 
-    return v;
 }
 
-mat44f_t yaml_as_mat44f_t(yaml_node_t body) {
+void yaml_as_mat44(yaml_node_t body, float* value) {
     CETECH_ASSERT("yaml", yaml_is_valid(body));
-
-    mat44f_t m = {0};
 
     yaml_node_t x = yaml_get_seq_node(body, 0);
     CETECH_ASSERT("yaml", yaml_is_valid(x));
-    m.x = yaml_as_vec4f_t(x);
+    yaml_as_vec4(x, &value[0*4]);
     yaml_node_free(x);
 
 
     yaml_node_t y = yaml_get_seq_node(body, 1);
     CETECH_ASSERT("yaml", yaml_is_valid(y));
-    m.y = yaml_as_vec4f_t(y);
+    yaml_as_vec4(y, &value[1*4]);
     yaml_node_free(y);
-
 
     yaml_node_t z = yaml_get_seq_node(body, 2);
     CETECH_ASSERT("yaml", yaml_is_valid(z));
-    m.z = yaml_as_vec4f_t(z);
+    yaml_as_vec4(z, &value[2*4]);
     yaml_node_free(z);
 
     yaml_node_t w = yaml_get_seq_node(body, 3);
     CETECH_ASSERT("yaml", yaml_is_valid(w));
-    m.z = yaml_as_vec4f_t(w);
+    yaml_as_vec4(w, &value[3*4]);
     yaml_node_free(w);
-
-    return m;
 }
 
-mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
-    CETECH_ASSERT("yaml", yaml_is_valid(body));
-
-    mat33f_t m = {0};
-
-    yaml_node_t x = yaml_get_seq_node(body, 0);
-    CETECH_ASSERT("yaml", yaml_is_valid(x));
-    m.x = yaml_as_vec3f_t(x);
-    yaml_node_free(x);
-
-
-    yaml_node_t y = yaml_get_seq_node(body, 1);
-    CETECH_ASSERT("yaml", yaml_is_valid(y));
-    m.y = yaml_as_vec3f_t(y);
-    yaml_node_free(y);
-
-
-    yaml_node_t z = yaml_get_seq_node(body, 2);
-    CETECH_ASSERT("yaml", yaml_is_valid(z));
-    m.z = yaml_as_vec3f_t(z);
-    yaml_node_free(z);
-
-    return m;
-}
+//mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
+//    CETECH_ASSERT("yaml", yaml_is_valid(body));
+//
+//    mat33f_t m = {0};
+//
+//    yaml_node_t x = yaml_get_seq_node(body, 0);
+//    CETECH_ASSERT("yaml", yaml_is_valid(x));
+//    m.x = yaml_as_vec3f_t(x);
+//    yaml_node_free(x);
+//
+//
+//    yaml_node_t y = yaml_get_seq_node(body, 1);
+//    CETECH_ASSERT("yaml", yaml_is_valid(y));
+//    m.y = yaml_as_vec3f_t(y);
+//    yaml_node_free(y);
+//
+//
+//    yaml_node_t z = yaml_get_seq_node(body, 2);
+//    CETECH_ASSERT("yaml", yaml_is_valid(z));
+//    m.z = yaml_as_vec3f_t(z);
+//    yaml_node_free(z);
+//
+//    return m;
+//}
 
 #define YAML_NODE_AS_DECL(type)\
     extern "C" type yaml_as_##type(yaml_node_t node) {\

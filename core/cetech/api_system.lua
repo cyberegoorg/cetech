@@ -19,17 +19,6 @@ struct ct_api_a0 {
 
 struct ct_api_a0 *ct_api_get();
 
-typedef struct vec2f_s {
-    union {
-        float f[2];
-        struct {
-            float x;
-            float y;
-        };
-    };
-} vec2f_t;
-
-
 typedef struct vec3f_s {
     union {
         float f[3];

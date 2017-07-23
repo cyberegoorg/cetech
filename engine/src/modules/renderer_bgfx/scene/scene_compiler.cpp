@@ -25,7 +25,7 @@
 
 #include "scene_blob.h"
 
-using namespace cetech;
+using namespace celib;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -83,14 +83,14 @@ namespace scene_resource_compiler {
 
         Array<uint64_t> node_name;
         Array<uint32_t> node_parent;
-        Array<mat44f_t> node_pose;
+        Array<float> node_pose;
         Array<uint64_t> geom_node;
     };
 
     struct compile_output *_crete_compile_output() {
         ct_allocator *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
-                CETECH_ALLOCATE(a, struct compile_output,
+                CEL_ALLOCATE(a, struct compile_output,
                                 sizeof(struct compile_output));
 
         output->geom_name.init(a);
@@ -128,7 +128,7 @@ namespace scene_resource_compiler {
         output->node_parent.destroy();
         output->node_pose.destroy();
 
-        CETECH_FREE(a, output);
+        CEL_FREE(a, output);
     }
 
     static void _type_to_attr_type(const char *name,
@@ -300,13 +300,15 @@ namespace scene_resource_compiler {
         uint64_t node_name = ct_hash_a0.id64_from_str(buffer);
 
         yaml_node_t local_pose = yaml_get_node(value, "local");
-        mat44f_t pose = yaml_as_mat44f_t(local_pose);
+
+        float pose[16];
+        yaml_as_mat44(local_pose, pose);
 
         uint32_t idx = (uint32_t) array::size(output->output->node_name);
 
         array::push_back(output->output->node_name, node_name);
         array::push_back(output->output->node_parent, output->parent_idx);
-        array::push_back(output->output->node_pose, pose);
+        array::push(output->output->node_pose, pose, 16);
 
         yaml_node_t geometries_n = yaml_get_node(value, "geometries");
         if (yaml_is_valid(geometries_n)) {
@@ -366,8 +368,7 @@ namespace scene_resource_compiler {
 
         array::push_back(output->node_name, name);
         array::push_back(output->node_parent, parent);
-        array::push_back(output->node_pose,
-                         *((mat44f_t *) &root->mTransformation));
+        array::push(output->node_pose, &root->mTransformation.a1, 16);
 
         for (int i = 0; i < root->mNumChildren; ++i) {
             _compile_assimp_node(root->mChildren[i], idx, output);
@@ -503,7 +504,7 @@ namespace scene_resource_compiler {
                  ct_compilator_api *compilator_api) {
 
         char *source_data =
-                CETECH_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                                 source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
@@ -525,7 +526,7 @@ namespace scene_resource_compiler {
 
         if (!ret) {
             _destroy_compile_output(output);
-            CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
+            CEL_FREE(ct_memory_a0.main_allocator(), source_data);
             return 0;
         }
 
@@ -568,14 +569,14 @@ namespace scene_resource_compiler {
                          sizeof(uint32_t),
                          array::size(output->node_parent));
         build_vio->write(build_vio->inst, array::begin(output->node_pose),
-                         sizeof(mat44f_t),
+                         sizeof(float),
                          array::size(output->node_pose));
         build_vio->write(build_vio->inst, array::begin(output->geom_node),
                          sizeof(uint64_t),
                          array::size(output->geom_name));
 
         _destroy_compile_output(output);
-        CETECH_FREE(ct_memory_a0.main_allocator(), source_data);
+        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 

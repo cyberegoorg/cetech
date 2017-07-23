@@ -22,7 +22,7 @@
 
 #include "shader_blob.h"
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 namespace shader_compiler {
@@ -63,14 +63,14 @@ namespace shader_resource {
                  ct_allocator *allocator) {
 
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
         return data;
     }
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -112,7 +112,7 @@ namespace shader_resource {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         return new_data;
     }

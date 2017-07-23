@@ -1,5 +1,5 @@
-#ifndef CETECH_HANDLERID_INL
-#define CETECH_HANDLERID_INL
+#ifndef CELIB_HANDLERID_INL
+#define CELIB_HANDLERID_INL
 
 //==============================================================================
 // Includes
@@ -26,7 +26,7 @@ struct ct_allocator;
 #define _gen(h) ((h) & ((1 << _GENBITCOUNT) - 1));
 #define _make_entity(idx, gen) (uint32_t)(((idx) << _INDEXBITCOUNT) | (gen))
 
-namespace cetech {
+namespace celib {
     namespace handler {
         template<typename T>
         T create(Handler<T> &handler);
@@ -41,7 +41,7 @@ namespace cetech {
     };
 };
 
-namespace cetech {
+namespace celib {
 
     namespace handler {
         template<typename T>
@@ -98,7 +98,13 @@ namespace cetech {
         _generation.destroy();
         _freeIdx.destroy();
     }
-
 };
 
-#endif //CETECH_HANDLERID_INL
+#undef _GENBITCOUNT
+#undef _INDEXBITCOUNT
+#undef _MINFREEINDEXS
+#undef _idx
+#undef _gen
+#undef _make_entity
+
+#endif //CELIB_HANDLERID_INL

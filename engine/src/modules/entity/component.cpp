@@ -17,7 +17,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Globals

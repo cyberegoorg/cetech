@@ -18,7 +18,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Defines
@@ -77,12 +77,12 @@ namespace filesystem {
 
         if (!file) {
             ct_log_a0.error(LOG_WHERE, "Could not load file %s", full_path);
-            CETECH_FREE(a, full_path);
+            CEL_FREE(a, full_path);
             return NULL;
         }
 
 
-        CETECH_FREE(a, full_path);
+        CEL_FREE(a, full_path);
         return file;
     }
 
@@ -97,7 +97,7 @@ namespace filesystem {
         char *full_path = get_fullpath(root, a, path);
 
         int ret = ct_path_a0.make_path(full_path);
-        CETECH_FREE(a, full_path);
+        CEL_FREE(a, full_path);
 
         return ret;
     }
@@ -116,7 +116,7 @@ namespace filesystem {
 
         ct_path_a0.list(full_path, 1, files, count, allocator);
 
-        CETECH_FREE(a, full_path);
+        CEL_FREE(a, full_path);
     }
 
     void listdir_free(char **files,
@@ -134,7 +134,7 @@ namespace filesystem {
 
         time_t ret = ct_path_a0.file_mtime(full_path);
 
-        CETECH_FREE(a, full_path);
+        CEL_FREE(a, full_path);
         return ret;
     }
 }
@@ -179,7 +179,7 @@ namespace filesystem_module {
         auto end_it = map::end(_G.root_map);
 
         while (it != end_it) {
-            CETECH_FREE(ct_memory_a0.main_allocator(), it->value);
+            CEL_FREE(ct_memory_a0.main_allocator(), it->value);
             ++it;
         }
 

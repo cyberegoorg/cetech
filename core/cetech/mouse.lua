@@ -20,8 +20,8 @@ struct ct_mouse_a0 {
 
     const char *(*axis_name)(const uint32_t axis_index);
 
-    vec2f_t (*axis)(uint32_t idx,
-                    const uint32_t axis_index);
+    void (*axis)(uint32_t idx,
+                    const uint32_t axis_index, float* value);
 
     void (*update)();
 }
@@ -87,9 +87,10 @@ function Mouse.axis_name(index)
 end
 
 function Mouse.axis(index)
-    local a = api.axis(0, index)
+    local p = ffi.new("float[3]")
+    api.axis(0, index, p)
 
-    return cetech.Vec2f.make(a.x, a.y)
+    return cetech.Vec3f.make(p[0], p[1], 0.0)
 end
 
 return Mouse

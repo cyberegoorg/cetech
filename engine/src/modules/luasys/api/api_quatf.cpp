@@ -1,8 +1,8 @@
 
-#include <cetech/celib/quatf.inl>
 #include <cetech/modules/luasys.h>
 
 #include <cetech/kernel/api_system.h>
+#include <cetech/celib/fpumath.h>
 #include "../luasys_private.h"
 
 #define API_NAME "Quatf"
@@ -13,7 +13,7 @@ static int _ctor(lua_State *l) {
     float z = luasys_to_float(l, 3);
     float w = luasys_to_float(l, 4);
 
-    luasys_push_quat(l, (quatf_t) {.x=x, .y=y, .z=z, .w=w});
+    luasys_push_quat(l, (float[4]) {x, y, z, w});
     return 1;
 }
 
@@ -23,67 +23,63 @@ static int _is(lua_State *l) {
 }
 
 static int _from_axis_angle(lua_State *l) {
-    quatf_t result = {0};
+    float result[4] = {0};
+    float axis[3] = {0};
 
-    const vec3f_t *axis = luasys_to_vec3f(l, 1);
-    float angle = luasys_to_float(l, 2);
+    luasys_to_vec3f(l, 1, axis);
+    float angle = luasys_to_float(l, 2) * celib::DEG_TO_RAD;
 
-    quatf_from_axis_angle(&result, axis, angle);
+    celib::quat_rotate_axis(result, axis, angle);
 
     luasys_push_quat(l, result);
     return 1;
 }
 
 static int _from_euler(lua_State *l) {
-    quatf_t result = {0};
+    float result[4] = {0};
 
-    const float heading = luasys_to_float(l, 1);
-    const float attitude = luasys_to_float(l, 2);
-    const float bank = luasys_to_float(l, 3);
+    const float heading = luasys_to_float(l, 1)* celib::DEG_TO_RAD;
+    const float attitude = luasys_to_float(l, 2)* celib::DEG_TO_RAD;
+    const float bank = luasys_to_float(l, 3)* celib::DEG_TO_RAD;
 
-    quatf_from_euler(&result, heading, attitude, bank);
+    celib::quatFromEuler(result, heading, attitude, bank);
 
     luasys_push_quat(l, result);
     return 1;
 }
 
 static int _to_mat44f(lua_State *l) {
-    const quatf_t *q = luasys_to_quat(l, 1);
-    mat44f_t result = {0};
+    float q[4];
+    float m[16];
 
-    quatf_to_mat44f(&result, q);
+    luasys_to_quat(l, 1, q);
 
-    luasys_push_mat44f(l, result);
+    celib::mat4_quat(m, q);
+
+    luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _to_euler_angle(lua_State *l) {
-    const quatf_t *q = luasys_to_quat(l, 1);
-    vec3f_t result = {0};
+    float q[4];
+    float v[3];
+    float v_deg[3];
 
-    quatf_to_eurel_angle(&result, q);
+    luasys_to_quat(l, 1, q);
 
-    luasys_push_vec3f(l, result);
-    return 1;
-}
+    celib::quat_to_euler(v, q);
 
-static int _length(lua_State *l) {
-    quatf_t *v = luasys_to_quat(l, 1);
-    luasys_push_float(l, quatf_length(v));
-    return 1;
-}
+    celib::vec3_mul(v_deg, v, celib::RAD_TO_DEG);
 
-static int _length_squared(lua_State *l) {
-    quatf_t *v = luasys_to_quat(l, 1);
-    luasys_push_float(l, quatf_length_squared(v));
+    luasys_push_vec3f(l, v_deg);
     return 1;
 }
 
 static int _normalized(lua_State *l) {
-    quatf_t *v = luasys_to_quat(l, 1);
-    quatf_t res = {0};
+    float q[4];
+    float res[4];
 
-    quatf_normalized(&res, v);
+    celib::quat_norm(res, q);
 
     luasys_push_quat(l, res);
     return 1;
@@ -98,8 +94,6 @@ void _register_lua_quatf_api(struct ct_api_a0 *api) {
     luasys_add_module_function(API_NAME, "to_mat44f", _to_mat44f);
     luasys_add_module_function(API_NAME, "to_euler_angle", _to_euler_angle);
 
-    luasys_add_module_function(API_NAME, "length", _length);
-    luasys_add_module_function(API_NAME, "length_squared", _length_squared);
     luasys_add_module_function(API_NAME, "normalized", _normalized);
 }
 

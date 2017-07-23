@@ -4,15 +4,15 @@
 //==============================================================================
 
 
-#ifndef CETECH_STRING_STREAM_H
-#define CETECH_STRING_STREAM_H
+#ifndef CELIB_STRING_STREAM_H
+#define CELIB_STRING_STREAM_H
 
 #include <cstring>
 #include <cstdio>
 
 #include <cetech/celib/array.inl>
 
-namespace cetech {
+namespace celib {
     /// Functions for operating on an Array<char> as a stream of characters,
     /// useful for string formatting, etc.
     namespace string_stream {
@@ -168,4 +168,4 @@ namespace cetech {
         }
     }
 }
-#endif //CETECH_STRING_STREAM_H
+#endif //CELIB_STRING_STREAM_H

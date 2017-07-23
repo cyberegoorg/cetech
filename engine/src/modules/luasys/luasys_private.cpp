@@ -9,9 +9,6 @@ extern "C" {
 }
 
 #include <cetech/celib/allocator.h>
-#include <cetech/celib/math_types.h>
-#include <cetech/celib/vec2f.inl>
-
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/config.h>
@@ -25,6 +22,7 @@ extern "C" {
 
 #include <include/mpack/mpack.h>
 #include <cetech/kernel/errors.h>
+#include <cetech/modules/entity.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_console_srv_a0);
@@ -60,17 +58,13 @@ static struct G {
     lua_State *L;
     uint64_t type_id;
 
-    uint32_t _temp_vec2f_used;
     uint32_t _temp_vec3f_used;
-    uint32_t _temp_vec4f_used;
     uint32_t _temp_mat44f_used;
     uint32_t _temp_quat_used;
 
-    vec2f_t _temp_vec2f_buffer[TEMP_VAR_COUNT];
-    vec3f_t _temp_vec3f_buffer[TEMP_VAR_COUNT];
-    vec4f_t _temp_vec4f_buffer[TEMP_VAR_COUNT];
-    mat44f_t _temp_mat44f_buffer[TEMP_VAR_COUNT];
-    quatf_t _temp_quat_buffer[TEMP_VAR_COUNT];
+    float _temp_vec3f_buffer[TEMP_VAR_COUNT][3];
+    float _temp_mat44f_buffer[TEMP_VAR_COUNT][16];
+    float _temp_quat_buffer[TEMP_VAR_COUNT][3];
 
 } LuaGlobals = {0};
 
@@ -102,29 +96,20 @@ static int require(lua_State *L) {
     return 1;
 }
 
-vec2f_t *_new_tmp_vec2f() {
-    CETECH_ASSERT("lua_enviroment", _G._temp_vec2f_used < 1024);
-    return &_G._temp_vec2f_buffer[_G._temp_vec2f_used++];
-}
 
-vec3f_t *_new_tmp_vec3f() {
+float *_new_tmp_vec3f() {
     CETECH_ASSERT("lua_enviroment", _G._temp_vec3f_used < 1024);
-    return &_G._temp_vec3f_buffer[_G._temp_vec3f_used++];
+    return &_G._temp_vec3f_buffer[3 * _G._temp_vec3f_used++][0];
 }
 
-vec4f_t *_new_tmp_vec4f() {
-    CETECH_ASSERT("lua_enviroment", _G._temp_vec4f_used < 1024);
-    return &_G._temp_vec4f_buffer[_G._temp_vec4f_used++];
-}
-
-mat44f_t *_new_tmp_mat44f() {
+float *_new_tmp_mat44f() {
     CETECH_ASSERT("lua_enviroment", _G._temp_mat44f_used < 1024);
-    return &_G._temp_mat44f_buffer[_G._temp_mat44f_used++];
+    return &_G._temp_mat44f_buffer[16 * _G._temp_mat44f_used++][0];
 }
 
-quatf_t *_new_tmp_quat() {
+float *_new_tmp_quat() {
     CETECH_ASSERT("lua_enviroment", _G._temp_quat_used < 1024);
-    return &_G._temp_quat_buffer[_G._temp_quat_used++];
+    return &_G._temp_quat_buffer[3 * _G._temp_quat_used++][0];
 }
 
 //==============================================================================
@@ -148,9 +133,7 @@ void _game_shutdown_clb() {
 }
 
 void _game_update_clb(float dt) {
-    _G._temp_vec2f_used = 0;
     _G._temp_vec3f_used = 0;
-    _G._temp_vec4f_used = 0;
     _G._temp_mat44f_used = 0;
     _G._temp_quat_used = 0;
 
@@ -172,10 +155,8 @@ static const ct_game_callbacks _GameCallbacks = {
     void _register_lua_##name##_api(ct_api_a0 *api);\
     _register_lua_##name##_api(api);
 
-extern "C" void _register_all_api(ct_api_a0 *api) {
-    REGISTER_LUA_API(vec2f, api);
+void _register_all_api(ct_api_a0 *api) {
     REGISTER_LUA_API(vec3f, api);
-    REGISTER_LUA_API(vec4f, api);
     REGISTER_LUA_API(mat44f, api);
     REGISTER_LUA_API(quatf, api);
     REGISTER_LUA_API(log, api);
@@ -479,72 +460,51 @@ const char *luasys_to_string_l(lua_State *_L,
     return lua_tolstring(_L, i, len);
 }
 
-vec2f_t *luasys_to_vec2f(lua_State *l,
-                         int i) {
-    void *v = lua_touserdata(l, i);
-    return (vec2f_t *) v;
+void luasys_to_vec3f(lua_State *l,
+                     int i,
+                     float *value) {
+    float *v = static_cast<float *>(lua_touserdata(l, i));
+
+    celib::vec3_move(value, v);
 }
 
-vec3f_t *luasys_to_vec3f(lua_State *l,
-                         int i) {
-    void *v = lua_touserdata(l, i);
-    return (vec3f_t *) v;
+void luasys_to_quat(lua_State *l,
+                        int i,float *value) {
+    float *v = static_cast<float *>(lua_touserdata(l, i));
+
+    celib::quat_move(value, v);
 }
 
-vec4f_t *luasys_to_vec4f(lua_State *l,
-                         int i) {
-    void *v = lua_touserdata(l, i);
-    return (vec4f_t *) v;
-}
-
-quatf_t *luasys_to_quat(lua_State *l,
-                        int i) {
-    void *v = lua_touserdata(l, i);
-    return (quatf_t *) v;
-}
-
-void luasys_push_vec2f(lua_State *l,
-                       vec2f_t v) {
-    vec2f_t *tmp_v = _new_tmp_vec2f();
-    *tmp_v = v;
-
-    lua_pushlightuserdata(l, tmp_v);
-}
 
 void luasys_push_vec3f(lua_State *l,
-                       vec3f_t v) {
-    vec3f_t *tmp_v = _new_tmp_vec3f();
-    *tmp_v = v;
+                       float *v) {
 
-    lua_pushlightuserdata(l, tmp_v);
-}
+    float *tmp_v = _new_tmp_vec3f();
 
-void luasys_push_vec4f(lua_State *l,
-                       vec4f_t v) {
-    vec4f_t *tmp_v = _new_tmp_vec4f();
-    *tmp_v = v;
+    celib::vec3_move(tmp_v, v);
 
     lua_pushlightuserdata(l, tmp_v);
 }
 
 void luasys_push_quat(lua_State *l,
-                      quatf_t v) {
-    quatf_t *tmp_v = _new_tmp_quat();
-    *tmp_v = v;
+                      float* v) {
+    float *tmp_v = _new_tmp_quat();
 
-    lua_pushlightuserdata(l, tmp_v);
-}
+    celib::quat_move(tmp_v, v);
 
-mat44f_t *luasys_to_mat44f(lua_State *l,
-                           int i) {
-    void *v = lua_touserdata(l, i);
-    return (mat44f_t *) v;
+    lua_pushlightuserdata(l, tmp_v);}
+
+void luasys_to_mat44f(lua_State *l,
+                           int i, float* value) {
+    const float *v = static_cast<const float *>(lua_topointer(l, i));
+    memcpy(value, v, sizeof(float)* 16);
 }
 
 void luasys_push_mat44f(lua_State *l,
-                        mat44f_t v) {
-    mat44f_t *tmp_v = _new_tmp_mat44f();
-    *tmp_v = v;
+                        float* v) {
+    float *tmp_v = _new_tmp_mat44f();
+
+    memcpy(tmp_v, v, sizeof(float)*16);
 
     lua_pushlightuserdata(l, tmp_v);
 }
@@ -600,97 +560,49 @@ void luasys_add_module_function(const char *module,
 //}
 
 
-int _is_vec2f(lua_State *L,
-                     int idx) {
-    vec2f_t *p = (vec2f_t *) lua_touserdata(L, idx);
-
-    return (p >= _G._temp_vec2f_buffer) &&
-           (p < (_G._temp_vec2f_buffer + 1024));
-}
-
 int _is_vec3f(lua_State *L,
-                     int idx) {
-    vec3f_t *p = (vec3f_t *) lua_touserdata(L, idx);
-    return (p >= _G._temp_vec3f_buffer) &&
-           (p < (_G._temp_vec3f_buffer + 1024));
+              int idx) {
+    float *p = (float*) lua_touserdata(L, idx);
+    return (p >= _G._temp_vec3f_buffer[0]) &&
+           (p < (_G._temp_vec3f_buffer[0] + 1024));
 }
 
-int _is_vec4f(lua_State *L,
-                     int idx) {
-    vec4f_t *p = (vec4f_t *) lua_touserdata(L, idx);
-    return (p >= _G._temp_vec4f_buffer) &&
-           (p < (_G._temp_vec4f_buffer + 1024));
-}
 
 int _is_quat(lua_State *L,
-                    int idx) {
-    quatf_t *p = (quatf_t *) lua_touserdata(L, idx);
-    return (p >= _G._temp_quat_buffer) && (p < (_G._temp_quat_buffer + 1024));
+             int idx) {
+    float *p = (float *) lua_touserdata(L, idx);
+    return (p >= _G._temp_quat_buffer[0]) && (p < (_G._temp_quat_buffer[0] + 1024));
 }
 
 int _is_mat44f(lua_State *L,
-                      int idx) {
-    mat44f_t *p = (mat44f_t *) lua_touserdata(L, idx);
-    return (p >= _G._temp_mat44f_buffer) &&
-           (p < (_G._temp_mat44f_buffer + 1024));
+               int idx) {
+    float *p = (float *) lua_touserdata(L, idx);
+    return (p >= _G._temp_mat44f_buffer[0]) &&
+           (p < (_G._temp_mat44f_buffer[0] + 1024));
 }
 
 static int lightuserdata_add(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_add(L);
-    }
-
     if (_is_vec3f(L, 1)) {
         return _vec3f_add(L);
-    }
-
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_add(L);
-    }
-
-    if (_is_quat(L, 1)) {
-        return _quat_add(L);
     }
 
     return 0;
 }
 
 static int lightuserdata_sub(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_sub(L);
-    }
-
     if (_is_vec3f(L, 1)) {
         return _vec3f_sub(L);
     }
 
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_sub(L);
-    }
 
-    if (_is_quat(L, 1)) {
-        return _quat_sub(L);
-    }
-
-//    if( _is_mat44f(L, p)) {
-//        return _mat44f_add(L);
-//    }
     return 0;
 }
 
 static int lightuserdata_mul(lua_State *L) {
     void *p = lua_touserdata(L, 1);
 
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_mul(L);
-    }
-
     if (_is_vec3f(L, 1)) {
         return _vec3f_mul(L);
-    }
-
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_mul(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -704,21 +616,11 @@ static int lightuserdata_mul(lua_State *L) {
 }
 
 static int lightuserdata_div(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_div(L);
-    }
 
     if (_is_vec3f(L, 1)) {
         return _vec3f_div(L);
     }
 
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_div(L);
-    }
-
-    if (_is_quat(L, 1)) {
-        return _quat_div(L);
-    }
 
 //    if( _is_mat44f(L, p)) {
 //        return _mat44f_add(L);
@@ -727,16 +629,9 @@ static int lightuserdata_div(lua_State *L) {
 }
 
 static int lightuserdata_unm(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_unm(L);
-    }
 
     if (_is_vec3f(L, 1)) {
         return _vec3f_unm(L);
-    }
-
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_unm(L);
     }
 
     if (_is_quat(L, 1)) {
@@ -751,48 +646,30 @@ static int lightuserdata_unm(lua_State *L) {
 }
 
 static int lightuserdata_index(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_index(L);
-    }
 
     if (_is_vec3f(L, 1)) {
         return _vec3f_index(L);
-    }
-
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_index(L);
-    }
-
-    if (_is_quat(L, 1)) {
-        return _quat_index(L);
     }
 
     if (_is_mat44f(L, 1)) {
         return _mat44f_index(L);
     }
 
+    if (_is_quat(L, 1)) {
+        return _quat_index(L);
+    }
+
     return 0;
 }
 
 static int lightuserdata_newindex(lua_State *L) {
-    if (_is_vec2f(L, 1)) {
-        return _vec2f_newindex(L);
-    }
 
     if (_is_vec3f(L, 1)) {
         return _vec3f_newindex(L);
     }
 
-    if (_is_vec4f(L, 1)) {
-        return _vec4f_newindex(L);
-    }
-
     if (_is_quat(L, 1)) {
         return _quat_newindex(L);
-    }
-
-    if (_is_mat44f(L, 1)) {
-        return _mat44f_newindex(L);
     }
 
     return 0;
@@ -836,14 +713,10 @@ static void _init_api(ct_api_a0 *api) {
     _api.to_handler = luasys_to_handler;
     _api.to_string = luasys_to_string;
     _api.to_string_l = luasys_to_string_l;
-    _api.to_vec2f = luasys_to_vec2f;
     _api.to_vec3f = luasys_to_vec3f;
-    _api.to_vec4f = luasys_to_vec4f;
     _api.to_mat44f = luasys_to_mat44f;
     _api.to_quat = luasys_to_quat;
-    _api.push_vec2f = luasys_push_vec2f;
     _api.push_vec3f = luasys_push_vec3f;
-    _api.push_vec4f = luasys_push_vec4f;
     _api.push_mat44f = luasys_push_mat44f;
     _api.push_quat = luasys_push_quat;
     _api.execute_string = luasys_execute_string;
@@ -854,9 +727,7 @@ static void _init_api(ct_api_a0 *api) {
     _api.execute_boot_script = luasys_execute_boot_script;
     _api.call_global = luasys_call_global;
     _api.to_u64 = luasys_to_u64;
-    _api.is_vec2f = _is_vec2f;
     _api.is_vec3f = _is_vec3f;
-    _api.is_vec4f = _is_vec4f;
     _api.is_quat = _is_quat;
     _api.is_mat44f = _is_mat44f;
 

@@ -4,7 +4,6 @@
 
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
-#include <cetech/celib/quatf.inl>
 
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/os.h>
@@ -21,7 +20,7 @@
 
 #include "level_blob.h"
 
-using namespace cetech;
+using namespace celib;
 
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -88,14 +87,14 @@ namespace level_resource {
     void *loader(ct_vio *input,
                  ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
         return data;
     }
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -113,7 +112,7 @@ namespace level_resource {
         resource_offline(name, old_data);
         online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -228,10 +227,13 @@ namespace level {
         uint8_t *data = level_blob::data(res);
 
         ct_entity level_ent = ct_entity_a0.create();
-        ct_transform t = ct_transform_a0.create(world, level_ent,
+        ct_transform t = ct_transform_a0.create(world,
+                                                level_ent,
                                                 {UINT32_MAX},
-                                                {0}, QUATF_IDENTITY,
-                                                {{1.0f, 1.0f, 1.0f}});
+                                                (float[3]) {0.0f},
+                                                (float[4]) {0.0f, 0.0f, 0.0f,
+                                                            1.0f},
+                                                (float[3]) {1.0f, 1.0f, 1.0f});
 
         ct_level level = _new_level(level_ent);
         struct level_instance *instance = get_level_instance(level);
@@ -260,7 +262,7 @@ namespace level {
                              instance->spawned_entity_count);
         ct_entity_a0.destroy(world, &instance->level_entity, 1);
 
-        CETECH_FREE(ct_memory_a0.main_allocator(),
+        CEL_FREE(ct_memory_a0.main_allocator(),
                     instance->spawned_entity);
 
         _destroy_level_instance(instance);

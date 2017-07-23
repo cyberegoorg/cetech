@@ -25,7 +25,7 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Defines
@@ -176,8 +176,8 @@ namespace consoleserver_module {
                                         "Console server rpc addr",
                                         "ws://*:4444");
 
-        _G.cv_log_addr = config.new_str("develop.log.addr",
-                                        "Console server log addr",
+        _G.cv_log_addr = config.new_str("develop.logsystem.addr",
+                                        "Console server logsystem addr",
                                         "ws://*:4445");
 
         _G.cv_push_addr = config.new_str("develop.push.addr", "Push addr", "");

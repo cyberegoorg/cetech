@@ -1,11 +1,11 @@
-#ifndef CETECH_CONTAINER_TYPES_H
-#define CETECH_CONTAINER_TYPES_H
+#ifndef CELIB_CONTAINER_TYPES_H
+#define CELIB_CONTAINER_TYPES_H
 
 #include <cstdint>
 
 struct ct_allocator;
 
-namespace cetech {
+namespace celib {
     template<typename T>
     struct Array {
         Array();
@@ -77,4 +77,4 @@ namespace cetech {
 
 }
 
-#endif //CETECH_CONTAINER_TYPES_H
+#endif //CELIB_CONTAINER_TYPES_H

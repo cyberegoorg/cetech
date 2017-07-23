@@ -14,8 +14,6 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include <cetech/celib/math_types.h>
-
 #include "_machine_enums.h"
 
 struct ct_allocator;
@@ -286,7 +284,7 @@ struct ct_mouse_event {
 
 struct ct_mouse_move_event {
     struct ct_event_header h; //!< Event header
-    vec2f_t pos;       //!< Actual position
+    float pos[2];       //!< Actual position
 };
 
 //! Keyboard event
@@ -300,7 +298,7 @@ struct ct_gamepad_move_event {
     struct ct_event_header h; //!< Event header
     uint8_t gamepad_id;         //!< Gamepad id
     uint32_t axis;              //!< Axis id
-    vec2f_t position;  //!< Position
+    float position[2];  //!< Position
 };
 
 //! Gamepad button event

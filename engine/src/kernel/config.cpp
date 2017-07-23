@@ -82,7 +82,7 @@ void _deallocate_all_string() {
             continue;
         }
 
-        CETECH_FREE(ct_memory_a0.main_allocator(), _G.values[i].s);
+        CEL_FREE(ct_memory_a0.main_allocator(), _G.values[i].s);
     }
 }
 
@@ -131,7 +131,7 @@ namespace config {
         ct_vio *source_vio = ct_vio_a0.from_file(source_path,
                                                  VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char,
+        char *data = CEL_ALLOCATE(a, char,
                                      source_vio->size(source_vio->inst));
 
         size_t size = (size_t) source_vio->size(source_vio->inst);
@@ -143,10 +143,10 @@ namespace config {
         build_vio->write(build_vio->inst, data, sizeof(char), size);
         build_vio->close(build_vio->inst);
 
-        CETECH_FREE(a, data);
-        CETECH_FREE(a, build_path);
-        CETECH_FREE(a, source_path);
-        CETECH_FREE(a, build_dir);
+        CEL_FREE(a, data);
+        CEL_FREE(a, build_path);
+        CEL_FREE(a, source_path);
+        CEL_FREE(a, build_dir);
     }
 
 #endif
@@ -242,7 +242,7 @@ namespace config {
         ct_vio *source_vio = ct_vio_a0.from_file(config_path,
                                                  VIO_OPEN_READ);
 
-        char *data = CETECH_ALLOCATE(a, char,
+        char *data = CEL_ALLOCATE(a, char,
                                      source_vio->size(source_vio->inst));
 
         source_vio->read(source_vio->inst, data,
@@ -453,7 +453,7 @@ namespace config {
         char *_s = _G.values[var.idx].s;
 
         if (_s != NULL) {
-            CETECH_FREE(ct_memory_a0.main_allocator(), _s);
+            CEL_FREE(ct_memory_a0.main_allocator(), _s);
         }
 
         _G.values[var.idx].s = ct_memory_a0.str_dup(s,

@@ -2,8 +2,6 @@ version: 0
 blobs:
     - name: level
       guard_prefix: CETECH
-      includes:
-        - <cetech/celib/math_types.h>
 
       values:
         - uint32_t entities_count

@@ -10,7 +10,7 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/log.h>
-#include <cetech/celib/carray.inl>
+#include <cetech/celib/allocator.h>
 
 #include "../allocator_core_private.h"
 
@@ -20,7 +20,7 @@ char *stacktrace(int skip) {
     auto *a = core_allocator::get();
 
 #if defined(CETECH_LINUX)
-    char *return_str = CETECH_ALLOCATE(a, char, 4096);
+    char *return_str = CEL_ALLOCATE(a, char, 4096);
     return_str[0] = '\0';
 
     void *array[50];
@@ -65,14 +65,14 @@ char *stacktrace(int skip) {
         }
     }
 
-    CETECH_FREE(a, messages);
+    CEL_FREE(a, messages);
     return return_str;
 #endif
 }
 
 void stacktrace_free(char *st) {
     auto *a = core_allocator::get();
-    CETECH_FREE(a, st);
+    CEL_FREE(a, st);
 }
 
 CETECH_DECL_API(ct_log_a0);

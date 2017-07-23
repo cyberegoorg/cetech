@@ -14,7 +14,7 @@ struct ct_renderer_a0 {
 
     void (*set_debug)(int debug);
 
-    vec2f_t (*get_size)();
+    void (*get_size)(int width, int height);
 
     void (*render_world)(struct ct_world world,
                          struct ct_camera camera,

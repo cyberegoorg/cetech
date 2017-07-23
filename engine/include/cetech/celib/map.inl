@@ -3,13 +3,13 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-#ifndef CETECH_MAP2_H
-#define CETECH_MAP2_H
+#ifndef CELIB_MAP2_H
+#define CELIB_MAP2_H
 
 #include "container_types.inl"
 #include "array.inl"
 
-namespace cetech {
+namespace celib {
 
     /// The map function stores its data in a "list-in-an-array" where
     /// indices are used instead of pointers.
@@ -435,4 +435,4 @@ namespace cetech {
 }
 
 
-#endif //CETECH_MAP2_H
+#endif //CELIB_MAP2_H

@@ -12,8 +12,6 @@ extern "C" {
 // Includes
 //==============================================================================
 
-#include <cetech/celib/math_types.h>
-
 //==============================================================================
 // Api
 //==============================================================================
@@ -66,8 +64,8 @@ struct ct_gamepad_a0 {
     //! Return axis value
     //! \param axis_index Axis index
     //! \return Axis value
-    vec2f_t (*axis)(uint32_t idx,
-                    const uint32_t axis_index);
+    void (*axis)(uint32_t idx,
+                 const uint32_t axis_index, float* value);
 
     //! Play rumble
     //! \param gamepad Gamepad
@@ -164,8 +162,8 @@ struct ct_mouse_a0 {
     //! Return axis value
     //! \param axis_index Axis index
     //! \return Axis value
-    vec2f_t (*axis)(uint32_t idx,
-                    const uint32_t axis_index);
+    void (*axis)(uint32_t idx,
+                    const uint32_t axis_index, float* value);
 
     void (*update)();
 };

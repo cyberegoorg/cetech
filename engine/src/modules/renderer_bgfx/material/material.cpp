@@ -14,7 +14,6 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/errors.h>
-#include <cetech/kernel/yaml.h>
 
 
 #include <cetech/modules/resource.h>
@@ -32,7 +31,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 namespace material_compiler {
     int init(ct_api_a0 *api);
@@ -45,7 +44,7 @@ namespace material_compiler {
 #define LOG_WHERE "material"
 
 #define _get_resorce(idx) (_G.instance_data[_G.instance_offset[(idx)]])
-#define material_blob_uniform_bgfx(r)    ((bgfx::UniformHandle*) ((material_blob::vec4f_value(r)+((r)->vec4f_count))))
+#define material_blob_uniform_bgfx(r)    ((bgfx::UniformHandle*) ((material_blob::mat44f_value(r)+((r)->mat44f_count*16))))
 
 //==============================================================================
 // GLobals
@@ -86,14 +85,14 @@ namespace material_resource {
     void *loader(ct_vio *input,
                  ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
         return data;
     }
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -112,7 +111,7 @@ namespace material_resource {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
         return new_data;
     }
 
@@ -258,50 +257,10 @@ namespace material {
         u_texture[slot_idx] = texture;
     }
 
-    void set_vec4f(ct_material material,
-                   const char *slot,
-                   vec4f_t v) {
-
-        uint32_t idx = map::get(_G.instace_map, material.idx,
-                                UINT32_MAX);
-
-        if (idx == UINT32_MAX) {
-            return;
-        }
-
-        auto resource = material_blob::get(&_get_resorce(idx));
-
-        vec4f_t *u_vec4f = material_blob::vec4f_value(resource);
-
-        int slot_idx = _material_find_slot(resource, slot);
-
-        u_vec4f[slot_idx - (resource->texture_count)] = v;
-    }
-
-    void set_mat33f(ct_material material,
-                    const char *slot,
-                    mat33f_t v) {
-
-        uint32_t idx = map::get(_G.instace_map, material.idx,
-                                UINT32_MAX);
-
-        if (idx == UINT32_MAX) {
-            return;
-        }
-
-        auto resource = material_blob::get(&_get_resorce(idx));
-
-        mat33f_t *u_mat33f = material_blob::mat33f_value(resource);
-
-        int slot_idx = _material_find_slot(resource, slot);
-
-        u_mat33f[slot_idx -
-                 (resource->texture_count + resource->vec4f_count)] = v;
-    }
 
     void set_mat44f(ct_material material,
                     const char *slot,
-                    mat44f_t v) {
+                    float *value) {
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -311,12 +270,14 @@ namespace material {
 
         auto resource = material_blob::get(&_get_resorce(idx));
 
-        mat44f_t *u_mat44f = material_blob::mat44f_value(resource);
+        float *u_mat44f = material_blob::mat44f_value(resource);
 
         int slot_idx = _material_find_slot(resource, slot);
 
-        u_mat44f[slot_idx - (resource->texture_count + resource->vec4f_count +
-                             resource->mat33f_count)] = v;
+
+        memcpy(&u_mat44f[16*(slot_idx -
+                         (resource->texture_count + resource->vec4f_count +
+                          resource->mat33f_count))], value, sizeof(float) * 16);
     }
 
 
@@ -331,12 +292,11 @@ namespace material {
         auto resource = material_blob::get(&_get_resorce(idx));
 
         uint64_t *u_texture = material_blob::texture_names(resource);
-        vec4f_t *u_vec4f = material_blob::vec4f_value(resource);
-        mat33f_t *u_mat33f = material_blob::mat33f_value(resource);
-        mat44f_t *u_mat44f = material_blob::mat44f_value(resource);
+        float *u_vec4f = material_blob::vec4f_value(resource);
+        float *u_mat33f = material_blob::mat33f_value(resource);
+        float *u_mat44f = material_blob::mat44f_value(resource);
 
         bgfx::UniformHandle *u_handler = material_blob_uniform_bgfx(resource);
-
 
         // TODO: refactor: one loop
         uint32_t offset = 0;
@@ -346,20 +306,18 @@ namespace material {
         }
         offset += resource->texture_count;
 
-
         for (int i = 0; i < resource->vec4f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_vec4f[i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_vec4f[4*i], 1);
         }
         offset += resource->vec4f_count;
 
-
         for (int i = 0; i < resource->mat33f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_mat33f[i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_mat33f[9*i], 1);
         }
         offset += resource->mat33f_count;
 
         for (int i = 0; i < resource->mat44f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_mat44f[i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_mat44f[16*i], 1);
         }
         offset += resource->mat44f_count;
 
@@ -369,7 +327,7 @@ namespace material {
                           | BGFX_STATE_ALPHA_WRITE
                           | BGFX_STATE_DEPTH_TEST_LESS
                           | BGFX_STATE_DEPTH_WRITE
-                          | BGFX_STATE_CULL_CCW
+                          | BGFX_STATE_CULL_CW
                           | BGFX_STATE_MSAA
         );
 

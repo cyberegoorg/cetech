@@ -8,7 +8,7 @@ namespace resource_lua {
     void *loader(struct ct_vio *input,
                  struct ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
 
         return data;
@@ -16,7 +16,7 @@ namespace resource_lua {
 
     void unloader(void *new_data,
                   struct ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -32,7 +32,7 @@ namespace resource_lua {
                    void *old_data,
                    void *new_data,
                    struct ct_allocator *allocator) {
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         struct lua_resource *resource = (lua_resource *) new_data;
         char *data = (char *) (resource + 1);

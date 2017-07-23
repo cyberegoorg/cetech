@@ -59,8 +59,8 @@ struct ct_camera_a0 {
     //! \param proj Project matrix
     //! \param view View Matrix
     void (*get_project_view)(struct ct_camera camera,
-                             mat44f_t *proj,
-                             mat44f_t *view);
+                             float *proj,
+                             float *view);
 
 
     //! Get camera component

@@ -22,5 +22,5 @@ __pycache__
 *.iml
 
 perf.data*
-log.db
+logsystem.db
 /TODO.md

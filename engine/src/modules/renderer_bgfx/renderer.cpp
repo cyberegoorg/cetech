@@ -2,7 +2,6 @@
 // includes
 //==============================================================================
 
-#include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 
 #include <cetech/modules/application.h>
@@ -111,11 +110,11 @@ void renderer_render_world(ct_world world,
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x66CCFFff, 1.0f,
                        0);
 
-    mat44f_t view_matrix;
-    mat44f_t proj_matrix;
+    float view_matrix[16];
+    float proj_matrix[16];
 
-    camera_api->get_project_view(camera, &proj_matrix, &view_matrix);
-    bgfx::setViewTransform(0, view_matrix.f, proj_matrix.f);
+    camera_api->get_project_view(camera, proj_matrix, view_matrix);
+    bgfx::setViewTransform(0, view_matrix, proj_matrix);
 
     bgfx::setViewRect(0, 0, 0, (uint16_t) _G.size_width,
                       (uint16_t) _G.size_height);
@@ -130,13 +129,9 @@ void renderer_render_world(ct_world world,
     ct_window_a0.update(ct_app_a0.main_window());
 }
 
-vec2f_t renderer_get_size() {
-    vec2f_t result;
-
-    result.x = _G.size_width;
-    result.y = _G.size_height;
-
-    return result;
+void renderer_get_size(int *width, int *height) {
+    *width = _G.size_width;
+    *height = _G.size_height;
 }
 
 namespace renderer_module {
@@ -151,8 +146,6 @@ namespace renderer_module {
             .resource_create = material::create,
             .get_texture_count = material::get_texture_count,
             .set_texture = material::set_texture,
-            .set_vec4f = material::set_vec4f,
-            .set_mat33f = material::set_mat33f,
             .set_mat44f = material::set_mat44f,
             .use = material::use,
             .submit = material::submit

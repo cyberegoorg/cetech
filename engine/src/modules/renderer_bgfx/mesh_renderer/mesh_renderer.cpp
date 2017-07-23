@@ -1,6 +1,5 @@
 #include <cetech/celib/array.inl>
 #include <cetech/celib/map.inl>
-#include <cetech/celib/mat44f.inl>
 
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
@@ -19,6 +18,7 @@
 #include "../scene/scene.h"
 
 #include <bgfx/bgfx.h>
+#include <cetech/celib/fpumath.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_scenegprah_a0);
@@ -28,7 +28,7 @@ CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 #define LOG_WHERE "mesh_renderer"
 #define hash_combine(a, b) ((a * 11)^(b))
@@ -73,7 +73,7 @@ namespace {
                 + sizeof(ct_material)
         );
 
-        new_data.buffer = CETECH_ALLOCATE(_allocator, char, bytes);
+        new_data.buffer = CEL_ALLOCATE(_allocator, char, bytes);
         new_data.n = _data.n;
         new_data.allocated = sz;
 
@@ -90,7 +90,7 @@ namespace {
         memcpy(new_data.material, _data.material,
                _data.n * sizeof(ct_material));
 
-        CETECH_FREE(_allocator, _data.buffer);
+        CEL_FREE(_allocator, _data.buffer);
 
         _data = new_data;
     }
@@ -147,7 +147,7 @@ namespace {
 
         ct_world last_world = _G.world_instances[last_idx].world;
 
-        CETECH_FREE(ct_memory_a0.main_allocator(),
+        CEL_FREE(ct_memory_a0.main_allocator(),
                     _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -300,21 +300,28 @@ void mesh_render_all(ct_world world) {
         ct_entity ent = data->entity[i];
 
         ct_transform t = ct_transform_a0.get(world, ent);
-        mat44f_t t_w = *ct_transform_a0.get_world_matrix(t);
+
+        float wm[16];
+
+        ct_transform_a0.get_world_matrix(t, wm);
+
         //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
-        mat44f_t node_w = MAT44F_INIT_IDENTITY;
-        mat44f_t final_w = MAT44F_INIT_IDENTITY;
+        float node_w[16];
+        float final_w[16];
+
+        celib::mat4_identity(node_w);
+        celib::mat4_identity(final_w);
 
         if (ct_scenegprah_a0.has(world, ent)) {
             uint64_t name = scene::get_mesh_node(scene, geom);
             if (name != 0) {
                 ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,
                                                                 name);
-                node_w = *ct_scenegprah_a0.get_world_matrix(n);
+                ct_scenegprah_a0.get_world_matrix(n, node_w);
             }
         }
 
-        mat44f_mul(&final_w, &node_w, &t_w);
+        celib::mat4_mul(final_w, node_w, wm);
 
         bgfx::setTransform(&final_w, 1);
 

@@ -1,8 +1,10 @@
-#ifndef CETECH_ALLOCATOR_H
-#define CETECH_ALLOCATOR_H
+#ifndef CELIB_ALLOCATOR_H
+#define CELIB_ALLOCATOR_H
 
 #include <stdint.h>
 #include <stddef.h>
+
+#include "macros.h"
 
 #ifdef __cplusplus
 
@@ -14,26 +16,27 @@
 // Defines
 //==============================================================================
 
-enum {
-    CETECH_SIZE_NOT_TRACKED = 0xffffffffu
-};
-
-#define CETECH_ALLOCATE(a, T, size) (T*)((a)->reallocate((a)->inst,          \
+#define CEL_ALLOCATE(a, T, size) (T*)((a)->reallocate((a)->inst,             \
                                                           NULL,              \
                                                           size,              \
-                                                          CETECH_ALIGNOF(T)))
+                                                          CEL_ALIGNOF(T)))
 
-#define CETECH_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->reallocate((a)->inst, \
-                                                          NULL,                  \
-                                                          size,                  \
+#define CEL_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->reallocate((a)->inst, \
+                                                          NULL,               \
+                                                          size,               \
                                                           align))
 
-#define CETECH_FREE(a, p) ((a)->reallocate((a)->inst,p,0,0))
+#define CEL_FREE(a, p) ((a)->reallocate((a)->inst,p,0,0))
 
-#define CETECH_NEW(a, T, ...) (new (CETECH_ALLOCATE_ALIGN(a, T, sizeof(T), \
-                                    CETECH_ALIGNOF(T))) T(__VA_ARGS__))
+#define CEL_NEW(a, T, ...) (new (CEL_ALLOCATE_ALIGN(a, T, sizeof(T), \
+                                    CEL_ALIGNOF(T))) T(__VA_ARGS__))
 
-#define CETECH_DELETE(a, T, p) do { if (p) {(p)->~T(); CETECH_FREE(a,p);}} while (0)
+#define CEL_DELETE(a, T, p) do { if (p) {(p)->~T(); CEL_FREE(a,p);}} while (0)
+
+
+enum {
+    CELIB_SIZE_NOT_TRACKED = 0xffffffffu
+};
 
 //==============================================================================
 // Defines
@@ -71,4 +74,4 @@ struct ct_allocator {
 };
 
 
-#endif //CETECH_ALLOCATOR_H
+#endif //CELIB_ALLOCATOR_H

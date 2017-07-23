@@ -17,7 +17,7 @@
 #define is_button_down(now, last) ((now) && !(last))
 #define is_button_up(now, last)   (!(now) && (last))
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Globals
@@ -30,7 +30,7 @@ static struct G {
     SDL_GameController *controller[GAMEPAD_MAX];
     SDL_Haptic *haptic[GAMEPAD_MAX];
 
-    vec2f_t position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX];
+    float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {0};
 
@@ -136,7 +136,7 @@ static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
 
 void sdl_gamepad_process(EventStream &stream) {
     int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {0};
-    vec2f_t curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX] = {0};
+    float curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX][2] = {0};
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         if (_G.controller[i] == NULL) {
@@ -158,10 +158,8 @@ void sdl_gamepad_process(EventStream &stream) {
             float x_norm = x * coef;
             float y_norm = y * coef;
 
-            curent_pos[i][j] = (vec2f_t) {
-                    .x = x_norm,
-                    .y = -y_norm,
-            };
+            curent_pos[i][j][0] = x_norm;
+            curent_pos[i][j][1] = -y_norm;
         }
     }
 
@@ -189,16 +187,17 @@ void sdl_gamepad_process(EventStream &stream) {
             event.gamepad_id = i;
             event.axis = j;
 
-            vec2f_t pos = curent_pos[i][j];
+            float pos[2] = {curent_pos[i][j][0], curent_pos[i][j][1]};
 
 
-            if ((pos.x != _G.position[i][j].x) ||
-                (pos.y != _G.position[i][j].y)) {
+            if ((pos[0] != _G.position[i][j][0]) ||
+                (pos[1] != _G.position[i][j][1])) {
 
-                _G.position[i][j].x = pos.x;
-                _G.position[i][j].y = pos.y;
+                _G.position[i][j][0] = pos[0];
+                _G.position[i][j][1] = pos[1];
 
-                event.position = pos;
+                event.position[0] = pos[0];
+                event.position[1] = pos[1];
 
                 eventstream::push(stream, EVENT_GAMEPAD_MOVE, event);
             }

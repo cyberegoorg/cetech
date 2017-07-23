@@ -20,6 +20,8 @@ struct ct_keyboard_a0 {
 };
 ]]
 
+local api = api_system.load("ct_keyboard_a0")
+
 --! #### Example
 --!
 --! Press `q` to quit application.
@@ -51,6 +53,7 @@ struct ct_keyboard_a0 {
 --! * `lalt`, `ralt`
 --!
 Keyboard = {}
+
 
 function Keyboard.button_index(name)
     return api.button_index(name)

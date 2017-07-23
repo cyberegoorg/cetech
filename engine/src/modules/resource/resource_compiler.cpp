@@ -21,7 +21,7 @@
 #include <cetech/celib/string_stream.h>
 
 
-using namespace cetech;
+using namespace celib;
 using namespace string_stream;
 
 CETECH_DECL_API(ct_memory_a0);
@@ -89,7 +89,7 @@ void _add_dependency(const char *who_filename,
 
     builddb_set_file(depend_on_filename, ct_path_a0.file_mtime(path));
 
-    CETECH_FREE(a, path);
+    CEL_FREE(a, path);
 }
 
 static ct_compilator_api _compilator_api = {
@@ -118,7 +118,7 @@ static void _compile_task(void *data) {
                         tdata->source_filename);
     }
 
-    CETECH_FREE(ct_memory_a0.main_scratch_allocator(),
+    CEL_FREE(ct_memory_a0.main_scratch_allocator(),
                 tdata->source_filename);
 
     tdata->source->close(tdata->source->inst);
@@ -196,14 +196,14 @@ void _compile_dir(Array<ct_task_item> &tasks,
         ct_vio *build_vio = ct_vio_a0.from_file(build_path,
                                                 VIO_OPEN_WRITE);
 
-        CETECH_FREE(a, build_path);
+        CEL_FREE(a, build_path);
 
         if (build_vio == NULL) {
             continue;
         }
 
         struct compile_task_data *data =
-                CETECH_ALLOCATE(
+                CEL_ALLOCATE(
                         ct_memory_a0.main_allocator(),
                         struct compile_task_data,
                         sizeof(struct compile_task_data));
@@ -273,8 +273,8 @@ static void _init(ct_api_a0 *api) {
 
     ct_path_a0.make_path(tmp_dir_full);
 
-    CETECH_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
-    CETECH_FREE(ct_memory_a0.main_allocator(), build_dir_full);
+    CEL_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
+    CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 }
 
 static void _shutdown() {
@@ -291,7 +291,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
     ct_path_a0.make_path(build_dir_full);
 
-    CETECH_FREE(ct_memory_a0.main_allocator(), build_dir_full);
+    CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 }
 
 void resource_compiler_register(uint64_t type,
@@ -330,10 +330,10 @@ void resource_compiler_compile_all() {
         compile_task_data *data = (compile_task_data *) tasks[i].data;
 
         ct_task_a0.wait_atomic(&data->completed, 0);
-        CETECH_FREE(ct_memory_a0.main_allocator(), data);
+        CEL_FREE(ct_memory_a0.main_allocator(), data);
     }
 
-    CETECH_FREE(ct_memory_a0.main_allocator(), build_dir_full);
+    CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 }
 
 int resource_compiler_get_filename(char *filename,
@@ -372,7 +372,7 @@ char *resource_compiler_external_join(ct_allocator *alocator,
 
     string_stream::Buffer buffer(alocator);
     string_stream::printf(buffer, "%s64", tmp_dir);
-    CETECH_FREE(alocator, tmp_dir);
+    CEL_FREE(alocator, tmp_dir);
 
     string_stream::c_str(buffer);
     return ct_path_a0.join(alocator, 4, string_stream::c_str(buffer), "release",

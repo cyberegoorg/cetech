@@ -12,22 +12,22 @@ struct ct_scenegprah_a0 {
 
     int (*is_valid)(struct ct_scene_node node);
 
-    vec3f_t (*get_position)(struct ct_scene_node node);
+    void (*get_position)(struct ct_scene_node node, float *value);
 
-    quatf_t (*get_rotation)(struct ct_scene_node node);
+    void (*get_rotation)(struct ct_scene_node node, float *value);
 
-    vec3f_t (*get_scale)(struct ct_scene_node node);
+    void (*get_scale)(struct ct_scene_node node, float *value);
 
-    mat44f_t *(*get_world_matrix)(struct ct_scene_node node);
+    void *(*get_world_matrix)(struct ct_scene_node node, float *value);
 
     void (*set_position)(struct ct_scene_node node,
-                         vec3f_t pos);
+                         float* pos);
 
     void (*set_rotation)(struct ct_scene_node node,
-                         quatf_t rot);
+                         float* rot);
 
     void (*set_scale)(struct ct_scene_node node,
-                      vec3f_t scale);
+                      float* scale);
 
     int (*has)(struct ct_world world,
                struct ct_entity entity);
@@ -39,7 +39,7 @@ struct ct_scenegprah_a0 {
                                    struct ct_entity entity,
                                    uint64_t *names,
                                    uint32_t *parent,
-                                   mat44f_t *pose,
+                                   float *pose,
                                    uint32_t count);
 
     void (*link)(struct ct_scene_node parent,
@@ -70,37 +70,43 @@ function SceneGraph.has(world, entity)
 end
 
 function SceneGraph.get_position(scene_node)
-    local p = api.get_position(scene_node)
+    local p = ffi.new("float[3]")
 
-    return cetech.Vec3f.make(p.x, p.y, p.z)
+    api.get_position(scene_node, p)
+
+    return cetech.Vec3f.make(p[0], p[1], p[2])
 end
 
 function SceneGraph.get_rotation(scene_node)
-    local r = api.get_rotation(scene_node)
+    local p = ffi.new("float[4]")
 
-    return cetech.Quatf.make(r.x, r.y, r.z, r.w)
+    api.get_rotation(scene_node, p)
+
+    return cetech.Quatf.make(p[0], p[1], p[2], p[3])
 end
 
 function SceneGraph.get_scale(scene_node)
-    local s = api.get_scale(scene_node)
+    local p = ffi.new("float[3]")
 
-    return cetech.Vec3f.make(s.x, s.y, s.z)
+    api.get_scale(scene_node, p)
+
+    return cetech.Vec3f.make(p[0], p[1], p[2])
 end
 
 function SceneGraph.set_position(scene_node, position)
-    local p = ffi.new("struct vec3f_s", { position.x, position.y, position.z })
+    local p = ffi.new("float[3]", { position.x, position.y, position.z })
 
     api.set_position(scene_node, p)
 end
 
 function SceneGraph.set_rotation(scene_node, rotation)
-    local r = ffi.new("struct vec4f_s", {{ rotation.x, rotation.y, rotation.z, rotation.w }})
+    local r = ffi.new("float[4]", { rotation.x, rotation.y, rotation.z, rotation.w })
 
     api.set_rotation(scene_node, r)
 end
 
 function SceneGraph.set_scale(scene_node, scale)
-    local s = ffi.new("struct vec3f_s", { scale.x, scale.y, scale.z })
+    local s = ffi.new("float[3]", { scale.x, scale.y, scale.z })
 
     api.set_scale(scene_node, s)
 end

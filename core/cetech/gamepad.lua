@@ -22,8 +22,8 @@ struct ct_gamepad_a0 {
 
     const char *(*axis_name)(const uint32_t axis_index);
 
-    vec2f_t (*axis)(uint32_t idx,
-                    const uint32_t axis_index);
+    void (*axis)(uint32_t idx,
+                    const uint32_t axis_index, float* value);
 
     void (*play_rumble)(uint32_t idx,
                         float strength,
@@ -99,9 +99,10 @@ function Gamepad.axis_name(index)
 end
 
 function Gamepad.axis(controler, index)
-    a = api.axis(controler, index)
+    local p = ffi.new("float[3]")
+    api.axis(controler, index, p)
 
-    return cetech.Vec2f.make(a.x, a.y)
+    return cetech.Vec3f.make(p[0], p[1], 0.0)
 end
 
 function Gamepad.play_rumble(controler, strength, length)

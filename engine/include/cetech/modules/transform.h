@@ -12,7 +12,6 @@ extern "C" {
 //==============================================================================
 
 #include <stdint.h>
-#include <cetech/celib/math_types.h>
 
 struct ct_world;
 struct ct_entity;
@@ -44,52 +43,52 @@ struct ct_transform_a0 {
     //! \param transform Transform
     //! \param parent Parent matrix
     void (*transform)(struct ct_transform transform,
-                      mat44f_t *parent);
+                      float *parent);
 
     //! Get transform position
     //! \param world World
     //! \param transform transform
     //! \return Position
-    vec3f_t (*get_position)(struct ct_transform transform);
+    void (*get_position)(struct ct_transform transform, float* position);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
-    quatf_t (*get_rotation)(struct ct_transform transform);
+    void (*get_rotation)(struct ct_transform transform, float* rotation);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
-    vec3f_t (*get_scale)(struct ct_transform transform);
+    void (*get_scale)(struct ct_transform transform, float* scale);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
-    mat44f_t *(*get_world_matrix)(struct ct_transform transform);
+    void (*get_world_matrix)(struct ct_transform transform, float* matrix);
 
     //! Set position
     //! \param world World
     //! \param transform transform
     //! \param pos Position
     void (*set_position)(struct ct_transform transform,
-                         vec3f_t pos);
+                         float* position);
 
     //! Set rotation
     //! \param world World
     //! \param transform transform
     //! \param rot Rotation
     void (*set_rotation)(struct ct_transform transform,
-                         quatf_t rot);
+                         float* rotation);
 
     //! Set scale
     //! \param world World
     //! \param transform transform
     //! \param scale Scale
     void (*set_scale)(struct ct_transform transform,
-                      vec3f_t scale);
+                      float* scale);
 
     //! Has entity scene-graph component?
     //! \param world World
@@ -116,9 +115,9 @@ struct ct_transform_a0 {
     struct ct_transform (*create)(struct ct_world world,
                                   struct ct_entity entity,
                                   struct ct_entity parent,
-                                  vec3f_t position,
-                                  quatf_t rotation,
-                                  vec3f_t scale);
+                                  float* position,
+                                  float* rotation,
+                                  float* scale);
 
     //! Link two transform
     //! \param world World

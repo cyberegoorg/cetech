@@ -11,6 +11,8 @@
 #include "../modules/static_module.h"
 #include "allocator_core_private.h"
 
+#include <cetech/celib/fpumath.h>
+
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_task_a0);
 
@@ -66,7 +68,7 @@ extern "C" void init_core(ct_api_a0 *api) {
 
     LOAD_STATIC_MODULE(api, hashlib);
 
-    log::register_api(api);
+    logsystem::register_api(api);
     core_allocator::register_api(api);
     memory::register_api(api);
     application_register_api(api);
@@ -88,7 +90,7 @@ extern "C" int cetech_kernel_init(int argc,
                        const char **argv) {
     auto *core_alloc = core_allocator::get();
 
-    log::init();
+    logsystem::init();
     api::init(core_alloc);
     ct_api_a0 *api = api::v0();
 
@@ -97,7 +99,7 @@ extern "C" int cetech_kernel_init(int argc,
     init_core(api);
     config::init(api);
 
-    log::logdb_init_db(".", api);
+    logsystem::logdb_init_db(".", api);
     load_config(argc, argv);
 
     load_core();
@@ -123,7 +125,7 @@ extern "C" int cetech_kernel_shutdown() {
     module::shutdown();
     api::shutdown();
     memory::memsys_shutdown();
-    log::shutdown();
+    logsystem::shutdown();
 
     return 1;
 }

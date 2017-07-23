@@ -18,7 +18,7 @@
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_log_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Extern functions

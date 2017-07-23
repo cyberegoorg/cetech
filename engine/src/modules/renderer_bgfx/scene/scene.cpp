@@ -19,7 +19,7 @@
 
 #include "scene_blob.h"
 
-using namespace cetech;
+using namespace celib;
 
 namespace scene_resource_compiler {
     int init(ct_api_a0 *api);
@@ -124,14 +124,14 @@ namespace scene_resource {
     void *loader(ct_vio *input,
                  ct_allocator *allocator) {
         const int64_t size = input->size(input->inst);
-        char *data = CETECH_ALLOCATE(allocator, char, size);
+        char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
         return data;
     }
 
     void unloader(void *new_data,
                   ct_allocator *allocator) {
-        CETECH_FREE(allocator, new_data);
+        CEL_FREE(allocator, new_data);
     }
 
     void online(uint64_t name,
@@ -184,7 +184,7 @@ namespace scene_resource {
         offline(name, old_data);
         online(name, new_data);
 
-        CETECH_FREE(allocator, old_data);
+        CEL_FREE(allocator, old_data);
 
         return new_data;
     }
@@ -258,7 +258,7 @@ namespace scene {
 
         uint64_t *node_name = scene_blob::node_name(res);
         uint32_t *node_parent = scene_blob::node_parent(res);
-        mat44f_t *node_pose = scene_blob::node_pose(res);
+        float *node_pose = scene_blob::node_pose(res);
 
         ct_scenegprah_a0.create(world,
                                 entity,

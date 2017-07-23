@@ -27,7 +27,7 @@ void vlog(const enum ct_log_level level,
           const char *format,
           va_list va) {
 
-    //CE_ASSERT("log", _globals.data != nullptr);
+    //CE_ASSERT("logsystem", _globals.data != nullptr);
 
     char msg[4096];     //!< Final msg.
     vsnprintf(msg, 4096, format, va);
@@ -40,7 +40,7 @@ void vlog(const enum ct_log_level level,
     }
 }
 
-namespace log {
+namespace logsystem {
 
     void log_info_va(const char *where,
                      const char *format,
@@ -132,8 +132,8 @@ namespace log {
     }
 
     static ct_log_a0 log_a0 = {
-            .set_wid_clb = log::set_wid_clb,
-            .register_handler = log::log_register_handler,
+            .set_wid_clb = logsystem::set_wid_clb,
+            .register_handler = logsystem::log_register_handler,
             .info_va = log_info_va,
             .info = log_info,
             .warning_va = log_warning_va,

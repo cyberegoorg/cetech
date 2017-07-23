@@ -8,7 +8,7 @@
 #include <cetech/kernel/os.h>
 #include <cetech/kernel/api_system.h>
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Defines

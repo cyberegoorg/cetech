@@ -100,12 +100,10 @@ set(SOURCE_FILES
         ########################################################################
 
         engine/src/modules/luasys/luasys_private.cpp
-        engine/src/modules/luasys/api/api_log.c
-        engine/src/modules/luasys/api/api_vec2f.c
-        engine/src/modules/luasys/api/api_vec3f.c
-        engine/src/modules/luasys/api/api_vec4f.c
-        engine/src/modules/luasys/api/api_quatf.c
-        engine/src/modules/luasys/api/api_mat44f.c
+        engine/src/modules/luasys/api/api_log.cpp
+        engine/src/modules/luasys/api/api_vec3f.cpp
+        engine/src/modules/luasys/api/api_quatf.cpp
+        engine/src/modules/luasys/api/api_mat44f.cpp
 
         engine/src/modules/resource/resource.cpp
         engine/src/modules/resource/resource_package.cpp

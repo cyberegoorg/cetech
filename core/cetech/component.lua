@@ -30,8 +30,8 @@ struct ct_property_value {
         int b;
         float f;
         const char *str;
-        vec3f_t vec3f;
-        quatf_t quatf;
+        float vec3f[3];
+        float quatf[4];
         uint64_t strid_64;
     } value;
 };
@@ -120,9 +120,9 @@ function Component.set_property(world, entity, component_type, key, value)
         prop_value = ffi.new("struct ct_property_value", { C.PROPERTY_BOOL, { b=value }})
     else
         if cetech.Vec3f.is(value) then
-            prop_value = ffi.new("struct ct_property_value", { C.PROPERTY_VEC3, { vec3f=ffi.cast("vec3f_t*", value)[0] }})
+            prop_value = ffi.new("struct ct_property_value", { C.PROPERTY_VEC3, { vec3f=ffi.cast("float*", value)[0] }})
         elseif cetech.Quatf.is(value) then
-            prop_value = ffi.new("struct ct_property_value", { C.PROPERTY_QUATF, { quatf=ffi.cast("quatf_t*", value)[0] }})
+            prop_value = ffi.new("struct ct_property_value", { C.PROPERTY_QUATF, { quatf=ffi.cast("float*", value)[0] }})
         end
     end
 
@@ -146,11 +146,11 @@ function Component.get_property(world, entity, component_type, key)
 
     elseif prop_value.type == C.PROPERTY_VEC3 then
         local v = prop_value.value.vec3f
-        return cetech.Vec3f.make(v.x, v.y, v.z)
+        return cetech.Vec3f.make(v[0], v[1], v[2])
 
     elseif prop_value.type == C.PROPERTY_QUATF then
         local q = prop_value.value.quatf
-        return cetech.Quatf.make(q.x, q.y, q.z, q.w)
+        return cetech.Quatf.make(q[0], q[1], q[2], q[3])
     end
 end
 

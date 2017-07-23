@@ -33,7 +33,7 @@ void *malloc_allocator_allocate(allocator_instance *allocator,
 
     if (size) {
         const uint32_t ts = size_with_padding(size, align);
-        Header *h = CETECH_ALLOCATE(core_alloc, Header, ts);
+        Header *h = CEL_ALLOCATE(core_alloc, Header, ts);
 
         void *p = data_pointer(h, align);
         fill(h, p, ts);
@@ -52,7 +52,7 @@ void *malloc_allocator_allocate(allocator_instance *allocator,
 
         memory::allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, ptr);
 
-        CETECH_FREE(core_alloc, h);
+        CEL_FREE(core_alloc, h);
 
         return NULL;
     }
@@ -72,10 +72,10 @@ namespace memory {
     ct_allocator *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
 
-        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator,
+        auto *a = CEL_ALLOCATE(core_alloc, ct_allocator,
                                   sizeof(ct_allocator));
 
-        struct allocator_malloc *m = CETECH_ALLOCATE(core_alloc,
+        struct allocator_malloc *m = CEL_ALLOCATE(core_alloc,
                                                      allocator_malloc,
                                                      sizeof(allocator_malloc));
         m->total_allocated = 0;
@@ -96,8 +96,8 @@ namespace memory {
 
         memory::allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
-        CETECH_FREE(core_alloc, m);
-        CETECH_FREE(core_alloc, a);
+        CEL_FREE(core_alloc, m);
+        CEL_FREE(core_alloc, a);
     }
 }
 

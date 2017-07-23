@@ -1,6 +1,5 @@
 #include <cetech/celib/map.inl>
 
-#include <cetech/celib/mat44f.inl>
 #include <cetech/kernel/yaml.h>
 #include <cetech/kernel/hash.h>
 #include <cetech/kernel/config.h>
@@ -13,6 +12,7 @@
 
 #include <cetech/modules/renderer.h>
 #include <cetech/modules/transform.h>
+#include <cetech/celib/fpumath.h>
 
 #include "cetech/modules/camera.h"
 
@@ -23,7 +23,7 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-using namespace cetech;
+using namespace celib;
 
 namespace {
 
@@ -63,7 +63,7 @@ namespace {
 
         WorldInstance new_data;
         const unsigned bytes = sz * (sizeof(ct_entity) + (3 * sizeof(float)));
-        new_data.buffer = CETECH_ALLOCATE(_allocator, char, bytes);
+        new_data.buffer = CEL_ALLOCATE(_allocator, char, bytes);
         new_data.n = _data.n;
         new_data.allocated = sz;
 
@@ -77,7 +77,7 @@ namespace {
         memcpy(new_data.far, _data.far, _data.n * sizeof(float));
         memcpy(new_data.fov, _data.fov, _data.n * sizeof(float));
 
-        CETECH_FREE(_allocator, _data.buffer);
+        CEL_FREE(_allocator, _data.buffer);
 
         _data = new_data;
     }
@@ -113,7 +113,7 @@ namespace {
 
         ct_world last_world = _G.world_instances[last_idx].world;
 
-        CETECH_FREE(ct_memory_a0.main_allocator(),
+        CEL_FREE(ct_memory_a0.main_allocator(),
                     _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -152,12 +152,16 @@ namespace camera {
     }
 
     void get_project_view(ct_camera camera,
-                          mat44f_t *proj,
-                          mat44f_t *view) {
+                          float *proj,
+                          float *view) {
 
         WorldInstance *world_inst = _get_world_instance(camera.world);
 
-        vec2f_t size = ct_renderer_a0.get_size(); // TODO, to arg... or viewport?
+        int width, height;
+        width = height = 0;
+
+        ct_renderer_a0.get_size(&width, &height); // TODO, to arg... or viewport?
+
         ct_entity e = world_inst->entity[camera.idx];
         ct_transform t = ct_transform_a0.get(camera.world, e);
 
@@ -165,10 +169,12 @@ namespace camera {
         float near = world_inst->near[camera.idx];
         float far = world_inst->far[camera.idx];
 
-        mat44f_set_perspective_fov(proj, fov, size.x / size.y, near, far);
+        celib::mat4_proj(proj, fov, width / float(height), near, far, true);
 
-        mat44f_t *w = ct_transform_a0.get_world_matrix(t);
-        mat44f_inverse(view, w);
+        float w[16];
+        ct_transform_a0.get_world_matrix(t, w);
+
+        celib::mat4_inverse(view, w);
     }
 
     int has(ct_world world,

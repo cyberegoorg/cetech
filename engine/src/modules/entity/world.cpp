@@ -13,7 +13,7 @@
 
 CETECH_DECL_API(ct_memory_a0);
 
-using namespace cetech;
+using namespace celib;
 
 //==============================================================================
 // Typedefs

@@ -15,8 +15,6 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include <cetech/celib/math_types.h>
-
 typedef struct lua_State lua_State;
 
 typedef int (*lua_CFunction)(lua_State *L);
@@ -173,70 +171,44 @@ struct ct_lua_a0 {
                                int i,
                                size_t *len);
 
-    //! Get element value as vec2f
-    //! \param l
-    //! \param i Element idx
-    //! \return Vec2f
-    vec2f_t *(*to_vec2f)(lua_State *l,
-                         int i);
-
     //! Get element value as vec3f
     //! \param l
     //! \param i Element idx
     //! \return Vec3f
-    vec3f_t *(*to_vec3f)(lua_State *l,
-                         int i);
-
-    //! Get element value as vec4f
-    //! \param l
-    //! \param i Element idx
-    //! \return Vec4f
-    vec4f_t *(*to_vec4f)(lua_State *l,
-                         int i);
+    void (*to_vec3f)(lua_State *l,
+                     int i, float* value);
 
     //! Get element value as mat44f
     //! \param l
     //! \param i Element idx
     //! \return Mat44f
-    mat44f_t *(*to_mat44f)(lua_State *l,
-                           int i);
+    void (*to_mat44f)(lua_State *l,
+                      int i, float* value);
 
     //! Get element value as quat
     //! \param l
     //! \param i Element idx
     //! \return Quatf
-    quatf_t *(*to_quat)(lua_State *l,
-                        int i);
-
-    //! Push vec2f
-    //! \param l
-    //! \param v Value
-    void (*push_vec2f)(lua_State *l,
-                       vec2f_t v);
+    void (*to_quat)(lua_State *l,
+                        int i, float* value);
 
     //! Push vec3f
     //! \param l
     //! \param v Value
     void (*push_vec3f)(lua_State *l,
-                       vec3f_t v);
-
-    //! Push vec4f
-    //! \param l
-    //! \param v Value
-    void (*push_vec4f)(lua_State *l,
-                       vec4f_t v);
+                       float* value);
 
     //! Push mat44f
     //! \param l
     //! \param v Value
     void (*push_mat44f)(lua_State *l,
-                        mat44f_t v);
+                        float* v);
 
     //! Push quatf
     //! \param l
     //! \param v Value
     void (*push_quat)(lua_State *l,
-                      quatf_t v);
+                      float* v);
 
     //! Execute lua code
     //! \param str Lua code

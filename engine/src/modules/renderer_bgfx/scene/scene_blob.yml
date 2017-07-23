@@ -3,8 +3,6 @@ blobs:
     - name: scene
       guard_prefix: CETECH
       includes:
-        - <cetech/core/hash.h>
-        - <cetech/celib/math_types.h>
         - <bgfx/bgfx.h>
 
       values:
@@ -22,5 +20,5 @@ blobs:
         - uint8_t vb[vb_len]
         - uint64_t node_name[node_count]
         - uint32_t node_parent[node_count]
-        - mat44f_t node_pose[node_count]
+        - float[16] node_pose[node_count]
         - uint64_t geom_node[geom_count]

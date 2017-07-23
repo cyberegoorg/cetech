@@ -1,43 +1,43 @@
 
-#include <cetech/celib/mat44f.inl>
 
 #include <cetech/modules/luasys.h>
 
 #include <cetech/kernel/api_system.h>
+#include <cetech/celib/fpumath.h>
+#include <include/luajit/lua.h>
 #include "../luasys_private.h"
 
 #define API_NAME "Mat44f"
 
 static int _identity(lua_State *l) {
-    luasys_push_mat44f(l, MAT44F_INIT_IDENTITY);
+    float m[16];
+
+    celib::mat4_identity(m);
+
+    luasys_push_mat44f(l, m);
     return 1;
 }
 
-static int _ctor(lua_State *l) {
-    vec4f_t *x = luasys_to_vec4f(l, 1);
-    vec4f_t *y = luasys_to_vec4f(l, 2);
-    vec4f_t *z = luasys_to_vec4f(l, 3);
-    vec4f_t *w = luasys_to_vec4f(l, 4);
-
-    luasys_push_mat44f(l, (mat44f_t) {.x=*x, .y=*y, .z=*z, .w=*w});
-    return 1;
-}
 
 static int _translate(lua_State *l) {
-    mat44f_t m = {0};
-    vec3f_t *v = luasys_to_vec3f(l, 1);
+    float m[16];
+    float v[3];
 
-    mat44f_translate(&m, v->x, v->y, v->z);
+    luasys_to_vec3f(l, 1, v);
+
+    celib::mat4_translate(m, v[0], v[1], v[2]);
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _scale(lua_State *l) {
-    mat44f_t m = {0};
-    vec3f_t *v = luasys_to_vec3f(l, 1);
+    float m[16];
+    float v[3];
 
-    mat44f_scale(&m, v->x, v->y, v->z);
+    luasys_to_vec3f(l, 1, v);
+
+    celib::mat4_scale(m, v[0], v[1], v[2]);
 
     luasys_push_mat44f(l, m);
     return 1;
@@ -45,98 +45,115 @@ static int _scale(lua_State *l) {
 
 
 static int _rotate_x(lua_State *l) {
-    mat44f_t m = {0};
+    float m[16];
     float x = luasys_to_float(l, 1);
 
-    mat44f_rotate_x(&m, x);
-
+    celib::mat4_rotate_x(m, x);
     luasys_push_mat44f(l, m);
+
     return 1;
 }
 
 static int _rotate_y(lua_State *l) {
-    mat44f_t m = {0};
-    float y = luasys_to_float(l, 1);
+    float m[16];
+    float x = luasys_to_float(l, 1);
 
-    mat44f_rotate_y(&m, y);
-
+    celib::mat4_rotate_y(m, x);
     luasys_push_mat44f(l, m);
+
     return 1;
 }
 
 static int _rotate_z(lua_State *l) {
-    mat44f_t m = {0};
-    float z = luasys_to_float(l, 1);
+    float m[16];
+    float x = luasys_to_float(l, 1);
 
-    mat44f_rotate_z(&m, z);
-
+    celib::mat4_rotate_z(m, x);
     luasys_push_mat44f(l, m);
+
     return 1;
 }
 
 static int _rotate_xy(lua_State *l) {
-    mat44f_t m = {0};
+    float m[16];
+
     float x = luasys_to_float(l, 1);
     float y = luasys_to_float(l, 2);
 
-    mat44f_rotate_xy(&m, x, y);
+    celib::mat4_rotate_xy(m, x, y);
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _rotate_xyz(lua_State *l) {
-    mat44f_t m = {0};
+    float m[16];
+
     float x = luasys_to_float(l, 1);
     float y = luasys_to_float(l, 2);
     float z = luasys_to_float(l, 3);
 
-    mat44f_rotate_xyz(&m, x, y, z);
+    celib::mat4_rotate_xyz(m, x, y, z);
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _rotate_zyx(lua_State *l) {
-    mat44f_t m = {0};
+    float m[16];
+
     float x = luasys_to_float(l, 1);
     float y = luasys_to_float(l, 2);
     float z = luasys_to_float(l, 3);
 
-    mat44f_rotate_zyx(&m, x, y, z);
+    celib::mat4_rotate_zyx(m, x, y, z);
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _transpose(lua_State *l) {
-    mat44f_t m = {0};
-    mat44f_t *a = luasys_to_mat44f(l, 1);
+    float m[16];
+    float res[16];
 
-    mat44f_transpose(&m, a);
+
+    luasys_to_mat44f(l, 1, m);
+
+    celib::mat4_transpose(res, m);
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 static int _perspective_fov(lua_State *l) {
-    mat44f_t m = {0};
+    float m[16];
 
     float fov = luasys_to_float(l, 1);
     float ar = luasys_to_float(l, 2);
     float near = luasys_to_float(l, 3);
     float far = luasys_to_float(l, 4);
 
-    mat44f_set_perspective_fov(&m, fov, ar, near, far);
+    celib::mat4_proj(m, fov, ar, near, far, true);
+
+    luasys_push_mat44f(l, m);
+    return 1;
+}
+
+static int _ctor(lua_State *l) {
+    float m[16];
+
+    for(int i = 0; i < 16; ++i) {
+        m[i] = luasys_to_float(l, i+1);
+    }
 
     luasys_push_mat44f(l, m);
     return 1;
 }
 
 void _register_lua_mat44f_api(struct ct_api_a0 *api) {
-    luasys_add_module_function(API_NAME, "identity", _identity);
-
     luasys_add_module_function(API_NAME, "make", _ctor);
+
+    luasys_add_module_function(API_NAME, "identity", _identity);
 
     luasys_add_module_function(API_NAME, "perspective_fov", _perspective_fov);
 

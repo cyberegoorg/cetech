@@ -14,7 +14,7 @@ extern "C" {
 //==============================================================================
 
 #include <stddef.h>
-#include <cetech/celib/math_types.h>
+
 #include <cetech/modules/blob.h>
 
 typedef struct yaml_node_s yaml_node_t;
@@ -87,8 +87,8 @@ struct ct_property_value {
         int b;
         float f;
         const char *str;
-        vec3f_t vec3f;
-        quatf_t quatf;
+        float vec3f[3];
+        float quatf[4];
         uint64_t strid_64;
     } value;
 };

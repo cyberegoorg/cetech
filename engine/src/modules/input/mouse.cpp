@@ -2,7 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <cetech/celib/math_types.h>
 #include <cetech/celib/allocator.h>
 #include <cetech/kernel/config.h>
 #include <cetech/celib/eventstream.inl>
@@ -33,8 +32,8 @@ CETECH_DECL_API(ct_log_a0);
 static struct G {
     uint8_t state[MOUSE_BTN_MAX];
     uint8_t last_state[MOUSE_BTN_MAX];
-    vec2f_t last_pos;
-    vec2f_t last_delta_pos;
+    float last_pos[2];
+    float last_delta_pos[2];
 } _G = {0};
 
 //==============================================================================
@@ -111,33 +110,40 @@ namespace mouse {
         return 0;
     }
 
-    vec2f_t axis(uint32_t idx,
-                 const uint32_t axis_index) {
+    void axis(uint32_t idx,
+                 const uint32_t axis_index, float* value) {
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
         switch (axis_index) {
             case MOUSE_AXIS_ABSOULTE:
-                return _G.last_pos;
+                value[0] = _G.last_pos[0];
+                value[1] = _G.last_pos[1];
+                return;
 
             case MOUSE_AXIS_RELATIVE:
-                return _G.last_delta_pos;
+                value[0] = _G.last_delta_pos[0];
+                value[1] = _G.last_delta_pos[1];
+
+                return;
 
             default:
-                return (vec2f_t) {0};
+                value[0] = 0.0f;
+                value[1] = 0.0f;
+                return;
         }
     }
 
-    void mouse_set_cursor_pos(vec2f_t pos) {
-        //TODO: implement
-    }
+//    void mouse_set_cursor_pos(vec2f_t pos) {
+//        //TODO: implement
+//    }
 
     void update() {
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
-        _G.last_delta_pos.x = 0;
-        _G.last_delta_pos.y = 0;
+        _G.last_delta_pos[0] = 0;
+        _G.last_delta_pos[1] = 0;
 
         while (event != ct_machine_a0.event_end()) {
             ct_mouse_move_event *move_event;
@@ -154,11 +160,11 @@ namespace mouse {
                 case EVENT_MOUSE_MOVE:
                     move_event = ((ct_mouse_move_event *) event);
 
-                    _G.last_delta_pos.x = move_event->pos.x - _G.last_pos.x;
-                    _G.last_delta_pos.y = move_event->pos.y - _G.last_pos.y;
+                    _G.last_delta_pos[0] = float(move_event->pos[0]) - _G.last_pos[0];
+                    _G.last_delta_pos[1] = float(move_event->pos[1]) - _G.last_pos[1];
 
-                    _G.last_pos.x = move_event->pos.x;
-                    _G.last_pos.y = move_event->pos.y;
+                    _G.last_pos[0] = move_event->pos[0];
+                    _G.last_pos[1] = move_event->pos[1];
 
                     break;
 

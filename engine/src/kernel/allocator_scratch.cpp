@@ -60,7 +60,7 @@ void *scratch_allocator_allocate(allocator_instance *allocator,
 
         // If the buffer is exhausted use the backing ct_allocator instead.
         if (in_use(a, p))
-            return CETECH_ALLOCATE_ALIGN(a->backing, void, size, align);
+            return CEL_ALLOCATE_ALIGN(a->backing, void, size, align);
 
         fill(h, data, p - (char *) h);
         a->allocate = p;
@@ -72,7 +72,7 @@ void *scratch_allocator_allocate(allocator_instance *allocator,
         }
 
         if ((char *) ptr < a->begin || (char *) ptr >= a->end) {
-            CETECH_FREE(a->backing, ptr);
+            CEL_FREE(a->backing, ptr);
             return NULL;
         }
 
@@ -111,14 +111,14 @@ namespace memory {
     ct_allocator *scratch_allocator_create(ct_allocator *backing,
                                            int size) {
         auto *core_alloc = core_allocator::get();
-        auto *a = CETECH_ALLOCATE(core_alloc, ct_allocator,
+        auto *a = CEL_ALLOCATE(core_alloc, ct_allocator,
                                   sizeof(ct_allocator));
 
-        allocator_scratch *m = CETECH_ALLOCATE(core_alloc, allocator_scratch,
+        allocator_scratch *m = CEL_ALLOCATE(core_alloc, allocator_scratch,
                                                sizeof(allocator_scratch));
 
         m->backing = backing;
-        m->begin = CETECH_ALLOCATE(backing, char, size);
+        m->begin = CEL_ALLOCATE(backing, char, size);
         m->end = m->begin + size;
         m->allocate = m->begin;
         m->free = m->begin;
@@ -138,9 +138,9 @@ namespace memory {
         auto *core_alloc = core_allocator::get();
         struct allocator_scratch *m = (struct allocator_scratch *) a->inst;
 
-        CETECH_FREE(m->backing, m->begin);
-        CETECH_FREE(core_alloc, m);
-        CETECH_FREE(core_alloc, a);
+        CEL_FREE(m->backing, m->begin);
+        CEL_FREE(core_alloc, m);
+        CEL_FREE(core_alloc, a);
     }
 }
 
