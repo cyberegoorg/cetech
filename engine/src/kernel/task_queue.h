@@ -28,13 +28,13 @@ struct task_queue {
     cacheline_pad_t _pad5;
     int _capacityMask;
     cacheline_pad_t _pad6;
-    struct ct_allocator *allocator;
+    struct cel_alloc *allocator;
 };
 
 
 void queue_task_init(struct task_queue *q,
                      uint32_t capacity,
-                     struct ct_allocator *allocator) {
+                     struct cel_alloc *allocator) {
     *q = (struct task_queue) {0};
 
     q->_capacityMask = capacity - 1;

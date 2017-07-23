@@ -16,7 +16,7 @@ extern "C" {
 #include <stdint.h>
 
 struct ct_vio;
-struct ct_allocator;
+struct cel_alloc;
 struct ct_config_a0;
 struct ct_app_a0;
 struct ct_compilator_api;
@@ -47,7 +47,7 @@ typedef struct {
     //! \param allocator Allocator
     //! \return Resource data
     void *(*loader)(struct ct_vio *input,
-                    struct ct_allocator *allocator);
+                    struct cel_alloc *allocator);
 
     //! Resource online callback
     //! \param name Resource name
@@ -65,7 +65,7 @@ typedef struct {
     //! \param new_data Resource data
     //! \param allocator Allocator
     void (*unloader)(void *new_data,
-                     struct ct_allocator *allocator);
+                     struct cel_alloc *allocator);
 
     //! Resource reloader
     //! \param name Resource name
@@ -75,7 +75,7 @@ typedef struct {
     void *(*reloader)(uint64_t name,
                       void *old_data,
                       void *new_data,
-                      struct ct_allocator *allocator);
+                      struct cel_alloc *allocator);
 } ct_resource_callbacks_t;
 
 
@@ -221,7 +221,7 @@ struct ct_resource_a0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    char *(*compiler_get_tmp_dir)(struct ct_allocator *a,
+    char *(*compiler_get_tmp_dir)(struct cel_alloc *a,
                                   const char *platform);
 
     //! Join tool path
@@ -229,7 +229,7 @@ struct ct_resource_a0 {
     //! \param max_len Max len
     //! \param name Tool name
     //! \return 1 if ok else 0
-    char *(*compiler_external_join)(struct ct_allocator *a,
+    char *(*compiler_external_join)(struct cel_alloc *a,
                                     const char *name);
 
     //! Create build dir
@@ -254,7 +254,7 @@ struct ct_resource_a0 {
     //! \param max_len Max build dir len
     //! \param platform Platform
     //! \return 1 if ok else 0
-    char *(*compiler_get_build_dir)(struct ct_allocator *a,
+    char *(*compiler_get_build_dir)(struct cel_alloc *a,
                                     const char *platform);
 };
 

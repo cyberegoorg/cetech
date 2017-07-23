@@ -88,7 +88,7 @@ namespace scene_resource_compiler {
     };
 
     struct compile_output *_crete_compile_output() {
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
                 CEL_ALLOCATE(a, struct compile_output,
                                 sizeof(struct compile_output));
@@ -112,7 +112,7 @@ namespace scene_resource_compiler {
     }
 
     void _destroy_compile_output(struct compile_output *output) {
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
 
         output->geom_name.destroy();
         output->ib_offset.destroy();

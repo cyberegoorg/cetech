@@ -122,7 +122,7 @@ namespace scene_resource {
 
 
     void *loader(ct_vio *input,
-                 ct_allocator *allocator) {
+                 cel_alloc *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -130,7 +130,7 @@ namespace scene_resource {
     }
 
     void unloader(void *new_data,
-                  ct_allocator *allocator) {
+                  cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -180,7 +180,7 @@ namespace scene_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   ct_allocator *allocator) {
+                   cel_alloc *allocator) {
         offline(name, old_data);
         online(name, new_data);
 

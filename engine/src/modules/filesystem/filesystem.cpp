@@ -58,7 +58,7 @@ namespace filesystem {
     }
 
     char *get_fullpath(uint64_t root,
-                       ct_allocator *allocator,
+                       cel_alloc *allocator,
                        const char *filename) {
 
         const char *root_path = get_root_dir(root);
@@ -108,7 +108,7 @@ namespace filesystem {
                  const char *filter,
                  char ***files,
                  uint32_t *count,
-                 ct_allocator *allocator) {
+                 cel_alloc *allocator) {
 
         auto a = ct_memory_a0.main_allocator();
 
@@ -121,7 +121,7 @@ namespace filesystem {
 
     void listdir_free(char **files,
                       uint32_t count,
-                      ct_allocator *allocator) {
+                      cel_alloc *allocator) {
         ct_path_a0.list_free(files, count, allocator);
     }
 

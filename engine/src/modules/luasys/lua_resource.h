@@ -6,7 +6,7 @@
 
 namespace resource_lua {
     void *loader(struct ct_vio *input,
-                 struct ct_allocator *allocator) {
+                 struct cel_alloc *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -15,7 +15,7 @@ namespace resource_lua {
     }
 
     void unloader(void *new_data,
-                  struct ct_allocator *allocator) {
+                  struct cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -31,7 +31,7 @@ namespace resource_lua {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   struct ct_allocator *allocator) {
+                   struct cel_alloc *allocator) {
         CEL_FREE(allocator, old_data);
 
         struct lua_resource *resource = (lua_resource *) new_data;

@@ -282,7 +282,7 @@ namespace entity_resource_compiler {
 
 
     ct_entity_compile_output *create_output() {
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
 
         ct_entity_compile_output *output = CEL_ALLOCATE(a,
                                                            ct_entity_compile_output,
@@ -327,7 +327,7 @@ namespace entity_resource_compiler {
         output->component_body.destroy();
         output->component_body_array.destroy();
 
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
         CEL_FREE(a, output);
     }
 
@@ -447,7 +447,7 @@ namespace entity_resource_compiler {
 namespace entity_resorce {
 
     void *loader(ct_vio *input,
-                 ct_allocator *allocator) {
+                 cel_alloc *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -456,7 +456,7 @@ namespace entity_resorce {
     }
 
     void unloader(void *new_data,
-                  ct_allocator *allocator) {
+                  cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -472,7 +472,7 @@ namespace entity_resorce {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   ct_allocator *allocator) {
+                   cel_alloc *allocator) {
         offline(name, old_data);
         online(name, new_data);
 

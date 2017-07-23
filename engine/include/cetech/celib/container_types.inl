@@ -3,14 +3,14 @@
 
 #include <cstdint>
 
-struct ct_allocator;
+struct cel_alloc;
 
 namespace celib {
     template<typename T>
     struct Array {
         Array();
 
-        Array(ct_allocator *a);
+        Array(cel_alloc *a);
 
         ~Array();
 
@@ -22,11 +22,11 @@ namespace celib {
 
         const T &operator[](uint32_t i) const;
 
-        void init(ct_allocator *a);
+        void init(cel_alloc *a);
 
         void destroy();
 
-        ct_allocator *_allocator;
+        cel_alloc *_allocator;
         uint32_t _size;
         uint32_t _capacity;
         T *_data;
@@ -37,9 +37,9 @@ namespace celib {
     public:
         Map();
 
-        Map(ct_allocator *a);
+        Map(cel_alloc *a);
 
-        void init(ct_allocator *a);
+        void init(cel_alloc *a);
 
         void destroy();
 
@@ -60,13 +60,13 @@ namespace celib {
     struct Queue {
         Queue();
 
-        explicit Queue(ct_allocator *a);
+        explicit Queue(cel_alloc *a);
 
         T &operator[](const uint32_t i);
 
         const T &operator[](const uint32_t i) const;
 
-        void init(ct_allocator *a);
+        void init(cel_alloc *a);
 
         void destroy();
 

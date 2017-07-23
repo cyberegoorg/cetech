@@ -28,7 +28,7 @@ namespace blob {
         return array::push(*array, (const uint8_t *) data, size);
     }
 
-    ct_blob *create(ct_allocator *allocator) {
+    ct_blob *create(cel_alloc *allocator) {
         blob_array *inst = CEL_NEW(allocator,
                                       blob_array,
                                       allocator);
@@ -45,7 +45,7 @@ namespace blob {
 
     void destroy(ct_blob *blob) {
         blob_array *inst = (blob_array *) blob->inst;
-        ct_allocator *a = inst->_allocator;
+        cel_alloc *a = inst->_allocator;
 
         CEL_DELETE(a, blob_array, inst);
         CEL_DELETE(a, ct_blob, blob);

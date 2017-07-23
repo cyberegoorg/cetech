@@ -76,7 +76,7 @@ namespace api {
             .exist = api::exist
     };
 
-    void init(ct_allocator *allocator) {
+    void init(cel_alloc *allocator) {
         _G = {0};
 
         _G.api_map.init(allocator);

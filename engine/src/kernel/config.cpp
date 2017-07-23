@@ -110,7 +110,7 @@ namespace config {
 #ifdef CETECH_CAN_COMPILE
 
     void compile_global(const char *platform) {
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
 
         ct_cvar bd = find("build");
         ct_cvar source_dir = find("src");
@@ -228,7 +228,7 @@ namespace config {
 
 
     void load_global(const char *platform) {
-        ct_allocator *a = ct_memory_a0.main_allocator();
+        cel_alloc *a = ct_memory_a0.main_allocator();
         ct_cvar bd = find("build");
         ct_cvar source_dir = find("src");
 

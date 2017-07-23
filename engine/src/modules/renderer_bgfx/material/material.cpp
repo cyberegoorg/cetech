@@ -58,7 +58,7 @@ namespace {
         Handler<uint32_t> material_handler;
         uint64_t type;
 
-        void init(ct_allocator *allocator) {
+        void init(cel_alloc *allocator) {
             this->type = ct_hash_a0.id64_from_str("material");
             this->material_handler.init(ct_memory_a0.main_allocator());
             this->instace_map.init(ct_memory_a0.main_allocator());
@@ -83,7 +83,7 @@ namespace material_resource {
     static const bgfx::ProgramHandle null_program = {0};
 
     void *loader(ct_vio *input,
-                 ct_allocator *allocator) {
+                 cel_alloc *allocator) {
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
         input->read(input->inst, data, 1, size);
@@ -91,7 +91,7 @@ namespace material_resource {
     }
 
     void unloader(void *new_data,
-                  ct_allocator *allocator) {
+                  cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -107,7 +107,7 @@ namespace material_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   ct_allocator *allocator) {
+                   cel_alloc *allocator) {
         offline(name, old_data);
         online(name, new_data);
 

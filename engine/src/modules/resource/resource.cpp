@@ -121,7 +121,7 @@ namespace {
 // Private
 //==============================================================================
 
-char *resource_compiler_get_build_dir(ct_allocator *a,
+char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform) {
 
     const char *build_dir_str = ct_config_a0.get_string(_G.config.build_dir);
@@ -131,7 +131,7 @@ char *resource_compiler_get_build_dir(ct_allocator *a,
 namespace package_resource {
 
     void *loader(ct_vio *input,
-                 ct_allocator *allocator) {
+                 cel_alloc *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
@@ -141,7 +141,7 @@ namespace package_resource {
     }
 
     void unloader(void *new_data,
-                  ct_allocator *allocator) {
+                  cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -156,7 +156,7 @@ namespace package_resource {
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
-                   ct_allocator *allocator) {
+                   cel_alloc *allocator) {
         CEL_FREE(allocator, old_data);
         return new_data;
     }

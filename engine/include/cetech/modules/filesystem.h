@@ -59,14 +59,14 @@ struct ct_filesystem_a0 {
                     const char *filter,
                     char ***files,
                     uint32_t *count,
-                    struct ct_allocator *allocator);
+                    struct cel_alloc *allocator);
 
     //! Free list directory array
     //! \param files File array
     //! \param allocator Allocator
     void (*listdir_free)(char **files,
                          uint32_t count,
-                         struct ct_allocator *allocator);
+                         struct cel_alloc *allocator);
 
     //! Create directory in root
     //! \param root Root
@@ -89,7 +89,7 @@ struct ct_filesystem_a0 {
     //! \param filename Filename
     //! \return 1 if ok else 0
     char *(*fullpath)(uint64_t root,
-                      struct ct_allocator *,
+                      struct cel_alloc *,
                       const char *filename);
 };
 

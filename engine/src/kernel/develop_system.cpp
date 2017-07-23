@@ -62,7 +62,7 @@ static struct DevelopSystemGlobals {
     atomic_int complete_flag[8]; // TODO: dynamic
     float time_accum;
 
-    void init(ct_allocator *a) {
+    void init(cel_alloc *a) {
         this->to_mpack.init(a);
         this->eventstream.init(a);
     }

@@ -216,7 +216,7 @@ namespace module {
             .module_reload_all = reload_all
     };
 
-    void init(ct_allocator *allocator,
+    void init(cel_alloc *allocator,
               struct ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_path_a0);

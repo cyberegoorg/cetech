@@ -5,7 +5,7 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/memory.h>
 
-static void *_reallocate(allocator_instance *a,
+static void *_reallocate(cel_alloc_inst *a,
                          void *ptr,
                          uint32_t size,
                          uint32_t align) {
@@ -21,14 +21,14 @@ static void *_reallocate(allocator_instance *a,
 }
 
 
-static ct_allocator _allocator = {
+static cel_alloc _allocator = {
         .inst = NULL,
         .reallocate= _reallocate
 };
 
 
 namespace core_allocator {
-    ct_allocator *get() {
+    cel_alloc *get() {
         return &_allocator;
     }
 

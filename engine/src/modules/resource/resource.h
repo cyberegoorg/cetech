@@ -23,10 +23,10 @@ int resource_compiler_get_filename(char *filename,
 const char *resource_compiler_get_source_dir();
 
 
-char *resource_compiler_get_tmp_dir(ct_allocator *alocator,
+char *resource_compiler_get_tmp_dir(cel_alloc *alocator,
                                     const char *platform);
 
-char *resource_compiler_external_join(ct_allocator *alocator,
+char *resource_compiler_external_join(cel_alloc *alocator,
                                       const char *name);
 
 void resource_compiler_create_build_dir(struct ct_config_a0 config,
@@ -37,7 +37,7 @@ const char *resource_compiler_get_core_dir();
 #endif
 
 
-char *resource_compiler_get_build_dir(ct_allocator *a,
+char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform);
 
 #ifdef __cplusplus

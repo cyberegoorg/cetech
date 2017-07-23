@@ -23,7 +23,7 @@ struct allocator_malloc {
     memory::allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
-void *malloc_allocator_allocate(allocator_instance *allocator,
+void *malloc_allocator_allocate(cel_alloc_inst *allocator,
                                 void *ptr,
                                 uint32_t size,
                                 uint32_t align) {
@@ -62,35 +62,33 @@ uint32_t malloc_allocator_allocated_size(void *p) {
     return header(p)->size;
 }
 
-uint32_t malloc_allocator_total_allocated(ct_allocator *allocator) {
+uint32_t malloc_allocator_total_allocated(cel_alloc *allocator) {
     struct allocator_malloc *a = (struct allocator_malloc *) allocator->inst;
 
     return a->total_allocated;
 }
 
 namespace memory {
-    ct_allocator *malloc_allocator_create() {
+    cel_alloc *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
 
-        auto *a = CEL_ALLOCATE(core_alloc, ct_allocator,
-                                  sizeof(ct_allocator));
+        auto *a = CEL_ALLOCATE(core_alloc, cel_alloc, sizeof(cel_alloc));
 
         struct allocator_malloc *m = CEL_ALLOCATE(core_alloc,
                                                      allocator_malloc,
                                                      sizeof(allocator_malloc));
         m->total_allocated = 0;
 
-        *a = (ct_allocator) {
+        *a = (cel_alloc) {
                 .inst = m,
                 .reallocate = malloc_allocator_allocate,
                 .total_allocated = malloc_allocator_total_allocated,
-                .allocated_size = malloc_allocator_allocated_size
         };
 
         return a;
     }
 
-    void malloc_allocator_destroy(ct_allocator *a) {
+    void malloc_allocator_destroy(cel_alloc *a) {
         auto *core_alloc = core_allocator::get();
         struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
 

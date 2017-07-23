@@ -108,7 +108,7 @@ static struct _G {
 
 
 static void allocate(WorldInstance &_data,
-                     ct_allocator *_allocator,
+                     cel_alloc *_allocator,
                      uint32_t sz) {
     //assert(sz > _data.n);
 

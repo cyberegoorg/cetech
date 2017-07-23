@@ -36,7 +36,7 @@ typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
     name ## _unload_module(api)
 
 namespace module {
-    void init(struct ct_allocator *allocator,
+    void init(struct cel_alloc *allocator,
               struct ct_api_a0 *a0);
 
     void shutdown();

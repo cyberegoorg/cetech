@@ -255,7 +255,7 @@ namespace celib {
                                _offset(0) {}
 
     template<typename T>
-    inline Queue<T>::Queue(ct_allocator *allocator) : _data(allocator),
+    inline Queue<T>::Queue(cel_alloc *allocator) : _data(allocator),
                                                       _size(0),
                                                       _offset(0) {}
 
@@ -270,7 +270,7 @@ namespace celib {
     }
 
     template<typename T>
-    inline void Queue<T>::init(ct_allocator *a) {
+    inline void Queue<T>::init(cel_alloc *a) {
         _data.init(a);
     }
 

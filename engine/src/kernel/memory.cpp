@@ -15,8 +15,8 @@ CETECH_DECL_API(ct_log_a0);
 #define ALLOCATOR_WHERE "allocator"
 
 struct MemorySystemGlobals {
-    ct_allocator *default_allocator;
-    ct_allocator *default_scratch_allocator;
+    cel_alloc *default_allocator;
+    cel_alloc *default_scratch_allocator;
 } _G = {0};
 
 
@@ -66,22 +66,22 @@ namespace memory {
                             "memory_leak: %p\n  stacktrace:\n%s\n",
                             entries[i].ptr, entries[i].stacktrace);
 
-            //allocator_free(ct_allocator, entries[i].ptr); // TODO: need this?
+            //allocator_free(cel_alloc, entries[i].ptr); // TODO: need this?
 
             stacktrace_free(entries[i].stacktrace);
         }
     }
 
-    ct_allocator *memsys_main_allocator() {
+    cel_alloc *memsys_main_allocator() {
         return _G.default_allocator;
     }
 
-    ct_allocator *memsys_main_scratch_allocator() {
+    cel_alloc *memsys_main_scratch_allocator() {
         return _G.default_scratch_allocator;
     }
 
     char *str_dup(const char *s,
-                  ct_allocator *allocator) {
+                  cel_alloc *allocator) {
         char *d = (char *) CEL_ALLOCATE(allocator, char, strlen(s) + 1);
         CETECH_ASSERT("string", d != NULL);
 

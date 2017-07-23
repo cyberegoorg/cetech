@@ -16,7 +16,7 @@ extern "C" {
 
 #include "_machine_enums.h"
 
-struct ct_allocator;
+struct cel_alloc;
 
 //==============================================================================
 // CPU
@@ -59,14 +59,14 @@ struct ct_path_a0 {
                  int recursive,
                  char ***files,
                  uint32_t *count,
-                 struct ct_allocator *allocator);
+                 struct cel_alloc *allocator);
 
     //! Free list dir array
     //! \param files Files array
     //! \param allocator Allocator
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct ct_allocator *allocator);
+                      struct cel_alloc *allocator);
 
     //! Create dir path
     //! \param path Path
@@ -99,7 +99,7 @@ struct ct_path_a0 {
     //! \param allocator Allocator
     //! \param count Path count.
     //! \return Result path len.
-    char *(*join)(struct ct_allocator *allocator,
+    char *(*join)(struct cel_alloc *allocator,
                   uint32_t count,
                   ...);
 };

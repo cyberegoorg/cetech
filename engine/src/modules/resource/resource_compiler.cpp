@@ -355,7 +355,7 @@ const char *resource_compiler_get_core_dir() {
     return ct_config_a0.get_string(_G.cv_core_dir);
 }
 
-char *resource_compiler_get_tmp_dir(ct_allocator *alocator,
+char *resource_compiler_get_tmp_dir(cel_alloc *alocator,
                                     const char *platform) {
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
@@ -363,7 +363,7 @@ char *resource_compiler_get_tmp_dir(ct_allocator *alocator,
     return ct_path_a0.join(alocator, 2, build_dir, "tmp");
 }
 
-char *resource_compiler_external_join(ct_allocator *alocator,
+char *resource_compiler_external_join(cel_alloc *alocator,
                                       const char *name) {
     const char *external_dir_str = ct_config_a0.get_string(_G.cv_external_dir);
 

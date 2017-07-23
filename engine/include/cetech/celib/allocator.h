@@ -58,20 +58,17 @@ enum {
 // Allocator
 //==============================================================================
 
-typedef void allocator_instance;
+typedef void cel_alloc_inst;
 
-struct ct_allocator {
-    allocator_instance *inst;
+struct cel_alloc {
+    cel_alloc_inst *inst;
 
-    void *(*reallocate)(allocator_instance *a,
+    void *(*reallocate)(cel_alloc_inst *a,
                         void *ptr,
                         uint32_t size,
                         uint32_t align);
 
-    uint32_t (*total_allocated)(struct ct_allocator *allocator);
-
-    uint32_t (*allocated_size)(void *p);
+    uint32_t (*total_allocated)(struct cel_alloc *allocator);
 };
-
 
 #endif //CELIB_ALLOCATOR_H

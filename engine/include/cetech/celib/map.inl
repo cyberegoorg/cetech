@@ -417,11 +417,11 @@ namespace celib {
 
 
     template<typename T>
-    Map<T>::Map(ct_allocator *a) :
+    Map<T>::Map(cel_alloc *a) :
             _hash(a), _data(a) {}
 
     template<typename T>
-    void Map<T>::init(ct_allocator *a) {
+    void Map<T>::init(cel_alloc *a) {
         _hash.init(a);
         _data.init(a);
     }

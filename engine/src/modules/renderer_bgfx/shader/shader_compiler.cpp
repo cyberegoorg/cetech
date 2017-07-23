@@ -134,7 +134,7 @@ namespace shader_compiler {
 
         shader_blob::blob_t resource = {0};
 
-        // TODO: temp ct_allocator?
+        // TODO: temp cel_alloc?
         char input_str[1024] = {0};
         char output_path[1024] = {0};
         char tmp_filename[1024] = {0};

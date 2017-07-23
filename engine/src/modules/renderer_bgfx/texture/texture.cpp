@@ -63,7 +63,7 @@ namespace texture_resource {
 
 
     void *_texture_resource_loader(ct_vio *input,
-                                   ct_allocator *allocator) {
+                                   cel_alloc *allocator) {
 
         const int64_t size = input->size(input->inst);
         char *data = CEL_ALLOCATE(allocator, char, size);
@@ -73,7 +73,7 @@ namespace texture_resource {
     }
 
     void _texture_resource_unloader(void *new_data,
-                                    ct_allocator *allocator) {
+                                    cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
@@ -104,7 +104,7 @@ namespace texture_resource {
     void *_texture_resource_reloader(uint64_t name,
                                      void *old_data,
                                      void *new_data,
-                                     ct_allocator *allocator) {
+                                     cel_alloc *allocator) {
         _texture_resource_offline(name, old_data);
         _texture_resource_online(name, new_data);
 

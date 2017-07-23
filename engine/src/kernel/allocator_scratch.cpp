@@ -9,13 +9,12 @@
 
 #include <cetech/kernel/errors.h>
 #include <cetech/celib/allocator.h>
-#include <cetech/kernel/macros.h>
 
 #include "memory_private.h"
 #include "allocator_core_private.h"
 
 struct allocator_scratch {
-    ct_allocator *backing;
+    cel_alloc *backing;
     char *begin;
     char *end;
     char *allocate;
@@ -33,7 +32,7 @@ int in_use(struct allocator_scratch *a,
     return ((char *) p >= a->free) || ((char *) p < a->allocate);
 }
 
-void *scratch_allocator_allocate(allocator_instance *allocator,
+void *scratch_allocator_allocate(cel_alloc_inst *allocator,
                                  void *ptr,
                                  uint32_t size,
                                  uint32_t align) {
@@ -58,7 +57,7 @@ void *scratch_allocator_allocate(allocator_instance *allocator,
             p = data + size;
         }
 
-        // If the buffer is exhausted use the backing ct_allocator instead.
+        // If the buffer is exhausted use the backing cel_alloc instead.
         if (in_use(a, p))
             return CEL_ALLOCATE_ALIGN(a->backing, void, size, align);
 
@@ -100,7 +99,7 @@ uint32_t scratch_allocator_allocated_size(void *p) {
     return h->size - ((char *) p - (char *) h);
 }
 
-uint32_t scratch_allocator_total_allocated(ct_allocator *allocator) {
+uint32_t scratch_allocator_total_allocated(cel_alloc *allocator) {
     struct allocator_scratch *a = (struct allocator_scratch *) allocator->inst;
 
     return a->end - a->begin;
@@ -108,14 +107,13 @@ uint32_t scratch_allocator_total_allocated(ct_allocator *allocator) {
 }
 
 namespace memory {
-    ct_allocator *scratch_allocator_create(ct_allocator *backing,
-                                           int size) {
+    cel_alloc *scratch_allocator_create(cel_alloc *backing,
+                                        int size) {
         auto *core_alloc = core_allocator::get();
-        auto *a = CEL_ALLOCATE(core_alloc, ct_allocator,
-                                  sizeof(ct_allocator));
+        auto *a = CEL_ALLOCATE(core_alloc, cel_alloc, sizeof(cel_alloc));
 
         allocator_scratch *m = CEL_ALLOCATE(core_alloc, allocator_scratch,
-                                               sizeof(allocator_scratch));
+                                            sizeof(allocator_scratch));
 
         m->backing = backing;
         m->begin = CEL_ALLOCATE(backing, char, size);
@@ -123,18 +121,17 @@ namespace memory {
         m->allocate = m->begin;
         m->free = m->begin;
 
-        *a = (ct_allocator) {
+        *a = (cel_alloc) {
                 .inst = m,
                 .reallocate = scratch_allocator_allocate,
                 .total_allocated = scratch_allocator_total_allocated,
-                .allocated_size = scratch_allocator_allocated_size
         };
 
 
         return a;
     }
 
-    void scratch_allocator_destroy(ct_allocator *a) {
+    void scratch_allocator_destroy(cel_alloc *a) {
         auto *core_alloc = core_allocator::get();
         struct allocator_scratch *m = (struct allocator_scratch *) a->inst;
 

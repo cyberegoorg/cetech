@@ -12,16 +12,16 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/container_types.inl>
 
-struct ct_allocator;
+struct cel_alloc;
 
 namespace celib {
     template<typename T>
     struct Handler {
         Handler();
 
-        Handler(ct_allocator *allocator);
+        Handler(cel_alloc *allocator);
 
-        void init(ct_allocator *allocator);
+        void init(cel_alloc *allocator);
 
         void destroy();
 

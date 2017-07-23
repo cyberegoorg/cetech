@@ -5,7 +5,7 @@ local ffi = require("ffi")
 ffi.cdef[[
 struct ct_compilator_api;
 struct ct_vio;
-struct ct_allocator;
+struct cel_alloc;
 
 typedef int (*ct_resource_compilator_t)(
         const char *filename,
@@ -15,7 +15,7 @@ typedef int (*ct_resource_compilator_t)(
 
 typedef struct {
     void *(*loader)(struct ct_vio *input,
-                    struct ct_allocator *allocator);
+                    struct cel_alloc *allocator);
 
     void (*online)(uint64_t name,
                    void *data);
@@ -24,12 +24,12 @@ typedef struct {
                     void *data);
 
     void (*unloader)(void *new_data,
-                     struct ct_allocator *allocator);
+                     struct cel_alloc *allocator);
 
     void *(*reloader)(uint64_t name,
                       void *old_data,
                       void *new_data,
-                      struct ct_allocator *allocator);
+                      struct cel_alloc *allocator);
 } ct_resource_callbacks_t;
 
 struct ct_resource_a0 {

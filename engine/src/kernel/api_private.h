@@ -1,10 +1,10 @@
 #ifndef CETECH__API_H
 #define CETECH__API_H
 
-struct ct_allocator;
+struct cel_alloc;
 
 namespace api {
-    void init(struct ct_allocator *allocator);
+    void init(struct cel_alloc *allocator);
 
     void shutdown();
 

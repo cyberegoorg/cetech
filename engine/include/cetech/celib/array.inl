@@ -3,7 +3,6 @@
 // git+web: https://bitbucket.org/bitsquid/foundation
 //==============================================================================
 
-
 #ifndef CELIB_ARRAY2_INL_H
 #define CELIB_ARRAY2_INL_H
 
@@ -223,12 +222,12 @@ namespace celib {
 
     template<typename T>
     inline
-    Array<T>::Array(struct ct_allocator *a) : _allocator(a), _size(0),
+    Array<T>::Array(struct cel_alloc *a) : _allocator(a), _size(0),
                                               _capacity(0), _data(0) {}
 
     template<typename T>
     inline
-    void Array<T>::init(ct_allocator *a) {
+    void Array<T>::init(cel_alloc *a) {
         _data = nullptr;
         _allocator = a;
         _size = 0;

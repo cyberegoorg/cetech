@@ -12,7 +12,7 @@
 #include <cetech/celib/allocator.h>
 #include <cetech/celib/queue.inl>
 
-struct ct_allocator;
+struct cel_alloc;
 
 //==============================================================================
 // Public interface
@@ -81,12 +81,12 @@ namespace celib {
     }
 
     template<typename T>
-    Handler<T>::Handler(ct_allocator *allocator) : _generation(allocator),
+    Handler<T>::Handler(cel_alloc *allocator) : _generation(allocator),
                                                    _freeIdx(allocator) {
     }
 
     template<typename T>
-    void Handler<T>::init(ct_allocator *allocator) {
+    void Handler<T>::init(cel_alloc *allocator) {
         _generation.init(allocator);
         _freeIdx.init(allocator);
 
