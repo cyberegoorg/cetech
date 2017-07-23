@@ -1,17 +1,17 @@
-#include <cetech/celib/allocator.h>
-#include <cetech/kernel/api_system.h>
-#include <cetech/kernel/task.h>
+#include <celib/allocator.h>
+#include <cetech/api_system.h>
+#include <cetech/task.h>
 
-#include "log_system_private.h"
-#include "memory_private.h"
-#include "api_private.h"
-#include "module_private.h"
-#include "config_private.h"
+#include "../log/log_system_private.h"
+#include "../memory/memory_private.h"
+#include "../api/api_private.h"
+#include "../module/module_private.h"
+#include "../config/config_private.h"
 
-#include "../modules/static_module.h"
-#include "allocator_core_private.h"
+#include "../static_module.h"
+#include "../memory/allocator_core_private.h"
 
-#include <cetech/celib/fpumath.h>
+#include <celib/fpumath.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_task_a0);
@@ -68,13 +68,20 @@ extern "C" void init_core(ct_api_a0 *api) {
 
     LOAD_STATIC_MODULE(api, hashlib);
 
-    logsystem::register_api(api);
     core_allocator::register_api(api);
     memory::register_api(api);
     application_register_api(api);
 
-    os::register_api(api);
-    LOAD_STATIC_MODULE(api, os);
+    LOAD_STATIC_MODULE(api, error);
+    LOAD_STATIC_MODULE(api, object);
+    LOAD_STATIC_MODULE(api, path);
+    LOAD_STATIC_MODULE(api, process);
+    LOAD_STATIC_MODULE(api, cpu);
+    LOAD_STATIC_MODULE(api, time);
+    LOAD_STATIC_MODULE(api, thread);
+    LOAD_STATIC_MODULE(api, vio);
+    LOAD_STATIC_MODULE(api, window);
+    LOAD_STATIC_MODULE(api, machine);
 
     module::init(core_alloc, api);
 }
@@ -90,21 +97,20 @@ extern "C" int cetech_kernel_init(int argc,
                        const char **argv) {
     auto *core_alloc = core_allocator::get();
 
-    logsystem::init();
     api::init(core_alloc);
     ct_api_a0 *api = api::v0();
+
+    LOAD_STATIC_MODULE(api, log);
 
     memory::init(4 * 1024 * 1024);
 
     init_core(api);
     config::init(api);
-
-    logsystem::logdb_init_db(".", api);
+    
     load_config(argc, argv);
 
     load_core();
     init_static_modules();
-
     module::load_dirs("./bin");
 
     CETECH_GET_API(api, ct_log_a0);
@@ -119,7 +125,6 @@ extern "C" int cetech_kernel_shutdown() {
 
     auto* api = api::v0();
 
-    UNLOAD_STATIC_MODULE(api, os);
 
     config::shutdown();
     module::shutdown();

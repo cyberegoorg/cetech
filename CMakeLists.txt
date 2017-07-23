@@ -68,74 +68,80 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/kernel/os_sdl2/os_sdl2.cpp
-        engine/src/kernel/os_linux/stacktrace_linux.cpp
-        engine/src/kernel/os_linux/os_linux.cpp
-        engine/src/kernel/os_sdl2/machine_sdl2.cpp
-        engine/src/kernel/os_sdl2/mouse_sdl2.cpp
-        engine/src/kernel/os_sdl2/keyboard_sdl2.cpp
-        engine/src/kernel/os_sdl2/gamepad_sdl2.cpp
+        engine/src/os/error.cpp
+        engine/src/machine/machine_sdl2.cpp
+        engine/src/machine/mouse_sdl2.cpp
+        engine/src/machine/keyboard_sdl2.cpp
+        engine/src/machine/gamepad_sdl2.cpp
 
-        engine/src/kernel/console_server.cpp
-        engine/src/kernel/allocator_core.cpp
-        engine/src/kernel/api_system.cpp
-        engine/src/kernel/log_system.cpp
-        engine/src/kernel/yaml.cpp
-        engine/src/kernel/module.cpp
-        engine/src/kernel/config.cpp
-        engine/src/kernel/memory.cpp
-        engine/src/kernel/allocator_malloc.cpp
-        engine/src/kernel/allocator_scratch.cpp
-        engine/src/modules/application/application.cpp
-        engine/src/kernel/task.cpp
-        engine/src/kernel/develop_system.cpp
-        engine/src/kernel/log_db_handler.cpp
-        engine/src/kernel/log_nanomsg_handler.cpp
-        engine/src/kernel/log_stdout_handler.cpp
+        engine/src/console_server/console_server.cpp
+        engine/src/memory/allocator_core.cpp
+        engine/src/api/api_system.cpp
+        engine/src/log/log_system.cpp
+        engine/src/yaml/yaml.cpp
+        engine/src/module/module.cpp
+        engine/src/config/config.cpp
+        engine/src/memory/memory.cpp
+        engine/src/memory/allocator_malloc.cpp
+        engine/src/memory/allocator_scratch.cpp
+        engine/src/application/application.cpp
+        engine/src/task/task.cpp
+        engine/src/develop_system/develop_system.cpp
+        engine/src/log/log_db_handler.cpp
+        engine/src/log/log_nanomsg_handler.cpp
+        engine/src/log/log_stdout_handler.cpp
         engine/src/kernel/kernel.cpp
-        engine/src/kernel/hashlib.cpp
+        engine/src/hash/hashlib.cpp
+        engine/src/os/object.cpp
+        engine/src/os/path.cpp
+        engine/src/os/process.cpp
+        engine/src/os/cpu.cpp
+        engine/src/os/thread.cpp
+        engine/src/os/vio.cpp
+        engine/src/os/window.cpp
+        engine/src/os/time.cpp
 
         ########################################################################
         # Modules
         ########################################################################
 
-        engine/src/modules/luasys/luasys_private.cpp
-        engine/src/modules/luasys/api/api_log.cpp
-        engine/src/modules/luasys/api/api_vec3f.cpp
-        engine/src/modules/luasys/api/api_quatf.cpp
-        engine/src/modules/luasys/api/api_mat44f.cpp
+        engine/src/luasys/luasys_private.cpp
+        engine/src/luasys/api/api_log.cpp
+        engine/src/luasys/api/api_vec3f.cpp
+        engine/src/luasys/api/api_quatf.cpp
+        engine/src/luasys/api/api_mat44f.cpp
 
-        engine/src/modules/resource/resource.cpp
-        engine/src/modules/resource/resource_package.cpp
-        engine/src/modules/resource/resource_compiler.cpp
+        engine/src/resource/resource.cpp
+        engine/src/resource/resource_package.cpp
+        engine/src/resource/resource_compiler.cpp
 
-        engine/src/modules/filesystem/filesystem.cpp
-        engine/src/modules/entity/component.cpp
-        engine/src/modules/entity/entity.cpp
-        engine/src/modules/entity/world.cpp
-        engine/src/modules/level/level.cpp
+        engine/src/filesystem/filesystem.cpp
+        engine/src/entity/component.cpp
+        engine/src/entity/entity.cpp
+        engine/src/entity/world.cpp
+        engine/src/level/level.cpp
 
-        engine/src/modules/input/keyboard.cpp
-        engine/src/modules/input/mouse.cpp
-        engine/src/modules/input/gamepad.cpp
+        engine/src/input/keyboard.cpp
+        engine/src/input/mouse.cpp
+        engine/src/input/gamepad.cpp
 
-        engine/src/modules/renderer_bgfx/renderer.cpp
-        engine/src/modules/renderer_bgfx/texture/texture.cpp
-        engine/src/modules/renderer_bgfx/shader/shader.cpp
-        engine/src/modules/renderer_bgfx/material/material.cpp
-        engine/src/modules/renderer_bgfx/scene/scene.cpp
-        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
-        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
+        engine/src/renderer_bgfx/renderer.cpp
+        engine/src/renderer_bgfx/texture/texture.cpp
+        engine/src/renderer_bgfx/shader/shader.cpp
+        engine/src/renderer_bgfx/material/material.cpp
+        engine/src/renderer_bgfx/scene/scene.cpp
+        engine/src/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
+        engine/src/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
 
-        engine/src/modules/transform/transform.cpp
-        engine/src/modules/scenegraph/scenegraph.cpp
-        engine/src/modules/camera/camera.cpp
-        engine/src/modules/blob/blob.cpp
-        engine/src/modules/renderer_bgfx/scene/scene_compiler.cpp
-        engine/src/modules/renderer_bgfx/shader/shader_compiler.cpp
-        engine/src/modules/renderer_bgfx/texture/texture_compiler.cpp
-        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
-        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
+        engine/src/transform/transform.cpp
+        engine/src/scenegraph/scenegraph.cpp
+        engine/src/camera/camera.cpp
+        engine/src/blob/blob.cpp
+        engine/src/renderer_bgfx/scene/scene_compiler.cpp
+        engine/src/renderer_bgfx/shader/shader_compiler.cpp
+        engine/src/renderer_bgfx/texture/texture_compiler.cpp
+        engine/src/renderer_bgfx/material/material_compiler.cpp
+        engine/src/renderer_bgfx/material/material_compiler.cpp
 
         )
 

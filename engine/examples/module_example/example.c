@@ -1,8 +1,8 @@
-#include <cetech/kernel/api_system.h>
-#include <cetech/kernel/log.h>
+#include <cetech/api_system.h>
+#include <cetech/log.h>
 
-#include "cetech/kernel/config.h"
-#include "cetech/modules/input.h"
+#include "cetech/config.h"
+#include "cetech/input.h"
 
 CETECH_DECL_API(ct_keyboard_a0)
 CETECH_DECL_API(ct_log_a0)
