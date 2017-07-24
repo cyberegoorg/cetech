@@ -7,9 +7,9 @@
 #include <celib/eventstream.inl>
 #include <cetech/machine/machine.h>
 
-#include <cetech/application.h>
-#include <cetech/resource.h>
-#include <cetech/api_system.h>
+#include <cetech/engine/application.h>
+#include <cetech/engine/resource.h>
+#include <cetech/core/api_system.h>
 
 using namespace celib;
 

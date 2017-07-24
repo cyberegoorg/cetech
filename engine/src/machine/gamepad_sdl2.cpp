@@ -7,8 +7,8 @@
 #include <cetech/machine/machine.h>
 #include <celib/eventstream.inl>
 
-#include <cetech/api_system.h>
-#include <cetech/log.h>
+#include <cetech/core/api_system.h>
+#include <cetech/core/log.h>
 
 //==============================================================================
 // Defines

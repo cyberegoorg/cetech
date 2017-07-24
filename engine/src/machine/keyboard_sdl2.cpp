@@ -6,7 +6,7 @@
 
 #include <celib/eventstream.inl>
 #include <cetech/machine/machine.h>
-#include <cetech/api_system.h>
+#include <cetech/core/api_system.h>
 
 using namespace celib;
 

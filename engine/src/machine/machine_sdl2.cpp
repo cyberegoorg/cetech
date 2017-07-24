@@ -3,14 +3,14 @@
 //==============================================================================
 
 #include <celib/eventstream.inl>
-#include <cetech/memory.h>
+#include <cetech/core/memory.h>
 
-#include <cetech/config.h>
-#include <cetech/resource.h>
-#include <cetech/api_system.h>
+#include <cetech/core/config.h>
+#include <cetech/engine/resource.h>
+#include <cetech/core/api_system.h>
 
-#include <cetech/log.h>
-#include <cetech/application.h>
+#include <cetech/core/log.h>
+#include <cetech/engine/application.h>
 #include <cetech/machine/machine.h>
 
 #include <include/SDL2/SDL.h>

@@ -6,7 +6,7 @@
 //==============================================================================
 
 #include "array.inl"
-#include "cetech/macros.h"
+#include "cetech/core/macros.h"
 
 
 namespace celib {
