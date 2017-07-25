@@ -1,9 +1,8 @@
 #include <cetech/core/api_system.h>
+#include <cetech/core/os/cpu.h>
 #include <cetech/core/log.h>
-#include <cetech/machine/machine.h>
 
 #include <include/SDL2/SDL_cpuinfo.h>
-#include <cetech/core/os/cpu.h>
 
 int cpu_count() {
     return SDL_GetCPUCount();

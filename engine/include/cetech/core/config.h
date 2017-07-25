@@ -51,6 +51,11 @@ struct ct_config_a0 {
     int (*parse_args)(int argc,
                       const char **argv);
 
+    //! Load config from yaml file.
+    //! \param yaml Yaml file path.
+    //! \param alloc Allocator.
+    int (*load_from_yaml_file)(const char *yaml, struct cel_alloc *alloc);
+
     //! Find cvar
     //! \param name Cvar name
     //! \return Cvar or null cvar if name not found.

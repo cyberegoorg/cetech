@@ -6,16 +6,20 @@
 #include <cetech/machine/machine.h>
 #include <errno.h>
 
-CETECH_DECL_API(ct_log_a0);
 
 #if defined(CETECH_LINUX)
+
 #include <dirent.h>
 #include <sys/stat.h>
+
 #endif
 
 #include <celib/string_stream.h>
-#include <cetech/machine/machine.h>
 #include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
+
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_vio_a0);
 
 #if defined(CETECH_LINUX)
 #define DIR_DELIM_CH '/'
@@ -235,6 +239,26 @@ char *path_join(struct cel_alloc *allocator,
     return data;
 }
 
+void copy_file(struct cel_alloc *allocator,
+               const char *from,
+               const char *to) {
+    ct_vio *source_vio = ct_vio_a0.from_file(from, VIO_OPEN_READ);
+
+    char *data = CEL_ALLOCATE(allocator, char,
+                              source_vio->size(source_vio->inst));
+
+    size_t size = (size_t) source_vio->size(source_vio->inst);
+    source_vio->read(source_vio->inst, data, sizeof(char), size);
+    source_vio->close(source_vio->inst);
+
+    ct_vio *build_vio = ct_vio_a0.from_file(to, VIO_OPEN_WRITE);
+
+    build_vio->write(build_vio->inst, data, sizeof(char), size);
+    build_vio->close(build_vio->inst);
+
+    CEL_FREE(allocator, data);
+}
+
 static ct_path_a0 path_api = {
         .list = dir_list,
         .list_free = dir_list_free,
@@ -244,11 +268,13 @@ static ct_path_a0 path_api = {
         .dir = path_dir,
         .extension = path_extension,
         .join = path_join,
-        .file_mtime = file_mtime
+        .file_mtime = file_mtime,
+        .copy_file = copy_file
 };
 
 extern "C" void path_load_module(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_vio_a0);
     api->register_api("ct_path_a0", &path_api);
 }
 

@@ -77,6 +77,10 @@ struct ct_path_a0 {
     char *(*join)(struct cel_alloc *allocator,
                   uint32_t count,
                   ...);
+
+    void (*copy_file)(struct cel_alloc *allocator,
+                      const char *from,
+                      const char *to);
 };
 
 #ifdef __cplusplus

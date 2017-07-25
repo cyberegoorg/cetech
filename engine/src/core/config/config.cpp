@@ -18,7 +18,6 @@
 
 #include <cetech/engine/resource.h>
 
-#include "config_private.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
@@ -107,51 +106,6 @@ ct_cvar _find_first_free() {
 // Interface
 //==============================================================================
 namespace config {
-
-#ifdef CETECH_CAN_COMPILE
-
-    void compile_global(const char *platform) {
-        cel_alloc *a = ct_memory_a0.main_allocator();
-
-        ct_cvar bd = find("build");
-        ct_cvar source_dir = find("src");
-
-        const char *build_dir_str = get_string(bd);
-
-        char *build_dir = ct_path_a0.join(a, 2, build_dir_str,
-                                          platform);
-        ct_path_a0.make_path(build_dir);
-
-        char *build_path = ct_path_a0.join(a, 3, build_dir_str,
-                                           platform,
-                                           "global.config");
-
-        char *source_path = ct_path_a0.join(a, 2, get_string(source_dir),
-                                            "global.config");
-
-        ct_vio *source_vio = ct_vio_a0.from_file(source_path,
-                                                 VIO_OPEN_READ);
-
-        char *data = CEL_ALLOCATE(a, char,
-                                     source_vio->size(source_vio->inst));
-
-        size_t size = (size_t) source_vio->size(source_vio->inst);
-        source_vio->read(source_vio->inst, data, sizeof(char), size);
-        source_vio->close(source_vio->inst);
-
-        ct_vio *build_vio = ct_vio_a0.from_file(build_path,
-                                                VIO_OPEN_WRITE);
-        build_vio->write(build_vio->inst, data, sizeof(char), size);
-        build_vio->close(build_vio->inst);
-
-        CEL_FREE(a, data);
-        CEL_FREE(a, build_path);
-        CEL_FREE(a, source_path);
-        CEL_FREE(a, build_dir);
-    }
-
-#endif
-
     ct_cvar find(const char *name) {
         for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
             if (_G.name[i][0] == '\0') {
@@ -166,181 +120,6 @@ namespace config {
         }
 
         return make_cvar(0);
-    }
-
-    struct foreach_config_data {
-        char *root_name;
-    };
-
-    void foreach_config_clb(yaml_node_t key,
-                            yaml_node_t value,
-                            void *_data) {
-        struct foreach_config_data *output = (foreach_config_data *) _data;
-
-        char key_str[128] = {0};
-        yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
-
-        char name[1024] = {0};
-        if (output->root_name != NULL) {
-            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
-                     key_str);
-        } else {
-            snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
-        }
-
-        enum yaml_node_type type = yaml_node_type(value);
-
-        if (type == YAML_TYPE_MAP) {
-            struct foreach_config_data _data = {
-                    .root_name = name
-            };
-
-            yaml_node_foreach_dict(value, foreach_config_clb, &_data);
-        } else if (type == YAML_TYPE_SCALAR) {
-            char value_str[128] = {0};
-
-            float tmp_f;
-            int tmp_int;
-            char tmp_str[128];
-
-            ct_cvar cvar = find(name);
-            if (cvar.idx != 0) {
-                enum cvar_type t = get_type(cvar);
-                switch (t) {
-                    case CV_NONE:
-                        break;
-                    case CV_FLOAT:
-                        tmp_f = yaml_as_float(value);
-                        set_float(cvar, tmp_f);
-                        break;
-                    case CV_INT:
-                        tmp_int = yaml_as_int(value);
-                        set_int(cvar, tmp_int);
-                        break;
-                    case CV_STRING:
-                        yaml_as_string(value, tmp_str,
-                                       CETECH_ARRAY_LEN(tmp_str));
-                        set_string(cvar, tmp_str);
-                        break;
-                }
-            }
-        }
-    }
-
-
-    void load_global(const char *platform) {
-        cel_alloc *a = ct_memory_a0.main_allocator();
-        ct_cvar bd = find("build");
-        ct_cvar source_dir = find("src");
-
-        const char *build_dir_str = get_string(bd);
-
-        char *config_path = ct_path_a0.join(a, 3,
-                                            build_dir_str,
-                                            platform,
-                                            "global.config");
-
-        ct_vio *source_vio = ct_vio_a0.from_file(config_path,
-                                                 VIO_OPEN_READ);
-
-        char *data = CEL_ALLOCATE(a, char,
-                                     source_vio->size(source_vio->inst));
-
-        source_vio->read(source_vio->inst, data,
-                         source_vio->size(source_vio->inst),
-                         source_vio->size(source_vio->inst));
-        source_vio->close(source_vio->inst);
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(data, &h);
-
-        struct foreach_config_data config_data = {
-                .root_name = NULL
-        };
-
-        yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
-
-    }
-
-    void _cvar_from_str(const char *name,
-                        const char *value) {
-        union {
-            float f;
-            int i;
-            const char *s;
-        } tmp_var;
-
-        ct_cvar cvar = find(name);
-        if (cvar.idx != 0) {
-            enum cvar_type type = _G.types[cvar.idx];
-            switch (type) {
-                case CV_FLOAT:
-                    sscanf(value, "%f", &tmp_var.f);
-                    set_float(cvar, tmp_var.f);
-                    break;
-
-                case CV_INT:
-                    if (value == NULL) {
-                        tmp_var.i = 1;
-                    } else {
-                        sscanf(value, "%d", &tmp_var.i);
-                    }
-
-                    set_int(cvar, tmp_var.i);
-                    break;
-
-                case CV_STRING:
-                    set_string(cvar, value);
-                    break;
-
-                default:
-                    ct_log_a0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
-                                    name);
-                    break;
-            }
-
-        } else {
-            if (value == NULL) {
-                new_int(name, "", 1);
-                return;
-            }
-
-            int d = 0;
-            float f = 0;
-            if (sscanf(value, "%d", &d)) {
-                new_int(name, "", d);
-                return;
-
-            } else if (sscanf(value, "%f", &f)) {
-                new_float(name, "", f);
-                return;
-            }
-
-            new_str(name, "", value);
-            //ct_log_a0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
-        }
-    }
-
-    int parse_args(int argc,
-                   const char **argv) {
-        for (int j = 0; j < argc; ++j) {
-            if (argv[j][0] != '-') {
-                continue;
-            }
-
-            const char *name = argv[j] + 1;
-            const char *value = (j != argc - 1) ? argv[j + 1] : NULL;
-
-            if (value && (value[0] == '-')) {
-                value = NULL;
-            } else {
-                ++j;
-            }
-
-            _cvar_from_str(name, value);
-        }
-
-        return 1;
     }
 
     ct_cvar find_or_create(const char *name,
@@ -485,7 +264,173 @@ namespace config {
         }
     }
 
-    static ct_config_a0 a0 = {
+    struct foreach_config_data {
+        char *root_name;
+    };
+
+    void foreach_config_clb(yaml_node_t key,
+                            yaml_node_t value,
+                            void *_data) {
+        struct foreach_config_data *output = (foreach_config_data *) _data;
+
+        char key_str[128] = {0};
+        yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
+
+        char name[1024] = {0};
+        if (output->root_name != NULL) {
+            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
+                     key_str);
+        } else {
+            snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
+        }
+
+        enum yaml_node_type type = yaml_node_type(value);
+
+        if (type == YAML_TYPE_MAP) {
+            struct foreach_config_data _data = {
+                    .root_name = name
+            };
+
+            yaml_node_foreach_dict(value, foreach_config_clb, &_data);
+        } else if (type == YAML_TYPE_SCALAR) {
+            char value_str[128] = {0};
+
+            float tmp_f;
+            int tmp_int;
+            char tmp_str[128];
+
+            ct_cvar cvar = find(name);
+            if (cvar.idx != 0) {
+                enum cvar_type t = get_type(cvar);
+                switch (t) {
+                    case CV_NONE:
+                        break;
+                    case CV_FLOAT:
+                        tmp_f = yaml_as_float(value);
+                        set_float(cvar, tmp_f);
+                        break;
+                    case CV_INT:
+                        tmp_int = yaml_as_int(value);
+                        set_int(cvar, tmp_int);
+                        break;
+                    case CV_STRING:
+                        yaml_as_string(value, tmp_str,
+                                       CETECH_ARRAY_LEN(tmp_str));
+                        set_string(cvar, tmp_str);
+                        break;
+                }
+            }
+        }
+    }
+
+
+    int load_from_yaml_file(const char *yaml, cel_alloc *alloc) {
+        ct_vio *source_vio = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
+
+        char *data = CEL_ALLOCATE(alloc, char,
+                                  source_vio->size(source_vio->inst));
+
+        source_vio->read(source_vio->inst, data,
+                         source_vio->size(source_vio->inst), 1);
+        source_vio->close(source_vio->inst);
+
+        yaml_document_t h;
+        yaml_node_t root = yaml_load_str(data, &h);
+
+        struct foreach_config_data config_data = {
+                .root_name = NULL
+        };
+
+        yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
+
+        CEL_FREE(alloc, data);
+
+        return 1;
+    }
+
+    void _cvar_from_str(const char *name,
+                        const char *value) {
+        union {
+            float f;
+            int i;
+            const char *s;
+        } tmp_var;
+
+        ct_cvar cvar = find(name);
+        if (cvar.idx != 0) {
+            enum cvar_type type = _G.types[cvar.idx];
+            switch (type) {
+                case CV_FLOAT:
+                    sscanf(value, "%f", &tmp_var.f);
+                    set_float(cvar, tmp_var.f);
+                    break;
+
+                case CV_INT:
+                    if (value == NULL) {
+                        tmp_var.i = 1;
+                    } else {
+                        sscanf(value, "%d", &tmp_var.i);
+                    }
+
+                    set_int(cvar, tmp_var.i);
+                    break;
+
+                case CV_STRING:
+                    set_string(cvar, value);
+                    break;
+
+                default:
+                    ct_log_a0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
+                                    name);
+                    break;
+            }
+
+        } else {
+            if (value == NULL) {
+                new_int(name, "", 1);
+                return;
+            }
+
+            int d = 0;
+            float f = 0;
+            if (sscanf(value, "%d", &d)) {
+                new_int(name, "", d);
+                return;
+
+            } else if (sscanf(value, "%f", &f)) {
+                new_float(name, "", f);
+                return;
+            }
+
+            new_str(name, "", value);
+            //ct_log_a0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+        }
+    }
+
+    int parse_args(int argc,
+                   const char **argv) {
+        for (int j = 0; j < argc; ++j) {
+            if (argv[j][0] != '-') {
+                continue;
+            }
+
+            const char *name = argv[j] + 1;
+            const char *value = (j != argc - 1) ? argv[j + 1] : NULL;
+
+            if (value && (value[0] == '-')) {
+                value = NULL;
+            } else {
+                ++j;
+            }
+
+            _cvar_from_str(name, value);
+        }
+
+        return 1;
+    }
+
+
+    static ct_config_a0 config_a0 = {
             .parse_args = parse_args,
             .find = find,
             .find_or_create = find_or_create,
@@ -500,29 +445,37 @@ namespace config {
             .set_int = set_int,
             .set_string = set_string,
             .log_all = log_all,
+            .load_from_yaml_file = load_from_yaml_file
     };
 
     int init(ct_api_a0 *api) {
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-
-        _G = {0};
-
-        ct_log_a0.debug(LOG_WHERE, "Init");
-
-        api->register_api("ct_config_a0", &a0);
-
-        _G.type = ct_hash_a0.id64_from_str("config");
 
         return 1;
     }
 
     void shutdown() {
-        ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-        _deallocate_all_string();
     }
 };
+
+extern "C" void config_load_module(ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_path_a0);
+    CETECH_GET_API(api, ct_vio_a0);
+    CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_hash_a0);
+
+    _G = {0};
+
+    ct_log_a0.debug(LOG_WHERE, "Init");
+
+    api->register_api("ct_config_a0", &config::config_a0);
+
+    _G.type = ct_hash_a0.id64_from_str("config");
+}
+
+extern "C" void config_unload_module(ct_api_a0 *api) {
+    ct_log_a0.debug(LOG_WHERE, "Shutdown");
+
+    _deallocate_all_string();
+}

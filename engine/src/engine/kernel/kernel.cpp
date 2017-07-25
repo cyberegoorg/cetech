@@ -1,12 +1,14 @@
 #include <celib/allocator.h>
+
 #include <cetech/core/api_system.h>
-#include <cetech/core/task.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/config.h>
 
 #include "../../core/log/log_system_private.h"
 #include "../../core/memory/memory_private.h"
 #include "../../core/api/api_private.h"
 #include "../../core/module/module_private.h"
-#include "../../core/config/config_private.h"
 #include "../../core/memory/allocator_core_private.h"
 
 #include "../static_module.h"
@@ -14,10 +16,11 @@
 #include <celib/fpumath.h>
 
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_task_a0);
+CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_path_a0);
 
 #define LOG_WHERE "kernel"
-
 
 namespace os {
     void register_api(ct_api_a0 *api);
@@ -39,24 +42,42 @@ const char *_platform() {
 int load_config(int argc,
                 const char **argv) {
 
-#ifdef CETECH_CAN_COMPILE
-    if (!config::parse_args(argc, argv)) {
+    if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
     }
 
-    ct_cvar compile = config::find("compile");
-    if (config::get_int(compile)) {
-        config::compile_global(_platform());
+    cel_alloc *a = ct_memory_a0.main_allocator();
+
+    ct_cvar bd = ct_config_a0.find("build");
+    ct_cvar source_dir = ct_config_a0.find("src");
+
+    const char *build_dir_str = ct_config_a0.get_string(bd);
+    const char *source_dir_str = ct_config_a0.get_string(source_dir);
+
+    char *build_dir = ct_path_a0.join(a, 2, build_dir_str, _platform());
+    char *build_config = ct_path_a0.join(a, 2, build_dir, "global.config");
+    char *source_config = ct_path_a0.join(a, 2, source_dir_str,
+                                        "global.config");
+
+#ifdef CETECH_CAN_COMPILE
+    ct_cvar compile = ct_config_a0.find("compile");
+    if (ct_config_a0.get_int(compile)) {
+        ct_path_a0.make_path(build_dir);
+        ct_path_a0.copy_file(a, source_config, build_config);
     }
 #endif
 
-    config::load_global(_platform());
+    ct_config_a0.load_from_yaml_file(build_config, a);
 
-    if (!config::parse_args(argc, argv)) {
+    CEL_FREE(a, build_config);
+    CEL_FREE(a, source_config);
+    CEL_FREE(a, build_dir);
+
+    if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
     }
 
-    config::log_all();
+    ct_config_a0.log_all();
 
     return 1;
 }
@@ -74,16 +95,22 @@ extern "C" void init_core(ct_api_a0 *api) {
 
     LOAD_STATIC_MODULE(api, error);
     LOAD_STATIC_MODULE(api, object);
+    LOAD_STATIC_MODULE(api, vio);
     LOAD_STATIC_MODULE(api, path);
+    LOAD_STATIC_MODULE(api, config);
     LOAD_STATIC_MODULE(api, process);
     LOAD_STATIC_MODULE(api, cpu);
     LOAD_STATIC_MODULE(api, time);
     LOAD_STATIC_MODULE(api, thread);
-    LOAD_STATIC_MODULE(api, vio);
     LOAD_STATIC_MODULE(api, window);
     LOAD_STATIC_MODULE(api, machine);
 
     module::init(core_alloc, api);
+
+    CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_path_a0);
+    CETECH_GET_API(api, ct_config_a0);
 }
 
 extern "C" void load_core() {
@@ -105,15 +132,13 @@ extern "C" int cetech_kernel_init(int argc,
     memory::init(4 * 1024 * 1024);
 
     init_core(api);
-    config::init(api);
-    
     load_config(argc, argv);
 
     load_core();
+
     init_static_modules();
     module::load_dirs("./bin");
 
-    CETECH_GET_API(api, ct_log_a0);
     return 1;
 }
 
@@ -125,8 +150,6 @@ extern "C" int cetech_kernel_shutdown() {
 
     auto* api = api::v0();
 
-
-    config::shutdown();
     module::shutdown();
     api::shutdown();
     memory::memsys_shutdown();
