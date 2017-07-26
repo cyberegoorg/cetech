@@ -6,6 +6,7 @@
 #include <memory.h>
 
 #include <cetech/core/os/path.h>
+#include <cetech/core/os/object.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/config.h>
@@ -39,18 +40,11 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
+CETECH_DECL_API(ct_object_a0);
 
 //==============================================================================
 // Private
 //==============================================================================
-
-
-void *load_object(const char *path);
-
-void unload_object(void *so);
-
-void *load_function(void *so,
-                    const char *name);
 
 
 void _add(const char path[11],
@@ -91,18 +85,18 @@ namespace module {
     void load(const char *path) {
         ct_log_a0.info(LOG_WHERE, "Loading module %s", path);
 
-        void *obj = load_object(path);
+        void *obj = ct_object_a0.load(path);
         if (obj == NULL) {
             return;
         }
 
-        ct_load_module_t load_fce = (ct_load_module_t) load_function(obj,
+        ct_load_module_t load_fce = (ct_load_module_t) ct_object_a0.load_function(obj,
                                                                      "load_module");
         if (load_fce == NULL) {
             return;
         }
 
-        ct_unload_module_t unload_fce = (ct_unload_module_t) load_function(obj,
+        ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0.load_function(obj,
                                                                            "unload_module");
         if (unload_fce == NULL) {
             return;
@@ -224,6 +218,7 @@ extern "C" void module_load_module(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_path_a0);
     CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_object_a0);
     ct_api_a0 = *api;
 
     api->register_api("ct_module_a0", &module::module_api);
