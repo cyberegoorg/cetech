@@ -4,10 +4,10 @@ local api_system  = require("cetech/api_system")
 ffi.cdef[[
 struct ct_module_a0 {
     //! Reload module by path
-    void (*module_reload)(const char *path);
+    void (*reload)(const char *path);
 
     //! Reload all loaded modules
-    void (*module_reload_all)();
+    void (*reload_all)();
 };
 ]]
 

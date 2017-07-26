@@ -17,6 +17,7 @@
 #include <cetech/core/os/path.h>
 
 #include <cetech/engine/resource.h>
+#include <celib/memory.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -327,11 +328,12 @@ namespace config {
     int load_from_yaml_file(const char *yaml, cel_alloc *alloc) {
         ct_vio *source_vio = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
 
-        char *data = CEL_ALLOCATE(alloc, char,
-                                  source_vio->size(source_vio->inst));
+        auto file_size = source_vio->size(source_vio->inst);
 
-        source_vio->read(source_vio->inst, data,
-                         source_vio->size(source_vio->inst), 1);
+        char *data = CEL_ALLOCATE(alloc, char, file_size);
+        celib::mem_set(data, 0, file_size);
+
+        source_vio->read(source_vio->inst, data, file_size, 1);
         source_vio->close(source_vio->inst);
 
         yaml_document_t h;

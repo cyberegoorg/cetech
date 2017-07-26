@@ -5,15 +5,12 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include <cetech/machine/machine.h>
+#include <cetech/core/os/path.h>
 #include <cetech/core/memory.h>
 #include <cetech/core/module.h>
 #include <cetech/core/config.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/log.h>
-#include <cetech/core/os/path.h>
-
-#include "module_private.h"
 
 //==============================================================================
 // Defines
@@ -212,26 +209,29 @@ namespace module {
     }
 
 
-    static ct_module_a0 module_api{
-            .module_reload = reload,
-            .module_reload_all = reload_all
+    static ct_module_a0 module_api = {
+            .reload = reload,
+            .reload_all = reload_all,
+            .add_static = add_static,
+            .load = load,
+            .unload_all = unload_all,
+            .load_dirs = load_dirs
     };
 
-    void init(cel_alloc *allocator,
-              struct ct_api_a0 *api) {
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        ct_api_a0 = *api;
+};
 
-        api->register_api("ct_module_a0", &module_api);
+extern "C" void module_load_module(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_path_a0);
+    CETECH_GET_API(api, ct_log_a0);
+    ct_api_a0 = *api;
 
-        _G = {0};
+    api->register_api("ct_module_a0", &module::module_api);
 
-    }
+    _G = {0};
+}
 
-    void shutdown() {
-        _G = {0};
-    }
-
+extern "C" void module_unload_module(struct ct_api_a0 *api) {
+    ct_log_a0.debug(LOG_WHERE, "Shutdown");
+    _G = {0};
 }

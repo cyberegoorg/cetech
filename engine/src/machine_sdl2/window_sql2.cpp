@@ -156,11 +156,13 @@ static ct_window_a0 window_api = {
         .native_display_ptr = window_native_display_ptr
 };
 
-extern "C" void window_load_module(ct_api_a0 *api) {
+
+int sdl_window_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
     api->register_api("ct_window_a0", &window_api);
+    return 1;
 }
 
-extern "C" void window_unload_module(ct_api_a0 *api) {
-}
+void sdl_window_shutdown() {
 
+}

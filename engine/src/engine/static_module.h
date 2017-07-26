@@ -6,13 +6,18 @@
 
 extern "C" void init_static_modules() {
     ADD_STATIC_MODULE(blob);
+    ADD_STATIC_MODULE(machine);
+
+    ADD_STATIC_MODULE(developsystem);
+    ADD_STATIC_MODULE(task);
+    ADD_STATIC_MODULE(consoleserver);
+
     ADD_STATIC_MODULE(filesystem);
     ADD_STATIC_MODULE(resourcesystem);
 
 #ifdef CETECH_CAN_COMPILE
     ADD_STATIC_MODULE(resourcecompiler);
 #endif
-
 
     ADD_STATIC_MODULE(world);
     ADD_STATIC_MODULE(component);

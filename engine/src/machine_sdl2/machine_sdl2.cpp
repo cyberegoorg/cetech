@@ -64,6 +64,10 @@ void sdl_gamepad_play_rumble(int gamepad,
                              float strength,
                              uint32_t length);
 
+extern int sdl_window_init(ct_api_a0 *api);
+
+extern void sdl_window_shutdown();
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -148,6 +152,7 @@ namespace machine_sdl {
             return; // TODO: dksandasdnask FUCK init without return type?????
         }
 
+        sdl_window_init(api);
         sdl_gamepad_init(api);
         sdl_mouse_init(api);
         sdl_keyboard_init(api);
@@ -158,6 +163,7 @@ namespace machine_sdl {
         sdl_gamepad_shutdown();
         sdl_mouse_shutdown();
         sdl_keyboard_shutdown();
+        sdl_window_shutdown();
 
         SDL_Quit();
 

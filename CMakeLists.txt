@@ -69,10 +69,10 @@ set(SOURCE_FILES
         # Core
         ########################################################################
         engine/src/core/os/error.cpp
-        engine/src/machine/machine_sdl2.cpp
-        engine/src/machine/mouse_sdl2.cpp
-        engine/src/machine/keyboard_sdl2.cpp
-        engine/src/machine/gamepad_sdl2.cpp
+        engine/src/machine_sdl2/machine_sdl2.cpp
+        engine/src/machine_sdl2/mouse_sdl2.cpp
+        engine/src/machine_sdl2/keyboard_sdl2.cpp
+        engine/src/machine_sdl2/gamepad_sdl2.cpp
 
         engine/src/engine/console_server/console_server.cpp
         engine/src/core/memory/allocator_core.cpp
@@ -98,7 +98,7 @@ set(SOURCE_FILES
         engine/src/core/os/cpu.cpp
         engine/src/core/os/thread.cpp
         engine/src/core/os/vio.cpp
-        engine/src/core/os/window.cpp
+        engine/src/machine_sdl2/window_sql2.cpp
         engine/src/core/os/time.cpp
 
         ########################################################################
