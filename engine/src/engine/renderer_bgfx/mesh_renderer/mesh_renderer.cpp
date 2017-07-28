@@ -148,7 +148,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CEL_FREE(ct_memory_a0.main_allocator(),
-                    _G.world_instances[idx].buffer);
+                 _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);

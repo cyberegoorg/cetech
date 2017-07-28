@@ -142,8 +142,8 @@ static int _perspective_fov(lua_State *l) {
 static int _ctor(lua_State *l) {
     float m[16];
 
-    for(int i = 0; i < 16; ++i) {
-        m[i] = luasys_to_float(l, i+1);
+    for (int i = 0; i < 16; ++i) {
+        m[i] = luasys_to_float(l, i + 1);
     }
 
     luasys_push_mat44f(l, m);

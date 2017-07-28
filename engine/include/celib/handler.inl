@@ -82,7 +82,7 @@ namespace celib {
 
     template<typename T>
     Handler<T>::Handler(cel_alloc *allocator) : _generation(allocator),
-                                                   _freeIdx(allocator) {
+                                                _freeIdx(allocator) {
     }
 
     template<typename T>

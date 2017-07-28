@@ -256,8 +256,8 @@ namespace celib {
 
     template<typename T>
     inline Queue<T>::Queue(cel_alloc *allocator) : _data(allocator),
-                                                      _size(0),
-                                                      _offset(0) {}
+                                                   _size(0),
+                                                   _offset(0) {}
 
     template<typename T>
     inline T &Queue<T>::operator[](const uint32_t i) {

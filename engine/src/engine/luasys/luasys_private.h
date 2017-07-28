@@ -71,31 +71,34 @@ const char *luasys_to_string_l(lua_State *,
                                size_t *);
 
 
-
 void luasys_to_vec3f(lua_State *l,
-                         int i, float* value);
+                     int i,
+                     float *value);
 
 void luasys_to_vec4f(lua_State *l,
-                         int i,float* value);
+                     int i,
+                     float *value);
 
 void luasys_to_mat44f(lua_State *l,
-                           int i,float* value);
+                      int i,
+                      float *value);
 
 void luasys_to_quat(lua_State *l,
-                        int i,float* value);
+                    int i,
+                    float *value);
 
 void luasys_push_vec3f(lua_State *l,
-                       float* value);
+                       float *value);
 
 void luasys_push_vec4f(lua_State *l,
-                       float* value);
+                       float *value);
 
 void luasys_push_mat44f(lua_State *l,
-                        float* value);
+                        float *value);
 
 
 void luasys_push_quat(lua_State *l,
-                      float* value);
+                      float *value);
 
 int luasys_execute_string(const char *str);
 

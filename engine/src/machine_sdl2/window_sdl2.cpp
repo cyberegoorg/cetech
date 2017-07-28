@@ -107,7 +107,8 @@ void *window_native_display_ptr(ct_window_ints *w) {
 #endif
 }
 
-ct_window *window_new(struct cel_alloc *alloc,const char *title,
+ct_window *window_new(struct cel_alloc *alloc,
+                      const char *title,
                       enum ct_window_pos x,
                       enum ct_window_pos y,
                       const int32_t width,
@@ -142,7 +143,8 @@ ct_window *window_new(struct cel_alloc *alloc,const char *title,
     return window;
 }
 
-ct_window *window_new_from(struct cel_alloc *alloc, void *hndl) {
+ct_window *window_new_from(struct cel_alloc *alloc,
+                           void *hndl) {
     auto *window = CEL_ALLOCATE(alloc, ct_window, sizeof(ct_window));
 
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
@@ -166,7 +168,8 @@ ct_window *window_new_from(struct cel_alloc *alloc, void *hndl) {
     return window;
 }
 
-void window_destroy(cel_alloc *alloc, ct_window *w) {
+void window_destroy(cel_alloc *alloc,
+                    ct_window *w) {
     SDL_DestroyWindow((SDL_Window *) w->inst);
     CEL_FREE(alloc, w);
 }

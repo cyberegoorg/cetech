@@ -170,7 +170,7 @@ namespace celib {
             T *new_data = 0;
             if (new_capacity > 0) {
                 new_data = CEL_ALLOCATE(a._allocator, T,
-                                           sizeof(T) * new_capacity);
+                                        sizeof(T) * new_capacity);
                 memcpy(new_data, a._data, sizeof(T) * a._size);
             }
 
@@ -223,7 +223,7 @@ namespace celib {
     template<typename T>
     inline
     Array<T>::Array(struct cel_alloc *a) : _allocator(a), _size(0),
-                                              _capacity(0), _data(0) {}
+                                           _capacity(0), _data(0) {}
 
     template<typename T>
     inline

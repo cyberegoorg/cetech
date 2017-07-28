@@ -60,7 +60,8 @@ struct ct_path_a0 {
     void (*basename)(const char *path,
                      char *out);
 
-    void (*dir)(char *out,const char *path);
+    void (*dir)(char *out,
+                const char *path);
 
     //! Get file extension
     //! \param path Path

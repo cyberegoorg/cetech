@@ -100,7 +100,8 @@ struct ct_develop_a0 {
     //! Enter scope
     //! \param name Scope name
     //! \return Scope data
-    struct ct_scope_data (*enter_scope)(const char *name, uint32_t worker_id);
+    struct ct_scope_data (*enter_scope)(const char *name,
+                                        uint32_t worker_id);
 
     //! Leave scope
     //! \param scope_data Scope data

@@ -65,7 +65,8 @@ struct ct_gamepad_a0 {
     //! \param axis_index Axis index
     //! \return Axis value
     void (*axis)(uint32_t idx,
-                 const uint32_t axis_index, float* value);
+                 const uint32_t axis_index,
+                 float *value);
 
     //! Play rumble
     //! \param gamepad Gamepad
@@ -163,7 +164,8 @@ struct ct_mouse_a0 {
     //! \param axis_index Axis index
     //! \return Axis value
     void (*axis)(uint32_t idx,
-                    const uint32_t axis_index, float* value);
+                 const uint32_t axis_index,
+                 float *value);
 
     void (*update)();
 };

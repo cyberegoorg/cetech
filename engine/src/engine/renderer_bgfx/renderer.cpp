@@ -118,7 +118,9 @@ void renderer_render_world(ct_world world,
     float view_matrix[16];
     float proj_matrix[16];
 
-    camera_api->get_project_view(camera, proj_matrix, view_matrix);
+    camera_api->get_project_view(camera, proj_matrix, view_matrix,
+                                 _G.size_width, _G.size_height);
+
     bgfx::setViewTransform(0, view_matrix, proj_matrix);
 
     bgfx::setViewRect(0, 0, 0, (uint16_t) _G.size_width,

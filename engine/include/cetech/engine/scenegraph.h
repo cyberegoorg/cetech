@@ -44,46 +44,50 @@ struct ct_scenegprah_a0 {
     //! \param world World
     //! \param node Node
     //! \return Position
-    void (*get_position)(struct ct_scene_node node, float* position);
+    void (*get_position)(struct ct_scene_node node,
+                         float *position);
 
     //! Get node rotation
     //! \param world World
     //! \param node Node
     //! \return Rotation
-    void (*get_rotation)(struct ct_scene_node node, float* rotation);
+    void (*get_rotation)(struct ct_scene_node node,
+                         float *rotation);
 
     //! Get node scale
     //! \param world World
     //! \param node Node
     //! \return Scale
-    void (*get_scale)(struct ct_scene_node node, float* scale);
+    void (*get_scale)(struct ct_scene_node node,
+                      float *scale);
 
     //! Get world matrix
     //! \param world World
     //! \param node Node
     //! \return World matrix
-    void (*get_world_matrix)(struct ct_scene_node node, float* matrix);
+    void (*get_world_matrix)(struct ct_scene_node node,
+                             float *matrix);
 
     //! Set position
     //! \param world World
     //! \param node Node
     //! \param pos Position
     void (*set_position)(struct ct_scene_node node,
-                         float* pos);
+                         float *pos);
 
     //! Set rotation
     //! \param world World
     //! \param node Node
     //! \param rot Rotation
     void (*set_rotation)(struct ct_scene_node node,
-                         float* rot);
+                         float *rot);
 
     //! Set scale
     //! \param world World
     //! \param node Node
     //! \param scale Scale
     void (*set_scale)(struct ct_scene_node node,
-                      float* scale);
+                      float *scale);
 
     //! Has entity scene-graph component?
     //! \param world World

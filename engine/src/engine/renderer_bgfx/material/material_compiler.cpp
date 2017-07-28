@@ -177,7 +177,7 @@ namespace material_compiler {
 
         char *source_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                source_vio->size(source_vio->inst) + 1);
+                             source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
         source_vio->read(source_vio->inst, source_data, sizeof(char),
@@ -230,7 +230,7 @@ namespace material_compiler {
         build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
 
         build_vio->write(build_vio->inst, output.uniform_names._data,
-                         sizeof(char),array::size(output.uniform_names));
+                         sizeof(char), array::size(output.uniform_names));
 
         build_vio->write(build_vio->inst, output.data._data, sizeof(uint8_t),
                          array::size(output.data));

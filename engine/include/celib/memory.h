@@ -87,26 +87,25 @@ namespace celib {
 
 namespace celib {
     template<bool>
-    inline bool isEnabled()
-    {
+    inline bool isEnabled() {
         return true;
     }
 
     template<>
-    inline bool isEnabled<false>()
-    {
+    inline bool isEnabled<false>() {
         return false;
     }
 
-    inline bool ignoreC4127(bool _x)
-    {
+    inline bool ignoreC4127(bool _x) {
         return _x;
     }
 
     template<typename Ty>
-    inline void xchg(Ty& _a, Ty& _b)
-    {
-        Ty tmp = _a; _a = _b; _b = tmp;
+    inline void xchg(Ty &_a,
+                     Ty &_b) {
+        Ty tmp = _a;
+        _a = _b;
+        _b = tmp;
     }
 
     inline void xchg(void *_a,

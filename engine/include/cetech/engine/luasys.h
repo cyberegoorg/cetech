@@ -176,39 +176,42 @@ struct ct_lua_a0 {
     //! \param i Element idx
     //! \return Vec3f
     void (*to_vec3f)(lua_State *l,
-                     int i, float* value);
+                     int i,
+                     float *value);
 
     //! Get element value as mat44f
     //! \param l
     //! \param i Element idx
     //! \return Mat44f
     void (*to_mat44f)(lua_State *l,
-                      int i, float* value);
+                      int i,
+                      float *value);
 
     //! Get element value as quat
     //! \param l
     //! \param i Element idx
     //! \return Quatf
     void (*to_quat)(lua_State *l,
-                        int i, float* value);
+                    int i,
+                    float *value);
 
     //! Push vec3f
     //! \param l
     //! \param v Value
     void (*push_vec3f)(lua_State *l,
-                       float* value);
+                       float *value);
 
     //! Push mat44f
     //! \param l
     //! \param v Value
     void (*push_mat44f)(lua_State *l,
-                        float* v);
+                        float *v);
 
     //! Push quatf
     //! \param l
     //! \param v Value
     void (*push_quat)(lua_State *l,
-                      float* v);
+                      float *v);
 
     //! Execute lua code
     //! \param str Lua code

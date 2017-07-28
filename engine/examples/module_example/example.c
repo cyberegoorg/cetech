@@ -5,6 +5,7 @@
 #include "cetech/engine/input.h"
 
 CETECH_DECL_API(ct_keyboard_a0)
+
 CETECH_DECL_API(ct_log_a0)
 
 void update() {

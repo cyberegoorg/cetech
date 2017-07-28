@@ -60,7 +60,7 @@ int load_config(int argc,
     ct_cvar source_dir = ct_config_a0.find("src");
     const char *source_dir_str = ct_config_a0.get_string(source_dir);
     char *source_config = ct_path_a0.join(a, 2, source_dir_str,
-                                        "global.config");
+                                          "global.config");
 
     ct_cvar compile = ct_config_a0.find("compile");
     if (ct_config_a0.get_int(compile)) {
@@ -87,7 +87,7 @@ int load_config(int argc,
 void application_register_api(ct_api_a0 *api);
 
 extern "C" int cetech_kernel_init(int argc,
-                       const char **argv) {
+                                  const char **argv) {
     auto *core_alloc = core_allocator::get();
 
     api::init(core_alloc);
@@ -136,7 +136,7 @@ extern "C" int cetech_kernel_shutdown() {
 
     ct_module_a0.unload_all();
 
-    auto* api = api::v0();
+    auto *api = api::v0();
 
     CETECH_UNLOAD_STATIC_MODULE(api, error);
     CETECH_UNLOAD_STATIC_MODULE(api, vio);

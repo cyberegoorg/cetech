@@ -75,7 +75,8 @@ typedef struct {
     //! On world update callback
     //! \param world World
     //! \param dt Delta time
-    void (*on_update)(struct ct_world world, float dt);
+    void (*on_update)(struct ct_world world,
+                      float dt);
 } ct_world_callbacks_t;
 
 
@@ -126,6 +127,7 @@ static struct ct_component_clb {
     struct ct_property_value (*get_property)(struct ct_world world,
                                              struct ct_entity entity,
                                              uint64_t key);
+
     ct_world_callbacks_t world_clb;
 } ct_component_clb_null = {};
 

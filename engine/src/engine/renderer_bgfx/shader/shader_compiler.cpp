@@ -168,7 +168,7 @@ namespace shader_compiler {
                                                VIO_OPEN_READ);
         char *vs_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                tmp_file->size(tmp_file->inst) + 1);
+                             tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, vs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
         resource.vs_size = tmp_file->size(tmp_file->inst);
@@ -197,7 +197,7 @@ namespace shader_compiler {
         tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                tmp_file->size(tmp_file->inst) + 1);
+                             tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, fs_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
 

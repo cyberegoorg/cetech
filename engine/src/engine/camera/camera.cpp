@@ -154,15 +154,13 @@ namespace camera {
 
     void get_project_view(ct_camera camera,
                           float *proj,
-                          float *view) {
+                          float *view,
+                          int width,
+                          int height) {
 
         WorldInstance *world_inst = _get_world_instance(camera.world);
 
-        int width, height;
-        width = height = 0;
-
-        ct_renderer_a0.get_size(&width,
-                                &height); // TODO, to arg... or viewport?
+        ct_renderer_a0.get_size(&width, &height);
 
         ct_entity e = world_inst->entity[camera.idx];
         ct_transform t = ct_transform_a0.get(camera.world, e);

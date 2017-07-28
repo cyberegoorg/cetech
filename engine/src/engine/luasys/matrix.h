@@ -41,19 +41,19 @@ static int _mat44f_index(lua_State *l) {
 
     switch (s[0]) {
         case 'x':
-            luasys_push_vec3f(l, &a[0*4]);
+            luasys_push_vec3f(l, &a[0 * 4]);
             return 1;
 
         case 'y':
-            luasys_push_vec3f(l, &a[1*4]);
+            luasys_push_vec3f(l, &a[1 * 4]);
             return 1;
 
         case 'z':
-            luasys_push_vec3f(l, &a[2*4]);
+            luasys_push_vec3f(l, &a[2 * 4]);
             return 1;
 
         case 'w':
-            luasys_push_vec3f(l, &a[3*4]);
+            luasys_push_vec3f(l, &a[3 * 4]);
             return 1;
 
         default:

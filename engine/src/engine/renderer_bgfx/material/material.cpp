@@ -281,9 +281,11 @@ namespace material {
         int slot_idx = _material_find_slot(resource, slot);
 
 
-        memcpy(&u_mat44f[16*(slot_idx -
-                         (resource->texture_count + resource->vec4f_count +
-                          resource->mat33f_count))], value, sizeof(float) * 16);
+        memcpy(&u_mat44f[16 * (slot_idx -
+                               (resource->texture_count +
+                                resource->vec4f_count +
+                                resource->mat33f_count))], value,
+               sizeof(float) * 16);
     }
 
 
@@ -313,17 +315,17 @@ namespace material {
         offset += resource->texture_count;
 
         for (uint32_t i = 0; i < resource->vec4f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_vec4f[4*i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_vec4f[4 * i], 1);
         }
         offset += resource->vec4f_count;
 
         for (uint32_t i = 0; i < resource->mat33f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_mat33f[9*i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_mat33f[9 * i], 1);
         }
         offset += resource->mat33f_count;
 
         for (uint32_t i = 0; i < resource->mat44f_count; ++i) {
-            bgfx::setUniform(u_handler[offset + i], &u_mat44f[16*i], 1);
+            bgfx::setUniform(u_handler[offset + i], &u_mat44f[16 * i], 1);
         }
         offset += resource->mat44f_count;
 

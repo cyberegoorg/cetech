@@ -14,7 +14,6 @@
 #include <cetech/engine/resource.h>
 #include <cetech/engine/entity.h>
 
-#include <cetech/core/yaml.h>
 #include <cetech/engine/scenegraph.h>
 
 #include "scene_blob.h"

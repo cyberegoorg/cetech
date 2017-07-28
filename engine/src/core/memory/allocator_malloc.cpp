@@ -75,8 +75,8 @@ namespace memory {
         auto *a = CEL_ALLOCATE(core_alloc, cel_alloc, sizeof(cel_alloc));
 
         struct allocator_malloc *m = CEL_ALLOCATE(core_alloc,
-                                                     allocator_malloc,
-                                                     sizeof(allocator_malloc));
+                                                  allocator_malloc,
+                                                  sizeof(allocator_malloc));
         m->total_allocated = 0;
 
         *a = (cel_alloc) {

@@ -49,46 +49,50 @@ struct ct_transform_a0 {
     //! \param world World
     //! \param transform transform
     //! \return Position
-    void (*get_position)(struct ct_transform transform, float* position);
+    void (*get_position)(struct ct_transform transform,
+                         float *position);
 
     //! Get transform rotation
     //! \param world World
     //! \param transform transform
     //! \return Rotation
-    void (*get_rotation)(struct ct_transform transform, float* rotation);
+    void (*get_rotation)(struct ct_transform transform,
+                         float *rotation);
 
     //! Get transform scale
     //! \param world World
     //! \param transform transform
     //! \return Scale
-    void (*get_scale)(struct ct_transform transform, float* scale);
+    void (*get_scale)(struct ct_transform transform,
+                      float *scale);
 
     //! Get world matrix
     //! \param world World
     //! \param transform transform
     //! \return World matrix
-    void (*get_world_matrix)(struct ct_transform transform, float* matrix);
+    void (*get_world_matrix)(struct ct_transform transform,
+                             float *matrix);
 
     //! Set position
     //! \param world World
     //! \param transform transform
     //! \param pos Position
     void (*set_position)(struct ct_transform transform,
-                         float* position);
+                         float *position);
 
     //! Set rotation
     //! \param world World
     //! \param transform transform
     //! \param rot Rotation
     void (*set_rotation)(struct ct_transform transform,
-                         float* rotation);
+                         float *rotation);
 
     //! Set scale
     //! \param world World
     //! \param transform transform
     //! \param scale Scale
     void (*set_scale)(struct ct_transform transform,
-                      float* scale);
+                      float *scale);
 
     //! Has entity scene-graph component?
     //! \param world World
@@ -115,9 +119,9 @@ struct ct_transform_a0 {
     struct ct_transform (*create)(struct ct_world world,
                                   struct ct_entity entity,
                                   struct ct_entity parent,
-                                  float* position,
-                                  float* rotation,
-                                  float* scale);
+                                  float *position,
+                                  float *rotation,
+                                  float *scale);
 
     //! Link two transform
     //! \param world World

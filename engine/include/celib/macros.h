@@ -194,19 +194,19 @@
 #endif
 ///
 #define CEL_CLASS_NO_DEFAULT_CTOR(_class) \
-			private: _class()
+            private: _class()
 
 #define CEL_CLASS_NO_COPY(_class) \
-			private: _class(const _class& _rhs)
+            private: _class(const _class& _rhs)
 
 #define CEL_CLASS_NO_ASSIGNMENT(_class) \
-			private: _class& operator=(const _class& _rhs)
+            private: _class& operator=(const _class& _rhs)
 
 #define CEL_CLASS_ALLOCATOR(_class) \
-			public: void* operator new(size_t _size); \
-			public: void  operator delete(void* _ptr); \
-			public: void* operator new[](size_t _size); \
-			public: void  operator delete[](void* _ptr)
+            public: void* operator new(size_t _size); \
+            public: void  operator delete(void* _ptr); \
+            public: void* operator new[](size_t _size); \
+            public: void  operator delete[](void* _ptr)
 
 #define CEL_CLASS_1(_class, _a1) CEL_CONCATENATE(CEL_CLASS_, _a1)(_class)
 #define CEL_CLASS_2(_class, _a1, _a2) CEL_CLASS_1(_class, _a1); CEL_CLASS_1(_class, _a2)

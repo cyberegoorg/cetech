@@ -303,352 +303,352 @@ namespace celib {
     inline void mat4_identity(float *result);
 
     inline void mat4_translate(float *result,
-                              float tx,
-                              float ty,
-                              float tz);
+                               float tx,
+                               float ty,
+                               float tz);
 
     inline void mat4_scale(float *result,
-                          float sx,
-                          float sy,
-                          float sz);
+                           float sx,
+                           float sy,
+                           float sz);
 
     inline void mat4_scale(float *result,
-                          float scale);
+                           float scale);
 
     inline void mat4_from_normal(float *result,
-                                const float *normal,
-                                float scale,
-                                const float *pos);
+                                 const float *normal,
+                                 float scale,
+                                 const float *pos);
 
     inline void mat4_from_normal(float *result,
-                                const float *normal,
-                                float scale,
-                                const float *pos,
-                                float angle);
+                                 const float *normal,
+                                 float scale,
+                                 const float *pos,
+                                 float angle);
 
     inline void mat3_inverse(float *result,
                              const float *a);
 
     inline void mat4_inverse(float *result,
-                            const float *a);
+                             const float *a);
 
     inline void mat4_quat(float *result,
-                         const float *quat);
+                          const float *quat);
 
     inline void mat4_quat_translation(float *result,
-                                     const float *quat,
-                                     const float *translation);
+                                      const float *quat,
+                                      const float *translation);
 
     inline void mat4_quat_translation_hmd(float *result,
-                                         const float *quat,
-                                         const float *translation);
+                                          const float *quat,
+                                          const float *translation);
 
 
     inline void mat4_look_at_lh(float *result,
-                               const float *eye,
-                               const float *at,
-                               const float *up);
+                                const float *eye,
+                                const float *at,
+                                const float *up);
 
     inline void mat4_look_at_rh(float *result,
-                               const float *eye,
-                               const float *at,
-                               const float *up);
+                                const float *eye,
+                                const float *at,
+                                const float *up);
 
     inline void mat4_look_at(float *result,
-                            const float *eye,
-                            const float *at,
-                            const float *up);
+                             const float *eye,
+                             const float *at,
+                             const float *up);
 
     template<Handness::Enum HandnessT>
     inline void mat4_proj_xywh(float *result,
-                              float x,
-                              float y,
-                              float width,
-                              float height,
-                              float near,
-                              float far,
-                              bool oglNdc);
+                               float x,
+                               float y,
+                               float width,
+                               float height,
+                               float near,
+                               float far,
+                               bool oglNdc);
 
 
     inline void mat4_proj(float *result,
-                         float ut,
-                         float dt,
-                         float lt,
-                         float rt,
-                         float near,
-                         float far,
-                         bool oglNdc);
+                          float ut,
+                          float dt,
+                          float lt,
+                          float rt,
+                          float near,
+                          float far,
+                          bool oglNdc);
 
 
     inline void mat4_proj(float *result,
-                         const float *fov,
-                         float near,
-                         float far,
-                         bool oglNdc);
+                          const float *fov,
+                          float near,
+                          float far,
+                          bool oglNdc);
 
 
     inline void mat4_proj(float *result,
-                         float fovy,
-                         float aspect,
-                         float near,
-                         float far,
-                         bool oglNdc);
+                          float fovy,
+                          float aspect,
+                          float near,
+                          float far,
+                          bool oglNdc);
 
 
     inline void mat4_proj_lh(float *result,
-                            float ut,
-                            float dt,
-                            float lt,
-                            float rt,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-
-    inline void mat4_proj_lh(float *result,
-                            const float *fov,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-    inline void mat4_proj_lh(float *result,
-                            float fovy,
-                            float aspect,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-
-    inline void mat4_proj_rh(float *result,
-                            float ut,
-                            float dt,
-                            float lt,
-                            float rt,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-    inline void mat4_proj_rh(float *result,
-                            const float *fov,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-    inline void mat4_proj_rh(float *result,
-                            float fovy,
-                            float aspect,
-                            float near,
-                            float far,
-                            bool oglNdc);
-
-    template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
-    inline void mat4_proj_inf_xywh(float *result,
-                                  float x,
-                                  float y,
-                                  float width,
-                                  float height,
-                                  float near,
-                                  bool oglNdc);
-
-
-    inline void mat4_proj_inf(float *result,
-                             const float *fov,
-                             float near,
-                             bool oglNdc);
-
-
-    inline void mat4_proj_inf(float *result,
                              float ut,
                              float dt,
                              float lt,
                              float rt,
                              float near,
+                             float far,
                              bool oglNdc);
 
 
-    inline void mat4_proj_inf(float *result,
+    inline void mat4_proj_lh(float *result,
+                             const float *fov,
+                             float near,
+                             float far,
+                             bool oglNdc);
+
+    inline void mat4_proj_lh(float *result,
                              float fovy,
                              float aspect,
                              float near,
+                             float far,
                              bool oglNdc);
 
 
-    inline void mat4_proj_inf_lh(float *result,
-                                float ut,
-                                float dt,
-                                float lt,
-                                float rt,
-                                float near,
-                                bool oglNdc);
+    inline void mat4_proj_rh(float *result,
+                             float ut,
+                             float dt,
+                             float lt,
+                             float rt,
+                             float near,
+                             float far,
+                             bool oglNdc);
+
+    inline void mat4_proj_rh(float *result,
+                             const float *fov,
+                             float near,
+                             float far,
+                             bool oglNdc);
+
+    inline void mat4_proj_rh(float *result,
+                             float fovy,
+                             float aspect,
+                             float near,
+                             float far,
+                             bool oglNdc);
+
+    template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
+    inline void mat4_proj_inf_xywh(float *result,
+                                   float x,
+                                   float y,
+                                   float width,
+                                   float height,
+                                   float near,
+                                   bool oglNdc);
+
+
+    inline void mat4_proj_inf(float *result,
+                              const float *fov,
+                              float near,
+                              bool oglNdc);
+
+
+    inline void mat4_proj_inf(float *result,
+                              float ut,
+                              float dt,
+                              float lt,
+                              float rt,
+                              float near,
+                              bool oglNdc);
+
+
+    inline void mat4_proj_inf(float *result,
+                              float fovy,
+                              float aspect,
+                              float near,
+                              bool oglNdc);
 
 
     inline void mat4_proj_inf_lh(float *result,
-                                const float *fov,
-                                float near,
-                                bool oglNdc);
+                                 float ut,
+                                 float dt,
+                                 float lt,
+                                 float rt,
+                                 float near,
+                                 bool oglNdc);
 
 
     inline void mat4_proj_inf_lh(float *result,
-                                float fovy,
-                                float aspect,
-                                float near,
-                                bool oglNdc);
+                                 const float *fov,
+                                 float near,
+                                 bool oglNdc);
+
+
+    inline void mat4_proj_inf_lh(float *result,
+                                 float fovy,
+                                 float aspect,
+                                 float near,
+                                 bool oglNdc);
 
 
     inline void mat4_proj_inf_rh(float *result,
-                                float ut,
-                                float dt,
-                                float lt,
-                                float rt,
-                                float near,
-                                bool oglNdc);
+                                 float ut,
+                                 float dt,
+                                 float lt,
+                                 float rt,
+                                 float near,
+                                 bool oglNdc);
 
 
     inline void mat4_proj_inf_rh(float *result,
-                                const float *fov,
-                                float near,
-                                bool oglNdc);
+                                 const float *fov,
+                                 float near,
+                                 bool oglNdc);
 
 
     inline void mat4_proj_inf_rh(float *result,
-                                float fovy,
-                                float aspect,
-                                float near,
-                                bool oglNdc);
+                                 float fovy,
+                                 float aspect,
+                                 float near,
+                                 bool oglNdc);
 
 
     inline void mat4_proj_rev_inf_lh(float *result,
-                                    float ut,
-                                    float dt,
-                                    float lt,
-                                    float rt,
-                                    float near,
-                                    bool oglNdc);
+                                     float ut,
+                                     float dt,
+                                     float lt,
+                                     float rt,
+                                     float near,
+                                     bool oglNdc);
 
 
     inline void mat4_proj_rev_inf_lh(float *result,
-                                    const float *fov,
-                                    float near,
-                                    bool oglNdc);
+                                     const float *fov,
+                                     float near,
+                                     bool oglNdc);
 
 
     inline void mat4_proj_rev_inf_lh(float *result,
-                                    float fovy,
-                                    float aspect,
-                                    float near,
-                                    bool oglNdc);
+                                     float fovy,
+                                     float aspect,
+                                     float near,
+                                     bool oglNdc);
 
 
     inline void mat4_proj_rev_inf_rh(float *result,
-                                    float ut,
-                                    float dt,
-                                    float lt,
-                                    float rt,
-                                    float near,
-                                    bool oglNdc);
+                                     float ut,
+                                     float dt,
+                                     float lt,
+                                     float rt,
+                                     float near,
+                                     bool oglNdc);
 
     inline void mat4_proj_rev_inf_rh(float *result,
-                                    const float *fov,
-                                    float near,
-                                    bool oglNdc);
+                                     const float *fov,
+                                     float near,
+                                     bool oglNdc);
 
     inline void mat4_proj_rev_inf_rh(float *result,
-                                    float fovy,
-                                    float aspect,
-                                    float near,
-                                    bool oglNdc);
+                                     float fovy,
+                                     float aspect,
+                                     float near,
+                                     bool oglNdc);
 
     inline void mat4_ortho(float *result,
-                          float left,
-                          float right,
-                          float bottom,
-                          float top,
-                          float near,
-                          float far,
-                          float offset,
-                          bool oglNdc);
+                           float left,
+                           float right,
+                           float bottom,
+                           float top,
+                           float near,
+                           float far,
+                           float offset,
+                           bool oglNdc);
 
     inline void mat4_ortho_lh(float *result,
-                             float left,
-                             float right,
-                             float bottom,
-                             float top,
-                             float near,
-                             float far,
-                             float offset,
-                             bool oglNdc);
+                              float left,
+                              float right,
+                              float bottom,
+                              float top,
+                              float near,
+                              float far,
+                              float offset,
+                              bool oglNdc);
 
     inline void mat4_ortho_rh(float *result,
-                             float left,
-                             float right,
-                             float bottom,
-                             float top,
-                             float near,
-                             float far,
-                             float offset,
-                             bool oglNdc);
+                              float left,
+                              float right,
+                              float bottom,
+                              float top,
+                              float near,
+                              float far,
+                              float offset,
+                              bool oglNdc);
 
 
     inline void mat4_rotate_x(float *result,
-                             float ax);
+                              float ax);
 
     inline void mat4_rotate_y(float *result,
-                             float ay);
-
-    inline void mat4_rotate_z(float *result,
-                             float az);
-
-    inline void mat4_rotate_xy(float *result,
-                              float ax,
                               float ay);
 
-    inline void mat4_rotate_xyz(float *result,
+    inline void mat4_rotate_z(float *result,
+                              float az);
+
+    inline void mat4_rotate_xy(float *result,
                                float ax,
-                               float ay,
-                               float az);
+                               float ay);
+
+    inline void mat4_rotate_xyz(float *result,
+                                float ax,
+                                float ay,
+                                float az);
 
     inline void mat4_rotate_zyx(float *result,
-                               float ax,
-                               float ay,
-                               float az);
+                                float ax,
+                                float ay,
+                                float az);
 
     inline void mat4_srt(float *result,
-                        float sx,
-                        float sy,
-                        float sz,
-                        float ax,
-                        float ay,
-                        float az,
-                        float tx,
-                        float ty,
-                        float tz);
+                         float sx,
+                         float sy,
+                         float sz,
+                         float ax,
+                         float ay,
+                         float az,
+                         float tx,
+                         float ty,
+                         float tz);
 
     inline void vec3_mul_mtx(float *result,
                              const float *vec,
                              const float *mat);
 
     inline void vec3_mul_mat4_h(float *result,
-                               const float *vec,
-                               const float *mat);
+                                const float *vec,
+                                const float *mat);
 
     inline void vec4_mul_mtx(float *result,
                              const float *vec,
                              const float *mat);
 
     inline void mat4_mul(float *result,
-                        const float *a,
-                        const float *b);
+                         const float *a,
+                         const float *b);
 
     inline void mat4_transpose(float *result,
-                              const float *a);
+                               const float *a);
 
     /// Convert LH to RH projection matrix and vice versa.
     inline void mat4_proj_flip_handedness(float *dst,
-                                         const float *src);
+                                          const float *src);
 
     /// Convert LH to RH view matrix and vice versa.
     inline void mat4_view_flip_handedness(float *dst,
-                                         const float *src);
+                                          const float *src);
 
     inline void calc_normal(float *result,
                             float *va,

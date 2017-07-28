@@ -102,9 +102,12 @@ void yaml_merge(yaml_node_t root,
 //==============================================================================
 // Define nodes
 //==============================================================================
-void yaml_as_vec3(yaml_node_t node, float* value);
-void yaml_as_vec4(yaml_node_t node, float* value);
-void yaml_as_mat44(yaml_node_t node, float* value);
+void yaml_as_vec3(yaml_node_t node,
+                  float *value);
+void yaml_as_vec4(yaml_node_t node,
+                  float *value);
+void yaml_as_mat44(yaml_node_t node,
+                   float *value);
 
 #define YAML_NODE_AS_DEFN(T, N) T yaml_as_##N(yaml_node_t node)
 #define YAML_NODE_AS_DEF(T) YAML_NODE_AS_DEFN(T, T)

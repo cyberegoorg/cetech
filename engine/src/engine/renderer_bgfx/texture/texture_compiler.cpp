@@ -143,7 +143,7 @@ namespace texture_compiler {
                                                VIO_OPEN_READ);
         char *tmp_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                tmp_file->size(tmp_file->inst) + 1);
+                             tmp_file->size(tmp_file->inst) + 1);
         tmp_file->read(tmp_file->inst, tmp_data, sizeof(char),
                        tmp_file->size(tmp_file->inst));
 

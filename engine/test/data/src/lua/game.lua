@@ -1,4 +1,3 @@
-
 for k, v in pairs(cetech) do _G[k] = v end
 
 Game = Game or {}

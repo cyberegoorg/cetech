@@ -1,7 +1,5 @@
 
-#include <cetech/engine/entity.h>
 
-#include "cetech/engine/transform.h"
 #include "../luasys_private.h"
 #include <cetech/core/api_system.h>
 #include <celib/fpumath.h>

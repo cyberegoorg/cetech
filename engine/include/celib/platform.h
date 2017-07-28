@@ -80,34 +80,34 @@
 #endif //
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
-#if defined(__arm__)     || \
-	defined(__aarch64__) || \
-	defined(_M_ARM)
+#if defined(__arm__) || \
+    defined(__aarch64__) || \
+    defined(_M_ARM)
 #	undef  CEL_CPU_ARM
 #	define CEL_CPU_ARM 1
 #	define CEL_CACHE_LINE_SIZE 64
-#elif defined(__MIPSEL__)     || \
-	  defined(__mips_isa_rev) || \
-	  defined(__mips64)
+#elif defined(__MIPSEL__) || \
+      defined(__mips_isa_rev) || \
+      defined(__mips64)
 #	undef  CEL_CPU_MIPS
 #	define CEL_CPU_MIPS 1
 #	define CEL_CACHE_LINE_SIZE 64
-#elif defined(_M_PPC)        || \
-	  defined(__powerpc__)   || \
-	  defined(__powerpc64__)
+#elif defined(_M_PPC) || \
+      defined(__powerpc__) || \
+      defined(__powerpc64__)
 #	undef  CEL_CPU_PPC
 #	define CEL_CPU_PPC 1
 #	define CEL_CACHE_LINE_SIZE 128
-#elif defined(__riscv)   || \
-	  defined(__riscv__) || \
-	  defined(RISCVEL)
+#elif defined(__riscv) || \
+      defined(__riscv__) || \
+      defined(RISCVEL)
 #	undef  CEL_CPU_RISCV
 #	define CEL_CPU_RISCV 1
 #	define CEL_CACHE_LINE_SIZE 64
-#elif defined(_M_IX86)    || \
-	  defined(_M_X64)     || \
-	  defined(__i386__)   || \
-	  defined(__x86_64__)
+#elif defined(_M_IX86) || \
+      defined(_M_X64) || \
+      defined(__i386__) || \
+      defined(__x86_64__)
 #	undef  CEL_CPU_X86
 #	define CEL_CPU_X86 1
 #	define CEL_CACHE_LINE_SIZE 64
@@ -117,14 +117,14 @@
 #	define CEL_CACHE_LINE_SIZE 64
 #endif //
 
-#if defined(__x86_64__)    || \
-	defined(_M_X64)        || \
-	defined(__aarch64__)   || \
-	defined(__64BIT__)     || \
-	defined(__mips64)      || \
-	defined(__powerpc64__) || \
-	defined(__ppc64__)     || \
-	defined(__LP64__)
+#if defined(__x86_64__) || \
+    defined(_M_X64) || \
+    defined(__aarch64__) || \
+    defined(__64BIT__) || \
+    defined(__mips64) || \
+    defined(__powerpc64__) || \
+    defined(__ppc64__) || \
+    defined(__LP64__)
 #	undef  CEL_ARCH_64BIT
 #	define CEL_ARCH_64BIT 64
 #else
@@ -188,7 +188,7 @@
 #	undef  CEL_PLATFORM_LINUX
 #	define CEL_PLATFORM_LINUX 1
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
-	|| defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
+ || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 #	undef  CEL_PLATFORM_IOS
 #	define CEL_PLATFORM_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
@@ -204,10 +204,10 @@
 #	undef  CEL_PLATFORM_QNX
 #	define CEL_PLATFORM_QNX 1
 #elif  defined(__FreeBSD__)        \
-	|| defined(__FreeBSD_kernel__) \
-	|| defined(__NetBSD__)         \
-	|| defined(__OpenBSD__)        \
-	|| defined(__DragonFly__)
+    || defined(__FreeBSD_kernel__) \
+    || defined(__NetBSD__)         \
+    || defined(__OpenBSD__)        \
+    || defined(__DragonFly__)
 #	undef  CEL_PLATFORM_BSD
 #	define CEL_PLATFORM_BSD 1
 #elif defined(__GNU__)
@@ -235,58 +235,58 @@
 #	endif //
 
 #	if !CEL_CRT_BIONIC \
-	&& !CEL_CRT_GLIBC  \
-	&& !CEL_CRT_LIBCXX \
-	&& !CEL_CRT_MINGW  \
-	&& !CEL_CRT_MSVC   \
-	&& !CEL_CRT_MUSL   \
-	&& !CEL_CRT_NEWLIB
+ && !CEL_CRT_GLIBC  \
+ && !CEL_CRT_LIBCXX \
+ && !CEL_CRT_MINGW  \
+ && !CEL_CRT_MSVC   \
+ && !CEL_CRT_MUSL   \
+ && !CEL_CRT_NEWLIB
 #		undef  CEL_CRT_NONE
 #		define CEL_CRT_NONE 1
 #	endif // CEL_CRT_*
 #endif // !CEL_CRT_NONE
 
 #define CEL_PLATFORM_POSIX (0      \
-		|| CEL_PLATFORM_ANDROID    \
-		|| CEL_PLATFORM_EMSCRIPTEN \
-		|| CEL_PLATFORM_BSD        \
-		|| CEL_PLATFORM_HURD       \
-		|| CEL_PLATFORM_IOS        \
-		|| CEL_PLATFORM_LINUX      \
-		|| CEL_PLATFORM_OSX        \
-		|| CEL_PLATFORM_QNX        \
-		|| CEL_PLATFORM_STEAMLINK  \
-		|| CEL_PLATFORM_PS4        \
-		|| CEL_PLATFORM_RPI        \
-		)
+        || CEL_PLATFORM_ANDROID    \
+        || CEL_PLATFORM_EMSCRIPTEN \
+        || CEL_PLATFORM_BSD        \
+        || CEL_PLATFORM_HURD       \
+        || CEL_PLATFORM_IOS        \
+        || CEL_PLATFORM_LINUX      \
+        || CEL_PLATFORM_OSX        \
+        || CEL_PLATFORM_QNX        \
+        || CEL_PLATFORM_STEAMLINK  \
+        || CEL_PLATFORM_PS4        \
+        || CEL_PLATFORM_RPI        \
+        )
 
 #define CEL_PLATFORM_NONE !(0      \
-		|| CEL_PLATFORM_ANDROID    \
-		|| CEL_PLATFORM_EMSCRIPTEN \
-		|| CEL_PLATFORM_BSD        \
-		|| CEL_PLATFORM_HURD       \
-		|| CEL_PLATFORM_IOS        \
-		|| CEL_PLATFORM_LINUX      \
-		|| CEL_PLATFORM_OSX        \
-		|| CEL_PLATFORM_PS4        \
-		|| CEL_PLATFORM_QNX        \
-		|| CEL_PLATFORM_RPI        \
-		|| CEL_PLATFORM_STEAMLINK  \
-		|| CEL_PLATFORM_WINDOWS    \
-		|| CEL_PLATFORM_WINRT      \
-		|| CEL_PLATFORM_XBOXONE    \
-		)
+        || CEL_PLATFORM_ANDROID    \
+        || CEL_PLATFORM_EMSCRIPTEN \
+        || CEL_PLATFORM_BSD        \
+        || CEL_PLATFORM_HURD       \
+        || CEL_PLATFORM_IOS        \
+        || CEL_PLATFORM_LINUX      \
+        || CEL_PLATFORM_OSX        \
+        || CEL_PLATFORM_PS4        \
+        || CEL_PLATFORM_QNX        \
+        || CEL_PLATFORM_RPI        \
+        || CEL_PLATFORM_STEAMLINK  \
+        || CEL_PLATFORM_WINDOWS    \
+        || CEL_PLATFORM_WINRT      \
+        || CEL_PLATFORM_XBOXONE    \
+        )
 
 #if CEL_COMPILER_GCC
 #	define CEL_COMPILER_NAME "GCC " \
-				CEL_STRINGIZE(__GNUC__) "." \
-				CEL_STRINGIZE(__GNUC_MINOR__) "." \
-				CEL_STRINGIZE(__GNUC_PATCHLEVEL__)
+                CEL_STRINGIZE(__GNUC__) "." \
+                CEL_STRINGIZE(__GNUC_MINOR__) "." \
+                CEL_STRINGIZE(__GNUC_PATCHLEVEL__)
 #elif CEL_COMPILER_CLANG
 #	define CEL_COMPILER_NAME "Clang " \
-				CEL_STRINGIZE(__clang_major__) "." \
-				CEL_STRINGIZE(__clang_minor__) "." \
-				CEL_STRINGIZE(__clang_patchlevel__)
+                CEL_STRINGIZE(__clang_major__) "." \
+                CEL_STRINGIZE(__clang_minor__) "." \
+                CEL_STRINGIZE(__clang_patchlevel__)
 #elif CEL_COMPILER_MSVC
 #	if CEL_COMPILER_MSVC >= 1910 // Visual Studio 2017
 #		define CEL_COMPILER_NAME "MSVC 15.0"
@@ -307,12 +307,12 @@
 
 #if CEL_PLATFORM_ANDROID
 #	define CEL_PLATFORM_NAME "Android " \
-				CEL_STRINGIZE(CEL_PLATFORM_ANDROID)
+                CEL_STRINGIZE(CEL_PLATFORM_ANDROID)
 #elif CEL_PLATFORM_EMSCRIPTEN
 #	define CEL_PLATFORM_NAME "asm.js " \
-				CEL_STRINGIZE(__EMSCRIPTEN_major__) "." \
-				CEL_STRINGIZE(__EMSCRIPTEN_minor__) "." \
-				CEL_STRINGIZE(__EMSCRIPTEN_tiny__)
+                CEL_STRINGIZE(__EMSCRIPTEN_major__) "." \
+                CEL_STRINGIZE(__EMSCRIPTEN_minor__) "." \
+                CEL_STRINGIZE(__EMSCRIPTEN_tiny__)
 #elif CEL_PLATFORM_BSD
 #	define CEL_PLATFORM_NAME "BSD"
 #elif CEL_PLATFORM_HURD

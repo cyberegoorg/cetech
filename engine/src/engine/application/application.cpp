@@ -252,7 +252,8 @@ extern "C" void application_start() {
                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = ct_window_a0.create_from(ct_memory_a0.main_allocator(), (void *) wid);
+            _G.main_window = ct_window_a0.create_from(
+                    ct_memory_a0.main_allocator(), (void *) wid);
         }
 
         ct_renderer_a0.create(_G.main_window);

@@ -182,8 +182,8 @@ void package_load(uint64_t name) {
 
     struct package_task_data *task_data =
             CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                            struct package_task_data,
-                            sizeof(struct package_task_data));
+                         struct package_task_data,
+                         sizeof(struct package_task_data));
 
     task_data->name = name;
 

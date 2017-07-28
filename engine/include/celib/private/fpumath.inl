@@ -672,9 +672,9 @@ namespace celib {
     }
 
     inline void mat4_translate(float *_result,
-                              float _tx,
-                              float _ty,
-                              float _tz) {
+                               float _tx,
+                               float _ty,
+                               float _tz) {
         mat4_identity(_result);
         _result[12] = _tx;
         _result[13] = _ty;
@@ -682,9 +682,9 @@ namespace celib {
     }
 
     inline void mat4_scale(float *_result,
-                          float _sx,
-                          float _sy,
-                          float _sz) {
+                           float _sx,
+                           float _sy,
+                           float _sz) {
         mem_set(_result, 0, sizeof(float) * 16);
         _result[0] = _sx;
         _result[5] = _sy;
@@ -693,14 +693,14 @@ namespace celib {
     }
 
     inline void mat4_scale(float *_result,
-                          float _scale) {
+                           float _scale) {
         mat4_scale(_result, _scale, _scale, _scale);
     }
 
     inline void mat4_from_normal(float *_result,
-                                const float *_normal,
-                                float _scale,
-                                const float *_pos) {
+                                 const float *_normal,
+                                 float _scale,
+                                 const float *_pos) {
         float tangent[3];
         float bitangent[3];
         vec3_tangent_frame(_normal, tangent, bitangent);
@@ -719,10 +719,10 @@ namespace celib {
     }
 
     inline void mat4_from_normal(float *_result,
-                                const float *_normal,
-                                float _scale,
-                                const float *_pos,
-                                float _angle) {
+                                 const float *_normal,
+                                 float _scale,
+                                 const float *_pos,
+                                 float _angle) {
         float tangent[3];
         float bitangent[3];
         vec3_tangent_frame(_normal, tangent, bitangent, _angle);
@@ -774,11 +774,11 @@ namespace celib {
 
     inline void mat4_move(float *_result,
                           const float *_a) {
-        mem_copy(_result, _a, sizeof(float)*16);
+        mem_copy(_result, _a, sizeof(float) * 16);
     }
 
     inline void mat4_inverse(float *_result,
-                            const float *_a) {
+                             const float *_a) {
         float xx = _a[0];
         float xy = _a[1];
         float xz = _a[2];
@@ -846,7 +846,7 @@ namespace celib {
     }
 
     inline void mat4_quat(float *_result,
-                         const float *_quat) {
+                          const float *_quat) {
         const float x = _quat[0];
         const float y = _quat[1];
         const float z = _quat[2];
@@ -887,8 +887,8 @@ namespace celib {
     }
 
     inline void mat4_quat_translation(float *_result,
-                                     const float *_quat,
-                                     const float *_translation) {
+                                      const float *_quat,
+                                      const float *_translation) {
         mat4_quat(_result, _quat);
         _result[12] = -(_result[0] * _translation[0] +
                         _result[4] * _translation[1] +
@@ -902,8 +902,8 @@ namespace celib {
     }
 
     inline void mat4_quat_translation_hmd(float *_result,
-                                         const float *_quat,
-                                         const float *_translation) {
+                                          const float *_quat,
+                                          const float *_translation) {
         float quat[4];
         quat[0] = -_quat[0];
         quat[1] = -_quat[1];
@@ -913,9 +913,9 @@ namespace celib {
     }
 
     inline void mat4_look_AtImpl(float *_result,
-                                const float *_eye,
-                                const float *_view,
-                                const float *_up) {
+                                 const float *_eye,
+                                 const float *_view,
+                                 const float *_up) {
         float up[3] = {0.0f, 1.0f, 0.0f};
         if (NULL != _up) {
             up[0] = _up[0];
@@ -951,9 +951,9 @@ namespace celib {
     }
 
     inline void mat4_look_at_lh(float *_result,
-                               const float *_eye,
-                               const float *_at,
-                               const float *_up) {
+                                const float *_eye,
+                                const float *_at,
+                                const float *_up) {
         float tmp[4];
         vec3_sub(tmp, _at, _eye);
 
@@ -964,9 +964,9 @@ namespace celib {
     }
 
     inline void mat4_look_at_rh(float *_result,
-                               const float *_eye,
-                               const float *_at,
-                               const float *_up) {
+                                const float *_eye,
+                                const float *_at,
+                                const float *_up) {
         float tmp[4];
         vec3_sub(tmp, _eye, _at);
 
@@ -977,21 +977,21 @@ namespace celib {
     }
 
     inline void mat4_look_at(float *_result,
-                            const float *_eye,
-                            const float *_at,
-                            const float *_up) {
+                             const float *_eye,
+                             const float *_at,
+                             const float *_up) {
         mat4_look_at_lh(_result, _eye, _at, _up);
     }
 
     template<Handness::Enum HandnessT>
     inline void mat4_proj_xywh(float *_result,
-                              float _x,
-                              float _y,
-                              float _width,
-                              float _height,
-                              float _near,
-                              float _far,
-                              bool _oglNdc) {
+                               float _x,
+                               float _y,
+                               float _width,
+                               float _height,
+                               float _near,
+                               float _far,
+                               bool _oglNdc) {
         const float diff = _far - _near;
         const float aa = _oglNdc ? (_far + _near) / diff : _far / diff;
         const float bb = _oglNdc ? (2.0f * _far * _near) / diff : _near * aa;
@@ -1022,7 +1022,7 @@ namespace celib {
         const float xx = (_rt + _lt) * invDiffRl;
         const float yy = (_ut + _dt) * invDiffUd;
         mat4_proj_xywh<HandnessT>(_result, xx, yy, width, height, _near, _far,
-                                 _oglNdc);
+                                  _oglNdc);
     }
 
     template<Handness::Enum HandnessT>
@@ -1045,108 +1045,108 @@ namespace celib {
         const float height = 1.0f / ftan(to_rad(_fovy) * 0.5f);
         const float width = height * 1.0f / _aspect;
         mat4_proj_xywh<HandnessT>(_result, 0.0f, 0.0f, width, height, _near,
-                                 _far,
-                                 _oglNdc);
+                                  _far,
+                                  _oglNdc);
     }
 
     inline void mat4_proj(float *_result,
-                         float _ut,
-                         float _dt,
-                         float _lt,
-                         float _rt,
-                         float _near,
-                         float _far,
-                         bool _oglNdc) {
+                          float _ut,
+                          float _dt,
+                          float _lt,
+                          float _rt,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _far,
                                     _oglNdc);
     }
 
     inline void mat4_proj(float *_result,
-                         const float *_fov,
-                         float _near,
-                         float _far,
-                         bool _oglNdc) {
+                          const float *_fov,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
     }
 
     inline void mat4_proj(float *_result,
-                         float _fovy,
-                         float _aspect,
-                         float _near,
-                         float _far,
-                         bool _oglNdc) {
+                          float _fovy,
+                          float _aspect,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _fovy, _aspect, _near, _far,
                                     _oglNdc);
     }
 
     inline void mat4_proj_lh(float *_result,
-                            float _ut,
-                            float _dt,
-                            float _lt,
-                            float _rt,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             float _ut,
+                             float _dt,
+                             float _lt,
+                             float _rt,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _far,
                                     _oglNdc);
     }
 
     inline void mat4_proj_lh(float *_result,
-                            const float *_fov,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             const float *_fov,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
     }
 
     inline void mat4_proj_lh(float *_result,
-                            float _fovy,
-                            float _aspect,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             float _fovy,
+                             float _aspect,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Left>(_result, _fovy, _aspect, _near, _far,
                                     _oglNdc);
     }
 
     inline void mat4_proj_rh(float *_result,
-                            float _ut,
-                            float _dt,
-                            float _lt,
-                            float _rt,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             float _ut,
+                             float _dt,
+                             float _lt,
+                             float _rt,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Right>(_result, _ut, _dt, _lt, _rt, _near, _far,
                                      _oglNdc);
     }
 
     inline void mat4_proj_rh(float *_result,
-                            const float *_fov,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             const float *_fov,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Right>(_result, _fov, _near, _far, _oglNdc);
     }
 
     inline void mat4_proj_rh(float *_result,
-                            float _fovy,
-                            float _aspect,
-                            float _near,
-                            float _far,
-                            bool _oglNdc) {
+                             float _fovy,
+                             float _aspect,
+                             float _near,
+                             float _far,
+                             bool _oglNdc) {
         mtxProjImpl<Handness::Right>(_result, _fovy, _aspect, _near, _far,
                                      _oglNdc);
     }
 
     template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
     inline void mat4_proj_inf_xywh(float *_result,
-                                  float _x,
-                                  float _y,
-                                  float _width,
-                                  float _height,
-                                  float _near,
-                                  bool _oglNdc) {
+                                   float _x,
+                                   float _y,
+                                   float _width,
+                                   float _height,
+                                   float _near,
+                                   bool _oglNdc) {
         float aa;
         float bb;
         if (CEL_ENABLED(NearFar::Reverse == NearFarT)) {
@@ -1182,7 +1182,7 @@ namespace celib {
         const float xx = (_rt + _lt) * invDiffRl;
         const float yy = (_ut + _dt) * invDiffUd;
         mat4_proj_inf_xywh<NearFarT, HandnessT>(_result, xx, yy, width, height,
-                                               _near, _oglNdc);
+                                                _near, _oglNdc);
     }
 
     template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
@@ -1203,152 +1203,152 @@ namespace celib {
         const float height = 1.0f / ftan(to_rad(_fovy) * 0.5f);
         const float width = height * 1.0f / _aspect;
         mat4_proj_inf_xywh<NearFarT, HandnessT>(_result, 0.0f, 0.0f, width,
-                                               height,
-                                               _near, _oglNdc);
+                                                height,
+                                                _near, _oglNdc);
     }
 
     inline void mat4_proj_inf(float *_result,
-                             const float *_fov,
-                             float _near,
-                             bool _oglNdc) {
+                              const float *_fov,
+                              float _near,
+                              bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _fov, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_inf(float *_result,
-                             float _ut,
-                             float _dt,
-                             float _lt,
-                             float _rt,
-                             float _near,
-                             bool _oglNdc) {
+                              float _ut,
+                              float _dt,
+                              float _lt,
+                              float _rt,
+                              float _near,
+                              bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _ut, _dt, _lt,
                                                          _rt, _near, _oglNdc);
     }
 
     inline void mat4_proj_inf(float *_result,
-                             float _fovy,
-                             float _aspect,
-                             float _near,
-                             bool _oglNdc) {
+                              float _fovy,
+                              float _aspect,
+                              float _near,
+                              bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _fovy,
                                                          _aspect, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_inf_lh(float *_result,
-                                float _ut,
-                                float _dt,
-                                float _lt,
-                                float _rt,
-                                float _near,
-                                bool _oglNdc) {
+                                 float _ut,
+                                 float _dt,
+                                 float _lt,
+                                 float _rt,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _ut, _dt, _lt,
                                                          _rt, _near, _oglNdc);
     }
 
     inline void mat4_proj_inf_lh(float *_result,
-                                const float *_fov,
-                                float _near,
-                                bool _oglNdc) {
+                                 const float *_fov,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _fov, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_inf_lh(float *_result,
-                                float _fovy,
-                                float _aspect,
-                                float _near,
-                                bool _oglNdc) {
+                                 float _fovy,
+                                 float _aspect,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Left>(_result, _fovy,
                                                          _aspect, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_inf_rh(float *_result,
-                                float _ut,
-                                float _dt,
-                                float _lt,
-                                float _rt,
-                                float _near,
-                                bool _oglNdc) {
+                                 float _ut,
+                                 float _dt,
+                                 float _lt,
+                                 float _rt,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Right>(_result, _ut, _dt,
                                                           _lt, _rt, _near,
                                                           _oglNdc);
     }
 
     inline void mat4_proj_inf_rh(float *_result,
-                                const float *_fov,
-                                float _near,
-                                bool _oglNdc) {
+                                 const float *_fov,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Right>(_result, _fov, _near,
                                                           _oglNdc);
     }
 
     inline void mat4_proj_inf_rh(float *_result,
-                                float _fovy,
-                                float _aspect,
-                                float _near,
-                                bool _oglNdc) {
+                                 float _fovy,
+                                 float _aspect,
+                                 float _near,
+                                 bool _oglNdc) {
         mtxProjInfImpl<NearFar::Default, Handness::Right>(_result, _fovy,
                                                           _aspect, _near,
                                                           _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_lh(float *_result,
-                                    float _ut,
-                                    float _dt,
-                                    float _lt,
-                                    float _rt,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     float _ut,
+                                     float _dt,
+                                     float _lt,
+                                     float _rt,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Left>(_result, _ut, _dt, _lt,
                                                          _rt, _near, _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_lh(float *_result,
-                                    const float *_fov,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     const float *_fov,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Left>(_result, _fov, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_lh(float *_result,
-                                    float _fovy,
-                                    float _aspect,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     float _fovy,
+                                     float _aspect,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Left>(_result, _fovy,
                                                          _aspect, _near,
                                                          _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_rh(float *_result,
-                                    float _ut,
-                                    float _dt,
-                                    float _lt,
-                                    float _rt,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     float _ut,
+                                     float _dt,
+                                     float _lt,
+                                     float _rt,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Right>(_result, _ut, _dt,
                                                           _lt, _rt, _near,
                                                           _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_rh(float *_result,
-                                    const float *_fov,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     const float *_fov,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Right>(_result, _fov, _near,
                                                           _oglNdc);
     }
 
     inline void mat4_proj_rev_inf_rh(float *_result,
-                                    float _fovy,
-                                    float _aspect,
-                                    float _near,
-                                    bool _oglNdc) {
+                                     float _fovy,
+                                     float _aspect,
+                                     float _near,
+                                     bool _oglNdc) {
         mtxProjInfImpl<NearFar::Reverse, Handness::Right>(_result, _fovy,
                                                           _aspect, _near,
                                                           _oglNdc);
@@ -1384,46 +1384,46 @@ namespace celib {
     }
 
     inline void mat4_ortho(float *_result,
-                          float _left,
-                          float _right,
-                          float _bottom,
-                          float _top,
-                          float _near,
-                          float _far,
-                          float _offset,
-                          bool _oglNdc) {
+                           float _left,
+                           float _right,
+                           float _bottom,
+                           float _top,
+                           float _near,
+                           float _far,
+                           float _offset,
+                           bool _oglNdc) {
         mtxOrthoImpl<Handness::Left>(_result, _left, _right, _bottom, _top,
                                      _near, _far, _offset, _oglNdc);
     }
 
     inline void mat4_ortho_lh(float *_result,
-                             float _left,
-                             float _right,
-                             float _bottom,
-                             float _top,
-                             float _near,
-                             float _far,
-                             float _offset,
-                             bool _oglNdc) {
+                              float _left,
+                              float _right,
+                              float _bottom,
+                              float _top,
+                              float _near,
+                              float _far,
+                              float _offset,
+                              bool _oglNdc) {
         mtxOrthoImpl<Handness::Left>(_result, _left, _right, _bottom, _top,
                                      _near, _far, _offset, _oglNdc);
     }
 
     inline void mat4_ortho_rh(float *_result,
-                             float _left,
-                             float _right,
-                             float _bottom,
-                             float _top,
-                             float _near,
-                             float _far,
-                             float _offset,
-                             bool _oglNdc) {
+                              float _left,
+                              float _right,
+                              float _bottom,
+                              float _top,
+                              float _near,
+                              float _far,
+                              float _offset,
+                              bool _oglNdc) {
         mtxOrthoImpl<Handness::Right>(_result, _left, _right, _bottom, _top,
                                       _near, _far, _offset, _oglNdc);
     }
 
     inline void mat4_rotate_x(float *_result,
-                             float _ax) {
+                              float _ax) {
         const float sx = fsin(_ax);
         const float cx = fcos(_ax);
 
@@ -1437,7 +1437,7 @@ namespace celib {
     }
 
     inline void mat4_rotate_y(float *_result,
-                             float _ay) {
+                              float _ay) {
         const float sy = fsin(_ay);
         const float cy = fcos(_ay);
 
@@ -1451,7 +1451,7 @@ namespace celib {
     }
 
     inline void mat4_rotate_z(float *_result,
-                             float _az) {
+                              float _az) {
         const float sz = fsin(_az);
         const float cz = fcos(_az);
 
@@ -1465,8 +1465,8 @@ namespace celib {
     }
 
     inline void mat4_rotate_xy(float *_result,
-                              float _ax,
-                              float _ay) {
+                               float _ax,
+                               float _ay) {
         const float sx = fsin(_ax);
         const float cx = fcos(_ax);
         const float sy = fsin(_ay);
@@ -1485,9 +1485,9 @@ namespace celib {
     }
 
     inline void mat4_rotate_xyz(float *_result,
-                               float _ax,
-                               float _ay,
-                               float _az) {
+                                float _ax,
+                                float _ay,
+                                float _az) {
         const float sx = fsin(_ax);
         const float cx = fcos(_ax);
         const float sy = fsin(_ay);
@@ -1509,9 +1509,9 @@ namespace celib {
     }
 
     inline void mat4_rotate_zyx(float *_result,
-                               float _ax,
-                               float _ay,
-                               float _az) {
+                                float _ax,
+                                float _ay,
+                                float _az) {
         const float sx = fsin(_ax);
         const float cx = fcos(_ax);
         const float sy = fsin(_ay);
@@ -1586,8 +1586,8 @@ namespace celib {
     }
 
     inline void vec3_mul_mat4_h(float *_result,
-                               const float *_vec,
-                               const float *_mat) {
+                                const float *_vec,
+                                const float *_mat) {
         float xx = _vec[0] * _mat[0] + _vec[1] * _mat[4] + _vec[2] * _mat[8] +
                    _mat[12];
         float yy = _vec[0] * _mat[1] + _vec[1] * _mat[5] + _vec[2] * _mat[9] +
@@ -1618,8 +1618,8 @@ namespace celib {
     }
 
     inline void mat4_mul(float *_result,
-                        const float *_a,
-                        const float *_b) {
+                         const float *_a,
+                         const float *_b) {
         vec4_mul_mtx(&_result[0], &_a[0], _b);
         vec4_mul_mtx(&_result[4], &_a[4], _b);
         vec4_mul_mtx(&_result[8], &_a[8], _b);
@@ -1627,7 +1627,7 @@ namespace celib {
     }
 
     inline void mat4_transpose(float *_result,
-                              const float *_a) {
+                               const float *_a) {
         _result[0] = _a[0];
         _result[4] = _a[1];
         _result[8] = _a[2];
@@ -1648,7 +1648,7 @@ namespace celib {
 
     /// Convert LH to RH projection matrix and vice versa.
     inline void mat4_proj_flip_handedness(float *_dst,
-                                         const float *_src) {
+                                          const float *_src) {
         _dst[0] = -_src[0];
         _dst[1] = -_src[1];
         _dst[2] = -_src[2];
@@ -1669,7 +1669,7 @@ namespace celib {
 
     /// Convert LH to RH view matrix and vice versa.
     inline void mat4_view_flip_handedness(float *_dst,
-                                         const float *_src) {
+                                          const float *_src) {
         _dst[0] = -_src[0];
         _dst[1] = _src[1];
         _dst[2] = -_src[2];

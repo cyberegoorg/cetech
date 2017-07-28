@@ -38,9 +38,9 @@ static int _from_axis_angle(lua_State *l) {
 static int _from_euler(lua_State *l) {
     float result[4] = {};
 
-    const float heading = luasys_to_float(l, 1)* celib::DEG_TO_RAD;
-    const float attitude = luasys_to_float(l, 2)* celib::DEG_TO_RAD;
-    const float bank = luasys_to_float(l, 3)* celib::DEG_TO_RAD;
+    const float heading = luasys_to_float(l, 1) * celib::DEG_TO_RAD;
+    const float attitude = luasys_to_float(l, 2) * celib::DEG_TO_RAD;
+    const float bank = luasys_to_float(l, 3) * celib::DEG_TO_RAD;
 
     celib::quatFromEuler(result, heading, attitude, bank);
 

@@ -62,7 +62,7 @@ struct ct_material_a0 {
     //! \param v Value
     void (*set_mat44f)(struct ct_material material,
                        const char *slot,
-                       float* value);
+                       float *value);
 
     //! Use material for actual render
     void (*use)(struct ct_material material);
@@ -163,7 +163,8 @@ struct ct_renderer_a0 {
 
     //! Get renderer window size
     //! \return Renderer window size
-    void  (*get_size)(int *width, int *height);
+    void (*get_size)(int *width,
+                     int *height);
 
     //! Render world
     //! \param world World

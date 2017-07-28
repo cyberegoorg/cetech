@@ -31,11 +31,11 @@ namespace blob {
 
     ct_blob *create(cel_alloc *allocator) {
         blob_array *inst = CEL_NEW(allocator,
-                                      blob_array,
-                                      allocator);
+                                   blob_array,
+                                   allocator);
 
         ct_blob *blob = CEL_NEW(allocator,
-                                   ct_blob);
+                                ct_blob);
         blob->inst = inst;
         blob->push = push;
         blob->size = size;
