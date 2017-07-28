@@ -20,7 +20,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_module_a0);
 
-#include "../static_module.h"
+#include "../../static_module.h"
 
 #define LOG_WHERE "kernel"
 
@@ -93,26 +93,26 @@ extern "C" int cetech_kernel_init(int argc,
     api::init(core_alloc);
     ct_api_a0 *api = api::v0();
 
-    LOAD_STATIC_MODULE(api, log);
+    CETECH_LOAD_STATIC_MODULE(api, log);
 
     memory::init(4 * 1024 * 1024);
 
     core_allocator::register_api(api);
 
-    LOAD_STATIC_MODULE(api, hashlib);
+    CETECH_LOAD_STATIC_MODULE(api, hashlib);
 
     memory::register_api(api);
 
-    LOAD_STATIC_MODULE(api, error);
-    LOAD_STATIC_MODULE(api, vio);
-    LOAD_STATIC_MODULE(api, process);
-    LOAD_STATIC_MODULE(api, cpu);
-    LOAD_STATIC_MODULE(api, time);
-    LOAD_STATIC_MODULE(api, thread);
-    LOAD_STATIC_MODULE(api, path);
-    LOAD_STATIC_MODULE(api, config);
-    LOAD_STATIC_MODULE(api, object);
-    LOAD_STATIC_MODULE(api, module);
+    CETECH_LOAD_STATIC_MODULE(api, error);
+    CETECH_LOAD_STATIC_MODULE(api, vio);
+    CETECH_LOAD_STATIC_MODULE(api, process);
+    CETECH_LOAD_STATIC_MODULE(api, cpu);
+    CETECH_LOAD_STATIC_MODULE(api, time);
+    CETECH_LOAD_STATIC_MODULE(api, thread);
+    CETECH_LOAD_STATIC_MODULE(api, path);
+    CETECH_LOAD_STATIC_MODULE(api, config);
+    CETECH_LOAD_STATIC_MODULE(api, object);
+    CETECH_LOAD_STATIC_MODULE(api, module);
 
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_memory_a0);
@@ -138,16 +138,16 @@ extern "C" int cetech_kernel_shutdown() {
 
     auto* api = api::v0();
 
-    UNLOAD_STATIC_MODULE(api, error);
-    UNLOAD_STATIC_MODULE(api, vio);
-    UNLOAD_STATIC_MODULE(api, process);
-    UNLOAD_STATIC_MODULE(api, cpu);
-    UNLOAD_STATIC_MODULE(api, time);
-    UNLOAD_STATIC_MODULE(api, thread);
-    UNLOAD_STATIC_MODULE(api, path);
-    UNLOAD_STATIC_MODULE(api, config);
-    UNLOAD_STATIC_MODULE(api, object);
-    UNLOAD_STATIC_MODULE(api, module);
+    CETECH_UNLOAD_STATIC_MODULE(api, error);
+    CETECH_UNLOAD_STATIC_MODULE(api, vio);
+    CETECH_UNLOAD_STATIC_MODULE(api, process);
+    CETECH_UNLOAD_STATIC_MODULE(api, cpu);
+    CETECH_UNLOAD_STATIC_MODULE(api, time);
+    CETECH_UNLOAD_STATIC_MODULE(api, thread);
+    CETECH_UNLOAD_STATIC_MODULE(api, path);
+    CETECH_UNLOAD_STATIC_MODULE(api, config);
+    CETECH_UNLOAD_STATIC_MODULE(api, object);
+    CETECH_UNLOAD_STATIC_MODULE(api, module);
 
     api::shutdown();
     memory::memsys_shutdown();

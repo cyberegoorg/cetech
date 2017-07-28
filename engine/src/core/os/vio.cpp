@@ -7,6 +7,7 @@
 #include <cetech/machine/machine.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/os/vio.h>
+#include <cetech/core/module.h>
 
 #define LOG_WHERE "vio_sdl"
 
@@ -60,7 +61,7 @@ struct ct_vio *vio_from_file(const char *path,
                              enum ct_vio_open_mode mode) {
 
     ct_vio *vio = CEL_ALLOCATE(core_allocator::get(), ct_vio,
-                                  sizeof(ct_vio));
+                               sizeof(ct_vio));
 
     CETECH_ASSERT(LOG_WHERE, vio != NULL);
 
@@ -88,11 +89,14 @@ static ct_vio_a0 vio_api = {
         .from_file = vio_from_file,
 };
 
-extern "C" void vio_load_module(ct_api_a0 *api) {
-    api->register_api("ct_vio_a0", &vio_api);
-}
+CETECH_MODULE_DEF(
+        vio,
+        {
+            api->register_api("ct_vio_a0", &vio_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)
 
-extern "C" void vio_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
 

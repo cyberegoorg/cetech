@@ -13,6 +13,7 @@
 #include <cetech/core/hash.h>
 #include <cetech/engine/console_server.h>
 #include <cetech/core/os/errors.h>
+#include <cetech/core/module.h>
 
 #include "include/mpack/mpack.h"
 #include "include/nanomsg/nn.h"
@@ -282,12 +283,17 @@ namespace consoleserver_module {
         _G.commands.destroy();
     }
 
-    extern "C" void consoleserver_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void consoleserver_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+
+CETECH_MODULE_DEF(
+        consoleserver,
+        {
+            consoleserver_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            consoleserver_module::_shutdown();
+        }
+)
+

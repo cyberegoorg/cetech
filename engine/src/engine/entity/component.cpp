@@ -13,6 +13,7 @@
 
 #include <cetech/core/yaml.h>
 #include <cetech/core/api_system.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
@@ -174,15 +175,16 @@ namespace component_module {
         _G.spawn_order_map.destroy();
         _G.component_clb.destroy();
     }
-
-    extern "C" void component_load_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _init(api);
-    }
-
-    extern "C" void component_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
-
 }
+
+CETECH_MODULE_DEF(
+        component,
+        {
+            component_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            component_module::_shutdown();
+        }
+)
+

@@ -14,6 +14,7 @@
 #include <cetech/machine/machine.h>
 
 #include <include/SDL2/SDL.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -99,7 +100,8 @@ namespace machine_sdl {
     }
 
     ct_event_header *machine_event_next(ct_event_header *header) {
-        return (ct_event_header *) eventstream::next((eventstream::event_header *) header);
+        return (ct_event_header *) eventstream::next(
+                (eventstream::event_header *) header);
     }
 
     void _update() {
@@ -170,12 +172,18 @@ namespace machine_sdl {
     }
 }
 
-extern "C" void machine_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
-    machine_sdl::init(api);
-}
 
-extern "C" void machine_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-    machine_sdl::shutdown();
-}
+CETECH_MODULE_DEF(
+        machine,
+        {
+            CETECH_GET_API(api, ct_log_a0);
+            machine_sdl::init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            CEL_UNUSED(api);
+            machine_sdl::shutdown();
+
+        }
+)

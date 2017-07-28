@@ -12,6 +12,7 @@
 #include "mousebtnstr.h"
 #include <cetech/core/log.h>
 #include <cetech/core/os/errors.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -114,7 +115,8 @@ namespace mouse {
     }
 
     void axis(uint32_t idx,
-                 const uint32_t axis_index, float* value) {
+              const uint32_t axis_index,
+              float *value) {
         CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
@@ -164,8 +166,10 @@ namespace mouse {
                 case EVENT_MOUSE_MOVE:
                     move_event = ((ct_mouse_move_event *) event);
 
-                    _G.last_delta_pos[0] = float(move_event->pos[0]) - _G.last_pos[0];
-                    _G.last_delta_pos[1] = float(move_event->pos[1]) - _G.last_pos[1];
+                    _G.last_delta_pos[0] =
+                            float(move_event->pos[0]) - _G.last_pos[0];
+                    _G.last_delta_pos[1] =
+                            float(move_event->pos[1]) - _G.last_pos[1];
 
                     _G.last_pos[0] = move_event->pos[0];
                     _G.last_pos[1] = move_event->pos[1];
@@ -215,13 +219,17 @@ namespace mouse_module {
         _G = {};
     }
 
-
-    extern "C" void mouse_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void mouse_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        mouse,
+        {
+            mouse_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            mouse_module::_shutdown();
+
+        }
+)

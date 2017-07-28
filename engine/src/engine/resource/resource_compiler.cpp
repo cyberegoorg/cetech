@@ -21,6 +21,7 @@
 #include <celib/string_stream.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
+#include <cetech/core/module.h>
 
 using namespace celib;
 using namespace string_stream;
@@ -120,7 +121,7 @@ static void _compile_task(void *data) {
     }
 
     CEL_FREE(ct_memory_a0.main_scratch_allocator(),
-                tdata->source_filename);
+             tdata->source_filename);
 
     tdata->source->close(tdata->source->inst);
     tdata->build->close(tdata->build->inst);
@@ -382,13 +383,18 @@ char *resource_compiler_external_join(cel_alloc *alocator,
                            "bin", name);
 }
 
-extern "C" void resourcecompiler_load_module(ct_api_a0 *api) {
-    _init(api);
-}
+CETECH_MODULE_DEF(
+        resourcecompiler,
+        {
+            _init(api);
+        },
+        {
+            CEL_UNUSED(api);
 
-extern "C" void resourcecompiler_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-    _shutdown();
-}
+            _shutdown();
+
+        }
+)
+
 
 #endif

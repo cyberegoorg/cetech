@@ -14,6 +14,7 @@
 #include <cetech/core/os/thread.h>
 
 #include <cetech/engine/resource.h>
+#include <cetech/core/module.h>
 
 #include "task_queue.h"
 
@@ -191,7 +192,8 @@ namespace taskmanager {
             return 0;
         }
 
-        auto sd = ct_develop_a0.enter_scope(_G._task_pool[t.id].name, _worker_id);
+        auto sd = ct_develop_a0.enter_scope(_G._task_pool[t.id].name,
+                                            _worker_id);
 
         _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
@@ -289,13 +291,16 @@ namespace taskmanager_module {
 
         _G = {};
     }
-
-    extern "C" void task_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void task_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+
+CETECH_MODULE_DEF(
+        task,
+        {
+            taskmanager_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            taskmanager_module::_shutdown();
+        }
+)

@@ -11,6 +11,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/core/log.h>
 #include <celib/allocator.h>
+#include <cetech/core/module.h>
 
 #include "../memory/allocator_core_private.h"
 
@@ -78,7 +79,6 @@ void stacktrace_free(char *st) {
 }
 
 
-
 void ct_error_assert(const char *where,
                      const char *condition,
                      const char *filename,
@@ -98,11 +98,13 @@ static ct_error_a0 error_api = {
         .assert = ct_error_assert
 };
 
-extern "C" void error_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
-    api->register_api("ct_error_a0", &error_api);
-}
-
-extern "C" void error_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
+CETECH_MODULE_DEF(
+        error,
+        {
+            CETECH_GET_API(api, ct_log_a0);
+            api->register_api("ct_error_a0", &error_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

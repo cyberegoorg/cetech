@@ -12,6 +12,7 @@
 #include "keystr.h"
 #include <cetech/core/log.h>
 #include <cetech/core/os/errors.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -145,16 +146,16 @@ namespace keyboard_module {
 
         _G = (struct G) {};
     }
-
-
-    extern "C" void keyboard_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
-
-
-    extern "C" void keyboard_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
 }
+
+CETECH_MODULE_DEF(
+        keyboard,
+        {
+            keyboard_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            keyboard_module::_shutdown();
+        }
+)

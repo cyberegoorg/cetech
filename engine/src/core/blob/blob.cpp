@@ -4,6 +4,7 @@
 
 #include <cetech/core/api_system.h>
 #include <cetech/core/blob.h>
+#include <cetech/core/module.h>
 
 
 using namespace celib;
@@ -57,13 +58,12 @@ namespace blob {
     };
 }
 
-
-namespace blob_module {
-    extern "C" void blob_load_module(ct_api_a0 *api) {
-        api->register_api("ct_blob_a0", &blob::api);
-    }
-
-    extern "C" void blob_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-    }
-}
+CETECH_MODULE_DEF(
+        blob,
+        {
+            api->register_api("ct_blob_a0", &blob::api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

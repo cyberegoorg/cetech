@@ -91,14 +91,16 @@ namespace module {
             return;
         }
 
-        ct_load_module_t load_fce = (ct_load_module_t) ct_object_a0.load_function(obj,
-                                                                     "load_module");
+        ct_load_module_t load_fce = (ct_load_module_t) ct_object_a0.load_function(
+                obj,
+                "load_module");
         if (load_fce == NULL) {
             return;
         }
 
-        ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0.load_function(obj,
-                                                                           "unload_module");
+        ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0.load_function(
+                obj,
+                "unload_module");
         if (unload_fce == NULL) {
             return;
         }
@@ -216,20 +218,22 @@ namespace module {
 
 };
 
-extern "C" void module_load_module(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_object_a0);
-    ct_api_a0 = *api;
+CETECH_MODULE_DEF(
+        module,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_object_a0);
+            ct_api_a0 = *api;
 
-    api->register_api("ct_module_a0", &module::module_api);
+            api->register_api("ct_module_a0", &module::module_api);
 
-    _G = {};
-}
-
-extern "C" void module_unload_module(struct ct_api_a0 *api) {
-    CEL_UNUSED(api);
-    ct_log_a0.debug(LOG_WHERE, "Shutdown");
-    _G = {};
-}
+            _G = {};
+        },
+        {
+            CEL_UNUSED(api);
+            ct_log_a0.debug(LOG_WHERE, "Shutdown");
+            _G = {};
+        }
+)

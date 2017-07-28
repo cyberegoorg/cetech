@@ -13,6 +13,7 @@
 #include <cetech/engine/renderer.h>
 #include <cetech/engine/transform.h>
 #include <celib/fpumath.h>
+#include <cetech/core/module.h>
 
 #include "cetech/engine/camera.h"
 
@@ -191,7 +192,7 @@ namespace camera {
     ct_camera get(ct_world world,
                   ct_entity entity) {
 
-        uint32_t idx = world.h ^ entity.h;
+        uint32_t idx = world.h ^entity.h;
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
         return (ct_camera) {.idx = component_idx, .world = world};
@@ -305,15 +306,15 @@ namespace camera_module {
         _G.world_instances.destroy();
         _G.world_map.destroy();
     }
-
-
-    extern "C" void camera_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void camera_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
-
 }
+
+CETECH_MODULE_DEF(
+        camera,
+        {
+            camera_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            camera_module::_shutdown();
+        }
+)

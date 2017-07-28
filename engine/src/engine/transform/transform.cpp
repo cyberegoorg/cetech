@@ -9,6 +9,7 @@
 
 #include <cetech/engine/entity.h>
 #include <celib/fpumath.h>
+#include <cetech/core/module.h>
 
 
 #include "cetech/engine/transform.h"
@@ -116,7 +117,7 @@ static void allocate(WorldInstance &_data,
     const unsigned bytes = sz * (sizeof(ct_entity) +
                                  (3 * sizeof(uint32_t)) +
                                  (2 * sizeof(float) * 3) +
-                                (sizeof(float) * 4) +
+                                 (sizeof(float) * 4) +
                                  (sizeof(float) * 16));
     new_data.buffer = CEL_ALLOCATE(_allocator, char, bytes);
     new_data.n = _data.n;
@@ -175,7 +176,7 @@ static void _destroy_world(ct_world world) {
     ct_world last_world = _G.world_instances[last_idx].world;
 
     CEL_FREE(ct_memory_a0.main_allocator(),
-                _G.world_instances[idx].buffer);
+             _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
     map::set(_G.world_map, last_world.h, idx);
@@ -278,9 +279,9 @@ void _set_property(ct_world world,
         celib::vec3_move(euler_rot, value.value.vec3f);
         celib::vec3_mul(euler_rot_rad, euler_rot, celib::DEG_TO_RAD);
         celib::quatFromEuler(rot,
-                              euler_rot_rad[0],
-                              euler_rot_rad[1],
-                              euler_rot_rad[2]);
+                             euler_rot_rad[0],
+                             euler_rot_rad[1],
+                             euler_rot_rad[2]);
 
         transform_set_rotation(transform, rot);
 
@@ -638,11 +639,14 @@ void transform_link(ct_world world,
     transform_transform(child_tr, p);
 }
 
-extern "C" void transform_load_module(ct_api_a0 *api) {
-    _init(api);
-}
 
-extern "C" void transform_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api)
-    _shutdown();
-}
+CETECH_MODULE_DEF(
+        transform,
+        {
+            _init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            _shutdown();
+        }
+)

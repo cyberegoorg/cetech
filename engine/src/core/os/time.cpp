@@ -1,9 +1,8 @@
 #include "include/SDL2/SDL.h"
-#include <cetech/core/macros.h>
-#include <cetech/machine/machine.h>
-#include <cetech/core/api_system.h>
 #include <cetech/core/os/time.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api_system.h>
 
 //==============================================================================
 // Time
@@ -27,10 +26,13 @@ static ct_time_a0 time_api = {
         .perf_freq =get_perf_freq
 };
 
-extern "C" void time_load_module(ct_api_a0 *api) {
-    api->register_api("ct_time_a0", &time_api);
-}
 
-extern "C" void time_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
+CETECH_MODULE_DEF(
+        time,
+        {
+            api->register_api("ct_time_a0", &time_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

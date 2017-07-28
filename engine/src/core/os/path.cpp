@@ -17,6 +17,7 @@
 #include <celib/string_stream.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
@@ -270,12 +271,14 @@ static ct_path_a0 path_api = {
         .copy_file = copy_file
 };
 
-extern "C" void path_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_vio_a0);
-    api->register_api("ct_path_a0", &path_api);
-}
-
-extern "C" void path_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
+CETECH_MODULE_DEF(
+        path,
+        {
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            api->register_api("ct_path_a0", &path_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

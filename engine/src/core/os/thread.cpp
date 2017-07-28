@@ -4,11 +4,11 @@
 
 #if defined(CETECH_LINUX)
 
-#include <unistd.h>
 #include <sched.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/os/thread.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
 
 #endif
 
@@ -78,11 +78,12 @@ static ct_thread_a0 thread_api = {
 };
 
 
-extern "C" void thread_load_module(ct_api_a0 *api) {
-    api->register_api("ct_thread_a0", &thread_api);
-}
-
-extern "C" void thread_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
-
+CETECH_MODULE_DEF(
+        thread,
+        {
+            api->register_api("ct_thread_a0", &thread_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

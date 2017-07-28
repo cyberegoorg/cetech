@@ -10,6 +10,7 @@
 #include <cetech/engine/entity.h>
 #include <cetech/engine/scenegraph.h>
 #include <celib/fpumath.h>
+#include <cetech/core/module.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -72,9 +73,9 @@ namespace {
         new_data.next_sibling = (uint32_t *) (new_data.first_child + sz);
         new_data.parent = (uint32_t *) (new_data.next_sibling + sz);
         new_data.position = (float *) (new_data.parent + sz);
-        new_data.rotation = (float *) (new_data.position + (sz*3));
-        new_data.scale = (float *) (new_data.rotation + (sz*4));
-        new_data.world_matrix = (float *) (new_data.scale + (sz*3));
+        new_data.rotation = (float *) (new_data.position + (sz * 3));
+        new_data.scale = (float *) (new_data.rotation + (sz * 4));
+        new_data.world_matrix = (float *) (new_data.scale + (sz * 3));
 
         memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
         memcpy(new_data.name, _data.name, _data.n * sizeof(uint64_t));
@@ -111,7 +112,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CEL_FREE(ct_memory_a0.main_allocator(),
-                    _G.world_instances[idx].buffer);
+                 _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
@@ -173,39 +174,45 @@ namespace scenegraph {
         ct_scene_node child_transform = {.idx = child, .world = node.world};
 
         while (is_valid(child_transform)) {
-            transform(child_transform, &world_inst->world_matrix[16*node.idx]);
+            transform(child_transform,
+                      &world_inst->world_matrix[16 * node.idx]);
 
             child_transform.idx = world_inst->next_sibling[child_transform.idx];
         }
     }
 
-    void get_position(ct_scene_node node, float* value) {
+    void get_position(ct_scene_node node,
+                      float *value) {
 
         WorldInstance *world_inst = _get_world_instance(node.world);
 
-        memcpy(value, &world_inst->position[3*node.idx], sizeof(float)*3);
+        memcpy(value, &world_inst->position[3 * node.idx], sizeof(float) * 3);
     }
 
-    void get_rotation(ct_scene_node node, float* value) {
+    void get_rotation(ct_scene_node node,
+                      float *value) {
 
         WorldInstance *world_inst = _get_world_instance(node.world);
 
-        memcpy(value, &world_inst->rotation[4*node.idx], sizeof(float)*4);
-}
-
-    void get_scale(ct_scene_node node, float* value) {
-
-        WorldInstance *world_inst = _get_world_instance(node.world);
-        memcpy(value, &world_inst->scale[3*node.idx], sizeof(float)*3);
+        memcpy(value, &world_inst->rotation[4 * node.idx], sizeof(float) * 4);
     }
 
-    void get_world_matrix(ct_scene_node node, float* value) {
+    void get_scale(ct_scene_node node,
+                   float *value) {
+
         WorldInstance *world_inst = _get_world_instance(node.world);
-        memcpy(value, &world_inst->world_matrix[16*node.idx], sizeof(float)*16);
+        memcpy(value, &world_inst->scale[3 * node.idx], sizeof(float) * 3);
+    }
+
+    void get_world_matrix(ct_scene_node node,
+                          float *value) {
+        WorldInstance *world_inst = _get_world_instance(node.world);
+        memcpy(value, &world_inst->world_matrix[16 * node.idx],
+               sizeof(float) * 16);
     }
 
     void set_position(ct_scene_node node,
-                      float* pos) {
+                      float *pos) {
 
         WorldInstance *world_inst = _get_world_instance(node.world);
 
@@ -215,7 +222,7 @@ namespace scenegraph {
 
         float p[16];
 
-        if(parent_idx != UINT32_MAX) {
+        if (parent_idx != UINT32_MAX) {
             get_world_matrix(pt, p);
         } else {
             celib::mat4_identity(p);
@@ -227,7 +234,7 @@ namespace scenegraph {
     }
 
     void set_rotation(ct_scene_node node,
-                      float* rot) {
+                      float *rot) {
         WorldInstance *world_inst = _get_world_instance(node.world);
 
         uint32_t parent_idx = world_inst->parent[node.idx];
@@ -236,7 +243,7 @@ namespace scenegraph {
 
         float p[16];
 
-        if(parent_idx != UINT32_MAX) {
+        if (parent_idx != UINT32_MAX) {
             get_world_matrix(pt, p);
         } else {
             celib::mat4_identity(p);
@@ -250,7 +257,7 @@ namespace scenegraph {
     }
 
     void set_scale(ct_scene_node node,
-                   float* scale) {
+                   float *scale) {
         WorldInstance *world_inst = _get_world_instance(node.world);
 
         uint32_t parent_idx = world_inst->parent[node.idx];
@@ -259,7 +266,7 @@ namespace scenegraph {
 
         float p[16];
 
-        if(parent_idx != UINT32_MAX) {
+        if (parent_idx != UINT32_MAX) {
             get_world_matrix(pt, p);
         } else {
             celib::mat4_identity(p);
@@ -302,8 +309,8 @@ namespace scenegraph {
         data->n += count;
 
         ct_scene_node *nodes = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                                               ct_scene_node,
-                                               sizeof(ct_scene_node) * count);
+                                            ct_scene_node,
+                                            sizeof(ct_scene_node) * count);
 
         for (uint32_t i = 0; i < count; ++i) {
             uint32_t idx = first_idx + i;
@@ -314,7 +321,7 @@ namespace scenegraph {
 
             float position[3] = {0.0f};
             float rotation[4];
-            float scale[3] = {1.0f,1.0f, 1.0f};
+            float scale[3] = {1.0f, 1.0f, 1.0f};
 
             celib::quat_identity(rotation);
 
@@ -331,12 +338,12 @@ namespace scenegraph {
 
             float m[16];
             celib::mat4_identity(m);
-            memcpy(&data->world_matrix[16*idx], m, sizeof(float)*16);
+            memcpy(&data->world_matrix[16 * idx], m, sizeof(float) * 16);
 
             ct_scene_node t = {.idx = idx, .world = world};
 
             float p[16];
-            if(parent[i] != UINT32_MAX) {
+            if (parent[i] != UINT32_MAX) {
                 get_world_matrix(nodes[parent[i]], p);
             } else {
                 celib::mat4_identity(p);
@@ -384,7 +391,7 @@ namespace scenegraph {
 
         float p[16];
 
-        if(parent.idx != UINT32_MAX) {
+        if (parent.idx != UINT32_MAX) {
             get_world_matrix(parent, p);
         } else {
             celib::mat4_identity(p);
@@ -475,14 +482,16 @@ namespace scenegraph_module {
         _G.ent_map.destroy();
     }
 
-    extern "C" void scenegraph_load_module(ct_api_a0 *api) {
-        scenegraph_module::init(api);
-
-    }
-
-    extern "C" void scenegraph_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        scenegraph_module::shutdown();
-    }
 }
 
+
+CETECH_MODULE_DEF(
+        scenegraph,
+        {
+            scenegraph_module::init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            scenegraph_module::shutdown();
+        }
+)

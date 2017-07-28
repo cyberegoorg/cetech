@@ -29,6 +29,7 @@
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/thread.h>
 #include <cetech/core/os/vio.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_console_srv_a0);
@@ -104,7 +105,7 @@ namespace {
 
     int _cmd_reload_all(mpack_node_t args,
                         mpack_writer_t *writer) {
-        CEL_UNUSED(args,writer);
+        CEL_UNUSED(args, writer);
         resource::reload_all();
         return 0;
     }
@@ -463,7 +464,8 @@ namespace resource {
                 load_now(type, &name, 1);
 
                 uint64_t type_name = hash_combine(type, name);
-                uint32_t res_idx = map::get(_G.resource_map, type_name, UINT32_MAX);
+                uint32_t res_idx = map::get(_G.resource_map, type_name,
+                                            UINT32_MAX);
                 item = {};
                 if (res_idx != UINT32_MAX) {
                     item = _G.resource_data[res_idx];
@@ -655,13 +657,17 @@ namespace resource_module {
         _G.resource_map.destroy();
     }
 
-
-    extern "C" void resourcesystem_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void resourcesystem_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        resourcesystem,
+        {
+            resource_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            resource_module::_shutdown();
+
+        }
+)

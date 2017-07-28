@@ -6,7 +6,6 @@
 
 #include <cetech/engine/application.h>
 #include <cetech/core/config.h>
-#include <cetech/machine/machine.h>
 #include <cetech/machine/window.h>
 #include <cetech/core/api_system.h>
 
@@ -18,6 +17,7 @@
 #include <cetech/engine/console_server.h>
 
 #include <include/mpack/mpack.h>
+#include <cetech/core/module.h>
 
 #include "bgfx/platform.h"
 
@@ -131,11 +131,12 @@ void renderer_render_world(ct_world world,
 
     bgfx::frame(0);
 
-    auto* main_window = ct_app_a0.main_window();
+    auto *main_window = ct_app_a0.main_window();
     main_window->update(main_window);
 }
 
-void renderer_get_size(int *width, int *height) {
+void renderer_get_size(int *width,
+                       int *height) {
     *width = _G.size_width;
     *height = _G.size_height;
 }
@@ -206,13 +207,17 @@ namespace renderer_module {
         _G = (struct G) {};
     }
 
-
-    extern "C" void renderer_load_module(struct ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void renderer_unload_module(struct ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        renderer,
+        {
+            renderer_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            renderer_module::_shutdown();
+
+        }
+)

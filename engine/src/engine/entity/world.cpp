@@ -10,6 +10,7 @@
 #include <cetech/core/api_system.h>
 
 #include <cetech/engine/entity.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_memory_a0);
 
@@ -104,13 +105,17 @@ namespace world_module {
         _G.world_handler.destroy();
     }
 
-
-    extern "C" void world_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void world_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        world,
+        {
+            world_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            world_module::_shutdown();
+
+        }
+)

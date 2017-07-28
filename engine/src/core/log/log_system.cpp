@@ -5,6 +5,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/core/api_system.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
 
 #define LOG_WHERE "log_system"
 
@@ -147,13 +148,15 @@ namespace logsystem {
 
 }
 
-extern "C" void log_load_module(ct_api_a0 *api) {
-    logsystem::init();
-    api->register_api("ct_log_a0", &logsystem::log_a0);
-}
-
-extern "C" void log_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-    logsystem::shutdown();
-}
+CETECH_MODULE_DEF(
+        log,
+        {
+            logsystem::init();
+            api->register_api("ct_log_a0", &logsystem::log_a0);
+        },
+        {
+            CEL_UNUSED(api);
+            logsystem::shutdown();
+        }
+)
 

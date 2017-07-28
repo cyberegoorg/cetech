@@ -18,6 +18,7 @@
 
 #include <cetech/engine/resource.h>
 #include <celib/memory.h>
+#include <cetech/core/module.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -323,7 +324,8 @@ namespace config {
     }
 
 
-    int load_from_yaml_file(const char *yaml, cel_alloc *alloc) {
+    int load_from_yaml_file(const char *yaml,
+                            cel_alloc *alloc) {
         ct_vio *source_vio = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
 
         auto file_size = source_vio->size(source_vio->inst);
@@ -458,26 +460,29 @@ namespace config {
     }
 };
 
-extern "C" void config_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_hash_a0);
 
-    _G = {};
+CETECH_MODULE_DEF(
+        config,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
 
-    ct_log_a0.debug(LOG_WHERE, "Init");
+            _G = {};
 
-    api->register_api("ct_config_a0", &config::config_a0);
+            ct_log_a0.debug(LOG_WHERE, "Init");
 
-    _G.type = ct_hash_a0.id64_from_str("config");
-}
+            api->register_api("ct_config_a0", &config::config_a0);
 
-extern "C" void config_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
+            _G.type = ct_hash_a0.id64_from_str("config");
+        },
+        {
+            CEL_UNUSED(api);
 
-    ct_log_a0.debug(LOG_WHERE, "Shutdown");
+            ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-    _deallocate_all_string();
-}
+            _deallocate_all_string();
+        }
+)

@@ -2,8 +2,9 @@
 #include <memory.h>
 
 #include <cetech/core/hash.h>
-#include <cetech/core/api_system.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api_system.h>
 
 uint64_t hash_murmur2_64(const void *key,
                          uint64_t len,
@@ -81,10 +82,13 @@ static ct_hash_a0 hash_api = {
         .hash_murmur2_64 = hash_murmur2_64
 };
 
-extern "C" void hashlib_load_module(ct_api_a0 *api) {
-    api->register_api("ct_hash_a0", &hash_api);
-}
+CETECH_MODULE_DEF(
+        hashlib,
+        {
+            api->register_api("ct_hash_a0", &hash_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)
 
-extern "C" void hashlib_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}

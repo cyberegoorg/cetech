@@ -10,7 +10,6 @@ extern "C" {
 
 #include <celib/allocator.h>
 #include <cetech/core/api_system.h>
-#include <cetech/machine/machine.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/config.h>
 #include <cetech/core/hash.h>
@@ -24,6 +23,7 @@ extern "C" {
 #include <include/mpack/mpack.h>
 #include <cetech/core/os/errors.h>
 #include <cetech/engine/entity.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_console_srv_a0);
@@ -471,7 +471,8 @@ void luasys_to_vec3f(lua_State *l,
 }
 
 void luasys_to_quat(lua_State *l,
-                        int i,float *value) {
+                    int i,
+                    float *value) {
     float *v = static_cast<float *>(lua_touserdata(l, i));
 
     celib::quat_move(value, v);
@@ -489,24 +490,26 @@ void luasys_push_vec3f(lua_State *l,
 }
 
 void luasys_push_quat(lua_State *l,
-                      float* v) {
+                      float *v) {
     float *tmp_v = _new_tmp_quat();
 
     celib::quat_move(tmp_v, v);
 
-    lua_pushlightuserdata(l, tmp_v);}
+    lua_pushlightuserdata(l, tmp_v);
+}
 
 void luasys_to_mat44f(lua_State *l,
-                           int i, float* value) {
+                      int i,
+                      float *value) {
     const float *v = static_cast<const float *>(lua_topointer(l, i));
-    memcpy(value, v, sizeof(float)* 16);
+    memcpy(value, v, sizeof(float) * 16);
 }
 
 void luasys_push_mat44f(lua_State *l,
-                        float* v) {
+                        float *v) {
     float *tmp_v = _new_tmp_mat44f();
 
-    memcpy(tmp_v, v, sizeof(float)*16);
+    memcpy(tmp_v, v, sizeof(float) * 16);
 
     lua_pushlightuserdata(l, tmp_v);
 }
@@ -564,7 +567,7 @@ void luasys_add_module_function(const char *module,
 
 int _is_vec3f(lua_State *L,
               int idx) {
-    float *p = (float*) lua_touserdata(L, idx);
+    float *p = (float *) lua_touserdata(L, idx);
     return (p >= _G._temp_vec3f_buffer[0]) &&
            (p < (_G._temp_vec3f_buffer[0] + 1024));
 }
@@ -573,7 +576,8 @@ int _is_vec3f(lua_State *L,
 int _is_quat(lua_State *L,
              int idx) {
     float *p = (float *) lua_touserdata(L, idx);
-    return (p >= _G._temp_quat_buffer[0]) && (p < (_G._temp_quat_buffer[0] + 1024));
+    return (p >= _G._temp_quat_buffer[0]) &&
+           (p < (_G._temp_quat_buffer[0] + 1024));
 }
 
 int _is_mat44f(lua_State *L,
@@ -845,11 +849,15 @@ void luasys_call_global(const char *func,
     lua_pop(_state, -1);
 }
 
-extern "C" void luasys_load_module(ct_api_a0 *api) {
-    _init(api);
-}
+CETECH_MODULE_DEF(
+        luasys,
+        {
+            _init(api);
+        },
+        {
+            CEL_UNUSED(api);
 
-extern "C" void luasys_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-    _shutdown();
-}
+            _shutdown();
+
+        }
+)

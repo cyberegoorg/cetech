@@ -12,6 +12,7 @@
 #include "gamepadstr.h"
 #include <cetech/core/log.h>
 #include <cetech/core/os/errors.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_log_a0)
 CETECH_DECL_API(ct_machine_a0);
@@ -118,7 +119,8 @@ namespace gamepad {
     }
 
     void axis(uint32_t idx,
-                 const uint32_t axis_index, float *value) {
+              const uint32_t axis_index,
+              float *value) {
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
@@ -217,13 +219,17 @@ namespace gamepad_module {
 
         _G = {};
     }
-
-    extern "C" void gamepad_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void gamepad_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 };
+
+CETECH_MODULE_DEF(
+        gamepad,
+        {
+            gamepad_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            gamepad_module::_shutdown();
+
+        }
+)

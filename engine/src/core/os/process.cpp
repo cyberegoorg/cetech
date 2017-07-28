@@ -1,13 +1,11 @@
-#include <dlfcn.h>
+
 
 #include <cetech/core/os/errors.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/log.h>
-#include <cetech/machine/machine.h>
-#include <stdio.h>
-#include <cetech/core/log.h>
 #include <cetech/core/os/process.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_log_a0);
 
@@ -39,12 +37,15 @@ static ct_process_a0 process_api = {
         .exec = exec
 };
 
-extern "C" void process_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
 
-    api->register_api("ct_process_a0", &process_api);
-}
+CETECH_MODULE_DEF(
+        process,
+        {
+            CETECH_GET_API(api, ct_log_a0);
 
-extern "C" void process_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
+            api->register_api("ct_process_a0", &process_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)

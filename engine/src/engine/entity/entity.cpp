@@ -23,6 +23,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_component_a0);
@@ -289,8 +290,8 @@ namespace entity_resource_compiler {
         cel_alloc *a = ct_memory_a0.main_allocator();
 
         ct_entity_compile_output *output = CEL_ALLOCATE(a,
-                                                           ct_entity_compile_output,
-                                                           sizeof(ct_entity_compile_output));
+                                                        ct_entity_compile_output,
+                                                        sizeof(ct_entity_compile_output));
 
         output->ent_counter = 0;
 
@@ -520,8 +521,8 @@ namespace entity {
         struct entity_resource *res = (entity_resource *) resource;
 
         ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                                             ct_entity, sizeof(ct_entity) *
-                                                        res->ent_count);
+                                          ct_entity, sizeof(ct_entity) *
+                                                     res->ent_count);
 
         for (uint32_t j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
@@ -643,13 +644,15 @@ namespace entity_module {
         _G.entity_handler.destroy();
     }
 
-
-    extern "C" void entity_load_module(ct_api_a0 *api) {
-        _init(api);
-    }
-
-    extern "C" void entity_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        entity,
+        {
+            entity_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            entity_module::_shutdown();
+        }
+)

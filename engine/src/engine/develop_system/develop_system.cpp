@@ -23,6 +23,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/core/os/thread.h>
 #include <cetech/core/os/time.h>
+#include <cetech/core/module.h>
 
 using namespace celib;
 
@@ -250,7 +251,8 @@ namespace develop_system {
         developsys_push(EVENT_RECORD_INT, ev);
     }
 
-    ct_scope_data developsys_enter_scope(const char *name, uint32_t worker_id) {
+    ct_scope_data developsys_enter_scope(const char *name,
+                                         uint32_t worker_id) {
         ++_scope_depth;
 
         return (ct_scope_data) {
@@ -345,14 +347,16 @@ namespace develop_system_module {
 
         _G.shutdown();
     }
-
-    extern "C" void developsystem_load_module(ct_api_a0 *api) {
-        _init(api);
-
-    }
-
-    extern "C" void developsystem_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
 }
+
+CETECH_MODULE_DEF(
+        developsystem,
+        {
+            develop_system_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+            develop_system_module::_shutdown();
+        }
+)
+

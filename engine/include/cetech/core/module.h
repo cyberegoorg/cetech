@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+struct ct_api_a0;
 
 //==============================================================================
 // Defines
@@ -14,31 +15,33 @@ extern "C" {
 
 //! Add static module and load it
 //! \param name Module name
-#define ADD_STATIC_MODULE(name)                                     \
+#define CETECH_ADD_STATIC_MODULE(name)                                     \
     extern void name ## _load_module(struct ct_api_a0*);               \
     extern void name ## _unload_module(struct ct_api_a0*);             \
     ct_module_a0.add_static(name ## _load_module, name ## _unload_module)
 
 //! Load static module
 //! \param name Module name
-#define LOAD_STATIC_MODULE(api, name)                 \
+#define CETECH_LOAD_STATIC_MODULE(api, name)                 \
     extern void name ## _load_module(struct ct_api_a0*); \
     name ## _load_module(api)
 
 //! Unload static module
 //! \param name Module name
-#define UNLOAD_STATIC_MODULE(api, name)                     \
+#define CETECH_UNLOAD_STATIC_MODULE(api, name)                     \
     extern void name ## _unload_module(struct ct_api_a0* api); \
     name ## _unload_module(api)
+
+#define CETECH_MODULE_DEF(name, load, unload) \
+    extern "C" void name##_load_module(struct ct_api_a0 *api) load \
+    extern "C" void name##_unload_module(struct ct_api_a0 *api) unload
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
 typedef void (*ct_load_module_t)(struct ct_api_a0 *api);
-
 typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
-
 
 //==============================================================================
 // Interface

@@ -18,6 +18,7 @@
 #include "cetech/engine/level.h"
 #include <cetech/core/os/vio.h>
 #include <cetech/core/yaml.h>
+#include <cetech/core/module.h>
 
 #include "level_blob.h"
 
@@ -332,13 +333,17 @@ namespace level_module {
         _G.level_instance.destroy();
     }
 
-    extern "C" void level_unload_module(ct_api_a0 *api) {
-        CEL_UNUSED(api);
-        _shutdown();
-    }
-
-    extern "C" void level_load_module(ct_api_a0 *api) {
-        _init(api);
-
-    }
 }
+
+CETECH_MODULE_DEF(
+        level,
+        {
+            level_module::_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            level_module::_shutdown();
+
+        }
+)

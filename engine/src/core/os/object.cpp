@@ -3,9 +3,9 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/log.h>
-#include <cetech/machine/machine.h>
 #include <cetech/core/os/object.h>
 #include <celib/macros.h>
+#include <cetech/core/module.h>
 
 CETECH_DECL_API(ct_log_a0);
 
@@ -51,12 +51,14 @@ static ct_object_a0 object_api = {
         .load_function  = load_function
 };
 
-extern "C" void object_load_module(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
+CETECH_MODULE_DEF(
+        object,
+        {
+            CETECH_GET_API(api, ct_log_a0);
 
-    api->register_api("ct_object_a0", &object_api);
-}
-
-extern "C" void object_unload_module(ct_api_a0 *api) {
-    CEL_UNUSED(api);
-}
+            api->register_api("ct_object_a0", &object_api);
+        },
+        {
+            CEL_UNUSED(api);
+        }
+)
