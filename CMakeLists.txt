@@ -98,7 +98,7 @@ set(SOURCE_FILES
         engine/src/core/os/cpu.cpp
         engine/src/core/os/thread.cpp
         engine/src/core/os/vio.cpp
-        engine/src/machine_sdl2/window_sql2.cpp
+        engine/src/machine_sdl2/window_sdl2.cpp
         engine/src/core/os/time.cpp
 
         ########################################################################

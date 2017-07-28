@@ -12,6 +12,7 @@
 
 #include <cetech/core/log.h>
 #include <memory.h>
+#include <celib/macros.h>
 
 /***********************************************************************
 **** Internals
@@ -59,6 +60,7 @@ void ct_log_stdout_handler(enum ct_log_level level,
                            const char *where,
                            const char *msg,
                            void *data) {
+    CEL_UNUSED(data);
 
     static const char *_level_to_str[4] = {
             [LOG_INFO]    = "info",
@@ -74,12 +76,12 @@ void ct_log_stdout_handler(enum ct_log_level level,
             [LOG_DBG]     = COLORED_TEXT(BGREEN, LOG_FORMAT)
     };
 
-    static const char *_nocolor_level_format[4] = {
-            [LOG_INFO]    = LOG_FORMAT,
-            [LOG_WARNING] = LOG_FORMAT,
-            [LOG_ERROR]   = LOG_FORMAT,
-            [LOG_DBG]     = LOG_FORMAT
-    };
+//    static const char *_nocolor_level_format[4] = {
+//            [LOG_INFO]    = LOG_FORMAT,
+//            [LOG_WARNING] = LOG_FORMAT,
+//            [LOG_ERROR]   = LOG_FORMAT,
+//            [LOG_DBG]     = LOG_FORMAT
+//    };
 
 
     FILE *out = level == LOG_ERROR ? stderr : stdout;

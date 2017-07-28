@@ -61,7 +61,7 @@ CETECH_DECL_API(ct_hash_a0);
 
 namespace texture_resource {
 
-    static const bgfx::TextureHandle null_texture = {0};
+    static const bgfx::TextureHandle null_texture = {};
 
 
     void *_texture_resource_loader(ct_vio *input,
@@ -93,6 +93,7 @@ namespace texture_resource {
 
     void _texture_resource_offline(uint64_t name,
                                    void *data) {
+        CEL_UNUSED(data);
 
         auto texture = map::get(_G.handler_map, name, null_texture);
 
@@ -140,7 +141,7 @@ namespace texture {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("texture");
 

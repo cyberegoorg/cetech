@@ -160,7 +160,7 @@ namespace {
 
         struct mesh_data t_data;
 
-        char tmp_buffer[64] = {0};
+        char tmp_buffer[64] = {};
 
         YAML_NODE_SCOPE(scene, body, "scene",
                         yaml_as_string(scene, tmp_buffer,
@@ -205,8 +205,8 @@ namespace {
 
     static void _destroyer(ct_world world,
                            ct_entity *ents,
-                           size_t ent_count) {
-        for (int i = 0; i < ent_count; i++) {
+                           uint32_t ent_count) {
+        for (uint32_t i = 0; i < ent_count; i++) {
             destroy(world, ents[i]);
         }
     }
@@ -216,11 +216,13 @@ namespace {
                          ct_entity *ents,
                          uint32_t *cents,
                          uint32_t *ents_parent,
-                         size_t ent_count,
+                         uint32_t ent_count,
                          void *data) {
+        CEL_UNUSED(ents_parent);
+
         struct mesh_data *tdata = (mesh_data *) data;
 
-        for (int i = 0; i < ent_count; ++i) {
+        for (uint32_t i = 0; i < ent_count; ++i) {
             ct_mesh_renderer_a0.create(world,
                                        ents[cents[i]],
                                        tdata[i].scene,
@@ -289,7 +291,7 @@ ct_mesh_renderer mesh_create(ct_world world,
 void mesh_render_all(ct_world world) {
     WorldInstance *data = _get_world_instance(world);
 
-    for (int i = 0; i < data->n; ++i) {
+    for (uint32_t i = 0; i < data->n; ++i) {
 
         ct_material material = data->material[i];
         uint64_t scene = data->scene[i];
@@ -350,10 +352,10 @@ static void _set_property(ct_world world,
                           ct_entity entity,
                           uint64_t key,
                           ct_property_value value) {
-
-    uint64_t scene = ct_hash_a0.id64_from_str("scene");
-    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
-    uint64_t node = ct_hash_a0.id64_from_str("node");
+//
+//    uint64_t scene = ct_hash_a0.id64_from_str("scene");
+//    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
+//    uint64_t node = ct_hash_a0.id64_from_str("node");
     uint64_t material = ct_hash_a0.id64_from_str("material");
 
     ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
@@ -367,15 +369,16 @@ static void _set_property(ct_world world,
 static ct_property_value _get_property(ct_world world,
                                        ct_entity entity,
                                        uint64_t key) {
-    uint64_t scene = ct_hash_a0.id64_from_str("scene");
-    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
-    uint64_t node = ct_hash_a0.id64_from_str("node");
-    uint64_t material = ct_hash_a0.id64_from_str("material");
-
-    ct_mesh_renderer mesh_r = mesh_get(world, entity);
-    WorldInstance *data = _get_world_instance(world);
-
-    char name_buff[256] = {0};
+    CEL_UNUSED(world, entity, key);
+//    uint64_t scene = ct_hash_a0.id64_from_str("scene");
+//    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
+//    uint64_t node = ct_hash_a0.id64_from_str("node");
+//    uint64_t material = ct_hash_a0.id64_from_str("material");
+//
+//    ct_mesh_renderer mesh_r = mesh_get(world, entity);
+//    WorldInstance *data = _get_world_instance(world);
+//
+//    char name_buff[256] = {};
 
 //    if (key.id == scene.id) {
 //        ResourceApiV0.get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->scene, mesh_r.idx));
@@ -416,7 +419,7 @@ static ct_property_value _get_property(ct_world world,
 
 
 static void _init_api(struct ct_api_a0 *api) {
-    static struct ct_mesh_renderer_a0 _api = {0};
+    static struct ct_mesh_renderer_a0 _api = {};
 
     _api.is_valid = mesh_is_valid;
     _api.has = mesh_has;
@@ -441,7 +444,7 @@ static void _init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_transform_a0);
     CETECH_GET_API(api, ct_hash_a0);
 
-    _G = {0};
+    _G = {};
 
     _G.world_map.init(ct_memory_a0.main_allocator());
     _G.world_instances.init(ct_memory_a0.main_allocator());

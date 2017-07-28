@@ -82,23 +82,23 @@ namespace {
         _data = new_data;
     }
 
-    void destroy(WorldInstance &_data,
-                 unsigned i) {
-
-        unsigned last = _data.n - 1;
-        ct_entity e = _data.entity[i];
-        ct_entity last_e = _data.entity[last];
-
-        _data.entity[i] = _data.entity[last];
-        _data.near[i] = _data.near[last];
-        _data.far[i] = _data.far[last];
-        _data.fov[i] = _data.fov[last];
-
-//    map::set(_G._map, last_e.h, i);
-//    map::remove(_G._map, e.h);
-
-        --_data.n;
-    }
+//    void destroy(WorldInstance &_data,
+//                 unsigned i) {
+//
+//        unsigned last = _data.n - 1;
+////        ct_entity e = _data.entity[i];
+////        ct_entity last_e = _data.entity[last];
+//
+//        _data.entity[i] = _data.entity[last];
+//        _data.near[i] = _data.near[last];
+//        _data.far[i] = _data.far[last];
+//        _data.fov[i] = _data.fov[last];
+//
+////    map::set(_G._map, last_e.h, i);
+////    map::remove(_G._map, e.h);
+//
+//        --_data.n;
+//    }
 
     static void _new_world(ct_world world) {
         uint32_t idx = array::size(_G.world_instances);
@@ -114,7 +114,7 @@ namespace {
         ct_world last_world = _G.world_instances[last_idx].world;
 
         CEL_FREE(ct_memory_a0.main_allocator(),
-                    _G.world_instances[idx].buffer);
+                 _G.world_instances[idx].buffer);
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
@@ -160,7 +160,8 @@ namespace camera {
         int width, height;
         width = height = 0;
 
-        ct_renderer_a0.get_size(&width, &height); // TODO, to arg... or viewport?
+        ct_renderer_a0.get_size(&width,
+                                &height); // TODO, to arg... or viewport?
 
         ct_entity e = world_inst->entity[camera.idx];
         ct_transform t = ct_transform_a0.get(camera.world, e);
@@ -169,11 +170,13 @@ namespace camera {
         float near = world_inst->near[camera.idx];
         float far = world_inst->far[camera.idx];
 
-        celib::mat4_proj(proj, fov, width / float(height), near, far, true);
+        celib::mat4_proj(proj, fov, float(width) / float(height), near, far,
+                         true);
 
         float w[16];
         ct_transform_a0.get_world_matrix(t, w);
 
+        //celib::mat4_move(view, w);
         celib::mat4_inverse(view, w);
     }
 
@@ -188,8 +191,7 @@ namespace camera {
     ct_camera get(ct_world world,
                   ct_entity entity) {
 
-        uint32_t idx = world.h ^entity.h;
-
+        uint32_t idx = world.h ^ entity.h;
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
         return (ct_camera) {.idx = component_idx, .world = world};
@@ -239,9 +241,11 @@ namespace camera_module {
 
     void _destroyer(ct_world world,
                     ct_entity *ents,
-                    size_t ent_count) {
+                    uint32_t ent_count) {
+        CEL_UNUSED(world);
+
         // TODO: remove from arrays, swap idx -> last AND change size
-        for (int i = 0; i < ent_count; i++) {
+        for (uint32_t i = 0; i < ent_count; i++) {
             map::remove(_G.world_map, ents[i].h);
         }
     }
@@ -250,11 +254,14 @@ namespace camera_module {
                   ct_entity *ents,
                   uint32_t *cents,
                   uint32_t *ents_parent,
-                  size_t ent_count,
+                  uint32_t ent_count,
                   void *data) {
+
+        CEL_UNUSED(ents_parent);
+
         camera_data *tdata = (camera_data *) data;
 
-        for (int i = 0; i < ent_count; ++i) {
+        for (uint32_t i = 0; i < ent_count; ++i) {
             camera::create(world,
                            ents[cents[i]],
                            tdata[i].near,
@@ -272,7 +279,7 @@ namespace camera_module {
         CETECH_GET_API(api, ct_transform_a0);
         CETECH_GET_API(api, ct_hash_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.world_map.init(ct_memory_a0.main_allocator());
         _G.world_instances.init(ct_memory_a0.main_allocator());
@@ -305,6 +312,7 @@ namespace camera_module {
     }
 
     extern "C" void camera_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 

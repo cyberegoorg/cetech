@@ -3,6 +3,7 @@
 #include <cetech/core/log.h>
 
 #include <include/SDL2/SDL_cpuinfo.h>
+#include <celib/macros.h>
 
 int cpu_count() {
     return SDL_GetCPUCount();
@@ -17,4 +18,5 @@ extern "C" void cpu_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void cpu_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
 }

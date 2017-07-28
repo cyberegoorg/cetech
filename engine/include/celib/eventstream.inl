@@ -40,8 +40,7 @@ namespace celib {
             return (event_header *) array::end(stream);
         }
 
-        inline event_header *next(EventStream &stream,
-                                  event_header *header) {
+        inline event_header *next(event_header *header) {
             return (event_header *) (((char *) header) + header->size);
         }
 

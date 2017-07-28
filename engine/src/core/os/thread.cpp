@@ -8,6 +8,7 @@
 #include <sched.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/os/thread.h>
+#include <celib/macros.h>
 
 #endif
 
@@ -82,6 +83,6 @@ extern "C" void thread_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void thread_unload_module(ct_api_a0 *api) {
-
+    CEL_UNUSED(api);
 }
 

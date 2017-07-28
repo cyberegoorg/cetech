@@ -5,6 +5,7 @@
 #include <cetech/core/log.h>
 #include <cetech/machine/machine.h>
 #include <cetech/core/os/object.h>
+#include <celib/macros.h>
 
 CETECH_DECL_API(ct_log_a0);
 
@@ -31,6 +32,8 @@ void unload_object(void *so) {
 
 void *load_function(void *so,
                     const char *name) {
+    CEL_UNUSED(name);
+
     void *fce = dlsym(so, "load_module");
 
     if (fce == NULL) {
@@ -55,5 +58,5 @@ extern "C" void object_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void object_unload_module(ct_api_a0 *api) {
-
+    CEL_UNUSED(api);
 }

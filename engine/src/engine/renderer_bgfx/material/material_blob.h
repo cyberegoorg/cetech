@@ -25,7 +25,7 @@ namespace material_blob {
         return (blob_t*)(data);
     }
 
-    inline const uint32_t blob_size(const blob_t* blob) {
+    inline uint32_t blob_size(const blob_t* blob) {
         return (
             sizeof(blob_t) +
             ( sizeof(char) * blob->uniforms_count * 32) +

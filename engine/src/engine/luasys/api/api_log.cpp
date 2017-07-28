@@ -23,7 +23,7 @@ static int _log_format(lua_State *l,
     const char *frmt = luasys_to_string_l(l, 2, &frmt_len);
 
     int arg_idx = 3;
-    for (int i = 0; i < frmt_len; ++i) {
+    for (size_t i = 0; i < frmt_len; ++i) {
         if (frmt[i] != '%') {
             *buffer_it = frmt[i];
             ++buffer_it;

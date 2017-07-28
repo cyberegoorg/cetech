@@ -21,17 +21,21 @@ namespace resource_lua {
 
     void online(uint64_t name,
                 void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void offline(uint64_t name,
                  void *data) {
-
+        CEL_UNUSED(name, data);
     }
 
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
                    struct cel_alloc *allocator) {
+
+        CEL_UNUSED(name);
+
         CEL_FREE(allocator, old_data);
 
         struct lua_resource *resource = (lua_resource *) new_data;

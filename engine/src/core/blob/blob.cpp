@@ -64,5 +64,6 @@ namespace blob_module {
     }
 
     extern "C" void blob_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
     }
 }

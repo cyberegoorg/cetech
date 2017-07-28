@@ -47,7 +47,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_api_a0);
+//CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_mouse_a0);
@@ -95,6 +95,8 @@ static struct ApplicationGlobals {
 
 static int _cmd_wait(mpack_node_t args,
                      mpack_writer_t *writer) {
+    CEL_UNUSED(args);
+    CEL_UNUSED(writer);
     return 0;
 }
 
@@ -208,7 +210,7 @@ static void _boot_unload() {
 
 
 extern "C" void application_start() {
-    _G = {0};
+    _G = {};
 
     _init_api(api::v0());
     _init_config();
@@ -234,7 +236,7 @@ extern "C" void application_start() {
     if (!ct_config_a0.get_int(_G.config.daemon)) {
         intptr_t wid = ct_config_a0.get_int(_G.config.wid);
 
-        char title[128] = {0};
+        char title[128] = {};
         snprintf(title, CETECH_ARRAY_LEN(title), "cetech - %s",
                  ct_config_a0.get_string(_G.config.boot_script));
 
@@ -269,7 +271,7 @@ extern "C" void application_start() {
     _G.is_running = 1;
     ct_log_a0.info("core.ready", "Run main loop");
 
-    float lag = 0.0f;
+    //float lag = 0.0f;
     float frame_limit = 60.0f;
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;

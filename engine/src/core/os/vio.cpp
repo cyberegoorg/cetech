@@ -93,5 +93,6 @@ extern "C" void vio_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void vio_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
 }
 

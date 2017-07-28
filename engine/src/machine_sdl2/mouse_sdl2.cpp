@@ -29,7 +29,7 @@ using namespace celib;
 static struct G {
     uint8_t state[MOUSE_BTN_MAX];
     float position[2];
-} _G = {0};
+} _G = {};
 
 
 CETECH_DECL_API(ct_app_a0);
@@ -40,7 +40,7 @@ CETECH_DECL_API(ct_window_a0);
 //==============================================================================
 
 int sdl_mouse_init(ct_api_a0 *api) {
-    _G = (struct G) {0};
+    _G = (struct G) {};
 
     CETECH_GET_API(api, ct_app_a0);
     CETECH_GET_API(api, ct_window_a0);
@@ -49,15 +49,15 @@ int sdl_mouse_init(ct_api_a0 *api) {
 }
 
 void sdl_mouse_shutdown() {
-    _G = (struct G) {0};
+    _G = (struct G) {};
 }
 
 void sdl_mouse_process(EventStream &stream) {
-    int pos[2] = {0};
+    int pos[2] = {};
 
     uint32_t state = SDL_GetMouseState(&pos[0], &pos[1]);
 
-    uint8_t curent_state[MOUSE_BTN_MAX] = {0};
+    uint8_t curent_state[MOUSE_BTN_MAX] = {};
 
     curent_state[MOUSE_BTN_LEFT] = (uint8_t) (state & SDL_BUTTON_LMASK);
     curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
@@ -66,7 +66,7 @@ void sdl_mouse_process(EventStream &stream) {
     if ((pos[0] != _G.position[0]) || (pos[1] != _G.position[1])) {
         auto *main_window = ct_app_a0.main_window();
 
-        uint32_t window_size[2] = {0};
+        uint32_t window_size[2] = {};
         main_window->size(main_window->inst, &window_size[0], &window_size[1]);
 
         _G.position[0] = pos[0];

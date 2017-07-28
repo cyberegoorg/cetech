@@ -26,15 +26,15 @@ namespace memory {
 //==============================================================================
 
     void allocator_trace_pointer(struct allocator_trace_entry *entries,
-                                 uint64_t max_entries,
+                                 uint32_t max_entries,
                                  void *p);
 
     void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
-                                      uint64_t max_entries,
+                                      uint32_t max_entries,
                                       void *p);
 
     void allocator_check_trace(struct allocator_trace_entry *entries,
-                               uint64_t max_entries);
+                               uint32_t max_entries);
 
 //==============================================================================
 // Malloc cel_alloc
@@ -71,13 +71,13 @@ struct Header {
 
 static const uint32_t HEADER_PAD_VALUE = 0xffffffffu;
 
-static void *data_pointer(struct Header *header,
+inline void *data_pointer(struct Header *header,
                           uint32_t align) {
     const void *p = header + 1;
     return (void *) pointer_align_forward(p, align);
 }
 
-static struct Header *header(void *data) {
+inline struct Header *header(void *data) {
     uint32_t *p = (uint32_t *) data;
 
     while (p[-1] == HEADER_PAD_VALUE)
@@ -86,7 +86,7 @@ static struct Header *header(void *data) {
     return (struct Header *) p - 1;
 }
 
-static void fill(struct Header *header,
+inline void fill(struct Header *header,
                  void *data,
                  uint32_t size) {
     header->size = size;

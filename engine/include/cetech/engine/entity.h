@@ -75,8 +75,7 @@ typedef struct {
     //! On world update callback
     //! \param world World
     //! \param dt Delta time
-    void (*on_update)(struct ct_world world,
-                                         float dt);
+    void (*on_update)(struct ct_world world, float dt);
 } ct_world_callbacks_t;
 
 
@@ -103,7 +102,7 @@ static struct ct_component_clb {
     //! \param ent_count Entity count
     void (*destroyer)(struct ct_world world,
                       struct ct_entity *ents,
-                      size_t ent_count);
+                      uint32_t ent_count);
 
     //! Component spawner
     //! \param world World where component live
@@ -116,7 +115,7 @@ static struct ct_component_clb {
                     struct ct_entity *ents,
                     uint32_t *cent,
                     uint32_t *ents_parent,
-                    size_t ent_count,
+                    uint32_t ent_count,
                     void *data);
 
     void (*set_property)(struct ct_world world,
@@ -128,7 +127,7 @@ static struct ct_component_clb {
                                              struct ct_entity entity,
                                              uint64_t key);
     ct_world_callbacks_t world_clb;
-} ct_component_clb_null = {0};
+} ct_component_clb_null = {};
 
 
 //==============================================================================

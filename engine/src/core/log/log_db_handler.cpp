@@ -9,6 +9,7 @@
 
 #include <cetech/core/memory.h>
 #include <cetech/core/os/path.h>
+#include <celib/macros.h>
 
 #include "include/sqlite3/sqlite3.h"
 
@@ -49,10 +50,10 @@ static int _step(sqlite3 *db,
 }
 
 static char *logdb_path = nullptr;
-static time_t _session_id = {0};
-static sqlite3 *db[256] = {0};
+static time_t _session_id = {};
+static sqlite3 *db[256] = {};
 
-static sqlite3 *_opendb(char worker_id) {
+static sqlite3 *_opendb(uint8_t worker_id) {
     if (db[worker_id] != 0) {
         return db[worker_id];
     }
@@ -100,6 +101,8 @@ void logdb_log(enum ct_log_level level,
                const char *where,
                const char *msg,
                void *data) {
+
+    CEL_UNUSED(data);
 
     static const char *_level_to_str[4] = {
             [LOG_INFO] = "info",

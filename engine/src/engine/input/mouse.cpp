@@ -34,7 +34,7 @@ static struct G {
     uint8_t last_state[MOUSE_BTN_MAX];
     float last_pos[2];
     float last_delta_pos[2];
-} _G = {0};
+} _G = {};
 
 //==============================================================================
 // Interface
@@ -65,6 +65,7 @@ namespace mouse {
 
     int button_state(uint32_t idx,
                      const uint32_t button_index) {
+        CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
                       (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
@@ -73,6 +74,7 @@ namespace mouse {
 
     int button_pressed(uint32_t idx,
                        const uint32_t button_index) {
+        CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
                       (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
@@ -81,6 +83,7 @@ namespace mouse {
 
     int button_released(uint32_t idx,
                         const uint32_t button_index) {
+        CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
                       (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
@@ -112,6 +115,7 @@ namespace mouse {
 
     void axis(uint32_t idx,
                  const uint32_t axis_index, float* value) {
+        CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
@@ -200,7 +204,7 @@ namespace mouse_module {
         CETECH_GET_API(api, ct_machine_a0);
         CETECH_GET_API(api, ct_log_a0);
 
-        _G = {0};
+        _G = {};
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
@@ -208,7 +212,7 @@ namespace mouse_module {
     void _shutdown() {
         ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-        _G = {0};
+        _G = {};
     }
 
 
@@ -217,6 +221,7 @@ namespace mouse_module {
     }
 
     extern "C" void mouse_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

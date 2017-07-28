@@ -75,8 +75,8 @@ namespace texture_compiler {
 
         auto a = ct_memory_a0.main_allocator();
 
-        char dir[1024] = {0};
-        ct_path_a0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
+        char dir[1024] = {};
+        ct_path_a0.dir(dir, filename);
 
         char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
         ct_path_a0.make_path(tmp_dirname);
@@ -97,9 +97,9 @@ namespace texture_compiler {
         auto a = ct_memory_a0.main_allocator();
 
         // TODO: temp cel_alloc?
-        char input_str[1024] = {0};
-        char output_path[1024] = {0};
-        char tmp_filename[1024] = {0};
+        char input_str[1024] = {};
+        char output_path[1024] = {};
+        char tmp_filename[1024] = {};
 
         char source_data[source_vio->size(source_vio->inst) + 1];
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);

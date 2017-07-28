@@ -116,6 +116,8 @@ static int _dot(lua_State *l) {
 }
 
 void _register_lua_vec3f_api(struct ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     luasys_add_module_function(API_NAME, "make", _ctor);
     luasys_add_module_function(API_NAME, "is", _is);
 

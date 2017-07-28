@@ -25,12 +25,12 @@ char *stacktrace(int skip) {
     char *return_str = CEL_ALLOCATE(a, char, 4096);
     return_str[0] = '\0';
 
-    void *array[50];
-    int size = backtrace(array, 50);
+    void *array[32];
+    int size = backtrace(array, 32);
 
     char **messages = backtrace_symbols(array, size);
 
-    char buffer[1024];
+    char buffer[256];
     for (int i = skip; i < size && messages != NULL; ++i) {
         buffer[0] = '\0';
         char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
@@ -104,4 +104,5 @@ extern "C" void error_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void error_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
 }

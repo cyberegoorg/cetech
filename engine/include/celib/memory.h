@@ -12,11 +12,11 @@
 #include <stdlib.h> // size_t
 #include <stddef.h> // ptrdiff_t
 
-#if !BX_CRT_NONE
+#if !CEL_CRT_NONE
 
 #	include <string.h> // memcpy, memmove, memset
 
-#endif // !BX_CRT_NONE
+#endif // !CEL_CRT_NONE
 
 
 #include "macros.h"
@@ -134,11 +134,11 @@ namespace celib {
     inline void mem_copy(void *_dst,
                          const void *_src,
                          size_t _numBytes) {
-#if BX_CRT_NONE
+#if CEL_CRT_NONE
         memCopyRef(_dst, _src, _numBytes);
 #else
         ::memcpy(_dst, _src, _numBytes);
-#endif // BX_CRT_NONE
+#endif // CEL_CRT_NONE
     }
 
     inline void mem_copy(void *_dst,
@@ -200,11 +200,11 @@ namespace celib {
     inline void mem_move(void *_dst,
                          const void *_src,
                          size_t _numBytes) {
-#if BX_CRT_NONE
+#if CEL_CRT_NONE
         memMoveRef(_dst, _src, _numBytes);
 #else
         ::memmove(_dst, _src, _numBytes);
-#endif // BX_CRT_NONE
+#endif // CEL_CRT_NONE
     }
 
     inline void mem_set_ref(void *_dst,
@@ -220,11 +220,11 @@ namespace celib {
     inline void mem_set(void *_dst,
                         uint8_t _ch,
                         size_t _numBytes) {
-#if BX_CRT_NONE
+#if CEL_CRT_NONE
         memSetRef(_dst, _ch, _numBytes);
 #else
         ::memset(_dst, _ch, _numBytes);
-#endif // BX_CRT_NONE
+#endif // CEL_CRT_NONE
     }
 
     inline int32_t mem_cmp_ref(const void *_lhs,
@@ -242,11 +242,11 @@ namespace celib {
     int32_t mem_cmp(const void *_lhs,
                     const void *_rhs,
                     size_t _numBytes) {
-#if BX_CRT_NONE
+#if CEL_CRT_NONE
         return memCmpRef(_lhs, _rhs, _numBytes);
 #else
         return ::memcmp(_lhs, _rhs, _numBytes);
-#endif // BX_CRT_NONE
+#endif // CEL_CRT_NONE
     }
 }
 

@@ -69,7 +69,7 @@ void _dir_list(const char *path,
                 continue;
             }
 
-            char tmp_path[1024] = {0};
+            char tmp_path[1024] = {};
             int len = 0;
 
             if (path[strlen(path) - 1] != '/') {
@@ -122,7 +122,7 @@ void dir_list(const char *path,
 void dir_list_free(char **files,
                    uint32_t count,
                    struct cel_alloc *allocator) {
-    for (int i = 0; i < count; ++i) {
+    for (uint32_t i = 0; i < count; ++i) {
         CEL_FREE(allocator, files[i]);
     }
 
@@ -177,8 +177,7 @@ const char *path_filename(const char *path) {
 }
 
 void path_basename(const char *path,
-                   char *out,
-                   size_t size) {
+                   char *out) {
     const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');
 
@@ -192,7 +191,6 @@ void path_basename(const char *path,
 }
 
 void path_dir(char *out,
-              size_t size,
               const char *path) {
     char *ch = strrchr(path, DIR_DELIM_CH);
 
@@ -225,7 +223,7 @@ char *path_join(struct cel_alloc *allocator,
 
     buffer << va_arg (arguments, const char*);
 
-    for (int i = 1; i < count; ++i) {
+    for (uint32_t i = 1; i < count; ++i) {
         buffer << DIR_DELIM_STR;
         buffer << va_arg (arguments, const char*);
     }
@@ -279,5 +277,5 @@ extern "C" void path_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void path_unload_module(ct_api_a0 *api) {
-
+    CEL_UNUSED(api);
 }

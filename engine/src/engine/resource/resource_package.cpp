@@ -40,7 +40,7 @@ struct package_task_data {
 #define _G PackageGlobals
 struct G {
     uint64_t package_typel;
-} _G = {0};
+} _G = {};
 
 //==============================================================================
 // Resource compiler
@@ -58,8 +58,8 @@ void forach_clb(yaml_node_t key,
                 void *data) {
     struct package_compile_data *compile_data = (package_compile_data *) data;
 
-    char type_str[128] = {0};
-    char name_str[128] = {0};
+    char type_str[128] = {};
+    char name_str[128] = {};
 
     yaml_as_string(key, type_str, CETECH_ARRAY_LEN(type_str));
 
@@ -69,7 +69,7 @@ void forach_clb(yaml_node_t key,
     array::push_back(compile_data->offset, array::size(compile_data->name));
     array::push_back(compile_data->name_count, name_count);
 
-    for (int i = 0; i < name_count; ++i) {
+    for (uint32_t i = 0; i < name_count; ++i) {
         yaml_node_t name_node = yaml_get_seq_node(value, i);
         yaml_as_string(name_node, name_str, CETECH_ARRAY_LEN(name_str));
 
@@ -85,6 +85,8 @@ int _package_compiler(const char *filename,
                       ct_vio *build_vio,
                       ct_compilator_api *compilator_api) {
 
+    CEL_UNUSED(filename, compilator_api);
+
     char source_data[source_vio->size(source_vio->inst) + 1];
     memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
     source_vio->read(source_vio->inst, source_data, sizeof(char),
@@ -93,7 +95,7 @@ int _package_compiler(const char *filename,
     yaml_document_t h;
     yaml_node_t root = yaml_load_str(source_data, &h);
 
-    struct package_compile_data compile_data = {0};
+    struct package_compile_data compile_data = {};
 
     compile_data.types.init(ct_memory_a0.main_allocator());
     compile_data.name.init(ct_memory_a0.main_allocator());
@@ -102,7 +104,7 @@ int _package_compiler(const char *filename,
 
     yaml_node_foreach_dict(root, forach_clb, &compile_data);
 
-    struct package_resource resource = {0};
+    struct package_resource resource = {};
     resource.type_count = array::size(compile_data.types);
     resource.type_offset = sizeof(resource);
 
@@ -143,7 +145,7 @@ int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_vio_a0);
     CETECH_GET_API(api, ct_hash_a0);
 
-    _G = (struct G) {0};
+    _G = (struct G) {};
 
     _G.package_typel = ct_hash_a0.id64_from_str("package");
 
@@ -166,7 +168,7 @@ void package_task(void *data) {
             task_data->name);
 
     const uint32_t task_count = package->type_count;
-    for (int j = 0; j < task_count; ++j) {
+    for (uint32_t j = 0; j < task_count; ++j) {
         ct_resource_a0.load_now(package_type(package)[j],
                                 &package_name(package)[package_offset(
                                         package)[j]],
@@ -201,7 +203,7 @@ void package_unload(uint64_t name) {
             name);
 
     const uint32_t task_count = package->type_count;
-    for (int j = 0; j < task_count; ++j) {
+    for (uint32_t j = 0; j < task_count; ++j) {
         ct_resource_a0.unload(package_type(package)[j],
                               &package_name(package)[package_offset(
                                       package)[j]],
@@ -220,7 +222,7 @@ int package_is_loaded(uint64_t name) {
 
     const uint32_t task_count = package->type_count;
 
-    for (int i = 0; i < task_count; ++i) {
+    for (uint32_t i = 0; i < task_count; ++i) {
         if (!ct_resource_a0.can_get_all(package_type(package)[i],
                                         &package_name(package)[package_offset(
                                                 package)[i]],

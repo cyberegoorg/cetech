@@ -15,11 +15,11 @@ namespace texture_blob {
         return (blob_t*)(data);
     }
 
-    inline const uint32_t blob_size(const blob_t* blob) {
-        return (
-            sizeof(blob_t) +
-        0);
-    }
+//    inline uint32_t blob_size(const blob_t* blob) {
+//        return (
+//            sizeof(blob_t) +
+//        0);
+//    }
 
     inline uint32_t size(const blob_t* blob) {
         return blob->size;

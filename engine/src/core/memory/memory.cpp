@@ -17,7 +17,7 @@ CETECH_DECL_API(ct_log_a0);
 struct MemorySystemGlobals {
     cel_alloc *default_allocator;
     cel_alloc *default_scratch_allocator;
-} _G = {0};
+} _G = {};
 
 
 extern char *stacktrace(int);
@@ -26,11 +26,11 @@ extern void stacktrace_free(char *);
 
 namespace memory {
     void allocator_trace_pointer(struct allocator_trace_entry *entries,
-                                 uint64_t max_entries,
+                                 uint32_t max_entries,
                                  void *p) {
         char *stacktrace_str = stacktrace(3);
 
-        for (int i = 0; i < max_entries; ++i) {
+        for (uint32_t i = 0; i < max_entries; ++i) {
             if (!entries[i].used) {
                 entries[i].used = 1;
                 entries[i].ptr = p;
@@ -41,9 +41,9 @@ namespace memory {
     }
 
     void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
-                                      uint64_t max_entries,
+                                      uint32_t max_entries,
                                       void *p) {
-        for (int i = 0; i < max_entries; ++i) {
+        for (uint32_t i = 0; i < max_entries; ++i) {
             if (entries[i].ptr != p) {
                 continue;
             }
@@ -56,8 +56,8 @@ namespace memory {
     }
 
     void allocator_check_trace(struct allocator_trace_entry *entries,
-                               uint64_t max_entries) {
-        for (int i = 0; i < max_entries; ++i) {
+                               uint32_t max_entries) {
+        for (uint32_t i = 0; i < max_entries; ++i) {
             if (!entries[i].used) {
                 continue;
             }
@@ -95,7 +95,7 @@ namespace memory {
     void register_api(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_log_a0);
 
-        static ct_memory_a0 _api = {0};
+        static ct_memory_a0 _api = {};
 
         _api.main_allocator = memsys_main_allocator;
         _api.main_scratch_allocator = memsys_main_scratch_allocator;
@@ -105,7 +105,7 @@ namespace memory {
     }
 
     void init(int scratch_buffer_size) {
-        _G = {0};
+        _G = {};
 
         _G.default_allocator = malloc_allocator_create();
 

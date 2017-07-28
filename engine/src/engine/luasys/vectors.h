@@ -50,18 +50,18 @@ static int _vec3f_mul(lua_State *l) {
     return 1;
 }
 
-static int _vec3f_div(lua_State *l) {
-    float a[3];
-    float b = luasys_to_float(l, 2);
-
-    luasys_to_vec3f(l, 1, a);
-
-    float res[3];
-    celib::vec3_mul(res, a, 1.0f / b);
-
-    luasys_push_vec3f(l, res);
-    return 1;
-}
+//static int _vec3f_div(lua_State *l) {
+//    float a[3];
+//    float b = luasys_to_float(l, 2);
+//
+//    luasys_to_vec3f(l, 1, a);
+//
+//    float res[3];
+//    celib::vec3_mul(res, a, 1.0f / b);
+//
+//    luasys_push_vec3f(l, res);
+//    return 1;
+//}
 
 static int _vec3f_unm(lua_State *l) {
     float a[3];

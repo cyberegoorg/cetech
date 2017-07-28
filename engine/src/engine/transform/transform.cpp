@@ -192,8 +192,8 @@ int _component_compiler(yaml_node_t body,
                     yaml_as_vec3(position, t_data.position););
 
     {
-        float v[3] = {0};
-        float v_rad[3] = {0};
+        float v[3] = {};
+        float v_rad[3] = {};
 
         yaml_node_t rotation = yaml_get_node(body, "rotation");
         yaml_as_vec3(rotation, v);
@@ -219,9 +219,12 @@ static void _on_world_destroy(ct_world world) {
 
 static void _destroyer(ct_world world,
                        ct_entity *ents,
-                       size_t ent_count) {
+                       uint32_t ent_count) {
+
+    CEL_UNUSED(world);
+
     // TODO: remove from arrays, swap idx -> last AND change size
-    for (int i = 0; i < ent_count; i++) {
+    for (uint32_t i = 0; i < ent_count; i++) {
         map::remove(_G.world_map, ents[i].h);
     }
 }
@@ -230,11 +233,11 @@ static void _spawner(ct_world world,
                      ct_entity *ents,
                      uint32_t *cents,
                      uint32_t *ents_parent,
-                     size_t ent_count,
+                     uint32_t ent_count,
                      void *data) {
     transform_data *tdata = (transform_data *) data;
 
-    for (int i = 0; i < ent_count; ++i) {
+    for (uint32_t i = 0; i < ent_count; ++i) {
         transform_create(world,
                          ents[cents[i]],
                          ents_parent[cents[i]] != UINT32_MAX
@@ -248,7 +251,7 @@ static void _spawner(ct_world world,
     float m[16];
     celib::mat4_identity(m);
 
-    for (int i = 0; i < ent_count; ++i) {
+    for (uint32_t i = 0; i < ent_count; ++i) {
         transform_transform(transform_get(world, ents[cents[i]]), m);
     }
 }
@@ -321,16 +324,15 @@ ct_property_value _get_property(ct_world world,
         return v;
 
     } else if (key == scale) {
-        float scale[3];
+        float scal[3];
 
         ct_property_value v = {
                 .type= PROPERTY_VEC3,
         };
 
 
-        transform_get_scale(transform, scale);
-        celib::vec3_move(v.value.vec3f, scale);
-
+        transform_get_scale(transform, scal);
+        celib::vec3_move(v.value.vec3f, scal);
 
         return v;
     }
@@ -362,7 +364,7 @@ static void _init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hash_a0);
 
 
-    _G = {0};
+    _G = {};
 
     _G.world_map.init(ct_memory_a0.main_allocator());
     _G.world_instances.init(ct_memory_a0.main_allocator());
@@ -413,7 +415,7 @@ void transform_transform(ct_transform transform,
     celib::mat4_quat(rm, rot);
     celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
 
-    mat4_mul(m, rm, sm);
+    celib::mat4_mul(m, sm, rm);
 
     m[4 * 3 + 0] = pos[0];
     m[4 * 3 + 1] = pos[1];
@@ -641,5 +643,6 @@ extern "C" void transform_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void transform_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api)
     _shutdown();
 }

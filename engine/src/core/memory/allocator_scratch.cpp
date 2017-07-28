@@ -82,11 +82,11 @@ void *scratch_allocator_allocate(cel_alloc_inst *allocator,
 
         // Advance the free pointer past all free slots.
         while (a->free != a->allocate) {
-            struct Header *h = (struct Header *) a->free;
-            if ((h->size & 0x80000000u) == 0)
+            struct Header *hh = (struct Header *) a->free;
+            if ((hh->size & 0x80000000u) == 0)
                 break;
 
-            a->free += h->size & 0x7fffffffu;
+            a->free += hh->size & 0x7fffffffu;
             if (a->free == a->end)
                 a->free = a->begin;
         }

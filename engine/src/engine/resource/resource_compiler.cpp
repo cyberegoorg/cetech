@@ -65,7 +65,7 @@ struct G {
     ct_cvar cv_source_dir;
     ct_cvar cv_core_dir;
     ct_cvar cv_external_dir;
-} ResourceCompilerGlobal = {0};
+} ResourceCompilerGlobal = {};
 
 
 #include "builddb.h"
@@ -152,13 +152,13 @@ void _compile_dir(Array<ct_task_item> &tasks,
     ct_path_a0.list(source_dir, 1, &files, &files_count,
                     ct_memory_a0.main_scratch_allocator());
 
-    for (int i = 0; i < files_count; ++i) {
+    for (uint32_t i = 0; i < files_count; ++i) {
         const char *source_filename_full = files[i];
         const char *source_filename_short = files[i] + strlen(source_dir) + 1;
         const char *resource_type = ct_path_a0.extension(
                 source_filename_short);
 
-        char resource_name[128] = {0};
+        char resource_name[128] = {};
         memcpy(resource_name, source_filename_short,
                strlen(source_filename_short) - 1 -
                strlen(resource_type));
@@ -177,7 +177,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
             continue;
         }
 
-        char build_name[33] = {0};
+        char build_name[33] = {};
         snprintf(build_name, CETECH_ARRAY_LEN(build_name),
                  "%" SDL_PRIX64 "%" SDL_PRIX64, type_id, name_id);
 
@@ -279,12 +279,14 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G = (struct G) {0};
+    _G = (struct G) {};
 }
 
 
 void resource_compiler_create_build_dir(struct ct_config_a0 config,
                                         struct ct_app_a0 app) {
+
+    CEL_UNUSED(config, app);
 
     const char *platform = ct_app_a0.platform();
     char *build_dir_full = resource_compiler_get_build_dir(
@@ -321,13 +323,13 @@ void resource_compiler_compile_all() {
     Array<ct_task_item> tasks(ct_memory_a0.main_allocator());
 
     const char *dirs[] = {source_dir, core_dir};
-    for (int i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
+    for (uint32_t i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
         _compile_dir(tasks, dirs[i], build_dir_full);
     }
 
     ct_task_a0.add(tasks._data, tasks._size);
 
-    for (int i = 0; i < array::size(tasks); ++i) {
+    for (uint32_t i = 0; i < array::size(tasks); ++i) {
         compile_task_data *data = (compile_task_data *) tasks[i].data;
 
         ct_task_a0.wait_atomic(&data->completed, 0);
@@ -341,7 +343,7 @@ int resource_compiler_get_filename(char *filename,
                                    size_t max_ken,
                                    uint64_t type,
                                    uint64_t name) {
-    char build_name[33] = {0};
+    char build_name[33] = {};
     ct_resource_a0.type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                     type,
                                     name);
@@ -385,6 +387,7 @@ extern "C" void resourcecompiler_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void resourcecompiler_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
     _shutdown();
 }
 

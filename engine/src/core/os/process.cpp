@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <cetech/core/log.h>
 #include <cetech/core/os/process.h>
+#include <celib/macros.h>
 
 CETECH_DECL_API(ct_log_a0);
 
@@ -45,5 +46,5 @@ extern "C" void process_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void process_unload_module(ct_api_a0 *api) {
-
+    CEL_UNUSED(api);
 }

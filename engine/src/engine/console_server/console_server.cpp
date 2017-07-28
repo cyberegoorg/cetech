@@ -79,7 +79,7 @@ namespace {
         mpack_node_t root = mpack_tree_root(&tree);
 
         // Find command
-        char cmd_name[256] = {0};
+        char cmd_name[256] = {};
         mpack_node_t name_node = mpack_node_map_cstr(root, "name");
         mpack_node_copy_cstr(name_node, cmd_name, 256);
 
@@ -120,6 +120,7 @@ namespace {
 
     static int cmd_ready(mpack_node_t args,
                          mpack_writer_t *writer) {
+        CEL_UNUSED(args, writer);
         return 0;
     }
 }
@@ -170,7 +171,7 @@ namespace consoleserver_module {
     };
 
     static void _init_cvar(struct ct_config_a0 config) {
-        _G = {0};
+        _G = {};
 
         _G.cv_rpc_addr = config.new_str("develop.rpc.addr",
                                         "Console server rpc addr",
@@ -286,6 +287,7 @@ namespace consoleserver_module {
     }
 
     extern "C" void consoleserver_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

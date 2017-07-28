@@ -9,6 +9,9 @@ static void *_reallocate(cel_alloc_inst *a,
                          void *ptr,
                          uint32_t size,
                          uint32_t align) {
+    CEL_UNUSED(a);
+    CEL_UNUSED(align);
+
     void *new_ptr = NULL;
 
     if (size)

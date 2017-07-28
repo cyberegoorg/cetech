@@ -293,6 +293,8 @@ namespace scenegraph {
                          uint32_t *parent,
                          float *pose,
                          uint32_t count) {
+        CEL_UNUSED(pose);
+
         WorldInstance *data = _get_world_instance(world);
 
         uint32_t first_idx = data->n;
@@ -303,12 +305,12 @@ namespace scenegraph {
                                                ct_scene_node,
                                                sizeof(ct_scene_node) * count);
 
-        for (int i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
             uint32_t idx = first_idx + i;
 
             nodes[i] = (ct_scene_node) {.idx = idx, .world = world};
 
-            float* local_pose = &pose[i*16];
+//            float* local_pose = &pose[i*16];
 
             float position[3] = {0.0f};
             float rotation[4];
@@ -458,7 +460,7 @@ namespace scenegraph_module {
         CETECH_GET_API(api, ct_world_a0);
         CETECH_GET_API(api, ct_memory_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.world_map.init(ct_memory_a0.main_allocator());
         _G.world_instances.init(ct_memory_a0.main_allocator());
@@ -479,6 +481,7 @@ namespace scenegraph_module {
     }
 
     extern "C" void scenegraph_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         scenegraph_module::shutdown();
     }
 }

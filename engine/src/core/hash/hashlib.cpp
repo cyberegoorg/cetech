@@ -3,6 +3,7 @@
 
 #include <cetech/core/hash.h>
 #include <cetech/core/api_system.h>
+#include <celib/macros.h>
 
 uint64_t hash_murmur2_64(const void *key,
                          uint64_t len,
@@ -85,5 +86,5 @@ extern "C" void hashlib_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void hashlib_unload_module(ct_api_a0 *api) {
-
+    CEL_UNUSED(api);
 }

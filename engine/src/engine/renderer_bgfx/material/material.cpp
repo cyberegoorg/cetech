@@ -61,6 +61,8 @@ namespace {
         uint64_t type;
 
         void init(cel_alloc *allocator) {
+            CEL_UNUSED(allocator);
+
             this->type = ct_hash_a0.id64_from_str("material");
             this->material_handler.init(ct_memory_a0.main_allocator());
             this->instace_map.init(ct_memory_a0.main_allocator());
@@ -82,7 +84,7 @@ namespace {
 // Resource
 //==============================================================================
 namespace material_resource {
-    static const bgfx::ProgramHandle null_program = {0};
+//    static const bgfx::ProgramHandle null_program = {};
 
     void *loader(ct_vio *input,
                  cel_alloc *allocator) {
@@ -99,11 +101,13 @@ namespace material_resource {
 
     void online(uint64_t name,
                 void *data) {
+        CEL_UNUSED(name, data);
 
     }
 
     void offline(uint64_t name,
                  void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void *reloader(uint64_t name,
@@ -155,7 +159,7 @@ namespace material {
         _G.shutdown();
     }
 
-    static const ct_material null_material = {0};
+//    static const ct_material null_material = {};
 
     ct_material create(uint64_t name) {
         auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
@@ -178,28 +182,28 @@ namespace material {
         uint32_t off = 0;
         uint32_t tmp_off = 0;
         off += resource->texture_count;
-        for (int i = 0; i < resource->texture_count; ++i) {
+        for (uint32_t i = 0; i < resource->texture_count; ++i) {
             bgfx_uniforms[i] = bgfx::createUniform(&u_names[i * 32],
                                                    bgfx::UniformType::Int1, 1);
         }
 
         tmp_off = off;
         off += resource->vec4f_count;
-        for (int i = tmp_off; i < off; ++i) {
+        for (uint32_t i = tmp_off; i < off; ++i) {
             bgfx_uniforms[i] = bgfx::createUniform(&u_names[i * 32],
                                                    bgfx::UniformType::Vec4, 1);
         }
 
         tmp_off = off;
         off += resource->mat33f_count;
-        for (int i = tmp_off; i < off; ++i) {
+        for (uint32_t i = tmp_off; i < off; ++i) {
             bgfx_uniforms[i] = bgfx::createUniform(&u_names[i * 32],
                                                    bgfx::UniformType::Mat3, 1);
         }
 
         tmp_off = off;
         off += resource->mat44f_count;
-        for (int i = tmp_off; i < off; ++i) {
+        for (uint32_t i = tmp_off; i < off; ++i) {
             bgfx_uniforms[i] = bgfx::createUniform(&u_names[i * 32],
                                                    bgfx::UniformType::Mat4, 1);
         }
@@ -302,23 +306,23 @@ namespace material {
 
         // TODO: refactor: one loop
         uint32_t offset = 0;
-        for (int i = 0; i < resource->texture_count; ++i) {
+        for (uint32_t i = 0; i < resource->texture_count; ++i) {
             auto texture = texture::texture_get(u_texture[i]);
             bgfx::setTexture(i, u_handler[offset + i], texture, 0);
         }
         offset += resource->texture_count;
 
-        for (int i = 0; i < resource->vec4f_count; ++i) {
+        for (uint32_t i = 0; i < resource->vec4f_count; ++i) {
             bgfx::setUniform(u_handler[offset + i], &u_vec4f[4*i], 1);
         }
         offset += resource->vec4f_count;
 
-        for (int i = 0; i < resource->mat33f_count; ++i) {
+        for (uint32_t i = 0; i < resource->mat33f_count; ++i) {
             bgfx::setUniform(u_handler[offset + i], &u_mat33f[9*i], 1);
         }
         offset += resource->mat33f_count;
 
-        for (int i = 0; i < resource->mat44f_count; ++i) {
+        for (uint32_t i = 0; i < resource->mat44f_count; ++i) {
             bgfx::setUniform(u_handler[offset + i], &u_mat44f[16*i], 1);
         }
         offset += resource->mat44f_count;

@@ -76,7 +76,7 @@ struct component_data {
 //    uint32_t idx = array::size(_G.spawned_array);
 //
 //
-//    array::push_back(_G.spawned_array, {0});
+//    array::push_back(_G.spawned_array, {});
 //
 //    Array<ct_entity> *array = &_G.spawned_array[idx];
 //    array->init(ct_memory_a0.main_allocator());
@@ -134,8 +134,8 @@ namespace entity_resource_compiler {
         yaml_node_t prefab_node = yaml_get_node(root, "prefab");
 
         if (yaml_is_valid(prefab_node)) {
-            char prefab_file[256] = {0};
-            char prefab_str[256] = {0};
+            char prefab_file[256] = {};
+            char prefab_str[256] = {};
             yaml_as_string(prefab_node, prefab_str,
                            CETECH_ARRAY_LEN(prefab_str));
 
@@ -180,6 +180,8 @@ namespace entity_resource_compiler {
     void forach_children_clb(yaml_node_t key,
                              yaml_node_t value,
                              void *_data) {
+        CEL_UNUSED(key);
+
         struct foreach_children_data *data = (foreach_children_data *) _data;
 
         compile_entitity(value, data->parent_ent, data->output);
@@ -194,8 +196,8 @@ namespace entity_resource_compiler {
     void foreach_components_clb(yaml_node_t key,
                                 yaml_node_t value,
                                 void *_data) {
-        char uid_str[256] = {0};
-        char component_type_str[256] = {0};
+        char uid_str[256] = {};
+        char component_type_str[256] = {};
         uint64_t cid;
         int contain_cid = 0;
 
@@ -211,7 +213,7 @@ namespace entity_resource_compiler {
 
         cid = ct_hash_a0.id64_from_str(component_type_str);
 
-        for (int i = 0; i < array::size(output->component_type); ++i) {
+        for (uint32_t i = 0; i < array::size(output->component_type); ++i) {
             if (output->component_type[i] != cid) {
                 continue;
             }
@@ -224,7 +226,7 @@ namespace entity_resource_compiler {
 
             uint32_t idx = array::size(output->component_ent_array);
             //Array<uint32_t> tmp_a(ct_memory_a0.main_allocator());
-            array::push_back(output->component_ent_array, {0});
+            array::push_back(output->component_ent_array, {});
             output->component_ent_array[idx].init(
                     ct_memory_a0.main_allocator());
 
@@ -234,7 +236,7 @@ namespace entity_resource_compiler {
         if (!map::has(output->component_body, cid)) {
             uint32_t idx = array::size(output->component_body_array);
             //Array<yaml_node_t> tmp_a(ct_memory_a0.main_allocator());
-            array::push_back(output->component_body_array, {0});
+            array::push_back(output->component_body_array, {});
             output->component_body_array[idx].init(
                     ct_memory_a0.main_allocator());
 
@@ -348,14 +350,14 @@ namespace entity_resource_compiler {
 
     void write_to_build(ct_entity_compile_output *output,
                         ct_blob *build) {
-        struct entity_resource res = {0};
+        struct entity_resource res = {};
         res.ent_count = (uint32_t) (output->ent_counter);
         res.comp_type_count = (uint32_t) array::size(output->component_type);
 
         build->push(build->inst, &res, sizeof(struct entity_resource));
 
         //write parents
-        for (int i = 0; i < res.ent_count; ++i) {
+        for (uint32_t i = 0; i < res.ent_count; ++i) {
             uint32_t id = map::get(output->entity_parent, i, UINT32_MAX);
 
             build->push(build->inst, &id, sizeof(id));
@@ -368,7 +370,7 @@ namespace entity_resource_compiler {
                     array::size(output->component_type));
 
         //write comp data
-        for (int j = 0; j < res.comp_type_count; ++j) {
+        for (uint32_t j = 0; j < res.comp_type_count; ++j) {
             uint64_t cid = output->component_type[j];
             uint64_t id = cid;
 
@@ -384,7 +386,7 @@ namespace entity_resource_compiler {
 
             ct_blob *blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
 
-            for (int i = 0; i < cdata.ent_count; ++i) {
+            for (uint32_t i = 0; i < cdata.ent_count; ++i) {
                 ct_component_a0.compile(id, body[i], blob);
             }
 
@@ -465,10 +467,12 @@ namespace entity_resorce {
 
     void online(uint64_t name,
                 void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void offline(uint64_t name,
                  void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void *reloader(uint64_t name,
@@ -519,17 +523,17 @@ namespace entity {
                                              ct_entity, sizeof(ct_entity) *
                                                         res->ent_count);
 
-        for (int j = 0; j < res->ent_count; ++j) {
+        for (uint32_t j = 0; j < res->ent_count; ++j) {
             spawned[j] = create();
         }
 
-        ct_entity root = spawned[0];
+//        ct_entity root = spawned[0];
 
         uint32_t *parents = entity_resource_parents(res);
         uint64_t *comp_types = entity_resource_comp_types(res);
 
         struct component_data *comp_data = entity_resource_comp_data(res);
-        for (int i = 0; i < res->comp_type_count; ++i) {
+        for (uint32_t i = 0; i < res->comp_type_count; ++i) {
             uint64_t type = comp_types[i];
 
             uint32_t *c_ent = component_data_ent(comp_data);
@@ -573,7 +577,7 @@ namespace entity {
 
         ct_component_a0.destroy(world, entity, count);
 
-        for (int i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
             handler::destroy(_G.entity_handler, entity[i].h);
         }
     }
@@ -615,7 +619,7 @@ namespace entity_module {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_blob_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("entity");
 
@@ -645,6 +649,7 @@ namespace entity_module {
     }
 
     extern "C" void entity_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

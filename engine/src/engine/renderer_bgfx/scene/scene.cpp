@@ -63,7 +63,7 @@ static struct SceneResourceGlobals {
 
 struct scene_instance *_init_scene_instance(uint64_t scene) {
     uint32_t idx = array::size(_G.scene_instance_array);
-    array::push_back(_G.scene_instance_array, {0});
+    array::push_back(_G.scene_instance_array, {});
 
     scene_instance *instance = &_G.scene_instance_array[idx];
     instance->scene = scene;
@@ -121,7 +121,7 @@ struct scene_instance *_get_scene_instance(uint64_t scene) {
 //==============================================================================
 namespace scene_resource {
 
-    static const bgfx::TextureHandle null_texture = {0};
+    //static const bgfx::TextureHandle null_texture = {};
 
 
     void *loader(ct_vio *input,
@@ -153,7 +153,7 @@ namespace scene_resource {
 
         scene_instance *instance = _init_scene_instance(name);
 
-        for (int i = 0; i < resource->geom_count; ++i) {
+        for (uint32_t i = 0; i < resource->geom_count; ++i) {
             auto vb_mem = bgfx::makeRef((const void *) &vb[vb_offset[i]],
                                         vb_size[i]);
 
@@ -177,6 +177,8 @@ namespace scene_resource {
 
     void offline(uint64_t name,
                  void *data) {
+        CEL_UNUSED(data);
+
         _destroy_scene_instance(name);
     }
 
@@ -214,7 +216,7 @@ namespace scene {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_thread_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("scene");
 
@@ -278,7 +280,7 @@ namespace scene {
         uint64_t *geom_node = scene_blob::geom_node(res);
         uint64_t *geom_name = scene_blob::geom_name(res);
 
-        for (int i = 0; i < res->geom_count; ++i) {
+        for (uint32_t i = 0; i < res->geom_count; ++i) {
             if (geom_name[i] != mesh) {
                 continue;
             }

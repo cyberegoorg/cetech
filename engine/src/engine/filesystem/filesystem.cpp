@@ -112,6 +112,8 @@ namespace filesystem {
                  uint32_t *count,
                  cel_alloc *allocator) {
 
+        CEL_UNUSED(filter);
+
         auto a = ct_memory_a0.main_allocator();
 
         char *full_path = get_fullpath(root, a, path);
@@ -167,7 +169,7 @@ namespace filesystem_module {
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_log_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.root_map.init(ct_memory_a0.main_allocator());
 
@@ -193,6 +195,7 @@ namespace filesystem_module {
     }
 
     extern "C" void filesystem_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

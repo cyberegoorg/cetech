@@ -52,8 +52,8 @@ namespace material_compiler {
             yaml_node_t parent_node = yaml_get_node(root, "parent");
 
             if (yaml_is_valid(parent_node)) {
-                char prefab_file[256] = {0};
-                char prefab_str[256] = {0};
+                char prefab_file[256] = {};
+                char prefab_str[256] = {};
                 yaml_as_string(parent_node, prefab_str,
                                CETECH_ARRAY_LEN(prefab_str));
                 snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file),
@@ -93,8 +93,8 @@ namespace material_compiler {
 
             output->texture_count += 1;
 
-            char tmp_buffer[512] = {0};
-            char uniform_name[32] = {0};
+            char tmp_buffer[512] = {};
+            char uniform_name[32] = {};
 
             yaml_as_string(key, uniform_name,
                            CETECH_ARRAY_LEN(uniform_name) - 1);
@@ -115,7 +115,7 @@ namespace material_compiler {
 
             output->vec4f_count += 1;
 
-            char uniform_name[32] = {0};
+            char uniform_name[32] = {};
             yaml_as_string(key, uniform_name,
                            CETECH_ARRAY_LEN(uniform_name) - 1);
 
@@ -136,7 +136,7 @@ namespace material_compiler {
 
             output->mat44f_count += 1;
 
-            char uniform_name[32] = {0};
+            char uniform_name[32] = {};
             yaml_as_string(key, uniform_name,
                            CETECH_ARRAY_LEN(uniform_name) - 1);
 
@@ -152,11 +152,13 @@ namespace material_compiler {
         void _forach_mat33f_clb(yaml_node_t key,
                                 yaml_node_t value,
                                 void *_data) {
+            CEL_UNUSED(key, value, _data);
+
 //            struct material_compile_output *output = (material_compile_output *) _data;
 //
 //            output->mat33f_count += 1;
 //
-//            char uniform_name[32] = {0};
+//            char uniform_name[32] = {};
 //            yaml_as_string(key, uniform_name,
 //                           CETECH_ARRAY_LEN(uniform_name) - 1);
 //
@@ -189,10 +191,10 @@ namespace material_compiler {
         yaml_node_t shader_node = yaml_get_node(root, "shader");
         CETECH_ASSERT("material", yaml_is_valid(shader_node));
 
-        char tmp_buffer[256] = {0};
+        char tmp_buffer[256] = {};
         yaml_as_string(shader_node, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
 
-        struct material_compile_output output = {0};
+        struct material_compile_output output = {};
         output.uniform_names.init(ct_memory_a0.main_allocator());
         output.data.init(ct_memory_a0.main_allocator());
 

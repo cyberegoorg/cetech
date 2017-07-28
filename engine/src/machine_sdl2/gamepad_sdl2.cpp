@@ -32,7 +32,7 @@ static struct G {
 
     float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
-} _G = {0};
+} _G = {};
 
 
 CETECH_DECL_API(ct_log_a0)
@@ -86,7 +86,7 @@ int _create_controler(int i) {
 int sdl_gamepad_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
 
-    _G = (struct G) {0};
+    _G = (struct G) {};
 
     int num_joy = SDL_NumJoysticks();
     for (int i = 0; i < num_joy; ++i) {
@@ -101,7 +101,7 @@ int sdl_gamepad_init(ct_api_a0 *api) {
 }
 
 void sdl_gamepad_shutdown() {
-    _G = (struct G) {0};
+    _G = (struct G) {};
 }
 
 static SDL_GameControllerButton _btn_to_sdl[GAMEPAD_BTN_MAX] = {
@@ -135,8 +135,8 @@ static SDL_GameControllerAxis _axis_to_sdl[GAMEPAD_AXIX_MAX][2] = {
 };
 
 void sdl_gamepad_process(EventStream &stream) {
-    int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {0};
-    float curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX][2] = {0};
+    int curent_state[GAMEPAD_MAX][GAMEPAD_AXIX_MAX] = {};
+    float curent_pos[GAMEPAD_MAX][GAMEPAD_BTN_MAX][2] = {};
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         if (_G.controller[i] == NULL) {

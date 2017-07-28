@@ -11,7 +11,7 @@ extern "C" {
 // Defines
 //==============================================================================
 
-#define CETECH_DECL_API(name) static struct name name = {0};
+#define CETECH_DECL_API(name) static struct name name {};
 #define CETECH_GET_API(_api, name) name = *(struct name*) (_api)->first(#name).api
 
 //==============================================================================

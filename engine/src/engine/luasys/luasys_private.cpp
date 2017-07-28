@@ -67,7 +67,7 @@ static struct G {
     float _temp_mat44f_buffer[TEMP_VAR_COUNT][16];
     float _temp_quat_buffer[TEMP_VAR_COUNT][3];
 
-} LuaGlobals = {0};
+} LuaGlobals = {};
 
 //==============================================================================
 // Private
@@ -286,6 +286,7 @@ int _lua_compiler(const char *filename,
                   ct_vio *source_vio,
                   ct_vio *build_vio,
                   ct_compilator_api *compilator_api) {
+    CEL_UNUSED(compilator_api);
 
     char tmp[source_vio->size(source_vio->inst) + 1];
     memset(tmp, 0, source_vio->size(source_vio->inst) + 1);
@@ -537,7 +538,7 @@ void luasys_add_module_function(const char *module,
 
     luaL_Reg entry[2] = {
             {.name = name, .func = func},
-            {0}
+            {}
     };
 
     luaL_register(_G.L, NULL, entry);
@@ -600,8 +601,6 @@ static int lightuserdata_sub(lua_State *L) {
 }
 
 static int lightuserdata_mul(lua_State *L) {
-    void *p = lua_touserdata(L, 1);
-
     if (_is_vec3f(L, 1)) {
         return _vec3f_mul(L);
     }
@@ -616,18 +615,18 @@ static int lightuserdata_mul(lua_State *L) {
     return 0;
 }
 
-static int lightuserdata_div(lua_State *L) {
-
-    if (_is_vec3f(L, 1)) {
-        return _vec3f_div(L);
-    }
-
-
-//    if( _is_mat44f(L, p)) {
-//        return _mat44f_add(L);
-//    }}
-    return 0;
-}
+//static int lightuserdata_div(lua_State *L) {
+//
+//    if (_is_vec3f(L, 1)) {
+//        return _vec3f_div(L);
+//    }
+//
+//
+////    if( _is_mat44f(L, p)) {
+////        return _mat44f_add(L);
+////    }}
+//    return 0;
+//}
 
 static int lightuserdata_unm(lua_State *L) {
 
@@ -693,7 +692,7 @@ void _create_lightuserdata() {
 }
 
 static void _init_api(ct_api_a0 *api) {
-    static ct_lua_a0 _api = {0};
+    static ct_lua_a0 _api = {};
 
     //api.get_top = luasys_get_top;
     _api.remove = luasys_remove;
@@ -789,7 +788,7 @@ static void _shutdown() {
 
     lua_close(_G.L);
 
-    _G = (struct G) {0};
+    _G = (struct G) {};
 }
 
 const ct_game_callbacks *luasys_get_game_callbacks() {
@@ -851,5 +850,6 @@ extern "C" void luasys_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void luasys_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
     _shutdown();
 }

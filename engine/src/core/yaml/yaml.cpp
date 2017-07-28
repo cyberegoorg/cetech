@@ -62,7 +62,7 @@ static yaml_node_t new_node(yaml_document_t handler,
     }
 
     CETECH_ASSERT("yaml", false);
-    return (yaml_node_t) {0};
+    return (yaml_node_t) {};
 }
 
 extern "C" yaml_node_t yaml_load_str(const char *str,
@@ -79,7 +79,7 @@ extern "C" yaml_node_t yaml_get_node(yaml_node_t node,
 
     auto cpp_node = nh->nodes[node.idx][key];
     if (!cpp_node) {
-        return (yaml_node_t) {0};
+        return (yaml_node_t) {};
     }
 
     return new_node(node.doc, cpp_node);
@@ -154,7 +154,7 @@ void yaml_node_foreach_seq(yaml_node_t node,
 
     auto cpp_node = nh->nodes[node.idx];
 
-    for (int i = 0; i < cpp_node.size(); ++i) {
+    for (size_t i = 0; i < cpp_node.size(); ++i) {
         yaml_node_t value = new_node(node.doc, cpp_node[i]);
         foreach_clb(i, value, data);
     }
@@ -265,7 +265,7 @@ void yaml_as_mat44(yaml_node_t body, float* value) {
 //mat33f_t yaml_as_mat33f_t(yaml_node_t body) {
 //    CETECH_ASSERT("yaml", yaml_is_valid(body));
 //
-//    mat33f_t m = {0};
+//    mat33f_t m = {};
 //
 //    yaml_node_t x = yaml_get_seq_node(body, 0);
 //    CETECH_ASSERT("yaml", yaml_is_valid(x));

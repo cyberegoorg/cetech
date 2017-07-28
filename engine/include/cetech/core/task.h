@@ -84,7 +84,7 @@ struct ct_task_a0 {
     //! \param signal Signal ptr
     //! \param value Signal value
     void (*wait_atomic)(atomic_int *signal,
-                        uint32_t value);
+                        int32_t value);
 
     //! Curent worker id
     //! \return Worker id

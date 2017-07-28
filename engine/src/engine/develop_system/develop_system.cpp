@@ -75,7 +75,7 @@ static struct DevelopSystemGlobals {
     }
 } _G;
 
-//static __thread uint8_t _stream_buffer[64 * 1024] = {0};
+//static __thread uint8_t _stream_buffer[64 * 1024] = {};
 //static __thread uint32_t _stream_buffer_size = 0;
 
 static __thread uint32_t _scope_depth = 0;
@@ -159,7 +159,7 @@ namespace {
         auto *event = eventstream::begin(_G.eventstream);
         while (event != eventstream::end(_G.eventstream)) {
             ++event_num;
-            event = eventstream::next(_G.eventstream, event);
+            event = eventstream::next(event);
         }
 
         char *data;
@@ -179,19 +179,19 @@ namespace {
                 to_mpack_fce((const ct_develop_event_header *) event, &writer);
             }
 
-            event = eventstream::next(_G.eventstream, event);
+            event = eventstream::next(event);
         }
 
         mpack_finish_array(&writer);
         CETECH_ASSERT("develop_manager",
                       mpack_writer_destroy(&writer) == mpack_ok);
-        int bytes = nn_send(_G.pub_socket, data, size, 0);
+        size_t bytes = nn_send(_G.pub_socket, data, size, 0);
         CETECH_ASSERT("develop", bytes == size);
         free(data);
     }
 
     static void _init_cvar(struct ct_config_a0 config) {
-        _G = {0};
+        _G = {};
         _G.cv_pub_addr = config.new_str("develop.pub.addr",
                                         "Console server rpc addr",
                                         "ws://*:4447");
@@ -233,7 +233,7 @@ namespace develop_system {
 
     void developsys_push_record_float(const char *name,
                                       float value) {
-        ct_record_float_event ev = {0};
+        ct_record_float_event ev = {};
 
         ev.value = value;
         memcpy(ev.name, name, strlen(name));
@@ -243,7 +243,7 @@ namespace develop_system {
 
     void developsys_push_record_int(const char *name,
                                     int value) {
-        ct_record_int_event ev = {0};
+        ct_record_int_event ev = {};
         ev.value = value;
         memcpy(ev.name, name, strlen(name));
 
@@ -266,7 +266,7 @@ namespace develop_system {
         --_scope_depth;
 
         ct_scope_event ev = {
-                .name = {0},
+                .name = {},
                 .worker_id = scope_data.worker_id,
                 .start = scope_data.start,
                 .duration =
@@ -352,6 +352,7 @@ namespace develop_system_module {
     }
 
     extern "C" void developsystem_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

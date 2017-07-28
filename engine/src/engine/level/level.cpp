@@ -7,7 +7,6 @@
 
 #include <cetech/core/config.h>
 #include <cetech/machine/machine.h>
-#include <cetech/core/yaml.h>
 #include <cetech/core/hash.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/memory.h>
@@ -18,6 +17,7 @@
 #include <cetech/engine/transform.h>
 #include "cetech/engine/level.h"
 #include <cetech/core/os/vio.h>
+#include <cetech/core/yaml.h>
 
 #include "level_blob.h"
 
@@ -64,7 +64,7 @@ namespace {
 
     ct_level _new_level(ct_entity level_entity) {
         uint32_t idx = array::size(_G.level_instance);
-        array::push_back(_G.level_instance, {0});
+        array::push_back(_G.level_instance, {});
 
         level_instance *instance = &_G.level_instance[idx];
 
@@ -100,10 +100,12 @@ namespace level_resource {
 
     void online(uint64_t name,
                 void *data) {
+        CEL_UNUSED(data, name);
     }
 
     void resource_offline(uint64_t name,
                           void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void *resource_reloader(uint64_t name,
@@ -145,7 +147,7 @@ namespace level_resource_compiler {
         struct foreach_entities_data *data = (foreach_entities_data *) _data;
 
 
-        char name[128] = {0};
+        char name[128] = {};
         yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
 
         array::push_back(*data->id, ct_hash_a0.id64_from_str(name));
@@ -228,13 +230,12 @@ namespace level {
         uint8_t *data = level_blob::data(res);
 
         ct_entity level_ent = ct_entity_a0.create();
-        ct_transform t = ct_transform_a0.create(world,
-                                                level_ent,
-                                                {UINT32_MAX},
-                                                (float[3]) {0.0f},
-                                                (float[4]) {0.0f, 0.0f, 0.0f,
-                                                            1.0f},
-                                                (float[3]) {1.0f, 1.0f, 1.0f});
+        ct_transform_a0.create(world,
+                               level_ent,
+                               {UINT32_MAX},
+                               (float[3]) {0.0f},
+                               (float[4]) {0.0f, 0.0f, 0.0f, 1.0f},
+                               (float[3]) {1.0f, 1.0f, 1.0f});
 
         ct_level level = _new_level(level_ent);
         struct level_instance *instance = get_level_instance(level);
@@ -243,7 +244,7 @@ namespace level {
                                          &instance->spawned_entity,
                                          &instance->spawned_entity_count);
 
-        for (int i = 0; i < level_blob::entities_count(res); ++i) {
+        for (uint32_t i = 0; i < level_blob::entities_count(res); ++i) {
             ct_entity e = instance->spawned_entity[offset[i]];
             map::set(instance->spawned_entity_map, id[i], e);
 
@@ -264,7 +265,7 @@ namespace level {
         ct_entity_a0.destroy(world, &instance->level_entity, 1);
 
         CEL_FREE(ct_memory_a0.main_allocator(),
-                    instance->spawned_entity);
+                 instance->spawned_entity);
 
         _destroy_level_instance(instance);
     }
@@ -272,7 +273,7 @@ namespace level {
     ct_entity entity_by_id(ct_level level,
                            uint64_t id) {
         struct level_instance *instance = get_level_instance(level);
-        return map::get(instance->spawned_entity_map, id, {0});
+        return map::get(instance->spawned_entity_map, id, {});
     }
 
     ct_entity entity(ct_level level) {
@@ -312,7 +313,7 @@ namespace level_module {
         CETECH_GET_API(api, ct_world_a0);
 
 
-        _G = {0};
+        _G = {};
 
         _G.level_type = ct_hash_a0.id64_from_str("level");
 
@@ -332,6 +333,7 @@ namespace level_module {
     }
 
     extern "C" void level_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 

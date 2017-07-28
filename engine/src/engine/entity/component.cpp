@@ -129,13 +129,11 @@ namespace component {
                                    ct_entity entity,
                                    uint64_t key) {
 
-        ct_property_value value = {PROPERTY_INVALID};
-
         ct_component_clb clb = map::get(_G.component_clb,
                                         type, ct_component_clb_null);
 
         if (!clb.get_property) {
-            return (ct_property_value) {PROPERTY_INVALID};
+            return (ct_property_value) {.type=PROPERTY_INVALID};
         }
 
         return clb.get_property(world, entity, key);
@@ -143,7 +141,7 @@ namespace component {
 }
 
 namespace component_module {
-    static ct_component_a0 api = {
+    static ct_component_a0 component_api = {
             .register_compiler = component::register_compiler,
             .compile = component::compile,
             .spawn_order = component::get_spawn_order,
@@ -155,7 +153,7 @@ namespace component_module {
     };
 
     void _init_api(ct_api_a0 *a0) {
-        a0->register_api("ct_component_a0", &api);
+        a0->register_api("ct_component_a0", &component_api);
     }
 
     void _init(ct_api_a0 *a0) {
@@ -164,7 +162,7 @@ namespace component_module {
         CETECH_GET_API(a0, ct_memory_a0);
         CETECH_GET_API(a0, ct_world_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.compiler_map.init(ct_memory_a0.main_allocator());
         _G.spawn_order_map.init(ct_memory_a0.main_allocator());
@@ -178,10 +176,12 @@ namespace component_module {
     }
 
     extern "C" void component_load_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _init(api);
     }
 
     extern "C" void component_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 

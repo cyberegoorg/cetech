@@ -8,7 +8,7 @@
 #include <cetech/core/api_system.h>
 #include <cetech/core/config.h>
 
-CETECH_DECL_API(ct_hash_a0)
+//CETECH_DECL_API(ct_hash_a0)
 
 using namespace celib;
 
@@ -52,7 +52,7 @@ namespace api {
         auto first = multi_map::find_first(_G.api_map, name_id);
 
         if (!first) {
-            return {0};
+            return {};
         }
 
         return {.api = first->value, .entry  = (void *) first};
@@ -63,7 +63,7 @@ namespace api {
         auto next = multi_map::find_next(_G.api_map, map_entry);
 
         if (!next) {
-            return {0};
+            return {};
         }
 
         return {.api = next->value, .entry  = (void *) entry};
@@ -77,7 +77,7 @@ namespace api {
     };
 
     void init(cel_alloc *allocator) {
-        _G = {0};
+        _G = {};
 
         _G.api_map.init(allocator);
 

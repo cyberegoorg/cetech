@@ -47,7 +47,7 @@ static struct G {
     int capture;
     int vsync;
     int need_reset;
-} _G = {0};
+} _G = {};
 
 
 //==============================================================================
@@ -65,6 +65,8 @@ static uint32_t _get_reset_flags() {
 
 static int _cmd_resize(mpack_node_t args,
                        mpack_writer_t *writer) {
+    CEL_UNUSED(writer);
+
     mpack_node_t width = mpack_node_map_cstr(args, "width");
     mpack_node_t height = mpack_node_map_cstr(args, "height");
 
@@ -77,7 +79,7 @@ static int _cmd_resize(mpack_node_t args,
 
 
 void renderer_create(ct_window *window) {
-    bgfx::PlatformData pd = {0};
+    bgfx::PlatformData pd = {};
     pd.nwh = window->native_window_ptr(window->inst);
     pd.ndt = window->native_display_ptr(window->inst);
     bgfx::setPlatformData(pd);
@@ -101,6 +103,8 @@ void renderer_set_debug(int debug) {
 void renderer_render_world(ct_world world,
                            ct_camera camera,
                            viewport_t viewport) {
+    CEL_UNUSED(viewport);
+
     ct_camera_a0 *camera_api = (ct_camera_a0 *) ct_api_a0.first(
             "ct_camera_a0").api; // TODO: SHIT !!!!
 
@@ -167,7 +171,7 @@ namespace renderer_module {
         CETECH_GET_API(api, ct_config_a0);
         CETECH_GET_API(api, ct_console_srv_a0);
 
-        _G = (struct G) {0};
+        _G = (struct G) {};
 
         ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
@@ -199,7 +203,7 @@ namespace renderer_module {
             bgfx::shutdown();
         }
 
-        _G = (struct G) {0};
+        _G = (struct G) {};
     }
 
 
@@ -208,6 +212,7 @@ namespace renderer_module {
     }
 
     extern "C" void renderer_unload_module(struct ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

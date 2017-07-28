@@ -99,8 +99,7 @@ namespace machine_sdl {
     }
 
     ct_event_header *machine_event_next(ct_event_header *header) {
-        return (ct_event_header *) eventstream::next(_G.eventstream,
-                                                     (eventstream::event_header *) header);
+        return (ct_event_header *) eventstream::next((eventstream::event_header *) header);
     }
 
     void _update() {
@@ -177,5 +176,6 @@ extern "C" void machine_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void machine_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
     machine_sdl::shutdown();
 }

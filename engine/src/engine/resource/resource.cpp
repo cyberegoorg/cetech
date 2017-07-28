@@ -82,7 +82,7 @@ namespace {
         uint8_t ref_count;
     } resource_item_t;
 
-    static const resource_item_t null_item = {0};
+    static const resource_item_t null_item = {};
 #define _G ResourceManagerGlobals
     struct ResourceManagerGlobals {
         Map<uint32_t> type_map;
@@ -99,11 +99,12 @@ namespace {
             ct_cvar build_dir;
         } config;
 
-    } ResourceManagerGlobals = {0};
+    } ResourceManagerGlobals = {};
 
 
     int _cmd_reload_all(mpack_node_t args,
                         mpack_writer_t *writer) {
+        CEL_UNUSED(args,writer);
         resource::reload_all();
         return 0;
     }
@@ -150,16 +151,20 @@ namespace package_resource {
 
     void online(uint64_t name,
                 void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void offline(uint64_t name,
                  void *data) {
+        CEL_UNUSED(name, data);
     }
 
     void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
                    cel_alloc *allocator) {
+        CEL_UNUSED(name);
+
         CEL_FREE(allocator, old_data);
         return new_data;
     }
@@ -319,28 +324,28 @@ namespace resource {
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
 
-        for (int i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
             uint64_t id = hash_combine(type, names[i]);
-            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-            resource_item_t item = {0};
-            if (idx != UINT32_MAX) {
+            uint32_t res_idx = map::get(_G.resource_map, id, UINT32_MAX);
+            resource_item_t item = {};
+            if (res_idx != UINT32_MAX) {
                 item = _G.resource_data[idx];
             }
 
             if (!force && (item.ref_count > 0)) {
                 ++item.ref_count;
-                _G.resource_data[idx] = item;
+                _G.resource_data[res_idx] = item;
                 loaded_data[i] = 0;
                 continue;
             }
 
-            char build_name[33] = {0};
+            char build_name[33] = {};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                              type,
                              names[i]);
 
 #ifdef CETECH_CAN_COMPILE
-            char filename[1024] = {0};
+            char filename[1024] = {};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
@@ -383,28 +388,28 @@ namespace resource {
 
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
-        for (int i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
             uint64_t id = hash_combine(type, names[i]);
-            uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
+            uint32_t res_idx = map::get(_G.resource_map, id, UINT32_MAX);
 
-            if (idx == UINT32_MAX) {
+            if (res_idx == UINT32_MAX) {
                 continue;
             }
 
-            resource_item_t &item = _G.resource_data[idx];
+            resource_item_t &item = _G.resource_data[res_idx];
 
             if (item.ref_count == 0) {
                 continue;
             }
 
             if (--item.ref_count == 0) {
-                char build_name[33] = {0};
+                char build_name[33] = {};
                 type_name_string(build_name,
                                  CETECH_ARRAY_LEN(build_name),
                                  type, names[i]);
 
 #ifdef CETECH_CAN_COMPILE
-                char filename[1024] = {0};
+                char filename[1024] = {};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
@@ -432,20 +437,20 @@ namespace resource {
 
         uint64_t id = hash_combine(type, name);
         uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-        resource_item_t item = {0};
+        resource_item_t item = {};
         if (idx != UINT32_MAX) {
             item = _G.resource_data[idx];
         }
 
         if (is_item_null(item)) {
-            char build_name[33] = {0};
+            char build_name[33] = {};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                              type,
                              name);
 
             if (_G.autoload_enabled) {
 #ifdef CETECH_CAN_COMPILE
-                char filename[1024] = {0};
+                char filename[1024] = {};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
@@ -457,11 +462,11 @@ namespace resource {
                                   filename);
                 load_now(type, &name, 1);
 
-                uint64_t id = hash_combine(type, name);
-                uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-                item = {0};
-                if (idx != UINT32_MAX) {
-                    item = _G.resource_data[idx];
+                uint64_t type_name = hash_combine(type, name);
+                uint32_t res_idx = map::get(_G.resource_map, type_name, UINT32_MAX);
+                item = {};
+                if (res_idx != UINT32_MAX) {
+                    item = _G.resource_data[res_idx];
                 }
 
             } else {
@@ -487,14 +492,14 @@ namespace resource {
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
         load(loaded_data, type, names, count, 1);
-        for (int i = 0; i < count; ++i) {
+        for (uint32_t i = 0; i < count; ++i) {
 #ifdef CETECH_CAN_COMPILE
-            char filename[1024] = {0};
+            char filename[1024] = {};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
 #else
-            char build_name[33] = {0};
+            char build_name[33] = {};
             resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                                        type, names[i]);
 
@@ -532,7 +537,7 @@ namespace resource {
 
             array::resize(name_array, 0);
 
-            for (int i = 0; i < array::size(_G.resource_data); ++i) {
+            for (uint32_t i = 0; i < array::size(_G.resource_data); ++i) {
                 resource_item_t item = _G.resource_data[i];
 
                 if (item.type == type_id) {
@@ -592,7 +597,7 @@ namespace resource_module {
 
 
     void _init_cvar(struct ct_config_a0 config) {
-        _G = {0};
+        _G = {};
 
         ct_config_a0 = config;
 
@@ -656,6 +661,7 @@ namespace resource_module {
     }
 
     extern "C" void resourcesystem_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

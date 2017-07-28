@@ -33,7 +33,7 @@ namespace {
         float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
         int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
         int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
-    } _G = {0};
+    } _G = {};
 }
 
 
@@ -203,7 +203,7 @@ namespace gamepad_module {
         CETECH_GET_API(api, ct_machine_a0);
         CETECH_GET_API(api, ct_log_a0);
 
-        _G = {0};
+        _G = {};
 
         ct_log_a0.debug(LOG_WHERE, "Init");
 
@@ -215,7 +215,7 @@ namespace gamepad_module {
     static void _shutdown() {
         ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-        _G = {0};
+        _G = {};
     }
 
     extern "C" void gamepad_load_module(ct_api_a0 *api) {
@@ -223,6 +223,7 @@ namespace gamepad_module {
     }
 
     extern "C" void gamepad_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 };

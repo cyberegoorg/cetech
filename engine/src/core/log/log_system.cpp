@@ -4,6 +4,7 @@
 #include <cetech/core/log.h>
 #include <cetech/core/os/errors.h>
 #include <cetech/core/api_system.h>
+#include <celib/macros.h>
 
 #define LOG_WHERE "log_system"
 
@@ -11,7 +12,7 @@ enum {
     MAX_HANDLERS = 32
 };
 
-#define G_INIT {0}
+#define G_INIT {}
 
 static struct global {
     ct_log_handler_t handlers[MAX_HANDLERS];
@@ -19,7 +20,7 @@ static struct global {
 
     ct_log_get_wid_clb_t get_wid_clb;
     char handlers_count;
-} _G = G_INIT;
+} _G;
 
 
 void vlog(const enum ct_log_level level,
@@ -34,7 +35,7 @@ void vlog(const enum ct_log_level level,
 
     time_t tm = time(NULL);
 
-    for (uint32_t i = 0; i < _G.handlers_count; ++i) {
+    for (uint8_t i = 0; i < _G.handlers_count; ++i) {
         _G.handlers[i](level, tm, _G.get_wid_clb != NULL ? _G.get_wid_clb() : 0,
                        where, msg, _G.handlers_data[i]);
     }
@@ -111,7 +112,7 @@ namespace logsystem {
 
     void log_register_handler(ct_log_handler_t handler,
                               void *data) {
-        const char idx = _G.handlers_count++;
+        const uint8_t idx = _G.handlers_count++;
 
         _G.handlers[idx] = handler;
         _G.handlers_data[idx] = data;
@@ -152,6 +153,7 @@ extern "C" void log_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void log_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
     logsystem::shutdown();
 }
 

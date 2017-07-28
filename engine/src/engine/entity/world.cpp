@@ -44,7 +44,7 @@ namespace world {
     ct_world create() {
         ct_world w = {.h = handler::create(_G.world_handler)};
 
-        for (int i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_created(w);
         }
 
@@ -52,7 +52,7 @@ namespace world {
     }
 
     void destroy(ct_world world) {
-        for (int i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
             _G.callbacks[i].on_destroy(world);
         }
 
@@ -61,7 +61,7 @@ namespace world {
 
     void update(ct_world world,
                 float dt) {
-        for (int i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
             if (_G.callbacks[i].on_update != NULL) {
                 _G.callbacks[i].on_update(world, dt);
             }
@@ -92,7 +92,7 @@ namespace world_module {
 
         CETECH_GET_API(api, ct_memory_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.callbacks.init(ct_memory_a0.main_allocator());
         _G.world_handler.init(ct_memory_a0.main_allocator());
@@ -110,6 +110,7 @@ namespace world_module {
     }
 
     extern "C" void world_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

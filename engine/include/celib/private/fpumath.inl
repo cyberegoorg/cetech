@@ -772,6 +772,11 @@ namespace celib {
         _result[8] = +(xx * yy - xy * yx) * invDet;
     }
 
+    inline void mat4_move(float *_result,
+                          const float *_a) {
+        mem_copy(_result, _a, sizeof(float)*16);
+    }
+
     inline void mat4_inverse(float *_result,
                             const float *_a) {
         float xx = _a[0];

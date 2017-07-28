@@ -12,6 +12,7 @@
 #include <cetech/core/config.h>
 #include <cetech/core/api_system.h>
 #include <cetech/core/log.h>
+#include <celib/macros.h>
 
 //==============================================================================
 // Defines
@@ -34,7 +35,7 @@ static struct ModuleSystemGlobals {
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
-} _G = {0};
+} _G = {};
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
@@ -108,6 +109,7 @@ namespace module {
     }
 
     void reload(const char *path) {
+        CEL_UNUSED(path);
 //        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
 //            if ((_G.module_handler[i] == NULL) ||
 //                (strcmp(_G.path[i], path)) != 0) {
@@ -180,7 +182,7 @@ namespace module {
         ct_path_a0.list(path, 1, &files, &files_count,
                         ct_memory_a0.main_allocator());
 
-        for (int k = 0; k < files_count; ++k) {
+        for (uint32_t k = 0; k < files_count; ++k) {
             const char *filename = ct_path_a0.filename(files[k]);
 
             if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
@@ -223,10 +225,11 @@ extern "C" void module_load_module(struct ct_api_a0 *api) {
 
     api->register_api("ct_module_a0", &module::module_api);
 
-    _G = {0};
+    _G = {};
 }
 
 extern "C" void module_unload_module(struct ct_api_a0 *api) {
+    CEL_UNUSED(api);
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
-    _G = {0};
+    _G = {};
 }

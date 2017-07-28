@@ -24,7 +24,7 @@ using namespace celib;
 
 static struct G {
     uint8_t state[KEY_MAX];
-} _G = {0};
+} _G = {};
 
 
 //==============================================================================
@@ -32,13 +32,14 @@ static struct G {
 //==============================================================================
 
 int sdl_keyboard_init(ct_api_a0 *api) {
-    _G = (struct G) {0};
+    CEL_UNUSED(api);
+    _G = (struct G) {};
 
     return 1;
 }
 
 void sdl_keyboard_shutdown() {
-    _G = (struct G) {0};
+    _G = (struct G) {};
 }
 
 void sdl_keyboard_process(EventStream &stream) {

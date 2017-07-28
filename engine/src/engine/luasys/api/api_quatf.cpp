@@ -23,8 +23,8 @@ static int _is(lua_State *l) {
 }
 
 static int _from_axis_angle(lua_State *l) {
-    float result[4] = {0};
-    float axis[3] = {0};
+    float result[4] = {};
+    float axis[3] = {};
 
     luasys_to_vec3f(l, 1, axis);
     float angle = luasys_to_float(l, 2) * celib::DEG_TO_RAD;
@@ -36,7 +36,7 @@ static int _from_axis_angle(lua_State *l) {
 }
 
 static int _from_euler(lua_State *l) {
-    float result[4] = {0};
+    float result[4] = {};
 
     const float heading = luasys_to_float(l, 1)* celib::DEG_TO_RAD;
     const float attitude = luasys_to_float(l, 2)* celib::DEG_TO_RAD;
@@ -86,6 +86,8 @@ static int _normalized(lua_State *l) {
 }
 
 void _register_lua_quatf_api(struct ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     luasys_add_module_function(API_NAME, "make", _ctor);
     luasys_add_module_function(API_NAME, "is", _is);
     luasys_add_module_function(API_NAME, "from_axis_angle", _from_axis_angle);

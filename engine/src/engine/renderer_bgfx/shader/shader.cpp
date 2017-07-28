@@ -59,7 +59,7 @@ CETECH_DECL_API(ct_hash_a0)
 
 namespace shader_resource {
 
-    static const bgfx::ProgramHandle null_program = {0};
+    static const bgfx::ProgramHandle null_program = {};
 
 
     void *loader(ct_vio *input,
@@ -96,6 +96,7 @@ namespace shader_resource {
 
     void offline(uint64_t name,
                  void *data) {
+        CEL_UNUSED(data);
 
         auto program = map::get(_G.handler_map, name, null_program);
 
@@ -145,7 +146,7 @@ namespace shader {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
 
-        _G = {0};
+        _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("shader");
 
@@ -165,7 +166,7 @@ namespace shader {
     }
 
     bgfx::ProgramHandle shader_get(uint64_t name) {
-        auto resource = shader_blob::get(ct_resource_a0.get(_G.type, name));
+        shader_blob::get(ct_resource_a0.get(_G.type, name));
         return map::get(_G.handler_map, name, shader_resource::null_program);
     }
 }

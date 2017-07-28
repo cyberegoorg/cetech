@@ -84,8 +84,8 @@ namespace shader_compiler {
 
         auto a = ct_memory_a0.main_allocator();
 
-        char dir[1024] = {0};
-        ct_path_a0.dir(dir, CETECH_ARRAY_LEN(dir), filename);
+        char dir[1024] = {};
+        ct_path_a0.dir(dir, filename);
 
         char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
         ct_path_a0.make_path(tmp_dirname);
@@ -135,12 +135,12 @@ namespace shader_compiler {
 
         char *include_dir = ct_path_a0.join(a, 2, core_dir, "bgfxshaders");
 
-        shader_blob::blob_t resource = {0};
+        shader_blob::blob_t resource = {};
 
         // TODO: temp cel_alloc?
-        char input_str[1024] = {0};
-        char output_path[1024] = {0};
-        char tmp_filename[1024] = {0};
+        char input_str[1024] = {};
+        char output_path[1024] = {};
+        char tmp_filename[1024] = {};
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
                                                             ct_app_a0.platform());

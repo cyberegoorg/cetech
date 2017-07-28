@@ -43,12 +43,12 @@ CETECH_DECL_API(ct_hash_a0);
 // Enums
 //==============================================================================
 
-static const char *_type_to_str[4] = {
-        [CV_NONE] = "invalid",
-        [CV_FLOAT] = "float",
-        [CV_INT] = "int",
-        [CV_STRING] = "string"
-};
+//static const char *_type_to_str[4] = {
+//        [CV_NONE] = "invalid",
+//        [CV_FLOAT] = "float",
+//        [CV_INT] = "int",
+//        [CV_STRING] = "string"
+//};
 
 
 //==============================================================================
@@ -274,10 +274,10 @@ namespace config {
                             void *_data) {
         struct foreach_config_data *output = (foreach_config_data *) _data;
 
-        char key_str[128] = {0};
+        char key_str[128] = {};
         yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
 
-        char name[1024] = {0};
+        char name[1024] = {};
         if (output->root_name != NULL) {
             snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
                      key_str);
@@ -288,14 +288,12 @@ namespace config {
         enum yaml_node_type type = yaml_node_type(value);
 
         if (type == YAML_TYPE_MAP) {
-            struct foreach_config_data _data = {
+            struct foreach_config_data data = {
                     .root_name = name
             };
 
-            yaml_node_foreach_dict(value, foreach_config_clb, &_data);
+            yaml_node_foreach_dict(value, foreach_config_clb, &data);
         } else if (type == YAML_TYPE_SCALAR) {
-            char value_str[128] = {0};
-
             float tmp_f;
             int tmp_int;
             char tmp_str[128];
@@ -451,7 +449,7 @@ namespace config {
     };
 
     int init(ct_api_a0 *api) {
-
+        CEL_UNUSED(api);
         return 1;
     }
 
@@ -467,7 +465,7 @@ extern "C" void config_load_module(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_hash_a0);
 
-    _G = {0};
+    _G = {};
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 
@@ -477,6 +475,8 @@ extern "C" void config_load_module(ct_api_a0 *api) {
 }
 
 extern "C" void config_unload_module(ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
     _deallocate_all_string();

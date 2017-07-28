@@ -48,7 +48,7 @@ struct task {
     enum ct_task_affinity affinity;
 };
 
-static __thread char _worker_id = 0;
+static __thread uint8_t _worker_id = 0;
 
 #define _G TaskManagerGlobal
 static struct G {
@@ -57,9 +57,9 @@ static struct G {
     ct_thread_t *_workers[TASK_MAX_WORKERS - 1];
     struct task_queue _gloalQueue;
     atomic_int _task_pool_idx;
-    int _workers_count;
+    uint32_t _workers_count;
     int _Run;
-} TaskManagerGlobal = {0};
+} TaskManagerGlobal = {};
 
 
 //==============================================================================
@@ -119,7 +119,7 @@ static task_t _try_pop(struct task_queue *q) {
 }
 
 static void _mark_task_job_done(task_t task) {
-
+    CEL_UNUSED(task);
 }
 
 static task_t _task_pop_new_work() {
@@ -203,7 +203,7 @@ namespace taskmanager {
     }
 
     void wait_atomic(atomic_int *signal,
-                     uint32_t value) {
+                     int32_t value) {
         while (atomic_load_explicit(signal, memory_order_acquire) == value) {
             do_work();
         }
@@ -242,7 +242,7 @@ namespace taskmanager_module {
 
         ct_log_a0.set_wid_clb(taskmanager::worker_id);
 
-        _G = (struct G) {0};
+        _G = {};
 
         int core_count = ct_cpu_a0.count();
 
@@ -257,12 +257,12 @@ namespace taskmanager_module {
         queue_task_init(&_G._gloalQueue, MAX_TASK,
                         ct_memory_a0.main_allocator());
 
-        for (int i = 0; i < worker_count + 1; ++i) {
+        for (uint32_t i = 0; i < worker_count + 1; ++i) {
             queue_task_init(&_G._workers_queue[i], MAX_TASK,
                             ct_memory_a0.main_allocator());
         }
 
-        for (int j = 0; j < worker_count; ++j) {
+        for (uint32_t j = 0; j < worker_count; ++j) {
             _G._workers[j] = ct_thread_a0.create(
                     (ct_thread_fce_t) _task_worker,
                     "worker",
@@ -283,11 +283,11 @@ namespace taskmanager_module {
 
         queue_task_destroy(&_G._gloalQueue);
 
-        for (int i = 0; i < _G._workers_count + 1; ++i) {
+        for (uint32_t i = 0; i < _G._workers_count + 1; ++i) {
             queue_task_destroy(&_G._workers_queue[i]);
         }
 
-        _G = (struct G) {0};
+        _G = {};
     }
 
     extern "C" void task_load_module(ct_api_a0 *api) {
@@ -295,6 +295,7 @@ namespace taskmanager_module {
     }
 
     extern "C" void task_unload_module(ct_api_a0 *api) {
+        CEL_UNUSED(api);
         _shutdown();
     }
 }

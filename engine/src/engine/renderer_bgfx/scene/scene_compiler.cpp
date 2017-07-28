@@ -94,7 +94,7 @@ namespace scene_resource_compiler {
         cel_alloc *a = ct_memory_a0.main_allocator();
         struct compile_output *output =
                 CEL_ALLOCATE(a, struct compile_output,
-                                sizeof(struct compile_output));
+                             sizeof(struct compile_output));
 
         output->geom_name.init(a);
         output->ib_offset.init(a);
@@ -138,7 +138,7 @@ namespace scene_resource_compiler {
                                    bgfx::AttribType::Enum *attr_type,
                                    size_t *size) {
 
-        for (int i = 0; i < CETECH_ARRAY_LEN(_attrin_tbl); ++i) {
+        for (uint32_t i = 0; i < CETECH_ARRAY_LEN(_attrin_tbl); ++i) {
             if (strcmp(_attrin_tbl[i].name, name) != 0) {
                 continue;
             }
@@ -160,7 +160,7 @@ namespace scene_resource_compiler {
         yaml_node_t type_n = yaml_get_node(decl_node, "type");
         yaml_node_t size_n = yaml_get_node(decl_node, "size");
 
-        char type_str[64] = {0};
+        char type_str[64] = {};
         yaml_as_string(type_n, type_str, CETECH_ARRAY_LEN(type_str));
 
         bgfx::AttribType::Enum attrib_type;
@@ -180,7 +180,7 @@ namespace scene_resource_compiler {
                               yaml_node_t types,
                               uint32_t *vertex_size) {
 
-        for (int i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
+        for (uint32_t i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
             YAML_NODE_SCOPE(node, types, _chanel_types[i].name,
                             if (yaml_is_valid(node))
                                 _parse_vertex_decl(decl, vertex_size,
@@ -196,7 +196,7 @@ namespace scene_resource_compiler {
                        const char *name,
                        yaml_node_t chanels_n,
                        struct compile_output *output) {
-        char tmp_buff[64] = {0};
+        char tmp_buff[64] = {};
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
@@ -222,7 +222,7 @@ namespace scene_resource_compiler {
         _type_to_attr_type(tmp_buff, &attrib_type, &v_size);
 
         yaml_node_t chanel_data_n = yaml_get_node(chanels_n, name);
-        for (int k = 0; k < size; ++k) {
+        for (uint32_t k = 0; k < size; ++k) {
             yaml_node_t n = yaml_get_seq_node(chanel_data_n, (idx * size) + k);
 
             // TODO: type
@@ -241,7 +241,7 @@ namespace scene_resource_compiler {
                                 void *_data) {
         struct compile_output *output = (compile_output *) _data;
 
-        char name_str[64] = {0};
+        char name_str[64] = {};
         yaml_as_string(key, name_str, CETECH_ARRAY_LEN(name_str));
 
         uint64_t name = ct_hash_a0.id64_from_str(name_str);
@@ -272,8 +272,8 @@ namespace scene_resource_compiler {
         array::push_back(output->ib_size, vertex_count);
         array::push_back(output->vb_size, vertex_size * vertex_count);
 
-        for (int i = 0; i < vertex_count; ++i) {
-            for (int j = 0; j < CETECH_ARRAY_LEN(_chanel_types); ++j) {
+        for (uint32_t i = 0; i < vertex_count; ++i) {
+            for (uint32_t j = 0; j < CETECH_ARRAY_LEN(_chanel_types); ++j) {
                 const char *name = _chanel_types[j].name;
 
                 YAML_NODE_SCOPE(node, indices_n, name,
@@ -296,7 +296,7 @@ namespace scene_resource_compiler {
     void foreach_graph_clb(yaml_node_t key,
                            yaml_node_t value,
                            void *_data) {
-        char buffer[128] = {0};
+        char buffer[128] = {};
         struct foreach_graph_data *output = (foreach_graph_data *) _data;
 
         yaml_as_string(key, buffer, CETECH_ARRAY_LEN(buffer));
@@ -316,13 +316,13 @@ namespace scene_resource_compiler {
         yaml_node_t geometries_n = yaml_get_node(value, "geometries");
         if (yaml_is_valid(geometries_n)) {
             const size_t name_count = yaml_node_size(geometries_n);
-            for (int i = 0; i < name_count; ++i) {
+            for (uint32_t i = 0; i < name_count; ++i) {
                 yaml_node_t name_node = yaml_get_seq_node(geometries_n, i);
                 yaml_as_string(name_node, buffer, CETECH_ARRAY_LEN(buffer));
                 yaml_node_free(name_node);
 
                 uint64_t geom_name = ct_hash_a0.id64_from_str(buffer);
-                for (int j = 0;
+                for (uint32_t j = 0;
                      j < array::size(output->output->geom_name); ++j) {
                     if (geom_name != output->output->geom_name[j]) {
                         continue;
@@ -373,11 +373,11 @@ namespace scene_resource_compiler {
         array::push_back(output->node_parent, parent);
         array::push(output->node_pose, &root->mTransformation.a1, 16);
 
-        for (int i = 0; i < root->mNumChildren; ++i) {
+        for (uint32_t i = 0; i < root->mNumChildren; ++i) {
             _compile_assimp_node(root->mChildren[i], idx, output);
         }
 
-        for (int i = 0; i < root->mNumMeshes; ++i) {
+        for (uint32_t i = 0; i < root->mNumMeshes; ++i) {
             array::push_back(output->geom_node, name);
         }
     }
@@ -393,7 +393,7 @@ namespace scene_resource_compiler {
 
         yaml_node_t postprocess_n = yaml_get_node(import_n, "postprocess");
 
-        char input_str[64] = {0};
+        char input_str[64] = {};
         yaml_as_string(input_n, input_str, CETECH_ARRAY_LEN(input_str));
         capi->add_dependency(filename, input_str);
 
@@ -413,10 +413,10 @@ namespace scene_resource_compiler {
                                                    postprocess_flag |
                                                    aiProcess_MakeLeftHanded);
 
-        char tmp_buffer[1024] = {0};
-        char tmp_buffer2[1024] = {0};
+        char tmp_buffer[1024] = {};
+        char tmp_buffer2[1024] = {};
         uint32_t unique = 0;
-        for (int i = 0; i < scene->mNumMeshes; ++i) {
+        for (uint32_t i = 0; i < scene->mNumMeshes; ++i) {
             struct aiMesh *mesh = scene->mMeshes[i];
 
             if (mesh->mName.length == 0) {
@@ -427,7 +427,7 @@ namespace scene_resource_compiler {
             }
 
             uint64_t name_id = ct_hash_a0.id64_from_str(tmp_buffer);
-            for (int k = 0; k < array::size(output->geom_name); ++k) {
+            for (uint32_t k = 0; k < array::size(output->geom_name); ++k) {
                 if (name_id == output->geom_name[k]) {
                     snprintf(tmp_buffer2, CETECH_ARRAY_LEN(tmp_buffer2), "%s%d",
                              tmp_buffer, ++unique);
@@ -470,7 +470,7 @@ namespace scene_resource_compiler {
             array::push_back(output->vb_decl, vertex_decl);
             array::push_back(output->vb_size, v_size * mesh->mNumVertices);
 
-            for (int j = 0; j < mesh->mNumVertices; ++j) {
+            for (uint32_t j = 0; j < mesh->mNumVertices; ++j) {
                 if (mesh->mVertices != NULL) {
                     array::push(output->vb, (uint8_t *) &mesh->mVertices[j],
                                 sizeof(float) * 3);
@@ -488,7 +488,7 @@ namespace scene_resource_compiler {
                 }
             }
 
-            for (int j = 0; j < mesh->mNumFaces; ++j) {
+            for (uint32_t j = 0; j < mesh->mNumFaces; ++j) {
                 array::push_back(output->ib, mesh->mFaces[j].mIndices[0]);
                 array::push_back(output->ib, mesh->mFaces[j].mIndices[1]);
                 array::push_back(output->ib, mesh->mFaces[j].mIndices[2]);
@@ -508,7 +508,7 @@ namespace scene_resource_compiler {
 
         char *source_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                source_vio->size(source_vio->inst) + 1);
+                             source_vio->size(source_vio->inst) + 1);
         memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
         source_vio->read(source_vio->inst, source_data, sizeof(char),

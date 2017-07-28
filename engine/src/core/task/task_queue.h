@@ -35,7 +35,7 @@ struct task_queue {
 void queue_task_init(struct task_queue *q,
                      uint32_t capacity,
                      struct cel_alloc *allocator) {
-    *q = (struct task_queue) {0};
+    *q = (struct task_queue) {};
 
     q->_capacityMask = capacity - 1;
     q->allocator = allocator;
