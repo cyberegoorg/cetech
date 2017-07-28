@@ -6,6 +6,7 @@
 
 #include <celib/eventstream.inl>
 #include <cetech/machine/machine.h>
+#include <cetech/machine/window.h>
 
 #include <cetech/engine/application.h>
 #include <cetech/engine/resource.h>
@@ -66,8 +67,7 @@ void sdl_mouse_process(EventStream &stream) {
         auto *main_window = ct_app_a0.main_window();
 
         uint32_t window_size[2] = {0};
-        ct_window_a0.size(main_window, &window_size[0],
-                          &window_size[1]);
+        main_window->size(main_window->inst, &window_size[0], &window_size[1]);
 
         _G.position[0] = pos[0];
         _G.position[1] = window_size[1] - pos[1];

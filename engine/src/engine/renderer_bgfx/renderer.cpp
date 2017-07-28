@@ -7,6 +7,7 @@
 #include <cetech/engine/application.h>
 #include <cetech/core/config.h>
 #include <cetech/machine/machine.h>
+#include <cetech/machine/window.h>
 #include <cetech/core/api_system.h>
 
 #include <cetech/engine/entity.h>
@@ -75,16 +76,16 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 
-void renderer_create(ct_window_t *window) {
+void renderer_create(ct_window *window) {
     bgfx::PlatformData pd = {0};
-    pd.nwh = ct_window_a0.native_window_ptr(window);
-    pd.ndt = ct_window_a0.native_display_ptr(window);
+    pd.nwh = window->native_window_ptr(window->inst);
+    pd.ndt = window->native_display_ptr(window->inst);
     bgfx::setPlatformData(pd);
 
     // TODO: from config
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
-    ct_window_a0.size(window, &_G.size_width, &_G.size_height);
+    window->size(window->inst, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -126,7 +127,8 @@ void renderer_render_world(ct_world world,
 
     bgfx::frame(0);
 
-    ct_window_a0.update(ct_app_a0.main_window());
+    auto* main_window = ct_app_a0.main_window();
+    main_window->update(main_window);
 }
 
 void renderer_get_size(int *width, int *height) {

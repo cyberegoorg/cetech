@@ -12,6 +12,7 @@
 #include <cetech/core/config.h>
 #include <cetech/engine/application.h>
 #include <cetech/machine/machine.h>
+#include <cetech/machine/window.h>
 #include <cetech/core/task.h>
 #include <cetech/engine/develop.h>
 
@@ -30,6 +31,7 @@
 #include <cetech/engine/input.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/time.h>
+#include <cetech/core/memory.h>
 
 CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_develop_a0);
@@ -44,6 +46,7 @@ CETECH_DECL_API(ct_time_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_keyboard_a0);
@@ -78,7 +81,7 @@ static struct ApplicationGlobals {
     struct GConfig config;
 
     const ct_game_callbacks *game;
-    ct_window_t *main_window;
+    ct_window *main_window;
     int is_running;
     int init_error;
     float dt;
@@ -103,7 +106,7 @@ const char *application_platform();
 
 const char *application_native_platform();
 
-ct_window_t *application_get_main_window();
+ct_window *application_get_main_window();
 
 
 void application_quit() {
@@ -138,6 +141,7 @@ void _init_api(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_keyboard_a0);
     CETECH_GET_API(api, ct_mouse_a0);
     CETECH_GET_API(api, ct_gamepad_a0);
+    CETECH_GET_API(api, ct_memory_a0);
 }
 
 void _init_config() {
@@ -236,6 +240,7 @@ extern "C" void application_start() {
 
         if (wid == 0) {
             _G.main_window = ct_window_a0.create(
+                    ct_memory_a0.main_allocator(),
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -245,7 +250,7 @@ extern "C" void application_start() {
                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
             );
         } else {
-            _G.main_window = ct_window_a0.create_from((void *) wid);
+            _G.main_window = ct_window_a0.create_from(ct_memory_a0.main_allocator(), (void *) wid);
         }
 
         ct_renderer_a0.create(_G.main_window);
@@ -329,6 +334,6 @@ const char *application_platform() {
     return application_native_platform();
 }
 
-ct_window_t *application_get_main_window() {
+ct_window *application_get_main_window() {
     return _G.main_window;
 }

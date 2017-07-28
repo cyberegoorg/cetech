@@ -21,6 +21,7 @@ extern "C" {
 struct ct_camera;
 struct ct_world;
 struct ct_entity;
+struct ct_window;
 
 typedef void ct_window_t;
 
@@ -154,7 +155,7 @@ typedef int viewport_t;
 struct ct_renderer_a0 {
     //! Create renderer.
     //! \param window Window
-    void (*create)(ct_window_t *window);
+    void (*create)(ct_window *window);
 
     //! Set debug mode on/off
     //! \param debug True/False
