@@ -8,7 +8,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-include_directories(engine/include)
+include_directories(src)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 add_definitions(-DCETECH_USE_SDL)
@@ -68,80 +68,80 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/core/os/error.cpp
-        engine/src/machine_sdl2/machine_sdl2.cpp
-        engine/src/machine_sdl2/mouse_sdl2.cpp
-        engine/src/machine_sdl2/keyboard_sdl2.cpp
-        engine/src/machine_sdl2/gamepad_sdl2.cpp
+        src/cetech/core/os/os/error.cpp
+        src/cetech/engine/machine/private/machine_sdl2.cpp
+        src/cetech/engine/machine/private/mouse_sdl2.cpp
+        src/cetech/engine/machine/private/keyboard_sdl2.cpp
+        src/cetech/engine/machine/private/gamepad_sdl2.cpp
 
-        engine/src/engine/console_server/console_server.cpp
-        engine/src/core/memory/allocator_core.cpp
-        engine/src/core/api/api_system.cpp
-        engine/src/core/log/log_system.cpp
-        engine/src/core/yaml/yaml.cpp
-        engine/src/core/module/module.cpp
-        engine/src/core/config/config.cpp
-        engine/src/core/memory/memory.cpp
-        engine/src/core/memory/allocator_malloc.cpp
-        engine/src/core/memory/allocator_scratch.cpp
-        engine/src/engine/application/application.cpp
-        engine/src/core/task/task.cpp
-        engine/src/engine/develop_system/develop_system.cpp
-        engine/src/core/log/log_db_handler.cpp
-        engine/src/core/log/log_nanomsg_handler.cpp
-        engine/src/core/log/log_stdout_handler.cpp
-        engine/src/engine/kernel/kernel.cpp
-        engine/src/core/hash/hashlib.cpp
-        engine/src/core/os/object.cpp
-        engine/src/core/os/path.cpp
-        engine/src/core/os/process.cpp
-        engine/src/core/os/cpu.cpp
-        engine/src/core/os/thread.cpp
-        engine/src/core/os/vio.cpp
-        engine/src/machine_sdl2/window_sdl2.cpp
-        engine/src/core/os/time.cpp
+        src/cetech/engine/console_server/private/console_server.cpp
+        src/cetech/core/memory/private/allocator_core.cpp
+        src/cetech/core/api/private/api_system.cpp
+        src/cetech/core/log/private/log_system.cpp
+        src/cetech/core/yaml/private/yaml.cpp
+        src/cetech/core/module/private/module.cpp
+        src/cetech/core/config/private/config.cpp
+        src/cetech/core/memory/private/memory.cpp
+        src/cetech/core/memory/private/allocator_malloc.cpp
+        src/cetech/core/memory/private/allocator_scratch.cpp
+        src/cetech/application/private/application.cpp
+        src/cetech/core/task/private/task.cpp
+        src/cetech/engine/develop_system/private/develop_system.cpp
+        src/cetech/core/log/private/log_db_handler.cpp
+        src/cetech/core/log/private/log_nanomsg_handler.cpp
+        src/cetech/core/log/private/log_stdout_handler.cpp
+        src/cetech/engine/kernel/private/kernel.cpp
+        src/cetech/core/hashlib/private/hashlib.cpp
+        src/cetech/core/os/os/object.cpp
+        src/cetech/core/os/os/path.cpp
+        src/cetech/core/os/os/process.cpp
+        src/cetech/core/os/os/cpu.cpp
+        src/cetech/core/os/os/thread.cpp
+        src/cetech/core/os/os/vio.cpp
+        src/cetech/engine/machine/private/window_sdl2.cpp
+        src/cetech/core/os/os/time.cpp
 
         ########################################################################
         # Modules
         ########################################################################
 
-        engine/src/engine/luasys/luasys_private.cpp
-        engine/src/engine/luasys/api/api_log.cpp
-        engine/src/engine/luasys/api/api_vec3f.cpp
-        engine/src/engine/luasys/api/api_quatf.cpp
-        engine/src/engine/luasys/api/api_mat44f.cpp
+        src/cetech/modules/luasys/private/luasys_private.cpp
+        src/cetech/modules/luasys/private/api/api_log.cpp
+        src/cetech/modules/luasys/private/api/api_vec3f.cpp
+        src/cetech/modules/luasys/private/api/api_quatf.cpp
+        src/cetech/modules/luasys/private/api/api_mat44f.cpp
 
-        engine/src/engine/resource/resource.cpp
-        engine/src/engine/resource/resource_package.cpp
-        engine/src/engine/resource/resource_compiler.cpp
+        src/cetech/engine/resource/private/resource.cpp
+        src/cetech/engine/resource/private/resource_package.cpp
+        src/cetech/engine/resource/private/resource_compiler.cpp
 
-        engine/src/engine/filesystem/filesystem.cpp
-        engine/src/engine/entity/component.cpp
-        engine/src/engine/entity/entity.cpp
-        engine/src/engine/entity/world.cpp
-        engine/src/engine/level/level.cpp
+        src/cetech/engine/filesystem/private/filesystem.cpp
+        src/cetech/engine/entity/private/component.cpp
+        src/cetech/engine/entity/private/entity.cpp
+        src/cetech/engine/entity/private/world.cpp
+        src/cetech/modules/level/private/level.cpp
 
-        engine/src/engine/input/keyboard.cpp
-        engine/src/engine/input/mouse.cpp
-        engine/src/engine/input/gamepad.cpp
+        src/cetech/engine/input/private/keyboard.cpp
+        src/cetech/engine/input/private/mouse.cpp
+        src/cetech/engine/input/private/gamepad.cpp
 
-        engine/src/engine/renderer_bgfx/renderer.cpp
-        engine/src/engine/renderer_bgfx/texture/texture.cpp
-        engine/src/engine/renderer_bgfx/shader/shader.cpp
-        engine/src/engine/renderer_bgfx/material/material.cpp
-        engine/src/engine/renderer_bgfx/scene/scene.cpp
-        engine/src/engine/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
-        engine/src/engine/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
+        src/cetech/modules/renderer/private/renderer.cpp
+        src/cetech/modules/renderer/private/texture/texture.cpp
+        src/cetech/modules/renderer/private/shader/shader.cpp
+        src/cetech/modules/renderer/private/material/material.cpp
+        src/cetech/modules/renderer/private/scene/scene.cpp
+        src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
+        src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
 
-        engine/src/engine/transform/transform.cpp
-        engine/src/engine/scenegraph/scenegraph.cpp
-        engine/src/engine/camera/camera.cpp
-        engine/src/core/blob/blob.cpp
-        engine/src/engine/renderer_bgfx/scene/scene_compiler.cpp
-        engine/src/engine/renderer_bgfx/shader/shader_compiler.cpp
-        engine/src/engine/renderer_bgfx/texture/texture_compiler.cpp
-        engine/src/engine/renderer_bgfx/material/material_compiler.cpp
-        engine/src/engine/renderer_bgfx/material/material_compiler.cpp
+        src/cetech/modules/transform/private/transform.cpp
+        src/cetech/modules/scenegraph/private/scenegraph.cpp
+        src/cetech/modules/camera/private/camera.cpp
+        src/cetech/core/blob/private/blob.cpp
+        src/cetech/modules/renderer/private/scene/scene_compiler.cpp
+        src/cetech/modules/renderer/private/shader/shader_compiler.cpp
+        src/cetech/modules/renderer/private/texture/texture_compiler.cpp
+        src/cetech/modules/renderer/private/material/material_compiler.cpp
+        src/cetech/modules/renderer/private/material/material_compiler.cpp
 
         )
 
@@ -241,6 +241,6 @@ target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_C
 target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(module_example SHARED engine/examples/module_example/example.c)
+add_library(module_example SHARED examples/module_example/example.c)
 set_target_properties(module_example PROPERTIES PREFIX "")
 
