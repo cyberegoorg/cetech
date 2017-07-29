@@ -6,7 +6,11 @@
 #ifndef CELIB_MACROS_H
 #define CELIB_MACROS_H
 
+#include <stdbool.h>
+
+#ifdef __cplusplus
 #include <type_traits>
+#endif
 
 #include "platform.h"
 

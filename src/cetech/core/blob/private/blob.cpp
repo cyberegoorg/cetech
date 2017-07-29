@@ -61,6 +61,9 @@ namespace blob {
 CETECH_MODULE_DEF(
         blob,
         {
+            CEL_UNUSED(api);
+        },
+        {
             api->register_api("ct_blob_a0", &blob::api);
         },
         {

@@ -16,14 +16,17 @@ struct ct_api_a0;
 //! Add static module and load it
 //! \param name Module name
 #define CETECH_ADD_STATIC_MODULE(name)                                     \
+    extern void name ## _initapi_module(struct ct_api_a0*);               \
     extern void name ## _load_module(struct ct_api_a0*);               \
     extern void name ## _unload_module(struct ct_api_a0*);             \
-    ct_module_a0.add_static(name ## _load_module, name ## _unload_module)
+    ct_module_a0.add_static(name ## _load_module, name ## _unload_module, name ## _initapi_module)
 
 //! Load static module
 //! \param name Module name
 #define CETECH_LOAD_STATIC_MODULE(api, name)                 \
     extern void name ## _load_module(struct ct_api_a0*); \
+    extern void name ## _initapi_module(struct ct_api_a0*); \
+    name ## _initapi_module(api); \
     name ## _load_module(api)
 
 //! Unload static module
@@ -32,9 +35,18 @@ struct ct_api_a0;
     extern void name ## _unload_module(struct ct_api_a0* api); \
     name ## _unload_module(api)
 
-#define CETECH_MODULE_DEF(name, load, unload) \
+#ifdef __cplusplus
+#define CETECH_MODULE_DEF(name, initapi, load, unload) \
+    extern "C" void name##_initapi_module(struct ct_api_a0 *api) initapi \
     extern "C" void name##_load_module(struct ct_api_a0 *api) load \
     extern "C" void name##_unload_module(struct ct_api_a0 *api) unload
+
+#else
+#define CETECH_MODULE_DEF(name, load, unload) \
+    void name##_initapi_module(struct ct_api_a0 *api) initapi \
+    void name##_load_module(struct ct_api_a0 *api) load \
+    void name##_unload_module(struct ct_api_a0 *api) unload
+#endif
 
 //==============================================================================
 // Typedefs
@@ -42,6 +54,7 @@ struct ct_api_a0;
 
 typedef void (*ct_load_module_t)(struct ct_api_a0 *api);
 typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
+typedef void (*ct_initapi_module_t)(struct ct_api_a0 *api);
 
 //==============================================================================
 // Interface
@@ -51,7 +64,8 @@ struct ct_module_a0 {
     //! Add static modules
     //! \param fce get api module fce
     void (*add_static)(ct_load_module_t load,
-                       ct_unload_module_t unload);
+                       ct_unload_module_t unload,
+                       ct_initapi_module_t initapi);
 
     //! Load module from path
     //! \param path Plugin path

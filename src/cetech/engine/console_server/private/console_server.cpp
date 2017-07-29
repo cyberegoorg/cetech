@@ -190,10 +190,7 @@ namespace consoleserver_module {
 
     static void _init(ct_api_a0 *api) {
         _init_api(api);
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_hash_a0);
+
 
         _init_cvar(ct_config_a0);
 
@@ -287,6 +284,12 @@ namespace consoleserver_module {
 
 CETECH_MODULE_DEF(
         consoleserver,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+        },
         {
             consoleserver_module::_init(api);
         },

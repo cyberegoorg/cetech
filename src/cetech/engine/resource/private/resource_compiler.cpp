@@ -254,15 +254,6 @@ static void _init_cvar(struct ct_config_a0 config) {
 }
 
 static void _init(ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_task_a0);
-    CETECH_GET_API(api, ct_app_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_hash_a0);
-    CETECH_GET_API(api, ct_config_a0);
 
     _init_cvar(ct_config_a0);
 
@@ -387,6 +378,17 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 
 CETECH_MODULE_DEF(
         resourcecompiler,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_task_a0);
+            CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_config_a0);
+        },
         {
             _init(api);
         },

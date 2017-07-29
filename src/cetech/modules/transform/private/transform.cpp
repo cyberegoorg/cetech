@@ -360,9 +360,6 @@ static ct_transform_a0 _api = {
 static void _init(ct_api_a0 *api) {
     api->register_api("ct_transform_a0", &_api);
 
-    CETECH_GET_API(api, ct_component_a0);
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_hash_a0);
 
 
     _G = {};
@@ -642,6 +639,11 @@ void transform_link(ct_world world,
 
 CETECH_MODULE_DEF(
         transform,
+        {
+            CETECH_GET_API(api, ct_component_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+        },
         {
             _init(api);
         },

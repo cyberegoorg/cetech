@@ -168,9 +168,6 @@ namespace renderer_module {
         _init_api(api);
 
         ct_api_a0 = *api;
-        CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_console_srv_a0);
 
         _G = (struct G) {};
 
@@ -211,6 +208,11 @@ namespace renderer_module {
 
 CETECH_MODULE_DEF(
         renderer,
+        {
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_console_srv_a0);
+        },
         {
             renderer_module::_init(api);
         },

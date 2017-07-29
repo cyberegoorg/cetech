@@ -90,6 +90,9 @@ static ct_vio_a0 vio_api = {
 CETECH_MODULE_DEF(
         vio,
         {
+
+        },
+        {
             api->register_api("ct_vio_a0", &vio_api);
         },
         {

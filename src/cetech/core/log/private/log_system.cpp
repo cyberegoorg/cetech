@@ -151,6 +151,9 @@ namespace logsystem {
 CETECH_MODULE_DEF(
         log,
         {
+
+        },
+        {
             logsystem::init();
             api->register_api("ct_log_a0", &logsystem::log_a0);
         },

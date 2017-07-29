@@ -293,6 +293,9 @@ namespace taskmanager_module {
 CETECH_MODULE_DEF(
         task,
         {
+
+        },
+        {
             taskmanager_module::_init(api);
         },
         {

@@ -131,8 +131,6 @@ namespace keyboard_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_machine_a0);
-        CETECH_GET_API(api, ct_log_a0);
 
         _G = (struct G) {};
 
@@ -148,6 +146,10 @@ namespace keyboard_module {
 
 CETECH_MODULE_DEF(
         keyboard,
+        {
+            CETECH_GET_API(api, ct_machine_a0);
+            CETECH_GET_API(api, ct_log_a0);
+        },
         {
             keyboard_module::_init(api);
         },

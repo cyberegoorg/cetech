@@ -200,8 +200,7 @@ namespace gamepad_module {
     static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_machine_a0);
-        CETECH_GET_API(api, ct_log_a0);
+
 
         _G = {};
 
@@ -221,6 +220,10 @@ namespace gamepad_module {
 
 CETECH_MODULE_DEF(
         gamepad,
+        {
+            CETECH_GET_API(api, ct_machine_a0);
+            CETECH_GET_API(api, ct_log_a0);
+        },
         {
             gamepad_module::_init(api);
         },

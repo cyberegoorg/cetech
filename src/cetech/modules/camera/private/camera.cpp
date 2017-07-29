@@ -264,10 +264,7 @@ namespace camera_module {
     static void _init(ct_api_a0 *api) {
         api->register_api("ct_camera_a0", &camera_api);
 
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_component_a0);
-        CETECH_GET_API(api, ct_transform_a0);
-        CETECH_GET_API(api, ct_hash_a0);
+
 
         _G = {};
 
@@ -299,6 +296,12 @@ namespace camera_module {
 
 CETECH_MODULE_DEF(
         camera,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_component_a0);
+            CETECH_GET_API(api, ct_transform_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+        },
         {
             camera_module::_init(api);
         },

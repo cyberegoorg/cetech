@@ -15,6 +15,9 @@ static ct_cpu_a0 cpu_api = {
 CETECH_MODULE_DEF(
         cpu,
         {
+            CEL_UNUSED(api);
+        },
+        {
             api->register_api("ct_cpu_a0", &cpu_api);
         },
         {

@@ -90,7 +90,7 @@ namespace world_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_memory_a0);
+
 
         _G = {};
 
@@ -108,6 +108,9 @@ namespace world_module {
 
 CETECH_MODULE_DEF(
         world,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+        },
         {
             world_module::_init(api);
         },

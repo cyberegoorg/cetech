@@ -41,6 +41,9 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_log_a0);
 
+        },
+        {
+
             api->register_api("ct_process_a0", &process_api);
         },
         {

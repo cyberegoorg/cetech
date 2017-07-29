@@ -466,6 +466,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
+        },
+        {
 
             _G = {};
 

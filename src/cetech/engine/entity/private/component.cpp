@@ -156,9 +156,6 @@ namespace component_module {
     void _init(ct_api_a0 *a0) {
         _init_api(a0);
 
-        CETECH_GET_API(a0, ct_memory_a0);
-        CETECH_GET_API(a0, ct_world_a0);
-
         _G = {};
 
         _G.compiler_map.init(ct_memory_a0.main_allocator());
@@ -175,6 +172,10 @@ namespace component_module {
 
 CETECH_MODULE_DEF(
         component,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_world_a0);
+        },
         {
             component_module::_init(api);
         },

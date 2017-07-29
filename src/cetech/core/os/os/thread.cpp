@@ -80,6 +80,10 @@ static ct_thread_a0 thread_api = {
 CETECH_MODULE_DEF(
         thread,
         {
+            CEL_UNUSED(api);
+
+        },
+        {
             api->register_api("ct_thread_a0", &thread_api);
         },
         {

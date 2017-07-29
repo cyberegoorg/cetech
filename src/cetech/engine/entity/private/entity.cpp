@@ -606,15 +606,6 @@ namespace entity_module {
     static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_component_a0);
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-        CETECH_GET_API(api, ct_blob_a0);
-
         _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("entity");
@@ -643,6 +634,16 @@ namespace entity_module {
 
 CETECH_MODULE_DEF(
         entity,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_component_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_blob_a0);
+        },
         {
             entity_module::_init(api);
         },

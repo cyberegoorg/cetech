@@ -206,8 +206,6 @@ namespace mouse_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_machine_a0);
-        CETECH_GET_API(api, ct_log_a0);
 
         _G = {};
 
@@ -224,6 +222,11 @@ namespace mouse_module {
 
 CETECH_MODULE_DEF(
         mouse,
+        {
+            CETECH_GET_API(api, ct_machine_a0);
+            CETECH_GET_API(api, ct_log_a0);
+
+        },
         {
             mouse_module::_init(api);
         },

@@ -9,10 +9,10 @@
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/object.h>
+#include <celib/string_stream.h>
 
 
 #include "cetech/core/log/log.h"
-#include "celib/macros.h"
 
 //==============================================================================
 // Defines
@@ -21,7 +21,7 @@
 #define MAX_PLUGINS 256
 #define MAX_PATH_LEN 256
 
-#define PLUGIN_PREFIX "module_"
+#define MODULE_PREFIX "module_"
 #define LOG_WHERE "module_system"
 
 
@@ -32,6 +32,7 @@
 static struct ModuleSystemGlobals {
     ct_load_module_t load_module[MAX_PLUGINS];
     ct_unload_module_t unload_module[MAX_PLUGINS];
+    ct_initapi_module_t initapi_module[MAX_PLUGINS];
     void *module_handler[MAX_PLUGINS];
     char used[MAX_PLUGINS];
     char path[MAX_PLUGINS][MAX_PATH_LEN];
@@ -51,6 +52,7 @@ CETECH_DECL_API(ct_object_a0);
 void _add(const char path[11],
           ct_load_module_t load_fce,
           ct_unload_module_t unload_fce,
+          ct_initapi_module_t initapi,
           void *handler) {
 
     for (size_t i = 0; i < MAX_PLUGINS; ++i) {
@@ -64,6 +66,7 @@ void _add(const char path[11],
 
         _G.load_module[i] = load_fce;
         _G.unload_module[i] = unload_fce;
+        _G.initapi_module[i] = initapi;
         _G.module_handler[i] = handler;
 
         break;
@@ -78,36 +81,74 @@ void _add(const char path[11],
 namespace module {
 
     void add_static(ct_load_module_t load,
-                    ct_unload_module_t unload) {
-        _add("__STATIC__", load, unload, NULL);
+                    ct_unload_module_t unload,ct_initapi_module_t initapi) {
+        _add("__STATIC__", load, unload, initapi, NULL);
+        initapi(&ct_api_a0);
         load(&ct_api_a0);
     }
 
     void load(const char *path) {
         ct_log_a0.info(LOG_WHERE, "Loading module %s", path);
 
+        const char *filename = ct_path_a0.filename(path);
+        char *name = strchr(filename, '_');
+        if (NULL == name) {
+            return;
+        }
+
+        ++name;
+        char *dot = strchr(filename, '.');
+        if (NULL == dot) {
+            return;
+        }
+
+        uint32_t name_len = static_cast<uint32_t>(dot - name);
+
+        celib::string_stream::Buffer module_name(ct_memory_a0.main_allocator());
+        celib::string_stream::push(module_name, name, (name_len));
+
+        celib::string_stream::Buffer buffer(ct_memory_a0.main_allocator());
+        celib::string_stream::printf(buffer, "%s_load_module",
+                                     celib::string_stream::c_str(module_name));
+
         void *obj = ct_object_a0.load(path);
         if (obj == NULL) {
             return;
         }
 
-        ct_load_module_t load_fce = (ct_load_module_t) ct_object_a0.load_function(
+        auto load_fce = (ct_load_module_t) ct_object_a0.load_function(
                 obj,
-                "load_module");
+                celib::string_stream::c_str(buffer));
         if (load_fce == NULL) {
             return;
         }
 
+        celib::array::clear(buffer);
+        celib::string_stream::printf(buffer, "%s_unload_module",
+                                     celib::string_stream::c_str(module_name));
+
         ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0.load_function(
                 obj,
-                "unload_module");
+                celib::string_stream::c_str(buffer));
         if (unload_fce == NULL) {
             return;
         }
 
+        celib::array::clear(buffer);
+        celib::string_stream::printf(buffer, "%s_initapi_module",
+                                     celib::string_stream::c_str(module_name));
+
+        ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_object_a0.load_function(
+                obj,
+                celib::string_stream::c_str(buffer));
+        if (initapi_fce == NULL) {
+            return;
+        }
+
+        initapi_fce(&ct_api_a0);
         load_fce(&ct_api_a0);
 
-        _add(path, load_fce, unload_fce, nullptr);
+        _add(path, load_fce, unload_fce, initapi_fce, obj);
     }
 
     void reload(const char *path) {
@@ -187,7 +228,7 @@ namespace module {
         for (uint32_t k = 0; k < files_count; ++k) {
             const char *filename = ct_path_a0.filename(files[k]);
 
-            if (!strncmp(filename, PLUGIN_PREFIX, strlen(PLUGIN_PREFIX))) {
+            if (!strncmp(filename, MODULE_PREFIX, strlen(MODULE_PREFIX))) {
                 load(files[k]);
             }
         }
@@ -225,6 +266,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_object_a0);
+        },
+        {
+
             ct_api_a0 = *api;
 
             api->register_api("ct_module_a0", &module::module_api);

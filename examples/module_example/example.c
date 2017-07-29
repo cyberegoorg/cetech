@@ -1,5 +1,7 @@
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/log/log.h>
+#include <cetech/core/module/module.h>
+#include <celib/macros.h>
 
 #include "cetech/core/config/config.h"
 #include "cetech/engine/input/input.h"
@@ -14,14 +16,16 @@ void update() {
 //    }
 }
 
+CETECH_MODULE_DEF(
+        example,
+        {
+            CETECH_GET_API(api, ct_keyboard_a0);
+            CETECH_GET_API(api, ct_log_a0);
 
-void load_module(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_keyboard_a0);
-    CETECH_GET_API(api, ct_log_a0);
-
-    ct_log_a0.info("example", "Init");
-}
-
-void unload_module(struct ct_api_a0 *api) {
-    ct_log_a0.info("example", "Shutdown");
-}
+            ct_log_a0.info("example", "Init");
+        },
+        {
+            CEL_UNUSED(api);
+            ct_log_a0.info("example", "Shutdown");
+        }
+)

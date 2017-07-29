@@ -605,18 +605,6 @@ namespace resource_module {
 
     void _init(ct_api_a0 *api) {
         _init_api(api);
-
-        CETECH_GET_API(api, ct_console_srv_a0);
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_filesystem_a0);
-        CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_app_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-        CETECH_GET_API(api, ct_thread_a0);
-
         _init_cvar(ct_config_a0);
 
         _G.type_map.init(ct_memory_a0.main_allocator());
@@ -656,6 +644,18 @@ namespace resource_module {
 
 CETECH_MODULE_DEF(
         resourcesystem,
+        {
+            CETECH_GET_API(api, ct_console_srv_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_thread_a0);
+        },
         {
             resource_module::_init(api);
         },

@@ -742,12 +742,6 @@ static void _init_api(ct_api_a0 *api) {
 static void _init(ct_api_a0 *a0) {
     _init_api(a0);
 
-    CETECH_GET_API(a0, ct_console_srv_a0);
-    CETECH_GET_API(a0, ct_resource_a0);
-    CETECH_GET_API(a0, ct_vio_a0);
-    CETECH_GET_API(a0, ct_log_a0);
-    CETECH_GET_API(a0, ct_hash_a0);
-
     ct_log_a0.debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
@@ -851,6 +845,14 @@ void luasys_call_global(const char *func,
 
 CETECH_MODULE_DEF(
         luasys,
+        {
+            CETECH_GET_API(api, ct_console_srv_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+
+        },
         {
             _init(api);
         },

@@ -301,16 +301,6 @@ namespace level_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_entity_a0);
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_transform_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-        CETECH_GET_API(api, ct_blob_a0);
-        CETECH_GET_API(api, ct_world_a0);
-
-
         _G = {};
 
         _G.level_type = ct_hash_a0.id64_from_str("level");
@@ -334,6 +324,16 @@ namespace level_module {
 
 CETECH_MODULE_DEF(
         level,
+        {
+            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_transform_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_blob_a0);
+            CETECH_GET_API(api, ct_world_a0);
+        },
         {
             level_module::_init(api);
         },

@@ -30,6 +30,9 @@ static ct_time_a0 time_api = {
 CETECH_MODULE_DEF(
         time,
         {
+
+        },
+        {
             api->register_api("ct_time_a0", &time_api);
         },
         {

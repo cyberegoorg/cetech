@@ -160,11 +160,6 @@ namespace filesystem_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_log_a0);
-
         _G = {};
 
         _G.root_map.init(ct_memory_a0.main_allocator());
@@ -191,12 +186,17 @@ namespace filesystem_module {
 CETECH_MODULE_DEF(
         filesystem,
         {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_log_a0);
+        },
+        {
             filesystem_module::_init(api);
         },
         {
             CEL_UNUSED(api);
 
             filesystem_module::_shutdown();
-
         }
 )

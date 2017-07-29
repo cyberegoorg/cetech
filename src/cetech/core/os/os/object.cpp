@@ -32,9 +32,8 @@ void unload_object(void *so) {
 
 void *load_function(void *so,
                     const char *name) {
-    CEL_UNUSED(name);
 
-    void *fce = dlsym(so, "load_module");
+    void *fce = dlsym(so, name);
 
     if (fce == NULL) {
         ct_log_a0.error(LOG_WHERE, "%s", dlerror());
@@ -55,6 +54,8 @@ CETECH_MODULE_DEF(
         object,
         {
             CETECH_GET_API(api, ct_log_a0);
+        },
+        {
 
             api->register_api("ct_object_a0", &object_api);
         },

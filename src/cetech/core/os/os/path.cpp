@@ -273,6 +273,8 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_vio_a0);
+        },
+        {
             api->register_api("ct_path_a0", &path_api);
         },
         {

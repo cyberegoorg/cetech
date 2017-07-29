@@ -464,8 +464,6 @@ namespace scenegraph_module {
     void init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_world_a0);
-        CETECH_GET_API(api, ct_memory_a0);
 
         _G = {};
 
@@ -487,6 +485,10 @@ namespace scenegraph_module {
 
 CETECH_MODULE_DEF(
         scenegraph,
+        {
+            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+        },
         {
             scenegraph_module::init(api);
         },

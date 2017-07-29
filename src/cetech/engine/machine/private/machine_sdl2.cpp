@@ -177,6 +177,8 @@ CETECH_MODULE_DEF(
         machine,
         {
             CETECH_GET_API(api, ct_log_a0);
+        },
+        {
             machine_sdl::init(api);
         },
         {
