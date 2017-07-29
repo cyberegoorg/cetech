@@ -17,29 +17,29 @@ struct ct_api_a0;
 //! \param name Module name
 #define CETECH_ADD_STATIC_MODULE(name)                                     \
     extern void name ## _initapi_module(struct ct_api_a0*);               \
-    extern void name ## _load_module(struct ct_api_a0*);               \
-    extern void name ## _unload_module(struct ct_api_a0*);             \
+    extern void name ## _load_module(struct ct_api_a0*, int reload);               \
+    extern void name ## _unload_module(struct ct_api_a0*, int reload);             \
     ct_module_a0.add_static(name ## _load_module, name ## _unload_module, name ## _initapi_module)
 
 //! Load static module
 //! \param name Module name
 #define CETECH_LOAD_STATIC_MODULE(api, name)                 \
-    extern void name ## _load_module(struct ct_api_a0*); \
+    extern void name ## _load_module(struct ct_api_a0*, int reload); \
     extern void name ## _initapi_module(struct ct_api_a0*); \
     name ## _initapi_module(api); \
-    name ## _load_module(api)
+    name ## _load_module(api, 0)
 
 //! Unload static module
 //! \param name Module name
 #define CETECH_UNLOAD_STATIC_MODULE(api, name)                     \
-    extern void name ## _unload_module(struct ct_api_a0* api); \
-    name ## _unload_module(api)
+    extern void name ## _unload_module(struct ct_api_a0* api, int reload); \
+    name ## _unload_module(api, 0)
 
 #ifdef __cplusplus
 #define CETECH_MODULE_DEF(name, initapi, load, unload) \
     extern "C" void name##_initapi_module(struct ct_api_a0 *api) initapi \
-    extern "C" void name##_load_module(struct ct_api_a0 *api) load \
-    extern "C" void name##_unload_module(struct ct_api_a0 *api) unload
+    extern "C" void name##_load_module(struct ct_api_a0 *api, int reload) load \
+    extern "C" void name##_unload_module(struct ct_api_a0 *api, int reload) unload
 
 #else
 #define CETECH_MODULE_DEF(name, load, unload) \
@@ -52,8 +52,8 @@ struct ct_api_a0;
 // Typedefs
 //==============================================================================
 
-typedef void (*ct_load_module_t)(struct ct_api_a0 *api);
-typedef void (*ct_unload_module_t)(struct ct_api_a0 *api);
+typedef void (*ct_load_module_t)(struct ct_api_a0 *api, int reload);
+typedef void (*ct_unload_module_t)(struct ct_api_a0 *api, int reload);
 typedef void (*ct_initapi_module_t)(struct ct_api_a0 *api);
 
 //==============================================================================

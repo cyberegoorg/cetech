@@ -84,7 +84,7 @@ namespace module {
                     ct_unload_module_t unload,ct_initapi_module_t initapi) {
         _add("__STATIC__", load, unload, initapi, NULL);
         initapi(&ct_api_a0);
-        load(&ct_api_a0);
+        load(&ct_api_a0, 0);
     }
 
     void load(const char *path) {
@@ -146,7 +146,7 @@ namespace module {
         }
 
         initapi_fce(&ct_api_a0);
-        load_fce(&ct_api_a0);
+        load_fce(&ct_api_a0, 0);
 
         _add(path, load_fce, unload_fce, initapi_fce, obj);
     }
@@ -243,7 +243,7 @@ namespace module {
                 continue;
             }
 
-            _G.unload_module[i](&ct_api_a0);
+            _G.unload_module[i](&ct_api_a0, 0);
         }
     }
 
