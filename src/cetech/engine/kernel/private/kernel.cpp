@@ -140,9 +140,8 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(gamepad);
     CETECH_ADD_STATIC_MODULE(mouse);
 
-    init_static_modules();
-
     CETECH_GET_API(api, ct_app_a0);
+    init_static_modules();
 
     ct_module_a0.load_dirs();
 

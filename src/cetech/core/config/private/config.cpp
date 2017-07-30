@@ -13,6 +13,7 @@
 #include <cetech/core/yaml/yaml.h>
 #include <celib/memory.h>
 #include <cetech/core/module/module.h>
+#include <celib/buffer.inl>
 
 #include "celib/allocator.h"
 
@@ -240,6 +241,10 @@ namespace config {
     }
 
     void log_all() {
+        celib::Buffer out(ct_memory_a0.main_allocator());
+
+        celib::buffer::printf(out, "config:\n");
+
         for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
             if (_G.name[i][0] == '\0') {
                 continue;
@@ -249,18 +254,20 @@ namespace config {
 
             switch (_G.types[i]) {
                 case CV_FLOAT:
-                    ct_log_a0.info(LOG_WHERE, "%s = %f", name, _G.values[i].f);
+                    celib::buffer::printf(out, "    - %s = %f\n", name, _G.values[i].f);
                     break;
                 case CV_INT:
-                    ct_log_a0.info(LOG_WHERE, "%s = %d", name, _G.values[i].i);
+                    celib::buffer::printf(out, "    - %s = %d\n", name, _G.values[i].i);
                     break;
                 case CV_STRING:
-                    ct_log_a0.info(LOG_WHERE, "%s = %s", name, _G.values[i].s);
+                    celib::buffer::printf(out, "    - %s = %s\n", name, _G.values[i].s);
                     break;
                 default:
                     break;
             }
         }
+
+        ct_log_a0.info(LOG_WHERE, "%s", celib::buffer::c_str(out));
     }
 
     struct foreach_config_data {
