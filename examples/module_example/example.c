@@ -21,11 +21,13 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_log_a0);
-
-            ct_log_a0.info("example", "Init");
         },
         {
             CEL_UNUSED(api);
-            ct_log_a0.info("example", "Shutdown");
+            ct_log_a0.info("example", "Init %d", reload);
+        },
+        {
+            CEL_UNUSED(api);
+            ct_log_a0.info("example", "Shutdown %d", reload);
         }
 )

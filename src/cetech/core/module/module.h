@@ -42,10 +42,10 @@ struct ct_api_a0;
     extern "C" void name##_unload_module(struct ct_api_a0 *api, int reload) unload
 
 #else
-#define CETECH_MODULE_DEF(name, load, unload) \
+#define CETECH_MODULE_DEF(name, initapi, load, unload) \
     void name##_initapi_module(struct ct_api_a0 *api) initapi \
-    void name##_load_module(struct ct_api_a0 *api) load \
-    void name##_unload_module(struct ct_api_a0 *api) unload
+    void name##_load_module(struct ct_api_a0 *api, int reload) load \
+    void name##_unload_module(struct ct_api_a0 *api, int reload) unload
 #endif
 
 //==============================================================================

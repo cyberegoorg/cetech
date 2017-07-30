@@ -18,7 +18,7 @@
 // Defines
 //==============================================================================
 
-#define MAX_PLUGINS 256
+#define MAX_MODULES 256
 #define MAX_PATH_LEN 256
 
 #define MODULE_PREFIX "module_"
@@ -28,14 +28,17 @@
 //==============================================================================
 // Globals
 //==============================================================================
+struct module_functios {
+    void *handler;
+    ct_load_module_t load;
+    ct_unload_module_t unload;
+    ct_initapi_module_t initapi;
+};
 
 static struct ModuleSystemGlobals {
-    ct_load_module_t load_module[MAX_PLUGINS];
-    ct_unload_module_t unload_module[MAX_PLUGINS];
-    ct_initapi_module_t initapi_module[MAX_PLUGINS];
-    void *module_handler[MAX_PLUGINS];
-    char used[MAX_PLUGINS];
-    char path[MAX_PLUGINS][MAX_PATH_LEN];
+    module_functios modules[MAX_MODULES];
+    char path[MAX_MODULES][MAX_PATH_LEN];
+    char used[MAX_MODULES];
 } _G = {};
 
 CETECH_DECL_API(ct_memory_a0);
@@ -44,18 +47,17 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_object_a0);
 
+using namespace celib;
+
 //==============================================================================
 // Private
 //==============================================================================
 
 
-void _add(const char path[11],
-          ct_load_module_t load_fce,
-          ct_unload_module_t unload_fce,
-          ct_initapi_module_t initapi,
-          void *handler) {
+void add_module(const char *path,
+                module_functios *module) {
 
-    for (size_t i = 0; i < MAX_PLUGINS; ++i) {
+    for (size_t i = 0; i < MAX_MODULES; ++i) {
         if (_G.used[i]) {
             continue;
         }
@@ -63,16 +65,87 @@ void _add(const char path[11],
         memcpy(_G.path[i], path, strlen(path));
 
         _G.used[i] = 1;
-
-        _G.load_module[i] = load_fce;
-        _G.unload_module[i] = unload_fce;
-        _G.initapi_module[i] = initapi;
-        _G.module_handler[i] = handler;
+        _G.modules[i] = *module;
 
         break;
     }
 }
 
+const char *get_module_name(const char *path,
+                            uint32_t *len) {
+    const char *filename = ct_path_a0.filename(path);
+    char *name = strchr(filename, '_');
+    if (NULL == name) {
+        return NULL;
+    }
+
+    ++name;
+    char *dot = strchr(filename, '.');
+    if (NULL == dot) {
+        return NULL;
+    }
+
+    *len = static_cast<uint32_t>(dot - name);
+
+    return name;
+}
+
+void get_module_fce_name(string_stream::Buffer &buffer,
+                         const char *name,
+                         uint32_t name_len,
+                         const char *fce_name) {
+    celib::array::clear(buffer);
+    celib::string_stream::push(buffer, name, name_len);
+    string_stream::printf(buffer, fce_name);
+}
+
+
+bool get_module_functions_from_path(module_functios *module,
+                                    const char *path) {
+    uint32_t name_len;
+    const char *name = get_module_name(path, &name_len);
+    celib::string_stream::Buffer buffer(ct_memory_a0.main_allocator());
+
+    get_module_fce_name(buffer, name, name_len, "_load_module");
+
+    void *obj = ct_object_a0.load(path);
+    if (obj == NULL) {
+        return false;
+    }
+
+    auto load_fce = (ct_load_module_t) ct_object_a0.load_function(
+            obj,
+            celib::string_stream::c_str(buffer));
+    if (load_fce == NULL) {
+        return false;
+    }
+
+    get_module_fce_name(buffer, name, name_len, "_unload_module");
+
+    auto unload_fce = (ct_unload_module_t) ct_object_a0.load_function(
+            obj,
+            celib::string_stream::c_str(buffer));
+    if (unload_fce == NULL) {
+        return false;
+    }
+
+    get_module_fce_name(buffer, name, name_len, "_initapi_module");
+
+    ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_object_a0.load_function(
+            obj,
+            celib::string_stream::c_str(buffer));
+    if (initapi_fce == NULL) {
+        return false;
+    }
+
+    *module = {
+            .handler = obj,
+            .load = load_fce,
+            .unload = unload_fce,
+            .initapi = initapi_fce
+    };
+    return true;
+}
 
 //==============================================================================
 // Interface
@@ -81,140 +154,81 @@ void _add(const char path[11],
 namespace module {
 
     void add_static(ct_load_module_t load,
-                    ct_unload_module_t unload,ct_initapi_module_t initapi) {
-        _add("__STATIC__", load, unload, initapi, NULL);
+                    ct_unload_module_t unload,
+                    ct_initapi_module_t initapi) {
+
+        module_functios module = {
+                .load=load,
+                .unload=unload,
+                .initapi=initapi,
+                .handler=NULL
+        };
+
+        add_module("__STATIC__", &module);
         initapi(&ct_api_a0);
         load(&ct_api_a0, 0);
     }
 
+
     void load(const char *path) {
         ct_log_a0.info(LOG_WHERE, "Loading module %s", path);
 
-        const char *filename = ct_path_a0.filename(path);
-        char *name = strchr(filename, '_');
-        if (NULL == name) {
-            return;
-        }
+        module_functios module;
 
-        ++name;
-        char *dot = strchr(filename, '.');
-        if (NULL == dot) {
-            return;
-        }
+        get_module_functions_from_path(&module, path);
 
-        uint32_t name_len = static_cast<uint32_t>(dot - name);
+        module.initapi(&ct_api_a0);
+        module.load(&ct_api_a0, 0);
 
-        celib::string_stream::Buffer module_name(ct_memory_a0.main_allocator());
-        celib::string_stream::push(module_name, name, (name_len));
-
-        celib::string_stream::Buffer buffer(ct_memory_a0.main_allocator());
-        celib::string_stream::printf(buffer, "%s_load_module",
-                                     celib::string_stream::c_str(module_name));
-
-        void *obj = ct_object_a0.load(path);
-        if (obj == NULL) {
-            return;
-        }
-
-        auto load_fce = (ct_load_module_t) ct_object_a0.load_function(
-                obj,
-                celib::string_stream::c_str(buffer));
-        if (load_fce == NULL) {
-            return;
-        }
-
-        celib::array::clear(buffer);
-        celib::string_stream::printf(buffer, "%s_unload_module",
-                                     celib::string_stream::c_str(module_name));
-
-        ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0.load_function(
-                obj,
-                celib::string_stream::c_str(buffer));
-        if (unload_fce == NULL) {
-            return;
-        }
-
-        celib::array::clear(buffer);
-        celib::string_stream::printf(buffer, "%s_initapi_module",
-                                     celib::string_stream::c_str(module_name));
-
-        ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_object_a0.load_function(
-                obj,
-                celib::string_stream::c_str(buffer));
-        if (initapi_fce == NULL) {
-            return;
-        }
-
-        initapi_fce(&ct_api_a0);
-        load_fce(&ct_api_a0, 0);
-
-        _add(path, load_fce, unload_fce, initapi_fce, obj);
+        add_module(path, &module);
     }
 
     void reload(const char *path) {
         CEL_UNUSED(path);
-//        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-//            if ((_G.module_handler[i] == NULL) ||
-//                (strcmp(_G.path[i], path)) != 0) {
-//                continue;
-//            }
-//
-//            void *data = NULL;
-//            struct module_export_a0 *api = _G.module_api[i];
-//            if (api != NULL && api->reload_begin) {
-//                data = api->reload_begin(&ct_api_a0);
-//            }
-//
-//            unload_object(_G.module_handler[i]);
-//
-//            void *obj = load_object(path);
-//            if (obj == NULL) {
-//                return;
-//            }
-//
-//            void *fce = load_function(obj, "load_module");
-//            if (fce == NULL) {
-//                return;
-//            }
-//
-//            _G.module_api[i] = api = (module_export_a0 *) ((get_api_fce_t) fce)(
-//                    PLUGIN_EXPORT_API_ID);
-//            if (api != NULL && api->reload_end) {
-//                api->reload_end(&ct_api_a0, data);
-//            }
-//        }
+        for (size_t i = 0; i < MAX_MODULES; ++i) {
+            module_functios old_module = _G.modules[i];
+
+            if ((old_module.handler == NULL) ||
+                (strcmp(_G.path[i], path)) != 0) {
+                continue;
+            }
+
+            module_functios new_module;
+            get_module_functions_from_path(&new_module, path);
+
+            new_module.initapi(&ct_api_a0);
+            new_module.load(&ct_api_a0, 1);
+
+            old_module.unload(&ct_api_a0, 1);
+            _G.modules[i] = new_module;
+
+            ct_object_a0.unload(old_module.handler);
+
+            break;
+        }
+
+        for (size_t i = 0; i < MAX_MODULES; ++i) {
+            if(!_G.used[i]) {
+                continue;
+            }
+
+            if ((strcmp(_G.path[i], path)) == 0) {
+                continue;
+            }
+
+            module_functios module = _G.modules[i];
+            module.initapi(&ct_api_a0);
+        }
     }
 
     void reload_all() {
-//        for (size_t i = 0; i < MAX_PLUGINS; ++i) {
-//            if (_G.module_handler[i] == NULL) {
-//                continue;
-//            }
-//
-//            void *data = NULL;
-//            struct module_export_a0 *api = _G.module_api[i];
-//            if (api != NULL && api->reload_begin) {
-//                data = api->reload_begin(&ct_api_a0);
-//            }
-//
-//            unload_object(_G.module_handler[i]);
-//
-//            void *obj = load_object(_G.path[i]);
-//            if (obj == NULL) {
-//                return;
-//            }
-//
-//            void *fce = load_function(obj, "load_module");
-//            if (fce == NULL) {
-//                return;
-//            }
-//
-//            _G.module_api[i] = api = (module_export_a0 *) ((get_api_fce_t) fce)(
-//                    PLUGIN_EXPORT_API_ID);
-//            if (api != NULL && api->reload_end) {
-//                api->reload_end(&ct_api_a0, data);
-//            }
-//        }
+        for (size_t i = 0; i < MAX_MODULES; ++i) {
+            if (_G.modules[i].handler == NULL) {
+                continue;
+            }
+
+            reload(_G.path[i]);
+        }
     }
 
 
@@ -238,12 +252,12 @@ namespace module {
     }
 
     void unload_all() {
-        for (int i = MAX_PLUGINS - 1; i >= 0; --i) {
+        for (int i = MAX_MODULES - 1; i >= 0; --i) {
             if (!_G.used[i]) {
                 continue;
             }
 
-            _G.unload_module[i](&ct_api_a0, 0);
+            _G.modules[i].unload(&ct_api_a0, 0);
         }
     }
 
@@ -256,7 +270,6 @@ namespace module {
             .unload_all = unload_all,
             .load_dirs = load_dirs
     };
-
 };
 
 CETECH_MODULE_DEF(
