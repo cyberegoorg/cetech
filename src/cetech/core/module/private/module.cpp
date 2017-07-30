@@ -9,7 +9,7 @@
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/object.h>
-#include <celib/string_stream.h>
+#include <celib/buffer.inl>
 
 
 #include "cetech/core/log/log.h"
@@ -90,13 +90,13 @@ const char *get_module_name(const char *path,
     return name;
 }
 
-void get_module_fce_name(string_stream::Buffer &buffer,
+void get_module_fce_name(Buffer &buffer,
                          const char *name,
                          uint32_t name_len,
                          const char *fce_name) {
     celib::array::clear(buffer);
-    celib::string_stream::push(buffer, name, name_len);
-    string_stream::printf(buffer, fce_name);
+    celib::buffer::push(buffer, name, name_len);
+    buffer::printf(buffer, fce_name);
 }
 
 
@@ -104,7 +104,7 @@ bool get_module_functions_from_path(module_functios *module,
                                     const char *path) {
     uint32_t name_len;
     const char *name = get_module_name(path, &name_len);
-    celib::string_stream::Buffer buffer(ct_memory_a0.main_allocator());
+    celib::Buffer buffer(ct_memory_a0.main_allocator());
 
     get_module_fce_name(buffer, name, name_len, "_load_module");
 
@@ -115,7 +115,7 @@ bool get_module_functions_from_path(module_functios *module,
 
     auto load_fce = (ct_load_module_t) ct_object_a0.load_function(
             obj,
-            celib::string_stream::c_str(buffer));
+            celib::buffer::c_str(buffer));
     if (load_fce == NULL) {
         return false;
     }
@@ -124,7 +124,7 @@ bool get_module_functions_from_path(module_functios *module,
 
     auto unload_fce = (ct_unload_module_t) ct_object_a0.load_function(
             obj,
-            celib::string_stream::c_str(buffer));
+            celib::buffer::c_str(buffer));
     if (unload_fce == NULL) {
         return false;
     }
@@ -133,7 +133,7 @@ bool get_module_functions_from_path(module_functios *module,
 
     ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_object_a0.load_function(
             obj,
-            celib::string_stream::c_str(buffer));
+            celib::buffer::c_str(buffer));
     if (initapi_fce == NULL) {
         return false;
     }
@@ -184,7 +184,6 @@ namespace module {
     }
 
     void reload(const char *path) {
-        CEL_UNUSED(path);
         for (size_t i = 0; i < MAX_MODULES; ++i) {
             module_functios old_module = _G.modules[i];
 

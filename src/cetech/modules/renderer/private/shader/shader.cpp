@@ -6,9 +6,9 @@
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
@@ -26,7 +26,7 @@
 #include "cetech/core/os/vio.h"
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 namespace shader_compiler {
     int init(ct_api_a0 *api);

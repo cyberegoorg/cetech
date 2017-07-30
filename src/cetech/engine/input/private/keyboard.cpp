@@ -8,12 +8,14 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/core/module/module.h>
+#include <cetech/engine/application/application.h>
 #include "celib/allocator.h"
 #include "celib/eventstream.inl"
 #include "keystr.h"
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_app_a0);
 
 //==============================================================================
 // Defines
@@ -87,7 +89,7 @@ namespace keyboard {
         return !_G.state[button_index] && _G.last_state[button_index];
     }
 
-    void _update() {
+    void _update(float dt) {
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, 512);
@@ -121,7 +123,6 @@ namespace keyboard_module {
             .button_state = keyboard::button_state,
             .button_pressed = keyboard::button_pressed,
             .button_released = keyboard::button_released,
-            .update = keyboard::_update
     };
 
     void _init_api(ct_api_a0 *api) {
@@ -133,6 +134,9 @@ namespace keyboard_module {
 
 
         _G = (struct G) {};
+
+        ct_app_a0.register_on_update(keyboard::_update);
+
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
@@ -149,6 +153,7 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_app_a0);
         },
         {
             keyboard_module::_init(api);

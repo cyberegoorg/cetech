@@ -18,6 +18,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCETECH_DEBUG)
 else ()
     set(CONFIGURATION release)
+    set(CONFIGURATION release)
 endif ()
 
 
@@ -74,7 +75,6 @@ set(SOURCE_FILES
         src/cetech/engine/machine/private/keyboard_sdl2.cpp
         src/cetech/engine/machine/private/gamepad_sdl2.cpp
 
-        src/cetech/engine/console_server/private/console_server.cpp
         src/cetech/core/memory/private/allocator_core.cpp
         src/cetech/core/api/private/api_system.cpp
         src/cetech/core/log/private/log_system.cpp
@@ -84,9 +84,8 @@ set(SOURCE_FILES
         src/cetech/core/memory/private/memory.cpp
         src/cetech/core/memory/private/allocator_malloc.cpp
         src/cetech/core/memory/private/allocator_scratch.cpp
-        src/cetech/modules/application/private/application.cpp
+        src/cetech/engine/application/private/application.cpp
         src/cetech/core/task/private/task.cpp
-        src/cetech/engine/develop_system/private/develop_system.cpp
         src/cetech/core/log/private/log_db_handler.cpp
         src/cetech/core/log/private/log_nanomsg_handler.cpp
         src/cetech/core/log/private/log_stdout_handler.cpp
@@ -235,11 +234,11 @@ target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
-target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
-target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+#target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
+#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 add_library(module_example SHARED examples/module_example/example.c)
 set_target_properties(module_example PROPERTIES PREFIX "")

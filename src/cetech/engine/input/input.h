@@ -76,7 +76,6 @@ struct ct_gamepad_a0 {
                         float strength,
                         uint32_t length);
 
-    void (*update)();
 };
 
 //==============================================================================
@@ -113,7 +112,6 @@ struct ct_keyboard_a0 {
     int (*button_released)(uint32_t idx,
                            const uint32_t button_index);
 
-    void (*update)();
 };
 
 //==============================================================================
@@ -167,7 +165,6 @@ struct ct_mouse_a0 {
                  const uint32_t axis_index,
                  float *value);
 
-    void (*update)();
 };
 
 #ifdef __cplusplus

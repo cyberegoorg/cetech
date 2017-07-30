@@ -94,7 +94,6 @@ struct ct_machine_a0 {
                                 float strength,
                                 uint32_t length);
 
-    void (*update)();
 };
 
 #ifdef __cplusplus

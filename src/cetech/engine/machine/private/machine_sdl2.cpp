@@ -13,12 +13,13 @@
 #include "cetech/engine/resource/resource.h"
 #include "cetech/engine/machine/machine.h"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 
 #include <include/SDL2/SDL.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
+CETECH_DECL_API(ct_app_a0);
 
 using namespace celib;
 
@@ -105,16 +106,14 @@ namespace machine_sdl {
                 (eventstream::event_header *) header);
     }
 
-    void _update() {
+    void _update(float dt) {
         eventstream::clear(_G.eventstream);
         SDL_Event e;
 
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
                 case SDL_QUIT: {
-                    ct_app_a0 * app_a0 = (ct_app_a0 *) ct_api_a0.first(
-                            "ct_app_a0").api;
-                    app_a0->quit();
+                    ct_app_a0.quit();
                 }
                     break;
 
@@ -139,7 +138,6 @@ namespace machine_sdl {
             .event_next = machine_sdl::machine_event_next,
             .gamepad_is_active = sdl_gamepad_is_active,
             .gamepad_play_rumble = sdl_gamepad_play_rumble,
-            .update = machine_sdl::_update,
     };
 
     void init(struct ct_api_a0 *api) {
@@ -147,6 +145,9 @@ namespace machine_sdl {
 
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_log_a0);
+        CETECH_GET_API(api, ct_app_a0);
+
+        ct_app_a0.register_on_update(machine_sdl::_update);
 
         _G.eventstream.init(ct_memory_a0.main_allocator());
 

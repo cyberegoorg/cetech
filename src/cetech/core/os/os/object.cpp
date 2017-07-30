@@ -12,7 +12,7 @@ CETECH_DECL_API(ct_log_a0);
 #define LOG_WHERE "object"
 
 void *load_object(const char *path) {
-    void *obj = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+    void *obj = dlopen(path, RTLD_NOW );
 
     CETECH_ASSERT(LOG_WHERE, obj != NULL);
 

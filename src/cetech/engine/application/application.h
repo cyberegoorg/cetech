@@ -28,6 +28,7 @@ struct ct_game_callbacks {
     void (*render)();
 };
 
+typedef void (*ct_app_on_update)(float dt);
 
 //==============================================================================
 // Api
@@ -37,12 +38,11 @@ struct ct_game_callbacks {
 struct ct_app_a0 {
     //! Stop main loop and quit.
     void (*quit)();
-
-//    //! Get main window
-//    //! \return Main window
-//    ct_window *(*main_window)();
-
     void (*start)();
+
+    void (*register_on_update)(ct_app_on_update on_update);
+    void (*unregister_on_update)(ct_app_on_update on_update);
+
 };
 
 #ifdef __cplusplus

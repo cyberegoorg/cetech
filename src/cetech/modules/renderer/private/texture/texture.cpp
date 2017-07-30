@@ -7,7 +7,7 @@
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
 #include "cetech/engine/machine/machine.h"
@@ -15,7 +15,7 @@
 #include "cetech/core/os/vio.h"
 
 #include "cetech/engine/resource/resource.h"
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 
 #include <bgfx/bgfx.h>
 
@@ -23,7 +23,7 @@
 #include "cetech/core/os/path.h"
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 
 namespace texture_compiler {

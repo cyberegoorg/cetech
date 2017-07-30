@@ -4,11 +4,10 @@
 
 #include "celib/allocator.h"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 
 #include <include/mpack/mpack.h>
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/console_server/console_server.h>
 #include <cetech/core/config/config.h>
 #include <cetech/engine/machine/window.h>
 #include <cetech/engine/entity/entity.h>
@@ -27,7 +26,6 @@
 #include "mesh_renderer/mesh_renderer_private.h"
 
 
-CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_window_a0);
@@ -220,12 +218,11 @@ namespace renderer_module {
             mesh::init(api);
 
             CETECH_GET_API(api, ct_mesh_renderer_a0);
-
-            ct_console_srv_a0.register_command("renderer.resize",
-                                               _cmd_resize);
         }
 
         CETECH_GET_API(api, ct_window_a0);
+
+        renderer_create();
     }
 
     void _shutdown() {
@@ -250,7 +247,6 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_console_srv_a0);
             CETECH_GET_API(api, ct_memory_a0);
         },
         {

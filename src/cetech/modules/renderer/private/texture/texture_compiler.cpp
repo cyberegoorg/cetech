@@ -8,7 +8,7 @@
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
 #include "cetech/engine/machine/machine.h"
@@ -18,14 +18,14 @@
 #include <cstdio>
 #include <cetech/core/config/config.h>
 #include "cetech/core/yaml/yaml.h"
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 #include "texture_blob.h"
 #include "cetech/core/os/path.h"
 #include "cetech/core/os/process.h"
 #include "cetech/core/os/vio.h"
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -43,7 +43,7 @@ namespace texture_compiler {
                          int gen_mipmaps,
                          int is_normalmap) {
 
-        string_stream::Buffer buffer(ct_memory_a0.main_allocator());
+        celib::Buffer buffer(ct_memory_a0.main_allocator());
 
         char *texturec = ct_resource_a0.compiler_external_join(
                 ct_memory_a0.main_allocator(),

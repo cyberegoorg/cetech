@@ -8,7 +8,7 @@
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
@@ -23,12 +23,12 @@
 #include "cetech/engine/machine/machine.h"
 #include "cetech/engine/resource/resource.h"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 
 #include "shader_blob.h"
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0)
 CETECH_DECL_API(ct_resource_a0)
@@ -49,7 +49,7 @@ namespace shader_compiler {
                         const char *platform,
                         const char *profile) {
 
-        string_stream::Buffer buffer(ct_memory_a0.main_allocator());
+        celib::Buffer buffer(ct_memory_a0.main_allocator());
 
         char *shaderc = ct_resource_a0.compiler_external_join(
                 ct_memory_a0.main_allocator(),
@@ -58,7 +58,7 @@ namespace shader_compiler {
         buffer << shaderc;
         CEL_FREE(ct_memory_a0.main_allocator(), shaderc);
 
-        string_stream::printf(buffer,
+        buffer::printf(buffer,
                               ""
                                       " -f %s"
                                       " -o %s"
@@ -72,7 +72,7 @@ namespace shader_compiler {
                               input, output, include_path, type, platform,
                               profile);
 
-        int status = ct_process_a0.exec(string_stream::c_str(buffer));
+        int status = ct_process_a0.exec(buffer::c_str(buffer));
 
         ct_log_a0.debug("shaderc", "STATUS %d", status);
 

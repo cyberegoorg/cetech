@@ -14,7 +14,7 @@
 
 #endif
 
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
@@ -25,7 +25,7 @@ CETECH_DECL_API(ct_vio_a0);
 #endif
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 //==============================================================================
 // File Interface

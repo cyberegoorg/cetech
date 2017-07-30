@@ -7,10 +7,9 @@
 #include "celib/array.inl"
 #include "celib/map.inl"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/engine/console_server/console_server.h>
 #include <cetech/engine/filesystem/filesystem.h>
 #include <cetech/core/config/config.h>
 #include <cetech/core/os/path.h>
@@ -27,7 +26,6 @@
 #include "resource.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_path_a0);
@@ -625,9 +623,6 @@ namespace resource_module {
         resource::resource_register_type(ct_hash_a0.id64_from_str("package"),
                                          package_resource::package_resource_callback);
 
-        ct_console_srv_a0.register_command("resource.reload_all",
-                                           _cmd_reload_all);
-
         package_init(api);
 
     }
@@ -646,7 +641,6 @@ namespace resource_module {
 CETECH_MODULE_DEF(
         resourcesystem,
         {
-            CETECH_GET_API(api, ct_console_srv_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_config_a0);

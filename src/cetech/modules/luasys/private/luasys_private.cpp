@@ -13,11 +13,10 @@ extern "C" {
 #include "cetech/core/os/vio.h"
 #include "cetech/core/config/config.h"
 #include "cetech/core/hashlib/hashlib.h"
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include "cetech/core/log/log.h"
 
 #include "cetech/engine/resource/resource.h"
-#include "cetech/engine/console_server/console_server.h"
 
 #include <include/mpack/mpack.h>
 #include <cetech/modules/luasys/luasys.h>
@@ -26,7 +25,6 @@ extern "C" {
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -771,10 +769,6 @@ static void _init(ct_api_a0 *a0) {
 
     _register_all_api(a0);
 
-//    luasys_add_module_function("module", "reload", _reload_module);
-    ct_console_srv_a0.register_command("lua_system.execute",
-                                       _cmd_execute_string);
-
     ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
     ct_resource_a0.compiler_register(_G.type_id, _lua_compiler);
@@ -846,11 +840,10 @@ void luasys_call_global(const char *func,
 CETECH_MODULE_DEF(
         luasys,
         {
-            CETECH_GET_API(api, ct_console_srv_a0);
-            CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_resource_a0);
 
         },
         {

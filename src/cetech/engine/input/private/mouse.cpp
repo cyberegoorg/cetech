@@ -4,6 +4,7 @@
 
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/input/input.h>
+#include <cetech/engine/application/application.h>
 #include "celib/allocator.h"
 #include "cetech/core/config/config.h"
 #include "celib/eventstream.inl"
@@ -17,6 +18,7 @@
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_app_a0);
 
 
 //==============================================================================
@@ -145,7 +147,7 @@ namespace mouse {
 //        //TODO: implement
 //    }
 
-    void update() {
+    void update(float dt) {
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -196,7 +198,6 @@ namespace mouse_module {
             .axis_index = mouse::axis_index,
             .axis_name = mouse::axis_name,
             .axis = mouse::axis,
-            .update = mouse::update
     };
 
     void _init_api(ct_api_a0 *api) {
@@ -206,8 +207,9 @@ namespace mouse_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-
         _G = {};
+
+        ct_app_a0.register_on_update(mouse::update);
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
@@ -225,6 +227,7 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_app_a0);
 
         },
         {

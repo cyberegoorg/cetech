@@ -7,7 +7,7 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/task/task.h>
@@ -19,11 +19,11 @@
 #include <cetech/engine/resource/resource.h>
 #include <cetech/core/module/module.h>
 
-#include "celib/string_stream.h"
+#include "celib/buffer.inl"
 
 
 using namespace celib;
-using namespace string_stream;
+using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -371,12 +371,12 @@ char *resource_compiler_external_join(cel_alloc *alocator,
     char *tmp_dir = ct_path_a0.join(alocator, 2, external_dir_str,
                                     ct_config_a0.get_string(native_platform));
 
-    string_stream::Buffer buffer(alocator);
-    string_stream::printf(buffer, "%s64", tmp_dir);
+    celib::Buffer buffer(alocator);
+    buffer::printf(buffer, "%s64", tmp_dir);
     CEL_FREE(alocator, tmp_dir);
 
-    string_stream::c_str(buffer);
-    return ct_path_a0.join(alocator, 4, string_stream::c_str(buffer), "release",
+    buffer::c_str(buffer);
+    return ct_path_a0.join(alocator, 4, buffer::c_str(buffer), "release",
                            "bin", name);
 }
 

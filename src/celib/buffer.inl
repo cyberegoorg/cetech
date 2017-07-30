@@ -13,11 +13,11 @@
 #include "array.inl"
 
 namespace celib {
+    typedef Array<char> Buffer;
+
     /// Functions for operating on an Array<char> as a stream of characters,
     /// useful for string formatting, etc.
-    namespace string_stream {
-        typedef Array<char> Buffer;
-
+    namespace buffer {
         /// Dumps the item to the stream using a default formatting.
         Buffer &operator<<(Buffer &b,
                            char c);
@@ -65,7 +65,7 @@ namespace celib {
     }
 
     namespace string_stream_internal {
-        using namespace string_stream;
+        using namespace buffer;
 
         template<typename T>
         inline Buffer &printf_small(Buffer &b,
@@ -77,7 +77,7 @@ namespace celib {
         }
     }
 
-    namespace string_stream {
+    namespace buffer {
         inline Buffer &operator<<(Buffer &b,
                                   char c) {
             array::push_back(b, c);

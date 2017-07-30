@@ -5,50 +5,38 @@
 #include <unistd.h>
 
 
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include <cetech/engine/entity/entity.h>
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/console_server/console_server.h>
-#include <cetech/engine/develop_system/develop.h>
-#include <cetech/modules/renderer/renderer.h>
 #include <cetech/engine/resource/package.h>
 #include <cetech/core/task/task.h>
 #include <cetech/modules/luasys/luasys.h>
 #include <cetech/core/config/config.h>
-#include <cetech/engine/machine/window.h>
 #include <cetech/core/os/time.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/log/log.h>
 #include <cetech/core/hashlib/hashlib.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/engine/input/input.h>
 #include <cetech/engine/resource/resource.h>
 
 #include <include/mpack/mpack.h>
 #include <celib/macros.h>
-#include <cetech/core/api/private/api_private.h>
 #include <cetech/core/module/module.h>
+#include <celib/container_types.inl>
+#include <celib/array.inl>
 
-CETECH_DECL_API(ct_console_srv_a0);
-CETECH_DECL_API(ct_develop_a0);
-CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
 CETECH_DECL_API(ct_task_a0);
-CETECH_DECL_API(ct_lua_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_window_a0);
 CETECH_DECL_API(ct_time_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_memory_a0);
-//CETECH_DECL_API(ct_api_a0);
-CETECH_DECL_API(ct_machine_a0);
-CETECH_DECL_API(ct_keyboard_a0);
-CETECH_DECL_API(ct_mouse_a0);
-CETECH_DECL_API(ct_gamepad_a0);
+
+CETECH_DECL_API(ct_lua_a0);
 
 //==============================================================================
 // Definess
@@ -76,6 +64,7 @@ struct GConfig {
 
 static struct ApplicationGlobals {
     struct GConfig config;
+    celib::Array<ct_app_on_update> on_update;
 
     const ct_game_callbacks *game;
 
@@ -100,13 +89,6 @@ static int _cmd_wait(mpack_node_t args,
 //==============================================================================
 // Interface
 //==============================================================================
-
-const char *application_platform();
-
-const char *application_native_platform();
-
-ct_window *application_get_main_window();
-
 
 void application_quit() {
     _G.is_running = 0;
@@ -172,17 +154,7 @@ static void _boot_unload() {
 
 
 extern "C" void application_start() {
-    _G = {};
-
     _init_config();
-
-    ct_console_srv_a0.register_command("wait", _cmd_wait);
-
-#if defined(CETECH_DEVELOP)
-    ct_resource_a0.set_autoload(1);
-#else
-    ct_resource_a0.set_autoload(0);
-#endif
 
 #ifdef CETECH_CAN_COMPILE
     if (ct_config_a0.get_int(_G.config.compile)) {
@@ -193,8 +165,6 @@ extern "C" void application_start() {
         }
     }
 #endif
-
-    ct_renderer_a0.create();
 
     _boot_stage();
 
@@ -214,10 +184,7 @@ extern "C" void application_start() {
     float frame_time = (1.0f / frame_limit);
     float frame_time_accum = 0.0f;
 
-    ct_console_srv_a0.push_begin();
     while (_G.is_running) {
-        auto application_sd = ct_develop_a0.enter_scope("Application:update()",
-                                                        ct_task_a0.worker_id());
 
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt =
@@ -227,29 +194,20 @@ extern "C" void application_start() {
         last_tick = now_ticks;
         frame_time_accum += dt;
 
-        ct_machine_a0.update();
-        ct_keyboard_a0.update();
-        ct_mouse_a0.update();
-        ct_gamepad_a0.update();
-        ct_console_srv_a0.update();
+        for(uint32_t i  = 0; i < celib::array::size(_G.on_update); ++i) {
+            _G.on_update[i](dt);
+        }
 
         _G.game->update(dt);
 
         if (frame_time_accum >= frame_time) {
             if (!ct_config_a0.get_int(_G.config.daemon)) {
-                auto render_sd = ct_develop_a0.enter_scope("Game:render()",
-                                                           ct_task_a0.worker_id());
                 _G.game->render();
-                ct_develop_a0.leave_scope(render_sd);
             }
 
             frame_time_accum = 0.0f;
         }
 
-        ct_develop_a0.leave_scope(application_sd);
-        ct_develop_a0.push_record_float("engine.delta_time", dt);
-
-        ct_develop_a0.after_update(dt);
         //thread_yield();
     }
 
@@ -258,10 +216,43 @@ extern "C" void application_start() {
     _boot_unload();
 }
 
+void register_on_update(ct_app_on_update on_update) {
+    celib::array::push_back(_G.on_update, on_update);
+}
+
+void unregister_on_update(ct_app_on_update on_update) {
+    const auto size = celib::array::size(_G.on_update);
+
+    for(uint32_t i = 0; i < size; ++i) {
+        if(_G.on_update[i] != on_update) {
+            continue;
+        }
+
+        uint32_t last_idx = size - 1;
+        _G.on_update[i] = _G.on_update[last_idx];
+
+        celib::array::pop_back(_G.on_update);
+        break;
+    }
+}
+
 static ct_app_a0 a0 = {
         .quit = application_quit,
-        .start = application_start
+        .start = application_start,
+        .register_on_update = register_on_update,
+        .unregister_on_update = unregister_on_update
 };
+
+void app_init(ct_api_a0 *api) {
+    api->register_api("ct_app_a0", &a0);
+
+#if defined(CETECH_DEVELOP)
+    ct_resource_a0.set_autoload(1);
+#else
+    ct_resource_a0.set_autoload(0);
+#endif
+    _G.on_update.init(ct_memory_a0.main_allocator());
+}
 
 CETECH_MODULE_DEF(
         application,
@@ -272,26 +263,17 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
 
-            CETECH_GET_API(api, ct_console_srv_a0);
-            CETECH_GET_API(api, ct_develop_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_package_a0);
             CETECH_GET_API(api, ct_task_a0);
-            CETECH_GET_API(api, ct_lua_a0);
-            CETECH_GET_API(api, ct_window_a0);
-            CETECH_GET_API(api, ct_machine_a0);
-
-            CETECH_GET_API(api, ct_keyboard_a0);
-            CETECH_GET_API(api, ct_mouse_a0);
-            CETECH_GET_API(api, ct_gamepad_a0);
             CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_lua_a0);
         },
         {
-            api->register_api("ct_app_a0", &a0);
+            app_init(api);
         },
         {
             CEL_UNUSED(api);
-
+            _G.on_update.destroy();
         }
 )

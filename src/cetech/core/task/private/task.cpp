@@ -4,7 +4,6 @@
 
 
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/develop_system/develop.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/os/thread.h>
 #include <cetech/core/os/cpu.h>
@@ -14,7 +13,6 @@
 
 #include "task_queue.h"
 
-CETECH_DECL_API(ct_develop_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_cpu_a0);
@@ -188,12 +186,7 @@ namespace taskmanager {
             return 0;
         }
 
-        auto sd = ct_develop_a0.enter_scope(_G._task_pool[t.id].name,
-                                            _worker_id);
-
         _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
-
-        ct_develop_a0.leave_scope(sd);
 
         _mark_task_job_done(t);
 
@@ -232,7 +225,6 @@ namespace taskmanager_module {
     static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        CETECH_GET_API(api, ct_develop_a0);
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_thread_a0);
         CETECH_GET_API(api, ct_log_a0);

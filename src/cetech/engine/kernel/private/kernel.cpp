@@ -1,4 +1,4 @@
-#include <cetech/modules/application/application.h>
+#include <cetech/engine/application/application.h>
 #include "celib/allocator.h"
 
 #include "cetech/core/api/api_system.h"
@@ -126,16 +126,17 @@ extern "C" int cetech_kernel_init(int argc,
     init_config(argc, argv);
 
     CETECH_ADD_STATIC_MODULE(blob);
-    CETECH_ADD_STATIC_MODULE(machine);
-    CETECH_ADD_STATIC_MODULE(developsystem);
     CETECH_ADD_STATIC_MODULE(task);
-    CETECH_ADD_STATIC_MODULE(consoleserver);
     CETECH_ADD_STATIC_MODULE(filesystem);
     CETECH_ADD_STATIC_MODULE(resourcesystem);
 
 #ifdef CETECH_CAN_COMPILE
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 #endif
+
+    CETECH_ADD_STATIC_MODULE(luasys);
+    CETECH_ADD_STATIC_MODULE(application);
+    CETECH_ADD_STATIC_MODULE(machine);
 
     CETECH_ADD_STATIC_MODULE(world);
     CETECH_ADD_STATIC_MODULE(component);

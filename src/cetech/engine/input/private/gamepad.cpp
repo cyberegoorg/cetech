@@ -8,12 +8,14 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/core/module/module.h>
+#include <cetech/engine/application/application.h>
 #include "celib/allocator.h"
 #include "celib/eventstream.inl"
 #include "gamepadstr.h"
 
 CETECH_DECL_API(ct_log_a0)
 CETECH_DECL_API(ct_machine_a0);
+CETECH_DECL_API(ct_app_a0);
 
 //==============================================================================
 // Defines
@@ -132,7 +134,7 @@ namespace gamepad {
         ct_machine_a0.gamepad_play_rumble(idx, strength, length);
     }
 
-    static void update() {
+    static void update(float dt) {
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state,
@@ -190,7 +192,6 @@ namespace gamepad_module {
             .axis_name = gamepad::axis_name,
             .axis = gamepad::axis,
             .play_rumble = gamepad::play_rumble,
-            .update = gamepad::update
     };
 
     static void _init_api(ct_api_a0 *api) {
@@ -199,10 +200,9 @@ namespace gamepad_module {
 
     static void _init(ct_api_a0 *api) {
         _init_api(api);
-
-
-
         _G = {};
+
+        ct_app_a0.register_on_update(gamepad::update);
 
         ct_log_a0.debug(LOG_WHERE, "Init");
 
@@ -223,6 +223,7 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_app_a0);
         },
         {
             gamepad_module::_init(api);
