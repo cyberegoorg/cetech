@@ -4,13 +4,15 @@
 
 #include <stdlib.h>
 #include <memory.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/os/path.h>
-#include <cetech/core/os/object.h>
+
 #include <celib/buffer.inl>
 
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/object.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/config/config.h>
 
 #include "cetech/core/log/log.h"
 
@@ -39,6 +41,7 @@ static struct ModuleSystemGlobals {
     module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
+    ct_cvar module_dir;
 } _G = {};
 
 CETECH_DECL_API(ct_memory_a0);
@@ -46,13 +49,13 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_object_a0);
+CETECH_DECL_API(ct_config_a0);
 
 using namespace celib;
 
 //==============================================================================
 // Private
 //==============================================================================
-
 
 void add_module(const char *path,
                 module_functios *module) {
@@ -231,9 +234,11 @@ namespace module {
     }
 
 
-    void load_dirs(const char *path) {
+    void load_dirs() {
         char **files = nullptr;
         uint32_t files_count = 0;
+
+        const char* path = ct_config_a0.get_string(_G.module_dir);
 
         ct_path_a0.list(path, 1, &files, &files_count,
                         ct_memory_a0.main_allocator());
@@ -278,14 +283,16 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_object_a0);
+            CETECH_GET_API(api, ct_config_a0);
         },
         {
 
             ct_api_a0 = *api;
 
             api->register_api("ct_module_a0", &module::module_api);
-
             _G = {};
+
+            _G.module_dir = ct_config_a0.new_str("module_dir", "module dir", "./bin/");
         },
         {
             CEL_UNUSED(api);

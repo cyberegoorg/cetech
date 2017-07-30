@@ -82,12 +82,8 @@ int init_config(int argc,
         return 0;
     }
 
-    ct_config_a0.log_all();
-
     return 1;
 }
-
-void application_register_api(ct_api_a0 *api);
 
 extern "C" int cetech_kernel_init(int argc,
                                   const char **argv) {
@@ -148,8 +144,9 @@ extern "C" int cetech_kernel_init(int argc,
 
     CETECH_GET_API(api, ct_app_a0);
 
-    ct_module_a0.load_dirs("./bin");
+    ct_module_a0.load_dirs();
 
+    ct_config_a0.log_all();
     return 1;
 }
 

@@ -24,7 +24,6 @@
 #include <cetech/core/module/module.h>
 #include <celib/container_types.inl>
 #include <celib/array.inl>
-#include <cetech/core/os/thread.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -69,18 +68,6 @@ static struct ApplicationGlobals {
     int is_running;
 } _G;
 
-
-//==============================================================================
-// Private
-//==============================================================================
-
-
-static int _cmd_wait(mpack_node_t args,
-                     mpack_writer_t *writer) {
-    CEL_UNUSED(args);
-    CEL_UNUSED(writer);
-    return 0;
-}
 
 //==============================================================================
 // Interface
@@ -186,10 +173,10 @@ extern "C" void application_start() {
 
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
-    void register_ ## name ## _(type name) {                                     \
+    void register_ ## name ## _(type name) {                                   \
         celib::array::push_back(_G.name, name);                                \
     }                                                                          \
-    void unregister_## name ## _(type name) {                                   \
+    void unregister_## name ## _(type name) {                                  \
         const auto size = celib::array::size(_G.name);                         \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
