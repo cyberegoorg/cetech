@@ -3,8 +3,8 @@
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/log/log.h>
 #include <cetech/core/module/module.h>
-#include "cetech/core/config/config.h"
-#include "cetech/engine/input/input.h"
+#include <cetech/core/config/config.h>
+#include <cetech/engine/input/input.h>
 #include <cetech/engine/application/application.h>
 
 CETECH_DECL_API(ct_log_a0)
@@ -26,7 +26,7 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(api);
-            ct_log_a0.info("example", "Init cccc %d", reload);
+            ct_log_a0.info("example", "Init %d", reload);
             ct_app_a0.register_on_update(update);
         },
         {

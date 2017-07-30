@@ -230,14 +230,6 @@ struct ct_lua_a0 {
                                 const char *name,
                                 const lua_CFunction func);
 
-    //! Get game callbacks
-    //! \return Lua game callbacks
-    const struct ct_game_callbacks *(*get_game_callbacks)();
-
-    //! Execute boot script
-    //! \param Boot script name
-    void (*execute_boot_script)(uint64_t name);
-
     //! Call global function
     //! \example lua_a0.call_global("print", "if", 1, 2.0f);
     //! \param func Function name

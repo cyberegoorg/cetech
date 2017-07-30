@@ -134,7 +134,6 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 #endif
 
-    CETECH_ADD_STATIC_MODULE(luasys);
     CETECH_ADD_STATIC_MODULE(application);
     CETECH_ADD_STATIC_MODULE(machine);
 

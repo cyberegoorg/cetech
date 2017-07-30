@@ -20,6 +20,7 @@ extern "C" {
 
 #include <include/mpack/mpack.h>
 #include <cetech/modules/luasys/luasys.h>
+#include <cetech/core/api/private/api_private.h>
 #include "cetech/core/os/errors.h"
 #include "cetech/engine/entity/entity.h"
 #include "cetech/core/module/module.h"
@@ -28,6 +29,9 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_app_a0);
+
 
 #include "matrix.h"
 #include "vectors.h"
@@ -65,7 +69,9 @@ static struct G {
     float _temp_mat44f_buffer[TEMP_VAR_COUNT][16];
     float _temp_quat_buffer[TEMP_VAR_COUNT][3];
 
+    ct_cvar boot_script;
 } LuaGlobals = {};
+
 
 //==============================================================================
 // Private
@@ -122,33 +128,6 @@ float *_new_tmp_quat() {
 //==============================================================================
 
 
-int _game_init_clb() {
-    luasys_call_global("init", NULL);
-    return 1;
-}
-
-void _game_shutdown_clb() {
-    luasys_call_global("shutdown", NULL);
-}
-
-void _game_update_clb(float dt) {
-    _G._temp_vec3f_used = 0;
-    _G._temp_mat44f_used = 0;
-    _G._temp_quat_used = 0;
-
-    luasys_call_global("update", "f", dt);
-}
-
-void _game_render_clb() {
-    luasys_call_global("render", NULL);
-}
-
-static const ct_game_callbacks _GameCallbacks = {
-        .init = _game_init_clb,
-        .shutdown = _game_shutdown_clb,
-        .update = _game_update_clb,
-        .render = _game_render_clb
-};
 
 #define REGISTER_LUA_API(name, api) \
     void _register_lua_##name##_api(ct_api_a0 *api);\
@@ -725,8 +704,6 @@ static void _init_api(ct_api_a0 *api) {
     _api.add_module_function = luasys_add_module_function;
     //_api.add_module_constructor = luasys_add_module_constructor;
     _api.execute_resource = luasys_execute_resource;
-    _api.get_game_callbacks = luasys_get_game_callbacks;
-    _api.execute_boot_script = luasys_execute_boot_script;
     _api.call_global = luasys_call_global;
     _api.to_u64 = luasys_to_u64;
     _api.is_vec3f = _is_vec3f;
@@ -737,8 +714,38 @@ static void _init_api(ct_api_a0 *api) {
 }
 
 
+
+void _game_init_clb() {
+    uint64_t boot_script = ct_hash_a0.id64_from_str(
+            ct_config_a0.get_string(_G.boot_script));
+    luasys_execute_boot_script(boot_script);
+
+    luasys_call_global("init", NULL);
+}
+
+void _game_shutdown_clb() {
+    luasys_call_global("shutdown", NULL);
+}
+
+void _game_update_clb(float dt) {
+    _G._temp_vec3f_used = 0;
+    _G._temp_mat44f_used = 0;
+    _G._temp_quat_used = 0;
+
+    luasys_call_global("update", "f", dt);
+}
+
+void _game_render_clb() {
+    luasys_call_global("render", NULL);
+}
+
 static void _init(ct_api_a0 *a0) {
     _init_api(a0);
+
+
+    _G.boot_script = ct_config_a0.new_str("core.boot_script",
+                                        "Boot script", "lua/boot"),
+
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 
@@ -769,6 +776,11 @@ static void _init(ct_api_a0 *a0) {
 
     _register_all_api(a0);
 
+    ct_app_a0.register_on_init(_game_init_clb);
+    ct_app_a0.register_on_shutdown(_game_shutdown_clb);
+    ct_app_a0.register_on_update(_game_update_clb);
+    ct_app_a0.register_on_render(_game_render_clb);
+
     ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
     ct_resource_a0.compiler_register(_G.type_id, _lua_compiler);
@@ -778,14 +790,16 @@ static void _init(ct_api_a0 *a0) {
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
+    ct_app_a0.unregister_on_init(_game_init_clb);
+    ct_app_a0.unregister_on_shutdown(_game_shutdown_clb);
+    ct_app_a0.unregister_on_update(_game_update_clb);
+    ct_app_a0.unregister_on_render(_game_render_clb);
+
     lua_close(_G.L);
 
     _G = (struct G) {};
 }
 
-const ct_game_callbacks *luasys_get_game_callbacks() {
-    return &_GameCallbacks;
-}
 
 void luasys_execute_boot_script(uint64_t name) {
     luasys_execute_resource(name);
@@ -844,6 +858,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_app_a0);
 
         },
         {

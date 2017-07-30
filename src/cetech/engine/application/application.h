@@ -18,17 +18,10 @@ struct ct_window;
 // Struct
 //==============================================================================
 
-struct ct_game_callbacks {
-    int (*init)();
-
-    void (*shutdown)();
-
-    void (*update)(float dt);
-
-    void (*render)();
-};
-
+typedef void (*ct_app_on_init)();
+typedef void (*ct_app_on_shutdown)();
 typedef void (*ct_app_on_update)(float dt);
+typedef void (*ct_app_on_render)();
 
 //==============================================================================
 // Api
@@ -40,9 +33,17 @@ struct ct_app_a0 {
     void (*quit)();
     void (*start)();
 
+    void (*register_on_init)(ct_app_on_init on_init);
+    void (*unregister_on_init)(ct_app_on_init on_init);
+
+    void (*register_on_shutdown)(ct_app_on_shutdown on_shutdown);
+    void (*unregister_on_shutdown)(ct_app_on_shutdown on_shutdown);
+
     void (*register_on_update)(ct_app_on_update on_update);
     void (*unregister_on_update)(ct_app_on_update on_update);
 
+    void (*register_on_render)(ct_app_on_render on_render);
+    void (*unregister_on_render)(ct_app_on_render on_render);
 };
 
 #ifdef __cplusplus
