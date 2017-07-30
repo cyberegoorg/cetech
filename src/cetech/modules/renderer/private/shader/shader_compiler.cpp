@@ -8,22 +8,24 @@
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
+#include "celib/string_stream.h"
 
-#include "cetech/core/hashlib/hashlib.h"
-#include <cetech/application/application.h>
-#include "cetech/core/memory/memory.h"
-#include "cetech/engine/machine/machine.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
 #include "cetech/core/yaml/yaml.h"
-
-
-#include "cetech/engine/resource/resource.h"
-#include "celib/string_stream.h"
-#include "shader_blob.h"
 #include "cetech/core/os/path.h"
 #include "cetech/core/os/process.h"
 #include "cetech/core/os/vio.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include <cetech/core/config/config.h>
+#include "cetech/core/memory/memory.h"
+
+#include "cetech/engine/machine/machine.h"
+#include "cetech/engine/resource/resource.h"
+
+#include <cetech/application/application.h>
+
+#include "shader_blob.h"
 
 using namespace celib;
 using namespace string_stream;
@@ -36,6 +38,7 @@ CETECH_DECL_API(ct_vio_a0)
 CETECH_DECL_API(ct_process_a0)
 CETECH_DECL_API(ct_log_a0)
 CETECH_DECL_API(ct_hash_a0)
+CETECH_DECL_API(ct_config_a0)
 
 
 namespace shader_compiler {
@@ -142,8 +145,10 @@ namespace shader_compiler {
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
 
-        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                            ct_app_a0.platform());
+        auto kernel_platform = ct_config_a0.find("kernel.platform");
+        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(
+                a,
+                ct_config_a0.get_string(kernel_platform));
 
         //////// VS
         yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
@@ -227,6 +232,7 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_process_a0);
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
+        CETECH_GET_API(api, ct_config_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"),
                                          compiler);

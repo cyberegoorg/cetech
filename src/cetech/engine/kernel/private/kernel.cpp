@@ -42,8 +42,10 @@ const char *_platform() {
     return NULL;
 }
 
-int load_config(int argc,
+int init_config(int argc,
                 const char **argv) {
+    auto kernel_platform = ct_config_a0.new_str("kernel.platform", "Kernel platform", _platform());
+    ct_config_a0.new_str("kernel.native_platform", "Kernel native platform", _platform());
 
     if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
@@ -54,7 +56,7 @@ int load_config(int argc,
     ct_cvar bd = ct_config_a0.find("build");
     const char *build_dir_str = ct_config_a0.get_string(bd);
 
-    char *build_dir = ct_path_a0.join(a, 2, build_dir_str, _platform());
+    char *build_dir = ct_path_a0.join(a, 2, build_dir_str, ct_config_a0.get_string(kernel_platform));
     char *build_config = ct_path_a0.join(a, 2, build_dir, "global.config");
 
 #ifdef CETECH_CAN_COMPILE
@@ -121,7 +123,7 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_module_a0);
 
-    load_config(argc, argv);
+    init_config(argc, argv);
 
     application_register_api(api);
 

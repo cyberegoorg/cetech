@@ -612,10 +612,12 @@ namespace resource_module {
         _G.resource_callbacks.init(ct_memory_a0.main_allocator());
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
+        auto platform = ct_config_a0.find("kernel.platform");
+
         char *build_dir_full = ct_path_a0.join(
                 ct_memory_a0.main_allocator(), 2,
                 ct_config_a0.get_string(_G.config.build_dir),
-                ct_app_a0.platform());
+                ct_config_a0.get_string(platform));
 
         ct_filesystem_a0.map_root_dir(
                 ct_hash_a0.id64_from_str("build"),

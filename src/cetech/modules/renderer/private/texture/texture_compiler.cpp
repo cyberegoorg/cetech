@@ -16,6 +16,7 @@
 
 #include "cetech/engine/resource/resource.h"
 #include <cstdio>
+#include <cetech/core/config/config.h>
 #include "cetech/core/yaml/yaml.h"
 #include "celib/string_stream.h"
 #include "texture_blob.h"
@@ -34,6 +35,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_config_a0);
 
 namespace texture_compiler {
 
@@ -96,6 +98,9 @@ namespace texture_compiler {
 
         auto a = ct_memory_a0.main_allocator();
 
+        auto platform = ct_config_a0.find("kernel.platform");
+
+
         // TODO: temp cel_alloc?
         char input_str[1024] = {};
         char output_path[1024] = {};
@@ -123,7 +128,7 @@ namespace texture_compiler {
 
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                            ct_app_a0.platform());
+                                                            ct_config_a0.get_string(platform));
 
         yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 
@@ -175,6 +180,7 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_process_a0);
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
+        CETECH_GET_API(api, ct_config_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("texture"),
                                          compiler);

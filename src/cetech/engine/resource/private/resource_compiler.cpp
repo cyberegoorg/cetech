@@ -21,8 +21,6 @@
 
 #include "celib/string_stream.h"
 
-#include "celib/array.inl"
-
 
 using namespace celib;
 using namespace string_stream;
@@ -257,8 +255,10 @@ static void _init(ct_api_a0 *api) {
 
     _init_cvar(ct_config_a0);
 
+    auto platform = ct_config_a0.find("kernel.platform");
+
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), ct_app_a0.platform());
+            ct_memory_a0.main_allocator(), ct_config_a0.get_string(platform));
 
     ct_path_a0.make_path(build_dir_full);
     builddb_init_db(build_dir_full, &ct_path_a0, &ct_memory_a0);
@@ -282,9 +282,10 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
     CEL_UNUSED(config, app);
 
-    const char *platform = ct_app_a0.platform();
+    auto platform = ct_config_a0.find("kernel.platform");
+
     char *build_dir_full = resource_compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), platform);
+            ct_memory_a0.main_allocator(), ct_config_a0.get_string(platform));
 
     ct_path_a0.make_path(build_dir_full);
 
@@ -309,9 +310,11 @@ void resource_compiler_compile_all() {
     const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
+    auto platform = ct_config_a0.find("kernel.platform");
+
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
             ct_memory_a0.main_allocator(),
-            ct_app_a0.platform()
+            ct_config_a0.get_string(platform)
     );
 
     Array<ct_task_item> tasks(ct_memory_a0.main_allocator());
@@ -364,8 +367,10 @@ char *resource_compiler_external_join(cel_alloc *alocator,
                                       const char *name) {
     const char *external_dir_str = ct_config_a0.get_string(_G.cv_external_dir);
 
+    auto native_platform = ct_config_a0.find("kernel.native_platform");
+
     char *tmp_dir = ct_path_a0.join(alocator, 2, external_dir_str,
-                                    ct_app_a0.native_platform());
+                                    ct_config_a0.get_string(native_platform));
 
     string_stream::Buffer buffer(alocator);
     string_stream::printf(buffer, "%s64", tmp_dir);

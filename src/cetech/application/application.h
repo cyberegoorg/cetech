@@ -38,14 +38,6 @@ struct ct_app_a0 {
     //! Stop main loop and quit.
     void (*quit)();
 
-    //! Get platform
-    //! \return Platform platfrom
-    const char *(*platform)();
-
-    //! Get native platform
-    //! \return Native platfrom
-    const char *(*native_platform)();
-
     //! Get main window
     //! \return Main window
     ct_window *(*main_window)();
