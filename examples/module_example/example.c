@@ -13,7 +13,7 @@ CETECH_DECL_API(ct_keyboard_a0)
 
 void update(float dt) {
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {
-        ct_log_a0.warning("example", "VVVVVssssVVVVsssV");
+        ct_log_a0.warning("example", "VVVVVsssddddddd    sVVVVsssV");
     }
 }
 
@@ -26,7 +26,7 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(api);
-            ct_log_a0.info("example", "Inidddddddddt %d", reload);
+            ct_log_a0.info("example", "Init cccc %d", reload);
             ct_app_a0.register_on_update(update);
         },
         {
