@@ -84,7 +84,7 @@ set(SOURCE_FILES
         src/cetech/core/memory/private/memory.cpp
         src/cetech/core/memory/private/allocator_malloc.cpp
         src/cetech/core/memory/private/allocator_scratch.cpp
-        src/cetech/application/private/application.cpp
+        src/cetech/modules/application/private/application.cpp
         src/cetech/core/task/private/task.cpp
         src/cetech/engine/develop_system/private/develop_system.cpp
         src/cetech/core/log/private/log_db_handler.cpp

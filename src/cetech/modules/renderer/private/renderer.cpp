@@ -4,7 +4,7 @@
 
 #include "celib/allocator.h"
 
-#include <cetech/application/application.h>
+#include <cetech/modules/application/application.h>
 
 #include <include/mpack/mpack.h>
 #include <cetech/core/api/api_system.h>
@@ -16,6 +16,7 @@
 #include <cetech/modules/camera/camera.h>
 #include <cetech/core/macros.h>
 #include <cetech/core/module/module.h>
+#include <cetech/core/memory/memory.h>
 
 #include "bgfx/platform.h"
 
@@ -29,9 +30,9 @@
 CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_window_a0);
 CETECH_DECL_API(ct_api_a0);
+CETECH_DECL_API(ct_memory_a0);
 
 //==============================================================================
 // GLobals
@@ -39,6 +40,7 @@ CETECH_DECL_API(ct_api_a0);
 
 #define _G RendererGlobals
 static struct G {
+    ct_window *main_window;
     uint64_t type;
     uint32_t size_width;
     uint32_t size_height;
@@ -47,6 +49,13 @@ static struct G {
     int need_reset;
 } _G = {};
 
+struct GConfig {
+    ct_cvar screen_x;
+    ct_cvar screen_y;
+    ct_cvar fullscreen;
+    ct_cvar daemon;
+    ct_cvar wid;
+} GConfig;
 
 //==============================================================================
 // Private
@@ -76,16 +85,39 @@ static int _cmd_resize(mpack_node_t args,
 }
 
 
-void renderer_create(ct_window *window) {
+void renderer_create() {
+    if (!ct_config_a0.get_int(GConfig.daemon)) {
+        intptr_t wid = ct_config_a0.get_int(GConfig.wid);
+
+        char title[128] = {};
+        snprintf(title, CETECH_ARRAY_LEN(title), "cetech");
+
+        if (wid == 0) {
+            _G.main_window = ct_window_a0.create(
+                    ct_memory_a0.main_allocator(),
+                    title,
+                    WINDOWPOS_UNDEFINED,
+                    WINDOWPOS_UNDEFINED,
+                    ct_config_a0.get_int(GConfig.screen_x),
+                    ct_config_a0.get_int(GConfig.screen_y),
+                    ct_config_a0.get_int(GConfig.fullscreen)
+                    ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+            );
+        } else {
+            _G.main_window = ct_window_a0.create_from(
+                    ct_memory_a0.main_allocator(), (void *) wid);
+        }
+    }
+
     bgfx::PlatformData pd = {};
-    pd.nwh = window->native_window_ptr(window->inst);
-    pd.ndt = window->native_display_ptr(window->inst);
+    pd.nwh = _G.main_window->native_window_ptr(_G.main_window->inst);
+    pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx::setPlatformData(pd);
 
     // TODO: from config
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
-    window->size(window->inst, &_G.size_width, &_G.size_height);
+    _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
 }
@@ -131,12 +163,11 @@ void renderer_render_world(ct_world world,
 
     bgfx::frame(0);
 
-    auto *main_window = ct_app_a0.main_window();
-    main_window->update(main_window);
+    _G.main_window->update(_G.main_window);
 }
 
-void renderer_get_size(int *width,
-                       int *height) {
+void renderer_get_size(uint32_t *width,
+                       uint32_t *height) {
     *width = _G.size_width;
     *height = _G.size_height;
 }
@@ -171,8 +202,17 @@ namespace renderer_module {
 
         _G = (struct G) {};
 
-        ct_cvar daemon = ct_config_a0.find("daemon");
-        if (!ct_config_a0.get_int(daemon)) {
+        GConfig = {
+                .screen_x = ct_config_a0.new_int("screen.x", "Screen width", 1024),
+                .screen_y = ct_config_a0.new_int("screen.y", "Screen height", 768),
+                .fullscreen = ct_config_a0.new_int("screen.fullscreen",
+                                                   "Fullscreen", 0),
+
+                .daemon = ct_config_a0.new_int("daemon", "Daemon mode", 0),
+                .wid = ct_config_a0.new_int("wid", "Wid", 0)
+        };
+
+        if (!ct_config_a0.get_int(GConfig.daemon)) {
             texture::texture_init(api);
             shader::shader_init(api);
             material::init(api);
@@ -185,7 +225,6 @@ namespace renderer_module {
                                                _cmd_resize);
         }
 
-        CETECH_GET_API(api, ct_app_a0);
         CETECH_GET_API(api, ct_window_a0);
     }
 
@@ -212,6 +251,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_console_srv_a0);
+            CETECH_GET_API(api, ct_memory_a0);
         },
         {
             renderer_module::_init(api);

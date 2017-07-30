@@ -7,7 +7,7 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/application/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/task/task.h>
@@ -29,7 +29,6 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_task_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -387,7 +386,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_task_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);

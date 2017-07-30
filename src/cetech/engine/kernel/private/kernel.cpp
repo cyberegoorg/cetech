@@ -1,3 +1,4 @@
+#include <cetech/modules/application/application.h>
 #include "celib/allocator.h"
 
 #include "cetech/core/api/api_system.h"
@@ -20,6 +21,7 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_module_a0);
+CETECH_DECL_API(ct_app_a0);
 
 #include <cetech/modules/static_module.h>
 
@@ -28,8 +30,6 @@ CETECH_DECL_API(ct_module_a0);
 namespace os {
     void register_api(ct_api_a0 *api);
 }
-
-extern "C" void application_start();
 
 const char *_platform() {
 #if defined(CETECH_LINUX)
@@ -125,8 +125,6 @@ extern "C" int cetech_kernel_init(int argc,
 
     init_config(argc, argv);
 
-    application_register_api(api);
-
     CETECH_ADD_STATIC_MODULE(blob);
     CETECH_ADD_STATIC_MODULE(machine);
     CETECH_ADD_STATIC_MODULE(developsystem);
@@ -147,6 +145,8 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(mouse);
 
     init_static_modules();
+
+    CETECH_GET_API(api, ct_app_a0);
 
     ct_module_a0.load_dirs("./bin");
 
@@ -183,7 +183,7 @@ int main(int argc,
          const char **argv) {
 
     if (cetech_kernel_init(argc, argv)) {
-        application_start();
+        ct_app_a0.start();
     }
 
     return cetech_kernel_shutdown();

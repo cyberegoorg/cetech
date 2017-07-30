@@ -23,7 +23,7 @@
 #include "cetech/engine/machine/machine.h"
 #include "cetech/engine/resource/resource.h"
 
-#include <cetech/application/application.h>
+#include <cetech/modules/application/application.h>
 
 #include "shader_blob.h"
 
@@ -32,7 +32,6 @@ using namespace string_stream;
 
 CETECH_DECL_API(ct_memory_a0)
 CETECH_DECL_API(ct_resource_a0)
-CETECH_DECL_API(ct_app_a0)
 CETECH_DECL_API(ct_path_a0)
 CETECH_DECL_API(ct_vio_a0)
 CETECH_DECL_API(ct_process_a0)
@@ -226,7 +225,6 @@ namespace shader_compiler {
     int init(ct_api_a0 *api) {
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_app_a0);
         CETECH_GET_API(api, ct_path_a0);
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_process_a0);

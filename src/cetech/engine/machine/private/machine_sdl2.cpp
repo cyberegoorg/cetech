@@ -3,21 +3,22 @@
 //==============================================================================
 
 #include "celib/eventstream.inl"
+
 #include "cetech/core/memory/memory.h"
-
+#include "cetech/core/module/module.h"
 #include "cetech/core/config/config.h"
-#include "cetech/engine/resource/resource.h"
 #include "cetech/core/api/api_system.h"
-
 #include "cetech/core/log/log.h"
-#include <cetech/application/application.h>
+
+#include "cetech/engine/resource/resource.h"
 #include "cetech/engine/machine/machine.h"
 
-#include <include/SDL2/SDL.h>
-#include "cetech/core/module/module.h"
+#include <cetech/modules/application/application.h>
 
-CETECH_DECL_API(ct_app_a0);
+#include <include/SDL2/SDL.h>
+
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_api_a0);
 
 using namespace celib;
 
@@ -29,7 +30,7 @@ using namespace celib;
 // Keyboard part
 //==============================================================================
 
-extern int sdl_keyboard_init(ct_api_a0 *api);
+extern int sdl_keyboard_init(struct ct_api_a0 *api);
 
 extern void sdl_keyboard_shutdown();
 
@@ -40,7 +41,7 @@ extern void sdl_keyboard_process(EventStream &stream);
 // Mouse part
 //==============================================================================
 
-extern int sdl_mouse_init(ct_api_a0 *api);
+extern int sdl_mouse_init(struct ct_api_a0 *api);
 
 extern void sdl_mouse_shutdown();
 
@@ -50,7 +51,7 @@ extern void sdl_mouse_process(EventStream &stream);
 // Gamepad part
 //==============================================================================
 
-extern int sdl_gamepad_init(ct_api_a0 *api);
+extern int sdl_gamepad_init(struct ct_api_a0 *api);
 
 extern void sdl_gamepad_shutdown();
 
@@ -65,7 +66,7 @@ void sdl_gamepad_play_rumble(int gamepad,
                              float strength,
                              uint32_t length);
 
-extern int sdl_window_init(ct_api_a0 *api);
+extern int sdl_window_init(struct ct_api_a0 *api);
 
 extern void sdl_window_shutdown();
 
@@ -110,8 +111,11 @@ namespace machine_sdl {
 
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
-                case SDL_QUIT:
-                    ct_app_a0.quit();
+                case SDL_QUIT: {
+                    ct_app_a0 * app_a0 = (ct_app_a0 *) ct_api_a0.first(
+                            "ct_app_a0").api;
+                    app_a0->quit();
+                }
                     break;
 
                 case SDL_CONTROLLERDEVICEADDED:
@@ -138,11 +142,10 @@ namespace machine_sdl {
             .update = machine_sdl::_update,
     };
 
-    void init(ct_api_a0 *api) {
+    void init(struct ct_api_a0 *api) {
         api->register_api("ct_machine_a0", &a0);
 
         CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_app_a0);
         CETECH_GET_API(api, ct_log_a0);
 
         _G.eventstream.init(ct_memory_a0.main_allocator());
@@ -177,6 +180,8 @@ CETECH_MODULE_DEF(
         machine,
         {
             CETECH_GET_API(api, ct_log_a0);
+
+            ct_api_a0 = *api;
         },
         {
             machine_sdl::init(api);

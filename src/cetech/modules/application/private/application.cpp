@@ -5,8 +5,7 @@
 #include <unistd.h>
 
 
-
-#include <cetech/application/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/engine/entity/entity.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/engine/console_server/console_server.h>
@@ -29,6 +28,7 @@
 #include <include/mpack/mpack.h>
 #include <celib/macros.h>
 #include <cetech/core/api/private/api_private.h>
+#include <cetech/core/module/module.h>
 
 CETECH_DECL_API(ct_console_srv_a0);
 CETECH_DECL_API(ct_develop_a0);
@@ -78,7 +78,7 @@ static struct ApplicationGlobals {
     struct GConfig config;
 
     const ct_game_callbacks *game;
-    ct_window *main_window;
+
     int is_running;
     int init_error;
     float dt;
@@ -113,36 +113,6 @@ void application_quit() {
     _G.init_error = 0;
 }
 
-static ct_app_a0 a0 = {
-        .quit = application_quit,
-        .platform =  application_platform,
-        .native_platform =  application_native_platform,
-        .main_window =  application_get_main_window,
-};
-
-void _init_api(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_config_a0);
-    CETECH_GET_API(api, ct_time_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_hash_a0);
-
-    CETECH_GET_API(api, ct_console_srv_a0);
-    CETECH_GET_API(api, ct_develop_a0);
-    CETECH_GET_API(api, ct_renderer_a0);
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_package_a0);
-    CETECH_GET_API(api, ct_task_a0);
-    CETECH_GET_API(api, ct_lua_a0);
-    CETECH_GET_API(api, ct_window_a0);
-    CETECH_GET_API(api, ct_machine_a0);
-
-    CETECH_GET_API(api, ct_keyboard_a0);
-    CETECH_GET_API(api, ct_mouse_a0);
-    CETECH_GET_API(api, ct_gamepad_a0);
-    CETECH_GET_API(api, ct_memory_a0);
-}
-
 void _init_config() {
     _G.config = (struct GConfig) {
             .boot_pkg = ct_config_a0.new_str("core.boot_pkg", "Boot package",
@@ -163,11 +133,6 @@ void _init_config() {
             .wait = ct_config_a0.new_int("wait", "Wait for client", 0),
             .wid = ct_config_a0.new_int("wid", "Wid", 0)
     };
-}
-
-
-void application_register_api(struct ct_api_a0 *api) {
-    api->register_api("ct_app_a0", &a0);
 }
 
 static void _boot_stage() {
@@ -209,7 +174,6 @@ static void _boot_unload() {
 extern "C" void application_start() {
     _G = {};
 
-    _init_api(api::v0());
     _init_config();
 
     ct_console_srv_a0.register_command("wait", _cmd_wait);
@@ -230,31 +194,7 @@ extern "C" void application_start() {
     }
 #endif
 
-    if (!ct_config_a0.get_int(_G.config.daemon)) {
-        intptr_t wid = ct_config_a0.get_int(_G.config.wid);
-
-        char title[128] = {};
-        snprintf(title, CETECH_ARRAY_LEN(title), "cetech - %s",
-                 ct_config_a0.get_string(_G.config.boot_script));
-
-        if (wid == 0) {
-            _G.main_window = ct_window_a0.create(
-                    ct_memory_a0.main_allocator(),
-                    title,
-                    WINDOWPOS_UNDEFINED,
-                    WINDOWPOS_UNDEFINED,
-                    ct_config_a0.get_int(_G.config.screen_x),
-                    ct_config_a0.get_int(_G.config.screen_y),
-                    ct_config_a0.get_int(_G.config.fullscreen)
-                    ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
-            );
-        } else {
-            _G.main_window = ct_window_a0.create_from(
-                    ct_memory_a0.main_allocator(), (void *) wid);
-        }
-
-        ct_renderer_a0.create(_G.main_window);
-    }
+    ct_renderer_a0.create();
 
     _boot_stage();
 
@@ -309,7 +249,6 @@ extern "C" void application_start() {
         ct_develop_a0.leave_scope(application_sd);
         ct_develop_a0.push_record_float("engine.delta_time", dt);
 
-
         ct_develop_a0.after_update(dt);
         //thread_yield();
     }
@@ -319,21 +258,40 @@ extern "C" void application_start() {
     _boot_unload();
 }
 
-const char *application_native_platform() {
-#if defined(CETECH_LINUX)
-    return "linux";
-#elif defined(CETECH_WINDOWS)
-    return "windows";
-#elif defined(CETECH_DARWIN)
-    return "darwin";
-#endif
-    return NULL;
-}
+static ct_app_a0 a0 = {
+        .quit = application_quit,
+        .start = application_start
+};
 
-const char *application_platform() {
-    return application_native_platform();
-}
+CETECH_MODULE_DEF(
+        application,
+        {
+            CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_time_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
 
-ct_window *application_get_main_window() {
-    return _G.main_window;
-}
+            CETECH_GET_API(api, ct_console_srv_a0);
+            CETECH_GET_API(api, ct_develop_a0);
+            CETECH_GET_API(api, ct_renderer_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_package_a0);
+            CETECH_GET_API(api, ct_task_a0);
+            CETECH_GET_API(api, ct_lua_a0);
+            CETECH_GET_API(api, ct_window_a0);
+            CETECH_GET_API(api, ct_machine_a0);
+
+            CETECH_GET_API(api, ct_keyboard_a0);
+            CETECH_GET_API(api, ct_mouse_a0);
+            CETECH_GET_API(api, ct_gamepad_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+        },
+        {
+            api->register_api("ct_app_a0", &a0);
+        },
+        {
+            CEL_UNUSED(api);
+
+        }
+)

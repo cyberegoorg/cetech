@@ -154,8 +154,7 @@ typedef int viewport_t;
 //! Render API V0
 struct ct_renderer_a0 {
     //! Create renderer.
-    //! \param window Window
-    void (*create)(ct_window *window);
+    void (*create)();
 
     //! Set debug mode on/off
     //! \param debug True/False
@@ -163,8 +162,8 @@ struct ct_renderer_a0 {
 
     //! Get renderer window size
     //! \return Renderer window size
-    void (*get_size)(int *width,
-                     int *height);
+    void (*get_size)(uint32_t *width,
+                     uint32_t *height);
 
     //! Render world
     //! \param world World

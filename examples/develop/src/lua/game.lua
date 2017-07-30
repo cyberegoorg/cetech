@@ -28,8 +28,6 @@ local log_test_btn = Keyboard.button_index 'l'
 local flymode_btn = Keyboard.button_index 'lshift'
 
 function Game:init()
-    Log.info("boot.lua", "Platform %s", Application.get_platform())
-
     Log.info("boot.lua", "info")
     Log.warning("boot.lua", "warn")
     Log.error("boot.lua", "error")

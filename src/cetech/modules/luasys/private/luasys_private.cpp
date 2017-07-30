@@ -13,7 +13,7 @@ extern "C" {
 #include "cetech/core/os/vio.h"
 #include "cetech/core/config/config.h"
 #include "cetech/core/hashlib/hashlib.h"
-#include <cetech/application/application.h>
+#include <cetech/modules/application/application.h>
 #include "cetech/core/log/log.h"
 
 #include "cetech/engine/resource/resource.h"

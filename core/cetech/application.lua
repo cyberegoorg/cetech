@@ -4,12 +4,7 @@ local api_system  = require("cetech/api_system")
 ffi.cdef[[
 struct ct_app_a0 {
     void (*quit)();
-
-    const char *(*platform)();
-
-    const char *(*native_platform)();
-
-    void *(*main_window)();
+    void (*start)();
 };
 ]]
 
@@ -21,19 +16,7 @@ Application = {}
 
 --! Quit application
 function Application.quit()
-    return api.quit()
-end
-
---! Get platform
---! \return string Platform
-function Application.get_platform()
-    return api.platform()
-end
-
---! Get native platform
---! \return string native platform
-function Application.get_native_platform()
-    return api.native_platform()
+   return api.quit()
 end
 
 return Application

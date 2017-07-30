@@ -38,9 +38,11 @@ struct ct_app_a0 {
     //! Stop main loop and quit.
     void (*quit)();
 
-    //! Get main window
-    //! \return Main window
-    ct_window *(*main_window)();
+//    //! Get main window
+//    //! \return Main window
+//    ct_window *(*main_window)();
+
+    void (*start)();
 };
 
 #ifdef __cplusplus
