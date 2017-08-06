@@ -31,7 +31,9 @@ struct ct_path_a0 {
     //! \param files Result files
     //! \param allocator Allocator
     void (*list)(const char *path,
+                 const char *patern,
                  int recursive,
+                 int only_dir,
                  char ***files,
                  uint32_t *count,
                  struct cel_alloc *allocator);

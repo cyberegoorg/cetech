@@ -9,20 +9,14 @@
 
 
 namespace celib {
-
     typedef Array<uint8_t> EventStream;
 
     namespace eventstream {
-        struct event_header {
-            uint32_t type;
-            uint64_t size;
-        };
-
-        template<typename T>
+        template<typename H, typename T>
         inline void push(EventStream &stream,
                          uint32_t type,
                          const T &event) {
-            event_header *header = (event_header *) (&event);
+            H *header = (H*) (&event);
 
             header->type = type;
             header->size = sizeof(T);
@@ -31,16 +25,19 @@ namespace celib {
             array::push(stream, (uint8_t *) header, sizeof(T));
         }
 
-        inline event_header *begin(EventStream &stream) {
-            return (event_header *) array::begin(stream);
+        template<typename H>
+        inline H *begin(EventStream &stream) {
+            return (H *) array::begin(stream);
         }
 
-        inline event_header *end(EventStream &stream) {
-            return (event_header *) array::end(stream);
+        template<typename H>
+        inline H *end(EventStream &stream) {
+            return (H *) array::end(stream);
         }
 
-        inline event_header *next(event_header *header) {
-            return (event_header *) (((char *) header) + header->size);
+        template<typename H>
+        inline H *next(H *header) {
+            return (H *) (((char *) header) + header->size);
         }
 
         inline void clear(EventStream &stream) {

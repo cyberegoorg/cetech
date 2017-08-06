@@ -19,11 +19,12 @@
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/resource/resource.h>
 
-#include <include/mpack/mpack.h>
 #include <celib/macros.h>
 #include <cetech/core/module/module.h>
 #include <celib/container_types.inl>
 #include <celib/array.inl>
+
+#include <cetech/core/os/watchdog.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -34,6 +35,8 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_module_a0);
+CETECH_DECL_API(ct_watchdog_a0);
 
 //==============================================================================
 // Definess
@@ -108,8 +111,9 @@ static void _boot_stage() {
 }
 
 static void _boot_unload() {
-    uint64_t boot_pkg = ct_hash_a0.id64_from_str(
-            ct_config_a0.get_string(_G.config.boot_pkg));
+    const char *boot_pkg_str = ct_config_a0.get_string(_G.config.boot_pkg);
+    uint64_t boot_pkg = ct_hash_a0.id64_from_str(boot_pkg_str);
+
     uint64_t core_pkg = ct_hash_a0.id64_from_str("core");
     uint64_t pkg = ct_hash_a0.id64_from_str("package");
 
@@ -150,6 +154,9 @@ extern "C" void application_start() {
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt =
                 ((float) (now_ticks - last_tick)) / ct_time_a0.perf_freq();
+        last_tick = now_ticks;
+
+        ct_module_a0.check_modules(); // TODO: SHIT...
 
         for (uint32_t i = 0; i < celib::array::size(_G.on_update); ++i) {
             _G.on_update[i](dt);
@@ -161,12 +168,13 @@ extern "C" void application_start() {
             }
         }
 
-        //thread_yield();
+        sleep(0);
     }
 
     for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
         _G.on_shutdown[i]();
     }
+
 
     _boot_unload();
 }
@@ -248,6 +256,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_package_a0);
             CETECH_GET_API(api, ct_task_a0);
             CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_module_a0);
+            CETECH_GET_API(api, ct_watchdog_a0);
         },
         {
             app_init(api);

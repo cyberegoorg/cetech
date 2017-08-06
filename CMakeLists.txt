@@ -69,7 +69,8 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/cetech/core/os/os/error.cpp
+
+        src/cetech/engine/machine/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp
         src/cetech/engine/machine/private/mouse_sdl2.cpp
         src/cetech/engine/machine/private/keyboard_sdl2.cpp
@@ -91,14 +92,16 @@ set(SOURCE_FILES
         src/cetech/core/log/private/log_stdout_handler.cpp
         src/cetech/engine/kernel/private/kernel.cpp
         src/cetech/core/hashlib/private/hashlib.cpp
-        src/cetech/core/os/os/object.cpp
-        src/cetech/core/os/os/path.cpp
-        src/cetech/core/os/os/process.cpp
-        src/cetech/core/os/os/cpu.cpp
-        src/cetech/core/os/os/thread.cpp
-        src/cetech/core/os/os/vio.cpp
-        src/cetech/engine/machine/private/window_sdl2.cpp
-        src/cetech/core/os/os/time.cpp
+
+        src/cetech/core/os/private/error.cpp
+        src/cetech/core/os/private/object.cpp
+        src/cetech/core/os/private/path.cpp
+        src/cetech/core/os/private/process.cpp
+        src/cetech/core/os/private/cpu.cpp
+        src/cetech/core/os/private/thread.cpp
+        src/cetech/core/os/private/vio.cpp
+        src/cetech/core/os/private/watchdog.cpp
+        src/cetech/core/os/private/time.cpp
 
         ########################################################################
         # Modules

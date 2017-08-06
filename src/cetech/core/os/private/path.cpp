@@ -11,6 +11,8 @@
 #include <cetech/core/os/vio.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/module/module.h>
+#include <glob.h>
+#include <fnmatch.h>
 
 #endif
 
@@ -45,7 +47,9 @@ uint32_t file_mtime(const char *path) {
 //==============================================================================
 
 void _dir_list(const char *path,
+               const char *patern,
                int recursive,
+               int only_dir,
                Array<char *> &tmp_files,
                struct cel_alloc *allocator) {
     DIR *dir;
@@ -78,8 +82,17 @@ void _dir_list(const char *path,
                                entry->d_name);
             }
 
-            _dir_list(tmp_path, 1, tmp_files, allocator);
-        } else {
+            if (only_dir){
+                char *new_path =
+                        CEL_ALLOCATE(allocator, char,
+                                     sizeof(char) * (len + 1));
+                memcpy(new_path, tmp_path, len + 1);
+                tmp_path[len] = '\0';
+                array::push_back(tmp_files, new_path);
+            }
+
+            _dir_list(tmp_path, patern, recursive, only_dir, tmp_files, allocator);
+        } else if(!only_dir){
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
                     CEL_ALLOCATE(allocator, char,
@@ -91,20 +104,27 @@ void _dir_list(const char *path,
                 snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
             }
 
+            if(0 != fnmatch(patern, new_path, 0)) {
+                continue;
+            }
+
             array::push_back(tmp_files, new_path);
         }
+
     } while ((entry = readdir(dir)));
     closedir(dir);
 }
 
 void dir_list(const char *path,
+              const char *patern,
               int recursive,
+              int only_dir,
               char ***files,
               uint32_t *count,
               struct cel_alloc *allocator) {
     Array<char *> tmp_files(allocator);
 
-    _dir_list(path, recursive, tmp_files, allocator);
+    _dir_list(path, patern, recursive, only_dir, tmp_files, allocator);
 
     char **new_files = CEL_ALLOCATE(allocator, char*,
                                     sizeof(char *) * array::size(tmp_files));
@@ -222,7 +242,10 @@ char *path_join(struct cel_alloc *allocator,
     buffer << va_arg (arguments, const char*);
 
     for (uint32_t i = 1; i < count; ++i) {
-        buffer << DIR_DELIM_STR;
+        if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
+            buffer << DIR_DELIM_STR;
+        }
+
         buffer << va_arg (arguments, const char*);
     }
 

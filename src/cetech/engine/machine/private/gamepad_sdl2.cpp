@@ -174,10 +174,12 @@ void sdl_gamepad_process(EventStream &stream) {
             event.button = j;
 
             if (is_button_down(curent_state[i][j], _G.state[i][j]))
-                eventstream::push(stream, EVENT_GAMEPAD_DOWN, event);
+                eventstream::push<ct_event_header>(stream, EVENT_GAMEPAD_DOWN,
+                                                   event);
 
             else if (is_button_up(curent_state[i][j], _G.state[i][j]))
-                eventstream::push(stream, EVENT_GAMEPAD_UP, event);
+                eventstream::push<ct_event_header>(stream, EVENT_GAMEPAD_UP,
+                                                   event);
 
             _G.state[i][j] = curent_state[i][j];
         }
@@ -199,7 +201,8 @@ void sdl_gamepad_process(EventStream &stream) {
                 event.position[0] = pos[0];
                 event.position[1] = pos[1];
 
-                eventstream::push(stream, EVENT_GAMEPAD_MOVE, event);
+                eventstream::push<ct_event_header>(stream, EVENT_GAMEPAD_MOVE,
+                                                   event);
             }
         }
     }
@@ -213,7 +216,8 @@ void sdl_gamepad_process_event(SDL_Event *event,
             ct_gamepad_device_event ev;
             ev.gamepad_id = idx;
 
-            eventstream::push(stream, EVENT_GAMEPAD_CONNECT, ev);
+            eventstream::push<ct_event_header>(stream, EVENT_GAMEPAD_CONNECT,
+                                               ev);
         }
             break;
 
@@ -230,7 +234,9 @@ void sdl_gamepad_process_event(SDL_Event *event,
                 _remove_controler(i);
 
                 ev.gamepad_id = i;
-                eventstream::push(stream, EVENT_GAMEPAD_DISCONNECT, ev);
+                eventstream::push<ct_event_header>(stream,
+                                                   EVENT_GAMEPAD_DISCONNECT,
+                                                   ev);
 
                 break;
             }

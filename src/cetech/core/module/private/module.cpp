@@ -13,6 +13,9 @@
 #include <cetech/core/module/module.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/config/config.h>
+#include <cetech/core/os/watchdog.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <celib/map.inl>
 
 #include "cetech/core/log/log.h"
 
@@ -20,7 +23,7 @@
 // Defines
 //==============================================================================
 
-#define MAX_MODULES 256
+#define MAX_MODULES 128
 #define MAX_PATH_LEN 256
 
 #define MODULE_PREFIX "module_"
@@ -42,6 +45,7 @@ static struct ModuleSystemGlobals {
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     ct_cvar module_dir;
+    ct_watchdog *wd;
 } _G = {};
 
 CETECH_DECL_API(ct_memory_a0);
@@ -50,6 +54,9 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_object_a0);
 CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_watchdog_a0);
+CETECH_DECL_API(ct_hash_a0);
+
 
 using namespace celib;
 
@@ -65,7 +72,7 @@ void add_module(const char *path,
             continue;
         }
 
-        memcpy(_G.path[i], path, strlen(path));
+        memcpy(_G.path[i], path, strlen(path) + 1);
 
         _G.used[i] = 1;
         _G.modules[i] = *module;
@@ -210,7 +217,7 @@ namespace module {
         }
 
         for (size_t i = 0; i < MAX_MODULES; ++i) {
-            if(!_G.used[i]) {
+            if (!_G.used[i]) {
                 continue;
             }
 
@@ -238,9 +245,12 @@ namespace module {
         char **files = nullptr;
         uint32_t files_count = 0;
 
-        const char* path = ct_config_a0.get_string(_G.module_dir);
+        cel_alloc *alloc = ct_memory_a0.main_allocator();
 
-        ct_path_a0.list(path, 1, &files, &files_count,
+        const char *path = ct_config_a0.get_string(_G.module_dir);
+        const char *glob_patern = "**/" MODULE_PREFIX "*.so";
+
+        ct_path_a0.list(path, glob_patern, 1, 0, &files, &files_count,
                         ct_memory_a0.main_allocator());
 
         for (uint32_t k = 0; k < files_count; ++k) {
@@ -265,6 +275,47 @@ namespace module {
         }
     }
 
+    void check_modules() {
+        auto *wd = _G.wd;
+
+        _G.wd->fetch_events(_G.wd->inst);
+
+        cel_alloc *alloc = ct_memory_a0.main_allocator();
+
+        auto *wd_it = wd->event_begin(wd->inst);
+        const auto *wd_end = wd->event_end(wd->inst);
+
+//        celib::Map<int> path_set(alloc);
+
+        while (wd_it != wd_end) {
+            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+                ct_wd_ev_file_write_end *ev = reinterpret_cast<ct_wd_ev_file_write_end *>(wd_it);
+
+                const char *ext = ct_path_a0.extension(ev->filename);
+
+                if ((NULL != ext) && (strcmp(ext, "so") == 0)) {
+                    char *path = ct_path_a0.join(alloc, 2, ev->dir,
+                                                 ev->filename);
+
+//                    uint64_t path_hash = ct_hash_a0.id64_from_str(path);
+//
+//                    if (!celib::map::has(path_set, path_hash)) {
+                        ct_log_a0.info(LOG_WHERE,
+                                       "Reload module from path \"%s\"",
+                                       path);
+
+                        module::reload(path);
+
+//                        celib::map::set(path_set, path_hash, 1);
+//                    }
+
+                    CEL_FREE(alloc, path);
+                }
+            }
+
+            wd_it = wd->event_next(wd->inst, wd_it);
+        }
+    }
 
     static ct_module_a0 module_api = {
             .reload = reload,
@@ -272,9 +323,11 @@ namespace module {
             .add_static = add_static,
             .load = load,
             .unload_all = unload_all,
-            .load_dirs = load_dirs
+            .load_dirs = load_dirs,
+            .check_modules = check_modules
     };
 };
+
 
 CETECH_MODULE_DEF(
         module,
@@ -284,19 +337,32 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_object_a0);
             CETECH_GET_API(api, ct_config_a0);
+            CETECH_GET_API(api, ct_watchdog_a0);
+            CETECH_GET_API(api, ct_hash_a0);
         },
         {
+            _G = {};
 
             ct_api_a0 = *api;
 
             api->register_api("ct_module_a0", &module::module_api);
-            _G = {};
 
-            _G.module_dir = ct_config_a0.new_str("module_dir", "module dir", "./bin/");
+            _G.module_dir = ct_config_a0.new_str("module_dir",
+                                                 "Path where is modules",
+                                                 "./bin/linux64/");
+
+            auto *wd = ct_watchdog_a0.create(ct_memory_a0.main_allocator());
+            wd->add_dir(wd->inst, ct_config_a0.get_string(_G.module_dir),
+                        false);
+            _G.wd = wd;
         },
         {
             CEL_UNUSED(api);
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
+
+
+            ct_watchdog_a0.destroy(_G.wd);
+
             _G = {};
         }
 )

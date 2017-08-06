@@ -93,17 +93,16 @@ CETECH_DECL_API(ct_memory_a0);
 //==============================================================================
 namespace machine_sdl {
     ct_event_header *machine_event_begin() {
-        return (ct_event_header *) eventstream::begin(_G.eventstream);
+        return eventstream::begin<ct_event_header>(_G.eventstream);
     }
 
 
     ct_event_header *machine_event_end() {
-        return (ct_event_header *) eventstream::end(_G.eventstream);
+        return eventstream::end<ct_event_header>(_G.eventstream);
     }
 
     ct_event_header *machine_event_next(ct_event_header *header) {
-        return (ct_event_header *) eventstream::next(
-                (eventstream::event_header *) header);
+        return eventstream::next(header);
     }
 
     void _update(float dt) {
@@ -121,15 +120,12 @@ namespace machine_sdl {
                 case SDL_CONTROLLERDEVICEREMOVED:
                     sdl_gamepad_process_event(&e, _G.eventstream);
                     break;
-
-                default:
-                    sdl_gamepad_process(_G.eventstream);
-                    sdl_mouse_process(_G.eventstream);
-                    sdl_keyboard_process(_G.eventstream);
-                    break;
             }
         }
 
+        sdl_gamepad_process(_G.eventstream);
+        sdl_mouse_process(_G.eventstream);
+        sdl_keyboard_process(_G.eventstream);
     }
 
     static ct_machine_a0 a0 = {

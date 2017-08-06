@@ -14,8 +14,6 @@ CETECH_DECL_API(ct_log_a0);
 void *load_object(const char *path) {
     void *obj =  dlmopen(LM_ID_NEWLM, path, RTLD_NOW);
 
-    CETECH_ASSERT(LOG_WHERE, obj != NULL);
-
     if (obj == NULL) {
         ct_log_a0.error(LOG_WHERE, "%s", dlerror());
         return NULL;

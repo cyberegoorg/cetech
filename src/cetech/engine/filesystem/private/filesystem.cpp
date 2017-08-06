@@ -108,13 +108,11 @@ namespace filesystem {
                  uint32_t *count,
                  cel_alloc *allocator) {
 
-        CEL_UNUSED(filter);
-
         auto a = ct_memory_a0.main_allocator();
 
         char *full_path = get_fullpath(root, a, path);
 
-        ct_path_a0.list(full_path, 1, files, count, allocator);
+        ct_path_a0.list(full_path, filter, 1, 0, files, count, allocator);
 
         CEL_FREE(a, full_path);
     }

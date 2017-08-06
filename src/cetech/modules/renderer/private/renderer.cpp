@@ -50,6 +50,7 @@ static struct G {
 struct GConfig {
     ct_cvar screen_x;
     ct_cvar screen_y;
+    ct_cvar screen_vsync;
     ct_cvar fullscreen;
     ct_cvar daemon;
     ct_cvar wid;
@@ -200,9 +201,11 @@ namespace renderer_module {
 
         _G = (struct G) {};
 
+
         GConfig = {
                 .screen_x = ct_config_a0.new_int("screen.x", "Screen width", 1024),
                 .screen_y = ct_config_a0.new_int("screen.y", "Screen height", 768),
+                .screen_vsync = ct_config_a0.new_int("screen.vsync", "Screen vsync", 1),
                 .fullscreen = ct_config_a0.new_int("screen.fullscreen",
                                                    "Fullscreen", 0),
 
@@ -216,6 +219,8 @@ namespace renderer_module {
             material::init(api);
             scene::init(api);
             mesh::init(api);
+
+            _G.vsync = ct_config_a0.get_int(GConfig.screen_vsync) > 0;
 
             CETECH_GET_API(api, ct_mesh_renderer_a0);
         }

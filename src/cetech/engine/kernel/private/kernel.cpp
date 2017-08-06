@@ -1,4 +1,3 @@
-#include <cetech/engine/application/application.h>
 #include "celib/allocator.h"
 
 #include "cetech/core/api/api_system.h"
@@ -6,12 +5,12 @@
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/config/config.h"
 #include "cetech/core/module/module.h"
-
 #include "cetech/core/log/private/log_system_private.h"
 #include "cetech/core/memory/private/memory_private.h"
 #include "cetech/core/api/private/api_private.h"
 #include "cetech/core/memory/private/allocator_core_private.h"
 
+#include <cetech/engine/application/application.h>
 
 #include "celib/fpumath.h"
 
@@ -111,6 +110,7 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_LOAD_STATIC_MODULE(api, path);
     CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);
+    CETECH_LOAD_STATIC_MODULE(api, watchdog);
     CETECH_LOAD_STATIC_MODULE(api, module);
 
     CETECH_GET_API(api, ct_log_a0);
@@ -124,14 +124,15 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(blob);
     CETECH_ADD_STATIC_MODULE(task);
     CETECH_ADD_STATIC_MODULE(filesystem);
+
     CETECH_ADD_STATIC_MODULE(resourcesystem);
+
+    CETECH_ADD_STATIC_MODULE(application);
+    CETECH_ADD_STATIC_MODULE(machine);
 
 #ifdef CETECH_CAN_COMPILE
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 #endif
-
-    CETECH_ADD_STATIC_MODULE(application);
-    CETECH_ADD_STATIC_MODULE(machine);
 
     CETECH_ADD_STATIC_MODULE(world);
     CETECH_ADD_STATIC_MODULE(component);
@@ -146,6 +147,10 @@ extern "C" int cetech_kernel_init(int argc,
     ct_module_a0.load_dirs();
 
     ct_config_a0.log_all();
+
+
+
+
     return 1;
 }
 
