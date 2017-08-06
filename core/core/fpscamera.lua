@@ -28,7 +28,7 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
 
     local x_dir = m_world.x
     local z_dir = m_world.z
-
+       
     -- Position
     if not self.fly_mode then
         z_dir.y = 0.0
@@ -43,5 +43,5 @@ function FPSCamera:update(dt, dx, dy, updown, leftright)
     local rotation = rotation_around_world_up * rotation_around_camera_right
 
     Transform.set_position(self.transform, pos)
-    Transform.set_rotation(self.transform, rotation * rot)
+    Transform.set_rotation(self.transform, rot * rotation)
 end

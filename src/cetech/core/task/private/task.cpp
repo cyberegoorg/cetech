@@ -236,7 +236,7 @@ namespace taskmanager_module {
 
         int core_count = ct_cpu_a0.count();
 
-        static const uint32_t main_threads_count = 1;
+        static const uint32_t main_threads_count = 1 + 1/* Renderer */;
         const uint32_t worker_count = core_count - main_threads_count;
 
         ct_log_a0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,

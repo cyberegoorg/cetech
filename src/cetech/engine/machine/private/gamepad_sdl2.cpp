@@ -17,6 +17,8 @@
 #define is_button_down(now, last) ((now) && !(last))
 #define is_button_up(now, last)   (!(now) && (last))
 
+#define LOG_WHERE "gamepad.sdl"
+
 using namespace celib;
 
 //==============================================================================
@@ -51,6 +53,11 @@ int _new_controler() {
 }
 
 void _remove_controler(int idx) {
+    ct_log_a0.info("input.gamepad", "Remove gamepad %d.", idx);
+
+    SDL_HapticClose(_G.haptic[idx]);
+    SDL_GameControllerClose(_G.controller[idx]);
+
     _G.controller[idx] = NULL;
     _G.haptic[idx] = NULL;
 }
@@ -65,13 +72,14 @@ int _create_controler(int i) {
 
     memset(_G.state[idx], 0, sizeof(int) * GAMEPAD_BTN_MAX);
 
+    ct_log_a0.info("input.gamepad", "Add gamepad %d.", i);
+
     if (SDL_JoystickIsHaptic(joy) == 1) {
         SDL_Haptic *haptic = SDL_HapticOpenFromJoystick(joy);
         SDL_HapticRumbleInit(haptic);
         _G.haptic[idx] = haptic;
 
-        ct_log_a0.info("input.gamepad", "Gamepad %d has haptic support",
-                       i);
+        ct_log_a0.info("input.gamepad", "Gamepad %d has haptic support.", i);
     } else {
         _G.haptic[idx] = NULL;
     }
@@ -83,24 +91,35 @@ int _create_controler(int i) {
 // Interface
 //==============================================================================
 
+#define GAMEPAD_SDL_SUBSYTEM_MASK (SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC | SDL_INIT_JOYSTICK)
+
 int sdl_gamepad_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
 
     _G = (struct G) {};
 
-    int num_joy = SDL_NumJoysticks();
-    for (int i = 0; i < num_joy; ++i) {
-        if (SDL_IsGameController(i) == SDL_FALSE) {
-            continue;
-        }
-
-        //_create_controler(i);
+    if (0 != SDL_InitSubSystem(GAMEPAD_SDL_SUBSYTEM_MASK)) {
+        ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s", SDL_GetError());
+        return 0;
     }
 
     return 1;
 }
 
 void sdl_gamepad_shutdown() {
+    for (int i = 0; i < GAMEPAD_MAX; ++i) {
+        if(_G.haptic[i] == NULL) {
+            continue;
+        }
+
+        if(_G.controller[i] == NULL) {
+            continue;
+        }
+
+        _remove_controler(i);
+    }
+
+    SDL_QuitSubSystem(GAMEPAD_SDL_SUBSYTEM_MASK);
     _G = (struct G) {};
 }
 

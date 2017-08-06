@@ -147,7 +147,7 @@ namespace machine_sdl {
 
         _G.eventstream.init(ct_memory_a0.main_allocator());
 
-        if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
+        if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO) != 0) {
             ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s",
                             SDL_GetError());
             return; // TODO: dksandasdnask FUCK init without return type?????
@@ -166,9 +166,9 @@ namespace machine_sdl {
         sdl_keyboard_shutdown();
         sdl_window_shutdown();
 
-        SDL_Quit();
-
         _G.eventstream.destroy();
+
+        SDL_Quit();
     }
 }
 

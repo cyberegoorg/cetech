@@ -27,7 +27,7 @@ static int _from_axis_angle(lua_State *l) {
 
     luasys_to_vec3f(l, 1, axis);
     float angle = luasys_to_float(l, 2) * celib::DEG_TO_RAD;
-
+    
     celib::quat_rotate_axis(result, axis, angle);
 
     luasys_push_quat(l, result);
