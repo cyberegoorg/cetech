@@ -436,7 +436,8 @@ void _update(float dt) {
 static void _init_cvar(struct ct_config_a0 config) {
     ct_config_a0 = config;
 
-    _G.cv_source_dir = config.new_str("src", "Resource source dir", "data/src");
+    _G.cv_source_dir = config.new_str("src", "Resource source dir", "src");
+
     _G.cv_core_dir = config.new_str("core",
                                     "Resource application source dir",
                                     "core");

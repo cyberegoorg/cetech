@@ -596,7 +596,7 @@ namespace resource_module {
         ct_config_a0 = config;
 
         _G.config.build_dir = config.new_str("build", "Resource build dir",
-                                             "data/build");
+                                             "build");
     }
 
 

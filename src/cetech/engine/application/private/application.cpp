@@ -156,7 +156,9 @@ extern "C" void application_start() {
                 ((float) (now_ticks - last_tick)) / ct_time_a0.perf_freq();
         last_tick = now_ticks;
 
+#if CETECH_DEVELOP
         ct_module_a0.check_modules(); // TODO: SHIT...
+#endif
 
         for (uint32_t i = 0; i < celib::array::size(_G.on_update); ++i) {
             _G.on_update[i](dt);

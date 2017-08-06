@@ -276,6 +276,7 @@ namespace module {
     }
 
     void check_modules() {
+
         auto *wd = _G.wd;
 
         _G.wd->fetch_events(_G.wd->inst);
@@ -350,18 +351,21 @@ CETECH_MODULE_DEF(
             _G.module_dir = ct_config_a0.new_str("module_dir",
                                                  "Path where is modules",
                                                  "./bin/linux64/");
-
+#if CETECH_DEVELOP
             auto *wd = ct_watchdog_a0.create(ct_memory_a0.main_allocator());
             wd->add_dir(wd->inst, ct_config_a0.get_string(_G.module_dir),
                         false);
             _G.wd = wd;
+#endif
+
         },
         {
             CEL_UNUSED(api);
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-
+#if CETECH_DEVELOP
             ct_watchdog_a0.destroy(_G.wd);
+#endif
 
             _G = {};
         }

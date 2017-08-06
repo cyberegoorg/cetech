@@ -45,6 +45,8 @@ int init_config(int argc,
                 const char **argv) {
     auto kernel_platform = ct_config_a0.new_str("kernel.platform", "Kernel platform", _platform());
     ct_config_a0.new_str("kernel.native_platform", "Kernel native platform", _platform());
+    auto build = ct_config_a0.new_str("build", "Resource build dir",
+                                         "build");
 
     if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
@@ -52,8 +54,7 @@ int init_config(int argc,
 
     cel_alloc *a = ct_memory_a0.main_allocator();
 
-    ct_cvar bd = ct_config_a0.find("build");
-    const char *build_dir_str = ct_config_a0.get_string(bd);
+    const char *build_dir_str = ct_config_a0.get_string(build);
 
     char *build_dir = ct_path_a0.join(a, 2, build_dir_str, ct_config_a0.get_string(kernel_platform));
     char *build_config = ct_path_a0.join(a, 2, build_dir, "global.config");
