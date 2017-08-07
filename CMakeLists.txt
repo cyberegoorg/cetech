@@ -70,6 +70,12 @@ set(SOURCE_FILES
         # Core
         ########################################################################
 
+        src/cetech/modules/debugui/private/bgfx_imgui/imgui.cpp
+        src/cetech/modules/debugui/private/ocornut-imgui/imgui.cpp
+        src/cetech/modules/debugui/private/ocornut-imgui/imgui_draw.cpp
+        src/cetech/modules/debugui/private/debugui.cpp
+        src/cetech/modules/playground/private/playground.cpp
+
         src/cetech/engine/machine/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp
         src/cetech/engine/machine/private/mouse_sdl2.cpp

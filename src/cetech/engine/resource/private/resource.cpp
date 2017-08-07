@@ -76,6 +76,7 @@ namespace {
     } resource_item_t;
 
     static const resource_item_t null_item = {};
+
 #define _G ResourceManagerGlobals
     struct ResourceManagerGlobals {
         Map<uint32_t> type_map;
@@ -93,25 +94,6 @@ namespace {
         } config;
 
     } ResourceManagerGlobals = {};
-
-
-    int _cmd_reload_all(mpack_node_t args,
-                        mpack_writer_t *writer) {
-        CEL_UNUSED(args, writer);
-        resource::reload_all();
-        return 0;
-    }
-
-//    Map<resource_item_t> *_get_resource_map(uint64_t type) {
-//        const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
-//
-//        if (idx == UINT32_MAX) {
-//            return NULL;
-//        }
-//
-//        return &_G.resource_data[idx];
-//    }
-
 }
 
 //==============================================================================

@@ -100,7 +100,7 @@ namespace texture_resource {
             return;
         }
 
-        bgfx::destroyTexture(texture);
+        bgfx::destroy(texture);
     }
 
     void *_texture_resource_reloader(uint64_t name,

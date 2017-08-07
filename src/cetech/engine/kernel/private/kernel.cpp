@@ -125,9 +125,7 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(blob);
     CETECH_ADD_STATIC_MODULE(task);
     CETECH_ADD_STATIC_MODULE(filesystem);
-
     CETECH_ADD_STATIC_MODULE(resourcesystem);
-
     CETECH_ADD_STATIC_MODULE(application);
     CETECH_ADD_STATIC_MODULE(machine);
 

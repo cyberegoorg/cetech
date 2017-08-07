@@ -16,6 +16,9 @@
 #include <cetech/core/macros.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/memory/memory.h>
+#include <cetech/engine/input/input.h>
+#include <cetech/modules/debugui/private/bgfx_imgui/imgui.h>
+#include <cetech/modules/debugui/debugui.h>
 
 #include "bgfx/platform.h"
 
@@ -31,6 +34,8 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_window_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_mouse_a0);
+CETECH_DECL_API(ct_debugui_a0);
 
 //==============================================================================
 // GLobals
@@ -45,6 +50,7 @@ static struct G {
     int capture;
     int vsync;
     int need_reset;
+    bgfx::FrameBufferHandle engine_fb;
 } _G = {};
 
 struct GConfig {
@@ -119,6 +125,8 @@ void renderer_create() {
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
 
     _G.need_reset = 1;
+
+    //bgfx::createFrameBuffer(0, uint16_t(win.m_width), uint16_t(win.m_height) );
 }
 
 void renderer_set_debug(int debug) {
@@ -159,6 +167,9 @@ void renderer_render_world(ct_world world,
     bgfx::dbgTextClear(0, 0);
 
     ct_mesh_renderer_a0.render_all(world);
+
+    ct_debugui_a0 = *CETECH_GET_API_PTR(&ct_api_a0, ct_debugui_a0); // TODO: SHIT !!!!
+    ct_debugui_a0.render(); // TODO: SHIT !!!!
 
     bgfx::frame(0);
 
@@ -203,9 +214,12 @@ namespace renderer_module {
 
 
         GConfig = {
-                .screen_x = ct_config_a0.new_int("screen.x", "Screen width", 1024),
-                .screen_y = ct_config_a0.new_int("screen.y", "Screen height", 768),
-                .screen_vsync = ct_config_a0.new_int("screen.vsync", "Screen vsync", 1),
+                .screen_x = ct_config_a0.new_int("screen.x", "Screen width",
+                                                 1024),
+                .screen_y = ct_config_a0.new_int("screen.y", "Screen height",
+                                                 768),
+                .screen_vsync = ct_config_a0.new_int("screen.vsync",
+                                                     "Screen vsync", 1),
                 .fullscreen = ct_config_a0.new_int("screen.fullscreen",
                                                    "Fullscreen", 0),
 
@@ -253,6 +267,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_mouse_a0);
         },
         {
             renderer_module::_init(api);

@@ -103,7 +103,7 @@ namespace shader_resource {
             return;
         }
 
-        bgfx::destroyProgram(program);
+        bgfx::destroy(program);
 
         map::remove(_G.handler_map, name);
     }

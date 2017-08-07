@@ -25,6 +25,8 @@
 #include <celib/array.inl>
 
 #include <cetech/core/os/watchdog.h>
+#include <cetech/modules/debugui/private/bgfx_imgui/imgui.h>
+#include <cetech/engine/input/input.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -37,6 +39,8 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_watchdog_a0);
+CETECH_DECL_API(ct_mouse_a0);
+CETECH_DECL_API(ct_api_a0);
 
 //==============================================================================
 // Definess
@@ -148,8 +152,6 @@ extern "C" void application_start() {
     }
 
     _G.is_running = 1;
-    ct_log_a0.info("core.ready", "Run main loop");
-
     while (_G.is_running) {
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt =
@@ -164,11 +166,15 @@ extern "C" void application_start() {
             _G.on_update[i](dt);
         }
 
+        CETECH_GET_API(&ct_api_a0, ct_mouse_a0);
+
+
         if (!ct_config_a0.get_int(_G.config.daemon)) {
             for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
                 _G.on_render[i]();
             }
         }
+
 
         sleep(0);
     }
@@ -177,10 +183,8 @@ extern "C" void application_start() {
         _G.on_shutdown[i]();
     }
 
-
     _boot_unload();
 }
-
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     void register_ ## name ## _(type name) {                                   \
@@ -230,7 +234,7 @@ static ct_app_a0 a0 = {
         .unregister_on_render = unregister_on_render_
 };
 
-void app_init(ct_api_a0 *api) {
+void app_init(struct ct_api_a0 *api) {
     api->register_api("ct_app_a0", &a0);
 
 #if defined(CETECH_DEVELOP)
@@ -260,6 +264,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_module_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
+
+            ct_api_a0 = *api;
         },
         {
             app_init(api);
