@@ -147,7 +147,7 @@ extern "C" void application_start() {
 
     uint64_t last_tick = ct_time_a0.perf_counter();
 
-    for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
+    for (uint32_t i = 0; i < celib::array::size(_G.on_init); ++i) {
         _G.on_init[i]();
     }
 
@@ -175,11 +175,10 @@ extern "C" void application_start() {
             }
         }
 
-
         sleep(0);
     }
 
-    for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
+    for (uint32_t i = 0; i < celib::array::size(_G.on_shutdown); ++i) {
         _G.on_shutdown[i]();
     }
 
@@ -187,10 +186,10 @@ extern "C" void application_start() {
 }
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
-    void register_ ## name ## _(type name) {                                   \
+    static void register_ ## name ## _(type name) {                                   \
         celib::array::push_back(_G.name, name);                                \
     }                                                                          \
-    void unregister_## name ## _(type name) {                                  \
+    static void unregister_## name ## _(type name) {                                  \
         const auto size = celib::array::size(_G.name);                         \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
@@ -215,7 +214,7 @@ _DEF_ON_CLB_FCE(ct_app_on_update, on_update)
 
 _DEF_ON_CLB_FCE(ct_app_on_render, on_render)
 
-//#undef _DEF_ON_CLB_FCE
+#undef _DEF_ON_CLB_FCE
 
 static ct_app_a0 a0 = {
         .quit = application_quit,

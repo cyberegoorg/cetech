@@ -1,4 +1,7 @@
 parent: material1
 
-textures:
-  u_texColor: content/scene/solider/m4tex
+layers:
+  default:
+
+    textures:
+      u_texColor: content/scene/solider/m4tex

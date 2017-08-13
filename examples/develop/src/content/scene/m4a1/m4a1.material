@@ -1,5 +1,7 @@
 parent: material1
 
-textures:
-  u_texColor: content/scene/m4a1/m4_diff
-  #u_texColor: content/scene/duck/duckCM
+layers:
+  default:
+    textures:
+      u_texColor: content/scene/m4a1/m4_diff
+      #u_texColor: content/scene/duck/duckCM

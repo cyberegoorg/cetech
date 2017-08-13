@@ -249,6 +249,6 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(module_example SHARED examples/module_example/example.c)
+add_library(module_example SHARED examples/module_example/example.cpp)
 set_target_properties(module_example PROPERTIES PREFIX "")
 

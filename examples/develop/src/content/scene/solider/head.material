@@ -1,4 +1,6 @@
 parent: material1
 
-textures:
-  u_texColor: content/scene/solider/head01
+layers:
+  default:
+    textures:
+      u_texColor: content/scene/solider/head01

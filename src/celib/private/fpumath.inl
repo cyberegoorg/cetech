@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+
 #ifndef CELIB_FPUMATH_INL
 #define CELIB_FPUMATH_INL
 
@@ -14,6 +15,40 @@
 
 
 namespace celib {
+
+    inline uint32_t float_to_bits(float _a) {
+        union {
+            float f;
+            uint32_t ui;
+        } u = {_a};
+        return u.ui;
+    }
+
+    inline float bits_to_float(uint32_t _a) {
+        union {
+            uint32_t ui;
+            float f;
+        } u = {_a};
+        return u.f;
+    }
+
+    inline uint64_t double_to_bits(double _a) {
+        union {
+            double f;
+            uint64_t ui;
+        } u = {_a};
+        return u.ui;
+    }
+
+    inline double bits_to_double(uint64_t _a) {
+        union {
+            uint64_t ui;
+            double f;
+        } u = {_a};
+        return u.f;
+    }
+
+
     inline float fabsolute(float _a) {
         return ::fabsf(_a);
     }
@@ -228,38 +263,6 @@ namespace celib {
 
     inline float to_deg(float _rad) {
         return _rad * 180.0f / PI;
-    }
-
-    inline uint32_t float_to_bits(float _a) {
-        union {
-            float f;
-            uint32_t ui;
-        } u = {_a};
-        return u.ui;
-    }
-
-    inline float bits_to_float(uint32_t _a) {
-        union {
-            uint32_t ui;
-            float f;
-        } u = {_a};
-        return u.f;
-    }
-
-    inline uint64_t double_to_bits(double _a) {
-        union {
-            double f;
-            uint64_t ui;
-        } u = {_a};
-        return u.ui;
-    }
-
-    inline double bits_to_double(uint64_t _a) {
-        union {
-            uint64_t ui;
-            double f;
-        } u = {_a};
-        return u.f;
     }
 
 

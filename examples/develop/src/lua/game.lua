@@ -33,7 +33,7 @@ function Game:init()
     Log.error("boot.lua", "error")
     Log.debug("boot.lua", "debug")
 
-    --    self.viewport = Renderer.GetViewport("default")
+    self.viewport = Renderer.create_viewport("default")
     self.world = World.create()
 
     --    self.entity = Entity.

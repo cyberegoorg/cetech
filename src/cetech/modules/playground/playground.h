@@ -15,6 +15,10 @@ extern "C" {
 struct ct_playground_module {
     const char* name;
     void (*on_gui)();
+    void (*on_init)();
+    void (*on_shutdown)();
+    void (*on_update)(float dt);
+    void (*on_render)();
 };
 
 //==============================================================================
@@ -24,6 +28,7 @@ struct ct_playground_module {
 //! Playground API V0
 struct ct_playground_a0 {
     void (*register_module)(ct_playground_module module);
+    void (*unregister_module)(ct_playground_module module);
 };
 
 #ifdef __cplusplus

@@ -53,13 +53,13 @@ namespace resource {
 #define LOG_WHERE "resource_manager"
 #define is_item_null(item) (item.data == null_item.data)
 
-//#define hash_combine(a, b) ((a * 11)^(b))
+#define hash_combine(a, b) ((a * 11)^(b))
 
-uint64_t hash_combine(uint64_t lhs,
-                      uint64_t rhs) {
-    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
-    return lhs;
-}
+//uint64_t hash_combine(uint64_t lhs,
+//                      uint64_t rhs) {
+//    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+//    return lhs;
+//}
 
 //==============================================================================
 // Gloals
@@ -606,6 +606,7 @@ namespace resource_module {
                                          package_resource::package_resource_callback);
 
         package_init(api);
+
 
     }
 

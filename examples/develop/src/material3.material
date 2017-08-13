@@ -1,6 +1,5 @@
-parent: material1
-
 layers:
   default:
+    shader: shader2
     textures:
       u_texColor: content/scene/solider/body01
