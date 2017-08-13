@@ -23,13 +23,14 @@ struct ct_world;
 struct ct_entity;
 struct ct_window;
 
-typedef void ct_window_t;
-
 //! Material typedef
 struct ct_material {
     uint32_t idx;
 };
 
+struct ct_viewport {
+    uint32_t idx;
+};
 
 //==============================================================================
 // Api
@@ -42,11 +43,6 @@ struct ct_material_a0 {
     //! \param name Material resource name
     //! \return Material
     struct ct_material (*resource_create)(uint64_t name);
-
-    //! Get texture count in material
-    //! \param material Material
-    //! \return Texture count
-    uint32_t (*get_texture_count)(struct ct_material material);
 
     //! Set texture value
     //! \param material Material
@@ -64,11 +60,8 @@ struct ct_material_a0 {
                        const char *slot,
                        float *value);
 
-    //! Use material for actual render
-    void (*use)(struct ct_material material);
-
     //! Submit material for actual render
-    void (*submit)(struct ct_material material);
+    void (*submit)(struct ct_material material,  uint64_t layer, uint8_t viewid);
 };
 
 //==============================================================================
@@ -137,7 +130,7 @@ struct ct_mesh_renderer_a0 {
 
     //! Render all mesh in world
     //! \param world Word
-    void (*render_all)(struct ct_world world);
+    void (*render_all)(struct ct_world world, uint8_t viewid);
 };
 
 
@@ -145,7 +138,41 @@ struct ct_mesh_renderer_a0 {
 // Tyedefs
 //==============================================================================
 
-typedef int viewport_t;
+typedef struct {
+    uint64_t name;
+    uint64_t type;
+    uint8_t input_count;
+    uint8_t output_count;
+    uint64_t input[8];
+    uint64_t output[8];
+} layer_entry_t;
+
+struct ct_texture {
+    uint16_t idx;
+};
+
+#define MAX_LOCAL_RESOURCE 64
+#define MAX_FRAME_BUFFERS 64
+
+struct viewport_instance {
+    uint16_t local_resource[MAX_LOCAL_RESOURCE];
+    uint64_t local_resource_name[MAX_LOCAL_RESOURCE];
+
+    uint16_t framebuffers[MAX_FRAME_BUFFERS];
+
+    float size[2];
+
+    layer_entry_t *layers;
+
+    uint64_t layers_name;
+    uint32_t layer_count;
+
+    uint32_t fb_count;
+    uint32_t resource_count;
+};
+
+typedef void (*ct_render_on_render)();
+typedef void(*ct_renderer_on_pass_t)(viewport_instance* viewport, uint8_t viewid, struct ct_world world, struct ct_camera camera);
 
 //==============================================================================
 // Api
@@ -165,13 +192,24 @@ struct ct_renderer_a0 {
     void (*get_size)(uint32_t *width,
                      uint32_t *height);
 
+
+    struct ct_texture (*get_global_resource)(uint64_t name);
+
     //! Render world
     //! \param world World
     //! \param camera Camera
     //! \param viewport Viewport
     void (*render_world)(struct ct_world world,
                          struct ct_camera camera,
-                         viewport_t viewport);
+                         struct ct_viewport viewport);
+
+    void (*register_layer_pass)(uint64_t  type, ct_renderer_on_pass_t on_pass);
+
+    void (*register_on_render)(ct_render_on_render on_render);
+    void (*unregister_on_render)(ct_render_on_render on_render);
+
+    struct ct_viewport (*create_viewport)(uint64_t name, float width, float height);
+    uint16_t (*viewport_get_local_resource)(ct_viewport viewport,uint64_t name);
 };
 
 #ifdef __cplusplus

@@ -236,8 +236,8 @@ namespace scene {
         _G.scene_instance_map.destroy();
     }
 
-    void submit(uint64_t scene,
-                uint64_t geom_name) {
+    void setVBIB(uint64_t scene,
+                 uint64_t geom_name) {
         scene_instance *instance = _get_scene_instance(scene);
 
         if (instance == NULL) {

@@ -31,3 +31,6 @@ scene:
 
 entity:
   - playground/cube
+
+render_config:
+  - default

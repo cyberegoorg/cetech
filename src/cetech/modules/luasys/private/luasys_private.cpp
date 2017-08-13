@@ -24,6 +24,8 @@ extern "C" {
 #include "cetech/core/os/errors.h"
 #include "cetech/engine/entity/entity.h"
 #include "cetech/core/module/module.h"
+#include <cetech/engine/entity/entity.h>
+#include <cetech/modules/renderer/renderer.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_vio_a0);
@@ -31,6 +33,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_renderer_a0);
 
 
 #include "matrix.h"
@@ -779,7 +782,9 @@ static void _init(ct_api_a0 *a0) {
     ct_app_a0.register_on_init(_game_init_clb);
     ct_app_a0.register_on_shutdown(_game_shutdown_clb);
     ct_app_a0.register_on_update(_game_update_clb);
-    ct_app_a0.register_on_render(_game_render_clb);
+
+
+    ct_renderer_a0.register_on_render(_game_render_clb);
 
     ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
 #ifdef CETECH_CAN_COMPILE
@@ -793,7 +798,7 @@ static void _shutdown() {
     ct_app_a0.unregister_on_init(_game_init_clb);
     ct_app_a0.unregister_on_shutdown(_game_shutdown_clb);
     ct_app_a0.unregister_on_update(_game_update_clb);
-    ct_app_a0.unregister_on_render(_game_render_clb);
+    ct_renderer_a0.unregister_on_render(_game_render_clb);
 
     lua_close(_G.L);
 
@@ -860,6 +865,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_renderer_a0);
 
         },
         {

@@ -9,16 +9,21 @@
 
 # Create on init
 global_resource:
-  - { name: gbuffer0, type: render_target, format: RGBA8, ration: equal }
-  - { name: gbuffer1, type: render_target, format: RGBA8, ration: equal }
-  - { name: gbuffer2, type: render_target, format: D24, ration: equal }
+      - { name: colorbuffer, type: render_target, format: RGBA8, ration: equal }
+      - { name: depthbuffer, type: render_target, format: D24, ration: equal }
 
 # Renderer layers
-layer:
+layers:
   default:
-    - { name: "gbuffer", output: ["gbuffer0", "gbuffer1", "gbuffer2"] }
-    #- { type: "fullscreen", name: "combine", input: ["gbuffer0", "gbuffer1", "gbuffer2"] }
+    - { type: "render", name: "gbuffer", output: ["bb_color", "bb_depth"]}
 
+# viewports
 viewport:
   default:
-    layer: default
+    layers: default
+
+    local_resource:
+      # !! This 2 resource is virtual-backbuffer and is used to show to user.
+      # !! DO NOT REMVOVE
+      - { name: bb_color, type: render_target, format: RGBA8, ration: equal }
+      - { name: bb_depth, type: render_target, format: D24, ration: equal }

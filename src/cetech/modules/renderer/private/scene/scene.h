@@ -6,8 +6,8 @@ namespace scene {
 
     void shutdown();
 
-    void submit(uint64_t scene,
-                uint64_t geom_name);
+    void setVBIB(uint64_t scene,
+                 uint64_t geom_name);
 
     void create_graph(struct ct_world world,
                       struct ct_entity entity,

@@ -289,7 +289,7 @@ ct_mesh_renderer mesh_create(ct_world world,
     return (ct_mesh_renderer) {.idx = idx, .world = world};
 }
 
-void mesh_render_all(ct_world world) {
+void mesh_render_all(ct_world world, uint8_t viewid) {
     WorldInstance *data = _get_world_instance(world);
 
     for (uint32_t i = 0; i < data->n; ++i) {
@@ -298,7 +298,6 @@ void mesh_render_all(ct_world world) {
         uint64_t scene = data->scene[i];
         uint64_t geom = data->mesh[i];
 
-        ct_material_a0.use(material);
 
         ct_entity ent = data->entity[i];
 
@@ -328,9 +327,9 @@ void mesh_render_all(ct_world world) {
 
         bgfx::setTransform(&final_w, 1);
 
-        scene::submit(scene, geom);
+        scene::setVBIB(scene, geom);
 
-        ct_material_a0.submit(material);
+        ct_material_a0.submit(material, ct_hash_a0.id64_from_str("default"), viewid);
     }
 }
 
