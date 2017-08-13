@@ -191,6 +191,7 @@ namespace material {
                     ut = bgfx::UniformType::Int1;
                     break;
                 case MAT_VAR_TEXTURE:
+                case MAT_VAR_TEXTURE2:
                     ut = bgfx::UniformType::Int1;
                     break;
                 case MAT_VAR_VEC4:
@@ -240,6 +241,24 @@ namespace material {
         return UINT32_MAX;
     }
 
+    void set_texture2(struct ct_material material,
+                      const char *slot,
+                      ct_texture texture) {
+        uint32_t idx = map::get(_G.instace_map, material.idx,
+                                UINT32_MAX);
+
+        if (idx == UINT32_MAX) {
+            return;
+        }
+
+        auto *resource = material_blob::get(&_get_material_instance(idx));
+        auto *uniforms = material_blob::uniforms(resource);
+
+        int slot_idx = _find_uniform_slot(resource, slot);
+        uniforms[slot_idx].t = texture.idx;
+        uniforms[slot_idx].type = MAT_VAR_TEXTURE2;
+    }
+
     void set_texture(ct_material material,
                      const char *slot,
                      uint64_t texture) {
@@ -257,6 +276,7 @@ namespace material {
         int slot_idx = _find_uniform_slot(resource, slot);
         uniforms[slot_idx].t = texture;
     }
+
 
 
     void set_mat44f(ct_material material,
@@ -320,6 +340,15 @@ namespace material {
                     ++texture_stage;
                 }
                     break;
+
+                //TODO : dklsamdlsamkdm????
+                case MAT_VAR_TEXTURE2: {
+                    bgfx::setTexture(texture_stage, u_handler[i], {
+                            static_cast<uint16_t>(uniform.t)});
+
+                    ++texture_stage;
+                }
+                    break;
                 case MAT_VAR_VEC4:
                     bgfx::setUniform(u_handler[i], &uniform.v4, 1);
                     break;
@@ -339,6 +368,7 @@ namespace material {
         );
 
         bgfx::setState(state, 0);
+                
         bgfx::submit(viewid, shader_name);
     }
 

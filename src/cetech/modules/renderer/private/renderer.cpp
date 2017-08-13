@@ -8,6 +8,7 @@
 #include <celib/array.inl>
 #include <celib/map.inl>
 #include <celib/handler.inl>
+#include <celib/fpumath.h>
 
 #include <cetech/core/yaml/yaml.h>
 #include <cetech/core/api/api_system.h>
@@ -101,6 +102,83 @@ struct GConfig {
 //==============================================================================
 // Private
 //==============================================================================
+struct PosTexCoord0Vertex
+{
+    float m_x;
+    float m_y;
+    float m_z;
+    float m_u;
+    float m_v;
+
+    static void init()
+    {
+        ms_decl
+                .begin()
+                .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+                .end();
+    }
+
+    static bgfx::VertexDecl ms_decl;
+};
+
+bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
+
+
+void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
+{
+    if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
+    {
+        bgfx::TransientVertexBuffer vb;
+        bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
+        PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
+
+        const float minx = -_width;
+        const float maxx =  _width;
+        const float miny = 0.0f;
+        const float maxy = _height*2.0f;
+
+        const float texelHalfW = _texelHalf/_textureWidth;
+        const float texelHalfH = _texelHalf/_textureHeight;
+        const float minu = -1.0f + texelHalfW;
+        const float maxu =  1.0f + texelHalfH;
+
+        const float zz = 0.0f;
+
+        float minv = texelHalfH;
+        float maxv = 2.0f + texelHalfH;
+
+        if (_originBottomLeft)
+        {
+            float temp = minv;
+            minv = maxv;
+            maxv = temp;
+
+            minv -= 1.0f;
+            maxv -= 1.0f;
+        }
+
+        vertex[0].m_x = minx;
+        vertex[0].m_y = miny;
+        vertex[0].m_z = zz;
+        vertex[0].m_u = minu;
+        vertex[0].m_v = minv;
+
+        vertex[1].m_x = maxx;
+        vertex[1].m_y = miny;
+        vertex[1].m_z = zz;
+        vertex[1].m_u = maxu;
+        vertex[1].m_v = minv;
+
+        vertex[2].m_x = maxx;
+        vertex[2].m_y = maxy;
+        vertex[2].m_z = zz;
+        vertex[2].m_u = maxu;
+        vertex[2].m_v = maxv;
+
+        bgfx::setVertexBuffer(0, &vb);
+    }
+}
 
 static uint32_t _get_reset_flags() {
     return (_G.capture ? BGFX_RESET_CAPTURE : 0) |
@@ -161,8 +239,6 @@ bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
 
 
 #include "renderconfig_blob.h"
-
-
 
 
 //==============================================================================
@@ -236,6 +312,7 @@ void renderer_set_debug(int debug) {
     }
 }
 
+static int viewid_counter = 0;
 
 void renderer_render_world(ct_world world,
                            ct_camera camera,
@@ -255,7 +332,7 @@ void renderer_render_world(ct_world world,
             continue;
         }
 
-        on_pass(&vi, i, world, camera);
+        on_pass(&vi, viewid_counter++, i, world, camera);
     }
 }
 
@@ -272,6 +349,7 @@ void on_render() {
 
     bgfx::frame();
     _G.main_window->update(_G.main_window);
+    viewid_counter = 0;
 }
 
 void renderer_get_size(uint32_t *width,
@@ -947,9 +1025,10 @@ namespace renderer_module {
             .viewport_get_local_resource = render_viewport_get_local_resource,
     };
 
-    static ct_material_a0 material_api = {
+    static struct ct_material_a0 material_api = {
             .resource_create = material::create,
             .set_texture = material::set_texture,
+            .set_texture2 = material::set_texture2,
             .set_mat44f = material::set_mat44f,
             .submit = material::submit
     };
@@ -1022,9 +1101,10 @@ namespace renderer_module {
 #endif
 
         renderer_register_layer_pass(
-                ct_hash_a0.id64_from_str("render"),
+                ct_hash_a0.id64_from_str("geometry"),
                 [](viewport_instance *viewport,
                    uint8_t viewid,
+                   uint8_t layerid,
                    ct_world world,
                    ct_camera camera) {
 
@@ -1050,17 +1130,53 @@ namespace renderer_module {
                                                  _G.size_width,
                                                  _G.size_height);
 
-                    auto fb = viewport->framebuffers[viewid];
+                    auto fb = viewport->framebuffers[layerid];
                     bgfx::setViewFrameBuffer(viewid, {fb});
 
                     bgfx::setViewTransform(viewid, view_matrix,
                                            proj_matrix);
 
-                    ct_mesh_renderer_a0.render_all(world, viewid);
+                    // TODO: CULLING
+                    ct_mesh_renderer_a0.render_all(world, viewid, viewport->layers[layerid].name);
+                });
+
+
+        renderer_register_layer_pass(
+                ct_hash_a0.id64_from_str("copy"),
+                [](viewport_instance *viewport,
+                   uint8_t viewid,
+                   uint8_t layerid,
+                   ct_world world,
+                   ct_camera camera) {
+                    static ct_material copy_material = material_api.resource_create(ct_hash_a0.id64_from_str("copy"));
+
+
+                    bgfx::setViewRect(viewid, 0, 0,
+                                      (uint16_t) viewport->size[0],  // TODO: SHITTT
+                                      (uint16_t) viewport->size[1]); // TODO: SHITTT
+
+                    auto fb = viewport->framebuffers[layerid];
+                    bgfx::setViewFrameBuffer(viewid, {fb});
+
+                    float proj[16];
+                    celib::mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, true);
+
+                    bgfx::setViewTransform(viewid, NULL, proj);
+
+                    auto& layer_entry = viewport->layers[layerid];
+
+                    screenSpaceQuad( viewport->size[0], viewport->size[1], 0.0f, true);
+
+                    auto input_tex = _render_viewport_get_local_resource(*viewport, layer_entry.input[0]);
+
+                    material_api.set_texture2(copy_material, "s_input_texture", {input_tex});
+                    material_api.submit(copy_material, layer_entry.name, viewid);
                 });
 
 
         ct_app_a0.register_on_render(on_render);
+
+        PosTexCoord0Vertex::init();
     }
 
     void _shutdown() {

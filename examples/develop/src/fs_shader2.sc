@@ -11,5 +11,5 @@ SAMPLER2D(s_tex1, 0);
 
 void main()
 {
-    gl_FragColor = texture2D(s_tex1,  v_texcoord0);
+    gl_FragData[0] = texture2D(s_tex1,  v_texcoord0);
 }

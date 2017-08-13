@@ -5,6 +5,7 @@ enum material_variable_type {
     MAT_VAR_NONE = 0,
     MAT_VAR_INT,
     MAT_VAR_TEXTURE,
+    MAT_VAR_TEXTURE2, //TODO: RENAME
     MAT_VAR_VEC4,
     MAT_VAR_MAT44
 };
@@ -32,6 +33,10 @@ namespace material {
                      const char *slot,
                      uint64_t texture);
 
+    // TODO: rename
+    void set_texture2(struct ct_material material,
+                     const char *slot,
+                     struct ct_texture texture);
 
     void set_mat44f(struct ct_material material,
                     const char *slot,

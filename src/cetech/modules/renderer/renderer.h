@@ -62,6 +62,10 @@ struct ct_material_a0 {
 
     //! Submit material for actual render
     void (*submit)(struct ct_material material,  uint64_t layer, uint8_t viewid);
+
+    void (*set_texture2)(struct ct_material material,
+                      const char *slot,
+                      struct ct_texture texture);
 };
 
 //==============================================================================
@@ -130,7 +134,7 @@ struct ct_mesh_renderer_a0 {
 
     //! Render all mesh in world
     //! \param world Word
-    void (*render_all)(struct ct_world world, uint8_t viewid);
+    void (*render_all)(struct ct_world world, uint8_t viewid,  uint64_t layer_name);
 };
 
 
@@ -172,7 +176,7 @@ struct viewport_instance {
 };
 
 typedef void (*ct_render_on_render)();
-typedef void(*ct_renderer_on_pass_t)(viewport_instance* viewport, uint8_t viewid, struct ct_world world, struct ct_camera camera);
+typedef void(*ct_renderer_on_pass_t)(viewport_instance* viewport, uint8_t viewid, uint8_t layeridx, struct ct_world world, struct ct_camera camera);
 
 //==============================================================================
 // Api

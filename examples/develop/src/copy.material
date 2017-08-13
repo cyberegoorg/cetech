@@ -1,0 +1,5 @@
+layers:
+  copy:
+    shader: copy
+    textures:
+      s_input_texture: ""

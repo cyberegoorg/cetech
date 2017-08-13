@@ -2,4 +2,4 @@ layers:
   default:
     shader: shader2
     textures:
-      u_texColor: content/scene/solider/body01
+      s_tex1: ""
