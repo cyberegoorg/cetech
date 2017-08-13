@@ -124,6 +124,19 @@ namespace imgui_wrap {
                             _to_imvec4(tint_col),
                             _to_imvec4(border_col));
     }
+    void Image2(struct ct_texture user_texture_id,
+               const _vec2 size,
+               const _vec2 uv0,
+               const _vec2 uv1,
+               const _vec4 tint_col,
+               const _vec4 border_col) {
+        return ImGui::Image((bgfx::TextureHandle){user_texture_id.idx},
+                            _to_imvec2(size),
+                            _to_imvec2(uv0),
+                            _to_imvec2(uv1),
+                            _to_imvec4(tint_col),
+                            _to_imvec4(border_col));
+    }
 
     bool ImageButton(ImTextureID user_texture_id,
                      const _vec2 size,
@@ -1100,5 +1113,21 @@ namespace imgui_wrap {
 
     void CloseCurrentPopup() {
         return ImGui::CloseCurrentPopup();
+    }
+
+    void ColorWheel(const char* text, float* rgba, float size) {
+        ImGui::ColorWheel(text, rgba,size);
+
+    }
+
+    void ColorWheel2(const char* text, uint32_t* rgba, float size) {
+        ImGui::ColorWheel(text, rgba,size);
+    }
+
+
+    void GetWindowSize(float size[2]) {
+        auto v = ImGui::GetWindowSize();
+        size[0] = v.x;
+        size[1] = v.y;
     }
 }

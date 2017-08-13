@@ -3,6 +3,8 @@
 #include <cetech/core/blob/blob.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/engine/input/input.h>
+#include <cetech/engine/application/application.h>
+#include <cetech/core/hashlib/hashlib.h>
 #include "celib/map.inl"
 
 #include "cetech/core/config/config.h"
@@ -16,6 +18,8 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_keyboard_a0);
+CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 using namespace celib;
 
@@ -24,37 +28,59 @@ static struct DebugUIGlobal {
 } _G;
 
 namespace debugui {
-    void render() {
+    void render(uint8_t viewid) {
         float mp[3] = {};
         ct_mouse_a0.axis(0, ct_mouse_a0.axis_index("absolute"), mp);
 
         uint8_t btn = 0;
 
-        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("left"))) {
+        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("left")) !=
+            0) {
             btn |= IMGUI_MBUT_LEFT;
         }
 
-        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("right"))) {
+        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("right")) !=
+            0) {
             btn |= IMGUI_MBUT_RIGHT;
         }
 
-        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("midle"))) {
+        if (ct_mouse_a0.button_state(0, ct_mouse_a0.button_index("midle")) !=
+            0) {
             btn |= IMGUI_MBUT_MIDDLE;
         }
 
         uint32_t w, h;
         ct_renderer_a0.get_size(&w, &h);
 
-        imguiBeginFrame(mp[0], h - mp[1], btn, 0, w, h);
+        imguiBeginFrame(mp[0], h - mp[1], btn, 0, w, h, 0, viewid);
+
+
         for (uint32_t i = 0; i < array::size(_G.on_gui); ++i) {
             _G.on_gui[i]();
         }
+
+//        auto th = ct_renderer_a0.get_global_resource(
+//                ct_hash_a0.id64_from_str("colorbuffer"));
+//        static bool foo = true;
+//        ImGui::BeginDock("render2", &foo);
+//        imgui_wrap::Image2(th,
+//                           (float[2]) {float(w), float(h)},
+//                           (float[2]) {0.0f, 0.0f},
+//                           (float[2]) {1.0f, 1.0f},
+//                           (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+//                           (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+//        ImGui::EndDock();
+
         imguiEndFrame();
     }
 
     void register_on_gui(void (*on_gui)()) {
         array::push_back(_G.on_gui, on_gui);
     }
+}
+
+static void on_render() {
+    debugui::render(255);
 }
 
 namespace debugui_module {
@@ -81,6 +107,7 @@ namespace debugui_module {
             .SmallButton = imgui_wrap::SmallButton,
             .InvisibleButton = imgui_wrap::InvisibleButton,
             .Image = imgui_wrap::Image,
+            .Image2 = imgui_wrap::Image2,
             .ImageButton = imgui_wrap::ImageButton,
             .Checkbox = imgui_wrap::Checkbox,
             .CheckboxFlags = imgui_wrap::CheckboxFlags,
@@ -180,6 +207,9 @@ namespace debugui_module {
             .BeginPopupContextVoid = imgui_wrap::BeginPopupContextVoid,
             .EndPopup = imgui_wrap::EndPopup,
             .CloseCurrentPopup = imgui_wrap::CloseCurrentPopup,
+            .ColorWheel = imgui_wrap::ColorWheel,
+            .ColorWheel2 = imgui_wrap::ColorWheel2,
+            .GetWindowSize = imgui_wrap::GetWindowSize,
     };
 
     static void _init(ct_api_a0 *api) {
@@ -188,12 +218,16 @@ namespace debugui_module {
 
         _G = {};
         _G.on_gui.init(ct_memory_a0.main_allocator());
+
+        ct_renderer_a0.register_on_render(on_render);
     }
 
     static void _shutdown() {
         imguiDestroy();
 
         _G.on_gui.destroy();
+        ct_renderer_a0.unregister_on_render(on_render);
+
         _G = {};
     }
 }
@@ -205,6 +239,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_mouse_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_renderer_a0);
+            CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_hash_a0);
         },
         {
             debugui_module::_init(api);

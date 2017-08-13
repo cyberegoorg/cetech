@@ -3,6 +3,7 @@
 
 #include <cetech/core/macros.h>
 #include <cstdarg>
+#include <bgfx/bgfx.h>
 
 #ifdef __cplusplus
 
@@ -151,99 +152,6 @@ enum DebugUISelectableFlags_ {
     1 << 2    //!< Generate press events on double clicks too
 };
 
-//!< User fill ImGuiIO.KeyMap[] array with indices into the ImGuiIO.KeysDown[512] array
-enum DebugUIKey_ {
-    DebugUIKey_Tab,       //!< for tabbing through fields
-    DebugUIKey_LeftArrow, //!< for text edit
-    DebugUIKey_RightArrow,//!< for text edit
-    DebugUIKey_UpArrow,   //!< for text edit
-    DebugUIKey_DownArrow, //!< for text edit
-    DebugUIKey_PageUp,
-    DebugUIKey_PageDown,
-    DebugUIKey_Home,      //!< for text edit
-    DebugUIKey_End,       //!< for text edit
-    DebugUIKey_Delete,    //!< for text edit
-    DebugUIKey_Backspace, //!< for text edit
-    DebugUIKey_Enter,     //!< for text edit
-    DebugUIKey_Escape,    //!< for text edit
-    DebugUIKey_A,         //!< for text edit CTRL+A: select all
-    DebugUIKey_C,         //!< for text edit CTRL+C: copy
-    DebugUIKey_V,         //!< for text edit CTRL+V: paste
-    DebugUIKey_X,         //!< for text edit CTRL+X: cut
-    DebugUIKey_Y,         //!< for text edit CTRL+Y: redo
-    DebugUIKey_Z,         //!< for text edit CTRL+Z: undo
-    DebugUIKey_COUNT
-};
-
-//!< Enumeration for PushStyleColor() / PopStyleColor()
-enum DebugUICol_ {
-    DebugUICol_Text,
-    DebugUICol_TextDisabled,
-    DebugUICol_WindowBg,              //!< Background of normal windows
-    DebugUICol_ChildWindowBg,         //!< Background of child windows
-    DebugUICol_PopupBg,               //!< Background of popups, menus, tooltips windows
-    DebugUICol_Border,
-    DebugUICol_BorderShadow,
-    DebugUICol_FrameBg,               //!< Background of checkbox, radio button, plot, slider, text input
-    DebugUICol_FrameBgHovered,
-    DebugUICol_FrameBgActive,
-    DebugUICol_TitleBg,
-    DebugUICol_TitleBgCollapsed,
-    DebugUICol_TitleBgActive,
-    DebugUICol_MenuBarBg,
-    DebugUICol_ScrollbarBg,
-    DebugUICol_ScrollbarGrab,
-    DebugUICol_ScrollbarGrabHovered,
-    DebugUICol_ScrollbarGrabActive,
-    DebugUICol_ComboBg,
-    DebugUICol_CheckMark,
-    DebugUICol_SliderGrab,
-    DebugUICol_SliderGrabActive,
-    DebugUICol_Button,
-    DebugUICol_ButtonHovered,
-    DebugUICol_ButtonActive,
-    DebugUICol_Header,
-    DebugUICol_HeaderHovered,
-    DebugUICol_HeaderActive,
-    DebugUICol_Column,
-    DebugUICol_ColumnHovered,
-    DebugUICol_ColumnActive,
-    DebugUICol_ResizeGrip,
-    DebugUICol_ResizeGripHovered,
-    DebugUICol_ResizeGripActive,
-    DebugUICol_CloseButton,
-    DebugUICol_CloseButtonHovered,
-    DebugUICol_CloseButtonActive,
-    DebugUICol_PlotLines,
-    DebugUICol_PlotLinesHovered,
-    DebugUICol_PlotHistogram,
-    DebugUICol_PlotHistogramHovered,
-    DebugUICol_TextSelectedBg,
-    DebugUICol_ModalWindowDarkening,  //!< darken entire screen when a modal window is active
-    DebugUICol_COUNT
-};
-
-//!< Enumeration for PushStyleVar() / PopStyleVar() to temporarily modify the ImGuiStyle structure.
-//!< NB: the enum only refers to fields of ImGuiStyle which makes sense to be pushed/poped inside UI code. During initialization, feel free to just poke into ImGuiStyle directly.
-//!< NB: if changing this enum, you need to update the associated internal table GStyleVarInfo[] accordingly. This is where we link enum values to members offset/type.
-enum DebugUIStyleVar_ {
-    //!< Enum name ......................//!< Member in ImGuiStyle structure (see ImGuiStyle for descriptions)
-            DebugUIStyleVar_Alpha,               //!< float     Alpha
-    DebugUIStyleVar_WindowPadding,       //!< ImVec2    WindowPadding
-    DebugUIStyleVar_WindowRounding,      //!< float     WindowRounding
-    DebugUIStyleVar_WindowMinSize,       //!< ImVec2    WindowMinSize
-    DebugUIStyleVar_ChildWindowRounding, //!< float     ChildWindowRounding
-    DebugUIStyleVar_FramePadding,        //!< ImVec2    FramePadding
-    DebugUIStyleVar_FrameRounding,       //!< float     FrameRounding
-    DebugUIStyleVar_ItemSpacing,         //!< ImVec2    ItemSpacing
-    DebugUIStyleVar_ItemInnerSpacing,    //!< ImVec2    ItemInnerSpacing
-    DebugUIStyleVar_IndentSpacing,       //!< float     IndentSpacing
-    DebugUIStyleVar_GrabMinSize,         //!< float     GrabMinSize
-    DebugUIStyleVar_ButtonTextAlign,     //!< ImVec2    ButtonTextAlign
-    DebugUIStyleVar_ViewId,              //!< uint8_t
-    DebugUIStyleVar_Count_
-};
-
 //!< Enumeration for ColorEditMode()
 //!< FIXME-OBSOLETE: Will be replaced by future color/picker api
 enum DebugUIColorEditMode_ {
@@ -254,18 +162,6 @@ enum DebugUIColorEditMode_ {
     DebugUIColorEditMode_HEX = 2
 };
 
-//!< Enumeration for GetMouseCursor()
-enum DebugUIMouseCursor_ {
-    DebugUIMouseCursor_None = -1,
-    DebugUIMouseCursor_Arrow = 0,
-    DebugUIMouseCursor_TextInput,         //!< When hovering over InputText, etc.
-    DebugUIMouseCursor_Move,              //!< Unused
-    DebugUIMouseCursor_ResizeNS,          //!< Unused
-    DebugUIMouseCursor_ResizeEW,          //!< When hovering over a column
-    DebugUIMouseCursor_ResizeNESW,        //!< Unused
-    DebugUIMouseCursor_ResizeNWSE,        //!< When hovering over the bottom-right corner of a window
-    DebugUIMouseCursor_Count_
-};
 
 //!< Condition flags for ImGui::SetWindow***(), SetNextWindow***(), SetNextTreeNode***() functions
 //!< All those functions treat 0 as a shortcut to DebugUISetCond_Always
@@ -279,10 +175,9 @@ enum DebugUISetCond_ {
             << 3  //!< Set the variable if the window is appearing after being hidden/inactive (or the first time)
 };
 
-
 //!<! DebugUI API V0
 struct ct_debugui_a0 {
-    void (*render)();
+    void (*render)(uint8_t viewid);
 
     void (*register_on_gui)(void (*on_gui)());
 
@@ -345,6 +240,13 @@ struct ct_debugui_a0 {
                   const _vec2 uv1,
                   const _vec4 tint_col,
                   const _vec4 border_col);
+
+    void (*Image2)(struct ct_texture user_texture_id,
+                   const _vec2 size,
+                   const _vec2 uv0,
+                   const _vec2 uv1,
+                   const _vec4 tint_col,
+                   const _vec4 border_col);
 
     bool (*ImageButton)(ImTextureID user_texture_id,
                         const _vec2 size,
@@ -821,6 +723,16 @@ struct ct_debugui_a0 {
     void (*EndPopup)();
 
     void (*CloseCurrentPopup)();
+
+    void (*ColorWheel)(const char *text,
+                       float *rgba,
+                       float size);
+
+    void (*ColorWheel2)(const char *text,
+                        uint32_t *rgba,
+                        float size);
+
+    void (*GetWindowSize)(float size[2]);
 };
 
 #ifdef __cplusplus
