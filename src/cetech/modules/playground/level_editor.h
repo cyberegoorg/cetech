@@ -1,5 +1,5 @@
-#ifndef CETECH_PLAYGROUND_H
-#define CETECH_PLAYGROUND_H
+#ifndef CETECH_LEVEL_VIEW_H
+#define CETECH_LEVEL_VIEW_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,21 +12,11 @@ extern "C" {
 #include <stddef.h>
 
 
-//struct ct_playground_module {
-//    const char* name;
-//    void (*on_gui)();
-//    void (*on_init)();
-//    void (*on_shutdown)();
-//    void (*on_update)(float dt);
-//    void (*on_render)();
-//};
-
 //==============================================================================
 // Api
 //==============================================================================
 
-//! Playground API V0
-struct ct_playground_a0 {
+struct ct_level_view_a0 {
       void (*_)();
 };
 
@@ -34,4 +24,4 @@ struct ct_playground_a0 {
 }
 #endif
 
-#endif //CETECH_PLAYGROUND_H
+#endif //CETECH_LEVEL_VIEW_H

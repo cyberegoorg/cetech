@@ -77,18 +77,22 @@ namespace shader_resource {
 
     void online(uint64_t name,
                 void *data) {
-        auto resource = shader_blob::get(data);
+        auto* resource = shader_blob::get(data);
 
-        auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
-        auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
+        bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 
-        memcpy(vs_mem->data, (resource + 1), resource->vs_size);
-        memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
-               resource->fs_size);
+        if(resource) {
+            auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
+            auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
 
-        auto vs_shader = bgfx::createShader(vs_mem);
-        auto fs_shader = bgfx::createShader(fs_mem);
-        auto program = bgfx::createProgram(vs_shader, fs_shader, 1);
+            memcpy(vs_mem->data, (resource + 1), resource->vs_size);
+            memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
+                   resource->fs_size);
+
+            auto vs_shader = bgfx::createShader(vs_mem);
+            auto fs_shader = bgfx::createShader(fs_mem);
+            program = bgfx::createProgram(vs_shader, fs_shader, 1);
+        }
 
         map::set(_G.handler_map, name, program);
     }

@@ -63,7 +63,7 @@ struct ct_material_a0 {
     //! Submit material for actual render
     void (*submit)(struct ct_material material,  uint64_t layer, uint8_t viewid);
 
-    void (*set_texture2)(struct ct_material material,
+    void (*set_texture_handler)(struct ct_material material,
                       const char *slot,
                       struct ct_texture texture);
 };
@@ -168,7 +168,7 @@ struct viewport_instance {
 
     layer_entry_t *layers;
 
-    uint64_t layers_name;
+    uint64_t viewport;
     uint32_t layer_count;
 
     uint32_t fb_count;
@@ -207,12 +207,13 @@ struct ct_renderer_a0 {
                          struct ct_camera camera,
                          struct ct_viewport viewport);
 
-    void (*register_layer_pass)(uint64_t  type, ct_renderer_on_pass_t on_pass);
+    void (*register_layer_pass)(uint64_t type, ct_renderer_on_pass_t on_pass);
 
     void (*register_on_render)(ct_render_on_render on_render);
     void (*unregister_on_render)(ct_render_on_render on_render);
 
     struct ct_viewport (*create_viewport)(uint64_t name, float width, float height);
+    void (*resize_viewport)(struct ct_viewport viewport, float width, float height);
     uint16_t (*viewport_get_local_resource)(ct_viewport viewport,uint64_t name);
 };
 

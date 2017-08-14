@@ -74,7 +74,9 @@ set(SOURCE_FILES
         src/cetech/modules/debugui/private/ocornut-imgui/imgui.cpp
         src/cetech/modules/debugui/private/ocornut-imgui/imgui_draw.cpp
         src/cetech/modules/debugui/private/debugui.cpp
+
         src/cetech/modules/playground/private/playground.cpp
+        src/cetech/modules/playground/private/level_editor.cpp
 
         src/cetech/engine/machine/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp

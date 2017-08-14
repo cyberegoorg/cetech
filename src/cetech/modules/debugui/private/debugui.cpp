@@ -74,9 +74,30 @@ namespace debugui {
         imguiEndFrame();
     }
 
-    void register_on_gui(void (*on_gui)()) {
-        array::push_back(_G.on_gui, on_gui);
+    typedef void (*on_gui)();
+
+#define _DEF_ON_CLB_FCE(type, name)                                            \
+    static void register_ ## name ## _(type name) {                                   \
+        celib::array::push_back(_G.name, name);                                \
+    }                                                                          \
+    static void unregister_## name ## _(type name) {                                  \
+        const auto size = celib::array::size(_G.name);                         \
+                                                                               \
+        for(uint32_t i = 0; i < size; ++i) {                                   \
+            if(_G.name[i] != name) {                                           \
+                continue;                                                      \
+            }                                                                  \
+                                                                               \
+            uint32_t last_idx = size - 1;                                      \
+            _G.name[i] = _G.name[last_idx];                                    \
+                                                                               \
+            celib::array::pop_back(_G.name);                                   \
+            break;                                                             \
+        }                                                                      \
     }
+
+    _DEF_ON_CLB_FCE(on_gui, on_gui);
+
 }
 
 static void on_render() {
@@ -87,7 +108,9 @@ namespace debugui_module {
 
     static ct_debugui_a0 debugui_api = {
             .render = debugui::render,
-            .register_on_gui = debugui::register_on_gui,
+
+            .register_on_gui = debugui::register_on_gui_,
+            .unregister_on_gui = debugui::unregister_on_gui_,
 
             .Text = imgui_wrap::Text,
             .TextV = imgui_wrap::TextV,
@@ -106,7 +129,6 @@ namespace debugui_module {
             .Button = imgui_wrap::Button,
             .SmallButton = imgui_wrap::SmallButton,
             .InvisibleButton = imgui_wrap::InvisibleButton,
-            .Image = imgui_wrap::Image,
             .Image2 = imgui_wrap::Image2,
             .ImageButton = imgui_wrap::ImageButton,
             .Checkbox = imgui_wrap::Checkbox,
@@ -210,6 +232,9 @@ namespace debugui_module {
             .ColorWheel = imgui_wrap::ColorWheel,
             .ColorWheel2 = imgui_wrap::ColorWheel2,
             .GetWindowSize = imgui_wrap::GetWindowSize,
+            .BeginDock = imgui_wrap::BeginDock,
+            .EndDock = imgui_wrap::EndDock,
+
     };
 
     static void _init(ct_api_a0 *api) {

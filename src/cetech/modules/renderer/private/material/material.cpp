@@ -191,7 +191,7 @@ namespace material {
                     ut = bgfx::UniformType::Int1;
                     break;
                 case MAT_VAR_TEXTURE:
-                case MAT_VAR_TEXTURE2:
+                case MAT_VAR_TEXTURE_HANDLER:
                     ut = bgfx::UniformType::Int1;
                     break;
                 case MAT_VAR_VEC4:
@@ -241,9 +241,10 @@ namespace material {
         return UINT32_MAX;
     }
 
-    void set_texture2(struct ct_material material,
-                      const char *slot,
-                      ct_texture texture) {
+    void set_texture_handler(struct ct_material material,
+                             const char *slot,
+                             ct_texture texture) {
+
         uint32_t idx = map::get(_G.instace_map, material.idx,
                                 UINT32_MAX);
 
@@ -255,8 +256,8 @@ namespace material {
         auto *uniforms = material_blob::uniforms(resource);
 
         int slot_idx = _find_uniform_slot(resource, slot);
-        uniforms[slot_idx].t = texture.idx;
-        uniforms[slot_idx].type = MAT_VAR_TEXTURE2;
+        uniforms[slot_idx].th = texture.idx;
+        uniforms[slot_idx].type = MAT_VAR_TEXTURE_HANDLER;
     }
 
     void set_texture(ct_material material,
@@ -341,11 +342,8 @@ namespace material {
                 }
                     break;
 
-                //TODO : dklsamdlsamkdm????
-                case MAT_VAR_TEXTURE2: {
-                    bgfx::setTexture(texture_stage, u_handler[i], {
-                            static_cast<uint16_t>(uniform.t)});
-
+                case MAT_VAR_TEXTURE_HANDLER: {
+                    bgfx::setTexture(texture_stage, u_handler[i], {uniform.th});
                     ++texture_stage;
                 }
                     break;
@@ -364,8 +362,7 @@ namespace material {
                           | BGFX_STATE_DEPTH_TEST_LESS
                           | BGFX_STATE_DEPTH_WRITE
                           | BGFX_STATE_CULL_CCW
-                          | BGFX_STATE_MSAA
-        );
+                          | BGFX_STATE_MSAA );
 
         bgfx::setState(state, 0);
                 

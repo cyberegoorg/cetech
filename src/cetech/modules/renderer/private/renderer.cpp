@@ -102,19 +102,17 @@ struct GConfig {
 //==============================================================================
 // Private
 //==============================================================================
-struct PosTexCoord0Vertex
-{
+struct PosTexCoord0Vertex {
     float m_x;
     float m_y;
     float m_z;
     float m_u;
     float m_v;
 
-    static void init()
-    {
+    static void init() {
         ms_decl
                 .begin()
-                .add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
                 .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
                 .end();
     }
@@ -125,31 +123,34 @@ struct PosTexCoord0Vertex
 bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
 
 
-void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
-{
-    if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
-    {
+void screenSpaceQuad(float _textureWidth,
+                     float _textureHeight,
+                     float _texelHalf,
+                     bool _originBottomLeft,
+                     float _width = 1.0f,
+                     float _height = 1.0f) {
+    if (3 ==
+        bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl)) {
         bgfx::TransientVertexBuffer vb;
         bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
-        PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
+        PosTexCoord0Vertex *vertex = (PosTexCoord0Vertex *) vb.data;
 
         const float minx = -_width;
-        const float maxx =  _width;
+        const float maxx = _width;
         const float miny = 0.0f;
-        const float maxy = _height*2.0f;
+        const float maxy = _height * 2.0f;
 
-        const float texelHalfW = _texelHalf/_textureWidth;
-        const float texelHalfH = _texelHalf/_textureHeight;
+        const float texelHalfW = _texelHalf / _textureWidth;
+        const float texelHalfH = _texelHalf / _textureHeight;
         const float minu = -1.0f + texelHalfW;
-        const float maxu =  1.0f + texelHalfH;
+        const float maxu = 1.0f + texelHalfH;
 
         const float zz = 0.0f;
 
         float minv = texelHalfH;
         float maxv = 2.0f + texelHalfH;
 
-        if (_originBottomLeft)
-        {
+        if (_originBottomLeft) {
             float temp = minv;
             minv = maxv;
             maxv = temp;
@@ -216,6 +217,7 @@ bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
     } _RatioIdToEnum[] = {
             {.id = ct_hash_a0.id64_from_str(
                     ""), .e = bgfx::BackbufferRatio::Count},
+
             {.id = ct_hash_a0.id64_from_str(
                     "equal"), .e = bgfx::BackbufferRatio::Equal},
     };
@@ -235,8 +237,6 @@ bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
 //==============================================================================
 // render global
 //==============================================================================
-
-
 
 #include "renderconfig_blob.h"
 
@@ -359,8 +359,8 @@ void renderer_get_size(uint32_t *width,
 }
 
 
-uint16_t _render_viewport_get_local_resource(viewport_instance& instance,
-                                            uint64_t name) {
+uint16_t _render_viewport_get_local_resource(viewport_instance &instance,
+                                             uint64_t name) {
 
 
     for (int i = 0; i < instance.resource_count; ++i) {
@@ -384,17 +384,13 @@ uint16_t render_viewport_get_local_resource(ct_viewport viewport,
     return _render_viewport_get_local_resource(vi, name);
 }
 
-ct_viewport renderer_create_viewport(uint64_t name,
-                                     float width,
-                                     float height) {
-    auto id = celib::handler::create(_G.viewport_handler);
+void _init_viewport(viewport_instance &vi,
+                    uint64_t name,
+                    float width,
+                    float height) {
 
     auto *resource = ct_resource_a0.get(_G.type, name);
     auto *blob = renderconfig_blob::get(resource);
-
-    auto idx = celib::array::size(_G.viewport_instances);
-
-    viewport_instance vi = {};
 
     if (!width || !height) {
         uint32_t w, h;
@@ -405,13 +401,12 @@ ct_viewport renderer_create_viewport(uint64_t name,
 
     vi.size[0] = width;
     vi.size[1] = height;
-
+    vi.viewport = name;
     for (uint32_t i = 0; i < blob->viewport_count; ++i) {
         auto &vp = renderconfig_blob::viewport(blob)[i];
         if (vp.name != name) {
             continue;
         }
-
 
         for (uint32_t j = 0; j < blob->layer_count; ++j) {
             auto layer_name = renderconfig_blob::layers_name(blob)[j];
@@ -424,7 +419,8 @@ ct_viewport renderer_create_viewport(uint64_t name,
             auto localresource_offset = renderconfig_blob::layers_localresource_offset(
                     blob)[j];
             auto *localresource =
-                    renderconfig_blob::local_resource(blob) + localresource_offset;
+                    renderconfig_blob::local_resource(blob) +
+                    localresource_offset;
 
             vi.resource_count = localresource_count;
 
@@ -442,8 +438,13 @@ ct_viewport renderer_create_viewport(uint64_t name,
                                               | BGFX_TEXTURE_U_CLAMP
                                               | BGFX_TEXTURE_V_CLAMP;
 
-                auto h = bgfx::createTexture2D(ration, false, 1, format,
-                                               samplerFlags);
+                if (0 != vi.local_resource[k]) {
+                    bgfx::destroy((bgfx::TextureHandle) {vi.local_resource[k]});
+                }
+
+                auto h = bgfx::createTexture2D(static_cast<uint16_t>(width),
+                                               static_cast<uint16_t>(height),
+                                               false, 1, format, samplerFlags);
 
                 vi.local_resource[k] = h.idx;
                 vi.local_resource_name[k] = lr.name;
@@ -456,23 +457,51 @@ ct_viewport renderer_create_viewport(uint64_t name,
             vi.layer_count = entry_count;
             vi.layers = entry;
 
+            vi.fb_count = entry_count;
             for (int k = 0; k < entry_count; ++k) {
                 auto &e = entry[k];
 
                 bgfx::TextureHandle th[e.output_count];
                 for (int l = 0; l < e.output_count; ++l) {
                     // TODO if not found in local then find in global
-                    th[l] = {_render_viewport_get_local_resource(vi, e.output[l])};
+                    th[l] = {_render_viewport_get_local_resource(vi,
+                                                                 e.output[l])};
+                }
+
+                if (0 != vi.framebuffers[k]) {
+                    bgfx::destroy((bgfx::FrameBufferHandle) {
+                            vi.framebuffers[k]});
                 }
 
                 auto fb = bgfx::createFrameBuffer(e.output_count, th, false);
-                vi.framebuffers[vi.fb_count] = fb.idx;
-                ++vi.fb_count;
+                vi.framebuffers[k] = fb.idx;
             }
-
         }
     }
+}
 
+void resize_viewport(ct_viewport viewport,
+                     float width,
+                     float height) {
+
+    auto idx = celib::map::get(_G.viewport_instance_map, viewport.idx,
+                               UINT32_MAX);
+    auto &vi = _G.viewport_instances[idx];
+
+    if ((width != vi.size[0]) || (height != vi.size[1])) {
+        _init_viewport(vi, vi.viewport, width, height);
+    }
+
+}
+
+ct_viewport renderer_create_viewport(uint64_t name,
+                                     float width,
+                                     float height) {
+    viewport_instance vi = {};
+    _init_viewport(vi, name, width, height);
+
+    auto idx = celib::array::size(_G.viewport_instances);
+    auto id = celib::handler::create(_G.viewport_handler);
     celib::map::set(_G.viewport_instance_map, id, idx);
     celib::array::push_back(_G.viewport_instances, vi);
 
@@ -484,7 +513,6 @@ ct_viewport renderer_create_viewport(uint64_t name,
 // render_config resource
 //==============================================================================
 namespace renderconfig_resource {
-
 
     void *loader(ct_vio *input,
                  cel_alloc *allocator) {
@@ -554,443 +582,441 @@ namespace renderconfig_resource {
 
 //// COMPIELr
 namespace renderconfig_compiler {
-    namespace {
-        struct compiler_output {
-            celib::Array<render_resource_t> global_resource;
-            celib::Array<render_resource_t> local_resource;
-            celib::Array<uint64_t> layer_names;
-            celib::Array<uint32_t> layers_entry_count;
-            celib::Array<uint32_t> layers_localresource_count;
-            celib::Array<uint32_t> layers_localresource_offset;
-            celib::Array<uint32_t> layers_entry_offset;
-            celib::Array<layer_entry_t> layers_entry;
-            celib::Array<viewport_entry_t> viewport;
-        };
+    struct compiler_output {
+        celib::Array<render_resource_t> global_resource;
+        celib::Array<render_resource_t> local_resource;
+        celib::Array<uint64_t> layer_names;
+        celib::Array<uint32_t> layers_entry_count;
+        celib::Array<uint32_t> layers_localresource_count;
+        celib::Array<uint32_t> layers_localresource_offset;
+        celib::Array<uint32_t> layers_entry_offset;
+        celib::Array<layer_entry_t> layers_entry;
+        celib::Array<viewport_entry_t> viewport;
+    };
 
 
-        int compiler(const char *filename,
-                     ct_vio *source_vio,
-                     ct_vio *build_vio,
-                     ct_compilator_api *compilator_api) {
+    int compiler(const char *filename,
+                 ct_vio *source_vio,
+                 ct_vio *build_vio,
+                 ct_compilator_api *compilator_api) {
 
-            char *source_data =
-                    CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                                 source_vio->size(source_vio->inst) + 1);
-            memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
+        char *source_data =
+                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
+                             source_vio->size(source_vio->inst) + 1);
+        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
 
-            source_vio->read(source_vio->inst, source_data, sizeof(char),
-                             source_vio->size(source_vio->inst));
+        source_vio->read(source_vio->inst, source_data, sizeof(char),
+                         source_vio->size(source_vio->inst));
 
-            yaml_document_t h;
-            yaml_node_t root = yaml_load_str(source_data, &h);
+        yaml_document_t h;
+        yaml_node_t root = yaml_load_str(source_data, &h);
 
-            struct compiler_output output = {};
-            output.global_resource.init(ct_memory_a0.main_allocator());
-            output.layer_names.init(ct_memory_a0.main_allocator());
-            output.layers_entry_count.init(ct_memory_a0.main_allocator());
-            output.layers_entry_offset.init(ct_memory_a0.main_allocator());
-            output.layers_entry.init(ct_memory_a0.main_allocator());
-            output.viewport.init(ct_memory_a0.main_allocator());
-            output.local_resource.init(ct_memory_a0.main_allocator());
-            output.layers_localresource_count.init(
-                    ct_memory_a0.main_allocator());
-            output.layers_localresource_offset.init(
-                    ct_memory_a0.main_allocator());
-
-
-            //==================================================================
-            // Global resource
-            //==================================================================
-            yaml_node_t global_resource = yaml_get_node(root,
-                                                        "global_resource");
-            if (yaml_is_valid(global_resource)) {
-                yaml_node_foreach_seq(
-                        global_resource,
-                        [](uint32_t idx,
-                           yaml_node_t value,
-                           void *_data) {
-                            char str_buffer[128] = {};
-                            render_resource_t gs = {};
-
-                            compiler_output &output = *((compiler_output *) _data);
-
-                            ////////////////////////////////////////////////////
-                            yaml_node_t name = yaml_get_node(value, "name");
-                            yaml_as_string(name, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                            gs.name = ct_hash_a0.id64_from_str(str_buffer);
+        struct compiler_output output = {};
+        output.global_resource.init(ct_memory_a0.main_allocator());
+        output.layer_names.init(ct_memory_a0.main_allocator());
+        output.layers_entry_count.init(ct_memory_a0.main_allocator());
+        output.layers_entry_offset.init(ct_memory_a0.main_allocator());
+        output.layers_entry.init(ct_memory_a0.main_allocator());
+        output.viewport.init(ct_memory_a0.main_allocator());
+        output.local_resource.init(ct_memory_a0.main_allocator());
+        output.layers_localresource_count.init(
+                ct_memory_a0.main_allocator());
+        output.layers_localresource_offset.init(
+                ct_memory_a0.main_allocator());
 
 
-                            /////////////////////////////////////////////////////
-                            yaml_node_t type = yaml_get_node(value, "type");
-                            yaml_as_string(type, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
+        //==================================================================
+        // Global resource
+        //==================================================================
+        yaml_node_t global_resource = yaml_get_node(root,
+                                                    "global_resource");
+        if (yaml_is_valid(global_resource)) {
+            yaml_node_foreach_seq(
+                    global_resource,
+                    [](uint32_t idx,
+                       yaml_node_t value,
+                       void *_data) {
+                        char str_buffer[128] = {};
+                        render_resource_t gs = {};
 
-                            gs.type = ct_hash_a0.id64_from_str(str_buffer);
+                        compiler_output &output = *((compiler_output *) _data);
+
+                        ////////////////////////////////////////////////////
+                        yaml_node_t name = yaml_get_node(value, "name");
+                        yaml_as_string(name, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
+
+                        gs.name = ct_hash_a0.id64_from_str(str_buffer);
 
 
-                            /////////////////////////////////////////////////////
-                            yaml_node_t format = yaml_get_node(value, "format");
-                            yaml_as_string(format, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
+                        /////////////////////////////////////////////////////
+                        yaml_node_t type = yaml_get_node(value, "type");
+                        yaml_as_string(type, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
 
-                            gs.format = ct_hash_a0.id64_from_str(str_buffer);
-
-                            /////////////////////////////////////////////////////
-                            yaml_node_t ration = yaml_get_node(value, "ration");
-                            yaml_as_string(ration, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                            gs.ration = ct_hash_a0.id64_from_str(str_buffer);
+                        gs.type = ct_hash_a0.id64_from_str(str_buffer);
 
 
-                            celib::array::push_back(output.global_resource, gs);
-                        }, &output);
-            }
+                        /////////////////////////////////////////////////////
+                        yaml_node_t format = yaml_get_node(value, "format");
+                        yaml_as_string(format, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
 
-            //==================================================================
-            // layers
-            //==================================================================
-            yaml_node_t layers = yaml_get_node(root, "layers");
-            if (yaml_is_valid(layers)) {
+                        gs.format = ct_hash_a0.id64_from_str(str_buffer);
 
-                yaml_node_foreach_dict(
-                        layers,
-                        [](yaml_node_t key,
-                           yaml_node_t value,
-                           void *_data) {
-                            char str_buffer[128] = {};
+                        /////////////////////////////////////////////////////
+                        yaml_node_t ration = yaml_get_node(value, "ration");
+                        yaml_as_string(ration, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
 
-                            compiler_output &output = *((compiler_output *) _data);
+                        gs.ration = ct_hash_a0.id64_from_str(str_buffer);
 
-                            yaml_as_string(key, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
 
-                            auto name_id = ct_hash_a0.id64_from_str(str_buffer);
-                            auto layer_offset = celib::array::size(
-                                    output.layers_entry);
+                        celib::array::push_back(output.global_resource, gs);
+                    }, &output);
+        }
 
-                            celib::array::push_back(output.layer_names,
-                                                    name_id);
-                            celib::array::push_back(output.layers_entry_offset,
-                                                    layer_offset);
+        //==================================================================
+        // layers
+        //==================================================================
+        yaml_node_t layers = yaml_get_node(root, "layers");
+        if (yaml_is_valid(layers)) {
 
+            yaml_node_foreach_dict(
+                    layers,
+                    [](yaml_node_t key,
+                       yaml_node_t value,
+                       void *_data) {
+                        char str_buffer[128] = {};
+
+                        compiler_output &output = *((compiler_output *) _data);
+
+                        yaml_as_string(key, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
+
+                        auto name_id = ct_hash_a0.id64_from_str(str_buffer);
+                        auto layer_offset = celib::array::size(
+                                output.layers_entry);
+
+                        celib::array::push_back(output.layer_names,
+                                                name_id);
+                        celib::array::push_back(output.layers_entry_offset,
+                                                layer_offset);
+
+                        yaml_node_foreach_seq(
+                                value,
+                                [](uint32_t idx,
+                                   yaml_node_t value,
+                                   void *_data) {
+                                    char str_buffer[128] = {};
+                                    layer_entry_t le = {};
+
+                                    auto &output = *((compiler_output *) _data);
+
+                                    ////////////////////////////////////////////////////
+                                    yaml_node_t name = yaml_get_node(value,
+                                                                     "name");
+                                    yaml_as_string(name, str_buffer,
+                                                   CETECH_ARRAY_LEN(
+                                                           str_buffer) - 1);
+
+                                    le.name = ct_hash_a0.id64_from_str(
+                                            str_buffer);
+
+
+                                    /////////////////////////////////////////////////////
+                                    yaml_node_t type = yaml_get_node(value,
+                                                                     "type");
+
+                                    yaml_as_string(type, str_buffer,
+                                                   CETECH_ARRAY_LEN(
+                                                           str_buffer) - 1);
+
+                                    le.type = ct_hash_a0.id64_from_str(
+                                            str_buffer);
+
+                                    /////////////////////////////////////////////////////
+                                    yaml_node_t input = yaml_get_node(value,
+                                                                      "input");
+                                    if (yaml_is_valid(input)) {
+                                        yaml_node_foreach_seq(
+                                                input,
+                                                [](uint32_t idx,
+                                                   yaml_node_t value,
+                                                   void *_data) {
+                                                    char str_buffer[128] = {};
+                                                    auto &le = *((layer_entry_t *) _data);
+
+                                                    yaml_as_string(value,
+                                                                   str_buffer,
+                                                                   CETECH_ARRAY_LEN(
+                                                                           str_buffer) -
+                                                                   1);
+
+                                                    le.input[idx] = ct_hash_a0.id64_from_str(
+                                                            str_buffer);
+                                                    ++le.input_count;
+
+                                                }, &le);
+                                    }
+
+                                    /////////////////////////////////////////////////////
+                                    yaml_node_t output_t = yaml_get_node(
+                                            value,
+                                            "output");
+                                    if (yaml_is_valid(output_t)) {
+                                        yaml_node_foreach_seq(
+                                                output_t,
+                                                [](uint32_t idx,
+                                                   yaml_node_t value,
+                                                   void *_data) {
+                                                    char str_buffer[128] = {};
+                                                    auto &le = *((layer_entry_t *) _data);
+
+                                                    yaml_as_string(value,
+                                                                   str_buffer,
+                                                                   CETECH_ARRAY_LEN(
+                                                                           str_buffer) -
+                                                                   1);
+
+                                                    le.output[idx] = ct_hash_a0.id64_from_str(
+                                                            str_buffer);
+                                                    ++le.output_count;
+
+                                                }, &le);
+                                    }
+
+
+                                    celib::array::push_back(
+                                            output.layers_entry, le);
+
+                                }, &output);
+
+                        celib::array::push_back(output.layers_entry_count,
+                                                celib::array::size(
+                                                        output.layers_entry) -
+                                                layer_offset);
+
+                    }, &output);
+        }
+
+        //==================================================================
+        // Viewport
+        //==================================================================
+        yaml_node_t viewport = yaml_get_node(root, "viewport");
+        if (yaml_is_valid(viewport)) {
+
+            yaml_node_foreach_dict(
+                    viewport,
+                    [](yaml_node_t key,
+                       yaml_node_t value,
+                       void *_data) {
+                        char str_buffer[128] = {};
+
+                        compiler_output &output = *((compiler_output *) _data);
+
+                        yaml_as_string(key, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
+
+                        auto name_id = ct_hash_a0.id64_from_str(str_buffer);
+
+                        yaml_as_string(key, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
+
+                        yaml_node_t layers = yaml_get_node(value, "layers");
+                        yaml_as_string(layers, str_buffer,
+                                       CETECH_ARRAY_LEN(str_buffer) - 1);
+                        auto layers_id = ct_hash_a0.id64_from_str(
+                                str_buffer);
+
+
+                        viewport_entry_t ve = {};
+
+                        ve.name = name_id;
+                        ve.layer = layers_id;
+
+                        celib::array::push_back(output.viewport, ve);
+
+                        //////
+                        auto localresource_offset = celib::array::size(
+                                output.local_resource);
+
+                        celib::array::push_back(
+                                output.layers_localresource_offset,
+                                localresource_offset);
+
+                        yaml_node_t local_resource = yaml_get_node(value,
+                                                                   "local_resource");
+                        if (yaml_is_valid(local_resource)) {
                             yaml_node_foreach_seq(
-                                    value,
+                                    local_resource,
                                     [](uint32_t idx,
                                        yaml_node_t value,
                                        void *_data) {
                                         char str_buffer[128] = {};
-                                        layer_entry_t le = {};
+                                        render_resource_t gs = {};
 
-                                        auto &output = *((compiler_output *) _data);
+                                        compiler_output &output = *((compiler_output *) _data);
 
                                         ////////////////////////////////////////////////////
-                                        yaml_node_t name = yaml_get_node(value,
-                                                                         "name");
+                                        yaml_node_t name = yaml_get_node(
+                                                value, "name");
                                         yaml_as_string(name, str_buffer,
                                                        CETECH_ARRAY_LEN(
-                                                               str_buffer) - 1);
+                                                               str_buffer) -
+                                                       1);
 
-                                        le.name = ct_hash_a0.id64_from_str(
+                                        gs.name = ct_hash_a0.id64_from_str(
                                                 str_buffer);
 
 
                                         /////////////////////////////////////////////////////
-                                        yaml_node_t type = yaml_get_node(value,
-                                                                         "type");
-
+                                        yaml_node_t type = yaml_get_node(
+                                                value, "type");
                                         yaml_as_string(type, str_buffer,
                                                        CETECH_ARRAY_LEN(
-                                                               str_buffer) - 1);
+                                                               str_buffer) -
+                                                       1);
 
-                                        le.type = ct_hash_a0.id64_from_str(
+                                        gs.type = ct_hash_a0.id64_from_str(
+                                                str_buffer);
+
+
+                                        /////////////////////////////////////////////////////
+                                        yaml_node_t format = yaml_get_node(
+                                                value, "format");
+                                        yaml_as_string(format, str_buffer,
+                                                       CETECH_ARRAY_LEN(
+                                                               str_buffer) -
+                                                       1);
+
+                                        gs.format = ct_hash_a0.id64_from_str(
                                                 str_buffer);
 
                                         /////////////////////////////////////////////////////
-                                        yaml_node_t input = yaml_get_node(value,
-                                                                          "input");
-                                        if (yaml_is_valid(input)) {
-                                            yaml_node_foreach_seq(
-                                                    input,
-                                                    [](uint32_t idx,
-                                                       yaml_node_t value,
-                                                       void *_data) {
-                                                        char str_buffer[128] = {};
-                                                        auto &le = *((layer_entry_t *) _data);
+                                        yaml_node_t ration = yaml_get_node(
+                                                value, "ration");
+                                        yaml_as_string(ration, str_buffer,
+                                                       CETECH_ARRAY_LEN(
+                                                               str_buffer) -
+                                                       1);
 
-                                                        yaml_as_string(value,
-                                                                       str_buffer,
-                                                                       CETECH_ARRAY_LEN(
-                                                                               str_buffer) -
-                                                                       1);
-
-                                                        le.input[idx] = ct_hash_a0.id64_from_str(
-                                                                str_buffer);
-                                                        ++le.input_count;
-
-                                                    }, &le);
-                                        }
-
-                                        /////////////////////////////////////////////////////
-                                        yaml_node_t output_t = yaml_get_node(
-                                                value,
-                                                "output");
-                                        if (yaml_is_valid(output_t)) {
-                                            yaml_node_foreach_seq(
-                                                    output_t,
-                                                    [](uint32_t idx,
-                                                       yaml_node_t value,
-                                                       void *_data) {
-                                                        char str_buffer[128] = {};
-                                                        auto &le = *((layer_entry_t *) _data);
-
-                                                        yaml_as_string(value,
-                                                                       str_buffer,
-                                                                       CETECH_ARRAY_LEN(
-                                                                               str_buffer) -
-                                                                       1);
-
-                                                        le.output[idx] = ct_hash_a0.id64_from_str(
-                                                                str_buffer);
-                                                        ++le.output_count;
-
-                                                    }, &le);
-                                        }
+                                        gs.ration = ct_hash_a0.id64_from_str(
+                                                str_buffer);
 
 
                                         celib::array::push_back(
-                                                output.layers_entry, le);
-
+                                                output.local_resource, gs);
                                     }, &output);
 
-                            celib::array::push_back(output.layers_entry_count,
-                                                    celib::array::size(
-                                                            output.layers_entry) -
-                                                    layer_offset);
-
-                        }, &output);
-            }
-
-            //==================================================================
-            // Viewport
-            //==================================================================
-            yaml_node_t viewport = yaml_get_node(root, "viewport");
-            if (yaml_is_valid(viewport)) {
-
-                yaml_node_foreach_dict(
-                        viewport,
-                        [](yaml_node_t key,
-                           yaml_node_t value,
-                           void *_data) {
-                            char str_buffer[128] = {};
-
-                            compiler_output &output = *((compiler_output *) _data);
-
-                            yaml_as_string(key, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                            auto name_id = ct_hash_a0.id64_from_str(str_buffer);
-
-                            yaml_as_string(key, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                            yaml_node_t layers = yaml_get_node(value, "layers");
-                            yaml_as_string(layers, str_buffer,
-                                           CETECH_ARRAY_LEN(str_buffer) - 1);
-                            auto layers_id = ct_hash_a0.id64_from_str(
-                                    str_buffer);
-
-
-                            viewport_entry_t ve = {};
-
-                            ve.name = name_id;
-                            ve.layer = layers_id;
-
-                            celib::array::push_back(output.viewport, ve);
-
-                            //////
-                            auto localresource_offset = celib::array::size(
-                                    output.local_resource);
-
                             celib::array::push_back(
-                                    output.layers_localresource_offset,
+                                    output.layers_localresource_count,
+                                    celib::array::size(
+                                            output.local_resource) -
                                     localresource_offset);
+                        }
 
-                            yaml_node_t local_resource = yaml_get_node(value,
-                                                                       "local_resource");
-                            if (yaml_is_valid(local_resource)) {
-                                yaml_node_foreach_seq(
-                                        local_resource,
-                                        [](uint32_t idx,
-                                           yaml_node_t value,
-                                           void *_data) {
-                                            char str_buffer[128] = {};
-                                            render_resource_t gs = {};
-
-                                            compiler_output &output = *((compiler_output *) _data);
-
-                                            ////////////////////////////////////////////////////
-                                            yaml_node_t name = yaml_get_node(
-                                                    value, "name");
-                                            yaml_as_string(name, str_buffer,
-                                                           CETECH_ARRAY_LEN(
-                                                                   str_buffer) -
-                                                           1);
-
-                                            gs.name = ct_hash_a0.id64_from_str(
-                                                    str_buffer);
-
-
-                                            /////////////////////////////////////////////////////
-                                            yaml_node_t type = yaml_get_node(
-                                                    value, "type");
-                                            yaml_as_string(type, str_buffer,
-                                                           CETECH_ARRAY_LEN(
-                                                                   str_buffer) -
-                                                           1);
-
-                                            gs.type = ct_hash_a0.id64_from_str(
-                                                    str_buffer);
-
-
-                                            /////////////////////////////////////////////////////
-                                            yaml_node_t format = yaml_get_node(
-                                                    value, "format");
-                                            yaml_as_string(format, str_buffer,
-                                                           CETECH_ARRAY_LEN(
-                                                                   str_buffer) -
-                                                           1);
-
-                                            gs.format = ct_hash_a0.id64_from_str(
-                                                    str_buffer);
-
-                                            /////////////////////////////////////////////////////
-                                            yaml_node_t ration = yaml_get_node(
-                                                    value, "ration");
-                                            yaml_as_string(ration, str_buffer,
-                                                           CETECH_ARRAY_LEN(
-                                                                   str_buffer) -
-                                                           1);
-
-                                            gs.ration = ct_hash_a0.id64_from_str(
-                                                    str_buffer);
-
-
-                                            celib::array::push_back(
-                                                    output.local_resource, gs);
-                                        }, &output);
-
-                                celib::array::push_back(
-                                        output.layers_localresource_count,
-                                        celib::array::size(
-                                                output.local_resource) -
-                                        localresource_offset);
-                            }
-
-                        }, &output);
-            }
-
-            renderconfig_blob::blob_t resource = {
-                    .global_resource_count = celib::array::size(
-                            output.global_resource),
-
-                    .layer_count = celib::array::size(
-                            output.layer_names),
-
-                    .layer_entry_count = celib::array::size(
-                            output.layers_entry),
-
-                    .local_resource_count = celib::array::size(
-                            output.local_resource),
-
-                    .viewport_count = celib::array::size(output.viewport),
-            };
-
-
-            build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.global_resource),
-                             sizeof(render_resource_t),
-                             celib::array::size(output.global_resource));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.local_resource),
-                             sizeof(render_resource_t),
-                             celib::array::size(output.local_resource));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.layer_names),
-                             sizeof(uint64_t),
-                             celib::array::size(output.layer_names));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.layers_entry_count),
-                             sizeof(uint32_t),
-                             celib::array::size(output.layers_entry_count));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.layers_entry_offset),
-                             sizeof(uint32_t),
-                             celib::array::size(output.layers_entry_offset));
-
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(
-                                     output.layers_localresource_count),
-                             sizeof(uint32_t),
-                             celib::array::size(
-                                     output.layers_localresource_count));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(
-                                     output.layers_localresource_offset),
-                             sizeof(uint32_t),
-                             celib::array::size(
-                                     output.layers_localresource_offset));
-
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.layers_entry),
-                             sizeof(layer_entry_t),
-                             celib::array::size(output.layers_entry));
-
-            build_vio->write(build_vio->inst,
-                             celib::array::begin(output.viewport),
-                             sizeof(viewport_entry_t),
-                             celib::array::size(output.viewport));
-
-            output.global_resource.destroy();
-            output.layer_names.destroy();
-            output.layers_entry_count.destroy();
-            output.layers_entry_offset.destroy();
-            output.layers_entry.destroy();
-            output.viewport.destroy();
-            output.local_resource.destroy();
-            output.layers_localresource_count.destroy();
-            output.layers_localresource_offset.destroy();
-
-            CEL_FREE(ct_memory_a0.main_allocator(), source_data);
-            return 1;
+                    }, &output);
         }
 
-        int init(struct ct_api_a0 *api) {
-            ct_resource_a0.compiler_register(
-                    ct_hash_a0.id64_from_str("render_config"),
-                    compiler);
+        renderconfig_blob::blob_t resource = {
+                .global_resource_count = celib::array::size(
+                        output.global_resource),
 
-            return 1;
-        }
+                .layer_count = celib::array::size(
+                        output.layer_names),
+
+                .layer_entry_count = celib::array::size(
+                        output.layers_entry),
+
+                .local_resource_count = celib::array::size(
+                        output.local_resource),
+
+                .viewport_count = celib::array::size(output.viewport),
+        };
+
+
+        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.global_resource),
+                         sizeof(render_resource_t),
+                         celib::array::size(output.global_resource));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.local_resource),
+                         sizeof(render_resource_t),
+                         celib::array::size(output.local_resource));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.layer_names),
+                         sizeof(uint64_t),
+                         celib::array::size(output.layer_names));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.layers_entry_count),
+                         sizeof(uint32_t),
+                         celib::array::size(output.layers_entry_count));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.layers_entry_offset),
+                         sizeof(uint32_t),
+                         celib::array::size(output.layers_entry_offset));
+
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(
+                                 output.layers_localresource_count),
+                         sizeof(uint32_t),
+                         celib::array::size(
+                                 output.layers_localresource_count));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(
+                                 output.layers_localresource_offset),
+                         sizeof(uint32_t),
+                         celib::array::size(
+                                 output.layers_localresource_offset));
+
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.layers_entry),
+                         sizeof(layer_entry_t),
+                         celib::array::size(output.layers_entry));
+
+        build_vio->write(build_vio->inst,
+                         celib::array::begin(output.viewport),
+                         sizeof(viewport_entry_t),
+                         celib::array::size(output.viewport));
+
+        output.global_resource.destroy();
+        output.layer_names.destroy();
+        output.layers_entry_count.destroy();
+        output.layers_entry_offset.destroy();
+        output.layers_entry.destroy();
+        output.viewport.destroy();
+        output.local_resource.destroy();
+        output.layers_localresource_count.destroy();
+        output.layers_localresource_offset.destroy();
+
+        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
+        return 1;
+    }
+
+    int init(struct ct_api_a0 *api) {
+        ct_resource_a0.compiler_register(
+                ct_hash_a0.id64_from_str("render_config"),
+                compiler);
+
+        return 1;
     }
 }
 /////
 #define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                                   \
+    static void register_ ## name ## _(type name) {                            \
         celib::array::push_back(_G.name, name);                                \
     }                                                                          \
-    static void unregister_## name ## _(type name) {                                  \
+    static void unregister_## name ## _(type name) {                           \
         const auto size = celib::array::size(_G.name);                         \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
@@ -1023,12 +1049,13 @@ namespace renderer_module {
             .unregister_on_render =unregister_on_render_,
             .create_viewport = renderer_create_viewport,
             .viewport_get_local_resource = render_viewport_get_local_resource,
+            .resize_viewport = resize_viewport,
     };
 
     static struct ct_material_a0 material_api = {
             .resource_create = material::create,
             .set_texture = material::set_texture,
-            .set_texture2 = material::set_texture2,
+            .set_texture_handler = material::set_texture_handler,
             .set_mat44f = material::set_mat44f,
             .submit = material::submit
     };
@@ -1137,7 +1164,8 @@ namespace renderer_module {
                                            proj_matrix);
 
                     // TODO: CULLING
-                    ct_mesh_renderer_a0.render_all(world, viewid, viewport->layers[layerid].name);
+                    ct_mesh_renderer_a0.render_all(world, viewid,
+                                                   viewport->layers[layerid].name);
                 });
 
 
@@ -1148,8 +1176,8 @@ namespace renderer_module {
                    uint8_t layerid,
                    ct_world world,
                    ct_camera camera) {
-                    static ct_material copy_material = material_api.resource_create(ct_hash_a0.id64_from_str("copy"));
-
+                    static ct_material copy_material = material_api.resource_create(
+                            ct_hash_a0.id64_from_str("copy"));
 
                     bgfx::setViewRect(viewid, 0, 0,
                                       (uint16_t) viewport->size[0],  // TODO: SHITTT
@@ -1159,18 +1187,24 @@ namespace renderer_module {
                     bgfx::setViewFrameBuffer(viewid, {fb});
 
                     float proj[16];
-                    celib::mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, true);
+                    celib::mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+                                      100.0f, 0.0f, true);
 
                     bgfx::setViewTransform(viewid, NULL, proj);
 
-                    auto& layer_entry = viewport->layers[layerid];
+                    auto &layer_entry = viewport->layers[layerid];
 
-                    screenSpaceQuad( viewport->size[0], viewport->size[1], 0.0f, true);
+                    screenSpaceQuad(viewport->size[0], viewport->size[1], 0.0f,
+                                    true);
 
-                    auto input_tex = _render_viewport_get_local_resource(*viewport, layer_entry.input[0]);
+                    auto input_tex = _render_viewport_get_local_resource(
+                            *viewport, layer_entry.input[0]);
 
-                    material_api.set_texture2(copy_material, "s_input_texture", {input_tex});
-                    material_api.submit(copy_material, layer_entry.name, viewid);
+                    material_api.set_texture_handler(copy_material,
+                                                     "s_input_texture",
+                                                     {input_tex});
+                    material_api.submit(copy_material, layer_entry.name,
+                                        viewid);
                 });
 
 
@@ -1224,6 +1258,5 @@ CETECH_MODULE_DEF(
             CEL_UNUSED(api);
 
             renderer_module::_shutdown();
-
         }
 )

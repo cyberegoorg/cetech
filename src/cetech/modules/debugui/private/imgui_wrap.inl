@@ -1130,4 +1130,14 @@ namespace imgui_wrap {
         size[0] = v.x;
         size[1] = v.y;
     }
+
+    bool BeginDock(const char* label, bool* opened, DebugUIWindowFlags_ extra_flags)
+    {
+        return ImGui::BeginDock(label, opened,extra_flags);
+    }
+
+    void EndDock()
+    {
+        ImGui::EndDock();
+    }
 }

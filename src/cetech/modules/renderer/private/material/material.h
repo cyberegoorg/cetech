@@ -5,7 +5,7 @@ enum material_variable_type {
     MAT_VAR_NONE = 0,
     MAT_VAR_INT,
     MAT_VAR_TEXTURE,
-    MAT_VAR_TEXTURE2, //TODO: RENAME
+    MAT_VAR_TEXTURE_HANDLER, //TODO: RENAME
     MAT_VAR_VEC4,
     MAT_VAR_MAT44
 };
@@ -16,6 +16,7 @@ struct material_variable {
         int i;
         float f;
         uint64_t t;
+        uint16_t th;
         float v3[3];
         float v4[4];
         float m44[16];
@@ -34,9 +35,9 @@ namespace material {
                      uint64_t texture);
 
     // TODO: rename
-    void set_texture2(struct ct_material material,
-                     const char *slot,
-                     struct ct_texture texture);
+    void set_texture_handler(struct ct_material material,
+                             const char *slot,
+                             struct ct_texture texture);
 
     void set_mat44f(struct ct_material material,
                     const char *slot,

@@ -12,6 +12,8 @@ extern "C" {
 
 #include <stddef.h>
 
+struct ct_texture;
+
 typedef float _vec4[4];
 typedef float _vec2[2];
 
@@ -32,7 +34,7 @@ typedef int (*ImGuiTextEditCallback)(ImGuiTextEditCallbackData *data);
 typedef void (*ImGuiSizeConstraintCallback)(ImGuiSizeConstraintCallbackData *data);
 
 enum DebugUIWindowFlags_ {
-
+    DebugUIWindowFlags_Empty = 0,
     DebugUIWindowFlags_NoTitleBar = 1 << 0,   //!< Disable title-bar
     DebugUIWindowFlags_NoResize =
     1 << 1,   //!< Disable user resizing with the lower-right grip
@@ -178,8 +180,9 @@ enum DebugUISetCond_ {
 //!<! DebugUI API V0
 struct ct_debugui_a0 {
     void (*render)(uint8_t viewid);
-
     void (*register_on_gui)(void (*on_gui)());
+    void (*unregister_on_gui)(void (*on_gui)());
+
 
     void (*Text)(const char *fmt,
                  ...) CTECH_ATTR_FORMAT(1, 2);
@@ -233,13 +236,6 @@ struct ct_debugui_a0 {
 
     bool (*InvisibleButton)(const char *str_id,
                             const _vec2 size);
-
-    void (*Image)(ImTextureID user_texture_id,
-                  const _vec2 size,
-                  const _vec2 uv0,
-                  const _vec2 uv1,
-                  const _vec4 tint_col,
-                  const _vec4 border_col);
 
     void (*Image2)(struct ct_texture user_texture_id,
                    const _vec2 size,
@@ -733,6 +729,9 @@ struct ct_debugui_a0 {
                         float size);
 
     void (*GetWindowSize)(float size[2]);
+
+    bool (*BeginDock)(const char* label, bool* opened, DebugUIWindowFlags_ extra_flags);
+    void (*EndDock)();
 };
 
 #ifdef __cplusplus
