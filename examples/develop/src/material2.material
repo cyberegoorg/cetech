@@ -2,7 +2,7 @@ parent: material1
 
 layers:
   default:
-    textures:
+    variables:
       u_texColor: texture2
       #u_texColor: content/scene/solider/body01
       #u_texColor: content/scene/m4a1/m4_diff

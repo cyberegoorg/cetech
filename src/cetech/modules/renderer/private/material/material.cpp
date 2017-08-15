@@ -316,6 +316,7 @@ namespace material {
         auto *layer_offset = material_blob::layer_offset(resource);
         auto *uniforms = material_blob::uniforms(resource);
         auto *uniform_cout = material_blob::uniform_count(resource);
+        auto *render_state = material_blob::render_state(resource);
 
         auto shader_name = shader::shader_get(shader_names[layer_idx]);
 
@@ -331,6 +332,7 @@ namespace material {
             switch (type) {
                 case MAT_VAR_NONE:
                     break;
+
                 case MAT_VAR_INT:
                     bgfx::setUniform(u_handler[i], &uniform.i, 1);
                     break;
@@ -356,17 +358,8 @@ namespace material {
             }
         }
 
-        uint64_t state = (0
-                          | BGFX_STATE_RGB_WRITE
-                          | BGFX_STATE_ALPHA_WRITE
-                          | BGFX_STATE_DEPTH_TEST_LESS
-                          | BGFX_STATE_DEPTH_WRITE
-                          | BGFX_STATE_CULL_CCW
-                          | BGFX_STATE_MSAA );
-
+        uint64_t state = render_state[layer_idx];
         bgfx::setState(state, 0);
-                
         bgfx::submit(viewid, shader_name);
     }
-
 }

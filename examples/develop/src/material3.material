@@ -1,5 +1,0 @@
-layers:
-  default:
-    shader: shader2
-    textures:
-      s_tex1: ""

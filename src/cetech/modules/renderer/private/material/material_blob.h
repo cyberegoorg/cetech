@@ -13,6 +13,7 @@ namespace material_blob {
         // uint64_t layer_names[layer_count];
         // uint64_t shader_name[layer_count];
         // uint32_t uniform_count[layer_count];
+        // uint64_t render_state[layer_count];
         // material_variable uniforms[all_uniform_count];
         // char[32] uniform_names[all_uniform_count];
         // uint32_t layer_offset[layer_count];
@@ -28,6 +29,7 @@ namespace material_blob {
             ( sizeof(uint64_t) * blob->layer_count ) +
             ( sizeof(uint64_t) * blob->layer_count ) +
             ( sizeof(uint32_t) * blob->layer_count ) +
+            ( sizeof(uint64_t) * blob->layer_count ) +
             ( sizeof(material_variable) * blob->all_uniform_count ) +
             ( sizeof(char) * blob->all_uniform_count * 32) +
             ( sizeof(uint32_t) * blob->layer_count ) +
@@ -49,8 +51,11 @@ namespace material_blob {
     inline uint32_t* uniform_count(const blob_t* blob) {
         return ((uint32_t*) (shader_name(blob) + (blob->layer_count)));
     }
+    inline uint64_t* render_state(const blob_t* blob) {
+        return ((uint64_t*) (uniform_count(blob) + (blob->layer_count)));
+    }
     inline material_variable* uniforms(const blob_t* blob) {
-        return ((material_variable*) (uniform_count(blob) + (blob->layer_count)));
+        return ((material_variable*) (render_state(blob) + (blob->layer_count)));
     }
     inline char* uniform_names(const blob_t* blob) {
         return ((char*) (uniforms(blob) + (blob->all_uniform_count)));

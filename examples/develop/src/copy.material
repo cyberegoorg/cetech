@@ -1,5 +1,14 @@
 layers:
   copy:
     shader: copy
-    textures:
+
+    render_state:
+      rgb_write: true
+      alpha_write: true
+      depth_write: true
+      depth_test_less: true
+      cull_ccw: true
+      msaa: true
+
+    variables:
       s_input_texture: ""

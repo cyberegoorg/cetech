@@ -2,15 +2,21 @@ layers:
   default:
     shader: shader1
 
-    textures:
+    render_state:
+      rgb_write: true
+      alpha_write: true
+      depth_write: true
+      depth_test_less: true
+      cull_ccw: true
+      msaa: true
+
+    variables:
       #u_texColor: texture2 # texture2.texture
       u_texColor: content/scene/solider/body01
 
-    vec4f:
       u_vec4: [1.0, 1.0, 1.0, 1.0]
 
-    mat44f:
-      u_m44: [[1.0, 1.0, 1.0, 1.0],
-              [1.0, 1.0, 1.0, 1.0],
-              [1.0, 1.0, 1.0, 1.0],
-              [1.0, 1.0, 1.0, 1.0]]
+      u_m44: [1.0, 1.0, 1.0, 1.0,
+              1.0, 1.0, 1.0, 1.0,
+              1.0, 1.0, 1.0, 1.0,
+              1.0, 1.0, 1.0, 1.0]

@@ -3,5 +3,5 @@ parent: material1
 layers:
   default:
 
-    textures:
+    variables:
       u_texColor: content/scene/solider/m4tex

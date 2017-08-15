@@ -10,6 +10,7 @@ blobs:
         - uint64_t layer_names[layer_count]
         - uint64_t shader_name[layer_count]
         - uint32_t uniform_count[layer_count]
+        - uint64_t render_state[layer_count]
         - material_variable uniforms[all_uniform_count]
         - char[32] uniform_names[all_uniform_count]
         - uint32_t layer_offset[layer_count]

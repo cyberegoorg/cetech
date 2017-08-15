@@ -243,26 +243,13 @@ void yaml_as_mat44(yaml_node_t body,
                    float *value) {
     CETECH_ASSERT("yaml", yaml_is_valid(body));
 
-    yaml_node_t x = yaml_get_seq_node(body, 0);
-    CETECH_ASSERT("yaml", yaml_is_valid(x));
-    yaml_as_vec4(x, &value[0 * 4]);
-    yaml_node_free(x);
+    for(uint8_t i = 0; i < 16; ++i) {
+        yaml_node_t x = yaml_get_seq_node(body, 0);
+        CETECH_ASSERT("yaml", yaml_is_valid(x));
+        value[i] = yaml_as_float(x);
+        yaml_node_free(x);
+    }
 
-
-    yaml_node_t y = yaml_get_seq_node(body, 1);
-    CETECH_ASSERT("yaml", yaml_is_valid(y));
-    yaml_as_vec4(y, &value[1 * 4]);
-    yaml_node_free(y);
-
-    yaml_node_t z = yaml_get_seq_node(body, 2);
-    CETECH_ASSERT("yaml", yaml_is_valid(z));
-    yaml_as_vec4(z, &value[2 * 4]);
-    yaml_node_free(z);
-
-    yaml_node_t w = yaml_get_seq_node(body, 3);
-    CETECH_ASSERT("yaml", yaml_is_valid(w));
-    yaml_as_vec4(w, &value[3 * 4]);
-    yaml_node_free(w);
 }
 
 //mat33f_t yaml_as_mat33f_t(yaml_node_t body) {

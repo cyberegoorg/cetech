@@ -2,6 +2,14 @@ layers:
   default:
     shader: shader1
 
-    textures:
+    render_state:
+      rgb_write: true
+      alpha_write: true
+      depth_write: true
+      depth_test_less: true
+      cull_ccw: true
+      msaa: true
+
+    variables:
       u_texColor: texture2 # texture2.texture
 
