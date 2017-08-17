@@ -2,7 +2,6 @@
 // includes
 //==============================================================================
 #include <cstdio>
-#include <unitypes.h>
 
 #include <celib/allocator.h>
 #include <celib/array.inl>
@@ -564,6 +563,8 @@ namespace renderconfig_resource {
                    cel_alloc *allocator) {
         offline(name, old_data);
         online(name, new_data);
+
+        recreate_all_viewport();
 
         CEL_FREE(allocator, old_data);
         return new_data;
