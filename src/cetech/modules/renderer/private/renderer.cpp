@@ -1002,10 +1002,11 @@ namespace renderconfig_compiler {
     }
 
     int init(struct ct_api_a0 *api) {
+#ifdef CETECH_DEVELOP
         ct_resource_a0.compiler_register(
                 ct_hash_a0.id64_from_str("render_config"),
                 compiler);
-
+#endif
         return 1;
     }
 }
