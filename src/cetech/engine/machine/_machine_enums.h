@@ -25,6 +25,8 @@ enum event {
     EVENT_GAMEPAD_DOWN,       //!< Gamepad button down
     EVENT_GAMEPAD_CONNECT,    //!< Gamepad connected
     EVENT_GAMEPAD_DISCONNECT, //!< Gamepad disconected
+
+    EVENT_WINDOW_RESIZED, //!< Window resized
 };
 
 //! Mouse button enum

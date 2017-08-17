@@ -27,6 +27,15 @@ struct ct_event_header {
     uint64_t size;
 };
 
+
+struct ct_window_resized_event {
+    struct ct_event_header h; //!< Event header
+    uint32_t window_id;
+    int32_t width;
+    int32_t height;
+};
+
+
 //! Mouse button status
 struct ct_mouse_event {
     struct ct_event_header h; //!< Event header

@@ -63,10 +63,10 @@ void module1() {
 
         ct_debugui_a0.Text("dear imgui, %d", 111);
 
-//            static float v[2] = {100.0f, 100.0f};
-//            if(ct_debugui_a0.Button("wwwwww", v)) {
-//                ct_log_a0.info("dasdsa", "dsadsadsadsad");
-//            }
+            static float v[2] = {100.0f, 100.0f};
+            if(ct_debugui_a0.Button("wwwwww", v)) {
+                ct_log_a0.info("dasdsa", "dsadkjjkhjkbjhkjbjkbjkksadsadsad");
+            }
 
         static float col[4] = {0.0f, 1.0f, 0.0f, 0.0f};
         ct_debugui_a0.ColorButton(col, 1, 2);

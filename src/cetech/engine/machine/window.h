@@ -21,13 +21,31 @@ extern "C" {
 //==============================================================================
 
 enum ct_window_flags {
-    WINDOW_NOFLAG = 0,
-    WINDOW_FULLSCREEN = 1,
+    WINDOW_NOFLAG             =  (1 << 0),
+    WINDOW_FULLSCREEN         =  (1 << 1),
+    WINDOW_SHOWN              =  (1 << 2),
+    WINDOW_HIDDEN             =  (1 << 3),
+    WINDOW_BORDERLESS         =  (1 << 4),
+    WINDOW_RESIZABLE          =  (1 << 5),
+    WINDOW_MINIMIZED          =  (1 << 6),
+    WINDOW_MAXIMIZED          =  (1 << 7),
+    WINDOW_INPUT_GRABBED      =  (1 << 8),
+    WINDOW_INPUT_FOCUS        =  (1 << 9),
+    WINDOW_MOUSE_FOCUS        =  (1 << 10),
+    WINDOW_FULLSCREEN_DESKTOP =  (1 << 11),
+    WINDOW_ALLOW_HIGHDPI      =  (1 << 12),
+    WINDOW_MOUSE_CAPTURE      =  (1 << 13),
+    WINDOW_ALWAYS_ON_TOP      =  (1 << 14),
+    WINDOW_SKIP_TASKBAR       =  (1 << 15),
+    WINDOW_UTILITY            =  (1 << 16),
+    WINDOW_TOOLTIP            =  (1 << 17),
+    WINDOW_POPUP_MENU         =  (1 << 18),
 };
 
 enum ct_window_pos {
-    WINDOWPOS_CENTERED = 1,
-    WINDOWPOS_UNDEFINED = 2
+    WINDOWPOS_NOFLAG     =  (1 << 0),
+    WINDOWPOS_CENTERED   =  (1 << 1),
+    WINDOWPOS_UNDEFINED  =  (1 << 2),
 };
 
 typedef void ct_window_ints;
@@ -63,7 +81,7 @@ struct ct_window_a0 {
                          enum ct_window_pos y,
                          const int32_t width,
                          const int32_t height,
-                         enum ct_window_flags flags);
+                         uint32_t flags);
 
     ct_window *(*create_from)(struct cel_alloc *alloc,
                               void *hndl);

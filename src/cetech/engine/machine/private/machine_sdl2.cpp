@@ -111,14 +111,34 @@ namespace machine_sdl {
 
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
-                case SDL_QUIT: {
+                case SDL_QUIT:
                     ct_app_a0.quit();
-                }
                     break;
 
                 case SDL_CONTROLLERDEVICEADDED:
                 case SDL_CONTROLLERDEVICEREMOVED:
                     sdl_gamepad_process_event(&e, _G.eventstream);
+                    break;
+
+                case SDL_WINDOWEVENT: {
+                    switch (e.window.event) {
+                        case SDL_WINDOWEVENT_SIZE_CHANGED: {
+                            ct_window_resized_event ev;
+                            ev.window_id = e.window.windowID;
+                            ev.width = e.window.data1;
+                            ev.height = e.window.data2;
+
+                            eventstream::push<ct_event_header>(_G.eventstream,
+                                                               EVENT_WINDOW_RESIZED,
+                                                               ev);
+                        }
+                            break;
+                    }
+                }
+                    break;
+
+
+                default:
                     break;
             }
         }

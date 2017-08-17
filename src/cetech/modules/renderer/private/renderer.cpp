@@ -29,6 +29,7 @@
 #include <cetech/modules/camera/camera.h>
 #include <cetech/modules/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/modules/debugui/debugui.h>
+#include <cetech/engine/machine/machine.h>
 
 #include "bgfx/platform.h"
 
@@ -48,6 +49,7 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_machine_a0);
 
 //==============================================================================
 // GLobals
@@ -233,7 +235,6 @@ bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
     return _RatioIdToEnum[0].e;
 }
 
-
 //==============================================================================
 // render global
 //==============================================================================
@@ -259,15 +260,20 @@ void renderer_create() {
         char title[128] = {};
         snprintf(title, CETECH_ARRAY_LEN(title), "cetech");
 
+
         if (wid == 0) {
+            uint32_t flags = WINDOW_NOFLAG;
+            flags |= ct_config_a0.get_int(GConfig.fullscreen)
+                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
+            flags |= WINDOW_RESIZABLE;
+
             _G.main_window = ct_window_a0.create(
                     ct_memory_a0.main_allocator(),
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
                     w, h,
-                    ct_config_a0.get_int(GConfig.fullscreen)
-                    ? WINDOW_FULLSCREEN : WINDOW_NOFLAG
+                    flags
             );
         } else {
             _G.main_window = ct_window_a0.create_from(
@@ -284,9 +290,7 @@ void renderer_create() {
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
-
     bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
-
     _G.main_window->update(_G.main_window);
 
     _G.need_reset = 1;
@@ -336,21 +340,6 @@ void renderer_render_world(ct_world world,
     }
 }
 
-void on_render() {
-    if (_G.need_reset) {
-        _G.need_reset = 0;
-
-         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
-    }
-
-    for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
-        _G.on_render[i]();
-    }
-
-    bgfx::frame();
-    _G.main_window->update(_G.main_window);
-    viewid_counter = 0;
-}
 
 void renderer_get_size(uint32_t *width,
                        uint32_t *height) {
@@ -491,7 +480,13 @@ void resize_viewport(ct_viewport viewport,
     if ((width != vi.size[0]) || (height != vi.size[1])) {
         _init_viewport(vi, vi.viewport, width, height);
     }
+}
 
+void recreate_all_viewport() {
+    for (uint32_t i = 0; i < celib::array::size(_G.viewport_instances); ++i) {
+        auto &vi = _G.viewport_instances[i];
+        _init_viewport(vi, vi.viewport, vi.size[0], vi.size[1]);
+    }
 }
 
 ct_viewport renderer_create_viewport(uint64_t name,
@@ -558,6 +553,9 @@ namespace renderconfig_resource {
     void offline(uint64_t name,
                  void *data) {
         CEL_UNUSED(name, data);
+        auto *blob = renderconfig_blob::get(data);
+
+
     }
 
     void *reloader(uint64_t name,
@@ -1036,6 +1034,44 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 
 #undef _DEF_ON_CLB_FCE
 
+void on_update(float dt) {
+    ct_event_header *event = ct_machine_a0.event_begin();
+
+    ct_window_resized_event *ev;
+    while (event != ct_machine_a0.event_end()) {
+        switch (event->type) {
+            case EVENT_WINDOW_RESIZED:
+                ev = (ct_window_resized_event *) event;
+                _G.need_reset = 1;
+                _G.size_width = ev->width;
+                _G.size_height = ev->height;
+                break;
+
+            default:
+                break;
+        }
+
+        event = ct_machine_a0.event_next(event);
+    }
+}
+
+void on_render() {
+    if (_G.need_reset) {
+        _G.need_reset = 0;
+
+        bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
+        recreate_all_viewport();
+    }
+
+    for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
+        _G.on_render[i]();
+    }
+
+    bgfx::frame();
+    _G.main_window->update(_G.main_window);
+    viewid_counter = 0;
+}
+
 
 namespace renderer_module {
     static ct_renderer_a0 rendderer_api = {
@@ -1209,6 +1245,7 @@ namespace renderer_module {
 
 
         ct_app_a0.register_on_render(on_render);
+        ct_app_a0.register_on_update(on_update);
 
         PosTexCoord0Vertex::init();
     }
@@ -1217,6 +1254,7 @@ namespace renderer_module {
         ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
             ct_app_a0.unregister_on_render(on_render);
+            ct_app_a0.unregister_on_update(on_update);
 
             texture::texture_shutdown();
             shader::shader_shutdown();
@@ -1250,6 +1288,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_machine_a0);
         },
         {
             renderer_module::_init(api);

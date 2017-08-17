@@ -26,11 +26,39 @@ static uint32_t _sdl_pos(const uint32_t pos) {
     }
 }
 
-static uint32_t _sdl_flags(enum ct_window_flags flags) {
+
+static struct {
+    enum ct_window_flags from;
+    SDL_WindowFlags to;
+} _flag_to_sdl[] = {
+        {.from = WINDOW_NOFLAG, .to =  SDL_WindowFlags(0)},
+        {.from = WINDOW_FULLSCREEN, .to = SDL_WINDOW_FULLSCREEN},
+        {.from = WINDOW_SHOWN, .to = SDL_WINDOW_SHOWN},
+        {.from = WINDOW_HIDDEN, .to = SDL_WINDOW_HIDDEN},
+        {.from = WINDOW_BORDERLESS, .to = SDL_WINDOW_BORDERLESS},
+        {.from = WINDOW_RESIZABLE, .to = SDL_WINDOW_RESIZABLE},
+        {.from = WINDOW_MINIMIZED, .to = SDL_WINDOW_MINIMIZED},
+        {.from = WINDOW_MAXIMIZED, .to = SDL_WINDOW_MAXIMIZED},
+        {.from = WINDOW_INPUT_GRABBED, .to = SDL_WINDOW_INPUT_GRABBED},
+        {.from = WINDOW_INPUT_FOCUS, .to = SDL_WINDOW_INPUT_FOCUS},
+        {.from = WINDOW_MOUSE_FOCUS, .to = SDL_WINDOW_MOUSE_FOCUS},
+        {.from = WINDOW_FULLSCREEN_DESKTOP, .to =  SDL_WINDOW_FULLSCREEN_DESKTOP},
+        {.from = WINDOW_ALLOW_HIGHDPI, .to = SDL_WINDOW_ALLOW_HIGHDPI},
+        {.from = WINDOW_MOUSE_CAPTURE, .to = SDL_WINDOW_MOUSE_CAPTURE},
+        {.from = WINDOW_ALWAYS_ON_TOP, .to = SDL_WINDOW_ALWAYS_ON_TOP},
+        {.from = WINDOW_SKIP_TASKBAR, .to = SDL_WINDOW_SKIP_TASKBAR},
+        {.from = WINDOW_UTILITY, .to = SDL_WINDOW_UTILITY},
+        {.from = WINDOW_TOOLTIP, .to = SDL_WINDOW_TOOLTIP},
+        {.from = WINDOW_POPUP_MENU, .to = SDL_WINDOW_POPUP_MENU},
+};
+
+static uint32_t _sdl_flags(uint32_t flags) {
     uint32_t sdl_flags = 0;
 
-    if (flags & WINDOW_FULLSCREEN) {
-        sdl_flags |= SDL_WINDOW_FULLSCREEN;
+    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_flag_to_sdl); ++i) {
+        if (flags & _flag_to_sdl[i].from) {
+            sdl_flags |= _flag_to_sdl[i].to;
+        }
     }
 
     return sdl_flags;
@@ -113,7 +141,7 @@ ct_window *window_new(struct cel_alloc *alloc,
                       enum ct_window_pos y,
                       const int32_t width,
                       const int32_t height,
-                      enum ct_window_flags flags) {
+                      uint32_t flags) {
 
     auto *window = CEL_ALLOCATE(alloc, ct_window, sizeof(ct_window));
 
