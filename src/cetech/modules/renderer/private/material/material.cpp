@@ -187,16 +187,20 @@ namespace material {
             switch (uniforms[i].type) {
                 case MAT_VAR_NONE:
                     break;
+
                 case MAT_VAR_INT:
                     ut = bgfx::UniformType::Int1;
                     break;
+
                 case MAT_VAR_TEXTURE:
                 case MAT_VAR_TEXTURE_HANDLER:
                     ut = bgfx::UniformType::Int1;
                     break;
+
                 case MAT_VAR_VEC4:
                     ut = bgfx::UniformType::Vec4;
                     break;
+
                 case MAT_VAR_MAT44:
                     ut = bgfx::UniformType::Mat4;
                     break;
@@ -349,9 +353,11 @@ namespace material {
                     ++texture_stage;
                 }
                     break;
+
                 case MAT_VAR_VEC4:
                     bgfx::setUniform(u_handler[i], &uniform.v4, 1);
                     break;
+
                 case MAT_VAR_MAT44:
                     bgfx::setUniform(u_handler[i], &uniform.m44, 1);
                     break;

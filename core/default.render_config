@@ -1,12 +1,3 @@
-#render_states:
-#  default:
-#    states:
-#      color_write: "true"
-#      alpha_write: "true"
-#      depth_write: "true"
-#      depth_func: "less"
-#      cull_mode: "cw"
-
 # Create on init
 global_resource:
       - { name: colorbuffer, type: render_target, format: RGBA8, ration: equal }
@@ -16,9 +7,9 @@ global_resource:
 layers:
   default:
     - { type: geometry, name: default, output: [gbuffer_color, gbuffer_depth]}
-    - { type: copy,  name: copy, input: [gbuffer_color], output: [bb_color]}
+    - { type: fullscreen,  name: copy, input: [gbuffer_color], output: [bb_color]}
 
-# viewports
+# Viewports
 viewport:
   default:
     layers: default

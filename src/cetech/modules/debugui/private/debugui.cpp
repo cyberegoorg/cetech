@@ -234,7 +234,8 @@ namespace debugui_module {
             .GetWindowSize = imgui_wrap::GetWindowSize,
             .BeginDock = imgui_wrap::BeginDock,
             .EndDock = imgui_wrap::EndDock,
-
+            .IsWindowFocused = ImGui::IsWindowFocused,
+            .IsMouseHoveringWindow = ImGui::IsMouseHoveringWindow,
     };
 
     static void _init(ct_api_a0 *api) {

@@ -13,7 +13,7 @@
 #include "celib/eventstream.inl"
 #include "gamepadstr.h"
 
-CETECH_DECL_API(ct_log_a0)
+CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_app_a0);
 

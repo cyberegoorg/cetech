@@ -43,13 +43,13 @@ struct shader_blobResourceGlobals {
 } ShaderResourceGlobals;
 
 
-CETECH_DECL_API(ct_memory_a0)
-CETECH_DECL_API(ct_resource_a0)
-CETECH_DECL_API(ct_path_a0)
-CETECH_DECL_API(ct_vio_a0)
-CETECH_DECL_API(ct_process_a0)
-CETECH_DECL_API(ct_log_a0)
-CETECH_DECL_API(ct_hash_a0)
+CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_path_a0);
+CETECH_DECL_API(ct_vio_a0);
+CETECH_DECL_API(ct_process_a0);
+CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_hash_a0);
 
 
 //==============================================================================

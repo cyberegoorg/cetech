@@ -340,7 +340,7 @@ void on_render() {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        // bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
+         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
     for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
@@ -1170,7 +1170,7 @@ namespace renderer_module {
 
 
         renderer_register_layer_pass(
-                ct_hash_a0.id64_from_str("copy"),
+                ct_hash_a0.id64_from_str("fullscreen"),
                 [](viewport_instance *viewport,
                    uint8_t viewid,
                    uint8_t layerid,

@@ -10,6 +10,9 @@
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
 
+CETECH_DECL_API(ct_log_a0);
+
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -20,6 +23,7 @@
 #define LOG_WHERE "gamepad.sdl"
 
 using namespace celib;
+
 
 //==============================================================================
 // Globals
@@ -36,8 +40,6 @@ static struct G {
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
 } _G = {};
 
-
-CETECH_DECL_API(ct_log_a0)
 
 
 int _new_controler() {

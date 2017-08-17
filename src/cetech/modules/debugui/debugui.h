@@ -728,6 +728,9 @@ struct ct_debugui_a0 {
                         uint32_t *rgba,
                         float size);
 
+    bool (*IsWindowFocused)();
+    bool (*IsMouseHoveringWindow)();
+
     void (*GetWindowSize)(float size[2]);
 
     bool (*BeginDock)(const char* label, bool* opened, DebugUIWindowFlags_ extra_flags);
