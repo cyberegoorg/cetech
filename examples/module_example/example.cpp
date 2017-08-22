@@ -1,22 +1,22 @@
 #include <celib/macros.h>
 
-#include <cetech/core/log/log.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/log/log.h>
+#include <cetech/config/config.h>
+#include <cetech/module/module.h>
+#include <cetech/api/api_system.h>
+#include <cetech/hashlib/hashlib.h>
 
-#include <cetech/engine/input/input.h>
-#include <cetech/engine/application/application.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/input/input.h>
+#include <cetech/application/application.h>
+#include <cetech/entity/entity.h>
 
-#include <cetech/modules/playground/playground.h>
-#include <cetech/modules/debugui/debugui.h>
-#include <cetech/modules/renderer/renderer.h>
-#include <cetech/modules/transform/transform.h>
-#include <cetech/modules/camera/camera.h>
-#include <cetech/modules/level/level.h>
-#include <cetech/modules/renderer/viewport.h>
+#include <cetech/playground/playground.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/transform/transform.h>
+#include <cetech/camera/camera.h>
+#include <cetech/level/level.h>
+#include <cetech/renderer/viewport.h>
 
 
 CETECH_DECL_API(ct_log_a0);
