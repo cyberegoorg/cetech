@@ -111,10 +111,6 @@ set(SOURCE_FILES
         src/cetech/os/private/watchdog.cpp
         src/cetech/os/private/time.cpp
 
-        ########################################################################
-        # Modules
-        ########################################################################
-
         src/cetech/luasys/private/luasys_private.cpp
         src/cetech/luasys/private/api/api_log.cpp
         src/cetech/luasys/private/api/api_vec3f.cpp
@@ -125,10 +121,11 @@ set(SOURCE_FILES
         src/cetech/resource/private/resource_package.cpp
         src/cetech/resource/private/resource_compiler.cpp
 
-        src/cetech/filesystem/private/filesystem.cpp
         src/cetech/entity/private/component.cpp
         src/cetech/entity/private/entity.cpp
         src/cetech/entity/private/world.cpp
+
+        src/cetech/filesystem/private/filesystem.cpp
         src/cetech/level/private/level.cpp
 
         src/cetech/input/private/keyboard.cpp
@@ -141,19 +138,18 @@ set(SOURCE_FILES
         src/cetech/renderer/private/material/material.cpp
         src/cetech/renderer/private/scene/scene.cpp
         src/cetech/renderer/private/viewport/viewport.cpp
+        src/cetech/renderer/private/viewport/fullscreen_pass.cpp
+        src/cetech/renderer/private/viewport/geometry_pass.cpp
         src/cetech/renderer/private/mesh_renderer/mesh_renderer.cpp
-        src/cetech/renderer/private/mesh_renderer/mesh_renderer.cpp
+        src/cetech/renderer/private/scene/scene_compiler.cpp
+        src/cetech/renderer/private/shader/shader_compiler.cpp
+        src/cetech/renderer/private/texture/texture_compiler.cpp
+        src/cetech/renderer/private/material/material_compiler.cpp
 
         src/cetech/transform/private/transform.cpp
         src/cetech/scenegraph/private/scenegraph.cpp
         src/cetech/camera/private/camera.cpp
         src/cetech/blob/private/blob.cpp
-        src/cetech/renderer/private/scene/scene_compiler.cpp
-        src/cetech/renderer/private/shader/shader_compiler.cpp
-        src/cetech/renderer/private/texture/texture_compiler.cpp
-        src/cetech/renderer/private/material/material_compiler.cpp
-        src/cetech/renderer/private/material/material_compiler.cpp
-
         )
 
 ################################################################################

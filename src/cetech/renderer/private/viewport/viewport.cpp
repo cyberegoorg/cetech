@@ -31,11 +31,12 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/machine/machine.h>
 #include <cetech/renderer/mesh_renderer.h>
-#include <cetech/renderer/viewport.h>
+#include <cetech/blob/blob.h>
+
 
 #include "bgfx/platform.h"
 
-#include "cetech/renderer/shader.h"
+#include <cetech/renderer/viewport.h>
 #include "cetech/renderer/scene.h"
 #include "cetech/renderer/material.h"
 
@@ -51,6 +52,7 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_renderer_a0);
+CETECH_DECL_API(ct_blob_a0);
 
 using namespace celib;
 
@@ -80,6 +82,8 @@ static struct G {
     Array<viewport_instance> viewport_instances;
     Handler<uint32_t> viewport_handler;
 
+    Map<ct_viewport_pass_compiler> compiler_map;
+
     uint64_t type;
 
     uint32_t size_width;
@@ -94,228 +98,7 @@ static struct GConfig {
 //==============================================================================
 // Private
 //==============================================================================
-struct PosTexCoord0Vertex {
-    float m_x;
-    float m_y;
-    float m_z;
-    float m_u;
-    float m_v;
-
-    static void init() {
-        ms_decl.begin()
-                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-                .end();
-    }
-
-    static bgfx::VertexDecl ms_decl;
-};
-
-bgfx::VertexDecl PosTexCoord0Vertex::ms_decl;
-
-
-void screenSpaceQuad(float _textureWidth,
-                     float _textureHeight,
-                     float _texelHalf,
-                     bool _originBottomLeft,
-                     float _width = 1.0f,
-                     float _height = 1.0f) {
-    if (3 ==
-        bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl)) {
-        bgfx::TransientVertexBuffer vb;
-        bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
-        PosTexCoord0Vertex *vertex = (PosTexCoord0Vertex *) vb.data;
-
-        const float minx = -_width;
-        const float maxx = _width;
-        const float miny = 0.0f;
-        const float maxy = _height * 2.0f;
-
-        const float texelHalfW = _texelHalf / _textureWidth;
-        const float texelHalfH = _texelHalf / _textureHeight;
-        const float minu = -1.0f + texelHalfW;
-        const float maxu = 1.0f + texelHalfH;
-
-        const float zz = 0.0f;
-
-        float minv = texelHalfH;
-        float maxv = 2.0f + texelHalfH;
-
-        if (_originBottomLeft) {
-            float temp = minv;
-            minv = maxv;
-            maxv = temp;
-
-            minv -= 1.0f;
-            maxv -= 1.0f;
-        }
-
-        vertex[0].m_x = minx;
-        vertex[0].m_y = miny;
-        vertex[0].m_z = zz;
-        vertex[0].m_u = minu;
-        vertex[0].m_v = minv;
-
-        vertex[1].m_x = maxx;
-        vertex[1].m_y = miny;
-        vertex[1].m_z = zz;
-        vertex[1].m_u = maxu;
-        vertex[1].m_v = minv;
-
-        vertex[2].m_x = maxx;
-        vertex[2].m_y = maxy;
-        vertex[2].m_z = zz;
-        vertex[2].m_u = maxu;
-        vertex[2].m_v = maxv;
-
-        bgfx::setVertexBuffer(0, &vb);
-    }
-}
-
-#define _ID64(a) ct_hash_a0.id64_from_str(a)
-
-bgfx::TextureFormat::Enum format_id_to_enum(uint64_t id) {
-    static struct {
-        uint64_t id;
-        bgfx::TextureFormat::Enum e;
-    } _FormatIdToEnum[] = {
-            {.id = _ID64(""), .e = bgfx::TextureFormat::Count},
-            {.id = _ID64("BC1"), .e = bgfx::TextureFormat::BC1},
-            {.id = _ID64("BC2"), .e = bgfx::TextureFormat::BC2},
-            {.id = _ID64("BC3"), .e = bgfx::TextureFormat::BC3},
-            {.id = _ID64("BC4"), .e = bgfx::TextureFormat::BC4},
-            {.id = _ID64("BC5"), .e = bgfx::TextureFormat::BC5},
-            {.id = _ID64("BC6H"), .e = bgfx::TextureFormat::BC6H},
-            {.id = _ID64("BC7"), .e = bgfx::TextureFormat::BC7},
-            {.id = _ID64("ETC1"), .e = bgfx::TextureFormat::ETC1},
-            {.id = _ID64("ETC2"), .e = bgfx::TextureFormat::ETC2},
-            {.id = _ID64("ETC2A"), .e = bgfx::TextureFormat::ETC2A},
-            {.id = _ID64("ETC2A1"), .e = bgfx::TextureFormat::ETC2A1},
-            {.id = _ID64("PTC12"), .e = bgfx::TextureFormat::PTC12},
-            {.id = _ID64("PTC14"), .e = bgfx::TextureFormat::PTC14},
-            {.id = _ID64("PTC12A"), .e = bgfx::TextureFormat::PTC12A},
-            {.id = _ID64("PTC14A"), .e = bgfx::TextureFormat::PTC14A},
-            {.id = _ID64("PTC22"), .e = bgfx::TextureFormat::PTC22},
-            {.id = _ID64("PTC24"), .e = bgfx::TextureFormat::PTC24},
-            {.id = _ID64("R1"), .e = bgfx::TextureFormat::R1},
-            {.id = _ID64("A8"), .e = bgfx::TextureFormat::A8},
-            {.id = _ID64("R8"), .e = bgfx::TextureFormat::R8},
-            {.id = _ID64("R8I"), .e = bgfx::TextureFormat::R8I},
-            {.id = _ID64("R8U"), .e = bgfx::TextureFormat::R8U},
-            {.id = _ID64("R8S"), .e = bgfx::TextureFormat::R8S},
-            {.id = _ID64("R16"), .e = bgfx::TextureFormat::R16},
-            {.id = _ID64("R16I"), .e = bgfx::TextureFormat::R16I},
-            {.id = _ID64("R16U"), .e = bgfx::TextureFormat::R16U},
-            {.id = _ID64("R16F"), .e = bgfx::TextureFormat::R16F},
-            {.id = _ID64("R16S"), .e = bgfx::TextureFormat::R16S},
-            {.id = _ID64("R32I"), .e = bgfx::TextureFormat::R32I},
-            {.id = _ID64("R32U"), .e = bgfx::TextureFormat::R32U},
-            {.id = _ID64("R32F"), .e = bgfx::TextureFormat::R32F},
-            {.id = _ID64("RG8"), .e = bgfx::TextureFormat::RG8},
-            {.id = _ID64("RG8I"), .e = bgfx::TextureFormat::RG8I},
-            {.id = _ID64("RG8U"), .e = bgfx::TextureFormat::RG8U},
-            {.id = _ID64("RG8S"), .e = bgfx::TextureFormat::RG8S},
-            {.id = _ID64("RG16"), .e = bgfx::TextureFormat::RG16},
-            {.id = _ID64("RG16I"), .e = bgfx::TextureFormat::RG16I},
-            {.id = _ID64("RG16U"), .e = bgfx::TextureFormat::RG16U},
-            {.id = _ID64("RG16F"), .e = bgfx::TextureFormat::RG16F},
-            {.id = _ID64("RG16S"), .e = bgfx::TextureFormat::RG16S},
-            {.id = _ID64("RG32I"), .e = bgfx::TextureFormat::RG32I},
-            {.id = _ID64("RG32U"), .e = bgfx::TextureFormat::RG32U},
-            {.id = _ID64("RG32F"), .e = bgfx::TextureFormat::RG32F},
-            {.id = _ID64("RGB8"), .e = bgfx::TextureFormat::RGB8},
-            {.id = _ID64("RGB8I"), .e = bgfx::TextureFormat::RGB8I},
-            {.id = _ID64("RGB8U"), .e = bgfx::TextureFormat::RGB8U},
-            {.id = _ID64("RGB8S"), .e = bgfx::TextureFormat::RGB8S},
-            {.id = _ID64("RGB9E5F"), .e = bgfx::TextureFormat::RGB9E5F},
-            {.id = _ID64("BGRA8"), .e = bgfx::TextureFormat::BGRA8},
-            {.id = _ID64("RGBA8"), .e = bgfx::TextureFormat::RGBA8},
-            {.id = _ID64("RGBA8I"), .e = bgfx::TextureFormat::RGBA8I},
-            {.id = _ID64("RGBA8U"), .e = bgfx::TextureFormat::RGBA8U},
-            {.id = _ID64("RGBA8S"), .e = bgfx::TextureFormat::RGBA8S},
-            {.id = _ID64("RGBA16"), .e = bgfx::TextureFormat::RGBA16},
-            {.id = _ID64("RGBA16I"), .e = bgfx::TextureFormat::RGBA16I},
-            {.id = _ID64("RGBA16U"), .e = bgfx::TextureFormat::RGBA16U},
-            {.id = _ID64("RGBA16F"), .e = bgfx::TextureFormat::RGBA16F},
-            {.id = _ID64("RGBA16S"), .e = bgfx::TextureFormat::RGBA16S},
-            {.id = _ID64("RGBA32I"), .e = bgfx::TextureFormat::RGBA32I},
-            {.id = _ID64("RGBA32U"), .e = bgfx::TextureFormat::RGBA32U},
-            {.id = _ID64("RGBA32F"), .e = bgfx::TextureFormat::RGBA32F},
-            {.id = _ID64("R5G6B5"), .e = bgfx::TextureFormat::R5G6B5},
-            {.id = _ID64("RGBA4"), .e = bgfx::TextureFormat::RGBA4},
-            {.id = _ID64("RGB5A1"), .e = bgfx::TextureFormat::RGB5A1},
-            {.id = _ID64("RGB10A2"), .e = bgfx::TextureFormat::RGB10A2},
-            {.id = _ID64("RG11B10F"), .e = bgfx::TextureFormat::RG11B10F},
-            {.id = _ID64("D16"), .e = bgfx::TextureFormat::D16},
-            {.id = _ID64("D24"), .e = bgfx::TextureFormat::D24},
-            {.id = _ID64("D24S8"), .e = bgfx::TextureFormat::D24S8},
-            {.id = _ID64("D32"), .e = bgfx::TextureFormat::D32},
-            {.id = _ID64("D16F"), .e = bgfx::TextureFormat::D16F},
-            {.id = _ID64("D24F"), .e = bgfx::TextureFormat::D24F},
-            {.id = _ID64("D32F"), .e = bgfx::TextureFormat::D32F},
-            {.id = _ID64("D0S8"), .e = bgfx::TextureFormat::D0S8},
-    };
-
-    for (int i = 1; i < CETECH_ARRAY_LEN(_FormatIdToEnum); ++i) {
-        if (_FormatIdToEnum[i].id != id) {
-            continue;
-        }
-
-        return _FormatIdToEnum[i].e;
-    }
-
-    return _FormatIdToEnum[0].e;
-}
-
-bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
-    static struct {
-        uint64_t id;
-        bgfx::BackbufferRatio::Enum e;
-    } _RatioIdToEnum[] = {
-            {.id = _ID64(""), .e = bgfx::BackbufferRatio::Count},
-            {.id = _ID64("equal"), .e = bgfx::BackbufferRatio::Equal},
-            {.id = _ID64("half"), .e = bgfx::BackbufferRatio::Half},
-            {.id = _ID64("quarter"), .e = bgfx::BackbufferRatio::Quarter},
-            {.id = _ID64("eighth"), .e = bgfx::BackbufferRatio::Eighth},
-            {.id = _ID64("sixteenth"), .e = bgfx::BackbufferRatio::Sixteenth},
-            {.id = _ID64("double"), .e = bgfx::BackbufferRatio::Double},
-    };
-
-    for (int i = 1; i < CETECH_ARRAY_LEN(_RatioIdToEnum); ++i) {
-        if (_RatioIdToEnum[i].id != id) {
-            continue;
-        }
-
-        return _RatioIdToEnum[i].e;
-    }
-
-    return _RatioIdToEnum[0].e;
-}
-
-float ratio_id_to_coef(uint64_t id) {
-    static struct {
-        uint64_t id;
-        float coef;
-    } _RatioIdToEnum[] = {
-            {.id = _ID64(""), .coef = 1.0f},
-            {.id = _ID64("equal"), .coef = 1.0f},
-            {.id = _ID64("half"), .coef = 1.0f / 2.0f},
-            {.id = _ID64("quarter"), .coef = 1.0f / 4.0f},
-            {.id = _ID64("eighth"), .coef = 1.0f / 8.0f},
-            {.id = _ID64("sixteenth"), .coef = 1.0f / 16.0f},
-            {.id = _ID64("double"), .coef = 2.0f},
-    };
-
-    for (int i = 1; i < CETECH_ARRAY_LEN(_RatioIdToEnum); ++i) {
-        if (_RatioIdToEnum[i].id != id) {
-            continue;
-        }
-
-        return _RatioIdToEnum[i].coef;
-    }
-
-    return _RatioIdToEnum[0].coef;
-}
+#include "viewport_enums.h"
 
 //==============================================================================
 // render global
@@ -361,13 +144,13 @@ void renderer_render_world(ct_world world,
             continue;
         }
 
-        on_pass(&vi, viewid_counter++, i, world, camera);
+        on_pass(&vi, viewport, viewid_counter++, i, world, camera);
     }
 }
 
 
-uint16_t _render_viewport_get_local_resource(viewport_instance &instance,
-                                             uint64_t name) {
+uint16_t get_local_resource(viewport_instance &instance,
+                            uint64_t name) {
     for (int i = 0; i < instance.resource_count; ++i) {
         if (instance.local_resource_name[i] != name) {
             continue;
@@ -386,7 +169,7 @@ uint16_t render_viewport_get_local_resource(ct_viewport viewport,
                         UINT32_MAX);
     auto &vi = _G.viewport_instances[idx];
 
-    return _render_viewport_get_local_resource(vi, name);
+    return get_local_resource(vi, name);
 }
 
 void _init_viewport(viewport_instance &vi,
@@ -407,6 +190,7 @@ void _init_viewport(viewport_instance &vi,
     vi.size[0] = width;
     vi.size[1] = height;
     vi.viewport = name;
+
     for (uint32_t i = 0; i < blob->viewport_count; ++i) {
         auto &vp = renderconfig_blob::viewport(blob)[i];
         if (vp.name != name) {
@@ -433,7 +217,6 @@ void _init_viewport(viewport_instance &vi,
                 auto &lr = localresource[k];
 
                 auto format = format_id_to_enum(lr.format);
-//                auto ration = ratio_id_to_enum(lr.ration);
                 auto ration_coef = ratio_id_to_coef(lr.ration);
 
                 const uint32_t samplerFlags = 0
@@ -460,9 +243,14 @@ void _init_viewport(viewport_instance &vi,
             auto entry_count = renderconfig_blob::layers_entry_count(blob)[j];
             auto entry_offset = renderconfig_blob::layers_entry_offset(blob)[j];
             auto *entry = renderconfig_blob::layers_entry(blob) + entry_offset;
+            auto *data = renderconfig_blob::data(blob);
+            auto *data_offset = renderconfig_blob::entry_data_offset(blob);
 
             vi.layer_count = entry_count;
             vi.layers = entry;
+
+            vi.layers_data = data;
+            vi.layers_data_offset = data_offset;
 
             vi.fb_count = entry_count;
             for (int k = 0; k < entry_count; ++k) {
@@ -471,8 +259,8 @@ void _init_viewport(viewport_instance &vi,
                 bgfx::TextureHandle th[e.output_count];
                 for (int l = 0; l < e.output_count; ++l) {
                     // TODO if not found in local then find in global
-                    th[l] = {_render_viewport_get_local_resource(vi,
-                                                                 e.output[l])};
+                    th[l] = {get_local_resource(vi,
+                                                e.output[l])};
                 }
 
                 if (0 != vi.framebuffers[k]) {
@@ -600,15 +388,17 @@ namespace renderconfig_resource {
 
 //// COMPIELr
 struct compiler_output {
-    Array<render_resource_t> global_resource;
-    Array<render_resource_t> local_resource;
     Array<uint64_t> layer_names;
     Array<uint32_t> layers_entry_count;
+    Array<uint32_t> layers_entry_offset;
     Array<uint32_t> layers_localresource_count;
     Array<uint32_t> layers_localresource_offset;
-    Array<uint32_t> layers_entry_offset;
+    Array<uint32_t> entry_data_offset;
+    Array<render_resource_t> global_resource;
+    Array<render_resource_t> local_resource;
     Array<layer_entry_t> layers_entry;
     Array<viewport_entry_t> viewport;
+    ct_blob *blob;
 };
 
 void compile_global_resource(uint32_t idx,
@@ -685,31 +475,6 @@ void compile_layer_entry(uint32_t idx,
             str_buffer);
 
     /////////////////////////////////////////////////////
-    yaml_node_t input = yaml_get_node(value,
-                                      "input");
-    if (yaml_is_valid(input)) {
-        yaml_node_foreach_seq(
-                input,
-                [](uint32_t idx,
-                   yaml_node_t value,
-                   void *_data) {
-                    char str_buffer[128] = {};
-                    auto &le = *((layer_entry_t *) _data);
-
-                    yaml_as_string(value,
-                                   str_buffer,
-                                   CETECH_ARRAY_LEN(
-                                           str_buffer) -
-                                   1);
-
-                    le.input[idx] = ct_hash_a0.id64_from_str(
-                            str_buffer);
-                    ++le.input_count;
-
-                }, &le);
-    }
-
-    /////////////////////////////////////////////////////
     yaml_node_t output_t = yaml_get_node(
             value,
             "output");
@@ -735,6 +500,17 @@ void compile_layer_entry(uint32_t idx,
                 }, &le);
     }
 
+    auto compiler = map::get<ct_viewport_pass_compiler>(_G.compiler_map,
+                                                        le.type, NULL);
+
+    auto blob = output.blob;
+
+    array::push_back(output.entry_data_offset,
+                     static_cast<const uint32_t &>(blob->size(blob->inst)));
+
+    if (compiler) {
+        compiler(value, output.blob);
+    }
 
     array::push_back(output.layers_entry, le);
 
@@ -796,7 +572,9 @@ namespace renderconfig_compiler {
                 ct_memory_a0.main_allocator());
         output.layers_localresource_offset.init(
                 ct_memory_a0.main_allocator());
+        output.entry_data_offset.init(ct_memory_a0.main_allocator());
 
+        output.blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
 
         //==================================================================
         // Global resource
@@ -981,40 +759,44 @@ namespace renderconfig_compiler {
                          sizeof(uint32_t),
                          array::size(output.layers_entry_offset));
 
-
         build_vio->write(build_vio->inst,
-                         array::begin(
-                                 output.layers_localresource_count),
+                         array::begin(output.layers_localresource_count),
                          sizeof(uint32_t),
                          array::size(output.layers_localresource_count));
 
         build_vio->write(build_vio->inst,
-                         array::begin(
-                                 output.layers_localresource_offset),
+                         array::begin(output.layers_localresource_offset),
                          sizeof(uint32_t),
-                         array::size(
-                                 output.layers_localresource_offset));
-
+                         array::size(output.layers_localresource_offset));
 
         build_vio->write(build_vio->inst,
-                         array::begin(output.layers_entry),
+                         array::begin(output.entry_data_offset),
+                         sizeof(uint32_t),
+                         array::size(output.entry_data_offset));
+
+        build_vio->write(build_vio->inst, array::begin(output.layers_entry),
                          sizeof(layer_entry_t),
                          array::size(output.layers_entry));
 
-        build_vio->write(build_vio->inst,
-                         array::begin(output.viewport),
+        build_vio->write(build_vio->inst, array::begin(output.viewport),
                          sizeof(viewport_entry_t),
                          array::size(output.viewport));
+
+        auto *blob = output.blob;
+        build_vio->write(build_vio->inst, blob->data(blob->inst),
+                         sizeof(uint8_t), blob->size(blob->inst));
 
         output.global_resource.destroy();
         output.layer_names.destroy();
         output.layers_entry_count.destroy();
         output.layers_entry_offset.destroy();
+        output.entry_data_offset.destroy();
         output.layers_entry.destroy();
         output.viewport.destroy();
         output.local_resource.destroy();
         output.layers_localresource_count.destroy();
         output.layers_localresource_offset.destroy();
+        ct_blob_a0.destroy(output.blob);
 
         CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
@@ -1062,6 +844,17 @@ void on_render() {
     viewid_counter = 0;
 }
 
+void register_pass_compiler(uint64_t type,
+                            ct_viewport_pass_compiler compiler) {
+    map::set(_G.compiler_map, type, compiler);
+}
+
+
+struct fullscree_pass_data {
+    uint8_t input_count;
+    char input_name[8][32];
+    uint64_t input_resource[8];
+};
 
 namespace viewport_module {
     static ct_viewport_a0 viewport_api = {
@@ -1071,6 +864,7 @@ namespace viewport_module {
             .create = renderer_create_viewport,
             .get_local_resource = render_viewport_get_local_resource,
             .resize = resize_viewport,
+            .register_pass_compiler = register_pass_compiler
     };
 
     void _init_api(struct ct_api_a0 *api) {
@@ -1097,101 +891,19 @@ namespace viewport_module {
         _G.viewport_instance_map.init(ct_memory_a0.main_allocator());
         _G.viewport_instances.init(ct_memory_a0.main_allocator());
         _G.viewport_handler.init(ct_memory_a0.main_allocator());
+        _G.compiler_map.init(ct_memory_a0.main_allocator());
 
         _G.type = ct_hash_a0.id64_from_str("render_config");
         ct_resource_a0.register_type(_G.type,
                                      renderconfig_resource::callback);
 
+
 #ifdef CETECH_CAN_COMPILE
         renderconfig_compiler::init(api);
 #endif
 
-        renderer_register_layer_pass(
-                ct_hash_a0.id64_from_str("geometry"),
-                [](viewport_instance *viewport,
-                   uint8_t viewid,
-                   uint8_t layerid,
-                   ct_world world,
-                   ct_camera camera) {
-
-                    ct_camera_a0 *camera_api = (ct_camera_a0 *) ct_api_a0.first(
-                            "ct_camera_a0").api; // TODO: SHIT !!!!
-
-                    bgfx::setViewClear(viewid,
-                                       BGFX_CLEAR_COLOR |
-                                       BGFX_CLEAR_DEPTH,
-                                       0x66CCFFff,
-                                       1.0f, 0);
-
-                    bgfx::setViewRect(viewid, 0, 0,
-                                      (uint16_t) viewport->size[0],  // TODO: SHITTT
-                                      (uint16_t) viewport->size[1]); // TODO: SHITTT
-
-                    float view_matrix[16];
-                    float proj_matrix[16];
-
-                    camera_api->get_project_view(camera,
-                                                 proj_matrix,
-                                                 view_matrix,
-                                                 _G.size_width,
-                                                 _G.size_height);
-
-                    auto fb = viewport->framebuffers[layerid];
-                    bgfx::setViewFrameBuffer(viewid, {fb});
-
-                    bgfx::setViewTransform(viewid, view_matrix,
-                                           proj_matrix);
-
-                    // TODO: CULLING
-                    ct_mesh_renderer_a0.render_all(world, viewid,
-                                                   viewport->layers[layerid].name);
-                });
-
-
-        renderer_register_layer_pass(
-                ct_hash_a0.id64_from_str("fullscreen"),
-                [](viewport_instance *viewport,
-                   uint8_t viewid,
-                   uint8_t layerid,
-                   ct_world world,
-                   ct_camera camera) {
-
-                    static ct_material copy_material = ct_material_a0.resource_create(
-                            ct_hash_a0.id64_from_str("copy"));
-
-                    bgfx::setViewRect(viewid, 0, 0,
-                                      (uint16_t) viewport->size[0],  // TODO: SHITTT
-                                      (uint16_t) viewport->size[1]); // TODO: SHITTT
-
-                    auto fb = viewport->framebuffers[layerid];
-                    bgfx::setViewFrameBuffer(viewid, {fb});
-
-                    float proj[16];
-                    mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-                               100.0f, 0.0f, true);
-
-                    bgfx::setViewTransform(viewid, NULL, proj);
-
-                    auto &layer_entry = viewport->layers[layerid];
-
-                    screenSpaceQuad(viewport->size[0], viewport->size[1], 0.0f,
-                                    true);
-
-                    auto input_tex = _render_viewport_get_local_resource(
-                            *viewport, layer_entry.input[0]);
-
-                    ct_material_a0.set_texture_handler(copy_material,
-                                                     "s_input_texture",
-                                                     {input_tex});
-                    ct_material_a0.submit(copy_material, layer_entry.name,
-                                        viewid);
-                });
-
-
         ct_app_a0.register_on_render(on_render);
         ct_app_a0.register_on_update(on_update);
-
-        PosTexCoord0Vertex::init();
     }
 
     void _shutdown() {
@@ -1206,6 +918,8 @@ namespace viewport_module {
             _G.viewport_instance_map.destroy();
             _G.viewport_instances.destroy();
             _G.viewport_handler.destroy();
+
+            _G.compiler_map.destroy();
         }
 
         _G = (struct G) {};
@@ -1227,6 +941,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_window_a0);
+            CETECH_GET_API(api, ct_blob_a0);
         },
         {
             viewport_module::_init(api);

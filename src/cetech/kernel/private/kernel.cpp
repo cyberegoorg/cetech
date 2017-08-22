@@ -122,33 +122,12 @@ extern "C" int cetech_kernel_init(int argc,
 
     init_config(argc, argv);
 
-    CETECH_ADD_STATIC_MODULE(blob);
-    CETECH_ADD_STATIC_MODULE(task);
-    CETECH_ADD_STATIC_MODULE(filesystem);
-    CETECH_ADD_STATIC_MODULE(resourcesystem);
-    CETECH_ADD_STATIC_MODULE(application);
-    CETECH_ADD_STATIC_MODULE(machine);
-
-#ifdef CETECH_CAN_COMPILE
-    CETECH_ADD_STATIC_MODULE(resourcecompiler);
-#endif
-
-    CETECH_ADD_STATIC_MODULE(world);
-    CETECH_ADD_STATIC_MODULE(component);
-    CETECH_ADD_STATIC_MODULE(entity);
-    CETECH_ADD_STATIC_MODULE(keyboard);
-    CETECH_ADD_STATIC_MODULE(gamepad);
-    CETECH_ADD_STATIC_MODULE(mouse);
-
-    CETECH_GET_API(api, ct_app_a0);
     init_static_modules();
+    CETECH_GET_API(api, ct_app_a0);
 
     ct_module_a0.load_dirs();
 
     ct_config_a0.log_all();
-
-
-
 
     return 1;
 }

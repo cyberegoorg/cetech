@@ -33,9 +33,7 @@ struct ct_viewport {
 typedef struct {
     uint64_t name;
     uint64_t type;
-    uint8_t input_count;
     uint8_t output_count;
-    uint64_t input[8];
     uint64_t output[8];
 } layer_entry_t;
 
@@ -52,6 +50,9 @@ struct viewport_instance {
 
     layer_entry_t *layers;
 
+    uint32_t *layers_data_offset;
+    uint8_t* layers_data;
+
     uint64_t viewport;
     uint32_t layer_count;
 
@@ -59,7 +60,11 @@ struct viewport_instance {
     uint32_t resource_count;
 };
 
+typedef int (*ct_viewport_pass_compiler)(yaml_node_t body,
+                                         struct ct_blob *data);
+
 typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,
+                                     ct_viewport viewport_id,
                                      uint8_t viewid,
                                      uint8_t layeridx,
                                      struct ct_world world,
@@ -75,6 +80,8 @@ struct ct_viewport_a0 {
                                  float width,
                                  float height);
 
+    void (*register_pass_compiler)(uint64_t type,
+                                   ct_viewport_pass_compiler compiler);
 
     void (*register_layer_pass)(uint64_t type,
                                 ct_viewport_on_pass_t on_pass);

@@ -94,8 +94,6 @@ struct ct_property_value {
 
 //! Component callbacks
 static struct ct_component_clb {
-
-
     //! Component destoryer
     //! \param world World where is component
     //! \param ents Destroy component for this entity
@@ -217,6 +215,7 @@ struct ct_entity_a0 {
 
 //! Component system API V0
 struct ct_component_a0 {
+
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce

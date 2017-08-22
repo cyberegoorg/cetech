@@ -7,7 +7,7 @@ global_resource:
 layers:
   default:
     - { type: geometry, name: default, output: [gbuffer_color, gbuffer_depth]}
-    - { type: fullscreen, name: copy, input: [gbuffer_color], output: [bb_color]}
+    - { type: fullscreen, name: copy, input: {s_input_texture: gbuffer_color}, output: [bb_color]}
 
 # Viewports
 viewport:
@@ -17,9 +17,6 @@ viewport:
     local_resource:
       - { name: gbuffer_color, type: render_target, format: RGBA8, ration: equal }
       - { name: gbuffer_depth, type: render_target, format: D24, ration: equal }
-
-      - { name: gbuffer_color2, type: render_target, format: RGBA8, ration: equal }
-      - { name: gbuffer_depth2, type: render_target, format: D24, ration: equal }
 
       # !! DO NOT REMOVE
       # !! This 2 resource is virtual-backbuffer and is used to show to user.

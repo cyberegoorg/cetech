@@ -6,6 +6,23 @@ extern "C" void init_static_modules() {
     //==========================================================================
     // Engine
     //==========================================================================
+    CETECH_ADD_STATIC_MODULE(blob);
+    CETECH_ADD_STATIC_MODULE(task);
+    CETECH_ADD_STATIC_MODULE(filesystem);
+    CETECH_ADD_STATIC_MODULE(resourcesystem);
+    CETECH_ADD_STATIC_MODULE(application);
+    CETECH_ADD_STATIC_MODULE(machine);
+
+#ifdef CETECH_CAN_COMPILE
+    CETECH_ADD_STATIC_MODULE(resourcecompiler);
+#endif
+
+    CETECH_ADD_STATIC_MODULE(world);
+    CETECH_ADD_STATIC_MODULE(component);
+    CETECH_ADD_STATIC_MODULE(entity);
+    CETECH_ADD_STATIC_MODULE(keyboard);
+    CETECH_ADD_STATIC_MODULE(gamepad);
+    CETECH_ADD_STATIC_MODULE(mouse);
 
     CETECH_ADD_STATIC_MODULE(transform);
     CETECH_ADD_STATIC_MODULE(scenegraph);
@@ -13,6 +30,9 @@ extern "C" void init_static_modules() {
 
     CETECH_ADD_STATIC_MODULE(level);
 
+    //==========================================================================
+    // Renderer
+    //==========================================================================
     CETECH_ADD_STATIC_MODULE(renderer);
     CETECH_ADD_STATIC_MODULE(shader);
     CETECH_ADD_STATIC_MODULE(texture);
@@ -20,11 +40,16 @@ extern "C" void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(scene);
     CETECH_ADD_STATIC_MODULE(mesh_renderer);
 
+    //==========================================================================
+    // Viewport
+    //==========================================================================
     CETECH_ADD_STATIC_MODULE(viewport);
-
-    CETECH_ADD_STATIC_MODULE(luasys);
+    CETECH_ADD_STATIC_MODULE(fullscreen_pass);
+    CETECH_ADD_STATIC_MODULE(geometry_pass);
 
     CETECH_ADD_STATIC_MODULE(debugui);
+
+    CETECH_ADD_STATIC_MODULE(luasys);
 
     //==========================================================================
     // Playground

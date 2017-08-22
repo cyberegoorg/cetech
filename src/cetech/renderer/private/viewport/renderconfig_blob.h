@@ -20,8 +20,10 @@ namespace renderconfig_blob {
         // uint32_t layers_entry_offset[layer_count];
         // uint32_t layers_localresource_count[layer_count];
         // uint32_t layers_localresource_offset[layer_count];
+        // uint32_t entry_data_offset[layer_entry_count];
         // layer_entry_t layers_entry[layer_entry_count];
         // viewport_entry_t viewport[viewport_count];
+        // uint8_t data[*];
     } blob_t;
 
     inline const blob_t* get(void* data) {
@@ -38,6 +40,7 @@ namespace renderconfig_blob {
             ( sizeof(uint32_t) * blob->layer_count ) +
             ( sizeof(uint32_t) * blob->layer_count ) +
             ( sizeof(uint32_t) * blob->layer_count ) +
+            ( sizeof(uint32_t) * blob->layer_entry_count ) +
             ( sizeof(layer_entry_t) * blob->layer_entry_count ) +
             ( sizeof(viewport_entry_t) * blob->viewport_count ) +
         0);
@@ -79,11 +82,17 @@ namespace renderconfig_blob {
     inline uint32_t* layers_localresource_offset(const blob_t* blob) {
         return ((uint32_t*) (layers_localresource_count(blob) + (blob->layer_count)));
     }
+    inline uint32_t* entry_data_offset(const blob_t* blob) {
+        return ((uint32_t*) (layers_localresource_offset(blob) + (blob->layer_count)));
+    }
     inline layer_entry_t* layers_entry(const blob_t* blob) {
-        return ((layer_entry_t*) (layers_localresource_offset(blob) + (blob->layer_count)));
+        return ((layer_entry_t*) (entry_data_offset(blob) + (blob->layer_entry_count)));
     }
     inline viewport_entry_t* viewport(const blob_t* blob) {
         return ((viewport_entry_t*) (layers_entry(blob) + (blob->layer_entry_count)));
+    }
+    inline uint8_t* data(const blob_t* blob) {
+        return ((uint8_t*) (viewport(blob) + (blob->viewport_count)));
     }
 
 }

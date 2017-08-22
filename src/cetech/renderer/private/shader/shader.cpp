@@ -57,7 +57,7 @@ CETECH_DECL_API(ct_hash_a0);
 
 namespace shader_resource {
 
-    static const ct_shader null_program = {};
+    static const ct_shader null_program = BGFX_INVALID_HANDLE;
 
 
     void *loader(ct_vio *input,

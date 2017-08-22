@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <cetech/entity/entity.h>
+#include <cetech/blob/blob.h>
 #include "celib/map.inl"
 
 #include "cetech/memory/memory.h"
