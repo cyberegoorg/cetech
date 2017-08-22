@@ -168,7 +168,6 @@ extern "C" void application_start() {
 
         CETECH_GET_API(&ct_api_a0, ct_mouse_a0);
 
-
         if (!ct_config_a0.get_int(_G.config.daemon)) {
             for (uint32_t i = 0; i < celib::array::size(_G.on_render); ++i) {
                 _G.on_render[i]();
@@ -186,10 +185,10 @@ extern "C" void application_start() {
 }
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                                   \
+    static void register_ ## name ## _(type name) {                            \
         celib::array::push_back(_G.name, name);                                \
     }                                                                          \
-    static void unregister_## name ## _(type name) {                                  \
+    static void unregister_## name ## _(type name) {                           \
         const auto size = celib::array::size(_G.name);                         \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
@@ -204,7 +203,6 @@ extern "C" void application_start() {
             break;                                                             \
         }                                                                      \
     }
-
 
 _DEF_ON_CLB_FCE(ct_app_on_init, on_init)
 

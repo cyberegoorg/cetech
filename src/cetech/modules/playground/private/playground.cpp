@@ -6,6 +6,7 @@
 #include <cetech/engine/application/application.h>
 #include <cetech/modules/level/level.h>
 #include <cetech/modules/camera/camera.h>
+#include <cetech/modules/renderer/viewport.h>
 #include "celib/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"

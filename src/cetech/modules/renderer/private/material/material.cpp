@@ -16,27 +16,31 @@
 
 #include "cetech/engine/machine/machine.h"
 #include "cetech/engine/resource/resource.h"
-#include "cetech/engine/entity/entity.h"
 
+#include <cetech/engine/entity/entity.h>
 #include <cetech/modules/renderer/renderer.h>
-#include <cetech/modules/renderer/private/texture/texture.h>
-#include <cetech/modules/renderer/private/shader/shader.h>
+#include <cetech/modules/renderer/material.h>
+#include <cetech/modules/renderer/shader.h>
 #include <celib/fpumath.h>
+#include <cetech/modules/renderer/texture.h>
+#include <cetech/core/module/module.h>
 
 #include "cetech/core/os/path.h"
 #include "cetech/core/os/vio.h"
-
-#include "material.h"
-
-#include "material_blob.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_texture_a0);
+CETECH_DECL_API(ct_shader_a0);
 
 using namespace celib;
+
+#include "material.h"
+
+#include "material_blob.h"
 
 namespace material_compiler {
     int init(ct_api_a0 *api);
@@ -138,32 +142,10 @@ namespace material_resource {
 // Interface
 //==============================================================================
 
-
 namespace material {
-    int init(ct_api_a0 *api) {
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-
-        _G.init(ct_memory_a0.main_allocator());
-
-        ct_resource_a0.register_type(_G.type, material_resource::callback);
-
-#ifdef CETECH_CAN_COMPILE
-        material_compiler::init(api);
-#endif
-        return 1;
-    }
-
-    void shutdown() {
-        _G.shutdown();
-    }
-
 //    static const ct_material null_material = {};
 
-    ct_material create(uint64_t name) {
+    struct ct_material create(uint64_t name) {
         auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
 
         uint32_t size = material_blob::blob_size(resource);
@@ -283,7 +265,6 @@ namespace material {
     }
 
 
-
     void set_mat44f(ct_material material,
                     const char *slot,
                     float *value) {
@@ -302,7 +283,8 @@ namespace material {
     }
 
     void submit(ct_material material,
-                uint64_t layer, uint8_t viewid) {
+                uint64_t layer,
+                uint8_t viewid) {
         uint32_t idx = map::get(_G.instace_map, material.idx, UINT32_MAX);
 
         if (UINT32_MAX == idx) {
@@ -312,7 +294,7 @@ namespace material {
         auto resource = material_blob::get(&_get_material_instance(idx));
         auto layer_idx = _find_layer_slot(resource, layer);
 
-        if(UINT32_MAX == layer_idx) {
+        if (UINT32_MAX == layer_idx) {
             return;
         }
 
@@ -322,7 +304,7 @@ namespace material {
         auto *uniform_cout = material_blob::uniform_count(resource);
         auto *render_state = material_blob::render_state(resource);
 
-        auto shader_name = shader::shader_get(shader_names[layer_idx]);
+        auto shader = ct_shader_a0.get(shader_names[layer_idx]);
 
         auto offset = layer_offset[layer_idx];
         bgfx::UniformHandle *u_handler = &_G.instance_uniform_data[offset];
@@ -342,8 +324,9 @@ namespace material {
                     break;
 
                 case MAT_VAR_TEXTURE: {
-                    auto texture = texture::texture_get(uniform.t);
-                    bgfx::setTexture(texture_stage, u_handler[i], texture);
+                    auto texture = ct_texture_a0.get(uniform.t);
+                    bgfx::setTexture(texture_stage, u_handler[i],
+                                     {texture.idx});
                     ++texture_stage;
                 }
                     break;
@@ -366,6 +349,53 @@ namespace material {
 
         uint64_t state = render_state[layer_idx];
         bgfx::setState(state, 0);
-        bgfx::submit(viewid, shader_name);
+        bgfx::submit(viewid, {shader.idx});
     }
 }
+
+
+static struct ct_material_a0 material_api = {
+        .resource_create = material::create,
+        .set_texture = material::set_texture,
+        .set_texture_handler = material::set_texture_handler,
+        .set_mat44f = material::set_mat44f,
+        .submit = material::submit
+};
+
+static int init(ct_api_a0 *api) {
+    api->register_api("ct_material_a0", &material_api);
+
+    _G.init(ct_memory_a0.main_allocator());
+
+    ct_resource_a0.register_type(_G.type, material_resource::callback);
+
+#ifdef CETECH_CAN_COMPILE
+    material_compiler::init(api);
+#endif
+    return 1;
+}
+
+static void shutdown() {
+    _G.shutdown();
+}
+
+CETECH_MODULE_DEF(
+        material,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_texture_a0);
+            CETECH_GET_API(api, ct_shader_a0);
+        },
+        {
+            init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            shutdown();
+        }
+)

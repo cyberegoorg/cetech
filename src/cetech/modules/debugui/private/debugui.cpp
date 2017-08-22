@@ -1,10 +1,12 @@
 #include <cetech/engine/entity/entity.h>
 #include <cetech/modules/renderer/renderer.h>
+#include <cetech/modules/renderer/texture.h>
 #include <cetech/core/blob/blob.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/core/hashlib/hashlib.h>
+#include <cetech/modules/renderer/viewport.h>
 #include "celib/map.inl"
 
 #include "cetech/core/config/config.h"
@@ -20,6 +22,7 @@ CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_viewport_a0);
 
 using namespace celib;
 
@@ -267,6 +270,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_viewport_a0);
         },
         {
             debugui_module::_init(api);

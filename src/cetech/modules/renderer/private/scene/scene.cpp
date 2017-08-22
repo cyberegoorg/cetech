@@ -2,6 +2,8 @@
 // Include
 //==============================================================================
 
+#include <cetech/core/module/module.h>
+#include <cetech/modules/renderer/scene.h>
 #include "celib/allocator.h"
 #include "celib/map.inl"
 
@@ -290,3 +292,35 @@ namespace scene {
         return 0;
     }
 }
+
+static ct_scene_a0 scene_api = {
+        .setVBIB = scene::setVBIB,
+        .create_graph = scene::create_graph,
+        .get_mesh_node = scene::get_mesh_node,
+};
+
+void _init_api(struct ct_api_a0 *api) {
+    api->register_api("ct_scene_a0", &scene_api);
+}
+
+CETECH_MODULE_DEF(
+        scene,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_scenegprah_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_thread_a0);
+        },
+        {
+            _init_api(api);
+            scene::init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            scene::shutdown();
+        }
+)

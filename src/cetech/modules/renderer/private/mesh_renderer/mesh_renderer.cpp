@@ -18,7 +18,10 @@
 #include <cetech/core/macros.h>
 #include <cetech/core/blob/blob.h>
 #include <cetech/modules/renderer/renderer.h>
-#include <cetech/modules/renderer/private/scene/scene.h>
+#include <cetech/modules/renderer/scene.h>
+#include <cetech/modules/renderer/material.h>
+#include <cetech/core/module/module.h>
+#include <cetech/modules/renderer/mesh_renderer.h>
 #include "celib/fpumath.h"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -26,8 +29,8 @@ CETECH_DECL_API(ct_scenegprah_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_material_a0);
-CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_scene_a0);
 
 using namespace celib;
 
@@ -213,6 +216,39 @@ namespace {
     }
 
 
+    ct_mesh_renderer mesh_create(ct_world world,
+                                 ct_entity entity,
+                                 uint64_t scene,
+                                 uint64_t mesh,
+                                 uint64_t node,
+                                 uint64_t material) {
+
+        WorldInstance *data = _get_world_instance(world);
+
+        uint32_t idx = data->n;
+        allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
+        ++data->n;
+
+        ct_scene_a0.create_graph(world, entity, scene);
+
+        ct_material material_instance = ct_material_a0.resource_create(material);
+
+        map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
+
+        if (node == 0) {
+            node = ct_scene_a0.get_mesh_node(scene, mesh);
+        }
+
+        data->entity[idx] = entity;
+
+        data->scene[idx] = scene;
+        data->mesh[idx] = mesh;
+        data->node[idx] = node;
+        data->material[idx] = material_instance;
+
+        return (ct_mesh_renderer) {.idx = idx, .world = world};
+    }
+
     static void _spawner(ct_world world,
                          ct_entity *ents,
                          uint32_t *cents,
@@ -224,7 +260,7 @@ namespace {
         struct mesh_data *tdata = (mesh_data *) data;
 
         for (uint32_t i = 0; i < ent_count; ++i) {
-            ct_mesh_renderer_a0.create(world,
+            mesh_create(world,
                                        ents[cents[i]],
                                        tdata[i].scene,
                                        tdata[i].mesh,
@@ -256,40 +292,9 @@ ct_mesh_renderer mesh_get(ct_world world,
     return {.idx = component_idx, .world = world};
 }
 
-ct_mesh_renderer mesh_create(ct_world world,
-                             ct_entity entity,
-                             uint64_t scene,
-                             uint64_t mesh,
-                             uint64_t node,
-                             uint64_t material) {
-
-    WorldInstance *data = _get_world_instance(world);
-
-    uint32_t idx = data->n;
-    allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
-    ++data->n;
-
-    scene::create_graph(world, entity, scene);
-
-    ct_material material_instance = ct_material_a0.resource_create(material);
-
-    map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
-
-    if (node == 0) {
-        node = scene::get_mesh_node(scene, mesh);
-    }
-
-    data->entity[idx] = entity;
-
-    data->scene[idx] = scene;
-    data->mesh[idx] = mesh;
-    data->node[idx] = node;
-    data->material[idx] = material_instance;
-
-    return (ct_mesh_renderer) {.idx = idx, .world = world};
-}
-
-void mesh_render_all(ct_world world, uint8_t viewid, uint64_t layer_name) {
+void mesh_render_all(ct_world world,
+                     uint8_t viewid,
+                     uint64_t layer_name) {
     WorldInstance *data = _get_world_instance(world);
 
     for (uint32_t i = 0; i < data->n; ++i) {
@@ -315,7 +320,7 @@ void mesh_render_all(ct_world world, uint8_t viewid, uint64_t layer_name) {
         celib::mat4_identity(final_w);
 
         if (ct_scenegprah_a0.has(world, ent)) {
-            uint64_t name = scene::get_mesh_node(scene, geom);
+            uint64_t name = ct_scene_a0.get_mesh_node(scene, geom);
             if (name != 0) {
                 ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,
                                                                 name);
@@ -327,7 +332,7 @@ void mesh_render_all(ct_world world, uint8_t viewid, uint64_t layer_name) {
 
         bgfx::setTransform(&final_w, 1);
 
-        scene::setVBIB(scene, geom);
+        ct_scene_a0.setVBIB(scene, geom);
 
         ct_material_a0.submit(material, layer_name, viewid);
     }
@@ -419,15 +424,16 @@ static ct_property_value _get_property(ct_world world,
 
 
 static void _init_api(struct ct_api_a0 *api) {
-    static struct ct_mesh_renderer_a0 _api = {};
+    static struct ct_mesh_renderer_a0 _api = {
+            .is_valid = mesh_is_valid,
+            .has = mesh_has,
+            .get = mesh_get,
+            .create = mesh_create,
+            .get_material = mesh_get_material,
+            .set_material = mesh_set_material,
+            .render_all = mesh_render_all,
+    };
 
-    _api.is_valid = mesh_is_valid;
-    _api.has = mesh_has;
-    _api.get = mesh_get;
-    _api.create = mesh_create;
-    _api.get_material = mesh_get_material;
-    _api.set_material = mesh_set_material;
-    _api.render_all = mesh_render_all;
 
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
@@ -435,14 +441,6 @@ static void _init_api(struct ct_api_a0 *api) {
 
 static void _init(ct_api_a0 *api) {
     _init_api(api);
-
-    CETECH_GET_API(api, ct_component_a0);
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_material_a0);
-    CETECH_GET_API(api, ct_mesh_renderer_a0);
-    CETECH_GET_API(api, ct_scenegprah_a0);
-    CETECH_GET_API(api, ct_transform_a0);
-    CETECH_GET_API(api, ct_hash_a0);
 
     _G = {};
 
@@ -479,3 +477,25 @@ namespace mesh {
         _shutdown();
     }
 }
+
+CETECH_MODULE_DEF(
+        mesh_renderer,
+        {
+            CETECH_GET_API(api, ct_component_a0);
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_scenegprah_a0);
+            CETECH_GET_API(api, ct_transform_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_material_a0);
+            CETECH_GET_API(api, ct_scene_a0);
+
+        },
+        {
+            mesh::init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            mesh::shutdown();
+        }
+)

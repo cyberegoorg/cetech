@@ -16,6 +16,7 @@
 #include <cetech/modules/transform/transform.h>
 #include <cetech/modules/camera/camera.h>
 #include <cetech/modules/level/level.h>
+#include <cetech/modules/renderer/viewport.h>
 
 
 CETECH_DECL_API(ct_log_a0);

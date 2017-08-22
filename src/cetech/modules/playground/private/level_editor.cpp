@@ -1,5 +1,6 @@
 #include <cetech/engine/entity/entity.h>
 #include <cetech/modules/renderer/renderer.h>
+#include <cetech/modules/renderer/texture.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/modules/level/level.h>
@@ -9,6 +10,7 @@
 #include <cetech/modules/transform/transform.h>
 #include <celib/fpumath.h>
 #include <cetech/engine/input/input.h>
+#include <cetech/modules/renderer/viewport.h>
 #include "celib/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"
@@ -28,6 +30,7 @@ CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
+CETECH_DECL_API(ct_viewport_a0);
 
 using namespace celib;
 
@@ -118,12 +121,12 @@ void on_gui() {
                 _G.active_editor = i;
             }
 
-            auto th = ct_renderer_a0.viewport_get_local_resource(
+            auto th = ct_viewport_a0.get_local_resource(
                     _G.viewport[i], ct_hash_a0.id64_from_str("bb_color"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
-            ct_renderer_a0.resize_viewport(_G.viewport[i], size[0], size[1]);
+            ct_viewport_a0.resize(_G.viewport[i], size[0], size[1]);
             ct_debugui_a0.Image2({th},
                                  size,
                                  (float[2]) {0.0f, 0.0f},
@@ -141,7 +144,7 @@ void render() {
             continue;
         }
 
-        ct_renderer_a0.render_world(_G.world[i], _G.camera[i], _G.viewport[i]);
+        ct_viewport_a0.render_world(_G.world[i], _G.camera[i], _G.viewport[i]);
     }
 }
 
@@ -151,7 +154,7 @@ void open_level() {
 
     _G.visible[idx] = true;
 
-    _G.viewport[idx] = ct_renderer_a0.create_viewport(
+    _G.viewport[idx] = ct_viewport_a0.create(
             ct_hash_a0.id64_from_str("default"), 0, 0);
 
     _G.world[idx] = ct_world_a0.create();
@@ -211,7 +214,7 @@ void update(float dt) {
                       updown, leftright, 10.0f, false);
 }
 
-static ct_level_view_a0 api = {
+static ct_level_view_a0 level_api = {
 //            .register_module = playground::register_module,
 //            .unregister_module = playground::unregister_module,
 };
@@ -225,7 +228,7 @@ static void _init(ct_api_a0 *api) {
     ct_app_a0.register_on_update(update);
     ct_debugui_a0.register_on_gui(on_gui);
 
-    api->register_api("ct_level_view_a0", &api);
+    api->register_api("ct_level_view_a0", &level_api);
 }
 
 static void _shutdown() {
@@ -252,6 +255,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
+            CETECH_GET_API(api, ct_viewport_a0);
         },
         {
             _init(api);

@@ -8,7 +8,6 @@
 #include "celib/map.inl"
 #include "celib/buffer.inl"
 
-#include <cetech/engine/application/application.h>
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
@@ -19,6 +18,8 @@
 #include "cetech/engine/resource/resource.h"
 
 #include <bgfx/bgfx.h>
+#include <cetech/core/module/module.h>
+#include <cetech/modules/renderer/shader.h>
 
 #include "shader_blob.h"
 #include "cetech/core/os/path.h"
@@ -37,11 +38,10 @@ namespace shader_compiler {
 //==============================================================================
 
 #define _G ShaderResourceGlobals
-struct shader_blobResourceGlobals {
-    Map<bgfx::ProgramHandle> handler_map;
+struct _G {
+    Map<ct_shader> handler_map;
     uint64_t type;
-} ShaderResourceGlobals;
-
+} _G;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -51,14 +51,13 @@ CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 
-
 //==============================================================================
 // Resource
 //==============================================================================
 
 namespace shader_resource {
 
-    static const bgfx::ProgramHandle null_program = {};
+    static const ct_shader null_program = {};
 
 
     void *loader(ct_vio *input,
@@ -77,11 +76,11 @@ namespace shader_resource {
 
     void online(uint64_t name,
                 void *data) {
-        auto* resource = shader_blob::get(data);
+        auto *resource = shader_blob::get(data);
 
         bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 
-        if(resource) {
+        if (resource) {
             auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
             auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
 
@@ -94,7 +93,7 @@ namespace shader_resource {
             program = bgfx::createProgram(vs_shader, fs_shader, 1);
         }
 
-        map::set(_G.handler_map, name, program);
+        map::set(_G.handler_map, name, {program.idx});
     }
 
     void offline(uint64_t name,
@@ -107,7 +106,7 @@ namespace shader_resource {
             return;
         }
 
-        bgfx::destroy(program);
+        bgfx::destroy((bgfx::ProgramHandle){program.idx});
 
         map::remove(_G.handler_map, name);
     }
@@ -138,16 +137,11 @@ namespace shader_resource {
 // Interface
 //==============================================================================
 
+
+
+
 namespace shader {
     int shader_init(ct_api_a0 *api) {
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_process_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-
         _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("shader");
@@ -167,9 +161,38 @@ namespace shader {
         _G.handler_map.destroy();
     }
 
-    bgfx::ProgramHandle shader_get(uint64_t name) {
+    ct_shader shader_get(uint64_t name) {
         shader_blob::get(ct_resource_a0.get(_G.type, name));
         return map::get(_G.handler_map, name, shader_resource::null_program);
     }
 }
-    
+
+static ct_shader_a0 shader_api = {
+        .get = shader::shader_get
+};
+
+static void _init_api(struct ct_api_a0 *api) {
+    api->register_api("ct_shader_a0", &shader_api);
+}
+
+CETECH_MODULE_DEF(
+        shader,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_process_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+        },
+        {
+            _init_api(api);
+            shader::shader_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            shader::shader_shutdown();
+        }
+)

@@ -18,6 +18,8 @@
 #include "celib/buffer.inl"
 
 #include <bgfx/bgfx.h>
+#include <cetech/core/module/module.h>
+#include <cetech/modules/renderer/texture.h>
 
 #include "texture_blob.h"
 #include "cetech/core/os/path.h"
@@ -36,7 +38,7 @@ namespace texture_compiler {
 
 #define _G TextureResourceGlobals
 struct TextureResourceGlobals {
-    Map<bgfx::TextureHandle> handler_map;
+    Map<ct_texture> handler_map;
     uint64_t type;
 } TextureResourceGlobals;
 
@@ -60,7 +62,7 @@ CETECH_DECL_API(ct_hash_a0);
 
 namespace texture_resource {
 
-    static const bgfx::TextureHandle null_texture = {};
+    static const ct_texture null_texture = {};
 
 
     void *_texture_resource_loader(ct_vio *input,
@@ -86,7 +88,7 @@ namespace texture_resource {
                                              texture_blob::size(resource));
         auto texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
-        map::set(_G.handler_map, name, texture);
+        map::set(_G.handler_map, name, {texture.idx});
     }
 
 
@@ -100,7 +102,7 @@ namespace texture_resource {
             return;
         }
 
-        bgfx::destroy(texture);
+        bgfx::destroy((bgfx::TextureHandle){texture.idx});
     }
 
     void *_texture_resource_reloader(uint64_t name,
@@ -130,15 +132,6 @@ namespace texture_resource {
 //==============================================================================
 namespace texture {
     int texture_init(ct_api_a0 *api) {
-
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_resource_a0);
-        CETECH_GET_API(api, ct_path_a0);
-        CETECH_GET_API(api, ct_vio_a0);
-        CETECH_GET_API(api, ct_process_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_hash_a0);
-
         _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("texture");
@@ -159,10 +152,41 @@ namespace texture {
         _G.handler_map.destroy();
     }
 
-    bgfx::TextureHandle texture_get(uint64_t name) {
+    ct_texture texture_get(uint64_t name) {
         ct_resource_a0.get(_G.type, name); // TODO: only for autoload
 
         return map::get(_G.handler_map, name, texture_resource::null_texture);
     }
 
 }
+
+static ct_texture_a0 texture_api = {
+        .get = texture::texture_get
+};
+
+static void _init_api(struct ct_api_a0 *api) {
+    api->register_api("ct_texture_a0", &texture_api);
+}
+
+
+CETECH_MODULE_DEF(
+        texture,
+        {
+            CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_process_a0);
+            CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_hash_a0);
+        },
+        {
+            _init_api(api);
+            texture::texture_init(api);
+        },
+        {
+            CEL_UNUSED(api);
+
+            texture::texture_shutdown();
+        }
+)

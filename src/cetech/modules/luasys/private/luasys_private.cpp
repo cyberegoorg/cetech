@@ -209,41 +209,6 @@ void _to_mpack(lua_State *_L,
     }
 }
 
-
-static int _cmd_execute_string(mpack_node_t args,
-                               mpack_writer_t *writer) {
-    mpack_node_t node = mpack_node_map_cstr(args, "script");
-
-    size_t strlen = mpack_node_strlen(node);
-    const char *str = mpack_node_str(node);
-
-    int top = lua_gettop(_G.L);
-
-    if ((luaL_loadbuffer(_G.L, str, strlen, "console") ||
-         lua_pcall(_G.L, 0, LUA_MULTRET, 0))) {
-
-        const char *last_error = lua_tostring(_G.L, -1);
-        lua_pop(_G.L, 1);
-        ct_log_a0.error(LOG_WHERE, "%s", last_error);
-
-        mpack_start_map(writer, 1);
-        mpack_write_cstr(writer, "error_msg");
-        mpack_write_cstr(writer, last_error);
-        mpack_finish_map(writer);
-
-        return 1;
-    }
-
-    int nresults = lua_gettop(_G.L) - top;
-
-    if (nresults != 0) {
-        _to_mpack(_G.L, -1, writer);
-        return 1;
-    }
-
-    return 0;
-}
-
 static int _execute_string(lua_State *_L,
                            const char *str) {
     if (luaL_dostring(_L, str)) {
@@ -782,7 +747,6 @@ static void _init(ct_api_a0 *a0) {
     ct_app_a0.register_on_init(_game_init_clb);
     ct_app_a0.register_on_shutdown(_game_shutdown_clb);
     ct_app_a0.register_on_update(_game_update_clb);
-
 
     ct_renderer_a0.register_on_render(_game_render_clb);
 

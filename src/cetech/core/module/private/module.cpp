@@ -250,8 +250,7 @@ namespace module {
         const char *path = ct_config_a0.get_string(_G.module_dir);
         const char *glob_patern = "**/" MODULE_PREFIX "*.so";
 
-        ct_path_a0.list(path, glob_patern, 1, 0, &files, &files_count,
-                        ct_memory_a0.main_allocator());
+        ct_path_a0.list(path, glob_patern, 1, 0, &files, &files_count, alloc);
 
         for (uint32_t k = 0; k < files_count; ++k) {
             const char *filename = ct_path_a0.filename(files[k]);

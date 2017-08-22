@@ -4,8 +4,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(cetech)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror -Wall")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
 include_directories(src)
@@ -140,6 +140,7 @@ set(SOURCE_FILES
         src/cetech/modules/renderer/private/shader/shader.cpp
         src/cetech/modules/renderer/private/material/material.cpp
         src/cetech/modules/renderer/private/scene/scene.cpp
+        src/cetech/modules/renderer/private/viewport/viewport.cpp
         src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
         src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
 
