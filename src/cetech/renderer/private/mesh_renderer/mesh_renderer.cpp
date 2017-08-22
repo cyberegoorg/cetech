@@ -231,7 +231,8 @@ namespace {
 
         ct_scene_a0.create_graph(world, entity, scene);
 
-        ct_material material_instance = ct_material_a0.resource_create(material);
+        ct_material material_instance = ct_material_a0.resource_create(
+                material);
 
         map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
 
@@ -261,11 +262,11 @@ namespace {
 
         for (uint32_t i = 0; i < ent_count; ++i) {
             mesh_create(world,
-                                       ents[cents[i]],
-                                       tdata[i].scene,
-                                       tdata[i].mesh,
-                                       tdata[i].node,
-                                       tdata[i].material);
+                        ents[cents[i]],
+                        tdata[i].scene,
+                        tdata[i].mesh,
+                        tdata[i].node,
+                        tdata[i].material);
         }
     }
 }

@@ -7,7 +7,6 @@
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/memory/memory.h"
-#include <cetech/application/application.h>
 #include "cetech/api/api_system.h"
 #include "cetech/log/log.h"
 #include "cetech/machine/machine.h"
@@ -102,7 +101,7 @@ namespace texture_resource {
             return;
         }
 
-        bgfx::destroy((bgfx::TextureHandle){texture.idx});
+        bgfx::destroy((bgfx::TextureHandle) {texture.idx});
     }
 
     void *_texture_resource_reloader(uint64_t name,

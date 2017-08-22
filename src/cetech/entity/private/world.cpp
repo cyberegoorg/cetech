@@ -91,7 +91,6 @@ namespace world_module {
         _init_api(api);
 
 
-
         _G = {};
 
         _G.callbacks.init(ct_memory_a0.main_allocator());

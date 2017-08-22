@@ -85,7 +85,7 @@ static ct_hash_a0 hash_api = {
 CETECH_MODULE_DEF(
         hashlib,
         {
-          CEL_UNUSED(api);
+            CEL_UNUSED(api);
         },
         {
             api->register_api("ct_hash_a0", &hash_api);

@@ -128,8 +128,8 @@ struct fullscree_pass_data {
 };
 
 
-
 #ifdef CETECH_CAN_COMPILE
+
 static void foreach_input(yaml_node_t key,
                           yaml_node_t value,
                           void *_data) {
@@ -173,6 +173,7 @@ static int fullscreen_pass_compiler(yaml_node_t body,
 
     return 1;
 }
+
 #endif
 
 static void fullscreen_pass(viewport_instance *viewport,

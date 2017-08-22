@@ -49,6 +49,7 @@ struct ct_renderer_a0 {
                      uint32_t *height);
 
     void (*register_on_render)(ct_render_on_render on_render);
+
     void (*unregister_on_render)(ct_render_on_render on_render);
 };
 

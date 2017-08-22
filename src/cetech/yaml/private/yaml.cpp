@@ -243,7 +243,7 @@ void yaml_as_mat44(yaml_node_t body,
                    float *value) {
     CETECH_ASSERT("yaml", yaml_is_valid(body));
 
-    for(uint8_t i = 0; i < 16; ++i) {
+    for (uint8_t i = 0; i < 16; ++i) {
         yaml_node_t x = yaml_get_seq_node(body, 0);
         CETECH_ASSERT("yaml", yaml_is_valid(x));
         value[i] = yaml_as_float(x);

@@ -25,7 +25,6 @@
 #include <celib/array.inl>
 
 #include <cetech/os/watchdog.h>
-#include <cetech/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/input/input.h>
 
 CETECH_DECL_API(ct_resource_a0);

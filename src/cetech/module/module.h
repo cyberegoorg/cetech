@@ -52,8 +52,10 @@ struct ct_api_a0;
 // Typedefs
 //==============================================================================
 
-typedef void (*ct_load_module_t)(struct ct_api_a0 *api, int reload);
-typedef void (*ct_unload_module_t)(struct ct_api_a0 *api, int reload);
+typedef void (*ct_load_module_t)(struct ct_api_a0 *api,
+                                 int reload);
+typedef void (*ct_unload_module_t)(struct ct_api_a0 *api,
+                                   int reload);
 typedef void (*ct_initapi_module_t)(struct ct_api_a0 *api);
 
 //==============================================================================

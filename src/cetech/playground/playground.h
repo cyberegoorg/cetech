@@ -27,7 +27,7 @@ extern "C" {
 
 //! Playground API V0
 struct ct_playground_a0 {
-      void (*_)();
+    void (*_)();
 };
 
 #ifdef __cplusplus

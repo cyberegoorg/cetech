@@ -407,8 +407,8 @@ void _update(float dt) {
 
         _resource_compiler_compile_all(type_name);
 
-        auto* type_it = map::begin(type_name);
-        auto* type_end = map::end(type_name);
+        auto *type_it = map::begin(type_name);
+        auto *type_end = map::end(type_name);
 
         Array<uint64_t> name_array(ct_memory_a0.main_allocator());
 
@@ -418,14 +418,15 @@ void _update(float dt) {
             array::resize(name_array, 0);
 
             auto it = multi_map::find_first(type_name, type_id);
-            while( it != nullptr) {
+            while (it != nullptr) {
                 array::push_back(name_array, it->value);
 
                 it = multi_map::find_next(type_name, it);
             }
 
 
-            ct_resource_a0.reload(type_id, &name_array[0], array::size(name_array));
+            ct_resource_a0.reload(type_id, &name_array[0],
+                                  array::size(name_array));
 
             ++type_it;
         }

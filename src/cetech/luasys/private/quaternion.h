@@ -4,7 +4,6 @@
 #include "include/luajit/luajit.h"
 
 
-
 //TODO: mul_s
 static int _quat_mul(lua_State *L) {
     float a[4];

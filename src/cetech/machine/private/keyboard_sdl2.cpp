@@ -49,11 +49,13 @@ void sdl_keyboard_process(EventStream &stream) {
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
-            eventstream::push<ct_event_header>(stream, EVENT_KEYBOARD_DOWN, keyboard_ev);
+            eventstream::push<ct_event_header>(stream, EVENT_KEYBOARD_DOWN,
+                                               keyboard_ev);
 
         } else if (is_button_up(state[i], _G.state[i])) {
             keyboard_ev.keycode = i;
-            eventstream::push<ct_event_header>(stream, EVENT_KEYBOARD_UP, keyboard_ev);
+            eventstream::push<ct_event_header>(stream, EVENT_KEYBOARD_UP,
+                                               keyboard_ev);
 
         }
 

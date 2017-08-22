@@ -15,9 +15,6 @@
 #include <cetech/module/module.h>
 #include <celib/buffer.inl>
 
-#include "celib/allocator.h"
-
-
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
@@ -254,13 +251,16 @@ namespace config {
 
             switch (_G.types[i]) {
                 case CV_FLOAT:
-                    celib::buffer::printf(out, "    - %s = %f\n", name, _G.values[i].f);
+                    celib::buffer::printf(out, "    - %s = %f\n", name,
+                                          _G.values[i].f);
                     break;
                 case CV_INT:
-                    celib::buffer::printf(out, "    - %s = %d\n", name, _G.values[i].i);
+                    celib::buffer::printf(out, "    - %s = %d\n", name,
+                                          _G.values[i].i);
                     break;
                 case CV_STRING:
-                    celib::buffer::printf(out, "    - %s = %s\n", name, _G.values[i].s);
+                    celib::buffer::printf(out, "    - %s = %s\n", name,
+                                          _G.values[i].s);
                     break;
                 default:
                     break;

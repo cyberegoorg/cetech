@@ -147,10 +147,10 @@ namespace material_compiler {
 //                          | BGFX_STATE_CULL_CCW
 //                          | BGFX_STATE_MSAA );
 
-    uint64_t render_state_to_enum(const char* name) {
+    uint64_t render_state_to_enum(const char *name) {
         static struct {
-            const char* name;
-            uint64_t  e;
+            const char *name;
+            uint64_t e;
         } _tbl[] = {
                 {.name = "", .e = 0},
                 {.name = "rgb_write", .e = BGFX_STATE_RGB_WRITE},
@@ -233,7 +233,8 @@ namespace material_compiler {
                     auto layer_id = ct_hash_a0.id64_from_str(tmp_buffer);
                     auto layer_offset = array::size(output.var);
 
-                    yaml_node_t render_state = yaml_get_node(value, "render_state");
+                    yaml_node_t render_state = yaml_get_node(value,
+                                                             "render_state");
                     if (yaml_is_valid(render_state)) {
                         output.curent_render_state = 0;
 
@@ -247,16 +248,19 @@ namespace material_compiler {
 
                                     char state_name[64] = {};
                                     yaml_as_string(key, state_name,
-                                                   CETECH_ARRAY_LEN(state_name));
+                                                   CETECH_ARRAY_LEN(
+                                                           state_name));
 
-                                    output.curent_render_state |= render_state_to_enum(state_name);
+                                    output.curent_render_state |= render_state_to_enum(
+                                            state_name);
 
                                 }, &output);
                     }
 
                     array::push_back(output.layer_names, layer_id);
                     array::push_back(output.layer_offset, layer_offset);
-                    array::push_back(output.render_state, output.curent_render_state);
+                    array::push_back(output.render_state,
+                                     output.curent_render_state);
 
                     yaml_node_t variables = yaml_get_node(value, "variables");
                     if (yaml_is_valid(variables)) {

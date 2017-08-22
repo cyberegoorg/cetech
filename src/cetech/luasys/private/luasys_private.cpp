@@ -20,11 +20,9 @@ extern "C" {
 
 #include <include/mpack/mpack.h>
 #include <cetech/luasys/luasys.h>
-#include <cetech/api/private/api_private.h>
 #include "cetech/os/errors.h"
 #include "cetech/entity/entity.h"
 #include "cetech/module/module.h"
-#include <cetech/entity/entity.h>
 #include <cetech/renderer/renderer.h>
 
 CETECH_DECL_API(ct_resource_a0);
@@ -682,7 +680,6 @@ static void _init_api(ct_api_a0 *api) {
 }
 
 
-
 void _game_init_clb() {
     uint64_t boot_script = ct_hash_a0.id64_from_str(
             ct_config_a0.get_string(_G.boot_script));
@@ -712,10 +709,10 @@ static void _init(ct_api_a0 *a0) {
 
 
     _G.boot_script = ct_config_a0.new_str("core.boot_script",
-                                        "Boot script", "lua/boot"),
+                                          "Boot script", "lua/boot"),
 
 
-    ct_log_a0.debug(LOG_WHERE, "Init");
+            ct_log_a0.debug(LOG_WHERE, "Init");
 
     _G.L = luaL_newstate();
     CETECH_ASSERT(LOG_WHERE, _G.L != NULL);

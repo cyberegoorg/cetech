@@ -265,7 +265,6 @@ namespace camera_module {
         api->register_api("ct_camera_a0", &camera_api);
 
 
-
         _G = {};
 
         _G.world_map.init(ct_memory_a0.main_allocator());

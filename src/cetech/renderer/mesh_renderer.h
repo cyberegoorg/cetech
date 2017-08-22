@@ -84,7 +84,9 @@ struct ct_mesh_renderer_a0 {
 
     //! Render all mesh in world
     //! \param world Word
-    void (*render_all)(struct ct_world world, uint8_t viewid,  uint64_t layer_name);
+    void (*render_all)(struct ct_world world,
+                       uint8_t viewid,
+                       uint64_t layer_name);
 };
 
 #ifdef __cplusplus

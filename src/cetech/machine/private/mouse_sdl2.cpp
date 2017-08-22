@@ -6,16 +6,10 @@
 
 #include "celib/eventstream.inl"
 #include "cetech/machine/machine.h"
-#include "cetech/machine/window.h"
 
-#include "cetech/entity/entity.h"
-#include <cetech/application/application.h>
 #include <cetech/module/module.h>
 #include "cetech/api/api_system.h"
-#include "cetech/resource/resource.h"
 #include <cetech/renderer/renderer.h>
-#include <celib/fpumath.h>
-#include <cfloat>
 
 using namespace celib;
 
@@ -66,7 +60,8 @@ void sdl_mouse_process(EventStream &stream) {
     curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
-    ct_renderer_a0* renderer_a0 = (ct_renderer_a0*) ct_api_a0.first("ct_renderer_a0").api;
+    ct_renderer_a0 *renderer_a0 = (ct_renderer_a0 *) ct_api_a0.first(
+            "ct_renderer_a0").api;
 
     uint32_t window_size[2] = {};
     renderer_a0->get_size(&window_size[0], &window_size[1]);
@@ -75,11 +70,11 @@ void sdl_mouse_process(EventStream &stream) {
     _G.position[1] = window_size[1] - pos[1];
 
     //if ((float(pos[0]) != _G.position[0]) || (float(pos[1]) != _G.position[1])) {
-        ct_mouse_move_event event;
-        event.pos[0] = pos[0];
-        event.pos[1] = window_size[1] - pos[1];
+    ct_mouse_move_event event;
+    event.pos[0] = pos[0];
+    event.pos[1] = window_size[1] - pos[1];
 
-        eventstream::push<ct_event_header>(stream, EVENT_MOUSE_MOVE, event);
+    eventstream::push<ct_event_header>(stream, EVENT_MOUSE_MOVE, event);
     //}
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {

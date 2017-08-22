@@ -82,7 +82,7 @@ void _dir_list(const char *path,
                                entry->d_name);
             }
 
-            if (only_dir){
+            if (only_dir) {
                 char *new_path =
                         CEL_ALLOCATE(allocator, char,
                                      sizeof(char) * (len + 1));
@@ -91,8 +91,9 @@ void _dir_list(const char *path,
                 array::push_back(tmp_files, new_path);
             }
 
-            _dir_list(tmp_path, patern, recursive, only_dir, tmp_files, allocator);
-        } else if(!only_dir){
+            _dir_list(tmp_path, patern, recursive, only_dir, tmp_files,
+                      allocator);
+        } else if (!only_dir) {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
                     CEL_ALLOCATE(allocator, char,
@@ -104,7 +105,7 @@ void _dir_list(const char *path,
                 snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
             }
 
-            if(0 != fnmatch(patern, new_path, 0)) {
+            if (0 != fnmatch(patern, new_path, 0)) {
                 continue;
             }
 

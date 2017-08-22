@@ -12,7 +12,7 @@ CETECH_DECL_API(ct_log_a0);
 #define LOG_WHERE "object"
 
 void *load_object(const char *path) {
-    void *obj =  dlmopen(LM_ID_NEWLM, path, RTLD_NOW);
+    void *obj = dlmopen(LM_ID_NEWLM, path, RTLD_NOW);
 
     if (obj == NULL) {
         ct_log_a0.error(LOG_WHERE, "%s", dlerror());

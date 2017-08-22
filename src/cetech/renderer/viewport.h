@@ -51,7 +51,7 @@ struct viewport_instance {
     layer_entry_t *layers;
 
     uint32_t *layers_data_offset;
-    uint8_t* layers_data;
+    uint8_t *layers_data;
 
     uint64_t viewport;
     uint32_t layer_count;

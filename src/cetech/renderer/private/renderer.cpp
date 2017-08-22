@@ -9,33 +9,23 @@
 #include <celib/handler.inl>
 #include <celib/fpumath.h>
 
-#include <cetech/yaml/yaml.h>
 #include <cetech/api/api_system.h>
 #include <cetech/config/config.h>
 #include <cetech/macros.h>
 #include <cetech/module/module.h>
 #include <cetech/memory/memory.h>
 #include <cetech/hashlib/hashlib.h>
-#include <cetech/os/vio.h>
 
 #include <cetech/application/application.h>
 #include <cetech/machine/window.h>
-#include <cetech/entity/entity.h>
 #include <cetech/input/input.h>
 #include <cetech/resource/resource.h>
 
 #include <cetech/renderer/renderer.h>
-#include <cetech/renderer/texture.h>
-#include <cetech/camera/camera.h>
 #include <cetech/debugui/private/bgfx_imgui/imgui.h>
-#include <cetech/debugui/debugui.h>
 #include <cetech/machine/machine.h>
 
 #include "bgfx/platform.h"
-
-#include "cetech/renderer/shader.h"
-#include "cetech/renderer/scene.h"
-#include "cetech/renderer/material.h"
 
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_window_a0);
@@ -270,7 +260,7 @@ namespace renderer_module {
         renderer_create();
 
         _G.on_render.init(ct_memory_a0.main_allocator());
-                ct_app_a0.register_on_render(on_render);
+        ct_app_a0.register_on_render(on_render);
         ct_app_a0.register_on_update(on_update);
     }
 

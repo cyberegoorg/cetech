@@ -23,8 +23,6 @@
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
 
-#include <cetech/application/application.h>
-
 #include "shader_blob.h"
 
 using namespace celib;
@@ -59,18 +57,18 @@ namespace shader_compiler {
         CEL_FREE(ct_memory_a0.main_allocator(), shaderc);
 
         buffer::printf(buffer,
-                              ""
-                                      " -f %s"
-                                      " -o %s"
-                                      " -i %s"
-                                      " --type %s"
-                                      " --platform %s"
-                                      " --profile %s"
+                       ""
+                               " -f %s"
+                               " -o %s"
+                               " -i %s"
+                               " --type %s"
+                               " --platform %s"
+                               " --profile %s"
 
-                                      " 2>&1",  // TODO: move to exec
+                               " 2>&1",  // TODO: move to exec
 
-                              input, output, include_path, type, platform,
-                              profile);
+                       input, output, include_path, type, platform,
+                       profile);
 
         int status = ct_process_a0.exec(buffer::c_str(buffer));
 

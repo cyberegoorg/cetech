@@ -8,7 +8,6 @@
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/memory/memory.h"
-#include <cetech/application/application.h>
 #include "cetech/api/api_system.h"
 #include "cetech/log/log.h"
 #include "cetech/machine/machine.h"
@@ -127,7 +126,8 @@ namespace texture_compiler {
 
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                            ct_config_a0.get_string(platform));
+                                                            ct_config_a0.get_string(
+                                                                    platform));
 
         yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
 

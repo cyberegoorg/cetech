@@ -361,7 +361,6 @@ static void _init(ct_api_a0 *api) {
     api->register_api("ct_transform_a0", &_api);
 
 
-
     _G = {};
 
     _G.world_map.init(ct_memory_a0.main_allocator());

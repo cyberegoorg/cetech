@@ -1,6 +1,5 @@
 #include "cetech/entity/entity.h"
 #include <cetech/scenegraph/scenegraph.h>
-#include "cetech/yaml/yaml.h"
 #include "cetech/config/config.h"
 #include "cetech/resource/resource.h"
 #include "cetech/memory/memory.h"

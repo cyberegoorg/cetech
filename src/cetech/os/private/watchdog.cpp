@@ -43,7 +43,8 @@ void add_dir(ct_watchdog_instance_t *inst,
     ct_log_a0.debug(LOG_WHERE, "New watch -> %s", path);
 
     if (-1 == wd) {
-        ct_log_a0.error(LOG_WHERE, "Could not add watch -> %s", strerror(errno));
+        ct_log_a0.error(LOG_WHERE, "Could not add watch -> %s",
+                        strerror(errno));
         return;
     }
 
@@ -53,14 +54,14 @@ void add_dir(ct_watchdog_instance_t *inst,
     celib::map::set(wi->dir2wd, path_hash, wd);
     celib::map::set(wi->wd2dir, wd, path_dup);
 
-    if(recursive) {
-        char** files;
-        uint32_t  files_count;
+    if (recursive) {
+        char **files;
+        uint32_t files_count;
 
         ct_path_a0.list(path, "*", 1, 1, &files, &files_count,
                         ct_memory_a0.main_scratch_allocator());
 
-        for(int i = 0; i < files_count; ++i) {
+        for (int i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 

@@ -9,7 +9,9 @@
 #include <stdbool.h>
 
 #ifdef __cplusplus
+
 #include <type_traits>
+
 #endif
 
 #include "platform.h"

@@ -106,7 +106,7 @@ namespace shader_resource {
             return;
         }
 
-        bgfx::destroy((bgfx::ProgramHandle){program.idx});
+        bgfx::destroy((bgfx::ProgramHandle) {program.idx});
 
         map::remove(_G.handler_map, name);
     }

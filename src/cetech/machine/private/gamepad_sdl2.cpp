@@ -41,7 +41,6 @@ static struct G {
 } _G = {};
 
 
-
 int _new_controler() {
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         if (_G.controller[i] != NULL) {
@@ -110,11 +109,11 @@ int sdl_gamepad_init(ct_api_a0 *api) {
 
 void sdl_gamepad_shutdown() {
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
-        if(_G.haptic[i] == NULL) {
+        if (_G.haptic[i] == NULL) {
             continue;
         }
 
-        if(_G.controller[i] == NULL) {
+        if (_G.controller[i] == NULL) {
             continue;
         }
 

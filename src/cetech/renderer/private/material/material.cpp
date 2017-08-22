@@ -17,7 +17,6 @@
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
 
-#include <cetech/entity/entity.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/material.h>
 #include <cetech/renderer/shader.h>

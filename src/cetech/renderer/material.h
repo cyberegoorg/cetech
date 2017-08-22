@@ -50,7 +50,9 @@ struct ct_material_a0 {
                        float *value);
 
     //! Submit material for actual render
-    void (*submit)(struct ct_material material,  uint64_t layer, uint8_t viewid);
+    void (*submit)(struct ct_material material,
+                   uint64_t layer,
+                   uint8_t viewid);
 
     void (*set_texture_handler)(struct ct_material material,
                                 const char *slot,

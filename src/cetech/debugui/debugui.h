@@ -180,7 +180,9 @@ enum DebugUISetCond_ {
 //!<! DebugUI API V0
 struct ct_debugui_a0 {
     void (*render)(uint8_t viewid);
+
     void (*register_on_gui)(void (*on_gui)());
+
     void (*unregister_on_gui)(void (*on_gui)());
 
     void (*Text)(const char *fmt,
@@ -293,7 +295,7 @@ struct ct_debugui_a0 {
                        float col[3]);
 
     bool (*ColorEdit4)(const char *label,
-                       uint32_t* rgba,
+                       uint32_t *rgba,
                        bool show_alpha);
 
     void (*ColorEditMode)(ImGuiColorEditMode mode);
@@ -728,11 +730,15 @@ struct ct_debugui_a0 {
                         float size);
 
     bool (*IsWindowFocused)();
+
     bool (*IsMouseHoveringWindow)();
 
     void (*GetWindowSize)(float size[2]);
 
-    bool (*BeginDock)(const char* label, bool* opened, DebugUIWindowFlags_ extra_flags);
+    bool (*BeginDock)(const char *label,
+                      bool *opened,
+                      DebugUIWindowFlags_ extra_flags);
+
     void (*EndDock)();
 };
 

@@ -21,7 +21,6 @@
 #include <cetech/module/module.h>
 
 #include "include/SDL2/SDL.h"
-#include "include/mpack/mpack.h"
 
 #include "resource.h"
 
