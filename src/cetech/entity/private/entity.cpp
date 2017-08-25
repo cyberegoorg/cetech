@@ -68,42 +68,6 @@ struct component_data {
 #define component_data_ent(cd) ((uint32_t*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
-//uint32_t _new_spawned_array() {
-//    uint32_t idx = array::size(_G.spawned_array);
-//
-//
-//    array::push_back(_G.spawned_array, {});
-//
-//    Array<ct_entity> *array = &_G.spawned_array[idx];
-//    array->init(ct_memory_a0.main_allocator());
-//
-//    return idx;
-//}
-//
-//void _map_spawned_array(ct_entity root,
-//                        uint32_t idx) {
-//
-//    map::set(_G.spawned_map, root.h, idx);
-//}
-//
-//Array<ct_entity> &_get_spawned_array_by_idx(uint32_t idx) {
-//    return _G.spawned_array[idx];
-//}
-//
-//Array<ct_entity> &_get_spawned_array(ct_entity entity) {
-//    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
-//
-//    return _G.spawned_array[idx];
-//}
-//
-//
-//void _destroy_spawned_array(ct_entity entity) {
-//    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
-//    map::remove(_G.spawned_map, entity.h);
-//
-//    Array<ct_entity> *array = &_G.spawned_array[idx];
-//    array->destroy();
-//}
 
 //==============================================================================
 // Compiler private

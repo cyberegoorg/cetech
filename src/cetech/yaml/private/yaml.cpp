@@ -141,7 +141,7 @@ yaml_node_foreach_dict(yaml_node_t node,
         foreach_clb(key, value, data);
 
         // TODO: ?????????
-        //yaml_node_free(key);
+        yaml_node_free(key);
         //yaml_node_free(value);
     }
 }
@@ -157,8 +157,8 @@ void yaml_node_foreach_seq(yaml_node_t node,
     for (size_t i = 0; i < cpp_node.size(); ++i) {
         yaml_node_t value = new_node(node.doc, cpp_node[i]);
         foreach_clb(i, value, data);
+        yaml_node_free(value);
     }
-
 }
 
 extern "C" int yaml_as_string(yaml_node_t node,
