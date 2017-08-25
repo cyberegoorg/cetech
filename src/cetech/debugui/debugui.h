@@ -740,6 +740,15 @@ struct ct_debugui_a0 {
                       DebugUIWindowFlags_ extra_flags);
 
     void (*EndDock)();
+
+    void (*SameLine)(float pos_x /* 0.0f */,
+                     float spacing_w /*-1.0f*/);
+
+    void (*HSplitter)(const char* str_id, float size[2]);
+    void (*VSplitter)(const char* str_id, float size[2]);
+
+    void (*SaveDock)(struct ct_vio* output);
+    void (*LoadDock)(struct ct_vio* input);
 };
 
 #ifdef __cplusplus

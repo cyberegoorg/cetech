@@ -40,6 +40,9 @@ namespace ImGui
         char* Ptr;
     };
 
+    void HSplitter(const char* str_id, ImVec2* size);
+    void VSplitter(const char* str_id, ImVec2* size);
+
 } // namespace ImGui
 
 #include "widgets/color_picker.h"

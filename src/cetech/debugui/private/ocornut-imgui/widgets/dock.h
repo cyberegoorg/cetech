@@ -1,3 +1,6 @@
+#include <celib/buffer.inl>
+#include <cetech/yaml/yaml.h>
+
 namespace ImGui
 {
 	///
@@ -17,5 +20,10 @@ namespace ImGui
 
 	///
 	IMGUI_API void SetDockActive();
+
+	///
+	IMGUI_API void saveToYaml(celib::Buffer& buffer);
+
+	IMGUI_API void loadFromYaml(yaml_node_t root);
 
 } // namespace ImGui

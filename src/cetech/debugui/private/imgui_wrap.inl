@@ -129,7 +129,7 @@ namespace imgui_wrap {
                 overlay_text,
                 scale_min,
                 scale_max,
-                (ImVec2 &) graph_size,
+                _to_imvec2( graph_size),
                 stride);
     }
 
@@ -151,7 +151,7 @@ namespace imgui_wrap {
                 overlay_text,
                 scale_min,
                 scale_max,
-                (ImVec2 &) graph_size);
+                _to_imvec2( graph_size));
     }
 
     void PlotHistogram(const char *label,
@@ -171,7 +171,7 @@ namespace imgui_wrap {
                 overlay_text,
                 scale_min,
                 scale_max,
-                (ImVec2 &) graph_size,
+                _to_imvec2( graph_size),
                 stride);
     }
 
@@ -194,7 +194,7 @@ namespace imgui_wrap {
                 overlay_text,
                 scale_min,
                 scale_max,
-                (ImVec2 &) graph_size);
+                _to_imvec2( graph_size));
     }
 
     void ProgressBar(float fraction,
@@ -202,7 +202,7 @@ namespace imgui_wrap {
                      const char *overlay) {
         return ImGui::ProgressBar(
                 fraction,
-                (ImVec2 &) size_arg,
+                _to_imvec2( size_arg),
                 overlay);
     }
 
@@ -314,7 +314,7 @@ namespace imgui_wrap {
                 label,
                 buf,
                 buf_size,
-                (ImVec2 &) size,
+                _to_imvec2( size),
                 flags, callback, user_data);
     }
 
@@ -428,7 +428,7 @@ namespace imgui_wrap {
                       float power) {
         return ImGui::VSliderFloat(
                 label,
-                (ImVec2 &) size,
+                _to_imvec2( size),
                 v,
                 v_min,
                 v_max,
@@ -444,7 +444,7 @@ namespace imgui_wrap {
                     const char *display_format) {
         return ImGui::VSliderInt(
                 label,
-                (ImVec2 &) size,
+                _to_imvec2( size),
                 v,
                 v_min,
                 v_max,
@@ -542,7 +542,7 @@ namespace imgui_wrap {
                     const _vec2 size) {
         return ImGui::Selectable(
                 label,
-                selected, flags, (ImVec2 &) size);
+                selected, flags, _to_imvec2(size));
     }
 
     bool Selectable2(const char *label,
@@ -552,7 +552,7 @@ namespace imgui_wrap {
         return ImGui::Selectable(
                 label,
                 p_selected, flags,
-                (ImVec2 &) size);
+                _to_imvec2( size));
     }
 
     bool ListBox2(const char *label,
@@ -575,7 +575,7 @@ namespace imgui_wrap {
                        const _vec2 size) {
         return ImGui::ListBoxHeader(
                 label,
-                (ImVec2 &) size);
+                _to_imvec2( size));
     }
 
     bool ListBoxHeader2(const char *label,
@@ -664,5 +664,12 @@ namespace imgui_wrap {
     void EndDock()
     {
         ImGui::EndDock();
+    }
+
+    void HSplitter(const char* str_id, float size[2]) {
+        ImGui::HSplitter(str_id, &_to_imvec2(size));
+    }
+    void VSplitter(const char* str_id, float size[2]) {
+        ImGui::VSplitter(str_id, &_to_imvec2(size));
     }
 }

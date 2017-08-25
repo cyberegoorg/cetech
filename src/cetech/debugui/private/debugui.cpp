@@ -7,6 +7,9 @@
 #include <cetech/application/application.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/renderer/viewport.h>
+#include <cetech/os/vio.h>
+#include <cetech/yaml/yaml.h>
+#include <cetech/filesystem/filesystem.h>
 #include "celib/map.inl"
 
 #include "cetech/config/config.h"
@@ -23,6 +26,7 @@ CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_viewport_a0);
+CETECH_DECL_API(ct_filesystem_a0);
 
 using namespace celib;
 
@@ -62,18 +66,6 @@ namespace debugui {
             _G.on_gui[i]();
         }
 
-//        auto th = ct_renderer_a0.get_global_resource(
-//                ct_hash_a0.id64_from_str("colorbuffer"));
-//        static bool foo = true;
-//        ImGui::BeginDock("render2", &foo);
-//        imgui_wrap::Image2(th,
-//                           (float[2]) {float(w), float(h)},
-//                           (float[2]) {0.0f, 0.0f},
-//                           (float[2]) {1.0f, 1.0f},
-//                           (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-//                           (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-//        ImGui::EndDock();
-
         imguiEndFrame();
     }
 
@@ -100,11 +92,32 @@ namespace debugui {
     }
 
     _DEF_ON_CLB_FCE(on_gui, on_gui);
-
 }
 
 static void on_render() {
     debugui::render(255);
+}
+
+void SaveDock(struct ct_vio* output) {
+    celib::Buffer buffer(ct_memory_a0.main_allocator());
+    ImGui::saveToYaml(buffer);
+
+    const char* str = celib::buffer::c_str(buffer);
+
+    output->write(output->inst, str, 1, strlen(str));
+}
+
+void LoadDock(struct ct_vio* input) {
+    char source_data[input->size(input->inst) + 1];
+    memset(source_data, 0, input->size(input->inst) + 1);
+    input->read(input->inst, source_data, sizeof(char),
+                 input->size(input->inst));
+
+    yaml_document_t h;
+    yaml_node_t root = yaml_load_str(source_data, &h);
+
+    ImGui::loadFromYaml(root);
+
 }
 
 namespace debugui_module {
@@ -239,6 +252,11 @@ namespace debugui_module {
             .EndDock = ImGui::EndDock,
             .IsWindowFocused = ImGui::IsWindowFocused,
             .IsMouseHoveringWindow = ImGui::IsMouseHoveringWindow,
+            .SameLine = ImGui::SameLine,
+            .HSplitter = imgui_wrap::HSplitter,
+            .VSplitter = imgui_wrap::VSplitter,
+            .SaveDock = SaveDock,
+            .LoadDock = LoadDock
     };
 
     static void _init(ct_api_a0 *api) {
@@ -249,6 +267,7 @@ namespace debugui_module {
         _G.on_gui.init(ct_memory_a0.main_allocator());
 
         ct_renderer_a0.register_on_render(on_render);
+
     }
 
     static void _shutdown() {
@@ -271,6 +290,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_viewport_a0);
+            CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
             debugui_module::_init(api);
