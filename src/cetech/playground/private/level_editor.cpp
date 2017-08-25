@@ -11,6 +11,9 @@
 #include <celib/fpumath.h>
 #include <cetech/input/input.h>
 #include <cetech/renderer/viewport.h>
+#include <cetech/playground/asset_browser.h>
+#include <cetech/playground/level_inspector.h>
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"
@@ -31,6 +34,8 @@ CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
+CETECH_DECL_API(ct_asset_browser_a0);
+CETECH_DECL_API(ct_level_inspector_a0);
 
 using namespace celib;
 
@@ -43,9 +48,14 @@ static struct globals {
     ct_camera camera[MAX_LEVEL_EDITOR];
     ct_entity camera_ent[MAX_LEVEL_EDITOR];
 
-    uint8_t active_editor;
+    const char* path[MAX_LEVEL_EDITOR];
+    uint64_t root[MAX_LEVEL_EDITOR];
+    uint64_t level[MAX_LEVEL_EDITOR];
 
+    uint8_t active_editor;
     uint8_t editor_count;
+
+
 } _G;
 
 
@@ -111,7 +121,7 @@ void on_gui() {
     _G.active_editor = UINT8_MAX;
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        snprintf(dock_id, CETECH_ARRAY_LEN(dock_id), "Level view #%d", i + 1);
+        snprintf(dock_id, CETECH_ARRAY_LEN(dock_id), "Level view %d", i + 1);
 
         if (ct_debugui_a0.BeginDock(dock_id, &_G.visible[i],
                                     DebugUIWindowFlags_(
@@ -119,6 +129,11 @@ void on_gui() {
 
             if (ct_debugui_a0.IsMouseHoveringWindow()) {
                 _G.active_editor = i;
+
+                if(ImGui::IsMouseClicked(0)) {
+                    ct_level_inspector_a0.set_level(_G.level[i], _G.root[i],
+                                                    _G.path[i]);
+                }
             }
 
             auto th = ct_viewport_a0.get_local_resource(
@@ -127,7 +142,7 @@ void on_gui() {
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
             ct_viewport_a0.resize(_G.viewport[i], size[0], size[1]);
-            ct_debugui_a0.Image2({th},
+            ct_debugui_a0.Image2(th,
                                  size,
                                  (float[2]) {0.0f, 0.0f},
                                  (float[2]) {1.0f, 1.0f},
@@ -148,7 +163,7 @@ void render() {
     }
 }
 
-void open_level() {
+void open_level(uint64_t name, uint64_t root, const char* path) {
     uint8_t idx = _G.editor_count;
     ++_G.editor_count;
 
@@ -165,18 +180,20 @@ void open_level() {
 
     _G.camera[idx] = ct_camera_a0.get(_G.world[idx], _G.camera_ent[idx]);
 
-    ct_level_a0.load_level(_G.world[idx],
-                           ct_hash_a0.id64_from_str("level1"));
+    _G.path[idx] = strdup(path);
+    _G.root[idx] = root;
+    _G.level[idx] = name;
+
+    ct_level_a0.load_level(_G.world[idx], name);
+
+    ct_level_inspector_a0.set_level(_G.level[idx], _G.root[idx], _G.path[idx]);
+
 }
 
 void init() {
-    open_level();
-    open_level();
-//        open_level();
 }
 
 void shutdown() {
-
 }
 
 void update(float dt) {
@@ -219,14 +236,26 @@ static ct_level_view_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
+static void on_asset_double_click(uint64_t type, uint64_t name, uint64_t root, const char* path) {
+    if( ct_hash_a0.id64_from_str("level") != type ) {
+        return;
+    }
+
+    open_level(name, root, path);
+}
+
 static void _init(ct_api_a0 *api) {
-    _G = {};
+    _G = {
+            .active_editor = UINT8_MAX
+    };
 
     ct_app_a0.register_on_init(init);
     ct_app_a0.register_on_shutdown(shutdown);
     ct_app_a0.register_on_render(render);
     ct_app_a0.register_on_update(update);
     ct_debugui_a0.register_on_gui(on_gui);
+
+    ct_asset_browser_a0.register_on_asset_double_click(on_asset_double_click);
 
     api->register_api("ct_level_view_a0", &level_api);
 }
@@ -237,6 +266,8 @@ static void _shutdown() {
     ct_app_a0.unregister_on_render(render);
     ct_app_a0.unregister_on_update(update);
     ct_debugui_a0.unregister_on_gui(on_gui);
+
+    ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
 
     _G = {};
 }
@@ -256,6 +287,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_viewport_a0);
+            CETECH_GET_API(api, ct_asset_browser_a0);
+            CETECH_GET_API(api, ct_level_inspector_a0);
         },
         {
             _init(api);
