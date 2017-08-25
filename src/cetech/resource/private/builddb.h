@@ -175,9 +175,8 @@ static int builddb_get_filename_by_hash(char *filename,
         const u_char *fn = sqlite3_column_text(stmt, 0);
 
         snprintf(filename, max_len, "%s", fn);
-
-        ok = 1;
     }
+    ok = 1;
 
     sqlite3_finalize(stmt);
     sqlite3_close_v2(_db);

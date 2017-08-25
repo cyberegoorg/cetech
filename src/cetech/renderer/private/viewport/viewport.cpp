@@ -149,20 +149,20 @@ void renderer_render_world(ct_world world,
 }
 
 
-uint16_t get_local_resource(viewport_instance &instance,
+ct_texture get_local_resource(viewport_instance &instance,
                             uint64_t name) {
     for (int i = 0; i < instance.resource_count; ++i) {
         if (instance.local_resource_name[i] != name) {
             continue;
         }
 
-        return instance.local_resource[i];
+        return {instance.local_resource[i]};
     }
 
-    return UINT16_MAX;
+    return {UINT16_MAX};
 }
 
-uint16_t render_viewport_get_local_resource(ct_viewport viewport,
+struct ct_texture render_viewport_get_local_resource(ct_viewport viewport,
                                             uint64_t name) {
 
     auto idx = map::get(_G.viewport_instance_map, viewport.idx,
@@ -259,8 +259,7 @@ void _init_viewport(viewport_instance &vi,
                 bgfx::TextureHandle th[e.output_count];
                 for (int l = 0; l < e.output_count; ++l) {
                     // TODO if not found in local then find in global
-                    th[l] = {get_local_resource(vi,
-                                                e.output[l])};
+                    th[l] = {get_local_resource(vi,e.output[l]).idx};
                 }
 
                 if (0 != vi.framebuffers[k]) {

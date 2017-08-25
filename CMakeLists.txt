@@ -77,6 +77,11 @@ set(SOURCE_FILES
 
         src/cetech/playground/private/playground.cpp
         src/cetech/playground/private/level_editor.cpp
+        src/cetech/playground/private/level_inspector.cpp
+        src/cetech/playground/private/property_inspector.cpp
+        src/cetech/playground/private/asset_property.cpp
+        src/cetech/playground/private/asset_browser.cpp
+        src/cetech/playground/private/asset_preview.cpp
 
         src/cetech/machine/private/window_sdl2.cpp
         src/cetech/machine/private/machine_sdl2.cpp
@@ -133,18 +138,25 @@ set(SOURCE_FILES
         src/cetech/input/private/gamepad.cpp
 
         src/cetech/renderer/private/renderer.cpp
+
         src/cetech/renderer/private/texture/texture.cpp
+        src/cetech/renderer/private/texture/texture_compiler.cpp
+        src/cetech/renderer/private/texture/texture_property.cpp
+
         src/cetech/renderer/private/shader/shader.cpp
+        src/cetech/renderer/private/shader/shader_compiler.cpp
+
         src/cetech/renderer/private/material/material.cpp
+        src/cetech/renderer/private/material/material_compiler.cpp
+
         src/cetech/renderer/private/scene/scene.cpp
+        src/cetech/renderer/private/scene/scene_compiler.cpp
+
         src/cetech/renderer/private/viewport/viewport.cpp
         src/cetech/renderer/private/viewport/fullscreen_pass.cpp
         src/cetech/renderer/private/viewport/geometry_pass.cpp
+
         src/cetech/renderer/private/mesh_renderer/mesh_renderer.cpp
-        src/cetech/renderer/private/scene/scene_compiler.cpp
-        src/cetech/renderer/private/shader/shader_compiler.cpp
-        src/cetech/renderer/private/texture/texture_compiler.cpp
-        src/cetech/renderer/private/material/material_compiler.cpp
 
         src/cetech/transform/private/transform.cpp
         src/cetech/scenegraph/private/scenegraph.cpp

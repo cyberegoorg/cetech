@@ -137,8 +137,8 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.register_on_update(update);
 
-            ct_debugui_a0.register_on_gui(module1);
-            ct_debugui_a0.register_on_gui(module2);
+//            ct_debugui_a0.register_on_gui(module1);
+//            ct_debugui_a0.register_on_gui(module2);
         },
 
 //==============================================================================
@@ -151,7 +151,7 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.unregister_on_update(update);
 
-            ct_debugui_a0.unregister_on_gui(module1);
-            ct_debugui_a0.unregister_on_gui(module2);
+//            ct_debugui_a0.unregister_on_gui(module1);
+//            ct_debugui_a0.unregister_on_gui(module2);
         }
 )

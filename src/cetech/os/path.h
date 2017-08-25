@@ -38,6 +38,12 @@ struct ct_path_a0 {
                  uint32_t *count,
                  struct cel_alloc *allocator);
 
+    void (*list2)(const char *path,
+                 const char *patern,
+                 int recursive,
+                 int only_dir,
+                 void(*on_item)(const char* filename));
+
     //! Free list dir array
     //! \param files Files array
     //! \param allocator Allocator

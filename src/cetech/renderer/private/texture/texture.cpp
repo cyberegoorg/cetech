@@ -41,7 +41,6 @@ struct TextureResourceGlobals {
     uint64_t type;
 } TextureResourceGlobals;
 
-
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);

@@ -33,7 +33,7 @@ function Game:init()
     Log.error("boot.lua", "error")
     Log.debug("boot.lua", "debug")
 
-    self.viewport = Renderer.create_viewport("default")
+    --self.viewport = Renderer.create_viewport("default")
     self.world = World.create()
 
     --    self.entity = Entity.
@@ -228,7 +228,7 @@ function Game:update(dt)
 end
 
 function Game:render()
-    Renderer.render_world(self.world, self.fps_camera.camera, self.viewport)
+--    Renderer.render_world(self.world, self.fps_camera.camera, self.viewport)
 end
 
 function foo(value)

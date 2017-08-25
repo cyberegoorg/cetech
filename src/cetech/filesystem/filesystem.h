@@ -57,9 +57,17 @@ struct ct_filesystem_a0 {
     void (*listdir)(uint64_t root,
                     const char *path,
                     const char *filter,
+                    bool only_dir,
                     char ***files,
                     uint32_t *count,
                     struct cel_alloc *allocator);
+
+    void (*listdir2)(uint64_t root,
+                    const char *path,
+                    const char *filter,
+                    bool only_dir,
+                    bool recursive,
+                    void (*on_item)(const char* path));
 
     //! Free list directory array
     //! \param files File array

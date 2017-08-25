@@ -7,6 +7,8 @@
 #include <cetech/level/level.h>
 #include <cetech/camera/camera.h>
 #include <cetech/renderer/viewport.h>
+#include <cetech/filesystem/filesystem.h>
+#include <cetech/os/vio.h>
 #include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"
@@ -24,6 +26,7 @@ CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
+CETECH_DECL_API(ct_filesystem_a0);
 
 using namespace celib;
 
@@ -33,6 +36,8 @@ static struct PlaygroundGlobal {
     ct_viewport viewport;
     ct_world world;
     ct_camera camera;
+
+    bool layout_loaded;
 } _G;
 
 namespace playground {
@@ -51,6 +56,21 @@ namespace playground {
             }
 
             if (ImGui::BeginMenu("Edit")) {
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Layout")) {
+                if (ImGui::MenuItem("Save")) {
+                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_WRITE);
+                    ct_debugui_a0.SaveDock(f);
+                    ct_filesystem_a0.close(f);
+                }
+
+                if (ImGui::MenuItem("Load")) {
+                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_READ);
+                    ct_debugui_a0.LoadDock(f);
+                    ct_filesystem_a0.close(f);
+                }
                 ImGui::EndMenu();
             }
 
@@ -91,11 +111,18 @@ namespace playground_module {
 
 
     static void _init(ct_api_a0 *api) {
+        _G = {};
+
         api->register_api("ct_playground_a0", &playground_api);
 
         ct_debugui_a0.register_on_gui(playground::on_gui);
 
-        _G = {};
+        if(!_G.layout_loaded) {
+            ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_READ);
+            ct_debugui_a0.LoadDock(f);
+            ct_filesystem_a0.close(f);
+            _G.layout_loaded = true;
+        }
     }
 
     static void _shutdown() {
@@ -115,6 +142,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
+            CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
             playground_module::_init(api);

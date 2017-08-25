@@ -116,6 +116,71 @@ void _dir_list(const char *path,
     closedir(dir);
 }
 
+void _dir_list2(const char *path,
+               const char *patern,
+               int recursive,
+               int only_dir,
+               void(*on_item)(const char* filename)) {
+    DIR *dir;
+    struct dirent *entry;
+
+    if (!(dir = opendir(path))) {
+        return;
+    }
+
+    if (!(entry = readdir(dir))) {
+        closedir(dir);
+        return;
+    }
+
+    do {
+        if (entry->d_type == 4) {
+            if (strcmp(entry->d_name, ".") == 0 ||
+                strcmp(entry->d_name, "..") == 0) {
+                continue;
+            }
+
+            char tmp_path[1024] = {};
+            int len = 0;
+
+            if (path[strlen(path) - 1] != '/') {
+                len = snprintf(tmp_path, sizeof(tmp_path) - 1, "%s/%s/", path,
+                               entry->d_name);
+            } else {
+                len = snprintf(tmp_path, sizeof(tmp_path) - 1, "%s%s/", path,
+                               entry->d_name);
+            }
+
+            if (only_dir) {
+                tmp_path[len] = '\0';
+                on_item(tmp_path);
+            }
+
+            if(recursive) {
+                _dir_list2(tmp_path, patern, recursive, only_dir, on_item);
+            }
+
+        } else if (!only_dir) {
+            size_t size = strlen(path) + strlen(entry->d_name) + 3;
+            char new_path[size];
+
+            if (path[strlen(path) - 1] != '/') {
+                snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
+            } else {
+                snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
+            }
+
+            if (0 != fnmatch(patern, new_path, 0)) {
+                continue;
+            }
+
+            on_item(new_path);
+        }
+
+    } while ((entry = readdir(dir)));
+    closedir(dir);
+}
+
 void dir_list(const char *path,
               const char *patern,
               int recursive,
@@ -137,6 +202,15 @@ void dir_list(const char *path,
     *files = new_files;
     *count = array::size(tmp_files);
 }
+
+void dir_list2(const char *path,
+              const char *patern,
+              int recursive,
+              int only_dir,
+              void(*on_item)(const char* filename)){
+    _dir_list2(path, patern, recursive, only_dir, on_item);
+}
+
 
 void dir_list_free(char **files,
                    uint32_t count,
@@ -281,6 +355,7 @@ void copy_file(struct cel_alloc *allocator,
 
 static ct_path_a0 path_api = {
         .list = dir_list,
+        .list2 = dir_list2,
         .list_free = dir_list_free,
         .make_path = dir_make_path,
         .filename = path_filename,

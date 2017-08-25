@@ -553,6 +553,7 @@ namespace resource_module {
             .compiler_external_join = resource_compiler_external_join,
             .compiler_create_build_dir = resource_compiler_create_build_dir,
             .compiler_get_source_dir = resource_compiler_get_source_dir,
+            .type_name_from_filename = type_name_from_filename,
 #endif
 
     };

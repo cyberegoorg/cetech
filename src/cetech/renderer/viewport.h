@@ -88,7 +88,7 @@ struct ct_viewport_a0 {
 
     struct ct_texture (*get_global_resource)(uint64_t name);
 
-    uint16_t (*get_local_resource)(ct_viewport viewport,
+    struct ct_texture (*get_local_resource)(ct_viewport viewport,
                                    uint64_t name);
 
     void (*resize)(struct ct_viewport viewport,

@@ -1,5 +1,5 @@
-#ifndef CETECH_PLAYGROUND_H
-#define CETECH_PLAYGROUND_H
+#ifndef CETECH_PROPERTY_INSPECTOR_H
+#define CETECH_PROPERTY_INSPECTOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,18 +11,21 @@ extern "C" {
 
 #include <stddef.h>
 
+//==============================================================================
+// Typedefs
+//==============================================================================
+typedef void (*ct_pi_on_gui)();
 
 //==============================================================================
 // Api
 //==============================================================================
 
-//! Playground API V0
-struct ct_playground_a0 {
-    void (*_)();
+struct ct_property_inspector_a0 {
+    void (*set_active)(ct_pi_on_gui on_gui);
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //CETECH_PLAYGROUND_H
+#endif //CETECH_PROPERTY_INSPECTOR_H

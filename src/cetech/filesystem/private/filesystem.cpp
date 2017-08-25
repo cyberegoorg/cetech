@@ -104,6 +104,7 @@ namespace filesystem {
     void listdir(uint64_t root,
                  const char *path,
                  const char *filter,
+                 bool only_dir,
                  char ***files,
                  uint32_t *count,
                  cel_alloc *allocator) {
@@ -112,7 +113,23 @@ namespace filesystem {
 
         char *full_path = get_fullpath(root, a, path);
 
-        ct_path_a0.list(full_path, filter, 1, 0, files, count, allocator);
+        ct_path_a0.list(full_path, filter, 1, only_dir, files, count, allocator);
+
+        CEL_FREE(a, full_path);
+    }
+
+    void listdir2(uint64_t root,
+                 const char *path,
+                 const char *filter,
+                 bool only_dir,
+                  bool recursive,
+                  void (*on_item)(const char* path)) {
+
+        auto a = ct_memory_a0.main_allocator();
+
+        char *full_path = get_fullpath(root, a, path);
+
+        ct_path_a0.list2(full_path, filter, recursive, only_dir, on_item);
 
         CEL_FREE(a, full_path);
     }
@@ -144,6 +161,7 @@ namespace filesystem_module {
             .map_root_dir = filesystem::map_root_dir,
             .close = filesystem::close,
             .listdir = filesystem::listdir,
+            .listdir2 = filesystem::listdir2,
             .listdir_free = filesystem::listdir_free,
             .create_directory = filesystem::create_directory,
             .file_mtime = filesystem::get_file_mtime,

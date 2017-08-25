@@ -49,11 +49,18 @@ extern "C" void init_static_modules() {
 
     CETECH_ADD_STATIC_MODULE(debugui);
 
-    CETECH_ADD_STATIC_MODULE(luasys);
-
     //==========================================================================
     // Playground
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(playground);
+    CETECH_ADD_STATIC_MODULE(property_inspector);
+    CETECH_ADD_STATIC_MODULE(asset_browser);
+    CETECH_ADD_STATIC_MODULE(asset_property);
+    CETECH_ADD_STATIC_MODULE(asset_preview);
+
+    CETECH_ADD_STATIC_MODULE(texture_property);
+    CETECH_ADD_STATIC_MODULE(level_inspector);
     CETECH_ADD_STATIC_MODULE(level_view);
+
+    CETECH_ADD_STATIC_MODULE(luasys);
 }

@@ -20,6 +20,7 @@
 #include <cetech/module/module.h>
 #include <cetech/os/watchdog.h>
 #include <celib/map.inl>
+#include <cetech/filesystem/filesystem.h>
 
 #include "celib/buffer.inl"
 
@@ -37,6 +38,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_filesystem_a0);
 
 //==============================================================================
 // Defines
@@ -473,6 +475,16 @@ static void _init(ct_api_a0 *api) {
     const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
+    ct_filesystem_a0.map_root_dir(
+            ct_hash_a0.id64_from_str("core"),
+            core_dir
+    );
+
+    ct_filesystem_a0.map_root_dir(
+            ct_hash_a0.id64_from_str("source"),
+            source_dir
+    );
+
     wd->add_dir(wd->inst, core_dir, true);
     wd->add_dir(wd->inst, source_dir, true);
 
@@ -499,6 +511,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
             _init(api);
