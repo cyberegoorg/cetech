@@ -30,7 +30,7 @@ static struct _G {
     uint64_t active_name;
 } _G;
 
-static void on_gui() {
+static void on_debugui() {
     if (!_G.active_on_asset) {
         return;
     }
@@ -55,7 +55,7 @@ static void set_asset(uint64_t type,
     _G.active_type = type;
     _G.active_name = name;
 
-    ct_property_inspector_a0.set_active(on_gui);
+    ct_property_inspector_a0.set_active(on_debugui);
 }
 
 static ct_asset_property_a0 asset_property_api = {

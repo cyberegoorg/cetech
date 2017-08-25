@@ -131,7 +131,7 @@ yaml_node_foreach_dict(yaml_node_t node,
 
     yamlcpp_handler *nh = (yamlcpp_handler *) node.doc.d;
 
-    auto cpp_node = nh->nodes[node.idx];
+    auto& cpp_node = nh->nodes[node.idx];
 
     for (YAML::const_iterator it = cpp_node.begin();
          it != cpp_node.end(); ++it) {

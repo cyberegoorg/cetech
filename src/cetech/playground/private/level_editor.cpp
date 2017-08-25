@@ -115,7 +115,7 @@ void fps_camera_update(ct_world world,
     ct_transform_a0.set_position(transform, pos);
 }
 
-void on_gui() {
+void on_debugui() {
     char dock_id[32] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -253,7 +253,7 @@ static void _init(ct_api_a0 *api) {
     ct_app_a0.register_on_shutdown(shutdown);
     ct_app_a0.register_on_render(render);
     ct_app_a0.register_on_update(update);
-    ct_debugui_a0.register_on_gui(on_gui);
+    ct_debugui_a0.register_on_debugui(on_debugui);
 
     ct_asset_browser_a0.register_on_asset_double_click(on_asset_double_click);
 
@@ -265,7 +265,7 @@ static void _shutdown() {
     ct_app_a0.unregister_on_shutdown(shutdown);
     ct_app_a0.unregister_on_render(render);
     ct_app_a0.unregister_on_update(update);
-    ct_debugui_a0.unregister_on_gui(on_gui);
+    ct_debugui_a0.unregister_on_debugui(on_debugui);
 
     ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
 

@@ -85,7 +85,7 @@ static void fps_camera_update(ct_world world,
     ct_transform_a0.set_position(transform, pos);
 }
 
-static void on_gui() {
+static void on_debugui() {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_(
                                         DebugUIWindowFlags_NoScrollbar))) {
@@ -178,7 +178,7 @@ static void _init(ct_api_a0 *api) {
     ct_app_a0.register_on_shutdown(shutdown);
     ct_app_a0.register_on_render(render);
     ct_app_a0.register_on_update(update);
-    ct_debugui_a0.register_on_gui(on_gui);
+    ct_debugui_a0.register_on_debugui(on_debugui);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
@@ -188,7 +188,7 @@ static void _shutdown() {
     ct_app_a0.unregister_on_shutdown(shutdown);
     ct_app_a0.unregister_on_render(render);
     ct_app_a0.unregister_on_update(update);
-    ct_debugui_a0.unregister_on_gui(on_gui);
+    ct_debugui_a0.unregister_on_debugui(on_debugui);
 
     _G = {};
 }

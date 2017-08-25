@@ -163,7 +163,7 @@ static void middleColumn() {
 }
 
 
-static void on_gui() {
+static void on_debugui() {
     if (ct_debugui_a0.BeginDock("Asset browser",
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -196,7 +196,7 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
-    ct_debugui_a0.register_on_gui(on_gui);
+    ct_debugui_a0.register_on_debugui(on_debugui);
 
     _G.on_asset_click.init(ct_memory_a0.main_allocator());
     _G.on_asset_double_click.init(ct_memory_a0.main_allocator());

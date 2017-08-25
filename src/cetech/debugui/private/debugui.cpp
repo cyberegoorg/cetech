@@ -31,7 +31,7 @@ CETECH_DECL_API(ct_filesystem_a0);
 using namespace celib;
 
 static struct DebugUIGlobal {
-    Array<void (*)()> on_gui;
+    Array<void (*)()> on_debugui;
 } _G;
 
 namespace debugui {
@@ -62,14 +62,14 @@ namespace debugui {
         imguiBeginFrame(mp[0], h - mp[1], btn, 0, w, h, 0, viewid);
 
 
-        for (uint32_t i = 0; i < array::size(_G.on_gui); ++i) {
-            _G.on_gui[i]();
+        for (uint32_t i = 0; i < array::size(_G.on_debugui); ++i) {
+            _G.on_debugui[i]();
         }
 
         imguiEndFrame();
     }
 
-    typedef void (*on_gui)();
+    typedef void (*on_debugui)();
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                                   \
@@ -91,7 +91,7 @@ namespace debugui {
         }                                                                      \
     }
 
-    _DEF_ON_CLB_FCE(on_gui, on_gui);
+    _DEF_ON_CLB_FCE(on_debugui, on_debugui);
 }
 
 static void on_render() {
@@ -125,8 +125,8 @@ namespace debugui_module {
     static ct_debugui_a0 debugui_api = {
             .render = debugui::render,
 
-            .register_on_gui = debugui::register_on_gui_,
-            .unregister_on_gui = debugui::unregister_on_gui_,
+            .register_on_debugui = debugui::register_on_debugui_,
+            .unregister_on_debugui = debugui::unregister_on_debugui_,
 
             .Text = ImGui::Text,
             .TextV = ImGui::TextV,
@@ -264,7 +264,7 @@ namespace debugui_module {
         imguiCreate(16);
 
         _G = {};
-        _G.on_gui.init(ct_memory_a0.main_allocator());
+        _G.on_debugui.init(ct_memory_a0.main_allocator());
 
         ct_renderer_a0.register_on_render(on_render);
 
@@ -273,7 +273,7 @@ namespace debugui_module {
     static void _shutdown() {
         imguiDestroy();
 
-        _G.on_gui.destroy();
+        _G.on_debugui.destroy();
         ct_renderer_a0.unregister_on_render(on_render);
 
         _G = {};

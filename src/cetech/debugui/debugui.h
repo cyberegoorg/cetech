@@ -181,9 +181,9 @@ enum DebugUISetCond_ {
 struct ct_debugui_a0 {
     void (*render)(uint8_t viewid);
 
-    void (*register_on_gui)(void (*on_gui)());
+    void (*register_on_debugui)(void (*on_debugui)());
 
-    void (*unregister_on_gui)(void (*on_gui)());
+    void (*unregister_on_debugui)(void (*on_debugui)());
 
     void (*Text)(const char *fmt,
                  ...) CTECH_ATTR_FORMAT(1, 2);

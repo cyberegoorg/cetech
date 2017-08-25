@@ -91,7 +91,7 @@ namespace playground {
         return menu_height;
     }
 
-    void on_gui() {
+    void on_debugui() {
         auto menu_height = draw_main_menu();
 
         uint32_t w, h;
@@ -115,7 +115,7 @@ namespace playground_module {
 
         api->register_api("ct_playground_a0", &playground_api);
 
-        ct_debugui_a0.register_on_gui(playground::on_gui);
+        ct_debugui_a0.register_on_debugui(playground::on_debugui);
 
         if(!_G.layout_loaded) {
             ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_READ);

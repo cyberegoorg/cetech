@@ -17,13 +17,13 @@ using namespace celib;
 
 #define _G property_inspector_global
 static struct _G {
-    ct_pi_on_gui on_gui;
+    ct_pi_on_debugui on_debugui;
     bool visible;
 } _G;
 
 
-static void set_active(ct_pi_on_gui on_gui) {
-    _G.on_gui = on_gui;
+static void set_active(ct_pi_on_debugui on_debugui) {
+    _G.on_debugui = on_debugui;
 }
 
 static ct_property_inspector_a0 property_inspector_api = {
@@ -31,11 +31,11 @@ static ct_property_inspector_a0 property_inspector_api = {
 };
 
 
-static void on_gui() {
+static void on_debugui() {
     if (ct_debugui_a0.BeginDock("Property inspector", &_G.visible,
                                 DebugUIWindowFlags_(0))) {
-        if (_G.on_gui) {
-            _G.on_gui();
+        if (_G.on_debugui) {
+            _G.on_debugui();
         }
     }
     ct_debugui_a0.EndDock();
@@ -47,7 +47,7 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_property_inspector_a0", &property_inspector_api);
-    ct_debugui_a0.register_on_gui(on_gui);
+    ct_debugui_a0.register_on_debugui(on_debugui);
 
 }
 

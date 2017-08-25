@@ -53,7 +53,7 @@ static ct_level_inspector_a0 level_inspector_api = {
 };
 
 
-static void on_gui() {
+static void on_debugui() {
     if (ct_debugui_a0.BeginDock("Level inspector", &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
@@ -85,6 +85,7 @@ static void on_gui() {
 
                                         }
 
+                                        yaml_node_free(value);
                                     }, NULL);
 
 
@@ -104,7 +105,7 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_level_inspector_a0", &level_inspector_api);
-    ct_debugui_a0.register_on_gui(on_gui);
+    ct_debugui_a0.register_on_debugui(on_debugui);
 }
 
 static void _shutdown() {
