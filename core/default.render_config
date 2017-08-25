@@ -1,7 +1,7 @@
 # Create on init
 global_resource:
-      - { name: colorbuffer, type: render_target, format: RGBA8, ration: equal }
-      - { name: depthbuffer, type: render_target, format: D24, ration: equal }
+  - { name: colorbuffer, type: render_target, format: RGBA8, ration: equal }
+  - { name: depthbuffer, type: render_target, format: D24, ration: equal }
 
 # Renderer layers
 layers:
@@ -22,3 +22,4 @@ viewport:
       # !! This 2 resource is virtual-backbuffer and is used to show to user.
       - { name: bb_color, type: render_target, format: RGBA8, ration: equal }
       - { name: bb_depth, type: render_target, format: D24, ration: equal }
+
