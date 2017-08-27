@@ -17,7 +17,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/level/level.h>
 #include <cetech/renderer/viewport.h>
-
+#include <cetech/renderer/texture.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_app_a0);
@@ -33,6 +33,7 @@ CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_level_a0);
+CETECH_DECL_API(ct_texture_a0);
 
 
 static struct G {
@@ -60,9 +61,11 @@ void module1() {
                                 DebugUIWindowFlags_Empty)) {
 
         ct_debugui_a0.Text("DT: %f", _G.dt);
-        ct_debugui_a0.Text("FPS: %f", 1.0f/_G.dt);
+        ct_debugui_a0.Text("FPS: %f", 1.0f / _G.dt );
 
-        ct_debugui_a0.Text("dear imgui, %d", 111);
+        ct_debugui_a0.Text("Random FPS: %f", static_cast<double>(rand()));
+
+        ct_debugui_a0.Text("xknalsnxlsanlknxlasnlknxslknsaxdear imgui, %d", 111);
 
             static float v[2] = {100.0f, 100.0f};
             if(ct_debugui_a0.Button("wwwwww", v)) {
@@ -82,6 +85,16 @@ void module1() {
         static float col3[4] = {0.0f, 1.0f, 0.0f, 0.0f};
         ct_debugui_a0.ColorWheel("WHEEE", col3, 0.2f);
 
+
+        float size[2] = {};
+        ct_debugui_a0.GetWindowSize(size);
+        size[1] = size[0];
+        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hash_a0.id64_from_str("content/scene/m4a1/m4_diff")),
+                             size,
+                             (float[2]) {0.0f, 0.0f},
+                             (float[2]) {1.0f, 1.0f},
+                             (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                             (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
     }
     ct_debugui_a0.EndDock();
 
@@ -125,6 +138,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_level_a0);
+            CETECH_GET_API(api, ct_texture_a0);
         },
 
 //==============================================================================
@@ -137,7 +151,7 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.register_on_update(update);
 
-//            ct_debugui_a0.register_on_debugui(module1);
+          //  ct_debugui_a0.register_on_debugui(module1);
 //            ct_debugui_a0.register_on_debugui(module2);
         },
 
@@ -149,9 +163,11 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Shutdown %d", reload);
 
-            ct_app_a0.unregister_on_update(update);
+            //ct_app_a0.unregister_on_update(update);
 
-//            ct_debugui_a0.unregister_on_debugui(module1);
+            ct_debugui_a0.unregister_on_debugui(module1);
 //            ct_debugui_a0.unregister_on_debugui(module2);
         }
 )
+
+

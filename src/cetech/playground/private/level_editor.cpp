@@ -43,14 +43,15 @@ using namespace celib;
 
 static struct globals {
     bool visible[MAX_LEVEL_EDITOR];
-    ct_viewport viewport[MAX_LEVEL_EDITOR];
-    ct_world world[MAX_LEVEL_EDITOR];
-    ct_camera camera[MAX_LEVEL_EDITOR];
-    ct_entity camera_ent[MAX_LEVEL_EDITOR];
+    struct ct_viewport viewport[MAX_LEVEL_EDITOR];
+    struct ct_world world[MAX_LEVEL_EDITOR];
+    struct ct_camera camera[MAX_LEVEL_EDITOR];
+    struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
+    struct ct_level level[MAX_LEVEL_EDITOR];
 
     const char* path[MAX_LEVEL_EDITOR];
     uint64_t root[MAX_LEVEL_EDITOR];
-    uint64_t level[MAX_LEVEL_EDITOR];
+    uint64_t level_name[MAX_LEVEL_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
@@ -131,7 +132,7 @@ void on_debugui() {
                 _G.active_editor = i;
 
                 if(ImGui::IsMouseClicked(0)) {
-                    ct_level_inspector_a0.set_level(_G.level[i], _G.root[i],
+                    ct_level_inspector_a0.set_level(_G.world[i], _G.level[i], _G.level_name[i], _G.root[i],
                                                     _G.path[i]);
                 }
             }
@@ -182,11 +183,11 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
-    _G.level[idx] = name;
+    _G.level_name[idx] = name;
 
-    ct_level_a0.load_level(_G.world[idx], name);
+    _G.level[idx] = ct_level_a0.load_level(_G.world[idx], name);
 
-    ct_level_inspector_a0.set_level(_G.level[idx], _G.root[idx], _G.path[idx]);
+    ct_level_inspector_a0.set_level(_G.world[idx], _G.level[idx], _G.level_name[idx], _G.root[idx], _G.path[idx]);
 
 }
 

@@ -5,6 +5,7 @@ entities:
     prefab: box1
 
   # 2
+  #"5564343313252"
   "55643423443313252":
     name: "m4a1"
     prefab: m4a1
@@ -19,4 +20,3 @@ entities:
         rotation: [45, 0, 0]
       "41232132255234":
         material: "material1"
-

@@ -213,7 +213,7 @@ namespace imgui_wrap {
                     float v_max,
                     const char *display_format,
                     float power) {
-        return ImGui::DragFloat(
+        return ImGui::DragFloat2(
                 label,
                 v,
                 v_speed,
@@ -230,7 +230,7 @@ namespace imgui_wrap {
                     float v_max,
                     const char *display_format,
                     float power) {
-        return ImGui::DragFloat(
+        return ImGui::DragFloat3(
                 label,
                 v,
                 v_speed,
@@ -247,7 +247,7 @@ namespace imgui_wrap {
                     float v_max,
                     const char *display_format,
                     float power) {
-        return ImGui::DragFloat(
+        return ImGui::DragFloat4(
                 label,
                 v,
                 v_speed,
@@ -379,7 +379,7 @@ namespace imgui_wrap {
                       float v_max,
                       const char *display_format,
                       float power) {
-        return ImGui::SliderFloat(
+        return ImGui::SliderFloat2(
                 label,
                 v,
                 v_min,
@@ -394,7 +394,7 @@ namespace imgui_wrap {
                       float v_max,
                       const char *display_format,
                       float power) {
-        return ImGui::SliderFloat(
+        return ImGui::SliderFloat3(
                 label,
                 v,
                 v_min,
