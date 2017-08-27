@@ -16,7 +16,6 @@
 #include "cetech/resource/resource.h"
 #include <cstdio>
 #include <cetech/config/config.h>
-#include "cetech/yaml/yaml.h"
 #include "celib/buffer.inl"
 #include "texture_blob.h"
 #include "cetech/os/path.h"
@@ -34,6 +33,7 @@ CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 namespace texture_compiler {
 
@@ -90,7 +90,7 @@ namespace texture_compiler {
     }
 
     static int compiler(const char *filename,
-                        ct_vio *source_vio,
+                        struct ct_yamlng_document *doc,
                         ct_vio *build_vio,
                         ct_compilator_api *compilator_api) {
 
@@ -98,29 +98,19 @@ namespace texture_compiler {
 
         auto platform = ct_config_a0.find("kernel.platform");
 
-
-        // TODO: temp cel_alloc?
-        char input_str[1024] = {};
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
 
-        char source_data[source_vio->size(source_vio->inst) + 1];
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
+        const char *input_str = doc->get_string(doc->inst,
+                                                ct_yamlng_a0.calc_key("input"),
+                                                "");
+        bool gen_mipmaps = doc->get_bool(doc->inst,
+                                         ct_yamlng_a0.calc_key("gen_mipmaps"),
+                                         true);
+        bool is_normalmap = doc->get_bool(doc->inst,
+                                          ct_yamlng_a0.calc_key("is_normalmap"),
+                                          false);
 
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
-
-        yaml_node_t input = yaml_get_node(root, "input");
-        yaml_node_t n_gen_mipmaps = yaml_get_node(root, "gen_mipmaps");
-        yaml_node_t n_is_normalmap = yaml_get_node(root, "is_normalmap");
-
-        int gen_mipmaps = yaml_is_valid(n_gen_mipmaps) ? yaml_as_bool(
-                n_gen_mipmaps)
-                                                       : 0;
-        int is_normalmap = yaml_is_valid(n_is_normalmap) ? yaml_as_bool(
-                n_is_normalmap) : 0;
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
 
@@ -128,9 +118,6 @@ namespace texture_compiler {
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
                                                             ct_config_a0.get_string(
                                                                     platform));
-
-        yaml_as_string(input, input_str, CETECH_ARRAY_LEN(input_str));
-
         char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
@@ -179,10 +166,11 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_config_a0);
+        CETECH_GET_API(api, ct_yamlng_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("texture"),
-                                         compiler);
+        ct_resource_a0.compiler_register_yaml(
+                ct_hash_a0.id64_from_str("texture"),
+                compiler);
 
         return 1;
     }

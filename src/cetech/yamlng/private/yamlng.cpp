@@ -33,9 +33,11 @@ struct node_value {
 
 struct yamlng_document_inst {
     struct cel_alloc *alloc;
+    struct ct_yamlng_document *doc;
 
     Map<uint32_t> key_map;
     Array<node_type> type;
+    Array<uint64_t > hash;
     Array<node_value> value;
     Array<uint32_t> first_child;
     Array<uint32_t> next_sibling;
@@ -43,18 +45,22 @@ struct yamlng_document_inst {
 };
 
 
-uint32_t new_node(yamlng_document_inst *inst,
+uint32_t new_node(ct_yamlng_document *doc,
                   node_type type,
                   node_value value,
-                  uint32_t parent) {
+                  uint32_t parent,
+                  uint64_t hash) {
+
+    yamlng_document_inst *inst = (yamlng_document_inst*)doc->inst;
+
     const uint32_t idx = array::size(inst->type);
 
     array::push_back(inst->type, type);
+    array::push_back(inst->hash, hash);
     array::push_back(inst->value, value);
     array::push_back(inst->first_child, (uint32_t) 0);
     array::push_back(inst->next_sibling, (uint32_t) 0);
     array::push_back(inst->parent, parent);
-
 
     if (parent) {
         inst->parent[idx] = parent;
@@ -101,6 +107,7 @@ void from_scalar(const uint8_t *scalar,
 
 uint64_t hash_combine(uint64_t lhs,
                       uint64_t rhs) {
+    if(lhs == 0) return rhs;
     lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
     return lhs;
 }
@@ -115,13 +122,42 @@ bool has_key(ct_yamlng_document_instance_t *_inst,
 struct ct_yamlng_node get(ct_yamlng_document_instance_t *_inst,
                           uint64_t key) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
-    return {.idx = map::get(inst->key_map, key, (uint32_t) 0)};
+    return {.idx = map::get(inst->key_map, key, (uint32_t) 0), .d = inst->doc};
+}
+
+
+struct ct_yamlng_node get_seq(ct_yamlng_document_instance_t *_inst,
+                                 uint64_t key,
+                                 uint32_t idx) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    uint32_t n_idx = map::get(inst->key_map, key, (uint32_t) 0);
+    uint32_t size = inst->value[n_idx].node_count;
+
+    uint32_t it = inst->first_child[n_idx];
+    for (int i = 1; i < size - idx; ++i) {
+        it = inst->next_sibling[it];
+    }
+
+    return {.idx = it, .d = inst->doc};
 }
 
 enum node_type type(ct_yamlng_document_instance_t *_inst,
                     ct_yamlng_node node) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return inst->type[node.idx];
+}
+
+uint64_t get_hash(ct_yamlng_document_instance_t *_inst,
+                  ct_yamlng_node node) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+    return inst->hash[node.idx];
+}
+
+uint32_t get_size(ct_yamlng_document_instance_t *_inst,
+                  ct_yamlng_node node) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+    return inst->value[node.idx].node_count;
 }
 
 const char *as_string(ct_yamlng_document_instance_t *_inst,
@@ -303,8 +339,8 @@ void foreach_dict_node(ct_yamlng_document_instance_t *_inst,
 
     uint32_t it = inst->first_child[node.idx];
     while (0 != it) {
-        ct_yamlng_node key = {.idx=it};
-        ct_yamlng_node value = {.idx=inst->first_child[it]};
+        ct_yamlng_node key = {.idx=it, .d = inst->doc};
+        ct_yamlng_node value = {.idx=inst->first_child[it], .d = inst->doc};
 
         foreach_clb(key, value, data);
 
@@ -321,7 +357,7 @@ void foreach_seq_node(ct_yamlng_document_instance_t *_inst,
     uint32_t idx = 0;
     uint32_t it = inst->first_child[node.idx];
     while (0 != it) {
-        ct_yamlng_node value = {.idx=it};
+        ct_yamlng_node value = {.idx=it, .d = inst->doc};
 
         foreach_clb(idx, value, data);
 
@@ -391,10 +427,11 @@ bool parse_yaml(struct cel_alloc *alloc,
                 break;
 
             case YAML_SEQUENCE_START_EVENT:
-                tmp_idx = new_node(inst, NODE_SEQ, {},
-                                   parent_stack[parent_stack_top].idx);
-
                 key = parent_stack[parent_stack_top].key_hash;
+
+                tmp_idx = new_node(inst->doc, NODE_SEQ, {},
+                                   parent_stack[parent_stack_top].idx, key);
+
                 map::set(inst->key_map, key, tmp_idx);
 
                 if (HAS_KEY()) {
@@ -412,10 +449,11 @@ bool parse_yaml(struct cel_alloc *alloc,
                 break;
 
             case YAML_MAPPING_START_EVENT:
-                tmp_idx = new_node(inst, NODE_MAP, {},
-                                   parent_stack[parent_stack_top].idx);
-
                 key = parent_stack[parent_stack_top].key_hash;
+
+                tmp_idx = new_node(inst->doc, NODE_MAP, {},
+                                   parent_stack[parent_stack_top].idx, key);
+
                 map::set(inst->key_map, key, tmp_idx);
 
                 if (HAS_KEY()) {
@@ -440,14 +478,12 @@ bool parse_yaml(struct cel_alloc *alloc,
                 node_value value;
                 from_scalar(event.data.scalar.value, &type, &value, IS_KEY());
 
-                tmp_idx = new_node(inst, type, value,
-                                   parent_stack[parent_stack_top].idx);
-
                 if (IS_KEY()) {
                     uint64_t parent_key = parent_stack[parent_stack_top].key_hash;
-
                     key = hash_combine(parent_key,
                                        ct_hash_a0.id64_from_str(value.string));
+
+                    uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
 
                     ++parent_stack[parent_stack_top].node_count;
                     array::push_back(parent_stack,
@@ -456,6 +492,8 @@ bool parse_yaml(struct cel_alloc *alloc,
                     // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].key_hash;
+
+                    uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
                     map::set(inst->key_map, key, tmp_idx);
 
                     array::pop_back(parent_stack);
@@ -469,10 +507,13 @@ bool parse_yaml(struct cel_alloc *alloc,
                             parent_stack[parent_stack_top].node_count);
 
                     key = hash_combine(key, ct_hash_a0.id64_from_str(buffer));
+
+                    uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
                     map::set(inst->key_map, key, tmp_idx);
 
                     ++parent_stack[parent_stack_top].node_count;
                 }
+
             }
                 break;
         }
@@ -499,6 +540,7 @@ static void destroy(struct ct_yamlng_document *document) {
 
     inst->key_map.destroy();
     inst->type.destroy();
+    inst->hash.destroy();
     inst->value.destroy();
     inst->first_child.destroy();
     inst->next_sibling.destroy();
@@ -525,30 +567,27 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
         return NULL;
     }
 
-
     *d_inst = {
-            .alloc = alloc
+            .alloc = alloc,
+            .doc = d
     };
 
     d_inst->key_map.init(alloc);
     d_inst->type.init(alloc);
+    d_inst->hash.init(alloc);
     d_inst->value.init(alloc);
     d_inst->first_child.init(alloc);
     d_inst->next_sibling.init(alloc);
     d_inst->parent.init(alloc);
 
-    // Null node
-    new_node(d_inst, NODE_INVALID, {}, 0);
-
-    if (!parse_yaml(alloc, vio, d_inst)) {
-        goto error;
-    }
-
     *d = {
             .inst = d_inst,
             .has_key = has_key,
             .type = type,
+            .hash = get_hash,
+            .size = get_size,
             .get = get,
+            .get_seq = get_seq,
 
             .as_string = as_string,
             .as_float = as_float,
@@ -564,6 +603,14 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
             .foreach_dict_node = foreach_dict_node,
             .foreach_seq_node = foreach_seq_node,
     };
+
+    // Null node
+    new_node(d, NODE_INVALID, {}, 0, ~(uint64_t)(0));
+
+    if (!parse_yaml(alloc, vio, d_inst)) {
+        goto error;
+    }
+
 
     return d;
 
@@ -601,9 +648,9 @@ uint64_t calc_key(const char *key) {
 
 uint64_t combine_key(uint64_t *keys,
                      uint32_t count) {
-    uint64_t hash = 0;
+    uint64_t hash = keys[0];
 
-    for (uint32_t i = 0; i < count; ++i) {
+    for (uint32_t i = 1; i < count; ++i) {
         hash = hash_combine(hash, keys[i]);
     }
 

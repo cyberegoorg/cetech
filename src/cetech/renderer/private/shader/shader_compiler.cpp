@@ -36,6 +36,7 @@ CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 
 namespace shader_compiler {
@@ -114,21 +115,18 @@ namespace shader_compiler {
 #endif
 
     static int compiler(const char *filename,
-                        ct_vio *source_vio,
+                        struct ct_yamlng_document *doc,
                         ct_vio *build_vio,
                         ct_compilator_api *compilator_api) {
         auto a = ct_memory_a0.main_allocator();
 
-        char source_data[source_vio->size(source_vio->inst) + 1];
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
+        const char *vs_input = doc->get_string(doc->inst,
+                                                ct_yamlng_a0.calc_key("vs_input"),
+                                                "");
 
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
-
-        yaml_node_t vs_input = yaml_get_node(root, "vs_input");
-        yaml_node_t fs_input = yaml_get_node(root, "fs_input");
+        const char *fs_input = doc->get_string(doc->inst,
+                                                ct_yamlng_a0.calc_key("fs_input"),
+                                                "");
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
         const char *core_dir = ct_resource_a0.compiler_get_core_dir();
@@ -138,7 +136,6 @@ namespace shader_compiler {
         shader_blob::blob_t resource = {};
 
         // TODO: temp cel_alloc?
-        char input_str[1024] = {};
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
 
@@ -148,13 +145,12 @@ namespace shader_compiler {
                 ct_config_a0.get_string(kernel_platform));
 
         //////// VS
-        yaml_as_string(vs_input, input_str, CETECH_ARRAY_LEN(input_str));
-        compilator_api->add_dependency(filename, input_str);
+        compilator_api->add_dependency(filename, vs_input);
 
-        char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
+        char *input_path = ct_path_a0.join(a, 2, source_dir, vs_input);
 
-        _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
-                      input_str);
+        _gen_tmp_name(output_path, tmp_dir,
+                      CETECH_ARRAY_LEN(tmp_filename),vs_input);
 
         int result = _shaderc(input_path, output_path, include_dir, "vertex",
                               platform, vs_profile);
@@ -178,13 +174,12 @@ namespace shader_compiler {
         ///////
 
         //////// FS
-        yaml_as_string(fs_input, input_str, CETECH_ARRAY_LEN(input_str));
-        compilator_api->add_dependency(filename, input_str);
+        compilator_api->add_dependency(filename, fs_input);
 
-        input_path = ct_path_a0.join(a, 2, source_dir, input_str);
+        input_path = ct_path_a0.join(a, 2, source_dir, fs_input);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
-                      input_str);
+                      fs_input);
 
         result = _shaderc(input_path, output_path, include_dir, "fragment",
                           platform, fs_profile);
@@ -229,9 +224,9 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
+        CETECH_GET_API(api, ct_yamlng_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"),
-                                         compiler);
+        ct_resource_a0.compiler_register_yaml(ct_hash_a0.id64_from_str("shader"), compiler);
 
         return 1;
     }

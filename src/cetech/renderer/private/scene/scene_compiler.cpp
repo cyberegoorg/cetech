@@ -20,7 +20,6 @@
 
 #include "cetech/resource/resource.h"
 #include "cetech/entity/entity.h"
-#include "cetech/yaml/yaml.h"
 
 #include "cetech/scenegraph/scenegraph.h"
 
@@ -38,6 +37,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_thread_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 
 namespace scene_resource_compiler {
@@ -157,94 +157,131 @@ namespace scene_resource_compiler {
     void _parse_vertex_decl(bgfx::VertexDecl *decl,
                             uint32_t *vertex_size,
                             bgfx::Attrib::Enum type,
-                            yaml_node_t decl_node) {
-        yaml_node_t type_n = yaml_get_node(decl_node, "type");
-        yaml_node_t size_n = yaml_get_node(decl_node, "size");
+                            ct_yamlng_node decl_node) {
 
-        char type_str[64] = {};
-        yaml_as_string(type_n, type_str, CETECH_ARRAY_LEN(type_str));
+        ct_yamlng_document *d = decl_node.d;
 
+        uint64_t keys[] = {
+                d->hash(d->inst, decl_node),
+                ct_yamlng_a0.calc_key("type"),
+        };
+        const char *type_str = d->get_string(d->inst,
+                                             ct_yamlng_a0.combine_key(keys,
+                                                                      CETECH_ARRAY_LEN(
+                                                                              keys)),
+                                             "");
+
+        keys[1] = ct_yamlng_a0.calc_key("size");
+        float size = d->get_float(d->inst, ct_yamlng_a0.combine_key(keys,
+                                                                    CETECH_ARRAY_LEN(
+                                                                            keys)),
+                                  0.0f);
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
         _type_to_attr_type(type_str, &attrib_type, &v_size);
 
-        *vertex_size += yaml_as_int(size_n) * v_size;
+        *vertex_size += int(size) * v_size;
 
-        decl->add(type, (uint8_t) yaml_as_int(size_n),
+        decl->add(type, (uint8_t) int(size),
                   attrib_type,
                   0, 0);
     }
 
 
     static void _parese_types(bgfx::VertexDecl *decl,
-                              yaml_node_t types,
+                              ct_yamlng_node types,
                               uint32_t *vertex_size) {
+        ct_yamlng_document *d = types.d;
 
         for (uint32_t i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
-            YAML_NODE_SCOPE(node, types, _chanel_types[i].name,
-                            if (yaml_is_valid(node))
-                                _parse_vertex_decl(decl, vertex_size,
-                                                   _chanel_types[i].attrib,
-                                                   node););
 
+            uint64_t keys[] = {
+                    d->hash(d->inst, types),
+                    ct_yamlng_a0.calc_key(_chanel_types[i].name),
+            };
+
+            ct_yamlng_node node = d->get(d->inst,
+                                         ct_yamlng_a0.combine_key(keys,
+                                                                  CETECH_ARRAY_LEN(
+                                                                          keys)));
+            if (0 != node.idx) {
+                _parse_vertex_decl(decl, vertex_size,
+                                   _chanel_types[i].attrib,
+                                   node);
+            }
         }
     }
 
-    void _write_chanel(yaml_node_t node,
-                       yaml_node_t types,
+    void _write_chanel(struct ct_yamlng_node node,
+                       struct ct_yamlng_node types,
                        size_t i,
                        const char *name,
-                       yaml_node_t chanels_n,
+                       struct ct_yamlng_node chanels_n,
                        struct compile_output *output) {
-        char tmp_buff[64] = {};
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
-        yaml_node_t idx_n = yaml_get_seq_node(node, i);
-        uint32_t idx = yaml_as_int(idx_n);
-        yaml_node_free(idx_n);
+        ct_yamlng_document *d = node.d;
+
+        struct ct_yamlng_node idx_n = d->get_seq(d->inst,
+                                                 d->hash(d->inst, node), i);
+
+        uint32_t idx = (uint32_t) (d->as_float(d->inst, idx_n, 0.0f));
 
         uint32_t size = 0;
-
+        const char *type_str = NULL;
         {
-            yaml_node_t chan_def_n = yaml_get_node(types, name);
-            yaml_node_t type_n = yaml_get_node(chan_def_n, "type");
-            yaml_node_t size_n = yaml_get_node(chan_def_n, "size");
+            uint64_t keys[] = {
+                    d->hash(d->inst,types),
+                    ct_yamlng_a0.calc_key(name),
+                    ct_yamlng_a0.calc_key("type"),
+            };
+            type_str = d->get_string(d->inst, ct_yamlng_a0.combine_key(keys,
+                                                                       CETECH_ARRAY_LEN(
+                                                                               keys)),
+                                     "");
 
-            yaml_as_string(type_n, tmp_buff, CETECH_ARRAY_LEN(tmp_buff));
-            size = yaml_as_int(size_n);
-
-            yaml_node_free(chan_def_n);
-            yaml_node_free(type_n);
-            yaml_node_free(size_n);
+            keys[2] = ct_yamlng_a0.calc_key("size"),
+                    size = (uint32_t) d->get_float(d->inst,
+                                                   ct_yamlng_a0.combine_key(
+                                                           keys,
+                                                           CETECH_ARRAY_LEN(
+                                                                   keys)),
+                                                   0.0f);
         }
 
-        _type_to_attr_type(tmp_buff, &attrib_type, &v_size);
+        _type_to_attr_type(type_str, &attrib_type, &v_size);
 
-        yaml_node_t chanel_data_n = yaml_get_node(chanels_n, name);
+
+        uint64_t keys[] = {
+                d->hash(d->inst, chanels_n),
+                ct_yamlng_a0.calc_key(name),
+        };
+        uint64_t chanel_data_n = ct_yamlng_a0.combine_key(keys,
+                                                          CETECH_ARRAY_LEN(
+                                                                  keys));
+
         for (uint32_t k = 0; k < size; ++k) {
-            yaml_node_t n = yaml_get_seq_node(chanel_data_n, (idx * size) + k);
+            struct ct_yamlng_node n = d->get_seq(d->inst, chanel_data_n,
+                                                 (idx * size) + k);
 
             // TODO: type
-            float v = yaml_as_float(n);
-            yaml_node_free(n);
-
+            float v = d->as_float(d->inst, n, 0.0f);
             //log_debug("casdsadsa", "%s:%d -  %f", name, k, v);
 
             array::push(output->vb, (uint8_t *) &v, sizeof(v));
         }
-        yaml_node_free(chanel_data_n);
     }
 
-    void foreach_geometries_clb(yaml_node_t key,
-                                yaml_node_t value,
+    void foreach_geometries_clb(struct ct_yamlng_node key,
+                                struct ct_yamlng_node value,
                                 void *_data) {
+
         struct compile_output *output = (compile_output *) _data;
+        ct_yamlng_document *d = key.d;
 
-        char name_str[64] = {};
-        yaml_as_string(key, name_str, CETECH_ARRAY_LEN(name_str));
-
+        const char *name_str = d->as_string(d->inst, key, "");
         uint64_t name = ct_hash_a0.id64_from_str(name_str);
 
         array::push_back(output->geom_name, name);
@@ -256,7 +293,14 @@ namespace scene_resource_compiler {
         bgfx::VertexDecl vertex_decl;
         vertex_decl.begin();
 
-        yaml_node_t types = yaml_get_node(value, "types");
+        uint64_t keys[] = {
+                d->hash(d->inst, value),
+                ct_yamlng_a0.calc_key("types"),
+        };
+        ct_yamlng_node types = d->get(d->inst, ct_yamlng_a0.combine_key(keys,
+                                                                        CETECH_ARRAY_LEN(
+                                                                                keys)));
+
         uint32_t vertex_size = 0;
         _parese_types(&vertex_decl, types, &vertex_size);
 
@@ -264,11 +308,26 @@ namespace scene_resource_compiler {
         array::push_back(output->vb_decl, vertex_decl);
 
         // IB, VB
-        yaml_node_t chanels_n = yaml_get_node(value, "chanels");
-        yaml_node_t indices_n = yaml_get_node(value, "indices");
-        yaml_node_t i_size = yaml_get_node(indices_n, "size");
+        keys[1] = ct_yamlng_a0.calc_key("chanels");
+        ct_yamlng_node chanels_n = d->get(d->inst,
+                                          ct_yamlng_a0.combine_key(keys,
+                                                                   CETECH_ARRAY_LEN(
+                                                                           keys)));
 
-        uint32_t vertex_count = yaml_as_int(i_size);
+
+        keys[1] = ct_yamlng_a0.calc_key("indices");
+        uint64_t  k = ct_yamlng_a0.combine_key(keys,
+                                               CETECH_ARRAY_LEN(
+                                                       keys));
+        ct_yamlng_node indices_n = d->get(d->inst, k);
+
+        keys[0] = k;
+        keys[1] = ct_yamlng_a0.calc_key("size");
+        ct_yamlng_node i_size = d->get(d->inst, ct_yamlng_a0.combine_key(keys,
+                                                                         CETECH_ARRAY_LEN(
+                                                                                 keys)));
+
+        uint32_t vertex_count = (uint32_t) d->as_float(d->inst, i_size, 0.0f);
 
         array::push_back(output->ib_size, vertex_count);
         array::push_back(output->vb_size, vertex_size * vertex_count);
@@ -277,11 +336,18 @@ namespace scene_resource_compiler {
             for (uint32_t j = 0; j < CETECH_ARRAY_LEN(_chanel_types); ++j) {
                 const char *name = _chanel_types[j].name;
 
-                YAML_NODE_SCOPE(node, indices_n, name,
-                                if (yaml_is_valid(node))
-                                    _write_chanel(node, types, i, name,
-                                                  chanels_n,
-                                                  output););
+                uint64_t keys[] = {
+                        d->hash(d->inst, indices_n),
+                        ct_yamlng_a0.calc_key(name),
+                };
+
+                ct_yamlng_node node = d->get(d->inst,
+                                             ct_yamlng_a0.combine_key(keys,
+                                                                      CETECH_ARRAY_LEN(
+                                                                              keys)));
+                if (0 != node.idx) {
+                    _write_chanel(node, types, i, name, chanels_n, output);
+                }
             }
 
             array::push_back(output->ib, (uint32_t) i);
@@ -294,19 +360,26 @@ namespace scene_resource_compiler {
         uint32_t parent_idx;
     };
 
-    void foreach_graph_clb(yaml_node_t key,
-                           yaml_node_t value,
+    void foreach_graph_clb(struct ct_yamlng_node key,
+                           struct ct_yamlng_node value,
                            void *_data) {
-        char buffer[128] = {};
         struct foreach_graph_data *output = (foreach_graph_data *) _data;
+        ct_yamlng_document *d = key.d;
 
-        yaml_as_string(key, buffer, CETECH_ARRAY_LEN(buffer));
-        uint64_t node_name = ct_hash_a0.id64_from_str(buffer);
+        const char *key_str = d->as_string(d->inst, key, "");
+        uint64_t node_name = ct_hash_a0.id64_from_str(key_str);
 
-        yaml_node_t local_pose = yaml_get_node(value, "local");
+        uint64_t keys[] = {
+                d->hash(d->inst, value),
+                ct_yamlng_a0.calc_key("local"),
+        };
+        ct_yamlng_node local_pose = d->get(d->inst,
+                                           ct_yamlng_a0.combine_key(keys,
+                                                                    CETECH_ARRAY_LEN(
+                                                                            keys)));
 
         float pose[16];
-        yaml_as_mat44(local_pose, pose);
+        d->as_mat4(d->inst, local_pose, pose);
 
         uint32_t idx = (uint32_t) array::size(output->output->node_name);
 
@@ -314,15 +387,22 @@ namespace scene_resource_compiler {
         array::push_back(output->output->node_parent, output->parent_idx);
         array::push(output->output->node_pose, pose, 16);
 
-        yaml_node_t geometries_n = yaml_get_node(value, "geometries");
-        if (yaml_is_valid(geometries_n)) {
-            const size_t name_count = yaml_node_size(geometries_n);
-            for (uint32_t i = 0; i < name_count; ++i) {
-                yaml_node_t name_node = yaml_get_seq_node(geometries_n, i);
-                yaml_as_string(name_node, buffer, CETECH_ARRAY_LEN(buffer));
-                yaml_node_free(name_node);
 
-                uint64_t geom_name = ct_hash_a0.id64_from_str(buffer);
+        keys[1] = ct_yamlng_a0.calc_key("geometries");
+        uint64_t geometries_k = ct_yamlng_a0.combine_key(keys,
+                                                         CETECH_ARRAY_LEN(
+                                                                 keys));
+
+        ct_yamlng_node geometries_n = d->get(d->inst, geometries_k);
+        if (0 != geometries_n.idx) {
+            const size_t name_count = d->size(d->inst, geometries_n);
+
+            for (uint32_t i = 0; i < name_count; ++i) {
+                struct ct_yamlng_node name_node = d->get_seq(d->inst,
+                                                             geometries_k, i);
+                const char *geom_str = d->as_string(d->inst, name_node, "");
+
+                uint64_t geom_name = ct_hash_a0.id64_from_str(geom_str);
                 for (uint32_t j = 0;
                      j < array::size(output->output->geom_name); ++j) {
                     if (geom_name != output->output->geom_name[j]) {
@@ -336,30 +416,44 @@ namespace scene_resource_compiler {
             }
         }
 
-        yaml_node_t children = yaml_get_node(value, "children");
-        if (yaml_is_valid(children)) {
+
+        keys[1] = ct_yamlng_a0.calc_key("children");
+        uint64_t children_k = ct_yamlng_a0.combine_key(keys,
+                                                       CETECH_ARRAY_LEN(
+                                                               keys));
+        ct_yamlng_node children_n = d->get(d->inst,
+                                           children_k);
+
+        if (idx != children_n.idx) {
             struct foreach_graph_data graph_data = {
                     .parent_idx = idx,
                     .output = output->output
             };
 
-            yaml_node_foreach_dict(children, foreach_graph_clb, &graph_data);
+            d->foreach_dict_node(d->inst, children_n, foreach_graph_clb,
+                                 &graph_data);
         }
     }
 
-    int _compile_yaml(yaml_node_t root,
+    int _compile_yaml(struct ct_yamlng_document *document,
                       struct compile_output *output) {
-        yaml_node_t geometries = yaml_get_node(root, "geometries");
-        yaml_node_t graph = yaml_get_node(root, "graph");
 
-        yaml_node_foreach_dict(geometries, foreach_geometries_clb, output);
+        ct_yamlng_node geometries = document->get(document->inst,
+                                                  ct_yamlng_a0.calc_key(
+                                                          "geometries"));
+        ct_yamlng_node graph = document->get(document->inst,
+                                             ct_yamlng_a0.calc_key("graph"));
+
+        document->foreach_dict_node(document->inst, geometries,
+                                    foreach_geometries_clb, output);
 
         struct foreach_graph_data graph_data = {
                 .parent_idx = UINT32_MAX,
                 .output = output
         };
 
-        yaml_node_foreach_dict(graph, foreach_graph_clb, &graph_data);
+        document->foreach_dict_node(document->inst, graph,
+                                    foreach_graph_clb, &graph_data);
         return 1;
     }
 
@@ -384,18 +478,15 @@ namespace scene_resource_compiler {
     }
 
     int _compile_assimp(const char *filename,
-                        yaml_node_t root,
+                        struct ct_yamlng_document *document,
                         struct compile_output *output,
                         ct_compilator_api *capi) {
         auto a = ct_memory_a0.main_allocator();
 
-        yaml_node_t import_n = yaml_get_node(root, "import");
-        yaml_node_t input_n = yaml_get_node(import_n, "input");
+        const char *input_str = document->get_string(
+                document->inst,
+                ct_yamlng_a0.calc_key("import.input"), "");
 
-        yaml_node_t postprocess_n = yaml_get_node(import_n, "postprocess");
-
-        char input_str[64] = {};
-        yaml_as_string(input_n, input_str, CETECH_ARRAY_LEN(input_str));
         capi->add_dependency(filename, input_str);
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
@@ -403,11 +494,10 @@ namespace scene_resource_compiler {
 
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
-        if (yaml_is_valid(postprocess_n)) {
-            YAML_NODE_SCOPE(node, postprocess_n, "flip_uvs",
-                            if (yaml_is_valid(node) &&
-                                yaml_as_bool(node))
-                                postprocess_flag |= aiProcess_FlipUVs;);
+        if (document->get_bool(document->inst,
+                               ct_yamlng_a0.calc_key("postprocess.flip_uvs"),
+                               false)) {
+            postprocess_flag |= aiProcess_FlipUVs;
         }
 
         const struct aiScene *scene = aiImportFile(input_path,
@@ -496,40 +586,27 @@ namespace scene_resource_compiler {
         }
 
         _compile_assimp_node(scene->mRootNode, UINT32_MAX, output);
-
-        yaml_node_free(import_n);
         return 1;
     }
 
     int compiler(const char *filename,
-                 ct_vio *source_vio,
+                 struct ct_yamlng_document *document,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
-
-        char *source_data =
-                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             source_vio->size(source_vio->inst) + 1);
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
 
         struct compile_output *output = _crete_compile_output();
 
         int ret = 1;
-        yaml_node_t import_node = yaml_get_node(root, "import");
-        if (yaml_is_valid(import_node)) {
-            ret = _compile_assimp(filename, root, output, compilator_api);
+
+        if (document->has_key(document->inst,
+                              ct_yamlng_a0.calc_key("import"))) {
+            ret = _compile_assimp(filename, document, output, compilator_api);
         } else {
-            ret = _compile_yaml(root, output);
+            ret = _compile_yaml(document, output);
         }
 
         if (!ret) {
             _destroy_compile_output(output);
-            CEL_FREE(ct_memory_a0.main_allocator(), source_data);
             return 0;
         }
 
@@ -579,7 +656,6 @@ namespace scene_resource_compiler {
                          array::size(output->geom_name));
 
         _destroy_compile_output(output);
-        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 
@@ -591,9 +667,10 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_thread_a0);
+        CETECH_GET_API(api, ct_yamlng_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
-                                         compiler);
+        ct_resource_a0.compiler_register_yaml(ct_hash_a0.id64_from_str("scene"),
+                                              compiler);
 
         return 1;
     }

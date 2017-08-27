@@ -39,6 +39,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 //==============================================================================
 // Defines
@@ -52,6 +53,11 @@ CETECH_DECL_API(ct_filesystem_a0);
 // Globals
 //==============================================================================
 
+struct compilator {
+    ct_resource_compilator_t compilator;
+    ct_resource_compilator_yaml_t compilator_yaml;
+};
+
 struct compile_task_data {
     char *source_filename;
     uint64_t type;
@@ -59,13 +65,13 @@ struct compile_task_data {
     ct_vio *source;
     ct_vio *build;
     time_t mtime;
-    ct_resource_compilator_t compilator;
+    struct compilator compilator;
     atomic_int completed;
 };
 
 struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
-    ct_resource_compilator_t compilator_map_compilator[MAX_TYPES]; // TODO: MAP
+    compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
     ct_watchdog *wd;
     ct_cvar cv_source_dir;
@@ -136,9 +142,21 @@ static void _compile_task(void *data) {
                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
                    tdata->source_filename, tdata->type, tdata->name);
 
+    bool res = false;
+    if (tdata->compilator.compilator) {
+        res = tdata->compilator.compilator(tdata->source_filename,
+                                           tdata->source, tdata->build,
+                                           &_compilator_api) > 0;
+    } else if (tdata->compilator.compilator_yaml) {
+        ct_yamlng_document *d = ct_yamlng_a0.from_vio(tdata->source,
+                                                      ct_memory_a0.main_allocator());
+        res = tdata->compilator.compilator_yaml(tdata->source_filename, d,
+                                                tdata->build,
+                                                &_compilator_api) > 0;
+        ct_yamlng_a0.destroy(d);
+    }
 
-    if (tdata->compilator(tdata->source_filename, tdata->source, tdata->build,
-                          &_compilator_api)) {
+    if (res) {
         builddb_set_file(tdata->source_filename, tdata->mtime);
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
@@ -159,7 +177,7 @@ static void _compile_task(void *data) {
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
-ct_resource_compilator_t _find_compilator(uint64_t type) {
+compilator _find_compilator(uint64_t type) {
     for (int i = 0; i < MAX_TYPES; ++i) {
         if (_G.compilator_map_type[i] != type) {
             continue;
@@ -168,7 +186,7 @@ ct_resource_compilator_t _find_compilator(uint64_t type) {
         return _G.compilator_map_compilator[i];
     }
 
-    return NULL;
+    return {NULL};
 }
 
 void _compile_dir(Array<ct_task_item> &tasks,
@@ -190,9 +208,9 @@ void _compile_dir(Array<ct_task_item> &tasks,
         type_name_from_filename(dir, files[i], &type_id, &name_id,
                                 &source_filename_short);
 
-        ct_resource_compilator_t compilator = _find_compilator(type_id);
-        if (compilator == NULL) {
-            //log_warning("resource_compilator", "Type \"%s\" does not register compilator", resource_type);
+        compilator compilator = _find_compilator(type_id);
+        if ((compilator.compilator == NULL) and
+            (compilator.compilator_yaml == NULL)) {
             continue;
         }
 
@@ -211,7 +229,6 @@ void _compile_dir(Array<ct_task_item> &tasks,
                 VIO_OPEN_READ);
 
         if (source_vio == NULL) {
-
             continue;
         }
 
@@ -283,7 +300,21 @@ void resource_compiler_register(uint64_t type,
         }
 
         _G.compilator_map_type[i] = type;
-        _G.compilator_map_compilator[i] = compilator;
+        _G.compilator_map_compilator[i] = {.compilator = compilator};
+        return;
+    }
+}
+
+void compiler_register_yaml(uint64_t type,
+                            ct_resource_compilator_yaml_t compilator) {
+
+    for (int i = 0; i < MAX_TYPES; ++i) {
+        if (_G.compilator_map_type[i] != 0) {
+            continue;
+        }
+
+        _G.compilator_map_type[i] = type;
+        _G.compilator_map_compilator[i] = {.compilator_yaml = compilator};
         return;
     }
 }
@@ -512,6 +543,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             _init(api);

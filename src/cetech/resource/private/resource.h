@@ -14,6 +14,10 @@ extern "C" {
 void resource_compiler_register(uint64_t type,
                                 ct_resource_compilator_t compilator);
 
+void compiler_register_yaml(uint64_t type,
+                                ct_resource_compilator_yaml_t compilator);
+
+
 void resource_compiler_compile_all();
 
 int resource_compiler_get_filename(char *filename,

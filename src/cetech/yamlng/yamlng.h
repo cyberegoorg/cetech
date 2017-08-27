@@ -46,7 +46,11 @@ enum node_type {
     NODE_SEQ,
 };
 
+
+struct ct_yamlng_document;
+
 struct ct_yamlng_node {
+    struct ct_yamlng_document *d;
     uint32_t idx;
 };
 
@@ -66,11 +70,22 @@ struct ct_yamlng_document {
     bool (*has_key)(ct_yamlng_document_instance_t *inst,
                     uint64_t key);
 
+
     struct ct_yamlng_node (*get)(ct_yamlng_document_instance_t *inst,
                                  uint64_t key);
 
+    struct ct_yamlng_node (*get_seq)(ct_yamlng_document_instance_t *inst,
+                                     uint64_t key,
+                                     uint32_t idx);
+
     enum node_type (*type)(ct_yamlng_document_instance_t *inst,
                            ct_yamlng_node node);
+
+    uint64_t (*hash)(ct_yamlng_document_instance_t *inst,
+                     ct_yamlng_node node);
+
+    uint32_t (*size)(ct_yamlng_document_instance_t *inst,
+                     ct_yamlng_node node);
 
     const char *(*as_string)(ct_yamlng_document_instance_t *inst,
                              ct_yamlng_node node,
@@ -86,15 +101,15 @@ struct ct_yamlng_document {
 
     void (*as_vec3)(ct_yamlng_document_instance_t *inst,
                     ct_yamlng_node node,
-                    float* value);
+                    float *value);
 
     void (*as_vec4)(ct_yamlng_document_instance_t *inst,
                     ct_yamlng_node node,
-                    float* value);
+                    float *value);
 
     void (*as_mat4)(ct_yamlng_document_instance_t *inst,
                     ct_yamlng_node node,
-                    float* value);
+                    float *value);
 
     const char *(*get_string)(ct_yamlng_document_instance_t *inst,
                               uint64_t key,
@@ -114,10 +129,11 @@ struct ct_yamlng_document {
                               void *data);
 
     void (*foreach_seq_node)(ct_yamlng_document_instance_t *inst,
-                              struct ct_yamlng_node node,
+                             struct ct_yamlng_node node,
                              ct_yamlng_foreach_seq_t foreach_clb,
-                              void *data);
+                             void *data);
 };
+
 
 struct ct_yamlng_a0 {
     ct_yamlng_document *(*from_vio)(struct ct_vio *vio,

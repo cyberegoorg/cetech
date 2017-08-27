@@ -4,6 +4,8 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
+#include <cetech/yamlng/yamlng.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,6 +38,12 @@ typedef int (*ct_resource_compilator_t)(
         struct ct_vio *build_vio,
         struct ct_compilator_api *compilator_api);
 
+
+typedef int (*ct_resource_compilator_yaml_t)(
+        const char *filename,
+        struct ct_yamlng_document *document,
+        struct ct_vio *build_vio,
+        struct ct_compilator_api *compilator_api);
 
 //==============================================================================
 // Structs
@@ -81,9 +89,7 @@ typedef struct {
 
 //! Compilator api
 struct ct_compilator_api {
-    const char *source_dir;
-    const char *build_dir;
-    const char *tmp_dir;
+    ct_resource_compilator_yaml_t *_yaml;
 
     //! Add dependency
     //! \param who_filname Source filename
@@ -201,6 +207,12 @@ struct ct_resource_a0 {
     void (*compiler_register)(uint64_t type,
                               ct_resource_compilator_t compilator);
 
+    //! Register resource compiler
+    //! \param type Type
+    //! \param compilator Compilator fce
+    void (*compiler_register_yaml)(uint64_t type,
+                              ct_resource_compilator_yaml_t compilator);
+
     //! Compile all resource in source dir
     void (*compiler_compile_all)();
 
@@ -261,6 +273,8 @@ struct ct_resource_a0 {
     //! \return 1 if ok else 0
     char *(*compiler_get_build_dir)(struct cel_alloc *a,
                                     const char *platform);
+
+
 };
 
 
