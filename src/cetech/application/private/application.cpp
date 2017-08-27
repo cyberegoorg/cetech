@@ -26,6 +26,8 @@
 
 #include <cetech/os/watchdog.h>
 #include <cetech/input/input.h>
+#include <cetech/yamlng/yamlng.h>
+#include <cetech/filesystem/filesystem.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -40,6 +42,8 @@ CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_api_a0);
+CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_filesystem_a0);
 
 //==============================================================================
 // Definess
@@ -130,6 +134,76 @@ static void _boot_unload() {
 
 
 extern "C" void application_start() {
+    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"),
+                                      "level1.level",
+                                      FS_OPEN_READ);
+
+    ct_yamlng_document* d = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
+    ct_filesystem_a0.close(f);
+
+    uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
+
+    uint64_t keys[] = {
+            ct_hash_a0.id64_from_str("entities"),
+            ct_hash_a0.id64_from_str("55643433135454252"),
+            ct_hash_a0.id64_from_str("components"),
+            ct_hash_a0.id64_from_str("41232132255234"),
+            ct_hash_a0.id64_from_str("material"),
+    };
+    key = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+
+    ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA %s", d->get_string(d->inst, key, "NULL"));
+
+    {
+        uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.components.234234331453252");
+        ct_yamlng_node node = d->get(d->inst, key);
+        d->foreach_dict_node(d->inst, node, [](
+                struct ct_yamlng_node key,
+                struct ct_yamlng_node value,
+                void *data) {
+                ct_yamlng_document* d = (ct_yamlng_document*)data;
+
+                const char* s = d->as_string(d->inst, key, "NULL");
+
+                ct_log_a0.info(LOG_WHERE, "KEYS: %s : %d", s, d->type(d->inst, value));
+        }, d);
+    }
+
+    {
+        uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.components.234234331453252.position");
+        ct_yamlng_node node = d->get(d->inst, key);
+        d->foreach_seq_node(d->inst, node, [](
+                uint32_t idx,
+                struct ct_yamlng_node value,
+                void *data) {
+            ct_yamlng_document* d = (ct_yamlng_document*)data;
+
+            float f = d->as_float(d->inst, value, 0.0f);
+
+            ct_log_a0.info(LOG_WHERE, "VALUE : %f", f);
+        }, d);
+    }
+
+
+    {
+        uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.components.234234331453252.rotation");
+        ct_yamlng_node node = d->get(d->inst, key);
+
+        float v[3] {0.0f};
+        d->as_vec3(d->inst, node, v);
+
+        ct_log_a0.info(LOG_WHERE, "ROTATION : %f, %f, %f", v[0], v[1], v[2]);
+    }
+
+    if(d->has_key(d->inst, key)) {
+        ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA dsadsad");
+    }
+
+    ct_yamlng_a0.destroy(d);
+
+
+//    return;
+
     _init_config();
 
 #ifdef CETECH_CAN_COMPILE
@@ -260,6 +334,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_module_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_filesystem_a0);
 
             ct_api_a0 = *api;
         },

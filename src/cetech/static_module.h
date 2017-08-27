@@ -7,6 +7,7 @@ extern "C" void init_static_modules() {
     // Engine
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(blob);
+    CETECH_ADD_STATIC_MODULE(yamlng);
     CETECH_ADD_STATIC_MODULE(task);
     CETECH_ADD_STATIC_MODULE(filesystem);
     CETECH_ADD_STATIC_MODULE(resourcesystem);
@@ -60,6 +61,9 @@ extern "C" void init_static_modules() {
 
     CETECH_ADD_STATIC_MODULE(texture_property);
     CETECH_ADD_STATIC_MODULE(level_inspector);
+    CETECH_ADD_STATIC_MODULE(entity_property);
+    CETECH_ADD_STATIC_MODULE(transform_property);
+
     CETECH_ADD_STATIC_MODULE(level_view);
 
     CETECH_ADD_STATIC_MODULE(luasys);

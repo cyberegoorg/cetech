@@ -82,6 +82,7 @@ set(SOURCE_FILES
         src/cetech/playground/private/asset_property.cpp
         src/cetech/playground/private/asset_browser.cpp
         src/cetech/playground/private/asset_preview.cpp
+        src/cetech/playground/private/entity_property.cpp
 
         src/cetech/machine/private/window_sdl2.cpp
         src/cetech/machine/private/machine_sdl2.cpp
@@ -159,9 +160,11 @@ set(SOURCE_FILES
         src/cetech/renderer/private/mesh_renderer/mesh_renderer.cpp
 
         src/cetech/transform/private/transform.cpp
+        src/cetech/transform/private/transform_property.cpp
         src/cetech/scenegraph/private/scenegraph.cpp
         src/cetech/camera/private/camera.cpp
         src/cetech/blob/private/blob.cpp
+        src/cetech/yamlng/private/yamlng.cpp
         )
 
 ################################################################################
@@ -211,6 +214,7 @@ set(RELEASE_LIBS
         IrrXML.a
         minizip.a
         aes.a
+        yaml
         )
 
 set(RELEASE_LIBS2

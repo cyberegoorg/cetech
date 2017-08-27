@@ -744,11 +744,10 @@ static void _init(ct_api_a0 *a0) {
     ct_app_a0.register_on_init(_game_init_clb);
     ct_app_a0.register_on_shutdown(_game_shutdown_clb);
     ct_app_a0.register_on_update(_game_update_clb);
-
     ct_renderer_a0.register_on_render(_game_render_clb);
 
     ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
-#ifdef CETECH_CAN_COMPILE
+    #ifdef CETECH_CAN_COMPILE
     ct_resource_a0.compiler_register(_G.type_id, _lua_compiler);
 #endif
 }
