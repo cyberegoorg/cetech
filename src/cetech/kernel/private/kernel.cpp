@@ -1,16 +1,16 @@
 #include "celib/allocator.h"
 
-#include "cetech/api/api_system.h"
-#include "cetech/os/path.h"
-#include "cetech/memory/memory.h"
-#include "cetech/config/config.h"
-#include "cetech/module/module.h"
-#include "cetech/log/private/log_system_private.h"
-#include "cetech/memory/private/memory_private.h"
-#include "cetech/api/private/api_private.h"
-#include "cetech/memory/private/allocator_core_private.h"
+#include "cetech/kernel/api_system.h"
+#include "cetech/kernel/path.h"
+#include "cetech/kernel/memory.h"
+#include "cetech/kernel/config.h"
+#include "cetech/kernel/module.h"
+#include "log_system_private.h"
+#include "memory_private.h"
+#include "api_private.h"
+#include "allocator_core_private.h"
 
-#include <cetech/application/application.h>
+#include <cetech/kernel/application.h>
 
 #include "celib/fpumath.h"
 
@@ -22,7 +22,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_app_a0);
 
-#include <cetech/static_module.h>
+#include <cetech/modules/static_module.h>
 
 #define LOG_WHERE "kernel"
 
@@ -126,11 +126,20 @@ extern "C" int cetech_kernel_init(int argc,
 
     init_config(argc, argv);
 
+    CETECH_ADD_STATIC_MODULE(blob);
+    CETECH_ADD_STATIC_MODULE(task);
+    CETECH_ADD_STATIC_MODULE(filesystem);
+    CETECH_ADD_STATIC_MODULE(resourcesystem);
+    CETECH_ADD_STATIC_MODULE(application);
+
+#ifdef CETECH_CAN_COMPILE
+    CETECH_ADD_STATIC_MODULE(resourcecompiler);
+#endif
+
     init_static_modules();
     CETECH_GET_API(api, ct_app_a0);
 
     ct_module_a0.load_dirs();
-
     ct_config_a0.log_all();
 
     return 1;
