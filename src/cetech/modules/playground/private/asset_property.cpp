@@ -36,7 +36,6 @@ static void on_debugui() {
     }
 
 
-#ifdef CETECH_CAN_COMPILE
     char filename[512] = {};
     ct_resource_a0.compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                          _G.active_type, _G.active_name);
@@ -44,7 +43,6 @@ static void on_debugui() {
     if(ct_debugui_a0.CollapsingHeader(filename, DebugUITreeNodeFlags_DefaultOpen)) {
         _G.active_on_asset(_G.active_type, _G.active_name);
     }
-#endif
 }
 
 static void register_asset(uint64_t type,

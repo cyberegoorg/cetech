@@ -58,11 +58,10 @@ static void texture_asset(uint64_t type,
 static int _init(ct_api_a0 *api) {
     _G = {};
 
-#if CETECH_CAN_COMPILE
     ct_asset_property_a0.register_asset(
             ct_hash_a0.id64_from_str("texture"),
             texture_asset);
-#endif
+
 
     return 1;
 }

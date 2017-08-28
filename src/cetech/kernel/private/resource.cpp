@@ -314,14 +314,13 @@ namespace resource {
                              type,
                              names[i]);
 
-#ifdef CETECH_CAN_COMPILE
             char filename[1024] = {};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
-#else
-            char *filename = build_name;
-#endif
+//#else
+//            char *filename = build_name;
+//#endif
             ct_log_a0.debug("resource", "Loading resource %s from %s/%s",
                             filename,
                             ct_filesystem_a0.root_dir(root_name),
@@ -384,15 +383,14 @@ namespace resource {
                                  CETECH_ARRAY_LEN(build_name),
                                  type, names[i]);
 
-#ifdef CETECH_CAN_COMPILE
                 char filename[1024] = {};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
                                                names[i]);
-#else
-                char *filename = build_name;
-#endif
+//#else
+//                char *filename = build_name;
+//#endif
 
                 ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
@@ -425,15 +423,14 @@ namespace resource {
                              name);
 
             if (_G.autoload_enabled) {
-#ifdef CETECH_CAN_COMPILE
                 char filename[1024] = {};
                 resource_compiler_get_filename(filename,
                                                CETECH_ARRAY_LEN(filename),
                                                type,
                                                name);
-#else
-                char *filename = build_name;
-#endif
+//#else
+//                char *filename = build_name;
+//#endif
                 ct_log_a0.warning(LOG_WHERE, "Autoloading resource %s",
                                   filename);
                 load_now(type, &name, 1);
@@ -470,18 +467,18 @@ namespace resource {
 
         load(loaded_data, type, names, count, 1);
         for (uint32_t i = 0; i < count; ++i) {
-#ifdef CETECH_CAN_COMPILE
+
             char filename[1024] = {};
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
-#else
-            char build_name[33] = {};
-            resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
-                                       type, names[i]);
-
-            char *filename = build_name;
-#endif
+//#else
+//            char build_name[33] = {};
+//            resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+//                                       type, names[i]);
+//
+//            char *filename = build_name;
+//#endif
             ct_log_a0.debug("resource", "Reload resource %s ", filename);
 
             void *old_data = get(type, names[i]);
@@ -546,7 +543,7 @@ namespace resource_module {
 
             .compiler_get_build_dir = ::resource_compiler_get_build_dir,
 
-#ifdef CETECH_CAN_COMPILE
+
             .compiler_get_core_dir = resource_compiler_get_core_dir,
             .compiler_register = resource_compiler_register,
             .compiler_register_yaml = compiler_register_yaml,
@@ -557,7 +554,6 @@ namespace resource_module {
             .compiler_create_build_dir = resource_compiler_create_build_dir,
             .compiler_get_source_dir = resource_compiler_get_source_dir,
             .type_name_from_filename = type_name_from_filename,
-#endif
 
     };
 

@@ -14,8 +14,8 @@
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/transform/transform.h>
-#include <cetech/camera/camera.h>
-#include <cetech/level/level.h>
+#include <cetech/modules/camera/camera.h>
+#include <cetech/modules/level/level.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/renderer/texture.h>
 

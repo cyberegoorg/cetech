@@ -82,8 +82,6 @@ struct ct_entity_compile_output {
     uint32_t ent_counter;
 };
 
-#ifdef CETECH_CAN_COMPILE
-
 namespace entity_resource_compiler {
     static void preprocess(const char *filename,
                            yaml_node_t root,
@@ -402,7 +400,6 @@ namespace entity_resource_compiler {
         return 1;
     }
 }
-#endif
 
 //==============================================================================
 // Resource
@@ -552,14 +549,12 @@ namespace entity_module {
             .spawn_from_resource = entity::spawn_from_resource,
             .spawn = entity::spawn,
 
-#ifdef CETECH_CAN_COMPILE
             .compiler_create_output = entity_resource_compiler::create_output,
             .compiler_destroy_output = entity_resource_compiler::destroy_output,
             .compiler_compile_entity = entity_resource_compiler::compile_entity,
             .compiler_ent_counter = entity_resource_compiler::ent_counter,
             .compiler_write_to_build = entity_resource_compiler::write_to_build,
             .resource_compiler = entity_resource_compiler::compiler
-#endif
     };
 
     static void _init_api(ct_api_a0 *api) {
@@ -579,11 +574,8 @@ namespace entity_module {
 
         ct_resource_a0.register_type(_G.type, entity_resorce::callback);
 
-#ifdef CETECH_CAN_COMPILE
         ct_resource_a0.compiler_register(_G.type,
                                          entity_resource_compiler::_entity_resource_compiler);
-#endif
-
 
         _G.entity_handler.init(ct_memory_a0.main_allocator());
     }

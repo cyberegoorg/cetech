@@ -199,7 +199,6 @@ struct ct_resource_a0 {
                             uint64_t type,
                             uint64_t name);
 
-#ifdef CETECH_CAN_COMPILE
 
     //! Register resource compiler
     //! \param type Type
@@ -263,7 +262,6 @@ struct ct_resource_a0 {
                                  uint64_t *type,
                                  uint64_t *name,
                                  const char **short_name);
-#endif
 
     //! Get build dir
     //! \param build_dir Build dir

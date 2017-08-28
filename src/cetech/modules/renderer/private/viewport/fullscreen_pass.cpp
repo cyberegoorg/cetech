@@ -128,7 +128,6 @@ struct fullscree_pass_data {
 };
 
 
-#ifdef CETECH_CAN_COMPILE
 
 static void foreach_input(struct ct_yamlng_node key,
                           struct ct_yamlng_node value,
@@ -172,7 +171,6 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
     return 1;
 }
 
-#endif
 
 static void fullscreen_pass(viewport_instance *viewport,
                             ct_viewport viewport_id,
@@ -218,10 +216,10 @@ static void fullscreen_pass(viewport_instance *viewport,
 }
 
 void _init(struct ct_api_a0 *api) {
-#ifdef CETECH_CAN_COMPILE
+
     ct_viewport_a0.register_pass_compiler(
             ct_hash_a0.id64_from_str("fullscreen"), fullscreen_pass_compiler);
-#endif
+
 
     ct_viewport_a0.register_layer_pass(ct_hash_a0.id64_from_str("fullscreen"),
                                        fullscreen_pass);

@@ -62,7 +62,6 @@ int init_config(int argc,
                                       ct_config_a0.get_string(kernel_platform));
     char *build_config = ct_path_a0.join(a, 2, build_dir, "global.config");
 
-#ifdef CETECH_CAN_COMPILE
     ct_cvar source_dir = ct_config_a0.find("src");
     const char *source_dir_str = ct_config_a0.get_string(source_dir);
     char *source_config = ct_path_a0.join(a, 2, source_dir_str,
@@ -74,7 +73,6 @@ int init_config(int argc,
         ct_path_a0.copy_file(a, source_config, build_config);
     }
     CEL_FREE(a, source_config);
-#endif
 
     ct_config_a0.load_from_yaml_file(build_config, a);
 
@@ -132,9 +130,7 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(application);
 
-#ifdef CETECH_CAN_COMPILE
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
-#endif
 
     init_static_modules();
     CETECH_GET_API(api, ct_app_a0);

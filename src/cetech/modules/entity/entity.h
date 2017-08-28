@@ -168,7 +168,6 @@ struct ct_entity_a0 {
     struct ct_entity (*spawn)(struct ct_world world,
                               uint64_t name);
 
-#ifdef CETECH_CAN_COMPILE
 
     //! Create compiler output structure
     //! \return New compiler output structure
@@ -208,8 +207,6 @@ struct ct_entity_a0 {
                               const char *filename,
                               struct ct_blob *build,
                               struct ct_compilator_api *compilator_api);
-
-#endif
 };
 
 

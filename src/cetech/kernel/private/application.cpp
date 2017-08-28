@@ -236,7 +236,6 @@ extern "C" void application_start() {
 
     _init_config();
 
-#ifdef CETECH_CAN_COMPILE
     if (ct_config_a0.get_int(_G.config.compile)) {
         ct_resource_a0.compiler_compile_all();
 
@@ -244,7 +243,6 @@ extern "C" void application_start() {
             return;
         }
     }
-#endif
 
     _boot_stage();
 

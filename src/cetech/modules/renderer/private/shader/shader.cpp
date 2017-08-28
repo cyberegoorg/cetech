@@ -150,9 +150,7 @@ namespace shader {
 
         ct_resource_a0.register_type(_G.type,
                                      shader_resource::callback);
-#ifdef CETECH_CAN_COMPILE
         shader_compiler::init(api);
-#endif
 
         return 1;
     }

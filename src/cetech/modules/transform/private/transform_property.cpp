@@ -65,17 +65,14 @@ static void on_component(struct ct_world world, struct ct_entity entity) {
 static int _init(ct_api_a0 *api) {
     _G = {};
 
-#if CETECH_CAN_COMPILE
     ct_entity_property_a0.register_component(on_component);
-#endif
 
     return 1;
 }
 
 static void _shutdown() {
-#if CETECH_CAN_COMPILE
+
     ct_entity_property_a0.unregister_component(on_component);
-#endif
 
     _G = {};
 }

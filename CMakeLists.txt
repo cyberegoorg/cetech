@@ -226,17 +226,17 @@ include_directories(externals/build/${PLATFORM_ID}/release/include)
 ################################################################################
 # Cetech RUNTIME
 ################################################################################
-add_executable(cetech ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
-target_link_libraries(cetech ${RELEASE_LIBS})
-target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/)
-target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_executable(cetech ${MAIN_SOURCE_FILES})
+#target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
+#target_link_libraries(cetech ${RELEASE_LIBS})
+#target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/)
+#target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 ################################################################################
 # Cetech DEVELOP
 ################################################################################
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
+target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)

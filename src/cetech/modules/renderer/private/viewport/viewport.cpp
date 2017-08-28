@@ -837,9 +837,7 @@ namespace viewport_module {
                                      renderconfig_resource::callback);
 
 
-#ifdef CETECH_CAN_COMPILE
         renderconfig_compiler::init(api);
-#endif
 
         ct_app_a0.register_on_render(on_render);
         ct_app_a0.register_on_update(on_update);

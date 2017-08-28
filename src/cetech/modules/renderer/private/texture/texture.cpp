@@ -136,9 +136,8 @@ namespace texture {
 
         _G.handler_map.init(ct_memory_a0.main_allocator());
 
-#ifdef CETECH_CAN_COMPILE
+
         texture_compiler::init(api);
-#endif
 
         ct_resource_a0.register_type(_G.type,
                                      texture_resource::texture_resource_callback);

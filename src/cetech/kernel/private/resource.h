@@ -9,7 +9,6 @@ extern "C" {
 
 #include "cetech/kernel/hashlib.h"
 
-#ifdef CETECH_CAN_COMPILE
 
 void resource_compiler_register(uint64_t type,
                                 ct_resource_compilator_t compilator);
@@ -43,9 +42,6 @@ void type_name_from_filename(const char *fullname,
                              uint64_t *type,
                              uint64_t *name,
                              const char **short_name);
-
-#endif
-
 
 char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform);

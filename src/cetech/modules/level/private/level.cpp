@@ -126,7 +126,6 @@ namespace level_resource {
     };
 }
 
-#ifdef CETECH_CAN_COMPILE
 namespace level_resource_compiler {
     struct foreach_entities_data {
         const char *filename;
@@ -208,7 +207,6 @@ namespace level_resource_compiler {
         return 1;
     }
 }
-#endif
 
 //==============================================================================
 // Public interface
@@ -307,10 +305,8 @@ namespace level_module {
 
         ct_resource_a0.register_type(_G.level_type, level_resource::callback);
 
-#ifdef CETECH_CAN_COMPILE
         ct_resource_a0.compiler_register(_G.level_type,
                                          level_resource_compiler::compiler);
-#endif
 
     }
 

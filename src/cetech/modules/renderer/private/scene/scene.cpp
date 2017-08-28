@@ -226,9 +226,9 @@ namespace scene {
 
         ct_resource_a0.register_type(_G.type, scene_resource::callback);
 
-#ifdef CETECH_CAN_COMPILE
+
         scene_resource_compiler::init(api);
-#endif
+
 
         return 1;
     }

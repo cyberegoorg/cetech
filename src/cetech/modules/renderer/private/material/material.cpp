@@ -368,9 +368,8 @@ static int init(ct_api_a0 *api) {
 
     ct_resource_a0.register_type(_G.type, material_resource::callback);
 
-#ifdef CETECH_CAN_COMPILE
     material_compiler::init(api);
-#endif
+
     return 1;
 }
 

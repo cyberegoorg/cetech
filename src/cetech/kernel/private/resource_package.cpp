@@ -146,9 +146,8 @@ int package_init(ct_api_a0 *api) {
 
     _G.package_typel = ct_hash_a0.id64_from_str("package");
 
-#ifdef CETECH_CAN_COMPILE
     ct_resource_a0.compiler_register(_G.package_typel, _package_compiler);
-#endif
+
 
     return 1;
 }
