@@ -25,6 +25,7 @@ enum ct_fs_open_mode {
 
 //! Filesystem API V0
 struct ct_filesystem_a0 {
+
     //! Return root dir
     //! \param root Root
     //! \return Root dir or NULL if root is invalid.
@@ -58,11 +59,12 @@ struct ct_filesystem_a0 {
                     const char *path,
                     const char *filter,
                     bool only_dir,
+                    bool recursive,
                     char ***files,
                     uint32_t *count,
                     struct cel_alloc *allocator);
 
-    void (*listdir2)(uint64_t root,
+    void (*listdir_iter)(uint64_t root,
                     const char *path,
                     const char *filter,
                     bool only_dir,
@@ -90,15 +92,6 @@ struct ct_filesystem_a0 {
     int64_t (*file_mtime)(uint64_t root,
                           const char *path);
 
-    //! Get full path
-    //! \param root Root
-    //! \param result Result path
-    //! \param maxlen Max result len
-    //! \param filename Filename
-    //! \return 1 if ok else 0
-    char *(*fullpath)(uint64_t root,
-                      struct cel_alloc *,
-                      const char *filename);
 };
 
 #ifdef __cplusplus

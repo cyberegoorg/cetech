@@ -184,9 +184,8 @@ static int builddb_get_filename_by_hash(char *filename,
     return ok;
 }
 
-static int builddb_need_compile(const char *source_dir,
-                                const char *filename,
-                                struct ct_path_a0 *path) {
+static int builddb_need_compile(const char *filename,
+                                struct ct_filesystem_a0 *fs) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"
@@ -207,12 +206,9 @@ static int builddb_need_compile(const char *source_dir,
     while (_step(_db, stmt) == SQLITE_ROW) {
         compile = 0;
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
-        char *full_path = path->join(ct_memory_a0.main_allocator(), 2,
-                                     source_dir, dep_file);
 
-        time_t actual_mtime = path->file_mtime(full_path);
-
-        CEL_FREE(ct_memory_a0.main_allocator(), full_path);
+        time_t actual_mtime = fs->file_mtime(
+                ct_hash_a0.id64_from_str("source"), dep_file);
 
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 

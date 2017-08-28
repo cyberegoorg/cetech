@@ -9,9 +9,7 @@
 #include <celib/handler.inl>
 #include <celib/fpumath.h>
 
-#include <cetech/yaml/yaml.h>
 #include <cetech/api/api_system.h>
-#include <cetech/config/config.h>
 #include <cetech/macros.h>
 #include <cetech/module/module.h>
 #include <cetech/hashlib/hashlib.h>
@@ -30,12 +28,14 @@
 #include "bgfx/platform.h"
 
 #include <cetech/renderer/viewport.h>
+#include <cetech/yamlng/yamlng.h>
 #include "cetech/renderer/scene.h"
 #include "cetech/renderer/material.h"
 
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_material_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 
 //==============================================================================
@@ -130,43 +130,41 @@ struct fullscree_pass_data {
 
 #ifdef CETECH_CAN_COMPILE
 
-static void foreach_input(yaml_node_t key,
-                          yaml_node_t value,
+static void foreach_input(struct ct_yamlng_node key,
+                          struct ct_yamlng_node value,
                           void *_data) {
+    ct_yamlng_document* d = key.d;
+
     fullscree_pass_data *pass_data = static_cast<fullscree_pass_data *>(_data);
 
-    char str_buffer[128] = {};
-    yaml_as_string(key,
-                   str_buffer,
-                   CETECH_ARRAY_LEN(
-                           str_buffer) - 1);
-
+    const char* key_str = d->as_string(d->inst, key, "");
     memcpy(&pass_data->input_name[pass_data->input_count],
-           str_buffer,
+           key_str,
            sizeof(char) *
-           strlen(str_buffer) + 1);
+           strlen(key_str) + 1);
 
-    yaml_as_string(value,
-                   str_buffer,
-                   CETECH_ARRAY_LEN(
-                           str_buffer) - 1);
-
-    uint64_t resource_name = ct_hash_a0.id64_from_str(
-            str_buffer);
+    const char* resource_name_str = d->as_string(d->inst, value, "");
+    uint64_t resource_name = ct_hash_a0.id64_from_str(resource_name_str);
 
     pass_data->input_resource[pass_data->input_count] = resource_name;
-
     ++pass_data->input_count;
 }
 
-static int fullscreen_pass_compiler(yaml_node_t body,
+static int fullscreen_pass_compiler(struct ct_yamlng_node body,
                                     struct ct_blob *data) {
-    yaml_node_t input = yaml_get_node(body, "input");
+    ct_yamlng_document* d = body.d;
 
-    if (yaml_is_valid(input)) {
+    uint64_t keys[2] = {
+            d->hash(d->inst, body),
+            ct_yamlng_a0.calc_key("input")
+    };
+    uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+
+    ct_yamlng_node input = d->get(d->inst, k);
+    if (0 != input.idx) {
         fullscree_pass_data pass_data = {};
 
-        yaml_node_foreach_dict(input, foreach_input, &pass_data);
+        d->foreach_dict_node(d->inst, input, foreach_input, &pass_data);
 
         data->push(data->inst, &pass_data, sizeof(pass_data));
     }
@@ -241,6 +239,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_material_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             _init(api);

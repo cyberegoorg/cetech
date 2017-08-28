@@ -61,13 +61,13 @@ namespace playground {
 
             if (ImGui::BeginMenu("Layout")) {
                 if (ImGui::MenuItem("Save")) {
-                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_WRITE);
+                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "default.dock_layout", FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
                     ct_filesystem_a0.close(f);
                 }
 
                 if (ImGui::MenuItem("Load")) {
-                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_READ);
+                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "default.dock_layout", FS_OPEN_READ);
                     ct_debugui_a0.LoadDock(f);
                     ct_filesystem_a0.close(f);
                 }
@@ -118,7 +118,7 @@ namespace playground_module {
         ct_debugui_a0.register_on_debugui(playground::on_debugui);
 
         if(!_G.layout_loaded) {
-            ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"), "default.dock_layout", FS_OPEN_READ);
+            ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "default.dock_layout", FS_OPEN_READ);
             ct_debugui_a0.LoadDock(f);
             ct_filesystem_a0.close(f);
             _G.layout_loaded = true;

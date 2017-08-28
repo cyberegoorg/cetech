@@ -134,51 +134,52 @@ static void _boot_unload() {
 
 
 extern "C" void application_start() {
-    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("core"),
-                                      "playground/cube.scene",
+    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"),
+                                      "default.render_config",
                                       FS_OPEN_READ);
 
     ct_yamlng_document* d = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
     ct_filesystem_a0.close(f);
 
     uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
-    uint64_t key2 = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
-
+//    uint64_t key2 = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
 
     uint64_t keys2[] = {
-            ct_hash_a0.id64_from_str("graph"),
-            ct_hash_a0.id64_from_str("root"),
-            ct_hash_a0.id64_from_str("local"),
+            ct_hash_a0.id64_from_str("viewport"),
+            ct_hash_a0.id64_from_str("default"),
+            ct_hash_a0.id64_from_str("local_resource"),
+            ct_hash_a0.id64_from_str("2"),
+            ct_hash_a0.id64_from_str("name"),
     };
-    key2 = ct_yamlng_a0.combine_key(keys2, CETECH_ARRAY_LEN(keys2));
+    key = ct_yamlng_a0.combine_key(keys2, CETECH_ARRAY_LEN(keys2));
 
-    uint64_t keys[] = {
-            ct_hash_a0.id64_from_str("graph"),
-            //ct_hash_a0.id64_from_str("root"),
-    };
-    key = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+//    uint64_t keys[] = {
+//            ct_hash_a0.id64_from_str("graph"),
+//            //ct_hash_a0.id64_from_str("root"),
+//    };
+//    key = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
 
-    ct_yamlng_node node = d->get(d->inst, key);
-    ct_yamlng_node node2 = d->get(d->inst, key2);
-    CEL_UNUSED(node2);
-
-    d->foreach_dict_node(d->inst, node, [](
-                struct ct_yamlng_node key,
-                struct ct_yamlng_node value,
-                void *data) {
-                ct_yamlng_document* d = (ct_yamlng_document*)data;
-
-                uint64_t keys[] = {
-                        d->hash(d->inst, value),
-                        ct_hash_a0.id64_from_str("local"),
-                };
-                uint64_t  k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-
-                ct_yamlng_node node = d->get(d->inst, k);
-
-                //const char* s = d->as_string(d->inst, key, "NULL");
-                ct_log_a0.info(LOG_WHERE, "KEYS: %d", d->type(d->inst, node));
-        }, d);
+//    ct_yamlng_node node = d->get(d->inst, key);
+//    ct_yamlng_node node2 = d->get(d->inst, key2);
+//    CEL_UNUSED(node2);
+//
+//    d->foreach_dict_node(d->inst, node, [](
+//                struct ct_yamlng_node key,
+//                struct ct_yamlng_node value,
+//                void *data) {
+//                ct_yamlng_document* d = (ct_yamlng_document*)data;
+//
+//                uint64_t keys[] = {
+//                        d->hash(d->inst, value),
+//                        ct_hash_a0.id64_from_str("local"),
+//                };
+//                uint64_t  k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+//
+//                ct_yamlng_node node = d->get(d->inst, k);
+//
+//                //const char* s = d->as_string(d->inst, key, "NULL");
+//                ct_log_a0.info(LOG_WHERE, "KEYS: %d", d->type(d->inst, node));
+//        }, d);
 
 //    ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA %s", d->get_string(d->inst, key, "NULL"));
 //
@@ -224,13 +225,14 @@ extern "C" void application_start() {
 //    }
 //
     if(d->has_key(d->inst, key)) {
-        ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA dsadsad");
+        ct_yamlng_node node = d->get(d->inst, key);
+        ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA dsadsad %s: %d", d->as_string(d->inst, node, ""), d->type(d->inst, node));
     }
 
     ct_yamlng_a0.destroy(d);
 
 
-    //return;
+//    return;
 
     _init_config();
 

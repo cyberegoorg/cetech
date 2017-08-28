@@ -60,7 +60,7 @@ struct viewport_instance {
     uint32_t resource_count;
 };
 
-typedef int (*ct_viewport_pass_compiler)(yaml_node_t body,
+typedef int (*ct_viewport_pass_compiler)(struct ct_yamlng_node body,
                                          struct ct_blob *data);
 
 typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,

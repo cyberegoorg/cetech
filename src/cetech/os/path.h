@@ -87,6 +87,8 @@ struct ct_path_a0 {
     void (*copy_file)(struct cel_alloc *allocator,
                       const char *from,
                       const char *to);
+
+    bool (*is_dir)(const char* path);
 };
 
 #ifdef __cplusplus

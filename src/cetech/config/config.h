@@ -14,10 +14,6 @@ extern "C" {
 
 #include <stdint.h>
 
-struct ct_api_a0;
-struct ct_memory_a0;
-struct ct_app_a0;
-
 struct cel_alloc;
 
 //==============================================================================

@@ -10,10 +10,10 @@
 #include <cetech/log/log.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/config/config.h>
-#include <cetech/yaml/yaml.h>
 #include <celib/memory.h>
 #include <cetech/module/module.h>
 #include <celib/buffer.inl>
+#include <cetech/yamlng/yamlng.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -21,6 +21,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 //==============================================================================
 // Defines
@@ -274,34 +275,35 @@ namespace config {
         char *root_name;
     };
 
-    void foreach_config_clb(yaml_node_t key,
-                            yaml_node_t value,
+    void foreach_config_clb(struct ct_yamlng_node key,
+                            struct ct_yamlng_node value,
                             void *_data) {
-        struct foreach_config_data *output = (foreach_config_data *) _data;
 
-        char key_str[128] = {};
-        yaml_as_string(key, key_str, CETECH_ARRAY_LEN(key_str));
+        struct foreach_config_data *output = (foreach_config_data *) _data;
+        ct_yamlng_document* d = key.d;
+
+        const char* key_str = d->as_string(d->inst, key, "");
 
         char name[1024] = {};
         if (output->root_name != NULL) {
-            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
-                     key_str);
+            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
         } else {
             snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
         }
 
-        enum yaml_node_type type = yaml_node_type(value);
+        enum node_type type = d->type(d->inst, value);
 
-        if (type == YAML_TYPE_MAP) {
+        if (type == NODE_MAP) {
             struct foreach_config_data data = {
                     .root_name = name
             };
 
-            yaml_node_foreach_dict(value, foreach_config_clb, &data);
-        } else if (type == YAML_TYPE_SCALAR) {
+            d->foreach_dict_node(d->inst, value, foreach_config_clb, &data);
+
+        } else if (type != NODE_SEQ) {
             float tmp_f;
             int tmp_int;
-            char tmp_str[128];
+            const char * str;
 
             ct_cvar cvar = find(name);
             if (cvar.idx != 0) {
@@ -310,17 +312,16 @@ namespace config {
                     case CV_NONE:
                         break;
                     case CV_FLOAT:
-                        tmp_f = yaml_as_float(value);
+                        tmp_f = d->as_float(d->inst, value, 0.0f);
                         set_float(cvar, tmp_f);
                         break;
                     case CV_INT:
-                        tmp_int = yaml_as_int(value);
+                        tmp_int = (int)d->as_float(d->inst, value, 0.0f);
                         set_int(cvar, tmp_int);
                         break;
                     case CV_STRING:
-                        yaml_as_string(value, tmp_str,
-                                       CETECH_ARRAY_LEN(tmp_str));
-                        set_string(cvar, tmp_str);
+                        str = d->as_string(d->inst, value, "");
+                        set_string(cvar, str);
                         break;
                 }
             }
@@ -330,26 +331,20 @@ namespace config {
 
     int load_from_yaml_file(const char *yaml,
                             cel_alloc *alloc) {
-        ct_vio *source_vio = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
-
-        auto file_size = source_vio->size(source_vio->inst);
-
-        char *data = CEL_ALLOCATE(alloc, char, file_size);
-        celib::mem_set(data, 0, file_size);
-
-        source_vio->read(source_vio->inst, data, file_size, 1);
-        source_vio->close(source_vio->inst);
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(data, &h);
+        ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
+        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
+                                                      ct_memory_a0.main_allocator());
+        f->close(f->inst);
 
         struct foreach_config_data config_data = {
                 .root_name = NULL
         };
 
-        yaml_node_foreach_dict(root, foreach_config_clb, &config_data);
 
-        CEL_FREE(alloc, data);
+        d->foreach_dict_node(d->inst, d->get(d->inst, 0), foreach_config_clb,
+                             &config_data);
+
+        ct_yamlng_a0.destroy(d);
 
         return 1;
     }
@@ -473,6 +468,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
 

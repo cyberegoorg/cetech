@@ -39,8 +39,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
 const char *resource_compiler_get_core_dir();
 
-void type_name_from_filename(const char *dir,
-                             const char *fullname,
+void type_name_from_filename(const char *fullname,
                              uint64_t *type,
                              uint64_t *name,
                              const char **short_name);

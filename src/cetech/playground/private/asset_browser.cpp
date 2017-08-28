@@ -30,6 +30,13 @@ static struct _G {
     const char *root;
     bool visible;
 
+    char **dirtree_list;
+    uint32_t dirtree_list_count;
+
+    bool reload_item_list;
+    char **item_list;
+    uint32_t item_list_count;
+
     Array<ct_ab_on_asset_click> on_asset_click;
     Array<ct_ab_on_asset_double_click> on_asset_double_click;
 } _G;
@@ -65,56 +72,31 @@ static ct_asset_browser_a0 asset_browser_api = {
         .unregister_on_asset_double_click = unregister_on_asset_double_click_,
 };
 
-static void leftColumn() {
+static void dir_list_column() {
     ImVec2 size = {_G.left_column_width, 0.0f};
 
     ImGui::BeginChild("left_col", size);
     ImGui::PushItemWidth(120);
 
-    if (ImGui::TreeNode("Source")) {
-        if (ImGui::Selectable("source")) {
-            strcpy(_G.current_dir, "");
-            _G.root = "source";
-        }
-
-        ct_filesystem_a0.listdir2(
-                ct_hash_a0.id64_from_str("source"),
-                "", "*",
-                true, true,
-                [](const char *path) {
-                    const char *short_path = path +
-                                             strlen(ct_filesystem_a0.root_dir(
-                                                     ct_hash_a0.id64_from_str(
-                                                             "source"))) + 1;
-                    if (ImGui::Selectable(short_path)) {
-                        strcpy(_G.current_dir, short_path);
-                        _G.root = "source";
-                    }
-                });
-
-        ImGui::TreePop();
+    if (!_G.dirtree_list) {
+        cel_alloc *a = ct_memory_a0.main_allocator();
+        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"), "", "*",
+                                 true, true, &_G.dirtree_list,
+                                 &_G.dirtree_list_count, a);
     }
 
-    if (ImGui::TreeNode("Core")) {
-        if (ImGui::Selectable("core")) {
+    if (ImGui::TreeNode("Source")) {
+        if (ImGui::Selectable(".")) {
             strcpy(_G.current_dir, "");
-            _G.root = "core";
+            _G.reload_item_list = true;
         }
 
-        ct_filesystem_a0.listdir2(
-                ct_hash_a0.id64_from_str("core"),
-                "", "*",
-                true, true,
-                [](const char *path) {
-                    const char *short_path = path +
-                                             strlen(ct_filesystem_a0.root_dir(
-                                                     ct_hash_a0.id64_from_str(
-                                                             "core"))) + 1;
-                    if (ImGui::Selectable(short_path)) {
-                        strcpy(_G.current_dir, short_path);
-                        _G.root = "core";
-                    }
-                });
+        for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
+            if (ImGui::Selectable(_G.dirtree_list[i])) {
+                strcpy(_G.current_dir, _G.dirtree_list[i]);
+                _G.reload_item_list = true;
+            }
+        }
 
         ImGui::TreePop();
     }
@@ -123,40 +105,50 @@ static void leftColumn() {
     ImGui::EndChild();
 }
 
-static void middleColumn() {
+static void item_list_column() {
     ImVec2 size = {_G.midle_column_width, 0.0f};
 
     ImGui::BeginChild("middle_col", size);
 
-    if (_G.root) {
-        ct_filesystem_a0.listdir2(
-                ct_hash_a0.id64_from_str(_G.root),
-                _G.current_dir, "*",
-                false, false,
-                [](const char *path) {
-                    auto root = ct_hash_a0.id64_from_str(_G.root);
-                    const char *root_dir = ct_filesystem_a0.root_dir(root);
+    if (_G.reload_item_list) {
+        cel_alloc *a = ct_memory_a0.main_allocator();
 
-                    const char *filename = ct_path_a0.filename(path);
-                    if (ImGui::Selectable(filename, false, ImGuiSelectableFlags_AllowDoubleClick)) {
-                        uint64_t type, name;
-                        ct_resource_a0.type_name_from_filename(root_dir, path,
-                                                               &type, &name,
-                                                               NULL);
+        if(_G.item_list) {
+            ct_filesystem_a0.listdir_free(_G.item_list, _G.item_list_count, a);
+        }
 
-                        if (ImGui::IsMouseDoubleClicked(0)) {
-                            for (uint32_t i = 0;
-                                 i < array::size(_G.on_asset_double_click); ++i) {
-                                _G.on_asset_double_click[i](type, name, root, path + strlen(root_dir) + 1);
-                            }
-                        } else {
-                            for (uint32_t i = 0;
-                                 i < array::size(_G.on_asset_click); ++i) {
-                                _G.on_asset_click[i](type, name, root, path + strlen(root_dir) + 1);
-                            }
-                        }
+        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+                                 _G.current_dir, "*",
+                                 false, false, &_G.item_list,
+                                 &_G.item_list_count, a);
+
+        _G.reload_item_list = false;
+    }
+
+    if (_G.item_list) {
+        for (uint32_t i = 0; i < _G.item_list_count; ++i) {
+            const char *path = _G.item_list[i];
+            const char *filename = ct_path_a0.filename(path);
+
+            uint64_t type, name;
+            ct_resource_a0.type_name_from_filename(path,
+                                                   &type, &name,
+                                                   NULL);
+            if (ImGui::Selectable(filename, false,
+                                  ImGuiSelectableFlags_AllowDoubleClick)) {
+                if (ImGui::IsMouseDoubleClicked(0)) {
+                    for (uint32_t i = 0;
+                         i < array::size(_G.on_asset_double_click); ++i) {
+                        _G.on_asset_double_click[i](type, name, ct_hash_a0.id64_from_str("source"), path);
                     }
-                });
+                } else {
+                    for (uint32_t i = 0;
+                         i < array::size(_G.on_asset_click); ++i) {
+                        _G.on_asset_click[i](type, name, ct_hash_a0.id64_from_str("source"), path);
+                    }
+                }
+            }
+        }
     }
 
     ImGui::EndChild();
@@ -174,7 +166,7 @@ static void on_debugui() {
                                     _G.left_column_width -
                                     120;
 
-        leftColumn();
+        dir_list_column();
 
         float left_size[] = {_G.left_column_width, 0.0f};
         ct_debugui_a0.SameLine(0.0f, -1.0f);
@@ -182,7 +174,7 @@ static void on_debugui() {
         _G.left_column_width = left_size[0];
         ct_debugui_a0.SameLine(0.0f, -1.0f);
 
-        middleColumn();
+        item_list_column();
 
     }
 

@@ -495,7 +495,7 @@ namespace scene_resource_compiler {
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
         if (document->get_bool(document->inst,
-                               ct_yamlng_a0.calc_key("postprocess.flip_uvs"),
+                               ct_yamlng_a0.calc_key("import.postprocess.flip_uvs"),
                                false)) {
             postprocess_flag |= aiProcess_FlipUVs;
         }

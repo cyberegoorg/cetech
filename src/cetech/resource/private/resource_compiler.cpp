@@ -90,15 +90,12 @@ struct G {
 // Private
 //==============================================================================
 
-void type_name_from_filename(const char *dir,
-                             const char *fullname,
+void type_name_from_filename(const char *fullname,
                              uint64_t *type,
                              uint64_t *name,
                              const char **short_name) {
 
-    size_t dir_len = strlen(dir);
-
-    const char *filename_short = fullname + dir_len + 1;
+    const char *filename_short = fullname;
     const char *resource_type = ct_path_a0.extension(filename_short);
 
     char resource_name[128] = {};
@@ -117,17 +114,11 @@ void type_name_from_filename(const char *dir,
 
 void _add_dependency(const char *who_filename,
                      const char *depend_on_filename) {
-    auto a = ct_memory_a0.main_allocator();
-
     builddb_set_file_depend(who_filename, depend_on_filename);
-
-    char *path = ct_path_a0.join(a, 2,
-                                 ct_resource_a0.compiler_get_source_dir(),
-                                 depend_on_filename);
-
-    builddb_set_file(depend_on_filename, ct_path_a0.file_mtime(path));
-
-    CEL_FREE(a, path);
+    builddb_set_file(depend_on_filename,
+                     ct_filesystem_a0.file_mtime(
+                             ct_hash_a0.id64_from_str("source"),
+                             depend_on_filename));
 }
 
 static ct_compilator_api _compilator_api = {
@@ -190,22 +181,16 @@ compilator _find_compilator(uint64_t type) {
 }
 
 void _compile_dir(Array<ct_task_item> &tasks,
-                  const char *dir,
                   char **files,
                   uint32_t files_count,
-                  const char *build_dir,
                   celib::Map<uint64_t> &compiled) {
-
-    auto a = ct_memory_a0.main_allocator();
-
     for (uint32_t i = 0; i < files_count; ++i) {
-        const char *source_filename_full = files[i];
         const char *source_filename_short;
 
         uint64_t type_id;
         uint64_t name_id;
 
-        type_name_from_filename(dir, files[i], &type_id, &name_id,
+        type_name_from_filename(files[i], &type_id, &name_id,
                                 &source_filename_short);
 
         compilator compilator = _find_compilator(type_id);
@@ -214,7 +199,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
             continue;
         }
 
-        if (!builddb_need_compile(dir, source_filename_short, &ct_path_a0)) {
+        if (!builddb_need_compile(source_filename_short, &ct_filesystem_a0)) {
             continue;
         }
 
@@ -224,19 +209,27 @@ void _compile_dir(Array<ct_task_item> &tasks,
 
         builddb_set_file_hash(source_filename_short, build_name);
 
-        ct_vio *source_vio = ct_vio_a0.from_file(
-                source_filename_full,
-                VIO_OPEN_READ);
+        ct_vio *source_vio = ct_filesystem_a0.open(
+                ct_hash_a0.id64_from_str("source"),
+                source_filename_short,
+                FS_OPEN_READ);
 
         if (source_vio == NULL) {
             continue;
         }
 
-        char *build_path = ct_path_a0.join(a, 2, build_dir, build_name);
+        auto platform = ct_config_a0.find("kernel.platform");
+        char *build_full = ct_path_a0.join(
+                ct_memory_a0.main_allocator(), 2,
+                ct_config_a0.get_string(platform),
+                build_name);
 
-        ct_vio *build_vio = ct_vio_a0.from_file(build_path, VIO_OPEN_WRITE);
+        ct_vio *build_vio = ct_filesystem_a0.open(
+                ct_hash_a0.id64_from_str("build"),
+                build_full,
+                FS_OPEN_WRITE);
 
-        CEL_FREE(a, build_path);
+        CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
         if (build_vio == NULL) {
             continue;
@@ -256,7 +249,10 @@ void _compile_dir(Array<ct_task_item> &tasks,
                 .compilator = compilator,
                 .source_filename = ct_memory_a0.str_dup(source_filename_short,
                                                         ct_memory_a0.main_scratch_allocator()),
-                .mtime = ct_path_a0.file_mtime(source_filename_full),
+                .mtime = ct_filesystem_a0.file_mtime(
+                        ct_hash_a0.id64_from_str("source"),
+                        source_filename_short),
+
                 .completed = 0
         };
 
@@ -320,36 +316,19 @@ void compiler_register_yaml(uint64_t type,
 }
 
 void _resource_compiler_compile_all(celib::Map<uint64_t> &compiled) {
-    const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
-    const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
-
-    auto platform = ct_config_a0.find("kernel.platform");
-
-    char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
-            ct_memory_a0.main_allocator(),
-            ct_config_a0.get_string(platform)
-    );
-
     Array<ct_task_item> tasks(ct_memory_a0.main_allocator());
-
-    const char *dirs[] = {source_dir, core_dir};
-
     const char *glob_patern = "**.*";
+    char **files = nullptr;
+    uint32_t files_count = 0;
 
-    for (uint32_t i = 0; i < CETECH_ARRAY_LEN(dirs); ++i) {
-        char **files = nullptr;
-        uint32_t files_count = 0;
-
-
-        ct_path_a0.list(dirs[i], glob_patern, 1, 0, &files, &files_count,
-                        ct_memory_a0.main_scratch_allocator());
-
-        _compile_dir(tasks, dirs[i], files, files_count, build_dir_full,
-                     compiled);
-
-        ct_path_a0.list_free(files, files_count,
+    ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+                             "", glob_patern, false, true, &files, &files_count,
                              ct_memory_a0.main_scratch_allocator());
-    }
+
+    _compile_dir(tasks, files, files_count, compiled);
+
+    ct_filesystem_a0.listdir_free(files, files_count,
+                                  ct_memory_a0.main_scratch_allocator());
 
     ct_task_a0.add(tasks._data, tasks._size);
 
@@ -359,8 +338,6 @@ void _resource_compiler_compile_all(celib::Map<uint64_t> &compiled) {
         ct_task_a0.wait_atomic(&data->completed, 0);
         CEL_FREE(ct_memory_a0.main_allocator(), data);
     }
-
-    CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 }
 
 
@@ -507,7 +484,7 @@ static void _init(ct_api_a0 *api) {
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
     ct_filesystem_a0.map_root_dir(
-            ct_hash_a0.id64_from_str("core"),
+            ct_hash_a0.id64_from_str("source"),
             core_dir
     );
 

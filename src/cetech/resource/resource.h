@@ -259,8 +259,7 @@ struct ct_resource_a0 {
     //! \return Core dir
     const char *(*compiler_get_core_dir)();
 
-    void (*type_name_from_filename)(const char *dir,
-                                 const char *fullname,
+    void (*type_name_from_filename)(const char *fullname,
                                  uint64_t *type,
                                  uint64_t *name,
                                  const char **short_name);

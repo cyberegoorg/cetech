@@ -9,7 +9,6 @@
 #include <celib/handler.inl>
 #include <celib/fpumath.h>
 
-#include <cetech/yaml/yaml.h>
 #include <cetech/api/api_system.h>
 #include <cetech/config/config.h>
 #include <cetech/macros.h>
@@ -53,6 +52,7 @@ CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_blob_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 using namespace celib;
 
@@ -401,101 +401,87 @@ struct compiler_output {
 };
 
 void compile_global_resource(uint32_t idx,
-                             yaml_node_t value,
+                             struct ct_yamlng_node value,
                              void *_data) {
-    char str_buffer[128] = {};
     render_resource_t gs = {};
 
     compiler_output &output = *((compiler_output *) _data);
+    ct_yamlng_document* d = value.d;
 
     ////////////////////////////////////////////////////
-    yaml_node_t name = yaml_get_node(value, "name");
-    yaml_as_string(name, str_buffer,
-                   CETECH_ARRAY_LEN(str_buffer) - 1);
-
-    gs.name = ct_hash_a0.id64_from_str(str_buffer);
-
-
-    /////////////////////////////////////////////////////
-    yaml_node_t type = yaml_get_node(value, "type");
-    yaml_as_string(type, str_buffer,
-                   CETECH_ARRAY_LEN(str_buffer) - 1);
-
-    gs.type = ct_hash_a0.id64_from_str(str_buffer);
-
+    uint64_t keys[2] = {
+            d->hash(d->inst, value),
+            ct_yamlng_a0.calc_key("name")
+    };
+    uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* name_str = d->get_string(d->inst, k, "");
+    gs.name = ct_hash_a0.id64_from_str(name_str);
 
     /////////////////////////////////////////////////////
-    yaml_node_t format = yaml_get_node(value, "format");
-    yaml_as_string(format, str_buffer,
-                   CETECH_ARRAY_LEN(str_buffer) - 1);
-
-    gs.format = ct_hash_a0.id64_from_str(str_buffer);
+    keys[1] = ct_yamlng_a0.calc_key("type");
+    k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* type_str = d->get_string(d->inst, k, "");
+    gs.type = ct_hash_a0.id64_from_str(type_str);
 
     /////////////////////////////////////////////////////
-    yaml_node_t ration = yaml_get_node(value, "ration");
-    yaml_as_string(ration, str_buffer,
-                   CETECH_ARRAY_LEN(str_buffer) - 1);
+    keys[1] = ct_yamlng_a0.calc_key("format");
+    k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* format_str = d->get_string(d->inst, k, "");
+    gs.format = ct_hash_a0.id64_from_str(format_str);
 
-    gs.ration = ct_hash_a0.id64_from_str(str_buffer);
-
+    /////////////////////////////////////////////////////
+    keys[1] = ct_yamlng_a0.calc_key("ration");
+    k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* ration_str = d->get_string(d->inst, k, "");
+    gs.ration = ct_hash_a0.id64_from_str(ration_str);
 
     array::push_back(output.global_resource, gs);
 }
 
 
 void compile_layer_entry(uint32_t idx,
-                         yaml_node_t value,
+                         struct ct_yamlng_node value,
                          void *_data) {
-    char str_buffer[128] = {};
     layer_entry_t le = {};
 
     auto &output = *((compiler_output *) _data);
+    ct_yamlng_document* d = value.d;
 
     ////////////////////////////////////////////////////
-    yaml_node_t name = yaml_get_node(value,
-                                     "name");
-    yaml_as_string(name, str_buffer,
-                   CETECH_ARRAY_LEN(
-                           str_buffer) - 1);
+    uint64_t keys[2] = {
+            d->hash(d->inst, value),
+            ct_yamlng_a0.calc_key("name")
+    };
+    uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* name_str = d->get_string(d->inst, k, "");
+    le.name = ct_hash_a0.id64_from_str(name_str);
 
-    le.name = ct_hash_a0.id64_from_str(
-            str_buffer);
-
-
-    /////////////////////////////////////////////////////
-    yaml_node_t type = yaml_get_node(value,
-                                     "type");
-
-    yaml_as_string(type, str_buffer,
-                   CETECH_ARRAY_LEN(
-                           str_buffer) - 1);
-
-    le.type = ct_hash_a0.id64_from_str(
-            str_buffer);
 
     /////////////////////////////////////////////////////
-    yaml_node_t output_t = yaml_get_node(
-            value,
-            "output");
-    if (yaml_is_valid(output_t)) {
-        yaml_node_foreach_seq(
-                output_t,
+    keys[1] = ct_yamlng_a0.calc_key("type");
+    k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    const char* type_str = d->get_string(d->inst, k, "");
+    le.type = ct_hash_a0.id64_from_str(type_str);
+
+    /////////////////////////////////////////////////////
+    keys[1] = ct_yamlng_a0.calc_key("output");
+    k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+
+    ct_yamlng_node output_node = d->get(d->inst, k);
+    if (0 != output_node.idx) {
+        d->foreach_seq_node(
+                d->inst,
+                output_node,
                 [](uint32_t idx,
-                   yaml_node_t value,
+                   struct ct_yamlng_node value,
                    void *_data) {
-                    char str_buffer[128] = {};
                     auto &le = *((layer_entry_t *) _data);
+                    ct_yamlng_document* d = value.d;
 
-                    yaml_as_string(value,
-                                   str_buffer,
-                                   CETECH_ARRAY_LEN(
-                                           str_buffer) -
-                                   1);
+                    const char* output_name = d->as_string(d->inst, value, "");
+                    le.output[idx] = ct_hash_a0.id64_from_str(output_name);
 
-                    le.output[idx] = ct_hash_a0.id64_from_str(
-                            str_buffer);
                     ++le.output_count;
-
                 }, &le);
     }
 
@@ -515,49 +501,32 @@ void compile_layer_entry(uint32_t idx,
 
 }
 
-void compile_layers(yaml_node_t key,
-                    yaml_node_t value,
+void compile_layers(struct ct_yamlng_node key,
+                    struct ct_yamlng_node value,
                     void *_data) {
-    char str_buffer[128] = {};
-
+    ct_yamlng_document* d = key.d;
     compiler_output &output = *((compiler_output *) _data);
 
-    yaml_as_string(key, str_buffer,
-                   CETECH_ARRAY_LEN(str_buffer) - 1);
+    const char* name_str = d->as_string(d->inst, key, "");
 
-    auto name_id = ct_hash_a0.id64_from_str(str_buffer);
-    auto layer_offset = array::size(
-            output.layers_entry);
+    auto name_id = ct_hash_a0.id64_from_str(name_str);
+    auto layer_offset = array::size(output.layers_entry);
 
     array::push_back(output.layer_names, name_id);
     array::push_back(output.layers_entry_offset, layer_offset);
 
-    yaml_node_foreach_seq(value, compile_layer_entry, &output);
+    d->foreach_seq_node(d->inst, value, compile_layer_entry, &output);
 
     const uint32_t entry_count = array::size(output.layers_entry);
 
-    array::push_back(output.layers_entry_count,
-                     entry_count - layer_offset);
+    array::push_back(output.layers_entry_count,entry_count - layer_offset);
 }
 
 namespace renderconfig_compiler {
-
-
     int compiler(const char *filename,
-                 ct_vio *source_vio,
+                 struct ct_yamlng_document *doc,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
-
-        char *source_data =
-                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             source_vio->size(source_vio->inst) + 1);
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
 
         struct compiler_output output = {};
         output.global_resource.init(ct_memory_a0.main_allocator());
@@ -578,55 +547,44 @@ namespace renderconfig_compiler {
         //==================================================================
         // Global resource
         //==================================================================
-        yaml_node_t global_resource = yaml_get_node(root,
-                                                    "global_resource");
-        if (yaml_is_valid(global_resource)) {
-            yaml_node_foreach_seq(
-                    global_resource,
-                    compile_global_resource, &output);
+        ct_yamlng_node global_resource = doc->get(doc->inst, ct_yamlng_a0.calc_key("global_resource"));
+        if (0 != global_resource.idx) {
+            doc->foreach_seq_node(doc->inst, global_resource, compile_global_resource, &output);
         }
 
         //==================================================================
         // layers
         //==================================================================
-        yaml_node_t layers = yaml_get_node(root, "layers");
-        if (yaml_is_valid(layers)) {
-
-            yaml_node_foreach_dict(
-                    layers,
-                    compile_layers, &output);
+        ct_yamlng_node layers = doc->get(doc->inst, ct_yamlng_a0.calc_key("layers"));
+        if (0 != layers.idx) {
+            doc->foreach_dict_node(doc->inst, layers, compile_layers, &output);
         }
 
         //==================================================================
         // Viewport
         //==================================================================
-        yaml_node_t viewport = yaml_get_node(root, "viewport");
-        if (yaml_is_valid(viewport)) {
-
-            yaml_node_foreach_dict(
+        ct_yamlng_node viewport = doc->get(doc->inst, ct_yamlng_a0.calc_key("viewport"));
+        if (0 != viewport.idx) {
+            doc->foreach_dict_node(
+                    doc->inst,
                     viewport,
-                    [](yaml_node_t key,
-                       yaml_node_t value,
+                    [](struct ct_yamlng_node key,
+                       struct ct_yamlng_node value,
                        void *_data) {
-                        char str_buffer[128] = {};
-
+                        ct_yamlng_document* d = key.d;
                         compiler_output &output = *((compiler_output *) _data);
 
-                        yaml_as_string(key, str_buffer,
-                                       CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                        auto name_id = ct_hash_a0.id64_from_str(str_buffer);
-
-                        yaml_as_string(key, str_buffer,
-                                       CETECH_ARRAY_LEN(str_buffer) - 1);
-
-                        yaml_node_t layers = yaml_get_node(value, "layers");
-                        yaml_as_string(layers, str_buffer,
-                                       CETECH_ARRAY_LEN(str_buffer) - 1);
-                        auto layers_id = ct_hash_a0.id64_from_str(
-                                str_buffer);
+                        const char* name_str = d->as_string(d->inst, key, "");
+                        auto name_id = ct_hash_a0.id64_from_str(name_str);
 
 
+                        uint64_t keys[2] = {
+                                d->hash(d->inst, value),
+                                ct_yamlng_a0.calc_key("layers")
+                        };
+                        uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                        const char* layers_str = d->get_string(d->inst, k, "");
+                        auto layers_id = ct_hash_a0.id64_from_str(layers_str);
                         viewport_entry_t ve = {};
 
                         ve.name = name_id;
@@ -642,64 +600,48 @@ namespace renderconfig_compiler {
                                 output.layers_localresource_offset,
                                 localresource_offset);
 
-                        yaml_node_t local_resource = yaml_get_node(value,
-                                                                   "local_resource");
-                        if (yaml_is_valid(local_resource)) {
-                            yaml_node_foreach_seq(
+                        keys[1] = ct_yamlng_a0.calc_key("local_resource");
+                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                        ct_yamlng_node local_resource = d->get(d->inst, k);
+                        if (0 != local_resource.idx) {
+                            d->foreach_seq_node(
+                                    d->inst,
                                     local_resource,
                                     [](uint32_t idx,
-                                       yaml_node_t value,
+                                       struct ct_yamlng_node value,
                                        void *_data) {
-                                        char str_buffer[128] = {};
                                         render_resource_t gs = {};
 
                                         compiler_output &output = *((compiler_output *) _data);
+                                        ct_yamlng_document* d = value.d;
 
                                         ////////////////////////////////////////////////////
-                                        yaml_node_t name = yaml_get_node(
-                                                value, "name");
-                                        yaml_as_string(name, str_buffer,
-                                                       CETECH_ARRAY_LEN(
-                                                               str_buffer) -
-                                                       1);
+                                        uint64_t keys[2] = {
+                                                d->hash(d->inst, value),
+                                                ct_yamlng_a0.calc_key("name")
+                                        };
+                                        uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                                        const char* name_str = d->get_string(d->inst, k, "");
+                                        gs.name = ct_hash_a0.id64_from_str(name_str);
 
-                                        gs.name = ct_hash_a0.id64_from_str(
-                                                str_buffer);
+                                        /////////////////////////////////////////////////////
+                                        keys[1] = ct_yamlng_a0.calc_key("type");
+                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                                        const char* type_str = d->get_string(d->inst, k, "");
+                                        gs.type = ct_hash_a0.id64_from_str(type_str);
 
 
                                         /////////////////////////////////////////////////////
-                                        yaml_node_t type = yaml_get_node(
-                                                value, "type");
-                                        yaml_as_string(type, str_buffer,
-                                                       CETECH_ARRAY_LEN(
-                                                               str_buffer) -
-                                                       1);
-
-                                        gs.type = ct_hash_a0.id64_from_str(
-                                                str_buffer);
-
+                                        keys[1] = ct_yamlng_a0.calc_key("format");
+                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                                        const char* format_str = d->get_string(d->inst, k, "");
+                                        gs.format = ct_hash_a0.id64_from_str(format_str);
 
                                         /////////////////////////////////////////////////////
-                                        yaml_node_t format = yaml_get_node(
-                                                value, "format");
-                                        yaml_as_string(format, str_buffer,
-                                                       CETECH_ARRAY_LEN(
-                                                               str_buffer) -
-                                                       1);
-
-                                        gs.format = ct_hash_a0.id64_from_str(
-                                                str_buffer);
-
-                                        /////////////////////////////////////////////////////
-                                        yaml_node_t ration = yaml_get_node(
-                                                value, "ration");
-                                        yaml_as_string(ration, str_buffer,
-                                                       CETECH_ARRAY_LEN(
-                                                               str_buffer) -
-                                                       1);
-
-                                        gs.ration = ct_hash_a0.id64_from_str(
-                                                str_buffer);
+                                        keys[1] = ct_yamlng_a0.calc_key("ration");
+                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                                        const char* ration_str = d->get_string(d->inst, k, "");
+                                        gs.ration = ct_hash_a0.id64_from_str(ration_str);
 
 
                                         array::push_back(
@@ -708,8 +650,7 @@ namespace renderconfig_compiler {
 
                             array::push_back(
                                     output.layers_localresource_count,
-                                    array::size(
-                                            output.local_resource) -
+                                    array::size(output.local_resource) -
                                     localresource_offset);
                         }
 
@@ -797,13 +738,12 @@ namespace renderconfig_compiler {
         output.layers_localresource_offset.destroy();
         ct_blob_a0.destroy(output.blob);
 
-        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 
     int init(struct ct_api_a0 *api) {
 #ifdef CETECH_DEVELOP
-        ct_resource_a0.compiler_register(
+        ct_resource_a0.compiler_register_yaml(
                 ct_hash_a0.id64_from_str("render_config"),
                 compiler);
 #endif
@@ -941,6 +881,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_window_a0);
             CETECH_GET_API(api, ct_blob_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             viewport_module::_init(api);

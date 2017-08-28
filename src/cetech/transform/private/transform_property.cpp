@@ -56,7 +56,8 @@ static void on_component(struct ct_world world, struct ct_entity entity) {
     float pos[3];
     ct_transform_a0.get_position(t, pos);
 
-    ct_debugui_a0.DragFloat3("position", pos, 1.0f,FLT_MIN, FLT_MAX,"%.3f", 1.0f);
+    ct_debugui_a0.DragFloat3("position", pos, 1.0f, -FLT_MAX, FLT_MAX, "%.3f", 1.0f);
+
 
     ct_transform_a0.set_position(t, pos);
 }

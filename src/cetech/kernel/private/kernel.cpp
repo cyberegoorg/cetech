@@ -112,6 +112,7 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_LOAD_STATIC_MODULE(api, time);
     CETECH_LOAD_STATIC_MODULE(api, thread);
     CETECH_LOAD_STATIC_MODULE(api, path);
+    CETECH_LOAD_STATIC_MODULE(api, yamlng);
     CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);
     CETECH_LOAD_STATIC_MODULE(api, watchdog);

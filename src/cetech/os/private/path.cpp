@@ -65,7 +65,7 @@ void _dir_list(const char *path,
     }
 
     do {
-        if (recursive && (entry->d_type == 4)) {
+        if (entry->d_type == 4) {
             if (strcmp(entry->d_name, ".") == 0 ||
                 strcmp(entry->d_name, "..") == 0) {
                 continue;
@@ -82,17 +82,19 @@ void _dir_list(const char *path,
                                entry->d_name);
             }
 
+            tmp_path[len] = '\0';
+
             if (only_dir) {
-                char *new_path =
-                        CEL_ALLOCATE(allocator, char,
-                                     sizeof(char) * (len + 1));
+                char *new_path = CEL_ALLOCATE(allocator, char,sizeof(char) * (len + 1));
                 memcpy(new_path, tmp_path, len + 1);
-                tmp_path[len] = '\0';
                 array::push_back(tmp_files, new_path);
             }
 
-            _dir_list(tmp_path, patern, recursive, only_dir, tmp_files,
-                      allocator);
+            if(recursive) {
+                _dir_list(tmp_path, patern, recursive,
+                          only_dir, tmp_files,allocator);
+            }
+
         } else if (!only_dir) {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
@@ -317,11 +319,17 @@ char *path_join(struct cel_alloc *allocator,
     buffer << va_arg (arguments, const char*);
 
     for (uint32_t i = 1; i < count; ++i) {
+        const char* t = va_arg (arguments, const char*);
+
+        if(!t[0]) {
+            continue;
+        }
+
         if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
             buffer << DIR_DELIM_STR;
         }
 
-        buffer << va_arg (arguments, const char*);
+        buffer << t;
     }
 
     va_end (arguments);
@@ -353,6 +361,11 @@ void copy_file(struct cel_alloc *allocator,
     CEL_FREE(allocator, data);
 }
 
+bool is_dir(const char* path) {
+    struct stat sb;
+    return (stat(path, &sb) == 0) && S_ISDIR(sb.st_mode);
+}
+
 static ct_path_a0 path_api = {
         .list = dir_list,
         .list2 = dir_list2,
@@ -364,7 +377,8 @@ static ct_path_a0 path_api = {
         .extension = path_extension,
         .join = path_join,
         .file_mtime = file_mtime,
-        .copy_file = copy_file
+        .copy_file = copy_file,
+        .is_dir = is_dir,
 };
 
 CETECH_MODULE_DEF(

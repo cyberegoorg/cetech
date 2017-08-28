@@ -324,13 +324,19 @@ namespace resource {
 #endif
             ct_log_a0.debug("resource", "Loading resource %s from %s/%s",
                             filename,
-                            ct_filesystem_a0.root_dir(
-                                    root_name),
+                            ct_filesystem_a0.root_dir(root_name),
                             build_name);
 
+            auto platform = ct_config_a0.find("kernel.platform");
+            char *build_full = ct_path_a0.join(
+                    ct_memory_a0.main_allocator(), 2,
+                    ct_config_a0.get_string(platform),
+                    build_name);
+
             ct_vio *resource_file = ct_filesystem_a0.open(root_name,
-                                                          build_name,
+                                                          build_full,
                                                           FS_OPEN_READ);
+            CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
             if (resource_file != NULL) {
                 loaded_data[i] = type_clb.loader(resource_file,
@@ -588,16 +594,9 @@ namespace resource_module {
         _G.resource_callbacks.init(ct_memory_a0.main_allocator());
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
-        auto platform = ct_config_a0.find("kernel.platform");
-
-        char *build_dir_full = ct_path_a0.join(
-                ct_memory_a0.main_allocator(), 2,
-                ct_config_a0.get_string(_G.config.build_dir),
-                ct_config_a0.get_string(platform));
-
-        ct_filesystem_a0.map_root_dir(
-                ct_hash_a0.id64_from_str("build"),
-                build_dir_full);
+        ct_filesystem_a0.map_root_dir(ct_hash_a0.id64_from_str("build"),
+                                      ct_config_a0.get_string(
+                                              _G.config.build_dir));
 
         resource::resource_register_type(ct_hash_a0.id64_from_str("package"),
                                          package_resource::package_resource_callback);

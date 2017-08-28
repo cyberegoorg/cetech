@@ -3,7 +3,6 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/os/vio.h>
 #include <cetech/filesystem/filesystem.h>
-#include <cetech/yaml/yaml.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/config/config.h>
 #include <cetech/memory/memory.h>

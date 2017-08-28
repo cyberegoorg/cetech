@@ -7,7 +7,6 @@ extern "C" void init_static_modules() {
     // Engine
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(blob);
-    CETECH_ADD_STATIC_MODULE(yamlng);
     CETECH_ADD_STATIC_MODULE(task);
     CETECH_ADD_STATIC_MODULE(filesystem);
     CETECH_ADD_STATIC_MODULE(resourcesystem);
