@@ -38,12 +38,12 @@ typedef void ct_yamlng_document_instance_t;
 
 enum node_type {
     NODE_INVALID = 0,
-    NODE_FLOAT,
-    NODE_STRING,
-    NODE_TRUE,
-    NODE_FALSE,
-    NODE_MAP,
-    NODE_SEQ,
+    NODE_FLOAT = 1,
+    NODE_STRING = 2,
+    NODE_TRUE = 3,
+    NODE_FALSE = 4,
+    NODE_MAP = 5,
+    NODE_SEQ = 6,
 };
 
 
