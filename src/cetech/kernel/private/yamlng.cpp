@@ -9,7 +9,7 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/vio.h>
 
-#include <yaml.h>
+#include "yaml/yaml.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);

@@ -197,7 +197,7 @@ set(RELEASE_LIBS
         IrrXML.a
         minizip.a
         aes.a
-        yaml
+        yaml_static.a
         )
 
 set(RELEASE_LIBS2
@@ -249,4 +249,3 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 
 add_library(module_example SHARED examples/module_example/example.cpp)
 set_target_properties(module_example PROPERTIES PREFIX "")
-
