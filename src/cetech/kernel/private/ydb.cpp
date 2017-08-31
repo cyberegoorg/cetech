@@ -38,7 +38,7 @@ ct_yamlng_document *get(const char *path) {
     doc = map::get<ct_yamlng_document *>(_G.document_cache, path_key, NULL);
 
     if (!doc) {
-        ct_log_a0.debug(LOG_WHERE, "Cache miss for %s", path);
+        ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
 
         ct_vio *f = ct_filesystem_a0.open(fs_root, path, FS_OPEN_READ);
 
@@ -56,8 +56,6 @@ ct_yamlng_document *get(const char *path) {
         }
 
         map::set(_G.document_cache, path_key, doc);
-    } else {
-        ct_log_a0.debug(LOG_WHERE, "Cache hit for %s", path);
     }
 
     return doc;

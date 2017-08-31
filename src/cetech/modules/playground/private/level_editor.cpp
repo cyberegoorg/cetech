@@ -46,7 +46,7 @@ static struct globals {
     bool visible[MAX_LEVEL_EDITOR];
     struct ct_viewport viewport[MAX_LEVEL_EDITOR];
     struct ct_world world[MAX_LEVEL_EDITOR];
-    struct ct_camera camera[MAX_LEVEL_EDITOR];
+    //struct ct_camera camera[MAX_LEVEL_EDITOR];
     struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
     struct ct_level level[MAX_LEVEL_EDITOR];
 
@@ -132,8 +132,11 @@ void on_debugui() {
             if (ct_debugui_a0.IsMouseHoveringWindow()) {
                 _G.active_editor = i;
 
-                if(ImGui::IsMouseClicked(0)) {
-                    ct_level_inspector_a0.set_level(_G.world[i], _G.level[i], _G.level_name[i], _G.root[i],
+                if(ct_debugui_a0.IsMouseClicked(0, false)) {
+                    ct_level_inspector_a0.set_level(_G.world[i],
+                                                    _G.level[i],
+                                                    _G.level_name[i],
+                                                    _G.root[i],
                                                     _G.path[i]);
                 }
             }
@@ -161,7 +164,8 @@ void render() {
             continue;
         }
 
-        ct_viewport_a0.render_world(_G.world[i], _G.camera[i], _G.viewport[i]);
+        ct_camera camera = ct_camera_a0.get(_G.world[i], _G.camera_ent[i]);
+        ct_viewport_a0.render_world(_G.world[i], camera, _G.viewport[i]);
     }
 }
 
@@ -179,8 +183,6 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
     _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
                                             ct_hash_a0.id64_from_str(
                                                     "camera"));
-
-    _G.camera[idx] = ct_camera_a0.get(_G.world[idx], _G.camera_ent[idx]);
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;

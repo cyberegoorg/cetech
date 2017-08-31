@@ -41,7 +41,7 @@ static int _from_euler(lua_State *l) {
     const float attitude = luasys_to_float(l, 2) * celib::DEG_TO_RAD;
     const float bank = luasys_to_float(l, 3) * celib::DEG_TO_RAD;
 
-    celib::quatFromEuler(result, heading, attitude, bank);
+    celib::quat_from_euler(result, heading, attitude, bank);
 
     luasys_push_quat(l, result);
     return 1;

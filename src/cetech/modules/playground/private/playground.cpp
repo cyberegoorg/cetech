@@ -1,7 +1,6 @@
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/debugui/debugui.h>
-#include <cetech/modules/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/modules/playground/playground.h>
 #include <cetech/kernel/application.h>
 #include <cetech/modules/level/level.h>
@@ -9,10 +8,9 @@
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/vio.h>
-#include "celib/map.inl"
+#include <celib/macros.h>
 
 #include "cetech/kernel/hashlib.h"
-#include "cetech/kernel/config.h"
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/module.h"
@@ -28,8 +26,6 @@ CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 
-using namespace celib;
-
 static struct PlaygroundGlobal {
     uint64_t type;
 
@@ -43,48 +39,50 @@ static struct PlaygroundGlobal {
 namespace playground {
     float draw_main_menu() {
         float menu_height = 0;
-        if (ImGui::BeginMainMenuBar()) {
-            if (ImGui::BeginMenu("File")) {
-                if (ImGui::MenuItem("Quit", "Alt+F4")) {
+        if (ct_debugui_a0.BeginMainMenuBar()) {
+            if (ct_debugui_a0.BeginMenu("File", true)) {
+                if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
                     ct_app_a0.quit();
                 }
 
-                if (ImGui::MenuItem("Settings")) {
+                if (ct_debugui_a0.MenuItem("Settings", NULL, false, true)) {
                 }
 
-                ImGui::EndMenu();
+                ct_debugui_a0.EndMenu();
             }
 
-            if (ImGui::BeginMenu("Edit")) {
-                ImGui::EndMenu();
+            if (ct_debugui_a0.BeginMenu("Edit", true)) {
+                ct_debugui_a0.EndMenu();
             }
 
-            if (ImGui::BeginMenu("Layout")) {
-                if (ImGui::MenuItem("Save")) {
+            if (ct_debugui_a0.BeginMenu("Layout", true)) {
+                if (ct_debugui_a0.MenuItem("Save", NULL, false, true )) {
                     ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "default.dock_layout", FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
                     ct_filesystem_a0.close(f);
                 }
 
-                if (ImGui::MenuItem("Load")) {
+                if (ct_debugui_a0.MenuItem("Load", NULL, false, true)) {
                     ct_debugui_a0.LoadDock("default.dock_layout");
                 }
-                ImGui::EndMenu();
+                ct_debugui_a0.EndMenu();
             }
 
-            if (ImGui::BeginMenu("Run")) {
-                ImGui::EndMenu();
+            if (ct_debugui_a0.BeginMenu("Run", true)) {
+                ct_debugui_a0.EndMenu();
             }
 
-            if (ImGui::BeginMenu("Help")) {
-                if (ImGui::MenuItem("About")) {
+            if (ct_debugui_a0.BeginMenu("Help", true)) {
+                if (ct_debugui_a0.MenuItem("About", NULL, false, true)) {
                 }
-                ImGui::EndMenu();
+                ct_debugui_a0.EndMenu();
             }
 
-            menu_height = ImGui::GetWindowSize().y;
+            float v[2];
+            ct_debugui_a0.GetWindowSize(v);
+            menu_height = v[1];
 
-            ImGui::EndMainMenuBar();
+            ct_debugui_a0.EndMainMenuBar();
         }
         return menu_height;
     }
@@ -94,9 +92,10 @@ namespace playground {
 
         uint32_t w, h;
         ct_renderer_a0.get_size(&w, &h);
-        auto pos = ImVec2(0, menu_height);
+        float pos[] = {0.0f, menu_height};
+        float size[] = {float(w), h - 25.0f};
 
-        ImGui::RootDock(pos, ImVec2(w, h - 25.0f));
+        ct_debugui_a0.RootDock(pos, size);
     }
 }
 

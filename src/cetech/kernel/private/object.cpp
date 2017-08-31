@@ -12,10 +12,14 @@ CETECH_DECL_API(ct_log_a0);
 #define LOG_WHERE "object"
 
 void *load_object(const char *path) {
-    void *obj = dlmopen(LM_ID_NEWLM, path, RTLD_NOW);
+    char buffer[128];
+    uint32_t it = sprintf(buffer, "%s", path);
+    it += sprintf(buffer+it, ".so");
+
+    void *obj = dlmopen(LM_ID_NEWLM, buffer, RTLD_LOCAL | RTLD_NOW);
 
     if (obj == NULL) {
-        ct_log_a0.error(LOG_WHERE, "%s", dlerror());
+        ct_log_a0.error(LOG_WHERE, "Could not load object file %s", dlerror());
         return NULL;
     }
 
@@ -30,6 +34,9 @@ void unload_object(void *so) {
 
 void *load_function(void *so,
                     const char *name) {
+    if(!so) {
+        return NULL;
+    }
 
     void *fce = dlsym(so, name);
 

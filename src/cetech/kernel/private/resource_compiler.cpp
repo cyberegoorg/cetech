@@ -75,7 +75,6 @@ struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_watchdog *wd;
     ct_cvar cv_source_dir;
     ct_cvar cv_core_dir;
     ct_cvar cv_external_dir;
@@ -126,7 +125,6 @@ void _add_dependency(const char *who_filename,
 static ct_compilator_api _compilator_api = {
         .add_dependency = _add_dependency
 };
-
 
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = (compile_task_data *) data;
@@ -317,7 +315,7 @@ void compiler_register_yaml(uint64_t type,
     }
 }
 
-void _resource_compiler_compile_all(celib::Map<uint64_t> &compiled) {
+void _compile_all(celib::Map<uint64_t> &compiled) {
     Array<ct_task_item> tasks(ct_memory_a0.main_allocator());
     const char *glob_patern = "**.*";
     char **files = nullptr;
@@ -345,7 +343,7 @@ void _resource_compiler_compile_all(celib::Map<uint64_t> &compiled) {
 
 void resource_compiler_compile_all() {
     Map<uint64_t> compieled(ct_memory_a0.main_allocator());
-    _resource_compiler_compile_all(compieled);
+    _compile_all(compieled);
 
 }
 
@@ -396,13 +394,11 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 
 
 void _update(float dt) {
-    auto *wd = _G.wd;
+    static uint64_t root = ct_hash_a0.id64_from_str("source");
 
-    _G.wd->fetch_events(_G.wd->inst);
-
+    auto *wd_it = ct_filesystem_a0.event_begin(root);
+    const auto *wd_end = ct_filesystem_a0.event_end(root);
     int need_compile = 0;
-    auto *wd_it = wd->event_begin(wd->inst);
-    const auto *wd_end = wd->event_end(wd->inst);
 
     while (wd_it != wd_end) {
         if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
@@ -410,14 +406,14 @@ void _update(float dt) {
             break;
         }
 
-        wd_it = wd->event_next(wd->inst, wd_it);
+        wd_it = ct_filesystem_a0.event_next(wd_it);
     }
 
     if (need_compile) {
         cel_alloc *alloc = ct_memory_a0.main_allocator();
         celib::Map<uint64_t> type_name(alloc);
 
-        _resource_compiler_compile_all(type_name);
+        _compile_all(type_name);
 
         auto *type_it = map::begin(type_name);
         auto *type_end = map::end(type_name);
@@ -480,29 +476,27 @@ static void _init(ct_api_a0 *api) {
     CEL_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
     CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 
-    auto *wd = ct_watchdog_a0.create(ct_memory_a0.main_allocator());
+//    auto *wd = ct_watchdog_a0.create(ct_memory_a0.main_allocator());
 
     const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
     ct_filesystem_a0.map_root_dir(
             ct_hash_a0.id64_from_str("source"),
-            core_dir
+            core_dir,
+            true
     );
 
     ct_filesystem_a0.map_root_dir(
             ct_hash_a0.id64_from_str("source"),
-            source_dir
+            source_dir,
+            true
     );
 
-    wd->add_dir(wd->inst, core_dir, true);
-    wd->add_dir(wd->inst, source_dir, true);
-
-    _G.wd = wd;
 }
 
 static void _shutdown() {
-    ct_watchdog_a0.destroy(_G.wd);
+    //ct_watchdog_a0.destroy(_G.wd);
 
     _G = {};
 }

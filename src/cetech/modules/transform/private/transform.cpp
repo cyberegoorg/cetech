@@ -209,7 +209,7 @@ int _component_compiler(const char *filename,
         ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v, (float[3]){0});
 
         celib::vec3_mul(v_rad, v, celib::DEG_TO_RAD);
-        celib::quatFromEuler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
+        celib::quat_from_euler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
     };
 
     data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
@@ -285,10 +285,10 @@ void _set_property(ct_world world,
 
         celib::vec3_move(euler_rot, value.value.vec3f);
         celib::vec3_mul(euler_rot_rad, euler_rot, celib::DEG_TO_RAD);
-        celib::quatFromEuler(rot,
-                             euler_rot_rad[0],
-                             euler_rot_rad[1],
-                             euler_rot_rad[2]);
+        celib::quat_from_euler(rot,
+                               euler_rot_rad[0],
+                               euler_rot_rad[1],
+                               euler_rot_rad[2]);
 
         transform_set_rotation(transform, rot);
 

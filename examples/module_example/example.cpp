@@ -163,9 +163,9 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Shutdown %d", reload);
 
-            //ct_app_a0.unregister_on_update(update);
+            ct_app_a0.unregister_on_update(update);
 
-            ct_debugui_a0.unregister_on_debugui(module1);
+//              ct_debugui_a0.unregister_on_debugui(module1);
 //            ct_debugui_a0.unregister_on_debugui(module2);
         }
 )

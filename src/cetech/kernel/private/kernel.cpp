@@ -113,7 +113,11 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_LOAD_STATIC_MODULE(api, yamlng);
     CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);
+    CETECH_LOAD_STATIC_MODULE(api, blob);
+    CETECH_LOAD_STATIC_MODULE(api, task);
     CETECH_LOAD_STATIC_MODULE(api, watchdog);
+    CETECH_LOAD_STATIC_MODULE(api, filesystem);
+    CETECH_LOAD_STATIC_MODULE(api, ydb);
     CETECH_LOAD_STATIC_MODULE(api, module);
 
     CETECH_GET_API(api, ct_log_a0);
@@ -122,12 +126,10 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_module_a0);
 
+
     init_config(argc, argv);
 
-    CETECH_ADD_STATIC_MODULE(blob);
-    CETECH_ADD_STATIC_MODULE(task);
-    CETECH_ADD_STATIC_MODULE(filesystem);
-    CETECH_ADD_STATIC_MODULE(ydb);
+
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(application);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
@@ -158,6 +160,12 @@ extern "C" int cetech_kernel_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, path);
     CETECH_UNLOAD_STATIC_MODULE(api, config);
     CETECH_UNLOAD_STATIC_MODULE(api, object);
+    CETECH_UNLOAD_STATIC_MODULE(api, module);
+    CETECH_UNLOAD_STATIC_MODULE(api, blob);
+    CETECH_UNLOAD_STATIC_MODULE(api, task);
+    CETECH_UNLOAD_STATIC_MODULE(api, watchdog);
+    CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
+    CETECH_UNLOAD_STATIC_MODULE(api, ydb);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
 
     api::shutdown();

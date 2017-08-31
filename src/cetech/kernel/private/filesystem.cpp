@@ -10,12 +10,15 @@
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/module.h>
 #include <cstdlib>
+#include <cetech/kernel/watchdog.h>
+#include <celib/eventstream.inl>
 #include "celib/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_watchdog_a0);
 
 using namespace celib;
 
@@ -32,24 +35,94 @@ using namespace celib;
 // Global
 //==============================================================================
 #define _G FilesystemGlobals
+
+struct fs_mount_point {
+    char* root_path;
+    ct_watchdog* wd;
+};
+
+struct fs_root {
+    Array<fs_mount_point> mount_points;
+    celib::EventStream event_stream;
+};
+
 static struct FilesystemGlobals {
-    Map<char *> root_map;
+    Map<uint32_t> root_map;
+    Array<fs_root> roots;
 } FilesystemGlobals;
 
 //==============================================================================
 // Interface
 //==============================================================================
 
-namespace filesystem {
-    void map_root_dir(uint64_t root,
-                      const char *base_path) {
-        multi_map::insert(_G.root_map, root,
-                          ct_memory_a0.str_dup(base_path,
-                                               ct_memory_a0.main_allocator()));
+uint32_t new_fs_root(uint64_t root) {
+    cel_alloc *a = ct_memory_a0.main_allocator();
+
+    uint32_t new_idx = array::size(_G.roots);
+
+    array::push_back(_G.roots, {});
+
+    fs_root *root_inst = &_G.roots[new_idx];
+    root_inst->event_stream.init(a);
+    root_inst->mount_points.init(a);
+
+    map::set(_G.root_map, root, new_idx);
+
+    return new_idx;
+}
+
+fs_root* get_fs_root(uint64_t root) {
+    uint32_t idx = map::get(_G.root_map, root, UINT32_MAX);
+
+    if(idx == UINT32_MAX) {
+        return NULL;
     }
 
-    const char *get_root_dir(uint64_t root) {
-        return map::get<char *>(_G.root_map, root, nullptr);
+    fs_root* fs_inst= &_G.roots[idx];
+    return  fs_inst;
+}
+
+fs_root* get_or_crate_root(uint64_t root) {
+    uint32_t idx = map::get(_G.root_map, root, UINT32_MAX);
+
+    if(idx == UINT32_MAX) {
+        uint32_t root_idx = new_fs_root(root);
+        return &_G.roots[root_idx];
+    }
+
+    fs_root* fs_inst= &_G.roots[idx];
+    return  fs_inst;
+}
+
+
+uint32_t new_fs_mount(uint64_t root, fs_mount_point mp) {
+    fs_root* fs_inst= get_or_crate_root(root);
+
+    auto& mount_points = fs_inst->mount_points;
+
+    uint32_t new_idx = array::size(mount_points);
+    array::push_back(mount_points, mp);
+    return new_idx;
+}
+
+
+namespace filesystem {
+    void map_root_dir(uint64_t root,
+                      const char *base_path,
+                      bool watch) {
+        cel_alloc *a = ct_memory_a0.main_allocator();
+
+        fs_mount_point mp = {};
+
+        if (watch) {
+            ct_watchdog *wd = ct_watchdog_a0.create(a);
+            wd->add_dir(wd->inst, base_path, true);
+
+            mp.wd = wd;
+        }
+
+        mp.root_path = ct_memory_a0.str_dup(base_path, a);
+        new_fs_mount(root, mp);
     }
 
     bool exist_dir(const char *full_path) {
@@ -73,17 +146,21 @@ namespace filesystem {
                         const char *filename,
                         bool test_dir) {
 
-        auto it = multi_map::find_first(_G.root_map, root);
-        while (it != nullptr) {
-            char *fullpath = ct_path_a0.join(allocator, 2, it->value, filename);
+        fs_root* fs_inst= get_fs_root(root);
+        const uint32_t mp_count = array::size(fs_inst->mount_points);
+
+        for (int i = 0; i < mp_count; ++i) {
+            fs_mount_point *mp = &fs_inst->mount_points[i];
+
+            char *fullpath = ct_path_a0.join(allocator, 2, mp->root_path, filename);
 
             if (((!test_dir) && exist(fullpath)) ||
                 (test_dir && exist_dir(fullpath))) {
                 return fullpath;
             }
 
-            it = multi_map::find_next(_G.root_map, it);
         }
+
         return NULL;
     }
 
@@ -135,13 +212,16 @@ namespace filesystem {
 
         auto a = ct_memory_a0.main_allocator();
 
-        auto it = multi_map::find_first(_G.root_map, root);
-
         Array<char *> all_files(a);
 
-        while (it != nullptr) {
-            const char *mount_point_dir = it->value;
-            uint32_t mount_point_dir_len = strlen(it->value);
+        fs_root* fs_inst= get_fs_root(root);
+        const uint32_t mp_count = array::size(fs_inst->mount_points);
+
+        for (int i = 0; i < mp_count; ++i) {
+            fs_mount_point* mp = &fs_inst->mount_points[i];
+
+            const char *mount_point_dir = mp->root_path;
+            uint32_t mount_point_dir_len = strlen(mount_point_dir);
             char **_files;
             uint32_t _count;
 
@@ -156,7 +236,6 @@ namespace filesystem {
 
             ct_path_a0.list_free(_files, _count, allocator);
             CEL_FREE(a, final_path);
-            it = multi_map::find_next(_G.root_map, it);
         }
 
         char **result_files = CEL_ALLOCATE(a, char*, sizeof(char *) *
@@ -212,19 +291,114 @@ namespace filesystem {
         CEL_FREE(a, full_path);
         return ret;
     }
+
+    void clean_events(fs_root *fs_inst) {
+        auto *wd_it = celib::eventstream::begin<ct_watchdog_ev_header>(
+                fs_inst->event_stream);
+        const auto *wd_end = celib::eventstream::end<ct_watchdog_ev_header>(
+                fs_inst->event_stream);
+
+        while (wd_it != wd_end) {
+            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+                ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
+                CEL_FREE(ct_memory_a0.main_allocator(), ev->filename);
+//              CEL_FREE(ct_memory_a0.main_allocator(), ev->dir);
+            }
+
+            wd_it = celib::eventstream::next<ct_watchdog_ev_header>(wd_it);
+        }
+
+        celib::eventstream::clear(fs_inst->event_stream);
+    }
+
+    void check_wd() {
+        cel_alloc *alloc = ct_memory_a0.main_allocator();
+        const uint32_t root_count = array::size(_G.roots);
+
+        for (int i = 0; i < root_count; ++i) {
+            fs_root *fs_inst = &_G.roots[i];
+            const uint32_t mp_count = array::size(fs_inst->mount_points);
+
+            clean_events(fs_inst);
+
+            for (int j = 0; j < mp_count; ++j) {
+                fs_mount_point* mp = &fs_inst->mount_points[j];
+                const uint32_t root_path_len = strlen(mp->root_path);
+
+                auto *wd = mp->wd;
+                if(!wd) {
+                    continue;
+                }
+
+                wd->fetch_events(wd->inst);
+
+                auto *wd_it = wd->event_begin(wd->inst);
+                const auto *wd_end = wd->event_end(wd->inst);
+
+                while (wd_it != wd_end) {
+                    if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+                        ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
+
+                        ct_wd_ev_file_write_end new_ev = *ev;
+
+                        new_ev.dir = ct_memory_a0.str_dup(ev->dir + root_path_len + 1, alloc);
+                        new_ev.filename = ct_memory_a0.str_dup(ev->filename, alloc);
+
+                        celib::eventstream::push<ct_watchdog_ev_header>(
+                                fs_inst->event_stream,
+                                CT_WATCHDOG_EVENT_FILE_WRITE_END,
+                                new_ev);
+                    }
+
+                    wd_it = wd->event_next(wd->inst, wd_it);
+                  }
+            }
+        }
+    }
+
+    ct_watchdog_ev_header *event_begin(uint64_t root) {
+        fs_root* fs_inst= get_fs_root(root);
+
+        return celib::eventstream::begin<ct_watchdog_ev_header>(
+                fs_inst->event_stream);
+    }
+
+    ct_watchdog_ev_header *event_end(uint64_t root) {
+        fs_root* fs_inst = get_fs_root(root);
+
+        return celib::eventstream::end<ct_watchdog_ev_header>(fs_inst->event_stream);
+    }
+
+    ct_watchdog_ev_header *event_next(ct_watchdog_ev_header *header) {
+        return celib::eventstream::next<ct_watchdog_ev_header>(header);
+    }
+
+void _get_full_path(uint64_t root, const char* path, char* fullpath, uint32_t max_len) {
+    cel_alloc *a = ct_memory_a0.main_allocator();
+
+    char* fp = get_full_path(root, a, path, false);
+
+    strcpy(fullpath, fp);
+
+    CEL_FREE(a, fp);
 }
 
+}
 namespace filesystem_module {
     static ct_filesystem_a0 _api = {
-            .root_dir = filesystem::get_root_dir,
             .open = filesystem::open,
             .map_root_dir = filesystem::map_root_dir,
             .close = filesystem::close,
             .listdir = filesystem::listdir,
-            .listdir_iter = filesystem::listdir2,
             .listdir_free = filesystem::listdir_free,
+            .listdir_iter = filesystem::listdir2,
             .create_directory = filesystem::create_directory,
             .file_mtime = filesystem::get_file_mtime,
+            .check_wd = filesystem::check_wd,
+            .event_begin = filesystem::event_begin,
+            .event_end = filesystem::event_end,
+            .event_next = filesystem::event_next,
+            .get_full_path = filesystem::_get_full_path,
 //            .fullpath = filesystem::get_fullpath
     };
 
@@ -233,12 +407,14 @@ namespace filesystem_module {
     }
 
 
+
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
         _G = {};
 
         _G.root_map.init(ct_memory_a0.main_allocator());
+        _G.roots.init(ct_memory_a0.main_allocator());
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
@@ -246,15 +422,8 @@ namespace filesystem_module {
     void _shutdown() {
         ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-        auto it = map::begin(_G.root_map);
-        auto end_it = map::end(_G.root_map);
-
-        while (it != end_it) {
-            CEL_FREE(ct_memory_a0.main_allocator(), it->value);
-            ++it;
-        }
-
         _G.root_map.destroy();
+        _G.roots.destroy();
     }
 
 }
@@ -265,6 +434,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_log_a0);
         },
         {

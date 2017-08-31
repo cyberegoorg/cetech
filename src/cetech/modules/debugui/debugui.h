@@ -735,6 +735,8 @@ struct ct_debugui_a0 {
 
     void (*GetWindowSize)(float size[2]);
 
+
+    void (*RootDock)(float pos[2], float size[2]);
     bool (*BeginDock)(const char *label,
                       bool *opened,
                       DebugUIWindowFlags_ extra_flags);
@@ -749,6 +751,9 @@ struct ct_debugui_a0 {
 
     void (*SaveDock)(struct ct_vio* output);
     void (*LoadDock)(const char* path);
+
+    bool (*IsMouseClicked)(int btn, bool repeat);
+    bool (*IsMouseDoubleClicked)(int btn);
 };
 
 #ifdef __cplusplus

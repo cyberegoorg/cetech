@@ -248,7 +248,10 @@ namespace debugui_module {
             .HSplitter = imgui_wrap::HSplitter,
             .VSplitter = imgui_wrap::VSplitter,
             .SaveDock = SaveDock,
-            .LoadDock = LoadDock
+            .LoadDock = LoadDock,
+            .RootDock = imgui_wrap::RootDock,
+            .IsMouseClicked = ImGui::IsMouseClicked,
+            .IsMouseDoubleClicked = ImGui::IsMouseDoubleClicked,
     };
 
     static void _init(ct_api_a0 *api) {

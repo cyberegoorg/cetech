@@ -321,9 +321,8 @@ namespace resource {
 //#else
 //            char *filename = build_name;
 //#endif
-            ct_log_a0.debug("resource", "Loading resource %s from %s/%s",
+            ct_log_a0.debug("resource", "Loading resource %s from %s",
                             filename,
-                            ct_filesystem_a0.root_dir(root_name),
                             build_name);
 
             auto platform = ct_config_a0.find("kernel.platform");
@@ -591,8 +590,7 @@ namespace resource_module {
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
         ct_filesystem_a0.map_root_dir(ct_hash_a0.id64_from_str("build"),
-                                      ct_config_a0.get_string(
-                                              _G.config.build_dir));
+                                      ct_config_a0.get_string(_G.config.build_dir), false);
 
         resource::resource_register_type(ct_hash_a0.id64_from_str("package"),
                                          package_resource::package_resource_callback);

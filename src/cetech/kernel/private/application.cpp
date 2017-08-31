@@ -273,10 +273,12 @@ extern "C" void application_start() {
 
     _G.is_running = 1;
     while (_G.is_running) {
+        uint64_t fq = ct_time_a0.perf_freq();
         uint64_t now_ticks = ct_time_a0.perf_counter();
-        float dt =
-                ((float) (now_ticks - last_tick)) / ct_time_a0.perf_freq();
+        float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
+
+        ct_filesystem_a0.check_wd();
 
 #if CETECH_DEVELOP
         ct_module_a0.check_modules(); // TODO: SHIT...

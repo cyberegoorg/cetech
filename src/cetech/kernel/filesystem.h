@@ -19,17 +19,15 @@ enum ct_fs_open_mode {
     FS_OPEN_WRITE,
 };
 
+struct ct_watchdog_ev_header;
+typedef void ct_watchdog_instance_t;
+
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Filesystem API V0
 struct ct_filesystem_a0 {
-
-    //! Return root dir
-    //! \param root Root
-    //! \return Root dir or NULL if root is invalid.
-    const char *(*root_dir)(uint64_t root);
 
     //! Open file
     //! \param root Root
@@ -44,7 +42,7 @@ struct ct_filesystem_a0 {
     //! \param root Root
     //! \param base_path Path
     void (*map_root_dir)(uint64_t root,
-                         const char *base_path);
+                         const char *base_path, bool watch);
 
     //! Close file
     //! \param file file
@@ -91,6 +89,16 @@ struct ct_filesystem_a0 {
     //! \return Modified time
     int64_t (*file_mtime)(uint64_t root,
                           const char *path);
+
+
+    ct_watchdog_ev_header *(*event_begin)(uint64_t root);
+    ct_watchdog_ev_header *(*event_end)(uint64_t root);
+    ct_watchdog_ev_header *(*event_next)(ct_watchdog_ev_header *header);
+
+    void (*get_full_path)(uint64_t root, const char* path, char* fullpath, uint32_t max_len);
+
+    /// TODO: shit
+    void (*check_wd)();
 
 };
 

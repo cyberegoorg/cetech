@@ -271,84 +271,6 @@ namespace config {
         ct_log_a0.info(LOG_WHERE, "%s", celib::buffer::c_str(out));
     }
 
-    struct foreach_config_data {
-        char *root_name;
-    };
-
-    void foreach_config_clb(struct ct_yamlng_node key,
-                            struct ct_yamlng_node value,
-                            void *_data) {
-
-        struct foreach_config_data *output = (foreach_config_data *) _data;
-        ct_yamlng_document* d = key.d;
-
-        const char* key_str = d->as_string(d->inst, key, "");
-
-        char name[1024] = {};
-        if (output->root_name != NULL) {
-            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
-        } else {
-            snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
-        }
-
-        enum node_type type = d->type(d->inst, value);
-
-        if (type == NODE_MAP) {
-            struct foreach_config_data data = {
-                    .root_name = name
-            };
-
-            d->foreach_dict_node(d->inst, value, foreach_config_clb, &data);
-
-        } else if (type != NODE_SEQ) {
-            float tmp_f;
-            int tmp_int;
-            const char * str;
-
-            ct_cvar cvar = find(name);
-            if (cvar.idx != 0) {
-                enum cvar_type t = get_type(cvar);
-                switch (t) {
-                    case CV_NONE:
-                        break;
-                    case CV_FLOAT:
-                        tmp_f = d->as_float(d->inst, value, 0.0f);
-                        set_float(cvar, tmp_f);
-                        break;
-                    case CV_INT:
-                        tmp_int = (int)d->as_float(d->inst, value, 0.0f);
-                        set_int(cvar, tmp_int);
-                        break;
-                    case CV_STRING:
-                        str = d->as_string(d->inst, value, "");
-                        set_string(cvar, str);
-                        break;
-                }
-            }
-        }
-    }
-
-
-    int load_from_yaml_file(const char *yaml,
-                            cel_alloc *alloc) {
-        ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
-        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
-                                                      ct_memory_a0.main_allocator());
-        f->close(f->inst);
-
-        struct foreach_config_data config_data = {
-                .root_name = NULL
-        };
-
-
-        d->foreach_dict_node(d->inst, d->get(d->inst, 0), foreach_config_clb,
-                             &config_data);
-
-        ct_yamlng_a0.destroy(d);
-
-        return 1;
-    }
-
     void _cvar_from_str(const char *name,
                         const char *value) {
         union {
@@ -407,6 +329,93 @@ namespace config {
             //ct_log_a0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
         }
     }
+
+    struct foreach_config_data {
+        char *root_name;
+    };
+
+
+    void foreach_config_clb(struct ct_yamlng_node key,
+                            struct ct_yamlng_node value,
+                            void *_data) {
+
+        struct foreach_config_data *output = (foreach_config_data *) _data;
+        ct_yamlng_document* d = key.d;
+
+        const char* key_str = d->as_string(d->inst, key, "");
+
+        char name[1024] = {};
+        if (output->root_name != NULL) {
+            snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name, key_str);
+        } else {
+            snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
+        }
+
+        enum node_type type = d->type(d->inst, value);
+
+        if (type == NODE_MAP) {
+            struct foreach_config_data data = {
+                    .root_name = name
+            };
+
+            d->foreach_dict_node(d->inst, value, foreach_config_clb, &data);
+
+        } else if (type != NODE_SEQ) {
+            float tmp_f;
+            int tmp_int;
+            const char * str;
+
+            if(type == NODE_STRING) {
+                str  = d->as_string(d->inst, value, "");
+                _cvar_from_str(name, str);
+
+            } else {
+                ct_cvar cvar = find(name);
+                if (cvar.idx != 0) {
+                    enum cvar_type t = get_type(cvar);
+                    switch (t) {
+                        case CV_NONE:
+                            break;
+                        case CV_FLOAT:
+                            tmp_f = d->as_float(d->inst, value, 0.0f);
+                            set_float(cvar, tmp_f);
+                            break;
+                        case CV_INT:
+                            tmp_int = (int) d->as_float(d->inst, value, 0.0f);
+                            set_int(cvar, tmp_int);
+                            break;
+                        case CV_STRING:
+                            str = d->as_string(d->inst, value, "");
+                            set_string(cvar, str);
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    int load_from_yaml_file(const char *yaml,
+                            cel_alloc *alloc) {
+        ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
+        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
+                                                      ct_memory_a0.main_allocator());
+        f->close(f->inst);
+
+        struct foreach_config_data config_data = {
+                .root_name = NULL
+        };
+
+
+        d->foreach_dict_node(d->inst, d->get(d->inst, 0), foreach_config_clb,
+                             &config_data);
+
+        ct_yamlng_a0.destroy(d);
+
+        return 1;
+    }
+
+
 
     int parse_args(int argc,
                    const char **argv) {

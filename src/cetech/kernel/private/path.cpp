@@ -316,17 +316,18 @@ char *path_join(struct cel_alloc *allocator,
     va_list arguments;
     va_start (arguments, count);
 
-    buffer << va_arg (arguments, const char*);
 
-    for (uint32_t i = 1; i < count; ++i) {
+    for (uint32_t i = 0; i < count; ++i) {
         const char* t = va_arg (arguments, const char*);
 
         if(!t[0]) {
             continue;
         }
 
-        if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
-            buffer << DIR_DELIM_STR;
+        if(array::size(buffer)) {
+            if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
+                buffer << DIR_DELIM_STR;
+            }
         }
 
         buffer << t;

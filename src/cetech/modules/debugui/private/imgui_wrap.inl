@@ -661,10 +661,11 @@ namespace imgui_wrap {
         return ImGui::BeginDock(label, opened, extra_flags);
     }
 
-    void EndDock()
+    void RootDock(float pos[2], float size[2])
     {
-        ImGui::EndDock();
+        ImGui::RootDock(_to_imvec2(pos), _to_imvec2(size));
     }
+
 
     void HSplitter(const char* str_id, float size[2]) {
         ImGui::HSplitter(str_id, &_to_imvec2(size));

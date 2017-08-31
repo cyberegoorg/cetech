@@ -585,10 +585,10 @@ namespace celib {
         _result[2] = fasin(2.0f * (x * y + z * w));
     }
 
-    inline void quatFromEuler(float *result,
-                              float heading,
-                              float attitude,
-                              float bank) {
+    inline void quat_from_euler(float *result,
+                                float heading,
+                                float attitude,
+                                float bank) {
 
         const float sx = fsin(heading * 0.5f);
         const float sy = fsin(attitude * 0.5f);

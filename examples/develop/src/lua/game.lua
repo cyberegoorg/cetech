@@ -184,12 +184,12 @@ function Game:update(dt)
         local m_axis = Mouse.axis(Mouse.axis_index("relative"))
         dx, dy = m_axis.x, m_axis.y
         if dx ~= 0 or dy ~= 0 then
-              Log.debug("lua", "%f %f", dx, dy)
+              --Log.debug("lua", "%f %f", dx, dy)
         end
 
         m_axis = Mouse.axis(Mouse.axis_index("absolute"))
         local x, y = m_axis.x, m_axis.y
-        Log.debug("lua", "abs: %f %f", x, y)
+        --Log.debug("lua", "abs: %f %f", x, y)
     end
 
     local up = Keyboard.button_state(Keyboard.button_index('w'))
