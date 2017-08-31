@@ -16,10 +16,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct yaml_node_s yaml_node_t;
-
 struct ct_entity_compile_output;
 struct ct_compilator_api;
+struct ct_blob;
 
 //==============================================================================
 // Enums
@@ -48,7 +47,9 @@ struct ct_world {
 //! Component compiler
 //! \param body Component body yaml
 //! \param data Compiled compoent data
-typedef int (*ct_component_compiler_t)(yaml_node_t body,
+typedef int (*ct_component_compiler_t)(const char* filename,
+                                       uint64_t* component_key,
+                                       uint32_t component_key_count,
                                        struct ct_blob *data);
 
 //==============================================================================
@@ -183,7 +184,8 @@ struct ct_entity_a0 {
     //! \param filename Resource filename
     //! \param compilator_api Compilator api
     void (*compiler_compile_entity)(struct ct_entity_compile_output *output,
-                                    yaml_node_t root,
+                                    uint64_t *root,
+                                    uint32_t root_count,
                                     const char *filename,
                                     struct ct_compilator_api *compilator_api);
 
@@ -196,6 +198,7 @@ struct ct_entity_a0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct ct_entity_compile_output *output,
+                                    const char* filename,
                                     struct ct_blob *build);
 
     //! Resource compile
@@ -203,10 +206,10 @@ struct ct_entity_a0 {
     //! \param filename Filename
     //! \param build Build
     //! \param compilator_api Compilator api
-    void (*resource_compiler)(yaml_node_t root,
+    void (*resource_compiler)(uint64_t root,
                               const char *filename,
-                              struct ct_blob *build,
-                              struct ct_compilator_api *compilator_api);
+                              ct_blob *build,
+                              ct_compilator_api *compilator_api);
 };
 
 
@@ -227,7 +230,9 @@ struct ct_component_a0 {
     //! \param data Compiled data
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
-                   yaml_node_t body,
+                   const char* filename,
+                   uint64_t* component_key,
+                   uint32_t component_key_count,
                    struct ct_blob *data);
 
     //! Get component spawn order

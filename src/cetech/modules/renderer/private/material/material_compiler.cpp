@@ -4,14 +4,13 @@
 
 #include <celib/fpumath.h>
 #include <bgfx/defines.h>
+#include <cetech/kernel/ydb.h>
 #include "celib/array.inl"
 #include "celib/handler.inl"
 #include "cetech/kernel/macros.h"
 
 #include "cetech/kernel/vio.h"
 #include "cetech/kernel/path.h"
-#include "cetech/kernel/errors.h"
-#include "cetech/modules/yaml/yaml.h"
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/hashlib.h"
@@ -27,6 +26,8 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 using namespace celib;
 
@@ -45,125 +46,82 @@ namespace material_compiler {
             uint64_t curent_render_state;
         };
 
-        void _preprocess(const char *filename,
-                         yaml_node_t root,
-                         ct_compilator_api *capi) {
-            auto a = ct_memory_a0.main_allocator();
 
-            yaml_node_t parent_node = yaml_get_node(root, "parent");
+        void _forach_variable_clb(const char *filename,
+                                  uint64_t root_key,
+                                  uint64_t key,
+                                  material_compile_output &output) {
 
-            if (yaml_is_valid(parent_node)) {
-                char prefab_file[256] = {};
-                char prefab_str[256] = {};
-                yaml_as_string(parent_node, prefab_str,
-                               CETECH_ARRAY_LEN(prefab_str));
-                snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file),
-                         "%s.material",
-                         prefab_str);
+            uint64_t tmp_keys[] = {
+                    root_key,
+                    key,
+                    ct_yamlng_a0.calc_key("name"),
+            };
 
-                capi->add_dependency(filename, prefab_file);
+            const char *name = ct_ydb_a0.get_string(filename, tmp_keys,
+                                                    CETECH_ARRAY_LEN(tmp_keys),
+                                                    "");
+            char uniform_name[32];
+            strcpy(uniform_name, name);
 
-                const char *source_dir = ct_resource_a0.compiler_get_source_dir();
-                char *full_path = ct_path_a0.join(a, 2, source_dir,
-                                                  prefab_file);
-
-                ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
-                                                         VIO_OPEN_READ);
-
-                CEL_FREE(a, full_path);
-
-                char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
-                memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
-                prefab_vio->read(prefab_vio->inst, prefab_data, sizeof(char),
-                                 prefab_vio->size(prefab_vio->inst));
-                prefab_vio->close(prefab_vio->inst);
-
-                yaml_document_t h;
-                yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
-
-                _preprocess(filename, prefab_root, capi);
-                yaml_merge(root, prefab_root);
-            }
-        }
-
-        void _forach_variable_clb(yaml_node_t key,
-                                  yaml_node_t value,
-                                  void *_data) {
-
-            struct material_compile_output *output = (material_compile_output *) _data;
-
-            char tmp_buffer[512] = {};
-            char uniform_name[32] = {};
-
-            yaml_as_string(key, uniform_name,
-                           CETECH_ARRAY_LEN(uniform_name) - 1);
+            tmp_keys[2] = ct_yamlng_a0.calc_key("type");
+            const char *type = ct_ydb_a0.get_string(filename, tmp_keys,
+                                                    CETECH_ARRAY_LEN(tmp_keys),
+                                                    "");
 
             material_variable mat_var = {};
 
-            auto variable_type = yaml_node_type(value);
+            tmp_keys[2] = ct_yamlng_a0.calc_key("value");
+            if (!strcmp(type, "texture")) {
+                uint64_t texture_name = 0;
 
-            if (YAML_TYPE_SCALAR == variable_type) {
-                yaml_as_string(value, tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer));
-                uint64_t texture_name = ct_hash_a0.id64_from_str(tmp_buffer);
+                //TODO : None type?
+                if(ct_ydb_a0.has_key(filename, tmp_keys,
+                                     CETECH_ARRAY_LEN(tmp_keys))) {
+                        const char *v = ct_ydb_a0.get_string(
+                                filename,
+                                tmp_keys, CETECH_ARRAY_LEN(tmp_keys), "");
+                    texture_name = ct_hash_a0.id64_from_str(v);
+                }
 
                 mat_var.type = MAT_VAR_TEXTURE;
                 mat_var.t = texture_name;
 
+            } else if (!strcmp(type, "vec4")) {
+                mat_var.type = MAT_VAR_VEC4;
+                ct_ydb_a0.get_vec4(filename, tmp_keys,
+                                   CETECH_ARRAY_LEN(tmp_keys), mat_var.v4,
+                                   (float[4]) {0.0f});
+
+            } else if (!strcmp(type, "mat4")) {
+                mat_var.type = MAT_VAR_MAT44;
+                ct_ydb_a0.get_mat4(filename, tmp_keys,
+                                   CETECH_ARRAY_LEN(tmp_keys), mat_var.m44,
+                                   (float[16]) {0.0f});
             }
 
-            if (YAML_TYPE_SEQ == variable_type) {
-                uint8_t count = yaml_node_size(value);
-                if (4 == count) {
-                    float v[4];
-                    yaml_as_vec4(value, v);
-
-                    mat_var.type = MAT_VAR_VEC4;
-
-                    celib::vec4_move(mat_var.v4, v);
-
-                } else if (16 == count) {
-                    float m[16];
-                    yaml_as_mat44(value, m);
-
-                    mat_var.type = MAT_VAR_MAT44;
-                    celib::mat4_move(mat_var.v4, m);
-                }
-            }
-
-            array::push(output->var, &mat_var, 1);
-            array::push(output->uniform_names, uniform_name,
-                        CETECH_ARRAY_LEN(uniform_name));
+            array::push(output.var, &mat_var, 1);
+            array::push(output.uniform_names, uniform_name, CETECH_ARRAY_LEN(uniform_name));
         }
     }
 
+    uint64_t render_state_to_enum(uint64_t name) {
 
-    //        (0
-//                          | BGFX_STATE_RGB_WRITE
-//                          | BGFX_STATE_ALPHA_WRITE
-//                          | BGFX_STATE_DEPTH_TEST_LESS
-//                          | BGFX_STATE_DEPTH_WRITE
-//                          | BGFX_STATE_CULL_CCW
-//                          | BGFX_STATE_MSAA );
-
-    uint64_t render_state_to_enum(const char *name) {
         static struct {
-            const char *name;
+            uint64_t name;
             uint64_t e;
         } _tbl[] = {
-                {.name = "", .e = 0},
-                {.name = "rgb_write", .e = BGFX_STATE_RGB_WRITE},
-                {.name = "alpha_write", .e = BGFX_STATE_ALPHA_WRITE},
-                {.name = "depth_write", .e = BGFX_STATE_DEPTH_WRITE},
-
-                {.name = "depth_test_less", .e = BGFX_STATE_DEPTH_TEST_LESS},
-
-                {.name = "cull_ccw", .e = BGFX_STATE_CULL_CCW},
-
-                {.name = "msaa", .e = BGFX_STATE_MSAA},
+                {.name = ct_hash_a0.id64_from_str(""), .e = 0},
+                {.name = ct_hash_a0.id64_from_str("rgb_write"), .e = BGFX_STATE_RGB_WRITE},
+                {.name = ct_hash_a0.id64_from_str("alpha_write"), .e = BGFX_STATE_ALPHA_WRITE},
+                {.name = ct_hash_a0.id64_from_str("depth_write"), .e = BGFX_STATE_DEPTH_WRITE},
+                {.name = ct_hash_a0.id64_from_str("depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
+                {.name = ct_hash_a0.id64_from_str("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
+                {.name = ct_hash_a0.id64_from_str("msaa"), .e = BGFX_STATE_MSAA},
         };
 
         for (int i = 1; i < CETECH_ARRAY_LEN(_tbl); ++i) {
-            if (0 != strcmp(_tbl[i].name, name)) {
+            if (_tbl[i].name != name) {
                 continue;
             }
 
@@ -174,23 +132,77 @@ namespace material_compiler {
     }
 
 
+    void foreach_layer(const char *filename,
+                       uint64_t root_key,
+                       uint64_t key,
+                       material_compile_output &output) {
+
+        uint64_t tmp_keys[] = {
+                root_key,
+                key,
+                ct_yamlng_a0.calc_key("shader"),
+        };
+
+        uint64_t tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+                                                    CETECH_ARRAY_LEN(tmp_keys));
+
+        const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
+        uint64_t shader_id = ct_hash_a0.id64_from_str(shader);
+        array::push_back(output.shader_name, shader_id);
+
+        auto layer_id = key;
+        auto layer_offset = array::size(output.var);
+
+        tmp_keys[2] = ct_yamlng_a0.calc_key("render_state");
+        tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+                                           CETECH_ARRAY_LEN(tmp_keys));
+        if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
+            output.curent_render_state = 0;
+
+            uint64_t render_state_keys[32] = {};
+            uint32_t render_state_count = 0;
+
+            ct_ydb_a0.get_map_keys(filename,
+                                   &tmp_key, 1,
+                                   render_state_keys,
+                                   CETECH_ARRAY_LEN(render_state_keys),
+                                   &render_state_count);
+
+            for (int i = 0; i < render_state_count; ++i) {
+                output.curent_render_state |= render_state_to_enum(render_state_keys[i]);
+            }
+        }
+
+        array::push_back(output.layer_names, layer_id);
+        array::push_back(output.layer_offset, layer_offset);
+        array::push_back(output.render_state, output.curent_render_state);
+
+        tmp_keys[2] = ct_yamlng_a0.calc_key("variables");
+        tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+                                           CETECH_ARRAY_LEN(tmp_keys));
+        if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
+            uint64_t layers_keys[32] = {};
+            uint32_t layers_keys_count = 0;
+
+            ct_ydb_a0.get_map_keys(filename,
+                                   &tmp_key, 1,
+                                   layers_keys, CETECH_ARRAY_LEN(layers_keys),
+                                   &layers_keys_count);
+
+            for (int i = 0; i < layers_keys_count; ++i) {
+                _forach_variable_clb(filename, tmp_key, layers_keys[i], output);
+            }
+        }
+
+        array::push_back(output.uniform_count,
+                         array::size(output.var) - layer_offset);
+
+    };
+
     int compiler(const char *filename,
                  ct_vio *source_vio,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
-
-        char *source_data =
-                CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             source_vio->size(source_vio->inst) + 1);
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
-
-        _preprocess(filename, root, compilator_api);
 
         struct material_compile_output output = {};
         output.uniform_names.init(ct_memory_a0.main_allocator());
@@ -201,75 +213,23 @@ namespace material_compiler {
         output.layer_offset.init(ct_memory_a0.main_allocator());
         output.shader_name.init(ct_memory_a0.main_allocator());
 
-        yaml_node_t layers = yaml_get_node(root, "layers");
-        if (!yaml_is_valid(layers)) {
+        uint64_t key = ct_yamlng_a0.calc_key("layers");
+
+        if (!ct_ydb_a0.has_key(filename, &key, 1)) {
             return 0;
         }
 
-        yaml_node_foreach_dict(
-                layers,
-                [](yaml_node_t key,
-                   yaml_node_t value,
-                   void *_data) {
+        uint64_t layers_keys[32] = {};
+        uint32_t layers_keys_count = 0;
 
-                    material_compile_output &output = *((material_compile_output *) _data);
+        ct_ydb_a0.get_map_keys(filename,
+                               &key, 1,
+                               layers_keys, CETECH_ARRAY_LEN(layers_keys),
+                               &layers_keys_count);
 
-                    yaml_node_t shader_node = yaml_get_node(value, "shader");
-                    CETECH_ASSERT("material", yaml_is_valid(shader_node));
-
-                    char tmp_buffer[256] = {};
-                    yaml_as_string(shader_node, tmp_buffer,
-                                   CETECH_ARRAY_LEN(tmp_buffer));
-
-                    uint64_t shader_id = ct_hash_a0.id64_from_str(tmp_buffer);
-                    array::push_back(output.shader_name, shader_id);
-
-
-                    yaml_as_string(key, tmp_buffer,
-                                   CETECH_ARRAY_LEN(tmp_buffer));
-
-                    auto layer_id = ct_hash_a0.id64_from_str(tmp_buffer);
-                    auto layer_offset = array::size(output.var);
-
-                    yaml_node_t render_state = yaml_get_node(value,
-                                                             "render_state");
-                    if (yaml_is_valid(render_state)) {
-                        output.curent_render_state = 0;
-
-                        yaml_node_foreach_dict(
-                                render_state,
-                                [](yaml_node_t key,
-                                   yaml_node_t value,
-                                   void *_data) {
-
-                                    material_compile_output &output = *((material_compile_output *) _data);
-
-                                    char state_name[64] = {};
-                                    yaml_as_string(key, state_name,
-                                                   CETECH_ARRAY_LEN(
-                                                           state_name));
-
-                                    output.curent_render_state |= render_state_to_enum(
-                                            state_name);
-
-                                }, &output);
-                    }
-
-                    array::push_back(output.layer_names, layer_id);
-                    array::push_back(output.layer_offset, layer_offset);
-                    array::push_back(output.render_state,
-                                     output.curent_render_state);
-
-                    yaml_node_t variables = yaml_get_node(value, "variables");
-                    if (yaml_is_valid(variables)) {
-                        yaml_node_foreach_dict(variables, _forach_variable_clb,
-                                               &output);
-                    }
-
-                    array::push_back(output.uniform_count,
-                                     array::size(output.var) - layer_offset);
-
-                }, &output);
+        for (int i = 0; i < layers_keys_count; ++i) {
+            foreach_layer(filename, key, layers_keys[i], output);
+        }
 
         material_blob::blob_t resource = {
                 .all_uniform_count = array::size(output.var),
@@ -309,7 +269,6 @@ namespace material_compiler {
         output.shader_name.destroy();
         output.render_state.destroy();
 
-        CEL_FREE(ct_memory_a0.main_allocator(), source_data);
         return 1;
     }
 
@@ -319,6 +278,8 @@ namespace material_compiler {
         CETECH_GET_API(api, ct_path_a0);
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_hash_a0);
+        CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_ydb_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("material"),
                                          compiler);

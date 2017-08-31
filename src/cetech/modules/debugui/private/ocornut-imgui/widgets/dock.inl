@@ -28,9 +28,9 @@
 #include <new> // placement new
 
 #include <celib/buffer.inl>
-#include <cetech/modules/yaml/yaml.h>
 #include <cetech/kernel/macros.h>
-static const char *DOCK_ENTRY_TEMPLATE = "- index: %d\n"
+static const char *DOCK_ENTRY_TEMPLATE = "%d: \n"
+        "  index: %d\n"
         "  label: %s\n"
         "  x: %d\n"
         "  y: %d\n"
@@ -1034,6 +1034,7 @@ namespace ImGui {
                 celib::buffer::printf(buffer,
                                       DOCK_ENTRY_TEMPLATE,
                                       i,
+                                      i,
                                       label,
                                       (int) dock.pos.x,
                                       (int) dock.pos.y,
@@ -1051,7 +1052,7 @@ namespace ImGui {
             }
         }
 
-        void loadFromYaml(yaml_node_t root) {
+        void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yamlng_a0* yng) {
             for (int i = 0; i < m_docks.size(); ++i)
             {
                 m_docks[i]->~Dock();
@@ -1059,61 +1060,91 @@ namespace ImGui {
             }
             m_docks.clear();
 
-            for(int i = 0; i < yaml_node_size(root); ++i) {
+            uint64_t tmp_keys = 0;
+            uint64_t type_keys[32] = {};
+            uint32_t type_keys_count = 0;
+            ydb->get_map_keys(path,
+                                   &tmp_keys,1,
+                                   type_keys,CETECH_ARRAY_LEN(type_keys),
+                                   &type_keys_count);
+
+            for (int i = 0; i < type_keys_count; ++i) {
                 Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));
                 m_docks.push_back(IM_PLACEMENT_NEW(new_dock) Dock());
             }
 
-            yaml_node_foreach_seq(
-                    root,
-                    [](uint32_t idx,
-                       yaml_node_t value,
-                       void *_data) {
+            for (int i = 0; i < type_keys_count; ++i) {
+                uint64_t k[2] {
+                        type_keys[i],
+                        yng->calc_key("index")
+                };
 
-                        auto index_n = yaml_get_node(value, "index");
-                        auto label_n = yaml_get_node(value, "label");
-                        auto x_n = yaml_get_node(value, "x");
-                        auto y_n = yaml_get_node(value, "y");
-                        auto location_n = yaml_get_node(value, "location");
-                        auto size_x_n = yaml_get_node(value, "size_x");
-                        auto size_y_n = yaml_get_node(value, "size_y");
-                        auto status_n = yaml_get_node(value, "status");
-                        auto active_n = yaml_get_node(value, "active");
-                        auto opened_n = yaml_get_node(value, "opened");
-                        auto prev_n = yaml_get_node(value, "prev");
-                        auto next_n = yaml_get_node(value, "next");
-                        auto child0_n = yaml_get_node(value, "child0");
-                        auto child1_n = yaml_get_node(value, "child1");
-                        auto parent_n = yaml_get_node(value, "parent");
+                int index_n = (int) ydb->get_float(path, k, 2, 0);
 
-                        auto* _this =  ((DockContext*)_data);
+                k[1] = yng->calc_key("label");
+                const char* label_n = ydb->get_string(path, k, 2, "");
 
-                        Dock* dock =  _this->getDockByIndex(yaml_as_int(index_n));
+                k[1] = yng->calc_key("x");
+                int x_n = (int) ydb->get_float(path, k, 2, 0);
 
-                        char buffer[128];
+                k[1] = yng->calc_key("y");
+                int y_n = (int) ydb->get_float(path, k, 2, 0);
 
-                        yaml_as_string(label_n, buffer, CETECH_ARRAY_LEN(buffer));
-                        dock->label = ImStrdup(buffer),
-                        dock->id = ImHash(dock->label, 0);
+                k[1] = yng->calc_key("location");
+                const char* location_n = ydb->get_string(path, k, 2, "");
 
-                        yaml_as_string(location_n, buffer, CETECH_ARRAY_LEN(buffer));
-                        strcpy(dock->location, buffer);
+                k[1] = yng->calc_key("size_x");
+                int size_x_n = (int) ydb->get_float(path, k, 2, 0);
 
-                        dock->pos.x = yaml_as_int(x_n);
-                        dock->pos.y = yaml_as_int(y_n);
-                        dock->size.x = yaml_as_int(size_x_n);
-                        dock->size.y = yaml_as_int(size_y_n);
-                        dock->status = Status_ (yaml_as_int(status_n));
-                        dock->active = yaml_as_int(active_n) != 0;
-                        dock->opened = yaml_as_int(opened_n) != 0;
+                k[1] = yng->calc_key("size_y");
+                int size_y_n = (int) ydb->get_float(path, k, 2, 0);
 
-                        dock->prev_tab = _this->getDockByIndex(yaml_as_int(prev_n));
-                        dock->next_tab = _this->getDockByIndex(yaml_as_int(next_n));
-                        dock->children[0] = _this->getDockByIndex(yaml_as_int(child0_n));
-                        dock->children[1] = _this->getDockByIndex(yaml_as_int(child1_n));
-                        dock->parent = _this->getDockByIndex(yaml_as_int(parent_n));
+                k[1] = yng->calc_key("status");
+                int status_n = (int) ydb->get_float(path, k, 2, 0);
 
-                    }, this);
+                k[1] = yng->calc_key("active");
+                int active_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("opened");
+                int opened_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("prev");
+                int prev_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("next");
+                int next_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("child0");
+                int child0_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("child1");
+                int child1_n = (int) ydb->get_float(path, k, 2, 0);
+
+                k[1] = yng->calc_key("parent");
+                int parent_n = (int) ydb->get_float(path, k, 2, 0);
+
+                Dock* dock =  this->getDockByIndex(index_n);
+
+                dock->label = ImStrdup(label_n);
+                dock->id = ImHash(dock->label, 0);
+                strcpy(dock->location, location_n);
+
+                dock->pos.x = x_n;
+                dock->pos.y =   y_n;
+                dock->size.x =  size_x_n;
+                dock->size.y =  size_y_n;
+                dock->status =  Status_ (status_n);
+                dock->active =  active_n != 0;
+                dock->opened =  opened_n != 0;
+
+                dock->prev_tab = this->getDockByIndex(prev_n);
+                dock->next_tab = this->getDockByIndex(next_n);
+                dock->children[0] = this->getDockByIndex(child0_n);
+                dock->children[1] = this->getDockByIndex(child1_n);
+                dock->parent = this->getDockByIndex(parent_n);
+
+            }
+
         }
     };
 
@@ -1153,8 +1184,8 @@ namespace ImGui {
         s_dock->saveToYaml(buffer);
     }
 
-    IMGUI_API void loadFromYaml(yaml_node_t root) {
-        s_dock->loadFromYaml(root);
+    IMGUI_API void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yamlng_a0* yng) {
+        s_dock->loadFromYaml(path, ydb, yng);
     }
 
 

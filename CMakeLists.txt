@@ -99,6 +99,7 @@ set(SOURCE_FILES
         src/cetech/kernel/private/filesystem.cpp
         src/cetech/kernel/private/blob.cpp
         src/cetech/kernel/private/yamlng.cpp
+        src/cetech/kernel/private/ydb.cpp
 
         src/cetech/modules/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/modules/debugui/private/ocornut-imgui/imgui.cpp
@@ -117,7 +118,6 @@ set(SOURCE_FILES
         src/cetech/modules/machine/private/mouse_sdl2.cpp
         src/cetech/modules/machine/private/keyboard_sdl2.cpp
         src/cetech/modules/machine/private/gamepad_sdl2.cpp
-        src/cetech/modules/yaml/private/yaml.cpp
         src/cetech/modules/luasys/private/luasys_private.cpp
         src/cetech/modules/luasys/private/api/api_log.cpp
         src/cetech/modules/luasys/private/api/api_vec3f.cpp
@@ -183,7 +183,6 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
 
         nanomsg.a
-        yaml-cpp.a
 
         bgfxRelease.a
         bimgRelease.a
@@ -209,7 +208,6 @@ set(RELEASE_LIBS2
         sqlite3
         assimp
         SDL2
-        yaml-cpp
         luajit
         )
 

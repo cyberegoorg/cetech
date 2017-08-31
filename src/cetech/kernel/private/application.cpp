@@ -26,8 +26,8 @@
 
 #include <cetech/kernel/watchdog.h>
 #include <cetech/modules/input/input.h>
-#include <cetech/kernel/yamlng.h>
 #include <cetech/kernel/filesystem.h>
+#include <cetech/kernel/ydb.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -44,6 +44,7 @@ CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_yamlng_a0);
 CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 //==============================================================================
 // Definess
@@ -138,7 +139,8 @@ extern "C" void application_start() {
                                       "default.render_config",
                                       FS_OPEN_READ);
 
-    ct_yamlng_document* d = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
+    ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
+                                                  ct_memory_a0.main_allocator());
     ct_filesystem_a0.close(f);
 
     uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
@@ -224,15 +226,32 @@ extern "C" void application_start() {
 //        ct_log_a0.info(LOG_WHERE, "ROTATION : %f, %f, %f", v[0], v[1], v[2]);
 //    }
 //
-    if(d->has_key(d->inst, key)) {
+    if (d->has_key(d->inst, key)) {
         ct_yamlng_node node = d->get(d->inst, key);
-        ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA dsadsad %s: %d", d->as_string(d->inst, node, ""), d->type(d->inst, node));
+        ct_log_a0.info(LOG_WHERE, "MAAAAAAAAAA dsadsad %s: %d",
+                       d->as_string(d->inst, node, ""), d->type(d->inst, node));
     }
 
     ct_yamlng_a0.destroy(d);
 
+    uint64_t foo_k[] = {
+            ct_yamlng_a0.calc_key("entities"),
+            ct_yamlng_a0.calc_key("5564343313252"),
+            ct_yamlng_a0.calc_key("components"),
+            ct_yamlng_a0.calc_key("412321322234"),
+            ct_yamlng_a0.calc_key("component_type"),
+    };
 
-//    return;
+//    uint64_t keys[32] = {};
+//    uint32_t keys_count = 0;
+
+    const char* type = ct_ydb_a0.get_string("level2.level", foo_k, CETECH_ARRAY_LEN(foo_k), "");
+    CEL_UNUSED(type);
+
+    //ct_ydb_a0.get_string("a.yaml", foo_k, CETECH_ARRAY_LEN(foo_k), "");
+
+    //ct_log_a0.debug(LOG_WHERE, "FPOOOOOO: %s", foo);
+    //return;
 
     _init_config();
 
@@ -364,6 +383,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_yamlng_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
 
             ct_api_a0 = *api;
         },

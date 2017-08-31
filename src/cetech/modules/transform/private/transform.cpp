@@ -5,10 +5,11 @@
 #include "cetech/kernel/api_system.h"
 #include "celib/array.inl"
 #include "celib/map.inl"
-#include "cetech/modules/yaml/yaml.h"
 
 #include "cetech/modules/entity/entity.h"
 #include <cetech/modules/transform/transform.h>
+#include <cetech/kernel/ydb.h>
+#include <cetech/kernel/macros.h>
 #include "celib/fpumath.h"
 #include "cetech/kernel/module.h"
 #include "cetech/kernel/blob.h"
@@ -17,6 +18,8 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_component_a0);
+CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -183,26 +186,30 @@ static void _destroy_world(ct_world world) {
     array::pop_back(_G.world_instances);
 }
 
-int _component_compiler(yaml_node_t body,
-                        ct_blob *data) {
+int _component_compiler(const char *filename,
+                        uint64_t* component_key,
+                        uint32_t component_key_count,
+                        struct ct_blob *data) {
     transform_data t_data;
 
-    YAML_NODE_SCOPE(scale, body, "scale",
-                    yaml_as_vec3(scale, t_data.scale););
-    YAML_NODE_SCOPE(position, body, "position",
-                    yaml_as_vec3(position, t_data.position););
+    uint64_t keys[component_key_count+1];
+    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
+    keys[component_key_count] = ct_yamlng_a0.calc_key("scale");
+
+    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.scale, (float[3]){0});
+
+    keys[component_key_count] = ct_yamlng_a0.calc_key("position");
+    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.position, (float[3]){0});
 
     {
         float v[3] = {};
         float v_rad[3] = {};
 
-        yaml_node_t rotation = yaml_get_node(body, "rotation");
-        yaml_as_vec3(rotation, v);
+        keys[component_key_count] = ct_yamlng_a0.calc_key("rotation");
+        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v, (float[3]){0});
 
         celib::vec3_mul(v_rad, v, celib::DEG_TO_RAD);
         celib::quatFromEuler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
-
-        yaml_node_free(rotation);
     };
 
     data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
@@ -642,6 +649,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             _init(api);

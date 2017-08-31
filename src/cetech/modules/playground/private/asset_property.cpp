@@ -28,6 +28,7 @@ static struct _G {
     ct_ap_on_asset active_on_asset;
     uint64_t active_type;
     uint64_t active_name;
+    const char *active_path;
 } _G;
 
 static void on_debugui() {
@@ -41,7 +42,7 @@ static void on_debugui() {
                                          _G.active_type, _G.active_name);
 
     if(ct_debugui_a0.CollapsingHeader(filename, DebugUITreeNodeFlags_DefaultOpen)) {
-        _G.active_on_asset(_G.active_type, _G.active_name);
+        _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
     }
 }
 
@@ -55,6 +56,7 @@ static void set_asset(uint64_t type,
     _G.active_on_asset = map::get<ct_ap_on_asset>(_G.on_asset, type, NULL);
     _G.active_type = type;
     _G.active_name = name;
+    _G.active_path = path;
 
     ct_property_inspector_a0.set_active(on_debugui);
 }

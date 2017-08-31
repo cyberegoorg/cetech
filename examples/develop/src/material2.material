@@ -1,8 +1,9 @@
-parent: material1
+PARENT: material1.material
 
 layers:
   default:
     variables:
-      u_texColor: texture2
-      #u_texColor: content/scene/solider/body01
-      #u_texColor: content/scene/m4a1/m4_diff
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value: texture2

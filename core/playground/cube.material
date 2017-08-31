@@ -11,5 +11,7 @@ layers:
       msaa: true
 
     variables:
-      u_texColor: texture2 # texture2.texture
-
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value: texture2

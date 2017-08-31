@@ -11,12 +11,20 @@ layers:
       msaa: true
 
     variables:
-      #u_texColor: texture2 # texture2.texture
-      u_texColor: content/scene/solider/body01
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value: content/scene/solider/body01
 
-      u_vec4: [1.0, 1.0, 1.0, 1.0]
+      k22cbxbg435124asdkj:
+        name: u_vec4
+        type: vec4
+        value: [1.0, 1.0, 1.0, 1.0]
 
-      u_m44: [1.0, 1.0, 1.0, 1.0,
-              1.0, 1.0, 1.0, 1.0,
-              1.0, 1.0, 1.0, 1.0,
-              1.0, 1.0, 1.0, 1.0]
+      kxbxcbxbg435124asdkj:
+        name: u_m44
+        type: mat4
+        value: [1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0]

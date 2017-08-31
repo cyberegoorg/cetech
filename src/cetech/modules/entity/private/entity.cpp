@@ -11,10 +11,10 @@
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/vio.h>
 #include <cetech/kernel/hashlib.h>
-#include <cetech/modules/yaml/yaml.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/blob.h>
+#include <cetech/kernel/ydb.h>
 
 #include "celib/handler.inl"
 #include "celib/map.inl"
@@ -28,6 +28,8 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_blob_a0);
+CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -69,6 +71,11 @@ struct component_data {
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
 
+struct compkey {
+    uint64_t keys[32];
+    uint32_t count;
+};
+
 //==============================================================================
 // Compiler private
 //==============================================================================
@@ -77,100 +84,53 @@ struct ct_entity_compile_output {
     Array<Array<uint32_t>> component_ent_array;
     Map<uint32_t> entity_parent;
     Map<uint32_t> component_body;
-    Array<Array<yaml_node_t>> component_body_array;
+    Array<Array<compkey>> component_key_array;
     Array<uint64_t> component_type;
     uint32_t ent_counter;
 };
 
 namespace entity_resource_compiler {
-    static void preprocess(const char *filename,
-                           yaml_node_t root,
-                           ct_compilator_api *capi) {
-        auto a = ct_memory_a0.main_allocator();
-        const char *source_dir = ct_resource_a0.compiler_get_source_dir();
-
-        yaml_node_t prefab_node = yaml_get_node(root, "prefab");
-
-        if (yaml_is_valid(prefab_node)) {
-            char prefab_file[256] = {};
-            char prefab_str[256] = {};
-            yaml_as_string(prefab_node, prefab_str,
-                           CETECH_ARRAY_LEN(prefab_str));
-
-            snprintf(prefab_file, CETECH_ARRAY_LEN(prefab_file),
-                     "%s.entity", prefab_str);
-
-            capi->add_dependency(filename, prefab_file);
-
-
-            char *full_path = ct_path_a0.join(a, 2, source_dir, prefab_file);
-
-            ct_vio *prefab_vio = ct_vio_a0.from_file(full_path,
-                                                     VIO_OPEN_READ);
-
-            char prefab_data[prefab_vio->size(prefab_vio->inst) + 1];
-            memset(prefab_data, 0, prefab_vio->size(prefab_vio->inst) + 1);
-            prefab_vio->read(prefab_vio->inst, prefab_data, sizeof(char),
-                             prefab_vio->size(prefab_vio->inst));
-
-            yaml_document_t h;
-            yaml_node_t prefab_root = yaml_load_str(prefab_data, &h);
-
-            preprocess(filename, prefab_root, capi);
-            yaml_merge(root, prefab_root);
-
-            prefab_vio->close(prefab_vio->inst);
-
-            CEL_FREE(a, full_path);
-        }
-    }
-
     struct foreach_children_data {
         int parent_ent;
         ct_entity_compile_output *output;
     };
 
 
-    static void compile_entitity(yaml_node_t rootNode,
+    static void compile_entitity(const char *filename,
+                                 uint64_t* root_key,
+                                 uint32_t root_count,
                                  int parent,
                                  ct_entity_compile_output *output);
-
-    void forach_children_clb(yaml_node_t key,
-                             yaml_node_t value,
-                             void *_data) {
-        CEL_UNUSED(key);
-
-        struct foreach_children_data *data = (foreach_children_data *) _data;
-
-        compile_entitity(value, data->parent_ent, data->output);
-    }
-
 
     struct foreach_componets_data {
         ct_entity_compile_output *output;
         uint32_t ent_id;
     };
 
-    void foreach_components_clb(yaml_node_t key,
-                                yaml_node_t value,
-                                void *_data) {
-        char uid_str[256] = {};
-        char component_type_str[256] = {};
+    void foreach_components_clb(const char *filename,
+                                uint64_t *root_key,
+                                uint32_t  root_count,
+                                uint64_t component_key,
+                                struct foreach_componets_data *data) {
+
         uint64_t cid;
         int contain_cid = 0;
 
-        struct foreach_componets_data *data = (foreach_componets_data *) _data;
         ct_entity_compile_output *output = data->output;
 
-        yaml_as_string(key, uid_str, CETECH_ARRAY_LEN(uid_str));
+        uint64_t tmp_keys[root_count + 2];
+        memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
+        tmp_keys[root_count] = component_key;
+        tmp_keys[root_count + 1] = ct_yamlng_a0.calc_key("component_type");
 
-        yaml_node_t component_type_node = yaml_get_node(value,
-                                                        "component_type");
-        yaml_as_string(component_type_node, component_type_str,
-                       CETECH_ARRAY_LEN(component_type_str));
+        const char *component_type = ct_ydb_a0.get_string(
+                filename, tmp_keys, root_count + 2, NULL);
 
-        cid = ct_hash_a0.id64_from_str(component_type_str);
+        if (!component_type) {
+            return;
+        }
 
+        cid = ct_hash_a0.id64_from_str(component_type);
         for (uint32_t i = 0; i < array::size(output->component_type); ++i) {
             if (output->component_type[i] != cid) {
                 continue;
@@ -192,10 +152,10 @@ namespace entity_resource_compiler {
         }
 
         if (!map::has(output->component_body, cid)) {
-            uint32_t idx = array::size(output->component_body_array);
+            uint32_t idx = array::size(output->component_key_array);
             //Array<yaml_node_t> tmp_a(ct_memory_a0.main_allocator());
-            array::push_back(output->component_body_array, {});
-            output->component_body_array[idx].init(
+            array::push_back(output->component_key_array, {});
+            output->component_key_array[idx].init(
                     ct_memory_a0.main_allocator());
 
             map::set(output->component_body, cid, idx);
@@ -206,11 +166,18 @@ namespace entity_resource_compiler {
         array::push_back(tmp_a, data->ent_id);
 
         idx = map::get(output->component_body, cid, UINT32_MAX);
-        Array<yaml_node_t> &tmp_b = output->component_body_array[idx];
-        array::push_back(tmp_b, value);
+        Array<compkey> &tmp_b = output->component_key_array[idx];
+
+        compkey ck;
+        memcpy(ck.keys, tmp_keys, sizeof(uint64_t) * (root_count + 1));
+        ck.count =root_count + 1;
+
+        array::push_back(tmp_b, ck);
     }
 
-    void compile_entitity(yaml_node_t rootNode,
+    void compile_entitity(const char *filename,
+                          uint64_t* root_key,
+                          uint32_t root_count,
                           int parent,
                           ct_entity_compile_output *output) {
 
@@ -218,27 +185,52 @@ namespace entity_resource_compiler {
 
         map::set(output->entity_parent, ent_id, (uint32_t) parent);
 
-        yaml_node_t components_node = yaml_get_node(rootNode, "components");
-        CETECH_ASSERT("entity_system", yaml_is_valid(components_node));
+        uint64_t tmp_keys[root_count + 2];
+        memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
+        tmp_keys[root_count] = ct_yamlng_a0.calc_key("components");
 
         struct foreach_componets_data data = {
                 .ent_id = ent_id,
                 .output = output
         };
 
-        yaml_node_foreach_dict(components_node, foreach_components_clb, &data);
 
-        yaml_node_t children_node = yaml_get_node(rootNode, "children");
-        if (yaml_is_valid(children_node)) {
+        uint64_t components_keys[32] = {};
+        uint32_t components_keys_count = 0;
+
+        ct_ydb_a0.get_map_keys(
+                filename,
+                tmp_keys, root_count + 1,
+                components_keys, CETECH_ARRAY_LEN(components_keys),
+                &components_keys_count);
+
+        for (int i = 0; i < components_keys_count; ++i) {
+            foreach_components_clb(
+                    filename,
+                    tmp_keys, root_count + 1,
+                    components_keys[i], &data);
+        }
+
+
+        tmp_keys[root_count] = ct_yamlng_a0.calc_key("children");
+
+        uint64_t children_keys[32] = {};
+        uint32_t children_keys_count = 0;
+
+        ct_ydb_a0.get_map_keys(filename,
+                               tmp_keys, root_count + 1,
+                               children_keys, CETECH_ARRAY_LEN(children_keys),
+                               &children_keys_count);
+
+        for (int i = 0; i < children_keys_count; ++i) {
             int parent_ent = ent_id;
             //output->ent_counter += 1;
 
-            struct foreach_children_data data = {
-                    .parent_ent = parent_ent,
-                    .output = output
-            };
+            tmp_keys[root_count+1] = children_keys[i];
 
-            yaml_node_foreach_dict(children_node, forach_children_clb, &data);
+            compile_entitity(filename,
+                             tmp_keys, root_count+2,
+                             parent_ent, output);
         }
     }
 
@@ -257,7 +249,7 @@ namespace entity_resource_compiler {
         output->component_ent_array.init(a);
         output->entity_parent.init(a);
         output->component_body.init(a);
-        output->component_body_array.init(a);
+        output->component_key_array.init(a);
 
         return output;
     }
@@ -278,8 +270,8 @@ namespace entity_resource_compiler {
         output->component_ent_array.destroy();
 
         // clean inner array
-        auto cb_it = array::begin(output->component_body_array);
-        auto cb_end = array::end(output->component_body_array);
+        auto cb_it = array::begin(output->component_key_array);
+        auto cb_end = array::end(output->component_key_array);
 
         while (cb_it != cb_end) {
             cb_it->destroy();
@@ -287,19 +279,19 @@ namespace entity_resource_compiler {
         }
 
         output->component_body.destroy();
-        output->component_body_array.destroy();
+        output->component_key_array.destroy();
 
         cel_alloc *a = ct_memory_a0.main_allocator();
         CEL_FREE(a, output);
     }
 
     void compile_entity(ct_entity_compile_output *output,
-                        yaml_node_t root,
+                        uint64_t* root,
+                        uint32_t root_count,
                         const char *filename,
                         ct_compilator_api *compilator_api) {
 
-        preprocess(filename, root, compilator_api);
-        compile_entitity(root, UINT32_MAX, output);
+        compile_entitity(filename, root, root_count, UINT32_MAX, output);
     }
 
     uint32_t ent_counter(ct_entity_compile_output *output) {
@@ -307,6 +299,7 @@ namespace entity_resource_compiler {
     }
 
     void write_to_build(ct_entity_compile_output *output,
+                        const char *filename,
                         ct_blob *build) {
         struct entity_resource res = {};
         res.ent_count = (uint32_t) (output->ent_counter);
@@ -340,12 +333,12 @@ namespace entity_resource_compiler {
             };
 
             idx = map::get(output->component_body, cid, UINT32_MAX);
-            Array<yaml_node_t> &body = output->component_body_array[idx];
+            Array<compkey> &body = output->component_key_array[idx];
 
             ct_blob *blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
 
             for (uint32_t i = 0; i < cdata.ent_count; ++i) {
-                ct_component_a0.compile(id, body[i], blob);
+                ct_component_a0.compile(id, filename, body[i].keys, body[i].count, blob);
             }
 
             cdata.size = blob->size(blob->inst);
@@ -361,14 +354,13 @@ namespace entity_resource_compiler {
         }
     }
 
-    void compiler(yaml_node_t root,
+    void compiler(uint64_t root,
                   const char *filename,
                   ct_blob *build,
                   ct_compilator_api *compilator_api) {
         ct_entity_compile_output *output = create_output();
-        compile_entity(output, root, filename, compilator_api);
-        write_to_build(output, build);
-
+        compile_entity(output, &root, 1, filename, compilator_api);
+        write_to_build(output, filename, build);
         destroy_output(output);
     }
 
@@ -376,20 +368,8 @@ namespace entity_resource_compiler {
                                   ct_vio *source_vio,
                                   ct_vio *build_vio,
                                   ct_compilator_api *compilator_api) {
-
-        char source_data[source_vio->size(source_vio->inst) + 1];
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
-
-
-        ct_blob *entity_data = ct_blob_a0.create(
-                ct_memory_a0.main_allocator());
-
-        compiler(root, filename, entity_data, compilator_api);
+        ct_blob *entity_data = ct_blob_a0.create(ct_memory_a0.main_allocator());
+        compiler(0, filename, entity_data, compilator_api);
 
         build_vio->write(build_vio->inst, entity_data->data(entity_data->inst),
                          sizeof(uint8_t),
@@ -599,6 +579,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_blob_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             entity_module::_init(api);

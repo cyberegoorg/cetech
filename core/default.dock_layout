@@ -1,4 +1,5 @@
-- index: 0
+0:
+  index: 0
   label: Level view 1
   x: 0
   y: 22
@@ -13,7 +14,9 @@
   child0: -1
   child1: -1
   parent: 5
-- index: 1
+
+1:
+  index: 1
   label: Property inspector
   x: 1519
   y: 322
@@ -28,7 +31,9 @@
   child0: -1
   child1: -1
   parent: 8
-- index: 2
+
+2:
+  index: 2
   label: Asset preview
   x: 1098
   y: 740
@@ -43,7 +48,9 @@
   child0: -1
   child1: -1
   parent: 6
-- index: 3
+
+3:
+  index: 3
   label: Asset browser
   x: 0
   y: 740
@@ -58,7 +65,9 @@
   child0: -1
   child1: -1
   parent: 6
-- index: 4
+
+4:
+  index: 4
   label: Level inspector
   x: 1519
   y: 22
@@ -73,7 +82,9 @@
   child0: -1
   child1: -1
   parent: 8
-- index: 5
+
+5:
+  index: 5
   label: ""
   x: 0
   y: 22
@@ -88,7 +99,9 @@
   child0: 0
   child1: 6
   parent: 7
-- index: 6
+
+6:
+  index: 6
   label: ""
   x: 0
   y: 740
@@ -103,7 +116,9 @@
   child0: 3
   child1: 2
   parent: 5
-- index: 7
+
+7:
+  index: 7
   label: ""
   x: 0
   y: 22
@@ -118,7 +133,9 @@
   child0: 5
   child1: 8
   parent: -1
-- index: 8
+
+8:
+  index: 8
   label: ""
   x: 1519
   y: 22

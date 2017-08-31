@@ -21,6 +21,7 @@
 #include <cetech/kernel/watchdog.h>
 #include <celib/map.inl>
 #include <cetech/kernel/filesystem.h>
+#include <cetech/kernel/ydb.h>
 
 #include "celib/buffer.inl"
 
@@ -40,6 +41,7 @@ CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 //==============================================================================
 // Defines
@@ -138,13 +140,13 @@ static void _compile_task(void *data) {
         res = tdata->compilator.compilator(tdata->source_filename,
                                            tdata->source, tdata->build,
                                            &_compilator_api) > 0;
+
     } else if (tdata->compilator.compilator_yaml) {
-        ct_yamlng_document *d = ct_yamlng_a0.from_vio(tdata->source,
-                                                      ct_memory_a0.main_allocator());
+        ct_yamlng_document *d = ct_ydb_a0.get(tdata->source_filename);
         res = tdata->compilator.compilator_yaml(tdata->source_filename, d,
                                                 tdata->build,
                                                 &_compilator_api) > 0;
-        ct_yamlng_a0.destroy(d);
+        ct_ydb_a0.free(tdata->source_filename);
     }
 
     if (res) {
@@ -521,6 +523,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             _init(api);

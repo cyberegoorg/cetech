@@ -1,7 +1,6 @@
 #include "celib/array.inl"
 #include "celib/map.inl"
 
-#include "cetech/modules/yaml/yaml.h"
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/config.h"
 #include "cetech/kernel/memory.h"
@@ -22,6 +21,7 @@
 #include <cetech/modules/renderer/material.h>
 #include <cetech/kernel/module.h>
 #include <cetech/modules/renderer/mesh_renderer.h>
+#include <cetech/kernel/ydb.h>
 #include "celib/fpumath.h"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -31,6 +31,8 @@ CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_scene_a0);
+CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -159,40 +161,36 @@ namespace {
         array::pop_back(_G.world_instances);
     }
 
-    int _mesh_component_compiler(yaml_node_t body,
-                                 ct_blob *data) {
+    int _mesh_component_compiler(const char *filename,
+                                 uint64_t* component_key,
+                                 uint32_t component_key_count,
+                                 struct ct_blob *data) {
 
         struct mesh_data t_data;
 
-        char tmp_buffer[64] = {};
+        uint64_t keys[component_key_count+1];
+        memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
+        keys[component_key_count] = ct_yamlng_a0.calc_key("scene");
 
-        YAML_NODE_SCOPE(scene, body, "scene",
-                        yaml_as_string(scene, tmp_buffer,
-                                       CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.scene = ct_hash_a0.id64_from_str(
-                                        tmp_buffer);
-        );
-        YAML_NODE_SCOPE(mesh, body, "mesh",
-                        yaml_as_string(mesh, tmp_buffer,
-                                       CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.mesh = ct_hash_a0.id64_from_str(
-                                        tmp_buffer);
-        );
+        t_data.scene = ct_hash_a0.id64_from_str(
+                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
+                                     ""));
 
-        YAML_NODE_SCOPE(material, body, "material",
-                        yaml_as_string(material, tmp_buffer,
-                                       CETECH_ARRAY_LEN(tmp_buffer));
-                                t_data.material = ct_hash_a0.id64_from_str(
-                                        tmp_buffer);
-        );
+        keys[component_key_count] = ct_yamlng_a0.calc_key("mesh");
+        t_data.mesh = ct_hash_a0.id64_from_str(
+                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
+                                     ""));
 
-        YAML_NODE_SCOPE(node, body, "node",
-                        if (yaml_is_valid(node)) {
-                            yaml_as_string(node, tmp_buffer,
-                                           CETECH_ARRAY_LEN(tmp_buffer));
-                            t_data.node = ct_hash_a0.id64_from_str(tmp_buffer);
-                        }
-        );
+        keys[component_key_count] = ct_yamlng_a0.calc_key("material");
+        t_data.material = ct_hash_a0.id64_from_str(
+                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
+                                     ""));
+
+        keys[component_key_count] = ct_yamlng_a0.calc_key("node");
+        t_data.node = ct_hash_a0.id64_from_str(
+                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
+                                     ""));
+
 
         data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
 
@@ -488,6 +486,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_material_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_scene_a0);
 
         },

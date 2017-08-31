@@ -10,7 +10,7 @@
 #include <cetech/kernel/thread.h>
 #include <cetech/kernel/vio.h>
 #include <cetech/kernel/hashlib.h>
-#include <cetech/modules/yaml/yaml.h>
+#include <cetech/kernel/ydb.h>
 
 #include "celib/allocator.h"
 #include "celib/array.inl"
@@ -23,6 +23,8 @@ CETECH_DECL_API(ct_task_a0);
 CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 using namespace celib;
 
@@ -50,48 +52,10 @@ struct package_compile_data {
     Array<uint32_t> offset;
 };
 
-void forach_clb(yaml_node_t key,
-                yaml_node_t value,
-                void *data) {
-    struct package_compile_data *compile_data = (package_compile_data *) data;
-
-    char type_str[128] = {};
-    char name_str[128] = {};
-
-    yaml_as_string(key, type_str, CETECH_ARRAY_LEN(type_str));
-
-    const uint32_t name_count = yaml_node_size(value);
-
-    array::push_back(compile_data->types, ct_hash_a0.id64_from_str(type_str));
-    array::push_back(compile_data->offset, array::size(compile_data->name));
-    array::push_back(compile_data->name_count, name_count);
-
-    for (uint32_t i = 0; i < name_count; ++i) {
-        yaml_node_t name_node = yaml_get_seq_node(value, i);
-        yaml_as_string(name_node, name_str, CETECH_ARRAY_LEN(name_str));
-
-        array::push_back(compile_data->name,
-                         ct_hash_a0.id64_from_str(name_str));
-
-        yaml_node_free(name_node);
-    }
-}
-
 int _package_compiler(const char *filename,
                       ct_vio *source_vio,
                       ct_vio *build_vio,
                       ct_compilator_api *compilator_api) {
-
-    CEL_UNUSED(filename, compilator_api);
-
-    char source_data[source_vio->size(source_vio->inst) + 1];
-    memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-    source_vio->read(source_vio->inst, source_data, sizeof(char),
-                     source_vio->size(source_vio->inst));
-
-    yaml_document_t h;
-    yaml_node_t root = yaml_load_str(source_data, &h);
-
     struct package_compile_data compile_data = {};
 
     compile_data.types.init(ct_memory_a0.main_allocator());
@@ -99,7 +63,34 @@ int _package_compiler(const char *filename,
     compile_data.offset.init(ct_memory_a0.main_allocator());
     compile_data.name_count.init(ct_memory_a0.main_allocator());
 
-    yaml_node_foreach_dict(root, forach_clb, &compile_data);
+    uint64_t tmp_keys = 0;
+
+    uint64_t type_keys[32] = {};
+    uint32_t type_keys_count = 0;
+    ct_ydb_a0.get_map_keys(filename,
+                           &tmp_keys,1,
+                           type_keys,CETECH_ARRAY_LEN(type_keys),
+                           &type_keys_count);
+
+    for (int i = 0; i < type_keys_count; ++i) {
+        uint64_t type_id = type_keys[i];
+
+        array::push_back(compile_data.types, type_id);
+        array::push_back(compile_data.offset, array::size(compile_data.name));
+
+        uint64_t name_keys[32] = {};
+        uint32_t name_keys_count = 0;
+        ct_ydb_a0.get_map_keys(filename,
+                               &type_keys[i],1,
+                               name_keys,CETECH_ARRAY_LEN(name_keys),
+                               &name_keys_count);
+
+        array::push_back(compile_data.name_count, name_keys_count);
+
+        for (uint32_t j = 0; j < name_keys_count; ++j) {
+            array::push_back(compile_data.name, name_keys[j]);
+        }
+    }
 
     struct package_resource resource = {};
     resource.type_count = array::size(compile_data.types);
@@ -141,6 +132,8 @@ int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_thread_a0);
     CETECH_GET_API(api, ct_vio_a0);
     CETECH_GET_API(api, ct_hash_a0);
+    CETECH_GET_API(api, ct_ydb_a0);
+    CETECH_GET_API(api, ct_yamlng_a0);
 
     _G = (struct G) {};
 

@@ -3,9 +3,11 @@
 #include <cetech/modules/transform/transform.h>
 #include <cetech/kernel/blob.h>
 #include <cetech/modules/camera/camera.h>
+#include <cetech/kernel/yamlng.h>
+#include <cetech/kernel/ydb.h>
+#include <cetech/kernel/macros.h>
 #include "celib/map.inl"
 
-#include "cetech/modules/yaml/yaml.h"
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/config.h"
 #include "cetech/kernel/memory.h"
@@ -17,6 +19,8 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -126,14 +130,24 @@ namespace {
         return nullptr;
     }
 
-    int _camera_component_compiler(yaml_node_t body,
-                                   ct_blob *data) {
+    int _camera_component_compiler(const char *filename,
+                                   uint64_t* component_key,
+                                   uint32_t component_key_count,
+                                   struct ct_blob *data) {
 
         struct camera_data t_data;
 
-        YAML_NODE_SCOPE(near, body, "near", t_data.near = yaml_as_float(near););
-        YAML_NODE_SCOPE(far, body, "far", t_data.far = yaml_as_float(far););
-        YAML_NODE_SCOPE(fov, body, "fov", t_data.fov = yaml_as_float(fov););
+        uint64_t keys[component_key_count+1];
+        memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
+        keys[component_key_count] = ct_yamlng_a0.calc_key("near");
+
+        t_data.near = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
+
+        keys[component_key_count] = ct_yamlng_a0.calc_key("far");
+        t_data.far = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
+
+        keys[component_key_count] = ct_yamlng_a0.calc_key("fov");
+        t_data.fov = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
 
         data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
 
@@ -300,6 +314,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             camera_module::_init(api);

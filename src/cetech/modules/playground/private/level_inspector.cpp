@@ -1,7 +1,6 @@
 #include "celib/map.inl"
 
 #include <cetech/modules/debugui/debugui.h>
-#include <cetech/kernel/vio.h>
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/hashlib.h>
 #include <cetech/kernel/config.h>
@@ -14,6 +13,7 @@
 #include <cetech/modules/playground/asset_browser.h>
 #include <cetech/modules/playground/level_inspector.h>
 #include <cetech/kernel/yamlng.h>
+#include <cetech/kernel/ydb.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -21,6 +21,7 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -69,9 +70,7 @@ void set_level(struct ct_world world, struct ct_level level, uint64_t name, uint
     _G.level = level;
     _G.world = world;
 
-    ct_vio *f = ct_filesystem_a0.open(root, path, FS_OPEN_READ);
-    _G.document = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
-    ct_filesystem_a0.close(f);
+    _G.document = ct_ydb_a0.get(path);
 }
 
 static ct_level_inspector_a0 level_inspector_api = {
@@ -155,6 +154,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             _init(api);

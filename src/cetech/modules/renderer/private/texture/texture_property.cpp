@@ -40,9 +40,9 @@ CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
 
-
 static void texture_asset(uint64_t type,
-                          uint64_t name) {
+                          uint64_t name,
+                          const char* path) {
     float size[2];
     ct_debugui_a0.GetWindowSize(size);
     size[1] = size[0];

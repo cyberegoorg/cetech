@@ -127,6 +127,13 @@ void type_value_from_scalar(const uint8_t *scalar,
                             node_value *vallue,
                             bool is_key) {
     const char *scalar_str = (const char *) scalar;
+
+    if (!strlen(scalar_str)) {
+        *type = NODE_STRING;
+        *vallue = {.string = strdup(scalar_str)};
+        return;
+    }
+
     float f;
 
     if (!is_key) {

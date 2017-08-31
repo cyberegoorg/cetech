@@ -8,7 +8,6 @@
 #include <cetech/kernel/hashlib.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/kernel/vio.h>
-#include <cetech/modules/yaml/yaml.h>
 #include <cetech/kernel/filesystem.h>
 #include "celib/map.inl"
 
@@ -27,6 +26,8 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 using namespace celib;
 
@@ -107,17 +108,8 @@ void SaveDock(struct ct_vio* output) {
     output->write(output->inst, str, 1, strlen(str));
 }
 
-void LoadDock(struct ct_vio* input) {
-    char source_data[input->size(input->inst) + 1];
-    memset(source_data, 0, input->size(input->inst) + 1);
-    input->read(input->inst, source_data, sizeof(char),
-                 input->size(input->inst));
-
-    yaml_document_t h;
-    yaml_node_t root = yaml_load_str(source_data, &h);
-
-    ImGui::loadFromYaml(root);
-
+void LoadDock(const char* path) {
+    ImGui::loadFromYaml(path, &ct_ydb_a0, &ct_yamlng_a0);
 }
 
 namespace debugui_module {
@@ -291,6 +283,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             debugui_module::_init(api);

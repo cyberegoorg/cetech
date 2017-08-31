@@ -1,5 +1,7 @@
+
 #include <celib/buffer.inl>
-#include <cetech/modules/yaml/yaml.h>
+#include <cetech/kernel/ydb.h>
+#include <cetech/kernel/yamlng.h>
 
 namespace ImGui
 {
@@ -24,6 +26,6 @@ namespace ImGui
 	///
 	IMGUI_API void saveToYaml(celib::Buffer& buffer);
 
-	IMGUI_API void loadFromYaml(yaml_node_t root);
+	IMGUI_API void loadFromYaml(const char* file, ct_ydb_a0* ydb, ct_yamlng_a0* yng);
 
 } // namespace ImGui

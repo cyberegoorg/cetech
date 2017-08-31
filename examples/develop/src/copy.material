@@ -11,4 +11,6 @@ layers:
       msaa: true
 
     variables:
-      s_input_texture: ""
+      43243243423423:
+        name: s_input_texture
+        type: texture

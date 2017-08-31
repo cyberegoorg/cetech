@@ -2,21 +2,21 @@ entities:
   # 3
   "5564343313252":
     name: "box1"
-    prefab: box1
+    PARENT: box1.entity
 
   # 2
   #"5564343313252"
   "55643423443313252":
     name: "m4a1"
-    prefab: m4a1
+    PARENT: m4a1.entity
 
   # 1
   "55643433135454252":
     name: "box2"
-    prefab: box2
+    PARENT: box2.entity
     components:
       "234234331453252":
         position: [0, 0, 0]
         rotation: [45, 0, 0]
       "41232132255234":
-        material: "material1"
+        material: "material2"

@@ -8,7 +8,6 @@
 
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/config.h"
-#include "cetech/modules/yaml/yaml.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/module.h"
 
@@ -45,7 +44,9 @@ namespace component {
     }
 
     int compile(uint64_t type,
-                yaml_node_t body,
+                const char* filename,
+                uint64_t* component_key,
+                uint32_t component_key_count,
                 ct_blob *data) {
 
         ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
@@ -55,7 +56,7 @@ namespace component {
             return 0;
         }
 
-        return compiler(body, data);
+        return compiler(filename, component_key, component_key_count, data);
     }
 
     uint32_t get_spawn_order(uint64_t type) {

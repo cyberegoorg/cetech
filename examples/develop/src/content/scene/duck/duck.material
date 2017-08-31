@@ -1,6 +1,9 @@
-parent: material1
+PARENT: material1.material
 
 layers:
   default:
     variables:
-      u_texColor: content/scene/duck/duckCM
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value:  content/scene/duck/duckCM

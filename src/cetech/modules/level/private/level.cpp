@@ -10,9 +10,9 @@
 #include <cetech/kernel/vio.h>
 #include <cetech/kernel/hashlib.h>
 #include <cetech/modules/level/level.h>
-#include <cetech/modules/yaml/yaml.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/blob.h>
+#include <cetech/kernel/ydb.h>
 #include <cetech/kernel/macros.h>
 #include "celib/array.inl"
 #include "celib/map.inl"
@@ -29,6 +29,8 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 //==============================================================================
 // Globals
@@ -136,38 +138,12 @@ namespace level_resource_compiler {
         ct_entity_compile_output *output;
     };
 
-    void forach_entities_clb(yaml_node_t key,
-                             yaml_node_t value,
-                             void *_data) {
-        struct foreach_entities_data *data = (foreach_entities_data *) _data;
-
-
-        char name[128] = {};
-        yaml_as_string(key, name, CETECH_ARRAY_LEN(name));
-
-        array::push_back(*data->id, ct_hash_a0.id64_from_str(name));
-        array::push_back(*data->offset,
-                         ct_entity_a0.compiler_ent_counter(data->output));
-
-        ct_entity_a0.compiler_compile_entity(data->output, value,
-                                             data->filename,
-                                             data->capi);
-    }
 
     int compiler(const char *filename,
                  ct_vio *source_vio,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
 
-        char source_data[source_vio->size(source_vio->inst) + 1];
-        memset(source_data, 0, source_vio->size(source_vio->inst) + 1);
-        source_vio->read(source_vio->inst, source_data, sizeof(char),
-                         source_vio->size(source_vio->inst));
-
-        yaml_document_t h;
-        yaml_node_t root = yaml_load_str(source_data, &h);
-
-        yaml_node_t entities = yaml_get_node(root, "entities");
 
         Array<uint64_t> id(ct_memory_a0.main_allocator());
         Array<uint32_t> offset(ct_memory_a0.main_allocator());
@@ -183,13 +159,50 @@ namespace level_resource_compiler {
                 .output = output
         };
 
-        yaml_node_foreach_dict(entities, forach_entities_clb, &entity_data);
+
+        uint64_t tmp_keys = 0;
+
+        uint64_t groups_keys[32] = {};
+        uint32_t groups_keys_count = 0;
+
+        ct_ydb_a0.get_map_keys(filename,
+                               &tmp_keys,1,
+                               groups_keys,CETECH_ARRAY_LEN(groups_keys),
+                               &groups_keys_count);
+
+        for (int i = 0; i < groups_keys_count; ++i) {
+            uint64_t entities_keys[32] = {};
+            uint32_t entities_keys_count = 0;
+
+            ct_ydb_a0.get_map_keys(filename,
+                                   &groups_keys[i], 1,
+                                   entities_keys,CETECH_ARRAY_LEN(entities_keys),
+                                   &entities_keys_count);
+
+            for (int j = 0; j < entities_keys_count; ++j) {
+                array::push_back(*entity_data.id, entities_keys[j]);
+                array::push_back(*entity_data.offset,
+                                 ct_entity_a0.compiler_ent_counter(entity_data.output));
+
+                uint64_t keys[] = {
+                        groups_keys[i],
+                        entities_keys[j],
+                };
+
+                ct_entity_a0.compiler_compile_entity(
+                        entity_data.output,
+                        keys, 2,
+                        filename,
+                        entity_data.capi);
+            }
+        }
+
 
         level_blob::blob_t res = {
                 .entities_count = (uint32_t) array::size(id)
         };
 
-        ct_entity_a0.compiler_write_to_build(output, entity_data.data);
+        ct_entity_a0.compiler_write_to_build(output, filename, entity_data.data);
 
         build_vio->write(build_vio->inst, &res, sizeof(level_blob::blob_t), 1);
         build_vio->write(build_vio->inst, array::begin(id), sizeof(uint64_t),
@@ -327,6 +340,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             level_module::_init(api);

@@ -748,7 +748,7 @@ struct ct_debugui_a0 {
     void (*VSplitter)(const char* str_id, float size[2]);
 
     void (*SaveDock)(struct ct_vio* output);
-    void (*LoadDock)(struct ct_vio* input);
+    void (*LoadDock)(const char* path);
 };
 
 #ifdef __cplusplus

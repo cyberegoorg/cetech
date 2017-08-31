@@ -1,6 +1,9 @@
-parent: material1
+PARENT: material1.material
 
 layers:
   default:
     variables:
-      u_texColor: content/scene/solider/body01
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value: content/scene/solider/body01
