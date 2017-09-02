@@ -93,6 +93,8 @@ static void on_component(struct ct_world world,
 }
 
 static int _init(ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     _G = {};
 
     ct_entity_property_a0.register_component(on_component);
@@ -124,9 +126,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

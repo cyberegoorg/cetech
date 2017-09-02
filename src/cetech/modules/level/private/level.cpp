@@ -144,7 +144,7 @@ namespace level_resource_compiler {
                  ct_vio *source_vio,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
-
+        CEL_UNUSED(source_vio);
 
         Array<uint64_t> id(ct_memory_a0.main_allocator());
         Array<uint32_t> offset(ct_memory_a0.main_allocator());
@@ -171,7 +171,7 @@ namespace level_resource_compiler {
                                groups_keys,CETECH_ARRAY_LEN(groups_keys),
                                &groups_keys_count);
 
-        for (int i = 0; i < groups_keys_count; ++i) {
+        for (uint32_t i = 0; i < groups_keys_count; ++i) {
             uint64_t entities_keys[32] = {};
             uint32_t entities_keys_count = 0;
 
@@ -180,7 +180,7 @@ namespace level_resource_compiler {
                                    entities_keys,CETECH_ARRAY_LEN(entities_keys),
                                    &entities_keys_count);
 
-            for (int j = 0; j < entities_keys_count; ++j) {
+            for (uint32_t j = 0; j < entities_keys_count; ++j) {
                 array::push_back(*entity_data.id, entities_keys[j]);
                 array::push_back(*entity_data.offset,
                                  ct_entity_a0.compiler_ent_counter(entity_data.output));
@@ -345,9 +345,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
+            CEL_UNUSED(reload);
             level_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             level_module::_shutdown();

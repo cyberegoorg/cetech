@@ -389,9 +389,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_shader_a0);
         },
         {
+            CEL_UNUSED(reload);
             init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             shutdown();

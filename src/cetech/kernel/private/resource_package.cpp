@@ -56,6 +56,8 @@ int _package_compiler(const char *filename,
                       ct_vio *source_vio,
                       ct_vio *build_vio,
                       ct_compilator_api *compilator_api) {
+    CEL_UNUSED(source_vio, compilator_api);
+
     struct package_compile_data compile_data = {};
 
     compile_data.types.init(ct_memory_a0.main_allocator());
@@ -72,7 +74,7 @@ int _package_compiler(const char *filename,
                            type_keys,CETECH_ARRAY_LEN(type_keys),
                            &type_keys_count);
 
-    for (int i = 0; i < type_keys_count; ++i) {
+    for (uint32_t i = 0; i < type_keys_count; ++i) {
         uint64_t type_id = type_keys[i];
 
         array::push_back(compile_data.types, type_id);

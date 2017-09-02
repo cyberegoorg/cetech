@@ -18,7 +18,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DCETECH_DEBUG)
 else ()
     set(CONFIGURATION release)
-    set(CONFIGURATION release)
 endif ()
 
 
@@ -105,14 +104,9 @@ set(SOURCE_FILES
         src/cetech/modules/debugui/private/ocornut-imgui/imgui.cpp
         src/cetech/modules/debugui/private/ocornut-imgui/imgui_draw.cpp
         src/cetech/modules/debugui/private/debugui.cpp
-        src/cetech/modules/playground/private/playground.cpp
-        src/cetech/modules/playground/private/level_editor.cpp
-        src/cetech/modules/playground/private/level_inspector.cpp
-        src/cetech/modules/playground/private/property_inspector.cpp
-        src/cetech/modules/playground/private/asset_property.cpp
-        src/cetech/modules/playground/private/asset_browser.cpp
-        src/cetech/modules/playground/private/asset_preview.cpp
-        src/cetech/modules/playground/private/entity_property.cpp
+
+
+
         src/cetech/modules/machine/private/window_sdl2.cpp
         src/cetech/modules/machine/private/machine_sdl2.cpp
         src/cetech/modules/machine/private/mouse_sdl2.cpp
@@ -133,7 +127,7 @@ set(SOURCE_FILES
         src/cetech/modules/renderer/private/renderer.cpp
         src/cetech/modules/renderer/private/texture/texture.cpp
         src/cetech/modules/renderer/private/texture/texture_compiler.cpp
-        src/cetech/modules/renderer/private/texture/texture_property.cpp
+
         src/cetech/modules/renderer/private/shader/shader.cpp
         src/cetech/modules/renderer/private/shader/shader_compiler.cpp
         src/cetech/modules/renderer/private/material/material.cpp
@@ -145,7 +139,7 @@ set(SOURCE_FILES
         src/cetech/modules/renderer/private/viewport/geometry_pass.cpp
         src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
         src/cetech/modules/transform/private/transform.cpp
-        src/cetech/modules/transform/private/transform_property.cpp
+
         src/cetech/modules/scenegraph/private/scenegraph.cpp
         src/cetech/modules/camera/private/camera.cpp
         )
@@ -183,7 +177,6 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
 
         nanomsg.a
-
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a
@@ -245,5 +238,55 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(module_example SHARED examples/module_example/example.cpp)
-set_target_properties(module_example PROPERTIES PREFIX "")
+add_library(example SHARED examples/module_example/example.cpp)
+set_target_properties(example PROPERTIES PREFIX "module_")
+
+# Level editor
+add_library(level_view SHARED
+        src/cetech/modules/playground/private/level_editor.cpp)
+set_target_properties(level_view PROPERTIES PREFIX "module_")
+
+# transform property
+add_library(transform_property SHARED
+        src/cetech/modules/transform/private/transform_property.cpp)
+set_target_properties(transform_property PROPERTIES PREFIX "module_")
+
+# transform property
+add_library(entity_property SHARED
+        src/cetech/modules/playground/private/entity_property.cpp)
+set_target_properties(entity_property PROPERTIES PREFIX "module_")
+
+# level inspector
+add_library(level_inspector SHARED
+        src/cetech/modules/playground/private/level_inspector.cpp)
+set_target_properties(level_inspector PROPERTIES PREFIX "module_")
+
+# texture_property
+add_library(texture_property SHARED
+        src/cetech/modules/renderer/private/texture/texture_property.cpp)
+set_target_properties(texture_property PROPERTIES PREFIX "module_")
+
+# texture_property
+add_library(asset_preview SHARED
+        src/cetech/modules/playground/private/asset_preview.cpp)
+set_target_properties(asset_preview PROPERTIES PREFIX "module_")
+
+# texture_property
+add_library(asset_property SHARED
+        src/cetech/modules/playground/private/asset_property.cpp)
+set_target_properties(asset_property PROPERTIES PREFIX "module_")
+
+# asset_browser
+add_library(asset_browser SHARED
+        src/cetech/modules/playground/private/asset_browser.cpp)
+set_target_properties(asset_browser PROPERTIES PREFIX "module_")
+
+# asset_browser
+add_library(playground SHARED
+        src/cetech/modules/playground/private/playground.cpp)
+set_target_properties(playground PROPERTIES PREFIX "module_")
+
+# asset_browser
+add_library(property_inspector SHARED
+        src/cetech/modules/playground/private/property_inspector.cpp)
+set_target_properties(property_inspector PROPERTIES PREFIX "module_")

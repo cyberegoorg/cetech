@@ -18,7 +18,7 @@ namespace level_blob {
         return (blob_t *) (data);
     }
 
-    inline const uint32_t blob_size(const blob_t *blob) {
+    inline uint32_t blob_size(const blob_t *blob) {
         return (
                 sizeof(blob_t) +
                 (sizeof(uint64_t) * blob->entities_count) +

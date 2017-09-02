@@ -389,9 +389,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_path_a0", &path_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

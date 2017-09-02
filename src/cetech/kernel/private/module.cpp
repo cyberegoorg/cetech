@@ -341,6 +341,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
+            CEL_UNUSED(reload);
             _G = {};
 
             ct_api_a0 = *api;
@@ -357,6 +358,7 @@ CETECH_MODULE_DEF(
 
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 

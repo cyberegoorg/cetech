@@ -204,7 +204,7 @@ namespace entity_resource_compiler {
                 components_keys, CETECH_ARRAY_LEN(components_keys),
                 &components_keys_count);
 
-        for (int i = 0; i < components_keys_count; ++i) {
+        for (uint32_t i = 0; i < components_keys_count; ++i) {
             foreach_components_clb(
                     filename,
                     tmp_keys, root_count + 1,
@@ -222,7 +222,7 @@ namespace entity_resource_compiler {
                                children_keys, CETECH_ARRAY_LEN(children_keys),
                                &children_keys_count);
 
-        for (int i = 0; i < children_keys_count; ++i) {
+        for (uint32_t i = 0; i < children_keys_count; ++i) {
             int parent_ent = ent_id;
             //output->ent_counter += 1;
 
@@ -290,6 +290,7 @@ namespace entity_resource_compiler {
                         uint32_t root_count,
                         const char *filename,
                         ct_compilator_api *compilator_api) {
+        CEL_UNUSED(compilator_api);
 
         compile_entitity(filename, root, root_count, UINT32_MAX, output);
     }
@@ -368,6 +369,8 @@ namespace entity_resource_compiler {
                                   ct_vio *source_vio,
                                   ct_vio *build_vio,
                                   ct_compilator_api *compilator_api) {
+        CEL_UNUSED(source_vio);
+
         ct_blob *entity_data = ct_blob_a0.create(ct_memory_a0.main_allocator());
         compiler(0, filename, entity_data, compilator_api);
 
@@ -583,9 +586,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
+            CEL_UNUSED(reload);
             entity_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             entity_module::_shutdown();
         }

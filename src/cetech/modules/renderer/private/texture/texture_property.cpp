@@ -43,6 +43,9 @@ CETECH_DECL_API(ct_texture_a0);
 static void texture_asset(uint64_t type,
                           uint64_t name,
                           const char* path) {
+    CEL_UNUSED(type);
+    CEL_UNUSED(path);
+
     float size[2];
     ct_debugui_a0.GetWindowSize(size);
     size[1] = size[0];
@@ -56,6 +59,8 @@ static void texture_asset(uint64_t type,
 }
 
 static int _init(ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     _G = {};
 
     ct_asset_property_a0.register_asset(
@@ -85,9 +90,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_texture_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

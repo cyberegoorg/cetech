@@ -827,9 +827,11 @@ CETECH_MODULE_DEF(
 
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

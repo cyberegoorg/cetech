@@ -120,7 +120,7 @@ namespace material_compiler {
                 {.name = ct_hash_a0.id64_from_str("msaa"), .e = BGFX_STATE_MSAA},
         };
 
-        for (int i = 1; i < CETECH_ARRAY_LEN(_tbl); ++i) {
+        for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_tbl); ++i) {
             if (_tbl[i].name != name) {
                 continue;
             }
@@ -168,7 +168,7 @@ namespace material_compiler {
                                    CETECH_ARRAY_LEN(render_state_keys),
                                    &render_state_count);
 
-            for (int i = 0; i < render_state_count; ++i) {
+            for (uint32_t i = 0; i < render_state_count; ++i) {
                 output.curent_render_state |= render_state_to_enum(render_state_keys[i]);
             }
         }
@@ -189,7 +189,7 @@ namespace material_compiler {
                                    layers_keys, CETECH_ARRAY_LEN(layers_keys),
                                    &layers_keys_count);
 
-            for (int i = 0; i < layers_keys_count; ++i) {
+            for (uint32_t i = 0; i < layers_keys_count; ++i) {
                 _forach_variable_clb(filename, tmp_key, layers_keys[i], output);
             }
         }
@@ -203,6 +203,9 @@ namespace material_compiler {
                  ct_vio *source_vio,
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
+
+        CEL_UNUSED(source_vio);
+        CEL_UNUSED(compilator_api);
 
         struct material_compile_output output = {};
         output.uniform_names.init(ct_memory_a0.main_allocator());
@@ -227,7 +230,7 @@ namespace material_compiler {
                                layers_keys, CETECH_ARRAY_LEN(layers_keys),
                                &layers_keys_count);
 
-        for (int i = 0; i < layers_keys_count; ++i) {
+        for (uint32_t i = 0; i < layers_keys_count; ++i) {
             foreach_layer(filename, key, layers_keys[i], output);
         }
 

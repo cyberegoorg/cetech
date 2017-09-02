@@ -70,6 +70,10 @@ void fps_camera_update(ct_world world,
                        float leftright,
                        float speed,
                        bool fly_mode) {
+
+    CEL_UNUSED(dx);
+    CEL_UNUSED(dy);
+
     float pos[3];
     float rot[4];
     float wm[16];
@@ -295,9 +299,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_level_inspector_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

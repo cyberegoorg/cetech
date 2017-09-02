@@ -492,9 +492,11 @@ CETECH_MODULE_DEF(
 
         },
         {
+            CEL_UNUSED(reload);
             mesh::init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             mesh::shutdown();

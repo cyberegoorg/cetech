@@ -62,6 +62,7 @@ ct_yamlng_document *get(const char *path) {
 };
 
 void free(const char *path) {
+    CEL_UNUSED(path);
     // TODO: ref counting
 }
 
@@ -88,7 +89,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
     static const uint64_t PARENT_KEY = ct_yamlng_a0.calc_key("PARENT");
     uint64_t tmp_key;
 
-    for (int i = 0; i < max_depth; ++i) {
+    for (uint64_t i = 0; i < max_depth; ++i) {
         tmp_key = tmp_keys[i];
 
         tmp_keys[i] = PARENT_KEY;
@@ -136,6 +137,8 @@ void get_map_keys(const char *path,
                              [](ct_yamlng_node k,
                                 ct_yamlng_node v,
                                 void *data) {
+                                 CEL_UNUSED(v);
+
                                  auto *out = (out_keys_s*)data;
 
                                  const char* string = k.d->as_string(k.d->inst, k, NULL);
@@ -165,7 +168,7 @@ void get_map_keys(const char *path,
     static const uint64_t PARENT_KEY = ct_yamlng_a0.calc_key("PARENT");
     uint64_t tmp_key;
 
-    for (int i = 0; i < keys_count; ++i) {
+    for (uint64_t i = 0; i < keys_count; ++i) {
         tmp_key = tmp_keys[i];
 
         tmp_keys[i] = PARENT_KEY;
@@ -329,9 +332,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

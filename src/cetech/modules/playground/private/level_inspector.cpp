@@ -62,6 +62,8 @@ _DEF_ON_CLB_FCE(ct_li_on_entity, on_entity_click);
 
 
 void set_level(struct ct_world world, struct ct_level level, uint64_t name, uint64_t root, const char* path) {
+    CEL_UNUSED(root);
+
     if( _G.level_name == name) {
         return;
     }
@@ -96,7 +98,7 @@ static void on_debugui() {
                     [](struct ct_yamlng_node key,
                        struct ct_yamlng_node value,
                        void *_data) {
-
+                        CEL_UNUSED(_data);
                         const char* key_str = _G.document->as_string(_G.document->inst, key, "INVALID");
 
                         if (ct_debugui_a0.TreeNodeEx(key_str, DebugUITreeNodeFlags_DefaultOpen)) {
@@ -106,6 +108,8 @@ static void on_debugui() {
                                     [](struct ct_yamlng_node key,
                                        struct ct_yamlng_node value,
                                        void *_data) {
+                                        CEL_UNUSED(value);
+                                        CEL_UNUSED(_data);
 
                                         const char* key_str = _G.document->as_string(_G.document->inst, key, "INVALID");
                                         uint64_t name_id = ct_hash_a0.id64_from_str(key_str);
@@ -157,9 +161,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

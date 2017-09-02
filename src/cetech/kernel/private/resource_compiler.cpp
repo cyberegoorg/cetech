@@ -177,7 +177,7 @@ compilator _find_compilator(uint64_t type) {
         return _G.compilator_map_compilator[i];
     }
 
-    return {NULL};
+    return {.compilator_yaml = NULL, .compilator = NULL};
 }
 
 void _compile_dir(Array<ct_task_item> &tasks,
@@ -394,6 +394,8 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 
 
 void _update(float dt) {
+    CEL_UNUSED(dt);
+
     static uint64_t root = ct_hash_a0.id64_from_str("source");
 
     auto *wd_it = ct_filesystem_a0.event_begin(root);
@@ -456,6 +458,8 @@ static void _init_cvar(struct ct_config_a0 config) {
 
 
 static void _init(ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     _init_cvar(ct_config_a0);
 
     ct_app_a0.register_on_update(_update);
@@ -520,9 +524,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

@@ -179,9 +179,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_world_a0);
         },
         {
+            CEL_UNUSED(reload);
             component_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             component_module::_shutdown();
         }

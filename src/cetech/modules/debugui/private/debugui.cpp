@@ -290,9 +290,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
+            CEL_UNUSED(reload);
             debugui_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             debugui_module::_shutdown();
         }

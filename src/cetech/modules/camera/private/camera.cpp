@@ -318,9 +318,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
+            CEL_UNUSED(reload);
             camera_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             camera_module::_shutdown();
         }

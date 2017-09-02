@@ -653,9 +653,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

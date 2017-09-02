@@ -90,6 +90,8 @@ namespace keyboard {
     }
 
     void _update(float dt) {
+        CEL_UNUSED(dt);
+
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, 512);
@@ -156,9 +158,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_app_a0);
         },
         {
+            CEL_UNUSED(reload);
             keyboard_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             keyboard_module::_shutdown();

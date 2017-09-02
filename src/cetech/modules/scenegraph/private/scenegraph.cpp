@@ -489,9 +489,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
         },
         {
+            CEL_UNUSED(reload);
             scenegraph_module::init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             scenegraph_module::shutdown();
         }

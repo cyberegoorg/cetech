@@ -151,7 +151,7 @@ void renderer_render_world(ct_world world,
 
 ct_texture get_local_resource(viewport_instance &instance,
                             uint64_t name) {
-    for (int i = 0; i < instance.resource_count; ++i) {
+    for (uint32_t i = 0; i < instance.resource_count; ++i) {
         if (instance.local_resource_name[i] != name) {
             continue;
         }
@@ -213,7 +213,7 @@ void _init_viewport(viewport_instance &vi,
 
             vi.resource_count = localresource_count;
 
-            for (int k = 0; k < localresource_count; ++k) {
+            for (uint32_t k = 0; k < localresource_count; ++k) {
                 auto &lr = localresource[k];
 
                 auto format = format_id_to_enum(lr.format);
@@ -253,7 +253,7 @@ void _init_viewport(viewport_instance &vi,
             vi.layers_data_offset = data_offset;
 
             vi.fb_count = entry_count;
-            for (int k = 0; k < entry_count; ++k) {
+            for (uint32_t k = 0; k < entry_count; ++k) {
                 auto &e = entry[k];
 
                 bgfx::TextureHandle th[e.output_count];
@@ -403,6 +403,9 @@ struct compiler_output {
 void compile_global_resource(uint32_t idx,
                              struct ct_yamlng_node value,
                              void *_data) {
+
+    CEL_UNUSED(idx);
+
     render_resource_t gs = {};
 
     compiler_output &output = *((compiler_output *) _data);
@@ -442,6 +445,8 @@ void compile_global_resource(uint32_t idx,
 void compile_layer_entry(uint32_t idx,
                          struct ct_yamlng_node value,
                          void *_data) {
+    CEL_UNUSED(idx);
+
     layer_entry_t le = {};
 
     auto &output = *((compiler_output *) _data);
@@ -528,6 +533,9 @@ namespace renderconfig_compiler {
                  ct_vio *build_vio,
                  ct_compilator_api *compilator_api) {
 
+        CEL_UNUSED(filename);
+        CEL_UNUSED(compilator_api);
+
         struct compiler_output output = {};
         output.global_resource.init(ct_memory_a0.main_allocator());
         output.layer_names.init(ct_memory_a0.main_allocator());
@@ -610,6 +618,9 @@ namespace renderconfig_compiler {
                                     [](uint32_t idx,
                                        struct ct_yamlng_node value,
                                        void *_data) {
+
+                                        CEL_UNUSED(idx);
+
                                         render_resource_t gs = {};
 
                                         compiler_output &output = *((compiler_output *) _data);
@@ -742,6 +753,8 @@ namespace renderconfig_compiler {
     }
 
     int init(struct ct_api_a0 *api) {
+        CEL_UNUSED(api);
+
 #ifdef CETECH_DEVELOP
         ct_resource_a0.compiler_register_yaml(
                 ct_hash_a0.id64_from_str("render_config"),
@@ -754,6 +767,8 @@ namespace renderconfig_compiler {
 }
 
 void on_update(float dt) {
+    CEL_UNUSED(dt)
+
     ct_event_header *event = ct_machine_a0.event_begin();
 
     ct_window_resized_event *ev;
@@ -882,9 +897,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
+
+            CEL_UNUSED(reload);
             viewport_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             viewport_module::_shutdown();

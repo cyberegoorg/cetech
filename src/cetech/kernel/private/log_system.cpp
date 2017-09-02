@@ -151,13 +151,15 @@ namespace logsystem {
 CETECH_MODULE_DEF(
         log,
         {
-
+            CEL_UNUSED(api);
         },
         {
+            CEL_UNUSED(reload);
             logsystem::init();
             api->register_api("ct_log_a0", &logsystem::log_a0);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             logsystem::shutdown();
         }

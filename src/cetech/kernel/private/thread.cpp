@@ -84,9 +84,11 @@ CETECH_MODULE_DEF(
 
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_thread_a0", &thread_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

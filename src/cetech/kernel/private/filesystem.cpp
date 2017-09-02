@@ -149,7 +149,7 @@ namespace filesystem {
         fs_root* fs_inst= get_fs_root(root);
         const uint32_t mp_count = array::size(fs_inst->mount_points);
 
-        for (int i = 0; i < mp_count; ++i) {
+        for (uint32_t i = 0; i < mp_count; ++i) {
             fs_mount_point *mp = &fs_inst->mount_points[i];
 
             char *fullpath = ct_path_a0.join(allocator, 2, mp->root_path, filename);
@@ -217,7 +217,7 @@ namespace filesystem {
         fs_root* fs_inst= get_fs_root(root);
         const uint32_t mp_count = array::size(fs_inst->mount_points);
 
-        for (int i = 0; i < mp_count; ++i) {
+        for (uint32_t i = 0; i < mp_count; ++i) {
             fs_mount_point* mp = &fs_inst->mount_points[i];
 
             const char *mount_point_dir = mp->root_path;
@@ -315,13 +315,13 @@ namespace filesystem {
         cel_alloc *alloc = ct_memory_a0.main_allocator();
         const uint32_t root_count = array::size(_G.roots);
 
-        for (int i = 0; i < root_count; ++i) {
+        for (uint32_t i = 0; i < root_count; ++i) {
             fs_root *fs_inst = &_G.roots[i];
             const uint32_t mp_count = array::size(fs_inst->mount_points);
 
             clean_events(fs_inst);
 
-            for (int j = 0; j < mp_count; ++j) {
+            for (uint32_t j = 0; j < mp_count; ++j) {
                 fs_mount_point* mp = &fs_inst->mount_points[j];
                 const uint32_t root_path_len = strlen(mp->root_path);
 
@@ -378,8 +378,13 @@ void _get_full_path(uint64_t root, const char* path, char* fullpath, uint32_t ma
 
     char* fp = get_full_path(root, a, path, false);
 
+    if(strlen(fp) > max_len) {
+        goto end;
+    }
+
     strcpy(fullpath, fp);
 
+    end:
     CEL_FREE(a, fp);
 }
 
@@ -438,9 +443,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
         },
         {
+            CEL_UNUSED(reload);
             filesystem_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             filesystem_module::_shutdown();

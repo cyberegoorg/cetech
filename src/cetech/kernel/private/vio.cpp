@@ -90,12 +90,14 @@ static ct_vio_a0 vio_api = {
 CETECH_MODULE_DEF(
         vio,
         {
-
+            CEL_UNUSED(api);
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_vio_a0", &vio_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

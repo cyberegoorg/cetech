@@ -624,9 +624,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_thread_a0);
         },
         {
+            CEL_UNUSED(reload);
             resource_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             resource_module::_shutdown();

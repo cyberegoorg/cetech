@@ -148,6 +148,7 @@ namespace mouse {
 //    }
 
     void update(float dt) {
+        CEL_UNUSED(dt);
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -229,9 +230,11 @@ CETECH_MODULE_DEF(
 
         },
         {
+            CEL_UNUSED(reload);
             mouse_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             mouse_module::_shutdown();

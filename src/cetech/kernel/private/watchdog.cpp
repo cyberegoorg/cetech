@@ -61,7 +61,7 @@ void add_dir(ct_watchdog_instance_t *inst,
         ct_path_a0.list(path, "*", 1, 1, &files, &files_count,
                         ct_memory_a0.main_scratch_allocator());
 
-        for (int i = 0; i < files_count; ++i) {
+        for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
@@ -86,6 +86,9 @@ ct_watchdog_ev_header *event_end(ct_watchdog_instance_t *inst) {
 
 ct_watchdog_ev_header *event_next(ct_watchdog_instance_t *inst,
                                   ct_watchdog_ev_header *header) {
+
+    CEL_UNUSED(inst);
+
     return celib::eventstream::next<ct_watchdog_ev_header>(header);
 }
 
@@ -229,9 +232,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_watchdog_a0", &wathdog_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

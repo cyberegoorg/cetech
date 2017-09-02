@@ -53,6 +53,8 @@ static void register_asset(uint64_t type,
 
 static void set_asset(uint64_t type,
                       uint64_t name, uint64_t root, const char* path) {
+    CEL_UNUSED(root);
+
     _G.active_on_asset = map::get<ct_ap_on_asset>(_G.on_asset, type, NULL);
     _G.active_type = type;
     _G.active_name = name;
@@ -96,9 +98,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

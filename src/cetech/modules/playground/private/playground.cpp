@@ -140,9 +140,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
         },
         {
+            CEL_UNUSED(reload);
             playground_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             playground_module::_shutdown();
         }

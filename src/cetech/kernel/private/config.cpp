@@ -397,9 +397,9 @@ namespace config {
 
     int load_from_yaml_file(const char *yaml,
                             cel_alloc *alloc) {
+
         ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
-        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
-                                                      ct_memory_a0.main_allocator());
+        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,alloc);
         f->close(f->inst);
 
         struct foreach_config_data config_data = {
@@ -480,6 +480,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
+            CEL_UNUSED(reload);
 
             _G = {};
 
@@ -490,7 +491,7 @@ CETECH_MODULE_DEF(
             _G.type = ct_hash_a0.id64_from_str("config");
         },
         {
-            CEL_UNUSED(api);
+            CEL_UNUSED(api, reload);
 
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 

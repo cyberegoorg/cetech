@@ -43,10 +43,11 @@ CETECH_MODULE_DEF(
 
         },
         {
-
+            CEL_UNUSED(reload);
             api->register_api("ct_process_a0", &process_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

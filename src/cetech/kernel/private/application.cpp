@@ -390,10 +390,13 @@ CETECH_MODULE_DEF(
             ct_api_a0 = *api;
         },
         {
+            CEL_UNUSED(reload);
+
             app_init(api);
         },
         {
-            CEL_UNUSED(api);
+            CEL_UNUSED(api, reload);
+
             _G.on_init.destroy();
             _G.on_shutdown.destroy();
             _G.on_update.destroy();

@@ -285,12 +285,14 @@ namespace taskmanager_module {
 CETECH_MODULE_DEF(
         task,
         {
-
+            CEL_UNUSED(api);
         },
         {
+            CEL_UNUSED(reload);
             taskmanager_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             taskmanager_module::_shutdown();
         }

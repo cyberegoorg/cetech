@@ -182,7 +182,7 @@ struct ct_yamlng_node get_seq(ct_yamlng_document_instance_t *_inst,
     uint32_t size = inst->value[n_idx].node_count;
 
     uint32_t it = inst->first_child[n_idx];
-    for (int i = 1; i < size - idx; ++i) {
+    for (uint32_t i = 1; i < size - idx; ++i) {
         it = inst->next_sibling[it];
     }
 
@@ -706,9 +706,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             _shutdown();
         }

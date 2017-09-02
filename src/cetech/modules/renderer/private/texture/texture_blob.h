@@ -15,7 +15,8 @@ namespace texture_blob {
         return (blob_t *) (data);
     }
 
-    inline const uint32_t blob_size(const blob_t *blob) {
+    inline uint32_t blob_size(const blob_t *blob) {
+        CEL_UNUSED(blob);
         return (
                 sizeof(blob_t) +
                 0);

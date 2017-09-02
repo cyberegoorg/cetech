@@ -106,6 +106,8 @@ namespace machine_sdl {
     }
 
     void _update(float dt) {
+        CEL_UNUSED(dt);
+
         eventstream::clear(_G.eventstream);
         SDL_Event e;
 
@@ -201,11 +203,11 @@ CETECH_MODULE_DEF(
             ct_api_a0 = *api;
         },
         {
+            CEL_UNUSED(reload);
             machine_sdl::init(api);
         },
         {
-            CEL_UNUSED(api);
-
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
             machine_sdl::shutdown();
 

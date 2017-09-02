@@ -11,8 +11,9 @@
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
 #include <stddef.h> // ptrdiff_t
+#include <cstring>
 
-#if !CEL_CRT_NONE
+#if !defined(CEL_CRT_NONE)
 
 #	include <string.h> // memcpy, memmove, memset
 

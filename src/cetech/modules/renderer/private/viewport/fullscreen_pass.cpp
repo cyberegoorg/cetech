@@ -179,6 +179,9 @@ static void fullscreen_pass(viewport_instance *viewport,
                             ct_world world,
                             ct_camera camera) {
 
+    CEL_UNUSED(world);
+    CEL_UNUSED(camera);
+
     static ct_material copy_material = ct_material_a0.resource_create(
             ct_hash_a0.id64_from_str("copy"));
 
@@ -216,6 +219,7 @@ static void fullscreen_pass(viewport_instance *viewport,
 }
 
 void _init(struct ct_api_a0 *api) {
+    CEL_UNUSED(api);
 
     ct_viewport_a0.register_pass_compiler(
             ct_hash_a0.id64_from_str("fullscreen"), fullscreen_pass_compiler);
@@ -240,9 +244,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

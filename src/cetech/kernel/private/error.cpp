@@ -102,9 +102,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_error_a0", &error_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

@@ -32,6 +32,7 @@ static void geometry_pass(viewport_instance *viewport,
                           uint8_t layerid,
                           ct_world world,
                           ct_camera camera) {
+    CEL_UNUSED(viewport_id);
 
     bgfx::setViewClear(viewid,
                        BGFX_CLEAR_COLOR |
@@ -62,6 +63,8 @@ static void geometry_pass(viewport_instance *viewport,
 }
 
 static void _init(struct ct_api_a0 *api) {
+    CEL_UNUSED(api);
+
     ct_viewport_a0.register_layer_pass(
             ct_hash_a0.id64_from_str("geometry"),
             geometry_pass);
@@ -80,9 +83,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_camera_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             _shutdown();

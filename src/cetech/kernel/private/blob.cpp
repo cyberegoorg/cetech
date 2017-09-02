@@ -64,9 +64,11 @@ CETECH_MODULE_DEF(
             CEL_UNUSED(api);
         },
         {
+            CEL_UNUSED(reload);
+
             api->register_api("ct_blob_a0", &blob::api);
         },
         {
-            CEL_UNUSED(api);
+            CEL_UNUSED(api, reload);
         }
 )

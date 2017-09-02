@@ -18,9 +18,11 @@ CETECH_MODULE_DEF(
             CEL_UNUSED(api);
         },
         {
+            CEL_UNUSED(reload);
             api->register_api("ct_cpu_a0", &cpu_api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
         }
 )

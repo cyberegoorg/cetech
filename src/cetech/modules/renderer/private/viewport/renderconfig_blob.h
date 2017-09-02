@@ -30,7 +30,7 @@ namespace renderconfig_blob {
         return (blob_t *) (data);
     }
 
-    inline const uint32_t blob_size(const blob_t *blob) {
+    inline uint32_t blob_size(const blob_t *blob) {
         return (
                 sizeof(blob_t) +
                 (sizeof(render_resource_t) * blob->global_resource_count) +

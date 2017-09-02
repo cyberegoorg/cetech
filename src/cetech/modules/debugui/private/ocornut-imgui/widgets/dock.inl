@@ -1068,12 +1068,12 @@ namespace ImGui {
                                    type_keys,CETECH_ARRAY_LEN(type_keys),
                                    &type_keys_count);
 
-            for (int i = 0; i < type_keys_count; ++i) {
+            for (uint32_t i = 0; i < type_keys_count; ++i) {
                 Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));
                 m_docks.push_back(IM_PLACEMENT_NEW(new_dock) Dock());
             }
 
-            for (int i = 0; i < type_keys_count; ++i) {
+            for (uint32_t i = 0; i < type_keys_count; ++i) {
                 uint64_t k[2] {
                         type_keys[i],
                         yng->calc_key("index")

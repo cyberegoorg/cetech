@@ -315,10 +315,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_thread_a0);
         },
         {
+            CEL_UNUSED(reload);
             _init_api(api);
             scene::init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             scene::shutdown();

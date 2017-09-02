@@ -171,6 +171,7 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 #undef _DEF_ON_CLB_FCE
 
 static void on_update(float dt) {
+    CEL_UNUSED(dt);
     ct_event_header *event = ct_machine_a0.event_begin();
 
     ct_window_resized_event *ev;
@@ -293,9 +294,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_machine_a0);
         },
         {
+            CEL_UNUSED(reload);
             renderer_module::_init(api);
         },
         {
+            CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
             renderer_module::_shutdown();
