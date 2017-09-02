@@ -49,6 +49,21 @@ void sdl_mouse_shutdown() {
     _G = (struct G) {};
 }
 
+void sdl_mouse_process(SDL_Event *event,
+                       EventStream &stream) {
+    switch (event->type) {
+        case SDL_MOUSEWHEEL: {
+            ct_mouse_move_event ev;
+            ev.pos[0] = event->wheel.x;
+            ev.pos[1] = event->wheel.y;
+
+            eventstream::push<ct_event_header>(stream, EVENT_MOUSE_WHEEL, ev);
+        }
+            break;
+    }
+
+}
+
 void sdl_mouse_process(EventStream &stream) {
     int pos[2] = {};
 
@@ -69,7 +84,6 @@ void sdl_mouse_process(EventStream &stream) {
     _G.position[0] = pos[0];
     _G.position[1] = window_size[1] - pos[1];
 
-    //if ((float(pos[0]) != _G.position[0]) || (float(pos[1]) != _G.position[1])) {
     ct_mouse_move_event event;
     event.pos[0] = pos[0];
     event.pos[1] = window_size[1] - pos[1];

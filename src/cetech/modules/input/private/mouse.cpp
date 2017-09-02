@@ -38,6 +38,8 @@ static struct G {
     uint8_t last_state[MOUSE_BTN_MAX];
     float pos[2];
     float delta_pos[2];
+    float wheel[2];
+    float wheel_last[2];
 } _G = {};
 
 //==============================================================================
@@ -136,6 +138,12 @@ namespace mouse {
 
                 return;
 
+            case MOUSE_AXIS_WHEEL:
+                value[0] = _G.wheel[0];
+                value[1] = _G.wheel[1];
+
+                return;
+
             default:
                 value[0] = 0.0f;
                 value[1] = 0.0f;
@@ -154,6 +162,8 @@ namespace mouse {
         memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
         _G.delta_pos[0] = 0;
         _G.delta_pos[1] = 0;
+        _G.wheel[0] = 0;
+        _G.wheel[1] = 0;
 
         while (event != ct_machine_a0.event_end()) {
             ct_mouse_move_event *move_event;
@@ -177,6 +187,15 @@ namespace mouse {
                     _G.pos[1] = move_event->pos[1];
 
                     break;
+
+                case EVENT_MOUSE_WHEEL: {
+                    ct_mouse_wheel_event* ev = ((ct_mouse_wheel_event *) event);
+                    _G.wheel[0] = ev->pos[0];// - _G.wheel_last[0];
+                    _G.wheel[1] = ev->pos[1];// - _G.wheel_last[1];
+
+                    _G.wheel_last[0] = ev->pos[0];
+                    _G.wheel_last[1] = ev->pos[1];
+                }
 
                 default:
                     break;

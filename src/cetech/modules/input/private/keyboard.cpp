@@ -31,6 +31,7 @@ CETECH_DECL_API(ct_app_a0);
 static struct G {
     uint8_t state[512];
     uint8_t last_state[512];
+    char text[32];
 } _G = {};
 
 
@@ -95,6 +96,7 @@ namespace keyboard {
         ct_event_header *event = ct_machine_a0.event_begin();
 
         memcpy(_G.last_state, _G.state, 512);
+        memset(_G.text, 0, sizeof(_G.text));
 
         uint32_t size = 0;
         while (event != ct_machine_a0.event_end()) {
@@ -109,12 +111,23 @@ namespace keyboard {
                     _G.state[((ct_keyboard_event *) event)->keycode] = 0;
                     break;
 
+                case EVENT_KEYBOARD_TEXT: {
+                    ct_keyboard_text_event* ev = (ct_keyboard_text_event*)event;
+                    memcpy(_G.text, ev->text, sizeof(ev->text));
+                    break;
+                }
+
+
                 default:
                     break;
             }
 
             event = ct_machine_a0.event_next(event);
         }
+    }
+
+    char* text(uint32_t idx) {
+        return _G.text;
     }
 }
 
@@ -125,6 +138,7 @@ namespace keyboard_module {
             .button_state = keyboard::button_state,
             .button_pressed = keyboard::button_pressed,
             .button_released = keyboard::button_released,
+            .text = keyboard::text,
     };
 
     void _init_api(ct_api_a0 *api) {

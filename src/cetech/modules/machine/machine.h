@@ -42,6 +42,11 @@ struct ct_mouse_event {
     uint32_t button;            //!< Button state
 };
 
+struct ct_mouse_wheel_event {
+    struct ct_event_header h; //!< Event header
+    float pos[2];               //!< Actual position
+};
+
 struct ct_mouse_move_event {
     struct ct_event_header h; //!< Event header
     float pos[2];       //!< Actual position
@@ -51,6 +56,11 @@ struct ct_mouse_move_event {
 struct ct_keyboard_event {
     struct ct_event_header h; //!< Event header
     uint32_t keycode; //!< Key code
+};
+
+struct ct_keyboard_text_event {
+    struct ct_event_header h; //!< Event header
+    char text[32];
 };
 
 //! Gamepad move event

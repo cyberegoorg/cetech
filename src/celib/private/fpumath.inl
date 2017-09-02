@@ -578,8 +578,8 @@ namespace celib {
 
         const float yy = y * y;
         const float zz = z * z;
-
         const float xx = x * x;
+
         _result[0] = fatan2(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz));
         _result[1] = fatan2(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz));
         _result[2] = fasin(2.0f * (x * y + z * w));

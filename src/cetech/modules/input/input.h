@@ -112,6 +112,8 @@ struct ct_keyboard_a0 {
     int (*button_released)(uint32_t idx,
                            const uint32_t button_index);
 
+
+    char* (*text)(uint32_t idx);
 };
 
 //==============================================================================

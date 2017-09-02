@@ -98,7 +98,7 @@ static const char *_key_to_str[512] = {
         [KEY_KP_MULTIPLY] = "",
         [KEY_KP_MINUS] = "",
         [KEY_KP_PLUS] = "",
-        [KEY_KP_ENTER] = "",
+        [KEY_KP_ENTER] = "kp_return",
         [KEY_KP_1] = "",
         [KEY_KP_2] = "",
         [KEY_KP_3] = "",
@@ -236,7 +236,7 @@ static const char *_key_to_str[512] = {
         [KEY_LGUI] = "lgui",
         [KEY_RGUI] = "rgui",
 
-        [KEY_MODE] = "",
+        [KEY_MODE] = "super",
 
         [KEY_AUDIONEXT] = "",
         [KEY_AUDIOPREV] = "",

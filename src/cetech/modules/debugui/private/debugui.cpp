@@ -57,10 +57,38 @@ namespace debugui {
             btn |= IMGUI_MBUT_MIDDLE;
         }
 
+
+
+
         uint32_t w, h;
         ct_renderer_a0.get_size(&w, &h);
 
-        imguiBeginFrame(mp[0], h - mp[1], btn, 0, w, h, 0, viewid);
+
+        const uint32_t axis = ct_mouse_a0.axis_index("wheel");
+        float wheel[2];
+        ct_mouse_a0.axis(0, axis, wheel);
+
+        ImGuiIO& io = ImGui::GetIO();
+
+        for (uint32_t i = 0; i < 512; ++i) {
+            io.KeysDown[i] = ct_keyboard_a0.button_state(0, i) > 0;
+        }
+
+        if(!io.KeysDown[40]) {
+            io.KeysDown[40] = ct_keyboard_a0.button_state(0, 88) > 0;
+        };
+
+        io.KeyShift = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("lshift")) > 0) || (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("rshift")) > 0);
+        io.KeyCtrl = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("lctrl")) > 0) || (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("rctrl")) > 0);
+        io.KeyAlt = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("lalt")) > 0) || (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("ralt")) > 0);
+        io.KeySuper = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("super")) > 0);
+
+        char* txt = ct_keyboard_a0.text(0);
+        if(txt[0]) {
+            io.AddInputCharactersUTF8(txt);
+        }
+
+        imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 
 
         for (uint32_t i = 0; i < array::size(_G.on_debugui); ++i) {
@@ -262,6 +290,29 @@ namespace debugui_module {
         _G.on_debugui.init(ct_memory_a0.main_allocator());
 
         ct_renderer_a0.register_on_render(on_render);
+
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.KeyMap[ImGuiKey_Tab] = ct_keyboard_a0.button_index("tab");
+        io.KeyMap[ImGuiKey_LeftArrow] = ct_keyboard_a0.button_index("left");
+        io.KeyMap[ImGuiKey_RightArrow] = ct_keyboard_a0.button_index("right");
+        io.KeyMap[ImGuiKey_UpArrow] = ct_keyboard_a0.button_index("up");
+        io.KeyMap[ImGuiKey_DownArrow] = ct_keyboard_a0.button_index("down");
+        io.KeyMap[ImGuiKey_PageUp] = ct_keyboard_a0.button_index("pageup");
+        io.KeyMap[ImGuiKey_PageDown] = ct_keyboard_a0.button_index("pagedown");
+        io.KeyMap[ImGuiKey_Home] = ct_keyboard_a0.button_index("home");
+        io.KeyMap[ImGuiKey_End] = ct_keyboard_a0.button_index("end");
+        io.KeyMap[ImGuiKey_Delete] = ct_keyboard_a0.button_index("delete");
+        io.KeyMap[ImGuiKey_Backspace] = ct_keyboard_a0.button_index("backspace");
+        io.KeyMap[ImGuiKey_Enter] = ct_keyboard_a0.button_index("return");
+        io.KeyMap[ImGuiKey_Escape] = ct_keyboard_a0.button_index("escape");
+
+        io.KeyMap[ImGuiKey_A] = ct_keyboard_a0.button_index("a");
+        io.KeyMap[ImGuiKey_C] = ct_keyboard_a0.button_index("c");
+        io.KeyMap[ImGuiKey_V] = ct_keyboard_a0.button_index("v");
+        io.KeyMap[ImGuiKey_X] = ct_keyboard_a0.button_index("x");
+        io.KeyMap[ImGuiKey_Y] = ct_keyboard_a0.button_index("y");
+        io.KeyMap[ImGuiKey_Z] = ct_keyboard_a0.button_index("z");
 
     }
 

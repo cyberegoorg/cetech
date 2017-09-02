@@ -15,4 +15,5 @@ static const char *_axis_to_str[MOUSE_AXIS_MAX] = {
         [MOUSE_AXIS_UNKNOWN] = "",
         [MOUSE_AXIS_ABSOULTE] = "absolute",
         [MOUSE_AXIS_RELATIVE] = "relative",
+        [MOUSE_AXIS_WHEEL] = "wheel",
 };

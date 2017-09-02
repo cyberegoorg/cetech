@@ -15,10 +15,12 @@ enum event {
 
     EVENT_KEYBOARD_UP,   //!< Keyboard button up
     EVENT_KEYBOARD_DOWN, //!< Keyboard button down
+    EVENT_KEYBOARD_TEXT, //!< Keyboard button down
 
     EVENT_MOUSE_MOVE,    //!< Mouse move
     EVENT_MOUSE_UP,      //!< Mouse button up
     EVENT_MOUSE_DOWN,    //!< Mouse button down
+    EVENT_MOUSE_WHEEL,    //!< Mouse wheel move
 
     EVENT_GAMEPAD_MOVE,       //!< Gamepad move
     EVENT_GAMEPAD_UP,         //!< Gamepad button up
@@ -46,6 +48,7 @@ enum {
 
     MOUSE_AXIS_ABSOULTE = 1, //!< Absolute mouse position
     MOUSE_AXIS_RELATIVE = 2, //!< Relative mouse position
+    MOUSE_AXIS_WHEEL = 3, //!< Wheel relative move
 
     MOUSE_AXIS_MAX = 8 //!< Max axis
 };

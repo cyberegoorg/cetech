@@ -37,6 +37,8 @@ extern void sdl_keyboard_shutdown();
 
 extern void sdl_keyboard_process(EventStream &stream);
 
+extern void sdl_keyboard_process(SDL_Event*event,  EventStream &stream);
+
 
 //==============================================================================
 // Mouse part
@@ -47,6 +49,9 @@ extern int sdl_mouse_init(struct ct_api_a0 *api);
 extern void sdl_mouse_shutdown();
 
 extern void sdl_mouse_process(EventStream &stream);
+
+extern void sdl_mouse_process(SDL_Event *event,
+                              EventStream &stream);
 
 //==============================================================================
 // Gamepad part
@@ -111,15 +116,14 @@ namespace machine_sdl {
         eventstream::clear(_G.eventstream);
         SDL_Event e;
 
+        sdl_gamepad_process(_G.eventstream);
+        sdl_mouse_process(_G.eventstream);
+        sdl_keyboard_process(_G.eventstream);
+
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
                 case SDL_QUIT:
                     ct_app_a0.quit();
-                    break;
-
-                case SDL_CONTROLLERDEVICEADDED:
-                case SDL_CONTROLLERDEVICEREMOVED:
-                    sdl_gamepad_process_event(&e, _G.eventstream);
                     break;
 
                 case SDL_WINDOWEVENT: {
@@ -141,13 +145,13 @@ namespace machine_sdl {
 
 
                 default:
+                    sdl_mouse_process(&e, _G.eventstream);
+                    sdl_gamepad_process_event(&e, _G.eventstream);
+                    sdl_keyboard_process(&e, _G.eventstream);
                     break;
             }
         }
 
-        sdl_gamepad_process(_G.eventstream);
-        sdl_mouse_process(_G.eventstream);
-        sdl_keyboard_process(_G.eventstream);
     }
 
     static ct_machine_a0 a0 = {

@@ -62,3 +62,17 @@ void sdl_keyboard_process(EventStream &stream) {
         _G.state[i] = state[i];
     }
 }
+
+
+void sdl_keyboard_process(SDL_Event* e, EventStream &stream) {
+    switch (e->type) {
+        case SDL_TEXTINPUT: {
+            ct_keyboard_text_event ev;
+            memcpy(ev.text, e->text.text, sizeof(ev.text));
+
+            eventstream::push<ct_event_header>(stream, EVENT_KEYBOARD_TEXT, ev);
+        }
+            break;
+    }
+}
+

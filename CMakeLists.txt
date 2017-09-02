@@ -142,6 +142,17 @@ set(SOURCE_FILES
 
         src/cetech/modules/scenegraph/private/scenegraph.cpp
         src/cetech/modules/camera/private/camera.cpp
+
+        src/cetech/modules/playground/private/level_editor.cpp
+        src/cetech/modules/transform/private/transform_property.cpp
+        src/cetech/modules/playground/private/entity_property.cpp
+        src/cetech/modules/playground/private/level_inspector.cpp
+        src/cetech/modules/renderer/private/texture/texture_property.cpp
+        src/cetech/modules/playground/private/asset_preview.cpp
+        src/cetech/modules/playground/private/asset_property.cpp
+        src/cetech/modules/playground/private/asset_browser.cpp
+        src/cetech/modules/playground/private/playground.cpp
+        src/cetech/modules/playground/private/property_inspector.cpp
         )
 
 ################################################################################
@@ -241,52 +252,4 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 add_library(example SHARED examples/module_example/example.cpp)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
-# Level editor
-add_library(level_view SHARED
-        src/cetech/modules/playground/private/level_editor.cpp)
-set_target_properties(level_view PROPERTIES PREFIX "module_")
 
-# transform property
-add_library(transform_property SHARED
-        src/cetech/modules/transform/private/transform_property.cpp)
-set_target_properties(transform_property PROPERTIES PREFIX "module_")
-
-# transform property
-add_library(entity_property SHARED
-        src/cetech/modules/playground/private/entity_property.cpp)
-set_target_properties(entity_property PROPERTIES PREFIX "module_")
-
-# level inspector
-add_library(level_inspector SHARED
-        src/cetech/modules/playground/private/level_inspector.cpp)
-set_target_properties(level_inspector PROPERTIES PREFIX "module_")
-
-# texture_property
-add_library(texture_property SHARED
-        src/cetech/modules/renderer/private/texture/texture_property.cpp)
-set_target_properties(texture_property PROPERTIES PREFIX "module_")
-
-# texture_property
-add_library(asset_preview SHARED
-        src/cetech/modules/playground/private/asset_preview.cpp)
-set_target_properties(asset_preview PROPERTIES PREFIX "module_")
-
-# texture_property
-add_library(asset_property SHARED
-        src/cetech/modules/playground/private/asset_property.cpp)
-set_target_properties(asset_property PROPERTIES PREFIX "module_")
-
-# asset_browser
-add_library(asset_browser SHARED
-        src/cetech/modules/playground/private/asset_browser.cpp)
-set_target_properties(asset_browser PROPERTIES PREFIX "module_")
-
-# asset_browser
-add_library(playground SHARED
-        src/cetech/modules/playground/private/playground.cpp)
-set_target_properties(playground PROPERTIES PREFIX "module_")
-
-# asset_browser
-add_library(property_inspector SHARED
-        src/cetech/modules/playground/private/property_inspector.cpp)
-set_target_properties(property_inspector PROPERTIES PREFIX "module_")
