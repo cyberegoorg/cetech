@@ -53,6 +53,7 @@ CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -150,7 +151,7 @@ void renderer_render_world(ct_world world,
 
 
 ct_texture get_local_resource(viewport_instance &instance,
-                            uint64_t name) {
+                              uint64_t name) {
     for (uint32_t i = 0; i < instance.resource_count; ++i) {
         if (instance.local_resource_name[i] != name) {
             continue;
@@ -163,7 +164,7 @@ ct_texture get_local_resource(viewport_instance &instance,
 }
 
 struct ct_texture render_viewport_get_local_resource(ct_viewport viewport,
-                                            uint64_t name) {
+                                                     uint64_t name) {
 
     auto idx = map::get(_G.viewport_instance_map, viewport.idx,
                         UINT32_MAX);
@@ -259,7 +260,7 @@ void _init_viewport(viewport_instance &vi,
                 bgfx::TextureHandle th[e.output_count];
                 for (int l = 0; l < e.output_count; ++l) {
                     // TODO if not found in local then find in global
-                    th[l] = {get_local_resource(vi,e.output[l]).idx};
+                    th[l] = {get_local_resource(vi, e.output[l]).idx};
                 }
 
                 if (0 != vi.framebuffers[k]) {
@@ -409,7 +410,7 @@ void compile_global_resource(uint32_t idx,
     render_resource_t gs = {};
 
     compiler_output &output = *((compiler_output *) _data);
-    ct_yamlng_document* d = value.d;
+    ct_yamlng_document *d = value.d;
 
     ////////////////////////////////////////////////////
     uint64_t keys[2] = {
@@ -417,25 +418,25 @@ void compile_global_resource(uint32_t idx,
             ct_yamlng_a0.calc_key("name")
     };
     uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* name_str = d->get_string(d->inst, k, "");
+    const char *name_str = d->get_string(d->inst, k, "");
     gs.name = ct_hash_a0.id64_from_str(name_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yamlng_a0.calc_key("type");
     k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* type_str = d->get_string(d->inst, k, "");
+    const char *type_str = d->get_string(d->inst, k, "");
     gs.type = ct_hash_a0.id64_from_str(type_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yamlng_a0.calc_key("format");
     k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* format_str = d->get_string(d->inst, k, "");
+    const char *format_str = d->get_string(d->inst, k, "");
     gs.format = ct_hash_a0.id64_from_str(format_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yamlng_a0.calc_key("ration");
     k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* ration_str = d->get_string(d->inst, k, "");
+    const char *ration_str = d->get_string(d->inst, k, "");
     gs.ration = ct_hash_a0.id64_from_str(ration_str);
 
     array::push_back(output.global_resource, gs);
@@ -450,7 +451,7 @@ void compile_layer_entry(uint32_t idx,
     layer_entry_t le = {};
 
     auto &output = *((compiler_output *) _data);
-    ct_yamlng_document* d = value.d;
+    ct_yamlng_document *d = value.d;
 
     ////////////////////////////////////////////////////
     uint64_t keys[2] = {
@@ -458,14 +459,14 @@ void compile_layer_entry(uint32_t idx,
             ct_yamlng_a0.calc_key("name")
     };
     uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* name_str = d->get_string(d->inst, k, "");
+    const char *name_str = d->get_string(d->inst, k, "");
     le.name = ct_hash_a0.id64_from_str(name_str);
 
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yamlng_a0.calc_key("type");
     k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char* type_str = d->get_string(d->inst, k, "");
+    const char *type_str = d->get_string(d->inst, k, "");
     le.type = ct_hash_a0.id64_from_str(type_str);
 
     /////////////////////////////////////////////////////
@@ -481,9 +482,9 @@ void compile_layer_entry(uint32_t idx,
                    struct ct_yamlng_node value,
                    void *_data) {
                     auto &le = *((layer_entry_t *) _data);
-                    ct_yamlng_document* d = value.d;
+                    ct_yamlng_document *d = value.d;
 
-                    const char* output_name = d->as_string(d->inst, value, "");
+                    const char *output_name = d->as_string(d->inst, value, "");
                     le.output[idx] = ct_hash_a0.id64_from_str(output_name);
 
                     ++le.output_count;
@@ -509,10 +510,10 @@ void compile_layer_entry(uint32_t idx,
 void compile_layers(struct ct_yamlng_node key,
                     struct ct_yamlng_node value,
                     void *_data) {
-    ct_yamlng_document* d = key.d;
+    ct_yamlng_document *d = key.d;
     compiler_output &output = *((compiler_output *) _data);
 
-    const char* name_str = d->as_string(d->inst, key, "");
+    const char *name_str = d->as_string(d->inst, key, "");
 
     auto name_id = ct_hash_a0.id64_from_str(name_str);
     auto layer_offset = array::size(output.layers_entry);
@@ -524,14 +525,14 @@ void compile_layers(struct ct_yamlng_node key,
 
     const uint32_t entry_count = array::size(output.layers_entry);
 
-    array::push_back(output.layers_entry_count,entry_count - layer_offset);
+    array::push_back(output.layers_entry_count, entry_count - layer_offset);
 }
 
 namespace renderconfig_compiler {
     int compiler(const char *filename,
-                 struct ct_yamlng_document *doc,
-                 ct_vio *build_vio,
-                 ct_compilator_api *compilator_api) {
+                 struct ct_vio *source_vio,
+                 struct ct_vio *build_vio,
+                 struct ct_compilator_api *compilator_api) {
 
         CEL_UNUSED(filename);
         CEL_UNUSED(compilator_api);
@@ -552,18 +553,25 @@ namespace renderconfig_compiler {
 
         output.blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
 
+
+        ct_yamlng_document* doc = ct_ydb_a0.get(filename);
+
         //==================================================================
         // Global resource
         //==================================================================
-        ct_yamlng_node global_resource = doc->get(doc->inst, ct_yamlng_a0.calc_key("global_resource"));
+        ct_yamlng_node global_resource = doc->get(doc->inst,
+                                                  ct_yamlng_a0.calc_key(
+                                                          "global_resource"));
         if (0 != global_resource.idx) {
-            doc->foreach_seq_node(doc->inst, global_resource, compile_global_resource, &output);
+            doc->foreach_seq_node(doc->inst, global_resource,
+                                  compile_global_resource, &output);
         }
 
         //==================================================================
         // layers
         //==================================================================
-        ct_yamlng_node layers = doc->get(doc->inst, ct_yamlng_a0.calc_key("layers"));
+        ct_yamlng_node layers = doc->get(doc->inst,
+                                         ct_yamlng_a0.calc_key("layers"));
         if (0 != layers.idx) {
             doc->foreach_dict_node(doc->inst, layers, compile_layers, &output);
         }
@@ -571,7 +579,8 @@ namespace renderconfig_compiler {
         //==================================================================
         // Viewport
         //==================================================================
-        ct_yamlng_node viewport = doc->get(doc->inst, ct_yamlng_a0.calc_key("viewport"));
+        ct_yamlng_node viewport = doc->get(doc->inst,
+                                           ct_yamlng_a0.calc_key("viewport"));
         if (0 != viewport.idx) {
             doc->foreach_dict_node(
                     doc->inst,
@@ -579,10 +588,10 @@ namespace renderconfig_compiler {
                     [](struct ct_yamlng_node key,
                        struct ct_yamlng_node value,
                        void *_data) {
-                        ct_yamlng_document* d = key.d;
+                        ct_yamlng_document *d = key.d;
                         compiler_output &output = *((compiler_output *) _data);
 
-                        const char* name_str = d->as_string(d->inst, key, "");
+                        const char *name_str = d->as_string(d->inst, key, "");
                         auto name_id = ct_hash_a0.id64_from_str(name_str);
 
 
@@ -590,8 +599,10 @@ namespace renderconfig_compiler {
                                 d->hash(d->inst, value),
                                 ct_yamlng_a0.calc_key("layers")
                         };
-                        uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-                        const char* layers_str = d->get_string(d->inst, k, "");
+                        uint64_t k = ct_yamlng_a0.combine_key(keys,
+                                                              CETECH_ARRAY_LEN(
+                                                                      keys));
+                        const char *layers_str = d->get_string(d->inst, k, "");
                         auto layers_id = ct_hash_a0.id64_from_str(layers_str);
                         viewport_entry_t ve = {};
 
@@ -609,7 +620,8 @@ namespace renderconfig_compiler {
                                 localresource_offset);
 
                         keys[1] = ct_yamlng_a0.calc_key("local_resource");
-                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+                        k = ct_yamlng_a0.combine_key(keys,
+                                                     CETECH_ARRAY_LEN(keys));
                         ct_yamlng_node local_resource = d->get(d->inst, k);
                         if (0 != local_resource.idx) {
                             d->foreach_seq_node(
@@ -624,35 +636,52 @@ namespace renderconfig_compiler {
                                         render_resource_t gs = {};
 
                                         compiler_output &output = *((compiler_output *) _data);
-                                        ct_yamlng_document* d = value.d;
+                                        ct_yamlng_document *d = value.d;
 
                                         ////////////////////////////////////////////////////
                                         uint64_t keys[2] = {
                                                 d->hash(d->inst, value),
                                                 ct_yamlng_a0.calc_key("name")
                                         };
-                                        uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-                                        const char* name_str = d->get_string(d->inst, k, "");
-                                        gs.name = ct_hash_a0.id64_from_str(name_str);
+                                        uint64_t k = ct_yamlng_a0.combine_key(
+                                                keys, CETECH_ARRAY_LEN(keys));
+                                        const char *name_str = d->get_string(
+                                                d->inst, k, "");
+                                        gs.name = ct_hash_a0.id64_from_str(
+                                                name_str);
 
                                         /////////////////////////////////////////////////////
                                         keys[1] = ct_yamlng_a0.calc_key("type");
-                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-                                        const char* type_str = d->get_string(d->inst, k, "");
-                                        gs.type = ct_hash_a0.id64_from_str(type_str);
+                                        k = ct_yamlng_a0.combine_key(keys,
+                                                                     CETECH_ARRAY_LEN(
+                                                                             keys));
+                                        const char *type_str = d->get_string(
+                                                d->inst, k, "");
+                                        gs.type = ct_hash_a0.id64_from_str(
+                                                type_str);
 
 
                                         /////////////////////////////////////////////////////
-                                        keys[1] = ct_yamlng_a0.calc_key("format");
-                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-                                        const char* format_str = d->get_string(d->inst, k, "");
-                                        gs.format = ct_hash_a0.id64_from_str(format_str);
+                                        keys[1] = ct_yamlng_a0.calc_key(
+                                                "format");
+                                        k = ct_yamlng_a0.combine_key(keys,
+                                                                     CETECH_ARRAY_LEN(
+                                                                             keys));
+                                        const char *format_str = d->get_string(
+                                                d->inst, k, "");
+                                        gs.format = ct_hash_a0.id64_from_str(
+                                                format_str);
 
                                         /////////////////////////////////////////////////////
-                                        keys[1] = ct_yamlng_a0.calc_key("ration");
-                                        k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-                                        const char* ration_str = d->get_string(d->inst, k, "");
-                                        gs.ration = ct_hash_a0.id64_from_str(ration_str);
+                                        keys[1] = ct_yamlng_a0.calc_key(
+                                                "ration");
+                                        k = ct_yamlng_a0.combine_key(keys,
+                                                                     CETECH_ARRAY_LEN(
+                                                                             keys));
+                                        const char *ration_str = d->get_string(
+                                                d->inst, k, "");
+                                        gs.ration = ct_hash_a0.id64_from_str(
+                                                ration_str);
 
 
                                         array::push_back(
@@ -756,9 +785,8 @@ namespace renderconfig_compiler {
         CEL_UNUSED(api);
 
 #ifdef CETECH_DEVELOP
-        ct_resource_a0.compiler_register_yaml(
-                ct_hash_a0.id64_from_str("render_config"),
-                compiler);
+        ct_resource_a0.compiler_register(
+                ct_hash_a0.id64_from_str("render_config"), compiler);
 #endif
 
         ct_renderer_a0.get_size(&_G.size_width, &_G.size_height);
@@ -895,6 +923,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_window_a0);
             CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
 

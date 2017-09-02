@@ -6,6 +6,7 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 #include <cetech/kernel/macros.h>
+#include <cetech/kernel/ydb.h>
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
@@ -36,6 +37,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 
 namespace scene_resource_compiler {
@@ -588,11 +590,13 @@ namespace scene_resource_compiler {
     }
 
     int compiler(const char *filename,
-                 struct ct_yamlng_document *document,
-                 ct_vio *build_vio,
-                 ct_compilator_api *compilator_api) {
+                 struct ct_vio *source_vio,
+                 struct ct_vio *build_vio,
+                 struct ct_compilator_api *compilator_api) {
 
         struct compile_output *output = _crete_compile_output();
+
+        ct_yamlng_document* document = ct_ydb_a0.get(filename);
 
         int ret = 1;
 
@@ -666,9 +670,10 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_thread_a0);
         CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register_yaml(ct_hash_a0.id64_from_str("scene"),
-                                              compiler);
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
+                                         compiler);
 
         return 1;
     }

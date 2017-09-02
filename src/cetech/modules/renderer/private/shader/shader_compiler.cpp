@@ -15,6 +15,7 @@
 #include "cetech/kernel/vio.h"
 #include "cetech/kernel/hashlib.h"
 #include <cetech/kernel/config.h>
+#include <cetech/kernel/ydb.h>
 #include "cetech/kernel/memory.h"
 
 #include "cetech/modules/machine/machine.h"
@@ -34,6 +35,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 
 namespace shader_compiler {
@@ -112,18 +114,19 @@ namespace shader_compiler {
 #endif
 
     static int compiler(const char *filename,
-                        struct ct_yamlng_document *doc,
-                        ct_vio *build_vio,
-                        ct_compilator_api *compilator_api) {
+                        struct ct_vio *source_vio,
+                        struct ct_vio *build_vio,
+                        struct ct_compilator_api *compilator_api) {
         auto a = ct_memory_a0.main_allocator();
 
-        const char *vs_input = doc->get_string(doc->inst,
-                                                ct_yamlng_a0.calc_key("vs_input"),
-                                                "");
+        uint64_t key[] = {
+                ct_yamlng_a0.calc_key("vs_input")
+        };
 
-        const char *fs_input = doc->get_string(doc->inst,
-                                                ct_yamlng_a0.calc_key("fs_input"),
-                                                "");
+        const char *vs_input = ct_ydb_a0.get_string( filename, key, 1, "");
+
+        key[0] = ct_yamlng_a0.calc_key("fs_input");
+        const char *fs_input = ct_ydb_a0.get_string( filename, key, 1, "");
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
         const char *core_dir = ct_resource_a0.compiler_get_core_dir();
@@ -222,8 +225,9 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
         CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register_yaml(ct_hash_a0.id64_from_str("shader"), compiler);
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"), compiler);
 
         return 1;
     }

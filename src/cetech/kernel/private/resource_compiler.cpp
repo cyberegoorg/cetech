@@ -57,7 +57,6 @@ CETECH_DECL_API(ct_ydb_a0);
 
 struct compilator {
     ct_resource_compilator_t compilator;
-    ct_resource_compilator_yaml_t compilator_yaml;
 };
 
 struct compile_task_data {
@@ -139,12 +138,6 @@ static void _compile_task(void *data) {
                                            tdata->source, tdata->build,
                                            &_compilator_api) > 0;
 
-    } else if (tdata->compilator.compilator_yaml) {
-        ct_yamlng_document *d = ct_ydb_a0.get(tdata->source_filename);
-        res = tdata->compilator.compilator_yaml(tdata->source_filename, d,
-                                                tdata->build,
-                                                &_compilator_api) > 0;
-        ct_ydb_a0.free(tdata->source_filename);
     }
 
     if (res) {
@@ -177,7 +170,7 @@ compilator _find_compilator(uint64_t type) {
         return _G.compilator_map_compilator[i];
     }
 
-    return {.compilator_yaml = NULL, .compilator = NULL};
+    return {.compilator = NULL};
 }
 
 void _compile_dir(Array<ct_task_item> &tasks,
@@ -194,8 +187,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
                                 &source_filename_short);
 
         compilator compilator = _find_compilator(type_id);
-        if ((compilator.compilator == NULL) and
-            (compilator.compilator_yaml == NULL)) {
+        if (compilator.compilator == NULL) {
             continue;
         }
 
@@ -297,20 +289,6 @@ void resource_compiler_register(uint64_t type,
 
         _G.compilator_map_type[i] = type;
         _G.compilator_map_compilator[i] = {.compilator = compilator};
-        return;
-    }
-}
-
-void compiler_register_yaml(uint64_t type,
-                            ct_resource_compilator_yaml_t compilator) {
-
-    for (int i = 0; i < MAX_TYPES; ++i) {
-        if (_G.compilator_map_type[i] != 0) {
-            continue;
-        }
-
-        _G.compilator_map_type[i] = type;
-        _G.compilator_map_compilator[i] = {.compilator_yaml = compilator};
         return;
     }
 }

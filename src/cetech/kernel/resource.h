@@ -39,12 +39,6 @@ typedef int (*ct_resource_compilator_t)(
         struct ct_compilator_api *compilator_api);
 
 
-typedef int (*ct_resource_compilator_yaml_t)(
-        const char *filename,
-        struct ct_yamlng_document *document,
-        struct ct_vio *build_vio,
-        struct ct_compilator_api *compilator_api);
-
 //==============================================================================
 // Structs
 //==============================================================================
@@ -89,8 +83,6 @@ typedef struct {
 
 //! Compilator api
 struct ct_compilator_api {
-    ct_resource_compilator_yaml_t *_yaml;
-
     //! Add dependency
     //! \param who_filname Source filename
     //! \param depend_on_filename Depend on this file
@@ -205,12 +197,6 @@ struct ct_resource_a0 {
     //! \param compilator Compilator fce
     void (*compiler_register)(uint64_t type,
                               ct_resource_compilator_t compilator);
-
-    //! Register resource compiler
-    //! \param type Type
-    //! \param compilator Compilator fce
-    void (*compiler_register_yaml)(uint64_t type,
-                              ct_resource_compilator_yaml_t compilator);
 
     //! Compile all resource in source dir
     void (*compiler_compile_all)();

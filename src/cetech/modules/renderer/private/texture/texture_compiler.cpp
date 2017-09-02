@@ -15,6 +15,7 @@
 #include "cetech/kernel/resource.h"
 #include <cstdio>
 #include <cetech/kernel/config.h>
+#include <cetech/kernel/ydb.h>
 #include "celib/buffer.inl"
 #include "texture_blob.h"
 #include "cetech/kernel/path.h"
@@ -33,6 +34,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 namespace texture_compiler {
 
@@ -89,9 +91,9 @@ namespace texture_compiler {
     }
 
     static int compiler(const char *filename,
-                        struct ct_yamlng_document *doc,
-                        ct_vio *build_vio,
-                        ct_compilator_api *compilator_api) {
+                        struct ct_vio *source_vio,
+                        struct ct_vio *build_vio,
+                        struct ct_compilator_api *compilator_api) {
 
         auto a = ct_memory_a0.main_allocator();
 
@@ -100,20 +102,19 @@ namespace texture_compiler {
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
 
-        const char *input_str = doc->get_string(doc->inst,
-                                                ct_yamlng_a0.calc_key("input"),
-                                                "");
+        uint64_t key[] = {
+                ct_yamlng_a0.calc_key("input")
+        };
 
-        bool gen_mipmaps = doc->get_bool(doc->inst,
-                                         ct_yamlng_a0.calc_key("gen_mipmaps"),
-                                         true);
+        const char *input_str = ct_ydb_a0.get_string( filename, key, 1, "");
 
-        bool is_normalmap = doc->get_bool(doc->inst,
-                                          ct_yamlng_a0.calc_key("is_normalmap"),
-                                          false);
+        key[0] = ct_yamlng_a0.calc_key("gen_mipmaps");
+        bool gen_mipmaps = ct_ydb_a0.get_bool(filename, key, 1, true);
+
+        key[0] = ct_yamlng_a0.calc_key("is_normalmap");
+        bool is_normalmap = ct_ydb_a0.get_bool(filename, key, 1, false);
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
-
 
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
                                                             ct_config_a0.get_string(
@@ -167,8 +168,9 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
         CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register_yaml(
+        ct_resource_a0.compiler_register(
                 ct_hash_a0.id64_from_str("texture"),
                 compiler);
 

@@ -545,7 +545,6 @@ namespace resource_module {
 
             .compiler_get_core_dir = resource_compiler_get_core_dir,
             .compiler_register = resource_compiler_register,
-            .compiler_register_yaml = compiler_register_yaml,
             .compiler_compile_all = resource_compiler_compile_all,
             .compiler_get_filename = resource_compiler_get_filename,
             .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
