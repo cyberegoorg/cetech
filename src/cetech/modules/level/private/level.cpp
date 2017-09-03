@@ -52,9 +52,7 @@ namespace {
         Array<struct level_instance> level_instance;
     } LevelGlobals;
 
-    void _init_level_instance(struct level_instance *instance,
-                              ct_entity level_entity) {
-        instance->level_entity = level_entity;
+    void _init_level_instance(struct level_instance *instance) {
         instance->spawned_entity_map.init(ct_memory_a0.main_allocator());
     }
 
@@ -63,13 +61,13 @@ namespace {
     }
 
 
-    ct_level _new_level(ct_entity level_entity) {
+    ct_level _new_level() {
         uint32_t idx = array::size(_G.level_instance);
         array::push_back(_G.level_instance, {});
 
         level_instance *instance = &_G.level_instance[idx];
 
-        _init_level_instance(instance, level_entity);
+        _init_level_instance(instance);
 
         return (ct_level) {.idx = idx};
     }
@@ -231,35 +229,16 @@ namespace level {
     ct_level load(ct_world world,
                   uint64_t name) {
 
-        auto res = level_blob::get(ct_resource_a0.get(_G.level_type, name));
+        auto res = ct_resource_a0.get(_G.level_type, name);
 
-        uint64_t *id = level_blob::names(res);
-        uint32_t *offset = level_blob::offset(res);
-        uint8_t *data = level_blob::data(res);
-
-        ct_entity level_ent = ct_entity_a0.create();
-        ct_transform_a0.create(world,
-                               level_ent,
-                               {UINT32_MAX},
-                               (float[3]) {0.0f},
-                               (float[4]) {0.0f, 0.0f, 0.0f, 1.0f},
-                               (float[3]) {1.0f, 1.0f, 1.0f});
-
-        ct_level level = _new_level(level_ent);
+        ct_level level = _new_level();
         struct level_instance *instance = get_level_instance(level);
 
-        ct_entity_a0.spawn_from_resource(world, data,
+        ct_entity_a0.spawn_from_resource(world, res,
                                          &instance->spawned_entity,
                                          &instance->spawned_entity_count);
 
-        for (uint32_t i = 0; i < level_blob::entities_count(res); ++i) {
-            ct_entity e = instance->spawned_entity[offset[i]];
-            map::set(instance->spawned_entity_map, id[i], e);
-
-            if (ct_transform_a0.has(world, e)) {
-                ct_transform_a0.link(world, level_ent, e);
-            }
-        }
+        instance->level_entity = instance->spawned_entity[0];
 
         return level;
     }
@@ -281,7 +260,7 @@ namespace level {
     ct_entity entity_by_id(ct_level level,
                            uint64_t id) {
         struct level_instance *instance = get_level_instance(level);
-        return map::get(instance->spawned_entity_map, id, {});
+        return ct_entity_a0.find_by_guid(instance->level_entity, id);
     }
 
     ct_entity entity(ct_level level) {
@@ -320,7 +299,7 @@ namespace level_module {
         ct_resource_a0.register_type(_G.level_type, level_resource::callback);
 
         ct_resource_a0.compiler_register(_G.level_type,
-                                         level_resource_compiler::compiler);
+                                         ct_entity_a0.compiler);
 
     }
 

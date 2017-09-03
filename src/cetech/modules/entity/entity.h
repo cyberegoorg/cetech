@@ -47,8 +47,8 @@ struct ct_world {
 //! Component compiler
 //! \param body Component body yaml
 //! \param data Compiled compoent data
-typedef int (*ct_component_compiler_t)(const char* filename,
-                                       uint64_t* component_key,
+typedef int (*ct_component_compiler_t)(const char *filename,
+                                       uint64_t *component_key,
                                        uint32_t component_key_count,
                                        struct ct_blob *data);
 
@@ -162,6 +162,11 @@ struct ct_entity_a0 {
                                 struct ct_entity **entities,
                                 uint32_t *entities_count);
 
+    int (*compiler)( const char *filename,
+                     struct ct_vio *source_vio,
+                     struct ct_vio *build_vio,
+                     struct ct_compilator_api *compilator_api);
+
     //! Spawn entity
     //! \param world World
     //! \param name Resource name
@@ -169,6 +174,7 @@ struct ct_entity_a0 {
     struct ct_entity (*spawn)(struct ct_world world,
                               uint64_t name);
 
+    struct ct_entity (*find_by_guid)(ct_entity root, uint64_t guid);
 
     //! Create compiler output structure
     //! \return New compiler output structure
@@ -198,7 +204,7 @@ struct ct_entity_a0 {
     //! \param output Output
     //! \param build Build
     void (*compiler_write_to_build)(struct ct_entity_compile_output *output,
-                                    const char* filename,
+                                    const char *filename,
                                     struct ct_blob *build);
 
     //! Resource compile
@@ -230,8 +236,8 @@ struct ct_component_a0 {
     //! \param data Compiled data
     //! \return 1 if compile is ok else 0
     int (*compile)(uint64_t type,
-                   const char* filename,
-                   uint64_t* component_key,
+                   const char *filename,
+                   uint64_t *component_key,
                    uint32_t component_key_count,
                    struct ct_blob *data);
 

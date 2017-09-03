@@ -14,6 +14,7 @@
 #include <cetech/modules/playground/level_inspector.h>
 #include <cetech/kernel/yamlng.h>
 #include <cetech/kernel/ydb.h>
+#include <cstdio>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -36,6 +37,7 @@ static struct _G {
     struct ct_world world;
 
     Array<ct_li_on_entity> on_entity_click;
+    const char *path;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
@@ -71,7 +73,7 @@ void set_level(struct ct_world world, struct ct_level level, uint64_t name, uint
     _G.level_name = name;
     _G.level = level;
     _G.world = world;
-
+    _G.path = path;
     _G.document = ct_ydb_a0.get(path);
 }
 
@@ -89,45 +91,37 @@ static void on_debugui() {
 
         ct_debugui_a0.LabelText("Level", "%lu", _G.level_name);
 
-        if(_G.document) {
-            ct_yamlng_node node = _G.document->get(_G.document->inst, 0);
+        if(_G.path) {
+            uint64_t  tmp_keys[32] = {};
+            uint64_t  group_keys[32] = {};
+            uint32_t  group_keys_count = 0;
 
-            _G.document->foreach_dict_node(
-                    _G.document->inst,
-                    node,
-                    [](struct ct_yamlng_node key,
-                       struct ct_yamlng_node value,
-                       void *_data) {
-                        CEL_UNUSED(_data);
-                        const char* key_str = _G.document->as_string(_G.document->inst, key, "INVALID");
+            tmp_keys[0] = ct_yamlng_a0.calc_key("children");
+            ct_ydb_a0.get_map_keys(
+                    _G.path,
+                    tmp_keys, 1,
+                    group_keys, CETECH_ARRAY_LEN(group_keys),
+                    &group_keys_count);
 
-                        if (ct_debugui_a0.TreeNodeEx(key_str, DebugUITreeNodeFlags_DefaultOpen)) {
-                            _G.document->foreach_dict_node(
-                                    _G.document->inst,
-                                    value,
-                                    [](struct ct_yamlng_node key,
-                                       struct ct_yamlng_node value,
-                                       void *_data) {
-                                        CEL_UNUSED(value);
-                                        CEL_UNUSED(_data);
+            for (uint32_t i = 0; i < group_keys_count; ++i) {
+                char buffer[256];
+                sprintf(buffer, "%lu", group_keys[i]);
 
-                                        const char* key_str = _G.document->as_string(_G.document->inst, key, "INVALID");
-                                        uint64_t name_id = ct_hash_a0.id64_from_str(key_str);
-                                        if (ct_debugui_a0.Selectable(key_str, false, 0, (float[]){0.0f, 0.0f})) {
-                                            for (uint32_t i = 0;
-                                                 i < array::size(_G.on_entity_click); ++i) {
-                                                _G.on_entity_click[i](_G.world, _G.level, name_id);
-                                            }
-                                        }
+                tmp_keys[1] = group_keys[i];
+                tmp_keys[2] = ct_yamlng_a0.calc_key("name");
 
-                                    }, NULL);
+                const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, 3, buffer);
 
-                            ct_debugui_a0.TreePop();
-                        }
-
-                    }, NULL);
+                if (ct_debugui_a0.Selectable(name, false, 0,
+                                             (float[]) {0.0f, 0.0f})) {
+                    for (uint32_t j = 0;j < array::size(_G.on_entity_click); ++j) {
+                        _G.on_entity_click[j](_G.world, _G.level, group_keys[i]);
+                    }
+                }
+            }
         }
     }
+
     ct_debugui_a0.EndDock();
 }
 

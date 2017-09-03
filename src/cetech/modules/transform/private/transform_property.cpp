@@ -55,39 +55,41 @@ static void on_component(struct ct_world world,
     ct_transform t = ct_transform_a0.get(world, entity);
 
     float pos[3];
-    float scale[3];
-    float rot[4];
-    float norm_rot[4];
-    static float tmp_rot[3];
-
     ct_transform_a0.get_position(t, pos);
     if (ct_debugui_a0.DragFloat3("position", pos, 1.0f, -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
         ct_transform_a0.set_position(t, pos);
     }
 
-//    ct_transform_a0.get_rotation(t, rot);
-//    quat_norm(norm_rot, rot);
-//    quat_to_euler(tmp_rot, norm_rot);
-//    vec3_mul(tmp_rot, tmp_rot, RAD_TO_DEG);
 
-//    if(tmp_rot[0] < 0.0f) tmp_rot[0] = tmp_rot[0] * -1.0f;
-//    if(tmp_rot[1] < 0.0f) tmp_rot[1] = tmp_rot[1] * -1.0f;
-//    if(tmp_rot[2] < 0.0f) tmp_rot[2] = tmp_rot[2] * -1.0f;
 
-    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, -FLT_MAX, FLT_MAX, "%.5f", 1.0f)) {
-        vec3_mul(tmp_rot, tmp_rot, DEG_TO_RAD);
-        quat_from_euler(rot, tmp_rot[0], tmp_rot[1], tmp_rot[2]);
-        quat_norm(norm_rot, rot);
-        ct_transform_a0.set_rotation(t, norm_rot);
+    float rot[4];
+    float norm_rot[4];
+    float tmp_rot[3];
+    ct_transform_a0.get_rotation(t, rot);
+    quat_norm(norm_rot, rot);
+    quat_to_euler(tmp_rot, norm_rot);
+    vec3_mul(tmp_rot, tmp_rot, RAD_TO_DEG);
+
+    float rad_rot[3];
+    float q[4];
+    tmp_rot[2] = 2.0f;
+    vec3_mul(rad_rot, tmp_rot, DEG_TO_RAD);
+    quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
+    quat_norm(norm_rot, q);
+    ct_transform_a0.set_rotation(t, norm_rot);
+
+    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f", 1.0f)) {
+
     }
 
+
+    float scale[3];
     ct_transform_a0.get_scale(t, scale);
     if (ct_debugui_a0.DragFloat3("scale", scale, 1.0f, -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
         ct_transform_a0.set_scale(t, scale);
     }
-
 }
 
 static int _init(ct_api_a0 *api) {

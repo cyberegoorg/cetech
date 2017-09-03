@@ -1,4 +1,12 @@
-entities:
+name: "Level 1"
+components:
+  "213213213123":
+    component_type: "transform"
+    position: [0, 0, 0]
+    rotation: [0, 0, 0]
+    scale: [1, 1, 1]
+
+children:
   # 3
   "5564343313252":
     name: "box1"

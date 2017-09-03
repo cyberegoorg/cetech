@@ -183,9 +183,7 @@ namespace scene_resource_compiler {
 
         *vertex_size += int(size) * v_size;
 
-        decl->add(type, (uint8_t) int(size),
-                  attrib_type,
-                  0, 0);
+        decl->add(type, (uint8_t) int(size), attrib_type, 0, 0);
     }
 
 
