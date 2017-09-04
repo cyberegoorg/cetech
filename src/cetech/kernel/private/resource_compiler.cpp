@@ -371,9 +371,7 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 }
 
 
-void _update(float dt) {
-    CEL_UNUSED(dt);
-
+void resource_compiler_check_fs() {
     static uint64_t root = ct_hash_a0.id64_from_str("source");
 
     auto *wd_it = ct_filesystem_a0.event_begin(root);
@@ -381,7 +379,7 @@ void _update(float dt) {
     int need_compile = 0;
 
     while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
             need_compile = 1;
             break;
         }
@@ -440,7 +438,7 @@ static void _init(ct_api_a0 *api) {
 
     _init_cvar(ct_config_a0);
 
-    ct_app_a0.register_on_update(_update);
+//    ct_app_a0.register_on_update(_update);
 
     auto platform = ct_config_a0.find("kernel.platform");
 

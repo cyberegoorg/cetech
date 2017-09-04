@@ -13,7 +13,7 @@ extern "C" {
 
 enum ct_watchdog_ev_type {
     CT_WATCHDOG_EVENT_NONE = 0,
-    CT_WATCHDOG_EVENT_FILE_WRITE_END = 1
+    CT_WATCHDOG_EVENT_FILE_MODIFIED = 1
 };
 
 struct ct_watchdog_ev_header {

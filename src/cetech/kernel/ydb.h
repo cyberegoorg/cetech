@@ -85,6 +85,9 @@ struct ct_ydb_a0 {
                          uint64_t *map_keys,
                          uint32_t max_map_keys,
                          uint32_t *map_keys_count);
+
+
+    void (*check_fs)();
 };
 
 #ifdef __cplusplus

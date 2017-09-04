@@ -100,7 +100,7 @@ void clean_events(watchdog_instance *wi) {
             wi->event_stream);
 
     while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
             ct_wd_ev_file_write_end *ev = reinterpret_cast<ct_wd_ev_file_write_end *>(wd_it);
             CEL_FREE(wi->alloc, ev->filename);
         }
@@ -134,7 +134,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
         if (event->mask & IN_ISDIR) {
 
         } else {
-            if (event->mask & IN_CLOSE_WRITE) {
+            if (event->mask & (IN_CLOSE_WRITE | IN_MOVE)) {
                 ct_wd_ev_file_write_end ev = {};
 
                 char *path = celib::map::get<char *>(
@@ -147,7 +147,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
                 celib::eventstream::push<ct_watchdog_ev_header>(
                         wi->event_stream,
-                        CT_WATCHDOG_EVENT_FILE_WRITE_END,
+                        CT_WATCHDOG_EVENT_FILE_MODIFIED,
                         ev);
 
                 continue;

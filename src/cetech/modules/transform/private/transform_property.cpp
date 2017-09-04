@@ -62,7 +62,6 @@ static void on_component(struct ct_world world,
     }
 
 
-
     float rot[4];
     float norm_rot[4];
     float tmp_rot[3];
@@ -71,16 +70,14 @@ static void on_component(struct ct_world world,
     quat_to_euler(tmp_rot, norm_rot);
     vec3_mul(tmp_rot, tmp_rot, RAD_TO_DEG);
 
-    float rad_rot[3];
-    float q[4];
-    tmp_rot[2] = 2.0f;
-    vec3_mul(rad_rot, tmp_rot, DEG_TO_RAD);
-    quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
-    quat_norm(norm_rot, q);
-    ct_transform_a0.set_rotation(t, norm_rot);
 
     if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f", 1.0f)) {
-
+        float rad_rot[3];
+        float q[4];
+	vec3_mul(rad_rot, tmp_rot, DEG_TO_RAD);
+	quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
+	quat_norm(norm_rot, q);
+	ct_transform_a0.set_rotation(t, norm_rot);
     }
 
 

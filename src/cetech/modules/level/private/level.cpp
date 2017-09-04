@@ -39,6 +39,7 @@ CETECH_DECL_API(ct_yamlng_a0);
 
 namespace {
     struct level_instance {
+        ct_world level_world;
         ct_entity level_entity;
         Map<ct_entity> spawned_entity_map;
         ct_entity *spawned_entity;
@@ -50,6 +51,7 @@ namespace {
     static struct LevelGlobals {
         uint64_t level_type;
         Array<struct level_instance> level_instance;
+        Map<uint32_t> resource_map;
     } LevelGlobals;
 
     void _init_level_instance(struct level_instance *instance) {
@@ -60,14 +62,15 @@ namespace {
         instance->spawned_entity_map.destroy();
     }
 
-
-    ct_level _new_level() {
+    ct_level _new_level(uint64_t name) {
         uint32_t idx = array::size(_G.level_instance);
         array::push_back(_G.level_instance, {});
 
         level_instance *instance = &_G.level_instance[idx];
 
         _init_level_instance(instance);
+
+        multi_map::insert(_G.resource_map, name, idx);
 
         return (ct_level) {.idx = idx};
     }
@@ -76,6 +79,30 @@ namespace {
         return &_G.level_instance[level.idx];
     }
 
+    void spawn_level_entity(ct_world world, ct_level level, void* data) {
+        struct level_instance *instance = get_level_instance(level);
+
+        ct_entity_a0.spawn_from_resource(world, data,
+                                         &instance->spawned_entity,
+                                         &instance->spawned_entity_count);
+        instance->level_world = world;
+        instance->level_entity = instance->spawned_entity[0];
+    }
+
+    void reload_level_instance(uint64_t name, void *data) {
+        auto it = multi_map::find_first(_G.resource_map, name);
+        while (it != nullptr) {
+            struct level_instance *instance = &_G.level_instance[it->value];
+
+            ct_entity_a0.destroy(instance->level_world,
+                                 instance->spawned_entity,
+                                 instance->spawned_entity_count);
+
+            spawn_level_entity(instance->level_world, {it->value}, data);
+
+            it = multi_map::find_next(_G.resource_map, it);
+        }
+    }
 };
 
 //==============================================================================
@@ -114,6 +141,8 @@ namespace level_resource {
         online(name, new_data);
 
         CEL_FREE(allocator, old_data);
+
+        reload_level_instance(name, new_data);
 
         return new_data;
     }
@@ -224,21 +253,19 @@ namespace level_resource_compiler {
 // Public interface
 //==============================================================================
 
+
 namespace level {
 
     ct_level load(ct_world world,
                   uint64_t name) {
 
         auto res = ct_resource_a0.get(_G.level_type, name);
+        if(!res) {
+            return {UINT32_MAX};
+        }
 
-        ct_level level = _new_level();
-        struct level_instance *instance = get_level_instance(level);
-
-        ct_entity_a0.spawn_from_resource(world, res,
-                                         &instance->spawned_entity,
-                                         &instance->spawned_entity_count);
-
-        instance->level_entity = instance->spawned_entity[0];
+        ct_level level = _new_level(name);
+        spawn_level_entity(world, level, res);
 
         return level;
     }
@@ -249,7 +276,6 @@ namespace level {
 
         ct_entity_a0.destroy(world, instance->spawned_entity,
                              instance->spawned_entity_count);
-        ct_entity_a0.destroy(world, &instance->level_entity, 1);
 
         CEL_FREE(ct_memory_a0.main_allocator(),
                  instance->spawned_entity);
@@ -295,7 +321,7 @@ namespace level_module {
         _G.level_type = ct_hash_a0.id64_from_str("level");
 
         _G.level_instance.init(ct_memory_a0.main_allocator());
-
+        _G.resource_map.init(ct_memory_a0.main_allocator());
         ct_resource_a0.register_type(_G.level_type, level_resource::callback);
 
         ct_resource_a0.compiler_register(_G.level_type,
@@ -305,6 +331,7 @@ namespace level_module {
 
     void _shutdown() {
         _G.level_instance.destroy();
+        _G.resource_map.destroy();
     }
 
 }

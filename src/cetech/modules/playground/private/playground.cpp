@@ -39,6 +39,8 @@ static struct PlaygroundGlobal {
 namespace playground {
     float draw_main_menu() {
         float menu_height = 0;
+        static bool debug = false;
+
         if (ct_debugui_a0.BeginMainMenuBar()) {
             if (ct_debugui_a0.BeginMenu("File", true)) {
                 if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
@@ -46,6 +48,10 @@ namespace playground {
                 }
 
                 if (ct_debugui_a0.MenuItem("Settings", NULL, false, true)) {
+                }
+
+                if (ct_debugui_a0.MenuItem2("Debug", "F9", &debug, true)) {
+                    ct_renderer_a0.set_debug(debug);
                 }
 
                 ct_debugui_a0.EndMenu();

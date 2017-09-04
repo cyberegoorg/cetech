@@ -282,7 +282,7 @@ namespace module {
         const auto *wd_end = ct_filesystem_a0.event_end(root);
 
         while (wd_it != wd_end) {
-            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
                 ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
 
                 const char *ext = ct_path_a0.extension(ev->filename);

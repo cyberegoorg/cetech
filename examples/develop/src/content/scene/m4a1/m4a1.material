@@ -7,3 +7,4 @@ layers:
         name: u_texColor
         type: texture
         value: content/scene/m4a1/m4_diff
+        #value: texture2

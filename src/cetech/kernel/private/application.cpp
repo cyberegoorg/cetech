@@ -278,11 +278,16 @@ extern "C" void application_start() {
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
+
         ct_filesystem_a0.check_wd();
+
+        ct_ydb_a0.check_fs();
+        ct_resource_a0.compiler_check_fs();
 
 #if CETECH_DEVELOP
         ct_module_a0.check_modules(); // TODO: SHIT...
 #endif
+
 
         for (uint32_t i = 0; i < celib::array::size(_G.on_update); ++i) {
             _G.on_update[i](dt);

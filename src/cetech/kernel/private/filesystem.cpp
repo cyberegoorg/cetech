@@ -299,7 +299,7 @@ namespace filesystem {
                 fs_inst->event_stream);
 
         while (wd_it != wd_end) {
-            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+            if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
                 ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
                 CEL_FREE(ct_memory_a0.main_allocator(), ev->filename);
 //              CEL_FREE(ct_memory_a0.main_allocator(), ev->dir);
@@ -336,7 +336,7 @@ namespace filesystem {
                 const auto *wd_end = wd->event_end(wd->inst);
 
                 while (wd_it != wd_end) {
-                    if (wd_it->type == CT_WATCHDOG_EVENT_FILE_WRITE_END) {
+                    if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
                         ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
 
                         ct_wd_ev_file_write_end new_ev = *ev;
@@ -346,7 +346,7 @@ namespace filesystem {
 
                         celib::eventstream::push<ct_watchdog_ev_header>(
                                 fs_inst->event_stream,
-                                CT_WATCHDOG_EVENT_FILE_WRITE_END,
+                                CT_WATCHDOG_EVENT_FILE_MODIFIED,
                                 new_ev);
                     }
 

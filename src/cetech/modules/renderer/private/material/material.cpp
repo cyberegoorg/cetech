@@ -56,35 +56,112 @@ namespace material_compiler {
 //======================================1========================================
 // GLobals
 //==============================================================================
+
+struct material_instance {
+    const material_blob::blob_t *data;
+    bgfx::UniformHandle *handlers;
+};
+
 static struct MaterialGlobals {
-    Map<uint32_t> instace_map;
-    Array<uint32_t> instance_offset;
-    Array<uint8_t> instance_data;
-    Array<bgfx::UniformHandle> instance_uniform_data;
     Handler<uint32_t> material_handler;
 
+    Map<uint32_t> instace_map;
+    Map<uint32_t> resource_map;
+    Array<material_instance> material_instances;
+
     uint64_t type;
-
-    void init(cel_alloc *allocator) {
-        CEL_UNUSED(allocator);
-
-        this->type = ct_hash_a0.id64_from_str("material");
-        this->material_handler.init(ct_memory_a0.main_allocator());
-        this->instace_map.init(ct_memory_a0.main_allocator());
-        this->instance_offset.init(ct_memory_a0.main_allocator());
-        this->instance_data.init(ct_memory_a0.main_allocator());
-        this->instance_uniform_data.init(ct_memory_a0.main_allocator());
-    }
-
-    void shutdown() {
-        this->material_handler.destroy();
-        this->instace_map.destroy();
-        this->instance_offset.destroy();
-        this->instance_data.destroy();
-        this->instance_uniform_data.destroy();
-    }
 } _G;
 
+
+void _destroy_instance(struct material_instance *instance) {
+    const uint32_t n = instance->data->all_uniform_count;
+
+    for (int i = 0; i < n; ++i) {
+        bgfx::destroy(instance->handlers[i]);
+    }
+
+    CEL_FREE(ct_memory_a0.main_allocator(), instance->handlers);
+}
+
+struct material_instance *_new_material(uint64_t name,
+                                        uint32_t handler) {
+    uint32_t idx = array::size(_G.material_instances);
+    array::push_back(_G.material_instances, {});
+
+    material_instance *instance = &_G.material_instances[idx];
+
+    map::set(_G.instace_map, handler, idx);
+    multi_map::insert(_G.resource_map, name, idx);
+
+    return instance;
+}
+
+struct material_instance *get_material_instance(ct_material material) {
+    uint32_t idx = map::get(_G.instace_map, material.idx, UINT32_MAX);
+
+    if (UINT32_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.material_instances[idx];
+}
+
+void spawn_material_instance(cel_alloc *alloc, const material_blob::blob_t *resource, material_instance* instance){
+    bgfx::UniformHandle *handlers = CEL_ALLOCATE(alloc,
+                                                 bgfx::UniformHandle,
+                                                 sizeof(bgfx::UniformHandle) *
+                                                 resource->all_uniform_count);
+
+    auto u_names = material_blob::uniform_names(resource);
+    auto uniforms = material_blob::uniforms(resource);
+
+    for (uint32_t i = 0; i < resource->all_uniform_count; ++i) {
+        bgfx::UniformType::Enum ut = bgfx::UniformType::Count;
+
+        switch (uniforms[i].type) {
+            case MAT_VAR_NONE:
+                break;
+
+            case MAT_VAR_INT:
+                ut = bgfx::UniformType::Int1;
+                break;
+
+            case MAT_VAR_TEXTURE:
+            case MAT_VAR_TEXTURE_HANDLER:
+                ut = bgfx::UniformType::Int1;
+                break;
+
+            case MAT_VAR_VEC4:
+                ut = bgfx::UniformType::Vec4;
+                break;
+
+            case MAT_VAR_MAT44:
+                ut = bgfx::UniformType::Mat4;
+                break;
+        }
+
+        handlers[i] = bgfx::createUniform(&u_names[i * 32], ut, 1);
+    }
+
+    instance->data = resource;
+    instance->handlers = handlers;
+
+}
+void reload_level_instance(uint64_t name, void *data) {
+    auto it = multi_map::find_first(_G.resource_map, name);
+    while (it != nullptr) {
+        struct material_instance *instance = &_G.material_instances[it->value];
+
+        _destroy_instance(instance);
+
+        auto* resource = material_blob::get(data);
+
+        spawn_material_instance(ct_memory_a0.main_allocator(),
+                                resource, instance);
+
+        it = multi_map::find_next(_G.resource_map, it);
+    }
+}
 
 //==============================================================================
 // Resource
@@ -123,6 +200,8 @@ namespace material_resource {
         offline(name, old_data);
         online(name, new_data);
 
+        reload_level_instance(name, new_data);
+
         CEL_FREE(allocator, old_data);
         return new_data;
     }
@@ -144,54 +223,18 @@ namespace material_resource {
 namespace material {
 //    static const ct_material null_material = {};
 
+
     struct ct_material create(uint64_t name) {
-        auto resource = material_blob::get(ct_resource_a0.get(_G.type, name));
+        auto res = ct_resource_a0.get(_G.type, name);
+        auto resource = material_blob::get(res);
 
-        uint32_t size = material_blob::blob_size(resource);
         uint32_t h = handler::create(_G.material_handler);
+        material_instance *instance = _new_material(name, h);
 
-        uint32_t idx = (uint32_t) array::size(_G.instance_offset);
 
-        map::set(_G.instace_map, h, idx);
+        cel_alloc *alloc = ct_memory_a0.main_allocator();
 
-        uint32_t offset = array::size(_G.instance_data);
-        array::push(_G.instance_data, (uint8_t *) resource, size);
-        array::push_back(_G.instance_offset, offset);
-
-        bgfx::UniformHandle bgfx_uniforms[resource->all_uniform_count];
-        auto u_names = material_blob::uniform_names(resource);
-        auto uniforms = material_blob::uniforms(resource);
-
-        for (uint32_t i = 0; i < resource->all_uniform_count; ++i) {
-            bgfx::UniformType::Enum ut = bgfx::UniformType::Count;
-
-            switch (uniforms[i].type) {
-                case MAT_VAR_NONE:
-                    break;
-
-                case MAT_VAR_INT:
-                    ut = bgfx::UniformType::Int1;
-                    break;
-
-                case MAT_VAR_TEXTURE:
-                case MAT_VAR_TEXTURE_HANDLER:
-                    ut = bgfx::UniformType::Int1;
-                    break;
-
-                case MAT_VAR_VEC4:
-                    ut = bgfx::UniformType::Vec4;
-                    break;
-
-                case MAT_VAR_MAT44:
-                    ut = bgfx::UniformType::Mat4;
-                    break;
-            }
-
-            bgfx_uniforms[i] = bgfx::createUniform(&u_names[i * 32], ut, 1);
-        }
-
-        array::push(_G.instance_uniform_data, bgfx_uniforms,
-                    resource->all_uniform_count);
+        spawn_material_instance(alloc, resource, instance);
 
         return (ct_material) {.idx=h};
     }
@@ -229,15 +272,9 @@ namespace material {
     void set_texture_handler(struct ct_material material,
                              const char *slot,
                              ct_texture texture) {
+        material_instance *mat_inst = get_material_instance(material);
 
-        uint32_t idx = map::get(_G.instace_map, material.idx,
-                                UINT32_MAX);
-
-        if (idx == UINT32_MAX) {
-            return;
-        }
-
-        auto *resource = material_blob::get(&_get_material_instance(idx));
+        auto *resource = mat_inst->data;
         auto *uniforms = material_blob::uniforms(resource);
 
         int slot_idx = _find_uniform_slot(resource, slot);
@@ -248,17 +285,10 @@ namespace material {
     void set_texture(ct_material material,
                      const char *slot,
                      uint64_t texture) {
+        material_instance *mat_inst = get_material_instance(material);
 
-        uint32_t idx = map::get(_G.instace_map, material.idx,
-                                UINT32_MAX);
-
-        if (idx == UINT32_MAX) {
-            return;
-        }
-
-        auto *resource = material_blob::get(&_get_material_instance(idx));
+        auto *resource = mat_inst->data;
         auto *uniforms = material_blob::uniforms(resource);
-
         int slot_idx = _find_uniform_slot(resource, slot);
         uniforms[slot_idx].t = texture;
     }
@@ -267,14 +297,9 @@ namespace material {
     void set_mat44f(ct_material material,
                     const char *slot,
                     float *value) {
-        uint32_t idx = map::get(_G.instace_map, material.idx,
-                                UINT32_MAX);
+        material_instance *mat_inst = get_material_instance(material);
 
-        if (idx == UINT32_MAX) {
-            return;
-        }
-
-        auto *resource = material_blob::get(&_get_material_instance(idx));
+        auto *resource = mat_inst->data;
         auto *uniforms = material_blob::uniforms(resource);
 
         int slot_idx = _find_uniform_slot(resource, slot);
@@ -284,13 +309,14 @@ namespace material {
     void submit(ct_material material,
                 uint64_t layer,
                 uint8_t viewid) {
-        uint32_t idx = map::get(_G.instace_map, material.idx, UINT32_MAX);
+        material_instance *mat_inst = get_material_instance(material);
 
-        if (UINT32_MAX == idx) {
-            return;
-        }
+//        if(!mat_inst) {
+//            return;
+//        }
 
-        auto resource = material_blob::get(&_get_material_instance(idx));
+        auto *resource = mat_inst->data;
+        auto *handlers = mat_inst->handlers;
         auto layer_idx = _find_layer_slot(resource, layer);
 
         if (UINT32_MAX == layer_idx) {
@@ -306,7 +332,6 @@ namespace material {
         auto shader = ct_shader_a0.get(shader_names[layer_idx]);
 
         auto offset = layer_offset[layer_idx];
-        bgfx::UniformHandle *u_handler = &_G.instance_uniform_data[offset];
 
         uint8_t texture_stage = 0;
 
@@ -319,29 +344,29 @@ namespace material {
                     break;
 
                 case MAT_VAR_INT:
-                    bgfx::setUniform(u_handler[i], &uniform.i, 1);
+                    bgfx::setUniform(handlers[i], &uniform.i, 1);
                     break;
 
                 case MAT_VAR_TEXTURE: {
                     auto texture = ct_texture_a0.get(uniform.t);
-                    bgfx::setTexture(texture_stage, u_handler[i],
+                    bgfx::setTexture(texture_stage, handlers[i],
                                      {texture.idx});
                     ++texture_stage;
                 }
                     break;
 
                 case MAT_VAR_TEXTURE_HANDLER: {
-                    bgfx::setTexture(texture_stage, u_handler[i], {uniform.th});
+                    bgfx::setTexture(texture_stage, handlers[i], {uniform.th});
                     ++texture_stage;
                 }
                     break;
 
                 case MAT_VAR_VEC4:
-                    bgfx::setUniform(u_handler[i], &uniform.v4, 1);
+                    bgfx::setUniform(handlers[i], &uniform.v4, 1);
                     break;
 
                 case MAT_VAR_MAT44:
-                    bgfx::setUniform(u_handler[i], &uniform.m44, 1);
+                    bgfx::setUniform(handlers[i], &uniform.m44, 1);
                     break;
             }
         }
@@ -364,7 +389,11 @@ static struct ct_material_a0 material_api = {
 static int init(ct_api_a0 *api) {
     api->register_api("ct_material_a0", &material_api);
 
-    _G.init(ct_memory_a0.main_allocator());
+    _G.type = ct_hash_a0.id64_from_str("material");
+    _G.material_handler.init(ct_memory_a0.main_allocator());
+    _G.instace_map.init(ct_memory_a0.main_allocator());
+    _G.material_instances.init(ct_memory_a0.main_allocator());
+    _G.resource_map.init(ct_memory_a0.main_allocator());
 
     ct_resource_a0.register_type(_G.type, material_resource::callback);
 
@@ -374,7 +403,11 @@ static int init(ct_api_a0 *api) {
 }
 
 static void shutdown() {
-    _G.shutdown();
+    _G.material_handler.destroy();
+    _G.instace_map.destroy();
+    _G.resource_map.destroy();
+    _G.material_instances.destroy();
+
 }
 
 CETECH_MODULE_DEF(

@@ -11,6 +11,8 @@
 #include <cetech/kernel/ydb.h>
 #include <cetech/kernel/filesystem.h>
 #include <celib/fpumath.h>
+#include <cetech/kernel/watchdog.h>
+#include <cetech/kernel/path.h>
 
 #include "yaml/yaml.h"
 
@@ -19,6 +21,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_path_a0);
 
 using namespace celib;
 
@@ -29,33 +32,52 @@ static struct _G {
     Map<ct_yamlng_document *> document_cache;
 } _G;
 
-ct_yamlng_document *get(const char *path) {
+void expire_document_in_cache(const char *path,
+                              uint64_t path_key) {
+    ct_yamlng_document* doc = map::get<ct_yamlng_document *>(_G.document_cache, path_key, NULL);
 
-    uint64_t fs_root = ct_hash_a0.id64_from_str("source");
+    if(!doc) {
+        return;
+    }
+
+    map::remove(_G.document_cache, path_key);
+    ct_yamlng_a0.destroy(doc);
+}
+
+ct_yamlng_document* load_to_cache(const char* path, uint64_t path_key) {
+    static const uint64_t fs_root = ct_hash_a0.id64_from_str("source");
+
+    ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
+
+    struct ct_yamlng_document *doc;
+    ct_vio *f = ct_filesystem_a0.open(fs_root, path, FS_OPEN_READ);
+
+    if (!f) {
+        ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
+        return NULL;
+    }
+
+    doc = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
+    ct_filesystem_a0.close(f);
+
+    if (!doc) {
+        ct_log_a0.error(LOG_WHERE, "Could not parse file %s", path);
+        return NULL;
+    }
+
+    map::set(_G.document_cache, path_key, doc);
+
+    return doc;
+}
+
+ct_yamlng_document *get(const char *path) {
     uint64_t path_key = ct_hash_a0.id64_from_str(path);
 
     struct ct_yamlng_document *doc;
     doc = map::get<ct_yamlng_document *>(_G.document_cache, path_key, NULL);
 
     if (!doc) {
-        ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
-
-        ct_vio *f = ct_filesystem_a0.open(fs_root, path, FS_OPEN_READ);
-
-        if (!f) {
-            ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
-            return NULL;
-        }
-
-        doc = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
-        ct_filesystem_a0.close(f);
-
-        if (!doc) {
-            ct_log_a0.error(LOG_WHERE, "Could not parse file %s", path);
-            return NULL;
-        }
-
-        map::set(_G.document_cache, path_key, doc);
+        return load_to_cache(path, path_key);
     }
 
     return doc;
@@ -63,6 +85,8 @@ ct_yamlng_document *get(const char *path) {
 
 void free(const char *path) {
     CEL_UNUSED(path);
+    //expire_document_in_cache(path, ct_hash_a0.id64_from_str(path));
+
     // TODO: ref counting
 }
 
@@ -284,6 +308,35 @@ void get_mat4(const char *path,
     n.d->as_mat4(n.d->inst, n, v);
 }
 
+void check_fs() {
+    cel_alloc *alloc = ct_memory_a0.main_allocator();
+
+    static uint64_t root = ct_hash_a0.id64_from_str("source");
+
+    auto *wd_it = ct_filesystem_a0.event_begin(root);
+    const auto *wd_end = ct_filesystem_a0.event_end(root);
+
+    while (wd_it != wd_end) {
+        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
+
+            char *path = ct_path_a0.join(alloc, 2, ev->dir, ev->filename);
+            uint64_t path_key = ct_hash_a0.id64_from_str(path);
+
+            if(map::has(_G.document_cache, path_key)) {
+                ct_log_a0.debug(LOG_WHERE, "Reload cached file %s", path);
+
+                expire_document_in_cache(path, path_key);
+                load_to_cache(path, path_key);
+            }
+
+            CEL_FREE(alloc, path);
+        }
+
+        wd_it = ct_filesystem_a0.event_next(wd_it);
+    }
+}
+
 static ct_ydb_a0 ydb_api = {
         .get = get,
         .free = free,
@@ -298,6 +351,8 @@ static ct_ydb_a0 ydb_api = {
         .get_mat4 = get_mat4,
 
         .get_map_keys = get_map_keys,
+
+        .check_fs = check_fs
 };
 
 static void _init(ct_api_a0 *api) {
@@ -313,6 +368,7 @@ static void _shutdown() {
 
     while (it != it_end) {
         ct_yamlng_document *d = it->value;
+
         ct_yamlng_a0.destroy(d);
         ++it;
     }
@@ -330,6 +386,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_yamlng_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_path_a0);
         },
         {
             CEL_UNUSED(reload);

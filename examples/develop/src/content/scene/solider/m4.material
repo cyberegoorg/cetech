@@ -7,3 +7,4 @@ layers:
         name: u_texColor
         type: texture
         value: content/scene/solider/m4tex
+        #value: texture2
