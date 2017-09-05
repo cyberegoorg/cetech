@@ -132,6 +132,10 @@ struct ct_yamlng_document {
                              struct ct_yamlng_node node,
                              ct_yamlng_foreach_seq_t foreach_clb,
                              void *data);
+
+    void (*parent_files)(ct_yamlng_document_instance_t *inst,
+                         const char ***files,
+                         uint32_t *count);
 };
 
 

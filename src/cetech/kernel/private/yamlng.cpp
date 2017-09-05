@@ -35,6 +35,8 @@ struct yamlng_document_inst {
     struct cel_alloc *alloc;
     struct ct_yamlng_document *doc;
 
+    Array<char*> parent_file;
+
     Map<uint32_t> key_map;
     Array<node_type> type;
     Array<uint64_t > hash;
@@ -425,6 +427,7 @@ bool parse_yaml(struct cel_alloc *alloc,
         uint32_t idx;
         uint32_t node_count;
         uint64_t key_hash;
+        uint64_t str_hash;
     };
 
     Array<parent_stack_state> parent_stack(ct_memory_a0.main_allocator());
@@ -537,27 +540,33 @@ bool parse_yaml(struct cel_alloc *alloc,
                 type_value_from_scalar(event.data.scalar.value,
                                        &type, &value, IS_KEY());
 
+                static const uint64_t PARENT_KEY = ct_hash_a0.id64_from_str("PARENT");
+
                 if (IS_KEY()) {
+                    uint64_t key_hash = ct_hash_a0.id64_from_str(value.string);
                     uint64_t parent_key = parent_stack[parent_stack_top].key_hash;
-                    key = hash_combine(parent_key,
-                                       ct_hash_a0.id64_from_str(value.string));
+                    key = hash_combine(parent_key, key_hash);
 
                     uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
 
                     ++parent_stack[parent_stack_top].node_count;
                     array::push_back(parent_stack,
-                                     (parent_stack_state) {.idx = tmp_idx, .type = NODE_STRING, .key_hash = key});
+                                     (parent_stack_state) {.idx = tmp_idx, .type = NODE_STRING, .key_hash = key, .str_hash = key_hash});
 
-                    // VALUE_WITH_KEY
+                // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].key_hash;
+
+                    if(PARENT_KEY == parent_stack[parent_stack_top].str_hash) {
+                        array::push_back(inst->parent_file, value.string);
+                    }
 
                     uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
                     map::set(inst->key_map, key, tmp_idx);
 
                     array::pop_back(parent_stack);
 
-                    // VALUE_IN_SEQ
+                // VALUE_IN_SEQ
                 } else if (parent_stack[parent_stack_top].type == NODE_SEQ) {
                     key = parent_stack[parent_stack_top].key_hash;
 
@@ -598,6 +607,7 @@ static void destroy(struct ct_yamlng_document *document) {
     struct cel_alloc *alloc = inst->alloc;
 
     inst->key_map.destroy();
+    inst->parent_file.destroy();
     inst->type.destroy();
     inst->hash.destroy();
     inst->value.destroy();
@@ -607,6 +617,13 @@ static void destroy(struct ct_yamlng_document *document) {
 
     CEL_FREE(alloc, inst);
     CEL_FREE(alloc, document);
+}
+
+void parent_files(ct_yamlng_document_instance_t *_inst, const char*** files, uint32_t *count){
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    *files = (const char **)array::begin(inst->parent_file);
+    *count = array::size(inst->parent_file);
 }
 
 ct_yamlng_document *from_vio(struct ct_vio *vio,
@@ -632,6 +649,7 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
     };
 
     d_inst->key_map.init(alloc);
+    d_inst->parent_file.init(alloc);
     d_inst->type.init(alloc);
     d_inst->hash.init(alloc);
     d_inst->value.init(alloc);
@@ -661,6 +679,8 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
 
             .foreach_dict_node = foreach_dict_node,
             .foreach_seq_node = foreach_seq_node,
+
+            .parent_files = parent_files,
     };
 
     // Null node

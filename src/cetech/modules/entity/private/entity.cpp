@@ -39,40 +39,24 @@ using namespace celib;
 
 #define _G EntityMaagerGlobals
 
-struct spawned_entity {
+struct entity_instance {
+    ct_world world;
     ct_entity* entity;
     uint64_t* guid;
     uint32_t entity_count;
+    uint64_t name;
 };
 
 static struct EntityMaagerGlobals {
     Handler<uint32_t> entity_handler;
 
+    Map<uint32_t> resource_map;
     Map<uint32_t> spawned_map;
-    Array<spawned_entity> spawned_array;
+    Array<entity_instance> spawned_array;
 
     uint64_t type;
+    uint64_t level_type;
 } EntityMaagerGlobals;
-
-
-spawned_entity* new_spawned_entity(ct_entity ent) {
-    uint32_t idx = array::size(_G.spawned_array);
-    array::push_back(_G.spawned_array, {});
-
-    map::set(_G.spawned_map, ent.h, idx);
-
-    return &_G.spawned_array[idx];
-}
-
-spawned_entity* get_spawned_entity(ct_entity ent) {
-    uint32_t idx = map::get(_G.spawned_map, ent.h, UINT32_MAX);
-
-    if(UINT32_MAX == idx) {
-        return NULL;
-    }
-
-    return &_G.spawned_array[idx];
-}
 
 struct entity_resource {
     uint32_t ent_count;
@@ -98,6 +82,133 @@ struct component_data {
 #define component_data_ent(cd) ((uint32_t*)((cd) + 1))
 #define component_data_data(cd) ((char*)((component_data_ent(cd) + ((cd)->ent_count))))
 
+
+entity_instance* get_spawned_entity(ct_entity ent) {
+    uint32_t idx = map::get(_G.spawned_map, ent.h, UINT32_MAX);
+
+    if(UINT32_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.spawned_array[idx];
+}
+
+
+
+ct_entity create() {
+    return (ct_entity) {.h = handler::create(_G.entity_handler)};
+}
+
+void destroy(ct_world world,
+             ct_entity *entity,
+             uint32_t count) {
+
+    for (uint32_t i = 0; i < count; ++i) {
+        entity_instance* instance = get_spawned_entity(entity[i]);
+        if(!instance) {
+            continue;
+        }
+
+        ct_component_a0.destroy(world, instance->entity, instance->entity_count);
+
+        auto it = multi_map::find_first(_G.resource_map, instance->name);
+        while (it != nullptr) {
+            struct entity_instance *inst = &_G.spawned_array[it->value];
+
+            if( instance == inst) {
+                multi_map::remove(_G.resource_map, it);
+                break;
+            }
+
+            it = multi_map::find_next(_G.resource_map, it);
+        }
+
+        map::remove(_G.spawned_map, entity[i].h);
+        handler::destroy(_G.entity_handler, entity[i].h);
+
+        CEL_FREE(ct_memory_a0.main_allocator(), instance->entity);
+    }
+}
+
+entity_instance * _new_entity(uint64_t name, ct_entity root) {
+    uint32_t idx = array::size(_G.spawned_array);
+    array::push_back(_G.spawned_array, {});
+
+    entity_instance *instance = &_G.spawned_array[idx];
+    instance->name = name;
+
+    multi_map::insert(_G.resource_map, name, idx);
+    map::set(_G.spawned_map, root.h, idx);
+    return instance;
+}
+
+struct entity_instance *get_entity_instance(ct_entity entity) {
+    uint32_t idx =map::get(_G.spawned_map, entity.h, UINT32_MAX);
+
+    if(UINT32_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.spawned_array[idx];
+}
+
+ct_entity spawn_from_resource(ct_world world,
+                              entity_instance *instance,
+                              entity_resource *resource,
+                              ct_entity *spawned) {
+
+    entity_resource *res = resource;
+
+    uint32_t *parents = entity_resource_parents(res);
+    uint64_t *comp_types = entity_resource_comp_types(res);
+
+    struct component_data *comp_data = entity_resource_comp_data(res);
+    for (uint32_t i = 0; i < res->comp_type_count; ++i) {
+        uint64_t type = comp_types[i];
+
+        uint32_t *c_ent = component_data_ent(comp_data);
+        char *c_data = component_data_data(comp_data);
+
+        ct_component_a0.spawn(world, type, &spawned[0],
+                              c_ent, parents, comp_data->ent_count,
+                              c_data);
+
+        comp_data = (struct component_data *) (c_data + comp_data->size);
+    }
+
+    entity_instance *se = instance;
+    se->world = world;
+    se->entity = spawned;
+    se->entity_count = res->ent_count;
+    se->guid = entity_resource_guid(res);
+
+    return spawned[0];
+}
+
+
+void reload_instance(uint64_t name, void *data) {
+    entity_resource *ent_res = (entity_resource *) data;
+
+    auto it = multi_map::find_first(_G.resource_map, name);
+    while (it != nullptr) {
+        struct entity_instance *instance = &_G.spawned_array[it->value];
+        //struct entity_instance old_instance = *instance;
+
+        ct_component_a0.destroy(instance->world, instance->entity, instance->entity_count);
+
+        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
+                                          ct_entity, sizeof(ct_entity) *
+                                                     ent_res->ent_count);
+
+        for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
+            spawned[j] = create();
+        }
+
+        spawn_from_resource(instance->world, instance, ent_res, spawned);
+
+        it = multi_map::find_next(_G.resource_map, it);
+    }
+}
 
 struct compkey {
     uint64_t keys[32];
@@ -126,10 +237,11 @@ namespace entity_resource_compiler {
 
 
     static void compile_entitity(const char *filename,
-                                 uint64_t* root_key,
-                                 uint32_t root_count,
-                                 int parent,
-                                 ct_entity_compile_output *output);
+                                    uint64_t *root_key,
+                                    uint32_t root_count,
+                                    unsigned int parent,
+                                    ct_entity_compile_output *output,
+                                    ct_compilator_api *pApi);
 
     struct foreach_componets_data {
         ct_entity_compile_output *output;
@@ -205,10 +317,11 @@ namespace entity_resource_compiler {
     }
 
     void compile_entitity(const char *filename,
-                          uint64_t* root_key,
-                          uint32_t root_count,
-                          int parent,
-                          ct_entity_compile_output *output) {
+                             uint64_t *root_key,
+                             uint32_t root_count,
+                             unsigned int parent,
+                             ct_entity_compile_output *output,
+                             ct_compilator_api *compilator_api) {
 
         uint32_t ent_id = output->ent_counter++;
 
@@ -260,9 +373,8 @@ namespace entity_resource_compiler {
 
             tmp_keys[root_count+1] = children_keys[i];
 
-            compile_entitity(filename,
-                             tmp_keys, root_count+2,
-                             parent_ent, output);
+            compile_entitity(filename, tmp_keys, root_count + 2, parent_ent,
+                             output, nullptr);
         }
     }
 
@@ -326,7 +438,15 @@ namespace entity_resource_compiler {
                         ct_compilator_api *compilator_api) {
         CEL_UNUSED(compilator_api);
 
-        compile_entitity(filename, root, root_count, UINT32_MAX, output);
+        const char** files;
+        uint32_t files_count;
+        ct_ydb_a0.parent_files(filename, &files, &files_count);
+        for (int i = 0; i < files_count; ++i) {
+            compilator_api->add_dependency(filename, files[i]);
+        }
+
+        compile_entitity(filename, root, root_count, UINT32_MAX, output,
+                         compilator_api);
     }
 
     uint32_t ent_counter(ct_entity_compile_output *output) {
@@ -459,8 +579,9 @@ namespace entity_resorce {
         offline(name, old_data);
         online(name, new_data);
 
-        CEL_FREE(allocator, old_data);
+        reload_instance(name, new_data);
 
+        CEL_FREE(allocator, old_data);
         return new_data;
     }
 
@@ -477,9 +598,6 @@ namespace entity_resorce {
 // Public interface
 //==============================================================================
 namespace entity {
-    ct_entity create() {
-        return (ct_entity) {.h = handler::create(_G.entity_handler)};
-    }
 
     void entity_manager_destroy(ct_entity entity) {
         handler::destroy(_G.entity_handler, entity.h);
@@ -489,78 +607,45 @@ namespace entity {
         return handler::alive(_G.entity_handler, entity.h);
     }
 
-    void spawn_from_resource(ct_world world,
-                             void *resource,
-                             ct_entity **entities,
-                             uint32_t *entities_count) {
-        struct entity_resource *res = (entity_resource *) resource;
 
-        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                                          ct_entity, sizeof(ct_entity) *
-                                                     res->ent_count);
+    ct_entity spawn_type(ct_world world,
+                         uint64_t type,
+                         uint64_t name) {
 
-        for (uint32_t j = 0; j < res->ent_count; ++j) {
-            spawned[j] = create();
-        }
-
-        uint32_t *parents = entity_resource_parents(res);
-        uint64_t *comp_types = entity_resource_comp_types(res);
-
-        struct component_data *comp_data = entity_resource_comp_data(res);
-        for (uint32_t i = 0; i < res->comp_type_count; ++i) {
-            uint64_t type = comp_types[i];
-
-            uint32_t *c_ent = component_data_ent(comp_data);
-            char *c_data = component_data_data(comp_data);
-
-            ct_component_a0.spawn(world, type, &spawned[0],
-                                  c_ent, parents, comp_data->ent_count,
-                                  c_data);
-
-            comp_data = (struct component_data *) (c_data + comp_data->size);
-        }
-
-        spawned_entity *se  = new_spawned_entity(spawned[0]);
-        se->entity = spawned;
-        se->entity_count = res->ent_count;
-        se->guid = entity_resource_guid(res);
-
-        *entities = spawned;
-        *entities_count = res->ent_count;
-    }
-
-    ct_entity spawn(ct_world world,
-                    uint64_t name) {
-        void *res = ct_resource_a0.get(_G.type, name);
+        void *res = ct_resource_a0.get(type, name);
 
         if (res == NULL) {
             ct_log_a0.error("entity", "Could not spawn entity.");
             return (ct_entity) {.h = 0};
         }
 
-        ct_entity *entities = nullptr;
-        uint32_t entities_count = 0;
 
-        spawn_from_resource(world, res, &entities, &entities_count);
+        entity_resource *ent_res = (entity_resource *) res;
+        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
+                                          ct_entity, sizeof(ct_entity) *
+                                                     ent_res->ent_count);
 
-        ct_entity root = entities[0];
-
-        return root;
-    }
-
-    void destroy(ct_world world,
-                 ct_entity *entity,
-                 uint32_t count) {
-
-        ct_component_a0.destroy(world, entity, count);
-
-        for (uint32_t i = 0; i < count; ++i) {
-            handler::destroy(_G.entity_handler, entity[i].h);
+        for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
+            spawned[j] = create();
         }
+
+        entity_instance* ent_inst = _new_entity(name, spawned[0]);
+
+        return spawn_from_resource(world, ent_inst, ent_res, spawned);
     }
+
+    ct_entity spawn_entity(ct_world world,
+                           uint64_t name) {
+        return spawn_type(world, _G.type, name);
+    }
+
+    ct_entity spawn_level(ct_world world, uint64_t name) {
+        return spawn_type(world, _G.level_type, name);
+    }
+
 
     ct_entity find_by_guid(ct_entity root, uint64_t guid) {
-        spawned_entity *se = get_spawned_entity(root);
+        entity_instance *se = get_spawned_entity(root);
 
         if(se) {
             for (int i = 0; i < se->entity_count; ++i) {
@@ -578,12 +663,11 @@ namespace entity {
 
 namespace entity_module {
     static ct_entity_a0 _api = {
-
-            .create = entity::create,
-            .destroy = entity::destroy,
+            .create = create,
+            .destroy = destroy,
             .alive = entity::alive,
-            .spawn_from_resource = entity::spawn_from_resource,
-            .spawn = entity::spawn,
+            .spawn = entity::spawn_entity,
+            .spawn_level = entity::spawn_level,
             .find_by_guid = entity::find_by_guid,
 
             .compiler = entity_resource_compiler::resource_compiler,
@@ -606,21 +690,28 @@ namespace entity_module {
         _G = {};
 
         _G.type = ct_hash_a0.id64_from_str("entity");
+        _G.level_type = ct_hash_a0.id64_from_str("level");
 
-//        _G.spawned_map.init(ct_memory_a0.main_allocator());
-//        _G.spawned_array.init(ct_memory_a0.main_allocator());
+        _G.spawned_map.init(ct_memory_a0.main_allocator());
+        _G.spawned_array.init(ct_memory_a0.main_allocator());
 
         ct_resource_a0.register_type(_G.type, entity_resorce::callback);
+        ct_resource_a0.register_type(_G.level_type, entity_resorce::callback);
 
         ct_resource_a0.compiler_register(_G.type,
+                                         entity_resource_compiler::resource_compiler);
+
+        ct_resource_a0.compiler_register(_G.level_type,
                                          entity_resource_compiler::resource_compiler);
 
         _G.entity_handler.init(ct_memory_a0.main_allocator());
         _G.spawned_map.init(ct_memory_a0.main_allocator());
         _G.spawned_array.init(ct_memory_a0.main_allocator());
+        _G.resource_map.init(ct_memory_a0.main_allocator());
     }
 
     static void _shutdown() {
+        _G.resource_map.destroy();
         _G.spawned_map.destroy();
         _G.spawned_array.destroy();
         _G.entity_handler.destroy();

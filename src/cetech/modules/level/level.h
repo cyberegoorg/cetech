@@ -19,10 +19,6 @@ struct ct_entity;
 //==============================================================================
 
 //! Level idx
-struct ct_level {
-    uint32_t idx;
-};
-
 
 //==============================================================================
 // Api
@@ -35,26 +31,22 @@ struct ct_level_a0 {
     //! \param world World
     //! \param name Resource name
     //! \return New level
-    struct ct_level (*load_level)(struct ct_world world,
+    struct ct_entity (*load_level)(struct ct_world world,
                                   uint64_t name);
 
     //! Destroy level
     //! \param world World
     //! \param level Level
     void (*destroy)(struct ct_world world,
-                    struct ct_level level);
+                    struct ct_entity level);
 
     //! Get entity in level by name
     //! \param level Level
     //! \param name Name
     //! \return Entity
-    struct ct_entity (*entity_by_id)(struct ct_level level,
+    struct ct_entity (*entity_by_id)(struct ct_entity level,
                                      uint64_t name);
 
-    //! Get level entity
-    //! \param level Level
-    //! \return Level entity
-    struct ct_entity (*entity)(struct ct_level level);
 };
 
 #ifdef __cplusplus

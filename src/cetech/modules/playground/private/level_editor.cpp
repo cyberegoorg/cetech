@@ -48,7 +48,7 @@ static struct globals {
     struct ct_world world[MAX_LEVEL_EDITOR];
     //struct ct_camera camera[MAX_LEVEL_EDITOR];
     struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
-    struct ct_level level[MAX_LEVEL_EDITOR];
+    struct ct_entity level[MAX_LEVEL_EDITOR];
 
     const char* path[MAX_LEVEL_EDITOR];
     uint64_t root[MAX_LEVEL_EDITOR];

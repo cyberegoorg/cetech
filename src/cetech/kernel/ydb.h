@@ -87,6 +87,10 @@ struct ct_ydb_a0 {
                          uint32_t *map_keys_count);
 
 
+    void (*parent_files)(const char* path,
+                         const char ***files,
+                         uint32_t *count);
+
     void (*check_fs)();
 };
 

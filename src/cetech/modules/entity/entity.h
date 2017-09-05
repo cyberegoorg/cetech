@@ -154,14 +154,6 @@ struct ct_entity_a0 {
     int (*alive)(struct ct_entity entity);
 
 
-    //! Spawn entity from resource data
-    //! \param world World
-    //! \param resource Resource data
-    void (*spawn_from_resource)(struct ct_world world,
-                                void *resource,
-                                struct ct_entity **entities,
-                                uint32_t *entities_count);
-
     int (*compiler)( const char *filename,
                      struct ct_vio *source_vio,
                      struct ct_vio *build_vio,
@@ -172,6 +164,9 @@ struct ct_entity_a0 {
     //! \param name Resource name
     //! \return New entity
     struct ct_entity (*spawn)(struct ct_world world,
+                              uint64_t name);
+
+    struct ct_entity (*spawn_level)(struct ct_world world,
                               uint64_t name);
 
     struct ct_entity (*find_by_guid)(ct_entity root, uint64_t guid);

@@ -33,7 +33,7 @@ static struct _G {
     ct_yamlng_document *document;
 
     uint64_t level_name;
-    struct ct_level level;
+    struct ct_entity level;
     struct ct_world world;
 
     Array<ct_li_on_entity> on_entity_click;
@@ -63,7 +63,7 @@ static struct _G {
 _DEF_ON_CLB_FCE(ct_li_on_entity, on_entity_click);
 
 
-void set_level(struct ct_world world, struct ct_level level, uint64_t name, uint64_t root, const char* path) {
+void set_level(struct ct_world world, struct ct_entity level, uint64_t name, uint64_t root, const char* path) {
     CEL_UNUSED(root);
 
     if( _G.level_name == name) {

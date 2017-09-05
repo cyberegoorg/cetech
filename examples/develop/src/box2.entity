@@ -17,7 +17,7 @@ children:
     components:
       "234234331453252":
         component_type: "transform"
-        position: [10, 10, 0]
+        position: [11, 10, 0]
         rotation: [0, 0, 0]
         scale: [1, 1, 1]
 

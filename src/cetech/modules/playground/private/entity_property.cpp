@@ -30,7 +30,7 @@ using namespace celib;
 #define _G entity_property_global
 static struct _G {
     uint64_t active_entity;
-    struct ct_level active_level;
+    struct ct_entity active_level;
     struct ct_world active_world;
 
     Array<ct_ep_on_component> on_component;
@@ -74,7 +74,7 @@ static void on_debugui() {
 
 }
 
-void on_entity_click(struct ct_world world, struct ct_level level, uint64_t entity_id) {
+void on_entity_click(struct ct_world world, struct ct_entity level, uint64_t entity_id) {
     ct_property_inspector_a0.set_active(on_debugui);
 
     _G.active_world = world;

@@ -308,6 +308,14 @@ void get_mat4(const char *path,
     n.d->as_mat4(n.d->inst, n, v);
 }
 
+
+void parent_files(const char* path,
+                     const char ***files,
+                     uint32_t *count){
+    struct ct_yamlng_document *d = get(path);
+    d->parent_files(d->inst, files, count);
+}
+
 void check_fs() {
     cel_alloc *alloc = ct_memory_a0.main_allocator();
 
@@ -351,7 +359,7 @@ static ct_ydb_a0 ydb_api = {
         .get_mat4 = get_mat4,
 
         .get_map_keys = get_map_keys,
-
+        .parent_files = parent_files,
         .check_fs = check_fs
 };
 
