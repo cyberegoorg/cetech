@@ -309,10 +309,103 @@ void get_mat4(const char *path,
 }
 
 
-void parent_files(const char* path,
-                     const char ***files,
-                     uint32_t *count){
+void set_float(const char *path,
+               uint64_t* keys,
+                  uint32_t keys_count,
+                  float value) {
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+                                                keys_count);
+    if (!n.idx) {
+        return;
+    }
+
+    n.d->set_float(n.d->inst, n, value);
+}
+
+void set_bool(const char *path,
+              uint64_t* keys,
+                 uint32_t keys_count,
+                 bool value) {
+
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+                                                keys_count);
+    if (!n.idx) {
+        return;
+    }
+
+    n.d->set_bool(n.d->inst, n, value);
+}
+
+
+void set_string(const char *path,
+                uint64_t* keys,
+                   uint32_t keys_count,
+                   const char *value) {
     struct ct_yamlng_document *d = get(path);
+
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+                                                keys_count);
+    if (!n.idx) {
+        return;
+    }
+
+    d->set_string(d->inst, n, value);
+}
+
+void set_vec3(const char *path,
+              uint64_t* keys,
+                 uint32_t keys_count,
+                 float *value) {
+
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count, keys_count);
+
+    if (!n.idx) {
+        return;
+    }
+
+    n.d->set_vec3(n.d->inst, n, value);
+}
+
+void set_vec4(const char *path,
+              uint64_t* keys,
+                 uint32_t keys_count,
+                 float *value) {
+
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+                                                keys_count);
+    if (!n.idx) {
+        return;
+    }
+
+    n.d->set_vec4(n.d->inst, n, value);
+}
+
+void set_mat4(const char *path,
+              uint64_t* keys,
+                 uint32_t keys_count,
+                 float *value) {
+
+    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+                                                keys_count);
+    if (!n.idx) {
+        return;
+    }
+
+    n.d->set_mat4(n.d->inst, n, value);
+}
+
+void parent_files(const char* path,
+                  const char ***files,
+                  uint32_t *count){
+
+    struct ct_yamlng_document *d = get(path);
+
+    if(!d) {
+        *files = NULL;
+        *count = 0;
+        return;
+    }
+
     d->parent_files(d->inst, files, count);
 }
 
@@ -345,6 +438,21 @@ void check_fs() {
     }
 }
 
+
+void save(const char* path){
+//    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), path, FS_OPEN_WRITE);
+//
+//    if (!f) {
+//        ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
+//        return;
+//    }
+//
+//    ct_yamlng_document* d = get(path);
+//    ct_yamlng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
+//
+//    ct_filesystem_a0.close(f);
+}
+
 static ct_ydb_a0 ydb_api = {
         .get = get,
         .free = free,
@@ -358,8 +466,16 @@ static ct_ydb_a0 ydb_api = {
         .get_vec4 = get_vec4,
         .get_mat4 = get_mat4,
 
+        .set_string = set_string,
+        .set_float = set_float,
+        .set_bool = set_bool,
+        .set_vec3 = set_vec3,
+        .set_vec4 = set_vec4,
+        .set_mat4 = set_mat4,
+
         .get_map_keys = get_map_keys,
         .parent_files = parent_files,
+        .save = save,
         .check_fs = check_fs
 };
 

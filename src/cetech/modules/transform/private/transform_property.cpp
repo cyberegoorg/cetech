@@ -22,6 +22,7 @@
 #include <cetech/modules/transform/transform.h>
 #include <cfloat>
 #include <celib/fpumath.h>
+#include <cetech/kernel/ydb.h>
 
 using namespace celib;
 using namespace buffer;
@@ -45,9 +46,15 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_entity_property_a0);
 CETECH_DECL_API(ct_transform_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 static void on_component(struct ct_world world,
-                         struct ct_entity entity) {
+                         struct ct_entity entity,
+                         const char *filename,
+                         uint64_t *keys,
+                         uint32_t keys_count) {
+
     if (!ct_transform_a0.has(world, entity)) {
         return;
     }
@@ -55,12 +62,20 @@ static void on_component(struct ct_world world,
     ct_transform t = ct_transform_a0.get(world, entity);
 
     float pos[3];
-    ct_transform_a0.get_position(t, pos);
+    uint64_t tmp_keys[keys_count+1];
+    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
+
+    tmp_keys[keys_count] = ct_yamlng_a0.calc_key("position");
+    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, pos, (float[3]){0.0f});
+
+    //ct_transform_a0.get_position(t, pos);
     if (ct_debugui_a0.DragFloat3("position", pos, 1.0f, -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
-        ct_transform_a0.set_position(t, pos);
-    }
 
+        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, pos);
+        ct_transform_a0.set_position(t, pos);
+        ct_ydb_a0.save(filename);
+    }
 
     float rot[4];
     float norm_rot[4];
@@ -70,16 +85,19 @@ static void on_component(struct ct_world world,
     quat_to_euler(tmp_rot, norm_rot);
     vec3_mul(tmp_rot, tmp_rot, RAD_TO_DEG);
 
+    tmp_keys[keys_count] = ct_yamlng_a0.calc_key("rotation");
+    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, tmp_rot, (float[3]){0.0f});
+    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f",
+                                 1.0f)) {
+        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, tmp_rot);
 
-    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f", 1.0f)) {
         float rad_rot[3];
         float q[4];
-	vec3_mul(rad_rot, tmp_rot, DEG_TO_RAD);
-	quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
-	quat_norm(norm_rot, q);
-	ct_transform_a0.set_rotation(t, norm_rot);
+        vec3_mul(rad_rot, tmp_rot, DEG_TO_RAD);
+        quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
+        quat_norm(norm_rot, q);
+        ct_transform_a0.set_rotation(t, norm_rot);
     }
-
 
     float scale[3];
     ct_transform_a0.get_scale(t, scale);
@@ -94,14 +112,14 @@ static int _init(ct_api_a0 *api) {
 
     _G = {};
 
-    ct_entity_property_a0.register_component(on_component);
+    ct_entity_property_a0.register_component(ct_hash_a0.id64_from_str("transform"), on_component);
 
     return 1;
 }
 
 static void _shutdown() {
 
-    ct_entity_property_a0.unregister_component(on_component);
+    ct_entity_property_a0.unregister_component(ct_hash_a0.id64_from_str("transform"));
 
     _G = {};
 }
@@ -121,6 +139,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_texture_a0);
             CETECH_GET_API(api, ct_entity_property_a0);
             CETECH_GET_API(api, ct_transform_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
         },
         {
             CEL_UNUSED(reload);

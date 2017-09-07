@@ -166,6 +166,7 @@ extern "C" int cetech_kernel_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, watchdog);
     CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
     CETECH_UNLOAD_STATIC_MODULE(api, ydb);
+    CETECH_UNLOAD_STATIC_MODULE(api, yamlng);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
 
     api::shutdown();

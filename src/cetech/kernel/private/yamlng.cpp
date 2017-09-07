@@ -1,3 +1,5 @@
+// TODO: string table
+
 #include "celib/map.inl"
 
 #include <cetech/kernel/api_system.h>
@@ -21,7 +23,21 @@ using namespace celib;
 #define LOG_WHERE "yamlng"
 
 static struct _G {
+    Map<uint32_t> key_to_str;
+    Array<uint32_t> key_to_str_offset;
+    Array<char> key_to_str_data;
 } _G;
+
+
+void add_key(const char* key, uint32_t key_len, uint64_t key_hash) {
+    const uint32_t idx = array::size(_G.key_to_str_offset);
+    const uint32_t offset = array::size(_G.key_to_str_data);
+
+    array::push(_G.key_to_str_data, key, sizeof(char) * key_len);
+    array::push_back(_G.key_to_str_offset, offset);
+
+    map::set(_G.key_to_str, key_hash, idx);
+}
 
 struct node_value {
     union {
@@ -44,6 +60,8 @@ struct yamlng_document_inst {
     Array<uint32_t> first_child;
     Array<uint32_t> next_sibling;
     Array<uint32_t> parent;
+
+    bool modified;
 };
 
 
@@ -66,17 +84,20 @@ uint64_t calc_key(const char *key) {
             begin = it;
             parse = true;
         } else if (*it == '.') {
-            uint32_t size = it - begin;
-            hash = hash_combine(hash,
-                                ct_hash_a0.hash_murmur2_64(begin, size, 22));
+            const uint32_t size = it - begin;
+            const uint64_t part_hash = ct_hash_a0.hash_murmur2_64(begin, size, 22);
+            add_key(begin, size, part_hash);
+            hash = hash_combine(hash, part_hash);
             parse = false;
         }
 
         ++it;
     }
 
-    uint32_t size = it - begin;
-    hash = hash_combine(hash, ct_hash_a0.hash_murmur2_64(begin, size, 22));
+    const uint32_t size = it - begin;
+    const uint64_t part_hash = ct_hash_a0.hash_murmur2_64(begin, size, 22);
+    add_key(begin, size, part_hash);
+    hash = hash_combine(hash, part_hash);
 
     return hash;
 }
@@ -87,6 +108,18 @@ uint64_t combine_key(uint64_t *keys,
 
     for (uint32_t i = 1; i < count; ++i) {
         hash = hash_combine(hash, keys[i]);
+    }
+
+    return hash;
+}
+
+
+uint64_t combine_key_str(const char** keys,
+                            uint32_t count) {
+    uint64_t hash = ct_hash_a0.id64_from_str(keys[0]);
+
+    for (uint32_t i = 1; i < count; ++i) {
+        hash = hash_combine(hash, ct_hash_a0.id64_from_str(keys[i]));
     }
 
     return hash;
@@ -379,6 +412,135 @@ bool get_bool(ct_yamlng_document_instance_t *_inst,
     return as_bool(_inst, node, defaultt);
 }
 
+void set_float(ct_yamlng_document_instance_t *_inst, struct ct_yamlng_node node, float value) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+    inst->value[node.idx].f = value;
+    inst->modified = true;
+}
+
+void set_bool(ct_yamlng_document_instance_t *_inst,
+                 struct ct_yamlng_node node,
+                 bool value){
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    char *str = inst->value[node.idx].string;
+
+    cel_alloc* alloc = ct_memory_a0.main_allocator();
+
+    CEL_FREE(alloc, str);
+
+    str = ct_memory_a0.str_dup(value ? "yes" : "no", alloc);
+    inst->value[node.idx].string = str;
+    inst->modified = true;
+}
+
+
+void set_string(ct_yamlng_document_instance_t *_inst,
+                   ct_yamlng_node node,
+                   const char *value) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    cel_alloc* alloc = ct_memory_a0.main_allocator();
+    char *str = inst->value[node.idx].string;
+
+    CEL_FREE(alloc, str);
+
+    str = ct_memory_a0.str_dup(value, alloc);
+    inst->value[node.idx].string = str;
+    inst->modified = true;
+}
+
+void set_vec3(ct_yamlng_document_instance_t *_inst,
+                 ct_yamlng_node node,
+                 float *value) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    uint32_t it = inst->first_child[node.idx];
+    inst->value[it].f = value[2];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[1];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[0];
+
+    inst->modified = true;
+}
+
+void set_vec4(ct_yamlng_document_instance_t *_inst,
+                 ct_yamlng_node node,
+                 float *value) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    uint32_t it = inst->first_child[node.idx];
+    inst->value[it].f = value[3];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[2];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[1];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[0];
+    inst->modified = true;
+}
+
+void set_mat4(ct_yamlng_document_instance_t *_inst,
+                 ct_yamlng_node node,
+                 float *value) {
+    yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
+
+    uint32_t it = inst->first_child[node.idx];
+    inst->value[it].f = value[15];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[14];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[13];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[12];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[11];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[10];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[9];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[8];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[7];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[6];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[5];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[4];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[3];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[2];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[1];
+
+    it = inst->next_sibling[it];
+    inst->value[it].f = value[0];
+
+    inst->modified = true;
+}
 
 void foreach_dict_node(ct_yamlng_document_instance_t *_inst,
                        struct ct_yamlng_node node,
@@ -601,6 +763,198 @@ bool parse_yaml(struct cel_alloc *alloc,
     return false;
 }
 
+void save_recursive(yamlng_document_inst* inst, uint32_t root, yaml_emitter_t *emitter) {
+    node_type type = inst->type[root];
+    node_value value = inst->value[root];
+    char buffer[128];
+
+    yaml_event_t event;
+
+    switch (type) {
+        case NODE_FLOAT:
+            sprintf(buffer, "%f", value.f);
+            yaml_scalar_event_initialize(&event,
+                                         NULL,
+                                         NULL,
+                                         (unsigned char *)buffer, strlen(buffer),
+                                         1, 1, YAML_PLAIN_SCALAR_STYLE);
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            break;
+
+        case NODE_STRING:
+            yaml_scalar_event_initialize(&event,
+                                         NULL,
+                                         NULL,
+                                         (unsigned char *)value.string, strlen(value.string),
+                                         1, 1, YAML_PLAIN_SCALAR_STYLE);
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            break;
+
+        case NODE_TRUE:
+            yaml_scalar_event_initialize(&event,
+                                         NULL,
+                                         NULL,
+                                         (unsigned char *)"yes", strlen("yes"),
+                                         1, 1, YAML_PLAIN_SCALAR_STYLE);
+
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            break;
+
+        case NODE_FALSE:
+            yaml_scalar_event_initialize(&event,
+                                         NULL,
+                                         NULL,
+                                         (unsigned char *)"no", strlen("no"),
+                                         1, 1, YAML_PLAIN_SCALAR_STYLE);
+
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            break;
+
+        case NODE_MAP: {
+            yaml_mapping_start_event_initialize(&event, NULL, NULL, 1,
+                                                YAML_BLOCK_MAPPING_STYLE);
+
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            uint32_t childs[value.node_count];
+
+            uint32_t it = 0;
+            it = inst->first_child[root];
+            for (int j = 0; j < value.node_count; ++j) {
+                childs[value.node_count - j - 1] = it;
+                it = inst->next_sibling[it];
+            }
+
+            for (int j = 0; j < value.node_count; ++j) {
+                it = childs[j];
+                save_recursive(inst, it, emitter);
+
+                uint32_t value_it = inst->first_child[it];
+                save_recursive(inst, value_it, emitter);
+            }
+
+            yaml_mapping_end_event_initialize(&event);
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+        }
+            break;
+
+        case NODE_SEQ:{
+            yaml_sequence_start_event_initialize(&event, NULL, NULL, 1,
+                                                 YAML_FLOW_SEQUENCE_STYLE);
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+            uint32_t childs[value.node_count];
+
+            uint32_t it = 0;
+            it = inst->first_child[root];
+            for (int j = 0; j < value.node_count; ++j) {
+                childs[value.node_count - j - 1] = it;
+                it = inst->next_sibling[it];
+            }
+
+            for (int j = 0; j < value.node_count; ++j) {
+                it = childs[j];
+                save_recursive(inst, it, emitter);
+            }
+
+
+            yaml_sequence_end_event_initialize(&event);
+            if (!yaml_emitter_emit(emitter, &event))
+                goto error;
+
+        }
+            break;
+
+        case NODE_INVALID:
+            break;
+    }
+
+    inst->modified = false;
+    return;
+
+    error:
+    return;
+}
+
+bool save_yaml(struct cel_alloc *alloc,
+               struct ct_vio *vio,
+               struct ct_yamlng_document *doc) {
+
+    unsigned char kim_nuke_shit[4096];
+    size_t writen = 0;
+
+    yaml_emitter_t emitter;
+    yaml_event_t event;
+
+//    struct stack_state {
+//        uint32_t parent_idx;
+//    };
+//
+//    Array<stack_state> parent_stack(ct_memory_a0.main_allocator());
+//    uint32_t parent_stack_top;
+
+    ct_yamlng_document* d  = doc;
+    yamlng_document_inst* inst = (yamlng_document_inst *)(d->inst);
+    ct_yamlng_node root_node = d->get(d->inst, 0);
+
+
+    if(!yaml_emitter_initialize(&emitter)) {
+        ct_log_a0.error(LOG_WHERE, "Could not initialize YAML emiter.");
+        return false;
+    }
+
+    yaml_emitter_set_output_string(&emitter, kim_nuke_shit, CETECH_ARRAY_LEN(kim_nuke_shit), &writen);
+
+//    FILE *output = fopen("fooo.yml", "wb");
+//    yaml_emitter_set_output_file(&emitter, output);
+
+
+    // BEGIN STREAM
+    yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING);
+    if (!yaml_emitter_emit(&emitter, &event))
+        goto error;
+
+    yaml_document_start_event_initialize(&event, NULL, NULL, NULL, 1);
+    if (!yaml_emitter_emit(&emitter, &event))
+        goto error;
+
+
+    // BODY
+    save_recursive(inst, root_node.idx, &emitter);
+
+
+    // END DOC
+    yaml_document_end_event_initialize(&event, 1);
+    if (!yaml_emitter_emit(&emitter, &event))
+        goto error;
+
+    // END STREAM
+    yaml_stream_end_event_initialize(&event);
+    if (!yaml_emitter_emit(&emitter, &event))
+        goto error;
+
+    //fclose(output);
+    kim_nuke_shit[writen] = '\0';
+    ct_log_a0.debug(LOG_WHERE, "YAML: %s", kim_nuke_shit);
+    return true;
+
+error:
+    ct_log_a0.error(LOG_WHERE, "Error emmit");
+    yaml_emitter_delete(&emitter);
+
+    return false;
+}
 
 static void destroy(struct ct_yamlng_document *document) {
     yamlng_document_inst *inst = (yamlng_document_inst *) document->inst;
@@ -677,6 +1031,13 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
             .get_float = get_float,
             .get_bool = get_bool,
 
+            .set_float = set_float,
+            .set_bool = set_bool,
+            .set_string = set_string,
+            .set_vec3 = set_vec3,
+            .set_vec4 = set_vec4,
+            .set_mat4 = set_mat4,
+
             .foreach_dict_node = foreach_dict_node,
             .foreach_seq_node = foreach_seq_node,
 
@@ -687,34 +1048,37 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
     new_node(d, NODE_INVALID, {}, 0, ~(uint64_t)(0));
 
     if (!parse_yaml(alloc, vio, d_inst)) {
-        goto error;
+        destroy(d);
+        d = NULL;
     }
 
-
     return d;
-
-    error:
-    destroy(d);
-    return NULL;
 }
-
-
-
 
 static ct_yamlng_a0 yamlng_api = {
         .from_vio = from_vio,
+        .save_to_vio = save_yaml,
         .destroy = destroy,
         .calc_key = calc_key,
         .combine_key = combine_key,
+        .combine_key_str = combine_key_str,
 };
 
 static void _init(ct_api_a0 *api) {
     _G = {};
 
+    _G.key_to_str.init(ct_memory_a0.main_allocator());
+    _G.key_to_str_offset.init(ct_memory_a0.main_allocator());
+    _G.key_to_str_data.init(ct_memory_a0.main_allocator());
+
     api->register_api("ct_yamlng_a0", &yamlng_api);
 }
 
 static void _shutdown() {
+    _G.key_to_str.destroy();
+    _G.key_to_str_offset.destroy();
+    _G.key_to_str_data.destroy();
+
     _G = {};
 }
 

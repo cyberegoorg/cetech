@@ -14,6 +14,7 @@
 #include <cetech/modules/playground/asset_browser.h>
 #include <cetech/modules/playground/entity_property.h>
 #include <cetech/modules/playground/level_inspector.h>
+#include <cetech/kernel/ydb.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -24,39 +25,45 @@ CETECH_DECL_API(ct_property_inspector_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_level_inspector_a0);
 CETECH_DECL_API(ct_level_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_yamlng_a0);
 
 using namespace celib;
 
 #define _G entity_property_global
 static struct _G {
     uint64_t active_entity;
+    uint64_t keys[64];
+    uint64_t keys_count;
     struct ct_entity active_level;
     struct ct_world active_world;
 
-    Array<ct_ep_on_component> on_component;
+    //Array<ct_ep_on_component> on_component;
+    Map<ct_ep_on_component> on_component;
+    const char *filename;
 } _G;
 
-#define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                            \
-        celib::array::push_back(_G.name, name);                                \
-    }                                                                          \
-    static void unregister_## name ## _(type name) {                           \
-        const auto size = celib::array::size(_G.name);                         \
-                                                                               \
-        for(uint32_t i = 0; i < size; ++i) {                                   \
-            if(_G.name[i] != name) {                                           \
-                continue;                                                      \
-            }                                                                  \
-                                                                               \
-            uint32_t last_idx = size - 1;                                      \
-            _G.name[i] = _G.name[last_idx];                                    \
-                                                                               \
-            celib::array::pop_back(_G.name);                                   \
-            break;                                                             \
-        }                                                                      \
-    }
-
-_DEF_ON_CLB_FCE(ct_ep_on_component, on_component);
+//#define _DEF_ON_CLB_FCE(type, name)                                            \
+//    static void register_ ## name ## _(type name) {                            \
+//        celib::array::push_back(_G.name, name);                                \
+//    }                                                                          \
+//    static void unregister_## name ## _(type name) {                           \
+//        const auto size = celib::array::size(_G.name);                         \
+//                                                                               \
+//        for(uint32_t i = 0; i < size; ++i) {                                   \
+//            if(_G.name[i] != name) {                                           \
+//                continue;                                                      \
+//            }                                                                  \
+//                                                                               \
+//            uint32_t last_idx = size - 1;                                      \
+//            _G.name[i] = _G.name[last_idx];                                    \
+//                                                                               \
+//            celib::array::pop_back(_G.name);                                   \
+//            break;                                                             \
+//        }                                                                      \
+//    }
+//
+//_DEF_ON_CLB_FCE(ct_ep_on_component, on_component);
 
 
 static void on_debugui() {
@@ -66,25 +73,75 @@ static void on_debugui() {
 
     ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
 
-    struct ct_entity entity = ct_level_a0.entity_by_id(_G.active_level, _G.active_entity);
+    struct ct_entity entity = ct_level_a0.entity_by_id(_G.active_level,
+                                                       _G.active_entity);
 
-    for (uint32_t i = 0;i < array::size(_G.on_component); ++i) {
-        _G.on_component[i](_G.active_world, entity);
+    uint64_t tmp_keys[_G.keys_count + 3];
+    memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
+
+    tmp_keys[_G.keys_count] = ct_yamlng_a0.calc_key("components");
+
+
+    uint64_t component_keys[32] = {};
+    uint32_t component_keys_count = 0;
+
+    ct_ydb_a0.get_map_keys(
+            _G.filename,
+            tmp_keys, _G.keys_count + 1,
+            component_keys, CETECH_ARRAY_LEN(component_keys),
+            &component_keys_count);
+
+    for (uint32_t i = 0; i < component_keys_count; ++i) {
+        tmp_keys[_G.keys_count + 1] = component_keys[i];
+        tmp_keys[_G.keys_count + 2] = ct_yamlng_a0.calc_key("component_type");
+
+        const char *component_type = ct_ydb_a0.get_string(_G.filename, tmp_keys,
+                                                          _G.keys_count + 3,
+                                                          "");
+        uint64_t component_type_hash = ct_hash_a0.id64_from_str(component_type);
+
+
+        ct_ep_on_component on_component = map::get<ct_ep_on_component>(_G.on_component,
+                                                   component_type_hash, NULL);
+
+        if (on_component) {
+            on_component(_G.active_world, entity, _G.filename, tmp_keys,
+                         _G.keys_count + 2);
+        }
+
     }
-
 }
 
-void on_entity_click(struct ct_world world, struct ct_entity level, uint64_t entity_id) {
+void on_entity_click(struct ct_world world,
+                     struct ct_entity level,
+                     const char *filename,
+                     uint64_t *keys,
+                     uint32_t keys_count) {
     ct_property_inspector_a0.set_active(on_debugui);
 
     _G.active_world = world;
     _G.active_level = level;
-    _G.active_entity = entity_id;
+    _G.filename = filename;
+
+    memcpy(_G.keys, keys, sizeof(uint64_t) * keys_count);
+    _G.keys_count = keys_count;
+
+    _G.active_entity = keys[keys_count - 1];
+}
+
+
+void register_on_component_(uint64_t type,
+                            ct_ep_on_component on_component) {
+    map::set(_G.on_component, type, on_component);
+}
+
+void unregister_on_component_(uint64_t type) {
+    map::remove(_G.on_component, type);
 }
 
 static ct_entity_property_a0 entity_property_a0 = {
-    .register_component = register_on_component_,
-    .unregister_component = unregister_on_component_,
+        .register_component = register_on_component_,
+        .unregister_component = unregister_on_component_,
 };
 
 
@@ -117,6 +174,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_level_inspector_a0);
             CETECH_GET_API(api, ct_level_a0);
+            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             CEL_UNUSED(reload);

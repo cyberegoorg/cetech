@@ -134,6 +134,14 @@ static void _compile_task(void *data) {
 
     bool res = false;
     if (tdata->compilator.compilator) {
+        const char** files;
+        uint32_t files_count;
+        ct_ydb_a0.parent_files(tdata->source_filename, &files, &files_count);
+        for (int i = 0; i < files_count; ++i) {
+            _compilator_api.add_dependency(tdata->source_filename, files[i]);
+        }
+
+
         res = tdata->compilator.compilator(tdata->source_filename,
                                            tdata->source, tdata->build,
                                            &_compilator_api) > 0;

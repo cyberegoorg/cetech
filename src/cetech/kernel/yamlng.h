@@ -123,6 +123,32 @@ struct ct_yamlng_document {
                      uint64_t key,
                      bool defaultt);
 
+    void (*set_float)(ct_yamlng_document_instance_t *inst,
+                      struct ct_yamlng_node node,
+                      float value);
+
+    void (*set_bool)(ct_yamlng_document_instance_t *inst,
+                     struct ct_yamlng_node node,
+                     bool value);
+
+
+    void (*set_string)(ct_yamlng_document_instance_t *inst,
+                       ct_yamlng_node node,
+                       const char *value);
+
+    void (*set_vec3)(ct_yamlng_document_instance_t *inst,
+                     ct_yamlng_node node,
+                     float *value);
+
+    void (*set_vec4)(ct_yamlng_document_instance_t *inst,
+                     ct_yamlng_node node,
+                     float *value);
+
+    void (*set_mat4)(ct_yamlng_document_instance_t *inst,
+                     ct_yamlng_node node,
+                     float *value);
+
+
     void (*foreach_dict_node)(ct_yamlng_document_instance_t *inst,
                               struct ct_yamlng_node node,
                               ct_yamlng_foreach_map_t foreach_clb,
@@ -143,12 +169,19 @@ struct ct_yamlng_a0 {
     ct_yamlng_document *(*from_vio)(struct ct_vio *vio,
                                     struct cel_alloc *alloc);
 
+    bool (*save_to_vio)(struct cel_alloc *alloc,
+                      struct ct_vio *vio,
+                      struct ct_yamlng_document *doc);
+
     void (*destroy)(struct ct_yamlng_document *document);
 
     uint64_t (*calc_key)(const char *key);
 
     uint64_t (*combine_key)(uint64_t *keys,
                             uint32_t count);
+
+    uint64_t (*combine_key_str)(const char **keys,
+                                uint32_t count);
 };
 
 #ifdef __cplusplus

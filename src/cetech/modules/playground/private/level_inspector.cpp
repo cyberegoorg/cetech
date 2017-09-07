@@ -93,21 +93,21 @@ static void on_debugui() {
 
         if(_G.path) {
             uint64_t  tmp_keys[32] = {};
-            uint64_t  group_keys[32] = {};
-            uint32_t  group_keys_count = 0;
+            uint64_t  children_keys[32] = {};
+            uint32_t  children_keys_count = 0;
 
             tmp_keys[0] = ct_yamlng_a0.calc_key("children");
             ct_ydb_a0.get_map_keys(
                     _G.path,
                     tmp_keys, 1,
-                    group_keys, CETECH_ARRAY_LEN(group_keys),
-                    &group_keys_count);
+                    children_keys, CETECH_ARRAY_LEN(children_keys),
+                    &children_keys_count);
 
-            for (uint32_t i = 0; i < group_keys_count; ++i) {
+            for (uint32_t i = 0; i < children_keys_count; ++i) {
                 char buffer[256];
-                sprintf(buffer, "%lu", group_keys[i]);
+                sprintf(buffer, "%lu", children_keys[i]);
 
-                tmp_keys[1] = group_keys[i];
+                tmp_keys[1] = children_keys[i];
                 tmp_keys[2] = ct_yamlng_a0.calc_key("name");
 
                 const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, 3, buffer);
@@ -115,7 +115,7 @@ static void on_debugui() {
                 if (ct_debugui_a0.Selectable(name, false, 0,
                                              (float[]) {0.0f, 0.0f})) {
                     for (uint32_t j = 0;j < array::size(_G.on_entity_click); ++j) {
-                        _G.on_entity_click[j](_G.world, _G.level, group_keys[i]);
+                        _G.on_entity_click[j](_G.world, _G.level, _G.path, tmp_keys, 2);
                     }
                 }
             }

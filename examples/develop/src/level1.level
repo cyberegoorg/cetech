@@ -1,34 +1,23 @@
-name: "Level 1"
+name: Level 1
 components:
-  "213213213123":
-    component_type: "transform"
-    position: [0, 0, 0]
-    rotation: [0, 0, 0]
-    scale: [1, 1, 1]
-
+  213213213123:
+    component_type: transform
+    position: [0.000000, 0.000000, 0.000000]
+    rotation: [0.000000, 0.000000, 0.000000]
+    scale: [1.000000, 1.000000, 1.000000]
 children:
-  # 3
-  "5564343313252":
-    name: "box1"
+  5564343313252:
+    name: box1
     PARENT: box1.entity
-
-  # 2
-  #"5564343313252"
-  "55643423443313252":
-    name: "m4a1"
+  55643423443313252:
+    name: m4a1
     PARENT: m4a1.entity
-#
-#  "556434234433132dsadasdas52":
-#    name: "lkldaslkmdlkasmsm4a1"
-#    PARENT: m4a1.entity
-
-#  # 1
-  "55643433135454252":
-    name: "box2"
+  55643433135454252:
+    name: box2
     PARENT: box2.entity
     components:
-      "234234331453252":
-        position: [0, 0, 0]
-        rotation: [45, 0, 0]
-      "41232132255234":
-        material: "material2"
+      234234331453252:
+        position: [0.000000, 0.000000, 0.000000]
+        rotation: [45.000000, 0.000000, 0.000000]
+      41232132255234:
+        material: material2

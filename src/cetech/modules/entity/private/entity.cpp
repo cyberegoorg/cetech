@@ -438,13 +438,6 @@ namespace entity_resource_compiler {
                         ct_compilator_api *compilator_api) {
         CEL_UNUSED(compilator_api);
 
-        const char** files;
-        uint32_t files_count;
-        ct_ydb_a0.parent_files(filename, &files, &files_count);
-        for (int i = 0; i < files_count; ++i) {
-            compilator_api->add_dependency(filename, files[i]);
-        }
-
         compile_entitity(filename, root, root_count, UINT32_MAX, output,
                          compilator_api);
     }

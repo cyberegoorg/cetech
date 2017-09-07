@@ -136,24 +136,29 @@ static void _boot_unload() {
 
 extern "C" void application_start() {
     ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"),
-                                      "default.render_config",
+                                      "level1.level",
                                       FS_OPEN_READ);
 
     ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,
                                                   ct_memory_a0.main_allocator());
+    ct_yamlng_a0.save_to_vio(ct_memory_a0.main_allocator(), NULL, d);
+
     ct_filesystem_a0.close(f);
 
     uint64_t key = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
 //    uint64_t key2 = ct_yamlng_a0.calc_key("entities.55643433135454252.prefab");
 
+
     uint64_t keys2[] = {
-            ct_hash_a0.id64_from_str("viewport"),
-            ct_hash_a0.id64_from_str("default"),
-            ct_hash_a0.id64_from_str("local_resource"),
-            ct_hash_a0.id64_from_str("2"),
-            ct_hash_a0.id64_from_str("name"),
+            ct_hash_a0.id64_from_str("children"),
+            ct_hash_a0.id64_from_str("55643423443313252"),
+            ct_hash_a0.id64_from_str("components"),
+            ct_hash_a0.id64_from_str("2342343313252"),
+            ct_hash_a0.id64_from_str("rotation"),
     };
-    key = ct_yamlng_a0.combine_key(keys2, CETECH_ARRAY_LEN(keys2));
+    float v[3];
+    ct_ydb_a0.get_vec3("level1.level", keys2, CETECH_ARRAY_LEN(keys2), v, (float[]){0.0f, 0.0f, 0.0f});
+//    key = ct_yamlng_a0.combine_key(keys2, CETECH_ARRAY_LEN(keys2));
 
 //    uint64_t keys[] = {
 //            ct_hash_a0.id64_from_str("graph"),
@@ -232,6 +237,8 @@ extern "C" void application_start() {
                        d->as_string(d->inst, node, ""), d->type(d->inst, node));
     }
 
+    ct_log_a0.info(LOG_WHERE, "FOOOOOOOOOOOOOO %f %f %f", v[0], v[1], v[2]);
+
     ct_yamlng_a0.destroy(d);
 
     uint64_t foo_k[] = {
@@ -239,7 +246,7 @@ extern "C" void application_start() {
             ct_yamlng_a0.calc_key("5564343313252"),
             ct_yamlng_a0.calc_key("components"),
             ct_yamlng_a0.calc_key("412321322234"),
-            ct_yamlng_a0.calc_key("component_type"),
+            ct_yamlng_a0.calc_key("position"),
     };
 
 //    uint64_t keys[32] = {};
@@ -251,7 +258,8 @@ extern "C" void application_start() {
     //ct_ydb_a0.get_string("a.yaml", foo_k, CETECH_ARRAY_LEN(foo_k), "");
 
     //ct_log_a0.debug(LOG_WHERE, "FPOOOOOO: %s", foo);
-    //return;
+
+//    return;
 
     _init_config();
 
