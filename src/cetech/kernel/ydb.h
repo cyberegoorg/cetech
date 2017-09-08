@@ -16,7 +16,7 @@ extern "C" {
 
 struct ct_vio;
 struct cel_alloc;
-struct ct_yamlng_document;
+struct ct_yng_doc;
 
 //==============================================================================
 // Defines
@@ -36,7 +36,7 @@ struct ct_yamlng_document;
 //==============================================================================
 
 struct ct_ydb_a0 {
-    ct_yamlng_document *(*get)(const char *path);
+    ct_yng_doc *(*get)(const char *path);
 
     void (*free)(const char *path);
 
@@ -121,6 +121,7 @@ struct ct_ydb_a0 {
                          uint32_t *count);
 
     void (*save)(const char* path);
+    void (*save_all_modified)();
 
     void (*check_fs)();
 };

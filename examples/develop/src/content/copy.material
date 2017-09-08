@@ -1,6 +1,6 @@
 layers:
   copy:
-    shader: copy
+    shader: content/copy
 
     render_state:
       rgb_write: true

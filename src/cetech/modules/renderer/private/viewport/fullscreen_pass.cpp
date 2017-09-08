@@ -35,7 +35,7 @@
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_material_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 
 //==============================================================================
@@ -132,7 +132,7 @@ struct fullscree_pass_data {
 static void foreach_input(struct ct_yamlng_node key,
                           struct ct_yamlng_node value,
                           void *_data) {
-    ct_yamlng_document* d = key.d;
+    ct_yng_doc* d = key.d;
 
     fullscree_pass_data *pass_data = static_cast<fullscree_pass_data *>(_data);
 
@@ -151,13 +151,13 @@ static void foreach_input(struct ct_yamlng_node key,
 
 static int fullscreen_pass_compiler(struct ct_yamlng_node body,
                                     struct ct_blob *data) {
-    ct_yamlng_document* d = body.d;
+    ct_yng_doc* d = body.d;
 
     uint64_t keys[2] = {
             d->hash(d->inst, body),
-            ct_yamlng_a0.calc_key("input")
+            ct_yng_a0.calc_key("input")
     };
-    uint64_t k = ct_yamlng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
 
     ct_yamlng_node input = d->get(d->inst, k);
     if (0 != input.idx) {
@@ -183,7 +183,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     CEL_UNUSED(camera);
 
     static ct_material copy_material = ct_material_a0.resource_create(
-            ct_hash_a0.id64_from_str("copy"));
+            ct_hash_a0.id64_from_str("content/copy"));
 
     bgfx::setViewRect(viewid, 0, 0,
                       (uint16_t) viewport->size[0],  // TODO: SHITTT
@@ -241,7 +241,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_material_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
         },
         {
             CEL_UNUSED(reload);

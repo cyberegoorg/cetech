@@ -10,7 +10,7 @@ children:
   # 3
   "5564343313252":
     name: "box1"
-    PARENT: box1.entity
+    PARENT: content/box1.entity
 
   # 2
 #  "55643423443313252":

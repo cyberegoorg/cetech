@@ -36,7 +36,6 @@ using namespace celib;
 static struct globals {
     ct_viewport viewport;
     ct_world world;
-    ct_camera camera;
     ct_entity camera_ent;
     bool visible;
     bool active;
@@ -115,7 +114,8 @@ static void on_debugui() {
 
 static void render() {
     if(_G.visible) {
-        ct_viewport_a0.render_world(_G.world, _G.camera, _G.viewport);
+        ct_camera camera = ct_camera_a0.get(_G.world, _G.camera_ent);
+        ct_viewport_a0.render_world(_G.world, camera, _G.viewport);
     }
 }
 
@@ -126,11 +126,10 @@ static void init() {
 
     _G.world = ct_world_a0.create();
 
-    _G.camera_ent = ct_entity_a0.spawn(_G.world,ct_hash_a0.id64_from_str("camera"));
+    _G.camera_ent = ct_entity_a0.spawn(_G.world,
+                                       ct_hash_a0.id64_from_str("content/camera"));
 
-    _G.camera = ct_camera_a0.get(_G.world, _G.camera_ent);
-
-    ct_level_a0.load_level(_G.world,ct_hash_a0.id64_from_str("level1"));
+    ct_level_a0.load_level(_G.world,ct_hash_a0.id64_from_str("content/level1"));
     //ct_entity_a0.spawn(_G.world, ct_hash_a0.id64_from_str("entity10"));
 }
 
@@ -168,8 +167,7 @@ static void update(float dt) {
     }
 
     fps_camera_update(_G.world, _G.camera_ent, dt,
-                      0, 0,
-                      updown, leftright, 10.0f, false);
+                      0, 0, updown, leftright, 10.0f, false);
 }
 
 static ct_asset_preview_a0 asset_preview_api = {

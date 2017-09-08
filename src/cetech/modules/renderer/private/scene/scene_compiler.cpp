@@ -36,7 +36,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_thread_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 
@@ -159,20 +159,20 @@ namespace scene_resource_compiler {
                             bgfx::Attrib::Enum type,
                             ct_yamlng_node decl_node) {
 
-        ct_yamlng_document *d = decl_node.d;
+        ct_yng_doc *d = decl_node.d;
 
         uint64_t keys[] = {
                 d->hash(d->inst, decl_node),
-                ct_yamlng_a0.calc_key("type"),
+                ct_yng_a0.calc_key("type"),
         };
         const char *type_str = d->get_string(d->inst,
-                                             ct_yamlng_a0.combine_key(keys,
+                                             ct_yng_a0.combine_key(keys,
                                                                       CETECH_ARRAY_LEN(
                                                                               keys)),
                                              "");
 
-        keys[1] = ct_yamlng_a0.calc_key("size");
-        float size = d->get_float(d->inst, ct_yamlng_a0.combine_key(keys,
+        keys[1] = ct_yng_a0.calc_key("size");
+        float size = d->get_float(d->inst, ct_yng_a0.combine_key(keys,
                                                                     CETECH_ARRAY_LEN(
                                                                             keys)),
                                   0.0f);
@@ -190,17 +190,17 @@ namespace scene_resource_compiler {
     static void _parese_types(bgfx::VertexDecl *decl,
                               ct_yamlng_node types,
                               uint32_t *vertex_size) {
-        ct_yamlng_document *d = types.d;
+        ct_yng_doc *d = types.d;
 
         for (uint32_t i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
 
             uint64_t keys[] = {
                     d->hash(d->inst, types),
-                    ct_yamlng_a0.calc_key(_chanel_types[i].name),
+                    ct_yng_a0.calc_key(_chanel_types[i].name),
             };
 
             ct_yamlng_node node = d->get(d->inst,
-                                         ct_yamlng_a0.combine_key(keys,
+                                         ct_yng_a0.combine_key(keys,
                                                                   CETECH_ARRAY_LEN(
                                                                           keys)));
             if (0 != node.idx) {
@@ -220,7 +220,7 @@ namespace scene_resource_compiler {
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
-        ct_yamlng_document *d = node.d;
+        ct_yng_doc *d = node.d;
 
         struct ct_yamlng_node idx_n = d->get_seq(d->inst,
                                                  d->hash(d->inst, node), i);
@@ -232,17 +232,17 @@ namespace scene_resource_compiler {
         {
             uint64_t keys[] = {
                     d->hash(d->inst,types),
-                    ct_yamlng_a0.calc_key(name),
-                    ct_yamlng_a0.calc_key("type"),
+                    ct_yng_a0.calc_key(name),
+                    ct_yng_a0.calc_key("type"),
             };
-            type_str = d->get_string(d->inst, ct_yamlng_a0.combine_key(keys,
+            type_str = d->get_string(d->inst, ct_yng_a0.combine_key(keys,
                                                                        CETECH_ARRAY_LEN(
                                                                                keys)),
                                      "");
 
-            keys[2] = ct_yamlng_a0.calc_key("size"),
+            keys[2] = ct_yng_a0.calc_key("size"),
                     size = (uint32_t) d->get_float(d->inst,
-                                                   ct_yamlng_a0.combine_key(
+                                                   ct_yng_a0.combine_key(
                                                            keys,
                                                            CETECH_ARRAY_LEN(
                                                                    keys)),
@@ -254,9 +254,9 @@ namespace scene_resource_compiler {
 
         uint64_t keys[] = {
                 d->hash(d->inst, chanels_n),
-                ct_yamlng_a0.calc_key(name),
+                ct_yng_a0.calc_key(name),
         };
-        uint64_t chanel_data_n = ct_yamlng_a0.combine_key(keys,
+        uint64_t chanel_data_n = ct_yng_a0.combine_key(keys,
                                                           CETECH_ARRAY_LEN(
                                                                   keys));
 
@@ -277,7 +277,7 @@ namespace scene_resource_compiler {
                                 void *_data) {
 
         struct compile_output *output = (compile_output *) _data;
-        ct_yamlng_document *d = key.d;
+        ct_yng_doc *d = key.d;
 
         const char *name_str = d->as_string(d->inst, key, "");
         uint64_t name = ct_hash_a0.id64_from_str(name_str);
@@ -293,9 +293,9 @@ namespace scene_resource_compiler {
 
         uint64_t keys[] = {
                 d->hash(d->inst, value),
-                ct_yamlng_a0.calc_key("types"),
+                ct_yng_a0.calc_key("types"),
         };
-        ct_yamlng_node types = d->get(d->inst, ct_yamlng_a0.combine_key(keys,
+        ct_yamlng_node types = d->get(d->inst, ct_yng_a0.combine_key(keys,
                                                                         CETECH_ARRAY_LEN(
                                                                                 keys)));
 
@@ -306,22 +306,22 @@ namespace scene_resource_compiler {
         array::push_back(output->vb_decl, vertex_decl);
 
         // IB, VB
-        keys[1] = ct_yamlng_a0.calc_key("chanels");
+        keys[1] = ct_yng_a0.calc_key("chanels");
         ct_yamlng_node chanels_n = d->get(d->inst,
-                                          ct_yamlng_a0.combine_key(keys,
+                                          ct_yng_a0.combine_key(keys,
                                                                    CETECH_ARRAY_LEN(
                                                                            keys)));
 
 
-        keys[1] = ct_yamlng_a0.calc_key("indices");
-        uint64_t  k = ct_yamlng_a0.combine_key(keys,
+        keys[1] = ct_yng_a0.calc_key("indices");
+        uint64_t  k = ct_yng_a0.combine_key(keys,
                                                CETECH_ARRAY_LEN(
                                                        keys));
         ct_yamlng_node indices_n = d->get(d->inst, k);
 
         keys[0] = k;
-        keys[1] = ct_yamlng_a0.calc_key("size");
-        ct_yamlng_node i_size = d->get(d->inst, ct_yamlng_a0.combine_key(keys,
+        keys[1] = ct_yng_a0.calc_key("size");
+        ct_yamlng_node i_size = d->get(d->inst, ct_yng_a0.combine_key(keys,
                                                                          CETECH_ARRAY_LEN(
                                                                                  keys)));
 
@@ -336,11 +336,11 @@ namespace scene_resource_compiler {
 
                 uint64_t keys[] = {
                         d->hash(d->inst, indices_n),
-                        ct_yamlng_a0.calc_key(name),
+                        ct_yng_a0.calc_key(name),
                 };
 
                 ct_yamlng_node node = d->get(d->inst,
-                                             ct_yamlng_a0.combine_key(keys,
+                                             ct_yng_a0.combine_key(keys,
                                                                       CETECH_ARRAY_LEN(
                                                                               keys)));
                 if (0 != node.idx) {
@@ -362,17 +362,17 @@ namespace scene_resource_compiler {
                            struct ct_yamlng_node value,
                            void *_data) {
         struct foreach_graph_data *output = (foreach_graph_data *) _data;
-        ct_yamlng_document *d = key.d;
+        ct_yng_doc *d = key.d;
 
         const char *key_str = d->as_string(d->inst, key, "");
         uint64_t node_name = ct_hash_a0.id64_from_str(key_str);
 
         uint64_t keys[] = {
                 d->hash(d->inst, value),
-                ct_yamlng_a0.calc_key("local"),
+                ct_yng_a0.calc_key("local"),
         };
         ct_yamlng_node local_pose = d->get(d->inst,
-                                           ct_yamlng_a0.combine_key(keys,
+                                           ct_yng_a0.combine_key(keys,
                                                                     CETECH_ARRAY_LEN(
                                                                             keys)));
 
@@ -386,8 +386,8 @@ namespace scene_resource_compiler {
         array::push(output->output->node_pose, pose, 16);
 
 
-        keys[1] = ct_yamlng_a0.calc_key("geometries");
-        uint64_t geometries_k = ct_yamlng_a0.combine_key(keys,
+        keys[1] = ct_yng_a0.calc_key("geometries");
+        uint64_t geometries_k = ct_yng_a0.combine_key(keys,
                                                          CETECH_ARRAY_LEN(
                                                                  keys));
 
@@ -415,8 +415,8 @@ namespace scene_resource_compiler {
         }
 
 
-        keys[1] = ct_yamlng_a0.calc_key("children");
-        uint64_t children_k = ct_yamlng_a0.combine_key(keys,
+        keys[1] = ct_yng_a0.calc_key("children");
+        uint64_t children_k = ct_yng_a0.combine_key(keys,
                                                        CETECH_ARRAY_LEN(
                                                                keys));
         ct_yamlng_node children_n = d->get(d->inst,
@@ -433,14 +433,14 @@ namespace scene_resource_compiler {
         }
     }
 
-    int _compile_yaml(struct ct_yamlng_document *document,
+    int _compile_yaml(struct ct_yng_doc *document,
                       struct compile_output *output) {
 
         ct_yamlng_node geometries = document->get(document->inst,
-                                                  ct_yamlng_a0.calc_key(
+                                                  ct_yng_a0.calc_key(
                                                           "geometries"));
         ct_yamlng_node graph = document->get(document->inst,
-                                             ct_yamlng_a0.calc_key("graph"));
+                                             ct_yng_a0.calc_key("graph"));
 
         document->foreach_dict_node(document->inst, geometries,
                                     foreach_geometries_clb, output);
@@ -476,14 +476,14 @@ namespace scene_resource_compiler {
     }
 
     int _compile_assimp(const char *filename,
-                        struct ct_yamlng_document *document,
+                        struct ct_yng_doc *document,
                         struct compile_output *output,
                         ct_compilator_api *capi) {
         auto a = ct_memory_a0.main_allocator();
 
         const char *input_str = document->get_string(
                 document->inst,
-                ct_yamlng_a0.calc_key("import.input"), "");
+                ct_yng_a0.calc_key("import.input"), "");
 
         capi->add_dependency(filename, input_str);
 
@@ -493,7 +493,7 @@ namespace scene_resource_compiler {
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
         if (document->get_bool(document->inst,
-                               ct_yamlng_a0.calc_key("import.postprocess.flip_uvs"),
+                               ct_yng_a0.calc_key("import.postprocess.flip_uvs"),
                                false)) {
             postprocess_flag |= aiProcess_FlipUVs;
         }
@@ -594,12 +594,12 @@ namespace scene_resource_compiler {
 
         struct compile_output *output = _crete_compile_output();
 
-        ct_yamlng_document* document = ct_ydb_a0.get(filename);
+        ct_yng_doc* document = ct_ydb_a0.get(filename);
 
         int ret = 1;
 
         if (document->has_key(document->inst,
-                              ct_yamlng_a0.calc_key("import"))) {
+                              ct_yng_a0.calc_key("import"))) {
             ret = _compile_assimp(filename, document, output, compilator_api);
         } else {
             ret = _compile_yaml(document, output);
@@ -667,11 +667,11 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_thread_a0);
-        CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
-                                         compiler);
+                                         compiler, true);
 
         return 1;
     }

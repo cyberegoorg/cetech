@@ -40,7 +40,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_filesystem_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 //==============================================================================
@@ -57,6 +57,7 @@ CETECH_DECL_API(ct_ydb_a0);
 
 struct compilator {
     ct_resource_compilator_t compilator;
+    bool yaml_based;
 };
 
 struct compile_task_data {
@@ -134,13 +135,18 @@ static void _compile_task(void *data) {
 
     bool res = false;
     if (tdata->compilator.compilator) {
-        const char** files;
-        uint32_t files_count;
-        ct_ydb_a0.parent_files(tdata->source_filename, &files, &files_count);
-        for (int i = 0; i < files_count; ++i) {
-            _compilator_api.add_dependency(tdata->source_filename, files[i]);
-        }
+        if(tdata->compilator.yaml_based) {
+            const char **files;
+            uint32_t files_count;
 
+            ct_ydb_a0.parent_files(tdata->source_filename, &files,
+                                   &files_count);
+
+            for (int i = 0; i < files_count; ++i) {
+                _compilator_api.add_dependency(tdata->source_filename,
+                                               files[i]);
+            }
+        }
 
         res = tdata->compilator.compilator(tdata->source_filename,
                                            tdata->source, tdata->build,
@@ -289,14 +295,14 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 }
 
 void resource_compiler_register(uint64_t type,
-                                ct_resource_compilator_t compilator) {
+                                ct_resource_compilator_t compilator, bool yaml_based) {
     for (int i = 0; i < MAX_TYPES; ++i) {
         if (_G.compilator_map_type[i] != 0) {
             continue;
         }
 
         _G.compilator_map_type[i] = type;
-        _G.compilator_map_compilator[i] = {.compilator = compilator};
+        _G.compilator_map_compilator[i] = {.compilator = compilator, .yaml_based = yaml_based};
         return;
     }
 }
@@ -419,8 +425,7 @@ void resource_compiler_check_fs() {
             }
 
 
-            ct_resource_a0.reload(type_id, &name_array[0],
-                                  array::size(name_array));
+            ct_resource_a0.reload(type_id, &name_array[0],array::size(name_array));
 
             ++type_it;
         }
@@ -504,7 +509,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

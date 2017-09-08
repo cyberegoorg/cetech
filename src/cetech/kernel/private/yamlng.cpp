@@ -33,10 +33,19 @@ void add_key(const char* key, uint32_t key_len, uint64_t key_hash) {
     const uint32_t idx = array::size(_G.key_to_str_offset);
     const uint32_t offset = array::size(_G.key_to_str_data);
 
-    array::push(_G.key_to_str_data, key, sizeof(char) * key_len);
+    array::push(_G.key_to_str_data, key, sizeof(char) * (key_len+1));
     array::push_back(_G.key_to_str_offset, offset);
 
     map::set(_G.key_to_str, key_hash, idx);
+}
+
+const char* get_key(uint64_t hash) {
+    uint32_t  idx = map::get(_G.key_to_str, hash, UINT32_MAX);
+    if(UINT32_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.key_to_str_data[_G.key_to_str_offset[idx]];
 }
 
 struct node_value {
@@ -49,7 +58,7 @@ struct node_value {
 
 struct yamlng_document_inst {
     struct cel_alloc *alloc;
-    struct ct_yamlng_document *doc;
+    struct ct_yng_doc *doc;
 
     Array<char*> parent_file;
 
@@ -125,7 +134,7 @@ uint64_t combine_key_str(const char** keys,
     return hash;
 }
 
-uint32_t new_node(ct_yamlng_document *doc,
+uint32_t new_node(ct_yng_doc *doc,
                   node_type type,
                   node_value value,
                   uint32_t parent,
@@ -194,21 +203,21 @@ void type_value_from_scalar(const uint8_t *scalar,
     *vallue = {.string = strdup(scalar_str)};
 }
 
-bool has_key(ct_yamlng_document_instance_t *_inst,
+bool has_key(ct_yng_doc_instance_t *_inst,
              uint64_t key) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return map::has(inst->key_map, key);
 }
 
 
-struct ct_yamlng_node get(ct_yamlng_document_instance_t *_inst,
+struct ct_yamlng_node get(ct_yng_doc_instance_t *_inst,
                           uint64_t key) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return {.idx = map::get(inst->key_map, key, (uint32_t) 0), .d = inst->doc};
 }
 
 
-struct ct_yamlng_node get_seq(ct_yamlng_document_instance_t *_inst,
+struct ct_yamlng_node get_seq(ct_yng_doc_instance_t *_inst,
                                  uint64_t key,
                                  uint32_t idx) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -224,25 +233,25 @@ struct ct_yamlng_node get_seq(ct_yamlng_document_instance_t *_inst,
     return {.idx = it, .d = inst->doc};
 }
 
-enum node_type type(ct_yamlng_document_instance_t *_inst,
+enum node_type type(ct_yng_doc_instance_t *_inst,
                     ct_yamlng_node node) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return inst->type[node.idx];
 }
 
-uint64_t get_hash(ct_yamlng_document_instance_t *_inst,
+uint64_t get_hash(ct_yng_doc_instance_t *_inst,
                   ct_yamlng_node node) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return inst->hash[node.idx];
 }
 
-uint32_t get_size(ct_yamlng_document_instance_t *_inst,
+uint32_t get_size(ct_yng_doc_instance_t *_inst,
                   ct_yamlng_node node) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     return inst->value[node.idx].node_count;
 }
 
-const char *as_string(ct_yamlng_document_instance_t *_inst,
+const char *as_string(ct_yng_doc_instance_t *_inst,
                       ct_yamlng_node node,
                       const char *defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -254,7 +263,7 @@ const char *as_string(ct_yamlng_document_instance_t *_inst,
     return inst->value[node.idx].string;
 }
 
-float as_float(ct_yamlng_document_instance_t *_inst,
+float as_float(ct_yng_doc_instance_t *_inst,
                ct_yamlng_node node,
                float defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -267,7 +276,7 @@ float as_float(ct_yamlng_document_instance_t *_inst,
     return inst->value[node.idx].f;
 }
 
-bool as_bool(ct_yamlng_document_instance_t *_inst,
+bool as_bool(ct_yng_doc_instance_t *_inst,
              ct_yamlng_node node,
              bool defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -280,7 +289,7 @@ bool as_bool(ct_yamlng_document_instance_t *_inst,
     return inst->type[node.idx] == NODE_TRUE;
 }
 
-void as_vec3(ct_yamlng_document_instance_t *_inst,
+void as_vec3(ct_yng_doc_instance_t *_inst,
              ct_yamlng_node node,
              float *value) {
 
@@ -301,7 +310,7 @@ void as_vec3(ct_yamlng_document_instance_t *_inst,
     value[count - 3] = inst->value[it].f;
 }
 
-void as_vec4(ct_yamlng_document_instance_t *_inst,
+void as_vec4(ct_yng_doc_instance_t *_inst,
              ct_yamlng_node node,
              float *value) {
 
@@ -325,7 +334,7 @@ void as_vec4(ct_yamlng_document_instance_t *_inst,
     value[count - 4] = inst->value[it].f;
 }
 
-void as_mat4(ct_yamlng_document_instance_t *_inst,
+void as_mat4(ct_yng_doc_instance_t *_inst,
              ct_yamlng_node node,
              float *value) {
 
@@ -385,7 +394,7 @@ void as_mat4(ct_yamlng_document_instance_t *_inst,
     value[count - 16] = inst->value[it].f;
 }
 
-const char *get_string(ct_yamlng_document_instance_t *_inst,
+const char *get_string(ct_yng_doc_instance_t *_inst,
                        uint64_t key,
                        const char *defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -394,7 +403,7 @@ const char *get_string(ct_yamlng_document_instance_t *_inst,
     return as_string(_inst, node, defaultt);
 }
 
-float get_float(ct_yamlng_document_instance_t *_inst,
+float get_float(ct_yng_doc_instance_t *_inst,
                 uint64_t key,
                 float defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -403,7 +412,7 @@ float get_float(ct_yamlng_document_instance_t *_inst,
     return as_float(_inst, node, defaultt);
 }
 
-bool get_bool(ct_yamlng_document_instance_t *_inst,
+bool get_bool(ct_yng_doc_instance_t *_inst,
               uint64_t key,
               bool defaultt) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -412,13 +421,13 @@ bool get_bool(ct_yamlng_document_instance_t *_inst,
     return as_bool(_inst, node, defaultt);
 }
 
-void set_float(ct_yamlng_document_instance_t *_inst, struct ct_yamlng_node node, float value) {
+void set_float(ct_yng_doc_instance_t *_inst, struct ct_yamlng_node node, float value) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
     inst->value[node.idx].f = value;
     inst->modified = true;
 }
 
-void set_bool(ct_yamlng_document_instance_t *_inst,
+void set_bool(ct_yng_doc_instance_t *_inst,
                  struct ct_yamlng_node node,
                  bool value){
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -435,7 +444,7 @@ void set_bool(ct_yamlng_document_instance_t *_inst,
 }
 
 
-void set_string(ct_yamlng_document_instance_t *_inst,
+void set_string(ct_yng_doc_instance_t *_inst,
                    ct_yamlng_node node,
                    const char *value) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -450,7 +459,7 @@ void set_string(ct_yamlng_document_instance_t *_inst,
     inst->modified = true;
 }
 
-void set_vec3(ct_yamlng_document_instance_t *_inst,
+void set_vec3(ct_yng_doc_instance_t *_inst,
                  ct_yamlng_node node,
                  float *value) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -467,7 +476,7 @@ void set_vec3(ct_yamlng_document_instance_t *_inst,
     inst->modified = true;
 }
 
-void set_vec4(ct_yamlng_document_instance_t *_inst,
+void set_vec4(ct_yng_doc_instance_t *_inst,
                  ct_yamlng_node node,
                  float *value) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -486,7 +495,7 @@ void set_vec4(ct_yamlng_document_instance_t *_inst,
     inst->modified = true;
 }
 
-void set_mat4(ct_yamlng_document_instance_t *_inst,
+void set_mat4(ct_yng_doc_instance_t *_inst,
                  ct_yamlng_node node,
                  float *value) {
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
@@ -542,7 +551,7 @@ void set_mat4(ct_yamlng_document_instance_t *_inst,
     inst->modified = true;
 }
 
-void foreach_dict_node(ct_yamlng_document_instance_t *_inst,
+void foreach_dict_node(ct_yng_doc_instance_t *_inst,
                        struct ct_yamlng_node node,
                        ct_yamlng_foreach_map_t foreach_clb,
                        void *data) {
@@ -559,7 +568,7 @@ void foreach_dict_node(ct_yamlng_document_instance_t *_inst,
     }
 }
 
-void foreach_seq_node(ct_yamlng_document_instance_t *_inst,
+void foreach_seq_node(ct_yng_doc_instance_t *_inst,
                       struct ct_yamlng_node node,
                       ct_yamlng_foreach_seq_t foreach_clb,
                       void *data) {
@@ -887,9 +896,15 @@ void save_recursive(yamlng_document_inst* inst, uint32_t root, yaml_emitter_t *e
     return;
 }
 
+int write_handler(void *ext, unsigned char *buffer, size_t size) {
+    ct_vio *output = (ct_vio *)ext;
+    output->write(output->inst, buffer, sizeof(unsigned char), size);
+    return 1;
+}
+
 bool save_yaml(struct cel_alloc *alloc,
                struct ct_vio *vio,
-               struct ct_yamlng_document *doc) {
+               struct ct_yng_doc *doc) {
 
     unsigned char kim_nuke_shit[4096];
     size_t writen = 0;
@@ -904,7 +919,7 @@ bool save_yaml(struct cel_alloc *alloc,
 //    Array<stack_state> parent_stack(ct_memory_a0.main_allocator());
 //    uint32_t parent_stack_top;
 
-    ct_yamlng_document* d  = doc;
+    ct_yng_doc* d  = doc;
     yamlng_document_inst* inst = (yamlng_document_inst *)(d->inst);
     ct_yamlng_node root_node = d->get(d->inst, 0);
 
@@ -914,11 +929,13 @@ bool save_yaml(struct cel_alloc *alloc,
         return false;
     }
 
-    yaml_emitter_set_output_string(&emitter, kim_nuke_shit, CETECH_ARRAY_LEN(kim_nuke_shit), &writen);
+//    yaml_emitter_set_output_string(&emitter, kim_nuke_shit, CETECH_ARRAY_LEN(kim_nuke_shit), &writen);
 
 //    FILE *output = fopen("fooo.yml", "wb");
 //    yaml_emitter_set_output_file(&emitter, output);
 
+
+    yaml_emitter_set_output(&emitter, write_handler, vio);
 
     // BEGIN STREAM
     yaml_stream_start_event_initialize(&event, YAML_UTF8_ENCODING);
@@ -956,7 +973,85 @@ error:
     return false;
 }
 
-static void destroy(struct ct_yamlng_document *document) {
+ct_yamlng_node create_tree(ct_yng_doc_instance_t *_inst,
+                              const char **keys,
+                              uint32_t keys_count) {
+    uint32_t first_nonexist = 0;
+    uint64_t last_exist_key = 0;
+    for (int i = 0; i < keys_count; ++i) {
+        uint64_t key = combine_key_str(keys, i+1);
+        if(!has_key(_inst, key)) {
+            first_nonexist = i;
+            break;
+        } else {
+            last_exist_key = key;
+        }
+    }
+
+    ct_yamlng_node n = get(_inst, last_exist_key);
+    yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
+
+    uint32_t parent = n.idx;
+    for (int i = first_nonexist; i < keys_count-1; ++i) {
+        uint64_t key = combine_key_str(keys, i);
+        inst->value[parent].node_count += 1;
+
+        uint32_t key_idx = new_node(
+                inst->doc,
+                NODE_STRING,
+                {.string = ct_memory_a0.str_dup(keys[i], ct_memory_a0.main_allocator())},
+                parent, key);
+
+        uint32_t new_map_idx = new_node(
+                inst->doc,
+                NODE_MAP, {.node_count=0},
+                key_idx, key);
+
+        map::set(inst->key_map, key, new_map_idx);
+
+        parent = new_map_idx;
+    }
+
+//    uint64_t key = combine_key_str(keys, keys_count);
+    inst->value[parent].node_count += 1;
+    uint32_t key_idx = new_node(
+            inst->doc,
+            NODE_STRING,
+            {.string = ct_memory_a0.str_dup(keys[keys_count-1], ct_memory_a0.main_allocator())},
+            parent, 0);
+
+    return {.idx = key_idx, .d = inst->doc};
+}
+
+void create_tree_vec3(ct_yng_doc_instance_t *_inst,
+                      const char **keys,
+                      uint32_t keys_count,
+                      float *value){
+
+    ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    ct_yng_doc* d = node.d;
+
+    uint64_t key = combine_key_str(keys, keys_count);
+
+    uint32_t new_map_idx = new_node(
+            d,
+            NODE_SEQ, {.node_count=3},
+            node.idx, key);
+
+    yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
+
+    map::set(inst->key_map, key, new_map_idx);
+
+    for (int i = 0; i < 3; ++i) {
+        new_node(
+                d,
+                NODE_FLOAT, {.f = value[2-i]},
+                new_map_idx, i);
+    }
+
+}
+
+static void destroy(struct ct_yng_doc *document) {
     yamlng_document_inst *inst = (yamlng_document_inst *) document->inst;
     struct cel_alloc *alloc = inst->alloc;
 
@@ -973,19 +1068,19 @@ static void destroy(struct ct_yamlng_document *document) {
     CEL_FREE(alloc, document);
 }
 
-void parent_files(ct_yamlng_document_instance_t *_inst, const char*** files, uint32_t *count){
+void parent_files(ct_yng_doc_instance_t *_inst, const char*** files, uint32_t *count){
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
 
     *files = (const char **)array::begin(inst->parent_file);
     *count = array::size(inst->parent_file);
 }
 
-ct_yamlng_document *from_vio(struct ct_vio *vio,
+ct_yng_doc *from_vio(struct ct_vio *vio,
                              struct cel_alloc *alloc) {
 
-    ct_yamlng_document *d = CEL_ALLOCATE(alloc,
-                                         ct_yamlng_document,
-                                         sizeof(ct_yamlng_document));
+    ct_yng_doc *d = CEL_ALLOCATE(alloc,
+                                         ct_yng_doc,
+                                         sizeof(ct_yng_doc));
     if (!d) {
         return NULL;
     }
@@ -1038,6 +1133,8 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
             .set_vec4 = set_vec4,
             .set_mat4 = set_mat4,
 
+            .create_tree_vec3 = create_tree_vec3,
+
             .foreach_dict_node = foreach_dict_node,
             .foreach_seq_node = foreach_seq_node,
 
@@ -1055,10 +1152,12 @@ ct_yamlng_document *from_vio(struct ct_vio *vio,
     return d;
 }
 
-static ct_yamlng_a0 yamlng_api = {
+static ct_yng_a0 yamlng_api = {
         .from_vio = from_vio,
         .save_to_vio = save_yaml,
         .destroy = destroy,
+
+        .get_key = get_key,
         .calc_key = calc_key,
         .combine_key = combine_key,
         .combine_key_str = combine_key_str,
@@ -1071,7 +1170,7 @@ static void _init(ct_api_a0 *api) {
     _G.key_to_str_offset.init(ct_memory_a0.main_allocator());
     _G.key_to_str_data.init(ct_memory_a0.main_allocator());
 
-    api->register_api("ct_yamlng_a0", &yamlng_api);
+    api->register_api("ct_yng_a0", &yamlng_api);
 }
 
 static void _shutdown() {

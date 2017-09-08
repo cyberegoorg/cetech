@@ -747,7 +747,7 @@ static void _init(ct_api_a0 *a0) {
 //    ct_renderer_a0.register_on_render(_game_render_clb);
 
     ct_resource_a0.register_type(_G.type_id, resource_lua::callback);
-    ct_resource_a0.compiler_register(_G.type_id, _lua_compiler);
+    ct_resource_a0.compiler_register(_G.type_id, _lua_compiler, false);
 }
 
 static void _shutdown() {

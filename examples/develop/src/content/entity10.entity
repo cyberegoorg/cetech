@@ -10,7 +10,7 @@ components:
     scene: "cube"
     mesh: "g_cube"
     node: "n_cube"
-    material: "material1"
+    material: "content/material1"
 
 children:
   "e432c0ed88dd461e81f50973ffb00263":

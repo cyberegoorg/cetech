@@ -33,4 +33,4 @@ entity:
   - playground/cube
 
 render_config:
-  - default
+  - core/renderer/default

@@ -27,7 +27,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
 
@@ -55,7 +55,7 @@ namespace material_compiler {
             uint64_t tmp_keys[] = {
                     root_key,
                     key,
-                    ct_yamlng_a0.calc_key("name"),
+                    ct_yng_a0.calc_key("name"),
             };
 
             const char *name = ct_ydb_a0.get_string(filename, tmp_keys,
@@ -64,14 +64,14 @@ namespace material_compiler {
             char uniform_name[32];
             strcpy(uniform_name, name);
 
-            tmp_keys[2] = ct_yamlng_a0.calc_key("type");
+            tmp_keys[2] = ct_yng_a0.calc_key("type");
             const char *type = ct_ydb_a0.get_string(filename, tmp_keys,
                                                     CETECH_ARRAY_LEN(tmp_keys),
                                                     "");
 
             material_variable mat_var = {};
 
-            tmp_keys[2] = ct_yamlng_a0.calc_key("value");
+            tmp_keys[2] = ct_yng_a0.calc_key("value");
             if (!strcmp(type, "texture")) {
                 uint64_t texture_name = 0;
 
@@ -140,10 +140,10 @@ namespace material_compiler {
         uint64_t tmp_keys[] = {
                 root_key,
                 key,
-                ct_yamlng_a0.calc_key("shader"),
+                ct_yng_a0.calc_key("shader"),
         };
 
-        uint64_t tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+        uint64_t tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                                     CETECH_ARRAY_LEN(tmp_keys));
 
         const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
@@ -153,8 +153,8 @@ namespace material_compiler {
         auto layer_id = key;
         auto layer_offset = array::size(output.var);
 
-        tmp_keys[2] = ct_yamlng_a0.calc_key("render_state");
-        tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+        tmp_keys[2] = ct_yng_a0.calc_key("render_state");
+        tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                            CETECH_ARRAY_LEN(tmp_keys));
         if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
             output.curent_render_state = 0;
@@ -177,8 +177,8 @@ namespace material_compiler {
         array::push_back(output.layer_offset, layer_offset);
         array::push_back(output.render_state, output.curent_render_state);
 
-        tmp_keys[2] = ct_yamlng_a0.calc_key("variables");
-        tmp_key = ct_yamlng_a0.combine_key(tmp_keys,
+        tmp_keys[2] = ct_yng_a0.calc_key("variables");
+        tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                            CETECH_ARRAY_LEN(tmp_keys));
         if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
             uint64_t layers_keys[32] = {};
@@ -216,7 +216,7 @@ namespace material_compiler {
         output.layer_offset.init(ct_memory_a0.main_allocator());
         output.shader_name.init(ct_memory_a0.main_allocator());
 
-        uint64_t key = ct_yamlng_a0.calc_key("layers");
+        uint64_t key = ct_yng_a0.calc_key("layers");
 
         if (!ct_ydb_a0.has_key(filename, &key, 1)) {
             return 0;
@@ -281,11 +281,11 @@ namespace material_compiler {
         CETECH_GET_API(api, ct_path_a0);
         CETECH_GET_API(api, ct_vio_a0);
         CETECH_GET_API(api, ct_hash_a0);
-        CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
         ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("material"),
-                                         compiler);
+                                         compiler, true);
 
         return 1;
     }

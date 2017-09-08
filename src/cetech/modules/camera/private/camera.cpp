@@ -19,10 +19,13 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
+
 using namespace celib;
+
+#define combine(a, b) ((a * 11)^(b))
 
 namespace {
 
@@ -139,14 +142,14 @@ namespace {
 
         uint64_t keys[component_key_count+1];
         memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-        keys[component_key_count] = ct_yamlng_a0.calc_key("near");
+        keys[component_key_count] = ct_yng_a0.calc_key("near");
 
         t_data.near = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("far");
+        keys[component_key_count] = ct_yng_a0.calc_key("far");
         t_data.far = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("fov");
+        keys[component_key_count] = ct_yng_a0.calc_key("fov");
         t_data.fov = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
 
         data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
@@ -188,7 +191,7 @@ namespace camera {
     int has(ct_world world,
             ct_entity entity) {
 
-        uint32_t idx = world.h ^entity.h;
+        uint32_t idx = combine(world.h, entity.h);
 
         return map::has(_G.ent_map, idx);
     }
@@ -196,7 +199,7 @@ namespace camera {
     ct_camera get(ct_world world,
                   ct_entity entity) {
 
-        uint32_t idx = world.h ^entity.h;
+        uint32_t idx = combine(world.h, entity.h);
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
         return (ct_camera) {.idx = component_idx, .world = world};
@@ -219,7 +222,7 @@ namespace camera {
         data->far[idx] = far;
         data->fov[idx] = fov;
 
-        map::set(_G.ent_map, world.h ^ entity.h, idx);
+        map::set(_G.ent_map, combine(world.h, entity.h), idx);
 
         return (ct_camera) {.idx = idx, .world = world};
     }
@@ -251,7 +254,9 @@ namespace camera_module {
 
         // TODO: remove from arrays, swap idx -> last AND change size
         for (uint32_t i = 0; i < ent_count; i++) {
-            map::remove(_G.world_map, ents[i].h);
+            if(camera::has(world, ents[i])) {
+                map::remove(_G.ent_map, combine(world.h, ents[i].h));
+            }
         }
     }
 
@@ -314,7 +319,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

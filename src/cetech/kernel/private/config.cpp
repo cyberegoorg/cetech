@@ -21,7 +21,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 //==============================================================================
 // Defines
@@ -340,7 +340,7 @@ namespace config {
                             void *_data) {
 
         struct foreach_config_data *output = (foreach_config_data *) _data;
-        ct_yamlng_document* d = key.d;
+        ct_yng_doc* d = key.d;
 
         const char* key_str = d->as_string(d->inst, key, "");
 
@@ -399,7 +399,7 @@ namespace config {
                             cel_alloc *alloc) {
 
         ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
-        ct_yamlng_document *d = ct_yamlng_a0.from_vio(f,alloc);
+        ct_yng_doc *d = ct_yng_a0.from_vio(f,alloc);
         f->close(f->inst);
 
         struct foreach_config_data config_data = {
@@ -410,7 +410,7 @@ namespace config {
         d->foreach_dict_node(d->inst, d->get(d->inst, 0), foreach_config_clb,
                              &config_data);
 
-        ct_yamlng_a0.destroy(d);
+        ct_yng_a0.destroy(d);
 
         return 1;
     }
@@ -477,7 +477,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
         },
         {
             CEL_UNUSED(reload);

@@ -31,7 +31,7 @@ CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_scene_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
@@ -170,23 +170,23 @@ namespace {
 
         uint64_t keys[component_key_count+1];
         memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-        keys[component_key_count] = ct_yamlng_a0.calc_key("scene");
+        keys[component_key_count] = ct_yng_a0.calc_key("scene");
 
         t_data.scene = ct_hash_a0.id64_from_str(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("mesh");
+        keys[component_key_count] = ct_yng_a0.calc_key("mesh");
         t_data.mesh = ct_hash_a0.id64_from_str(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("material");
+        keys[component_key_count] = ct_yng_a0.calc_key("material");
         t_data.material = ct_hash_a0.id64_from_str(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("node");
+        keys[component_key_count] = ct_yng_a0.calc_key("node");
         t_data.node = ct_hash_a0.id64_from_str(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
@@ -321,8 +321,7 @@ void mesh_render_all(ct_world world,
         if (ct_scenegprah_a0.has(world, ent)) {
             uint64_t name = ct_scene_a0.get_mesh_node(scene, geom);
             if (name != 0) {
-                ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,
-                                                                name);
+                ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,name);
                 ct_scenegprah_a0.get_world_matrix(n, node_w);
             }
         }
@@ -486,7 +485,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_material_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_scene_a0);
 

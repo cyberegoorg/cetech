@@ -21,7 +21,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
@@ -29,8 +29,6 @@ using namespace celib;
 #define _G property_inspector_global
 static struct _G {
     bool visible;
-
-    ct_yamlng_document *document;
 
     uint64_t level_name;
     struct ct_entity level;
@@ -63,7 +61,12 @@ static struct _G {
 _DEF_ON_CLB_FCE(ct_li_on_entity, on_entity_click);
 
 
-void set_level(struct ct_world world, struct ct_entity level, uint64_t name, uint64_t root, const char* path) {
+void set_level(struct ct_world world,
+               struct ct_entity level,
+               uint64_t name,
+               uint64_t root,
+               const char* path) {
+
     CEL_UNUSED(root);
 
     if( _G.level_name == name) {
@@ -74,7 +77,6 @@ void set_level(struct ct_world world, struct ct_entity level, uint64_t name, uin
     _G.level = level;
     _G.world = world;
     _G.path = path;
-    _G.document = ct_ydb_a0.get(path);
 }
 
 static ct_level_inspector_a0 level_inspector_api = {
@@ -96,7 +98,7 @@ static void on_debugui() {
             uint64_t  children_keys[32] = {};
             uint32_t  children_keys_count = 0;
 
-            tmp_keys[0] = ct_yamlng_a0.calc_key("children");
+            tmp_keys[0] = ct_yng_a0.calc_key("children");
             ct_ydb_a0.get_map_keys(
                     _G.path,
                     tmp_keys, 1,
@@ -108,7 +110,7 @@ static void on_debugui() {
                 sprintf(buffer, "%lu", children_keys[i]);
 
                 tmp_keys[1] = children_keys[i];
-                tmp_keys[2] = ct_yamlng_a0.calc_key("name");
+                tmp_keys[2] = ct_yng_a0.calc_key("name");
 
                 const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, 3, buffer);
 
@@ -133,7 +135,6 @@ static void _init(ct_api_a0 *api) {
     api->register_api("ct_level_inspector_a0", &level_inspector_api);
     ct_debugui_a0.register_on_debugui(on_debugui);
 
-
     _G.on_entity_click.init(ct_memory_a0.main_allocator());
 }
 
@@ -151,7 +152,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

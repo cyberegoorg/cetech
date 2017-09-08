@@ -20,7 +20,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_filesystem_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_path_a0);
 
 using namespace celib;
@@ -29,27 +29,28 @@ using namespace celib;
 #define LOG_WHERE "ydb"
 
 static struct _G {
-    Map<ct_yamlng_document *> document_cache;
+    Map<ct_yng_doc *> document_cache;
+    Map<char*> modified_files;
 } _G;
 
 void expire_document_in_cache(const char *path,
                               uint64_t path_key) {
-    ct_yamlng_document* doc = map::get<ct_yamlng_document *>(_G.document_cache, path_key, NULL);
+    ct_yng_doc* doc = map::get<ct_yng_doc *>(_G.document_cache, path_key, NULL);
 
     if(!doc) {
         return;
     }
 
     map::remove(_G.document_cache, path_key);
-    ct_yamlng_a0.destroy(doc);
+    ct_yng_a0.destroy(doc);
 }
 
-ct_yamlng_document* load_to_cache(const char* path, uint64_t path_key) {
+ct_yng_doc* load_to_cache(const char* path, uint64_t path_key) {
     static const uint64_t fs_root = ct_hash_a0.id64_from_str("source");
 
     ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
 
-    struct ct_yamlng_document *doc;
+    struct ct_yng_doc *doc;
     ct_vio *f = ct_filesystem_a0.open(fs_root, path, FS_OPEN_READ);
 
     if (!f) {
@@ -57,7 +58,7 @@ ct_yamlng_document* load_to_cache(const char* path, uint64_t path_key) {
         return NULL;
     }
 
-    doc = ct_yamlng_a0.from_vio(f, ct_memory_a0.main_allocator());
+    doc = ct_yng_a0.from_vio(f, ct_memory_a0.main_allocator());
     ct_filesystem_a0.close(f);
 
     if (!doc) {
@@ -70,11 +71,11 @@ ct_yamlng_document* load_to_cache(const char* path, uint64_t path_key) {
     return doc;
 }
 
-ct_yamlng_document *get(const char *path) {
+ct_yng_doc *get(const char *path) {
     uint64_t path_key = ct_hash_a0.id64_from_str(path);
 
-    struct ct_yamlng_document *doc;
-    doc = map::get<ct_yamlng_document *>(_G.document_cache, path_key, NULL);
+    struct ct_yng_doc *doc;
+    doc = map::get<ct_yng_doc *>(_G.document_cache, path_key, NULL);
 
     if (!doc) {
         return load_to_cache(path, path_key);
@@ -95,9 +96,9 @@ ct_yamlng_node get_first_node_recursive(const char *path,
                                         uint32_t keys_count,
                                         uint32_t max_depth) {
 
-    struct ct_yamlng_document *d = get(path);
+    struct ct_yng_doc *d = get(path);
 
-    uint64_t result_key = ct_yamlng_a0.combine_key(keys, keys_count);
+    uint64_t result_key = ct_yng_a0.combine_key(keys, keys_count);
 
     ct_yamlng_node n = d->get(d->inst, result_key);
     if (n.idx) {
@@ -110,14 +111,14 @@ ct_yamlng_node get_first_node_recursive(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yamlng_a0.calc_key("PARENT");
+    static const uint64_t PARENT_KEY = ct_yng_a0.calc_key("PARENT");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < max_depth; ++i) {
         tmp_key = tmp_keys[i];
 
         tmp_keys[i] = PARENT_KEY;
-        uint64_t k = ct_yamlng_a0.combine_key(tmp_keys, i + 1);
+        uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
         parent_file_str = d->get_string(d->inst, k, "");
 
@@ -130,7 +131,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
         tmp_keys[i] = tmp_key;
     }
 
-    return {};
+    return {0};
 }
 
 
@@ -151,9 +152,9 @@ void get_map_keys(const char *path,
             .count = map_keys_count,
     };
 
-    struct ct_yamlng_document *d = get(path);
+    struct ct_yng_doc *d = get(path);
 
-    uint64_t result_key = ct_yamlng_a0.combine_key(keys, keys_count);
+    uint64_t result_key = ct_yng_a0.combine_key(keys, keys_count);
 
     ct_yamlng_node n = d->get(d->inst, result_key);
     if (n.idx) {
@@ -170,7 +171,7 @@ void get_map_keys(const char *path,
                                      return;
                                  }
 
-                                 uint64_t str_key = ct_yamlng_a0.calc_key(string);
+                                 uint64_t str_key = ct_yng_a0.calc_key(string);
 
                                  const uint32_t s = *out->count;
                                  for (uint32_t i = 0; i < s; ++i) {
@@ -189,14 +190,14 @@ void get_map_keys(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yamlng_a0.calc_key("PARENT");
+    static const uint64_t PARENT_KEY = ct_yng_a0.calc_key("PARENT");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < keys_count; ++i) {
         tmp_key = tmp_keys[i];
 
         tmp_keys[i] = PARENT_KEY;
-        uint64_t k = ct_yamlng_a0.combine_key(tmp_keys, i + 1);
+        uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
         parent_file_str = d->get_string(d->inst, k, "");
 
@@ -309,6 +310,25 @@ void get_mat4(const char *path,
 }
 
 
+void modified(const char* path) {
+    uint64_t hash = ct_hash_a0.id64_from_str(path);
+
+    if(!map::has(_G.modified_files, hash)) {
+        char* new_str = ct_memory_a0.str_dup(path, ct_memory_a0.main_allocator());
+        map::set(_G.modified_files, hash, new_str);
+    }
+}
+
+void unmodified(const char* path) {
+    uint64_t hash = ct_hash_a0.id64_from_str(path);
+
+    if(map::has(_G.modified_files, hash)) {
+        char* new_str = map::get<char*>(_G.modified_files, hash, NULL);
+        CEL_FREE(ct_memory_a0.main_allocator(), new_str);
+        map::remove(_G.modified_files, hash);
+    }
+}
+
 void set_float(const char *path,
                uint64_t* keys,
                   uint32_t keys_count,
@@ -341,7 +361,7 @@ void set_string(const char *path,
                 uint64_t* keys,
                    uint32_t keys_count,
                    const char *value) {
-    struct ct_yamlng_document *d = get(path);
+    struct ct_yng_doc *d = get(path);
 
     ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
@@ -350,6 +370,7 @@ void set_string(const char *path,
     }
 
     d->set_string(d->inst, n, value);
+    modified(path);
 }
 
 void set_vec3(const char *path,
@@ -357,13 +378,23 @@ void set_vec3(const char *path,
                  uint32_t keys_count,
                  float *value) {
 
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count, keys_count);
+    struct ct_yng_doc *d = get(path);
+    uint64_t key = ct_yng_a0.combine_key(keys, keys_count);
+
+    ct_yamlng_node n = d->get(d->inst, key);
 
     if (!n.idx) {
-        return;
+        const char* str_keys[keys_count];
+        for (int i = 0; i < keys_count; ++i) {
+            str_keys[i] = ct_yng_a0.get_key(keys[i]);
+        }
+        
+        n.d->create_tree_vec3(n.d->inst, str_keys, keys_count, value);
+    } else {
+        n.d->set_vec3(n.d->inst, n, value);
     }
 
-    n.d->set_vec3(n.d->inst, n, value);
+    modified(path);
 }
 
 void set_vec4(const char *path,
@@ -378,6 +409,7 @@ void set_vec4(const char *path,
     }
 
     n.d->set_vec4(n.d->inst, n, value);
+    modified(path);
 }
 
 void set_mat4(const char *path,
@@ -392,13 +424,14 @@ void set_mat4(const char *path,
     }
 
     n.d->set_mat4(n.d->inst, n, value);
+    modified(path);
 }
 
 void parent_files(const char* path,
                   const char ***files,
                   uint32_t *count){
 
-    struct ct_yamlng_document *d = get(path);
+    struct ct_yng_doc *d = get(path);
 
     if(!d) {
         *files = NULL;
@@ -440,17 +473,30 @@ void check_fs() {
 
 
 void save(const char* path){
-//    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), path, FS_OPEN_WRITE);
-//
-//    if (!f) {
-//        ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
-//        return;
-//    }
-//
-//    ct_yamlng_document* d = get(path);
-//    ct_yamlng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
-//
-//    ct_filesystem_a0.close(f);
+    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), path, FS_OPEN_WRITE);
+
+    if (!f) {
+        ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
+        return;
+    }
+
+    ct_yng_doc* d = get(path);
+    ct_yng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
+
+    ct_filesystem_a0.close(f);
+
+    unmodified(path);
+}
+
+
+void save_all_modified() {
+    auto *it = map::begin(_G.modified_files);
+    auto *it_end = map::end(_G.modified_files);
+
+    while (it != it_end) {
+        save(it->value);
+        ++it;
+    }
 }
 
 static ct_ydb_a0 ydb_api = {
@@ -476,6 +522,7 @@ static ct_ydb_a0 ydb_api = {
         .get_map_keys = get_map_keys,
         .parent_files = parent_files,
         .save = save,
+        .save_all_modified = save_all_modified,
         .check_fs = check_fs
 };
 
@@ -483,6 +530,8 @@ static void _init(ct_api_a0 *api) {
     _G = {};
 
     _G.document_cache.init(ct_memory_a0.main_allocator());
+    _G.modified_files.init(ct_memory_a0.main_allocator());
+
     api->register_api("ct_ydb_a0", &ydb_api);
 }
 
@@ -491,13 +540,14 @@ static void _shutdown() {
     auto *it_end = map::end(_G.document_cache);
 
     while (it != it_end) {
-        ct_yamlng_document *d = it->value;
+        ct_yng_doc *d = it->value;
 
-        ct_yamlng_a0.destroy(d);
+        ct_yng_a0.destroy(d);
         ++it;
     }
 
     _G.document_cache.destroy();
+    _G.modified_files.destroy();
 
     _G = {};
 }
@@ -508,7 +558,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_path_a0);
         },

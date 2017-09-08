@@ -1,4 +1,4 @@
-PARENT: material1.material
+PARENT: content/material1.material
 
 layers:
   default:
@@ -6,4 +6,4 @@ layers:
       kdasdvxcvcxbxcbxbg435124asdkj:
         name: u_texColor
         type: texture
-        value: texture2
+        value: content/texture2

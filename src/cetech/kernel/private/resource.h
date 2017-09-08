@@ -11,7 +11,7 @@ extern "C" {
 
 
 void resource_compiler_register(uint64_t type,
-                                ct_resource_compilator_t compilator);
+                                ct_resource_compilator_t compilator, bool yaml_based);
 
 void resource_compiler_check_fs();
 void resource_compiler_compile_all();

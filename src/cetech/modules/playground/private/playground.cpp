@@ -9,6 +9,7 @@
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/vio.h>
 #include <celib/macros.h>
+#include <cetech/kernel/ydb.h>
 
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/memory.h"
@@ -25,6 +26,7 @@ CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 static struct PlaygroundGlobal {
     uint64_t type;
@@ -43,15 +45,16 @@ namespace playground {
 
         if (ct_debugui_a0.BeginMainMenuBar()) {
             if (ct_debugui_a0.BeginMenu("File", true)) {
-                if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
-                    ct_app_a0.quit();
-                }
-
-                if (ct_debugui_a0.MenuItem("Settings", NULL, false, true)) {
+                if (ct_debugui_a0.MenuItem("Save", "Alt+s", false, true)) {
+                    ct_ydb_a0.save_all_modified();
                 }
 
                 if (ct_debugui_a0.MenuItem2("Debug", "F9", &debug, true)) {
                     ct_renderer_a0.set_debug(debug);
+                }
+
+                if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
+                    ct_app_a0.quit();
                 }
 
                 ct_debugui_a0.EndMenu();
@@ -63,13 +66,13 @@ namespace playground {
 
             if (ct_debugui_a0.BeginMenu("Layout", true)) {
                 if (ct_debugui_a0.MenuItem("Save", NULL, false, true )) {
-                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "default.dock_layout", FS_OPEN_WRITE);
+                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "core/default.dock_layout", FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
                     ct_filesystem_a0.close(f);
                 }
 
                 if (ct_debugui_a0.MenuItem("Load", NULL, false, true)) {
-                    ct_debugui_a0.LoadDock("default.dock_layout");
+                    ct_debugui_a0.LoadDock("core/default.dock_layout");
                 }
                 ct_debugui_a0.EndMenu();
             }
@@ -121,7 +124,7 @@ namespace playground_module {
         ct_debugui_a0.register_on_debugui(playground::on_debugui);
 
         if(!_G.layout_loaded) {
-            ct_debugui_a0.LoadDock("default.dock_layout");
+            ct_debugui_a0.LoadDock("core/default.dock_layout");
             _G.layout_loaded = true;
         }
     }
@@ -144,6 +147,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             CEL_UNUSED(reload);

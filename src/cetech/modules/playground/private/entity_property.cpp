@@ -26,7 +26,7 @@ CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_level_inspector_a0);
 CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
 
@@ -79,7 +79,7 @@ static void on_debugui() {
     uint64_t tmp_keys[_G.keys_count + 3];
     memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
 
-    tmp_keys[_G.keys_count] = ct_yamlng_a0.calc_key("components");
+    tmp_keys[_G.keys_count] = ct_yng_a0.calc_key("components");
 
 
     uint64_t component_keys[32] = {};
@@ -93,7 +93,7 @@ static void on_debugui() {
 
     for (uint32_t i = 0; i < component_keys_count; ++i) {
         tmp_keys[_G.keys_count + 1] = component_keys[i];
-        tmp_keys[_G.keys_count + 2] = ct_yamlng_a0.calc_key("component_type");
+        tmp_keys[_G.keys_count + 2] = ct_yng_a0.calc_key("component_type");
 
         const char *component_type = ct_ydb_a0.get_string(_G.filename, tmp_keys,
                                                           _G.keys_count + 3,
@@ -174,7 +174,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_level_inspector_a0);
             CETECH_GET_API(api, ct_level_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

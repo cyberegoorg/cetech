@@ -27,7 +27,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 //==============================================================================
 // Globals
@@ -103,7 +103,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
         },
         {
             CEL_UNUSED(reload);

@@ -28,7 +28,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_blob_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
@@ -186,6 +186,18 @@ ct_entity spawn_from_resource(ct_world world,
 }
 
 
+uint32_t find_by_guid(uint64_t* guids, uint32_t guids_count, uint64_t guid) {
+    for (int i = 0; i < guids_count; ++i) {
+        if(guids[i] != guid ) {
+            continue;
+        }
+
+        return i;
+    }
+
+    return UINT32_MAX;
+}
+
 void reload_instance(uint64_t name, void *data) {
     entity_resource *ent_res = (entity_resource *) data;
 
@@ -200,8 +212,14 @@ void reload_instance(uint64_t name, void *data) {
                                           ct_entity, sizeof(ct_entity) *
                                                      ent_res->ent_count);
 
+        uint64_t* guid = entity_resource_guid(ent_res);
         for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
-            spawned[j] = create();
+            uint32_t idx = find_by_guid(instance->guid, instance->entity_count, guid[j]);
+            if(UINT32_MAX == idx) {
+                spawned[j] = create();
+            } else {
+                spawned[j] = instance->entity[idx];
+            }
         }
 
         spawn_from_resource(instance->world, instance, ent_res, spawned);
@@ -262,7 +280,7 @@ namespace entity_resource_compiler {
         uint64_t tmp_keys[root_count + 2];
         memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
         tmp_keys[root_count] = component_key;
-        tmp_keys[root_count + 1] = ct_yamlng_a0.calc_key("component_type");
+        tmp_keys[root_count + 1] = ct_yng_a0.calc_key("component_type");
 
         const char *component_type = ct_ydb_a0.get_string(
                 filename, tmp_keys, root_count + 2, NULL);
@@ -332,7 +350,7 @@ namespace entity_resource_compiler {
 
         uint64_t tmp_keys[root_count + 2];
         memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
-        tmp_keys[root_count] = ct_yamlng_a0.calc_key("components");
+        tmp_keys[root_count] = ct_yng_a0.calc_key("components");
 
         struct foreach_componets_data data = {
                 .ent_id = ent_id,
@@ -357,7 +375,7 @@ namespace entity_resource_compiler {
         }
 
 
-        tmp_keys[root_count] = ct_yamlng_a0.calc_key("children");
+        tmp_keys[root_count] = ct_yng_a0.calc_key("children");
 
         uint64_t children_keys[32] = {};
         uint32_t children_keys_count = 0;
@@ -692,10 +710,10 @@ namespace entity_module {
         ct_resource_a0.register_type(_G.level_type, entity_resorce::callback);
 
         ct_resource_a0.compiler_register(_G.type,
-                                         entity_resource_compiler::resource_compiler);
+                                         entity_resource_compiler::resource_compiler, true);
 
         ct_resource_a0.compiler_register(_G.level_type,
-                                         entity_resource_compiler::resource_compiler);
+                                         entity_resource_compiler::resource_compiler, true);
 
         _G.entity_handler.init(ct_memory_a0.main_allocator());
         _G.spawned_map.init(ct_memory_a0.main_allocator());
@@ -723,7 +741,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_blob_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

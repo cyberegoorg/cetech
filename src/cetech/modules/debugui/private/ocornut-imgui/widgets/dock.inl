@@ -1052,9 +1052,9 @@ namespace ImGui {
             }
         }
 
-        void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yamlng_a0* yng) {
-            for (int i = 0; i < m_docks.size(); ++i)
-            {
+        void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yng_a0* yng) {
+            const uint32_t size = m_docks.size();
+            for (int i = 0; i < size; ++i) {
                 m_docks[i]->~Dock();
                 MemFree(m_docks[i]);
             }
@@ -1184,7 +1184,7 @@ namespace ImGui {
         s_dock->saveToYaml(buffer);
     }
 
-    IMGUI_API void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yamlng_a0* yng) {
+    IMGUI_API void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yng_a0* yng) {
         s_dock->loadFromYaml(path, ydb, yng);
     }
 

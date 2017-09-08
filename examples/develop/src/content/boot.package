@@ -3,7 +3,7 @@ lua:
   - "lua/game"
 
 texture:
-  - "texture2"
+  - "content/texture2"
   - "content/texture1"
   - "content/uv_checker"
   - "content/scene/duck/duckCM"
@@ -16,16 +16,16 @@ texture:
 #  - "core"
 
 entity:
-  - "camera"
-  - "box1"
-  - "box2"
-  - "m4a1"
-  - "entity1"
-  - "entity10"
-  - "entity11"
+  - "content/camera"
+  - "content/box1"
+  - "content/box2"
+  - "content/m4a1"
+  - "content/entity1"
+  - "content/entity10"
+  - "content/entity11"
 
 material:
-  - "material1"
+  - "content/material1"
   - "content/scene/duck/duck"
   - "content/scene/m4a1/m4a1"
   - "content/scene/solider/body"
@@ -34,13 +34,13 @@ material:
   - "content/scene/solider/solider"
 
 shader:
-  - "shader1"
+  - "content/shader1"
 
 level:
-  - "level1"
+  - "content/level1"
 
 scene:
-  - "cube"
+  - "content/cube"
   - "content/scene/duck/duck"
   - "content/scene/m4a1/m4a1"
   - "content/scene/solider/ArmyPilot"

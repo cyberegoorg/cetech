@@ -34,7 +34,7 @@ CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 
@@ -120,12 +120,12 @@ namespace shader_compiler {
         auto a = ct_memory_a0.main_allocator();
 
         uint64_t key[] = {
-                ct_yamlng_a0.calc_key("vs_input")
+                ct_yng_a0.calc_key("vs_input")
         };
 
         const char *vs_input = ct_ydb_a0.get_string( filename, key, 1, "");
 
-        key[0] = ct_yamlng_a0.calc_key("fs_input");
+        key[0] = ct_yng_a0.calc_key("fs_input");
         const char *fs_input = ct_ydb_a0.get_string( filename, key, 1, "");
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
@@ -224,10 +224,10 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"), compiler);
+        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"), compiler, true);
 
         return 1;
     }

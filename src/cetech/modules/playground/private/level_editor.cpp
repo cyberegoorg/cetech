@@ -46,7 +46,6 @@ static struct globals {
     bool visible[MAX_LEVEL_EDITOR];
     struct ct_viewport viewport[MAX_LEVEL_EDITOR];
     struct ct_world world[MAX_LEVEL_EDITOR];
-    //struct ct_camera camera[MAX_LEVEL_EDITOR];
     struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
     struct ct_entity level[MAX_LEVEL_EDITOR];
 
@@ -179,14 +178,12 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
 
     _G.visible[idx] = true;
 
-    _G.viewport[idx] = ct_viewport_a0.create(
-            ct_hash_a0.id64_from_str("default"), 0, 0);
+    _G.viewport[idx] = ct_viewport_a0.create(ct_hash_a0.id64_from_str("default"), 0, 0);
 
     _G.world[idx] = ct_world_a0.create();
 
     _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
-                                            ct_hash_a0.id64_from_str(
-                                                    "camera"));
+                                            ct_hash_a0.id64_from_str("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;

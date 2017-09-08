@@ -1,6 +1,6 @@
 layers:
   default:
-    shader: shader1
+    shader: content/shader1
 
     render_state:
       rgb_write: true

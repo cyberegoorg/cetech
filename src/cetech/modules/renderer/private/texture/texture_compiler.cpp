@@ -33,7 +33,7 @@ CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 namespace texture_compiler {
@@ -103,15 +103,15 @@ namespace texture_compiler {
         char tmp_filename[1024] = {};
 
         uint64_t key[] = {
-                ct_yamlng_a0.calc_key("input")
+                ct_yng_a0.calc_key("input")
         };
 
         const char *input_str = ct_ydb_a0.get_string( filename, key, 1, "");
 
-        key[0] = ct_yamlng_a0.calc_key("gen_mipmaps");
+        key[0] = ct_yng_a0.calc_key("gen_mipmaps");
         bool gen_mipmaps = ct_ydb_a0.get_bool(filename, key, 1, true);
 
-        key[0] = ct_yamlng_a0.calc_key("is_normalmap");
+        key[0] = ct_yng_a0.calc_key("is_normalmap");
         bool is_normalmap = ct_ydb_a0.get_bool(filename, key, 1, false);
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
@@ -167,12 +167,12 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_config_a0);
-        CETECH_GET_API(api, ct_yamlng_a0);
+        CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
         ct_resource_a0.compiler_register(
                 ct_hash_a0.id64_from_str("texture"),
-                compiler);
+                compiler, true);
 
         return 1;
     }

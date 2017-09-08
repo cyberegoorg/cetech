@@ -27,7 +27,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
 
@@ -137,7 +137,7 @@ void SaveDock(struct ct_vio* output) {
 }
 
 void LoadDock(const char* path) {
-    ImGui::loadFromYaml(path, &ct_ydb_a0, &ct_yamlng_a0);
+    ImGui::loadFromYaml(path, &ct_ydb_a0, &ct_yng_a0);
 }
 
 namespace debugui_module {
@@ -338,7 +338,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
         },
         {
             CEL_UNUSED(reload);

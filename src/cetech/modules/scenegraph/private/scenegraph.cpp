@@ -15,7 +15,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
 
-#define hash_combine(a, b) ((a)^(b))
+#define hash_combine(a, b) ((a * 11)^(b))
 
 using namespace celib;
 
@@ -52,7 +52,7 @@ namespace {
                   uint32_t sz) {
         //assert(sz > _data.n);
 
-        WorldInstance new_data;
+        WorldInstance new_data = {};
         const unsigned bytes = sz * (
                 sizeof(ct_entity)
                 + sizeof(uint64_t)

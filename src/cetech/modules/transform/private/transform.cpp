@@ -18,7 +18,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_component_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
@@ -194,18 +194,18 @@ int _component_compiler(const char *filename,
 
     uint64_t keys[component_key_count+1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-    keys[component_key_count] = ct_yamlng_a0.calc_key("scale");
+    keys[component_key_count] = ct_yng_a0.calc_key("scale");
 
     ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.scale, (float[3]){0});
 
-    keys[component_key_count] = ct_yamlng_a0.calc_key("position");
+    keys[component_key_count] = ct_yng_a0.calc_key("position");
     ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.position, (float[3]){0});
 
     {
         float v[3] = {};
         float v_rad[3] = {};
 
-        keys[component_key_count] = ct_yamlng_a0.calc_key("rotation");
+        keys[component_key_count] = ct_yng_a0.calc_key("rotation");
         ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v, (float[3]){0});
 
         celib::vec3_mul(v_rad, v, celib::DEG_TO_RAD);
@@ -233,7 +233,9 @@ static void _destroyer(ct_world world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (uint32_t i = 0; i < ent_count; i++) {
-        map::remove(_G.world_map, ents[i].h);
+        if(transform_has(world, ents[i])) {
+            map::remove(_G.ent_map, hash_combine(world.h, ents[i].h));
+        }
     }
 }
 
@@ -649,7 +651,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_yamlng_a0);
+            CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {

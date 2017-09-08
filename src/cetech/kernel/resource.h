@@ -196,7 +196,7 @@ struct ct_resource_a0 {
     //! \param type Type
     //! \param compilator Compilator fce
     void (*compiler_register)(uint64_t type,
-                              ct_resource_compilator_t compilator);
+                              ct_resource_compilator_t compilator, bool yaml_based);
 
     //! Compile all resource in source dir
     void (*compiler_compile_all)();

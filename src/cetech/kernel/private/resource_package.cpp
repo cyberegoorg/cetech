@@ -24,7 +24,7 @@ CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yamlng_a0);
+CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
 
@@ -135,13 +135,13 @@ int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_vio_a0);
     CETECH_GET_API(api, ct_hash_a0);
     CETECH_GET_API(api, ct_ydb_a0);
-    CETECH_GET_API(api, ct_yamlng_a0);
+    CETECH_GET_API(api, ct_yng_a0);
 
     _G = (struct G) {};
 
     _G.package_typel = ct_hash_a0.id64_from_str("package");
 
-    ct_resource_a0.compiler_register(_G.package_typel, _package_compiler);
+    ct_resource_a0.compiler_register(_G.package_typel, _package_compiler, true);
 
 
     return 1;
