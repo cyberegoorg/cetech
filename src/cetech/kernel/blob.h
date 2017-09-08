@@ -38,7 +38,7 @@ struct ct_blob {
 struct ct_blob_a0 {
     struct ct_blob *(*create)(struct cel_alloc *allocator);
 
-    void (*destroy)(struct ct_blob *blob);
+    void (*destroy)(struct ct_blob *blob, bool free);
 };
 
 #ifdef __cplusplus

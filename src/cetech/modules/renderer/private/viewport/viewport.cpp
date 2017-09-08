@@ -776,7 +776,7 @@ namespace renderconfig_compiler {
         output.local_resource.destroy();
         output.layers_localresource_count.destroy();
         output.layers_localresource_offset.destroy();
-        ct_blob_a0.destroy(output.blob);
+        ct_blob_a0.destroy(output.blob, true);
     }
 
     int init(struct ct_api_a0 *api) {

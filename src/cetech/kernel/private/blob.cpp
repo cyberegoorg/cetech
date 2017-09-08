@@ -44,9 +44,13 @@ namespace blob {
         return blob;
     }
 
-    void destroy(ct_blob *blob) {
+    void destroy(ct_blob *blob, bool free) {
         blob_array *inst = (blob_array *) blob->inst;
         cel_alloc *a = inst->_allocator;
+
+        if(!free) {
+            inst->_data = NULL;
+        }
 
         CEL_DELETE(a, blob_array, inst);
         CEL_DELETE(a, ct_blob, blob);

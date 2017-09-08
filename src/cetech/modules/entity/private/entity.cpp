@@ -519,7 +519,7 @@ namespace entity_resource_compiler {
             build->push(build->inst, blob->data(blob->inst),
                         sizeof(uint8_t) * blob->size(blob->inst));
 
-            ct_blob_a0.destroy(blob);
+            ct_blob_a0.destroy(blob, true);
         }
     }
 
@@ -597,15 +597,9 @@ namespace entity_resorce {
 // Public interface
 //==============================================================================
 namespace entity {
-
-    void entity_manager_destroy(ct_entity entity) {
-        handler::destroy(_G.entity_handler, entity.h);
-    }
-
     int alive(ct_entity entity) {
         return handler::alive(_G.entity_handler, entity.h);
     }
-
 
     ct_entity spawn_type(ct_world world,
                          uint64_t type,

@@ -19,6 +19,7 @@
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/package.h>
 #include <cetech/kernel/module.h>
+#include <cetech/kernel/blob.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -94,6 +95,9 @@ namespace {
 //==============================================================================
 // Private
 //==============================================================================
+
+
+
 
 char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform) {
@@ -523,7 +527,30 @@ namespace resource {
             ++type_it;
         }
     }
+
 }
+
+    void resource_memory_reload(uint64_t type, uint64_t name, ct_blob *blob) {
+        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, UINT32_MAX);
+
+        const uint64_t id = hash_combine(type, name);
+        const uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
+        if (item_idx == UINT32_MAX) {
+            return;
+        }
+
+        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+
+        void *old_data = resource::get(type, name);
+
+        void *new_data = type_clb.reloader(name, old_data,
+                                           blob->data(blob->inst),
+                                           ct_memory_a0.main_allocator());
+
+        resource_item_t item = _G.resource_data[item_idx];
+        item.data = new_data;
+        _G.resource_data[item_idx] = item;
+    }
 
 namespace resource_module {
     static ct_resource_a0 resource_api = {
@@ -542,7 +569,7 @@ namespace resource_module {
 
             .compiler_get_build_dir = ::resource_compiler_get_build_dir,
 
-
+            .compile_and_reload = compile_and_reload,
             .compiler_get_core_dir = resource_compiler_get_core_dir,
             .compiler_register = resource_compiler_register,
             .compiler_compile_all = resource_compiler_compile_all,
@@ -610,6 +637,8 @@ namespace resource_module {
     }
 
 }
+
+
 
 CETECH_MODULE_DEF(
         resourcesystem,

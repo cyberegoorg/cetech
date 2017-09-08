@@ -390,6 +390,31 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 }
 
 
+void resource_memory_reload(uint64_t type, uint64_t name, ct_blob *blob);
+
+void compile_and_reload(const char* filename) {
+    struct ct_blob* output_blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
+
+    uint64_t type_id;
+    uint64_t name_id;
+
+    type_name_from_filename(filename, &type_id, &name_id, NULL);
+
+    compilator compilator = _find_compilator(type_id);
+    if (compilator.compilator == NULL) {
+        goto error;
+    }
+
+    compilator.compilator(filename, output_blob, &_compilator_api);
+
+    resource_memory_reload(type_id, name_id, output_blob);
+    ct_blob_a0.destroy(output_blob, false);
+    return;
+
+    error:
+    ct_blob_a0.destroy(output_blob, true);
+}
+
 void resource_compiler_check_fs() {
     static uint64_t root = ct_hash_a0.id64_from_str("source");
 

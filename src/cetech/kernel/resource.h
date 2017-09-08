@@ -200,6 +200,8 @@ struct ct_resource_a0 {
     //! Compile all resource in source dir
     void (*compiler_compile_all)();
 
+    void (*compile_and_reload)(const char* filename);
+
     //! Type, Name => filename
     //! \param filename Result filename
     //! \param max_ken Max filename size
