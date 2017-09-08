@@ -17,13 +17,14 @@ children:
     PARENT: content/m4a1.entity
     components:
       2342343313252:
-        position: [11.000001, 44.000004, 100.000008]
+        position: [11.000001, 44.000004, 25.000002]
+        rotation: [13.000000, 94.000000, 4.000000]
   55643433135454252:
     name: box2
     PARENT: content/box2.entity
     components:
       234234331453252:
-        position: [-1.000000, 0.000000, 20.000000]
+        position: [-1.000000, 7.000000, 20.000000]
         rotation: [45.000000, 0.000000, 0.000000]
       41232132255234:
         material: content/material2

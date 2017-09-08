@@ -154,9 +154,8 @@ struct ct_entity_a0 {
     int (*alive)(struct ct_entity entity);
 
 
-    int (*compiler)( const char *filename,
-                     struct ct_vio *source_vio,
-                     struct ct_vio *build_vio,
+    void (*compiler)( const char *filename,
+                     struct ct_blob *output,
                      struct ct_compilator_api *compilator_api);
 
     //! Spawn entity

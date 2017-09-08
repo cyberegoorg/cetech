@@ -32,10 +32,9 @@ struct ct_compilator_api;
 //! \param source_vio Source vio
 //! \param build_vio Build vio
 //! \param compilator_api Compilator api
-typedef int (*ct_resource_compilator_t)(
+typedef void (*ct_resource_compilator_t)(
         const char *filename,
-        struct ct_vio *source_vio,
-        struct ct_vio *build_vio,
+        struct ct_blob *output,
         struct ct_compilator_api *compilator_api);
 
 

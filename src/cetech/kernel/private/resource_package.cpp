@@ -11,6 +11,7 @@
 #include <cetech/kernel/vio.h>
 #include <cetech/kernel/hashlib.h>
 #include <cetech/kernel/ydb.h>
+#include <cetech/kernel/blob.h>
 
 #include "celib/allocator.h"
 #include "celib/array.inl"
@@ -52,11 +53,10 @@ struct package_compile_data {
     Array<uint32_t> offset;
 };
 
-int _package_compiler(const char *filename,
-                      ct_vio *source_vio,
-                      ct_vio *build_vio,
+void _package_compiler(const char *filename,
+                      struct ct_blob *output,
                       ct_compilator_api *compilator_api) {
-    CEL_UNUSED(source_vio, compilator_api);
+    CEL_UNUSED(compilator_api);
 
     struct package_compile_data compile_data = {};
 
@@ -70,8 +70,8 @@ int _package_compiler(const char *filename,
     uint64_t type_keys[32] = {};
     uint32_t type_keys_count = 0;
     ct_ydb_a0.get_map_keys(filename,
-                           &tmp_keys,1,
-                           type_keys,CETECH_ARRAY_LEN(type_keys),
+                           &tmp_keys, 1,
+                           type_keys, CETECH_ARRAY_LEN(type_keys),
                            &type_keys_count);
 
     for (uint32_t i = 0; i < type_keys_count; ++i) {
@@ -83,8 +83,8 @@ int _package_compiler(const char *filename,
         uint64_t name_keys[32] = {};
         uint32_t name_keys_count = 0;
         ct_ydb_a0.get_map_keys(filename,
-                               &type_keys[i],1,
-                               name_keys,CETECH_ARRAY_LEN(name_keys),
+                               &type_keys[i], 1,
+                               name_keys, CETECH_ARRAY_LEN(name_keys),
                                &name_keys_count);
 
         array::push_back(compile_data.name_count, name_keys_count);
@@ -110,21 +110,16 @@ int _package_compiler(const char *filename,
                              (array::size(compile_data.name) *
                               sizeof(uint64_t));
 
-    build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
 
-    build_vio->write(build_vio->inst, array::begin(compile_data.types),
-                     sizeof(uint64_t), array::size(compile_data.types));
-
-    build_vio->write(build_vio->inst, array::begin(compile_data.name_count),
-                     sizeof(uint32_t), array::size(compile_data.name_count));
-
-    build_vio->write(build_vio->inst, array::begin(compile_data.name),
-                     sizeof(uint64_t), array::size(compile_data.name));
-
-    build_vio->write(build_vio->inst, array::begin(compile_data.offset),
-                     sizeof(uint32_t), array::size(compile_data.offset));
-
-    return 1;
+    output->push(output->inst, &resource, sizeof(resource));
+    output->push(output->inst, array::begin(compile_data.types),
+                 sizeof(uint64_t) * array::size(compile_data.types));
+    output->push(output->inst, array::begin(compile_data.name_count),
+                 sizeof(uint32_t) * array::size(compile_data.name_count));
+    output->push(output->inst, array::begin(compile_data.name),
+                 sizeof(uint64_t) * array::size(compile_data.name));
+    output->push(output->inst, array::begin(compile_data.offset),
+                 sizeof(uint32_t) * array::size(compile_data.offset));
 }
 
 int package_init(ct_api_a0 *api) {

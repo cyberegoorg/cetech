@@ -3,21 +3,23 @@
 //==============================================================================
 
 #include <celib/fpumath.h>
-#include <bgfx/defines.h>
-#include <cetech/kernel/ydb.h>
 #include "celib/array.inl"
 #include "celib/handler.inl"
-#include "cetech/kernel/macros.h"
 
+#include <cetech/kernel/ydb.h>
+#include "cetech/kernel/macros.h"
 #include "cetech/kernel/vio.h"
 #include "cetech/kernel/path.h"
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/hashlib.h"
+#include "cetech/kernel/blob.h"
+#include "cetech/kernel/resource.h"
 
 #include "cetech/modules/entity/entity.h"
 #include "cetech/modules/machine/machine.h"
-#include "cetech/kernel/resource.h"
+
+#include <bgfx/defines.h>
 
 #include "material.h"
 
@@ -199,12 +201,9 @@ namespace material_compiler {
 
     };
 
-    int compiler(const char *filename,
-                 ct_vio *source_vio,
-                 ct_vio *build_vio,
+    void compiler(const char *filename,
+                 struct ct_blob *output_blob,
                  ct_compilator_api *compilator_api) {
-
-        CEL_UNUSED(source_vio);
         CEL_UNUSED(compilator_api);
 
         struct material_compile_output output = {};
@@ -219,7 +218,7 @@ namespace material_compiler {
         uint64_t key = ct_yng_a0.calc_key("layers");
 
         if (!ct_ydb_a0.has_key(filename, &key, 1)) {
-            return 0;
+            return;
         }
 
         uint64_t layers_keys[32] = {};
@@ -240,29 +239,28 @@ namespace material_compiler {
         };
 
 
-        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+        output_blob->push(output_blob->inst, &resource, sizeof(resource));
 
-        build_vio->write(build_vio->inst, array::begin(output.layer_names),
-                         sizeof(uint64_t), array::size(output.layer_names));
+        output_blob->push(output_blob->inst, array::begin(output.layer_names),
+                         sizeof(uint64_t) * array::size(output.layer_names));
 
-        build_vio->write(build_vio->inst, array::begin(output.shader_name),
-                         sizeof(uint64_t), array::size(output.shader_name));
+        output_blob->push(output_blob->inst, array::begin(output.shader_name),
+                         sizeof(uint64_t)* array::size(output.shader_name));
 
-        build_vio->write(build_vio->inst, array::begin(output.uniform_count),
-                         sizeof(uint32_t), array::size(output.uniform_count));
+        output_blob->push(output_blob->inst, array::begin(output.uniform_count),
+                         sizeof(uint32_t)* array::size(output.uniform_count));
 
-        build_vio->write(build_vio->inst, array::begin(output.render_state),
-                         sizeof(uint64_t), array::size(output.render_state));
+        output_blob->push(output_blob->inst, array::begin(output.render_state),
+                         sizeof(uint64_t)* array::size(output.render_state));
 
-        build_vio->write(build_vio->inst, array::begin(output.var),
-                         sizeof(material_variable), array::size(output.var));
+        output_blob->push(output_blob->inst, array::begin(output.var),
+                         sizeof(material_variable) * array::size(output.var));
 
-        build_vio->write(build_vio->inst, array::begin(output.uniform_names),
-                         sizeof(char),
-                         array::size(output.uniform_names));
+        output_blob->push(output_blob->inst, array::begin(output.uniform_names),
+                         sizeof(char)* array::size(output.uniform_names));
 
-        build_vio->write(build_vio->inst, array::begin(output.layer_offset),
-                         sizeof(uint32_t), array::size(output.layer_offset));
+        output_blob->push(output_blob->inst, array::begin(output.layer_offset),
+                         sizeof(uint32_t) * array::size(output.layer_offset));
 
         output.uniform_names.destroy();
         output.layer_names.destroy();
@@ -271,8 +269,6 @@ namespace material_compiler {
         output.layer_offset.destroy();
         output.shader_name.destroy();
         output.render_state.destroy();
-
-        return 1;
     }
 
     int init(ct_api_a0 *api) {

@@ -22,6 +22,7 @@
 #include <celib/map.inl>
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/ydb.h>
+#include <cetech/kernel/blob.h>
 
 #include "celib/buffer.inl"
 
@@ -42,6 +43,7 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_blob_a0);
 
 //==============================================================================
 // Defines
@@ -62,10 +64,9 @@ struct compilator {
 
 struct compile_task_data {
     char *source_filename;
+    char *build_filename;
     uint64_t type;
     uint64_t name;
-    ct_vio *source;
-    ct_vio *build;
     time_t mtime;
     struct compilator compilator;
     atomic_int completed;
@@ -133,7 +134,8 @@ static void _compile_task(void *data) {
                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
                    tdata->source_filename, tdata->type, tdata->name);
 
-    bool res = false;
+    struct ct_blob* output_blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
+
     if (tdata->compilator.compilator) {
         if(tdata->compilator.yaml_based) {
             const char **files;
@@ -148,29 +150,42 @@ static void _compile_task(void *data) {
             }
         }
 
-        res = tdata->compilator.compilator(tdata->source_filename,
-                                           tdata->source, tdata->build,
-                                           &_compilator_api) > 0;
+        tdata->compilator.compilator(tdata->source_filename,
+                                     output_blob,
+                                     &_compilator_api);
 
     }
 
-    if (res) {
-        builddb_set_file(tdata->source_filename, tdata->mtime);
-        builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
-
-        ct_log_a0.info("resource_compiler.task",
-                       "Resource \"%s\" compiled", tdata->source_filename);
-    } else {
+    if (!output_blob->size(output_blob->inst)) {
         ct_log_a0.error("resource_compiler.task",
                         "Resource \"%s\" compilation fail",
                         tdata->source_filename);
+    } else {
+        builddb_set_file(tdata->source_filename, tdata->mtime);
+        builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
+
+        ct_vio *build_vio = ct_filesystem_a0.open(
+                ct_hash_a0.id64_from_str("build"),
+                tdata->build_filename, FS_OPEN_WRITE);
+
+        CEL_FREE(ct_memory_a0.main_allocator(), tdata->build_filename);
+
+        if (build_vio == NULL) {
+            goto end;
+        }
+
+        build_vio->write(build_vio->inst, output_blob->data(output_blob->inst), sizeof(char), output_blob->size(output_blob->inst));
+
+        ct_filesystem_a0.close(build_vio);
+
+        ct_log_a0.info("resource_compiler.task",
+                       "Resource \"%s\" compiled", tdata->source_filename);
     }
+
+end:
 
     CEL_FREE(ct_memory_a0.main_scratch_allocator(),
              tdata->source_filename);
-
-    tdata->source->close(tdata->source->inst);
-    tdata->build->close(tdata->build->inst);
 
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
@@ -187,10 +202,10 @@ compilator _find_compilator(uint64_t type) {
     return {.compilator = NULL};
 }
 
-void _compile_dir(Array<ct_task_item> &tasks,
-                  char **files,
-                  uint32_t files_count,
-                  celib::Map<uint64_t> &compiled) {
+void _compile_files(Array<ct_task_item> &tasks,
+                    char **files,
+                    uint32_t files_count,
+                    celib::Map<uint64_t> &compiled) {
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *source_filename_short;
 
@@ -215,14 +230,14 @@ void _compile_dir(Array<ct_task_item> &tasks,
 
         builddb_set_file_hash(source_filename_short, build_name);
 
-        ct_vio *source_vio = ct_filesystem_a0.open(
-                ct_hash_a0.id64_from_str("source"),
-                source_filename_short,
-                FS_OPEN_READ);
-
-        if (source_vio == NULL) {
-            continue;
-        }
+//        ct_vio *source_vio = ct_filesystem_a0.open(
+//                ct_hash_a0.id64_from_str("source"),
+//                source_filename_short,
+//                FS_OPEN_READ);
+//
+//        if (source_vio == NULL) {
+//            continue;
+//        }
 
         auto platform = ct_config_a0.find("kernel.platform");
         char *build_full = ct_path_a0.join(
@@ -230,16 +245,7 @@ void _compile_dir(Array<ct_task_item> &tasks,
                 ct_config_a0.get_string(platform),
                 build_name);
 
-        ct_vio *build_vio = ct_filesystem_a0.open(
-                ct_hash_a0.id64_from_str("build"),
-                build_full,
-                FS_OPEN_WRITE);
-
-        CEL_FREE(ct_memory_a0.main_allocator(), build_full);
-
-        if (build_vio == NULL) {
-            continue;
-        }
+//        CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
         struct compile_task_data *data =
                 CEL_ALLOCATE(
@@ -250,9 +256,8 @@ void _compile_dir(Array<ct_task_item> &tasks,
         *data = (struct compile_task_data) {
                 .name = name_id,
                 .type = type_id,
-                .build = build_vio,
-                .source = source_vio,
                 .compilator = compilator,
+                .build_filename = build_full,
                 .source_filename = ct_memory_a0.str_dup(source_filename_short,
                                                         ct_memory_a0.main_scratch_allocator()),
                 .mtime = ct_filesystem_a0.file_mtime(
@@ -317,7 +322,7 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
                              "", glob_patern, false, true, &files, &files_count,
                              ct_memory_a0.main_scratch_allocator());
 
-    _compile_dir(tasks, files, files_count, compiled);
+    _compile_files(tasks, files, files_count, compiled);
 
     ct_filesystem_a0.listdir_free(files, files_count,
                                   ct_memory_a0.main_scratch_allocator());
@@ -507,6 +512,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_blob_a0);
         },
         {
             CEL_UNUSED(reload);

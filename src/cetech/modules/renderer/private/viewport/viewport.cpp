@@ -530,9 +530,8 @@ void compile_layers(struct ct_yamlng_node key,
 }
 
 namespace renderconfig_compiler {
-    int compiler(const char *filename,
-                 struct ct_vio *source_vio,
-                 struct ct_vio *build_vio,
+    void compiler(const char *filename,
+                 struct ct_blob *output_blob,
                  struct ct_compilator_api *compilator_api) {
 
         CEL_UNUSED(filename);
@@ -713,59 +712,59 @@ namespace renderconfig_compiler {
         };
 
 
-        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
+        output_blob->push(output_blob->inst,&resource, sizeof(resource));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.global_resource),
-                         sizeof(render_resource_t),
+                         sizeof(render_resource_t)*
                          array::size(output.global_resource));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.local_resource),
-                         sizeof(render_resource_t),
+                         sizeof(render_resource_t)*
                          array::size(output.local_resource));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.layer_names),
-                         sizeof(uint64_t),
+                         sizeof(uint64_t)*
                          array::size(output.layer_names));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.layers_entry_count),
-                         sizeof(uint32_t),
+                         sizeof(uint32_t)*
                          array::size(output.layers_entry_count));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.layers_entry_offset),
-                         sizeof(uint32_t),
+                         sizeof(uint32_t)*
                          array::size(output.layers_entry_offset));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.layers_localresource_count),
-                         sizeof(uint32_t),
+                         sizeof(uint32_t)*
                          array::size(output.layers_localresource_count));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.layers_localresource_offset),
-                         sizeof(uint32_t),
+                         sizeof(uint32_t)*
                          array::size(output.layers_localresource_offset));
 
-        build_vio->write(build_vio->inst,
+        output_blob->push(output_blob->inst,
                          array::begin(output.entry_data_offset),
-                         sizeof(uint32_t),
+                         sizeof(uint32_t)*
                          array::size(output.entry_data_offset));
 
-        build_vio->write(build_vio->inst, array::begin(output.layers_entry),
-                         sizeof(layer_entry_t),
+        output_blob->push(output_blob->inst,array::begin(output.layers_entry),
+                         sizeof(layer_entry_t)*
                          array::size(output.layers_entry));
 
-        build_vio->write(build_vio->inst, array::begin(output.viewport),
-                         sizeof(viewport_entry_t),
+        output_blob->push(output_blob->inst,array::begin(output.viewport),
+                         sizeof(viewport_entry_t)*
                          array::size(output.viewport));
 
         auto *blob = output.blob;
-        build_vio->write(build_vio->inst, blob->data(blob->inst),
-                         sizeof(uint8_t), blob->size(blob->inst));
+        output_blob->push(output_blob->inst,blob->data(blob->inst),
+                         sizeof(uint8_t) * blob->size(blob->inst));
 
         output.global_resource.destroy();
         output.layer_names.destroy();
@@ -778,8 +777,6 @@ namespace renderconfig_compiler {
         output.layers_localresource_count.destroy();
         output.layers_localresource_offset.destroy();
         ct_blob_a0.destroy(output.blob);
-
-        return 1;
     }
 
     int init(struct ct_api_a0 *api) {

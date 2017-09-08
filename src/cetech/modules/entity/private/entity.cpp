@@ -533,22 +533,10 @@ namespace entity_resource_compiler {
         destroy_output(output);
     }
 
-    int resource_compiler(const char *filename,
-                          ct_vio *source_vio,
-                          ct_vio *build_vio,
+    void resource_compiler(const char *filename,
+                          struct ct_blob *output,
                           ct_compilator_api *compilator_api) {
-        CEL_UNUSED(source_vio);
-
-        ct_blob *entity_data = ct_blob_a0.create(ct_memory_a0.main_allocator());
-        _entity_resource_compiler(0, filename, entity_data, compilator_api);
-
-        build_vio->write(build_vio->inst, entity_data->data(entity_data->inst),
-                         sizeof(uint8_t),
-                         entity_data->size(entity_data->inst));
-
-
-        ct_blob_a0.destroy(entity_data);
-        return 1;
+        _entity_resource_compiler(0, filename, output, compilator_api);
     }
 }
 

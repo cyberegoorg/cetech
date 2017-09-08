@@ -17,6 +17,7 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/ydb.h>
 #include "cetech/kernel/memory.h"
+#include "cetech/kernel/blob.h"
 
 #include "cetech/modules/machine/machine.h"
 #include "cetech/kernel/resource.h"
@@ -113,9 +114,8 @@ namespace shader_compiler {
     const char* fs_profile = "ps_4_0";
 #endif
 
-    static int compiler(const char *filename,
-                        struct ct_vio *source_vio,
-                        struct ct_vio *build_vio,
+    static void compiler(const char *filename,
+                        struct ct_blob *output,
                         struct ct_compilator_api *compilator_api) {
         auto a = ct_memory_a0.main_allocator();
 
@@ -159,7 +159,7 @@ namespace shader_compiler {
 
         if (result != 0) {
             CEL_FREE(a, include_dir);
-            return 0;
+            return;
         }
 
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
@@ -188,7 +188,7 @@ namespace shader_compiler {
 
         if (result != 0) {
             CEL_FREE(a, include_dir);
-            return 0;
+            return;
         }
 
         tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
@@ -202,17 +202,13 @@ namespace shader_compiler {
 
         tmp_file->close(tmp_file->inst);
 
-        build_vio->write(build_vio->inst, &resource, sizeof(resource), 1);
-        build_vio->write(build_vio->inst, vs_data, sizeof(char),
-                         resource.vs_size);
-        build_vio->write(build_vio->inst, fs_data, sizeof(char),
-                         resource.fs_size);
+        output->push(output->inst, &resource, sizeof(resource));
+        output->push(output->inst, vs_data, sizeof(char) * resource.vs_size);
+        output->push(output->inst, fs_data, sizeof(char) * resource.fs_size);
 
         CEL_FREE(a, vs_data);
         CEL_FREE(a, fs_data);
         CEL_FREE(a, include_dir);
-
-        return 1;
     }
 
     int init(ct_api_a0 *api) {

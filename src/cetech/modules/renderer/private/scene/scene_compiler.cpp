@@ -14,6 +14,7 @@
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
+#include "cetech/kernel/blob.h"
 #include "cetech/modules/machine/machine.h"
 
 
@@ -587,9 +588,8 @@ namespace scene_resource_compiler {
         return 1;
     }
 
-    int compiler(const char *filename,
-                 struct ct_vio *source_vio,
-                 struct ct_vio *build_vio,
+    void compiler(const char *filename,
+                 struct ct_blob *output_blob,
                  struct ct_compilator_api *compilator_api) {
 
         struct compile_output *output = _crete_compile_output();
@@ -607,7 +607,7 @@ namespace scene_resource_compiler {
 
         if (!ret) {
             _destroy_compile_output(output);
-            return 0;
+            return;
         }
 
         scene_blob::blob_t res = {
@@ -617,46 +617,45 @@ namespace scene_resource_compiler {
                 .vb_len = (uint32_t) array::size(output->vb),
         };
 
-        build_vio->write(build_vio->inst, &res, sizeof(res), 1);
-        build_vio->write(build_vio->inst, array::begin(output->geom_name),
-                         sizeof(uint64_t),
+        output_blob->push(output_blob->inst, &res, sizeof(res));
+        output_blob->push(output_blob->inst, array::begin(output->geom_name),
+                         sizeof(uint64_t) *
                          array::size(output->geom_name));
-        build_vio->write(build_vio->inst, array::begin(output->ib_offset),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->ib_offset),
+                         sizeof(uint32_t) *
                          array::size(output->ib_offset));
-        build_vio->write(build_vio->inst, array::begin(output->vb_offset),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->vb_offset),
+                         sizeof(uint32_t) *
                          array::size(output->vb_offset));
-        build_vio->write(build_vio->inst, array::begin(output->vb_decl),
-                         sizeof(bgfx::VertexDecl),
+        output_blob->push(output_blob->inst, array::begin(output->vb_decl),
+                         sizeof(bgfx::VertexDecl) *
                          array::size(output->vb_decl));
-        build_vio->write(build_vio->inst, array::begin(output->ib_size),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->ib_size),
+                         sizeof(uint32_t)*
                          array::size(output->ib_size));
-        build_vio->write(build_vio->inst, array::begin(output->vb_size),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->vb_size),
+                         sizeof(uint32_t)*
                          array::size(output->vb_size));
-        build_vio->write(build_vio->inst, array::begin(output->ib),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->ib),
+                         sizeof(uint32_t)*
                          array::size(output->ib));
-        build_vio->write(build_vio->inst, array::begin(output->vb),
-                         sizeof(uint8_t),
+        output_blob->push(output_blob->inst, array::begin(output->vb),
+                         sizeof(uint8_t)*
                          array::size(output->vb));
-        build_vio->write(build_vio->inst, array::begin(output->node_name),
-                         sizeof(uint64_t),
+        output_blob->push(output_blob->inst, array::begin(output->node_name),
+                         sizeof(uint64_t)*
                          array::size(output->node_name));
-        build_vio->write(build_vio->inst, array::begin(output->node_parent),
-                         sizeof(uint32_t),
+        output_blob->push(output_blob->inst, array::begin(output->node_parent),
+                         sizeof(uint32_t)*
                          array::size(output->node_parent));
-        build_vio->write(build_vio->inst, array::begin(output->node_pose),
-                         sizeof(float),
+        output_blob->push(output_blob->inst, array::begin(output->node_pose),
+                         sizeof(float)*
                          array::size(output->node_pose));
-        build_vio->write(build_vio->inst, array::begin(output->geom_node),
-                         sizeof(uint64_t),
+        output_blob->push(output_blob->inst, array::begin(output->geom_node),
+                         sizeof(uint64_t)*
                          array::size(output->geom_name));
 
         _destroy_compile_output(output);
-        return 1;
     }
 
     int init(ct_api_a0 *api) {
