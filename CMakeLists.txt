@@ -112,11 +112,7 @@ set(SOURCE_FILES
         src/cetech/modules/machine/private/mouse_sdl2.cpp
         src/cetech/modules/machine/private/keyboard_sdl2.cpp
         src/cetech/modules/machine/private/gamepad_sdl2.cpp
-        src/cetech/modules/luasys/private/luasys_private.cpp
-        src/cetech/modules/luasys/private/api/api_log.cpp
-        src/cetech/modules/luasys/private/api/api_vec3f.cpp
-        src/cetech/modules/luasys/private/api/api_quatf.cpp
-        src/cetech/modules/luasys/private/api/api_mat44f.cpp
+
         src/cetech/modules/entity/private/component.cpp
         src/cetech/modules/entity/private/entity.cpp
         src/cetech/modules/entity/private/world.cpp

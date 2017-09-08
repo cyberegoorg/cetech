@@ -1,7 +1,3 @@
-lua:
-  - "lua/boot"
-  - "lua/game"
-
 texture:
   - "content/texture2"
   - "content/texture1"

@@ -1,5 +1,5 @@
 site_name: CETech
-site_author: Ondra Voves
+site_author: CyberEg{o.o}org
 
 repo_url: https://gitlab.com/cyberegoorg/cetech
 theme: readthedocs
@@ -31,5 +31,3 @@ pages:
 
   - Examples:
     - 00-minimal: 'examples/00-minimal.md'
-
-  - Lua API: 'lua_api.md'

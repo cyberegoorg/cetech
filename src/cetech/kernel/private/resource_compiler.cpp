@@ -469,8 +469,6 @@ static void _init(ct_api_a0 *api) {
     CEL_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
     CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 
-//    auto *wd = ct_watchdog_a0.create(ct_memory_a0.main_allocator());
-
     const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
@@ -489,8 +487,6 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    //ct_watchdog_a0.destroy(_G.wd);
-
     _G = {};
 }
 
