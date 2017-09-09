@@ -129,6 +129,7 @@ set(SOURCE_FILES
         src/cetech/modules/renderer/private/shader/shader.cpp
         src/cetech/modules/renderer/private/shader/shader_compiler.cpp
         src/cetech/modules/renderer/private/material/material.cpp
+        src/cetech/modules/renderer/private/material/material_preview.cpp
         src/cetech/modules/renderer/private/material/material_compiler.cpp
         src/cetech/modules/renderer/private/scene/scene.cpp
         src/cetech/modules/renderer/private/scene/scene_compiler.cpp
