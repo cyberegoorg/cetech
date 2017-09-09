@@ -17,7 +17,7 @@ children:
     PARENT: content/m4a1.entity
     components:
       2342343313252:
-        position: [5.000000, 99.000008, 25.000002]
+        position: [32.000000, 121.000008, 25.000002]
         rotation: [13.000000, 94.000000, 4.000000]
   55643433135454252:
     name: box2

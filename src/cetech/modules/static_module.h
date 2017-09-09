@@ -57,4 +57,6 @@ extern "C" void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(entity_property);
     CETECH_ADD_STATIC_MODULE(transform_property);
     CETECH_ADD_STATIC_MODULE(level_view);
+    CETECH_ADD_STATIC_MODULE(entity_preview);
+    CETECH_ADD_STATIC_MODULE(level_preview);
 }

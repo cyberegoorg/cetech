@@ -7,7 +7,7 @@ components:
 
   "6277d33652cd49b5b5828b686e7de2c6":
     component_type: "mesh_renderer"
-    scene: "cube"
+    scene: "content/cube"
     mesh: "g_cube"
     node: "n_cube"
     material: "content/material1"

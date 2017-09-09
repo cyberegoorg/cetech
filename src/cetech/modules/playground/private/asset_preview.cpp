@@ -10,6 +10,7 @@
 #include <cetech/modules/input/input.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/playground/asset_preview.h>
+#include <cetech/modules/playground/asset_browser.h>
 #include "celib/map.inl"
 
 #include "cetech/kernel/hashlib.h"
@@ -30,10 +31,17 @@ CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
+CETECH_DECL_API(ct_asset_browser_a0);
 
 using namespace celib;
 
 static struct globals {
+    Map<ct_asset_preview_fce> preview_fce;
+
+    uint64_t active_type;
+    uint64_t active_name;
+    const char *active_path;
+
     ct_viewport viewport;
     ct_world world;
     ct_entity camera_ent;
@@ -43,14 +51,14 @@ static struct globals {
 
 
 static void fps_camera_update(ct_world world,
-                       ct_entity camera_ent,
-                       float dt,
-                       float dx,
-                       float dy,
-                       float updown,
-                       float leftright,
-                       float speed,
-                       bool fly_mode) {
+                              ct_entity camera_ent,
+                              float dt,
+                              float dx,
+                              float dy,
+                              float updown,
+                              float leftright,
+                              float speed,
+                              bool fly_mode) {
 
     CEL_UNUSED(dx);
     CEL_UNUSED(dy);
@@ -113,24 +121,52 @@ static void on_debugui() {
 }
 
 static void render() {
-    if(_G.visible) {
+    if (_G.visible) {
         ct_camera camera = ct_camera_a0.get(_G.world, _G.camera_ent);
         ct_viewport_a0.render_world(_G.world, camera, _G.viewport);
+    }
+}
+
+static void set_asset(uint64_t type,
+                      uint64_t name,
+                      uint64_t root,
+                      const char *path) {
+    CEL_UNUSED(root);
+
+    if (_G.active_name == name) {
+        return;
+    }
+
+    ct_asset_preview_fce fce = map::get(_G.preview_fce, _G.active_type,
+                                        (ct_asset_preview_fce) {NULL});
+    if (fce.unload) {
+        fce.unload(_G.active_path, _G.active_type, _G.active_name, _G.world);
+    }
+
+    _G.active_type = type;
+    _G.active_name = name;
+    _G.active_path = path;
+
+    fce = map::get(_G.preview_fce, type, (ct_asset_preview_fce) {NULL});
+    if (fce.load) {
+        fce.load(path, type, name, _G.world);
     }
 }
 
 static void init() {
     _G.visible = true;
 
-    _G.viewport = ct_viewport_a0.create(ct_hash_a0.id64_from_str("default"), 0, 0);
+    _G.viewport = ct_viewport_a0.create(ct_hash_a0.id64_from_str("default"), 0,
+                                        0);
 
     _G.world = ct_world_a0.create();
 
     _G.camera_ent = ct_entity_a0.spawn(_G.world,
-                                       ct_hash_a0.id64_from_str("content/camera"));
+                                       ct_hash_a0.id64_from_str(
+                                               "content/camera"));
 
-    ct_level_a0.load_level(_G.world,ct_hash_a0.id64_from_str("content/level1"));
-    //ct_entity_a0.spawn(_G.world, ct_hash_a0.id64_from_str("entity10"));
+    ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
+    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -50.0f});
 }
 
 static void shutdown() {
@@ -170,27 +206,45 @@ static void update(float dt) {
                       0, 0, updown, leftright, 10.0f, false);
 }
 
+
+void register_type_preview(uint64_t type,
+                           ct_asset_preview_fce fce) {
+    map::set(_G.preview_fce, type, fce);
+}
+
+void unregister_type_preview(uint64_t type) {
+    map::remove(_G.preview_fce, type);
+}
+
 static ct_asset_preview_a0 asset_preview_api = {
+        .register_type_preview = register_type_preview,
+        .unregister_type_preview = unregister_type_preview
 };
 
 static void _init(ct_api_a0 *api) {
     _G = {};
+
+    _G.preview_fce.init(ct_memory_a0.main_allocator());
 
     ct_app_a0.register_on_init(init);
     ct_app_a0.register_on_shutdown(shutdown);
     ct_app_a0.register_on_render(render);
     ct_app_a0.register_on_update(update);
     ct_debugui_a0.register_on_debugui(on_debugui);
+    ct_asset_browser_a0.register_on_asset_click(set_asset);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
 
 static void _shutdown() {
+    _G.preview_fce.destroy();
+
     ct_app_a0.unregister_on_init(init);
     ct_app_a0.unregister_on_shutdown(shutdown);
     ct_app_a0.unregister_on_render(render);
     ct_app_a0.unregister_on_update(update);
     ct_debugui_a0.unregister_on_debugui(on_debugui);
+    ct_asset_browser_a0.unregister_on_asset_click(set_asset);
 
     _G = {};
 }
@@ -210,6 +264,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_viewport_a0);
+            CETECH_GET_API(api, ct_asset_browser_a0);
         },
         {
             CEL_UNUSED(reload);

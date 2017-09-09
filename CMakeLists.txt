@@ -114,6 +114,8 @@ set(SOURCE_FILES
         src/cetech/modules/machine/private/gamepad_sdl2.cpp
 
         src/cetech/modules/entity/private/component.cpp
+        src/cetech/modules/entity/private/entity_preview.cpp
+        src/cetech/modules/entity/private/level_preview.cpp
         src/cetech/modules/entity/private/entity.cpp
         src/cetech/modules/entity/private/world.cpp
         src/cetech/modules/level/private/level.cpp
