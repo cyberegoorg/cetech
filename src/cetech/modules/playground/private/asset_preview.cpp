@@ -166,7 +166,7 @@ static void init() {
                                                "content/camera"));
 
     ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
-    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -50.0f});
+    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
 static void shutdown() {

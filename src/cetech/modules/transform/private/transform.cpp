@@ -414,18 +414,26 @@ void transform_transform(ct_transform transform,
     float *rot = &world_inst->rotation[4 * transform.idx];
     float *sca = &world_inst->scale[3 * transform.idx];
 
-    float rm[16];
-    float sm[16];
+//    float rm[16];
+//    float sm[16];
     float m[16];
+    float euler[3];
 
-    celib::mat4_quat(rm, rot);
-    celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
+    quat_to_euler(euler, rot);
 
-    celib::mat4_mul(m, sm, rm);
+//    celib::mat4_quat(rm, rot);
+//    celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
+//
+//    celib::mat4_mul(m, sm, rm);
+//
+//    m[4 * 3 + 0] = pos[0];
+//    m[4 * 3 + 1] = pos[1];
+//    m[4 * 3 + 2] = pos[2];
 
-    m[4 * 3 + 0] = pos[0];
-    m[4 * 3 + 1] = pos[1];
-    m[4 * 3 + 2] = pos[2];
+    mtxSRT(m,
+           sca[0], sca[1], sca[2],
+           euler[0], euler[1], euler[2],
+           pos[0], pos[1], pos[2]);
 
     celib::mat4_mul(&world_inst->world_matrix[16 * transform.idx], m, parent);
 

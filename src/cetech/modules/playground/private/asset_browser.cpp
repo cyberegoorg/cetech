@@ -27,6 +27,10 @@ static struct _G {
     float left_column_width;
     float midle_column_width;
     char current_dir[512];
+
+    uint64_t selected_dir_hash;
+    uint64_t selected_file;
+
     const char *root;
     bool visible;
 
@@ -86,14 +90,20 @@ static void dir_list_column() {
     }
 
     if (ImGui::TreeNode("Source")) {
-        if (ImGui::Selectable(".")) {
+        uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
+
+        if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
             strcpy(_G.current_dir, "");
+            _G.selected_dir_hash = dir_hash;
             _G.reload_item_list = true;
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
-            if (ImGui::Selectable(_G.dirtree_list[i])) {
+            dir_hash = ct_hash_a0.id64_from_str(_G.dirtree_list[i]);
+
+            if (ImGui::Selectable(_G.dirtree_list[i], _G.selected_dir_hash == dir_hash)) {
                 strcpy(_G.current_dir, _G.dirtree_list[i]);
+                _G.selected_dir_hash = dir_hash;
                 _G.reload_item_list = true;
             }
         }
@@ -129,13 +139,17 @@ static void item_list_column() {
         for (uint32_t i = 0; i < _G.item_list_count; ++i) {
             const char *path = _G.item_list[i];
             const char *filename = ct_path_a0.filename(path);
+            uint64_t filename_hash = ct_hash_a0.id64_from_str(filename);
 
             uint64_t type, name;
             ct_resource_a0.type_name_from_filename(path,
                                                    &type, &name,
                                                    NULL);
-            if (ImGui::Selectable(filename, false,
+
+            if (ImGui::Selectable(filename, _G.selected_file == filename_hash,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
+                _G.selected_file = filename_hash;
+
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t i = 0;
                          i < array::size(_G.on_asset_double_click); ++i) {

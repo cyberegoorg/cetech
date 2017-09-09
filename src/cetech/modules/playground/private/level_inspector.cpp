@@ -30,6 +30,7 @@ using namespace celib;
 static struct _G {
     bool visible;
 
+    uint64_t selected_name;
     uint64_t level_name;
     struct ct_entity level;
     struct ct_world world;
@@ -113,9 +114,12 @@ static void on_debugui() {
                 tmp_keys[2] = ct_yng_a0.calc_key("name");
 
                 const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, 3, buffer);
+                uint64_t name_hash = ct_yng_a0.calc_key(name);
+                bool selected = _G.selected_name == name_hash;
 
-                if (ct_debugui_a0.Selectable(name, false, 0,
+                if (ct_debugui_a0.Selectable(name, selected, 0,
                                              (float[]) {0.0f, 0.0f})) {
+                    _G.selected_name = name_hash;
                     for (uint32_t j = 0;j < array::size(_G.on_entity_click); ++j) {
                         _G.on_entity_click[j](_G.world, _G.level, _G.path, tmp_keys, 2);
                     }

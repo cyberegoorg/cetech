@@ -38,23 +38,19 @@ static struct _G {
 } _G;
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_path_a0);
-CETECH_DECL_API(ct_vio_a0);
-CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_asset_property_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_texture_a0);
-CETECH_DECL_API(ct_entity_property_a0);
 CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_entity_a0);
 
 static void load(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
-    _G.ent = ct_entity_a0.spawn(world, name);
+    ct_entity ent = ct_entity_a0.spawn(world, name);
+    _G.ent = ent;
+
+    if(ct_transform_a0.has(world, ent)) {
+        ct_transform t = ct_transform_a0.get(world, ent);
+        ct_transform_a0.set_position(t, (float[3]){0.0f});
+    }
 }
 
 static void unload(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
@@ -65,6 +61,7 @@ static int _init(ct_api_a0 *api) {
     CEL_UNUSED(api);
 
     _G = {};
+
 
     ct_asset_preview_a0.register_type_preview(
             ct_hash_a0.id64_from_str("entity"),
@@ -87,20 +84,11 @@ CETECH_MODULE_DEF(
         entity_preview,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_asset_property_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_texture_a0);
-            CETECH_GET_API(api, ct_entity_property_a0);
             CETECH_GET_API(api, ct_transform_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_asset_preview_a0);
             CETECH_GET_API(api, ct_entity_a0);
+
         },
         {
             CEL_UNUSED(reload);

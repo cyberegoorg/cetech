@@ -13,7 +13,6 @@
 
 #include <math.h>
 
-
 namespace celib {
 
     inline uint32_t float_to_bits(float _a) {
