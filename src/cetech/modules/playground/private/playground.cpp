@@ -2,7 +2,7 @@
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/modules/playground/playground.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/modules/level/level.h>
 #include <cetech/modules/camera/camera.h>
 #include <cetech/modules/renderer/viewport.h>

@@ -13,7 +13,7 @@
 #include <cetech/modules/playground/asset_browser.h>
 #include <cetech/modules/playground/level_inspector.h>
 #include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <celib/fpumath.h>
 #include <cetech/modules/playground/playground.h>
 #include "celib/map.inl"

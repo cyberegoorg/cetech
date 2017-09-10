@@ -4,7 +4,7 @@
 
 #include <cetech/modules/machine/machine.h>
 #include <cetech/modules/input/input.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include "celib/allocator.h"
 #include "cetech/kernel/config.h"
 #include "celib/eventstream.inl"

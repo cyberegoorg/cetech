@@ -76,7 +76,7 @@ set(SOURCE_FILES
         src/cetech/kernel/private/memory.cpp
         src/cetech/kernel/private/allocator_malloc.cpp
         src/cetech/kernel/private/allocator_scratch.cpp
-        src/cetech/kernel/private/application.cpp
+        src/cetech/modules/application/private/application.cpp
         src/cetech/kernel/private/task.cpp
         src/cetech/kernel/private/log_db_handler.cpp
         src/cetech/kernel/private/log_nanomsg_handler.cpp

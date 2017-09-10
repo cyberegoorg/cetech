@@ -10,7 +10,7 @@
 #include "api_private.h"
 #include "allocator_core_private.h"
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 
 #include "celib/fpumath.h"
 
@@ -131,7 +131,6 @@ extern "C" int cetech_kernel_init(int argc,
 
 
     CETECH_ADD_STATIC_MODULE(resourcesystem);
-    CETECH_ADD_STATIC_MODULE(application);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 
     init_static_modules();

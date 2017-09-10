@@ -8,7 +8,7 @@
 #include <cetech/kernel/errors.h>
 #include <cetech/modules/input/input.h>
 #include <cetech/kernel/module.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include "celib/allocator.h"
 #include "celib/eventstream.inl"
 #include "keystr.h"

@@ -86,6 +86,8 @@ struct ct_gamepad_device_event {
 
 //! Machine API V0
 struct ct_machine_a0 {
+    void(*update)(float dt);
+
 
     //! Get eventstream begin
     //! \return Begin

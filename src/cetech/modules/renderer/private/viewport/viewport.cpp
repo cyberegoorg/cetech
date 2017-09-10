@@ -17,7 +17,7 @@
 #include <cetech/kernel/hashlib.h>
 #include <cetech/kernel/vio.h>
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/modules/machine/window.h>
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/input/input.h>
@@ -793,8 +793,6 @@ namespace renderconfig_compiler {
 }
 
 void on_update(float dt) {
-    CEL_UNUSED(dt)
-
     ct_event_header *event = ct_machine_a0.event_begin();
 
     ct_window_resized_event *ev;
@@ -880,7 +878,7 @@ namespace viewport_module {
         renderconfig_compiler::init(api);
 
         ct_renderer_a0.register_on_render(on_render);
-        ct_app_a0.register_on_update(on_update);
+        //ct_app_a0.register_on_update(on_update);
     }
 
     void _shutdown() {

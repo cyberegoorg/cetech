@@ -13,13 +13,12 @@
 #include "cetech/kernel/resource.h"
 #include "cetech/modules/machine/machine.h"
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 
 #include <include/SDL2/SDL.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
-CETECH_DECL_API(ct_app_a0);
 
 using namespace celib;
 
@@ -122,9 +121,13 @@ namespace machine_sdl {
 
         while (SDL_PollEvent(&e) > 0) {
             switch (e.type) {
-                case SDL_QUIT:
-                    ct_app_a0.quit();
-                    break;
+                case SDL_QUIT: {
+                    ct_event_header ev;
+                    eventstream::push<ct_event_header>(_G.eventstream,
+                                                       EVENT_QUIT,
+                                                       ev);
+                }
+                break;
 
                 case SDL_WINDOWEVENT: {
                     switch (e.window.event) {
@@ -155,6 +158,7 @@ namespace machine_sdl {
     }
 
     static ct_machine_a0 a0 = {
+            .update = machine_sdl::_update,
             .event_begin = machine_sdl::machine_event_begin,
             .event_end = machine_sdl::machine_event_end,
             .event_next = machine_sdl::machine_event_next,
@@ -167,9 +171,6 @@ namespace machine_sdl {
 
         CETECH_GET_API(api, ct_memory_a0);
         CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_app_a0);
-
-        ct_app_a0.register_on_update(machine_sdl::_update);
 
         _G.eventstream.init(ct_memory_a0.main_allocator());
 

@@ -3,11 +3,20 @@
 //==============================================================================
 
 extern "C" void init_static_modules() {
+    CETECH_ADD_STATIC_MODULE(machine);
+
+    //==========================================================================
+    // Renderer
+    //==========================================================================
+    CETECH_ADD_STATIC_MODULE(renderer);
+    CETECH_ADD_STATIC_MODULE(shader);
+    CETECH_ADD_STATIC_MODULE(texture);
+    CETECH_ADD_STATIC_MODULE(material);
+
     //==========================================================================
     // Engine
     //==========================================================================
-
-    CETECH_ADD_STATIC_MODULE(machine);
+    CETECH_ADD_STATIC_MODULE(application);
 
     CETECH_ADD_STATIC_MODULE(world);
     CETECH_ADD_STATIC_MODULE(component);
@@ -19,18 +28,10 @@ extern "C" void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(transform);
     CETECH_ADD_STATIC_MODULE(scenegraph);
     CETECH_ADD_STATIC_MODULE(camera);
-
-    CETECH_ADD_STATIC_MODULE(level);
-
-    //==========================================================================
-    // Renderer
-    //==========================================================================
-    CETECH_ADD_STATIC_MODULE(renderer);
-    CETECH_ADD_STATIC_MODULE(shader);
-    CETECH_ADD_STATIC_MODULE(texture);
-    CETECH_ADD_STATIC_MODULE(material);
     CETECH_ADD_STATIC_MODULE(scene);
     CETECH_ADD_STATIC_MODULE(mesh_renderer);
+
+    CETECH_ADD_STATIC_MODULE(level);
 
     //==========================================================================
     // Viewport

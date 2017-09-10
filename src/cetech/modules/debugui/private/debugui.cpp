@@ -4,7 +4,7 @@
 #include <cetech/kernel/blob.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/modules/input/input.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/kernel/hashlib.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/kernel/vio.h>
@@ -72,7 +72,7 @@ namespace debugui {
 
         if(!io.KeysDown[40]) {
             io.KeysDown[40] = ct_keyboard_a0.button_state(0, 88) > 0;
-        };
+        }
 
         io.KeyShift = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("lshift")) > 0) || (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("rshift")) > 0);
         io.KeyCtrl = (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("lctrl")) > 0) || (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("rctrl")) > 0);

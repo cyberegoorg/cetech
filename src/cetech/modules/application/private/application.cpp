@@ -9,7 +9,7 @@
 #include <celib/array.inl>
 #include <celib/map.inl>
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/kernel/watchdog.h>
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/ydb.h>
@@ -48,6 +48,8 @@ CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_renderer_a0);
+CETECH_DECL_API(ct_machine_a0);
 
 //==============================================================================
 // Definess
@@ -81,7 +83,6 @@ static struct ApplicationGlobals {
 
     celib::Map<ct_game_fce> game_map;
     ct_game_fce active_game;
-
     int is_running;
 } _G;
 
@@ -151,12 +152,24 @@ void set_active_game(uint64_t name) {
     _G.active_game = game;
 }
 
+static void check_machine() {
+    ct_event_header *event = ct_machine_a0.event_begin();
+
+    while (event != ct_machine_a0.event_end()) {
+        switch (event->type) {
+            case EVENT_QUIT:
+                application_quit();
+                break;
+
+            default:
+                break;
+        }
+
+        event = ct_machine_a0.event_next(event);
+    }
+}
+
 extern "C" void application_start() {
-    // TODO: SHITT
-    CETECH_DECL_API(ct_renderer_a0);
-    CETECH_GET_API(&ct_api_a0, ct_renderer_a0);
-
-
     _init_config();
 
     if (ct_config_a0.get_int(_G.config.compile)) {
@@ -195,6 +208,8 @@ extern "C" void application_start() {
 #if CETECH_DEVELOP
         ct_module_a0.check_modules(); // TODO: SHIT...
 #endif
+        ct_machine_a0.update(dt);
+        check_machine();
 
         for (uint32_t i = 0; i < celib::array::size(_G.on_update); ++i) {
             _G.on_update[i](dt);
@@ -314,6 +329,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+
+            CETECH_GET_API(api, ct_renderer_a0);
+            CETECH_GET_API(api, ct_machine_a0);
 
             ct_api_a0 = *api;
         },

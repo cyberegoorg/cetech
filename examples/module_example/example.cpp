@@ -7,7 +7,7 @@
 #include <cetech/kernel/hashlib.h>
 
 #include <cetech/modules/input/input.h>
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/modules/entity/entity.h>
 
 #include <cetech/modules/playground//playground.h>
@@ -151,8 +151,8 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.register_on_update(update);
 
-          //  ct_debugui_a0.register_on_debugui(module1);
-//            ct_debugui_a0.register_on_debugui(module2);
+            //ct_debugui_a0.register_on_debugui(module1);
+            //ct_debugui_a0.register_on_debugui(module2);
         },
 
 //==============================================================================
@@ -165,8 +165,8 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.unregister_on_update(update);
 
-//              ct_debugui_a0.unregister_on_debugui(module1);
-//            ct_debugui_a0.unregister_on_debugui(module2);
+            ct_debugui_a0.unregister_on_debugui(module1);
+            ct_debugui_a0.unregister_on_debugui(module2);
         }
 )
 

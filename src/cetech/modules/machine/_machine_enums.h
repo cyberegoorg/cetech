@@ -13,6 +13,8 @@ extern "C" {
 enum event {
     EVENT_INVALID = 0,   //!< Invalid type
 
+    EVENT_QUIT = 0,   //!< Invalid type
+
     EVENT_KEYBOARD_UP,   //!< Keyboard button up
     EVENT_KEYBOARD_DOWN, //!< Keyboard button down
     EVENT_KEYBOARD_TEXT, //!< Keyboard button down

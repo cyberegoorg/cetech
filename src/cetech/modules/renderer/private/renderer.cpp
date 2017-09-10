@@ -16,7 +16,7 @@
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/hashlib.h>
 
-#include <cetech/kernel/application.h>
+#include <cetech/modules/application/application.h>
 #include <cetech/modules/machine/window.h>
 #include <cetech/modules/input/input.h>
 #include <cetech/kernel/resource.h>
@@ -31,10 +31,8 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_window_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_machine_a0);
 
 using namespace celib;
@@ -170,8 +168,7 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 
 #undef _DEF_ON_CLB_FCE
 
-static void on_update(float dt) {
-    CEL_UNUSED(dt);
+static void on_update() {
     ct_event_header *event = ct_machine_a0.event_begin();
 
     ct_window_resized_event *ev;
@@ -193,6 +190,8 @@ static void on_update(float dt) {
 }
 
 static void on_render(void (*on_render)()) {
+    on_update();
+
     if (_G.need_reset) {
         _G.need_reset = 0;
 
@@ -206,7 +205,6 @@ static void on_render(void (*on_render)()) {
     for (uint32_t i = 0; i < array::size(_G.on_render); ++i) {
         _G.on_render[i]();
     }
-
 
     bgfx::frame();
     _G.main_window->update(_G.main_window);
@@ -266,13 +264,11 @@ namespace renderer_module {
         renderer_create();
 
         _G.on_render.init(ct_memory_a0.main_allocator());
-        ct_app_a0.register_on_update(on_update);
     }
 
     void _shutdown() {
         ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
-            ct_app_a0.unregister_on_update(on_update);
 
             _G.on_render.destroy();
 
@@ -290,10 +286,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_mouse_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_machine_a0);
         },
         {
