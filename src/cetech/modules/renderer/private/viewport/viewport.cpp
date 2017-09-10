@@ -877,17 +877,16 @@ namespace viewport_module {
         ct_resource_a0.register_type(_G.type,
                                      renderconfig_resource::callback);
 
-
         renderconfig_compiler::init(api);
 
-        ct_app_a0.register_on_render(on_render);
+        ct_renderer_a0.register_on_render(on_render);
         ct_app_a0.register_on_update(on_update);
     }
 
     void _shutdown() {
         ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
-            ct_app_a0.unregister_on_render(on_render);
+            ct_renderer_a0.unregister_on_render(on_render);
             ct_app_a0.unregister_on_update(on_update);
 
             _G.global_resource.destroy();

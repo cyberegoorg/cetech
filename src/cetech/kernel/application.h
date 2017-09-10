@@ -12,11 +12,22 @@ extern "C" {
 // Include
 //==============================================================================
 
+#include <stdint.h>
+
 struct ct_window;
 
 //==============================================================================
 // Struct
 //==============================================================================
+
+
+struct ct_game_fce {
+    void (*on_init)();
+    void (*on_shutdown)();
+    void (*on_update)(float dt);
+    void (*on_render)();
+    void (*on_ui)();
+};
 
 typedef void (*ct_app_on_init)();
 typedef void (*ct_app_on_shutdown)();
@@ -34,6 +45,10 @@ struct ct_app_a0 {
 
     void (*start)();
 
+    void (*register_game)(uint64_t name, ct_game_fce game);
+    void (*unregister_game)(uint64_t name);
+    void (*set_active_game)(uint64_t name);
+
     void (*register_on_init)(ct_app_on_init on_init);
 
     void (*unregister_on_init)(ct_app_on_init on_init);
@@ -45,10 +60,6 @@ struct ct_app_a0 {
     void (*register_on_update)(ct_app_on_update on_update);
 
     void (*unregister_on_update)(ct_app_on_update on_update);
-
-    void (*register_on_render)(ct_app_on_render on_render);
-
-    void (*unregister_on_render)(ct_app_on_render on_render);
 };
 
 #ifdef __cplusplus

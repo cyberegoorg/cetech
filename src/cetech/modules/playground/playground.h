@@ -11,6 +11,13 @@ extern "C" {
 
 #include <stddef.h>
 
+struct ct_playground_module_fce {
+    void (*on_init)();
+    void (*on_shutdown)();
+    void (*on_update)(float dt);
+    void (*on_render)();
+    void (*on_ui)();
+};
 
 //==============================================================================
 // Api
@@ -18,7 +25,8 @@ extern "C" {
 
 //! Playground API V0
 struct ct_playground_a0 {
-    void (*_)();
+    void (*register_module)(uint64_t name, ct_playground_module_fce game);
+    void (*unregister_module)(uint64_t name);
 };
 
 #ifdef __cplusplus

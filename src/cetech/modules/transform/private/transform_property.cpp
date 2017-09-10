@@ -85,8 +85,7 @@ static void on_component(struct ct_world world,
 
     tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
     ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, tmp_rot, (float[3]){0.0f});
-    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f",
-                                 1.0f)) {
+    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f", 1.0f)) {
         ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, tmp_rot);
 
         float rad_rot[3];
@@ -100,11 +99,12 @@ static void on_component(struct ct_world world,
     float scale[3];
     tmp_keys[keys_count] = ct_yng_a0.calc_key("scale");
     ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, scale, (float[3]){1.0f});
-    if (ct_debugui_a0.DragFloat3("scale", scale, 1.0f, -FLT_MAX, FLT_MAX,
+    if (ct_debugui_a0.DragFloat3("scale", scale, 1.0f,
+                                 -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
         ct_transform_a0.set_scale(t, scale);
-        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, pos);
+        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, scale);
     }
 }
 

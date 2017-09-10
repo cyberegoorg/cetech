@@ -450,7 +450,7 @@ void transform_transform(ct_transform transform,
            euler[0], euler[1], euler[2],
            pos[0], pos[1], pos[2]);
 
-    celib::mat4_mul(&world_inst->world_matrix[16 * transform.idx], m, parent);
+    celib::mat4_mul(&world_inst->world_matrix[16 * transform.idx], parent, m);
 
     uint32_t child = world_inst->first_child[transform.idx];
 

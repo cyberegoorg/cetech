@@ -9,6 +9,7 @@
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/vio.h>
 #include <celib/macros.h>
+#include <celib/map.inl>
 #include <cetech/kernel/ydb.h>
 
 #include "cetech/kernel/hashlib.h"
@@ -28,6 +29,8 @@ CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
+using namespace celib;
+
 static struct PlaygroundGlobal {
     uint64_t type;
 
@@ -36,6 +39,8 @@ static struct PlaygroundGlobal {
     ct_camera camera;
 
     bool layout_loaded;
+
+    Map<ct_playground_module_fce> module_map;
 } _G;
 
 namespace playground {
@@ -108,28 +113,126 @@ namespace playground {
     }
 }
 
+static void on_init(){
+    if(!_G.layout_loaded) {
+        ct_debugui_a0.LoadDock("core/default.dock_layout");
+        _G.layout_loaded = true;
+    }
+
+    auto *it = map::begin(_G.module_map);
+    auto *it_end = map::end(_G.module_map);
+
+    while (it != it_end) {
+        if(it->value.on_init){
+            it->value.on_init();
+        }
+
+        ++it;
+    }
+}
+
+static void on_shutdown() {
+    auto *it = map::begin(_G.module_map);
+    auto *it_end = map::end(_G.module_map);
+
+    while (it != it_end) {
+        if(it->value.on_shutdown) {
+            it->value.on_shutdown();
+        }
+        ++it;
+    }
+}
+
+
+static void on_update(float dt) {
+
+
+    auto *it = map::begin(_G.module_map);
+    auto *it_end = map::end(_G.module_map);
+
+    while (it != it_end) {
+        if(it->value.on_update) {
+            it->value.on_update(dt);
+        }
+        ++it;
+    }
+}
+
+static bool active_hack = false;
+static void on_render() {
+    active_hack = true;
+
+    auto *it = map::begin(_G.module_map);
+    auto *it_end = map::end(_G.module_map);
+    while (it != it_end) {
+        if(it->value.on_render) {
+            it->value.on_render();
+        }
+
+        ++it;
+    }
+}
+
+
+static void on_ui() {
+    if(!active_hack) {
+        return;
+    }
+
+    active_hack = false;
+    playground::on_debugui();
+
+    auto *it = map::begin(_G.module_map);
+    auto *it_end = map::end(_G.module_map);
+
+    while (it != it_end) {
+        if(it->value.on_ui) {
+            it->value.on_ui();
+        }
+        ++it;
+    }
+
+}
+
+static ct_game_fce playground_game {
+        .on_init = on_init,
+        .on_shutdown = on_shutdown,
+        .on_update   = on_update,
+        .on_render =  on_render,
+        .on_ui =  on_ui,
+};
+
+
+void register_module(uint64_t name, ct_playground_module_fce module) {
+    celib::map::set(_G.module_map, name, module);
+}
+
+void unregister_module(uint64_t name) {
+    celib::map::remove(_G.module_map, name);
+}
+
+static ct_playground_a0 playground_api = {
+        .register_module = register_module,
+        .unregister_module = unregister_module,
+};
+
 namespace playground_module {
-
-    static ct_playground_a0 playground_api = {
-//            .register_module = playground::register_module,
-//            .unregister_module = playground::unregister_module,
-    };
-
-
     static void _init(ct_api_a0 *api) {
         _G = {};
 
+        _G.module_map.init(ct_memory_a0.main_allocator());
+
         api->register_api("ct_playground_a0", &playground_api);
 
-        ct_debugui_a0.register_on_debugui(playground::on_debugui);
-
-        if(!_G.layout_loaded) {
-            ct_debugui_a0.LoadDock("core/default.dock_layout");
-            _G.layout_loaded = true;
-        }
+        ct_app_a0.register_game(ct_hash_a0.id64_from_str("playground"), playground_game);
+        ct_debugui_a0.register_on_debugui(on_ui);
     }
 
     static void _shutdown() {
+        ct_debugui_a0.unregister_on_debugui(on_ui);
+        ct_app_a0.unregister_game(ct_hash_a0.id64_from_str("playground"));
+        _G.module_map.destroy();
+
         _G = {};
     }
 }

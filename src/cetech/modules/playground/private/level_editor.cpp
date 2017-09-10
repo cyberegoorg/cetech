@@ -15,6 +15,7 @@
 #include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/kernel/application.h>
 #include <celib/fpumath.h>
+#include <cetech/modules/playground/playground.h>
 #include "celib/map.inl"
 
 #include "cetech/kernel/hashlib.h"
@@ -37,6 +38,7 @@ CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_level_inspector_a0);
+CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
@@ -254,11 +256,15 @@ static void _init(ct_api_a0 *api) {
             .active_editor = UINT8_MAX
     };
 
-    ct_app_a0.register_on_init(init);
-    ct_app_a0.register_on_shutdown(shutdown);
-    ct_app_a0.register_on_render(render);
-    ct_app_a0.register_on_update(update);
-    ct_debugui_a0.register_on_debugui(on_debugui);
+    ct_playground_a0.register_module(
+            ct_hash_a0.id64_from_str("level_editor"),
+            (ct_playground_module_fce){
+                    .on_init = init,
+                    .on_shutdown = shutdown,
+                    .on_render = render,
+                    .on_update = update,
+                    .on_ui = on_debugui,
+            });
 
     ct_asset_browser_a0.register_on_asset_double_click(on_asset_double_click);
 
@@ -266,11 +272,11 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_app_a0.unregister_on_init(init);
-    ct_app_a0.unregister_on_shutdown(shutdown);
-    ct_app_a0.unregister_on_render(render);
-    ct_app_a0.unregister_on_update(update);
-    ct_debugui_a0.unregister_on_debugui(on_debugui);
+
+    ct_playground_a0.unregister_module(
+            ct_hash_a0.id64_from_str("level_editor")
+    );
+
 
     ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
 
@@ -294,6 +300,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_level_inspector_a0);
+            CETECH_GET_API(api, ct_playground_a0);
         },
         {
             CEL_UNUSED(reload);

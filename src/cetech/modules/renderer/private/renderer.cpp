@@ -192,16 +192,21 @@ static void on_update(float dt) {
     }
 }
 
-static void on_render() {
+static void on_render(void (*on_render)()) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
+    if(on_render) {
+        on_render();
+    }
+
     for (uint32_t i = 0; i < array::size(_G.on_render); ++i) {
         _G.on_render[i]();
     }
+
 
     bgfx::frame();
     _G.main_window->update(_G.main_window);
@@ -210,6 +215,7 @@ static void on_render() {
 
 namespace renderer_module {
     static ct_renderer_a0 rendderer_api = {
+            .render = on_render,
             .create = renderer_create,
             .set_debug = renderer_set_debug,
             .get_size = renderer_get_size,
@@ -251,7 +257,6 @@ namespace renderer_module {
         };
 
         if (!ct_config_a0.get_int(GConfig.daemon)) {
-
             _G.vsync = ct_config_a0.get_int(GConfig.screen_vsync) > 0;
 
         }
@@ -261,14 +266,12 @@ namespace renderer_module {
         renderer_create();
 
         _G.on_render.init(ct_memory_a0.main_allocator());
-        ct_app_a0.register_on_render(on_render);
         ct_app_a0.register_on_update(on_update);
     }
 
     void _shutdown() {
         ct_cvar daemon = ct_config_a0.find("daemon");
         if (!ct_config_a0.get_int(daemon)) {
-            ct_app_a0.unregister_on_render(on_render);
             ct_app_a0.unregister_on_update(on_update);
 
             _G.on_render.destroy();

@@ -57,12 +57,8 @@ namespace debugui {
             btn |= IMGUI_MBUT_MIDDLE;
         }
 
-
-
-
         uint32_t w, h;
         ct_renderer_a0.get_size(&w, &h);
-
 
         const uint32_t axis = ct_mouse_a0.axis_index("wheel");
         float wheel[2];
@@ -89,7 +85,6 @@ namespace debugui {
         }
 
         imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
-
 
         for (uint32_t i = 0; i < array::size(_G.on_debugui); ++i) {
             _G.on_debugui[i]();

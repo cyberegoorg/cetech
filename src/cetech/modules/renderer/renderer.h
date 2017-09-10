@@ -39,6 +39,8 @@ struct ct_renderer_a0 {
     //! Create renderer.
     void (*create)();
 
+    void (*render)(void (*on_render)());
+
     //! Set debug mode on/off
     //! \param debug True/False
     void (*set_debug)(int debug);

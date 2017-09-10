@@ -6,6 +6,7 @@
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/path.h>
 #include <cetech/kernel/resource.h>
+#include <cetech/modules/playground/playground.h>
 
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/config.h"
@@ -19,6 +20,7 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
@@ -202,13 +204,22 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
-    ct_debugui_a0.register_on_debugui(on_debugui);
+
+    ct_playground_a0.register_module(
+            ct_hash_a0.id64_from_str("asset_browser"),
+            (ct_playground_module_fce){
+            .on_ui = on_debugui,
+            });
 
     _G.on_asset_click.init(ct_memory_a0.main_allocator());
     _G.on_asset_double_click.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
+    ct_playground_a0.unregister_module(
+            ct_hash_a0.id64_from_str("asset_browser")
+    );
+
     _G.on_asset_click.destroy();
     _G.on_asset_double_click.destroy();
 
@@ -224,6 +235,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_playground_a0);
         },
         {
             CEL_UNUSED(reload);

@@ -2,6 +2,7 @@
 
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/modules/playground/property_inspector.h>
+#include <cetech/modules/playground/playground.h>
 
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/config.h"
@@ -12,6 +13,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_debugui_a0);
+CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
@@ -47,11 +49,19 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_property_inspector_a0", &property_inspector_api);
-    ct_debugui_a0.register_on_debugui(on_debugui);
 
+    ct_playground_a0.register_module(
+            ct_hash_a0.id64_from_str("property_inspector"),
+            (ct_playground_module_fce){
+                    .on_ui = on_debugui,
+            });
 }
 
 static void _shutdown() {
+    ct_playground_a0.unregister_module(
+            ct_hash_a0.id64_from_str("property_inspector")
+    );
+
     _G = {};
 }
 
@@ -61,6 +71,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_debugui_a0);
+            CETECH_GET_API(api, ct_playground_a0);
         },
         {
             CEL_UNUSED(reload);

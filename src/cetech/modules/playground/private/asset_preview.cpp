@@ -11,6 +11,7 @@
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/playground/asset_preview.h>
 #include <cetech/modules/playground/asset_browser.h>
+#include <cetech/modules/playground/playground.h>
 #include "celib/map.inl"
 
 #include "cetech/kernel/hashlib.h"
@@ -32,6 +33,7 @@ CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
+CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
@@ -226,26 +228,30 @@ static void _init(ct_api_a0 *api) {
 
     _G.preview_fce.init(ct_memory_a0.main_allocator());
 
-    ct_app_a0.register_on_init(init);
-    ct_app_a0.register_on_shutdown(shutdown);
-    ct_app_a0.register_on_render(render);
-    ct_app_a0.register_on_update(update);
+    ct_playground_a0.register_module(
+            ct_hash_a0.id64_from_str("asset_preview"),
+            (ct_playground_module_fce){
+                    .on_init = init,
+                    .on_shutdown = shutdown,
+                    .on_render = render,
+                    .on_update = update,
+                    .on_ui = on_debugui,
+            });
 
-    ct_debugui_a0.register_on_debugui(on_debugui);
     ct_asset_browser_a0.register_on_asset_click(set_asset);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
 
 static void _shutdown() {
-    _G.preview_fce.destroy();
 
-    ct_app_a0.unregister_on_init(init);
-    ct_app_a0.unregister_on_shutdown(shutdown);
-    ct_app_a0.unregister_on_render(render);
-    ct_app_a0.unregister_on_update(update);
-    ct_debugui_a0.unregister_on_debugui(on_debugui);
+    ct_playground_a0.unregister_module(
+            ct_hash_a0.id64_from_str("asset_preview")
+    );
+
     ct_asset_browser_a0.unregister_on_asset_click(set_asset);
+
+    _G.preview_fce.destroy();
 
     _G = {};
 }
@@ -266,6 +272,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
+            CETECH_GET_API(api, ct_playground_a0);
         },
         {
             CEL_UNUSED(reload);

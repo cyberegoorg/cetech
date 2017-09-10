@@ -51,7 +51,7 @@ namespace resource {
 //==============================================================================
 
 #define LOG_WHERE "resource_manager"
-#define is_item_null(item) (item.data == null_item.data)
+#define is_item_null(item) ((item).data == null_item.data)
 
 
 static uint64_t hash_combine(uint64_t lhs,

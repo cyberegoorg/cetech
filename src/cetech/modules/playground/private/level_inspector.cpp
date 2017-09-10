@@ -15,6 +15,7 @@
 #include <cetech/kernel/yamlng.h>
 #include <cetech/kernel/ydb.h>
 #include <cstdio>
+#include <cetech/modules/playground/playground.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -23,6 +24,7 @@ CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
@@ -137,12 +139,21 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_level_inspector_a0", &level_inspector_api);
-    ct_debugui_a0.register_on_debugui(on_debugui);
+
+    ct_playground_a0.register_module(
+            ct_hash_a0.id64_from_str("level_inspector"),
+            (ct_playground_module_fce){
+                    .on_ui = on_debugui,
+            });
 
     _G.on_entity_click.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
+    ct_playground_a0.unregister_module(
+            ct_hash_a0.id64_from_str("level_inspector")
+    );
+
     _G.on_entity_click.destroy();
 
     _G = {};
@@ -158,6 +169,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_playground_a0);
         },
         {
             CEL_UNUSED(reload);
