@@ -15,7 +15,20 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
 
-#define hash_combine(a, b) ((a * 11)^(b))
+static uint64_t hash_combine(uint32_t a, uint32_t b) {
+    union {
+        struct {
+            uint32_t a;
+            uint32_t b;
+        };
+        uint64_t ab;
+    } c {
+            .a = a,
+            .b = b,
+    };
+
+    return c.ab;
+}
 
 using namespace celib;
 
@@ -278,7 +291,7 @@ namespace scenegraph {
 
     int has(ct_world world,
             ct_entity entity) {
-        uint32_t idx = hash_combine(world.h, entity.h);
+        uint64_t idx = hash_combine(world.h, entity.h);
 
         return map::has(_G.ent_map, idx);
     }
@@ -286,7 +299,7 @@ namespace scenegraph {
     ct_scene_node get_root(ct_world world,
                            ct_entity entity) {
 
-        uint32_t idx = hash_combine(world.h, entity.h);
+        uint64_t idx = hash_combine(world.h, entity.h);
 
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 

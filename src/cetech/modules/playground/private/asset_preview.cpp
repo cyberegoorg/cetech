@@ -79,7 +79,7 @@ static void fps_camera_update(ct_world world,
     celib::vec4_move(z_dir, &wm[2 * 4]);
 
 
-    if (fly_mode) {
+    if (!fly_mode) {
         z_dir[1] = 0.0f;
     }
 
@@ -230,6 +230,7 @@ static void _init(ct_api_a0 *api) {
     ct_app_a0.register_on_shutdown(shutdown);
     ct_app_a0.register_on_render(render);
     ct_app_a0.register_on_update(update);
+
     ct_debugui_a0.register_on_debugui(on_debugui);
     ct_asset_browser_a0.register_on_asset_click(set_asset);
 

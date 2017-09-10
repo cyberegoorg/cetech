@@ -151,14 +151,14 @@ static void item_list_column() {
                 _G.selected_file = filename_hash;
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    for (uint32_t i = 0;
-                         i < array::size(_G.on_asset_double_click); ++i) {
-                        _G.on_asset_double_click[i](type, name, ct_hash_a0.id64_from_str("source"), path);
+                    for (uint32_t j = 0;
+                         j < array::size(_G.on_asset_double_click); ++j) {
+                        _G.on_asset_double_click[j](type, name, ct_hash_a0.id64_from_str("source"), path);
                     }
                 } else {
-                    for (uint32_t i = 0;
-                         i < array::size(_G.on_asset_click); ++i) {
-                        _G.on_asset_click[i](type, name, ct_hash_a0.id64_from_str("source"), path);
+                    for (uint32_t j = 0;
+                         j < array::size(_G.on_asset_click); ++j) {
+                        _G.on_asset_click[j](type, name, ct_hash_a0.id64_from_str("source"), path);
                     }
                 }
             }

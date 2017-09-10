@@ -37,7 +37,21 @@ CETECH_DECL_API(ct_ydb_a0);
 using namespace celib;
 
 #define LOG_WHERE "mesh_renderer"
-#define hash_combine(a, b) ((a * 11)^(b))
+
+static uint64_t hash_combine(uint32_t a, uint32_t b) {
+    union {
+        struct {
+            uint32_t a;
+            uint32_t b;
+        };
+        uint64_t ab;
+    } c {
+            .a = a,
+            .b = b,
+    };
+
+    return c.ab;
+}
 
 struct mesh_data {
     uint64_t scene;
@@ -116,7 +130,7 @@ namespace {
                  ct_entity ent) {
         WorldInstance &_data = *_get_world_instance(world);
 
-        uint32_t id = hash_combine(world.h, ent.h);
+        uint64_t id = hash_combine(world.h, ent.h);
         uint32_t i = map::get(_G.ent_map, id, UINT32_MAX);
 
         if (i == UINT32_MAX) {
@@ -276,7 +290,7 @@ int mesh_is_valid(ct_mesh_renderer mesh) {
 
 int mesh_has(ct_world world,
              ct_entity entity) {
-    uint32_t idx = hash_combine(world.h, entity.h);
+    uint64_t idx = hash_combine(world.h, entity.h);
 
     return map::has(_G.ent_map, idx);
 }
@@ -284,7 +298,7 @@ int mesh_has(ct_world world,
 ct_mesh_renderer mesh_get(ct_world world,
                           ct_entity entity) {
 
-    uint32_t idx = hash_combine(world.h, entity.h);
+    uint64_t idx = hash_combine(world.h, entity.h);
 
     uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 

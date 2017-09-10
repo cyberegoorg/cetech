@@ -108,7 +108,22 @@ static struct _G {
 } _G;
 
 
-#define hash_combine(a, b) ((a * 11)^(b))
+static uint64_t hash_combine(uint32_t a, uint32_t b) {
+    union {
+        struct {
+            uint32_t a;
+            uint32_t b;
+        };
+        uint64_t ab;
+    } c {
+       .a = a,
+       .b = b,
+    };
+
+    return c.ab;
+}
+
+//#define hash_combine(a, b) (((a) * 11)^(b))
 
 
 static void allocate(WorldInstance &_data,
@@ -546,7 +561,7 @@ void transform_set_scale(ct_transform node,
 
 int transform_has(ct_world world,
                   ct_entity entity) {
-    uint32_t idx = hash_combine(world.h, entity.h);
+    uint64_t idx = hash_combine(world.h, entity.h);
 
     return map::has(_G.ent_map, idx);
 }
@@ -554,7 +569,7 @@ int transform_has(ct_world world,
 ct_transform transform_get(ct_world world,
                            ct_entity entity) {
 
-    uint32_t idx = hash_combine(world.h, entity.h);
+    uint64_t idx = hash_combine(world.h, entity.h);
 
     uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 

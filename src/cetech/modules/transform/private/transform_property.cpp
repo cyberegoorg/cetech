@@ -60,6 +60,7 @@ static void on_component(struct ct_world world,
     }
     ct_transform t = ct_transform_a0.get(world, entity);
 
+
     float pos[3];
     uint64_t tmp_keys[keys_count+1];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);

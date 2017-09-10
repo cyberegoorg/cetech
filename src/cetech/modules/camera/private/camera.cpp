@@ -25,7 +25,20 @@ CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
-#define combine(a, b) ((a * 11)^(b))
+uint64_t combine(uint32_t a, uint32_t b) {
+    union {
+        struct {
+            uint32_t a;
+            uint32_t b;
+        };
+        uint64_t ab;
+    } c {
+            .a = a,
+            .b = b,
+    };
+
+    return c.ab;
+}
 
 namespace {
 
@@ -137,8 +150,9 @@ namespace {
                                    uint64_t* component_key,
                                    uint32_t component_key_count,
                                    struct ct_blob *data) {
-
         struct camera_data t_data;
+
+
 
         uint64_t keys[component_key_count+1];
         memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
@@ -191,7 +205,7 @@ namespace camera {
     int has(ct_world world,
             ct_entity entity) {
 
-        uint32_t idx = combine(world.h, entity.h);
+        uint64_t idx = combine(world.h, entity.h);
 
         return map::has(_G.ent_map, idx);
     }
@@ -199,7 +213,7 @@ namespace camera {
     ct_camera get(ct_world world,
                   ct_entity entity) {
 
-        uint32_t idx = combine(world.h, entity.h);
+        uint64_t idx = combine(world.h, entity.h);
         uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
 
         return (ct_camera) {.idx = component_idx, .world = world};
