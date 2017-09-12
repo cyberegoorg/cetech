@@ -114,11 +114,6 @@ namespace playground {
 }
 
 static void on_init(){
-    if(!_G.layout_loaded) {
-        ct_debugui_a0.LoadDock("core/default.dock_layout");
-        _G.layout_loaded = true;
-    }
-
     auto *it = map::begin(_G.module_map);
     auto *it_end = map::end(_G.module_map);
 

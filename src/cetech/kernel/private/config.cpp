@@ -32,7 +32,7 @@ CETECH_DECL_API(ct_yng_a0);
 #define MAX_DESC_LEN 256
 #define LOG_WHERE "cvar"
 
-#define make_cvar(i) (ct_cvar){.idx = i}
+#define make_cvar(i) (ct_cvar){.idx = (i)}
 
 #define str_set(result, str) memcpy(result, str, strlen(str))
 

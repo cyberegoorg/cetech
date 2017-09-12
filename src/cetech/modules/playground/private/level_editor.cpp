@@ -50,15 +50,13 @@ static struct globals {
     struct ct_world world[MAX_LEVEL_EDITOR];
     struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
     struct ct_entity level[MAX_LEVEL_EDITOR];
-
     const char* path[MAX_LEVEL_EDITOR];
     uint64_t root[MAX_LEVEL_EDITOR];
     uint64_t level_name[MAX_LEVEL_EDITOR];
+    bool is_first[MAX_LEVEL_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
-
-
 } _G;
 
 
@@ -91,7 +89,7 @@ void fps_camera_update(ct_world world,
     celib::vec4_move(z_dir, &wm[2 * 4]);
 
 
-    if (fly_mode) {
+    if (!fly_mode) {
         z_dir[1] = 0.0f;
     }
 
@@ -174,27 +172,46 @@ void render() {
     }
 }
 
+uint32_t find_level(uint64_t name) {
+    for (uint32_t i = 0; i < MAX_LEVEL_EDITOR; ++i) {
+        if(_G.level_name[i] != name){
+            continue;
+        }
+
+        return i;
+    }
+
+    return UINT32_MAX;
+}
+
 void open_level(uint64_t name, uint64_t root, const char* path) {
-    uint8_t idx = _G.editor_count;
+    uint32_t level_idx = find_level(name);
+
+    int idx = _G.editor_count;
     ++_G.editor_count;
 
     _G.visible[idx] = true;
+    _G.viewport[idx] = ct_viewport_a0.create(
+            ct_hash_a0.id64_from_str("default"), 0, 0);
 
-    _G.viewport[idx] = ct_viewport_a0.create(ct_hash_a0.id64_from_str("default"), 0, 0);
-
-    _G.world[idx] = ct_world_a0.create();
-
+    if(UINT32_MAX != level_idx) {
+        _G.world[idx] = _G.world[level_idx];
+    } else {
+        _G.world[idx] = ct_world_a0.create();
+        _G.level[idx] = ct_level_a0.load_level(_G.world[idx], name);
+        _G.is_first[idx] = true;
+    }
     _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
-                                            ct_hash_a0.id64_from_str("content/camera"));
+                                            ct_hash_a0.id64_from_str(
+                                                    "content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
     _G.level_name[idx] = name;
 
-    _G.level[idx] = ct_level_a0.load_level(_G.world[idx], name);
-
-    ct_level_inspector_a0.set_level(_G.world[idx], _G.level[idx], _G.level_name[idx], _G.root[idx], _G.path[idx]);
-
+    ct_level_inspector_a0.set_level(_G.world[idx], _G.level[idx],
+                                    _G.level_name[idx], _G.root[idx],
+                                    _G.path[idx]);
 }
 
 void init() {

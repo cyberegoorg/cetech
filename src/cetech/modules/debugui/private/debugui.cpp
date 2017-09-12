@@ -96,10 +96,10 @@ namespace debugui {
     typedef void (*on_debugui)();
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                                   \
+    static void register_ ## name ## _(type name) {                            \
         celib::array::push_back(_G.name, name);                                \
     }                                                                          \
-    static void unregister_## name ## _(type name) {                                  \
+    static void unregister_## name ## _(type name) {                           \
         const auto size = celib::array::size(_G.name);                         \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \

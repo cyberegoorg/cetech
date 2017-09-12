@@ -20,8 +20,6 @@ extern "C" {
 struct ct_world;
 struct ct_entity;
 
-typedef struct mat44f_s mat44f_t;
-
 //==============================================================================
 // Structs
 //==============================================================================
@@ -51,7 +49,6 @@ struct ct_camera_a0 {
     //! \param camera Camera
     //! \return 1 if is oK else 0
     int (*is_valid)(struct ct_camera camera);
-
 
     //! Get camera project and view matrix
     //! \param world World

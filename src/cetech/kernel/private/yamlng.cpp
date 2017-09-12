@@ -905,19 +905,10 @@ int write_handler(void *ext, unsigned char *buffer, size_t size) {
 bool save_yaml(struct cel_alloc *alloc,
                struct ct_vio *vio,
                struct ct_yng_doc *doc) {
-
-    unsigned char kim_nuke_shit[4096];
-    size_t writen = 0;
+//    unsigned char kim_nuke_shit[4096];
 
     yaml_emitter_t emitter;
     yaml_event_t event;
-
-//    struct stack_state {
-//        uint32_t parent_idx;
-//    };
-//
-//    Array<stack_state> parent_stack(ct_memory_a0.main_allocator());
-//    uint32_t parent_stack_top;
 
     ct_yng_doc* d  = doc;
     yamlng_document_inst* inst = (yamlng_document_inst *)(d->inst);
@@ -928,12 +919,6 @@ bool save_yaml(struct cel_alloc *alloc,
         ct_log_a0.error(LOG_WHERE, "Could not initialize YAML emiter.");
         return false;
     }
-
-//    yaml_emitter_set_output_string(&emitter, kim_nuke_shit, CETECH_ARRAY_LEN(kim_nuke_shit), &writen);
-
-//    FILE *output = fopen("fooo.yml", "wb");
-//    yaml_emitter_set_output_file(&emitter, output);
-
 
     yaml_emitter_set_output(&emitter, write_handler, vio);
 
@@ -946,10 +931,8 @@ bool save_yaml(struct cel_alloc *alloc,
     if (!yaml_emitter_emit(&emitter, &event))
         goto error;
 
-
     // BODY
     save_recursive(inst, root_node.idx, &emitter);
-
 
     // END DOC
     yaml_document_end_event_initialize(&event, 1);
@@ -961,9 +944,6 @@ bool save_yaml(struct cel_alloc *alloc,
     if (!yaml_emitter_emit(&emitter, &event))
         goto error;
 
-    //fclose(output);
-    kim_nuke_shit[writen] = '\0';
-    ct_log_a0.debug(LOG_WHERE, "YAML: %s", kim_nuke_shit);
     return true;
 
 error:
