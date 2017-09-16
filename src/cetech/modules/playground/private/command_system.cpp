@@ -27,6 +27,16 @@ static struct _G {
 } _G;
 
 
+static ct_cmd* get_curent_cmd() {
+    if (!_G.curent_pos) {
+        return NULL;
+    }
+
+    ct_cmd* curent_cmd = (ct_cmd*)&_G.cmd_buffer[_G.cmd[_G.curent_pos]];
+
+    return curent_cmd;
+}
+
 void execute(const struct ct_cmd *cmd) {
     ct_cmd_execute_t cmd_fce = map::get<ct_cmd_execute_t>(_G.cmd_map, cmd->type, NULL);
 
@@ -34,11 +44,22 @@ void execute(const struct ct_cmd *cmd) {
         return;
     }
 
-    uint32_t size = array::size(_G.cmd_buffer);
+    uint32_t buffer_offset = array::size(_G.cmd_buffer);
+    uint32_t size = array::size(_G.cmd);
 
+    if(_G.curent_pos != (size-1)) {
+        ct_cmd* cur_cmd = get_curent_cmd();
+        if(cur_cmd) {
+            uint32_t offset = _G.cmd[_G.curent_pos];
+            uint32_t end_offset = offset + cur_cmd->size;
+
+            array::resize(_G.cmd, _G.curent_pos + 1);
+            array::resize(_G.cmd_buffer, end_offset);
+        }
+    }
 
     array::push<uint8_t>(_G.cmd_buffer, (uint8_t*)cmd, cmd->size);
-    array::push_back<uint32_t >(_G.cmd, size);
+    array::push_back<uint32_t >(_G.cmd, buffer_offset);
 
     _G.curent_pos += 1;
 
@@ -49,16 +70,6 @@ void register_cmd_execute(uint64_t type, ct_cmd_execute_t execute) {
     map::set(_G.cmd_map, type, execute);
 }
 
-
-static ct_cmd* get_curent_cmd() {
-    if (!_G.curent_pos) {
-        return NULL;
-    }
-
-    ct_cmd* curent_cmd = (ct_cmd*)&_G.cmd_buffer[_G.cmd[_G.curent_pos]];
-
-    return curent_cmd;
-}
 
 void undo() {
     ct_cmd* curent_cmd = get_curent_cmd();
