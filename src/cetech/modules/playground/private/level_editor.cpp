@@ -135,6 +135,25 @@ void on_debugui() {
             if (ct_debugui_a0.IsMouseHoveringWindow()) {
                 _G.active_editor = i;
 
+                float proj[16], view[16];
+                float size[2];
+                ct_debugui_a0.GetWindowSize(size);
+
+                ct_camera camera = ct_camera_a0.get(_G.world[i], _G.camera_ent[i]);
+                ct_camera_a0.get_project_view(camera, proj, view,
+                                              static_cast<int>(size[0]),
+                                              static_cast<int>(size[1]));
+
+//                static float im[16] = {
+//                        1.0f, 0.0f, 0.0f, 0.0f,
+//                        0.0f, 1.0f, 0.0f, 0.0f,
+//                        0.0f, 0.0f, 1.0f, 0.0f,
+//                        0.0f, 0.0f, 0.0f, 1.0f,
+//                };
+//                auto origin = ImGui::GetItemRectMin();
+//                ImGuizmo::SetRect(origin.x, origin.y, size[0], size[1]);
+//                ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::WORLD, im);
+
                 if(ct_debugui_a0.IsMouseClicked(0, false)) {
                     ct_level_inspector_a0.set_level(_G.world[i],
                                                     _G.level[i],
@@ -158,6 +177,7 @@ void on_debugui() {
                                  (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
         }
         ct_debugui_a0.EndDock();
+
     }
 }
 
@@ -212,6 +232,8 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
     ct_level_inspector_a0.set_level(_G.world[idx], _G.level[idx],
                                     _G.level_name[idx], _G.root[idx],
                                     _G.path[idx]);
+
+    ct_playground_a0.reload_layout();
 }
 
 void init() {

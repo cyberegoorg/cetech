@@ -152,6 +152,7 @@ set(SOURCE_FILES
         src/cetech/modules/playground/private/asset_browser.cpp
         src/cetech/modules/playground/private/playground.cpp
         src/cetech/modules/playground/private/property_inspector.cpp
+        src/cetech/modules/playground/private/command_system.cpp
         )
 
 ################################################################################
@@ -166,7 +167,7 @@ set(MAIN_SOURCE_FILES
 
 if (UNIX)
     set(RELEASE_LIBS_LINUX
-            #jemalloc_pic.a
+            jemalloc_pic.a
             pthread
             anl # NANOMSG
             dl

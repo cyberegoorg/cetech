@@ -42,7 +42,8 @@ struct ct_filesystem_a0 {
     //! \param root Root
     //! \param base_path Path
     void (*map_root_dir)(uint64_t root,
-                         const char *base_path, bool watch);
+                         const char *base_path,
+                         bool watch);
 
     //! Close file
     //! \param file file
@@ -63,11 +64,11 @@ struct ct_filesystem_a0 {
                     struct cel_alloc *allocator);
 
     void (*listdir_iter)(uint64_t root,
-                    const char *path,
-                    const char *filter,
-                    bool only_dir,
-                    bool recursive,
-                    void (*on_item)(const char* path));
+                         const char *path,
+                         const char *filter,
+                         bool only_dir,
+                         bool recursive,
+                         void (*on_item)(const char *path));
 
     //! Free list directory array
     //! \param files File array
@@ -92,10 +93,15 @@ struct ct_filesystem_a0 {
 
 
     ct_watchdog_ev_header *(*event_begin)(uint64_t root);
+
     ct_watchdog_ev_header *(*event_end)(uint64_t root);
+
     ct_watchdog_ev_header *(*event_next)(ct_watchdog_ev_header *header);
 
-    void (*get_full_path)(uint64_t root, const char* path, char* fullpath, uint32_t max_len);
+    void (*get_full_path)(uint64_t root,
+                          const char *path,
+                          char *fullpath,
+                          uint32_t max_len);
 
     /// TODO: shit
     void (*check_wd)();

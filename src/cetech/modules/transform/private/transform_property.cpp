@@ -23,6 +23,7 @@
 #include <cfloat>
 #include <celib/fpumath.h>
 #include <cetech/kernel/ydb.h>
+#include <cetech/modules/playground/command_system.h>
 
 using namespace celib;
 using namespace buffer;
@@ -48,6 +49,37 @@ CETECH_DECL_API(ct_entity_property_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_cmd_system_a0);
+
+
+struct set_pos_cmd_s {
+    ct_cmd header;
+
+    // ENT
+    ct_world world;
+    ct_entity entity;
+
+    // ENT YAML
+    const char* filename;
+    uint64_t keys[32];
+    uint32_t keys_count;
+
+    // VALUES
+    float new_value[3];
+    float old_value[3];
+};
+
+static void set_pos_cmd(const struct ct_cmd *cmd,
+                        bool inverse) {
+    const struct set_pos_cmd_s *pos_cmd = (const set_pos_cmd_s*)cmd;
+
+    const float* value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
+
+    ct_ydb_a0.set_vec3(pos_cmd->filename, pos_cmd->keys, pos_cmd->keys_count, (float*)value);
+
+    ct_transform t = ct_transform_a0.get(pos_cmd->world, pos_cmd->entity);
+    ct_transform_a0.set_position(t, (float*)value);
+}
 
 static void on_component(struct ct_world world,
                          struct ct_entity entity,
@@ -62,17 +94,32 @@ static void on_component(struct ct_world world,
 
 
     float pos[3];
-    uint64_t tmp_keys[keys_count+1];
+    float pos_new[3];
+    uint64_t tmp_keys[keys_count + 1];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
     tmp_keys[keys_count] = ct_yng_a0.calc_key("position");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, pos, (float[3]){0.0f});
+    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1,
+                       pos_new, (float[3]) {0.0f});
 
-    if (ct_debugui_a0.DragFloat3("position", pos, 1.0f, -FLT_MAX, FLT_MAX,
+    vec3_move(pos, pos_new);
+
+    if (ct_debugui_a0.DragFloat3("position", pos_new, 1.0f, -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
-        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, pos);
-        ct_transform_a0.set_position(t, pos);
+        struct set_pos_cmd_s cmd = {
+                .header.size = sizeof(struct set_pos_cmd_s),
+                .header.type = ct_hash_a0.id64_from_str("transform_set_position"),
+                .header.description = {"set transformation position"},
+                .world = world,
+                .entity = entity,
+                .filename = filename,
+                .keys_count = keys_count  + 1,
+                .new_value = {pos_new[0], pos_new[1], pos_new[2]},
+                .old_value = {pos[0], pos[1], pos[2]},
+        };
+        memcpy(cmd.keys, tmp_keys, sizeof(uint64_t) * cmd.keys_count);
+        ct_cmd_system_a0.execute(&cmd.header);
     }
 
     float rot[4];
@@ -84,9 +131,11 @@ static void on_component(struct ct_world world,
     vec3_mul(tmp_rot, tmp_rot, RAD_TO_DEG);
 
     tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, tmp_rot, (float[3]){0.0f});
-    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f", 1.0f)) {
-        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, tmp_rot);
+    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, tmp_rot,
+                       (float[3]) {0.0f});
+    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f",
+                                 1.0f)) {
+        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count + 1, tmp_rot);
 
         float rad_rot[3];
         float q[4];
@@ -98,13 +147,14 @@ static void on_component(struct ct_world world,
 
     float scale[3];
     tmp_keys[keys_count] = ct_yng_a0.calc_key("scale");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count+1, scale, (float[3]){1.0f});
+    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, scale,
+                       (float[3]) {1.0f});
     if (ct_debugui_a0.DragFloat3("scale", scale, 1.0f,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
         ct_transform_a0.set_scale(t, scale);
-        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count+1, scale);
+        ct_ydb_a0.set_vec3(filename, tmp_keys, keys_count + 1, scale);
     }
 }
 
@@ -113,14 +163,20 @@ static int _init(ct_api_a0 *api) {
 
     _G = {};
 
-    ct_entity_property_a0.register_component(ct_hash_a0.id64_from_str("transform"), on_component);
+    ct_entity_property_a0.register_component(
+            ct_hash_a0.id64_from_str("transform"), on_component);
+
+    ct_cmd_system_a0.register_cmd_execute(
+            ct_hash_a0.id64_from_str("transform_set_position"),
+            set_pos_cmd);
 
     return 1;
 }
 
 static void _shutdown() {
 
-    ct_entity_property_a0.unregister_component(ct_hash_a0.id64_from_str("transform"));
+    ct_entity_property_a0.unregister_component(
+            ct_hash_a0.id64_from_str("transform"));
 
     _G = {};
 }
@@ -142,6 +198,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_cmd_system_a0);
         },
         {
             CEL_UNUSED(reload);

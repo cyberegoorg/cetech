@@ -1,3 +1,16 @@
+#include <stdio.h>
+
+#include <celib/macros.h>
+#include <celib/map.inl>
+
+#include <cetech/kernel/filesystem.h>
+#include <cetech/kernel/vio.h>
+#include <cetech/kernel/ydb.h>
+#include "cetech/kernel/hashlib.h"
+#include "cetech/kernel/memory.h"
+#include "cetech/kernel/api_system.h"
+#include "cetech/kernel/module.h"
+
 #include <cetech/modules/entity/entity.h>
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/debugui/debugui.h>
@@ -6,16 +19,7 @@
 #include <cetech/modules/level/level.h>
 #include <cetech/modules/camera/camera.h>
 #include <cetech/modules/renderer/viewport.h>
-#include <cetech/kernel/filesystem.h>
-#include <cetech/kernel/vio.h>
-#include <celib/macros.h>
-#include <celib/map.inl>
-#include <cetech/kernel/ydb.h>
-
-#include "cetech/kernel/hashlib.h"
-#include "cetech/kernel/memory.h"
-#include "cetech/kernel/api_system.h"
-#include "cetech/kernel/module.h"
+#include <cetech/modules/playground/command_system.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
@@ -28,6 +32,7 @@ CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_cmd_system_a0);
 
 using namespace celib;
 
@@ -38,7 +43,7 @@ static struct PlaygroundGlobal {
     ct_world world;
     ct_camera camera;
 
-    bool layout_loaded;
+    bool load_layout;
 
     Map<ct_playground_module_fce> module_map;
 } _G;
@@ -66,6 +71,20 @@ namespace playground {
             }
 
             if (ct_debugui_a0.BeginMenu("Edit", true)) {
+                char buffer[128];
+                const char* txt = ct_cmd_system_a0.undo_text();
+
+                sprintf(buffer, "Undo %s", txt ? txt : "");
+                if (ct_debugui_a0.MenuItem(buffer, "Ctrl+Z", false, NULL!=txt)) {
+                    ct_cmd_system_a0.undo();
+                }
+
+                txt = ct_cmd_system_a0.redo_text();
+                sprintf(buffer, "Redo %s", txt ? txt : "");
+                if (ct_debugui_a0.MenuItem(buffer, "Ctrl+Shift+Z", false, NULL!=txt)) {
+                    ct_cmd_system_a0.redo();
+                }
+
                 ct_debugui_a0.EndMenu();
             }
 
@@ -114,6 +133,7 @@ namespace playground {
 }
 
 static void on_init(){
+
     auto *it = map::begin(_G.module_map);
     auto *it_end = map::end(_G.module_map);
 
@@ -138,10 +158,11 @@ static void on_shutdown() {
     }
 }
 
+void reload_layout() {
+    _G.load_layout = true;
+}
 
 static void on_update(float dt) {
-
-
     auto *it = map::begin(_G.module_map);
     auto *it_end = map::end(_G.module_map);
 
@@ -187,6 +208,10 @@ static void on_ui() {
         ++it;
     }
 
+    if(_G.load_layout) {
+        ct_debugui_a0.LoadDock("core/default.dock_layout");
+        _G.load_layout = false;
+    }
 }
 
 static ct_game_fce playground_game {
@@ -209,11 +234,14 @@ void unregister_module(uint64_t name) {
 static ct_playground_a0 playground_api = {
         .register_module = register_module,
         .unregister_module = unregister_module,
+        .reload_layout = reload_layout,
 };
 
 namespace playground_module {
     static void _init(ct_api_a0 *api) {
-        _G = {};
+        _G = {
+             .load_layout = true,
+        };
 
         _G.module_map.init(ct_memory_a0.main_allocator());
 
@@ -246,6 +274,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_cmd_system_a0);
         },
         {
             CEL_UNUSED(reload);

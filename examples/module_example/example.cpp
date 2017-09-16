@@ -62,14 +62,17 @@ void module1() {
 
         ct_debugui_a0.Text("DT: %f", _G.dt);
         ct_debugui_a0.Text("FPS: %f", 1.0f / _G.dt );
-
         ct_debugui_a0.Text("Random FPS: %f", static_cast<double>(rand()));
+
+        float fps =  (1.0f / _G.dt);
+
+        ct_debugui_a0.PlotLines("FPS", &fps, 1, 0, NULL, 0.0f, 0.0f, (float[2]){100.0f, 50.0f}, 0);
 
         ct_debugui_a0.Text("xknalsnxlsanlknxlasnlknxslknsaxdear imgui, %d", 111);
 
             static float v[2] = {100.0f, 100.0f};
-            if(ct_debugui_a0.Button("wwwwww", v)) {
-                ct_log_a0.info("dasdsa", "dsadkjjkhjkbjhkjbjkbjkksadsadsad");
+            if(ct_debugui_a0.Button("sjdoiasjwww", v)) {
+                ct_log_a0.debug("dasdsa", "dsadsdsadsadsadasd");
             }
 
         static float col[4] = {0.0f, 1.0f, 0.0f, 0.0f};
@@ -89,7 +92,7 @@ void module1() {
         float size[2] = {};
         ct_debugui_a0.GetWindowSize(size);
         size[1] = size[0];
-        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hash_a0.id64_from_str("content/scene/m4a1/m4_diff")),
+        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hash_a0.id64_from_str("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
                              size,
                              (float[2]) {0.0f, 0.0f},
                              (float[2]) {1.0f, 1.0f},
@@ -131,7 +134,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_renderer_a0);
-
 
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_world_a0);

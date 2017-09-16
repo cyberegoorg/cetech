@@ -374,7 +374,7 @@ void set_string(const char *path,
 }
 
 void set_vec3(const char *path,
-              uint64_t* keys,
+              const uint64_t* keys,
                  uint32_t keys_count,
                  float *value) {
 

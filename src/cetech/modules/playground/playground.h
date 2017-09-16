@@ -27,6 +27,8 @@ struct ct_playground_module_fce {
 struct ct_playground_a0 {
     void (*register_module)(uint64_t name, ct_playground_module_fce game);
     void (*unregister_module)(uint64_t name);
+
+    void (*reload_layout)();
 };
 
 #ifdef __cplusplus

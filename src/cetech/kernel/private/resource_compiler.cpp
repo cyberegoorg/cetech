@@ -229,22 +229,11 @@ void _compile_files(Array<ct_task_item> &tasks,
 
         builddb_set_file_hash(source_filename_short, build_name);
 
-//        ct_vio *source_vio = ct_filesystem_a0.open(
-//                ct_hash_a0.id64_from_str("source"),
-//                source_filename_short,
-//                FS_OPEN_READ);
-//
-//        if (source_vio == NULL) {
-//            continue;
-//        }
-
         auto platform = ct_config_a0.find("kernel.platform");
         char *build_full = ct_path_a0.join(
                 ct_memory_a0.main_allocator(), 2,
                 ct_config_a0.get_string(platform),
                 build_name);
-
-//        CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
         struct compile_task_data *data =
                 CEL_ALLOCATE(
@@ -452,7 +441,6 @@ void resource_compiler_check_fs() {
 
                 it = multi_map::find_next(type_name, it);
             }
-
 
             ct_resource_a0.reload(type_id, &name_array[0],array::size(name_array));
 

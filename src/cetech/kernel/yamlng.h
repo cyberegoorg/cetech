@@ -183,7 +183,7 @@ struct ct_yng_a0 {
 
     uint64_t (*calc_key)(const char *key);
 
-    uint64_t (*combine_key)(uint64_t *keys,
+    uint64_t (*combine_key)(const uint64_t *keys,
                             uint32_t count);
 
     uint64_t (*combine_key_str)(const char **keys,

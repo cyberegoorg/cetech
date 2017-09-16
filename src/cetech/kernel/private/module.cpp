@@ -350,7 +350,7 @@ CETECH_MODULE_DEF(
 
             _G.module_dir = ct_config_a0.new_str("module_dir",
                                                  "Path where is modules",
-                                                 "./bin/linux64/");
+                                                 "./bin/linux64/"); // TODO: platform specific
 
 
             static uint64_t root = ct_hash_a0.id64_from_str("modules");

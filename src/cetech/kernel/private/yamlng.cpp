@@ -111,7 +111,7 @@ uint64_t calc_key(const char *key) {
     return hash;
 }
 
-uint64_t combine_key(uint64_t *keys,
+uint64_t combine_key(const uint64_t *keys,
                      uint32_t count) {
     uint64_t hash = keys[0];
 
