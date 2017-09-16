@@ -153,6 +153,21 @@ struct ct_yng_doc {
                                   uint32_t keys_count,
                                   float *value);
 
+    void (*create_tree_bool)(ct_yng_doc_instance_t *inst,
+                             const char **keys,
+                             uint32_t keys_count,
+                             bool value);
+
+    void (*create_tree_float)(ct_yng_doc_instance_t *inst,
+                             const char **keys,
+                             uint32_t keys_count,
+                             float value);
+
+    void (*create_tree_string)(ct_yng_doc_instance_t *inst,
+                              const char **keys,
+                              uint32_t keys_count,
+                              const char* value);
+
     void (*foreach_dict_node)(ct_yng_doc_instance_t *inst,
                               struct ct_yamlng_node node,
                               ct_yamlng_foreach_map_t foreach_clb,

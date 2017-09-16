@@ -432,14 +432,7 @@ void set_bool(ct_yng_doc_instance_t *_inst,
                  bool value){
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
 
-    char *str = inst->value[node.idx].string;
-
-    cel_alloc* alloc = ct_memory_a0.main_allocator();
-
-    CEL_FREE(alloc, str);
-
-    str = ct_memory_a0.str_dup(value ? "yes" : "no", alloc);
-    inst->value[node.idx].string = str;
+    inst->type[node.idx] = value ? NODE_TRUE : NODE_FALSE;
     inst->modified = true;
 }
 
@@ -1031,6 +1024,77 @@ void create_tree_vec3(ct_yng_doc_instance_t *_inst,
 
 }
 
+
+void create_tree_bool(ct_yng_doc_instance_t *_inst,
+                         const char **keys,
+                         uint32_t keys_count,
+                         bool value) {
+    ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    ct_yng_doc* d = node.d;
+
+    uint64_t key = combine_key_str(keys, keys_count);
+
+    uint32_t new_idx;
+    char* str =  ct_memory_a0.str_dup(value ? "yes" : "no", ct_memory_a0.main_allocator());
+    if(value) {
+        new_idx = new_node(
+                d,
+                NODE_TRUE, {.string=str},
+                node.idx, key);
+    } else {
+        new_idx = new_node(
+                d,
+                NODE_FALSE, {.string=str},
+                node.idx, key);
+    }
+
+    yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
+    map::set(inst->key_map, key, new_idx);
+}
+
+void create_tree_float(ct_yng_doc_instance_t *_inst,
+                          const char **keys,
+                          uint32_t keys_count,
+                          float value) {
+    ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    ct_yng_doc* d = node.d;
+
+    uint64_t key = combine_key_str(keys, keys_count);
+
+    uint32_t new_idx;
+
+    new_idx = new_node(
+            d,
+            NODE_FLOAT, {.f = value},
+            node.idx, key);
+
+    yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
+    map::set(inst->key_map, key, new_idx);
+}
+
+void create_tree_string(ct_yng_doc_instance_t *_inst,
+                           const char **keys,
+                           uint32_t keys_count,
+                           const char* value) {
+    ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    ct_yng_doc* d = node.d;
+
+    uint64_t key = combine_key_str(keys, keys_count);
+
+    uint32_t new_idx;
+
+    char* str = ct_memory_a0.str_dup(value, ct_memory_a0.main_allocator());
+
+    new_idx = new_node(
+            d,
+            NODE_FLOAT, {.string = str},
+            node.idx, key);
+
+    yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
+    map::set(inst->key_map, key, new_idx);
+}
+
+
 static void destroy(struct ct_yng_doc *document) {
     yamlng_document_inst *inst = (yamlng_document_inst *) document->inst;
     struct cel_alloc *alloc = inst->alloc;
@@ -1114,6 +1178,9 @@ ct_yng_doc *from_vio(struct ct_vio *vio,
             .set_mat4 = set_mat4,
 
             .create_tree_vec3 = create_tree_vec3,
+            .create_tree_bool = create_tree_bool,
+            .create_tree_float = create_tree_float,
+            .create_tree_string = create_tree_string,
 
             .foreach_dict_node = foreach_dict_node,
             .foreach_seq_node = foreach_seq_node,

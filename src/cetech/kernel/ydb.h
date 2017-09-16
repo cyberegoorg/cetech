@@ -91,7 +91,7 @@ struct ct_ydb_a0 {
                       float value);
 
     void (*set_bool)(const char *path,
-                     uint64_t* keys,
+                     const uint64_t* keys,
                      uint32_t keys_count,
                      bool value);
 
