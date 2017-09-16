@@ -164,7 +164,6 @@ static void _init(ct_api_a0 *api) {
     _G.cmd_buffer.init(ct_memory_a0.main_allocator());
     _G.cmd.init(ct_memory_a0.main_allocator());
 
-
     array::push_back<uint32_t >(_G.cmd, 0);
 }
 

@@ -10,7 +10,6 @@
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/log.h"
-#include "cetech/kernel/process.h"
 #include "cetech/kernel/path.h"
 #include "cetech/kernel/vio.h"
 #include "cetech/kernel/resource.h"
@@ -18,6 +17,8 @@
 #include <cetech/modules/playground//asset_property.h>
 #include <cetech/modules/debugui/debugui.h>
 #include <cetech/modules/renderer/texture.h>
+#include <cetech/kernel/ydb.h>
+#include <cetech/modules/playground/command_system.h>
 
 using namespace celib;
 using namespace buffer;
@@ -39,13 +40,94 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
+CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_cmd_system_a0);
 
-static void texture_asset(uint64_t type,
-                          uint64_t name,
-                          const char* path) {
-    CEL_UNUSED(type);
-    CEL_UNUSED(path);
 
+static void set_ydb_bool_cmd(const struct ct_cmd *cmd,
+                             bool inverse) {
+    const struct ct_ydb_cmd_bool_s *bool_cmd = (const ct_ydb_cmd_bool_s *) cmd;
+
+    bool value = inverse ? bool_cmd->old_value : bool_cmd->new_value;
+
+    ct_ydb_a0.set_bool(bool_cmd->ydb.filename,
+                       bool_cmd->ydb.keys,
+                       bool_cmd->ydb.keys_count, value);
+
+    ct_resource_a0.compile_and_reload(bool_cmd->ydb.filename);
+}
+
+static void ui_input(const char *path) {
+    uint64_t tmp_keys[32] = {};
+
+    tmp_keys[0] = ct_yng_a0.calc_key("input");
+
+    const char *input = ct_ydb_a0.get_string(path, tmp_keys, 1, "");
+
+    static char txt_buffer[128] = {};
+    strcpy(txt_buffer, input);
+
+    ct_debugui_a0.InputText("input", txt_buffer, CETECH_ARRAY_LEN(txt_buffer),
+                            DebugInputTextFlags_ReadOnly, 0, NULL);
+}
+
+static void ui_gen_mipmaps(const char *path) {
+    uint64_t tmp_keys = ct_yng_a0.calc_key("gen_mipmaps");
+
+    bool gen_mipmaps = ct_ydb_a0.get_bool(path, &tmp_keys, 1, false);
+    bool new_gen_mipmaps = gen_mipmaps;
+
+    if (ct_debugui_a0.Checkbox("gen mipmaps", &new_gen_mipmaps)) {
+        struct ct_ydb_cmd_bool_s cmd = {
+                .header = {
+                        .description = {"set texture mipmaps"},
+                        .size = sizeof(struct ct_ydb_cmd_bool_s),
+                        .type = ct_hash_a0.id64_from_str("texture_set_bool"),
+                },
+
+                .ydb = {
+                        .filename = path,
+                        .keys = {[0] = tmp_keys},
+                        .keys_count = 1,
+                },
+
+                .new_value = new_gen_mipmaps,
+                .old_value = gen_mipmaps,
+        };
+        ct_cmd_system_a0.execute(&cmd.header);
+    }
+}
+
+static void ui_is_normalmap(const char *path) {
+    uint64_t tmp_keys = ct_yng_a0.calc_key("is_normalmap");
+
+    bool is_normalmap = ct_ydb_a0.get_bool(path, &tmp_keys, 1, false);
+    bool new_is_normalmap = is_normalmap;
+
+    if (ct_debugui_a0.Checkbox("is normalmap", &new_is_normalmap)) {
+        struct ct_ydb_cmd_bool_s cmd = {
+                .header = {
+                        .description = {"set texture normalmap"},
+                        .size = sizeof(struct ct_ydb_cmd_bool_s),
+                        .type = ct_hash_a0.id64_from_str("texture_set_bool"),
+                },
+
+                .ydb = {
+                        .filename = path,
+                        .keys = {[0] = tmp_keys},
+                        .keys_count = 1,
+                },
+
+                .new_value = new_is_normalmap,
+                .old_value = is_normalmap,
+        };
+
+        ct_cmd_system_a0.execute(&cmd.header);
+    }
+}
+
+static void ui_texture_preview(uint64_t name) {
     float size[2];
     ct_debugui_a0.GetWindowSize(size);
     size[1] = size[0];
@@ -58,6 +140,17 @@ static void texture_asset(uint64_t type,
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
+static void texture_asset(uint64_t type,
+                          uint64_t name,
+                          const char *path) {
+    CEL_UNUSED(type);
+
+    ui_input(path);
+    ui_gen_mipmaps(path);
+    ui_is_normalmap(path);
+    ui_texture_preview(name);
+}
+
 static int _init(ct_api_a0 *api) {
     CEL_UNUSED(api);
 
@@ -67,6 +160,9 @@ static int _init(ct_api_a0 *api) {
             ct_hash_a0.id64_from_str("texture"),
             texture_asset);
 
+    ct_cmd_system_a0.register_cmd_execute(
+            ct_hash_a0.id64_from_str("texture_set_bool"),
+            set_ydb_bool_cmd);
 
     return 1;
 }
@@ -88,6 +184,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_property_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_texture_a0);
+            CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_cmd_system_a0);
         },
         {
             CEL_UNUSED(reload);

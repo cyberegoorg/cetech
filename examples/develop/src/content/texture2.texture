@@ -1,2 +1,3 @@
 input: content/texture2.png
-gen_mipmaps: true
+gen_mipmaps: yes
+is_normalmap: no
