@@ -1,11 +1,11 @@
-0:
+0: 
   index: 0
-  label: Level view 1
-  x: 0
-  y: 22
+  label: Property inspector
+  x: 1524
+  y: 533
   location: ""
-  size_x: 1519
-  size_y: 718
+  size_x: 342
+  size_y: 512
   status: 0
   active: 1
   opened: 1
@@ -14,66 +14,14 @@
   child0: -1
   child1: -1
   parent: 5
-
-1:
+1: 
   index: 1
-  label: Property inspector
-  x: 1519
-  y: 322
-  location: ""
-  size_x: 347
-  size_y: 723
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 8
-
-2:
-  index: 2
-  label: Asset preview
-  x: 1098
-  y: 740
-  location: ""
-  size_x: 421
-  size_y: 305
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 6
-
-3:
-  index: 3
   label: Asset browser
   x: 0
-  y: 740
+  y: 743
   location: ""
-  size_x: 1098
-  size_y: 305
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 6
-
-4:
-  index: 4
-  label: Level inspector
-  x: 1519
-  y: 22
-  location: ""
-  size_x: 347
-  size_y: 300
+  size_x: 1177
+  size_y: 302
   status: 0
   active: 1
   opened: 1
@@ -82,43 +30,72 @@
   child0: -1
   child1: -1
   parent: 8
-
-5:
-  index: 5
-  label: ""
+2: 
+  index: 2
+  label: Asset preview
+  x: 1177
+  y: 743
+  location: ""
+  size_x: 347
+  size_y: 302
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 8
+3: 
+  index: 3
+  label: Level inspector
+  x: 1524
+  y: 22
+  location: ""
+  size_x: 342
+  size_y: 511
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 5
+4: 
+  index: 4
+  label: Level content/level1.level###level_editor_1
   x: 0
   y: 22
   location: ""
-  size_x: 1519
+  size_x: 1524
+  size_y: 721
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 7
+5: 
+  index: 5
+  label: ""
+  x: 1524
+  y: 22
+  location: ""
+  size_x: 342
   size_y: 1023
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 0
-  child1: 6
-  parent: 7
-
-6:
-  index: 6
-  label: ""
-  x: 0
-  y: 740
-  location: ""
-  size_x: 1519
-  size_y: 305
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
   child0: 3
-  child1: 2
-  parent: 5
-
-7:
-  index: 7
+  child1: 0
+  parent: 6
+6: 
+  index: 6
   label: ""
   x: 0
   y: 22
@@ -130,17 +107,16 @@
   opened: 0
   prev: -1
   next: -1
-  child0: 5
-  child1: 8
+  child0: 7
+  child1: 5
   parent: -1
-
-8:
-  index: 8
+7: 
+  index: 7
   label: ""
-  x: 1519
+  x: 0
   y: 22
   location: ""
-  size_x: 347
+  size_x: 1524
   size_y: 1023
   status: 0
   active: 1
@@ -148,5 +124,21 @@
   prev: -1
   next: -1
   child0: 4
-  child1: 1
+  child1: 8
+  parent: 6
+8: 
+  index: 8
+  label: ""
+  x: 0
+  y: 743
+  location: ""
+  size_x: 1524
+  size_y: 302
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 1
+  child1: 2
   parent: 7

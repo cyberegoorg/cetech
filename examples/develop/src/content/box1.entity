@@ -15,7 +15,7 @@ components:
     material: "content/scene/solider/head"
 
 children:
-  "e432c0ed88dd461e81f50973ffb00263":
+  "c432c432c432c432c423c4":
       components:
         "32c0ed88dd461e81":
           component_type: "transform"
@@ -32,7 +32,7 @@ children:
 
           material: "content/scene/solider/body"
 
-  "81f50973ffb00263":
+  "cxvcxvcxvxcef3f23":
       components:
         "32c0ed88dd461e81":
           component_type: "transform"

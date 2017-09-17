@@ -36,14 +36,14 @@ static void on_debugui() {
         return;
     }
 
-
     char filename[512] = {};
     ct_resource_a0.compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                          _G.active_type, _G.active_name);
 
-    if(ct_debugui_a0.CollapsingHeader(filename, DebugUITreeNodeFlags_DefaultOpen)) {
-        _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
-    }
+    ct_debugui_a0.InputText("asset", filename, strlen(filename),
+                            DebugInputTextFlags_ReadOnly, 0, NULL);
+
+    _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
 }
 
 static void register_asset(uint64_t type,

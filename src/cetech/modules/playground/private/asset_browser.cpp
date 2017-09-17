@@ -24,8 +24,7 @@ CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
-#define _G property_inspector_global
-static struct _G {
+static struct property_inspector_global {
     float left_column_width;
     float midle_column_width;
     char current_dir[512];
@@ -198,11 +197,6 @@ static void on_debugui() {
 }
 
 static void _init(ct_api_a0 *api) {
-    _G = {
-            .visible = true,
-            .left_column_width = 120.0f
-    };
-
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
 
     ct_playground_a0.register_module(
@@ -210,6 +204,10 @@ static void _init(ct_api_a0 *api) {
             (ct_playground_module_fce){
             .on_ui = on_debugui,
             });
+
+    _G = {};
+    _G.visible = true;
+    _G.left_column_width = 120.0f;
 
     _G.on_asset_click.init(ct_memory_a0.main_allocator());
     _G.on_asset_double_click.init(ct_memory_a0.main_allocator());

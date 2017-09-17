@@ -16,10 +16,8 @@
 #include <cetech/modules/application/application.h>
 #include <celib/fpumath.h>
 #include <cetech/modules/playground/playground.h>
-#include "celib/map.inl"
 
 #include "cetech/kernel/hashlib.h"
-#include "cetech/kernel/config.h"
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/module.h"
@@ -42,18 +40,19 @@ CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
-#define MAX_LEVEL_EDITOR 8
+#define MAX_EDITOR 8
 
 static struct globals {
-    bool visible[MAX_LEVEL_EDITOR];
-    struct ct_viewport viewport[MAX_LEVEL_EDITOR];
-    struct ct_world world[MAX_LEVEL_EDITOR];
-    struct ct_entity camera_ent[MAX_LEVEL_EDITOR];
-    struct ct_entity level[MAX_LEVEL_EDITOR];
-    const char* path[MAX_LEVEL_EDITOR];
-    uint64_t root[MAX_LEVEL_EDITOR];
-    uint64_t level_name[MAX_LEVEL_EDITOR];
-    bool is_first[MAX_LEVEL_EDITOR];
+    bool visible[MAX_EDITOR];
+    struct ct_viewport viewport[MAX_EDITOR];
+    struct ct_world world[MAX_EDITOR];
+    struct ct_entity camera_ent[MAX_EDITOR];
+    struct ct_entity entity[MAX_EDITOR];
+    const char *path[MAX_EDITOR];
+    uint64_t root[MAX_EDITOR];
+    uint64_t entity_name[MAX_EDITOR];
+    bool is_first[MAX_EDITOR];
+    bool is_level[MAX_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
@@ -85,8 +84,8 @@ void fps_camera_update(ct_world world,
 
     float x_dir[4];
     float z_dir[4];
-    celib::vec4_move(x_dir, &wm[0 * 4]);
-    celib::vec4_move(z_dir, &wm[2 * 4]);
+    vec4_move(x_dir, &wm[0 * 4]);
+    vec4_move(z_dir, &wm[2 * 4]);
 
 
     if (!fly_mode) {
@@ -97,11 +96,11 @@ void fps_camera_update(ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    celib::vec3_mul(x_dir_new, x_dir, dt * leftright * speed);
-    celib::vec3_mul(z_dir_new, z_dir, dt * updown * speed);
+    vec3_mul(x_dir_new, x_dir, dt * leftright * speed);
+    vec3_mul(z_dir_new, z_dir, dt * updown * speed);
 
-    celib::vec3_add(pos, pos, x_dir_new);
-    celib::vec3_add(pos, pos, z_dir_new);
+    vec3_add(pos, pos, x_dir_new);
+    vec3_add(pos, pos, z_dir_new);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -121,14 +120,21 @@ void fps_camera_update(ct_world world,
 }
 
 void on_debugui() {
-    char dock_id[32] = {};
+    char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        snprintf(dock_id, CETECH_ARRAY_LEN(dock_id), "Level view %d", i + 1);
+        if (_G.is_level[i]) {
+            snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
+                     "Level %s###level_editor_%d", _G.path[i], i + 1);
+        } else {
+            snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
+                     "Entity %s###level_editor_%d", _G.path[i], i + 1);
+        }
 
-        if (ct_debugui_a0.BeginDock(dock_id, &_G.visible[i],
+        if (ct_debugui_a0.BeginDock(dock_id,
+                                    &_G.visible[i],
                                     DebugUIWindowFlags_(
                                             DebugUIWindowFlags_NoScrollbar))) {
 
@@ -139,7 +145,8 @@ void on_debugui() {
                 float size[2];
                 ct_debugui_a0.GetWindowSize(size);
 
-                ct_camera camera = ct_camera_a0.get(_G.world[i], _G.camera_ent[i]);
+                ct_camera camera = ct_camera_a0.get(_G.world[i],
+                                                    _G.camera_ent[i]);
                 ct_camera_a0.get_project_view(camera, proj, view,
                                               static_cast<int>(size[0]),
                                               static_cast<int>(size[1]));
@@ -154,12 +161,11 @@ void on_debugui() {
 //                ImGuizmo::SetRect(origin.x, origin.y, size[0], size[1]);
 //                ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::WORLD, im);
 
-                if(ct_debugui_a0.IsMouseClicked(0, false)) {
-                    ct_level_inspector_a0.set_level(_G.world[i],
-                                                    _G.level[i],
-                                                    _G.level_name[i],
-                                                    _G.root[i],
-                                                    _G.path[i]);
+                if (ct_debugui_a0.IsMouseClicked(0, false)) {
+                    ct_level_inspector_a0.set_level(_G.world[i], _G.entity[i],
+                                                    _G.entity_name[i],
+                                                    _G.root[i], _G.path[i],
+                                                    false);
                 }
             }
 
@@ -175,6 +181,8 @@ void on_debugui() {
                                  (float[2]) {1.0f, 1.0f},
                                  (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                                  (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+        } else {
+
         }
         ct_debugui_a0.EndDock();
 
@@ -193,8 +201,8 @@ void render() {
 }
 
 uint32_t find_level(uint64_t name) {
-    for (uint32_t i = 0; i < MAX_LEVEL_EDITOR; ++i) {
-        if(_G.level_name[i] != name){
+    for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
+        if (_G.entity_name[i] != name) {
             continue;
         }
 
@@ -204,7 +212,10 @@ uint32_t find_level(uint64_t name) {
     return UINT32_MAX;
 }
 
-void open_level(uint64_t name, uint64_t root, const char* path) {
+static void open(uint64_t name,
+                 uint64_t root,
+                 const char *path,
+                 bool is_level) {
     uint32_t level_idx = find_level(name);
 
     int idx = _G.editor_count;
@@ -214,12 +225,19 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
     _G.viewport[idx] = ct_viewport_a0.create(
             ct_hash_a0.id64_from_str("default"), 0, 0);
 
-    if(UINT32_MAX != level_idx) {
+    if (UINT32_MAX != level_idx) {
         _G.world[idx] = _G.world[level_idx];
     } else {
         _G.world[idx] = ct_world_a0.create();
-        _G.level[idx] = ct_level_a0.load_level(_G.world[idx], name);
+
+        if (is_level) {
+            _G.entity[idx] = ct_level_a0.load_level(_G.world[idx], name);
+        } else {
+            _G.entity[idx] = ct_entity_a0.spawn(_G.world[idx], name);
+        }
+
         _G.is_first[idx] = true;
+        _G.is_level[idx] = is_level;
     }
     _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
                                             ct_hash_a0.id64_from_str(
@@ -227,11 +245,11 @@ void open_level(uint64_t name, uint64_t root, const char* path) {
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
-    _G.level_name[idx] = name;
+    _G.entity_name[idx] = name;
 
-    ct_level_inspector_a0.set_level(_G.world[idx], _G.level[idx],
-                                    _G.level_name[idx], _G.root[idx],
-                                    _G.path[idx]);
+    ct_level_inspector_a0.set_level(_G.world[idx], _G.entity[idx],
+                                    _G.entity_name[idx], _G.root[idx],
+                                    _G.path[idx], is_level);
 
     ct_playground_a0.reload_layout();
 }
@@ -282,12 +300,19 @@ static ct_level_view_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
-static void on_asset_double_click(uint64_t type, uint64_t name, uint64_t root, const char* path) {
-    if( ct_hash_a0.id64_from_str("level") != type ) {
+static void on_asset_double_click(uint64_t type,
+                                  uint64_t name,
+                                  uint64_t root,
+                                  const char *path) {
+    if (ct_hash_a0.id64_from_str("level") == type) {
+        open(name, root, path, true);
         return;
     }
 
-    open_level(name, root, path);
+    if (ct_hash_a0.id64_from_str("entity") == type) {
+        open(name, root, path, false);
+        return;
+    }
 }
 
 static void _init(ct_api_a0 *api) {
@@ -297,7 +322,7 @@ static void _init(ct_api_a0 *api) {
 
     ct_playground_a0.register_module(
             ct_hash_a0.id64_from_str("level_editor"),
-            (ct_playground_module_fce){
+            (ct_playground_module_fce) {
                     .on_init = init,
                     .on_shutdown = shutdown,
                     .on_render = render,

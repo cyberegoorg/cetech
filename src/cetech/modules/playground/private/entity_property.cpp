@@ -27,6 +27,7 @@ CETECH_DECL_API(ct_level_inspector_a0);
 CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_entity_a0);
 
 using namespace celib;
 
@@ -35,7 +36,7 @@ static struct _G {
     uint64_t active_entity;
     uint64_t keys[64];
     uint64_t keys_count;
-    struct ct_entity active_level;
+    struct ct_entity top_entity;
     struct ct_world active_world;
 
     //Array<ct_ep_on_component> on_component;
@@ -67,13 +68,13 @@ static struct _G {
 
 
 static void on_debugui() {
-    if (!_G.active_entity) {
+    if (!_G.filename) {
         return;
     }
 
     ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
 
-    struct ct_entity entity = ct_level_a0.entity_by_id(_G.active_level,
+    struct ct_entity entity = ct_entity_a0.find_by_guid(_G.top_entity,
                                                        _G.active_entity);
 
     uint64_t tmp_keys[_G.keys_count + 3];
@@ -120,13 +121,13 @@ void on_entity_click(struct ct_world world,
     ct_property_inspector_a0.set_active(on_debugui);
 
     _G.active_world = world;
-    _G.active_level = level;
+    _G.top_entity = level;
     _G.filename = filename;
 
     memcpy(_G.keys, keys, sizeof(uint64_t) * keys_count);
     _G.keys_count = keys_count;
 
-    _G.active_entity = keys[keys_count - 1];
+    _G.active_entity = keys_count ? keys[keys_count - 1] : 0;
 }
 
 
@@ -176,6 +177,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_entity_a0);
         },
         {
             CEL_UNUSED(reload);
