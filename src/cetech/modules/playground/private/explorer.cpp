@@ -11,7 +11,7 @@
 #include <cetech/modules/entity/entity.h>
 
 #include <cetech/modules/playground/asset_browser.h>
-#include <cetech/modules/playground/level_inspector.h>
+#include <cetech/modules/playground/explorer.h>
 #include <cetech/kernel/yamlng.h>
 #include <cetech/kernel/ydb.h>
 #include <cstdio>
@@ -28,6 +28,9 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
+
+#define WINDOW_NAME "Explorer"
+#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("explorer")
 
 #define _G property_inspector_global
 static struct _G {
@@ -86,7 +89,7 @@ void set_level(struct ct_world world,
     _G.is_level = is_level;
 }
 
-static ct_level_inspector_a0 level_inspector_api = {
+static ct_explorer_a0 level_inspector_api = {
         .set_level = set_level,
 
         .register_on_entity_click  = register_on_entity_click_,
@@ -159,7 +162,7 @@ static void ui_entity_item_begin(const char *name,
 
 
 static void on_debugui() {
-    if (ct_debugui_a0.BeginDock("Level inspector", &_G.visible,
+    if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
         if(_G.is_level) {
@@ -179,26 +182,29 @@ static void on_debugui() {
     ct_debugui_a0.EndDock();
 }
 
+static void on_menu_window() {
+    ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+}
+
 static void _init(ct_api_a0 *api) {
     _G = {
             .visible = true
     };
 
-    api->register_api("ct_level_inspector_a0", &level_inspector_api);
+    api->register_api("ct_explorer_a0", &level_inspector_api);
 
     ct_playground_a0.register_module(
-            ct_hash_a0.id64_from_str("level_inspector"),
+            PLAYGROUND_MODULE_NAME,
             (ct_playground_module_fce){
                     .on_ui = on_debugui,
+                    .on_menu_window = on_menu_window,
             });
 
     _G.on_entity_click.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(
-            ct_hash_a0.id64_from_str("level_inspector")
-    );
+    ct_playground_a0.unregister_module(PLAYGROUND_MODULE_NAME);
 
     _G.on_entity_click.destroy();
 

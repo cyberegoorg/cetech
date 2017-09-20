@@ -145,13 +145,13 @@ set(SOURCE_FILES
         src/cetech/modules/playground/private/level_editor.cpp
         src/cetech/modules/transform/private/transform_property.cpp
         src/cetech/modules/playground/private/entity_property.cpp
-        src/cetech/modules/playground/private/level_inspector.cpp
+        src/cetech/modules/playground/private/explorer.cpp
         src/cetech/modules/renderer/private/texture/texture_property.cpp
         src/cetech/modules/playground/private/asset_preview.cpp
         src/cetech/modules/playground/private/asset_property.cpp
         src/cetech/modules/playground/private/asset_browser.cpp
         src/cetech/modules/playground/private/playground.cpp
-        src/cetech/modules/playground/private/property_inspector.cpp
+        src/cetech/modules/playground/private/property_editor.cpp
         src/cetech/modules/playground/private/command_system.cpp
         )
 

@@ -1,29 +1,16 @@
-name: "Level 2"
+name: Level 2
 components:
-  "213213213123":
-    component_type: "transform"
-    position: [0, 0, 0]
-    rotation: [0, 0, 0]
-    scale: [1, 1, 1]
-
+  213213213123:
+    component_type: transform
+    position: [0.000000, 0.000000, 0.000000]
+    rotation: [0.000000, 0.000000, 0.000000]
+    scale: [1.000000, 1.000000, 1.000000]
 children:
-  # 3
-  "5564343313252":
-    name: "box1"
+  5564343313252:
+    name: box1
     PARENT: content/box1.entity
-
-  # 2
-#  "55643423443313252":
-#    name: "m4a1"
-#    prefab: m4a1
-
-#blabla_group:
-#  # 3
-#  "5564343313252":
-#    name: "box1"
-#    prefab: box1
-
-  # 2
-#  "55643423443313252":
-#    name: "m4a1"
-#    prefab: m4a1
+    children:
+      e432c0ed88dd461e81f50973ffb00263:
+        components:
+          32c0ed88dd461e81:
+            position: [0.000000, 4.000000, 0.000000]

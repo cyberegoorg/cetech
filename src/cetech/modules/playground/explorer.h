@@ -18,13 +18,17 @@ struct ct_world;
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_li_on_entity)(struct ct_world world, struct ct_entity level, const char* filename, uint64_t* keys, uint32_t keys_count);
+typedef void (*ct_li_on_entity)(struct ct_world world,
+                                struct ct_entity level,
+                                const char *filename,
+                                uint64_t *keys,
+                                uint32_t keys_count);
 
 //==============================================================================
 // Api
 //==============================================================================
 
-struct ct_level_inspector_a0 {
+struct ct_explorer_a0 {
     void (*set_level)(ct_world world,
                           ct_entity level,
                           uint64_t name,

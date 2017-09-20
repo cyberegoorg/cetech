@@ -10,10 +10,10 @@
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/module.h>
 
-#include <cetech/modules/playground/property_inspector.h>
+#include <cetech/modules/playground/property_editor.h>
 #include <cetech/modules/playground/asset_browser.h>
 #include <cetech/modules/playground/entity_property.h>
-#include <cetech/modules/playground/level_inspector.h>
+#include <cetech/modules/playground/explorer.h>
 #include <cetech/kernel/ydb.h>
 
 
@@ -21,9 +21,9 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_property_inspector_a0);
+CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_level_inspector_a0);
+CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
@@ -72,7 +72,9 @@ static void on_debugui() {
         return;
     }
 
-    ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
+    if (ct_debugui_a0.CollapsingHeader("Entity", DebugUITreeNodeFlags_DefaultOpen)) {
+        ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
+    }
 
     struct ct_entity entity = ct_entity_a0.find_by_guid(_G.top_entity,
                                                        _G.active_entity);
@@ -118,7 +120,7 @@ void on_entity_click(struct ct_world world,
                      const char *filename,
                      uint64_t *keys,
                      uint32_t keys_count) {
-    ct_property_inspector_a0.set_active(on_debugui);
+    ct_property_editor_a0.set_active(on_debugui);
 
     _G.active_world = world;
     _G.top_entity = level;
@@ -153,13 +155,13 @@ static void _init(ct_api_a0 *api) {
 
     _G.on_component.init(ct_memory_a0.main_allocator());
 
-    ct_level_inspector_a0.register_on_entity_click(on_entity_click);
+    ct_explorer_a0.register_on_entity_click(on_entity_click);
 }
 
 static void _shutdown() {
     _G.on_component.destroy();
 
-    ct_level_inspector_a0.unregister_on_entity_click(on_entity_click);
+    ct_explorer_a0.unregister_on_entity_click(on_entity_click);
 
     _G = {};
 }
@@ -171,9 +173,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_property_inspector_a0);
+            CETECH_GET_API(api, ct_property_editor_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_level_inspector_a0);
+            CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);

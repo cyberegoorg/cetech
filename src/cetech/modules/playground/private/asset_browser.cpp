@@ -196,6 +196,10 @@ static void on_debugui() {
     ct_debugui_a0.EndDock();
 }
 
+static void on_menu_window() {
+    ct_debugui_a0.MenuItem2("Asset browser", NULL, &_G.visible, true);
+}
+
 static void _init(ct_api_a0 *api) {
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
 
@@ -203,6 +207,7 @@ static void _init(ct_api_a0 *api) {
             ct_hash_a0.id64_from_str("asset_browser"),
             (ct_playground_module_fce){
             .on_ui = on_debugui,
+            .on_menu_window = on_menu_window,
             });
 
     _G = {};

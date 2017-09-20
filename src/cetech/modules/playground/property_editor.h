@@ -20,7 +20,7 @@ typedef void (*ct_pi_on_debugui)();
 // Api
 //==============================================================================
 
-struct ct_property_inspector_a0 {
+struct ct_property_editor_a0 {
     void (*set_active)(ct_pi_on_debugui on_debugui);
 };
 

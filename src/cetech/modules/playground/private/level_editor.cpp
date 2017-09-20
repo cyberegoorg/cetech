@@ -11,7 +11,7 @@
 #include <cetech/modules/input/input.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/playground/asset_browser.h>
-#include <cetech/modules/playground/level_inspector.h>
+#include <cetech/modules/playground/explorer.h>
 #include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/modules/application/application.h>
 #include <celib/fpumath.h>
@@ -35,7 +35,7 @@ CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_level_inspector_a0);
+CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
@@ -162,7 +162,7 @@ void on_debugui() {
 //                ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::WORLD, im);
 
                 if (ct_debugui_a0.IsMouseClicked(0, false)) {
-                    ct_level_inspector_a0.set_level(_G.world[i], _G.entity[i],
+                    ct_explorer_a0.set_level(_G.world[i], _G.entity[i],
                                                     _G.entity_name[i],
                                                     _G.root[i], _G.path[i],
                                                     false);
@@ -247,7 +247,7 @@ static void open(uint64_t name,
     _G.root[idx] = root;
     _G.entity_name[idx] = name;
 
-    ct_level_inspector_a0.set_level(_G.world[idx], _G.entity[idx],
+    ct_explorer_a0.set_level(_G.world[idx], _G.entity[idx],
                                     _G.entity_name[idx], _G.root[idx],
                                     _G.path[idx], is_level);
 
@@ -363,7 +363,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_level_inspector_a0);
+            CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_playground_a0);
         },
         {

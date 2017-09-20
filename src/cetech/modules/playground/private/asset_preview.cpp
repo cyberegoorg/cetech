@@ -218,6 +218,10 @@ void unregister_type_preview(uint64_t type) {
     map::remove(_G.preview_fce, type);
 }
 
+static void on_menu_window() {
+    ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
+}
+
 static ct_asset_preview_a0 asset_preview_api = {
         .register_type_preview = register_type_preview,
         .unregister_type_preview = unregister_type_preview
@@ -236,6 +240,7 @@ static void _init(ct_api_a0 *api) {
                     .on_render = render,
                     .on_update = update,
                     .on_ui = on_debugui,
+                    .on_menu_window = on_menu_window,
             });
 
     ct_asset_browser_a0.register_on_asset_click(set_asset);

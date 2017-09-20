@@ -13,7 +13,7 @@ components:
     material: "content/material1"
 
 children:
-  "4rccr43tv54vy54by63":
+  "23321321312dsaczx4234331453252":
     components:
       "234234331453252":
         component_type: "transform"
@@ -21,7 +21,7 @@ children:
         rotation: [0, 0, 0]
         scale: [1, 1, 1]
 
-      "c25436v2v64":
+      "4123213225523dsadasdqqw21324":
         component_type: "mesh_renderer"
         scene: "content/cube"
         mesh: "g_cube"

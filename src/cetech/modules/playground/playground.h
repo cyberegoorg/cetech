@@ -17,6 +17,7 @@ struct ct_playground_module_fce {
     void (*on_update)(float dt);
     void (*on_render)();
     void (*on_ui)();
+    void (*on_menu_window)();
 };
 
 //==============================================================================

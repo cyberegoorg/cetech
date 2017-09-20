@@ -1,7 +1,7 @@
 #include "celib/map.inl"
 
 #include <cetech/modules/debugui/debugui.h>
-#include <cetech/modules/playground/property_inspector.h>
+#include <cetech/modules/playground/property_editor.h>
 #include <cetech/modules/playground/asset_property.h>
 #include <cetech/kernel/resource.h>
 #include <cetech/modules/playground/asset_browser.h>
@@ -16,7 +16,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_property_inspector_a0);
+CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 
 using namespace celib;
@@ -60,7 +60,7 @@ static void set_asset(uint64_t type,
     _G.active_name = name;
     _G.active_path = path;
 
-    ct_property_inspector_a0.set_active(on_debugui);
+    ct_property_editor_a0.set_active(on_debugui);
 }
 
 static ct_asset_property_a0 asset_property_api = {
@@ -94,7 +94,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_property_inspector_a0);
+            CETECH_GET_API(api, ct_property_editor_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
         },
         {

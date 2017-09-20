@@ -58,7 +58,7 @@ struct ct_ent_cmd_s {
     ct_entity entity;
 
     // ENT YAML
-    const char* filename;
+    const char *filename;
     uint64_t keys[32];
     uint32_t keys_count;
 };
@@ -83,39 +83,43 @@ struct ct_ent_cmd_str_s {
 
 static void set_pos_cmd(const struct ct_cmd *cmd,
                         bool inverse) {
-    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s*)cmd;
+    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
 
-    const float* value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
+    const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
 
-    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys, pos_cmd->ent.keys_count, (float*)value);
+    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys,
+                       pos_cmd->ent.keys_count, (float *) value);
 
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world, pos_cmd->ent.entity);
-    ct_transform_a0.set_position(t, (float*)value);
+    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
+                                         pos_cmd->ent.entity);
+    ct_transform_a0.set_position(t, (float *) value);
 }
 
 static void set_scale_cmd(const struct ct_cmd *cmd,
-                         bool inverse) {
-    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s*)cmd;
+                          bool inverse) {
+    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
 
-    const float* value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
+    const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
 
-    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys, pos_cmd->ent.keys_count, (float*)value);
+    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys,
+                       pos_cmd->ent.keys_count, (float *) value);
 
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world, pos_cmd->ent.entity);
-    ct_transform_a0.set_scale(t, (float*)value);
+    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
+                                         pos_cmd->ent.entity);
+    ct_transform_a0.set_scale(t, (float *) value);
 }
 
 
 static void set_rotation_cmd(const struct ct_cmd *cmd,
-                          bool inverse) {
-    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s*)cmd;
+                             bool inverse) {
+    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
 
-    const float* value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
+    const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
 
     ct_ydb_a0.set_vec3(pos_cmd->ent.filename,
                        pos_cmd->ent.keys,
                        pos_cmd->ent.keys_count,
-                       (float*)value);
+                       (float *) value);
 
     float rad_rot[3];
     float norm_rot[3];
@@ -124,7 +128,8 @@ static void set_rotation_cmd(const struct ct_cmd *cmd,
     quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
     quat_norm(norm_rot, q);
 
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world, pos_cmd->ent.entity);
+    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
+                                         pos_cmd->ent.entity);
     ct_transform_a0.set_rotation(t, norm_rot);
 }
 
@@ -133,12 +138,14 @@ static void on_component(struct ct_world world,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
-
     if (!ct_transform_a0.has(world, entity)) {
         return;
     }
     ct_transform t = ct_transform_a0.get(world, entity);
 
+    if (!ct_debugui_a0.CollapsingHeader("Transformation", DebugUITreeNodeFlags_DefaultOpen)) {
+        return;
+    }
 
     //==========================================================================
     // Position
@@ -159,15 +166,16 @@ static void on_component(struct ct_world world,
 
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
-                    .description = {"set entity position"},
-                    .size = sizeof(struct ct_ent_cmd_vec3_s),
-                    .type = ct_hash_a0.id64_from_str("transform_set_position"),
+                        .description = {"set entity position"},
+                        .size = sizeof(struct ct_ent_cmd_vec3_s),
+                        .type = ct_hash_a0.id64_from_str(
+                                "transform_set_position"),
                 },
                 .ent = {
-                    .world = world,
-                    .entity = entity,
-                    .filename = filename,
-                    .keys_count = keys_count + 1,
+                        .world = world,
+                        .entity = entity,
+                        .filename = filename,
+                        .keys_count = keys_count + 1,
                 },
                 .new_value = {pos_new[0], pos_new[1], pos_new[2]},
                 .old_value = {pos[0], pos[1], pos[2]},
@@ -199,9 +207,10 @@ static void on_component(struct ct_world world,
 
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
+                        .type = ct_hash_a0.id64_from_str(
+                                "transform_set_rotation"),
                         .description = {"set entity rotation"},
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
-                        .type = ct_hash_a0.id64_from_str("transform_set_rotation"),
                 },
                 .ent = {
                         .world = world,

@@ -2,29 +2,16 @@ name: Level 1
 components:
   213213213123:
     component_type: transform
-    position: [0.000000, 0.000000, 0.000000]
+    position: [0.000000, 1.000000, 0.000000]
     rotation: [0.000000, 0.000000, 0.000000]
     scale: [1.000000, 1.000000, 1.000000]
 children:
   5564343313252:
     name: box1
     PARENT: content/box1.entity
-    components:
-      2342343313252:
-        position: [5.000000, -84.000008, 0.000000]
   55643423443313252:
     name: m4a1
     PARENT: content/m4a1.entity
-    components:
-      2342343313252:
-        position: [64.000000, 46.000004, 103.000008]
-        rotation: [126.000000, 0.000000, 131.000000]
   55643433135454252:
     name: box2
     PARENT: content/box2.entity
-    components:
-      234234331453252:
-        position: [-1.000000, 7.000000, 20.000000]
-        rotation: [45.000000, 0.000000, 0.000000]
-      41232132255234:
-        material: content/material2

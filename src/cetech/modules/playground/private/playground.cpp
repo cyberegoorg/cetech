@@ -20,6 +20,7 @@
 #include <cetech/modules/camera/camera.h>
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/playground/command_system.h>
+#include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
@@ -88,20 +89,32 @@ namespace playground {
                 ct_debugui_a0.EndMenu();
             }
 
-            if (ct_debugui_a0.BeginMenu("Layout", true)) {
-                if (ct_debugui_a0.MenuItem("Save", NULL, false, true )) {
-                    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "core/default.dock_layout", FS_OPEN_WRITE);
-                    ct_debugui_a0.SaveDock(f);
-                    ct_filesystem_a0.close(f);
+            if(ct_debugui_a0.BeginMenu("Window", true)) {
+                if (ct_debugui_a0.BeginMenu("Layout", true)) {
+                    if (ct_debugui_a0.MenuItem("Save", NULL, false, true )) {
+                        ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "core/default.dock_layout", FS_OPEN_WRITE);
+                        ct_debugui_a0.SaveDock(f);
+                        ct_filesystem_a0.close(f);
+                    }
+
+                    if (ct_debugui_a0.MenuItem("Load", NULL, false, true)) {
+                        ct_debugui_a0.LoadDock("core/default.dock_layout");
+                    }
+                    ct_debugui_a0.EndMenu();
                 }
 
-                if (ct_debugui_a0.MenuItem("Load", NULL, false, true)) {
-                    ct_debugui_a0.LoadDock("core/default.dock_layout");
-                }
-                ct_debugui_a0.EndMenu();
-            }
+                ImGui::Separator();
 
-            if (ct_debugui_a0.BeginMenu("Run", true)) {
+                auto *it = map::begin(_G.module_map);
+                auto *it_end = map::end(_G.module_map);
+
+                while (it != it_end) {
+                    if(it->value.on_menu_window){
+                        it->value.on_menu_window();
+                    }
+
+                    ++it;
+                }
                 ct_debugui_a0.EndMenu();
             }
 
@@ -133,7 +146,6 @@ namespace playground {
 }
 
 static void on_init(){
-
     auto *it = map::begin(_G.module_map);
     auto *it_end = map::end(_G.module_map);
 
