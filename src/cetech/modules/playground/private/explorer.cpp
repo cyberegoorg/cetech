@@ -32,7 +32,7 @@ using namespace celib;
 #define WINDOW_NAME "Explorer"
 #define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("explorer")
 
-#define _G property_inspector_global
+#define _G explorer_globals
 static struct _G {
     bool visible;
 

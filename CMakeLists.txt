@@ -153,6 +153,7 @@ set(SOURCE_FILES
         src/cetech/modules/playground/private/playground.cpp
         src/cetech/modules/playground/private/property_editor.cpp
         src/cetech/modules/playground/private/command_system.cpp
+        src/cetech/modules/playground/private/log_view.cpp
         )
 
 ################################################################################

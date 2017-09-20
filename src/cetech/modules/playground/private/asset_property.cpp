@@ -5,6 +5,7 @@
 #include <cetech/modules/playground/asset_property.h>
 #include <cetech/kernel/resource.h>
 #include <cetech/modules/playground/asset_browser.h>
+#include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
 
 #include "cetech/kernel/hashlib.h"
 #include "cetech/kernel/config.h"
@@ -32,18 +33,20 @@ static struct _G {
 } _G;
 
 static void on_debugui() {
-    if (!_G.active_on_asset) {
-        return;
-    }
-
     char filename[512] = {};
     ct_resource_a0.compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                          _G.active_type, _G.active_name);
+    if(ct_debugui_a0.CollapsingHeader("Asset", DebugUITreeNodeFlags_DefaultOpen)){
+        ct_debugui_a0.InputText("asset",
+                                filename, strlen(filename),
+                                DebugInputTextFlags_ReadOnly,
+                                0, NULL);
+    }
 
-    ct_debugui_a0.InputText("asset", filename, strlen(filename),
-                            DebugInputTextFlags_ReadOnly, 0, NULL);
+    if (_G.active_on_asset) {
+        _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
+    }
 
-    _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
 }
 
 static void register_asset(uint64_t type,

@@ -22,6 +22,10 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_playground_a0);
 
+
+#define WINDOW_NAME "Asset browser"
+#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("asset_browser")
+
 using namespace celib;
 
 static struct property_inspector_global {
@@ -38,7 +42,7 @@ static struct property_inspector_global {
     char **dirtree_list;
     uint32_t dirtree_list_count;
 
-    bool reload_item_list;
+    bool need_reaload;
     char **item_list;
     uint32_t item_list_count;
 
@@ -96,7 +100,7 @@ static void dir_list_column() {
         if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
             strcpy(_G.current_dir, "");
             _G.selected_dir_hash = dir_hash;
-            _G.reload_item_list = true;
+            _G.need_reaload = true;
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
@@ -105,7 +109,7 @@ static void dir_list_column() {
             if (ImGui::Selectable(_G.dirtree_list[i], _G.selected_dir_hash == dir_hash)) {
                 strcpy(_G.current_dir, _G.dirtree_list[i]);
                 _G.selected_dir_hash = dir_hash;
-                _G.reload_item_list = true;
+                _G.need_reaload = true;
             }
         }
 
@@ -121,7 +125,7 @@ static void item_list_column() {
 
     ImGui::BeginChild("middle_col", size);
 
-    if (_G.reload_item_list) {
+    if (_G.need_reaload) {
         cel_alloc *a = ct_memory_a0.main_allocator();
 
         if(_G.item_list) {
@@ -133,7 +137,7 @@ static void item_list_column() {
                                  false, false, &_G.item_list,
                                  &_G.item_list_count, a);
 
-        _G.reload_item_list = false;
+        _G.need_reaload = false;
     }
 
     if (_G.item_list) {
@@ -171,7 +175,7 @@ static void item_list_column() {
 
 
 static void on_debugui() {
-    if (ct_debugui_a0.BeginDock("Asset browser",
+    if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
@@ -190,21 +194,20 @@ static void on_debugui() {
         ct_debugui_a0.SameLine(0.0f, -1.0f);
 
         item_list_column();
-
     }
 
     ct_debugui_a0.EndDock();
 }
 
 static void on_menu_window() {
-    ct_debugui_a0.MenuItem2("Asset browser", NULL, &_G.visible, true);
+    ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
 static void _init(ct_api_a0 *api) {
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
 
     ct_playground_a0.register_module(
-            ct_hash_a0.id64_from_str("asset_browser"),
+            PLAYGROUND_MODULE_NAME,
             (ct_playground_module_fce){
             .on_ui = on_debugui,
             .on_menu_window = on_menu_window,
@@ -220,7 +223,7 @@ static void _init(ct_api_a0 *api) {
 
 static void _shutdown() {
     ct_playground_a0.unregister_module(
-            ct_hash_a0.id64_from_str("asset_browser")
+            PLAYGROUND_MODULE_NAME
     );
 
     _G.on_asset_click.destroy();

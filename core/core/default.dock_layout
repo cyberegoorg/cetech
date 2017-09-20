@@ -26,7 +26,7 @@
   active: 1
   opened: 1
   prev: -1
-  next: -1
+  next: 11
   child0: -1
   child1: -1
   parent: 10
@@ -174,3 +174,19 @@
   child0: 1
   child1: 2
   parent: 5
+11: 
+  index: 11
+  label: Log view
+  x: 0
+  y: 532
+  location: ""
+  size_x: 572
+  size_y: 233
+  status: 0
+  active: 0
+  opened: 1
+  prev: 1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 10

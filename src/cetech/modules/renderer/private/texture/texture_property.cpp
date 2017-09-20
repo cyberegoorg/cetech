@@ -144,11 +144,12 @@ static void texture_asset(uint64_t type,
                           uint64_t name,
                           const char *path) {
     CEL_UNUSED(type);
-
-    ui_input(path);
-    ui_gen_mipmaps(path);
-    ui_is_normalmap(path);
-    ui_texture_preview(name);
+    if(ct_debugui_a0.CollapsingHeader("Texture", DebugUITreeNodeFlags_DefaultOpen)) {
+        ui_input(path);
+        ui_gen_mipmaps(path);
+        ui_is_normalmap(path);
+        ui_texture_preview(name);
+    }
 }
 
 static int _init(ct_api_a0 *api) {
