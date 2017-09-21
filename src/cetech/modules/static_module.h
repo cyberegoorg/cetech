@@ -49,6 +49,7 @@ extern "C" void init_static_modules() {
     // Playground
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(cmd_system);
+    CETECH_ADD_STATIC_MODULE(action_manager);
     CETECH_ADD_STATIC_MODULE(playground);
     CETECH_ADD_STATIC_MODULE(property_inspector);
     CETECH_ADD_STATIC_MODULE(asset_browser);

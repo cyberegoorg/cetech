@@ -21,6 +21,7 @@
 #include <cetech/modules/renderer/viewport.h>
 #include <cetech/modules/playground/command_system.h>
 #include <cetech/modules/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/modules/playground/action_manager.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
@@ -34,6 +35,7 @@ CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
+CETECH_DECL_API(ct_action_manager_a0);
 
 using namespace celib;
 
@@ -74,16 +76,21 @@ namespace playground {
             if (ct_debugui_a0.BeginMenu("Edit", true)) {
                 char buffer[128];
                 const char* txt = ct_cmd_system_a0.undo_text();
+                const char* shortcut;
 
                 sprintf(buffer, "Undo %s", txt ? txt : "");
-                if (ct_debugui_a0.MenuItem(buffer, "Ctrl+Z", false, NULL!=txt)) {
-                    ct_cmd_system_a0.undo();
+
+                shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("undo"));
+                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, NULL!=txt)) {
+                    ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("undo"));
                 }
 
+
                 txt = ct_cmd_system_a0.redo_text();
+                shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("redo"));
                 sprintf(buffer, "Redo %s", txt ? txt : "");
-                if (ct_debugui_a0.MenuItem(buffer, "Ctrl+Shift+Z", false, NULL!=txt)) {
-                    ct_cmd_system_a0.redo();
+                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, NULL!=txt)) {
+                    ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("redo"));
                 }
 
                 ct_debugui_a0.EndMenu();
@@ -175,6 +182,8 @@ void reload_layout() {
 }
 
 static void on_update(float dt) {
+    ct_action_manager_a0.check();
+
     auto *it = map::begin(_G.module_map);
     auto *it_end = map::end(_G.module_map);
 
@@ -259,6 +268,18 @@ namespace playground_module {
 
         api->register_api("ct_playground_a0", &playground_api);
 
+        ct_action_manager_a0.register_action(
+                ct_hash_a0.id64_from_str("undo"),
+                "ctrl+z",
+                ct_cmd_system_a0.undo
+        );
+
+        ct_action_manager_a0.register_action(
+                ct_hash_a0.id64_from_str("redo"),
+                "ctrl+shift+z",
+                ct_cmd_system_a0.redo
+        );
+
         ct_app_a0.register_game(ct_hash_a0.id64_from_str("playground"), playground_game);
         ct_debugui_a0.register_on_debugui(on_ui);
     }
@@ -286,6 +307,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_action_manager_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
         },
         {
