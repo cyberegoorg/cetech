@@ -18,26 +18,26 @@
   index: 1
   label: Asset browser
   x: 0
-  y: 532
+  y: 753
   location: ""
-  size_x: 572
-  size_y: 233
+  size_x: 1101
+  size_y: 292
   status: 0
   active: 1
   opened: 1
   prev: -1
-  next: 11
+  next: 10
   child0: -1
   child1: -1
-  parent: 10
+  parent: 12
 2: 
   index: 2
   label: Asset preview
-  x: 572
-  y: 532
+  x: 1101
+  y: 753
   location: ""
-  size_x: 212
-  size_y: 233
+  size_x: 327
+  size_y: 292
   status: 0
   active: 1
   opened: 1
@@ -45,7 +45,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 10
+  parent: 12
 3: 
   index: 3
   label: Level inspector
@@ -68,8 +68,8 @@
   x: 0
   y: 22
   location: ""
-  size_x: 784
-  size_y: 510
+  size_x: 1428
+  size_y: 731
   status: 0
   active: 1
   opened: 1
@@ -84,24 +84,24 @@
   x: 0
   y: 22
   location: ""
-  size_x: 784
-  size_y: 743
+  size_x: 1428
+  size_y: 1023
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
   child0: 4
-  child1: 10
+  child1: 12
   parent: 8
 6: 
   index: 6
   label: Property editor
-  x: 784
-  y: 232
+  x: 1428
+  y: 311
   location: ""
-  size_x: 240
-  size_y: 533
+  size_x: 438
+  size_y: 442
   status: 0
   active: 1
   opened: 1
@@ -109,15 +109,15 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 9
+  parent: 13
 7: 
   index: 7
   label: Explorer
-  x: 784
+  x: 1428
   y: 22
   location: ""
-  size_x: 240
-  size_y: 210
+  size_x: 438
+  size_y: 289
   status: 0
   active: 1
   opened: 1
@@ -132,8 +132,8 @@
   x: 0
   y: 22
   location: ""
-  size_x: 1024
-  size_y: 743
+  size_x: 1866
+  size_y: 1023
   status: 0
   active: 1
   opened: 0
@@ -145,27 +145,59 @@
 9: 
   index: 9
   label: ""
-  x: 784
+  x: 1428
   y: 22
   location: ""
-  size_x: 240
-  size_y: 743
+  size_x: 438
+  size_y: 1023
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
   child0: 7
-  child1: 6
+  child1: 13
   parent: 8
 10: 
   index: 10
+  label: Log view
+  x: 0
+  y: 753
+  location: ""
+  size_x: 1101
+  size_y: 292
+  status: 0
+  active: 0
+  opened: 1
+  prev: 1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 12
+11: 
+  index: 11
+  label: Command history
+  x: 1428
+  y: 753
+  location: ""
+  size_x: 438
+  size_y: 292
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 13
+12: 
+  index: 12
   label: ""
   x: 0
-  y: 532
+  y: 753
   location: ""
-  size_x: 784
-  size_y: 233
+  size_x: 1428
+  size_y: 292
   status: 0
   active: 1
   opened: 0
@@ -174,19 +206,19 @@
   child0: 1
   child1: 2
   parent: 5
-11: 
-  index: 11
-  label: Log view
-  x: 0
-  y: 532
+13: 
+  index: 13
+  label: ""
+  x: 1428
+  y: 311
   location: ""
-  size_x: 572
-  size_y: 233
+  size_x: 438
+  size_y: 734
   status: 0
-  active: 0
-  opened: 1
-  prev: 1
+  active: 1
+  opened: 0
+  prev: -1
   next: -1
-  child0: -1
-  child1: -1
-  parent: 10
+  child0: 6
+  child1: 11
+  parent: 9

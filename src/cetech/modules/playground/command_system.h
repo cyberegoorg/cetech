@@ -91,12 +91,16 @@ struct ct_cmd_system_a0 {
                                  ct_cmd_execute_t execute);
 
     void (*undo)();
-
     void (*redo)();
 
     const char *(*undo_text)();
-
     const char *(*redo_text)();
+
+    const char *(*command_text)(uint32_t idx);
+    uint32_t (*command_count)();
+
+    uint32_t (*curent_idx)();
+    void (*goto_idx)(uint32_t idx);
 };
 
 #ifdef __cplusplus

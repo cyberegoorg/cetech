@@ -142,6 +142,37 @@ const char* redo_text() {
     return next_cmd->description;
 }
 
+const char *command_text(uint32_t idx) {
+    const struct ct_cmd* cmd = (const struct ct_cmd* ) &_G.cmd_buffer[_G.cmd[idx]];
+    return cmd->description;
+}
+
+uint32_t command_count() {
+    return array::size(_G.cmd) - 1;
+}
+
+void goto_idx(uint32_t idx) {
+    int diff = _G.curent_pos - idx;
+
+    if(!diff) {
+        return;
+    }
+
+    if( diff < 0 ){
+        diff = -diff;
+        for (int i = 0; i < diff; ++i) {
+            redo();
+        }
+    } else {
+        for (int i = 0; i < diff; ++i) {
+            undo();
+        }
+    }
+}
+
+uint32_t curent_idx() {
+    return _G.curent_pos;
+}
 
 static struct ct_cmd_system_a0 cmd_system_a0 = {
         .execute = execute,
@@ -150,6 +181,10 @@ static struct ct_cmd_system_a0 cmd_system_a0 = {
         .redo = redo,
         .undo_text = undo_text,
         .redo_text = redo_text,
+        .command_text = command_text,
+        .command_count= command_count,
+        .curent_idx = curent_idx,
+        .goto_idx = goto_idx,
 };
 
 
