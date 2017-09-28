@@ -37,13 +37,13 @@ static void ui_command_list() {
     const uint32_t current_idx = ct_cmd_system_a0.curent_idx();
 
     char buffer[128];
+    char buffer2[128];
 
     for (uint32_t i = command_count; i > 0; --i) {
-        const char *command_text = ct_cmd_system_a0.command_text(i);
+        ct_cmd_system_a0.command_text(buffer2, CETECH_ARRAY_LEN(buffer2), i);
         const bool is_selected = current_idx == i;
 
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "%s##cmd_%d", command_text,
-                 i);
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
 
         if (ImGui::Selectable(buffer, is_selected)) {
             ct_cmd_system_a0.goto_idx(i);

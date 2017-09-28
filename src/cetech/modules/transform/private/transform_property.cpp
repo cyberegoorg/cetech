@@ -133,6 +133,46 @@ static void set_rotation_cmd(const struct ct_cmd *cmd,
     ct_transform_a0.set_rotation(t, norm_rot);
 }
 
+static void cmd_description(char *buffer,
+                            uint32_t buffer_size,
+                            const struct ct_cmd *cmd,
+                            bool inverse) {
+    static const uint64_t set_position = ct_hash_a0.id64_from_str(
+            "transform_set_position");
+    static const uint64_t set_rotation = ct_hash_a0.id64_from_str(
+            "transform_set_rotation");
+    static const uint64_t set_scale = ct_hash_a0.id64_from_str(
+            "transform_set_scale");
+
+    if (cmd->type == set_position) {
+        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        snprintf(buffer, buffer_size,
+                 "Set ent position [%f, %f, %f] -> [%f, %f, %f]",
+                 ent_cmd->old_value[0], ent_cmd->old_value[1],
+                 ent_cmd->old_value[2],
+                 ent_cmd->new_value[0], ent_cmd->new_value[1],
+                 ent_cmd->new_value[2]);
+
+    } else if (cmd->type == set_rotation) {
+        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        snprintf(buffer, buffer_size,
+                 "Set ent rotation [%f, %f, %f] -> [%f, %f, %f]",
+                 ent_cmd->old_value[0], ent_cmd->old_value[1],
+                 ent_cmd->old_value[2],
+                 ent_cmd->new_value[0], ent_cmd->new_value[1],
+                 ent_cmd->new_value[2]);
+
+    } else if (cmd->type == set_scale) {
+        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        snprintf(buffer, buffer_size,
+                 "Set ent scale [%f, %f, %f] -> [%f, %f, %f]",
+                 ent_cmd->old_value[0], ent_cmd->old_value[1],
+                 ent_cmd->old_value[2],
+                 ent_cmd->new_value[0], ent_cmd->new_value[1],
+                 ent_cmd->new_value[2]);
+    }
+}
+
 static void on_component(struct ct_world world,
                          struct ct_entity entity,
                          const char *filename,
@@ -143,7 +183,8 @@ static void on_component(struct ct_world world,
     }
     ct_transform t = ct_transform_a0.get(world, entity);
 
-    if (!ct_debugui_a0.CollapsingHeader("Transformation", DebugUITreeNodeFlags_DefaultOpen)) {
+    if (!ct_debugui_a0.CollapsingHeader("Transformation",
+                                        DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
 
@@ -166,7 +207,6 @@ static void on_component(struct ct_world world,
 
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
-                        .description = {"set entity position"},
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = ct_hash_a0.id64_from_str(
                                 "transform_set_position"),
@@ -209,7 +249,6 @@ static void on_component(struct ct_world world,
                 .header = {
                         .type = ct_hash_a0.id64_from_str(
                                 "transform_set_rotation"),
-                        .description = {"set entity rotation"},
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                 },
                 .ent = {
@@ -241,7 +280,6 @@ static void on_component(struct ct_world world,
 
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
-                        .description = {"set entity scale"},
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = ct_hash_a0.id64_from_str("transform_set_scale"),
                 },
@@ -270,15 +308,15 @@ static int _init(ct_api_a0 *api) {
 
     ct_cmd_system_a0.register_cmd_execute(
             ct_hash_a0.id64_from_str("transform_set_position"),
-            set_pos_cmd);
+            (ct_cmd_fce) {.execute = set_pos_cmd, .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             ct_hash_a0.id64_from_str("transform_set_scale"),
-            set_scale_cmd);
+            (ct_cmd_fce) {.execute = set_scale_cmd, .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             ct_hash_a0.id64_from_str("transform_set_rotation"),
-            set_rotation_cmd);
+            (ct_cmd_fce) {.execute = set_rotation_cmd, .description = cmd_description});
 
     return 1;
 }

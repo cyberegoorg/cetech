@@ -75,21 +75,23 @@ namespace playground {
 
             if (ct_debugui_a0.BeginMenu("Edit", true)) {
                 char buffer[128];
-                const char* txt = ct_cmd_system_a0.undo_text();
+                char buffer2[128];
+
+                ct_cmd_system_a0.undo_text(buffer2, CETECH_ARRAY_LEN(buffer2));
                 const char* shortcut;
 
-                sprintf(buffer, "Undo %s", txt ? txt : "");
+                sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
 
                 shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("undo"));
-                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, NULL!=txt)) {
+                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, buffer2[0] != '0')) {
                     ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("undo"));
                 }
 
 
-                txt = ct_cmd_system_a0.redo_text();
+                ct_cmd_system_a0.redo_text(buffer2, CETECH_ARRAY_LEN(buffer2));
                 shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("redo"));
-                sprintf(buffer, "Redo %s", txt ? txt : "");
-                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, NULL!=txt)) {
+                sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
+                if (ct_debugui_a0.MenuItem(buffer, shortcut, false, buffer2[0] != '0')) {
                     ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("redo"));
                 }
 

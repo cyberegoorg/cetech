@@ -72,6 +72,26 @@ static void ui_input(const char *path) {
                             DebugInputTextFlags_ReadOnly, 0, NULL);
 }
 
+static void cmd_description(char *buffer,
+                            uint32_t buffer_size,
+                            const struct ct_cmd *cmd,
+                            bool inverse) {
+    static const uint64_t set_mipmaps = ct_hash_a0.id64_from_str(
+            "texture_set_mipmaps");
+    static const uint64_t set_normalmap = ct_hash_a0.id64_from_str(
+            "texture_set_normalmap");
+
+    if (cmd->type == set_mipmaps) {
+        struct ct_ydb_cmd_bool_s *ydb_cmd = (struct ct_ydb_cmd_bool_s *) cmd;
+        snprintf(buffer, buffer_size, "%s texture mipmaps",
+                 ydb_cmd->new_value ? "Enable" : "Disable");
+    } else if (cmd->type == set_normalmap) {
+        struct ct_ydb_cmd_bool_s *ydb_cmd = (struct ct_ydb_cmd_bool_s *) cmd;
+        snprintf(buffer, buffer_size, "%s texture normalmap",
+                 ydb_cmd->new_value ? "Enable" : "Disable");
+    }
+}
+
 static void ui_gen_mipmaps(const char *path) {
     uint64_t tmp_keys = ct_yng_a0.calc_key("gen_mipmaps");
 
@@ -81,9 +101,8 @@ static void ui_gen_mipmaps(const char *path) {
     if (ct_debugui_a0.Checkbox("gen mipmaps", &new_gen_mipmaps)) {
         struct ct_ydb_cmd_bool_s cmd = {
                 .header = {
-                        .description = {"set texture mipmaps"},
                         .size = sizeof(struct ct_ydb_cmd_bool_s),
-                        .type = ct_hash_a0.id64_from_str("texture_set_bool"),
+                        .type = ct_hash_a0.id64_from_str("texture_set_mipmaps"),
                 },
 
                 .ydb = {
@@ -108,9 +127,9 @@ static void ui_is_normalmap(const char *path) {
     if (ct_debugui_a0.Checkbox("is normalmap", &new_is_normalmap)) {
         struct ct_ydb_cmd_bool_s cmd = {
                 .header = {
-                        .description = {"set texture normalmap"},
                         .size = sizeof(struct ct_ydb_cmd_bool_s),
-                        .type = ct_hash_a0.id64_from_str("texture_set_bool"),
+                        .type = ct_hash_a0.id64_from_str(
+                                "texture_set_normalmap"),
                 },
 
                 .ydb = {
@@ -144,7 +163,8 @@ static void texture_asset(uint64_t type,
                           uint64_t name,
                           const char *path) {
     CEL_UNUSED(type);
-    if(ct_debugui_a0.CollapsingHeader("Texture", DebugUITreeNodeFlags_DefaultOpen)) {
+    if (ct_debugui_a0.CollapsingHeader("Texture",
+                                       DebugUITreeNodeFlags_DefaultOpen)) {
         ui_input(path);
         ui_gen_mipmaps(path);
         ui_is_normalmap(path);
@@ -162,8 +182,12 @@ static int _init(ct_api_a0 *api) {
             texture_asset);
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("texture_set_bool"),
-            set_ydb_bool_cmd);
+            ct_hash_a0.id64_from_str("texture_set_mipmaps"),
+            (struct ct_cmd_fce) {.execute = set_ydb_bool_cmd, .description = cmd_description});
+
+    ct_cmd_system_a0.register_cmd_execute(
+            ct_hash_a0.id64_from_str("texture_set_normalmap"),
+            (struct ct_cmd_fce) {.execute = set_ydb_bool_cmd, .description = cmd_description});
 
     return 1;
 }
