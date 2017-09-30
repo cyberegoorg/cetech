@@ -144,7 +144,7 @@ namespace shader {
     int shader_init(ct_api_a0 *api) {
         _G = {};
 
-        _G.type = ct_hash_a0.id64_from_str("shader");
+        _G.type = CT_ID64_0("shader");
 
         _G.handler_map.init(ct_memory_a0.main_allocator());
 

@@ -76,9 +76,9 @@ static void cmd_description(char *buffer,
                             uint32_t buffer_size,
                             const struct ct_cmd *cmd,
                             bool inverse) {
-    static const uint64_t set_mipmaps = ct_hash_a0.id64_from_str(
+    static const uint64_t set_mipmaps = CT_ID64_0(
             "texture_set_mipmaps");
-    static const uint64_t set_normalmap = ct_hash_a0.id64_from_str(
+    static const uint64_t set_normalmap = CT_ID64_0(
             "texture_set_normalmap");
 
     if (cmd->type == set_mipmaps) {
@@ -102,7 +102,7 @@ static void ui_gen_mipmaps(const char *path) {
         struct ct_ydb_cmd_bool_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ydb_cmd_bool_s),
-                        .type = ct_hash_a0.id64_from_str("texture_set_mipmaps"),
+                        .type = CT_ID64_0("texture_set_mipmaps"),
                 },
 
                 .ydb = {
@@ -128,8 +128,7 @@ static void ui_is_normalmap(const char *path) {
         struct ct_ydb_cmd_bool_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ydb_cmd_bool_s),
-                        .type = ct_hash_a0.id64_from_str(
-                                "texture_set_normalmap"),
+                        .type = CT_ID64_0("texture_set_normalmap"),
                 },
 
                 .ydb = {
@@ -178,15 +177,15 @@ static int _init(ct_api_a0 *api) {
     _G = {};
 
     ct_asset_property_a0.register_asset(
-            ct_hash_a0.id64_from_str("texture"),
+            CT_ID64_0("texture"),
             texture_asset);
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("texture_set_mipmaps"),
+            CT_ID64_0("texture_set_mipmaps"),
             (struct ct_cmd_fce) {.execute = set_ydb_bool_cmd, .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("texture_set_normalmap"),
+            CT_ID64_0("texture_set_normalmap"),
             (struct ct_cmd_fce) {.execute = set_ydb_bool_cmd, .description = cmd_description});
 
     return 1;

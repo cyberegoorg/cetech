@@ -24,7 +24,7 @@ CETECH_DECL_API(ct_cmd_system_a0);
 using namespace celib;
 
 #define WINDOW_NAME "Command history"
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("command_history")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
 
 #define _G command_history_global
 static struct _G {

@@ -45,7 +45,7 @@ void expire_document_in_cache(const char *path,
 
 ct_yng_doc *load_to_cache(const char *path,
                           uint64_t path_key) {
-    static const uint64_t fs_root = ct_hash_a0.id64_from_str("source");
+    static const uint64_t fs_root = CT_ID64_0("source");
 
     ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
 
@@ -71,7 +71,7 @@ ct_yng_doc *load_to_cache(const char *path,
 }
 
 ct_yng_doc *get(const char *path) {
-    uint64_t path_key = ct_hash_a0.id64_from_str(path);
+    uint64_t path_key = CT_ID64_0(path);
 
     struct ct_yng_doc *doc;
     doc = map::get<ct_yng_doc *>(_G.document_cache, path_key, NULL);
@@ -85,7 +85,7 @@ ct_yng_doc *get(const char *path) {
 
 void free(const char *path) {
     CEL_UNUSED(path);
-    //expire_document_in_cache(path, ct_hash_a0.id64_from_str(path));
+    //expire_document_in_cache(path, CT_ID64_0(path));
 
     // TODO: ref counting
 }
@@ -312,7 +312,7 @@ void get_mat4(const char *path,
 
 
 void modified(const char *path) {
-    uint64_t hash = ct_hash_a0.id64_from_str(path);
+    uint64_t hash = CT_ID64_0(path);
 
     if (!map::has(_G.modified_files, hash)) {
         char *new_str = ct_memory_a0.str_dup(path,
@@ -322,7 +322,7 @@ void modified(const char *path) {
 }
 
 void unmodified(const char *path) {
-    uint64_t hash = ct_hash_a0.id64_from_str(path);
+    uint64_t hash = CT_ID64_0(path);
 
     if (map::has(_G.modified_files, hash)) {
         char *new_str = map::get<char *>(_G.modified_files, hash, NULL);
@@ -476,7 +476,7 @@ void parent_files(const char *path,
 void check_fs() {
     cel_alloc *alloc = ct_memory_a0.main_allocator();
 
-    static uint64_t root = ct_hash_a0.id64_from_str("source");
+    static uint64_t root = CT_ID64_0("source");
 
     auto *wd_it = ct_filesystem_a0.event_begin(root);
     const auto *wd_end = ct_filesystem_a0.event_end(root);
@@ -486,7 +486,7 @@ void check_fs() {
             ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
 
             char *path = ct_path_a0.join(alloc, 2, ev->dir, ev->filename);
-            uint64_t path_key = ct_hash_a0.id64_from_str(path);
+            uint64_t path_key = CT_ID64_0(path);
 
             if (map::has(_G.document_cache, path_key)) {
                 ct_log_a0.debug(LOG_WHERE, "Reload cached file %s", path);
@@ -504,7 +504,7 @@ void check_fs() {
 
 
 void save(const char *path) {
-    ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), path,
+    ct_vio *f = ct_filesystem_a0.open(CT_ID64_0("source"), path,
                                       FS_OPEN_WRITE);
 
     if (!f) {

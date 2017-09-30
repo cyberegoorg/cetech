@@ -24,7 +24,7 @@ CETECH_DECL_API(ct_playground_a0);
 
 
 #define WINDOW_NAME "Asset browser"
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("asset_browser")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("asset_browser")
 
 using namespace celib;
 
@@ -107,7 +107,7 @@ static void ui_breadcrumb(const char *dir) {
 
     ct_debugui_a0.SameLine(0.0f, -1.0f);
     if (ct_debugui_a0.Button("Source", (float[2]) {0.0f})) {
-        uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
+        uint64_t dir_hash = CT_ID64_0(".");
         set_current_dir("", dir_hash);
     }
 
@@ -122,7 +122,7 @@ static void ui_breadcrumb(const char *dir) {
             if (ct_debugui_a0.Button(buffer, (float[2]) {0.0f})) {
                 char tmp_dir[128] = {0};
                 strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
-                uint64_t dir_hash = ct_hash_a0.id64_from_str(tmp_dir);
+                uint64_t dir_hash = CT_ID64_0(tmp_dir);
                 set_current_dir(tmp_dir, dir_hash);
             };
 
@@ -139,21 +139,21 @@ static void ui_dir_list() {
 
     if (!_G.dirtree_list) {
         cel_alloc *a = ct_memory_a0.main_allocator();
-        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"), "", "*",
+        ct_filesystem_a0.listdir(CT_ID64_0("source"), "", "*",
                                  true, true, &_G.dirtree_list,
                                  &_G.dirtree_list_count, a);
     }
 
 
     if (ImGui::TreeNode("Source")) {
-        uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
+        uint64_t dir_hash = CT_ID64_0(".");
 
         if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
             set_current_dir("", dir_hash);
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
-            dir_hash = ct_hash_a0.id64_from_str(_G.dirtree_list[i]);
+            dir_hash = CT_ID64_0(_G.dirtree_list[i]);
 
             if (ImGui::Selectable(_G.dirtree_list[i],
                                   _G.selected_dir_hash == dir_hash)) {
@@ -185,12 +185,12 @@ static void ui_asset_list() {
             ct_filesystem_a0.listdir_free(_G.dir_list, _G.dir_list_count, a);
         }
 
-        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+        ct_filesystem_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  false, false, &_G.asset_list,
                                  &_G.asset_list_count, a);
 
-        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+        ct_filesystem_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  true, false, &_G.dir_list,
                                  &_G.dir_list_count, a);
@@ -203,7 +203,7 @@ static void ui_asset_list() {
         for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
             const char *path = _G.dir_list[i];
             ct_path_a0.dirname(dirname, path);
-            uint64_t filename_hash = ct_hash_a0.id64_from_str(dirname);
+            uint64_t filename_hash = CT_ID64_0(dirname);
 
             if (!_G.asset_filter.PassFilter(dirname)) {
                 continue;
@@ -214,7 +214,7 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    set_current_dir(path, ct_hash_a0.id64_from_str(path));
+                    set_current_dir(path, CT_ID64_0(path));
                 }
             }
         }
@@ -224,7 +224,7 @@ static void ui_asset_list() {
         for (uint32_t i = 0; i < _G.asset_list_count; ++i) {
             const char *path = _G.asset_list[i];
             const char *filename = ct_path_a0.filename(path);
-            uint64_t filename_hash = ct_hash_a0.id64_from_str(filename);
+            uint64_t filename_hash = CT_ID64_0(filename);
 
             if (!_G.asset_filter.PassFilter(filename)) {
                 continue;
@@ -243,15 +243,13 @@ static void ui_asset_list() {
                     for (uint32_t j = 0;
                          j < array::size(_G.on_asset_double_click); ++j) {
                         _G.on_asset_double_click[j](type, name,
-                                                    ct_hash_a0.id64_from_str(
-                                                            "source"), path);
+                                                    CT_ID64_0("source"), path);
                     }
                 } else {
                     for (uint32_t j = 0;
                          j < array::size(_G.on_asset_click); ++j) {
                         _G.on_asset_click[j](type, name,
-                                             ct_hash_a0.id64_from_str("source"),
-                                             path);
+                                             CT_ID64_0("source"),path);
                     }
                 }
             }

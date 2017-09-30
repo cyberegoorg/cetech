@@ -281,7 +281,7 @@ namespace scene_resource_compiler {
         ct_yng_doc *d = key.d;
 
         const char *name_str = d->as_string(d->inst, key, "");
-        uint64_t name = ct_hash_a0.id64_from_str(name_str);
+        uint64_t name = CT_ID64_0(name_str);
 
         array::push_back(output->geom_name, name);
         array::push_back<uint64_t>(output->geom_node, 0);
@@ -366,7 +366,7 @@ namespace scene_resource_compiler {
         ct_yng_doc *d = key.d;
 
         const char *key_str = d->as_string(d->inst, key, "");
-        uint64_t node_name = ct_hash_a0.id64_from_str(key_str);
+        uint64_t node_name = CT_ID64_0(key_str);
 
         uint64_t keys[] = {
                 d->hash(d->inst, value),
@@ -401,7 +401,7 @@ namespace scene_resource_compiler {
                                                              geometries_k, i);
                 const char *geom_str = d->as_string(d->inst, name_node, "");
 
-                uint64_t geom_name = ct_hash_a0.id64_from_str(geom_str);
+                uint64_t geom_name = CT_ID64_0(geom_str);
                 for (uint32_t j = 0;
                      j < array::size(output->output->geom_name); ++j) {
                     if (geom_name != output->output->geom_name[j]) {
@@ -459,7 +459,7 @@ namespace scene_resource_compiler {
     void _compile_assimp_node(struct aiNode *root,
                               uint32_t parent,
                               struct compile_output *output) {
-        uint64_t name = ct_hash_a0.id64_from_str(root->mName.data);
+        uint64_t name = CT_ID64_0(root->mName.data);
 
         uint32_t idx = array::size(output->node_name);
 
@@ -515,7 +515,7 @@ namespace scene_resource_compiler {
                 memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
             }
 
-            uint64_t name_id = ct_hash_a0.id64_from_str(tmp_buffer);
+            uint64_t name_id = CT_ID64_0(tmp_buffer);
             for (uint32_t k = 0; k < array::size(output->geom_name); ++k) {
                 if (name_id == output->geom_name[k]) {
                     snprintf(tmp_buffer2, CETECH_ARRAY_LEN(tmp_buffer2), "%s%d",
@@ -527,7 +527,7 @@ namespace scene_resource_compiler {
             }
 
             array::push_back(output->geom_name,
-                             ct_hash_a0.id64_from_str(tmp_buffer));
+                             CT_ID64_0(tmp_buffer));
             array::push_back<uint64_t>(output->geom_node, 0);
             array::push_back(output->ib_offset, array::size(output->ib));
             array::push_back(output->vb_offset, array::size(output->vb));
@@ -669,7 +669,7 @@ namespace scene_resource_compiler {
         CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("scene"),
+        ct_resource_a0.compiler_register(CT_ID64_0("scene"),
                                          compiler, true);
 
         return 1;

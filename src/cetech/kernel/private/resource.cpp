@@ -296,7 +296,7 @@ namespace resource {
             return;
         }
 
-        const uint64_t root_name = ct_hash_a0.id64_from_str("build");
+        const uint64_t root_name = CT_ID64_0("build");
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
 
@@ -618,10 +618,10 @@ namespace resource_module {
         _G.resource_callbacks.init(ct_memory_a0.main_allocator());
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
-        ct_filesystem_a0.map_root_dir(ct_hash_a0.id64_from_str("build"),
+        ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
                                       ct_config_a0.get_string(_G.config.build_dir), false);
 
-        resource::resource_register_type(ct_hash_a0.id64_from_str("package"),
+        resource::resource_register_type(CT_ID64_0("package"),
                                          package_resource::package_resource_callback);
 
         package_init(api);

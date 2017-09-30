@@ -170,7 +170,7 @@ void on_debugui() {
             }
 
             auto th = ct_viewport_a0.get_local_resource(
-                    _G.viewport[i], ct_hash_a0.id64_from_str("bb_color"));
+                    _G.viewport[i], CT_ID64_0("bb_color"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
@@ -223,7 +223,7 @@ static void open(uint64_t name,
 
     _G.visible[idx] = true;
     _G.viewport[idx] = ct_viewport_a0.create(
-            ct_hash_a0.id64_from_str("default"), 0, 0);
+            CT_ID64_0("default"), 0, 0);
 
     if (UINT32_MAX != level_idx) {
         _G.world[idx] = _G.world[level_idx];
@@ -240,8 +240,7 @@ static void open(uint64_t name,
         _G.is_level[idx] = is_level;
     }
     _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
-                                            ct_hash_a0.id64_from_str(
-                                                    "content/camera"));
+                                            CT_ID64_0("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
@@ -304,12 +303,12 @@ static void on_asset_double_click(uint64_t type,
                                   uint64_t name,
                                   uint64_t root,
                                   const char *path) {
-    if (ct_hash_a0.id64_from_str("level") == type) {
+    if (CT_ID64_0("level") == type) {
         open(name, root, path, true);
         return;
     }
 
-    if (ct_hash_a0.id64_from_str("entity") == type) {
+    if (CT_ID64_0("entity") == type) {
         open(name, root, path, false);
         return;
     }
@@ -321,7 +320,7 @@ static void _init(ct_api_a0 *api) {
     };
 
     ct_playground_a0.register_module(
-            ct_hash_a0.id64_from_str("level_editor"),
+            CT_ID64_0("level_editor"),
             (ct_playground_module_fce) {
                     .on_init = init,
                     .on_shutdown = shutdown,
@@ -338,7 +337,7 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
 
     ct_playground_a0.unregister_module(
-            ct_hash_a0.id64_from_str("level_editor")
+            CT_ID64_0("level_editor")
     );
 
 

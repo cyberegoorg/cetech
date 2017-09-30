@@ -132,7 +132,7 @@ namespace texture {
     int texture_init(ct_api_a0 *api) {
         _G = {};
 
-        _G.type = ct_hash_a0.id64_from_str("texture");
+        _G.type = CT_ID64_0("texture");
 
         _G.handler_map.init(ct_memory_a0.main_allocator());
 

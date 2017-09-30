@@ -168,7 +168,7 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_ydb_a0);
 
         ct_resource_a0.compiler_register(
-                ct_hash_a0.id64_from_str("texture"),
+                CT_ID64_0("texture"),
                 compiler, true);
 
         return 1;

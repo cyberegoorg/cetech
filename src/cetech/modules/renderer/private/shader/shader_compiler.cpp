@@ -223,7 +223,7 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("shader"), compiler, true);
+        ct_resource_a0.compiler_register(CT_ID64_0("shader"), compiler, true);
 
         return 1;
     }

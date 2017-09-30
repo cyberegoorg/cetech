@@ -219,7 +219,7 @@ namespace scene {
 
         _G = {};
 
-        _G.type = ct_hash_a0.id64_from_str("scene");
+        _G.type = CT_ID64_0("scene");
 
         _G.scene_instance_array.init(ct_memory_a0.main_allocator());
         _G.scene_instance_map.init(ct_memory_a0.main_allocator());

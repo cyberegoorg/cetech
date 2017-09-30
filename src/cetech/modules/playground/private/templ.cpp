@@ -14,7 +14,7 @@ CETECH_DECL_API(ct_hash_a0);
 
 using namespace celib;
 
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("action_manager")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("action_manager")
 
 #define _G action_manager_global
 static struct _G {

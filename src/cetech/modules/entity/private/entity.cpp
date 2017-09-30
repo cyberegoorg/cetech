@@ -289,7 +289,7 @@ namespace entity_resource_compiler {
             return;
         }
 
-        cid = ct_hash_a0.id64_from_str(component_type);
+        cid = CT_ID64_0(component_type);
         for (uint32_t i = 0; i < array::size(output->component_type); ++i) {
             if (output->component_type[i] != cid) {
                 continue;
@@ -682,8 +682,8 @@ namespace entity_module {
 
         _G = {};
 
-        _G.type = ct_hash_a0.id64_from_str("entity");
-        _G.level_type = ct_hash_a0.id64_from_str("level");
+        _G.type = CT_ID64_0("entity");
+        _G.level_type = CT_ID64_0("level");
 
         _G.spawned_map.init(ct_memory_a0.main_allocator());
         _G.spawned_array.init(ct_memory_a0.main_allocator());

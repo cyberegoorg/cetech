@@ -22,7 +22,7 @@ CETECH_DECL_API(ct_log_a0);
 using namespace celib;
 
 #define WINDOW_NAME "Log view"
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("log_view")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")
 #define LOG_FORMAT "%s -> %s"
 
 struct log_item {

@@ -66,7 +66,7 @@ static void _init(struct ct_api_a0 *api) {
     CEL_UNUSED(api);
 
     ct_viewport_a0.register_layer_pass(
-            ct_hash_a0.id64_from_str("geometry"),
+            CT_ID64_0("geometry"),
             geometry_pass);
 }
 

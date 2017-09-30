@@ -137,11 +137,11 @@ static void cmd_description(char *buffer,
                             uint32_t buffer_size,
                             const struct ct_cmd *cmd,
                             bool inverse) {
-    static const uint64_t set_position = ct_hash_a0.id64_from_str(
+    static const uint64_t set_position = CT_ID64_0(
             "transform_set_position");
-    static const uint64_t set_rotation = ct_hash_a0.id64_from_str(
+    static const uint64_t set_rotation = CT_ID64_0(
             "transform_set_rotation");
-    static const uint64_t set_scale = ct_hash_a0.id64_from_str(
+    static const uint64_t set_scale = CT_ID64_0(
             "transform_set_scale");
 
     if (cmd->type == set_position) {
@@ -208,8 +208,7 @@ static void on_component(struct ct_world world,
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
-                        .type = ct_hash_a0.id64_from_str(
-                                "transform_set_position"),
+                        .type = CT_ID64_0("transform_set_position"),
                 },
                 .ent = {
                         .world = world,
@@ -247,8 +246,7 @@ static void on_component(struct ct_world world,
 
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
-                        .type = ct_hash_a0.id64_from_str(
-                                "transform_set_rotation"),
+                        .type = CT_ID64_0("transform_set_rotation"),
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                 },
                 .ent = {
@@ -281,7 +279,7 @@ static void on_component(struct ct_world world,
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
-                        .type = ct_hash_a0.id64_from_str("transform_set_scale"),
+                        .type = CT_ID64_0("transform_set_scale"),
                 },
                 .ent = {
                         .world = world,
@@ -303,19 +301,19 @@ static int _init(ct_api_a0 *api) {
     _G = {};
 
     ct_entity_property_a0.register_component(
-            ct_hash_a0.id64_from_str("transform"),
+            CT_ID64_0("transform"),
             on_component);
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("transform_set_position"),
+            CT_ID64_0("transform_set_position"),
             (ct_cmd_fce) {.execute = set_pos_cmd, .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("transform_set_scale"),
+            CT_ID64_0("transform_set_scale"),
             (ct_cmd_fce) {.execute = set_scale_cmd, .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
-            ct_hash_a0.id64_from_str("transform_set_rotation"),
+            CT_ID64_0("transform_set_rotation"),
             (ct_cmd_fce) {.execute = set_rotation_cmd, .description = cmd_description});
 
     return 1;
@@ -324,7 +322,7 @@ static int _init(ct_api_a0 *api) {
 static void _shutdown() {
 
     ct_entity_property_a0.unregister_component(
-            ct_hash_a0.id64_from_str("transform"));
+            CT_ID64_0("transform"));
 
     _G = {};
 }

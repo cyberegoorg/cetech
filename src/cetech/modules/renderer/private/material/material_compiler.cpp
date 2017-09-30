@@ -83,7 +83,7 @@ namespace material_compiler {
                         const char *v = ct_ydb_a0.get_string(
                                 filename,
                                 tmp_keys, CETECH_ARRAY_LEN(tmp_keys), "");
-                    texture_name = ct_hash_a0.id64_from_str(v);
+                    texture_name = CT_ID64_0(v);
                 }
 
                 mat_var.type = MAT_VAR_TEXTURE;
@@ -113,13 +113,13 @@ namespace material_compiler {
             uint64_t name;
             uint64_t e;
         } _tbl[] = {
-                {.name = ct_hash_a0.id64_from_str(""), .e = 0},
-                {.name = ct_hash_a0.id64_from_str("rgb_write"), .e = BGFX_STATE_RGB_WRITE},
-                {.name = ct_hash_a0.id64_from_str("alpha_write"), .e = BGFX_STATE_ALPHA_WRITE},
-                {.name = ct_hash_a0.id64_from_str("depth_write"), .e = BGFX_STATE_DEPTH_WRITE},
-                {.name = ct_hash_a0.id64_from_str("depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
-                {.name = ct_hash_a0.id64_from_str("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
-                {.name = ct_hash_a0.id64_from_str("msaa"), .e = BGFX_STATE_MSAA},
+                {.name = CT_ID64_0(""), .e = 0},
+                {.name = CT_ID64_0("rgb_write"), .e = BGFX_STATE_RGB_WRITE},
+                {.name = CT_ID64_0("alpha_write"), .e = BGFX_STATE_ALPHA_WRITE},
+                {.name = CT_ID64_0("depth_write"), .e = BGFX_STATE_DEPTH_WRITE},
+                {.name = CT_ID64_0("depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
+                {.name = CT_ID64_0("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
+                {.name = CT_ID64_0("msaa"), .e = BGFX_STATE_MSAA},
         };
 
         for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_tbl); ++i) {
@@ -149,7 +149,7 @@ namespace material_compiler {
                                                     CETECH_ARRAY_LEN(tmp_keys));
 
         const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
-        uint64_t shader_id = ct_hash_a0.id64_from_str(shader);
+        uint64_t shader_id = CT_ID64_0(shader);
         array::push_back(output.shader_name, shader_id);
 
         auto layer_id = key;
@@ -280,7 +280,7 @@ namespace material_compiler {
         CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
 
-        ct_resource_a0.compiler_register(ct_hash_a0.id64_from_str("material"),
+        ct_resource_a0.compiler_register(CT_ID64_0("material"),
                                          compiler, true);
 
         return 1;

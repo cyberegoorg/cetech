@@ -179,7 +179,7 @@ void _init_viewport(viewport_instance &vi,
                     float height) {
     const char* render_config = ct_config_a0.get_string(GConfig.render_config_name);
 
-    auto *resource = ct_resource_a0.get(_G.type, ct_hash_a0.id64_from_str(render_config));
+    auto *resource = ct_resource_a0.get(_G.type, CT_ID64_0(render_config));
     auto *blob = renderconfig_blob::get(resource);
 
     if (!width || !height) {
@@ -420,25 +420,25 @@ void compile_global_resource(uint32_t idx,
     };
     uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *name_str = d->get_string(d->inst, k, "");
-    gs.name = ct_hash_a0.id64_from_str(name_str);
+    gs.name = CT_ID64_0(name_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.calc_key("type");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *type_str = d->get_string(d->inst, k, "");
-    gs.type = ct_hash_a0.id64_from_str(type_str);
+    gs.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.calc_key("format");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *format_str = d->get_string(d->inst, k, "");
-    gs.format = ct_hash_a0.id64_from_str(format_str);
+    gs.format = CT_ID64_0(format_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.calc_key("ration");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *ration_str = d->get_string(d->inst, k, "");
-    gs.ration = ct_hash_a0.id64_from_str(ration_str);
+    gs.ration = CT_ID64_0(ration_str);
 
     array::push_back(output.global_resource, gs);
 }
@@ -461,14 +461,14 @@ void compile_layer_entry(uint32_t idx,
     };
     uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *name_str = d->get_string(d->inst, k, "");
-    le.name = ct_hash_a0.id64_from_str(name_str);
+    le.name = CT_ID64_0(name_str);
 
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.calc_key("type");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
     const char *type_str = d->get_string(d->inst, k, "");
-    le.type = ct_hash_a0.id64_from_str(type_str);
+    le.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.calc_key("output");
@@ -486,7 +486,7 @@ void compile_layer_entry(uint32_t idx,
                     ct_yng_doc *d = value.d;
 
                     const char *output_name = d->as_string(d->inst, value, "");
-                    le.output[idx] = ct_hash_a0.id64_from_str(output_name);
+                    le.output[idx] = CT_ID64_0(output_name);
 
                     ++le.output_count;
                 }, &le);
@@ -516,7 +516,7 @@ void compile_layers(struct ct_yamlng_node key,
 
     const char *name_str = d->as_string(d->inst, key, "");
 
-    auto name_id = ct_hash_a0.id64_from_str(name_str);
+    auto name_id = CT_ID64_0(name_str);
     auto layer_offset = array::size(output.layers_entry);
 
     array::push_back(output.layer_names, name_id);
@@ -592,7 +592,7 @@ namespace renderconfig_compiler {
                         compiler_output &output = *((compiler_output *) _data);
 
                         const char *name_str = d->as_string(d->inst, key, "");
-                        auto name_id = ct_hash_a0.id64_from_str(name_str);
+                        auto name_id = CT_ID64_0(name_str);
 
 
                         uint64_t keys[2] = {
@@ -603,7 +603,7 @@ namespace renderconfig_compiler {
                                                               CETECH_ARRAY_LEN(
                                                                       keys));
                         const char *layers_str = d->get_string(d->inst, k, "");
-                        auto layers_id = ct_hash_a0.id64_from_str(layers_str);
+                        auto layers_id = CT_ID64_0(layers_str);
                         viewport_entry_t ve = {};
 
                         ve.name = name_id;
@@ -647,8 +647,7 @@ namespace renderconfig_compiler {
                                                 keys, CETECH_ARRAY_LEN(keys));
                                         const char *name_str = d->get_string(
                                                 d->inst, k, "");
-                                        gs.name = ct_hash_a0.id64_from_str(
-                                                name_str);
+                                        gs.name = CT_ID64_0(name_str);
 
                                         /////////////////////////////////////////////////////
                                         keys[1] = ct_yng_a0.calc_key("type");
@@ -657,8 +656,7 @@ namespace renderconfig_compiler {
                                                                              keys));
                                         const char *type_str = d->get_string(
                                                 d->inst, k, "");
-                                        gs.type = ct_hash_a0.id64_from_str(
-                                                type_str);
+                                        gs.type = CT_ID64_0(type_str);
 
 
                                         /////////////////////////////////////////////////////
@@ -669,19 +667,16 @@ namespace renderconfig_compiler {
                                                                              keys));
                                         const char *format_str = d->get_string(
                                                 d->inst, k, "");
-                                        gs.format = ct_hash_a0.id64_from_str(
-                                                format_str);
+                                        gs.format = CT_ID64_0(format_str);
 
                                         /////////////////////////////////////////////////////
-                                        keys[1] = ct_yng_a0.calc_key(
-                                                "ration");
+                                        keys[1] = ct_yng_a0.calc_key("ration");
                                         k = ct_yng_a0.combine_key(keys,
                                                                      CETECH_ARRAY_LEN(
                                                                              keys));
                                         const char *ration_str = d->get_string(
                                                 d->inst, k, "");
-                                        gs.ration = ct_hash_a0.id64_from_str(
-                                                ration_str);
+                                        gs.ration = CT_ID64_0(ration_str);
 
 
                                         array::push_back(
@@ -784,7 +779,7 @@ namespace renderconfig_compiler {
 
 #ifdef CETECH_DEVELOP
         ct_resource_a0.compiler_register(
-                ct_hash_a0.id64_from_str("render_config"), compiler, true);
+                CT_ID64_0("render_config"), compiler, true);
 #endif
 
         ct_renderer_a0.get_size(&_G.size_width, &_G.size_height);
@@ -871,7 +866,7 @@ namespace viewport_module {
         _G.viewport_handler.init(ct_memory_a0.main_allocator());
         _G.compiler_map.init(ct_memory_a0.main_allocator());
 
-        _G.type = ct_hash_a0.id64_from_str("render_config");
+        _G.type = CT_ID64_0("render_config");
         ct_resource_a0.register_type(_G.type,
                                      renderconfig_resource::callback);
 

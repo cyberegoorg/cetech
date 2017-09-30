@@ -186,22 +186,22 @@ namespace {
         memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
         keys[component_key_count] = ct_yng_a0.calc_key("scene");
 
-        t_data.scene = ct_hash_a0.id64_from_str(
+        t_data.scene = CT_ID64_0(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
         keys[component_key_count] = ct_yng_a0.calc_key("mesh");
-        t_data.mesh = ct_hash_a0.id64_from_str(
+        t_data.mesh = CT_ID64_0(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
         keys[component_key_count] = ct_yng_a0.calc_key("material");
-        t_data.material = ct_hash_a0.id64_from_str(
+        t_data.material = CT_ID64_0(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
         keys[component_key_count] = ct_yng_a0.calc_key("node");
-        t_data.node = ct_hash_a0.id64_from_str(
+        t_data.node = CT_ID64_0(
                 ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
                                      ""));
 
@@ -370,16 +370,16 @@ static void _set_property(ct_world world,
                           uint64_t key,
                           ct_property_value value) {
 //
-//    uint64_t scene = ct_hash_a0.id64_from_str("scene");
-//    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
-//    uint64_t node = ct_hash_a0.id64_from_str("node");
-    uint64_t material = ct_hash_a0.id64_from_str("material");
+//    uint64_t scene = CT_ID64_0("scene");
+//    uint64_t mesh = CT_ID64_0("mesh");
+//    uint64_t node = CT_ID64_0("node");
+    uint64_t material = CT_ID64_0("material");
 
     ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
 
     if (key == material) {
         mesh_set_material(mesh_renderer,
-                          ct_hash_a0.id64_from_str(value.value.str));
+                          CT_ID64_0(value.value.str));
     }
 }
 
@@ -387,10 +387,10 @@ static ct_property_value _get_property(ct_world world,
                                        ct_entity entity,
                                        uint64_t key) {
     CEL_UNUSED(world, entity, key);
-//    uint64_t scene = ct_hash_a0.id64_from_str("scene");
-//    uint64_t mesh = ct_hash_a0.id64_from_str("mesh");
-//    uint64_t node = ct_hash_a0.id64_from_str("node");
-//    uint64_t material = ct_hash_a0.id64_from_str("material");
+//    uint64_t scene = CT_ID64_0("scene");
+//    uint64_t mesh = CT_ID64_0("mesh");
+//    uint64_t node = CT_ID64_0("node");
+//    uint64_t material = CT_ID64_0("material");
 //
 //    ct_mesh_renderer mesh_r = mesh_get(world, entity);
 //    WorldInstance *data = _get_world_instance(world);
@@ -459,7 +459,7 @@ static void _init(ct_api_a0 *api) {
     _G.world_map.init(ct_memory_a0.main_allocator());
     _G.world_instances.init(ct_memory_a0.main_allocator());
     _G.ent_map.init(ct_memory_a0.main_allocator());
-    _G.type = ct_hash_a0.id64_from_str("mesh_renderer");
+    _G.type = CT_ID64_0("mesh_renderer");
 
     ct_component_a0.register_compiler(_G.type, _mesh_component_compiler, 10);
 

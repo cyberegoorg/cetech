@@ -17,7 +17,7 @@ CETECH_DECL_API(ct_playground_a0);
 using namespace celib;
 
 #define WINDOW_NAME "Property editor"
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("property_editor")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("property_editor")
 
 #define _G property_inspector_global
 static struct _G {

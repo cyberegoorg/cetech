@@ -143,7 +143,7 @@ static void foreach_input(struct ct_yamlng_node key,
            strlen(key_str) + 1);
 
     const char* resource_name_str = d->as_string(d->inst, value, "");
-    uint64_t resource_name = ct_hash_a0.id64_from_str(resource_name_str);
+    uint64_t resource_name = CT_ID64_0(resource_name_str);
 
     pass_data->input_resource[pass_data->input_count] = resource_name;
     ++pass_data->input_count;
@@ -183,7 +183,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     CEL_UNUSED(camera);
 
     static ct_material copy_material = ct_material_a0.resource_create(
-            ct_hash_a0.id64_from_str("content/copy"));
+            CT_ID64_0("content/copy"));
 
     bgfx::setViewRect(viewid, 0, 0,
                       (uint16_t) viewport->size[0],  // TODO: SHITTT
@@ -222,10 +222,10 @@ void _init(struct ct_api_a0 *api) {
     CEL_UNUSED(api);
 
     ct_viewport_a0.register_pass_compiler(
-            ct_hash_a0.id64_from_str("fullscreen"), fullscreen_pass_compiler);
+            CT_ID64_0("fullscreen"), fullscreen_pass_compiler);
 
 
-    ct_viewport_a0.register_layer_pass(ct_hash_a0.id64_from_str("fullscreen"),
+    ct_viewport_a0.register_layer_pass(CT_ID64_0("fullscreen"),
                                        fullscreen_pass);
 
     PosTexCoord0Vertex::init();

@@ -286,9 +286,9 @@ void _set_property(ct_world world,
                    uint64_t key,
                    ct_property_value value) {
 
-    uint64_t position = ct_hash_a0.id64_from_str("position");
-    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
-    uint64_t scale = ct_hash_a0.id64_from_str("scale");
+    uint64_t position = CT_ID64_0("position");
+    uint64_t rotation = CT_ID64_0("rotation");
+    uint64_t scale = CT_ID64_0("scale");
 
     ct_transform transform = transform_get(world, entity);
 
@@ -318,9 +318,9 @@ void _set_property(ct_world world,
 ct_property_value _get_property(ct_world world,
                                 ct_entity entity,
                                 uint64_t key) {
-    uint64_t position = ct_hash_a0.id64_from_str("position");
-    uint64_t rotation = ct_hash_a0.id64_from_str("rotation");
-    uint64_t scale = ct_hash_a0.id64_from_str("scale");
+    uint64_t position = CT_ID64_0("position");
+    uint64_t rotation = CT_ID64_0("rotation");
+    uint64_t scale = CT_ID64_0("scale");
 
     ct_transform transform = transform_get(world, entity);
 
@@ -391,7 +391,7 @@ static void _init(ct_api_a0 *api) {
     _G.world_instances.init(ct_memory_a0.main_allocator());
     _G.ent_map.init(ct_memory_a0.main_allocator());
 
-    _G.type = ct_hash_a0.id64_from_str("transform");
+    _G.type = CT_ID64_0("transform");
 
     ct_component_a0.register_type(
             _G.type,

@@ -488,7 +488,7 @@ CETECH_MODULE_DEF(
 
             api->register_api("ct_config_a0", &config::config_a0);
 
-            _G.type = ct_hash_a0.id64_from_str("config");
+            _G.type = CT_ID64_0("config");
         },
         {
             CEL_UNUSED(api, reload);

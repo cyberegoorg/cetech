@@ -49,7 +49,7 @@ void add_dir(ct_watchdog_instance_t *inst,
     }
 
     char *path_dup = ct_memory_a0.str_dup(path, wi->alloc);
-    uint64_t path_hash = ct_hash_a0.id64_from_str(path_dup);
+    uint64_t path_hash = CT_ID64_0(path_dup);
 
     celib::map::set(wi->dir2wd, path_hash, wd);
     celib::map::set(wi->wd2dir, wd, path_dup);

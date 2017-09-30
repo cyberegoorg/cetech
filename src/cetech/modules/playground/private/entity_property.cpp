@@ -101,7 +101,7 @@ static void on_debugui() {
         const char *component_type = ct_ydb_a0.get_string(_G.filename, tmp_keys,
                                                           _G.keys_count + 3,
                                                           "");
-        uint64_t component_type_hash = ct_hash_a0.id64_from_str(component_type);
+        uint64_t component_type_hash = CT_ID64_0(component_type);
 
 
         ct_ep_on_component on_component = map::get<ct_ep_on_component>(_G.on_component,

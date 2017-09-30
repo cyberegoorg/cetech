@@ -111,10 +111,10 @@ void _init_config() {
 
 static void _boot_stage() {
     const char *boot_pkg_str = ct_config_a0.get_string(_G.config.boot_pkg);
-    uint64_t boot_pkg = ct_hash_a0.id64_from_str(boot_pkg_str);
-    uint64_t pkg = ct_hash_a0.id64_from_str("package");
+    uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
+    uint64_t pkg = CT_ID64_0("package");
 
-    uint64_t core_pkg = ct_hash_a0.id64_from_str("core/core");
+    uint64_t core_pkg = CT_ID64_0("core/core");
     uint64_t resources[] = {core_pkg, boot_pkg};
 
     ct_resource_a0.load_now(pkg, resources, 2);
@@ -128,10 +128,10 @@ static void _boot_stage() {
 
 static void _boot_unload() {
     const char *boot_pkg_str = ct_config_a0.get_string(_G.config.boot_pkg);
-    uint64_t boot_pkg = ct_hash_a0.id64_from_str(boot_pkg_str);
+    uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
 
-    uint64_t core_pkg = ct_hash_a0.id64_from_str("core/core");
-    uint64_t pkg = ct_hash_a0.id64_from_str("package");
+    uint64_t core_pkg = CT_ID64_0("core/core");
+    uint64_t pkg = CT_ID64_0("package");
 
     uint64_t resources[] = {core_pkg, boot_pkg};
 
@@ -188,7 +188,7 @@ extern "C" void application_start() {
         _G.on_init[i]();
     }
 
-    set_active_game(ct_hash_a0.id64_from_str(ct_config_a0.get_string(_G.config.game)));
+    set_active_game(CT_ID64_0(ct_config_a0.get_string(_G.config.game)));
 
     if(_G.active_game.on_init) {
         _G.active_game.on_init();

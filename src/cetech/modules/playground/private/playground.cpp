@@ -82,17 +82,17 @@ namespace playground {
 
                 sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
 
-                shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("undo"));
+                shortcut = ct_action_manager_a0.shortcut_str(CT_ID64_0("undo"));
                 if (ct_debugui_a0.MenuItem(buffer, shortcut, false, buffer2[0] != '0')) {
-                    ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("undo"));
+                    ct_action_manager_a0.execute(CT_ID64_0("undo"));
                 }
 
 
                 ct_cmd_system_a0.redo_text(buffer2, CETECH_ARRAY_LEN(buffer2));
-                shortcut = ct_action_manager_a0.shortcut_str(ct_hash_a0.id64_from_str("redo"));
+                shortcut = ct_action_manager_a0.shortcut_str(CT_ID64_0("redo"));
                 sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
                 if (ct_debugui_a0.MenuItem(buffer, shortcut, false, buffer2[0] != '0')) {
-                    ct_action_manager_a0.execute(ct_hash_a0.id64_from_str("redo"));
+                    ct_action_manager_a0.execute(CT_ID64_0("redo"));
                 }
 
                 ct_debugui_a0.EndMenu();
@@ -101,7 +101,7 @@ namespace playground {
             if(ct_debugui_a0.BeginMenu("Window", true)) {
                 if (ct_debugui_a0.BeginMenu("Layout", true)) {
                     if (ct_debugui_a0.MenuItem("Save", NULL, false, true )) {
-                        ct_vio *f = ct_filesystem_a0.open(ct_hash_a0.id64_from_str("source"), "core/default.dock_layout", FS_OPEN_WRITE);
+                        ct_vio *f = ct_filesystem_a0.open(CT_ID64_0("source"), "core/default.dock_layout", FS_OPEN_WRITE);
                         ct_debugui_a0.SaveDock(f);
                         ct_filesystem_a0.close(f);
                     }
@@ -271,24 +271,24 @@ namespace playground_module {
         api->register_api("ct_playground_a0", &playground_api);
 
         ct_action_manager_a0.register_action(
-                ct_hash_a0.id64_from_str("undo"),
+                CT_ID64_0("undo"),
                 "ctrl+z",
                 ct_cmd_system_a0.undo
         );
 
         ct_action_manager_a0.register_action(
-                ct_hash_a0.id64_from_str("redo"),
+                CT_ID64_0("redo"),
                 "ctrl+shift+z",
                 ct_cmd_system_a0.redo
         );
 
-        ct_app_a0.register_game(ct_hash_a0.id64_from_str("playground"), playground_game);
+        ct_app_a0.register_game(CT_ID64_0("playground"), playground_game);
         ct_debugui_a0.register_on_debugui(on_ui);
     }
 
     static void _shutdown() {
         ct_debugui_a0.unregister_on_debugui(on_ui);
-        ct_app_a0.unregister_game(ct_hash_a0.id64_from_str("playground"));
+        ct_app_a0.unregister_game(CT_ID64_0("playground"));
         _G.module_map.destroy();
 
         _G = {};

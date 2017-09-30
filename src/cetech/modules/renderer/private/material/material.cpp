@@ -389,7 +389,7 @@ static struct ct_material_a0 material_api = {
 static int init(ct_api_a0 *api) {
     api->register_api("ct_material_a0", &material_api);
 
-    _G.type = ct_hash_a0.id64_from_str("material");
+    _G.type = CT_ID64_0("material");
     _G.material_handler.init(ct_memory_a0.main_allocator());
     _G.instace_map.init(ct_memory_a0.main_allocator());
     _G.material_instances.init(ct_memory_a0.main_allocator());

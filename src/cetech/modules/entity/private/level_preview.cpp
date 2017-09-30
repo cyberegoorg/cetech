@@ -67,7 +67,7 @@ static int _init(ct_api_a0 *api) {
     _G = {};
 
     ct_asset_preview_a0.register_type_preview(
-            ct_hash_a0.id64_from_str("level"),
+            CT_ID64_0("level"),
             (ct_asset_preview_fce){
                     .load = load,
                     .unload = unload
@@ -77,7 +77,7 @@ static int _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_asset_preview_a0.unregister_type_preview(ct_hash_a0.id64_from_str("level"));
+    ct_asset_preview_a0.unregister_type_preview(CT_ID64_0("level"));
 
     _G = {};
 }

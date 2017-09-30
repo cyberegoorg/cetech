@@ -304,7 +304,7 @@ namespace camera_module {
         _G.world_instances.init(ct_memory_a0.main_allocator());
         _G.ent_map.init(ct_memory_a0.main_allocator());
 
-        _G.type = ct_hash_a0.id64_from_str("camera");
+        _G.type = CT_ID64_0("camera");
 
         ct_component_a0.register_compiler(_G.type,
                                           _camera_component_compiler,

@@ -30,7 +30,7 @@ CETECH_DECL_API(ct_playground_a0);
 using namespace celib;
 
 #define WINDOW_NAME "Explorer"
-#define PLAYGROUND_MODULE_NAME ct_hash_a0.id64_from_str("explorer")
+#define PLAYGROUND_MODULE_NAME CT_ID64_0("explorer")
 
 #define _G explorer_globals
 static struct _G {

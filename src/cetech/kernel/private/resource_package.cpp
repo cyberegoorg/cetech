@@ -134,7 +134,7 @@ int package_init(ct_api_a0 *api) {
 
     _G = (struct G) {};
 
-    _G.package_typel = ct_hash_a0.id64_from_str("package");
+    _G.package_typel = CT_ID64_0("package");
 
     ct_resource_a0.compiler_register(_G.package_typel, _package_compiler, true);
 
@@ -198,7 +198,7 @@ void package_unload(uint64_t name) {
 }
 
 int package_is_loaded(uint64_t name) {
-    const uint64_t package_type = ct_hash_a0.id64_from_str("package");
+    const uint64_t package_type = CT_ID64_0("package");
     package_resource *package = (package_resource *) ct_resource_a0.get(
             package_type, name);
 

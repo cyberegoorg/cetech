@@ -276,7 +276,7 @@ namespace module {
     void check_modules() {
         cel_alloc *alloc = ct_memory_a0.main_allocator();
 
-        static uint64_t root = ct_hash_a0.id64_from_str("modules");
+        static uint64_t root = CT_ID64_0("modules");
 
         auto *wd_it = ct_filesystem_a0.event_begin(root);
         const auto *wd_end = ct_filesystem_a0.event_end(root);
@@ -353,7 +353,7 @@ CETECH_MODULE_DEF(
                                                  "./bin/linux64/"); // TODO: platform specific
 
 
-            static uint64_t root = ct_hash_a0.id64_from_str("modules");
+            static uint64_t root = CT_ID64_0("modules");
             ct_filesystem_a0.map_root_dir(root, ct_config_a0.get_string(_G.module_dir), true);
 
         },

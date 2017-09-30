@@ -105,8 +105,8 @@ void type_name_from_filename(const char *fullname,
 
     memcpy(resource_name, filename_short, size);
 
-    *type = ct_hash_a0.id64_from_str(resource_type);
-    *name = ct_hash_a0.id64_from_str(resource_name);
+    *type = CT_ID64_0(resource_type);
+    *name = CT_ID64_0(resource_name);
 
     if (short_name) {
         *short_name = filename_short;
@@ -118,7 +118,7 @@ void _add_dependency(const char *who_filename,
     builddb_set_file_depend(who_filename, depend_on_filename);
     builddb_set_file(depend_on_filename,
                      ct_filesystem_a0.file_mtime(
-                             ct_hash_a0.id64_from_str("source"),
+                             CT_ID64_0("source"),
                              depend_on_filename));
 }
 
@@ -164,7 +164,7 @@ static void _compile_task(void *data) {
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
         ct_vio *build_vio = ct_filesystem_a0.open(
-                ct_hash_a0.id64_from_str("build"),
+                CT_ID64_0("build"),
                 tdata->build_filename, FS_OPEN_WRITE);
 
         CEL_FREE(ct_memory_a0.main_allocator(), tdata->build_filename);
@@ -249,7 +249,7 @@ void _compile_files(Array<ct_task_item> &tasks,
                 .source_filename = ct_memory_a0.str_dup(source_filename_short,
                                                         ct_memory_a0.main_scratch_allocator()),
                 .mtime = ct_filesystem_a0.file_mtime(
-                        ct_hash_a0.id64_from_str("source"),
+                        CT_ID64_0("source"),
                         source_filename_short),
 
                 .completed = 0
@@ -306,7 +306,7 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
     char **files = nullptr;
     uint32_t files_count = 0;
 
-    ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+    ct_filesystem_a0.listdir(CT_ID64_0("source"),
                              "", glob_patern, false, true, &files, &files_count,
                              ct_memory_a0.main_scratch_allocator());
 
@@ -404,7 +404,7 @@ void compile_and_reload(const char* filename) {
 }
 
 void resource_compiler_check_fs() {
-    static uint64_t root = ct_hash_a0.id64_from_str("source");
+    static uint64_t root = CT_ID64_0("source");
 
     auto *wd_it = ct_filesystem_a0.event_begin(root);
     const auto *wd_end = ct_filesystem_a0.event_end(root);
@@ -490,13 +490,13 @@ static void _init(ct_api_a0 *api) {
     const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
 
     ct_filesystem_a0.map_root_dir(
-            ct_hash_a0.id64_from_str("source"),
+            CT_ID64_0("source"),
             core_dir,
             true
     );
 
     ct_filesystem_a0.map_root_dir(
-            ct_hash_a0.id64_from_str("source"),
+            CT_ID64_0("source"),
             source_dir,
             true
     );

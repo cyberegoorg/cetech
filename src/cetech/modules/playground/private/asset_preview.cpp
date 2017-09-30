@@ -106,7 +106,7 @@ static void on_debugui() {
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
 
         auto th = ct_viewport_a0.get_local_resource(
-                _G.viewport, ct_hash_a0.id64_from_str("bb_color"));
+                _G.viewport, CT_ID64_0("bb_color"));
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
@@ -158,14 +158,12 @@ static void set_asset(uint64_t type,
 static void init() {
     _G.visible = true;
 
-    _G.viewport = ct_viewport_a0.create(ct_hash_a0.id64_from_str("default"), 0,
+    _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0,
                                         0);
 
     _G.world = ct_world_a0.create();
 
-    _G.camera_ent = ct_entity_a0.spawn(_G.world,
-                                       ct_hash_a0.id64_from_str(
-                                               "content/camera"));
+    _G.camera_ent = ct_entity_a0.spawn(_G.world,CT_ID64_0("content/camera"));
 
     ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
     ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
@@ -233,7 +231,7 @@ static void _init(ct_api_a0 *api) {
     _G.preview_fce.init(ct_memory_a0.main_allocator());
 
     ct_playground_a0.register_module(
-            ct_hash_a0.id64_from_str("asset_preview"),
+            CT_ID64_0("asset_preview"),
             (ct_playground_module_fce){
                     .on_init = init,
                     .on_shutdown = shutdown,
@@ -251,7 +249,7 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
 
     ct_playground_a0.unregister_module(
-            ct_hash_a0.id64_from_str("asset_preview")
+            CT_ID64_0("asset_preview")
     );
 
     ct_asset_browser_a0.unregister_on_asset_click(set_asset);
