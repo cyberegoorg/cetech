@@ -81,7 +81,46 @@ static ct_asset_browser_a0 asset_browser_api = {
         .unregister_on_asset_double_click = unregister_on_asset_double_click_,
 };
 
-static void dir_list_column() {
+
+static void set_current_dir(const char* dir, uint64_t dir_hash) {
+    strcpy(_G.current_dir, dir);
+    _G.selected_dir_hash = dir_hash;
+    _G.need_reaload = true;
+}
+
+static void ui_breadcrumb(const char* dir) {
+    const size_t len = strlen(dir);
+
+    char buffer[128] = {0};
+    uint32_t buffer_pos = 0;
+
+    ct_debugui_a0.SameLine(0.0f, -1.0f);
+    if(ct_debugui_a0.Button("Source", (float[2]){0.0f}) ) {
+        uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
+        set_current_dir("", dir_hash);
+    }
+
+    for (int i = 0; i < len; ++i) {
+        if(dir[i] != '/') {
+            buffer[buffer_pos++] = dir[i];
+        } else {
+            buffer[buffer_pos] = '\0';
+            ct_debugui_a0.SameLine(0.0f, -1.0f);
+            ct_debugui_a0.Text(">");
+            ct_debugui_a0.SameLine(0.0f, -1.0f);
+            if(ct_debugui_a0.Button(buffer, (float[2]){0.0f})) {
+                char tmp_dir[128] = {0};
+                strncpy(tmp_dir, dir, sizeof(char) * (i+1));
+                uint64_t dir_hash = ct_hash_a0.id64_from_str(tmp_dir);
+                set_current_dir(tmp_dir, dir_hash);
+            };
+
+            buffer_pos = 0;
+        }
+    }
+}
+
+static void ui_dir_list() {
     ImVec2 size = {_G.left_column_width, 0.0f};
 
     ImGui::BeginChild("left_col", size);
@@ -98,18 +137,15 @@ static void dir_list_column() {
         uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
 
         if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
-            strcpy(_G.current_dir, "");
-            _G.selected_dir_hash = dir_hash;
-            _G.need_reaload = true;
+            set_current_dir("", dir_hash);
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
             dir_hash = ct_hash_a0.id64_from_str(_G.dirtree_list[i]);
 
-            if (ImGui::Selectable(_G.dirtree_list[i], _G.selected_dir_hash == dir_hash)) {
-                strcpy(_G.current_dir, _G.dirtree_list[i]);
-                _G.selected_dir_hash = dir_hash;
-                _G.need_reaload = true;
+            if (ImGui::Selectable(_G.dirtree_list[i],
+                                  _G.selected_dir_hash == dir_hash)) {
+                set_current_dir(_G.dirtree_list[i], dir_hash);
             }
         }
 
@@ -120,7 +156,7 @@ static void dir_list_column() {
     ImGui::EndChild();
 }
 
-static void item_list_column() {
+static void ui_asset_list() {
     ImVec2 size = {_G.midle_column_width, 0.0f};
 
     ImGui::BeginChild("middle_col", size);
@@ -128,7 +164,7 @@ static void item_list_column() {
     if (_G.need_reaload) {
         cel_alloc *a = ct_memory_a0.main_allocator();
 
-        if(_G.item_list) {
+        if (_G.item_list) {
             ct_filesystem_a0.listdir_free(_G.item_list, _G.item_list_count, a);
         }
 
@@ -158,12 +194,16 @@ static void item_list_column() {
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t j = 0;
                          j < array::size(_G.on_asset_double_click); ++j) {
-                        _G.on_asset_double_click[j](type, name, ct_hash_a0.id64_from_str("source"), path);
+                        _G.on_asset_double_click[j](type, name,
+                                                    ct_hash_a0.id64_from_str(
+                                                            "source"), path);
                     }
                 } else {
                     for (uint32_t j = 0;
                          j < array::size(_G.on_asset_click); ++j) {
-                        _G.on_asset_click[j](type, name, ct_hash_a0.id64_from_str("source"), path);
+                        _G.on_asset_click[j](type, name,
+                                             ct_hash_a0.id64_from_str("source"),
+                                             path);
                     }
                 }
             }
@@ -184,8 +224,9 @@ static void on_debugui() {
             _G.midle_column_width = content_w -
                                     _G.left_column_width -
                                     120;
+        ui_breadcrumb(_G.current_dir);
 
-        dir_list_column();
+        ui_dir_list();
 
         float left_size[] = {_G.left_column_width, 0.0f};
         ct_debugui_a0.SameLine(0.0f, -1.0f);
@@ -193,7 +234,7 @@ static void on_debugui() {
         _G.left_column_width = left_size[0];
         ct_debugui_a0.SameLine(0.0f, -1.0f);
 
-        item_list_column();
+        ui_asset_list();
     }
 
     ct_debugui_a0.EndDock();
@@ -208,9 +249,9 @@ static void _init(ct_api_a0 *api) {
 
     ct_playground_a0.register_module(
             PLAYGROUND_MODULE_NAME,
-            (ct_playground_module_fce){
-            .on_ui = on_debugui,
-            .on_menu_window = on_menu_window,
+            (ct_playground_module_fce) {
+                    .on_ui = on_debugui,
+                    .on_menu_window = on_menu_window,
             });
 
     _G = {};
