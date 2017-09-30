@@ -12,7 +12,6 @@
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/api_system.h"
 #include "cetech/kernel/module.h"
-#include "cetech/kernel/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -43,6 +42,25 @@ static struct _G {
     bool visible;
 } _G;
 
+static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
+
+static ImVec4 _level_to_color[][4] = {
+        [LOG_INFO]    = {{0.0f, 0.0f, 1.0f, 1.0f},
+                         {0.0f, 0.0f, 0.5f, 1.0f}},
+        [LOG_WARNING] = {{1.0f, 1.0f, 0.0f, 1.0f},
+                         {0.5f, 0.5f, 0.0f, 1.0f}},
+        [LOG_ERROR]   = {{1.0f, 0.0f, 0.0f, 1.0f},
+                         {0.5f, 0.0f, 0.0f, 1.0f}},
+        [LOG_DBG]     = {{0.0f, 1.0f, 0.0f, 1.0f},
+                         {0.0f, 0.5f, 0.0f, 1.0f}},
+};
+
+static const char *_level_to_label[4] = {
+        [LOG_INFO]    = "I (%d)",
+        [LOG_WARNING] = "W (%d)",
+        [LOG_ERROR]   = "E (%d)",
+        [LOG_DBG]     = "D (%d)",
+};
 
 static ct_log_view_a0 log_view_api = {
 };
@@ -66,28 +84,12 @@ static void log_handler(enum ct_log_level level,
     };
 
     char buffer[1024];
-    int len = snprintf(buffer, CETECH_ARRAY_LEN(buffer), LOG_FORMAT, where, msg);
+    int len = snprintf(buffer, CETECH_ARRAY_LEN(buffer), LOG_FORMAT, where,
+                       msg);
 
     array::push_back(_G.log_items, item);
     array::push(_G.line_buffer, buffer, len + 1);
 }
-
-static ImVec4 _level_to_color[][4] = {
-        [LOG_INFO]    = {{0.0f, 0.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.5f, 1.0f}},
-        [LOG_WARNING] = {{1.0f, 1.0f, 0.0f, 1.0f}, {0.5f, 0.5f, 0.0f, 1.0f}},
-        [LOG_ERROR]   = {{1.0f, 0.0f, 0.0f, 1.0f}, {0.5f, 0.0f, 0.0f, 1.0f}},
-        [LOG_DBG]     = {{0.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.5f, 0.0f, 1.0f}},
-};
-
-static const char *_level_to_label[4] = {
-        [LOG_INFO]    = "I (%d)",
-        [LOG_WARNING] = "W (%d)",
-        [LOG_ERROR]   = "E (%d)",
-        [LOG_DBG]     = "D (%d)",
-};
-
-static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
-
 
 
 static void ui_filter() {
@@ -95,10 +97,12 @@ static void ui_filter() {
 }
 
 static void ui_level_mask() {
-    char buffer[256];
+    char buffer[64];
     for (int i = 0; i < CETECH_ARRAY_LEN(_levels); ++i) {
         int level = _levels[i];
-        sprintf(buffer, _level_to_label[level], _G.level_counters[level]);
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer),
+                 _level_to_label[level],_G.level_counters[level]);
+
         bool active = (_G.level_mask & (1 << level)) > 0;
 
         ImGui::PushStyleColor(ImGuiCol_CheckMark, _level_to_color[level][0]);
@@ -106,7 +110,7 @@ static void ui_level_mask() {
         ImGui::PushStyleColor(ImGuiCol_FrameBg, _level_to_color[level][1]);
 
 
-        if(i > 0) {
+        if (i > 0) {
             ct_debugui_a0.SameLine(0, -1);
         }
 
@@ -129,7 +133,7 @@ static void ui_log_items() {
     const int size = array::size(_G.log_items);
     for (int i = size - 1; i >= 0; --i) {
         log_item *item = &_G.log_items[i];
-        const char* line = &_G.line_buffer[item->offset];
+        const char *line = &_G.line_buffer[item->offset];
 
         if (!_G.filter.PassFilter(line)) {
             continue;
