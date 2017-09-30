@@ -28,7 +28,7 @@ CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
-static struct property_inspector_global {
+static struct asset_browser_global {
     float left_column_width;
     float midle_column_width;
     char current_dir[512];
@@ -43,8 +43,14 @@ static struct property_inspector_global {
     uint32_t dirtree_list_count;
 
     bool need_reaload;
-    char **item_list;
-    uint32_t item_list_count;
+
+    ImGuiTextFilter asset_filter;
+
+    char **asset_list;
+    uint32_t asset_list_count;
+
+    char **dir_list;
+    uint32_t dir_list_count;
 
     Array<ct_ab_on_asset_click> on_asset_click;
     Array<ct_ab_on_asset_double_click> on_asset_double_click;
@@ -82,35 +88,40 @@ static ct_asset_browser_a0 asset_browser_api = {
 };
 
 
-static void set_current_dir(const char* dir, uint64_t dir_hash) {
+static void set_current_dir(const char *dir,
+                            uint64_t dir_hash) {
     strcpy(_G.current_dir, dir);
     _G.selected_dir_hash = dir_hash;
     _G.need_reaload = true;
 }
 
-static void ui_breadcrumb(const char* dir) {
+static void ui_asset_filter() {
+    _G.asset_filter.Draw();
+}
+
+static void ui_breadcrumb(const char *dir) {
     const size_t len = strlen(dir);
 
     char buffer[128] = {0};
     uint32_t buffer_pos = 0;
 
     ct_debugui_a0.SameLine(0.0f, -1.0f);
-    if(ct_debugui_a0.Button("Source", (float[2]){0.0f}) ) {
+    if (ct_debugui_a0.Button("Source", (float[2]) {0.0f})) {
         uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
         set_current_dir("", dir_hash);
     }
 
     for (int i = 0; i < len; ++i) {
-        if(dir[i] != '/') {
+        if (dir[i] != '/') {
             buffer[buffer_pos++] = dir[i];
         } else {
             buffer[buffer_pos] = '\0';
             ct_debugui_a0.SameLine(0.0f, -1.0f);
             ct_debugui_a0.Text(">");
             ct_debugui_a0.SameLine(0.0f, -1.0f);
-            if(ct_debugui_a0.Button(buffer, (float[2]){0.0f})) {
+            if (ct_debugui_a0.Button(buffer, (float[2]) {0.0f})) {
                 char tmp_dir[128] = {0};
-                strncpy(tmp_dir, dir, sizeof(char) * (i+1));
+                strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
                 uint64_t dir_hash = ct_hash_a0.id64_from_str(tmp_dir);
                 set_current_dir(tmp_dir, dir_hash);
             };
@@ -124,7 +135,7 @@ static void ui_dir_list() {
     ImVec2 size = {_G.left_column_width, 0.0f};
 
     ImGui::BeginChild("left_col", size);
-    ImGui::PushItemWidth(120);
+    ImGui::PushItemWidth(180);
 
     if (!_G.dirtree_list) {
         cel_alloc *a = ct_memory_a0.main_allocator();
@@ -132,6 +143,7 @@ static void ui_dir_list() {
                                  true, true, &_G.dirtree_list,
                                  &_G.dirtree_list_count, a);
     }
+
 
     if (ImGui::TreeNode("Source")) {
         uint64_t dir_hash = ct_hash_a0.id64_from_str(".");
@@ -164,23 +176,59 @@ static void ui_asset_list() {
     if (_G.need_reaload) {
         cel_alloc *a = ct_memory_a0.main_allocator();
 
-        if (_G.item_list) {
-            ct_filesystem_a0.listdir_free(_G.item_list, _G.item_list_count, a);
+        if (_G.asset_list) {
+            ct_filesystem_a0.listdir_free(_G.asset_list, _G.asset_list_count,
+                                          a);
+        }
+
+        if (_G.dir_list) {
+            ct_filesystem_a0.listdir_free(_G.dir_list, _G.dir_list_count, a);
         }
 
         ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
                                  _G.current_dir, "*",
-                                 false, false, &_G.item_list,
-                                 &_G.item_list_count, a);
+                                 false, false, &_G.asset_list,
+                                 &_G.asset_list_count, a);
+
+        ct_filesystem_a0.listdir(ct_hash_a0.id64_from_str("source"),
+                                 _G.current_dir, "*",
+                                 true, false, &_G.dir_list,
+                                 &_G.dir_list_count, a);
 
         _G.need_reaload = false;
     }
 
-    if (_G.item_list) {
-        for (uint32_t i = 0; i < _G.item_list_count; ++i) {
-            const char *path = _G.item_list[i];
+    if (_G.dir_list) {
+        char dirname[128] = {0};
+        for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
+            const char *path = _G.dir_list[i];
+            ct_path_a0.dirname(dirname, path);
+            uint64_t filename_hash = ct_hash_a0.id64_from_str(dirname);
+
+            if (!_G.asset_filter.PassFilter(dirname)) {
+                continue;
+            }
+
+            if (ImGui::Selectable(dirname, _G.selected_file == filename_hash,
+                                  ImGuiSelectableFlags_AllowDoubleClick)) {
+                _G.selected_file = filename_hash;
+
+                if (ImGui::IsMouseDoubleClicked(0)) {
+                    set_current_dir(path, ct_hash_a0.id64_from_str(path));
+                }
+            }
+        }
+    }
+
+    if (_G.asset_list) {
+        for (uint32_t i = 0; i < _G.asset_list_count; ++i) {
+            const char *path = _G.asset_list[i];
             const char *filename = ct_path_a0.filename(path);
             uint64_t filename_hash = ct_hash_a0.id64_from_str(filename);
+
+            if (!_G.asset_filter.PassFilter(filename)) {
+                continue;
+            }
 
             uint64_t type, name;
             ct_resource_a0.type_name_from_filename(path,
@@ -223,9 +271,9 @@ static void on_debugui() {
         if (_G.midle_column_width < 0)
             _G.midle_column_width = content_w -
                                     _G.left_column_width -
-                                    120;
+                                    180;
         ui_breadcrumb(_G.current_dir);
-
+        ui_asset_filter();
         ui_dir_list();
 
         float left_size[] = {_G.left_column_width, 0.0f};
@@ -256,7 +304,7 @@ static void _init(ct_api_a0 *api) {
 
     _G = {};
     _G.visible = true;
-    _G.left_column_width = 120.0f;
+    _G.left_column_width = 180.0f;
 
     _G.on_asset_click.init(ct_memory_a0.main_allocator());
     _G.on_asset_double_click.init(ct_memory_a0.main_allocator());

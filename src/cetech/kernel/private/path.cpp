@@ -85,14 +85,15 @@ void _dir_list(const char *path,
             tmp_path[len] = '\0';
 
             if (only_dir) {
-                char *new_path = CEL_ALLOCATE(allocator, char,sizeof(char) * (len + 1));
+                char *new_path = CEL_ALLOCATE(allocator, char,
+                                              sizeof(char) * (len + 1));
                 memcpy(new_path, tmp_path, len + 1);
                 array::push_back(tmp_files, new_path);
             }
 
-            if(recursive) {
+            if (recursive) {
                 _dir_list(tmp_path, patern, recursive,
-                          only_dir, tmp_files,allocator);
+                          only_dir, tmp_files, allocator);
             }
 
         } else if (!only_dir) {
@@ -119,10 +120,10 @@ void _dir_list(const char *path,
 }
 
 void _dir_list2(const char *path,
-               const char *patern,
-               int recursive,
-               int only_dir,
-               void(*on_item)(const char* filename)) {
+                const char *patern,
+                int recursive,
+                int only_dir,
+                void(*on_item)(const char *filename)) {
     DIR *dir;
     struct dirent *entry;
 
@@ -158,7 +159,7 @@ void _dir_list2(const char *path,
                 on_item(tmp_path);
             }
 
-            if(recursive) {
+            if (recursive) {
                 _dir_list2(tmp_path, patern, recursive, only_dir, on_item);
             }
 
@@ -206,10 +207,10 @@ void dir_list(const char *path,
 }
 
 void dir_list2(const char *path,
-              const char *patern,
-              int recursive,
-              int only_dir,
-              void(*on_item)(const char* filename)){
+               const char *patern,
+               int recursive,
+               int only_dir,
+               void(*on_item)(const char *filename)) {
     _dir_list2(path, patern, recursive, only_dir, on_item);
 }
 
@@ -296,6 +297,26 @@ void path_dir(char *out,
     }
 }
 
+void path_dirname(char *out,
+                  const char *path) {
+    char buffer[128] = {0};
+    strcpy(buffer, path);
+
+    const size_t path_len = strlen(path);
+
+    if(buffer[path_len-1] == DIR_DELIM_CH) {
+        buffer[path_len-1] = '\0';
+    }
+
+    char *ch = strrchr(buffer, DIR_DELIM_CH);
+
+    if (ch != NULL) {
+        strcpy(out, ch+1);
+    } else {
+        strcpy(out, buffer);
+    }
+}
+
 const char *path_extension(const char *path) {
     const char *filename = path_filename(path);
     const char *ch = strrchr(filename, '.');
@@ -318,13 +339,13 @@ char *path_join(struct cel_alloc *allocator,
 
 
     for (uint32_t i = 0; i < count; ++i) {
-        const char* t = va_arg (arguments, const char*);
+        const char *t = va_arg (arguments, const char*);
 
-        if(!t[0]) {
+        if (!t[0]) {
             continue;
         }
 
-        if(array::size(buffer)) {
+        if (array::size(buffer)) {
             if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
                 buffer << DIR_DELIM_STR;
             }
@@ -362,7 +383,7 @@ void copy_file(struct cel_alloc *allocator,
     CEL_FREE(allocator, data);
 }
 
-bool is_dir(const char* path) {
+bool is_dir(const char *path) {
     struct stat sb;
     return (stat(path, &sb) == 0) && S_ISDIR(sb.st_mode);
 }
@@ -375,6 +396,7 @@ static ct_path_a0 path_api = {
         .filename = path_filename,
         .basename = path_basename,
         .dir = path_dir,
+        .dirname = path_dirname,
         .extension = path_extension,
         .join = path_join,
         .file_mtime = file_mtime,

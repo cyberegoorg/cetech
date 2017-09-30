@@ -71,6 +71,9 @@ struct ct_path_a0 {
     void (*dir)(char *out,
                 const char *path);
 
+    void (*dirname)(char *out,
+                const char *path);
+
     //! Get file extension
     //! \param path Path
     //! \return file extension
