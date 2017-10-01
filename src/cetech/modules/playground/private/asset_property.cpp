@@ -36,12 +36,9 @@ static void on_debugui() {
     char filename[512] = {};
     ct_resource_a0.compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                          _G.active_type, _G.active_name);
-    if(ct_debugui_a0.CollapsingHeader("Asset", DebugUITreeNodeFlags_DefaultOpen)){
-        ct_debugui_a0.InputText("asset",
-                                filename, strlen(filename),
-                                DebugInputTextFlags_ReadOnly,
-                                0, NULL);
-    }
+    ct_debugui_a0.InputText("asset",
+                            filename, strlen(filename),
+                            DebugInputTextFlags_ReadOnly, 0, NULL);
 
     if (_G.active_on_asset) {
         _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
@@ -55,7 +52,9 @@ static void register_asset(uint64_t type,
 }
 
 static void set_asset(uint64_t type,
-                      uint64_t name, uint64_t root, const char* path) {
+                      uint64_t name,
+                      uint64_t root,
+                      const char *path) {
     CEL_UNUSED(root);
 
     _G.active_on_asset = map::get<ct_ap_on_asset>(_G.on_asset, type, NULL);
@@ -78,14 +77,14 @@ static void _init(ct_api_a0 *api) {
 
     _G.on_asset.init(ct_memory_a0.main_allocator());
 
-    ct_asset_browser_a0.register_on_asset_click(set_asset);
+    ct_asset_browser_a0.register_on_asset_double_click(set_asset);
 
 }
 
 static void _shutdown() {
     _G.on_asset.destroy();
 
-    ct_asset_browser_a0.unregister_on_asset_click(set_asset);
+    ct_asset_browser_a0.unregister_on_asset_double_click(set_asset);
 
     _G = {};
 }
