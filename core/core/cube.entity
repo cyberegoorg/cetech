@@ -8,6 +8,9 @@ components:
   "41232dsadsa132255234":
     component_type: "mesh_renderer"
     scene: "core/cube"
-    material: "core/cube"
-    mesh: "g_cube"
-    node: "n_cube"
+
+    geometries:
+      3321387978411:
+        node: "n_cube"
+        mesh: "g_cube"
+        material: "core/cube"

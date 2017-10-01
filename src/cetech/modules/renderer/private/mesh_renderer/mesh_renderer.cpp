@@ -38,14 +38,15 @@ using namespace celib;
 
 #define LOG_WHERE "mesh_renderer"
 
-static uint64_t hash_combine(uint32_t a, uint32_t b) {
+static uint64_t hash_combine(uint32_t a,
+                             uint32_t b) {
     union {
         struct {
             uint32_t a;
             uint32_t b;
         };
         uint64_t ab;
-    } c {
+    } c{
             .a = a,
             .b = b,
     };
@@ -55,9 +56,11 @@ static uint64_t hash_combine(uint32_t a, uint32_t b) {
 
 struct mesh_data {
     uint64_t scene;
-    uint64_t mesh;
-    uint64_t node;
-    uint64_t material;
+    uint64_t mesh[32];
+    uint64_t node[32];
+    uint64_t material[32];
+    ct_material material_inst[32];
+    uint32_t count;
 };
 
 namespace {
@@ -68,10 +71,7 @@ namespace {
         void *buffer;
 
         ct_entity *entity;
-        uint64_t *scene;
-        uint64_t *mesh;
-        uint64_t *node;
-        ct_material *material;
+        mesh_data *mesh;
     };
 
     static struct MeshRendererGlobal {
@@ -89,8 +89,7 @@ namespace {
         WorldInstance new_data;
         const unsigned bytes = sz * (
                 sizeof(ct_entity)
-                + (3 * sizeof(uint64_t))
-                + sizeof(ct_material)
+                + sizeof(mesh_data)
         );
 
         new_data.buffer = CEL_ALLOCATE(_allocator, char, bytes);
@@ -98,17 +97,10 @@ namespace {
         new_data.allocated = sz;
 
         new_data.entity = (ct_entity *) (new_data.buffer);
-        new_data.scene = (uint64_t *) (new_data.entity + sz);
-        new_data.mesh = (uint64_t *) (new_data.scene + sz);
-        new_data.node = (uint64_t *) (new_data.mesh + sz);
-        new_data.material = (ct_material *) (new_data.node + sz);
+        new_data.mesh = (mesh_data *) (new_data.entity + sz);
 
         memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
-        memcpy(new_data.scene, _data.scene, _data.n * sizeof(uint64_t));
-        memcpy(new_data.mesh, _data.mesh, _data.n * sizeof(uint64_t));
-        memcpy(new_data.node, _data.node, _data.n * sizeof(uint64_t));
-        memcpy(new_data.material, _data.material,
-               _data.n * sizeof(ct_material));
+        memcpy(new_data.mesh, _data.mesh, _data.n * sizeof(mesh_data));
 
         CEL_FREE(_allocator, _data.buffer);
 
@@ -142,10 +134,7 @@ namespace {
         ct_entity last_e = _data.entity[last];
 
         _data.entity[i] = _data.entity[last];
-        _data.scene[i] = _data.scene[last];
-        _data.mesh[i] = _data.mesh[last];
-        _data.node[i] = _data.node[last];
-        _data.material[i] = _data.material[last];
+         _data.mesh[i] = _data.mesh[last];
 
         map::set(_G.ent_map, hash_combine(world.h, last_e.h), i);
         map::remove(_G.ent_map, hash_combine(world.h, e.h));
@@ -175,38 +164,52 @@ namespace {
         array::pop_back(_G.world_instances);
     }
 
+
     int _mesh_component_compiler(const char *filename,
-                                 uint64_t* component_key,
+                                 uint64_t *component_key,
                                  uint32_t component_key_count,
                                  struct ct_blob *data) {
 
         struct mesh_data t_data;
 
-        uint64_t keys[component_key_count+1];
+        uint64_t keys[component_key_count + 3];
         memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
+
         keys[component_key_count] = ct_yng_a0.calc_key("scene");
+        t_data.scene = CT_ID64_0(ct_ydb_a0.get_string(
+                filename, keys, component_key_count + 1, ""));
 
-        t_data.scene = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
-                                     ""));
+        uint64_t geom[32] = {};
+        uint32_t geom_keys_count = 0;
 
-        keys[component_key_count] = ct_yng_a0.calc_key("mesh");
-        t_data.mesh = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
-                                     ""));
+        keys[component_key_count] = ct_yng_a0.calc_key("geometries");
+        ct_ydb_a0.get_map_keys(filename,
+                               keys, component_key_count + 1,
+                               geom, CETECH_ARRAY_LEN(geom),
+                               &geom_keys_count);
 
-        keys[component_key_count] = ct_yng_a0.calc_key("material");
-        t_data.material = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
-                                     ""));
+        for (uint32_t i = 0; i < geom_keys_count; ++i) {
+            keys[component_key_count+1] = geom[i];
 
-        keys[component_key_count] = ct_yng_a0.calc_key("node");
-        t_data.node = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, CETECH_ARRAY_LEN(keys),
-                                     ""));
+            keys[component_key_count+2] = ct_yng_a0.calc_key("mesh");
+            t_data.mesh[i] = CT_ID64_0(
+                    ct_ydb_a0.get_string(filename, keys,
+                                         component_key_count+3, ""));
 
+            keys[component_key_count+2] = ct_yng_a0.calc_key("material");
+            t_data.material[i] = CT_ID64_0(
+                    ct_ydb_a0.get_string(filename, keys,
+                                         component_key_count+3, ""));
 
-        data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
+            keys[component_key_count+2] = ct_yng_a0.calc_key("node");
+            t_data.node[i] = CT_ID64_0(
+                    ct_ydb_a0.get_string(filename, keys,
+                                         component_key_count+3, ""));
+        }
+
+        t_data.count = geom_keys_count;
+
+        data->push(data->inst, (uint8_t *) &t_data, sizeof(struct mesh_data));
 
         return 1;
     }
@@ -231,9 +234,10 @@ namespace {
     ct_mesh_renderer mesh_create(ct_world world,
                                  ct_entity entity,
                                  uint64_t scene,
-                                 uint64_t mesh,
-                                 uint64_t node,
-                                 uint64_t material) {
+                                 uint64_t *mesh,
+                                 uint64_t *node,
+                                 uint64_t *material,
+                                 uint32_t geom_count) {
 
         WorldInstance *data = _get_world_instance(world);
 
@@ -241,23 +245,28 @@ namespace {
         allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
         ++data->n;
 
-        ct_scene_a0.create_graph(world, entity, scene);
-
-        ct_material material_instance = ct_material_a0.resource_create(
-                material);
-
         map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
 
-        if (node == 0) {
-            node = ct_scene_a0.get_mesh_node(scene, mesh);
-        }
+        ct_scene_a0.create_graph(world, entity, scene);
 
         data->entity[idx] = entity;
+        mesh_data *mesh_data = &data->mesh[idx];
+        *mesh_data = {};
 
-        data->scene[idx] = scene;
-        data->mesh[idx] = mesh;
-        data->node[idx] = node;
-        data->material[idx] = material_instance;
+        mesh_data->scene = scene;
+        mesh_data->count = geom_count;
+        for (uint32_t i = 0; i < geom_count; ++i) {
+            uint64_t n = node[i];
+            if (n == 0) {
+                n = ct_scene_a0.get_mesh_node(scene, mesh[i]);
+            }
+
+            mesh_data->mesh[i] = mesh[i];
+            mesh_data->node[i] = n;
+            mesh_data->material[i] = material[i];
+            mesh_data->material_inst[i] = ct_material_a0.resource_create(
+                    material[i]);
+        }
 
         return (ct_mesh_renderer) {.idx = idx, .world = world};
     }
@@ -278,7 +287,9 @@ namespace {
                         tdata[i].scene,
                         tdata[i].mesh,
                         tdata[i].node,
-                        tdata[i].material);
+                        tdata[i].material,
+                        tdata[i].count
+            );
         }
     }
 }
@@ -311,11 +322,9 @@ void mesh_render_all(ct_world world,
     WorldInstance *data = _get_world_instance(world);
 
     for (uint32_t i = 0; i < data->n; ++i) {
+        mesh_data *mesh_data = &data->mesh[i];
 
-        ct_material material = data->material[i];
-        uint64_t scene = data->scene[i];
-        uint64_t geom = data->mesh[i];
-
+        uint64_t scene = mesh_data->scene;
 
         ct_entity ent = data->entity[i];
 
@@ -325,43 +334,51 @@ void mesh_render_all(ct_world world,
 
         ct_transform_a0.get_world_matrix(t, wm);
 
-        //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
-        float node_w[16];
-        float final_w[16];
+        for (int j = 0; j < mesh_data->count; ++j) {
+            ct_material material = mesh_data->material_inst[j];
+            uint64_t geom = mesh_data->mesh[j];
 
-        celib::mat4_identity(node_w);
-        celib::mat4_identity(final_w);
+            //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
+            float node_w[16];
+            float final_w[16];
 
-        if (ct_scenegprah_a0.has(world, ent)) {
-            uint64_t name = ct_scene_a0.get_mesh_node(scene, geom);
-            if (name != 0) {
-                ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,name);
-                ct_scenegprah_a0.get_world_matrix(n, node_w);
+            celib::mat4_identity(node_w);
+            celib::mat4_identity(final_w);
+
+            if (ct_scenegprah_a0.has(world, ent)) {
+                uint64_t name = ct_scene_a0.get_mesh_node(scene, geom);
+                if (name != 0) {
+                    ct_scene_node n = ct_scenegprah_a0.node_by_name(world, ent,
+                                                                    name);
+                    ct_scenegprah_a0.get_world_matrix(n, node_w);
+                }
             }
+
+            celib::mat4_mul(final_w, node_w, wm);
+
+            bgfx::setTransform(&final_w, 1);
+
+            ct_scene_a0.setVBIB(scene, geom);
+
+            ct_material_a0.submit(material, layer_name, viewid);
         }
-
-        celib::mat4_mul(final_w, node_w, wm);
-
-        bgfx::setTransform(&final_w, 1);
-
-        ct_scene_a0.setVBIB(scene, geom);
-
-        ct_material_a0.submit(material, layer_name, viewid);
     }
 }
 
-ct_material mesh_get_material(ct_mesh_renderer mesh) {
+ct_material mesh_get_material(ct_mesh_renderer mesh,
+                              uint32_t idx) {
     WorldInstance *data = _get_world_instance(mesh.world);
-    return data->material[mesh.idx];
+    return data->mesh[mesh.idx].material_inst[idx];
 
 }
 
 void mesh_set_material(ct_mesh_renderer mesh,
+                       uint32_t idx,
                        uint64_t material) {
     WorldInstance *data = _get_world_instance(mesh.world);
     ct_material material_instance = ct_material_a0.resource_create(material);
 
-    data->material[mesh.idx] = material_instance;
+    data->mesh[mesh.idx].material_inst[idx] = material_instance;
 }
 
 
@@ -375,11 +392,9 @@ static void _set_property(ct_world world,
 //    uint64_t node = CT_ID64_0("node");
     uint64_t material = CT_ID64_0("material");
 
-    ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
-
+//    ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
     if (key == material) {
-        mesh_set_material(mesh_renderer,
-                          CT_ID64_0(value.value.str));
+        //TODO: mesh_set_material(mesh_renderer, CT_ID64_0(value.value.str));
     }
 }
 

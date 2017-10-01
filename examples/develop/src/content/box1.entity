@@ -9,42 +9,15 @@ components:
     component_type: "mesh_renderer"
     scene: "content/scene/solider/ArmyPilot"
 
-    mesh: "Mesh1Mesh"
-#    node: "Mesh1"
+    geometries:
+      3321387978411:
+        mesh: "Mesh1Mesh"
+        material: "content/scene/solider/head"
 
-    material: "content/scene/solider/head"
+      21389198798718:
+        mesh: "Mesh1Mesh1"
+        material: "content/scene/solider/body"
 
-children:
-  "e432c0ed88dd461e81f50973ffb00263":
-      components:
-        "32c0ed88dd461e81":
-          component_type: "transform"
-          position: [0, 0, 0]
-          rotation: [0, 0, 0]
-          scale: [1, 1, 1]
-
-        "41265598456134":
-          component_type: "mesh_renderer"
-          scene: "content/scene/solider/ArmyPilot"
-
-          mesh: "Mesh1Mesh1"
-#          node: "Mesh1"
-
-          material: "content/scene/solider/body"
-
-  "81f50973ffb00263":
-      components:
-        "32c0ed88dd461e81":
-          component_type: "transform"
-          position: [0, 0, 0]
-          rotation: [0, 0, 0]
-          scale: [1, 1, 1]
-
-        "41265598456134":
-          component_type: "mesh_renderer"
-          scene: "content/scene/solider/ArmyPilot"
-
-          mesh: "Mesh1Mesh12"
-#          node: "Mesh1"
-
-          material: "content/scene/solider/m4"
+      132189797984986:
+        mesh: "Mesh1Mesh12"
+        material: "content/scene/solider/m4"

@@ -52,7 +52,7 @@ static void load(const char* filename, uint64_t type, uint64_t name, struct ct_w
     _G.ent = ent;
 
     ct_mesh_renderer mesh = ct_mesh_renderer_a0.get(world, ent);
-    ct_mesh_renderer_a0.set_material(mesh, name);
+    ct_mesh_renderer_a0.set_material(mesh, 0, name);
 
     if(ct_transform_a0.has(world, ent)) {
         ct_transform t = ct_transform_a0.get(world, ent);

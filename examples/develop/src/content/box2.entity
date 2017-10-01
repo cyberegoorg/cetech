@@ -8,9 +8,13 @@ components:
   "41232132255234":
     component_type: "mesh_renderer"
     scene: "content/cube"
-    mesh: "g_cube"
-    node: "n_cube"
-    material: "content/material1"
+
+    geometries:
+      3321387978411:
+        mesh: "g_cube"
+        node: "n_cube"
+        material: "content/material1"
+
 
 children:
   "23321321312dsaczx4234331453252":
@@ -24,6 +28,10 @@ children:
       "4123213225523dsadasdqqw21324":
         component_type: "mesh_renderer"
         scene: "content/cube"
-        mesh: "g_cube"
-        node: "n_cube"
-        material: "content/material1"
+
+        geometries:
+          3321387978411:
+            mesh: "g_cube"
+            node: "n_cube"
+            material: "content/material1"
+

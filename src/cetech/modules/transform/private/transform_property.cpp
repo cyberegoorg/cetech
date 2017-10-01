@@ -306,23 +306,28 @@ static int _init(ct_api_a0 *api) {
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_position"),
-            (ct_cmd_fce) {.execute = set_pos_cmd, .description = cmd_description});
+            (ct_cmd_fce) {
+                    .execute = set_pos_cmd,
+                    .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_scale"),
-            (ct_cmd_fce) {.execute = set_scale_cmd, .description = cmd_description});
+            (ct_cmd_fce) {
+                    .execute = set_scale_cmd,
+                    .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_rotation"),
-            (ct_cmd_fce) {.execute = set_rotation_cmd, .description = cmd_description});
+            (ct_cmd_fce) {
+                    .execute = set_rotation_cmd,
+                    .description = cmd_description});
 
     return 1;
 }
 
 static void _shutdown() {
 
-    ct_entity_property_a0.unregister_component(
-            CT_ID64_0("transform"));
+    ct_entity_property_a0.unregister_component(CT_ID64_0("transform"));
 
     _G = {};
 }

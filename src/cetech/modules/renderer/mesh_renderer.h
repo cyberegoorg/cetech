@@ -65,21 +65,23 @@ struct ct_mesh_renderer_a0 {
     struct ct_mesh_renderer (*create)(struct ct_world world,
                                       struct ct_entity entity,
                                       uint64_t scene,
-                                      uint64_t mesh,
-                                      uint64_t node,
-                                      uint64_t material);
+                                      uint64_t *mesh,
+                                      uint64_t *node,
+                                      uint64_t *material,
+                                      uint32_t geom_count);
 
     //! Get mesh renderer material
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
-    struct ct_material (*get_material)(struct ct_mesh_renderer mesh);
+    struct ct_material (*get_material)(struct ct_mesh_renderer mesh, uint32_t idx);
 
     //! Set material
     //! \param world World
     //! \param mesh Mesh
     //! \param material Material
     void (*set_material)(struct ct_mesh_renderer mesh,
+                         uint32_t idx,
                          uint64_t material);
 
     //! Render all mesh in world
