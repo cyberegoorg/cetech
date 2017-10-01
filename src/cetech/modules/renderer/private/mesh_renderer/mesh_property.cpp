@@ -237,7 +237,6 @@ static void on_component(struct ct_world world,
                     tmp_keys, keys_count + 1, CT_ID64_0("mesh_set_scene"), 0);
 
 
-
     ct_debugui_a0.SameLine(0.0f, -1.0f);
     ct_debugui_a0.InputText("scene",
                             (char *) scene_buffer, strlen(scene_buffer),
@@ -271,116 +270,126 @@ static void on_component(struct ct_world world,
         const char *node_name = ct_ydb_a0.get_string(filename, tmp_keys,
                                                      keys_count + 3, "");
 
-        ImGui::Separator();
+        char id[32] = {0};
+        sprintf(id, "element %d", i);
+        if (ImGui::TreeNodeEx(id, ImGuiTreeNodeFlags_DefaultOpen)) {
 
-        //======================================================================
-        // Material
-        //======================================================================
 
-        sprintf(labelid, "mp_select_material_%d", i);
+            //======================================================================
+            // Material
+            //======================================================================
 
-        tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("material");
-        char material_buffer[128] = {'\0'};
-        ui_select_asset(material_buffer, labelid, "material", material_name,
-                        world,
-                        entity, filename, tmp_keys, keys_count + 3,
-                        CT_ID64_0("mesh_set_material"), i);
+            sprintf(labelid, "mp_select_material_%d", i);
 
-        ct_debugui_a0.SameLine(0.0f, -1.0f);
-        sprintf(labelid, "material##mp_material_%d", i);
-        ct_debugui_a0.InputText(labelid,
-                                (char *) material_buffer,
-                                strlen(material_buffer),
-                                DebugInputTextFlags_ReadOnly, 0, NULL);
+            tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("material");
+            char material_buffer[128] = {'\0'};
+            ui_select_asset(material_buffer, labelid, "material", material_name,
+                            world,
+                            entity, filename, tmp_keys, keys_count + 3,
+                            CT_ID64_0("mesh_set_material"), i);
 
-        //======================================================================
-        // Mesh
-        //======================================================================
-        {
-            char* items;
-            uint32_t items_count;
-            ct_scene_a0.get_all_geometries(CT_ID64_0(scene_buffer), &items, &items_count);
+            ct_debugui_a0.SameLine(0.0f, -1.0f);
+            sprintf(labelid, "material##mp_material_%d", i);
+            ct_debugui_a0.InputText(labelid,
+                                    (char *) material_buffer,
+                                    strlen(material_buffer),
+                                    DebugInputTextFlags_ReadOnly, 0, NULL);
 
-            int item2 = -1;
-            const char* items2[items_count];
-            for (int j = 0; j < items_count; ++j) {
-                items2[j] = &items[j * 128];
+            //======================================================================
+            // Mesh
+            //======================================================================
+            {
+                char *items;
+                uint32_t items_count;
+                ct_scene_a0.get_all_geometries(CT_ID64_0(scene_buffer), &items,
+                                               &items_count);
 
-                if(!strcmp(items2[j], mesh_name)) {
-                    item2 = j;
+                int item2 = -1;
+                const char *items2[items_count];
+                for (int j = 0; j < items_count; ++j) {
+                    items2[j] = &items[j * 128];
+
+                    if (!strcmp(items2[j], mesh_name)) {
+                        item2 = j;
+                    }
+                }
+
+                sprintf(labelid, "mesh##mp_mesh_%d", i);
+                if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count,
+                                        -1)) {
+                    tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("mesh");
+                    struct ct_ent_cmd_str_s cmd = {
+                            .header = {
+                                    .size = sizeof(struct ct_ent_cmd_str_s),
+                                    .type = CT_ID64_0("mesh_set_mesh"),
+                            },
+                            .ent = {
+                                    .world = world,
+                                    .entity = entity,
+                                    .filename = filename,
+                                    .keys_count = keys_count + 3,
+                            },
+                            .idx = i,
+                    };
+
+                    memcpy(cmd.ent.keys, tmp_keys,
+                           sizeof(uint64_t) * (keys_count + 3));
+
+                    strcpy(cmd.new_value, items2[item2]);
+                    strcpy(cmd.old_value, mesh_name);
+
+                    ct_cmd_system_a0.execute(&cmd.header);
                 }
             }
 
-            sprintf(labelid, "mesh##mp_mesh_%d", i);
-            if(ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1) ) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("mesh");
-                struct ct_ent_cmd_str_s cmd = {
-                        .header = {
-                                .size = sizeof(struct ct_ent_cmd_str_s),
-                                .type = CT_ID64_0("mesh_set_mesh"),
-                        },
-                        .ent = {
-                                .world = world,
-                                .entity = entity,
-                                .filename = filename,
-                                .keys_count = keys_count+3,
-                        },
-                        .idx = i,
-                };
+            //======================================================================
+            // Node
+            //======================================================================
+            {
+                char *items;
+                uint32_t items_count;
+                ct_scene_a0.get_all_nodes(CT_ID64_0(scene_buffer), &items,
+                                          &items_count);
 
-                memcpy(cmd.ent.keys, tmp_keys,
-                       sizeof(uint64_t) * (keys_count+3));
+                int item2 = -1;
+                const char *items2[items_count];
+                for (int j = 0; j < items_count; ++j) {
+                    items2[j] = &items[j * 128];
 
-                strcpy(cmd.new_value, items2[item2]);
-                strcpy(cmd.old_value, mesh_name);
-
-                ct_cmd_system_a0.execute(&cmd.header);
-            }
-        }
-
-        //======================================================================
-        // Node
-        //======================================================================
-        {
-            char* items;
-            uint32_t items_count;
-            ct_scene_a0.get_all_nodes(CT_ID64_0(scene_buffer), &items, &items_count);
-
-            int item2 = -1;
-            const char* items2[items_count];
-            for (int j = 0; j < items_count; ++j) {
-                items2[j] = &items[j * 128];
-
-                if(!strcmp(items2[j], node_name)) {
-                    item2 = j;
+                    if (!strcmp(items2[j], node_name)) {
+                        item2 = j;
+                    }
                 }
+
+                sprintf(labelid, "node##mp_node_%d", i);
+                if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count,
+                                        -1)) {
+                    tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("node");
+                    struct ct_ent_cmd_str_s cmd = {
+                            .header = {
+                                    .size = sizeof(struct ct_ent_cmd_str_s),
+                                    .type = CT_ID64_0("mesh_set_node"),
+                            },
+                            .ent = {
+                                    .world = world,
+                                    .entity = entity,
+                                    .filename = filename,
+                                    .keys_count = keys_count + 3,
+                            },
+                            .idx = i,
+                    };
+
+                    memcpy(cmd.ent.keys, tmp_keys,
+                           sizeof(uint64_t) * (keys_count + 3));
+
+                    strcpy(cmd.new_value, items2[item2]);
+                    strcpy(cmd.old_value, node_name);
+
+                    ct_cmd_system_a0.execute(&cmd.header);
+                };
             }
 
-            sprintf(labelid, "node##mp_node_%d", i);
-            if(ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1)) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("node");
-                struct ct_ent_cmd_str_s cmd = {
-                        .header = {
-                                .size = sizeof(struct ct_ent_cmd_str_s),
-                                .type = CT_ID64_0("mesh_set_node"),
-                        },
-                        .ent = {
-                                .world = world,
-                                .entity = entity,
-                                .filename = filename,
-                                .keys_count = keys_count+3,
-                        },
-                        .idx = i,
-                };
-
-                memcpy(cmd.ent.keys, tmp_keys,
-                       sizeof(uint64_t) * (keys_count+3));
-
-                strcpy(cmd.new_value, items2[item2]);
-                strcpy(cmd.old_value, node_name);
-
-                ct_cmd_system_a0.execute(&cmd.header);
-            };
+            ImGui::TreePop();
         }
     }
 }
