@@ -369,7 +369,6 @@ ct_material mesh_get_material(ct_mesh_renderer mesh,
                               uint32_t idx) {
     WorldInstance *data = _get_world_instance(mesh.world);
     return data->mesh[mesh.idx].material_inst[idx];
-
 }
 
 void mesh_set_material(ct_mesh_renderer mesh,
@@ -381,6 +380,25 @@ void mesh_set_material(ct_mesh_renderer mesh,
     data->mesh[mesh.idx].material_inst[idx] = material_instance;
 }
 
+void set_geometry(struct ct_mesh_renderer mesh,
+                     uint32_t idx,
+                     uint64_t geometry) {
+    WorldInstance *data = _get_world_instance(mesh.world);
+    data->mesh[mesh.idx].mesh[idx] = geometry;
+}
+
+void set_node(struct ct_mesh_renderer mesh,
+                 uint32_t idx,
+                 uint64_t node) {
+    WorldInstance *data = _get_world_instance(mesh.world);
+    data->mesh[mesh.idx].node[idx] = node;
+}
+
+void set_scene(struct ct_mesh_renderer mesh,
+              uint64_t scene) {
+    WorldInstance *data = _get_world_instance(mesh.world);
+    data->mesh[mesh.idx].scene = scene;
+}
 
 static void _set_property(ct_world world,
                           ct_entity entity,
@@ -458,6 +476,9 @@ static void _init_api(struct ct_api_a0 *api) {
             .create = mesh_create,
             .get_material = mesh_get_material,
             .set_material = mesh_set_material,
+            .set_geometry = set_geometry,
+            .set_node = set_node,
+            .set_scene = set_scene,
             .render_all = mesh_render_all,
     };
 

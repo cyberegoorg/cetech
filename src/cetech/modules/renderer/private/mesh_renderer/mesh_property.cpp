@@ -81,7 +81,7 @@ struct ct_ent_cmd_str_s {
     char old_value[128];
 };
 
-static void set_str_cmd(const struct ct_cmd *cmd,
+static void cmd_set_str(const struct ct_cmd *cmd,
                         bool inverse) {
     const struct ct_ent_cmd_str_s *pos_cmd = (const ct_ent_cmd_str_s *) cmd;
 
@@ -99,8 +99,15 @@ static void set_str_cmd(const struct ct_cmd *cmd,
 
     if (pos_cmd->header.type == CT_ID64_0("mesh_set_material")) {
         ct_mesh_renderer_a0.set_material(mr, pos_cmd->idx, CT_ID64_0(value));
-    } else {
-        ct_resource_a0.compile_and_reload(pos_cmd->ent.filename);
+
+    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_mesh")) {
+        ct_mesh_renderer_a0.set_geometry(mr, pos_cmd->idx, CT_ID64_0(value));
+
+    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_node")) {
+        ct_mesh_renderer_a0.set_node(mr, pos_cmd->idx, CT_ID64_0(value));
+
+    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_scene")) {
+        ct_mesh_renderer_a0.set_scene(mr, CT_ID64_0(value));
     }
 }
 
@@ -390,25 +397,25 @@ static int _init(ct_api_a0 *api) {
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("mesh_set_scene"),
             (ct_cmd_fce) {
-                    .execute = set_str_cmd,
+                    .execute = cmd_set_str,
                     .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("mesh_set_mesh"),
             (ct_cmd_fce) {
-                    .execute = set_str_cmd,
+                    .execute = cmd_set_str,
                     .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("mesh_set_node"),
             (ct_cmd_fce) {
-                    .execute = set_str_cmd,
+                    .execute = cmd_set_str,
                     .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("mesh_set_material"),
             (ct_cmd_fce) {
-                    .execute = set_str_cmd,
+                    .execute = cmd_set_str,
                     .description = cmd_description});
 
     return 1;

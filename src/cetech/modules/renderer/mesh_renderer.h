@@ -74,7 +74,11 @@ struct ct_mesh_renderer_a0 {
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
-    struct ct_material (*get_material)(struct ct_mesh_renderer mesh, uint32_t idx);
+    struct ct_material (*get_material)(struct ct_mesh_renderer mesh,
+                                       uint32_t idx);
+
+    void (*set_scene)(struct ct_mesh_renderer mesh,
+                      uint64_t scene);
 
     //! Set material
     //! \param world World
@@ -83,6 +87,15 @@ struct ct_mesh_renderer_a0 {
     void (*set_material)(struct ct_mesh_renderer mesh,
                          uint32_t idx,
                          uint64_t material);
+
+    void (*set_geometry)(struct ct_mesh_renderer mesh,
+                         uint32_t idx,
+                         uint64_t geometry);
+
+    void (*set_node)(struct ct_mesh_renderer mesh,
+                     uint32_t idx,
+                     uint64_t node);
+
 
     //! Render all mesh in world
     //! \param world Word
