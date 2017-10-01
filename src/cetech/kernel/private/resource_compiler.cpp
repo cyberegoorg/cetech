@@ -94,22 +94,21 @@ struct G {
 void type_name_from_filename(const char *fullname,
                              uint64_t *type,
                              uint64_t *name,
-                             const char **short_name) {
+                             char *short_name) {
 
-    const char *filename_short = fullname;
-    const char *resource_type = ct_path_a0.extension(filename_short);
+    const char *resource_type = ct_path_a0.extension(fullname);
+
+    size_t size = strlen(fullname) - strlen(resource_type) - 1;
 
     char resource_name[128] = {};
-
-    size_t size = strlen(filename_short) - strlen(resource_type) - 1;
-
-    memcpy(resource_name, filename_short, size);
+    memcpy(resource_name, fullname, size);
 
     *type = CT_ID64_0(resource_type);
     *name = CT_ID64_0(resource_name);
 
     if (short_name) {
-        *short_name = filename_short;
+        memcpy(short_name, fullname, sizeof(char) * size);
+        short_name[size] = '\0';
     }
 }
 
@@ -206,20 +205,18 @@ void _compile_files(Array<ct_task_item> &tasks,
                     uint32_t files_count,
                     celib::Map<uint64_t> &compiled) {
     for (uint32_t i = 0; i < files_count; ++i) {
-        const char *source_filename_short;
-
         uint64_t type_id;
         uint64_t name_id;
 
         type_name_from_filename(files[i], &type_id, &name_id,
-                                &source_filename_short);
+                                NULL);
 
         compilator compilator = _find_compilator(type_id);
         if (compilator.compilator == NULL) {
             continue;
         }
 
-        if (!builddb_need_compile(source_filename_short, &ct_filesystem_a0)) {
+        if (!builddb_need_compile(files[i], &ct_filesystem_a0)) {
             continue;
         }
 
@@ -227,7 +224,7 @@ void _compile_files(Array<ct_task_item> &tasks,
         snprintf(build_name, CETECH_ARRAY_LEN(build_name),
                  "%" SDL_PRIX64 "%" SDL_PRIX64, type_id, name_id);
 
-        builddb_set_file_hash(source_filename_short, build_name);
+        builddb_set_file_hash(files[i], build_name);
 
         auto platform = ct_config_a0.find("kernel.platform");
         char *build_full = ct_path_a0.join(
@@ -246,11 +243,11 @@ void _compile_files(Array<ct_task_item> &tasks,
                 .type = type_id,
                 .compilator = compilator,
                 .build_filename = build_full,
-                .source_filename = ct_memory_a0.str_dup(source_filename_short,
+                .source_filename = ct_memory_a0.str_dup(files[i],
                                                         ct_memory_a0.main_scratch_allocator()),
                 .mtime = ct_filesystem_a0.file_mtime(
                         CT_ID64_0("source"),
-                        source_filename_short),
+                        files[i]),
 
                 .completed = 0
         };

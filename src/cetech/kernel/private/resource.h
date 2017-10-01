@@ -40,7 +40,7 @@ void compile_and_reload(const char* filename);
 void type_name_from_filename(const char *fullname,
                              uint64_t *type,
                              uint64_t *name,
-                             const char **short_name);
+                             char *short_name);
 
 char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform);

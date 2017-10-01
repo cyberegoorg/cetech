@@ -22,3 +22,5 @@ blobs:
         - uint32_t node_parent[node_count]
         - float[16] node_pose[node_count]
         - uint64_t geom_node[geom_count]
+        - char[128] geom_str[geom_count]
+        - char[128] node_str[node_count]

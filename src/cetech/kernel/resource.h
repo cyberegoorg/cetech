@@ -248,7 +248,7 @@ struct ct_resource_a0 {
     void (*type_name_from_filename)(const char *fullname,
                                  uint64_t *type,
                                  uint64_t *name,
-                                 const char **short_name);
+                                 char *short_name);
 
     //! Get build dir
     //! \param build_dir Build dir

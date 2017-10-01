@@ -33,6 +33,9 @@ struct ct_scene_a0 {
 
     uint64_t (*get_mesh_node)(uint64_t scene,
                               uint64_t mesh);
+
+    void (*get_all_geometries)(uint64_t scene, char** geometries, uint32_t* count);
+    void (*get_all_nodes)(uint64_t scene, char** geometries, uint32_t* count);
 };
 
 #ifdef __cplusplus

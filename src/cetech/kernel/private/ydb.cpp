@@ -91,7 +91,7 @@ void free(const char *path) {
 }
 
 ct_yamlng_node get_first_node_recursive(const char *path,
-                                        uint64_t *keys,
+                                        const uint64_t *keys,
                                         uint32_t keys_count,
                                         uint32_t max_depth) {
 
@@ -182,6 +182,7 @@ void get_map_keys(const char *path,
 
                     out->keys[(*out->count)++] = str_key;
                 }, &out_keys);
+
     }
 
     // Find parent
@@ -382,7 +383,7 @@ void set_bool(const char *path,
 
 
 void set_string(const char *path,
-                uint64_t *keys,
+                const uint64_t *keys,
                 uint32_t keys_count,
                 const char *value) {
     struct ct_yng_doc *d = get(path);
@@ -429,7 +430,7 @@ void set_vec3(const char *path,
 }
 
 void set_vec4(const char *path,
-              uint64_t *keys,
+              const uint64_t *keys,
               uint32_t keys_count,
               float *value) {
 
@@ -444,7 +445,7 @@ void set_vec4(const char *path,
 }
 
 void set_mat4(const char *path,
-              uint64_t *keys,
+              const uint64_t *keys,
               uint32_t keys_count,
               float *value) {
 

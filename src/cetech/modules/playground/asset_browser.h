@@ -27,6 +27,9 @@ struct ct_asset_browser_a0 {
 
     void (*register_on_asset_double_click)(ct_ab_on_asset_double_click fce);
     void (*unregister_on_asset_double_click)(ct_ab_on_asset_double_click fce);
+
+    uint64_t (*get_selected_asset_type)();
+    void (*get_selected_asset_name)(char* asset_name);
 };
 
 #ifdef __cplusplus

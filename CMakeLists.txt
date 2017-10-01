@@ -137,6 +137,7 @@ set(SOURCE_FILES
         src/cetech/modules/renderer/private/viewport/fullscreen_pass.cpp
         src/cetech/modules/renderer/private/viewport/geometry_pass.cpp
         src/cetech/modules/renderer/private/mesh_renderer/mesh_renderer.cpp
+        src/cetech/modules/renderer/private/mesh_renderer/mesh_property.cpp
         src/cetech/modules/transform/private/transform.cpp
 
         src/cetech/modules/scenegraph/private/scenegraph.cpp

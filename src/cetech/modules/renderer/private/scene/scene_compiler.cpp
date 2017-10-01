@@ -90,6 +90,9 @@ namespace scene_resource_compiler {
         Array<uint32_t> node_parent;
         Array<float> node_pose;
         Array<uint64_t> geom_node;
+
+        Array<char[128]> geom_str; // TODO : SHIT
+        Array<char[128]> node_str; // TODO : SHIT
     };
 
     struct compile_output *_crete_compile_output() {
@@ -112,6 +115,8 @@ namespace scene_resource_compiler {
         output->node_parent.init(a);
         output->node_pose.init(a);
 
+        output->node_str.init(a);
+        output->geom_str.init(a);
 
         return output;
     }
@@ -132,6 +137,9 @@ namespace scene_resource_compiler {
         output->geom_node.destroy();
         output->node_parent.destroy();
         output->node_pose.destroy();
+
+        output->node_str.destroy();
+        output->geom_str.destroy();
 
         CEL_FREE(a, output);
     }
@@ -283,7 +291,11 @@ namespace scene_resource_compiler {
         const char *name_str = d->as_string(d->inst, key, "");
         uint64_t name = CT_ID64_0(name_str);
 
+        char tmp_name[128];
+        strncpy(tmp_name, name_str, 127);
+
         array::push_back(output->geom_name, name);
+        array::push(output->geom_str, &tmp_name, 1);
         array::push_back<uint64_t>(output->geom_node, 0);
         array::push_back(output->ib_offset, array::size(output->ib));
         array::push_back(output->vb_offset, array::size(output->vb));
@@ -367,6 +379,11 @@ namespace scene_resource_compiler {
 
         const char *key_str = d->as_string(d->inst, key, "");
         uint64_t node_name = CT_ID64_0(key_str);
+
+
+        char tmp_name[128];
+        strncpy(tmp_name, key_str, 127);
+        array::push(output->output->node_str, &tmp_name, 1);
 
         uint64_t keys[] = {
                 d->hash(d->inst, value),
@@ -461,6 +478,11 @@ namespace scene_resource_compiler {
                               struct compile_output *output) {
         uint64_t name = CT_ID64_0(root->mName.data);
 
+
+        char tmp_name[128];
+        strncpy(tmp_name, root->mName.data, 127);
+        array::push(output->node_str, &tmp_name, 1);
+
         uint32_t idx = array::size(output->node_name);
 
         array::push_back(output->node_name, name);
@@ -525,6 +547,11 @@ namespace scene_resource_compiler {
                     break;
                 }
             }
+
+
+            char tmp_name[128];
+            strncpy(tmp_name, tmp_buffer, 127);
+            array::push(output->geom_str, &tmp_name, 1);
 
             array::push_back(output->geom_name,
                              CT_ID64_0(tmp_buffer));
@@ -654,6 +681,14 @@ namespace scene_resource_compiler {
         output_blob->push(output_blob->inst, array::begin(output->geom_node),
                          sizeof(uint64_t)*
                          array::size(output->geom_name));
+
+        output_blob->push(output_blob->inst, array::begin(output->geom_str),
+                          sizeof(char[128])*
+                          array::size(output->geom_str));
+
+        output_blob->push(output_blob->inst, array::begin(output->node_str),
+                          sizeof(char[128])*
+                          array::size(output->node_str));
 
         _destroy_compile_output(output);
     }

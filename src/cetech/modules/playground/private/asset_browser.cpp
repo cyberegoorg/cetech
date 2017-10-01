@@ -35,6 +35,7 @@ static struct asset_browser_global {
 
     uint64_t selected_dir_hash;
     uint64_t selected_file;
+    uint32_t selected_file_idx;
 
     const char *root;
     bool visible;
@@ -80,11 +81,35 @@ _DEF_ON_CLB_FCE(ct_ab_on_asset_click, on_asset_click);
 
 _DEF_ON_CLB_FCE(ct_ab_on_asset_double_click, on_asset_double_click);
 
+
+uint64_t get_selected_asset_type() {
+    const char *path = _G.asset_list[_G.selected_file_idx];
+
+    uint64_t type, name;
+    ct_resource_a0.type_name_from_filename(path,
+                                           &type, &name,
+                                           NULL);
+
+    return type;
+}
+
+void get_selected_asset_name(char* asset_name) {
+    const char *path = _G.asset_list[_G.selected_file_idx];
+
+    uint64_t type, name;
+    ct_resource_a0.type_name_from_filename(path,
+                                           &type, &name,
+                                           asset_name);
+}
+
 static ct_asset_browser_a0 asset_browser_api = {
         .register_on_asset_click = register_on_asset_click_,
         .unregister_on_asset_click = unregister_on_asset_click_,
         .register_on_asset_double_click =  register_on_asset_double_click_,
         .unregister_on_asset_double_click = unregister_on_asset_double_click_,
+        .get_selected_asset_name = get_selected_asset_name,
+        .get_selected_asset_type = get_selected_asset_type
+
 };
 
 
@@ -238,6 +263,7 @@ static void ui_asset_list() {
             if (ImGui::Selectable(filename, _G.selected_file == filename_hash,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
                 _G.selected_file = filename_hash;
+                _G.selected_file_idx = i;
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t j = 0;

@@ -966,7 +966,7 @@ ct_yamlng_node create_tree(ct_yng_doc_instance_t *_inst,
 
     uint32_t parent = n.idx;
     for (int i = first_nonexist; i < keys_count-1; ++i) {
-        uint64_t key = combine_key_str(keys, i);
+        uint64_t key = combine_key_str(keys, i+1);
         inst->value[parent].node_count += 1;
 
         uint32_t key_idx = new_node(
@@ -985,13 +985,13 @@ ct_yamlng_node create_tree(ct_yng_doc_instance_t *_inst,
         parent = new_map_idx;
     }
 
-//    uint64_t key = combine_key_str(keys, keys_count);
+    uint64_t key_hash = CT_ID64_0(keys[keys_count-1]);
     inst->value[parent].node_count += 1;
     uint32_t key_idx = new_node(
             inst->doc,
             NODE_STRING,
             {.string = ct_memory_a0.str_dup(keys[keys_count-1], ct_memory_a0.main_allocator())},
-            parent, 0);
+            parent, key_hash);
 
     return {.idx = key_idx, .d = inst->doc};
 }
@@ -1006,20 +1006,20 @@ void create_tree_vec3(ct_yng_doc_instance_t *_inst,
 
     uint64_t key = combine_key_str(keys, keys_count);
 
-    uint32_t new_map_idx = new_node(
+    uint32_t new_seq_idx = new_node(
             d,
             NODE_SEQ, {.node_count=3},
             node.idx, key);
 
     yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);
 
-    map::set(inst->key_map, key, new_map_idx);
+    map::set(inst->key_map, key, new_seq_idx);
 
     for (int i = 0; i < 3; ++i) {
         new_node(
                 d,
                 NODE_FLOAT, {.f = value[2-i]},
-                new_map_idx, i);
+                new_seq_idx, i);
     }
 
 }
@@ -1087,7 +1087,7 @@ void create_tree_string(ct_yng_doc_instance_t *_inst,
 
     new_idx = new_node(
             d,
-            NODE_FLOAT, {.string = str},
+            NODE_STRING, {.string = str},
             node.idx, key);
 
     yamlng_document_inst* inst = (yamlng_document_inst *)(_inst);

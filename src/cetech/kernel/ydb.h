@@ -97,7 +97,7 @@ struct ct_ydb_a0 {
 
 
     void (*set_string)(const char *path,
-                       uint64_t* keys,
+                       const uint64_t* keys,
                        uint32_t keys_count,
                        const char *value);
 
@@ -107,12 +107,12 @@ struct ct_ydb_a0 {
                      float *value);
 
     void (*set_vec4)(const char *path,
-                     uint64_t* keys,
+                     const uint64_t* keys,
                      uint32_t keys_count,
                      float *value);
 
     void (*set_mat4)(const char *path,
-                     uint64_t* keys,
+                     const uint64_t* keys,
                      uint32_t keys_count,
                      float *value);
 

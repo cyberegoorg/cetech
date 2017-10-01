@@ -291,12 +291,29 @@ namespace scene {
 
         return 0;
     }
+
+    void get_all_geometries(uint64_t scene, char** geometries, uint32_t* count) {
+        auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+
+        *geometries = scene_blob::geom_str(res);
+        *count = scene_blob::geom_count(res);
+    }
+
+    void get_all_nodes(uint64_t scene, char** geometries, uint32_t* count) {
+        auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+
+        *geometries = scene_blob::node_str(res);
+        *count = scene_blob::node_count(res);
+    }
 }
+
 
 static ct_scene_a0 scene_api = {
         .setVBIB = scene::setVBIB,
         .create_graph = scene::create_graph,
         .get_mesh_node = scene::get_mesh_node,
+        .get_all_geometries = scene::get_all_geometries,
+        .get_all_nodes =  scene::get_all_nodes,
 };
 
 void _init_api(struct ct_api_a0 *api) {

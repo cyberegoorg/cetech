@@ -142,6 +142,8 @@ void unregister_on_component_(uint64_t type) {
     map::remove(_G.on_component, type);
 }
 
+
+
 static ct_entity_property_a0 entity_property_a0 = {
         .register_component = register_on_component_,
         .unregister_component = unregister_on_component_,
