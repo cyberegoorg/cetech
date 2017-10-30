@@ -72,6 +72,15 @@ static void on_debugui() {
         return;
     }
 
+    if (ct_debugui_a0.Button("Save", (float[2]) {0.0f})) {
+        ct_ydb_a0.save(_G.filename);
+    }
+    ct_debugui_a0.SameLine(0.0f, -1.0f);
+
+    ct_debugui_a0.InputText("asset",
+                            (char*)_G.filename, strlen(_G.filename),
+                            DebugInputTextFlags_ReadOnly, 0, NULL);
+
     if (ct_debugui_a0.CollapsingHeader("Entity", DebugUITreeNodeFlags_DefaultOpen)) {
         ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
     }

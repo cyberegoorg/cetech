@@ -19,6 +19,7 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -36,6 +37,12 @@ static void on_debugui() {
     char filename[512] = {};
     ct_resource_a0.compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                          _G.active_type, _G.active_name);
+
+    if (ct_debugui_a0.Button("Save", (float[2]) {0.0f})) {
+        ct_ydb_a0.save(filename);
+    }
+    ct_debugui_a0.SameLine(0.0f, -1.0f);
+
     ct_debugui_a0.InputText("asset",
                             filename, strlen(filename),
                             DebugInputTextFlags_ReadOnly, 0, NULL);
@@ -43,7 +50,6 @@ static void on_debugui() {
     if (_G.active_on_asset) {
         _G.active_on_asset(_G.active_type, _G.active_name, _G.active_path);
     }
-
 }
 
 static void register_asset(uint64_t type,
@@ -98,6 +104,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_property_editor_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             CEL_UNUSED(reload);

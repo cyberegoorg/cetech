@@ -82,11 +82,12 @@ namespace memory {
 
     char *str_dup(const char *s,
                   cel_alloc *allocator) {
-        char *d = (char *) CEL_ALLOCATE(allocator, char, strlen(s) + 1);
+        const uint32_t size = strlen(s) + 1;
+
+        char *d = CEL_ALLOCATE(allocator, char, size);
         CETECH_ASSERT("string", d != NULL);
 
-        if (d == NULL) return NULL;
-
+        memset(d, '\0', sizeof(char) * size);
         strcpy(d, s);
 
         return d;

@@ -12,6 +12,13 @@ children:
   55643423443313252:
     name: m4a1
     PARENT: content/m4a1.entity
+    components:
+      412321322234:
+        geometries:
+          52641619861635165:
+            mesh: geom_0
+
   55643433135454252:
     name: box2
     PARENT: content/box2.entity
+

@@ -37,6 +37,7 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
+CETECH_DECL_API(ct_ydb_a0);
 
 using namespace celib;
 
@@ -249,8 +250,6 @@ static void open(uint64_t name,
     ct_explorer_a0.set_level(_G.world[idx], _G.entity[idx],
                                     _G.entity_name[idx], _G.root[idx],
                                     _G.path[idx], is_level);
-
-    ct_playground_a0.reload_layout();
 }
 
 void init() {
@@ -364,6 +363,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_playground_a0);
+            CETECH_GET_API(api, ct_ydb_a0);
         },
         {
             CEL_UNUSED(reload);

@@ -292,10 +292,11 @@ static void on_debugui() {
                                 DebugUIWindowFlags_(0))) {
 
         float content_w = ImGui::GetContentRegionAvailWidth();
-        if (_G.midle_column_width < 0)
-            _G.midle_column_width = content_w -
-                                    _G.left_column_width -
-                                    180;
+
+        if (_G.midle_column_width < 0) {
+            _G.midle_column_width = content_w - _G.left_column_width - 180;
+        }
+
         ui_breadcrumb(_G.current_dir);
         ui_asset_filter();
         ui_dir_list();
