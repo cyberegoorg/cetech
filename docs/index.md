@@ -1,7 +1,7 @@
 # What is it?
 
-CETech is a Data-Driven game engine and toolset designed for develolp games and other interactive applications.
-They are trying to be free, small, easily expandable and multiplatform (yes, typical bullshit = D).
+CETech is a Data-Driven game engine and toolset designed for develop games and other interactive applications.
+They are trying to be small, easily expandable and multiplatform (yes, typical bullshit = D).
 Not trying to be a pummeling functions and does not allow you a few clicks to create professional look game
 like Unreal Engine, Unity etc... But instead will provide a good basis for further work.
 
@@ -18,8 +18,7 @@ from technology scratch.
 
 ### What does it consist?
 
-The main part is the [**engine**][engine], development environment [**Playground**][playground] and a set of python
-scripts to facilitate the compilation and managing dependencies.
+The main part is the [**engine**][engine] and a set of python scripts to facilitate the compilation and managing dependencies.
 
 ---
 
@@ -27,5 +26,4 @@ scripts to facilitate the compilation and managing dependencies.
 [unity3d]: https://unity3d.com
 [cryengine]: https:/www.cryengine.com
 [stingray]: http://www.autodesk.com/products/stingray/overview
-[playground]: playground/overview.md
 [engine]: engine/overview.md
