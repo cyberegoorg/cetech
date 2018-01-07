@@ -1,7 +1,13 @@
 #include <unistd.h>
 #include <errno.h>
 
+#ifdef CETECH_LINUX
 #include <sys/inotify.h>
+#elif defined(CETECH_DARWIN)
+#include <CoreServices/CoreServices.h>
+#else
+#warning Watchdog is unsupported
+#endif
 
 #include <celib/macros.h>
 #include <celib/map.inl>
@@ -29,7 +35,15 @@ struct watchdog_instance {
     celib::Map<char *> wd2dir;
     celib::Map<int> dir2wd;
     cel_alloc *alloc;
+
+#ifdef CETECH_LINUX
     int inotify;
+#endif
+
+#ifdef CETECH_DARWIN
+
+#endif
+
 };
 
 void add_dir(ct_watchdog_instance_t *inst,
@@ -39,6 +53,7 @@ void add_dir(ct_watchdog_instance_t *inst,
 
     int wd = 0;
 
+#ifdef CETECH_LINUX
     wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
     ct_log_a0.debug(LOG_WHERE, "New watch -> %s", path);
 
@@ -47,6 +62,7 @@ void add_dir(ct_watchdog_instance_t *inst,
                         strerror(errno));
         return;
     }
+#endif
 
     char *path_dup = ct_memory_a0.str_dup(path, wi->alloc);
     uint64_t path_hash = CT_ID64_0(path_dup);
@@ -69,7 +85,6 @@ void add_dir(ct_watchdog_instance_t *inst,
                              ct_memory_a0.main_scratch_allocator());
     }
 }
-
 
 ct_watchdog_ev_header *event_begin(ct_watchdog_instance_t *inst) {
     watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
@@ -117,7 +132,9 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
     clean_events(wi);
 
-#define BUF_LEN 1024
+#ifdef CETECH_LINUX
+    #define BUF_LEN 1024
+
     char buf[BUF_LEN] __attribute__ ((aligned(8)));
 
     ssize_t numRead = read(wi->inotify, buf, BUF_LEN);
@@ -126,6 +143,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
     }
 
     struct inotify_event *event;
+
     for (char *p = buf;
          p < buf + numRead; p += sizeof(struct inotify_event) +
                                  event->len) {
@@ -154,6 +172,8 @@ void fetch_events(ct_watchdog_instance_t *inst) {
             }
         }
     }
+#endif
+
 }
 
 ct_watchdog *create(struct cel_alloc *alloc) {
@@ -170,12 +190,15 @@ ct_watchdog *create(struct cel_alloc *alloc) {
         return NULL;
     }
 
+#ifdef CETECH_LINUX
     int inotify = inotify_init1(IN_NONBLOCK);
     if (-1 == inotify) {
         ct_log_a0.error(LOG_WHERE, "Could not init inotify");
         return NULL;
     }
     watchdog_inst->inotify = inotify;
+#endif
+
     watchdog_inst->alloc = alloc;
 
     *watchdog = {
@@ -204,12 +227,16 @@ void destroy(struct ct_watchdog *watchdog) {
     while (ct_it != ct_end) {
         CEL_FREE(alloc, ct_it->value);
 
+#ifdef CETECH_LINUX
         inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
-
+#endif
+        
         ++ct_it;
     }
 
+#ifdef CETECH_LINUX
     close(wi->inotify);
+#endif
 
     wi->wd2dir.destroy();
     wi->dir2wd.destroy();

@@ -96,7 +96,9 @@ void ct_log_stdout_handler(enum ct_log_level level,
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
+#ifdef CETECH_LINUX
     fflush_unlocked(out);
+#endif
 
 #if defined(CETECH_LINUX)
     flock(out->_fileno, LOCK_UN);

@@ -1,26 +1,27 @@
-
-#include <string.h>
-
-#if defined(CETECH_LINUX)
-
-#include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <celib/allocator.h>
+
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/private/allocator_core_private.h>
 #include <cetech/kernel/log.h>
 #include <cetech/kernel/errors.h>
 #include <cetech/kernel/module.h>
-#include "celib/allocator.h"
+
+#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
+
+#include <execinfo.h>
 
 #endif
 
 CETECH_DECL_API(ct_log_a0);
 
 char *stacktrace(int skip) {
+#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
     auto *a = core_allocator::get();
 
-#if defined(CETECH_LINUX)
     char *return_str = CEL_ALLOCATE(a, char, 4096);
     return_str[0] = '\0';
 
@@ -69,6 +70,8 @@ char *stacktrace(int skip) {
     CEL_FREE(a, messages);
     return return_str;
 #endif
+
+    return NULL;
 }
 
 void stacktrace_free(char *st) {

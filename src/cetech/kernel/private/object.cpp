@@ -14,9 +14,17 @@ CETECH_DECL_API(ct_log_a0);
 void *load_object(const char *path) {
     char buffer[128];
     uint32_t it = sprintf(buffer, "%s", path);
-    it += sprintf(buffer+it, ".so");
 
+#ifdef CETECH_LINUX
+    it += sprintf(buffer+it, ".so");
     void *obj = dlmopen(LM_ID_NEWLM, buffer, RTLD_LOCAL | RTLD_NOW);
+#endif
+
+#ifdef CETECH_DARWIN
+    it += sprintf(buffer+it, ".dylib");
+    void *obj = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
+#endif
+
 
     if (obj == NULL) {
         ct_log_a0.error(LOG_WHERE, "Could not load object file %s", dlerror());

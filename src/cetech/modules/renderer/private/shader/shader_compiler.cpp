@@ -162,8 +162,15 @@ namespace shader_compiler {
             return;
         }
 
+
         ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
                                                VIO_OPEN_READ);
+
+        do {
+            tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
+        } while (tmp_file == NULL);
+
+
         char *vs_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
                              tmp_file->size(tmp_file->inst) + 1);

@@ -280,7 +280,7 @@ namespace filesystem {
     }
 
 
-    time_t get_file_mtime(uint64_t root,
+    int64_t get_file_mtime(uint64_t root,
                           const char *path) {
         auto a = ct_memory_a0.main_allocator();
 

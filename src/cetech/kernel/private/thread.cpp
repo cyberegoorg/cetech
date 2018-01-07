@@ -1,15 +1,19 @@
 #include "include/SDL2/SDL.h"
 
 #if defined(CETECH_LINUX)
-
 #include <sched.h>
+#endif
+
+#if defined(CETECH_DARWIN)
+#include <sched.h>
+#include <unistd.h>
+#endif
+
 #include <cetech/kernel/thread.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
 
 #include "celib/macros.h"
-
-#endif
 
 //! Create new thread
 //! \param fce Thread fce
@@ -52,6 +56,7 @@ uint64_t thread_actual_id() {
 void thread_yield() {
 #if defined(CETECH_DARWIN)
     sched_yield();
+    usleep(1000);
 #elif defined(CETECH_LINUX)
     sched_yield();
 #endif

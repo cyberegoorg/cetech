@@ -6,7 +6,7 @@
 #include <bgfx/bgfx.h>
 #include <bgfx/embedded_shader.h>
 #include <bx/allocator.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/timer.h>
 #include <celib/macros.h>
 #include <cetech/kernel/module.h>

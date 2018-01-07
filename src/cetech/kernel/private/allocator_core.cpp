@@ -1,5 +1,11 @@
 #include <stdint.h>
+
+#if defined(CETECH_LINUX)
 #include <malloc.h>
+#elif defined(CETECH_DARWIN)
+#include <sys/malloc.h>
+#endif
+
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/api_system.h>
 
@@ -14,11 +20,12 @@ static void *_reallocate(cel_alloc_inst *a,
 
     void *new_ptr = NULL;
 
-    if (size)
+    if (size) {
         new_ptr = realloc(ptr, size);
 
-    else
-        free(ptr);
+    } else {
+        // free(ptr);
+    }
 
     return new_ptr;
 }

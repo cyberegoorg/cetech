@@ -146,7 +146,7 @@ static void ui_entity_item_begin(const char *name,
     if (open) {
         for (uint32_t i = 0; i < children_keys_count; ++i) {
             char buffer[256];
-            sprintf(buffer, "%lu", children_keys[i]);
+            sprintf(buffer, "%llu", children_keys[i]);
 
             tmp_keys[keys_count+1] = children_keys[i];
             tmp_keys[keys_count+2] = ct_yng_a0.calc_key("name");
@@ -166,9 +166,9 @@ static void on_debugui() {
                                 DebugUIWindowFlags_(0))) {
 
         if(_G.is_level) {
-            ct_debugui_a0.LabelText("Level", "%lu", _G.level_name);
+            ct_debugui_a0.LabelText("Level", "%llu", _G.level_name);
         } else {
-            ct_debugui_a0.LabelText("Entity", "%lu", _G.level_name);
+            ct_debugui_a0.LabelText("Entity", "%llu", _G.level_name);
         }
 
         if(_G.path) {

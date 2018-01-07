@@ -82,7 +82,7 @@ static void on_debugui() {
                             DebugInputTextFlags_ReadOnly, 0, NULL);
 
     if (ct_debugui_a0.CollapsingHeader("Entity", DebugUITreeNodeFlags_DefaultOpen)) {
-        ct_debugui_a0.LabelText("Entity", "%lu", _G.active_entity);
+        ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
     struct ct_entity entity = ct_entity_a0.find_by_guid(_G.top_entity,

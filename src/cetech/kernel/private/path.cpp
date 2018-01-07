@@ -2,26 +2,31 @@
 #include <errno.h>
 
 #if defined(CETECH_LINUX)
-
 #include <dirent.h>
 #include <sys/stat.h>
+#include <malloc.h>
+#endif
+
+#if defined(CETECH_DARWIN)
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/malloc.h>
+#endif
+
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/log.h>
-#include <malloc.h>
 #include <cetech/kernel/vio.h>
 #include <cetech/kernel/path.h>
 #include <cetech/kernel/module.h>
 #include <glob.h>
 #include <fnmatch.h>
-
-#endif
-
 #include "celib/buffer.inl"
+
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
 
-#if defined(CETECH_LINUX)
+#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
 #define DIR_DELIM_CH '/'
 #define DIR_DELIM_STR "/"
 #endif
@@ -228,7 +233,7 @@ void dir_list_free(char **files,
 
 int dir_make(const char *path) {
     struct stat st;
-    const int mode = 0775;
+    const int mode = 0777;
 
     if (stat(path, &st) != 0) {
         if (mkdir(path, mode) != 0 && errno != EEXIST) {
@@ -268,7 +273,7 @@ int dir_make_path(const char *path) {
 }
 
 const char *path_filename(const char *path) {
-    char *ch = strrchr(path, DIR_DELIM_CH);
+    const char *ch = strrchr(path, DIR_DELIM_CH);
     return ch != NULL ? ch + 1 : path;
 }
 
@@ -288,7 +293,7 @@ void path_basename(const char *path,
 
 void path_dir(char *out,
               const char *path) {
-    char *ch = strrchr(path, DIR_DELIM_CH);
+    const char *ch = strrchr(path, DIR_DELIM_CH);
 
     if (ch != NULL) {
         size_t len = ch - path;

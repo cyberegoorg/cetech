@@ -8,7 +8,8 @@
 #define CELIB_STRING_STREAM_H
 
 #include <cstring>
-#include <cstdio>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "array.inl"
 

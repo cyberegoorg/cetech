@@ -27,6 +27,8 @@ if (APPLE)
     add_definitions(-DCETECH_COLORED_LOG)
     add_definitions(-DCETECH_DARWIN)
 
+
+
 elseif (UNIX)
     set(PLATFORM_ID linux64)
 
@@ -169,9 +171,29 @@ set(MAIN_SOURCE_FILES
 # Release sources
 ################################################################################
 
-if (UNIX)
+if (APPLE)
+    set(RELEASE_LIBS_DARWIN
+            z
+            dl
+            m
+            iconv
+            objc
+
+            "-framework Cocoa"
+            "-framework CoreAudio"
+            "-framework AudioToolbox"
+            "-framework ForceFeedback"
+            #"-framework CoreVideo"
+            "-framework Carbon"
+            "-framework IOKit"
+            "-framework QuartzCore"
+            "-framework OpenGL"
+            "-weak_framework Metal"
+            )
+
+elseif(UNIX)
     set(RELEASE_LIBS_LINUX
-            jemalloc_pic.a
+            #jemalloc_pic.a
             pthread
             anl # NANOMSG
             dl
@@ -190,21 +212,21 @@ endif ()
 set(RELEASE_LIBS
         ${RELEASE_LIBS_LINUX}
         ${RELEASE_LIBS_WINDOWS}
+        ${RELEASE_LIBS_DARWIN}
 
         nanomsg.a
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a
 
-        luajit.a
         sqlite3.a
         SDL2.a
 
         assimp.a
         IrrXML.a
         minizip.a
-        aes.a
         yaml_static.a
+        #aes.a
         )
 
 set(RELEASE_LIBS2
@@ -216,7 +238,7 @@ set(RELEASE_LIBS2
         sqlite3
         assimp
         SDL2
-        luajit
+        #luajit
         )
 
 ################################################################################

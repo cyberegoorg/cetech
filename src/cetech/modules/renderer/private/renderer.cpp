@@ -111,7 +111,7 @@ void renderer_create() {
         }
     }
 
-    bgfx::PlatformData pd = {};
+    bgfx::PlatformData pd = {NULL};
     pd.nwh = _G.main_window->native_window_ptr(_G.main_window->inst);
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx::setPlatformData(pd);
@@ -121,7 +121,7 @@ void renderer_create() {
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
     bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
-    _G.main_window->update(_G.main_window);
+    //_G.main_window->update(_G.main_window);
 
     _G.need_reset = 1;
 }
@@ -146,10 +146,10 @@ void renderer_get_size(uint32_t *width,
 /////
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        array::push_back(_G.name, name);                                \
+        array::push_back(_G.name, name);                                       \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = array::size(_G.name);                         \
+        const auto size = array::size(_G.name);                                \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -159,7 +159,7 @@ void renderer_get_size(uint32_t *width,
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            array::pop_back(_G.name);                                   \
+            array::pop_back(_G.name);                                          \
             break;                                                             \
         }                                                                      \
     }

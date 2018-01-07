@@ -3,9 +3,12 @@
 #include <cetech/kernel/private/allocator_core_private.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/api_system.h>
+#include <cetech/kernel/log.h>
 
 #include "include/SDL2/SDL.h"
 #include "celib/allocator.h"
+
+CETECH_DECL_API(ct_log_a0);
 
 #define LOG_WHERE "vio_sdl"
 
@@ -90,7 +93,7 @@ static ct_vio_a0 vio_api = {
 CETECH_MODULE_DEF(
         vio,
         {
-            CEL_UNUSED(api);
+            CETECH_GET_API(api, ct_log_a0);
         },
         {
             CEL_UNUSED(reload);

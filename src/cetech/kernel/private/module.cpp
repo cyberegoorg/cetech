@@ -85,7 +85,7 @@ void add_module(const char *path,
 const char *get_module_name(const char *path,
                             uint32_t *len) {
     const char *filename = ct_path_a0.filename(path);
-    char *name = strchr(filename, '_');
+    const char *name = strchr(filename, '_');
     if (NULL == name) {
         return NULL;
     }
@@ -181,7 +181,7 @@ namespace module {
 
         module_functios module;
 
-        if(!load_from_path(&module, path)) {
+        if (!load_from_path(&module, path)) {
             return;
         }
 
@@ -201,7 +201,7 @@ namespace module {
             }
 
             module_functios new_module;
-            if(!load_from_path(&new_module, path)) {
+            if (!load_from_path(&new_module, path)) {
                 continue;
             }
 
@@ -251,12 +251,13 @@ namespace module {
             sprintf(key + len, "%d", i);
             ct_cvar n = ct_config_a0.find(key);
 
-            if(n.idx == 0) {
+            if (n.idx == 0) {
                 break;
             }
 
-            const char* module_file = ct_config_a0.get_string(n);
-            char* module_path = ct_path_a0.join(ct_memory_a0.main_allocator(), 2, path, module_file);
+            const char *module_file = ct_config_a0.get_string(n);
+            char *module_path = ct_path_a0.join(ct_memory_a0.main_allocator(),
+                                                2, path, module_file);
             load(module_path);
 
             CEL_FREE(ct_memory_a0.main_allocator(), module_path);
@@ -283,7 +284,7 @@ namespace module {
 
         while (wd_it != wd_end) {
             if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-                ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *)wd_it;
+                ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
 
                 const char *ext = ct_path_a0.extension(ev->filename);
 
@@ -295,11 +296,12 @@ namespace module {
 
 
                     char full_path[4096];
-                    ct_filesystem_a0.get_full_path(root, path, full_path, CETECH_ARRAY_LEN(full_path));
+                    ct_filesystem_a0.get_full_path(root, path, full_path,
+                                                   CETECH_ARRAY_LEN(full_path));
 
                     int pat_size = strlen(full_path);
                     int ext_size = strlen(ext);
-                    full_path[pat_size-ext_size - 1] = '\0';
+                    full_path[pat_size - ext_size - 1] = '\0';
 
                     ct_log_a0.info(LOG_WHERE,
                                    "Reload module from path \"%s\"",
@@ -328,6 +330,14 @@ namespace module {
 };
 
 
+static const char* _get_load_dir() {
+#if defined(CETECH_LINUX)
+    return "./bin/linux64/";
+#elif defined(CETECH_DARWIN)
+    return "./bin/darwin64/";
+#endif
+}
+
 CETECH_MODULE_DEF(
         module,
         {
@@ -348,13 +358,18 @@ CETECH_MODULE_DEF(
 
             api->register_api("ct_module_a0", &module::module_api);
 
-            _G.module_dir = ct_config_a0.new_str("module_dir",
-                                                 "Path where is modules",
-                                                 "./bin/linux64/"); // TODO: platform specific
+
+
+            _G.module_dir = ct_config_a0.new_str(
+                    "module_dir",
+                    "Path where is modules",
+                    _get_load_dir()
+            );
 
 
             static uint64_t root = CT_ID64_0("modules");
-            ct_filesystem_a0.map_root_dir(root, ct_config_a0.get_string(_G.module_dir), true);
+            ct_filesystem_a0.map_root_dir(root, ct_config_a0.get_string(
+                    _G.module_dir), true);
 
         },
         {
