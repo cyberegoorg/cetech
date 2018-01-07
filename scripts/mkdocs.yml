@@ -25,9 +25,7 @@ pages:
     - Build: 'engine/build.md'
     - Resource: 'engine/resource.md'
 
-  - Playground:
-    - Overview: 'playground/overview.md'
-    - Images: 'playground/image_history.md'
+  - Images: 'image_history.md'
 
   - Examples:
     - 00-minimal: 'examples/00-minimal.md'

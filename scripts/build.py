@@ -48,6 +48,7 @@ BUILD_ACTION = ('build', '')
 # Build platform.
 PLATFORMS = {
     'linux64',
+    'darwin64',
 }
 
 
@@ -61,7 +62,8 @@ def make_make(config, platform_, debug):
 
 
 PLATFORMS_MAKE = {
-    'linux64': make_make
+    'linux64': make_make,
+    'darwin64': make_make
 }
 
 ########

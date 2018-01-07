@@ -267,7 +267,7 @@ end
 	}
 
 	defines {
-		"CETECH_LINUX=1",
+		"CETECH_DARWIN=1",
 		"CETECH_DEBUG=1",
 		"CETECH_DEVELOP=1",
 		"CETECH_CAN_COMPILE=1",
