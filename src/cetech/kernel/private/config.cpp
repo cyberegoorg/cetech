@@ -3,6 +3,7 @@
 //==============================================================================
 #include <stdio.h>
 #include <string.h>
+
 #include <cetech/kernel/api_system.h>
 #include <cetech/kernel/memory.h>
 #include <cetech/kernel/path.h>
@@ -14,6 +15,7 @@
 #include <cetech/kernel/module.h>
 #include <celib/buffer.inl>
 #include <cetech/kernel/yamlng.h>
+#include <cetech/kernel/coredb.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -22,6 +24,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
 // Defines
@@ -55,17 +58,10 @@ CETECH_DECL_API(ct_yng_a0);
 #define _G ConfigSystemGlobals
 
 static struct ConfigSystemGlobals {
-    char name[MAX_VARIABLES][MAX_NAME_LEN];
-    char desc[MAX_VARIABLES][MAX_DESC_LEN];
-
-    cvar_type types[MAX_VARIABLES];
-
-    union {
-        float f;
-        int i;
-        char *s;
-    } values[MAX_VARIABLES];
     uint64_t type;
+
+    ct_coredb_object_t *config_object;
+    ct_coredb_object_t *config_desc;
 } _G;
 
 
@@ -74,260 +70,42 @@ static struct ConfigSystemGlobals {
 //==============================================================================
 
 
-void _deallocate_all_string() {
-    for (int i = 0; i < MAX_VARIABLES; ++i) {
-        if (_G.types[i] != CV_STRING) {
-            continue;
-        }
-
-        CEL_FREE(ct_memory_a0.main_allocator(), _G.values[i].s);
-    }
-}
-
-ct_cvar _find_first_free() {
-
-    for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
-        if (_G.name[i][0] != '\0') {
-            continue;
-        }
-
-        return make_cvar(i);
-    }
-
-    ct_log_a0.error(LOG_WHERE, "Could not create _new config variable");
-
-    return make_cvar(0);
-}
-
-
 //==============================================================================
 // Interface
 //==============================================================================
 namespace config {
-    ct_cvar find(const char *name) {
-        for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
-            if (_G.name[i][0] == '\0') {
-                continue;
-            }
-
-            if (strcmp(_G.name[i], name) != 0) {
-                continue;
-            }
-
-            return make_cvar(i);
-        }
-
-        return make_cvar(0);
-    }
-
-    ct_cvar find_or_create(const char *name,
-                           int *_new) {
-        if (_new) *_new = 0;
-
-        for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
-            if (_G.name[i][0] == '\0') {
-                continue;
-            }
-
-            if (strcmp(_G.name[i], name) != 0) {
-                continue;
-            }
-
-            return make_cvar(i);
-        }
-
-        const ct_cvar var = _find_first_free();
-
-        if (var.idx != 0) {
-            str_set(_G.name[var.idx], name);
-
-            if (_new) *_new = 1;
-            return var;
-        }
-
-        return make_cvar(0);
-    }
-
-    ct_cvar new_float(const char *name,
-                      const char *desc,
-                      float f) {
-        int _new;
-        ct_cvar find = find_or_create(name, &_new);
-
-        if (_new) {
-            str_set(_G.name[find.idx], name);
-            _G.types[find.idx] = CV_FLOAT;
-            _G.values[find.idx].f = f;
-        }
-
-        str_set(_G.desc[find.idx], desc);
-
-        return find;
-    }
-
-    ct_cvar new_int(const char *name,
-                    const char *desc,
-                    int i) {
-        int _new;
-        ct_cvar find = find_or_create(name, &_new);
-
-        if (_new) {
-            str_set(_G.name[find.idx], name);
-            _G.types[find.idx] = CV_INT;
-            _G.values[find.idx].i = i;
-        }
-
-        str_set(_G.desc[find.idx], desc);
-
-        return find;
-    }
-
-    ct_cvar new_str(const char *name,
-                    const char *desc,
-                    const char *s) {
-        int _new;
-        ct_cvar find = find_or_create(name, &_new);
-
-        if (_new) {
-            str_set(_G.name[find.idx], name);
-            _G.types[find.idx] = CV_STRING;
-            _G.values[find.idx].s = ct_memory_a0.str_dup(s,
-                                                         ct_memory_a0.main_allocator());
-        }
-
-        str_set(_G.desc[find.idx], desc);
-
-        return find;
-    }
-
-    float get_float(ct_cvar var) {
-        return _G.values[var.idx].f;
-    }
-
-    int get_int(ct_cvar var) {
-        return _G.values[var.idx].i;
-    }
-
-    const char *get_string(ct_cvar var) {
-        return _G.values[var.idx].s;
-    }
-
-    enum cvar_type get_type(ct_cvar var) {
-        return _G.types[var.idx];
-    }
-
-    void set_float(ct_cvar var,
-                   float f) {
-        _G.values[var.idx].f = f;
-    }
-
-    void set_int(ct_cvar var,
-                 int i) {
-        _G.values[var.idx].i = i;
-    }
-
-    void set_string(ct_cvar var,
-                    const char *s) {
-        char *_s = _G.values[var.idx].s;
-
-        if (_s != NULL) {
-            CEL_FREE(ct_memory_a0.main_allocator(), _s);
-        }
-
-        _G.values[var.idx].s = ct_memory_a0.str_dup(s,
-                                                    ct_memory_a0.main_allocator());
-    }
 
     void log_all() {
-        celib::Buffer out(ct_memory_a0.main_allocator());
-
-        celib::buffer::printf(out, "config:\n");
-
-        for (uint64_t i = 1; i < MAX_VARIABLES; ++i) {
-            if (_G.name[i][0] == '\0') {
-                continue;
-            }
-
-            const char *name = _G.name[i];
-
-            switch (_G.types[i]) {
-                case CV_FLOAT:
-                    celib::buffer::printf(out, "    - %s = %f\n", name,
-                                          _G.values[i].f);
-                    break;
-                case CV_INT:
-                    celib::buffer::printf(out, "    - %s = %d\n", name,
-                                          _G.values[i].i);
-                    break;
-                case CV_STRING:
-                    celib::buffer::printf(out, "    - %s = %s\n", name,
-                                          _G.values[i].s);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        ct_log_a0.info(LOG_WHERE, "%s", celib::buffer::c_str(out));
     }
 
     void _cvar_from_str(const char *name,
                         const char *value) {
-        union {
-            float f;
-            int i;
-            const char *s;
-        } tmp_var;
+        int d = 0;
+        float f = 0;
 
-        ct_cvar cvar = find(name);
-        if (cvar.idx != 0) {
-            enum cvar_type type = _G.types[cvar.idx];
-            switch (type) {
-                case CV_FLOAT:
-                    sscanf(value, "%f", &tmp_var.f);
-                    set_float(cvar, tmp_var.f);
-                    break;
+        ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
 
-                case CV_INT:
-                    if (value == NULL) {
-                        tmp_var.i = 1;
-                    } else {
-                        sscanf(value, "%d", &tmp_var.i);
-                    }
+        const uint64_t key = CT_ID64_0(name);
 
-                    set_int(cvar, tmp_var.i);
-                    break;
-
-                case CV_STRING:
-                    set_string(cvar, value);
-                    break;
-
-                default:
-                    ct_log_a0.error(LOG_WHERE, "Invalid type for cvar \"%s\"",
-                                    name);
-                    break;
-            }
-
-        } else {
-            if (value == NULL) {
-                new_int(name, "", 1);
-                return;
-            }
-
-            int d = 0;
-            float f = 0;
-            if (sscanf(value, "%d", &d)) {
-                new_int(name, "", d);
-                return;
-
-            } else if (sscanf(value, "%f", &f)) {
-                new_float(name, "", f);
-                return;
-            }
-
-            new_str(name, "", value);
-            //ct_log_a0.error(LOG_WHERE, "Invalid cvar \"%s\"", name);
+        if (value == NULL) {
+            ct_coredb_a0.set_uint32(writer, key, 1);
+            goto end;
         }
+
+
+        if (sscanf(value, "%d", &d)) {
+            ct_coredb_a0.set_uint32(writer, key, d);
+            goto end;
+
+        } else if (sscanf(value, "%f", &f)) {
+            ct_coredb_a0.set_float(writer, key, d);
+            goto end;
+        }
+
+        ct_coredb_a0.set_string(writer, key, value);
+
+end:
+        ct_coredb_a0.write_commit(writer);
     }
 
     struct foreach_config_data {
@@ -370,25 +148,33 @@ namespace config {
                 _cvar_from_str(name, str);
 
             } else {
-                ct_cvar cvar = find(name);
-                if (cvar.idx != 0) {
-                    enum cvar_type t = get_type(cvar);
+                const uint64_t key = CT_ID64_0(name);
+
+                if (ct_coredb_a0.prop_exist(_G.config_object, key)) {
+                    enum ct_coredb_prop_type t = ct_coredb_a0.prop_type(_G.config_object, key);
+                    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+
                     switch (t) {
-                        case CV_NONE:
+                        case COREDB_TYPE_NONE:
                             break;
-                        case CV_FLOAT:
+
+                        case COREDB_TYPE_FLOAT:
                             tmp_f = d->as_float(d->inst, value, 0.0f);
-                            set_float(cvar, tmp_f);
+                            ct_coredb_a0.set_float(writer, key, tmp_f);
                             break;
-                        case CV_INT:
+
+                        case COREDB_TYPE_UINT32:
                             tmp_int = (int) d->as_float(d->inst, value, 0.0f);
-                            set_int(cvar, tmp_int);
+                            ct_coredb_a0.set_uint32(writer, key, tmp_int);
                             break;
-                        case CV_STRING:
+
+                        case COREDB_TYPE_STRPTR:
                             str = d->as_string(d->inst, value, "");
-                            set_string(cvar, str);
+                            ct_coredb_a0.set_string(writer, key, str);
                             break;
                     }
+
+                    ct_coredb_a0.write_begin(_G.config_object);
                 }
             }
         }
@@ -440,26 +226,22 @@ namespace config {
     }
 
 
+    ct_coredb_object_t* config_object() {
+        return _G.config_object;
+    }
+
     static ct_config_a0 config_a0 = {
+            .config_object = config_object,
             .parse_args = parse_args,
-            .find = find,
-            .find_or_create = find_or_create,
-            .new_float = new_float,
-            .new_int = new_int,
-            .new_str = new_str,
-            .get_float = get_float,
-            .get_int = get_int,
-            .get_string = get_string,
-            .get_type  = get_type,
-            .set_float = set_float,
-            .set_int = set_int,
-            .set_string = set_string,
             .log_all = log_all,
             .load_from_yaml_file = load_from_yaml_file
     };
 
     int init(ct_api_a0 *api) {
         CEL_UNUSED(api);
+
+
+
         return 1;
     }
 
@@ -478,6 +260,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);
@@ -485,6 +268,9 @@ CETECH_MODULE_DEF(
             _G = {};
 
             ct_log_a0.debug(LOG_WHERE, "Init");
+
+            _G.config_object = ct_coredb_a0.create_object();
+            _G.config_desc = ct_coredb_a0.create_object();
 
             api->register_api("ct_config_a0", &config::config_a0);
 
@@ -495,6 +281,5 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-            _deallocate_all_string();
         }
 )

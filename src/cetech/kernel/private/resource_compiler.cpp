@@ -23,6 +23,7 @@
 #include <cetech/kernel/filesystem.h>
 #include <cetech/kernel/ydb.h>
 #include <cetech/kernel/blob.h>
+#include <cetech/kernel/coredb.h>
 
 #include "celib/buffer.inl"
 
@@ -43,6 +44,7 @@ CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_blob_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
 // Defines
@@ -75,9 +77,7 @@ struct G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_cvar cv_source_dir;
-    ct_cvar cv_core_dir;
-    ct_cvar cv_external_dir;
+    ct_coredb_object_t* config;
 } ResourceCompilerGlobal = {};
 
 
@@ -85,6 +85,7 @@ struct G {
 #include "resource.h"
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
+
 
 
 //==============================================================================
@@ -200,6 +201,12 @@ compilator _find_compilator(uint64_t type) {
     return {.compilator = NULL};
 }
 
+#define CONFIG_KERNEL_PLATFORM CT_ID64_0("kernel.platform")
+#define CONFIG_SOURCE_DIR CT_ID64_0("src")
+#define CONFIG_CORE_DIR CT_ID64_0("core")
+#define CONFIG_EXTERNAL_DIR CT_ID64_0("external")
+
+
 void _compile_files(Array<ct_task_item> &tasks,
                     char **files,
                     uint32_t files_count,
@@ -226,10 +233,9 @@ void _compile_files(Array<ct_task_item> &tasks,
 
         builddb_set_file_hash(files[i], build_name);
 
-        auto platform = ct_config_a0.find("kernel.platform");
         char *build_full = ct_path_a0.join(
                 ct_memory_a0.main_allocator(), 2,
-                ct_config_a0.get_string(platform),
+                ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""),
                 build_name);
 
         struct compile_task_data *data =
@@ -274,10 +280,8 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
                                         struct ct_app_a0 app) {
     CEL_UNUSED(config, app);
 
-    auto platform = ct_config_a0.find("kernel.platform");
-
     char *build_dir_full = resource_compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), ct_config_a0.get_string(platform));
+            ct_memory_a0.main_allocator(), ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     ct_path_a0.make_path(build_dir_full);
 
@@ -341,11 +345,11 @@ int resource_compiler_get_filename(char *filename,
 }
 
 const char *resource_compiler_get_source_dir() {
-    return ct_config_a0.get_string(_G.cv_source_dir);
+    return ct_coredb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
 }
 
 const char *resource_compiler_get_core_dir() {
-    return ct_config_a0.get_string(_G.cv_core_dir);
+    return ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");;
 }
 
 char *resource_compiler_get_tmp_dir(cel_alloc *alocator,
@@ -358,12 +362,10 @@ char *resource_compiler_get_tmp_dir(cel_alloc *alocator,
 
 char *resource_compiler_external_join(cel_alloc *alocator,
                                       const char *name) {
-    const char *external_dir_str = ct_config_a0.get_string(_G.cv_external_dir);
-
-    auto native_platform = ct_config_a0.find("kernel.native_platform");
+    const char *external_dir_str = ct_coredb_a0.read_string(_G.config, CONFIG_EXTERNAL_DIR, "");
 
     char *tmp_dir = ct_path_a0.join(alocator, 2, external_dir_str,
-                                    ct_config_a0.get_string(native_platform));
+                                    ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     celib::Buffer buffer(alocator);
     buffer::printf(buffer, "%s64", tmp_dir);
@@ -448,29 +450,35 @@ void resource_compiler_check_fs() {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    ct_config_a0 = config;
+    ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
+    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
+        ct_coredb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
+    }
 
-    _G.cv_source_dir = config.new_str("src", "Resource source dir", "src");
+    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
+        ct_coredb_a0.set_string(writer, CONFIG_CORE_DIR, "core");
+    }
 
-    _G.cv_core_dir = config.new_str("core",
-                                    "Resource application source dir",
-                                    "core");
-    _G.cv_external_dir = config.new_str("external", "External build dir",
-                                        "externals/build");
+    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
+        ct_coredb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "external");
+    }
+
+    ct_coredb_a0.write_commit(writer);
 }
 
 
 static void _init(ct_api_a0 *api) {
     CEL_UNUSED(api);
 
-    _init_cvar(ct_config_a0);
+    _G.config = ct_config_a0.config_object();
 
+    _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
 
-    auto platform = ct_config_a0.find("kernel.platform");
+    auto platform = ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, "");
 
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), ct_config_a0.get_string(platform));
+            ct_memory_a0.main_allocator(), platform);
 
     ct_path_a0.make_path(build_dir_full);
     builddb_init_db(build_dir_full, &ct_path_a0, &ct_memory_a0);
@@ -483,8 +491,8 @@ static void _init(ct_api_a0 *api) {
     CEL_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
     CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 
-    const char *core_dir = ct_config_a0.get_string(_G.cv_core_dir);
-    const char *source_dir = ct_config_a0.get_string(_G.cv_source_dir);
+    const char *core_dir = ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");
+    const char *source_dir = ct_coredb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
 
     ct_filesystem_a0.map_root_dir(
             CT_ID64_0("source"),
@@ -521,9 +529,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_blob_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);
+
+
             _init(api);
         },
         {

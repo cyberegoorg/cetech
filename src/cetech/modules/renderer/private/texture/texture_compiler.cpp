@@ -17,6 +17,7 @@
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/ydb.h>
 #include <cetech/kernel/blob.h>
+#include <cetech/kernel/coredb.h>
 #include "celib/buffer.inl"
 #include "texture_blob.h"
 #include "cetech/kernel/path.h"
@@ -36,6 +37,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 namespace texture_compiler {
 
@@ -99,7 +101,7 @@ namespace texture_compiler {
 
         auto a = ct_memory_a0.main_allocator();
 
-        auto platform = ct_config_a0.find("kernel.platform");
+        auto platform = ct_coredb_a0.read_string(ct_config_a0.config_object(), CT_ID64_0("kernel.platform"), "");
 
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
@@ -118,9 +120,7 @@ namespace texture_compiler {
 
         const char *source_dir = ct_resource_a0.compiler_get_source_dir();
 
-        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a,
-                                                            ct_config_a0.get_string(
-                                                                    platform));
+        char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a, platform);
         char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
 
         _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
@@ -171,6 +171,7 @@ namespace texture_compiler {
         CETECH_GET_API(api, ct_config_a0);
         CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
+        CETECH_GET_API(api, ct_coredb_a0);
 
         ct_resource_a0.compiler_register(
                 CT_ID64_0("texture"),

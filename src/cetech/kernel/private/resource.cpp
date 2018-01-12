@@ -20,6 +20,7 @@
 #include <cetech/kernel/package.h>
 #include <cetech/kernel/module.h>
 #include <cetech/kernel/blob.h>
+#include <cetech/kernel/coredb.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -28,6 +29,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_config_a0);
+CETECH_DECL_API(ct_coredb_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -86,10 +88,7 @@ namespace {
         int autoload_enabled;
 
         ct_spinlock add_lock;
-
-        struct {
-            ct_cvar build_dir;
-        } config;
+        ct_coredb_object_t* config_object;
 
     } ResourceManagerGlobals = {};
 }
@@ -99,12 +98,13 @@ namespace {
 //==============================================================================
 
 
-
+#define CONFIG_BUILD_DIR CT_ID64_0("build")
+#define CONFIG_KERNEL_PLATFORM CT_ID64_0("kernel.platform")
 
 char *resource_compiler_get_build_dir(cel_alloc *a,
                                       const char *platform) {
 
-    const char *build_dir_str = ct_config_a0.get_string(_G.config.build_dir);
+    const char *build_dir_str = ct_coredb_a0.read_string(_G.config_object, CONFIG_BUILD_DIR, "");
     return ct_path_a0.join(a, 2, build_dir_str, platform);
 }
 
@@ -331,10 +331,9 @@ namespace resource {
                             filename,
                             build_name);
 
-            auto platform = ct_config_a0.find("kernel.platform");
             char *build_full = ct_path_a0.join(
                     ct_memory_a0.main_allocator(), 2,
-                    ct_config_a0.get_string(platform),
+                    ct_coredb_a0.read_string(_G.config_object, CONFIG_KERNEL_PLATFORM, ""),
                     build_name);
 
             ct_vio *resource_file = ct_filesystem_a0.open(root_name,
@@ -603,9 +602,13 @@ namespace resource_module {
         _G = {};
 
         ct_config_a0 = config;
+        _G.config_object = ct_config_a0.config_object();
 
-        _G.config.build_dir = config.new_str("build", "Resource build dir",
-                                             "build");
+        ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config_object);
+        if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BUILD_DIR)) {
+            ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
+        }
+        ct_coredb_a0.write_commit(writer);
     }
 
 
@@ -619,7 +622,7 @@ namespace resource_module {
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
         ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
-                                      ct_config_a0.get_string(_G.config.build_dir), false);
+                                      ct_coredb_a0.read_string(_G.config_object, CONFIG_BUILD_DIR, ""), false);
 
         resource::resource_register_type(CT_ID64_0("package"),
                                          package_resource::package_resource_callback);
@@ -653,6 +656,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_thread_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);

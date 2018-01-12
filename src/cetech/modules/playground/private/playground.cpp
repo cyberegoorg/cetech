@@ -36,6 +36,7 @@ CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_action_manager_a0);
+CETECH_DECL_API(ct_module_a0);
 
 using namespace celib;
 
@@ -58,6 +59,10 @@ namespace playground {
 
         if (ct_debugui_a0.BeginMainMenuBar()) {
             if (ct_debugui_a0.BeginMenu("File", true)) {
+                if (ct_debugui_a0.MenuItem("Reload", "Alt+r", false, true)) {
+                    ct_module_a0.reload_all();
+                }
+
                 if (ct_debugui_a0.MenuItem("Save", "Alt+s", false, true)) {
                     ct_ydb_a0.save_all_modified();
                 }
@@ -311,6 +316,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_action_manager_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
+            CETECH_GET_API(api, ct_module_a0);
         },
         {
             CEL_UNUSED(reload);

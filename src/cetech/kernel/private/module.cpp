@@ -17,6 +17,7 @@
 #include <cetech/kernel/hashlib.h>
 #include <celib/map.inl>
 #include <cetech/kernel/filesystem.h>
+#include <cetech/kernel/coredb.h>
 
 #include "cetech/kernel/log.h"
 
@@ -45,7 +46,7 @@ static struct ModuleSystemGlobals {
     module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
-    ct_cvar module_dir;
+    ct_coredb_object_t* config_object;
 } _G = {};
 
 CETECH_DECL_API(ct_memory_a0);
@@ -57,7 +58,9 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
+#define MODULE_DIR_KEY CT_ID64_0("module_dir")
 
 using namespace celib;
 
@@ -245,17 +248,19 @@ namespace module {
         char key[64];
         size_t len = strlen("load_module.");
         strcpy(key, "load_module.");
-        const char *path = ct_config_a0.get_string(_G.module_dir);
+        const char *path = ct_coredb_a0.read_string(_G.config_object, MODULE_DIR_KEY, "");
 
         for (int i = 0; true; ++i) {
             sprintf(key + len, "%d", i);
-            ct_cvar n = ct_config_a0.find(key);
 
-            if (n.idx == 0) {
+            const uint64_t key_id = CT_ID64_0(key);
+
+            if (!ct_coredb_a0.prop_exist(_G.config_object, key_id)) {
                 break;
             }
 
-            const char *module_file = ct_config_a0.get_string(n);
+
+            const char *module_file = ct_coredb_a0.read_string(_G.config_object, key_id, "");
             char *module_path = ct_path_a0.join(ct_memory_a0.main_allocator(),
                                                 2, path, module_file);
             load(module_path);
@@ -330,13 +335,13 @@ namespace module {
 };
 
 
-static const char* _get_load_dir() {
-#if defined(CETECH_LINUX)
-    return "./bin/linux64/";
-#elif defined(CETECH_DARWIN)
-    return "./bin/darwin64/";
-#endif
-}
+//static const char* _get_load_dir() {
+//#if defined(CETECH_LINUX)
+//    return "./bin/linux64/";
+//#elif defined(CETECH_DARWIN)
+//    return "./bin/darwin64/";
+//#endif
+//}
 
 CETECH_MODULE_DEF(
         module,
@@ -349,6 +354,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);
@@ -357,19 +363,11 @@ CETECH_MODULE_DEF(
             ct_api_a0 = *api;
 
             api->register_api("ct_module_a0", &module::module_api);
-
-
-
-            _G.module_dir = ct_config_a0.new_str(
-                    "module_dir",
-                    "Path where is modules",
-                    _get_load_dir()
-            );
-
+            _G.config_object = ct_config_a0.config_object();
 
             static uint64_t root = CT_ID64_0("modules");
-            ct_filesystem_a0.map_root_dir(root, ct_config_a0.get_string(
-                    _G.module_dir), true);
+            ct_filesystem_a0.map_root_dir(root,
+                                          ct_coredb_a0.read_string(_G.config_object, MODULE_DIR_KEY, "bin"), true);
 
         },
         {

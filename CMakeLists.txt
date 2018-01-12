@@ -101,13 +101,12 @@ set(SOURCE_FILES
         src/cetech/kernel/private/blob.cpp
         src/cetech/kernel/private/yamlng.cpp
         src/cetech/kernel/private/ydb.cpp
+        src/cetech/kernel/private/coredb.cpp
 
         src/cetech/modules/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/modules/debugui/private/ocornut-imgui/imgui.cpp
         src/cetech/modules/debugui/private/ocornut-imgui/imgui_draw.cpp
         src/cetech/modules/debugui/private/debugui.cpp
-
-
 
         src/cetech/modules/machine/private/window_sdl2.cpp
         src/cetech/modules/machine/private/machine_sdl2.cpp

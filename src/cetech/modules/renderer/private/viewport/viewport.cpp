@@ -36,6 +36,7 @@
 #include "bgfx/platform.h"
 
 #include <cetech/modules/renderer/viewport.h>
+#include <cetech/kernel/coredb.h>
 #include "cetech/modules/renderer/scene.h"
 #include "cetech/modules/renderer/material.h"
 
@@ -54,6 +55,7 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 using namespace celib;
 
@@ -90,11 +92,11 @@ static struct G {
     uint32_t size_width;
     uint32_t size_height;
     int need_reset;
+    ct_coredb_object_t *config;
 } _G = {};
 
-static struct GConfig {
-    ct_cvar render_config_name;
-} GConfig;
+#define CONFIG_RENDER_CONFIG CT_ID64_0("default")
+#define CONFIG_DAEMON CT_ID64_0("daemon")
 
 //==============================================================================
 // Private
@@ -177,7 +179,7 @@ void _init_viewport(viewport_instance &vi,
                     uint64_t name,
                     float width,
                     float height) {
-    const char* render_config = ct_config_a0.get_string(GConfig.render_config_name);
+    const char* render_config =ct_coredb_a0.read_string(ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
     auto *resource = ct_resource_a0.get(_G.type, CT_ID64_0(render_config));
     auto *blob = renderconfig_blob::get(resource);
@@ -851,12 +853,13 @@ namespace viewport_module {
 
         _G = (struct G) {};
 
+        _G.config = ct_config_a0.config_object();
 
-        GConfig = {
-                .render_config_name = ct_config_a0.new_str("renderer.config",
-                                                           "Render condfig",
-                                                           "default")
-        };
+        ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
+            ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG,  "default");
+        }
+        ct_coredb_a0.write_commit(writer);
 
         _G.global_resource.init(ct_memory_a0.main_allocator());
         _G.on_pass.init(ct_memory_a0.main_allocator());
@@ -877,8 +880,7 @@ namespace viewport_module {
     }
 
     void _shutdown() {
-        ct_cvar daemon = ct_config_a0.find("daemon");
-        if (!ct_config_a0.get_int(daemon)) {
+        if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
             ct_renderer_a0.unregister_on_render(on_render);
             ct_app_a0.unregister_on_update(on_update);
 
@@ -914,6 +916,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
 

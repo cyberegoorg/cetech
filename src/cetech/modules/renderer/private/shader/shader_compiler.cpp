@@ -16,6 +16,7 @@
 #include "cetech/kernel/hashlib.h"
 #include <cetech/kernel/config.h>
 #include <cetech/kernel/ydb.h>
+#include <cetech/kernel/coredb.h>
 #include "cetech/kernel/memory.h"
 #include "cetech/kernel/blob.h"
 
@@ -37,6 +38,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 
 namespace shader_compiler {
@@ -139,10 +141,9 @@ namespace shader_compiler {
         char output_path[1024] = {};
         char tmp_filename[1024] = {};
 
-        auto kernel_platform = ct_config_a0.find("kernel.platform");
         char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(
                 a,
-                ct_config_a0.get_string(kernel_platform));
+                ct_coredb_a0.read_string(ct_config_a0.config_object(), CT_ID64_0("kernel.platform"), ""));
 
         //////// VS
         compilator_api->add_dependency(filename, vs_input);
@@ -229,6 +230,7 @@ namespace shader_compiler {
         CETECH_GET_API(api, ct_config_a0);
         CETECH_GET_API(api, ct_yng_a0);
         CETECH_GET_API(api, ct_ydb_a0);
+        CETECH_GET_API(api, ct_coredb_a0);
 
         ct_resource_a0.compiler_register(CT_ID64_0("shader"), compiler, true);
 

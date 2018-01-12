@@ -62,7 +62,7 @@ void module1() {
 
         ct_debugui_a0.Text("DT: %f", _G.dt);
         ct_debugui_a0.Text("FPS: %f", 1.0f / _G.dt );
-        ct_debugui_a0.Text("Random FPS: %f", static_cast<double>(rand()));
+        ct_debugui_a0.Text("Raddnddddom FPS: %f", static_cast<double>(rand()));
 
         float fps =  (1.0f / _G.dt);
 
@@ -153,7 +153,7 @@ CETECH_MODULE_DEF(
 
             ct_app_a0.register_on_update(update);
 
-            //ct_debugui_a0.register_on_debugui(module1);
+            ct_debugui_a0.register_on_debugui(module1);
             //ct_debugui_a0.register_on_debugui(module2);
         },
 

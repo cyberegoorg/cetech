@@ -24,6 +24,8 @@
 #include <cetech/modules/renderer/renderer.h>
 #include <cetech/modules/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/modules/machine/machine.h>
+#include <cetech/kernel/coredb.h>
+#include <cetech/kernel/private/api_private.h>
 
 #include "bgfx/platform.h"
 
@@ -34,6 +36,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_machine_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 using namespace celib;
 
@@ -54,17 +57,8 @@ static struct G {
     int capture;
     int vsync;
     int need_reset;
+    ct_coredb_object_t *config;
 } _G = {};
-
-static struct GConfig {
-    ct_cvar screen_x;
-    ct_cvar screen_y;
-    ct_cvar screen_vsync;
-    ct_cvar fullscreen;
-    ct_cvar daemon;
-    ct_cvar wid;
-    ct_cvar render_config_name;
-} GConfig;
 
 
 static uint32_t _get_reset_flags() {
@@ -72,20 +66,29 @@ static uint32_t _get_reset_flags() {
            (_G.vsync ? BGFX_RESET_VSYNC : 0);
 }
 
+#define CONFIG_SCREEN_X CT_ID64_0("screen.x")
+#define CONFIG_SCREEN_Y CT_ID64_0("screen.y")
+#define CONFIG_SCREEN_VSYNC CT_ID64_0("screen.vsync")
+#define CONFIG_SCREEN_FULLSCREEN CT_ID64_0("screen.fullscreen")
+#define CONFIG_DAEMON CT_ID64_0("daemon")
+#define CONFIG_WID CT_ID64_0("wid")
+#define CONFIG_RENDER_CONFIG CT_ID64_0("renderer.config")
+
+
 //==============================================================================
 // Interface
 //==============================================================================
 
 void renderer_create() {
 
-    if (!ct_config_a0.get_int(GConfig.daemon)) {
+    if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
         int w, h;
-        w = ct_config_a0.get_int(GConfig.screen_x);
-        h = ct_config_a0.get_int(GConfig.screen_y);
+        w = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_X, 0);
+        h = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ct_config_a0.get_int(GConfig.wid);
+        intptr_t wid = ct_coredb_a0.read_uint32(_G.config, CONFIG_WID, 0);
 
         char title[128] = {};
         snprintf(title, CETECH_ARRAY_LEN(title), "cetech");
@@ -93,7 +96,7 @@ void renderer_create() {
 
         if (wid == 0) {
             uint32_t flags = WINDOW_NOFLAG;
-            flags |= ct_config_a0.get_int(GConfig.fullscreen)
+            flags |= ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_FULLSCREEN, 0)
                      ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
@@ -232,32 +235,38 @@ namespace renderer_module {
 
         _G = (struct G) {};
 
+        _G.config = ct_config_a0.config_object();
 
-        GConfig = {
-                .screen_x = ct_config_a0.new_int(
-                        "screen.x", "Screen width", 1024),
+        ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
 
-                .screen_y = ct_config_a0.new_int(
-                        "screen.y", "Screen height", 768),
-
-                .screen_vsync = ct_config_a0.new_int(
-                        "screen.vsync", "Screen vsync", 1),
-
-                .fullscreen = ct_config_a0.new_int(
-                        "screen.fullscreen", "Fullscreen", 0),
-
-                .daemon = ct_config_a0.new_int("daemon", "Daemon mode", 0),
-                .wid = ct_config_a0.new_int("wid", "Wid", 0),
-
-                .render_config_name = ct_config_a0.new_str("renderer.config",
-                                                           "Render condfig",
-                                                           "default")
-        };
-
-        if (!ct_config_a0.get_int(GConfig.daemon)) {
-            _G.vsync = ct_config_a0.get_int(GConfig.screen_vsync) > 0;
-
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
+            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
         }
+
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
+            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
+        }
+
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
+            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
+        }
+
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
+            ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+        }
+
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_WID)) {
+            ct_coredb_a0.set_uint32(writer, CONFIG_WID, 0);
+        }
+
+        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
+            ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
+        }
+
+        ct_coredb_a0.write_commit(writer);
+
+
+        _G.vsync = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
         CETECH_GET_API(api, ct_window_a0);
 
@@ -267,8 +276,7 @@ namespace renderer_module {
     }
 
     void _shutdown() {
-        ct_cvar daemon = ct_config_a0.find("daemon");
-        if (!ct_config_a0.get_int(daemon)) {
+        if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
 
             _G.on_render.destroy();
 
@@ -284,11 +292,11 @@ CETECH_MODULE_DEF(
         renderer,
         {
             CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_machine_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);
