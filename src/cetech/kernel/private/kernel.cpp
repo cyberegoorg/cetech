@@ -1,18 +1,19 @@
 #include "celib/allocator.h"
 
-#include "cetech/kernel/api_system.h"
-#include "cetech/kernel/path.h"
-#include "cetech/kernel/memory.h"
-#include "cetech/kernel/config.h"
-#include "cetech/kernel/module.h"
-#include "cetech/kernel/hashlib.h"
-#include "log_system_private.h"
-#include "memory_private.h"
-#include "api_private.h"
-#include "allocator_core_private.h"
+#include "cetech/api/api_system.h"
+#include "cetech/os/path.h"
+#include "cetech/kernel/kernel.h"
+#include "cetech/os/memory.h"
+#include "cetech/config/config.h"
+#include "cetech/module/module.h"
+#include "cetech/hashlib/hashlib.h"
+#include "cetech/log/private/log_system_private.h"
+#include "cetech/os/private/memory_private.h"
+#include "cetech/api/private/api_private.h"
+#include "cetech/os/private/allocator_core_private.h"
 
-#include <cetech/modules/application/application.h>
-#include <cetech/kernel/coredb.h>
+#include <cetech/application/application.h>
+#include <cetech/coredb/coredb.h>
 
 #include "celib/fpumath.h"
 
@@ -26,7 +27,7 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_coredb_a0);
 
-#include <cetech/modules/static_module.h>
+#include <cetech/static_module.h>
 
 #define LOG_WHERE "kernel"
 
@@ -45,13 +46,12 @@ const char *_platform() {
     return NULL;
 }
 
+#define CONFIG_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
+#define CONFIG_NATIVE_PLATFORM CT_ID64_0(CONFIG_NATIVE_PLATFORM_ID)
 
-#define CONFIG_PLATFORM CT_ID64_0("kernel.platform")
-#define CONFIG_NATIVE_PLATFORM CT_ID64_0("kernel.native_platform")
-#define CONFIG_BUILD CT_ID64_0("build")
-#define CONFIG_SRC CT_ID64_0("src")
-#define CONFIG_COMPILE CT_ID64_0("compile")
-
+#define CONFIG_BUILD CT_ID64_0(CONFIG_BUILD_ID)
+#define CONFIG_SRC CT_ID64_0(CONFIG_SRC_ID)
+#define CONFIG_COMPILE CT_ID64_0(CONFIG_COMPILE_ID)
 
 int init_config(int argc, const char **argv, ct_coredb_object_t *object) {
     ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
