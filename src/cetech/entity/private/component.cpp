@@ -21,8 +21,8 @@ using namespace celib;
 
 #define _G ComponentMaagerGlobals
 static struct ComponentMaagerGlobals {
-    Map<ct_component_compiler_t> compiler_map;
     Map<uint32_t> spawn_order_map;
+    Map<ct_component_compiler_t> compiler_map;
     Map<ct_component_clb> component_clb;
 } ComponentMaagerGlobals;
 

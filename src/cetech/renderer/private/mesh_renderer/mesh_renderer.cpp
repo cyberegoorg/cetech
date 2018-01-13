@@ -1,5 +1,6 @@
 #include "celib/array.inl"
 #include "celib/map.inl"
+#include "celib/hash.h"
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
@@ -22,6 +23,7 @@
 #include <cetech/renderer/mesh_renderer.h>
 #include <cetech/yaml/ydb.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 #include "celib/fpumath.h"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -74,7 +76,7 @@ struct WorldInstance {
 };
 
 static struct MeshRendererGlobal {
-    Map<uint32_t> world_map;
+    struct cel_hash_t world_map;
     WorldInstance* world_instances;
     Map<uint32_t> ent_map;
     uint64_t type;
@@ -108,9 +110,9 @@ void allocate(WorldInstance &_data,
 }
 
 WorldInstance *_get_world_instance(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint64_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT64_MAX);
 
-    if (idx != UINT32_MAX) {
+    if (idx != UINT64_MAX) {
         return &_G.world_instances[idx];
     }
 
@@ -146,12 +148,12 @@ static void _new_world(ct_world world) {
     uint32_t idx = cel_array_size(_G.world_instances);
     cel_array_push(_G.world_instances, WorldInstance(), _G.allocator);
     _G.world_instances[idx].world = world;
-    map::set(_G.world_map, world.h, idx);
+    cel_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
 
 static void _destroy_world(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint64_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = cel_array_size(_G.world_instances) - 1;
 
     ct_world last_world = _G.world_instances[last_idx].world;
@@ -160,7 +162,7 @@ static void _destroy_world(ct_world world) {
              _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
-    map::set(_G.world_map, last_world.h, idx);
+    cel_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
     cel_array_pop_back(_G.world_instances);
 }
 
@@ -427,7 +429,6 @@ static void _init(ct_api_a0 *api) {
             .type = CT_ID64_0("mesh_renderer"),
     };
 
-    _G.world_map.init(ct_memory_a0.main_allocator());
     _G.ent_map.init(ct_memory_a0.main_allocator());
 
     ct_component_a0.register_compiler(_G.type, _mesh_component_compiler, 10);
@@ -443,7 +444,7 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G.world_map.destroy();
+    cel_hash_free(&_G.world_map, _G.allocator);
     _G.ent_map.destroy();
     cel_array_free(_G.world_instances, _G.allocator);
 }

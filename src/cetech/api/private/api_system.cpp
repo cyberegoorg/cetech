@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <cetech/api/api_system.h>
+#include <celib/hash.h>
 #include "celib/map.inl"
 
 //CETECH_DECL_API(ct_hash_a0)
@@ -20,7 +21,9 @@ using namespace celib;
 //==============================================================================
 
 static struct ApiSystemGlobals {
-    Map<void *> api_map;
+    cel_hash_t api_map;
+    void** api;
+    cel_alloc* allocator;
 } _G;
 
 //==============================================================================
@@ -34,36 +37,37 @@ namespace api {
                       void *api) {
         uint64_t name_id = stringid64_from_string(name);
 
-        multi_map::insert(_G.api_map, name_id, api);
+        cel_array_push(_G.api, api, _G.allocator);
+        cel_hash_add(&_G.api_map, name_id, cel_array_size(_G.api) - 1, _G.allocator);
     }
 
     int exist(const char *name) {
         uint64_t name_id = stringid64_from_string(name);
 
-        return map::has(_G.api_map, name_id);
+        return cel_hash_contain(&_G.api_map, name_id);
     }
 
     ct_api_entry first(const char *name) {
         uint64_t name_id = stringid64_from_string(name);
 
-        auto first = multi_map::find_first(_G.api_map, name_id);
+        uint64_t first = cel_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
 
-        if (!first) {
+        if (first == UINT64_MAX) {
             return {};
         }
 
-        return {.api = first->value, .entry  = (void *) first};
+        return {.api = _G.api[first], .entry  = (void *) first};
     }
 
     ct_api_entry next(ct_api_entry *entry) {
-        auto map_entry = (const Map<void *>::Entry *) entry->entry;
-        auto next = multi_map::find_next(_G.api_map, map_entry);
+//        auto map_entry = (const Map<void *>::Entry *) entry->entry;
+//        auto next = multi_map::find_next(_G.api_map, map_entry);
 
-        if (!next) {
+//        if (!next) {
             return {};
-        }
+//        }
 
-        return {.api = next->value, .entry  = (void *) entry};
+//        return {.api = next->value, .entry  = (void *) entry};
     }
 
     static ct_api_a0 a0 = {
@@ -74,15 +78,13 @@ namespace api {
     };
 
     void init(cel_alloc *allocator) {
-        _G = {};
-
-        _G.api_map.init(allocator);
+        _G = {.allocator = allocator};
 
         api::register_api("ct_api_a0", &a0);
     }
 
     void shutdown() {
-        _G.api_map.destroy();
+        cel_hash_free(&_G.api_map, _G.allocator);
     }
 
     ct_api_a0 *v0() {

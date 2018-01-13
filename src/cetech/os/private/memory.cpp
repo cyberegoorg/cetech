@@ -89,14 +89,14 @@ extern void stacktrace_free(char *);
     }
 
     void register_api(ct_api_a0 *api) {
-        CETECH_GET_API(api, ct_log_a0);
-
         static ct_memory_a0 _api = {};
 
         _api.main_allocator = memsys_main_allocator;
         _api.str_dup = str_dup;
 
         api->register_api("ct_memory_a0", &_api);
+
+        CETECH_GET_API(api, ct_log_a0);
     }
 
     void memory_init() {

@@ -35,6 +35,7 @@
 #include <cetech/coredb/coredb.h>
 
 #include <celib/array.h>
+#include <celib/hash.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -73,7 +74,9 @@ static struct ApplicationGlobals {
     ct_app_on_shutdown* on_shutdown;
     ct_app_on_update* on_update;
 
-    celib::Map<ct_game_fce> game_map;
+    cel_hash_t game_map;
+    ct_game_fce* game;
+
     ct_game_fce active_game;
     int is_running;
     cel_alloc *allocator;
@@ -160,14 +163,10 @@ static void _boot_unload() {
 }
 
 void set_active_game(uint64_t name) {
-    static ct_game_fce null_game = {};
-
-    ct_game_fce game = celib::map::get(_G.game_map, name, {});
-    if(!::memcmp(&game, &null_game, sizeof(ct_game_fce))){
-        return;
+    uint64_t idx = cel_hash_lookup(&_G.game_map, name, UINT64_MAX);
+    if(idx != UINT64_MAX) {
+        _G.active_game = _G.game[idx];
     }
-
-    _G.active_game = game;
 }
 
 static void check_machine() {
@@ -325,11 +324,12 @@ _DEF_ON_CLB_FCE(ct_app_on_update, on_update)
 #undef _DEF_ON_CLB_FCE
 
 void register_game(uint64_t name, ct_game_fce game) {
-    celib::map::set(_G.game_map, name, game);
+    cel_array_push(_G.game, game, _G.allocator);
+    cel_hash_add(&_G.game_map, name, cel_array_size(_G.game) - 1, _G.allocator);
 }
 
 void unregister_game(uint64_t name) {
-    celib::map::remove(_G.game_map, name);
+    cel_hash_remove(&_G.game_map, name);
 }
 
 
@@ -362,8 +362,6 @@ void app_init(struct ct_api_a0 *api) {
 #else
     ct_resource_a0.set_autoload(0);
 #endif
-
-    _G.game_map.init(ct_memory_a0.main_allocator());
 }
 
 CETECH_MODULE_DEF(
@@ -402,6 +400,7 @@ CETECH_MODULE_DEF(
             cel_array_free(_G.on_init, _G.allocator);
             cel_array_free(_G.on_shutdown, _G.allocator);
             cel_array_free(_G.on_update, _G.allocator);
-            _G.game_map.destroy();
+            cel_array_free(_G.game, _G.allocator);
+            cel_hash_free(&_G.game_map, _G.allocator);
         }
 )
