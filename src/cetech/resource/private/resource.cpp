@@ -21,6 +21,7 @@
 #include <cetech/module/module.h>
 #include <cetech/coredb/coredb.h>
 #include <cetech/kernel/kernel.h>
+#include <celib/array.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -80,16 +81,16 @@ namespace {
 #define _G ResourceManagerGlobals
     struct ResourceManagerGlobals {
         Map<uint32_t> type_map;
-        Array<ct_resource_callbacks_t> resource_callbacks;
+        ct_resource_callbacks_t* resource_callbacks;
 
         Map<uint32_t> resource_map;
-        Array<resource_item_t> resource_data;
+        resource_item_t* resource_data;
 
         int autoload_enabled;
 
         ct_spinlock add_lock;
         ct_coredb_object_t* config_object;
-
+        cel_alloc* allocator;
     } ResourceManagerGlobals = {};
 }
 
@@ -176,9 +177,9 @@ namespace resource {
     void resource_register_type(uint64_t type,
                                 ct_resource_callbacks_t callbacks) {
 
-        const uint32_t idx = array::size(_G.resource_callbacks);
+        const uint32_t idx = cel_array_size(_G.resource_callbacks);
 
-        array::push_back(_G.resource_callbacks, callbacks);
+        cel_array_push(_G.resource_callbacks, callbacks, _G.allocator);
         map::set(_G.type_map, type, idx);
     }
 
@@ -213,8 +214,8 @@ namespace resource {
             uint64_t id = hash_combine(type, names[i]);
 
             if (!map::has(_G.resource_map, id)) {
-                uint32_t idx = array::size(_G.resource_data);
-                array::push_back(_G.resource_data, item);
+                uint32_t idx = cel_array_size(_G.resource_data);
+                cel_array_push(_G.resource_data, item, _G.allocator);
                 map::set(_G.resource_map, id, idx);
             } else {
                 uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
@@ -508,22 +509,22 @@ namespace resource {
         const Map<uint32_t>::Entry *type_it = map::begin(_G.type_map);
         const Map<uint32_t>::Entry *type_end = map::end(_G.type_map);
 
-        Array<uint64_t> name_array(ct_memory_a0.main_allocator());
+        uint64_t* name_array = NULL;
 
         while (type_it != type_end) {
             uint64_t type_id = type_it->key;
 
-            array::resize(name_array, 0);
+            cel_array_clean(name_array);
 
-            for (uint32_t i = 0; i < array::size(_G.resource_data); ++i) {
+            for (uint32_t i = 0; i < cel_array_size(_G.resource_data); ++i) {
                 resource_item_t item = _G.resource_data[i];
 
                 if (item.type == type_id) {
-                    array::push_back(name_array, item.name);
+                    cel_array_push(name_array, item.name, _G.allocator);
                 }
             }
 
-            reload(type_id, &name_array[0], array::size(name_array));
+            reload(type_id, &name_array[0], cel_array_size(name_array));
 
             ++type_it;
         }
@@ -616,9 +617,12 @@ namespace resource_module {
         _init_api(api);
         _init_cvar(ct_config_a0);
 
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+                .config_object = ct_config_a0.config_object(),
+        };
+
         _G.type_map.init(ct_memory_a0.main_allocator());
-        _G.resource_data.init(ct_memory_a0.main_allocator());
-        _G.resource_callbacks.init(ct_memory_a0.main_allocator());
         _G.resource_map.init(ct_memory_a0.main_allocator());
 
         ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
@@ -633,8 +637,8 @@ namespace resource_module {
         package_shutdown();
 
         _G.type_map.destroy();
-        _G.resource_data.destroy();
-        _G.resource_callbacks.destroy();
+        cel_array_free(_G.resource_data, _G.allocator);
+        cel_array_free(_G.resource_callbacks, _G.allocator);
         _G.resource_map.destroy();
     }
 

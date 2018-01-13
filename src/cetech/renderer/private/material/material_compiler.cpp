@@ -37,13 +37,13 @@ using namespace celib;
 namespace material_compiler {
     namespace {
         struct material_compile_output {
-            Array<uint64_t> layer_names;
-            Array<uint64_t> shader_name;
-            Array<char> uniform_names;
-            Array<uint32_t> uniform_count;
-            Array<uint32_t> layer_offset;
-            Array<material_variable> var;
-            Array<uint64_t> render_state;
+            uint64_t* layer_names;
+            uint64_t* shader_name;
+            char* uniform_names;
+            uint32_t* uniform_count;
+            uint32_t* layer_offset;
+            material_variable* var;
+            uint64_t* render_state;
             uint64_t curent_render_state;
         };
 
@@ -52,6 +52,7 @@ namespace material_compiler {
                                   uint64_t root_key,
                                   uint64_t key,
                                   material_compile_output &output) {
+            cel_alloc* a = ct_memory_a0.main_allocator();
 
             uint64_t tmp_keys[] = {
                     root_key,
@@ -101,8 +102,8 @@ namespace material_compiler {
                                    (float[16]) {0.0f});
             }
 
-            array::push(output.var, &mat_var, 1);
-            array::push(output.uniform_names, uniform_name, CETECH_ARRAY_LEN(uniform_name));
+            cel_array_push_n(output.var, &mat_var, 1, a);
+            cel_array_push_n(output.uniform_names, uniform_name, CETECH_ARRAY_LEN(uniform_name), a);
         }
     }
 
@@ -137,7 +138,7 @@ namespace material_compiler {
                        uint64_t root_key,
                        uint64_t key,
                        material_compile_output &output) {
-
+        cel_alloc *a = ct_memory_a0.main_allocator();
         uint64_t tmp_keys[] = {
                 root_key,
                 key,
@@ -149,10 +150,10 @@ namespace material_compiler {
 
         const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
         uint64_t shader_id = CT_ID64_0(shader);
-        array::push_back(output.shader_name, shader_id);
+        cel_array_push(output.shader_name, shader_id, a);
 
         auto layer_id = key;
-        auto layer_offset = array::size(output.var);
+        auto layer_offset = cel_array_size(output.var);
 
         tmp_keys[2] = ct_yng_a0.calc_key("render_state");
         tmp_key = ct_yng_a0.combine_key(tmp_keys,
@@ -174,9 +175,9 @@ namespace material_compiler {
             }
         }
 
-        array::push_back(output.layer_names, layer_id);
-        array::push_back(output.layer_offset, layer_offset);
-        array::push_back(output.render_state, output.curent_render_state);
+        cel_array_push(output.layer_names, layer_id, a);
+        cel_array_push(output.layer_offset, layer_offset, a);
+        cel_array_push(output.render_state, output.curent_render_state, a);
 
         tmp_keys[2] = ct_yng_a0.calc_key("variables");
         tmp_key = ct_yng_a0.combine_key(tmp_keys,
@@ -195,8 +196,8 @@ namespace material_compiler {
             }
         }
 
-        array::push_back(output.uniform_count,
-                         array::size(output.var) - layer_offset);
+        cel_array_push(output.uniform_count,
+                         cel_array_size(output.var) - layer_offset, a);
 
     };
 
@@ -208,13 +209,6 @@ namespace material_compiler {
         cel_alloc* a = ct_memory_a0.main_allocator();
 
         struct material_compile_output output = {};
-        output.uniform_names.init(ct_memory_a0.main_allocator());
-        output.layer_names.init(ct_memory_a0.main_allocator());
-        output.uniform_count.init(ct_memory_a0.main_allocator());
-        output.var.init(ct_memory_a0.main_allocator());
-        output.render_state.init(ct_memory_a0.main_allocator());
-        output.layer_offset.init(ct_memory_a0.main_allocator());
-        output.shader_name.init(ct_memory_a0.main_allocator());
 
         uint64_t key = ct_yng_a0.calc_key("layers");
 
@@ -235,41 +229,41 @@ namespace material_compiler {
         }
 
         material_blob::blob_t resource = {
-                .all_uniform_count = array::size(output.var),
-                .layer_count = array::size(output.layer_names),
+                .all_uniform_count = cel_array_size(output.var),
+                .layer_count = cel_array_size(output.layer_names),
         };
 
 
         cel_array_push_n(*output_blob, &resource, sizeof(resource), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.layer_names),
-                         sizeof(uint64_t) * array::size(output.layer_names), a);
+        cel_array_push_n(*output_blob, output.layer_names,
+                         sizeof(uint64_t) * cel_array_size(output.layer_names), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.shader_name),
-                         sizeof(uint64_t)* array::size(output.shader_name), a);
+        cel_array_push_n(*output_blob, output.shader_name,
+                         sizeof(uint64_t)* cel_array_size(output.shader_name), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.uniform_count),
-                         sizeof(uint32_t)* array::size(output.uniform_count), a);
+        cel_array_push_n(*output_blob, output.uniform_count,
+                         sizeof(uint32_t)* cel_array_size(output.uniform_count), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.render_state),
-                         sizeof(uint64_t)* array::size(output.render_state), a);
+        cel_array_push_n(*output_blob, output.render_state,
+                         sizeof(uint64_t)* cel_array_size(output.render_state), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.var),
-                         sizeof(material_variable) * array::size(output.var), a);
+        cel_array_push_n(*output_blob, output.var,
+                         sizeof(material_variable) * cel_array_size(output.var), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.uniform_names),
-                         sizeof(char)* array::size(output.uniform_names), a);
+        cel_array_push_n(*output_blob, output.uniform_names,
+                         sizeof(char)* cel_array_size(output.uniform_names), a);
 
-        cel_array_push_n(*output_blob, array::begin(output.layer_offset),
-                         sizeof(uint32_t) * array::size(output.layer_offset), a);
+        cel_array_push_n(*output_blob, output.layer_offset,
+                         sizeof(uint32_t) * cel_array_size(output.layer_offset), a);
 
-        output.uniform_names.destroy();
-        output.layer_names.destroy();
-        output.uniform_count.destroy();
-        output.var.destroy();
-        output.layer_offset.destroy();
-        output.shader_name.destroy();
-        output.render_state.destroy();
+        cel_array_free(output.uniform_names, a);
+        cel_array_free(output.layer_names, a);
+        cel_array_free(output.uniform_count, a);
+        cel_array_free(output.var, a);
+        cel_array_free(output.layer_offset, a);
+        cel_array_free(output.shader_name, a);
+        cel_array_free(output.render_state, a);
     }
 
     int init(ct_api_a0 *api) {

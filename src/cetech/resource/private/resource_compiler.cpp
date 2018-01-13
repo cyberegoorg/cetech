@@ -210,7 +210,7 @@ compilator _find_compilator(uint64_t type) {
 
 
 
-void _compile_files(Array<ct_task_item> &tasks,
+void _compile_files(ct_task_item** tasks,
                     char **files,
                     uint32_t files_count,
                     celib::Map<uint64_t> &compiled) {
@@ -268,7 +268,7 @@ void _compile_files(Array<ct_task_item> &tasks,
                 .affinity = TASK_AFFINITY_NONE
         };
 
-        array::push_back(tasks, item);
+        cel_array_push(*tasks, item, _G.allocator);
         multi_map::insert(compiled, type_id, name_id);
     }
 }
@@ -300,7 +300,7 @@ void resource_compiler_register(uint64_t type,
 }
 
 void _compile_all(celib::Map<uint64_t> &compiled) {
-    Array<ct_task_item> tasks(ct_memory_a0.main_allocator());
+    ct_task_item* tasks = NULL;
     const char *glob_patern = "**.*";
     char **files = nullptr;
     uint32_t files_count = 0;
@@ -309,19 +309,21 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
                              "", glob_patern, false, true, &files, &files_count,
                              ct_memory_a0.main_allocator());
 
-    _compile_files(tasks, files, files_count, compiled);
+    _compile_files(&tasks, files, files_count, compiled);
 
     ct_filesystem_a0.listdir_free(files, files_count,
                                   ct_memory_a0.main_allocator());
 
-    ct_task_a0.add(tasks._data, tasks._size);
+    ct_task_a0.add(tasks, cel_array_size(tasks));
 
-    for (uint32_t i = 0; i < array::size(tasks); ++i) {
+    for (uint32_t i = 0; i < cel_array_size(tasks); ++i) {
         compile_task_data *data = (compile_task_data *) tasks[i].data;
 
         ct_task_a0.wait_atomic(&data->completed, 0);
         CEL_FREE(ct_memory_a0.main_allocator(), data);
     }
+
+    cel_array_free(tasks, _G.allocator);
 }
 
 
@@ -425,24 +427,26 @@ void resource_compiler_check_fs() {
         auto *type_it = map::begin(type_name);
         auto *type_end = map::end(type_name);
 
-        Array<uint64_t> name_array(ct_memory_a0.main_allocator());
+        uint64_t* name_array = NULL;
 
         while (type_it != type_end) {
             uint64_t type_id = type_it->key;
 
-            array::resize(name_array, 0);
+            cel_array_clean(name_array);
 
             auto it = multi_map::find_first(type_name, type_id);
             while (it != nullptr) {
-                array::push_back(name_array, it->value);
+                cel_array_push(name_array, it->value, _G.allocator);
 
                 it = multi_map::find_next(type_name, it);
             }
 
-            ct_resource_a0.reload(type_id, &name_array[0],array::size(name_array));
+            ct_resource_a0.reload(type_id, &name_array[0],cel_array_size(name_array));
 
             ++type_it;
         }
+
+        cel_array_free(name_array, _G.allocator);
     }
 }
 

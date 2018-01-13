@@ -4,6 +4,7 @@
 
 #include <cetech/module/module.h>
 #include <cetech/renderer/scene.h>
+#include <celib/array.h>
 #include "celib/allocator.h"
 #include "celib/map.inl"
 
@@ -45,9 +46,9 @@ CETECH_DECL_API(ct_thread_a0);
 struct scene_instance {
     uint64_t scene;
     Map<uint8_t> geom_map;
-    Array<uint32_t> size;
-    Array<bgfx::VertexBufferHandle> vb;
-    Array<bgfx::IndexBufferHandle> ib;
+    uint32_t* size;
+    bgfx::VertexBufferHandle* vb;
+    bgfx::IndexBufferHandle* ib;
 };
 
 
@@ -55,24 +56,22 @@ struct scene_instance {
 // GLobals
 //==============================================================================
 
-#define  _G SceneResourceGlobals
-static struct SceneResourceGlobals {
+#define _G SceneResourceGlobals
+static struct _G {
     uint64_t type;
     Map<uint32_t> scene_instance_map;
-    Array<scene_instance> scene_instance_array;
-} SceneResourceGlobals;
+    scene_instance* scene_instance_array;
+    cel_alloc* allocator;
+} _G;
 
 struct scene_instance *_init_scene_instance(uint64_t scene) {
-    uint32_t idx = array::size(_G.scene_instance_array);
-    array::push_back(_G.scene_instance_array, {});
+    uint32_t idx = cel_array_size(_G.scene_instance_array);
+    cel_array_push(_G.scene_instance_array, {}, _G.allocator);
 
     scene_instance *instance = &_G.scene_instance_array[idx];
     instance->scene = scene;
 
     instance->geom_map.init(ct_memory_a0.main_allocator());
-    instance->size.init(ct_memory_a0.main_allocator());
-    instance->vb.init(ct_memory_a0.main_allocator());
-    instance->ib.init(ct_memory_a0.main_allocator());
 
     map::set(_G.scene_instance_map, scene, idx);
 
@@ -85,20 +84,21 @@ void _destroy_scene_instance(uint64_t scene) {
     map::remove(map1, 1111);
 
     uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
-    uint32_t size = array::size(_G.scene_instance_array);
+    uint32_t size = cel_array_size(_G.scene_instance_array);
 
     scene_instance *instance = &_G.scene_instance_array[idx];
     scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
     instance->geom_map.destroy();
-    instance->size.destroy();
-    instance->vb.destroy();
-    instance->ib.destroy();
+
+    cel_array_free(instance->size, _G.allocator);
+    cel_array_free(instance->vb, _G.allocator);
+    cel_array_free(instance->ib, _G.allocator);
 
     *instance = *last_instance;
     map::remove(_G.scene_instance_map, scene);
     map::set(_G.scene_instance_map, last_instance->scene, idx);
-    array::pop_back(_G.scene_instance_array);
+    cel_array_pop_back(_G.scene_instance_array);
 }
 
 struct scene_instance *_get_scene_instance(uint64_t scene) {
@@ -167,12 +167,12 @@ namespace scene_resource {
             auto ib_handle = bgfx::createIndexBuffer(ib_mem,
                                                      BGFX_BUFFER_INDEX32);
 
-            uint8_t idx = (uint8_t) array::size(instance->vb);
+            uint8_t idx = (uint8_t) cel_array_size(instance->vb);
             map::set(instance->geom_map, geom_name[i], idx);
 
-            array::push_back(instance->size, ib_size[i]);
-            array::push_back(instance->vb, bv_handle);
-            array::push_back(instance->ib, ib_handle);
+            cel_array_push(instance->size, ib_size[i], _G.allocator);
+            cel_array_push(instance->vb, bv_handle, _G.allocator);
+            cel_array_push(instance->ib, ib_handle, _G.allocator);
         }
     }
 
@@ -217,24 +217,21 @@ namespace scene {
         CETECH_GET_API(api, ct_hash_a0);
         CETECH_GET_API(api, ct_thread_a0);
 
-        _G = {};
+        _G = {.allocator=ct_memory_a0.main_allocator()};
 
         _G.type = CT_ID64_0("scene");
 
-        _G.scene_instance_array.init(ct_memory_a0.main_allocator());
         _G.scene_instance_map.init(ct_memory_a0.main_allocator());
 
         ct_resource_a0.register_type(_G.type, scene_resource::callback);
 
-
         scene_resource_compiler::init(api);
-
 
         return 1;
     }
 
     void shutdown() {
-        _G.scene_instance_array.destroy();
+        cel_array_free(_G.scene_instance_array, _G.allocator);
         _G.scene_instance_map.destroy();
     }
 

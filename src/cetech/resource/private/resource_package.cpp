@@ -48,10 +48,10 @@ struct _G {
 //==============================================================================
 
 struct package_compile_data {
-    Array<uint64_t> types;
-    Array<uint64_t> name;
-    Array<uint32_t> name_count;
-    Array<uint32_t> offset;
+    uint64_t* types;
+    uint64_t* name;
+    uint32_t* name_count;
+    uint32_t* offset;
 };
 
 void _package_compiler(const char *filename,
@@ -60,11 +60,7 @@ void _package_compiler(const char *filename,
     CEL_UNUSED(compilator_api);
 
     struct package_compile_data compile_data = {};
-    compile_data.types.init(ct_memory_a0.main_allocator());
-    compile_data.name.init(ct_memory_a0.main_allocator());
-    compile_data.offset.init(ct_memory_a0.main_allocator());
-    compile_data.name_count.init(ct_memory_a0.main_allocator());
-
+    
     uint64_t tmp_keys = 0;
 
     uint64_t type_keys[32] = {};
@@ -77,8 +73,8 @@ void _package_compiler(const char *filename,
     for (uint32_t i = 0; i < type_keys_count; ++i) {
         uint64_t type_id = type_keys[i];
 
-        array::push_back(compile_data.types, type_id);
-        array::push_back(compile_data.offset, array::size(compile_data.name));
+        cel_array_push(compile_data.types, type_id, _G.allocator);
+        cel_array_push(compile_data.offset, cel_array_size(compile_data.name), _G.allocator);
 
         uint64_t name_keys[32] = {};
         uint32_t name_keys_count = 0;
@@ -87,34 +83,34 @@ void _package_compiler(const char *filename,
                                name_keys, CETECH_ARRAY_LEN(name_keys),
                                &name_keys_count);
 
-        array::push_back(compile_data.name_count, name_keys_count);
+        cel_array_push(compile_data.name_count, name_keys_count, _G.allocator);
 
         for (uint32_t j = 0; j < name_keys_count; ++j) {
-            array::push_back(compile_data.name, name_keys[j]);
+            cel_array_push(compile_data.name, name_keys[j], _G.allocator);
         }
     }
 
     struct package_resource resource = {};
-    resource.type_count = array::size(compile_data.types);
+    resource.type_count = cel_array_size(compile_data.types);
     resource.type_offset = sizeof(resource);
 
     resource.name_count_offset = resource.type_offset +
-                                 (array::size(compile_data.types) *
+                                 (cel_array_size(compile_data.types) *
                                   sizeof(uint64_t));
 
     resource.name_offset = resource.name_count_offset +
-                           (array::size(compile_data.name_count) *
+                           (cel_array_size(compile_data.name_count) *
                             sizeof(uint32_t));
 
     resource.offset_offset = resource.name_offset +
-                             (array::size(compile_data.name) *
+                             (cel_array_size(compile_data.name) *
                               sizeof(uint64_t));
 
     cel_array_push_n(*output, &resource, sizeof(resource), _G.allocator );
-    cel_array_push_n(*output, array::begin(compile_data.types), sizeof(uint64_t) * array::size(compile_data.types), _G.allocator );
-    cel_array_push_n(*output, array::begin(compile_data.name_count), sizeof(uint32_t) * array::size(compile_data.name_count), _G.allocator );
-    cel_array_push_n(*output, array::begin(compile_data.name),  sizeof(uint64_t) * array::size(compile_data.name), _G.allocator );
-    cel_array_push_n(*output, array::begin(compile_data.offset), sizeof(uint32_t) * array::size(compile_data.offset), _G.allocator );
+    cel_array_push_n(*output, compile_data.types, sizeof(uint64_t) * cel_array_size(compile_data.types), _G.allocator );
+    cel_array_push_n(*output, compile_data.name_count, sizeof(uint32_t) * cel_array_size(compile_data.name_count), _G.allocator );
+    cel_array_push_n(*output, compile_data.name,  sizeof(uint64_t) * cel_array_size(compile_data.name), _G.allocator );
+    cel_array_push_n(*output, compile_data.offset, sizeof(uint32_t) * cel_array_size(compile_data.offset), _G.allocator );
 }
 
 int package_init(ct_api_a0 *api) {

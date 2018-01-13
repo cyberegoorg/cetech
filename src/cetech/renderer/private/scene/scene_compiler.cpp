@@ -8,6 +8,7 @@
 #include <cetech/macros.h>
 #include <cetech/yaml/ydb.h>
 #include <celib/array.h>
+#include <CoreServices/CoreServices.h>
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
@@ -76,23 +77,22 @@ namespace scene_resource_compiler {
             // TODO: {.name="u10", .size=sizeof(u10), .attrib_type=BGFX_ATTRIB_TYPE_UINT10},
     };
 
+    typedef char char_128[128];
     struct compile_output {
-        Array<uint64_t> geom_name;
-        Array<uint32_t> ib_offset;
-        Array<uint32_t> vb_offset;
-        Array<bgfx::VertexDecl> vb_decl;
-        Array<uint32_t> ib_size;
-        Array<uint32_t> vb_size;
-        Array<uint32_t> ib;
-        Array<uint8_t> vb;
-
-        Array<uint64_t> node_name;
-        Array<uint32_t> node_parent;
-        Array<float> node_pose;
-        Array<uint64_t> geom_node;
-
-        Array<char[128]> geom_str; // TODO : SHIT
-        Array<char[128]> node_str; // TODO : SHIT
+        uint64_t *geom_name;
+        uint32_t *ib_offset;
+        uint32_t *vb_offset;
+        bgfx::VertexDecl *vb_decl;
+        uint32_t *ib_size;
+        uint32_t *vb_size;
+        uint32_t *ib;
+        uint8_t *vb;
+        uint64_t *node_name;
+        uint32_t *node_parent;
+        float *node_pose;
+        uint64_t *geom_node;
+        char_128 *geom_str; // TODO : SHIT
+        char_128 *node_str; // TODO : SHIT
     };
 
     struct compile_output *_crete_compile_output() {
@@ -100,23 +100,7 @@ namespace scene_resource_compiler {
         struct compile_output *output =
                 CEL_ALLOCATE(a, struct compile_output,
                              sizeof(struct compile_output));
-
-        output->geom_name.init(a);
-        output->ib_offset.init(a);
-        output->vb_offset.init(a);
-        output->vb_decl.init(a);
-        output->ib_size.init(a);
-        output->vb_size.init(a);
-        output->ib.init(a);
-        output->vb.init(a);
-
-        output->node_name.init(a);
-        output->geom_node.init(a);
-        output->node_parent.init(a);
-        output->node_pose.init(a);
-
-        output->node_str.init(a);
-        output->geom_str.init(a);
+        *output = {0};
 
         return output;
     }
@@ -124,22 +108,20 @@ namespace scene_resource_compiler {
     void _destroy_compile_output(struct compile_output *output) {
         cel_alloc *a = ct_memory_a0.main_allocator();
 
-        output->geom_name.destroy();
-        output->ib_offset.destroy();
-        output->vb_offset.destroy();
-        output->vb_decl.destroy();
-        output->ib_size.destroy();
-        output->vb_size.destroy();
-        output->ib.destroy();
-        output->vb.destroy();
-
-        output->node_name.destroy();
-        output->geom_node.destroy();
-        output->node_parent.destroy();
-        output->node_pose.destroy();
-
-        output->node_str.destroy();
-        output->geom_str.destroy();
+        cel_array_free(output->geom_name, a);
+        cel_array_free(output->ib_offset, a);
+        cel_array_free(output->vb_offset, a);
+        cel_array_free(output->vb_decl, a);
+        cel_array_free(output->ib_size, a);
+        cel_array_free(output->vb_size, a);
+        cel_array_free(output->ib, a);
+        cel_array_free(output->vb, a);
+        cel_array_free(output->node_name, a);
+        cel_array_free(output->geom_node, a);
+        cel_array_free(output->node_parent, a);
+        cel_array_free(output->node_pose, a);
+        cel_array_free(output->node_str, a);
+        cel_array_free(output->geom_str, a);
 
         CEL_FREE(a, output);
     }
@@ -176,14 +158,14 @@ namespace scene_resource_compiler {
         };
         const char *type_str = d->get_string(d->inst,
                                              ct_yng_a0.combine_key(keys,
-                                                                      CETECH_ARRAY_LEN(
-                                                                              keys)),
+                                                                   CETECH_ARRAY_LEN(
+                                                                           keys)),
                                              "");
 
         keys[1] = ct_yng_a0.calc_key("size");
         float size = d->get_float(d->inst, ct_yng_a0.combine_key(keys,
-                                                                    CETECH_ARRAY_LEN(
-                                                                            keys)),
+                                                                 CETECH_ARRAY_LEN(
+                                                                         keys)),
                                   0.0f);
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
@@ -210,8 +192,8 @@ namespace scene_resource_compiler {
 
             ct_yamlng_node node = d->get(d->inst,
                                          ct_yng_a0.combine_key(keys,
-                                                                  CETECH_ARRAY_LEN(
-                                                                          keys)));
+                                                               CETECH_ARRAY_LEN(
+                                                                       keys)));
             if (0 != node.idx) {
                 _parse_vertex_decl(decl, vertex_size,
                                    _chanel_types[i].attrib,
@@ -226,6 +208,8 @@ namespace scene_resource_compiler {
                        const char *name,
                        struct ct_yamlng_node chanels_n,
                        struct compile_output *output) {
+        struct cel_alloc *a = ct_memory_a0.main_allocator();
+
         bgfx::AttribType::Enum attrib_type;
         size_t v_size;
 
@@ -240,13 +224,13 @@ namespace scene_resource_compiler {
         const char *type_str = NULL;
         {
             uint64_t keys[] = {
-                    d->hash(d->inst,types),
+                    d->hash(d->inst, types),
                     ct_yng_a0.calc_key(name),
                     ct_yng_a0.calc_key("type"),
             };
             type_str = d->get_string(d->inst, ct_yng_a0.combine_key(keys,
-                                                                       CETECH_ARRAY_LEN(
-                                                                               keys)),
+                                                                    CETECH_ARRAY_LEN(
+                                                                            keys)),
                                      "");
 
             keys[2] = ct_yng_a0.calc_key("size"),
@@ -266,8 +250,8 @@ namespace scene_resource_compiler {
                 ct_yng_a0.calc_key(name),
         };
         uint64_t chanel_data_n = ct_yng_a0.combine_key(keys,
-                                                          CETECH_ARRAY_LEN(
-                                                                  keys));
+                                                       CETECH_ARRAY_LEN(
+                                                               keys));
 
         for (uint32_t k = 0; k < size; ++k) {
             struct ct_yamlng_node n = d->get_seq(d->inst, chanel_data_n,
@@ -277,13 +261,14 @@ namespace scene_resource_compiler {
             float v = d->as_float(d->inst, n, 0.0f);
             //log_debug("casdsadsa", "%s:%d -  %f", name, k, v);
 
-            array::push(output->vb, (uint8_t *) &v, sizeof(v));
+            cel_array_push_n(output->vb, (uint8_t *) &v, sizeof(v), a);
         }
     }
 
     void foreach_geometries_clb(struct ct_yamlng_node key,
                                 struct ct_yamlng_node value,
                                 void *_data) {
+        struct cel_alloc *a = ct_memory_a0.main_allocator();
 
         struct compile_output *output = (compile_output *) _data;
         ct_yng_doc *d = key.d;
@@ -294,11 +279,11 @@ namespace scene_resource_compiler {
         char tmp_name[128];
         strncpy(tmp_name, name_str, 127);
 
-        array::push_back(output->geom_name, name);
-        array::push(output->geom_str, &tmp_name, 1);
-        array::push_back<uint64_t>(output->geom_node, 0);
-        array::push_back(output->ib_offset, array::size(output->ib));
-        array::push_back(output->vb_offset, array::size(output->vb));
+        cel_array_push(output->geom_name, name, a);
+        cel_array_push_n(output->geom_str, &tmp_name, 1, a);
+        cel_array_push(output->geom_node, 0, a);
+        cel_array_push(output->ib_offset, cel_array_size(output->ib), a);
+        cel_array_push(output->vb_offset, cel_array_size(output->vb), a);
 
         // DECL
         bgfx::VertexDecl vertex_decl;
@@ -309,39 +294,39 @@ namespace scene_resource_compiler {
                 ct_yng_a0.calc_key("types"),
         };
         ct_yamlng_node types = d->get(d->inst, ct_yng_a0.combine_key(keys,
-                                                                        CETECH_ARRAY_LEN(
-                                                                                keys)));
+                                                                     CETECH_ARRAY_LEN(
+                                                                             keys)));
 
         uint32_t vertex_size = 0;
         _parese_types(&vertex_decl, types, &vertex_size);
 
         vertex_decl.end();
-        array::push_back(output->vb_decl, vertex_decl);
+        cel_array_push(output->vb_decl, vertex_decl, a);
 
         // IB, VB
         keys[1] = ct_yng_a0.calc_key("chanels");
         ct_yamlng_node chanels_n = d->get(d->inst,
                                           ct_yng_a0.combine_key(keys,
-                                                                   CETECH_ARRAY_LEN(
-                                                                           keys)));
+                                                                CETECH_ARRAY_LEN(
+                                                                        keys)));
 
 
         keys[1] = ct_yng_a0.calc_key("indices");
-        uint64_t  k = ct_yng_a0.combine_key(keys,
-                                               CETECH_ARRAY_LEN(
-                                                       keys));
+        uint64_t k = ct_yng_a0.combine_key(keys,
+                                           CETECH_ARRAY_LEN(
+                                                   keys));
         ct_yamlng_node indices_n = d->get(d->inst, k);
 
         keys[0] = k;
         keys[1] = ct_yng_a0.calc_key("size");
         ct_yamlng_node i_size = d->get(d->inst, ct_yng_a0.combine_key(keys,
-                                                                         CETECH_ARRAY_LEN(
-                                                                                 keys)));
+                                                                      CETECH_ARRAY_LEN(
+                                                                              keys)));
 
         uint32_t vertex_count = (uint32_t) d->as_float(d->inst, i_size, 0.0f);
 
-        array::push_back(output->ib_size, vertex_count);
-        array::push_back(output->vb_size, vertex_size * vertex_count);
+        cel_array_push(output->ib_size, vertex_count, a);
+        cel_array_push(output->vb_size, vertex_size * vertex_count, a);
 
         for (uint32_t i = 0; i < vertex_count; ++i) {
             for (uint32_t j = 0; j < CETECH_ARRAY_LEN(_chanel_types); ++j) {
@@ -354,14 +339,14 @@ namespace scene_resource_compiler {
 
                 ct_yamlng_node node = d->get(d->inst,
                                              ct_yng_a0.combine_key(keys,
-                                                                      CETECH_ARRAY_LEN(
-                                                                              keys)));
+                                                                   CETECH_ARRAY_LEN(
+                                                                           keys)));
                 if (0 != node.idx) {
                     _write_chanel(node, types, i, name, chanels_n, output);
                 }
             }
 
-            array::push_back(output->ib, (uint32_t) i);
+            cel_array_push(output->ib, i, a);
         }
     }
 
@@ -374,6 +359,8 @@ namespace scene_resource_compiler {
     void foreach_graph_clb(struct ct_yamlng_node key,
                            struct ct_yamlng_node value,
                            void *_data) {
+        struct cel_alloc *a = ct_memory_a0.main_allocator();
+
         struct foreach_graph_data *output = (foreach_graph_data *) _data;
         ct_yng_doc *d = key.d;
 
@@ -383,7 +370,7 @@ namespace scene_resource_compiler {
 
         char tmp_name[128];
         strncpy(tmp_name, key_str, 127);
-        array::push(output->output->node_str, &tmp_name, 1);
+        cel_array_push_n(output->output->node_str, &tmp_name, 1, a);
 
         uint64_t keys[] = {
                 d->hash(d->inst, value),
@@ -391,23 +378,23 @@ namespace scene_resource_compiler {
         };
         ct_yamlng_node local_pose = d->get(d->inst,
                                            ct_yng_a0.combine_key(keys,
-                                                                    CETECH_ARRAY_LEN(
-                                                                            keys)));
+                                                                 CETECH_ARRAY_LEN(
+                                                                         keys)));
 
         float pose[16];
         d->as_mat4(d->inst, local_pose, pose);
 
-        uint32_t idx = (uint32_t) array::size(output->output->node_name);
+        uint32_t idx = (uint32_t) cel_array_size(output->output->node_name);
 
-        array::push_back(output->output->node_name, node_name);
-        array::push_back(output->output->node_parent, output->parent_idx);
-        array::push(output->output->node_pose, pose, 16);
+        cel_array_push(output->output->node_name, node_name, a);
+        cel_array_push(output->output->node_parent, output->parent_idx, a);
+        cel_array_push_n(output->output->node_pose, pose, 16, a);
 
 
         keys[1] = ct_yng_a0.calc_key("geometries");
         uint64_t geometries_k = ct_yng_a0.combine_key(keys,
-                                                         CETECH_ARRAY_LEN(
-                                                                 keys));
+                                                      CETECH_ARRAY_LEN(
+                                                              keys));
 
         ct_yamlng_node geometries_n = d->get(d->inst, geometries_k);
         if (0 != geometries_n.idx) {
@@ -420,7 +407,7 @@ namespace scene_resource_compiler {
 
                 uint64_t geom_name = CT_ID64_0(geom_str);
                 for (uint32_t j = 0;
-                     j < array::size(output->output->geom_name); ++j) {
+                     j < cel_array_size(output->output->geom_name); ++j) {
                     if (geom_name != output->output->geom_name[j]) {
                         continue;
                     }
@@ -435,8 +422,8 @@ namespace scene_resource_compiler {
 
         keys[1] = ct_yng_a0.calc_key("children");
         uint64_t children_k = ct_yng_a0.combine_key(keys,
-                                                       CETECH_ARRAY_LEN(
-                                                               keys));
+                                                    CETECH_ARRAY_LEN(
+                                                            keys));
         ct_yamlng_node children_n = d->get(d->inst,
                                            children_k);
 
@@ -476,25 +463,27 @@ namespace scene_resource_compiler {
     void _compile_assimp_node(struct aiNode *root,
                               uint32_t parent,
                               struct compile_output *output) {
+        struct cel_alloc *a = ct_memory_a0.main_allocator();
+
         uint64_t name = CT_ID64_0(root->mName.data);
 
 
         char tmp_name[128];
         strncpy(tmp_name, root->mName.data, 127);
-        array::push(output->node_str, &tmp_name, 1);
+        cel_array_push_n(output->node_str, &tmp_name, 1, a);
 
-        uint32_t idx = array::size(output->node_name);
+        uint32_t idx = cel_array_size(output->node_name);
 
-        array::push_back(output->node_name, name);
-        array::push_back(output->node_parent, parent);
-        array::push(output->node_pose, &root->mTransformation.a1, 16);
+        cel_array_push(output->node_name, name, a);
+        cel_array_push(output->node_parent, parent, a);
+        cel_array_push_n(output->node_pose, &root->mTransformation.a1, 16, a);
 
         for (uint32_t i = 0; i < root->mNumChildren; ++i) {
             _compile_assimp_node(root->mChildren[i], idx, output);
         }
 
         for (uint32_t i = 0; i < root->mNumMeshes; ++i) {
-            array::push_back(output->geom_node, name);
+            cel_array_push(output->geom_node, name, a);
         }
     }
 
@@ -516,7 +505,8 @@ namespace scene_resource_compiler {
         uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
         if (document->get_bool(document->inst,
-                               ct_yng_a0.calc_key("import.postprocess.flip_uvs"),
+                               ct_yng_a0.calc_key(
+                                       "import.postprocess.flip_uvs"),
                                false)) {
             postprocess_flag |= aiProcess_FlipUVs;
         }
@@ -538,7 +528,7 @@ namespace scene_resource_compiler {
             }
 
             uint64_t name_id = CT_ID64_0(tmp_buffer);
-            for (uint32_t k = 0; k < array::size(output->geom_name); ++k) {
+            for (uint32_t k = 0; k < cel_array_size(output->geom_name); ++k) {
                 if (name_id == output->geom_name[k]) {
                     snprintf(tmp_buffer2, CETECH_ARRAY_LEN(tmp_buffer2), "%s%d",
                              tmp_buffer, ++unique);
@@ -551,14 +541,13 @@ namespace scene_resource_compiler {
 
             char tmp_name[128];
             strncpy(tmp_name, tmp_buffer, 127);
-            array::push(output->geom_str, &tmp_name, 1);
+            cel_array_push_n(output->geom_str, &tmp_name, 1, a);
 
-            array::push_back(output->geom_name,
-                             CT_ID64_0(tmp_buffer));
-            array::push_back<uint64_t>(output->geom_node, 0);
-            array::push_back(output->ib_offset, array::size(output->ib));
-            array::push_back(output->vb_offset, array::size(output->vb));
-            array::push_back(output->ib_size, mesh->mNumFaces * 3);
+            cel_array_push(output->geom_name, CT_ID64_0(tmp_buffer), a);
+            cel_array_push(output->geom_node, 0, a);
+            cel_array_push(output->ib_offset, cel_array_size(output->ib), a);
+            cel_array_push(output->vb_offset, cel_array_size(output->vb), a);
+            cel_array_push(output->ib_size, mesh->mNumFaces * 3, a);
 
             bgfx::VertexDecl vertex_decl;
             vertex_decl.begin();
@@ -583,31 +572,33 @@ namespace scene_resource_compiler {
             }
             vertex_decl.end();
 
-            array::push_back(output->vb_decl, vertex_decl);
-            array::push_back(output->vb_size, v_size * mesh->mNumVertices);
+            cel_array_push(output->vb_decl, vertex_decl, a);
+            cel_array_push(output->vb_size, v_size * mesh->mNumVertices, a);
 
             for (uint32_t j = 0; j < mesh->mNumVertices; ++j) {
                 if (mesh->mVertices != NULL) {
-                    array::push(output->vb, (uint8_t *) &mesh->mVertices[j],
-                                sizeof(float) * 3);
+                    cel_array_push_n(output->vb,
+                                     (uint8_t *) &mesh->mVertices[j],
+                                     sizeof(float) * 3, a);
                 }
 
                 if (mesh->mNormals != NULL) {
-                    array::push(output->vb, (uint8_t *) &mesh->mNormals[j],
-                                sizeof(float) * 3);
+                    cel_array_push_n(output->vb,
+                                     (uint8_t *) &mesh->mNormals[j],
+                                     sizeof(float) * 3, a);
                 }
 
                 if (mesh->mTextureCoords[0] != NULL) {
-                    array::push(output->vb,
-                                (uint8_t *) &mesh->mTextureCoords[0][j],
-                                sizeof(float) * 2);
+                    cel_array_push_n(output->vb,
+                                     (uint8_t *) &mesh->mTextureCoords[0][j],
+                                     sizeof(float) * 2, a);
                 }
             }
 
             for (uint32_t j = 0; j < mesh->mNumFaces; ++j) {
-                array::push_back(output->ib, mesh->mFaces[j].mIndices[0]);
-                array::push_back(output->ib, mesh->mFaces[j].mIndices[1]);
-                array::push_back(output->ib, mesh->mFaces[j].mIndices[2]);
+                cel_array_push(output->ib, mesh->mFaces[j].mIndices[0], a);
+                cel_array_push(output->ib, mesh->mFaces[j].mIndices[1], a);
+                cel_array_push(output->ib, mesh->mFaces[j].mIndices[2], a);
             }
         }
 
@@ -616,13 +607,13 @@ namespace scene_resource_compiler {
     }
 
     void compiler(const char *filename,
-                 char**output_blob,
-                 struct ct_compilator_api *compilator_api) {
+                  char **output_blob,
+                  struct ct_compilator_api *compilator_api) {
 
         struct compile_output *output = _crete_compile_output();
         struct cel_alloc *a = ct_memory_a0.main_allocator();
 
-        ct_yng_doc* document = ct_ydb_a0.get(filename);
+        ct_yng_doc *document = ct_ydb_a0.get(filename);
 
         int ret = 1;
 
@@ -639,57 +630,58 @@ namespace scene_resource_compiler {
         }
 
         scene_blob::blob_t res = {
-                .geom_count = (uint32_t) array::size(output->geom_name),
-                .node_count = (uint32_t) array::size(output->node_name),
-                .ib_len = (uint32_t) array::size(output->ib),
-                .vb_len = (uint32_t) array::size(output->vb),
+                .geom_count = (uint32_t) cel_array_size(output->geom_name),
+                .node_count = (uint32_t) cel_array_size(output->node_name),
+                .ib_len = (uint32_t) cel_array_size(output->ib),
+                .vb_len = (uint32_t) cel_array_size(output->vb),
         };
 
         cel_array_push_n(*output_blob, &res, sizeof(res), a);
-        cel_array_push_n(*output_blob, array::begin(output->geom_name),
+        cel_array_push_n(*output_blob, output->geom_name,
                          sizeof(uint64_t) *
-                         array::size(output->geom_name), a);
-        cel_array_push_n(*output_blob, array::begin(output->ib_offset),
+                         cel_array_size(output->geom_name), a);
+        cel_array_push_n(*output_blob, output->ib_offset,
                          sizeof(uint32_t) *
-                         array::size(output->ib_offset), a);
-        cel_array_push_n(*output_blob, array::begin(output->vb_offset),
+                         cel_array_size(output->ib_offset), a);
+        cel_array_push_n(*output_blob, output->vb_offset,
                          sizeof(uint32_t) *
-                         array::size(output->vb_offset), a);
-        cel_array_push_n(*output_blob, array::begin(output->vb_decl),
+                         cel_array_size(output->vb_offset), a);
+        cel_array_push_n(*output_blob, output->vb_decl,
                          sizeof(bgfx::VertexDecl) *
-                         array::size(output->vb_decl), a);
-        cel_array_push_n(*output_blob, array::begin(output->ib_size),
-                         sizeof(uint32_t)*
-                         array::size(output->ib_size), a);
-        cel_array_push_n(*output_blob, array::begin(output->vb_size),
-                         sizeof(uint32_t)*
-                         array::size(output->vb_size), a);
-        cel_array_push_n(*output_blob, array::begin(output->ib),
-                         sizeof(uint32_t)*
-                         array::size(output->ib), a);
-        cel_array_push_n(*output_blob, array::begin(output->vb),
-                         sizeof(uint8_t)*
-                         array::size(output->vb), a);
-        cel_array_push_n(*output_blob, array::begin(output->node_name),
-                         sizeof(uint64_t)*
-                         array::size(output->node_name), a);
-        cel_array_push_n(*output_blob, array::begin(output->node_parent),
-                         sizeof(uint32_t)*
-                         array::size(output->node_parent), a);
-        cel_array_push_n(*output_blob, array::begin(output->node_pose),
-                         sizeof(float)*
-                         array::size(output->node_pose), a);
-        cel_array_push_n(*output_blob, array::begin(output->geom_node),
-                         sizeof(uint64_t)*
-                         array::size(output->geom_name), a);
+                         cel_array_size(output->vb_decl), a);
+        cel_array_push_n(*output_blob, output->ib_size,
+                         sizeof(uint32_t) *
+                         cel_array_size(output->ib_size), a);
+        cel_array_push_n(*output_blob, output->vb_size,
+                         sizeof(uint32_t) *
+                         cel_array_size(output->vb_size), a);
+        cel_array_push_n(*output_blob, output->ib,
+                         sizeof(uint32_t) *
+                         cel_array_size(output->ib), a);
+        cel_array_push_n(*output_blob, output->vb,
+                         sizeof(uint8_t) *
+                         cel_array_size(output->vb), a);
+        cel_array_push_n(*output_blob, output->node_name,
+                         sizeof(uint64_t) *
+                         cel_array_size(output->node_name), a);
 
-        cel_array_push_n(*output_blob, array::begin(output->geom_str),
-                          sizeof(char[128])*
-                          array::size(output->geom_str), a);
+        cel_array_push_n(*output_blob, output->node_parent,
+                         sizeof(uint32_t) *
+                         cel_array_size(output->node_parent), a);
+        cel_array_push_n(*output_blob, output->node_pose,
+                         sizeof(float) *
+                         cel_array_size(output->node_pose), a);
+        cel_array_push_n(*output_blob, output->geom_node,
+                         sizeof(uint64_t) *
+                         cel_array_size(output->geom_name), a);
 
-        cel_array_push_n(*output_blob, array::begin(output->node_str),
-                          sizeof(char[128])*
-                          array::size(output->node_str), a);
+        cel_array_push_n(*output_blob, output->geom_str,
+                         sizeof(char[128]) *
+                         cel_array_size(output->geom_str), a);
+
+        cel_array_push_n(*output_blob, output->node_str,
+                         sizeof(char[128]) *
+                         cel_array_size(output->node_str), a);
 
         _destroy_compile_output(output);
     }

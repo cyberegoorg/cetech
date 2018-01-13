@@ -79,7 +79,7 @@ static struct G {
     Map<bgfx::TextureHandle> global_resource;
     Map<ct_viewport_on_pass_t> on_pass;
     Map<uint32_t> viewport_instance_map;
-    Array<viewport_instance> viewport_instances;
+    viewport_instance* viewport_instances;
     Handler<uint32_t> viewport_handler;
 
     Map<ct_viewport_pass_compiler> compiler_map;
@@ -290,7 +290,7 @@ void resize_viewport(ct_viewport viewport,
 }
 
 void recreate_all_viewport() {
-    for (uint32_t i = 0; i < array::size(_G.viewport_instances); ++i) {
+    for (uint32_t i = 0; i < cel_array_size(_G.viewport_instances); ++i) {
         auto &vi = _G.viewport_instances[i];
         _init_viewport(vi, vi.viewport, vi.size[0], vi.size[1]);
     }
@@ -302,10 +302,10 @@ ct_viewport renderer_create_viewport(uint64_t name,
     viewport_instance vi = {};
     _init_viewport(vi, name, width, height);
 
-    auto idx = array::size(_G.viewport_instances);
+    auto idx = cel_array_size(_G.viewport_instances);
     auto id = handler::create(_G.viewport_handler);
     map::set(_G.viewport_instance_map, id, idx);
-    array::push_back(_G.viewport_instances, vi);
+    cel_array_push(_G.viewport_instances, vi, _G.allocator);
 
     return {.idx = id};
 }
@@ -389,16 +389,16 @@ namespace renderconfig_resource {
 
 //// COMPIELr
 struct compiler_output {
-    Array<uint64_t> layer_names;
-    Array<uint32_t> layers_entry_count;
-    Array<uint32_t> layers_entry_offset;
-    Array<uint32_t> layers_localresource_count;
-    Array<uint32_t> layers_localresource_offset;
-    Array<uint32_t> entry_data_offset;
-    Array<render_resource_t> global_resource;
-    Array<render_resource_t> local_resource;
-    Array<layer_entry_t> layers_entry;
-    Array<viewport_entry_t> viewport;
+    uint64_t* layer_names;
+    uint32_t* layers_entry_count;
+    uint32_t* layers_entry_offset;
+    uint32_t* layers_localresource_count;
+    uint32_t* layers_localresource_offset;
+    uint32_t* entry_data_offset;
+    render_resource_t* global_resource;
+    render_resource_t* local_resource;
+    layer_entry_t* layers_entry;
+    viewport_entry_t* viewport;
     char* blob;
 };
 
@@ -440,7 +440,7 @@ void compile_global_resource(uint32_t idx,
     const char *ration_str = d->get_string(d->inst, k, "");
     gs.ration = CT_ID64_0(ration_str);
 
-    array::push_back(output.global_resource, gs);
+    cel_array_push(output.global_resource, gs, _G.allocator);
 }
 
 
@@ -495,13 +495,13 @@ void compile_layer_entry(uint32_t idx,
     auto compiler = map::get<ct_viewport_pass_compiler>(_G.compiler_map,
                                                         le.type, NULL);
 
-    array::push_back(output.entry_data_offset, cel_array_size(output.blob));
+    cel_array_push(output.entry_data_offset, cel_array_size(output.blob), _G.allocator);
 
     if (compiler) {
         compiler(value, &output.blob);
     }
 
-    array::push_back(output.layers_entry, le);
+    cel_array_push(output.layers_entry, le, _G.allocator);
 
 }
 
@@ -514,16 +514,16 @@ void compile_layers(struct ct_yamlng_node key,
     const char *name_str = d->as_string(d->inst, key, "");
 
     auto name_id = CT_ID64_0(name_str);
-    auto layer_offset = array::size(output.layers_entry);
+    auto layer_offset = cel_array_size(output.layers_entry);
 
-    array::push_back(output.layer_names, name_id);
-    array::push_back(output.layers_entry_offset, layer_offset);
+    cel_array_push(output.layer_names, name_id, _G.allocator);
+    cel_array_push(output.layers_entry_offset, layer_offset, _G.allocator);
 
     d->foreach_seq_node(d->inst, value, compile_layer_entry, &output);
 
-    const uint32_t entry_count = array::size(output.layers_entry);
+    const uint32_t entry_count = cel_array_size(output.layers_entry);
 
-    array::push_back(output.layers_entry_count, entry_count - layer_offset);
+    cel_array_push(output.layers_entry_count, entry_count - layer_offset, _G.allocator);
 }
 
 namespace renderconfig_compiler {
@@ -536,20 +536,6 @@ namespace renderconfig_compiler {
 
         struct compiler_output output = {
         };
-
-        output.global_resource.init(ct_memory_a0.main_allocator());
-        output.layer_names.init(ct_memory_a0.main_allocator());
-        output.layers_entry_count.init(ct_memory_a0.main_allocator());
-        output.layers_entry_offset.init(ct_memory_a0.main_allocator());
-        output.layers_entry.init(ct_memory_a0.main_allocator());
-        output.viewport.init(ct_memory_a0.main_allocator());
-        output.local_resource.init(ct_memory_a0.main_allocator());
-        output.layers_localresource_count.init(
-                ct_memory_a0.main_allocator());
-        output.layers_localresource_offset.init(
-                ct_memory_a0.main_allocator());
-        output.entry_data_offset.init(ct_memory_a0.main_allocator());
-
 
         ct_yng_doc* doc = ct_ydb_a0.get(filename);
 
@@ -606,15 +592,15 @@ namespace renderconfig_compiler {
                         ve.name = name_id;
                         ve.layer = layers_id;
 
-                        array::push_back(output.viewport, ve);
+                        cel_array_push(output.viewport, ve, _G.allocator);
 
                         //////
-                        auto localresource_offset = array::size(
+                        auto localresource_offset = cel_array_size(
                                 output.local_resource);
 
-                        array::push_back(
+                        cel_array_push(
                                 output.layers_localresource_offset,
-                                localresource_offset);
+                                localresource_offset, _G.allocator);
 
                         keys[1] = ct_yng_a0.calc_key("local_resource");
                         k = ct_yng_a0.combine_key(keys,
@@ -676,96 +662,96 @@ namespace renderconfig_compiler {
                                         gs.ration = CT_ID64_0(ration_str);
 
 
-                                        array::push_back(
-                                                output.local_resource, gs);
+                                        cel_array_push(
+                                                output.local_resource, gs, _G.allocator);
                                     }, &output);
 
-                            array::push_back(
+                            cel_array_push(
                                     output.layers_localresource_count,
-                                    array::size(output.local_resource) -
-                                    localresource_offset);
+                                    cel_array_size(output.local_resource) -
+                                    localresource_offset, _G.allocator);
                         }
 
                     }, &output);
         }
 
         renderconfig_blob::blob_t resource = {
-                .global_resource_count = array::size(
+                .global_resource_count = cel_array_size(
                         output.global_resource),
 
-                .layer_count = array::size(output.layer_names),
+                .layer_count = cel_array_size(output.layer_names),
 
-                .layer_entry_count = array::size(output.layers_entry),
+                .layer_entry_count = cel_array_size(output.layers_entry),
 
-                .local_resource_count = array::size(
+                .local_resource_count = cel_array_size(
                         output.local_resource),
 
-                .viewport_count = array::size(output.viewport),
+                .viewport_count = cel_array_size(output.viewport),
         };
 
 
         cel_array_push_n(*output_blob,&resource, sizeof(resource), _G.allocator);
         cel_array_push_n(*output_blob,
-                         array::begin(output.global_resource),
+                         output.global_resource,
                          sizeof(render_resource_t)*
-                         array::size(output.global_resource), _G.allocator);
+                         cel_array_size(output.global_resource), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.local_resource),
+                         output.local_resource,
                          sizeof(render_resource_t)*
-                         array::size(output.local_resource), _G.allocator);
+                         cel_array_size(output.local_resource), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.layer_names),
+                         output.layer_names,
                          sizeof(uint64_t)*
-                         array::size(output.layer_names), _G.allocator);
+                         cel_array_size(output.layer_names), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.layers_entry_count),
+                         output.layers_entry_count,
                          sizeof(uint32_t)*
-                         array::size(output.layers_entry_count), _G.allocator);
+                         cel_array_size(output.layers_entry_count), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.layers_entry_offset),
+                         output.layers_entry_offset,
                          sizeof(uint32_t)*
-                         array::size(output.layers_entry_offset), _G.allocator);
+                         cel_array_size(output.layers_entry_offset), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.layers_localresource_count),
+                         output.layers_localresource_count,
                          sizeof(uint32_t)*
-                         array::size(output.layers_localresource_count), _G.allocator);
+                         cel_array_size(output.layers_localresource_count), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.layers_localresource_offset),
+                         output.layers_localresource_offset,
                          sizeof(uint32_t)*
-                         array::size(output.layers_localresource_offset), _G.allocator);
+                         cel_array_size(output.layers_localresource_offset), _G.allocator);
 
         cel_array_push_n(*output_blob,
-                         array::begin(output.entry_data_offset),
+                         output.entry_data_offset,
                          sizeof(uint32_t)*
-                         array::size(output.entry_data_offset), _G.allocator);
+                         cel_array_size(output.entry_data_offset), _G.allocator);
 
-        cel_array_push_n(*output_blob, array::begin(output.layers_entry),
+        cel_array_push_n(*output_blob, output.layers_entry,
                          sizeof(layer_entry_t)*
-                         array::size(output.layers_entry), _G.allocator);
+                         cel_array_size(output.layers_entry), _G.allocator);
 
-        cel_array_push_n(*output_blob,array::begin(output.viewport),
+        cel_array_push_n(*output_blob,output.viewport,
                          sizeof(viewport_entry_t)*
-                         array::size(output.viewport), _G.allocator);
+                         cel_array_size(output.viewport), _G.allocator);
 
         cel_array_push_n(*output_blob, output.blob,
                          sizeof(uint8_t) * cel_array_size(output.blob), _G.allocator);
 
-        output.global_resource.destroy();
-        output.layer_names.destroy();
-        output.layers_entry_count.destroy();
-        output.layers_entry_offset.destroy();
-        output.entry_data_offset.destroy();
-        output.layers_entry.destroy();
-        output.viewport.destroy();
-        output.local_resource.destroy();
-        output.layers_localresource_count.destroy();
-        output.layers_localresource_offset.destroy();
+        cel_array_free(output.global_resource, _G.allocator);
+        cel_array_free(output.layer_names, _G.allocator);
+        cel_array_free(output.layers_entry_count, _G.allocator);
+        cel_array_free(output.layers_entry_offset, _G.allocator);
+        cel_array_free(output.entry_data_offset, _G.allocator);
+        cel_array_free(output.layers_entry, _G.allocator);
+        cel_array_free(output.viewport, _G.allocator);
+        cel_array_free(output.local_resource, _G.allocator);
+        cel_array_free(output.layers_localresource_count, _G.allocator);
+        cel_array_free(output.layers_localresource_offset, _G.allocator);
 
         cel_array_free(output.blob, _G.allocator);
     }
@@ -863,7 +849,6 @@ namespace viewport_module {
         _G.on_pass.init(ct_memory_a0.main_allocator());
 
         _G.viewport_instance_map.init(ct_memory_a0.main_allocator());
-        _G.viewport_instances.init(ct_memory_a0.main_allocator());
         _G.viewport_handler.init(ct_memory_a0.main_allocator());
         _G.compiler_map.init(ct_memory_a0.main_allocator());
 
@@ -885,7 +870,7 @@ namespace viewport_module {
             _G.on_pass.destroy();
 
             _G.viewport_instance_map.destroy();
-            _G.viewport_instances.destroy();
+            cel_array_free(_G.viewport_instances, _G.allocator);
             _G.viewport_handler.destroy();
 
             _G.compiler_map.destroy();

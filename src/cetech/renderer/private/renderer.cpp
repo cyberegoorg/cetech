@@ -5,6 +5,7 @@
 
 #include <celib/allocator.h>
 #include <celib/array.inl>
+#include <celib/array.h>
 #include <celib/map.inl>
 #include <celib/fpumath.h>
 
@@ -46,7 +47,7 @@ using namespace celib;
 
 #define _G RendererGlobals
 static struct _G {
-    celib::Array<ct_render_on_render> on_render;
+    ct_render_on_render* on_render;
     ct_window *main_window;
 
     uint64_t type;
@@ -58,6 +59,7 @@ static struct _G {
     int vsync;
     int need_reset;
     ct_coredb_object_t *config;
+    cel_alloc* allocator;
 } _G = {};
 
 
@@ -149,10 +151,10 @@ void renderer_get_size(uint32_t *width,
 /////
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        array::push_back(_G.name, name);                                       \
+        cel_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = array::size(_G.name);                                \
+        const auto size = cel_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -162,7 +164,7 @@ void renderer_get_size(uint32_t *width,
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            array::pop_back(_G.name);                                          \
+            cel_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -205,7 +207,7 @@ static void on_render(void (*on_render)()) {
         on_render();
     }
 
-    for (uint32_t i = 0; i < array::size(_G.on_render); ++i) {
+    for (uint32_t i = 0; i < cel_array_size(_G.on_render); ++i) {
         _G.on_render[i]();
     }
 
@@ -233,9 +235,10 @@ namespace renderer_module {
 
         ct_api_a0 = *api;
 
-        _G =  {};
-
-        _G.config = ct_config_a0.config_object();
+        _G =  {
+                .allocator = ct_memory_a0.main_allocator(),
+                .config = ct_config_a0.config_object(),
+        };
 
         ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
 
@@ -272,13 +275,12 @@ namespace renderer_module {
 
         renderer_create();
 
-        _G.on_render.init(ct_memory_a0.main_allocator());
     }
 
     void _shutdown() {
         if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
 
-            _G.on_render.destroy();
+            cel_array_free(_G.on_render, _G.allocator);
 
             bgfx::shutdown();
         }

@@ -7,6 +7,7 @@
 #include <cetech/log/log.h>
 #include <cetech/playground/log_view.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <celib/array.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/os/memory.h"
@@ -32,14 +33,15 @@ struct log_item {
 
 #define _G log_view_global
 static struct _G {
-    Array<log_item> log_items;
-    Array<char> line_buffer;
+    log_item* log_items;
+    char* line_buffer;
     ImGuiTextFilter filter;
 
     int level_counters[5];
     uint8_t level_mask;
 
     bool visible;
+    cel_alloc* allocator;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -71,13 +73,13 @@ static void log_handler(enum ct_log_level level,
                         const char *where,
                         const char *msg,
                         void *data) {
-    if (!_G.log_items._allocator) {
+    if (!_G.allocator) {
         return;
     }
 
     ++_G.level_counters[level];
 
-    int offset = array::size(_G.line_buffer);
+    int offset = cel_array_size(_G.line_buffer);
     log_item item = {
             .level = level,
             .offset = offset
@@ -87,8 +89,8 @@ static void log_handler(enum ct_log_level level,
     int len = snprintf(buffer, CETECH_ARRAY_LEN(buffer), LOG_FORMAT, where,
                        msg);
 
-    array::push_back(_G.log_items, item);
-    array::push(_G.line_buffer, buffer, len + 1);
+    cel_array_push(_G.log_items, item, _G.allocator);
+    cel_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
 }
 
 
@@ -130,7 +132,7 @@ static void ui_log_items() {
                       ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()),
                       false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    const int size = array::size(_G.log_items);
+    const int size = cel_array_size(_G.log_items);
     for (int i = size - 1; i >= 0; --i) {
         log_item *item = &_G.log_items[i];
         const char *line = &_G.line_buffer[item->offset];
@@ -174,11 +176,10 @@ static void _init(ct_api_a0 *api) {
     _G = {
             .visible = true,
             .level_mask = (uint8_t) ~0,
+            .allocator = ct_memory_a0.main_allocator(),
     };
 
     api->register_api("ct_log_view_a0", &log_view_api);
-    _G.log_items.init(ct_memory_a0.main_allocator());
-    _G.line_buffer.init(ct_memory_a0.main_allocator());
 
     ct_log_a0.register_handler(log_handler, NULL);
     ct_playground_a0.register_module(
@@ -191,8 +192,9 @@ static void _init(ct_api_a0 *api) {
 
 static void _shutdown() {
     ct_playground_a0.unregister_module(PLAYGROUND_MODULE_NAME);
-    _G.log_items.destroy();
-    _G.line_buffer.destroy();
+
+    cel_array_free(_G.log_items, _G.allocator);
+    cel_array_free(_G.line_buffer, _G.allocator);
     _G = {};
 }
 

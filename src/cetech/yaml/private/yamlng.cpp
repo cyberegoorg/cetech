@@ -10,6 +10,7 @@
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/log/log.h>
 #include <cetech/os/vio.h>
+#include <celib/array.h>
 
 #include "yaml/yaml.h"
 
@@ -24,17 +25,18 @@ using namespace celib;
 
 static struct _G {
     Map<uint32_t> key_to_str;
-    Array<uint32_t> key_to_str_offset;
-    Array<char> key_to_str_data;
+    uint32_t* key_to_str_offset;
+    char* key_to_str_data;
+    cel_alloc* allocator;
 } _G;
 
 
 void add_key(const char* key, uint32_t key_len, uint64_t key_hash) {
-    const uint32_t idx = array::size(_G.key_to_str_offset);
-    const uint32_t offset = array::size(_G.key_to_str_data);
+    const uint32_t idx = cel_array_size(_G.key_to_str_offset);
+    const uint32_t offset = cel_array_size(_G.key_to_str_data);
 
-    array::push(_G.key_to_str_data, key, sizeof(char) * (key_len+1));
-    array::push_back(_G.key_to_str_offset, offset);
+    cel_array_push_n(_G.key_to_str_data, key, sizeof(char) * (key_len+1), _G.allocator);
+    cel_array_push(_G.key_to_str_offset, offset, _G.allocator);
 
     map::set(_G.key_to_str, key_hash, idx);
 }
@@ -60,15 +62,15 @@ struct yamlng_document_inst {
     struct cel_alloc *alloc;
     struct ct_yng_doc *doc;
 
-    Array<char*> parent_file;
+    char** parent_file;
 
     Map<uint32_t> key_map;
-    Array<node_type> type;
-    Array<uint64_t > hash;
-    Array<node_value> value;
-    Array<uint32_t> first_child;
-    Array<uint32_t> next_sibling;
-    Array<uint32_t> parent;
+    node_type*  type;
+    uint64_t *  hash;
+    node_value*  value;
+    uint32_t*  first_child;
+    uint32_t*  next_sibling;
+    uint32_t*  parent;
 
     bool modified;
 };
@@ -142,14 +144,14 @@ uint32_t new_node(ct_yng_doc *doc,
 
     yamlng_document_inst *inst = (yamlng_document_inst*)doc->inst;
 
-    const uint32_t idx = array::size(inst->type);
+    const uint32_t idx = cel_array_size(inst->type);
 
-    array::push_back(inst->type, type);
-    array::push_back(inst->hash, hash);
-    array::push_back(inst->value, value);
-    array::push_back(inst->first_child, (uint32_t) 0);
-    array::push_back(inst->next_sibling, (uint32_t) 0);
-    array::push_back(inst->parent, parent);
+    cel_array_push(inst->type, type, _G.allocator);
+    cel_array_push(inst->hash, hash, _G.allocator);
+    cel_array_push(inst->value, value, _G.allocator);
+    cel_array_push(inst->first_child, 0, _G.allocator);
+    cel_array_push(inst->next_sibling, 0, _G.allocator);
+    cel_array_push(inst->parent, parent, _G.allocator);
 
     if (parent) {
         inst->parent[idx] = parent;
@@ -594,13 +596,12 @@ bool parse_yaml(struct cel_alloc *alloc,
         uint64_t str_hash;
     };
 
-    Array<parent_stack_state> parent_stack(ct_memory_a0.main_allocator());
+    parent_stack_state* parent_stack = NULL;
     uint32_t parent_stack_top;
     uint32_t tmp_idx;
     uint64_t key = 0;
 
-    array::push_back(parent_stack,
-                     (parent_stack_state) {.type = NODE_INVALID, .idx = 0});
+    cel_array_push(parent_stack, {}, _G.allocator);
 
     uint8_t *source_data = CEL_ALLOCATE(alloc, uint8_t,
                                         vio->size(vio) + 1);
@@ -618,13 +619,14 @@ bool parse_yaml(struct cel_alloc *alloc,
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
 #define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
     do {
-        parent_stack_top = array::size(parent_stack) - 1;
+        parent_stack_top = cel_array_size(parent_stack) - 1;
 
         if (!yaml_parser_parse(&parser, &event)) {
             ct_log_a0.error(LOG_WHERE, "Parser error %d\n", parser.error);
             goto error;
         }
 
+        parent_stack_state state = {};
         switch (event.type) {
             case YAML_NO_EVENT:
                 break;
@@ -650,17 +652,19 @@ bool parse_yaml(struct cel_alloc *alloc,
                 map::set(inst->key_map, key, tmp_idx);
 
                 if (HAS_KEY()) {
-                    array::pop_back(parent_stack);
+                    cel_array_pop_back(parent_stack);
                 }
 
                 ++parent_stack[parent_stack_top].node_count;
-                array::push_back(parent_stack,
-                                 (parent_stack_state) {.idx = tmp_idx, .type = NODE_SEQ, .key_hash =key});
+
+                state = (parent_stack_state){ .idx = tmp_idx, .type = NODE_SEQ, .key_hash = key};
+
+                cel_array_push(parent_stack, state, _G.allocator);
                 break;
 
             case YAML_SEQUENCE_END_EVENT:
                 inst->value[parent_stack[parent_stack_top].idx].node_count = parent_stack[parent_stack_top].node_count;
-                array::pop_back(parent_stack);
+                cel_array_pop_back(parent_stack);
                 break;
 
             case YAML_MAPPING_START_EVENT:
@@ -682,17 +686,18 @@ bool parse_yaml(struct cel_alloc *alloc,
                 map::set(inst->key_map, key, tmp_idx);
 
                 if (HAS_KEY()) {
-                    array::pop_back(parent_stack);
+                    cel_array_pop_back(parent_stack);
                 }
 
+                state =  (parent_stack_state) {.idx = tmp_idx, .type = NODE_MAP, .key_hash = key};
+
                 ++parent_stack[parent_stack_top].node_count;
-                array::push_back(parent_stack,
-                                 (parent_stack_state) {.idx = tmp_idx, .type = NODE_MAP, .key_hash = key});
+                cel_array_push(parent_stack, state, _G.allocator);
                 break;
 
             case YAML_MAPPING_END_EVENT:
                 inst->value[parent_stack[parent_stack_top].idx].node_count = parent_stack[parent_stack_top].node_count;
-                array::pop_back(parent_stack);
+                cel_array_pop_back(parent_stack);
                 break;
 
             case YAML_ALIAS_EVENT:
@@ -713,22 +718,23 @@ bool parse_yaml(struct cel_alloc *alloc,
 
                     uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
 
+                    state =  (parent_stack_state){.idx = tmp_idx, .type = NODE_STRING, .key_hash = key, .str_hash = key_hash};
+
                     ++parent_stack[parent_stack_top].node_count;
-                    array::push_back(parent_stack,
-                                     (parent_stack_state) {.idx = tmp_idx, .type = NODE_STRING, .key_hash = key, .str_hash = key_hash});
+                    cel_array_push(parent_stack, state, _G.allocator);
 
                 // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].key_hash;
 
                     if(PARENT_KEY == parent_stack[parent_stack_top].str_hash) {
-                        array::push_back(inst->parent_file, value.string);
+                        cel_array_push(inst->parent_file, value.string, _G.allocator);
                     }
 
                     uint32_t tmp_idx = new_node(inst->doc, type, value, parent_stack[parent_stack_top].idx, key);
                     map::set(inst->key_map, key, tmp_idx);
 
-                    array::pop_back(parent_stack);
+                    cel_array_pop_back(parent_stack);
 
                 // VALUE_IN_SEQ
                 } else if (parent_stack[parent_stack_top].type == NODE_SEQ) {
@@ -1100,13 +1106,13 @@ static void destroy(struct ct_yng_doc *document) {
     struct cel_alloc *alloc = inst->alloc;
 
     inst->key_map.destroy();
-    inst->parent_file.destroy();
-    inst->type.destroy();
-    inst->hash.destroy();
-    inst->value.destroy();
-    inst->first_child.destroy();
-    inst->next_sibling.destroy();
-    inst->parent.destroy();
+    cel_array_free(inst->parent_file, _G.allocator);
+    cel_array_free(inst->type, _G.allocator);
+    cel_array_free(inst->hash, _G.allocator);
+    cel_array_free(inst->value, _G.allocator);
+    cel_array_free(inst->first_child, _G.allocator);
+    cel_array_free(inst->next_sibling, _G.allocator);
+    cel_array_free(inst->parent, _G.allocator);
 
     CEL_FREE(alloc, inst);
     CEL_FREE(alloc, document);
@@ -1115,8 +1121,8 @@ static void destroy(struct ct_yng_doc *document) {
 void parent_files(ct_yng_doc_instance_t *_inst, const char*** files, uint32_t *count){
     yamlng_document_inst *inst = (yamlng_document_inst *) _inst;
 
-    *files = (const char **)array::begin(inst->parent_file);
-    *count = array::size(inst->parent_file);
+    *files = (const char **)inst->parent_file;
+    *count = cel_array_size(inst->parent_file);
 }
 
 ct_yng_doc *from_vio(struct ct_vio *vio,
@@ -1142,13 +1148,6 @@ ct_yng_doc *from_vio(struct ct_vio *vio,
     };
 
     d_inst->key_map.init(alloc);
-    d_inst->parent_file.init(alloc);
-    d_inst->type.init(alloc);
-    d_inst->hash.init(alloc);
-    d_inst->value.init(alloc);
-    d_inst->first_child.init(alloc);
-    d_inst->next_sibling.init(alloc);
-    d_inst->parent.init(alloc);
 
     *d = {
             .inst = d_inst,
@@ -1211,19 +1210,17 @@ static ct_yng_a0 yamlng_api = {
 };
 
 static void _init(ct_api_a0 *api) {
-    _G = {};
+    _G = {.allocator = ct_memory_a0.main_allocator()};
 
     _G.key_to_str.init(ct_memory_a0.main_allocator());
-    _G.key_to_str_offset.init(ct_memory_a0.main_allocator());
-    _G.key_to_str_data.init(ct_memory_a0.main_allocator());
 
     api->register_api("ct_yng_a0", &yamlng_api);
 }
 
 static void _shutdown() {
     _G.key_to_str.destroy();
-    _G.key_to_str_offset.destroy();
-    _G.key_to_str_data.destroy();
+    cel_array_free(_G.key_to_str_offset, _G.allocator);
+    cel_array_free(_G.key_to_str_data, _G.allocator);
 
     _G = {};
 }

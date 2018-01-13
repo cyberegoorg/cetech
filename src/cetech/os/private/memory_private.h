@@ -13,7 +13,7 @@ namespace memory {
 
     struct allocator_trace_entry {
         void *ptr;
-        char *stacktrace;
+        //char *stacktrace;
         char used;
     };
 

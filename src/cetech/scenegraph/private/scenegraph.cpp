@@ -1,5 +1,6 @@
 #include "cetech/entity/entity.h"
 #include <cetech/scenegraph/scenegraph.h>
+#include <celib/array.h>
 #include "cetech/config/config.h"
 #include "cetech/resource/resource.h"
 #include "cetech/os/memory.h"
@@ -56,8 +57,10 @@ namespace {
 
     static struct SceneGraphGlobal {
         Map<uint32_t> world_map;
-        Array<WorldInstance> world_instances;
+        WorldInstance* world_instances;
         Map<uint32_t> ent_map;
+
+        cel_alloc *allocator;
     } _G;
 
     void allocate(WorldInstance &_data,
@@ -111,15 +114,15 @@ namespace {
     }
 
     void _new_world(ct_world world) {
-        uint32_t idx = array::size(_G.world_instances);
-        array::push_back(_G.world_instances, WorldInstance());
+        uint32_t idx = cel_array_size(_G.world_instances);
+        cel_array_push(_G.world_instances, WorldInstance(), _G.allocator);
         _G.world_instances[idx].world = world;
         map::set(_G.world_map, world.h, idx);
     }
 
     void _destroy_world(ct_world world) {
         uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
-        uint32_t last_idx = array::size(_G.world_instances) - 1;
+        uint32_t last_idx = cel_array_size(_G.world_instances) - 1;
 
         ct_world last_world = _G.world_instances[last_idx].world;
 
@@ -128,7 +131,7 @@ namespace {
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
-        array::pop_back(_G.world_instances);
+        cel_array_pop_back(_G.world_instances);
     }
 
     WorldInstance *_get_world_instance(ct_world world) {
@@ -472,15 +475,15 @@ namespace scenegraph_module {
         api->register_api("ct_scenegprah_a0", &scenegraph_api);
     }
 
-
     void init(ct_api_a0 *api) {
         _init_api(api);
 
 
-        _G = {};
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+        };
 
         _G.world_map.init(ct_memory_a0.main_allocator());
-        _G.world_instances.init(ct_memory_a0.main_allocator());
         _G.ent_map.init(ct_memory_a0.main_allocator());
 
         ct_world_a0.register_callback(world_callbacks);
@@ -488,8 +491,8 @@ namespace scenegraph_module {
 
     void shutdown() {
         _G.world_map.destroy();
-        _G.world_instances.destroy();
         _G.ent_map.destroy();
+        cel_array_free(_G.world_instances, _G.allocator);
     }
 
 }

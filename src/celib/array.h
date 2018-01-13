@@ -19,6 +19,9 @@
 #define cel_array_capacity(a) \
      ((a) ? cel_array_header(a)->capacity : 0)
 
+#define cel_array_clean(a) \
+     ((a) ? cel_array_header(a)->size = 0 : 0)
+
 #define cel_array_empty(a) (cel_array_size(a) == 0)
 #define cel_array_any(a) (cel_array_size(a) > 0)
 
@@ -56,7 +59,7 @@ struct cel_array_header_t {
 static void *cel_array_grow(void *a,
                             uint32_t size,
                             size_t type_size,
-                            cel_alloc *alloc) {
+                            struct cel_alloc *alloc) {
     uint32_t new_capacity = cel_array_capacity(a) * 2 + size;
     if(new_capacity < size) {
         new_capacity = size;

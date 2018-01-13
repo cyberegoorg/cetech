@@ -28,13 +28,13 @@ namespace memory {
     void allocator_trace_pointer(struct allocator_trace_entry *entries,
                                  uint32_t max_entries,
                                  void *p) {
-        char *stacktrace_str = stacktrace(3);
+        //char *stacktrace_str = stacktrace(3);
 
         for (uint32_t i = 0; i < max_entries; ++i) {
             if (!entries[i].used) {
                 entries[i].used = 1;
                 entries[i].ptr = p;
-                entries[i].stacktrace = stacktrace_str;
+                //entries[i].stacktrace = stacktrace_str;
                 break;
             }
         }
@@ -50,8 +50,8 @@ namespace memory {
 
             entries[i].used = 0;
 
-            stacktrace_free(entries[i].stacktrace);
-            entries[i].stacktrace = NULL;
+            //stacktrace_free(entries[i].stacktrace);
+            //entries[i].stacktrace = NULL;
         }
     }
 
@@ -63,12 +63,12 @@ namespace memory {
             }
 
             ct_log_a0.error(ALLOCATOR_WHERE,
-                            "memory_leak: %p\n  stacktrace:\n%s\n",
-                            entries[i].ptr, entries[i].stacktrace);
+                            "memory_leak: %p\n",
+                            entries[i].ptr);
 
             //allocator_free(cel_alloc, entries[i].ptr); // TODO: need this?
 
-            stacktrace_free(entries[i].stacktrace);
+            //stacktrace_free(entries[i].stacktrace);
         }
     }
 

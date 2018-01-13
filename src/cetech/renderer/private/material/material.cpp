@@ -67,9 +67,10 @@ static struct MaterialGlobals {
 
     Map<uint32_t> instace_map;
     Map<uint32_t> resource_map;
-    Array<material_instance> material_instances;
+    material_instance* material_instances;
 
     uint64_t type;
+    cel_alloc* allocator;
 } _G;
 
 
@@ -85,8 +86,8 @@ void _destroy_instance(struct material_instance *instance) {
 
 struct material_instance *_new_material(uint64_t name,
                                         uint32_t handler) {
-    uint32_t idx = array::size(_G.material_instances);
-    array::push_back(_G.material_instances, {});
+    uint32_t idx = cel_array_size(_G.material_instances);
+    cel_array_push(_G.material_instances, {}, _G.allocator);
 
     material_instance *instance = &_G.material_instances[idx];
 
@@ -387,12 +388,14 @@ static struct ct_material_a0 material_api = {
 };
 
 static int init(ct_api_a0 *api) {
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+    };
     api->register_api("ct_material_a0", &material_api);
 
     _G.type = CT_ID64_0("material");
     _G.material_handler.init(ct_memory_a0.main_allocator());
     _G.instace_map.init(ct_memory_a0.main_allocator());
-    _G.material_instances.init(ct_memory_a0.main_allocator());
     _G.resource_map.init(ct_memory_a0.main_allocator());
 
     ct_resource_a0.register_type(_G.type, material_resource::callback);
@@ -406,7 +409,8 @@ static void shutdown() {
     _G.material_handler.destroy();
     _G.instace_map.destroy();
     _G.resource_map.destroy();
-    _G.material_instances.destroy();
+
+    cel_array_free(_G.material_instances, _G.allocator);
 
 }
 
