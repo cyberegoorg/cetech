@@ -33,6 +33,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/coredb/coredb.h>
+#include <celib/array.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -228,6 +229,20 @@ extern "C" void application_start() {
     CEL_UNUSED(f1)
     CEL_UNUSED(obj2)
     CEL_UNUSED(obj3)
+
+    uint32_t* arr = NULL;
+    cel_array_push(arr, 1, ct_memory_a0.main_allocator());
+    cel_array_push(arr, 1, ct_memory_a0.main_allocator());
+    cel_array_push(arr, 1, ct_memory_a0.main_allocator());
+
+    uint32_t aaa[] = {1, 2};
+    cel_array_push_n(arr, aaa, 2, ct_memory_a0.main_allocator());
+
+    for (int j = 0; j < cel_array_size(arr); ++j) {
+        ct_log_a0.debug("dddd", "%d", arr[j]);
+    }
+
+    cel_array_free(arr, ct_memory_a0.main_allocator());
 
     _G.is_running = 1;
     while (_G.is_running) {
