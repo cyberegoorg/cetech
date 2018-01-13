@@ -603,9 +603,9 @@ bool parse_yaml(struct cel_alloc *alloc,
                      (parent_stack_state) {.type = NODE_INVALID, .idx = 0});
 
     uint8_t *source_data = CEL_ALLOCATE(alloc, uint8_t,
-                                        vio->size(vio->inst) + 1);
-    memset(source_data, 0, vio->size(vio->inst) + 1);
-    vio->read(vio->inst, source_data, sizeof(char), vio->size(vio->inst));
+                                        vio->size(vio) + 1);
+    memset(source_data, 0, vio->size(vio) + 1);
+    vio->read(vio, source_data, sizeof(char), vio->size(vio));
 
     if (!yaml_parser_initialize(&parser)) {
         ct_log_a0.error(LOG_WHERE, "Failed to initialize parser");
@@ -613,7 +613,7 @@ bool parse_yaml(struct cel_alloc *alloc,
     }
 
     yaml_parser_set_input_string(&parser, source_data,
-                                 vio->size(vio->inst));
+                                 vio->size(vio));
 
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
 #define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
@@ -891,7 +891,7 @@ void save_recursive(yamlng_document_inst* inst, uint32_t root, yaml_emitter_t *e
 
 int write_handler(void *ext, unsigned char *buffer, size_t size) {
     ct_vio *output = (ct_vio *)ext;
-    output->write(output->inst, buffer, sizeof(unsigned char), size);
+    output->write(output, buffer, sizeof(unsigned char), size);
     return 1;
 }
 

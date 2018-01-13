@@ -70,7 +70,6 @@ struct ct_yng_doc {
     bool (*has_key)(ct_yng_doc_instance_t *inst,
                     uint64_t key);
 
-
     struct ct_yamlng_node (*get)(ct_yng_doc_instance_t *inst,
                                  uint64_t key);
 

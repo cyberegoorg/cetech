@@ -24,15 +24,6 @@ struct ct_blob;
 // Enums
 //==============================================================================
 
-enum ct_property_type {
-    PROPERTY_INVALID = 0,
-    PROPERTY_BOOL,
-    PROPERTY_FLOAT,
-    PROPERTY_STRING,
-    PROPERTY_STRINGID64,
-    PROPERTY_VEC3,
-    PROPERTY_QUATF,
-};
 
 //==============================================================================
 // Typedefs
@@ -80,19 +71,6 @@ typedef struct {
 } ct_world_callbacks_t;
 
 
-struct ct_property_value {
-    enum ct_property_type type;
-
-    union {
-        int b;
-        float f;
-        const char *str;
-        float vec3f[3];
-        float quatf[4];
-        uint64_t strid_64;
-    } value;
-};
-
 //! Component callbacks
 static struct ct_component_clb {
     //! Component destoryer
@@ -116,15 +94,6 @@ static struct ct_component_clb {
                     uint32_t *ents_parent,
                     uint32_t ent_count,
                     void *data);
-
-    void (*set_property)(struct ct_world world,
-                         struct ct_entity entity,
-                         uint64_t key,
-                         struct ct_property_value value);
-
-    struct ct_property_value (*get_property)(struct ct_world world,
-                                             struct ct_entity entity,
-                                             uint64_t key);
 
     ct_world_callbacks_t world_clb;
 } ct_component_clb_null = {};

@@ -11,7 +11,7 @@
 
 #include "celib/allocator.h"
 
-static void *_reallocate(cel_alloc_inst *a,
+static void *_reallocate(const cel_alloc *a,
                          void *ptr,
                          uint32_t size,
                          uint32_t align) {
@@ -30,10 +30,13 @@ static void *_reallocate(cel_alloc_inst *a,
     return new_ptr;
 }
 
+static cel_alloc_fce alloc_fce = {
+        .reallocate = _reallocate
+};
 
 static cel_alloc _allocator = {
         .inst = NULL,
-        .reallocate= _reallocate
+        .call = &alloc_fce,
 };
 
 namespace core_allocator {

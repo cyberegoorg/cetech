@@ -140,18 +140,18 @@ namespace texture_compiler {
 
         char *tmp_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             tmp_file->size(tmp_file->inst) + 1);
-        tmp_file->read(tmp_file->inst, tmp_data, sizeof(char),
-                       tmp_file->size(tmp_file->inst));
+                             tmp_file->size(tmp_file) + 1);
+        tmp_file->read(tmp_file, tmp_data, sizeof(char),
+                       tmp_file->size(tmp_file));
 
         texture_blob::blob_t resource = {
-                .size = (uint32_t) tmp_file->size(tmp_file->inst)
+                .size = (uint32_t) tmp_file->size(tmp_file)
         };
 
         output->push(output->inst, &resource, sizeof(resource));
         output->push(output->inst, tmp_data, sizeof(char) * resource.size);
 
-        tmp_file->close(tmp_file->inst);
+        tmp_file->close(tmp_file);
 
         compilator_api->add_dependency(filename, input_str);
 

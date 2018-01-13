@@ -77,7 +77,6 @@ set(SOURCE_FILES
         src/cetech/config/private/config.cpp
         src/cetech/os/private/memory.cpp
         src/cetech/os/private/allocator_malloc.cpp
-        src/cetech/os/private/allocator_scratch.cpp
         src/cetech/application/private/application.cpp
         src/cetech/task/private/task.cpp
         src/cetech/log/private/log_db_handler.cpp

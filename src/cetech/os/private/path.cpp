@@ -374,16 +374,16 @@ void copy_file(struct cel_alloc *allocator,
     ct_vio *source_vio = ct_vio_a0.from_file(from, VIO_OPEN_READ);
 
     char *data = CEL_ALLOCATE(allocator, char,
-                              source_vio->size(source_vio->inst));
+                              source_vio->size(source_vio));
 
-    size_t size = (size_t) source_vio->size(source_vio->inst);
-    source_vio->read(source_vio->inst, data, sizeof(char), size);
-    source_vio->close(source_vio->inst);
+    size_t size = (size_t) source_vio->size(source_vio);
+    source_vio->read(source_vio, data, sizeof(char), size);
+    source_vio->close(source_vio);
 
     ct_vio *build_vio = ct_vio_a0.from_file(to, VIO_OPEN_WRITE);
 
-    build_vio->write(build_vio->inst, data, sizeof(char), size);
-    build_vio->close(build_vio->inst);
+    build_vio->write(build_vio, data, sizeof(char), size);
+    build_vio->close(build_vio);
 
     CEL_FREE(allocator, data);
 }

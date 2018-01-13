@@ -178,7 +178,7 @@ static void _compile_task(void *data) {
             goto end;
         }
 
-        build_vio->write(build_vio->inst, output_blob->data(output_blob->inst), sizeof(char), output_blob->size(output_blob->inst));
+        build_vio->write(build_vio, output_blob->data(output_blob->inst), sizeof(char), output_blob->size(output_blob->inst));
 
         ct_filesystem_a0.close(build_vio);
 
@@ -188,7 +188,7 @@ static void _compile_task(void *data) {
 
 end:
 
-    CEL_FREE(ct_memory_a0.main_scratch_allocator(),
+    CEL_FREE(ct_memory_a0.main_allocator(),
              tdata->source_filename);
 
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
@@ -251,7 +251,7 @@ void _compile_files(Array<ct_task_item> &tasks,
                 .compilator = compilator,
                 .build_filename = build_full,
                 .source_filename = ct_memory_a0.str_dup(files[i],
-                                                        ct_memory_a0.main_scratch_allocator()),
+                                                        ct_memory_a0.main_allocator()),
                 .mtime = ct_filesystem_a0.file_mtime(
                         CT_ID64_0("source"),
                         files[i]),
@@ -310,12 +310,12 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
 
     ct_filesystem_a0.listdir(CT_ID64_0("source"),
                              "", glob_patern, false, true, &files, &files_count,
-                             ct_memory_a0.main_scratch_allocator());
+                             ct_memory_a0.main_allocator());
 
     _compile_files(tasks, files, files_count, compiled);
 
     ct_filesystem_a0.listdir_free(files, files_count,
-                                  ct_memory_a0.main_scratch_allocator());
+                                  ct_memory_a0.main_allocator());
 
     ct_task_a0.add(tasks._data, tasks._size);
 

@@ -75,7 +75,6 @@ struct ct_gamepad_a0 {
     void (*play_rumble)(uint32_t idx,
                         float strength,
                         uint32_t length);
-
 };
 
 //==============================================================================

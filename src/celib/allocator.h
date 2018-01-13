@@ -16,17 +16,17 @@
 // Defines
 //==============================================================================
 
-#define CEL_ALLOCATE(a, T, size) (T*)((a)->reallocate((a)->inst,             \
+#define CEL_ALLOCATE(a, T, size) (T*)((a)->call->reallocate((a),             \
                                                           NULL,              \
                                                           size,              \
                                                           CEL_ALIGNOF(T)))
 
-#define CEL_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->reallocate((a)->inst, \
+#define CEL_ALLOCATE_ALIGN(a, T, size, align) (T*)((a)->call->reallocate((a), \
                                                           NULL,               \
                                                           size,               \
                                                           align))
 
-#define CEL_FREE(a, p) ((a)->reallocate((a)->inst,p,0,0))
+#define CEL_FREE(a, p) ((a)->call->reallocate((a),p,0,0))
 
 #define CEL_NEW(a, T, ...) (new (CEL_ALLOCATE_ALIGN(a, T, sizeof(T), \
                                     CEL_ALIGNOF(T))) T(__VA_ARGS__))
@@ -60,15 +60,20 @@ enum {
 
 typedef void cel_alloc_inst;
 
-struct cel_alloc {
-    cel_alloc_inst *inst;
+struct cel_alloc;
 
-    void *(*reallocate)(cel_alloc_inst *a,
+struct cel_alloc_fce {
+    void *(*reallocate)(const cel_alloc *a,
                         void *ptr,
                         uint32_t size,
                         uint32_t align);
 
     uint32_t (*total_allocated)(struct cel_alloc *allocator);
+};
+
+struct cel_alloc {
+    cel_alloc_inst *inst;
+    cel_alloc_fce* call;
 };
 
 #endif //CELIB_ALLOCATOR_H

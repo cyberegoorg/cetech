@@ -66,9 +66,9 @@ namespace texture_resource {
     void *_texture_resource_loader(ct_vio *input,
                                    cel_alloc *allocator) {
 
-        const int64_t size = input->size(input->inst);
+        const int64_t size = input->size(input);
         char *data = CEL_ALLOCATE(allocator, char, size);
-        input->read(input->inst, data, 1, size);
+        input->read(input, data, 1, size);
 
         return data;
     }

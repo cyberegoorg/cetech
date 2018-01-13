@@ -400,72 +400,6 @@ void set_scene(struct ct_mesh_renderer mesh,
     data->mesh[mesh.idx].scene = scene;
 }
 
-static void _set_property(ct_world world,
-                          ct_entity entity,
-                          uint64_t key,
-                          ct_property_value value) {
-//
-//    uint64_t scene = CT_ID64_0("scene");
-//    uint64_t mesh = CT_ID64_0("mesh");
-//    uint64_t node = CT_ID64_0("node");
-    uint64_t material = CT_ID64_0("material");
-
-//    ct_mesh_renderer mesh_renderer = mesh_get(world, entity);
-    if (key == material) {
-        //TODO: mesh_set_material(mesh_renderer, CT_ID64_0(value.value.str));
-    }
-}
-
-static ct_property_value _get_property(ct_world world,
-                                       ct_entity entity,
-                                       uint64_t key) {
-    CEL_UNUSED(world, entity, key);
-//    uint64_t scene = CT_ID64_0("scene");
-//    uint64_t mesh = CT_ID64_0("mesh");
-//    uint64_t node = CT_ID64_0("node");
-//    uint64_t material = CT_ID64_0("material");
-//
-//    ct_mesh_renderer mesh_r = mesh_get(world, entity);
-//    WorldInstance *data = _get_world_instance(world);
-//
-//    char name_buff[256] = {};
-
-//    if (key.id == scene.id) {
-//        ResourceApiV0.get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->scene, mesh_r.idx));
-//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
-//
-//        return (ct_property_value) {
-//                .type= PROPERTY_STRING,
-//                .value.str = name
-//        };
-//    } else if (key.id == mesh.id) {
-//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->mesh, mesh_r.idx));
-//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
-//
-//        return (ct_property_value) {
-//                .type= PROPERTY_STRING,
-//                .value.str = name
-//        };
-//    } else if (key.id == node.id) {
-//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->node, mesh_r.idx));
-//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
-//
-//        return (ct_property_value) {
-//                .type= PROPERTY_STRING,
-//                .value.str = name
-//        };
-//    } else if (key.id == material.id) {
-//        ResourceApiV0.compiler_get_filename(name_buff, CEL_ARRAY_LEN(name_buff), scene, ARRAY_AT(&data->scene, mesh_r.idx));
-//        char* name = cel_strdup(name_buff, MemSysApiV0.main_scratch_allocator());
-//
-//        return (ct_property_value) {
-//                .type= PROPERTY_STRING,
-//                .value.str = name
-//        };
-//    }
-
-    return (ct_property_value) {.type= PROPERTY_INVALID};
-}
 
 
 static void _init_api(struct ct_api_a0 *api) {
@@ -506,7 +440,6 @@ static void _init(ct_api_a0 *api) {
             .world_clb.on_created = _on_world_create,
             .world_clb.on_destroy = _on_world_destroy,
 
-            .set_property=_set_property, .get_property=_get_property
     });
 }
 

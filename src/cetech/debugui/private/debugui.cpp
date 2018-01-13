@@ -128,7 +128,7 @@ void SaveDock(struct ct_vio* output) {
 
     const char* str = celib::buffer::c_str(buffer);
 
-    output->write(output->inst, str, 1, strlen(str));
+    output->write(output, str, 1, strlen(str));
 }
 
 void LoadDock(const char* path) {

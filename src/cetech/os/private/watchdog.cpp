@@ -75,14 +75,14 @@ void add_dir(ct_watchdog_instance_t *inst,
         uint32_t files_count;
 
         ct_path_a0.list(path, "*", 1, 1, &files, &files_count,
-                        ct_memory_a0.main_scratch_allocator());
+                        ct_memory_a0.main_allocator());
 
         for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
         ct_path_a0.list_free(files, files_count,
-                             ct_memory_a0.main_scratch_allocator());
+                             ct_memory_a0.main_allocator());
     }
 }
 

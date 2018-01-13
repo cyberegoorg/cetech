@@ -12,7 +12,7 @@ CETECH_DECL_API(ct_log_a0);
 
 #define LOG_WHERE "vio_sdl"
 
-int64_t vio_sdl_seek(ct_vio_instance_t *file,
+int64_t vio_sdl_seek(ct_vio *file,
                      int64_t offset,
                      enum ct_vio_seek whence) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
@@ -23,37 +23,37 @@ int64_t vio_sdl_seek(ct_vio_instance_t *file,
             [VIO_SEEK_END] = RW_SEEK_END
     };
 
-    return SDL_RWseek((SDL_RWops *) file, offset, -_whence[whence]);
+    return SDL_RWseek((SDL_RWops *) file->inst, offset, -_whence[whence]);
 }
 
-size_t vio_sdl_read(ct_vio_instance_t *file,
+size_t vio_sdl_read(ct_vio *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
-    return SDL_RWread((SDL_RWops *) file, buffer, size, maxnum);
+    return SDL_RWread((SDL_RWops *) file->inst, buffer, size, maxnum);
 };
 
-size_t vio_sdl_write(ct_vio_instance_t *file,
+size_t vio_sdl_write(ct_vio *file,
                      const void *buffer,
                      size_t size,
                      size_t maxnum) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
-    return SDL_RWwrite((SDL_RWops *) file, buffer, size, maxnum);
+    return SDL_RWwrite((SDL_RWops *) file->inst, buffer, size, maxnum);
 };
 
-int64_t vio_sdl_size(ct_vio_instance_t *file) {
+int64_t vio_sdl_size(ct_vio *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
-    return SDL_RWsize((SDL_RWops *) file);
+    return SDL_RWsize((SDL_RWops *) file->inst);
 };
 
-int vio_sdl_close(ct_vio_instance_t *file) {
+int vio_sdl_close(ct_vio *file) {
     CETECH_ASSERT(LOG_WHERE, file != NULL);
 
-    SDL_RWclose((SDL_RWops *) file);
+    SDL_RWclose((SDL_RWops *) file->inst);
     return 1;
 }
 

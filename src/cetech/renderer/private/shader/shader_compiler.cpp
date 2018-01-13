@@ -174,11 +174,11 @@ namespace shader_compiler {
 
         char *vs_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             tmp_file->size(tmp_file->inst) + 1);
-        tmp_file->read(tmp_file->inst, vs_data, sizeof(char),
-                       tmp_file->size(tmp_file->inst));
-        resource.vs_size = tmp_file->size(tmp_file->inst);
-        tmp_file->close(tmp_file->inst);
+                             tmp_file->size(tmp_file) + 1);
+        tmp_file->read(tmp_file, vs_data, sizeof(char),
+                       tmp_file->size(tmp_file));
+        resource.vs_size = tmp_file->size(tmp_file);
+        tmp_file->close(tmp_file);
         ///////
 
         //////// FS
@@ -202,13 +202,13 @@ namespace shader_compiler {
         tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
         char *fs_data =
                 CEL_ALLOCATE(ct_memory_a0.main_allocator(), char,
-                             tmp_file->size(tmp_file->inst) + 1);
-        tmp_file->read(tmp_file->inst, fs_data, sizeof(char),
-                       tmp_file->size(tmp_file->inst));
+                             tmp_file->size(tmp_file) + 1);
+        tmp_file->read(tmp_file, fs_data, sizeof(char),
+                       tmp_file->size(tmp_file));
 
-        resource.fs_size = tmp_file->size(tmp_file->inst);
+        resource.fs_size = tmp_file->size(tmp_file);
 
-        tmp_file->close(tmp_file->inst);
+        tmp_file->close(tmp_file);
 
         output->push(output->inst, &resource, sizeof(resource));
         output->push(output->inst, vs_data, sizeof(char) * resource.vs_size);

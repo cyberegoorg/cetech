@@ -24,9 +24,6 @@ struct ct_memory_a0 {
     //! \return Main alocator
     struct cel_alloc *(*main_allocator)();
 
-    //! Main scratch allocator
-    //! \return Main scratch alocator
-    struct cel_alloc *(*main_scratch_allocator)();
 
     char *(*str_dup)(const char *s,
                      struct cel_alloc *allocator);

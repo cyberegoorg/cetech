@@ -106,37 +106,6 @@ namespace component {
             ++ct_it;
         }
     }
-
-    void set_property(uint64_t type,
-                      ct_world world,
-                      ct_entity entity,
-                      uint64_t key,
-                      ct_property_value value) {
-
-        ct_component_clb clb = map::get(_G.component_clb,
-                                        type, ct_component_clb_null);
-
-        if (!clb.set_property) {
-            return;
-        }
-
-        clb.set_property(world, entity, key, value);
-    }
-
-    ct_property_value get_property(uint64_t type,
-                                   ct_world world,
-                                   ct_entity entity,
-                                   uint64_t key) {
-
-        ct_component_clb clb = map::get(_G.component_clb,
-                                        type, ct_component_clb_null);
-
-        if (!clb.get_property) {
-            return (ct_property_value) {.type=PROPERTY_INVALID};
-        }
-
-        return clb.get_property(world, entity, key);
-    }
 }
 
 namespace component_module {
@@ -147,8 +116,6 @@ namespace component_module {
             .register_type = component::register_type,
             .spawn = component::spawn,
             .destroy = component::destroy,
-            .set_property = component::set_property,
-            .get_property = component::get_property
     };
 
     void _init_api(ct_api_a0 *a0) {

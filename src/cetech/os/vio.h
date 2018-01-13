@@ -32,23 +32,23 @@ typedef void ct_vio_instance_t;
 struct ct_vio {
     ct_vio_instance_t *inst;
 
-    int64_t (*size)(ct_vio_instance_t *vio);
+    int64_t (*size)(ct_vio *vio);
 
-    int64_t (*seek)(ct_vio_instance_t *vio,
+    int64_t (*seek)(ct_vio *vio,
                     int64_t offset,
                     enum ct_vio_seek whence);
 
-    size_t (*read)(ct_vio_instance_t *vio,
+    size_t (*read)(ct_vio *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
 
-    size_t (*write)(ct_vio_instance_t *vio,
+    size_t (*write)(ct_vio *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
 
-    int (*close)(ct_vio_instance_t *vio);
+    int (*close)(ct_vio *vio);
 };
 
 struct ct_vio_a0 {

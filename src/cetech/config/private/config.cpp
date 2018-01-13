@@ -186,7 +186,7 @@ end:
 
         ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
         ct_yng_doc *d = ct_yng_a0.from_vio(f,alloc);
-        f->close(f->inst);
+        f->close(f);
 
         struct foreach_config_data config_data = {
                 .root_name = NULL

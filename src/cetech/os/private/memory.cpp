@@ -76,10 +76,6 @@ namespace memory {
         return _G.default_allocator;
     }
 
-    cel_alloc *memsys_main_scratch_allocator() {
-        return _G.default_scratch_allocator;
-    }
-
     char *str_dup(const char *s,
                   cel_alloc *allocator) {
         const uint32_t size = strlen(s) + 1;
@@ -99,7 +95,6 @@ namespace memory {
         static ct_memory_a0 _api = {};
 
         _api.main_allocator = memsys_main_allocator;
-        _api.main_scratch_allocator = memsys_main_scratch_allocator;
         _api.str_dup = str_dup;
 
         api->register_api("ct_memory_a0", &_api);
@@ -110,13 +105,9 @@ namespace memory {
 
         _G.default_allocator = malloc_allocator_create();
 
-        _G.default_scratch_allocator = scratch_allocator_create(
-                _G.default_allocator,
-                scratch_buffer_size);
     }
 
     void memsys_shutdown() {
-        scratch_allocator_destroy(_G.default_scratch_allocator);
         malloc_allocator_destroy(_G.default_allocator);
     }
 }

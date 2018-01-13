@@ -11,9 +11,6 @@ namespace memory {
 
     struct cel_alloc *memsys_main_allocator();
 
-    struct cel_alloc *memsys_main_scratch_allocator();
-
-
     struct allocator_trace_entry {
         void *ptr;
         char *stacktrace;
@@ -45,15 +42,6 @@ namespace memory {
 
     void malloc_allocator_destroy(struct cel_alloc *a);
 
-
-//==============================================================================
-// Scratch cel_alloc
-//==============================================================================
-
-    struct cel_alloc *scratch_allocator_create(struct cel_alloc *backing,
-                                               int size);
-
-    void scratch_allocator_destroy(struct cel_alloc *a);
 }
 
 static const void *pointer_align_forward(const void *p,

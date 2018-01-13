@@ -20,13 +20,13 @@ struct allocator_malloc {
     memory::allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
-void *malloc_allocator_allocate(cel_alloc_inst *allocator,
+void *malloc_allocator_allocate(const cel_alloc *allocator,
                                 void *ptr,
                                 uint32_t size,
                                 uint32_t align) {
 
     auto *core_alloc = core_allocator::get();
-    auto *a = (struct allocator_malloc *) allocator;
+    auto *a = (struct allocator_malloc *) allocator->inst;
 
     if (size) {
         const uint32_t ts = size_with_padding(size, align);
@@ -65,6 +65,11 @@ uint32_t malloc_allocator_total_allocated(cel_alloc *allocator) {
     return a->total_allocated;
 }
 
+static cel_alloc_fce alloc_fce = {
+        .reallocate = malloc_allocator_allocate,
+        .total_allocated = malloc_allocator_total_allocated,
+};
+
 namespace memory {
     cel_alloc *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
@@ -78,8 +83,7 @@ namespace memory {
 
         *a = (cel_alloc) {
                 .inst = m,
-                .reallocate = malloc_allocator_allocate,
-                .total_allocated = malloc_allocator_total_allocated,
+                .call = &alloc_fce,
         };
 
         return a;

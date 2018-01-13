@@ -134,7 +134,7 @@ namespace filesystem {
     bool exist(const char *full_path) {
         ct_vio *f = ct_vio_a0.from_file(full_path, VIO_OPEN_READ);
         if (f != NULL) {
-            f->close(f->inst);
+            f->close(f);
             return true;
         }
 
@@ -185,7 +185,7 @@ namespace filesystem {
     }
 
     void close(ct_vio *file) {
-        file->close(file->inst);
+        file->close(file);
     }
 
     int create_directory(uint64_t root,

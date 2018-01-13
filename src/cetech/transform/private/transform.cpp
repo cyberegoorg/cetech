@@ -281,89 +281,6 @@ static void _spawner(ct_world world,
     }
 }
 
-void _set_property(ct_world world,
-                   ct_entity entity,
-                   uint64_t key,
-                   ct_property_value value) {
-
-    uint64_t position = CT_ID64_0("position");
-    uint64_t rotation = CT_ID64_0("rotation");
-    uint64_t scale = CT_ID64_0("scale");
-
-    ct_transform transform = transform_get(world, entity);
-
-    if (key == position) {
-        transform_set_position(transform, value.value.vec3f);
-
-    } else if (key == rotation) {
-        float rot[4];
-        float euler_rot[3];
-        float euler_rot_rad[3];
-
-        celib::vec3_move(euler_rot, value.value.vec3f);
-        celib::vec3_mul(euler_rot_rad, euler_rot, celib::DEG_TO_RAD);
-        celib::quat_from_euler(rot,
-                               euler_rot_rad[0],
-                               euler_rot_rad[1],
-                               euler_rot_rad[2]);
-
-        transform_set_rotation(transform, rot);
-
-    } else if (key == scale) {
-        transform_set_scale(transform, value.value.vec3f);
-    }
-
-}
-
-ct_property_value _get_property(ct_world world,
-                                ct_entity entity,
-                                uint64_t key) {
-    uint64_t position = CT_ID64_0("position");
-    uint64_t rotation = CT_ID64_0("rotation");
-    uint64_t scale = CT_ID64_0("scale");
-
-    ct_transform transform = transform_get(world, entity);
-
-    if (key == position) {
-        ct_property_value v = {
-                .type= PROPERTY_VEC3
-        };
-
-        transform_get_position(transform, v.value.vec3f);
-
-    } else if (key == rotation) {
-        float euler_rot[3];
-        float euler_rot_rad[4];
-        float rot[3];
-
-        ct_property_value v = {
-                .type= PROPERTY_VEC3,
-        };
-
-        transform_get_rotation(transform, rot);
-
-        celib::quat_to_euler(euler_rot_rad, rot);
-        celib::vec3_mul(euler_rot, euler_rot_rad, celib::RAD_TO_DEG);
-
-        celib::vec3_move(v.value.vec3f, euler_rot);
-        return v;
-
-    } else if (key == scale) {
-        float scal[3];
-
-        ct_property_value v = {
-                .type= PROPERTY_VEC3,
-        };
-
-
-        transform_get_scale(transform, scal);
-        celib::vec3_move(v.value.vec3f, scal);
-
-        return v;
-    }
-
-    return (ct_property_value) {.type= PROPERTY_INVALID};
-}
 
 static ct_transform_a0 _api = {
         .is_valid = transform_is_valid,
@@ -401,9 +318,6 @@ static void _init(ct_api_a0 *api) {
 
                     .world_clb.on_created=_on_world_create,
                     .world_clb.on_destroy=_on_world_destroy,
-
-                    .set_property=_set_property,
-                    .get_property=_get_property
             }
     );
 
