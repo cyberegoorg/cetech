@@ -112,8 +112,7 @@ struct ct_resource_a0 {
     //! \param names Names
     //! \param count Names count
     //! \param force Force load
-    void (*load)(void **loaded_data,
-                 uint64_t type,
+    void (*load)(uint64_t type,
                  uint64_t *names,
                  size_t count,
                  int force);
@@ -125,7 +124,6 @@ struct ct_resource_a0 {
     //! \param count Resouce count
     void (*add_loaded)(uint64_t type,
                        uint64_t *names,
-                       void **resource_data,
                        size_t count);
 
 

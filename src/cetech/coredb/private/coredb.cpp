@@ -17,7 +17,6 @@ CETECH_DECL_API(ct_memory_a0);
 #define MAX_OBJECTS 1000000000ULL
 
 
-
 struct object {
     uint8_t *buffer;
 
@@ -95,7 +94,8 @@ struct object *_new_object(const struct cel_alloc *a) {
     return obj;
 }
 
-static object *_object_clone(object *obj, const cel_alloc *alloc) {
+static object *_object_clone(object *obj,
+                             const cel_alloc *alloc) {
     const uint64_t properties_count = obj->properties_count;
     const uint64_t values_size = obj->values_size;
     const uint64_t buffer_size = obj->buffer_size;
@@ -117,7 +117,9 @@ static object *_object_clone(object *obj, const cel_alloc *alloc) {
     return new_obj;
 }
 
-uint64_t _find_prop_index(uint64_t key, const uint64_t *keys, size_t size) {
+uint64_t _find_prop_index(uint64_t key,
+                          const uint64_t *keys,
+                          size_t size) {
     for (uint64_t i = 1; i < size; ++i) {
         if (keys[i] != key) {
             continue;
@@ -194,7 +196,7 @@ void set_string(ct_coredb_writer_t *_writer,
     if (!idx) {
         idx = _object_new_property(obj, property,
                                    COREDB_TYPE_STRPTR,
-                                   &value, sizeof(char*),
+                                   &value, sizeof(char *),
                                    ct_memory_a0.main_allocator());
     } else {
         CEL_FREE(a, ((char *) (obj->values + obj->offset[idx])));
@@ -222,13 +224,33 @@ void set_uint32(ct_coredb_writer_t *_writer,
     *(uint32_t *) (obj->values + obj->offset[idx]) = value;
 }
 
-bool prop_exist(ct_coredb_object_t *_object, uint64_t key) {
+void set_ptr(ct_coredb_writer_t *_writer,
+             uint64_t property,
+             void *value) {
+    writer_t *writer = (writer_t *) _writer;
+
+    object *obj = writer->clone_obj;
+
+    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    if (!idx) {
+        idx = _object_new_property(obj, property, COREDB_TYPE_PTR, &value,
+                                   sizeof(uint32_t),
+                                   ct_memory_a0.main_allocator());
+    }
+
+    *(void **) (obj->values + obj->offset[idx]) = value;
+}
+
+
+bool prop_exist(ct_coredb_object_t *_object,
+                uint64_t key) {
     object *obj = *(object **) _object;
 
     return _find_prop_index(key, obj->keys, obj->properties_count) > 0;
 }
 
-ct_coredb_prop_type prop_type(ct_coredb_object_t *_object, uint64_t key) {
+ct_coredb_prop_type prop_type(ct_coredb_object_t *_object,
+                              uint64_t key) {
     object *obj = *(object **) _object;
 
     uint64_t idx = _find_prop_index(key, obj->keys, obj->properties_count);
@@ -251,16 +273,25 @@ const char *read_string(ct_coredb_object_t *_obj,
     object *obj = *(object **) _obj;
 
     uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
-    return idx ? *(const char**) (obj->values + obj->offset[idx]) : defaultt;
+    return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
 uint32_t read_uint32(ct_coredb_object_t *_obj,
-                        uint64_t property,
-                        uint32_t defaultt) {
+                     uint64_t property,
+                     uint32_t defaultt) {
     object *obj = *(object **) _obj;
 
     uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
     return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
+}
+
+void *read_ptr(ct_coredb_object_t *_obj,
+               uint64_t property,
+               void *defaultt) {
+    object *obj = *(object **) _obj;
+
+    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
 static struct ct_coredb_a0 coredb_api = {
@@ -272,6 +303,7 @@ static struct ct_coredb_a0 coredb_api = {
         .read_float = read_float,
         .read_string = read_string,
         .read_uint32 = read_uint32,
+        .read_ptr = read_ptr,
 
         .write_begin = write_begin,
         .write_commit = write_commit,
@@ -279,6 +311,7 @@ static struct ct_coredb_a0 coredb_api = {
         .set_float = set_float,
         .set_string = set_string,
         .set_uint32 = set_uint32,
+        .set_ptr = set_ptr,
 };
 
 

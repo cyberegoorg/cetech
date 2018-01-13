@@ -172,6 +172,8 @@ end:
                             str = d->as_string(d->inst, value, "");
                             ct_coredb_a0.set_string(writer, key, str);
                             break;
+                        default:
+                            break;
                     }
 
                     ct_coredb_a0.write_begin(_G.config_object);

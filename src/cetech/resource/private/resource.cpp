@@ -41,9 +41,7 @@ CETECH_DECL_API(ct_thread_a0);
 void resource_register_type(uint64_t type,
                             ct_resource_callbacks_t callbacks);
 
-
 using namespace celib;
-
 
 namespace resource {
     void reload_all();
@@ -57,43 +55,42 @@ namespace resource {
 #define is_item_null(item) ((item).data == null_item.data)
 
 
-static uint64_t hash_combine(uint64_t lhs,
-                      uint64_t rhs) {
-    if(lhs == 0) return rhs;
-    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
-    return lhs;
-}
+//static uint64_t hash_combine(uint64_t lhs,
+//                      uint64_t rhs) {
+//    if(lhs == 0) return rhs;
+//    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+//    return lhs;
+//}
 
 //==============================================================================
 // Gloals
 //==============================================================================
 
-namespace {
-    typedef struct {
-        uint64_t type;
-        uint64_t name;
-        void *data;
-    } resource_item_t;
+#define MAX_TYPES 64
 
-    static const resource_item_t null_item = {};
+#define PROP_RESOURECE_DATA "data"
+
+namespace {
+    struct type_item_t {
+        Map<uint32_t> name_map;
+        ct_coredb_object_t** resource_objects;
+        uint64_t type;
+        ct_spinlock lock;
+    };
 
 #define _G ResourceManagerGlobals
-    struct ResourceManagerGlobals {
+    struct _G {
         Map<uint32_t> type_map;
         ct_resource_callbacks_t* resource_callbacks;
 
-        Map<uint32_t> resource_map;
-        resource_item_t* resource_data;
-
-        ct_coredb_object_t** resource_object;
+        type_item_t type_items[MAX_TYPES+1];
+        uint32_t type_items_count;
 
         int autoload_enabled;
 
-        ct_spinlock add_lock;
-
         ct_coredb_object_t* config_object;
         cel_alloc* allocator;
-    } ResourceManagerGlobals = {};
+    } _G = {};
 }
 
 //==============================================================================
@@ -112,6 +109,18 @@ char *resource_compiler_get_build_dir(cel_alloc *a,
 }
 
 
+
+static uint32_t _find_type(uint64_t type) {
+    for (uint32_t i = 0; i < _G.type_items_count; ++i) {
+        if(_G.type_items[i].type != type ) {
+            continue;
+        }
+
+        return i;
+    }
+
+    return 0;
+}
 
 //==============================================================================
 // Public interface
@@ -139,55 +148,31 @@ namespace resource {
 
         cel_array_push(_G.resource_callbacks, callbacks, _G.allocator);
         map::set(_G.type_map, type, idx);
+
+        type_item_t* type_item = &_G.type_items[_G.type_items_count++];
+        *type_item = {.type = type};
+        type_item->name_map.init(_G.allocator);
     }
+
+    void *get(uint64_t type,
+              uint64_t name);
 
     void add_loaded(uint64_t type,
                     uint64_t *names,
-                    void **resource_data,
                     size_t count) {
-        ct_thread_a0.spin_lock(&_G.add_lock);
-
 
         const uint32_t type_idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (type_idx == UINT32_MAX) {
-            ct_thread_a0.spin_unlock(&_G.add_lock);
             return;
         }
 
-
         for (size_t i = 0; i < count; i++) {
-
-            if (resource_data[i] == 0) {
-                continue;
-            }
-
-            resource_item_t item = {
-                    .name = names[i],
-                    .type = type,
-                    .data=resource_data[i]
-            };
-
-            uint64_t id = hash_combine(type, names[i]);
-
-            if (!map::has(_G.resource_map, id)) {
-                uint32_t idx = cel_array_size(_G.resource_data);
-                cel_array_push(_G.resource_data, item, _G.allocator);
-                map::set(_G.resource_map, id, idx);
-            } else {
-                uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-                _G.resource_data[idx] = item;
-            }
-
-
-            _G.resource_callbacks[type_idx].online(names[i], resource_data[i]);
+            _G.resource_callbacks[type_idx].online(names[i], get(type, names[i]));
         }
-
-        ct_thread_a0.spin_unlock(&_G.add_lock);
     }
 
-    void load(void **loaded_data,
-              uint64_t type,
+    void load(uint64_t type,
               uint64_t *names,
               size_t count,
               int force);
@@ -195,34 +180,21 @@ namespace resource {
     void load_now(uint64_t type,
                   uint64_t *names,
                   size_t count) {
-        void *loaded_data[count];
-        load(loaded_data, type, names, count, 0);
-        add_loaded(type, names, loaded_data, count);
+        load(type, names, count, 0);
+        add_loaded(type, names, count);
     }
 
     int can_get(uint64_t type,
                 uint64_t name) {
 
-        if (!map::has(_G.type_map, type)) {
-            return 1;
-        }
-
-        ct_thread_a0.spin_lock(&_G.add_lock);
-
-        uint64_t id = hash_combine(type, name);
-        int h = map::has(_G.resource_map, id);
-
-        ct_thread_a0.spin_unlock(&_G.add_lock);
-
-        return h;
+        const uint32_t type_item_idx = _find_type(type);
+        type_item_t* type_item = &_G.type_items[type_item_idx];
+        return map::has(type_item->name_map, name);
     }
 
     int can_get_all(uint64_t type,
                     uint64_t *names,
                     size_t count) {
-
-//        ct_thread_a0.spin_lock(&_G.add_lock);
-
         for (size_t i = 0; i < count; ++i) {
             if (!can_get(type, names[i])) {
                 //ce_thread_a0.spin_unlock(&_G.add_lock);
@@ -230,46 +202,36 @@ namespace resource {
             }
         }
 
-//        ct_thread_a0.spin_unlock(&_G.add_lock);
-
         return 1;
     }
 
-    void load(void **loaded_data,
-              uint64_t type,
+    void load(uint64_t type,
               uint64_t *names,
               size_t count,
               int force) {
 
-        ct_thread_a0.spin_lock(&_G.add_lock);
-
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
-        if (idx == UINT32_MAX) {
-            ct_log_a0.error(LOG_WHERE,
-                            "Loader for resource is not is not registred");
-            memset(loaded_data, sizeof(void *), count);
-            ct_thread_a0.spin_unlock(&_G.add_lock);
-            return;
-        }
+        const uint32_t type_item_idx = _find_type(type);
+        type_item_t* type_item = &_G.type_items[type_item_idx];
 
         const uint64_t root_name = CT_ID64_0("build");
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
-
+        ct_thread_a0.spin_lock(&type_item->lock);
         for (uint32_t i = 0; i < count; ++i) {
-            uint64_t id = hash_combine(type, names[i]);
-            uint32_t res_idx = map::get(_G.resource_map, id, UINT32_MAX);
-            resource_item_t item = {};
-            if (res_idx != UINT32_MAX) {
-                item = _G.resource_data[idx];
-                if (!force) {
-                    _G.resource_data[res_idx] = item;
-                    loaded_data[i] = 0;
-                    continue;
-                }
-            }
+            uint64_t id = names[i];
+            uint32_t res_idx = map::get(type_item->name_map, id, UINT32_MAX);
 
+            ct_coredb_object_t *object = NULL;
+
+            if (res_idx != UINT32_MAX) {
+                continue;
+            };
+
+            object = ct_coredb_a0.create_object();
+            map::set(type_item->name_map, id, cel_array_size(type_item->resource_objects));
+            cel_array_push(type_item->resource_objects, object, _G.allocator);
 
             char build_name[33] = {};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -280,9 +242,7 @@ namespace resource {
             resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
                                            type,
                                            names[i]);
-//#else
-//            char *filename = build_name;
-//#endif
+
             ct_log_a0.debug("resource", "Loading resource %s from %s",
                             filename,
                             build_name);
@@ -298,42 +258,35 @@ namespace resource {
             CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
             if (resource_file != NULL) {
-                loaded_data[i] = type_clb.loader(resource_file,
-                                                 ct_memory_a0.main_allocator());
-                ct_filesystem_a0.close(resource_file);
-            } else {
-                loaded_data[i] = 0;
+                void * data = type_clb.loader(resource_file,
+                                              ct_memory_a0.main_allocator());
+
+                ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(object);
+                ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), data);
+                ct_coredb_a0.write_commit(writer);
             }
         }
-
-        ct_thread_a0.spin_unlock(&_G.add_lock);
+        ct_thread_a0.spin_unlock(&type_item->lock);
     }
 
     void unload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
-        ct_thread_a0.spin_lock(&_G.add_lock);
 
         const uint32_t idx = map::get(_G.type_map, type, UINT32_MAX);
 
         if (idx == UINT32_MAX) {
-            ct_thread_a0.spin_unlock(&_G.add_lock);
             return;
         }
+
+        const uint32_t type_item_idx = _find_type(type);
+        type_item_t* type_item = &_G.type_items[type_item_idx];
 
         ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
         for (uint32_t i = 0; i < count; ++i) {
-            uint64_t id = hash_combine(type, names[i]);
-            uint32_t res_idx = map::get(_G.resource_map, id, UINT32_MAX);
 
-            if (res_idx == UINT32_MAX) {
-                continue;
-            }
-
-            resource_item_t &item = _G.resource_data[res_idx];
-
-            if (1) {
+            if (1) {// TODO: ref counting
                 char build_name[33] = {};
                 type_name_string(build_name,
                                  CETECH_ARRAY_LEN(build_name),
@@ -344,35 +297,37 @@ namespace resource {
                                                CETECH_ARRAY_LEN(filename),
                                                type,
                                                names[i]);
-//#else
-//                char *filename = build_name;
-//#endif
 
                 ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
-                type_clb.offline(names[i], item.data);
-                type_clb.unloader(item.data, ct_memory_a0.main_allocator());
+                uint32_t idx = 0;
+                idx = map::get(type_item->name_map, names[i], UINT32_MAX);
+                ct_coredb_object_t* object = type_item->resource_objects[idx];
 
-                map::remove(_G.resource_map, hash_combine(type, names[i]));
+                void* data = ct_coredb_a0.read_ptr(object, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
+
+                type_clb.offline(names[i], data);
+                type_clb.unloader(data, ct_memory_a0.main_allocator());
+
+                ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(object);
+                ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
+                ct_coredb_a0.write_commit(writer);
             }
-
-            //_G.resource_data[idx] = item;
         }
-        ct_thread_a0.spin_unlock(&_G.add_lock);
+
     }
 
     void *get(uint64_t type,
               uint64_t name) {
         //ce_thread_a0.spin_lock(&_G.add_lock);
 
-        uint64_t id = hash_combine(type, name);
-        uint32_t idx = map::get(_G.resource_map, id, UINT32_MAX);
-        resource_item_t item = {};
-        if (idx != UINT32_MAX) {
-            item = _G.resource_data[idx];
-        }
+        const uint32_t type_item_idx = _find_type(type);
+        type_item_t* type_item = &_G.type_items[type_item_idx];
+        uint32_t idx = 0;
 
-        if (is_item_null(item)) {
+find:
+        idx = map::get(type_item->name_map, name, UINT32_MAX);
+        if (idx == UINT32_MAX) {
             char build_name[33] = {};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                              type,
@@ -384,50 +339,42 @@ namespace resource {
                                                CETECH_ARRAY_LEN(filename),
                                                type,
                                                name);
-//#else
-//                char *filename = build_name;
-//#endif
+
                 ct_log_a0.warning(LOG_WHERE, "Autoloading resource %s",
                                   filename);
                 load_now(type, &name, 1);
 
-                uint64_t type_name = hash_combine(type, name);
-                uint32_t res_idx = map::get(_G.resource_map, type_name,
-                                            UINT32_MAX);
-                item = {};
-                if (res_idx != UINT32_MAX) {
-                    item = _G.resource_data[res_idx];
-                }
-
+                goto find;
             } else {
                 // TODO: fallback resource #205
                 CETECH_ASSERT(LOG_WHERE, false);
             }
         }
 
-        //ce_thread_a0.spin_unlock(&_G.add_lock);
+        ct_coredb_object_t* object = type_item->resource_objects[idx];
+        void* data = ct_coredb_a0.read_ptr(object, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
 
-        return item.data;
+        return data;
     }
 
     void reload(uint64_t type,
                 uint64_t *names,
                 size_t count) {
-//        reload_all();
 
-        void *loaded_data[count];
-
-        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
-
-        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
-
-        load(loaded_data, type, names, count, 1);
-        for (uint32_t i = 0; i < count; ++i) {
-
-            char filename[1024] = {};
-            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
-                                           type,
-                                           names[i]);
+//        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
+//        void* data = NULL;
+//        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+//
+//        const uint32_t type_item_idx = _find_type(type);
+//        type_item_t* type_item = &_G.type_items[type_item_idx];
+//
+//        load(type, names, count, 1);
+//        for (uint32_t i = 0; i < count; ++i) {
+//
+//            char filename[1024] = {};
+//            resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
+//                                           type,
+//                                           names[i]);
 //#else
 //            char build_name[33] = {};
 //            resource::type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -435,74 +382,80 @@ namespace resource {
 //
 //            char *filename = build_name;
 //#endif
-            ct_log_a0.debug("resource", "Reload resource %s ", filename);
+//            ct_log_a0.debug("resource", "Reload resource %s ", filename);
 
-            void *old_data = get(type, names[i]);
-
-            void *new_data = type_clb.reloader(names[i], old_data,
-                                               loaded_data[i],
-                                               ct_memory_a0.main_allocator());
-
-            uint64_t id = hash_combine(type, names[i]);
-            uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
-            if (item_idx == UINT32_MAX) {
-                continue;
-            }
-
-            resource_item_t item = _G.resource_data[item_idx];
-            item.data = new_data;
-            //--item.ref_count; // Load call increase item.ref_count, because is loaded
-            _G.resource_data[item_idx] = item;
-        }
+//            void *old_data = get(type, names[i]);
+//
+//            void *new_data = type_clb.reloader(names[i], old_data,
+//                                               loaded_data[i],
+//                                               ct_memory_a0.main_allocator());
+//
+//            uint64_t id = hash_combine(type, names[i]);
+//            uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
+//            if (item_idx == UINT32_MAX) {
+//                continue;
+//            }
+//
+//            resource_item_t item = _G.resource_data[item_idx];
+//            item.data = new_data;
+//            //--item.ref_count; // Load call increase item.ref_count, because is loaded
+//            _G.resource_data[item_idx] = item;
+//        }
     }
 
     void reload_all() {
-        const Map<uint32_t>::Entry *type_it = map::begin(_G.type_map);
-        const Map<uint32_t>::Entry *type_end = map::end(_G.type_map);
+//        uint64_t* name_array = NULL;
 
-        uint64_t* name_array = NULL;
+        for (int j = 0; j < _G.type_items_count; ++j) {
+//            type_item_t* type_item = &_G.type_items[j];
 
-        while (type_it != type_end) {
-            uint64_t type_id = type_it->key;
-
-            cel_array_clean(name_array);
-
-            for (uint32_t i = 0; i < cel_array_size(_G.resource_data); ++i) {
-                resource_item_t item = _G.resource_data[i];
-
-                if (item.type == type_id) {
-                    cel_array_push(name_array, item.name, _G.allocator);
-                }
-            }
-
-            reload(type_id, &name_array[0], cel_array_size(name_array));
-
-            ++type_it;
+//            reload(type_item->type, &name_array[0], cel_array_size(name_array));
         }
+//
+//        const Map<uint32_t>::Entry *type_it = map::begin(_G.type_map);
+//        const Map<uint32_t>::Entry *type_end = map::end(_G.type_map);
+//
+//        while (type_it != type_end) {
+//            uint64_t type_id = type_it->key;
+//
+//            cel_array_clean(name_array);
+//
+//            for (uint32_t i = 0; i < cel_array_size(_G.resource_data); ++i) {
+//                resource_item_t item = _G.resource_data[i];
+//
+//                if (item.type == type_id) {
+//                    cel_array_push(name_array, item.name, _G.allocator);
+//                }
+//            }
+//
+//            reload(type_id, &name_array[0], cel_array_size(name_array));
+//
+//            ++type_it;
+//        }
     }
 
 }
 
     void resource_memory_reload(uint64_t type, uint64_t name, char** blob) {
-        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, UINT32_MAX);
-
-        const uint64_t id = hash_combine(type, name);
-        const uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
-        if (item_idx == UINT32_MAX) {
-            return;
-        }
-
-        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
-
-        void *old_data = resource::get(type, name);
-
-        void *new_data = type_clb.reloader(name, old_data,
-                                           blob,
-                                           ct_memory_a0.main_allocator());
-
-        resource_item_t item = _G.resource_data[item_idx];
-        item.data = new_data;
-        _G.resource_data[item_idx] = item;
+//        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, UINT32_MAX);
+//
+//        const uint64_t id = hash_combine(type, name);
+//        const uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
+//        if (item_idx == UINT32_MAX) {
+//            return;
+//        }
+//
+//        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+//
+//        void *old_data = resource::get(type, name);
+//
+//        void *new_data = type_clb.reloader(name, old_data,
+//                                           blob,
+//                                           ct_memory_a0.main_allocator());
+//
+//        resource_item_t item = _G.resource_data[item_idx];
+//        item.data = new_data;
+//        _G.resource_data[item_idx] = item;
     }
 
 namespace resource_module {
@@ -571,10 +524,10 @@ namespace resource_module {
         _G = {
                 .allocator = ct_memory_a0.main_allocator(),
                 .config_object = ct_config_a0.config_object(),
+                .type_items_count = 1,
         };
 
         _G.type_map.init(ct_memory_a0.main_allocator());
-        _G.resource_map.init(ct_memory_a0.main_allocator());
 
         ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
                                       ct_coredb_a0.read_string(_G.config_object, CONFIG_BUILD_DIR, ""), false);
@@ -587,9 +540,7 @@ namespace resource_module {
         package_shutdown();
 
         _G.type_map.destroy();
-        cel_array_free(_G.resource_data, _G.allocator);
         cel_array_free(_G.resource_callbacks, _G.allocator);
-        _G.resource_map.destroy();
     }
 
 }

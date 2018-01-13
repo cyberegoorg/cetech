@@ -34,6 +34,7 @@ struct ct_coredb_writer_t {
 enum ct_coredb_prop_type {
     COREDB_TYPE_NONE = 0,
     COREDB_TYPE_UINT32,
+    COREDB_TYPE_PTR,
     COREDB_TYPE_FLOAT,
     COREDB_TYPE_STRPTR,
 };
@@ -65,6 +66,10 @@ struct ct_coredb_a0 {
                        uint64_t property,
                        uint32_t value);
 
+    void (*set_ptr)(ct_coredb_writer_t *object,
+                       uint64_t property,
+                       void* value);
+
     // READ
     float (*read_float)(ct_coredb_object_t *object,
                         uint64_t property,
@@ -77,6 +82,11 @@ struct ct_coredb_a0 {
     uint32_t (*read_uint32)(ct_coredb_object_t *object,
                         uint64_t property,
                         uint32_t defaultt);
+
+    void* (*read_ptr)(ct_coredb_object_t *object,
+                            uint64_t property,
+                            void* defaultt);
+
 };
 
 #ifdef __cplusplus
