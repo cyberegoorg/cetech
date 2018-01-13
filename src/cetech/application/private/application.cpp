@@ -33,6 +33,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/coredb/coredb.h>
+
 #include <celib/array.h>
 
 CETECH_DECL_API(ct_resource_a0);
@@ -67,13 +68,15 @@ CETECH_DECL_API(ct_coredb_a0);
 
 static struct ApplicationGlobals {
     ct_coredb_object_t* config_object;
-    celib::Array<ct_app_on_init> on_init;
-    celib::Array<ct_app_on_shutdown> on_shutdown;
-    celib::Array<ct_app_on_update> on_update;
+
+    ct_app_on_init* on_init;
+    ct_app_on_shutdown* on_shutdown;
+    ct_app_on_update* on_update;
 
     celib::Map<ct_game_fce> game_map;
     ct_game_fce active_game;
     int is_running;
+    cel_alloc *allocator;
 } _G;
 
 
@@ -199,7 +202,7 @@ extern "C" void application_start() {
 
     uint64_t last_tick = ct_time_a0.perf_counter();
 
-    for (uint32_t i = 0; i < celib::array::size(_G.on_init); ++i) {
+    for (uint32_t i = 0; i < cel_array_size(_G.on_init); ++i) {
         _G.on_init[i]();
     }
 
@@ -264,7 +267,7 @@ extern "C" void application_start() {
         ct_machine_a0.update(dt);
         check_machine();
 
-        for (uint32_t i = 0; i < celib::array::size(_G.on_update); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(_G.on_update); ++i) {
             _G.on_update[i](dt);
         }
 
@@ -285,7 +288,7 @@ extern "C" void application_start() {
         _G.active_game.on_shutdown();
     }
 
-    for (uint32_t i = 0; i < celib::array::size(_G.on_shutdown); ++i) {
+    for (uint32_t i = 0; i < cel_array_size(_G.on_shutdown); ++i) {
         _G.on_shutdown[i]();
     }
 
@@ -294,10 +297,10 @@ extern "C" void application_start() {
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        celib::array::push_back(_G.name, name);                                \
+        cel_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = celib::array::size(_G.name);                         \
+        const auto size = cel_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -307,7 +310,7 @@ extern "C" void application_start() {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            celib::array::pop_back(_G.name);                                   \
+            cel_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -352,15 +355,14 @@ static ct_app_a0 a0 = {
 void app_init(struct ct_api_a0 *api) {
     api->register_api("ct_app_a0", &a0);
 
+    _G.allocator = ct_memory_a0.main_allocator();
+
 #if defined(CETECH_DEVELOP)
     ct_resource_a0.set_autoload(1);
 #else
     ct_resource_a0.set_autoload(0);
 #endif
 
-    _G.on_update.init(ct_memory_a0.main_allocator());
-    _G.on_init.init(ct_memory_a0.main_allocator());
-    _G.on_shutdown.init(ct_memory_a0.main_allocator());
     _G.game_map.init(ct_memory_a0.main_allocator());
 }
 
@@ -397,9 +399,9 @@ CETECH_MODULE_DEF(
         {
             CEL_UNUSED(api, reload);
 
-            _G.on_init.destroy();
-            _G.on_shutdown.destroy();
-            _G.on_update.destroy();
+            cel_array_free(_G.on_init, _G.allocator);
+            cel_array_free(_G.on_shutdown, _G.allocator);
+            cel_array_free(_G.on_update, _G.allocator);
             _G.game_map.destroy();
         }
 )

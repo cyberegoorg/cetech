@@ -27,7 +27,9 @@ using namespace celib;
 namespace {
 #define _G WorldGlobals
     static struct WorldGlobals {
-        Array<ct_world_callbacks_t> callbacks;
+        ct_world_callbacks_t* callbacks;
+        cel_alloc* allocator;
+
         Handler<uint32_t> world_handler;
     } WorldGlobals;
 }
@@ -38,13 +40,13 @@ namespace {
 
 namespace world {
     void register_callback(ct_world_callbacks_t clb) {
-        array::push_back(_G.callbacks, clb);
+        cel_array_push(_G.callbacks, clb, _G.allocator);
     }
 
     ct_world create() {
         ct_world w = {.h = handler::create(_G.world_handler)};
 
-        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(_G.callbacks); ++i) {
             _G.callbacks[i].on_created(w);
         }
 
@@ -52,7 +54,7 @@ namespace world {
     }
 
     void destroy(ct_world world) {
-        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(_G.callbacks); ++i) {
             _G.callbacks[i].on_destroy(world);
         }
 
@@ -61,7 +63,7 @@ namespace world {
 
     void update(ct_world world,
                 float dt) {
-        for (uint32_t i = 0; i < array::size(_G.callbacks); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(_G.callbacks); ++i) {
             if (_G.callbacks[i].on_update != NULL) {
                 _G.callbacks[i].on_update(world, dt);
             }
@@ -91,15 +93,17 @@ namespace world_module {
         _init_api(api);
 
 
-        _G = {};
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+        };
 
-        _G.callbacks.init(ct_memory_a0.main_allocator());
         _G.world_handler.init(ct_memory_a0.main_allocator());
 
     }
 
     void _shutdown() {
-        _G.callbacks.destroy();
+        cel_array_free(_G.callbacks, _G.allocator);
+
         _G.world_handler.destroy();
     }
 

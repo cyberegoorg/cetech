@@ -40,6 +40,9 @@
 #define cel_array_pop_front(a) \
     cel_array_any(a) ? memcpy(a, (a+1), sizeof(*a) * (cel_array_header(a)->size--)) : 0
 
+#define cel_array_pop_back(a) \
+    cel_array_any(a) ? cel_array_header(a)->size-- : 0
+
 
 #define cel_array_front(a) a[0]
 #define cel_array_back(a) a[cel_array_size(a)-1]

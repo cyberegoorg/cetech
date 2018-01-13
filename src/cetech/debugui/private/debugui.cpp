@@ -9,6 +9,7 @@
 #include <cetech/renderer/viewport.h>
 #include <cetech/os/vio.h>
 #include <cetech/filesystem/filesystem.h>
+#include <celib/array.h>
 #include "celib/map.inl"
 
 #include "cetech/config/config.h"
@@ -31,8 +32,11 @@ CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
 
+typedef void (on_debug_t)();
+
 static struct DebugUIGlobal {
-    Array<void (*)()> on_debugui;
+    on_debug_t** on_debugui;
+    cel_alloc *allocator;
 } _G;
 
 namespace debugui {
@@ -86,7 +90,7 @@ namespace debugui {
 
         imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 
-        for (uint32_t i = 0; i < array::size(_G.on_debugui); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(_G.on_debugui); ++i) {
             _G.on_debugui[i]();
         }
 
@@ -97,10 +101,10 @@ namespace debugui {
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        celib::array::push_back(_G.name, name);                                \
+        cel_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = celib::array::size(_G.name);                         \
+        const auto size = cel_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -110,7 +114,7 @@ namespace debugui {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            celib::array::pop_back(_G.name);                                   \
+            cel_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -281,11 +285,11 @@ namespace debugui_module {
         api->register_api("ct_debugui_a0", &debugui_api);
         imguiCreate(16);
 
-        _G = {};
-        _G.on_debugui.init(ct_memory_a0.main_allocator());
+        _G = {
+                .allocator = ct_memory_a0.main_allocator()
+        };
 
         ct_renderer_a0.register_on_render(on_render);
-
 
         ImGuiIO& io = ImGui::GetIO();
         io.KeyMap[ImGuiKey_Tab] = ct_keyboard_a0.button_index("tab");
@@ -314,7 +318,7 @@ namespace debugui_module {
     static void _shutdown() {
         imguiDestroy();
 
-        _G.on_debugui.destroy();
+        cel_array_free(_G.on_debugui, _G.allocator);
         ct_renderer_a0.unregister_on_render(on_render);
 
         _G = {};

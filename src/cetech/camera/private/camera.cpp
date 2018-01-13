@@ -6,6 +6,7 @@
 #include <cetech/yaml/yamlng.h>
 #include <cetech/yaml/ydb.h>
 #include <cetech/macros.h>
+#include <celib/array.h>
 #include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"
@@ -66,8 +67,10 @@ namespace {
         uint64_t type;
 
         Map<uint32_t> world_map;
-        Array<WorldInstance> world_instances;
         Map<uint32_t> ent_map;
+
+        WorldInstance* world_instances;
+        cel_alloc* allocator;
     } CameraGlobal;
 
 
@@ -116,15 +119,15 @@ namespace {
 //    }
 
     static void _new_world(ct_world world) {
-        uint32_t idx = array::size(_G.world_instances);
-        array::push_back(_G.world_instances, WorldInstance());
+        uint32_t idx = cel_array_size(_G.world_instances);
+        cel_array_push(_G.world_instances, WorldInstance(), _G.allocator);
         _G.world_instances[idx].world = world;
         map::set(_G.world_map, world.h, idx);
     }
 
     static void _destroy_world(ct_world world) {
         uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
-        uint32_t last_idx = array::size(_G.world_instances) - 1;
+        uint32_t last_idx = cel_array_size(_G.world_instances) - 1;
 
         ct_world last_world = _G.world_instances[last_idx].world;
 
@@ -133,7 +136,7 @@ namespace {
 
         _G.world_instances[idx] = _G.world_instances[last_idx];
         map::set(_G.world_map, last_world.h, idx);
-        array::pop_back(_G.world_instances);
+        cel_array_pop_back(_G.world_instances);
     }
 
     static WorldInstance *_get_world_instance(ct_world world) {
@@ -298,10 +301,11 @@ namespace camera_module {
         api->register_api("ct_camera_a0", &camera_api);
 
 
-        _G = {};
+        _G = {
+                .allocator = ct_memory_a0.main_allocator()
+        };
 
         _G.world_map.init(ct_memory_a0.main_allocator());
-        _G.world_instances.init(ct_memory_a0.main_allocator());
         _G.ent_map.init(ct_memory_a0.main_allocator());
 
         _G.type = CT_ID64_0("camera");
@@ -321,7 +325,7 @@ namespace camera_module {
 
     static void _shutdown() {
         _G.ent_map.destroy();
-        _G.world_instances.destroy();
+        cel_array_free(_G.world_instances, _G.allocator);
         _G.world_map.destroy();
     }
 }

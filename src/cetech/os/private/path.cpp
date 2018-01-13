@@ -20,6 +20,7 @@
 #include <cetech/module/module.h>
 #include <glob.h>
 #include <fnmatch.h>
+#include <celib/array.h>
 #include "celib/buffer.inl"
 
 
@@ -55,7 +56,7 @@ void _dir_list(const char *path,
                const char *patern,
                int recursive,
                int only_dir,
-               Array<char *> &tmp_files,
+               char *** tmp_files,
                struct cel_alloc *allocator) {
     DIR *dir;
     struct dirent *entry;
@@ -93,7 +94,7 @@ void _dir_list(const char *path,
                 char *new_path = CEL_ALLOCATE(allocator, char,
                                               sizeof(char) * (len + 1));
                 memcpy(new_path, tmp_path, len + 1);
-                array::push_back(tmp_files, new_path);
+                cel_array_push(*tmp_files, new_path, allocator);
             }
 
             if (recursive) {
@@ -117,7 +118,7 @@ void _dir_list(const char *path,
                 continue;
             }
 
-            array::push_back(tmp_files, new_path);
+            cel_array_push(*tmp_files, new_path, allocator);
         }
 
     } while ((entry = readdir(dir)));
@@ -196,19 +197,19 @@ void dir_list(const char *path,
               char ***files,
               uint32_t *count,
               struct cel_alloc *allocator) {
-    Array<char *> tmp_files(allocator);
+    char ** tmp_files = NULL;
 
-    _dir_list(path, patern, recursive, only_dir, tmp_files, allocator);
+    _dir_list(path, patern, recursive, only_dir, &tmp_files, allocator);
 
     char **new_files = CEL_ALLOCATE(allocator, char*,
-                                    sizeof(char *) * array::size(tmp_files));
+                                    sizeof(char *) * cel_array_size(tmp_files));
 
     memcpy(new_files,
-           array::begin(tmp_files),
-           sizeof(char *) * array::size(tmp_files));
+           tmp_files,
+           sizeof(char *) * cel_array_size(tmp_files));
 
     *files = new_files;
-    *count = array::size(tmp_files);
+    *count = cel_array_size(tmp_files);
 }
 
 void dir_list2(const char *path,
