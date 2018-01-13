@@ -12,11 +12,10 @@
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/yaml/ydb.h>
 #include <celib/array.h>
+#include <cetech/macros.h>
 
 #include "celib/allocator.h"
 #include "celib/array.inl"
-
-#include "resource_package.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -28,6 +27,21 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
 
 using namespace celib;
+
+
+struct package_resource {
+    uint32_t type_count;
+    uint32_t name_count_offset;
+    uint32_t type_offset;
+    uint32_t name_offset;
+    uint32_t offset_offset;
+};
+
+#define package_name_count(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_count_offset)))
+#define package_offset(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->offset_offset)))
+#define package_type(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
+#define package_name(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
+
 
 //==============================================================================
 // Public interface
@@ -42,6 +56,50 @@ struct _G {
     uint64_t package_typel;
     cel_alloc* allocator;
 } _G = {};
+
+void *loader(ct_vio *input,
+             cel_alloc *allocator) {
+
+    const int64_t size = input->size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    input->read(input, data, 1, size);
+
+    return data;
+}
+
+void unloader(void *new_data,
+              cel_alloc *allocator) {
+    CEL_FREE(allocator, new_data);
+}
+
+void online(uint64_t name,
+            void *data) {
+    CEL_UNUSED(name, data);
+}
+
+void offline(uint64_t name,
+             void *data) {
+    CEL_UNUSED(name, data);
+}
+
+void *reloader(uint64_t name,
+               void *old_data,
+               void *new_data,
+               cel_alloc *allocator) {
+    CEL_UNUSED(name);
+
+    CEL_FREE(allocator, old_data);
+    return new_data;
+}
+
+static const ct_resource_callbacks_t package_resource_callback = {
+        .loader = loader,
+        .unloader =unloader,
+        .online =online,
+        .offline =offline,
+        .reloader = reloader
+};
+
 
 //==============================================================================
 // Resource compiler
@@ -127,6 +185,9 @@ int package_init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
             .package_typel = CT_ID64_0("package"),
     };
+
+    ct_resource_a0.register_type(_G.package_typel,
+                                 package_resource_callback);
 
     ct_resource_a0.compiler_register(_G.package_typel, _package_compiler, true);
 

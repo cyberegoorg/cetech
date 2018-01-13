@@ -73,7 +73,6 @@ namespace {
         uint64_t type;
         uint64_t name;
         void *data;
-        uint8_t ref_count;
     } resource_item_t;
 
     static const resource_item_t null_item = {};
@@ -86,9 +85,12 @@ namespace {
         Map<uint32_t> resource_map;
         resource_item_t* resource_data;
 
+        ct_coredb_object_t** resource_object;
+
         int autoload_enabled;
 
         ct_spinlock add_lock;
+
         ct_coredb_object_t* config_object;
         cel_alloc* allocator;
     } ResourceManagerGlobals = {};
@@ -109,51 +111,7 @@ char *resource_compiler_get_build_dir(cel_alloc *a,
     return ct_path_a0.join(a, 2, build_dir_str, platform);
 }
 
-namespace package_resource {
 
-    void *loader(ct_vio *input,
-                 cel_alloc *allocator) {
-
-        const int64_t size = input->size(input);
-        char *data = CEL_ALLOCATE(allocator, char, size);
-        input->read(input, data, 1, size);
-
-        return data;
-    }
-
-    void unloader(void *new_data,
-                  cel_alloc *allocator) {
-        CEL_FREE(allocator, new_data);
-    }
-
-    void online(uint64_t name,
-                void *data) {
-        CEL_UNUSED(name, data);
-    }
-
-    void offline(uint64_t name,
-                 void *data) {
-        CEL_UNUSED(name, data);
-    }
-
-    void *reloader(uint64_t name,
-                   void *old_data,
-                   void *new_data,
-                   cel_alloc *allocator) {
-        CEL_UNUSED(name);
-
-        CEL_FREE(allocator, old_data);
-        return new_data;
-    }
-
-    static const ct_resource_callbacks_t package_resource_callback = {
-            .loader = loader,
-            .unloader =unloader,
-            .online =online,
-            .offline =offline,
-            .reloader = reloader
-    };
-};
 
 //==============================================================================
 // Public interface
@@ -205,7 +163,6 @@ namespace resource {
             }
 
             resource_item_t item = {
-                    .ref_count=1,
                     .name = names[i],
                     .type = type,
                     .data=resource_data[i]
@@ -239,7 +196,6 @@ namespace resource {
                   uint64_t *names,
                   size_t count) {
         void *loaded_data[count];
-
         load(loaded_data, type, names, count, 0);
         add_loaded(type, names, loaded_data, count);
     }
@@ -307,14 +263,13 @@ namespace resource {
             resource_item_t item = {};
             if (res_idx != UINT32_MAX) {
                 item = _G.resource_data[idx];
+                if (!force) {
+                    _G.resource_data[res_idx] = item;
+                    loaded_data[i] = 0;
+                    continue;
+                }
             }
 
-            if (!force && (item.ref_count > 0)) {
-                ++item.ref_count;
-                _G.resource_data[res_idx] = item;
-                loaded_data[i] = 0;
-                continue;
-            }
 
             char build_name[33] = {};
             type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -378,11 +333,7 @@ namespace resource {
 
             resource_item_t &item = _G.resource_data[res_idx];
 
-            if (item.ref_count == 0) {
-                continue;
-            }
-
-            if (--item.ref_count == 0) {
+            if (1) {
                 char build_name[33] = {};
                 type_name_string(build_name,
                                  CETECH_ARRAY_LEN(build_name),
@@ -628,8 +579,7 @@ namespace resource_module {
         ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
                                       ct_coredb_a0.read_string(_G.config_object, CONFIG_BUILD_DIR, ""), false);
 
-        resource::resource_register_type(CT_ID64_0("package"),
-                                         package_resource::package_resource_callback);
+
 
     }
 
