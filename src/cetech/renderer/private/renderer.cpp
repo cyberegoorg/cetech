@@ -45,7 +45,7 @@ using namespace celib;
 //==============================================================================
 
 #define _G RendererGlobals
-static struct G {
+static struct _G {
     celib::Array<ct_render_on_render> on_render;
     ct_window *main_window;
 
@@ -233,7 +233,7 @@ namespace renderer_module {
 
         ct_api_a0 = *api;
 
-        _G = (struct G) {};
+        _G =  {};
 
         _G.config = ct_config_a0.config_object();
 
@@ -283,7 +283,7 @@ namespace renderer_module {
             bgfx::shutdown();
         }
 
-        _G = (struct G) {};
+        _G =  {};
     }
 
 }

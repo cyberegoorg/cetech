@@ -1,7 +1,6 @@
 #include <cetech/entity/entity.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/transform/transform.h>
-#include <celib/blob.h>
 #include <cetech/camera/camera.h>
 #include <cetech/yaml/yamlng.h>
 #include <cetech/yaml/ydb.h>
@@ -152,7 +151,7 @@ namespace {
     int _camera_component_compiler(const char *filename,
                                    uint64_t* component_key,
                                    uint32_t component_key_count,
-                                   struct ct_blob *data) {
+                                   char**data) {
         struct camera_data t_data;
 
 
@@ -169,7 +168,7 @@ namespace {
         keys[component_key_count] = ct_yng_a0.calc_key("fov");
         t_data.fov = ct_ydb_a0.get_float(filename, keys, CETECH_ARRAY_LEN(keys), 0.0f);
 
-        data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
+        cel_array_push_n(*data, (uint8_t *) &t_data, sizeof(t_data), _G.allocator);
 
         return 1;
     }

@@ -32,7 +32,7 @@ using namespace buffer;
 // GLobals
 //==============================================================================
 
-#define _G Globals
+#define _G LevelPreviewGlobals
 static struct _G {
     ct_entity ent;
 } _G;

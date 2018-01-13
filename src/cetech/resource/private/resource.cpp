@@ -19,7 +19,6 @@
 #include <cetech/os/errors.h>
 #include <cetech/resource/package.h>
 #include <cetech/module/module.h>
-#include <celib/blob.h>
 #include <cetech/coredb/coredb.h>
 #include <cetech/kernel/kernel.h>
 
@@ -532,7 +531,7 @@ namespace resource {
 
 }
 
-    void resource_memory_reload(uint64_t type, uint64_t name, ct_blob *blob) {
+    void resource_memory_reload(uint64_t type, uint64_t name, char** blob) {
         const uint32_t idx = map::get<uint32_t>(_G.type_map, type, UINT32_MAX);
 
         const uint64_t id = hash_combine(type, name);
@@ -546,7 +545,7 @@ namespace resource {
         void *old_data = resource::get(type, name);
 
         void *new_data = type_clb.reloader(name, old_data,
-                                           blob->data(blob->inst),
+                                           blob,
                                            ct_memory_a0.main_allocator());
 
         resource_item_t item = _G.resource_data[item_idx];
@@ -627,9 +626,6 @@ namespace resource_module {
 
         resource::resource_register_type(CT_ID64_0("package"),
                                          package_resource::package_resource_callback);
-
-        package_init(api);
-
 
     }
 

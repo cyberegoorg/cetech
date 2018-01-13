@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <cetech/entity/entity.h>
-#include <celib/blob.h>
 #include "celib/map.inl"
 
 #include "cetech/os/memory.h"
@@ -47,7 +46,7 @@ namespace component {
                 const char* filename,
                 uint64_t* component_key,
                 uint32_t component_key_count,
-                ct_blob *data) {
+                char** data) {
 
         ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
                 _G.compiler_map, type, nullptr);

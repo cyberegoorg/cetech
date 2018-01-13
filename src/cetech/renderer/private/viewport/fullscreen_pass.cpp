@@ -21,13 +21,13 @@
 #include <cetech/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/mesh_renderer.h>
-#include <celib/blob.h>
-
 
 #include "bgfx/platform.h"
 
 #include <cetech/renderer/viewport.h>
 #include <cetech/yaml/yamlng.h>
+#include <cetech/os/memory.h>
+#include <celib/array.h>
 #include "cetech/renderer/scene.h"
 #include "cetech/renderer/material.h"
 
@@ -35,6 +35,7 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_memory_a0);
 
 
 //==============================================================================
@@ -149,7 +150,7 @@ static void foreach_input(struct ct_yamlng_node key,
 }
 
 static int fullscreen_pass_compiler(struct ct_yamlng_node body,
-                                    struct ct_blob *data) {
+                                    char**data) {
     ct_yng_doc* d = body.d;
 
     uint64_t keys[2] = {
@@ -164,7 +165,7 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
 
         d->foreach_dict_node(d->inst, input, foreach_input, &pass_data);
 
-        data->push(data->inst, &pass_data, sizeof(pass_data));
+        cel_array_push_n(*data, &pass_data, sizeof(pass_data), ct_memory_a0.main_allocator());
     }
 
     return 1;
@@ -241,6 +242,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_material_a0);
             CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_memory_a0);
         },
         {
             CEL_UNUSED(reload);

@@ -10,10 +10,9 @@
 #include <cetech/transform/transform.h>
 #include <cetech/yaml/ydb.h>
 #include <cetech/macros.h>
+#include <celib/array.h>
 #include "celib/fpumath.h"
 #include "cetech/module/module.h"
-#include "celib/blob.h"
-
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -105,6 +104,7 @@ static struct _G {
     Map<uint32_t> world_map;
     Array<WorldInstance> world_instances;
     Map<uint32_t> ent_map;
+    cel_alloc* allocator;
 } _G;
 
 
@@ -204,7 +204,7 @@ static void _destroy_world(ct_world world) {
 int _component_compiler(const char *filename,
                         uint64_t* component_key,
                         uint32_t component_key_count,
-                        struct ct_blob *data) {
+                        char**data) {
     transform_data t_data;
 
     uint64_t keys[component_key_count+1];
@@ -227,7 +227,7 @@ int _component_compiler(const char *filename,
         celib::quat_from_euler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
     };
 
-    data->push(data->inst, (uint8_t *) &t_data, sizeof(t_data));
+    cel_array_push_n(*data, (uint8_t *) &t_data, sizeof(t_data), _G.allocator);
 
     return 1;
 }
@@ -302,13 +302,14 @@ static void _init(ct_api_a0 *api) {
     api->register_api("ct_transform_a0", &_api);
 
 
-    _G = {};
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+            .type = CT_ID64_0("transform"),
+    };
 
     _G.world_map.init(ct_memory_a0.main_allocator());
     _G.world_instances.init(ct_memory_a0.main_allocator());
     _G.ent_map.init(ct_memory_a0.main_allocator());
-
-    _G.type = CT_ID64_0("transform");
 
     ct_component_a0.register_type(
             _G.type,

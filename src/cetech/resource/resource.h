@@ -34,7 +34,7 @@ struct ct_compilator_api;
 //! \param compilator_api Compilator api
 typedef void (*ct_resource_compilator_t)(
         const char *filename,
-        struct ct_blob *output,
+        char** output,
         struct ct_compilator_api *compilator_api);
 
 

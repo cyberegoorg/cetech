@@ -34,7 +34,7 @@ using namespace buffer;
 // GLobals
 //==============================================================================
 
-#define _G Globals
+#define _G MaterialPreviewGlobals
 static struct _G {
     ct_entity ent;
 } _G;

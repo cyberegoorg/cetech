@@ -122,7 +122,6 @@ extern "C" int cetech_kernel_init(int argc,
     CETECH_LOAD_STATIC_MODULE(api, yamlng);
     CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);
-    CETECH_LOAD_STATIC_MODULE(api, blob);
     CETECH_LOAD_STATIC_MODULE(api, task);
     CETECH_LOAD_STATIC_MODULE(api, watchdog);
     CETECH_LOAD_STATIC_MODULE(api, filesystem);
@@ -172,7 +171,6 @@ extern "C" int cetech_kernel_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, config);
     CETECH_UNLOAD_STATIC_MODULE(api, object);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
-    CETECH_UNLOAD_STATIC_MODULE(api, blob);
     CETECH_UNLOAD_STATIC_MODULE(api, task);
     CETECH_UNLOAD_STATIC_MODULE(api, watchdog);
     CETECH_UNLOAD_STATIC_MODULE(api, filesystem);

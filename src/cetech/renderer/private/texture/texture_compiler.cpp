@@ -16,8 +16,8 @@
 #include <cstdio>
 #include <cetech/config/config.h>
 #include <cetech/yaml/ydb.h>
-#include <celib/blob.h>
 #include <cetech/coredb/coredb.h>
+#include <celib/array.h>
 #include "celib/buffer.inl"
 #include "texture_blob.h"
 #include "cetech/os/path.h"
@@ -96,7 +96,7 @@ namespace texture_compiler {
     }
 
     static void compiler(const char *filename,
-                        struct ct_blob *output,
+                        char**output,
                         struct ct_compilator_api *compilator_api) {
 
         auto a = ct_memory_a0.main_allocator();
@@ -148,8 +148,8 @@ namespace texture_compiler {
                 .size = (uint32_t) tmp_file->size(tmp_file)
         };
 
-        output->push(output->inst, &resource, sizeof(resource));
-        output->push(output->inst, tmp_data, sizeof(char) * resource.size);
+        cel_array_push_n(*output, &resource, sizeof(resource), a);
+        cel_array_push_n(*output, tmp_data, sizeof(char) * resource.size, a);
 
         tmp_file->close(tmp_file);
 

@@ -22,9 +22,9 @@
 #include <celib/map.inl>
 #include <cetech/filesystem/filesystem.h>
 #include <cetech/yaml/ydb.h>
-#include <celib/blob.h>
 #include <cetech/coredb/coredb.h>
 #include <cetech/kernel/kernel.h>
+#include <celib/array.h>
 
 #include "celib/buffer.inl"
 
@@ -44,7 +44,6 @@ CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
@@ -78,12 +77,14 @@ struct compile_task_data {
     atomic_int completed;
 };
 
-struct G {
+static struct _G {
+    uint32_t count;
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
     ct_coredb_object_t* config;
-} ResourceCompilerGlobal = {};
+    cel_alloc * allocator;
+} _G ;
 
 
 #include "builddb.h"
@@ -138,7 +139,7 @@ static void _compile_task(void *data) {
                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
                    tdata->source_filename, tdata->type, tdata->name);
 
-    struct ct_blob* output_blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
+    char* output_blob = NULL;
 
     if (tdata->compilator.compilator) {
         if(tdata->compilator.yaml_based) {
@@ -155,12 +156,12 @@ static void _compile_task(void *data) {
         }
 
         tdata->compilator.compilator(tdata->source_filename,
-                                     output_blob,
+                                     &output_blob,
                                      &_compilator_api);
 
     }
 
-    if (!output_blob->size(output_blob->inst)) {
+    if (!cel_array_size(output_blob)) {
         ct_log_a0.error("resource_compiler.task",
                         "Resource \"%s\" compilation fail",
                         tdata->source_filename);
@@ -178,7 +179,7 @@ static void _compile_task(void *data) {
             goto end;
         }
 
-        build_vio->write(build_vio, output_blob->data(output_blob->inst), sizeof(char), output_blob->size(output_blob->inst));
+        build_vio->write(build_vio, output_blob, sizeof(char), cel_array_size(output_blob));
 
         ct_filesystem_a0.close(build_vio);
 
@@ -187,6 +188,7 @@ static void _compile_task(void *data) {
     }
 
 end:
+    cel_array_free(output_blob, _G.allocator);
 
     CEL_FREE(ct_memory_a0.main_allocator(),
              tdata->source_filename);
@@ -291,15 +293,10 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
 void resource_compiler_register(uint64_t type,
                                 ct_resource_compilator_t compilator, bool yaml_based) {
-    for (int i = 0; i < MAX_TYPES; ++i) {
-        if (_G.compilator_map_type[i] != 0) {
-            continue;
-        }
+    const uint32_t idx = _G.count++;
 
-        _G.compilator_map_type[i] = type;
-        _G.compilator_map_compilator[i] = {.compilator = compilator, .yaml_based = yaml_based};
-        return;
-    }
+    _G.compilator_map_type[idx] = type;
+    _G.compilator_map_compilator[idx] = {.compilator = compilator, .yaml_based = yaml_based};
 }
 
 void _compile_all(celib::Map<uint64_t> &compiled) {
@@ -378,10 +375,10 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 }
 
 
-void resource_memory_reload(uint64_t type, uint64_t name, ct_blob *blob);
+void resource_memory_reload(uint64_t type, uint64_t name, char** blob);
 
 void compile_and_reload(const char* filename) {
-    struct ct_blob* output_blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
+    char** output_blob = NULL;
 
     uint64_t type_id;
     uint64_t name_id;
@@ -396,11 +393,11 @@ void compile_and_reload(const char* filename) {
     compilator.compilator(filename, output_blob, &_compilator_api);
 
     resource_memory_reload(type_id, name_id, output_blob);
-    ct_blob_a0.destroy(output_blob, false);
+    cel_array_free(output_blob, _G.allocator);
     return;
 
     error:
-    ct_blob_a0.destroy(output_blob, true);
+    cel_array_free(output_blob, _G.allocator);
 }
 
 void resource_compiler_check_fs() {
@@ -461,7 +458,7 @@ static void _init_cvar(struct ct_config_a0 config) {
     }
 
     if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
-        ct_coredb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "external");
+        ct_coredb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "externals/build");
     }
 
     ct_coredb_a0.write_commit(writer);
@@ -470,8 +467,12 @@ static void _init_cvar(struct ct_config_a0 config) {
 
 static void _init(ct_api_a0 *api) {
     CEL_UNUSED(api);
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+            .config = ct_config_a0.config_object(),
+    };
 
-    _G.config = ct_config_a0.config_object();
+    package_init(api);
 
     _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
@@ -529,12 +530,10 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CEL_UNUSED(reload);
-
 
             _init(api);
         },

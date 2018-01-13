@@ -8,7 +8,7 @@
 #include "allocator.h"
 
 #define cel_array_free(a, alloc) \
-    ((a) ?  CEL_FREE(alloc, cel_array_header(a)) : 0, a=NULL )
+    ((a) ?  CEL_FREE(alloc, cel_array_header(a)) : 0, a = NULL )
 
 #define cel_array_header(a) \
     ((cel_array_header_t *)((char *)(a) - sizeof(cel_array_header_t)))
@@ -29,16 +29,16 @@
      ((a) ? (cel_array_size(a) + (n)) >= cel_array_capacity(a) : 1)
 
 #define cel_array_push(a, item, alloc) \
-    cel_array_full(a) ? a = (__typeof(a))cel_array_grow(a, 1, sizeof(*a), alloc) : 0, \
+    cel_array_full(a) ? (a) = (__typeof(a))cel_array_grow(a, 1, sizeof(*a), alloc) : 0, \
     (a)[cel_array_header(a)->size++] = item
 
 #define cel_array_push_n(a, items, n, alloc) \
-    cel_array_full_n(a, n) ? a =  (__typeof(a))cel_array_grow(a, n, sizeof(*a), alloc) : 0, \
-    memcpy(a+cel_array_header(a)->size, (items), sizeof(*a) * n), \
+    cel_array_full_n(a, n) ? (a) =  (__typeof(a))cel_array_grow(a, n, sizeof(*(a)), alloc) : 0, \
+    memcpy((a)+cel_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
     cel_array_header(a)->size += n
 
 #define cel_array_pop_front(a) \
-    cel_array_any(a) ? memcpy(a, (a+1), sizeof(*a) * (cel_array_header(a)->size--)) : 0
+    cel_array_any(a) ? memcpy(a, ((a)+1), sizeof(*(a)) * (cel_array_header(a)->size--)) : 0
 
 #define cel_array_pop_back(a) \
     cel_array_any(a) ? cel_array_header(a)->size-- : 0
@@ -56,7 +56,10 @@ static void *cel_array_grow(void *a,
                             uint32_t size,
                             size_t type_size,
                             cel_alloc *alloc) {
-    const uint32_t new_capacity = (cel_array_capacity(a) + size) * 2 + 8;
+    uint32_t new_capacity = cel_array_capacity(a) * 2 + size;
+    if(new_capacity < size) {
+        new_capacity = size;
+    }
 
     void *new_data = CEL_ALLOCATE(alloc, void*, sizeof(cel_array_header_t) +
                                                 (new_capacity * type_size));
@@ -72,5 +75,7 @@ static void *cel_array_grow(void *a,
 
     return new_array;
 }
+
+static void* _ = (void*)&cel_array_grow; // UNUSED
 
 #endif //CETECH_ARRAY_H

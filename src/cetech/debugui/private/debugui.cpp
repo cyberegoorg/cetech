@@ -1,7 +1,6 @@
 #include <cetech/entity/entity.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/texture.h>
-#include <celib/blob.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/input/input.h>
 #include <cetech/application/application.h>

@@ -12,13 +12,13 @@
 #include "cetech/os/memory.h"
 #include "cetech/api/api_system.h"
 #include "cetech/hashlib/hashlib.h"
-#include "celib/blob.h"
 #include "cetech/resource/resource.h"
 
 #include "cetech/entity/entity.h"
 #include "cetech/machine/machine.h"
 
 #include <bgfx/defines.h>
+#include <celib/array.h>
 
 #include "material.h"
 
@@ -201,9 +201,11 @@ namespace material_compiler {
     };
 
     void compiler(const char *filename,
-                 struct ct_blob *output_blob,
+                 char**output_blob,
                  ct_compilator_api *compilator_api) {
         CEL_UNUSED(compilator_api);
+
+        cel_alloc* a = ct_memory_a0.main_allocator();
 
         struct material_compile_output output = {};
         output.uniform_names.init(ct_memory_a0.main_allocator());
@@ -238,28 +240,28 @@ namespace material_compiler {
         };
 
 
-        output_blob->push(output_blob->inst, &resource, sizeof(resource));
+        cel_array_push_n(*output_blob, &resource, sizeof(resource), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.layer_names),
-                         sizeof(uint64_t) * array::size(output.layer_names));
+        cel_array_push_n(*output_blob, array::begin(output.layer_names),
+                         sizeof(uint64_t) * array::size(output.layer_names), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.shader_name),
-                         sizeof(uint64_t)* array::size(output.shader_name));
+        cel_array_push_n(*output_blob, array::begin(output.shader_name),
+                         sizeof(uint64_t)* array::size(output.shader_name), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.uniform_count),
-                         sizeof(uint32_t)* array::size(output.uniform_count));
+        cel_array_push_n(*output_blob, array::begin(output.uniform_count),
+                         sizeof(uint32_t)* array::size(output.uniform_count), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.render_state),
-                         sizeof(uint64_t)* array::size(output.render_state));
+        cel_array_push_n(*output_blob, array::begin(output.render_state),
+                         sizeof(uint64_t)* array::size(output.render_state), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.var),
-                         sizeof(material_variable) * array::size(output.var));
+        cel_array_push_n(*output_blob, array::begin(output.var),
+                         sizeof(material_variable) * array::size(output.var), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.uniform_names),
-                         sizeof(char)* array::size(output.uniform_names));
+        cel_array_push_n(*output_blob, array::begin(output.uniform_names),
+                         sizeof(char)* array::size(output.uniform_names), a);
 
-        output_blob->push(output_blob->inst, array::begin(output.layer_offset),
-                         sizeof(uint32_t) * array::size(output.layer_offset));
+        cel_array_push_n(*output_blob, array::begin(output.layer_offset),
+                         sizeof(uint32_t) * array::size(output.layer_offset), a);
 
         output.uniform_names.destroy();
         output.layer_names.destroy();

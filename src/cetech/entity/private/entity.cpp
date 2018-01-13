@@ -13,7 +13,6 @@
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/os/errors.h>
 #include <cetech/module/module.h>
-#include <celib/blob.h>
 #include <cetech/yaml/ydb.h>
 
 #include "celib/handler.inl"
@@ -27,7 +26,6 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
@@ -56,6 +54,8 @@ static struct EntityMaagerGlobals {
 
     uint64_t type;
     uint64_t level_type;
+
+    cel_alloc* allocator;
 } EntityMaagerGlobals;
 
 struct entity_resource {
@@ -466,28 +466,28 @@ namespace entity_resource_compiler {
 
     void write_to_build(ct_entity_compile_output *output,
                         const char *filename,
-                        ct_blob *build) {
+                        char** build) {
         struct entity_resource res = {};
         res.ent_count = (uint32_t) (output->ent_counter);
         res.comp_type_count = (uint32_t) array::size(output->component_type);
 
-        build->push(build->inst, &res, sizeof(struct entity_resource));
+
+        cel_array_push_n(*build, &res, sizeof(struct entity_resource), _G.allocator);
 
         //write guids
-        build->push(build->inst, &output->guid[0], sizeof(uint64_t) * res.ent_count);
+        cel_array_push_n(*build, &output->guid[0], sizeof(uint64_t) * res.ent_count, _G.allocator);
 
         //write parents
         for (uint32_t i = 0; i < res.ent_count; ++i) {
             uint32_t id = map::get(output->entity_parent, i, UINT32_MAX);
 
-            build->push(build->inst, &id, sizeof(id));
+            cel_array_push_n(*build, &id, sizeof(id), _G.allocator);
         }
 
         //write comp types
-        build->push(build->inst,
+        cel_array_push_n(*build,
                     (uint8_t *) array::begin(output->component_type),
-                    sizeof(uint64_t) *
-                    array::size(output->component_type));
+                    sizeof(uint64_t) * array::size(output->component_type), _G.allocator);
 
         //write comp data
         for (uint32_t j = 0; j < res.comp_type_count; ++j) {
@@ -504,28 +504,25 @@ namespace entity_resource_compiler {
             idx = map::get(output->component_body, cid, UINT32_MAX);
             Array<compkey> &body = output->component_key_array[idx];
 
-            ct_blob *blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
+            char* blob = NULL;
 
             for (uint32_t i = 0; i < cdata.ent_count; ++i) {
-                ct_component_a0.compile(id, filename, body[i].keys, body[i].count, blob);
+                ct_component_a0.compile(id, filename, body[i].keys, body[i].count, &blob);
             }
 
-            cdata.size = blob->size(blob->inst);
+            cdata.size = cel_array_size(blob);
 
-            build->push(build->inst, (uint8_t *) &cdata, sizeof(cdata));
-            build->push(build->inst, (uint8_t *) array::begin(ent_arr),
-                        sizeof(uint32_t) * cdata.ent_count);
+            cel_array_push_n(*build, (uint8_t *) &cdata, sizeof(cdata), _G.allocator);
+            cel_array_push_n(*build, (uint8_t *) array::begin(ent_arr), sizeof(uint32_t) * cdata.ent_count, _G.allocator);
+            cel_array_push_n(*build, blob, sizeof(uint8_t) * cel_array_size(blob), _G.allocator);
 
-            build->push(build->inst, blob->data(blob->inst),
-                        sizeof(uint8_t) * blob->size(blob->inst));
-
-            ct_blob_a0.destroy(blob, true);
+            cel_array_free(blob, _G.allocator);
         }
     }
 
     void _entity_resource_compiler(uint64_t root,
                                    const char *filename,
-                                   ct_blob *build,
+                                   char** build,
                                    ct_compilator_api *compilator_api) {
         ct_entity_compile_output *output = create_output();
         compile_entity(output, &root, 1, filename, compilator_api);
@@ -534,7 +531,7 @@ namespace entity_resource_compiler {
     }
 
     void resource_compiler(const char *filename,
-                          struct ct_blob *output,
+                          char**output,
                           ct_compilator_api *compilator_api) {
         _entity_resource_compiler(0, filename, output, compilator_api);
     }
@@ -680,10 +677,11 @@ namespace entity_module {
     static void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        _G = {};
-
-        _G.type = CT_ID64_0("entity");
-        _G.level_type = CT_ID64_0("level");
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+                .type = CT_ID64_0("entity"),
+                .level_type = CT_ID64_0("level"),
+        };
 
         _G.spawned_map.init(ct_memory_a0.main_allocator());
         _G.spawned_array.init(ct_memory_a0.main_allocator());
@@ -722,7 +720,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
         },

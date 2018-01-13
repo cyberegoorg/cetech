@@ -61,7 +61,7 @@ struct viewport_instance {
 };
 
 typedef int (*ct_viewport_pass_compiler)(struct ct_yamlng_node body,
-                                         struct ct_blob *data);
+                                         char**data);
 
 typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,
                                      ct_viewport viewport_id,

@@ -17,8 +17,8 @@
 #include <cetech/config/config.h>
 #include <cetech/yaml/ydb.h>
 #include <cetech/coredb/coredb.h>
+#include <celib/array.h>
 #include "cetech/os/memory.h"
-#include "celib/blob.h"
 
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
@@ -117,7 +117,7 @@ namespace shader_compiler {
 #endif
 
     static void compiler(const char *filename,
-                        struct ct_blob *output,
+                        char**output,
                         struct ct_compilator_api *compilator_api) {
         auto a = ct_memory_a0.main_allocator();
 
@@ -210,9 +210,9 @@ namespace shader_compiler {
 
         tmp_file->close(tmp_file);
 
-        output->push(output->inst, &resource, sizeof(resource));
-        output->push(output->inst, vs_data, sizeof(char) * resource.vs_size);
-        output->push(output->inst, fs_data, sizeof(char) * resource.fs_size);
+        cel_array_push_n(*output, &resource, sizeof(resource), a);
+        cel_array_push_n(*output, vs_data, sizeof(char) * resource.vs_size, a);
+        cel_array_push_n(*output, fs_data, sizeof(char) * resource.fs_size, a);
 
         CEL_FREE(a, vs_data);
         CEL_FREE(a, fs_data);

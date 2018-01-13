@@ -11,7 +11,7 @@
 #include <cetech/os/vio.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/yaml/ydb.h>
-#include <celib/blob.h>
+#include <celib/array.h>
 
 #include "celib/allocator.h"
 #include "celib/array.inl"
@@ -38,8 +38,9 @@ struct package_task_data {
 };
 
 #define _G PackageGlobals
-struct G {
+struct _G {
     uint64_t package_typel;
+    cel_alloc* allocator;
 } _G = {};
 
 //==============================================================================
@@ -54,12 +55,11 @@ struct package_compile_data {
 };
 
 void _package_compiler(const char *filename,
-                      struct ct_blob *output,
+                      char** output,
                       ct_compilator_api *compilator_api) {
     CEL_UNUSED(compilator_api);
 
     struct package_compile_data compile_data = {};
-
     compile_data.types.init(ct_memory_a0.main_allocator());
     compile_data.name.init(ct_memory_a0.main_allocator());
     compile_data.offset.init(ct_memory_a0.main_allocator());
@@ -110,16 +110,11 @@ void _package_compiler(const char *filename,
                              (array::size(compile_data.name) *
                               sizeof(uint64_t));
 
-
-    output->push(output->inst, &resource, sizeof(resource));
-    output->push(output->inst, array::begin(compile_data.types),
-                 sizeof(uint64_t) * array::size(compile_data.types));
-    output->push(output->inst, array::begin(compile_data.name_count),
-                 sizeof(uint32_t) * array::size(compile_data.name_count));
-    output->push(output->inst, array::begin(compile_data.name),
-                 sizeof(uint64_t) * array::size(compile_data.name));
-    output->push(output->inst, array::begin(compile_data.offset),
-                 sizeof(uint32_t) * array::size(compile_data.offset));
+    cel_array_push_n(*output, &resource, sizeof(resource), _G.allocator );
+    cel_array_push_n(*output, array::begin(compile_data.types), sizeof(uint64_t) * array::size(compile_data.types), _G.allocator );
+    cel_array_push_n(*output, array::begin(compile_data.name_count), sizeof(uint32_t) * array::size(compile_data.name_count), _G.allocator );
+    cel_array_push_n(*output, array::begin(compile_data.name),  sizeof(uint64_t) * array::size(compile_data.name), _G.allocator );
+    cel_array_push_n(*output, array::begin(compile_data.offset), sizeof(uint32_t) * array::size(compile_data.offset), _G.allocator );
 }
 
 int package_init(ct_api_a0 *api) {
@@ -132,12 +127,12 @@ int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_yng_a0);
 
-    _G = (struct G) {};
-
-    _G.package_typel = CT_ID64_0("package");
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+            .package_typel = CT_ID64_0("package"),
+    };
 
     ct_resource_a0.compiler_register(_G.package_typel, _package_compiler, true);
-
 
     return 1;
 }

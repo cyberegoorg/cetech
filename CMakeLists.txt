@@ -97,7 +97,6 @@ set(SOURCE_FILES
         src/cetech/resource/private/resource_package.cpp
         src/cetech/resource/private/resource_compiler.cpp
         src/cetech/filesystem/private/filesystem.cpp
-        src/celib/private/blob.cpp
         src/cetech/yaml/private/yamlng.cpp
         src/cetech/yaml/private/ydb.cpp
         src/cetech/coredb/private/coredb.cpp

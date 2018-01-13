@@ -30,8 +30,6 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/machine/machine.h>
 #include <cetech/renderer/mesh_renderer.h>
-#include <celib/blob.h>
-
 
 #include "bgfx/platform.h"
 
@@ -52,7 +50,6 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_renderer_a0);
-CETECH_DECL_API(ct_blob_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_coredb_a0);
@@ -77,7 +74,7 @@ typedef struct {
 } viewport_entry_t;
 
 
-#define _G RendererGlobals
+#define _G ViewportsGlobals
 static struct G {
     Map<bgfx::TextureHandle> global_resource;
     Map<ct_viewport_on_pass_t> on_pass;
@@ -93,6 +90,7 @@ static struct G {
     uint32_t size_height;
     int need_reset;
     ct_coredb_object_t *config;
+    cel_alloc* allocator;
 } _G = {};
 
 #define CONFIG_RENDER_CONFIG CT_ID64_0("default")
@@ -401,7 +399,7 @@ struct compiler_output {
     Array<render_resource_t> local_resource;
     Array<layer_entry_t> layers_entry;
     Array<viewport_entry_t> viewport;
-    ct_blob *blob;
+    char* blob;
 };
 
 void compile_global_resource(uint32_t idx,
@@ -497,13 +495,10 @@ void compile_layer_entry(uint32_t idx,
     auto compiler = map::get<ct_viewport_pass_compiler>(_G.compiler_map,
                                                         le.type, NULL);
 
-    auto blob = output.blob;
-
-    array::push_back(output.entry_data_offset,
-                     static_cast<const uint32_t &>(blob->size(blob->inst)));
+    array::push_back(output.entry_data_offset, cel_array_size(output.blob));
 
     if (compiler) {
-        compiler(value, output.blob);
+        compiler(value, &output.blob);
     }
 
     array::push_back(output.layers_entry, le);
@@ -533,13 +528,15 @@ void compile_layers(struct ct_yamlng_node key,
 
 namespace renderconfig_compiler {
     void compiler(const char *filename,
-                 struct ct_blob *output_blob,
+                 char**output_blob,
                  struct ct_compilator_api *compilator_api) {
 
         CEL_UNUSED(filename);
         CEL_UNUSED(compilator_api);
 
-        struct compiler_output output = {};
+        struct compiler_output output = {
+        };
+
         output.global_resource.init(ct_memory_a0.main_allocator());
         output.layer_names.init(ct_memory_a0.main_allocator());
         output.layers_entry_count.init(ct_memory_a0.main_allocator());
@@ -552,8 +549,6 @@ namespace renderconfig_compiler {
         output.layers_localresource_offset.init(
                 ct_memory_a0.main_allocator());
         output.entry_data_offset.init(ct_memory_a0.main_allocator());
-
-        output.blob = ct_blob_a0.create(ct_memory_a0.main_allocator());
 
 
         ct_yng_doc* doc = ct_ydb_a0.get(filename);
@@ -709,59 +704,57 @@ namespace renderconfig_compiler {
         };
 
 
-        output_blob->push(output_blob->inst,&resource, sizeof(resource));
-
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,&resource, sizeof(resource), _G.allocator);
+        cel_array_push_n(*output_blob,
                          array::begin(output.global_resource),
                          sizeof(render_resource_t)*
-                         array::size(output.global_resource));
+                         array::size(output.global_resource), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.local_resource),
                          sizeof(render_resource_t)*
-                         array::size(output.local_resource));
+                         array::size(output.local_resource), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.layer_names),
                          sizeof(uint64_t)*
-                         array::size(output.layer_names));
+                         array::size(output.layer_names), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.layers_entry_count),
                          sizeof(uint32_t)*
-                         array::size(output.layers_entry_count));
+                         array::size(output.layers_entry_count), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.layers_entry_offset),
                          sizeof(uint32_t)*
-                         array::size(output.layers_entry_offset));
+                         array::size(output.layers_entry_offset), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.layers_localresource_count),
                          sizeof(uint32_t)*
-                         array::size(output.layers_localresource_count));
+                         array::size(output.layers_localresource_count), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.layers_localresource_offset),
                          sizeof(uint32_t)*
-                         array::size(output.layers_localresource_offset));
+                         array::size(output.layers_localresource_offset), _G.allocator);
 
-        output_blob->push(output_blob->inst,
+        cel_array_push_n(*output_blob,
                          array::begin(output.entry_data_offset),
                          sizeof(uint32_t)*
-                         array::size(output.entry_data_offset));
+                         array::size(output.entry_data_offset), _G.allocator);
 
-        output_blob->push(output_blob->inst,array::begin(output.layers_entry),
+        cel_array_push_n(*output_blob, array::begin(output.layers_entry),
                          sizeof(layer_entry_t)*
-                         array::size(output.layers_entry));
+                         array::size(output.layers_entry), _G.allocator);
 
-        output_blob->push(output_blob->inst,array::begin(output.viewport),
+        cel_array_push_n(*output_blob,array::begin(output.viewport),
                          sizeof(viewport_entry_t)*
-                         array::size(output.viewport));
+                         array::size(output.viewport), _G.allocator);
 
-        auto *blob = output.blob;
-        output_blob->push(output_blob->inst,blob->data(blob->inst),
-                         sizeof(uint8_t) * blob->size(blob->inst));
+        cel_array_push_n(*output_blob, output.blob,
+                         sizeof(uint8_t) * cel_array_size(output.blob), _G.allocator);
 
         output.global_resource.destroy();
         output.layer_names.destroy();
@@ -773,7 +766,8 @@ namespace renderconfig_compiler {
         output.local_resource.destroy();
         output.layers_localresource_count.destroy();
         output.layers_localresource_offset.destroy();
-        ct_blob_a0.destroy(output.blob, true);
+
+        cel_array_free(output.blob, _G.allocator);
     }
 
     int init(struct ct_api_a0 *api) {
@@ -851,8 +845,12 @@ namespace viewport_module {
 
         ct_api_a0 = *api;
 
-        _G = (struct G) {};
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+                .type = CT_ID64_0("render_config"),
+        };
 
+        _G.allocator = ct_memory_a0.main_allocator();
         _G.config = ct_config_a0.config_object();
 
         ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
@@ -869,7 +867,6 @@ namespace viewport_module {
         _G.viewport_handler.init(ct_memory_a0.main_allocator());
         _G.compiler_map.init(ct_memory_a0.main_allocator());
 
-        _G.type = CT_ID64_0("render_config");
         ct_resource_a0.register_type(_G.type,
                                      renderconfig_resource::callback);
 
@@ -913,7 +910,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_window_a0);
-            CETECH_GET_API(api, ct_blob_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_coredb_a0);

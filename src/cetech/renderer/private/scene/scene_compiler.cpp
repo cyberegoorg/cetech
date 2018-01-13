@@ -7,6 +7,7 @@
 #include <include/assimp/cimport.h>
 #include <cetech/macros.h>
 #include <cetech/yaml/ydb.h>
+#include <celib/array.h>
 
 #include "celib/allocator.h"
 #include "celib/map.inl"
@@ -14,7 +15,6 @@
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/os/memory.h"
 #include "cetech/api/api_system.h"
-#include "celib/blob.h"
 #include "cetech/machine/machine.h"
 
 
@@ -616,10 +616,11 @@ namespace scene_resource_compiler {
     }
 
     void compiler(const char *filename,
-                 struct ct_blob *output_blob,
+                 char**output_blob,
                  struct ct_compilator_api *compilator_api) {
 
         struct compile_output *output = _crete_compile_output();
+        struct cel_alloc *a = ct_memory_a0.main_allocator();
 
         ct_yng_doc* document = ct_ydb_a0.get(filename);
 
@@ -644,51 +645,51 @@ namespace scene_resource_compiler {
                 .vb_len = (uint32_t) array::size(output->vb),
         };
 
-        output_blob->push(output_blob->inst, &res, sizeof(res));
-        output_blob->push(output_blob->inst, array::begin(output->geom_name),
+        cel_array_push_n(*output_blob, &res, sizeof(res), a);
+        cel_array_push_n(*output_blob, array::begin(output->geom_name),
                          sizeof(uint64_t) *
-                         array::size(output->geom_name));
-        output_blob->push(output_blob->inst, array::begin(output->ib_offset),
+                         array::size(output->geom_name), a);
+        cel_array_push_n(*output_blob, array::begin(output->ib_offset),
                          sizeof(uint32_t) *
-                         array::size(output->ib_offset));
-        output_blob->push(output_blob->inst, array::begin(output->vb_offset),
+                         array::size(output->ib_offset), a);
+        cel_array_push_n(*output_blob, array::begin(output->vb_offset),
                          sizeof(uint32_t) *
-                         array::size(output->vb_offset));
-        output_blob->push(output_blob->inst, array::begin(output->vb_decl),
+                         array::size(output->vb_offset), a);
+        cel_array_push_n(*output_blob, array::begin(output->vb_decl),
                          sizeof(bgfx::VertexDecl) *
-                         array::size(output->vb_decl));
-        output_blob->push(output_blob->inst, array::begin(output->ib_size),
+                         array::size(output->vb_decl), a);
+        cel_array_push_n(*output_blob, array::begin(output->ib_size),
                          sizeof(uint32_t)*
-                         array::size(output->ib_size));
-        output_blob->push(output_blob->inst, array::begin(output->vb_size),
+                         array::size(output->ib_size), a);
+        cel_array_push_n(*output_blob, array::begin(output->vb_size),
                          sizeof(uint32_t)*
-                         array::size(output->vb_size));
-        output_blob->push(output_blob->inst, array::begin(output->ib),
+                         array::size(output->vb_size), a);
+        cel_array_push_n(*output_blob, array::begin(output->ib),
                          sizeof(uint32_t)*
-                         array::size(output->ib));
-        output_blob->push(output_blob->inst, array::begin(output->vb),
+                         array::size(output->ib), a);
+        cel_array_push_n(*output_blob, array::begin(output->vb),
                          sizeof(uint8_t)*
-                         array::size(output->vb));
-        output_blob->push(output_blob->inst, array::begin(output->node_name),
+                         array::size(output->vb), a);
+        cel_array_push_n(*output_blob, array::begin(output->node_name),
                          sizeof(uint64_t)*
-                         array::size(output->node_name));
-        output_blob->push(output_blob->inst, array::begin(output->node_parent),
+                         array::size(output->node_name), a);
+        cel_array_push_n(*output_blob, array::begin(output->node_parent),
                          sizeof(uint32_t)*
-                         array::size(output->node_parent));
-        output_blob->push(output_blob->inst, array::begin(output->node_pose),
+                         array::size(output->node_parent), a);
+        cel_array_push_n(*output_blob, array::begin(output->node_pose),
                          sizeof(float)*
-                         array::size(output->node_pose));
-        output_blob->push(output_blob->inst, array::begin(output->geom_node),
+                         array::size(output->node_pose), a);
+        cel_array_push_n(*output_blob, array::begin(output->geom_node),
                          sizeof(uint64_t)*
-                         array::size(output->geom_name));
+                         array::size(output->geom_name), a);
 
-        output_blob->push(output_blob->inst, array::begin(output->geom_str),
+        cel_array_push_n(*output_blob, array::begin(output->geom_str),
                           sizeof(char[128])*
-                          array::size(output->geom_str));
+                          array::size(output->geom_str), a);
 
-        output_blob->push(output_blob->inst, array::begin(output->node_str),
+        cel_array_push_n(*output_blob, array::begin(output->node_str),
                           sizeof(char[128])*
-                          array::size(output->node_str));
+                          array::size(output->node_str), a);
 
         _destroy_compile_output(output);
     }
