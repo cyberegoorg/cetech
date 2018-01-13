@@ -4,6 +4,7 @@
 #include <cetech/playground/asset_property.h>
 #include <cetech/resource/resource.h>
 #include <cetech/playground/command_system.h>
+#include <celib/array.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
@@ -21,9 +22,10 @@ using namespace celib;
 #define _G asset_property_global
 static struct _G {
     Map<ct_cmd_fce> cmd_map;
-    Array<uint8_t> cmd_buffer;
-    Array<uint32_t > cmd;
+    uint8_t* cmd_buffer;
+    uint32_t* cmd;
     uint32_t curent_pos;
+    cel_alloc* allocator;
 } _G;
 
 
@@ -44,22 +46,22 @@ void execute(const struct ct_cmd *cmd) {
         return;
     }
 
-    uint32_t buffer_offset = array::size(_G.cmd_buffer);
-    uint32_t size = array::size(_G.cmd);
+    uint32_t buffer_offset = cel_array_size(_G.cmd_buffer);
+    uint32_t size = cel_array_size(_G.cmd);
 
     if(_G.curent_pos != (size-1)) {
         ct_cmd* cur_cmd = get_curent_cmd();
         if(cur_cmd) {
-            uint32_t offset = _G.cmd[_G.curent_pos];
-            uint32_t end_offset = offset + cur_cmd->size;
+//            uint32_t offset = _G.cmd[_G.curent_pos];
+//            uint32_t end_offset = offset + cur_cmd->size;
 
-            array::resize(_G.cmd, _G.curent_pos + 1);
-            array::resize(_G.cmd_buffer, end_offset);
+//            array::resize(_G.cmd, _G.curent_pos + 1);
+//            array::resize(_G.cmd_buffer, end_offset);
         }
     }
 
-    array::push<uint8_t>(_G.cmd_buffer, (uint8_t*)cmd, cmd->size);
-    array::push_back<uint32_t >(_G.cmd, buffer_offset);
+    cel_array_push_n(_G.cmd_buffer, (uint8_t*)cmd, cmd->size, _G.allocator);
+    cel_array_push(_G.cmd, buffer_offset, _G.allocator);
 
     _G.curent_pos += 1;
 
@@ -90,7 +92,7 @@ void undo() {
 
 
 static ct_cmd* get_next_cmd() {
-    uint32_t cmd_size = array::size(_G.cmd);
+    uint32_t cmd_size = cel_array_size(_G.cmd);
 
     if (!cmd_size) {
         return NULL;
@@ -172,7 +174,7 @@ void command_text(char* buffer, uint32_t buffer_size, uint32_t idx) {
 }
 
 uint32_t command_count() {
-    return array::size(_G.cmd) - 1;
+    return cel_array_size(_G.cmd) - 1;
 }
 
 void goto_idx(uint32_t idx) {
@@ -214,22 +216,22 @@ static struct ct_cmd_system_a0 cmd_system_a0 = {
 
 static void _init(ct_api_a0 *api) {
     _G = {
-            .curent_pos = 0
+            .curent_pos = 0,
+            .allocator = ct_memory_a0.main_allocator(),
     };
 
     api->register_api("ct_cmd_system_a0", &cmd_system_a0);
 
     _G.cmd_map.init(ct_memory_a0.main_allocator());
-    _G.cmd_buffer.init(ct_memory_a0.main_allocator());
-    _G.cmd.init(ct_memory_a0.main_allocator());
 
-    array::push_back<uint32_t >(_G.cmd, 0);
+    cel_array_push(_G.cmd, 0, _G.allocator);
 }
 
 static void _shutdown() {
     _G.cmd_map.destroy();
-    _G.cmd_buffer.destroy();
-    _G.cmd.destroy();
+
+    cel_array_free(_G.cmd_buffer, _G.allocator);
+    cel_array_free(_G.cmd, _G.allocator);
 
     _G = {};
 }

@@ -45,18 +45,18 @@ struct entity_instance {
     uint64_t name;
 };
 
-static struct EntityMaagerGlobals {
+static struct _G {
     Handler<uint32_t> entity_handler;
 
     Map<uint32_t> resource_map;
     Map<uint32_t> spawned_map;
-    Array<entity_instance> spawned_array;
+    entity_instance* spawned_array;
 
     uint64_t type;
     uint64_t level_type;
 
     cel_alloc* allocator;
-} EntityMaagerGlobals;
+} _G;
 
 struct entity_resource {
     uint32_t ent_count;
@@ -131,8 +131,8 @@ void destroy(ct_world world,
 }
 
 entity_instance * _new_entity(uint64_t name, ct_entity root) {
-    uint32_t idx = array::size(_G.spawned_array);
-    array::push_back(_G.spawned_array, {});
+    uint32_t idx = cel_array_size(_G.spawned_array);
+    cel_array_push(_G.spawned_array, {}, _G.allocator);
 
     entity_instance *instance = &_G.spawned_array[idx];
     instance->name = name;
@@ -238,12 +238,12 @@ struct compkey {
 //==============================================================================
 struct ct_entity_compile_output {
     Map<uint32_t> component_ent;
-    Array<Array<uint32_t>> component_ent_array;
+    uint32_t** component_ent_array;
     Map<uint32_t> entity_parent;
     Map<uint32_t> component_body;
-    Array<Array<compkey>> component_key_array;
-    Array<uint64_t> component_type;
-    Array<uint64_t> guid;
+    compkey** component_key_array;
+    uint64_t* component_type;
+    uint64_t* guid;
     uint32_t ent_counter;
 };
 
@@ -290,7 +290,7 @@ namespace entity_resource_compiler {
         }
 
         cid = CT_ID64_0(component_type);
-        for (uint32_t i = 0; i < array::size(output->component_type); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(output->component_type); ++i) {
             if (output->component_type[i] != cid) {
                 continue;
             }
@@ -299,39 +299,35 @@ namespace entity_resource_compiler {
         }
 
         if (!contain_cid) {
-            array::push_back(output->component_type, cid);
+            cel_array_push(output->component_type, cid, _G.allocator);
 
-            uint32_t idx = array::size(output->component_ent_array);
+            uint32_t idx = cel_array_size(output->component_ent_array);
             //Array<uint32_t> tmp_a(ct_memory_a0.main_allocator());
-            array::push_back(output->component_ent_array, {});
-            output->component_ent_array[idx].init(
-                    ct_memory_a0.main_allocator());
+            cel_array_push(output->component_ent_array, {}, _G.allocator);
+            output->component_ent_array[idx] = NULL;
 
             map::set(output->component_ent, cid, idx);
         }
 
         if (!map::has(output->component_body, cid)) {
-            uint32_t idx = array::size(output->component_key_array);
+            uint32_t idx = cel_array_size(output->component_key_array);
             //Array<yaml_node_t> tmp_a(ct_memory_a0.main_allocator());
-            array::push_back(output->component_key_array, {});
-            output->component_key_array[idx].init(
-                    ct_memory_a0.main_allocator());
+            cel_array_push(output->component_key_array, {}, _G.allocator);
+            output->component_key_array[idx] = NULL;
 
             map::set(output->component_body, cid, idx);
         }
 
         uint32_t idx = map::get(output->component_ent, cid, UINT32_MAX);
-        Array<uint32_t> &tmp_a = output->component_ent_array[idx];
-        array::push_back(tmp_a, data->ent_id);
+        cel_array_push(output->component_ent_array[idx], data->ent_id, _G.allocator);
 
         idx = map::get(output->component_body, cid, UINT32_MAX);
-        Array<compkey> &tmp_b = output->component_key_array[idx];
 
         compkey ck;
         memcpy(ck.keys, tmp_keys, sizeof(uint64_t) * (root_count + 1));
         ck.count =root_count + 1;
 
-        array::push_back(tmp_b, ck);
+        cel_array_push(output->component_key_array[idx], ck, _G.allocator);
     }
 
     void compile_entitity(const char *filename,
@@ -346,7 +342,7 @@ namespace entity_resource_compiler {
         map::set(output->entity_parent, ent_id, (uint32_t) parent);
 
         uint64_t guid = root_key[root_count-1];
-        array::push_back(output->guid, guid);
+        cel_array_push(output->guid, guid, _G.allocator);
 
         uint64_t tmp_keys[root_count + 2];
         memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
@@ -403,47 +399,42 @@ namespace entity_resource_compiler {
         ct_entity_compile_output *output = CEL_ALLOCATE(a,
                                                         ct_entity_compile_output,
                                                         sizeof(ct_entity_compile_output));
+        *output = {0};
 
-        output->ent_counter = 0;
-
-        output->component_type.init(a);
-        output->guid.init(a);
         output->component_ent.init(a);
-        output->component_ent_array.init(a);
         output->entity_parent.init(a);
         output->component_body.init(a);
-        output->component_key_array.init(a);
 
         return output;
     }
 
     void destroy_output(ct_entity_compile_output *output) {
-        output->component_type.destroy();
+        cel_array_free(output->component_type, _G.allocator);
+        cel_array_free(output->guid, _G.allocator);
         output->entity_parent.destroy();
-        output->guid.destroy();
 
         // clean inner array
-        auto ct_it = array::begin(output->component_ent_array);
-        auto ct_end = array::end(output->component_ent_array);
+        auto ct_it = output->component_ent_array;
+        auto ct_end =output->component_ent_array;
         while (ct_it != ct_end) {
-            ct_it->destroy();
+            cel_array_free(*ct_it, _G.allocator);
             ++ct_it;
         }
 
         output->component_ent.destroy();
-        output->component_ent_array.destroy();
+        cel_array_free(output->component_ent_array, _G.allocator);
 
         // clean inner array
-        auto cb_it = array::begin(output->component_key_array);
-        auto cb_end = array::end(output->component_key_array);
+        auto cb_it = output->component_key_array;
+        auto cb_end = output->component_key_array;
 
         while (cb_it != cb_end) {
-            cb_it->destroy();
+            cel_array_free(*cb_it, _G.allocator);
             ++cb_it;
         }
 
         output->component_body.destroy();
-        output->component_key_array.destroy();
+        cel_array_free(output->component_key_array, _G.allocator);
 
         cel_alloc *a = ct_memory_a0.main_allocator();
         CEL_FREE(a, output);
@@ -469,7 +460,7 @@ namespace entity_resource_compiler {
                         char** build) {
         struct entity_resource res = {};
         res.ent_count = (uint32_t) (output->ent_counter);
-        res.comp_type_count = (uint32_t) array::size(output->component_type);
+        res.comp_type_count = (uint32_t) cel_array_size(output->component_type);
 
 
         cel_array_push_n(*build, &res, sizeof(struct entity_resource), _G.allocator);
@@ -486,8 +477,8 @@ namespace entity_resource_compiler {
 
         //write comp types
         cel_array_push_n(*build,
-                    (uint8_t *) array::begin(output->component_type),
-                    sizeof(uint64_t) * array::size(output->component_type), _G.allocator);
+                    (uint8_t *) output->component_type,
+                    sizeof(uint64_t) * cel_array_size(output->component_type), _G.allocator);
 
         //write comp data
         for (uint32_t j = 0; j < res.comp_type_count; ++j) {
@@ -495,14 +486,14 @@ namespace entity_resource_compiler {
             uint64_t id = cid;
 
             uint32_t idx = map::get(output->component_ent, cid, UINT32_MAX);
-            Array<uint32_t> &ent_arr = output->component_ent_array[idx];
+            uint32_t* ent_arr = output->component_ent_array[idx];
 
             struct component_data cdata = {
-                    .ent_count = (uint32_t) array::size(ent_arr)
+                    .ent_count = (uint32_t) cel_array_size(ent_arr)
             };
 
             idx = map::get(output->component_body, cid, UINT32_MAX);
-            Array<compkey> &body = output->component_key_array[idx];
+            compkey* body = output->component_key_array[idx];
 
             char* blob = NULL;
 
@@ -513,7 +504,7 @@ namespace entity_resource_compiler {
             cdata.size = cel_array_size(blob);
 
             cel_array_push_n(*build, (uint8_t *) &cdata, sizeof(cdata), _G.allocator);
-            cel_array_push_n(*build, (uint8_t *) array::begin(ent_arr), sizeof(uint32_t) * cdata.ent_count, _G.allocator);
+            cel_array_push_n(*build, (uint8_t *) ent_arr, sizeof(uint32_t) * cdata.ent_count, _G.allocator);
             cel_array_push_n(*build, blob, sizeof(uint8_t) * cel_array_size(blob), _G.allocator);
 
             cel_array_free(blob, _G.allocator);
@@ -684,7 +675,6 @@ namespace entity_module {
         };
 
         _G.spawned_map.init(ct_memory_a0.main_allocator());
-        _G.spawned_array.init(ct_memory_a0.main_allocator());
 
         ct_resource_a0.register_type(_G.type, entity_resorce::callback);
         ct_resource_a0.register_type(_G.level_type, entity_resorce::callback);
@@ -697,15 +687,15 @@ namespace entity_module {
 
         _G.entity_handler.init(ct_memory_a0.main_allocator());
         _G.spawned_map.init(ct_memory_a0.main_allocator());
-        _G.spawned_array.init(ct_memory_a0.main_allocator());
         _G.resource_map.init(ct_memory_a0.main_allocator());
     }
 
     static void _shutdown() {
         _G.resource_map.destroy();
         _G.spawned_map.destroy();
-        _G.spawned_array.destroy();
         _G.entity_handler.destroy();
+
+        cel_array_free(_G.spawned_array, _G.allocator);
     }
 
 }

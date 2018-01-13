@@ -8,6 +8,7 @@
 
 #include <cetech/playground/action_manager.h>
 #include <cetech/input/input.h>
+#include <celib/array.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -37,9 +38,11 @@ struct shortcut {
 static struct _G {
     Map<uint32_t> action_map;
     modifiactor mod;
-    Array<shortcut> shorcut;
-    Array<action_fce_t> action_fce;
-    Array<bool> action_active;
+
+    shortcut* shorcut;
+    action_fce_t* action_fce;
+    bool* action_active;
+    cel_alloc* allocator;
 } _G;
 
 static void fill_button(shortcut *sc) {
@@ -74,15 +77,15 @@ static void fill_button(shortcut *sc) {
 static void register_action(uint64_t name,
                             const char *shortcut_str,
                             action_fce_t fce) {
-    uint32_t idx = array::size(_G.shorcut);
+    uint32_t idx = cel_array_size(_G.shorcut);
     shortcut sc = {};
 
     strncpy(sc.str, shortcut_str, 64);
     fill_button(&sc);
 
-    array::push(_G.shorcut, &sc, 1);
-    array::push_back(_G.action_active, false);
-    array::push_back(_G.action_fce, fce);
+    cel_array_push_n(_G.shorcut, &sc, 1, _G.allocator);
+    cel_array_push(_G.action_active, false, _G.allocator);
+    cel_array_push(_G.action_fce, fce, _G.allocator);
     map::set(_G.action_map, name, idx);
 }
 
@@ -125,7 +128,7 @@ static void check() {
         _G.mod.flags.alt = 1;
     }
 
-    const int size = array::size(_G.shorcut);
+    const int size = cel_array_size(_G.shorcut);
     for (int i = 0; i < size; ++i) {
         shortcut *sc = &_G.shorcut[i];
 
@@ -168,21 +171,21 @@ static ct_action_manager_a0 action_manager_api = {
 
 static void _init(ct_api_a0 *api) {
     _G = {
+        .allocator = ct_memory_a0.main_allocator()
     };
 
     _G.action_map.init(ct_memory_a0.main_allocator());
-    _G.shorcut.init(ct_memory_a0.main_allocator());
-    _G.action_fce.init(ct_memory_a0.main_allocator());
-    _G.action_active.init(ct_memory_a0.main_allocator());
+
 
     api->register_api("ct_action_manager_a0", &action_manager_api);
 }
 
 static void _shutdown() {
     _G.action_map.destroy();
-    _G.shorcut.destroy();
-    _G.action_fce.destroy();
-    _G.action_active.destroy();
+
+    cel_array_free(_G.shorcut, _G.allocator);
+    cel_array_free(_G.action_fce, _G.allocator);
+    cel_array_free(_G.action_active, _G.allocator);
 
     _G = {};
 }

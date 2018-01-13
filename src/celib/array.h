@@ -28,6 +28,7 @@
 #define cel_array_full_n(a, n) \
      ((a) ? (cel_array_size(a) + (n)) >= cel_array_capacity(a) : 1)
 
+
 #define cel_array_push(a, item, alloc) \
     cel_array_full(a) ? (a) = (__typeof(a))cel_array_grow(a, 1, sizeof(*a), alloc) : 0, \
     (a)[cel_array_header(a)->size++] = item

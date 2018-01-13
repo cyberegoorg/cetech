@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cetech/os/watchdog.h>
 #include <celib/eventstream.inl>
+#include <celib/array.h>
 #include "celib/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -42,14 +43,15 @@ struct fs_mount_point {
 };
 
 struct fs_root {
-    Array<fs_mount_point> mount_points;
+    fs_mount_point* mount_points;
     celib::EventStream event_stream;
 };
 
-static struct FilesystemGlobals {
+static struct _G {
     Map<uint32_t> root_map;
-    Array<fs_root> roots;
-} FilesystemGlobals;
+    fs_root* roots;
+    cel_alloc* allocator;
+} _G;
 
 //==============================================================================
 // Interface
@@ -58,13 +60,12 @@ static struct FilesystemGlobals {
 uint32_t new_fs_root(uint64_t root) {
     cel_alloc *a = ct_memory_a0.main_allocator();
 
-    uint32_t new_idx = array::size(_G.roots);
+    uint32_t new_idx = cel_array_size(_G.roots);
 
-    array::push_back(_G.roots, {});
+    cel_array_push(_G.roots, {}, _G.allocator);
 
     fs_root *root_inst = &_G.roots[new_idx];
     root_inst->event_stream.init(a);
-    root_inst->mount_points.init(a);
 
     map::set(_G.root_map, root, new_idx);
 
@@ -100,8 +101,8 @@ uint32_t new_fs_mount(uint64_t root, fs_mount_point mp) {
 
     auto& mount_points = fs_inst->mount_points;
 
-    uint32_t new_idx = array::size(mount_points);
-    array::push_back(mount_points, mp);
+    uint32_t new_idx = cel_array_size(mount_points);
+    cel_array_push(mount_points, mp, _G.allocator);
     return new_idx;
 }
 
@@ -147,7 +148,7 @@ namespace filesystem {
                         bool test_dir) {
 
         fs_root* fs_inst= get_fs_root(root);
-        const uint32_t mp_count = array::size(fs_inst->mount_points);
+        const uint32_t mp_count = cel_array_size(fs_inst->mount_points);
 
         for (uint32_t i = 0; i < mp_count; ++i) {
             fs_mount_point *mp = &fs_inst->mount_points[i];
@@ -212,10 +213,10 @@ namespace filesystem {
 
         auto a = ct_memory_a0.main_allocator();
 
-        Array<char *> all_files(a);
+        char ** all_files = NULL;
 
         fs_root* fs_inst= get_fs_root(root);
-        const uint32_t mp_count = array::size(fs_inst->mount_points);
+        const uint32_t mp_count = cel_array_size(fs_inst->mount_points);
 
         for (uint32_t i = 0; i < mp_count; ++i) {
             fs_mount_point* mp = &fs_inst->mount_points[i];
@@ -230,8 +231,8 @@ namespace filesystem {
                             &_count, allocator);
 
             for (uint32_t i = 0; i < _count; ++i) {
-                array::push_back(all_files,
-                                 strdup(_files[i] + mount_point_dir_len + 1));
+                cel_array_push(all_files,
+                                 strdup(_files[i] + mount_point_dir_len + 1), _G.allocator);
             }
 
             ct_path_a0.list_free(_files, _count, allocator);
@@ -239,14 +240,16 @@ namespace filesystem {
         }
 
         char **result_files = CEL_ALLOCATE(a, char*, sizeof(char *) *
-                                                     array::size(all_files));
+                                                     cel_array_size(all_files));
 
-        for (uint32_t i = 0; i < array::size(all_files); ++i) {
+        for (uint32_t i = 0; i < cel_array_size(all_files); ++i) {
             result_files[i] = all_files[i];
         }
 
         *files = result_files;
-        *count = array::size(all_files);
+        *count = cel_array_size(all_files);
+
+
     }
 
     void listdir_free(char **files,
@@ -313,11 +316,11 @@ namespace filesystem {
 
     void check_wd() {
         cel_alloc *alloc = ct_memory_a0.main_allocator();
-        const uint32_t root_count = array::size(_G.roots);
+        const uint32_t root_count = cel_array_size(_G.roots);
 
         for (uint32_t i = 0; i < root_count; ++i) {
             fs_root *fs_inst = &_G.roots[i];
-            const uint32_t mp_count = array::size(fs_inst->mount_points);
+            const uint32_t mp_count = cel_array_size(fs_inst->mount_points);
 
             clean_events(fs_inst);
 
@@ -416,10 +419,11 @@ namespace filesystem_module {
     void _init(ct_api_a0 *api) {
         _init_api(api);
 
-        _G = {};
+        _G = {
+                .allocator = ct_memory_a0.main_allocator(),
+        };
 
         _G.root_map.init(ct_memory_a0.main_allocator());
-        _G.roots.init(ct_memory_a0.main_allocator());
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
@@ -428,7 +432,7 @@ namespace filesystem_module {
         ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _G.root_map.destroy();
-        _G.roots.destroy();
+        cel_array_free(_G.roots, _G.allocator);
     }
 
 }

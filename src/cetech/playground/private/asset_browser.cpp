@@ -7,6 +7,7 @@
 #include <cetech/os/path.h>
 #include <cetech/resource/resource.h>
 #include <cetech/playground/playground.h>
+#include <celib/array.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
@@ -53,16 +54,18 @@ static struct asset_browser_global {
     char **dir_list;
     uint32_t dir_list_count;
 
-    Array<ct_ab_on_asset_click> on_asset_click;
-    Array<ct_ab_on_asset_double_click> on_asset_double_click;
+    ct_ab_on_asset_click* on_asset_click;
+    ct_ab_on_asset_double_click* on_asset_double_click;
+
+    cel_alloc* allocator;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        celib::array::push_back(_G.name, name);                                \
+        cel_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = celib::array::size(_G.name);                         \
+        const auto size = cel_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -72,7 +75,7 @@ static struct asset_browser_global {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            celib::array::pop_back(_G.name);                                   \
+            cel_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -267,13 +270,13 @@ static void ui_asset_list() {
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t j = 0;
-                         j < array::size(_G.on_asset_double_click); ++j) {
+                         j < cel_array_size(_G.on_asset_double_click); ++j) {
                         _G.on_asset_double_click[j](type, name,
                                                     CT_ID64_0("source"), path);
                     }
                 } else {
                     for (uint32_t j = 0;
-                         j < array::size(_G.on_asset_click); ++j) {
+                         j < cel_array_size(_G.on_asset_click); ++j) {
                         _G.on_asset_click[j](type, name,
                                              CT_ID64_0("source"),path);
                     }
@@ -327,12 +330,12 @@ static void _init(ct_api_a0 *api) {
                     .on_menu_window = on_menu_window,
             });
 
-    _G = {};
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+    };
     _G.visible = true;
     _G.left_column_width = 180.0f;
 
-    _G.on_asset_click.init(ct_memory_a0.main_allocator());
-    _G.on_asset_double_click.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
@@ -340,8 +343,8 @@ static void _shutdown() {
             PLAYGROUND_MODULE_NAME
     );
 
-    _G.on_asset_click.destroy();
-    _G.on_asset_double_click.destroy();
+    cel_array_free(_G.on_asset_click, _G.allocator);
+    cel_array_free(_G.on_asset_double_click, _G.allocator);
 
     _G = {};
 }
