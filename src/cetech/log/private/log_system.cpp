@@ -24,7 +24,7 @@ static struct global {
 } _G;
 
 
-void vlog(const enum ct_log_level level,
+static void vlog(const enum ct_log_level level,
           const char *where,
           const char *format,
           va_list va) {
@@ -42,16 +42,14 @@ void vlog(const enum ct_log_level level,
     }
 }
 
-namespace logsystem {
-
-    void log_info_va(const char *where,
+static void log_info_va(const char *where,
                      const char *format,
                      va_list va) {
         vlog(LOG_INFO, where, format, va);
     }
 
 
-    void log_info(const char *where,
+static void log_info(const char *where,
                   const char *format,
                   ...) {
         va_list args;
@@ -61,13 +59,13 @@ namespace logsystem {
         va_end(args);
     }
 
-    void log_warning_va(const char *where,
+static void log_warning_va(const char *where,
                         const char *format,
                         va_list va) {
         vlog(LOG_WARNING, where, format, va);
     }
 
-    void log_warning(const char *where,
+static void log_warning(const char *where,
                      const char *format,
                      ...) {
         va_list args;
@@ -77,13 +75,13 @@ namespace logsystem {
         va_end(args);
     }
 
-    void log_error_va(const char *where,
+static void log_error_va(const char *where,
                       const char *format,
                       va_list va) {
         vlog(LOG_ERROR, where, format, va);
     }
 
-    void log_error(const char *where,
+static void log_error(const char *where,
                    const char *format,
                    ...) {
         va_list args;
@@ -93,14 +91,14 @@ namespace logsystem {
         va_end(args);
     }
 
-    void log_debug_va(const char *where,
+static void log_debug_va(const char *where,
                       const char *format,
                       va_list va) {
 
         vlog(LOG_DBG, where, format, va);
     }
 
-    void log_debug(const char *where,
+static void log_debug(const char *where,
                    const char *format,
                    ...) {
         va_list args;
@@ -111,7 +109,7 @@ namespace logsystem {
     }
 
 
-    void log_register_handler(ct_log_handler_t handler,
+static void log_register_handler(ct_log_handler_t handler,
                               void *data) {
         const uint8_t idx = _G.handlers_count++;
 
@@ -119,23 +117,23 @@ namespace logsystem {
         _G.handlers_data[idx] = data;
     }
 
-    void init() {
+void logsystem_init() {
         _G = (struct global) G_INIT;
         log_register_handler(ct_log_stdout_handler, NULL);
     }
 
-    void shutdown() {
+void logsystem_shutdown() {
         _G = (struct global) G_INIT;
     }
 
 
-    void set_wid_clb(ct_log_get_wid_clb_t get_wid_clb) {
+static void set_wid_clb(ct_log_get_wid_clb_t get_wid_clb) {
         _G.get_wid_clb = get_wid_clb;
     }
 
     static ct_log_a0 log_a0 = {
-            .set_wid_clb = logsystem::set_wid_clb,
-            .register_handler = logsystem::log_register_handler,
+            .set_wid_clb = set_wid_clb,
+            .register_handler = log_register_handler,
             .info_va = log_info_va,
             .info = log_info,
             .warning_va = log_warning_va,
@@ -146,7 +144,6 @@ namespace logsystem {
             .debug = log_debug
     };
 
-}
 
 CETECH_MODULE_DEF(
         log,
@@ -155,13 +152,13 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            logsystem::init();
-            api->register_api("ct_log_a0", &logsystem::log_a0);
+            logsystem_init();
+            api->register_api("ct_log_a0", &log_a0);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
-            logsystem::shutdown();
+            logsystem_shutdown();
         }
 )
 

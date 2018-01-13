@@ -69,7 +69,7 @@ using namespace celib;
 // Private
 //==============================================================================
 
-void add_module(const char *path,
+static void add_module(const char *path,
                 module_functios *module) {
 
     for (size_t i = 0; i < MAX_MODULES; ++i) {
@@ -86,7 +86,7 @@ void add_module(const char *path,
     }
 }
 
-const char *get_module_name(const char *path,
+static const char *get_module_name(const char *path,
                             uint32_t *len) {
     const char *filename = ct_path_a0.filename(path);
     const char *name = strchr(filename, '_');
@@ -100,7 +100,7 @@ const char *get_module_name(const char *path,
     return name;
 }
 
-void get_module_fce_name(Buffer &buffer,
+static void get_module_fce_name(Buffer &buffer,
                          const char *name,
                          uint32_t name_len,
                          const char *fce_name) {
@@ -110,7 +110,7 @@ void get_module_fce_name(Buffer &buffer,
 }
 
 
-bool load_from_path(module_functios *module,
+static bool load_from_path(module_functios *module,
                     const char *path) {
     uint32_t name_len;
     const char *name = get_module_name(path, &name_len);
@@ -161,9 +161,8 @@ bool load_from_path(module_functios *module,
 // Interface
 //==============================================================================
 
-namespace module {
 
-    void add_static(ct_load_module_t load,
+static void add_static(ct_load_module_t load,
                     ct_unload_module_t unload,
                     ct_initapi_module_t initapi) {
 
@@ -180,7 +179,7 @@ namespace module {
     }
 
 
-    void load(const char *path) {
+static void load(const char *path) {
         ct_log_a0.info(LOG_WHERE, "Loading module %s", path);
 
         module_functios module;
@@ -195,7 +194,7 @@ namespace module {
         add_module(path, &module);
     }
 
-    void reload(const char *path) {
+static void reload(const char *path) {
         for (size_t i = 0; i < MAX_MODULES; ++i) {
             module_functios old_module = _G.modules[i];
 
@@ -234,7 +233,7 @@ namespace module {
         }
     }
 
-    void reload_all() {
+static void reload_all() {
         for (size_t i = 0; i < MAX_MODULES; ++i) {
             if (_G.modules[i].handler == NULL) {
                 continue;
@@ -245,7 +244,7 @@ namespace module {
     }
 
 
-    void load_dirs() {
+static void load_dirs() {
         char key[64];
         size_t len = strlen("load_module.");
         strcpy(key, "load_module.");
@@ -270,7 +269,7 @@ namespace module {
         }
     }
 
-    void unload_all() {
+static void unload_all() {
         for (int i = MAX_MODULES - 1; i >= 0; --i) {
             if (!_G.used[i]) {
                 continue;
@@ -280,7 +279,7 @@ namespace module {
         }
     }
 
-    void check_modules() {
+    static void check_modules() {
         cel_alloc *alloc = ct_memory_a0.main_allocator();
 
         static uint64_t root = CT_ID64_0("modules");
@@ -313,7 +312,7 @@ namespace module {
                                    "Reload module from path \"%s\"",
                                    full_path);
 
-                    module::reload(full_path);
+                    reload(full_path);
 
 
                     CEL_FREE(alloc, path);
@@ -333,8 +332,6 @@ namespace module {
             .load_dirs = load_dirs,
             .check_modules = check_modules
     };
-};
-
 
 //static const char* _get_load_dir() {
 //#if defined(CETECH_LINUX)
@@ -363,7 +360,7 @@ CETECH_MODULE_DEF(
 
             ct_api_a0 = *api;
 
-            api->register_api("ct_module_a0", &module::module_api);
+            api->register_api("ct_module_a0", &module_api);
             _G.config_object = ct_config_a0.config_object();
 
             static uint64_t root = CT_ID64_0("modules");

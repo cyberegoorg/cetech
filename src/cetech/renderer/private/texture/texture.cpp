@@ -27,9 +27,7 @@ using namespace celib;
 using namespace buffer;
 
 
-namespace texture_compiler {
-    int init(ct_api_a0 *api);
-}
+int texturecompiler_init(ct_api_a0 *api);
 
 //==============================================================================
 // GLobals
@@ -57,8 +55,6 @@ CETECH_DECL_API(ct_hash_a0);
 //==============================================================================
 // Resource
 //==============================================================================
-
-namespace texture_resource {
 
     static const ct_texture null_texture = {};
 
@@ -123,12 +119,10 @@ namespace texture_resource {
             .reloader = _texture_resource_reloader
     };
 
-}
 
 //==============================================================================
 // Interface
 //==============================================================================
-namespace texture {
     int texture_init(ct_api_a0 *api) {
         _G = {};
 
@@ -137,10 +131,10 @@ namespace texture {
         _G.handler_map.init(ct_memory_a0.main_allocator());
 
 
-        texture_compiler::init(api);
+        texturecompiler_init(api);
 
         ct_resource_a0.register_type(_G.type,
-                                     texture_resource::texture_resource_callback);
+                                     texture_resource_callback);
 
         return 1;
     }
@@ -152,13 +146,11 @@ namespace texture {
     ct_texture texture_get(uint64_t name) {
         ct_resource_a0.get(_G.type, name); // TODO: only for autoload
 
-        return map::get(_G.handler_map, name, texture_resource::null_texture);
+        return map::get(_G.handler_map, name, null_texture);
     }
 
-}
-
 static ct_texture_a0 texture_api = {
-        .get = texture::texture_get
+        .get = texture_get
 };
 
 static void _init_api(struct ct_api_a0 *api) {
@@ -180,12 +172,12 @@ CETECH_MODULE_DEF(
         {
             CEL_UNUSED(reload);
             _init_api(api);
-            texture::texture_init(api);
+            texture_init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
-            texture::texture_shutdown();
+            texture_shutdown();
         }
 )

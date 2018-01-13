@@ -45,8 +45,7 @@ static struct G {
 //==============================================================================
 // Interface
 //==============================================================================
-namespace mouse {
-    uint32_t button_index(const char *button_name) {
+static uint32_t button_index(const char *button_name) {
         for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
             if (!_btn_to_str[i]) {
                 continue;
@@ -62,14 +61,14 @@ namespace mouse {
         return 0;
     }
 
-    const char *button_name(const uint32_t button_index) {
+static const char *button_name(const uint32_t button_index) {
         CETECH_ASSERT(LOG_WHERE,
                       (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
         return _btn_to_str[button_index];
     }
 
-    int button_state(uint32_t idx,
+static int button_state(uint32_t idx,
                      const uint32_t button_index) {
         CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
@@ -78,7 +77,7 @@ namespace mouse {
         return _G.state[button_index];
     }
 
-    int button_pressed(uint32_t idx,
+static int button_pressed(uint32_t idx,
                        const uint32_t button_index) {
         CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
@@ -87,7 +86,7 @@ namespace mouse {
         return _G.state[button_index] && !_G.last_state[button_index];
     }
 
-    int button_released(uint32_t idx,
+static int button_released(uint32_t idx,
                         const uint32_t button_index) {
         CEL_UNUSED(idx);
         CETECH_ASSERT(LOG_WHERE,
@@ -96,14 +95,14 @@ namespace mouse {
         return !_G.state[button_index] && _G.last_state[button_index];
     }
 
-    const char *axis_name(const uint32_t axis_index) {
+static const char *axis_name(const uint32_t axis_index) {
         CETECH_ASSERT(LOG_WHERE,
                       (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
         return _axis_to_str[axis_index];
     }
 
-    uint32_t axis_index(const char *axis_name) {
+static uint32_t axis_index(const char *axis_name) {
         for (uint32_t i = 0; i < MOUSE_AXIS_MAX; ++i) {
             if (!_axis_to_str[i]) {
                 continue;
@@ -119,7 +118,7 @@ namespace mouse {
         return 0;
     }
 
-    void axis(uint32_t idx,
+static void axis(uint32_t idx,
               const uint32_t axis_index,
               float *value) {
         CEL_UNUSED(idx);
@@ -155,7 +154,7 @@ namespace mouse {
 //        //TODO: implement
 //    }
 
-    void update(float dt) {
+static void update(float dt) {
         CEL_UNUSED(dt);
         ct_event_header *event = ct_machine_a0.event_begin();
 
@@ -204,41 +203,37 @@ namespace mouse {
             event = ct_machine_a0.event_next(event);
         }
     }
-}
 
-namespace mouse_module {
-    static ct_mouse_a0 a0 = {
-            .button_index = mouse::button_index,
-            .button_name = mouse::button_name,
-            .button_state = mouse::button_state,
-            .button_pressed = mouse::button_pressed,
-            .button_released = mouse::button_released,
-            .axis_index = mouse::axis_index,
-            .axis_name = mouse::axis_name,
-            .axis = mouse::axis,
+static ct_mouse_a0 a0 = {
+            .button_index = button_index,
+            .button_name = button_name,
+            .button_state = button_state,
+            .button_pressed = button_pressed,
+            .button_released = button_released,
+            .axis_index = axis_index,
+            .axis_name = axis_name,
+            .axis = axis,
     };
 
-    void _init_api(ct_api_a0 *api) {
+static void _init_api(ct_api_a0 *api) {
         api->register_api("ct_mouse_a0", &a0);
     }
 
-    void _init(ct_api_a0 *api) {
+static void _init(ct_api_a0 *api) {
         _init_api(api);
 
         _G = {};
 
-        ct_app_a0.register_on_update(mouse::update);
+        ct_app_a0.register_on_update(update);
 
         ct_log_a0.debug(LOG_WHERE, "Init");
     }
 
-    void _shutdown() {
+static void _shutdown() {
         ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
         _G = {};
     }
-
-}
 
 CETECH_MODULE_DEF(
         mouse,
@@ -250,13 +245,13 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            mouse_module::_init(api);
+            _init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
-            mouse_module::_shutdown();
+            _shutdown();
 
         }
 )

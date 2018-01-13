@@ -24,7 +24,6 @@ extern char *stacktrace(int);
 
 extern void stacktrace_free(char *);
 
-namespace memory {
     void allocator_trace_pointer(struct allocator_trace_entry *entries,
                                  uint32_t max_entries,
                                  void *p) {
@@ -100,7 +99,7 @@ namespace memory {
         api->register_api("ct_memory_a0", &_api);
     }
 
-    void init(int scratch_buffer_size) {
+    void memory_init() {
         _G = {};
 
         _G.default_allocator = malloc_allocator_create();
@@ -110,6 +109,6 @@ namespace memory {
     void memsys_shutdown() {
         malloc_allocator_destroy(_G.default_allocator);
     }
-}
+
 
 

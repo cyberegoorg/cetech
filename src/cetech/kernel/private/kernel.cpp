@@ -31,9 +31,7 @@ CETECH_DECL_API(ct_coredb_a0);
 
 #define LOG_WHERE "kernel"
 
-namespace os {
-    void register_api(ct_api_a0 *api);
-}
+void register_api(ct_api_a0 *api);
 
 const char *_platform() {
 #if defined(CETECH_LINUX)
@@ -103,13 +101,13 @@ extern "C" int cetech_kernel_init(int argc,
 
     CETECH_LOAD_STATIC_MODULE(api, log);
 
-    memory::init(4 * 1024 * 1024);
+    memory_init();
 
     core_allocator::register_api(api);
 
     CETECH_LOAD_STATIC_MODULE(api, hashlib);
 
-    memory::register_api(api);
+    register_api(api);
 
     CETECH_LOAD_STATIC_MODULE(api, error);
     CETECH_LOAD_STATIC_MODULE(api, vio);
@@ -179,8 +177,8 @@ extern "C" int cetech_kernel_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, module);
 
     api::shutdown();
-    memory::memsys_shutdown();
-    logsystem::shutdown();
+    memsys_shutdown();
+    logsystem_shutdown();
 
     return 1;
 }

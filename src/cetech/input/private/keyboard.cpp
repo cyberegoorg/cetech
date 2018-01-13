@@ -39,129 +39,125 @@ static struct G {
 // Interface
 //==============================================================================
 
-namespace keyboard {
-    uint32_t button_index(const char *button_name) {
-        for (uint32_t i = 0; i < KEY_MAX; ++i) {
-            if (!_key_to_str[i]) {
-                continue;
-            }
-
-            if (strcmp(_key_to_str[i], button_name)) {
-                continue;
-            }
-
-            return i;
+static uint32_t button_index(const char *button_name) {
+    for (uint32_t i = 0; i < KEY_MAX; ++i) {
+        if (!_key_to_str[i]) {
+            continue;
         }
 
-        return 0;
+        if (strcmp(_key_to_str[i], button_name)) {
+            continue;
+        }
+
+        return i;
     }
 
-    const char *button_name(const uint32_t button_index) {
-        CETECH_ASSERT(LOG_WHERE,
-                      (button_index >= 0) && (button_index < KEY_MAX));
+    return 0;
+}
 
-        return _key_to_str[button_index];
-    }
+static const char *button_name(const uint32_t button_index) {
+    CETECH_ASSERT(LOG_WHERE,
+                  (button_index >= 0) && (button_index < KEY_MAX));
 
-    int button_state(uint32_t idx,
-                     const uint32_t button_index) {
-        CEL_UNUSED(idx);
-        CETECH_ASSERT(LOG_WHERE,
-                      (button_index >= 0) && (button_index < KEY_MAX));
+    return _key_to_str[button_index];
+}
 
-        return _G.state[button_index];
-    }
-
-    int button_pressed(uint32_t idx,
-                       const uint32_t button_index) {
-        CEL_UNUSED(idx);
-        CETECH_ASSERT(LOG_WHERE,
-                      (button_index >= 0) && (button_index < KEY_MAX));
-
-        return _G.state[button_index] && !_G.last_state[button_index];
-    }
-
-    int button_released(uint32_t idx,
+static int button_state(uint32_t idx,
                         const uint32_t button_index) {
-        CEL_UNUSED(idx);
-        CETECH_ASSERT(LOG_WHERE,
-                      (button_index >= 0) && (button_index < KEY_MAX));
+    CEL_UNUSED(idx);
+    CETECH_ASSERT(LOG_WHERE,
+                  (button_index >= 0) && (button_index < KEY_MAX));
 
-        return !_G.state[button_index] && _G.last_state[button_index];
-    }
+    return _G.state[button_index];
+}
 
-    void _update(float dt) {
-        CEL_UNUSED(dt);
+static int button_pressed(uint32_t idx,
+                          const uint32_t button_index) {
+    CEL_UNUSED(idx);
+    CETECH_ASSERT(LOG_WHERE,
+                  (button_index >= 0) && (button_index < KEY_MAX));
 
-        ct_event_header *event = ct_machine_a0.event_begin();
+    return _G.state[button_index] && !_G.last_state[button_index];
+}
 
-        memcpy(_G.last_state, _G.state, 512);
-        memset(_G.text, 0, sizeof(_G.text));
+static int button_released(uint32_t idx,
+                           const uint32_t button_index) {
+    CEL_UNUSED(idx);
+    CETECH_ASSERT(LOG_WHERE,
+                  (button_index >= 0) && (button_index < KEY_MAX));
 
-        uint32_t size = 0;
-        while (event != ct_machine_a0.event_end()) {
-            size = size + 1;
+    return !_G.state[button_index] && _G.last_state[button_index];
+}
 
-            switch (event->type) {
-                case EVENT_KEYBOARD_DOWN:
-                    _G.state[((ct_keyboard_event *) event)->keycode] = 1;
-                    break;
+static void _update(float dt) {
+    CEL_UNUSED(dt);
 
-                case EVENT_KEYBOARD_UP:
-                    _G.state[((ct_keyboard_event *) event)->keycode] = 0;
-                    break;
+    ct_event_header *event = ct_machine_a0.event_begin();
 
-                case EVENT_KEYBOARD_TEXT: {
-                    ct_keyboard_text_event* ev = (ct_keyboard_text_event*)event;
-                    memcpy(_G.text, ev->text, sizeof(ev->text));
-                    break;
-                }
+    memcpy(_G.last_state, _G.state, 512);
+    memset(_G.text, 0, sizeof(_G.text));
 
+    uint32_t size = 0;
+    while (event != ct_machine_a0.event_end()) {
+        size = size + 1;
 
-                default:
-                    break;
+        switch (event->type) {
+            case EVENT_KEYBOARD_DOWN:
+                _G.state[((ct_keyboard_event *) event)->keycode] = 1;
+                break;
+
+            case EVENT_KEYBOARD_UP:
+                _G.state[((ct_keyboard_event *) event)->keycode] = 0;
+                break;
+
+            case EVENT_KEYBOARD_TEXT: {
+                ct_keyboard_text_event *ev = (ct_keyboard_text_event *) event;
+                memcpy(_G.text, ev->text, sizeof(ev->text));
+                break;
             }
 
-            event = ct_machine_a0.event_next(event);
-        }
-    }
 
-    char* text(uint32_t idx) {
-        return _G.text;
+            default:
+                break;
+        }
+
+        event = ct_machine_a0.event_next(event);
     }
 }
 
-namespace keyboard_module {
-    static ct_keyboard_a0 a0 = {
-            .button_index = keyboard::button_index,
-            .button_name = keyboard::button_name,
-            .button_state = keyboard::button_state,
-            .button_pressed = keyboard::button_pressed,
-            .button_released = keyboard::button_released,
-            .text = keyboard::text,
-    };
+static char *text(uint32_t idx) {
+    return _G.text;
+}
 
-    void _init_api(ct_api_a0 *api) {
-        api->register_api("ct_keyboard_a0", &a0);
-    }
+static ct_keyboard_a0 a0 = {
+        .button_index = button_index,
+        .button_name = button_name,
+        .button_state = button_state,
+        .button_pressed = button_pressed,
+        .button_released = button_released,
+        .text = text,
+};
 
-    void _init(ct_api_a0 *api) {
-        _init_api(api);
+static void _init_api(ct_api_a0 *api) {
+    api->register_api("ct_keyboard_a0", &a0);
+}
 
-
-        _G = (struct G) {};
-
-        ct_app_a0.register_on_update(keyboard::_update);
+static void _init(ct_api_a0 *api) {
+    _init_api(api);
 
 
-        ct_log_a0.debug(LOG_WHERE, "Init");
-    }
+    _G = (struct G) {};
 
-    void _shutdown() {
-        ct_log_a0.debug(LOG_WHERE, "Shutdown");
+    ct_app_a0.register_on_update(_update);
 
-        _G = (struct G) {};
-    }
+
+    ct_log_a0.debug(LOG_WHERE, "Init");
+}
+
+static void _shutdown() {
+    ct_log_a0.debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct G) {};
 }
 
 CETECH_MODULE_DEF(
@@ -173,12 +169,12 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            keyboard_module::_init(api);
+            _init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
-            keyboard_module::_shutdown();
+            _shutdown();
         }
 )

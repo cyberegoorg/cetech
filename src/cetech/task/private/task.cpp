@@ -18,9 +18,8 @@ CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_cpu_a0);
 CETECH_DECL_API(ct_log_a0);
 
-namespace taskmanager {
-    int do_work();
-}
+int do_work();
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -147,7 +146,7 @@ static int _task_worker(void *o) {
     ct_log_a0.debug("task_worker", "Worker %d init", _worker_id);
 
     while (_G._Run) {
-        if (!taskmanager::do_work()) {
+        if (!do_work()) {
             ct_thread_a0.yield();
         }
     }
@@ -162,7 +161,6 @@ static int _task_worker(void *o) {
 // Api
 //==============================================================================
 
-namespace taskmanager {
     void add(ct_task_item *items,
              uint32_t count) {
         for (uint32_t i = 0; i < count; ++i) {
@@ -207,16 +205,14 @@ namespace taskmanager {
     int worker_count() {
         return _G._workers_count;
     }
-}
 
-namespace taskmanager_module {
     static void _init_api(ct_api_a0 *api) {
         static ct_task_a0 _api = {
-                .worker_id = taskmanager::worker_id,
-                .worker_count = taskmanager::worker_count,
-                .add = taskmanager::add,
-                .do_work = taskmanager::do_work,
-                .wait_atomic = taskmanager::wait_atomic
+                .worker_id = worker_id,
+                .worker_count = worker_count,
+                .add = add,
+                .do_work = do_work,
+                .wait_atomic = wait_atomic
         };
 
         api->register_api("ct_task_a0", &_api);
@@ -230,7 +226,7 @@ namespace taskmanager_module {
         CETECH_GET_API(api, ct_log_a0);
         CETECH_GET_API(api, ct_cpu_a0);
 
-        ct_log_a0.set_wid_clb(taskmanager::worker_id);
+        ct_log_a0.set_wid_clb(worker_id);
 
         _G = {};
 
@@ -279,8 +275,6 @@ namespace taskmanager_module {
 
         _G = {};
     }
-}
-
 
 CETECH_MODULE_DEF(
         task,
@@ -289,11 +283,11 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            taskmanager_module::_init(api);
+            _init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
-            taskmanager_module::_shutdown();
+            _shutdown();
         }
 )

@@ -47,7 +47,7 @@ using namespace celib;
 
 #define _G RendererGlobals
 static struct _G {
-    ct_render_on_render* on_render;
+    ct_render_on_render *on_render;
     ct_window *main_window;
 
     uint64_t type;
@@ -59,7 +59,7 @@ static struct _G {
     int vsync;
     int need_reset;
     ct_coredb_object_t *config;
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G = {};
 
 
@@ -81,7 +81,7 @@ static uint32_t _get_reset_flags() {
 // Interface
 //==============================================================================
 
-void renderer_create() {
+static void renderer_create() {
 
     if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
         int w, h;
@@ -98,7 +98,8 @@ void renderer_create() {
 
         if (wid == 0) {
             uint32_t flags = WINDOW_NOFLAG;
-            flags |= ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_FULLSCREEN, 0)
+            flags |= ct_coredb_a0.read_uint32(_G.config,
+                                              CONFIG_SCREEN_FULLSCREEN, 0)
                      ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
@@ -132,7 +133,7 @@ void renderer_create() {
 }
 
 
-void renderer_set_debug(int debug) {
+static void renderer_set_debug(int debug) {
     if (debug) {
         bgfx::setDebug(BGFX_DEBUG_STATS);
     } else {
@@ -141,7 +142,7 @@ void renderer_set_debug(int debug) {
 }
 
 
-void renderer_get_size(uint32_t *width,
+static void renderer_get_size(uint32_t *width,
                        uint32_t *height) {
     *width = _G.size_width;
     *height = _G.size_height;
@@ -203,7 +204,7 @@ static void on_render(void (*on_render)()) {
         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    if(on_render) {
+    if (on_render) {
         on_render();
     }
 
@@ -216,78 +217,75 @@ static void on_render(void (*on_render)()) {
 }
 
 
-namespace renderer_module {
-    static ct_renderer_a0 rendderer_api = {
-            .render = on_render,
-            .create = renderer_create,
-            .set_debug = renderer_set_debug,
-            .get_size = renderer_get_size,
-            .register_on_render =register_on_render_,
-            .unregister_on_render =unregister_on_render_,
+static ct_renderer_a0 rendderer_api = {
+        .render = on_render,
+        .create = renderer_create,
+        .set_debug = renderer_set_debug,
+        .get_size = renderer_get_size,
+        .register_on_render =register_on_render_,
+        .unregister_on_render =unregister_on_render_,
+};
+
+static void _init_api(struct ct_api_a0 *api) {
+    api->register_api("ct_renderer_a0", &rendderer_api);
+}
+
+static void _init(struct ct_api_a0 *api) {
+    _init_api(api);
+
+    ct_api_a0 = *api;
+
+    _G = {
+            .allocator = ct_memory_a0.main_allocator(),
+            .config = ct_config_a0.config_object(),
     };
 
-    void _init_api(struct ct_api_a0 *api) {
-        api->register_api("ct_renderer_a0", &rendderer_api);
+    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
+        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
     }
 
-    void _init(struct ct_api_a0 *api) {
-        _init_api(api);
-
-        ct_api_a0 = *api;
-
-        _G =  {
-                .allocator = ct_memory_a0.main_allocator(),
-                .config = ct_config_a0.config_object(),
-        };
-
-        ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
-            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
-        }
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
-            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
-        }
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
-            ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
-        }
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
-            ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
-        }
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_WID)) {
-            ct_coredb_a0.set_uint32(writer, CONFIG_WID, 0);
-        }
-
-        if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
-            ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
-        }
-
-        ct_coredb_a0.write_commit(writer);
-
-
-        _G.vsync = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
-
-        CETECH_GET_API(api, ct_window_a0);
-
-        renderer_create();
-
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
+        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
     }
 
-    void _shutdown() {
-        if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
-
-            cel_array_free(_G.on_render, _G.allocator);
-
-            bgfx::shutdown();
-        }
-
-        _G =  {};
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
+        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
+        ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+    }
+
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_WID)) {
+        ct_coredb_a0.set_uint32(writer, CONFIG_WID, 0);
+    }
+
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
+        ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
+    }
+
+    ct_coredb_a0.write_commit(writer);
+
+
+    _G.vsync = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
+
+    CETECH_GET_API(api, ct_window_a0);
+
+    renderer_create();
+
+}
+
+static void _shutdown() {
+    if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+
+        cel_array_free(_G.on_render, _G.allocator);
+
+        bgfx::shutdown();
+    }
+
+    _G = {};
 }
 
 CETECH_MODULE_DEF(
@@ -302,12 +300,12 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            renderer_module::_init(api);
+            _init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
-            renderer_module::_shutdown();
+            _shutdown();
         }
 )

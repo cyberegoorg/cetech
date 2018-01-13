@@ -29,9 +29,7 @@
 using namespace celib;
 using namespace buffer;
 
-namespace shader_compiler {
-    int init(ct_api_a0 *api);
-}
+int shadercompiler_init(ct_api_a0 *api);
 
 //==============================================================================
 // GLobals
@@ -55,118 +53,108 @@ CETECH_DECL_API(ct_hash_a0);
 // Resource
 //==============================================================================
 
-namespace shader_resource {
-
-    static const ct_shader null_program = BGFX_INVALID_HANDLE;
+static const ct_shader null_program = BGFX_INVALID_HANDLE;
 
 
-    void *loader(ct_vio *input,
-                 cel_alloc *allocator) {
+static void *loader(ct_vio *input,
+             cel_alloc *allocator) {
 
-        const int64_t size = input->size(input);
-        char *data = CEL_ALLOCATE(allocator, char, size);
-        input->read(input, data, 1, size);
-        return data;
-    }
-
-    void unloader(void *new_data,
-                  cel_alloc *allocator) {
-        CEL_FREE(allocator, new_data);
-    }
-
-    void online(uint64_t name,
-                void *data) {
-        auto *resource = shader_blob::get(data);
-
-        bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
-
-        if (resource) {
-            auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
-            auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
-
-            memcpy(vs_mem->data, (resource + 1), resource->vs_size);
-            memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
-                   resource->fs_size);
-
-            auto vs_shader = bgfx::createShader(vs_mem);
-            auto fs_shader = bgfx::createShader(fs_mem);
-            program = bgfx::createProgram(vs_shader, fs_shader, 1);
-        }
-
-        map::set(_G.handler_map, name, {program.idx});
-    }
-
-    void offline(uint64_t name,
-                 void *data) {
-        CEL_UNUSED(data);
-
-        auto program = map::get(_G.handler_map, name, null_program);
-
-        if (program.idx == null_program.idx) {
-            return;
-        }
-
-        bgfx::destroy((bgfx::ProgramHandle) {program.idx});
-
-        map::remove(_G.handler_map, name);
-    }
-
-    void *reloader(uint64_t name,
-                   void *old_data,
-                   void *new_data,
-                   cel_alloc *allocator) {
-        offline(name, old_data);
-        online(name, new_data);
-
-        CEL_FREE(allocator, old_data);
-
-        return new_data;
-    }
-
-    static const ct_resource_callbacks_t callback = {
-            .loader = loader,
-            .unloader =unloader,
-            .online = online,
-            .offline = offline,
-            .reloader = reloader
-    };
-
+    const int64_t size = input->size(input);
+    char *data = CEL_ALLOCATE(allocator, char, size);
+    input->read(input, data, 1, size);
+    return data;
 }
+
+static void unloader(void *new_data,
+              cel_alloc *allocator) {
+    CEL_FREE(allocator, new_data);
+}
+
+static void online(uint64_t name,
+            void *data) {
+    auto *resource = shader_blob::get(data);
+
+    bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
+
+    if (resource) {
+        auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
+        auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
+
+        memcpy(vs_mem->data, (resource + 1), resource->vs_size);
+        memcpy(fs_mem->data, ((char *) (resource + 1)) + resource->vs_size,
+               resource->fs_size);
+
+        auto vs_shader = bgfx::createShader(vs_mem);
+        auto fs_shader = bgfx::createShader(fs_mem);
+        program = bgfx::createProgram(vs_shader, fs_shader, 1);
+    }
+
+    map::set(_G.handler_map, name, {program.idx});
+}
+
+static void offline(uint64_t name,
+             void *data) {
+    CEL_UNUSED(data);
+
+    auto program = map::get(_G.handler_map, name, null_program);
+
+    if (program.idx == null_program.idx) {
+        return;
+    }
+
+    bgfx::destroy((bgfx::ProgramHandle) {program.idx});
+
+    map::remove(_G.handler_map, name);
+}
+
+static void *reloader(uint64_t name,
+               void *old_data,
+               void *new_data,
+               cel_alloc *allocator) {
+    offline(name, old_data);
+    online(name, new_data);
+
+    CEL_FREE(allocator, old_data);
+
+    return new_data;
+}
+
+static const ct_resource_callbacks_t callback = {
+        .loader = loader,
+        .unloader =unloader,
+        .online = online,
+        .offline = offline,
+        .reloader = reloader
+};
 
 //==============================================================================
 // Interface
 //==============================================================================
+int shader_init(ct_api_a0 *api) {
+    _G = {};
 
+    _G.type = CT_ID64_0("shader");
 
+    _G.handler_map.init(ct_memory_a0.main_allocator());
 
+    ct_resource_a0.register_type(_G.type,
+                                 callback);
+    shadercompiler_init(api);
 
-namespace shader {
-    int shader_init(ct_api_a0 *api) {
-        _G = {};
+    return 1;
+}
 
-        _G.type = CT_ID64_0("shader");
+void shader_shutdown() {
+    _G.handler_map.destroy();
+}
 
-        _G.handler_map.init(ct_memory_a0.main_allocator());
-
-        ct_resource_a0.register_type(_G.type,
-                                     shader_resource::callback);
-        shader_compiler::init(api);
-
-        return 1;
-    }
-
-    void shader_shutdown() {
-        _G.handler_map.destroy();
-    }
-
-    ct_shader shader_get(uint64_t name) {
-        shader_blob::get(ct_resource_a0.get(_G.type, name));
-        return map::get(_G.handler_map, name, shader_resource::null_program);
-    }
+ct_shader shader_get(uint64_t name) {
+    shader_blob::get(ct_resource_a0.get(_G.type, name));
+    return map::get(_G.handler_map, name, null_program);
 }
 
 static ct_shader_a0 shader_api = {
-        .get = shader::shader_get
+        .get = shader_get
 };
 
 static void _init_api(struct ct_api_a0 *api) {
@@ -187,12 +175,12 @@ CETECH_MODULE_DEF(
         {
             CEL_UNUSED(reload);
             _init_api(api);
-            shader::shader_init(api);
+            shader_init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
 
-            shader::shader_shutdown();
+            shader_shutdown();
         }
 )

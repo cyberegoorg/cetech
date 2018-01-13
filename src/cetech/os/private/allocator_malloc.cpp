@@ -17,7 +17,7 @@ static uint32_t size_with_padding(uint32_t size,
 
 struct allocator_malloc {
     uint32_t total_allocated;
-    memory::allocator_trace_entry trace[MAX_MEM_TRACE];
+    allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
 void *malloc_allocator_allocate(const cel_alloc *allocator,
@@ -47,7 +47,7 @@ void *malloc_allocator_allocate(const cel_alloc *allocator,
         struct Header *h = header(ptr);
         a->total_allocated -= h->size;
 
-        memory::allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, ptr);
+        allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, ptr);
 
         CEL_FREE(core_alloc, h);
 
@@ -70,7 +70,6 @@ static cel_alloc_fce alloc_fce = {
         .total_allocated = malloc_allocator_total_allocated,
 };
 
-namespace memory {
     cel_alloc *malloc_allocator_create() {
         auto *core_alloc = core_allocator::get();
 
@@ -93,11 +92,10 @@ namespace memory {
         auto *core_alloc = core_allocator::get();
         struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
 
-        memory::allocator_check_trace(m->trace, MAX_MEM_TRACE);
+        allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
         CEL_FREE(core_alloc, m);
         CEL_FREE(core_alloc, a);
     }
-}
 
 #endif //CETECH_ALLOCATOR_MALLOC_H

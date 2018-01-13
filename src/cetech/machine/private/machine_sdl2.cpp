@@ -95,21 +95,20 @@ CETECH_DECL_API(ct_memory_a0);
 //==============================================================================
 // Interface
 //==============================================================================
-namespace machine_sdl {
-    ct_event_header *machine_event_begin() {
+static ct_event_header *machine_event_begin() {
         return eventstream::begin<ct_event_header>(_G.eventstream);
     }
 
 
-    ct_event_header *machine_event_end() {
+static ct_event_header *machine_event_end() {
         return eventstream::end<ct_event_header>(_G.eventstream);
     }
 
-    ct_event_header *machine_event_next(ct_event_header *header) {
+static ct_event_header *machine_event_next(ct_event_header *header) {
         return eventstream::next(header);
     }
 
-    void _update(float dt) {
+static void _update(float dt) {
         CEL_UNUSED(dt);
 
         eventstream::clear(_G.eventstream);
@@ -158,15 +157,15 @@ namespace machine_sdl {
     }
 
     static ct_machine_a0 a0 = {
-            .update = machine_sdl::_update,
-            .event_begin = machine_sdl::machine_event_begin,
-            .event_end = machine_sdl::machine_event_end,
-            .event_next = machine_sdl::machine_event_next,
+            .update = _update,
+            .event_begin = machine_event_begin,
+            .event_end = machine_event_end,
+            .event_next = machine_event_next,
             .gamepad_is_active = sdl_gamepad_is_active,
             .gamepad_play_rumble = sdl_gamepad_play_rumble,
     };
 
-    void init(struct ct_api_a0 *api) {
+static void init(struct ct_api_a0 *api) {
         api->register_api("ct_machine_a0", &a0);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -188,7 +187,7 @@ namespace machine_sdl {
 
     }
 
-    void shutdown() {
+static void shutdown() {
         sdl_gamepad_shutdown();
         sdl_mouse_shutdown();
         sdl_keyboard_shutdown();
@@ -198,8 +197,6 @@ namespace machine_sdl {
 
         SDL_Quit();
     }
-}
-
 
 CETECH_MODULE_DEF(
         machine,
@@ -210,12 +207,12 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            machine_sdl::init(api);
+            init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
-            machine_sdl::shutdown();
+            shutdown();
 
         }
 )

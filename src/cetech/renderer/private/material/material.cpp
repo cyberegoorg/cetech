@@ -41,9 +41,7 @@ using namespace celib;
 
 #include "material_blob.h"
 
-namespace material_compiler {
-    int init(ct_api_a0 *api);
-}
+int materialcompiler_init(ct_api_a0 *api);
 
 //==============================================================================
 // Defines
@@ -74,7 +72,7 @@ static struct MaterialGlobals {
 } _G;
 
 
-void _destroy_instance(struct material_instance *instance) {
+static void _destroy_instance(struct material_instance *instance) {
     const uint32_t n = instance->data->all_uniform_count;
 
     for (int i = 0; i < n; ++i) {
@@ -84,7 +82,7 @@ void _destroy_instance(struct material_instance *instance) {
     CEL_FREE(ct_memory_a0.main_allocator(), instance->handlers);
 }
 
-struct material_instance *_new_material(uint64_t name,
+static struct material_instance *_new_material(uint64_t name,
                                         uint32_t handler) {
     uint32_t idx = cel_array_size(_G.material_instances);
     cel_array_push(_G.material_instances, {}, _G.allocator);
@@ -97,7 +95,7 @@ struct material_instance *_new_material(uint64_t name,
     return instance;
 }
 
-struct material_instance *get_material_instance(ct_material material) {
+static struct material_instance *get_material_instance(ct_material material) {
     uint32_t idx = map::get(_G.instace_map, material.idx, UINT32_MAX);
 
     if (UINT32_MAX == idx) {
@@ -107,7 +105,7 @@ struct material_instance *get_material_instance(ct_material material) {
     return &_G.material_instances[idx];
 }
 
-void spawn_material_instance(cel_alloc *alloc, const material_blob::blob_t *resource, material_instance* instance){
+static void spawn_material_instance(cel_alloc *alloc, const material_blob::blob_t *resource, material_instance* instance){
     bgfx::UniformHandle *handlers = CEL_ALLOCATE(alloc,
                                                  bgfx::UniformHandle,
                                                  sizeof(bgfx::UniformHandle) *
@@ -167,10 +165,9 @@ void reload_level_instance(uint64_t name, void *data) {
 //==============================================================================
 // Resource
 //==============================================================================
-namespace material_resource {
 //    static const bgfx::ProgramHandle null_program = {};
 
-    void *loader(ct_vio *input,
+static void *loader(ct_vio *input,
                  cel_alloc *allocator) {
         const int64_t size = input->size(input);
         char *data = CEL_ALLOCATE(allocator, char, size);
@@ -178,23 +175,23 @@ namespace material_resource {
         return data;
     }
 
-    void unloader(void *new_data,
+static void unloader(void *new_data,
                   cel_alloc *allocator) {
         CEL_FREE(allocator, new_data);
     }
 
-    void online(uint64_t name,
+static void online(uint64_t name,
                 void *data) {
         CEL_UNUSED(name, data);
 
     }
 
-    void offline(uint64_t name,
+static void offline(uint64_t name,
                  void *data) {
         CEL_UNUSED(name, data);
     }
 
-    void *reloader(uint64_t name,
+static void *reloader(uint64_t name,
                    void *old_data,
                    void *new_data,
                    cel_alloc *allocator) {
@@ -208,24 +205,20 @@ namespace material_resource {
     }
 
     static const ct_resource_callbacks_t callback = {
-            .loader = material_resource::loader,
-            .unloader = material_resource::unloader,
-            .online = material_resource::online,
-            .offline = material_resource::offline,
-            .reloader = material_resource::reloader
+            .loader = loader,
+            .unloader = unloader,
+            .online = online,
+            .offline = offline,
+            .reloader = reloader
     };
-}
 
 
 //==============================================================================
 // Interface
 //==============================================================================
-
-namespace material {
 //    static const ct_material null_material = {};
 
-
-    struct ct_material create(uint64_t name) {
+static struct ct_material create(uint64_t name) {
         auto res = ct_resource_a0.get(_G.type, name);
         auto resource = material_blob::get(res);
 
@@ -240,7 +233,7 @@ namespace material {
         return (ct_material) {.idx=h};
     }
 
-    uint32_t _find_uniform_slot(const material_blob::blob_t *resource,
+static uint32_t _find_uniform_slot(const material_blob::blob_t *resource,
                                 const char *name) {
 
         const char *u_names = material_blob::uniform_names(resource);
@@ -255,7 +248,7 @@ namespace material {
         return UINT32_MAX;
     }
 
-    uint32_t _find_layer_slot(const material_blob::blob_t *resource,
+static uint32_t _find_layer_slot(const material_blob::blob_t *resource,
                               uint64_t layer) {
 
         auto *u_names = material_blob::layer_names(resource);
@@ -270,7 +263,7 @@ namespace material {
         return UINT32_MAX;
     }
 
-    void set_texture_handler(struct ct_material material,
+static void set_texture_handler(struct ct_material material,
                              const char *slot,
                              ct_texture texture) {
         material_instance *mat_inst = get_material_instance(material);
@@ -283,7 +276,7 @@ namespace material {
         uniforms[slot_idx].type = MAT_VAR_TEXTURE_HANDLER;
     }
 
-    void set_texture(ct_material material,
+static void set_texture(ct_material material,
                      const char *slot,
                      uint64_t texture) {
         material_instance *mat_inst = get_material_instance(material);
@@ -295,7 +288,7 @@ namespace material {
     }
 
 
-    void set_mat44f(ct_material material,
+static void set_mat44f(ct_material material,
                     const char *slot,
                     float *value) {
         material_instance *mat_inst = get_material_instance(material);
@@ -307,7 +300,7 @@ namespace material {
         celib::mat4_move(uniforms[slot_idx].m44, value);
     }
 
-    void submit(ct_material material,
+static void submit(ct_material material,
                 uint64_t layer,
                 uint8_t viewid) {
         material_instance *mat_inst = get_material_instance(material);
@@ -376,15 +369,13 @@ namespace material {
         bgfx::setState(state, 0);
         bgfx::submit(viewid, {shader.idx});
     }
-}
-
 
 static struct ct_material_a0 material_api = {
-        .resource_create = material::create,
-        .set_texture = material::set_texture,
-        .set_texture_handler = material::set_texture_handler,
-        .set_mat44f = material::set_mat44f,
-        .submit = material::submit
+        .resource_create = create,
+        .set_texture = set_texture,
+        .set_texture_handler = set_texture_handler,
+        .set_mat44f = set_mat44f,
+        .submit = submit
 };
 
 static int init(ct_api_a0 *api) {
@@ -398,9 +389,9 @@ static int init(ct_api_a0 *api) {
     _G.instace_map.init(ct_memory_a0.main_allocator());
     _G.resource_map.init(ct_memory_a0.main_allocator());
 
-    ct_resource_a0.register_type(_G.type, material_resource::callback);
+    ct_resource_a0.register_type(_G.type, callback);
 
-    material_compiler::init(api);
+    materialcompiler_init(api);
 
     return 1;
 }

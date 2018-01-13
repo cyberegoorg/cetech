@@ -60,7 +60,7 @@ static struct globals {
 } _G;
 
 
-void fps_camera_update(ct_world world,
+static void fps_camera_update(ct_world world,
                        ct_entity camera_ent,
                        float dt,
                        float dx,
@@ -120,7 +120,7 @@ void fps_camera_update(ct_world world,
     ct_transform_a0.set_position(transform, pos);
 }
 
-void on_debugui() {
+static void on_debugui() {
     char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -190,7 +190,7 @@ void on_debugui() {
     }
 }
 
-void render() {
+static void render() {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         if (!_G.visible[i]) {
             continue;
@@ -201,7 +201,7 @@ void render() {
     }
 }
 
-uint32_t find_level(uint64_t name) {
+static uint32_t find_level(uint64_t name) {
     for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
         if (_G.entity_name[i] != name) {
             continue;
@@ -252,13 +252,13 @@ static void open(uint64_t name,
                                     _G.path[idx], is_level);
 }
 
-void init() {
+static void init() {
 }
 
-void shutdown() {
+static void shutdown() {
 }
 
-void update(float dt) {
+static void update(float dt) {
     if (UINT8_MAX == _G.active_editor) {
         return;
     }

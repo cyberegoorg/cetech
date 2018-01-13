@@ -19,123 +19,116 @@ using namespace celib;
 // Globals
 //==============================================================================
 
-namespace {
 #define _G ComponentMaagerGlobals
-    static struct ComponentMaagerGlobals {
-        Map<ct_component_compiler_t> compiler_map;
-        Map<uint32_t> spawn_order_map;
-        Map<ct_component_clb> component_clb;
-    } ComponentMaagerGlobals;
-}
+static struct ComponentMaagerGlobals {
+    Map<ct_component_compiler_t> compiler_map;
+    Map<uint32_t> spawn_order_map;
+    Map<ct_component_clb> component_clb;
+} ComponentMaagerGlobals;
 
 
 //==============================================================================
 // Public interface
 //==============================================================================
 
-namespace component {
+static void register_compiler(uint64_t type,
+                       ct_component_compiler_t compiler,
+                       uint32_t spawn_order) {
+    map::set(_G.compiler_map, type, compiler);
+    map::set(_G.spawn_order_map, type, spawn_order);
+}
 
-    void register_compiler(uint64_t type,
-                           ct_component_compiler_t compiler,
-                           uint32_t spawn_order) {
-        map::set(_G.compiler_map, type, compiler);
-        map::set(_G.spawn_order_map, type, spawn_order);
+static int compile(uint64_t type,
+            const char *filename,
+            uint64_t *component_key,
+            uint32_t component_key_count,
+            char **data) {
+
+    ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
+            _G.compiler_map, type, nullptr);
+
+    if (!compiler) {
+        return 0;
     }
 
-    int compile(uint64_t type,
-                const char* filename,
-                uint64_t* component_key,
-                uint32_t component_key_count,
-                char** data) {
+    return compiler(filename, component_key, component_key_count, data);
+}
 
-        ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
-                _G.compiler_map, type, nullptr);
+static uint32_t get_spawn_order(uint64_t type) {
+    return map::get(_G.spawn_order_map, type, (uint32_t) 0);
+}
 
-        if (!compiler) {
-            return 0;
-        }
+static void register_type(uint64_t type,
+                   ct_component_clb clb) {
+    map::set(_G.component_clb, type, clb);
 
-        return compiler(filename, component_key, component_key_count, data);
+    ct_world_callbacks_t wclb = {
+            .on_created = clb.world_clb.on_created,
+            .on_destroy = clb.world_clb.on_destroy,
+            .on_update = clb.world_clb.on_update,
+    };
+
+    ct_world_a0.register_callback(wclb);
+}
+
+static void spawn(ct_world world,
+           uint64_t type,
+           ct_entity *ent_ids,
+           uint32_t *cent,
+           uint32_t *ents_parent,
+           uint32_t ent_count,
+           void *data) {
+
+    ct_component_clb clb = map::get(_G.component_clb, type,
+                                    ct_component_clb_null);
+
+    if (!clb.spawner) {
+        return;
     }
 
-    uint32_t get_spawn_order(uint64_t type) {
-        return map::get(_G.spawn_order_map, type, (uint32_t) 0);
-    }
+    clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
+}
 
-    void register_type(uint64_t type,
-                       ct_component_clb clb) {
-        map::set(_G.component_clb, type, clb);
+static void destroy(ct_world world,
+             ct_entity *ent,
+             uint32_t count) {
 
-        ct_world_callbacks_t wclb = {
-                .on_created = clb.world_clb.on_created,
-                .on_destroy = clb.world_clb.on_destroy,
-                .on_update = clb.world_clb.on_update,
-        };
+    auto ct_it = map::begin(_G.component_clb);
+    auto ct_end = map::end(_G.component_clb);
 
-        ct_world_a0.register_callback(wclb);
-    }
-
-    void spawn(ct_world world,
-               uint64_t type,
-               ct_entity *ent_ids,
-               uint32_t *cent,
-               uint32_t *ents_parent,
-               uint32_t ent_count,
-               void *data) {
-
-        ct_component_clb clb = map::get(_G.component_clb, type,
-                                        ct_component_clb_null);
-
-        if (!clb.spawner) {
-            return;
-        }
-
-        clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
-    }
-
-    void destroy(ct_world world,
-                 ct_entity *ent,
-                 uint32_t count) {
-
-        auto ct_it = map::begin(_G.component_clb);
-        auto ct_end = map::end(_G.component_clb);
-
-        while (ct_it != ct_end) {
-            ct_it->value.destroyer(world, ent, count);
-            ++ct_it;
-        }
+    while (ct_it != ct_end) {
+        ct_it->value.destroyer(world, ent, count);
+        ++ct_it;
     }
 }
 
-namespace component_module {
-    static ct_component_a0 component_api = {
-            .register_compiler = component::register_compiler,
-            .compile = component::compile,
-            .spawn_order = component::get_spawn_order,
-            .register_type = component::register_type,
-            .spawn = component::spawn,
-            .destroy = component::destroy,
-    };
+static ct_component_a0 component_api = {
+        .register_compiler = register_compiler,
+        .compile = compile,
+        .spawn_order = get_spawn_order,
+        .register_type = register_type,
+        .spawn = spawn,
+        .destroy = destroy,
+};
 
-    void _init_api(ct_api_a0 *a0) {
-        a0->register_api("ct_component_a0", &component_api);
-    }
+static void _init_api(ct_api_a0 *a0) {
+    a0->register_api("ct_component_a0", &component_api);
+}
 
-    void _init(ct_api_a0 *a0) {
-        _init_api(a0);
+static void _init(ct_api_a0 *a0) {
+    _init_api(a0);
 
-        _G = {};
+    _G = {};
 
-        _G.compiler_map.init(ct_memory_a0.main_allocator());
-        _G.spawn_order_map.init(ct_memory_a0.main_allocator());
-        _G.component_clb.init(ct_memory_a0.main_allocator());
-    }
+    _G.compiler_map.init(ct_memory_a0.main_allocator());
+    _G.spawn_order_map.init(ct_memory_a0.main_allocator());
+    _G.component_clb.init(ct_memory_a0.main_allocator());
+}
 
-    void _shutdown() {
-        _G.compiler_map.destroy();
-        _G.spawn_order_map.destroy();
-        _G.component_clb.destroy();
-    }
+static void _shutdown() {
+    _G.compiler_map.destroy();
+    _G.spawn_order_map.destroy();
+    _G.component_clb.destroy();
 }
 
 CETECH_MODULE_DEF(
@@ -146,12 +139,12 @@ CETECH_MODULE_DEF(
         },
         {
             CEL_UNUSED(reload);
-            component_module::_init(api);
+            _init(api);
         },
         {
             CEL_UNUSED(reload);
             CEL_UNUSED(api);
-            component_module::_shutdown();
+            _shutdown();
         }
 )
 

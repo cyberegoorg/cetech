@@ -1,9 +1,8 @@
 #ifndef CETECH__MEMORY_H
 #define CETECH__MEMORY_H
 
-namespace memory {
 
-    void init(int scratch_buffer_size);
+    void memory_init();
 
     void register_api(struct ct_api_a0 *api);
 
@@ -41,8 +40,6 @@ namespace memory {
     struct cel_alloc *malloc_allocator_create();
 
     void malloc_allocator_destroy(struct cel_alloc *a);
-
-}
 
 static const void *pointer_align_forward(const void *p,
                                          uint32_t align) {
