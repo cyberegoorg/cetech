@@ -10,7 +10,7 @@
 #include "container_types.inl"
 #include "handler_types.inl"
 #include "allocator.h"
-#include "queue.inl"
+#include "array.h"
 
 struct cel_alloc;
 
@@ -48,13 +48,13 @@ namespace celib {
         T create(Handler<T> &handler) {
             T idx;
 
-            if (queue::size(handler._freeIdx) > _MINFREEINDEXS) {
+            if (cel_array_size(handler._freeIdx) > _MINFREEINDEXS) {
                 idx = handler._freeIdx[0];
-                queue::pop_front(handler._freeIdx);
+                cel_array_pop_front(handler._freeIdx);
             } else {
-                array::push_back(handler._generation, (uint32_t) 0);
+                cel_array_push(handler._generation, 0, handler.alloc);
 
-                idx = array::size(handler._generation) - 1;
+                idx = cel_array_size(handler._generation) - 1;
             }
 
             return _make_entity(idx, handler._generation[idx]);
@@ -66,7 +66,7 @@ namespace celib {
             T id = _idx(h);
 
             handler._generation[id] += 1;
-            queue::push_back(handler._freeIdx, id);
+            cel_array_push(handler._freeIdx, id, handler.alloc);
         }
 
         template<typename T>
@@ -77,26 +77,25 @@ namespace celib {
     };
 
     template<typename T>
-    Handler<T>::Handler() {
+    Handler<T>::Handler() : _generation(nullptr), _freeIdx(nullptr),
+                            alloc(nullptr) {
     }
 
     template<typename T>
-    Handler<T>::Handler(cel_alloc *allocator) : _generation(allocator),
-                                                _freeIdx(allocator) {
+    Handler<T>::Handler(cel_alloc *allocator) : _generation(nullptr), _freeIdx(nullptr),
+                                                alloc(allocator) {
     }
 
     template<typename T>
     void Handler<T>::init(cel_alloc *allocator) {
-        _generation.init(allocator);
-        _freeIdx.init(allocator);
-
+        alloc = allocator;
         handler::create(*this);
     }
 
     template<typename T>
     void Handler<T>::destroy() {
-        _generation.destroy();
-        _freeIdx.destroy();
+        cel_array_free(_freeIdx, alloc);
+        cel_array_free(_generation, alloc);
     }
 };
 

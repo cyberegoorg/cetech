@@ -238,6 +238,9 @@ extern "C" void application_start() {
     uint32_t aaa[] = {1, 2};
     cel_array_push_n(arr, aaa, 2, ct_memory_a0.main_allocator());
 
+    cel_array_pop_front(arr);
+    cel_array_pop_front(arr);
+
     for (int j = 0; j < cel_array_size(arr); ++j) {
         ct_log_a0.debug("dddd", "%d", arr[j]);
     }

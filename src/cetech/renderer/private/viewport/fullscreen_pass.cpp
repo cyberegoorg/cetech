@@ -6,7 +6,6 @@
 #include <celib/allocator.h>
 #include <celib/array.inl>
 #include <celib/map.inl>
-#include <celib/handler.inl>
 #include <celib/fpumath.h>
 
 #include <cetech/api/api_system.h>

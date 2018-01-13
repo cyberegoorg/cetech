@@ -7,11 +7,6 @@
 
 #include <stdint.h>
 
-#include "queue.inl"
-#include "array.inl"
-#include "allocator.h"
-#include "container_types.inl"
-
 struct cel_alloc;
 
 namespace celib {
@@ -25,8 +20,9 @@ namespace celib {
 
         void destroy();
 
-        Array<uint32_t> _generation;
-        Queue<uint32_t> _freeIdx;
+        uint32_t* _generation;
+        uint32_t* _freeIdx;
+        cel_alloc* alloc;
     };
 }
 
