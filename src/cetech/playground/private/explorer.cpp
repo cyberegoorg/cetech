@@ -42,10 +42,10 @@ static struct _G {
     struct ct_entity level;
     struct ct_world world;
 
-    ct_li_on_entity* on_entity_click;
+    ct_li_on_entity *on_entity_click;
     const char *path;
     bool is_level;
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
@@ -75,12 +75,12 @@ void set_level(struct ct_world world,
                struct ct_entity level,
                uint64_t name,
                uint64_t root,
-               const char* path,
+               const char *path,
                bool is_level) {
 
     CEL_UNUSED(root);
 
-    if( _G.level_name == name) {
+    if (_G.level_name == name) {
         return;
     }
 
@@ -110,32 +110,33 @@ static void ui_entity_item_begin(const char *name,
     uint64_t name_hash = ct_yng_a0.calc_key(name);
     bool selected = _G.selected_name == name_hash;
 
-    uint64_t  children_keys[32] = {};
-    uint32_t  children_keys_count = 0;
+    uint64_t children_keys[32] = {};
+    uint32_t children_keys_count = 0;
 
-    uint64_t tmp_keys[keys_count+3];
+    uint64_t tmp_keys[keys_count + 3];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
     tmp_keys[keys_count] = ct_yng_a0.calc_key("children");
     ct_ydb_a0.get_map_keys(
             _G.path,
-            tmp_keys, keys_count+1,
+            tmp_keys, keys_count + 1,
             children_keys, CETECH_ARRAY_LEN(children_keys),
             &children_keys_count);
 
-    ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow | DebugUITreeNodeFlags_OpenOnDoubleClick;
+    ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
+                               DebugUITreeNodeFlags_OpenOnDoubleClick;
 
-    if(selected) {
+    if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    if(children_keys_count == 0) {
+    if (children_keys_count == 0) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
     bool open = ct_debugui_a0.TreeNodeEx(name, flags);
-    if(ImGui::IsItemClicked(0)) {
-        if(_G.selected_name != name_hash) {
+    if (ImGui::IsItemClicked(0)) {
+        if (_G.selected_name != name_hash) {
             for (uint32_t j = 0; j < cel_array_size(_G.on_entity_click); ++j) {
                 _G.on_entity_click[j](_G.world, _G.level, _G.path, keys,
                                       keys_count);
@@ -150,11 +151,12 @@ static void ui_entity_item_begin(const char *name,
             char buffer[256];
             sprintf(buffer, "%llu", children_keys[i]);
 
-            tmp_keys[keys_count+1] = children_keys[i];
-            tmp_keys[keys_count+2] = ct_yng_a0.calc_key("name");
+            tmp_keys[keys_count + 1] = children_keys[i];
+            tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("name");
 
-            const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, keys_count+3, buffer);
-            ui_entity_item_begin(name, tmp_keys, keys_count+2);
+            const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys,
+                                                    keys_count + 3, buffer);
+            ui_entity_item_begin(name, tmp_keys, keys_count + 2);
         }
 
         ui_entity_item_end();
@@ -162,21 +164,21 @@ static void ui_entity_item_begin(const char *name,
 }
 
 
-
 static void on_debugui() {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
-        if(_G.is_level) {
+        if (_G.is_level) {
             ct_debugui_a0.LabelText("Level", "%llu", _G.level_name);
         } else {
             ct_debugui_a0.LabelText("Entity", "%llu", _G.level_name);
         }
 
-        if(_G.path) {
-            uint64_t  tmp_keys[32] = {};
+        if (_G.path) {
+            uint64_t tmp_keys[32] = {};
             tmp_keys[0] = ct_yng_a0.calc_key("name");
-            const char* name = ct_ydb_a0.get_string(_G.path, tmp_keys, 1, "ROOT");
+            const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys, 1,
+                                                    "ROOT");
             ui_entity_item_begin(name, tmp_keys, 0);
         }
     }
@@ -198,7 +200,7 @@ static void _init(ct_api_a0 *api) {
 
     ct_playground_a0.register_module(
             PLAYGROUND_MODULE_NAME,
-            (ct_playground_module_fce){
+            (ct_playground_module_fce) {
                     .on_ui = on_debugui,
                     .on_menu_window = on_menu_window,
             });

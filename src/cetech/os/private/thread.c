@@ -5,8 +5,10 @@
 #endif
 
 #if defined(CETECH_DARWIN)
+
 #include <sched.h>
 #include <unistd.h>
+
 #endif
 
 #include <cetech/os/thread.h>

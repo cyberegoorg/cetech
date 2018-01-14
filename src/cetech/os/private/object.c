@@ -21,7 +21,7 @@ void *load_object(const char *path) {
 #endif
 
 #ifdef CETECH_DARWIN
-    it += sprintf(buffer+it, ".dylib");
+    it += sprintf(buffer + it, ".dylib");
     void *obj = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
 #endif
 
@@ -42,7 +42,7 @@ void unload_object(void *so) {
 
 void *load_function(void *so,
                     const char *name) {
-    if(!so) {
+    if (!so) {
         return NULL;
     }
 

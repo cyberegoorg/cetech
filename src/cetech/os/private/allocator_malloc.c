@@ -73,7 +73,8 @@ static struct cel_alloc_fce alloc_fce = {
 struct cel_alloc *malloc_allocator_create() {
     struct cel_alloc *core_alloc = coreallocator_get();
 
-    struct cel_alloc *a = CEL_ALLOCATE(core_alloc, struct cel_alloc, sizeof(struct cel_alloc));
+    struct cel_alloc *a = CEL_ALLOCATE(core_alloc, struct cel_alloc,
+                                       sizeof(struct cel_alloc));
 
     struct allocator_malloc *m = CEL_ALLOCATE(core_alloc,
                                               struct allocator_malloc,

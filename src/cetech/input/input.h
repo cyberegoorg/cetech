@@ -112,7 +112,7 @@ struct ct_keyboard_a0 {
                            const uint32_t button_index);
 
 
-    char* (*text)(uint32_t idx);
+    char *(*text)(uint32_t idx);
 };
 
 //==============================================================================

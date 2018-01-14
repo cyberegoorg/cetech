@@ -142,7 +142,7 @@ static void renderer_set_debug(int debug) {
 
 
 static void renderer_get_size(uint32_t *width,
-                       uint32_t *height) {
+                              uint32_t *height) {
     *width = _G.size_width;
     *height = _G.size_height;
 }

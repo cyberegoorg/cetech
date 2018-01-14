@@ -186,7 +186,7 @@ int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_yng_a0);
 
-    _G = (struct _G){
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .package_typel = CT_ID64_0("package"),
     };

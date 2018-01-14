@@ -77,7 +77,7 @@ struct WorldInstance {
 
 static struct MeshRendererGlobal {
     struct cel_hash_t world_map;
-    WorldInstance* world_instances;
+    WorldInstance *world_instances;
     cel_hash_t ent_map;
     uint64_t type;
     cel_alloc *allocator;
@@ -248,7 +248,8 @@ ct_mesh_renderer mesh_create(ct_world world,
     allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
     ++data->n;
 
-    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx, _G.allocator);
+    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx,
+                 _G.allocator);
 
     ct_scene_a0.create_graph(world, entity, scene);
 

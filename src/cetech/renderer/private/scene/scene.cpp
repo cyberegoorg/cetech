@@ -76,7 +76,8 @@ static struct scene_instance *_init_scene_instance(uint64_t scene) {
 }
 
 static void _destroy_scene_instance(uint64_t scene) {
-    uint32_t idx = (uint32_t)cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
+    uint32_t idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene,
+                                              UINT32_MAX);
     uint32_t size = cel_array_size(_G.scene_instance_array);
 
     scene_instance *instance = &_G.scene_instance_array[idx];
@@ -90,16 +91,19 @@ static void _destroy_scene_instance(uint64_t scene) {
 
     *instance = *last_instance;
     cel_hash_remove(&_G.scene_instance_map, scene);
-    cel_hash_add(&_G.scene_instance_map, last_instance->scene, idx, _G.allocator);
+    cel_hash_add(&_G.scene_instance_map, last_instance->scene, idx,
+                 _G.allocator);
     cel_array_pop_back(_G.scene_instance_array);
 }
 
 static struct scene_instance *_get_scene_instance(uint64_t scene) {
-    uint32_t idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
+    uint32_t idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene,
+                                              UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         ct_resource_a0.get(_G.type, scene);
-        idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
+        idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene,
+                                         UINT32_MAX);
     }
 
     return &_G.scene_instance_array[idx];
@@ -117,7 +121,7 @@ static struct scene_instance *_get_scene_instance(uint64_t scene) {
 
 
 static void *loader(ct_vio *input,
-             cel_alloc *allocator) {
+                    cel_alloc *allocator) {
     const int64_t size = input->size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     input->read(input, data, 1, size);
@@ -125,12 +129,12 @@ static void *loader(ct_vio *input,
 }
 
 static void unloader(void *new_data,
-              cel_alloc *allocator) {
+                     cel_alloc *allocator) {
     CEL_FREE(allocator, new_data);
 }
 
 static void online(uint64_t name,
-            void *data) {
+                   void *data) {
 
     auto resource = scene_blob::get(data);
 
@@ -168,16 +172,16 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-             void *data) {
+                    void *data) {
     CEL_UNUSED(data);
 
     _destroy_scene_instance(name);
 }
 
 static void *reloader(uint64_t name,
-               void *old_data,
-               void *new_data,
-               cel_alloc *allocator) {
+                      void *old_data,
+                      void *new_data,
+                      cel_alloc *allocator) {
     offline(name, old_data);
     online(name, new_data);
 
@@ -226,7 +230,7 @@ static void shutdown() {
 }
 
 static void setVBIB(uint64_t scene,
-             uint64_t geom_name) {
+                    uint64_t geom_name) {
     scene_instance *instance = _get_scene_instance(scene);
 
     if (instance == NULL) {
@@ -234,7 +238,7 @@ static void setVBIB(uint64_t scene,
     }
 
     uint8_t idx = (uint8_t) cel_hash_lookup(&instance->geom_map, geom_name,
-                                    UINT8_MAX);
+                                            UINT8_MAX);
 
     if (idx == UINT8_MAX) {
         return;
@@ -245,8 +249,8 @@ static void setVBIB(uint64_t scene,
 }
 
 static void create_graph(ct_world world,
-                  ct_entity entity,
-                  uint64_t scene) {
+                         ct_entity entity,
+                         uint64_t scene) {
     auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
     uint64_t *node_name = scene_blob::node_name(res);
@@ -262,7 +266,7 @@ static void create_graph(ct_world world,
 }
 
 static uint64_t get_mesh_node(uint64_t scene,
-                       uint64_t mesh) {
+                              uint64_t mesh) {
     auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
     uint64_t *geom_node = scene_blob::geom_node(res);
@@ -280,8 +284,8 @@ static uint64_t get_mesh_node(uint64_t scene,
 }
 
 static void get_all_geometries(uint64_t scene,
-                        char **geometries,
-                        uint32_t *count) {
+                               char **geometries,
+                               uint32_t *count) {
     auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
     *geometries = scene_blob::geom_str(res);
@@ -289,8 +293,8 @@ static void get_all_geometries(uint64_t scene,
 }
 
 static void get_all_nodes(uint64_t scene,
-                   char **geometries,
-                   uint32_t *count) {
+                          char **geometries,
+                          uint32_t *count) {
     auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
 
     *geometries = scene_blob::node_str(res);

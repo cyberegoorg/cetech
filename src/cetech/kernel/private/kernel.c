@@ -49,7 +49,8 @@ const char *_platform() {
 #define CONFIG_SRC CT_ID64_0(CONFIG_SRC_ID)
 #define CONFIG_COMPILE CT_ID64_0(CONFIG_COMPILE_ID)
 
-int init_config(int argc, const char **argv,
+int init_config(int argc,
+                const char **argv,
                 struct ct_coredb_object_t *object) {
     struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
     ct_coredb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
@@ -63,13 +64,17 @@ int init_config(int argc, const char **argv,
 
     struct cel_alloc *a = ct_memory_a0.main_allocator();
 
-    const char *build_dir_str = ct_coredb_a0.read_string(object, CONFIG_BUILD, "");
+    const char *build_dir_str = ct_coredb_a0.read_string(object, CONFIG_BUILD,
+                                                         "");
 
     char *build_dir = ct_path_a0.join(a, 2, build_dir_str,
-                                      ct_coredb_a0.read_string(object, CONFIG_NATIVE_PLATFORM, ""));
+                                      ct_coredb_a0.read_string(object,
+                                                               CONFIG_NATIVE_PLATFORM,
+                                                               ""));
     char *build_config = ct_path_a0.join(a, 2, build_dir, "global.config");
 
-    const char *source_dir_str =  ct_coredb_a0.read_string(object, CONFIG_SRC, "");
+    const char *source_dir_str = ct_coredb_a0.read_string(object, CONFIG_SRC,
+                                                          "");
     char *source_config = ct_path_a0.join(a, 2, source_dir_str,
                                           "global.config");
 
@@ -92,7 +97,7 @@ int init_config(int argc, const char **argv,
 }
 
 int cetech_kernel_init(int argc,
-                                  const char **argv) {
+                       const char **argv) {
     struct cel_alloc *core_alloc = coreallocator_get();
 
     api_init(core_alloc);

@@ -161,120 +161,120 @@ static int _task_worker(void *o) {
 // Api
 //==============================================================================
 
-    void add(struct ct_task_item *items,
-             uint32_t count) {
-        for (uint32_t i = 0; i < count; ++i) {
-            task_t task = _new_task();
-            _G._task_pool[task.id] = (struct task) {
-                    .name = items[i].name,
-                    .task_work = items[i].work,
-                    .affinity = items[i].affinity,
-            };
-
-            _G._task_pool[task.id].data = items[i].data;
-
-            _push_task(task);
-        }
-    }
-
-    int do_work() {
-        task_t t = _task_pop_new_work();
-
-        if (t.id == 0) {
-            return 0;
-        }
-
-        _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
-
-        _mark_task_job_done(t);
-
-        return 1;
-    }
-
-    void wait_atomic(atomic_int *signal,
-                     int32_t value) {
-        while (atomic_load_explicit(signal, memory_order_acquire) == value) {
-            do_work();
-        }
-    }
-
-    char worker_id() {
-        return _worker_id;
-    }
-
-    int worker_count() {
-        return _G._workers_count;
-    }
-
-    static void _init_api(struct ct_api_a0 *api) {
-        static struct ct_task_a0 _api = {
-                .worker_id = worker_id,
-                .worker_count = worker_count,
-                .add = add,
-                .do_work = do_work,
-                .wait_atomic = wait_atomic
+void add(struct ct_task_item *items,
+         uint32_t count) {
+    for (uint32_t i = 0; i < count; ++i) {
+        task_t task = _new_task();
+        _G._task_pool[task.id] = (struct task) {
+                .name = items[i].name,
+                .task_work = items[i].work,
+                .affinity = items[i].affinity,
         };
 
-        api->register_api("ct_task_a0", &_api);
+        _G._task_pool[task.id].data = items[i].data;
+
+        _push_task(task);
+    }
+}
+
+int do_work() {
+    task_t t = _task_pop_new_work();
+
+    if (t.id == 0) {
+        return 0;
     }
 
-    static void _init(struct ct_api_a0 *api) {
-        _init_api(api);
+    _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
 
-        CETECH_GET_API(api, ct_memory_a0);
-        CETECH_GET_API(api, ct_thread_a0);
-        CETECH_GET_API(api, ct_log_a0);
-        CETECH_GET_API(api, ct_cpu_a0);
+    _mark_task_job_done(t);
 
-        ct_log_a0.set_wid_clb(worker_id);
+    return 1;
+}
 
-        _G = (struct _G){};
+void wait_atomic(atomic_int *signal,
+                 int32_t value) {
+    while (atomic_load_explicit(signal, memory_order_acquire) == value) {
+        do_work();
+    }
+}
 
-        int core_count = 2;//ct_cpu_a0.count();
+char worker_id() {
+    return _worker_id;
+}
 
-        static const uint32_t main_threads_count = 1 + 1/* Renderer */;
-        const uint32_t worker_count = core_count - main_threads_count;
+int worker_count() {
+    return _G._workers_count;
+}
 
-        ct_log_a0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-                       main_threads_count, worker_count);
+static void _init_api(struct ct_api_a0 *api) {
+    static struct ct_task_a0 _api = {
+            .worker_id = worker_id,
+            .worker_count = worker_count,
+            .add = add,
+            .do_work = do_work,
+            .wait_atomic = wait_atomic
+    };
 
-        _G._workers_count = worker_count;
+    api->register_api("ct_task_a0", &_api);
+}
 
-        queue_task_init(&_G._gloalQueue, MAX_TASK,
+static void _init(struct ct_api_a0 *api) {
+    _init_api(api);
+
+    CETECH_GET_API(api, ct_memory_a0);
+    CETECH_GET_API(api, ct_thread_a0);
+    CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_cpu_a0);
+
+    ct_log_a0.set_wid_clb(worker_id);
+
+    _G = (struct _G) {};
+
+    int core_count = 2;//ct_cpu_a0.count();
+
+    static const uint32_t main_threads_count = 1 + 1/* Renderer */;
+    const uint32_t worker_count = core_count - main_threads_count;
+
+    ct_log_a0.info("task", "Core/Main/Worker: %d, %d, %d", core_count,
+                   main_threads_count, worker_count);
+
+    _G._workers_count = worker_count;
+
+    queue_task_init(&_G._gloalQueue, MAX_TASK,
+                    ct_memory_a0.main_allocator());
+
+    for (uint32_t i = 0; i < worker_count + 1; ++i) {
+        queue_task_init(&_G._workers_queue[i], MAX_TASK,
                         ct_memory_a0.main_allocator());
-
-        for (uint32_t i = 0; i < worker_count + 1; ++i) {
-            queue_task_init(&_G._workers_queue[i], MAX_TASK,
-                            ct_memory_a0.main_allocator());
-        }
-
-        for (uint32_t j = 0; j < worker_count; ++j) {
-            _G._workers[j] = ct_thread_a0.create(
-                    (ct_thread_fce_t) _task_worker,
-                    "worker",
-                    (void *) ((intptr_t) (j +
-                                          1)));
-        }
-
-        _G._Run = 1;
     }
 
-    static void _shutdown() {
-        _G._Run = 0;
-        int status = 0;
-
-        for (uint32_t i = 0; i < _G._workers_count; ++i) {
-            ct_thread_a0.wait(_G._workers[i], &status);
-        }
-
-        queue_task_destroy(&_G._gloalQueue);
-
-        for (uint32_t i = 0; i < _G._workers_count + 1; ++i) {
-            queue_task_destroy(&_G._workers_queue[i]);
-        }
-
-        _G = (struct _G){};
+    for (uint32_t j = 0; j < worker_count; ++j) {
+        _G._workers[j] = ct_thread_a0.create(
+                (ct_thread_fce_t) _task_worker,
+                "worker",
+                (void *) ((intptr_t) (j +
+                                      1)));
     }
+
+    _G._Run = 1;
+}
+
+static void _shutdown() {
+    _G._Run = 0;
+    int status = 0;
+
+    for (uint32_t i = 0; i < _G._workers_count; ++i) {
+        ct_thread_a0.wait(_G._workers[i], &status);
+    }
+
+    queue_task_destroy(&_G._gloalQueue);
+
+    for (uint32_t i = 0; i < _G._workers_count + 1; ++i) {
+        queue_task_destroy(&_G._workers_queue[i]);
+    }
+
+    _G = (struct _G) {};
+}
 
 CETECH_MODULE_DEF(
         task,

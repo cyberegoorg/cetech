@@ -293,56 +293,53 @@
 #define STB_TEXTEDIT_POSITIONTYPE    int
 #endif
 
-typedef struct
-{
-   // private data
-   STB_TEXTEDIT_POSITIONTYPE  where;
-   short           insert_length;
-   short           delete_length;
-   short           char_storage;
+typedef struct {
+    // private data
+    STB_TEXTEDIT_POSITIONTYPE where;
+    short insert_length;
+    short delete_length;
+    short char_storage;
 } StbUndoRecord;
 
-typedef struct
-{
-   // private data
-   StbUndoRecord          undo_rec [STB_TEXTEDIT_UNDOSTATECOUNT];
-   STB_TEXTEDIT_CHARTYPE  undo_char[STB_TEXTEDIT_UNDOCHARCOUNT];
-   short undo_point, redo_point;
-   short undo_char_point, redo_char_point;
+typedef struct {
+    // private data
+    StbUndoRecord undo_rec[STB_TEXTEDIT_UNDOSTATECOUNT];
+    STB_TEXTEDIT_CHARTYPE undo_char[STB_TEXTEDIT_UNDOCHARCOUNT];
+    short undo_point, redo_point;
+    short undo_char_point, redo_char_point;
 } StbUndoState;
 
-typedef struct
-{
-   /////////////////////
-   //
-   // public data
-   //
+typedef struct {
+    /////////////////////
+    //
+    // public data
+    //
 
-   int cursor;
-   // position of the text cursor within the string
+    int cursor;
+    // position of the text cursor within the string
 
-   int select_start;          // selection start point
-   int select_end;
-   // selection start and end point in characters; if equal, no selection.
-   // note that start may be less than or greater than end (e.g. when
-   // dragging the mouse, start is where the initial click was, and you
-   // can drag in either direction)
+    int select_start;          // selection start point
+    int select_end;
+    // selection start and end point in characters; if equal, no selection.
+    // note that start may be less than or greater than end (e.g. when
+    // dragging the mouse, start is where the initial click was, and you
+    // can drag in either direction)
 
-   unsigned char insert_mode;
-   // each textfield keeps its own insert mode state. to keep an app-wide
-   // insert mode, copy this value in/out of the app state
+    unsigned char insert_mode;
+    // each textfield keeps its own insert mode state. to keep an app-wide
+    // insert mode, copy this value in/out of the app state
 
-   /////////////////////
-   //
-   // private data
-   //
-   unsigned char cursor_at_end_of_line; // not implemented yet
-   unsigned char initialized;
-   unsigned char has_preferred_x;
-   unsigned char single_line;
-   unsigned char padding1, padding2, padding3;
-   float preferred_x; // this determines where the cursor up/down tries to seek to along x
-   StbUndoState undostate;
+    /////////////////////
+    //
+    // private data
+    //
+    unsigned char cursor_at_end_of_line; // not implemented yet
+    unsigned char initialized;
+    unsigned char has_preferred_x;
+    unsigned char single_line;
+    unsigned char padding1, padding2, padding3;
+    float preferred_x; // this determines where the cursor up/down tries to seek to along x
+    StbUndoState undostate;
 } STB_TexteditState;
 
 
@@ -354,12 +351,11 @@ typedef struct
 // the text in each row is.
 
 // result of layout query
-typedef struct
-{
-   float x0,x1;             // starting x location, end x location (allows for align=right, etc)
-   float baseline_y_delta;  // position of baseline relative to previous row's baseline
-   float ymin,ymax;         // height of row above and below baseline
-   int num_chars;
+typedef struct {
+    float x0, x1;             // starting x location, end x location (allows for align=right, etc)
+    float baseline_y_delta;  // position of baseline relative to previous row's baseline
+    float ymin, ymax;         // height of row above and below baseline
+    int num_chars;
 } StbTexteditRow;
 #endif //INCLUDE_STB_TEXTEDIT_H
 

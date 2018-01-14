@@ -85,7 +85,7 @@ static fs_root *get_fs_root(uint64_t root) {
 }
 
 static fs_root *get_or_crate_root(uint64_t root) {
-    uint32_t idx =  cel_hash_lookup(&_G.root_map, root, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.root_map, root, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         uint32_t root_idx = new_fs_root(root);
@@ -98,7 +98,7 @@ static fs_root *get_or_crate_root(uint64_t root) {
 
 
 static uint32_t new_fs_mount(uint64_t root,
-                      fs_mount_point mp) {
+                             fs_mount_point mp) {
     fs_root *fs_inst = get_or_crate_root(root);
 
     auto &mount_points = fs_inst->mount_points;
@@ -110,8 +110,8 @@ static uint32_t new_fs_mount(uint64_t root,
 
 
 static void map_root_dir(uint64_t root,
-                  const char *base_path,
-                  bool watch) {
+                         const char *base_path,
+                         bool watch) {
     cel_alloc *a = ct_memory_a0.main_allocator();
 
     fs_mount_point mp = {};
@@ -144,9 +144,9 @@ static bool exist(const char *full_path) {
 }
 
 static char *get_full_path(uint64_t root,
-                    cel_alloc *allocator,
-                    const char *filename,
-                    bool test_dir) {
+                           cel_alloc *allocator,
+                           const char *filename,
+                           bool test_dir) {
 
     fs_root *fs_inst = get_fs_root(root);
     const uint32_t mp_count = cel_array_size(fs_inst->mount_points);
@@ -167,8 +167,8 @@ static char *get_full_path(uint64_t root,
 }
 
 static ct_vio *open(uint64_t root,
-             const char *path,
-             ct_fs_open_mode mode) {
+                    const char *path,
+                    ct_fs_open_mode mode) {
     auto a = ct_memory_a0.main_allocator();
 
     char *full_path = get_full_path(root, a, path, mode == FS_OPEN_WRITE);
@@ -191,7 +191,7 @@ static void close(ct_vio *file) {
 }
 
 static int create_directory(uint64_t root,
-                     const char *path) {
+                            const char *path) {
     auto a = ct_memory_a0.main_allocator();
 
 
@@ -204,13 +204,13 @@ static int create_directory(uint64_t root,
 }
 
 static void listdir(uint64_t root,
-             const char *path,
-             const char *filter,
-             bool only_dir,
-             bool recursive,
-             char ***files,
-             uint32_t *count,
-             cel_alloc *allocator) {
+                    const char *path,
+                    const char *filter,
+                    bool only_dir,
+                    bool recursive,
+                    char ***files,
+                    uint32_t *count,
+                    cel_alloc *allocator) {
 
     auto a = ct_memory_a0.main_allocator();
 
@@ -255,8 +255,8 @@ static void listdir(uint64_t root,
 }
 
 static void listdir_free(char **files,
-                  uint32_t count,
-                  cel_alloc *allocator) {
+                         uint32_t count,
+                         cel_alloc *allocator) {
     for (uint32_t i = 0; i < count; ++i) {
         free(files[i]);
     }
@@ -265,11 +265,11 @@ static void listdir_free(char **files,
 }
 
 static void listdir2(uint64_t root,
-              const char *path,
-              const char *filter,
-              bool only_dir,
-              bool recursive,
-              void (*on_item)(const char *path)) {
+                     const char *path,
+                     const char *filter,
+                     bool only_dir,
+                     bool recursive,
+                     void (*on_item)(const char *path)) {
 
     char **files;
     uint32_t count;
@@ -286,7 +286,7 @@ static void listdir2(uint64_t root,
 
 
 static int64_t get_file_mtime(uint64_t root,
-                       const char *path) {
+                              const char *path) {
     auto a = ct_memory_a0.main_allocator();
 
     char *full_path = get_full_path(root, a, path, false);
@@ -381,9 +381,9 @@ static ct_watchdog_ev_header *event_next(ct_watchdog_ev_header *header) {
 }
 
 static void _get_full_path(uint64_t root,
-                    const char *path,
-                    char *fullpath,
-                    uint32_t max_len) {
+                           const char *path,
+                           char *fullpath,
+                           uint32_t max_len) {
     cel_alloc *a = ct_memory_a0.main_allocator();
 
     char *fp = get_full_path(root, a, path, false);

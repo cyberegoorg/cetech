@@ -163,7 +163,7 @@ static void init() {
 
     _G.world = ct_world_a0.create();
 
-    _G.camera_ent = ct_entity_a0.spawn(_G.world,CT_ID64_0("content/camera"));
+    _G.camera_ent = ct_entity_a0.spawn(_G.world, CT_ID64_0("content/camera"));
 
     ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
     ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
@@ -232,7 +232,7 @@ static void _init(ct_api_a0 *api) {
 
     ct_playground_a0.register_module(
             CT_ID64_0("asset_preview"),
-            (ct_playground_module_fce){
+            (ct_playground_module_fce) {
                     .on_init = init,
                     .on_shutdown = shutdown,
                     .on_render = render,

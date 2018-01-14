@@ -57,7 +57,7 @@ static const ct_shader null_program = BGFX_INVALID_HANDLE;
 
 
 static void *loader(ct_vio *input,
-             cel_alloc *allocator) {
+                    cel_alloc *allocator) {
 
     const int64_t size = input->size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
@@ -66,12 +66,12 @@ static void *loader(ct_vio *input,
 }
 
 static void unloader(void *new_data,
-              cel_alloc *allocator) {
+                     cel_alloc *allocator) {
     CEL_FREE(allocator, new_data);
 }
 
 static void online(uint64_t name,
-            void *data) {
+                   void *data) {
     auto *resource = shader_blob::get(data);
 
     bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
@@ -93,7 +93,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-             void *data) {
+                    void *data) {
     CEL_UNUSED(data);
 
     auto program = map::get(_G.handler_map, name, null_program);
@@ -108,9 +108,9 @@ static void offline(uint64_t name,
 }
 
 static void *reloader(uint64_t name,
-               void *old_data,
-               void *new_data,
-               cel_alloc *allocator) {
+                      void *old_data,
+                      void *new_data,
+                      cel_alloc *allocator) {
     offline(name, old_data);
     online(name, new_data);
 

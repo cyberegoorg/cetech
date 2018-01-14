@@ -133,7 +133,7 @@ void register_api(struct ct_api_a0 *api) {
 }
 
 void memory_init() {
-    _G = (struct MemorySystemGlobals){0};
+    _G = (struct MemorySystemGlobals) {0};
 
     _G.default_allocator = malloc_allocator_create();
 

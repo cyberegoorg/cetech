@@ -17,11 +17,16 @@ extern "C" {
 //==============================================================================
 
 struct ct_action_manager_a0 {
-    void (*register_action)(uint64_t name, const char* shortcut, void (*fce)());
+    void (*register_action)(uint64_t name,
+                            const char *shortcut,
+                            void (*fce)());
+
     void (*unregister_action)(uint64_t name);
 
-    const char* (*shortcut_str)(uint64_t name);
+    const char *(*shortcut_str)(uint64_t name);
+
     void (*execute)(uint64_t name);
+
     void (*check)();
 
 };

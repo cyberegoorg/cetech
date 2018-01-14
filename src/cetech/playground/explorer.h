@@ -30,13 +30,14 @@ typedef void (*ct_li_on_entity)(struct ct_world world,
 
 struct ct_explorer_a0 {
     void (*set_level)(ct_world world,
-                          ct_entity level,
-                          uint64_t name,
-                          uint64_t root,
-                          const char *path,
-                          bool b);
+                      ct_entity level,
+                      uint64_t name,
+                      uint64_t root,
+                      const char *path,
+                      bool b);
 
     void (*register_on_entity_click)(ct_li_on_entity on_entity);
+
     void (*unregister_on_entity_click)(ct_li_on_entity on_entity);
 };
 

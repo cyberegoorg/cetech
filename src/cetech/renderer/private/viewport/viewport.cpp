@@ -128,11 +128,11 @@ struct ct_texture renderer_get_global_resource(uint64_t name) {
 static int viewid_counter = 0;
 
 static void renderer_render_world(ct_world world,
-                           ct_camera camera,
-                           ct_viewport viewport) {
+                                  ct_camera camera,
+                                  ct_viewport viewport) {
 
     auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
-                        UINT32_MAX);
+                               UINT32_MAX);
 
     auto &vi = _G.viewport_instances[idx];
 
@@ -152,7 +152,7 @@ static void renderer_render_world(ct_world world,
 
 
 static ct_texture get_local_resource(viewport_instance &instance,
-                              uint64_t name) {
+                                     uint64_t name) {
     for (uint32_t i = 0; i < instance.resource_count; ++i) {
         if (instance.local_resource_name[i] != name) {
             continue;
@@ -164,20 +164,21 @@ static ct_texture get_local_resource(viewport_instance &instance,
     return {UINT16_MAX};
 }
 
-static struct ct_texture render_viewport_get_local_resource(ct_viewport viewport,
-                                                     uint64_t name) {
+static struct ct_texture
+render_viewport_get_local_resource(ct_viewport viewport,
+                                   uint64_t name) {
 
     auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
-                        UINT32_MAX);
+                               UINT32_MAX);
     auto &vi = _G.viewport_instances[idx];
 
     return get_local_resource(vi, name);
 }
 
 static void _init_viewport(viewport_instance &vi,
-                    uint64_t name,
-                    float width,
-                    float height) {
+                           uint64_t name,
+                           float width,
+                           float height) {
     const char *render_config = ct_coredb_a0.read_string(
             ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
@@ -279,11 +280,11 @@ static void _init_viewport(viewport_instance &vi,
 }
 
 static void resize_viewport(ct_viewport viewport,
-                     float width,
-                     float height) {
+                            float width,
+                            float height) {
 
     auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
-                        UINT32_MAX);
+                               UINT32_MAX);
     auto &vi = _G.viewport_instances[idx];
 
     if ((width != vi.size[0]) || (height != vi.size[1])) {
@@ -299,8 +300,8 @@ static void recreate_all_viewport() {
 }
 
 static ct_viewport renderer_create_viewport(uint64_t name,
-                                     float width,
-                                     float height) {
+                                            float width,
+                                            float height) {
     viewport_instance vi = {};
     _init_viewport(vi, name, width, height);
 
@@ -317,7 +318,7 @@ static ct_viewport renderer_create_viewport(uint64_t name,
 // render_config resource
 //==============================================================================
 static void *loader(ct_vio *input,
-             cel_alloc *allocator) {
+                    cel_alloc *allocator) {
     const int64_t size = input->size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     input->read(input, data, 1, size);
@@ -325,12 +326,12 @@ static void *loader(ct_vio *input,
 }
 
 static void unloader(void *new_data,
-              cel_alloc *allocator) {
+                     cel_alloc *allocator) {
     CEL_FREE(allocator, new_data);
 }
 
 static void online(uint64_t name,
-            void *data) {
+                   void *data) {
     CEL_UNUSED(name);
 
     auto *blob = renderconfig_blob::get(data);
@@ -358,7 +359,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-             void *data) {
+                    void *data) {
     CEL_UNUSED(name, data);
     //auto *blob = renderconfig_blob::get(data);
 
@@ -366,9 +367,9 @@ static void offline(uint64_t name,
 }
 
 static void *reloader(uint64_t name,
-               void *old_data,
-               void *new_data,
-               cel_alloc *allocator) {
+                      void *old_data,
+                      void *new_data,
+                      cel_alloc *allocator) {
     offline(name, old_data);
     online(name, new_data);
 
@@ -402,8 +403,8 @@ struct compiler_output {
 };
 
 static void compile_global_resource(uint32_t idx,
-                             struct ct_yamlng_node value,
-                             void *_data) {
+                                    struct ct_yamlng_node value,
+                                    void *_data) {
 
     CEL_UNUSED(idx);
 
@@ -444,8 +445,8 @@ static void compile_global_resource(uint32_t idx,
 
 
 static void compile_layer_entry(uint32_t idx,
-                         struct ct_yamlng_node value,
-                         void *_data) {
+                                struct ct_yamlng_node value,
+                                void *_data) {
     CEL_UNUSED(idx);
 
     layer_entry_t le = {};
@@ -506,8 +507,8 @@ static void compile_layer_entry(uint32_t idx,
 }
 
 static void compile_layers(struct ct_yamlng_node key,
-                    struct ct_yamlng_node value,
-                    void *_data) {
+                           struct ct_yamlng_node value,
+                           void *_data) {
     ct_yng_doc *d = key.d;
     compiler_output &output = *((compiler_output *) _data);
 
@@ -528,8 +529,8 @@ static void compile_layers(struct ct_yamlng_node key,
 }
 
 static void compiler(const char *filename,
-              char **output_blob,
-              struct ct_compilator_api *compilator_api) {
+                     char **output_blob,
+                     struct ct_compilator_api *compilator_api) {
 
     CEL_UNUSED(filename);
     CEL_UNUSED(compilator_api);
@@ -803,7 +804,7 @@ static void on_render() {
 }
 
 static void register_pass_compiler(uint64_t type,
-                            ct_viewport_pass_compiler compiler) {
+                                   ct_viewport_pass_compiler compiler) {
     map::set(_G.compiler_map, type, compiler);
 }
 

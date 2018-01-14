@@ -20,7 +20,7 @@ CETECH_DECL_API(ct_log_a0);
 
 char *stacktrace(int skip) {
 #if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
-    struct cel_alloc* a = coreallocator_get();
+    struct cel_alloc *a = coreallocator_get();
 
     char *return_str = CEL_ALLOCATE(a, char, 4096);
     return_str[0] = '\0';
@@ -75,7 +75,7 @@ char *stacktrace(int skip) {
 }
 
 void stacktrace_free(char *st) {
-    struct cel_alloc* a = coreallocator_get();
+    struct cel_alloc *a = coreallocator_get();
 
     CEL_FREE(a, st);
 }

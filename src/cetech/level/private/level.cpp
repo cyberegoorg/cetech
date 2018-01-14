@@ -39,21 +39,21 @@ static struct LevelGlobals {
 
 
 
-    static ct_entity load(ct_world world,
-                   uint64_t name) {
+static ct_entity load(ct_world world,
+                      uint64_t name) {
 
-        return ct_entity_a0.spawn_level(world, name);
-    }
+    return ct_entity_a0.spawn_level(world, name);
+}
 
 static void destroy(ct_world world,
-                 ct_entity level) {
-        ct_entity_a0.destroy(world, &level, 1);
-    }
+                    ct_entity level) {
+    ct_entity_a0.destroy(world, &level, 1);
+}
 
 static ct_entity entity_by_id(ct_entity level,
-                           uint64_t id) {
-        return ct_entity_a0.find_by_guid(level, id);
-    }
+                              uint64_t id) {
+    return ct_entity_a0.find_by_guid(level, id);
+}
 
 
 
@@ -61,27 +61,27 @@ static ct_entity entity_by_id(ct_entity level,
 // Module interface
 //==============================================================================
 
-    static ct_level_a0 _api = {
-            .load_level = load,
-            .destroy = destroy,
-            .entity_by_id = entity_by_id,
-    };
+static ct_level_a0 _api = {
+        .load_level = load,
+        .destroy = destroy,
+        .entity_by_id = entity_by_id,
+};
 
 static void _init_api(ct_api_a0 *api) {
-        api->register_api("ct_level_a0", &_api);
-    }
+    api->register_api("ct_level_a0", &_api);
+}
 
 
 static void _init(ct_api_a0 *api) {
-        _init_api(api);
+    _init_api(api);
 
-        _G = {};
+    _G = {};
 
-    }
+}
 
 static void _shutdown() {
-        _G = {};
-    }
+    _G = {};
+}
 
 CETECH_MODULE_DEF(
         level,

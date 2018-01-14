@@ -103,22 +103,23 @@ static struct _G {
     uint64_t type;
 
     cel_hash_t world_map;
-    WorldInstance* world_instances;
+    WorldInstance *world_instances;
     cel_hash_t ent_map;
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 
-static uint64_t hash_combine(uint32_t a, uint32_t b) {
+static uint64_t hash_combine(uint32_t a,
+                             uint32_t b) {
     union {
         struct {
             uint32_t a;
             uint32_t b;
         };
         uint64_t ab;
-    } c {
-       .a = a,
-       .b = b,
+    } c{
+            .a = a,
+            .b = b,
     };
 
     return c.ab;
@@ -203,26 +204,29 @@ static void _destroy_world(ct_world world) {
 }
 
 int _component_compiler(const char *filename,
-                        uint64_t* component_key,
+                        uint64_t *component_key,
                         uint32_t component_key_count,
-                        char**data) {
+                        char **data) {
     transform_data t_data;
 
-    uint64_t keys[component_key_count+1];
+    uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
     keys[component_key_count] = ct_yng_a0.calc_key("scale");
 
-    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.scale, (float[3]){0});
+    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.scale,
+                       (float[3]) {0});
 
     keys[component_key_count] = ct_yng_a0.calc_key("position");
-    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.position, (float[3]){0});
+    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), t_data.position,
+                       (float[3]) {0});
 
     {
         float v[3] = {};
         float v_rad[3] = {};
 
         keys[component_key_count] = ct_yng_a0.calc_key("rotation");
-        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v, (float[3]){0});
+        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v,
+                           (float[3]) {0});
 
         celib::vec3_mul(v_rad, v, celib::DEG_TO_RAD);
         celib::quat_from_euler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
@@ -249,7 +253,7 @@ static void _destroyer(ct_world world,
 
     // TODO: remove from arrays, swap idx -> last AND change size
     for (uint32_t i = 0; i < ent_count; i++) {
-        if(transform_has(world, ents[i])) {
+        if (transform_has(world, ents[i])) {
             cel_hash_remove(&_G.ent_map, hash_combine(world.h, ents[i].h));
         }
     }
@@ -526,12 +530,13 @@ ct_transform transform_create(ct_world world,
     transform_transform(t, p);
 
 
-    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx, _G.allocator);
+    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx,
+                 _G.allocator);
 
     if (parent.h != UINT32_MAX) {
         uint32_t parent_idx = cel_hash_lookup(&_G.ent_map,
-                                       hash_combine(world.h, parent.h),
-                                       UINT32_MAX);
+                                              hash_combine(world.h, parent.h),
+                                              UINT32_MAX);
 
         data->parent[idx] = parent_idx;
 

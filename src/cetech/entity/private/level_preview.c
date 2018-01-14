@@ -46,22 +46,28 @@ CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_entity_a0);
 
-static void load(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
+static void load(const char *filename,
+                 uint64_t type,
+                 uint64_t name,
+                 struct ct_world world) {
     _G.ent = ct_entity_a0.spawn_level(world, name);
 }
 
-static void unload(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
+static void unload(const char *filename,
+                   uint64_t type,
+                   uint64_t name,
+                   struct ct_world world) {
     ct_entity_a0.destroy(world, &_G.ent, 1);
 }
 
 static int _init(struct ct_api_a0 *api) {
     CEL_UNUSED(api);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 
     ct_asset_preview_a0.register_type_preview(
             CT_ID64_0("level"),
-            (struct ct_asset_preview_fce){
+            (struct ct_asset_preview_fce) {
                     .load = load,
                     .unload = unload
             });
@@ -72,7 +78,7 @@ static int _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     ct_asset_preview_a0.unregister_type_preview(CT_ID64_0("level"));
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

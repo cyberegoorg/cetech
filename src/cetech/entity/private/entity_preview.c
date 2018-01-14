@@ -29,29 +29,35 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_entity_a0);
 
-static void load(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
+static void load(const char *filename,
+                 uint64_t type,
+                 uint64_t name,
+                 struct ct_world world) {
     struct ct_entity ent = ct_entity_a0.spawn(world, name);
     _G.ent = ent;
 
-    if(ct_transform_a0.has(world, ent)) {
+    if (ct_transform_a0.has(world, ent)) {
         struct ct_transform t = ct_transform_a0.get(world, ent);
-        ct_transform_a0.set_position(t, (float[3]){0.0f});
+        ct_transform_a0.set_position(t, (float[3]) {0.0f});
     }
 }
 
-static void unload(const char* filename, uint64_t type, uint64_t name, struct ct_world world){
+static void unload(const char *filename,
+                   uint64_t type,
+                   uint64_t name,
+                   struct ct_world world) {
     ct_entity_a0.destroy(world, &_G.ent, 1);
 }
 
 static int _init(struct ct_api_a0 *api) {
     CEL_UNUSED(api);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 
 
     ct_asset_preview_a0.register_type_preview(
             CT_ID64_0("entity"),
-            (struct ct_asset_preview_fce){
+            (struct ct_asset_preview_fce) {
                     .load = load,
                     .unload = unload
             });
@@ -62,7 +68,7 @@ static int _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     ct_asset_preview_a0.unregister_type_preview(CT_ID64_0("entity"));
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 

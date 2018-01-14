@@ -9,7 +9,9 @@ struct cel_alloc;
 struct ct_api_a0;
 
 void api_init(struct cel_alloc *allocator);
+
 void api_shutdown();
+
 struct ct_api_a0 *api_v0();
 
 #ifdef __cplusplus

@@ -22,19 +22,19 @@ using namespace celib;
 #define _G asset_property_global
 static struct _G {
     Map<ct_cmd_fce> cmd_map;
-    uint8_t* cmd_buffer;
-    uint32_t* cmd;
+    uint8_t *cmd_buffer;
+    uint32_t *cmd;
     uint32_t curent_pos;
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 
-static ct_cmd* get_curent_cmd() {
+static ct_cmd *get_curent_cmd() {
     if (!_G.curent_pos) {
         return NULL;
     }
 
-    ct_cmd* curent_cmd = (ct_cmd*)&_G.cmd_buffer[_G.cmd[_G.curent_pos]];
+    ct_cmd *curent_cmd = (ct_cmd *) &_G.cmd_buffer[_G.cmd[_G.curent_pos]];
 
     return curent_cmd;
 }
@@ -42,16 +42,16 @@ static ct_cmd* get_curent_cmd() {
 void execute(const struct ct_cmd *cmd) {
     ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, cmd->type, {NULL});
 
-    if(!cmd_fce.execute) {
+    if (!cmd_fce.execute) {
         return;
     }
 
     uint32_t buffer_offset = cel_array_size(_G.cmd_buffer);
     uint32_t size = cel_array_size(_G.cmd);
 
-    if(_G.curent_pos != (size-1)) {
-        ct_cmd* cur_cmd = get_curent_cmd();
-        if(cur_cmd) {
+    if (_G.curent_pos != (size - 1)) {
+        ct_cmd *cur_cmd = get_curent_cmd();
+        if (cur_cmd) {
 //            uint32_t offset = _G.cmd[_G.curent_pos];
 //            uint32_t end_offset = offset + cur_cmd->size;
 
@@ -60,7 +60,7 @@ void execute(const struct ct_cmd *cmd) {
         }
     }
 
-    cel_array_push_n(_G.cmd_buffer, (uint8_t*)cmd, cmd->size, _G.allocator);
+    cel_array_push_n(_G.cmd_buffer, (uint8_t *) cmd, cmd->size, _G.allocator);
     cel_array_push(_G.cmd, buffer_offset, _G.allocator);
 
     _G.curent_pos += 1;
@@ -68,20 +68,22 @@ void execute(const struct ct_cmd *cmd) {
     cmd_fce.execute(cmd, false);
 }
 
-void register_cmd_execute(uint64_t type, ct_cmd_fce fce) {
+void register_cmd_execute(uint64_t type,
+                          ct_cmd_fce fce) {
     map::set(_G.cmd_map, type, fce);
 }
 
 void undo() {
-    ct_cmd* curent_cmd = get_curent_cmd();
+    ct_cmd *curent_cmd = get_curent_cmd();
 
-    if(!curent_cmd) {
+    if (!curent_cmd) {
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type, {NULL});
+    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type,
+                                              {NULL});
 
-    if(!cmd_fce.execute) {
+    if (!cmd_fce.execute) {
         return;
     }
 
@@ -91,31 +93,32 @@ void undo() {
 }
 
 
-static ct_cmd* get_next_cmd() {
+static ct_cmd *get_next_cmd() {
     uint32_t cmd_size = cel_array_size(_G.cmd);
 
     if (!cmd_size) {
         return NULL;
     }
 
-    if(_G.curent_pos == (cmd_size-1)) {
+    if (_G.curent_pos == (cmd_size - 1)) {
         return NULL;
     }
 
-    ct_cmd* next_cmd = (ct_cmd*)&_G.cmd_buffer[_G.cmd[_G.curent_pos + 1]];
+    ct_cmd *next_cmd = (ct_cmd *) &_G.cmd_buffer[_G.cmd[_G.curent_pos + 1]];
 
     return next_cmd;
 }
 
 void redo() {
-    ct_cmd* next_cmd = get_next_cmd();
+    ct_cmd *next_cmd = get_next_cmd();
 
-    if(!next_cmd) {
+    if (!next_cmd) {
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type, {NULL});
-    if(!cmd_fce.execute) {
+    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type,
+                                              {NULL});
+    if (!cmd_fce.execute) {
         return;
     }
 
@@ -124,16 +127,18 @@ void redo() {
     _G.curent_pos += 1;
 }
 
-void undo_text(char* buffer, uint32_t buffer_size) {
-    ct_cmd* curent_cmd = get_curent_cmd();
+void undo_text(char *buffer,
+               uint32_t buffer_size) {
+    ct_cmd *curent_cmd = get_curent_cmd();
 
-    if(!curent_cmd){
+    if (!curent_cmd) {
         buffer[0] = '\0';
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type, {NULL});
-    if(!cmd_fce.description) {
+    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type,
+                                              {NULL});
+    if (!cmd_fce.description) {
         buffer[0] = '\0';
         return;
     }
@@ -141,16 +146,18 @@ void undo_text(char* buffer, uint32_t buffer_size) {
     cmd_fce.description(buffer, buffer_size, curent_cmd, true);
 }
 
-void redo_text(char* buffer, uint32_t buffer_size) {
-    ct_cmd* next_cmd = get_next_cmd();
+void redo_text(char *buffer,
+               uint32_t buffer_size) {
+    ct_cmd *next_cmd = get_next_cmd();
 
-    if(!next_cmd){
+    if (!next_cmd) {
         buffer[0] = '\0';
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type, {NULL});
-    if(!cmd_fce.description) {
+    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type,
+                                              {NULL});
+    if (!cmd_fce.description) {
         buffer[0] = '\0';
         return;
     }
@@ -158,11 +165,13 @@ void redo_text(char* buffer, uint32_t buffer_size) {
     cmd_fce.description(buffer, buffer_size, next_cmd, true);
 }
 
-void command_text(char* buffer, uint32_t buffer_size, uint32_t idx) {
-    const struct ct_cmd* cmd = (const struct ct_cmd* ) &_G.cmd_buffer[_G.cmd[idx]];
+void command_text(char *buffer,
+                  uint32_t buffer_size,
+                  uint32_t idx) {
+    const struct ct_cmd *cmd = (const struct ct_cmd *) &_G.cmd_buffer[_G.cmd[idx]];
 
     ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, cmd->type, {NULL});
-    if(!cmd_fce.description) {
+    if (!cmd_fce.description) {
         goto invalid;
     }
 
@@ -180,11 +189,11 @@ uint32_t command_count() {
 void goto_idx(uint32_t idx) {
     int diff = _G.curent_pos - idx;
 
-    if(!diff) {
+    if (!diff) {
         return;
     }
 
-    if( diff < 0 ){
+    if (diff < 0) {
         diff = -diff;
         for (int i = 0; i < diff; ++i) {
             redo();

@@ -148,9 +148,9 @@ struct ct_yng_doc {
                      float *value);
 
     void (*create_tree_vec3)(ct_yng_doc_instance_t *inst,
-                                  const char **keys,
-                                  uint32_t keys_count,
-                                  float *value);
+                             const char **keys,
+                             uint32_t keys_count,
+                             float *value);
 
     void (*create_tree_bool)(ct_yng_doc_instance_t *inst,
                              const char **keys,
@@ -158,14 +158,14 @@ struct ct_yng_doc {
                              bool value);
 
     void (*create_tree_float)(ct_yng_doc_instance_t *inst,
-                             const char **keys,
-                             uint32_t keys_count,
-                             float value);
-
-    void (*create_tree_string)(ct_yng_doc_instance_t *inst,
                               const char **keys,
                               uint32_t keys_count,
-                              const char* value);
+                              float value);
+
+    void (*create_tree_string)(ct_yng_doc_instance_t *inst,
+                               const char **keys,
+                               uint32_t keys_count,
+                               const char *value);
 
     void (*foreach_dict_node)(ct_yng_doc_instance_t *inst,
                               struct ct_yamlng_node node,
@@ -185,7 +185,7 @@ struct ct_yng_doc {
 
 struct ct_yng_a0 {
     struct ct_yng_doc *(*from_vio)(struct ct_vio *vio,
-                            struct cel_alloc *alloc);
+                                   struct cel_alloc *alloc);
 
     bool (*save_to_vio)(struct cel_alloc *alloc,
                         struct ct_vio *vio,
@@ -193,7 +193,7 @@ struct ct_yng_a0 {
 
     void (*destroy)(struct ct_yng_doc *document);
 
-    const char* (*get_key)(uint64_t hash);
+    const char *(*get_key)(uint64_t hash);
 
     uint64_t (*calc_key)(const char *key);
 

@@ -103,9 +103,15 @@ struct ct_cmd_system_a0 {
 
     void (*redo)();
 
-    void (*undo_text)(char* buffer, uint32_t buffer_size);
-    void (*redo_text)(char* buffer, uint32_t buffer_size);
-    void (*command_text)(char* buffer, uint32_t buffer_size, uint32_t idx);
+    void (*undo_text)(char *buffer,
+                      uint32_t buffer_size);
+
+    void (*redo_text)(char *buffer,
+                      uint32_t buffer_size);
+
+    void (*command_text)(char *buffer,
+                         uint32_t buffer_size,
+                         uint32_t idx);
 
     uint32_t (*command_count)();
 

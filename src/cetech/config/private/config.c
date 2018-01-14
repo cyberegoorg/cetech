@@ -77,11 +77,12 @@ static void log_all() {
 }
 
 static void _cvar_from_str(const char *name,
-                    const char *value) {
+                           const char *value) {
     int d = 0;
     float f = 0;
 
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+            _G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
 
@@ -112,8 +113,8 @@ struct foreach_config_data {
 
 
 static void foreach_config_clb(struct ct_yamlng_node key,
-                        struct ct_yamlng_node value,
-                        void *_data) {
+                               struct ct_yamlng_node value,
+                               void *_data) {
 
     struct foreach_config_data *output = (struct foreach_config_data *) _data;
     struct ct_yng_doc *d = key.d;
@@ -206,7 +207,7 @@ static int load_from_yaml_file(const char *yaml,
 
 
 static int parse_args(int argc,
-               const char **argv) {
+                      const char **argv) {
     for (int j = 0; j < argc; ++j) {
         if (argv[j][0] != '-') {
             continue;
@@ -253,7 +254,7 @@ CETECH_MODULE_DEF(
         {
             CEL_UNUSED(reload);
 
-            _G = (struct _G){0};
+            _G = (struct _G) {0};
 
             ct_log_a0.debug(LOG_WHERE, "Init");
 

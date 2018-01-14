@@ -145,9 +145,9 @@ static void _type_to_attr_type(const char *name,
 }
 
 static void _parse_vertex_decl(bgfx::VertexDecl *decl,
-                        uint32_t *vertex_size,
-                        bgfx::Attrib::Enum type,
-                        ct_yamlng_node decl_node) {
+                               uint32_t *vertex_size,
+                               bgfx::Attrib::Enum type,
+                               ct_yamlng_node decl_node) {
 
     ct_yng_doc *d = decl_node.d;
 
@@ -202,11 +202,11 @@ static void _parese_types(bgfx::VertexDecl *decl,
 }
 
 static void _write_chanel(struct ct_yamlng_node node,
-                   struct ct_yamlng_node types,
-                   size_t i,
-                   const char *name,
-                   struct ct_yamlng_node chanels_n,
-                   struct compile_output *output) {
+                          struct ct_yamlng_node types,
+                          size_t i,
+                          const char *name,
+                          struct ct_yamlng_node chanels_n,
+                          struct compile_output *output) {
     struct cel_alloc *a = ct_memory_a0.main_allocator();
 
     bgfx::AttribType::Enum attrib_type;
@@ -265,8 +265,8 @@ static void _write_chanel(struct ct_yamlng_node node,
 }
 
 static void foreach_geometries_clb(struct ct_yamlng_node key,
-                            struct ct_yamlng_node value,
-                            void *_data) {
+                                   struct ct_yamlng_node value,
+                                   void *_data) {
     struct cel_alloc *a = ct_memory_a0.main_allocator();
 
     struct compile_output *output = (compile_output *) _data;
@@ -356,8 +356,8 @@ struct foreach_graph_data {
 };
 
 static void foreach_graph_clb(struct ct_yamlng_node key,
-                       struct ct_yamlng_node value,
-                       void *_data) {
+                              struct ct_yamlng_node value,
+                              void *_data) {
     struct cel_alloc *a = ct_memory_a0.main_allocator();
 
     struct foreach_graph_data *output = (foreach_graph_data *) _data;
@@ -438,7 +438,7 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
 }
 
 static int _compile_yaml(struct ct_yng_doc *document,
-                  struct compile_output *output) {
+                         struct compile_output *output) {
 
     ct_yamlng_node geometries = document->get(document->inst,
                                               ct_yng_a0.calc_key(
@@ -460,8 +460,8 @@ static int _compile_yaml(struct ct_yng_doc *document,
 }
 
 static void _compile_assimp_node(struct aiNode *root,
-                          uint32_t parent,
-                          struct compile_output *output) {
+                                 uint32_t parent,
+                                 struct compile_output *output) {
     struct cel_alloc *a = ct_memory_a0.main_allocator();
 
     uint64_t name = CT_ID64_0(root->mName.data);
@@ -487,9 +487,9 @@ static void _compile_assimp_node(struct aiNode *root,
 }
 
 static int _compile_assimp(const char *filename,
-                    struct ct_yng_doc *document,
-                    struct compile_output *output,
-                    ct_compilator_api *capi) {
+                           struct ct_yng_doc *document,
+                           struct compile_output *output,
+                           ct_compilator_api *capi) {
     auto a = ct_memory_a0.main_allocator();
 
     const char *input_str = document->get_string(
@@ -606,8 +606,8 @@ static int _compile_assimp(const char *filename,
 }
 
 static void compiler(const char *filename,
-              char **output_blob,
-              struct ct_compilator_api *compilator_api) {
+                     char **output_blob,
+                     struct ct_compilator_api *compilator_api) {
 
     struct compile_output *output = _crete_compile_output();
     struct cel_alloc *a = ct_memory_a0.main_allocator();

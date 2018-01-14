@@ -34,7 +34,7 @@ struct ct_compilator_api;
 //! \param compilator_api Compilator api
 typedef void (*ct_resource_compilator_t)(
         const char *filename,
-        char** output,
+        char **output,
         struct ct_compilator_api *compilator_api);
 
 
@@ -193,12 +193,13 @@ struct ct_resource_a0 {
     //! \param type Type
     //! \param compilator Compilator fce
     void (*compiler_register)(uint64_t type,
-                              ct_resource_compilator_t compilator, bool yaml_based);
+                              ct_resource_compilator_t compilator,
+                              bool yaml_based);
 
     //! Compile all resource in source dir
     void (*compiler_compile_all)();
 
-    void (*compile_and_reload)(const char* filename);
+    void (*compile_and_reload)(const char *filename);
 
     //! Type, Name => filename
     //! \param filename Result filename
@@ -244,9 +245,9 @@ struct ct_resource_a0 {
     const char *(*compiler_get_core_dir)();
 
     void (*type_name_from_filename)(const char *fullname,
-                                 uint64_t *type,
-                                 uint64_t *name,
-                                 char *short_name);
+                                    uint64_t *type,
+                                    uint64_t *name,
+                                    char *short_name);
 
     //! Get build dir
     //! \param build_dir Build dir

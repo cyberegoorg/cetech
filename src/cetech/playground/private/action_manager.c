@@ -36,10 +36,10 @@ static struct _G {
     struct cel_hash_t action_map;
     union modifiactor mod;
 
-    struct shortcut* shorcut;
-    action_fce_t* action_fce;
-    bool* action_active;
-    struct cel_alloc* allocator;
+    struct shortcut *shorcut;
+    action_fce_t *action_fce;
+    bool *action_active;
+    struct cel_alloc *allocator;
 } _G;
 
 static void fill_button(struct shortcut *sc) {
@@ -108,7 +108,7 @@ static void check() {
     const uint32_t lalt = ct_keyboard_a0.button_index("lalt");
     const uint32_t ralt = ct_keyboard_a0.button_index("ralt");
 
-    _G.mod = (union modifiactor){};
+    _G.mod = (union modifiactor) {};
 
     if (ct_keyboard_a0.button_state(0, lshift) ||
         ct_keyboard_a0.button_state(0, rshift)) {
@@ -129,7 +129,7 @@ static void check() {
     for (int i = 0; i < size; ++i) {
         struct shortcut *sc = &_G.shorcut[i];
 
-        if( _G.mod.u - sc->mod.u ) {
+        if (_G.mod.u - sc->mod.u) {
             continue;
         }
 
@@ -146,7 +146,7 @@ static void check() {
     }
 }
 
-const char* shortcut_str(uint64_t name) {
+const char *shortcut_str(uint64_t name) {
     uint32_t idx = cel_hash_lookup(&_G.action_map, name, UINT32_MAX);
 
     if (UINT32_MAX == idx) {
@@ -167,8 +167,8 @@ static struct ct_action_manager_a0 action_manager_api = {
 
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G){
-        .allocator = ct_memory_a0.main_allocator()
+    _G = (struct _G) {
+            .allocator = ct_memory_a0.main_allocator()
     };
 
     api->register_api("ct_action_manager_a0", &action_manager_api);
@@ -181,7 +181,7 @@ static void _shutdown() {
     cel_array_free(_G.action_fce, _G.allocator);
     cel_array_free(_G.action_active, _G.allocator);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

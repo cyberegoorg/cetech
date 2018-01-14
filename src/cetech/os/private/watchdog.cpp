@@ -4,7 +4,9 @@
 #ifdef CETECH_LINUX
 #include <sys/inotify.h>
 #elif defined(CETECH_DARWIN)
+
 #include <CoreServices/CoreServices.h>
+
 #else
 #warning Watchdog is unsupported
 #endif
@@ -133,7 +135,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
     clean_events(wi);
 
 #ifdef CETECH_LINUX
-    #define BUF_LEN 1024
+#define BUF_LEN 1024
 
     char buf[BUF_LEN] __attribute__ ((aligned(8)));
 
@@ -230,7 +232,7 @@ void destroy(struct ct_watchdog *watchdog) {
 #ifdef CETECH_LINUX
         inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
 #endif
-        
+
         ++ct_it;
     }
 

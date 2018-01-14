@@ -120,10 +120,13 @@ static uint32_t _find_type(uint64_t type) {
 //==============================================================================
 
 static int type_name_string(char *str,
-                     size_t max_len,
-                     uint64_t type,
-                     uint64_t name) {
-    return snprintf(str, max_len, "%" SDL_PRIX64 "%" SDL_PRIX64, type,
+                            size_t max_len,
+                            uint64_t type,
+                            uint64_t name) {
+    return snprintf(str, max_len, "%"
+            SDL_PRIX64
+            "%"
+            SDL_PRIX64, type,
                     name);
 }
 
@@ -141,15 +144,15 @@ void resource_register_type(uint64_t type,
     cel_hash_add(&_G.type_map, type, idx, _G.allocator);
 
     struct type_item_t *type_item = &_G.type_items[_G.type_items_count++];
-    *type_item = (struct type_item_t){.type = type};
+    *type_item = (struct type_item_t) {.type = type};
 }
 
 static void *get(uint64_t type,
-          uint64_t name);
+                 uint64_t name);
 
 static void add_loaded(uint64_t type,
-                uint64_t *names,
-                size_t count) {
+                       uint64_t *names,
+                       size_t count) {
 
     const uint32_t type_idx = cel_hash_lookup(&_G.type_map, type, UINT32_MAX);
 
@@ -163,19 +166,19 @@ static void add_loaded(uint64_t type,
 }
 
 static void load(uint64_t type,
-          uint64_t *names,
-          size_t count,
-          int force);
+                 uint64_t *names,
+                 size_t count,
+                 int force);
 
 static void load_now(uint64_t type,
-              uint64_t *names,
-              size_t count) {
+                     uint64_t *names,
+                     size_t count) {
     load(type, names, count, 0);
     add_loaded(type, names, count);
 }
 
 static int can_get(uint64_t type,
-            uint64_t name) {
+                   uint64_t name) {
 
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
@@ -183,8 +186,8 @@ static int can_get(uint64_t type,
 }
 
 static int can_get_all(uint64_t type,
-                uint64_t *names,
-                size_t count) {
+                       uint64_t *names,
+                       size_t count) {
     for (size_t i = 0; i < count; ++i) {
         if (!can_get(type, names[i])) {
             //ce_thread_a0.spin_unlock(&_G.add_lock);
@@ -196,9 +199,9 @@ static int can_get_all(uint64_t type,
 }
 
 static void load(uint64_t type,
-          uint64_t *names,
-          size_t count,
-          int force) {
+                 uint64_t *names,
+                 size_t count,
+                 int force) {
 
     const uint32_t idx = cel_hash_lookup(&_G.type_map, type, UINT32_MAX);
 
@@ -211,7 +214,8 @@ static void load(uint64_t type,
     ct_thread_a0.spin_lock(&type_item->lock);
     for (uint32_t i = 0; i < count; ++i) {
         uint64_t id = names[i];
-        uint32_t res_idx = cel_hash_lookup(&type_item->name_map, id, UINT32_MAX);
+        uint32_t res_idx = cel_hash_lookup(&type_item->name_map, id,
+                                           UINT32_MAX);
 
         struct ct_coredb_object_t *object = NULL;
 
@@ -221,7 +225,7 @@ static void load(uint64_t type,
 
         object = ct_coredb_a0.create_object();
         cel_hash_add(&type_item->name_map, id,
-                 cel_array_size(type_item->resource_objects), _G.allocator);
+                     cel_array_size(type_item->resource_objects), _G.allocator);
         cel_array_push(type_item->resource_objects, object, _G.allocator);
 
         char build_name[33] = {};
@@ -245,15 +249,16 @@ static void load(uint64_t type,
                 build_name);
 
         struct ct_vio *resource_file = ct_filesystem_a0.open(root_name,
-                                                      build_full,
-                                                      FS_OPEN_READ);
+                                                             build_full,
+                                                             FS_OPEN_READ);
         CEL_FREE(ct_memory_a0.main_allocator(), build_full);
 
         if (resource_file != NULL) {
             void *data = type_clb.loader(resource_file,
                                          ct_memory_a0.main_allocator());
 
-            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+                    object);
             ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), data);
             ct_coredb_a0.write_commit(writer);
         }
@@ -262,8 +267,8 @@ static void load(uint64_t type,
 }
 
 static void unload(uint64_t type,
-            uint64_t *names,
-            size_t count) {
+                   uint64_t *names,
+                   size_t count) {
 
     const uint32_t idx = cel_hash_lookup(&_G.type_map, type, UINT32_MAX);
 
@@ -303,7 +308,8 @@ static void unload(uint64_t type,
             type_clb.offline(names[i], data);
             type_clb.unloader(data, ct_memory_a0.main_allocator());
 
-            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+                    object);
             ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
             ct_coredb_a0.write_commit(writer);
         }
@@ -312,7 +318,7 @@ static void unload(uint64_t type,
 }
 
 static void *get(uint64_t type,
-          uint64_t name) {
+                 uint64_t name) {
     //ce_thread_a0.spin_lock(&_G.add_lock);
 
     const uint32_t type_item_idx = _find_type(type);
@@ -353,8 +359,8 @@ static void *get(uint64_t type,
 }
 
 static void reload(uint64_t type,
-            uint64_t *names,
-            size_t count) {
+                   uint64_t *names,
+                   size_t count) {
 
 //        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
 //        void* data = NULL;
@@ -498,12 +504,13 @@ static void _init_api(struct ct_api_a0 *api) {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    _G = (struct _G){};
+    _G = (struct _G) {};
 
     ct_config_a0 = config;
     _G.config_object = ct_config_a0.config_object();
 
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+            _G.config_object);
     if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BUILD_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }
@@ -515,7 +522,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_api(api);
     _init_cvar(ct_config_a0);
 
-    _G = (struct _G){
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .config_object = ct_config_a0.config_object(),
             .type_items_count = 1,

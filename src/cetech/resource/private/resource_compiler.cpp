@@ -82,9 +82,9 @@ static struct _G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_coredb_object_t* config;
-    cel_alloc * allocator;
-} _G ;
+    ct_coredb_object_t *config;
+    cel_alloc *allocator;
+} _G;
 
 
 #include "builddb.h"
@@ -139,10 +139,10 @@ static void _compile_task(void *data) {
                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "%" SDL_PRIX64 "\"",
                    tdata->source_filename, tdata->type, tdata->name);
 
-    char* output_blob = NULL;
+    char *output_blob = NULL;
 
     if (tdata->compilator.compilator) {
-        if(tdata->compilator.yaml_based) {
+        if (tdata->compilator.yaml_based) {
             const char **files;
             uint32_t files_count;
 
@@ -179,7 +179,8 @@ static void _compile_task(void *data) {
             goto end;
         }
 
-        build_vio->write(build_vio, output_blob, sizeof(char), cel_array_size(output_blob));
+        build_vio->write(build_vio, output_blob, sizeof(char),
+                         cel_array_size(output_blob));
 
         ct_filesystem_a0.close(build_vio);
 
@@ -187,7 +188,7 @@ static void _compile_task(void *data) {
                        "Resource \"%s\" compiled", tdata->source_filename);
     }
 
-end:
+    end:
     cel_array_free(output_blob, _G.allocator);
 
     CEL_FREE(ct_memory_a0.main_allocator(),
@@ -209,8 +210,7 @@ compilator _find_compilator(uint64_t type) {
 }
 
 
-
-void _compile_files(ct_task_item** tasks,
+void _compile_files(ct_task_item **tasks,
                     char **files,
                     uint32_t files_count,
                     celib::Map<uint64_t> &compiled) {
@@ -284,7 +284,8 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
     CEL_UNUSED(config, app);
 
     char *build_dir_full = resource_compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+            ct_memory_a0.main_allocator(),
+            ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     ct_path_a0.make_path(build_dir_full);
 
@@ -292,7 +293,8 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 }
 
 void resource_compiler_register(uint64_t type,
-                                ct_resource_compilator_t compilator, bool yaml_based) {
+                                ct_resource_compilator_t compilator,
+                                bool yaml_based) {
     const uint32_t idx = _G.count++;
 
     _G.compilator_map_type[idx] = type;
@@ -300,7 +302,7 @@ void resource_compiler_register(uint64_t type,
 }
 
 void _compile_all(celib::Map<uint64_t> &compiled) {
-    ct_task_item* tasks = NULL;
+    ct_task_item *tasks = NULL;
     const char *glob_patern = "**.*";
     char **files = nullptr;
     uint32_t files_count = 0;
@@ -362,10 +364,14 @@ char *resource_compiler_get_tmp_dir(cel_alloc *alocator,
 
 char *resource_compiler_external_join(cel_alloc *alocator,
                                       const char *name) {
-    const char *external_dir_str = ct_coredb_a0.read_string(_G.config, CONFIG_EXTERNAL_DIR, "");
+    const char *external_dir_str = ct_coredb_a0.read_string(_G.config,
+                                                            CONFIG_EXTERNAL_DIR,
+                                                            "");
 
     char *tmp_dir = ct_path_a0.join(alocator, 2, external_dir_str,
-                                    ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+                                    ct_coredb_a0.read_string(_G.config,
+                                                             CONFIG_KERNEL_PLATFORM,
+                                                             ""));
 
     celib::Buffer buffer(alocator);
     buffer::printf(buffer, "%s64", tmp_dir);
@@ -377,10 +383,12 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 }
 
 
-extern "C" void resource_memory_reload(uint64_t type, uint64_t name, char** blob);
+extern "C" void resource_memory_reload(uint64_t type,
+                                       uint64_t name,
+                                       char **blob);
 
-void compile_and_reload(const char* filename) {
-    char** output_blob = NULL;
+void compile_and_reload(const char *filename) {
+    char **output_blob = NULL;
 
     uint64_t type_id;
     uint64_t name_id;
@@ -427,7 +435,7 @@ void resource_compiler_check_fs() {
         auto *type_it = map::begin(type_name);
         auto *type_end = map::end(type_name);
 
-        uint64_t* name_array = NULL;
+        uint64_t *name_array = NULL;
 
         while (type_it != type_end) {
             uint64_t type_id = type_it->key;
@@ -441,7 +449,8 @@ void resource_compiler_check_fs() {
                 it = multi_map::find_next(type_name, it);
             }
 
-            ct_resource_a0.reload(type_id, &name_array[0],cel_array_size(name_array));
+            ct_resource_a0.reload(type_id, &name_array[0],
+                                  cel_array_size(name_array));
 
             ++type_it;
         }
@@ -452,16 +461,16 @@ void resource_compiler_check_fs() {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config);
-    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
+    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_CORE_DIR, "core");
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "externals/build");
     }
 
@@ -481,7 +490,8 @@ static void _init(ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
 
-    auto platform = ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, "");
+    auto platform = ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM,
+                                             "");
 
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
             ct_memory_a0.main_allocator(), platform);
@@ -497,8 +507,10 @@ static void _init(ct_api_a0 *api) {
     CEL_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
     CEL_FREE(ct_memory_a0.main_allocator(), build_dir_full);
 
-    const char *core_dir = ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");
-    const char *source_dir = ct_coredb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
+    const char *core_dir = ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR,
+                                                    "");
+    const char *source_dir = ct_coredb_a0.read_string(_G.config,
+                                                      CONFIG_SOURCE_DIR, "");
 
     ct_filesystem_a0.map_root_dir(
             CT_ID64_0("source"),

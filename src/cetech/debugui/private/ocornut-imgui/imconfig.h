@@ -13,6 +13,7 @@
 
 //---- Define assertion handler. Defaults to calling assert().
 #include <assert.h>
+
 #define IM_ASSERT(_EXPR, ...) assert(_EXPR)
 
 //---- Define attributes of all API symbols declarations, e.g. for DLL under Windows.

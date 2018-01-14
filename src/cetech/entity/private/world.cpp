@@ -57,7 +57,7 @@ static void destroy(ct_world world) {
 }
 
 static void update(ct_world world,
-            float dt) {
+                   float dt) {
     for (uint32_t i = 0; i < cel_array_size(_G.callbacks); ++i) {
         if (_G.callbacks[i].on_update != NULL) {
             _G.callbacks[i].on_update(world, dt);

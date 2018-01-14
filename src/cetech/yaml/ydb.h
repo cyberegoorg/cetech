@@ -86,41 +86,42 @@ struct ct_ydb_a0 {
                          uint32_t *map_keys_count);
 
     void (*set_float)(const char *path,
-                      uint64_t* keys,
+                      uint64_t *keys,
                       uint32_t keys_count,
                       float value);
 
     void (*set_bool)(const char *path,
-                     const uint64_t* keys,
+                     const uint64_t *keys,
                      uint32_t keys_count,
                      bool value);
 
 
     void (*set_string)(const char *path,
-                       const uint64_t* keys,
+                       const uint64_t *keys,
                        uint32_t keys_count,
                        const char *value);
 
     void (*set_vec3)(const char *path,
-                     const uint64_t* keys,
+                     const uint64_t *keys,
                      uint32_t keys_count,
                      float *value);
 
     void (*set_vec4)(const char *path,
-                     const uint64_t* keys,
+                     const uint64_t *keys,
                      uint32_t keys_count,
                      float *value);
 
     void (*set_mat4)(const char *path,
-                     const uint64_t* keys,
+                     const uint64_t *keys,
                      uint32_t keys_count,
                      float *value);
 
-    void (*parent_files)(const char* path,
+    void (*parent_files)(const char *path,
                          const char ***files,
                          uint32_t *count);
 
-    void (*save)(const char* path);
+    void (*save)(const char *path);
+
     void (*save_all_modified)();
 
     void (*check_fs)();

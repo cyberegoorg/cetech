@@ -127,21 +127,20 @@ struct fullscree_pass_data {
 };
 
 
-
 static void foreach_input(struct ct_yamlng_node key,
                           struct ct_yamlng_node value,
                           void *_data) {
-    ct_yng_doc* d = key.d;
+    ct_yng_doc *d = key.d;
 
     fullscree_pass_data *pass_data = static_cast<fullscree_pass_data *>(_data);
 
-    const char* key_str = d->as_string(d->inst, key, "");
+    const char *key_str = d->as_string(d->inst, key, "");
     memcpy(&pass_data->input_name[pass_data->input_count],
            key_str,
            sizeof(char) *
            strlen(key_str) + 1);
 
-    const char* resource_name_str = d->as_string(d->inst, value, "");
+    const char *resource_name_str = d->as_string(d->inst, value, "");
     uint64_t resource_name = CT_ID64_0(resource_name_str);
 
     pass_data->input_resource[pass_data->input_count] = resource_name;
@@ -149,8 +148,8 @@ static void foreach_input(struct ct_yamlng_node key,
 }
 
 static int fullscreen_pass_compiler(struct ct_yamlng_node body,
-                                    char**data) {
-    ct_yng_doc* d = body.d;
+                                    char **data) {
+    ct_yng_doc *d = body.d;
 
     uint64_t keys[2] = {
             d->hash(d->inst, body),
@@ -164,7 +163,8 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
 
         d->foreach_dict_node(d->inst, input, foreach_input, &pass_data);
 
-        cel_array_push_n(*data, &pass_data, sizeof(pass_data), ct_memory_a0.main_allocator());
+        cel_array_push_n(*data, &pass_data, sizeof(pass_data),
+                         ct_memory_a0.main_allocator());
     }
 
     return 1;

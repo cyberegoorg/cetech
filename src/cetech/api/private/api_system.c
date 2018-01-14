@@ -30,7 +30,7 @@ static struct ApiSystemGlobals {
 uint64_t stringid64_from_string(const char *);
 
 static void api_register_api(const char *name,
-                      void *api) {
+                             void *api) {
     uint64_t name_id = stringid64_from_string(name);
 
     cel_array_push(_G.api, api, _G.allocator);
@@ -50,10 +50,10 @@ static struct ct_api_entry api_first(const char *name) {
     uint64_t first = cel_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
 
     if (first == UINT64_MAX) {
-        return (struct ct_api_entry){0};
+        return (struct ct_api_entry) {0};
     }
 
-    return (struct ct_api_entry){.api = _G.api[first], .entry  = (void *) first};
+    return (struct ct_api_entry) {.api = _G.api[first], .entry  = (void *) first};
 }
 
 static struct ct_api_entry api_next(struct ct_api_entry *entry) {
@@ -61,7 +61,7 @@ static struct ct_api_entry api_next(struct ct_api_entry *entry) {
 //        auto next = multi_map::find_next(_G.api_map, map_entry);
 
 //        if (!next) {
-    return (struct ct_api_entry){0};
+    return (struct ct_api_entry) {0};
 //        }
 
 //        return {.api = next->value, .entry  = (void *) entry};
@@ -75,7 +75,7 @@ static struct ct_api_a0 a0 = {
 };
 
 void api_init(struct cel_alloc *allocator) {
-    _G = (struct ApiSystemGlobals){
+    _G = (struct ApiSystemGlobals) {
             .allocator = allocator
     };
 

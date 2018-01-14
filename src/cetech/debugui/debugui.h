@@ -737,7 +737,9 @@ struct ct_debugui_a0 {
     void (*GetWindowSize)(float size[2]);
 
 
-    void (*RootDock)(float pos[2], float size[2]);
+    void (*RootDock)(float pos[2],
+                     float size[2]);
+
     bool (*BeginDock)(const char *label,
                       bool *opened,
                       enum DebugUIWindowFlags_ extra_flags);
@@ -747,13 +749,19 @@ struct ct_debugui_a0 {
     void (*SameLine)(float pos_x /* 0.0f */,
                      float spacing_w /*-1.0f*/);
 
-    void (*HSplitter)(const char* str_id, float size[2]);
-    void (*VSplitter)(const char* str_id, float size[2]);
+    void (*HSplitter)(const char *str_id,
+                      float size[2]);
 
-    void (*SaveDock)(struct ct_vio* output);
-    void (*LoadDock)(const char* path);
+    void (*VSplitter)(const char *str_id,
+                      float size[2]);
 
-    bool (*IsMouseClicked)(int btn, bool repeat);
+    void (*SaveDock)(struct ct_vio *output);
+
+    void (*LoadDock)(const char *path);
+
+    bool (*IsMouseClicked)(int btn,
+                           bool repeat);
+
     bool (*IsMouseDoubleClicked)(int btn);
 };
 

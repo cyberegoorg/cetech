@@ -148,9 +148,9 @@ static WorldInstance *_get_world_instance(ct_world world) {
 }
 
 static int _camera_component_compiler(const char *filename,
-                               uint64_t *component_key,
-                               uint32_t component_key_count,
-                               char **data) {
+                                      uint64_t *component_key,
+                                      uint32_t component_key_count,
+                                      char **data) {
     struct camera_data t_data;
 
 
@@ -180,10 +180,10 @@ static int is_valid(ct_camera camera) {
 }
 
 static void get_project_view(ct_camera camera,
-                      float *proj,
-                      float *view,
-                      int width,
-                      int height) {
+                             float *proj,
+                             float *view,
+                             int width,
+                             int height) {
 
     WorldInstance *world_inst = _get_world_instance(camera.world);
 
@@ -205,7 +205,7 @@ static void get_project_view(ct_camera camera,
 }
 
 static int has(ct_world world,
-        ct_entity entity) {
+               ct_entity entity) {
 
     uint64_t idx = combine(world.h, entity.h);
 
@@ -213,19 +213,20 @@ static int has(ct_world world,
 }
 
 static ct_camera get(ct_world world,
-              ct_entity entity) {
+                     ct_entity entity) {
 
     uint64_t idx = combine(world.h, entity.h);
-    uint32_t component_idx = (uint32_t)cel_hash_lookup(&_G.ent_map, idx, UINT32_MAX);
+    uint32_t component_idx = (uint32_t) cel_hash_lookup(&_G.ent_map, idx,
+                                                        UINT32_MAX);
 
     return (ct_camera) {.idx = component_idx, .world = world};
 }
 
 static ct_camera create(ct_world world,
-                 ct_entity entity,
-                 float near,
-                 float far,
-                 float fov) {
+                        ct_entity entity,
+                        float near,
+                        float far,
+                        float fov) {
 
     WorldInstance *data = _get_world_instance(world);
 
@@ -261,8 +262,8 @@ static void _on_world_destroy(ct_world world) {
 }
 
 static void _destroyer(ct_world world,
-                ct_entity *ents,
-                uint32_t ent_count) {
+                       ct_entity *ents,
+                       uint32_t ent_count) {
     CEL_UNUSED(world);
 
     // TODO: remove from arrays, swap idx -> last AND change size
@@ -274,11 +275,11 @@ static void _destroyer(ct_world world,
 }
 
 static void _spawner(ct_world world,
-              ct_entity *ents,
-              uint32_t *cents,
-              uint32_t *ents_parent,
-              uint32_t ent_count,
-              void *data) {
+                     ct_entity *ents,
+                     uint32_t *cents,
+                     uint32_t *ents_parent,
+                     uint32_t ent_count,
+                     void *data) {
 
     CEL_UNUSED(ents_parent);
 
@@ -286,10 +287,10 @@ static void _spawner(ct_world world,
 
     for (uint32_t i = 0; i < ent_count; ++i) {
         create(world,
-                       ents[cents[i]],
-                       tdata[i].near,
-                       tdata[i].far,
-                       tdata[i].fov);
+               ents[cents[i]],
+               tdata[i].near,
+               tdata[i].far,
+               tdata[i].fov);
     }
 }
 

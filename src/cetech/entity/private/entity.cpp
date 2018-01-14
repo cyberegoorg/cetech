@@ -86,7 +86,7 @@ struct component_data {
 
 
 entity_instance *get_spawned_entity(ct_entity ent) {
-    uint64_t idx =  cel_hash_lookup(&_G.spawned_map, ent.h, UINT64_MAX);
+    uint64_t idx = cel_hash_lookup(&_G.spawned_map, ent.h, UINT64_MAX);
 
     if (UINT64_MAX == idx) {
         return NULL;
@@ -275,10 +275,10 @@ struct foreach_componets_data {
 };
 
 static void foreach_components_clb(const char *filename,
-                            uint64_t *root_key,
-                            uint32_t root_count,
-                            uint64_t component_key,
-                            struct foreach_componets_data *data) {
+                                   uint64_t *root_key,
+                                   uint32_t root_count,
+                                   uint64_t component_key,
+                                   struct foreach_componets_data *data) {
 
     uint64_t cid;
     int contain_cid = 0;
@@ -340,15 +340,16 @@ static void foreach_components_clb(const char *filename,
 }
 
 static void compile_entitity(const char *filename,
-                      uint64_t *root_key,
-                      uint32_t root_count,
-                      unsigned int parent,
-                      ct_entity_compile_output *output,
-                      ct_compilator_api *compilator_api) {
+                             uint64_t *root_key,
+                             uint32_t root_count,
+                             unsigned int parent,
+                             ct_entity_compile_output *output,
+                             ct_compilator_api *compilator_api) {
 
     uint32_t ent_id = output->ent_counter++;
 
-    cel_hash_add(&output->entity_parent, ent_id, (uint32_t) parent, _G.allocator);
+    cel_hash_add(&output->entity_parent, ent_id, (uint32_t) parent,
+                 _G.allocator);
 
     uint64_t guid = root_key[root_count - 1];
     cel_array_push(output->guid, guid, _G.allocator);
@@ -446,10 +447,10 @@ static void destroy_output(ct_entity_compile_output *output) {
 }
 
 static void compile_entity(ct_entity_compile_output *output,
-                    uint64_t *root,
-                    uint32_t root_count,
-                    const char *filename,
-                    ct_compilator_api *compilator_api) {
+                           uint64_t *root,
+                           uint32_t root_count,
+                           const char *filename,
+                           ct_compilator_api *compilator_api) {
     CEL_UNUSED(compilator_api);
 
     compile_entitity(filename, root, root_count, UINT32_MAX, output,
@@ -461,8 +462,8 @@ static uint32_t ent_counter(ct_entity_compile_output *output) {
 }
 
 static void write_to_build(ct_entity_compile_output *output,
-                    const char *filename,
-                    char **build) {
+                           const char *filename,
+                           char **build) {
     struct entity_resource res = {};
     res.ent_count = (uint32_t) (output->ent_counter);
     res.comp_type_count = (uint32_t) cel_array_size(output->component_type);
@@ -524,9 +525,9 @@ static void write_to_build(ct_entity_compile_output *output,
 }
 
 static void _entity_resource_compiler(uint64_t root,
-                               const char *filename,
-                               char **build,
-                               ct_compilator_api *compilator_api) {
+                                      const char *filename,
+                                      char **build,
+                                      ct_compilator_api *compilator_api) {
     ct_entity_compile_output *output = create_output();
     compile_entity(output, &root, 1, filename, compilator_api);
     write_to_build(output, filename, build);
@@ -534,8 +535,8 @@ static void _entity_resource_compiler(uint64_t root,
 }
 
 static void resource_compiler(const char *filename,
-                       char **output,
-                       ct_compilator_api *compilator_api) {
+                              char **output,
+                              ct_compilator_api *compilator_api) {
     _entity_resource_compiler(0, filename, output, compilator_api);
 }
 
@@ -544,7 +545,7 @@ static void resource_compiler(const char *filename,
 //==============================================================================
 
 static void *loader(ct_vio *input,
-             cel_alloc *allocator) {
+                    cel_alloc *allocator) {
     const int64_t size = input->size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
     input->read(input, data, 1, size);
@@ -553,25 +554,25 @@ static void *loader(ct_vio *input,
 }
 
 static void unloader(void *new_data,
-              cel_alloc *allocator) {
+                     cel_alloc *allocator) {
     CEL_FREE(allocator, new_data);
 }
 
 
 static void online(uint64_t name,
-            void *data) {
+                   void *data) {
     CEL_UNUSED(name, data);
 }
 
 static void offline(uint64_t name,
-             void *data) {
+                    void *data) {
     CEL_UNUSED(name, data);
 }
 
 static void *reloader(uint64_t name,
-               void *old_data,
-               void *new_data,
-               cel_alloc *allocator) {
+                      void *old_data,
+                      void *new_data,
+                      cel_alloc *allocator) {
     offline(name, old_data);
     online(name, new_data);
 
@@ -598,8 +599,8 @@ static int alive(ct_entity entity) {
 }
 
 static ct_entity spawn_type(ct_world world,
-                     uint64_t type,
-                     uint64_t name) {
+                            uint64_t type,
+                            uint64_t name) {
 
     void *res = ct_resource_a0.get(type, name);
 
@@ -624,18 +625,18 @@ static ct_entity spawn_type(ct_world world,
 }
 
 static ct_entity spawn_entity(ct_world world,
-                       uint64_t name) {
+                              uint64_t name) {
     return spawn_type(world, _G.type, name);
 }
 
 static ct_entity spawn_level(ct_world world,
-                      uint64_t name) {
+                             uint64_t name) {
     return spawn_type(world, _G.level_type, name);
 }
 
 
 static ct_entity find_by_guid(ct_entity root,
-                       uint64_t guid) {
+                              uint64_t guid) {
     entity_instance *se = get_spawned_entity(root);
 
     if (se) {

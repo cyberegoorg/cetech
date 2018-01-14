@@ -54,10 +54,10 @@ static struct asset_browser_global {
     char **dir_list;
     uint32_t dir_list_count;
 
-    ct_ab_on_asset_click* on_asset_click;
-    ct_ab_on_asset_double_click* on_asset_double_click;
+    ct_ab_on_asset_click *on_asset_click;
+    ct_ab_on_asset_double_click *on_asset_double_click;
 
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
@@ -96,7 +96,7 @@ uint64_t get_selected_asset_type() {
     return type;
 }
 
-void get_selected_asset_name(char* asset_name) {
+void get_selected_asset_name(char *asset_name) {
     const char *path = _G.asset_list[_G.selected_file_idx];
 
     uint64_t type, name;
@@ -278,7 +278,7 @@ static void ui_asset_list() {
                     for (uint32_t j = 0;
                          j < cel_array_size(_G.on_asset_click); ++j) {
                         _G.on_asset_click[j](type, name,
-                                             CT_ID64_0("source"),path);
+                                             CT_ID64_0("source"), path);
                     }
                 }
             }

@@ -1,28 +1,27 @@
-namespace ImGui
-{
-	struct ImFileInfo
-	{
-		ImFileInfo(const char* name, int64_t size);
-		~ImFileInfo();
+namespace ImGui {
+    struct ImFileInfo {
+        ImFileInfo(const char *name,
+                   int64_t size);
 
-		ImString Name;
-		int64_t Size;
-	};
+        ~ImFileInfo();
 
-	struct ImFileList
-	{
-		typedef ImVector<ImFileInfo> FileInfoArray;
-		FileInfoArray FileList;
-		int Pos;
+        ImString Name;
+        int64_t Size;
+    };
 
-		ImFileList(const char* path = ".")
-			: Pos(0)
-		{
-			ChDir(path);
-		}
+    struct ImFileList {
+        typedef ImVector<ImFileInfo> FileInfoArray;
+        FileInfoArray FileList;
+        int Pos;
 
-		void ChDir(const char* path);
-		void Draw();
-	};
+        ImFileList(const char *path = ".")
+                : Pos(0) {
+            ChDir(path);
+        }
+
+        void ChDir(const char *path);
+
+        void Draw();
+    };
 
 } // namespace ImGui

@@ -688,7 +688,7 @@ bool parse_yaml(struct cel_alloc *alloc,
                     key = hash_combine(key, calc_key(buffer));
                 }
 
-                tmp_idx = new_node(inst->doc, NODE_MAP, (struct node_value){},
+                tmp_idx = new_node(inst->doc, NODE_MAP, (struct node_value) {},
                                    parent_stack[parent_stack_top].idx, key);
 
                 cel_hash_add(&inst->key_map, key, tmp_idx, _G.allocator);
@@ -999,13 +999,13 @@ struct ct_yamlng_node create_tree(ct_yng_doc_instance_t *_inst,
         uint32_t key_idx = new_node(
                 inst->doc,
                 NODE_STRING,
-                (struct node_value){.string = ct_memory_a0.str_dup(keys[i],
-                                                ct_memory_a0.main_allocator())},
+                (struct node_value) {.string = ct_memory_a0.str_dup(keys[i],
+                                                                    ct_memory_a0.main_allocator())},
                 parent, key);
 
         uint32_t new_map_idx = new_node(
                 inst->doc,
-                NODE_MAP, (struct node_value){.node_count=0},
+                NODE_MAP, (struct node_value) {.node_count=0},
                 key_idx, key);
 
         cel_hash_add(&inst->key_map, key, new_map_idx, _G.allocator);
@@ -1018,11 +1018,12 @@ struct ct_yamlng_node create_tree(ct_yng_doc_instance_t *_inst,
     uint32_t key_idx = new_node(
             inst->doc,
             NODE_STRING,
-            (struct node_value){.string = ct_memory_a0.str_dup(keys[keys_count - 1],
-                                            ct_memory_a0.main_allocator())},
+            (struct node_value) {.string = ct_memory_a0.str_dup(
+                    keys[keys_count - 1],
+                    ct_memory_a0.main_allocator())},
             parent, key_hash);
 
-    return (struct ct_yamlng_node){.idx = key_idx, .d = inst->doc};
+    return (struct ct_yamlng_node) {.idx = key_idx, .d = inst->doc};
 }
 
 void create_tree_vec3(ct_yng_doc_instance_t *_inst,
@@ -1037,7 +1038,7 @@ void create_tree_vec3(ct_yng_doc_instance_t *_inst,
 
     uint32_t new_seq_idx = new_node(
             d,
-            NODE_SEQ, (struct node_value){.node_count=3},
+            NODE_SEQ, (struct node_value) {.node_count=3},
             node.idx, key);
 
     struct yamlng_document_inst *inst = (struct yamlng_document_inst *) (_inst);
@@ -1047,7 +1048,7 @@ void create_tree_vec3(ct_yng_doc_instance_t *_inst,
     for (int i = 0; i < 3; ++i) {
         new_node(
                 d,
-                NODE_FLOAT, (struct node_value){.f = value[2 - i]},
+                NODE_FLOAT, (struct node_value) {.f = value[2 - i]},
                 new_seq_idx, i);
     }
 
@@ -1069,12 +1070,12 @@ void create_tree_bool(ct_yng_doc_instance_t *_inst,
     if (value) {
         new_idx = new_node(
                 d,
-                NODE_TRUE, (struct node_value){.string=str},
+                NODE_TRUE, (struct node_value) {.string=str},
                 node.idx, key);
     } else {
         new_idx = new_node(
                 d,
-                NODE_FALSE, (struct node_value){.string=str},
+                NODE_FALSE, (struct node_value) {.string=str},
                 node.idx, key);
     }
 
@@ -1095,7 +1096,7 @@ void create_tree_float(ct_yng_doc_instance_t *_inst,
 
     new_idx = new_node(
             d,
-            NODE_FLOAT, (struct node_value){.f = value},
+            NODE_FLOAT, (struct node_value) {.f = value},
             node.idx, key);
 
     struct yamlng_document_inst *inst = (struct yamlng_document_inst *) (_inst);
@@ -1117,7 +1118,7 @@ void create_tree_string(ct_yng_doc_instance_t *_inst,
 
     new_idx = new_node(
             d,
-            NODE_STRING, (struct node_value){.string = str},
+            NODE_STRING, (struct node_value) {.string = str},
             node.idx, key);
 
     struct yamlng_document_inst *inst = (struct yamlng_document_inst *) (_inst);
@@ -1170,12 +1171,12 @@ struct ct_yng_doc *from_vio(struct ct_vio *vio,
         return NULL;
     }
 
-    *d_inst = (struct yamlng_document_inst){
+    *d_inst = (struct yamlng_document_inst) {
             .alloc = alloc,
             .doc = d
     };
 
-    *d = (struct ct_yng_doc){
+    *d = (struct ct_yng_doc) {
             .inst = d_inst,
             .has_key = has_key,
             .type = type,
@@ -1214,7 +1215,7 @@ struct ct_yng_doc *from_vio(struct ct_vio *vio,
     };
 
     // Null node
-    new_node(d, NODE_INVALID, (struct node_value){}, 0, ~(uint64_t) (0));
+    new_node(d, NODE_INVALID, (struct node_value) {}, 0, ~(uint64_t) (0));
 
     if (!parse_yaml(alloc, vio, d_inst)) {
         destroy(d);
@@ -1246,7 +1247,7 @@ static void _shutdown() {
     cel_array_free(_G.key_to_str_offset, _G.allocator);
     cel_array_free(_G.key_to_str_data, _G.allocator);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

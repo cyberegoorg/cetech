@@ -15,14 +15,17 @@ extern "C" {
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_ap_on_asset)(uint64_t type, uint64_t name, const char* path);
+typedef void (*ct_ap_on_asset)(uint64_t type,
+                               uint64_t name,
+                               const char *path);
 
 //==============================================================================
 // Api
 //==============================================================================
 
 struct ct_asset_property_a0 {
-    void (*register_asset)(uint64_t type, ct_ap_on_asset on_asset);
+    void (*register_asset)(uint64_t type,
+                           ct_ap_on_asset on_asset);
 };
 
 #ifdef __cplusplus

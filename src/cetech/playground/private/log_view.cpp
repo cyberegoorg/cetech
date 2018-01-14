@@ -33,15 +33,15 @@ struct log_item {
 
 #define _G log_view_global
 static struct _G {
-    log_item* log_items;
-    char* line_buffer;
+    log_item *log_items;
+    char *line_buffer;
     ImGuiTextFilter filter;
 
     int level_counters[5];
     uint8_t level_mask;
 
     bool visible;
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -103,7 +103,7 @@ static void ui_level_mask() {
     for (int i = 0; i < CETECH_ARRAY_LEN(_levels); ++i) {
         int level = _levels[i];
         snprintf(buffer, CETECH_ARRAY_LEN(buffer),
-                 _level_to_label[level],_G.level_counters[level]);
+                 _level_to_label[level], _G.level_counters[level]);
 
         bool active = (_G.level_mask & (1 << level)) > 0;
 

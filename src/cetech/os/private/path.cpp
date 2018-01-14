@@ -8,9 +8,11 @@
 #endif
 
 #if defined(CETECH_DARWIN)
+
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/malloc.h>
+
 #endif
 
 #include <cetech/api/api_system.h>
@@ -309,14 +311,14 @@ void path_dirname(char *out,
 
     const size_t path_len = strlen(path);
 
-    if(buffer[path_len-1] == DIR_DELIM_CH) {
-        buffer[path_len-1] = '\0';
+    if (buffer[path_len - 1] == DIR_DELIM_CH) {
+        buffer[path_len - 1] = '\0';
     }
 
     char *ch = strrchr(buffer, DIR_DELIM_CH);
 
     if (ch != NULL) {
-        strcpy(out, ch+1);
+        strcpy(out, ch + 1);
     } else {
         strcpy(out, buffer);
     }

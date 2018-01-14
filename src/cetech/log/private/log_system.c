@@ -25,9 +25,9 @@ static struct global {
 
 
 static void vlog(const enum ct_log_level level,
-          const char *where,
-          const char *format,
-          va_list va) {
+                 const char *where,
+                 const char *format,
+                 va_list va) {
 
     //CE_ASSERT("logsystem", _globals.data != nullptr);
 
@@ -43,106 +43,106 @@ static void vlog(const enum ct_log_level level,
 }
 
 static void log_info_va(const char *where,
-                     const char *format,
-                     va_list va) {
-        vlog(LOG_INFO, where, format, va);
-    }
+                        const char *format,
+                        va_list va) {
+    vlog(LOG_INFO, where, format, va);
+}
 
 
 static void log_info(const char *where,
-                  const char *format,
-                  ...) {
-        va_list args;
-
-        va_start(args, format);
-        log_info_va(where, format, args);
-        va_end(args);
-    }
-
-static void log_warning_va(const char *where,
-                        const char *format,
-                        va_list va) {
-        vlog(LOG_WARNING, where, format, va);
-    }
-
-static void log_warning(const char *where,
                      const char *format,
                      ...) {
-        va_list args;
+    va_list args;
 
-        va_start(args, format);
-        log_warning_va(where, format, args);
-        va_end(args);
-    }
+    va_start(args, format);
+    log_info_va(where, format, args);
+    va_end(args);
+}
+
+static void log_warning_va(const char *where,
+                           const char *format,
+                           va_list va) {
+    vlog(LOG_WARNING, where, format, va);
+}
+
+static void log_warning(const char *where,
+                        const char *format,
+                        ...) {
+    va_list args;
+
+    va_start(args, format);
+    log_warning_va(where, format, args);
+    va_end(args);
+}
 
 static void log_error_va(const char *where,
-                      const char *format,
-                      va_list va) {
-        vlog(LOG_ERROR, where, format, va);
-    }
+                         const char *format,
+                         va_list va) {
+    vlog(LOG_ERROR, where, format, va);
+}
 
 static void log_error(const char *where,
-                   const char *format,
-                   ...) {
-        va_list args;
+                      const char *format,
+                      ...) {
+    va_list args;
 
-        va_start(args, format);
-        log_error_va(where, format, args);
-        va_end(args);
-    }
+    va_start(args, format);
+    log_error_va(where, format, args);
+    va_end(args);
+}
 
 static void log_debug_va(const char *where,
-                      const char *format,
-                      va_list va) {
+                         const char *format,
+                         va_list va) {
 
-        vlog(LOG_DBG, where, format, va);
-    }
+    vlog(LOG_DBG, where, format, va);
+}
 
 static void log_debug(const char *where,
-                   const char *format,
-                   ...) {
-        va_list args;
+                      const char *format,
+                      ...) {
+    va_list args;
 
-        va_start(args, format);
-        log_debug_va(where, format, args);
-        va_end(args);
-    }
+    va_start(args, format);
+    log_debug_va(where, format, args);
+    va_end(args);
+}
 
 
 static void log_register_handler(ct_log_handler_t handler,
-                              void *data) {
-        const uint8_t idx = _G.handlers_count++;
+                                 void *data) {
+    const uint8_t idx = _G.handlers_count++;
 
-        _G.handlers[idx] = handler;
-        _G.handlers_data[idx] = data;
-    }
+    _G.handlers[idx] = handler;
+    _G.handlers_data[idx] = data;
+}
 
 void logsystem_init() {
-        _G = (struct global) G_INIT;
-        log_register_handler(ct_log_stdout_handler, NULL);
-    }
+    _G = (struct global) G_INIT;
+    log_register_handler(ct_log_stdout_handler, NULL);
+}
 
 void logsystem_shutdown() {
-        _G = (struct global) G_INIT;
-    }
+    _G = (struct global) G_INIT;
+}
 
 
 static void set_wid_clb(ct_log_get_wid_clb_t get_wid_clb) {
-        _G.get_wid_clb = get_wid_clb;
-    }
+    _G.get_wid_clb = get_wid_clb;
+}
 
-    static struct ct_log_a0 log_a0 = {
-            .set_wid_clb = set_wid_clb,
-            .register_handler = log_register_handler,
-            .info_va = log_info_va,
-            .info = log_info,
-            .warning_va = log_warning_va,
-            .warning = log_warning,
-            .error_va = log_error_va,
-            .error = log_error,
-            .debug_va = log_debug_va,
-            .debug = log_debug
-    };
+static struct ct_log_a0 log_a0 = {
+        .set_wid_clb = set_wid_clb,
+        .register_handler = log_register_handler,
+        .info_va = log_info_va,
+        .info = log_info,
+        .warning_va = log_warning_va,
+        .warning = log_warning,
+        .error_va = log_error_va,
+        .error = log_error,
+        .debug_va = log_debug_va,
+        .debug = log_debug
+};
 
 
 CETECH_MODULE_DEF(

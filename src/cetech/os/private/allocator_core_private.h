@@ -9,6 +9,7 @@ struct cel_alloc;
 struct ct_api_a0;
 
 extern void coreallocator_register_api(struct ct_api_a0 *api);
+
 extern struct cel_alloc *coreallocator_get();
 
 #ifdef __cplusplus

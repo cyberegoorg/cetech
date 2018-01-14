@@ -41,7 +41,7 @@ struct ct_world {
 typedef int (*ct_component_compiler_t)(const char *filename,
                                        uint64_t *component_key,
                                        uint32_t component_key_count,
-                                       char** data);
+                                       char **data);
 
 //==============================================================================
 // Structs
@@ -123,8 +123,8 @@ struct ct_entity_a0 {
     int (*alive)(struct ct_entity entity);
 
 
-    void (*compiler)( const char *filename,
-                     char**output,
+    void (*compiler)(const char *filename,
+                     char **output,
                      struct ct_compilator_api *compilator_api);
 
     //! Spawn entity
@@ -135,9 +135,10 @@ struct ct_entity_a0 {
                               uint64_t name);
 
     struct ct_entity (*spawn_level)(struct ct_world world,
-                              uint64_t name);
+                                    uint64_t name);
 
-    struct ct_entity (*find_by_guid)(struct ct_entity root, uint64_t guid);
+    struct ct_entity (*find_by_guid)(struct ct_entity root,
+                                     uint64_t guid);
 
     //! Create compiler output structure
     //! \return New compiler output structure
@@ -168,7 +169,7 @@ struct ct_entity_a0 {
     //! \param build Build
     void (*compiler_write_to_build)(struct ct_entity_compile_output *output,
                                     const char *filename,
-                                    char**build);
+                                    char **build);
 
     //! Resource compile
     //! \param root Root yaml node
@@ -177,7 +178,7 @@ struct ct_entity_a0 {
     //! \param compilator_api Compilator api
     void (*resource_compiler)(uint64_t root,
                               const char *filename,
-                              char** build,
+                              char **build,
                               struct ct_compilator_api *compilator_api);
 };
 
@@ -202,7 +203,7 @@ struct ct_component_a0 {
                    const char *filename,
                    uint64_t *component_key,
                    uint32_t component_key_count,
-                   char** data);
+                   char **data);
 
     //! Get component spawn order
     //! \param type Component type

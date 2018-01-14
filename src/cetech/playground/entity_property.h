@@ -27,7 +27,8 @@ typedef void (*ct_ep_on_component)(struct ct_world world,
 // Api
 //==============================================================================
 struct ct_entity_property_a0 {
-    void (*register_component)(uint64_t type, ct_ep_on_component on_component);
+    void (*register_component)(uint64_t type,
+                               ct_ep_on_component on_component);
 
     void (*unregister_component)(uint64_t type);
 };

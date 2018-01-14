@@ -23,9 +23,13 @@ struct ct_window;
 
 struct ct_game_fce {
     void (*on_init)();
+
     void (*on_shutdown)();
+
     void (*on_update)(float dt);
+
     void (*on_render)();
+
     void (*on_ui)();
 };
 
@@ -45,8 +49,11 @@ struct ct_app_a0 {
 
     void (*start)();
 
-    void (*register_game)(uint64_t name, struct ct_game_fce game);
+    void (*register_game)(uint64_t name,
+                          struct ct_game_fce game);
+
     void (*unregister_game)(uint64_t name);
+
     void (*set_active_game)(uint64_t name);
 
     void (*register_on_init)(ct_app_on_init on_init);

@@ -64,7 +64,8 @@ void sdl_keyboard_process(EventStream &stream) {
 }
 
 
-void sdl_keyboard_process(SDL_Event* e, EventStream &stream) {
+void sdl_keyboard_process(SDL_Event *e,
+                          EventStream &stream) {
     switch (e->type) {
         case SDL_TEXTINPUT: {
             ct_keyboard_text_event ev;

@@ -27,7 +27,7 @@ static struct _G {
     Map<ct_component_compiler_t> compiler_map;
     Map<ct_component_clb> component_clb;
 
-    cel_alloc* allocator;
+    cel_alloc *allocator;
 } _G;
 
 
@@ -36,18 +36,18 @@ static struct _G {
 //==============================================================================
 
 static void register_compiler(uint64_t type,
-                       ct_component_compiler_t compiler,
-                       uint32_t spawn_order) {
+                              ct_component_compiler_t compiler,
+                              uint32_t spawn_order) {
     map::set(_G.compiler_map, type, compiler);
 
     cel_hash_add(&_G.spawn_order_map, type, spawn_order, _G.allocator);
 }
 
 static int compile(uint64_t type,
-            const char *filename,
-            uint64_t *component_key,
-            uint32_t component_key_count,
-            char **data) {
+                   const char *filename,
+                   uint64_t *component_key,
+                   uint32_t component_key_count,
+                   char **data) {
 
     ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
             _G.compiler_map, type, nullptr);
@@ -60,11 +60,11 @@ static int compile(uint64_t type,
 }
 
 static uint32_t get_spawn_order(uint64_t type) {
-    return (uint32_t) cel_hash_lookup(&_G.spawn_order_map, type,  0);
+    return (uint32_t) cel_hash_lookup(&_G.spawn_order_map, type, 0);
 }
 
 static void register_type(uint64_t type,
-                   ct_component_clb clb) {
+                          ct_component_clb clb) {
     map::set(_G.component_clb, type, clb);
 
     ct_world_callbacks_t wclb = {
@@ -77,12 +77,12 @@ static void register_type(uint64_t type,
 }
 
 static void spawn(ct_world world,
-           uint64_t type,
-           ct_entity *ent_ids,
-           uint32_t *cent,
-           uint32_t *ents_parent,
-           uint32_t ent_count,
-           void *data) {
+                  uint64_t type,
+                  ct_entity *ent_ids,
+                  uint32_t *cent,
+                  uint32_t *ents_parent,
+                  uint32_t ent_count,
+                  void *data) {
 
     ct_component_clb clb = map::get(_G.component_clb, type,
                                     ct_component_clb_null);
@@ -95,8 +95,8 @@ static void spawn(ct_world world,
 }
 
 static void destroy(ct_world world,
-             ct_entity *ent,
-             uint32_t count) {
+                    ct_entity *ent,
+                    uint32_t count) {
 
     auto ct_it = map::begin(_G.component_clb);
     auto ct_end = map::end(_G.component_clb);

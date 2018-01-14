@@ -64,8 +64,8 @@ static struct SceneGraphGlobal {
 } _G;
 
 static void allocate(WorldInstance &_data,
-              cel_alloc *_allocator,
-              uint32_t sz) {
+                     cel_alloc *_allocator,
+                     uint32_t sz) {
     //assert(sz > _data.n);
 
     WorldInstance new_data = {};
@@ -158,7 +158,7 @@ static int is_valid(ct_scene_node node) {
 }
 
 static void transform(ct_scene_node node,
-               float *parent) {
+                      float *parent) {
     WorldInstance *world_inst = _get_world_instance(node.world);
 
     float *pos = &world_inst->position[3 * node.idx];
@@ -193,7 +193,7 @@ static void transform(ct_scene_node node,
 }
 
 static void get_position(ct_scene_node node,
-                  float *value) {
+                         float *value) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
 
@@ -201,7 +201,7 @@ static void get_position(ct_scene_node node,
 }
 
 static void get_rotation(ct_scene_node node,
-                  float *value) {
+                         float *value) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
 
@@ -209,21 +209,21 @@ static void get_rotation(ct_scene_node node,
 }
 
 static void get_scale(ct_scene_node node,
-               float *value) {
+                      float *value) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
     memcpy(value, &world_inst->scale[3 * node.idx], sizeof(float) * 3);
 }
 
 static void get_world_matrix(ct_scene_node node,
-                      float *value) {
+                             float *value) {
     WorldInstance *world_inst = _get_world_instance(node.world);
     memcpy(value, &world_inst->world_matrix[16 * node.idx],
            sizeof(float) * 16);
 }
 
 static void set_position(ct_scene_node node,
-                  float *pos) {
+                         float *pos) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
 
@@ -245,7 +245,7 @@ static void set_position(ct_scene_node node,
 }
 
 static void set_rotation(ct_scene_node node,
-                  float *rot) {
+                         float *rot) {
     WorldInstance *world_inst = _get_world_instance(node.world);
 
     uint32_t parent_idx = world_inst->parent[node.idx];
@@ -268,7 +268,7 @@ static void set_rotation(ct_scene_node node,
 }
 
 static void set_scale(ct_scene_node node,
-               float *scale) {
+                      float *scale) {
     WorldInstance *world_inst = _get_world_instance(node.world);
 
     uint32_t parent_idx = world_inst->parent[node.idx];
@@ -289,14 +289,14 @@ static void set_scale(ct_scene_node node,
 }
 
 static int has(ct_world world,
-        ct_entity entity) {
+               ct_entity entity) {
     uint64_t idx = hash_combine(world.h, entity.h);
 
     return cel_hash_contain(&_G.ent_map, idx);
 }
 
 static ct_scene_node get_root(ct_world world,
-                       ct_entity entity) {
+                              ct_entity entity) {
 
     uint64_t idx = hash_combine(world.h, entity.h);
 
@@ -306,11 +306,11 @@ static ct_scene_node get_root(ct_world world,
 }
 
 static ct_scene_node create(ct_world world,
-                     ct_entity entity,
-                     uint64_t *names,
-                     uint32_t *parent,
-                     float *pose,
-                     uint32_t count) {
+                            ct_entity entity,
+                            uint64_t *names,
+                            uint32_t *parent,
+                            float *pose,
+                            uint32_t count) {
     CEL_UNUSED(pose);
 
     WorldInstance *data = _get_world_instance(world);
@@ -390,7 +390,7 @@ static ct_scene_node create(ct_world world,
 }
 
 static void link(ct_scene_node parent,
-          ct_scene_node child) {
+                 ct_scene_node child) {
     WorldInstance *data = _get_world_instance(parent.world);
 
     data->parent[child.idx] = parent.idx;
@@ -414,8 +414,8 @@ static void link(ct_scene_node parent,
 }
 
 static ct_scene_node _node_by_name(WorldInstance *data,
-                            ct_scene_node root,
-                            uint64_t name) {
+                                   ct_scene_node root,
+                                   uint64_t name) {
     if (data->name[root.idx] == name) {
         return root;
     }
@@ -434,8 +434,8 @@ static ct_scene_node _node_by_name(WorldInstance *data,
 }
 
 static ct_scene_node node_by_name(ct_world world,
-                           ct_entity entity,
-                           uint64_t name) {
+                                  ct_entity entity,
+                                  uint64_t name) {
     WorldInstance *data = _get_world_instance(world);
     ct_scene_node root = get_root(world, entity);
 

@@ -61,7 +61,7 @@ struct viewport_instance {
 };
 
 typedef int (*ct_viewport_pass_compiler)(struct ct_yamlng_node body,
-                                         char**data);
+                                         char **data);
 
 typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,
                                      ct_viewport viewport_id,
@@ -89,7 +89,7 @@ struct ct_viewport_a0 {
     struct ct_texture (*get_global_resource)(uint64_t name);
 
     struct ct_texture (*get_local_resource)(ct_viewport viewport,
-                                   uint64_t name);
+                                            uint64_t name);
 
     void (*resize)(struct ct_viewport viewport,
                    float width,

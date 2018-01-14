@@ -69,7 +69,7 @@ static const char *button_name(const uint32_t button_index) {
 }
 
 static int button_state(uint32_t idx,
-                 const uint32_t button_index) {
+                        const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
@@ -77,7 +77,7 @@ static int button_state(uint32_t idx,
 }
 
 static int button_pressed(uint32_t idx,
-                   const uint32_t button_index) {
+                          const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
@@ -85,7 +85,7 @@ static int button_pressed(uint32_t idx,
 }
 
 static int button_released(uint32_t idx,
-                    const uint32_t button_index) {
+                           const uint32_t button_index) {
     CETECH_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
@@ -116,8 +116,8 @@ static uint32_t axis_index(const char *axis_name) {
 }
 
 static void axis(uint32_t idx,
-          const uint32_t axis_index,
-          float *value) {
+                 const uint32_t axis_index,
+                 float *value) {
     CETECH_ASSERT(LOG_WHERE,
                   (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
@@ -126,8 +126,8 @@ static void axis(uint32_t idx,
 }
 
 static void play_rumble(uint32_t idx,
-                 float strength,
-                 uint32_t length) {
+                        float strength,
+                        uint32_t length) {
     ct_machine_a0.gamepad_play_rumble(idx, strength, length);
 }
 
@@ -195,7 +195,7 @@ static void _init_api(struct ct_api_a0 *api) {
 
 static void _init(struct ct_api_a0 *api) {
     _init_api(api);
-    _G = (struct _G){};
+    _G = (struct _G) {};
 
     ct_app_a0.register_on_update(update);
 
@@ -209,7 +209,7 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

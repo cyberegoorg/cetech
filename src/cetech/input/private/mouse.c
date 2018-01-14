@@ -222,7 +222,7 @@ static void _init_api(struct ct_api_a0 *api) {
 static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 
     ct_app_a0.register_on_update(update);
 
@@ -232,7 +232,7 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

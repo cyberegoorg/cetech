@@ -68,14 +68,14 @@ CETECH_DECL_API(ct_coredb_a0);
 //==============================================================================
 
 static struct ApplicationGlobals {
-    ct_coredb_object_t* config_object;
+    ct_coredb_object_t *config_object;
 
-    ct_app_on_init* on_init;
-    ct_app_on_shutdown* on_shutdown;
-    ct_app_on_update* on_update;
+    ct_app_on_init *on_init;
+    ct_app_on_shutdown *on_shutdown;
+    ct_app_on_update *on_update;
 
     cel_hash_t game_map;
-    ct_game_fce* game;
+    ct_game_fce *game;
 
     ct_game_fce active_game;
     int is_running;
@@ -101,29 +101,29 @@ void application_quit() {
 void _init_config() {
     _G.config_object = ct_config_a0.config_object();
 
-    ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(_G.config_object);
+    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
         ct_coredb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_GAME)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_GAME)) {
         ct_coredb_a0.set_string(writer, CONFIG_GAME, "playground");
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_DAEMON)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_DAEMON)) {
         ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_COMPILE)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_COMPILE)) {
         ct_coredb_a0.set_uint32(writer, CONFIG_COMPILE, 0);
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_CONTINUE)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_CONTINUE)) {
         ct_coredb_a0.set_uint32(writer, CONFIG_CONTINUE, 0);
     }
 
-    if(!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_WAIT)) {
+    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_WAIT)) {
         ct_coredb_a0.set_uint32(writer, CONFIG_WAIT, 0);
     }
 
@@ -131,7 +131,8 @@ void _init_config() {
 }
 
 static void _boot_stage() {
-    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object, CONFIG_BOOT_PKG, "");
+    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object,
+                                                        CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
     uint64_t pkg = CT_ID64_0("package");
 
@@ -148,7 +149,8 @@ static void _boot_stage() {
 }
 
 static void _boot_unload() {
-    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object, CONFIG_BOOT_PKG, "");
+    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object,
+                                                        CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
 
     uint64_t core_pkg = CT_ID64_0("core/core");
@@ -164,7 +166,7 @@ static void _boot_unload() {
 
 void set_active_game(uint64_t name) {
     uint64_t idx = cel_hash_lookup(&_G.game_map, name, UINT64_MAX);
-    if(idx != UINT64_MAX) {
+    if (idx != UINT64_MAX) {
         _G.active_game = _G.game[idx];
     }
 }
@@ -205,19 +207,20 @@ extern "C" void application_start() {
         _G.on_init[i]();
     }
 
-    set_active_game(CT_ID64_0(ct_coredb_a0.read_string(_G.config_object, CONFIG_GAME, "")));
+    set_active_game(CT_ID64_0(ct_coredb_a0.read_string(_G.config_object,
+                                                       CONFIG_GAME, "")));
 
-    if(_G.active_game.on_init) {
+    if (_G.active_game.on_init) {
         _G.active_game.on_init();
     }
 
-    ct_coredb_object_t* obj1 = ct_coredb_a0.create_object();
-    ct_coredb_object_t* obj2 = ct_coredb_a0.create_object();
-    ct_coredb_object_t* obj3 = ct_coredb_a0.create_object();
+    ct_coredb_object_t *obj1 = ct_coredb_a0.create_object();
+    ct_coredb_object_t *obj2 = ct_coredb_a0.create_object();
+    ct_coredb_object_t *obj3 = ct_coredb_a0.create_object();
 
     float f1 = ct_coredb_a0.read_float(obj1, 1, 22.0f);
 
-    ct_coredb_writer_t* writer = ct_coredb_a0.write_begin(obj1);
+    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(obj1);
     ct_coredb_a0.set_float(writer, 1, 44.0f);
     ct_coredb_a0.set_float(writer, 2, 55.0f);
     ct_coredb_a0.set_float(writer, 3, 66.0f);
@@ -232,7 +235,7 @@ extern "C" void application_start() {
     CEL_UNUSED(obj2)
     CEL_UNUSED(obj3)
 
-    uint32_t* arr = NULL;
+    uint32_t *arr = NULL;
     cel_array_push(arr, 1, ct_memory_a0.main_allocator());
     cel_array_push(arr, 1, ct_memory_a0.main_allocator());
     cel_array_push(arr, 1, ct_memory_a0.main_allocator());
@@ -270,20 +273,21 @@ extern "C" void application_start() {
             _G.on_update[i](dt);
         }
 
-        if(_G.active_game.on_update) {
+        if (_G.active_game.on_update) {
             _G.active_game.on_update(dt);
         }
 
         CETECH_GET_API(&ct_api_a0, ct_mouse_a0); // TODO: WTF
 
         if (!ct_coredb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
-            ct_renderer_a0.render(_G.active_game.on_render? _G.active_game.on_render : NULL);
+            ct_renderer_a0.render(
+                    _G.active_game.on_render ? _G.active_game.on_render : NULL);
         }
 
         sleep(0);
     }
 
-    if(_G.active_game.on_shutdown) {
+    if (_G.active_game.on_shutdown) {
         _G.active_game.on_shutdown();
     }
 
@@ -323,7 +327,8 @@ _DEF_ON_CLB_FCE(ct_app_on_update, on_update)
 
 #undef _DEF_ON_CLB_FCE
 
-void register_game(uint64_t name, ct_game_fce game) {
+void register_game(uint64_t name,
+                   ct_game_fce game) {
     cel_array_push(_G.game, game, _G.allocator);
     cel_hash_add(&_G.game_map, name, cel_array_size(_G.game) - 1, _G.allocator);
 }

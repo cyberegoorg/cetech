@@ -11,9 +11,11 @@ extern "C" {
 
 
 void resource_compiler_register(uint64_t type,
-                                ct_resource_compilator_t compilator, bool yaml_based);
+                                ct_resource_compilator_t compilator,
+                                bool yaml_based);
 
 void resource_compiler_check_fs();
+
 void resource_compiler_compile_all();
 
 int resource_compiler_get_filename(char *filename,
@@ -35,7 +37,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
 const char *resource_compiler_get_core_dir();
 
-void compile_and_reload(const char* filename);
+void compile_and_reload(const char *filename);
 
 void type_name_from_filename(const char *fullname,
                              uint64_t *type,

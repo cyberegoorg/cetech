@@ -78,15 +78,16 @@ static void on_debugui() {
     ct_debugui_a0.SameLine(0.0f, -1.0f);
 
     ct_debugui_a0.InputText("asset",
-                            (char*)_G.filename, strlen(_G.filename),
+                            (char *) _G.filename, strlen(_G.filename),
                             DebugInputTextFlags_ReadOnly, 0, NULL);
 
-    if (ct_debugui_a0.CollapsingHeader("Entity", DebugUITreeNodeFlags_DefaultOpen)) {
+    if (ct_debugui_a0.CollapsingHeader("Entity",
+                                       DebugUITreeNodeFlags_DefaultOpen)) {
         ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
     struct ct_entity entity = ct_entity_a0.find_by_guid(_G.top_entity,
-                                                       _G.active_entity);
+                                                        _G.active_entity);
 
     uint64_t tmp_keys[_G.keys_count + 3];
     memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
@@ -113,8 +114,9 @@ static void on_debugui() {
         uint64_t component_type_hash = CT_ID64_0(component_type);
 
 
-        ct_ep_on_component on_component = map::get<ct_ep_on_component>(_G.on_component,
-                                                   component_type_hash, NULL);
+        ct_ep_on_component on_component = map::get<ct_ep_on_component>(
+                _G.on_component,
+                component_type_hash, NULL);
 
         if (on_component) {
             on_component(_G.active_world, entity, _G.filename, tmp_keys,
@@ -150,7 +152,6 @@ void register_on_component_(uint64_t type,
 void unregister_on_component_(uint64_t type) {
     map::remove(_G.on_component, type);
 }
-
 
 
 static ct_entity_property_a0 entity_property_a0 = {

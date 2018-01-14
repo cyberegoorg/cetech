@@ -61,14 +61,14 @@ static struct globals {
 
 
 static void fps_camera_update(ct_world world,
-                       ct_entity camera_ent,
-                       float dt,
-                       float dx,
-                       float dy,
-                       float updown,
-                       float leftright,
-                       float speed,
-                       bool fly_mode) {
+                              ct_entity camera_ent,
+                              float dt,
+                              float dx,
+                              float dy,
+                              float updown,
+                              float leftright,
+                              float speed,
+                              bool fly_mode) {
 
     CEL_UNUSED(dx);
     CEL_UNUSED(dy);
@@ -164,9 +164,9 @@ static void on_debugui() {
 
                 if (ct_debugui_a0.IsMouseClicked(0, false)) {
                     ct_explorer_a0.set_level(_G.world[i], _G.entity[i],
-                                                    _G.entity_name[i],
-                                                    _G.root[i], _G.path[i],
-                                                    false);
+                                             _G.entity_name[i],
+                                             _G.root[i], _G.path[i],
+                                             false);
                 }
             }
 
@@ -248,8 +248,8 @@ static void open(uint64_t name,
     _G.entity_name[idx] = name;
 
     ct_explorer_a0.set_level(_G.world[idx], _G.entity[idx],
-                                    _G.entity_name[idx], _G.root[idx],
-                                    _G.path[idx], is_level);
+                             _G.entity_name[idx], _G.root[idx],
+                             _G.path[idx], is_level);
 }
 
 static void init() {

@@ -40,10 +40,10 @@ struct ct_path_a0 {
                  struct cel_alloc *allocator);
 
     void (*list2)(const char *path,
-                 const char *patern,
-                 int recursive,
-                 int only_dir,
-                 void(*on_item)(const char* filename));
+                  const char *patern,
+                  int recursive,
+                  int only_dir,
+                  void(*on_item)(const char *filename));
 
     //! Free list dir array
     //! \param files Files array
@@ -73,7 +73,7 @@ struct ct_path_a0 {
                 const char *path);
 
     void (*dirname)(char *out,
-                const char *path);
+                    const char *path);
 
     //! Get file extension
     //! \param path Path
@@ -92,7 +92,7 @@ struct ct_path_a0 {
                       const char *from,
                       const char *to);
 
-    bool (*is_dir)(const char* path);
+    bool (*is_dir)(const char *path);
 };
 
 #ifdef __cplusplus
