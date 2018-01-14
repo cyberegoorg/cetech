@@ -64,8 +64,8 @@ static void cel_hash_remove(struct cel_hash_t *hash, uint64_t k){
         return;
     }
 
-    memcpy(hash->keys+idx, hash->keys+idx+1, sizeof(uint64_t) * (hash->n - idx));
-    memcpy(hash->values+idx, hash->values+idx+1, sizeof(uint64_t) * (hash->n - idx));
+    memmove(hash->keys+idx, hash->keys+idx+1, sizeof(uint64_t) * (hash->n - idx - 1));
+    memmove(hash->values+idx, hash->values+idx+1, sizeof(uint64_t) * (hash->n - idx -1));
 
     hash->n--;
 }

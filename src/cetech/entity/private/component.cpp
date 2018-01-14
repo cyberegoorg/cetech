@@ -4,7 +4,6 @@
 
 #include <cetech/entity/entity.h>
 #include <celib/hash.h>
-#include "celib/map.inl"
 
 #include "cetech/os/memory.h"
 #include "cetech/config/config.h"
@@ -14,7 +13,6 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
 
-using namespace celib;
 
 //==============================================================================
 // Globals
@@ -24,8 +22,11 @@ using namespace celib;
 static struct _G {
     cel_hash_t spawn_order_map;
 
-    Map<ct_component_compiler_t> compiler_map;
-    Map<ct_component_clb> component_clb;
+    cel_hash_t compiler_map;
+    cel_hash_t component_clb_map;
+
+    ct_component_compiler_t *compilers;
+    ct_component_clb *components;
 
     cel_alloc *allocator;
 } _G;
@@ -38,8 +39,10 @@ static struct _G {
 static void register_compiler(uint64_t type,
                               ct_component_compiler_t compiler,
                               uint32_t spawn_order) {
-    map::set(_G.compiler_map, type, compiler);
+    cel_array_push(_G.compilers, compiler, _G.allocator);
 
+    cel_hash_add(&_G.compiler_map, type, cel_array_size(_G.compilers) - 1,
+                 _G.allocator);
     cel_hash_add(&_G.spawn_order_map, type, spawn_order, _G.allocator);
 }
 
@@ -49,13 +52,12 @@ static int compile(uint64_t type,
                    uint32_t component_key_count,
                    char **data) {
 
-    ct_component_compiler_t compiler = map::get<ct_component_compiler_t>(
-            _G.compiler_map, type, nullptr);
-
-    if (!compiler) {
+    uint64_t idx = cel_hash_lookup(&_G.compiler_map, type, UINT64_MAX);
+    if (idx == UINT64_MAX) {
         return 0;
     }
 
+    ct_component_compiler_t compiler = _G.compilers[idx];
     return compiler(filename, component_key, component_key_count, data);
 }
 
@@ -65,7 +67,9 @@ static uint32_t get_spawn_order(uint64_t type) {
 
 static void register_type(uint64_t type,
                           ct_component_clb clb) {
-    map::set(_G.component_clb, type, clb);
+    cel_array_push(_G.components, clb, _G.allocator);
+    cel_hash_add(&_G.component_clb_map,
+                 type, cel_array_size(_G.compilers) - 1, _G.allocator);
 
     ct_world_callbacks_t wclb = {
             .on_created = clb.world_clb.on_created,
@@ -84,26 +88,24 @@ static void spawn(ct_world world,
                   uint32_t ent_count,
                   void *data) {
 
-    ct_component_clb clb = map::get(_G.component_clb, type,
-                                    ct_component_clb_null);
+    uint64_t idx = cel_hash_lookup(&_G.compiler_map, type, UINT64_MAX);
+    if (idx == UINT64_MAX) {
+        return;
+    }
+
+    ct_component_clb clb = _G.components[idx];
 
     if (!clb.spawner) {
         return;
     }
-
     clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
 }
 
 static void destroy(ct_world world,
                     ct_entity *ent,
                     uint32_t count) {
-
-    auto ct_it = map::begin(_G.component_clb);
-    auto ct_end = map::end(_G.component_clb);
-
-    while (ct_it != ct_end) {
-        ct_it->value.destroyer(world, ent, count);
-        ++ct_it;
+    for (int i = 0; i < cel_array_size(_G.components); ++i) {
+        _G.components[i].destroyer(world, ent, count);
     }
 }
 
@@ -127,13 +129,11 @@ static void _init(ct_api_a0 *a0) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    _G.compiler_map.init(ct_memory_a0.main_allocator());
-    _G.component_clb.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
-    _G.compiler_map.destroy();
-    _G.component_clb.destroy();
+    cel_hash_free(&_G.compiler_map, _G.allocator);
+    cel_hash_free(&_G.component_clb_map, _G.allocator);
     cel_hash_free(&_G.spawn_order_map, _G.allocator);
 }
 

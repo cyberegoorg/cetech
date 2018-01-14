@@ -46,7 +46,7 @@ extern "C" {
     cel_array_header(a)->size += n
 
 #define cel_array_pop_front(a) \
-    cel_array_any(a) ? memcpy(a, ((a)+1), sizeof(*(a)) * (cel_array_header(a)->size--)) : 0
+    cel_array_any(a) ? memmove(a, ((a)+1), sizeof(*(a)) * (cel_array_header(a)->size--)) : 0
 
 #define cel_array_pop_back(a) \
     cel_array_any(a) ? cel_array_header(a)->size-- : 0

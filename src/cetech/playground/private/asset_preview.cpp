@@ -12,6 +12,7 @@
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
+#include <celib/hash.h>
 #include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"
@@ -21,12 +22,9 @@
 #include "cetech/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
@@ -37,8 +35,12 @@ CETECH_DECL_API(ct_playground_a0);
 
 using namespace celib;
 
-static struct globals {
-    Map<ct_asset_preview_fce> preview_fce;
+#define _G AssetPreviewGlobals
+
+static struct _G {
+    cel_alloc* allocator;
+    struct cel_hash_t preview_fce_map;
+    ct_asset_preview_fce* preview_fce;
 
     uint64_t active_type;
     uint64_t active_name;
@@ -139,30 +141,33 @@ static void set_asset(uint64_t type,
         return;
     }
 
-    ct_asset_preview_fce fce = map::get(_G.preview_fce, _G.active_type,
-                                        (ct_asset_preview_fce) {NULL});
-    if (fce.unload) {
-        fce.unload(_G.active_path, _G.active_type, _G.active_name, _G.world);
+    uint64_t idx = cel_hash_lookup(&_G.preview_fce_map,_G.active_type, UINT64_MAX);
+    if(idx != UINT64_MAX) {
+        ct_asset_preview_fce fce = _G.preview_fce[idx];
+
+        if(fce.unload) {
+            fce.unload(_G.active_path, _G.active_type, _G.active_name, _G.world);
+        }
     }
 
     _G.active_type = type;
     _G.active_name = name;
     _G.active_path = path;
 
-    fce = map::get(_G.preview_fce, type, (ct_asset_preview_fce) {NULL});
-    if (fce.load) {
-        fce.load(path, type, name, _G.world);
+    idx = cel_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+    if(idx != UINT64_MAX) {
+        ct_asset_preview_fce fce = _G.preview_fce[idx];
+
+        if (fce.load) {
+            fce.load(path, type, name, _G.world);
+        }
     }
 }
 
 static void init() {
     _G.visible = true;
-
-    _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0,
-                                        0);
-
+    _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
     _G.world = ct_world_a0.create();
-
     _G.camera_ent = ct_entity_a0.spawn(_G.world, CT_ID64_0("content/camera"));
 
     ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
@@ -206,14 +211,21 @@ static void update(float dt) {
                       0, 0, updown, leftright, 10.0f, false);
 }
 
+#define cel_instance_map(a, h, k, item, al) \
+    cel_array_push(a, item, al); \
+    cel_hash_add(h, k, cel_array_size(a) - 1, al)
 
 void register_type_preview(uint64_t type,
                            ct_asset_preview_fce fce) {
-    map::set(_G.preview_fce, type, fce);
+    cel_instance_map(_G.preview_fce, &_G.preview_fce_map, type, fce, _G.allocator);
 }
 
 void unregister_type_preview(uint64_t type) {
-    map::remove(_G.preview_fce, type);
+    uint64_t idx = cel_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+    if(UINT64_MAX == idx){
+        return;
+    }
+    cel_hash_remove(&_G.preview_fce_map, type);
 }
 
 static void on_menu_window() {
@@ -226,9 +238,9 @@ static ct_asset_preview_a0 asset_preview_api = {
 };
 
 static void _init(ct_api_a0 *api) {
-    _G = {};
-
-    _G.preview_fce.init(ct_memory_a0.main_allocator());
+    _G = (struct _G){
+            .allocator = ct_memory_a0.main_allocator()
+    };
 
     ct_playground_a0.register_module(
             CT_ID64_0("asset_preview"),
@@ -247,14 +259,11 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-
-    ct_playground_a0.unregister_module(
-            CT_ID64_0("asset_preview")
-    );
-
+    ct_playground_a0.unregister_module(CT_ID64_0("asset_preview"));
     ct_asset_browser_a0.unregister_on_asset_click(set_asset);
 
-    _G.preview_fce.destroy();
+    cel_hash_free(&_G.preview_fce_map, _G.allocator);
+    cel_array_free(_G.preview_fce, _G.allocator);
 
     _G = {};
 }
@@ -264,11 +273,8 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_world_a0);
-            CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);

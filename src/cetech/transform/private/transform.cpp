@@ -356,7 +356,7 @@ void transform_transform(ct_transform transform,
 //    celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
 //
 //    celib::mat4_mul(m, sm, rm);
-//
+
 //    m[4 * 3 + 0] = pos[0];
 //    m[4 * 3 + 1] = pos[1];
 //    m[4 * 3 + 2] = pos[2];
@@ -405,6 +405,11 @@ void transform_get_scale(ct_transform node,
 void transform_get_world_matrix(ct_transform node,
                                 float *value) {
     WorldInstance *world_inst = _get_world_instance(node.world);
+
+
+    if(node.idx == UINT32_MAX) {
+        return;
+    }
 
     memcpy(value, &world_inst->world_matrix[16 * node.idx], sizeof(float) * 16);
 }
@@ -529,9 +534,8 @@ ct_transform transform_create(ct_world world,
     }
     transform_transform(t, p);
 
-
-    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx,
-                 _G.allocator);
+    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h),
+                 idx, _G.allocator);
 
     if (parent.h != UINT32_MAX) {
         uint32_t parent_idx = cel_hash_lookup(&_G.ent_map,

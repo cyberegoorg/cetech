@@ -190,20 +190,6 @@ ct_entity spawn_from_resource(ct_world world,
 }
 
 
-uint32_t find_by_guid(uint64_t *guids,
-                      uint32_t guids_count,
-                      uint64_t guid) {
-    for (int i = 0; i < guids_count; ++i) {
-        if (guids[i] != guid) {
-            continue;
-        }
-
-        return i;
-    }
-
-    return UINT32_MAX;
-}
-
 void reload_instance(uint64_t name,
                      void *data) {
 //    entity_resource *ent_res = (entity_resource *) data;
@@ -609,11 +595,10 @@ static ct_entity spawn_type(ct_world world,
         return (ct_entity) {.h = 0};
     }
 
-
     entity_resource *ent_res = (entity_resource *) res;
-    ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                                      ct_entity, sizeof(ct_entity) *
-                                                 ent_res->ent_count);
+    ct_entity *spawned = CEL_ALLOCATE(_G.allocator,
+                                      ct_entity,
+                                      sizeof(ct_entity) * ent_res->ent_count);
 
     for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
         spawned[j] = create();

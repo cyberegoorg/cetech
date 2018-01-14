@@ -34,8 +34,10 @@ CETECH_DECL_API(ct_path_a0);
 
 struct watchdog_instance {
     celib::EventStream event_stream;
+
     celib::Map<char *> wd2dir;
     celib::Map<int> dir2wd;
+
     cel_alloc *alloc;
 
 #ifdef CETECH_LINUX
