@@ -20,7 +20,7 @@ uint64_t get_perf_freq() {
     return SDL_GetPerformanceFrequency();
 }
 
-static ct_time_a0 time_api = {
+static struct ct_time_a0 time_api = {
         .ticks =get_ticks,
         .perf_counter =get_perf_counter,
         .perf_freq =get_perf_freq

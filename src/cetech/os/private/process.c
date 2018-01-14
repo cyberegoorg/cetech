@@ -36,7 +36,7 @@ int exec(const char *argv) {
 #endif
 }
 
-static ct_process_a0 process_api = {
+static struct ct_process_a0 process_api = {
         .exec = exec
 };
 

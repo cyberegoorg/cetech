@@ -8,7 +8,7 @@ int cpu_count() {
     return SDL_GetCPUCount();
 }
 
-static ct_cpu_a0 cpu_api = {
+static struct ct_cpu_a0 cpu_api = {
         .count = cpu_count
 };
 

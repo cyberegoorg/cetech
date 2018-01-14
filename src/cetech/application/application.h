@@ -45,7 +45,7 @@ struct ct_app_a0 {
 
     void (*start)();
 
-    void (*register_game)(uint64_t name, ct_game_fce game);
+    void (*register_game)(uint64_t name, struct ct_game_fce game);
     void (*unregister_game)(uint64_t name);
     void (*set_active_game)(uint64_t name);
 

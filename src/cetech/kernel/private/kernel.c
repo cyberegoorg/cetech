@@ -15,8 +15,6 @@
 #include <cetech/application/application.h>
 #include <cetech/coredb/coredb.h>
 
-#include "celib/fpumath.h"
-
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_config_a0);
@@ -31,7 +29,7 @@ CETECH_DECL_API(ct_coredb_a0);
 
 #define LOG_WHERE "kernel"
 
-void register_api(ct_api_a0 *api);
+void register_api(struct ct_api_a0 *api);
 
 const char *_platform() {
 #if defined(CETECH_LINUX)
@@ -51,8 +49,9 @@ const char *_platform() {
 #define CONFIG_SRC CT_ID64_0(CONFIG_SRC_ID)
 #define CONFIG_COMPILE CT_ID64_0(CONFIG_COMPILE_ID)
 
-int init_config(int argc, const char **argv, ct_coredb_object_t *object) {
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+int init_config(int argc, const char **argv,
+                struct ct_coredb_object_t *object) {
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
     ct_coredb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
     ct_coredb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
     ct_coredb_a0.set_string(writer, CONFIG_BUILD, "build");
@@ -62,7 +61,7 @@ int init_config(int argc, const char **argv, ct_coredb_object_t *object) {
         return 0;
     }
 
-    cel_alloc *a = ct_memory_a0.main_allocator();
+    struct cel_alloc *a = ct_memory_a0.main_allocator();
 
     const char *build_dir_str = ct_coredb_a0.read_string(object, CONFIG_BUILD, "");
 
@@ -92,18 +91,18 @@ int init_config(int argc, const char **argv, ct_coredb_object_t *object) {
     return 1;
 }
 
-extern "C" int cetech_kernel_init(int argc,
+int cetech_kernel_init(int argc,
                                   const char **argv) {
-    auto *core_alloc = core_allocator::get();
+    struct cel_alloc *core_alloc = coreallocator_get();
 
-    api::init(core_alloc);
-    ct_api_a0 *api = api::v0();
+    api_init(core_alloc);
+    struct ct_api_a0 *api = api_v0();
 
     CETECH_LOAD_STATIC_MODULE(api, log);
 
     memory_init();
 
-    core_allocator::register_api(api);
+    coreallocator_register_api(api);
 
     CETECH_LOAD_STATIC_MODULE(api, hashlib);
 
@@ -152,12 +151,12 @@ extern "C" int cetech_kernel_init(int argc,
 }
 
 
-extern "C" int cetech_kernel_shutdown() {
+int cetech_kernel_shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
     ct_module_a0.unload_all();
 
-    auto *api = api::v0();
+    struct ct_api_a0 *api = api_v0();
 
     CETECH_UNLOAD_STATIC_MODULE(api, error);
     CETECH_UNLOAD_STATIC_MODULE(api, vio);
@@ -176,7 +175,7 @@ extern "C" int cetech_kernel_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, yamlng);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
 
-    api::shutdown();
+    api_shutdown();
     memsys_shutdown();
     logsystem_shutdown();
 

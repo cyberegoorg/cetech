@@ -9,8 +9,8 @@
 #include <cetech/input/input.h>
 #include <cetech/module/module.h>
 #include <cetech/application/application.h>
+#include <string.h>
 #include "celib/allocator.h"
-#include "celib/eventstream.inl"
 #include "keystr.h"
 
 CETECH_DECL_API(ct_machine_a0);
@@ -92,7 +92,7 @@ static int button_released(uint32_t idx,
 static void _update(float dt) {
     CEL_UNUSED(dt);
 
-    ct_event_header *event = ct_machine_a0.event_begin();
+    struct ct_event_header *event = ct_machine_a0.event_begin();
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
@@ -103,15 +103,15 @@ static void _update(float dt) {
 
         switch (event->type) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[((ct_keyboard_event *) event)->keycode] = 1;
+                _G.state[((struct ct_keyboard_event *) event)->keycode] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[((ct_keyboard_event *) event)->keycode] = 0;
+                _G.state[((struct ct_keyboard_event *) event)->keycode] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                ct_keyboard_text_event *ev = (ct_keyboard_text_event *) event;
+                struct ct_keyboard_text_event *ev = (struct ct_keyboard_text_event *) event;
                 memcpy(_G.text, ev->text, sizeof(ev->text));
                 break;
             }
@@ -129,7 +129,7 @@ static char *text(uint32_t idx) {
     return _G.text;
 }
 
-static ct_keyboard_a0 a0 = {
+static struct ct_keyboard_a0 a0 = {
         .button_index = button_index,
         .button_name = button_name,
         .button_state = button_state,
@@ -138,11 +138,11 @@ static ct_keyboard_a0 a0 = {
         .text = text,
 };
 
-static void _init_api(ct_api_a0 *api) {
+static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_keyboard_a0", &a0);
 }
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
 

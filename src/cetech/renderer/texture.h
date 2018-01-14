@@ -29,7 +29,7 @@ struct ct_texture {
 
 //! Texture API V0
 struct ct_texture_a0 {
-    ct_texture (*get)(uint64_t name);
+    struct ct_texture (*get)(uint64_t name);
 };
 
 #ifdef __cplusplus

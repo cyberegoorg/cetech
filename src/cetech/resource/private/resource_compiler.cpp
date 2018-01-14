@@ -377,7 +377,7 @@ char *resource_compiler_external_join(cel_alloc *alocator,
 }
 
 
-void resource_memory_reload(uint64_t type, uint64_t name, char** blob);
+extern "C" void resource_memory_reload(uint64_t type, uint64_t name, char** blob);
 
 void compile_and_reload(const char* filename) {
     char** output_blob = NULL;

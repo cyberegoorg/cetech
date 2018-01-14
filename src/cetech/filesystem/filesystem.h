@@ -92,11 +92,11 @@ struct ct_filesystem_a0 {
                           const char *path);
 
 
-    ct_watchdog_ev_header *(*event_begin)(uint64_t root);
+    struct ct_watchdog_ev_header *(*event_begin)(uint64_t root);
 
-    ct_watchdog_ev_header *(*event_end)(uint64_t root);
+    struct ct_watchdog_ev_header *(*event_end)(uint64_t root);
 
-    ct_watchdog_ev_header *(*event_next)(ct_watchdog_ev_header *header);
+    struct ct_watchdog_ev_header *(*event_next)(struct ct_watchdog_ev_header *header);
 
     void (*get_full_path)(uint64_t root,
                           const char *path,

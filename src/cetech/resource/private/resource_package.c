@@ -11,11 +11,10 @@
 #include <cetech/os/vio.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/yaml/ydb.h>
-#include <celib/array.h>
 #include <cetech/macros.h>
+#include <celib/array.h>
 
 #include "celib/allocator.h"
-#include "celib/array.inl"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -25,9 +24,6 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
-
-using namespace celib;
-
 
 struct package_resource {
     uint32_t type_count;
@@ -54,11 +50,11 @@ struct package_task_data {
 #define _G PackageGlobals
 struct _G {
     uint64_t package_typel;
-    cel_alloc* allocator;
+    struct cel_alloc *allocator;
 } _G = {};
 
-void *loader(ct_vio *input,
-             cel_alloc *allocator) {
+void *loader(struct ct_vio *input,
+             struct cel_alloc *allocator) {
 
     const int64_t size = input->size(input);
     char *data = CEL_ALLOCATE(allocator, char, size);
@@ -68,7 +64,7 @@ void *loader(ct_vio *input,
 }
 
 void unloader(void *new_data,
-              cel_alloc *allocator) {
+              struct cel_alloc *allocator) {
     CEL_FREE(allocator, new_data);
 }
 
@@ -85,7 +81,7 @@ void offline(uint64_t name,
 void *reloader(uint64_t name,
                void *old_data,
                void *new_data,
-               cel_alloc *allocator) {
+               struct cel_alloc *allocator) {
     CEL_UNUSED(name);
 
     CEL_FREE(allocator, old_data);
@@ -106,19 +102,19 @@ static const ct_resource_callbacks_t package_resource_callback = {
 //==============================================================================
 
 struct package_compile_data {
-    uint64_t* types;
-    uint64_t* name;
-    uint32_t* name_count;
-    uint32_t* offset;
+    uint64_t *types;
+    uint64_t *name;
+    uint32_t *name_count;
+    uint32_t *offset;
 };
 
 void _package_compiler(const char *filename,
-                      char** output,
-                      ct_compilator_api *compilator_api) {
+                       char **output,
+                       struct ct_compilator_api *compilator_api) {
     CEL_UNUSED(compilator_api);
 
     struct package_compile_data compile_data = {};
-    
+
     uint64_t tmp_keys = 0;
 
     uint64_t type_keys[32] = {};
@@ -132,7 +128,8 @@ void _package_compiler(const char *filename,
         uint64_t type_id = type_keys[i];
 
         cel_array_push(compile_data.types, type_id, _G.allocator);
-        cel_array_push(compile_data.offset, cel_array_size(compile_data.name), _G.allocator);
+        cel_array_push(compile_data.offset, cel_array_size(compile_data.name),
+                       _G.allocator);
 
         uint64_t name_keys[32] = {};
         uint32_t name_keys_count = 0;
@@ -164,14 +161,22 @@ void _package_compiler(const char *filename,
                              (cel_array_size(compile_data.name) *
                               sizeof(uint64_t));
 
-    cel_array_push_n(*output, &resource, sizeof(resource), _G.allocator );
-    cel_array_push_n(*output, compile_data.types, sizeof(uint64_t) * cel_array_size(compile_data.types), _G.allocator );
-    cel_array_push_n(*output, compile_data.name_count, sizeof(uint32_t) * cel_array_size(compile_data.name_count), _G.allocator );
-    cel_array_push_n(*output, compile_data.name,  sizeof(uint64_t) * cel_array_size(compile_data.name), _G.allocator );
-    cel_array_push_n(*output, compile_data.offset, sizeof(uint32_t) * cel_array_size(compile_data.offset), _G.allocator );
+    cel_array_push_n(*output, &resource, sizeof(resource), _G.allocator);
+    cel_array_push_n(*output, compile_data.types,
+                     sizeof(uint64_t) * cel_array_size(compile_data.types),
+                     _G.allocator);
+    cel_array_push_n(*output, compile_data.name_count,
+                     sizeof(uint32_t) * cel_array_size(compile_data.name_count),
+                     _G.allocator);
+    cel_array_push_n(*output, compile_data.name,
+                     sizeof(uint64_t) * cel_array_size(compile_data.name),
+                     _G.allocator);
+    cel_array_push_n(*output, compile_data.offset,
+                     sizeof(uint32_t) * cel_array_size(compile_data.offset),
+                     _G.allocator);
 }
 
-int package_init(ct_api_a0 *api) {
+int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_task_a0);
@@ -181,7 +186,7 @@ int package_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_yng_a0);
 
-    _G = {
+    _G = (struct _G){
             .allocator = ct_memory_a0.main_allocator(),
             .package_typel = CT_ID64_0("package"),
     };
@@ -200,8 +205,8 @@ void package_shutdown() {
 
 
 void package_task(void *data) {
-    struct package_task_data *task_data = (package_task_data *) data;
-    struct package_resource *package = (package_resource *) ct_resource_a0.get(
+    struct package_task_data *task_data = (struct package_task_data *) data;
+    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
             _G.package_typel,
             task_data->name);
 
@@ -225,7 +230,7 @@ void package_load(uint64_t name) {
 
     task_data->name = name;
 
-    ct_task_item item = {
+    struct ct_task_item item = {
             .name = "package_task",
             .work = package_task,
             .data = task_data,
@@ -236,7 +241,7 @@ void package_load(uint64_t name) {
 }
 
 void package_unload(uint64_t name) {
-    package_resource *package = (package_resource *) ct_resource_a0.get(
+    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
             _G.package_typel,
             name);
 
@@ -251,7 +256,7 @@ void package_unload(uint64_t name) {
 
 int package_is_loaded(uint64_t name) {
     const uint64_t package_type = CT_ID64_0("package");
-    package_resource *package = (package_resource *) ct_resource_a0.get(
+    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
             package_type, name);
 
     if (package == NULL) {

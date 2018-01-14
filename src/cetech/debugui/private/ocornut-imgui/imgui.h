@@ -77,8 +77,8 @@ typedef int ImGuiSetCond;           // condition flags for Set*()           // e
 typedef int ImGuiInputTextFlags;    // flags for InputText*()               // enum ImGuiInputTextFlags_
 typedef int ImGuiSelectableFlags;   // flags for Selectable()               // enum ImGuiSelectableFlags_
 typedef int ImGuiTreeNodeFlags;     // flags for TreeNode*(), Collapsing*() // enum ImGuiTreeNodeFlags_
-typedef int (*ImGuiTextEditCallback)(ImGuiTextEditCallbackData *data);
-typedef void (*ImGuiSizeConstraintCallback)(ImGuiSizeConstraintCallbackData* data);
+typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
+typedef void (*ImGuiSizeConstraintCallback)(struct ImGuiSizeConstraintCallbackData* data);
 #ifdef _MSC_VER
 typedef unsigned __int64 ImU64;     // 64-bit unsigned integer
 #else

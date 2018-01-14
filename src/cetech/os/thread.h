@@ -56,9 +56,9 @@ struct ct_thread_a0 {
 
     void (*yield)();
 
-    void (*spin_lock)(ct_spinlock *lock);
+    void (*spin_lock)(struct ct_spinlock *lock);
 
-    void (*spin_unlock)(ct_spinlock *lock);
+    void (*spin_unlock)(struct ct_spinlock *lock);
 };
 
 

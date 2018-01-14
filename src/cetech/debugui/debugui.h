@@ -2,8 +2,7 @@
 #define CETECH_DEBUGUI_H
 
 #include <cetech/macros.h>
-#include <cstdarg>
-#include <bgfx/bgfx.h>
+#include <stdarg.h>
 
 #ifdef __cplusplus
 
@@ -11,8 +10,10 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <stdbool.h>
 
 struct ct_texture;
+struct ct_vio;
 
 typedef float _vec4[4];
 typedef float _vec2[2];
@@ -30,8 +31,8 @@ typedef int ImGuiSetCond;
 typedef int ImGuiInputTextFlags;
 typedef int ImGuiSelectableFlags;
 typedef int ImGuiTreeNodeFlags;
-typedef int (*ImGuiTextEditCallback)(ImGuiTextEditCallbackData *data);
-typedef void (*ImGuiSizeConstraintCallback)(ImGuiSizeConstraintCallbackData *data);
+typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
+typedef void (*ImGuiSizeConstraintCallback)(struct ImGuiSizeConstraintCallbackData *data);
 
 enum DebugUIWindowFlags_ {
     DebugUIWindowFlags_Empty = 0,
@@ -739,7 +740,7 @@ struct ct_debugui_a0 {
     void (*RootDock)(float pos[2], float size[2]);
     bool (*BeginDock)(const char *label,
                       bool *opened,
-                      DebugUIWindowFlags_ extra_flags);
+                      enum DebugUIWindowFlags_ extra_flags);
 
     void (*EndDock)();
 

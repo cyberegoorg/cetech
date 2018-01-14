@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include <cetech/entity/entity.h>
-#include "celib/array.inl"
 #include "celib/handler.inl"
 #include "cetech/os/memory.h"
 #include "cetech/config/config.h"

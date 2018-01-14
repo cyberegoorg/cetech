@@ -1,5 +1,3 @@
-#include "celib/map.inl"
-
 #include <cetech/log/log.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/os/memory.h>
@@ -15,8 +13,6 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 
-using namespace celib;
-
 typedef void (*action_fce_t)();
 
 union modifiactor {
@@ -30,23 +26,23 @@ union modifiactor {
 
 struct shortcut {
     char str[64];
-    modifiactor mod;
+    union modifiactor mod;
     uint32_t key;
 };
 
 
 #define _G action_manager_global
 static struct _G {
-    cel_hash_t action_map;
-    modifiactor mod;
+    struct cel_hash_t action_map;
+    union modifiactor mod;
 
-    shortcut* shorcut;
+    struct shortcut* shorcut;
     action_fce_t* action_fce;
     bool* action_active;
-    cel_alloc* allocator;
+    struct cel_alloc* allocator;
 } _G;
 
-static void fill_button(shortcut *sc) {
+static void fill_button(struct shortcut *sc) {
     uint8_t count = 1;
     char str[64] = {};
     strncpy(str, sc->str, 64);
@@ -79,7 +75,7 @@ static void register_action(uint64_t name,
                             const char *shortcut_str,
                             action_fce_t fce) {
     uint32_t idx = cel_array_size(_G.shorcut);
-    shortcut sc = {};
+    struct shortcut sc = {};
 
     strncpy(sc.str, shortcut_str, 64);
     fill_button(&sc);
@@ -105,14 +101,14 @@ static void execute(uint64_t name) {
 }
 
 static void check() {
-    static const uint32_t lshift = ct_keyboard_a0.button_index("lshift");
-    static const uint32_t rshift = ct_keyboard_a0.button_index("rshift");
-    static const uint32_t lctrl = ct_keyboard_a0.button_index("lctrl");
-    static const uint32_t rctrl = ct_keyboard_a0.button_index("rctrl");
-    static const uint32_t lalt = ct_keyboard_a0.button_index("lalt");
-    static const uint32_t ralt = ct_keyboard_a0.button_index("ralt");
+    const uint32_t lshift = ct_keyboard_a0.button_index("lshift");
+    const uint32_t rshift = ct_keyboard_a0.button_index("rshift");
+    uint32_t lctrl = ct_keyboard_a0.button_index("lctrl");
+    const uint32_t rctrl = ct_keyboard_a0.button_index("rctrl");
+    const uint32_t lalt = ct_keyboard_a0.button_index("lalt");
+    const uint32_t ralt = ct_keyboard_a0.button_index("ralt");
 
-    _G.mod = {};
+    _G.mod = (union modifiactor){};
 
     if (ct_keyboard_a0.button_state(0, lshift) ||
         ct_keyboard_a0.button_state(0, rshift)) {
@@ -131,7 +127,7 @@ static void check() {
 
     const int size = cel_array_size(_G.shorcut);
     for (int i = 0; i < size; ++i) {
-        shortcut *sc = &_G.shorcut[i];
+        struct shortcut *sc = &_G.shorcut[i];
 
         if( _G.mod.u - sc->mod.u ) {
             continue;
@@ -161,7 +157,7 @@ const char* shortcut_str(uint64_t name) {
     return _G.shorcut[idx].str;
 }
 
-static ct_action_manager_a0 action_manager_api = {
+static struct ct_action_manager_a0 action_manager_api = {
         .register_action = register_action,
         .unregister_action = unregister_action,
         .execute = execute,
@@ -170,8 +166,8 @@ static ct_action_manager_a0 action_manager_api = {
 };
 
 
-static void _init(ct_api_a0 *api) {
-    _G = {
+static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G){
         .allocator = ct_memory_a0.main_allocator()
     };
 
@@ -185,7 +181,7 @@ static void _shutdown() {
     cel_array_free(_G.action_fce, _G.allocator);
     cel_array_free(_G.action_active, _G.allocator);
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

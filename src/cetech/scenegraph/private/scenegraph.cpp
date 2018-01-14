@@ -6,7 +6,6 @@
 #include "cetech/resource/resource.h"
 #include "cetech/os/memory.h"
 #include "cetech/api/api_system.h"
-#include "celib/array.inl"
 #include "celib/map.inl"
 
 

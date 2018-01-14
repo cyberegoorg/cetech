@@ -9,8 +9,8 @@
 #include <cetech/input/input.h>
 #include <cetech/module/module.h>
 #include <cetech/application/application.h>
+#include <string.h>
 #include "celib/allocator.h"
-#include "celib/eventstream.inl"
 #include "gamepadstr.h"
 
 CETECH_DECL_API(ct_log_a0);
@@ -28,7 +28,8 @@ CETECH_DECL_API(ct_app_a0);
 // Globals
 //==============================================================================
 
-static struct GamepadGlobals {
+#define _G GamepadGlobals
+static struct _G {
     int active[GAMEPAD_MAX];
     float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
@@ -133,15 +134,15 @@ static void play_rumble(uint32_t idx,
 static void update(float dt) {
     CEL_UNUSED(dt);
 
-    ct_event_header *event = ct_machine_a0.event_begin();
+    struct ct_event_header *event = ct_machine_a0.event_begin();
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
     while (event != ct_machine_a0.event_end()) {
-        ct_gamepad_move_event *move_event = (ct_gamepad_move_event *) event;
-        ct_gamepad_btn_event *btn_event = (ct_gamepad_btn_event *) event;
-        ct_gamepad_device_event *device_event = (ct_gamepad_device_event *) event;
+        struct ct_gamepad_move_event *move_event = (struct ct_gamepad_move_event *) event;
+        struct ct_gamepad_btn_event *btn_event = (struct ct_gamepad_btn_event *) event;
+        struct ct_gamepad_device_event *device_event = (struct ct_gamepad_device_event *) event;
 
         switch (event->type) {
             case EVENT_GAMEPAD_DOWN:
@@ -175,7 +176,7 @@ static void update(float dt) {
     }
 }
 
-static ct_gamepad_a0 a0 = {
+static struct ct_gamepad_a0 a0 = {
         .is_active = is_active,
         .button_index = button_index,
         .button_name = button_name,
@@ -188,13 +189,13 @@ static ct_gamepad_a0 a0 = {
         .play_rumble = play_rumble,
 };
 
-static void _init_api(ct_api_a0 *api) {
+static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_gamepad_a0", &a0);
 }
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
-    _G = {};
+    _G = (struct _G){};
 
     ct_app_a0.register_on_update(update);
 
@@ -208,7 +209,7 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

@@ -12,6 +12,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 struct cel_alloc;
 

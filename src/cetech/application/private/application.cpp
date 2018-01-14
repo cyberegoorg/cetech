@@ -6,7 +6,7 @@
 
 #include <celib/macros.h>
 #include <celib/container_types.inl>
-#include <celib/array.inl>
+
 #include <celib/map.inl>
 
 #include <cetech/application/application.h>

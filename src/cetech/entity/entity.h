@@ -137,7 +137,7 @@ struct ct_entity_a0 {
     struct ct_entity (*spawn_level)(struct ct_world world,
                               uint64_t name);
 
-    struct ct_entity (*find_by_guid)(ct_entity root, uint64_t guid);
+    struct ct_entity (*find_by_guid)(struct ct_entity root, uint64_t guid);
 
     //! Create compiler output structure
     //! \return New compiler output structure
@@ -178,7 +178,7 @@ struct ct_entity_a0 {
     void (*resource_compiler)(uint64_t root,
                               const char *filename,
                               char** build,
-                              ct_compilator_api *compilator_api);
+                              struct ct_compilator_api *compilator_api);
 };
 
 
@@ -238,17 +238,6 @@ struct ct_component_a0 {
     void (*destroy)(struct ct_world world,
                     struct ct_entity *ent,
                     uint32_t count);
-
-    void (*set_property)(uint64_t type,
-                         struct ct_world world,
-                         struct ct_entity entity,
-                         uint64_t key,
-                         struct ct_property_value value);
-
-    struct ct_property_value (*get_property)(uint64_t type,
-                                             struct ct_world world,
-                                             struct ct_entity entity,
-                                             uint64_t key);
 };
 
 //! World API V0

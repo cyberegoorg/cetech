@@ -7,9 +7,11 @@
 #include "macros.h"
 
 #ifdef __cplusplus
-
 #include <new>
+#endif
 
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 //==============================================================================
@@ -63,7 +65,7 @@ typedef void cel_alloc_inst;
 struct cel_alloc;
 
 struct cel_alloc_fce {
-    void *(*reallocate)(const cel_alloc *a,
+    void *(*reallocate)(const struct cel_alloc *a,
                         void *ptr,
                         uint32_t size,
                         uint32_t align);
@@ -73,7 +75,11 @@ struct cel_alloc_fce {
 
 struct cel_alloc {
     cel_alloc_inst *inst;
-    cel_alloc_fce* call;
+    struct cel_alloc_fce* call;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CELIB_ALLOCATOR_H

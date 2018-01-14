@@ -36,7 +36,7 @@ struct ct_yng_doc;
 //==============================================================================
 
 struct ct_ydb_a0 {
-    ct_yng_doc *(*get)(const char *path);
+    struct ct_yng_doc *(*get)(const char *path);
 
     void (*free)(const char *path);
 

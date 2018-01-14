@@ -7,7 +7,6 @@
 #include <cetech/macros.h>
 #include <celib/array.h>
 #include <celib/hash.h>
-#include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"

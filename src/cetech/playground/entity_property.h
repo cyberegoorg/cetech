@@ -1,8 +1,6 @@
 #ifndef CETECH_ENTITY_PROPERTY_H
 #define CETECH_ENTITY_PROPERTY_H
 
-#include <cstdint>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

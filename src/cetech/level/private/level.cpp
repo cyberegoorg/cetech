@@ -13,9 +13,7 @@
 
 #include <cetech/module/module.h>
 #include <cetech/yaml/ydb.h>
-#include "celib/array.inl"
-
-using namespace celib;
+#include <celib/macros.h>
 
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_resource_a0);

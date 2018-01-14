@@ -51,13 +51,13 @@ static void cel_hash_add(struct cel_hash_t *hash, uint64_t k, uint64_t value, st
     hash->n++;
 }
 
-static void cel_hash_free(cel_hash_t *hash, struct cel_alloc *allocator){
+static void cel_hash_free(struct cel_hash_t *hash, struct cel_alloc *allocator){
     cel_array_free(hash->keys,allocator);
     cel_array_free(hash->values, allocator);
     hash->n = 0;
 }
 
-static void cel_hash_remove(cel_hash_t *hash, uint64_t k){
+static void cel_hash_remove(struct cel_hash_t *hash, uint64_t k){
     uint32_t idx = cel_hash_lookup_idx(hash, k);
 
     if(idx == UINT32_MAX){

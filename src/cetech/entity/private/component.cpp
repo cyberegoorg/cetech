@@ -21,12 +21,14 @@ using namespace celib;
 //==============================================================================
 
 #define _G ComponentMaagerGlobals
-static struct ComponentMaagerGlobals {
+static struct _G {
     cel_hash_t spawn_order_map;
+
     Map<ct_component_compiler_t> compiler_map;
     Map<ct_component_clb> component_clb;
+
     cel_alloc* allocator;
-} ComponentMaagerGlobals;
+} _G;
 
 
 //==============================================================================

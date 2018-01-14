@@ -7,11 +7,15 @@
 
 #include "allocator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define cel_array_free(a, alloc) \
     ((a) ?  CEL_FREE(alloc, cel_array_header(a)) : 0, a = NULL )
 
 #define cel_array_header(a) \
-    ((cel_array_header_t *)((char *)(a) - sizeof(cel_array_header_t)))
+    ((struct cel_array_header_t *)((char *)(a) - sizeof(struct cel_array_header_t)))
 
 #define cel_array_size(a) \
     ((a) ? cel_array_header(a)->size : 0)
@@ -65,12 +69,12 @@ static void *cel_array_grow(void *a,
         new_capacity = size;
     }
 
-    void *new_data = CEL_ALLOCATE(alloc, void*, sizeof(cel_array_header_t) +
+    void *new_data = CEL_ALLOCATE(alloc, void*, sizeof(struct cel_array_header_t) +
                                                 (new_capacity * type_size));
 
-    void *new_array = (char *) new_data + sizeof(cel_array_header_t);
+    char *new_array = (char*)new_data + sizeof(struct cel_array_header_t);
 
-    *((cel_array_header_t *) new_data) = {
+    *((struct cel_array_header_t *) new_data) = (struct cel_array_header_t){
             .size = cel_array_size(a),
             .capacity = new_capacity
     };
@@ -81,5 +85,9 @@ static void *cel_array_grow(void *a,
 }
 
 static void* _ = (void*)&cel_array_grow; // UNUSED
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //CETECH_ARRAY_H

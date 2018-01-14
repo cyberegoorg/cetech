@@ -22,7 +22,7 @@ struct ct_asset_preview_fce {
 //==============================================================================
 
 struct ct_asset_preview_a0 {
-    void (*register_type_preview)(uint64_t type, ct_asset_preview_fce fce);
+    void (*register_type_preview)(uint64_t type, struct ct_asset_preview_fce fce);
     void (*unregister_type_preview)(uint64_t type);
 };
 

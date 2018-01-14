@@ -11,11 +11,10 @@
 #include <cetech/log/log.h>
 #include <cetech/hashlib/hashlib.h>
 #include <cetech/config/config.h>
-#include <celib/memory.h>
 #include <cetech/module/module.h>
-#include <celib/buffer.inl>
 #include <cetech/yaml/yamlng.h>
 #include <cetech/coredb/coredb.h>
+#include <celib/macros.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -60,8 +59,8 @@ CETECH_DECL_API(ct_coredb_a0);
 static struct ConfigSystemGlobals {
     uint64_t type;
 
-    ct_coredb_object_t *config_object;
-    ct_coredb_object_t *config_desc;
+    struct ct_coredb_object_t *config_object;
+    struct ct_coredb_object_t *config_desc;
 } _G;
 
 
@@ -82,7 +81,7 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
 
@@ -116,8 +115,8 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                         struct ct_yamlng_node value,
                         void *_data) {
 
-    struct foreach_config_data *output = (foreach_config_data *) _data;
-    ct_yng_doc *d = key.d;
+    struct foreach_config_data *output = (struct foreach_config_data *) _data;
+    struct ct_yng_doc *d = key.d;
 
     const char *key_str = d->as_string(d->inst, key, "");
 
@@ -153,7 +152,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
             if (ct_coredb_a0.prop_exist(_G.config_object, key)) {
                 enum ct_coredb_prop_type t = ct_coredb_a0.prop_type(
                         _G.config_object, key);
-                ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+                struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
                         _G.config_object);
 
                 switch (t) {
@@ -186,10 +185,10 @@ static void foreach_config_clb(struct ct_yamlng_node key,
 
 
 static int load_from_yaml_file(const char *yaml,
-                        cel_alloc *alloc) {
+                               struct cel_alloc *alloc) {
 
-    ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
-    ct_yng_doc *d = ct_yng_a0.from_vio(f, alloc);
+    struct ct_vio *f = ct_vio_a0.from_file(yaml, VIO_OPEN_READ);
+    struct ct_yng_doc *d = ct_yng_a0.from_vio(f, alloc);
     f->close(f);
 
     struct foreach_config_data config_data = {
@@ -229,11 +228,11 @@ static int parse_args(int argc,
 }
 
 
-static ct_coredb_object_t *config_object() {
+static struct ct_coredb_object_t *config_object() {
     return _G.config_object;
 }
 
-static ct_config_a0 config_a0 = {
+static struct ct_config_a0 config_a0 = {
         .config_object = config_object,
         .parse_args = parse_args,
         .log_all = log_all,
@@ -254,7 +253,7 @@ CETECH_MODULE_DEF(
         {
             CEL_UNUSED(reload);
 
-            _G = {};
+            _G = (struct _G){0};
 
             ct_log_a0.debug(LOG_WHERE, "Init");
 

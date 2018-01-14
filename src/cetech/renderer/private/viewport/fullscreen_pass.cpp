@@ -4,7 +4,6 @@
 #include <cstdio>
 
 #include <celib/allocator.h>
-#include <celib/array.inl>
 #include <celib/map.inl>
 #include <celib/fpumath.h>
 

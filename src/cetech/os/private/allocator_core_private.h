@@ -1,13 +1,18 @@
 #ifndef CETECH_CORE_ALLOCATOR_PRIVATE_H
 #define CETECH_CORE_ALLOCATOR_PRIVATE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct cel_alloc;
 struct ct_api_a0;
 
-namespace core_allocator {
-    void register_api(ct_api_a0 *api);
+extern void coreallocator_register_api(struct ct_api_a0 *api);
+extern struct cel_alloc *coreallocator_get();
 
-    cel_alloc *get();
+#ifdef __cplusplus
 }
+#endif
 
 #endif //CETECH_CORE_ALLOCATOR_PRIVATE_H

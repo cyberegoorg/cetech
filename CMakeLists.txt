@@ -70,36 +70,36 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/cetech/os/private/allocator_core.cpp
-        src/cetech/api/private/api_system.cpp
-        src/cetech/log/private/log_system.cpp
+        src/cetech/os/private/allocator_core.c
+        src/cetech/api/private/api_system.c
+        src/cetech/log/private/log_system.c
         src/cetech/module/private/module.cpp
-        src/cetech/config/private/config.cpp
-        src/cetech/os/private/memory.cpp
-        src/cetech/os/private/allocator_malloc.cpp
+        src/cetech/config/private/config.c
+        src/cetech/os/private/memory.c
+        src/cetech/os/private/allocator_malloc.c
         src/cetech/application/private/application.cpp
-        src/cetech/task/private/task.cpp
-        src/cetech/log/private/log_db_handler.cpp
-        src/cetech/log/private/log_nanomsg_handler.cpp
-        src/cetech/log/private/log_stdout_handler.cpp
-        src/cetech/kernel/private/kernel.cpp
-        src/cetech/hashlib/private/hashlib.cpp
-        src/cetech/os/private/error.cpp
-        src/cetech/os/private/object.cpp
+        src/cetech/task/private/task.c
+        src/cetech/log/private/log_db_handler.c
+        src/cetech/log/private/log_nanomsg_handler.c
+        src/cetech/log/private/log_stdout_handler.c
+        src/cetech/kernel/private/kernel.c
+        src/cetech/hashlib/private/hashlib.c
+        src/cetech/os/private/error.c
+        src/cetech/os/private/object.c
         src/cetech/os/private/path.cpp
-        src/cetech/os/private/process.cpp
-        src/cetech/os/private/cpu.cpp
-        src/cetech/os/private/thread.cpp
-        src/cetech/os/private/vio.cpp
+        src/cetech/os/private/process.c
+        src/cetech/os/private/cpu.c
+        src/cetech/os/private/thread.c
+        src/cetech/os/private/vio.c
         src/cetech/os/private/watchdog.cpp
-        src/cetech/os/private/time.cpp
-        src/cetech/resource/private/resource.cpp
-        src/cetech/resource/private/resource_package.cpp
+        src/cetech/os/private/time.c
+        src/cetech/resource/private/resource.c
+        src/cetech/resource/private/resource_package.c
         src/cetech/resource/private/resource_compiler.cpp
         src/cetech/filesystem/private/filesystem.cpp
-        src/cetech/yaml/private/yamlng.cpp
+        src/cetech/yaml/private/yamlng.c
         src/cetech/yaml/private/ydb.cpp
-        src/cetech/coredb/private/coredb.cpp
+        src/cetech/coredb/private/coredb.c
 
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/debugui/private/ocornut-imgui/imgui.cpp
@@ -113,14 +113,14 @@ set(SOURCE_FILES
         src/cetech/machine/private/gamepad_sdl2.cpp
 
         src/cetech/entity/private/component.cpp
-        src/cetech/entity/private/entity_preview.cpp
-        src/cetech/entity/private/level_preview.cpp
+        src/cetech/entity/private/entity_preview.c
+        src/cetech/entity/private/level_preview.c
         src/cetech/entity/private/entity.cpp
         src/cetech/entity/private/world.cpp
         src/cetech/level/private/level.cpp
-        src/cetech/input/private/keyboard.cpp
-        src/cetech/input/private/mouse.cpp
-        src/cetech/input/private/gamepad.cpp
+        src/cetech/input/private/keyboard.c
+        src/cetech/input/private/mouse.c
+        src/cetech/input/private/gamepad.c
         src/cetech/renderer/private/renderer.cpp
         src/cetech/renderer/private/texture/texture.cpp
         src/cetech/renderer/private/texture/texture_compiler.cpp
@@ -155,7 +155,7 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_system.cpp
         src/cetech/playground/private/command_history.cpp
         src/cetech/playground/private/log_view.cpp
-        src/cetech/playground/private/action_manager.cpp
+        src/cetech/playground/private/action_manager.c
         )
 
 ################################################################################

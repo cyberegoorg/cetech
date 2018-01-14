@@ -131,7 +131,7 @@ static void set_wid_clb(ct_log_get_wid_clb_t get_wid_clb) {
         _G.get_wid_clb = get_wid_clb;
     }
 
-    static ct_log_a0 log_a0 = {
+    static struct ct_log_a0 log_a0 = {
             .set_wid_clb = set_wid_clb,
             .register_handler = log_register_handler,
             .info_va = log_info_va,

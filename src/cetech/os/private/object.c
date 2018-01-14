@@ -57,7 +57,7 @@ void *load_function(void *so,
 }
 
 
-static ct_object_a0 object_api = {
+static struct ct_object_a0 object_api = {
         .load  = load_object,
         .unload  = unload_object,
         .load_function  = load_function

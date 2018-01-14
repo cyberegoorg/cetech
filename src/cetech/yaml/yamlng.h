@@ -78,36 +78,36 @@ struct ct_yng_doc {
                                      uint32_t idx);
 
     enum node_type (*type)(ct_yng_doc_instance_t *inst,
-                           ct_yamlng_node node);
+                           struct ct_yamlng_node node);
 
     uint64_t (*hash)(ct_yng_doc_instance_t *inst,
-                     ct_yamlng_node node);
+                     struct ct_yamlng_node node);
 
     uint32_t (*size)(ct_yng_doc_instance_t *inst,
-                     ct_yamlng_node node);
+                     struct ct_yamlng_node node);
 
     const char *(*as_string)(ct_yng_doc_instance_t *inst,
-                             ct_yamlng_node node,
+                             struct ct_yamlng_node node,
                              const char *defaultt);
 
     float (*as_float)(ct_yng_doc_instance_t *inst,
-                      ct_yamlng_node node,
+                      struct ct_yamlng_node node,
                       float defaultt);
 
     bool (*as_bool)(ct_yng_doc_instance_t *inst,
-                    ct_yamlng_node node,
+                    struct ct_yamlng_node node,
                     bool defaultt);
 
     void (*as_vec3)(ct_yng_doc_instance_t *inst,
-                    ct_yamlng_node node,
+                    struct ct_yamlng_node node,
                     float *value);
 
     void (*as_vec4)(ct_yng_doc_instance_t *inst,
-                    ct_yamlng_node node,
+                    struct ct_yamlng_node node,
                     float *value);
 
     void (*as_mat4)(ct_yng_doc_instance_t *inst,
-                    ct_yamlng_node node,
+                    struct ct_yamlng_node node,
                     float *value);
 
     const char *(*get_string)(ct_yng_doc_instance_t *inst,
@@ -132,19 +132,19 @@ struct ct_yng_doc {
 
 
     void (*set_string)(ct_yng_doc_instance_t *inst,
-                       ct_yamlng_node node,
+                       struct ct_yamlng_node node,
                        const char *value);
 
     void (*set_vec3)(ct_yng_doc_instance_t *inst,
-                     ct_yamlng_node node,
+                     struct ct_yamlng_node node,
                      float *value);
 
     void (*set_vec4)(ct_yng_doc_instance_t *inst,
-                     ct_yamlng_node node,
+                     struct ct_yamlng_node node,
                      float *value);
 
     void (*set_mat4)(ct_yng_doc_instance_t *inst,
-                     ct_yamlng_node node,
+                     struct ct_yamlng_node node,
                      float *value);
 
     void (*create_tree_vec3)(ct_yng_doc_instance_t *inst,
@@ -184,7 +184,7 @@ struct ct_yng_doc {
 
 
 struct ct_yng_a0 {
-    ct_yng_doc *(*from_vio)(struct ct_vio *vio,
+    struct ct_yng_doc *(*from_vio)(struct ct_vio *vio,
                             struct cel_alloc *alloc);
 
     bool (*save_to_vio)(struct cel_alloc *alloc,

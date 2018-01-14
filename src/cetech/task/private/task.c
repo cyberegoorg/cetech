@@ -39,13 +39,13 @@ struct task {
     void (*task_work)(void *data);
 
     const char *name;
-    ct_task_affinity affinity;
+    enum ct_task_affinity affinity;
 };
 
 static __thread uint8_t _worker_id = 0;
 
 #define _G TaskManagerGlobal
-static struct G {
+static struct _G {
     struct task _task_pool[MAX_TASK];
     struct task_queue _workers_queue[TASK_MAX_WORKERS];
     ct_thread_t *_workers[TASK_MAX_WORKERS - 1];
@@ -53,7 +53,7 @@ static struct G {
     atomic_int _task_pool_idx;
     uint32_t _workers_count;
     int _Run;
-} TaskManagerGlobal = {};
+} _G;
 
 
 //==============================================================================
@@ -161,7 +161,7 @@ static int _task_worker(void *o) {
 // Api
 //==============================================================================
 
-    void add(ct_task_item *items,
+    void add(struct ct_task_item *items,
              uint32_t count) {
         for (uint32_t i = 0; i < count; ++i) {
             task_t task = _new_task();
@@ -206,8 +206,8 @@ static int _task_worker(void *o) {
         return _G._workers_count;
     }
 
-    static void _init_api(ct_api_a0 *api) {
-        static ct_task_a0 _api = {
+    static void _init_api(struct ct_api_a0 *api) {
+        static struct ct_task_a0 _api = {
                 .worker_id = worker_id,
                 .worker_count = worker_count,
                 .add = add,
@@ -218,7 +218,7 @@ static int _task_worker(void *o) {
         api->register_api("ct_task_a0", &_api);
     }
 
-    static void _init(ct_api_a0 *api) {
+    static void _init(struct ct_api_a0 *api) {
         _init_api(api);
 
         CETECH_GET_API(api, ct_memory_a0);
@@ -228,7 +228,7 @@ static int _task_worker(void *o) {
 
         ct_log_a0.set_wid_clb(worker_id);
 
-        _G = {};
+        _G = (struct _G){};
 
         int core_count = 2;//ct_cpu_a0.count();
 
@@ -273,7 +273,7 @@ static int _task_worker(void *o) {
             queue_task_destroy(&_G._workers_queue[i]);
         }
 
-        _G = {};
+        _G = (struct _G){};
     }
 
 CETECH_MODULE_DEF(

@@ -44,7 +44,7 @@ struct ct_config_a0 {
     int (*load_from_yaml_file)(const char *yaml,
                                struct cel_alloc *alloc);
 
-    ct_coredb_object_t* (*config_object)();
+    struct ct_coredb_object_t* (*config_object)();
 
     //! Dump all variables to log
     void (*log_all)();

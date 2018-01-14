@@ -44,48 +44,53 @@ enum ct_coredb_prop_type {
 //==============================================================================
 
 struct ct_coredb_a0 {
-    ct_coredb_object_t *(*create_object)();
+    struct ct_coredb_object_t *(*create_object)();
 
-    bool (*prop_exist)(ct_coredb_object_t *object, uint64_t key);
-    ct_coredb_prop_type (*prop_type)(ct_coredb_object_t *object, uint64_t key);
+    bool (*prop_exist)(struct ct_coredb_object_t *object,
+                       uint64_t key);
+
+    enum ct_coredb_prop_type (*prop_type)(struct ct_coredb_object_t *object,
+                                          uint64_t key);
 
     // WRITE
-    ct_coredb_writer_t *(*write_begin)(ct_coredb_object_t *object);
-    void (*write_commit)(ct_coredb_writer_t *writer);
+    struct ct_coredb_writer_t *
+    (*write_begin)(struct ct_coredb_object_t *object);
+
+    void (*write_commit)(struct ct_coredb_writer_t *writer);
 
     // SET
-    void (*set_float)(ct_coredb_writer_t *object,
+    void (*set_float)(struct ct_coredb_writer_t *object,
                       uint64_t property,
                       float value);
 
-    void (*set_string)(ct_coredb_writer_t *object,
+    void (*set_string)(struct ct_coredb_writer_t *object,
                        uint64_t property,
                        const char *value);
 
-    void (*set_uint32)(ct_coredb_writer_t *object,
+    void (*set_uint32)(struct ct_coredb_writer_t *object,
                        uint64_t property,
                        uint32_t value);
 
-    void (*set_ptr)(ct_coredb_writer_t *object,
-                       uint64_t property,
-                       void* value);
+    void (*set_ptr)(struct ct_coredb_writer_t *object,
+                    uint64_t property,
+                    void *value);
 
     // READ
-    float (*read_float)(ct_coredb_object_t *object,
+    float (*read_float)(struct ct_coredb_object_t *object,
                         uint64_t property,
                         float defaultt);
 
-    const char *(*read_string)(ct_coredb_object_t *object,
+    const char *(*read_string)(struct ct_coredb_object_t *object,
                                uint64_t property,
                                const char *defaultt);
 
-    uint32_t (*read_uint32)(ct_coredb_object_t *object,
-                        uint64_t property,
-                        uint32_t defaultt);
-
-    void* (*read_ptr)(ct_coredb_object_t *object,
+    uint32_t (*read_uint32)(struct ct_coredb_object_t *object,
                             uint64_t property,
-                            void* defaultt);
+                            uint32_t defaultt);
+
+    void *(*read_ptr)(struct ct_coredb_object_t *object,
+                      uint64_t property,
+                      void *defaultt);
 
 };
 

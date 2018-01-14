@@ -18,6 +18,7 @@
 #include <cetech/level/level.h>
 #include <cetech/renderer/viewport.h>
 #include <cetech/renderer/texture.h>
+#include <cstdlib>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_app_a0);

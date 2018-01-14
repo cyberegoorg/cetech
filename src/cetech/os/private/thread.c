@@ -62,15 +62,15 @@ void thread_yield() {
 #endif
 }
 
-void thread_spin_lock(ct_spinlock *lock) {
+void thread_spin_lock(struct ct_spinlock *lock) {
     SDL_AtomicLock((SDL_SpinLock *) lock);
 }
 
-void thread_spin_unlock(ct_spinlock *lock) {
+void thread_spin_unlock(struct ct_spinlock *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }
 
-static ct_thread_a0 thread_api = {
+static struct ct_thread_a0 thread_api = {
         .create = thread_create,
         .kill = thread_kill,
         .wait = thread_wait,

@@ -2,7 +2,7 @@
 // Static engine system configuration
 //==============================================================================
 
-extern "C" void init_static_modules() {
+void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(machine);
 
     //==========================================================================

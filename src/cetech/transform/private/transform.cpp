@@ -3,7 +3,7 @@
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/os/memory.h"
 #include "cetech/api/api_system.h"
-#include "celib/array.inl"
+
 #include "celib/map.inl"
 
 #include "cetech/entity/entity.h"

@@ -2,10 +2,8 @@
 // Includes
 //==============================================================================
 
-
-#include "celib/container_types.inl"
-#include "celib/array.inl"
-#include "celib/map.inl"
+#include <celib/array.h>
+#include <celib/hash.h>
 
 #include <cetech/application/application.h>
 #include <cetech/api/api_system.h>
@@ -21,8 +19,6 @@
 #include <cetech/module/module.h>
 #include <cetech/coredb/coredb.h>
 #include <cetech/kernel/kernel.h>
-#include <celib/array.h>
-#include <celib/hash.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -41,8 +37,6 @@ CETECH_DECL_API(ct_thread_a0);
 
 void resource_register_type(uint64_t type,
                             ct_resource_callbacks_t callbacks);
-
-using namespace celib;
 
 //namespace resource {
 //    void reload_all();
@@ -72,24 +66,24 @@ using namespace celib;
 #define PROP_RESOURECE_DATA "data"
 
 struct type_item_t {
-    cel_hash_t name_map;
-    ct_coredb_object_t **resource_objects;
+    struct cel_hash_t name_map;
+    struct ct_coredb_object_t **resource_objects;
     uint64_t type;
-    ct_spinlock lock;
+    struct ct_spinlock lock;
 };
 
 #define _G ResourceManagerGlobals
 struct _G {
-    cel_hash_t type_map;
+    struct cel_hash_t type_map;
     ct_resource_callbacks_t *resource_callbacks;
 
-    type_item_t type_items[MAX_TYPES + 1];
+    struct type_item_t type_items[MAX_TYPES + 1];
     uint32_t type_items_count;
 
     int autoload_enabled;
 
-    ct_coredb_object_t *config_object;
-    cel_alloc *allocator;
+    struct ct_coredb_object_t *config_object;
+    struct cel_alloc *allocator;
 } _G = {};
 
 //==============================================================================
@@ -100,7 +94,7 @@ struct _G {
 #define CONFIG_BUILD_DIR CT_ID64_0(CONFIG_BUILD_ID)
 #define CONFIG_KERNEL_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
 
-char *resource_compiler_get_build_dir(cel_alloc *a,
+char *resource_compiler_get_build_dir(struct cel_alloc *a,
                                       const char *platform) {
 
     const char *build_dir_str = ct_coredb_a0.read_string(_G.config_object,
@@ -146,8 +140,8 @@ void resource_register_type(uint64_t type,
     cel_array_push(_G.resource_callbacks, callbacks, _G.allocator);
     cel_hash_add(&_G.type_map, type, idx, _G.allocator);
 
-    type_item_t *type_item = &_G.type_items[_G.type_items_count++];
-    *type_item = {.type = type};
+    struct type_item_t *type_item = &_G.type_items[_G.type_items_count++];
+    *type_item = (struct type_item_t){.type = type};
 }
 
 static void *get(uint64_t type,
@@ -184,7 +178,7 @@ static int can_get(uint64_t type,
             uint64_t name) {
 
     const uint32_t type_item_idx = _find_type(type);
-    type_item_t *type_item = &_G.type_items[type_item_idx];
+    struct type_item_t *type_item = &_G.type_items[type_item_idx];
     return cel_hash_contain(&type_item->name_map, name);
 }
 
@@ -209,7 +203,7 @@ static void load(uint64_t type,
     const uint32_t idx = cel_hash_lookup(&_G.type_map, type, UINT32_MAX);
 
     const uint32_t type_item_idx = _find_type(type);
-    type_item_t *type_item = &_G.type_items[type_item_idx];
+    struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
     const uint64_t root_name = CT_ID64_0("build");
     ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
@@ -219,7 +213,7 @@ static void load(uint64_t type,
         uint64_t id = names[i];
         uint32_t res_idx = cel_hash_lookup(&type_item->name_map, id, UINT32_MAX);
 
-        ct_coredb_object_t *object = NULL;
+        struct ct_coredb_object_t *object = NULL;
 
         if (res_idx != UINT32_MAX) {
             continue;
@@ -250,7 +244,7 @@ static void load(uint64_t type,
                                          CONFIG_KERNEL_PLATFORM, ""),
                 build_name);
 
-        ct_vio *resource_file = ct_filesystem_a0.open(root_name,
+        struct ct_vio *resource_file = ct_filesystem_a0.open(root_name,
                                                       build_full,
                                                       FS_OPEN_READ);
         CEL_FREE(ct_memory_a0.main_allocator(), build_full);
@@ -259,7 +253,7 @@ static void load(uint64_t type,
             void *data = type_clb.loader(resource_file,
                                          ct_memory_a0.main_allocator());
 
-            ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
             ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), data);
             ct_coredb_a0.write_commit(writer);
         }
@@ -278,7 +272,7 @@ static void unload(uint64_t type,
     }
 
     const uint32_t type_item_idx = _find_type(type);
-    type_item_t *type_item = &_G.type_items[type_item_idx];
+    struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
     ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
@@ -300,7 +294,7 @@ static void unload(uint64_t type,
 
             uint32_t idx = 0;
             idx = cel_hash_lookup(&type_item->name_map, names[i], UINT32_MAX);
-            ct_coredb_object_t *object = type_item->resource_objects[idx];
+            struct ct_coredb_object_t *object = type_item->resource_objects[idx];
 
             void *data = ct_coredb_a0.read_ptr(object,
                                                CT_ID64_0(PROP_RESOURECE_DATA),
@@ -309,7 +303,7 @@ static void unload(uint64_t type,
             type_clb.offline(names[i], data);
             type_clb.unloader(data, ct_memory_a0.main_allocator());
 
-            ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
             ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
             ct_coredb_a0.write_commit(writer);
         }
@@ -322,7 +316,7 @@ static void *get(uint64_t type,
     //ce_thread_a0.spin_lock(&_G.add_lock);
 
     const uint32_t type_item_idx = _find_type(type);
-    type_item_t *type_item = &_G.type_items[type_item_idx];
+    struct type_item_t *type_item = &_G.type_items[type_item_idx];
     uint32_t idx = 0;
 
     find:
@@ -351,7 +345,7 @@ static void *get(uint64_t type,
         }
     }
 
-    ct_coredb_object_t *object = type_item->resource_objects[idx];
+    struct ct_coredb_object_t *object = type_item->resource_objects[idx];
     void *data = ct_coredb_a0.read_ptr(object, CT_ID64_0(PROP_RESOURECE_DATA),
                                        NULL);
 
@@ -459,7 +453,7 @@ void resource_memory_reload(uint64_t type,
 //        _G.resource_data[item_idx] = item;
 }
 
-static ct_resource_a0 resource_api = {
+static struct ct_resource_a0 resource_api = {
         .set_autoload = set_autoload,
         .register_type = resource_register_type,
         .load = load,
@@ -489,7 +483,7 @@ static ct_resource_a0 resource_api = {
 
 };
 
-static ct_package_a0 package_api = {
+static struct ct_package_a0 package_api = {
         .load = package_load,
         .unload = package_unload,
         .is_loaded = package_is_loaded,
@@ -497,19 +491,19 @@ static ct_package_a0 package_api = {
 };
 
 
-static void _init_api(ct_api_a0 *api) {
+static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_resource_a0", &resource_api);
     api->register_api("ct_package_a0", &package_api);
 }
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    _G = {};
+    _G = (struct _G){};
 
     ct_config_a0 = config;
     _G.config_object = ct_config_a0.config_object();
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
     if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BUILD_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }
@@ -517,11 +511,11 @@ static void _init_cvar(struct ct_config_a0 config) {
 }
 
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
     _init_cvar(ct_config_a0);
 
-    _G = {
+    _G = (struct _G){
             .allocator = ct_memory_a0.main_allocator(),
             .config_object = ct_config_a0.config_object(),
             .type_items_count = 1,

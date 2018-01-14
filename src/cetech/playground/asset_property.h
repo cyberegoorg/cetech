@@ -1,7 +1,6 @@
 #ifndef CETECH_ASSET_PROPERTY_H
 #define CETECH_ASSET_PROPERTY_H
 
-#include <cstdint>
 
 #ifdef __cplusplus
 extern "C" {

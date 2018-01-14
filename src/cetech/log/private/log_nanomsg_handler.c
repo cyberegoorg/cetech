@@ -22,7 +22,7 @@ static const char *_level_to_str[4] = {
         [LOG_DBG] = "debug"
 };
 
-extern "C" void ct_nano_log_handler(enum ct_log_level level,
+void ct_nano_log_handler(enum ct_log_level level,
                                     time_t time,
                                     char worker_id,
                                     const char *where,
