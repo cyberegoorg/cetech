@@ -35,6 +35,7 @@
 
 #include <cetech/renderer/viewport.h>
 #include <cetech/coredb/coredb.h>
+#include <celib/hash.h>
 #include "cetech/renderer/scene.h"
 #include "cetech/renderer/material.h"
 
@@ -78,7 +79,7 @@ typedef struct {
 static struct G {
     Map<bgfx::TextureHandle> global_resource;
     Map<ct_viewport_on_pass_t> on_pass;
-    Map<uint32_t> viewport_instance_map;
+    cel_hash_t viewport_instance_map;
     viewport_instance *viewport_instances;
     Handler<uint32_t> viewport_handler;
 
@@ -131,8 +132,9 @@ static void renderer_render_world(ct_world world,
                            ct_camera camera,
                            ct_viewport viewport) {
 
-    auto idx = map::get(_G.viewport_instance_map, viewport.idx,
+    auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
                         UINT32_MAX);
+
     auto &vi = _G.viewport_instances[idx];
 
     for (uint8_t i = 0; i < vi.layer_count; ++i) {
@@ -166,7 +168,7 @@ static ct_texture get_local_resource(viewport_instance &instance,
 static struct ct_texture render_viewport_get_local_resource(ct_viewport viewport,
                                                      uint64_t name) {
 
-    auto idx = map::get(_G.viewport_instance_map, viewport.idx,
+    auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
                         UINT32_MAX);
     auto &vi = _G.viewport_instances[idx];
 
@@ -281,7 +283,7 @@ static void resize_viewport(ct_viewport viewport,
                      float width,
                      float height) {
 
-    auto idx = map::get(_G.viewport_instance_map, viewport.idx,
+    auto idx = cel_hash_lookup(&_G.viewport_instance_map, viewport.idx,
                         UINT32_MAX);
     auto &vi = _G.viewport_instances[idx];
 
@@ -305,7 +307,7 @@ static ct_viewport renderer_create_viewport(uint64_t name,
 
     auto idx = cel_array_size(_G.viewport_instances);
     auto id = handler::create(_G.viewport_handler);
-    map::set(_G.viewport_instance_map, id, idx);
+    cel_hash_add(&_G.viewport_instance_map, id, idx, _G.allocator);
     cel_array_push(_G.viewport_instances, vi, _G.allocator);
 
     return {.idx = id};
@@ -849,7 +851,6 @@ static void _init(struct ct_api_a0 *api) {
     _G.global_resource.init(ct_memory_a0.main_allocator());
     _G.on_pass.init(ct_memory_a0.main_allocator());
 
-    _G.viewport_instance_map.init(ct_memory_a0.main_allocator());
     _G.viewport_handler.init(ct_memory_a0.main_allocator());
     _G.compiler_map.init(ct_memory_a0.main_allocator());
 
@@ -870,7 +871,7 @@ static void _shutdown() {
         _G.global_resource.destroy();
         _G.on_pass.destroy();
 
-        _G.viewport_instance_map.destroy();
+        cel_hash_free(&_G.viewport_instance_map, _G.allocator);
         cel_array_free(_G.viewport_instances, _G.allocator);
         _G.viewport_handler.destroy();
 

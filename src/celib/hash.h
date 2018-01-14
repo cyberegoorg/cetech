@@ -14,20 +14,6 @@ struct cel_hash_t {
     uint64_t* values;
 };
 
-static uint64_t cel_hash_lookup(const struct cel_hash_t *hash, uint64_t k, uint64_t default_value){
-    // TODO : FAST !!!
-    const uint32_t size = hash->n;
-    for (uint32_t i = 0; i < size; ++i) {
-        if(hash->keys[i] != k) {
-            continue;
-        }
-
-        return hash->values[i];
-    }
-
-    return default_value;
-}
-
 static uint32_t cel_hash_lookup_idx(const struct cel_hash_t *hash, uint64_t k){
     // TODO : FAST !!!
     const uint32_t size = hash->n;
@@ -42,19 +28,14 @@ static uint32_t cel_hash_lookup_idx(const struct cel_hash_t *hash, uint64_t k){
     return UINT32_MAX;
 }
 
+static uint64_t cel_hash_lookup(const struct cel_hash_t *hash, uint64_t k, uint64_t default_value){
+    const uint32_t idx = cel_hash_lookup_idx(hash, k);
+    return idx != UINT32_MAX ? hash->values[idx] : default_value;
+}
+
 static bool cel_hash_contain(const struct cel_hash_t *hash, uint64_t k){
-    // TODO : FAST !!!
-    const uint32_t size = hash->n;
-
-    for (int i = 0; i < size; ++i) {
-        if(hash->keys[i] != k) {
-            continue;
-        }
-
-        return true;
-    }
-
-    return false;
+    const uint32_t idx = cel_hash_lookup_idx(hash, k);
+    return idx != UINT32_MAX;
 }
 
 static void cel_hash_add(struct cel_hash_t *hash, uint64_t k, uint64_t value, struct cel_alloc *allocator){

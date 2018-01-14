@@ -14,9 +14,11 @@
 #include <cetech/os/errors.h>
 #include <cetech/module/module.h>
 #include <cetech/yaml/ydb.h>
+#include <celib/hash.h>
 
 #include "celib/handler.inl"
 #include "celib/map.inl"
+#include "celib/hash.h"
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -48,8 +50,8 @@ struct entity_instance {
 static struct _G {
     Handler<uint32_t> entity_handler;
 
-    Map<uint32_t> resource_map;
-    Map<uint32_t> spawned_map;
+//    cel_hash_t resource_map;
+    cel_hash_t spawned_map;
     entity_instance *spawned_array;
 
     uint64_t type;
@@ -84,9 +86,9 @@ struct component_data {
 
 
 entity_instance *get_spawned_entity(ct_entity ent) {
-    uint32_t idx = map::get(_G.spawned_map, ent.h, UINT32_MAX);
+    uint64_t idx =  cel_hash_lookup(&_G.spawned_map, ent.h, UINT64_MAX);
 
-    if (UINT32_MAX == idx) {
+    if (UINT64_MAX == idx) {
         return NULL;
     }
 
@@ -111,19 +113,20 @@ void destroy(ct_world world,
         ct_component_a0.destroy(world, instance->entity,
                                 instance->entity_count);
 
-        auto it = multi_map::find_first(_G.resource_map, instance->name);
-        while (it != nullptr) {
-            struct entity_instance *inst = &_G.spawned_array[it->value];
+//        auto it = multi_map::find_first(_G.resource_map, instance->name);
+//        while (it != nullptr) {
+//            struct entity_instance *inst = &_G.spawned_array[it->value];
+//
+//            if (instance == inst) {
+//                multi_map::remove(_G.resource_map, it);
+//                break;
+//            }
+//
+//            it = multi_map::find_next(_G.resource_map, it);
+//        }
+//
+//        map::remove(_G.spawned_map, entity[i].h);
 
-            if (instance == inst) {
-                multi_map::remove(_G.resource_map, it);
-                break;
-            }
-
-            it = multi_map::find_next(_G.resource_map, it);
-        }
-
-        map::remove(_G.spawned_map, entity[i].h);
         handler::destroy(_G.entity_handler, entity[i].h);
 
         CEL_FREE(ct_memory_a0.main_allocator(), instance->entity);
@@ -138,15 +141,15 @@ entity_instance *_new_entity(uint64_t name,
     entity_instance *instance = &_G.spawned_array[idx];
     instance->name = name;
 
-    multi_map::insert(_G.resource_map, name, idx);
-    map::set(_G.spawned_map, root.h, idx);
+//    multi_map::insert(_G.resource_map, name, idx);
+    cel_hash_add(&_G.spawned_map, root.h, idx, _G.allocator);
     return instance;
 }
 
 struct entity_instance *get_entity_instance(ct_entity entity) {
-    uint32_t idx = map::get(_G.spawned_map, entity.h, UINT32_MAX);
+    uint64_t idx = cel_hash_lookup(&_G.spawned_map, entity.h, UINT64_MAX);
 
-    if (UINT32_MAX == idx) {
+    if (UINT64_MAX == idx) {
         return NULL;
     }
 
@@ -203,35 +206,35 @@ uint32_t find_by_guid(uint64_t *guids,
 
 void reload_instance(uint64_t name,
                      void *data) {
-    entity_resource *ent_res = (entity_resource *) data;
-
-    auto it = multi_map::find_first(_G.resource_map, name);
-    while (it != nullptr) {
-        struct entity_instance *instance = &_G.spawned_array[it->value];
-        //struct entity_instance old_instance = *instance;
-
-        ct_component_a0.destroy(instance->world, instance->entity,
-                                instance->entity_count);
-
-        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
-                                          ct_entity, sizeof(ct_entity) *
-                                                     ent_res->ent_count);
-
-        uint64_t *guid = entity_resource_guid(ent_res);
-        for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
-            uint32_t idx = find_by_guid(instance->guid, instance->entity_count,
-                                        guid[j]);
-            if (UINT32_MAX == idx) {
-                spawned[j] = create();
-            } else {
-                spawned[j] = instance->entity[idx];
-            }
-        }
-
-        spawn_from_resource(instance->world, instance, ent_res, spawned);
-
-        it = multi_map::find_next(_G.resource_map, it);
-    }
+//    entity_resource *ent_res = (entity_resource *) data;
+//
+//    auto it = multi_map::find_first(_G.resource_map, name);
+//    while (it != nullptr) {
+//        struct entity_instance *instance = &_G.spawned_array[it->value];
+//        //struct entity_instance old_instance = *instance;
+//
+//        ct_component_a0.destroy(instance->world, instance->entity,
+//                                instance->entity_count);
+//
+//        ct_entity *spawned = CEL_ALLOCATE(ct_memory_a0.main_allocator(),
+//                                          ct_entity, sizeof(ct_entity) *
+//                                                     ent_res->ent_count);
+//
+//        uint64_t *guid = entity_resource_guid(ent_res);
+//        for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
+//            uint32_t idx = find_by_guid(instance->guid, instance->entity_count,
+//                                        guid[j]);
+//            if (UINT32_MAX == idx) {
+//                spawned[j] = create();
+//            } else {
+//                spawned[j] = instance->entity[idx];
+//            }
+//        }
+//
+//        spawn_from_resource(instance->world, instance, ent_res, spawned);
+//
+//        it = multi_map::find_next(_G.resource_map, it);
+//    }
 }
 
 struct compkey {
@@ -243,10 +246,10 @@ struct compkey {
 // Compiler private
 //==============================================================================
 struct ct_entity_compile_output {
-    Map<uint32_t> component_ent;
+    cel_hash_t component_ent;
     uint32_t **component_ent_array;
-    Map<uint32_t> entity_parent;
-    Map<uint32_t> component_body;
+    cel_hash_t entity_parent;
+    cel_hash_t component_body;
     compkey **component_key_array;
     uint64_t *component_type;
     uint64_t *guid;
@@ -311,23 +314,23 @@ static void foreach_components_clb(const char *filename,
         cel_array_push(output->component_ent_array, {}, _G.allocator);
         output->component_ent_array[idx] = NULL;
 
-        map::set(output->component_ent, cid, idx);
+        cel_hash_add(&output->component_ent, cid, idx, _G.allocator);
     }
 
-    if (!map::has(output->component_body, cid)) {
+    if (!cel_hash_contain(&output->component_body, cid)) {
         uint32_t idx = cel_array_size(output->component_key_array);
         //Array<yaml_node_t> tmp_a(ct_memory_a0.main_allocator());
         cel_array_push(output->component_key_array, {}, _G.allocator);
         output->component_key_array[idx] = NULL;
 
-        map::set(output->component_body, cid, idx);
+        cel_hash_add(&output->component_body, cid, idx, _G.allocator);
     }
 
-    uint32_t idx = map::get(output->component_ent, cid, UINT32_MAX);
+    uint64_t idx = cel_hash_lookup(&output->component_ent, cid, UINT64_MAX);
     cel_array_push(output->component_ent_array[idx], data->ent_id,
                    _G.allocator);
 
-    idx = map::get(output->component_body, cid, UINT32_MAX);
+    idx = cel_hash_lookup(&output->component_body, cid, UINT64_MAX);
 
     compkey ck;
     memcpy(ck.keys, tmp_keys, sizeof(uint64_t) * (root_count + 1));
@@ -345,7 +348,7 @@ static void compile_entitity(const char *filename,
 
     uint32_t ent_id = output->ent_counter++;
 
-    map::set(output->entity_parent, ent_id, (uint32_t) parent);
+    cel_hash_add(&output->entity_parent, ent_id, (uint32_t) parent, _G.allocator);
 
     uint64_t guid = root_key[root_count - 1];
     cel_array_push(output->guid, guid, _G.allocator);
@@ -405,11 +408,7 @@ static ct_entity_compile_output *create_output() {
     ct_entity_compile_output *output = CEL_ALLOCATE(a,
                                                     ct_entity_compile_output,
                                                     sizeof(ct_entity_compile_output));
-    *output = {0};
-
-    output->component_ent.init(a);
-    output->entity_parent.init(a);
-    output->component_body.init(a);
+    *output = {};
 
     return output;
 }
@@ -417,7 +416,7 @@ static ct_entity_compile_output *create_output() {
 static void destroy_output(ct_entity_compile_output *output) {
     cel_array_free(output->component_type, _G.allocator);
     cel_array_free(output->guid, _G.allocator);
-    output->entity_parent.destroy();
+    cel_hash_free(&output->entity_parent, _G.allocator);
 
     // clean inner array
     auto ct_it = output->component_ent_array;
@@ -427,7 +426,7 @@ static void destroy_output(ct_entity_compile_output *output) {
         ++ct_it;
     }
 
-    output->component_ent.destroy();
+    cel_hash_free(&output->component_ent, _G.allocator);
     cel_array_free(output->component_ent_array, _G.allocator);
 
     // clean inner array
@@ -439,7 +438,7 @@ static void destroy_output(ct_entity_compile_output *output) {
         ++cb_it;
     }
 
-    output->component_body.destroy();
+    cel_hash_free(&output->component_body, _G.allocator);
     cel_array_free(output->component_key_array, _G.allocator);
 
     cel_alloc *a = ct_memory_a0.main_allocator();
@@ -478,7 +477,7 @@ static void write_to_build(ct_entity_compile_output *output,
 
     //write parents
     for (uint32_t i = 0; i < res.ent_count; ++i) {
-        uint32_t id = map::get(output->entity_parent, i, UINT32_MAX);
+        uint32_t id = cel_hash_lookup(&output->entity_parent, i, UINT32_MAX);
 
         cel_array_push_n(*build, &id, sizeof(id), _G.allocator);
     }
@@ -494,14 +493,14 @@ static void write_to_build(ct_entity_compile_output *output,
         uint64_t cid = output->component_type[j];
         uint64_t id = cid;
 
-        uint32_t idx = map::get(output->component_ent, cid, UINT32_MAX);
+        uint32_t idx = cel_hash_lookup(&output->component_ent, cid, UINT32_MAX);
         uint32_t *ent_arr = output->component_ent_array[idx];
 
         struct component_data cdata = {
                 .ent_count = (uint32_t) cel_array_size(ent_arr)
         };
 
-        idx = map::get(output->component_body, cid, UINT32_MAX);
+        idx = cel_hash_lookup(&output->component_body, cid, UINT32_MAX);
         compkey *body = output->component_key_array[idx];
 
         char *blob = NULL;
@@ -683,8 +682,6 @@ static void _init(ct_api_a0 *api) {
             .level_type = CT_ID64_0("level"),
     };
 
-    _G.spawned_map.init(ct_memory_a0.main_allocator());
-
     ct_resource_a0.register_type(_G.type, callback);
     ct_resource_a0.register_type(_G.level_type, callback);
 
@@ -697,13 +694,11 @@ static void _init(ct_api_a0 *api) {
                                      true);
 
     _G.entity_handler.init(ct_memory_a0.main_allocator());
-    _G.spawned_map.init(ct_memory_a0.main_allocator());
-    _G.resource_map.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
-    _G.resource_map.destroy();
-    _G.spawned_map.destroy();
+//    _G.resource_map.destroy();
+    cel_hash_free(&_G.spawned_map, _G.allocator);
     _G.entity_handler.destroy();
 
     cel_array_free(_G.spawned_array, _G.allocator);

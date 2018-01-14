@@ -5,6 +5,7 @@
 #include <cetech/module/module.h>
 #include <cetech/renderer/scene.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 #include "celib/allocator.h"
 #include "celib/map.inl"
 
@@ -43,7 +44,7 @@ CETECH_DECL_API(ct_thread_a0);
 
 struct scene_instance {
     uint64_t scene;
-    Map<uint8_t> geom_map;
+    cel_hash_t geom_map;
     uint32_t *size;
     bgfx::VertexBufferHandle *vb;
     bgfx::IndexBufferHandle *ib;
@@ -57,7 +58,7 @@ struct scene_instance {
 #define _G SceneResourceGlobals
 static struct _G {
     uint64_t type;
-    Map<uint32_t> scene_instance_map;
+    cel_hash_t scene_instance_map;
     scene_instance *scene_instance_array;
     cel_alloc *allocator;
 } _G;
@@ -69,42 +70,36 @@ static struct scene_instance *_init_scene_instance(uint64_t scene) {
     scene_instance *instance = &_G.scene_instance_array[idx];
     instance->scene = scene;
 
-    instance->geom_map.init(ct_memory_a0.main_allocator());
-
-    map::set(_G.scene_instance_map, scene, idx);
+    cel_hash_add(&_G.scene_instance_map, scene, idx, _G.allocator);
 
     return instance;
 }
 
 static void _destroy_scene_instance(uint64_t scene) {
-    Map<uint32_t> map1(ct_memory_a0.main_allocator());
-    map::set<uint32_t>(map1, 1111, 111);
-    map::remove(map1, 1111);
-
-    uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
+    uint32_t idx = (uint32_t)cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
     uint32_t size = cel_array_size(_G.scene_instance_array);
 
     scene_instance *instance = &_G.scene_instance_array[idx];
     scene_instance *last_instance = &_G.scene_instance_array[size - 1];
 
-    instance->geom_map.destroy();
+    cel_hash_free(&instance->geom_map, _G.allocator);
 
     cel_array_free(instance->size, _G.allocator);
     cel_array_free(instance->vb, _G.allocator);
     cel_array_free(instance->ib, _G.allocator);
 
     *instance = *last_instance;
-    map::remove(_G.scene_instance_map, scene);
-    map::set(_G.scene_instance_map, last_instance->scene, idx);
+    cel_hash_remove(&_G.scene_instance_map, scene);
+    cel_hash_add(&_G.scene_instance_map, last_instance->scene, idx, _G.allocator);
     cel_array_pop_back(_G.scene_instance_array);
 }
 
 static struct scene_instance *_get_scene_instance(uint64_t scene) {
-    uint32_t idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
+    uint32_t idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         ct_resource_a0.get(_G.type, scene);
-        idx = map::get(_G.scene_instance_map, scene, UINT32_MAX);
+        idx = (uint32_t) cel_hash_lookup(&_G.scene_instance_map, scene, UINT32_MAX);
     }
 
     return &_G.scene_instance_array[idx];
@@ -164,7 +159,7 @@ static void online(uint64_t name,
                                                  BGFX_BUFFER_INDEX32);
 
         uint8_t idx = (uint8_t) cel_array_size(instance->vb);
-        map::set(instance->geom_map, geom_name[i], idx);
+        cel_hash_add(&instance->geom_map, geom_name[i], idx, _G.allocator);
 
         cel_array_push(instance->size, ib_size[i], _G.allocator);
         cel_array_push(instance->vb, bv_handle, _G.allocator);
@@ -212,11 +207,11 @@ int sceneinit(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hash_a0);
     CETECH_GET_API(api, ct_thread_a0);
 
-    _G = {.allocator=ct_memory_a0.main_allocator()};
+    _G = {
+            .allocator=ct_memory_a0.main_allocator(),
+            .type = _G.type = CT_ID64_0("scene"),
 
-    _G.type = CT_ID64_0("scene");
-
-    _G.scene_instance_map.init(ct_memory_a0.main_allocator());
+    };
 
     ct_resource_a0.register_type(_G.type, callback);
 
@@ -227,7 +222,7 @@ int sceneinit(ct_api_a0 *api) {
 
 static void shutdown() {
     cel_array_free(_G.scene_instance_array, _G.allocator);
-    _G.scene_instance_map.destroy();
+    cel_hash_free(&_G.scene_instance_map, _G.allocator);
 }
 
 static void setVBIB(uint64_t scene,
@@ -238,7 +233,7 @@ static void setVBIB(uint64_t scene,
         return;
     }
 
-    uint8_t idx = map::get<uint8_t>(instance->geom_map, geom_name,
+    uint8_t idx = (uint8_t) cel_hash_lookup(&instance->geom_map, geom_name,
                                     UINT8_MAX);
 
     if (idx == UINT8_MAX) {

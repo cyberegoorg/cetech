@@ -199,7 +199,7 @@ void set_string(ct_coredb_writer_t *_writer,
                                    &value, sizeof(char *),
                                    ct_memory_a0.main_allocator());
     } else {
-        CEL_FREE(a, ((char *) (obj->values + obj->offset[idx])));
+        CEL_FREE(a, *((char **) (obj->values + obj->offset[idx])));
     }
 
     char *value_clone = ct_memory_a0.str_dup(value, a);

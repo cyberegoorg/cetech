@@ -24,7 +24,7 @@ static void *_reallocate(const cel_alloc *a,
         new_ptr = realloc(ptr, size);
 
     } else {
-        // free(ptr);
+        free(ptr);
     }
 
     return new_ptr;

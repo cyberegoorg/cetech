@@ -13,6 +13,7 @@
 #include <cetech/os/watchdog.h>
 #include <celib/eventstream.inl>
 #include <celib/array.h>
+#include <celib/hash.h>
 #include "celib/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -48,7 +49,7 @@ struct fs_root {
 };
 
 static struct _G {
-    Map<uint32_t> root_map;
+    cel_hash_t root_map;
     fs_root *roots;
     cel_alloc *allocator;
 } _G;
@@ -67,13 +68,13 @@ static uint32_t new_fs_root(uint64_t root) {
     fs_root *root_inst = &_G.roots[new_idx];
     root_inst->event_stream.init(a);
 
-    map::set(_G.root_map, root, new_idx);
+    cel_hash_add(&_G.root_map, root, new_idx, _G.allocator);
 
     return new_idx;
 }
 
 static fs_root *get_fs_root(uint64_t root) {
-    uint32_t idx = map::get(_G.root_map, root, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.root_map, root, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
@@ -84,7 +85,7 @@ static fs_root *get_fs_root(uint64_t root) {
 }
 
 static fs_root *get_or_crate_root(uint64_t root) {
-    uint32_t idx = map::get(_G.root_map, root, UINT32_MAX);
+    uint32_t idx =  cel_hash_lookup(&_G.root_map, root, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         uint32_t root_idx = new_fs_root(root);
@@ -426,16 +427,14 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
     };
 
-    _G.root_map.init(ct_memory_a0.main_allocator());
-
     ct_log_a0.debug(LOG_WHERE, "Init");
 }
 
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-    _G.root_map.destroy();
     cel_array_free(_G.roots, _G.allocator);
+    cel_hash_free(&_G.root_map, _G.allocator);
 }
 
 CETECH_MODULE_DEF(

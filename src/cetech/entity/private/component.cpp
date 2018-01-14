@@ -3,6 +3,7 @@
 //==============================================================================
 
 #include <cetech/entity/entity.h>
+#include <celib/hash.h>
 #include "celib/map.inl"
 
 #include "cetech/os/memory.h"
@@ -21,9 +22,10 @@ using namespace celib;
 
 #define _G ComponentMaagerGlobals
 static struct ComponentMaagerGlobals {
-    Map<uint32_t> spawn_order_map;
+    cel_hash_t spawn_order_map;
     Map<ct_component_compiler_t> compiler_map;
     Map<ct_component_clb> component_clb;
+    cel_alloc* allocator;
 } ComponentMaagerGlobals;
 
 
@@ -35,7 +37,8 @@ static void register_compiler(uint64_t type,
                        ct_component_compiler_t compiler,
                        uint32_t spawn_order) {
     map::set(_G.compiler_map, type, compiler);
-    map::set(_G.spawn_order_map, type, spawn_order);
+
+    cel_hash_add(&_G.spawn_order_map, type, spawn_order, _G.allocator);
 }
 
 static int compile(uint64_t type,
@@ -55,7 +58,7 @@ static int compile(uint64_t type,
 }
 
 static uint32_t get_spawn_order(uint64_t type) {
-    return map::get(_G.spawn_order_map, type, (uint32_t) 0);
+    return (uint32_t) cel_hash_lookup(&_G.spawn_order_map, type,  0);
 }
 
 static void register_type(uint64_t type,
@@ -118,17 +121,18 @@ static void _init_api(ct_api_a0 *a0) {
 static void _init(ct_api_a0 *a0) {
     _init_api(a0);
 
-    _G = {};
+    _G = {
+            .allocator = ct_memory_a0.main_allocator()
+    };
 
     _G.compiler_map.init(ct_memory_a0.main_allocator());
-    _G.spawn_order_map.init(ct_memory_a0.main_allocator());
     _G.component_clb.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
     _G.compiler_map.destroy();
-    _G.spawn_order_map.destroy();
     _G.component_clb.destroy();
+    cel_hash_free(&_G.spawn_order_map, _G.allocator);
 }
 
 CETECH_MODULE_DEF(

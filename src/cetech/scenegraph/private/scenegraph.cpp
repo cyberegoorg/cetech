@@ -1,6 +1,7 @@
 #include "cetech/entity/entity.h"
 #include <cetech/scenegraph/scenegraph.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 #include "cetech/config/config.h"
 #include "cetech/resource/resource.h"
 #include "cetech/os/memory.h"
@@ -56,9 +57,9 @@ struct WorldInstance {
 
 
 static struct SceneGraphGlobal {
-    Map<uint32_t> world_map;
+    cel_hash_t world_map;
     WorldInstance *world_instances;
-    Map<uint32_t> ent_map;
+    cel_hash_t ent_map;
 
     cel_alloc *allocator;
 } _G;
@@ -117,11 +118,11 @@ static void _new_world(ct_world world) {
     uint32_t idx = cel_array_size(_G.world_instances);
     cel_array_push(_G.world_instances, WorldInstance(), _G.allocator);
     _G.world_instances[idx].world = world;
-    map::set(_G.world_map, world.h, idx);
+    cel_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
 static void _destroy_world(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = cel_array_size(_G.world_instances) - 1;
 
     ct_world last_world = _G.world_instances[last_idx].world;
@@ -130,12 +131,12 @@ static void _destroy_world(ct_world world) {
              _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
-    map::set(_G.world_map, last_world.h, idx);
+    cel_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
     cel_array_pop_back(_G.world_instances);
 }
 
 static WorldInstance *_get_world_instance(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
 
     if (idx != UINT32_MAX) {
         return &_G.world_instances[idx];
@@ -292,7 +293,7 @@ static int has(ct_world world,
         ct_entity entity) {
     uint64_t idx = hash_combine(world.h, entity.h);
 
-    return map::has(_G.ent_map, idx);
+    return cel_hash_contain(&_G.ent_map, idx);
 }
 
 static ct_scene_node get_root(ct_world world,
@@ -300,7 +301,7 @@ static ct_scene_node get_root(ct_world world,
 
     uint64_t idx = hash_combine(world.h, entity.h);
 
-    uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
+    uint32_t component_idx = cel_hash_lookup(&_G.ent_map, idx, UINT32_MAX);
 
     return (ct_scene_node) {.idx = component_idx, .world = world};
 }
@@ -383,7 +384,7 @@ static ct_scene_node create(ct_world world,
 
     uint64_t hash = hash_combine(world.h, entity.h);
 
-    map::set(_G.ent_map, hash, root.idx);
+    cel_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
     CEL_FREE(ct_memory_a0.main_allocator(), nodes);
 
     return root;
@@ -475,15 +476,12 @@ static void init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
     };
 
-    _G.world_map.init(ct_memory_a0.main_allocator());
-    _G.ent_map.init(ct_memory_a0.main_allocator());
-
     ct_world_a0.register_callback(world_callbacks);
 }
 
 static void shutdown() {
-    _G.world_map.destroy();
-    _G.ent_map.destroy();
+    cel_hash_free(&_G.ent_map, _G.allocator);
+    cel_hash_free(&_G.world_map, _G.allocator);
     cel_array_free(_G.world_instances, _G.allocator);
 }
 

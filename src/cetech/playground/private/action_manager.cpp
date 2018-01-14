@@ -9,6 +9,7 @@
 #include <cetech/playground/action_manager.h>
 #include <cetech/input/input.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -36,7 +37,7 @@ struct shortcut {
 
 #define _G action_manager_global
 static struct _G {
-    Map<uint32_t> action_map;
+    cel_hash_t action_map;
     modifiactor mod;
 
     shortcut* shorcut;
@@ -86,7 +87,7 @@ static void register_action(uint64_t name,
     cel_array_push_n(_G.shorcut, &sc, 1, _G.allocator);
     cel_array_push(_G.action_active, false, _G.allocator);
     cel_array_push(_G.action_fce, fce, _G.allocator);
-    map::set(_G.action_map, name, idx);
+    cel_hash_add(&_G.action_map, name, idx, _G.allocator);
 }
 
 static void unregister_action(uint64_t name) {
@@ -94,7 +95,7 @@ static void unregister_action(uint64_t name) {
 }
 
 static void execute(uint64_t name) {
-    uint32_t idx = map::get(_G.action_map, name, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.action_map, name, UINT32_MAX);
 
     if (UINT32_MAX == idx) {
         return;
@@ -150,7 +151,7 @@ static void check() {
 }
 
 const char* shortcut_str(uint64_t name) {
-    uint32_t idx = map::get(_G.action_map, name, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.action_map, name, UINT32_MAX);
 
     if (UINT32_MAX == idx) {
         return NULL;
@@ -174,14 +175,11 @@ static void _init(ct_api_a0 *api) {
         .allocator = ct_memory_a0.main_allocator()
     };
 
-    _G.action_map.init(ct_memory_a0.main_allocator());
-
-
     api->register_api("ct_action_manager_a0", &action_manager_api);
 }
 
 static void _shutdown() {
-    _G.action_map.destroy();
+    cel_hash_free(&_G.action_map, _G.allocator);
 
     cel_array_free(_G.shorcut, _G.allocator);
     cel_array_free(_G.action_fce, _G.allocator);

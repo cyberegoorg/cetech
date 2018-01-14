@@ -11,6 +11,7 @@
 #include <cetech/yaml/ydb.h>
 #include <cetech/macros.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 #include "celib/fpumath.h"
 #include "cetech/module/module.h"
 
@@ -101,9 +102,9 @@ struct WorldInstance {
 static struct _G {
     uint64_t type;
 
-    Map<uint32_t> world_map;
+    cel_hash_t world_map;
     WorldInstance* world_instances;
-    Map<uint32_t> ent_map;
+    cel_hash_t ent_map;
     cel_alloc* allocator;
 } _G;
 
@@ -173,12 +174,12 @@ static void _new_world(ct_world world) {
     uint32_t idx = cel_array_size(_G.world_instances);
     cel_array_push(_G.world_instances, WorldInstance(), _G.allocator);
     _G.world_instances[idx].world = world;
-    map::set(_G.world_map, world.h, idx);
+    cel_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
 
 static WorldInstance *_get_world_instance(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
 
     if (idx != UINT32_MAX) {
         return &_G.world_instances[idx];
@@ -188,7 +189,7 @@ static WorldInstance *_get_world_instance(ct_world world) {
 }
 
 static void _destroy_world(ct_world world) {
-    uint32_t idx = map::get(_G.world_map, world.h, UINT32_MAX);
+    uint32_t idx = cel_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = cel_array_size(_G.world_instances) - 1;
 
     ct_world last_world = _G.world_instances[last_idx].world;
@@ -197,7 +198,7 @@ static void _destroy_world(ct_world world) {
              _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
-    map::set(_G.world_map, last_world.h, idx);
+    cel_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
     cel_array_pop_back(_G.world_instances);
 }
 
@@ -249,7 +250,7 @@ static void _destroyer(ct_world world,
     // TODO: remove from arrays, swap idx -> last AND change size
     for (uint32_t i = 0; i < ent_count; i++) {
         if(transform_has(world, ents[i])) {
-            map::remove(_G.ent_map, hash_combine(world.h, ents[i].h));
+            cel_hash_remove(&_G.ent_map, hash_combine(world.h, ents[i].h));
         }
     }
 }
@@ -307,9 +308,6 @@ static void _init(ct_api_a0 *api) {
             .type = CT_ID64_0("transform"),
     };
 
-    _G.world_map.init(ct_memory_a0.main_allocator());
-    _G.ent_map.init(ct_memory_a0.main_allocator());
-
     ct_component_a0.register_type(
             _G.type,
             (ct_component_clb) {
@@ -325,8 +323,8 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G.world_map.destroy();
-    _G.ent_map.destroy();
+    cel_hash_free(&_G.ent_map, _G.allocator);
+    cel_hash_free(&_G.world_map, _G.allocator);
     cel_array_free(_G.world_instances, _G.allocator);
 }
 
@@ -477,7 +475,7 @@ int transform_has(ct_world world,
                   ct_entity entity) {
     uint64_t idx = hash_combine(world.h, entity.h);
 
-    return map::has(_G.ent_map, idx);
+    return cel_hash_contain(&_G.ent_map, idx);
 }
 
 ct_transform transform_get(ct_world world,
@@ -485,7 +483,7 @@ ct_transform transform_get(ct_world world,
 
     uint64_t idx = hash_combine(world.h, entity.h);
 
-    uint32_t component_idx = map::get(_G.ent_map, idx, UINT32_MAX);
+    uint32_t component_idx = cel_hash_lookup(&_G.ent_map, idx, UINT32_MAX);
 
     return (ct_transform) {.idx = component_idx, .world = world};
 }
@@ -528,10 +526,10 @@ ct_transform transform_create(ct_world world,
     transform_transform(t, p);
 
 
-    map::set(_G.ent_map, hash_combine(world.h, entity.h), idx);
+    cel_hash_add(&_G.ent_map, hash_combine(world.h, entity.h), idx, _G.allocator);
 
     if (parent.h != UINT32_MAX) {
-        uint32_t parent_idx = map::get(_G.ent_map,
+        uint32_t parent_idx = cel_hash_lookup(&_G.ent_map,
                                        hash_combine(world.h, parent.h),
                                        UINT32_MAX);
 
