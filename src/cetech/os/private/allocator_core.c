@@ -25,7 +25,6 @@ static void *_reallocate(const struct cel_alloc *a,
 
     if (size) {
         new_ptr = realloc(ptr, size);
-
     } else {
         free(ptr);
     }

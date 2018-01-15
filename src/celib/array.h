@@ -65,16 +65,17 @@ static void *cel_array_grow(void *a,
                             size_t type_size,
                             struct cel_alloc *alloc) {
     uint32_t new_capacity = cel_array_capacity(a) * 2 + size;
-    if(new_capacity < size) {
+    if (new_capacity < size) {
         new_capacity = size;
     }
 
-    void *new_data = CEL_ALLOCATE(alloc, void*, sizeof(struct cel_array_header_t) +
-                                                (new_capacity * type_size));
+    void *new_data = CEL_ALLOCATE(alloc, void*,
+                                  sizeof(struct cel_array_header_t) +
+                                  (new_capacity * type_size));
 
-    char *new_array = (char*)new_data + sizeof(struct cel_array_header_t);
+    char *new_array = (char *) new_data + sizeof(struct cel_array_header_t);
 
-    *((struct cel_array_header_t *) new_data) = (struct cel_array_header_t){
+    *((struct cel_array_header_t *) new_data) = (struct cel_array_header_t) {
             .size = cel_array_size(a),
             .capacity = new_capacity
     };
@@ -84,7 +85,7 @@ static void *cel_array_grow(void *a,
     return new_array;
 }
 
-static void* _ = (void*)&cel_array_grow; // UNUSED
+//static void* _ = (void*)&cel_array_grow; // UNUSED
 
 #ifdef __cplusplus
 }
