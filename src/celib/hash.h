@@ -15,7 +15,7 @@ struct cel_hash_t {
 };
 
 static uint32_t cel_hash_lookup_idx(const struct cel_hash_t *hash,
-                                    uint64_t k) {
+                                     uint64_t k) {
     // TODO : FAST !!!
     const uint32_t size = hash->n;
     for (uint32_t i = 0; i < size; ++i) {

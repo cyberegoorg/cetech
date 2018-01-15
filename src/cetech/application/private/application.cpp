@@ -252,9 +252,35 @@ extern "C" void application_start() {
 
     cel_array_free(arr, ct_memory_a0.main_allocator());
 
+
+    uint64_t fq = ct_time_a0.perf_freq();
+
+//    cel_hash_t h1 = {};
+//    uint64_t t1 = ct_time_a0.perf_counter();
+//    uint64_t k;
+//    for (k = 0; k < 100000; ++k) {
+//        cel_hash_add(&h1, k, 0, _G.allocator);
+//    }
+//    uint64_t t2 = ct_time_a0.perf_counter();
+//    float dt = ((float) (t2 - t1)) / fq;
+//
+//    t1 = ct_time_a0.perf_counter();
+//    uint64_t idx = cel_hash_lookup(&h1, k-1, 0);
+//    CEL_UNUSED(dt, idx);
+//    t2 = ct_time_a0.perf_counter();
+//    dt = ((float) (t2 - t1)) / fq;
+//
+//    t1 = ct_time_a0.perf_counter();
+//    celib::Map<int> m2(_G.allocator);
+//    for (k = 0; k < 100000; ++k) {
+//        celib::map::set(m2, k, 0);
+//    }
+//    CEL_UNUSED(dt, idx);
+//    t2 = ct_time_a0.perf_counter();
+//    dt = ((float) (t2 - t1)) / fq;
+
     _G.is_running = 1;
     while (_G.is_running) {
-        uint64_t fq = ct_time_a0.perf_freq();
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
