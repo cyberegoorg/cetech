@@ -82,7 +82,7 @@ struct _G {
 
     int autoload_enabled;
 
-    struct ct_coredb_object_t *config_object;
+    struct ct_coredb_object_t *config;
     struct cel_alloc *allocator;
 } _G = {};
 
@@ -97,7 +97,7 @@ struct _G {
 char *resource_compiler_get_build_dir(struct cel_alloc *a,
                                       const char *platform) {
 
-    const char *build_dir_str = ct_coredb_a0.read_string(_G.config_object,
+    const char *build_dir_str = ct_coredb_a0.read_string(_G.config,
                                                          CONFIG_BUILD_DIR, "");
     return ct_path_a0.join(a, 2, build_dir_str, platform);
 }
@@ -182,6 +182,7 @@ static int can_get(uint64_t type,
 
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
+
     return cel_hash_contain(&type_item->name_map, name);
 }
 
@@ -190,7 +191,6 @@ static int can_get_all(uint64_t type,
                        size_t count) {
     for (size_t i = 0; i < count; ++i) {
         if (!can_get(type, names[i])) {
-            //ce_thread_a0.spin_unlock(&_G.add_lock);
             return 0;
         }
     }
@@ -244,7 +244,7 @@ static void load(uint64_t type,
 
         char *build_full = ct_path_a0.join(
                 ct_memory_a0.main_allocator(), 2,
-                ct_coredb_a0.read_string(_G.config_object,
+                ct_coredb_a0.read_string(_G.config,
                                          CONFIG_KERNEL_PLATFORM, ""),
                 build_name);
 
@@ -507,11 +507,10 @@ static void _init_cvar(struct ct_config_a0 config) {
     _G = (struct _G) {};
 
     ct_config_a0 = config;
-    _G.config_object = ct_config_a0.config_object();
+    _G.config = ct_config_a0.config_object();
 
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
-            _G.config_object);
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BUILD_DIR)) {
+    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_BUILD_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }
     ct_coredb_a0.write_commit(writer);
@@ -524,15 +523,14 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
-            .config_object = ct_config_a0.config_object(),
+            .config = ct_config_a0.config_object(),
             .type_items_count = 1,
     };
 
     ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
-                                  ct_coredb_a0.read_string(_G.config_object,
+                                  ct_coredb_a0.read_string(_G.config,
                                                            CONFIG_BUILD_DIR,
                                                            ""), false);
-
 
 }
 
