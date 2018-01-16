@@ -17,7 +17,8 @@
 // Globals
 //==============================================================================
 
-static struct ApiSystemGlobals {
+#define _G ApiSystemGlobals
+static struct _G {
     struct cel_hash_t api_map;
     void **api;
     struct cel_alloc *allocator;

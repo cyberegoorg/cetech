@@ -253,8 +253,26 @@ extern "C" void application_start() {
     cel_array_free(arr, ct_memory_a0.main_allocator());
 
 
-    uint64_t fq = ct_time_a0.perf_freq();
+//    cel_hash_t h1 = {};
+//
+//    cel_hash_add(&h1, CT_ID64_0("dva"), 2, _G.allocator);
+//    cel_hash_add(&h1, CT_ID64_0("tri"), 3, _G.allocator);
+//
+//    for (int k = 1; k <100; ++k) {
+//        cel_hash_add(&h1, k, 1, _G.allocator);
+//
+//    }
+//
+//    uint64_t jedna = cel_hash_lookup(&h1, CT_ID64_0("jedna"), 0);
+//    uint64_t dva = cel_hash_lookup(&h1, CT_ID64_0("dva"), 0);
+//    uint64_t tri = cel_hash_lookup(&h1, CT_ID64_0("tri"), 0);
+//
+//    CEL_UNUSED(jedna)
+//    CEL_UNUSED(dva)
+//    CEL_UNUSED(tri)
 
+    uint64_t fq = ct_time_a0.perf_freq();
+//
 //    cel_hash_t h1 = {};
 //    uint64_t t1 = ct_time_a0.perf_counter();
 //    uint64_t k;

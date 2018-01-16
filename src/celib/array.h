@@ -26,6 +26,12 @@ extern "C" {
 #define cel_array_clean(a) \
      ((a) ? cel_array_header(a)->size = 0 : 0)
 
+#define cel_array_set_capacity(a, c, alloc) \
+     ((a) = (__typeof(a)) cel_array_grow(a, c, sizeof(*(a)), alloc))
+
+#define cel_array_resize(a, c, alloc) \
+     (cel_array_set_capacity(a, c, alloc), cel_array_header(a)->size = (c))
+
 #define cel_array_empty(a) (cel_array_size(a) == 0)
 #define cel_array_any(a) (cel_array_size(a) > 0)
 
@@ -37,19 +43,19 @@ extern "C" {
 
 
 #define cel_array_push(a, item, alloc) \
-    cel_array_full(a) ? (a) = (__typeof(a))cel_array_grow(a, 1, sizeof(*a), alloc) : 0, \
+    cel_array_full(a) ? (a) = (__typeof(a))cel_array_grow(a, cel_array_size(a) + 1, sizeof(*(a)), alloc) : 0, \
     (a)[cel_array_header(a)->size++] = item
 
 #define cel_array_push_n(a, items, n, alloc) \
-    cel_array_full_n(a, n) ? (a) =  (__typeof(a))cel_array_grow(a, n, sizeof(*(a)), alloc) : 0, \
+    cel_array_full_n(a, n) ? (a) =  (__typeof(a))cel_array_grow(a, cel_array_size(a) + n, sizeof(*(a)), alloc) : 0, \
     memcpy((a)+cel_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
     cel_array_header(a)->size += n
 
 #define cel_array_pop_front(a) \
-    cel_array_any(a) ? memmove(a, ((a)+1), sizeof(*(a)) * (cel_array_header(a)->size--)) : 0
+    (cel_array_any(a) ? memmove(a, ((a)+1), sizeof(*(a)) * (cel_array_header(a)->size--)) : 0)
 
 #define cel_array_pop_back(a) \
-    cel_array_any(a) ? cel_array_header(a)->size-- : 0
+    (cel_array_any(a) ? cel_array_header(a)->size-- : 0)
 
 
 #define cel_array_front(a) a[0]
@@ -61,19 +67,25 @@ struct cel_array_header_t {
 };
 
 static void *cel_array_grow(void *a,
-                            uint32_t size,
+                            uint32_t capacity,
                             size_t type_size,
                             struct cel_alloc *alloc) {
-    uint32_t new_capacity = cel_array_capacity(a) * 2 + size;
-    if (new_capacity < size) {
-        new_capacity = size;
+    if (capacity <= cel_array_capacity(a)) {
+        return a;
     }
 
-    void *new_data = CEL_ALLOCATE(alloc, void*,
-                                  sizeof(struct cel_array_header_t) +
-                                  (new_capacity * type_size));
+    uint32_t new_capacity = cel_array_capacity(a) * 2 + 8;
+    if (new_capacity < capacity) {
+        new_capacity = capacity;
+    }
 
+    const uint32_t size = sizeof(struct cel_array_header_t) +
+                          (new_capacity * type_size);
+
+    void *new_data = CEL_ALLOCATE(alloc, void*, size);
     char *new_array = (char *) new_data + sizeof(struct cel_array_header_t);
+
+    memset(new_data, 0, size);
 
     *((struct cel_array_header_t *) new_data) = (struct cel_array_header_t) {
             .size = cel_array_size(a),
