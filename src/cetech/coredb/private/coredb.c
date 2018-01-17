@@ -16,7 +16,6 @@ CETECH_DECL_API(ct_memory_a0);
 
 #define MAX_OBJECTS 1000000000ULL
 
-
 struct object {
     uint8_t *buffer;
 

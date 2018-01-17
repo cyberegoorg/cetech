@@ -344,8 +344,8 @@ void mesh_render_all(ct_world world,
             float node_w[16];
             float final_w[16];
 
-            celib::mat4_identity(node_w);
-            celib::mat4_identity(final_w);
+            cel_mat4_identity(node_w);
+            cel_mat4_identity(final_w);
 
             if (ct_scenegprah_a0.has(world, ent)) {
                 uint64_t name = ct_scene_a0.get_mesh_node(scene, geom);
@@ -356,7 +356,7 @@ void mesh_render_all(ct_world world,
                 }
             }
 
-            celib::mat4_mul(final_w, node_w, wm);
+            cel_mat4_mul(final_w, node_w, wm);
 
             bgfx::setTransform(&final_w, 1);
 

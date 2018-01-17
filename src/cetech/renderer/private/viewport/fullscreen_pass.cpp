@@ -192,7 +192,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     bgfx::setViewFrameBuffer(viewid, {fb});
 
     float proj[16];
-    celib::mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, true);
+    cel_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, true);
 
     bgfx::setViewTransform(viewid, NULL, proj);
 
@@ -200,7 +200,7 @@ static void fullscreen_pass(viewport_instance *viewport,
 
     screenspace_quad(viewport->size[0], viewport->size[1], 0.0f, true);
 
-    fullscree_pass_data *pass_data = reinterpret_cast<fullscree_pass_data *>(&viewport->layers_data[viewport->layers_data_offset[layerid]]);
+    fullscree_pass_data *pass_data = (fullscree_pass_data *)(&viewport->layers_data[viewport->layers_data_offset[layerid]]);
 
     for (uint8_t i = 0; i < pass_data->input_count; ++i) {
         auto input_tex = ct_viewport_a0.get_local_resource(
@@ -213,8 +213,7 @@ static void fullscreen_pass(viewport_instance *viewport,
 
     }
 
-    ct_material_a0.submit(copy_material, layer_entry.name,
-                          viewid);
+    ct_material_a0.submit(copy_material, layer_entry.name, viewid);
 }
 
 void _init(struct ct_api_a0 *api) {

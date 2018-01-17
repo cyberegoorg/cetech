@@ -85,9 +85,8 @@ static void fps_camera_update(ct_world world,
 
     float x_dir[4];
     float z_dir[4];
-    vec4_move(x_dir, &wm[0 * 4]);
-    vec4_move(z_dir, &wm[2 * 4]);
-
+    cel_vec4_move(x_dir, &wm[0 * 4]);
+    cel_vec4_move(z_dir, &wm[2 * 4]);
 
     if (!fly_mode) {
         z_dir[1] = 0.0f;
@@ -97,11 +96,11 @@ static void fps_camera_update(ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    vec3_mul(x_dir_new, x_dir, dt * leftright * speed);
-    vec3_mul(z_dir_new, z_dir, dt * updown * speed);
+    cel_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+    cel_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    vec3_add(pos, pos, x_dir_new);
-    vec3_add(pos, pos, z_dir_new);
+    cel_vec3_add(pos, pos, x_dir_new);
+    cel_vec3_add(pos, pos, z_dir_new);
 
     // ROT
 //    float rotation_around_world_up[4];

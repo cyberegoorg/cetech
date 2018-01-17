@@ -270,7 +270,7 @@ void get_vec3(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        vec3_move(v, defaultt);
+        cel_vec3_move(v, defaultt);
         return;
     }
 
@@ -287,7 +287,7 @@ void get_vec4(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        vec4_move(v, defaultt);
+        cel_vec4_move(v, defaultt);
         return;
     }
 
@@ -304,7 +304,7 @@ void get_mat4(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        mat4_move(v, defaultt);
+        cel_mat4_move(v, defaultt);
         return;
     }
 

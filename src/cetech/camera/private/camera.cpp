@@ -200,8 +200,8 @@ static void get_project_view(ct_camera camera,
     float w[16];
     ct_transform_a0.get_world_matrix(t, w);
 
-    //celib::mat4_move(view, w);
-    celib::mat4_inverse(view, w);
+    //cel_mat4_move(view, w);
+    cel_mat4_inverse(view, w);
 }
 
 static int has(ct_world world,

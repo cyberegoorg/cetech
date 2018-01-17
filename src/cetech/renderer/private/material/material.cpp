@@ -299,7 +299,7 @@ static void set_mat44f(ct_material material,
     auto *uniforms = material_blob::uniforms(resource);
 
     int slot_idx = _find_uniform_slot(resource, slot);
-    celib::mat4_move(uniforms[slot_idx].m44, value);
+    cel_mat4_move(uniforms[slot_idx].m44, value);
 }
 
 static void submit(ct_material material,
