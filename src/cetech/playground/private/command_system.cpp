@@ -5,6 +5,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/playground/command_system.h>
 #include <celib/array.h>
+#include <celib/hash.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
@@ -21,7 +22,9 @@ using namespace celib;
 
 #define _G asset_property_global
 static struct _G {
-    Map<ct_cmd_fce> cmd_map;
+    cel_hash_t cmd_map;
+    ct_cmd_fce* cmds;
+
     uint8_t *cmd_buffer;
     uint32_t *cmd;
     uint32_t curent_pos;
@@ -40,7 +43,8 @@ static ct_cmd *get_curent_cmd() {
 }
 
 void execute(const struct ct_cmd *cmd) {
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, cmd->type, {NULL});
+    uint32_t idx = cel_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.execute) {
         return;
@@ -70,7 +74,8 @@ void execute(const struct ct_cmd *cmd) {
 
 void register_cmd_execute(uint64_t type,
                           ct_cmd_fce fce) {
-    map::set(_G.cmd_map, type, fce);
+    cel_array_push(_G.cmds, fce, _G.allocator);
+    cel_hash_add(&_G.cmd_map, type, cel_array_size(_G.cmds) - 1, _G.allocator);
 }
 
 void undo() {
@@ -80,8 +85,8 @@ void undo() {
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type,
-                                              {NULL});
+    uint32_t idx = cel_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.execute) {
         return;
@@ -116,8 +121,9 @@ void redo() {
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type,
-                                              {NULL});
+    uint32_t idx = cel_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
+
     if (!cmd_fce.execute) {
         return;
     }
@@ -136,8 +142,9 @@ void undo_text(char *buffer,
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, curent_cmd->type,
-                                              {NULL});
+    uint32_t idx = cel_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
+
     if (!cmd_fce.description) {
         buffer[0] = '\0';
         return;
@@ -155,8 +162,9 @@ void redo_text(char *buffer,
         return;
     }
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, next_cmd->type,
-                                              {NULL});
+    uint32_t idx = cel_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
+
     if (!cmd_fce.description) {
         buffer[0] = '\0';
         return;
@@ -170,7 +178,9 @@ void command_text(char *buffer,
                   uint32_t idx) {
     const struct ct_cmd *cmd = (const struct ct_cmd *) &_G.cmd_buffer[_G.cmd[idx]];
 
-    ct_cmd_fce cmd_fce = map::get<ct_cmd_fce>(_G.cmd_map, cmd->type, {NULL});
+    uint32_t idxx = cel_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
+    ct_cmd_fce cmd_fce = (UINT32_MAX != idxx ? _G.cmds[idxx] : (ct_cmd_fce){NULL});
+
     if (!cmd_fce.description) {
         goto invalid;
     }
@@ -231,13 +241,12 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_cmd_system_a0", &cmd_system_a0);
 
-    _G.cmd_map.init(ct_memory_a0.main_allocator());
-
     cel_array_push(_G.cmd, 0, _G.allocator);
 }
 
 static void _shutdown() {
-    _G.cmd_map.destroy();
+    cel_array_free(_G.cmds, _G.allocator);
+    cel_hash_free(&_G.cmd_map, _G.allocator);
 
     cel_array_free(_G.cmd_buffer, _G.allocator);
     cel_array_free(_G.cmd, _G.allocator);

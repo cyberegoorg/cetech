@@ -6,6 +6,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <celib/hash.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
@@ -25,12 +26,14 @@ using namespace celib;
 
 #define _G asset_property_global
 static struct _G {
-    Map<ct_ap_on_asset> on_asset;
+    cel_hash_t on_asset_map;
+    ct_ap_on_asset* on_asset;
 
     ct_ap_on_asset active_on_asset;
     uint64_t active_type;
     uint64_t active_name;
     const char *active_path;
+    struct cel_alloc* allocator;
 } _G;
 
 static void on_debugui() {
@@ -54,7 +57,8 @@ static void on_debugui() {
 
 static void register_asset(uint64_t type,
                            ct_ap_on_asset on_asset) {
-    map::set(_G.on_asset, type, on_asset);
+    cel_array_push(_G.on_asset, on_asset, _G.allocator);
+    cel_hash_add(&_G.on_asset_map, type, cel_array_size(_G.on_asset) - 1, _G.allocator);
 }
 
 static void set_asset(uint64_t type,
@@ -63,7 +67,9 @@ static void set_asset(uint64_t type,
                       const char *path) {
     CEL_UNUSED(root);
 
-    _G.active_on_asset = map::get<ct_ap_on_asset>(_G.on_asset, type, NULL);
+    uint32_t idx = cel_hash_lookup(&_G.on_asset_map, type, UINT32_MAX);
+
+    _G.active_on_asset = UINT32_MAX != idx ? _G.on_asset[idx]: NULL;
     _G.active_type = type;
     _G.active_name = name;
     _G.active_path = path;
@@ -77,18 +83,18 @@ static ct_asset_property_a0 asset_property_api = {
 
 
 static void _init(ct_api_a0 *api) {
-    _G = {};
+    _G = {
+            .allocator = ct_memory_a0.main_allocator()
+    };
 
     api->register_api("ct_asset_property_a0", &asset_property_api);
 
-    _G.on_asset.init(ct_memory_a0.main_allocator());
-
     ct_asset_browser_a0.register_on_asset_double_click(set_asset);
-
 }
 
 static void _shutdown() {
-    _G.on_asset.destroy();
+    cel_array_free(_G.on_asset, _G.allocator);
+    cel_hash_free(&_G.on_asset_map, _G.allocator);
 
     ct_asset_browser_a0.unregister_on_asset_double_click(set_asset);
 
