@@ -5,7 +5,7 @@
 
 #include <celib/allocator.h>
 #include <celib/map.inl>
-#include <celib/fpumath.h>
+
 
 #include <cetech/api/api_system.h>
 #include <cetech/macros.h>
@@ -27,6 +27,7 @@
 #include <cetech/yaml/yamlng.h>
 #include <cetech/os/memory.h>
 #include <celib/array.h>
+#include <celib/fmath.h>
 #include "cetech/renderer/scene.h"
 #include "cetech/renderer/material.h"
 

@@ -12,7 +12,8 @@
 #include <cetech/macros.h>
 #include <celib/array.h>
 #include <celib/hash.h>
-#include "celib/fpumath.h"
+#include <celib/fmath.h>
+
 #include "cetech/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);

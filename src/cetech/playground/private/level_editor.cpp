@@ -14,8 +14,9 @@
 #include <cetech/playground/explorer.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/application/application.h>
-#include <celib/fpumath.h>
+
 #include <cetech/playground/playground.h>
+#include <celib/fmath.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/os/memory.h"

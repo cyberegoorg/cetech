@@ -2,6 +2,7 @@
 #include <cetech/scenegraph/scenegraph.h>
 #include <celib/array.h>
 #include <celib/hash.h>
+#include <celib/fmath.h>
 #include "cetech/config/config.h"
 #include "cetech/resource/resource.h"
 #include "cetech/os/memory.h"
@@ -9,7 +10,7 @@
 #include "celib/map.inl"
 
 
-#include "celib/fpumath.h"
+
 #include "cetech/module/module.h"
 
 

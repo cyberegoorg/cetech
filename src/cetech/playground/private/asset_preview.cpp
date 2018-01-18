@@ -6,13 +6,14 @@
 #include <cetech/level/level.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
-#include <celib/fpumath.h>
+
 #include <cetech/input/input.h>
 #include <cetech/renderer/viewport.h>
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
 #include <celib/hash.h>
+#include <celib/fmath.h>
 #include "celib/map.inl"
 
 #include "cetech/hashlib/hashlib.h"

@@ -24,7 +24,8 @@
 #include <cetech/yaml/ydb.h>
 #include <celib/array.h>
 #include <celib/hash.h>
-#include "celib/fpumath.h"
+#include <celib/fmath.h>
+
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_scenegprah_a0);

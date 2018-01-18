@@ -21,9 +21,10 @@
 #include <cetech/entity/entity.h>
 #include <cetech/transform/transform.h>
 #include <cfloat>
-#include <celib/fpumath.h>
+
 #include <cetech/yaml/ydb.h>
 #include <cetech/playground/command_system.h>
+#include <celib/fmath.h>
 
 using namespace celib;
 using namespace buffer;

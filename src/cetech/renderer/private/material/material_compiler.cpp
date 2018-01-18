@@ -2,7 +2,7 @@
 // Include
 //==============================================================================
 
-#include <celib/fpumath.h>
+
 
 #include <cetech/yaml/ydb.h>
 #include "cetech/macros.h"
@@ -28,8 +28,6 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
-
-using namespace celib;
 
 #include "material_blob.h"
 

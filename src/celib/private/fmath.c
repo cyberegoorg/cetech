@@ -1468,3 +1468,391 @@ void cel_mat4_ortho_rh(float *_result,
     _result[14] = ff;
     _result[15] = 1.0f;
 }
+
+enum Handness {
+    Left,
+    Right,
+};
+
+enum NearFar {
+    Default,
+    Reverse,
+};
+
+void cel_mat4_proj_xywh(float *_result,
+                        float _x,
+                        float _y,
+                        float _width,
+                        float _height,
+                        float _near,
+                        float _far,
+                        bool _oglNdc,
+                        enum Handness handness) {
+
+    const float diff = _far - _near;
+    const float aa = _oglNdc ? (_far + _near) / diff : _far / diff;
+    const float bb = _oglNdc ? (2.0f * _far * _near) / diff : _near * aa;
+
+    memset(_result, 0, sizeof(float) * 16);
+    _result[0] = _width;
+    _result[5] = _height;
+    _result[8] = (Right == handness) ? _x : -_x;
+    _result[9] = (Right == handness) ? _y : -_y;
+    _result[10] = (Right == handness) ? -aa : aa;
+    _result[11] = (Right == handness) ? -1.0f : 1.0f;
+    _result[14] = -bb;
+}
+
+void cel_mat4_proj_impl(float *_result,
+                        float _ut,
+                        float _dt,
+                        float _lt,
+                        float _rt,
+                        float _near,
+                        float _far,
+                        bool _oglNdc,
+                        enum Handness handness) {
+    const float invDiffRl = 1.0f / (_rt - _lt);
+    const float invDiffUd = 1.0f / (_ut - _dt);
+    const float width = 2.0f * _near * invDiffRl;
+    const float height = 2.0f * _near * invDiffUd;
+    const float xx = (_rt + _lt) * invDiffRl;
+    const float yy = (_ut + _dt) * invDiffUd;
+    cel_mat4_proj_xywh(_result, xx, yy, width, height, _near, _far,
+                       _oglNdc, handness);
+}
+
+void mat4_proj_impl_fov(float *_result,
+                        const float *_fov,
+                        float _near,
+                        float _far,
+                        bool _oglNdc,
+                        enum Handness handness) {
+    cel_mat4_proj_impl(_result, _fov[0], _fov[1], _fov[2], _fov[3],
+                       _near, _far, _oglNdc, handness);
+}
+
+void cel_mat4_proj_impl_fovy(float *_result,
+                             float _fovy,
+                             float _aspect,
+                             float _near,
+                             float _far,
+                             bool _oglNdc,
+                             enum Handness handness) {
+    const float height = 1.0f / cel_ftan(cel_to_rad(_fovy) * 0.5f);
+    const float width = height * 1.0f / _aspect;
+    cel_mat4_proj_xywh(_result, 0.0f, 0.0f, width, height, _near,
+                       _far,
+                       _oglNdc, handness);
+}
+
+void cel_mat4_proj(float *_result,
+                   float _ut,
+                   float _dt,
+                   float _lt,
+                   float _rt,
+                   float _near,
+                   float _far,
+                   bool _oglNdc) {
+    cel_mat4_proj_impl(_result, _ut, _dt, _lt, _rt, _near, _far,
+                       _oglNdc, Left);
+}
+
+void cel_mat4_proj_fov(float *_result,
+                       const float *_fov,
+                       float _near,
+                       float _far,
+                       bool _oglNdc) {
+    mat4_proj_impl_fov(_result, _fov, _near, _far, _oglNdc, Left);
+}
+
+void cel_mat4_proj_fovy(float *_result,
+                        float _fovy,
+                        float _aspect,
+                        float _near,
+                        float _far,
+                        bool _oglNdc) {
+    cel_mat4_proj_impl_fovy(_result, _fovy, _aspect, _near, _far,
+                            _oglNdc, Left);
+}
+
+void cel_mat4_proj_lh(float *_result,
+                      float _ut,
+                      float _dt,
+                      float _lt,
+                      float _rt,
+                      float _near,
+                      float _far,
+                      bool _oglNdc) {
+    cel_mat4_proj_impl(_result, _ut, _dt, _lt, _rt, _near, _far,
+                       _oglNdc, Left);
+}
+
+void cel_mat4_proj_lh_fov(float *_result,
+                          const float *_fov,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
+    mat4_proj_impl_fov(_result, _fov, _near, _far, _oglNdc, Left);
+}
+
+void cel_mat4_proj_lh_fovy(float *_result,
+                           float _fovy,
+                           float _aspect,
+                           float _near,
+                           float _far,
+                           bool _oglNdc) {
+    cel_mat4_proj_impl_fovy(_result, _fovy, _aspect, _near, _far,
+                            _oglNdc, Left);
+}
+
+void cel_mat4_proj_rh(float *_result,
+                      float _ut,
+                      float _dt,
+                      float _lt,
+                      float _rt,
+                      float _near,
+                      float _far,
+                      bool _oglNdc) {
+    cel_mat4_proj_impl(_result, _ut, _dt, _lt, _rt, _near, _far,
+                       _oglNdc, Right);
+}
+
+void cel_mat4_proj_rh_fov(float *_result,
+                          const float *_fov,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
+    mat4_proj_impl_fov(_result, _fov, _near, _far, _oglNdc, Right);
+}
+
+void cel_at4_proj_rh_fovy(float *_result,
+                          float _fovy,
+                          float _aspect,
+                          float _near,
+                          float _far,
+                          bool _oglNdc) {
+    cel_mat4_proj_impl_fovy(_result, _fovy, _aspect, _near, _far,
+                            _oglNdc, Right);
+}
+
+void cel_mat4_proj_inf_xywh(float *_result,
+                            float _x,
+                            float _y,
+                            float _width,
+                            float _height,
+                            float _near,
+                            bool _oglNdc,
+                            enum NearFar nearfar,
+                            enum Handness handness) {
+    float aa;
+    float bb;
+    if (Reverse == nearfar) {
+        aa = _oglNdc ? -1.0f : 0.0f;
+        bb = _oglNdc ? -2.0f * _near : -_near;
+    } else {
+        aa = 1.0f;
+        bb = _oglNdc ? 2.0f * _near : _near;
+    }
+
+    memset(_result, 0, sizeof(float) * 16);
+    _result[0] = _width;
+    _result[5] = _height;
+    _result[8] = (Right == handness) ? _x : -_x;
+    _result[9] = (Right == handness) ? _y : -_y;
+    _result[10] = (Right == handness) ? -aa : aa;
+    _result[11] = (Right == handness) ? -1.0f : 1.0f;
+    _result[14] = -bb;
+}
+
+void mat4_proj_inf_impl(float *_result,
+                        float _ut,
+                        float _dt,
+                        float _lt,
+                        float _rt,
+                        float _near,
+                        bool _oglNdc,
+                        enum NearFar nearfar,
+                        enum Handness handness) {
+    const float invDiffRl = 1.0f / (_rt - _lt);
+    const float invDiffUd = 1.0f / (_ut - _dt);
+    const float width = 2.0f * _near * invDiffRl;
+    const float height = 2.0f * _near * invDiffUd;
+    const float xx = (_rt + _lt) * invDiffRl;
+    const float yy = (_ut + _dt) * invDiffUd;
+    cel_mat4_proj_inf_xywh(_result, xx, yy, width, height,
+                           _near, _oglNdc, nearfar, handness);
+}
+
+void cel_mat4_proj_inf_iml_fov(float *_result,
+                               const float *_fov,
+                               float _near,
+                               bool _oglNdc,
+                               enum NearFar nearfar,
+                               enum Handness handness) {
+    mat4_proj_inf_impl(_result, _fov[0], _fov[1], _fov[2],
+                       _fov[3], _near, _oglNdc, nearfar, handness);
+}
+
+void cel_mat4_proj_inf_impl_fovy(float *_result,
+                                 float _fovy,
+                                 float _aspect,
+                                 float _near,
+                                 bool _oglNdc,
+                                 enum NearFar nearfar,
+                                 enum Handness handness) {
+    const float height = 1.0f / cel_ftan(cel_to_rad(_fovy) * 0.5f);
+    const float width = height * 1.0f / _aspect;
+    cel_mat4_proj_inf_xywh(_result, 0.0f, 0.0f, width,
+                           height,
+                           _near, _oglNdc, nearfar, handness);
+}
+
+void cel_mat4_proj_inf_fov(float *_result,
+                           const float *_fov,
+                           float _near,
+                           bool _oglNdc) {
+    cel_mat4_proj_inf_iml_fov(_result, _fov, _near,
+                              _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf(float *_result,
+                       float _ut,
+                       float _dt,
+                       float _lt,
+                       float _rt,
+                       float _near,
+                       bool _oglNdc) {
+    mat4_proj_inf_impl(_result, _ut, _dt, _lt,
+                       _rt, _near, _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf_fovy(float *_result,
+                            float _fovy,
+                            float _aspect,
+                            float _near,
+                            bool _oglNdc) {
+    cel_mat4_proj_inf_impl_fovy(_result, _fovy,
+                                _aspect, _near,
+                                _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf_lh(float *_result,
+                          float _ut,
+                          float _dt,
+                          float _lt,
+                          float _rt,
+                          float _near,
+                          bool _oglNdc) {
+    mat4_proj_inf_impl(_result, _ut, _dt, _lt,
+                       _rt, _near, _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf_lh_fov(float *_result,
+                              const float *_fov,
+                              float _near,
+                              bool _oglNdc) {
+    cel_mat4_proj_inf_iml_fov(_result, _fov, _near,
+                              _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf_lh_fovy(float *_result,
+                               float _fovy,
+                               float _aspect,
+                               float _near,
+                               bool _oglNdc) {
+    cel_mat4_proj_inf_impl_fovy(_result, _fovy,
+                                _aspect, _near,
+                                _oglNdc, Default, Left);
+}
+
+void cel_mat4_proj_inf_rh(float *_result,
+                          float _ut,
+                          float _dt,
+                          float _lt,
+                          float _rt,
+                          float _near,
+                          bool _oglNdc) {
+    mat4_proj_inf_impl(_result, _ut, _dt,
+                       _lt, _rt, _near,
+                       _oglNdc, Default, Right);
+}
+
+void cel_mat4_proj_inf_rh_fov(float *_result,
+                              const float *_fov,
+                              float _near,
+                              bool _oglNdc) {
+    cel_mat4_proj_inf_iml_fov(_result, _fov, _near,
+                              _oglNdc, Default, Right);
+}
+
+void cel_mat4_proj_inf_rh_fovy(float *_result,
+                               float _fovy,
+                               float _aspect,
+                               float _near,
+                               bool _oglNdc) {
+    cel_mat4_proj_inf_impl_fovy(_result, _fovy,
+                                _aspect, _near,
+                                _oglNdc, Default, Right);
+}
+
+void cel_mat4_proj_rev_inf_lh(float *_result,
+                              float _ut,
+                              float _dt,
+                              float _lt,
+                              float _rt,
+                              float _near,
+                              bool _oglNdc) {
+    mat4_proj_inf_impl(_result, _ut, _dt, _lt,
+                       _rt, _near, _oglNdc, Reverse, Left);
+}
+
+void cel_mat4_proj_rev_inf_lh_fov(float *_result,
+                                  const float *_fov,
+                                  float _near,
+                                  bool _oglNdc) {
+    cel_mat4_proj_inf_iml_fov(_result, _fov, _near,
+                              _oglNdc, Reverse, Left);
+}
+
+void cel_mat4_proj_rev_inf_lh_fovy(float *_result,
+                                   float _fovy,
+                                   float _aspect,
+                                   float _near,
+                                   bool _oglNdc) {
+    cel_mat4_proj_inf_impl_fovy(_result, _fovy,
+                                _aspect, _near,
+                                _oglNdc, Reverse, Left);
+}
+
+void cel_mat4_proj_rev_inf_rh(float *_result,
+                              float _ut,
+                              float _dt,
+                              float _lt,
+                              float _rt,
+                              float _near,
+                              bool _oglNdc) {
+    mat4_proj_inf_impl(_result, _ut, _dt,
+                       _lt, _rt, _near,
+                       _oglNdc, Reverse, Right);
+}
+
+void cel_mat4_proj_rev_inf_rh_fov(float *_result,
+                                  const float *_fov,
+                                  float _near,
+                                  bool _oglNdc) {
+    cel_mat4_proj_inf_iml_fov(_result, _fov, _near,
+                              _oglNdc, Reverse, Right);
+}
+
+void cel_mat4_proj_rev_inf_rh_fovy(float *_result,
+                                   float _fovy,
+                                   float _aspect,
+                                   float _near,
+                                   bool _oglNdc) {
+    cel_mat4_proj_inf_impl_fovy(_result, _fovy,
+                                _aspect, _near,
+                                _oglNdc, Reverse, Right);
+}
+
+

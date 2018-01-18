@@ -8,14 +8,14 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#define CEL_PI 3.1415926535897932384626433832795f
-#define CEL_PI2  6.2831853071795864769252867665590f
-#define CEL_INV_PI  (1.0f / CEL_PI)
-#define CEL_PI_HALF  1.5707963267948966192313216916398f
-#define CEL_SQRT2  1.4142135623730950488016887242097f
-#define CEL_INV_LOG_NAT_2  1.4426950408889634073599246810019f
-#define CEL_DEG_TO_RAD  (CEL_PI / 180.0f)
-#define CEL_RAD_TO_DEG  (180.0f / CEL_PI)
+#define CEL_PI             (3.1415926535897932384626433832795f)
+#define CEL_PI2            (6.2831853071795864769252867665590f)
+#define CEL_INV_PI         (1.0f / CEL_PI)
+#define CEL_PI_HALF        (1.5707963267948966192313216916398f)
+#define CEL_SQRT2          (1.4142135623730950488016887242097f)
+#define CEL_INV_LOG_NAT_2  (1.4426950408889634073599246810019f)
+#define CEL_DEG_TO_RAD     (CEL_PI / 180.0f)
+#define CEL_RAD_TO_DEG     (180.0f / CEL_PI)
 
 #if CEL_COMPILER_MSVC
 #define HUGEE = float(HUGE_VAL);
@@ -381,11 +381,9 @@ void cel_mat4_mul(float *result,
 void cel_mat4_transpose(float *result,
                         const float *a);
 
-/// Convert LH to RH projection matrix and vice versa.
 void cel_mat4_proj_flip_handedness(float *dst,
                                    const float *src);
 
-/// Convert LH to RH view matrix and vice versa.
 void cel_mat4_view_flip_handedness(float *dst,
                                    const float *src);
 
@@ -464,144 +462,100 @@ void cel_mat4_ortho_rh(float *result,
 
 
 void cel_mat4_proj(float *result,
-               float ut,
-               float dt,
-               float lt,
-               float rt,
-               float near,
-               float far,
-               bool oglNdc);
-
-
-void cel_mat4_proj(float *result,
-               const float *fov,
-               float near,
-               float far,
-               bool oglNdc);
-
-
-void cel_mat4_proj(float *result,
-               float fovy,
-               float aspect,
-               float near,
-               float far,
-               bool oglNdc);
-
-
-void cel_mat4_proj_lh(float *result,
-                  float ut,
-                  float dt,
-                  float lt,
-                  float rt,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-
-void cel_mat4_proj_lh(float *result,
-                  const float *fov,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-void cel_mat4_proj_lh(float *result,
-                  float fovy,
-                  float aspect,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-
-void cel_mat4_proj_rh(float *result,
-                  float ut,
-                  float dt,
-                  float lt,
-                  float rt,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-void cel_mat4_proj_rh(float *result,
-                  const float *fov,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-void cel_mat4_proj_rh(float *result,
-                  float fovy,
-                  float aspect,
-                  float near,
-                  float far,
-                  bool oglNdc);
-
-
-void cel_mat4_proj_inf(float *result,
-                   const float *fov,
-                   float near,
-                   bool oglNdc);
-
-
-void cel_mat4_proj_inf(float *result,
                    float ut,
                    float dt,
                    float lt,
                    float rt,
                    float near,
+                   float far,
                    bool oglNdc);
+
+
+void cel_mat4_proj_fov(float *result,
+                       const float *fov,
+                       float near,
+                       float far,
+                       bool oglNdc);
+
+
+void cel_mat4_proj_fovy(float *result,
+                        float fovy,
+                        float aspect,
+                        float near,
+                        float far,
+                        bool oglNdc);
+
+
+void cel_mat4_proj_lh(float *result,
+                      float ut,
+                      float dt,
+                      float lt,
+                      float rt,
+                      float near,
+                      float far,
+                      bool oglNdc);
+
+
+void cel_mat4_proj_lh_fov(float *result,
+                          const float *fov,
+                          float near,
+                          float far,
+                          bool oglNdc);
+
+void cel_mat4_proj_lh_fovy(float *result,
+                           float fovy,
+                           float aspect,
+                           float near,
+                           float far,
+                           bool oglNdc);
+
+
+void cel_mat4_proj_rh(float *result,
+                      float ut,
+                      float dt,
+                      float lt,
+                      float rt,
+                      float near,
+                      float far,
+                      bool oglNdc);
+
+void cel_mat4_proj_rh_fov(float *result,
+                          const float *fov,
+                          float near,
+                          float far,
+                          bool oglNdc);
+
+void cel_mat4_proj_rh_fovy(float *result,
+                           float fovy,
+                           float aspect,
+                           float near,
+                           float far,
+                           bool oglNdc);
+
+
+void cel_mat4_proj_inf_fov(float *result,
+                           const float *fov,
+                           float near,
+                           bool oglNdc);
 
 
 void cel_mat4_proj_inf(float *result,
-                   float fovy,
-                   float aspect,
-                   float near,
-                   bool oglNdc);
+                       float ut,
+                       float dt,
+                       float lt,
+                       float rt,
+                       float near,
+                       bool oglNdc);
+
+
+void cel_mat4_proj_inf_fovy(float *result,
+                            float fovy,
+                            float aspect,
+                            float near,
+                            bool oglNdc);
 
 
 void cel_mat4_proj_inf_lh(float *result,
-                      float ut,
-                      float dt,
-                      float lt,
-                      float rt,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_inf_lh(float *result,
-                      const float *fov,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_inf_lh(float *result,
-                      float fovy,
-                      float aspect,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_inf_rh(float *result,
-                      float ut,
-                      float dt,
-                      float lt,
-                      float rt,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_inf_rh(float *result,
-                      const float *fov,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_inf_rh(float *result,
-                      float fovy,
-                      float aspect,
-                      float near,
-                      bool oglNdc);
-
-
-void cel_mat4_proj_rev_inf_lh(float *result,
                           float ut,
                           float dt,
                           float lt,
@@ -610,20 +564,20 @@ void cel_mat4_proj_rev_inf_lh(float *result,
                           bool oglNdc);
 
 
-void cel_mat4_proj_rev_inf_lh(float *result,
-                          const float *fov,
-                          float near,
-                          bool oglNdc);
+void cel_mat4_proj_inf_lh_fov(float *result,
+                              const float *fov,
+                              float near,
+                              bool oglNdc);
 
 
-void cel_mat4_proj_rev_inf_lh(float *result,
-                          float fovy,
-                          float aspect,
-                          float near,
-                          bool oglNdc);
+void cel_mat4_proj_inf_lh_fovy(float *result,
+                               float fovy,
+                               float aspect,
+                               float near,
+                               bool oglNdc);
 
 
-void cel_mat4_proj_rev_inf_rh(float *result,
+void cel_mat4_proj_inf_rh(float *result,
                           float ut,
                           float dt,
                           float lt,
@@ -631,16 +585,60 @@ void cel_mat4_proj_rev_inf_rh(float *result,
                           float near,
                           bool oglNdc);
 
-void cel_mat4_proj_rev_inf_rh(float *result,
-                          const float *fov,
-                          float near,
-                          bool oglNdc);
+
+void cel_mat4_proj_inf_rh_fov(float *result,
+                              const float *fov,
+                              float near,
+                              bool oglNdc);
+
+
+void cel_mat4_proj_inf_rh_fovy(float *result,
+                               float fovy,
+                               float aspect,
+                               float near,
+                               bool oglNdc);
+
+
+void cel_mat4_proj_rev_inf_lh(float *result,
+                              float ut,
+                              float dt,
+                              float lt,
+                              float rt,
+                              float near,
+                              bool oglNdc);
+
+
+void cel_mat4_proj_rev_inf_lh_fov(float *result,
+                                  const float *fov,
+                                  float near,
+                                  bool oglNdc);
+
+
+void cel_mat4_proj_rev_inf_lh_fovy(float *result,
+                                   float fovy,
+                                   float aspect,
+                                   float near,
+                                   bool oglNdc);
+
 
 void cel_mat4_proj_rev_inf_rh(float *result,
-                          float fovy,
-                          float aspect,
-                          float near,
-                          bool oglNdc);
+                              float ut,
+                              float dt,
+                              float lt,
+                              float rt,
+                              float near,
+                              bool oglNdc);
+
+void cel_mat4_proj_rev_inf_rh_fov(float *result,
+                                  const float *fov,
+                                  float near,
+                                  bool oglNdc);
+
+void cel_mat4_proj_rev_inf_rh_fovy(float *result,
+                                   float fovy,
+                                   float aspect,
+                                   float near,
+                                   bool oglNdc);
 
 #ifdef __cplusplus
 }

@@ -10,9 +10,10 @@
 #include <cetech/os/vio.h>
 #include <cetech/yaml/ydb.h>
 #include <cetech/filesystem/filesystem.h>
-#include <celib/fpumath.h>
+
 #include <cetech/os/watchdog.h>
 #include <cetech/os/path.h>
+#include <celib/fmath.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
