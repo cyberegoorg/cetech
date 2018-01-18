@@ -10,9 +10,10 @@
 #include <cetech/os/vio.h>
 #include <cetech/yaml/ydb.h>
 #include <cetech/filesystem/filesystem.h>
-#include <celib/fpumath.h>
+
 #include <cetech/os/watchdog.h>
 #include <cetech/os/path.h>
+#include <celib/fmath.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -270,7 +271,7 @@ void get_vec3(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        vec3_move(v, defaultt);
+        cel_vec3_move(v, defaultt);
         return;
     }
 
@@ -287,7 +288,7 @@ void get_vec4(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        vec4_move(v, defaultt);
+        cel_vec4_move(v, defaultt);
         return;
     }
 
@@ -304,7 +305,7 @@ void get_mat4(const char *path,
                                                 keys_count);
 
     if (0 == n.idx) {
-        mat4_move(v, defaultt);
+        cel_mat4_move(v, defaultt);
         return;
     }
 

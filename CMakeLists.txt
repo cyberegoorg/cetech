@@ -156,13 +156,13 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_history.cpp
         src/cetech/playground/private/log_view.cpp
         src/cetech/playground/private/action_manager.c
-        )
+        src/celib/private/fmath.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES})
+        ${SOURCE_FILES} src/celib/private/fmath.c)
 
 ################################################################################
 # Release sources

@@ -2,6 +2,7 @@
 #include <cetech/scenegraph/scenegraph.h>
 #include <celib/array.h>
 #include <celib/hash.h>
+#include <celib/fmath.h>
 #include "cetech/config/config.h"
 #include "cetech/resource/resource.h"
 #include "cetech/os/memory.h"
@@ -9,7 +10,7 @@
 #include "celib/map.inl"
 
 
-#include "celib/fpumath.h"
+
 #include "cetech/module/module.h"
 
 
@@ -169,16 +170,16 @@ static void transform(ct_scene_node node,
     float sm[16];
     float m[16];
 
-    celib::mat4_quat(rm, rot);
-    celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
+    cel_mat4_quat(rm, rot);
+    cel_mat4_scale(sm, sca[0], sca[1], sca[2]);
 
-    mat4_mul(m, rm, sm);
+    cel_mat4_mul(m, rm, sm);
 
     m[4 * 3 + 0] = pos[0];
     m[4 * 3 + 1] = pos[1];
     m[4 * 3 + 2] = pos[2];
 
-    celib::mat4_mul(&world_inst->world_matrix[16 * node.idx], m, parent);
+    cel_mat4_mul(&world_inst->world_matrix[16 * node.idx], m, parent);
 
     uint32_t child = world_inst->first_child[node.idx];
 
@@ -236,10 +237,10 @@ static void set_position(ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
-    vec3_move(&world_inst->position[3 * node.idx], pos);
+    cel_vec3_move(&world_inst->position[3 * node.idx], pos);
 
     transform(node, p);
 }
@@ -257,12 +258,12 @@ static void set_rotation(ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
     float nq[4];
-    celib::quat_norm(nq, rot);
-    celib::quat_move(&world_inst->rotation[4 * node.idx], nq);
+    cel_quat_norm(nq, rot);
+    cel_quat_move(&world_inst->rotation[4 * node.idx], nq);
 
     transform(node, p);
 }
@@ -280,10 +281,10 @@ static void set_scale(ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
-    vec3_move(&world_inst->scale[3 * node.idx], scale);
+    cel_vec3_move(&world_inst->scale[3 * node.idx], scale);
 
     transform(node, p);
 }
@@ -334,21 +335,21 @@ static ct_scene_node create(ct_world world,
         float rotation[4];
         float scale[3] = {1.0f, 1.0f, 1.0f};
 
-        celib::quat_identity(rotation);
+        cel_quat_identity(rotation);
 
         data->entity[idx] = entity;
         data->name[idx] = names[i];
 
-        celib::vec3_move(&data->position[3 * idx], position);
-        celib::quat_move(&data->rotation[4 * idx], rotation);
-        celib::vec3_move(&data->scale[3 * idx], scale);
+        cel_vec3_move(&data->position[3 * idx], position);
+        cel_quat_move(&data->rotation[4 * idx], rotation);
+        cel_vec3_move(&data->scale[3 * idx], scale);
 
         data->parent[idx] = UINT32_MAX;
         data->first_child[idx] = UINT32_MAX;
         data->next_sibling[idx] = UINT32_MAX;
 
         float m[16];
-        celib::mat4_identity(m);
+        cel_mat4_identity(m);
         memcpy(&data->world_matrix[16 * idx], m, sizeof(float) * 16);
 
         ct_scene_node t = {.idx = idx, .world = world};
@@ -357,7 +358,7 @@ static ct_scene_node create(ct_world world,
         if (parent[i] != UINT32_MAX) {
             get_world_matrix(nodes[parent[i]], p);
         } else {
-            celib::mat4_identity(p);
+            cel_mat4_identity(p);
         }
         transform(t, p);
 
@@ -405,7 +406,7 @@ static void link(ct_scene_node parent,
     if (parent.idx != UINT32_MAX) {
         get_world_matrix(parent, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
     transform(parent, p);
 

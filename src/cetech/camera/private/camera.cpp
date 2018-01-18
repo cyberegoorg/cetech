@@ -7,12 +7,13 @@
 #include <cetech/macros.h>
 #include <celib/array.h>
 #include <celib/hash.h>
+#include <celib/fmath.h>
 
 #include "cetech/hashlib/hashlib.h"
 #include "cetech/config/config.h"
 #include "cetech/os/memory.h"
 #include "cetech/api/api_system.h"
-#include "celib/fpumath.h"
+
 #include "cetech/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -22,8 +23,6 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
-
-using namespace celib;
 
 uint64_t combine(uint32_t a,
                  uint32_t b) {
@@ -194,14 +193,13 @@ static void get_project_view(ct_camera camera,
     float near = world_inst->near[camera.idx];
     float far = world_inst->far[camera.idx];
 
-    celib::mat4_proj(proj, fov, float(width) / float(height), near, far,
-                     true);
+    cel_mat4_proj_fovy(proj, fov, float(width) / float(height), near, far, true);
 
     float w[16];
     ct_transform_a0.get_world_matrix(t, w);
 
-    //celib::mat4_move(view, w);
-    celib::mat4_inverse(view, w);
+    //cel_mat4_move(view, w);
+    cel_mat4_inverse(view, w);
 }
 
 static int has(ct_world world,

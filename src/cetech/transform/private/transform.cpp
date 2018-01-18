@@ -12,7 +12,8 @@
 #include <cetech/macros.h>
 #include <celib/array.h>
 #include <celib/hash.h>
-#include "celib/fpumath.h"
+#include <celib/fmath.h>
+
 #include "cetech/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -228,8 +229,8 @@ int _component_compiler(const char *filename,
         ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys), v,
                            (float[3]) {0});
 
-        celib::vec3_mul(v_rad, v, celib::DEG_TO_RAD);
-        celib::quat_from_euler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
+        cel_vec3_mul_s(v_rad, v, CEL_DEG_TO_RAD);
+        cel_quat_from_euler(t_data.rotation, v_rad[0], v_rad[1], v_rad[2]);
     };
 
     cel_array_push_n(*data, (uint8_t *) &t_data, sizeof(t_data), _G.allocator);
@@ -279,7 +280,7 @@ static void _spawner(ct_world world,
     }
 
     float m[16];
-    celib::mat4_identity(m);
+    cel_mat4_identity(m);
 
     for (uint32_t i = 0; i < ent_count; ++i) {
         transform_transform(transform_get(world, ents[cents[i]]), m);
@@ -350,23 +351,23 @@ void transform_transform(ct_transform transform,
     float m[16];
     float euler[3];
 
-    quat_to_euler(euler, rot);
+    cel_quat_to_euler(euler, rot);
 
-//    celib::mat4_quat(rm, rot);
-//    celib::mat4_scale(sm, sca[0], sca[1], sca[2]);
+//    cel_mat4_quat(rm, rot);
+//    cel_mat4_scale(sm, sca[0], sca[1], sca[2]);
 //
-//    celib::mat4_mul(m, sm, rm);
+//    cel_mat4_mul(m, sm, rm);
 
 //    m[4 * 3 + 0] = pos[0];
 //    m[4 * 3 + 1] = pos[1];
 //    m[4 * 3 + 2] = pos[2];
 
-    mtxSRT(m,
-           sca[0], sca[1], sca[2],
-           euler[0], euler[1], euler[2],
-           pos[0], pos[1], pos[2]);
+    cel_mat4_srt(m,
+                 sca[0], sca[1], sca[2],
+                 euler[0], euler[1], euler[2],
+                 pos[0], pos[1], pos[2]);
 
-    celib::mat4_mul(&world_inst->world_matrix[16 * transform.idx], m, parent);
+    cel_mat4_mul(&world_inst->world_matrix[16 * transform.idx], m, parent);
 
     uint32_t child = world_inst->first_child[transform.idx];
 
@@ -384,7 +385,7 @@ void transform_get_position(ct_transform node,
                             float *value) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
-    celib::vec3_move(value, &world_inst->position[3 * node.idx]);
+    cel_vec3_move(value, &world_inst->position[3 * node.idx]);
 }
 
 void transform_get_rotation(ct_transform node,
@@ -392,14 +393,14 @@ void transform_get_rotation(ct_transform node,
 
     WorldInstance *world_inst = _get_world_instance(node.world);
 
-    celib::quat_move(value, &world_inst->rotation[4 * node.idx]);
+    cel_quat_move(value, &world_inst->rotation[4 * node.idx]);
 }
 
 void transform_get_scale(ct_transform node,
                          float *value) {
 
     WorldInstance *world_inst = _get_world_instance(node.world);
-    celib::vec3_move(value, &world_inst->scale[3 * node.idx]);
+    cel_vec3_move(value, &world_inst->scale[3 * node.idx]);
 }
 
 void transform_get_world_matrix(ct_transform node,
@@ -407,7 +408,7 @@ void transform_get_world_matrix(ct_transform node,
     WorldInstance *world_inst = _get_world_instance(node.world);
 
 
-    if(node.idx == UINT32_MAX) {
+    if (node.idx == UINT32_MAX) {
         return;
     }
 
@@ -428,10 +429,10 @@ void transform_set_position(ct_transform node,
     if (parent_idx != UINT32_MAX) {
         transform_get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
-    vec3_move(&world_inst->position[3 * node.idx], pos);
+    cel_vec3_move(&world_inst->position[3 * node.idx], pos);
 
     transform_transform(node, p);
 }
@@ -449,12 +450,12 @@ void transform_set_rotation(ct_transform node,
     if (parent_idx != UINT32_MAX) {
         transform_get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
     float nq[4];
-    celib::quat_norm(nq, rot);
-    celib::quat_move(&world_inst->rotation[4 * node.idx], nq);
+    cel_quat_norm(nq, rot);
+    cel_quat_move(&world_inst->rotation[4 * node.idx], nq);
 
     transform_transform(node, p);
 }
@@ -472,10 +473,10 @@ void transform_set_scale(ct_transform node,
     if (parent_idx != UINT32_MAX) {
         transform_get_world_matrix(pt, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
 
-    vec3_move(&world_inst->scale[3 * node.idx], scale);
+    cel_vec3_move(&world_inst->scale[3 * node.idx], scale);
 
     transform_transform(node, p);
 }
@@ -512,16 +513,16 @@ ct_transform transform_create(ct_world world,
 
     data->entity[idx] = entity;
 
-    celib::vec3_move(&data->position[3 * idx], position);
-    celib::quat_move(&data->rotation[4 * idx], rotation);
-    celib::vec3_move(&data->scale[3 * idx], scale);
+    cel_vec3_move(&data->position[3 * idx], position);
+    cel_quat_move(&data->rotation[4 * idx], rotation);
+    cel_vec3_move(&data->scale[3 * idx], scale);
 
     data->parent[idx] = UINT32_MAX;
     data->first_child[idx] = UINT32_MAX;
     data->next_sibling[idx] = UINT32_MAX;
 
     float m[16];
-    celib::mat4_identity(m);
+    cel_mat4_identity(m);
     memcpy(&data->world_matrix[16 * idx], m, sizeof(float) * 16);
 
     ct_transform t = {.idx = idx, .world=world};
@@ -530,7 +531,7 @@ ct_transform transform_create(ct_world world,
     if (parent.h != UINT32_MAX) {
         transform_get_world_matrix(transform_get(world, parent), p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
     transform_transform(t, p);
 
@@ -580,7 +581,7 @@ void transform_link(ct_world world,
     if (parent_tr.idx != UINT32_MAX) {
         transform_get_world_matrix(parent_tr, p);
     } else {
-        celib::mat4_identity(p);
+        cel_mat4_identity(p);
     }
     transform_transform(parent_tr, p);
 

@@ -21,7 +21,7 @@
 #include <cetech/entity/entity.h>
 #include <cetech/transform/transform.h>
 #include <cfloat>
-#include <celib/fpumath.h>
+
 #include <cetech/yaml/ydb.h>
 #include <cetech/playground/asset_preview.h>
 #include <cetech/renderer/mesh_renderer.h>

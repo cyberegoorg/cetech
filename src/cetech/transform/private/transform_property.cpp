@@ -21,9 +21,10 @@
 #include <cetech/entity/entity.h>
 #include <cetech/transform/transform.h>
 #include <cfloat>
-#include <celib/fpumath.h>
+
 #include <cetech/yaml/ydb.h>
 #include <cetech/playground/command_system.h>
+#include <celib/fmath.h>
 
 using namespace celib;
 using namespace buffer;
@@ -124,9 +125,9 @@ static void set_rotation_cmd(const struct ct_cmd *cmd,
     float rad_rot[3];
     float norm_rot[3];
     float q[4];
-    vec3_mul(rad_rot, value, DEG_TO_RAD);
-    quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
-    quat_norm(norm_rot, q);
+    cel_vec3_mul_s(rad_rot, value, CEL_DEG_TO_RAD);
+    cel_quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
+    cel_quat_norm(norm_rot, q);
 
     ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
                                          pos_cmd->ent.entity);
@@ -200,7 +201,7 @@ static void on_component(struct ct_world world,
     ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1,
                        pos_new, (float[3]) {0.0f});
 
-    vec3_move(pos, pos_new);
+    cel_vec3_move(pos, pos_new);
 
     if (ct_debugui_a0.DragFloat3("position", pos_new, 1.0f, -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
@@ -232,15 +233,15 @@ static void on_component(struct ct_world world,
     float tmp_rot[3];
 
     ct_transform_a0.get_rotation(t, rot);
-    quat_norm(norm_rot, rot);
-    quat_to_euler(rot, norm_rot);
-    vec3_mul(tmp_rot, rot, RAD_TO_DEG);
+    cel_quat_norm(norm_rot, rot);
+    cel_quat_to_euler(rot, norm_rot);
+    cel_vec3_mul_s(tmp_rot, rot, CEL_RAD_TO_DEG);
 
     tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
     ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, tmp_rot,
                        (float[3]) {0.0f});
 
-    vec3_move(rot, tmp_rot);
+    cel_vec3_move(rot, tmp_rot);
     if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f",
                                  1.0f)) {
 
@@ -271,7 +272,7 @@ static void on_component(struct ct_world world,
     ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, scale_new,
                        (float[3]) {1.0f});
 
-    vec3_move(scale, scale_new);
+    cel_vec3_move(scale, scale_new);
     if (ct_debugui_a0.DragFloat3("scale", scale_new, 1.0f,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
