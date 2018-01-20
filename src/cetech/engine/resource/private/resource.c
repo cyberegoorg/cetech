@@ -17,7 +17,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/engine/resource/package.h>
 #include <cetech/core/module/module.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
 #include <cetech/core/containers/buffer.h>
 

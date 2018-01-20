@@ -30,7 +30,7 @@
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>

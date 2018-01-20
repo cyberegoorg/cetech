@@ -97,7 +97,7 @@ set(SOURCE_FILES
         src/cetech/engine/filesystem/private/filesystem.cpp
         src/cetech/core/yaml/private/yamlng.c
         src/cetech/core/yaml/private/ydb.cpp
-        src/cetech/engine/coredb/private/coredb.c
+        src/cetech/core/coredb/private/coredb.c
 
         src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/engine/debugui/private/ocornut-imgui/imgui.cpp

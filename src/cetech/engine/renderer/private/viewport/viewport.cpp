@@ -33,7 +33,7 @@
 #include "bgfx/platform.h"
 
 #include <cetech/engine/renderer/viewport.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/core/containers/hash.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"

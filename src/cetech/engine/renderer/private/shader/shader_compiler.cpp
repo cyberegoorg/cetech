@@ -16,7 +16,7 @@
 #include "cetech/core/hashlib/hashlib.h"
 #include <cetech/engine/config/config.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include "cetech/core/memory/memory.h"
 
 #include "cetech/engine/machine/machine.h"

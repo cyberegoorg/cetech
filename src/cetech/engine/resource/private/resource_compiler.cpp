@@ -22,7 +22,7 @@
 #include <cetech/core/containers/map.inl>
 #include <cetech/engine/filesystem/filesystem.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/buffer.h>

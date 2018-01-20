@@ -610,7 +610,7 @@ bool parse_yaml(struct ct_alloc *alloc,
     ct_array_push(parent_stack, (struct parent_stack_state) {}, _G.allocator);
 
     uint8_t *source_data = CT_ALLOC(alloc, uint8_t,
-                                       vio->size(vio) + 1);
+                                    vio->size(vio) + 1);
     memset(source_data, 0, vio->size(vio) + 1);
     vio->read(vio, source_data, sizeof(char), vio->size(vio));
 
@@ -1156,16 +1156,16 @@ struct ct_yng_doc *from_vio(struct ct_vio *vio,
                             struct ct_alloc *alloc) {
 
     struct ct_yng_doc *d = CT_ALLOC(alloc,
-                                       struct ct_yng_doc,
-                                       sizeof(struct ct_yng_doc));
+                                    struct ct_yng_doc,
+                                    sizeof(struct ct_yng_doc));
 
     if (!d) {
         return NULL;
     }
 
     struct yamlng_document_inst *d_inst = CT_ALLOC(alloc,
-                                                      struct yamlng_document_inst,
-                                                      sizeof(struct yamlng_document_inst));
+                                                   struct yamlng_document_inst,
+                                                   sizeof(struct yamlng_document_inst));
 
     if (!d_inst) {
         return NULL;

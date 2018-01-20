@@ -17,7 +17,7 @@ struct ct_hash_t {
 
 
 static void ct_hash_free(struct ct_hash_t *hash,
-                         struct ct_alloc *allocator) {
+                         const struct ct_alloc *allocator) {
     ct_array_free(hash->keys, allocator);
     ct_array_free(hash->values, allocator);
     hash->n = 0;
@@ -64,7 +64,7 @@ static bool ct_hash_contain(const struct ct_hash_t *hash,
 static void ct_hash_add(struct ct_hash_t *hash,
                         uint64_t k,
                         uint64_t value,
-                        struct ct_alloc *allocator) {
+                        const struct ct_alloc *allocator) {
     if (!hash->n) {
         hash->n = 16;
         ct_array_set_capacity(hash->keys, hash->n, allocator);
@@ -113,9 +113,27 @@ static void ct_hash_remove(struct ct_hash_t *hash,
     }
 }
 
+static void ct_hash_clone(const struct ct_hash_t *from,
+                          struct ct_hash_t *to,
+                          const struct ct_alloc *alloc) {
+    struct ct_hash_t tmp_hash = {0};
+    tmp_hash.n = from->n;
+
+    if (tmp_hash.n) {
+        ct_array_resize(tmp_hash.values, tmp_hash.n, alloc);
+        ct_array_resize(tmp_hash.keys, tmp_hash.n, alloc);
+
+        memcpy(tmp_hash.keys, from->keys, sizeof(uint64_t) * tmp_hash.n);
+        memcpy(tmp_hash.values, from->values, sizeof(uint64_t) * tmp_hash.n);
+    }
+    *to = tmp_hash;
+}
+
 static void *_2 = (void *) &ct_hash_contain; // UNUSED
 static void *_3 = (void *) &ct_hash_add; // UNUSED
 static void *_4 = (void *) &ct_hash_free; // UNUSED
 static void *_5 = (void *) &ct_hash_remove; // UNUSED
+static void *_6 = (void *) &ct_hash_clone; // UNUSED
+static void *_7 = (void *) &ct_hash_lookup; // UNUSED
 
 #endif //CETECH_HASHH_H

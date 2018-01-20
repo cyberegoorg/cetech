@@ -69,7 +69,7 @@ struct ct_array_header_t {
 static void *ct_array_grow(void *a,
                            uint32_t capacity,
                            size_t type_size,
-                           struct ct_alloc *alloc) {
+                           const struct ct_alloc *alloc) {
     if (capacity <= ct_array_capacity(a)) {
         return a;
     }

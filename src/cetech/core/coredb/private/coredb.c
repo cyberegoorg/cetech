@@ -4,10 +4,11 @@
 
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/macros.h>
 #include <cetech/core/memory/allocator.h>
+#include <cetech/core/containers/hash.h>
 
 CETECH_DECL_API(ct_memory_a0);
 
@@ -17,10 +18,11 @@ CETECH_DECL_API(ct_memory_a0);
 #define MAX_OBJECTS 1000000000ULL
 
 struct object {
+    struct ct_hash_t prop_map;
     uint8_t *buffer;
 
     uint64_t *keys;
-    enum ct_coredb_prop_type *type;
+    uint8_t *type;
     uint64_t *offset;
     uint8_t *values;
 
@@ -50,26 +52,27 @@ static uint64_t _object_new_property(struct object *obj,
     const uint64_t new_value_size = values_size + size;
 
     const size_t new_buffer_size = ((sizeof(uint64_t) +
-                                     sizeof(enum ct_coredb_prop_type) +
+                                     sizeof(uint8_t) +
                                      sizeof(uint64_t)) * new_prop_count) +
                                    (sizeof(uint8_t) * new_value_size);
 
-    struct object new_obj = {0};
+    struct object new_obj = {
+            .buffer = CT_ALLOC(alloc, uint8_t, new_buffer_size),
+            .buffer_size = new_buffer_size,
+            .properties_count = new_prop_count,
+            .values_size = new_value_size
+    };
 
-    new_obj.buffer = CT_ALLOC(alloc, uint8_t, new_buffer_size);
-    new_obj.buffer_size = new_buffer_size;
-    new_obj.properties_count = new_prop_count;
-    new_obj.values_size = new_value_size;
+    new_obj.keys = (uint64_t *) new_obj.buffer,
+    new_obj.type = (uint8_t *) (new_obj.keys + new_prop_count),
+    new_obj.offset = (uint64_t *) (new_obj.type + new_prop_count),
+    new_obj.values = (uint8_t *) (new_obj.offset + new_prop_count),
 
-    new_obj.keys = (uint64_t *) new_obj.buffer;
-    new_obj.type = (enum ct_coredb_prop_type *) (new_obj.keys + new_prop_count);
-    new_obj.offset = (uint64_t *) (new_obj.type + new_prop_count);
-    new_obj.values = (uint8_t *) (new_obj.offset + new_prop_count);
+    ct_hash_clone(&obj->prop_map, &new_obj.prop_map, alloc);
 
     memcpy(new_obj.keys, obj->keys, sizeof(uint64_t) * prop_count);
-    memcpy(new_obj.type, obj->type,
-           sizeof(enum ct_coredb_prop_type) * prop_count);
     memcpy(new_obj.offset, obj->offset, sizeof(uint64_t) * prop_count);
+    memcpy(new_obj.type, obj->type, sizeof(uint8_t) * prop_count);
     memcpy(new_obj.values, obj->values, sizeof(uint8_t) * values_size);
 
     new_obj.keys[prop_count] = key;
@@ -80,6 +83,8 @@ static uint64_t _object_new_property(struct object *obj,
 
     CT_FREE(alloc, obj->buffer);
 
+    ct_hash_add(&new_obj.prop_map, key, prop_count, alloc);
+
     *obj = new_obj;
 
     return prop_count;
@@ -87,7 +92,7 @@ static uint64_t _object_new_property(struct object *obj,
 
 struct object *_new_object(const struct ct_alloc *a) {
     struct object *obj = CT_ALLOC(a, struct object, sizeof(struct object));
-    *obj = (struct object) {0};
+    *obj = (struct object) {{0}};
 
     _object_new_property(obj, 0, COREDB_TYPE_NONE, NULL, 0, a);
 
@@ -108,28 +113,19 @@ static struct object *_object_clone(struct object *obj,
     new_obj->values_size = values_size;
 
     new_obj->keys = (uint64_t *) new_obj->buffer;
-    new_obj->type = (enum ct_coredb_prop_type *) (new_obj->keys +
-                                                  properties_count);
+    new_obj->type = (uint8_t *) (new_obj->keys + properties_count);
     new_obj->offset = (uint64_t *) (new_obj->type + properties_count);
     new_obj->values = (uint8_t *) (new_obj->offset + properties_count);
 
     memcpy(new_obj->buffer, obj->buffer, sizeof(uint8_t) * buffer_size);
+    ct_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
 
     return new_obj;
 }
 
-static uint64_t _find_prop_index(uint64_t key,
-                                 const uint64_t *keys,
-                                 size_t size) {
-    for (uint64_t i = 1; i < size; ++i) {
-        if (keys[i] != key) {
-            continue;
-        }
-
-        return i;
-    }
-
-    return 0;
+static uint64_t _find_prop_index(const struct object *obj,
+                                 uint64_t key) {
+    return ct_hash_lookup(&obj->prop_map, key, 0);
 }
 
 static struct ct_coredb_object_t *create_object() {
@@ -151,8 +147,8 @@ struct writer_t {
 
 static struct ct_coredb_writer_t *write_begin(struct ct_coredb_object_t *obj) {
     struct writer_t *writer = CT_ALLOC(ct_memory_a0.main_allocator(),
-                                           struct writer_t,
-                                           sizeof(struct writer_t));
+                                       struct writer_t,
+                                       sizeof(struct writer_t));
 
     writer->clone_obj = _object_clone(*(struct object **) (obj),
                                       ct_memory_a0.main_allocator());
@@ -174,7 +170,7 @@ static void set_float(struct ct_coredb_writer_t *_writer,
 
     struct object *obj = writer->clone_obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_FLOAT, &value,
                                    sizeof(float),
@@ -193,7 +189,7 @@ static void set_string(struct ct_coredb_writer_t *_writer,
 
     struct object *obj = writer->clone_obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property,
                                    COREDB_TYPE_STRPTR,
@@ -215,7 +211,7 @@ static void set_uint32(struct ct_coredb_writer_t *_writer,
 
     struct object *obj = writer->clone_obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_UINT32, &value,
                                    sizeof(uint32_t),
@@ -232,7 +228,7 @@ static void set_ptr(struct ct_coredb_writer_t *_writer,
 
     struct object *obj = writer->clone_obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_PTR, &value,
                                    sizeof(uint32_t),
@@ -247,14 +243,14 @@ static bool prop_exist(struct ct_coredb_object_t *_object,
                        uint64_t key) {
     struct object *obj = *(struct object **) _object;
 
-    return _find_prop_index(key, obj->keys, obj->properties_count) > 0;
+    return _find_prop_index(obj, key) > 0;
 }
 
 static enum ct_coredb_prop_type prop_type(struct ct_coredb_object_t *_object,
                                           uint64_t key) {
     struct object *obj = *(struct object **) _object;
 
-    uint64_t idx = _find_prop_index(key, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, key);
 
     return idx ? obj->type[idx] : COREDB_TYPE_NONE;
 }
@@ -264,7 +260,7 @@ static float read_float(struct ct_coredb_object_t *_obj,
                         float defaultt) {
     struct object *obj = *(struct object **) _obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(float *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
@@ -273,7 +269,7 @@ static const char *read_string(struct ct_coredb_object_t *_obj,
                                const char *defaultt) {
     struct object *obj = *(struct object **) _obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
@@ -282,7 +278,7 @@ static uint32_t read_uint32(struct ct_coredb_object_t *_obj,
                             uint32_t defaultt) {
     struct object *obj = *(struct object **) _obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
@@ -291,7 +287,7 @@ static void *read_ptr(struct ct_coredb_object_t *_obj,
                       void *defaultt) {
     struct object *obj = *(struct object **) _obj;
 
-    uint64_t idx = _find_prop_index(property, obj->keys, obj->properties_count);
+    uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
 }
 

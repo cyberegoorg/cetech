@@ -17,7 +17,7 @@
 #include <cetech/core/hashlib/hashlib.h>
 #include <cetech/core/containers/map.inl>
 #include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
 
 #include "cetech/core/log/log.h"

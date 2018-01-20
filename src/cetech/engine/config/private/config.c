@@ -13,7 +13,7 @@
 #include <cetech/engine/config/config.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/yaml/yamlng.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/core/macros.h>
 
 

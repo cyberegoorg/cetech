@@ -22,7 +22,7 @@
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/core/api/private/api_private.h>
 
 #include "bgfx/platform.h"

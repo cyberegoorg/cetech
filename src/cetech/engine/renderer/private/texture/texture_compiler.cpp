@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <cetech/engine/config/config.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/coredb/coredb.h>
+#include <cetech/core/coredb/coredb.h>
 #include <cetech/core/containers/array.h>
 #include "cetech/core/containers/buffer.h"
 #include "texture_blob.h"
