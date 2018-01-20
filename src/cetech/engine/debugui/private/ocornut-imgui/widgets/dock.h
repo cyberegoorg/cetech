@@ -1,5 +1,5 @@
 
-#include <cetech/core/buffer.inl>
+#include <cetech/core/buffer.h>
 #include <cetech/core/private/ydb.h>
 #include <cetech/core/private/yamlng.h>
 
@@ -26,7 +26,7 @@ namespace ImGui {
     IMGUI_API void SetDockActive();
 
     ///
-    IMGUI_API void saveToYaml(celib::Buffer &buffer);
+    IMGUI_API void saveToYaml(char** buffer, ct_alloc* alloc);
 
     IMGUI_API void loadFromYaml(const char *file,
                                 ct_ydb_a0 *ydb,

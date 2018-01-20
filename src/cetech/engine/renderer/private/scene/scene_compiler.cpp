@@ -498,7 +498,8 @@ static int _compile_assimp(const char *filename,
     capi->add_dependency(filename, input_str);
 
     const char *source_dir = ct_resource_a0.compiler_get_source_dir();
-    char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
+    char *input_path = NULL;
+    ct_path_a0.join(&input_path, a, 2, source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 

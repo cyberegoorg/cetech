@@ -25,12 +25,10 @@
 #include <cetech/engine/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
 #include <cetech/core/array.h>
-
-#include "cetech/core/buffer.inl"
+#include <cetech/core/buffer.h>
 
 
 using namespace celib;
-using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -173,7 +171,7 @@ static void _compile_task(void *data) {
                 CT_ID64_0("build"),
                 tdata->build_filename, FS_OPEN_WRITE);
 
-        CT_FREE(ct_memory_a0.main_allocator(), tdata->build_filename);
+        ct_buffer_free(tdata->build_filename, ct_memory_a0.main_allocator());
 
         if (build_vio == NULL) {
             goto end;
@@ -236,10 +234,12 @@ void _compile_files(ct_task_item **tasks,
 
         builddb_set_file_hash(files[i], build_name);
 
-        char *build_full = ct_path_a0.join(
-                ct_memory_a0.main_allocator(), 2,
-                ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""),
-                build_name);
+        char *build_full = NULL;
+        ct_path_a0.join(&build_full,
+                        ct_memory_a0.main_allocator(), 2,
+                        ct_coredb_a0.read_string(_G.config,
+                                                 CONFIG_KERNEL_PLATFORM, ""),
+                        build_name);
 
         struct compile_task_data *data = CT_ALLOC(_G.allocator,
                                                   struct compile_task_data,
@@ -357,7 +357,9 @@ char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
 
-    return ct_path_a0.join(alocator, 2, build_dir, "tmp");
+    char *buffer = NULL;
+    ct_path_a0.join(&buffer, alocator, 2, build_dir, "tmp");
+    return buffer;
 }
 
 char *resource_compiler_external_join(ct_alloc *alocator,
@@ -366,18 +368,19 @@ char *resource_compiler_external_join(ct_alloc *alocator,
                                                             CONFIG_EXTERNAL_DIR,
                                                             "");
 
-    char *tmp_dir = ct_path_a0.join(alocator, 2, external_dir_str,
-                                    ct_coredb_a0.read_string(_G.config,
-                                                             CONFIG_KERNEL_PLATFORM,
-                                                             ""));
+    char *tmp_dir = NULL;
+    ct_path_a0.join(&tmp_dir, alocator, 2, external_dir_str,
+                    ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
-    celib::Buffer buffer(alocator);
-    buffer::printf(buffer, "%s64", tmp_dir);
-    CT_FREE(alocator, tmp_dir);
+    char* buffer = NULL;
+    ct_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
+    ct_buffer_free(tmp_dir, alocator);
 
-    buffer::c_str(buffer);
-    return ct_path_a0.join(alocator, 4,
-                           buffer::c_str(buffer), "release", "bin", name);
+    char* result = NULL;
+    ct_path_a0.join(&result, alocator, 4, buffer, "release", "bin", name);
+    ct_buffer_free(buffer, alocator);
+
+    return result;
 }
 
 
@@ -497,13 +500,14 @@ static void _init(ct_api_a0 *api) {
     ct_path_a0.make_path(build_dir_full);
     builddb_init_db(build_dir_full, &ct_path_a0, &ct_memory_a0);
 
-    char *tmp_dir_full = ct_path_a0.join(ct_memory_a0.main_allocator(), 2,
+    char *tmp_dir_full = NULL;
+    ct_path_a0.join(&tmp_dir_full, ct_memory_a0.main_allocator(), 2,
                                          build_dir_full, "tmp");
 
     ct_path_a0.make_path(tmp_dir_full);
 
-    CT_FREE(ct_memory_a0.main_allocator(), tmp_dir_full);
-    CT_FREE(ct_memory_a0.main_allocator(), build_dir_full);
+    ct_buffer_free(tmp_dir_full, ct_memory_a0.main_allocator());
+    ct_buffer_free(build_dir_full, ct_memory_a0.main_allocator());
 
     const char *core_dir = ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR,
                                                     "");

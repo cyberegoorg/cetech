@@ -27,7 +27,7 @@
 
 #include <new> // placement new
 
-#include <cetech/core/buffer.inl>
+#include <cetech/core/buffer.h>
 #include <cetech/macros.h>
 static const char *DOCK_ENTRY_TEMPLATE = "%d: \n"
         "  index: %d\n"
@@ -1024,14 +1024,14 @@ namespace ImGui {
             return idx < 0 ? NULL : m_docks[(int) idx];
         }
 
-        void saveToYaml(celib::Buffer &buffer) {
+        void saveToYaml(char** buffer, ct_alloc* alloc) {
             for (int i = 0; i < m_docks.size(); ++i) {
                 Dock &dock = *m_docks[i];
 
                 const char* label = strlen(dock.label) > 0 ? dock.label : "\"\"";
                 const char* location = strlen(dock.location) > 0 ? dock.location : "\"\"";
 
-                celib::buffer::printf(buffer,
+                ct_buffer_printf(buffer,alloc,
                                       DOCK_ENTRY_TEMPLATE,
                                       i,
                                       i,
@@ -1180,8 +1180,8 @@ namespace ImGui {
         s_dock->setDockActive();
     }
 
-    IMGUI_API void saveToYaml(celib::Buffer& buffer) {
-        s_dock->saveToYaml(buffer);
+    IMGUI_API void saveToYaml(char** buffer, ct_alloc* alloc) {
+        s_dock->saveToYaml(buffer, alloc);
     }
 
     IMGUI_API void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yng_a0* yng) {

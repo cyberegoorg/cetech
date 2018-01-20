@@ -6,7 +6,7 @@
 
 #include "cetech/core/allocator.h"
 #include "cetech/core/map.inl"
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 
 #include "cetech/core/api_system.h"
 #include "cetech/core/log.h"
@@ -17,7 +17,6 @@
 #include <cetech/engine/config/config.h>
 #include <cetech/core/private/ydb.h>
 #include <cetech/engine/coredb/coredb.h>
-#include <cetech/core/array.h>
 #include "cetech/core/memory.h"
 
 #include "cetech/engine/machine/machine.h"
@@ -26,7 +25,6 @@
 #include "shader_blob.h"
 
 using namespace celib;
-using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -46,31 +44,29 @@ static int _shaderc(const char *input,
                     const char *type,
                     const char *platform,
                     const char *profile) {
+    ct_alloc *a = ct_memory_a0.main_allocator();
 
-    celib::Buffer buffer(ct_memory_a0.main_allocator());
+    char *buffer = NULL;
 
-    char *shaderc = ct_resource_a0.compiler_external_join(
-            ct_memory_a0.main_allocator(),
-            "shaderc");
+    char *shaderc = ct_resource_a0.compiler_external_join(a, "shaderc");
 
-    buffer << shaderc;
-    CT_FREE(ct_memory_a0.main_allocator(), shaderc);
+    ct_buffer_printf(&buffer, a, "%s", shaderc);
 
-    buffer::printf(buffer,
-                   ""
-                           " -f %s"
-                           " -o %s"
-                           " -i %s"
-                           " --type %s"
-                           " --platform %s"
-                           " --profile %s"
+    ct_buffer_free(shaderc, a);
 
-                           " 2>&1",  // TODO: move to exec
+    ct_buffer_printf(&buffer, a,
+                     ""
+                             " -f %s"
+                             " -o %s"
+                             " -i %s"
+                             " --type %s"
+                             " --platform %s"
+                             " --profile %s"
 
-                   input, output, include_path, type, platform,
-                   profile);
+                             " 2>&1",  // TODO: move to exec
+                     input, output, include_path, type, platform, profile);
 
-    int status = ct_process_a0.exec(buffer::c_str(buffer));
+    int status = ct_process_a0.exec(buffer);
 
     ct_log_a0.debug("shaderc", "STATUS %d", status);
 
@@ -87,13 +83,14 @@ static int _gen_tmp_name(char *tmp_filename,
     char dir[1024] = {};
     ct_path_a0.dir(dir, filename);
 
-    char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
+    char *tmp_dirname = NULL;
+    ct_path_a0.join(&tmp_dirname, a, 2, tmp_dir, dir);
+
     ct_path_a0.make_path(tmp_dirname);
 
     int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
                        ct_path_a0.filename(filename));
-
-    CT_FREE(a, tmp_dirname);
+    ct_buffer_free(tmp_dirname, a);
 
     return ret;
 }
@@ -130,7 +127,8 @@ static void compiler(const char *filename,
     const char *source_dir = ct_resource_a0.compiler_get_source_dir();
     const char *core_dir = ct_resource_a0.compiler_get_core_dir();
 
-    char *include_dir = ct_path_a0.join(a, 2, core_dir, "bgfxshaders");
+    char *include_dir = NULL;
+    ct_path_a0.join(&include_dir, a, 2, core_dir, "bgfxshaders");
 
     shader_blob::blob_t resource = {};
 
@@ -146,7 +144,8 @@ static void compiler(const char *filename,
     //////// VS
     compilator_api->add_dependency(filename, vs_input);
 
-    char *input_path = ct_path_a0.join(a, 2, source_dir, vs_input);
+    char *input_path = NULL;
+    ct_path_a0.join(&input_path, a, 2, source_dir, vs_input);
 
     _gen_tmp_name(output_path, tmp_dir,
                   CETECH_ARRAY_LEN(tmp_filename), vs_input);
@@ -154,7 +153,7 @@ static void compiler(const char *filename,
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
                           platform, vs_profile);
 
-    CT_FREE(a, input_path);
+    ct_buffer_free(input_path, a);
 
     if (result != 0) {
         CT_FREE(a, include_dir);
@@ -162,27 +161,26 @@ static void compiler(const char *filename,
     }
 
 
-    ct_vio *tmp_file = ct_vio_a0.from_file(output_path,
-                                           VIO_OPEN_READ);
+    ct_vio *tmp_file;
 
     do {
         tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
     } while (tmp_file == NULL);
 
 
-    char *vs_data =
-            CT_ALLOC(ct_memory_a0.main_allocator(), char,
-                         tmp_file->size(tmp_file) + 1);
-    tmp_file->read(tmp_file, vs_data, sizeof(char),
-                   tmp_file->size(tmp_file));
+    char *vs_data = CT_ALLOC(ct_memory_a0.main_allocator(), char,
+                     tmp_file->size(tmp_file) + 1);
+
+    tmp_file->read(tmp_file, vs_data, sizeof(char), tmp_file->size(tmp_file));
     resource.vs_size = tmp_file->size(tmp_file);
     tmp_file->close(tmp_file);
     ///////
 
     //////// FS
     compilator_api->add_dependency(filename, fs_input);
+    ct_buffer_clear(input_path);
 
-    input_path = ct_path_a0.join(a, 2, source_dir, fs_input);
+    ct_path_a0.join(&input_path, a, 2, source_dir, fs_input);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                   fs_input);
@@ -190,19 +188,16 @@ static void compiler(const char *filename,
     result = _shaderc(input_path, output_path, include_dir, "fragment",
                       platform, fs_profile);
 
-    CT_FREE(a, input_path);
+    ct_buffer_free(input_path, a);
 
     if (result != 0) {
-        CT_FREE(a, include_dir);
+        ct_buffer_free(include_dir, a);
         return;
     }
 
     tmp_file = ct_vio_a0.from_file(output_path, VIO_OPEN_READ);
-    char *fs_data =
-            CT_ALLOC(ct_memory_a0.main_allocator(), char,
-                         tmp_file->size(tmp_file) + 1);
-    tmp_file->read(tmp_file, fs_data, sizeof(char),
-                   tmp_file->size(tmp_file));
+    char *fs_data = CT_ALLOC(ct_memory_a0.main_allocator(), char, tmp_file->size(tmp_file) + 1);
+    tmp_file->read(tmp_file, fs_data, sizeof(char), tmp_file->size(tmp_file));
 
     resource.fs_size = tmp_file->size(tmp_file);
 
@@ -214,7 +209,9 @@ static void compiler(const char *filename,
 
     CT_FREE(a, vs_data);
     CT_FREE(a, fs_data);
-    CT_FREE(a, include_dir);
+
+    ct_buffer_free(include_dir, a);
+
 }
 
 int shadercompiler_init(ct_api_a0 *api) {

@@ -18,14 +18,13 @@
 #include <cetech/core/private/ydb.h>
 #include <cetech/engine/coredb/coredb.h>
 #include <cetech/core/array.h>
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 #include "texture_blob.h"
 #include "cetech/core/path.h"
 #include "cetech/core/process.h"
 #include "cetech/core/vio.h"
 
 using namespace celib;
-using namespace buffer;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -43,29 +42,27 @@ static int _texturec(const char *input,
                      const char *output,
                      int gen_mipmaps,
                      int is_normalmap) {
+    ct_alloc* alloc = ct_memory_a0.main_allocator();
+    char* buffer = NULL;
 
-    celib::Buffer buffer(ct_memory_a0.main_allocator());
+    char *texturec = ct_resource_a0.compiler_external_join(alloc,"texturec");
 
-    char *texturec = ct_resource_a0.compiler_external_join(
-            ct_memory_a0.main_allocator(),
-            "texturec");
+    ct_buffer_printf(&buffer, alloc, "%s", texturec);
+    ct_buffer_free(texturec, alloc);
 
-    buffer << texturec;
-    CT_FREE(ct_memory_a0.main_allocator(), texturec);
-
-    printf(buffer, " -f %s -o %s", input, output);
+    ct_buffer_printf(&buffer, alloc,  " -f %s -o %s", input, output);
 
     if (gen_mipmaps) {
-        buffer << " --mips";
+        ct_buffer_printf(&buffer, alloc, " %s", "--mips");
     }
 
     if (is_normalmap) {
-        buffer << " --normalmap";
+        ct_buffer_printf(&buffer, alloc, " %s", "--normalmap");
     }
 
-    buffer << " 2>&1";
+    ct_buffer_printf(&buffer, alloc, " %s", "2>&1");
 
-    int status = ct_process_a0.exec(c_str(buffer));
+    int status = ct_process_a0.exec(buffer);
 
     ct_log_a0.info("application", "STATUS %d", status);
 
@@ -82,13 +79,15 @@ static int _gen_tmp_name(char *tmp_filename,
     char dir[1024] = {};
     ct_path_a0.dir(dir, filename);
 
-    char *tmp_dirname = ct_path_a0.join(a, 2, tmp_dir, dir);
+    char *tmp_dirname = NULL;
+    ct_path_a0.join(&tmp_dirname, a, 2, tmp_dir, dir);
+
     ct_path_a0.make_path(tmp_dirname);
 
     int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dirname,
                        ct_path_a0.filename(filename));
 
-    CT_FREE(a, tmp_dirname);
+    ct_buffer_free(tmp_dirname, a);
 
     return ret;
 }
@@ -120,7 +119,8 @@ static void compiler(const char *filename,
     const char *source_dir = ct_resource_a0.compiler_get_source_dir();
 
     char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(a, platform);
-    char *input_path = ct_path_a0.join(a, 2, source_dir, input_str);
+    char *input_path = NULL;
+    ct_path_a0.join(&input_path, a, 2, source_dir, input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
                   input_str);
@@ -155,8 +155,8 @@ static void compiler(const char *filename,
     compilator_api->add_dependency(filename, input_str);
 
     CT_FREE(a, tmp_data);
-    CT_FREE(a, input_path);
-    CT_FREE(a, tmp_dir);
+    ct_buffer_free(input_path, a);
+    ct_buffer_free(tmp_dir, a);
 }
 
 int texturecompiler_init(ct_api_a0 *api) {

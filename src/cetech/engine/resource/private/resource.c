@@ -19,6 +19,7 @@
 #include <cetech/core/module.h>
 #include <cetech/engine/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
+#include <cetech/core/buffer.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -99,7 +100,11 @@ char *resource_compiler_get_build_dir(struct ct_alloc *a,
 
     const char *build_dir_str = ct_coredb_a0.read_string(_G.config,
                                                          CONFIG_BUILD_DIR, "");
-    return ct_path_a0.join(a, 2, build_dir_str, platform);
+
+    char *buffer = NULL;
+    ct_path_a0.join(&buffer, a, 2, build_dir_str, platform);
+
+    return buffer;
 }
 
 
@@ -224,7 +229,7 @@ static void load(uint64_t type,
 
         object = ct_coredb_a0.create_object();
         ct_hash_add(&type_item->name_map, id,
-                     ct_array_size(type_item->resource_objects), _G.allocator);
+                    ct_array_size(type_item->resource_objects), _G.allocator);
         ct_array_push(type_item->resource_objects, object, _G.allocator);
 
         char build_name[33] = {};
@@ -241,16 +246,18 @@ static void load(uint64_t type,
                         filename,
                         build_name);
 
-        char *build_full = ct_path_a0.join(
-                ct_memory_a0.main_allocator(), 2,
-                ct_coredb_a0.read_string(_G.config,
-                                         CONFIG_KERNEL_PLATFORM, ""),
-                build_name);
+        char *build_full = NULL;
+        ct_path_a0.join(&build_full,
+                        ct_memory_a0.main_allocator(), 2,
+                        ct_coredb_a0.read_string(_G.config,
+                                                 CONFIG_KERNEL_PLATFORM, ""),
+                        build_name);
 
         struct ct_vio *resource_file = ct_filesystem_a0.open(root_name,
                                                              build_full,
                                                              FS_OPEN_READ);
-        CT_FREE(ct_memory_a0.main_allocator(), build_full);
+
+        ct_buffer_free(build_full, ct_memory_a0.main_allocator());
 
         if (resource_file != NULL) {
             void *data = type_clb.loader(resource_file,

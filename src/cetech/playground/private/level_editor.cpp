@@ -40,8 +40,6 @@ CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_ydb_a0);
 
-using namespace celib;
-
 #define MAX_EDITOR 8
 
 static struct globals {

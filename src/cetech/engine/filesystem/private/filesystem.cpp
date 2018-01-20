@@ -13,6 +13,7 @@
 #include <cetech/core/watchdog.h>
 #include <cetech/core/eventstream.inl>
 #include <cetech/core/hash.h>
+#include <cetech/core/buffer.h>
 #include "cetech/core/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
@@ -153,7 +154,8 @@ static char *get_full_path(uint64_t root,
     for (uint32_t i = 0; i < mp_count; ++i) {
         fs_mount_point *mp = &fs_inst->mount_points[i];
 
-        char *fullpath = ct_path_a0.join(allocator, 2, mp->root_path, filename);
+        char *fullpath = NULL;
+        ct_path_a0.join(&fullpath, allocator, 2, mp->root_path, filename);
 
         if (((!test_dir) && exist(fullpath)) ||
             (test_dir && exist_dir(fullpath))) {
@@ -177,11 +179,11 @@ static ct_vio *open(uint64_t root,
 
     if (!file) {
         ct_log_a0.error(LOG_WHERE, "Could not load file %s", full_path);
-        CT_FREE(a, full_path);
+        ct_buffer_free(full_path, a);
         return NULL;
     }
 
-    CT_FREE(a, full_path);
+    ct_buffer_free(full_path, a);
     return file;
 }
 
@@ -226,7 +228,8 @@ static void listdir(uint64_t root,
         char **_files;
         uint32_t _count;
 
-        char *final_path = ct_path_a0.join(a, 2, mount_point_dir, path);
+        char *final_path = NULL;
+        ct_path_a0.join(&final_path, a, 2, mount_point_dir, path);
         ct_path_a0.list(final_path, filter, recursive, only_dir, &_files,
                         &_count, allocator);
 
@@ -237,7 +240,7 @@ static void listdir(uint64_t root,
         }
 
         ct_path_a0.list_free(_files, _count, allocator);
-        CT_FREE(a, final_path);
+        ct_buffer_free(final_path, a);
     }
 
     char **result_files = CT_ALLOC(a, char*, sizeof(char *) *
@@ -292,7 +295,8 @@ static int64_t get_file_mtime(uint64_t root,
 
     time_t ret = ct_path_a0.file_mtime(full_path);
 
-    CT_FREE(a, full_path);
+    ct_buffer_free(full_path, a);
+
     return ret;
 }
 

@@ -21,7 +21,7 @@
 #include <cetech/core/module.h>
 #include <glob.h>
 #include <fnmatch.h>
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 
 
 CETECH_DECL_API(ct_log_a0);
@@ -31,9 +31,6 @@ CETECH_DECL_API(ct_vio_a0);
 #define DIR_DELIM_CH '/'
 #define DIR_DELIM_STR "/"
 #endif
-
-using namespace celib;
-using namespace buffer;
 
 //==============================================================================
 // File Interface
@@ -56,7 +53,7 @@ void _dir_list(const char *path,
                const char *patern,
                int recursive,
                int only_dir,
-               Array<char *> &tmp_files,
+               char ***tmp_files,
                struct ct_alloc *allocator) {
     DIR *dir;
     struct dirent *entry;
@@ -92,9 +89,9 @@ void _dir_list(const char *path,
 
             if (only_dir) {
                 char *new_path = CT_ALLOC(allocator, char,
-                                              sizeof(char) * (len + 1));
+                                          sizeof(char) * (len + 1));
                 memcpy(new_path, tmp_path, len + 1);
-                array::push_back(tmp_files, new_path);
+                ct_array_push(*tmp_files, new_path, allocator);
             }
 
             if (recursive) {
@@ -105,8 +102,7 @@ void _dir_list(const char *path,
         } else if (!only_dir) {
             size_t size = strlen(path) + strlen(entry->d_name) + 3;
             char *new_path =
-                    CT_ALLOC(allocator, char,
-                                 sizeof(char) * size);
+                    CT_ALLOC(allocator, char, sizeof(char) * size);
 
             if (path[strlen(path) - 1] != '/') {
                 snprintf(new_path, size - 1, "%s/%s", path, entry->d_name);
@@ -118,7 +114,7 @@ void _dir_list(const char *path,
                 continue;
             }
 
-            array::push_back(tmp_files, new_path);
+            ct_array_push(*tmp_files, new_path, allocator);
         }
 
     } while ((entry = readdir(dir)));
@@ -197,19 +193,19 @@ void dir_list(const char *path,
               char ***files,
               uint32_t *count,
               struct ct_alloc *allocator) {
-    Array<char *> tmp_files(allocator);
 
-    _dir_list(path, patern, recursive, only_dir, tmp_files, allocator);
+    char **tmp_files = NULL;
+
+    _dir_list(path, patern, recursive, only_dir, &tmp_files, allocator);
 
     char **new_files = CT_ALLOC(allocator, char*,
-                                    sizeof(char *) * array::size(tmp_files));
+                                sizeof(char *) * ct_buffer_size(tmp_files));
 
-    memcpy(new_files,
-           array::begin(tmp_files),
-           sizeof(char *) * array::size(tmp_files));
+    memcpy(new_files, tmp_files,
+           sizeof(char *) * ct_buffer_size(tmp_files));
 
     *files = new_files;
-    *count = array::size(tmp_files);
+    *count = ct_buffer_size(tmp_files);
 }
 
 void dir_list2(const char *path,
@@ -334,15 +330,13 @@ const char *path_extension(const char *path) {
     return ch + 1;
 }
 
-char *path_join(struct ct_alloc *allocator,
-                uint32_t count,
-                ...) {
-
-    Buffer buffer(allocator);
+void path_join(char **buffer,
+               struct ct_alloc *allocator,
+               uint32_t count,
+               ...) {
 
     va_list arguments;
     va_start (arguments, count);
-
 
     for (uint32_t i = 0; i < count; ++i) {
         const char *t = va_arg (arguments, const char*);
@@ -351,22 +345,16 @@ char *path_join(struct ct_alloc *allocator,
             continue;
         }
 
-        if (array::size(buffer)) {
-            if (buffer[array::size(buffer) - 1] != DIR_DELIM_CH) {
-                buffer << DIR_DELIM_STR;
+        if (ct_buffer_size(*buffer)) {
+            if ((*buffer)[ct_buffer_size(*buffer) - 1] != DIR_DELIM_CH) {
+                ct_buffer_push_ch(*buffer, DIR_DELIM_CH, allocator);
             }
         }
 
-        buffer << t;
+        ct_buffer_printf(buffer, allocator, "%s", t);
     }
 
     va_end (arguments);
-
-    c_str(buffer);
-    char *data = buffer._data;
-    buffer._data = NULL;
-
-    return data;
 }
 
 void copy_file(struct ct_alloc *allocator,
@@ -375,7 +363,7 @@ void copy_file(struct ct_alloc *allocator,
     ct_vio *source_vio = ct_vio_a0.from_file(from, VIO_OPEN_READ);
 
     char *data = CT_ALLOC(allocator, char,
-                              source_vio->size(source_vio));
+                          source_vio->size(source_vio));
 
     size_t size = (size_t) source_vio->size(source_vio);
     source_vio->read(source_vio, data, sizeof(char), size);

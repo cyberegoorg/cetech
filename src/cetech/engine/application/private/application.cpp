@@ -34,6 +34,7 @@
 
 #include <cetech/core/array.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/buffer.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -250,6 +251,10 @@ extern "C" void application_start() {
 
     ct_array_free(arr, ct_memory_a0.main_allocator());
 
+    char* buffer = NULL;
+
+    ct_buffer_printf(&buffer, _G.allocator, "foo %f", 10.f);
+    ct_log_a0.info("dddsss", "%s", buffer);
 
 //    ct_hash_t h1 = {};
 //

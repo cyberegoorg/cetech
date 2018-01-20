@@ -15,6 +15,7 @@
 #include <cetech/core/path.h>
 #include <cetech/core/fmath.h>
 #include <cetech/core/hash.h>
+#include <cetech/core/buffer.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -490,7 +491,9 @@ void check_fs() {
         if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
             ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
 
-            char *path = ct_path_a0.join(alloc, 2, ev->dir, ev->filename);
+            char *path = NULL;
+            ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
+
             uint64_t path_key = CT_ID64_0(path);
 
             if (ct_hash_contain(&_G.document_cache_map, path_key)) {
@@ -500,7 +503,7 @@ void check_fs() {
                 load_to_cache(path, path_key);
             }
 
-            CT_FREE(alloc, path);
+            ct_buffer_free(path, alloc);
         }
 
         wd_it = ct_filesystem_a0.event_next(wd_it);

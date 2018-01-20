@@ -14,7 +14,7 @@
 #include "cetech/core/vio.h"
 
 #include "cetech/engine/resource/resource.h"
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 
 #include <bgfx/bgfx.h>
 #include <cetech/core/module.h>
@@ -24,8 +24,6 @@
 #include "cetech/core/path.h"
 
 using namespace celib;
-using namespace buffer;
-
 
 int texturecompiler_init(ct_api_a0 *api);
 

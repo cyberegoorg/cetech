@@ -84,7 +84,8 @@ struct ct_path_a0 {
     //! \param allocator Allocator
     //! \param count Path count.
     //! \return Result path len.
-    char *(*join)(struct ct_alloc *allocator,
+    void (*join)(char** buffer,
+                  struct ct_alloc *allocator,
                   uint32_t count,
                   ...);
 

@@ -4,7 +4,7 @@
 
 #include "cetech/core/allocator.h"
 #include "cetech/core/map.inl"
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 
 #include "cetech/core/hashlib.h"
 #include "cetech/core/memory.h"
@@ -27,7 +27,6 @@
 #include <cetech/core/fmath.h>
 
 using namespace celib;
-using namespace buffer;
 
 //==============================================================================
 // GLobals

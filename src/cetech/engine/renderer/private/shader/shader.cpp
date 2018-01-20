@@ -6,7 +6,7 @@
 
 #include "cetech/core/allocator.h"
 #include "cetech/core/map.inl"
-#include "cetech/core/buffer.inl"
+#include "cetech/core/buffer.h"
 
 #include "cetech/core/memory.h"
 #include "cetech/core/api_system.h"
@@ -27,7 +27,6 @@
 #include "cetech/core/vio.h"
 
 using namespace celib;
-using namespace buffer;
 
 int shadercompiler_init(ct_api_a0 *api);
 

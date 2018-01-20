@@ -136,12 +136,10 @@ static void on_render() {
 }
 
 static void SaveDock(struct ct_vio *output) {
-    celib::Buffer buffer(ct_memory_a0.main_allocator());
-    ImGui::saveToYaml(buffer);
+    char* buffer = NULL;
+    ImGui::saveToYaml(&buffer, _G.allocator);
 
-    const char *str = celib::buffer::c_str(buffer);
-
-    output->write(output, str, 1, strlen(str));
+    output->write(output, buffer, 1, strlen(buffer));
 }
 
 static void LoadDock(const char *path) {
