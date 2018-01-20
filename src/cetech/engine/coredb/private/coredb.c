@@ -2,12 +2,12 @@
 #include <string.h>
 #include <sys/mman.h>
 
-#include <cetech/core/api_system.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/coredb/coredb.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/core/macros.h>
-#include <cetech/core/allocator.h>
+#include <cetech/core/memory/allocator.h>
 
 CETECH_DECL_API(ct_memory_a0);
 

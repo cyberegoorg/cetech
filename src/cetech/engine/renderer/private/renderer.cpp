@@ -3,27 +3,27 @@
 //==============================================================================
 #include <cstdio>
 
-#include <cetech/core/allocator.h>
-#include <cetech/core/array.h>
-#include <cetech/core/map.inl>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/containers/array.h>
+#include <cetech/core/containers/map.inl>
 
-#include <cetech/core/api_system.h>
+#include <cetech/core/api/api_system.h>
 #include <cetech/engine/config/config.h>
 #include <cetech/macros.h>
-#include <cetech/core/module.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/hashlib.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/hashlib/hashlib.h>
 #include <cetech/engine/kernel/kernel.h>
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/window.h>
+#include <cetech/core/os/window.h>
 #include <cetech/engine/resource/resource.h>
 
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/coredb/coredb.h>
-#include <cetech/core/private/api_private.h>
+#include <cetech/core/api/private/api_private.h>
 
 #include "bgfx/platform.h"
 

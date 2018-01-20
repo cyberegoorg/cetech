@@ -1,4 +1,4 @@
-#include "cetech/core/map.inl"
+#include "cetech/core/containers/map.inl"
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/property_editor.h>
@@ -6,13 +6,13 @@
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/core/hash.h>
+#include <cetech/core/containers/hash.h>
 
-#include "cetech/core/hashlib.h"
+#include "cetech/core/hashlib/hashlib.h"
 #include "cetech/engine/config/config.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/module.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);

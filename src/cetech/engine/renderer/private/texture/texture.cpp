@@ -2,26 +2,26 @@
 // Include
 //==============================================================================
 
-#include "cetech/core/allocator.h"
-#include "cetech/core/map.inl"
+#include "cetech/core/memory/allocator.h"
+#include "cetech/core/containers/map.inl"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/log.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/log/log.h"
 #include "cetech/engine/machine/machine.h"
-#include "cetech/core/process.h"
-#include "cetech/core/vio.h"
+#include "cetech/core/os/process.h"
+#include "cetech/core/os/vio.h"
 
 #include "cetech/engine/resource/resource.h"
-#include "cetech/core/buffer.h"
+#include "cetech/core/containers/buffer.h"
 
 #include <bgfx/bgfx.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/engine/renderer/texture.h>
 
 #include "texture_blob.h"
-#include "cetech/core/path.h"
+#include "cetech/core/os/path.h"
 
 using namespace celib;
 

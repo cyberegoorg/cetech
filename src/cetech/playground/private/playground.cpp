@@ -1,15 +1,15 @@
 #include <stdio.h>
 
 #include <cetech/core/macros.h>
-#include <cetech/core/map.inl>
+#include <cetech/core/containers/map.inl>
 
 #include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/private/ydb.h>
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/module.h"
+#include <cetech/core/os/vio.h>
+#include <cetech/core/yaml/ydb.h>
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/module/module.h"
 
 #include <cetech/engine/entity/entity.h>
 #include <cetech/engine/renderer/renderer.h>

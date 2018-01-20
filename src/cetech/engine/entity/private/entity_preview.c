@@ -2,13 +2,13 @@
 // Include
 //==============================================================================
 
-#include "cetech/core/allocator.h"
+#include "cetech/core/memory/allocator.h"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/log.h"
-#include <cetech/core/module.h>
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/log/log.h"
+#include <cetech/core/module/module.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/engine/entity/entity.h>
 #include <cetech/engine/transform/transform.h>

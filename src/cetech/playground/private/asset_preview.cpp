@@ -11,15 +11,15 @@
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/fmath.h>
-#include "cetech/core/map.inl"
+#include <cetech/core/containers/hash.h>
+#include <cetech/core/math/fmath.h>
+#include "cetech/core/containers/map.inl"
 
-#include "cetech/core/hashlib.h"
+#include "cetech/core/hashlib/hashlib.h"
 #include "cetech/engine/config/config.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/module.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);

@@ -4,13 +4,13 @@
 
 #include <bgfx/bgfx.h>
 
-#include "cetech/core/allocator.h"
-#include "cetech/core/map.inl"
-#include "cetech/core/handler.inl"
+#include "cetech/core/memory/allocator.h"
+#include "cetech/core/containers/map.inl"
+#include "cetech/core/containers/handler.inl"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
 
 
 #include "cetech/engine/machine/machine.h"
@@ -21,11 +21,11 @@
 #include <cetech/engine/renderer/shader.h>
 
 #include <cetech/engine/renderer/texture.h>
-#include <cetech/core/module.h>
-#include <cetech/core/fmath.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/math/fmath.h>
 
-#include "cetech/core/path.h"
-#include "cetech/core/vio.h"
+#include "cetech/core/os/path.h"
+#include "cetech/core/os/vio.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);

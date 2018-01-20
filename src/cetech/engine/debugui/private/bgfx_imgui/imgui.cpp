@@ -8,7 +8,7 @@
 #include <bx/allocator.h>
 #include <bx/math.h>
 #include <bx/timer.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 
 #include "cetech/engine/debugui/private/ocornut-imgui/imgui.h"
 

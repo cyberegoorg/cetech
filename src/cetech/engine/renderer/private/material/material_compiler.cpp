@@ -4,20 +4,20 @@
 
 
 
-#include <cetech/core/private/ydb.h>
+#include <cetech/core/yaml/ydb.h>
 #include "cetech/macros.h"
-#include "cetech/core/vio.h"
-#include "cetech/core/path.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/hashlib.h"
+#include "cetech/core/os/vio.h"
+#include "cetech/core/os/path.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/hashlib/hashlib.h"
 #include "cetech/engine/resource/resource.h"
 
 #include "cetech/engine/entity/entity.h"
 #include "cetech/engine/machine/machine.h"
 
 #include <bgfx/defines.h>
-#include <cetech/core/array.h>
+#include <cetech/core/containers/array.h>
 
 #include "material.h"
 

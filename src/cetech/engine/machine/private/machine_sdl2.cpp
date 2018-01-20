@@ -2,13 +2,13 @@
 // Includes
 //==============================================================================
 
-#include "cetech/core/eventstream.inl"
+#include "cetech/core/containers/eventstream.inl"
 
-#include "cetech/core/memory.h"
-#include "cetech/core/module.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/module/module.h"
 #include "cetech/engine/config/config.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/log.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/log/log.h"
 
 #include "cetech/engine/resource/resource.h"
 #include "cetech/engine/machine/machine.h"

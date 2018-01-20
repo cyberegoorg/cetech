@@ -3,16 +3,16 @@
 //==============================================================================
 
 #include <stddef.h>
-#include <cetech/core/api_system.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/task.h>
-#include <cetech/core/thread.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/hashlib.h>
-#include <cetech/core/private/ydb.h>
+#include <cetech/core/task/task.h>
+#include <cetech/core/os/thread.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/yaml/ydb.h>
 #include <cetech/macros.h>
-#include <cetech/core/array.h>
+#include <cetech/core/containers/array.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);

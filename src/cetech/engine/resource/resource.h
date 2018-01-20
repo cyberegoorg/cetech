@@ -4,7 +4,7 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <cetech/core/private/yamlng.h>
+#include <cetech/core/yaml/yamlng.h>
 
 #ifdef __cplusplus
 extern "C" {

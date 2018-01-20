@@ -27,7 +27,7 @@
 
 #include <new> // placement new
 
-#include <cetech/core/buffer.h>
+#include <cetech/core/containers/buffer.h>
 #include <cetech/macros.h>
 static const char *DOCK_ENTRY_TEMPLATE = "%d: \n"
         "  index: %d\n"

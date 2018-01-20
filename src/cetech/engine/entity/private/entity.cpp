@@ -3,20 +3,20 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <cetech/core/api_system.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/entity/entity.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/path.h>
-#include <cetech/core/log.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/hashlib.h>
-#include <cetech/core/errors.h>
-#include <cetech/core/module.h>
-#include <cetech/core/private/ydb.h>
-#include <cetech/core/hash.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/os/errors.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/yaml/ydb.h>
+#include <cetech/core/containers/hash.h>
 
-#include "cetech/core/handler.inl"
+#include "cetech/core/containers/handler.inl"
 
 
 CETECH_DECL_API(ct_memory_a0);

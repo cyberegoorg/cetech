@@ -70,33 +70,33 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/cetech/core/private/allocator_core.c
-        src/cetech/core/private/api_system.c
-        src/cetech/core/private/log_system.c
-        src/cetech/core/private/module.cpp
+        src/cetech/core/memory/private/allocator_core.c
+        src/cetech/core/api/private/api_system.c
+        src/cetech/core/log/private/log_system.c
+        src/cetech/core/module/private/module.cpp
         src/cetech/engine/config/private/config.c
-        src/cetech/core/private/memory.c
-        src/cetech/core/private/allocator_malloc.c
+        src/cetech/core/memory/private/memory.c
+        src/cetech/core/memory/private/allocator_malloc.c
         src/cetech/engine/application/private/application.cpp
-        src/cetech/core/private/task.c
-        src/cetech/core/private/log_stdout_handler.c
+        src/cetech/core/task/private/task.c
+        src/cetech/core/log/private/log_stdout_handler.c
         src/cetech/engine/kernel/private/kernel.c
-        src/cetech/core/private/hashlib.c
-        src/cetech/core/private/os/error.c
-        src/cetech/core/private/os/object.c
-        src/cetech/core/private/os/path.cpp
-        src/cetech/core/private/os/process.c
-        src/cetech/core/private/os/cpu.c
-        src/cetech/core/private/os/thread.c
-        src/cetech/core/private/os/vio.c
-        src/cetech/core/private/os/watchdog.cpp
-        src/cetech/core/private/os/time.c
+        src/cetech/core/hashlib/private/hashlib.c
+        src/cetech/core/os/private/error.c
+        src/cetech/core/os/private/object.c
+        src/cetech/core/os/private/path.cpp
+        src/cetech/core/os/private/process.c
+        src/cetech/core/os/private/cpu.c
+        src/cetech/core/os/private/thread.c
+        src/cetech/core/os/private/vio.c
+        src/cetech/core/os/private/watchdog.cpp
+        src/cetech/core/os/private/time.c
         src/cetech/engine/resource/private/resource.c
         src/cetech/engine/resource/private/resource_package.c
         src/cetech/engine/resource/private/resource_compiler.cpp
         src/cetech/engine/filesystem/private/filesystem.cpp
-        src/cetech/core/private/yamlng.c
-        src/cetech/core/private/ydb.cpp
+        src/cetech/core/yaml/private/yamlng.c
+        src/cetech/core/yaml/private/ydb.cpp
         src/cetech/engine/coredb/private/coredb.c
 
         src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
@@ -104,7 +104,7 @@ set(SOURCE_FILES
         src/cetech/engine/debugui/private/ocornut-imgui/imgui_draw.cpp
         src/cetech/engine/debugui/private/debugui.cpp
 
-        src/cetech/core/private/window_sdl2.cpp
+        src/cetech/core/os/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp
         src/cetech/engine/machine/private/mouse_sdl2.cpp
         src/cetech/engine/machine/private/keyboard_sdl2.cpp
@@ -155,13 +155,13 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_history.cpp
         src/cetech/playground/private/log_view.cpp
         src/cetech/playground/private/action_manager.c
-        src/cetech/core/private/fmath.c src/cetech/core/private/celib.c)
+        src/cetech/core/math/private/fmath.c src/cetech/core/core.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES} src/cetech/core/private/fmath.c)
+        ${SOURCE_FILES} src/cetech/core/math/private/fmath.c)
 
 ################################################################################
 # Release sources

@@ -1,16 +1,16 @@
-#include "cetech/core/allocator.h"
+#include "cetech/core/memory/allocator.h"
 
-#include "cetech/core/api_system.h"
-#include "cetech/core/path.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/os/path.h"
 #include "cetech/engine/kernel/kernel.h"
-#include "cetech/core/memory.h"
+#include "cetech/core/memory/memory.h"
 #include "cetech/engine/config/config.h"
-#include "cetech/core/module.h"
-#include "cetech/core/hashlib.h"
-#include "cetech/core/private/log_system_private.h"
-#include "cetech/core/private/memory_private.h"
-#include "cetech/core/private/api_private.h"
-#include "cetech/core/private/allocator_core_private.h"
+#include "cetech/core/module/module.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/log/private/log_system_private.h"
+#include "cetech/core/memory/private/memory_private.h"
+#include "cetech/core/api/private/api_private.h"
+#include "cetech/core/memory/private/allocator_core_private.h"
 
 #include <cetech/engine/application/application.h>
 #include <cetech/engine/coredb/coredb.h>
@@ -26,8 +26,8 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_coredb_a0);
 
 #include <cetech/static_module.h>
-#include <cetech/core/celib.h>
-#include <cetech/core/buffer.h>
+#include <cetech/core/core.h>
+#include <cetech/core/containers/buffer.h>
 
 #define LOG_WHERE "kernel"
 

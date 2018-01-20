@@ -2,15 +2,15 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/api_system.h>
+#include <cetech/core/api/api_system.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/core/log.h>
-#include <cetech/core/errors.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/os/errors.h>
 #include <cetech/engine/input/input.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/engine/application/application.h>
 #include <string.h>
-#include "cetech/core/allocator.h"
+#include "cetech/core/memory/allocator.h"
 #include "keystr.h"
 
 CETECH_DECL_API(ct_machine_a0);

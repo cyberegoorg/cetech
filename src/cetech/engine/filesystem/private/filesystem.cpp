@@ -2,19 +2,19 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/api_system.h>
-#include <cetech/core/path.h>
-#include <cetech/core/log.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cstdlib>
-#include <cetech/core/watchdog.h>
-#include <cetech/core/eventstream.inl>
-#include <cetech/core/hash.h>
-#include <cetech/core/buffer.h>
-#include "cetech/core/map.inl"
+#include <cetech/core/os/watchdog.h>
+#include <cetech/core/containers/eventstream.inl>
+#include <cetech/core/containers/hash.h>
+#include <cetech/core/containers/buffer.h>
+#include "cetech/core/containers/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);

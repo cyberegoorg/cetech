@@ -1,7 +1,7 @@
 
-#include <cetech/core/buffer.h>
-#include <cetech/core/private/ydb.h>
-#include <cetech/core/private/yamlng.h>
+#include <cetech/core/containers/buffer.h>
+#include <cetech/core/yaml/ydb.h>
+#include <cetech/core/yaml/yamlng.h>
 
 namespace ImGui {
     ///

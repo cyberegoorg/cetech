@@ -1,10 +1,10 @@
 #include <cetech/core/macros.h>
 
-#include <cetech/core/log.h>
+#include <cetech/core/log/log.h>
 #include <cetech/engine/config/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/api_system.h>
-#include <cetech/core/hashlib.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/hashlib/hashlib.h>
 
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/application/application.h>

@@ -5,25 +5,25 @@
 #include <unistd.h>
 
 #include <cetech/core/macros.h>
-#include <cetech/core/container_types.inl>
+#include <cetech/core/containers/container_types.inl>
 
-#include <cetech/core/map.inl>
+#include <cetech/core/containers/map.inl>
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/watchdog.h>
+#include <cetech/core/os/watchdog.h>
 #include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/core/private/ydb.h>
-#include <cetech/core/api_system.h>
+#include <cetech/core/yaml/ydb.h>
+#include <cetech/core/api/api_system.h>
 #include <cetech/engine/resource/package.h>
-#include <cetech/core/task.h>
+#include <cetech/core/task/task.h>
 #include <cetech/engine/config/config.h>
-#include <cetech/core/time.h>
-#include <cetech/core/path.h>
-#include <cetech/core/log.h>
-#include <cetech/core/hashlib.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/os/time.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/engine/kernel/kernel.h>
 
 // TODO: shit , app == module?
@@ -32,9 +32,9 @@
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/coredb/coredb.h>
 
-#include <cetech/core/array.h>
-#include <cetech/core/hash.h>
-#include <cetech/core/buffer.h>
+#include <cetech/core/containers/array.h>
+#include <cetech/core/containers/hash.h>
+#include <cetech/core/containers/buffer.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);

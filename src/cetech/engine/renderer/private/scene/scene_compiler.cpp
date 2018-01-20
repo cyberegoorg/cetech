@@ -6,15 +6,15 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 #include <cetech/macros.h>
-#include <cetech/core/private/ydb.h>
-#include <cetech/core/array.h>
+#include <cetech/core/yaml/ydb.h>
+#include <cetech/core/containers/array.h>
 #include <CoreServices/CoreServices.h>
 
-#include "cetech/core/map.inl"
+#include "cetech/core/containers/map.inl"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
 #include "cetech/engine/machine/machine.h"
 
 
@@ -24,9 +24,9 @@
 #include "cetech/engine/scenegraph/scenegraph.h"
 
 #include "scene_blob.h"
-#include "cetech/core/path.h"
-#include "cetech/core/thread.h"
-#include "cetech/core/vio.h"
+#include "cetech/core/os/path.h"
+#include "cetech/core/os/thread.h"
+#include "cetech/core/os/vio.h"
 
 using namespace celib;
 

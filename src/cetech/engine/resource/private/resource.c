@@ -2,24 +2,24 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/array.h>
-#include <cetech/core/hash.h>
+#include <cetech/core/containers/array.h>
+#include <cetech/core/containers/hash.h>
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/api_system.h>
-#include <cetech/core/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/memory/memory.h>
 #include <cetech/engine/filesystem/filesystem.h>
 #include <cetech/engine/config/config.h>
-#include <cetech/core/path.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/log.h>
-#include <cetech/core/thread.h>
-#include <cetech/core/errors.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/os/thread.h>
+#include <cetech/core/os/errors.h>
 #include <cetech/engine/resource/package.h>
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/engine/coredb/coredb.h>
 #include <cetech/engine/kernel/kernel.h>
-#include <cetech/core/buffer.h>
+#include <cetech/core/containers/buffer.h>
 
 #include "include/SDL2/SDL.h"
 

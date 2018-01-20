@@ -4,17 +4,17 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/application/application.h>
-#include <cetech/core/hashlib.h>
+#include <cetech/core/hashlib/hashlib.h>
 #include <cetech/engine/renderer/viewport.h>
-#include <cetech/core/vio.h>
+#include <cetech/core/os/vio.h>
 #include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/core/array.h>
-#include "cetech/core/map.inl"
+#include <cetech/core/containers/array.h>
+#include "cetech/core/containers/map.inl"
 
 #include "cetech/engine/config/config.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/module.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/module/module.h"
 
 #include "imgui_wrap.inl"
 

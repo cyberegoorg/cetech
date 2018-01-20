@@ -2,18 +2,18 @@
 // Include
 //==============================================================================
 
-#include "cetech/core/allocator.h"
-#include "cetech/core/map.inl"
-#include "cetech/core/buffer.h"
+#include "cetech/core/memory/allocator.h"
+#include "cetech/core/containers/map.inl"
+#include "cetech/core/containers/buffer.h"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/log.h"
-#include "cetech/core/path.h"
-#include "cetech/core/vio.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/log/log.h"
+#include "cetech/core/os/path.h"
+#include "cetech/core/os/vio.h"
 #include "cetech/engine/resource/resource.h"
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/playground//asset_property.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/texture.h>
@@ -22,9 +22,9 @@
 #include <cetech/engine/transform/transform.h>
 #include <cfloat>
 
-#include <cetech/core/private/ydb.h>
+#include <cetech/core/yaml/ydb.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/core/fmath.h>
+#include <cetech/core/math/fmath.h>
 
 using namespace celib;
 

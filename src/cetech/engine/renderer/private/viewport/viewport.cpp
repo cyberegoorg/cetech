@@ -3,21 +3,21 @@
 //==============================================================================
 #include <cstdio>
 
-#include <cetech/core/allocator.h>
-#include <cetech/core/map.inl>
-#include <cetech/core/handler.inl>
+#include <cetech/core/memory/allocator.h>
+#include <cetech/core/containers/map.inl>
+#include <cetech/core/containers/handler.inl>
 
 
-#include <cetech/core/api_system.h>
+#include <cetech/core/api/api_system.h>
 #include <cetech/engine/config/config.h>
 #include <cetech/macros.h>
-#include <cetech/core/module.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/hashlib.h>
-#include <cetech/core/vio.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/os/vio.h>
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/window.h>
+#include <cetech/core/os/window.h>
 #include <cetech/engine/entity/entity.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/resource/resource.h>
@@ -34,7 +34,7 @@
 
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/coredb/coredb.h>
-#include <cetech/core/hash.h>
+#include <cetech/core/containers/hash.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"
 

@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include "cetech/core/hashlib.h"
+#include "cetech/core/hashlib/hashlib.h"
 #include <cetech/engine/resource/resource.h>
 
 

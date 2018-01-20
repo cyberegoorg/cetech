@@ -4,9 +4,9 @@
 
 #include <include/SDL2/SDL.h>
 
-#include "cetech/core/eventstream.inl"
+#include "cetech/core/containers/eventstream.inl"
 #include "cetech/engine/machine/machine.h"
-#include "cetech/core/api_system.h"
+#include "cetech/core/api/api_system.h"
 
 using namespace celib;
 

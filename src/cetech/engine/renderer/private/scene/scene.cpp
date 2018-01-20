@@ -2,15 +2,15 @@
 // Include
 //==============================================================================
 
-#include <cetech/core/module.h>
+#include <cetech/core/module/module.h>
 #include <cetech/engine/renderer/scene.h>
-#include <cetech/core/array.h>
-#include <cetech/core/hash.h>
-#include "cetech/core/map.inl"
+#include <cetech/core/containers/array.h>
+#include <cetech/core/containers/hash.h>
+#include "cetech/core/containers/map.inl"
 
-#include "cetech/core/hashlib.h"
-#include "cetech/core/memory.h"
-#include "cetech/core/api_system.h"
+#include "cetech/core/hashlib/hashlib.h"
+#include "cetech/core/memory/memory.h"
+#include "cetech/core/api/api_system.h"
 #include "cetech/engine/machine/machine.h"
 
 
@@ -20,9 +20,9 @@
 #include "cetech/engine/scenegraph/scenegraph.h"
 
 #include "scene_blob.h"
-#include "cetech/core/path.h"
-#include "cetech/core/thread.h"
-#include "cetech/core/vio.h"
+#include "cetech/core/os/path.h"
+#include "cetech/core/os/thread.h"
+#include "cetech/core/os/vio.h"
 
 using namespace celib;
 

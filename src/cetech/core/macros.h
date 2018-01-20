@@ -8,7 +8,7 @@
 
 #include <stdbool.h>
 
-#include "platform.h"
+#include "cetech/core/os/platform.h"
 
 ///
 #if CT_COMPILER_MSVC

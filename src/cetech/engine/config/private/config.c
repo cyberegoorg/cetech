@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <cetech/core/api_system.h>
-#include <cetech/core/memory.h>
-#include <cetech/core/path.h>
-#include <cetech/core/vio.h>
-#include <cetech/core/log.h>
-#include <cetech/core/hashlib.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/os/path.h>
+#include <cetech/core/os/vio.h>
+#include <cetech/core/log/log.h>
+#include <cetech/core/hashlib/hashlib.h>
 #include <cetech/engine/config/config.h>
-#include <cetech/core/module.h>
-#include <cetech/core/private/yamlng.h>
+#include <cetech/core/module/module.h>
+#include <cetech/core/yaml/yamlng.h>
 #include <cetech/engine/coredb/coredb.h>
 #include <cetech/core/macros.h>
 

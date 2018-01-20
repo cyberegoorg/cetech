@@ -3,12 +3,12 @@
 //==============================================================================
 
 #include <cetech/engine/entity/entity.h>
-#include <cetech/core/hash.h>
+#include <cetech/core/containers/hash.h>
 
-#include "cetech/core/memory.h"
+#include "cetech/core/memory/memory.h"
 #include "cetech/engine/config/config.h"
-#include "cetech/core/api_system.h"
-#include "cetech/core/module.h"
+#include "cetech/core/api/api_system.h"
+#include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
