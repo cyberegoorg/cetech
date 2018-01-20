@@ -1,19 +1,19 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
+#include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/asset_browser.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/filesystem/filesystem.h>
-#include <cetech/os/path.h>
-#include <cetech/resource/resource.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/path.h>
+#include <cetech/engine/resource/resource.h>
 #include <cetech/playground/playground.h>
-#include <celib/array.h>
+#include <cetech/core/array.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/config/config.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/engine/config/config.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -57,15 +57,15 @@ static struct asset_browser_global {
     ct_ab_on_asset_click *on_asset_click;
     ct_ab_on_asset_double_click *on_asset_double_click;
 
-    cel_alloc *allocator;
+    ct_alloc *allocator;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        cel_array_push(_G.name, name, _G.allocator);                           \
+        ct_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = cel_array_size(_G.name);                             \
+        const auto size = ct_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -75,7 +75,7 @@ static struct asset_browser_global {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            cel_array_pop_back(_G.name);                                       \
+            ct_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -166,7 +166,7 @@ static void ui_dir_list() {
     ImGui::PushItemWidth(180);
 
     if (!_G.dirtree_list) {
-        cel_alloc *a = ct_memory_a0.main_allocator();
+        ct_alloc *a = ct_memory_a0.main_allocator();
         ct_filesystem_a0.listdir(CT_ID64_0("source"), "", "*",
                                  true, true, &_G.dirtree_list,
                                  &_G.dirtree_list_count, a);
@@ -202,7 +202,7 @@ static void ui_asset_list() {
     ImGui::BeginChild("middle_col", size);
 
     if (_G.need_reaload) {
-        cel_alloc *a = ct_memory_a0.main_allocator();
+        ct_alloc *a = ct_memory_a0.main_allocator();
 
         if (_G.asset_list) {
             ct_filesystem_a0.listdir_free(_G.asset_list, _G.asset_list_count,
@@ -270,13 +270,13 @@ static void ui_asset_list() {
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t j = 0;
-                         j < cel_array_size(_G.on_asset_double_click); ++j) {
+                         j < ct_array_size(_G.on_asset_double_click); ++j) {
                         _G.on_asset_double_click[j](type, name,
                                                     CT_ID64_0("source"), path);
                     }
                 } else {
                     for (uint32_t j = 0;
-                         j < cel_array_size(_G.on_asset_click); ++j) {
+                         j < ct_array_size(_G.on_asset_click); ++j) {
                         _G.on_asset_click[j](type, name,
                                              CT_ID64_0("source"), path);
                     }
@@ -343,8 +343,8 @@ static void _shutdown() {
             PLAYGROUND_MODULE_NAME
     );
 
-    cel_array_free(_G.on_asset_click, _G.allocator);
-    cel_array_free(_G.on_asset_double_click, _G.allocator);
+    ct_array_free(_G.on_asset_click, _G.allocator);
+    ct_array_free(_G.on_asset_double_click, _G.allocator);
 
     _G = {};
 }
@@ -361,12 +361,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

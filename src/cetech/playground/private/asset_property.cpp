@@ -1,18 +1,18 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
+#include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_property.h>
-#include <cetech/resource/resource.h>
+#include <cetech/engine/resource/resource.h>
 #include <cetech/playground/asset_browser.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <celib/hash.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/core/hash.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/config/config.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/engine/config/config.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -26,14 +26,14 @@ using namespace celib;
 
 #define _G asset_property_global
 static struct _G {
-    cel_hash_t on_asset_map;
+    ct_hash_t on_asset_map;
     ct_ap_on_asset* on_asset;
 
     ct_ap_on_asset active_on_asset;
     uint64_t active_type;
     uint64_t active_name;
     const char *active_path;
-    struct cel_alloc* allocator;
+    struct ct_alloc* allocator;
 } _G;
 
 static void on_debugui() {
@@ -57,17 +57,17 @@ static void on_debugui() {
 
 static void register_asset(uint64_t type,
                            ct_ap_on_asset on_asset) {
-    cel_array_push(_G.on_asset, on_asset, _G.allocator);
-    cel_hash_add(&_G.on_asset_map, type, cel_array_size(_G.on_asset) - 1, _G.allocator);
+    ct_array_push(_G.on_asset, on_asset, _G.allocator);
+    ct_hash_add(&_G.on_asset_map, type, ct_array_size(_G.on_asset) - 1, _G.allocator);
 }
 
 static void set_asset(uint64_t type,
                       uint64_t name,
                       uint64_t root,
                       const char *path) {
-    CEL_UNUSED(root);
+    CT_UNUSED(root);
 
-    uint32_t idx = cel_hash_lookup(&_G.on_asset_map, type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.on_asset_map, type, UINT32_MAX);
 
     _G.active_on_asset = UINT32_MAX != idx ? _G.on_asset[idx]: NULL;
     _G.active_type = type;
@@ -93,8 +93,8 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    cel_array_free(_G.on_asset, _G.allocator);
-    cel_hash_free(&_G.on_asset_map, _G.allocator);
+    ct_array_free(_G.on_asset, _G.allocator);
+    ct_hash_free(&_G.on_asset_map, _G.allocator);
 
     ct_asset_browser_a0.unregister_on_asset_double_click(set_asset);
 
@@ -113,12 +113,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

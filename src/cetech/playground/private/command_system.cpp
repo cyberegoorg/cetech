@@ -1,17 +1,15 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
-#include <cetech/playground/asset_property.h>
-#include <cetech/resource/resource.h>
+#include <cetech/engine/resource/resource.h>
 #include <cetech/playground/command_system.h>
-#include <celib/array.h>
-#include <celib/hash.h>
+#include <cetech/core/array.h>
+#include <cetech/core/hash.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/config/config.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/engine/config/config.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -22,13 +20,13 @@ using namespace celib;
 
 #define _G asset_property_global
 static struct _G {
-    cel_hash_t cmd_map;
+    ct_hash_t cmd_map;
     ct_cmd_fce* cmds;
 
     uint8_t *cmd_buffer;
     uint32_t *cmd;
     uint32_t curent_pos;
-    cel_alloc *allocator;
+    ct_alloc *allocator;
 } _G;
 
 
@@ -43,15 +41,15 @@ static ct_cmd *get_curent_cmd() {
 }
 
 void execute(const struct ct_cmd *cmd) {
-    uint32_t idx = cel_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.execute) {
         return;
     }
 
-    uint32_t buffer_offset = cel_array_size(_G.cmd_buffer);
-    uint32_t size = cel_array_size(_G.cmd);
+    uint32_t buffer_offset = ct_array_size(_G.cmd_buffer);
+    uint32_t size = ct_array_size(_G.cmd);
 
     if (_G.curent_pos != (size - 1)) {
         ct_cmd *cur_cmd = get_curent_cmd();
@@ -64,8 +62,8 @@ void execute(const struct ct_cmd *cmd) {
         }
     }
 
-    cel_array_push_n(_G.cmd_buffer, (uint8_t *) cmd, cmd->size, _G.allocator);
-    cel_array_push(_G.cmd, buffer_offset, _G.allocator);
+    ct_array_push_n(_G.cmd_buffer, (uint8_t *) cmd, cmd->size, _G.allocator);
+    ct_array_push(_G.cmd, buffer_offset, _G.allocator);
 
     _G.curent_pos += 1;
 
@@ -74,8 +72,8 @@ void execute(const struct ct_cmd *cmd) {
 
 void register_cmd_execute(uint64_t type,
                           ct_cmd_fce fce) {
-    cel_array_push(_G.cmds, fce, _G.allocator);
-    cel_hash_add(&_G.cmd_map, type, cel_array_size(_G.cmds) - 1, _G.allocator);
+    ct_array_push(_G.cmds, fce, _G.allocator);
+    ct_hash_add(&_G.cmd_map, type, ct_array_size(_G.cmds) - 1, _G.allocator);
 }
 
 void undo() {
@@ -85,7 +83,7 @@ void undo() {
         return;
     }
 
-    uint32_t idx = cel_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.execute) {
@@ -99,7 +97,7 @@ void undo() {
 
 
 static ct_cmd *get_next_cmd() {
-    uint32_t cmd_size = cel_array_size(_G.cmd);
+    uint32_t cmd_size = ct_array_size(_G.cmd);
 
     if (!cmd_size) {
         return NULL;
@@ -121,7 +119,7 @@ void redo() {
         return;
     }
 
-    uint32_t idx = cel_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.execute) {
@@ -142,7 +140,7 @@ void undo_text(char *buffer,
         return;
     }
 
-    uint32_t idx = cel_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.cmd_map, curent_cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.description) {
@@ -162,7 +160,7 @@ void redo_text(char *buffer,
         return;
     }
 
-    uint32_t idx = cel_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
+    uint32_t idx = ct_hash_lookup(&_G.cmd_map, next_cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idx ? _G.cmds[idx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.description) {
@@ -178,7 +176,7 @@ void command_text(char *buffer,
                   uint32_t idx) {
     const struct ct_cmd *cmd = (const struct ct_cmd *) &_G.cmd_buffer[_G.cmd[idx]];
 
-    uint32_t idxx = cel_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
+    uint32_t idxx = ct_hash_lookup(&_G.cmd_map, cmd->type, UINT32_MAX);
     ct_cmd_fce cmd_fce = (UINT32_MAX != idxx ? _G.cmds[idxx] : (ct_cmd_fce){NULL});
 
     if (!cmd_fce.description) {
@@ -193,7 +191,7 @@ void command_text(char *buffer,
 }
 
 uint32_t command_count() {
-    return cel_array_size(_G.cmd) - 1;
+    return ct_array_size(_G.cmd) - 1;
 }
 
 void goto_idx(uint32_t idx) {
@@ -241,15 +239,15 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_cmd_system_a0", &cmd_system_a0);
 
-    cel_array_push(_G.cmd, 0, _G.allocator);
+    ct_array_push(_G.cmd, 0, _G.allocator);
 }
 
 static void _shutdown() {
-    cel_array_free(_G.cmds, _G.allocator);
-    cel_hash_free(&_G.cmd_map, _G.allocator);
+    ct_array_free(_G.cmds, _G.allocator);
+    ct_hash_free(&_G.cmd_map, _G.allocator);
 
-    cel_array_free(_G.cmd_buffer, _G.allocator);
-    cel_array_free(_G.cmd, _G.allocator);
+    ct_array_free(_G.cmd_buffer, _G.allocator);
+    ct_array_free(_G.cmd, _G.allocator);
 
     _G = {};
 }
@@ -262,12 +260,12 @@ CETECH_MODULE_DEF(
 
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

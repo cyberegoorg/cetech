@@ -1,27 +1,27 @@
 #include <stdio.h>
 
-#include <cetech/entity/entity.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/renderer/texture.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/level/level.h>
-#include <cetech/camera/camera.h>
+#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/renderer/renderer.h>
+#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/level/level.h>
+#include <cetech/engine/camera/camera.h>
 #include <cetech/playground/level_editor.h>
-#include <cetech/transform/transform.h>
-#include <cetech/input/input.h>
-#include <cetech/renderer/viewport.h>
+#include <cetech/engine/transform/transform.h>
+#include <cetech/engine/input/input.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/application/application.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/engine/application/application.h>
 
 #include <cetech/playground/playground.h>
-#include <celib/fmath.h>
+#include <cetech/core/fmath.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
@@ -71,8 +71,8 @@ static void fps_camera_update(ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CEL_UNUSED(dx);
-    CEL_UNUSED(dy);
+    CT_UNUSED(dx);
+    CT_UNUSED(dy);
 
     float pos[3];
     float rot[4];
@@ -86,8 +86,8 @@ static void fps_camera_update(ct_world world,
 
     float x_dir[4];
     float z_dir[4];
-    cel_vec4_move(x_dir, &wm[0 * 4]);
-    cel_vec4_move(z_dir, &wm[2 * 4]);
+    ct_vec4_move(x_dir, &wm[0 * 4]);
+    ct_vec4_move(z_dir, &wm[2 * 4]);
 
     if (!fly_mode) {
         z_dir[1] = 0.0f;
@@ -97,11 +97,11 @@ static void fps_camera_update(ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    cel_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    cel_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+    ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+    ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    cel_vec3_add(pos, pos, x_dir_new);
-    cel_vec3_add(pos, pos, z_dir_new);
+    ct_vec3_add(pos, pos, x_dir_new);
+    ct_vec3_add(pos, pos, z_dir_new);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -366,12 +366,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

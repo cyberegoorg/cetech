@@ -1,23 +1,23 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
-#include <cetech/filesystem/filesystem.h>
-#include <cetech/hashlib/hashlib.h>
-#include <cetech/config/config.h>
-#include <cetech/os/memory.h>
-#include <cetech/api/api_system.h>
-#include <cetech/module/module.h>
-#include <cetech/level/level.h>
-#include <cetech/entity/entity.h>
+#include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/hashlib.h>
+#include <cetech/engine/config/config.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/api_system.h>
+#include <cetech/core/module.h>
+#include <cetech/engine/level/level.h>
+#include <cetech/engine/entity/entity.h>
 
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/yaml/yamlng.h>
-#include <cetech/yaml/ydb.h>
+#include <cetech/core/private/yamlng.h>
+#include <cetech/core/private/ydb.h>
 #include <cstdio>
 #include <cetech/playground/playground.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <celib/array.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/core/array.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -45,15 +45,15 @@ static struct _G {
     ct_li_on_entity *on_entity_click;
     const char *path;
     bool is_level;
-    cel_alloc *allocator;
+    ct_alloc *allocator;
 } _G;
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        cel_array_push(_G.name, name, _G.allocator);                           \
+        ct_array_push(_G.name, name, _G.allocator);                           \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = cel_array_size(_G.name);                             \
+        const auto size = ct_array_size(_G.name);                             \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -63,7 +63,7 @@ static struct _G {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            cel_array_pop_back(_G.name);                                       \
+            ct_array_pop_back(_G.name);                                       \
             break;                                                             \
         }                                                                      \
     }
@@ -78,7 +78,7 @@ void set_level(struct ct_world world,
                const char *path,
                bool is_level) {
 
-    CEL_UNUSED(root);
+    CT_UNUSED(root);
 
     if (_G.level_name == name) {
         return;
@@ -137,7 +137,7 @@ static void ui_entity_item_begin(const char *name,
     bool open = ct_debugui_a0.TreeNodeEx(name, flags);
     if (ImGui::IsItemClicked(0)) {
         if (_G.selected_name != name_hash) {
-            for (uint32_t j = 0; j < cel_array_size(_G.on_entity_click); ++j) {
+            for (uint32_t j = 0; j < ct_array_size(_G.on_entity_click); ++j) {
                 _G.on_entity_click[j](_G.world, _G.level, _G.path, keys,
                                       keys_count);
             }
@@ -209,7 +209,7 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
     ct_playground_a0.unregister_module(PLAYGROUND_MODULE_NAME);
 
-    cel_array_free(_G.on_entity_click, _G.allocator);
+    ct_array_free(_G.on_entity_click, _G.allocator);
 
     _G = {};
 }
@@ -227,12 +227,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

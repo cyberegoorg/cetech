@@ -1,13 +1,13 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
+#include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/playground.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -80,12 +80,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

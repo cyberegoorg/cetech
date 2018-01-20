@@ -1,20 +1,20 @@
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
-#include <cetech/debugui/debugui.h>
-#include <cetech/resource/resource.h>
-#include <cetech/level/level.h>
-#include <cetech/entity/entity.h>
-#include <cetech/hashlib/hashlib.h>
-#include <cetech/config/config.h>
-#include <cetech/os/memory.h>
-#include <cetech/api/api_system.h>
-#include <cetech/module/module.h>
+#include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/resource/resource.h>
+#include <cetech/engine/level/level.h>
+#include <cetech/engine/entity/entity.h>
+#include <cetech/core/hashlib.h>
+#include <cetech/engine/config/config.h>
+#include <cetech/core/memory.h>
+#include <cetech/core/api_system.h>
+#include <cetech/core/module.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/yaml/ydb.h>
+#include <cetech/core/private/ydb.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -46,10 +46,10 @@ static struct _G {
 
 //#define _DEF_ON_CLB_FCE(type, name)                                            \
 //    static void register_ ## name ## _(type name) {                            \
-//        celib::array::push_back(_G.name, name);                                \
+//        core::array::push_back(_G.name, name);                                \
 //    }                                                                          \
 //    static void unregister_## name ## _(type name) {                           \
-//        const auto size = celib::array::size(_G.name);                         \
+//        const auto size = core::array::size(_G.name);                         \
 //                                                                               \
 //        for(uint32_t i = 0; i < size; ++i) {                                   \
 //            if(_G.name[i] != name) {                                           \
@@ -59,7 +59,7 @@ static struct _G {
 //            uint32_t last_idx = size - 1;                                      \
 //            _G.name[i] = _G.name[last_idx];                                    \
 //                                                                               \
-//            celib::array::pop_back(_G.name);                                   \
+//            core::array::pop_back(_G.name);                                   \
 //            break;                                                             \
 //        }                                                                      \
 //    }
@@ -194,12 +194,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_entity_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

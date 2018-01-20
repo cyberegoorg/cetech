@@ -1,26 +1,25 @@
-#include <cetech/entity/entity.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/renderer/texture.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/application/application.h>
-#include <cetech/level/level.h>
-#include <cetech/camera/camera.h>
-#include <cetech/transform/transform.h>
+#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/renderer/renderer.h>
+#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/level/level.h>
+#include <cetech/engine/camera/camera.h>
+#include <cetech/engine/transform/transform.h>
 
-#include <cetech/input/input.h>
-#include <cetech/renderer/viewport.h>
+#include <cetech/engine/input/input.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
-#include <celib/hash.h>
-#include <celib/fmath.h>
-#include "celib/map.inl"
+#include <cetech/core/hash.h>
+#include <cetech/core/fmath.h>
+#include "cetech/core/map.inl"
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/config/config.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/engine/config/config.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -39,9 +38,9 @@ using namespace celib;
 #define _G AssetPreviewGlobals
 
 static struct _G {
-    cel_alloc* allocator;
-    struct cel_hash_t preview_fce_map;
-    ct_asset_preview_fce* preview_fce;
+    ct_alloc *allocator;
+    struct ct_hash_t preview_fce_map;
+    ct_asset_preview_fce *preview_fce;
 
     uint64_t active_type;
     uint64_t active_name;
@@ -65,8 +64,8 @@ static void fps_camera_update(ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CEL_UNUSED(dx);
-    CEL_UNUSED(dy);
+    CT_UNUSED(dx);
+    CT_UNUSED(dy);
 
     float pos[3];
     float rot[4];
@@ -80,8 +79,8 @@ static void fps_camera_update(ct_world world,
 
     float x_dir[4];
     float z_dir[4];
-    cel_vec4_move(x_dir, &wm[0 * 4]);
-    cel_vec4_move(z_dir, &wm[2 * 4]);
+    ct_vec4_move(x_dir, &wm[0 * 4]);
+    ct_vec4_move(z_dir, &wm[2 * 4]);
 
 
     if (!fly_mode) {
@@ -92,11 +91,11 @@ static void fps_camera_update(ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    cel_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    cel_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+    ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+    ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    cel_vec3_add(pos, pos, x_dir_new);
-    cel_vec3_add(pos, pos, z_dir_new);
+    ct_vec3_add(pos, pos, x_dir_new);
+    ct_vec3_add(pos, pos, z_dir_new);
 
     ct_transform_a0.set_position(transform, pos);
 }
@@ -136,18 +135,20 @@ static void set_asset(uint64_t type,
                       uint64_t name,
                       uint64_t root,
                       const char *path) {
-    CEL_UNUSED(root);
+    CT_UNUSED(root);
 
     if (_G.active_name == name) {
         return;
     }
 
-    uint64_t idx = cel_hash_lookup(&_G.preview_fce_map,_G.active_type, UINT64_MAX);
-    if(idx != UINT64_MAX) {
+    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, _G.active_type,
+                                  UINT64_MAX);
+    if (idx != UINT64_MAX) {
         ct_asset_preview_fce fce = _G.preview_fce[idx];
 
-        if(fce.unload) {
-            fce.unload(_G.active_path, _G.active_type, _G.active_name, _G.world);
+        if (fce.unload) {
+            fce.unload(_G.active_path, _G.active_type, _G.active_name,
+                       _G.world);
         }
     }
 
@@ -155,8 +156,8 @@ static void set_asset(uint64_t type,
     _G.active_name = name;
     _G.active_path = path;
 
-    idx = cel_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
-    if(idx != UINT64_MAX) {
+    idx = ct_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+    if (idx != UINT64_MAX) {
         ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.load) {
@@ -212,21 +213,22 @@ static void update(float dt) {
                       0, 0, updown, leftright, 10.0f, false);
 }
 
-#define cel_instance_map(a, h, k, item, al) \
-    cel_array_push(a, item, al); \
-    cel_hash_add(h, k, cel_array_size(a) - 1, al)
+#define ct_instance_map(a, h, k, item, al) \
+    ct_array_push(a, item, al); \
+    ct_hash_add(h, k, ct_array_size(a) - 1, al)
 
 void register_type_preview(uint64_t type,
                            ct_asset_preview_fce fce) {
-    cel_instance_map(_G.preview_fce, &_G.preview_fce_map, type, fce, _G.allocator);
+    ct_instance_map(_G.preview_fce, &_G.preview_fce_map, type, fce,
+                    _G.allocator);
 }
 
 void unregister_type_preview(uint64_t type) {
-    uint64_t idx = cel_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
-    if(UINT64_MAX == idx){
+    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+    if (UINT64_MAX == idx) {
         return;
     }
-    cel_hash_remove(&_G.preview_fce_map, type);
+    ct_hash_remove(&_G.preview_fce_map, type);
 }
 
 static void on_menu_window() {
@@ -239,7 +241,7 @@ static ct_asset_preview_a0 asset_preview_api = {
 };
 
 static void _init(ct_api_a0 *api) {
-    _G = (struct _G){
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
@@ -263,8 +265,8 @@ static void _shutdown() {
     ct_playground_a0.unregister_module(CT_ID64_0("asset_preview"));
     ct_asset_browser_a0.unregister_on_asset_click(set_asset);
 
-    cel_hash_free(&_G.preview_fce_map, _G.allocator);
-    cel_array_free(_G.preview_fce, _G.allocator);
+    ct_hash_free(&_G.preview_fce_map, _G.allocator);
+    ct_array_free(_G.preview_fce, _G.allocator);
 
     _G = {};
 }
@@ -285,12 +287,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )

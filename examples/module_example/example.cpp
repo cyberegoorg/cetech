@@ -1,23 +1,23 @@
-#include <celib/macros.h>
+#include <cetech/core/macros.h>
 
-#include <cetech/log/log.h>
-#include <cetech/config/config.h>
-#include <cetech/module/module.h>
-#include <cetech/api/api_system.h>
-#include <cetech/hashlib/hashlib.h>
+#include <cetech/core/log.h>
+#include <cetech/engine/config/config.h>
+#include <cetech/core/module.h>
+#include <cetech/core/api_system.h>
+#include <cetech/core/hashlib.h>
 
-#include <cetech/input/input.h>
-#include <cetech/application/application.h>
-#include <cetech/entity/entity.h>
+#include <cetech/engine/input/input.h>
+#include <cetech/engine/application/application.h>
+#include <cetech/engine/entity/entity.h>
 
 #include <cetech/playground//playground.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/transform/transform.h>
-#include <cetech/camera/camera.h>
-#include <cetech/level/level.h>
-#include <cetech/renderer/viewport.h>
-#include <cetech/renderer/texture.h>
+#include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/renderer/renderer.h>
+#include <cetech/engine/transform/transform.h>
+#include <cetech/engine/camera/camera.h>
+#include <cetech/engine/level/level.h>
+#include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/renderer/texture.h>
 #include <cstdlib>
 
 CETECH_DECL_API(ct_log_a0);
@@ -148,7 +148,7 @@ CETECH_MODULE_DEF(
 // Load
 //==============================================================================
         {
-            CEL_UNUSED(api);
+            CT_UNUSED(api);
 
             ct_log_a0.info("example", "Init %d", reload);
 
@@ -162,7 +162,7 @@ CETECH_MODULE_DEF(
 // Unload
 //==============================================================================
         {
-            CEL_UNUSED(api);
+            CT_UNUSED(api);
 
             ct_log_a0.info("example", "Shutdown %d", reload);
 

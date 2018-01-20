@@ -1,18 +1,18 @@
 #include <stdio.h>
-#include "celib/map.inl"
+#include "cetech/core/map.inl"
 
 
-#include <cetech/debugui/debugui.h>
+#include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
-#include <cetech/log/log.h>
+#include <cetech/core/log.h>
 #include <cetech/playground/log_view.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <celib/array.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/core/array.h>
 
-#include "cetech/hashlib/hashlib.h"
-#include "cetech/os/memory.h"
-#include "cetech/api/api_system.h"
-#include "cetech/module/module.h"
+#include "cetech/core/hashlib.h"
+#include "cetech/core/memory.h"
+#include "cetech/core/api_system.h"
+#include "cetech/core/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
@@ -41,7 +41,7 @@ static struct _G {
     uint8_t level_mask;
 
     bool visible;
-    cel_alloc *allocator;
+    ct_alloc *allocator;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -79,7 +79,7 @@ static void log_handler(enum ct_log_level level,
 
     ++_G.level_counters[level];
 
-    int offset = cel_array_size(_G.line_buffer);
+    int offset = ct_array_size(_G.line_buffer);
     log_item item = {
             .level = level,
             .offset = offset
@@ -89,8 +89,8 @@ static void log_handler(enum ct_log_level level,
     int len = snprintf(buffer, CETECH_ARRAY_LEN(buffer), LOG_FORMAT, where,
                        msg);
 
-    cel_array_push(_G.log_items, item, _G.allocator);
-    cel_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
+    ct_array_push(_G.log_items, item, _G.allocator);
+    ct_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
 }
 
 
@@ -132,7 +132,7 @@ static void ui_log_items() {
                       ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()),
                       false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    const int size = cel_array_size(_G.log_items);
+    const int size = ct_array_size(_G.log_items);
     for (int i = size - 1; i >= 0; --i) {
         log_item *item = &_G.log_items[i];
         const char *line = &_G.line_buffer[item->offset];
@@ -193,8 +193,8 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
     ct_playground_a0.unregister_module(PLAYGROUND_MODULE_NAME);
 
-    cel_array_free(_G.log_items, _G.allocator);
-    cel_array_free(_G.line_buffer, _G.allocator);
+    ct_array_free(_G.log_items, _G.allocator);
+    ct_array_free(_G.line_buffer, _G.allocator);
     _G = {};
 }
 
@@ -208,12 +208,12 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
         },
         {
-            CEL_UNUSED(reload);
+            CT_UNUSED(reload);
             _init(api);
         },
         {
-            CEL_UNUSED(reload);
-            CEL_UNUSED(api);
+            CT_UNUSED(reload);
+            CT_UNUSED(api);
             _shutdown();
         }
 )
