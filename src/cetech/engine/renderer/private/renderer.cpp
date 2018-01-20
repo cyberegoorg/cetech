@@ -55,7 +55,7 @@ static struct _G {
     int capture;
     int vsync;
     int need_reset;
-    ct_coredb_object_t *config;
+    ct_cdb_object_t *config;
     ct_alloc *allocator;
 } _G = {};
 
@@ -237,7 +237,7 @@ static void _init(struct ct_api_a0 *api) {
             .config = ct_config_a0.config_object(),
     };
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
 
     if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
         ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);

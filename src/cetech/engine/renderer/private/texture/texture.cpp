@@ -32,10 +32,10 @@ int texturecompiler_init(ct_api_a0 *api);
 //==============================================================================
 
 #define _G TextureResourceGlobals
-struct TextureResourceGlobals {
-    Map<ct_texture> handler_map;
+struct _G {
     uint64_t type;
-} TextureResourceGlobals;
+    ct_alloc* allocator;
+} _G;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -44,6 +44,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
 // Compiler private
@@ -54,67 +55,36 @@ CETECH_DECL_API(ct_hash_a0);
 // Resource
 //==============================================================================
 
-static const ct_texture null_texture = {};
-
-
-void *_texture_resource_loader(ct_vio *input,
-                               ct_alloc *allocator) {
-
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
-    input->read(input, data, 1, size);
-
-    return data;
-}
-
-void _texture_resource_unloader(void *new_data,
-                                ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
+#define TEXTURE_HANDLER_PROP CT_ID64_0("handler")
 
 void _texture_resource_online(uint64_t name,
-                              void *data) {
-    auto resource = texture_blob::get(data);
+                              struct ct_vio* input,
+                              struct ct_cdb_object_t *obj) {
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
+    input->read(input, data, 1, size);
 
-    const bgfx::Memory *mem = bgfx::copy((resource + 1),
+    auto resource = texture_blob::get(data);
+    const bgfx::Memory *mem = bgfx::copy(resource + 1,
                                          texture_blob::size(resource));
     auto texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
-    map::set(_G.handler_map, name, {texture.idx});
+    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
+    ct_coredb_a0.write_commit(writer);
 }
 
 
 void _texture_resource_offline(uint64_t name,
-                               void *data) {
-    CT_UNUSED(data);
-
-    auto texture = map::get(_G.handler_map, name, null_texture);
-
-    if (texture.idx == null_texture.idx) {
-        return;
-    }
-
-    bgfx::destroy((bgfx::TextureHandle) {texture.idx});
+                               struct ct_cdb_object_t *obj) {
+    const uint64_t texture = ct_coredb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
+    bgfx::destroy((bgfx::TextureHandle) {.idx=(uint16_t)texture});
 }
 
-void *_texture_resource_reloader(uint64_t name,
-                                 void *old_data,
-                                 void *new_data,
-                                 ct_alloc *allocator) {
-    _texture_resource_offline(name, old_data);
-    _texture_resource_online(name, new_data);
-
-    CT_FREE(allocator, old_data);
-
-    return new_data;
-}
 
 static const ct_resource_callbacks_t texture_resource_callback = {
-        .loader = _texture_resource_loader,
-        .unloader =_texture_resource_unloader,
         .online =_texture_resource_online,
         .offline =_texture_resource_offline,
-        .reloader = _texture_resource_reloader
 };
 
 
@@ -122,12 +92,10 @@ static const ct_resource_callbacks_t texture_resource_callback = {
 // Interface
 //==============================================================================
 int texture_init(ct_api_a0 *api) {
-    _G = {};
-
-    _G.type = CT_ID64_0("texture");
-
-    _G.handler_map.init(ct_memory_a0.main_allocator());
-
+    _G = (struct _G) {
+            .allocator = ct_memory_a0.main_allocator(),
+            .type = CT_ID64_0("texture")
+    };
 
     texturecompiler_init(api);
 
@@ -138,13 +106,16 @@ int texture_init(ct_api_a0 *api) {
 }
 
 void texture_shutdown() {
-    _G.handler_map.destroy();
 }
 
 ct_texture texture_get(uint64_t name) {
-    ct_resource_a0.get(_G.type, name); // TODO: only for autoload
+    ct_cdb_object_t* obj = ct_resource_a0.get_obj(_G.type, name);
 
-    return map::get(_G.handler_map, name, null_texture);
+    ct_texture texture = {
+            .idx = (uint16_t)ct_coredb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)
+    };
+
+    return texture;
 }
 
 static ct_texture_a0 texture_api = {
@@ -152,6 +123,7 @@ static ct_texture_a0 texture_api = {
 };
 
 static void _init_api(struct ct_api_a0 *api) {
+
     api->register_api("ct_texture_a0", &texture_api);
 }
 
@@ -166,6 +138,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_process_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CT_UNUSED(reload);

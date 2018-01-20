@@ -68,7 +68,7 @@ static uint64_t _object_new_property(struct object *obj,
     new_obj.offset = (uint64_t *) (new_obj.type + new_prop_count),
     new_obj.values = (uint8_t *) (new_obj.offset + new_prop_count),
 
-    ct_hash_clone(&obj->prop_map, &new_obj.prop_map, alloc);
+            ct_hash_clone(&obj->prop_map, &new_obj.prop_map, alloc);
 
     memcpy(new_obj.keys, obj->keys, sizeof(uint64_t) * prop_count);
     memcpy(new_obj.offset, obj->offset, sizeof(uint64_t) * prop_count);
@@ -128,7 +128,7 @@ static uint64_t _find_prop_index(const struct object *obj,
     return ct_hash_lookup(&obj->prop_map, key, 0);
 }
 
-static struct ct_coredb_object_t *create_object() {
+static struct ct_cdb_object_t *create_object() {
     struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     struct object *obj = _new_object(a);
@@ -136,7 +136,7 @@ static struct ct_coredb_object_t *create_object() {
     struct object **obj_addr = _G.objects + _G.object_used++;
     *obj_addr = obj;
 
-    return (struct ct_coredb_object_t *) obj_addr;
+    return (struct ct_cdb_object_t *) obj_addr;
 }
 
 
@@ -145,7 +145,7 @@ struct writer_t {
     struct object *clone_obj;
 };
 
-static struct ct_coredb_writer_t *write_begin(struct ct_coredb_object_t *obj) {
+static struct ct_cdb_writer_t *write_begin(struct ct_cdb_object_t *obj) {
     struct writer_t *writer = CT_ALLOC(ct_memory_a0.main_allocator(),
                                        struct writer_t,
                                        sizeof(struct writer_t));
@@ -154,16 +154,16 @@ static struct ct_coredb_writer_t *write_begin(struct ct_coredb_object_t *obj) {
                                       ct_memory_a0.main_allocator());
     writer->obj = (struct object **) obj;
 
-    return (struct ct_coredb_writer_t *) writer;
+    return (struct ct_cdb_writer_t *) writer;
 }
 
-static void write_commit(struct ct_coredb_writer_t *_writer) {
+static void write_commit(struct ct_cdb_writer_t *_writer) {
     struct writer_t *writer = (struct writer_t *) _writer;
 
     *writer->obj = writer->clone_obj;
 }
 
-static void set_float(struct ct_coredb_writer_t *_writer,
+static void set_float(struct ct_cdb_writer_t *_writer,
                       uint64_t property,
                       float value) {
     struct writer_t *writer = (struct writer_t *) _writer;
@@ -180,7 +180,7 @@ static void set_float(struct ct_coredb_writer_t *_writer,
     *(float *) (obj->values + obj->offset[idx]) = value;
 }
 
-static void set_string(struct ct_coredb_writer_t *_writer,
+static void set_string(struct ct_cdb_writer_t *_writer,
                        uint64_t property,
                        const char *value) {
     struct ct_alloc *a = ct_memory_a0.main_allocator();
@@ -204,7 +204,7 @@ static void set_string(struct ct_coredb_writer_t *_writer,
     memcpy(obj->values + obj->offset[idx], &value_clone, sizeof(value_clone));
 }
 
-static void set_uint32(struct ct_coredb_writer_t *_writer,
+static void set_uint32(struct ct_cdb_writer_t *_writer,
                        uint64_t property,
                        uint32_t value) {
     struct writer_t *writer = (struct writer_t *) _writer;
@@ -221,7 +221,24 @@ static void set_uint32(struct ct_coredb_writer_t *_writer,
     *(uint32_t *) (obj->values + obj->offset[idx]) = value;
 }
 
-static void set_ptr(struct ct_coredb_writer_t *_writer,
+static void set_uint64(struct ct_cdb_writer_t *_writer,
+                       uint64_t property,
+                       uint64_t value) {
+    struct writer_t *writer = (struct writer_t *) _writer;
+
+    struct object *obj = writer->clone_obj;
+
+    uint64_t idx = _find_prop_index(obj, property);
+    if (!idx) {
+        idx = _object_new_property(obj, property, COREDB_TYPE_UINT32, &value,
+                                   sizeof(uint32_t),
+                                   ct_memory_a0.main_allocator());
+    }
+
+    *(uint64_t *) (obj->values + obj->offset[idx]) = value;
+}
+
+static void set_ptr(struct ct_cdb_writer_t *_writer,
                     uint64_t property,
                     void *value) {
     struct writer_t *writer = (struct writer_t *) _writer;
@@ -231,28 +248,45 @@ static void set_ptr(struct ct_coredb_writer_t *_writer,
     uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_PTR, &value,
-                                   sizeof(uint32_t),
+                                   sizeof(void*),
                                    ct_memory_a0.main_allocator());
     }
 
     *(void **) (obj->values + obj->offset[idx]) = value;
 }
 
+static void set_ref(struct ct_cdb_writer_t *_writer,
+                    uint64_t property,
+                    struct ct_cdb_object_t *ref) {
 
-static bool prop_exist(struct ct_coredb_object_t *_object,
+    struct writer_t *writer = (struct writer_t *) _writer;
+
+    struct object *obj = writer->clone_obj;
+
+    uint64_t idx = _find_prop_index(obj, property);
+    if (!idx) {
+        idx = _object_new_property(obj, property, COREDB_TYPE_REF, ref,
+                                   sizeof(struct ct_cdb_object_t *),
+                                   ct_memory_a0.main_allocator());
+    }
+
+    *(struct ct_cdb_object_t **) (obj->values + obj->offset[idx]) = ref;
+}
+
+static bool prop_exist(struct ct_cdb_object_t *_object,
                        uint64_t key) {
     struct object *obj = *(struct object **) _object;
     return _find_prop_index(obj, key) > 0;
 }
 
-static enum ct_coredb_prop_type prop_type(struct ct_coredb_object_t *_object,
+static enum ct_coredb_prop_type prop_type(struct ct_cdb_object_t *_object,
                                           uint64_t key) {
     struct object *obj = *(struct object **) _object;
     uint64_t idx = _find_prop_index(obj, key);
     return idx ? obj->type[idx] : COREDB_TYPE_NONE;
 }
 
-static float read_float(struct ct_coredb_object_t *_obj,
+static float read_float(struct ct_cdb_object_t *_obj,
                         uint64_t property,
                         float defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -260,7 +294,7 @@ static float read_float(struct ct_coredb_object_t *_obj,
     return idx ? *(float *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static const char *read_string(struct ct_coredb_object_t *_obj,
+static const char *read_string(struct ct_cdb_object_t *_obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -268,7 +302,7 @@ static const char *read_string(struct ct_coredb_object_t *_obj,
     return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static uint32_t read_uint32(struct ct_coredb_object_t *_obj,
+static uint32_t read_uint32(struct ct_cdb_object_t *_obj,
                             uint64_t property,
                             uint32_t defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -276,12 +310,28 @@ static uint32_t read_uint32(struct ct_coredb_object_t *_obj,
     return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static void *read_ptr(struct ct_coredb_object_t *_obj,
+static uint64_t read_uint64(struct ct_cdb_object_t *_obj,
+                            uint64_t property,
+                            uint64_t defaultt) {
+    struct object *obj = *(struct object **) _obj;
+    uint64_t idx = _find_prop_index(obj, property);
+    return idx ? *(uint64_t *) (obj->values + obj->offset[idx]) : defaultt;
+}
+
+static void *read_ptr(struct ct_cdb_object_t *_obj,
                       uint64_t property,
                       void *defaultt) {
     struct object *obj = *(struct object **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
+}
+
+static struct ct_cdb_object_t *read_ref(struct ct_cdb_object_t *_obj,
+                                           uint64_t property,
+                                           struct ct_cdb_object_t *defaultt) {
+    struct object *obj = *(struct object **) _obj;
+    uint64_t idx = _find_prop_index(obj, property);
+    return idx ? *(struct ct_cdb_object_t **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
 static struct ct_coredb_a0 coredb_api = {
@@ -293,7 +343,9 @@ static struct ct_coredb_a0 coredb_api = {
         .read_float = read_float,
         .read_string = read_string,
         .read_uint32 = read_uint32,
+        .read_uint64 = read_uint64,
         .read_ptr = read_ptr,
+        .read_ref = read_ref,
 
         .write_begin = write_begin,
         .write_commit = write_commit,
@@ -301,7 +353,9 @@ static struct ct_coredb_a0 coredb_api = {
         .set_float = set_float,
         .set_string = set_string,
         .set_uint32 = set_uint32,
+        .set_uint64 = set_uint64,
         .set_ptr = set_ptr,
+        .set_ref = set_ref,
 };
 
 

@@ -53,8 +53,8 @@ const char *_platform() {
 
 int init_config(int argc,
                 const char **argv,
-                struct ct_coredb_object_t *object) {
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(object);
+                struct ct_cdb_object_t *object) {
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(object);
     ct_coredb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
     ct_coredb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
     ct_coredb_a0.set_string(writer, CONFIG_BUILD, "build");

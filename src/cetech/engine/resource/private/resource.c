@@ -39,10 +39,6 @@ CETECH_DECL_API(ct_thread_a0);
 void resource_register_type(uint64_t type,
                             ct_resource_callbacks_t callbacks);
 
-//namespace resource {
-//    void reload_all();
-//}
-
 //==============================================================================
 // Gloals
 //==============================================================================
@@ -51,46 +47,35 @@ void resource_register_type(uint64_t type,
 #define is_item_null(item) ((item).data == null_item.data)
 
 
-//static uint64_t hash_combine(uint64_t lhs,
-//                      uint64_t rhs) {
-//    if(lhs == 0) return rhs;
-//    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
-//    return lhs;
-//}
-
 //==============================================================================
 // Gloals
 //==============================================================================
 
 #define MAX_TYPES 64
 
-#define PROP_RESOURECE_DATA "data"
-
 struct type_item_t {
-    struct ct_hash_t name_map;
-    struct ct_coredb_object_t **resource_objects;
-    uint64_t type;
+    struct ct_cdb_object_t *type_objects;
     struct ct_spinlock lock;
+    uint64_t type;
 };
 
 #define _G ResourceManagerGlobals
 struct _G {
     struct ct_hash_t type_map;
-    ct_resource_callbacks_t *resource_callbacks;
-
     struct type_item_t type_items[MAX_TYPES + 1];
     uint32_t type_items_count;
 
-    int autoload_enabled;
+    ct_resource_callbacks_t *resource_callbacks;
 
-    struct ct_coredb_object_t *config;
+    bool autoload_enabled;
+
+    struct ct_cdb_object_t *config;
     struct ct_alloc *allocator;
 } _G = {};
 
 //==============================================================================
 // Private
 //==============================================================================
-
 
 #define CONFIG_BUILD_DIR CT_ID64_0(CONFIG_BUILD_ID)
 #define CONFIG_KERNEL_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
@@ -136,7 +121,7 @@ static int type_name_string(char *str,
 }
 
 
-static void set_autoload(int enable) {
+static void set_autoload(bool enable) {
     _G.autoload_enabled = enable;
 }
 
@@ -149,25 +134,10 @@ void resource_register_type(uint64_t type,
     ct_hash_add(&_G.type_map, type, idx, _G.allocator);
 
     struct type_item_t *type_item = &_G.type_items[_G.type_items_count++];
-    *type_item = (struct type_item_t) {.type = type};
-}
-
-static void *get(uint64_t type,
-                 uint64_t name);
-
-static void add_loaded(uint64_t type,
-                       uint64_t *names,
-                       size_t count) {
-
-    const uint32_t type_idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
-
-    if (type_idx == UINT32_MAX) {
-        return;
-    }
-
-    for (size_t i = 0; i < count; i++) {
-        _G.resource_callbacks[type_idx].online(names[i], get(type, names[i]));
-    }
+    *type_item = (struct type_item_t) {
+            .type = type,
+            .type_objects = ct_coredb_a0.create_object()
+    };
 }
 
 static void load(uint64_t type,
@@ -179,7 +149,6 @@ static void load_now(uint64_t type,
                      uint64_t *names,
                      size_t count) {
     load(type, names, count, 0);
-    add_loaded(type, names, count);
 }
 
 static int can_get(uint64_t type,
@@ -188,7 +157,7 @@ static int can_get(uint64_t type,
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
-    return ct_hash_contain(&type_item->name_map, name);
+    return ct_coredb_a0.prop_exist(type_item->type_objects, name);
 }
 
 static int can_get_all(uint64_t type,
@@ -207,35 +176,33 @@ static void load(uint64_t type,
                  uint64_t *names,
                  size_t count,
                  int force) {
-
-    const uint32_t idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
+    const uint32_t type_idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
+    if (type_idx == UINT32_MAX) {
+        return;
+    }
 
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
     const uint64_t root_name = CT_ID64_0("build");
-    ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
     ct_thread_a0.spin_lock(&type_item->lock);
+    struct ct_cdb_writer_t *type_writer = ct_coredb_a0.write_begin(
+            type_item->type_objects);
     for (uint32_t i = 0; i < count; ++i) {
-        uint64_t id = names[i];
-        uint32_t res_idx = ct_hash_lookup(&type_item->name_map, id, UINT32_MAX);
+        const uint64_t asset_name = names[i];
 
-        struct ct_coredb_object_t *object = NULL;
-
-        if (res_idx != UINT32_MAX) {
+        if (!force &&
+            ct_coredb_a0.prop_exist(type_item->type_objects, asset_name)) {
             continue;
         };
 
-        object = ct_coredb_a0.create_object();
-        ct_hash_add(&type_item->name_map, id,
-                    ct_array_size(type_item->resource_objects), _G.allocator);
-        ct_array_push(type_item->resource_objects, object, _G.allocator);
+        struct ct_cdb_object_t *object = ct_coredb_a0.create_object();
 
         char build_name[33] = {};
         type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
                          type,
-                         names[i]);
+                         asset_name);
 
         char filename[1024] = {};
         resource_compiler_get_filename(filename, CETECH_ARRAY_LEN(filename),
@@ -243,12 +210,11 @@ static void load(uint64_t type,
                                        names[i]);
 
         ct_log_a0.debug("resource", "Loading resource %s from %s",
-                        filename,
-                        build_name);
+                        filename, build_name);
 
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
-                        ct_memory_a0.main_allocator(), 2,
+                        _G.allocator, 2,
                         ct_coredb_a0.read_string(_G.config,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
@@ -257,18 +223,17 @@ static void load(uint64_t type,
                                                              build_full,
                                                              FS_OPEN_READ);
 
-        ct_buffer_free(build_full, ct_memory_a0.main_allocator());
+        ct_buffer_free(build_full, _G.allocator);
 
         if (resource_file != NULL) {
-            void *data = type_clb.loader(resource_file,
-                                         ct_memory_a0.main_allocator());
+            _G.resource_callbacks[type_idx].online(names[i],
+                                                   resource_file,
+                                                   object);
 
-            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
-                    object);
-            ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), data);
-            ct_coredb_a0.write_commit(writer);
+            ct_coredb_a0.set_ref(type_writer, asset_name, object);
         }
     }
+    ct_coredb_a0.write_commit(type_writer);
     ct_thread_a0.spin_unlock(&type_item->lock);
 }
 
@@ -277,7 +242,6 @@ static void unload(uint64_t type,
                    size_t count) {
 
     const uint32_t idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
-
     if (idx == UINT32_MAX) {
         return;
     }
@@ -288,7 +252,6 @@ static void unload(uint64_t type,
     ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
 
     for (uint32_t i = 0; i < count; ++i) {
-
         if (1) {// TODO: ref counting
             char build_name[33] = {};
             type_name_string(build_name,
@@ -303,65 +266,50 @@ static void unload(uint64_t type,
 
             ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
-            uint32_t idx = 0;
-            idx = ct_hash_lookup(&type_item->name_map, names[i], UINT32_MAX);
-            struct ct_coredb_object_t *object = type_item->resource_objects[idx];
+            struct ct_cdb_object_t *object = ct_coredb_a0.read_ref(
+                    type_item->type_objects, names[i], NULL);
 
-            void *data = ct_coredb_a0.read_ptr(object,
-                                               CT_ID64_0(PROP_RESOURECE_DATA),
-                                               NULL);
-
-            type_clb.offline(names[i], data);
-            type_clb.unloader(data, ct_memory_a0.main_allocator());
-
-            struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
-                    object);
-            ct_coredb_a0.set_ptr(writer, CT_ID64_0(PROP_RESOURECE_DATA), NULL);
-            ct_coredb_a0.write_commit(writer);
+            type_clb.offline(names[i], object);
         }
     }
 
 }
 
-static void *get(uint64_t type,
-                 uint64_t name) {
-    //ce_thread_a0.spin_lock(&_G.add_lock);
+static struct ct_cdb_object_t *get_obj(uint64_t type,
+                                       uint64_t name) {
 
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
-    uint32_t idx = 0;
+    struct ct_cdb_object_t *type_object;
+    type_object = type_item->type_objects;
 
-    find:
-    idx = ct_hash_lookup(&type_item->name_map, name, UINT32_MAX);
-    if (idx == UINT32_MAX) {
-        char build_name[33] = {};
-        type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
-                         type,
-                         name);
+    struct ct_cdb_object_t *object = ct_coredb_a0.read_ref(type_object, name, NULL);
 
-        if (_G.autoload_enabled) {
-            char filename[1024] = {};
-            resource_compiler_get_filename(filename,
-                                           CETECH_ARRAY_LEN(filename),
-                                           type,
-                                           name);
-
-            ct_log_a0.warning(LOG_WHERE, "Autoloading resource %s",
-                              filename);
-            load_now(type, &name, 1);
-
-            goto find;
-        } else {
-            // TODO: fallback resource #205
-            CETECH_ASSERT(LOG_WHERE, false);
-        }
+    if(object) {
+        return object;
     }
 
-    struct ct_coredb_object_t *object = type_item->resource_objects[idx];
-    void *data = ct_coredb_a0.read_ptr(object, CT_ID64_0(PROP_RESOURECE_DATA),
-                                       NULL);
+    char build_name[33] = {};
+    type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
+                     type,
+                     name);
 
-    return data;
+    if (_G.autoload_enabled) {
+        char filename[1024] = {};
+        resource_compiler_get_filename(filename,
+                                       CETECH_ARRAY_LEN(filename),
+                                       type,
+                                       name);
+
+        ct_log_a0.warning(LOG_WHERE, "Autoloading resource %s",
+                          filename);
+        load_now(type, &name, 1);
+    } else {
+        // TODO: fallback resource #205
+        CETECH_ASSERT(LOG_WHERE, false);
+    }
+
+    return ct_coredb_a0.read_ref(type_object, name, NULL);
 }
 
 static void reload(uint64_t type,
@@ -395,7 +343,7 @@ static void reload(uint64_t type,
 //
 //            void *new_data = type_clb.reloader(names[i], old_data,
 //                                               loaded_data[i],
-//                                               ct_memory_a0.main_allocator());
+//                                               _G.allocator);
 //
 //            uint64_t id = hash_combine(type, names[i]);
 //            uint32_t item_idx = map::get(_G.resource_map, id, UINT32_MAX);
@@ -458,7 +406,7 @@ void resource_memory_reload(uint64_t type,
 //
 //        void *new_data = type_clb.reloader(name, old_data,
 //                                           blob,
-//                                           ct_memory_a0.main_allocator());
+//                                           _G.allocator);
 //
 //        resource_item_t item = _G.resource_data[item_idx];
 //        item.data = new_data;
@@ -469,14 +417,14 @@ static struct ct_resource_a0 resource_api = {
         .set_autoload = set_autoload,
         .register_type = resource_register_type,
         .load = load,
-        .add_loaded = add_loaded,
         .load_now = load_now,
         .unload = unload,
         .reload = reload,
         .reload_all = reload_all,
         .can_get = can_get,
         .can_get_all = can_get_all,
-        .get = get,
+//        .get = get,
+        .get_obj = get_obj,
         .type_name_string = type_name_string,
 
         .compiler_get_build_dir = resource_compiler_get_build_dir,
@@ -515,7 +463,7 @@ static void _init_cvar(struct ct_config_a0 config) {
     ct_config_a0 = config;
     _G.config = ct_config_a0.config_object();
 
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
     if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_BUILD_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }

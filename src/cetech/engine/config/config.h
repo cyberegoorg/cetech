@@ -16,7 +16,7 @@ extern "C" {
 
 struct ct_alloc;
 
-struct ct_coredb_object_t;
+struct ct_cdb_object_t;
 
 //==============================================================================
 // Typedefs
@@ -44,7 +44,7 @@ struct ct_config_a0 {
     int (*load_from_yaml_file)(const char *yaml,
                                struct ct_alloc *alloc);
 
-    struct ct_coredb_object_t *(*config_object)();
+    struct ct_cdb_object_t *(*config_object)();
 
     //! Dump all variables to log
     void (*log_all)();

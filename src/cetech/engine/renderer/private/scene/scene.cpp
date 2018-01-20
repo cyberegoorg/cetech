@@ -39,6 +39,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_thread_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 
 struct scene_instance {
@@ -100,7 +101,7 @@ static struct scene_instance *_get_scene_instance(uint64_t scene) {
                                               UINT32_MAX);
 
     if (idx == UINT32_MAX) {
-        ct_resource_a0.get(_G.type, scene);
+        ct_resource_a0.get_obj(_G.type, scene);
         idx = (uint32_t) ct_hash_lookup(&_G.scene_instance_map, scene,
                                          UINT32_MAX);
     }
@@ -116,24 +117,18 @@ static struct scene_instance *_get_scene_instance(uint64_t scene) {
 //==============================================================================
 // Resource
 //==============================================================================
-//static const bgfx::TextureHandle null_texture = {};
 
-
-static void *loader(ct_vio *input,
-                    ct_alloc *allocator) {
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
-    input->read(input, data, 1, size);
-    return data;
-}
-
-static void unloader(void *new_data,
-                     ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
+#define SCENE_PROP CT_ID64_0("scene")
 
 static void online(uint64_t name,
-                   void *data) {
+                   struct ct_vio* input,struct ct_cdb_object_t* obj) {
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
+    input->read(input, data, 1, size);
+
+    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, SCENE_PROP, data);
+    ct_coredb_a0.write_commit(writer);
 
     auto resource = scene_blob::get(data);
 
@@ -147,6 +142,7 @@ static void online(uint64_t name,
     uint8_t *vb = scene_blob::vb(resource);
 
     scene_instance *instance = _init_scene_instance(name);
+
 
     for (uint32_t i = 0; i < resource->geom_count; ++i) {
         auto vb_mem = bgfx::makeRef((const void *) &vb[vb_offset[i]],
@@ -171,30 +167,15 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    void *data) {
-    CT_UNUSED(data);
+                    struct ct_cdb_object_t* obj) {
+    CT_UNUSED(obj);
 
     _destroy_scene_instance(name);
 }
 
-static void *reloader(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      ct_alloc *allocator) {
-    offline(name, old_data);
-    online(name, new_data);
-
-    CT_FREE(allocator, old_data);
-
-    return new_data;
-}
-
 static const ct_resource_callbacks_t callback = {
-        .loader = loader,
-        .unloader = unloader,
         .online = online,
         .offline = offline,
-        .reloader = reloader
 };
 
 
@@ -247,10 +228,16 @@ static void setVBIB(uint64_t scene,
     bgfx::setIndexBuffer(instance->ib[idx], 0, instance->size[idx]);
 }
 
+static scene_blob::blob_t* resource_data(uint64_t name) {
+    auto object = ct_resource_a0.get_obj(_G.type, name);
+    return (scene_blob::blob_t*)(ct_coredb_a0.read_ptr(object, SCENE_PROP, NULL));
+}
+
 static void create_graph(ct_world world,
                          ct_entity entity,
                          uint64_t scene) {
-    auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+
+    auto *res = resource_data(scene);
 
     uint64_t *node_name = scene_blob::node_name(res);
     uint32_t *node_parent = scene_blob::node_parent(res);
@@ -266,10 +253,10 @@ static void create_graph(ct_world world,
 
 static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
-    auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+    auto *res = resource_data(scene);
 
-    uint64_t *geom_node = scene_blob::geom_node(res);
     uint64_t *geom_name = scene_blob::geom_name(res);
+    uint64_t *geom_node = scene_blob::geom_node(res);
 
     for (uint32_t i = 0; i < res->geom_count; ++i) {
         if (geom_name[i] != mesh) {
@@ -285,7 +272,7 @@ static uint64_t get_mesh_node(uint64_t scene,
 static void get_all_geometries(uint64_t scene,
                                char **geometries,
                                uint32_t *count) {
-    auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+    auto *res = resource_data(scene);
 
     *geometries = scene_blob::geom_str(res);
     *count = scene_blob::geom_count(res);
@@ -294,14 +281,14 @@ static void get_all_geometries(uint64_t scene,
 static void get_all_nodes(uint64_t scene,
                           char **geometries,
                           uint32_t *count) {
-    auto *res = scene_blob::get(ct_resource_a0.get(_G.type, scene));
+    auto *res = resource_data(scene);
 
     *geometries = scene_blob::node_str(res);
     *count = scene_blob::node_count(res);
 }
 
 static ct_scene_a0 scene_api = {
-        .setVBIB =setVBIB,
+        .setVBIB = setVBIB,
         .create_graph =create_graph,
         .get_mesh_node =get_mesh_node,
         .get_all_geometries =get_all_geometries,
@@ -322,6 +309,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_thread_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CT_UNUSED(reload);

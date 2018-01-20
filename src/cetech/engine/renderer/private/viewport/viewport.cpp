@@ -89,12 +89,14 @@ static struct G {
     uint32_t size_width;
     uint32_t size_height;
     int need_reset;
-    ct_coredb_object_t *config;
+    ct_cdb_object_t *config;
     ct_alloc *allocator;
 } _G = {};
 
 #define CONFIG_RENDER_CONFIG CT_ID64_0("default")
 #define CONFIG_DAEMON CT_ID64_0("daemon")
+
+#define VIEWPORT_PROP CT_ID64_0("viewport")
 
 //==============================================================================
 // Private
@@ -182,7 +184,8 @@ static void _init_viewport(viewport_instance &vi,
     const char *render_config = ct_coredb_a0.read_string(
             ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
-    auto *resource = ct_resource_a0.get(_G.type, CT_ID64_0(render_config));
+    ct_cdb_object_t* object = ct_resource_a0.get_obj(_G.type, CT_ID64_0(render_config));
+    void* resource = ct_coredb_a0.read_ptr(object, VIEWPORT_PROP, NULL);
     auto *blob = renderconfig_blob::get(resource);
 
     if (!width || !height) {
@@ -317,22 +320,15 @@ static ct_viewport renderer_create_viewport(uint64_t name,
 //==============================================================================
 // render_config resource
 //==============================================================================
-static void *loader(ct_vio *input,
-                    ct_alloc *allocator) {
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
-    input->read(input, data, 1, size);
-    return data;
-}
 
-static void unloader(void *new_data,
-                     ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
 
 static void online(uint64_t name,
-                   void *data) {
+                   struct ct_vio* input, struct ct_cdb_object_t* obj) {
     CT_UNUSED(name);
+
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
+    input->read(input, data, 1, size);
 
     auto *blob = renderconfig_blob::get(data);
 
@@ -350,41 +346,27 @@ static void online(uint64_t name,
                                       | BGFX_TEXTURE_U_CLAMP
                                       | BGFX_TEXTURE_V_CLAMP;
 
-        auto h = bgfx::createTexture2D(ration, false, 1, format,
-                                       samplerFlags);
+        auto h = bgfx::createTexture2D(ration, false, 1, format, samplerFlags);
 
         map::set(_G.global_resource, gr.name, h);
     }
 
+    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, VIEWPORT_PROP, data);
+    ct_coredb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
-                    void *data) {
-    CT_UNUSED(name, data);
+                    struct ct_cdb_object_t* obj) {
+    CT_UNUSED(name, obj);
     //auto *blob = renderconfig_blob::get(data);
 
 
 }
 
-static void *reloader(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      ct_alloc *allocator) {
-    offline(name, old_data);
-    online(name, new_data);
-
-    recreate_all_viewport();
-
-    CT_FREE(allocator, old_data);
-    return new_data;
-}
-
 static const ct_resource_callbacks_t callback = {
-        .loader = loader,
-        .unloader = unloader,
         .online = online,
         .offline = offline,
-        .reloader = reloader
 };
 
 //// COMPIELr
@@ -842,7 +824,7 @@ static void _init(struct ct_api_a0 *api) {
     _G.allocator = ct_memory_a0.main_allocator();
     _G.config = ct_config_a0.config_object();
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
     if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
         ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
     }

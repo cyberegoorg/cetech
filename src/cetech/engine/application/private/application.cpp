@@ -67,7 +67,7 @@ CETECH_DECL_API(ct_coredb_a0);
 //==============================================================================
 
 static struct ApplicationGlobals {
-    ct_coredb_object_t *config_object;
+    ct_cdb_object_t *config_object;
 
     ct_app_on_init *on_init;
     ct_app_on_shutdown *on_shutdown;
@@ -100,7 +100,7 @@ void application_quit() {
 void _init_config() {
     _G.config_object = ct_config_a0.config_object();
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
 
     if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
         ct_coredb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
@@ -213,13 +213,13 @@ extern "C" void application_start() {
         _G.active_game.on_init();
     }
 
-    ct_coredb_object_t *obj1 = ct_coredb_a0.create_object();
-    ct_coredb_object_t *obj2 = ct_coredb_a0.create_object();
-    ct_coredb_object_t *obj3 = ct_coredb_a0.create_object();
+    ct_cdb_object_t *obj1 = ct_coredb_a0.create_object();
+    ct_cdb_object_t *obj2 = ct_coredb_a0.create_object();
+    ct_cdb_object_t *obj3 = ct_coredb_a0.create_object();
 
     float f1 = ct_coredb_a0.read_float(obj1, 1, 22.0f);
 
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(obj1);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj1);
     ct_coredb_a0.set_float(writer, 1, 44.0f);
     ct_coredb_a0.set_float(writer, 2, 55.0f);
     ct_coredb_a0.set_float(writer, 3, 66.0f);

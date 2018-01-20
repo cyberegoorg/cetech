@@ -59,8 +59,8 @@ CETECH_DECL_API(ct_coredb_a0);
 static struct ConfigSystemGlobals {
     uint64_t type;
 
-    struct ct_coredb_object_t *config_object;
-    struct ct_coredb_object_t *config_desc;
+    struct ct_cdb_object_t *config_object;
+    struct ct_cdb_object_t *config_desc;
 } _G;
 
 
@@ -81,7 +81,7 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(
             _G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
@@ -153,7 +153,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
             if (ct_coredb_a0.prop_exist(_G.config_object, key)) {
                 enum ct_coredb_prop_type t = ct_coredb_a0.prop_type(
                         _G.config_object, key);
-                struct ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(
+                struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(
                         _G.config_object);
 
                 switch (t) {
@@ -229,7 +229,7 @@ static int parse_args(int argc,
 }
 
 
-static struct ct_coredb_object_t *config_object() {
+static struct ct_cdb_object_t *config_object() {
     return _G.config_object;
 }
 

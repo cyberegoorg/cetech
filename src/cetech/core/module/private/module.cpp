@@ -47,7 +47,7 @@ static struct _G {
     module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
-    ct_coredb_object_t *config;
+    ct_cdb_object_t *config;
     ct_alloc *allocator;
 } _G = {};
 

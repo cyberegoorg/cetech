@@ -22,6 +22,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 struct package_resource {
     uint32_t type_count;
@@ -51,29 +52,23 @@ struct _G {
     struct ct_alloc *allocator;
 } _G = {};
 
-void *loader(struct ct_vio *input,
-             struct ct_alloc *allocator) {
-
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
+void online(uint64_t name,
+            struct ct_vio* input,
+            struct ct_cdb_object_t *obj) {
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    return data;
-}
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
+    ct_coredb_a0.write_commit(writer);
 
-void unloader(void *new_data,
-              struct ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
-
-void online(uint64_t name,
-            void *data) {
-    CT_UNUSED(name, data);
+    CT_UNUSED(name, input);
 }
 
 void offline(uint64_t name,
-             void *data) {
-    CT_UNUSED(name, data);
+             struct ct_cdb_object_t *obj) {
+    CT_UNUSED(name, obj);
 }
 
 void *reloader(uint64_t name,
@@ -87,11 +82,8 @@ void *reloader(uint64_t name,
 }
 
 static const ct_resource_callbacks_t package_resource_callback = {
-        .loader = loader,
-        .unloader =unloader,
         .online =online,
         .offline =offline,
-        .reloader = reloader
 };
 
 
@@ -127,7 +119,7 @@ void _package_compiler(const char *filename,
 
         ct_array_push(compile_data.types, type_id, _G.allocator);
         ct_array_push(compile_data.offset, ct_array_size(compile_data.name),
-                       _G.allocator);
+                      _G.allocator);
 
         uint64_t name_keys[32] = {};
         uint32_t name_keys_count = 0;
@@ -161,17 +153,17 @@ void _package_compiler(const char *filename,
 
     ct_array_push_n(*output, &resource, sizeof(resource), _G.allocator);
     ct_array_push_n(*output, compile_data.types,
-                     sizeof(uint64_t) * ct_array_size(compile_data.types),
-                     _G.allocator);
+                    sizeof(uint64_t) * ct_array_size(compile_data.types),
+                    _G.allocator);
     ct_array_push_n(*output, compile_data.name_count,
-                     sizeof(uint32_t) * ct_array_size(compile_data.name_count),
-                     _G.allocator);
+                    sizeof(uint32_t) * ct_array_size(compile_data.name_count),
+                    _G.allocator);
     ct_array_push_n(*output, compile_data.name,
-                     sizeof(uint64_t) * ct_array_size(compile_data.name),
-                     _G.allocator);
+                    sizeof(uint64_t) * ct_array_size(compile_data.name),
+                    _G.allocator);
     ct_array_push_n(*output, compile_data.offset,
-                     sizeof(uint32_t) * ct_array_size(compile_data.offset),
-                     _G.allocator);
+                    sizeof(uint32_t) * ct_array_size(compile_data.offset),
+                    _G.allocator);
 }
 
 int package_init(struct ct_api_a0 *api) {
@@ -183,6 +175,7 @@ int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hash_a0);
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_yng_a0);
+    CETECH_GET_API(api, ct_coredb_a0);
 
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
@@ -204,9 +197,9 @@ void package_shutdown() {
 
 void package_task(void *data) {
     struct package_task_data *task_data = (struct package_task_data *) data;
-    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
-            _G.package_typel,
-            task_data->name);
+
+    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, task_data->name);
+    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
     for (uint32_t j = 0; j < task_count; ++j) {
@@ -223,8 +216,8 @@ void package_load(uint64_t name) {
 
     struct package_task_data *task_data =
             CT_ALLOC(ct_memory_a0.main_allocator(),
-                         struct package_task_data,
-                         sizeof(struct package_task_data));
+                     struct package_task_data,
+                     sizeof(struct package_task_data));
 
     task_data->name = name;
 
@@ -239,9 +232,8 @@ void package_load(uint64_t name) {
 }
 
 void package_unload(uint64_t name) {
-    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
-            _G.package_typel,
-            name);
+    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
+    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
     for (uint32_t j = 0; j < task_count; ++j) {
@@ -253,9 +245,8 @@ void package_unload(uint64_t name) {
 }
 
 int package_is_loaded(uint64_t name) {
-    const uint64_t package_type = CT_ID64_0("package");
-    struct package_resource *package = (struct package_resource *) ct_resource_a0.get(
-            package_type, name);
+    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
+    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (package == NULL) {
         return 0;

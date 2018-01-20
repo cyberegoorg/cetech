@@ -28,6 +28,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
 // Globals
@@ -93,7 +94,8 @@ entity_instance *get_spawned_entity(ct_entity ent) {
 
 
 ct_entity create() {
-    return (ct_entity) {.h = ct_handler_create(&_G.entity_handler, _G.allocator)};
+    return (ct_entity) {.h = ct_handler_create(&_G.entity_handler,
+                                               _G.allocator)};
 }
 
 void destroy(ct_world world,
@@ -310,7 +312,7 @@ static void foreach_components_clb(const char *filename,
 
     uint64_t idx = ct_hash_lookup(&output->component_ent, cid, UINT64_MAX);
     ct_array_push(output->component_ent_array[idx], data->ent_id,
-                   _G.allocator);
+                  _G.allocator);
 
     idx = ct_hash_lookup(&output->component_body, cid, UINT64_MAX);
 
@@ -331,7 +333,7 @@ static void compile_entitity(const char *filename,
     uint32_t ent_id = output->ent_counter++;
 
     ct_hash_add(&output->entity_parent, ent_id, (uint32_t) parent,
-                 _G.allocator);
+                _G.allocator);
 
     uint64_t guid = root_key[root_count - 1];
     ct_array_push(output->guid, guid, _G.allocator);
@@ -389,8 +391,8 @@ static ct_entity_compile_output *create_output() {
     ct_alloc *a = ct_memory_a0.main_allocator();
 
     ct_entity_compile_output *output = CT_ALLOC(a,
-                                                    ct_entity_compile_output,
-                                                    sizeof(ct_entity_compile_output));
+                                                ct_entity_compile_output,
+                                                sizeof(ct_entity_compile_output));
     *output = {};
 
     return output;
@@ -452,11 +454,11 @@ static void write_to_build(ct_entity_compile_output *output,
 
 
     ct_array_push_n(*build, &res, sizeof(struct entity_resource),
-                     _G.allocator);
+                    _G.allocator);
 
     //write guids
     ct_array_push_n(*build, &output->guid[0], sizeof(uint64_t) * res.ent_count,
-                     _G.allocator);
+                    _G.allocator);
 
     //write parents
     for (uint32_t i = 0; i < res.ent_count; ++i) {
@@ -467,9 +469,9 @@ static void write_to_build(ct_entity_compile_output *output,
 
     //write comp types
     ct_array_push_n(*build,
-                     (uint8_t *) output->component_type,
-                     sizeof(uint64_t) * ct_array_size(output->component_type),
-                     _G.allocator);
+                    (uint8_t *) output->component_type,
+                    sizeof(uint64_t) * ct_array_size(output->component_type),
+                    _G.allocator);
 
     //write comp data
     for (uint32_t j = 0; j < res.comp_type_count; ++j) {
@@ -496,11 +498,11 @@ static void write_to_build(ct_entity_compile_output *output,
         cdata.size = ct_array_size(blob);
 
         ct_array_push_n(*build, (uint8_t *) &cdata, sizeof(cdata),
-                         _G.allocator);
+                        _G.allocator);
         ct_array_push_n(*build, (uint8_t *) ent_arr,
-                         sizeof(uint32_t) * cdata.ent_count, _G.allocator);
+                        sizeof(uint32_t) * cdata.ent_count, _G.allocator);
         ct_array_push_n(*build, blob, sizeof(uint8_t) * ct_array_size(blob),
-                         _G.allocator);
+                        _G.allocator);
 
         ct_array_free(blob, _G.allocator);
     }
@@ -526,50 +528,29 @@ static void resource_compiler(const char *filename,
 // Resource
 //==============================================================================
 
-static void *loader(ct_vio *input,
-                    ct_alloc *allocator) {
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
+static void online(uint64_t name,
+                   struct ct_vio *input,
+                   struct ct_cdb_object_t *obj) {
+
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    return data;
-}
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
+    ct_coredb_a0.write_commit(writer);
 
-static void unloader(void *new_data,
-                     ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
-
-
-static void online(uint64_t name,
-                   void *data) {
     CT_UNUSED(name, data);
 }
 
 static void offline(uint64_t name,
-                    void *data) {
-    CT_UNUSED(name, data);
-}
-
-static void *reloader(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      ct_alloc *allocator) {
-    offline(name, old_data);
-    online(name, new_data);
-
-    reload_instance(name, new_data);
-
-    CT_FREE(allocator, old_data);
-    return new_data;
+                    struct ct_cdb_object_t *obj) {
+    CT_UNUSED(name, obj);
 }
 
 static const ct_resource_callbacks_t callback = {
-        .loader = loader,
-        .unloader = unloader,
         .online = online,
         .offline = offline,
-        .reloader = reloader
 };
 
 
@@ -584,25 +565,25 @@ static ct_entity spawn_type(ct_world world,
                             uint64_t type,
                             uint64_t name) {
 
-    void *res = ct_resource_a0.get(type, name);
+    struct ct_cdb_object_t* obj = ct_resource_a0.get_obj(type, name);
+    entity_resource *res = (entity_resource*)ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (res == NULL) {
         ct_log_a0.error("entity", "Could not spawn entity.");
         return (ct_entity) {.h = 0};
     }
 
-    entity_resource *ent_res = (entity_resource *) res;
     ct_entity *spawned = CT_ALLOC(_G.allocator,
-                                      ct_entity,
-                                      sizeof(ct_entity) * ent_res->ent_count);
+                                  ct_entity,
+                                  sizeof(ct_entity) * res->ent_count);
 
-    for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
+    for (uint32_t j = 0; j < res->ent_count; ++j) {
         spawned[j] = create();
     }
 
     entity_instance *ent_inst = _new_entity(name, spawned[0]);
 
-    return spawn_from_resource(world, ent_inst, ent_res, spawned);
+    return spawn_from_resource(world, ent_inst, res, spawned);
 }
 
 static ct_entity spawn_entity(ct_world world,
@@ -696,6 +677,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CT_UNUSED(reload);

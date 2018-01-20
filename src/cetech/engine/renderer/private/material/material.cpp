@@ -33,6 +33,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_shader_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 using namespace celib;
 
@@ -170,49 +171,31 @@ void reload_level_instance(uint64_t name,
 //==============================================================================
 //    static const bgfx::ProgramHandle null_program = {};
 
-static void *loader(ct_vio *input,
-                    ct_alloc *allocator) {
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
-    input->read(input, data, 1, size);
-    return data;
-}
+#define MATERIAL_PROP CT_ID64_0("material")
 
-static void unloader(void *new_data,
-                     ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
 
 static void online(uint64_t name,
-                   void *data) {
-    CT_UNUSED(name, data);
+                   struct ct_vio* input,
+                   struct ct_cdb_object_t* obj) {
 
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
+    input->read(input, data, 1, size);
+
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, MATERIAL_PROP, data);
+    ct_coredb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
-                    void *data) {
-    CT_UNUSED(name, data);
+                    struct ct_cdb_object_t* obj) {
+    CT_UNUSED(name, obj);
 }
 
-static void *reloader(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      ct_alloc *allocator) {
-    offline(name, old_data);
-    online(name, new_data);
-
-    reload_level_instance(name, new_data);
-
-    CT_FREE(allocator, old_data);
-    return new_data;
-}
 
 static const ct_resource_callbacks_t callback = {
-        .loader = loader,
-        .unloader = unloader,
         .online = online,
         .offline = offline,
-        .reloader = reloader
 };
 
 
@@ -222,8 +205,8 @@ static const ct_resource_callbacks_t callback = {
 //    static const ct_material null_material = {};
 
 static struct ct_material create(uint64_t name) {
-    auto res = ct_resource_a0.get(_G.type, name);
-    auto resource = material_blob::get(res);
+    auto object = ct_resource_a0.get_obj(_G.type, name);
+    auto resource = material_blob::get(ct_coredb_a0.read_ptr(object, MATERIAL_PROP, NULL));
 
     uint64_t h = ct_handler_create(&_G.material_handler, _G.allocator);
     material_instance *instance = _new_material(name, h);
@@ -415,6 +398,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_texture_a0);
             CETECH_GET_API(api, ct_shader_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CT_UNUSED(reload);

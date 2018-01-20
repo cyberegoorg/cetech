@@ -80,7 +80,7 @@ static struct _G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_coredb_object_t *config;
+    ct_cdb_object_t *config;
     ct_alloc *allocator;
 } _G;
 
@@ -462,7 +462,7 @@ void resource_compiler_check_fs() {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    ct_coredb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
     if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
         ct_coredb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
     }

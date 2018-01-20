@@ -38,6 +38,7 @@ int shadercompiler_init(ct_api_a0 *api);
 struct _G {
     Map<ct_shader> handler_map;
     uint64_t type;
+    ct_alloc* allocator;
 } _G;
 
 CETECH_DECL_API(ct_memory_a0);
@@ -47,35 +48,27 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_coredb_a0);
 
 //==============================================================================
 // Resource
 //==============================================================================
 
-static const ct_shader null_program = BGFX_INVALID_HANDLE;
-
-
-static void *loader(ct_vio *input,
-                    ct_alloc *allocator) {
-
-    const int64_t size = input->size(input);
-    char *data = CT_ALLOC(allocator, char, size);
-    input->read(input, data, 1, size);
-    return data;
-}
-
-static void unloader(void *new_data,
-                     ct_alloc *allocator) {
-    CT_FREE(allocator, new_data);
-}
+#define SHADER_PROP CT_ID64_0("shader")
 
 static void online(uint64_t name,
-                   void *data) {
+                   struct ct_vio* input,
+                   struct ct_cdb_object_t *obj) {
+    const uint64_t size = input->size(input);
+    char *data = CT_ALLOC(_G.allocator, char, size);
+    input->read(input, data, 1, size);
+
     auto *resource = shader_blob::get(data);
 
     bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 
     if (resource) {
+
         auto vs_mem = bgfx::alloc(shader_blob::vs_size(resource));
         auto fs_mem = bgfx::alloc(shader_blob::fs_size(resource));
 
@@ -86,51 +79,32 @@ static void online(uint64_t name,
         auto vs_shader = bgfx::createShader(vs_mem);
         auto fs_shader = bgfx::createShader(fs_mem);
         program = bgfx::createProgram(vs_shader, fs_shader, 1);
+
     }
 
-    map::set(_G.handler_map, name, {program.idx});
+    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_uint64(writer, SHADER_PROP, program.idx);
+    ct_coredb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
-                    void *data) {
-    CT_UNUSED(data);
+                    struct ct_cdb_object_t *obj) {
+    CT_UNUSED(name);
 
-    auto program = map::get(_G.handler_map, name, null_program);
-
-    if (program.idx == null_program.idx) {
-        return;
-    }
-
-    bgfx::destroy((bgfx::ProgramHandle) {program.idx});
-
-    map::remove(_G.handler_map, name);
-}
-
-static void *reloader(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      ct_alloc *allocator) {
-    offline(name, old_data);
-    online(name, new_data);
-
-    CT_FREE(allocator, old_data);
-
-    return new_data;
+    const uint64_t program = ct_coredb_a0.read_uint64(obj, SHADER_PROP, 0);
+    bgfx::destroy((bgfx::ProgramHandle) {.idx=(uint16_t)program});
 }
 
 static const ct_resource_callbacks_t callback = {
-        .loader = loader,
-        .unloader =unloader,
         .online = online,
         .offline = offline,
-        .reloader = reloader
 };
 
 //==============================================================================
 // Interface
 //==============================================================================
 int shader_init(ct_api_a0 *api) {
-    _G = {};
+    _G = {.allocator = ct_memory_a0.main_allocator()};
 
     _G.type = CT_ID64_0("shader");
 
@@ -148,8 +122,9 @@ void shader_shutdown() {
 }
 
 ct_shader shader_get(uint64_t name) {
-    shader_blob::get(ct_resource_a0.get(_G.type, name));
-    return map::get(_G.handler_map, name, null_program);
+    struct ct_cdb_object_t* obj = ct_resource_a0.get_obj(_G.type, name);
+    const uint64_t idx = ct_coredb_a0.read_uint64(obj, SHADER_PROP, 0);
+    return (ct_shader){.idx=(uint16_t)idx};
 }
 
 static ct_shader_a0 shader_api = {
@@ -157,6 +132,7 @@ static ct_shader_a0 shader_api = {
 };
 
 static void _init_api(struct ct_api_a0 *api) {
+
     api->register_api("ct_shader_a0", &shader_api);
 }
 
@@ -170,6 +146,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_process_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_coredb_a0);
         },
         {
             CT_UNUSED(reload);

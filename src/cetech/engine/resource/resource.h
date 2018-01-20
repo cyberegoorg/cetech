@@ -5,6 +5,9 @@
 #define CETECH_RESOURCE_H
 
 #include <cetech/core/yaml/yamlng.h>
+#include <cetech/core/coredb/coredb.h>
+
+#define PROP_RESOURECE_DATA CT_ID64_0("data")
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,39 +47,18 @@ typedef void (*ct_resource_compilator_t)(
 
 //! Resource callbacks
 typedef struct {
-    //! \param input Input vio
-    //! \param allocator Allocator
-    //! \return Resource data
-    void *(*loader)(struct ct_vio *input,
-                    struct ct_alloc *allocator);
-
     //! Resource online callback
     //! \param name Resource name
     //! \param data Resource data
     void (*online)(uint64_t name,
-                   void *data);
+                   struct ct_vio* input,
+                   struct ct_cdb_object_t *obj);
 
     //! Resource offline callback
     //! \param name Resource name
     //! \param data Resource data
     void (*offline)(uint64_t name,
-                    void *data);
-
-    //! Resource unload callback
-    //! \param new_data Resource data
-    //! \param allocator Allocator
-    void (*unloader)(void *new_data,
-                     struct ct_alloc *allocator);
-
-    //! Resource reloader
-    //! \param name Resource name
-    //! \param old_data Resource old data
-    //! \param new_data Resource new data
-    //! \param allocator Allocator
-    void *(*reloader)(uint64_t name,
-                      void *old_data,
-                      void *new_data,
-                      struct ct_alloc *allocator);
+                    struct ct_cdb_object_t *obj);
 } ct_resource_callbacks_t;
 
 
@@ -98,7 +80,7 @@ struct ct_compilator_api {
 struct ct_resource_a0 {
     //! Enable autoload feature
     //! \param enable Enable
-    void (*set_autoload)(int enable);
+    void (*set_autoload)(bool enable);
 
     //! Register resource type
     //! \param type Type
@@ -116,16 +98,6 @@ struct ct_resource_a0 {
                  uint64_t *names,
                  size_t count,
                  int force);
-
-    //! Add loaded resourcess
-    //! \param type Types
-    //! \param names Names
-    //! \param resource_data Resource data array
-    //! \param count Resouce count
-    void (*add_loaded)(uint64_t type,
-                       uint64_t *names,
-                       size_t count);
-
 
     //! Load resource (now)
     //! \param type Type
@@ -174,8 +146,11 @@ struct ct_resource_a0 {
     //! \param type Type
     //! \param names Name
     //! \return Resource data or NULL if resource is not loaded
-    void *(*get)(uint64_t type,
-                 uint64_t names);
+//    void *(*get)(uint64_t type,
+//                 uint64_t names);
+
+    struct ct_cdb_object_t *(*get_obj)(uint64_t type,
+                                       uint64_t names);
 
     //! Type, Name => string
     //! \param str Result string
