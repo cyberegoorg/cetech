@@ -18,7 +18,7 @@ extern "C" {
 struct ct_texture;
 
 struct ct_material {
-    uint32_t idx;
+    uint64_t idx;
 };
 
 //==============================================================================

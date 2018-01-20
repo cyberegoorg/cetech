@@ -5,7 +5,7 @@
 
 #include <cetech/core/memory/allocator.h>
 #include <cetech/core/containers/map.inl>
-#include <cetech/core/containers/handler.inl>
+#include <cetech/core/containers/handler.h>
 
 
 #include <cetech/core/api/api_system.h>
@@ -80,7 +80,7 @@ static struct G {
     Map<ct_viewport_on_pass_t> on_pass;
     ct_hash_t viewport_instance_map;
     viewport_instance *viewport_instances;
-    Handler<uint32_t> viewport_handler;
+    ct_handler_t viewport_handler;
 
     Map<ct_viewport_pass_compiler> compiler_map;
 
@@ -306,7 +306,7 @@ static ct_viewport renderer_create_viewport(uint64_t name,
     _init_viewport(vi, name, width, height);
 
     auto idx = ct_array_size(_G.viewport_instances);
-    auto id = handler::create(_G.viewport_handler);
+    uint64_t id = ct_handler_create(&_G.viewport_handler, _G.allocator);
     ct_hash_add(&_G.viewport_instance_map, id, idx, _G.allocator);
     ct_array_push(_G.viewport_instances, vi, _G.allocator);
 
@@ -850,15 +850,10 @@ static void _init(struct ct_api_a0 *api) {
 
     _G.global_resource.init(ct_memory_a0.main_allocator());
     _G.on_pass.init(ct_memory_a0.main_allocator());
-
-    _G.viewport_handler.init(ct_memory_a0.main_allocator());
     _G.compiler_map.init(ct_memory_a0.main_allocator());
 
-    ct_resource_a0.register_type(_G.type,
-                                 callback);
-
+    ct_resource_a0.register_type(_G.type, callback);
     init(api);
-
     ct_renderer_a0.register_on_render(on_render);
     //ct_app_a0.register_on_update(on_update);
 }
@@ -873,7 +868,7 @@ static void _shutdown() {
 
         ct_hash_free(&_G.viewport_instance_map, _G.allocator);
         ct_array_free(_G.viewport_instances, _G.allocator);
-        _G.viewport_handler.destroy();
+        ct_handler_free(&_G.viewport_handler, _G.allocator);
 
         _G.compiler_map.destroy();
     }

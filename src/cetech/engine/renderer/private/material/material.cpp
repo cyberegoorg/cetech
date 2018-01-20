@@ -6,7 +6,7 @@
 
 #include "cetech/core/memory/allocator.h"
 #include "cetech/core/containers/map.inl"
-#include "cetech/core/containers/handler.inl"
+#include "cetech/core/containers/handler.h"
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
@@ -60,7 +60,7 @@ struct material_instance {
 };
 
 static struct MaterialGlobals {
-    Handler<uint32_t> material_handler;
+    ct_handler_t material_handler;
 
     Map<uint32_t> instace_map;
     Map<uint32_t> resource_map;
@@ -225,7 +225,7 @@ static struct ct_material create(uint64_t name) {
     auto res = ct_resource_a0.get(_G.type, name);
     auto resource = material_blob::get(res);
 
-    uint32_t h = handler::create(_G.material_handler);
+    uint64_t h = ct_handler_create(&_G.material_handler, _G.allocator);
     material_instance *instance = _new_material(name, h);
 
 
@@ -388,7 +388,6 @@ static int init(ct_api_a0 *api) {
     api->register_api("ct_material_a0", &material_api);
 
     _G.type = CT_ID64_0("material");
-    _G.material_handler.init(ct_memory_a0.main_allocator());
     _G.instace_map.init(ct_memory_a0.main_allocator());
     _G.resource_map.init(ct_memory_a0.main_allocator());
 
@@ -400,12 +399,11 @@ static int init(ct_api_a0 *api) {
 }
 
 static void shutdown() {
-    _G.material_handler.destroy();
-    _G.instace_map.destroy();
-    _G.resource_map.destroy();
-
+    ct_handler_free(&_G.material_handler, _G.allocator);
     ct_array_free(_G.material_instances, _G.allocator);
 
+    _G.instace_map.destroy();
+    _G.resource_map.destroy();
 }
 
 CETECH_MODULE_DEF(

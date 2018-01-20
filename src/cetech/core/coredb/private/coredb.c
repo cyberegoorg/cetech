@@ -242,16 +242,13 @@ static void set_ptr(struct ct_coredb_writer_t *_writer,
 static bool prop_exist(struct ct_coredb_object_t *_object,
                        uint64_t key) {
     struct object *obj = *(struct object **) _object;
-
     return _find_prop_index(obj, key) > 0;
 }
 
 static enum ct_coredb_prop_type prop_type(struct ct_coredb_object_t *_object,
                                           uint64_t key) {
     struct object *obj = *(struct object **) _object;
-
     uint64_t idx = _find_prop_index(obj, key);
-
     return idx ? obj->type[idx] : COREDB_TYPE_NONE;
 }
 
@@ -259,7 +256,6 @@ static float read_float(struct ct_coredb_object_t *_obj,
                         uint64_t property,
                         float defaultt) {
     struct object *obj = *(struct object **) _obj;
-
     uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(float *) (obj->values + obj->offset[idx]) : defaultt;
 }
@@ -268,7 +264,6 @@ static const char *read_string(struct ct_coredb_object_t *_obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object *obj = *(struct object **) _obj;
-
     uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
 }
@@ -277,7 +272,6 @@ static uint32_t read_uint32(struct ct_coredb_object_t *_obj,
                             uint64_t property,
                             uint32_t defaultt) {
     struct object *obj = *(struct object **) _obj;
-
     uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
 }
@@ -286,7 +280,6 @@ static void *read_ptr(struct ct_coredb_object_t *_obj,
                       uint64_t property,
                       void *defaultt) {
     struct object *obj = *(struct object **) _obj;
-
     uint64_t idx = _find_prop_index(obj, property);
     return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
 }

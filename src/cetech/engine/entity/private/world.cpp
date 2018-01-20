@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <cetech/engine/entity/entity.h>
-#include "cetech/core/containers/handler.inl"
+#include "cetech/core/containers/handler.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/engine/config/config.h"
 #include "cetech/core/api/api_system.h"
@@ -11,8 +11,6 @@
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-
-using namespace celib;
 
 //==============================================================================
 // Typedefs
@@ -27,7 +25,7 @@ static struct WorldGlobals {
     ct_world_callbacks_t *callbacks;
     ct_alloc *allocator;
 
-    Handler<uint32_t> world_handler;
+    ct_handler_t world_handler;
 } WorldGlobals;
 
 //==============================================================================
@@ -39,7 +37,7 @@ static void register_callback(ct_world_callbacks_t clb) {
 }
 
 static ct_world create() {
-    ct_world w = {.h = handler::create(_G.world_handler)};
+    ct_world w = {.h = ct_handler_create(&_G.world_handler, _G.allocator)};
 
     for (uint32_t i = 0; i < ct_array_size(_G.callbacks); ++i) {
         _G.callbacks[i].on_created(w);
@@ -53,7 +51,7 @@ static void destroy(ct_world world) {
         _G.callbacks[i].on_destroy(world);
     }
 
-    handler::destroy(_G.world_handler, world.h);
+    ct_handler_destroy(&_G.world_handler, world.h, _G.allocator);
 }
 
 static void update(ct_world world,
@@ -90,14 +88,12 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
     };
 
-    _G.world_handler.init(ct_memory_a0.main_allocator());
-
 }
 
 static void _shutdown() {
     ct_array_free(_G.callbacks, _G.allocator);
 
-    _G.world_handler.destroy();
+    ct_handler_free(&_G.world_handler, _G.allocator);
 }
 
 CETECH_MODULE_DEF(

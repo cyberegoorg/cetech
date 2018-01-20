@@ -16,7 +16,7 @@
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/core/containers/hash.h>
 
-#include "cetech/core/containers/handler.inl"
+#include "cetech/core/containers/handler.h"
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -28,8 +28,6 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-
-using namespace celib;
 
 //==============================================================================
 // Globals
@@ -46,7 +44,7 @@ struct entity_instance {
 };
 
 static struct _G {
-    Handler<uint32_t> entity_handler;
+    ct_handler_t entity_handler;
 
 //    ct_hash_t resource_map;
     ct_hash_t spawned_map;
@@ -95,7 +93,7 @@ entity_instance *get_spawned_entity(ct_entity ent) {
 
 
 ct_entity create() {
-    return (ct_entity) {.h = handler::create(_G.entity_handler)};
+    return (ct_entity) {.h = ct_handler_create(&_G.entity_handler, _G.allocator)};
 }
 
 void destroy(ct_world world,
@@ -125,7 +123,7 @@ void destroy(ct_world world,
 //
 //        map::remove(_G.spawned_map, entity[i].h);
 
-        handler::destroy(_G.entity_handler, entity[i].h);
+        ct_handler_destroy(&_G.entity_handler, entity[i].h, _G.allocator);
 
         CT_FREE(ct_memory_a0.main_allocator(), instance->entity);
     }
@@ -579,7 +577,7 @@ static const ct_resource_callbacks_t callback = {
 // Public interface
 //==============================================================================
 static int alive(ct_entity entity) {
-    return handler::alive(_G.entity_handler, entity.h);
+    return ct_handler_alive(&_G.entity_handler, entity.h);
 }
 
 static ct_entity spawn_type(ct_world world,
@@ -677,13 +675,11 @@ static void _init(ct_api_a0 *api) {
                                      resource_compiler,
                                      true);
 
-    _G.entity_handler.init(ct_memory_a0.main_allocator());
 }
 
 static void _shutdown() {
-//    _G.resource_map.destroy();
     ct_hash_free(&_G.spawned_map, _G.allocator);
-    _G.entity_handler.destroy();
+    ct_handler_free(&_G.entity_handler, _G.allocator);
 
     ct_array_free(_G.spawned_array, _G.allocator);
 }

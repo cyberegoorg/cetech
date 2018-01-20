@@ -31,7 +31,7 @@ struct ct_blob;
 
 //! World handler
 struct ct_world {
-    uint32_t h;
+    uint64_t h;
 };
 
 
@@ -49,7 +49,7 @@ typedef int (*ct_component_compiler_t)(const char *filename,
 
 //! Entity typedef
 struct ct_entity {
-    uint32_t h;
+    uint64_t h;
 };
 
 
