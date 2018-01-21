@@ -530,7 +530,7 @@ static void resource_compiler(const char *filename,
 
 static void online(uint64_t name,
                    struct ct_vio *input,
-                   struct ct_cdb_object_t *obj) {
+                   struct ct_cdb_obj_t *obj) {
 
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
@@ -544,7 +544,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_object_t *obj) {
+                    struct ct_cdb_obj_t *obj) {
     CT_UNUSED(name, obj);
 }
 
@@ -565,7 +565,7 @@ static ct_entity spawn_type(ct_world world,
                             uint64_t type,
                             uint64_t name) {
 
-    struct ct_cdb_object_t* obj = ct_resource_a0.get_obj(type, name);
+    struct ct_cdb_obj_t* obj = ct_resource_a0.get_obj(type, name);
     entity_resource *res = (entity_resource*)ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (res == NULL) {

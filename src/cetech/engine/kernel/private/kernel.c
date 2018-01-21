@@ -53,7 +53,7 @@ const char *_platform() {
 
 int init_config(int argc,
                 const char **argv,
-                struct ct_cdb_object_t *object) {
+                struct ct_cdb_obj_t *object) {
     struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(object);
     ct_cdb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
     ct_cdb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
@@ -66,17 +66,17 @@ int init_config(int argc,
 
     struct ct_alloc *a = ct_memory_a0.main_allocator();
 
-    const char *build_dir_str = ct_cdb_a0.read_string(object, CONFIG_BUILD,
+    const char *build_dir_str = ct_cdb_a0.read_str(object, CONFIG_BUILD,
                                                          "");
     char *build_dir = NULL;
     ct_path_a0.join(&build_dir, a, 2,
                     build_dir_str,
-                    ct_cdb_a0.read_string(object, CONFIG_NATIVE_PLATFORM, ""));
+                    ct_cdb_a0.read_str(object, CONFIG_NATIVE_PLATFORM, ""));
 
     char *build_config = NULL;
     ct_path_a0.join(&build_config, a, 2, build_dir, "global.config");
 
-    const char *source_dir_str = ct_cdb_a0.read_string(object, CONFIG_SRC,
+    const char *source_dir_str = ct_cdb_a0.read_str(object, CONFIG_SRC,
                                                           "");
     char *source_config = NULL;
     ct_path_a0.join(&source_config, a, 2, source_dir_str, "global.config");

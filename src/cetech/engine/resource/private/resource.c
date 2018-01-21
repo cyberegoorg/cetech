@@ -53,7 +53,7 @@ void resource_register_type(uint64_t type,
 #define MAX_TYPES 64
 
 struct type_item_t {
-    struct ct_cdb_object_t *type_objects;
+    struct ct_cdb_obj_t *type_objects;
     struct ct_spinlock lock;
     uint64_t type;
 };
@@ -67,7 +67,7 @@ struct _G {
 
     bool autoload_enabled;
 
-    struct ct_cdb_object_t *config;
+    struct ct_cdb_obj_t *config;
     struct ct_alloc *allocator;
 } _G = {};
 
@@ -81,7 +81,7 @@ struct _G {
 char *resource_compiler_get_build_dir(struct ct_alloc *a,
                                       const char *platform) {
 
-    const char *build_dir_str = ct_cdb_a0.read_string(_G.config,
+    const char *build_dir_str = ct_cdb_a0.read_str(_G.config,
                                                          CONFIG_BUILD_DIR, "");
 
     char *buffer = NULL;
@@ -195,7 +195,7 @@ static void load(uint64_t type,
             continue;
         };
 
-        struct ct_cdb_object_t *object = ct_cdb_a0.create_object();
+        struct ct_cdb_obj_t *object = ct_cdb_a0.create_object();
 
         char build_name[33] = {};
         type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -213,7 +213,7 @@ static void load(uint64_t type,
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
                         _G.allocator, 2,
-                        ct_cdb_a0.read_string(_G.config,
+                        ct_cdb_a0.read_str(_G.config,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
 
@@ -264,7 +264,7 @@ static void unload(uint64_t type,
 
             ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
-            struct ct_cdb_object_t *object = ct_cdb_a0.read_ref(
+            struct ct_cdb_obj_t *object = ct_cdb_a0.read_ref(
                     type_item->type_objects, names[i], NULL);
 
             type_clb.offline(names[i], object);
@@ -273,15 +273,15 @@ static void unload(uint64_t type,
 
 }
 
-static struct ct_cdb_object_t *get_obj(uint64_t type,
+static struct ct_cdb_obj_t *get_obj(uint64_t type,
                                        uint64_t name) {
 
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
-    struct ct_cdb_object_t *type_object;
+    struct ct_cdb_obj_t *type_object;
     type_object = type_item->type_objects;
 
-    struct ct_cdb_object_t *object = ct_cdb_a0.read_ref(type_object, name, NULL);
+    struct ct_cdb_obj_t *object = ct_cdb_a0.read_ref(type_object, name, NULL);
 
     if(object) {
         return object;
@@ -480,7 +480,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
-                                  ct_cdb_a0.read_string(_G.config,
+                                  ct_cdb_a0.read_str(_G.config,
                                                            CONFIG_BUILD_DIR,
                                                            ""), false);
 

@@ -59,7 +59,7 @@ CETECH_DECL_API(ct_cdb_a0);
 
 void _texture_resource_online(uint64_t name,
                               struct ct_vio* input,
-                              struct ct_cdb_object_t *obj) {
+                              struct ct_cdb_obj_t *obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -76,7 +76,7 @@ void _texture_resource_online(uint64_t name,
 
 
 void _texture_resource_offline(uint64_t name,
-                               struct ct_cdb_object_t *obj) {
+                               struct ct_cdb_obj_t *obj) {
     const uint64_t texture = ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
     bgfx::destroy((bgfx::TextureHandle) {.idx=(uint16_t)texture});
 }
@@ -109,7 +109,7 @@ void texture_shutdown() {
 }
 
 ct_texture texture_get(uint64_t name) {
-    ct_cdb_object_t* obj = ct_resource_a0.get_obj(_G.type, name);
+    ct_cdb_obj_t* obj = ct_resource_a0.get_obj(_G.type, name);
 
     ct_texture texture = {
             .idx = (uint16_t)ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)

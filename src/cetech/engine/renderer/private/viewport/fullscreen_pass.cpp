@@ -181,7 +181,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     CT_UNUSED(world);
     CT_UNUSED(camera);
 
-    static ct_cdb_object_t *copy_material = ct_material_a0.resource_create(
+    static ct_cdb_obj_t *copy_material = ct_material_a0.resource_create(
             CT_ID64_0("content/copy"));
 
     bgfx::setViewRect(viewid, 0, 0,

@@ -89,7 +89,7 @@ static struct G {
     uint32_t size_width;
     uint32_t size_height;
     int need_reset;
-    ct_cdb_object_t *config;
+    ct_cdb_obj_t *config;
     ct_alloc *allocator;
 } _G = {};
 
@@ -181,10 +181,10 @@ static void _init_viewport(viewport_instance &vi,
                            uint64_t name,
                            float width,
                            float height) {
-    const char *render_config = ct_cdb_a0.read_string(
+    const char *render_config = ct_cdb_a0.read_str(
             ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
-    ct_cdb_object_t* object = ct_resource_a0.get_obj(_G.type, CT_ID64_0(render_config));
+    ct_cdb_obj_t* object = ct_resource_a0.get_obj(_G.type, CT_ID64_0(render_config));
     void* resource = ct_cdb_a0.read_ptr(object, VIEWPORT_PROP, NULL);
     auto *blob = renderconfig_blob::get(resource);
 
@@ -323,7 +323,7 @@ static ct_viewport renderer_create_viewport(uint64_t name,
 
 
 static void online(uint64_t name,
-                   struct ct_vio* input, struct ct_cdb_object_t* obj) {
+                   struct ct_vio* input, struct ct_cdb_obj_t* obj) {
     CT_UNUSED(name);
 
     const uint64_t size = input->size(input);
@@ -357,7 +357,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_object_t* obj) {
+                    struct ct_cdb_obj_t* obj) {
     CT_UNUSED(name, obj);
     //auto *blob = renderconfig_blob::get(data);
 

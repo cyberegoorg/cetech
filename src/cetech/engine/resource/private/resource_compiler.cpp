@@ -80,7 +80,7 @@ static struct _G {
     uint64_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_cdb_object_t *config;
+    ct_cdb_obj_t *config;
     ct_alloc *allocator;
 } _G;
 
@@ -237,7 +237,7 @@ void _compile_files(ct_task_item **tasks,
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
                         ct_memory_a0.main_allocator(), 2,
-                        ct_cdb_a0.read_string(_G.config,
+                        ct_cdb_a0.read_str(_G.config,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
 
@@ -283,7 +283,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
     char *build_dir_full = resource_compiler_get_build_dir(
             ct_memory_a0.main_allocator(),
-            ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+            ct_cdb_a0.read_str(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     ct_path_a0.make_path(build_dir_full);
 
@@ -345,11 +345,11 @@ int resource_compiler_get_filename(char *filename,
 }
 
 const char *resource_compiler_get_source_dir() {
-    return ct_cdb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
+    return ct_cdb_a0.read_str(_G.config, CONFIG_SOURCE_DIR, "");
 }
 
 const char *resource_compiler_get_core_dir() {
-    return ct_cdb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");;
+    return ct_cdb_a0.read_str(_G.config, CONFIG_CORE_DIR, "");;
 }
 
 char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
@@ -364,13 +364,13 @@ char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
 
 char *resource_compiler_external_join(ct_alloc *alocator,
                                       const char *name) {
-    const char *external_dir_str = ct_cdb_a0.read_string(_G.config,
+    const char *external_dir_str = ct_cdb_a0.read_str(_G.config,
                                                             CONFIG_EXTERNAL_DIR,
                                                             "");
 
     char *tmp_dir = NULL;
     ct_path_a0.join(&tmp_dir, alocator, 2, external_dir_str,
-                    ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+                    ct_cdb_a0.read_str(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     char* buffer = NULL;
     ct_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
@@ -491,7 +491,7 @@ static void _init(ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
 
-    auto platform = ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM,
+    auto platform = ct_cdb_a0.read_str(_G.config, CONFIG_KERNEL_PLATFORM,
                                              "");
 
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
@@ -509,9 +509,9 @@ static void _init(ct_api_a0 *api) {
     ct_buffer_free(tmp_dir_full, ct_memory_a0.main_allocator());
     ct_buffer_free(build_dir_full, ct_memory_a0.main_allocator());
 
-    const char *core_dir = ct_cdb_a0.read_string(_G.config, CONFIG_CORE_DIR,
+    const char *core_dir = ct_cdb_a0.read_str(_G.config, CONFIG_CORE_DIR,
                                                     "");
-    const char *source_dir = ct_cdb_a0.read_string(_G.config,
+    const char *source_dir = ct_cdb_a0.read_str(_G.config,
                                                       CONFIG_SOURCE_DIR, "");
 
     ct_filesystem_a0.map_root_dir(

@@ -47,7 +47,7 @@ static struct _G {
     module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
-    ct_cdb_object_t *config;
+    ct_cdb_obj_t *config;
     ct_alloc *allocator;
 } _G = {};
 
@@ -246,7 +246,7 @@ static void load_dirs() {
     char key[64];
     size_t len = strlen("load_module.");
     strcpy(key, "load_module.");
-    const char *path = ct_cdb_a0.read_string(_G.config,
+    const char *path = ct_cdb_a0.read_str(_G.config,
                                                 CONFIG_MODULE_DIR,
                                                 "bin/darwin64");
     char* buffer = NULL;
@@ -262,7 +262,7 @@ static void load_dirs() {
         }
 
 
-        const char *module_file = ct_cdb_a0.read_string(_G.config,
+        const char *module_file = ct_cdb_a0.read_str(_G.config,
                                                            key_id, "");
         ct_path_a0.join(&buffer,
                                             ct_memory_a0.main_allocator(),
@@ -354,7 +354,7 @@ static void _init(struct ct_api_a0* api){
 
     static uint64_t root = CT_ID64_0("modules");
     ct_filesystem_a0.map_root_dir(root,
-                                  ct_cdb_a0.read_string(
+                                  ct_cdb_a0.read_str(
                                           _G.config,
                                           CONFIG_MODULE_DIR,
                                           "bin/darwin64"), true);

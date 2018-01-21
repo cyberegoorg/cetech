@@ -55,7 +55,7 @@ static struct _G {
     int capture;
     int vsync;
     int need_reset;
-    ct_cdb_object_t *config;
+    ct_cdb_obj_t *config;
     ct_alloc *allocator;
 } _G = {};
 

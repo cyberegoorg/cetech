@@ -138,7 +138,7 @@ static void compiler(const char *filename,
 
     char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(
             a,
-            ct_cdb_a0.read_string(ct_config_a0.config_object(),
+            ct_cdb_a0.read_str(ct_config_a0.config_object(),
                                      CT_ID64_0("kernel.platform"), ""));
 
     //////// VS

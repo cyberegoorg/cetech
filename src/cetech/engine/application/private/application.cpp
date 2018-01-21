@@ -67,7 +67,7 @@ CETECH_DECL_API(ct_cdb_a0);
 //==============================================================================
 
 static struct ApplicationGlobals {
-    ct_cdb_object_t *config_object;
+    ct_cdb_obj_t *config_object;
 
     ct_app_on_init *on_init;
     ct_app_on_shutdown *on_shutdown;
@@ -130,7 +130,7 @@ void _init_config() {
 }
 
 static void _boot_stage() {
-    const char *boot_pkg_str = ct_cdb_a0.read_string(_G.config_object,
+    const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
                                                         CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
     uint64_t pkg = CT_ID64_0("package");
@@ -148,7 +148,7 @@ static void _boot_stage() {
 }
 
 static void _boot_unload() {
-    const char *boot_pkg_str = ct_cdb_a0.read_string(_G.config_object,
+    const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
                                                         CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
 
@@ -206,16 +206,16 @@ extern "C" void application_start() {
         _G.on_init[i]();
     }
 
-    set_active_game(CT_ID64_0(ct_cdb_a0.read_string(_G.config_object,
+    set_active_game(CT_ID64_0(ct_cdb_a0.read_str(_G.config_object,
                                                        CONFIG_GAME, "")));
 
     if (_G.active_game.on_init) {
         _G.active_game.on_init();
     }
 
-    ct_cdb_object_t *obj1 = ct_cdb_a0.create_object();
-    ct_cdb_object_t *obj2 = ct_cdb_a0.create_object();
-    ct_cdb_object_t *obj3 = ct_cdb_a0.create_object();
+    ct_cdb_obj_t *obj1 = ct_cdb_a0.create_object();
+    ct_cdb_obj_t *obj2 = ct_cdb_a0.create_object();
+    ct_cdb_obj_t *obj3 = ct_cdb_a0.create_object();
 
     float f1 = ct_cdb_a0.read_float(obj1, 1, 22.0f);
 

@@ -53,7 +53,7 @@ struct _G {
 
 void online(uint64_t name,
             struct ct_vio* input,
-            struct ct_cdb_object_t *obj) {
+            struct ct_cdb_obj_t *obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -66,7 +66,7 @@ void online(uint64_t name,
 }
 
 void offline(uint64_t name,
-             struct ct_cdb_object_t *obj) {
+             struct ct_cdb_obj_t *obj) {
     CT_UNUSED(name, obj);
 }
 
@@ -197,7 +197,7 @@ void package_shutdown() {
 void package_task(void *data) {
     struct package_task_data *task_data = (struct package_task_data *) data;
 
-    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, task_data->name);
+    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, task_data->name);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
@@ -231,7 +231,7 @@ void package_load(uint64_t name) {
 }
 
 void package_unload(uint64_t name) {
-    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
+    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
@@ -244,7 +244,7 @@ void package_unload(uint64_t name) {
 }
 
 int package_is_loaded(uint64_t name) {
-    struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
+    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (package == NULL) {

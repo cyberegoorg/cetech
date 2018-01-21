@@ -52,13 +52,13 @@ typedef struct {
     //! \param data Resource data
     void (*online)(uint64_t name,
                    struct ct_vio* input,
-                   struct ct_cdb_object_t *obj);
+                   struct ct_cdb_obj_t *obj);
 
     //! Resource offline callback
     //! \param name Resource name
     //! \param data Resource data
     void (*offline)(uint64_t name,
-                    struct ct_cdb_object_t *obj);
+                    struct ct_cdb_obj_t *obj);
 } ct_resource_type_t;
 
 
@@ -149,7 +149,7 @@ struct ct_resource_a0 {
 //    void *(*get)(uint64_t type,
 //                 uint64_t names);
 
-    struct ct_cdb_object_t *(*get_obj)(uint64_t type,
+    struct ct_cdb_obj_t *(*get_obj)(uint64_t type,
                                        uint64_t names);
 
     //! Type, Name => string

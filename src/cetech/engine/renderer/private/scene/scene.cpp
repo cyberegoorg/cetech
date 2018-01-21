@@ -72,7 +72,7 @@ static struct _G {
 #define SCENE_SIZE_PROP CT_ID64_0("size")
 
 static void online(uint64_t name,
-                   struct ct_vio* input,struct ct_cdb_object_t* obj) {
+                   struct ct_vio* input,struct ct_cdb_obj_t* obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -106,7 +106,7 @@ static void online(uint64_t name,
         auto ib_handle = bgfx::createIndexBuffer(ib_mem,
                                                  BGFX_BUFFER_INDEX32);
 
-        ct_cdb_object_t* geom_obj = ct_cdb_a0.create_object();
+        ct_cdb_obj_t* geom_obj = ct_cdb_a0.create_object();
         ct_cdb_writer_t* geom_writer = ct_cdb_a0.write_begin(geom_obj);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
@@ -120,7 +120,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_object_t* obj) {
+                    struct ct_cdb_obj_t* obj) {
     CT_UNUSED(obj);
 
 }
@@ -162,8 +162,8 @@ static void shutdown() {
 
 static void setVBIB(uint64_t scene,
                     uint64_t geom_name) {
-    ct_cdb_object_t *obj = ct_resource_a0.get_obj(_G.type, scene);
-    ct_cdb_object_t *geom_obj = ct_cdb_a0.read_ref(obj, geom_name, NULL);
+    ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.type, scene);
+    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(obj, geom_name, NULL);
 
     uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
     uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);

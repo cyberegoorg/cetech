@@ -98,7 +98,7 @@ static void compiler(const char *filename,
 
     auto a = ct_memory_a0.main_allocator();
 
-    auto platform = ct_cdb_a0.read_string(ct_config_a0.config_object(),
+    auto platform = ct_cdb_a0.read_str(ct_config_a0.config_object(),
                                              CT_ID64_0("kernel.platform"), "");
 
     char output_path[1024] = {};

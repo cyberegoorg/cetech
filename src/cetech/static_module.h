@@ -68,5 +68,6 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(entity_preview);
     CETECH_ADD_STATIC_MODULE(level_preview);
     CETECH_ADD_STATIC_MODULE(material_preview);
+    CETECH_ADD_STATIC_MODULE(material_property);
 }
 

@@ -128,7 +128,7 @@ static uint64_t _find_prop_index(const struct object *obj,
     return ct_hash_lookup(&obj->prop_map, key, 0);
 }
 
-static struct ct_cdb_object_t *create_object() {
+static struct ct_cdb_obj_t *create_object() {
     struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     struct object *obj = _new_object(a);
@@ -136,7 +136,7 @@ static struct ct_cdb_object_t *create_object() {
     struct object **obj_addr = _G.objects + _G.object_used++;
     *obj_addr = obj;
 
-    return (struct ct_cdb_object_t *) obj_addr;
+    return (struct ct_cdb_obj_t *) obj_addr;
 }
 
 
@@ -145,7 +145,7 @@ struct writer_t {
     struct object *clone_obj;
 };
 
-static struct ct_cdb_writer_t *write_begin(struct ct_cdb_object_t *obj) {
+static struct ct_cdb_writer_t *write_begin(struct ct_cdb_obj_t *obj) {
     struct writer_t *writer = CT_ALLOC(ct_memory_a0.main_allocator(),
                                        struct writer_t,
                                        sizeof(struct writer_t));
@@ -257,7 +257,7 @@ static void set_ptr(struct ct_cdb_writer_t *_writer,
 
 static void set_ref(struct ct_cdb_writer_t *_writer,
                     uint64_t property,
-                    struct ct_cdb_object_t *ref) {
+                    struct ct_cdb_obj_t *ref) {
 
     struct writer_t *writer = (struct writer_t *) _writer;
 
@@ -266,26 +266,26 @@ static void set_ref(struct ct_cdb_writer_t *_writer,
     uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_REF, ref,
-                                   sizeof(struct ct_cdb_object_t *),
+                                   sizeof(struct ct_cdb_obj_t *),
                                    ct_memory_a0.main_allocator());
     }
-    memcpy((obj->values + obj->offset[idx]), &ref, sizeof(struct ct_cdb_object_t*));
+    memcpy((obj->values + obj->offset[idx]), &ref, sizeof(struct ct_cdb_obj_t*));
 }
 
-static bool prop_exist(struct ct_cdb_object_t *_object,
+static bool prop_exist(struct ct_cdb_obj_t *_object,
                        uint64_t key) {
     struct object *obj = *(struct object **) _object;
     return _find_prop_index(obj, key) > 0;
 }
 
-static enum ct_coredb_prop_type prop_type(struct ct_cdb_object_t *_object,
+static enum ct_coredb_prop_type prop_type(struct ct_cdb_obj_t *_object,
                                           uint64_t key) {
     struct object *obj = *(struct object **) _object;
     uint64_t idx = _find_prop_index(obj, key);
     return idx ? obj->type[idx] : COREDB_TYPE_NONE;
 }
 
-static float read_float(struct ct_cdb_object_t *_obj,
+static float read_float(struct ct_cdb_obj_t *_obj,
                         uint64_t property,
                         float defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -293,7 +293,7 @@ static float read_float(struct ct_cdb_object_t *_obj,
     return idx ? *(float *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static const char *read_string(struct ct_cdb_object_t *_obj,
+static const char *read_string(struct ct_cdb_obj_t *_obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -301,7 +301,7 @@ static const char *read_string(struct ct_cdb_object_t *_obj,
     return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static uint32_t read_uint32(struct ct_cdb_object_t *_obj,
+static uint32_t read_uint32(struct ct_cdb_obj_t *_obj,
                             uint64_t property,
                             uint32_t defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -309,7 +309,7 @@ static uint32_t read_uint32(struct ct_cdb_object_t *_obj,
     return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static uint64_t read_uint64(struct ct_cdb_object_t *_obj,
+static uint64_t read_uint64(struct ct_cdb_obj_t *_obj,
                             uint64_t property,
                             uint64_t defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -317,7 +317,7 @@ static uint64_t read_uint64(struct ct_cdb_object_t *_obj,
     return idx ? *(uint64_t *) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static void *read_ptr(struct ct_cdb_object_t *_obj,
+static void *read_ptr(struct ct_cdb_obj_t *_obj,
                       uint64_t property,
                       void *defaultt) {
     struct object *obj = *(struct object **) _obj;
@@ -325,20 +325,20 @@ static void *read_ptr(struct ct_cdb_object_t *_obj,
     return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static struct ct_cdb_object_t *read_ref(struct ct_cdb_object_t *_obj,
+static struct ct_cdb_obj_t *read_ref(struct ct_cdb_obj_t *_obj,
                                            uint64_t property,
-                                           struct ct_cdb_object_t *defaultt) {
+                                           struct ct_cdb_obj_t *defaultt) {
     struct object *obj = *(struct object **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(struct ct_cdb_object_t **) (obj->values + obj->offset[idx]) : defaultt;
+    return idx ? *(struct ct_cdb_obj_t **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
-static uint64_t * prop_keys(struct ct_cdb_object_t *_obj){
+static uint64_t * prop_keys(struct ct_cdb_obj_t *_obj){
     struct object *obj = *(struct object **) _obj;
     return obj->keys + 1;
 }
 
-static uint64_t prop_count(struct ct_cdb_object_t *_obj) {
+static uint64_t prop_count(struct ct_cdb_obj_t *_obj) {
     struct object *obj = *(struct object **) _obj;
     return obj->properties_count - 1;
 }
@@ -352,7 +352,7 @@ static struct ct_cdb_a0 coredb_api = {
         .prop_count = prop_count,
 
         .read_float = read_float,
-        .read_string = read_string,
+        .read_str = read_string,
         .read_uint32 = read_uint32,
         .read_uint64 = read_uint64,
         .read_ptr = read_ptr,

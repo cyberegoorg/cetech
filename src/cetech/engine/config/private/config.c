@@ -59,8 +59,8 @@ CETECH_DECL_API(ct_cdb_a0);
 static struct ConfigSystemGlobals {
     uint64_t type;
 
-    struct ct_cdb_object_t *config_object;
-    struct ct_cdb_object_t *config_desc;
+    struct ct_cdb_obj_t *config_object;
+    struct ct_cdb_obj_t *config_desc;
 } _G;
 
 
@@ -229,7 +229,7 @@ static int parse_args(int argc,
 }
 
 
-static struct ct_cdb_object_t *config_object() {
+static struct ct_cdb_obj_t *config_object() {
     return _G.config_object;
 }
 

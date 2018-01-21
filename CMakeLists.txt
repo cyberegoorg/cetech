@@ -128,6 +128,7 @@ set(SOURCE_FILES
         src/cetech/engine/renderer/private/material/material.cpp
         src/cetech/engine/renderer/private/material/material_preview.cpp
         src/cetech/engine/renderer/private/material/material_compiler.cpp
+        src/cetech/engine/renderer/private/material/material_property.cpp
         src/cetech/engine/renderer/private/scene/scene.cpp
         src/cetech/engine/renderer/private/scene/scene_compiler.cpp
         src/cetech/engine/renderer/private/viewport/viewport.cpp
