@@ -28,7 +28,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_config_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -81,7 +81,7 @@ struct _G {
 char *resource_compiler_get_build_dir(struct ct_alloc *a,
                                       const char *platform) {
 
-    const char *build_dir_str = ct_coredb_a0.read_string(_G.config,
+    const char *build_dir_str = ct_cdb_a0.read_string(_G.config,
                                                          CONFIG_BUILD_DIR, "");
 
     char *buffer = NULL;
@@ -134,7 +134,7 @@ void resource_register_type(uint64_t type,
     struct type_item_t *type_item = &_G.type_items[_G.type_items_count++];
     *type_item = (struct type_item_t) {
             .type = type,
-            .type_objects = ct_coredb_a0.create_object()
+            .type_objects = ct_cdb_a0.create_object()
     };
 }
 
@@ -155,7 +155,7 @@ static int can_get(uint64_t type,
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
-    return ct_coredb_a0.prop_exist(type_item->type_objects, name);
+    return ct_cdb_a0.prop_exist(type_item->type_objects, name);
 }
 
 static int can_get_all(uint64_t type,
@@ -185,17 +185,17 @@ static void load(uint64_t type,
     const uint64_t root_name = CT_ID64_0("build");
 
     ct_thread_a0.spin_lock(&type_item->lock);
-    struct ct_cdb_writer_t *type_writer = ct_coredb_a0.write_begin(
+    struct ct_cdb_writer_t *type_writer = ct_cdb_a0.write_begin(
             type_item->type_objects);
     for (uint32_t i = 0; i < count; ++i) {
         const uint64_t asset_name = names[i];
 
         if (!force &&
-            ct_coredb_a0.prop_exist(type_item->type_objects, asset_name)) {
+            ct_cdb_a0.prop_exist(type_item->type_objects, asset_name)) {
             continue;
         };
 
-        struct ct_cdb_object_t *object = ct_coredb_a0.create_object();
+        struct ct_cdb_object_t *object = ct_cdb_a0.create_object();
 
         char build_name[33] = {};
         type_name_string(build_name, CETECH_ARRAY_LEN(build_name),
@@ -213,7 +213,7 @@ static void load(uint64_t type,
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
                         _G.allocator, 2,
-                        ct_coredb_a0.read_string(_G.config,
+                        ct_cdb_a0.read_string(_G.config,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
 
@@ -228,10 +228,10 @@ static void load(uint64_t type,
                                                    resource_file,
                                                    object);
 
-            ct_coredb_a0.set_ref(type_writer, asset_name, object);
+            ct_cdb_a0.set_ref(type_writer, asset_name, object);
         }
     }
-    ct_coredb_a0.write_commit(type_writer);
+    ct_cdb_a0.write_commit(type_writer);
     ct_thread_a0.spin_unlock(&type_item->lock);
 }
 
@@ -264,7 +264,7 @@ static void unload(uint64_t type,
 
             ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
-            struct ct_cdb_object_t *object = ct_coredb_a0.read_ref(
+            struct ct_cdb_object_t *object = ct_cdb_a0.read_ref(
                     type_item->type_objects, names[i], NULL);
 
             type_clb.offline(names[i], object);
@@ -281,7 +281,7 @@ static struct ct_cdb_object_t *get_obj(uint64_t type,
     struct ct_cdb_object_t *type_object;
     type_object = type_item->type_objects;
 
-    struct ct_cdb_object_t *object = ct_coredb_a0.read_ref(type_object, name, NULL);
+    struct ct_cdb_object_t *object = ct_cdb_a0.read_ref(type_object, name, NULL);
 
     if(object) {
         return object;
@@ -307,7 +307,7 @@ static struct ct_cdb_object_t *get_obj(uint64_t type,
         CETECH_ASSERT(LOG_WHERE, false);
     }
 
-    return ct_coredb_a0.read_ref(type_object, name, NULL);
+    return ct_cdb_a0.read_ref(type_object, name, NULL);
 }
 
 static void reload(uint64_t type,
@@ -461,11 +461,11 @@ static void _init_cvar(struct ct_config_a0 config) {
     ct_config_a0 = config;
     _G.config = ct_config_a0.config_object();
 
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_BUILD_DIR)) {
-        ct_coredb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_BUILD_DIR)) {
+        ct_cdb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 }
 
 
@@ -480,7 +480,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
-                                  ct_coredb_a0.read_string(_G.config,
+                                  ct_cdb_a0.read_string(_G.config,
                                                            CONFIG_BUILD_DIR,
                                                            ""), false);
 
@@ -505,7 +505,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_thread_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

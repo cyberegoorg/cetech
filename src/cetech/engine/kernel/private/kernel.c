@@ -23,7 +23,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 #include <cetech/static_module.h>
 #include <cetech/core/core.h>
@@ -54,11 +54,11 @@ const char *_platform() {
 int init_config(int argc,
                 const char **argv,
                 struct ct_cdb_object_t *object) {
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(object);
-    ct_coredb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
-    ct_coredb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
-    ct_coredb_a0.set_string(writer, CONFIG_BUILD, "build");
-    ct_coredb_a0.write_commit(writer);
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(object);
+    ct_cdb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
+    ct_cdb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
+    ct_cdb_a0.set_string(writer, CONFIG_BUILD, "build");
+    ct_cdb_a0.write_commit(writer);
 
     if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
@@ -66,22 +66,22 @@ int init_config(int argc,
 
     struct ct_alloc *a = ct_memory_a0.main_allocator();
 
-    const char *build_dir_str = ct_coredb_a0.read_string(object, CONFIG_BUILD,
+    const char *build_dir_str = ct_cdb_a0.read_string(object, CONFIG_BUILD,
                                                          "");
     char *build_dir = NULL;
     ct_path_a0.join(&build_dir, a, 2,
                     build_dir_str,
-                    ct_coredb_a0.read_string(object, CONFIG_NATIVE_PLATFORM, ""));
+                    ct_cdb_a0.read_string(object, CONFIG_NATIVE_PLATFORM, ""));
 
     char *build_config = NULL;
     ct_path_a0.join(&build_config, a, 2, build_dir, "global.config");
 
-    const char *source_dir_str = ct_coredb_a0.read_string(object, CONFIG_SRC,
+    const char *source_dir_str = ct_cdb_a0.read_string(object, CONFIG_SRC,
                                                           "");
     char *source_config = NULL;
     ct_path_a0.join(&source_config, a, 2, source_dir_str, "global.config");
 
-    if (ct_coredb_a0.read_uint32(object, CONFIG_COMPILE, 0)) {
+    if (ct_cdb_a0.read_uint32(object, CONFIG_COMPILE, 0)) {
         ct_path_a0.make_path(build_dir);
         ct_path_a0.copy_file(a, source_config, build_config);
     }
@@ -115,7 +115,7 @@ int cetech_kernel_init(int argc,
     CETECH_GET_API(api, ct_path_a0);
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_module_a0);
-    CETECH_GET_API(api, ct_coredb_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
     CETECH_GET_API(api, ct_hash_a0);
 
 

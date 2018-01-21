@@ -28,7 +28,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Globals
@@ -536,9 +536,9 @@ static void online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
-    ct_coredb_a0.write_commit(writer);
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
+    ct_cdb_a0.write_commit(writer);
 
     CT_UNUSED(name, data);
 }
@@ -566,7 +566,7 @@ static ct_entity spawn_type(ct_world world,
                             uint64_t name) {
 
     struct ct_cdb_object_t* obj = ct_resource_a0.get_obj(type, name);
-    entity_resource *res = (entity_resource*)ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    entity_resource *res = (entity_resource*)ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (res == NULL) {
         ct_log_a0.error("entity", "Could not spawn entity.");
@@ -677,7 +677,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

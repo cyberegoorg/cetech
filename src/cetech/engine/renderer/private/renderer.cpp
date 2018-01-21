@@ -34,7 +34,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_machine_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 using namespace celib;
 
@@ -80,14 +80,14 @@ static uint32_t _get_reset_flags() {
 
 static void renderer_create() {
 
-    if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
         int w, h;
-        w = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_X, 0);
-        h = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_Y, 0);
+        w = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_X, 0);
+        h = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ct_coredb_a0.read_uint32(_G.config, CONFIG_WID, 0);
+        intptr_t wid = ct_cdb_a0.read_uint32(_G.config, CONFIG_WID, 0);
 
         char title[128] = {};
         snprintf(title, CETECH_ARRAY_LEN(title), "cetech");
@@ -95,7 +95,7 @@ static void renderer_create() {
 
         if (wid == 0) {
             uint32_t flags = WINDOW_NOFLAG;
-            flags |= ct_coredb_a0.read_uint32(_G.config,
+            flags |= ct_cdb_a0.read_uint32(_G.config,
                                               CONFIG_SCREEN_FULLSCREEN, 0)
                      ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
@@ -237,36 +237,36 @@ static void _init(struct ct_api_a0 *api) {
             .config = ct_config_a0.config_object(),
     };
 
-    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
+    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_WID)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_WID, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_WID)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_WID, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
-        ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
+        ct_cdb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
     }
 
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 
 
-    _G.vsync = ct_coredb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
+    _G.vsync = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
     CETECH_GET_API(api, ct_window_a0);
 
@@ -275,7 +275,7 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
 
         ct_array_free(_G.on_render, _G.allocator);
 
@@ -293,7 +293,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

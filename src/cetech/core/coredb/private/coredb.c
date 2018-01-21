@@ -343,7 +343,7 @@ static uint64_t prop_count(struct ct_cdb_object_t *_obj) {
     return obj->properties_count - 1;
 }
 
-static struct ct_coredb_a0 coredb_api = {
+static struct ct_cdb_a0 coredb_api = {
         .create_object = create_object,
 
         .prop_exist = prop_exist,
@@ -379,7 +379,7 @@ static void _init(struct ct_api_a0 *api) {
                                          MAP_PRIVATE | MAP_ANONYMOUS,
                                          -1, 0);
 
-    api->register_api("ct_coredb_a0", &coredb_api);
+    api->register_api("ct_cdb_a0", &coredb_api);
 }
 
 static void _shutdown() {

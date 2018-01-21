@@ -23,7 +23,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Defines
@@ -81,30 +81,30 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(
             _G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
 
     if (value == NULL) {
-        ct_coredb_a0.set_uint32(writer, key, 1);
+        ct_cdb_a0.set_uint32(writer, key, 1);
         goto end;
     }
 
 
     if (sscanf(value, "%d", &d)) {
-        ct_coredb_a0.set_uint32(writer, key, d);
+        ct_cdb_a0.set_uint32(writer, key, d);
         goto end;
 
     } else if (sscanf(value, "%f", &f)) {
-        ct_coredb_a0.set_float(writer, key, d);
+        ct_cdb_a0.set_float(writer, key, d);
         goto end;
     }
 
-    ct_coredb_a0.set_string(writer, key, value);
+    ct_cdb_a0.set_string(writer, key, value);
 
     end:
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 }
 
 struct foreach_config_data {
@@ -150,10 +150,10 @@ static void foreach_config_clb(struct ct_yamlng_node key,
         } else {
             const uint64_t key = CT_ID64_0(name);
 
-            if (ct_coredb_a0.prop_exist(_G.config_object, key)) {
-                enum ct_coredb_prop_type t = ct_coredb_a0.prop_type(
+            if (ct_cdb_a0.prop_exist(_G.config_object, key)) {
+                enum ct_coredb_prop_type t = ct_cdb_a0.prop_type(
                         _G.config_object, key);
-                struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(
+                struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(
                         _G.config_object);
 
                 switch (t) {
@@ -162,23 +162,23 @@ static void foreach_config_clb(struct ct_yamlng_node key,
 
                     case COREDB_TYPE_FLOAT:
                         tmp_f = d->as_float(d->inst, value, 0.0f);
-                        ct_coredb_a0.set_float(writer, key, tmp_f);
+                        ct_cdb_a0.set_float(writer, key, tmp_f);
                         break;
 
                     case COREDB_TYPE_UINT32:
                         tmp_int = (int) d->as_float(d->inst, value, 0.0f);
-                        ct_coredb_a0.set_uint32(writer, key, tmp_int);
+                        ct_cdb_a0.set_uint32(writer, key, tmp_int);
                         break;
 
                     case COREDB_TYPE_STRPTR:
                         str = d->as_string(d->inst, value, "");
-                        ct_coredb_a0.set_string(writer, key, str);
+                        ct_cdb_a0.set_string(writer, key, str);
                         break;
                     default:
                         break;
                 }
 
-                ct_coredb_a0.write_begin(_G.config_object);
+                ct_cdb_a0.write_begin(_G.config_object);
             }
         }
     }
@@ -249,7 +249,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);
@@ -258,8 +258,8 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.debug(LOG_WHERE, "Init");
 
-            _G.config_object = ct_coredb_a0.create_object();
-            _G.config_desc = ct_coredb_a0.create_object();
+            _G.config_object = ct_cdb_a0.create_object();
+            _G.config_desc = ct_cdb_a0.create_object();
 
             api->register_api("ct_config_a0", &config_a0);
 

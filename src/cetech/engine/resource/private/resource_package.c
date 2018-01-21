@@ -22,7 +22,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 struct package_resource {
     uint32_t type_count;
@@ -58,9 +58,9 @@ void online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
-    ct_coredb_a0.write_commit(writer);
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
+    ct_cdb_a0.write_commit(writer);
 
     CT_UNUSED(name, input);
 }
@@ -174,7 +174,7 @@ int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hash_a0);
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_yng_a0);
-    CETECH_GET_API(api, ct_coredb_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
 
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
@@ -198,7 +198,7 @@ void package_task(void *data) {
     struct package_task_data *task_data = (struct package_task_data *) data;
 
     struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, task_data->name);
-    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
     for (uint32_t j = 0; j < task_count; ++j) {
@@ -232,7 +232,7 @@ void package_load(uint64_t name) {
 
 void package_unload(uint64_t name) {
     struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
-    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     const uint32_t task_count = package->type_count;
     for (uint32_t j = 0; j < task_count; ++j) {
@@ -245,7 +245,7 @@ void package_unload(uint64_t name) {
 
 int package_is_loaded(uint64_t name) {
     struct ct_cdb_object_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
-    struct package_resource *package = ct_coredb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (package == NULL) {
         return 0;

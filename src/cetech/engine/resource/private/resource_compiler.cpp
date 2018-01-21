@@ -42,7 +42,7 @@ CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Defines
@@ -237,7 +237,7 @@ void _compile_files(ct_task_item **tasks,
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
                         ct_memory_a0.main_allocator(), 2,
-                        ct_coredb_a0.read_string(_G.config,
+                        ct_cdb_a0.read_string(_G.config,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
 
@@ -283,7 +283,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config,
 
     char *build_dir_full = resource_compiler_get_build_dir(
             ct_memory_a0.main_allocator(),
-            ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+            ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     ct_path_a0.make_path(build_dir_full);
 
@@ -345,11 +345,11 @@ int resource_compiler_get_filename(char *filename,
 }
 
 const char *resource_compiler_get_source_dir() {
-    return ct_coredb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
+    return ct_cdb_a0.read_string(_G.config, CONFIG_SOURCE_DIR, "");
 }
 
 const char *resource_compiler_get_core_dir() {
-    return ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");;
+    return ct_cdb_a0.read_string(_G.config, CONFIG_CORE_DIR, "");;
 }
 
 char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
@@ -364,13 +364,13 @@ char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
 
 char *resource_compiler_external_join(ct_alloc *alocator,
                                       const char *name) {
-    const char *external_dir_str = ct_coredb_a0.read_string(_G.config,
+    const char *external_dir_str = ct_cdb_a0.read_string(_G.config,
                                                             CONFIG_EXTERNAL_DIR,
                                                             "");
 
     char *tmp_dir = NULL;
     ct_path_a0.join(&tmp_dir, alocator, 2, external_dir_str,
-                    ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
+                    ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     char* buffer = NULL;
     ct_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
@@ -462,20 +462,20 @@ void resource_compiler_check_fs() {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
-        ct_coredb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
+    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
+        ct_cdb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
-        ct_coredb_a0.set_string(writer, CONFIG_CORE_DIR, "core");
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
+        ct_cdb_a0.set_string(writer, CONFIG_CORE_DIR, "core");
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
-        ct_coredb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "externals/build");
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
+        ct_cdb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "externals/build");
     }
 
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 }
 
 
@@ -491,7 +491,7 @@ static void _init(ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
 
-    auto platform = ct_coredb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM,
+    auto platform = ct_cdb_a0.read_string(_G.config, CONFIG_KERNEL_PLATFORM,
                                              "");
 
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
@@ -509,9 +509,9 @@ static void _init(ct_api_a0 *api) {
     ct_buffer_free(tmp_dir_full, ct_memory_a0.main_allocator());
     ct_buffer_free(build_dir_full, ct_memory_a0.main_allocator());
 
-    const char *core_dir = ct_coredb_a0.read_string(_G.config, CONFIG_CORE_DIR,
+    const char *core_dir = ct_cdb_a0.read_string(_G.config, CONFIG_CORE_DIR,
                                                     "");
-    const char *source_dir = ct_coredb_a0.read_string(_G.config,
+    const char *source_dir = ct_cdb_a0.read_string(_G.config,
                                                       CONFIG_SOURCE_DIR, "");
 
     ct_filesystem_a0.map_root_dir(
@@ -548,7 +548,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_filesystem_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

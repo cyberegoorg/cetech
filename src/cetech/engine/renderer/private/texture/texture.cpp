@@ -44,7 +44,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Compiler private
@@ -69,15 +69,15 @@ void _texture_resource_online(uint64_t name,
                                          texture_blob::size(resource));
     bgfx::TextureHandle texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
-    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
+    ct_cdb_a0.write_commit(writer);
 }
 
 
 void _texture_resource_offline(uint64_t name,
                                struct ct_cdb_object_t *obj) {
-    const uint64_t texture = ct_coredb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
+    const uint64_t texture = ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
     bgfx::destroy((bgfx::TextureHandle) {.idx=(uint16_t)texture});
 }
 
@@ -112,7 +112,7 @@ ct_texture texture_get(uint64_t name) {
     ct_cdb_object_t* obj = ct_resource_a0.get_obj(_G.type, name);
 
     ct_texture texture = {
-            .idx = (uint16_t)ct_coredb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)
+            .idx = (uint16_t)ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)
     };
 
     return texture;
@@ -138,7 +138,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_process_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

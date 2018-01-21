@@ -44,7 +44,7 @@ enum ct_coredb_prop_type {
 // Interface
 //==============================================================================
 
-struct ct_coredb_a0 {
+struct ct_cdb_a0 {
     struct ct_cdb_object_t *(*create_object)();
 
     bool (*prop_exist)(struct ct_cdb_object_t *object,

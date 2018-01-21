@@ -60,7 +60,7 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_filesystem_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 #define CONFIG_MODULE_DIR CT_ID64_0(CONFIG_MODULE_DIR_ID)
 
@@ -246,7 +246,7 @@ static void load_dirs() {
     char key[64];
     size_t len = strlen("load_module.");
     strcpy(key, "load_module.");
-    const char *path = ct_coredb_a0.read_string(_G.config,
+    const char *path = ct_cdb_a0.read_string(_G.config,
                                                 CONFIG_MODULE_DIR,
                                                 "bin/darwin64");
     char* buffer = NULL;
@@ -257,12 +257,12 @@ static void load_dirs() {
 
         const uint64_t key_id = CT_ID64_0(key);
 
-        if (!ct_coredb_a0.prop_exist(_G.config, key_id)) {
+        if (!ct_cdb_a0.prop_exist(_G.config, key_id)) {
             break;
         }
 
 
-        const char *module_file = ct_coredb_a0.read_string(_G.config,
+        const char *module_file = ct_cdb_a0.read_string(_G.config,
                                                            key_id, "");
         ct_path_a0.join(&buffer,
                                             ct_memory_a0.main_allocator(),
@@ -354,7 +354,7 @@ static void _init(struct ct_api_a0* api){
 
     static uint64_t root = CT_ID64_0("modules");
     ct_filesystem_a0.map_root_dir(root,
-                                  ct_coredb_a0.read_string(
+                                  ct_cdb_a0.read_string(
                                           _G.config,
                                           CONFIG_MODULE_DIR,
                                           "bin/darwin64"), true);
@@ -371,7 +371,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_filesystem_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

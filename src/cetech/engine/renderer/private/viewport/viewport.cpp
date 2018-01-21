@@ -52,7 +52,7 @@ CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 using namespace celib;
 
@@ -181,11 +181,11 @@ static void _init_viewport(viewport_instance &vi,
                            uint64_t name,
                            float width,
                            float height) {
-    const char *render_config = ct_coredb_a0.read_string(
+    const char *render_config = ct_cdb_a0.read_string(
             ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
     ct_cdb_object_t* object = ct_resource_a0.get_obj(_G.type, CT_ID64_0(render_config));
-    void* resource = ct_coredb_a0.read_ptr(object, VIEWPORT_PROP, NULL);
+    void* resource = ct_cdb_a0.read_ptr(object, VIEWPORT_PROP, NULL);
     auto *blob = renderconfig_blob::get(resource);
 
     if (!width || !height) {
@@ -351,9 +351,9 @@ static void online(uint64_t name,
         map::set(_G.global_resource, gr.name, h);
     }
 
-    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, VIEWPORT_PROP, data);
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_ptr(writer, VIEWPORT_PROP, data);
+    ct_cdb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
@@ -824,11 +824,11 @@ static void _init(struct ct_api_a0 *api) {
     _G.allocator = ct_memory_a0.main_allocator();
     _G.config = ct_config_a0.config_object();
 
-    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config);
-    if (!ct_coredb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
-        ct_coredb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
+    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
+    if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
+        ct_cdb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
     }
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 
     _G.global_resource.init(ct_memory_a0.main_allocator());
     _G.on_pass.init(ct_memory_a0.main_allocator());
@@ -841,7 +841,7 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    if (!ct_coredb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
         ct_renderer_a0.unregister_on_render(on_render);
         ct_app_a0.unregister_on_update(on_update);
 
@@ -874,7 +874,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_window_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
 

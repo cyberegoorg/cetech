@@ -39,7 +39,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_thread_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 struct scene_instance {
@@ -90,8 +90,8 @@ static void online(uint64_t name,
 
 //    scene_instance *instance = _init_scene_instance(name);
 
-    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, SCENE_PROP, data);
+    ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_ptr(writer, SCENE_PROP, data);
 
     for (uint32_t i = 0; i < resource->geom_count; ++i) {
         auto vb_mem = bgfx::makeRef((const void *) &vb[vb_offset[i]],
@@ -106,17 +106,17 @@ static void online(uint64_t name,
         auto ib_handle = bgfx::createIndexBuffer(ib_mem,
                                                  BGFX_BUFFER_INDEX32);
 
-        ct_cdb_object_t* geom_obj = ct_coredb_a0.create_object();
-        ct_cdb_writer_t* geom_writer = ct_coredb_a0.write_begin(geom_obj);
-        ct_coredb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
-        ct_coredb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
-        ct_coredb_a0.set_uint64(geom_writer, SCENE_SIZE_PROP, size);
-        ct_coredb_a0.write_commit(geom_writer);
+        ct_cdb_object_t* geom_obj = ct_cdb_a0.create_object();
+        ct_cdb_writer_t* geom_writer = ct_cdb_a0.write_begin(geom_obj);
+        ct_cdb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
+        ct_cdb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
+        ct_cdb_a0.set_uint64(geom_writer, SCENE_SIZE_PROP, size);
+        ct_cdb_a0.write_commit(geom_writer);
 
-        ct_coredb_a0.set_ref(writer, geom_name[i], geom_obj);
+        ct_cdb_a0.set_ref(writer, geom_name[i], geom_obj);
     }
 
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
@@ -163,11 +163,11 @@ static void shutdown() {
 static void setVBIB(uint64_t scene,
                     uint64_t geom_name) {
     ct_cdb_object_t *obj = ct_resource_a0.get_obj(_G.type, scene);
-    ct_cdb_object_t *geom_obj = ct_coredb_a0.read_ref(obj, geom_name, NULL);
+    ct_cdb_object_t *geom_obj = ct_cdb_a0.read_ref(obj, geom_name, NULL);
 
-    uint64_t size = ct_coredb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
-    uint64_t ib = ct_coredb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
-    uint64_t vb = ct_coredb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
+    uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
+    uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
+    uint64_t vb = ct_cdb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
 
     bgfx::IndexBufferHandle ibh = {.idx = (uint16_t)ib};
     bgfx::VertexBufferHandle vbh = {.idx = (uint16_t)vb};
@@ -178,7 +178,7 @@ static void setVBIB(uint64_t scene,
 
 static scene_blob::blob_t* resource_data(uint64_t name) {
     auto object = ct_resource_a0.get_obj(_G.type, name);
-    return (scene_blob::blob_t*)(ct_coredb_a0.read_ptr(object, SCENE_PROP, NULL));
+    return (scene_blob::blob_t*)(ct_cdb_a0.read_ptr(object, SCENE_PROP, NULL));
 }
 
 static void create_graph(ct_world world,
@@ -257,7 +257,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_hash_a0);
             CETECH_GET_API(api, ct_thread_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

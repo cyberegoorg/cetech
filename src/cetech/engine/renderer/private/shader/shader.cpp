@@ -48,7 +48,7 @@ CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Resource
@@ -82,16 +82,16 @@ static void online(uint64_t name,
 
     }
 
-    struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_uint64(writer, SHADER_PROP, program.idx);
-    ct_coredb_a0.write_commit(writer);
+    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_uint64(writer, SHADER_PROP, program.idx);
+    ct_cdb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
                     struct ct_cdb_object_t *obj) {
     CT_UNUSED(name);
 
-    const uint64_t program = ct_coredb_a0.read_uint64(obj, SHADER_PROP, 0);
+    const uint64_t program = ct_cdb_a0.read_uint64(obj, SHADER_PROP, 0);
     bgfx::destroy((bgfx::ProgramHandle) {.idx=(uint16_t)program});
 }
 
@@ -122,7 +122,7 @@ void shader_shutdown() {
 }
 
 ct_shader shader_get(ct_cdb_object_t* shader) {
-    const uint64_t idx = ct_coredb_a0.read_uint64(shader, SHADER_PROP, 0);
+    const uint64_t idx = ct_cdb_a0.read_uint64(shader, SHADER_PROP, 0);
     return (ct_shader){.idx=(uint16_t)idx};
 }
 
@@ -145,7 +145,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_process_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

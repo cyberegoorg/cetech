@@ -36,7 +36,7 @@ CETECH_DECL_API(ct_hash_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 static int _shaderc(const char *input,
                     const char *output,
@@ -138,7 +138,7 @@ static void compiler(const char *filename,
 
     char *tmp_dir = ct_resource_a0.compiler_get_tmp_dir(
             a,
-            ct_coredb_a0.read_string(ct_config_a0.config_object(),
+            ct_cdb_a0.read_string(ct_config_a0.config_object(),
                                      CT_ID64_0("kernel.platform"), ""));
 
     //////// VS
@@ -225,7 +225,7 @@ int shadercompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
-    CETECH_GET_API(api, ct_coredb_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
 
     ct_resource_a0.compiler_register(CT_ID64_0("shader"), compiler, true);
 

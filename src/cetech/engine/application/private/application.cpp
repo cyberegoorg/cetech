@@ -54,7 +54,7 @@ CETECH_DECL_API(ct_filesystem_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_machine_a0);
-CETECH_DECL_API(ct_coredb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Definess
@@ -100,37 +100,37 @@ void application_quit() {
 void _init_config() {
     _G.config_object = ct_config_a0.config_object();
 
-    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(_G.config_object);
+    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config_object);
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
-        ct_coredb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
+        ct_cdb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_GAME)) {
-        ct_coredb_a0.set_string(writer, CONFIG_GAME, "playground");
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_GAME)) {
+        ct_cdb_a0.set_string(writer, CONFIG_GAME, "playground");
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_DAEMON)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_DAEMON)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_COMPILE)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_COMPILE, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_COMPILE)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_COMPILE, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_CONTINUE)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_CONTINUE, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_CONTINUE)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_CONTINUE, 0);
     }
 
-    if (!ct_coredb_a0.prop_exist(_G.config_object, CONFIG_WAIT)) {
-        ct_coredb_a0.set_uint32(writer, CONFIG_WAIT, 0);
+    if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_WAIT)) {
+        ct_cdb_a0.set_uint32(writer, CONFIG_WAIT, 0);
     }
 
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_a0.write_commit(writer);
 }
 
 static void _boot_stage() {
-    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object,
+    const char *boot_pkg_str = ct_cdb_a0.read_string(_G.config_object,
                                                         CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
     uint64_t pkg = CT_ID64_0("package");
@@ -148,7 +148,7 @@ static void _boot_stage() {
 }
 
 static void _boot_unload() {
-    const char *boot_pkg_str = ct_coredb_a0.read_string(_G.config_object,
+    const char *boot_pkg_str = ct_cdb_a0.read_string(_G.config_object,
                                                         CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
 
@@ -190,10 +190,10 @@ static void check_machine() {
 extern "C" void application_start() {
     _init_config();
 
-    if (ct_coredb_a0.read_uint32(_G.config_object, CONFIG_COMPILE, 0)) {
+    if (ct_cdb_a0.read_uint32(_G.config_object, CONFIG_COMPILE, 0)) {
         ct_resource_a0.compiler_compile_all();
 
-        if (!ct_coredb_a0.read_uint32(_G.config_object, CONFIG_CONTINUE, 0)) {
+        if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_CONTINUE, 0)) {
             return;
         }
     }
@@ -206,35 +206,35 @@ extern "C" void application_start() {
         _G.on_init[i]();
     }
 
-    set_active_game(CT_ID64_0(ct_coredb_a0.read_string(_G.config_object,
+    set_active_game(CT_ID64_0(ct_cdb_a0.read_string(_G.config_object,
                                                        CONFIG_GAME, "")));
 
     if (_G.active_game.on_init) {
         _G.active_game.on_init();
     }
 
-    ct_cdb_object_t *obj1 = ct_coredb_a0.create_object();
-    ct_cdb_object_t *obj2 = ct_coredb_a0.create_object();
-    ct_cdb_object_t *obj3 = ct_coredb_a0.create_object();
+    ct_cdb_object_t *obj1 = ct_cdb_a0.create_object();
+    ct_cdb_object_t *obj2 = ct_cdb_a0.create_object();
+    ct_cdb_object_t *obj3 = ct_cdb_a0.create_object();
 
-    float f1 = ct_coredb_a0.read_float(obj1, 1, 22.0f);
+    float f1 = ct_cdb_a0.read_float(obj1, 1, 22.0f);
 
-    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj1);
-    ct_coredb_a0.set_float(writer, 1, 44.0f);
-    ct_coredb_a0.set_float(writer, 2, 55.0f);
-    ct_coredb_a0.set_float(writer, 3, 66.0f);
-    ct_coredb_a0.set_ref(writer, 4, obj2);
-    ct_coredb_a0.set_ref(writer, 5, obj1);
-    ct_coredb_a0.set_ref(writer, 6, obj2);
-    ct_coredb_a0.set_ref(writer, 7, obj2);
-    ct_coredb_a0.write_commit(writer);
+    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj1);
+    ct_cdb_a0.set_float(writer, 1, 44.0f);
+    ct_cdb_a0.set_float(writer, 2, 55.0f);
+    ct_cdb_a0.set_float(writer, 3, 66.0f);
+    ct_cdb_a0.set_ref(writer, 4, obj2);
+    ct_cdb_a0.set_ref(writer, 5, obj1);
+    ct_cdb_a0.set_ref(writer, 6, obj2);
+    ct_cdb_a0.set_ref(writer, 7, obj2);
+    ct_cdb_a0.write_commit(writer);
 
-    f1 = ct_coredb_a0.read_float(obj1, 1, 22.0f);
-    f1 = ct_coredb_a0.read_float(obj1, 2, 22.0f);
-    f1 = ct_coredb_a0.read_float(obj1, 3, 22.0f);
+    f1 = ct_cdb_a0.read_float(obj1, 1, 22.0f);
+    f1 = ct_cdb_a0.read_float(obj1, 2, 22.0f);
+    f1 = ct_cdb_a0.read_float(obj1, 3, 22.0f);
 
-    obj3 = ct_coredb_a0.read_ref(obj1, 4, NULL);
-    obj2 = ct_coredb_a0.read_ref(obj1, 5, NULL);
+    obj3 = ct_cdb_a0.read_ref(obj1, 4, NULL);
+    obj2 = ct_cdb_a0.read_ref(obj1, 5, NULL);
 
     CT_UNUSED(obj1)
     CT_UNUSED(f1)
@@ -333,7 +333,7 @@ extern "C" void application_start() {
 
         CETECH_GET_API(&ct_api_a0, ct_mouse_a0); // TODO: WTF
 
-        if (!ct_coredb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
+        if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
             ct_renderer_a0.render(
                     _G.active_game.on_render ? _G.active_game.on_render : NULL);
         }
@@ -444,7 +444,7 @@ CETECH_MODULE_DEF(
 
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_coredb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
 
             ct_api_a0 = *api;
         },
