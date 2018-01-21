@@ -74,7 +74,7 @@ struct ct_mesh_renderer_a0 {
     //! \param world World
     //! \param mesh Mesh
     //! \return Material
-    struct ct_material (*get_material)(struct ct_mesh_renderer mesh,
+    struct ct_cdb_object_t* (*get_material)(struct ct_mesh_renderer mesh,
                                        uint32_t idx);
 
     void (*set_scene)(struct ct_mesh_renderer mesh,

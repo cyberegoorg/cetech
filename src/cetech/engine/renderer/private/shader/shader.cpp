@@ -95,7 +95,7 @@ static void offline(uint64_t name,
     bgfx::destroy((bgfx::ProgramHandle) {.idx=(uint16_t)program});
 }
 
-static const ct_resource_callbacks_t callback = {
+static const ct_resource_type_t callback = {
         .online = online,
         .offline = offline,
 };
@@ -121,9 +121,8 @@ void shader_shutdown() {
     _G.handler_map.destroy();
 }
 
-ct_shader shader_get(uint64_t name) {
-    struct ct_cdb_object_t* obj = ct_resource_a0.get_obj(_G.type, name);
-    const uint64_t idx = ct_coredb_a0.read_uint64(obj, SHADER_PROP, 0);
+ct_shader shader_get(ct_cdb_object_t* shader) {
+    const uint64_t idx = ct_coredb_a0.read_uint64(shader, SHADER_PROP, 0);
     return (ct_shader){.idx=(uint16_t)idx};
 }
 

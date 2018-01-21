@@ -55,145 +55,151 @@ int materialcompiler_init(ct_api_a0 *api);
 // GLobals
 //==============================================================================
 
-struct material_instance {
-    const material_blob::blob_t *data;
-    bgfx::UniformHandle *handlers;
-};
-
 static struct MaterialGlobals {
-    ct_handler_t material_handler;
-
-    Map<uint32_t> instace_map;
-    Map<uint32_t> resource_map;
-    material_instance *material_instances;
-
     uint64_t type;
     ct_alloc *allocator;
 } _G;
 
 
-static void _destroy_instance(struct material_instance *instance) {
-    const uint32_t n = instance->data->all_uniform_count;
-
-    for (int i = 0; i < n; ++i) {
-        bgfx::destroy(instance->handlers[i]);
-    }
-
-    CT_FREE(ct_memory_a0.main_allocator(), instance->handlers);
-}
-
-static struct material_instance *_new_material(uint64_t name,
-                                               uint32_t handler) {
-    uint32_t idx = ct_array_size(_G.material_instances);
-    ct_array_push(_G.material_instances, {}, _G.allocator);
-
-    material_instance *instance = &_G.material_instances[idx];
-
-    map::set(_G.instace_map, handler, idx);
-    multi_map::insert(_G.resource_map, name, idx);
-
-    return instance;
-}
-
-static struct material_instance *get_material_instance(ct_material material) {
-    uint32_t idx = map::get(_G.instace_map, material.idx, UINT32_MAX);
-
-    if (UINT32_MAX == idx) {
-        return NULL;
-    }
-
-    return &_G.material_instances[idx];
-}
-
-static void spawn_material_instance(ct_alloc *alloc,
-                                    const material_blob::blob_t *resource,
-                                    material_instance *instance) {
-    bgfx::UniformHandle *handlers = CT_ALLOC(alloc,
-                                                 bgfx::UniformHandle,
-                                                 sizeof(bgfx::UniformHandle) *
-                                                 resource->all_uniform_count);
-
-    auto u_names = material_blob::uniform_names(resource);
-    auto uniforms = material_blob::uniforms(resource);
-
-    for (uint32_t i = 0; i < resource->all_uniform_count; ++i) {
-        bgfx::UniformType::Enum ut = bgfx::UniformType::Count;
-
-        switch (uniforms[i].type) {
-            case MAT_VAR_NONE:
-                break;
-
-            case MAT_VAR_INT:
-                ut = bgfx::UniformType::Int1;
-                break;
-
-            case MAT_VAR_TEXTURE:
-            case MAT_VAR_TEXTURE_HANDLER:
-                ut = bgfx::UniformType::Int1;
-                break;
-
-            case MAT_VAR_VEC4:
-                ut = bgfx::UniformType::Vec4;
-                break;
-
-            case MAT_VAR_MAT44:
-                ut = bgfx::UniformType::Mat4;
-                break;
-        }
-
-        handlers[i] = bgfx::createUniform(&u_names[i * 32], ut, 1);
-    }
-
-    instance->data = resource;
-    instance->handlers = handlers;
-
-}
-
-void reload_level_instance(uint64_t name,
-                           void *data) {
-    auto it = multi_map::find_first(_G.resource_map, name);
-    while (it != nullptr) {
-        struct material_instance *instance = &_G.material_instances[it->value];
-
-        _destroy_instance(instance);
-
-        auto *resource = material_blob::get(data);
-
-        spawn_material_instance(ct_memory_a0.main_allocator(),
-                                resource, instance);
-
-        it = multi_map::find_next(_G.resource_map, it);
-    }
-}
-
 //==============================================================================
 // Resource
 //==============================================================================
-//    static const bgfx::ProgramHandle null_program = {};
 
-#define MATERIAL_PROP CT_ID64_0("material")
+#define MATERIAL_SHADER_PROP CT_ID64_0("shader")
+#define MATERIAL_STATE_PROP CT_ID64_0("state")
+#define MATERIAL_VARIABLE_PROP CT_ID64_0("variables")
 
+#define MATERIAL_VAR_HANDLER_PROP CT_ID64_0("handler")
+#define MATERIAL_VAR_TYPE_PROP CT_ID64_0("type")
+#define MATERIAL_VAR_VALUE_PROP CT_ID64_0("value")
+#define MATERIAL_VAR_VALUE_X_PROP CT_ID64_0("value_x")
+#define MATERIAL_VAR_VALUE_Y_PROP CT_ID64_0("value_y")
+#define MATERIAL_VAR_VALUE_Z_PROP CT_ID64_0("value_z")
+#define MATERIAL_VAR_VALUE_W_PROP CT_ID64_0("value_w")
+
+static bgfx::UniformType::Enum _type_to_bgfx[] = {
+        [MAT_VAR_NONE] = bgfx::UniformType::Count,
+        [MAT_VAR_INT] = bgfx::UniformType::Int1,
+        [MAT_VAR_TEXTURE] = bgfx::UniformType::Int1,
+        [MAT_VAR_TEXTURE_HANDLER] = bgfx::UniformType::Int1,
+        [MAT_VAR_VEC4] = bgfx::UniformType::Vec4,
+        [MAT_VAR_MAT44] = bgfx::UniformType::Mat4,
+};
 
 static void online(uint64_t name,
-                   struct ct_vio* input,
-                   struct ct_cdb_object_t* obj) {
+                   struct ct_vio *input,
+                   struct ct_cdb_object_t *obj) {
 
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
+    const material_blob::blob_t *resource = material_blob::get(data);
+
+    auto *shader_names = material_blob::shader_name(resource);
+    auto *layer_names = material_blob::layer_names(resource);
+    auto *layer_offset = material_blob::layer_offset(resource);
+    auto *uniforms = material_blob::uniforms(resource);
+    auto *uniforms_names = material_blob::uniform_names(resource);
+    auto *uniform_cout = material_blob::uniform_count(resource);
+    auto *render_state = material_blob::render_state(resource);
+
     struct ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, MATERIAL_PROP, data);
+    for (int i = 0; i < material_blob::layer_count(resource); ++i) {
+        uint64_t layer_name = layer_names[i];
+        uint64_t rstate = render_state[i];
+        uint64_t shader = shader_names[i];
+
+        ct_cdb_object_t *layer_object = ct_coredb_a0.create_object();
+        struct ct_cdb_writer_t *layer_writer;
+        layer_writer = ct_coredb_a0.write_begin(layer_object);
+
+        ct_coredb_a0.set_ref(layer_writer,
+                             MATERIAL_SHADER_PROP,
+                             ct_resource_a0.get_obj(CT_ID64_0("shader"),
+                                                    shader));
+        ct_coredb_a0.set_uint64(layer_writer, MATERIAL_STATE_PROP, rstate);
+
+        ct_cdb_object_t *vars_obj = ct_coredb_a0.create_object();
+        ct_cdb_writer_t *vars_writer = ct_coredb_a0.write_begin(vars_obj);
+        ct_coredb_a0.set_ref(layer_writer, MATERIAL_VARIABLE_PROP, vars_obj);
+
+        uint64_t uniform_offset = layer_offset[i];
+        for (int j = 0; j < uniform_cout[i]; ++j) {
+            auto &uniform = uniforms[uniform_offset + j];
+            auto type = uniform.type;
+            const char *uname = &uniforms_names[j * 32];
+            uint64_t name_id = CT_ID64_0(uname);
+
+            bgfx::UniformHandle handler = bgfx::createUniform(uname,
+                                                              _type_to_bgfx[type],
+                                                              1);
+
+            ct_cdb_object_t *var_obj = ct_coredb_a0.create_object();
+            ct_cdb_writer_t *var_writer = ct_coredb_a0.write_begin(var_obj);
+
+            ct_coredb_a0.set_uint64(var_writer, MATERIAL_VAR_HANDLER_PROP,
+                                    handler.idx);
+
+            ct_coredb_a0.set_uint64(var_writer, MATERIAL_VAR_TYPE_PROP, type);
+            switch (type) {
+                case MAT_VAR_NONE:
+                    break;
+
+                case MAT_VAR_INT:
+                    ct_coredb_a0.set_uint64(var_writer, MATERIAL_VAR_VALUE_PROP,
+                                            uniform.i);
+                    break;
+
+                case MAT_VAR_TEXTURE:
+                    ct_coredb_a0.set_uint64(var_writer, MATERIAL_VAR_VALUE_PROP,
+                                            uniform.t);
+                    break;
+
+                case MAT_VAR_TEXTURE_HANDLER:
+                    ct_coredb_a0.set_uint64(var_writer, MATERIAL_VAR_VALUE_PROP,
+                                            uniform.th);
+                    break;
+
+                case MAT_VAR_VEC4:
+                    ct_coredb_a0.set_float(var_writer,
+                                           MATERIAL_VAR_VALUE_X_PROP,
+                                           uniform.v4[0]);
+                    ct_coredb_a0.set_float(var_writer,
+                                           MATERIAL_VAR_VALUE_Y_PROP,
+                                           uniform.v4[1]);
+                    ct_coredb_a0.set_float(var_writer,
+                                           MATERIAL_VAR_VALUE_Z_PROP,
+                                           uniform.v4[2]);
+                    ct_coredb_a0.set_float(var_writer,
+                                           MATERIAL_VAR_VALUE_W_PROP,
+                                           uniform.v4[3]);
+                    break;
+
+                case MAT_VAR_MAT44:
+                    break;
+            }
+            ct_coredb_a0.write_commit(var_writer);
+
+            ct_coredb_a0.set_ref(vars_writer, name_id, var_obj);
+        }
+
+        ct_coredb_a0.write_commit(vars_writer);
+        ct_coredb_a0.write_commit(layer_writer);
+
+        ct_coredb_a0.set_ref(writer, layer_name, layer_object);
+    }
+
     ct_coredb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_object_t* obj) {
+                    struct ct_cdb_object_t *obj) {
     CT_UNUSED(name, obj);
 }
 
 
-static const ct_resource_callbacks_t callback = {
+static const ct_resource_type_t callback = {
         .online = online,
         .offline = offline,
 };
@@ -202,156 +208,132 @@ static const ct_resource_callbacks_t callback = {
 //==============================================================================
 // Interface
 //==============================================================================
-//    static const ct_material null_material = {};
 
-static struct ct_material create(uint64_t name) {
+static struct ct_cdb_object_t *create(uint64_t name) {
     auto object = ct_resource_a0.get_obj(_G.type, name);
-    auto resource = material_blob::get(ct_coredb_a0.read_ptr(object, MATERIAL_PROP, NULL));
-
-    uint64_t h = ct_handler_create(&_G.material_handler, _G.allocator);
-    material_instance *instance = _new_material(name, h);
-
-
-    ct_alloc *alloc = ct_memory_a0.main_allocator();
-
-    spawn_material_instance(alloc, resource, instance);
-
-    return (ct_material) {.idx=h};
+    return object;
 }
 
-static uint32_t _find_uniform_slot(const material_blob::blob_t *resource,
-                                   const char *name) {
-
-    const char *u_names = material_blob::uniform_names(resource);
-    for (uint32_t i = 0; i < resource->all_uniform_count; ++i) {
-        if (strcmp(&u_names[i * 32], name) != 0) {
-            continue;
-        }
-
-        return i;
-    }
-
-    return UINT32_MAX;
-}
-
-static uint32_t _find_layer_slot(const material_blob::blob_t *resource,
-                                 uint64_t layer) {
-
-    auto *u_names = material_blob::layer_names(resource);
-    for (uint32_t i = 0; i < resource->layer_count; ++i) {
-        if (u_names[i] != layer) {
-            continue;
-        }
-
-        return i;
-    }
-
-    return UINT32_MAX;
-}
-
-static void set_texture_handler(struct ct_material material,
+static void set_texture_handler(struct ct_cdb_object_t *material,
+                                uint64_t layer,
                                 const char *slot,
                                 ct_texture texture) {
-    material_instance *mat_inst = get_material_instance(material);
+    ct_cdb_object_t *layer_obj = ct_coredb_a0.read_ref(material, layer, NULL);
+    ct_cdb_object_t *variables = ct_coredb_a0.read_ref(layer_obj,
+                                                       MATERIAL_VARIABLE_PROP,
+                                                       NULL);
 
-    auto *resource = mat_inst->data;
-    auto *uniforms = material_blob::uniforms(resource);
-
-    int slot_idx = _find_uniform_slot(resource, slot);
-    uniforms[slot_idx].th = texture.idx;
-    uniforms[slot_idx].type = MAT_VAR_TEXTURE_HANDLER;
+    ct_cdb_object_t *var = ct_coredb_a0.read_ref(variables, CT_ID64_0(slot),
+                                                 NULL);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(var);
+    ct_coredb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
+    ct_coredb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
+                            MAT_VAR_TEXTURE_HANDLER);
+    ct_coredb_a0.write_commit(writer);
 }
 
-static void set_texture(ct_material material,
+static void set_texture(ct_cdb_object_t *material,
+                        uint64_t layer,
                         const char *slot,
                         uint64_t texture) {
-    material_instance *mat_inst = get_material_instance(material);
+    ct_cdb_object_t *layer_obj = ct_coredb_a0.read_ref(material, layer, NULL);
+    ct_cdb_object_t *variables = ct_coredb_a0.read_ref(layer_obj,
+                                                       MATERIAL_VARIABLE_PROP,
+                                                       NULL);
 
-    auto *resource = mat_inst->data;
-    auto *uniforms = material_blob::uniforms(resource);
-    int slot_idx = _find_uniform_slot(resource, slot);
-    uniforms[slot_idx].t = texture;
+    ct_cdb_object_t *var = ct_coredb_a0.read_ref(variables, CT_ID64_0(slot),
+                                                 NULL);
+    ct_cdb_writer_t *writer = ct_coredb_a0.write_begin(var);
+    ct_coredb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture);
+    ct_coredb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP, MAT_VAR_TEXTURE);
+    ct_coredb_a0.write_commit(writer);
 }
 
 
-static void set_mat44f(ct_material material,
+static void set_mat44f(ct_cdb_object_t *material,
+                       uint64_t layer,
                        const char *slot,
                        float *value) {
-    material_instance *mat_inst = get_material_instance(material);
-
-    auto *resource = mat_inst->data;
-    auto *uniforms = material_blob::uniforms(resource);
-
-    int slot_idx = _find_uniform_slot(resource, slot);
-    ct_mat4_move(uniforms[slot_idx].m44, value);
 }
 
-static void submit(ct_material material,
-                   uint64_t layer,
+static void submit(ct_cdb_object_t *material,
+                   uint64_t _layer,
                    uint8_t viewid) {
-    material_instance *mat_inst = get_material_instance(material);
+    ct_cdb_object_t *layer = ct_coredb_a0.read_ref(material, _layer, NULL);
+    ct_cdb_object_t *variables = ct_coredb_a0.read_ref(layer,
+                                                       MATERIAL_VARIABLE_PROP,
+                                                       NULL);
 
-//        if(!mat_inst) {
-//            return;
-//        }
-
-    auto *resource = mat_inst->data;
-    auto *handlers = mat_inst->handlers;
-    auto layer_idx = _find_layer_slot(resource, layer);
-
-    if (UINT32_MAX == layer_idx) {
-        return;
-    }
-
-    auto *shader_names = material_blob::shader_name(resource);
-    auto *layer_offset = material_blob::layer_offset(resource);
-    auto *uniforms = material_blob::uniforms(resource);
-    auto *uniform_cout = material_blob::uniform_count(resource);
-    auto *render_state = material_blob::render_state(resource);
-
-    auto shader = ct_shader_a0.get(shader_names[layer_idx]);
-
-    auto offset = layer_offset[layer_idx];
-
+    uint64_t *keys = ct_coredb_a0.prop_keys(variables);
+    uint64_t key_count = ct_coredb_a0.prop_count(variables);
     uint8_t texture_stage = 0;
 
-    for (uint32_t i = 0; i < uniform_cout[layer_idx]; ++i) {
-        auto &uniform = uniforms[offset + i];
-        auto type = uniform.type;
+    for (int j = 0; j < key_count; ++j) {
+        ct_cdb_object_t *var = ct_coredb_a0.read_ref(variables, keys[j], NULL);
+        uint64_t type = ct_coredb_a0.read_uint64(var, MATERIAL_VAR_TYPE_PROP,
+                                                 0);
+
+        bgfx::UniformHandle handle = {.idx = (uint16_t) ct_coredb_a0.read_uint64(
+                var,
+                MATERIAL_VAR_HANDLER_PROP,
+                0)
+        };
 
         switch (type) {
             case MAT_VAR_NONE:
                 break;
 
-            case MAT_VAR_INT:
-                bgfx::setUniform(handlers[i], &uniform.i, 1);
+            case MAT_VAR_INT: {
+                uint32_t v = ct_coredb_a0.read_uint64(var,
+                                                      MATERIAL_VAR_VALUE_PROP,
+                                                      0);
+                bgfx::setUniform(handle, &v, 1);
+            }
                 break;
 
             case MAT_VAR_TEXTURE: {
-                auto texture = ct_texture_a0.get(uniform.t);
-                bgfx::setTexture(texture_stage, handlers[i],
-                                 {texture.idx});
-                ++texture_stage;
+                uint64_t t = ct_coredb_a0.read_uint64(var,
+                                                      MATERIAL_VAR_VALUE_PROP,
+                                                      0);
+                auto texture = ct_texture_a0.get(t);
+                bgfx::setTexture(texture_stage++, handle, {texture.idx});
             }
                 break;
 
             case MAT_VAR_TEXTURE_HANDLER: {
-                bgfx::setTexture(texture_stage, handlers[i], {uniform.th});
-                ++texture_stage;
+                uint64_t t = ct_coredb_a0.read_uint64(var,
+                                                      MATERIAL_VAR_VALUE_PROP,
+                                                      0);
+                bgfx::setTexture(texture_stage++, handle, {.idx=(uint16_t) t});
             }
                 break;
 
-            case MAT_VAR_VEC4:
-                bgfx::setUniform(handlers[i], &uniform.v4, 1);
+            case MAT_VAR_VEC4: {
+                float v[] = {
+                        ct_coredb_a0.read_float(var, MATERIAL_VAR_VALUE_X_PROP,
+                                                0.0f),
+                        ct_coredb_a0.read_float(var, MATERIAL_VAR_VALUE_Y_PROP,
+                                                0.0f),
+                        ct_coredb_a0.read_float(var, MATERIAL_VAR_VALUE_Z_PROP,
+                                                0.0f),
+                        ct_coredb_a0.read_float(var, MATERIAL_VAR_VALUE_W_PROP,
+                                                0.0f),
+                };
+                bgfx::setUniform(handle, &v, 1);
+            }
                 break;
 
             case MAT_VAR_MAT44:
-                bgfx::setUniform(handlers[i], &uniform.m44, 1);
                 break;
         }
     }
 
-    uint64_t state = render_state[layer_idx];
+    ct_cdb_object_t *shader_obj = ct_coredb_a0.read_ref(layer,
+                                                        MATERIAL_SHADER_PROP,
+                                                        NULL);
+    auto shader = ct_shader_a0.get(shader_obj);
+    uint64_t state = ct_coredb_a0.read_uint64(layer, MATERIAL_STATE_PROP, 0);
+
     bgfx::setState(state, 0);
     bgfx::submit(viewid, {shader.idx});
 }
@@ -367,12 +349,9 @@ static struct ct_material_a0 material_api = {
 static int init(ct_api_a0 *api) {
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
+            .type = CT_ID64_0("material"),
     };
     api->register_api("ct_material_a0", &material_api);
-
-    _G.type = CT_ID64_0("material");
-    _G.instace_map.init(ct_memory_a0.main_allocator());
-    _G.resource_map.init(ct_memory_a0.main_allocator());
 
     ct_resource_a0.register_type(_G.type, callback);
 
@@ -382,11 +361,6 @@ static int init(ct_api_a0 *api) {
 }
 
 static void shutdown() {
-    ct_handler_free(&_G.material_handler, _G.allocator);
-    ct_array_free(_G.material_instances, _G.allocator);
-
-    _G.instace_map.destroy();
-    _G.resource_map.destroy();
 }
 
 CETECH_MODULE_DEF(

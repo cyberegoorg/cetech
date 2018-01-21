@@ -1,6 +1,8 @@
 #ifndef CETECH_SHADER_H
 #define CETECH_SHADER_H
 
+#include <cetech/core/coredb/coredb.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,7 +31,7 @@ struct ct_shader {
 
 //! Shader API V0
 struct ct_shader_a0 {
-    ct_shader (*get)(uint64_t name);
+    ct_shader (*get)(ct_cdb_object_t* shader);
 };
 
 #ifdef __cplusplus

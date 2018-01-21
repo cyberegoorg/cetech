@@ -37,7 +37,6 @@ struct package_resource {
 #define package_type(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
 #define package_name(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
 
-
 //==============================================================================
 // Public interface
 //==============================================================================
@@ -81,7 +80,7 @@ void *reloader(uint64_t name,
     return new_data;
 }
 
-static const ct_resource_callbacks_t package_resource_callback = {
+static const ct_resource_type_t package_resource_callback = {
         .online =online,
         .offline =offline,
 };

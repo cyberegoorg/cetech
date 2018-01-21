@@ -37,15 +37,14 @@ CETECH_DECL_API(ct_thread_a0);
 
 
 void resource_register_type(uint64_t type,
-                            ct_resource_callbacks_t callbacks);
+                            ct_resource_type_t callbacks);
 
 //==============================================================================
 // Gloals
 //==============================================================================
 
+#define _G ResourceManagerGlobals
 #define LOG_WHERE "resource_manager"
-#define is_item_null(item) ((item).data == null_item.data)
-
 
 //==============================================================================
 // Gloals
@@ -59,13 +58,12 @@ struct type_item_t {
     uint64_t type;
 };
 
-#define _G ResourceManagerGlobals
 struct _G {
     struct ct_hash_t type_map;
     struct type_item_t type_items[MAX_TYPES + 1];
     uint32_t type_items_count;
 
-    ct_resource_callbacks_t *resource_callbacks;
+    ct_resource_type_t *resource_callbacks;
 
     bool autoload_enabled;
 
@@ -126,7 +124,7 @@ static void set_autoload(bool enable) {
 }
 
 void resource_register_type(uint64_t type,
-                            ct_resource_callbacks_t callbacks) {
+                            ct_resource_type_t callbacks) {
 
     const uint32_t idx = ct_array_size(_G.resource_callbacks);
 
@@ -249,7 +247,7 @@ static void unload(uint64_t type,
     const uint32_t type_item_idx = _find_type(type);
     struct type_item_t *type_item = &_G.type_items[type_item_idx];
 
-    ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+    ct_resource_type_t type_clb = _G.resource_callbacks[idx];
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
@@ -318,7 +316,7 @@ static void reload(uint64_t type,
 
 //        const uint32_t idx = map::get<uint32_t>(_G.type_map, type, 0);
 //        void* data = NULL;
-//        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+//        ct_resource_type_t type_clb = _G.resource_callbacks[idx];
 //
 //        const uint32_t type_item_idx = _find_type(type);
 //        type_item_t* type_item = &_G.type_items[type_item_idx];
@@ -400,7 +398,7 @@ void resource_memory_reload(uint64_t type,
 //            return;
 //        }
 //
-//        ct_resource_callbacks_t type_clb = _G.resource_callbacks[idx];
+//        ct_resource_type_t type_clb = _G.resource_callbacks[idx];
 //
 //        void *old_data = get(type, name);
 //

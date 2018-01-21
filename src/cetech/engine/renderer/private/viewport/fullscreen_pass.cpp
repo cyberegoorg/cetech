@@ -164,7 +164,7 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
         d->foreach_dict_node(d->inst, input, foreach_input, &pass_data);
 
         ct_array_push_n(*data, &pass_data, sizeof(pass_data),
-                         ct_memory_a0.main_allocator());
+                        ct_memory_a0.main_allocator());
     }
 
     return 1;
@@ -181,7 +181,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     CT_UNUSED(world);
     CT_UNUSED(camera);
 
-    static ct_material copy_material = ct_material_a0.resource_create(
+    static ct_cdb_object_t *copy_material = ct_material_a0.resource_create(
             CT_ID64_0("content/copy"));
 
     bgfx::setViewRect(viewid, 0, 0,
@@ -200,14 +200,14 @@ static void fullscreen_pass(viewport_instance *viewport,
 
     screenspace_quad(viewport->size[0], viewport->size[1], 0.0f, true);
 
-    fullscree_pass_data *pass_data = (fullscree_pass_data *)(&viewport->layers_data[viewport->layers_data_offset[layerid]]);
+    fullscree_pass_data *pass_data = (fullscree_pass_data *) (&viewport->layers_data[viewport->layers_data_offset[layerid]]);
 
     for (uint8_t i = 0; i < pass_data->input_count; ++i) {
-        auto input_tex = ct_viewport_a0.get_local_resource(
-                viewport_id, pass_data->input_resource[i]);
+        auto input_tex = ct_viewport_a0.get_local_resource(viewport_id,
+                                                           pass_data->input_resource[i]);
 
         ct_material_a0.set_texture_handler(
-                copy_material,
+                copy_material, layer_entry.name,
                 pass_data->input_name[i],
                 {input_tex});
 

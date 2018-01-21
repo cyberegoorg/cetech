@@ -1,6 +1,8 @@
 #ifndef CETECH_MATERIAL_H
 #define CETECH_MATERIAL_H
 
+#include <cetech/core/coredb/coredb.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -16,6 +18,7 @@ extern "C" {
 //==============================================================================
 
 struct ct_texture;
+struct ct_cdb_object_t;
 
 struct ct_material {
     uint64_t idx;
@@ -31,13 +34,14 @@ struct ct_material_a0 {
     //! Create new material
     //! \param name Material resource name
     //! \return Material
-    struct ct_material (*resource_create)(uint64_t name);
+    struct ct_cdb_object_t* (*resource_create)(uint64_t name);
 
     //! Set texture value
     //! \param material Material
     //! \param slot Slot Name
     //! \param texture Texture name
-    void (*set_texture)(struct ct_material material,
+    void (*set_texture)(struct ct_cdb_object_t* material,
+                        uint64_t layer,
                         const char *slot,
                         uint64_t texture);
 
@@ -45,16 +49,18 @@ struct ct_material_a0 {
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
-    void (*set_mat44f)(struct ct_material material,
+    void (*set_mat44f)(struct ct_cdb_object_t* material,
+                       uint64_t layer,
                        const char *slot,
                        float *value);
 
     //! Submit material for actual render
-    void (*submit)(struct ct_material material,
+    void (*submit)(struct ct_cdb_object_t* material,
                    uint64_t layer,
                    uint8_t viewid);
 
-    void (*set_texture_handler)(struct ct_material material,
+    void (*set_texture_handler)(struct ct_cdb_object_t* material,
+                                uint64_t layer,
                                 const char *slot,
                                 struct ct_texture texture);
 };

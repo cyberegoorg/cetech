@@ -364,7 +364,7 @@ static void offline(uint64_t name,
 
 }
 
-static const ct_resource_callbacks_t callback = {
+static const ct_resource_type_t callback = {
         .online = online,
         .offline = offline,
 };

@@ -59,7 +59,7 @@ typedef struct {
     //! \param data Resource data
     void (*offline)(uint64_t name,
                     struct ct_cdb_object_t *obj);
-} ct_resource_callbacks_t;
+} ct_resource_type_t;
 
 
 //! Compilator api
@@ -86,7 +86,7 @@ struct ct_resource_a0 {
     //! \param type Type
     //! \param callbacks Callbacks
     void (*register_type)(uint64_t type,
-                          ct_resource_callbacks_t callbacks);
+                          ct_resource_type_t callbacks);
 
     //! Load resources
     //! \param loaded_data Loaded data array

@@ -55,7 +55,7 @@ CETECH_DECL_API(ct_coredb_a0);
 // Resource
 //==============================================================================
 
-#define TEXTURE_HANDLER_PROP CT_ID64_0("handler")
+#define TEXTURE_HANDLER_PROP CT_ID64_0("texture_handler")
 
 void _texture_resource_online(uint64_t name,
                               struct ct_vio* input,
@@ -67,7 +67,7 @@ void _texture_resource_online(uint64_t name,
     auto resource = texture_blob::get(data);
     const bgfx::Memory *mem = bgfx::copy(resource + 1,
                                          texture_blob::size(resource));
-    auto texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
+    bgfx::TextureHandle texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
     ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
     ct_coredb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
@@ -82,7 +82,7 @@ void _texture_resource_offline(uint64_t name,
 }
 
 
-static const ct_resource_callbacks_t texture_resource_callback = {
+static const ct_resource_type_t texture_resource_callback = {
         .online =_texture_resource_online,
         .offline =_texture_resource_offline,
 };

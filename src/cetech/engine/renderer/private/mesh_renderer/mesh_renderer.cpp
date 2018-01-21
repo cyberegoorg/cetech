@@ -60,7 +60,7 @@ struct mesh_data {
     uint64_t mesh[32];
     uint64_t node[32];
     uint64_t material[32];
-    ct_material material_inst[32];
+    ct_cdb_object_t* material_inst[32];
     uint32_t count;
 };
 
@@ -336,7 +336,7 @@ void mesh_render_all(ct_world world,
         ct_transform_a0.get_world_matrix(t, wm);
 
         for (int j = 0; j < mesh_data->count; ++j) {
-            ct_material material = mesh_data->material_inst[j];
+            ct_cdb_object_t* material = mesh_data->material_inst[j];
             uint64_t geom = mesh_data->mesh[j];
 
             //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
@@ -366,7 +366,7 @@ void mesh_render_all(ct_world world,
     }
 }
 
-ct_material mesh_get_material(ct_mesh_renderer mesh,
+ct_cdb_object_t* mesh_get_material(ct_mesh_renderer mesh,
                               uint32_t idx) {
     WorldInstance *data = _get_world_instance(mesh.world);
     return data->mesh[mesh.idx].material_inst[idx];
@@ -376,7 +376,7 @@ void mesh_set_material(ct_mesh_renderer mesh,
                        uint32_t idx,
                        uint64_t material) {
     WorldInstance *data = _get_world_instance(mesh.world);
-    ct_material material_instance = ct_material_a0.resource_create(material);
+    ct_cdb_object_t* material_instance = ct_material_a0.resource_create(material);
 
     data->mesh[mesh.idx].material_inst[idx] = material_instance;
 }

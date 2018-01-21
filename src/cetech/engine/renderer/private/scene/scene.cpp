@@ -43,11 +43,6 @@ CETECH_DECL_API(ct_coredb_a0);
 
 
 struct scene_instance {
-    uint64_t scene;
-    ct_hash_t geom_map;
-    uint32_t *size;
-    bgfx::VertexBufferHandle *vb;
-    bgfx::IndexBufferHandle *ib;
 };
 
 
@@ -58,56 +53,9 @@ struct scene_instance {
 #define _G SceneResourceGlobals
 static struct _G {
     uint64_t type;
-    ct_hash_t scene_instance_map;
-    scene_instance *scene_instance_array;
     ct_alloc *allocator;
 } _G;
 
-static struct scene_instance *_init_scene_instance(uint64_t scene) {
-    uint32_t idx = ct_array_size(_G.scene_instance_array);
-    ct_array_push(_G.scene_instance_array, {}, _G.allocator);
-
-    scene_instance *instance = &_G.scene_instance_array[idx];
-    instance->scene = scene;
-
-    ct_hash_add(&_G.scene_instance_map, scene, idx, _G.allocator);
-
-    return instance;
-}
-
-static void _destroy_scene_instance(uint64_t scene) {
-    uint32_t idx = (uint32_t) ct_hash_lookup(&_G.scene_instance_map, scene,
-                                              UINT32_MAX);
-    uint32_t size = ct_array_size(_G.scene_instance_array);
-
-    scene_instance *instance = &_G.scene_instance_array[idx];
-    scene_instance *last_instance = &_G.scene_instance_array[size - 1];
-
-    ct_hash_free(&instance->geom_map, _G.allocator);
-
-    ct_array_free(instance->size, _G.allocator);
-    ct_array_free(instance->vb, _G.allocator);
-    ct_array_free(instance->ib, _G.allocator);
-
-    *instance = *last_instance;
-    ct_hash_remove(&_G.scene_instance_map, scene);
-    ct_hash_add(&_G.scene_instance_map, last_instance->scene, idx,
-                 _G.allocator);
-    ct_array_pop_back(_G.scene_instance_array);
-}
-
-static struct scene_instance *_get_scene_instance(uint64_t scene) {
-    uint32_t idx = (uint32_t) ct_hash_lookup(&_G.scene_instance_map, scene,
-                                              UINT32_MAX);
-
-    if (idx == UINT32_MAX) {
-        ct_resource_a0.get_obj(_G.type, scene);
-        idx = (uint32_t) ct_hash_lookup(&_G.scene_instance_map, scene,
-                                         UINT32_MAX);
-    }
-
-    return &_G.scene_instance_array[idx];
-}
 
 //==============================================================================
 // Compiler private
@@ -118,17 +66,16 @@ static struct scene_instance *_get_scene_instance(uint64_t scene) {
 // Resource
 //==============================================================================
 
-#define SCENE_PROP CT_ID64_0("scene")
+#define SCENE_PROP      CT_ID64_0("scene")
+#define SCENE_IB_PROP   CT_ID64_0("ib")
+#define SCENE_VB_PROP   CT_ID64_0("vb")
+#define SCENE_SIZE_PROP CT_ID64_0("size")
 
 static void online(uint64_t name,
                    struct ct_vio* input,struct ct_cdb_object_t* obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
-
-    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
-    ct_coredb_a0.set_ptr(writer, SCENE_PROP, data);
-    ct_coredb_a0.write_commit(writer);
 
     auto resource = scene_blob::get(data);
 
@@ -141,8 +88,10 @@ static void online(uint64_t name,
     uint32_t *ib = scene_blob::ib(resource);
     uint8_t *vb = scene_blob::vb(resource);
 
-    scene_instance *instance = _init_scene_instance(name);
+//    scene_instance *instance = _init_scene_instance(name);
 
+    ct_cdb_writer_t* writer = ct_coredb_a0.write_begin(obj);
+    ct_coredb_a0.set_ptr(writer, SCENE_PROP, data);
 
     for (uint32_t i = 0; i < resource->geom_count; ++i) {
         auto vb_mem = bgfx::makeRef((const void *) &vb[vb_offset[i]],
@@ -157,23 +106,26 @@ static void online(uint64_t name,
         auto ib_handle = bgfx::createIndexBuffer(ib_mem,
                                                  BGFX_BUFFER_INDEX32);
 
-        uint8_t idx = (uint8_t) ct_array_size(instance->vb);
-        ct_hash_add(&instance->geom_map, geom_name[i], idx, _G.allocator);
+        ct_cdb_object_t* geom_obj = ct_coredb_a0.create_object();
+        ct_cdb_writer_t* geom_writer = ct_coredb_a0.write_begin(geom_obj);
+        ct_coredb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
+        ct_coredb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
+        ct_coredb_a0.set_uint64(geom_writer, SCENE_SIZE_PROP, size);
+        ct_coredb_a0.write_commit(geom_writer);
 
-        ct_array_push(instance->size, ib_size[i], _G.allocator);
-        ct_array_push(instance->vb, bv_handle, _G.allocator);
-        ct_array_push(instance->ib, ib_handle, _G.allocator);
+        ct_coredb_a0.set_ref(writer, geom_name[i], geom_obj);
     }
+
+    ct_coredb_a0.write_commit(writer);
 }
 
 static void offline(uint64_t name,
                     struct ct_cdb_object_t* obj) {
     CT_UNUSED(obj);
 
-    _destroy_scene_instance(name);
 }
 
-static const ct_resource_callbacks_t callback = {
+static const ct_resource_type_t callback = {
         .online = online,
         .offline = offline,
 };
@@ -205,27 +157,23 @@ int sceneinit(ct_api_a0 *api) {
 }
 
 static void shutdown() {
-    ct_array_free(_G.scene_instance_array, _G.allocator);
-    ct_hash_free(&_G.scene_instance_map, _G.allocator);
+
 }
 
 static void setVBIB(uint64_t scene,
                     uint64_t geom_name) {
-    scene_instance *instance = _get_scene_instance(scene);
+    ct_cdb_object_t *obj = ct_resource_a0.get_obj(_G.type, scene);
+    ct_cdb_object_t *geom_obj = ct_coredb_a0.read_ref(obj, geom_name, NULL);
 
-    if (instance == NULL) {
-        return;
-    }
+    uint64_t size = ct_coredb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
+    uint64_t ib = ct_coredb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
+    uint64_t vb = ct_coredb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
 
-    uint8_t idx = (uint8_t) ct_hash_lookup(&instance->geom_map, geom_name,
-                                            UINT8_MAX);
+    bgfx::IndexBufferHandle ibh = {.idx = (uint16_t)ib};
+    bgfx::VertexBufferHandle vbh = {.idx = (uint16_t)vb};
 
-    if (idx == UINT8_MAX) {
-        return;
-    }
-
-    bgfx::setVertexBuffer(0, instance->vb[idx], 0, instance->size[idx]);
-    bgfx::setIndexBuffer(instance->ib[idx], 0, instance->size[idx]);
+    bgfx::setVertexBuffer(0, vbh, 0, size);
+    bgfx::setIndexBuffer(ibh, 0, size);
 }
 
 static scene_blob::blob_t* resource_data(uint64_t name) {

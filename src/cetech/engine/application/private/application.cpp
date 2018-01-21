@@ -223,11 +223,18 @@ extern "C" void application_start() {
     ct_coredb_a0.set_float(writer, 1, 44.0f);
     ct_coredb_a0.set_float(writer, 2, 55.0f);
     ct_coredb_a0.set_float(writer, 3, 66.0f);
+    ct_coredb_a0.set_ref(writer, 4, obj2);
+    ct_coredb_a0.set_ref(writer, 5, obj1);
+    ct_coredb_a0.set_ref(writer, 6, obj2);
+    ct_coredb_a0.set_ref(writer, 7, obj2);
     ct_coredb_a0.write_commit(writer);
 
     f1 = ct_coredb_a0.read_float(obj1, 1, 22.0f);
     f1 = ct_coredb_a0.read_float(obj1, 2, 22.0f);
     f1 = ct_coredb_a0.read_float(obj1, 3, 22.0f);
+
+    obj3 = ct_coredb_a0.read_ref(obj1, 4, NULL);
+    obj2 = ct_coredb_a0.read_ref(obj1, 5, NULL);
 
     CT_UNUSED(obj1)
     CT_UNUSED(f1)

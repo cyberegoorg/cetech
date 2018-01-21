@@ -53,6 +53,9 @@ struct ct_coredb_a0 {
     enum ct_coredb_prop_type (*prop_type)(struct ct_cdb_object_t *object,
                                           uint64_t key);
 
+    uint64_t * (*prop_keys)(struct ct_cdb_object_t *object);
+    uint64_t (*prop_count)(struct ct_cdb_object_t *object);
+
     // WRITE
     struct ct_cdb_writer_t *
     (*write_begin)(struct ct_cdb_object_t *object);

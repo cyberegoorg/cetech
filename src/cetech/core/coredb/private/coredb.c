@@ -177,7 +177,7 @@ static void set_float(struct ct_cdb_writer_t *_writer,
                                    ct_memory_a0.main_allocator());
     }
 
-    *(float *) (obj->values + obj->offset[idx]) = value;
+    memcpy((obj->values + obj->offset[idx]), &value, sizeof(float));
 }
 
 static void set_string(struct ct_cdb_writer_t *_writer,
@@ -214,11 +214,11 @@ static void set_uint32(struct ct_cdb_writer_t *_writer,
     uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_UINT32, &value,
-                                   sizeof(uint32_t),
+                                   sizeof(uint64_t),
                                    ct_memory_a0.main_allocator());
     }
 
-    *(uint32_t *) (obj->values + obj->offset[idx]) = value;
+    memcpy((obj->values + obj->offset[idx]), &value, sizeof(uint32_t));
 }
 
 static void set_uint64(struct ct_cdb_writer_t *_writer,
@@ -231,11 +231,11 @@ static void set_uint64(struct ct_cdb_writer_t *_writer,
     uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
         idx = _object_new_property(obj, property, COREDB_TYPE_UINT32, &value,
-                                   sizeof(uint32_t),
+                                   sizeof(uint64_t),
                                    ct_memory_a0.main_allocator());
     }
 
-    *(uint64_t *) (obj->values + obj->offset[idx]) = value;
+    memcpy((obj->values + obj->offset[idx]), &value, sizeof(uint64_t));
 }
 
 static void set_ptr(struct ct_cdb_writer_t *_writer,
@@ -252,7 +252,7 @@ static void set_ptr(struct ct_cdb_writer_t *_writer,
                                    ct_memory_a0.main_allocator());
     }
 
-    *(void **) (obj->values + obj->offset[idx]) = value;
+    memcpy((obj->values + obj->offset[idx]), &value, sizeof(void *));
 }
 
 static void set_ref(struct ct_cdb_writer_t *_writer,
@@ -269,8 +269,7 @@ static void set_ref(struct ct_cdb_writer_t *_writer,
                                    sizeof(struct ct_cdb_object_t *),
                                    ct_memory_a0.main_allocator());
     }
-
-    *(struct ct_cdb_object_t **) (obj->values + obj->offset[idx]) = ref;
+    memcpy((obj->values + obj->offset[idx]), &ref, sizeof(struct ct_cdb_object_t*));
 }
 
 static bool prop_exist(struct ct_cdb_object_t *_object,
@@ -334,11 +333,23 @@ static struct ct_cdb_object_t *read_ref(struct ct_cdb_object_t *_obj,
     return idx ? *(struct ct_cdb_object_t **) (obj->values + obj->offset[idx]) : defaultt;
 }
 
+static uint64_t * prop_keys(struct ct_cdb_object_t *_obj){
+    struct object *obj = *(struct object **) _obj;
+    return obj->keys + 1;
+}
+
+static uint64_t prop_count(struct ct_cdb_object_t *_obj) {
+    struct object *obj = *(struct object **) _obj;
+    return obj->properties_count - 1;
+}
+
 static struct ct_coredb_a0 coredb_api = {
         .create_object = create_object,
 
         .prop_exist = prop_exist,
         .prop_type = prop_type,
+        .prop_keys = prop_keys,
+        .prop_count = prop_count,
 
         .read_float = read_float,
         .read_string = read_string,
