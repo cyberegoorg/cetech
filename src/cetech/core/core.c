@@ -5,7 +5,7 @@
 #include "cetech/core/memory/private/memory_private.h"
 #include "cetech/core/log/private/log_system_private.h"
 
-bool celib_init() {
+bool corelib_init() {
     struct ct_alloc *core_alloc = coreallocator_get();
 
     api_init(core_alloc);
@@ -30,14 +30,18 @@ bool celib_init() {
     CETECH_LOAD_STATIC_MODULE(api, path);
     CETECH_LOAD_STATIC_MODULE(api, task);
     CETECH_LOAD_STATIC_MODULE(api, watchdog);
-    CETECH_LOAD_STATIC_MODULE(api, filesystem);
-
+    CETECH_LOAD_STATIC_MODULE(api, cdb);
+    CETECH_LOAD_STATIC_MODULE(api, yamlng);
+    CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);
+    CETECH_LOAD_STATIC_MODULE(api, filesystem);
+    CETECH_LOAD_STATIC_MODULE(api, module);
+    CETECH_LOAD_STATIC_MODULE(api, ydb);
 
     return true;
 }
 
-bool celib_shutdown() {
+bool corelib_shutdown() {
     struct ct_api_a0 *api = api_v0();
 
     CETECH_UNLOAD_STATIC_MODULE(api, error);
@@ -47,10 +51,15 @@ bool celib_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, time);
     CETECH_UNLOAD_STATIC_MODULE(api, thread);
     CETECH_UNLOAD_STATIC_MODULE(api, path);
-    CETECH_UNLOAD_STATIC_MODULE(api, object);
-    CETECH_UNLOAD_STATIC_MODULE(api, module);
     CETECH_UNLOAD_STATIC_MODULE(api, task);
     CETECH_UNLOAD_STATIC_MODULE(api, watchdog);
+    CETECH_UNLOAD_STATIC_MODULE(api, cdb);
+    CETECH_UNLOAD_STATIC_MODULE(api, yamlng);
+    CETECH_UNLOAD_STATIC_MODULE(api, config);
+    CETECH_UNLOAD_STATIC_MODULE(api, object);
+    CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
+    CETECH_UNLOAD_STATIC_MODULE(api, module);
+   // CETECH_UNLOAD_STATIC_MODULE(api, ydb);
 
     api_shutdown();
     memsys_shutdown();

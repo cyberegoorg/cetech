@@ -3,22 +3,22 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 #include <cetech/core/os/path.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/playground.h>
 #include <cetech/core/containers/array.h>
 
 #include "cetech/core/hashlib/hashlib.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_playground_a0);
@@ -167,7 +167,7 @@ static void ui_dir_list() {
 
     if (!_G.dirtree_list) {
         ct_alloc *a = ct_memory_a0.main_allocator();
-        ct_filesystem_a0.listdir(CT_ID64_0("source"), "", "*",
+        ct_fs_a0.listdir(CT_ID64_0("source"), "", "*",
                                  true, true, &_G.dirtree_list,
                                  &_G.dirtree_list_count, a);
     }
@@ -205,20 +205,20 @@ static void ui_asset_list() {
         ct_alloc *a = ct_memory_a0.main_allocator();
 
         if (_G.asset_list) {
-            ct_filesystem_a0.listdir_free(_G.asset_list, _G.asset_list_count,
+            ct_fs_a0.listdir_free(_G.asset_list, _G.asset_list_count,
                                           a);
         }
 
         if (_G.dir_list) {
-            ct_filesystem_a0.listdir_free(_G.dir_list, _G.dir_list_count, a);
+            ct_fs_a0.listdir_free(_G.dir_list, _G.dir_list_count, a);
         }
 
-        ct_filesystem_a0.listdir(CT_ID64_0("source"),
+        ct_fs_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  false, false, &_G.asset_list,
                                  &_G.asset_list_count, a);
 
-        ct_filesystem_a0.listdir(CT_ID64_0("source"),
+        ct_fs_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  true, false, &_G.dir_list,
                                  &_G.dir_list_count, a);
@@ -353,9 +353,9 @@ CETECH_MODULE_DEF(
         asset_browser,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_playground_a0);

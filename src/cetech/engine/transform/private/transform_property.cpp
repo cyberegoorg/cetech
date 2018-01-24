@@ -41,7 +41,7 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
@@ -341,7 +341,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_property_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_texture_a0);

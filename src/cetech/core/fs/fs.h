@@ -27,7 +27,7 @@ typedef void ct_watchdog_instance_t;
 //==============================================================================
 
 //! Filesystem API V0
-struct ct_filesystem_a0 {
+struct ct_fs_a0 {
 
     //! Open file
     //! \param root Root

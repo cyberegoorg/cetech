@@ -38,7 +38,7 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
@@ -47,32 +47,37 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
-static void ui_vec4(ct_cdb_obj_t *variable) {
+static void ui_vec4(ct_cdb_obj_t *var) {
     const char *str;
-    str = ct_cdb_a0.read_str(variable, MATERIAL_VAR_NAME_PROP, "");
+    str = ct_cdb_a0.read_str(var, MATERIAL_VAR_NAME_PROP, "");
 
-    float v[] = {
-            ct_cdb_a0.read_float(variable,
-                                 MATERIAL_VAR_VALUE_X_PROP, 0.0f),
-
-            ct_cdb_a0.read_float(variable,
-                                 MATERIAL_VAR_VALUE_Y_PROP, 0.0f),
-
-            ct_cdb_a0.read_float(variable,
-                                 MATERIAL_VAR_VALUE_Z_PROP, 0.0f),
-
-            ct_cdb_a0.read_float(variable,
-                                 MATERIAL_VAR_VALUE_W_PROP, 0.0f),
-    };
+    float v[4] = {0.0f};
+    ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
     if (ct_debugui_a0.DragFloat3(str, v, 0.1f, -1.0f, 1.0f, "%.5f", 1.0f)) {
-        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(variable);
-        ct_cdb_a0.set_float(wr, MATERIAL_VAR_VALUE_X_PROP, v[0]);
-        ct_cdb_a0.set_float(wr, MATERIAL_VAR_VALUE_Y_PROP, v[1]);
-        ct_cdb_a0.set_float(wr, MATERIAL_VAR_VALUE_Z_PROP, v[2]);
-        ct_cdb_a0.set_float(wr, MATERIAL_VAR_VALUE_W_PROP, v[3]);
+        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+        ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
         ct_cdb_a0.write_commit(wr);
     }
+}
+
+static void ui_color4(ct_cdb_obj_t *var) {
+    const char *str;
+    str = ct_cdb_a0.read_str(var, MATERIAL_VAR_NAME_PROP, "");
+
+    float v[4] = {0.0f};
+    ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
+
+    ct_debugui_a0.ColorWheel(str, v, 1.0f);
+    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+    ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
+    ct_cdb_a0.write_commit(wr);
+
+//    if (ct_debugui_a0.ColorEdit3(str, v)) {
+//        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+//        ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
+//        ct_cdb_a0.write_commit(wr);
+//    }
 }
 
 static void ui_texture(ct_cdb_obj_t *variable) {
@@ -133,6 +138,10 @@ static void material_asset(uint64_t type,
                         ui_vec4(var);
                         break;
 
+                    case MAT_VAR_COLOR4:
+                        ui_color4(var);
+                        break;
+
                     case MAT_VAR_MAT44:
                         break;
 
@@ -153,9 +162,7 @@ static int _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_asset_property_a0.register_asset(
-            CT_ID64_0("material"),
-            material_asset);
+    ct_asset_property_a0.register_asset(CT_ID64_0("material"), material_asset);
 
     return 1;
 }
@@ -173,7 +180,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_property_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_texture_a0);

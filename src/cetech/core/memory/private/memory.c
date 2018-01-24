@@ -94,9 +94,9 @@ void allocator_check_trace(struct allocator_trace_entry *entries,
             continue;
         }
 
-        ct_log_a0.error(ALLOCATOR_WHERE,
-                        "memory_leak: %p\n",
-                        entries[i].ptr);
+//        ct_log_a0.error(ALLOCATOR_WHERE,
+//                        "memory_leak: %p\n",
+//                        entries[i].ptr);
 
         //allocator_free(ct_alloc, entries[i].ptr); // TODO: need this?
 

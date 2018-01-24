@@ -16,13 +16,13 @@
 #include "cetech/core/containers/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_entity_a0);
@@ -164,6 +164,9 @@ static void set_asset(uint64_t type,
             fce.load(path, type, name, _G.world);
         }
     }
+
+    ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
+    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
 static void init() {
@@ -275,7 +278,7 @@ CETECH_MODULE_DEF(
         asset_preview,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_entity_a0);

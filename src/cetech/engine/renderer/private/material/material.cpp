@@ -29,7 +29,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_shader_a0);
 CETECH_DECL_API(ct_cdb_a0);
@@ -152,19 +152,10 @@ static void online(uint64_t name,
                                          uniform.th);
                     break;
 
+                case MAT_VAR_COLOR4:
                 case MAT_VAR_VEC4:
-                    ct_cdb_a0.set_float(var_writer,
-                                        MATERIAL_VAR_VALUE_X_PROP,
-                                        uniform.v4[0]);
-                    ct_cdb_a0.set_float(var_writer,
-                                        MATERIAL_VAR_VALUE_Y_PROP,
-                                        uniform.v4[1]);
-                    ct_cdb_a0.set_float(var_writer,
-                                        MATERIAL_VAR_VALUE_Z_PROP,
-                                        uniform.v4[2]);
-                    ct_cdb_a0.set_float(var_writer,
-                                        MATERIAL_VAR_VALUE_W_PROP,
-                                        uniform.v4[3]);
+                    ct_cdb_a0.set_vec4(var_writer, MATERIAL_VAR_VALUE_PROP,
+                                       uniform.v4);
                     break;
 
                 case MAT_VAR_MAT44:
@@ -211,11 +202,10 @@ static void set_texture_handler(struct ct_cdb_obj_t *material,
                                 ct_texture texture) {
     ct_cdb_obj_t *layer_obj = ct_cdb_a0.read_ref(material, layer, NULL);
     ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer_obj,
-                                                    MATERIAL_VARIABLES_PROP,
-                                                    NULL);
+                                                 MATERIAL_VARIABLES_PROP,
+                                                 NULL);
 
-    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot),
-                                              NULL);
+    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
     ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
@@ -229,11 +219,10 @@ static void set_texture(ct_cdb_obj_t *material,
                         uint64_t texture) {
     ct_cdb_obj_t *layer_obj = ct_cdb_a0.read_ref(material, layer, NULL);
     ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer_obj,
-                                                    MATERIAL_VARIABLES_PROP,
-                                                    NULL);
+                                                 MATERIAL_VARIABLES_PROP,
+                                                 NULL);
 
-    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot),
-                                              NULL);
+    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
     ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP, MAT_VAR_TEXTURE);
@@ -256,8 +245,8 @@ static void submit(ct_cdb_obj_t *material,
     }
 
     ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer,
-                                                    MATERIAL_VARIABLES_PROP,
-                                                    NULL);
+                                                 MATERIAL_VARIABLES_PROP,
+                                                 NULL);
 
     uint64_t *keys = ct_cdb_a0.prop_keys(variables);
     uint64_t key_count = ct_cdb_a0.prop_count(variables);
@@ -265,8 +254,7 @@ static void submit(ct_cdb_obj_t *material,
 
     for (int j = 0; j < key_count; ++j) {
         ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, keys[j], NULL);
-        uint64_t type = ct_cdb_a0.read_uint64(var, MATERIAL_VAR_TYPE_PROP,
-                                              0);
+        uint64_t type = ct_cdb_a0.read_uint64(var, MATERIAL_VAR_TYPE_PROP, 0);
 
         bgfx::UniformHandle handle = {.idx = (uint16_t) ct_cdb_a0.read_uint64(
                 var,
@@ -300,21 +288,11 @@ static void submit(ct_cdb_obj_t *material,
             }
                 break;
 
+            case MAT_VAR_COLOR4:
             case MAT_VAR_VEC4: {
-                float v[] = {
-                        ct_cdb_a0.read_float(var,
-                                             MATERIAL_VAR_VALUE_X_PROP, 0.0f),
-
-                        ct_cdb_a0.read_float(var,
-                                             MATERIAL_VAR_VALUE_Y_PROP, 0.0f),
-
-                        ct_cdb_a0.read_float(var,
-                                             MATERIAL_VAR_VALUE_Z_PROP, 0.0f),
-
-                        ct_cdb_a0.read_float(var,
-                                             MATERIAL_VAR_VALUE_W_PROP, 0.0f),
-                };
-                bgfx::setUniform(handle, &v, 1);
+                float v[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+                ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v),
+                        bgfx::setUniform(handle, &v, 1);
             }
                 break;
 
@@ -324,8 +302,8 @@ static void submit(ct_cdb_obj_t *material,
     }
 
     ct_cdb_obj_t *shader_obj = ct_cdb_a0.read_ref(layer,
-                                                     MATERIAL_SHADER_PROP,
-                                                     NULL);
+                                                  MATERIAL_SHADER_PROP,
+                                                  NULL);
     auto shader = ct_shader_a0.get(shader_obj);
     uint64_t state = ct_cdb_a0.read_uint64(layer, MATERIAL_STATE_PROP, 0);
 
@@ -364,7 +342,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_texture_a0);
             CETECH_GET_API(api, ct_shader_a0);
             CETECH_GET_API(api, ct_cdb_a0);

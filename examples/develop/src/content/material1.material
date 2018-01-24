@@ -18,6 +18,11 @@ layers:
 
       k22cbxbg435124asdkj:
         name: u_vec4
+        type: color
+        value: [1.0, 1.0, 1.0, 1.0]
+
+      fdsgfdsgfgfs:
+        name: u_vec42
         type: vec4
         value: [1.0, 1.0, 1.0, 1.0]
 

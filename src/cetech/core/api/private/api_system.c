@@ -5,7 +5,7 @@
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/containers/hash.h>
 
-//CETECH_DECL_API(ct_hash_a0)
+//CETECH_DECL_API(ct_hashlib_a0)
 
 //==============================================================================
 // Defines

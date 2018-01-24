@@ -11,7 +11,7 @@
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/task/task.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/log/log.h>
 #include <cetech/core/os/vio.h>
@@ -20,9 +20,9 @@
 #include <cetech/core/module/module.h>
 #include <cetech/core/os/watchdog.h>
 #include <cetech/core/containers/map.inl>
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/engine/kernel/kernel.h>
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/buffer.h>
@@ -37,9 +37,9 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_watchdog_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
@@ -121,7 +121,7 @@ void _add_dependency(const char *who_filename,
                      const char *depend_on_filename) {
     builddb_set_file_depend(who_filename, depend_on_filename);
     builddb_set_file(depend_on_filename,
-                     ct_filesystem_a0.file_mtime(
+                     ct_fs_a0.file_mtime(
                              CT_ID64_0("source"),
                              depend_on_filename));
 }
@@ -167,7 +167,7 @@ static void _compile_task(void *data) {
         builddb_set_file(tdata->source_filename, tdata->mtime);
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
-        ct_vio *build_vio = ct_filesystem_a0.open(
+        ct_vio *build_vio = ct_fs_a0.open(
                 CT_ID64_0("build"),
                 tdata->build_filename, FS_OPEN_WRITE);
 
@@ -180,7 +180,7 @@ static void _compile_task(void *data) {
         build_vio->write(build_vio, output_blob, sizeof(char),
                          ct_array_size(output_blob));
 
-        ct_filesystem_a0.close(build_vio);
+        ct_fs_a0.close(build_vio);
 
         ct_log_a0.info("resource_compiler.task",
                        "Resource \"%s\" compiled", tdata->source_filename);
@@ -224,7 +224,7 @@ void _compile_files(ct_task_item **tasks,
             continue;
         }
 
-        if (!builddb_need_compile(files[i], &ct_filesystem_a0)) {
+        if (!builddb_need_compile(files[i], &ct_fs_a0)) {
             continue;
         }
 
@@ -252,7 +252,7 @@ void _compile_files(ct_task_item **tasks,
                 .build_filename = build_full,
                 .source_filename = ct_memory_a0.str_dup(files[i],
                                                         ct_memory_a0.main_allocator()),
-                .mtime = ct_filesystem_a0.file_mtime(
+                .mtime = ct_fs_a0.file_mtime(
                         CT_ID64_0("source"),
                         files[i]),
 
@@ -305,13 +305,13 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
     char **files = nullptr;
     uint32_t files_count = 0;
 
-    ct_filesystem_a0.listdir(CT_ID64_0("source"),
+    ct_fs_a0.listdir(CT_ID64_0("source"),
                              "", glob_patern, false, true, &files, &files_count,
                              ct_memory_a0.main_allocator());
 
     _compile_files(&tasks, files, files_count, compiled);
 
-    ct_filesystem_a0.listdir_free(files, files_count,
+    ct_fs_a0.listdir_free(files, files_count,
                                   ct_memory_a0.main_allocator());
 
     ct_task_a0.add(tasks, ct_array_size(tasks));
@@ -414,8 +414,8 @@ void compile_and_reload(const char *filename) {
 void resource_compiler_check_fs() {
     static uint64_t root = CT_ID64_0("source");
 
-    auto *wd_it = ct_filesystem_a0.event_begin(root);
-    const auto *wd_end = ct_filesystem_a0.event_end(root);
+    auto *wd_it = ct_fs_a0.event_begin(root);
+    const auto *wd_end = ct_fs_a0.event_end(root);
     int need_compile = 0;
 
     while (wd_it != wd_end) {
@@ -424,7 +424,7 @@ void resource_compiler_check_fs() {
             break;
         }
 
-        wd_it = ct_filesystem_a0.event_next(wd_it);
+        wd_it = ct_fs_a0.event_next(wd_it);
     }
 
     if (need_compile) {
@@ -514,13 +514,13 @@ static void _init(ct_api_a0 *api) {
     const char *source_dir = ct_cdb_a0.read_str(_G.config,
                                                       CONFIG_SOURCE_DIR, "");
 
-    ct_filesystem_a0.map_root_dir(
+    ct_fs_a0.map_root_dir(
             CT_ID64_0("source"),
             core_dir,
             true
     );
 
-    ct_filesystem_a0.map_root_dir(
+    ct_fs_a0.map_root_dir(
             CT_ID64_0("source"),
             source_dir,
             true
@@ -542,10 +542,10 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);

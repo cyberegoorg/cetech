@@ -9,7 +9,7 @@
 
 
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/macros.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/memory/memory.h>
@@ -33,7 +33,7 @@
 #include "bgfx/platform.h"
 
 #include <cetech/engine/renderer/viewport.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/core/containers/hash.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"
@@ -44,7 +44,7 @@ CETECH_DECL_API(ct_window_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_mouse_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_machine_a0);
@@ -864,7 +864,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_mouse_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_machine_a0);

@@ -25,7 +25,7 @@
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_world_a0);
@@ -104,8 +104,6 @@ static void fps_camera_update(ct_world world,
     // ROT
 //    float rotation_around_world_up[4];
 //    float rotation_around_camera_right[4];
-//
-//
 //
 //    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), -dx * dt * 100)
 //    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, dy * dt * 100)
@@ -286,9 +284,8 @@ static void update(float dt) {
     }
 
     fps_camera_update(_G.world[_G.active_editor],
-                      _G.camera_ent[_G.active_editor], dt,
-                      0, 0,
-                      updown, leftright, 10.0f, false);
+                      _G.camera_ent[_G.active_editor],
+                      dt, 0, 0, updown, leftright, 10.0f, false);
 }
 
 static ct_level_view_a0 level_api = {
@@ -332,12 +329,7 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-
-    ct_playground_a0.unregister_module(
-            CT_ID64_0("level_editor")
-    );
-
-
+    ct_playground_a0.unregister_module(CT_ID64_0("level_editor"));
     ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
 
     _G = {};
@@ -347,7 +339,7 @@ CETECH_MODULE_DEF(
         level_view,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_app_a0);

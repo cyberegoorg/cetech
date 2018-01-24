@@ -9,13 +9,13 @@
 #include <cetech/core/containers/hash.h>
 
 #include "cetech/core/hashlib/hashlib.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_property_editor_a0);
@@ -105,7 +105,7 @@ CETECH_MODULE_DEF(
         asset_property,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_property_editor_a0);

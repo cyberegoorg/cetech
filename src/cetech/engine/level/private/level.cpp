@@ -20,7 +20,7 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_vio_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
@@ -91,7 +91,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_vio_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);

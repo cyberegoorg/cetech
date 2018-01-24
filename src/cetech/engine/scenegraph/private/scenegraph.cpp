@@ -3,7 +3,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/engine/resource/resource.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"

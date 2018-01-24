@@ -15,7 +15,7 @@
 #include "cetech/engine/resource/resource.h"
 #include <cetech/core/module/module.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 #include <cetech/playground//asset_property.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/texture.h>
@@ -43,7 +43,7 @@ CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_texture_a0);
@@ -52,7 +52,7 @@ CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_scene_a0);
@@ -445,7 +445,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_property_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_texture_a0);
@@ -454,7 +454,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_scene_a0);

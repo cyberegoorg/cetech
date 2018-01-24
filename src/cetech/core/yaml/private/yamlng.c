@@ -1,7 +1,7 @@
 // TODO: string table
 
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/yaml/yamlng.h>
@@ -14,7 +14,7 @@
 #include "yaml/yaml.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_log_a0);
 
 #define _G yamlng_global
@@ -95,7 +95,7 @@ uint64_t calc_key(const char *key) {
             parse = true;
         } else if (*it == '.') {
             const uint32_t size = it - begin;
-            const uint64_t part_hash = ct_hash_a0.hash_murmur2_64(begin, size,
+            const uint64_t part_hash = ct_hashlib_a0.hash_murmur2_64(begin, size,
                                                                   22);
             add_key(begin, size, part_hash);
             hash = hash_combine(hash, part_hash);
@@ -106,7 +106,7 @@ uint64_t calc_key(const char *key) {
     }
 
     const uint32_t size = it - begin;
-    const uint64_t part_hash = ct_hash_a0.hash_murmur2_64(begin, size, 22);
+    const uint64_t part_hash = ct_hashlib_a0.hash_murmur2_64(begin, size, 22);
     add_key(begin, size, part_hash);
     hash = hash_combine(hash, part_hash);
 
@@ -1254,7 +1254,7 @@ CETECH_MODULE_DEF(
         yamlng,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_log_a0);
         },
         {

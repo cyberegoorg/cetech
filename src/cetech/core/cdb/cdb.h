@@ -31,13 +31,15 @@ struct ct_cdb_writer_t {
 //==============================================================================
 // Enums
 //==============================================================================
-enum ct_coredb_prop_type {
+enum ct_cdb_prop_type {
     COREDB_TYPE_NONE = 0,
     COREDB_TYPE_UINT32,
     COREDB_TYPE_PTR,
     COREDB_TYPE_REF,
     COREDB_TYPE_FLOAT,
     COREDB_TYPE_STRPTR,
+    COREDB_TYPE_VEC3,
+    COREDB_TYPE_VEC4,
 };
 
 //==============================================================================
@@ -50,10 +52,11 @@ struct ct_cdb_a0 {
     bool (*prop_exist)(struct ct_cdb_obj_t *object,
                        uint64_t key);
 
-    enum ct_coredb_prop_type (*prop_type)(struct ct_cdb_obj_t *object,
+    enum ct_cdb_prop_type (*prop_type)(struct ct_cdb_obj_t *object,
                                           uint64_t key);
 
-    uint64_t * (*prop_keys)(struct ct_cdb_obj_t *object);
+    uint64_t *(*prop_keys)(struct ct_cdb_obj_t *object);
+
     uint64_t (*prop_count)(struct ct_cdb_obj_t *object);
 
     // WRITE
@@ -66,6 +69,15 @@ struct ct_cdb_a0 {
     void (*set_float)(struct ct_cdb_writer_t *object,
                       uint64_t property,
                       float value);
+
+    void (*set_vec3)(struct ct_cdb_writer_t *object,
+                     uint64_t property,
+                     const float *value);
+
+    void (*set_vec4)(struct ct_cdb_writer_t *object,
+                     uint64_t property,
+                     const float *value);
+
 
     void (*set_string)(struct ct_cdb_writer_t *object,
                        uint64_t property,
@@ -92,9 +104,17 @@ struct ct_cdb_a0 {
                         uint64_t property,
                         float defaultt);
 
+    void (*read_vec3)(struct ct_cdb_obj_t *object,
+                              uint64_t property,
+                              float* value);
+
+    void (*read_vec4)(struct ct_cdb_obj_t *object,
+                      uint64_t property,
+                      float* value);
+
     const char *(*read_str)(struct ct_cdb_obj_t *object,
-                               uint64_t property,
-                               const char *defaultt);
+                            uint64_t property,
+                            const char *defaultt);
 
     uint32_t (*read_uint32)(struct ct_cdb_obj_t *object,
                             uint64_t property,
@@ -109,8 +129,8 @@ struct ct_cdb_a0 {
                       void *defaultt);
 
     struct ct_cdb_obj_t *(*read_ref)(struct ct_cdb_obj_t *object,
-                                        uint64_t property,
-                                        struct ct_cdb_obj_t *defaultt);
+                                     uint64_t property,
+                                     struct ct_cdb_obj_t *defaultt);
 
 };
 

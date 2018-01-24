@@ -20,7 +20,7 @@
 #include "cetech/engine/renderer/scene.h"
 
 CETECH_DECL_API(ct_viewport_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_camera_a0);
 
@@ -77,7 +77,7 @@ CETECH_MODULE_DEF(
         geometry_pass,
         {
             CETECH_GET_API(api, ct_viewport_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_camera_a0);
         },

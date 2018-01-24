@@ -3,7 +3,7 @@
 #include <cetech/core/macros.h>
 #include <cetech/core/containers/map.inl>
 
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/yaml/ydb.h>
 #include "cetech/core/hashlib/hashlib.h"
@@ -25,14 +25,14 @@
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_action_manager_a0);
@@ -107,11 +107,11 @@ static float draw_main_menu() {
         if (ct_debugui_a0.BeginMenu("Window", true)) {
             if (ct_debugui_a0.BeginMenu("Layout", true)) {
                 if (ct_debugui_a0.MenuItem("Save", NULL, false, true)) {
-                    ct_vio *f = ct_filesystem_a0.open(CT_ID64_0("source"),
+                    ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"),
                                                       "core/default.dock_layout",
                                                       FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
-                    ct_filesystem_a0.close(f);
+                    ct_fs_a0.close(f);
                 }
 
                 if (ct_debugui_a0.MenuItem("Load", NULL, false, true)) {
@@ -306,7 +306,7 @@ CETECH_MODULE_DEF(
         playground,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_app_a0);
@@ -314,7 +314,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_action_manager_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);

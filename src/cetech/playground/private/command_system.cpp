@@ -6,13 +6,13 @@
 #include <cetech/core/containers/hash.h>
 
 #include "cetech/core/hashlib/hashlib.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 using namespace celib;
 
@@ -256,7 +256,7 @@ CETECH_MODULE_DEF(
         cmd_system,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
 
         },
         {

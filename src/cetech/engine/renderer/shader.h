@@ -1,7 +1,7 @@
 #ifndef CETECH_SHADER_H
 #define CETECH_SHADER_H
 
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 
 #ifdef __cplusplus
 extern "C" {

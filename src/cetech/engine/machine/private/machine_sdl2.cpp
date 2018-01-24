@@ -6,7 +6,7 @@
 
 #include "cetech/core/memory/memory.h"
 #include "cetech/core/module/module.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/log/log.h"
 

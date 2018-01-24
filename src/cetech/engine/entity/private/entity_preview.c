@@ -25,7 +25,7 @@ static struct _G {
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_entity_a0);
 
@@ -77,7 +77,7 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_transform_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_preview_a0);
             CETECH_GET_API(api, ct_entity_a0);
 

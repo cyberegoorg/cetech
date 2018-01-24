@@ -10,10 +10,10 @@
 #include <cetech/core/os/vio.h>
 #include <cetech/core/log/log.h>
 #include <cetech/core/hashlib/hashlib.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/yaml/yamlng.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/core/macros.h>
 
 
@@ -21,7 +21,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
@@ -123,8 +123,8 @@ static void foreach_config_clb(struct ct_yamlng_node key,
 
     char name[1024] = {};
     if (output->root_name != NULL) {
-        snprintf(name, CETECH_ARRAY_LEN(name), "%s.%s", output->root_name,
-                 key_str);
+        snprintf(name, CETECH_ARRAY_LEN(name),
+                 "%s.%s", output->root_name, key_str);
     } else {
         snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
     }
@@ -151,7 +151,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
             const uint64_t key = CT_ID64_0(name);
 
             if (ct_cdb_a0.prop_exist(_G.config_object, key)) {
-                enum ct_coredb_prop_type t = ct_cdb_a0.prop_type(
+                enum ct_cdb_prop_type t = ct_cdb_a0.prop_type(
                         _G.config_object, key);
                 struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(
                         _G.config_object);
@@ -247,7 +247,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },

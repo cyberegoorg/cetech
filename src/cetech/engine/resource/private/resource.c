@@ -8,8 +8,8 @@
 #include <cetech/engine/application/application.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/fs/fs.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/log/log.h>
@@ -17,7 +17,7 @@
 #include <cetech/core/os/errors.h>
 #include <cetech/engine/resource/package.h>
 #include <cetech/core/module/module.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/engine/kernel/kernel.h>
 #include <cetech/core/containers/buffer.h>
 
@@ -26,13 +26,13 @@
 #include "resource.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_thread_a0);
 
 
@@ -217,7 +217,7 @@ static void load(uint64_t type,
                                                  CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
 
-        struct ct_vio *resource_file = ct_filesystem_a0.open(root_name,
+        struct ct_vio *resource_file = ct_fs_a0.open(root_name,
                                                              build_full,
                                                              FS_OPEN_READ);
 
@@ -479,7 +479,7 @@ static void _init(struct ct_api_a0 *api) {
             .type_items_count = 1,
     };
 
-    ct_filesystem_a0.map_root_dir(CT_ID64_0("build"),
+    ct_fs_a0.map_root_dir(CT_ID64_0("build"),
                                   ct_cdb_a0.read_str(_G.config,
                                                            CONFIG_BUILD_DIR,
                                                            ""), false);
@@ -498,12 +498,12 @@ CETECH_MODULE_DEF(
         resourcesystem,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_thread_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },

@@ -49,7 +49,7 @@ extern "C" {
 #define ct_array_push_n(a, items, n, alloc) \
     ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + n, sizeof(*(a)), alloc) : 0, \
     memcpy((a)+ct_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
-    ct_array_header(a)->size += n
+    ct_array_header(a)->size += (n)
 
 #define ct_array_pop_front(a) \
     (ct_array_any(a) ? memmove(a, ((a)+1), sizeof(*(a)) * (ct_array_header(a)->size--)) : 0)

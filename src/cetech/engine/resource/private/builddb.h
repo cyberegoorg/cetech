@@ -184,7 +184,7 @@ static int builddb_get_filename_by_hash(char *filename,
 }
 
 static int builddb_need_compile(const char *filename,
-                                struct ct_filesystem_a0 *fs) {
+                                struct ct_fs_a0 *fs) {
     static const char *sql = "SELECT\n"
             "    file_dependency.depend_on, files.mtime\n"
             "FROM\n"

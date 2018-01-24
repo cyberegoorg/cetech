@@ -1,7 +1,7 @@
 #include <cetech/core/macros.h>
 
 #include <cetech/core/log/log.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/hashlib/hashlib.h>
@@ -25,7 +25,7 @@ CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 CETECH_DECL_API(ct_renderer_a0);
 
@@ -93,7 +93,7 @@ void module1() {
         float size[2] = {};
         ct_debugui_a0.GetWindowSize(size);
         size[1] = size[0];
-        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hash_a0.id64_from_str("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
+        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hashlib_a0.id64_from_str("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
                              size,
                              (float[2]) {0.0f, 0.0f},
                              (float[2]) {1.0f, 1.0f},
@@ -133,7 +133,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);
 
             CETECH_GET_API(api, ct_transform_a0);

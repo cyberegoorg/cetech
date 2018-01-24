@@ -1,15 +1,12 @@
-#include <stdint.h>
+#include <stdlib.h>
 
 #if defined(CETECH_LINUX)
 #include <malloc.h>
 #elif defined(CETECH_DARWIN)
-
 #endif
 
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/api/api_system.h>
-#include <stdlib.h>
-
 #include "cetech/core/memory/allocator.h"
 
 static void *_reallocate(const struct ct_alloc *a,

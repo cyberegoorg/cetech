@@ -1,4 +1,4 @@
-/***********************************************************************
+ /***********************************************************************
 **** Includes
 ***********************************************************************/
 
@@ -70,19 +70,11 @@ void ct_log_stdout_handler(enum ct_log_level level,
     };
 
     static const char *_level_format[4] = {
-            [LOG_INFO]    = COLORED_TEXT(BBLUE, LOG_FORMAT),
+            [LOG_INFO]    = LOG_FORMAT,
             [LOG_WARNING] = COLORED_TEXT(BYELLOW, LOG_FORMAT),
             [LOG_ERROR]   = COLORED_TEXT(BRED, LOG_FORMAT),
             [LOG_DBG]     = COLORED_TEXT(BGREEN, LOG_FORMAT)
     };
-
-//    static const char *_nocolor_level_format[4] = {
-//            [LOG_INFO]    = LOG_FORMAT,
-//            [LOG_WARNING] = LOG_FORMAT,
-//            [LOG_ERROR]   = LOG_FORMAT,
-//            [LOG_DBG]     = LOG_FORMAT
-//    };
-
 
     FILE *out = level == LOG_ERROR ? stderr : stdout;
 

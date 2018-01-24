@@ -11,12 +11,12 @@
 
 #include <cetech/engine/application/application.h>
 #include <cetech/core/os/watchdog.h>
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/engine/resource/package.h>
 #include <cetech/core/task/task.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/os/time.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/log/log.h>
@@ -30,7 +30,7 @@
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
@@ -43,14 +43,14 @@ CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_time_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_watchdog_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_machine_a0);
@@ -313,7 +313,7 @@ extern "C" void application_start() {
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
-        ct_filesystem_a0.check_wd();
+        ct_fs_a0.check_wd();
         ct_ydb_a0.check_fs();
         ct_resource_a0.compiler_check_fs();
 
@@ -430,7 +430,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_time_a0);
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
 
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_package_a0);
@@ -439,7 +439,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_module_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_ydb_a0);
 
             CETECH_GET_API(api, ct_renderer_a0);

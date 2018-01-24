@@ -74,7 +74,7 @@ set(SOURCE_FILES
         src/cetech/core/api/private/api_system.c
         src/cetech/core/log/private/log_system.c
         src/cetech/core/module/private/module.cpp
-        src/cetech/engine/config/private/config.c
+        src/cetech/core/config/private/config.c
         src/cetech/core/memory/private/memory.c
         src/cetech/core/memory/private/allocator_malloc.c
         src/cetech/engine/application/private/application.cpp
@@ -94,10 +94,10 @@ set(SOURCE_FILES
         src/cetech/engine/resource/private/resource.c
         src/cetech/engine/resource/private/resource_package.c
         src/cetech/engine/resource/private/resource_compiler.cpp
-        src/cetech/engine/filesystem/private/filesystem.cpp
+        src/cetech/core/fs/private/fs.cpp
         src/cetech/core/yaml/private/yamlng.c
         src/cetech/core/yaml/private/ydb.cpp
-        src/cetech/core/coredb/private/coredb.c
+        src/cetech/core/cdb/private/cdb.c
 
         src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/engine/debugui/private/ocornut-imgui/imgui.cpp

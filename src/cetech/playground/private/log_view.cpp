@@ -15,7 +15,7 @@
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -47,8 +47,8 @@ static struct _G {
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
 
 static ImVec4 _level_to_color[][4] = {
-        [LOG_INFO]    = {{0.0f, 0.0f, 1.0f, 1.0f},
-                         {0.0f, 0.0f, 0.5f, 1.0f}},
+        [LOG_INFO]    = {{1.0f, 1.0f, 1.0f, 1.0f},
+                         {0.5f, 0.5f, 0.5f, 1.0f}},
         [LOG_WARNING] = {{1.0f, 1.0f, 0.0f, 1.0f},
                          {0.5f, 0.5f, 0.0f, 1.0f}},
         [LOG_ERROR]   = {{1.0f, 0.0f, 0.0f, 1.0f},
@@ -202,7 +202,7 @@ CETECH_MODULE_DEF(
         log_view,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_log_a0);

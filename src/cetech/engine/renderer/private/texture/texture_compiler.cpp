@@ -14,9 +14,9 @@
 
 #include "cetech/engine/resource/resource.h"
 #include <cstdio>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/core/containers/array.h>
 #include "cetech/core/containers/buffer.h"
 #include "texture_blob.h"
@@ -32,7 +32,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_process_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
@@ -166,7 +166,7 @@ int texturecompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_vio_a0);
     CETECH_GET_API(api, ct_process_a0);
     CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_hash_a0);
+    CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);

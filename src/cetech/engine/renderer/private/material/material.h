@@ -6,6 +6,7 @@ enum material_variable_type {
     MAT_VAR_INT,
     MAT_VAR_TEXTURE,
     MAT_VAR_TEXTURE_HANDLER, //TODO: RENAME
+    MAT_VAR_COLOR4,
     MAT_VAR_VEC4,
     MAT_VAR_MAT44
 };

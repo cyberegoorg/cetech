@@ -1,7 +1,7 @@
 #include "cetech/core/containers/map.inl"
 
 #include <cetech/core/api/api_system.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/yaml/yamlng.h>
@@ -9,7 +9,7 @@
 #include <cetech/core/log/log.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/filesystem/filesystem.h>
+#include <cetech/core/fs/fs.h>
 
 #include <cetech/core/os/watchdog.h>
 #include <cetech/core/os/path.h>
@@ -18,9 +18,9 @@
 #include <cetech/core/containers/buffer.h>
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_path_a0);
 
@@ -57,7 +57,7 @@ ct_yng_doc *load_to_cache(const char *path,
     ct_log_a0.debug(LOG_WHERE, "Load file %s to cache", path);
 
     struct ct_yng_doc *doc;
-    ct_vio *f = ct_filesystem_a0.open(fs_root, path, FS_OPEN_READ);
+    ct_vio *f = ct_fs_a0.open(fs_root, path, FS_OPEN_READ);
 
     if (!f) {
         ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
@@ -65,7 +65,7 @@ ct_yng_doc *load_to_cache(const char *path,
     }
 
     doc = ct_yng_a0.from_vio(f, ct_memory_a0.main_allocator());
-    ct_filesystem_a0.close(f);
+    ct_fs_a0.close(f);
 
     if (!doc) {
         ct_log_a0.error(LOG_WHERE, "Could not parse file %s", path);
@@ -484,8 +484,8 @@ void check_fs() {
 
     static uint64_t root = CT_ID64_0("source");
 
-    auto *wd_it = ct_filesystem_a0.event_begin(root);
-    const auto *wd_end = ct_filesystem_a0.event_end(root);
+    auto *wd_it = ct_fs_a0.event_begin(root);
+    const auto *wd_end = ct_fs_a0.event_end(root);
 
     while (wd_it != wd_end) {
         if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
@@ -506,13 +506,13 @@ void check_fs() {
             ct_buffer_free(path, alloc);
         }
 
-        wd_it = ct_filesystem_a0.event_next(wd_it);
+        wd_it = ct_fs_a0.event_next(wd_it);
     }
 }
 
 
 void save(const char *path) {
-    ct_vio *f = ct_filesystem_a0.open(CT_ID64_0("source"), path, FS_OPEN_WRITE);
+    ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"), path, FS_OPEN_WRITE);
 
     if (!f) {
         ct_log_a0.error(LOG_WHERE, "Could not read file %s", path);
@@ -522,7 +522,7 @@ void save(const char *path) {
     ct_yng_doc *d = get(path);
     ct_yng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
 
-    ct_filesystem_a0.close(f);
+    ct_fs_a0.close(f);
 
     unmodified(path);
 }
@@ -589,10 +589,10 @@ CETECH_MODULE_DEF(
         ydb,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_path_a0);
         },
         {

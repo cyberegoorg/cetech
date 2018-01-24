@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-bool celib_init();
+bool corelib_init();
 
-bool celib_shutdown();
+bool corelib_shutdown();
 
 #endif //CETECH_CECORE_H

@@ -77,7 +77,7 @@ uint64_t stringid64_from_string(const char *str) {
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
 }
 
-static struct ct_hash_a0 hash_api = {
+static struct ct_hashlib_a0 hash_api = {
         .id64_from_str = stringid64_from_string,
         .hash_murmur2_64 = hash_murmur2_64
 };
@@ -90,7 +90,7 @@ CETECH_MODULE_DEF(
         },
         {
             CT_UNUSED(reload);
-            api->register_api("ct_hash_a0", &hash_api);
+            api->register_api("ct_hashlib_a0", &hash_api);
         },
         {
             CT_UNUSED(reload);

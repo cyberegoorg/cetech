@@ -10,7 +10,7 @@
 
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 using namespace celib;
 
@@ -39,7 +39,7 @@ CETECH_MODULE_DEF(
         action_manager,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
         },
         {
             CT_UNUSED(reload);

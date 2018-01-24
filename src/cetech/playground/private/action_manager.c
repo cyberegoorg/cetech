@@ -10,7 +10,7 @@
 #include <cetech/core/containers/hash.h>
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 
 typedef void (*action_fce_t)();
@@ -188,7 +188,7 @@ CETECH_MODULE_DEF(
         action_manager,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
         },
         {

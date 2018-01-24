@@ -4,7 +4,7 @@
 #include "cetech/core/os/path.h"
 #include "cetech/engine/kernel/kernel.h"
 #include "cetech/core/memory/memory.h"
-#include "cetech/engine/config/config.h"
+#include "cetech/core/config/config.h"
 #include "cetech/core/module/module.h"
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/log/private/log_system_private.h"
@@ -13,7 +13,7 @@
 #include "cetech/core/memory/private/allocator_core_private.h"
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/cdb/cdb.h>
 
 
 CETECH_DECL_API(ct_log_a0);
@@ -22,7 +22,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_app_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 #include <cetech/static_module.h>
@@ -101,14 +101,8 @@ int init_config(int argc,
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
-    celib_init();
+    corelib_init();
     struct ct_api_a0 *api = api_v0();
-
-    CETECH_LOAD_STATIC_MODULE(api, coredb);
-    CETECH_LOAD_STATIC_MODULE(api, yamlng);
-    CETECH_LOAD_STATIC_MODULE(api, config);
-    CETECH_LOAD_STATIC_MODULE(api, ydb);
-    CETECH_LOAD_STATIC_MODULE(api, module);
 
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_memory_a0);
@@ -116,11 +110,9 @@ int cetech_kernel_init(int argc,
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_module_a0);
     CETECH_GET_API(api, ct_cdb_a0);
-    CETECH_GET_API(api, ct_hash_a0);
-
+    CETECH_GET_API(api, ct_hashlib_a0);
 
     init_config(argc, argv, ct_config_a0.config_object());
-
 
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
@@ -137,17 +129,8 @@ int cetech_kernel_init(int argc,
 
 int cetech_kernel_shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
-
     ct_module_a0.unload_all();
-
-    struct ct_api_a0 *api = api_v0();
-
-    CETECH_UNLOAD_STATIC_MODULE(api, config);
-    CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
-    CETECH_UNLOAD_STATIC_MODULE(api, ydb);
-    CETECH_UNLOAD_STATIC_MODULE(api, yamlng);
-
-    celib_shutdown();
+    corelib_shutdown();
 
     return 1;
 }

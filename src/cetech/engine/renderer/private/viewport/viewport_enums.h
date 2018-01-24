@@ -1,4 +1,4 @@
-#define _ID64(a) ct_hash_a0.id64_from_str(a)
+#define _ID64(a) ct_hashlib_a0.id64_from_str(a)
 
 bgfx::TextureFormat::Enum format_id_to_enum(uint64_t id) {
     static struct {

@@ -16,9 +16,9 @@ extern "C" {
 // Api
 //==============================================================================
 
-#define CT_ID64_0(str) ct_hash_a0.id64_from_str(str)
+#define CT_ID64_0(str) ct_hashlib_a0.id64_from_str(str)
 
-struct ct_hash_a0 {
+struct ct_hashlib_a0 {
 
     //! 64bit murmur 2 hash
     //! \param key Key

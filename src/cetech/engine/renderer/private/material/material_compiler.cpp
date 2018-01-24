@@ -25,7 +25,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
 
@@ -89,6 +89,11 @@ void _forach_variable_clb(const char *filename,
         ct_ydb_a0.get_vec4(filename, tmp_keys,
                            CETECH_ARRAY_LEN(tmp_keys), mat_var.v4,
                            (float[4]) {0.0f});
+    } else if (!strcmp(type, "color")) {
+        mat_var.type = MAT_VAR_COLOR4;
+        ct_ydb_a0.get_vec4(filename, tmp_keys,
+                           CETECH_ARRAY_LEN(tmp_keys), mat_var.v4,
+                           (float[4]) {0.0f});
 
     } else if (!strcmp(type, "mat4")) {
         mat_var.type = MAT_VAR_MAT44;
@@ -99,7 +104,7 @@ void _forach_variable_clb(const char *filename,
 
     ct_array_push_n(output.var, &mat_var, 1, a);
     ct_array_push_n(output.uniform_names, uniform_name,
-                     CETECH_ARRAY_LEN(uniform_name), a);
+                    CETECH_ARRAY_LEN(uniform_name), a);
 }
 
 uint64_t render_state_to_enum(uint64_t name) {
@@ -194,7 +199,7 @@ void foreach_layer(const char *filename,
     }
 
     ct_array_push(output.uniform_count,
-                   ct_array_size(output.var) - layer_offset, a);
+                  ct_array_size(output.var) - layer_offset, a);
 
 };
 
@@ -234,26 +239,26 @@ void compiler(const char *filename,
     ct_array_push_n(*output_blob, &resource, sizeof(resource), a);
 
     ct_array_push_n(*output_blob, output.layer_names,
-                     sizeof(uint64_t) * ct_array_size(output.layer_names), a);
+                    sizeof(uint64_t) * ct_array_size(output.layer_names), a);
 
     ct_array_push_n(*output_blob, output.shader_name,
-                     sizeof(uint64_t) * ct_array_size(output.shader_name), a);
+                    sizeof(uint64_t) * ct_array_size(output.shader_name), a);
 
     ct_array_push_n(*output_blob, output.uniform_count,
-                     sizeof(uint32_t) * ct_array_size(output.uniform_count),
-                     a);
+                    sizeof(uint32_t) * ct_array_size(output.uniform_count),
+                    a);
 
     ct_array_push_n(*output_blob, output.render_state,
-                     sizeof(uint64_t) * ct_array_size(output.render_state), a);
+                    sizeof(uint64_t) * ct_array_size(output.render_state), a);
 
     ct_array_push_n(*output_blob, output.var,
-                     sizeof(material_variable) * ct_array_size(output.var), a);
+                    sizeof(material_variable) * ct_array_size(output.var), a);
 
     ct_array_push_n(*output_blob, output.uniform_names,
-                     sizeof(char) * ct_array_size(output.uniform_names), a);
+                    sizeof(char) * ct_array_size(output.uniform_names), a);
 
     ct_array_push_n(*output_blob, output.layer_offset,
-                     sizeof(uint32_t) * ct_array_size(output.layer_offset), a);
+                    sizeof(uint32_t) * ct_array_size(output.layer_offset), a);
 
     ct_array_free(output.uniform_names, a);
     ct_array_free(output.layer_names, a);
@@ -269,7 +274,7 @@ int materialcompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_path_a0);
     CETECH_GET_API(api, ct_vio_a0);
-    CETECH_GET_API(api, ct_hash_a0);
+    CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
 

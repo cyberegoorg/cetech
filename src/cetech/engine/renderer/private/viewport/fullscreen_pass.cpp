@@ -31,7 +31,7 @@
 #include "cetech/engine/renderer/material.h"
 
 CETECH_DECL_API(ct_viewport_a0);
-CETECH_DECL_API(ct_hash_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_memory_a0);
@@ -237,7 +237,7 @@ CETECH_MODULE_DEF(
         fullscreen_pass,
         {
             CETECH_GET_API(api, ct_viewport_a0);
-            CETECH_GET_API(api, ct_hash_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_material_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_memory_a0);

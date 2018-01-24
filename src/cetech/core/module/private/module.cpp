@@ -12,12 +12,12 @@
 #include <cetech/core/os/object.h>
 #include <cetech/core/module/module.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/engine/config/config.h>
+#include <cetech/core/config/config.h>
 #include <cetech/core/os/watchdog.h>
 #include <cetech/core/hashlib/hashlib.h>
 #include <cetech/core/containers/map.inl>
-#include <cetech/engine/filesystem/filesystem.h>
-#include <cetech/core/coredb/coredb.h>
+#include <cetech/core/fs/fs.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/engine/kernel/kernel.h>
 
 #include "cetech/core/log/log.h"
@@ -58,8 +58,8 @@ CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_object_a0);
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_watchdog_a0);
-CETECH_DECL_API(ct_hash_a0);
-CETECH_DECL_API(ct_filesystem_a0);
+CETECH_DECL_API(ct_hashlib_a0);
+CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 #define CONFIG_MODULE_DIR CT_ID64_0(CONFIG_MODULE_DIR_ID)
@@ -288,8 +288,8 @@ static void check_modules() {
 
     static uint64_t root = CT_ID64_0("modules");
 
-    auto *wd_it = ct_filesystem_a0.event_begin(root);
-    const auto *wd_end = ct_filesystem_a0.event_end(root);
+    auto *wd_it = ct_fs_a0.event_begin(root);
+    const auto *wd_end = ct_fs_a0.event_end(root);
 
     while (wd_it != wd_end) {
         if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
@@ -304,7 +304,7 @@ static void check_modules() {
                 ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
 
                 char full_path[4096];
-                ct_filesystem_a0.get_full_path(root, path, full_path,
+                ct_fs_a0.get_full_path(root, path, full_path,
                                                CETECH_ARRAY_LEN(full_path));
 
                 int pat_size = strlen(full_path);
@@ -321,7 +321,7 @@ static void check_modules() {
             }
         }
 
-        wd_it = ct_filesystem_a0.event_next(wd_it);
+        wd_it = ct_fs_a0.event_next(wd_it);
     }
 }
 
@@ -353,7 +353,7 @@ static void _init(struct ct_api_a0* api){
     api->register_api("ct_module_a0", &module_api);
 
     static uint64_t root = CT_ID64_0("modules");
-    ct_filesystem_a0.map_root_dir(root,
+    ct_fs_a0.map_root_dir(root,
                                   ct_cdb_a0.read_str(
                                           _G.config,
                                           CONFIG_MODULE_DIR,
@@ -369,8 +369,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_object_a0);
             CETECH_GET_API(api, ct_config_a0);
             CETECH_GET_API(api, ct_watchdog_a0);
-            CETECH_GET_API(api, ct_hash_a0);
-            CETECH_GET_API(api, ct_filesystem_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
+            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },
         {
