@@ -27,6 +27,7 @@ int do_work();
 #define make_task(i) (task_t){.id = i}
 
 #define MAX_TASK 4096
+#define MAX_COUNTERS 4096
 #define LOG_WHERE "taskmanager"
 
 //==============================================================================
@@ -39,18 +40,25 @@ struct task {
     void (*task_work)(void *data);
 
     const char *name;
-    enum ct_task_affinity affinity;
+    atomic_int *counter;
 };
 
 static __thread uint8_t _worker_id = 0;
 
 #define _G TaskManagerGlobal
 static struct _G {
-    struct task _task_pool[MAX_TASK];
-    struct task_queue _workers_queue[TASK_MAX_WORKERS];
     ct_thread_t *_workers[TASK_MAX_WORKERS - 1];
-    struct task_queue _gloalQueue;
+
+    // TASK
+    struct task _task_pool[MAX_TASK];
     atomic_int _task_pool_idx;
+
+    // COUNTERS
+    atomic_int _counter_pool_idx;
+    atomic_int _counter_pool[MAX_COUNTERS];
+
+    struct task_queue _gloalQueue;
+
     uint32_t _workers_count;
     int _Run;
 } _G;
@@ -76,21 +84,24 @@ static task_t _new_task() {
     return make_task((uint32_t) (idx & (MAX_TASK - 1)));
 }
 
-static void _push_task(task_t t) {
-    CETECH_ASSERT("", t.id != 0);
+static uint32_t _new_counter_task(uint32_t value) {
+    int idx = atomic_fetch_add(&_G._counter_pool_idx, 1);
 
-    int affinity = _G._task_pool[t.id].affinity;
-
-    struct task_queue *q;
-    switch (_G._task_pool[t.id].affinity) {
-        case TASK_AFFINITY_NONE:
-            q = &_G._gloalQueue;
-            break;
-
-        default:
-            q = &_G._workers_queue[affinity - 2];
-            break;
+    if ((idx & (MAX_COUNTERS - 1)) == 0) {
+        idx = atomic_fetch_add(&_G._counter_pool_idx, 1);
     }
+
+    uint32_t ret_idx = (uint32_t) (idx & (MAX_TASK - 1));
+
+    atomic_int *counter = &_G._counter_pool[ret_idx];
+    atomic_init(counter, value);
+
+    return ret_idx;
+}
+
+static void _push_task(task_t t) {
+    struct task_queue *q;
+    q = &_G._gloalQueue;
 
     queue_task_push(q, t.id);
 }
@@ -112,20 +123,9 @@ static task_t _try_pop(struct task_queue *q) {
     return task_null;
 }
 
-static void _mark_task_job_done(task_t task) {
-    CT_UNUSED(task);
-}
-
 static task_t _task_pop_new_work() {
     task_t popedTask;
-
-    struct task_queue *qw = &_G._workers_queue[_worker_id];
     struct task_queue *qg = &_G._gloalQueue;
-
-    popedTask = _try_pop(qw);
-    if (popedTask.id != 0) {
-        return popedTask;
-    }
 
     popedTask = _try_pop(qg);
     if (popedTask.id != 0) {
@@ -162,13 +162,19 @@ static int _task_worker(void *o) {
 //==============================================================================
 
 void add(struct ct_task_item *items,
-         uint32_t count) {
+         uint32_t count,
+         struct ct_task_counter_t **counter) {
+    uint32_t new_counter = _new_counter_task(count);
+
+    atomic_int *cnt = &_G._counter_pool[new_counter];
+    *counter = (struct ct_task_counter_t *) &_G._counter_pool[new_counter];
+
     for (uint32_t i = 0; i < count; ++i) {
         task_t task = _new_task();
         _G._task_pool[task.id] = (struct task) {
                 .name = items[i].name,
                 .task_work = items[i].work,
-                .affinity = items[i].affinity,
+                .counter = cnt
         };
 
         _G._task_pool[task.id].data = items[i].data;
@@ -184,16 +190,18 @@ int do_work() {
         return 0;
     }
 
-    _G._task_pool[t.id].task_work(_G._task_pool[t.id].data);
+    struct task *task = &_G._task_pool[t.id];
 
-    _mark_task_job_done(t);
+    task->task_work(_G._task_pool[t.id].data);
+    atomic_fetch_sub(task->counter, 1);
 
     return 1;
 }
 
-void wait_atomic(atomic_int *signal,
+void wait_atomic(struct ct_task_counter_t *signal,
                  int32_t value) {
-    while (atomic_load_explicit(signal, memory_order_acquire) == value) {
+    while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
+           value) {
         do_work();
     }
 }
@@ -212,7 +220,7 @@ static void _init_api(struct ct_api_a0 *api) {
             .worker_count = worker_count,
             .add = add,
             .do_work = do_work,
-            .wait_atomic = wait_atomic
+            .wait_for_counter = wait_atomic
     };
 
     api->register_api("ct_task_a0", &_api);
@@ -230,7 +238,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {};
 
-    int core_count = 2;//ct_cpu_a0.count();
+    int core_count = ct_cpu_a0.count();
 
     static const uint32_t main_threads_count = 1 + 1/* Renderer */;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -243,17 +251,11 @@ static void _init(struct ct_api_a0 *api) {
     queue_task_init(&_G._gloalQueue, MAX_TASK,
                     ct_memory_a0.main_allocator());
 
-    for (uint32_t i = 0; i < worker_count + 1; ++i) {
-        queue_task_init(&_G._workers_queue[i], MAX_TASK,
-                        ct_memory_a0.main_allocator());
-    }
-
     for (uint32_t j = 0; j < worker_count; ++j) {
         _G._workers[j] = ct_thread_a0.create(
                 (ct_thread_fce_t) _task_worker,
                 "worker",
-                (void *) ((intptr_t) (j +
-                                      1)));
+                (void *) ((intptr_t) (j + 1)));
     }
 
     _G._Run = 1;
@@ -268,10 +270,6 @@ static void _shutdown() {
     }
 
     queue_task_destroy(&_G._gloalQueue);
-
-    for (uint32_t i = 0; i < _G._workers_count + 1; ++i) {
-        queue_task_destroy(&_G._workers_queue[i]);
-    }
 
     _G = (struct _G) {};
 }

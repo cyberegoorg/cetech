@@ -224,10 +224,10 @@ void package_load(uint64_t name) {
             .name = "package_task",
             .work = package_task,
             .data = task_data,
-            .affinity = TASK_AFFINITY_NONE
     };
 
-    ct_task_a0.add(&item, 1);
+    struct ct_task_counter_t* counter = NULL;
+    ct_task_a0.add(&item, 1, &counter);
 }
 
 void package_unload(uint64_t name) {

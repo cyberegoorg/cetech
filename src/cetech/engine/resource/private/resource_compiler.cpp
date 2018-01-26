@@ -262,8 +262,7 @@ void _compile_files(ct_task_item **tasks,
         ct_task_item item = {
                 .name = "compiler_task",
                 .work = _compile_task,
-                .data = data,
-                .affinity = TASK_AFFINITY_NONE
+                .data = data
         };
 
         ct_array_push(*tasks, item, _G.allocator);
@@ -314,15 +313,14 @@ void _compile_all(celib::Map<uint64_t> &compiled) {
     ct_fs_a0.listdir_free(files, files_count,
                                   ct_memory_a0.main_allocator());
 
-    ct_task_a0.add(tasks, ct_array_size(tasks));
+    struct ct_task_counter_t* counter = NULL;
+    ct_task_a0.add(tasks, ct_array_size(tasks), &counter);
+    ct_task_a0.wait_for_counter(counter, 0);
 
     for (uint32_t i = 0; i < ct_array_size(tasks); ++i) {
         compile_task_data *data = (compile_task_data *) tasks[i].data;
-
-        ct_task_a0.wait_atomic(&data->completed, 0);
         CT_FREE(ct_memory_a0.main_allocator(), data);
     }
-
     ct_array_free(tasks, _G.allocator);
 }
 
