@@ -29,6 +29,7 @@ int do_work();
 #define MAX_TASK 4096
 #define MAX_COUNTERS 4096
 #define LOG_WHERE "taskmanager"
+#define _G TaskManagerGlobal
 
 //==============================================================================
 // Globals
@@ -36,16 +37,17 @@ int do_work();
 
 struct task {
     void *data;
-
     void (*task_work)(void *data);
-
     const char *name;
     atomic_int *counter;
 };
 
-static __thread uint8_t _worker_id = 0;
+typedef struct {
+    uint32_t id;
+} task_t;
 
-#define _G TaskManagerGlobal
+static const task_t task_null = (task_t) {.id = 0};
+
 static struct _G {
     ct_thread_t *_workers[TASK_MAX_WORKERS - 1];
 
@@ -63,16 +65,11 @@ static struct _G {
     int _Run;
 } _G;
 
-
-//==============================================================================
 // Private
+static __thread uint8_t _worker_id = 0;
+
 //==============================================================================
-
-typedef struct {
-    uint32_t id;
-} task_t;
-
-static const task_t task_null = (task_t) {.id = 0};
+//==============================================================================
 
 static task_t _new_task() {
     int idx = atomic_fetch_add(&_G._task_pool_idx, 1);

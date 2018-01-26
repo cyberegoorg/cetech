@@ -52,7 +52,7 @@ struct _G {
 } _G = {};
 
 void online(uint64_t name,
-            struct ct_vio* input,
+            struct ct_vio *input,
             struct ct_cdb_obj_t *obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
@@ -193,26 +193,58 @@ void package_shutdown() {
 
 }
 
+struct package_type_data {
+    uint64_t type;
+    uint64_t *name;
+    uint32_t count;
+};
+
+void package_load_task(void *data) {
+    struct package_type_data *task_data = (struct package_type_data *) data;
+    ct_resource_a0.load_now(task_data->type, task_data->name, task_data->count);
+}
 
 void package_task(void *data) {
     struct package_task_data *task_data = (struct package_task_data *) data;
 
-    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, task_data->name);
-    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
-
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel,
+                                                      task_data->name);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj,
+                                                          PROP_RESOURECE_DATA,
+                                                          NULL);
     const uint32_t task_count = package->type_count;
+
+    struct ct_task_item *load_tasks = NULL;
+    struct package_type_data *pkg_load_tasks = NULL;
+    ct_array_set_capacity(pkg_load_tasks, task_count, _G.allocator);
+
     for (uint32_t j = 0; j < task_count; ++j) {
-        ct_resource_a0.load_now(package_type(package)[j],
-                                &package_name(package)[package_offset(
-                                        package)[j]],
-                                package_name_count(package)[j]);
+        struct package_type_data ptd = (struct package_type_data) {
+                .type = package_type(package)[j],
+                .name = &package_name(package)[package_offset(package)[j]],
+                .count = package_name_count(package)[j]
+        };
+        ct_array_push(pkg_load_tasks, ptd, _G.allocator);
+
+        struct ct_task_item item = {
+                .name = "package_task",
+                .work = package_load_task,
+                .data = &pkg_load_tasks[ct_array_size(pkg_load_tasks) - 1],
+        };
+
+        ct_array_push(load_tasks, item, _G.allocator);
     }
 
+    struct ct_task_counter_t *counter = NULL;
+    ct_task_a0.add(load_tasks, task_count, &counter);
+    ct_task_a0.wait_for_counter(counter, 0);
+
+    ct_array_free(load_tasks, _G.allocator);
+    ct_array_free(pkg_load_tasks, _G.allocator);
     CT_FREE(ct_memory_a0.main_allocator(), task_data);
 }
 
 void package_load(uint64_t name) {
-
     struct package_task_data *task_data =
             CT_ALLOC(ct_memory_a0.main_allocator(),
                      struct package_task_data,
@@ -226,13 +258,15 @@ void package_load(uint64_t name) {
             .data = task_data,
     };
 
-    struct ct_task_counter_t* counter = NULL;
+    struct ct_task_counter_t *counter = NULL;
     ct_task_a0.add(&item, 1, &counter);
 }
 
 void package_unload(uint64_t name) {
-    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
-    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel, name);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj,
+                                                          PROP_RESOURECE_DATA,
+                                                          NULL);
 
     const uint32_t task_count = package->type_count;
     for (uint32_t j = 0; j < task_count; ++j) {
@@ -244,8 +278,10 @@ void package_unload(uint64_t name) {
 }
 
 int package_is_loaded(uint64_t name) {
-    struct ct_cdb_obj_t* obj =ct_resource_a0.get_obj(_G.package_typel, name);
-    struct package_resource *package = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel, name);
+    struct package_resource *package = ct_cdb_a0.read_ptr(obj,
+                                                          PROP_RESOURECE_DATA,
+                                                          NULL);
 
     if (package == NULL) {
         return 0;
