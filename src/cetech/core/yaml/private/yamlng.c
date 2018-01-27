@@ -10,12 +10,14 @@
 #include <cetech/core/os/vio.h>
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
+#include <cetech/core/os/thread.h>
 
 #include "yaml/yaml.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_thread_a0);
 
 #define _G yamlng_global
 #define LOG_WHERE "yamlng"
@@ -24,6 +26,7 @@ static struct _G {
     struct ct_hash_t key_to_str;
     uint32_t *key_to_str_offset;
     char *key_to_str_data;
+    struct ct_spinlock key_lock;
     struct ct_alloc *allocator;
 } _G;
 
@@ -31,6 +34,7 @@ static struct _G {
 void add_key(const char *key,
              uint32_t key_len,
              uint64_t key_hash) {
+    ct_thread_a0.spin_lock(&_G.key_lock);
     const uint32_t idx = ct_array_size(_G.key_to_str_offset);
     const uint32_t offset = ct_array_size(_G.key_to_str_data);
 
@@ -39,6 +43,7 @@ void add_key(const char *key,
     ct_array_push(_G.key_to_str_offset, offset, _G.allocator);
 
     ct_hash_add(&_G.key_to_str, key_hash, idx, _G.allocator);
+    ct_thread_a0.spin_unlock(&_G.key_lock);
 }
 
 const char *get_key(uint64_t hash) {
@@ -1256,6 +1261,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_thread_a0);
         },
         {
             CT_UNUSED(reload);

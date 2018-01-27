@@ -51,15 +51,13 @@ int package_init(struct ct_api_a0 *api);
 
 void package_shutdown();
 
-void package_load(uint64_t name);
-
-void package_load(uint64_t name);
+struct ct_task_counter_t * package_load(uint64_t name);
 
 void package_unload(uint64_t name);
 
 int package_is_loaded(uint64_t name);
 
-void package_flush(uint64_t name);
+void package_flush(struct ct_task_counter_t *counter);
 
 #ifdef __cplusplus
 }

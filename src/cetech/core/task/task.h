@@ -66,8 +66,6 @@ struct ct_task_a0 {
     void (*add)(struct ct_task_item *items,
                 uint32_t count, struct ct_task_counter_t** counter);
 
-    int (*do_work)();
-
     void (*wait_for_counter)(struct ct_task_counter_t *signal, int32_t value);
 };
 

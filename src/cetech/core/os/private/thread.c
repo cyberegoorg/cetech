@@ -58,7 +58,6 @@ uint64_t thread_actual_id() {
 void thread_yield() {
 #if defined(CETECH_DARWIN)
     sched_yield();
-    usleep(1000);
 #elif defined(CETECH_LINUX)
     sched_yield();
 #endif

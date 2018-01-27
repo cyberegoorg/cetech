@@ -80,7 +80,9 @@ static uint64_t _object_new_property(struct object *obj,
     new_obj.offset[prop_count] = values_size;
     new_obj.type[prop_count] = type;
 
-    memcpy(new_obj.values + values_size, value, size);
+    if (value) {
+        memcpy(new_obj.values + values_size, value, size);
+    }
 
     CT_FREE(alloc, obj->buffer);
 
@@ -94,7 +96,7 @@ static uint64_t _object_new_property(struct object *obj,
 struct object *_new_object(const struct ct_alloc *a) {
     struct object *obj = CT_ALLOC(a, struct object, sizeof(struct object));
     *obj = (struct object) {{0}};
-    _object_new_property(obj, 0, COREDB_TYPE_NONE, NULL, 0, a);
+    _object_new_property(obj, 0, COREDB_TYPE_NONE, NULL, sizeof(uint64_t), a);
     return obj;
 }
 
@@ -315,7 +317,7 @@ static bool prop_exist(struct ct_cdb_obj_t *_object,
 }
 
 static enum ct_cdb_prop_type prop_type(struct ct_cdb_obj_t *_object,
-                                          uint64_t key) {
+                                       uint64_t key) {
     struct object *obj = *(struct object **) _object;
     uint64_t idx = _find_prop_index(obj, key);
     return idx ? (enum ct_cdb_prop_type) obj->type[idx] : COREDB_TYPE_NONE;

@@ -140,11 +140,11 @@ static void _boot_stage() {
 
     ct_resource_a0.load_now(pkg, resources, 2);
 
-    ct_package_a0.load(boot_pkg);
-    ct_package_a0.flush(boot_pkg);
+    ct_task_counter_t *boot_pkg_cnt = ct_package_a0.load(boot_pkg);
+    ct_package_a0.flush(boot_pkg_cnt);
 
-    ct_package_a0.load(core_pkg);
-    ct_package_a0.flush(core_pkg);
+    ct_task_counter_t *core_pkg_cnt = ct_package_a0.load(core_pkg);
+    ct_package_a0.flush(core_pkg_cnt);
 }
 
 static void _boot_unload() {

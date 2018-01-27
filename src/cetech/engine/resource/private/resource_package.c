@@ -244,7 +244,7 @@ void package_task(void *data) {
     CT_FREE(ct_memory_a0.main_allocator(), task_data);
 }
 
-void package_load(uint64_t name) {
+struct ct_task_counter_t * package_load(uint64_t name) {
     struct package_task_data *task_data =
             CT_ALLOC(ct_memory_a0.main_allocator(),
                      struct package_task_data,
@@ -260,6 +260,8 @@ void package_load(uint64_t name) {
 
     struct ct_task_counter_t *counter = NULL;
     ct_task_a0.add(&item, 1, &counter);
+
+    return counter;
 }
 
 void package_unload(uint64_t name) {
@@ -282,7 +284,6 @@ int package_is_loaded(uint64_t name) {
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);
-
     if (package == NULL) {
         return 0;
     }
@@ -301,10 +302,6 @@ int package_is_loaded(uint64_t name) {
     return 1;
 }
 
-void package_flush(uint64_t name) {
-    while (!package_is_loaded(name)) {
-        if (!ct_task_a0.do_work()) {
-            ct_thread_a0.yield();
-        }
-    }
+void package_flush(struct ct_task_counter_t *counter) {
+    ct_task_a0.wait_for_counter(counter, 0);
 }
