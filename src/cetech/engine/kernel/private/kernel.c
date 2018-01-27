@@ -15,6 +15,9 @@
 #include <cetech/engine/application/application.h>
 #include <cetech/core/cdb/cdb.h>
 
+#include <cetech/core/core.h>
+#include <cetech/core/containers/buffer.h>
+#include <cetech/core/task/task.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_config_a0);
@@ -24,12 +27,9 @@ CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_task_a0);
 
 #include <cetech/static_module.h>
-#include <cetech/core/core.h>
-#include <cetech/core/containers/buffer.h>
-
-#define LOG_WHERE "kernel"
 
 void register_api(struct ct_api_a0 *api);
 
@@ -43,6 +43,8 @@ const char *_platform() {
 #endif
     return NULL;
 }
+
+#define LOG_WHERE "kernel"
 
 #define CONFIG_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
 #define CONFIG_NATIVE_PLATFORM CT_ID64_0(CONFIG_NATIVE_PLATFORM_ID)
@@ -111,6 +113,7 @@ int cetech_kernel_init(int argc,
     CETECH_GET_API(api, ct_module_a0);
     CETECH_GET_API(api, ct_cdb_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
+    CETECH_GET_API(api, ct_task_a0);
 
     init_config(argc, argv, ct_config_a0.config_object());
 
@@ -135,11 +138,22 @@ int cetech_kernel_shutdown() {
     return 1;
 }
 
+static void start_app(void* data){
+    ct_app_a0.start();
+}
+
 int main(int argc,
          const char **argv) {
 
     if (cetech_kernel_init(argc, argv)) {
-        ct_app_a0.start();
+        struct ct_task_item task = (struct ct_task_item) {
+                .name = "application",
+                .work = start_app,
+        };
+
+        struct ct_task_counter_t* app = NULL;
+        ct_task_a0.add(&task, 1, &app);
+        ct_task_a0.wait_for_counter(app, 0);
     }
 
     return cetech_kernel_shutdown();

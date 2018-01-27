@@ -52,9 +52,9 @@ static struct _G {
     uint32_t size_width;
     uint32_t size_height;
 
-    int capture;
-    int vsync;
-    int need_reset;
+    bool capture;
+    bool vsync;
+    bool need_reset;
     ct_cdb_obj_t *config;
     ct_alloc *allocator;
 } _G = {};

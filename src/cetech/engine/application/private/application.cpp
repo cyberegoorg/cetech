@@ -30,7 +30,6 @@
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/core/cdb/cdb.h>
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
@@ -131,7 +130,7 @@ void _init_config() {
 
 static void _boot_stage() {
     const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
-                                                        CONFIG_BOOT_PKG, "");
+                                                  CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
     uint64_t pkg = CT_ID64_0("package");
 
@@ -149,7 +148,7 @@ static void _boot_stage() {
 
 static void _boot_unload() {
     const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
-                                                        CONFIG_BOOT_PKG, "");
+                                                  CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
 
     uint64_t core_pkg = CT_ID64_0("core/core");
@@ -207,105 +206,13 @@ extern "C" void application_start() {
     }
 
     set_active_game(CT_ID64_0(ct_cdb_a0.read_str(_G.config_object,
-                                                       CONFIG_GAME, "")));
+                                                 CONFIG_GAME, "")));
 
     if (_G.active_game.on_init) {
         _G.active_game.on_init();
     }
 
-    ct_cdb_obj_t *obj1 = ct_cdb_a0.create_object();
-    ct_cdb_obj_t *obj2 = ct_cdb_a0.create_object();
-    ct_cdb_obj_t *obj3 = ct_cdb_a0.create_object();
-
-    float f1 = ct_cdb_a0.read_float(obj1, 1, 22.0f);
-
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj1);
-    ct_cdb_a0.set_float(writer, 1, 44.0f);
-    ct_cdb_a0.set_float(writer, 2, 55.0f);
-    ct_cdb_a0.set_float(writer, 3, 66.0f);
-    ct_cdb_a0.set_ref(writer, 4, obj2);
-    ct_cdb_a0.set_ref(writer, 5, obj1);
-    ct_cdb_a0.set_ref(writer, 6, obj2);
-    ct_cdb_a0.set_ref(writer, 7, obj2);
-    ct_cdb_a0.write_commit(writer);
-
-    f1 = ct_cdb_a0.read_float(obj1, 1, 22.0f);
-    f1 = ct_cdb_a0.read_float(obj1, 2, 22.0f);
-    f1 = ct_cdb_a0.read_float(obj1, 3, 22.0f);
-
-    obj3 = ct_cdb_a0.read_ref(obj1, 4, NULL);
-    obj2 = ct_cdb_a0.read_ref(obj1, 5, NULL);
-
-    CT_UNUSED(obj1)
-    CT_UNUSED(f1)
-    CT_UNUSED(obj2)
-    CT_UNUSED(obj3)
-
-    uint32_t *arr = NULL;
-    ct_array_push(arr, 1, ct_memory_a0.main_allocator());
-    ct_array_push(arr, 1, ct_memory_a0.main_allocator());
-    ct_array_push(arr, 1, ct_memory_a0.main_allocator());
-
-    uint32_t aaa[] = {1, 2};
-    ct_array_push_n(arr, aaa, 2, ct_memory_a0.main_allocator());
-
-    ct_array_pop_front(arr);
-    ct_array_pop_front(arr);
-
-    for (int j = 0; j < ct_array_size(arr); ++j) {
-        ct_log_a0.debug("dddd", "%d", arr[j]);
-    }
-
-    ct_array_free(arr, ct_memory_a0.main_allocator());
-
-    char* buffer = NULL;
-
-    ct_buffer_printf(&buffer, _G.allocator, "foo %f", 10.f);
-    ct_log_a0.info("dddsss", "%s", buffer);
-
-//    ct_hash_t h1 = {};
-//
-//    ct_hash_add(&h1, CT_ID64_0("dva"), 2, _G.allocator);
-//    ct_hash_add(&h1, CT_ID64_0("tri"), 3, _G.allocator);
-//
-//    for (int k = 1; k <100; ++k) {
-//        ct_hash_add(&h1, k, 1, _G.allocator);
-//
-//    }
-//
-//    uint64_t jedna = ct_hash_lookup(&h1, CT_ID64_0("jedna"), 0);
-//    uint64_t dva = ct_hash_lookup(&h1, CT_ID64_0("dva"), 0);
-//    uint64_t tri = ct_hash_lookup(&h1, CT_ID64_0("tri"), 0);
-//
-//    CT_UNUSED(jedna)
-//    CT_UNUSED(dva)
-//    CT_UNUSED(tri)
-
     uint64_t fq = ct_time_a0.perf_freq();
-
-//    ct_hash_t h1 = {};
-//    uint64_t t1 = ct_time_a0.perf_counter();
-//    uint64_t k;
-//    for (k = 0; k < 100000; ++k) {
-//        ct_hash_add(&h1, k, 0, _G.allocator);
-//    }
-//    uint64_t t2 = ct_time_a0.perf_counter();
-//    float dt = ((float) (t2 - t1)) / fq;
-//
-//    t1 = ct_time_a0.perf_counter();
-//    uint64_t idx = ct_hash_lookup(&h1, k-1, 0);
-//    CT_UNUSED(dt, idx);
-//    t2 = ct_time_a0.perf_counter();
-//    dt = ((float) (t2 - t1)) / fq;
-//
-//    t1 = ct_time_a0.perf_counter();
-//    core::Map<int> m2(_G.allocator);
-//    for (k = 0; k < 100000; ++k) {
-//        core::map::set(m2, k, 0);
-//    }
-//    CT_UNUSED(dt, idx);
-//    t2 = ct_time_a0.perf_counter();
-//    dt = ((float) (t2 - t1)) / fq;
 
     _G.is_running = 1;
     while (_G.is_running) {
@@ -337,8 +244,8 @@ extern "C" void application_start() {
             ct_renderer_a0.render(
                     _G.active_game.on_render ? _G.active_game.on_render : NULL);
         }
-
-        sleep(0);
+//
+//        sleep(0);
     }
 
     if (_G.active_game.on_shutdown) {

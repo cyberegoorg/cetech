@@ -88,7 +88,6 @@ struct ct_gamepad_device_event {
 struct ct_machine_a0 {
     void (*update)(float dt);
 
-
     //! Get eventstream begin
     //! \return Begin
     struct ct_event_header *(*event_begin)();
@@ -114,7 +113,6 @@ struct ct_machine_a0 {
     void (*gamepad_play_rumble)(int gamepad,
                                 float strength,
                                 uint32_t length);
-
 };
 
 #ifdef __cplusplus
