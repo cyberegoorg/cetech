@@ -86,11 +86,22 @@ static void ui_texture(ct_cdb_obj_t *variable) {
 
     uint64_t name = ct_cdb_a0.read_uint64(variable, MATERIAL_VAR_VALUE_PROP, 0);
 
+
     char buff[128];
     snprintf(buff, 128, "%llu", name);
 
     ct_debugui_a0.InputText(str, buff, strlen(buff),
                             DebugInputTextFlags_ReadOnly, 0, NULL);
+    float size[2];
+    ct_debugui_a0.GetWindowSize(size);
+    size[1] = size[0];
+
+    ct_debugui_a0.Image2(ct_texture_a0.get(name),
+                         size,
+                         (float[2]) {0.0f, 0.0f},
+                         (float[2]) {1.0f, 1.0f},
+                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
 static void material_asset(uint64_t type,

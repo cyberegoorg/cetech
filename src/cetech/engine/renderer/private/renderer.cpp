@@ -120,6 +120,7 @@ static void renderer_create() {
     bgfx::setPlatformData(pd);
 
     // TODO: from config
+    bgfx::renderFrame();
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
@@ -210,7 +211,6 @@ static void on_render(void (*on_render)()) {
     }
 
     bgfx::frame();
-    _G.main_window->update(_G.main_window);
 }
 
 

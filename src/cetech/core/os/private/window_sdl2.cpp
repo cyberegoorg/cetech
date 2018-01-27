@@ -79,10 +79,6 @@ const char *window_get_title(ct_window_ints *w) {
     return SDL_GetWindowTitle((SDL_Window *) w);
 }
 
-void window_update(ct_window_ints *w) {
-    SDL_UpdateWindowSurface((SDL_Window *) w);
-}
-
 void window_resize(ct_window_ints *w,
                    uint32_t width,
                    uint32_t height) {
@@ -102,7 +98,7 @@ void window_get_size(ct_window_ints *window,
 }
 
 void *window_native_window_ptr(ct_window_ints *w) {
-    SDL_SysWMinfo wmi;
+    SDL_SysWMinfo wmi = {{0}};
 
     SDL_VERSION(&wmi.version);
 
@@ -163,7 +159,6 @@ ct_window *window_new(struct ct_alloc *alloc,
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
-            .update = window_update,
             .resize = window_resize,
             .size = window_get_size,
             .native_window_ptr = window_native_window_ptr,
@@ -188,7 +183,6 @@ ct_window *window_new_from(struct ct_alloc *alloc,
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
-            .update = window_update,
             .resize = window_resize,
             .size = window_get_size,
             .native_window_ptr = window_native_window_ptr,

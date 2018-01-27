@@ -58,8 +58,6 @@ struct ct_window {
 
     const char *(*get_title)(ct_window_ints *w);
 
-    void (*update)(ct_window_ints *w);
-
     void (*resize)(ct_window_ints *w,
                    uint32_t width,
                    uint32_t height);
