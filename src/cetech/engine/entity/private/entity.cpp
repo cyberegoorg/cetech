@@ -54,6 +54,9 @@ static struct _G {
     uint64_t type;
     uint64_t level_type;
 
+    // NEW
+    ct_hash_t ent_obj;
+
     ct_alloc *allocator;
 } _G;
 
@@ -92,10 +95,19 @@ entity_instance *get_spawned_entity(ct_entity ent) {
     return &_G.spawned_array[idx];
 }
 
+struct ct_cdb_obj_t* ent_obj(struct ct_entity entity){
+    ct_cdb_obj_t* obj = (ct_cdb_obj_t*)ct_hash_lookup(&_G.ent_obj, entity.h, 0);
+    return obj;
+};
 
 ct_entity create() {
-    return (ct_entity) {.h = ct_handler_create(&_G.entity_handler,
-                                               _G.allocator)};
+    ct_entity ent = {.h = ct_handler_create(&_G.entity_handler,
+                                            _G.allocator)};
+
+    ct_cdb_obj_t* obj = ct_cdb_a0.create_object();
+
+    ct_hash_add(&_G.ent_obj, ent.h, (uint64_t)obj, _G.allocator);
+    return ent;
 }
 
 void destroy(ct_world world,
@@ -616,6 +628,7 @@ static ct_entity find_by_guid(ct_entity root,
 
 static ct_entity_a0 _api = {
         .create = create,
+        .ent_obj = ent_obj,
         .destroy = destroy,
         .alive = alive,
         .spawn = spawn_entity,

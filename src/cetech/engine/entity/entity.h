@@ -98,6 +98,7 @@ static struct ct_component_clb {
     ct_world_callbacks_t world_clb;
 } ct_component_clb_null = {};
 
+struct ct_cdb_obj_t;
 
 //==============================================================================
 // Api
@@ -108,6 +109,8 @@ struct ct_entity_a0 {
     //! Create new entity
     //! \return New entity
     struct ct_entity (*create)();
+
+    struct ct_cdb_obj_t* (*ent_obj)(struct ct_entity entity);
 
     //! Destroy entities
     //! \param world World

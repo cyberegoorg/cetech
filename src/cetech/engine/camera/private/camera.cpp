@@ -8,6 +8,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
+#include <cetech/core/cdb/cdb.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/config/config.h"
@@ -22,6 +23,8 @@ CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 uint64_t combine(uint32_t a,
@@ -46,7 +49,6 @@ struct camera_data {
     float fov;
 };
 
-
 struct WorldInstance {
     ct_world world;
     uint32_t n;
@@ -54,9 +56,6 @@ struct WorldInstance {
     void *buffer;
 
     ct_entity *entity;
-    float *near;
-    float *far;
-    float *fov;
 };
 
 #define _G CameraGlobal
@@ -83,14 +82,8 @@ static void allocate(WorldInstance &_data,
     new_data.allocated = sz;
 
     new_data.entity = (ct_entity *) (new_data.buffer);
-    new_data.near = (float *) (new_data.entity + sz);
-    new_data.far = (float *) (new_data.near + sz);
-    new_data.fov = (float *) (new_data.far + sz);
 
     memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
-    memcpy(new_data.near, _data.near, _data.n * sizeof(float));
-    memcpy(new_data.far, _data.far, _data.n * sizeof(float));
-    memcpy(new_data.fov, _data.fov, _data.n * sizeof(float));
 
     CT_FREE(_allocator, _data.buffer);
 
@@ -189,9 +182,12 @@ static void get_project_view(ct_camera camera,
     ct_entity e = world_inst->entity[camera.idx];
     ct_transform t = ct_transform_a0.get(camera.world, e);
 
-    float fov = world_inst->fov[camera.idx];
-    float near = world_inst->near[camera.idx];
-    float far = world_inst->far[camera.idx];
+    ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(e);
+    ct_cdb_obj_t* camera_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
+
+    float fov = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("fov"), 0.0f);
+    float near = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("near"), 0.0f);
+    float far = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("far"), 0.0f);
 
     ct_mat4_proj_fovy(proj, fov, float(width) / float(height), near, far, true);
 
@@ -233,12 +229,20 @@ static ct_camera create(ct_world world,
     ++data->n;
 
     data->entity[idx] = entity;
-    data->near[idx] = near;
-    data->far[idx] = far;
-    data->fov[idx] = fov;
+
+    ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t* camera_obj = ct_cdb_a0.create_object();
+    ct_cdb_writer_t* camera_writer = ct_cdb_a0.write_begin(camera_obj);
+    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("near"), near);
+    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("far"), far);
+    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("fov"), fov);
+    ct_cdb_a0.write_commit(camera_writer);
+
+    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_a0.set_ref(ent_writer, _G.type, camera_obj);
+    ct_cdb_a0.write_commit(ent_writer);
 
     ct_hash_add(&_G.ent_map, combine(world.h, entity.h), idx, _G.allocator);
-
     return (ct_camera) {.idx = idx, .world = world};
 }
 
@@ -295,7 +299,6 @@ static void _spawner(ct_world world,
 static void _init(ct_api_a0 *api) {
     api->register_api("ct_camera_a0", &camera_api);
 
-
     _G = {
             .allocator = ct_memory_a0.main_allocator()
     };
@@ -331,6 +334,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

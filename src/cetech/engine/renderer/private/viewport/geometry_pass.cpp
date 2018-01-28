@@ -63,10 +63,7 @@ static void geometry_pass(viewport_instance *viewport,
 
 static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
-
-    ct_viewport_a0.register_layer_pass(
-            CT_ID64_0("geometry"),
-            geometry_pass);
+    ct_viewport_a0.register_layer_pass(CT_ID64_0("geometry"), geometry_pass);
 }
 
 static void _shutdown() {

@@ -22,7 +22,6 @@
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/core/cdb/cdb.h>
 #include <cetech/core/api/private/api_private.h>
 
 #include "bgfx/platform.h"
@@ -96,12 +95,12 @@ static void renderer_create() {
         if (wid == 0) {
             uint32_t flags = WINDOW_NOFLAG;
             flags |= ct_cdb_a0.read_uint32(_G.config,
-                                              CONFIG_SCREEN_FULLSCREEN, 0)
+                                           CONFIG_SCREEN_FULLSCREEN, 0)
                      ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
             _G.main_window = ct_window_a0.create(
-                    ct_memory_a0.main_allocator(),
+                    _G.allocator,
                     title,
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
@@ -109,8 +108,8 @@ static void renderer_create() {
                     flags
             );
         } else {
-            _G.main_window = ct_window_a0.create_from(
-                    ct_memory_a0.main_allocator(), (void *) wid);
+            _G.main_window = ct_window_a0.create_from(_G.allocator,
+                                                      (void *) wid);
         }
     }
 
@@ -120,7 +119,6 @@ static void renderer_create() {
     bgfx::setPlatformData(pd);
 
     // TODO: from config
-    bgfx::renderFrame();
     bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);

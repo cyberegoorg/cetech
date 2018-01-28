@@ -458,7 +458,7 @@ void set_string(ct_yng_doc_instance_t *_inst,
     struct ct_alloc *alloc = ct_memory_a0.main_allocator();
     char *str = inst->value[node.idx].string;
 
-    CT_FREE(alloc, str);
+    //CT_FREE(alloc, str);
 
     str = ct_memory_a0.str_dup(value, alloc);
     inst->value[node.idx].string = str;
