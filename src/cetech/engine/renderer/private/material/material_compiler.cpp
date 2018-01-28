@@ -203,6 +203,13 @@ void foreach_layer(const char *filename,
 
 };
 
+void name_from_filename(const char *fullname,
+                             char *name) {
+    const char *resource_type = ct_path_a0.extension(fullname);
+    size_t size = strlen(fullname) - strlen(resource_type) - 1;
+    memcpy(name, fullname, size);
+}
+
 void compiler(const char *filename,
               char **output_blob,
               ct_compilator_api *compilator_api) {
@@ -235,6 +242,7 @@ void compiler(const char *filename,
             .layer_count = ct_array_size(output.layer_names),
     };
 
+    name_from_filename(filename, resource.asset_name);
 
     ct_array_push_n(*output_blob, &resource, sizeof(resource), a);
 

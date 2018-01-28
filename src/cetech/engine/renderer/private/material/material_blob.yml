@@ -4,6 +4,7 @@ blobs:
       guard_prefix: CETECH
 
       values:
+        - char asset_name
         - uint32_t layer_count
         - uint32_t all_uniform_count
 

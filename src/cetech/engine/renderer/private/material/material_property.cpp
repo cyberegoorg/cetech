@@ -111,15 +111,19 @@ static void material_asset(uint64_t type,
     uint64_t *layer_keys = ct_cdb_a0.prop_keys(material);
     uint64_t layer_count = ct_cdb_a0.prop_count(material);
 
+
     for (int i = 0; i < layer_count; ++i) {
+        if(layer_keys[i] == CT_ID64_0("asset_name")) {
+            continue;
+        }
+
         if (ct_debugui_a0.CollapsingHeader("Layer",
                                            DebugUITreeNodeFlags_DefaultOpen)) {
             ct_cdb_obj_t *layer;
             layer = ct_cdb_a0.read_ref(material, layer_keys[i], NULL);
 
             ct_cdb_obj_t *variables;
-            variables = ct_cdb_a0.read_ref(layer, MATERIAL_VARIABLES_PROP,
-                                           NULL);
+            variables = ct_cdb_a0.read_ref(layer, MATERIAL_VARIABLES_PROP, NULL);
 
             const uint64_t *keys = ct_cdb_a0.prop_keys(variables);
             const uint64_t count = ct_cdb_a0.prop_count(variables);

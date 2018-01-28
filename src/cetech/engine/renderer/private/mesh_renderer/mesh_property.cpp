@@ -148,72 +148,40 @@ static void cmd_description(char *buffer,
 }
 
 
-//static bool get_selected_asset(char *asset_name,
-//                               const char *asset_type) {
-//    if (ct_asset_browser_a0.get_selected_asset_type() !=
-//        CT_ID64_0(asset_type)) {
-//        return false;
-//    }
-//
-//    ct_asset_browser_a0.get_selected_asset_name(asset_name);
-//    return true;
-//}
+static bool ui_select_asset(ct_cdb_obj_t* object,
+                            const char *id,
+                            uint64_t asset_type,
+                            uint64_t key) {
 
-//static bool ui_select_asset(char *buffer,
-//                            const char *id,
-//                            const char *asset_type,
-//                            const char *old_value,
-//                            ct_world world,
-//                            ct_entity entity,
-//                            const char *filename,
-//                            uint64_t *keys,
-//                            uint32_t keys_count,
-//                            uint64_t cmd_type,
-//                            uint32_t idx) {
-//
-//    char id_str[512] = {0};
-//    sprintf(id_str, ">>##%s", id);
-//
-//    if (ct_debugui_a0.Button(id_str, (float[2]) {0.0f})) {
-//        if (get_selected_asset(buffer, asset_type)) {
-//            struct ct_ent_cmd_str_s cmd = {
-//                    .header = {
-//                            .size = sizeof(struct ct_ent_cmd_str_s),
-//                            .type = cmd_type,
-//                    },
-//                    .ent = {
-//                            .world = world,
-//                            .entity = entity,
-//                            .filename = filename,
-//                            .keys_count = keys_count,
-//                    },
-//                    .idx = idx,
-//            };
-//
-//            memcpy(cmd.ent.keys, keys,
-//                   sizeof(uint64_t) * keys_count);
-//
-//            strcpy(cmd.new_value, buffer);
-//            strcpy(cmd.old_value, old_value);
-//
-//            ct_cmd_system_a0.execute(&cmd.header);
-//            return true;
-//        }
-//    }
-//
-//    strcpy(buffer, old_value);
-//
-//    return false;
-//}
+    char id_str[512] = {0};
+    sprintf(id_str, ">>##%s", id);
+
+    if (ct_debugui_a0.Button(id_str, (float[2]) {0.0f})) {
+        if (ct_asset_browser_a0.get_selected_asset_type() != asset_type) {
+            return false;
+        }
+
+        char selected_asset[128] = {0};
+        ct_asset_browser_a0.get_selected_asset_name(selected_asset);
+
+        ct_cdb_obj_t *new_material = ct_resource_a0.get_obj(asset_type, CT_ID64_0(selected_asset));
+
+        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(object);
+        ct_cdb_a0.set_ref(wr, key, new_material);
+        ct_cdb_a0.write_commit(wr);
+
+            return true;
+    }
+
+    return false;
+}
 
 static void ui_scene(ct_cdb_obj_t* ent_obj, uint64_t scene) {
     char labelid[128] = {'\0'};
     sprintf(labelid, "mp_scene");
 
     char scene_buffer[128] = {'\0'};
-//    ui_select_asset(scene_buffer, labelid, "scene", scene_str, world, entity,
-//                    filename,
-//                    tmp_keys, keys_count + 1, CT_ID64_0("mesh_set_scene"), 0);
+//    ui_select_asset(scene_buffer, labelid, "scene");
 
     snprintf(scene_buffer, CETECH_ARRAY_LEN(scene_buffer), "%llu", scene);
 //    ct_debugui_a0.SameLine(0.0f, -1.0f);
@@ -248,28 +216,22 @@ static void on_component(struct ct_world world,
     //==========================================================================
     // Geometries
     //==========================================================================
-    uint64_t geom[32] = {};
-    uint32_t geom_keys_count = 0;
-
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("geometries");
-    ct_ydb_a0.get_map_keys(filename,
-                           tmp_keys, keys_count + 1,
-                           geom, CETECH_ARRAY_LEN(geom),
-                           &geom_keys_count);
-
     uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("geom_count"), 0);
 
     char buffer[512] = {0};
     for (uint32_t i = 0; i < geom_count; ++i) {
         snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", i);
-        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0(buffer), 0);
+        uint64_t mesh_key = CT_ID64_0(buffer);
+        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, mesh_key, 0);
 
         snprintf(buffer, CETECH_ARRAY_LEN(buffer), "node%d", i);
-        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0(buffer), 0);
+        uint64_t node_key = CT_ID64_0(buffer);
+        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, node_key, 0);
 
 
         snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", i);
-//        ct_cdb_obj_t* material = ct_cdb_a0.read_ref(ent_obj, CT_ID64_0(buffer), 0);
+        uint64_t material_key = CT_ID64_0(buffer);
+        ct_cdb_obj_t* material = ct_cdb_a0.read_ref(ent_obj, material_key, 0);
 
         char id[32] = {0};
         sprintf(id, "element %d", i);
@@ -281,17 +243,14 @@ static void on_component(struct ct_world world,
 
             sprintf(labelid, "mp_select_material_%d", i);
 
-            tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("material");
             char material_buffer[128] = {'\0'};
-//            ui_select_asset(material_buffer, labelid, "material", material_name,
-//                            world,
-//                            entity, filename, tmp_keys, keys_count + 3,
-//                            CT_ID64_0("mesh_set_material"), i);
+            strcpy(material_buffer, ct_cdb_a0.read_str(material, CT_ID64_0("asset_name"), ""));
+            ui_select_asset(ent_obj, labelid, CT_ID64_0("material"), material_key);
 
-//            ct_debugui_a0.SameLine(0.0f, -1.0f);
+            ct_debugui_a0.SameLine(0.0f, -1.0f);
             sprintf(labelid, "material##mp_material_%d", i);
             ct_debugui_a0.InputText(labelid,
-                                    (char *) material_buffer,
+                                    material_buffer,
                                     strlen(material_buffer),
                                     DebugInputTextFlags_ReadOnly, 0, NULL);
 

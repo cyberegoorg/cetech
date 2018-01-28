@@ -94,6 +94,9 @@ static void online(uint64_t name,
     auto *render_state = material_blob::render_state(resource);
 
     struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+
+    ct_cdb_a0.set_string(writer, CT_ID64_0("asset_name"), resource->asset_name);
+
     for (int i = 0; i < material_blob::layer_count(resource); ++i) {
         uint64_t layer_name = layer_names[i];
         uint64_t rstate = render_state[i];

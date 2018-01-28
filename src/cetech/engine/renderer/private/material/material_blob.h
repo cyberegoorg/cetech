@@ -8,6 +8,7 @@ namespace material_blob {
     typedef struct {
         uint32_t blob_version;
 
+        char asset_name[128];
         uint32_t layer_count;
         uint32_t all_uniform_count;
         // uint64_t layer_names[layer_count];
@@ -19,59 +20,49 @@ namespace material_blob {
         // uint32_t layer_offset[layer_count];
     } blob_t;
 
-    inline const blob_t *get(void *data) {
-        return (blob_t *) (data);
+    inline const blob_t* get(void* data) {
+        return (blob_t*)(data);
     }
 
-    inline const uint32_t blob_size(const blob_t *blob) {
+    inline const uint32_t blob_size(const blob_t* blob) {
         return (
-                sizeof(blob_t) +
-                (sizeof(uint64_t) * blob->layer_count) +
-                (sizeof(uint64_t) * blob->layer_count) +
-                (sizeof(uint32_t) * blob->layer_count) +
-                (sizeof(uint64_t) * blob->layer_count) +
-                (sizeof(material_variable) * blob->all_uniform_count) +
-                (sizeof(char) * blob->all_uniform_count * 32) +
-                (sizeof(uint32_t) * blob->layer_count) +
-                0);
+            sizeof(blob_t) +
+            ( sizeof(uint64_t) * blob->layer_count ) +
+            ( sizeof(uint64_t) * blob->layer_count ) +
+            ( sizeof(uint32_t) * blob->layer_count ) +
+            ( sizeof(uint64_t) * blob->layer_count ) +
+            ( sizeof(material_variable) * blob->all_uniform_count ) +
+            ( sizeof(char) * blob->all_uniform_count * 32) +
+            ( sizeof(uint32_t) * blob->layer_count ) +
+        0);
     }
 
-    inline uint32_t layer_count(const blob_t *blob) {
+    inline uint32_t layer_count(const blob_t* blob) {
         return blob->layer_count;
     }
-
-    inline uint32_t all_uniform_count(const blob_t *blob) {
+    inline uint32_t all_uniform_count(const blob_t* blob) {
         return blob->all_uniform_count;
     }
-
-    inline uint64_t *layer_names(const blob_t *blob) {
-        return (uint64_t *) ((blob) + 1);
+    inline uint64_t* layer_names(const blob_t* blob) {
+        return (uint64_t*)((blob) + 1);
     }
-
-    inline uint64_t *shader_name(const blob_t *blob) {
-        return ((uint64_t *) (layer_names(blob) + (blob->layer_count)));
+    inline uint64_t* shader_name(const blob_t* blob) {
+        return ((uint64_t*) (layer_names(blob) + (blob->layer_count)));
     }
-
-    inline uint32_t *uniform_count(const blob_t *blob) {
-        return ((uint32_t *) (shader_name(blob) + (blob->layer_count)));
+    inline uint32_t* uniform_count(const blob_t* blob) {
+        return ((uint32_t*) (shader_name(blob) + (blob->layer_count)));
     }
-
-    inline uint64_t *render_state(const blob_t *blob) {
-        return ((uint64_t *) (uniform_count(blob) + (blob->layer_count)));
+    inline uint64_t* render_state(const blob_t* blob) {
+        return ((uint64_t*) (uniform_count(blob) + (blob->layer_count)));
     }
-
-    inline material_variable *uniforms(const blob_t *blob) {
-        return ((material_variable *) (render_state(blob) +
-                                       (blob->layer_count)));
+    inline material_variable* uniforms(const blob_t* blob) {
+        return ((material_variable*) (render_state(blob) + (blob->layer_count)));
     }
-
-    inline char *uniform_names(const blob_t *blob) {
-        return ((char *) (uniforms(blob) + (blob->all_uniform_count)));
+    inline char* uniform_names(const blob_t* blob) {
+        return ((char*) (uniforms(blob) + (blob->all_uniform_count)));
     }
-
-    inline uint32_t *layer_offset(const blob_t *blob) {
-        return ((uint32_t *) (uniform_names(blob) +
-                              (blob->all_uniform_count * 32)));
+    inline uint32_t* layer_offset(const blob_t* blob) {
+        return ((uint32_t*) (uniform_names(blob) + (blob->all_uniform_count*32)));
     }
 
 }
