@@ -183,11 +183,9 @@ static void get_project_view(ct_camera camera,
     ct_transform t = ct_transform_a0.get(camera.world, e);
 
     ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(e);
-    ct_cdb_obj_t* camera_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-
-    float fov = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("fov"), 0.0f);
-    float near = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("near"), 0.0f);
-    float far = ct_cdb_a0.read_float(camera_obj, CT_ID64_0("far"), 0.0f);
+    float fov = ct_cdb_a0.read_float(ent_obj, CT_ID64_0("fov"), 0.0f);
+    float near = ct_cdb_a0.read_float(ent_obj, CT_ID64_0("near"), 0.0f);
+    float far = ct_cdb_a0.read_float(ent_obj, CT_ID64_0("far"), 0.0f);
 
     ct_mat4_proj_fovy(proj, fov, float(width) / float(height), near, far, true);
 
@@ -231,15 +229,10 @@ static ct_camera create(ct_world world,
     data->entity[idx] = entity;
 
     ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(entity);
-    ct_cdb_obj_t* camera_obj = ct_cdb_a0.create_object();
-    ct_cdb_writer_t* camera_writer = ct_cdb_a0.write_begin(camera_obj);
-    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("near"), near);
-    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("far"), far);
-    ct_cdb_a0.set_float(camera_writer, CT_ID64_0("fov"), fov);
-    ct_cdb_a0.write_commit(camera_writer);
-
     ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
-    ct_cdb_a0.set_ref(ent_writer, _G.type, camera_obj);
+    ct_cdb_a0.set_float(ent_writer, CT_ID64_0("near"), near);
+    ct_cdb_a0.set_float(ent_writer, CT_ID64_0("far"), far);
+    ct_cdb_a0.set_float(ent_writer, CT_ID64_0("fov"), fov);
     ct_cdb_a0.write_commit(ent_writer);
 
     ct_hash_add(&_G.ent_map, combine(world.h, entity.h), idx, _G.allocator);

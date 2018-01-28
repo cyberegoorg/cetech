@@ -56,7 +56,8 @@ CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_scene_a0);
-
+CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 struct ct_ent_cmd_s {
     // ENT
@@ -147,62 +148,78 @@ static void cmd_description(char *buffer,
 }
 
 
-static bool get_selected_asset(char *asset_name,
-                               const char *asset_type) {
-    if (ct_asset_browser_a0.get_selected_asset_type() !=
-        CT_ID64_0(asset_type)) {
-        return false;
-    }
+//static bool get_selected_asset(char *asset_name,
+//                               const char *asset_type) {
+//    if (ct_asset_browser_a0.get_selected_asset_type() !=
+//        CT_ID64_0(asset_type)) {
+//        return false;
+//    }
+//
+//    ct_asset_browser_a0.get_selected_asset_name(asset_name);
+//    return true;
+//}
 
-    ct_asset_browser_a0.get_selected_asset_name(asset_name);
-    return true;
-}
+//static bool ui_select_asset(char *buffer,
+//                            const char *id,
+//                            const char *asset_type,
+//                            const char *old_value,
+//                            ct_world world,
+//                            ct_entity entity,
+//                            const char *filename,
+//                            uint64_t *keys,
+//                            uint32_t keys_count,
+//                            uint64_t cmd_type,
+//                            uint32_t idx) {
+//
+//    char id_str[512] = {0};
+//    sprintf(id_str, ">>##%s", id);
+//
+//    if (ct_debugui_a0.Button(id_str, (float[2]) {0.0f})) {
+//        if (get_selected_asset(buffer, asset_type)) {
+//            struct ct_ent_cmd_str_s cmd = {
+//                    .header = {
+//                            .size = sizeof(struct ct_ent_cmd_str_s),
+//                            .type = cmd_type,
+//                    },
+//                    .ent = {
+//                            .world = world,
+//                            .entity = entity,
+//                            .filename = filename,
+//                            .keys_count = keys_count,
+//                    },
+//                    .idx = idx,
+//            };
+//
+//            memcpy(cmd.ent.keys, keys,
+//                   sizeof(uint64_t) * keys_count);
+//
+//            strcpy(cmd.new_value, buffer);
+//            strcpy(cmd.old_value, old_value);
+//
+//            ct_cmd_system_a0.execute(&cmd.header);
+//            return true;
+//        }
+//    }
+//
+//    strcpy(buffer, old_value);
+//
+//    return false;
+//}
 
-static bool ui_select_asset(char *buffer,
-                            const char *id,
-                            const char *asset_type,
-                            const char *old_value,
-                            ct_world world,
-                            ct_entity entity,
-                            const char *filename,
-                            uint64_t *keys,
-                            uint32_t keys_count,
-                            uint64_t cmd_type,
-                            uint32_t idx) {
+static void ui_scene(ct_cdb_obj_t* ent_obj, uint64_t scene) {
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "mp_scene");
 
-    char id_str[512] = {0};
-    sprintf(id_str, ">>##%s", id);
+    char scene_buffer[128] = {'\0'};
+//    ui_select_asset(scene_buffer, labelid, "scene", scene_str, world, entity,
+//                    filename,
+//                    tmp_keys, keys_count + 1, CT_ID64_0("mesh_set_scene"), 0);
 
-    if (ct_debugui_a0.Button(id_str, (float[2]) {0.0f})) {
-        if (get_selected_asset(buffer, asset_type)) {
-            struct ct_ent_cmd_str_s cmd = {
-                    .header = {
-                            .size = sizeof(struct ct_ent_cmd_str_s),
-                            .type = cmd_type,
-                    },
-                    .ent = {
-                            .world = world,
-                            .entity = entity,
-                            .filename = filename,
-                            .keys_count = keys_count,
-                    },
-                    .idx = idx,
-            };
-
-            memcpy(cmd.ent.keys, keys,
-                   sizeof(uint64_t) * keys_count);
-
-            strcpy(cmd.new_value, buffer);
-            strcpy(cmd.old_value, old_value);
-
-            ct_cmd_system_a0.execute(&cmd.header);
-            return true;
-        }
-    }
-
-    strcpy(buffer, old_value);
-
-    return false;
+    snprintf(scene_buffer, CETECH_ARRAY_LEN(scene_buffer), "%llu", scene);
+//    ct_debugui_a0.SameLine(0.0f, -1.0f);
+    ct_debugui_a0.InputText("scene",
+                            (char *) scene_buffer, strlen(scene_buffer),
+                            DebugInputTextFlags_ReadOnly, 0, NULL);
 }
 
 static void on_component(struct ct_world world,
@@ -210,6 +227,7 @@ static void on_component(struct ct_world world,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
+    ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(entity);
 
     if (!ct_debugui_a0.CollapsingHeader("Mesh renderer",
                                         DebugUITreeNodeFlags_DefaultOpen)) {
@@ -218,28 +236,14 @@ static void on_component(struct ct_world world,
 
     uint64_t tmp_keys[keys_count + 3];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
+    char labelid[128] = {'\0'};
 
     //==========================================================================
     // Scene
     //==========================================================================
+    uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("scene"), 0);
 
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("scene");
-    const char *scene_str = ct_ydb_a0.get_string(filename, tmp_keys,
-                                                 keys_count + 1, "");
-
-    char labelid[128] = {'\0'};
-    sprintf(labelid, "mp_scene");
-
-    char scene_buffer[128] = {'\0'};
-    ui_select_asset(scene_buffer, labelid, "scene", scene_str, world, entity,
-                    filename,
-                    tmp_keys, keys_count + 1, CT_ID64_0("mesh_set_scene"), 0);
-
-
-    ct_debugui_a0.SameLine(0.0f, -1.0f);
-    ct_debugui_a0.InputText("scene",
-                            (char *) scene_buffer, strlen(scene_buffer),
-                            DebugInputTextFlags_ReadOnly, 0, NULL);
+    ui_scene(ent_obj, scene);
 
     //==========================================================================
     // Geometries
@@ -253,26 +257,23 @@ static void on_component(struct ct_world world,
                            geom, CETECH_ARRAY_LEN(geom),
                            &geom_keys_count);
 
+    uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("geom_count"), 0);
 
-    for (uint32_t i = 0; i < geom_keys_count; ++i) {
-        tmp_keys[keys_count + 1] = geom[i];
+    char buffer[512] = {0};
+    for (uint32_t i = 0; i < geom_count; ++i) {
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", i);
+        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0(buffer), 0);
 
-        tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("mesh");
-        const char *mesh_name = ct_ydb_a0.get_string(filename, tmp_keys,
-                                                     keys_count + 3, "");
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "node%d", i);
+        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0(buffer), 0);
 
-        tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("material");
-        const char *material_name = ct_ydb_a0.get_string(filename, tmp_keys,
-                                                         keys_count + 3, "");
 
-        tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("node");
-        const char *node_name = ct_ydb_a0.get_string(filename, tmp_keys,
-                                                     keys_count + 3, "");
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", i);
+//        ct_cdb_obj_t* material = ct_cdb_a0.read_ref(ent_obj, CT_ID64_0(buffer), 0);
 
         char id[32] = {0};
         sprintf(id, "element %d", i);
         if (ImGui::TreeNodeEx(id, ImGuiTreeNodeFlags_DefaultOpen)) {
-
 
             //======================================================================
             // Material
@@ -282,12 +283,12 @@ static void on_component(struct ct_world world,
 
             tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("material");
             char material_buffer[128] = {'\0'};
-            ui_select_asset(material_buffer, labelid, "material", material_name,
-                            world,
-                            entity, filename, tmp_keys, keys_count + 3,
-                            CT_ID64_0("mesh_set_material"), i);
+//            ui_select_asset(material_buffer, labelid, "material", material_name,
+//                            world,
+//                            entity, filename, tmp_keys, keys_count + 3,
+//                            CT_ID64_0("mesh_set_material"), i);
 
-            ct_debugui_a0.SameLine(0.0f, -1.0f);
+//            ct_debugui_a0.SameLine(0.0f, -1.0f);
             sprintf(labelid, "material##mp_material_%d", i);
             ct_debugui_a0.InputText(labelid,
                                     (char *) material_buffer,
@@ -300,16 +301,16 @@ static void on_component(struct ct_world world,
             {
                 char *items;
                 uint32_t items_count;
-                ct_scene_a0.get_all_geometries(CT_ID64_0(scene_buffer), &items,
-                                               &items_count);
+                ct_scene_a0.get_all_geometries(scene, &items, &items_count);
 
                 int item2 = -1;
                 const char *items2[items_count];
                 for (int j = 0; j < items_count; ++j) {
                     items2[j] = &items[j * 128];
 
-                    if (!strcmp(items2[j], mesh_name)) {
+                    if (CT_ID64_0(items2[j]) == mesh) {
                         item2 = j;
+                        break;
                     }
                 }
 
@@ -335,7 +336,7 @@ static void on_component(struct ct_world world,
                            sizeof(uint64_t) * (keys_count + 3));
 
                     strcpy(cmd.new_value, items2[item2]);
-                    strcpy(cmd.old_value, mesh_name);
+//                    strcpy(cmd.old_value, mesh);
 
                     ct_cmd_system_a0.execute(&cmd.header);
                 }
@@ -347,7 +348,7 @@ static void on_component(struct ct_world world,
             {
                 char *items;
                 uint32_t items_count;
-                ct_scene_a0.get_all_nodes(CT_ID64_0(scene_buffer), &items,
+                ct_scene_a0.get_all_nodes(scene, &items,
                                           &items_count);
 
                 int item2 = -1;
@@ -355,8 +356,9 @@ static void on_component(struct ct_world world,
                 for (int j = 0; j < items_count; ++j) {
                     items2[j] = &items[j * 128];
 
-                    if (!strcmp(items2[j], node_name)) {
+                    if (CT_ID64_0(items2[j]) ==  node) {
                         item2 = j;
+                        break;
                     }
                 }
 
@@ -382,7 +384,7 @@ static void on_component(struct ct_world world,
                            sizeof(uint64_t) * (keys_count + 3));
 
                     strcpy(cmd.new_value, items2[item2]);
-                    strcpy(cmd.old_value, node_name);
+//                    strcpy(cmd.old_value, node_name);
 
                     ct_cmd_system_a0.execute(&cmd.header);
                 };
@@ -458,6 +460,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_scene_a0);
+            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

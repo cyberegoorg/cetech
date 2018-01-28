@@ -23,6 +23,7 @@
 #include <cetech/engine/renderer/mesh_renderer.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/core/math/fmath.h>
+#include <cetech/core/containers/buffer.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -64,7 +65,6 @@ struct mesh_data {
     uint64_t mesh[32];
     uint64_t node[32];
     uint64_t material[32];
-    ct_cdb_obj_t *material_inst[32];
 };
 
 struct WorldInstance {
@@ -239,7 +239,6 @@ ct_mesh_renderer mesh_create(ct_world world,
                              uint64_t *node,
                              uint64_t *material,
                              uint32_t geom_count) {
-
     WorldInstance *data = _get_world_instance(world);
 
     uint32_t idx = data->n;
@@ -251,41 +250,33 @@ ct_mesh_renderer mesh_create(ct_world world,
 
     data->entity[idx] = entity;
 
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.create_object();
-    ct_cdb_writer_t *renderer_writer = ct_cdb_a0.write_begin(renderer_obj);
+    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
 
-    ct_cdb_a0.set_uint64(renderer_writer, CT_ID64_0("scene"), scene);
+    ct_cdb_a0.set_uint64(ent_writer, CT_ID64_0("scene"), scene);
+    ct_cdb_a0.set_uint64(ent_writer, CT_ID64_0("geom_count"), geom_count);
 
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.create_object();
-    ct_cdb_writer_t *geom_writer = ct_cdb_a0.write_begin(geom_obj);
+    char buffer[512] = {0};
     for (uint32_t i = 0; i < geom_count; ++i) {
-        ct_cdb_obj_t *gobj = ct_cdb_a0.create_object();
-        ct_cdb_writer_t *gobj_writer = ct_cdb_a0.write_begin(gobj);
 
         uint64_t n = node[i];
         if (n == 0) {
             n = ct_scene_a0.get_mesh_node(scene, mesh[i]);
         }
 
-        ct_cdb_a0.set_uint64(gobj_writer, CT_ID64_0("mesh"), mesh[i]);
-        ct_cdb_a0.set_uint64(gobj_writer, CT_ID64_0("node"), n);
-        ct_cdb_a0.set_ref(gobj_writer, CT_ID64_0("material"),
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", i);
+        ct_cdb_a0.set_uint64(ent_writer, CT_ID64_0(buffer), mesh[i]);
+
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "node%d", i);
+        ct_cdb_a0.set_uint64(ent_writer, CT_ID64_0("buffer"), n);
+
+
+        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", i);
+        ct_cdb_a0.set_ref(ent_writer, CT_ID64_0(buffer),
                           ct_material_a0.resource_create(material[i]));
-
-        ct_cdb_a0.write_commit(gobj_writer);
-
-        ct_cdb_a0.set_ref(geom_writer, i + 1, gobj);
     }
-    ct_cdb_a0.write_commit(geom_writer);
-    ct_cdb_a0.set_ref(renderer_writer, CT_ID64_0("geometries"), geom_obj);
-    ct_cdb_a0.write_commit(renderer_writer);
 
-
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
-    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
-    ct_cdb_a0.set_ref(ent_writer, _G.type, renderer_obj);
     ct_cdb_a0.write_commit(ent_writer);
-
 
     return (ct_mesh_renderer) {.idx = idx, .world = world};
 }
@@ -342,30 +333,26 @@ void mesh_render_all(ct_world world,
         ct_entity ent = data->entity[i];
 
         ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(ent);
-        ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-        ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(renderer_obj,
-                                                    CT_ID64_0("geometries"),
-                                                    NULL);
 
-        uint64_t scene = ct_cdb_a0.read_uint64(renderer_obj, CT_ID64_0("scene"),
-                                               0);
+        uint64_t scene = ct_cdb_a0.read_uint64(ent_obj,
+                                               CT_ID64_0("scene"), 0);
 
         float wm[16];
         ct_transform t = ct_transform_a0.get(world, ent);
         ct_transform_a0.get_world_matrix(t, wm);
 
-        uint64_t *keys = ct_cdb_a0.prop_keys(geom_obj);
-        uint64_t kcount = ct_cdb_a0.prop_count(geom_obj);
+        uint64_t kcount = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("geom_count"), 0);
+        char buffer[512] = {0};
         for (int j = 0; j < kcount; ++j) {
-            ct_cdb_obj_t *geom = ct_cdb_a0.read_ref(geom_obj, keys[j],
-                                                    NULL);
+            snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", j);
 
-            ct_cdb_obj_t *material = ct_cdb_a0.read_ref(geom,
-                                                        CT_ID64_0("material"),
+            ct_cdb_obj_t *material = ct_cdb_a0.read_ref(ent_obj,
+                                                        CT_ID64_0(buffer),
                                                         0);
 
-            uint64_t mesh = ct_cdb_a0.read_uint64(geom,
-                                                  CT_ID64_0("mesh"), 0);
+            snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", j);
+            uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj,
+                                                  CT_ID64_0(buffer), 0);
 
             //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
             float node_w[16];
@@ -384,11 +371,8 @@ void mesh_render_all(ct_world world,
             }
 
             ct_mat4_mul(final_w, node_w, wm);
-
             bgfx::setTransform(&final_w, 1);
-
             ct_scene_a0.setVBIB(scene, mesh);
-
             ct_material_a0.submit(material, layer_name, viewid);
         }
     }
@@ -399,12 +383,10 @@ ct_cdb_obj_t *mesh_get_material(ct_mesh_renderer mesh,
     WorldInstance *data = _get_world_instance(mesh.world);
 
     ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(data->entity[mesh.idx]);
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(renderer_obj,
-                                                CT_ID64_0("geometries"),
-                                                NULL);
-    ct_cdb_obj_t *gobj = ct_cdb_a0.read_ref(geom_obj, idx+1, NULL);
-    return ct_cdb_a0.read_ref(gobj, CT_ID64_0("material"), NULL);
+
+    char buffer[512] = {0};
+    snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", idx);
+    return ct_cdb_a0.read_ref(ent_obj, CT_ID64_0(buffer), NULL);
 }
 
 void mesh_set_material(ct_mesh_renderer mesh,
@@ -414,14 +396,12 @@ void mesh_set_material(ct_mesh_renderer mesh,
     ct_cdb_obj_t *material_instance = ct_material_a0.resource_create(material);
 
     ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(data->entity[mesh.idx]);
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(renderer_obj,
-                                                CT_ID64_0("geometries"),
-                                                NULL);
-    ct_cdb_obj_t *gobj = ct_cdb_a0.read_ref(geom_obj, idx+1, NULL);
 
-    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(gobj);
-    ct_cdb_a0.set_ref(wr, CT_ID64_0("material"), material_instance);
+    char buffer[512] = {0};
+    snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", idx);
+
+    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_a0.set_ref(wr, CT_ID64_0(buffer), material_instance);
     ct_cdb_a0.write_commit(wr);
 }
 
@@ -430,14 +410,12 @@ void set_geometry(struct ct_mesh_renderer mesh,
                   uint64_t geometry) {
     WorldInstance *data = _get_world_instance(mesh.world);
     ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(data->entity[mesh.idx]);
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(renderer_obj,
-                                                CT_ID64_0("geometries"),
-                                                NULL);
-    ct_cdb_obj_t *gobj = ct_cdb_a0.read_ref(geom_obj, idx+1, NULL);
 
-    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(gobj);
-    ct_cdb_a0.set_uint64(wr, CT_ID64_0("mesh"), geometry);
+    char buffer[512] = {0};
+    snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", idx);
+
+    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0(buffer), geometry);
     ct_cdb_a0.write_commit(wr);
 }
 
@@ -446,14 +424,12 @@ void set_node(struct ct_mesh_renderer mesh,
               uint64_t node) {
     WorldInstance *data = _get_world_instance(mesh.world);
     ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(data->entity[mesh.idx]);
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(renderer_obj,
-                                                CT_ID64_0("geometries"),
-                                                NULL);
-    ct_cdb_obj_t *gobj = ct_cdb_a0.read_ref(geom_obj, idx+1, NULL);
 
-    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(gobj);
-    ct_cdb_a0.set_uint64(wr, CT_ID64_0("node"), node);
+    char buffer[512] = {0};
+    snprintf(buffer, CETECH_ARRAY_LEN(buffer), "node%d", idx);
+
+    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0(buffer), node);
     ct_cdb_a0.write_commit(wr);
 }
 
@@ -461,9 +437,8 @@ void set_scene(struct ct_mesh_renderer mesh,
                uint64_t scene) {
     WorldInstance *data = _get_world_instance(mesh.world);
     ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(data->entity[mesh.idx]);
-    ct_cdb_obj_t *renderer_obj = ct_cdb_a0.read_ref(ent_obj, _G.type, NULL);
 
-    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(renderer_obj);
+    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint64(wr, CT_ID64_0("scene"), scene);
     ct_cdb_a0.write_commit(wr);
 }
