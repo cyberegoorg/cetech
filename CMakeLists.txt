@@ -57,12 +57,13 @@ set(EXTERNAL_SOURCE_FILES
         ########################################################################
         # Externals: MPack
         ########################################################################
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c)
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
+        )
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
@@ -211,7 +212,7 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
         ${RELEASE_LIBS_DARWIN}
 
-        nanomsg.a
+#        nanomsg.a
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a

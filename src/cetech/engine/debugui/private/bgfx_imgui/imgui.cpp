@@ -174,12 +174,12 @@ struct OcornutImguiContext {
                     }
 
                     const uint16_t xx = uint16_t(
-                            bx::fmax(cmd->ClipRect.x, 0.0f));
+                            bx::max(cmd->ClipRect.x, 0.0f));
                     const uint16_t yy = uint16_t(
-                            bx::fmax(cmd->ClipRect.y, 0.0f));
+                            bx::max(cmd->ClipRect.y, 0.0f));
                     bgfx::setScissor(xx, yy, uint16_t(
-                            bx::fmin(cmd->ClipRect.z, 65535.0f) - xx), uint16_t(
-                            bx::fmin(cmd->ClipRect.w, 65535.0f) - yy)
+                            bx::min(cmd->ClipRect.z, 65535.0f) - xx), uint16_t(
+                            bx::min(cmd->ClipRect.w, 65535.0f) - yy)
                     );
 
                     bgfx::setState(state);
