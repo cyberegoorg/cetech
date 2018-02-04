@@ -296,7 +296,7 @@ struct ct_debugui_a0 {
                        float col[3]);
 
     bool (*ColorEdit4)(const char *label,
-                       uint32_t *rgba,
+                       float *rgba,
                        bool show_alpha);
 
     void (*ColorEditMode)(ImGuiColorEditMode mode);

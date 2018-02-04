@@ -47,7 +47,7 @@ extern "C" {
     (a)[ct_array_header(a)->size++] = item
 
 #define ct_array_push_n(a, items, n, alloc) \
-    ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + n, sizeof(*(a)), alloc) : 0, \
+    ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + (n), sizeof(*(a)), alloc) : 0, \
     memcpy((a)+ct_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
     ct_array_header(a)->size += (n)
 

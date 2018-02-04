@@ -30,7 +30,7 @@ static void geometry_pass(viewport_instance *viewport,
                           uint8_t viewid,
                           uint8_t layerid,
                           ct_world world,
-                          ct_camera camera) {
+                          ct_entity camera) {
     CT_UNUSED(viewport_id);
 
     bgfx::setViewClear(viewid,
@@ -45,7 +45,8 @@ static void geometry_pass(viewport_instance *viewport,
     float view_matrix[16];
     float proj_matrix[16];
 
-    ct_camera_a0.get_project_view(camera,
+    ct_camera_a0.get_project_view(world,
+                                  camera,
                                   proj_matrix,
                                   view_matrix,
                                   viewport->size[0],

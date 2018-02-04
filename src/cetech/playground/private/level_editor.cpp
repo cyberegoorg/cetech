@@ -39,6 +39,7 @@ CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_ydb_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 #define MAX_EDITOR 8
 
@@ -73,14 +74,15 @@ static void fps_camera_update(ct_world world,
     CT_UNUSED(dy);
 
     float pos[3];
-    float rot[4];
+    float rot[3];
     float wm[16];
 
-    auto transform = ct_transform_a0.get(world, camera_ent);
+    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(camera_ent);
 
-    ct_transform_a0.get_position(transform, pos);
-    ct_transform_a0.get_rotation(transform, rot);
-    ct_transform_a0.get_world_matrix(transform, wm);
+    ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
+    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
+
+    ct_transform_a0.get_world_matrix(camera_ent, wm);
 
     float x_dir[4];
     float z_dir[4];
@@ -113,7 +115,9 @@ static void fps_camera_update(ct_world world,
 //    Transform.set_rotation(self.transform, rot * rotation)
 //    end
 
-    ct_transform_a0.set_position(transform, pos);
+    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0.write_commit(w);
 }
 
 static void on_debugui() {
@@ -142,9 +146,8 @@ static void on_debugui() {
                 float size[2];
                 ct_debugui_a0.GetWindowSize(size);
 
-                ct_camera camera = ct_camera_a0.get(_G.world[i],
-                                                    _G.camera_ent[i]);
-                ct_camera_a0.get_project_view(camera, proj, view,
+                ct_camera_a0.get_project_view(_G.world[i], _G.camera_ent[i],
+                                              proj, view,
                                               static_cast<int>(size[0]),
                                               static_cast<int>(size[1]));
 
@@ -182,7 +185,6 @@ static void on_debugui() {
 
         }
         ct_debugui_a0.EndDock();
-
     }
 }
 
@@ -192,8 +194,7 @@ static void render() {
             continue;
         }
 
-        ct_camera camera = ct_camera_a0.get(_G.world[i], _G.camera_ent[i]);
-        ct_viewport_a0.render_world(_G.world[i], camera, _G.viewport[i]);
+        ct_viewport_a0.render_world(_G.world[i], _G.camera_ent[i], _G.viewport[i]);
     }
 }
 
@@ -354,6 +355,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

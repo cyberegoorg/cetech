@@ -68,7 +68,7 @@ typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,
                                      uint8_t viewid,
                                      uint8_t layeridx,
                                      struct ct_world world,
-                                     struct ct_camera camera);
+                                     struct ct_entity camera);
 
 //==============================================================================
 // Api
@@ -100,7 +100,7 @@ struct ct_viewport_a0 {
     //! \param camera Camera
     //! \param viewport Viewport
     void (*render_world)(struct ct_world world,
-                         struct ct_camera camera,
+                         struct ct_entity camera,
                          struct ct_viewport viewport);
 };
 

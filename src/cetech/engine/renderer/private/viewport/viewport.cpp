@@ -130,7 +130,7 @@ struct ct_texture renderer_get_global_resource(uint64_t name) {
 static int viewid_counter = 0;
 
 static void renderer_render_world(ct_world world,
-                                  ct_camera camera,
+                                  ct_entity camera,
                                   ct_viewport viewport) {
 
     auto idx = ct_hash_lookup(&_G.viewport_instance_map, viewport.idx,

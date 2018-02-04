@@ -40,19 +40,13 @@ static struct _G {
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_path_a0);
-CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_asset_property_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_entity_property_a0);
-CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
-CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_scene_a0);
@@ -91,24 +85,18 @@ static void cmd_set_str(const struct ct_cmd *cmd,
                          pos_cmd->ent.keys, pos_cmd->ent.keys_count,
                          value);
 
-    ct_mesh_renderer mr = ct_mesh_renderer_a0.get(pos_cmd->ent.world,
-                                                  pos_cmd->ent.entity);
-    if (!ct_mesh_renderer_a0.is_valid(mr)) {
-        return;
-    }
-
-    if (pos_cmd->header.type == CT_ID64_0("mesh_set_material")) {
-        ct_mesh_renderer_a0.set_material(mr, pos_cmd->idx, CT_ID64_0(value));
-
-    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_mesh")) {
-        ct_mesh_renderer_a0.set_geometry(mr, pos_cmd->idx, CT_ID64_0(value));
-
-    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_node")) {
-        ct_mesh_renderer_a0.set_node(mr, pos_cmd->idx, CT_ID64_0(value));
-
-    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_scene")) {
-        ct_mesh_renderer_a0.set_scene(mr, CT_ID64_0(value));
-    }
+//    if (pos_cmd->header.type == CT_ID64_0("mesh_set_material")) {
+//        ct_mesh_renderer_a0.set_material(pos_cmd->ent.entity, pos_cmd->idx, CT_ID64_0(value));
+//
+//    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_mesh")) {
+//        ct_mesh_renderer_a0.set_geometry(pos_cmd->ent.entity, pos_cmd->idx, CT_ID64_0(value));
+//
+//    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_node")) {
+//        ct_mesh_renderer_a0.set_node(pos_cmd->ent.entity, pos_cmd->idx, CT_ID64_0(value));
+//
+//    } else if (pos_cmd->header.type == CT_ID64_0("mesh_set_scene")) {
+//        ct_mesh_renderer_a0.set_scene(pos_cmd->ent.entity, CT_ID64_0(value));
+//    }
 }
 
 static void cmd_description(char *buffer,
@@ -148,7 +136,7 @@ static void cmd_description(char *buffer,
 }
 
 
-static bool ui_select_asset(ct_cdb_obj_t* object,
+static bool ui_select_asset(ct_cdb_obj_t *object,
                             const char *id,
                             uint64_t asset_type,
                             uint64_t key) {
@@ -164,19 +152,19 @@ static bool ui_select_asset(ct_cdb_obj_t* object,
         char selected_asset[128] = {0};
         ct_asset_browser_a0.get_selected_asset_name(selected_asset);
 
-        ct_cdb_obj_t *new_material = ct_resource_a0.get_obj(asset_type, CT_ID64_0(selected_asset));
-
-        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(object);
-        ct_cdb_a0.set_ref(wr, key, new_material);
+        uint64_t k = CT_ID64_0(selected_asset);
+        ct_cdb_writer_t *wr = ct_cdb_a0.write_begin(object);
+        ct_cdb_a0.set_uint64(wr, key, k);
         ct_cdb_a0.write_commit(wr);
 
-            return true;
+        return true;
     }
 
     return false;
 }
 
-static void ui_scene(ct_cdb_obj_t* ent_obj, uint64_t scene) {
+static void ui_scene(ct_cdb_obj_t *ent_obj,
+                     uint64_t scene) {
     char labelid[128] = {'\0'};
     sprintf(labelid, "mp_scene");
 
@@ -195,13 +183,13 @@ static void on_component(struct ct_world world,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
-    ct_cdb_obj_t* ent_obj = ct_entity_a0.ent_obj(entity);
 
     if (!ct_debugui_a0.CollapsingHeader("Mesh renderer",
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
 
+    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
     uint64_t tmp_keys[keys_count + 3];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
     char labelid[128] = {'\0'};
@@ -209,29 +197,19 @@ static void on_component(struct ct_world world,
     //==========================================================================
     // Scene
     //==========================================================================
-    uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("scene"), 0);
+    uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
 
     ui_scene(ent_obj, scene);
 
     //==========================================================================
     // Geometries
     //==========================================================================
-    uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, CT_ID64_0("geom_count"), 0);
+    uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
 
-    char buffer[512] = {0};
     for (uint32_t i = 0; i < geom_count; ++i) {
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "mesh%d", i);
-        uint64_t mesh_key = CT_ID64_0(buffer);
-        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, mesh_key, 0);
-
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "node%d", i);
-        uint64_t node_key = CT_ID64_0(buffer);
-        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, node_key, 0);
-
-
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "material%d", i);
-        uint64_t material_key = CT_ID64_0(buffer);
-        ct_cdb_obj_t* material = ct_cdb_a0.read_ref(ent_obj, material_key, 0);
+        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, PROP_MESH_ID+i, 0);
+        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, PROP_NODE+i, 0);
+        ct_cdb_obj_t *material = ct_cdb_a0.read_ref(ent_obj, PROP_MATERIAL+i, NULL);
 
         char id[32] = {0};
         sprintf(id, "element %d", i);
@@ -244,8 +222,11 @@ static void on_component(struct ct_world world,
             sprintf(labelid, "mp_select_material_%d", i);
 
             char material_buffer[128] = {'\0'};
-            strcpy(material_buffer, ct_cdb_a0.read_str(material, CT_ID64_0("asset_name"), ""));
-            ui_select_asset(ent_obj, labelid, CT_ID64_0("material"), material_key);
+            strcpy(material_buffer,
+                   ct_cdb_a0.read_str(material, CT_ID64_0("asset_name"), ""));
+
+            ui_select_asset(ent_obj, labelid,
+                            CT_ID64_0("material"), PROP_MATERIAL_ID+i);
 
             ct_debugui_a0.SameLine(0.0f, -1.0f);
             sprintf(labelid, "material##mp_material_%d", i);
@@ -315,7 +296,7 @@ static void on_component(struct ct_world world,
                 for (int j = 0; j < items_count; ++j) {
                     items2[j] = &items[j * 128];
 
-                    if (CT_ID64_0(items2[j]) ==  node) {
+                    if (CT_ID64_0(items2[j]) == node) {
                         item2 = j;
                         break;
                     }
@@ -403,19 +384,13 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_asset_property_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_texture_a0);
             CETECH_GET_API(api, ct_entity_property_a0);
-            CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
-            CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_scene_a0);

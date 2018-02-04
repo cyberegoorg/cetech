@@ -50,7 +50,7 @@ static int compile(uint64_t type,
                    const char *filename,
                    uint64_t *component_key,
                    uint32_t component_key_count,
-                   char **data) {
+                   struct ct_cdb_writer_t *writer) {
 
     uint64_t idx = ct_hash_lookup(&_G.compiler_map, type, UINT64_MAX);
     if (idx == UINT64_MAX) {
@@ -58,7 +58,7 @@ static int compile(uint64_t type,
     }
 
     ct_component_compiler_t compiler = _G.compilers[idx];
-    return compiler(filename, component_key, component_key_count, data);
+    return compiler(filename, component_key, component_key_count, writer);
 }
 
 static uint32_t get_spawn_order(uint64_t type) {
@@ -80,42 +80,11 @@ static void register_type(uint64_t type,
     ct_world_a0.register_callback(wclb);
 }
 
-static void spawn(ct_world world,
-                  uint64_t type,
-                  ct_entity *ent_ids,
-                  uint32_t *cent,
-                  uint32_t *ents_parent,
-                  uint32_t ent_count,
-                  void *data) {
-
-    uint64_t idx = ct_hash_lookup(&_G.compiler_map, type, UINT64_MAX);
-    if (idx == UINT64_MAX) {
-        return;
-    }
-
-    ct_component_clb clb = _G.components[idx];
-
-    if (!clb.spawner) {
-        return;
-    }
-    clb.spawner(world, ent_ids, cent, ents_parent, ent_count, data);
-}
-
-static void destroy(ct_world world,
-                    ct_entity *ent,
-                    uint32_t count) {
-    for (int i = 0; i < ct_array_size(_G.components); ++i) {
-        _G.components[i].destroyer(world, ent, count);
-    }
-}
-
 static ct_component_a0 component_api = {
         .register_compiler = register_compiler,
         .compile = compile,
         .spawn_order = get_spawn_order,
         .register_type = register_type,
-        .spawn = spawn,
-        .destroy = destroy,
 };
 
 static void _init_api(ct_api_a0 *a0) {

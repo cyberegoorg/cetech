@@ -11,6 +11,16 @@ extern "C" {
 
 #include <stdint.h>
 
+
+#define PROP_SCENE CT_ID64_0("scene")
+#define PROP_GEOM_COUNT CT_ID64_0("geom_count")
+
+#define PROP_MESH_ID (CT_ID64_0("mesh_id") << 32)
+#define PROP_NODE_ID (CT_ID64_0("node_id") << 32)
+#define PROP_NODE (CT_ID64_0("node_id") << 32)
+#define PROP_MATERIAL_ID (CT_ID64_0("material_id")<< 32)
+#define PROP_MATERIAL (CT_ID64_0("material")<< 32)
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -18,15 +28,6 @@ extern "C" {
 struct ct_world;
 struct ct_entity;
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-//! Mesh typedef
-struct ct_mesh_renderer {
-    struct ct_world world;
-    uint32_t idx;
-};
 
 //==============================================================================
 // Api
@@ -34,68 +35,13 @@ struct ct_mesh_renderer {
 
 //! Mesh API V0
 struct ct_mesh_renderer_a0 {
-
-    //! Is mesh valid
-    //! \param mesh Mesh
-    //! \return 1 if is valid else 0
-    int (*is_valid)(struct ct_mesh_renderer mesh);
-
-    //! Has entity mesh renderer?
-    //! \param world World
-    //! \param entity Entity
-    //! \return 1 if entity has mesh rendere else 0
-    int (*has)(struct ct_world world,
-               struct ct_entity entity);
-
-    //! Get mesh render for entity
-    //! \param world World
-    //! \param entity Entity
-    //! \return Mesh renderer
-    struct ct_mesh_renderer (*get)(struct ct_world world,
-                                   struct ct_entity entity);
-
-    //! Create new mesh render
-    //! \param world World
-    //! \param entity Entity
-    //! \param scene Scene
-    //! \param mesh Mesh
-    //! \param node Node
-    //! \param material Material
-    //! \return Mesh renderer
-    struct ct_mesh_renderer (*create)(struct ct_world world,
-                                      struct ct_entity entity,
-                                      uint64_t scene,
-                                      uint64_t *mesh,
-                                      uint64_t *node,
-                                      uint64_t *material,
-                                      uint32_t geom_count);
-
-    //! Get mesh renderer material
-    //! \param world World
-    //! \param mesh Mesh
-    //! \return Material
-    struct ct_cdb_obj_t* (*get_material)(struct ct_mesh_renderer mesh,
-                                       uint32_t idx);
-
-    void (*set_scene)(struct ct_mesh_renderer mesh,
-                      uint64_t scene);
-
     //! Set material
     //! \param world World
     //! \param mesh Mesh
     //! \param material Material
-    void (*set_material)(struct ct_mesh_renderer mesh,
+    void (*set_material)(struct ct_entity mesh,
                          uint32_t idx,
                          uint64_t material);
-
-    void (*set_geometry)(struct ct_mesh_renderer mesh,
-                         uint32_t idx,
-                         uint64_t geometry);
-
-    void (*set_node)(struct ct_mesh_renderer mesh,
-                     uint32_t idx,
-                     uint64_t node);
-
 
     //! Render all mesh in world
     //! \param world Word

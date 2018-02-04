@@ -1,12 +1,11 @@
 name: body
 components:
-  2342343313252:
-    component_type: transform
+  transform:
     position: [0.000000, -13.000001, 0.000000]
     rotation: [90.000000, 180.000000, 0.000000]
     scale: [1.000000, 1.000000, 1.000000]
-  412321322234:
-    component_type: mesh_renderer
+
+  mesh_renderer:
     scene: content/scene/m4a1/m4a1
 
     geometries:

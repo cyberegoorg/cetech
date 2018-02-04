@@ -176,7 +176,7 @@ static void fullscreen_pass(viewport_instance *viewport,
                             uint8_t viewid,
                             uint8_t layerid,
                             ct_world world,
-                            ct_camera camera) {
+                            ct_entity camera) {
 
     CT_UNUSED(world);
     CT_UNUSED(camera);

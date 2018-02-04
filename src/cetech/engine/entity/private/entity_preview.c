@@ -35,11 +35,6 @@ static void load(const char *filename,
                  struct ct_world world) {
     struct ct_entity ent = ct_entity_a0.spawn(world, name);
     _G.ent = ent;
-
-    if (ct_transform_a0.has(world, ent)) {
-        struct ct_transform t = ct_transform_a0.get(world, ent);
-        ct_transform_a0.set_position(t, (float[3]) {0.0f});
-    }
 }
 
 static void unload(const char *filename,

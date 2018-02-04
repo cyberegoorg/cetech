@@ -40,7 +40,6 @@ CETECH_DECL_API(ct_texture_a0);
 static struct G {
     ct_viewport viewport;
     ct_world world;
-    ct_camera camera;
     ct_entity camera_ent;
     float dt;
 } _G;

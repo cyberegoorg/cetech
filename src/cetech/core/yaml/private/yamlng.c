@@ -1042,18 +1042,14 @@ void create_tree_vec3(ct_yng_doc_instance_t *_inst,
     uint64_t key = combine_key_str(keys, keys_count);
 
     uint32_t new_seq_idx = new_node(
-            d,
-            NODE_SEQ, (struct node_value) {.node_count=3},
-            node.idx, key);
+            d, NODE_SEQ, (struct node_value) {.node_count=3}, node.idx, key);
 
     struct yamlng_document_inst *inst = (struct yamlng_document_inst *) (_inst);
 
     ct_hash_add(&inst->key_map, key, new_seq_idx, _G.allocator);
 
     for (int i = 0; i < 3; ++i) {
-        new_node(
-                d,
-                NODE_FLOAT, (struct node_value) {.f = value[2 - i]},
+        new_node(d, NODE_FLOAT, (struct node_value) {.f = value[2 - i]},
                 new_seq_idx, i);
     }
 

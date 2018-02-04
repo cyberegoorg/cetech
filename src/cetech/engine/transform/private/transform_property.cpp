@@ -49,18 +49,20 @@ CETECH_DECL_API(ct_entity_property_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 struct ct_ent_cmd_s {
-    // ENT
-    ct_world world;
-    ct_entity entity;
-
-    // ENT YAML
+    // YAML
     const char *filename;
     uint64_t keys[32];
     uint32_t keys_count;
+
+    // CDB
+    ct_cdb_obj_t* obj;
+    uint64_t prop;
 };
 
 struct ct_ent_cmd_vec3_s {
@@ -81,7 +83,7 @@ struct ct_ent_cmd_str_s {
     char old_value[128];
 };
 
-static void set_pos_cmd(const struct ct_cmd *cmd,
+static void set_vec3_cmd(const struct ct_cmd *cmd,
                         bool inverse) {
     const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
 
@@ -90,59 +92,18 @@ static void set_pos_cmd(const struct ct_cmd *cmd,
     ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys,
                        pos_cmd->ent.keys_count, (float *) value);
 
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
-                                         pos_cmd->ent.entity);
-    ct_transform_a0.set_position(t, (float *) value);
-}
-
-static void set_scale_cmd(const struct ct_cmd *cmd,
-                          bool inverse) {
-    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
-
-    const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
-
-    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys,
-                       pos_cmd->ent.keys_count, (float *) value);
-
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
-                                         pos_cmd->ent.entity);
-    ct_transform_a0.set_scale(t, (float *) value);
-}
-
-
-static void set_rotation_cmd(const struct ct_cmd *cmd,
-                             bool inverse) {
-    const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;
-
-    const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
-
-    ct_ydb_a0.set_vec3(pos_cmd->ent.filename,
-                       pos_cmd->ent.keys,
-                       pos_cmd->ent.keys_count,
-                       (float *) value);
-
-    float rad_rot[3];
-    float norm_rot[3];
-    float q[4];
-    ct_vec3_mul_s(rad_rot, value, CT_DEG_TO_RAD);
-    ct_quat_from_euler(q, rad_rot[0], rad_rot[1], rad_rot[2]);
-    ct_quat_norm(norm_rot, q);
-
-    ct_transform t = ct_transform_a0.get(pos_cmd->ent.world,
-                                         pos_cmd->ent.entity);
-    ct_transform_a0.set_rotation(t, norm_rot);
+    ct_cdb_writer_t* w = ct_cdb_a0.write_begin(pos_cmd->ent.obj);
+    ct_cdb_a0.set_vec3(w, pos_cmd->ent.prop, value);
+    ct_cdb_a0.write_commit(w);
 }
 
 static void cmd_description(char *buffer,
                             uint32_t buffer_size,
                             const struct ct_cmd *cmd,
                             bool inverse) {
-    static const uint64_t set_position = CT_ID64_0(
-            "transform_set_position");
-    static const uint64_t set_rotation = CT_ID64_0(
-            "transform_set_rotation");
-    static const uint64_t set_scale = CT_ID64_0(
-            "transform_set_scale");
+    static const uint64_t set_position = CT_ID64_0("transform_set_position");
+    static const uint64_t set_rotation = CT_ID64_0("transform_set_rotation");
+    static const uint64_t set_scale = CT_ID64_0("transform_set_scale");
 
     if (cmd->type == set_position) {
         struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
@@ -178,43 +139,39 @@ static void on_component(struct ct_world world,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
-    if (!ct_transform_a0.has(world, entity)) {
-        return;
-    }
-    ct_transform t = ct_transform_a0.get(world, entity);
-
     if (!ct_debugui_a0.CollapsingHeader("Transformation",
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
+
+    uint64_t tmp_keys[keys_count + 1];
+    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
+
+    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(entity);
 
     //==========================================================================
     // Position
     //==========================================================================
     float pos[3];
     float pos_new[3];
-    uint64_t tmp_keys[keys_count + 1];
-    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("position");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1,
-                       pos_new, (float[3]) {0.0f});
-
+    ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos_new);
     ct_vec3_move(pos, pos_new);
-
-    if (ct_debugui_a0.DragFloat3("position", pos_new, 1.0f, -FLT_MAX, FLT_MAX,
+    if (ct_debugui_a0.DragFloat3("position", pos_new, 1.0f,
+                                 -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
+        tmp_keys[keys_count] = ct_yng_a0.calc_key("position");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = CT_ID64_0("transform_set_position"),
                 },
                 .ent = {
-                        .world = world,
-                        .entity = entity,
                         .filename = filename,
                         .keys_count = keys_count + 1,
+                        .prop = PROP_POSITION,
+                        .obj = obj,
                 },
                 .new_value = {pos_new[0], pos_new[1], pos_new[2]},
                 .old_value = {pos[0], pos[1], pos[2]},
@@ -227,35 +184,29 @@ static void on_component(struct ct_world world,
     //==========================================================================
     // Rotation
     //==========================================================================
-    float rot[4];
-    float norm_rot[4];
-    float tmp_rot[3];
+    float rot[3];
+    float rot_new[3];
 
-    ct_transform_a0.get_rotation(t, rot);
-    ct_quat_norm(norm_rot, rot);
-    ct_quat_to_euler(rot, norm_rot);
-    ct_vec3_mul_s(tmp_rot, rot, CT_RAD_TO_DEG);
 
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, tmp_rot,
-                       (float[3]) {0.0f});
+    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
 
-    ct_vec3_move(rot, tmp_rot);
-    if (ct_debugui_a0.DragFloat3("rotation", tmp_rot, 1.0f, 0, 360, "%.5f",
+    ct_vec3_move(rot_new, rot);
+    if (ct_debugui_a0.DragFloat3("rotation", rot_new, 1.0f, 0, 360, "%.5f",
                                  1.0f)) {
 
+        tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
-                        .type = CT_ID64_0("transform_set_rotation"),
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
+                        .type = CT_ID64_0("transform_set_rotation"),
                 },
                 .ent = {
-                        .world = world,
-                        .entity = entity,
                         .filename = filename,
                         .keys_count = keys_count + 1,
+                        .prop = PROP_ROTATION,
+                        .obj = obj,
                 },
-                .new_value = {tmp_rot[0], tmp_rot[1], tmp_rot[2]},
+                .new_value = {rot_new[0], rot_new[1], rot_new[2]},
                 .old_value = {rot[0], rot[1], rot[2]},
         };
         memcpy(cmd.ent.keys, tmp_keys, sizeof(uint64_t) * cmd.ent.keys_count);
@@ -266,28 +217,27 @@ static void on_component(struct ct_world world,
     // Scale
     //==========================================================================
     float scale[3];
-    float scale_new[3];
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("scale");
-    ct_ydb_a0.get_vec3(filename, tmp_keys, keys_count + 1, scale_new,
-                       (float[3]) {1.0f});
+    float scale_name[3];
 
-    ct_vec3_move(scale, scale_new);
-    if (ct_debugui_a0.DragFloat3("scale", scale_new, 1.0f,
+    ct_cdb_a0.read_vec3(obj, PROP_SCALE, scale);
+    ct_vec3_move(scale_name, scale);
+    if (ct_debugui_a0.DragFloat3("scale", scale_name, 1.0f,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
+        tmp_keys[keys_count] = ct_yng_a0.calc_key("scale");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = CT_ID64_0("transform_set_scale"),
                 },
                 .ent = {
-                        .world = world,
-                        .entity = entity,
                         .filename = filename,
                         .keys_count = keys_count + 1,
+                        .prop = PROP_SCALE,
+                        .obj = obj,
                 },
-                .new_value = {scale_new[0], scale_new[1], scale_new[2]},
+                .new_value = {scale_name[0], scale_name[1], scale_name[2]},
                 .old_value = {scale[0], scale[1], scale[2]},
         };
         memcpy(cmd.ent.keys, tmp_keys, sizeof(uint64_t) * cmd.ent.keys_count);
@@ -307,19 +257,19 @@ static int _init(ct_api_a0 *api) {
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_position"),
             (ct_cmd_fce) {
-                    .execute = set_pos_cmd,
+                    .execute = set_vec3_cmd,
                     .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_scale"),
             (ct_cmd_fce) {
-                    .execute = set_scale_cmd,
+                    .execute = set_vec3_cmd,
                     .description = cmd_description});
 
     ct_cmd_system_a0.register_cmd_execute(
             CT_ID64_0("transform_set_rotation"),
             (ct_cmd_fce) {
-                    .execute = set_rotation_cmd,
+                    .execute = set_vec3_cmd,
                     .description = cmd_description});
 
     return 1;
@@ -350,6 +300,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
+            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

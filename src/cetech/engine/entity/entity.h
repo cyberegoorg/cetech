@@ -15,10 +15,12 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
+#include <cetech/core/cdb/cdb.h>
 
 struct ct_entity_compile_output;
 struct ct_compilator_api;
 struct ct_blob;
+struct ct_cdb_obj_t;
 
 //==============================================================================
 // Enums
@@ -41,7 +43,7 @@ struct ct_world {
 typedef int (*ct_component_compiler_t)(const char *filename,
                                        uint64_t *component_key,
                                        uint32_t component_key_count,
-                                       char **data);
+                                       struct ct_cdb_writer_t *writer);
 
 //==============================================================================
 // Structs
@@ -52,6 +54,9 @@ struct ct_entity {
     uint64_t h;
 };
 
+struct ct_component_id {
+    uint64_t id;
+};
 
 //! World callbacks
 typedef struct {
@@ -73,36 +78,30 @@ typedef struct {
 
 //! Component callbacks
 static struct ct_component_clb {
-    //! Component destoryer
-    //! \param world World where is component
-    //! \param ents Destroy component for this entity
-    //! \param ent_count Entity count
-    void (*destroyer)(struct ct_world world,
-                      struct ct_entity *ents,
-                      uint32_t ent_count);
-
-    //! Component spawner
-    //! \param world World where component live
-    //! \param ents Create component for this entities
-    //! \param cent Entity map
-    //! \param ents_parent Parent map
-    //! \param ent_count Entity count
-    //! \param data Component data
-    void (*spawner)(struct ct_world world,
-                    struct ct_entity *ents,
-                    uint32_t *cent,
-                    uint32_t *ents_parent,
-                    uint32_t ent_count,
-                    void *data);
-
     ct_world_callbacks_t world_clb;
 } ct_component_clb_null = {};
 
 struct ct_cdb_obj_t;
 
+typedef void (*ct_simulate_fce_t)(struct ct_entity *ent,
+                                  struct ct_cdb_obj_t **obj,
+                                  uint32_t n,
+                                  float dt);
+
+struct ct_comp_watch {
+    void (*on_add)(struct ct_world world,
+                   struct ct_entity ent,
+                   uint64_t comp_mask);
+
+    void (*on_remove)(struct ct_world world,
+                      struct ct_entity ent,
+                      uint64_t comp_mask);
+};
+
 //==============================================================================
 // Api
 //==============================================================================
+
 
 //! Entity system API V0
 struct ct_entity_a0 {
@@ -110,7 +109,7 @@ struct ct_entity_a0 {
     //! \return New entity
     struct ct_entity (*create)();
 
-    struct ct_cdb_obj_t* (*ent_obj)(struct ct_entity entity);
+    struct ct_cdb_obj_t *(*ent_obj)(struct ct_entity entity);
 
     //! Destroy entities
     //! \param world World
@@ -125,11 +124,6 @@ struct ct_entity_a0 {
     //! \return 1 if entity is alive else 0
     int (*alive)(struct ct_entity entity);
 
-
-    void (*compiler)(const char *filename,
-                     char **output,
-                     struct ct_compilator_api *compilator_api);
-
     //! Spawn entity
     //! \param world World
     //! \param name Resource name
@@ -143,46 +137,29 @@ struct ct_entity_a0 {
     struct ct_entity (*find_by_guid)(struct ct_entity root,
                                      uint64_t guid);
 
-    //! Create compiler output structure
-    //! \return New compiler output structure
-    struct ct_entity_compile_output *(*compiler_create_output)();
+    // NEW
+    struct ct_component_id (*register_component)(uint64_t component_name);
 
-    //! Destroy compiler output structure
-    //! \param output Compiler output
-    void (*compiler_destroy_output)(struct ct_entity_compile_output *output);
+    uint64_t (*component_mask)(uint64_t component_name);
 
-    //! Compile entity
-    //! \param output Compile output
-    //! \param root Yaml root node
-    //! \param filename Resource filename
-    //! \param compilator_api Compilator api
-    void (*compiler_compile_entity)(struct ct_entity_compile_output *output,
-                                    uint64_t *root,
-                                    uint32_t root_count,
-                                    const char *filename,
-                                    struct ct_compilator_api *compilator_api);
+    bool (*has)(struct ct_entity ent,
+                uint64_t *component_name,
+                uint32_t name_count);
 
-    //! Get entity counter from output
-    //! \param output Compiler output
-    //! \return Entity counter
-    uint32_t (*compiler_ent_counter)(struct ct_entity_compile_output *output);
+    void (*add_components)(struct ct_world world,
+                           struct ct_entity ent,
+                           uint64_t *component_name,
+                           uint32_t name_count);
 
-    //! Write output to build
-    //! \param output Output
-    //! \param build Build
-    void (*compiler_write_to_build)(struct ct_entity_compile_output *output,
-                                    const char *filename,
-                                    char **build);
+    void (*remove_component)(struct ct_entity ent,
+                             uint64_t component_name);
 
-    //! Resource compile
-    //! \param root Root yaml node
-    //! \param filename Filename
-    //! \param build Build
-    //! \param compilator_api Compilator api
-    void (*resource_compiler)(uint64_t root,
-                              const char *filename,
-                              char **build,
-                              struct ct_compilator_api *compilator_api);
+    void (*add_simulation)(uint64_t components_mask,
+                           ct_simulate_fce_t simulation);
+
+    void (*add_components_watch)(struct ct_comp_watch watch);
+
+    void (*simulate)(float dt);
 };
 
 
@@ -206,7 +183,7 @@ struct ct_component_a0 {
                    const char *filename,
                    uint64_t *component_key,
                    uint32_t component_key_count,
-                   char **data);
+                   struct ct_cdb_writer_t *writer);
 
     //! Get component spawn order
     //! \param type Component type
@@ -219,34 +196,10 @@ struct ct_component_a0 {
     void (*register_type)(uint64_t type,
                           struct ct_component_clb clb);
 
-    //! Spawn components
-    //! \param world World where component live
-    //! \param type Component type
-    //! \param ents Create component for this entities
-    //! \param cent Entity map
-    //! \param ents_parent Parent map
-    //! \param ent_count Entity count
-    //! \param data Component data
-    void (*spawn)(struct ct_world world,
-                  uint64_t type,
-                  struct ct_entity *ent_ids,
-                  uint32_t *cent,
-                  uint32_t *ents_parent,
-                  uint32_t ent_count,
-                  void *data);
-
-    //! Destroy components
-    //! \param world World where component live
-    //! \param ent Destroy component for this entities
-    //! \param count Entities count
-    void (*destroy)(struct ct_world world,
-                    struct ct_entity *ent,
-                    uint32_t count);
 };
 
 //! World API V0
 struct ct_world_a0 {
-
     //! Register world calbacks
     //! \param clb Callbacks
     void (*register_callback)(ct_world_callbacks_t clb);

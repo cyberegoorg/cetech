@@ -45,7 +45,6 @@ static struct PlaygroundGlobal {
 
     ct_viewport viewport;
     ct_world world;
-    ct_camera camera;
 
     bool load_layout;
 

@@ -1,5 +1,5 @@
-#ifndef CETECH_COREDB_H
-#define CETECH_COREDB_H
+#ifndef CETECH_CDB_H
+#define CETECH_CDB_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21,9 +21,12 @@ extern "C" {
 //==============================================================================
 // Typedefs
 //==============================================================================
+struct ct_alloc;
+
 struct ct_cdb_obj_t {
     void *_;
 };
+
 struct ct_cdb_writer_t {
     void *_;
 };
@@ -32,32 +35,42 @@ struct ct_cdb_writer_t {
 // Enums
 //==============================================================================
 enum ct_cdb_prop_type {
-    COREDB_TYPE_NONE = 0,
-    COREDB_TYPE_UINT32,
-    COREDB_TYPE_PTR,
-    COREDB_TYPE_REF,
-    COREDB_TYPE_FLOAT,
-    COREDB_TYPE_STRPTR,
-    COREDB_TYPE_VEC3,
-    COREDB_TYPE_VEC4,
+    CDB_TYPE_NONE = 0,
+    CDB_TYPE_UINT32,
+    CDB_TYPE_UINT64,
+    CDB_TYPE_PTR,
+    CDB_TYPE_REF,
+    CDB_TYPE_FLOAT,
+    CDB_TYPE_STRPTR,
+    CDB_TYPE_VEC3,
+    CDB_TYPE_VEC4,
 };
 
 //==============================================================================
 // Interface
 //==============================================================================
 
+typedef void (*ct_cdb_chg_notify)(struct ct_cdb_obj_t* obj, uint64_t *prop, uint32_t prop_count);
+
 struct ct_cdb_a0 {
     struct ct_cdb_obj_t *(*create_object)();
+
+    void (*dump)(struct ct_cdb_obj_t *obj, char** output, struct ct_alloc* allocator);
+
+    void (*load)(struct ct_cdb_obj_t *_obj, const char* input, struct ct_alloc* allocator);
+
+    void (*register_notify)(struct ct_cdb_obj_t* obj, ct_cdb_chg_notify clb);
 
     bool (*prop_exist)(struct ct_cdb_obj_t *object,
                        uint64_t key);
 
     enum ct_cdb_prop_type (*prop_type)(struct ct_cdb_obj_t *object,
-                                          uint64_t key);
+                                       uint64_t key);
 
     uint64_t *(*prop_keys)(struct ct_cdb_obj_t *object);
 
     uint64_t (*prop_count)(struct ct_cdb_obj_t *object);
+
 
     // WRITE
     struct ct_cdb_writer_t *
@@ -138,4 +151,4 @@ struct ct_cdb_a0 {
 }
 #endif
 
-#endif //CETECH_COREDB_H
+#endif //CETECH_CDB_H

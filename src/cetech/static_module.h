@@ -16,11 +16,12 @@ void init_static_modules() {
     //==========================================================================
     // Engine
     //==========================================================================
-    CETECH_ADD_STATIC_MODULE(application);
-
     CETECH_ADD_STATIC_MODULE(world);
     CETECH_ADD_STATIC_MODULE(component);
     CETECH_ADD_STATIC_MODULE(entity);
+
+    CETECH_ADD_STATIC_MODULE(application);
+
     CETECH_ADD_STATIC_MODULE(keyboard);
     CETECH_ADD_STATIC_MODULE(gamepad);
     CETECH_ADD_STATIC_MODULE(mouse);
@@ -60,9 +61,11 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(asset_preview);
     CETECH_ADD_STATIC_MODULE(texture_property);
     CETECH_ADD_STATIC_MODULE(level_inspector);
+
     CETECH_ADD_STATIC_MODULE(entity_property);
-    CETECH_ADD_STATIC_MODULE(mesh_property);
     CETECH_ADD_STATIC_MODULE(transform_property);
+    CETECH_ADD_STATIC_MODULE(mesh_property);
+
     CETECH_ADD_STATIC_MODULE(level_view);
     CETECH_ADD_STATIC_MODULE(log_view);
     CETECH_ADD_STATIC_MODULE(entity_preview);

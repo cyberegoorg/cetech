@@ -28,12 +28,11 @@
 
 // TODO: shit , app == module?
 #include <cetech/engine/machine/machine.h>
-#include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/renderer.h>
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
-#include <cetech/core/containers/buffer.h>
+#include <cetech/engine/entity/entity.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -46,7 +45,6 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_watchdog_a0);
-CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_fs_a0);
@@ -54,6 +52,7 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_entity_a0);
 
 //==============================================================================
 // Definess
@@ -186,6 +185,13 @@ static void check_machine() {
     }
 }
 
+void simplesimu(struct ct_entity *ent,
+                struct ct_cdb_obj_t **obj,
+                uint32_t n,
+                float dt) {
+
+}
+
 extern "C" void application_start() {
     _init_config();
 
@@ -214,6 +220,10 @@ extern "C" void application_start() {
 
     uint64_t fq = ct_time_a0.perf_freq();
 
+//    ct_entity_a0.add_simulation(
+//            ct_entity_a0.component_mask(CT_ID64_0("transformation")),
+//            simplesimu);
+
     _G.is_running = 1;
     while (_G.is_running) {
         uint64_t now_ticks = ct_time_a0.perf_counter();
@@ -238,11 +248,11 @@ extern "C" void application_start() {
             _G.active_game.on_update(dt);
         }
 
-        CETECH_GET_API(&ct_api_a0, ct_mouse_a0); // TODO: WTF
+        ct_entity_a0.simulate(dt);
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
-            ct_renderer_a0.render(
-                    _G.active_game.on_render ? _G.active_game.on_render : NULL);
+            ct_renderer_a0.render(_G.active_game.on_render ?
+                                  _G.active_game.on_render : NULL);
         }
 //
 //        sleep(0);
@@ -261,10 +271,10 @@ extern "C" void application_start() {
 
 #define _DEF_ON_CLB_FCE(type, name)                                            \
     static void register_ ## name ## _(type name) {                            \
-        ct_array_push(_G.name, name, _G.allocator);                           \
+        ct_array_push(_G.name, name, _G.allocator);                            \
     }                                                                          \
     static void unregister_## name ## _(type name) {                           \
-        const auto size = ct_array_size(_G.name);                             \
+        const auto size = ct_array_size(_G.name);                              \
                                                                                \
         for(uint32_t i = 0; i < size; ++i) {                                   \
             if(_G.name[i] != name) {                                           \
@@ -274,7 +284,7 @@ extern "C" void application_start() {
             uint32_t last_idx = size - 1;                                      \
             _G.name[i] = _G.name[last_idx];                                    \
                                                                                \
-            ct_array_pop_back(_G.name);                                       \
+            ct_array_pop_back(_G.name);                                        \
             break;                                                             \
         }                                                                      \
     }
@@ -324,7 +334,7 @@ void app_init(struct ct_api_a0 *api) {
     _G.allocator = ct_memory_a0.main_allocator();
 
 #if defined(CETECH_DEVELOP)
-    ct_resource_a0.set_autoload(1);
+    ct_resource_a0.set_autoload(true);
 #else
     ct_resource_a0.set_autoload(0);
 #endif
@@ -352,6 +362,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_entity_a0);
 
             ct_api_a0 = *api;
         },

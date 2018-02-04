@@ -36,7 +36,8 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
-CETECH_DECL_API(ct_material_a0);
+CETECH_DECL_API(ct_cdb_a0);
+
 
 static void load(const char *filename,
                  uint64_t type,
@@ -45,13 +46,9 @@ static void load(const char *filename,
     ct_entity ent = ct_entity_a0.spawn(world, CT_ID64_0("core/cube"));
     _G.ent = ent;
 
-    ct_mesh_renderer mesh = ct_mesh_renderer_a0.get(world, ent);
-    ct_mesh_renderer_a0.set_material(mesh, 0, name);
-
-    if (ct_transform_a0.has(world, ent)) {
-        ct_transform t = ct_transform_a0.get(world, ent);
-        ct_transform_a0.set_position(t, (float[3]) {0.0f});
-    }
+    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_entity_a0.ent_obj(ent));
+    ct_cdb_a0.set_uint64(w, PROP_MATERIAL_ID, name);
+    ct_cdb_a0.write_commit(w);
 }
 
 static void unload(const char *filename,
@@ -95,7 +92,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_preview_a0);
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
-            CETECH_GET_API(api, ct_material_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
 
         },
         {

@@ -535,7 +535,6 @@ void save(const char *path) {
     ct_yng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
 
     ct_fs_a0.close(f);
-
     unmodified(path);
 }
 

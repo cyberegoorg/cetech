@@ -157,20 +157,20 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                         _G.config_object);
 
                 switch (t) {
-                    case COREDB_TYPE_NONE:
+                    case CDB_TYPE_NONE:
                         break;
 
-                    case COREDB_TYPE_FLOAT:
+                    case CDB_TYPE_FLOAT:
                         tmp_f = d->as_float(d->inst, value, 0.0f);
                         ct_cdb_a0.set_float(writer, key, tmp_f);
                         break;
 
-                    case COREDB_TYPE_UINT32:
+                    case CDB_TYPE_UINT32:
                         tmp_int = (int) d->as_float(d->inst, value, 0.0f);
                         ct_cdb_a0.set_uint32(writer, key, tmp_int);
                         break;
 
-                    case COREDB_TYPE_STRPTR:
+                    case CDB_TYPE_STRPTR:
                         str = d->as_string(d->inst, value, "");
                         ct_cdb_a0.set_string(writer, key, str);
                         break;

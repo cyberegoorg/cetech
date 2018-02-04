@@ -68,7 +68,8 @@ static void ui_color4(ct_cdb_obj_t *var) {
     float v[4] = {0.0f};
     ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
-    ct_debugui_a0.ColorWheel(str, v, 1.0f);
+    ct_debugui_a0.ColorEdit4(str, v, true);
+
     ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
     ct_cdb_a0.write_commit(wr);

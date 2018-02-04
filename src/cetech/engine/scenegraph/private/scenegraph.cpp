@@ -3,6 +3,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
+#include <cetech/core/hashlib/hashlib.h>
 #include "cetech/core/config/config.h"
 #include "cetech/engine/resource/resource.h"
 #include "cetech/core/memory/memory.h"
@@ -16,6 +17,9 @@
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 static uint64_t hash_combine(uint32_t a,
                              uint32_t b) {
@@ -56,11 +60,13 @@ struct WorldInstance {
 };
 
 
-static struct SceneGraphGlobal {
+#define _G ScenegraphGlobals
+static struct _G {
     ct_hash_t world_map;
     WorldInstance *world_instances;
     ct_hash_t ent_map;
 
+    uint64_t type;
     ct_alloc *allocator;
 } _G;
 
@@ -145,14 +151,6 @@ static WorldInstance *_get_world_instance(ct_world world) {
     return nullptr;
 }
 
-
-static void _on_world_create(ct_world world) {
-    _new_world(world);
-}
-
-static void _on_world_destroy(ct_world world) {
-    _destroy_world(world);
-}
 
 static int is_valid(ct_scene_node node) {
     return node.idx != UINT32_MAX;
@@ -298,12 +296,10 @@ static int has(ct_world world,
 
 static ct_scene_node get_root(ct_world world,
                               ct_entity entity) {
-
-    uint64_t idx = hash_combine(world.h, entity.h);
-
-    uint32_t component_idx = ct_hash_lookup(&_G.ent_map, idx, UINT32_MAX);
-
-    return (ct_scene_node) {.idx = component_idx, .world = world};
+    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    uint32_t idx = ct_cdb_a0.read_uint32(ent_obj,
+                                         CT_ID64_0("scenegraph.idx"), UINT32_MAX);
+    return (ct_scene_node) {.idx = idx, .world = world};
 }
 
 static ct_scene_node create(ct_world world,
@@ -314,6 +310,8 @@ static ct_scene_node create(ct_world world,
                             uint32_t count) {
     CT_UNUSED(pose);
 
+    ct_entity_a0.add_components(world, entity, &_G.type, 1);
+
     WorldInstance *data = _get_world_instance(world);
 
     uint32_t first_idx = data->n;
@@ -321,8 +319,8 @@ static ct_scene_node create(ct_world world,
     data->n += count;
 
     ct_scene_node *nodes = CT_ALLOC(ct_memory_a0.main_allocator(),
-                                        ct_scene_node,
-                                        sizeof(ct_scene_node) * count);
+                                    ct_scene_node,
+                                    sizeof(ct_scene_node) * count);
 
     for (uint32_t i = 0; i < count; ++i) {
         uint32_t idx = first_idx + i;
@@ -387,6 +385,11 @@ static ct_scene_node create(ct_world world,
     ct_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
     CT_FREE(ct_memory_a0.main_allocator(), nodes);
 
+    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_a0.set_uint32(ent_writer, CT_ID64_0("scenegraph.idx"), root.idx);
+    ct_cdb_a0.write_commit(ent_writer);
+
     return root;
 }
 
@@ -421,7 +424,11 @@ static ct_scene_node _node_by_name(WorldInstance *data,
         return root;
     }
 
-    ct_scene_node node_it = {.idx = data->first_child[root.idx], .world = root.world};
+    ct_scene_node node_it = {
+            .idx = data->first_child[root.idx],
+            .world = root.world
+    };
+
     while (is_valid(node_it)) {
         ct_scene_node ret = _node_by_name(data, node_it, name);
         if (ret.idx != UINT32_MAX) {
@@ -459,10 +466,6 @@ static ct_scenegprah_a0 scenegraph_api = {
         .node_by_name = node_by_name
 };
 
-static ct_world_callbacks_t world_callbacks = {
-        .on_created=_on_world_create,
-        .on_destroy=_on_world_destroy
-};
 
 static void _init_api(ct_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
@@ -474,9 +477,15 @@ static void init(ct_api_a0 *api) {
 
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
+            .type = CT_ID64_0("scenegraph"),
     };
 
-    ct_world_a0.register_callback(world_callbacks);
+
+    ct_entity_a0.register_component(_G.type);
+    ct_world_a0.register_callback((ct_world_callbacks_t) {
+            .on_created=_new_world,
+            .on_destroy=_destroy_world
+    });
 }
 
 static void shutdown() {
@@ -490,6 +499,9 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_memory_a0);
+            CETECH_GET_API(api,ct_entity_a0);
+            CETECH_GET_API(api,ct_cdb_a0);
+            CETECH_GET_API(api,ct_hashlib_a0);
         },
         {
             CT_UNUSED(reload);

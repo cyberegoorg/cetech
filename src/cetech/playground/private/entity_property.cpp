@@ -1,20 +1,21 @@
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/config/config.h>
+#include <cetech/core/memory/memory.h>
+#include <cetech/core/api/api_system.h>
+#include <cetech/core/yaml/ydb.h>
+#include <cetech/core/containers/array.h>
+#include <cetech/core/module/module.h>
 #include "cetech/core/containers/map.inl"
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/engine/level/level.h>
 #include <cetech/engine/entity/entity.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/module/module.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/core/yaml/ydb.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -31,6 +32,11 @@ CETECH_DECL_API(ct_entity_a0);
 
 using namespace celib;
 
+struct comp {
+    uint64_t name;
+    ct_ep_on_component clb;
+};
+
 #define _G entity_property_global
 static struct _G {
     uint64_t active_entity;
@@ -39,33 +45,11 @@ static struct _G {
     struct ct_entity top_entity;
     struct ct_world active_world;
 
-    //Array<ct_ep_on_component> on_component;
-    Map<ct_ep_on_component> on_component;
+    comp *components;
+
     const char *filename;
+    ct_alloc *allocator;
 } _G;
-
-//#define _DEF_ON_CLB_FCE(type, name)                                            \
-//    static void register_ ## name ## _(type name) {                            \
-//        core::array::push_back(_G.name, name);                                \
-//    }                                                                          \
-//    static void unregister_## name ## _(type name) {                           \
-//        const auto size = core::array::size(_G.name);                         \
-//                                                                               \
-//        for(uint32_t i = 0; i < size; ++i) {                                   \
-//            if(_G.name[i] != name) {                                           \
-//                continue;                                                      \
-//            }                                                                  \
-//                                                                               \
-//            uint32_t last_idx = size - 1;                                      \
-//            _G.name[i] = _G.name[last_idx];                                    \
-//                                                                               \
-//            core::array::pop_back(_G.name);                                   \
-//            break;                                                             \
-//        }                                                                      \
-//    }
-//
-//_DEF_ON_CLB_FCE(ct_ep_on_component, on_component);
-
 
 static void on_debugui() {
     if (!_G.filename) {
@@ -91,36 +75,13 @@ static void on_debugui() {
 
     uint64_t tmp_keys[_G.keys_count + 3];
     memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
-
     tmp_keys[_G.keys_count] = ct_yng_a0.calc_key("components");
 
-
-    uint64_t component_keys[32] = {};
-    uint32_t component_keys_count = 0;
-
-    ct_ydb_a0.get_map_keys(
-            _G.filename,
-            tmp_keys, _G.keys_count + 1,
-            component_keys, CETECH_ARRAY_LEN(component_keys),
-            &component_keys_count);
-
-    for (uint32_t i = 0; i < component_keys_count; ++i) {
-        tmp_keys[_G.keys_count + 1] = component_keys[i];
-        tmp_keys[_G.keys_count + 2] = ct_yng_a0.calc_key("component_type");
-
-        const char *component_type = ct_ydb_a0.get_string(_G.filename, tmp_keys,
-                                                          _G.keys_count + 3,
-                                                          "");
-        uint64_t component_type_hash = CT_ID64_0(component_type);
-
-
-        ct_ep_on_component on_component = map::get<ct_ep_on_component>(
-                _G.on_component,
-                component_type_hash, NULL);
-
-        if (on_component) {
-            on_component(_G.active_world, entity, _G.filename, tmp_keys,
-                         _G.keys_count + 2);
+    for (int j = 0; j < ct_array_size(_G.components); ++j) {
+        if (ct_entity_a0.has(entity, &_G.components[j].name, 1)) {
+            tmp_keys[_G.keys_count + 1] = _G.components[j].name;
+            _G.components[j].clb(_G.active_world, entity, _G.filename, tmp_keys,
+                                 _G.keys_count + 2);
         }
 
     }
@@ -146,11 +107,11 @@ void on_entity_click(struct ct_world world,
 
 void register_on_component_(uint64_t type,
                             ct_ep_on_component on_component) {
-    map::set(_G.on_component, type, on_component);
+    comp item = {.name= type, .clb = on_component};
+    ct_array_push(_G.components, item, _G.allocator);
 }
 
 void unregister_on_component_(uint64_t type) {
-    map::remove(_G.on_component, type);
 }
 
 
@@ -161,17 +122,15 @@ static ct_entity_property_a0 entity_property_a0 = {
 
 
 static void _init(ct_api_a0 *api) {
-    _G = {};
+    _G = {
+            .allocator = ct_memory_a0.main_allocator()
+    };
 
     api->register_api("ct_entity_property_a0", &entity_property_a0);
-
-    _G.on_component.init(ct_memory_a0.main_allocator());
-
     ct_explorer_a0.register_on_entity_click(on_entity_click);
 }
 
 static void _shutdown() {
-    _G.on_component.destroy();
 
     ct_explorer_a0.unregister_on_entity_click(on_entity_click);
 

@@ -24,7 +24,7 @@ struct ct_handler_t {
 #define _gen(h) ((h) & ((1 << (_GENBITCOUNT - 1))))
 #define _make_entity(idx, gen) (uint64_t)(((idx) << _INDEXBITCOUNT) | (gen))
 
-static uint64_t ct_handler_create(ct_handler_t *handler,
+static uint64_t ct_handler_create(struct ct_handler_t *handler,
                                   const struct ct_alloc *allocator) {
     uint64_t idx;
 
@@ -40,7 +40,7 @@ static uint64_t ct_handler_create(ct_handler_t *handler,
     return _make_entity(idx, handler->_generation[idx]);
 }
 
-static void ct_handler_destroy(ct_handler_t *handler,
+static void ct_handler_destroy(struct ct_handler_t *handler,
                                uint64_t handlerid,
                                const struct ct_alloc *allocator) {
     uint64_t id = _idx(handlerid);
@@ -49,12 +49,12 @@ static void ct_handler_destroy(ct_handler_t *handler,
     ct_array_push(handler->_freeIdx, id, allocator);
 }
 
-static bool ct_handler_alive(ct_handler_t *handler,
+static bool ct_handler_alive(struct ct_handler_t *handler,
                              uint64_t handlerid) {
     return handler->_generation[_idx(handlerid)] == _gen(handlerid);
 }
 
-static void ct_handler_free(ct_handler_t *handler,
+static void ct_handler_free(struct ct_handler_t *handler,
                             const struct ct_alloc *allocator) {
     ct_array_free(handler->_freeIdx, allocator);
     ct_array_free(handler->_generation, allocator);

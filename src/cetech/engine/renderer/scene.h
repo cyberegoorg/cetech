@@ -22,7 +22,6 @@ struct ct_entity;
 // Api
 //==============================================================================
 
-//! Texture API V0
 struct ct_scene_a0 {
     void (*setVBIB)(uint64_t scene,
                     uint64_t geom_name);

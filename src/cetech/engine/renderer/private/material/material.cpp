@@ -108,8 +108,7 @@ static void online(uint64_t name,
 
         ct_cdb_a0.set_ref(layer_writer,
                           MATERIAL_SHADER_PROP,
-                          ct_resource_a0.get_obj(CT_ID64_0("shader"),
-                                                 shader));
+                          ct_resource_a0.get_obj(CT_ID64_0("shader"), shader));
         ct_cdb_a0.set_uint64(layer_writer, MATERIAL_STATE_PROP, rstate);
 
         ct_cdb_obj_t *vars_obj = ct_cdb_a0.create_object();

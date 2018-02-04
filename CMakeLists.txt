@@ -114,7 +114,7 @@ set(SOURCE_FILES
         src/cetech/engine/entity/private/component.cpp
         src/cetech/engine/entity/private/entity_preview.c
         src/cetech/engine/entity/private/level_preview.c
-        src/cetech/engine/entity/private/entity.cpp
+        src/cetech/engine/entity/private/entity.c
         src/cetech/engine/entity/private/world.cpp
         src/cetech/engine/level/private/level.cpp
         src/cetech/engine/input/private/keyboard.c
@@ -140,7 +140,7 @@ set(SOURCE_FILES
         src/cetech/engine/transform/private/transform.cpp
 
         src/cetech/engine/scenegraph/private/scenegraph.cpp
-        src/cetech/engine/camera/private/camera.cpp
+        src/cetech/engine/camera/private/camera.c
 
         src/cetech/engine/transform/private/transform_property.cpp
         src/cetech/engine/renderer/private/texture/texture_property.cpp

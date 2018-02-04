@@ -32,6 +32,7 @@ CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_playground_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 using namespace celib;
 
@@ -68,20 +69,20 @@ static void fps_camera_update(ct_world world,
     CT_UNUSED(dy);
 
     float pos[3];
-    float rot[4];
+    float rot[3];
     float wm[16];
 
-    auto transform = ct_transform_a0.get(world, camera_ent);
+    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(camera_ent);
 
-    ct_transform_a0.get_position(transform, pos);
-    ct_transform_a0.get_rotation(transform, rot);
-    ct_transform_a0.get_world_matrix(transform, wm);
+    ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
+    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
+
+    ct_transform_a0.get_world_matrix(camera_ent, wm);
 
     float x_dir[4];
     float z_dir[4];
     ct_vec4_move(x_dir, &wm[0 * 4]);
     ct_vec4_move(z_dir, &wm[2 * 4]);
-
 
     if (!fly_mode) {
         z_dir[1] = 0.0f;
@@ -97,7 +98,21 @@ static void fps_camera_update(ct_world world,
     ct_vec3_add(pos, pos, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    ct_transform_a0.set_position(transform, pos);
+    // ROT
+//    float rotation_around_world_up[4];
+//    float rotation_around_camera_right[4];
+//
+//    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), -dx * dt * 100)
+//    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, dy * dt * 100)
+//    local rotation = rotation_around_world_up * rotation_around_camera_right
+//
+//    Transform.set_position(self.transform, pos)
+//    Transform.set_rotation(self.transform, rot * rotation)
+//    end
+
+    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0.write_commit(w);
 }
 
 static void on_debugui() {
@@ -126,8 +141,7 @@ static void on_debugui() {
 
 static void render() {
     if (_G.visible) {
-        ct_camera camera = ct_camera_a0.get(_G.world, _G.camera_ent);
-        ct_viewport_a0.render_world(_G.world, camera, _G.viewport);
+        ct_viewport_a0.render_world(_G.world, _G.camera_ent, _G.viewport);
     }
 }
 
@@ -165,8 +179,10 @@ static void set_asset(uint64_t type,
         }
     }
 
-    ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
-    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
+    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(_G.camera_ent);
+    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_vec3(w, PROP_POSITION, (float[3]) {0.0f, 0.0f, -10.0f});
+    ct_cdb_a0.write_commit(w);
 }
 
 static void init() {
@@ -174,9 +190,6 @@ static void init() {
     _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
     _G.world = ct_world_a0.create();
     _G.camera_ent = ct_entity_a0.spawn(_G.world, CT_ID64_0("content/camera"));
-
-    ct_transform t = ct_transform_a0.get(_G.world, _G.camera_ent);
-    ct_transform_a0.set_position(t, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
 static void shutdown() {
@@ -288,6 +301,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_playground_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);
