@@ -39,7 +39,7 @@ CETECH_DECL_API(ct_cdb_a0);
 struct entity_instance {
     struct ct_world world;
     struct ct_entity *entity;
-    uint64_t *guid;
+    uint64_t *uid;
     uint32_t entity_count;
     uint64_t name;
 };
@@ -84,7 +84,7 @@ static struct _G {
 
 struct entity_resource {
     uint32_t ent_count;
-    //uint64_t guid [ent_count]
+    //uint64_t uid [ent_count]
     //uint64_t parents [ent_count]
     //uint64_t[64] ent_types[ent_count]
     //uint32_t ent_types_count[ent_count]
@@ -108,13 +108,13 @@ struct ct_entity_compile_output {
     struct compkey *ent_type;
     uint32_t *ent_type_count;
 
-    uint64_t *guid;
+    uint64_t *uid;
     uint32_t ent_counter;
 };
 
 
-#define entity_resource_guid(r) ((uint64_t*)((r) + 1))
-#define entity_resource_parents(r) ((uint32_t*)(entity_resource_guid(r) + ((r)->ent_count)))
+#define entity_resource_uid(r) ((uint64_t*)((r) + 1))
+#define entity_resource_parents(r) ((uint32_t*)(entity_resource_uid(r) + ((r)->ent_count)))
 #define entity_resource_ent_types(r) ((uint64_t*)(entity_resource_parents(r) + ((r)->ent_count)))
 #define entity_resource_ent_types_count(r) ((uint32_t*)(entity_resource_ent_types(r) + (64 * (r)->ent_count)))
 #define entity_resource_ent_data_offset(r) ((uint32_t*)(entity_resource_ent_types_count(r) + ((r)->ent_count)))
@@ -356,7 +356,7 @@ struct ct_entity spawn_from_resource(struct ct_world world,
     se->world = world;
     se->entity = spawned;
     se->entity_count = res->ent_count;
-    se->guid = entity_resource_guid(res);
+    se->uid = entity_resource_uid(res);
 
     for (int i = 0; i < res->ent_count; ++i) {
         uint32_t offset = entity_resource_ent_data_offset(res)[i];
@@ -394,10 +394,10 @@ void reload_instance(uint64_t name,
 //                                          ct_entity, sizeof(ct_entity) *
 //                                                     ent_res->ent_count);
 //
-//        uint64_t *guid = entity_resource_guid(ent_res);
+//        uint64_t *uid = entity_resource_uid(ent_res);
 //        for (uint32_t j = 0; j < ent_res->ent_count; ++j) {
-//            uint32_t idx = find_by_guid(instance->guid, instance->entity_count,
-//                                        guid[j]);
+//            uint32_t idx = find_by_uid(instance->uid, instance->entity_count,
+//                                        uid[j]);
 //            if (UINT32_MAX == idx) {
 //                spawned[j] = create();
 //            } else {
@@ -443,8 +443,8 @@ static void compile_entitity(const char *filename,
     ct_hash_add(&output->entity_parent, ent_id, (uint32_t) parent,
                 _G.allocator);
 
-    uint64_t guid = root_key[root_count - 1];
-    ct_array_push(output->guid, guid, _G.allocator);
+    uint64_t uid = root_key[root_count - 1];
+    ct_array_push(output->uid, uid, _G.allocator);
 
     uint64_t tmp_keys[root_count + 2];
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
@@ -508,7 +508,7 @@ static struct ct_entity_compile_output *create_output() {
 }
 
 static void destroy_output(struct ct_entity_compile_output *output) {
-    ct_array_free(output->guid, _G.allocator);
+    ct_array_free(output->uid, _G.allocator);
     ct_hash_free(&output->entity_parent, _G.allocator);
 
     // clean inner array
@@ -550,8 +550,8 @@ static void write_to_build(struct ct_entity_compile_output *output,
 
     ct_array_push_n(*build, &res, sizeof(struct entity_resource), _G.allocator);
 
-    //write guids
-    ct_array_push_n(*build, &output->guid[0], sizeof(uint64_t) * res.ent_count,
+    //write uids
+    ct_array_push_n(*build, &output->uid[0], sizeof(uint64_t) * res.ent_count,
                     _G.allocator);
 
     //write parents
@@ -671,13 +671,13 @@ static struct ct_entity spawn_level(struct ct_world world,
 }
 
 
-static struct ct_entity find_by_guid(struct ct_entity root,
-                                     uint64_t guid) {
+static struct ct_entity find_by_uid(struct ct_entity root,
+                                     uint64_t uid) {
     struct entity_instance *se = get_spawned_entity(root);
 
     if (se) {
         for (int i = 0; i < se->entity_count; ++i) {
-            if (se->guid[i] != guid) {
+            if (se->uid[i] != uid) {
                 continue;
             }
 
@@ -695,7 +695,7 @@ static struct ct_entity_a0 _api = {
         .alive = alive,
         .spawn = spawn_entity,
         .spawn_level = spawn_level,
-        .find_by_guid = find_by_guid,
+        .find_by_uid = find_by_uid,
 
         .has = has,
         .register_component = register_component,

@@ -465,8 +465,7 @@ static void _compile_assimp_node(struct aiNode *root,
 
     uint64_t name = CT_ID64_0(root->mName.data);
 
-
-    char tmp_name[128];
+    char tmp_name[128] = {0};
     strncpy(tmp_name, root->mName.data, 127);
     ct_array_push_n(output->node_str, &tmp_name, 1, a);
 
@@ -520,8 +519,7 @@ static int _compile_assimp(const char *filename,
         struct aiMesh *mesh = scene->mMeshes[i];
 
         if (mesh->mName.length == 0) {
-            snprintf(tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer), "geom_%d",
-                     i);
+            snprintf(tmp_buffer, CETECH_ARRAY_LEN(tmp_buffer), "geom_%d", i);
         } else {
             memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
         }
@@ -538,12 +536,11 @@ static int _compile_assimp(const char *filename,
         }
 
 
-        char tmp_name[128];
+        char tmp_name[128] = {0};
         strncpy(tmp_name, tmp_buffer, 127);
         ct_array_push_n(output->geom_str, &tmp_name, 1, a);
 
         ct_array_push(output->geom_name, CT_ID64_0(tmp_buffer), a);
-        ct_array_push(output->geom_node, 0, a);
         ct_array_push(output->ib_offset, ct_array_size(output->ib), a);
         ct_array_push(output->vb_offset, ct_array_size(output->vb), a);
         ct_array_push(output->ib_size, mesh->mNumFaces * 3, a);

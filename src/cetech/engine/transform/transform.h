@@ -24,12 +24,6 @@ extern "C" {
 struct ct_world;
 struct ct_entity;
 
-//! Transform component
-struct ct_transform {
-    struct ct_world world;
-    uint32_t idx;
-};
-
 //==============================================================================
 // Api
 //==============================================================================

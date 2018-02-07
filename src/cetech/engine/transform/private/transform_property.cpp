@@ -54,35 +54,6 @@ CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 
-struct ct_ent_cmd_s {
-    // YAML
-    const char *filename;
-    uint64_t keys[32];
-    uint32_t keys_count;
-
-    // CDB
-    ct_cdb_obj_t* obj;
-    uint64_t prop;
-};
-
-struct ct_ent_cmd_vec3_s {
-    ct_cmd header;
-    ct_ent_cmd_s ent;
-
-    // VALUES
-    float new_value[3];
-    float old_value[3];
-};
-
-struct ct_ent_cmd_str_s {
-    ct_cmd header;
-    ct_ent_cmd_s ent;
-
-    // VALUES
-    char new_value[128];
-    char old_value[128];
-};
-
 static void set_vec3_cmd(const struct ct_cmd *cmd,
                         bool inverse) {
     const struct ct_ent_cmd_vec3_s *pos_cmd = (const ct_ent_cmd_vec3_s *) cmd;

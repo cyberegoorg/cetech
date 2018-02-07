@@ -20,6 +20,7 @@ extern "C" {
 #define PROP_NODE (CT_ID64_0("node_id") << 32)
 #define PROP_MATERIAL_ID (CT_ID64_0("material_id")<< 32)
 #define PROP_MATERIAL (CT_ID64_0("material")<< 32)
+#define PROP_MR_UID (CT_ID64_0("material_uid")<< 32)
 
 //==============================================================================
 // Typedefs

@@ -6,7 +6,6 @@
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/macros.h>
 #include <cetech/core/containers/array.h>
-#include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
 
 #include "cetech/core/hashlib/hashlib.h"
@@ -56,20 +55,20 @@ static struct CameraGlobal {
 } CameraGlobal;
 
 static int _camera_component_compiler(const char *filename,
-                                      uint64_t *component_key,
-                                      uint32_t component_key_count,
+                                      uint64_t *comp_key,
+                                      uint32_t key_count,
                                       struct ct_cdb_writer_t *writer) {
     struct camera_data t_data;
-    uint64_t keys[component_key_count + 1];
-    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-    keys[component_key_count] = ct_yng_a0.calc_key("near");
+    uint64_t keys[key_count + 1];
+    memcpy(keys, comp_key, sizeof(uint64_t) * key_count);
+    keys[key_count] = ct_yng_a0.calc_key("near");
 
     t_data.near = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    keys[component_key_count] = ct_yng_a0.calc_key("far");
+    keys[key_count] = ct_yng_a0.calc_key("far");
     t_data.far = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    keys[component_key_count] = ct_yng_a0.calc_key("fov");
+    keys[key_count] = ct_yng_a0.calc_key("fov");
     t_data.fov = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
     ct_cdb_a0.set_float(writer, PROP_NEAR, t_data.near);
@@ -92,7 +91,7 @@ static void get_project_view(struct ct_world world,
     float near = ct_cdb_a0.read_float(ent_obj, PROP_NEAR, 0.0f);
     float far = ct_cdb_a0.read_float(ent_obj, PROP_FAR, 0.0f);
 
-    float ratio = (float)(width) / (float)(height);
+    float ratio = (float) (width) / (float) (height);
 
     ct_mat4_proj_fovy(proj, fov, ratio, near, far, true);
 
@@ -110,14 +109,13 @@ static struct ct_camera_a0 camera_api = {
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_camera_a0", &camera_api);
 
-    _G = (struct _G ){
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .type = CT_ID64_0("camera"),
     };
 
     ct_component_a0.register_compiler(_G.type,
-                                      _camera_component_compiler,
-                                      10);
+                                      _camera_component_compiler);
 
     ct_entity_a0.register_component(_G.type);
 }

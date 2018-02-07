@@ -52,7 +52,7 @@ static void destroy(ct_world world,
 
 static ct_entity entity_by_id(ct_entity level,
                               uint64_t id) {
-    return ct_entity_a0.find_by_guid(level, id);
+    return ct_entity_a0.find_by_uid(level, id);
 }
 
 

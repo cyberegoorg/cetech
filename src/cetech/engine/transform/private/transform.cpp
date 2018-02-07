@@ -23,11 +23,17 @@ CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_world_a0);
 
 using namespace celib;
 
 
-int transform_is_valid(ct_transform transform);
+//! Transform component
+struct ct_transform {
+    struct ct_world world;
+    uint32_t idx;
+};
+
 
 void transform_transform(ct_transform transform,
                          float *parent);
@@ -391,15 +397,11 @@ static void _init(ct_api_a0 *api) {
 
     ct_entity_a0.register_component(_G.type);
     ct_entity_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
-    ct_component_a0.register_type(
-            _G.type,
-            (ct_component_clb) {
-                    .world_clb.on_created=_on_world_create,
-                    .world_clb.on_destroy=_on_world_destroy,
-            }
-    );
+    ct_world_a0.register_callback({
+                    .on_created=_on_world_create,
+                    .on_destroy=_on_world_destroy});
 
-    ct_component_a0.register_compiler(_G.type, _component_compiler, 10);
+    ct_component_a0.register_compiler(_G.type, _component_compiler);
 }
 
 static void _shutdown() {
@@ -459,9 +461,9 @@ void transform_transform(ct_transform transform,
 
 void transform_get_world_matrix(struct ct_entity transform,
                                 float *value) {
-    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(transform);
+    ct_cdb_obj_t *obj = ct_entity_a0.ent_obj(transform);
     const uint32_t idx = ct_cdb_a0.read_uint32(obj, CT_ID64_0("transform.idx"),
-                                         UINT32_MAX);
+                                               UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return;
@@ -523,6 +525,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
         },
         {
             CT_UNUSED(reload);

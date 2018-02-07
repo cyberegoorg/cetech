@@ -19,7 +19,6 @@ extern "C" {
 
 struct ct_entity_compile_output;
 struct ct_compilator_api;
-struct ct_blob;
 struct ct_cdb_obj_t;
 
 //==============================================================================
@@ -76,13 +75,6 @@ typedef struct {
 } ct_world_callbacks_t;
 
 
-//! Component callbacks
-static struct ct_component_clb {
-    ct_world_callbacks_t world_clb;
-} ct_component_clb_null = {};
-
-struct ct_cdb_obj_t;
-
 typedef void (*ct_simulate_fce_t)(struct ct_entity *ent,
                                   struct ct_cdb_obj_t **obj,
                                   uint32_t n,
@@ -134,8 +126,8 @@ struct ct_entity_a0 {
     struct ct_entity (*spawn_level)(struct ct_world world,
                                     uint64_t name);
 
-    struct ct_entity (*find_by_guid)(struct ct_entity root,
-                                     uint64_t guid);
+    struct ct_entity (*find_by_uid)(struct ct_entity root,
+                                     uint64_t uid);
 
     // NEW
     struct ct_component_id (*register_component)(uint64_t component_name);
@@ -165,14 +157,12 @@ struct ct_entity_a0 {
 
 //! Component system API V0
 struct ct_component_a0 {
-
     //! Register component compiler
     //! \param type Component type
     //! \param compiler Compiler fce
     //! \param spawn_order Spawn order number
     void (*register_compiler)(uint64_t type,
-                              ct_component_compiler_t compiler,
-                              uint32_t spawn_order);
+                              ct_component_compiler_t compiler);
 
     //! Compile component
     //! \param type Component type
@@ -184,18 +174,6 @@ struct ct_component_a0 {
                    uint64_t *component_key,
                    uint32_t component_key_count,
                    struct ct_cdb_writer_t *writer);
-
-    //! Get component spawn order
-    //! \param type Component type
-    //! \return Spawn order
-    uint32_t (*spawn_order)(uint64_t type);
-
-    //! Register new component type
-    //! \param type Component type
-    //! \param clb Callbacks
-    void (*register_type)(uint64_t type,
-                          struct ct_component_clb clb);
-
 };
 
 //! World API V0

@@ -37,8 +37,8 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_resource_a0);
+CETECH_DECL_API(ct_world_a0);
 
-using namespace celib;
 
 #define LOG_WHERE "mesh_renderer"
 
@@ -58,29 +58,21 @@ static uint64_t hash_combine(uint32_t a,
     return c.ab;
 }
 
-struct mesh_data {
-    uint64_t scene;
-    uint32_t count;
-    uint64_t mesh[32];
-    uint64_t node[32];
-    uint64_t material[32];
-};
-
 struct WorldInstance {
-    ct_world world;
+    struct ct_world world;
     uint32_t n;
     uint32_t allocated;
     void *buffer;
 
-    ct_entity *entity;
+    struct ct_entity *entity;
 };
 
 static struct MeshRendererGlobal {
     struct ct_hash_t world_map;
-    WorldInstance *world_instances;
-    ct_hash_t ent_map;
+    struct WorldInstance *world_instances;
+    struct ct_hash_t ent_map;
     uint64_t type;
-    ct_alloc *allocator;
+    struct ct_alloc *allocator;
 } _G;
 
 void allocate(WorldInstance &_data,
@@ -88,10 +80,9 @@ void allocate(WorldInstance &_data,
               uint32_t sz) {
     //assert(sz > _data.n);
 
-    WorldInstance new_data;
+struct WorldInstance new_data;
     const unsigned bytes = sz * (
             sizeof(ct_entity)
-            + sizeof(mesh_data)
     );
 
     new_data.buffer = CT_ALLOC(_allocator, char, bytes);
@@ -100,14 +91,14 @@ void allocate(WorldInstance &_data,
 
     new_data.entity = (ct_entity *) (new_data.buffer);
 
-    memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
+    memcpy(new_data.entity, _data.entity, _data.n * sizeof(struct ct_entity));
 
     CT_FREE(_allocator, _data.buffer);
 
     _data = new_data;
 }
 
-WorldInstance *_get_world_instance(ct_world world) {
+struct WorldInstance *_get_world_instance(struct ct_world world) {
     uint64_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT64_MAX);
 
     if (idx != UINT64_MAX) {
@@ -127,7 +118,7 @@ static void on_obj_change(struct ct_cdb_obj_t *obj,
             uint32_t idx = (uint32_t) (key - PROP_MATERIAL_ID);
 
             uint64_t material = ct_cdb_a0.read_uint64(obj, key, 0);
-            ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+            struct ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
             ct_cdb_a0.set_ref(w, PROP_MATERIAL + idx,
                               ct_material_a0.resource_create(material));
             ct_cdb_a0.write_commit(w);
@@ -135,8 +126,8 @@ static void on_obj_change(struct ct_cdb_obj_t *obj,
     }
 }
 
-void destroy(ct_world world,
-             ct_entity ent) {
+void destroy(struct ct_world world,
+             struct ct_entity ent) {
     ct_entity_a0.remove_component(ent, _G.type);
 
     WorldInstance &_data = *_get_world_instance(world);
@@ -149,8 +140,8 @@ void destroy(ct_world world,
     }
 
     unsigned last = _data.n - 1;
-    ct_entity e = _data.entity[i];
-    ct_entity last_e = _data.entity[last];
+    struct ct_entity e = _data.entity[i];
+    struct ct_entity last_e = _data.entity[last];
 
     _data.entity[i] = _data.entity[last];
 
@@ -160,7 +151,7 @@ void destroy(ct_world world,
     --_data.n;
 }
 
-static void _new_world(ct_world world) {
+static void _new_world(struct ct_world world) {
 
     uint32_t idx = ct_array_size(_G.world_instances);
     ct_array_push(_G.world_instances, WorldInstance(), _G.allocator);
@@ -169,11 +160,11 @@ static void _new_world(ct_world world) {
 }
 
 
-static void _destroy_world(ct_world world) {
+static void _destroy_world(struct ct_world world) {
     uint64_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = ct_array_size(_G.world_instances) - 1;
 
-    ct_world last_world = _G.world_instances[last_idx].world;
+    struct ct_world last_world = _G.world_instances[last_idx].world;
 
     CT_FREE(ct_memory_a0.main_allocator(),
             _G.world_instances[idx].buffer);
@@ -188,13 +179,11 @@ int _mesh_component_compiler(const char *filename,
                              uint64_t *comp_keys,
                              uint32_t count,
                              struct ct_cdb_writer_t *writer) {
-    struct mesh_data t_data;
     uint64_t keys[count + 3];
     memcpy(keys, comp_keys, sizeof(uint64_t) * count);
 
     keys[count] = ct_yng_a0.calc_key("scene");
-    t_data.scene = CT_ID64_0(ct_ydb_a0.get_string(
-            filename, keys, count + 1, ""));
+    uint64_t scene = CT_ID64_0(ct_ydb_a0.get_string(filename, keys, count + 1, NULL));
 
     uint64_t geom[32] = {};
     uint32_t geom_keys_count = 0;
@@ -209,40 +198,35 @@ int _mesh_component_compiler(const char *filename,
         keys[count + 1] = geom[i];
 
         keys[count + 2] = ct_yng_a0.calc_key("mesh");
-        t_data.mesh[i] = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, count + 3, ""));
+        const char* mesh = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
         keys[count + 2] = ct_yng_a0.calc_key("material");
-        t_data.material[i] = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, count + 3, ""));
+        const char* mat = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
         keys[count + 2] = ct_yng_a0.calc_key("node");
-        t_data.node[i] = CT_ID64_0(
-                ct_ydb_a0.get_string(filename, keys, count + 3, ""));
+        const char* node = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
-
-        ct_cdb_a0.set_uint64(writer, PROP_MESH_ID + i, t_data.mesh[i]);
-        ct_cdb_a0.set_uint64(writer, PROP_NODE_ID + i, t_data.node[i]);
-        ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID + i, t_data.material[i]);
+        ct_cdb_a0.set_uint64(writer, PROP_MESH_ID + i, CT_ID64_0(mesh));
+        ct_cdb_a0.set_uint64(writer, PROP_NODE_ID + i, CT_ID64_0(node));
+        ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID + i, CT_ID64_0(mat));
+        ct_cdb_a0.set_uint64(writer, PROP_MR_UID + i,  geom[i]);
     }
 
-    t_data.count = geom_keys_count;
-
-    ct_cdb_a0.set_uint64(writer, PROP_SCENE, t_data.scene);
-    ct_cdb_a0.set_uint64(writer, PROP_GEOM_COUNT, t_data.count);
+    ct_cdb_a0.set_uint64(writer, PROP_SCENE, scene);
+    ct_cdb_a0.set_uint64(writer, PROP_GEOM_COUNT, geom_keys_count);
 
     return 1;
 }
 
-void mesh_render_all(ct_world world,
+void mesh_render_all(struct ct_world world,
                      uint8_t viewid,
                      uint64_t layer_name) {
-    WorldInstance *data = _get_world_instance(world);
+    struct WorldInstance *data = _get_world_instance(world);
 
     for (uint32_t i = 0; i < data->n; ++i) {
-        ct_entity ent = data->entity[i];
+        struct ct_entity ent = data->entity[i];
 
-        ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(ent);
+        struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(ent);
 
         uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
 
@@ -252,7 +236,7 @@ void mesh_render_all(ct_world world,
         uint64_t kcount = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
 
         for (int j = 0; j < kcount; ++j) {
-            ct_cdb_obj_t *mat = ct_cdb_a0.read_ref(ent_obj, PROP_MATERIAL + j,
+            struct ct_cdb_obj_t *mat = ct_cdb_a0.read_ref(ent_obj, PROP_MATERIAL + j,
                                                    0);
 
             uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj,
@@ -268,29 +252,39 @@ void mesh_render_all(ct_world world,
             if (ct_scenegprah_a0.has(world, ent)) {
                 uint64_t name = ct_scene_a0.get_mesh_node(scene, mesh);
                 if (name != 0) {
-                    ct_scene_node n = ct_scenegprah_a0.node_by_name(world,
-                                                                    ent,
-                                                                    name);
+                    struct ct_scene_node n;
+                    n = ct_scenegprah_a0.node_by_name(world, ent, name);
                     ct_scenegprah_a0.get_world_matrix(n, node_w);
                 }
             }
-
             ct_mat4_mul(final_w, node_w, wm);
+
+            struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(CT_ID64_0("scene"), scene);
+            struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj, mesh, NULL);
+            uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
+            uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
+            uint64_t vb = ct_cdb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
+            bgfx::IndexBufferHandle ibh = {.idx = (uint16_t)ib};
+            bgfx::VertexBufferHandle vbh = {.idx = (uint16_t)vb};
+
+            bgfx::Encoder* e = bgfx::begin();
             bgfx::setTransform(&final_w, 1);
-            ct_scene_a0.setVBIB(scene, mesh);
+            bgfx::setVertexBuffer(0, vbh, 0, size);
+            bgfx::setIndexBuffer(ibh, 0, size);
             ct_material_a0.submit(mat, layer_name, viewid);
+            bgfx::end(e);
         }
     }
 }
 
-void mesh_set_material(ct_entity mesh,
+void mesh_set_material(struct ct_entity mesh,
                        uint32_t idx,
                        uint64_t material) {
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(mesh);
+    struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(mesh);
 
-    ct_cdb_obj_t *material_instance = ct_material_a0.resource_create(material);
+    struct ct_cdb_obj_t *material_instance = ct_material_a0.resource_create(material);
 
-    ct_cdb_writer_t *wr = ct_cdb_a0.write_begin(ent_obj);
+    struct ct_cdb_writer_t *wr = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_ref(wr, PROP_MATERIAL + idx, material_instance);
     ct_cdb_a0.write_commit(wr);
 }
@@ -302,11 +296,11 @@ static void on_add(struct ct_world world,
         return;
     }
 
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
     uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
     uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
 
-    WorldInstance *data = _get_world_instance(world);
+    struct WorldInstance *data = _get_world_instance(world);
 
     uint32_t idx = data->n;
     allocate(*data, ct_memory_a0.main_allocator(), data->n + 1);
@@ -319,7 +313,7 @@ static void on_add(struct ct_world world,
 
     data->entity[idx] = entity;
 
-    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    struct ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
         uint64_t n = ct_cdb_a0.read_uint64(ent_obj, PROP_NODE_ID + i, 0);
 
@@ -366,7 +360,7 @@ static void _init_api(struct ct_api_a0 *api) {
 }
 
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
     _G = {
@@ -377,10 +371,10 @@ static void _init(ct_api_a0 *api) {
     ct_entity_a0.register_component(_G.type);
     ct_entity_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
 
-    ct_component_a0.register_compiler(_G.type, _mesh_component_compiler, 10);
-    ct_component_a0.register_type(_G.type, {
-            .world_clb.on_created =  _new_world,
-            .world_clb.on_destroy = _destroy_world,
+    ct_component_a0.register_compiler(_G.type, _mesh_component_compiler);
+    ct_world_a0.register_callback({
+            .on_created =  _new_world,
+            .on_destroy = _destroy_world,
     });
 }
 
@@ -390,7 +384,7 @@ static void _shutdown() {
     ct_array_free(_G.world_instances, _G.allocator);
 }
 
-static void init(ct_api_a0 *api) {
+static void init(struct ct_api_a0 *api) {
     _init(api);
 }
 
@@ -414,6 +408,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_resource_a0);
+            CETECH_GET_API(api, ct_world_a0);
 
         },
         {

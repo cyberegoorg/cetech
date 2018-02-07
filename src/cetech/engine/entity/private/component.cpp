@@ -26,7 +26,6 @@ static struct _G {
     ct_hash_t component_clb_map;
 
     ct_component_compiler_t *compilers;
-    ct_component_clb *components;
 
     ct_alloc *allocator;
 } _G;
@@ -37,13 +36,11 @@ static struct _G {
 //==============================================================================
 
 static void register_compiler(uint64_t type,
-                              ct_component_compiler_t compiler,
-                              uint32_t spawn_order) {
+                              ct_component_compiler_t compiler) {
     ct_array_push(_G.compilers, compiler, _G.allocator);
 
     ct_hash_add(&_G.compiler_map, type, ct_array_size(_G.compilers) - 1,
                  _G.allocator);
-    ct_hash_add(&_G.spawn_order_map, type, spawn_order, _G.allocator);
 }
 
 static int compile(uint64_t type,
@@ -61,30 +58,9 @@ static int compile(uint64_t type,
     return compiler(filename, component_key, component_key_count, writer);
 }
 
-static uint32_t get_spawn_order(uint64_t type) {
-    return (uint32_t) ct_hash_lookup(&_G.spawn_order_map, type, 0);
-}
-
-static void register_type(uint64_t type,
-                          ct_component_clb clb) {
-    ct_array_push(_G.components, clb, _G.allocator);
-    ct_hash_add(&_G.component_clb_map,
-                 type, ct_array_size(_G.compilers) - 1, _G.allocator);
-
-    ct_world_callbacks_t wclb = {
-            .on_created = clb.world_clb.on_created,
-            .on_destroy = clb.world_clb.on_destroy,
-            .on_update = clb.world_clb.on_update,
-    };
-
-    ct_world_a0.register_callback(wclb);
-}
-
 static ct_component_a0 component_api = {
-        .register_compiler = register_compiler,
         .compile = compile,
-        .spawn_order = get_spawn_order,
-        .register_type = register_type,
+        .register_compiler = register_compiler
 };
 
 static void _init_api(ct_api_a0 *a0) {

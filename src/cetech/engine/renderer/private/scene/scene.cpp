@@ -42,10 +42,6 @@ CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 
-struct scene_instance {
-};
-
-
 //==============================================================================
 // GLobals
 //==============================================================================
@@ -58,18 +54,8 @@ static struct _G {
 
 
 //==============================================================================
-// Compiler private
-//==============================================================================
-
-
-//==============================================================================
 // Resource
 //==============================================================================
-
-#define SCENE_PROP      CT_ID64_0("scene")
-#define SCENE_IB_PROP   CT_ID64_0("ib")
-#define SCENE_VB_PROP   CT_ID64_0("vb")
-#define SCENE_SIZE_PROP CT_ID64_0("size")
 
 static void online(uint64_t name,
                    struct ct_vio* input,struct ct_cdb_obj_t* obj) {
@@ -87,8 +73,6 @@ static void online(uint64_t name,
     uint32_t *vb_size = scene_blob::vb_size(resource);
     uint32_t *ib = scene_blob::ib(resource);
     uint8_t *vb = scene_blob::vb(resource);
-
-//    scene_instance *instance = _init_scene_instance(name);
 
     ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ptr(writer, SCENE_PROP, data);
@@ -160,22 +144,6 @@ static void shutdown() {
 
 }
 
-static void setVBIB(uint64_t scene,
-                    uint64_t geom_name) {
-    ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.type, scene);
-    ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(obj, geom_name, NULL);
-
-    uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
-    uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
-    uint64_t vb = ct_cdb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
-
-    bgfx::IndexBufferHandle ibh = {.idx = (uint16_t)ib};
-    bgfx::VertexBufferHandle vbh = {.idx = (uint16_t)vb};
-
-    bgfx::setVertexBuffer(0, vbh, 0, size);
-    bgfx::setIndexBuffer(ibh, 0, size);
-}
-
 static scene_blob::blob_t* resource_data(uint64_t name) {
     auto object = ct_resource_a0.get_obj(_G.type, name);
     return (scene_blob::blob_t*)(ct_cdb_a0.read_ptr(object, SCENE_PROP, NULL));
@@ -236,7 +204,6 @@ static void get_all_nodes(uint64_t scene,
 }
 
 static ct_scene_a0 scene_api = {
-        .setVBIB = setVBIB,
         .create_graph =create_graph,
         .get_mesh_node =get_mesh_node,
         .get_all_geometries =get_all_geometries,

@@ -9,6 +9,10 @@
 uint64_t hash_murmur2_64(const void *key,
                          uint64_t len,
                          uint64_t seed) {
+    if(!key) {
+        return 0;
+    }
+
 
     static const uint64_t m = 0xc6a4a7935bd1e995ULL;
     static const uint32_t r = 47;
@@ -74,6 +78,10 @@ uint64_t hash_murmur2_64(const void *key,
 //==============================================================================
 
 uint64_t stringid64_from_string(const char *str) {
+    if(!str){
+        return 0;
+    }
+
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
 }
 

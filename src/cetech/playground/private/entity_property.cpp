@@ -70,7 +70,7 @@ static void on_debugui() {
         ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
-    struct ct_entity entity = ct_entity_a0.find_by_guid(_G.top_entity,
+    struct ct_entity entity = ct_entity_a0.find_by_uid(_G.top_entity,
                                                         _G.active_entity);
 
     uint64_t tmp_keys[_G.keys_count + 3];
