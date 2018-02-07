@@ -74,7 +74,6 @@ typedef void(*ct_viewport_on_pass_t)(viewport_instance *viewport,
 // Api
 //==============================================================================
 
-//! Viewport API V0
 struct ct_viewport_a0 {
     struct ct_viewport (*create)(uint64_t name,
                                  float width,
@@ -95,10 +94,6 @@ struct ct_viewport_a0 {
                    float width,
                    float height);
 
-    //! Render world
-    //! \param world World
-    //! \param camera Camera
-    //! \param viewport Viewport
     void (*render_world)(struct ct_world world,
                          struct ct_entity camera,
                          struct ct_viewport viewport);

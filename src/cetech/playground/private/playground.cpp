@@ -200,29 +200,9 @@ static void on_update(float dt) {
     }
 }
 
-static bool active_hack = false;
-
-static void on_render() {
-    active_hack = true;
-
-    auto *it = map::begin(_G.module_map);
-    auto *it_end = map::end(_G.module_map);
-    while (it != it_end) {
-        if (it->value.on_render) {
-            it->value.on_render();
-        }
-
-        ++it;
-    }
-}
 
 
 static void on_ui() {
-    if (!active_hack) {
-        return;
-    }
-
-    active_hack = false;
     on_debugui();
 
     auto *it = map::begin(_G.module_map);
@@ -245,7 +225,6 @@ static ct_game_fce playground_game{
         .on_init = on_init,
         .on_shutdown = on_shutdown,
         .on_update   = on_update,
-        .on_render =  on_render,
         .on_ui =  on_ui,
 };
 

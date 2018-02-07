@@ -151,7 +151,7 @@ static void on_component(struct ct_world world,
         return;
     }
 
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
     uint64_t tmp_keys[keys_count + 3];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
     char labelid[128] = {'\0'};

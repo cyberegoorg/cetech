@@ -36,7 +36,7 @@ struct ct_transform {
 void transform_transform(ct_transform transform,
                          float *parent);
 
-void transform_get_world_matrix(struct ct_entity transform,
+void transform_get_world_matrix(ct_world world, struct ct_entity transform,
                                 float *value);
 
 ct_transform transform_get(ct_world world,
@@ -238,7 +238,7 @@ void on_obj_change(struct ct_cdb_obj_t *obj,
             float p[16];
 
             if (parent_idx != UINT32_MAX) {
-                transform_get_world_matrix(ent, p);
+                transform_get_world_matrix(world, ent, p);
             } else {
                 ct_mat4_identity(p);
             }
@@ -254,7 +254,7 @@ void on_obj_change(struct ct_cdb_obj_t *obj,
             float p[16];
 
             if (parent_idx != UINT32_MAX) {
-                transform_get_world_matrix(ent, p);
+                transform_get_world_matrix(world, ent, p);
             } else {
                 ct_mat4_identity(p);
             }
@@ -277,7 +277,7 @@ void on_obj_change(struct ct_cdb_obj_t *obj,
             float p[16];
 
             if (parent_idx != UINT32_MAX) {
-                transform_get_world_matrix(ent, p);
+                transform_get_world_matrix(world, ent, p);
             } else {
                 ct_mat4_identity(p);
             }
@@ -303,7 +303,7 @@ void on_add(struct ct_world world,
 
     data->entity[idx] = entity;
 
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
 
     ct_cdb_a0.register_notify(ent_obj, on_obj_change);
 
@@ -341,7 +341,7 @@ void on_add(struct ct_world world,
 
     float p[16];
     if (parent.h != UINT32_MAX) {
-        transform_get_world_matrix(parent, p);
+        transform_get_world_matrix(world, parent, p);
     } else {
         ct_mat4_identity(p);
     }
@@ -457,9 +457,10 @@ void transform_transform(ct_transform transform,
 }
 
 
-void transform_get_world_matrix(struct ct_entity transform,
+void transform_get_world_matrix(struct ct_world world,
+                                struct ct_entity transform,
                                 float *value) {
-    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(transform);
+    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(world, transform);
     const uint32_t idx = ct_cdb_a0.read_uint32(obj, CT_ID64_0("transform.idx"),
                                                UINT32_MAX);
 
@@ -467,17 +468,13 @@ void transform_get_world_matrix(struct ct_entity transform,
         return;
     }
 
-    ct_world world = {
-            .h = ct_cdb_a0.read_uint64(obj, CT_ID64_0("world"), 0)
-    };
-
     WorldInstance *world_inst = _get_world_instance(world);
     memcpy(value, &world_inst->world_matrix[16 * idx], sizeof(float) * 16);
 }
 
 ct_transform transform_get(ct_world world,
                            ct_entity entity) {
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
     uint32_t idx = ct_cdb_a0.read_uint32(ent_obj, CT_ID64_0("transform.idx"),
                                          UINT32_MAX);
     return (ct_transform) {.idx = idx, .world = world};
@@ -502,13 +499,13 @@ void transform_link(ct_world world,
     float p[16];
 
     if (parent_tr.idx != UINT32_MAX) {
-        transform_get_world_matrix(parent, p);
+        transform_get_world_matrix(world, parent, p);
     } else {
         ct_mat4_identity(p);
     }
     transform_transform(parent_tr, p);
 
-    transform_get_world_matrix(parent, p);
+    transform_get_world_matrix(world, parent, p);
     transform_transform(child_tr, p);
 }
 

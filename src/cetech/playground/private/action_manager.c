@@ -103,7 +103,7 @@ static void execute(uint64_t name) {
 static void check() {
     const uint32_t lshift = ct_keyboard_a0.button_index("lshift");
     const uint32_t rshift = ct_keyboard_a0.button_index("rshift");
-    uint32_t lctrl = ct_keyboard_a0.button_index("lctrl");
+    const uint32_t lctrl = ct_keyboard_a0.button_index("lctrl");
     const uint32_t rctrl = ct_keyboard_a0.button_index("rctrl");
     const uint32_t lalt = ct_keyboard_a0.button_index("lalt");
     const uint32_t ralt = ct_keyboard_a0.button_index("ralt");

@@ -249,11 +249,9 @@ extern "C" void application_start() {
         }
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
-            ct_renderer_a0.render(_G.active_game.on_render ?
-                                  _G.active_game.on_render : NULL);
+            ct_renderer_a0.render();
         }
-//
-//        sleep(0);
+
     }
 
     if (_G.active_game.on_shutdown) {

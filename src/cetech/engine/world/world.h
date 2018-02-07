@@ -37,10 +37,6 @@ struct ct_entity {
     uint64_t h;
 };
 
-struct ct_component_id {
-    uint64_t id;
-};
-
 //! Component compiler
 //! \param body Component body yaml
 //! \param data Compiled compoent data
@@ -100,9 +96,9 @@ struct ct_world_a0 {
                            struct ct_entity *entity,
                            uint32_t count);
 
-    struct ct_cdb_obj_t *(*ent_obj)(struct ct_entity entity);
+    struct ct_cdb_obj_t *(*ent_obj)(struct ct_world world,struct ct_entity entity);
 
-    bool (*entity_alive)(struct ct_entity entity);
+    bool (*entity_alive)(struct ct_world world, struct ct_entity entity);
 
     struct ct_entity (*spawn_entity)(struct ct_world world,
                                      uint64_t name);
@@ -110,7 +106,7 @@ struct ct_world_a0 {
     struct ct_entity (*spawn_level)(struct ct_world world,
                                     uint64_t name);
 
-    struct ct_entity (*find_by_uid)(struct ct_entity root,
+    struct ct_entity (*find_by_uid)(struct ct_world world, struct ct_entity root,
                                     uint64_t uid);
 
     // WORLD
@@ -118,15 +114,14 @@ struct ct_world_a0 {
 
     void (*destroy_world)(struct ct_world world);
 
-    void (*update_world)(struct ct_world world,
-                         float dt);
 
     // COMPONENT
     void (*register_component)(uint64_t component_name);
 
     uint64_t (*component_mask)(uint64_t component_name);
 
-    bool (*has)(struct ct_entity ent,
+    bool (*has)(struct ct_world world,
+                struct ct_entity ent,
                 uint64_t *component_name,
                 uint32_t name_count);
 
@@ -135,7 +130,8 @@ struct ct_world_a0 {
                            uint64_t *component_name,
                            uint32_t name_count);
 
-    void (*remove_component)(struct ct_entity ent,
+    void (*remove_component)(struct ct_world world,
+                             struct ct_entity ent,
                              uint64_t component_name);
 
     void (*register_component_compiler)(uint64_t type,

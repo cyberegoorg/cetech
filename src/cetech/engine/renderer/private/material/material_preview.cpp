@@ -46,7 +46,7 @@ static void load(const char *filename,
     ct_entity ent = ct_world_a0.spawn_entity(world, CT_ID64_0("core/cube"));
     _G.ent = ent;
 
-    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_world_a0.ent_obj(ent));
+    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_world_a0.ent_obj(world, ent));
     ct_cdb_a0.set_uint64(w, PROP_MATERIAL_ID, name);
     ct_cdb_a0.write_commit(w);
 }

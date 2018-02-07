@@ -118,7 +118,7 @@ static void on_component(struct ct_world world,
     uint64_t tmp_keys[keys_count + 1];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(world, entity);
 
     //==========================================================================
     // Position

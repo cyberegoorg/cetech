@@ -191,7 +191,7 @@ static void on_update() {
     }
 }
 
-static void on_render(void (*on_render)()) {
+static void on_render() {
     on_update();
 
     if (_G.need_reset) {
@@ -200,9 +200,6 @@ static void on_render(void (*on_render)()) {
         bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    if (on_render) {
-        on_render();
-    }
 
     for (uint32_t i = 0; i < ct_array_size(_G.on_render); ++i) {
         _G.on_render[i]();

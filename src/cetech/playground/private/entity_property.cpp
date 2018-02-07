@@ -68,7 +68,8 @@ static void on_debugui() {
         ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
-    struct ct_entity entity = ct_world_a0.find_by_uid(_G.top_entity,
+    struct ct_entity entity = ct_world_a0.find_by_uid(_G.active_world,
+                                                      _G.top_entity,
                                                         _G.active_entity);
 
     uint64_t tmp_keys[_G.keys_count + 3];
@@ -76,7 +77,7 @@ static void on_debugui() {
     tmp_keys[_G.keys_count] = ct_yng_a0.key("components");
 
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
-        if (ct_world_a0.has(entity, &_G.components[j].name, 1)) {
+        if (ct_world_a0.has(_G.active_world, entity, &_G.components[j].name, 1)) {
             tmp_keys[_G.keys_count + 1] = _G.components[j].name;
             _G.components[j].clb(_G.active_world, entity, _G.filename, tmp_keys,
                                  _G.keys_count + 2);

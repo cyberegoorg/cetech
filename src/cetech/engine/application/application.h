@@ -28,8 +28,6 @@ struct ct_game_fce {
 
     void (*on_update)(float dt);
 
-    void (*on_render)();
-
     void (*on_ui)();
 };
 

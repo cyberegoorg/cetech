@@ -35,7 +35,7 @@ struct ct_transform_a0 {
     //! \param world World
     //! \param transform transform
     //! \return World matrix
-    void (*get_world_matrix)(struct ct_entity transform,
+    void (*get_world_matrix)(struct ct_world world, struct ct_entity transform,
                              float *matrix);
 
 

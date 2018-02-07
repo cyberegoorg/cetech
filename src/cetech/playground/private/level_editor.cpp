@@ -74,12 +74,12 @@ static void fps_camera_update(ct_world world,
     float rot[3];
     float wm[16];
 
-    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(camera_ent);
+    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(world, camera_ent);
 
     ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
     ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
 
-    ct_transform_a0.get_world_matrix(camera_ent, wm);
+    ct_transform_a0.get_world_matrix(world, camera_ent, wm);
 
     float x_dir[4];
     float z_dir[4];
@@ -185,16 +185,6 @@ static void on_debugui() {
     }
 }
 
-static void render() {
-    for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        if (!_G.visible[i]) {
-            continue;
-        }
-
-        ct_viewport_a0.render_world(_G.world[i], _G.camera_ent[i], _G.viewport[i]);
-    }
-}
-
 static uint32_t find_level(uint64_t name) {
     for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
         if (_G.entity_name[i] != name) {
@@ -235,7 +225,7 @@ static void open(uint64_t name,
         _G.is_level[idx] = is_level;
     }
     _G.camera_ent[idx] = ct_world_a0.spawn_entity(_G.world[idx],
-                                            CT_ID64_0("content/camera"));
+                                                  CT_ID64_0("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
@@ -253,37 +243,46 @@ static void shutdown() {
 }
 
 static void update(float dt) {
-    if (UINT8_MAX == _G.active_editor) {
-        return;
+    if (UINT8_MAX != _G.active_editor) {
+
+        float updown = 0.0f;
+        float leftright = 0.0f;
+
+        auto up_key = ct_keyboard_a0.button_index("w");
+        auto down_key = ct_keyboard_a0.button_index("s");
+        auto left_key = ct_keyboard_a0.button_index("a");
+        auto right_key = ct_keyboard_a0.button_index("d");
+
+        if (ct_keyboard_a0.button_state(0, up_key) > 0) {
+            updown = 1.0f;
+        }
+
+        if (ct_keyboard_a0.button_state(0, down_key) > 0) {
+            updown = -1.0f;
+        }
+
+        if (ct_keyboard_a0.button_state(0, right_key) > 0) {
+            leftright = 1.0f;
+        }
+
+        if (ct_keyboard_a0.button_state(0, left_key) > 0) {
+            leftright = -1.0f;
+        }
+
+        fps_camera_update(_G.world[_G.active_editor],
+                          _G.camera_ent[_G.active_editor],
+                          dt, 0, 0, updown, leftright, 10.0f, false);
+
     }
 
-    float updown = 0.0f;
-    float leftright = 0.0f;
+    for (uint8_t i = 0; i < _G.editor_count; ++i) {
+        if (!_G.visible[i]) {
+            continue;
+        }
 
-    auto up_key = ct_keyboard_a0.button_index("w");
-    auto down_key = ct_keyboard_a0.button_index("s");
-    auto left_key = ct_keyboard_a0.button_index("a");
-    auto right_key = ct_keyboard_a0.button_index("d");
-
-    if (ct_keyboard_a0.button_state(0, up_key) > 0) {
-        updown = 1.0f;
+        ct_viewport_a0.render_world(_G.world[i], _G.camera_ent[i],
+                                    _G.viewport[i]);
     }
-
-    if (ct_keyboard_a0.button_state(0, down_key) > 0) {
-        updown = -1.0f;
-    }
-
-    if (ct_keyboard_a0.button_state(0, right_key) > 0) {
-        leftright = 1.0f;
-    }
-
-    if (ct_keyboard_a0.button_state(0, left_key) > 0) {
-        leftright = -1.0f;
-    }
-
-    fps_camera_update(_G.world[_G.active_editor],
-                      _G.camera_ent[_G.active_editor],
-                      dt, 0, 0, updown, leftright, 10.0f, false);
 }
 
 static ct_level_view_a0 level_api = {
@@ -316,7 +315,6 @@ static void _init(ct_api_a0 *api) {
             (ct_playground_module_fce) {
                     .on_init = init,
                     .on_shutdown = shutdown,
-                    .on_render = render,
                     .on_update = update,
                     .on_ui = on_debugui,
             });

@@ -76,7 +76,7 @@ static void get_project_view(struct ct_world world,
                              float *view,
                              int width,
                              int height) {
-    struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(camera);
+    struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, camera);
 
     float fov = ct_cdb_a0.read_float(ent_obj, PROP_FOV, 0.0f);
     float near = ct_cdb_a0.read_float(ent_obj, PROP_NEAR, 0.0f);
@@ -87,7 +87,7 @@ static void get_project_view(struct ct_world world,
     ct_mat4_proj_fovy(proj, fov, ratio, near, far, true);
 
     float w[16];
-    ct_transform_a0.get_world_matrix(camera, w);
+    ct_transform_a0.get_world_matrix(world, camera, w);
 
     //ct_mat4_move(view, w);
     ct_mat4_inverse(view, w);

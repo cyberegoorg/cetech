@@ -36,14 +36,6 @@ struct ct_entity;
 
 //! Mesh API V0
 struct ct_mesh_renderer_a0 {
-    //! Set material
-    //! \param world World
-    //! \param mesh Mesh
-    //! \param material Material
-    void (*set_material)(struct ct_entity mesh,
-                         uint32_t idx,
-                         uint64_t material);
-
     //! Render all mesh in world
     //! \param world Word
     void (*render_all)(struct ct_world world,

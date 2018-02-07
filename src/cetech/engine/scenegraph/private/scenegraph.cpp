@@ -295,7 +295,7 @@ static int has(ct_world world,
 
 static ct_scene_node get_root(ct_world world,
                               ct_entity entity) {
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
     uint32_t idx = ct_cdb_a0.read_uint32(ent_obj,
                                          CT_ID64_0("scenegraph.idx"), UINT32_MAX);
     return (ct_scene_node) {.idx = idx, .world = world};
@@ -384,7 +384,7 @@ static ct_scene_node create(ct_world world,
     ct_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
     CT_FREE(ct_memory_a0.main_allocator(), nodes);
 
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
     ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint32(ent_writer, CT_ID64_0("scenegraph.idx"), root.idx);
     ct_cdb_a0.write_commit(ent_writer);
