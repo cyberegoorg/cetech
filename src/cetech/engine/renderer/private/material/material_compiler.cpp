@@ -52,7 +52,7 @@ void _forach_variable_clb(const char *filename,
     uint64_t tmp_keys[] = {
             root_key,
             key,
-            ct_yng_a0.calc_key("name"),
+            ct_yng_a0.key("name"),
     };
 
     const char *name = ct_ydb_a0.get_string(filename, tmp_keys,
@@ -61,14 +61,14 @@ void _forach_variable_clb(const char *filename,
     char uniform_name[32];
     strcpy(uniform_name, name);
 
-    tmp_keys[2] = ct_yng_a0.calc_key("type");
+    tmp_keys[2] = ct_yng_a0.key("type");
     const char *type = ct_ydb_a0.get_string(filename, tmp_keys,
                                             CETECH_ARRAY_LEN(tmp_keys),
                                             "");
 
     material_variable mat_var = {};
 
-    tmp_keys[2] = ct_yng_a0.calc_key("value");
+    tmp_keys[2] = ct_yng_a0.key("value");
     if (!strcmp(type, "texture")) {
         uint64_t texture_name = 0;
 
@@ -143,7 +143,7 @@ void foreach_layer(const char *filename,
     uint64_t tmp_keys[] = {
             root_key,
             key,
-            ct_yng_a0.calc_key("shader"),
+            ct_yng_a0.key("shader"),
     };
 
     uint64_t tmp_key = ct_yng_a0.combine_key(tmp_keys,
@@ -156,7 +156,7 @@ void foreach_layer(const char *filename,
     auto layer_id = key;
     auto layer_offset = ct_array_size(output.var);
 
-    tmp_keys[2] = ct_yng_a0.calc_key("render_state");
+    tmp_keys[2] = ct_yng_a0.key("render_state");
     tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                     CETECH_ARRAY_LEN(tmp_keys));
     if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
@@ -181,7 +181,7 @@ void foreach_layer(const char *filename,
     ct_array_push(output.layer_offset, layer_offset, a);
     ct_array_push(output.render_state, output.curent_render_state, a);
 
-    tmp_keys[2] = ct_yng_a0.calc_key("variables");
+    tmp_keys[2] = ct_yng_a0.key("variables");
     tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                     CETECH_ARRAY_LEN(tmp_keys));
     if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
@@ -219,7 +219,7 @@ void compiler(const char *filename,
 
     struct material_compile_output output = {};
 
-    uint64_t key = ct_yng_a0.calc_key("layers");
+    uint64_t key = ct_yng_a0.key("layers");
 
     if (!ct_ydb_a0.has_key(filename, &key, 1)) {
         return;

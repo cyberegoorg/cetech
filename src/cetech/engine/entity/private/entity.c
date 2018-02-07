@@ -448,7 +448,7 @@ static void compile_entitity(const char *filename,
 
     uint64_t tmp_keys[root_count + 2];
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
-    tmp_keys[root_count] = ct_yng_a0.calc_key("components");
+    tmp_keys[root_count] = ct_yng_a0.key("components");
 
     struct compkey ck = {{0}};
     uint32_t components_keys_count = 0;
@@ -473,7 +473,7 @@ static void compile_entitity(const char *filename,
     ct_cdb_a0.dump(obj, &output->entity_data, _G.allocator);
     ct_array_push(output->entity_offset, offset, _G.allocator);
 
-    tmp_keys[root_count] = ct_yng_a0.calc_key("children");
+    tmp_keys[root_count] = ct_yng_a0.key("children");
 
     uint64_t children_keys[32] = {};
     uint32_t children_keys_count = 0;

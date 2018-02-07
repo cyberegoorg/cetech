@@ -182,13 +182,13 @@ int _mesh_component_compiler(const char *filename,
     uint64_t keys[count + 3];
     memcpy(keys, comp_keys, sizeof(uint64_t) * count);
 
-    keys[count] = ct_yng_a0.calc_key("scene");
+    keys[count] = ct_yng_a0.key("scene");
     uint64_t scene = CT_ID64_0(ct_ydb_a0.get_string(filename, keys, count + 1, NULL));
 
     uint64_t geom[32] = {};
     uint32_t geom_keys_count = 0;
 
-    keys[count] = ct_yng_a0.calc_key("geometries");
+    keys[count] = ct_yng_a0.key("geometries");
     ct_ydb_a0.get_map_keys(filename,
                            keys, count + 1,
                            geom, CETECH_ARRAY_LEN(geom),
@@ -197,13 +197,13 @@ int _mesh_component_compiler(const char *filename,
     for (uint32_t i = 0; i < geom_keys_count; ++i) {
         keys[count + 1] = geom[i];
 
-        keys[count + 2] = ct_yng_a0.calc_key("mesh");
+        keys[count + 2] = ct_yng_a0.key("mesh");
         const char* mesh = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
-        keys[count + 2] = ct_yng_a0.calc_key("material");
+        keys[count + 2] = ct_yng_a0.key("material");
         const char* mat = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
-        keys[count + 2] = ct_yng_a0.calc_key("node");
+        keys[count + 2] = ct_yng_a0.key("node");
         const char* node = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
         ct_cdb_a0.set_uint64(writer, PROP_MESH_ID + i, CT_ID64_0(mesh));

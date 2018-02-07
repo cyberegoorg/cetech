@@ -165,7 +165,7 @@ static void on_component(struct ct_world world,
     //==========================================================================
     // Geometries
     //==========================================================================
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("geometries");
+    tmp_keys[keys_count] = ct_yng_a0.key("geometries");
     uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
     for (uint32_t i = 0; i < geom_count; ++i) {
         char id[32] = {0};
@@ -222,7 +222,7 @@ static void on_component(struct ct_world world,
 
             sprintf(labelid, "mesh##mp_mesh_%d", i);
             if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1)) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("mesh");
+                tmp_keys[keys_count + 2] = ct_yng_a0.key("mesh");
                 struct ct_ent_cmd_str_s cmd = {
                         .header = {
                                 .size = sizeof(struct ct_ent_cmd_str_s),
@@ -267,7 +267,7 @@ static void on_component(struct ct_world world,
 
             sprintf(labelid, "node##mp_node_%d", i);
             if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1)) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("node");
+                tmp_keys[keys_count + 2] = ct_yng_a0.key("node");
                 struct ct_ent_cmd_str_s cmd = {
                         .header = {
                                 .size = sizeof(struct ct_ent_cmd_str_s),

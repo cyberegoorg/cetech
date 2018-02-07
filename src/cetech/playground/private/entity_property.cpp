@@ -75,7 +75,7 @@ static void on_debugui() {
 
     uint64_t tmp_keys[_G.keys_count + 3];
     memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
-    tmp_keys[_G.keys_count] = ct_yng_a0.calc_key("components");
+    tmp_keys[_G.keys_count] = ct_yng_a0.key("components");
 
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
         if (ct_entity_a0.has(entity, &_G.components[j].name, 1)) {

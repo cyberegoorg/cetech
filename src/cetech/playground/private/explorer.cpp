@@ -107,7 +107,7 @@ static void ui_entity_item_begin(const char *name,
                                  uint64_t *keys,
                                  uint32_t keys_count) {
 
-    uint64_t name_hash = ct_yng_a0.calc_key(name);
+    uint64_t name_hash = ct_yng_a0.key(name);
     bool selected = _G.selected_name == name_hash;
 
     uint64_t children_keys[32] = {};
@@ -116,7 +116,7 @@ static void ui_entity_item_begin(const char *name,
     uint64_t tmp_keys[keys_count + 3];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    tmp_keys[keys_count] = ct_yng_a0.calc_key("children");
+    tmp_keys[keys_count] = ct_yng_a0.key("children");
     ct_ydb_a0.get_map_keys(
             _G.path,
             tmp_keys, keys_count + 1,
@@ -152,7 +152,7 @@ static void ui_entity_item_begin(const char *name,
             sprintf(buffer, "%llu", children_keys[i]);
 
             tmp_keys[keys_count + 1] = children_keys[i];
-            tmp_keys[keys_count + 2] = ct_yng_a0.calc_key("name");
+            tmp_keys[keys_count + 2] = ct_yng_a0.key("name");
 
             const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys,
                                                     keys_count + 3, buffer);
@@ -176,7 +176,7 @@ static void on_debugui() {
 
         if (_G.path) {
             uint64_t tmp_keys[32] = {};
-            tmp_keys[0] = ct_yng_a0.calc_key("name");
+            tmp_keys[0] = ct_yng_a0.key("name");
             const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys, 1,
                                                     "ROOT");
             ui_entity_item_begin(name, tmp_keys, 0);

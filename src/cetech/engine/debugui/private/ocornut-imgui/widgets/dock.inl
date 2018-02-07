@@ -1076,51 +1076,51 @@ namespace ImGui {
             for (uint32_t i = 0; i < type_keys_count; ++i) {
                 uint64_t k[2] {
                         type_keys[i],
-                        yng->calc_key("index")
+                        yng->key("index")
                 };
 
                 int index_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("label");
+                k[1] = yng->key("label");
                 const char* label_n = ydb->get_string(path, k, 2, "");
 
-                k[1] = yng->calc_key("x");
+                k[1] = yng->key("x");
                 int x_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("y");
+                k[1] = yng->key("y");
                 int y_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("location");
+                k[1] = yng->key("location");
                 const char* location_n = ydb->get_string(path, k, 2, "");
 
-                k[1] = yng->calc_key("size_x");
+                k[1] = yng->key("size_x");
                 int size_x_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("size_y");
+                k[1] = yng->key("size_y");
                 int size_y_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("status");
+                k[1] = yng->key("status");
                 int status_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("active");
+                k[1] = yng->key("active");
                 int active_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("opened");
+                k[1] = yng->key("opened");
                 int opened_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("prev");
+                k[1] = yng->key("prev");
                 int prev_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("next");
+                k[1] = yng->key("next");
                 int next_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("child0");
+                k[1] = yng->key("child0");
                 int child0_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("child1");
+                k[1] = yng->key("child1");
                 int child1_n = (int) ydb->get_float(path, k, 2, 0);
 
-                k[1] = yng->calc_key("parent");
+                k[1] = yng->key("parent");
                 int parent_n = (int) ydb->get_float(path, k, 2, 0);
 
                 Dock* dock =  this->getDockByIndex(index_n);

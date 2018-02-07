@@ -126,7 +126,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
 
     uint64_t result_key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, result_key);
+    ct_yamlng_node n = d->get(d, result_key);
     if (n.idx) {
         return n;
     }
@@ -137,7 +137,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yng_a0.calc_key("PARENT");
+    static const uint64_t PARENT_KEY = ct_yng_a0.key("PARENT");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < max_depth; ++i) {
@@ -146,7 +146,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
         tmp_keys[i] = PARENT_KEY;
         uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
-        parent_file_str = d->get_string(d->inst, k, "");
+        parent_file_str = d->get_str(d, k, "");
 
         if ('\0' != parent_file_str[0]) {
             return get_first_node_recursive(parent_file_str, keys + i,
@@ -182,10 +182,10 @@ void get_map_keys(const char *path,
 
     uint64_t result_key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, result_key);
+    ct_yamlng_node n = d->get(d, result_key);
     if (n.idx) {
         d->foreach_dict_node(
-                d->inst, n,
+                d, n,
                 [](ct_yamlng_node k,
                    ct_yamlng_node v,
                    void *data) {
@@ -193,12 +193,12 @@ void get_map_keys(const char *path,
 
                     auto *out = (out_keys_s *) data;
 
-                    const char *string = k.d->as_string(k.d->inst, k, NULL);
+                    const char *string = k.d->as_string(k.d, k, NULL);
                     if (!string) {
                         return;
                     }
 
-                    uint64_t str_key = ct_yng_a0.calc_key(string);
+                    uint64_t str_key = ct_yng_a0.key(string);
 
                     const uint32_t s = *out->count;
                     for (uint32_t i = 0; i < s; ++i) {
@@ -218,7 +218,7 @@ void get_map_keys(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yng_a0.calc_key("PARENT");
+    static const uint64_t PARENT_KEY = ct_yng_a0.key("PARENT");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < keys_count; ++i) {
@@ -227,7 +227,7 @@ void get_map_keys(const char *path,
         tmp_keys[i] = PARENT_KEY;
         uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
-        parent_file_str = d->get_string(d->inst, k, "");
+        parent_file_str = d->get_str(d, k, "");
 
         if ('\0' != parent_file_str[0]) {
             get_map_keys(parent_file_str, keys + i, keys_count - i, map_keys,
@@ -256,7 +256,7 @@ const char *get_string(const char *path,
         return defaultt;
     }
 
-    return n.d->as_string(n.d->inst, n, defaultt);
+    return n.d->as_string(n.d, n, defaultt);
 }
 
 float get_float(const char *path,
@@ -270,7 +270,7 @@ float get_float(const char *path,
         return defaultt;
     }
 
-    return n.d->as_float(n.d->inst, n, defaultt);
+    return n.d->as_float(n.d, n, defaultt);
 }
 
 bool get_bool(const char *path,
@@ -284,7 +284,7 @@ bool get_bool(const char *path,
         return defaultt;
     }
 
-    return n.d->as_bool(n.d->inst, n, defaultt);
+    return n.d->as_bool(n.d, n, defaultt);
 }
 
 
@@ -302,7 +302,7 @@ void get_vec3(const char *path,
     }
 
 
-    n.d->as_vec3(n.d->inst, n, v);
+    n.d->as_vec3(n.d, n, v);
 }
 
 void get_vec4(const char *path,
@@ -319,7 +319,7 @@ void get_vec4(const char *path,
     }
 
 
-    n.d->as_vec4(n.d->inst, n, v);
+    n.d->as_vec4(n.d, n, v);
 }
 
 void get_mat4(const char *path,
@@ -335,7 +335,7 @@ void get_mat4(const char *path,
         return;
     }
 
-    n.d->as_mat4(n.d->inst, n, v);
+    n.d->as_mat4(n.d, n, v);
 }
 
 
@@ -356,7 +356,7 @@ void set_float(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, key);
+    ct_yamlng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -364,9 +364,9 @@ void set_float(const char *path,
             str_keys[i] = ct_yng_a0.get_key(keys[i]);
         }
 
-        n.d->create_tree_float(n.d->inst, str_keys, keys_count, value);
+        n.d->create_tree_float(n.d, str_keys, keys_count, value);
     } else {
-        n.d->set_float(n.d->inst, n, value);
+        n.d->set_float(n.d, n, value);
 
     }
 
@@ -381,7 +381,7 @@ void set_bool(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, key);
+    ct_yamlng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -389,10 +389,10 @@ void set_bool(const char *path,
             str_keys[i] = ct_yng_a0.get_key(keys[i]);
         }
 
-        n.d->create_tree_bool(n.d->inst, str_keys, keys_count, value);
+        n.d->create_tree_bool(n.d, str_keys, keys_count, value);
 
     } else {
-        n.d->set_bool(n.d->inst, n, value);
+        n.d->set_bool(n.d, n, value);
     }
 
     modified(path);
@@ -406,7 +406,7 @@ void set_string(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, key);
+    ct_yamlng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -414,9 +414,9 @@ void set_string(const char *path,
             str_keys[i] = ct_yng_a0.get_key(keys[i]);
         }
 
-        n.d->create_tree_string(n.d->inst, str_keys, keys_count, value);
+        n.d->create_tree_string(n.d, str_keys, keys_count, value);
     } else {
-        n.d->set_string(n.d->inst, n, value);
+        n.d->set_str(n.d, n, value);
     }
 
     modified(path);
@@ -430,7 +430,7 @@ void set_vec3(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0.combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d->inst, key);
+    ct_yamlng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -438,9 +438,9 @@ void set_vec3(const char *path,
             str_keys[i] = ct_yng_a0.get_key(keys[i]);
         }
 
-        n.d->create_tree_vec3(n.d->inst, str_keys, keys_count, value);
+        n.d->create_tree_vec3(n.d, str_keys, keys_count, value);
     } else {
-        n.d->set_vec3(n.d->inst, n, value);
+        n.d->set_vec3(n.d, n, value);
     }
 
     modified(path);
@@ -457,7 +457,7 @@ void set_vec4(const char *path,
         return;
     }
 
-    n.d->set_vec4(n.d->inst, n, value);
+    n.d->set_vec4(n.d, n, value);
     modified(path);
 }
 
@@ -472,7 +472,7 @@ void set_mat4(const char *path,
         return;
     }
 
-    n.d->set_mat4(n.d->inst, n, value);
+    n.d->set_mat4(n.d, n, value);
     modified(path);
 }
 
@@ -488,7 +488,7 @@ void parent_files(const char *path,
         return;
     }
 
-    d->parent_files(d->inst, files, count);
+    d->parent_files(d, files, count);
 }
 
 void check_fs() {

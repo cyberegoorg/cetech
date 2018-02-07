@@ -397,29 +397,29 @@ static void compile_global_resource(uint32_t idx,
 
     ////////////////////////////////////////////////////
     uint64_t keys[2] = {
-            d->hash(d->inst, value),
-            ct_yng_a0.calc_key("name")
+            d->hash(d, value),
+            ct_yng_a0.key("name")
     };
     uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *name_str = d->get_string(d->inst, k, "");
+    const char *name_str = d->get_str(d, k, "");
     gs.name = CT_ID64_0(name_str);
 
     /////////////////////////////////////////////////////
-    keys[1] = ct_yng_a0.calc_key("type");
+    keys[1] = ct_yng_a0.key("type");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *type_str = d->get_string(d->inst, k, "");
+    const char *type_str = d->get_str(d, k, "");
     gs.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
-    keys[1] = ct_yng_a0.calc_key("format");
+    keys[1] = ct_yng_a0.key("format");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *format_str = d->get_string(d->inst, k, "");
+    const char *format_str = d->get_str(d, k, "");
     gs.format = CT_ID64_0(format_str);
 
     /////////////////////////////////////////////////////
-    keys[1] = ct_yng_a0.calc_key("ration");
+    keys[1] = ct_yng_a0.key("ration");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *ration_str = d->get_string(d->inst, k, "");
+    const char *ration_str = d->get_str(d, k, "");
     gs.ration = CT_ID64_0(ration_str);
 
     ct_array_push(output.global_resource, gs, _G.allocator);
@@ -438,28 +438,28 @@ static void compile_layer_entry(uint32_t idx,
 
     ////////////////////////////////////////////////////
     uint64_t keys[2] = {
-            d->hash(d->inst, value),
-            ct_yng_a0.calc_key("name")
+            d->hash(d, value),
+            ct_yng_a0.key("name")
     };
     uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *name_str = d->get_string(d->inst, k, "");
+    const char *name_str = d->get_str(d, k, "");
     le.name = CT_ID64_0(name_str);
 
 
     /////////////////////////////////////////////////////
-    keys[1] = ct_yng_a0.calc_key("type");
+    keys[1] = ct_yng_a0.key("type");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
-    const char *type_str = d->get_string(d->inst, k, "");
+    const char *type_str = d->get_str(d, k, "");
     le.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
-    keys[1] = ct_yng_a0.calc_key("output");
+    keys[1] = ct_yng_a0.key("output");
     k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
 
-    ct_yamlng_node output_node = d->get(d->inst, k);
+    ct_yamlng_node output_node = d->get(d, k);
     if (0 != output_node.idx) {
         d->foreach_seq_node(
-                d->inst,
+                d,
                 output_node,
                 [](uint32_t idx,
                    struct ct_yamlng_node value,
@@ -467,7 +467,7 @@ static void compile_layer_entry(uint32_t idx,
                     auto &le = *((layer_entry_t *) _data);
                     ct_yng_doc *d = value.d;
 
-                    const char *output_name = d->as_string(d->inst, value, "");
+                    const char *output_name = d->as_string(d, value, "");
                     le.output[idx] = CT_ID64_0(output_name);
 
                     ++le.output_count;
@@ -494,7 +494,7 @@ static void compile_layers(struct ct_yamlng_node key,
     ct_yng_doc *d = key.d;
     compiler_output &output = *((compiler_output *) _data);
 
-    const char *name_str = d->as_string(d->inst, key, "");
+    const char *name_str = d->as_string(d, key, "");
 
     auto name_id = CT_ID64_0(name_str);
     auto layer_offset = ct_array_size(output.layers_entry);
@@ -502,7 +502,7 @@ static void compile_layers(struct ct_yamlng_node key,
     ct_array_push(output.layer_names, name_id, _G.allocator);
     ct_array_push(output.layers_entry_offset, layer_offset, _G.allocator);
 
-    d->foreach_seq_node(d->inst, value, compile_layer_entry, &output);
+    d->foreach_seq_node(d, value, compile_layer_entry, &output);
 
     const uint32_t entry_count = ct_array_size(output.layers_entry);
 
@@ -525,31 +525,31 @@ static void compiler(const char *filename,
     //==================================================================
     // Global resource
     //==================================================================
-    ct_yamlng_node global_resource = doc->get(doc->inst,
-                                              ct_yng_a0.calc_key(
+    ct_yamlng_node global_resource = doc->get(doc,
+                                              ct_yng_a0.key(
                                                       "global_resource"));
     if (0 != global_resource.idx) {
-        doc->foreach_seq_node(doc->inst, global_resource,
+        doc->foreach_seq_node(doc, global_resource,
                               compile_global_resource, &output);
     }
 
     //==================================================================
     // layers
     //==================================================================
-    ct_yamlng_node layers = doc->get(doc->inst,
-                                     ct_yng_a0.calc_key("layers"));
+    ct_yamlng_node layers = doc->get(doc,
+                                     ct_yng_a0.key("layers"));
     if (0 != layers.idx) {
-        doc->foreach_dict_node(doc->inst, layers, compile_layers, &output);
+        doc->foreach_dict_node(doc, layers, compile_layers, &output);
     }
 
     //==================================================================
     // Viewport
     //==================================================================
-    ct_yamlng_node viewport = doc->get(doc->inst,
-                                       ct_yng_a0.calc_key("viewport"));
+    ct_yamlng_node viewport = doc->get(doc,
+                                       ct_yng_a0.key("viewport"));
     if (0 != viewport.idx) {
         doc->foreach_dict_node(
-                doc->inst,
+                doc,
                 viewport,
                 [](struct ct_yamlng_node key,
                    struct ct_yamlng_node value,
@@ -557,18 +557,18 @@ static void compiler(const char *filename,
                     ct_yng_doc *d = key.d;
                     compiler_output &output = *((compiler_output *) _data);
 
-                    const char *name_str = d->as_string(d->inst, key, "");
+                    const char *name_str = d->as_string(d, key, "");
                     auto name_id = CT_ID64_0(name_str);
 
 
                     uint64_t keys[2] = {
-                            d->hash(d->inst, value),
-                            ct_yng_a0.calc_key("layers")
+                            d->hash(d, value),
+                            ct_yng_a0.key("layers")
                     };
                     uint64_t k = ct_yng_a0.combine_key(keys,
                                                        CETECH_ARRAY_LEN(
                                                                keys));
-                    const char *layers_str = d->get_string(d->inst, k, "");
+                    const char *layers_str = d->get_str(d, k, "");
                     auto layers_id = CT_ID64_0(layers_str);
                     viewport_entry_t ve = {};
 
@@ -585,13 +585,13 @@ static void compiler(const char *filename,
                             output.layers_localresource_offset,
                             localresource_offset, _G.allocator);
 
-                    keys[1] = ct_yng_a0.calc_key("local_resource");
+                    keys[1] = ct_yng_a0.key("local_resource");
                     k = ct_yng_a0.combine_key(keys,
                                               CETECH_ARRAY_LEN(keys));
-                    ct_yamlng_node local_resource = d->get(d->inst, k);
+                    ct_yamlng_node local_resource = d->get(d, k);
                     if (0 != local_resource.idx) {
                         d->foreach_seq_node(
-                                d->inst,
+                                d,
                                 local_resource,
                                 [](uint32_t idx,
                                    struct ct_yamlng_node value,
@@ -606,42 +606,42 @@ static void compiler(const char *filename,
 
                                     ////////////////////////////////////////////////////
                                     uint64_t keys[2] = {
-                                            d->hash(d->inst, value),
-                                            ct_yng_a0.calc_key("name")
+                                            d->hash(d, value),
+                                            ct_yng_a0.key("name")
                                     };
                                     uint64_t k = ct_yng_a0.combine_key(
                                             keys, CETECH_ARRAY_LEN(keys));
-                                    const char *name_str = d->get_string(
-                                            d->inst, k, "");
+                                    const char *name_str = d->get_str(
+                                            d, k, "");
                                     gs.name = CT_ID64_0(name_str);
 
                                     /////////////////////////////////////////////////////
-                                    keys[1] = ct_yng_a0.calc_key("type");
+                                    keys[1] = ct_yng_a0.key("type");
                                     k = ct_yng_a0.combine_key(keys,
                                                               CETECH_ARRAY_LEN(
                                                                       keys));
-                                    const char *type_str = d->get_string(
-                                            d->inst, k, "");
+                                    const char *type_str = d->get_str(
+                                            d, k, "");
                                     gs.type = CT_ID64_0(type_str);
 
 
                                     /////////////////////////////////////////////////////
-                                    keys[1] = ct_yng_a0.calc_key(
+                                    keys[1] = ct_yng_a0.key(
                                             "format");
                                     k = ct_yng_a0.combine_key(keys,
                                                               CETECH_ARRAY_LEN(
                                                                       keys));
-                                    const char *format_str = d->get_string(
-                                            d->inst, k, "");
+                                    const char *format_str = d->get_str(
+                                            d, k, "");
                                     gs.format = CT_ID64_0(format_str);
 
                                     /////////////////////////////////////////////////////
-                                    keys[1] = ct_yng_a0.calc_key("ration");
+                                    keys[1] = ct_yng_a0.key("ration");
                                     k = ct_yng_a0.combine_key(keys,
                                                               CETECH_ARRAY_LEN(
                                                                       keys));
-                                    const char *ration_str = d->get_string(
-                                            d->inst, k, "");
+                                    const char *ration_str = d->get_str(
+                                            d, k, "");
                                     gs.ration = CT_ID64_0(ration_str);
 
 

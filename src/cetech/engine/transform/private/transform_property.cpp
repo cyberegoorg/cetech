@@ -132,7 +132,7 @@ static void on_component(struct ct_world world,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.calc_key("position");
+        tmp_keys[keys_count] = ct_yng_a0.key("position");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
@@ -165,7 +165,7 @@ static void on_component(struct ct_world world,
     if (ct_debugui_a0.DragFloat3("rotation", rot_new, 1.0f, 0, 360, "%.5f",
                                  1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.calc_key("rotation");
+        tmp_keys[keys_count] = ct_yng_a0.key("rotation");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
@@ -196,7 +196,7 @@ static void on_component(struct ct_world world,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.calc_key("scale");
+        tmp_keys[keys_count] = ct_yng_a0.key("scale");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),

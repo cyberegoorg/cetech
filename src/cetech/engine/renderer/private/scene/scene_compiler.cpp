@@ -8,7 +8,6 @@
 #include <cetech/macros.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/core/containers/array.h>
-#include <CoreServices/CoreServices.h>
 
 #include "cetech/core/containers/map.inl"
 
@@ -97,7 +96,7 @@ struct compile_output *_crete_compile_output() {
     ct_alloc *a = ct_memory_a0.main_allocator();
     struct compile_output *output =
             CT_ALLOC(a, struct compile_output,
-                         sizeof(struct compile_output));
+                     sizeof(struct compile_output));
     *output = {0};
 
     return output;
@@ -151,19 +150,19 @@ static void _parse_vertex_decl(bgfx::VertexDecl *decl,
     ct_yng_doc *d = decl_node.d;
 
     uint64_t keys[] = {
-            d->hash(d->inst, decl_node),
-            ct_yng_a0.calc_key("type"),
+            d->hash(d, decl_node),
+            ct_yng_a0.key("type"),
     };
-    const char *type_str = d->get_string(d->inst,
-                                         ct_yng_a0.combine_key(keys,
-                                                               CETECH_ARRAY_LEN(
-                                                                       keys)),
-                                         "");
+    const char *type_str = d->get_str(d,
+                                      ct_yng_a0.combine_key(keys,
+                                                            CETECH_ARRAY_LEN(
+                                                                    keys)),
+                                      "");
 
-    keys[1] = ct_yng_a0.calc_key("size");
-    float size = d->get_float(d->inst, ct_yng_a0.combine_key(keys,
-                                                             CETECH_ARRAY_LEN(
-                                                                     keys)),
+    keys[1] = ct_yng_a0.key("size");
+    float size = d->get_float(d, ct_yng_a0.combine_key(keys,
+                                                       CETECH_ARRAY_LEN(
+                                                               keys)),
                               0.0f);
     bgfx::AttribType::Enum attrib_type;
     size_t v_size;
@@ -184,11 +183,11 @@ static void _parese_types(bgfx::VertexDecl *decl,
     for (uint32_t i = 0; i < CETECH_ARRAY_LEN(_chanel_types); ++i) {
 
         uint64_t keys[] = {
-                d->hash(d->inst, types),
-                ct_yng_a0.calc_key(_chanel_types[i].name),
+                d->hash(d, types),
+                ct_yng_a0.key(_chanel_types[i].name),
         };
 
-        ct_yamlng_node node = d->get(d->inst,
+        ct_yamlng_node node = d->get(d,
                                      ct_yng_a0.combine_key(keys,
                                                            CETECH_ARRAY_LEN(
                                                                    keys)));
@@ -213,26 +212,26 @@ static void _write_chanel(struct ct_yamlng_node node,
 
     ct_yng_doc *d = node.d;
 
-    struct ct_yamlng_node idx_n = d->get_seq(d->inst,
-                                             d->hash(d->inst, node), i);
+    struct ct_yamlng_node idx_n = d->get_seq(d,
+                                             d->hash(d, node), i);
 
-    uint32_t idx = (uint32_t) (d->as_float(d->inst, idx_n, 0.0f));
+    uint32_t idx = (uint32_t) (d->as_float(d, idx_n, 0.0f));
 
     uint32_t size = 0;
     const char *type_str = NULL;
     {
         uint64_t keys[] = {
-                d->hash(d->inst, types),
-                ct_yng_a0.calc_key(name),
-                ct_yng_a0.calc_key("type"),
+                d->hash(d, types),
+                ct_yng_a0.key(name),
+                ct_yng_a0.key("type"),
         };
-        type_str = d->get_string(d->inst, ct_yng_a0.combine_key(keys,
-                                                                CETECH_ARRAY_LEN(
-                                                                        keys)),
-                                 "");
+        type_str = d->get_str(d, ct_yng_a0.combine_key(keys,
+                                                       CETECH_ARRAY_LEN(
+                                                               keys)),
+                              "");
 
-        keys[2] = ct_yng_a0.calc_key("size"),
-                size = (uint32_t) d->get_float(d->inst,
+        keys[2] = ct_yng_a0.key("size"),
+                size = (uint32_t) d->get_float(d,
                                                ct_yng_a0.combine_key(
                                                        keys,
                                                        CETECH_ARRAY_LEN(
@@ -244,19 +243,19 @@ static void _write_chanel(struct ct_yamlng_node node,
 
 
     uint64_t keys[] = {
-            d->hash(d->inst, chanels_n),
-            ct_yng_a0.calc_key(name),
+            d->hash(d, chanels_n),
+            ct_yng_a0.key(name),
     };
     uint64_t chanel_data_n = ct_yng_a0.combine_key(keys,
                                                    CETECH_ARRAY_LEN(
                                                            keys));
 
     for (uint32_t k = 0; k < size; ++k) {
-        struct ct_yamlng_node n = d->get_seq(d->inst, chanel_data_n,
+        struct ct_yamlng_node n = d->get_seq(d, chanel_data_n,
                                              (idx * size) + k);
 
         // TODO: type
-        float v = d->as_float(d->inst, n, 0.0f);
+        float v = d->as_float(d, n, 0.0f);
         //log_debug("casdsadsa", "%s:%d -  %f", name, k, v);
 
         ct_array_push_n(output->vb, (uint8_t *) &v, sizeof(v), a);
@@ -271,7 +270,7 @@ static void foreach_geometries_clb(struct ct_yamlng_node key,
     struct compile_output *output = (compile_output *) _data;
     ct_yng_doc *d = key.d;
 
-    const char *name_str = d->as_string(d->inst, key, "");
+    const char *name_str = d->as_string(d, key, "");
     uint64_t name = CT_ID64_0(name_str);
 
     char tmp_name[128];
@@ -288,12 +287,12 @@ static void foreach_geometries_clb(struct ct_yamlng_node key,
     vertex_decl.begin();
 
     uint64_t keys[] = {
-            d->hash(d->inst, value),
-            ct_yng_a0.calc_key("types"),
+            d->hash(d, value),
+            ct_yng_a0.key("types"),
     };
-    ct_yamlng_node types = d->get(d->inst, ct_yng_a0.combine_key(keys,
-                                                                 CETECH_ARRAY_LEN(
-                                                                         keys)));
+    ct_yamlng_node types = d->get(d, ct_yng_a0.combine_key(keys,
+                                                           CETECH_ARRAY_LEN(
+                                                                   keys)));
 
     uint32_t vertex_size = 0;
     _parese_types(&vertex_decl, types, &vertex_size);
@@ -302,26 +301,26 @@ static void foreach_geometries_clb(struct ct_yamlng_node key,
     ct_array_push(output->vb_decl, vertex_decl, a);
 
     // IB, VB
-    keys[1] = ct_yng_a0.calc_key("chanels");
-    ct_yamlng_node chanels_n = d->get(d->inst,
+    keys[1] = ct_yng_a0.key("chanels");
+    ct_yamlng_node chanels_n = d->get(d,
                                       ct_yng_a0.combine_key(keys,
                                                             CETECH_ARRAY_LEN(
                                                                     keys)));
 
 
-    keys[1] = ct_yng_a0.calc_key("indices");
+    keys[1] = ct_yng_a0.key("indices");
     uint64_t k = ct_yng_a0.combine_key(keys,
                                        CETECH_ARRAY_LEN(
                                                keys));
-    ct_yamlng_node indices_n = d->get(d->inst, k);
+    ct_yamlng_node indices_n = d->get(d, k);
 
     keys[0] = k;
-    keys[1] = ct_yng_a0.calc_key("size");
-    ct_yamlng_node i_size = d->get(d->inst, ct_yng_a0.combine_key(keys,
-                                                                  CETECH_ARRAY_LEN(
-                                                                          keys)));
+    keys[1] = ct_yng_a0.key("size");
+    ct_yamlng_node i_size = d->get(d, ct_yng_a0.combine_key(keys,
+                                                            CETECH_ARRAY_LEN(
+                                                                    keys)));
 
-    uint32_t vertex_count = (uint32_t) d->as_float(d->inst, i_size, 0.0f);
+    uint32_t vertex_count = (uint32_t) d->as_float(d, i_size, 0.0f);
 
     ct_array_push(output->ib_size, vertex_count, a);
     ct_array_push(output->vb_size, vertex_size * vertex_count, a);
@@ -331,11 +330,11 @@ static void foreach_geometries_clb(struct ct_yamlng_node key,
             const char *name = _chanel_types[j].name;
 
             uint64_t keys[] = {
-                    d->hash(d->inst, indices_n),
-                    ct_yng_a0.calc_key(name),
+                    d->hash(d, indices_n),
+                    ct_yng_a0.key(name),
             };
 
-            ct_yamlng_node node = d->get(d->inst,
+            ct_yamlng_node node = d->get(d,
                                          ct_yng_a0.combine_key(keys,
                                                                CETECH_ARRAY_LEN(
                                                                        keys)));
@@ -362,7 +361,7 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
     struct foreach_graph_data *output = (foreach_graph_data *) _data;
     ct_yng_doc *d = key.d;
 
-    const char *key_str = d->as_string(d->inst, key, "");
+    const char *key_str = d->as_string(d, key, "");
     uint64_t node_name = CT_ID64_0(key_str);
 
 
@@ -371,16 +370,16 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
     ct_array_push_n(output->output->node_str, &tmp_name, 1, a);
 
     uint64_t keys[] = {
-            d->hash(d->inst, value),
-            ct_yng_a0.calc_key("local"),
+            d->hash(d, value),
+            ct_yng_a0.key("local"),
     };
-    ct_yamlng_node local_pose = d->get(d->inst,
+    ct_yamlng_node local_pose = d->get(d,
                                        ct_yng_a0.combine_key(keys,
                                                              CETECH_ARRAY_LEN(
                                                                      keys)));
 
     float pose[16];
-    d->as_mat4(d->inst, local_pose, pose);
+    d->as_mat4(d, local_pose, pose);
 
     uint32_t idx = (uint32_t) ct_array_size(output->output->node_name);
 
@@ -389,19 +388,19 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
     ct_array_push_n(output->output->node_pose, pose, 16, a);
 
 
-    keys[1] = ct_yng_a0.calc_key("geometries");
+    keys[1] = ct_yng_a0.key("geometries");
     uint64_t geometries_k = ct_yng_a0.combine_key(keys,
                                                   CETECH_ARRAY_LEN(
                                                           keys));
 
-    ct_yamlng_node geometries_n = d->get(d->inst, geometries_k);
+    ct_yamlng_node geometries_n = d->get(d, geometries_k);
     if (0 != geometries_n.idx) {
-        const size_t name_count = d->size(d->inst, geometries_n);
+        const size_t name_count = d->size(d, geometries_n);
 
         for (uint32_t i = 0; i < name_count; ++i) {
-            struct ct_yamlng_node name_node = d->get_seq(d->inst,
+            struct ct_yamlng_node name_node = d->get_seq(d,
                                                          geometries_k, i);
-            const char *geom_str = d->as_string(d->inst, name_node, "");
+            const char *geom_str = d->as_string(d, name_node, "");
 
             uint64_t geom_name = CT_ID64_0(geom_str);
             for (uint32_t j = 0;
@@ -418,11 +417,11 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
     }
 
 
-    keys[1] = ct_yng_a0.calc_key("children");
+    keys[1] = ct_yng_a0.key("children");
     uint64_t children_k = ct_yng_a0.combine_key(keys,
                                                 CETECH_ARRAY_LEN(
                                                         keys));
-    ct_yamlng_node children_n = d->get(d->inst,
+    ct_yamlng_node children_n = d->get(d,
                                        children_k);
 
     if (idx != children_n.idx) {
@@ -431,7 +430,7 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
                 .output = output->output
         };
 
-        d->foreach_dict_node(d->inst, children_n, foreach_graph_clb,
+        d->foreach_dict_node(d, children_n, foreach_graph_clb,
                              &graph_data);
     }
 }
@@ -439,13 +438,12 @@ static void foreach_graph_clb(struct ct_yamlng_node key,
 static int _compile_yaml(struct ct_yng_doc *document,
                          struct compile_output *output) {
 
-    ct_yamlng_node geometries = document->get(document->inst,
-                                              ct_yng_a0.calc_key(
-                                                      "geometries"));
-    ct_yamlng_node graph = document->get(document->inst,
-                                         ct_yng_a0.calc_key("graph"));
+    ct_yamlng_node geometries = document->get(document,
+                                              ct_yng_a0.key("geometries"));
+    ct_yamlng_node graph = document->get(document,
+                                         ct_yng_a0.key("graph"));
 
-    document->foreach_dict_node(document->inst, geometries,
+    document->foreach_dict_node(document, geometries,
                                 foreach_geometries_clb, output);
 
     struct foreach_graph_data graph_data = {
@@ -453,7 +451,7 @@ static int _compile_yaml(struct ct_yng_doc *document,
             .output = output
     };
 
-    document->foreach_dict_node(document->inst, graph,
+    document->foreach_dict_node(document, graph,
                                 foreach_graph_clb, &graph_data);
     return 1;
 }
@@ -485,14 +483,13 @@ static void _compile_assimp_node(struct aiNode *root,
 }
 
 static int _compile_assimp(const char *filename,
-                           struct ct_yng_doc *document,
+                           struct ct_yng_doc *doc,
                            struct compile_output *output,
                            ct_compilator_api *capi) {
     auto a = ct_memory_a0.main_allocator();
 
-    const char *input_str = document->get_string(
-            document->inst,
-            ct_yng_a0.calc_key("import.input"), "");
+    const char *input_str = doc->get_str(doc,
+                                         ct_yng_a0.key("import.input"), "");
 
     capi->add_dependency(filename, input_str);
 
@@ -502,10 +499,10 @@ static int _compile_assimp(const char *filename,
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
 
-    if (document->get_bool(document->inst,
-                           ct_yng_a0.calc_key(
-                                   "import.postprocess.flip_uvs"),
-                           false)) {
+    if (doc->get_bool(doc,
+                      ct_yng_a0.key(
+                              "import.postprocess.flip_uvs"),
+                      false)) {
         postprocess_flag |= aiProcess_FlipUVs;
     }
 
@@ -574,20 +571,20 @@ static int _compile_assimp(const char *filename,
         for (uint32_t j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
                 ct_array_push_n(output->vb,
-                                 (uint8_t *) &mesh->mVertices[j],
-                                 sizeof(float) * 3, a);
+                                (uint8_t *) &mesh->mVertices[j],
+                                sizeof(float) * 3, a);
             }
 
             if (mesh->mNormals != NULL) {
                 ct_array_push_n(output->vb,
-                                 (uint8_t *) &mesh->mNormals[j],
-                                 sizeof(float) * 3, a);
+                                (uint8_t *) &mesh->mNormals[j],
+                                sizeof(float) * 3, a);
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
                 ct_array_push_n(output->vb,
-                                 (uint8_t *) &mesh->mTextureCoords[0][j],
-                                 sizeof(float) * 2, a);
+                                (uint8_t *) &mesh->mTextureCoords[0][j],
+                                sizeof(float) * 2, a);
             }
         }
 
@@ -613,8 +610,8 @@ static void compiler(const char *filename,
 
     int ret = 1;
 
-    if (document->has_key(document->inst,
-                          ct_yng_a0.calc_key("import"))) {
+    if (document->has_key(document,
+                          ct_yng_a0.key("import"))) {
         ret = _compile_assimp(filename, document, output, compilator_api);
     } else {
         ret = _compile_yaml(document, output);
@@ -634,50 +631,50 @@ static void compiler(const char *filename,
 
     ct_array_push_n(*output_blob, &res, sizeof(res), a);
     ct_array_push_n(*output_blob, output->geom_name,
-                     sizeof(uint64_t) *
-                     ct_array_size(output->geom_name), a);
+                    sizeof(uint64_t) *
+                    ct_array_size(output->geom_name), a);
     ct_array_push_n(*output_blob, output->ib_offset,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->ib_offset), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->ib_offset), a);
     ct_array_push_n(*output_blob, output->vb_offset,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->vb_offset), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->vb_offset), a);
     ct_array_push_n(*output_blob, output->vb_decl,
-                     sizeof(bgfx::VertexDecl) *
-                     ct_array_size(output->vb_decl), a);
+                    sizeof(bgfx::VertexDecl) *
+                    ct_array_size(output->vb_decl), a);
     ct_array_push_n(*output_blob, output->ib_size,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->ib_size), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->ib_size), a);
     ct_array_push_n(*output_blob, output->vb_size,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->vb_size), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->vb_size), a);
     ct_array_push_n(*output_blob, output->ib,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->ib), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->ib), a);
     ct_array_push_n(*output_blob, output->vb,
-                     sizeof(uint8_t) *
-                     ct_array_size(output->vb), a);
+                    sizeof(uint8_t) *
+                    ct_array_size(output->vb), a);
     ct_array_push_n(*output_blob, output->node_name,
-                     sizeof(uint64_t) *
-                     ct_array_size(output->node_name), a);
+                    sizeof(uint64_t) *
+                    ct_array_size(output->node_name), a);
 
     ct_array_push_n(*output_blob, output->node_parent,
-                     sizeof(uint32_t) *
-                     ct_array_size(output->node_parent), a);
+                    sizeof(uint32_t) *
+                    ct_array_size(output->node_parent), a);
     ct_array_push_n(*output_blob, output->node_pose,
-                     sizeof(float) *
-                     ct_array_size(output->node_pose), a);
+                    sizeof(float) *
+                    ct_array_size(output->node_pose), a);
     ct_array_push_n(*output_blob, output->geom_node,
-                     sizeof(uint64_t) *
-                     ct_array_size(output->geom_name), a);
+                    sizeof(uint64_t) *
+                    ct_array_size(output->geom_name), a);
 
     ct_array_push_n(*output_blob, output->geom_str,
-                     sizeof(char[128]) *
-                     ct_array_size(output->geom_str), a);
+                    sizeof(char[128]) *
+                    ct_array_size(output->geom_str), a);
 
     ct_array_push_n(*output_blob, output->node_str,
-                     sizeof(char[128]) *
-                     ct_array_size(output->node_str), a);
+                    sizeof(char[128]) *
+                    ct_array_size(output->node_str), a);
 
     _destroy_compile_output(output);
 }

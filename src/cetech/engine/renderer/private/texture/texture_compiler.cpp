@@ -105,15 +105,15 @@ static void compiler(const char *filename,
     char tmp_filename[1024] = {};
 
     uint64_t key[] = {
-            ct_yng_a0.calc_key("input")
+            ct_yng_a0.key("input")
     };
 
     const char *input_str = ct_ydb_a0.get_string(filename, key, 1, "");
 
-    key[0] = ct_yng_a0.calc_key("gen_mipmaps");
+    key[0] = ct_yng_a0.key("gen_mipmaps");
     bool gen_mipmaps = ct_ydb_a0.get_bool(filename, key, 1, true);
 
-    key[0] = ct_yng_a0.calc_key("is_normalmap");
+    key[0] = ct_yng_a0.key("is_normalmap");
     bool is_normalmap = ct_ydb_a0.get_bool(filename, key, 1, false);
 
     const char *source_dir = ct_resource_a0.compiler_get_source_dir();

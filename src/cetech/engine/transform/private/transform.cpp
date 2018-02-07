@@ -188,15 +188,15 @@ int _component_compiler(const char *filename,
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
-    keys[component_key_count] = ct_yng_a0.calc_key("scale");
+    keys[component_key_count] = ct_yng_a0.key("scale");
     ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
                        t_data.scale, (float[3]) {0});
 
-    keys[component_key_count] = ct_yng_a0.calc_key("position");
+    keys[component_key_count] = ct_yng_a0.key("position");
     ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
                        t_data.position, (float[3]) {0});
 
-    keys[component_key_count] = ct_yng_a0.calc_key("rotation");
+    keys[component_key_count] = ct_yng_a0.key("rotation");
     ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
                        t_data.rotation, (float[3]) {0});
 

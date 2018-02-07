@@ -67,117 +67,117 @@ typedef void(*ct_yamlng_foreach_seq_t)(
 struct ct_yng_doc {
     ct_yng_doc_instance_t *inst;
 
-    bool (*has_key)(ct_yng_doc_instance_t *inst,
+    bool (*has_key)(struct ct_yng_doc *doc,
                     uint64_t key);
 
-    struct ct_yamlng_node (*get)(ct_yng_doc_instance_t *inst,
+    struct ct_yamlng_node (*get)(struct ct_yng_doc *doc,
                                  uint64_t key);
 
-    struct ct_yamlng_node (*get_seq)(ct_yng_doc_instance_t *inst,
+    struct ct_yamlng_node (*get_seq)(struct ct_yng_doc *doc,
                                      uint64_t key,
                                      uint32_t idx);
 
-    enum node_type (*type)(ct_yng_doc_instance_t *inst,
+    enum node_type (*type)(struct ct_yng_doc *doc,
                            struct ct_yamlng_node node);
 
-    uint64_t (*hash)(ct_yng_doc_instance_t *inst,
+    uint64_t (*hash)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node);
 
-    uint32_t (*size)(ct_yng_doc_instance_t *inst,
+    uint32_t (*size)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node);
 
-    const char *(*as_string)(ct_yng_doc_instance_t *inst,
+    const char *(*as_string)(struct ct_yng_doc *doc,
                              struct ct_yamlng_node node,
                              const char *defaultt);
 
-    float (*as_float)(ct_yng_doc_instance_t *inst,
+    float (*as_float)(struct ct_yng_doc *doc,
                       struct ct_yamlng_node node,
                       float defaultt);
 
-    bool (*as_bool)(ct_yng_doc_instance_t *inst,
+    bool (*as_bool)(struct ct_yng_doc *doc,
                     struct ct_yamlng_node node,
                     bool defaultt);
 
-    void (*as_vec3)(ct_yng_doc_instance_t *inst,
+    void (*as_vec3)(struct ct_yng_doc *doc,
                     struct ct_yamlng_node node,
                     float *value);
 
-    void (*as_vec4)(ct_yng_doc_instance_t *inst,
+    void (*as_vec4)(struct ct_yng_doc *doc,
                     struct ct_yamlng_node node,
                     float *value);
 
-    void (*as_mat4)(ct_yng_doc_instance_t *inst,
+    void (*as_mat4)(struct ct_yng_doc *doc,
                     struct ct_yamlng_node node,
                     float *value);
 
-    const char *(*get_string)(ct_yng_doc_instance_t *inst,
-                              uint64_t key,
-                              const char *defaultt);
+    const char *(*get_str)(struct ct_yng_doc *doc,
+                           uint64_t key,
+                           const char *defaultt);
 
-    float (*get_float)(ct_yng_doc_instance_t *inst,
+    float (*get_float)(struct ct_yng_doc *doc,
                        uint64_t key,
                        float defaultt);
 
-    bool (*get_bool)(ct_yng_doc_instance_t *inst,
+    bool (*get_bool)(struct ct_yng_doc *doc,
                      uint64_t key,
                      bool defaultt);
 
-    void (*set_float)(ct_yng_doc_instance_t *inst,
+    void (*set_float)(struct ct_yng_doc *doc,
                       struct ct_yamlng_node node,
                       float value);
 
-    void (*set_bool)(ct_yng_doc_instance_t *inst,
+    void (*set_bool)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node,
                      bool value);
 
 
-    void (*set_string)(ct_yng_doc_instance_t *inst,
-                       struct ct_yamlng_node node,
-                       const char *value);
+    void (*set_str)(struct ct_yng_doc *doc,
+                    struct ct_yamlng_node node,
+                    const char *value);
 
-    void (*set_vec3)(ct_yng_doc_instance_t *inst,
+    void (*set_vec3)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node,
                      float *value);
 
-    void (*set_vec4)(ct_yng_doc_instance_t *inst,
+    void (*set_vec4)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node,
                      float *value);
 
-    void (*set_mat4)(ct_yng_doc_instance_t *inst,
+    void (*set_mat4)(struct ct_yng_doc *doc,
                      struct ct_yamlng_node node,
                      float *value);
 
-    void (*create_tree_vec3)(ct_yng_doc_instance_t *inst,
+    void (*create_tree_vec3)(struct ct_yng_doc *doc,
                              const char **keys,
                              uint32_t keys_count,
                              float *value);
 
-    void (*create_tree_bool)(ct_yng_doc_instance_t *inst,
+    void (*create_tree_bool)(struct ct_yng_doc *doc,
                              const char **keys,
                              uint32_t keys_count,
                              bool value);
 
-    void (*create_tree_float)(ct_yng_doc_instance_t *inst,
+    void (*create_tree_float)(struct ct_yng_doc *doc,
                               const char **keys,
                               uint32_t keys_count,
                               float value);
 
-    void (*create_tree_string)(ct_yng_doc_instance_t *inst,
+    void (*create_tree_string)(struct ct_yng_doc *doc,
                                const char **keys,
                                uint32_t keys_count,
                                const char *value);
 
-    void (*foreach_dict_node)(ct_yng_doc_instance_t *inst,
+    void (*foreach_dict_node)(struct ct_yng_doc *doc,
                               struct ct_yamlng_node node,
                               ct_yamlng_foreach_map_t foreach_clb,
                               void *data);
 
-    void (*foreach_seq_node)(ct_yng_doc_instance_t *inst,
+    void (*foreach_seq_node)(struct ct_yng_doc *doc,
                              struct ct_yamlng_node node,
                              ct_yamlng_foreach_seq_t foreach_clb,
                              void *data);
 
-    void (*parent_files)(ct_yng_doc_instance_t *inst,
+    void (*parent_files)(struct ct_yng_doc *doc,
                          const char ***files,
                          uint32_t *count);
 };
@@ -195,7 +195,7 @@ struct ct_yng_a0 {
 
     const char *(*get_key)(uint64_t hash);
 
-    uint64_t (*calc_key)(const char *key);
+    uint64_t (*key)(const char *key);
 
     uint64_t (*combine_key)(const uint64_t *keys,
                             uint32_t count);

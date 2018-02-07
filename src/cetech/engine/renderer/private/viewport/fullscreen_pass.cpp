@@ -134,13 +134,13 @@ static void foreach_input(struct ct_yamlng_node key,
 
     fullscree_pass_data *pass_data = static_cast<fullscree_pass_data *>(_data);
 
-    const char *key_str = d->as_string(d->inst, key, "");
+    const char *key_str = d->as_string(d, key, "");
     memcpy(&pass_data->input_name[pass_data->input_count],
            key_str,
            sizeof(char) *
            strlen(key_str) + 1);
 
-    const char *resource_name_str = d->as_string(d->inst, value, "");
+    const char *resource_name_str = d->as_string(d, value, "");
     uint64_t resource_name = CT_ID64_0(resource_name_str);
 
     pass_data->input_resource[pass_data->input_count] = resource_name;
@@ -152,16 +152,16 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
     ct_yng_doc *d = body.d;
 
     uint64_t keys[2] = {
-            d->hash(d->inst, body),
-            ct_yng_a0.calc_key("input")
+            d->hash(d, body),
+            ct_yng_a0.key("input")
     };
     uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
 
-    ct_yamlng_node input = d->get(d->inst, k);
+    ct_yamlng_node input = d->get(d, k);
     if (0 != input.idx) {
         fullscree_pass_data pass_data = {};
 
-        d->foreach_dict_node(d->inst, input, foreach_input, &pass_data);
+        d->foreach_dict_node(d, input, foreach_input, &pass_data);
 
         ct_array_push_n(*data, &pass_data, sizeof(pass_data),
                         ct_memory_a0.main_allocator());

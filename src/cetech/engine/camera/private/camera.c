@@ -61,14 +61,14 @@ static int _camera_component_compiler(const char *filename,
     struct camera_data t_data;
     uint64_t keys[key_count + 1];
     memcpy(keys, comp_key, sizeof(uint64_t) * key_count);
-    keys[key_count] = ct_yng_a0.calc_key("near");
+    keys[key_count] = ct_yng_a0.key("near");
 
     t_data.near = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    keys[key_count] = ct_yng_a0.calc_key("far");
+    keys[key_count] = ct_yng_a0.key("far");
     t_data.far = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    keys[key_count] = ct_yng_a0.calc_key("fov");
+    keys[key_count] = ct_yng_a0.key("fov");
     t_data.fov = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
     ct_cdb_a0.set_float(writer, PROP_NEAR, t_data.near);

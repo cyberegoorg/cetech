@@ -60,7 +60,7 @@ static void set_ydb_bool_cmd(const struct ct_cmd *cmd,
 static void ui_input(const char *path) {
     uint64_t tmp_keys[32] = {};
 
-    tmp_keys[0] = ct_yng_a0.calc_key("input");
+    tmp_keys[0] = ct_yng_a0.key("input");
 
     const char *input = ct_ydb_a0.get_string(path, tmp_keys, 1, "");
 
@@ -92,7 +92,7 @@ static void cmd_description(char *buffer,
 }
 
 static void ui_gen_mipmaps(const char *path) {
-    uint64_t tmp_keys = ct_yng_a0.calc_key("gen_mipmaps");
+    uint64_t tmp_keys = ct_yng_a0.key("gen_mipmaps");
 
     bool gen_mipmaps = ct_ydb_a0.get_bool(path, &tmp_keys, 1, false);
     bool new_gen_mipmaps = gen_mipmaps;
@@ -118,7 +118,7 @@ static void ui_gen_mipmaps(const char *path) {
 }
 
 static void ui_is_normalmap(const char *path) {
-    uint64_t tmp_keys = ct_yng_a0.calc_key("is_normalmap");
+    uint64_t tmp_keys = ct_yng_a0.key("is_normalmap");
 
     bool is_normalmap = ct_ydb_a0.get_bool(path, &tmp_keys, 1, false);
     bool new_is_normalmap = is_normalmap;

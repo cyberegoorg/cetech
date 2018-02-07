@@ -119,7 +119,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
     struct foreach_config_data *output = (struct foreach_config_data *) _data;
     struct ct_yng_doc *d = key.d;
 
-    const char *key_str = d->as_string(d->inst, key, "");
+    const char *key_str = d->as_string(d, key, "");
 
     char name[1024] = {};
     if (output->root_name != NULL) {
@@ -129,14 +129,14 @@ static void foreach_config_clb(struct ct_yamlng_node key,
         snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
     }
 
-    enum node_type type = d->type(d->inst, value);
+    enum node_type type = d->type(d, value);
 
     if (type == NODE_MAP) {
         struct foreach_config_data data = {
                 .root_name = name
         };
 
-        d->foreach_dict_node(d->inst, value, foreach_config_clb, &data);
+        d->foreach_dict_node(d, value, foreach_config_clb, &data);
 
     } else if (type != NODE_SEQ) {
         float tmp_f;
@@ -144,7 +144,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
         const char *str;
 
         if (type == NODE_STRING) {
-            str = d->as_string(d->inst, value, "");
+            str = d->as_string(d, value, "");
             _cvar_from_str(name, str);
 
         } else {
@@ -161,17 +161,17 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                         break;
 
                     case CDB_TYPE_FLOAT:
-                        tmp_f = d->as_float(d->inst, value, 0.0f);
+                        tmp_f = d->as_float(d, value, 0.0f);
                         ct_cdb_a0.set_float(writer, key, tmp_f);
                         break;
 
                     case CDB_TYPE_UINT32:
-                        tmp_int = (int) d->as_float(d->inst, value, 0.0f);
+                        tmp_int = (int) d->as_float(d, value, 0.0f);
                         ct_cdb_a0.set_uint32(writer, key, tmp_int);
                         break;
 
                     case CDB_TYPE_STRPTR:
-                        str = d->as_string(d->inst, value, "");
+                        str = d->as_string(d, value, "");
                         ct_cdb_a0.set_string(writer, key, str);
                         break;
                     default:
@@ -197,7 +197,7 @@ static int load_from_yaml_file(const char *yaml,
     };
 
 
-    d->foreach_dict_node(d->inst, d->get(d->inst, 0), foreach_config_clb,
+    d->foreach_dict_node(d, d->get(d, 0), foreach_config_clb,
                          &config_data);
 
     ct_yng_a0.destroy(d);
