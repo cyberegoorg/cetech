@@ -32,7 +32,7 @@
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -52,7 +52,7 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 
 //==============================================================================
 // Definess
@@ -220,8 +220,8 @@ extern "C" void application_start() {
 
     uint64_t fq = ct_time_a0.perf_freq();
 
-//    ct_entity_a0.add_simulation(
-//            ct_entity_a0.component_mask(CT_ID64_0("transformation")),
+//    ct_world_a0.add_simulation(
+//            ct_world_a0.component_mask(CT_ID64_0("transformation")),
 //            simplesimu);
 
     _G.is_running = 1;
@@ -247,8 +247,6 @@ extern "C" void application_start() {
         if (_G.active_game.on_update) {
             _G.active_game.on_update(dt);
         }
-
-        ct_entity_a0.simulate(dt);
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
             ct_renderer_a0.render(_G.active_game.on_render ?
@@ -362,7 +360,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
 
             ct_api_a0 = *api;
         },

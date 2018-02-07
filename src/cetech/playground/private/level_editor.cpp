@@ -1,10 +1,9 @@
 #include <stdio.h>
 
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/level/level.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/playground/level_editor.h>
 #include <cetech/engine/transform/transform.h>
@@ -29,8 +28,6 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_level_a0);
-CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
@@ -77,7 +74,7 @@ static void fps_camera_update(ct_world world,
     float rot[3];
     float wm[16];
 
-    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(camera_ent);
+    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(camera_ent);
 
     ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
     ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
@@ -226,18 +223,18 @@ static void open(uint64_t name,
     if (UINT32_MAX != level_idx) {
         _G.world[idx] = _G.world[level_idx];
     } else {
-        _G.world[idx] = ct_world_a0.create();
+        _G.world[idx] = ct_world_a0.create_world();
 
         if (is_level) {
-            _G.entity[idx] = ct_level_a0.load_level(_G.world[idx], name);
+            _G.entity[idx] = ct_world_a0.spawn_level(_G.world[idx], name);
         } else {
-            _G.entity[idx] = ct_entity_a0.spawn(_G.world[idx], name);
+            _G.entity[idx] = ct_world_a0.spawn_entity(_G.world[idx], name);
         }
 
         _G.is_first[idx] = true;
         _G.is_level[idx] = is_level;
     }
-    _G.camera_ent[idx] = ct_entity_a0.spawn(_G.world[idx],
+    _G.camera_ent[idx] = ct_world_a0.spawn_entity(_G.world[idx],
                                             CT_ID64_0("content/camera"));
 
     _G.path[idx] = strdup(path);
@@ -345,8 +342,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_world_a0);
-            CETECH_GET_API(api, ct_level_a0);
-            CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);

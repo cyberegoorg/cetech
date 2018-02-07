@@ -1,4 +1,4 @@
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>

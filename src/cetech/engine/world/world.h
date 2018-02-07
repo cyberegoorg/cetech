@@ -1,8 +1,5 @@
-//! \defgroup Entity
-//! Entity system
-//! \{
-#ifndef CETECH_ENTITY_MANAGER_H
-#define CETECH_ENTITY_MANAGER_H
+#ifndef CETECH_WORLD_H
+#define CETECH_WORLD_H
 
 
 #ifdef __cplusplus
@@ -35,6 +32,14 @@ struct ct_world {
     uint64_t h;
 };
 
+//! Entity typedef
+struct ct_entity {
+    uint64_t h;
+};
+
+struct ct_component_id {
+    uint64_t id;
+};
 
 //! Component compiler
 //! \param body Component body yaml
@@ -47,15 +52,6 @@ typedef int (*ct_component_compiler_t)(const char *filename,
 //==============================================================================
 // Structs
 //==============================================================================
-
-//! Entity typedef
-struct ct_entity {
-    uint64_t h;
-};
-
-struct ct_component_id {
-    uint64_t id;
-};
 
 //! World callbacks
 typedef struct {
@@ -75,7 +71,8 @@ typedef struct {
 } ct_world_callbacks_t;
 
 
-typedef void (*ct_simulate_fce_t)(struct ct_entity *ent,
+typedef void (*ct_simulate_fce_t)(struct ct_world world,
+                                  struct ct_entity *ent,
                                   struct ct_cdb_obj_t **obj,
                                   uint32_t n,
                                   float dt);
@@ -95,42 +92,37 @@ struct ct_comp_watch {
 //==============================================================================
 
 
-//! Entity system API V0
-struct ct_entity_a0 {
-    //! Create new entity
-    //! \return New entity
-    struct ct_entity (*create)();
+struct ct_world_a0 {
+    // ENT
+    struct ct_entity (*create_entity)();
+
+    void (*destroy_entity)(struct ct_world world,
+                           struct ct_entity *entity,
+                           uint32_t count);
 
     struct ct_cdb_obj_t *(*ent_obj)(struct ct_entity entity);
 
-    //! Destroy entities
-    //! \param world World
-    //! \param entity entities
-    //! \param count entity count
-    void (*destroy)(struct ct_world world,
-                    struct ct_entity *entity,
-                    uint32_t count);
+    bool (*entity_alive)(struct ct_entity entity);
 
-    //! Is entity alive?
-    //! \param entity Entity
-    //! \return 1 if entity is alive else 0
-    int (*alive)(struct ct_entity entity);
-
-    //! Spawn entity
-    //! \param world World
-    //! \param name Resource name
-    //! \return New entity
-    struct ct_entity (*spawn)(struct ct_world world,
-                              uint64_t name);
+    struct ct_entity (*spawn_entity)(struct ct_world world,
+                                     uint64_t name);
 
     struct ct_entity (*spawn_level)(struct ct_world world,
                                     uint64_t name);
 
     struct ct_entity (*find_by_uid)(struct ct_entity root,
-                                     uint64_t uid);
+                                    uint64_t uid);
 
-    // NEW
-    struct ct_component_id (*register_component)(uint64_t component_name);
+    // WORLD
+    struct ct_world (*create_world)();
+
+    void (*destroy_world)(struct ct_world world);
+
+    void (*update_world)(struct ct_world world,
+                         float dt);
+
+    // COMPONENT
+    void (*register_component)(uint64_t component_name);
 
     uint64_t (*component_mask)(uint64_t component_name);
 
@@ -146,60 +138,24 @@ struct ct_entity_a0 {
     void (*remove_component)(struct ct_entity ent,
                              uint64_t component_name);
 
-    void (*add_simulation)(uint64_t components_mask,
-                           ct_simulate_fce_t simulation);
+    void (*register_component_compiler)(uint64_t type,
+                                        ct_component_compiler_t compiler);
 
     void (*add_components_watch)(struct ct_comp_watch watch);
 
-    void (*simulate)(float dt);
-};
-
-
-//! Component system API V0
-struct ct_component_a0 {
-    //! Register component compiler
-    //! \param type Component type
-    //! \param compiler Compiler fce
-    //! \param spawn_order Spawn order number
-    void (*register_compiler)(uint64_t type,
-                              ct_component_compiler_t compiler);
-
-    //! Compile component
-    //! \param type Component type
-    //! \param body Component yaml body
-    //! \param data Compiled data
-    //! \return 1 if compile is ok else 0
-    int (*compile)(uint64_t type,
-                   const char *filename,
-                   uint64_t *component_key,
-                   uint32_t component_key_count,
-                   struct ct_cdb_writer_t *writer);
-};
-
-//! World API V0
-struct ct_world_a0 {
-    //! Register world calbacks
-    //! \param clb Callbacks
     void (*register_callback)(ct_world_callbacks_t clb);
 
-    //! Create new world
-    //! \return New world
-    struct ct_world (*create)();
+    void (*simulate)(struct ct_world world,
+                     float dt);
 
-    //! Destroy world
-    //! \param world World
-    void (*destroy)(struct ct_world world);
+    void (*add_simulation)(uint64_t components_mask,
+                           ct_simulate_fce_t simulation);
 
-    //! Update world
-    //! \param world World
-    //! \param dt Delta time
-    void (*update)(struct ct_world world,
-                   float dt);
 };
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //CETECH_ENTITY_MANAGER_H
+#endif //CETECH_WORLD_H
 //! \}

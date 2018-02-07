@@ -1,8 +1,8 @@
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/camera/camera.h>
-#include <cetech/core/yaml/yamlng.h>
+#include <cetech/core/yaml/yng.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/macros.h>
 #include <cetech/core/containers/array.h>
@@ -16,12 +16,11 @@
 #include "cetech/core/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 
@@ -41,12 +40,6 @@ uint64_t combine(uint32_t a,
     return c.ab;
 }
 
-struct camera_data {
-    float near;
-    float far;
-    float fov;
-};
-
 
 #define _G CameraGlobal
 static struct CameraGlobal {
@@ -58,26 +51,24 @@ static int _camera_component_compiler(const char *filename,
                                       uint64_t *comp_key,
                                       uint32_t key_count,
                                       struct ct_cdb_writer_t *writer) {
-    struct camera_data t_data;
     uint64_t keys[key_count + 1];
     memcpy(keys, comp_key, sizeof(uint64_t) * key_count);
-    keys[key_count] = ct_yng_a0.key("near");
 
-    t_data.near = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    keys[key_count] = ct_yng_a0.key("near");
+    float near = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
     keys[key_count] = ct_yng_a0.key("far");
-    t_data.far = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    float far = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
     keys[key_count] = ct_yng_a0.key("fov");
-    t_data.fov = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    float fov = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    ct_cdb_a0.set_float(writer, PROP_NEAR, t_data.near);
-    ct_cdb_a0.set_float(writer, PROP_FAR, t_data.far);
-    ct_cdb_a0.set_float(writer, PROP_FOV, t_data.fov);
+    ct_cdb_a0.set_float(writer, PROP_NEAR, near);
+    ct_cdb_a0.set_float(writer, PROP_FAR, far);
+    ct_cdb_a0.set_float(writer, PROP_FOV, fov);
 
     return 1;
 }
-
 
 static void get_project_view(struct ct_world world,
                              struct ct_entity camera,
@@ -85,7 +76,7 @@ static void get_project_view(struct ct_world world,
                              float *view,
                              int width,
                              int height) {
-    struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(camera);
+    struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(camera);
 
     float fov = ct_cdb_a0.read_float(ent_obj, PROP_FOV, 0.0f);
     float near = ct_cdb_a0.read_float(ent_obj, PROP_NEAR, 0.0f);
@@ -114,10 +105,10 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("camera"),
     };
 
-    ct_component_a0.register_compiler(_G.type,
+    ct_world_a0.register_component_compiler(_G.type,
                                       _camera_component_compiler);
 
-    ct_entity_a0.register_component(_G.type);
+    ct_world_a0.register_component(_G.type);
 }
 
 static void _shutdown() {
@@ -128,12 +119,11 @@ CETECH_MODULE_DEF(
         camera,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },
         {

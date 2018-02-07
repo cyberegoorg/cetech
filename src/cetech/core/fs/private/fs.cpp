@@ -118,7 +118,7 @@ static void map_root_dir(uint64_t root,
 
     if (watch) {
         ct_watchdog *wd = ct_watchdog_a0.create(a);
-        wd->add_dir(wd, base_path, true);
+        wd->add_dir(wd->inst, base_path, true);
 
         mp.wd = wd;
     }

@@ -7,12 +7,11 @@
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/module/module.h>
-#include <cetech/engine/level/level.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/core/yaml/yamlng.h>
+#include <cetech/core/yaml/yng.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cstdio>
 #include <cetech/playground/playground.h>

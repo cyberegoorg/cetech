@@ -8,7 +8,7 @@
 #include <cetech/core/module/module.h>
 #include <cetech/core/hashlib/hashlib.h>
 
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/camera/camera.h>

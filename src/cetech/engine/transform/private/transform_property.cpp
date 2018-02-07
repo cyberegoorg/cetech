@@ -18,7 +18,7 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/playground//entity_property.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/transform/transform.h>
 #include <cfloat>
 
@@ -49,7 +49,7 @@ CETECH_DECL_API(ct_entity_property_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
@@ -118,7 +118,7 @@ static void on_component(struct ct_world world,
     uint64_t tmp_keys[keys_count + 1];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(entity);
 
     //==========================================================================
     // Position
@@ -271,7 +271,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },
         {

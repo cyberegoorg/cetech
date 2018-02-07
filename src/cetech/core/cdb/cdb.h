@@ -44,6 +44,7 @@ enum ct_cdb_prop_type {
     CDB_TYPE_STRPTR,
     CDB_TYPE_VEC3,
     CDB_TYPE_VEC4,
+    CDB_TYPE_MAT4,
 };
 
 //==============================================================================
@@ -91,6 +92,9 @@ struct ct_cdb_a0 {
                      uint64_t property,
                      const float *value);
 
+    void (*set_mat4)(struct ct_cdb_writer_t *object,
+                     uint64_t property,
+                     const float *value);
 
     void (*set_string)(struct ct_cdb_writer_t *object,
                        uint64_t property,
@@ -122,6 +126,10 @@ struct ct_cdb_a0 {
                               float* value);
 
     void (*read_vec4)(struct ct_cdb_obj_t *object,
+                      uint64_t property,
+                      float* value);
+
+    void (*read_mat4)(struct ct_cdb_obj_t *object,
                       uint64_t property,
                       float* value);
 

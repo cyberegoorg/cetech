@@ -18,7 +18,7 @@
 
 #include <cetech/engine/application/application.h>
 #include <cetech/core/os/window.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/resource/resource.h>
 

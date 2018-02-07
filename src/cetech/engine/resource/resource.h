@@ -4,7 +4,7 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <cetech/core/yaml/yamlng.h>
+#include <cetech/core/yaml/yng.h>
 #include <cetech/core/cdb/cdb.h>
 
 #define PROP_RESOURECE_DATA CT_ID64_0("data")

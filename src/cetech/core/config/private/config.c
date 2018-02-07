@@ -12,7 +12,7 @@
 #include <cetech/core/hashlib/hashlib.h>
 #include <cetech/core/config/config.h>
 #include <cetech/core/module/module.h>
-#include <cetech/core/yaml/yamlng.h>
+#include <cetech/core/yaml/yng.h>
 #include <cetech/core/cdb/cdb.h>
 #include <cetech/core/macros.h>
 

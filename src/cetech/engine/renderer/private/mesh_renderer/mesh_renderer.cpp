@@ -9,7 +9,7 @@
 
 #include "cetech/engine/resource/resource.h"
 
-#include "cetech/engine/entity/entity.h"
+#include "cetech/engine/world/world.h"
 
 #include "cetech/engine/transform/transform.h"
 #include "cetech/engine/scenegraph/scenegraph.h"
@@ -28,16 +28,14 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_scenegprah_a0);
 CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_material_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_scene_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_world_a0);
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -128,7 +126,7 @@ static void on_obj_change(struct ct_cdb_obj_t *obj,
 
 void destroy(struct ct_world world,
              struct ct_entity ent) {
-    ct_entity_a0.remove_component(ent, _G.type);
+    ct_world_a0.remove_component(ent, _G.type);
 
     WorldInstance &_data = *_get_world_instance(world);
 
@@ -226,7 +224,7 @@ void mesh_render_all(struct ct_world world,
     for (uint32_t i = 0; i < data->n; ++i) {
         struct ct_entity ent = data->entity[i];
 
-        struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(ent);
+        struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(ent);
 
         uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
 
@@ -280,7 +278,7 @@ void mesh_render_all(struct ct_world world,
 void mesh_set_material(struct ct_entity mesh,
                        uint32_t idx,
                        uint64_t material) {
-    struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(mesh);
+    struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(mesh);
 
     struct ct_cdb_obj_t *material_instance = ct_material_a0.resource_create(material);
 
@@ -292,11 +290,11 @@ void mesh_set_material(struct ct_entity mesh,
 static void on_add(struct ct_world world,
                    struct ct_entity entity,
                    uint64_t comp_mask) {
-    if (!(comp_mask & ct_entity_a0.component_mask(_G.type))) {
+    if (!(comp_mask & ct_world_a0.component_mask(_G.type))) {
         return;
     }
 
-    struct ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    struct ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
     uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
     uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
 
@@ -341,7 +339,7 @@ static void on_add(struct ct_world world,
 static void on_remove(struct ct_world world,
                       struct ct_entity ent,
                       uint64_t comp_mask) {
-    if (!(comp_mask & ct_entity_a0.component_mask(_G.type))) {
+    if (!(comp_mask & ct_world_a0.component_mask(_G.type))) {
         return;
     }
 
@@ -368,10 +366,10 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("mesh_renderer"),
     };
 
-    ct_entity_a0.register_component(_G.type);
-    ct_entity_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
+    ct_world_a0.register_component(_G.type);
+    ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
 
-    ct_component_a0.register_compiler(_G.type, _mesh_component_compiler);
+    ct_world_a0.register_component_compiler(_G.type, _mesh_component_compiler);
     ct_world_a0.register_callback({
             .on_created =  _new_world,
             .on_destroy = _destroy_world,
@@ -396,7 +394,6 @@ static void shutdown() {
 CETECH_MODULE_DEF(
         mesh_renderer,
         {
-            CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_scenegprah_a0);
             CETECH_GET_API(api, ct_transform_a0);
@@ -405,10 +402,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_scene_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_world_a0);
 
         },
         {

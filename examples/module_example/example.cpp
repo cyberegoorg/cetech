@@ -8,14 +8,13 @@
 
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/application/application.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 
 #include <cetech/playground//playground.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/camera/camera.h>
-#include <cetech/engine/level/level.h>
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cstdlib>
@@ -31,9 +30,7 @@ CETECH_DECL_API(ct_renderer_a0);
 
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_texture_a0);
 
 
@@ -137,9 +134,7 @@ CETECH_MODULE_DEF(
 
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_world_a0);
-            CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_texture_a0);
         },
 

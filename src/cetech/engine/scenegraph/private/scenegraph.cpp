@@ -1,4 +1,4 @@
-#include "cetech/engine/entity/entity.h"
+#include "cetech/engine/world/world.h"
 #include <cetech/engine/scenegraph/scenegraph.h>
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
@@ -17,7 +17,6 @@
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 
@@ -296,7 +295,7 @@ static int has(ct_world world,
 
 static ct_scene_node get_root(ct_world world,
                               ct_entity entity) {
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
     uint32_t idx = ct_cdb_a0.read_uint32(ent_obj,
                                          CT_ID64_0("scenegraph.idx"), UINT32_MAX);
     return (ct_scene_node) {.idx = idx, .world = world};
@@ -310,7 +309,7 @@ static ct_scene_node create(ct_world world,
                             uint32_t count) {
     CT_UNUSED(pose);
 
-    ct_entity_a0.add_components(world, entity, &_G.type, 1);
+    ct_world_a0.add_components(world, entity, &_G.type, 1);
 
     WorldInstance *data = _get_world_instance(world);
 
@@ -385,7 +384,7 @@ static ct_scene_node create(ct_world world,
     ct_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
     CT_FREE(ct_memory_a0.main_allocator(), nodes);
 
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
     ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint32(ent_writer, CT_ID64_0("scenegraph.idx"), root.idx);
     ct_cdb_a0.write_commit(ent_writer);
@@ -481,7 +480,7 @@ static void init(ct_api_a0 *api) {
     };
 
 
-    ct_entity_a0.register_component(_G.type);
+    ct_world_a0.register_component(_G.type);
     ct_world_a0.register_callback((ct_world_callbacks_t) {
             .on_created=_new_world,
             .on_destroy=_destroy_world
@@ -497,9 +496,8 @@ static void shutdown() {
 CETECH_MODULE_DEF(
         scenegraph,
         {
-            CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api,ct_entity_a0);
+            CETECH_GET_API(api,ct_world_a0);
             CETECH_GET_API(api,ct_cdb_a0);
             CETECH_GET_API(api,ct_hashlib_a0);
         },

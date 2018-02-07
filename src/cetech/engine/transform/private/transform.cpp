@@ -6,7 +6,7 @@
 
 #include "cetech/core/containers/map.inl"
 
-#include "cetech/engine/entity/entity.h"
+#include "cetech/engine/world/world.h"
 #include <cetech/engine/transform/transform.h>
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/macros.h>
@@ -18,12 +18,10 @@
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_component_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_entity_a0);
-CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 using namespace celib;
 
@@ -293,7 +291,7 @@ void on_obj_change(struct ct_cdb_obj_t *obj,
 void on_add(struct ct_world world,
             struct ct_entity entity,
             uint64_t comp_mask) {
-    if (!(comp_mask & ct_entity_a0.component_mask(_G.type))) {
+    if (!(comp_mask & ct_world_a0.component_mask(_G.type))) {
         return;
     }
 
@@ -305,7 +303,7 @@ void on_add(struct ct_world world,
 
     data->entity[idx] = entity;
 
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
 
     ct_cdb_a0.register_notify(ent_obj, on_obj_change);
 
@@ -395,13 +393,13 @@ static void _init(ct_api_a0 *api) {
             .type = CT_ID64_0("transform"),
     };
 
-    ct_entity_a0.register_component(_G.type);
-    ct_entity_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
+    ct_world_a0.register_component(_G.type);
+    ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
     ct_world_a0.register_callback({
                     .on_created=_on_world_create,
                     .on_destroy=_on_world_destroy});
 
-    ct_component_a0.register_compiler(_G.type, _component_compiler);
+    ct_world_a0.register_component_compiler(_G.type, _component_compiler);
 }
 
 static void _shutdown() {
@@ -461,7 +459,7 @@ void transform_transform(ct_transform transform,
 
 void transform_get_world_matrix(struct ct_entity transform,
                                 float *value) {
-    ct_cdb_obj_t *obj = ct_entity_a0.ent_obj(transform);
+    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(transform);
     const uint32_t idx = ct_cdb_a0.read_uint32(obj, CT_ID64_0("transform.idx"),
                                                UINT32_MAX);
 
@@ -479,7 +477,7 @@ void transform_get_world_matrix(struct ct_entity transform,
 
 ct_transform transform_get(ct_world world,
                            ct_entity entity) {
-    ct_cdb_obj_t *ent_obj = ct_entity_a0.ent_obj(entity);
+    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(entity);
     uint32_t idx = ct_cdb_a0.read_uint32(ent_obj, CT_ID64_0("transform.idx"),
                                          UINT32_MAX);
     return (ct_transform) {.idx = idx, .world = world};
@@ -518,13 +516,11 @@ void transform_link(ct_world world,
 CETECH_MODULE_DEF(
         transform,
         {
-            CETECH_GET_API(api, ct_component_a0);
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_world_a0);
         },
         {

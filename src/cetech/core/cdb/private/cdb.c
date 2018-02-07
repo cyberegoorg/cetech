@@ -290,6 +290,24 @@ static void set_vec4(struct ct_cdb_writer_t *_writer,
     memcpy((obj->values + obj->offset[idx]), value, size);
 }
 
+static void set_mat4(struct ct_cdb_writer_t *_writer,
+                     uint64_t property,
+                     const float *value) {
+    const size_t size = sizeof(float) * 4;
+    struct writer_t *writer = (struct writer_t *) _writer;
+    struct object_t *obj = writer->clone_obj;
+
+    uint64_t idx = _find_prop_index(obj, property);
+    if (!idx) {
+        idx = _object_new_property(obj, property,
+                                   CDB_TYPE_MAT4, value,
+                                   size, _G.allocator);
+    }
+
+    ct_array_push(writer->changed_prop, property, _G.allocator);
+    memcpy((obj->values + obj->offset[idx]), value, size);
+}
+
 static void set_string(struct ct_cdb_writer_t *_writer,
                        uint64_t property,
                        const char *value) {
@@ -434,6 +452,19 @@ static void read_vec4(struct ct_cdb_obj_t *_obj,
     }
 }
 
+static void read_mat4(struct ct_cdb_obj_t *_obj,
+                      uint64_t property,
+                      float *value) {
+    struct object_t *obj = *(struct object_t **) _obj;
+    uint64_t idx = _find_prop_index(obj, property);
+
+    if (idx) {
+        const float *f = (const float *) (obj->values + obj->offset[idx]);
+        memcpy(value, f, sizeof(float) * 16);
+    }
+}
+
+
 static const char *read_string(struct ct_cdb_obj_t *_obj,
                                uint64_t property,
                                const char *defaultt) {
@@ -498,6 +529,7 @@ static struct ct_cdb_a0 cdb_api = {
         .read_float = read_float,
         .read_vec3 = read_vec3,
         .read_vec4 = read_vec4,
+        .read_mat4 = read_mat4,
         .read_str = read_string,
         .read_uint32 = read_uint32,
         .read_uint64 = read_uint64,
@@ -510,6 +542,7 @@ static struct ct_cdb_a0 cdb_api = {
         .set_float = set_float,
         .set_vec3 = set_vec3,
         .set_vec4 = set_vec4,
+        .set_mat4 = set_mat4,
         .set_string = set_string,
         .set_uint32 = set_uint32,
         .set_uint64 = set_uint64,

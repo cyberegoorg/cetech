@@ -13,7 +13,7 @@
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/engine/resource/resource.h"
 
-#include "cetech/engine/entity/entity.h"
+#include "cetech/engine/world/world.h"
 #include "cetech/engine/machine/machine.h"
 
 #include <bgfx/defines.h>

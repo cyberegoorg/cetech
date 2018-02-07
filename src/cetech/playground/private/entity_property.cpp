@@ -9,8 +9,7 @@
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/engine/level/level.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_browser.h>
@@ -25,10 +24,9 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_explorer_a0);
-CETECH_DECL_API(ct_level_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 
 using namespace celib;
 
@@ -70,7 +68,7 @@ static void on_debugui() {
         ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
-    struct ct_entity entity = ct_entity_a0.find_by_uid(_G.top_entity,
+    struct ct_entity entity = ct_world_a0.find_by_uid(_G.top_entity,
                                                         _G.active_entity);
 
     uint64_t tmp_keys[_G.keys_count + 3];
@@ -78,7 +76,7 @@ static void on_debugui() {
     tmp_keys[_G.keys_count] = ct_yng_a0.key("components");
 
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
-        if (ct_entity_a0.has(entity, &_G.components[j].name, 1)) {
+        if (ct_world_a0.has(entity, &_G.components[j].name, 1)) {
             tmp_keys[_G.keys_count + 1] = _G.components[j].name;
             _G.components[j].clb(_G.active_world, entity, _G.filename, tmp_keys,
                                  _G.keys_count + 2);
@@ -147,10 +145,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_property_editor_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_explorer_a0);
-            CETECH_GET_API(api, ct_level_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
         },
         {
             CT_UNUSED(reload);

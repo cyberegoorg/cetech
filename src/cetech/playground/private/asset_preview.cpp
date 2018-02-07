@@ -1,8 +1,7 @@
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/level/level.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/transform/transform.h>
 
@@ -25,7 +24,6 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_entity_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
@@ -72,7 +70,7 @@ static void fps_camera_update(ct_world world,
     float rot[3];
     float wm[16];
 
-    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(camera_ent);
+    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(camera_ent);
 
     ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
     ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
@@ -117,13 +115,12 @@ static void fps_camera_update(ct_world world,
 
 static void on_debugui() {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
-                                DebugUIWindowFlags_(
-                                        DebugUIWindowFlags_NoScrollbar))) {
+                                DebugUIWindowFlags_NoScrollbar)) {
 
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
 
-        auto th = ct_viewport_a0.get_local_resource(
-                _G.viewport, CT_ID64_0("bb_color"));
+        auto th = ct_viewport_a0.get_local_resource(_G.viewport,
+                                                    CT_ID64_0("bb_color"));
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
@@ -179,7 +176,7 @@ static void set_asset(uint64_t type,
         }
     }
 
-    ct_cdb_obj_t* obj = ct_entity_a0.ent_obj(_G.camera_ent);
+    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.camera_ent);
     ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_vec3(w, PROP_POSITION, (float[3]) {0.0f, 0.0f, -10.0f});
     ct_cdb_a0.write_commit(w);
@@ -188,8 +185,8 @@ static void set_asset(uint64_t type,
 static void init() {
     _G.visible = true;
     _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
-    _G.world = ct_world_a0.create();
-    _G.camera_ent = ct_entity_a0.spawn(_G.world, CT_ID64_0("content/camera"));
+    _G.world = ct_world_a0.create_world();
+    _G.camera_ent = ct_world_a0.spawn_entity(_G.world, CT_ID64_0("content/camera"));
 }
 
 static void shutdown() {
@@ -294,7 +291,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_world_a0);
-            CETECH_GET_API(api, ct_entity_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);

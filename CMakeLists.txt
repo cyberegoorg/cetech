@@ -96,7 +96,7 @@ set(SOURCE_FILES
         src/cetech/engine/resource/private/resource_package.c
         src/cetech/engine/resource/private/resource_compiler.cpp
         src/cetech/core/fs/private/fs.cpp
-        src/cetech/core/yaml/private/yamlng.c
+        src/cetech/core/yaml/private/yng.c
         src/cetech/core/yaml/private/ydb.cpp
         src/cetech/core/cdb/private/cdb.c
 
@@ -111,12 +111,9 @@ set(SOURCE_FILES
         src/cetech/engine/machine/private/keyboard_sdl2.cpp
         src/cetech/engine/machine/private/gamepad_sdl2.cpp
 
-        src/cetech/engine/entity/private/component.cpp
-        src/cetech/engine/entity/private/entity_preview.c
-        src/cetech/engine/entity/private/level_preview.c
-        src/cetech/engine/entity/private/entity.c
-        src/cetech/engine/entity/private/world.cpp
-        src/cetech/engine/level/private/level.cpp
+        src/cetech/playground/private/entity_preview.c
+        src/cetech/playground/private/level_preview.c
+        src/cetech/engine/world/private/world.c
         src/cetech/engine/input/private/keyboard.c
         src/cetech/engine/input/private/mouse.c
         src/cetech/engine/input/private/gamepad.c

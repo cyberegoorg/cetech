@@ -12,7 +12,7 @@
 #include "cetech/core/log/log.h"
 #include <cetech/core/module/module.h>
 #include <cetech/playground//entity_property.h>
-#include <cetech/engine/entity/entity.h>
+#include <cetech/engine/world/world.h>
 #include <cetech/engine/transform/transform.h>
 
 #include <cetech/playground/asset_preview.h>
@@ -34,7 +34,7 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
-CETECH_DECL_API(ct_entity_a0);
+CETECH_DECL_API(ct_world_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
@@ -43,10 +43,10 @@ static void load(const char *filename,
                  uint64_t type,
                  uint64_t name,
                  struct ct_world world) {
-    ct_entity ent = ct_entity_a0.spawn(world, CT_ID64_0("core/cube"));
+    ct_entity ent = ct_world_a0.spawn_entity(world, CT_ID64_0("core/cube"));
     _G.ent = ent;
 
-    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_entity_a0.ent_obj(ent));
+    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_world_a0.ent_obj(ent));
     ct_cdb_a0.set_uint64(w, PROP_MATERIAL_ID, name);
     ct_cdb_a0.write_commit(w);
 }
@@ -56,7 +56,7 @@ static void unload(const char *filename,
                    uint64_t name,
                    struct ct_world world) {
     if (_G.ent.h != 0) {
-        ct_entity_a0.destroy(world, &_G.ent, 1);
+        ct_world_a0.destroy_entity(world, &_G.ent, 1);
     }
 }
 
@@ -90,7 +90,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_preview_a0);
-            CETECH_GET_API(api, ct_entity_a0);
+            CETECH_GET_API(api, ct_world_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_cdb_a0);
 
