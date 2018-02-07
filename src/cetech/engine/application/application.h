@@ -34,7 +34,6 @@ struct ct_game_fce {
 typedef void (*ct_app_on_init)();
 typedef void (*ct_app_on_shutdown)();
 typedef void (*ct_app_on_update)(float dt);
-typedef void (*ct_app_renderer)(void (*on_render)());
 
 //==============================================================================
 // Api

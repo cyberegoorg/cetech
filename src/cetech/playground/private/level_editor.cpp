@@ -42,7 +42,6 @@ CETECH_DECL_API(ct_cdb_a0);
 
 static struct globals {
     bool visible[MAX_EDITOR];
-    struct ct_viewport viewport[MAX_EDITOR];
     struct ct_world world[MAX_EDITOR];
     struct ct_entity camera_ent[MAX_EDITOR];
     struct ct_entity entity[MAX_EDITOR];
@@ -166,12 +165,16 @@ static void on_debugui() {
                 }
             }
 
-            auto th = ct_viewport_a0.get_local_resource(
-                    _G.viewport[i], CT_ID64_0("bb_color"));
+            struct ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world[i], _G.camera_ent[i]);
+            ct_viewport v = {
+                    .idx = ct_cdb_a0.read_uint64(obj, PROP_CAMERA_VIEWPORT, 0)
+            };
+
+            auto th = ct_viewport_a0.get_local_resource(v, CT_ID64_0("bb_color"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
-            ct_viewport_a0.resize(_G.viewport[i], size[0], size[1]);
+            ct_viewport_a0.resize(v, size[0], size[1]);
             ct_debugui_a0.Image2(th,
                                  size,
                                  (float[2]) {0.0f, 0.0f},
@@ -207,8 +210,6 @@ static void open(uint64_t name,
     ++_G.editor_count;
 
     _G.visible[idx] = true;
-    _G.viewport[idx] = ct_viewport_a0.create(
-            CT_ID64_0("default"), 0, 0);
 
     if (UINT32_MAX != level_idx) {
         _G.world[idx] = _G.world[level_idx];
@@ -279,9 +280,7 @@ static void update(float dt) {
         if (!_G.visible[i]) {
             continue;
         }
-
-        ct_viewport_a0.render_world(_G.world[i], _G.camera_ent[i],
-                                    _G.viewport[i]);
+        ct_world_a0.simulate(_G.world[i], dt);
     }
 }
 

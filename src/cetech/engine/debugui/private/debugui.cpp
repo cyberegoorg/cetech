@@ -22,7 +22,6 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_keyboard_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_fs_a0);
@@ -131,9 +130,6 @@ typedef void (*on_debugui)();
 
 _DEF_ON_CLB_FCE(on_debugui, on_debugui);
 
-static void on_render() {
-    render(255);
-}
 
 static void SaveDock(struct ct_vio *output) {
     char* buffer = NULL;
@@ -295,7 +291,6 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_renderer_a0.register_on_render(on_render);
 
     ImGuiIO &io = ImGui::GetIO();
     io.KeyMap[ImGuiKey_Tab] = ct_keyboard_a0.button_index("tab");
@@ -325,7 +320,6 @@ static void _shutdown() {
     imguiDestroy();
 
     ct_array_free(_G.on_debugui, _G.allocator);
-    ct_renderer_a0.unregister_on_render(on_render);
 
     _G = {};
 }
@@ -337,7 +331,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_mouse_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_renderer_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_fs_a0);

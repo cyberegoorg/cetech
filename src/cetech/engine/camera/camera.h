@@ -16,6 +16,7 @@ extern "C" {
 #define PROP_FOV CT_ID64_0("fov")
 #define PROP_NEAR CT_ID64_0("near")
 #define PROP_FAR CT_ID64_0("far")
+#define PROP_CAMERA_VIEWPORT CT_ID64_0("camera.viewport")
 #define PROP_PROJECTION CT_ID64_0("projection")
 #define PROP_VIEW CT_ID64_0("view")
 

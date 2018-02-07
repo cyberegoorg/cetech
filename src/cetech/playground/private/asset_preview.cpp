@@ -45,7 +45,6 @@ static struct _G {
     uint64_t active_name;
     const char *active_path;
 
-    ct_viewport viewport;
     ct_world world;
     ct_entity camera_ent;
     bool visible;
@@ -119,12 +118,16 @@ static void on_debugui() {
 
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
 
-        auto th = ct_viewport_a0.get_local_resource(_G.viewport,
-                                                    CT_ID64_0("bb_color"));
+        struct ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world, _G.camera_ent);
+        ct_viewport v = {
+                .idx = ct_cdb_a0.read_uint64(obj, PROP_CAMERA_VIEWPORT, 0)
+        };
+
+        auto th = ct_viewport_a0.get_local_resource(v, CT_ID64_0("bb_color"));
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
-        ct_viewport_a0.resize(_G.viewport, size[0], size[1]);
+        ct_viewport_a0.resize(v, size[0], size[1]);
         ct_debugui_a0.Image2(th,
                              size,
                              (float[2]) {0.0f, 0.0f},
@@ -179,7 +182,6 @@ static void set_asset(uint64_t type,
 
 static void init() {
     _G.visible = true;
-    _G.viewport = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
     _G.world = ct_world_a0.create_world();
     _G.camera_ent = ct_world_a0.spawn_entity(_G.world, CT_ID64_0("content/camera"));
 }
@@ -219,7 +221,7 @@ static void update(float dt) {
     }
 
     if(_G.visible) {
-        ct_viewport_a0.render_world(_G.world, _G.camera_ent, _G.viewport);
+        ct_world_a0.simulate(_G.world, dt);
     }
 }
 

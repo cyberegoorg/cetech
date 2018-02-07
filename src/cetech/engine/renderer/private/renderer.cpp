@@ -23,6 +23,7 @@
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
 #include <cetech/core/api/private/api_private.h>
+#include <cetech/engine/world/world.h>
 
 #include "bgfx/platform.h"
 
@@ -34,8 +35,9 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_world_a0);
 
-using namespace celib;
+
 
 //==============================================================================
 // GLobals
@@ -191,6 +193,7 @@ static void on_update() {
     }
 }
 
+
 static void on_render() {
     on_update();
 
@@ -231,6 +234,7 @@ static void _init(struct ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
             .config = ct_config_a0.config_object(),
     };
+
 
     ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
 
@@ -289,6 +293,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_world_a0);
         },
         {
             CT_UNUSED(reload);

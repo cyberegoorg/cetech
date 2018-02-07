@@ -357,7 +357,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
 
     ct_world_a0.register_component_compiler(_G.type, _mesh_component_compiler);
-    ct_world_a0.register_callback({
+    ct_world_a0.register_world_callback({
             .on_created =  _new_world,
             .on_destroy = _destroy_world,
     });

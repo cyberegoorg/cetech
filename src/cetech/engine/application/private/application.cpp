@@ -33,6 +33,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/engine/world/world.h>
+#include <cetech/engine/debugui/debugui.h>
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -185,13 +186,6 @@ static void check_machine() {
     }
 }
 
-void simplesimu(struct ct_entity *ent,
-                struct ct_cdb_obj_t **obj,
-                uint32_t n,
-                float dt) {
-
-}
-
 extern "C" void application_start() {
     _init_config();
 
@@ -220,10 +214,6 @@ extern "C" void application_start() {
 
     uint64_t fq = ct_time_a0.perf_freq();
 
-//    ct_world_a0.add_simulation(
-//            ct_world_a0.component_mask(CT_ID64_0("transformation")),
-//            simplesimu);
-
     _G.is_running = 1;
     while (_G.is_running) {
         uint64_t now_ticks = ct_time_a0.perf_counter();
@@ -250,6 +240,9 @@ extern "C" void application_start() {
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
             ct_renderer_a0.render();
+
+            ct_debugui_a0 CETECH_GET_API(&ct_api_a0, ct_debugui_a0);
+            ct_debugui_a0.render(255);
         }
 
     }

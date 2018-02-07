@@ -89,6 +89,14 @@ struct ct_comp_watch {
 
 
 struct ct_world_a0 {
+    // WORLD
+    struct ct_world (*create_world)();
+
+    void (*destroy_world)(struct ct_world world);
+
+    void (*register_world_callback)(ct_world_callbacks_t clb);
+
+
     // ENT
     struct ct_entity (*create_entity)();
 
@@ -108,11 +116,6 @@ struct ct_world_a0 {
 
     struct ct_entity (*find_by_uid)(struct ct_world world, struct ct_entity root,
                                     uint64_t uid);
-
-    // WORLD
-    struct ct_world (*create_world)();
-
-    void (*destroy_world)(struct ct_world world);
 
 
     // COMPONENT
@@ -139,7 +142,6 @@ struct ct_world_a0 {
 
     void (*add_components_watch)(struct ct_comp_watch watch);
 
-    void (*register_callback)(ct_world_callbacks_t clb);
 
     void (*simulate)(struct ct_world world,
                      float dt);

@@ -395,7 +395,7 @@ static void _init(ct_api_a0 *api) {
 
     ct_world_a0.register_component(_G.type);
     ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
-    ct_world_a0.register_callback({
+    ct_world_a0.register_world_callback({
                     .on_created=_on_world_create,
                     .on_destroy=_on_world_destroy});
 

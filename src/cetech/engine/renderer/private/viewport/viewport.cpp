@@ -53,6 +53,7 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_world_a0);
 
 using namespace celib;
 
@@ -360,7 +361,6 @@ static void offline(uint64_t name,
                     struct ct_cdb_obj_t* obj) {
     CT_UNUSED(name, obj);
     //auto *blob = renderconfig_blob::get(data);
-
 
 }
 
@@ -821,7 +821,6 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("render_config"),
     };
 
-    _G.allocator = ct_memory_a0.main_allocator();
     _G.config = ct_config_a0.config_object();
 
     ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
@@ -837,7 +836,6 @@ static void _init(struct ct_api_a0 *api) {
     ct_resource_a0.register_type(_G.type, callback);
     init(api);
     ct_renderer_a0.register_on_render(on_render);
-    //ct_app_a0.register_on_update(on_update);
 }
 
 static void _shutdown() {
@@ -875,6 +873,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_world_a0);
         },
         {
 

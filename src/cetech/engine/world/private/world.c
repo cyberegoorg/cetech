@@ -156,13 +156,12 @@ struct ct_cdb_obj_t *ent_obj(struct ct_world world,
 };
 
 void register_component(uint64_t component_name) {
-    uint64_t cid = ++_G.component_count;
+    uint64_t cid = _G.component_count++;
     ct_hash_add(&_G.component_types, component_name, cid, _G.allocator);
 }
 
 uint64_t component_mask(uint64_t component_name) {
-    return (uint64_t) (1
-            << ct_hash_lookup(&_G.component_types, component_name, 0));
+    return (uint64_t) (1 << ct_hash_lookup(&_G.component_types, component_name, 0));
 }
 
 void _remove_from_type_slot(struct world_instance *w,
@@ -610,7 +609,7 @@ static struct ct_world_a0 _api = {
 
         .register_component_compiler = register_compiler,
 
-        .register_callback = register_callback,
+        .register_world_callback = register_callback,
         .create_world = create_world,
         .destroy_world = destroy_world,
 };
@@ -628,6 +627,8 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("entity"),
             .level_type = CT_ID64_0("level"),
     };
+
+    ct_handler_create(&_G.world_handler, _G.allocator);
 
     ct_resource_a0.register_type(_G.type, callback);
     ct_resource_a0.register_type(_G.level_type, callback);
