@@ -37,6 +37,7 @@ void init_static_modules() {
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(viewport);
     CETECH_ADD_STATIC_MODULE(camera);
+    CETECH_ADD_STATIC_MODULE(camera);
     CETECH_ADD_STATIC_MODULE(fullscreen_pass);
     CETECH_ADD_STATIC_MODULE(geometry_pass);
 
@@ -65,10 +66,9 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(transform_property);
     CETECH_ADD_STATIC_MODULE(mesh_property);
 
-    CETECH_ADD_STATIC_MODULE(level_view);
     CETECH_ADD_STATIC_MODULE(log_view);
+    CETECH_ADD_STATIC_MODULE(entity_editor);
     CETECH_ADD_STATIC_MODULE(entity_preview);
-    CETECH_ADD_STATIC_MODULE(level_preview);
     CETECH_ADD_STATIC_MODULE(material_preview);
     CETECH_ADD_STATIC_MODULE(material_property);
 }

@@ -184,9 +184,9 @@ static void load(uint64_t type,
 
     const uint64_t root_name = CT_ID64_0("build");
 
-    ct_thread_a0.spin_lock(&type_item->lock);
-    struct ct_cdb_writer_t *type_writer = ct_cdb_a0.write_begin(
-            type_item->type_objects);
+//    ct_thread_a0.spin_lock(&type_item->lock);
+    struct ct_cdb_writer_t *type_writer = ct_cdb_a0.write_begin(type_item->type_objects);
+
     for (uint32_t i = 0; i < count; ++i) {
         const uint64_t asset_name = names[i];
 
@@ -232,7 +232,7 @@ static void load(uint64_t type,
         }
     }
     ct_cdb_a0.write_commit(type_writer);
-    ct_thread_a0.spin_unlock(&type_item->lock);
+//    ct_thread_a0.spin_unlock(&type_item->lock);
 }
 
 static void unload(uint64_t type,

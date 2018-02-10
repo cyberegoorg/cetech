@@ -1118,10 +1118,9 @@ void create_tree_string(struct ct_yng_doc *_inst,
 
     char *str = ct_memory_a0.str_dup(value, ct_memory_a0.main_allocator());
 
-    new_idx = new_node(
-            d,
-            NODE_STRING, (struct node_value) {.string = str},
-            node.idx, key);
+    new_idx = new_node(d,
+                       NODE_STRING, (struct node_value) {.string = str},
+                       node.idx, key);
 
     struct doc_inst *inst = (struct doc_inst *) (_inst);
     ct_hash_add(&inst->key_map, key, new_idx, _G.allocator);

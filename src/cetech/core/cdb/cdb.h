@@ -51,16 +51,24 @@ enum ct_cdb_prop_type {
 // Interface
 //==============================================================================
 
-typedef void (*ct_cdb_chg_notify)(struct ct_cdb_obj_t* obj, uint64_t *prop, uint32_t prop_count);
+typedef void (*ct_cdb_chg_notify)(struct ct_cdb_obj_t *obj,
+                                  uint64_t *prop,
+                                  uint32_t prop_count);
 
 struct ct_cdb_a0 {
     struct ct_cdb_obj_t *(*create_object)();
+    struct ct_cdb_obj_t *(*create_from)(struct ct_cdb_obj_t* obj);
 
-    void (*dump)(struct ct_cdb_obj_t *obj, char** output, struct ct_alloc* allocator);
+    void (*dump)(struct ct_cdb_obj_t *obj,
+                 char **output,
+                 struct ct_alloc *allocator);
 
-    void (*load)(struct ct_cdb_obj_t *_obj, const char* input, struct ct_alloc* allocator);
+    void (*load)(struct ct_cdb_obj_t *_obj,
+                 const char *input,
+                 struct ct_alloc *allocator);
 
-    void (*register_notify)(struct ct_cdb_obj_t* obj, ct_cdb_chg_notify clb);
+    void (*register_notify)(struct ct_cdb_obj_t *obj,
+                            ct_cdb_chg_notify clb);
 
     bool (*prop_exist)(struct ct_cdb_obj_t *object,
                        uint64_t key);
@@ -74,12 +82,15 @@ struct ct_cdb_a0 {
 
 
     // WRITE
-    struct ct_cdb_writer_t *
-    (*write_begin)(struct ct_cdb_obj_t *object);
+    struct ct_cdb_writer_t *(*write_begin)(struct ct_cdb_obj_t *object);
 
     void (*write_commit)(struct ct_cdb_writer_t *writer);
 
+
     // SET
+    void (*set_prefab)(struct ct_cdb_writer_t *_writer,
+                       struct ct_cdb_obj_t *prefab_obj);
+
     void (*set_float)(struct ct_cdb_writer_t *object,
                       uint64_t property,
                       float value);
@@ -122,16 +133,16 @@ struct ct_cdb_a0 {
                         float defaultt);
 
     void (*read_vec3)(struct ct_cdb_obj_t *object,
-                              uint64_t property,
-                              float* value);
+                      uint64_t property,
+                      float *value);
 
     void (*read_vec4)(struct ct_cdb_obj_t *object,
                       uint64_t property,
-                      float* value);
+                      float *value);
 
     void (*read_mat4)(struct ct_cdb_obj_t *object,
                       uint64_t property,
-                      float* value);
+                      float *value);
 
     const char *(*read_str)(struct ct_cdb_obj_t *object,
                             uint64_t property,

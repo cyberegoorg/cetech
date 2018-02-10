@@ -18,15 +18,16 @@ CETECH_DECL_API(ct_memory_a0);
 #define MAX_OBJECTS 1000000000ULL
 
 struct object_t {
+    struct ct_cdb_obj_t *prefab;
+    struct ct_cdb_obj_t **instances;
     ct_cdb_chg_notify *notify;
-    struct ct_hash_t prop_map;
-    uint8_t *buffer;
 
+    struct ct_hash_t prop_map; // TODO: STATIC HASH 128?
+    uint8_t *buffer;
     uint64_t *keys;
     uint8_t *type;
     uint64_t *offset;
     uint8_t *values;
-
     uint64_t buffer_size;
     uint64_t properties_count;
     uint64_t values_size;
@@ -58,6 +59,7 @@ static uint64_t _object_new_property(struct object_t *obj,
                                    (sizeof(uint8_t) * new_value_size);
 
     struct object_t new_obj = {
+            .prefab = obj->prefab,
             .notify = obj->notify,
             .buffer = CT_ALLOC(alloc, uint8_t, new_buffer_size),
             .buffer_size = new_buffer_size,
@@ -114,6 +116,7 @@ static struct object_t *_object_clone(struct object_t *obj,
     new_obj->buffer_size = buffer_size;
     new_obj->properties_count = properties_count;
     new_obj->values_size = values_size;
+    new_obj->prefab = obj->prefab;
 
     new_obj->keys = (uint64_t *) new_obj->buffer;
     new_obj->type = (uint8_t *) (new_obj->keys + properties_count);
@@ -123,9 +126,14 @@ static struct object_t *_object_clone(struct object_t *obj,
     memcpy(new_obj->buffer, obj->buffer, sizeof(uint8_t) * buffer_size);
     ct_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
 
-    const uint32_t n = ct_array_size(obj->notify);
-    if(n) {
+    uint32_t n = ct_array_size(obj->notify);
+    if (n) {
         ct_array_push_n(new_obj->notify, obj->notify, n, alloc);
+    }
+
+    n = ct_array_size(obj->instances);
+    if (n) {
+        ct_array_push_n(new_obj->instances, obj->instances, n, alloc);
     }
 
     return new_obj;
@@ -143,6 +151,22 @@ static struct ct_cdb_obj_t *create_object() {
 
     struct object_t **obj_addr = _G.objects + _G.object_used++;
     *obj_addr = obj;
+
+    return (struct ct_cdb_obj_t *) obj_addr;
+}
+
+static struct ct_cdb_obj_t *create_from(struct ct_cdb_obj_t *_obj) {
+    struct object_t *obj = *(struct object_t **) _obj;
+
+    struct object_t *inst = _new_object(_G.allocator);
+    struct object_t **obj_addr = _G.objects + _G.object_used++;
+    *obj_addr = inst;
+
+    ct_array_push(obj->instances,
+                  (struct ct_cdb_obj_t *) obj_addr,
+                  _G.allocator);
+
+    inst->prefab = _obj;
 
     return (struct ct_cdb_obj_t *) obj_addr;
 }
@@ -217,16 +241,26 @@ static struct ct_cdb_writer_t *write_begin(struct ct_cdb_obj_t *obj) {
     return (struct ct_cdb_writer_t *) writer;
 }
 
+static void _notify(struct ct_cdb_obj_t *_obj,
+                    uint64_t *changed_prop) {
+    struct object_t *obj = *(struct object_t **) _obj;
+
+    for (int i = 0; i < ct_array_size(obj->notify); ++i) {
+        obj->notify[i](_obj, changed_prop, ct_array_size(changed_prop));
+    }
+
+    obj = *(struct object_t **) _obj;
+    for (int i = 0; i < ct_array_size(obj->instances); ++i) {
+        _notify(obj->instances[i], changed_prop);
+    }
+}
+
 static void write_commit(struct ct_cdb_writer_t *_writer) {
     struct writer_t *writer = (struct writer_t *) _writer;
-
     struct object_t *old_obj = *writer->obj;
     *writer->obj = writer->clone_obj;
 
-    for (int i = 0; i < ct_array_size(old_obj->notify); ++i) {
-        old_obj->notify[i]((struct ct_cdb_obj_t *) writer->obj,
-                           writer->changed_prop, ct_array_size(writer->changed_prop));
-    }
+    _notify((struct ct_cdb_obj_t *) writer->obj, writer->changed_prop);
 
     ct_hash_free(&old_obj->prop_map, _G.allocator);
     ct_array_free(writer->changed_prop, _G.allocator);
@@ -244,7 +278,8 @@ static void set_float(struct ct_cdb_writer_t *_writer,
 
     uint64_t idx = _find_prop_index(obj, property);
     if (!idx) {
-        idx = _object_new_property(obj, property, CDB_TYPE_FLOAT, &value,
+        idx = _object_new_property(obj, property,
+                                   CDB_TYPE_FLOAT, &value,
                                    sizeof(float),
                                    _G.allocator);
     }
@@ -417,7 +452,16 @@ static enum ct_cdb_prop_type prop_type(struct ct_cdb_obj_t *_object,
                                        uint64_t key) {
     struct object_t *obj = *(struct object_t **) _object;
     uint64_t idx = _find_prop_index(obj, key);
-    return idx ? (enum ct_cdb_prop_type) obj->type[idx] : CDB_TYPE_NONE;
+
+    if (idx) {
+        return (enum ct_cdb_prop_type) obj->type[idx];
+    }
+
+    if (obj->prefab) {
+        return prop_type(obj->prefab, key);
+    }
+
+    return CDB_TYPE_NONE;
 }
 
 static float read_float(struct ct_cdb_obj_t *_obj,
@@ -425,7 +469,16 @@ static float read_float(struct ct_cdb_obj_t *_obj,
                         float defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(float *) (obj->values + obj->offset[idx]) : defaultt;
+
+    if (idx) {
+        return *(float *) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_float(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static void read_vec3(struct ct_cdb_obj_t *_obj,
@@ -434,9 +487,16 @@ static void read_vec3(struct ct_cdb_obj_t *_obj,
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
 
+
     if (idx) {
         const float *f = (const float *) (obj->values + obj->offset[idx]);
         memcpy(value, f, sizeof(float) * 3);
+
+        return;
+    }
+
+    if (obj->prefab) {
+        read_vec3(obj->prefab, property, value);
     }
 }
 
@@ -446,9 +506,16 @@ static void read_vec4(struct ct_cdb_obj_t *_obj,
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
 
+
     if (idx) {
         const float *f = (const float *) (obj->values + obj->offset[idx]);
         memcpy(value, f, sizeof(float) * 4);
+
+        return;
+    }
+
+    if (obj->prefab) {
+        read_vec4(obj->prefab, property, value);
     }
 }
 
@@ -458,19 +525,35 @@ static void read_mat4(struct ct_cdb_obj_t *_obj,
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
 
+
     if (idx) {
         const float *f = (const float *) (obj->values + obj->offset[idx]);
         memcpy(value, f, sizeof(float) * 16);
-    }
-}
 
+        return;
+    }
+
+    if (obj->prefab) {
+        read_mat4(obj->prefab, property, value);
+    }
+
+}
 
 static const char *read_string(struct ct_cdb_obj_t *_obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(const char **) (obj->values + obj->offset[idx]) : defaultt;
+
+    if (idx) {
+        return *(const char **) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_string(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static uint32_t read_uint32(struct ct_cdb_obj_t *_obj,
@@ -478,7 +561,16 @@ static uint32_t read_uint32(struct ct_cdb_obj_t *_obj,
                             uint32_t defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(uint32_t *) (obj->values + obj->offset[idx]) : defaultt;
+
+    if (idx) {
+        return *(uint32_t *) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_uint32(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static uint64_t read_uint64(struct ct_cdb_obj_t *_obj,
@@ -486,7 +578,16 @@ static uint64_t read_uint64(struct ct_cdb_obj_t *_obj,
                             uint64_t defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(uint64_t *) (obj->values + obj->offset[idx]) : defaultt;
+
+    if (idx) {
+        return *(uint64_t *) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_uint64(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static void *read_ptr(struct ct_cdb_obj_t *_obj,
@@ -494,7 +595,16 @@ static void *read_ptr(struct ct_cdb_obj_t *_obj,
                       void *defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(void **) (obj->values + obj->offset[idx]) : defaultt;
+
+    if (idx) {
+        return *(void **) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_ptr(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static struct ct_cdb_obj_t *read_ref(struct ct_cdb_obj_t *_obj,
@@ -502,8 +612,16 @@ static struct ct_cdb_obj_t *read_ref(struct ct_cdb_obj_t *_obj,
                                      struct ct_cdb_obj_t *defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
-    return idx ? *(struct ct_cdb_obj_t **) (obj->values + obj->offset[idx])
-               : defaultt;
+
+    if (idx) {
+        return *(struct ct_cdb_obj_t **) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_ptr(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
 }
 
 static uint64_t *prop_keys(struct ct_cdb_obj_t *_obj) {
@@ -518,8 +636,11 @@ static uint64_t prop_count(struct ct_cdb_obj_t *_obj) {
 
 static struct ct_cdb_a0 cdb_api = {
         .create_object = create_object,
+        .create_from = create_from,
+
         .dump = dump,
         .load = load,
+
         .register_notify = register_notify,
         .prop_exist = prop_exist,
         .prop_type = prop_type,

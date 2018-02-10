@@ -142,6 +142,7 @@ static void ui_scene(ct_cdb_obj_t *ent_obj,
 
 static void on_component(struct ct_world world,
                          struct ct_entity entity,
+                         struct ct_cdb_obj_t *obj,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
@@ -192,7 +193,7 @@ static void on_component(struct ct_world world,
                ct_cdb_a0.read_str(material, CT_ID64_0("asset_name"), ""));
 
         sprintf(labelid, "mp_select_material_%d", i);
-        ui_select_asset(ent_obj, labelid,
+        ui_select_asset(obj, labelid,
                         CT_ID64_0("material"), PROP_MATERIAL_ID + i);
 
         ct_debugui_a0.SameLine(0.0f, -1.0f);
@@ -232,7 +233,7 @@ static void on_component(struct ct_world world,
 
                                 .filename = filename,
                                 .keys_count = keys_count + 3,
-                                .obj = ent_obj,
+                                .obj = obj,
                                 .prop = PROP_MESH_ID + i,
                         },
                 };
@@ -276,7 +277,7 @@ static void on_component(struct ct_world world,
                         .ent = {
                                 .filename = filename,
                                 .keys_count = keys_count + 3,
-                                .obj = ent_obj,
+                                .obj = obj,
                                 .prop = PROP_NODE_ID + i,
                         },
                 };

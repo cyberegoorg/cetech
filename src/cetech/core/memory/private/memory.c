@@ -16,13 +16,7 @@ CETECH_DECL_API(ct_log_a0);
 
 struct MemorySystemGlobals {
     struct ct_alloc *default_allocator;
-    struct ct_alloc *default_scratch_allocator;
 } _G = {};
-
-
-extern char *stacktrace(int);
-
-extern void stacktrace_free(char *);
 
 void *data_pointer(struct Header *header,
                    uint32_t align) {
@@ -55,53 +49,6 @@ const void *pointer_align_forward(const void *p,
     if (mod)
         pi += (align - mod);
     return (void *) pi;
-}
-
-void allocator_trace_pointer(struct allocator_trace_entry *entries,
-                             uint32_t max_entries,
-                             void *p) {
-    //char *stacktrace_str = stacktrace(3);
-
-    for (uint32_t i = 0; i < max_entries; ++i) {
-        if (!entries[i].used) {
-            entries[i].used = 1;
-            entries[i].ptr = p;
-            //entries[i].stacktrace = stacktrace_str;
-            break;
-        }
-    }
-}
-
-void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
-                                  uint32_t max_entries,
-                                  void *p) {
-    for (uint32_t i = 0; i < max_entries; ++i) {
-        if (entries[i].ptr != p) {
-            continue;
-        }
-
-        entries[i].used = 0;
-
-        //stacktrace_free(entries[i].stacktrace);
-        //entries[i].stacktrace = NULL;
-    }
-}
-
-void allocator_check_trace(struct allocator_trace_entry *entries,
-                           uint32_t max_entries) {
-    for (uint32_t i = 0; i < max_entries; ++i) {
-        if (!entries[i].used) {
-            continue;
-        }
-
-//        ct_log_a0.error(ALLOCATOR_WHERE,
-//                        "memory_leak: %p\n",
-//                        entries[i].ptr);
-
-        //allocator_free(ct_alloc, entries[i].ptr); // TODO: need this?
-
-        //stacktrace_free(entries[i].stacktrace);
-    }
 }
 
 struct ct_alloc *memsys_main_allocator() {

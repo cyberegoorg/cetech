@@ -13,12 +13,14 @@ extern "C" {
 
 struct ct_entity;
 struct ct_world;
+struct ct_cdb_obj_t;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 typedef void (*ct_ep_on_component)(struct ct_world world,
                                    struct ct_entity entity,
+                                   struct ct_cdb_obj_t *obj,
                                    const char *filename,
                                    uint64_t *keys,
                                    uint32_t keys_count);

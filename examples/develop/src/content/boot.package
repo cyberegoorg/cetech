@@ -19,6 +19,7 @@ entity:
   - "content/entity1"
   - "content/entity10"
   - "content/entity11"
+  - "content/level1"
 
 material:
   - "content/material1"
@@ -32,8 +33,6 @@ material:
 shader:
   - "content/shader1"
 
-level:
-  - "content/level1"
 
 scene:
   - "content/cube"

@@ -5,7 +5,7 @@
 
 ###########
 # IMPORTS #
-########################################################################################################################
+################################################################################
 
 import argparse
 import multiprocessing
@@ -17,7 +17,7 @@ import sys
 
 ###########
 # GLOBALS #
-########################################################################################################################
+################################################################################
 
 CPU_COUNT = multiprocessing.cpu_count()
 CPU_COUNT_STR = str(CPU_COUNT)
@@ -28,13 +28,14 @@ OS_ARCH = 64 if sys.maxsize > 2 ** 32 else 32
 ROOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
 BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'build'))
 BIN_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'bin'))
-EXTERNAL_BUILD_DIR = os.path.abspath(os.path.join(ROOT_DIR, 'externals', 'build'))
+EXTERNAL_BUILD_DIR = os.path.abspath(
+    os.path.join(ROOT_DIR, 'externals', 'build'))
 
 DEFAULT_BUILD = "%s%s" % (OS_NAME, OS_ARCH)
 
 ##########
 # CONFIG #
-########################################################################################################################
+################################################################################
 
 # Command line actions.
 ACTIONS = {
@@ -68,7 +69,7 @@ PLATFORMS_MAKE = {
 
 ########
 # ARGS #
-########################################################################################################################
+################################################################################
 
 ARGS_PARSER = argparse.ArgumentParser(description='CETech build script')
 
@@ -99,7 +100,7 @@ ARGS_PARSER.add_argument(
 
 ###########
 # PROGRAM #
-########################################################################################################################
+################################################################################
 
 def run_cmake(config, platform_, action=''):
     """Run platform specific genie command.
@@ -110,7 +111,8 @@ def run_cmake(config, platform_, action=''):
     os.makedirs(BUILD_DIR, exist_ok=True)
     os.chdir(BUILD_DIR)
 
-    cmds = ['cmake', os.pardir, '-DCMAKE_C_COMPILER=clang', '-DCMAKE_CXX_COMPILER=clang++', '-DCMAKE_BUILD_TYPE=Debug']
+    cmds = ['cmake', os.pardir, '-DCMAKE_C_COMPILER=clang',
+            '-DCMAKE_CXX_COMPILER=clang++', '-DCMAKE_BUILD_TYPE=Debug']
 
     subprocess.check_call(cmds)
 
@@ -125,7 +127,8 @@ def make(config, platform_, debug, generate_only=False):
     run_cmake(config=config, platform_=platform_)
 
     if not generate_only:
-        cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_, debug=debug)
+        cmds = PLATFORMS_MAKE[platform_](config=config, platform_=platform_,
+                                         debug=debug)
         subprocess.check_call(cmds)
 
 
@@ -165,9 +168,9 @@ def main(args=None):
 
 ########
 # MAIN #
-########################################################################################################################
+################################################################################
 
 if __name__ == '__main__':
     main()
 
-########################################################################################################################
+################################################################################

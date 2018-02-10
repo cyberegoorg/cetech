@@ -26,6 +26,7 @@ CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_world_a0);
 
 using namespace celib;
@@ -48,6 +49,9 @@ static struct _G {
     const char *filename;
     ct_alloc *allocator;
 } _G;
+
+#define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
+
 
 static void on_debugui() {
     if (!_G.filename) {
@@ -72,6 +76,11 @@ static void on_debugui() {
                                                       _G.top_entity,
                                                         _G.active_entity);
 
+    uint64_t type, name;
+    type = name = 0;
+    ct_resource_a0.type_name_from_filename(_G.filename, &type, &name, NULL);
+
+
     uint64_t tmp_keys[_G.keys_count + 3];
     memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
     tmp_keys[_G.keys_count] = ct_yng_a0.key("components");
@@ -79,10 +88,15 @@ static void on_debugui() {
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
         if (ct_world_a0.has(_G.active_world, entity, &_G.components[j].name, 1)) {
             tmp_keys[_G.keys_count + 1] = _G.components[j].name;
-            _G.components[j].clb(_G.active_world, entity, _G.filename, tmp_keys,
+
+            ct_cdb_obj_t* obj = ct_resource_a0.get_obj(type, name);
+            obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
+
+            _G.components[j].clb(_G.active_world,
+                                 entity, obj,
+                                 _G.filename, tmp_keys,
                                  _G.keys_count + 2);
         }
-
     }
 }
 
@@ -149,6 +163,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

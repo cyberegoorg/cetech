@@ -23,21 +23,6 @@ struct allocator_trace_entry {
 
 
 //==============================================================================
-// Allocator
-//==============================================================================
-
-void allocator_trace_pointer(struct allocator_trace_entry *entries,
-                             uint32_t max_entries,
-                             void *p);
-
-void allocator_stop_trace_pointer(struct allocator_trace_entry *entries,
-                                  uint32_t max_entries,
-                                  void *p);
-
-void allocator_check_trace(struct allocator_trace_entry *entries,
-                           uint32_t max_entries);
-
-//==============================================================================
 // Malloc ct_alloc
 //==============================================================================
 

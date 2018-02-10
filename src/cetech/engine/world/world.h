@@ -59,13 +59,7 @@ typedef struct {
     //! \param world World
     void (*on_destroy)(struct ct_world world);
 
-    //! On world update callback
-    //! \param world World
-    //! \param dt Delta time
-    void (*on_update)(struct ct_world world,
-                      float dt);
 } ct_world_callbacks_t;
-
 
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   struct ct_entity *ent,
@@ -96,30 +90,33 @@ struct ct_world_a0 {
 
     void (*register_world_callback)(ct_world_callbacks_t clb);
 
-
     // ENT
-    struct ct_entity (*create_entity)();
+    void (*create_entity)(struct ct_world world, struct ct_entity * entity, uint32_t count);
 
     void (*destroy_entity)(struct ct_world world,
                            struct ct_entity *entity,
                            uint32_t count);
 
-    struct ct_cdb_obj_t *(*ent_obj)(struct ct_world world,struct ct_entity entity);
+    struct ct_cdb_obj_t *(*ent_obj)(struct ct_world world,
+                                    struct ct_entity entity);
 
-    bool (*entity_alive)(struct ct_world world, struct ct_entity entity);
+    bool (*entity_alive)(struct ct_world world,
+                         struct ct_entity entity);
 
     struct ct_entity (*spawn_entity)(struct ct_world world,
                                      uint64_t name);
 
-    struct ct_entity (*spawn_level)(struct ct_world world,
-                                    uint64_t name);
-
-    struct ct_entity (*find_by_uid)(struct ct_world world, struct ct_entity root,
+    struct ct_entity (*find_by_uid)(struct ct_world world,
+                                    struct ct_entity root,
                                     uint64_t uid);
 
 
     // COMPONENT
-    void (*register_component)(uint64_t component_name);
+    void (*register_component)(const char *component_name);
+
+    void (*register_component_compiler)(uint64_t type,
+                                        ct_component_compiler_t compiler);
+
 
     uint64_t (*component_mask)(uint64_t component_name);
 
@@ -133,12 +130,10 @@ struct ct_world_a0 {
                            uint64_t *component_name,
                            uint32_t name_count);
 
-    void (*remove_component)(struct ct_world world,
-                             struct ct_entity ent,
-                             uint64_t component_name);
-
-    void (*register_component_compiler)(uint64_t type,
-                                        ct_component_compiler_t compiler);
+    void (*remove_components)(struct ct_world world,
+                              struct ct_entity ent,
+                              uint64_t *component_name,
+                              uint32_t name_count);
 
     void (*add_components_watch)(struct ct_comp_watch watch);
 
@@ -148,7 +143,6 @@ struct ct_world_a0 {
 
     void (*add_simulation)(uint64_t components_mask,
                            ct_simulate_fce_t simulation);
-
 };
 
 #ifdef __cplusplus

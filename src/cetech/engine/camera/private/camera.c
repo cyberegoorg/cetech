@@ -26,23 +26,6 @@ CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_viewport_a0);
 
 
-uint64_t combine(uint32_t a,
-                 uint32_t b) {
-    union {
-        struct {
-            uint32_t a;
-            uint32_t b;
-        };
-        uint64_t ab;
-    } c = {
-            .a = a,
-            .b = b,
-    };
-
-    return c.ab;
-}
-
-
 #define _G CameraGlobal
 static struct CameraGlobal {
     uint64_t type;
@@ -99,9 +82,9 @@ static struct ct_camera_a0 camera_api = {
         .get_project_view = get_project_view,
 };
 
-void on_add(struct ct_world world,
-            struct ct_entity entity,
-            uint64_t comp_mask) {
+static void on_add(struct ct_world world,
+                   struct ct_entity entity,
+                   uint64_t comp_mask) {
     if (!(comp_mask & ct_world_a0.component_mask(_G.type))) {
         return;
     }
@@ -115,9 +98,9 @@ void on_add(struct ct_world world,
     ct_cdb_a0.write_commit(ent_writer);
 }
 
-void on_remove(struct ct_world world,
-               struct ct_entity ent,
-               uint64_t comp_mask) {
+static void on_remove(struct ct_world world,
+                      struct ct_entity ent,
+                      uint64_t comp_mask) {
 
 }
 
@@ -143,19 +126,17 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("camera"),
     };
 
-    ct_world_a0.register_component(_G.type);
+    ct_world_a0.register_component("camera");
+
 
     ct_world_a0.add_simulation(
-            ct_world_a0.component_mask(_G.type),
-            render_simu);
-
+            ct_world_a0.component_mask(_G.type), render_simu);
 
     ct_world_a0.register_component_compiler(_G.type,
                                             _camera_component_compiler);
 
     ct_world_a0.add_components_watch(
             (struct ct_comp_watch) {.on_add=on_add, .on_remove=on_remove});
-
 }
 
 static void _shutdown() {

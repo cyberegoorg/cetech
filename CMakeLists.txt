@@ -112,7 +112,6 @@ set(SOURCE_FILES
         src/cetech/engine/machine/private/gamepad_sdl2.cpp
 
         src/cetech/playground/private/entity_preview.c
-        src/cetech/playground/private/level_preview.c
         src/cetech/engine/world/private/world.c
         src/cetech/engine/input/private/keyboard.c
         src/cetech/engine/input/private/mouse.c
@@ -142,7 +141,7 @@ set(SOURCE_FILES
         src/cetech/engine/transform/private/transform_property.cpp
         src/cetech/engine/renderer/private/texture/texture_property.cpp
 
-        src/cetech/playground/private/level_editor.cpp
+        src/cetech/playground/private/entity_editor.cpp
         src/cetech/playground/private/entity_property.cpp
         src/cetech/playground/private/explorer.cpp
         src/cetech/playground/private/asset_preview.cpp

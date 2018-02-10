@@ -16,7 +16,7 @@ extern "C" {
 // Api
 //==============================================================================
 
-struct ct_level_view_a0 {
+struct ct_entity_editor_a0 {
     void (*_)();
 };
 

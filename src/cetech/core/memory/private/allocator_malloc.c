@@ -7,9 +7,6 @@
 #include "allocator_core_private.h"
 #include "memory_private.h"
 
-
-#define MAX_MEM_TRACE 1024
-
 static uint32_t size_with_padding(uint32_t size,
                                   uint32_t align) {
     return size + align + sizeof(struct Header);
@@ -17,7 +14,6 @@ static uint32_t size_with_padding(uint32_t size,
 
 struct allocator_malloc {
     uint32_t total_allocated;
-    struct allocator_trace_entry trace[MAX_MEM_TRACE];
 };
 
 void *malloc_allocator_allocate(const struct ct_alloc *allocator,
@@ -36,8 +32,6 @@ void *malloc_allocator_allocate(const struct ct_alloc *allocator,
         fill(h, p, ts);
         a->total_allocated += ts;
 
-        allocator_trace_pointer(a->trace, MAX_MEM_TRACE, p);
-
         return p;
     } else {
         if (!ptr) {
@@ -47,16 +41,10 @@ void *malloc_allocator_allocate(const struct ct_alloc *allocator,
         struct Header *h = header(ptr);
         a->total_allocated -= h->size;
 
-        allocator_stop_trace_pointer(a->trace, MAX_MEM_TRACE, ptr);
-
         CT_FREE(core_alloc, h);
 
         return NULL;
     }
-}
-
-uint32_t malloc_allocator_allocated_size(void *p) {
-    return header(p)->size;
 }
 
 uint32_t malloc_allocator_total_allocated(struct ct_alloc *allocator) {
@@ -74,11 +62,11 @@ struct ct_alloc *malloc_allocator_create() {
     struct ct_alloc *core_alloc = coreallocator_get();
 
     struct ct_alloc *a = CT_ALLOC(core_alloc, struct ct_alloc,
-                                     sizeof(struct ct_alloc));
+                                  sizeof(struct ct_alloc));
 
     struct allocator_malloc *m = CT_ALLOC(core_alloc,
-                                             struct allocator_malloc,
-                                             sizeof(struct allocator_malloc));
+                                          struct allocator_malloc,
+                                          sizeof(struct allocator_malloc));
     m->total_allocated = 0;
 
     *a = (struct ct_alloc) {
@@ -92,8 +80,6 @@ struct ct_alloc *malloc_allocator_create() {
 void malloc_allocator_destroy(struct ct_alloc *a) {
     struct ct_alloc *core_alloc = coreallocator_get();
     struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
-
-    allocator_check_trace(m->trace, MAX_MEM_TRACE);
 
     CT_FREE(core_alloc, m);
     CT_FREE(core_alloc, a);

@@ -107,6 +107,7 @@ static void cmd_description(char *buffer,
 
 static void on_component(struct ct_world world,
                          struct ct_entity entity,
+                         struct ct_cdb_obj_t *obj,
                          const char *filename,
                          uint64_t *keys,
                          uint32_t keys_count) {
@@ -118,7 +119,7 @@ static void on_component(struct ct_world world,
     uint64_t tmp_keys[keys_count + 1];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(world, entity);
+//    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(world, entity);
 
     //==========================================================================
     // Position

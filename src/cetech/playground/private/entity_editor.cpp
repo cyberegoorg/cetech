@@ -5,7 +5,7 @@
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/camera/camera.h>
-#include <cetech/playground/level_editor.h>
+#include <cetech/playground/entity_editor.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/viewport.h>
@@ -49,7 +49,6 @@ static struct globals {
     uint64_t root[MAX_EDITOR];
     uint64_t entity_name[MAX_EDITOR];
     bool is_first[MAX_EDITOR];
-    bool is_level[MAX_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
@@ -122,13 +121,8 @@ static void on_debugui() {
     _G.active_editor = UINT8_MAX;
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        if (_G.is_level[i]) {
-            snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
-                     "Level %s###level_editor_%d", _G.path[i], i + 1);
-        } else {
-            snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
-                     "Entity %s###level_editor_%d", _G.path[i], i + 1);
-        }
+        snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
+                 "Entity %s###level_editor_%d", _G.path[i], i + 1);
 
         if (ct_debugui_a0.BeginDock(dock_id,
                                     &_G.visible[i],
@@ -188,7 +182,7 @@ static void on_debugui() {
     }
 }
 
-static uint32_t find_level(uint64_t name) {
+static uint32_t find_entity(uint64_t name) {
     for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
         if (_G.entity_name[i] != name) {
             continue;
@@ -204,26 +198,22 @@ static void open(uint64_t name,
                  uint64_t root,
                  const char *path,
                  bool is_level) {
-    uint32_t level_idx = find_level(name);
+    uint32_t ent_idx = find_entity(name);
 
     int idx = _G.editor_count;
     ++_G.editor_count;
 
     _G.visible[idx] = true;
 
-    if (UINT32_MAX != level_idx) {
-        _G.world[idx] = _G.world[level_idx];
+    if (UINT32_MAX != ent_idx) {
+        _G.world[idx] = _G.world[ent_idx];
     } else {
         _G.world[idx] = ct_world_a0.create_world();
 
-        if (is_level) {
-            _G.entity[idx] = ct_world_a0.spawn_level(_G.world[idx], name);
-        } else {
+
             _G.entity[idx] = ct_world_a0.spawn_entity(_G.world[idx], name);
-        }
 
         _G.is_first[idx] = true;
-        _G.is_level[idx] = is_level;
     }
     _G.camera_ent[idx] = ct_world_a0.spawn_entity(_G.world[idx],
                                                   CT_ID64_0("content/camera"));
@@ -284,7 +274,7 @@ static void update(float dt) {
     }
 }
 
-static ct_level_view_a0 level_api = {
+static ct_entity_editor_a0 level_api = {
 //            .register_module = playground::register_module,
 //            .unregister_module = playground::unregister_module,
 };
@@ -310,7 +300,7 @@ static void _init(ct_api_a0 *api) {
     };
 
     ct_playground_a0.register_module(
-            CT_ID64_0("level_editor"),
+            CT_ID64_0("entity_editor"),
             (ct_playground_module_fce) {
                     .on_init = init,
                     .on_shutdown = shutdown,
@@ -324,14 +314,14 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(CT_ID64_0("level_editor"));
+    ct_playground_a0.unregister_module(CT_ID64_0("entity_editor"));
     ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
 
     _G = {};
 }
 
 CETECH_MODULE_DEF(
-        level_view,
+        entity_editor,
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);

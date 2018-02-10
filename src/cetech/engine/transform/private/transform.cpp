@@ -183,24 +183,37 @@ int _component_compiler(const char *filename,
                         ct_cdb_writer_t *writer) {
     transform_data t_data;
 
+    ct_yng_doc *d = ct_ydb_a0.get(filename);
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
     keys[component_key_count] = ct_yng_a0.key("scale");
-    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
-                       t_data.scale, (float[3]) {0});
+
+    uint64_t key;
+
+    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    if(d->has_key(d, key)) {
+        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+                           t_data.scale, (float[3]) {0});
+        ct_cdb_a0.set_vec3(writer, PROP_SCALE, t_data.scale);
+    }
+
 
     keys[component_key_count] = ct_yng_a0.key("position");
-    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
-                       t_data.position, (float[3]) {0});
+    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    if(d->has_key(d, key)) {
+        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+                           t_data.position, (float[3]) {0});
+        ct_cdb_a0.set_vec3(writer, PROP_POSITION, t_data.position);
+    }
 
     keys[component_key_count] = ct_yng_a0.key("rotation");
-    ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
-                       t_data.rotation, (float[3]) {0});
-
-    ct_cdb_a0.set_vec3(writer, PROP_POSITION, t_data.position);
-    ct_cdb_a0.set_vec3(writer, PROP_ROTATION, t_data.rotation);
-    ct_cdb_a0.set_vec3(writer, PROP_SCALE, t_data.scale);
+    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    if(d->has_key(d, key)) {
+        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+                           t_data.rotation, (float[3]) {0});
+        ct_cdb_a0.set_vec3(writer, PROP_ROTATION, t_data.rotation);
+    }
 
     return 1;
 }
@@ -393,7 +406,7 @@ static void _init(ct_api_a0 *api) {
             .type = CT_ID64_0("transform"),
     };
 
-    ct_world_a0.register_component(_G.type);
+    ct_world_a0.register_component("transform");
     ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
     ct_world_a0.register_world_callback({
                     .on_created=_on_world_create,

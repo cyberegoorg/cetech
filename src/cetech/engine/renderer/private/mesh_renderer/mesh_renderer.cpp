@@ -78,7 +78,7 @@ void allocate(WorldInstance &_data,
               uint32_t sz) {
     //assert(sz > _data.n);
 
-struct WorldInstance new_data;
+    struct WorldInstance new_data = {{0}};
     const unsigned bytes = sz * (
             sizeof(ct_entity)
     );
@@ -126,7 +126,7 @@ static void on_obj_change(struct ct_cdb_obj_t *obj,
 
 void destroy(struct ct_world world,
              struct ct_entity ent) {
-    ct_world_a0.remove_component(world, ent, _G.type);
+    ct_world_a0.remove_components(world, ent, &_G.type, 1);
 
     WorldInstance &_data = *_get_world_instance(world);
 
@@ -181,7 +181,8 @@ int _mesh_component_compiler(const char *filename,
     memcpy(keys, comp_keys, sizeof(uint64_t) * count);
 
     keys[count] = ct_yng_a0.key("scene");
-    uint64_t scene = CT_ID64_0(ct_ydb_a0.get_string(filename, keys, count + 1, NULL));
+    uint64_t scene = CT_ID64_0(
+            ct_ydb_a0.get_string(filename, keys, count + 1, NULL));
 
     uint64_t geom[32] = {};
     uint32_t geom_keys_count = 0;
@@ -196,18 +197,20 @@ int _mesh_component_compiler(const char *filename,
         keys[count + 1] = geom[i];
 
         keys[count + 2] = ct_yng_a0.key("mesh");
-        const char* mesh = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
+        const char *mesh = ct_ydb_a0.get_string(filename, keys, count + 3,
+                                                NULL);
 
         keys[count + 2] = ct_yng_a0.key("material");
-        const char* mat = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
+        const char *mat = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
 
         keys[count + 2] = ct_yng_a0.key("node");
-        const char* node = ct_ydb_a0.get_string(filename, keys, count + 3, NULL);
+        const char *node = ct_ydb_a0.get_string(filename, keys, count + 3,
+                                                NULL);
 
         ct_cdb_a0.set_uint64(writer, PROP_MESH_ID + i, CT_ID64_0(mesh));
         ct_cdb_a0.set_uint64(writer, PROP_NODE_ID + i, CT_ID64_0(node));
         ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID + i, CT_ID64_0(mat));
-        ct_cdb_a0.set_uint64(writer, PROP_MR_UID + i,  geom[i]);
+        ct_cdb_a0.set_uint64(writer, PROP_MR_UID + i, geom[i]);
     }
 
     ct_cdb_a0.set_uint64(writer, PROP_SCENE, scene);
@@ -234,11 +237,11 @@ void mesh_render_all(struct ct_world world,
         uint64_t kcount = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
 
         for (int j = 0; j < kcount; ++j) {
-            struct ct_cdb_obj_t *mat = ct_cdb_a0.read_ref(ent_obj, PROP_MATERIAL + j,
-                                                   0);
+            struct ct_cdb_obj_t *mat = ct_cdb_a0.read_ref(ent_obj,
+                                                          PROP_MATERIAL + j,
+                                                          0);
 
-            uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj,
-                                                  PROP_MESH_ID + j, 0);
+            uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, PROP_MESH_ID + j, 0);
 
             //mat44f_t t_w = MAT44F_INIT_IDENTITY;//*transform_get_world_matrix(world, t);
             float node_w[16];
@@ -257,20 +260,22 @@ void mesh_render_all(struct ct_world world,
             }
             ct_mat4_mul(final_w, node_w, wm);
 
-            struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(CT_ID64_0("scene"), scene);
-            struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj, mesh, NULL);
+            struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(
+                    CT_ID64_0("scene"), scene);
+            struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj, mesh,
+                                                               NULL);
             uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
             uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
             uint64_t vb = ct_cdb_a0.read_uint64(geom_obj, SCENE_VB_PROP, 0);
-            bgfx::IndexBufferHandle ibh = {.idx = (uint16_t)ib};
-            bgfx::VertexBufferHandle vbh = {.idx = (uint16_t)vb};
+            bgfx::IndexBufferHandle ibh = {.idx = (uint16_t) ib};
+            bgfx::VertexBufferHandle vbh = {.idx = (uint16_t) vb};
 
-            bgfx::Encoder* e = bgfx::begin();
+//            bgfx::Encoder* e = bgfx::begin();
             bgfx::setTransform(&final_w, 1);
             bgfx::setVertexBuffer(0, vbh, 0, size);
             bgfx::setIndexBuffer(ibh, 0, size);
             ct_material_a0.submit(mat, layer_name, viewid);
-            bgfx::end(e);
+//            bgfx::end(e);
         }
     }
 }
@@ -311,8 +316,8 @@ static void on_add(struct ct_world world,
 
         ct_cdb_a0.set_uint64(ent_writer, PROP_NODE + i, n);
 
-        uint64_t material = ct_cdb_a0.read_uint64(ent_obj, PROP_MATERIAL_ID + i,
-                                                  0);
+        uint64_t material = ct_cdb_a0.read_uint64(ent_obj,
+                                                  PROP_MATERIAL_ID + i, 0);
 
         ct_cdb_a0.set_ref(ent_writer, PROP_MATERIAL + i,
                           ct_material_a0.resource_create(material));
@@ -327,17 +332,16 @@ static void on_add(struct ct_world world,
 static void on_remove(struct ct_world world,
                       struct ct_entity ent,
                       uint64_t comp_mask) {
-    if (!(comp_mask & ct_world_a0.component_mask(_G.type))) {
+    if (comp_mask & ct_world_a0.component_mask(_G.type)) {
+        destroy(world, ent);
         return;
     }
 
-    destroy(world, ent);
 }
 
 static struct ct_mesh_renderer_a0 _api = {
         .render_all = mesh_render_all,
 };
-
 
 static void _init_api(struct ct_api_a0 *api) {
 
@@ -353,14 +357,14 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("mesh_renderer"),
     };
 
-    ct_world_a0.register_component(_G.type);
+    ct_world_a0.register_component("mesh_renderer");
     ct_world_a0.add_components_watch({.on_add=on_add, .on_remove=on_remove});
 
     ct_world_a0.register_component_compiler(_G.type, _mesh_component_compiler);
     ct_world_a0.register_world_callback({
-            .on_created =  _new_world,
-            .on_destroy = _destroy_world,
-    });
+                                                .on_created =  _new_world,
+                                                .on_destroy = _destroy_world,
+                                        });
 }
 
 static void _shutdown() {

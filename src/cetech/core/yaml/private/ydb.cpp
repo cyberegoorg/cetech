@@ -209,7 +209,6 @@ void get_map_keys(const char *path,
 
                     out->keys[(*out->count)++] = str_key;
                 }, &out_keys);
-
     }
 
     // Find parent
