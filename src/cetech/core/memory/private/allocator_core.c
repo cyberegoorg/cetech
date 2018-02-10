@@ -12,9 +12,13 @@
 static void *_reallocate(const struct ct_alloc *a,
                          void *ptr,
                          uint32_t size,
-                         uint32_t align) {
+                         uint32_t align,
+                         const char *filename,
+                         uint32_t line) {
     CT_UNUSED(a);
     CT_UNUSED(align);
+    CT_UNUSED(filename);
+    CT_UNUSED(line);
 
     void *new_ptr = NULL;
 

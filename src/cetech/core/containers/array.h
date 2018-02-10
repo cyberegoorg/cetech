@@ -27,7 +27,7 @@ extern "C" {
      ((a) ? ct_array_header(a)->size = 0 : 0)
 
 #define ct_array_set_capacity(a, c, alloc) \
-     ((a) = (__typeof(a)) ct_array_grow(a, c, sizeof(*(a)), alloc))
+     ((a) = (__typeof(a)) ct_array_grow(a, c, sizeof(*(a)), alloc, __FILE__, __LINE__))
 
 #define ct_array_resize(a, c, alloc) \
      (ct_array_set_capacity(a, c, alloc), ct_array_header(a)->size = (c))
@@ -43,11 +43,11 @@ extern "C" {
 
 
 #define ct_array_push(a, item, alloc) \
-    ct_array_full(a) ? (a) = (__typeof(a))ct_array_grow(a, ct_array_size(a) + 1, sizeof(*(a)), alloc) : 0, \
+    ct_array_full(a) ? (a) = (__typeof(a))ct_array_grow(a, ct_array_size(a) + 1, sizeof(*(a)), alloc, __FILE__, __LINE__) : 0, \
     (a)[ct_array_header(a)->size++] = item
 
 #define ct_array_push_n(a, items, n, alloc) \
-    ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + (n), sizeof(*(a)), alloc) : 0, \
+    ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + (n), sizeof(*(a)), alloc, __FILE__, __LINE__) : 0, \
     memcpy((a)+ct_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
     ct_array_header(a)->size += (n)
 
@@ -69,7 +69,9 @@ struct ct_array_header_t {
 static void *ct_array_grow(void *a,
                            uint32_t capacity,
                            size_t type_size,
-                           const struct ct_alloc *alloc) {
+                           const struct ct_alloc *alloc,
+                           const char *filename,
+                           uint32_t line) {
     if (capacity <= ct_array_capacity(a)) {
         return a;
     }
@@ -82,7 +84,10 @@ static void *ct_array_grow(void *a,
     const uint32_t size = sizeof(struct ct_array_header_t) +
                           (new_capacity * type_size);
 
-    void *new_data = CT_ALLOC(alloc, void*, size);
+    void *new_data = alloc->call->reallocate(alloc, NULL,
+                                             size, CT_ALIGNOF(void*),
+                                             filename, line);
+
     char *new_array = (char *) new_data + sizeof(struct ct_array_header_t);
 
     memset(new_data, 0, size);

@@ -19,7 +19,9 @@ struct allocator_malloc {
 void *malloc_allocator_allocate(const struct ct_alloc *allocator,
                                 void *ptr,
                                 uint32_t size,
-                                uint32_t align) {
+                                uint32_t align,
+                                const char *filename,
+                                uint32_t line) {
 
     struct ct_alloc *core_alloc = coreallocator_get();
     struct allocator_malloc *a = (struct allocator_malloc *) allocator->inst;
