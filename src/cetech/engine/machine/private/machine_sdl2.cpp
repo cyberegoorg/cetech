@@ -176,7 +176,7 @@ static void init(struct ct_api_a0 *api) {
         //if (SDL_Init(0) != 0) {
         ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s",
                         SDL_GetError());
-        return; // TODO: dksandasdnask FUCK init without return type?????
+        return; // TODO: dksandasdnask FUCK init without return ptype?????
     }
 
     sdl_window_init(api);

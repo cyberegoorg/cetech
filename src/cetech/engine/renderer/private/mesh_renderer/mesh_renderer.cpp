@@ -116,7 +116,7 @@ static void on_obj_change(struct ct_cdb_obj_t *obj,
             uint32_t idx = (uint32_t) (key - PROP_MATERIAL_ID);
 
             uint64_t material = ct_cdb_a0.read_uint64(obj, key, 0);
-            struct ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+            struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
             ct_cdb_a0.set_ref(w, PROP_MATERIAL + idx,
                               ct_material_a0.resource_create(material));
             ct_cdb_a0.write_commit(w);
@@ -176,13 +176,13 @@ static void _destroy_world(struct ct_world world) {
 int _mesh_component_compiler(const char *filename,
                              uint64_t *comp_keys,
                              uint32_t count,
-                             struct ct_cdb_writer_t *writer) {
+                             struct ct_cdb_obj_t *writer) {
     uint64_t keys[count + 3];
     memcpy(keys, comp_keys, sizeof(uint64_t) * count);
 
     keys[count] = ct_yng_a0.key("scene");
-    uint64_t scene = CT_ID64_0(
-            ct_ydb_a0.get_string(filename, keys, count + 1, NULL));
+    uint64_t scene = CT_ID32_0(ct_ydb_a0.get_string(filename, keys,
+                                                    count + 1, NULL));
 
     uint64_t geom[32] = {};
     uint32_t geom_keys_count = 0;
@@ -190,7 +190,7 @@ int _mesh_component_compiler(const char *filename,
     keys[count] = ct_yng_a0.key("geometries");
     ct_ydb_a0.get_map_keys(filename,
                            keys, count + 1,
-                           geom, CETECH_ARRAY_LEN(geom),
+                           geom, CT_ARRAY_LEN(geom),
                            &geom_keys_count);
 
     for (uint32_t i = 0; i < geom_keys_count; ++i) {
@@ -209,7 +209,7 @@ int _mesh_component_compiler(const char *filename,
 
         ct_cdb_a0.set_uint64(writer, PROP_MESH_ID + i, CT_ID64_0(mesh));
         ct_cdb_a0.set_uint64(writer, PROP_NODE_ID + i, CT_ID64_0(node));
-        ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID + i, CT_ID64_0(mat));
+        ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID + i, CT_ID32_0(mat));
         ct_cdb_a0.set_uint64(writer, PROP_MR_UID + i, geom[i]);
     }
 
@@ -260,8 +260,12 @@ void mesh_render_all(struct ct_world world,
             }
             ct_mat4_mul(final_w, node_w, wm);
 
-            struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(
-                    CT_ID64_0("scene"), scene);
+            struct ct_resource_id rid = (struct ct_resource_id){
+                    .type = CT_ID32_0("scene"),
+                    .name = static_cast<uint32_t>(scene),
+            };
+
+            struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(rid);
             struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj, mesh,
                                                                NULL);
             uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
@@ -304,7 +308,7 @@ static void on_add(struct ct_world world,
 
     data->entity[idx] = entity;
 
-    struct ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    struct ct_cdb_obj_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
         uint64_t n = ct_cdb_a0.read_uint64(ent_obj, PROP_NODE_ID + i, 0);
 

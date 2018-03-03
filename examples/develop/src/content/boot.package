@@ -11,15 +11,15 @@ texture:
 #package:
 #  - "core"
 
-entity:
-  - "content/camera"
-  - "content/box1"
-  - "content/box2"
-  - "content/m4a1"
-  - "content/entity1"
-  - "content/entity10"
-  - "content/entity11"
-  - "content/level1"
+#entity:
+#  - "content/camera"
+#  - "content/box1"
+#  - "content/box2"
+#  - "content/m4a1"
+#  - "content/entity1"
+#  - "content/entity10"
+#  - "content/entity11"
+#  - "content/level1"
 
 material:
   - "content/material1"

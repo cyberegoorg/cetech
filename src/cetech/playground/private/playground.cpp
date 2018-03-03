@@ -77,7 +77,7 @@ static float draw_main_menu() {
             char buffer[128];
             char buffer2[128];
 
-            ct_cmd_system_a0.undo_text(buffer2, CETECH_ARRAY_LEN(buffer2));
+            ct_cmd_system_a0.undo_text(buffer2, CT_ARRAY_LEN(buffer2));
             const char *shortcut;
 
             sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
@@ -89,7 +89,7 @@ static float draw_main_menu() {
             }
 
 
-            ct_cmd_system_a0.redo_text(buffer2, CETECH_ARRAY_LEN(buffer2));
+            ct_cmd_system_a0.redo_text(buffer2, CT_ARRAY_LEN(buffer2));
             shortcut = ct_action_manager_a0.shortcut_str(CT_ID64_0("redo"));
             sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
             if (ct_debugui_a0.MenuItem(buffer, shortcut, false,

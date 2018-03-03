@@ -25,7 +25,6 @@
 
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/core/containers/array.h>
 #include <cetech/core/math/fmath.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"
@@ -155,7 +154,7 @@ static int fullscreen_pass_compiler(struct ct_yamlng_node body,
             d->hash(d, body),
             ct_yng_a0.key("input")
     };
-    uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    uint64_t k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
 
     ct_yamlng_node input = d->get(d, k);
     if (0 != input.idx) {
@@ -182,7 +181,7 @@ static void fullscreen_pass(viewport_instance *viewport,
     CT_UNUSED(camera);
 
     static ct_cdb_obj_t *copy_material = ct_material_a0.resource_create(
-            CT_ID64_0("content/copy"));
+            CT_ID32_0("content/copy"));
 
     bgfx::setViewRect(viewid, 0, 0,
                       (uint16_t) viewport->size[0],  // TODO: SHITTT
@@ -206,10 +205,9 @@ static void fullscreen_pass(viewport_instance *viewport,
         auto input_tex = ct_viewport_a0.get_local_resource(viewport_id,
                                                            pass_data->input_resource[i]);
 
-        ct_material_a0.set_texture_handler(
-                copy_material, layer_entry.name,
-                pass_data->input_name[i],
-                {input_tex});
+        ct_material_a0.set_texture_handler(copy_material, layer_entry.name,
+                                           pass_data->input_name[i],
+                                           {input_tex});
 
     }
 

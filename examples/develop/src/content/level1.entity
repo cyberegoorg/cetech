@@ -1,14 +1,15 @@
 name: Level 1
 children:
-  5564343313252:
-    name: box1
-    PARENT: content/box1.entity
+#  5564343313252:
+#    name: box1
+#    PARENT: content/box1.entity
+#
+#  55643433135454252:
+#    name: box2
+#    PARENT: content/box2.entity
 
   55643423443313252:
     name: m4a1
     PARENT: content/m4a1.entity
 
-  55643433135454252:
-    name: box2
-    PARENT: content/box2.entity
 

@@ -86,7 +86,7 @@ static void log_handler(enum ct_log_level level,
     };
 
     char buffer[1024];
-    int len = snprintf(buffer, CETECH_ARRAY_LEN(buffer), LOG_FORMAT, where,
+    int len = snprintf(buffer, CT_ARRAY_LEN(buffer), LOG_FORMAT, where,
                        msg);
 
     ct_array_push(_G.log_items, item, _G.allocator);
@@ -100,9 +100,9 @@ static void ui_filter() {
 
 static void ui_level_mask() {
     char buffer[64];
-    for (int i = 0; i < CETECH_ARRAY_LEN(_levels); ++i) {
+    for (int i = 0; i < CT_ARRAY_LEN(_levels); ++i) {
         int level = _levels[i];
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer),
+        snprintf(buffer, CT_ARRAY_LEN(buffer),
                  _level_to_label[level], _G.level_counters[level]);
 
         bool active = (_G.level_mask & (1 << level)) > 0;

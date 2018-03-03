@@ -10,7 +10,7 @@ extern "C" {
 #include <cetech/engine/resource/resource.h>
 
 
-void resource_compiler_register(uint64_t type,
+void resource_compiler_register(const char* type,
                                 ct_resource_compilator_t compilator,
                                 bool yaml_based);
 
@@ -20,8 +20,7 @@ void resource_compiler_compile_all();
 
 int resource_compiler_get_filename(char *filename,
                                    size_t max_ken,
-                                   uint64_t type,
-                                   uint64_t name);
+                                   struct ct_resource_id resource_id);
 
 const char *resource_compiler_get_source_dir();
 
@@ -40,8 +39,7 @@ const char *resource_compiler_get_core_dir();
 void compile_and_reload(const char *filename);
 
 void type_name_from_filename(const char *fullname,
-                             uint64_t *type,
-                             uint64_t *name,
+                             struct ct_resource_id* resource_id,
                              char *short_name);
 
 char *resource_compiler_get_build_dir(struct ct_alloc *a,

@@ -16,6 +16,14 @@ struct ct_hash_t {
 };
 
 
+static void ct_hash_clean(struct ct_hash_t *hash) {
+    memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
+    hash->n = 0;
+
+    ct_array_clean(hash->keys);
+    ct_array_clean(hash->values);
+}
+
 static void ct_hash_free(struct ct_hash_t *hash,
                          const struct ct_alloc *allocator) {
     ct_array_free(hash->keys, allocator);
@@ -132,6 +140,7 @@ static void ct_hash_clone(const struct ct_hash_t *from,
 static void *_2 = (void *) &ct_hash_contain; // UNUSED
 static void *_3 = (void *) &ct_hash_add; // UNUSED
 static void *_4 = (void *) &ct_hash_free; // UNUSED
+static void *_44 = (void *) &ct_hash_clean; // UNUSED
 static void *_5 = (void *) &ct_hash_remove; // UNUSED
 static void *_6 = (void *) &ct_hash_clone; // UNUSED
 static void *_7 = (void *) &ct_hash_lookup; // UNUSED

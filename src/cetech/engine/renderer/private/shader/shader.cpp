@@ -82,7 +82,7 @@ static void online(uint64_t name,
 
     }
 
-    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_uint64(writer, SHADER_PROP, program.idx);
     ct_cdb_a0.write_commit(writer);
 }
@@ -110,8 +110,7 @@ int shader_init(ct_api_a0 *api) {
 
     _G.handler_map.init(ct_memory_a0.main_allocator());
 
-    ct_resource_a0.register_type(_G.type,
-                                 callback);
+    ct_resource_a0.register_type("shader", callback);
     shadercompiler_init(api);
 
     return 1;

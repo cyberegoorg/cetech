@@ -43,7 +43,7 @@ struct ct_entity {
 typedef int (*ct_component_compiler_t)(const char *filename,
                                        uint64_t *component_key,
                                        uint32_t component_key_count,
-                                       struct ct_cdb_writer_t *writer);
+                                       struct ct_cdb_obj_t *writer);
 
 //==============================================================================
 // Structs
@@ -104,7 +104,7 @@ struct ct_world_a0 {
                          struct ct_entity entity);
 
     struct ct_entity (*spawn_entity)(struct ct_world world,
-                                     uint64_t name);
+                                     uint32_t name);
 
     struct ct_entity (*find_by_uid)(struct ct_world world,
                                     struct ct_entity root,

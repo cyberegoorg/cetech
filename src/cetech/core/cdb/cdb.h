@@ -23,25 +23,25 @@ extern "C" {
 //==============================================================================
 struct ct_alloc;
 
-struct ct_cdb_obj_t {
-    void *_;
+struct ct_cdb_t {
+    uint64_t idx;
 };
 
-struct ct_cdb_writer_t {
+struct ct_cdb_obj_t {
     void *_;
 };
 
 //==============================================================================
 // Enums
 //==============================================================================
-enum ct_cdb_prop_type {
+enum ct_cdb_type {
     CDB_TYPE_NONE = 0,
     CDB_TYPE_UINT32,
     CDB_TYPE_UINT64,
     CDB_TYPE_PTR,
     CDB_TYPE_REF,
     CDB_TYPE_FLOAT,
-    CDB_TYPE_STRPTR,
+    CDB_TYPE_STR,
     CDB_TYPE_VEC3,
     CDB_TYPE_VEC4,
     CDB_TYPE_MAT4,
@@ -51,13 +51,27 @@ enum ct_cdb_prop_type {
 // Interface
 //==============================================================================
 
-typedef void (*ct_cdb_chg_notify)(struct ct_cdb_obj_t *obj,
-                                  uint64_t *prop,
-                                  uint32_t prop_count);
+typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
+                              uint64_t *prop,
+                              uint32_t prop_count);
 
 struct ct_cdb_a0 {
-    struct ct_cdb_obj_t *(*create_object)();
-    struct ct_cdb_obj_t *(*create_from)(struct ct_cdb_obj_t* obj);
+    struct ct_cdb_t (*create_db)();
+
+    struct ct_cdb_obj_t *(*create_object)(struct ct_cdb_t db, uint64_t type);
+
+    struct ct_cdb_obj_t *(*create_from)(struct ct_cdb_t db,
+                                        struct ct_cdb_obj_t *obj);
+
+    void (*destroy_db)(struct ct_cdb_t db);
+    void (*destroy_object)(struct ct_cdb_obj_t *obj);
+
+    void (*gc)();
+
+    void (*add_child)(struct ct_cdb_obj_t *parent,
+                      struct ct_cdb_obj_t *child);
+
+    struct ct_cdb_obj_t **(*children)(struct ct_cdb_obj_t *obj);
 
     void (*dump)(struct ct_cdb_obj_t *obj,
                  char **output,
@@ -68,13 +82,13 @@ struct ct_cdb_a0 {
                  struct ct_alloc *allocator);
 
     void (*register_notify)(struct ct_cdb_obj_t *obj,
-                            ct_cdb_chg_notify clb);
+                            ct_cdb_notify clb);
 
     bool (*prop_exist)(struct ct_cdb_obj_t *object,
                        uint64_t key);
 
-    enum ct_cdb_prop_type (*prop_type)(struct ct_cdb_obj_t *object,
-                                       uint64_t key);
+    enum ct_cdb_type (*prop_type)(struct ct_cdb_obj_t *object,
+                                  uint64_t key);
 
     uint64_t *(*prop_keys)(struct ct_cdb_obj_t *object);
 
@@ -82,48 +96,48 @@ struct ct_cdb_a0 {
 
 
     // WRITE
-    struct ct_cdb_writer_t *(*write_begin)(struct ct_cdb_obj_t *object);
+    struct ct_cdb_obj_t *(*write_begin)(struct ct_cdb_obj_t *object);
 
-    void (*write_commit)(struct ct_cdb_writer_t *writer);
+    void (*write_commit)(struct ct_cdb_obj_t *writer);
 
 
     // SET
-    void (*set_prefab)(struct ct_cdb_writer_t *_writer,
+    void (*set_prefab)(struct ct_cdb_obj_t *writer,
                        struct ct_cdb_obj_t *prefab_obj);
 
-    void (*set_float)(struct ct_cdb_writer_t *object,
+    void (*set_float)(struct ct_cdb_obj_t *writer,
                       uint64_t property,
                       float value);
 
-    void (*set_vec3)(struct ct_cdb_writer_t *object,
+    void (*set_vec3)(struct ct_cdb_obj_t *writer,
                      uint64_t property,
                      const float *value);
 
-    void (*set_vec4)(struct ct_cdb_writer_t *object,
+    void (*set_vec4)(struct ct_cdb_obj_t *writer,
                      uint64_t property,
                      const float *value);
 
-    void (*set_mat4)(struct ct_cdb_writer_t *object,
+    void (*set_mat4)(struct ct_cdb_obj_t *writer,
                      uint64_t property,
                      const float *value);
 
-    void (*set_string)(struct ct_cdb_writer_t *object,
+    void (*set_string)(struct ct_cdb_obj_t *writer,
                        uint64_t property,
                        const char *value);
 
-    void (*set_uint32)(struct ct_cdb_writer_t *object,
+    void (*set_uint32)(struct ct_cdb_obj_t *writer,
                        uint64_t property,
                        uint32_t value);
 
-    void (*set_uint64)(struct ct_cdb_writer_t *object,
+    void (*set_uint64)(struct ct_cdb_obj_t *writer,
                        uint64_t property,
                        uint64_t value);
 
-    void (*set_ptr)(struct ct_cdb_writer_t *object,
+    void (*set_ptr)(struct ct_cdb_obj_t *writer,
                     uint64_t property,
                     void *value);
 
-    void (*set_ref)(struct ct_cdb_writer_t *object,
+    void (*set_ref)(struct ct_cdb_obj_t *writer,
                     uint64_t property,
                     struct ct_cdb_obj_t *ref);
 

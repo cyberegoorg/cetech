@@ -385,7 +385,7 @@ static ct_scene_node create(ct_world world,
     CT_FREE(ct_memory_a0.main_allocator(), nodes);
 
     ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
-    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_obj_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint32(ent_writer, CT_ID64_0("scenegraph.idx"), root.idx);
     ct_cdb_a0.write_commit(ent_writer);
 

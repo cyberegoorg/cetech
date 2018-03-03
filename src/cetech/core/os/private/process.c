@@ -19,7 +19,7 @@ int exec(const char *argv) {
     if (fp == NULL)
         return -1;
 
-    while (fgets(output, CETECH_ARRAY_LEN(output), fp) != NULL) {
+    while (fgets(output, CT_ARRAY_LEN(output), fp) != NULL) {
         printf("%s", output);
     }
 

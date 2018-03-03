@@ -122,7 +122,7 @@ static void compiler(const char *filename,
     char *input_path = NULL;
     ct_path_a0.join(&input_path, a, 2, source_dir, input_str);
 
-    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
+    _gen_tmp_name(output_path, tmp_dir, CT_ARRAY_LEN(tmp_filename),
                   input_str);
 
     int result = _texturec(input_path, output_path, gen_mipmaps,
@@ -172,9 +172,7 @@ int texturecompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_cdb_a0);
 
-    ct_resource_a0.compiler_register(
-            CT_ID64_0("texture"),
-            compiler, true);
+    ct_resource_a0.compiler_register("texture", compiler, true);
 
     return 1;
 }

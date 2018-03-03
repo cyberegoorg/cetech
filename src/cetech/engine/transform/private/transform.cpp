@@ -180,7 +180,7 @@ static void _destroy_world(ct_world world) {
 int _component_compiler(const char *filename,
                         uint64_t *component_key,
                         uint32_t component_key_count,
-                        ct_cdb_writer_t *writer) {
+                        ct_cdb_obj_t *writer) {
     transform_data t_data;
 
     ct_yng_doc *d = ct_ydb_a0.get(filename);
@@ -191,26 +191,26 @@ int _component_compiler(const char *filename,
 
     uint64_t key;
 
-    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if(d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.scale, (float[3]) {0});
         ct_cdb_a0.set_vec3(writer, PROP_SCALE, t_data.scale);
     }
 
 
     keys[component_key_count] = ct_yng_a0.key("position");
-    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if(d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.position, (float[3]) {0});
         ct_cdb_a0.set_vec3(writer, PROP_POSITION, t_data.position);
     }
 
     keys[component_key_count] = ct_yng_a0.key("rotation");
-    key = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if(d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(filename, keys, CETECH_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.rotation, (float[3]) {0});
         ct_cdb_a0.set_vec3(writer, PROP_ROTATION, t_data.rotation);
     }
@@ -381,7 +381,7 @@ void on_add(struct ct_world world,
         data->parent[idx] = parent_idx;
     }
 
-    ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    ct_cdb_obj_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint32(ent_writer, CT_ID64_0("transform.idx"), idx);
     ct_cdb_a0.write_commit(ent_writer);
 }

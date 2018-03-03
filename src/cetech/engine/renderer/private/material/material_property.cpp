@@ -55,7 +55,7 @@ static void ui_vec4(ct_cdb_obj_t *var) {
     ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
     if (ct_debugui_a0.DragFloat3(str, v, 0.1f, -1.0f, 1.0f, "%.5f", 1.0f)) {
-        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+        ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
         ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
         ct_cdb_a0.write_commit(wr);
     }
@@ -70,12 +70,12 @@ static void ui_color4(ct_cdb_obj_t *var) {
 
     ct_debugui_a0.ColorEdit4(str, v, true);
 
-    ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+    ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
     ct_cdb_a0.write_commit(wr);
 
 //    if (ct_debugui_a0.ColorEdit3(str, v)) {
-//        ct_cdb_writer_t* wr = ct_cdb_a0.write_begin(var);
+//        ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
 //        ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
 //        ct_cdb_a0.write_commit(wr);
 //    }
@@ -105,10 +105,9 @@ static void ui_texture(ct_cdb_obj_t *variable) {
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static void material_asset(uint64_t type,
-                           uint64_t name,
+static void material_asset(struct ct_resource_id asset,
                            const char *path) {
-    ct_cdb_obj_t *material = ct_resource_a0.get_obj(type, name);
+    ct_cdb_obj_t *material = ct_resource_a0.get_obj(asset);
     uint64_t *layer_keys = ct_cdb_a0.prop_keys(material);
     uint64_t layer_count = ct_cdb_a0.prop_count(material);
 
@@ -178,7 +177,7 @@ static int _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_asset_property_a0.register_asset(CT_ID64_0("material"), material_asset);
+    ct_asset_property_a0.register_asset(CT_ID32_0("material"), material_asset);
 
     return 1;
 }

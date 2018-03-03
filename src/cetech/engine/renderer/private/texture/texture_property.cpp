@@ -67,7 +67,7 @@ static void ui_input(const char *path) {
     static char txt_buffer[128] = {};
     strcpy(txt_buffer, input);
 
-    ct_debugui_a0.InputText("input", txt_buffer, CETECH_ARRAY_LEN(txt_buffer),
+    ct_debugui_a0.InputText("input", txt_buffer, CT_ARRAY_LEN(txt_buffer),
                             DebugInputTextFlags_ReadOnly, 0, NULL);
 }
 
@@ -144,7 +144,7 @@ static void ui_is_normalmap(const char *path) {
     }
 }
 
-static void ui_texture_preview(uint64_t name) {
+static void ui_texture_preview(uint32_t name) {
     float size[2];
     ct_debugui_a0.GetWindowSize(size);
     size[1] = size[0];
@@ -157,16 +157,14 @@ static void ui_texture_preview(uint64_t name) {
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static void texture_asset(uint64_t type,
-                          uint64_t name,
-                          const char *path) {
-    CT_UNUSED(type);
+static void texture_asset(ct_resource_id asset, const char *path) {
+
     if (ct_debugui_a0.CollapsingHeader("Texture",
                                        DebugUITreeNodeFlags_DefaultOpen)) {
         ui_input(path);
         ui_gen_mipmaps(path);
         ui_is_normalmap(path);
-        ui_texture_preview(name);
+        ui_texture_preview(asset.name);
     }
 }
 
@@ -176,7 +174,7 @@ static int _init(ct_api_a0 *api) {
     _G = {};
 
     ct_asset_property_a0.register_asset(
-            CT_ID64_0("texture"),
+            CT_ID32_0("texture"),
             texture_asset);
 
     ct_cmd_system_a0.register_cmd_execute(

@@ -17,6 +17,7 @@ extern "C" {
 //==============================================================================
 
 #define CT_ID64_0(str) ct_hashlib_a0.id64_from_str(str)
+#define CT_ID32_0(str) ct_hashlib_a0.id32_from_str(str)
 
 struct ct_hashlib_a0 {
 
@@ -28,7 +29,12 @@ struct ct_hashlib_a0 {
                                 uint64_t len,
                                 uint64_t seed);
 
+    uint32_t (*hash_murmur2_32)(const void *key,
+                                uint32_t len,
+                                uint32_t seed);
+
     uint64_t (*id64_from_str)(const char *str);
+    uint32_t (*id32_from_str)(const char *str);
 };
 
 #ifdef __cplusplus

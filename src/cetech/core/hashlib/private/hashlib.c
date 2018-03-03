@@ -9,7 +9,7 @@
 uint64_t hash_murmur2_64(const void *key,
                          uint64_t len,
                          uint64_t seed) {
-    if(!key) {
+    if (!key) {
         return 0;
     }
 
@@ -71,23 +71,76 @@ uint64_t hash_murmur2_64(const void *key,
     return h;
 }
 
+uint32_t hash_murmur2_32(const void *key,
+                         uint32_t len,
+                         uint32_t seed) {
+    const unsigned int m = 0x5bd1e995;
+    const int r = 24;
+
+    unsigned int h = seed ^len;
+
+    const unsigned char *data = (const unsigned char *) key;
+
+    while (len >= 4) {
+        unsigned int k = *(unsigned int *) data;
+
+        k *= m;
+        k ^= k >> r;
+        k *= m;
+
+        h *= m;
+        h ^= k;
+
+        data += 4;
+        len -= 4;
+    }
+
+    switch (len) {
+        case 3:
+            h ^= data[2] << 16;
+        case 2:
+            h ^= data[1] << 8;
+        case 1:
+            h ^= data[0];
+            h *= m;
+    };
+
+    h ^= h >> 13;
+    h *= m;
+    h ^= h >> 15;
+
+    return h;
+}
+
+
 #define STRINGID64_SEED 22
+#define STRINGID32_SEED 22
 
 //==============================================================================
 // Interface
 //==============================================================================
 
 uint64_t stringid64_from_string(const char *str) {
-    if(!str){
+    if (!str) {
         return 0;
     }
 
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
 }
 
+uint32_t stringid32_from_string(const char *str) {
+    if (!str) {
+        return 0;
+    }
+
+    return hash_murmur2_32(str, strlen(str), STRINGID32_SEED);
+}
+
 static struct ct_hashlib_a0 hash_api = {
         .id64_from_str = stringid64_from_string,
-        .hash_murmur2_64 = hash_murmur2_64
+        .id32_from_str = stringid32_from_string,
+        .hash_murmur2_64 = hash_murmur2_64,
+        .hash_murmur2_32 = hash_murmur2_32,
 };
 
 CETECH_MODULE_DEF(

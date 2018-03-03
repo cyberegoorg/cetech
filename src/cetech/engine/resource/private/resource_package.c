@@ -34,20 +34,20 @@ struct package_resource {
 
 #define package_name_count(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_count_offset)))
 #define package_offset(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->offset_offset)))
-#define package_type(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
-#define package_name(resource_ptr) ((uint64_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
+#define package_type(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->type_offset)))
+#define package_name(resource_ptr) ((uint32_t*)((void*)(((char*)(resource_ptr)) + (resource_ptr)->name_offset)))
 
 //==============================================================================
 // Public interface
 //==============================================================================
 
 struct package_task_data {
-    uint64_t name;
+    uint32_t name;
 };
 
 #define _G PackageGlobals
 struct _G {
-    uint64_t package_typel;
+    uint32_t package_typel;
     struct ct_alloc *allocator;
 } _G = {};
 
@@ -58,7 +58,7 @@ void online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
     ct_cdb_a0.write_commit(writer);
 
@@ -110,7 +110,7 @@ void _package_compiler(const char *filename,
     uint32_t type_keys_count = 0;
     ct_ydb_a0.get_map_keys(filename,
                            &tmp_keys, 1,
-                           type_keys, CETECH_ARRAY_LEN(type_keys),
+                           type_keys, CT_ARRAY_LEN(type_keys),
                            &type_keys_count);
 
     for (uint32_t i = 0; i < type_keys_count; ++i) {
@@ -124,7 +124,7 @@ void _package_compiler(const char *filename,
         uint32_t name_keys_count = 0;
         ct_ydb_a0.get_map_keys(filename,
                                &type_keys[i], 1,
-                               name_keys, CETECH_ARRAY_LEN(name_keys),
+                               name_keys, CT_ARRAY_LEN(name_keys),
                                &name_keys_count);
 
         ct_array_push(compile_data.name_count, name_keys_count, _G.allocator);
@@ -178,13 +178,13 @@ int package_init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
-            .package_typel = CT_ID64_0("package"),
+            .package_typel = CT_ID32_0("package"),
     };
 
-    ct_resource_a0.register_type(_G.package_typel,
+    ct_resource_a0.register_type("package",
                                  package_resource_callback);
 
-    ct_resource_a0.compiler_register(_G.package_typel, _package_compiler, true);
+    ct_resource_a0.compiler_register("package", _package_compiler, true);
 
     return 1;
 }
@@ -194,8 +194,8 @@ void package_shutdown() {
 }
 
 struct package_type_data {
-    uint64_t type;
-    uint64_t *name;
+    uint32_t type;
+    uint32_t *name;
     uint32_t count;
 };
 
@@ -207,8 +207,12 @@ void package_load_task(void *data) {
 void package_task(void *data) {
     struct package_task_data *task_data = (struct package_task_data *) data;
 
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel,
-                                                      task_data->name);
+    struct ct_resource_id rid = (struct ct_resource_id) {
+            .type = _G.package_typel,
+            .name = task_data->name
+    };
+
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);
@@ -244,7 +248,7 @@ void package_task(void *data) {
     CT_FREE(ct_memory_a0.main_allocator(), task_data);
 }
 
-struct ct_task_counter_t * package_load(uint64_t name) {
+struct ct_task_counter_t *package_load(uint32_t name) {
     struct package_task_data *task_data =
             CT_ALLOC(ct_memory_a0.main_allocator(),
                      struct package_task_data,
@@ -264,8 +268,13 @@ struct ct_task_counter_t * package_load(uint64_t name) {
     return counter;
 }
 
-void package_unload(uint64_t name) {
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel, name);
+void package_unload(uint32_t name) {
+    struct ct_resource_id rid = (struct ct_resource_id) {
+            .type = _G.package_typel,
+            .name = name
+    };
+
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);
@@ -279,8 +288,13 @@ void package_unload(uint64_t name) {
     }
 }
 
-int package_is_loaded(uint64_t name) {
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(_G.package_typel, name);
+int package_is_loaded(uint32_t name) {
+    struct ct_resource_id rid = (struct ct_resource_id) {
+            .type = _G.package_typel,
+            .name = name
+    };
+
+    struct ct_cdb_obj_t *obj = ct_resource_a0.get_obj(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);

@@ -54,10 +54,7 @@ static void cmd_set_str(const struct ct_cmd *_cmd,
 
     const char *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
 
-    ct_ydb_a0.set_string(pos_cmd->ent.filename,
-                         pos_cmd->ent.keys, pos_cmd->ent.keys_count, value);
-
-    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(pos_cmd->ent.obj);
+    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->ent.obj);
     ct_cdb_a0.set_uint64(w, pos_cmd->ent.prop, CT_ID64_0(value));
     ct_cdb_a0.write_commit(w);
 }
@@ -115,7 +112,7 @@ static bool ui_select_asset(ct_cdb_obj_t *object,
         ct_asset_browser_a0.get_selected_asset_name(selected_asset);
 
         uint64_t k = CT_ID64_0(selected_asset);
-        ct_cdb_writer_t *wr = ct_cdb_a0.write_begin(object);
+        ct_cdb_obj_t *wr = ct_cdb_a0.write_begin(object);
         ct_cdb_a0.set_uint64(wr, key, k);
         ct_cdb_a0.write_commit(wr);
 
@@ -133,7 +130,7 @@ static void ui_scene(ct_cdb_obj_t *ent_obj,
     char scene_buffer[128] = {'\0'};
 //    ui_select_asset(scene_buffer, labelid, "scene");
 
-    snprintf(scene_buffer, CETECH_ARRAY_LEN(scene_buffer), "%llu", scene);
+    snprintf(scene_buffer, CT_ARRAY_LEN(scene_buffer), "%llu", scene);
 //    ct_debugui_a0.SameLine(0.0f, -1.0f);
     ct_debugui_a0.InputText("scene",
                             (char *) scene_buffer, strlen(scene_buffer),
@@ -141,33 +138,25 @@ static void ui_scene(ct_cdb_obj_t *ent_obj,
 }
 
 static void on_component(struct ct_world world,
-                         struct ct_entity entity,
-                         struct ct_cdb_obj_t *obj,
-                         const char *filename,
-                         uint64_t *keys,
-                         uint32_t keys_count) {
+                         struct ct_cdb_obj_t *obj) {
 
     if (!ct_debugui_a0.CollapsingHeader("Mesh renderer",
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
 
-    ct_cdb_obj_t *ent_obj = ct_world_a0.ent_obj(world, entity);
-    uint64_t tmp_keys[keys_count + 3];
-    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
     char labelid[128] = {'\0'};
 
     //==========================================================================
     // Scene
     //==========================================================================
-    uint64_t scene = ct_cdb_a0.read_uint64(ent_obj, PROP_SCENE, 0);
-    ui_scene(ent_obj, scene);
+    uint64_t scene = ct_cdb_a0.read_uint64(obj, PROP_SCENE, 0);
+    ui_scene(obj, scene);
 
     //==========================================================================
     // Geometries
     //==========================================================================
-    tmp_keys[keys_count] = ct_yng_a0.key("geometries");
-    uint64_t geom_count = ct_cdb_a0.read_uint64(ent_obj, PROP_GEOM_COUNT, 0);
+    uint64_t geom_count = ct_cdb_a0.read_uint64(obj, PROP_GEOM_COUNT, 0);
     for (uint32_t i = 0; i < geom_count; ++i) {
         char id[32] = {0};
         sprintf(id, "element %d", i);
@@ -176,13 +165,16 @@ static void on_component(struct ct_world world,
             continue;
         }
 
-        uint64_t mesh = ct_cdb_a0.read_uint64(ent_obj, PROP_MESH_ID + i, 0);
-        uint64_t node = ct_cdb_a0.read_uint64(ent_obj, PROP_NODE + i, 0);
-        uint64_t uid = ct_cdb_a0.read_uint64(ent_obj, PROP_MR_UID + i, 0);
-        ct_cdb_obj_t *material = ct_cdb_a0.read_ref(ent_obj, PROP_MATERIAL + i,
-                                                    NULL);
+        uint64_t mesh = ct_cdb_a0.read_uint64(obj, PROP_MESH_ID + i, 0);
+        uint64_t node = ct_cdb_a0.read_uint64(obj, PROP_NODE + i, 0);
+        uint64_t mid = ct_cdb_a0.read_uint64(obj, PROP_MATERIAL_ID + i, 0);
 
-        tmp_keys[keys_count + 1] = uid;
+        struct ct_resource_id rid = (struct ct_resource_id){
+                .type = CT_ID32_0("material"),
+                .name = static_cast<uint32_t>(mid),
+        };
+
+        ct_cdb_obj_t *material = ct_resource_a0.get_obj(rid);
 
 
         //======================================================================
@@ -223,23 +215,17 @@ static void on_component(struct ct_world world,
 
             sprintf(labelid, "mesh##mp_mesh_%d", i);
             if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1)) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.key("mesh");
                 struct ct_ent_cmd_str_s cmd = {
                         .header = {
                                 .size = sizeof(struct ct_ent_cmd_str_s),
                                 .type = CT_ID64_0("mesh_set_mesh"),
                         },
                         .ent = {
-
-                                .filename = filename,
-                                .keys_count = keys_count + 3,
                                 .obj = obj,
                                 .prop = PROP_MESH_ID + i,
                         },
                 };
 
-                memcpy(cmd.ent.keys, tmp_keys,
-                       sizeof(uint64_t) * (keys_count + 3));
 
                 strcpy(cmd.new_value, items2[item2]);
                 strcpy(cmd.old_value, items2[item3]);
@@ -268,22 +254,17 @@ static void on_component(struct ct_world world,
 
             sprintf(labelid, "node##mp_node_%d", i);
             if (ct_debugui_a0.Combo(labelid, &item2, items2, items_count, -1)) {
-                tmp_keys[keys_count + 2] = ct_yng_a0.key("node");
                 struct ct_ent_cmd_str_s cmd = {
                         .header = {
                                 .size = sizeof(struct ct_ent_cmd_str_s),
                                 .type = CT_ID64_0("mesh_set_node"),
                         },
                         .ent = {
-                                .filename = filename,
-                                .keys_count = keys_count + 3,
+
                                 .obj = obj,
                                 .prop = PROP_NODE_ID + i,
                         },
                 };
-
-                memcpy(cmd.ent.keys, tmp_keys,
-                       sizeof(uint64_t) * (keys_count + 3));
 
                 strcpy(cmd.new_value, items2[item2]);
                 strcpy(cmd.old_value, items2[item3]);

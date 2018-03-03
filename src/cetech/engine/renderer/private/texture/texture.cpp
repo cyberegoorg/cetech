@@ -33,7 +33,7 @@ int texturecompiler_init(ct_api_a0 *api);
 
 #define _G TextureResourceGlobals
 struct _G {
-    uint64_t type;
+    uint32_t type;
     ct_alloc* allocator;
 } _G;
 
@@ -69,7 +69,7 @@ void _texture_resource_online(uint64_t name,
                                          texture_blob::size(resource));
     bgfx::TextureHandle texture = bgfx::createTexture(mem, BGFX_TEXTURE_NONE, 0, NULL);
 
-    ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_t* writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ct_cdb_a0.write_commit(writer);
 }
@@ -94,13 +94,12 @@ static const ct_resource_type_t texture_resource_callback = {
 int texture_init(ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
-            .type = CT_ID64_0("texture")
+            .type = CT_ID32_0("texture")
     };
 
     texturecompiler_init(api);
 
-    ct_resource_a0.register_type(_G.type,
-                                 texture_resource_callback);
+    ct_resource_a0.register_type("texture", texture_resource_callback);
 
     return 1;
 }
@@ -108,8 +107,9 @@ int texture_init(ct_api_a0 *api) {
 void texture_shutdown() {
 }
 
-ct_texture texture_get(uint64_t name) {
-    ct_cdb_obj_t* obj = ct_resource_a0.get_obj(_G.type, name);
+ct_texture texture_get(uint32_t name) {
+    ct_resource_id rid = {.type = _G.type, .name = name};
+    ct_cdb_obj_t* obj = ct_resource_a0.get_obj(rid);
 
     ct_texture texture = {
             .idx = (uint16_t)ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)

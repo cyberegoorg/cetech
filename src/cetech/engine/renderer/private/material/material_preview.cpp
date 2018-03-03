@@ -40,20 +40,18 @@ CETECH_DECL_API(ct_cdb_a0);
 
 
 static void load(const char *filename,
-                 uint64_t type,
-                 uint64_t name,
+                 struct ct_resource_id resourceid,
                  struct ct_world world) {
-    ct_entity ent = ct_world_a0.spawn_entity(world, CT_ID64_0("core/cube"));
+    ct_entity ent = ct_world_a0.spawn_entity(world, CT_ID32_0("core/cube"));
     _G.ent = ent;
 
-    ct_cdb_writer_t*w  = ct_cdb_a0.write_begin(ct_world_a0.ent_obj(world, ent));
-    ct_cdb_a0.set_uint64(w, PROP_MATERIAL_ID, name);
+    ct_cdb_obj_t*w  = ct_cdb_a0.write_begin(ct_world_a0.ent_obj(world, ent));
+    ct_cdb_a0.set_uint64(w, PROP_MATERIAL_ID, resourceid.name);
     ct_cdb_a0.write_commit(w);
 }
 
 static void unload(const char *filename,
-                   uint64_t type,
-                   uint64_t name,
+                   struct ct_resource_id resourceid,
                    struct ct_world world) {
     if (_G.ent.h != 0) {
         ct_world_a0.destroy_entity(world, &_G.ent, 1);
@@ -67,7 +65,7 @@ static int _init(ct_api_a0 *api) {
 
 
     ct_asset_preview_a0.register_type_preview(
-            CT_ID64_0("material"),
+            "material",
             (ct_asset_preview_fce) {
                     .load = load,
                     .unload = unload
@@ -77,7 +75,7 @@ static int _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_asset_preview_a0.unregister_type_preview(CT_ID64_0("entity"));
+    ct_asset_preview_a0.unregister_type_preview("material");
 
     _G = {};
 }

@@ -225,8 +225,7 @@ namespace ImGui {
             }
 
             Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));
-            IM_PLACEMENT_NEW(new_dock)
-            Dock();
+            IM_PLACEMENT_NEW(new_dock) Dock();
             m_docks.push_back(new_dock);
             new_dock->label = ImStrdup(label);
             IM_ASSERT(new_dock->label);
@@ -1065,7 +1064,7 @@ namespace ImGui {
             uint32_t type_keys_count = 0;
             ydb->get_map_keys(path,
                                    &tmp_keys,1,
-                                   type_keys,CETECH_ARRAY_LEN(type_keys),
+                                   type_keys,CT_ARRAY_LEN(type_keys),
                                    &type_keys_count);
 
             for (uint32_t i = 0; i < type_keys_count; ++i) {
@@ -1143,6 +1142,7 @@ namespace ImGui {
                 dock->children[1] = this->getDockByIndex(child1_n);
                 dock->parent = this->getDockByIndex(parent_n);
 
+                tryDockToStoredLocation(*dock);
             }
 
         }

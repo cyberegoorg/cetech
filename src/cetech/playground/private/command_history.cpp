@@ -40,10 +40,10 @@ static void ui_command_list() {
     char buffer2[128];
 
     for (uint32_t i = command_count; i > 0; --i) {
-        ct_cmd_system_a0.command_text(buffer2, CETECH_ARRAY_LEN(buffer2), i);
+        ct_cmd_system_a0.command_text(buffer2, CT_ARRAY_LEN(buffer2), i);
         const bool is_selected = current_idx == i;
 
-        snprintf(buffer, CETECH_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
+        snprintf(buffer, CT_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
 
         if (ImGui::Selectable(buffer, is_selected)) {
             ct_cmd_system_a0.goto_idx(i);

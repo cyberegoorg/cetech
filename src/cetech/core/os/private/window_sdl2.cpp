@@ -57,7 +57,7 @@ static struct {
 static uint32_t _sdl_flags(uint32_t flags) {
     uint32_t sdl_flags = 0;
 
-    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_flag_to_sdl); ++i) {
+    for (uint32_t i = 1; i < CT_ARRAY_LEN(_flag_to_sdl); ++i) {
         if (flags & _flag_to_sdl[i].from) {
             sdl_flags |= _flag_to_sdl[i].to;
         }

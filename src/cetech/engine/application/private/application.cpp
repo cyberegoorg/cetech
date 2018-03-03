@@ -99,7 +99,7 @@ void application_quit() {
 void _init_config() {
     _G.config_object = ct_config_a0.config_object();
 
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config_object);
+    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
         ct_cdb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
@@ -131,11 +131,11 @@ void _init_config() {
 static void _boot_stage() {
     const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
                                                   CONFIG_BOOT_PKG, "");
-    uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
-    uint64_t pkg = CT_ID64_0("package");
+    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
+    uint32_t pkg = CT_ID32_0("package");
 
-    uint64_t core_pkg = CT_ID64_0("core/core");
-    uint64_t resources[] = {core_pkg, boot_pkg};
+    uint32_t core_pkg = CT_ID32_0("core/core");
+    uint32_t resources[] = {core_pkg, boot_pkg};
 
     ct_resource_a0.load_now(pkg, resources, 2);
 
@@ -149,12 +149,12 @@ static void _boot_stage() {
 static void _boot_unload() {
     const char *boot_pkg_str = ct_cdb_a0.read_str(_G.config_object,
                                                   CONFIG_BOOT_PKG, "");
-    uint64_t boot_pkg = CT_ID64_0(boot_pkg_str);
+    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
 
-    uint64_t core_pkg = CT_ID64_0("core/core");
-    uint64_t pkg = CT_ID64_0("package");
+    uint32_t core_pkg = CT_ID32_0("core/core");
+    uint32_t pkg = CT_ID32_0("package");
 
-    uint64_t resources[] = {core_pkg, boot_pkg};
+    uint32_t resources[] = {core_pkg, boot_pkg};
 
     ct_package_a0.unload(boot_pkg);
     ct_package_a0.unload(core_pkg);
@@ -245,6 +245,7 @@ extern "C" void application_start() {
             ct_debugui_a0.render(255);
         }
 
+//        ct_cdb_a0.gc();
     }
 
     if (_G.active_game.on_shutdown) {

@@ -82,7 +82,7 @@ bgfx::TextureFormat::Enum format_id_to_enum(uint64_t id) {
             {.id = _ID64("D0S8"), .e = bgfx::TextureFormat::D0S8},
     };
 
-    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_FormatIdToEnum); ++i) {
+    for (uint32_t i = 1; i < CT_ARRAY_LEN(_FormatIdToEnum); ++i) {
         if (_FormatIdToEnum[i].id != id) {
             continue;
         }
@@ -107,7 +107,7 @@ bgfx::BackbufferRatio::Enum ratio_id_to_enum(uint64_t id) {
             {.id = _ID64("double"), .e = bgfx::BackbufferRatio::Double},
     };
 
-    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_RatioIdToEnum); ++i) {
+    for (uint32_t i = 1; i < CT_ARRAY_LEN(_RatioIdToEnum); ++i) {
         if (_RatioIdToEnum[i].id != id) {
             continue;
         }
@@ -132,7 +132,7 @@ float ratio_id_to_coef(uint64_t id) {
             {.id = _ID64("double"), .coef = 2.0f},
     };
 
-    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_RatioIdToEnum); ++i) {
+    for (uint32_t i = 1; i < CT_ARRAY_LEN(_RatioIdToEnum); ++i) {
         if (_RatioIdToEnum[i].id != id) {
             continue;
         }

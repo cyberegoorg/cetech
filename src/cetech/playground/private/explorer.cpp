@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/core/containers/array.h>
+#include <cetech/engine/resource/resource.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -26,6 +26,8 @@ CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_playground_a0);
+CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_resource_a0);
 
 using namespace celib;
 
@@ -36,14 +38,13 @@ using namespace celib;
 static struct _G {
     bool visible;
 
-    uint64_t selected_name;
-    uint64_t level_name;
-    struct ct_entity level;
+    struct ct_cdb_obj_t* selected_obj;
+    uint32_t ent_name;
+    struct ct_entity entity;
     struct ct_world world;
 
     ct_li_on_entity *on_entity_click;
     const char *path;
-    bool is_level;
     ct_alloc *allocator;
 } _G;
 
@@ -74,20 +75,18 @@ void set_level(struct ct_world world,
                struct ct_entity level,
                uint64_t name,
                uint64_t root,
-               const char *path,
-               bool is_level) {
+               const char *path) {
 
     CT_UNUSED(root);
 
-    if (_G.level_name == name) {
+    if (_G.ent_name == name) {
         return;
     }
 
-    _G.level_name = name;
-    _G.level = level;
+    _G.ent_name = name;
+    _G.entity = level;
     _G.world = world;
     _G.path = path;
-    _G.is_level = is_level;
 }
 
 static ct_explorer_a0 level_inspector_api = {
@@ -102,62 +101,47 @@ static void ui_entity_item_end() {
     ct_debugui_a0.TreePop();
 }
 
-static void ui_entity_item_begin(const char *name,
-                                 uint64_t *keys,
-                                 uint32_t keys_count) {
-
-    uint64_t name_hash = ct_yng_a0.key(name);
-    bool selected = _G.selected_name == name_hash;
-
-    uint64_t children_keys[32] = {};
-    uint32_t children_keys_count = 0;
-
-    uint64_t tmp_keys[keys_count + 3];
-    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
-
-    tmp_keys[keys_count] = ct_yng_a0.key("children");
-    ct_ydb_a0.get_map_keys(
-            _G.path,
-            tmp_keys, keys_count + 1,
-            children_keys, CETECH_ARRAY_LEN(children_keys),
-            &children_keys_count);
+static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
 
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
 
+    bool selected = _G.selected_obj == obj;
     if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    if (children_keys_count == 0) {
+    ct_cdb_obj_t** children = ct_cdb_a0.children(obj);
+    if (ct_array_size(children) == 0) {
         flags |= DebugUITreeNodeFlags_Leaf;
+    }
+
+
+    char name[128] = {0};
+    const char* ent_name = ct_cdb_a0.read_str(obj, CT_ID64_0("name"), NULL);
+    if(ent_name) {
+        strcpy(name, ent_name);
+    } else {
+        uint64_t uid = ct_cdb_a0.read_uint64(obj, CT_ID64_0("uid"), 0);
+        snprintf(name, CT_ARRAY_LEN(name), "%llu", uid);
     }
 
     bool open = ct_debugui_a0.TreeNodeEx(name, flags);
     if (ImGui::IsItemClicked(0)) {
-        if (_G.selected_name != name_hash) {
+        if (_G.selected_obj != obj) {
             for (uint32_t j = 0; j < ct_array_size(_G.on_entity_click); ++j) {
-                _G.on_entity_click[j](_G.world, _G.level, _G.path, keys,
-                                      keys_count);
+                _G.on_entity_click[j](_G.world, _G.entity, _G.path, obj);
             }
         }
 
-        _G.selected_name = name_hash;
+        _G.selected_obj = obj;
     }
 
     if (open) {
-        for (uint32_t i = 0; i < children_keys_count; ++i) {
-            char buffer[256];
-            sprintf(buffer, "%llu", children_keys[i]);
-
-            tmp_keys[keys_count + 1] = children_keys[i];
-            tmp_keys[keys_count + 2] = ct_yng_a0.key("name");
-
-            const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys,
-                                                    keys_count + 3, buffer);
-            ui_entity_item_begin(name, tmp_keys, keys_count + 2);
+        ct_cdb_obj_t** children = ct_cdb_a0.children(obj);
+        for (uint32_t i = 0; i < ct_array_size(children); ++i) {
+            ui_entity_item_begin(children[i]);
         }
-
         ui_entity_item_end();
     }
 }
@@ -167,18 +151,20 @@ static void on_debugui() {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
-        if (_G.is_level) {
-            ct_debugui_a0.LabelText("Level", "%llu", _G.level_name);
-        } else {
-            ct_debugui_a0.LabelText("Entity", "%llu", _G.level_name);
-        }
+        ct_debugui_a0.LabelText("Entity", "%u", _G.ent_name);
 
         if (_G.path) {
-            uint64_t tmp_keys[32] = {};
-            tmp_keys[0] = ct_yng_a0.key("name");
-            const char *name = ct_ydb_a0.get_string(_G.path, tmp_keys, 1,
-                                                    "ROOT");
-            ui_entity_item_begin(name, tmp_keys, 0);
+            struct ct_resource_id rid = (struct ct_resource_id){
+                    .type = CT_ID32_0("entity"),
+                    .name = _G.ent_name,
+            };
+
+            ct_cdb_obj_t* obj = ct_resource_a0.get_obj(rid);
+
+#define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
+            obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
+            ui_entity_item_begin(obj);
+
         }
     }
 
@@ -224,6 +210,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_playground_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_resource_a0);
         },
         {
             CT_UNUSED(reload);

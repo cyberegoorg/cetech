@@ -39,8 +39,7 @@ struct ct_entity_compile_output {
     uint32_t *ent_type_count;
 
     uint64_t *uid;
-    uint64_t *prefab;
-    uint64_t *prefab_type;
+    uint32_t *prefab;
     uint32_t ent_counter;
 };
 
@@ -53,7 +52,7 @@ static void foreach_component(const char *filename,
                               uint64_t *root_key,
                               uint32_t root_count,
                               uint64_t component_key,
-                              struct ct_cdb_writer_t *writer) {
+                              struct ct_cdb_obj_t *writer) {
 
     uint64_t tmp_keys[root_count + 1];
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
@@ -82,35 +81,40 @@ static void compile_entitity(const char *filename,
     uint64_t tmp_keys[root_count + 2];
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
 
-
-    struct ct_cdb_obj_t *obj = ct_cdb_a0.create_object();
-    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    tmp_keys[root_count] = ct_yng_a0.key("name");
+    const char *name_str = ct_ydb_a0.get_string(filename, tmp_keys,
+                                              root_count + 1, NULL);
 
     tmp_keys[root_count] = ct_yng_a0.key("PARENT");
     const char *prefab = ct_ydb_a0.get_string(filename, tmp_keys,
                                               root_count + 1, NULL);
 
-    uint64_t type, name;
-    type = name = 0;
+    struct ct_resource_id rid = {{{0}}};
     if (prefab) {
 //        compilator_api->add_dependency(filename, prefab);
-        ct_resource_a0.type_name_from_filename(prefab, &type, &name, NULL);
+        ct_resource_a0.type_name_from_filename(prefab, &rid, NULL);
     }
 
-    ct_array_push(output->prefab, name, _G.allocator);
-    ct_array_push(output->prefab_type, type, _G.allocator);
+    ct_array_push(output->prefab, rid.name, _G.allocator);
 
     tmp_keys[root_count] = ct_yng_a0.key("components");
     struct compkey ck = {{0}};
     uint32_t components_keys_count = 0;
 
     ct_ydb_a0.get_map_keys(filename, tmp_keys, root_count + 1,
-                           ck.keys, CETECH_ARRAY_LEN(ck.keys),
+                           ck.keys, CT_ARRAY_LEN(ck.keys),
                            &components_keys_count);
 
     ct_array_push(output->ent_type, ck, _G.allocator);
     ct_array_push(output->ent_type_count, components_keys_count, _G.allocator);
 
+    struct ct_cdb_obj_t *obj = ct_cdb_a0.create_object(_G.db, 0);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
+
+    if(name_str) {
+        ct_cdb_a0.set_string(writer, CT_ID64_0("name"), name_str);
+    }
+    ct_cdb_a0.set_uint64(writer, CT_ID64_0("uid"), uid);
 
     for (uint32_t i = 0; i < components_keys_count; ++i) {
         foreach_component(filename,
@@ -130,7 +134,7 @@ static void compile_entitity(const char *filename,
 
     ct_ydb_a0.get_map_keys(filename,
                            tmp_keys, root_count + 1,
-                           children_keys, CETECH_ARRAY_LEN(children_keys),
+                           children_keys, CT_ARRAY_LEN(children_keys),
                            &children_keys_count);
 
     for (uint32_t i = 0; i < children_keys_count; ++i) {
@@ -222,11 +226,7 @@ static void write_to_build(struct ct_entity_compile_output *output,
                     _G.allocator);
 
     ct_array_push_n(*build, output->prefab,
-                    sizeof(uint64_t) * ct_array_size(output->prefab),
-                    _G.allocator);
-
-    ct_array_push_n(*build, output->prefab_type,
-                    sizeof(uint64_t) * ct_array_size(output->prefab_type),
+                    sizeof(uint32_t) * ct_array_size(output->prefab),
                     _G.allocator);
 
     ct_array_push_n(*build, output->entity_data,

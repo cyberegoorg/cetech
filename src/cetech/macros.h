@@ -13,9 +13,9 @@
 
 #define CETECH_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
-#define CETECH_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
+#define CT_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
 
-#define CETECH_ARR_ARG(a) a, CETECH_ARRAY_LEN(a)
+#define CETECH_ARR_ARG(a) a, CT_ARRAY_LEN(a)
 
 #define CTECH_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 

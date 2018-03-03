@@ -55,7 +55,8 @@ int materialcompiler_init(ct_api_a0 *api);
 //==============================================================================
 
 static struct _G {
-    uint64_t type;
+    ct_cdb_t db;
+    uint32_t type;
     ct_alloc *allocator;
 } _G;
 
@@ -93,7 +94,7 @@ static void online(uint64_t name,
     auto *uniform_cout = material_blob::uniform_count(resource);
     auto *render_state = material_blob::render_state(resource);
 
-    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(obj);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
 
     ct_cdb_a0.set_string(writer, CT_ID64_0("asset_name"), resource->asset_name);
 
@@ -102,17 +103,22 @@ static void online(uint64_t name,
         uint64_t rstate = render_state[i];
         uint64_t shader = shader_names[i];
 
-        ct_cdb_obj_t *layer_object = ct_cdb_a0.create_object();
-        struct ct_cdb_writer_t *layer_writer;
+        ct_cdb_obj_t *layer_object = ct_cdb_a0.create_object(_G.db, 0);
+        struct ct_cdb_obj_t *layer_writer;
         layer_writer = ct_cdb_a0.write_begin(layer_object);
 
+        struct ct_resource_id rid = (struct ct_resource_id){
+                .type = CT_ID32_0("shader"),
+                .name = static_cast<uint32_t>(shader),
+        };
+
         ct_cdb_a0.set_ref(layer_writer,
-                          MATERIAL_SHADER_PROP,
-                          ct_resource_a0.get_obj(CT_ID64_0("shader"), shader));
+                          MATERIAL_SHADER_PROP, ct_resource_a0.get_obj(rid));
+
         ct_cdb_a0.set_uint64(layer_writer, MATERIAL_STATE_PROP, rstate);
 
-        ct_cdb_obj_t *vars_obj = ct_cdb_a0.create_object();
-        ct_cdb_writer_t *vars_writer = ct_cdb_a0.write_begin(vars_obj);
+        ct_cdb_obj_t *vars_obj = ct_cdb_a0.create_object(_G.db, 0);
+        ct_cdb_obj_t *vars_writer = ct_cdb_a0.write_begin(vars_obj);
         ct_cdb_a0.set_ref(layer_writer, MATERIAL_VARIABLES_PROP, vars_obj);
 
         uint64_t uniform_offset = layer_offset[i];
@@ -126,8 +132,8 @@ static void online(uint64_t name,
                                                               _type_to_bgfx[type],
                                                               1);
 
-            ct_cdb_obj_t *var_obj = ct_cdb_a0.create_object();
-            ct_cdb_writer_t *var_writer = ct_cdb_a0.write_begin(var_obj);
+            ct_cdb_obj_t *var_obj = ct_cdb_a0.create_object(_G.db, 0);
+            ct_cdb_obj_t *var_writer = ct_cdb_a0.write_begin(var_obj);
 
             ct_cdb_a0.set_uint64(var_writer, MATERIAL_VAR_HANDLER_PROP,
                                  handler.idx);
@@ -193,8 +199,13 @@ static const ct_resource_type_t callback = {
 // Interface
 //==============================================================================
 
-static struct ct_cdb_obj_t *create(uint64_t name) {
-    auto object = ct_resource_a0.get_obj(_G.type, name);
+static struct ct_cdb_obj_t *create(uint32_t name) {
+    struct ct_resource_id rid = (struct ct_resource_id){
+            .type = _G.type,
+            .name = name,
+    };
+
+    auto object = ct_resource_a0.get_obj(rid);
     return object;
 }
 
@@ -208,7 +219,7 @@ static void set_texture_handler(struct ct_cdb_obj_t *material,
                                                  NULL);
 
     ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(var);
+    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
                          MAT_VAR_TEXTURE_HANDLER);
@@ -225,7 +236,7 @@ static void set_texture(ct_cdb_obj_t *material,
                                                  NULL);
 
     ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(var);
+    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP, MAT_VAR_TEXTURE);
     ct_cdb_a0.write_commit(writer);
@@ -324,11 +335,12 @@ static struct ct_material_a0 material_api = {
 static int init(ct_api_a0 *api) {
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
-            .type = CT_ID64_0("material"),
+            .type = CT_ID32_0("material"),
+            .db = ct_cdb_a0.create_db()
     };
     api->register_api("ct_material_a0", &material_api);
 
-    ct_resource_a0.register_type(_G.type, callback);
+    ct_resource_a0.register_type("material", callback);
 
     materialcompiler_init(api);
 
@@ -336,6 +348,7 @@ static int init(ct_api_a0 *api) {
 }
 
 static void shutdown() {
+    ct_cdb_a0.destroy_db(_G.db);
 }
 
 CETECH_MODULE_DEF(

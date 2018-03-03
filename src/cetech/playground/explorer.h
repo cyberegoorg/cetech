@@ -21,8 +21,7 @@ struct ct_world;
 typedef void (*ct_li_on_entity)(struct ct_world world,
                                 struct ct_entity entity,
                                 const char *filename,
-                                uint64_t *keys,
-                                uint32_t keys_count);
+                                ct_cdb_obj_t* obj);
 
 //==============================================================================
 // Api
@@ -33,8 +32,7 @@ struct ct_explorer_a0 {
                       ct_entity level,
                       uint64_t name,
                       uint64_t root,
-                      const char *path,
-                      bool b);
+                      const char *path);
 
     void (*register_on_entity_click)(ct_li_on_entity on_entity);
 

@@ -35,7 +35,7 @@ static struct CameraGlobal {
 static int _camera_component_compiler(const char *filename,
                                       uint64_t *comp_key,
                                       uint32_t key_count,
-                                      struct ct_cdb_writer_t *writer) {
+                                      struct ct_cdb_obj_t *writer) {
     uint64_t keys[key_count + 1];
     memcpy(keys, comp_key, sizeof(uint64_t) * key_count);
 
@@ -93,7 +93,7 @@ static void on_add(struct ct_world world,
 
     struct ct_viewport v = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
 
-    struct ct_cdb_writer_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
+    struct ct_cdb_obj_t *ent_writer = ct_cdb_a0.write_begin(ent_obj);
     ct_cdb_a0.set_uint64(ent_writer, PROP_CAMERA_VIEWPORT, v.idx);
     ct_cdb_a0.write_commit(ent_writer);
 }

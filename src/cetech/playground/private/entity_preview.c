@@ -30,16 +30,14 @@ CETECH_DECL_API(ct_asset_preview_a0);
 CETECH_DECL_API(ct_world_a0);
 
 static void load(const char *filename,
-                 uint64_t type,
-                 uint64_t name,
+                 struct ct_resource_id resourceid,
                  struct ct_world world) {
-    struct ct_entity ent = ct_world_a0.spawn_entity(world, name);
+    struct ct_entity ent = ct_world_a0.spawn_entity(world, resourceid.name);
     _G.ent = ent;
 }
 
 static void unload(const char *filename,
-                   uint64_t type,
-                   uint64_t name,
+                   struct ct_resource_id resourceid,
                    struct ct_world world) {
     ct_world_a0.destroy_entity(world, &_G.ent, 1);
 }
@@ -52,7 +50,7 @@ static int _init(struct ct_api_a0 *api) {
 
 
     ct_asset_preview_a0.register_type_preview(
-            CT_ID64_0("entity"),
+            "entity",
             (struct ct_asset_preview_fce) {
                     .load = load,
                     .unload = unload
@@ -63,7 +61,7 @@ static int _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_asset_preview_a0.unregister_type_preview(CT_ID64_0("entity"));
+    ct_asset_preview_a0.unregister_type_preview("entity");
 
     _G = (struct _G) {};
 }

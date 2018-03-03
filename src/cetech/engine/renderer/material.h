@@ -39,7 +39,7 @@ struct ct_material_a0 {
     //! Create new material
     //! \param name Material resource name
     //! \return Material
-    struct ct_cdb_obj_t* (*resource_create)(uint64_t name);
+    struct ct_cdb_obj_t* (*resource_create)(uint32_t name);
 
     //! Set texture value
     //! \param material Material

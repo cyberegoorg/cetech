@@ -57,8 +57,9 @@ CETECH_DECL_API(ct_cdb_a0);
 #define _G ConfigSystemGlobals
 
 static struct ConfigSystemGlobals {
-    uint64_t type;
+    uint32_t type;
 
+    struct ct_cdb_t db;
     struct ct_cdb_obj_t *config_object;
     struct ct_cdb_obj_t *config_desc;
 } _G;
@@ -81,8 +82,7 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(
-            _G.config_object);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
 
@@ -123,10 +123,10 @@ static void foreach_config_clb(struct ct_yamlng_node key,
 
     char name[1024] = {};
     if (output->root_name != NULL) {
-        snprintf(name, CETECH_ARRAY_LEN(name),
+        snprintf(name, CT_ARRAY_LEN(name),
                  "%s.%s", output->root_name, key_str);
     } else {
-        snprintf(name, CETECH_ARRAY_LEN(name), "%s", key_str);
+        snprintf(name, CT_ARRAY_LEN(name), "%s", key_str);
     }
 
     enum node_type type = d->type(d, value);
@@ -151,10 +151,10 @@ static void foreach_config_clb(struct ct_yamlng_node key,
             const uint64_t key = CT_ID64_0(name);
 
             if (ct_cdb_a0.prop_exist(_G.config_object, key)) {
-                enum ct_cdb_prop_type t = ct_cdb_a0.prop_type(
+                enum ct_cdb_type t = ct_cdb_a0.prop_type(
                         _G.config_object, key);
-                struct ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(
-                        _G.config_object);
+
+                struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
 
                 switch (t) {
                     case CDB_TYPE_NONE:
@@ -170,7 +170,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                         ct_cdb_a0.set_uint32(writer, key, tmp_int);
                         break;
 
-                    case CDB_TYPE_STRPTR:
+                    case CDB_TYPE_STR:
                         str = d->as_string(d, value, "");
                         ct_cdb_a0.set_string(writer, key, str);
                         break;
@@ -258,17 +258,18 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.debug(LOG_WHERE, "Init");
 
-            _G.config_object = ct_cdb_a0.create_object();
-            _G.config_desc = ct_cdb_a0.create_object();
+            _G.db = ct_cdb_a0.create_db();
+            _G.config_object = ct_cdb_a0.create_object(_G.db, 0);
+            _G.config_desc = ct_cdb_a0.create_object(_G.db, 1);
 
             api->register_api("ct_config_a0", &config_a0);
 
-            _G.type = CT_ID64_0("config");
+            _G.type = CT_ID32_0("config");
         },
         {
             CT_UNUSED(api, reload);
-
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
+            ct_cdb_a0.destroy_db(_G.db);
         }
 )

@@ -41,11 +41,6 @@ struct ct_ydb_cmd_s {
 };
 
 struct ct_ent_cmd_s {
-    // YAML
-    const char *filename;
-    uint64_t keys[32];
-    uint32_t keys_count;
-
     // CDB
     struct ct_cdb_obj_t* obj;
     uint64_t prop;

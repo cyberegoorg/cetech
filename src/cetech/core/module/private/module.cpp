@@ -305,7 +305,7 @@ static void check_modules() {
 
                 char full_path[4096];
                 ct_fs_a0.get_full_path(root, path, full_path,
-                                               CETECH_ARRAY_LEN(full_path));
+                                               CT_ARRAY_LEN(full_path));
 
                 int pat_size = strlen(full_path);
                 int ext_size = strlen(ext);

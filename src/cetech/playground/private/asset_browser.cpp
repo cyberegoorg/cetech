@@ -87,22 +87,15 @@ _DEF_ON_CLB_FCE(ct_ab_on_asset_double_click, on_asset_double_click);
 
 uint64_t get_selected_asset_type() {
     const char *path = _G.asset_list[_G.selected_file_idx];
-
-    uint64_t type, name;
-    ct_resource_a0.type_name_from_filename(path,
-                                           &type, &name,
-                                           NULL);
-
-    return type;
+    struct ct_resource_id resourceid;
+    ct_resource_a0.type_name_from_filename(path, &resourceid, NULL);
+    return resourceid.type;
 }
 
 void get_selected_asset_name(char *asset_name) {
+    struct ct_resource_id resourceid;
     const char *path = _G.asset_list[_G.selected_file_idx];
-
-    uint64_t type, name;
-    ct_resource_a0.type_name_from_filename(path,
-                                           &type, &name,
-                                           asset_name);
+    ct_resource_a0.type_name_from_filename(path, &resourceid, asset_name);
 }
 
 static ct_asset_browser_a0 asset_browser_api = {
@@ -258,10 +251,8 @@ static void ui_asset_list() {
                 continue;
             }
 
-            uint64_t type, name;
-            ct_resource_a0.type_name_from_filename(path,
-                                                   &type, &name,
-                                                   NULL);
+            struct ct_resource_id resourceid;
+            ct_resource_a0.type_name_from_filename(path, &resourceid, NULL);
 
             if (ImGui::Selectable(filename, _G.selected_file == filename_hash,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
@@ -271,13 +262,13 @@ static void ui_asset_list() {
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     for (uint32_t j = 0;
                          j < ct_array_size(_G.on_asset_double_click); ++j) {
-                        _G.on_asset_double_click[j](type, name,
+                        _G.on_asset_double_click[j](resourceid,
                                                     CT_ID64_0("source"), path);
                     }
                 } else {
                     for (uint32_t j = 0;
                          j < ct_array_size(_G.on_asset_click); ++j) {
-                        _G.on_asset_click[j](type, name,
+                        _G.on_asset_click[j](resourceid,
                                              CT_ID64_0("source"), path);
                     }
                 }

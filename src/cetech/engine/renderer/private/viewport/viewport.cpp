@@ -85,7 +85,7 @@ static struct G {
 
     Map<ct_viewport_pass_compiler> compiler_map;
 
-    uint64_t type;
+    uint32_t type;
 
     uint32_t size_width;
     uint32_t size_height;
@@ -185,7 +185,12 @@ static void _init_viewport(viewport_instance &vi,
     const char *render_config = ct_cdb_a0.read_str(
             ct_config_a0.config_object(), CT_ID64_0("renderer.config"), "");
 
-    ct_cdb_obj_t* object = ct_resource_a0.get_obj(_G.type, CT_ID64_0(render_config));
+    struct ct_resource_id rid = (struct ct_resource_id){
+            .type = _G.type,
+            .name =  CT_ID32_0(render_config),
+    };
+
+    ct_cdb_obj_t* object = ct_resource_a0.get_obj(rid);
     void* resource = ct_cdb_a0.read_ptr(object, VIEWPORT_PROP, NULL);
     auto *blob = renderconfig_blob::get(resource);
 
@@ -352,7 +357,7 @@ static void online(uint64_t name,
         map::set(_G.global_resource, gr.name, h);
     }
 
-    ct_cdb_writer_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_t* writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ptr(writer, VIEWPORT_PROP, data);
     ct_cdb_a0.write_commit(writer);
 }
@@ -400,25 +405,25 @@ static void compile_global_resource(uint32_t idx,
             d->hash(d, value),
             ct_yng_a0.key("name")
     };
-    uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    uint64_t k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *name_str = d->get_str(d, k, "");
     gs.name = CT_ID64_0(name_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.key("type");
-    k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *type_str = d->get_str(d, k, "");
     gs.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.key("format");
-    k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *format_str = d->get_str(d, k, "");
     gs.format = CT_ID64_0(format_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.key("ration");
-    k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *ration_str = d->get_str(d, k, "");
     gs.ration = CT_ID64_0(ration_str);
 
@@ -441,20 +446,20 @@ static void compile_layer_entry(uint32_t idx,
             d->hash(d, value),
             ct_yng_a0.key("name")
     };
-    uint64_t k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    uint64_t k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *name_str = d->get_str(d, k, "");
     le.name = CT_ID64_0(name_str);
 
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.key("type");
-    k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     const char *type_str = d->get_str(d, k, "");
     le.type = CT_ID64_0(type_str);
 
     /////////////////////////////////////////////////////
     keys[1] = ct_yng_a0.key("output");
-    k = ct_yng_a0.combine_key(keys, CETECH_ARRAY_LEN(keys));
+    k = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
 
     ct_yamlng_node output_node = d->get(d, k);
     if (0 != output_node.idx) {
@@ -566,7 +571,7 @@ static void compiler(const char *filename,
                             ct_yng_a0.key("layers")
                     };
                     uint64_t k = ct_yng_a0.combine_key(keys,
-                                                       CETECH_ARRAY_LEN(
+                                                       CT_ARRAY_LEN(
                                                                keys));
                     const char *layers_str = d->get_str(d, k, "");
                     auto layers_id = CT_ID64_0(layers_str);
@@ -587,7 +592,7 @@ static void compiler(const char *filename,
 
                     keys[1] = ct_yng_a0.key("local_resource");
                     k = ct_yng_a0.combine_key(keys,
-                                              CETECH_ARRAY_LEN(keys));
+                                              CT_ARRAY_LEN(keys));
                     ct_yamlng_node local_resource = d->get(d, k);
                     if (0 != local_resource.idx) {
                         d->foreach_seq_node(
@@ -610,7 +615,7 @@ static void compiler(const char *filename,
                                             ct_yng_a0.key("name")
                                     };
                                     uint64_t k = ct_yng_a0.combine_key(
-                                            keys, CETECH_ARRAY_LEN(keys));
+                                            keys, CT_ARRAY_LEN(keys));
                                     const char *name_str = d->get_str(
                                             d, k, "");
                                     gs.name = CT_ID64_0(name_str);
@@ -618,7 +623,7 @@ static void compiler(const char *filename,
                                     /////////////////////////////////////////////////////
                                     keys[1] = ct_yng_a0.key("type");
                                     k = ct_yng_a0.combine_key(keys,
-                                                              CETECH_ARRAY_LEN(
+                                                              CT_ARRAY_LEN(
                                                                       keys));
                                     const char *type_str = d->get_str(
                                             d, k, "");
@@ -629,7 +634,7 @@ static void compiler(const char *filename,
                                     keys[1] = ct_yng_a0.key(
                                             "format");
                                     k = ct_yng_a0.combine_key(keys,
-                                                              CETECH_ARRAY_LEN(
+                                                              CT_ARRAY_LEN(
                                                                       keys));
                                     const char *format_str = d->get_str(
                                             d, k, "");
@@ -638,7 +643,7 @@ static void compiler(const char *filename,
                                     /////////////////////////////////////////////////////
                                     keys[1] = ct_yng_a0.key("ration");
                                     k = ct_yng_a0.combine_key(keys,
-                                                              CETECH_ARRAY_LEN(
+                                                              CT_ARRAY_LEN(
                                                                       keys));
                                     const char *ration_str = d->get_str(
                                             d, k, "");
@@ -747,8 +752,7 @@ static int init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
 
 #ifdef CETECH_DEVELOP
-    ct_resource_a0.compiler_register(
-            CT_ID64_0("render_config"), compiler, true);
+    ct_resource_a0.compiler_register("render_config", compiler, true);
 #endif
 
     ct_renderer_a0.get_size(&_G.size_width, &_G.size_height);
@@ -818,12 +822,12 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
-            .type = CT_ID64_0("render_config"),
+            .type = CT_ID32_0("render_config"),
     };
 
     _G.config = ct_config_a0.config_object();
 
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_RENDER_CONFIG)) {
         ct_cdb_a0.set_string(writer, CONFIG_RENDER_CONFIG, "default");
     }
@@ -833,7 +837,8 @@ static void _init(struct ct_api_a0 *api) {
     _G.on_pass.init(ct_memory_a0.main_allocator());
     _G.compiler_map.init(ct_memory_a0.main_allocator());
 
-    ct_resource_a0.register_type(_G.type, callback);
+    ct_resource_a0.register_type("render_config", callback);
+
     init(api);
     ct_renderer_a0.register_on_render(on_render);
 }

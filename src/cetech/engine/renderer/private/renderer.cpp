@@ -91,7 +91,7 @@ static void renderer_create() {
         intptr_t wid = ct_cdb_a0.read_uint32(_G.config, CONFIG_WID, 0);
 
         char title[128] = {};
-        snprintf(title, CETECH_ARRAY_LEN(title), "cetech");
+        snprintf(title, CT_ARRAY_LEN(title), "cetech");
 
 
         if (wid == 0) {
@@ -236,7 +236,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    ct_cdb_writer_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
         ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);

@@ -12,6 +12,7 @@
 #include <cetech/playground/playground.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
+#include <cetech/engine/resource/resource.h>
 #include "cetech/core/containers/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"
@@ -41,8 +42,8 @@ static struct _G {
     struct ct_hash_t preview_fce_map;
     ct_asset_preview_fce *preview_fce;
 
-    uint64_t active_type;
-    uint64_t active_name;
+    ct_resource_id active_asset;
+
     const char *active_path;
 
     ct_world world;
@@ -107,7 +108,7 @@ static void fps_camera_update(ct_world world,
 //    Transform.set_rotation(self.transform, rot * rotation)
 //    end
 
-    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
     ct_cdb_a0.write_commit(w);
 }
@@ -140,42 +141,39 @@ static void on_debugui() {
 }
 
 
-static void set_asset(uint64_t type,
-                      uint64_t name,
+static void set_asset(struct ct_resource_id asset,
                       uint64_t root,
                       const char *path) {
     CT_UNUSED(root);
 
-    if (_G.active_name == name) {
+    if (_G.active_asset.i64 == asset.i64) {
         return;
     }
 
-    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, _G.active_type,
+    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, _G.active_asset.type,
                                   UINT64_MAX);
     if (idx != UINT64_MAX) {
         ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.unload) {
-            fce.unload(_G.active_path, _G.active_type, _G.active_name,
-                       _G.world);
+            fce.unload(_G.active_path, _G.active_asset, _G.world);
         }
     }
 
-    _G.active_type = type;
-    _G.active_name = name;
+    _G.active_asset = asset,
     _G.active_path = path;
 
-    idx = ct_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+    idx = ct_hash_lookup(&_G.preview_fce_map, asset.type, UINT64_MAX);
     if (idx != UINT64_MAX) {
         ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.load) {
-            fce.load(path, type, name, _G.world);
+            fce.load(path, asset, _G.world);
         }
     }
 
     ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world, _G.camera_ent);
-    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_vec3(w, PROP_POSITION, (float[3]) {0.0f, 0.0f, -10.0f});
     ct_cdb_a0.write_commit(w);
 }
@@ -183,7 +181,7 @@ static void set_asset(uint64_t type,
 static void init() {
     _G.visible = true;
     _G.world = ct_world_a0.create_world();
-    _G.camera_ent = ct_world_a0.spawn_entity(_G.world, CT_ID64_0("content/camera"));
+    _G.camera_ent = ct_world_a0.spawn_entity(_G.world, CT_ID32_0("content/camera"));
 }
 
 static void shutdown() {
@@ -229,18 +227,21 @@ static void update(float dt) {
     ct_array_push(a, item, al); \
     ct_hash_add(h, k, ct_array_size(a) - 1, al)
 
-void register_type_preview(uint64_t type,
+void register_type_preview(const char* type,
                            ct_asset_preview_fce fce) {
-    ct_instance_map(_G.preview_fce, &_G.preview_fce_map, type, fce,
+    uint32_t id = CT_ID32_0(type);
+    ct_instance_map(_G.preview_fce, &_G.preview_fce_map, id, fce,
                     _G.allocator);
 }
 
-void unregister_type_preview(uint64_t type) {
-    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, type, UINT64_MAX);
+void unregister_type_preview(const char* type) {
+    uint32_t id = CT_ID32_0(type);
+
+    uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, id, UINT64_MAX);
     if (UINT64_MAX == idx) {
         return;
     }
-    ct_hash_remove(&_G.preview_fce_map, type);
+    ct_hash_remove(&_G.preview_fce_map, id);
 }
 
 static void on_menu_window() {

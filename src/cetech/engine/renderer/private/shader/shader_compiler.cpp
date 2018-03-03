@@ -148,7 +148,7 @@ static void compiler(const char *filename,
     ct_path_a0.join(&input_path, a, 2, source_dir, vs_input);
 
     _gen_tmp_name(output_path, tmp_dir,
-                  CETECH_ARRAY_LEN(tmp_filename), vs_input);
+                  CT_ARRAY_LEN(tmp_filename), vs_input);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
                           platform, vs_profile);
@@ -182,7 +182,7 @@ static void compiler(const char *filename,
 
     ct_path_a0.join(&input_path, a, 2, source_dir, fs_input);
 
-    _gen_tmp_name(output_path, tmp_dir, CETECH_ARRAY_LEN(tmp_filename),
+    _gen_tmp_name(output_path, tmp_dir, CT_ARRAY_LEN(tmp_filename),
                   fs_input);
 
     result = _shaderc(input_path, output_path, include_dir, "fragment",
@@ -227,7 +227,7 @@ int shadercompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_cdb_a0);
 
-    ct_resource_a0.compiler_register(CT_ID64_0("shader"), compiler, true);
+    ct_resource_a0.compiler_register("shader", compiler, true);
 
     return 1;
 }

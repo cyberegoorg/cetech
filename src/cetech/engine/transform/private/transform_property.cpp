@@ -60,10 +60,7 @@ static void set_vec3_cmd(const struct ct_cmd *cmd,
 
     const float *value = inverse ? pos_cmd->old_value : pos_cmd->new_value;
 
-    ct_ydb_a0.set_vec3(pos_cmd->ent.filename, pos_cmd->ent.keys,
-                       pos_cmd->ent.keys_count, (float *) value);
-
-    ct_cdb_writer_t* w = ct_cdb_a0.write_begin(pos_cmd->ent.obj);
+    ct_cdb_obj_t* w = ct_cdb_a0.write_begin(pos_cmd->ent.obj);
     ct_cdb_a0.set_vec3(w, pos_cmd->ent.prop, value);
     ct_cdb_a0.write_commit(w);
 }
@@ -106,18 +103,11 @@ static void cmd_description(char *buffer,
 }
 
 static void on_component(struct ct_world world,
-                         struct ct_entity entity,
-                         struct ct_cdb_obj_t *obj,
-                         const char *filename,
-                         uint64_t *keys,
-                         uint32_t keys_count) {
+                         struct ct_cdb_obj_t *obj) {
     if (!ct_debugui_a0.CollapsingHeader("Transformation",
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
-
-    uint64_t tmp_keys[keys_count + 1];
-    memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
 //    ct_cdb_obj_t* obj = ct_world_a0.ent_obj(world, entity);
 
@@ -133,22 +123,19 @@ static void on_component(struct ct_world world,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.key("position");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = CT_ID64_0("transform_set_position"),
                 },
                 .ent = {
-                        .filename = filename,
-                        .keys_count = keys_count + 1,
                         .prop = PROP_POSITION,
                         .obj = obj,
                 },
                 .new_value = {pos_new[0], pos_new[1], pos_new[2]},
                 .old_value = {pos[0], pos[1], pos[2]},
         };
-        memcpy(cmd.ent.keys, tmp_keys, sizeof(uint64_t) * cmd.ent.keys_count);
+
         ct_cmd_system_a0.execute(&cmd.header);
     }
 
@@ -166,22 +153,19 @@ static void on_component(struct ct_world world,
     if (ct_debugui_a0.DragFloat3("rotation", rot_new, 1.0f, 0, 360, "%.5f",
                                  1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.key("rotation");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = CT_ID64_0("transform_set_rotation"),
                 },
                 .ent = {
-                        .filename = filename,
-                        .keys_count = keys_count + 1,
                         .prop = PROP_ROTATION,
                         .obj = obj,
                 },
                 .new_value = {rot_new[0], rot_new[1], rot_new[2]},
                 .old_value = {rot[0], rot[1], rot[2]},
         };
-        memcpy(cmd.ent.keys, tmp_keys, sizeof(uint64_t) * cmd.ent.keys_count);
+
         ct_cmd_system_a0.execute(&cmd.header);
     }
 
@@ -197,22 +181,18 @@ static void on_component(struct ct_world world,
                                  -FLT_MAX, FLT_MAX,
                                  "%.3f", 1.0f)) {
 
-        tmp_keys[keys_count] = ct_yng_a0.key("scale");
         struct ct_ent_cmd_vec3_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_vec3_s),
                         .type = CT_ID64_0("transform_set_scale"),
                 },
                 .ent = {
-                        .filename = filename,
-                        .keys_count = keys_count + 1,
                         .prop = PROP_SCALE,
                         .obj = obj,
                 },
                 .new_value = {scale_name[0], scale_name[1], scale_name[2]},
                 .old_value = {scale[0], scale[1], scale[2]},
         };
-        memcpy(cmd.ent.keys, tmp_keys, sizeof(uint64_t) * cmd.ent.keys_count);
         ct_cmd_system_a0.execute(&cmd.header);
     }
 }

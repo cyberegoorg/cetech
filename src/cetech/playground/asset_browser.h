@@ -11,15 +11,16 @@ extern "C" {
 
 #include <stddef.h>
 
+struct ct_resource_id;
+
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_ab_on_asset_click)(uint64_t type,
-                                     uint64_t name,
+typedef void (*ct_ab_on_asset_click)(struct ct_resource_id asset,
                                      uint64_t root,
                                      const char *path);
-typedef void (*ct_ab_on_asset_double_click)(uint64_t type,
-                                            uint64_t name,
+
+typedef void (*ct_ab_on_asset_double_click)(struct ct_resource_id asset,
                                             uint64_t root,
                                             const char *path);
 

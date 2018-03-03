@@ -56,15 +56,13 @@ void _forach_variable_clb(const char *filename,
     };
 
     const char *name = ct_ydb_a0.get_string(filename, tmp_keys,
-                                            CETECH_ARRAY_LEN(tmp_keys),
-                                            "");
+                                            CT_ARRAY_LEN(tmp_keys), "");
     char uniform_name[32];
     strcpy(uniform_name, name);
 
     tmp_keys[2] = ct_yng_a0.key("type");
     const char *type = ct_ydb_a0.get_string(filename, tmp_keys,
-                                            CETECH_ARRAY_LEN(tmp_keys),
-                                            "");
+                                            CT_ARRAY_LEN(tmp_keys), "");
 
     material_variable mat_var = {};
 
@@ -72,13 +70,13 @@ void _forach_variable_clb(const char *filename,
     if (!strcmp(type, "texture")) {
         uint64_t texture_name = 0;
 
-        //TODO : None type?
-        if (ct_ydb_a0.has_key(filename, tmp_keys,
-                              CETECH_ARRAY_LEN(tmp_keys))) {
-            const char *v = ct_ydb_a0.get_string(
-                    filename,
-                    tmp_keys, CETECH_ARRAY_LEN(tmp_keys), "");
-            texture_name = CT_ID64_0(v);
+        //TODO : None ptype?
+        if (ct_ydb_a0.has_key(filename, tmp_keys, CT_ARRAY_LEN(tmp_keys))) {
+            const char *v = ct_ydb_a0.get_string(filename,
+                                                 tmp_keys,
+                                                 CT_ARRAY_LEN(tmp_keys),
+                                                 "");
+            texture_name = CT_ID32_0(v);
         }
 
         mat_var.type = MAT_VAR_TEXTURE;
@@ -87,24 +85,24 @@ void _forach_variable_clb(const char *filename,
     } else if (!strcmp(type, "vec4")) {
         mat_var.type = MAT_VAR_VEC4;
         ct_ydb_a0.get_vec4(filename, tmp_keys,
-                           CETECH_ARRAY_LEN(tmp_keys), mat_var.v4,
+                           CT_ARRAY_LEN(tmp_keys), mat_var.v4,
                            (float[4]) {0.0f});
     } else if (!strcmp(type, "color")) {
         mat_var.type = MAT_VAR_COLOR4;
         ct_ydb_a0.get_vec4(filename, tmp_keys,
-                           CETECH_ARRAY_LEN(tmp_keys), mat_var.v4,
+                           CT_ARRAY_LEN(tmp_keys), mat_var.v4,
                            (float[4]) {0.0f});
 
     } else if (!strcmp(type, "mat4")) {
         mat_var.type = MAT_VAR_MAT44;
         ct_ydb_a0.get_mat4(filename, tmp_keys,
-                           CETECH_ARRAY_LEN(tmp_keys), mat_var.m44,
+                           CT_ARRAY_LEN(tmp_keys), mat_var.m44,
                            (float[16]) {0.0f});
     }
 
     ct_array_push_n(output.var, &mat_var, 1, a);
     ct_array_push_n(output.uniform_names, uniform_name,
-                    CETECH_ARRAY_LEN(uniform_name), a);
+                    CT_ARRAY_LEN(uniform_name), a);
 }
 
 uint64_t render_state_to_enum(uint64_t name) {
@@ -123,7 +121,7 @@ uint64_t render_state_to_enum(uint64_t name) {
             {.name = CT_ID64_0("msaa"), .e = BGFX_STATE_MSAA},
     };
 
-    for (uint32_t i = 1; i < CETECH_ARRAY_LEN(_tbl); ++i) {
+    for (uint32_t i = 1; i < CT_ARRAY_LEN(_tbl); ++i) {
         if (_tbl[i].name != name) {
             continue;
         }
@@ -147,10 +145,10 @@ void foreach_layer(const char *filename,
     };
 
     uint64_t tmp_key = ct_yng_a0.combine_key(tmp_keys,
-                                             CETECH_ARRAY_LEN(tmp_keys));
+                                             CT_ARRAY_LEN(tmp_keys));
 
     const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
-    uint64_t shader_id = CT_ID64_0(shader);
+    uint64_t shader_id = CT_ID32_0(shader);
     ct_array_push(output.shader_name, shader_id, a);
 
     auto layer_id = key;
@@ -158,7 +156,7 @@ void foreach_layer(const char *filename,
 
     tmp_keys[2] = ct_yng_a0.key("render_state");
     tmp_key = ct_yng_a0.combine_key(tmp_keys,
-                                    CETECH_ARRAY_LEN(tmp_keys));
+                                    CT_ARRAY_LEN(tmp_keys));
     if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
         output.curent_render_state = 0;
 
@@ -168,7 +166,7 @@ void foreach_layer(const char *filename,
         ct_ydb_a0.get_map_keys(filename,
                                &tmp_key, 1,
                                render_state_keys,
-                               CETECH_ARRAY_LEN(render_state_keys),
+                               CT_ARRAY_LEN(render_state_keys),
                                &render_state_count);
 
         for (uint32_t i = 0; i < render_state_count; ++i) {
@@ -183,14 +181,14 @@ void foreach_layer(const char *filename,
 
     tmp_keys[2] = ct_yng_a0.key("variables");
     tmp_key = ct_yng_a0.combine_key(tmp_keys,
-                                    CETECH_ARRAY_LEN(tmp_keys));
+                                    CT_ARRAY_LEN(tmp_keys));
     if (ct_ydb_a0.has_key(filename, &tmp_key, 1)) {
         uint64_t layers_keys[32] = {};
         uint32_t layers_keys_count = 0;
 
         ct_ydb_a0.get_map_keys(filename,
                                &tmp_key, 1,
-                               layers_keys, CETECH_ARRAY_LEN(layers_keys),
+                               layers_keys, CT_ARRAY_LEN(layers_keys),
                                &layers_keys_count);
 
         for (uint32_t i = 0; i < layers_keys_count; ++i) {
@@ -204,7 +202,7 @@ void foreach_layer(const char *filename,
 };
 
 void name_from_filename(const char *fullname,
-                             char *name) {
+                        char *name) {
     const char *resource_type = ct_path_a0.extension(fullname);
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
     memcpy(name, fullname, size);
@@ -230,7 +228,7 @@ void compiler(const char *filename,
 
     ct_ydb_a0.get_map_keys(filename,
                            &key, 1,
-                           layers_keys, CETECH_ARRAY_LEN(layers_keys),
+                           layers_keys, CT_ARRAY_LEN(layers_keys),
                            &layers_keys_count);
 
     for (uint32_t i = 0; i < layers_keys_count; ++i) {
@@ -286,8 +284,7 @@ int materialcompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
 
-    ct_resource_a0.compiler_register(CT_ID64_0("material"),
-                                     compiler, true);
+    ct_resource_a0.compiler_register("material", compiler, true);
 
     return 1;
 }

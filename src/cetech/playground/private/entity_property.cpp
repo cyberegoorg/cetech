@@ -37,10 +37,10 @@ struct comp {
 };
 
 #define _G entity_property_global
+
+
 static struct _G {
     uint64_t active_entity;
-    uint64_t keys[64];
-    uint64_t keys_count;
     struct ct_entity top_entity;
     struct ct_world active_world;
 
@@ -48,9 +48,8 @@ static struct _G {
 
     const char *filename;
     ct_alloc *allocator;
+    ct_cdb_obj_t *obj;
 } _G;
-
-#define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
 
 
 static void on_debugui() {
@@ -72,49 +71,28 @@ static void on_debugui() {
         ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
     }
 
-    struct ct_entity entity = ct_world_a0.find_by_uid(_G.active_world,
-                                                      _G.top_entity,
-                                                        _G.active_entity);
+    struct ct_resource_id rid;
+    ct_resource_a0.type_name_from_filename(_G.filename, &rid, NULL);
 
-    uint64_t type, name;
-    type = name = 0;
-    ct_resource_a0.type_name_from_filename(_G.filename, &type, &name, NULL);
-
-
-    uint64_t tmp_keys[_G.keys_count + 3];
-    memcpy(tmp_keys, _G.keys, sizeof(uint64_t) * _G.keys_count);
-    tmp_keys[_G.keys_count] = ct_yng_a0.key("components");
-
+    uint64_t ent_type = ct_cdb_a0.read_uint64(_G.obj, CT_ID64_0("ent_type"), 0);
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
-        if (ct_world_a0.has(_G.active_world, entity, &_G.components[j].name, 1)) {
-            tmp_keys[_G.keys_count + 1] = _G.components[j].name;
-
-            ct_cdb_obj_t* obj = ct_resource_a0.get_obj(type, name);
-            obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
-
-            _G.components[j].clb(_G.active_world,
-                                 entity, obj,
-                                 _G.filename, tmp_keys,
-                                 _G.keys_count + 2);
+        uint64_t cmask = ct_world_a0.component_mask(_G.components[j].name);
+        if (ent_type & cmask) {
+            _G.components[j].clb(_G.active_world, _G.obj);
         }
     }
 }
 
 void on_entity_click(struct ct_world world,
-                     struct ct_entity level,
+                     struct ct_entity entity,
                      const char *filename,
-                     uint64_t *keys,
-                     uint32_t keys_count) {
+                     ct_cdb_obj_t* obj) {
     ct_property_editor_a0.set_active(on_debugui);
 
     _G.active_world = world;
-    _G.top_entity = level;
+    _G.top_entity = entity;
     _G.filename = filename;
-
-    memcpy(_G.keys, keys, sizeof(uint64_t) * keys_count);
-    _G.keys_count = keys_count;
-
-    _G.active_entity = keys_count ? keys[keys_count - 1] : 0;
+    _G.obj = obj;
 }
 
 

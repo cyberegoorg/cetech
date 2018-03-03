@@ -16,6 +16,7 @@
 
 #include <cetech/playground/playground.h>
 #include <cetech/core/math/fmath.h>
+#include <cetech/engine/resource/resource.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
@@ -47,7 +48,7 @@ static struct globals {
     struct ct_entity entity[MAX_EDITOR];
     const char *path[MAX_EDITOR];
     uint64_t root[MAX_EDITOR];
-    uint64_t entity_name[MAX_EDITOR];
+    uint32_t entity_name[MAX_EDITOR];
     bool is_first[MAX_EDITOR];
 
     uint8_t active_editor;
@@ -110,7 +111,7 @@ static void fps_camera_update(ct_world world,
 //    Transform.set_rotation(self.transform, rot * rotation)
 //    end
 
-    ct_cdb_writer_t *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
     ct_cdb_a0.write_commit(w);
 }
@@ -121,26 +122,24 @@ static void on_debugui() {
     _G.active_editor = UINT8_MAX;
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        snprintf(dock_id, CETECH_ARRAY_LEN(dock_id),
+        snprintf(dock_id, CT_ARRAY_LEN(dock_id),
                  "Entity %s###level_editor_%d", _G.path[i], i + 1);
 
-        if (ct_debugui_a0.BeginDock(dock_id,
-                                    &_G.visible[i],
-                                    DebugUIWindowFlags_(
-                                            DebugUIWindowFlags_NoScrollbar))) {
+        if (ct_debugui_a0.BeginDock(dock_id, &_G.visible[i],
+                                    DebugUIWindowFlags_NoScrollbar)) {
 
             if (ct_debugui_a0.IsMouseHoveringWindow()) {
                 _G.active_editor = i;
 
-                float proj[16], view[16];
-                float size[2];
-                ct_debugui_a0.GetWindowSize(size);
-
-                ct_camera_a0.get_project_view(_G.world[i], _G.camera_ent[i],
-                                              proj, view,
-                                              static_cast<int>(size[0]),
-                                              static_cast<int>(size[1]));
-
+//                float proj[16], view[16];
+//                float size[2];
+//                ct_debugui_a0.GetWindowSize(size);
+//
+//                ct_camera_a0.get_project_view(_G.world[i], _G.camera_ent[i],
+//                                              proj, view,
+//                                              static_cast<int>(size[0]),
+//                                              static_cast<int>(size[1]));
+//
 //                static float im[16] = {
 //                        1.0f, 0.0f, 0.0f, 0.0f,
 //                        0.0f, 1.0f, 0.0f, 0.0f,
@@ -154,8 +153,7 @@ static void on_debugui() {
                 if (ct_debugui_a0.IsMouseClicked(0, false)) {
                     ct_explorer_a0.set_level(_G.world[i], _G.entity[i],
                                              _G.entity_name[i],
-                                             _G.root[i], _G.path[i],
-                                             false);
+                                             _G.root[i], _G.path[i]);
                 }
             }
 
@@ -182,7 +180,7 @@ static void on_debugui() {
     }
 }
 
-static uint32_t find_entity(uint64_t name) {
+static uint32_t find_entity(uint32_t name) {
     for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
         if (_G.entity_name[i] != name) {
             continue;
@@ -194,11 +192,11 @@ static uint32_t find_entity(uint64_t name) {
     return UINT32_MAX;
 }
 
-static void open(uint64_t name,
+static void open(struct ct_resource_id asset,
                  uint64_t root,
-                 const char *path,
-                 bool is_level) {
-    uint32_t ent_idx = find_entity(name);
+                 const char *path) {
+
+    uint32_t ent_idx = find_entity(asset.name);
 
     int idx = _G.editor_count;
     ++_G.editor_count;
@@ -211,20 +209,20 @@ static void open(uint64_t name,
         _G.world[idx] = ct_world_a0.create_world();
 
 
-            _G.entity[idx] = ct_world_a0.spawn_entity(_G.world[idx], name);
+            _G.entity[idx] = ct_world_a0.spawn_entity(_G.world[idx], asset.name);
 
         _G.is_first[idx] = true;
     }
     _G.camera_ent[idx] = ct_world_a0.spawn_entity(_G.world[idx],
-                                                  CT_ID64_0("content/camera"));
+                                                  CT_ID32_0("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
-    _G.entity_name[idx] = name;
+    _G.entity_name[idx] = asset.name;
 
     ct_explorer_a0.set_level(_G.world[idx], _G.entity[idx],
                              _G.entity_name[idx], _G.root[idx],
-                             _G.path[idx], is_level);
+                             _G.path[idx]);
 }
 
 static void init() {
@@ -279,17 +277,11 @@ static ct_entity_editor_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
-static void on_asset_double_click(uint64_t type,
-                                  uint64_t name,
+static void on_asset_double_click(struct ct_resource_id asset,
                                   uint64_t root,
                                   const char *path) {
-    if (CT_ID64_0("level") == type) {
-        open(name, root, path, true);
-        return;
-    }
-
-    if (CT_ID64_0("entity") == type) {
-        open(name, root, path, false);
+    if (CT_ID32_0("entity") == asset.type) {
+        open(asset, root, path);
         return;
     }
 }
