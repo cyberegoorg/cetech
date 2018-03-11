@@ -2,6 +2,7 @@
 #define CETECH_ALLOCATOR_MALLOC_H
 
 #include <stdint.h>
+#include <cetech/core/containers/hash.h>
 
 #include "cetech/core/memory/allocator.h"
 #include "allocator_core_private.h"
@@ -28,7 +29,7 @@ void *malloc_allocator_allocate(const struct ct_alloc *allocator,
 
     if (size) {
         const uint32_t ts = size_with_padding(size, align);
-        struct Header *h = CT_ALLOC(core_alloc, struct Header, ts);
+        struct Header *h = CT_ALLOC(core_alloc, struct Header, sizeof(struct Header) + ts);
 
         void *p = data_pointer(h, align);
         fill(h, p, ts);

@@ -8,15 +8,15 @@
 #include <cetech/core/module/module.h>
 #include <cetech/core/hashlib/hashlib.h>
 
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/engine/renderer/renderer.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/renderer/mesh_renderer.h>
 
 #include "bgfx/platform.h"
 
-#include <cetech/engine/renderer/viewport.h>
 #include "cetech/engine/renderer/scene.h"
 
 CETECH_DECL_API(ct_viewport_a0);

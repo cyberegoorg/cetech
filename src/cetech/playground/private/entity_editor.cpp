@@ -1,14 +1,15 @@
 #include <stdio.h>
 
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
+
 #include <cetech/engine/camera/camera.h>
 #include <cetech/playground/entity_editor.h>
 #include <cetech/engine/transform/transform.h>
-#include <cetech/engine/input/input.h>
-#include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/controlers/keyboard.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
@@ -17,6 +18,7 @@
 #include <cetech/playground/playground.h>
 #include <cetech/core/math/fmath.h>
 #include <cetech/engine/resource/resource.h>
+#include <cetech/core/ebus/ebus.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
@@ -28,7 +30,7 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_app_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
@@ -38,6 +40,7 @@ CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 #define MAX_EDITOR 8
 
@@ -69,16 +72,16 @@ static void fps_camera_update(ct_world world,
     CT_UNUSED(dx);
     CT_UNUSED(dy);
 
-    float pos[3];
-    float rot[3];
     float wm[16];
 
-    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(world, camera_ent);
 
-    ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
-    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
+    struct ct_transform_comp *transform;
+    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
+            world,
+            TRANSFORM_COMPONENT,
+            camera_ent));
 
-    ct_transform_a0.get_world_matrix(world, camera_ent, wm);
+    ct_mat4_move(wm, transform->world);
 
     float x_dir[4];
     float z_dir[4];
@@ -96,9 +99,9 @@ static void fps_camera_update(ct_world world,
     ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
     ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    ct_vec3_add(pos, pos, x_dir_new);
-    ct_vec3_add(pos, pos, z_dir_new);
-
+    ct_vec3_add(transform->position, transform->position, x_dir_new);
+    ct_vec3_add(transform->position, transform->position, z_dir_new);
+    ct_ecs_a0.entity_component_change(world, TRANSFORM_COMPONENT, camera_ent);
     // ROT
 //    float rotation_around_world_up[4];
 //    float rotation_around_camera_right[4];
@@ -110,13 +113,10 @@ static void fps_camera_update(ct_world world,
 //    Transform.set_position(self.transform, pos)
 //    Transform.set_rotation(self.transform, rot * rotation)
 //    end
-
-    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
-    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0.write_commit(w);
 }
 
-static void on_debugui() {
+static void on_debugui(uint64_t busname,
+                       void* event) {
     char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -157,16 +157,20 @@ static void on_debugui() {
                 }
             }
 
-            struct ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world[i], _G.camera_ent[i]);
-            ct_viewport v = {
-                    .idx = ct_cdb_a0.read_uint64(obj, PROP_CAMERA_VIEWPORT, 0)
-            };
+//            struct ct_cdb_obj_t *obj = ct_ecs_a0.ent_obj(_G.world[i],
+//                                                           _G.camera_ent[i]);
+//
+            struct ct_camera_component *camera_data;
+            camera_data = static_cast<ct_camera_component *>(ct_ecs_a0.entity_data(_G.world[i],
+                                                                                               CAMERA_COMPONENT,
+                                                                                               _G.camera_ent[i]));
 
-            auto th = ct_viewport_a0.get_local_resource(v, CT_ID64_0("bb_color"));
+            auto th = ct_viewport_a0.get_local_resource(camera_data->viewport,
+                                                        CT_ID64_0("bb_color"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
-            ct_viewport_a0.resize(v, size[0], size[1]);
+            ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
             ct_debugui_a0.Image2(th,
                                  size,
                                  (float[2]) {0.0f, 0.0f},
@@ -206,14 +210,14 @@ static void open(struct ct_resource_id asset,
     if (UINT32_MAX != ent_idx) {
         _G.world[idx] = _G.world[ent_idx];
     } else {
-        _G.world[idx] = ct_world_a0.create_world();
+        _G.world[idx] = ct_ecs_a0.create_world();
+        ct_ecs_a0.add_simulation(_G.world[idx], CT_ID64_0("render"));
 
-
-            _G.entity[idx] = ct_world_a0.spawn_entity(_G.world[idx], asset.name);
+        _G.entity[idx] = ct_ecs_a0.spawn_entity(_G.world[idx], asset.name);
 
         _G.is_first[idx] = true;
     }
-    _G.camera_ent[idx] = ct_world_a0.spawn_entity(_G.world[idx],
+    _G.camera_ent[idx] = ct_ecs_a0.spawn_entity(_G.world[idx],
                                                   CT_ID32_0("content/camera"));
 
     _G.path[idx] = strdup(path);
@@ -225,13 +229,11 @@ static void open(struct ct_resource_id asset,
                              _G.path[idx]);
 }
 
-static void init() {
-}
+static void update(uint64_t busname,
+                   void* event) {
+    ct_playground_update_ev *ev = static_cast<ct_playground_update_ev *>(event);
+    float dt = ev->dt;
 
-static void shutdown() {
-}
-
-static void update(float dt) {
     if (UINT8_MAX != _G.active_editor) {
 
         float updown = 0.0f;
@@ -268,7 +270,8 @@ static void update(float dt) {
         if (!_G.visible[i]) {
             continue;
         }
-        ct_world_a0.simulate(_G.world[i], dt);
+
+        ct_ecs_a0.simulate(_G.world[i], dt);
     }
 }
 
@@ -277,11 +280,13 @@ static ct_entity_editor_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
-static void on_asset_double_click(struct ct_resource_id asset,
-                                  uint64_t root,
-                                  const char *path) {
-    if (CT_ID32_0("entity") == asset.type) {
-        open(asset, root, path);
+static void on_asset_double_click(uint64_t bus_name,
+                                  void *event) {
+    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
+    ct_resource_id rid = {.i64 = ev->asset};
+
+    if (CT_ID32_0("entity") == rid.type) {
+        open(rid, ev->root, ev->path);
         return;
     }
 }
@@ -291,24 +296,16 @@ static void _init(ct_api_a0 *api) {
             .active_editor = UINT8_MAX
     };
 
-    ct_playground_a0.register_module(
-            CT_ID64_0("entity_editor"),
-            (ct_playground_module_fce) {
-                    .on_init = init,
-                    .on_shutdown = shutdown,
-                    .on_update = update,
-                    .on_ui = on_debugui,
-            });
 
-    ct_asset_browser_a0.register_on_asset_double_click(on_asset_double_click);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, on_asset_double_click);
 
     api->register_api("ct_level_view_a0", &level_api);
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(CT_ID64_0("entity_editor"));
-    ct_asset_browser_a0.unregister_on_asset_double_click(on_asset_double_click);
-
     _G = {};
 }
 
@@ -320,7 +317,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_app_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
@@ -330,6 +327,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

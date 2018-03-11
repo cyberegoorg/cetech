@@ -13,6 +13,9 @@ extern "C" {
 
 #include <stdint.h>
 
+#define TRANSFORMATION_COMPONENT_NAME "transform"
+#define TRANSFORM_COMPONENT CT_ID64_0(TRANSFORMATION_COMPONENT_NAME)
+
 #define PROP_POSITION CT_ID64_0("position")
 #define PROP_ROTATION CT_ID64_0("rotation")
 #define PROP_SCALE CT_ID64_0("scale")
@@ -25,27 +28,20 @@ extern "C" {
 struct ct_world;
 struct ct_entity;
 
+struct ct_transform_comp {
+    float position[3];
+    float scale[3];
+    float rotation[3];
+    float world[16];
+};
+
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Transform API V0
 struct ct_transform_a0 {
-    //! Get world matrix
-    //! \param world World
-    //! \param transform transform
-    //! \return World matrix
-    void (*get_world_matrix)(struct ct_world world, struct ct_entity transform,
-                             float *matrix);
-
-
-    //! Link two transform
-    //! \param world World
-    //! \param parent Parent entity
-    //! \param child Child entity
-    void (*link)(struct ct_world world,
-                 struct ct_entity parent,
-                 struct ct_entity child);
+    void (*_)();
 };
 
 #ifdef __cplusplus

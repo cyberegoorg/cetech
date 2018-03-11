@@ -1,102 +1,75 @@
-#ifndef CETECH_MACHINE_H
-#define CETECH_MACHINE_H
+#ifndef CETECH_KEYBOARD_H
+#define CETECH_KEYBOARD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //==============================================================================
-// Enums
+// Includes
 //==============================================================================
+#include <stdint.h>
 
-//! Machine event type enum
-enum event {
+#define KEYBOARD_EBUS_NAME "keyboard"
+#define KEYBOARD_EBUS CT_ID64_0(KEYBOARD_EBUS_NAME)
+
+
+//! Keyboard event
+struct ct_keyboard_event {
+    uint32_t keycode; //!< Key code
+};
+
+struct ct_keyboard_text_event {
+    char text[32];
+};
+
+enum {
     EVENT_INVALID = 0,   //!< Invalid type
-
-    EVENT_QUIT = 0,   //!< Invalid type
 
     EVENT_KEYBOARD_UP,   //!< Keyboard button up
     EVENT_KEYBOARD_DOWN, //!< Keyboard button down
     EVENT_KEYBOARD_TEXT, //!< Keyboard button down
-
-    EVENT_MOUSE_MOVE,    //!< Mouse move
-    EVENT_MOUSE_UP,      //!< Mouse button up
-    EVENT_MOUSE_DOWN,    //!< Mouse button down
-    EVENT_MOUSE_WHEEL,    //!< Mouse wheel move
-
-    EVENT_GAMEPAD_MOVE,       //!< Gamepad move
-    EVENT_GAMEPAD_UP,         //!< Gamepad button up
-    EVENT_GAMEPAD_DOWN,       //!< Gamepad button down
-    EVENT_GAMEPAD_CONNECT,    //!< Gamepad connected
-    EVENT_GAMEPAD_DISCONNECT, //!< Gamepad disconected
-
-    EVENT_WINDOW_RESIZED, //!< Window resized
 };
 
-//! Mouse button enum
+//==============================================================================
+// Api
+//==============================================================================
+
+//! Keyboard API V0
+struct ct_keyboard_a0 {
+    //! Return button index
+    //! \param button_name Button name
+    //! \return Button index
+    uint32_t (*button_index)(const char *button_name);
+
+    //! Return button name
+    //! \param button_index Button index
+    //! \return Button name
+    const char *(*button_name)(const uint32_t button_index);
+
+    //! Return button state
+    //! \param button_index Button index
+    //! \return 1 if button is in current frame down else 0
+    int (*button_state)(uint32_t idx,
+                        const uint32_t button_index);
+
+    //! Is button pressed?
+    //! \param button_index Button index
+    //! \return 1 if button is in current frame pressed else 0
+    int (*button_pressed)(uint32_t idx,
+                          const uint32_t button_index);
+
+    //! Is button released?
+    //! \param button_index Button index
+    //! \return 1 if button is in current frame released else 0
+    int (*button_released)(uint32_t idx,
+                           const uint32_t button_index);
+
+
+    char *(*text)(uint32_t idx);
+};
+
 enum {
-    MOUSE_BTN_UNKNOWN = 0, //!< Invalid button
-
-    MOUSE_BTN_LEFT = 1,    //!< Left mouse button
-    MOUSE_BTN_MIDLE = 2,   //!< Midle mouse button
-    MOUSE_BTN_RIGHT = 3,   //!< Right mouse button
-
-    MOUSE_BTN_MAX = 8      //!< Max mouse button
-};
-
-//! Mouse axis enum
-enum {
-    MOUSE_AXIS_UNKNOWN = 0, //!< Invalid axis
-
-    MOUSE_AXIS_ABSOULTE = 1, //!< Absolute mouse position
-    MOUSE_AXIS_RELATIVE = 2, //!< Relative mouse position
-    MOUSE_AXIS_WHEEL = 3, //!< Wheel relative move
-
-    MOUSE_AXIS_MAX = 8 //!< Max axis
-};
-
-//! Gampead id enum
-enum {
-    GAMEPAD_UNKNOWN = 0,     //!< Invalid gamepad
-    GAMEPAD_1 = 1,           //!< Gamepad 1
-    GAMEPAD_2 = 2,           //!< Gamepad 2
-    GAMEPAD_3 = 3,           //!< Gamepad 3
-    GAMEPAD_4 = 4,           //!< Gamepad 4
-    GAMEPAD_MAX = GAMEPAD_4, //!< Max gamepads
-};
-
-//! Gamepad button enum
-enum {
-    GAMEPAD_BTN_INVALID = 0,    //!< Invalid button
-    GAMEPAD_BTN_A,              //!< Button A
-    GAMEPAD_BTN_B,              //!< Button B
-    GAMEPAD_BTN_X,              //!< Button X
-    GAMEPAD_BTN_Y,              //!< Button Y
-    GAMEPAD_BTN_BACK,           //!< Back
-    GAMEPAD_BTN_GUIDE,          //!< Guide
-    GAMEPAD_BTN_START,          //!< Start
-    GAMEPAD_BTN_LEFTSTICK,      //!< Left stick
-    GAMEPAD_BTN_RIGHTSTICK,     //!< Right stick
-    GAMEPAD_BTN_LEFTSHOULDER,   //!< Left shoulder
-    GAMEPAD_BTN_RIGHTSHOULDER,  //!< Right shoulder
-    GAMEPAD_BTN_DPADUP,         //!< Dpad up
-    GAMEPAD_BTN_DPADDOWN,       //!< Dpad down
-    GAMEPAD_BTN_DPADLEFT,       //!< Dpad left
-    GAMEPAD_BTN_DPADRIGHT,      //!< Dpad right
-    GAMEPAD_BTN_MAX             //!< Max buttons
-};
-
-//! Gamepad axis type enum
-enum {
-    GAMEPAD_AXIS_INVALID = 0, //!< Invalid axis
-    GAMEPAD_AXIS_LEFT = 1,    //!< Left axis
-    GAMEPAD_AXIS_RIGHT = 2,   //!< Right axis
-    GAMEPAD_AXIS_TRIGER = 3,  //!< Triger axis
-    GAMEPAD_AXIX_MAX          //!< Max axis
-};
-
-//! Keyboard enum
-enum key {
     KEY_UNKNOWN = 0,
 
     KEY_A = 4,
@@ -365,4 +338,5 @@ enum key {
 }
 #endif
 
-#endif //CETECH_MACHINE_H
+#endif //CETECH_KEYBOARD_H
+//! \}

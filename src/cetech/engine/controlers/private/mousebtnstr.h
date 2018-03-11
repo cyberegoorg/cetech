@@ -2,8 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <cetech/engine/machine/_machine_enums.h>
-
 static const char *_btn_to_str[MOUSE_BTN_MAX] = {
         [MOUSE_BTN_UNKNOWN] = "",
         [MOUSE_BTN_LEFT] = "left",

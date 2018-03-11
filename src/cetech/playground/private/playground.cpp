@@ -11,41 +11,37 @@
 #include "cetech/core/api/api_system.h"
 #include "cetech/core/module/module.h"
 
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/application/application.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/playground/command_system.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/playground/action_manager.h>
+#include <cetech/core/ebus/ebus.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_app_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_action_manager_a0);
 CETECH_DECL_API(ct_module_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 using namespace celib;
 
 static struct PlaygroundGlobal {
-    uint64_t type;
-
-    ct_viewport viewport;
-    ct_world world;
-
     bool load_layout;
-
-    Map<ct_playground_module_fce> module_map;
 } _G;
 
 static float draw_main_menu() {
@@ -118,16 +114,8 @@ static float draw_main_menu() {
 
             ImGui::Separator();
 
-            auto *it = map::begin(_G.module_map);
-            auto *it_end = map::end(_G.module_map);
+            ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, 0, NULL);
 
-            while (it != it_end) {
-                if (it->value.on_menu_window) {
-                    it->value.on_menu_window();
-                }
-
-                ++it;
-            }
             ct_debugui_a0.EndMenu();
         }
 
@@ -158,28 +146,12 @@ static void on_debugui() {
 }
 
 static void on_init() {
-    auto *it = map::begin(_G.module_map);
-    auto *it_end = map::end(_G.module_map);
-
-    while (it != it_end) {
-        if (it->value.on_init) {
-            it->value.on_init();
-        }
-
-        ++it;
-    }
+    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, 0, NULL);
 }
 
 static void on_shutdown() {
-    auto *it = map::begin(_G.module_map);
-    auto *it_end = map::end(_G.module_map);
+    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, 0, NULL);
 
-    while (it != it_end) {
-        if (it->value.on_shutdown) {
-            it->value.on_shutdown();
-        }
-        ++it;
-    }
 }
 
 void reload_layout() {
@@ -189,15 +161,8 @@ void reload_layout() {
 static void on_update(float dt) {
     ct_action_manager_a0.check();
 
-    auto *it = map::begin(_G.module_map);
-    auto *it_end = map::end(_G.module_map);
-
-    while (it != it_end) {
-        if (it->value.on_update) {
-            it->value.on_update(dt);
-        }
-        ++it;
-    }
+    ct_playground_update_ev ev = {.dt=dt};
+    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, sizeof(ev), &ev);
 }
 
 
@@ -205,15 +170,7 @@ static void on_update(float dt) {
 static void on_ui() {
     on_debugui();
 
-    auto *it = map::begin(_G.module_map);
-    auto *it_end = map::end(_G.module_map);
-
-    while (it != it_end) {
-        if (it->value.on_ui) {
-            it->value.on_ui();
-        }
-        ++it;
-    }
+    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, 0, NULL);
 
     if (_G.load_layout) {
         ct_debugui_a0.LoadDock("core/default.dock_layout");
@@ -229,18 +186,7 @@ static ct_game_fce playground_game{
 };
 
 
-void register_module(uint64_t name,
-                     ct_playground_module_fce module) {
-    celib::map::set(_G.module_map, name, module);
-}
-
-void unregister_module(uint64_t name) {
-    celib::map::remove(_G.module_map, name);
-}
-
 static ct_playground_a0 playground_api = {
-        .register_module = register_module,
-        .unregister_module = unregister_module,
         .reload_layout = reload_layout,
 };
 
@@ -249,9 +195,9 @@ static void _init(ct_api_a0 *api) {
             .load_layout = true,
     };
 
-    _G.module_map.init(ct_memory_a0.main_allocator());
-
     api->register_api("ct_playground_a0", &playground_api);
+
+    ct_ebus_a0.create_ebus(PLAYGROUND_EBUS_NAME);
 
     ct_action_manager_a0.register_action(
             CT_ID64_0("undo"),
@@ -272,7 +218,6 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
     ct_debugui_a0.unregister_on_debugui(on_ui);
     ct_app_a0.unregister_game(CT_ID64_0("playground"));
-    _G.module_map.destroy();
 
     _G = {};
 }
@@ -285,13 +230,14 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_app_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_action_manager_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
             CETECH_GET_API(api, ct_module_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

@@ -14,6 +14,19 @@ extern "C" {
 #include <stdint.h>
 #include <cetech/core/cdb/cdb.h>
 
+#define ECS_EBUS_NAME "ecs"
+#define ECS_EBUS CT_ID64_0(ECS_EBUS_NAME)
+
+enum {
+    ECS_INVALID_EVENT = 0,
+    ECS_WORLD_CREATE ,
+    ECS_WORLD_DESTROY,
+
+    ECS_COMPONENT_ADD,
+    ECS_COMPONENT_REMOVE,
+    ECS_COMPONENT_CHANGE,
+};
+
 struct ct_entity_compile_output;
 struct ct_compilator_api;
 struct ct_cdb_obj_t;
@@ -27,78 +40,77 @@ struct ct_cdb_obj_t;
 // Typedefs
 //==============================================================================
 
-//! World handler
 struct ct_world {
     uint64_t h;
 };
 
-//! Entity typedef
 struct ct_entity {
     uint64_t h;
 };
 
-//! Component compiler
-//! \param body Component body yaml
-//! \param data Compiled compoent data
+struct ct_ecs_world_ev {
+    struct ct_world world;
+};
+
+struct ct_ecs_component_ev {
+    struct ct_world world;
+    struct ct_entity ent;
+    uint64_t comp_mask;
+};
+
+
 typedef int (*ct_component_compiler_t)(const char *filename,
                                        uint64_t *component_key,
                                        uint32_t component_key_count,
                                        struct ct_cdb_obj_t *writer);
 
+struct ct_component_prop_map {
+    uint64_t key;
+    uint64_t offset;
+};
+
+struct ct_component_info {
+    void (*component_spawner)(struct ct_cdb_obj_t *obj,
+                              void *data);
+
+    struct ct_component_prop_map* prop_map;
+    uint32_t prop_count;
+    uint64_t size;
+};
+
 //==============================================================================
 // Structs
 //==============================================================================
 
-//! World callbacks
-typedef struct {
-    //! On world create callback
-    //! \param world World
-    void (*on_created)(struct ct_world world);
+typedef void ct_entity_storage_t;
 
-    //! On world destroy callback
-    //! \param world World
-    void (*on_destroy)(struct ct_world world);
+typedef void (*ct_process_fce_t)(struct ct_world world,
+                                 struct ct_entity *ent,
+                                 ct_entity_storage_t *item,
+                                 uint32_t n,
+                                 void *data);
 
-} ct_world_callbacks_t;
-
-typedef void (*ct_simulate_fce_t)(struct ct_world world,
-                                  struct ct_entity *ent,
-                                  struct ct_cdb_obj_t **obj,
-                                  uint32_t n,
-                                  float dt);
-
-struct ct_comp_watch {
-    void (*on_add)(struct ct_world world,
-                   struct ct_entity ent,
-                   uint64_t comp_mask);
-
-    void (*on_remove)(struct ct_world world,
-                      struct ct_entity ent,
-                      uint64_t comp_mask);
-};
+typedef void (*ct_simulate_fce_t)(struct ct_world world, float dt);
 
 //==============================================================================
 // Api
 //==============================================================================
 
 
-struct ct_world_a0 {
+struct ct_ecs_a0 {
     // WORLD
     struct ct_world (*create_world)();
 
     void (*destroy_world)(struct ct_world world);
 
-    void (*register_world_callback)(ct_world_callbacks_t clb);
-
     // ENT
-    void (*create_entity)(struct ct_world world, struct ct_entity * entity, uint32_t count);
+    void (*create_entity)(struct ct_world world,
+                          struct ct_entity *entity,
+                          uint32_t count);
 
     void (*destroy_entity)(struct ct_world world,
                            struct ct_entity *entity,
                            uint32_t count);
-
-    struct ct_cdb_obj_t *(*ent_obj)(struct ct_world world,
-                                    struct ct_entity entity);
 
     bool (*entity_alive)(struct ct_world world,
                          struct ct_entity entity);
@@ -110,15 +122,31 @@ struct ct_world_a0 {
                                     struct ct_entity root,
                                     uint64_t uid);
 
+    void (*link)(struct ct_world world,
+                 struct ct_entity parent,
+                 struct ct_entity child);
 
     // COMPONENT
-    void (*register_component)(const char *component_name);
+    void (*register_component)(const char *component_name,
+                               struct ct_component_info info);
 
     void (*register_component_compiler)(uint64_t type,
                                         ct_component_compiler_t compiler);
 
 
     uint64_t (*component_mask)(uint64_t component_name);
+
+    void *(*component_data)(uint64_t component_name,
+                            ct_entity_storage_t *item);
+
+    void *(*entity_data)(struct ct_world world,
+                         uint64_t component_name,
+                         struct ct_entity entity);
+
+
+    void (*entity_component_change)(struct ct_world world,
+                                    uint64_t component_name,
+                                    struct ct_entity entity);
 
     bool (*has)(struct ct_world world,
                 struct ct_entity ent,
@@ -135,14 +163,16 @@ struct ct_world_a0 {
                               uint64_t *component_name,
                               uint32_t name_count);
 
-    void (*add_components_watch)(struct ct_comp_watch watch);
-
-
     void (*simulate)(struct ct_world world,
                      float dt);
 
-    void (*add_simulation)(uint64_t components_mask,
-                           ct_simulate_fce_t simulation);
+    void (*process)(struct ct_world world,
+                    uint64_t components_mask,
+                    ct_process_fce_t fce,
+                    void *data);
+
+    void (*register_simulation)(const char* name, ct_simulate_fce_t simulation);
+    void (*add_simulation)(struct ct_world world, uint64_t name);
 };
 
 #ifdef __cplusplus

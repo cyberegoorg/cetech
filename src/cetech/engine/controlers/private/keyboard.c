@@ -6,16 +6,20 @@
 #include <cetech/engine/machine/machine.h>
 #include <cetech/core/log/log.h>
 #include <cetech/core/os/errors.h>
-#include <cetech/engine/input/input.h>
+#include <cetech/engine/controlers/keyboard.h>
 #include <cetech/core/module/module.h>
 #include <cetech/engine/application/application.h>
 #include <string.h>
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/ebus/ebus.h>
 #include "cetech/core/memory/allocator.h"
 #include "keystr.h"
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_app_a0);
+CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 //==============================================================================
 // Defines
@@ -89,19 +93,19 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(float dt) {
-    CT_UNUSED(dt);
+static void _update(uint64_t bus_name, void *_event) {
 
-    struct ct_event_header *event = ct_machine_a0.event_begin();
+
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    uint32_t size = 0;
-    while (event != ct_machine_a0.event_end()) {
-        size = size + 1;
+    void* event = ct_ebus_a0.first_event(KEYBOARD_EBUS);
+    struct ebus_header_t *header;
+    while (event) {
+        header = ct_ebus_a0.event_header(event);
 
-        switch (event->type) {
+        switch (header->type) {
             case EVENT_KEYBOARD_DOWN:
                 _G.state[((struct ct_keyboard_event *) event)->keycode] = 1;
                 break;
@@ -120,8 +124,7 @@ static void _update(float dt) {
             default:
                 break;
         }
-
-        event = ct_machine_a0.event_next(event);
+        event = ct_ebus_a0.next_event(KEYBOARD_EBUS, event);
     }
 }
 
@@ -148,8 +151,11 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct G) {};
 
-    ct_app_a0.register_on_update(_update);
 
+    ct_ebus_a0.create_ebus(KEYBOARD_EBUS_NAME);
+
+    ct_ebus_a0.connect(APPLICATION_EBUS,
+                                APP_UPDATE_EVENT, _update);
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 }
@@ -166,6 +172,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_app_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_hashlib_a0);
         },
         {
             CT_UNUSED(reload);

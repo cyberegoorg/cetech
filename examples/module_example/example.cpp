@@ -6,15 +6,15 @@
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/hashlib/hashlib.h>
 
-#include <cetech/engine/input/input.h>
+#include <cetech/engine/controlers/keyboard.h>
+#include <cetech/core/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground//playground.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
-#include <cetech/engine/camera/camera.h>
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cstdlib>
@@ -29,9 +29,10 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_renderer_a0);
 
 CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_world_a0);
-CETECH_DECL_API(ct_camera_a0);
+CETECH_DECL_API(ct_ecs_a0);
+//CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_texture_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 
 static struct G {
@@ -42,9 +43,10 @@ static struct G {
 } _G;
 
 
-void update(float dt) {
-    _G.dt = dt;
+void update(uint64_t bus_name, void *event) {
+    ct_app_update_ev *ev = static_cast<ct_app_update_ev *>(event);
 
+    _G.dt = ev->dt;
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {
         ct_log_a0.info("example", "PO");
         ct_log_a0.error("example", "LICE");
@@ -131,10 +133,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
 
             CETECH_GET_API(api, ct_transform_a0);
-            CETECH_GET_API(api, ct_world_a0);
-            CETECH_GET_API(api, ct_camera_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
+//            CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_texture_a0);
         },
 
@@ -146,7 +149,9 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Init %d", reload);
 
-            ct_app_a0.register_on_update(update);
+            ct_ebus_a0.connect(APPLICATION_EBUS,
+                                        APP_UPDATE_EVENT, update);
+
 
             ct_debugui_a0.register_on_debugui(module1);
             //ct_debugui_a0.register_on_debugui(module2);
@@ -159,8 +164,6 @@ CETECH_MODULE_DEF(
             CT_UNUSED(api);
 
             ct_log_a0.info("example", "Shutdown %d", reload);
-
-            ct_app_a0.unregister_on_update(update);
 
             ct_debugui_a0.unregister_on_debugui(module1);
             ct_debugui_a0.unregister_on_debugui(module2);

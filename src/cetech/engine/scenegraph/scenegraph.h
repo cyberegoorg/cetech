@@ -18,9 +18,15 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
+
+#define SCENEGRAPH_COMPONENT CT_ID64_0("scenegraph")
+
 struct ct_world;
 struct ct_entity;
 
+struct ct_scenegraph_component {
+    uint32_t idx;
+};
 
 //! Scene node struct
 struct ct_scene_node {

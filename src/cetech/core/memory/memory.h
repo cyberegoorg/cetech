@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+struct ct_alloc;
+
 struct ct_core_allocator_a0 {
     struct ct_alloc *(*get_allocator)();
 };

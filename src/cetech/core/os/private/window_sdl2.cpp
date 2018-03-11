@@ -1,3 +1,5 @@
+#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/core/ebus/ebus.h>
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
@@ -10,6 +12,8 @@
 #include "cetech/core/memory/allocator.h"
 
 CETECH_DECL_API(ct_log_a0);
+CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_hashlib_a0);
 
 //==============================================================================
 // Private
@@ -207,7 +211,11 @@ static ct_window_a0 window_api = {
 
 int sdl_window_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
+    CETECH_GET_API(api, ct_ebus_a0);
+    CETECH_GET_API(api, ct_hashlib_a0);
+
     api->register_api("ct_window_a0", &window_api);
+    ct_ebus_a0.create_ebus(WINDOW_EBUS_NAME);
     return 1;
 }
 

@@ -1,18 +1,18 @@
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/camera/camera.h>
-#include <cetech/engine/transform/transform.h>
-
-#include <cetech/engine/input/input.h>
 #include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/camera/camera.h>
+
+#include <cetech/engine/transform/transform.h>
+#include <cetech/engine/controlers/keyboard.h>
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
-#include <cetech/engine/resource/resource.h>
+#include <cetech/core/ebus/ebus.h>
 #include "cetech/core/containers/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"
@@ -24,7 +24,7 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
@@ -32,6 +32,7 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_cdb_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 using namespace celib;
 
@@ -66,16 +67,16 @@ static void fps_camera_update(ct_world world,
     CT_UNUSED(dx);
     CT_UNUSED(dy);
 
-    float pos[3];
-    float rot[3];
     float wm[16];
 
-    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(world, camera_ent);
 
-    ct_cdb_a0.read_vec3(obj, PROP_POSITION, pos);
-    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, rot);
+    struct ct_transform_comp *transform;
+    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
+            world,
+            TRANSFORM_COMPONENT,
+            camera_ent));
 
-    ct_transform_a0.get_world_matrix(world, camera_ent, wm);
+    ct_mat4_move(wm, transform->world);
 
     float x_dir[4];
     float z_dir[4];
@@ -93,8 +94,10 @@ static void fps_camera_update(ct_world world,
     ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
     ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    ct_vec3_add(pos, pos, x_dir_new);
-    ct_vec3_add(pos, pos, z_dir_new);
+    ct_vec3_add(transform->position, transform->position, x_dir_new);
+    ct_vec3_add(transform->position, transform->position, z_dir_new);
+
+    ct_ecs_a0.entity_component_change(world, TRANSFORM_COMPONENT, camera_ent);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -107,28 +110,27 @@ static void fps_camera_update(ct_world world,
 //    Transform.set_position(self.transform, pos)
 //    Transform.set_rotation(self.transform, rot * rotation)
 //    end
-
-    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
-    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0.write_commit(w);
 }
 
-static void on_debugui() {
+static void on_debugui(uint64_t busname,
+                       void* event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
 
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
 
-        struct ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world, _G.camera_ent);
-        ct_viewport v = {
-                .idx = ct_cdb_a0.read_uint64(obj, PROP_CAMERA_VIEWPORT, 0)
-        };
+        struct ct_camera_component *camera_data;
+        camera_data = static_cast<ct_camera_component *>(ct_ecs_a0.entity_data(
+                _G.world,
+                CAMERA_COMPONENT,
+                _G.camera_ent));
 
-        auto th = ct_viewport_a0.get_local_resource(v, CT_ID64_0("bb_color"));
+        auto th = ct_viewport_a0.get_local_resource(camera_data->viewport,
+                                                    CT_ID64_0("bb_color"));
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
-        ct_viewport_a0.resize(v, size[0], size[1]);
+        ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
         ct_debugui_a0.Image2(th,
                              size,
                              (float[2]) {0.0f, 0.0f},
@@ -141,12 +143,13 @@ static void on_debugui() {
 }
 
 
-static void set_asset(struct ct_resource_id asset,
-                      uint64_t root,
-                      const char *path) {
-    CT_UNUSED(root);
+static void set_asset(uint64_t bus_name,
+                      void *event) {
 
-    if (_G.active_asset.i64 == asset.i64) {
+    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
+    ct_resource_id rid = {.i64 = ev->asset};
+
+    if (_G.active_asset.i64 == rid.i64) {
         return;
     }
 
@@ -160,35 +163,43 @@ static void set_asset(struct ct_resource_id asset,
         }
     }
 
-    _G.active_asset = asset,
-    _G.active_path = path;
+    _G.active_asset = rid;
+    _G.active_path = ev->path;
 
-    idx = ct_hash_lookup(&_G.preview_fce_map, asset.type, UINT64_MAX);
+    idx = ct_hash_lookup(&_G.preview_fce_map, rid.type, UINT64_MAX);
     if (idx != UINT64_MAX) {
         ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.load) {
-            fce.load(path, asset, _G.world);
+            fce.load(ev->path, rid, _G.world);
         }
     }
 
-    ct_cdb_obj_t *obj = ct_world_a0.ent_obj(_G.world, _G.camera_ent);
-    ct_cdb_obj_t *w = ct_cdb_a0.write_begin(obj);
-    ct_cdb_a0.set_vec3(w, PROP_POSITION, (float[3]) {0.0f, 0.0f, -10.0f});
-    ct_cdb_a0.write_commit(w);
+    struct ct_transform_comp *transform;
+    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
+            _G.world,
+            TRANSFORM_COMPONENT,
+            _G.camera_ent));
+
+//    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init() {
+static void init(uint64_t busname,
+                 void* event) {
     _G.visible = true;
-    _G.world = ct_world_a0.create_world();
-    _G.camera_ent = ct_world_a0.spawn_entity(_G.world, CT_ID32_0("content/camera"));
+    _G.world = ct_ecs_a0.create_world();
+    _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
+                                           CT_ID32_0("content/camera"));
+
+    ct_ecs_a0.add_simulation(_G.world, CT_ID64_0("render"));
 }
 
-static void shutdown() {
 
-}
+static void update(uint64_t busname,
+                   void* event) {
+    ct_playground_update_ev *ev = static_cast<ct_playground_update_ev *>(event);
+    float dt = ev->dt;
 
-static void update(float dt) {
     if (_G.active) {
         float updown = 0.0f;
         float leftright = 0.0f;
@@ -218,8 +229,8 @@ static void update(float dt) {
                           0, 0, updown, leftright, 10.0f, false);
     }
 
-    if(_G.visible) {
-        ct_world_a0.simulate(_G.world, dt);
+    if (_G.visible) {
+        ct_ecs_a0.simulate(_G.world, dt);
     }
 }
 
@@ -227,14 +238,14 @@ static void update(float dt) {
     ct_array_push(a, item, al); \
     ct_hash_add(h, k, ct_array_size(a) - 1, al)
 
-void register_type_preview(const char* type,
+void register_type_preview(const char *type,
                            ct_asset_preview_fce fce) {
     uint32_t id = CT_ID32_0(type);
     ct_instance_map(_G.preview_fce, &_G.preview_fce_map, id, fce,
                     _G.allocator);
 }
 
-void unregister_type_preview(const char* type) {
+void unregister_type_preview(const char *type) {
     uint32_t id = CT_ID32_0(type);
 
     uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, id, UINT64_MAX);
@@ -244,7 +255,8 @@ void unregister_type_preview(const char* type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window() {
+static void on_menu_window(uint64_t busname,
+                           void* event) {
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
 }
 
@@ -258,25 +270,18 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_playground_a0.register_module(
-            CT_ID64_0("asset_preview"),
-            (ct_playground_module_fce) {
-                    .on_init = init,
-                    .on_shutdown = shutdown,
-                    .on_update = update,
-                    .on_ui = on_debugui,
-                    .on_menu_window = on_menu_window,
-            });
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
 
-    ct_asset_browser_a0.register_on_asset_click(set_asset);
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset);
+
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(CT_ID64_0("asset_preview"));
-    ct_asset_browser_a0.unregister_on_asset_click(set_asset);
-
     ct_hash_free(&_G.preview_fce_map, _G.allocator);
     ct_array_free(_G.preview_fce, _G.allocator);
 
@@ -289,7 +294,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
@@ -297,6 +302,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

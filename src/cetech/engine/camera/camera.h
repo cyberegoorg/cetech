@@ -13,6 +13,8 @@ extern "C" {
 
 #include <stddef.h>
 
+#define CAMERA_COMPONENT CT_ID64_0("camera")
+
 #define PROP_FOV CT_ID64_0("fov")
 #define PROP_NEAR CT_ID64_0("near")
 #define PROP_FAR CT_ID64_0("far")
@@ -20,6 +22,16 @@ extern "C" {
 #define PROP_PROJECTION CT_ID64_0("projection")
 #define PROP_VIEW CT_ID64_0("view")
 
+struct ct_viewport;
+
+
+struct ct_camera_component {
+    float near;
+    float far;
+    float fov;
+
+    struct ct_viewport viewport;
+};
 
 //==============================================================================
 // Typedefs

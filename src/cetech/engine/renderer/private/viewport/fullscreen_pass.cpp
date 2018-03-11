@@ -12,10 +12,12 @@
 #include <cetech/core/module/module.h>
 #include <cetech/core/hashlib/hashlib.h>
 
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
+
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/debugui/debugui.h>
@@ -23,7 +25,6 @@
 
 #include "bgfx/platform.h"
 
-#include <cetech/engine/renderer/viewport.h>
 #include <cetech/core/memory/memory.h>
 #include <cetech/core/math/fmath.h>
 #include "cetech/engine/renderer/scene.h"

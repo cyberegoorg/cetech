@@ -18,12 +18,13 @@
 
 #include <cetech/engine/application/application.h>
 #include <cetech/core/os/window.h>
-#include <cetech/engine/world/world.h>
-#include <cetech/engine/input/input.h>
+#include <cetech/engine/ecs/ecs.h>
+#include <cetech/engine/controlers/keyboard.h>
 #include <cetech/engine/resource/resource.h>
 
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/debugui/debugui.h>
@@ -35,6 +36,7 @@
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/core/cdb/cdb.h>
 #include <cetech/core/containers/hash.h>
+#include <cetech/engine/controlers/mouse.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"
 
@@ -53,7 +55,7 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 
 using namespace celib;
 
@@ -152,7 +154,6 @@ static void renderer_render_world(ct_world world,
         on_pass(&vi, viewport, viewid_counter++, i, world, camera);
     }
 }
-
 
 static ct_texture get_local_resource(viewport_instance &instance,
                                      uint64_t name) {
@@ -759,26 +760,26 @@ static int init(struct ct_api_a0 *api) {
     return 1;
 }
 
-static void on_update(float dt) {
-    ct_event_header *event = ct_machine_a0.event_begin();
-
-    ct_window_resized_event *ev;
-    while (event != ct_machine_a0.event_end()) {
-        switch (event->type) {
-            case EVENT_WINDOW_RESIZED:
-                ev = (ct_window_resized_event *) event;
-                _G.need_reset = 1;
-                _G.size_width = ev->width;
-                _G.size_height = ev->height;
-                break;
-
-            default:
-                break;
-        }
-
-        event = ct_machine_a0.event_next(event);
-    }
-}
+//static void on_update(float dt) {
+//    ct_event_header *event = ct_machine_a0.event_begin();
+//
+//    ct_window_resized_event *ev;
+//    while (event != ct_machine_a0.event_end()) {
+//        switch (event->type) {
+//            case EVENT_WINDOW_RESIZED:
+//                ev = (ct_window_resized_event *) event;
+//                _G.need_reset = 1;
+//                _G.size_width = ev->width;
+//                _G.size_height = ev->height;
+//                break;
+//
+//            default:
+//                break;
+//        }
+//
+//        event = ct_machine_a0.event_next(event);
+//    }
+//}
 
 static void on_render() {
     if (_G.need_reset) {
@@ -846,7 +847,6 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
         ct_renderer_a0.unregister_on_render(on_render);
-        ct_app_a0.unregister_on_update(on_update);
 
         _G.global_resource.destroy();
         _G.on_pass.destroy();
@@ -878,7 +878,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
         },
         {
 

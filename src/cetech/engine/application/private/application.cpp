@@ -8,7 +8,7 @@
 #include <cetech/core/containers/container_types.inl>
 
 #include <cetech/core/containers/map.inl>
-
+#include <cetech/core/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/core/os/watchdog.h>
 #include <cetech/core/fs/fs.h>
@@ -32,8 +32,9 @@
 
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/debugui/debugui.h>
+
 
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_package_a0);
@@ -53,7 +54,8 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 //==============================================================================
 // Definess
@@ -67,10 +69,6 @@ CETECH_DECL_API(ct_world_a0);
 
 static struct ApplicationGlobals {
     ct_cdb_obj_t *config_object;
-
-    ct_app_on_init *on_init;
-    ct_app_on_shutdown *on_shutdown;
-    ct_app_on_update *on_update;
 
     ct_hash_t game_map;
     ct_game_fce *game;
@@ -169,21 +167,8 @@ void set_active_game(uint64_t name) {
     }
 }
 
-static void check_machine() {
-    ct_event_header *event = ct_machine_a0.event_begin();
-
-    while (event != ct_machine_a0.event_end()) {
-        switch (event->type) {
-            case EVENT_QUIT:
-                application_quit();
-                break;
-
-            default:
-                break;
-        }
-
-        event = ct_machine_a0.event_next(event);
-    }
+static void on_quit(uint64_t ebus, void* event) {
+    application_quit();
 }
 
 extern "C" void application_start() {
@@ -199,23 +184,25 @@ extern "C" void application_start() {
 
     _boot_stage();
 
-    uint64_t last_tick = ct_time_a0.perf_counter();
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_QUIT_EVENT, on_quit);
 
-    for (uint32_t i = 0; i < ct_array_size(_G.on_init); ++i) {
-        _G.on_init[i]();
-    }
+    ct_ebus_a0.send(APPLICATION_EBUS, APP_INI_EVENT, 0, NULL);
 
-    set_active_game(CT_ID64_0(ct_cdb_a0.read_str(_G.config_object,
-                                                 CONFIG_GAME, "")));
+    const char* game = ct_cdb_a0.read_str(_G.config_object, CONFIG_GAME, "");
+    set_active_game(CT_ID64_0(game));
 
     if (_G.active_game.on_init) {
         _G.active_game.on_init();
     }
 
-    uint64_t fq = ct_time_a0.perf_freq();
 
     _G.is_running = 1;
+
+    uint64_t fq = ct_time_a0.perf_freq();
+    uint64_t last_tick = ct_time_a0.perf_counter();
     while (_G.is_running) {
+        ct_ebus_a0.begin_frame();
+
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
@@ -228,65 +215,33 @@ extern "C" void application_start() {
         ct_module_a0.check_modules(); // TODO: SHIT...
 #endif
         ct_machine_a0.update(dt);
-        check_machine();
 
-        for (uint32_t i = 0; i < ct_array_size(_G.on_update); ++i) {
-            _G.on_update[i](dt);
-        }
+        ct_app_update_ev ev = {.dt=dt};
+        ct_ebus_a0.send(APPLICATION_EBUS,
+                              APP_UPDATE_EVENT, sizeof(ev), &ev);
 
         if (_G.active_game.on_update) {
             _G.active_game.on_update(dt);
         }
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
-            ct_renderer_a0.render();
-
             ct_debugui_a0 CETECH_GET_API(&ct_api_a0, ct_debugui_a0);
             ct_debugui_a0.render(255);
+            ct_renderer_a0.render();
         }
 
-//        ct_cdb_a0.gc();
+        ct_cdb_a0.gc();
     }
 
     if (_G.active_game.on_shutdown) {
         _G.active_game.on_shutdown();
     }
 
-    for (uint32_t i = 0; i < ct_array_size(_G.on_shutdown); ++i) {
-        _G.on_shutdown[i]();
-    }
+    ct_ebus_a0.send(APPLICATION_EBUS,
+                          APP_SHUTDOWN_EVENT, 0, NULL);
 
     _boot_unload();
 }
-
-#define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                            \
-        ct_array_push(_G.name, name, _G.allocator);                            \
-    }                                                                          \
-    static void unregister_## name ## _(type name) {                           \
-        const auto size = ct_array_size(_G.name);                              \
-                                                                               \
-        for(uint32_t i = 0; i < size; ++i) {                                   \
-            if(_G.name[i] != name) {                                           \
-                continue;                                                      \
-            }                                                                  \
-                                                                               \
-            uint32_t last_idx = size - 1;                                      \
-            _G.name[i] = _G.name[last_idx];                                    \
-                                                                               \
-            ct_array_pop_back(_G.name);                                        \
-            break;                                                             \
-        }                                                                      \
-    }
-
-_DEF_ON_CLB_FCE(ct_app_on_init, on_init)
-
-_DEF_ON_CLB_FCE(ct_app_on_shutdown, on_shutdown)
-
-_DEF_ON_CLB_FCE(ct_app_on_update, on_update)
-
-
-#undef _DEF_ON_CLB_FCE
 
 void register_game(uint64_t name,
                    ct_game_fce game) {
@@ -306,22 +261,14 @@ static ct_app_a0 a0 = {
         .register_game = register_game,
         .unregister_game = unregister_game,
         .set_active_game = set_active_game,
-
-        .register_on_init = register_on_init_,
-        .unregister_on_init = unregister_on_init_,
-
-        .register_on_shutdown = register_on_shutdown_,
-        .unregister_on_shutdown = unregister_on_shutdown_,
-
-        .register_on_update = register_on_update_,
-        .unregister_on_update = unregister_on_update_,
-
 };
 
 void app_init(struct ct_api_a0 *api) {
     api->register_api("ct_app_a0", &a0);
 
     _G.allocator = ct_memory_a0.main_allocator();
+
+    ct_ebus_a0.create_ebus(APPLICATION_EBUS_NAME);
 
 #if defined(CETECH_DEVELOP)
     ct_resource_a0.set_autoload(true);
@@ -352,7 +299,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
 
             ct_api_a0 = *api;
         },
@@ -364,9 +312,6 @@ CETECH_MODULE_DEF(
         {
             CT_UNUSED(api, reload);
 
-            ct_array_free(_G.on_init, _G.allocator);
-            ct_array_free(_G.on_shutdown, _G.allocator);
-            ct_array_free(_G.on_update, _G.allocator);
             ct_array_free(_G.game, _G.allocator);
             ct_hash_free(&_G.game_map, _G.allocator);
         }

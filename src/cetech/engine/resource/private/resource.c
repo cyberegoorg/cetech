@@ -5,6 +5,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/core/containers/hash.h>
 
+#include <cetech/core/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
@@ -197,10 +198,12 @@ static void load(uint32_t type,
                                                    resource_file,
                                                    object);
 
+
             ct_thread_a0.spin_lock(&_G.lock);
-            ct_hash_add(&_G.resource_map, rid.i64, (uint64_t) object,
-                        _G.allocator);
+            ct_hash_add(&_G.resource_map, rid.i64,
+                        (uint64_t) object, _G.allocator);
             ct_thread_a0.spin_unlock(&_G.lock);
+            ct_fs_a0.close(resource_file);
         }
     }
 }

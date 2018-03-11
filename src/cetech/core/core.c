@@ -28,6 +28,7 @@ bool corelib_init() {
     CETECH_LOAD_STATIC_MODULE(api, time);
     CETECH_LOAD_STATIC_MODULE(api, thread);
     CETECH_LOAD_STATIC_MODULE(api, path);
+    CETECH_LOAD_STATIC_MODULE(api, ebus);
     CETECH_LOAD_STATIC_MODULE(api, task);
     CETECH_LOAD_STATIC_MODULE(api, watchdog);
     CETECH_LOAD_STATIC_MODULE(api, cdb);
@@ -53,11 +54,11 @@ bool corelib_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, path);
     CETECH_UNLOAD_STATIC_MODULE(api, task);
     CETECH_UNLOAD_STATIC_MODULE(api, watchdog);
-    CETECH_UNLOAD_STATIC_MODULE(api, cdb);
     CETECH_UNLOAD_STATIC_MODULE(api, yamlng);
     CETECH_UNLOAD_STATIC_MODULE(api, config);
     CETECH_UNLOAD_STATIC_MODULE(api, object);
     CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
+    CETECH_UNLOAD_STATIC_MODULE(api, cdb);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
    // CETECH_UNLOAD_STATIC_MODULE(api, ydb);
 

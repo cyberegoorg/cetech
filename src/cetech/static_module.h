@@ -4,7 +4,7 @@
 
 void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(machine);
-    CETECH_ADD_STATIC_MODULE(world);
+    CETECH_ADD_STATIC_MODULE(ecs);
 
     //==========================================================================
     // Renderer
@@ -36,7 +36,6 @@ void init_static_modules() {
     // Viewport
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(viewport);
-    CETECH_ADD_STATIC_MODULE(camera);
     CETECH_ADD_STATIC_MODULE(camera);
     CETECH_ADD_STATIC_MODULE(fullscreen_pass);
     CETECH_ADD_STATIC_MODULE(geometry_pass);

@@ -23,7 +23,8 @@
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
 #include <cetech/core/api/private/api_private.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
+#include <cetech/core/ebus/ebus.h>
 
 #include "bgfx/platform.h"
 
@@ -35,7 +36,8 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 
 
@@ -172,31 +174,17 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 
 #undef _DEF_ON_CLB_FCE
 
-static void on_update() {
-    ct_event_header *event = ct_machine_a0.event_begin();
+static void on_resize(uint64_t bus_name,
+                      void *event) {
+    ct_window_resized_event* ev = (ct_window_resized_event *) event;
+_G.need_reset = 1;
+_G.size_width = ev->width;
+_G.size_height = ev->height;
 
-    ct_window_resized_event *ev;
-    while (event != ct_machine_a0.event_end()) {
-        switch (event->type) {
-            case EVENT_WINDOW_RESIZED:
-                ev = (ct_window_resized_event *) event;
-                _G.need_reset = 1;
-                _G.size_width = ev->width;
-                _G.size_height = ev->height;
-                break;
-
-            default:
-                break;
-        }
-
-        event = ct_machine_a0.event_next(event);
-    }
 }
 
 
 static void on_render() {
-    on_update();
-
     if (_G.need_reset) {
         _G.need_reset = 0;
 
@@ -235,6 +223,8 @@ static void _init(struct ct_api_a0 *api) {
             .config = ct_config_a0.config_object(),
     };
 
+
+    ct_ebus_a0.connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
 
     ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
 
@@ -293,7 +283,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

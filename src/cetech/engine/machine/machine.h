@@ -14,92 +14,14 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "_machine_enums.h"
-
-struct ct_alloc;
-
 //==============================================================================
 // Machine
 //==============================================================================
 
-struct ct_event_header {
-    uint32_t type;
-    uint64_t size;
-};
-
-
-struct ct_window_resized_event {
-    struct ct_event_header h; //!< Event header
-    uint32_t window_id;
-    int32_t width;
-    int32_t height;
-};
-
-
-//! Mouse button status
-struct ct_mouse_event {
-    struct ct_event_header h; //!< Event header
-    uint32_t button;            //!< Button state
-};
-
-struct ct_mouse_wheel_event {
-    struct ct_event_header h; //!< Event header
-    float pos[2];               //!< Actual position
-};
-
-struct ct_mouse_move_event {
-    struct ct_event_header h; //!< Event header
-    float pos[2];       //!< Actual position
-};
-
-//! Keyboard event
-struct ct_keyboard_event {
-    struct ct_event_header h; //!< Event header
-    uint32_t keycode; //!< Key code
-};
-
-struct ct_keyboard_text_event {
-    struct ct_event_header h; //!< Event header
-    char text[32];
-};
-
-//! Gamepad move event
-struct ct_gamepad_move_event {
-    struct ct_event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-    uint32_t axis;              //!< Axis id
-    float position[2];  //!< Position
-};
-
-//! Gamepad button event
-struct ct_gamepad_btn_event {
-    struct ct_event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-    uint32_t button;            //!< Button state
-};
-
-//! Gamepad device event
-struct ct_gamepad_device_event {
-    struct ct_event_header h; //!< Event header
-    uint8_t gamepad_id;         //!< Gamepad id
-};
 
 //! Machine API V0
 struct ct_machine_a0 {
     void (*update)(float dt);
-
-    //! Get eventstream begin
-    //! \return Begin
-    struct ct_event_header *(*event_begin)();
-
-    //! Get eventstream end
-    //! \return End
-    struct ct_event_header *(*event_end)();
-
-    //! Next event
-    //! \param header Actual event header
-    //! \return Next event header
-    struct ct_event_header *(*event_next)(struct ct_event_header *header);
 
     //! Is gamepad active?
     //! \param gamepad Gamepad ID

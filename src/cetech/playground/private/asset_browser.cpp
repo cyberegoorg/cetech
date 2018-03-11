@@ -8,6 +8,7 @@
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/playground.h>
 #include <cetech/core/containers/array.h>
+#include <cetech/core/ebus/ebus.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/config/config.h"
@@ -22,6 +23,7 @@ CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_playground_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 
 #define WINDOW_NAME "Asset browser"
@@ -54,35 +56,8 @@ static struct asset_browser_global {
     char **dir_list;
     uint32_t dir_list_count;
 
-    ct_ab_on_asset_click *on_asset_click;
-    ct_ab_on_asset_double_click *on_asset_double_click;
-
     ct_alloc *allocator;
 } _G;
-
-#define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                            \
-        ct_array_push(_G.name, name, _G.allocator);                           \
-    }                                                                          \
-    static void unregister_## name ## _(type name) {                           \
-        const auto size = ct_array_size(_G.name);                             \
-                                                                               \
-        for(uint32_t i = 0; i < size; ++i) {                                   \
-            if(_G.name[i] != name) {                                           \
-                continue;                                                      \
-            }                                                                  \
-                                                                               \
-            uint32_t last_idx = size - 1;                                      \
-            _G.name[i] = _G.name[last_idx];                                    \
-                                                                               \
-            ct_array_pop_back(_G.name);                                       \
-            break;                                                             \
-        }                                                                      \
-    }
-
-_DEF_ON_CLB_FCE(ct_ab_on_asset_click, on_asset_click);
-
-_DEF_ON_CLB_FCE(ct_ab_on_asset_double_click, on_asset_double_click);
 
 
 uint64_t get_selected_asset_type() {
@@ -99,10 +74,6 @@ void get_selected_asset_name(char *asset_name) {
 }
 
 static ct_asset_browser_a0 asset_browser_api = {
-        .register_on_asset_click = register_on_asset_click_,
-        .unregister_on_asset_click = unregister_on_asset_click_,
-        .register_on_asset_double_click =  register_on_asset_double_click_,
-        .unregister_on_asset_double_click = unregister_on_asset_double_click_,
         .get_selected_asset_name = get_selected_asset_name,
         .get_selected_asset_type = get_selected_asset_type
 
@@ -259,18 +230,20 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
+                ct_asset_browser_click_ev ev = {
+                        .asset = resourceid.i64,
+                        .path=path,
+                        .root=CT_ID64_0("source")
+                };
+
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    for (uint32_t j = 0;
-                         j < ct_array_size(_G.on_asset_double_click); ++j) {
-                        _G.on_asset_double_click[j](resourceid,
-                                                    CT_ID64_0("source"), path);
-                    }
+                    ct_ebus_a0.send(ASSET_BROWSER_EBUS,
+                                    ASSET_DCLICK_EVENT,
+                                    sizeof(ev), &ev);
                 } else {
-                    for (uint32_t j = 0;
-                         j < ct_array_size(_G.on_asset_click); ++j) {
-                        _G.on_asset_click[j](resourceid,
-                                             CT_ID64_0("source"), path);
-                    }
+                    ct_ebus_a0.send(ASSET_BROWSER_EBUS,
+                                    ASSET_CLICK_EVENT,
+                                    sizeof(ev), &ev);
                 }
             }
         }
@@ -280,7 +253,8 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui() {
+static void on_debugui(uint64_t bus_name,
+                       void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -307,35 +281,31 @@ static void on_debugui() {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window() {
+static void on_menu_window(uint64_t bus_name,
+                           void *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
 static void _init(ct_api_a0 *api) {
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
 
-    ct_playground_a0.register_module(
-            PLAYGROUND_MODULE_NAME,
-            (ct_playground_module_fce) {
-                    .on_ui = on_debugui,
-                    .on_menu_window = on_menu_window,
-            });
+
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+
 
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
     };
+
+    ct_ebus_a0.create_ebus(ASSET_BROWSER_EBUS_NAME);
+
     _G.visible = true;
     _G.left_column_width = 180.0f;
 
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(
-            PLAYGROUND_MODULE_NAME
-    );
-
-    ct_array_free(_G.on_asset_click, _G.allocator);
-    ct_array_free(_G.on_asset_double_click, _G.allocator);
 
     _G = {};
 }
@@ -350,6 +320,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_path_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_playground_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

@@ -12,6 +12,7 @@
 #include "cetech/core/api/private/api_private.h"
 #include "cetech/core/memory/private/allocator_core_private.h"
 
+#include <cetech/core/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/core/cdb/cdb.h>
 
@@ -147,14 +148,16 @@ int main(int argc,
          const char **argv) {
 
     if (cetech_kernel_init(argc, argv)) {
-        struct ct_task_item task = (struct ct_task_item) {
-                .name = "application",
-                .work = start_app,
-        };
-
-        struct ct_task_counter_t* app = NULL;
-        ct_task_a0.add(&task, 1, &app);
-        ct_task_a0.wait_for_counter(app, 0);
+        start_app(NULL);
+//
+//        struct ct_task_item task = (struct ct_task_item) {
+//                .name = "application",
+//                .work = start_app,
+//        };
+//
+//        struct ct_task_counter_t* app = NULL;
+//        ct_task_a0.add(&task, 1, &app);
+//        ct_task_a0.wait_for_counter(app, 0);
     }
 
     return cetech_kernel_shutdown();

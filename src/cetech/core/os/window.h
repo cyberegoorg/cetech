@@ -14,7 +14,20 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-#include "cetech/engine/machine/_machine_enums.h"
+#define WINDOW_EBUS_NAME "window"
+#define WINDOW_EBUS CT_ID64_0(WINDOW_EBUS_NAME)
+
+enum {
+    EVENT_WINDOW_INVALID = 0,   //!< Invalid type
+
+    EVENT_WINDOW_RESIZED, //!< Window resized
+};
+
+struct ct_window_resized_event {
+    uint32_t window_id;
+    int32_t width;
+    int32_t height;
+};
 
 //==============================================================================
 // Window

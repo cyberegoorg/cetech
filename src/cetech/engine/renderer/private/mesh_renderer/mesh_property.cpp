@@ -13,7 +13,7 @@
 
 #include "cetech/engine/resource/resource.h"
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/engine/renderer/scene.h>
@@ -44,7 +44,7 @@ CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_scene_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
 
@@ -335,7 +335,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_scene_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },
         {

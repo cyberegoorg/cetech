@@ -11,16 +11,21 @@ extern "C" {
 
 #include <stddef.h>
 
-struct ct_playground_module_fce {
-    void (*on_init)();
+#define PLAYGROUND_EBUS_NAME "playground"
+#define PLAYGROUND_EBUS CT_ID64_0(PLAYGROUND_EBUS_NAME)
 
-    void (*on_shutdown)();
+enum {
+    PLAYGROUND_INAVLID_EVENT = 0,
+    PLAYGROUND_INIT_EVENT,
+    PLAYGROUND_SHUTDOWN_EVENT,
+    PLAYGROUND_UPDATE_EVENT,
+    PLAYGROUND_UI_EVENT,
+    PLAYGROUND_UI_MAINMENU_EVENT,
+};
 
-    void (*on_update)(float dt);
 
-    void (*on_ui)();
-
-    void (*on_menu_window)();
+struct ct_playground_update_ev {
+    float dt;
 };
 
 //==============================================================================
@@ -29,11 +34,6 @@ struct ct_playground_module_fce {
 
 //! Playground API V0
 struct ct_playground_a0 {
-    void (*register_module)(uint64_t name,
-                            ct_playground_module_fce game);
-
-    void (*unregister_module)(uint64_t name);
-
     void (*reload_layout)();
 };
 

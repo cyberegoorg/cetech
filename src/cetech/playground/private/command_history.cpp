@@ -8,6 +8,7 @@
 #include <cetech/playground/command_history.h>
 #include <cetech/playground/command_system.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/core/ebus/ebus.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/memory/memory.h"
@@ -20,6 +21,7 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 using namespace celib;
 
@@ -52,7 +54,8 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui() {
+static void on_debugui(uint64_t bus_name,
+                       void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -63,7 +66,8 @@ static void on_debugui() {
 
 }
 
-static void on_menu_window() {
+static void on_menu_window(uint64_t bus_name,
+                           void *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
@@ -78,17 +82,12 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_command_history_a0", &command_history_api);
 
-    ct_playground_a0.register_module(
-            PLAYGROUND_MODULE_NAME,
-            (ct_playground_module_fce) {
-                    .on_ui = on_debugui,
-                    .on_menu_window = on_menu_window,
-            });
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+
 }
 
 static void _shutdown() {
-    ct_playground_a0.unregister_module(PLAYGROUND_MODULE_NAME);
-
     _G = {};
 }
 
@@ -101,6 +100,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

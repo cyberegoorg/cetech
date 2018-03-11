@@ -46,7 +46,7 @@ static sqlite3 *_opendb() {
     sqlite3_open_v2(_logdb_path,
                     &_db,
                     SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE |
-                    SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_NOMUTEX,
+                    SQLITE_OPEN_SHAREDCACHE | SQLITE_OPEN_FULLMUTEX,
                     NULL);
 
     // thanks http://stackoverflow.com/questions/1711631/improve-insert-per-second-performance-of-sqlite
@@ -65,6 +65,9 @@ static int _do_sql(const char *sql) {
     if (_step(_db, stmt) != SQLITE_DONE) {
         goto error;
     }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close_v2(_db);
 
     return 1;
 

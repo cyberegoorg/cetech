@@ -20,6 +20,20 @@ struct ct_window;
 // Struct
 //==============================================================================
 
+#define APPLICATION_EBUS_NAME "application"
+#define APPLICATION_EBUS CT_ID64_0(APPLICATION_EBUS_NAME)
+
+enum {
+    APP_INVALID_EVNT = 0,
+    APP_INI_EVENT,
+    APP_UPDATE_EVENT,
+    APP_SHUTDOWN_EVENT,
+    APP_QUIT_EVENT,
+};
+
+struct ct_app_update_ev {
+    float dt;
+};
 
 struct ct_game_fce {
     void (*on_init)();
@@ -30,10 +44,6 @@ struct ct_game_fce {
 
     void (*on_ui)();
 };
-
-typedef void (*ct_app_on_init)();
-typedef void (*ct_app_on_shutdown)();
-typedef void (*ct_app_on_update)(float dt);
 
 //==============================================================================
 // Api
@@ -53,17 +63,6 @@ struct ct_app_a0 {
 
     void (*set_active_game)(uint64_t name);
 
-    void (*register_on_init)(ct_app_on_init on_init);
-
-    void (*unregister_on_init)(ct_app_on_init on_init);
-
-    void (*register_on_shutdown)(ct_app_on_shutdown on_shutdown);
-
-    void (*unregister_on_shutdown)(ct_app_on_shutdown on_shutdown);
-
-    void (*register_on_update)(ct_app_on_update on_update);
-
-    void (*unregister_on_update)(ct_app_on_update on_update);
 };
 
 #ifdef __cplusplus

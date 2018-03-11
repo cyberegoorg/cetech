@@ -7,6 +7,7 @@
 #include <cetech/playground/asset_browser.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/core/containers/hash.h>
+#include <cetech/core/ebus/ebus.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/config/config.h"
@@ -21,8 +22,7 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_ydb_a0);
-
-using namespace celib;
+CETECH_DECL_API(ct_ebus_a0);
 
 #define _G asset_property_global
 static struct _G {
@@ -64,16 +64,17 @@ static void register_asset(uint32_t type,
                 _G.allocator);
 }
 
-static void set_asset(struct ct_resource_id resourceid,
-                      uint64_t root,
-                      const char *path) {
-    CT_UNUSED(root);
+static void set_asset(uint64_t bus_name,
+                      void *event) {
+    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
+    ct_resource_id rid = {.i64 = ev->asset};
 
-    uint32_t idx = ct_hash_lookup(&_G.on_asset_map, resourceid.type, UINT32_MAX);
+
+    uint32_t idx = ct_hash_lookup(&_G.on_asset_map, rid.type, UINT32_MAX);
 
     _G.active_on_asset = UINT32_MAX != idx ? _G.on_asset[idx] : NULL;
-    _G.active_asset = resourceid;
-    _G.active_path = path;
+    _G.active_asset = rid;
+    _G.active_path = ev->path;
 
     ct_property_editor_a0.set_active(on_debugui);
 }
@@ -90,14 +91,15 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_asset_property_a0", &asset_property_api);
 
-    ct_asset_browser_a0.register_on_asset_double_click(set_asset);
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, set_asset);
+
 }
 
 static void _shutdown() {
     ct_array_free(_G.on_asset, _G.allocator);
     ct_hash_free(&_G.on_asset_map, _G.allocator);
 
-    ct_asset_browser_a0.unregister_on_asset_double_click(set_asset);
+
 
     _G = {};
 }
@@ -112,6 +114,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_property_editor_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_ydb_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

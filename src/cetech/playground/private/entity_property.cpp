@@ -9,12 +9,13 @@
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/playground/explorer.h>
+#include <cetech/core/ebus/ebus.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -27,7 +28,8 @@ CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
 using namespace celib;
 
@@ -76,23 +78,24 @@ static void on_debugui() {
 
     uint64_t ent_type = ct_cdb_a0.read_uint64(_G.obj, CT_ID64_0("ent_type"), 0);
     for (int j = 0; j < ct_array_size(_G.components); ++j) {
-        uint64_t cmask = ct_world_a0.component_mask(_G.components[j].name);
+        uint64_t cmask = ct_ecs_a0.component_mask(_G.components[j].name);
         if (ent_type & cmask) {
             _G.components[j].clb(_G.active_world, _G.obj);
         }
     }
 }
 
-void on_entity_click(struct ct_world world,
-                     struct ct_entity entity,
-                     const char *filename,
-                     ct_cdb_obj_t* obj) {
+void on_entity_click(uint64_t bus_name,
+                     void *event) {
+
+    ct_ent_selected_ev *ev = static_cast<ct_ent_selected_ev *>(event);
+
     ct_property_editor_a0.set_active(on_debugui);
 
-    _G.active_world = world;
-    _G.top_entity = entity;
-    _G.filename = filename;
-    _G.obj = obj;
+    _G.active_world  = ev->world;
+    _G.top_entity = ev->entity;
+    _G.filename = ev->filename;
+    _G.obj = ev->obj;
 }
 
 
@@ -118,13 +121,11 @@ static void _init(ct_api_a0 *api) {
     };
 
     api->register_api("ct_entity_property_a0", &entity_property_a0);
-    ct_explorer_a0.register_on_entity_click(on_entity_click);
+
+    ct_ebus_a0.connect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, on_entity_click);
 }
 
 static void _shutdown() {
-
-    ct_explorer_a0.unregister_on_entity_click(on_entity_click);
-
     _G = {};
 }
 
@@ -140,8 +141,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_cdb_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

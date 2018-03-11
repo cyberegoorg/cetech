@@ -51,9 +51,9 @@ enum ct_cdb_type {
 // Interface
 //==============================================================================
 
-typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
-                              uint64_t *prop,
-                              uint32_t prop_count);
+    typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
+                                  uint64_t *prop,
+                                  uint32_t prop_count);
 
 struct ct_cdb_a0 {
     struct ct_cdb_t (*create_db)();

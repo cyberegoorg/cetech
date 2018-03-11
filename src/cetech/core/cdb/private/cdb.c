@@ -37,14 +37,16 @@ struct object_t {
     uint32_t idx;
     struct ct_cdb_t db;
     struct ct_hash_t prop_map; // TODO: STATIC HASH 128?
+
+    uint64_t buffer_size;
+    uint64_t properties_count;
+    uint64_t values_size;
+
     uint8_t *buffer;
     uint64_t *keys;
     uint8_t *ptype;
     uint64_t *offset;
     uint8_t *values;
-    uint64_t buffer_size;
-    uint64_t properties_count;
-    uint64_t values_size;
 };
 
 struct type_item_t {
@@ -59,13 +61,16 @@ struct db_t {
     struct object_t **objects;
     uint64_t object_used;
 
-    struct object_t* object_pool;
-    uint32_t* free_objects;
-    uint32_t* to_free_objects;
+    struct object_t *object_pool;
+    uint32_t *free_objects;
+    uint32_t *to_free_objects;
 };
 
 static struct _G {
     struct db_t *dbs;
+    uint32_t *free_db;
+    uint32_t *to_free_db;
+
     struct ct_alloc *allocator;
 } _G;
 
@@ -132,15 +137,16 @@ static uint64_t _object_new_property(struct object_t *obj,
     return prop_count;
 }
 
-struct object_t *_new_object(struct db_t *db, const struct ct_alloc *a) {
+struct object_t *_new_object(struct db_t *db,
+                             const struct ct_alloc *a) {
     uint32_t idx;
 
-    if(ct_array_size(db->free_objects)) {
+    if (ct_array_size(db->free_objects)) {
         idx = ct_array_back(db->free_objects);
         ct_array_pop_back(db->free_objects);
     } else {
         idx = ct_array_size(db->object_pool);
-        ct_array_push(db->object_pool, (struct object_t){0}, a);
+        ct_array_push(db->object_pool, (struct object_t) {0}, a);
     }
 
     struct object_t *obj = &db->object_pool[idx];
@@ -149,7 +155,8 @@ struct object_t *_new_object(struct db_t *db, const struct ct_alloc *a) {
     return obj;
 }
 
-static struct object_t *_object_clone(struct db_t* db, struct object_t *obj,
+static struct object_t *_object_clone(struct db_t *db,
+                                      struct object_t *obj,
                                       const struct ct_alloc *alloc) {
     const uint64_t properties_count = obj->properties_count;
     const uint64_t values_size = obj->values_size;
@@ -196,8 +203,8 @@ static uint64_t _find_prop_index(const struct object_t *obj,
 }
 
 static void _add_to_type_slot(struct db_t *db,
-                       struct ct_cdb_obj_t *_obj,
-                       uint64_t type) {
+                              struct ct_cdb_obj_t *_obj,
+                              uint64_t type) {
     struct object_t *obj = *(struct object_t **) _obj;
 
     uint64_t type_idx = ct_hash_lookup(&db->type_hash, type, UINT64_MAX);
@@ -246,7 +253,7 @@ static void _add_to_type_slot(struct db_t *db,
 //    }
 //}
 
-static void _destroy_object(struct object_t* obj){
+static void _destroy_object(struct object_t *obj) {
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
     ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
 }
@@ -254,14 +261,16 @@ static void _destroy_object(struct object_t* obj){
 static struct ct_cdb_t create_db() {
     uint64_t idx = ct_array_size(_G.dbs);
 
-    ct_array_push(_G.dbs, (struct db_t) {
-            .objects = (struct object_t **) mmap(NULL,
-                                                 MAX_OBJECTS *
-                                                 sizeof(struct object_t *),
-                                                 PROT_READ | PROT_WRITE,
-                                                 MAP_PRIVATE | MAP_ANONYMOUS,
-                                                 -1, 0)
-    }, _G.allocator);
+    struct db_t db = (struct db_t) {
+            .objects = (struct object_t **) mmap(
+                    NULL,
+                    MAX_OBJECTS * sizeof(struct object_t *),
+                    PROT_READ | PROT_WRITE,
+                    MAP_PRIVATE | MAP_ANONYMOUS,
+                    -1, 0)
+    };
+
+    ct_array_push(_G.dbs, db, _G.allocator);
 
     return (struct ct_cdb_t) {.idx = idx};
 };
@@ -301,10 +310,10 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
 }
 
 static void destroy_db(struct ct_cdb_t db) {
-
+    ct_array_push(_G.to_free_db, db.idx, _G.allocator);
 }
 
-static void destroy_object(struct ct_cdb_obj_t *_obj){
+static void destroy_object(struct ct_cdb_obj_t *_obj) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
@@ -321,10 +330,10 @@ static void gc() {
         for (int j = 0; j < to_free_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects[j];
             ct_array_push(db_inst->free_objects, idx, _G.allocator);
-            db_inst->object_pool[idx] = (struct object_t){0};
+            db_inst->object_pool[idx] = (struct object_t) {0};
         }
 
-        if(to_free_n) {
+        if (to_free_n) {
             ct_array_resize(db_inst->to_free_objects, 0, _G.allocator);
         }
     }

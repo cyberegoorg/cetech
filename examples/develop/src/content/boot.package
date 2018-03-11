@@ -11,7 +11,7 @@ texture:
 #package:
 #  - "core"
 
-#entity:
+#ecs:
 #  - "content/camera"
 #  - "content/box1"
 #  - "content/box2"

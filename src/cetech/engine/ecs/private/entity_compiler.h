@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/core/os/path.h>
 #include <cetech/core/log/log.h>

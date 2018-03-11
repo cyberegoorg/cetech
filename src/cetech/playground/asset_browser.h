@@ -16,29 +16,28 @@ struct ct_resource_id;
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_ab_on_asset_click)(struct ct_resource_id asset,
-                                     uint64_t root,
-                                     const char *path);
 
-typedef void (*ct_ab_on_asset_double_click)(struct ct_resource_id asset,
-                                            uint64_t root,
-                                            const char *path);
+struct ct_asset_browser_click_ev {
+    uint64_t asset;
+    uint64_t root;
+    const char *path;
+};
+
+#define ASSET_BROWSER_EBUS_NAME "asset_browser"
+#define ASSET_BROWSER_EBUS CT_ID64_0(ASSET_BROWSER_EBUS_NAME)
+
+enum {
+    ASSET_INAVLID_EVENT = 0,
+    ASSET_CLICK_EVENT,
+    ASSET_DCLICK_EVENT,
+};
 
 //==============================================================================
 // Api
 //==============================================================================
 
 struct ct_asset_browser_a0 {
-    void (*register_on_asset_click)(ct_ab_on_asset_click fce);
-
-    void (*unregister_on_asset_click)(ct_ab_on_asset_click fce);
-
-    void (*register_on_asset_double_click)(ct_ab_on_asset_double_click fce);
-
-    void (*unregister_on_asset_double_click)(ct_ab_on_asset_double_click fce);
-
     uint64_t (*get_selected_asset_type)();
-
     void (*get_selected_asset_name)(char *asset_name);
 };
 

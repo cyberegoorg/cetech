@@ -10,7 +10,7 @@
 #include "cetech/core/log/log.h"
 #include <cetech/core/module/module.h>
 #include <cetech/playground/entity_property.h>
-#include <cetech/engine/world/world.h>
+#include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/playground/asset_preview.h>
 
@@ -27,19 +27,19 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_asset_preview_a0);
-CETECH_DECL_API(ct_world_a0);
+CETECH_DECL_API(ct_ecs_a0);
 
 static void load(const char *filename,
                  struct ct_resource_id resourceid,
                  struct ct_world world) {
-    struct ct_entity ent = ct_world_a0.spawn_entity(world, resourceid.name);
+    struct ct_entity ent = ct_ecs_a0.spawn_entity(world, resourceid.name);
     _G.ent = ent;
 }
 
 static void unload(const char *filename,
                    struct ct_resource_id resourceid,
                    struct ct_world world) {
-    ct_world_a0.destroy_entity(world, &_G.ent, 1);
+    ct_ecs_a0.destroy_entity(world, &_G.ent, 1);
 }
 
 
@@ -74,7 +74,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_asset_preview_a0);
-            CETECH_GET_API(api, ct_world_a0);
+            CETECH_GET_API(api, ct_ecs_a0);
 
         },
         {

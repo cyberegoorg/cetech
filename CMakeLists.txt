@@ -99,6 +99,7 @@ set(SOURCE_FILES
         src/cetech/core/yaml/private/yng.c
         src/cetech/core/yaml/private/ydb.cpp
         src/cetech/core/cdb/private/cdb.c
+        src/cetech/core/ebus/private/ebus.c
 
         src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/engine/debugui/private/ocornut-imgui/imgui.cpp
@@ -107,15 +108,12 @@ set(SOURCE_FILES
 
         src/cetech/core/os/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp
-        src/cetech/engine/machine/private/mouse_sdl2.cpp
-        src/cetech/engine/machine/private/keyboard_sdl2.cpp
-        src/cetech/engine/machine/private/gamepad_sdl2.cpp
 
         src/cetech/playground/private/entity_preview.c
-        src/cetech/engine/world/private/world.c
-        src/cetech/engine/input/private/keyboard.c
-        src/cetech/engine/input/private/mouse.c
-        src/cetech/engine/input/private/gamepad.c
+        src/cetech/engine/ecs/private/ecs.c
+        src/cetech/engine/controlers/private/keyboard.c
+        src/cetech/engine/controlers/private/mouse.c
+        src/cetech/engine/controlers/private/gamepad.c
         src/cetech/engine/renderer/private/renderer.cpp
         src/cetech/engine/renderer/private/texture/texture.cpp
         src/cetech/engine/renderer/private/texture/texture_compiler.cpp
@@ -133,9 +131,9 @@ set(SOURCE_FILES
         src/cetech/engine/renderer/private/viewport/geometry_pass.cpp
         src/cetech/engine/renderer/private/mesh_renderer/mesh_renderer.cpp
         src/cetech/engine/renderer/private/mesh_renderer/mesh_property.cpp
-        src/cetech/engine/transform/private/transform.cpp
+        src/cetech/engine/transform/private/transform.c
 
-        src/cetech/engine/scenegraph/private/scenegraph.cpp
+        src/cetech/engine/scenegraph/private/scenegraph.c
         src/cetech/engine/camera/private/camera.c
 
         src/cetech/engine/transform/private/transform_property.cpp
