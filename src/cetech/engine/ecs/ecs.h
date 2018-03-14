@@ -19,7 +19,7 @@ extern "C" {
 
 enum {
     ECS_INVALID_EVENT = 0,
-    ECS_WORLD_CREATE ,
+    ECS_WORLD_CREATE,
     ECS_WORLD_DESTROY,
 
     ECS_COMPONENT_ADD,
@@ -73,7 +73,7 @@ struct ct_component_info {
     void (*component_spawner)(struct ct_cdb_obj_t *obj,
                               void *data);
 
-    struct ct_component_prop_map* prop_map;
+    struct ct_component_prop_map *prop_map;
     uint32_t prop_count;
     uint64_t size;
 };
@@ -90,7 +90,8 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
                                  uint32_t n,
                                  void *data);
 
-typedef void (*ct_simulate_fce_t)(struct ct_world world, float dt);
+typedef void (*ct_simulate_fce_t)(struct ct_world world,
+                                  float dt);
 
 //==============================================================================
 // Api
@@ -171,8 +172,11 @@ struct ct_ecs_a0 {
                     ct_process_fce_t fce,
                     void *data);
 
-    void (*register_simulation)(const char* name, ct_simulate_fce_t simulation);
-    void (*add_simulation)(struct ct_world world, uint64_t name);
+    void (*register_simulation)(const char *name,
+                                ct_simulate_fce_t simulation);
+
+    void (*add_simulation)(struct ct_world world,
+                           uint64_t name);
 };
 
 #ifdef __cplusplus

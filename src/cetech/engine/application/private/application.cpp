@@ -186,7 +186,7 @@ extern "C" void application_start() {
 
     ct_ebus_a0.connect(APPLICATION_EBUS, APP_QUIT_EVENT, on_quit);
 
-    ct_ebus_a0.send(APPLICATION_EBUS, APP_INI_EVENT, 0, NULL);
+    ct_ebus_a0.send(APPLICATION_EBUS, APP_INI_EVENT, NULL, 0);
 
     const char* game = ct_cdb_a0.read_str(_G.config_object, CONFIG_GAME, "");
     set_active_game(CT_ID64_0(game));
@@ -217,8 +217,7 @@ extern "C" void application_start() {
         ct_machine_a0.update(dt);
 
         ct_app_update_ev ev = {.dt=dt};
-        ct_ebus_a0.send(APPLICATION_EBUS,
-                              APP_UPDATE_EVENT, sizeof(ev), &ev);
+        ct_ebus_a0.send(APPLICATION_EBUS, APP_UPDATE_EVENT, &ev, sizeof(ev));
 
         if (_G.active_game.on_update) {
             _G.active_game.on_update(dt);
@@ -237,8 +236,7 @@ extern "C" void application_start() {
         _G.active_game.on_shutdown();
     }
 
-    ct_ebus_a0.send(APPLICATION_EBUS,
-                          APP_SHUTDOWN_EVENT, 0, NULL);
+    ct_ebus_a0.send(APPLICATION_EBUS, APP_SHUTDOWN_EVENT, NULL, 0);
 
     _boot_unload();
 }

@@ -111,9 +111,8 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
                     .obj = obj,
             };
 
-            ct_ebus_a0.send(EXPLORER_EBUS,
-                            EXPLORER_ENTITY_SELECT_EVENT,
-                            sizeof(ev), &ev);
+            ct_ebus_a0.send(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
+                            sizeof(ev));
         }
 
         _G.selected_obj = obj;

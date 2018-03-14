@@ -30,8 +30,8 @@ struct ct_entity;
 
 struct ct_transform_comp {
     float position[3];
-    float scale[3];
     float rotation[3];
+    float scale[3];
     float world[16];
 };
 

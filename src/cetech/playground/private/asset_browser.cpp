@@ -237,13 +237,11 @@ static void ui_asset_list() {
                 };
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    ct_ebus_a0.send(ASSET_BROWSER_EBUS,
-                                    ASSET_DCLICK_EVENT,
-                                    sizeof(ev), &ev);
+                    ct_ebus_a0.send(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, &ev,
+                                    sizeof(ev));
                 } else {
-                    ct_ebus_a0.send(ASSET_BROWSER_EBUS,
-                                    ASSET_CLICK_EVENT,
-                                    sizeof(ev), &ev);
+                    ct_ebus_a0.send(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, &ev,
+                                    sizeof(ev));
                 }
             }
         }
