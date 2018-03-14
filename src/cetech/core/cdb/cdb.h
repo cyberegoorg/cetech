@@ -18,6 +18,20 @@ extern "C" {
 // Defines
 //==============================================================================
 
+#define CDB_EBUS_NAME "cdb"
+#define CDB_EBUS CT_ID64_0(CDB_EBUS_NAME)
+
+enum {
+    CDB_INVALID_EVENT = 0,
+    CDB_OBJ_CHANGE,
+};
+
+struct ct_cdb_obj_change_ev {
+    struct ct_cdb_obj_t *obj;
+    uint64_t *prop;
+    uint32_t prop_count;
+};
+
 //==============================================================================
 // Typedefs
 //==============================================================================
@@ -51,10 +65,6 @@ enum ct_cdb_type {
 // Interface
 //==============================================================================
 
-    typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
-                                  uint64_t *prop,
-                                  uint32_t prop_count);
-
 struct ct_cdb_a0 {
     struct ct_cdb_t (*create_db)();
 
@@ -80,9 +90,6 @@ struct ct_cdb_a0 {
     void (*load)(struct ct_cdb_obj_t *_obj,
                  const char *input,
                  struct ct_alloc *allocator);
-
-    void (*register_notify)(struct ct_cdb_obj_t *obj,
-                            ct_cdb_notify clb);
 
     bool (*prop_exist)(struct ct_cdb_obj_t *object,
                        uint64_t key);
