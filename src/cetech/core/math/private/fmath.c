@@ -1626,7 +1626,7 @@ void ct_mat4_proj_rh_fov(float *_result,
     mat4_proj_impl_fov(_result, _fov, _near, _far, _oglNdc, Right);
 }
 
-void ct_at4_proj_rh_fovy(float *_result,
+void ct_mat4_proj_rh_fovy(float *_result,
                          float _fovy,
                          float _aspect,
                          float _near,

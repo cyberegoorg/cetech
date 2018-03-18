@@ -1,3 +1,4 @@
+#include <cetech/core/cdb/cdb.h>
 #include "cetech/engine/ecs/ecs.h"
 #include <cetech/engine/scenegraph/scenegraph.h>
 #include <cetech/core/containers/array.h>
@@ -475,8 +476,8 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
 }
 
-static void _component_spawner(struct ct_cdb_obj_t *obj,
-                               void *data) {
+static void _component_spawner(uint32_t ebus,
+                               void *event) {
 }
 
 static void init(struct ct_api_a0 *api) {
@@ -488,10 +489,13 @@ static void init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("scenegraph"),
     };
 
-    ct_ecs_a0.register_component("scenegraph", (struct ct_component_info) {
+    ct_ecs_a0.register_component((struct ct_component_info) {
             .size = sizeof(struct ct_scenegraph_component),
-            .component_spawner = _component_spawner,
+            .component_name = "scenegraph",
     });
+
+    ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            CT_ID64_0("scenegraph"), _component_spawner);
 
     ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
     ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);

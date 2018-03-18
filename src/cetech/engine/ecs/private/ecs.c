@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <cetech/core/api/api_system.h>
 #include <cetech/core/memory/memory.h>
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/core/os/path.h>
@@ -88,13 +89,10 @@ static struct _G {
 
     uint32_t component_count;
     struct ct_hash_t component_types;
-    struct ct_hash_t compiler_map;
 
     struct ct_component_info component_info[MAX_COMPONENTS];
     struct ct_hash_t component_param_offset[MAX_COMPONENTS];
     struct ct_hash_t prop_to_comp;
-
-    ct_component_compiler_t *compilers;
 
     struct ct_alloc *allocator;
 } _G;
@@ -131,27 +129,21 @@ struct entity_resource {
 #define entity_resource_prefab(r) ((uint32_t*)(entity_resource_ent_data_offset(r) + ((r)->ent_count)))
 #define entity_resource_entity_data(r) ((uint8_t*)(entity_resource_prefab(r) + ((r)->ent_count)))
 
-static void register_compiler(uint64_t type,
-                              ct_component_compiler_t compiler) {
-    ct_array_push(_G.compilers, compiler, _G.allocator);
-
-    ct_hash_add(&_G.compiler_map, type, ct_array_size(_G.compilers) - 1,
-                _G.allocator);
-}
-
 static int compile(uint64_t type,
                    const char *filename,
                    uint64_t *component_key,
                    uint32_t component_key_count,
                    struct ct_cdb_obj_t *writer) {
+    struct ct_ecs_component_compile_ev ev = {
+            .filename = filename,
+            .writer = writer,
+            .component_key = component_key,
+            .component_key_count = component_key_count
+    };
 
-    uint64_t idx = ct_hash_lookup(&_G.compiler_map, type, UINT64_MAX);
-    if (idx == UINT64_MAX) {
-        return 0;
-    }
+    ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_COMPILE, type, &ev, sizeof(ev));
 
-    ct_component_compiler_t compiler = _G.compilers[idx];
-    return compiler(filename, component_key, component_key_count, writer);
+    return 1;
 }
 
 static struct world_instance *get_world_instance(struct ct_world world) {
@@ -165,11 +157,12 @@ static struct world_instance *get_world_instance(struct ct_world world) {
 }
 
 
-static void register_component(const char *component_name,
-                               struct ct_component_info info) {
-    uint64_t cid = _G.component_count++;
+static void register_component(struct ct_component_info info) {
+    const uint64_t cid = _G.component_count++;
 
-    uint64_t component_hash = CT_ID64_0(component_name);
+    const uint64_t component_hash = CT_ID64_0(info.component_name);
+    info.component_name_hash = component_hash;
+
     _G.component_info[cid] = info;
     ct_hash_add(&_G.component_types, component_hash, cid, _G.allocator);
 
@@ -880,7 +873,14 @@ static struct ct_entity spawn_entity(struct ct_world world,
             struct ct_component_info info = _G.component_info[j];
 
             void *comp_data = item->entity_data[j];
-            info.component_spawner(root, comp_data + (info.size * idx));
+
+            struct ct_ecs_component_spawn_ev ev = {
+                    .obj = root,
+                    .data = comp_data + (info.size * idx),
+            };
+
+            ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            info.component_name_hash, &ev, sizeof(ev));
         }
 
         struct ct_ecs_component_ev ev = {
@@ -965,8 +965,6 @@ static struct ct_ecs_a0 _api = {
 
         .register_simulation = register_simulation,
         .add_simulation = add_simulation,
-
-        .register_component_compiler = register_compiler,
 
         .create_world = create_world,
         .destroy_world = destroy_world,

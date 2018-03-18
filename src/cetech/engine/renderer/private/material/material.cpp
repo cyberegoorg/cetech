@@ -217,7 +217,6 @@ static void set_texture_handler(struct ct_cdb_obj_t *material,
     ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer_obj,
                                                  MATERIAL_VARIABLES_PROP,
                                                  NULL);
-
     ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
     ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);

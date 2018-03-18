@@ -555,14 +555,14 @@ static ct_ydb_a0 ydb_api = {
 
         .has_key = has_key,
 
-        .get_string = get_string,
+        .get_str = get_string,
         .get_float = get_float,
         .get_bool = get_bool,
         .get_vec3 = get_vec3,
         .get_vec4 = get_vec4,
         .get_mat4 = get_mat4,
 
-        .set_string = set_string,
+        .set_str = set_string,
         .set_float = set_float,
         .set_bool = set_bool,
         .set_vec3 = set_vec3,

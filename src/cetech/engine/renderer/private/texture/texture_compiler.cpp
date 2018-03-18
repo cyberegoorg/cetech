@@ -108,7 +108,7 @@ static void compiler(const char *filename,
             ct_yng_a0.key("input")
     };
 
-    const char *input_str = ct_ydb_a0.get_string(filename, key, 1, "");
+    const char *input_str = ct_ydb_a0.get_str(filename, key, 1, "");
 
     key[0] = ct_yng_a0.key("gen_mipmaps");
     bool gen_mipmaps = ct_ydb_a0.get_bool(filename, key, 1, true);

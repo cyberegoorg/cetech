@@ -44,10 +44,10 @@ struct ct_ydb_a0 {
                     uint64_t *keys,
                     uint32_t keys_count);
 
-    const char *(*get_string)(const char *path,
-                              uint64_t *keys,
-                              uint32_t keys_count,
-                              const char *defaultt);
+    const char *(*get_str)(const char *path,
+                           uint64_t *keys,
+                           uint32_t keys_count,
+                           const char *defaultt);
 
     float (*get_float)(const char *path,
                        uint64_t *keys,
@@ -96,10 +96,10 @@ struct ct_ydb_a0 {
                      bool value);
 
 
-    void (*set_string)(const char *path,
-                       const uint64_t *keys,
-                       uint32_t keys_count,
-                       const char *value);
+    void (*set_str)(const char *path,
+                    const uint64_t *keys,
+                    uint32_t keys_count,
+                    const char *value);
 
     void (*set_vec3)(const char *path,
                      const uint64_t *keys,

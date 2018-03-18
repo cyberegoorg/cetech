@@ -12,7 +12,6 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
-#include <cetech/core/cdb/cdb.h>
 
 #define ECS_EBUS_NAME "ecs"
 
@@ -28,11 +27,14 @@ enum {
     ECS_COMPONENT_ADD,
     ECS_COMPONENT_REMOVE,
     ECS_COMPONENT_CHANGE,
+    ECS_COMPONENT_SPAWN,
+    ECS_COMPONENT_COMPILE,
 };
 
 struct ct_entity_compile_output;
 struct ct_compilator_api;
 struct ct_cdb_obj_t;
+typedef void ct_entity_storage_t;
 
 //==============================================================================
 // Enums
@@ -61,11 +63,17 @@ struct ct_ecs_component_ev {
     uint64_t comp_mask;
 };
 
+struct ct_ecs_component_spawn_ev {
+    struct ct_cdb_obj_t *obj;
+    void *data;
+};
 
-typedef int (*ct_component_compiler_t)(const char *filename,
-                                       uint64_t *component_key,
-                                       uint32_t component_key_count,
-                                       struct ct_cdb_obj_t *writer);
+struct ct_ecs_component_compile_ev {
+    const char *filename;
+    uint64_t *component_key;
+    uint32_t component_key_count;
+    struct ct_cdb_obj_t *writer;
+};
 
 struct ct_component_prop_map {
     uint64_t key;
@@ -73,19 +81,16 @@ struct ct_component_prop_map {
 };
 
 struct ct_component_info {
+    const char *component_name;
+    uint64_t component_name_hash;
     struct ct_component_prop_map *prop_map;
     uint32_t prop_count;
     uint64_t size;
-
-    void (*component_spawner)(struct ct_cdb_obj_t *obj,
-                              void *data);
 };
 
 //==============================================================================
 // Structs
 //==============================================================================
-
-typedef void ct_entity_storage_t;
 
 typedef void (*ct_process_fce_t)(struct ct_world world,
                                  struct ct_entity *ent,
@@ -131,12 +136,7 @@ struct ct_ecs_a0 {
                  struct ct_entity child);
 
     // COMPONENT
-    void (*register_component)(const char *component_name,
-                               struct ct_component_info info);
-
-    void (*register_component_compiler)(uint64_t type,
-                                        ct_component_compiler_t compiler);
-
+    void (*register_component)(struct ct_component_info info);
 
     uint64_t (*component_mask)(uint64_t component_name);
 

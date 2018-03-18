@@ -46,7 +46,7 @@ struct viewport_instance {
 
     uint16_t framebuffers[MAX_FRAME_BUFFERS];
 
-    float size[2];
+    uint32_t size[2];
 
     layer_entry_t *layers;
 

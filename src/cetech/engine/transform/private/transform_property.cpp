@@ -74,29 +74,23 @@ static void cmd_description(char *buffer,
     static const uint64_t set_scale = CT_ID64_0("transform_set_scale");
 
     if (cmd->type == set_position) {
-        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        const struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
         snprintf(buffer, buffer_size,
-                 "Set ent position [%f, %f, %f] -> [%f, %f, %f]",
-                 ent_cmd->old_value[0], ent_cmd->old_value[1],
-                 ent_cmd->old_value[2],
+                 "Set ent position [%f, %f, %f]",
                  ent_cmd->new_value[0], ent_cmd->new_value[1],
                  ent_cmd->new_value[2]);
 
     } else if (cmd->type == set_rotation) {
-        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        const struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
         snprintf(buffer, buffer_size,
-                 "Set ent rotation [%f, %f, %f] -> [%f, %f, %f]",
-                 ent_cmd->old_value[0], ent_cmd->old_value[1],
-                 ent_cmd->old_value[2],
+                 "Set ent rotation [%f, %f, %f]",
                  ent_cmd->new_value[0], ent_cmd->new_value[1],
                  ent_cmd->new_value[2]);
 
     } else if (cmd->type == set_scale) {
-        struct ct_ent_cmd_vec3_s *ent_cmd = (struct ct_ent_cmd_vec3_s *) cmd;
+        const struct ct_ent_cmd_vec3_s *ent_cmd = (const struct ct_ent_cmd_vec3_s *) cmd;
         snprintf(buffer, buffer_size,
-                 "Set ent scale [%f, %f, %f] -> [%f, %f, %f]",
-                 ent_cmd->old_value[0], ent_cmd->old_value[1],
-                 ent_cmd->old_value[2],
+                 "Set ent scale [%f, %f, %f]",
                  ent_cmd->new_value[0], ent_cmd->new_value[1],
                  ent_cmd->new_value[2]);
     }
@@ -108,8 +102,6 @@ static void on_component(struct ct_world world,
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
-
-//    ct_cdb_obj_t* obj = ct_ecs_a0.ent_obj(world, ecs);
 
     //==========================================================================
     // Position

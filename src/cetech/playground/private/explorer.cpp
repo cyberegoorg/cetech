@@ -103,17 +103,15 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
 
     bool open = ct_debugui_a0.TreeNodeEx(name, flags);
     if (ImGui::IsItemClicked(0)) {
-        if (_G.selected_obj != obj) {
-            ct_ent_selected_ev ev = {
-                    .world  = _G.world,
-                    .entity = _G.entity,
-                    .filename = _G.path,
-                    .obj = obj,
-            };
+        ct_ent_selected_ev ev = {
+                .world  = _G.world,
+                .entity = _G.entity,
+                .filename = _G.path,
+                .obj = obj,
+        };
 
-            ct_ebus_a0.broadcast(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
-                            sizeof(ev));
-        }
+        ct_ebus_a0.broadcast(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
+                        sizeof(ev));
 
         _G.selected_obj = obj;
     }

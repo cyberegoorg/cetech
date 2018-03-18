@@ -82,11 +82,11 @@ static void compile_entitity(const char *filename,
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
 
     tmp_keys[root_count] = ct_yng_a0.key("name");
-    const char *name_str = ct_ydb_a0.get_string(filename, tmp_keys,
+    const char *name_str = ct_ydb_a0.get_str(filename, tmp_keys,
                                               root_count + 1, NULL);
 
     tmp_keys[root_count] = ct_yng_a0.key("PARENT");
-    const char *prefab = ct_ydb_a0.get_string(filename, tmp_keys,
+    const char *prefab = ct_ydb_a0.get_str(filename, tmp_keys,
                                               root_count + 1, NULL);
 
     struct ct_resource_id rid = {{{0}}};

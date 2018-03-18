@@ -55,13 +55,13 @@ void _forach_variable_clb(const char *filename,
             ct_yng_a0.key("name"),
     };
 
-    const char *name = ct_ydb_a0.get_string(filename, tmp_keys,
+    const char *name = ct_ydb_a0.get_str(filename, tmp_keys,
                                             CT_ARRAY_LEN(tmp_keys), "");
     char uniform_name[32];
     strcpy(uniform_name, name);
 
     tmp_keys[2] = ct_yng_a0.key("type");
-    const char *type = ct_ydb_a0.get_string(filename, tmp_keys,
+    const char *type = ct_ydb_a0.get_str(filename, tmp_keys,
                                             CT_ARRAY_LEN(tmp_keys), "");
 
     material_variable mat_var = {};
@@ -72,7 +72,7 @@ void _forach_variable_clb(const char *filename,
 
         //TODO : None ptype?
         if (ct_ydb_a0.has_key(filename, tmp_keys, CT_ARRAY_LEN(tmp_keys))) {
-            const char *v = ct_ydb_a0.get_string(filename,
+            const char *v = ct_ydb_a0.get_str(filename,
                                                  tmp_keys,
                                                  CT_ARRAY_LEN(tmp_keys),
                                                  "");
@@ -115,9 +115,9 @@ uint64_t render_state_to_enum(uint64_t name) {
             {.name = CT_ID64_0("rgb_write"), .e = BGFX_STATE_RGB_WRITE},
             {.name = CT_ID64_0("alpha_write"), .e = BGFX_STATE_ALPHA_WRITE},
             {.name = CT_ID64_0("depth_write"), .e = BGFX_STATE_DEPTH_WRITE},
-            {.name = CT_ID64_0(
-                    "depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
+            {.name = CT_ID64_0("depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
             {.name = CT_ID64_0("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
+            {.name = CT_ID64_0("cull_cw"), .e = BGFX_STATE_CULL_CW},
             {.name = CT_ID64_0("msaa"), .e = BGFX_STATE_MSAA},
     };
 
@@ -147,7 +147,7 @@ void foreach_layer(const char *filename,
     uint64_t tmp_key = ct_yng_a0.combine_key(tmp_keys,
                                              CT_ARRAY_LEN(tmp_keys));
 
-    const char *shader = ct_ydb_a0.get_string(filename, &tmp_key, 1, "");
+    const char *shader = ct_ydb_a0.get_str(filename, &tmp_key, 1, "");
     uint64_t shader_id = CT_ID32_0(shader);
     ct_array_push(output.shader_name, shader_id, a);
 

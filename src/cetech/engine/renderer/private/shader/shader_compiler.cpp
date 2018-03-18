@@ -119,10 +119,10 @@ static void compiler(const char *filename,
             ct_yng_a0.key("vs_input")
     };
 
-    const char *vs_input = ct_ydb_a0.get_string(filename, key, 1, "");
+    const char *vs_input = ct_ydb_a0.get_str(filename, key, 1, "");
 
     key[0] = ct_yng_a0.key("fs_input");
-    const char *fs_input = ct_ydb_a0.get_string(filename, key, 1, "");
+    const char *fs_input = ct_ydb_a0.get_str(filename, key, 1, "");
 
     const char *source_dir = ct_resource_a0.compiler_get_source_dir();
     const char *core_dir = ct_resource_a0.compiler_get_core_dir();

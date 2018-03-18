@@ -1081,7 +1081,7 @@ namespace ImGui {
                 int index_n = (int) ydb->get_float(path, k, 2, 0);
 
                 k[1] = yng->key("label");
-                const char* label_n = ydb->get_string(path, k, 2, "");
+                const char* label_n = ydb->get_str(path, k, 2, "");
 
                 k[1] = yng->key("x");
                 int x_n = (int) ydb->get_float(path, k, 2, 0);
@@ -1090,7 +1090,7 @@ namespace ImGui {
                 int y_n = (int) ydb->get_float(path, k, 2, 0);
 
                 k[1] = yng->key("location");
-                const char* location_n = ydb->get_string(path, k, 2, "");
+                const char* location_n = ydb->get_str(path, k, 2, "");
 
                 k[1] = yng->key("size_x");
                 int size_x_n = (int) ydb->get_float(path, k, 2, 0);

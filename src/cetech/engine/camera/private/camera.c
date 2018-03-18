@@ -1,3 +1,4 @@
+#include <cetech/core/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
@@ -35,27 +36,24 @@ static struct CameraGlobal {
     struct ct_alloc *allocator;
 } CameraGlobal;
 
-static int _camera_compiler(const char *filename,
-                            uint64_t *comp_key,
-                            uint32_t key_count,
-                            struct ct_cdb_obj_t *writer) {
-    uint64_t keys[key_count + 1];
-    memcpy(keys, comp_key, sizeof(uint64_t) * key_count);
+static void _camera_compiler(uint32_t ebus,void *event) {
+    struct ct_ecs_component_compile_ev* ev = event;
 
-    keys[key_count] = ct_yng_a0.key("near");
-    float near = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    uint64_t keys[ev->component_key_count + 1];
+    memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
 
-    keys[key_count] = ct_yng_a0.key("far");
-    float far = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    keys[ev->component_key_count] = ct_yng_a0.key("near");
+    float near = ct_ydb_a0.get_float(ev->filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    keys[key_count] = ct_yng_a0.key("fov");
-    float fov = ct_ydb_a0.get_float(filename, CETECH_ARR_ARG(keys), 0.0f);
+    keys[ev->component_key_count] = ct_yng_a0.key("far");
+    float far = ct_ydb_a0.get_float(ev->filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    ct_cdb_a0.set_float(writer, PROP_NEAR, near);
-    ct_cdb_a0.set_float(writer, PROP_FAR, far);
-    ct_cdb_a0.set_float(writer, PROP_FOV, fov);
+    keys[ev->component_key_count] = ct_yng_a0.key("fov");
+    float fov = ct_ydb_a0.get_float(ev->filename, CETECH_ARR_ARG(keys), 0.0f);
 
-    return 1;
+    ct_cdb_a0.set_float(ev->writer, PROP_NEAR, near);
+    ct_cdb_a0.set_float(ev->writer, PROP_FAR, far);
+    ct_cdb_a0.set_float(ev->writer, PROP_FOV, fov);
 }
 
 static void get_project_view(struct ct_world world,
@@ -74,7 +72,8 @@ static void get_project_view(struct ct_world world,
 
     float ratio = (float) (width) / (float) (height);
 
-    ct_mat4_proj_fovy(proj, camera_data->fov, ratio,
+    ct_mat4_proj_fovy(proj,
+                      camera_data->fov, ratio,
                       camera_data->near, camera_data->far, true);
 
     ct_mat4_inverse(view, transform->world);
@@ -84,21 +83,6 @@ static struct ct_camera_a0 camera_api = {
         .get_project_view = get_project_view,
 };
 
-static void on_add(uint32_t bus_name,
-                   void *event) {
-
-    struct ct_ecs_component_ev* ev = event;
-
-    if (!(ev->comp_mask & ct_ecs_a0.component_mask(_G.type))) {
-        return;
-    }
-
-    struct ct_viewport v = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
-
-    struct ct_camera_component *camera;
-    camera = ct_ecs_a0.entity_data(ev->world, CAMERA_COMPONENT, ev->ent);
-    camera->viewport = v;
-}
 
 struct cameras {
     struct ct_camera_component camera_data[32];
@@ -143,14 +127,18 @@ static void render_simu(struct ct_world world,
     }
 }
 
-static void _component_spawner(struct ct_cdb_obj_t *obj,
-                               void *data) {
-    struct ct_camera_component *camera = data;
+static void _component_spawner(uint32_t ebus,
+                               void *event) {
+    struct ct_ecs_component_spawn_ev *ev = event;
+    struct ct_camera_component *camera = ev->data;
+
+    struct ct_viewport v = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
 
     *camera = (struct ct_camera_component) {
-            .fov = ct_cdb_a0.read_float(obj, PROP_FOV, 0.0f),
-            .near = ct_cdb_a0.read_float(obj, PROP_NEAR, 0.0f),
-            .far = ct_cdb_a0.read_float(obj, PROP_FAR, 0.0f)
+            .fov = ct_cdb_a0.read_float(ev->obj, PROP_FOV, 0.0f),
+            .near = ct_cdb_a0.read_float(ev->obj, PROP_NEAR, 0.0f),
+            .far = ct_cdb_a0.read_float(ev->obj, PROP_FAR, 0.0f),
+            .viewport = v,
     };
 }
 
@@ -168,18 +156,22 @@ static void _init(struct ct_api_a0 *api) {
             {.key = PROP_FOV, .offset = offsetof(struct ct_camera_component, fov)}
     };
 
-    ct_ecs_a0.register_component("camera", (struct ct_component_info) {
+    ct_ecs_a0.register_component((struct ct_component_info) {
+            .component_name = "camera",
             .size = sizeof(struct ct_camera_component),
-            .component_spawner = _component_spawner,
             .prop_map = prop_map,
             .prop_count = CT_ARRAY_LEN(prop_map)
     });
 
+    ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            CT_ID64_0("camera"), _component_spawner);
+
+
+    ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
+                            CT_ID64_0("camera"), _camera_compiler);
+
+
     ct_ecs_a0.register_simulation("render", render_simu);
-    ct_ecs_a0.register_component_compiler(_G.type, _camera_compiler);
-
-    ct_ebus_a0.connect(ECS_EBUS, ECS_COMPONENT_ADD, on_add);
-
 }
 
 static void _shutdown() {

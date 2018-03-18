@@ -62,7 +62,7 @@ static void ui_input(const char *path) {
 
     tmp_keys[0] = ct_yng_a0.key("input");
 
-    const char *input = ct_ydb_a0.get_string(path, tmp_keys, 1, "");
+    const char *input = ct_ydb_a0.get_str(path, tmp_keys, 1, "");
 
     static char txt_buffer[128] = {};
     strcpy(txt_buffer, input);
