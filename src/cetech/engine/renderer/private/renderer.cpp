@@ -174,7 +174,7 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 
 #undef _DEF_ON_CLB_FCE
 
-static void on_resize(uint64_t bus_name,
+static void on_resize(uint32_t bus_name,
                       void *event) {
     ct_window_resized_event* ev = (ct_window_resized_event *) event;
 _G.need_reset = 1;

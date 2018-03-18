@@ -1,5 +1,3 @@
-//! \addtogroup World
-//! \{
 #ifndef CETECH_TRANSFORM_H
 #define CETECH_TRANSFORM_H
 
@@ -49,4 +47,3 @@ struct ct_transform_a0 {
 #endif
 
 #endif //CETECH_TRANSFORM_H
-//! |}

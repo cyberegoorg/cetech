@@ -21,7 +21,10 @@ struct ct_window;
 //==============================================================================
 
 #define APPLICATION_EBUS_NAME "application"
-#define APPLICATION_EBUS CT_ID64_0(APPLICATION_EBUS_NAME)
+
+enum {
+    APPLICATION_EBUS = 0x6a0c4eb6
+};
 
 enum {
     APP_INVALID_EVNT = 0,

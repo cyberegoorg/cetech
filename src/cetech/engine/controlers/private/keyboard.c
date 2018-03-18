@@ -93,7 +93,7 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(uint64_t bus_name, void *_event) {
+static void _update(uint32_t bus_name, void *_event) {
 
 
 
@@ -152,7 +152,7 @@ static void _init(struct ct_api_a0 *api) {
     _G = (struct G) {};
 
 
-    ct_ebus_a0.create_ebus(KEYBOARD_EBUS_NAME);
+    ct_ebus_a0.create_ebus(KEYBOARD_EBUS_NAME, KEYBOARD_EBUS);
 
     ct_ebus_a0.connect(APPLICATION_EBUS,
                                 APP_UPDATE_EVENT, _update);

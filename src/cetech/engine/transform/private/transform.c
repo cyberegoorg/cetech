@@ -211,7 +211,7 @@ void transform_transform(struct ct_transform_comp *transform,
 }
 
 
-static void on_change(uint64_t bus_name,
+static void on_change(uint32_t bus_name,
                       void *event) {
     struct ct_ecs_component_ev *ev = event;
 
@@ -228,7 +228,7 @@ static void on_change(uint64_t bus_name,
 }
 
 
-static void on_add(uint64_t bus_name,
+static void on_add(uint32_t bus_name,
                    void *event) {
     struct ct_ecs_component_ev *ev = event;
 

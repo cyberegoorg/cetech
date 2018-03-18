@@ -114,7 +114,7 @@ static float draw_main_menu() {
 
             ImGui::Separator();
 
-            ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, NULL,
+            ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, NULL,
                             0);
 
             ct_debugui_a0.EndMenu();
@@ -147,11 +147,11 @@ static void on_debugui() {
 }
 
 static void on_init() {
-    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
 }
 
 static void on_shutdown() {
-    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
 
 }
 
@@ -163,7 +163,7 @@ static void on_update(float dt) {
     ct_action_manager_a0.check();
 
     ct_playground_update_ev ev = {.dt=dt};
-    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, &ev, sizeof(ev));
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, &ev, sizeof(ev));
 }
 
 
@@ -171,7 +171,7 @@ static void on_update(float dt) {
 static void on_ui() {
     on_debugui();
 
-    ct_ebus_a0.send(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);
 
     if (_G.load_layout) {
         ct_debugui_a0.LoadDock("core/default.dock_layout");
@@ -198,7 +198,7 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_playground_a0", &playground_api);
 
-    ct_ebus_a0.create_ebus(PLAYGROUND_EBUS_NAME);
+    ct_ebus_a0.create_ebus(PLAYGROUND_EBUS_NAME, PLAYGROUND_EBUS);
 
     ct_action_manager_a0.register_action(
             CT_ID64_0("undo"),

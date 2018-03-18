@@ -461,8 +461,8 @@ static void _notify(struct ct_cdb_obj_t *_obj,
             .prop = changed_prop,
     };
 
-    ct_ebus_a0.send_addr(CDB_EBUS, CDB_OBJ_CHANGE,
-                         (uint64_t) _obj, &ev, sizeof(ev));
+    ct_ebus_a0.send(CDB_EBUS, CDB_OBJ_CHANGE,
+                   (uint64_t) _obj, &ev, sizeof(ev));
 
     for (int i = 0; i < ct_array_size(obj->instances); ++i) {
         _notify(obj->instances[i], changed_prop);
@@ -887,7 +887,7 @@ static void _init(struct ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_ebus_a0.create_ebus(CDB_EBUS_NAME);
+    ct_ebus_a0.create_ebus(CDB_EBUS_NAME, CDB_EBUS);
 
     api->register_api("ct_cdb_a0", &cdb_api);
 }

@@ -12,7 +12,11 @@ extern "C" {
 #include <stddef.h>
 
 #define PLAYGROUND_EBUS_NAME "playground"
-#define PLAYGROUND_EBUS CT_ID64_0(PLAYGROUND_EBUS_NAME)
+
+enum {
+    PLAYGROUND_EBUS = 0x7f3091f7
+};
+
 
 enum {
     PLAYGROUND_INAVLID_EVENT = 0,

@@ -84,7 +84,7 @@ static struct ct_camera_a0 camera_api = {
         .get_project_view = get_project_view,
 };
 
-static void on_add(uint64_t bus_name,
+static void on_add(uint32_t bus_name,
                    void *event) {
 
     struct ct_ecs_component_ev* ev = event;

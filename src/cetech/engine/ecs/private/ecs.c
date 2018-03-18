@@ -250,7 +250,7 @@ static void entity_component_change(struct ct_world world,
             .comp_mask = com_mask,
     };
 
-    ct_ebus_a0.send_addr(ECS_EBUS, ECS_COMPONENT_CHANGE,
+    ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_CHANGE,
                          entity.h, &ev, sizeof(ev));
 }
 
@@ -439,7 +439,7 @@ static void add_components(struct ct_world world,
             .comp_mask = ent_type,
     };
 
-    ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
+    ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
 }
 
 static void remove_components(struct ct_world world,
@@ -558,7 +558,7 @@ static void destroy(struct ct_world world,
                 .comp_mask = ent_type,
         };
 
-        ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_REMOVE, &ev, sizeof(ev));
+        ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_REMOVE, &ev, sizeof(ev));
 
         ct_handler_destroy(&w->entity_handler, entity[i].h, _G.allocator);
     }
@@ -700,7 +700,7 @@ static struct ct_entity find_by_uid(struct ct_world world,
     return (struct ct_entity) {.h=0};
 }
 
-static void _on_obj_change(uint64_t bus_name,
+static void _on_obj_change(uint32_t bus_name,
                            void *event) {
 
     struct ct_cdb_obj_change_ev *ev = event;
@@ -877,7 +877,7 @@ static struct ct_entity spawn_entity(struct ct_world world,
                 .comp_mask = ent_type,
         };
 
-        ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
+        ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
 
     }
 
@@ -914,14 +914,14 @@ static struct ct_world create_world() {
 
     struct ct_ecs_world_ev ev = {.world=world};
 
-    ct_ebus_a0.send(ECS_EBUS, ECS_WORLD_CREATE, &ev, sizeof(ev));
+    ct_ebus_a0.broadcast(ECS_EBUS, ECS_WORLD_CREATE, &ev, sizeof(ev));
 
     return world;
 }
 
 static void destroy_world(struct ct_world world) {
     struct ct_ecs_world_ev ev = {.world=world};
-    ct_ebus_a0.send(ECS_EBUS, ECS_WORLD_DESTROY, &ev, sizeof(ev));
+    ct_ebus_a0.broadcast(ECS_EBUS, ECS_WORLD_DESTROY, &ev, sizeof(ev));
 
     struct world_instance *w = _new_world(world);
     ct_handler_free(&w->entity_handler, _G.allocator);
@@ -976,7 +976,7 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_handler_create(&_G.world_handler, _G.allocator);
 
-    ct_ebus_a0.create_ebus(ECS_EBUS_NAME);
+    ct_ebus_a0.create_ebus(ECS_EBUS_NAME, ECS_EBUS);
 
     ct_resource_a0.register_type("entity", callback);
     ct_resource_a0.compiler_register("entity", resource_compiler, true);

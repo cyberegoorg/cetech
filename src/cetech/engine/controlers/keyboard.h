@@ -11,8 +11,10 @@ extern "C" {
 #include <stdint.h>
 
 #define KEYBOARD_EBUS_NAME "keyboard"
-#define KEYBOARD_EBUS CT_ID64_0(KEYBOARD_EBUS_NAME)
 
+enum {
+    KEYBOARD_EBUS = 0x5712c6b9
+};
 
 //! Keyboard event
 struct ct_keyboard_event {

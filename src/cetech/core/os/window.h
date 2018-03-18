@@ -15,7 +15,11 @@ extern "C" {
 #include <stddef.h>
 
 #define WINDOW_EBUS_NAME "window"
-#define WINDOW_EBUS CT_ID64_0(WINDOW_EBUS_NAME)
+
+
+enum {
+    WINDOW_EBUS   = 0x7a0d633e
+};
 
 enum {
     EVENT_WINDOW_INVALID = 0,   //!< Invalid type

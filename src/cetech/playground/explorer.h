@@ -16,7 +16,10 @@ struct ct_entity;
 struct ct_world;
 
 #define EXPLORER_EBUS_NAME "entity_explorer"
-#define EXPLORER_EBUS CT_ID64_0(EXPLORER_EBUS_NAME)
+
+enum {
+    EXPLORER_EBUS = 0x53f94136
+};
 
 enum {
     EXPLORER_INAVLID_EVENT = 0,

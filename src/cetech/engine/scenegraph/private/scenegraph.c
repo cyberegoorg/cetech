@@ -115,7 +115,7 @@ static void allocate(struct WorldInstance *_data,
     *_data = new_data;
 }
 
-static void _new_world(uint64_t bus_name,
+static void _new_world(uint32_t bus_name,
                        void *event) {
     struct ct_world world = ((struct ct_ecs_world_ev*)event)->world;
 
@@ -125,7 +125,7 @@ static void _new_world(uint64_t bus_name,
     ct_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
-static void _destroy_world(uint64_t bus_name,
+static void _destroy_world(uint32_t bus_name,
                            void *event) {
     struct ct_world world = ((struct ct_ecs_world_ev*)event)->world;
 

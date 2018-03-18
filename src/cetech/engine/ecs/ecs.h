@@ -15,7 +15,10 @@ extern "C" {
 #include <cetech/core/cdb/cdb.h>
 
 #define ECS_EBUS_NAME "ecs"
-#define ECS_EBUS CT_ID64_0(ECS_EBUS_NAME)
+
+enum {
+    ECS_EBUS = 0x3c870dac
+};
 
 enum {
     ECS_INVALID_EVENT = 0,

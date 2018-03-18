@@ -135,7 +135,7 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0.gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(uint64_t bus_name, void *_event) {
+static void update(uint32_t bus_name, void *_event) {
 
 
     memcpy(_G.last_state, _G.state,
@@ -160,7 +160,6 @@ static void update(uint64_t bus_name, void *_event) {
                 break;
 
             case EVENT_GAMEPAD_MOVE:
-
                 _G.position[move_event->gamepad_id][move_event->axis][0] = move_event->position[0];
                 _G.position[move_event->gamepad_id][move_event->axis][1] = move_event->position[1];
                 break;
@@ -206,7 +205,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0.connect(APPLICATION_EBUS,
                                 APP_UPDATE_EVENT, update);
 
-    ct_ebus_a0.create_ebus(GAMEPAD_EBUS_NAME);
+    ct_ebus_a0.create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 

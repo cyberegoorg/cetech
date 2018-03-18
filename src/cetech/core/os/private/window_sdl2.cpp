@@ -215,7 +215,7 @@ int sdl_window_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hashlib_a0);
 
     api->register_api("ct_window_a0", &window_api);
-    ct_ebus_a0.create_ebus(WINDOW_EBUS_NAME);
+    ct_ebus_a0.create_ebus(WINDOW_EBUS_NAME, WINDOW_EBUS);
     return 1;
 }
 

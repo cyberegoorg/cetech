@@ -237,10 +237,10 @@ static void ui_asset_list() {
                 };
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    ct_ebus_a0.send(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, &ev,
+                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, &ev,
                                     sizeof(ev));
                 } else {
-                    ct_ebus_a0.send(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, &ev,
+                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, &ev,
                                     sizeof(ev));
                 }
             }
@@ -251,7 +251,7 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(uint64_t bus_name,
+static void on_debugui(uint32_t bus_name,
                        void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
@@ -279,7 +279,7 @@ static void on_debugui(uint64_t bus_name,
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(uint64_t bus_name,
+static void on_menu_window(uint32_t bus_name,
                            void *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
@@ -296,7 +296,7 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator(),
     };
 
-    ct_ebus_a0.create_ebus(ASSET_BROWSER_EBUS_NAME);
+    ct_ebus_a0.create_ebus(ASSET_BROWSER_EBUS_NAME, ASSET_BROWSER_EBUS);
 
     _G.visible = true;
     _G.left_column_width = 180.0f;

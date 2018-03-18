@@ -54,7 +54,7 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui(uint64_t bus_name,
+static void on_debugui(uint32_t bus_name,
                        void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
@@ -66,7 +66,7 @@ static void on_debugui(uint64_t bus_name,
 
 }
 
-static void on_menu_window(uint64_t bus_name,
+static void on_menu_window(uint32_t bus_name,
                            void *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }

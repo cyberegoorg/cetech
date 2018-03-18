@@ -111,7 +111,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
                     .obj = obj,
             };
 
-            ct_ebus_a0.send(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
+            ct_ebus_a0.broadcast(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
                             sizeof(ev));
         }
 
@@ -128,7 +128,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
 }
 
 
-static void on_debugui(uint64_t bus_name,
+static void on_debugui(uint32_t bus_name,
                        void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -153,7 +153,7 @@ static void on_debugui(uint64_t bus_name,
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(uint64_t bus_name,
+static void on_menu_window(uint32_t bus_name,
                            void *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
@@ -170,7 +170,7 @@ static void _init(ct_api_a0 *api) {
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
 
 
-    ct_ebus_a0.create_ebus(EXPLORER_EBUS_NAME);
+    ct_ebus_a0.create_ebus(EXPLORER_EBUS_NAME, EXPLORER_EBUS);
 }
 
 static void _shutdown() {

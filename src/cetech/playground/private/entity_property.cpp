@@ -85,7 +85,7 @@ static void on_debugui() {
     }
 }
 
-void on_entity_click(uint64_t bus_name,
+void on_entity_click(uint32_t bus_name,
                      void *event) {
 
     ct_ent_selected_ev *ev = static_cast<ct_ent_selected_ev *>(event);

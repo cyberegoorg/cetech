@@ -24,7 +24,10 @@ struct ct_asset_browser_click_ev {
 };
 
 #define ASSET_BROWSER_EBUS_NAME "asset_browser"
-#define ASSET_BROWSER_EBUS CT_ID64_0(ASSET_BROWSER_EBUS_NAME)
+
+enum {
+    ASSET_BROWSER_EBUS = 0x271fc190
+};
 
 enum {
     ASSET_INAVLID_EVENT = 0,
@@ -38,6 +41,7 @@ enum {
 
 struct ct_asset_browser_a0 {
     uint64_t (*get_selected_asset_type)();
+
     void (*get_selected_asset_name)(char *asset_name);
 };
 

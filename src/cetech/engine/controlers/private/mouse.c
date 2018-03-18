@@ -158,7 +158,7 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(uint64_t bus_name, void *_event) {
+static void update(uint32_t bus_name, void *_event) {
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
     _G.delta_pos[0] = 0;
     _G.delta_pos[1] = 0;
@@ -229,7 +229,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {};
 
-    ct_ebus_a0.create_ebus(MOUSE_EBUS_NAME);
+    ct_ebus_a0.create_ebus(MOUSE_EBUS_NAME, MOUSE_EBUS);
 
     ct_ebus_a0.connect(APPLICATION_EBUS,
                                 APP_UPDATE_EVENT, update);

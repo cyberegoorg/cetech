@@ -112,7 +112,7 @@ static void fps_camera_update(ct_world world,
 //    end
 }
 
-static void on_debugui(uint64_t busname,
+static void on_debugui(uint32_t bus_name,
                        void* event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
@@ -143,7 +143,7 @@ static void on_debugui(uint64_t busname,
 }
 
 
-static void set_asset(uint64_t bus_name,
+static void set_asset(uint32_t bus_name,
                       void *event) {
 
     ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
@@ -184,7 +184,7 @@ static void set_asset(uint64_t bus_name,
 //    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init(uint64_t busname,
+static void init(uint32_t bus_name,
                  void* event) {
     _G.visible = true;
     _G.world = ct_ecs_a0.create_world();
@@ -195,7 +195,7 @@ static void init(uint64_t busname,
 }
 
 
-static void update(uint64_t busname,
+static void update(uint32_t bus_name,
                    void* event) {
     ct_playground_update_ev *ev = static_cast<ct_playground_update_ev *>(event);
     float dt = ev->dt;
@@ -255,7 +255,7 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(uint64_t busname,
+static void on_menu_window(uint32_t bus_name,
                            void* event) {
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
 }

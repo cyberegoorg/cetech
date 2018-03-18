@@ -64,7 +64,7 @@ static void register_asset(uint32_t type,
                 _G.allocator);
 }
 
-static void set_asset(uint64_t bus_name,
+static void set_asset(uint32_t bus_name,
                       void *event) {
     ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
     ct_resource_id rid = {.i64 = ev->asset};

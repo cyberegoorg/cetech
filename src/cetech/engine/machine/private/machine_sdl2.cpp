@@ -110,17 +110,17 @@ void sdl_mouse_process() {
     event.pos[0] = pos[0];
     event.pos[1] = window_size[1] - pos[1];
 
-    ct_ebus_a0.send(MOUSE_EBUS, EVENT_MOUSE_MOVE, &event, sizeof(event));
+    ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_MOVE, &event, sizeof(event));
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         ct_mouse_event event;
         event.button = i;
 
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.send(MOUSE_EBUS, EVENT_MOUSE_DOWN, &event, sizeof(event));
+            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_DOWN, &event, sizeof(event));
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.send(MOUSE_EBUS, EVENT_MOUSE_UP, &event, sizeof(event));
+            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_UP, &event, sizeof(event));
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -134,12 +134,12 @@ void sdl_keyboard_process() {
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
             keyboard_ev.keycode = i;
-            ct_ebus_a0.send(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN, &keyboard_ev,
+            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN, &keyboard_ev,
                             sizeof(keyboard_ev));
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
             keyboard_ev.keycode = i;
-            ct_ebus_a0.send(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, &keyboard_ev,
+            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, &keyboard_ev,
                             sizeof(keyboard_ev));
         }
 
@@ -265,13 +265,13 @@ void sdl_gamepad_process() {
             event.button = j;
 
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
-                ct_ebus_a0.send(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, &event,
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, &event,
                                 sizeof(event));
 
 
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
-                ct_ebus_a0.send(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, &event,
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, &event,
                                 sizeof(event));
 
             }
@@ -296,7 +296,7 @@ void sdl_gamepad_process() {
                 event.position[0] = pos[0];
                 event.position[1] = pos[1];
 
-                ct_ebus_a0.send(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, &event,
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, &event,
                                 sizeof(event));
             }
         }
@@ -324,7 +324,7 @@ static void _update(float dt) {
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT:
-                ct_ebus_a0.send(APPLICATION_EBUS, APP_QUIT_EVENT, NULL, 0);
+                ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_QUIT_EVENT, NULL, 0);
                 break;
 
             case SDL_WINDOWEVENT: {
@@ -335,7 +335,7 @@ static void _update(float dt) {
                         ev.width = e.window.data1;
                         ev.height = e.window.data2;
 
-                        ct_ebus_a0.send(WINDOW_EBUS, EVENT_WINDOW_RESIZED, &ev,
+                        ct_ebus_a0.broadcast(WINDOW_EBUS, EVENT_WINDOW_RESIZED, &ev,
                                         sizeof(ev));
                     }
                         break;
@@ -348,7 +348,7 @@ static void _update(float dt) {
                 ev.pos[0] = e.wheel.x;
                 ev.pos[1] = e.wheel.y;
 
-                ct_ebus_a0.send(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev, sizeof(ev));
+                ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev, sizeof(ev));
             }
 
 
@@ -356,7 +356,7 @@ static void _update(float dt) {
                 ct_keyboard_text_event ev= {{0}};
                 memcpy(ev.text, e.text.text, sizeof(ev.text));
 
-                ct_ebus_a0.send(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT, &ev,
+                ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT, &ev,
                                 sizeof(ev));
 
             }
@@ -367,7 +367,7 @@ static void _update(float dt) {
                 ev.gamepad_id = idx;
 
 
-                ct_ebus_a0.send(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT, &ev,
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT, &ev,
                                 sizeof(ev));
 
             }
@@ -386,7 +386,7 @@ static void _update(float dt) {
                     _remove_controler(i);
 
                     ev.gamepad_id = i;
-                    ct_ebus_a0.send(GAMEPAD_EBUS, EVENT_GAMEPAD_DISCONNECT, &ev,
+                    ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DISCONNECT, &ev,
                                     sizeof(ev));
 
                     break;

@@ -19,7 +19,10 @@ extern "C" {
 //==============================================================================
 
 #define CDB_EBUS_NAME "cdb"
-#define CDB_EBUS CT_ID64_0(CDB_EBUS_NAME)
+
+enum {
+    CDB_EBUS = 0x6b6b9f5b
+};
 
 enum {
     CDB_INVALID_EVENT = 0,

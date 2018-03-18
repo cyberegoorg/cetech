@@ -43,7 +43,7 @@ static struct G {
 } _G;
 
 
-void update(uint64_t bus_name, void *event) {
+void update(uint32_t bus_name, void *event) {
     ct_app_update_ev *ev = static_cast<ct_app_update_ev *>(event);
 
     _G.dt = ev->dt;

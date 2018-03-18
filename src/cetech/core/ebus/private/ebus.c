@@ -41,7 +41,7 @@ struct ebus_event_handlers {
 };
 
 struct ebus_t {
-    uint64_t bus_name;
+    uint32_t bus_name;
 
     struct ct_hash_t handler_idx;
     struct ebus_event_handlers *handlers;
@@ -61,18 +61,18 @@ static struct _G {
 //==============================================================================
 
 
-void create_ebus(const char *name) {
+void create_ebus(const char *name, uint32_t id) {
     uint64_t ebus_idx = ct_array_size(_G.ebus_pool);
 
     struct ebus_t ebus = {
-            .bus_name = CT_ID64_0(name),
+            .bus_name = id,
     };
 
     ct_array_push(_G.ebus_pool, ebus, _G.allocator);
     ct_hash_add(&_G.ebus_idx, ebus.bus_name, ebus_idx, _G.allocator);
 }
 
-void send_addr(uint64_t bus_name,
+void send_addr(uint32_t bus_name,
                uint64_t event_type,
                uint64_t addr,
                void *event,
@@ -113,11 +113,10 @@ void send_addr(uint64_t bus_name,
         ev_handlers->handlers[i].handler(bus_name,
                                          ebus->buffer + ev_offset +
                                          sizeof(struct ebus_header_t));
-
     }
 }
 
-void push_event(uint64_t bus_name,
+void broadcast(uint32_t bus_name,
                 uint64_t event_type,
                 void *event,
                 uint64_t event_size) {
@@ -134,7 +133,7 @@ void begin_frame() {
     }
 }
 
-void _connect_addr(uint64_t bus_name,
+void _connect_addr(uint32_t bus_name,
                    uint64_t event,
                    uint64_t addr,
                    ct_ebus_handler *handler) {
@@ -169,14 +168,14 @@ void _connect_addr(uint64_t bus_name,
     ct_array_push(ev_handlers->handlers, h, _G.allocator);
 }
 
-void _connect(uint64_t bus_name,
+void _connect(uint32_t bus_name,
               uint64_t event,
               ct_ebus_handler *handler) {
     _connect_addr(bus_name, event, 0, handler);
 }
 
 
-void *first_event(uint64_t bus_name) {
+void *first_event(uint32_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
@@ -192,7 +191,7 @@ void *first_event(uint64_t bus_name) {
     return ebus->buffer + sizeof(struct ebus_header_t);
 }
 
-void *next_event(uint64_t bus_name,
+void *next_event(uint32_t bus_name,
                  void *event) {
     struct ebus_header_t *header = event - sizeof(struct ebus_header_t);
 
@@ -222,8 +221,8 @@ struct ebus_header_t *event_header(void *event) {
 
 static struct ct_ebus_a0 _api = {
         .create_ebus = create_ebus,
-        .send = push_event,
-        .send_addr = send_addr,
+        .broadcast = broadcast,
+        .send = send_addr,
         .connect = _connect,
         .connect_addr = _connect_addr,
         .begin_frame = begin_frame,
@@ -247,7 +246,7 @@ static void _init(struct ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    create_ebus("");
+    create_ebus("", 0);
 }
 
 static void _shutdown() {

@@ -11,7 +11,11 @@ extern "C" {
 #include <stdint.h>
 
 #define MOUSE_EBUS_NAME "mouse"
-#define MOUSE_EBUS CT_ID64_0(MOUSE_EBUS_NAME)
+
+enum {
+    MOUSE_EBUS = 0x3ddd354d
+};
+
 
 //! Mouse button status
 struct ct_mouse_event {

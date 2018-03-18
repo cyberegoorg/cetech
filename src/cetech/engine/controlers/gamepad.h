@@ -13,7 +13,10 @@ extern "C" {
 #include <stdint.h>
 
 #define GAMEPAD_EBUS_NAME "gamepad"
-#define GAMEPAD_EBUS CT_ID64_0(GAMEPAD_EBUS_NAME)
+
+enum {
+    GAMEPAD_EBUS = 0x3913b95f
+};
 
 //! Gamepad move event
 struct ct_gamepad_move_event {
