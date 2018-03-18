@@ -479,9 +479,9 @@ static void write_commit(struct ct_cdb_obj_t *_writer) {
 
     ct_hash_free(&orig_obj->prop_map, _G.allocator);
     _destroy_object(orig_obj);
+//    CT_FREE(_G.allocator, old_obj);
 //    ct_array_free(writer->changed_prop, _G.allocator);
 //    CT_FREE(_G.allocator, old_obj->buffer);
-//    CT_FREE(_G.allocator, old_obj);
 }
 
 static void set_float(struct ct_cdb_obj_t *_writer,

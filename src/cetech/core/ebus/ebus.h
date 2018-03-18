@@ -21,9 +21,6 @@ struct ebus_header_t {
 typedef void (ct_ebus_handler)(uint32_t bus_name,
                                void *event);
 
-typedef void (ct_ebus_call)(uint32_t bus_name,
-                               void *request, void *reply);
-
 //==============================================================================
 // Api
 //==============================================================================
@@ -35,15 +32,15 @@ struct ct_ebus_a0 {
     void (*begin_frame)();
 
     void (*broadcast)(uint32_t bus_name,
-                     uint64_t event_type,
-                     void *event,
-                     uint64_t event_size);
+                      uint64_t event_type,
+                      void *event,
+                      uint64_t event_size);
 
     void (*send)(uint32_t bus_name,
-                     uint64_t event_type,
-                     uint64_t addr,
-                      void *event,
-                     uint64_t event_size);
+                 uint64_t event_type,
+                 uint64_t addr,
+                 void *event,
+                 uint64_t event_size);
 
     void (*connect)(uint32_t bus_name,
                     uint64_t event,

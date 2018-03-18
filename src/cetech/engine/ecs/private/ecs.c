@@ -51,9 +51,10 @@ struct world_instance {
     struct ct_world world;
     struct ct_cdb_t db;
 
-    // Entities OBJ
-    struct ct_hash_t obj_map;
-    struct ct_entity **obj_ent;
+    // Spawn entitites
+    struct ct_hash_t obj_spawn_idx_map;
+    struct ct_hash_t ent_spawn_idx_map;
+    struct ct_entity **obj_spawn_ent;
 
     // Entities
     struct ct_handler_t entity_handler;
@@ -550,6 +551,22 @@ static void destroy(struct ct_world world,
             child = w->next_sibling[_idx(child.h)];
         }
 
+        uint64_t spawn_idx = ct_hash_lookup(&w->ent_spawn_idx_map, entity->h, UINT64_MAX);
+        if(UINT64_MAX != spawn_idx) {
+            struct ct_entity *ents = w->obj_spawn_ent[spawn_idx];
+            const uint64_t size = ct_array_size(ents);
+            for (int j = 0; j < size; ++j) {
+                if(ents[j].h != entity[i].h) {
+                    continue;
+                }
+
+                ents[j] = ents[size -1];
+                ct_array_pop_back(ents);
+            }
+
+            ct_hash_remove(&w->ent_spawn_idx_map, entity->h);
+        }
+
         _remove_from_type_slot(w, entity[i], ent_type);
 
         struct ct_ecs_component_ev ev = {
@@ -560,18 +577,12 @@ static void destroy(struct ct_world world,
 
         ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_REMOVE, &ev, sizeof(ev));
 
+
         ct_handler_destroy(&w->entity_handler, entity[i].h, _G.allocator);
     }
 }
 
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
-
-
-void reload_instance(uint64_t name,
-                     void *data) {
-
-}
-
 
 //==============================================================================
 // Resource
@@ -707,13 +718,13 @@ static void _on_obj_change(uint32_t bus_name,
 
     for (int i = 0; i < ct_array_size(_G.world_array); ++i) {
         struct world_instance *w = &_G.world_array[i];
-        uint64_t spawn_idx = ct_hash_lookup(&w->obj_map, (uint64_t) ev->obj, 0);
+        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map, (uint64_t) ev->obj, 0);
 
         if (!spawn_idx) {
             continue;
         }
 
-        struct ct_entity *ent = w->obj_ent[spawn_idx];
+        struct ct_entity *ent = w->obj_spawn_ent[spawn_idx];
         const uint32_t ent_n = ct_array_size(ent);
 
         for (int k = 0; k < ev->prop_count; ++k) {
@@ -829,15 +840,17 @@ static struct ct_entity spawn_entity(struct ct_world world,
                                 CDB_OBJ_CHANGE, (uint64_t) root,
                                 _on_obj_change);
 
-        uint64_t spawn_idx = ct_hash_lookup(&w->obj_map, (uint64_t) root, 0);
+        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map, (uint64_t) root, 0);
 
         if (!spawn_idx) {
-            spawn_idx = ct_array_size(w->obj_ent);
-            ct_array_push(w->obj_ent, 0, _G.allocator);
-            ct_hash_add(&w->obj_map, (uint64_t) root, spawn_idx, _G.allocator);
+            spawn_idx = ct_array_size(w->obj_spawn_ent);
+            ct_array_push(w->obj_spawn_ent, 0, _G.allocator);
+            ct_hash_add(&w->obj_spawn_idx_map, (uint64_t) root, spawn_idx, _G.allocator);
         }
 
-        ct_array_push(w->obj_ent[spawn_idx], spawned[i], _G.allocator);
+        ct_array_push(w->obj_spawn_ent[spawn_idx], spawned[i], _G.allocator);
+
+        ct_hash_add(&w->ent_spawn_idx_map, spawned[i].h, spawn_idx, _G.allocator);
 
         uint64_t ent_type = combine_component(
                 &entity_resource_ent_types(res)[i * 64],
