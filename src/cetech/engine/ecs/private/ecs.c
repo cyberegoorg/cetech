@@ -71,12 +71,8 @@ struct world_instance {
     struct ct_hash_t entity_storage_map;
     struct entity_storage *entity_storage;
 
+    // Simulations
     uint64_t *simulations;
-};
-
-
-struct simulation_pack {
-    ct_simulate_fce_t simulation;
 };
 
 static struct _G {
@@ -252,7 +248,7 @@ static void entity_component_change(struct ct_world world,
     };
 
     ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_CHANGE,
-                         entity.h, &ev, sizeof(ev));
+                    entity.h, &ev, sizeof(ev));
 }
 
 static void _remove_from_type_slot(struct world_instance *w,
@@ -266,12 +262,12 @@ static void _remove_from_type_slot(struct world_instance *w,
 
         uint32_t idx = w->entity_data_idx[_idx(ent.h)];
         uint32_t last_idx = item->n - 1;
-        uint32_t last_ent_idx = _idx(item->entity[last_idx].h);
+        uint64_t last_ent_idx = _idx(item->entity[last_idx].h);
 
         w->entity_data_idx[last_ent_idx] = idx;
 
         for (int i = 0; i < MAX_COMPONENTS; ++i) {
-            uint32_t size = _G.component_info[i].size;
+            uint64_t size = _G.component_info[i].size;
 
             if (!item->entity_data[i]) {
                 continue;
@@ -551,16 +547,17 @@ static void destroy(struct ct_world world,
             child = w->next_sibling[_idx(child.h)];
         }
 
-        uint64_t spawn_idx = ct_hash_lookup(&w->ent_spawn_idx_map, entity->h, UINT64_MAX);
-        if(UINT64_MAX != spawn_idx) {
+        uint64_t spawn_idx = ct_hash_lookup(&w->ent_spawn_idx_map, entity->h,
+                                            UINT64_MAX);
+        if (UINT64_MAX != spawn_idx) {
             struct ct_entity *ents = w->obj_spawn_ent[spawn_idx];
             const uint64_t size = ct_array_size(ents);
             for (int j = 0; j < size; ++j) {
-                if(ents[j].h != entity[i].h) {
+                if (ents[j].h != entity[i].h) {
                     continue;
                 }
 
-                ents[j] = ents[size -1];
+                ents[j] = ents[size - 1];
                 ct_array_pop_back(ents);
             }
 
@@ -587,6 +584,100 @@ static void destroy(struct ct_world world,
 //==============================================================================
 // Resource
 //==============================================================================
+
+static void _on_obj_change(uint32_t bus_name,
+                           void *event) {
+
+    struct ct_cdb_obj_change_ev *ev = event;
+
+    for (int i = 0; i < ct_array_size(_G.world_array); ++i) {
+        struct world_instance *w = &_G.world_array[i];
+
+        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map,
+                                            (uint64_t) ev->obj, UINT64_MAX);
+
+        if (UINT64_MAX == spawn_idx) {
+            continue;
+        }
+
+        struct ct_entity *ent = w->obj_spawn_ent[spawn_idx];
+        const uint32_t ent_n = ct_array_size(ent);
+
+        for (int k = 0; k < ev->prop_count; ++k) {
+            uint64_t component = ct_hash_lookup(&_G.prop_to_comp, ev->prop[k],
+                                                0);
+            uint64_t comp_idx = component_idx(component);
+
+            enum ct_cdb_type type = ct_cdb_a0.prop_type(ev->obj, ev->prop[k]);
+            uint64_t prop_offset = ct_hash_lookup(
+                    &_G.component_param_offset[comp_idx], ev->prop[k],
+                    UINT64_MAX);
+
+            if (prop_offset == UINT64_MAX) {
+                continue;
+            }
+
+
+            for (int l = 0; l < ent_n; ++l) {
+                uint8_t *comp_data = entity_data(w->world, component, ent[l]);
+
+                struct data {
+                    union {
+                        float f;
+                        float v3[3];
+                        float v4[4];
+                        float m16[16];
+                        uint32_t u32;
+                        uint64_t u64;
+                        void *ptr;
+                    };
+                };
+
+                struct data *dt = (struct data *) (comp_data + prop_offset);
+
+                switch (type) {
+                    case CDB_TYPE_NONE:
+                    case CDB_TYPE_REF:
+                    case CDB_TYPE_STR:
+                        break;
+
+                    case CDB_TYPE_UINT32:
+                        dt->u32 = ct_cdb_a0.read_uint32(ev->obj, ev->prop[k],
+                                                        0);
+                        break;
+                    case CDB_TYPE_UINT64:
+                        dt->u64 = ct_cdb_a0.read_uint64(ev->obj, ev->prop[k],
+                                                        0);
+                        break;
+                    case CDB_TYPE_PTR:
+                        dt->ptr = ct_cdb_a0.read_ptr(ev->obj, ev->prop[k],
+                                                     NULL);
+                        break;
+
+                    case CDB_TYPE_FLOAT:
+                        dt->f = ct_cdb_a0.read_float(ev->obj, ev->prop[k],
+                                                     0.0f);
+                        break;
+
+                    case CDB_TYPE_VEC3:
+                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v3);
+                        break;
+
+                    case CDB_TYPE_VEC4:
+                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v4);
+                        break;
+
+                    case CDB_TYPE_MAT4:
+                        ct_cdb_a0.read_mat4(ev->obj, ev->prop[k], dt->m16);
+                        break;
+                }
+                entity_component_change(w->world, component, ent[l]);
+            }
+
+        }
+    }
+
+}
 
 static void online(uint64_t name,
                    struct ct_vio *input,
@@ -620,12 +711,18 @@ static void online(uint64_t name,
             struct ct_cdb_obj_t *prefab_obj = ct_cdb_a0.read_ref(prefab_res,
                                                                  PROP_ENT_OBJ,
                                                                  NULL);
+
             eobj = ct_cdb_a0.create_from(_G.db, prefab_obj);
         } else {
             eobj = ct_cdb_a0.create_object(_G.db, 0);
             ct_cdb_a0.load(eobj, (const char *) (ent_data + offset),
                            _G.allocator);
         }
+
+        ct_ebus_a0.connect_addr(CDB_EBUS,
+                                CDB_OBJ_CHANGE, (uint64_t) eobj,
+                                _on_obj_change);
+
 
         objs[i] = eobj;
         ct_cdb_a0.set_ref(writer, PROP_ENT_OBJ + i, eobj);
@@ -711,102 +808,6 @@ static struct ct_entity find_by_uid(struct ct_world world,
     return (struct ct_entity) {.h=0};
 }
 
-static void _on_obj_change(uint32_t bus_name,
-                           void *event) {
-
-    struct ct_cdb_obj_change_ev *ev = event;
-
-    for (int i = 0; i < ct_array_size(_G.world_array); ++i) {
-        struct world_instance *w = &_G.world_array[i];
-        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map, (uint64_t) ev->obj, 0);
-
-        if (!spawn_idx) {
-            continue;
-        }
-
-        struct ct_entity *ent = w->obj_spawn_ent[spawn_idx];
-        const uint32_t ent_n = ct_array_size(ent);
-
-        for (int k = 0; k < ev->prop_count; ++k) {
-            uint64_t component = ct_hash_lookup(&_G.prop_to_comp, ev->prop[k],
-                                                0);
-            uint64_t comp_idx = component_idx(component);
-
-            enum ct_cdb_type type = ct_cdb_a0.prop_type(ev->obj, ev->prop[k]);
-            uint64_t prop_offset = ct_hash_lookup(
-                    &_G.component_param_offset[comp_idx], ev->prop[k],
-                    UINT64_MAX);
-
-            if (prop_offset == UINT64_MAX) {
-                continue;
-            }
-
-
-            for (int l = 0; l < ent_n; ++l) {
-                uint8_t *comp_data = entity_data(w->world, component, ent[l]);
-
-                struct data {
-                    union {
-                        float f;
-                        float v3[3];
-                        float v4[4];
-                        float m16[16];
-                        uint32_t u32;
-                        uint64_t u64;
-                        void *ptr;
-                    };
-                };
-
-                struct data *dt = (struct data *) (comp_data + prop_offset);
-
-                switch (type) {
-                    case CDB_TYPE_NONE:
-                        break;
-
-                    case CDB_TYPE_REF:
-                        break;
-                    case CDB_TYPE_STR:
-                        break;
-
-
-                    case CDB_TYPE_UINT32:
-                        dt->u32 = ct_cdb_a0.read_uint32(ev->obj, ev->prop[k],
-                                                        0);
-                        break;
-                    case CDB_TYPE_UINT64:
-                        dt->u64 = ct_cdb_a0.read_uint64(ev->obj, ev->prop[k],
-                                                        0);
-                        break;
-                    case CDB_TYPE_PTR:
-                        dt->ptr = ct_cdb_a0.read_ptr(ev->obj, ev->prop[k],
-                                                     NULL);
-                        break;
-
-                    case CDB_TYPE_FLOAT:
-                        dt->f = ct_cdb_a0.read_float(ev->obj, ev->prop[k],
-                                                     0.0f);
-                        break;
-
-                    case CDB_TYPE_VEC3:
-                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v3);
-                        break;
-
-                    case CDB_TYPE_VEC4:
-                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v4);
-                        break;
-
-                    case CDB_TYPE_MAT4:
-                        ct_cdb_a0.read_mat4(ev->obj, ev->prop[k], dt->m16);
-                        break;
-                }
-                entity_component_change(w->world, component, ent[l]);
-            }
-
-        }
-    }
-
-}
-
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint32_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
@@ -820,12 +821,11 @@ static struct ct_entity spawn_entity(struct ct_world world,
     res = ct_cdb_a0.read_ptr(obj, PROP_RESOURECE_DATA, NULL);
 
     if (!res) {
-        ct_log_a0.error("entity", "Could not spawn ecs.");
+        ct_log_a0.error("entity", "Could not spawn entity.");
         return (struct ct_entity) {.h = 0};
     }
 
     struct ct_entity spawned[res->ent_count];
-
     create_entities(world, spawned, res->ent_count);
 
     struct world_instance *w = get_world_instance(world);
@@ -836,21 +836,20 @@ static struct ct_entity spawn_entity(struct ct_world world,
                                                        PROP_ENT_OBJ + i,
                                                        NULL);
 
-        ct_ebus_a0.connect_addr(CDB_EBUS,
-                                CDB_OBJ_CHANGE, (uint64_t) root,
-                                _on_obj_change);
-
-        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map, (uint64_t) root, 0);
+        uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map,
+                                            (uint64_t) root, 0);
 
         if (!spawn_idx) {
             spawn_idx = ct_array_size(w->obj_spawn_ent);
             ct_array_push(w->obj_spawn_ent, 0, _G.allocator);
-            ct_hash_add(&w->obj_spawn_idx_map, (uint64_t) root, spawn_idx, _G.allocator);
+            ct_hash_add(&w->obj_spawn_idx_map,
+                        (uint64_t) root, spawn_idx, _G.allocator);
         }
 
         ct_array_push(w->obj_spawn_ent[spawn_idx], spawned[i], _G.allocator);
 
-        ct_hash_add(&w->ent_spawn_idx_map, spawned[i].h, spawn_idx, _G.allocator);
+        ct_hash_add(&w->ent_spawn_idx_map, spawned[i].h, spawn_idx,
+                    _G.allocator);
 
         uint64_t ent_type = combine_component(
                 &entity_resource_ent_types(res)[i * 64],

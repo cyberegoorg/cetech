@@ -73,12 +73,12 @@ struct ct_component_prop_map {
 };
 
 struct ct_component_info {
-    void (*component_spawner)(struct ct_cdb_obj_t *obj,
-                              void *data);
-
     struct ct_component_prop_map *prop_map;
     uint32_t prop_count;
     uint64_t size;
+
+    void (*component_spawner)(struct ct_cdb_obj_t *obj,
+                              void *data);
 };
 
 //==============================================================================
