@@ -224,7 +224,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    ct_ebus_a0.connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
+    ct_ebus_a0.connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
 
     ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
 

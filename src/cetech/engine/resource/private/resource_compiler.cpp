@@ -399,55 +399,55 @@ void compile_and_reload(const char *filename) {
     ct_array_free(output_blob, _G.allocator);
 }
 
-void resource_compiler_check_fs() {
-    static uint64_t root = CT_ID64_0("source");
-
-    auto *wd_it = ct_fs_a0.event_begin(root);
-    const auto *wd_end = ct_fs_a0.event_end(root);
-    int need_compile = 0;
-
-    while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-            need_compile = 1;
-            break;
-        }
-
-        wd_it = ct_fs_a0.event_next(wd_it);
-    }
-
-    if (need_compile) {
-        ct_alloc *alloc = ct_memory_a0.main_allocator();
-        celib::Map<uint64_t> type_name(alloc);
-
-        _compile_all(type_name);
-
-        auto *type_it = map::begin(type_name);
-        auto *type_end = map::end(type_name);
-
-        uint64_t *name_array = NULL;
-
-        while (type_it != type_end) {
-            uint64_t type_id = type_it->key;
-
-            ct_array_clean(name_array);
-
-            auto it = multi_map::find_first(type_name, type_id);
-            while (it != nullptr) {
-                ct_array_push(name_array, it->value, _G.allocator);
-
-                it = multi_map::find_next(type_name, it);
-            }
-
-            ct_resource_a0.reload(static_cast<uint32_t>(type_id),
-                                  reinterpret_cast<uint32_t *>(&name_array[0]),
-                                  ct_array_size(name_array));
-
-            ++type_it;
-        }
-
-        ct_array_free(name_array, _G.allocator);
-    }
-}
+//void resource_compiler_check_fs() {
+//    static uint64_t root = CT_ID64_0("source");
+//
+//    auto *wd_it = ct_fs_a0.event_begin(root);
+//    const auto *wd_end = ct_fs_a0.event_end(root);
+//    int need_compile = 0;
+//
+//    while (wd_it != wd_end) {
+//        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+//            need_compile = 1;
+//            break;
+//        }
+//
+//        wd_it = ct_fs_a0.event_next(wd_it);
+//    }
+//
+//    if (need_compile) {
+//        ct_alloc *alloc = ct_memory_a0.main_allocator();
+//        celib::Map<uint64_t> type_name(alloc);
+//
+//        _compile_all(type_name);
+//
+//        auto *type_it = map::begin(type_name);
+//        auto *type_end = map::end(type_name);
+//
+//        uint64_t *name_array = NULL;
+//
+//        while (type_it != type_end) {
+//            uint64_t type_id = type_it->key;
+//
+//            ct_array_clean(name_array);
+//
+//            auto it = multi_map::find_first(type_name, type_id);
+//            while (it != nullptr) {
+//                ct_array_push(name_array, it->value, _G.allocator);
+//
+//                it = multi_map::find_next(type_name, it);
+//            }
+//
+//            ct_resource_a0.reload(static_cast<uint32_t>(type_id),
+//                                  reinterpret_cast<uint32_t *>(&name_array[0]),
+//                                  ct_array_size(name_array));
+//
+//            ++type_it;
+//        }
+//
+//        ct_array_free(name_array, _G.allocator);
+//    }
+//}
 
 
 static void _init_cvar(struct ct_config_a0 config) {

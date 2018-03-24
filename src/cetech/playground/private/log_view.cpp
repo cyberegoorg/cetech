@@ -131,7 +131,7 @@ static void ui_level_mask() {
 
 static void ui_log_items() {
     ImGui::BeginChild("log_view_scrolling_region",
-                      ImVec2(0, -ImGui::GetItemsLineHeightWithSpacing()),
+                      ImVec2(0, -ImGui::GetTextLineHeightWithSpacing()),
                       false, ImGuiWindowFlags_HorizontalScrollbar);
 
     const int size = ct_array_size(_G.log_items);
@@ -189,8 +189,8 @@ static void _init(ct_api_a0 *api) {
     ct_log_a0.register_handler(log_handler, NULL);
 
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window, 0);
 
 }
 

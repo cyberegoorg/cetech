@@ -212,10 +212,10 @@ static void _init(struct ct_api_a0 *api) {
             });
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0("mesh_renderer"), _component_spawner);
+                            CT_ID64_0("mesh_renderer"), _component_spawner, 0);
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0("mesh_renderer"), _mesh_component_compiler);
+                            CT_ID64_0("mesh_renderer"), _mesh_component_compiler, 0);
 
 }
 

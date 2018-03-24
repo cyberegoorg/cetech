@@ -112,9 +112,9 @@ uint64_t render_state_to_enum(uint64_t name) {
         uint64_t e;
     } _tbl[] = {
             {.name = CT_ID64_0(""), .e = 0},
-            {.name = CT_ID64_0("rgb_write"), .e = BGFX_STATE_RGB_WRITE},
-            {.name = CT_ID64_0("alpha_write"), .e = BGFX_STATE_ALPHA_WRITE},
-            {.name = CT_ID64_0("depth_write"), .e = BGFX_STATE_DEPTH_WRITE},
+            {.name = CT_ID64_0("rgb_write"), .e = BGFX_STATE_WRITE_RGB},
+            {.name = CT_ID64_0("alpha_write"), .e = BGFX_STATE_WRITE_A},
+            {.name = CT_ID64_0("depth_write"), .e = BGFX_STATE_WRITE_Z},
             {.name = CT_ID64_0("depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
             {.name = CT_ID64_0("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
             {.name = CT_ID64_0("cull_cw"), .e = BGFX_STATE_CULL_CW},

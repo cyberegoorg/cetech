@@ -13,7 +13,6 @@
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/math/fmath.h>
 #include <cetech/core/ebus/ebus.h>
-#include "cetech/core/containers/map.inl"
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/config/config.h"
@@ -34,28 +33,26 @@ CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
 
-using namespace celib;
-
 #define _G AssetPreviewGlobals
 
 static struct _G {
-    ct_alloc *allocator;
+    struct ct_alloc *allocator;
     struct ct_hash_t preview_fce_map;
-    ct_asset_preview_fce *preview_fce;
+    struct ct_asset_preview_fce *preview_fce;
 
-    ct_resource_id active_asset;
+    struct ct_resource_id active_asset;
 
     const char *active_path;
 
-    ct_world world;
-    ct_entity camera_ent;
+    struct ct_world world;
+    struct ct_entity camera_ent;
     bool visible;
     bool active;
 } _G;
 
 
-static void fps_camera_update(ct_world world,
-                              ct_entity camera_ent,
+static void fps_camera_update(struct ct_world world,
+                              struct ct_entity camera_ent,
                               float dt,
                               float dx,
                               float dy,
@@ -71,10 +68,7 @@ static void fps_camera_update(ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
-            world,
-            TRANSFORM_COMPONENT,
-            camera_ent));
+    transform = ct_ecs_a0.entity_data(world, TRANSFORM_COMPONENT, camera_ent);
 
     ct_mat4_move(wm, transform->world);
 
@@ -113,20 +107,19 @@ static void fps_camera_update(ct_world world,
 }
 
 static void on_debugui(uint32_t bus_name,
-                       void* event) {
+                       void *event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
 
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
 
         struct ct_camera_component *camera_data;
-        camera_data = static_cast<ct_camera_component *>(ct_ecs_a0.entity_data(
-                _G.world,
-                CAMERA_COMPONENT,
-                _G.camera_ent));
+        camera_data = ct_ecs_a0.entity_data(_G.world, CAMERA_COMPONENT,
+                                            _G.camera_ent);
 
-        auto th = ct_viewport_a0.get_local_resource(camera_data->viewport,
-                                                    CT_ID64_0("bb_color"));
+        struct ct_texture th = ct_viewport_a0.get_local_resource(
+                camera_data->viewport,
+                CT_ID64_0("bb_color"));
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
@@ -146,8 +139,8 @@ static void on_debugui(uint32_t bus_name,
 static void set_asset(uint32_t bus_name,
                       void *event) {
 
-    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
-    ct_resource_id rid = {.i64 = ev->asset};
+    struct ct_asset_browser_click_ev *ev = event;
+    struct ct_resource_id rid = {.i64 = ev->asset};
 
     if (_G.active_asset.i64 == rid.i64) {
         return;
@@ -156,7 +149,7 @@ static void set_asset(uint32_t bus_name,
     uint64_t idx = ct_hash_lookup(&_G.preview_fce_map, _G.active_asset.type,
                                   UINT64_MAX);
     if (idx != UINT64_MAX) {
-        ct_asset_preview_fce fce = _G.preview_fce[idx];
+        struct ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.unload) {
             fce.unload(_G.active_path, _G.active_asset, _G.world);
@@ -168,7 +161,7 @@ static void set_asset(uint32_t bus_name,
 
     idx = ct_hash_lookup(&_G.preview_fce_map, rid.type, UINT64_MAX);
     if (idx != UINT64_MAX) {
-        ct_asset_preview_fce fce = _G.preview_fce[idx];
+        struct ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.load) {
             fce.load(ev->path, rid, _G.world);
@@ -176,16 +169,15 @@ static void set_asset(uint32_t bus_name,
     }
 
     struct ct_transform_comp *transform;
-    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
-            _G.world,
-            TRANSFORM_COMPONENT,
-            _G.camera_ent));
+    transform = ct_ecs_a0.entity_data(_G.world,
+                                      TRANSFORM_COMPONENT,
+                                      _G.camera_ent);
 
 //    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
 static void init(uint32_t bus_name,
-                 void* event) {
+                 void *event) {
     _G.visible = true;
     _G.world = ct_ecs_a0.create_world();
     _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
@@ -196,18 +188,18 @@ static void init(uint32_t bus_name,
 
 
 static void update(uint32_t bus_name,
-                   void* event) {
-    ct_playground_update_ev *ev = static_cast<ct_playground_update_ev *>(event);
+                   void *event) {
+    struct ct_playground_update_ev *ev = event;
     float dt = ev->dt;
 
     if (_G.active) {
         float updown = 0.0f;
         float leftright = 0.0f;
 
-        auto up_key = ct_keyboard_a0.button_index("w");
-        auto down_key = ct_keyboard_a0.button_index("s");
-        auto left_key = ct_keyboard_a0.button_index("a");
-        auto right_key = ct_keyboard_a0.button_index("d");
+        uint32_t up_key = ct_keyboard_a0.button_index("w");
+        uint32_t down_key = ct_keyboard_a0.button_index("s");
+        uint32_t left_key = ct_keyboard_a0.button_index("a");
+        uint32_t right_key = ct_keyboard_a0.button_index("d");
 
         if (ct_keyboard_a0.button_state(0, up_key) > 0) {
             updown = 1.0f;
@@ -239,7 +231,7 @@ static void update(uint32_t bus_name,
     ct_hash_add(h, k, ct_array_size(a) - 1, al)
 
 void register_type_preview(const char *type,
-                           ct_asset_preview_fce fce) {
+                           struct ct_asset_preview_fce fce) {
     uint32_t id = CT_ID32_0(type);
     ct_instance_map(_G.preview_fce, &_G.preview_fce_map, id, fce,
                     _G.allocator);
@@ -256,26 +248,27 @@ void unregister_type_preview(const char *type) {
 }
 
 static void on_menu_window(uint32_t bus_name,
-                           void* event) {
+                           void *event) {
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
 }
 
-static ct_asset_preview_a0 asset_preview_api = {
+static struct ct_asset_preview_a0 asset_preview_api = {
         .register_type_preview = register_type_preview,
         .unregister_type_preview = unregister_type_preview
 };
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                       on_menu_window, 0);
 
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset);
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
@@ -285,7 +278,7 @@ static void _shutdown() {
     ct_hash_free(&_G.preview_fce_map, _G.allocator);
     ct_array_free(_G.preview_fce, _G.allocator);
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

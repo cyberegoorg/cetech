@@ -110,14 +110,13 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
                 .obj = obj,
         };
 
-        ct_ebus_a0.broadcast(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, &ev,
-                        sizeof(ev));
+        ct_ebus_a0.broadcast(EXPLORER_EBUS,
+                             EXPLORER_ENTITY_SELECT_EVENT, &ev, sizeof(ev));
 
         _G.selected_obj = obj;
     }
 
     if (open) {
-        ct_cdb_obj_t** children = ct_cdb_a0.children(obj);
         for (uint32_t i = 0; i < ct_array_size(children); ++i) {
             ui_entity_item_begin(children[i]);
         }
@@ -164,8 +163,8 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_explorer_a0", &level_inspector_api);
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window, 0);
 
 
     ct_ebus_a0.create_ebus(EXPLORER_EBUS_NAME, EXPLORER_EBUS);

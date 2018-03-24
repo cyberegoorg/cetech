@@ -6,6 +6,8 @@
 
 #pragma once
 
+#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+
 //---- Define your own ImVector<> type if you don't want to use the provided implementation defined in imgui.h
 //#include <vector>
 //#define ImVector  std::vector
@@ -13,7 +15,6 @@
 
 //---- Define assertion handler. Defaults to calling assert().
 #include <assert.h>
-
 #define IM_ASSERT(_EXPR, ...) assert(_EXPR)
 
 //---- Define attributes of all API symbols declarations, e.g. for DLL under Windows.
@@ -31,8 +32,8 @@
 #define IMGUI_INCLUDE_IMGUI_USER_H
 
 //---- Don't implement default handlers for Windows (so as not to link with OpenClipboard() and others Win32 functions)
-#define IMGUI_DISABLE_WIN32_DEFAULT_CLIPBOARD_FUNCS
-#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCS
+#define IMGUI_DISABLE_WIN32_DEFAULT_CLIPBOARD_FUNCTIONS
+#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCTIONS
 
 //---- Don't implement help and test window functionality (ShowUserGuide()/ShowStyleEditor()/ShowTestWindow() methods will be empty)
 //#define IMGUI_DISABLE_TEST_WINDOWS

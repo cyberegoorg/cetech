@@ -124,7 +124,6 @@ struct ct_ydb_a0 {
 
     void (*save_all_modified)();
 
-    void (*check_fs)();
 };
 
 #ifdef __cplusplus

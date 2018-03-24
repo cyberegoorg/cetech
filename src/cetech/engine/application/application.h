@@ -1,6 +1,3 @@
-//! \defgroup Application
-//! Main application
-//! \{
 #ifndef CETECH_APPLICATION_API_H
 #define CETECH_APPLICATION_API_H
 
@@ -54,7 +51,6 @@ struct ct_game_fce {
 
 //! Application API V0
 struct ct_app_a0 {
-    //! Stop main loop and quit.
     void (*quit)();
 
     void (*start)();
@@ -65,7 +61,6 @@ struct ct_app_a0 {
     void (*unregister_game)(uint64_t name);
 
     void (*set_active_game)(uint64_t name);
-
 };
 
 #ifdef __cplusplus

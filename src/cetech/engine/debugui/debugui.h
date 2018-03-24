@@ -31,6 +31,8 @@ typedef int ImGuiSetCond;
 typedef int ImGuiInputTextFlags;
 typedef int ImGuiSelectableFlags;
 typedef int ImGuiTreeNodeFlags;
+typedef int ImGuiFocusedFlags;
+typedef int ImGuiColorEditFlags;
 typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 typedef void (*ImGuiSizeConstraintCallback)(struct ImGuiSizeConstraintCallbackData *data);
 
@@ -288,18 +290,10 @@ struct ct_debugui_a0 {
                    int items_count,
                    int height_in_items);
 
-    bool (*ColorButton)(const _vec4 col,
-                        bool small_height,
-                        bool outline_border);
 
-    bool (*ColorEdit3)(const char *label,
-                       float col[3]);
+    bool (*ColorEdit3)(const char* label, float col[3], ImGuiColorEditFlags flags);
 
-    bool (*ColorEdit4)(const char *label,
-                       float *rgba,
-                       bool show_alpha);
-
-    void (*ColorEditMode)(ImGuiColorEditMode mode);
+    bool (*ColorEdit4)(const char* label, float col[3], ImGuiColorEditFlags flags);
 
     void (*PlotLines)(const char *label,
                       const float *values,
@@ -661,12 +655,6 @@ struct ct_debugui_a0 {
                    float v,
                    const char *float_format);
 
-    void (*ValueColor)(const char *prefix,
-                       const _vec4 v);
-
-    void (*ValueColor2)(const char *prefix,
-                        ImU32 v);
-
     void (*SetTooltip)(const char *fmt,
                        ...) CTECH_ATTR_FORMAT(1, 2);
 
@@ -702,7 +690,7 @@ struct ct_debugui_a0 {
 
     void (*OpenPopup)(const char *str_id);
 
-    bool (*BeginPopup)(const char *str_id);
+    bool (*BeginPopup)(const char *str_id, ImGuiWindowFlags flags);
 
     bool (*BeginPopupModal)(const char *name,
                             bool *p_open,
@@ -711,9 +699,7 @@ struct ct_debugui_a0 {
     bool (*BeginPopupContextItem)(const char *str_id,
                                   int mouse_button);
 
-    bool (*BeginPopupContextWindow)(bool also_over_items,
-                                    const char *str_id,
-                                    int mouse_button);
+    bool (*BeginPopupContextWindow)(const char* str_id, int mouse_button, bool also_over_items);
 
     bool (*BeginPopupContextVoid)(const char *str_id,
                                   int mouse_button);
@@ -730,7 +716,7 @@ struct ct_debugui_a0 {
                         uint32_t *rgba,
                         float size);
 
-    bool (*IsWindowFocused)();
+    bool (*IsWindowFocused)(ImGuiFocusedFlags flags);
 
     bool (*IsMouseHoveringWindow)();
 

@@ -495,10 +495,10 @@ static void init(struct ct_api_a0 *api) {
     });
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0("scenegraph"), _component_spawner);
+                            CT_ID64_0("scenegraph"), _component_spawner, 0);
 
-    ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
-    ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);
+    ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
+    ct_ebus_a0.connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
 
 }
 

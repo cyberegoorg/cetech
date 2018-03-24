@@ -714,7 +714,7 @@ static void online(uint64_t name,
 
         ct_ebus_a0.connect_addr(CDB_EBUS,
                                 CDB_OBJ_CHANGE, (uint64_t) eobj,
-                                _on_obj_change);
+                                _on_obj_change, 0);
 
 
         objs[i] = eobj;

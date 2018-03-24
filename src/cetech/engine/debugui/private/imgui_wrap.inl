@@ -1,4 +1,5 @@
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
+#include <cetech/engine/debugui/private/ocornut-imgui/imgui_internal.h>
 
 #define  _to_imvec2(a) (*((ImVec2*) (a)))
 #define  _to_imvec4(a) (*((ImVec4*) (a)))
@@ -99,18 +100,6 @@ namespace imgui_wrap {
                 height_in_items);
     }
 
-    bool ColorButton(const _vec4 col,
-                     bool small_height,
-                     bool outline_border) {
-        return ImGui::ColorButton(
-                _to_imvec4(col),
-                           small_height,
-                           outline_border);
-    }
-
-    void ColorEditMode(ImGuiColorEditMode mode) {
-        ImGui::ColorEditMode(mode);
-    }
 
     void PlotLines(const char *label,
                    const float *values,
@@ -621,18 +610,6 @@ namespace imgui_wrap {
                 float_format);
     }
 
-    void ValueColor(const char *prefix,
-                    const _vec4 v) {
-        return ImGui::ValueColor(
-                prefix,
-                (ImVec4 &) v);
-    }
-
-    void ValueColor2(const char *prefix,
-                     ImU32 v) {
-        return ImGui::ValueColor(prefix, v);
-    }
-
     bool MenuItem2(const char *label,
                    const char *shortcut,
                    bool *p_selected,
@@ -667,10 +644,34 @@ namespace imgui_wrap {
     }
 
 
+    void VSplitter(const char* str_id, float size[2])
+    {
+        ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+        ImGui::InvisibleButton(str_id, ImVec2(3, -1));
+        ImVec2 end_pos = {screen_pos.x + ImGui::GetItemRectSize().x, screen_pos.y + ImGui::GetItemRectSize().y} ;
+        ImGuiWindow* win = ImGui::GetCurrentWindow();
+        ImVec4* colors = ImGui::GetStyle().Colors;
+        ImU32 color = ImGui::GetColorU32(ImGui::IsItemActive() || ImGui::IsItemHovered() ? colors[ImGuiCol_ButtonActive] : colors[ImGuiCol_Button]);
+        win->DrawList->AddRectFilled(screen_pos, end_pos, color);
+        if (ImGui::IsItemActive())
+        {
+            size[0] = ImMax(1.0f, ImGui::GetIO().MouseDelta.x + size[0]);
+        }
+    }
+
     void HSplitter(const char* str_id, float size[2]) {
-        ImGui::HSplitter(str_id, &_to_imvec2(size));
+        ImVec2 screen_pos = ImGui::GetCursorScreenPos();
+        ImGui::InvisibleButton(str_id, ImVec2(-1, 3));
+        ImVec2 end_pos = {screen_pos.x + ImGui::GetItemRectSize().x, screen_pos.y + ImGui::GetItemRectSize().y} ;
+        ImGuiWindow* win = ImGui::GetCurrentWindow();
+        ImVec4* colors = ImGui::GetStyle().Colors;
+        ImU32 color = ImGui::GetColorU32(ImGui::IsItemActive() || ImGui::IsItemHovered() ? colors[ImGuiCol_ButtonActive] : colors[ImGuiCol_Button]);
+        win->DrawList->AddRectFilled(screen_pos, end_pos, color);
+        if (ImGui::IsItemActive())
+        {
+            size[1] = ImMax(1.0f, ImGui::GetIO().MouseDelta.y + size[1]);
+        }
     }
-    void VSplitter(const char* str_id, float size[2]) {
-        ImGui::VSplitter(str_id, &_to_imvec2(size));
-    }
+
+    static inline bool  IsMouseHoveringWindow()               { return ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem); }
 }

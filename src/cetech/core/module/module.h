@@ -84,8 +84,6 @@ struct ct_module_a0 {
 
     //! Reload all loaded modules
     void (*reload_all)();
-
-    void (*check_modules)();
 };
 
 #ifdef __cplusplus

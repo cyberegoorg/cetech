@@ -164,11 +164,11 @@ static void _init(struct ct_api_a0 *api) {
     });
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0("camera"), _component_spawner);
+                            CT_ID64_0("camera"), _component_spawner, 0);
 
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0("camera"), _camera_compiler);
+                            CT_ID64_0("camera"), _camera_compiler, 0);
 
 
     ct_ecs_a0.register_simulation("render", render_simu);

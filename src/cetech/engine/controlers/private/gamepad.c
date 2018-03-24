@@ -203,7 +203,7 @@ static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {};
 
     ct_ebus_a0.connect(APPLICATION_EBUS,
-                                APP_UPDATE_EVENT, update);
+                                APP_UPDATE_EVENT, update, 0);
 
     ct_ebus_a0.create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
 

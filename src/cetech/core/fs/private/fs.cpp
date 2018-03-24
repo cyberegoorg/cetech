@@ -241,8 +241,8 @@ static void listdir(uint64_t root,
         ct_buffer_free(final_path, a);
     }
 
-    char **result_files = CT_ALLOC(a, char*, sizeof(char *) *
-                                                 ct_array_size(all_files));
+    char **result_files = CT_ALLOC(a, char*,
+                                   sizeof(char *) *ct_array_size(all_files));
 
     for (uint32_t i = 0; i < ct_array_size(all_files); ++i) {
         result_files[i] = all_files[i];
@@ -298,88 +298,70 @@ static int64_t get_file_mtime(uint64_t root,
     return ret;
 }
 
-static void clean_events(fs_root *fs_inst) {
-    auto *wd_it = celib::eventstream::begin<ct_watchdog_ev_header>(
-            fs_inst->event_stream);
-    const auto *wd_end = celib::eventstream::end<ct_watchdog_ev_header>(
-            fs_inst->event_stream);
 
-    while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
-            CT_FREE(ct_memory_a0.main_allocator(), ev->filename);
-//              CT_FREE(ct_memory_a0.main_allocator(), ev->dir);
-        }
+//static void check_wd() {
+//    ct_alloc *alloc = ct_memory_a0.main_allocator();
+//    const uint32_t root_count = ct_array_size(_G.roots);
+//
+//    for (uint32_t i = 0; i < root_count; ++i) {
+//        fs_root *fs_inst = &_G.roots[i];
+//        const uint32_t mp_count = ct_array_size(fs_inst->mount_points);
+//
+//        clean_events(fs_inst);
+//
+//        for (uint32_t j = 0; j < mp_count; ++j) {
+//            fs_mount_point *mp = &fs_inst->mount_points[j];
+//            const uint32_t root_path_len = strlen(mp->root_path);
+//
+//            auto *wd = mp->wd;
+//            if (!wd) {
+//                continue;
+//            }
+//
+//            wd->fetch_events(wd->inst);
+//
+//            auto *wd_it = wd->event_begin(wd->inst);
+//            const auto *wd_end = wd->event_end(wd->inst);
+//
+//            while (wd_it != wd_end) {
+//                if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+//                    ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
+//
+//                    ct_wd_ev_file_write_end new_ev = *ev;
+//
+//                    new_ev.dir = ct_memory_a0.str_dup(
+//                            ev->dir + root_path_len + 1, alloc);
+//                    new_ev.filename = ct_memory_a0.str_dup(ev->filename, alloc);
+//
+//                    celib::eventstream::push<ct_watchdog_ev_header>(
+//                            fs_inst->event_stream,
+//                            CT_WATCHDOG_EVENT_FILE_MODIFIED,
+//                            new_ev);
+//                }
+//
+//                wd_it = wd->event_next(wd, wd_it);
+//            }
+//        }
+//    }
+//}
 
-        wd_it = celib::eventstream::next<ct_watchdog_ev_header>(wd_it);
-    }
-
-    celib::eventstream::clear(fs_inst->event_stream);
-}
-
-static void check_wd() {
-    ct_alloc *alloc = ct_memory_a0.main_allocator();
-    const uint32_t root_count = ct_array_size(_G.roots);
-
-    for (uint32_t i = 0; i < root_count; ++i) {
-        fs_root *fs_inst = &_G.roots[i];
-        const uint32_t mp_count = ct_array_size(fs_inst->mount_points);
-
-        clean_events(fs_inst);
-
-        for (uint32_t j = 0; j < mp_count; ++j) {
-            fs_mount_point *mp = &fs_inst->mount_points[j];
-            const uint32_t root_path_len = strlen(mp->root_path);
-
-            auto *wd = mp->wd;
-            if (!wd) {
-                continue;
-            }
-
-            wd->fetch_events(wd->inst);
-
-            auto *wd_it = wd->event_begin(wd->inst);
-            const auto *wd_end = wd->event_end(wd->inst);
-
-            while (wd_it != wd_end) {
-                if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-                    ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
-
-                    ct_wd_ev_file_write_end new_ev = *ev;
-
-                    new_ev.dir = ct_memory_a0.str_dup(
-                            ev->dir + root_path_len + 1, alloc);
-                    new_ev.filename = ct_memory_a0.str_dup(ev->filename, alloc);
-
-                    celib::eventstream::push<ct_watchdog_ev_header>(
-                            fs_inst->event_stream,
-                            CT_WATCHDOG_EVENT_FILE_MODIFIED,
-                            new_ev);
-                }
-
-                wd_it = wd->event_next(wd, wd_it);
-            }
-        }
-    }
-}
-
-static ct_watchdog_ev_header *event_begin(uint64_t root) {
-    fs_root *fs_inst = get_fs_root(root);
-
-    return celib::eventstream::begin<ct_watchdog_ev_header>(
-            fs_inst->event_stream);
-}
-
-static ct_watchdog_ev_header *event_end(uint64_t root) {
-    fs_root *fs_inst = get_fs_root(root);
-
-    return celib::eventstream::end<ct_watchdog_ev_header>(
-            fs_inst->event_stream);
-}
-
-static ct_watchdog_ev_header *event_next(ct_watchdog_ev_header *header) {
-    return celib::eventstream::next<ct_watchdog_ev_header>(header);
-}
+//static ct_watchdog_ev_header *event_begin(uint64_t root) {
+//    fs_root *fs_inst = get_fs_root(root);
+//
+//    return celib::eventstream::begin<ct_watchdog_ev_header>(
+//            fs_inst->event_stream);
+//}
+//
+//static ct_watchdog_ev_header *event_end(uint64_t root) {
+//    fs_root *fs_inst = get_fs_root(root);
+//
+//    return celib::eventstream::end<ct_watchdog_ev_header>(
+//            fs_inst->event_stream);
+//}
+//
+//static ct_watchdog_ev_header *event_next(ct_watchdog_ev_header *header) {
+//    return celib::eventstream::next<ct_watchdog_ev_header>(header);
+//}
 
 static void _get_full_path(uint64_t root,
                            const char *path,
@@ -408,12 +390,7 @@ static ct_fs_a0 _api = {
         .listdir_iter = listdir2,
         .create_directory = create_directory,
         .file_mtime = get_file_mtime,
-        .check_wd = check_wd,
-        .event_begin = event_begin,
-        .event_end = event_end,
-        .event_next = event_next,
         .get_full_path = _get_full_path,
-//            .fullpath = get_fullpath
 };
 
 static void _init_api(ct_api_a0 *api) {

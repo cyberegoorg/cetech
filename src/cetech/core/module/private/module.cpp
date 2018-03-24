@@ -283,47 +283,47 @@ static void unload_all() {
     }
 }
 
-static void check_modules() {
-    ct_alloc *alloc = ct_memory_a0.main_allocator();
-
-    static uint64_t root = CT_ID64_0("modules");
-
-    auto *wd_it = ct_fs_a0.event_begin(root);
-    const auto *wd_end = ct_fs_a0.event_end(root);
-
-    while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
-
-            const char *ext = ct_path_a0.extension(ev->filename);
-
-            if ((NULL != ext) && (strcmp(ext, "so") == 0)) {
-
-
-                char *path = NULL;
-                ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
-
-                char full_path[4096];
-                ct_fs_a0.get_full_path(root, path, full_path,
-                                               CT_ARRAY_LEN(full_path));
-
-                int pat_size = strlen(full_path);
-                int ext_size = strlen(ext);
-                full_path[pat_size - ext_size - 1] = '\0';
-
-                ct_log_a0.info(LOG_WHERE,
-                               "Reload module from path \"%s\"",
-                               full_path);
-
-                reload(full_path);
-
-                ct_buffer_free(path, alloc);
-            }
-        }
-
-        wd_it = ct_fs_a0.event_next(wd_it);
-    }
-}
+//static void check_modules() {
+//    ct_alloc *alloc = ct_memory_a0.main_allocator();
+//
+//    static uint64_t root = CT_ID64_0("modules");
+//
+//    auto *wd_it = ct_fs_a0.event_begin(root);
+//    const auto *wd_end = ct_fs_a0.event_end(root);
+//
+//    while (wd_it != wd_end) {
+//        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+//            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
+//
+//            const char *ext = ct_path_a0.extension(ev->filename);
+//
+//            if ((NULL != ext) && (strcmp(ext, "so") == 0)) {
+//
+//
+//                char *path = NULL;
+//                ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
+//
+//                char full_path[4096];
+//                ct_fs_a0.get_full_path(root, path, full_path,
+//                                               CT_ARRAY_LEN(full_path));
+//
+//                int pat_size = strlen(full_path);
+//                int ext_size = strlen(ext);
+//                full_path[pat_size - ext_size - 1] = '\0';
+//
+//                ct_log_a0.info(LOG_WHERE,
+//                               "Reload module from path \"%s\"",
+//                               full_path);
+//
+//                reload(full_path);
+//
+//                ct_buffer_free(path, alloc);
+//            }
+//        }
+//
+//        wd_it = ct_fs_a0.event_next(wd_it);
+//    }
+//}
 
 static ct_module_a0 module_api = {
         .reload = reload,
@@ -332,7 +332,6 @@ static ct_module_a0 module_api = {
         .load = load,
         .unload_all = unload_all,
         .load_dirs = load_dirs,
-        .check_modules = check_modules
 };
 
 //static const char* _get_load_dir() {

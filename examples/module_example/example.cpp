@@ -74,15 +74,15 @@ void module1() {
                 ct_log_a0.debug("dasdsa", "dsadsdsadsadsadasd");
             }
 
-        static float col[4] = {0.0f, 1.0f, 0.0f, 0.0f};
-        ct_debugui_a0.ColorButton(col, 1, 2);
+//        static float col[4] = {0.0f, 1.0f, 0.0f, 0.0f};
+//        ct_debugui_a0.ColorButton(col, 1, 2);
 
         static float vv;
         ct_debugui_a0.DragFloat("FOO:", &vv, 1.0f, 0.0f, 10000.0f, "%.3f",
                                 1.0f);
 
         static float col2[4] = {0.0f, 1.0f, 0.0f, 0.0f};
-        ct_debugui_a0.ColorEdit3("COLOR", col2);
+        ct_debugui_a0.ColorEdit3("COLOR", col2, 0);
 
         static float col3[4] = {0.0f, 1.0f, 0.0f, 0.0f};
         ct_debugui_a0.ColorWheel("WHEEE", col3, 0.2f);
@@ -150,7 +150,7 @@ CETECH_MODULE_DEF(
             ct_log_a0.info("example", "Init %d", reload);
 
             ct_ebus_a0.connect(APPLICATION_EBUS,
-                                        APP_UPDATE_EVENT, update);
+                                        APP_UPDATE_EVENT, update, 0);
 
 
             ct_debugui_a0.register_on_debugui(module1);

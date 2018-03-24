@@ -1,3 +1,5 @@
+#undef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
+
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/renderer/texture.h>
@@ -28,6 +30,8 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+
+
 
 using namespace celib;
 
@@ -176,10 +180,8 @@ static ct_debugui_a0 debugui_api = {
         .Combo = ImGui::Combo,
         .Combo2 = imgui_wrap::Combo2,
         .Combo3 = imgui_wrap::Combo3,
-        .ColorButton = imgui_wrap::ColorButton,
         .ColorEdit3 = ImGui::ColorEdit3,
         .ColorEdit4 = ImGui::ColorEdit4,
-        .ColorEditMode = imgui_wrap::ColorEditMode,
         .PlotLines = imgui_wrap::PlotLines,
         .PlotLines2 = imgui_wrap::PlotLines2,
         .PlotHistogram = imgui_wrap::PlotHistogram,
@@ -245,8 +247,7 @@ static ct_debugui_a0 debugui_api = {
         .Value2 = imgui_wrap::Value2,
         .Value3 = imgui_wrap::Value3,
         .Value4 = imgui_wrap::Value4,
-        .ValueColor = imgui_wrap::ValueColor,
-        .ValueColor2 = imgui_wrap::ValueColor2,
+
         .SetTooltip = ImGui::SetTooltip,
         .SetTooltipV = ImGui::SetTooltipV,
         .BeginTooltip = ImGui::BeginTooltip,
@@ -273,7 +274,7 @@ static ct_debugui_a0 debugui_api = {
         .BeginDock = imgui_wrap::BeginDock,
         .EndDock = ImGui::EndDock,
         .IsWindowFocused = ImGui::IsWindowFocused,
-        .IsMouseHoveringWindow = ImGui::IsMouseHoveringWindow,
+        .IsMouseHoveringWindow = imgui_wrap::IsMouseHoveringWindow,
         .SameLine = ImGui::SameLine,
         .HSplitter = imgui_wrap::HSplitter,
         .VSplitter = imgui_wrap::VSplitter,

@@ -1,14 +1,17 @@
-namespace ImGui {
-    struct MemoryEditor {
-        bool AllowEdits;
-        bool HexII;
-        int Rows;
-        int DataEditingAddr;
-        bool DataEditingTakeFocus;
-        char DataInput[32];
-        char AddrInput[32];
+namespace ImGui
+{
+    struct MemoryEditor
+    {
+        bool    AllowEdits;
+        bool    HexII;
+        int     Rows;
+        int     DataEditingAddr;
+        bool    DataEditingTakeFocus;
+        char    DataInput[32];
+        char    AddrInput[32];
 
-        MemoryEditor() {
+        MemoryEditor()
+        {
             AllowEdits = true;
             HexII = true;
             Rows = 16;
@@ -18,12 +21,7 @@ namespace ImGui {
             strcpy(AddrInput, "");
         }
 
-        void Draw(void *mem_data,
-                  int mem_size,
-                  int base_display_addr = 0);
-
-        void Draw(const void *mem_data,
-                  int mem_size,
-                  int base_display_addr = 0);
+        void Draw(void* mem_data, int mem_size, int base_display_addr = 0);
+        void Draw(const void* mem_data, int mem_size, int base_display_addr = 0);
     };
 } // namespace ImGui

@@ -44,12 +44,14 @@ struct ct_ebus_a0 {
 
     void (*connect)(uint32_t bus_name,
                     uint64_t event,
-                    ct_ebus_handler *handler);
+                    ct_ebus_handler *handler,
+                    uint32_t order);
 
     void (*connect_addr)(uint32_t bus_name,
                          uint64_t event,
                          uint64_t addr,
-                         ct_ebus_handler *handler);
+                         ct_ebus_handler *handler,
+                         uint32_t order);
 
     void *(*first_event)(uint32_t bus_name);
 

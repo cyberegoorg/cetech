@@ -1,13 +1,12 @@
-#include "cetech/core/containers/map.inl"
-
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_property.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/asset_browser.h>
-#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
+
 #include <cetech/core/containers/hash.h>
 #include <cetech/core/ebus/ebus.h>
+#include <cetech/core/yaml/ydb.h>
 
 #include "cetech/core/hashlib/hashlib.h"
 #include "cetech/core/config/config.h"
@@ -26,12 +25,12 @@ CETECH_DECL_API(ct_ebus_a0);
 
 #define _G asset_property_global
 static struct _G {
-    ct_hash_t on_asset_map;
+    struct ct_hash_t on_asset_map;
     ct_ap_on_asset *on_asset;
 
     ct_ap_on_asset active_on_asset;
 
-    ct_resource_id active_asset;
+    struct ct_resource_id active_asset;
 
     const char *active_path;
     struct ct_alloc *allocator;
@@ -66,8 +65,8 @@ static void register_asset(uint32_t type,
 
 static void set_asset(uint32_t bus_name,
                       void *event) {
-    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
-    ct_resource_id rid = {.i64 = ev->asset};
+    struct ct_asset_browser_click_ev *ev = event;
+    struct ct_resource_id rid = {.i64 = ev->asset};
 
 
     uint32_t idx = ct_hash_lookup(&_G.on_asset_map, rid.type, UINT32_MAX);
@@ -79,19 +78,19 @@ static void set_asset(uint32_t bus_name,
     ct_property_editor_a0.set_active(on_debugui);
 }
 
-static ct_asset_property_a0 asset_property_api = {
+static struct ct_asset_property_a0 asset_property_api = {
         .register_asset = register_asset,
 };
 
 
-static void _init(ct_api_a0 *api) {
-    _G = {
+static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G){
             .allocator = ct_memory_a0.main_allocator()
     };
 
     api->register_api("ct_asset_property_a0", &asset_property_api);
 
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, set_asset);
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, set_asset, 0);
 
 }
 
@@ -101,7 +100,7 @@ static void _shutdown() {
 
 
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

@@ -8,12 +8,30 @@
 #include <bx/allocator.h>
 #include <bx/math.h>
 #include <bx/timer.h>
-#include <cetech/core/module/module.h>
+#include <cetech/engine/debugui/private/bgfx_utils.h>
 
-#include "cetech/engine/debugui/private/ocornut-imgui/imgui.h"
+#include "../ocornut-imgui/imgui.h"
 
 #include "imgui.h"
 
+//#define USE_ENTRY 1
+
+#ifndef USE_ENTRY
+#	if defined(SCI_NAMESPACE)
+#		define USE_ENTRY 1
+#	else
+#		define USE_ENTRY 0
+#	endif // defined(SCI_NAMESPACE)
+#endif // USE_ENTRY
+
+#if USE_ENTRY
+#	include "../entry/entry.h"
+#	include "../entry/input.h"
+#endif // USE_ENTRY
+
+#if defined(SCI_NAMESPACE)
+#	include "scintilla.h"
+#endif // defined(SCI_NAMESPACE)
 
 #include "vs_ocornut_imgui.bin.h"
 #include "fs_ocornut_imgui.bin.h"
@@ -26,524 +44,449 @@
 #include "icons_font_awesome.ttf.h"
 
 static const bgfx::EmbeddedShader s_embeddedShaders[] =
-        {
-                BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
-                BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
-                BGFX_EMBEDDED_SHADER(vs_imgui_image),
-                BGFX_EMBEDDED_SHADER(fs_imgui_image),
+{
+	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER(vs_imgui_image),
+	BGFX_EMBEDDED_SHADER(fs_imgui_image),
 
-                BGFX_EMBEDDED_SHADER_END()
-        };
+	BGFX_EMBEDDED_SHADER_END()
+};
 
-struct FontRangeMerge {
-    const void *data;
-    size_t size;
-    ImWchar ranges[3];
+struct FontRangeMerge
+{
+	const void* data;
+	size_t      size;
+	ImWchar     ranges[3];
 };
 
 static FontRangeMerge s_fontRangeMerge[] =
-        {
-                {s_iconsKenneyTtf,      sizeof(s_iconsKenneyTtf),      {ICON_MIN_KI, ICON_MAX_KI, 0}},
-                {s_iconsFontAwesomeTtf, sizeof(s_iconsFontAwesomeTtf), {ICON_MIN_FA, ICON_MAX_FA, 0}},
-        };
+{
+	{ s_iconsKenneyTtf,      sizeof(s_iconsKenneyTtf),      { ICON_MIN_KI, ICON_MAX_KI, 0 } },
+	{ s_iconsFontAwesomeTtf, sizeof(s_iconsFontAwesomeTtf), { ICON_MIN_FA, ICON_MAX_FA, 0 } },
+};
 
-static void *memAlloc(size_t _size);
+static void* memAlloc(size_t _size, void* _userData);
+static void memFree(void* _ptr, void* _userData);
 
-static void memFree(void *_ptr);
+struct OcornutImguiContext
+{
+	void render(ImDrawData* _drawData)
+	{
+		const ImGuiIO& io = ImGui::GetIO();
+		const float width  = io.DisplaySize.x;
+		const float height = io.DisplaySize.y;
 
+		bgfx::setViewName(m_viewId, "ImGui");
+		bgfx::setViewMode(m_viewId, bgfx::ViewMode::Sequential);
 
-inline bool checkAvailTransientBuffers(uint32_t _numVertices,
-                                       const bgfx::VertexDecl &_decl,
-                                       uint32_t _numIndices) {
-    return _numVertices ==
-           bgfx::getAvailTransientVertexBuffer(_numVertices, _decl)
-           && _numIndices == bgfx::getAvailTransientIndexBuffer(_numIndices);
-}
+		const bgfx::HMD*  hmd  = bgfx::getHMD();
+		const bgfx::Caps* caps = bgfx::getCaps();
+		if (NULL != hmd && 0 != (hmd->flags & BGFX_HMD_RENDERING) )
+		{
+			float proj[16];
+			bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 
-struct OcornutImguiContext {
-    static void renderDrawLists(ImDrawData *_drawData);
+			static float time = 0.0f;
+			time += 0.05f;
 
-    void render(ImDrawData *_drawData) {
-        const ImGuiIO &io = ImGui::GetIO();
-        const float width = io.DisplaySize.x;
-        const float height = io.DisplaySize.y;
+			const float dist = 10.0f;
+			const float offset0 = -proj[8] + (hmd->eye[0].viewOffset[0] / dist * proj[0]);
+			const float offset1 = -proj[8] + (hmd->eye[1].viewOffset[0] / dist * proj[0]);
 
-        bgfx::setViewName(m_viewId, "ImGui");
-        bgfx::setViewMode(m_viewId, bgfx::ViewMode::Sequential);
+			float ortho[2][16];
+			const float viewOffset = width/4.0f;
+			const float viewWidth  = width/2.0f;
+			bx::mtxOrtho(ortho[0], viewOffset, viewOffset + viewWidth, height, 0.0f, 0.0f, 1000.0f, offset0, caps->homogeneousDepth);
+			bx::mtxOrtho(ortho[1], viewOffset, viewOffset + viewWidth, height, 0.0f, 0.0f, 1000.0f, offset1, caps->homogeneousDepth);
+			bgfx::setViewTransform(m_viewId, NULL, ortho[0], BGFX_VIEW_STEREO, ortho[1]);
+			bgfx::setViewRect(m_viewId, 0, 0, hmd->width, hmd->height);
+		}
+		else
+		{
+			float ortho[16];
+			bx::mtxOrtho(ortho, 0.0f, width, height, 0.0f, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
+			bgfx::setViewTransform(m_viewId, NULL, ortho);
+			bgfx::setViewRect(m_viewId, 0, 0, uint16_t(width), uint16_t(height) );
+		}
 
-        const bgfx::HMD *hmd = bgfx::getHMD();
-        const bgfx::Caps *caps = bgfx::getCaps();
-        if (NULL != hmd && 0 != (hmd->flags & BGFX_HMD_RENDERING)) {
-            float proj[16];
-            bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 100.0f,
-                        bgfx::getCaps()->homogeneousDepth);
+		// Render command lists
+		for (int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
+		{
+			bgfx::TransientVertexBuffer tvb;
+			bgfx::TransientIndexBuffer tib;
 
-            static float time = 0.0f;
-            time += 0.05f;
+			const ImDrawList* drawList = _drawData->CmdLists[ii];
+			uint32_t numVertices = (uint32_t)drawList->VtxBuffer.size();
+			uint32_t numIndices  = (uint32_t)drawList->IdxBuffer.size();
 
-            const float dist = 10.0f;
-            const float offset0 =
-                    -proj[8] + (hmd->eye[0].viewOffset[0] / dist * proj[0]);
-            const float offset1 =
-                    -proj[8] + (hmd->eye[1].viewOffset[0] / dist * proj[0]);
+			if (!checkAvailTransientBuffers(numVertices, m_decl, numIndices) )
+			{
+				// not enough space in transient buffer just quit drawing the rest...
+				break;
+			}
 
-            float ortho[2][16];
-            const float viewOffset = width / 4.0f;
-            const float viewWidth = width / 2.0f;
-            bx::mtxOrtho(ortho[0], viewOffset, viewOffset + viewWidth, height,
-                         0.0f, 0.0f, 1000.0f, offset0, caps->homogeneousDepth);
-            bx::mtxOrtho(ortho[1], viewOffset, viewOffset + viewWidth, height,
-                         0.0f, 0.0f, 1000.0f, offset1, caps->homogeneousDepth);
-            bgfx::setViewTransform(m_viewId, NULL, ortho[0], BGFX_VIEW_STEREO,
-                                   ortho[1]);
-            bgfx::setViewRect(m_viewId, 0, 0, hmd->width, hmd->height);
-        } else {
-            float ortho[16];
-            bx::mtxOrtho(ortho, 0.0f, width, height, 0.0f, 0.0f, 1000.0f, 0.0f,
-                         caps->homogeneousDepth);
-            bgfx::setViewTransform(m_viewId, NULL, ortho);
-            bgfx::setViewRect(m_viewId, 0, 0, uint16_t(width),
-                              uint16_t(height));
-        }
+			bgfx::allocTransientVertexBuffer(&tvb, numVertices, m_decl);
+			bgfx::allocTransientIndexBuffer(&tib, numIndices);
 
-        // Render command lists
-        for (int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii) {
-            bgfx::TransientVertexBuffer tvb;
-            bgfx::TransientIndexBuffer tib;
+			ImDrawVert* verts = (ImDrawVert*)tvb.data;
+			bx::memCopy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert) );
 
-            const ImDrawList *drawList = _drawData->CmdLists[ii];
-            uint32_t numVertices = (uint32_t) drawList->VtxBuffer.size();
-            uint32_t numIndices = (uint32_t) drawList->IdxBuffer.size();
+			ImDrawIdx* indices = (ImDrawIdx*)tib.data;
+			bx::memCopy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx) );
 
-            if (!checkAvailTransientBuffers(numVertices, m_decl, numIndices)) {
-                // not enough space in transient buffer just quit drawing the rest...
-                break;
-            }
+			uint32_t offset = 0;
+			for (const ImDrawCmd* cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end(); cmd != cmdEnd; ++cmd)
+			{
+				if (cmd->UserCallback)
+				{
+					cmd->UserCallback(drawList, cmd);
+				}
+				else if (0 != cmd->ElemCount)
+				{
+					uint64_t state = 0
+						| BGFX_STATE_WRITE_RGB
+						| BGFX_STATE_WRITE_A
+						| BGFX_STATE_MSAA
+						;
 
-            bgfx::allocTransientVertexBuffer(&tvb, numVertices, m_decl);
-            bgfx::allocTransientIndexBuffer(&tib, numIndices);
+					bgfx::TextureHandle th = m_texture;
+					bgfx::ProgramHandle program = m_program;
 
-            ImDrawVert *verts = (ImDrawVert *) tvb.data;
-            bx::memCopy(verts, drawList->VtxBuffer.begin(),
-                        numVertices * sizeof(ImDrawVert));
+					if (NULL != cmd->TextureId)
+					{
+						union { ImTextureID ptr; struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; } texture = { cmd->TextureId };
+						state |= 0 != (IMGUI_FLAGS_ALPHA_BLEND & texture.s.flags)
+							? BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+							: BGFX_STATE_NONE
+							;
+						th = texture.s.handle;
+						if (0 != texture.s.mip)
+						{
+							const float lodEnabled[4] = { float(texture.s.mip), 1.0f, 0.0f, 0.0f };
+							bgfx::setUniform(u_imageLodEnabled, lodEnabled);
+							program = m_imageProgram;
+						}
+					}
+					else
+					{
+						state |= BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+					}
 
-            ImDrawIdx *indices = (ImDrawIdx *) tib.data;
-            bx::memCopy(indices, drawList->IdxBuffer.begin(),
-                        numIndices * sizeof(ImDrawIdx));
+					const uint16_t xx = uint16_t(bx::max(cmd->ClipRect.x, 0.0f) );
+					const uint16_t yy = uint16_t(bx::max(cmd->ClipRect.y, 0.0f) );
+					bgfx::setScissor(xx, yy
+							, uint16_t(bx::min(cmd->ClipRect.z, 65535.0f)-xx)
+							, uint16_t(bx::min(cmd->ClipRect.w, 65535.0f)-yy)
+							);
 
-            uint32_t offset = 0;
-            for (const ImDrawCmd *cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end();
-                 cmd != cmdEnd; ++cmd) {
-                if (cmd->UserCallback) {
-                    cmd->UserCallback(drawList, cmd);
-                } else if (0 != cmd->ElemCount) {
-                    uint64_t state = 0
-                                     | BGFX_STATE_RGB_WRITE
-                                     | BGFX_STATE_ALPHA_WRITE
-                                     | BGFX_STATE_MSAA;
+					bgfx::setState(state);
+					bgfx::setTexture(0, s_tex, th);
+					bgfx::setVertexBuffer(0, &tvb, 0, numVertices);
+					bgfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
+					bgfx::submit(cmd->ViewId, program);
+				}
 
-                    bgfx::TextureHandle th = m_texture;
-                    bgfx::ProgramHandle program = m_program;
+				offset += cmd->ElemCount;
+			}
+		}
+	}
 
-                    if (NULL != cmd->TextureId) {
-                        union {
-                            ImTextureID ptr;
-                            struct {
-                                bgfx::TextureHandle handle;
-                                uint8_t flags;
-                                uint8_t mip;
-                            } s;
-                        } texture = {cmd->TextureId};
-                        state |=
-                                0 != (IMGUI_FLAGS_ALPHA_BLEND & texture.s.flags)
-                                ? BGFX_STATE_BLEND_FUNC(
-                                        BGFX_STATE_BLEND_SRC_ALPHA,
-                                        BGFX_STATE_BLEND_INV_SRC_ALPHA)
-                                : BGFX_STATE_NONE;
-                        th = texture.s.handle;
-                        if (0 != texture.s.mip) {
-                            const float lodEnabled[4] = {float(texture.s.mip),
-                                                         1.0f, 0.0f, 0.0f};
-                            bgfx::setUniform(u_imageLodEnabled, lodEnabled);
-                            program = m_imageProgram;
-                        }
-                    } else {
-                        state |= BGFX_STATE_BLEND_FUNC(
-                                BGFX_STATE_BLEND_SRC_ALPHA,
-                                BGFX_STATE_BLEND_INV_SRC_ALPHA);
-                    }
+	void create(float _fontSize, bx::AllocatorI* _allocator)
+	{
+		m_allocator = _allocator;
 
-                    const uint16_t xx = uint16_t(
-                            bx::max(cmd->ClipRect.x, 0.0f));
-                    const uint16_t yy = uint16_t(
-                            bx::max(cmd->ClipRect.y, 0.0f));
-                    bgfx::setScissor(xx, yy, uint16_t(
-                            bx::min(cmd->ClipRect.z, 65535.0f) - xx), uint16_t(
-                            bx::min(cmd->ClipRect.w, 65535.0f) - yy)
-                    );
+		if (NULL == _allocator)
+		{
+			static bx::DefaultAllocator allocator;
+			m_allocator = &allocator;
+		}
 
-                    bgfx::setState(state);
-                    bgfx::setTexture(0, s_tex, th);
-                    bgfx::setVertexBuffer(0, &tvb, 0, numVertices);
-                    bgfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
-                    bgfx::submit(cmd->ViewId, program);
-                }
+		m_viewId = 255;
+		m_lastScroll = 0;
+		m_last = bx::getHPCounter();
 
-                offset += cmd->ElemCount;
-            }
-        }
-    }
+		ImGui::SetAllocatorFunctions(memAlloc, memFree, NULL);
 
-    void create(float _fontSize,
-                bx::AllocatorI *_allocator) {
-        m_allocator = _allocator;
+		m_imgui = ImGui::CreateContext();
 
-        if (NULL == _allocator) {
-            static bx::DefaultAllocator allocator;
-            m_allocator = &allocator;
-        }
+		ImGuiIO& io = ImGui::GetIO();
 
+		io.DisplaySize = ImVec2(1280.0f, 720.0f);
+		io.DeltaTime   = 1.0f / 60.0f;
+		io.IniFilename = NULL;
 
-        m_viewId = 255;
-        m_lastScroll = 0;
-        m_last = bx::getHPCounter();
+		setupStyle(true);
 
-        ImGuiIO &io = ImGui::GetIO();
-        io.RenderDrawListsFn = renderDrawLists;
-        io.MemAllocFn = memAlloc;
-        io.MemFreeFn = memFree;
+#if USE_ENTRY
+		io.KeyMap[ImGuiKey_Tab]        = (int)entry::Key::Tab;
+		io.KeyMap[ImGuiKey_LeftArrow]  = (int)entry::Key::Left;
+		io.KeyMap[ImGuiKey_RightArrow] = (int)entry::Key::Right;
+		io.KeyMap[ImGuiKey_UpArrow]    = (int)entry::Key::Up;
+		io.KeyMap[ImGuiKey_DownArrow]  = (int)entry::Key::Down;
+		io.KeyMap[ImGuiKey_PageUp]     = (int)entry::Key::PageUp;
+		io.KeyMap[ImGuiKey_PageDown]   = (int)entry::Key::PageDown;
+		io.KeyMap[ImGuiKey_Home]       = (int)entry::Key::Home;
+		io.KeyMap[ImGuiKey_End]        = (int)entry::Key::End;
+		io.KeyMap[ImGuiKey_Insert]     = (int)entry::Key::Insert;
+		io.KeyMap[ImGuiKey_Delete]     = (int)entry::Key::Delete;
+		io.KeyMap[ImGuiKey_Backspace]  = (int)entry::Key::Backspace;
+		io.KeyMap[ImGuiKey_Space]      = (int)entry::Key::Space;
+		io.KeyMap[ImGuiKey_Enter]      = (int)entry::Key::Return;
+		io.KeyMap[ImGuiKey_Escape]     = (int)entry::Key::Esc;
+		io.KeyMap[ImGuiKey_A]          = (int)entry::Key::KeyA;
+		io.KeyMap[ImGuiKey_C]          = (int)entry::Key::KeyC;
+		io.KeyMap[ImGuiKey_V]          = (int)entry::Key::KeyV;
+		io.KeyMap[ImGuiKey_X]          = (int)entry::Key::KeyX;
+		io.KeyMap[ImGuiKey_Y]          = (int)entry::Key::KeyY;
+		io.KeyMap[ImGuiKey_Z]          = (int)entry::Key::KeyZ;
 
-        io.DisplaySize = ImVec2(1280.0f, 720.0f);
-        io.DeltaTime = 1.0f / 60.0f;
-        io.IniFilename = NULL;
+		io.NavFlags |= 0
+			| ImGuiNavFlags_EnableGamepad
+			| ImGuiNavFlags_EnableKeyboard
+			;
+		io.NavInputs[ImGuiNavInput_Activate]    = (int)entry::Key::GamepadA;
+		io.NavInputs[ImGuiNavInput_Cancel]      = (int)entry::Key::GamepadB;
+//		io.NavInputs[ImGuiNavInput_Input]       = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_Menu]        = (int)entry::Key::;
+		io.NavInputs[ImGuiNavInput_DpadLeft]    = (int)entry::Key::GamepadLeft;
+		io.NavInputs[ImGuiNavInput_DpadRight]   = (int)entry::Key::GamepadRight;
+		io.NavInputs[ImGuiNavInput_DpadUp]      = (int)entry::Key::GamepadUp;
+		io.NavInputs[ImGuiNavInput_DpadDown]    = (int)entry::Key::GamepadDown;
+//		io.NavInputs[ImGuiNavInput_LStickLeft]  = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_LStickRight] = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_LStickUp]    = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_LStickDown]  = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_FocusPrev]   = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_FocusNext]   = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_TweakSlow]   = (int)entry::Key::;
+//		io.NavInputs[ImGuiNavInput_TweakFast]   = (int)entry::Key::;
+#endif // USE_ENTRY
 
-        setupStyle(true);
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
+		m_program = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_ocornut_imgui")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_ocornut_imgui")
+			, true
+			);
 
-#if defined(SCI_NAMESPACE)
-        io.KeyMap[ImGuiKey_Tab]        = (int)entry::Key::Tab;
-        io.KeyMap[ImGuiKey_LeftArrow]  = (int)entry::Key::Left;
-        io.KeyMap[ImGuiKey_RightArrow] = (int)entry::Key::Right;
-        io.KeyMap[ImGuiKey_UpArrow]    = (int)entry::Key::Up;
-        io.KeyMap[ImGuiKey_DownArrow]  = (int)entry::Key::Down;
-        io.KeyMap[ImGuiKey_Home]       = (int)entry::Key::Home;
-        io.KeyMap[ImGuiKey_End]        = (int)entry::Key::End;
-        io.KeyMap[ImGuiKey_Delete]     = (int)entry::Key::Delete;
-        io.KeyMap[ImGuiKey_Backspace]  = (int)entry::Key::Backspace;
-        io.KeyMap[ImGuiKey_Enter]      = (int)entry::Key::Return;
-        io.KeyMap[ImGuiKey_Escape]     = (int)entry::Key::Esc;
-        io.KeyMap[ImGuiKey_A]          = (int)entry::Key::KeyA;
-        io.KeyMap[ImGuiKey_C]          = (int)entry::Key::KeyC;
-        io.KeyMap[ImGuiKey_V]          = (int)entry::Key::KeyV;
-        io.KeyMap[ImGuiKey_X]          = (int)entry::Key::KeyX;
-        io.KeyMap[ImGuiKey_Y]          = (int)entry::Key::KeyY;
-        io.KeyMap[ImGuiKey_Z]          = (int)entry::Key::KeyZ;
-#endif // defined(SCI_NAMESPACE)
+		u_imageLodEnabled = bgfx::createUniform("u_imageLodEnabled", bgfx::UniformType::Vec4);
+		m_imageProgram = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_image")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_image")
+			, true
+			);
 
-        bgfx::RendererType::Enum type = bgfx::getRendererType();
-        m_program = bgfx::createProgram(
-                bgfx::createEmbeddedShader(s_embeddedShaders, type,
-                                           "vs_ocornut_imgui"),
-                bgfx::createEmbeddedShader(s_embeddedShaders, type,
-                                           "fs_ocornut_imgui"), true
-        );
+		m_decl
+			.begin()
+			.add(bgfx::Attrib::Position,  2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true)
+			.end();
 
-        u_imageLodEnabled = bgfx::createUniform("u_imageLodEnabled",
-                                                bgfx::UniformType::Vec4);
-        m_imageProgram = bgfx::createProgram(
-                bgfx::createEmbeddedShader(s_embeddedShaders, type,
-                                           "vs_imgui_image"),
-                bgfx::createEmbeddedShader(s_embeddedShaders, type,
-                                           "fs_imgui_image"), true
-        );
+		s_tex = bgfx::createUniform("s_tex", bgfx::UniformType::Int1);
 
-        m_decl
-                .begin()
-                .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
-                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-                .add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true)
-                .end();
-
-        s_tex = bgfx::createUniform("s_tex", bgfx::UniformType::Int1);
-
-        uint8_t *data;
-        int32_t width;
-        int32_t height;
-        {
-            ImFontConfig config;
-            config.FontDataOwnedByAtlas = false;
-            config.MergeMode = false;
+		uint8_t* data;
+		int32_t width;
+		int32_t height;
+		{
+			ImFontConfig config;
+			config.FontDataOwnedByAtlas = false;
+			config.MergeMode = false;
 //			config.MergeGlyphCenterV = true;
 
-            const ImWchar *ranges = io.Fonts->GetGlyphRangesCyrillic();
-            m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF(
-                    (void *) s_robotoRegularTtf, sizeof(s_robotoRegularTtf),
-                    _fontSize, &config, ranges);
-            m_font[ImGui::Font::Mono] = io.Fonts->AddFontFromMemoryTTF(
-                    (void *) s_robotoMonoRegularTtf,
-                    sizeof(s_robotoMonoRegularTtf), _fontSize - 3.0f, &config,
-                    ranges);
+			const ImWchar* ranges = io.Fonts->GetGlyphRangesCyrillic();
+			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     _fontSize,      &config, ranges);
+			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize-3.0f, &config, ranges);
 
-            config.MergeMode = true;
-            config.DstFont = m_font[ImGui::Font::Regular];
+			config.MergeMode = true;
+			config.DstFont   = m_font[ImGui::Font::Regular];
 
-            for (uint32_t ii = 0; ii < BX_COUNTOF(s_fontRangeMerge); ++ii) {
-                const FontRangeMerge &frm = s_fontRangeMerge[ii];
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_fontRangeMerge); ++ii)
+			{
+				const FontRangeMerge& frm = s_fontRangeMerge[ii];
 
-                io.Fonts->AddFontFromMemoryTTF((void *) frm.data,
-                                               (int) frm.size, _fontSize - 3.0f,
-                                               &config, frm.ranges
-                );
-            }
-        }
+				io.Fonts->AddFontFromMemoryTTF( (void*)frm.data
+						, (int)frm.size
+						, _fontSize-3.0f
+						, &config
+						, frm.ranges
+						);
+			}
+		}
 
-        io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
+		io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
-        m_texture = bgfx::createTexture2D(
-                (uint16_t) width, (uint16_t) height, false, 1,
-                bgfx::TextureFormat::BGRA8, 0,
-                bgfx::copy(data, width * height * 4)
-        );
+		m_texture = bgfx::createTexture2D(
+			  (uint16_t)width
+			, (uint16_t)height
+			, false
+			, 1
+			, bgfx::TextureFormat::BGRA8
+			, 0
+			, bgfx::copy(data, width*height*4)
+			);
 
-        ImGui::InitDockContext();
-    }
+		ImGui::InitDockContext();
+	}
 
-    void destroy() {
-        ImGui::ShutdownDockContext();
-        ImGui::Shutdown();
+	void destroy()
+	{
+		ImGui::ShutdownDockContext();
+		ImGui::DestroyContext(m_imgui);
 
-        bgfx::destroy(s_tex);
-        bgfx::destroy(m_texture);
+		bgfx::destroy(s_tex);
+		bgfx::destroy(m_texture);
 
-        bgfx::destroy(u_imageLodEnabled);
-        bgfx::destroy(m_imageProgram);
-        bgfx::destroy(m_program);
+		bgfx::destroy(u_imageLodEnabled);
+		bgfx::destroy(m_imageProgram);
+		bgfx::destroy(m_program);
 
-        m_allocator = NULL;
-    }
+		m_allocator = NULL;
+	}
 
-    void setupStyle(bool _dark) {
-        // Doug Binks' darl color scheme
-        // https://gist.github.com/dougbinks/8089b4bbaccaaf6fa204236978d165a9
-        ImGuiStyle &style = ImGui::GetStyle();
+	void setupStyle(bool _dark)
+	{
+		// Doug Binks' darl color scheme
+		// https://gist.github.com/dougbinks/8089b4bbaccaaf6fa204236978d165a9
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (_dark)
+		{
+			ImGui::StyleColorsDark(&style);
+		}
+		else
+		{
+			ImGui::StyleColorsLight(&style);
+		}
 
-        style.FrameRounding = 4.0f;
+		style.FrameRounding    = 4.0f;
+		style.WindowBorderSize = 0.0f;
+	}
 
-        // light style from Pacome Danhiez (user itamago)
-        // https://github.com/ocornut/imgui/pull/511#issuecomment-175719267
-        style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
-        style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.60f, 0.60f, 0.60f,
-                                                     1.00f);
-        style.Colors[ImGuiCol_WindowBg] = ImVec4(0.94f, 0.94f, 0.94f, 1.00f);
-        style.Colors[ImGuiCol_ChildWindowBg] = ImVec4(0.00f, 0.00f, 0.00f,
-                                                      0.00f);
-        style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.39f);
-        style.Colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f,
-                                                     0.10f);
-        style.Colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
-        style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                       0.40f);
-        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                      0.67f);
-        style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-        style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f,
-                                                         0.51f);
-        style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f,
-                                                      1.00f);
-        style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
-        style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
-        style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f,
-                                                      0.80f);
-        style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.49f, 0.49f,
-                                                             0.49f, 0.80f);
-        style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f,
-                                                            1.00f);
-        style.Colors[ImGuiCol_ComboBg] = ImVec4(0.86f, 0.86f, 0.86f, 0.99f);
-        style.Colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-        style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.26f, 0.59f, 0.98f, 0.78f);
-        style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                         1.00f);
-        style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                      1.00f);
-        style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f,
-                                                     1.00f);
-        style.Colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-        style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                      0.80f);
-        style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                     1.00f);
-        style.Colors[ImGuiCol_Column] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-        style.Colors[ImGuiCol_ColumnHovered] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                      0.78f);
-        style.Colors[ImGuiCol_ColumnActive] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                     1.00f);
-        style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
-        style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                          0.67f);
-        style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                         0.95f);
-        style.Colors[ImGuiCol_CloseButton] = ImVec4(0.59f, 0.59f, 0.59f, 0.50f);
-        style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.98f, 0.39f, 0.36f,
-                                                           1.00f);
-        style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.98f, 0.39f, 0.36f,
-                                                          1.00f);
-        style.Colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-        style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f,
-                                                         1.00f);
-        style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f,
-                                                      1.00f);
-        style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f,
-                                                             0.00f, 1.00f);
-        style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f,
-                                                       0.35f);
-        style.Colors[ImGuiCol_PopupBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-        style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.20f, 0.20f,
-                                                             0.20f, 0.35f);
+	void beginFrame(
+		  int32_t _mx
+		, int32_t _my
+		, uint8_t _button
+		, int32_t _scroll
+		, int _width
+		, int _height
+		, char _inputChar
+		, bgfx::ViewId _viewId
+		)
+	{
+		m_viewId = _viewId;
 
-        if (_dark) {
-            for (int i = 0; i <= ImGuiCol_COUNT; i++) {
-                ImVec4 &col = style.Colors[i];
-                float H, S, V;
-                ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
+		ImGuiIO& io = ImGui::GetIO();
+		if (_inputChar < 0x7f)
+		{
+			io.AddInputCharacter(_inputChar); // ASCII or GTFO! :(
+		}
 
-                if (S < 0.1f) {
-                    V = 1.0f - V;
-                }
-                ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
-            }
-        }
-    }
+		io.DisplaySize = ImVec2( (float)_width, (float)_height);
 
-    void beginFrame(
-            float _mx,
-            float _my,
-            uint8_t _button,
-            int32_t _scroll,
-            int _width,
-            int _height,
-            char _inputChar,
-            uint8_t _viewId
-    ) {
-        m_viewId = _viewId;
+		const int64_t now = bx::getHPCounter();
+		const int64_t frameTime = now - m_last;
+		m_last = now;
+		const double freq = double(bx::getHPFrequency() );
+		io.DeltaTime = float(frameTime/freq);
 
-        ImGuiIO &io = ImGui::GetIO();
-        if (_inputChar < 0x7f) {
-            io.AddInputCharacter(_inputChar); // ASCII or GTFO! :(
-        }
+		io.MousePos = ImVec2( (float)_mx, (float)_my);
+		io.MouseDown[0] = 0 != (_button & IMGUI_MBUT_LEFT);
+		io.MouseDown[1] = 0 != (_button & IMGUI_MBUT_RIGHT);
+		io.MouseDown[2] = 0 != (_button & IMGUI_MBUT_MIDDLE);
+		io.MouseWheel = (float)(_scroll - m_lastScroll);
+		m_lastScroll = _scroll;
 
-        io.DisplaySize = ImVec2((float) _width, (float) _height);
+#if USE_ENTRY
+		uint8_t modifiers = inputGetModifiersState();
+		io.KeyShift = 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) );
+		io.KeyCtrl  = 0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) );
+		io.KeyAlt   = 0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) );
+		for (int32_t ii = 0; ii < (int32_t)entry::Key::Count; ++ii)
+		{
+			io.KeysDown[ii] = inputGetKeyState(entry::Key::Enum(ii) );
+		}
+#endif // USE_ENTRY
 
-        const int64_t now = bx::getHPCounter();
-        const int64_t frameTime = now - m_last;
-        m_last = now;
-        const double freq = double(bx::getHPFrequency());
-        io.DeltaTime = float(frameTime / freq);
+		ImGui::NewFrame();
+		ImGui::PushStyleVar(ImGuiStyleVar_ViewId, (float)_viewId);
 
-        io.MousePos = ImVec2(_mx, _my);
-        io.MouseDown[0] = 0 != (_button & IMGUI_MBUT_LEFT);
-        io.MouseDown[1] = 0 != (_button & IMGUI_MBUT_RIGHT);
-        io.MouseDown[2] = 0 != (_button & IMGUI_MBUT_MIDDLE);
-        io.MouseWheel = (float) (_scroll);
-        //m_lastScroll = _scroll;
+		ImGuizmo::BeginFrame();
+	}
 
-#if defined(SCI_NAMESPACE)
-        uint8_t modifiers = inputGetModifiersState();
-        io.KeyShift = 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) );
-        io.KeyCtrl  = 0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) );
-        io.KeyAlt   = 0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) );
-        for (int32_t ii = 0; ii < (int32_t)entry::Key::Count; ++ii)
-        {
-            io.KeysDown[ii] = inputGetKeyState(entry::Key::Enum(ii) );
-        }
-#endif // defined(SCI_NAMESPACE)
+	void endFrame()
+	{
+		ImGui::PopStyleVar(1);
+		ImGui::Render();
+		render(ImGui::GetDrawData() );
+	}
 
-        ImGui::NewFrame();
-        ImGui::PushStyleVar(ImGuiStyleVar_ViewId, (float) _viewId);
-
-        ImGuizmo::BeginFrame();
-    }
-
-    void endFrame() {
-        ImGui::PopStyleVar(1);
-        ImGui::Render();
-    }
-
-    bx::AllocatorI *m_allocator;
-    bgfx::VertexDecl m_decl;
-    bgfx::ProgramHandle m_program;
-    bgfx::ProgramHandle m_imageProgram;
-    bgfx::TextureHandle m_texture;
-    bgfx::UniformHandle s_tex;
-    bgfx::UniformHandle u_imageLodEnabled;
-    ImFont *m_font[ImGui::Font::Count];
-    int64_t m_last;
-    int32_t m_lastScroll;
-    uint8_t m_viewId;
+	ImGuiContext*       m_imgui;
+	bx::AllocatorI*     m_allocator;
+	bgfx::VertexDecl    m_decl;
+	bgfx::ProgramHandle m_program;
+	bgfx::ProgramHandle m_imageProgram;
+	bgfx::TextureHandle m_texture;
+	bgfx::UniformHandle s_tex;
+	bgfx::UniformHandle u_imageLodEnabled;
+	ImFont* m_font[ImGui::Font::Count];
+	int64_t m_last;
+	int32_t m_lastScroll;
+	bgfx::ViewId m_viewId;
 };
 
 static OcornutImguiContext s_ctx;
 
-static void *memAlloc(size_t _size) {
-    return BX_ALLOC(s_ctx.m_allocator, _size);
+static void* memAlloc(size_t _size, void* _userData)
+{
+	BX_UNUSED(_userData);
+	return BX_ALLOC(s_ctx.m_allocator, _size);
 }
 
-static void memFree(void *_ptr) {
-    BX_FREE(s_ctx.m_allocator, _ptr);
+static void memFree(void* _ptr, void* _userData)
+{
+	BX_UNUSED(_userData);
+	BX_FREE(s_ctx.m_allocator, _ptr);
 }
 
-void OcornutImguiContext::renderDrawLists(ImDrawData *_drawData) {
-    s_ctx.render(_drawData);
+void imguiCreate(float _fontSize, bx::AllocatorI* _allocator)
+{
+	s_ctx.create(_fontSize, _allocator);
 }
 
-void imguiCreate(float _fontSize,
-                 bx::AllocatorI *_allocator) {
-    s_ctx.create(_fontSize, _allocator);
+void imguiDestroy()
+{
+	s_ctx.destroy();
 }
 
-void imguiDestroy() {
-    s_ctx.destroy();
+void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar, bgfx::ViewId _viewId)
+{
+	s_ctx.beginFrame(_mx, _my, _button, _scroll, _width, _height, _inputChar, _viewId);
 }
 
-void imguiBeginFrame(float _mx,
-                     float _my,
-                     uint8_t _button,
-                     int32_t _scroll,
-                     uint16_t _width,
-                     uint16_t _height,
-                     char _inputChar,
-                     uint8_t _viewId) {
-    s_ctx.beginFrame(_mx, _my, _button, _scroll, _width, _height, _inputChar,
-                     _viewId);
+void imguiEndFrame()
+{
+	s_ctx.endFrame();
 }
 
-void imguiEndFrame() {
-    s_ctx.endFrame();
-}
-
-namespace ImGui {
-    void PushFont(Font::Enum _font) {
-        PushFont(s_ctx.m_font[_font]);
-    }
+namespace ImGui
+{
+	void PushFont(Font::Enum _font)
+	{
+		PushFont(s_ctx.m_font[_font]);
+	}
 } // namespace ImGui
 
-
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(
-        4505); // error C4505: '' : unreferenced local function has been removed
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(
-        "-Wunused-function"); // warning: ‘int rect_width_compare(const void*, const void*)’ defined but not used
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4505); // error C4505: '' : unreferenced local function has been removed
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wunused-function"); // warning: ‘int rect_width_compare(const void*, const void*)’ defined but not used
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunknown-pragmas")
 //BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wunused-but-set-variable"); // warning: variable ‘L1’ set but not used
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(
-        "-Wtype-limits"); // warning: comparison is always true due to limited range of data type
-#define STBTT_malloc(_size, _userData) memAlloc(_size)
-#define STBTT_free(_ptr, _userData) memFree(_ptr)
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wtype-limits"); // warning: comparison is always true due to limited range of data type
+#define STBTT_malloc(_size, _userData) memAlloc(_size, _userData)
+#define STBTT_free(_ptr, _userData) memFree(_ptr, _userData)
 #define STB_RECT_PACK_IMPLEMENTATION
-
-#include "cetech/engine/debugui/private/stb/stb_rect_pack.h"
-
+#include <stb/stb_rect_pack.h>
 #define STB_TRUETYPE_IMPLEMENTATION
-
-#include "cetech/engine/debugui/private/stb/stb_truetype.h"
-
+#include <stb/stb_truetype.h>
 BX_PRAGMA_DIAGNOSTIC_POP();

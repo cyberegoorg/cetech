@@ -490,36 +490,36 @@ void parent_files(const char *path,
     d->parent_files(d, files, count);
 }
 
-void check_fs() {
-    ct_alloc *alloc = ct_memory_a0.main_allocator();
-
-    static uint64_t root = CT_ID64_0("source");
-
-    auto *wd_it = ct_fs_a0.event_begin(root);
-    const auto *wd_end = ct_fs_a0.event_end(root);
-
-    while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
-
-            char *path = NULL;
-            ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
-
-            uint64_t path_key = CT_ID64_0(path);
-
-            if (ct_hash_contain(&_G.document_cache_map, path_key)) {
-                ct_log_a0.debug(LOG_WHERE, "Reload cached file %s", path);
-
-                expire_document_in_cache(path, path_key);
-                load_to_cache(path, path_key);
-            }
-
-            ct_buffer_free(path, alloc);
-        }
-
-        wd_it = ct_fs_a0.event_next(wd_it);
-    }
-}
+//void check_fs() {
+//    ct_alloc *alloc = ct_memory_a0.main_allocator();
+//
+//    static uint64_t root = CT_ID64_0("source");
+//
+//    auto *wd_it = ct_fs_a0.event_begin(root);
+//    const auto *wd_end = ct_fs_a0.event_end(root);
+//
+//    while (wd_it != wd_end) {
+//        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+//            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
+//
+//            char *path = NULL;
+//            ct_path_a0.join(&path, alloc, 2, ev->dir, ev->filename);
+//
+//            uint64_t path_key = CT_ID64_0(path);
+//
+//            if (ct_hash_contain(&_G.document_cache_map, path_key)) {
+//                ct_log_a0.debug(LOG_WHERE, "Reload cached file %s", path);
+//
+//                expire_document_in_cache(path, path_key);
+//                load_to_cache(path, path_key);
+//            }
+//
+//            ct_buffer_free(path, alloc);
+//        }
+//
+//        wd_it = ct_fs_a0.event_next(wd_it);
+//    }
+//}
 
 
 void save(const char *path) {
@@ -573,7 +573,6 @@ static ct_ydb_a0 ydb_api = {
         .parent_files = parent_files,
         .save = save,
         .save_all_modified = save_all_modified,
-        .check_fs = check_fs
 };
 
 static void _init(ct_api_a0 *api) {

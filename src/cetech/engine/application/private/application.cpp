@@ -184,7 +184,7 @@ extern "C" void application_start() {
 
     _boot_stage();
 
-    ct_ebus_a0.connect(APPLICATION_EBUS, APP_QUIT_EVENT, on_quit);
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_QUIT_EVENT, on_quit, 0);
 
     ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_INI_EVENT, NULL, 0);
 
@@ -207,13 +207,6 @@ extern "C" void application_start() {
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
-        ct_fs_a0.check_wd();
-        ct_ydb_a0.check_fs();
-        ct_resource_a0.compiler_check_fs();
-
-#if CETECH_DEVELOP
-        ct_module_a0.check_modules(); // TODO: SHIT...
-#endif
         ct_machine_a0.update(dt);
 
         ct_app_update_ev ev = {.dt=dt};

@@ -1,9 +1,12 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-namespace ImGui {
-    struct Font {
-        enum Enum {
+namespace ImGui
+{
+    struct Font
+    {
+        enum Enum
+        {
             Regular,
             Mono,
 
@@ -14,37 +17,28 @@ namespace ImGui {
     void PushFont(Font::Enum _font);
 
     // BK - simple string class for convenience.
-    class ImString {
+    class ImString
+    {
     public:
         ImString();
-
-        ImString(const ImString &rhs);
-
-        ImString(const char *rhs);
-
+        ImString(const ImString& rhs);
+        ImString(const char* rhs);
         ~ImString();
 
-        ImString &operator=(const ImString &rhs);
-
-        ImString &operator=(const char *rhs);
+        ImString& operator=(const ImString& rhs);
+        ImString& operator=(const char* rhs);
 
         void Clear();
-
         bool IsEmpty() const;
 
-        const char *CStr() const {
+        const char* CStr() const
+        {
             return NULL == Ptr ? "" : Ptr;
         }
 
     private:
-        char *Ptr;
+        char* Ptr;
     };
-
-    void HSplitter(const char *str_id,
-                   ImVec2 *size);
-
-    void VSplitter(const char *str_id,
-                   ImVec2 *size);
 
 } // namespace ImGui
 

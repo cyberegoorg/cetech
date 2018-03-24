@@ -33,6 +33,7 @@ CETECH_DECL_API(ct_hashlib_a0);
 
 struct ebus_event_handler {
     uint64_t addr;
+    uint32_t order;
     ct_ebus_handler *handler;
 };
 
@@ -61,7 +62,8 @@ static struct _G {
 //==============================================================================
 
 
-void create_ebus(const char *name, uint32_t id) {
+void create_ebus(const char *name,
+                 uint32_t id) {
     uint64_t ebus_idx = ct_array_size(_G.ebus_pool);
 
     struct ebus_t ebus = {
@@ -106,7 +108,8 @@ void send_addr(uint32_t bus_name,
 
     const uint32_t handlers_n = ct_array_size(ev_handlers->handlers);
     for (int i = 0; i < handlers_n; ++i) {
-        if (ev_handlers->handlers[i].addr && (ev_handlers->handlers[i].addr != addr)) {
+        if (ev_handlers->handlers[i].addr &&
+            (ev_handlers->handlers[i].addr != addr)) {
             continue;
         }
 
@@ -117,9 +120,9 @@ void send_addr(uint32_t bus_name,
 }
 
 void broadcast(uint32_t bus_name,
-                uint64_t event_type,
-                void *event,
-                uint64_t event_size) {
+               uint64_t event_type,
+               void *event,
+               uint64_t event_size) {
     send_addr(bus_name, event_type, 0, event, event_size);
 }
 
@@ -136,7 +139,8 @@ void begin_frame() {
 void _connect_addr(uint32_t bus_name,
                    uint64_t event,
                    uint64_t addr,
-                   ct_ebus_handler *handler) {
+                   ct_ebus_handler *handler,
+                   uint32_t order) {
 
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
@@ -151,10 +155,9 @@ void _connect_addr(uint32_t bus_name,
     if (UINT64_MAX == event_idx) {
         event_idx = ct_array_size(ebus->handlers);
 
-        struct ebus_event_handlers ev_handlers = {
-        };
-
+        struct ebus_event_handlers ev_handlers = {};
         ct_array_push(ebus->handlers, ev_handlers, _G.allocator);
+
         ct_hash_add(&ebus->handler_idx, event, event_idx, _G.allocator);
     }
 
@@ -163,15 +166,31 @@ void _connect_addr(uint32_t bus_name,
     struct ebus_event_handler h = {
             .handler = handler,
             .addr = addr,
+            .order = order,
     };
 
-    ct_array_push(ev_handlers->handlers, h, _G.allocator);
+    const uint32_t handlers_n = ct_array_size(ev_handlers->handlers);
+
+    if(0 == handlers_n) {
+        ct_array_push(ev_handlers->handlers, h, _G.allocator);
+        return;
+    }
+
+    for (int i = 0; i < handlers_n; ++i) {
+        if(ev_handlers->handlers[i].order < order) {
+            continue;
+        }
+
+        ct_array_insert(ev_handlers->handlers, i, h, _G.allocator);
+        return;
+    }
 }
 
 void _connect(uint32_t bus_name,
               uint64_t event,
-              ct_ebus_handler *handler) {
-    _connect_addr(bus_name, event, 0, handler);
+              ct_ebus_handler *handler,
+              uint32_t order) {
+    _connect_addr(bus_name, event, 0, handler, order);
 }
 
 

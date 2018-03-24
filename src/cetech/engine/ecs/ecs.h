@@ -12,6 +12,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define ECS_EBUS_NAME "ecs"
 

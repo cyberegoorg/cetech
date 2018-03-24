@@ -156,10 +156,9 @@ void _component_compiler(uint32_t ebus,void *event) {
     uint64_t keys[ev->component_key_count + 1];
     memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
 
-    keys[ev->component_key_count] = ct_yng_a0.key("scale");
-
     uint64_t key;
 
+    keys[ev->component_key_count] = ct_yng_a0.key("scale");
     key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
         ct_ydb_a0.get_vec3(ev->filename, keys, CT_ARRAY_LEN(keys),
@@ -266,12 +265,12 @@ static void _init(struct ct_api_a0 *api) {
                     .prop_count = CT_ARRAY_LEN(prop_map)});
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_spawner);
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_spawner, 0);
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_compiler);
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_compiler, 0);
 
-    ct_ebus_a0.connect(ECS_EBUS, ECS_COMPONENT_CHANGE, on_change);
+    ct_ebus_a0.connect(ECS_EBUS, ECS_COMPONENT_CHANGE, on_change, 0);
 
 }
 

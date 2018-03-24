@@ -142,8 +142,8 @@ set(SOURCE_FILES
         src/cetech/playground/private/entity_editor.cpp
         src/cetech/playground/private/entity_property.cpp
         src/cetech/playground/private/explorer.cpp
-        src/cetech/playground/private/asset_preview.cpp
-        src/cetech/playground/private/asset_property.cpp
+        src/cetech/playground/private/asset_preview.c
+        src/cetech/playground/private/asset_property.c
         src/cetech/playground/private/asset_browser.cpp
         src/cetech/playground/private/playground.cpp
         src/cetech/playground/private/property_editor.cpp

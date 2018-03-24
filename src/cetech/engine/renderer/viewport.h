@@ -20,7 +20,7 @@ struct ct_world;
 struct ct_entity;
 struct ct_window;
 struct ct_texture;
-
+struct ct_yamlng_node;
 
 struct ct_viewport {
     uint64_t idx;

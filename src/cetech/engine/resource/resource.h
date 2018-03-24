@@ -161,8 +161,6 @@ struct ct_resource_a0 {
     char *(*compiler_get_build_dir)(struct ct_alloc *a,
                                     const char *platform);
 
-    void (*compiler_check_fs)();
-
 };
 
 #ifdef __cplusplus

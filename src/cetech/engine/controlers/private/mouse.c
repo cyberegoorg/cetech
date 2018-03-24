@@ -232,7 +232,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0.create_ebus(MOUSE_EBUS_NAME, MOUSE_EBUS);
 
     ct_ebus_a0.connect(APPLICATION_EBUS,
-                                APP_UPDATE_EVENT, update);
+                                APP_UPDATE_EVENT, update, 0);
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 }

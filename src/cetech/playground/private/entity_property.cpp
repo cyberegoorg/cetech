@@ -122,7 +122,7 @@ static void _init(ct_api_a0 *api) {
 
     api->register_api("ct_entity_property_a0", &entity_property_a0);
 
-    ct_ebus_a0.connect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, on_entity_click);
+    ct_ebus_a0.connect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, on_entity_click, 0);
 }
 
 static void _shutdown() {

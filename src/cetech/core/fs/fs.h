@@ -62,21 +62,10 @@ struct ct_fs_a0 {
     int64_t (*file_mtime)(uint64_t root,
                           const char *path);
 
-
-    struct ct_watchdog_ev_header *(*event_begin)(uint64_t root);
-
-    struct ct_watchdog_ev_header *(*event_end)(uint64_t root);
-
-    struct ct_watchdog_ev_header *
-    (*event_next)(struct ct_watchdog_ev_header *header);
-
     void (*get_full_path)(uint64_t root,
                           const char *path,
                           char *fullpath,
                           uint32_t max_len);
-
-    /// TODO: shit
-    void (*check_wd)();
 
 };
 

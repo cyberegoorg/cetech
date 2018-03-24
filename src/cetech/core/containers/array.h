@@ -57,6 +57,12 @@ extern "C" {
 #define ct_array_pop_back(a) \
     (ct_array_any(a) ? ct_array_header(a)->size-- : 0)
 
+#define ct_array_insert(a, idx, v, alloc) \
+    do {\
+        ct_array_resize(a, ct_array_size(a) + 1, alloc);\
+        memcpy(a+idx+1,a+idx, (ct_array_size(a)-idx)*sizeof(*(a)));\
+        a[idx] = v;\
+    } while(0)
 
 #define ct_array_front(a) a[0]
 #define ct_array_back(a) a[ct_array_size(a)-1]
