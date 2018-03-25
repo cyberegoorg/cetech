@@ -9,11 +9,32 @@
 extern "C" {
 #endif
 
+//==============================================================================
+// Includes
+//==============================================================================
+
 #include <stddef.h>
 #include <stdbool.h>
 
 struct ct_texture;
 struct ct_vio;
+
+//==============================================================================
+//
+//==============================================================================
+
+enum {
+    DEBUGUI_EBUS = 0x5ae1e5c8
+};
+
+enum {
+    DEBUGUI_INVALID_EVENT = 0,
+    DEBUGUI_EVENT
+};
+
+//==============================================================================
+// ImGUI
+//==============================================================================
 
 typedef float _vec4[4];
 typedef float _vec2[2];
@@ -184,10 +205,6 @@ enum DebugUISetCond_ {
 struct ct_debugui_a0 {
     void (*render)(uint8_t viewid);
 
-    void (*register_on_debugui)(void (*on_debugui)());
-
-    void (*unregister_on_debugui)(void (*on_debugui)());
-
     void (*Text)(const char *fmt,
                  ...) CTECH_ATTR_FORMAT(1, 2);
 
@@ -291,9 +308,13 @@ struct ct_debugui_a0 {
                    int height_in_items);
 
 
-    bool (*ColorEdit3)(const char* label, float col[3], ImGuiColorEditFlags flags);
+    bool (*ColorEdit3)(const char *label,
+                       float col[3],
+                       ImGuiColorEditFlags flags);
 
-    bool (*ColorEdit4)(const char* label, float col[3], ImGuiColorEditFlags flags);
+    bool (*ColorEdit4)(const char *label,
+                       float col[3],
+                       ImGuiColorEditFlags flags);
 
     void (*PlotLines)(const char *label,
                       const float *values,
@@ -690,7 +711,8 @@ struct ct_debugui_a0 {
 
     void (*OpenPopup)(const char *str_id);
 
-    bool (*BeginPopup)(const char *str_id, ImGuiWindowFlags flags);
+    bool (*BeginPopup)(const char *str_id,
+                       ImGuiWindowFlags flags);
 
     bool (*BeginPopupModal)(const char *name,
                             bool *p_open,
@@ -699,7 +721,9 @@ struct ct_debugui_a0 {
     bool (*BeginPopupContextItem)(const char *str_id,
                                   int mouse_button);
 
-    bool (*BeginPopupContextWindow)(const char* str_id, int mouse_button, bool also_over_items);
+    bool (*BeginPopupContextWindow)(const char *str_id,
+                                    int mouse_button,
+                                    bool also_over_items);
 
     bool (*BeginPopupContextVoid)(const char *str_id,
                                   int mouse_button);

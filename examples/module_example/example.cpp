@@ -54,7 +54,7 @@ void update(uint32_t bus_name, void *event) {
     ///ct_log_a0.debug("example", "%f", dt);
 }
 
-void module1() {
+void module1(uint32_t ebus_name, void* event) {
     static bool visible = true;
     if (ct_debugui_a0.BeginDock("Module 1", &visible,
                                 DebugUIWindowFlags_Empty)) {
@@ -152,8 +152,10 @@ CETECH_MODULE_DEF(
             ct_ebus_a0.connect(APPLICATION_EBUS,
                                         APP_UPDATE_EVENT, update, 0);
 
+            ct_ebus_a0.connect(DEBUGUI_EBUS,
+                               DEBUGUI_EVENT, module1, 0);
 
-            ct_debugui_a0.register_on_debugui(module1);
+//            ct_debugui_a0.register_on_debugui(module1);
             //ct_debugui_a0.register_on_debugui(module2);
         },
 
@@ -165,8 +167,8 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Shutdown %d", reload);
 
-            ct_debugui_a0.unregister_on_debugui(module1);
-            ct_debugui_a0.unregister_on_debugui(module2);
+//            ct_debugui_a0.unregister_on_debugui(module1);
+//            ct_debugui_a0.unregister_on_debugui(module2);
         }
 )
 

@@ -70,10 +70,6 @@ CETECH_DECL_API(ct_ebus_a0);
 static struct ApplicationGlobals {
     ct_cdb_obj_t *config_object;
 
-    ct_hash_t game_map;
-    ct_game_fce *game;
-
-    ct_game_fce active_game;
     int is_running;
     ct_alloc *allocator;
 } _G;
@@ -160,12 +156,6 @@ static void _boot_unload() {
     ct_resource_a0.unload(pkg, resources, 2);
 }
 
-void set_active_game(uint64_t name) {
-    uint64_t idx = ct_hash_lookup(&_G.game_map, name, UINT64_MAX);
-    if (idx != UINT64_MAX) {
-        _G.active_game = _G.game[idx];
-    }
-}
 
 static void on_quit(uint32_t ebus, void* event) {
     application_quit();
@@ -188,13 +178,7 @@ extern "C" void application_start() {
 
     ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_INI_EVENT, NULL, 0);
 
-    const char* game = ct_cdb_a0.read_str(_G.config_object, CONFIG_GAME, "");
-    set_active_game(CT_ID64_0(game));
-
-    if (_G.active_game.on_init) {
-        _G.active_game.on_init();
-    }
-
+    ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_GAME_INIT_EVENT, NULL, 0);
 
     _G.is_running = 1;
 
@@ -212,9 +196,7 @@ extern "C" void application_start() {
         ct_app_update_ev ev = {.dt=dt};
         ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_UPDATE_EVENT, &ev, sizeof(ev));
 
-        if (_G.active_game.on_update) {
-            _G.active_game.on_update(dt);
-        }
+        ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_GAME_UPDATE_EVENT, &ev, sizeof(ev));
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
             ct_debugui_a0 CETECH_GET_API(&ct_api_a0, ct_debugui_a0);
@@ -225,33 +207,16 @@ extern "C" void application_start() {
         ct_cdb_a0.gc();
     }
 
-    if (_G.active_game.on_shutdown) {
-        _G.active_game.on_shutdown();
-    }
+    ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_GAME_SHUTDOWN_EVENT, NULL, 0);
 
     ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_SHUTDOWN_EVENT, NULL, 0);
 
     _boot_unload();
 }
 
-void register_game(uint64_t name,
-                   ct_game_fce game) {
-    ct_array_push(_G.game, game, _G.allocator);
-    ct_hash_add(&_G.game_map, name, ct_array_size(_G.game) - 1, _G.allocator);
-}
-
-void unregister_game(uint64_t name) {
-    ct_hash_remove(&_G.game_map, name);
-}
-
-
 static ct_app_a0 a0 = {
         .quit = application_quit,
         .start = application_start,
-
-        .register_game = register_game,
-        .unregister_game = unregister_game,
-        .set_active_game = set_active_game,
 };
 
 void app_init(struct ct_api_a0 *api) {
@@ -302,8 +267,5 @@ CETECH_MODULE_DEF(
         },
         {
             CT_UNUSED(api, reload);
-
-            ct_array_free(_G.game, _G.allocator);
-            ct_hash_free(&_G.game_map, _G.allocator);
         }
 )

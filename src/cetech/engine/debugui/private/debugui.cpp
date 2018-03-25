@@ -12,6 +12,7 @@
 #include <cetech/core/containers/array.h>
 #include <cetech/engine/controlers/mouse.h>
 #include <cetech/core/log/log.h>
+#include <cetech/core/ebus/ebus.h>
 #include "cetech/core/containers/map.inl"
 
 #include "cetech/core/config/config.h"
@@ -31,15 +32,10 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_ebus_a0);
 
-
-
-using namespace celib;
-
-typedef void (on_debug_t)();
 
 static struct DebugUIGlobal {
-    on_debug_t **on_debugui;
     ct_alloc *allocator;
 } _G;
 
@@ -104,38 +100,9 @@ static void render(uint8_t viewid) {
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
-
-    for (uint32_t i = 0; i < ct_array_size(_G.on_debugui); ++i) {
-        _G.on_debugui[i]();
-    }
-
+    ct_ebus_a0.broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, 0,0);
     imguiEndFrame();
 }
-
-typedef void (*on_debugui)();
-
-#define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                            \
-        ct_array_push(_G.name, name, _G.allocator);                           \
-    }                                                                          \
-    static void unregister_## name ## _(type name) {                           \
-        const auto size = ct_array_size(_G.name);                             \
-                                                                               \
-        for(uint32_t i = 0; i < size; ++i) {                                   \
-            if(_G.name[i] != name) {                                           \
-                continue;                                                      \
-            }                                                                  \
-                                                                               \
-            uint32_t last_idx = size - 1;                                      \
-            _G.name[i] = _G.name[last_idx];                                    \
-                                                                               \
-            ct_array_pop_back(_G.name);                                       \
-            break;                                                             \
-        }                                                                      \
-    }
-
-_DEF_ON_CLB_FCE(on_debugui, on_debugui);
-
 
 static void SaveDock(struct ct_vio *output) {
     char* buffer = NULL;
@@ -151,9 +118,6 @@ static void LoadDock(const char *path) {
 
 static ct_debugui_a0 debugui_api = {
         .render = render,
-
-        .register_on_debugui = register_on_debugui_,
-        .unregister_on_debugui = unregister_on_debugui_,
 
         .Text = ImGui::Text,
         .TextV = ImGui::TextV,
@@ -294,6 +258,7 @@ static void _init(ct_api_a0 *api) {
             .allocator = ct_memory_a0.main_allocator()
     };
 
+    ct_ebus_a0.create_ebus("debugui", DEBUGUI_EBUS);
 
     ImGuiIO &io = ImGui::GetIO();
     io.KeyMap[ImGuiKey_Tab] = ct_keyboard_a0.button_index("tab");
@@ -322,8 +287,6 @@ static void _init(ct_api_a0 *api) {
 static void _shutdown() {
     imguiDestroy();
 
-    ct_array_free(_G.on_debugui, _G.allocator);
-
     _G = {};
 }
 
@@ -340,6 +303,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_log_a0);
+            CETECH_GET_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

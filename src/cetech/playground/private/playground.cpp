@@ -146,11 +146,11 @@ static void on_debugui() {
     ct_debugui_a0.RootDock(pos, size);
 }
 
-static void on_init() {
+static void on_init(uint32_t ebus_name, void* event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
 }
 
-static void on_shutdown() {
+static void on_shutdown(uint32_t ebus_name, void* event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
 
 }
@@ -159,16 +159,20 @@ void reload_layout() {
     _G.load_layout = true;
 }
 
-static void on_update(float dt) {
+static void on_update(uint32_t ebus_name, void* event) {
     ct_action_manager_a0.check();
 
-    ct_playground_update_ev ev = {.dt=dt};
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, &ev, sizeof(ev));
+    ct_app_update_ev * app_ev = static_cast<ct_app_update_ev *>(event);
+
+    ct_playground_update_ev ev= {.dt=app_ev->dt};
+
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT,
+                         &ev, sizeof(ev));
 }
 
 
 
-static void on_ui() {
+static void on_ui(uint32_t ebus_name, void* event) {
     on_debugui();
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);
@@ -178,13 +182,6 @@ static void on_ui() {
         _G.load_layout = false;
     }
 }
-
-static ct_game_fce playground_game{
-        .on_init = on_init,
-        .on_shutdown = on_shutdown,
-        .on_update   = on_update,
-        .on_ui =  on_ui,
-};
 
 
 static ct_playground_a0 playground_api = {
@@ -212,14 +209,14 @@ static void _init(ct_api_a0 *api) {
             ct_cmd_system_a0.redo
     );
 
-    ct_app_a0.register_game(CT_ID64_0("playground"), playground_game);
-    ct_debugui_a0.register_on_debugui(on_ui);
+
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_INI_EVENT, on_init, 0);
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_UPDATE_EVENT, on_update, 0);
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_SHUTDOWN_EVENT, on_shutdown, 0);
+    ct_ebus_a0.connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 0);
 }
 
 static void _shutdown() {
-    ct_debugui_a0.unregister_on_debugui(on_ui);
-    ct_app_a0.unregister_game(CT_ID64_0("playground"));
-
     _G = {};
 }
 
