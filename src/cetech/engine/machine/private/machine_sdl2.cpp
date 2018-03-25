@@ -117,10 +117,12 @@ void sdl_mouse_process() {
         event.button = i;
 
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_DOWN, &event, sizeof(event));
+            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_DOWN, &event,
+                                 sizeof(event));
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_UP, &event, sizeof(event));
+            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_UP, &event,
+                                 sizeof(event));
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -134,13 +136,14 @@ void sdl_keyboard_process() {
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
             keyboard_ev.keycode = i;
-            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN, &keyboard_ev,
-                            sizeof(keyboard_ev));
+            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN,
+                                 &keyboard_ev,
+                                 sizeof(keyboard_ev));
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
             keyboard_ev.keycode = i;
             ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, &keyboard_ev,
-                            sizeof(keyboard_ev));
+                                 sizeof(keyboard_ev));
         }
 
         _G.keyboard.state[i] = state[i];
@@ -186,7 +189,8 @@ int _create_controler(int i) {
         SDL_HapticRumbleInit(haptic);
         _G.controlers.haptic[idx] = haptic;
 
-        ct_log_a0.info("controlers.gamepad", "Gamepad %d has haptic support.", i);
+        ct_log_a0.info("controlers.gamepad", "Gamepad %d has haptic support.",
+                       i);
     } else {
         _G.controlers.haptic[idx] = NULL;
     }
@@ -266,13 +270,13 @@ void sdl_gamepad_process() {
 
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, &event,
-                                sizeof(event));
+                                     sizeof(event));
 
 
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, &event,
-                                sizeof(event));
+                                     sizeof(event));
 
             }
 
@@ -297,7 +301,7 @@ void sdl_gamepad_process() {
                 event.position[1] = pos[1];
 
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, &event,
-                                sizeof(event));
+                                     sizeof(event));
             }
         }
     }
@@ -335,8 +339,9 @@ static void _update(float dt) {
                         ev.width = e.window.data1;
                         ev.height = e.window.data2;
 
-                        ct_ebus_a0.broadcast(WINDOW_EBUS, EVENT_WINDOW_RESIZED, &ev,
-                                        sizeof(ev));
+                        ct_ebus_a0.broadcast(WINDOW_EBUS, EVENT_WINDOW_RESIZED,
+                                             &ev,
+                                             sizeof(ev));
                     }
                         break;
                 }
@@ -347,19 +352,20 @@ static void _update(float dt) {
                 ct_mouse_move_event ev;
                 ev.pos[0] = e.wheel.x;
                 ev.pos[1] = e.wheel.y;
-
-                ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev, sizeof(ev));
+                ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev,
+                                     sizeof(ev));
             }
-
+                break;
 
             case SDL_TEXTINPUT: {
-                ct_keyboard_text_event ev= {{0}};
+                ct_keyboard_text_event ev = {{0}};
                 memcpy(ev.text, e.text.text, sizeof(ev.text));
 
                 ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT, &ev,
-                                sizeof(ev));
+                                     sizeof(ev));
 
             }
+                break;
 
             case SDL_CONTROLLERDEVICEADDED: {
                 int idx = _create_controler(e.cdevice.which);
@@ -368,7 +374,7 @@ static void _update(float dt) {
 
 
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT, &ev,
-                                sizeof(ev));
+                                     sizeof(ev));
 
             }
                 break;
@@ -386,8 +392,9 @@ static void _update(float dt) {
                     _remove_controler(i);
 
                     ev.gamepad_id = i;
-                    ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DISCONNECT, &ev,
-                                    sizeof(ev));
+                    ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DISCONNECT,
+                                         &ev,
+                                         sizeof(ev));
 
                     break;
                 }

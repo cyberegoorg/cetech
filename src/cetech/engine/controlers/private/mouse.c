@@ -162,8 +162,8 @@ static void update(uint32_t bus_name, void *_event) {
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
     _G.delta_pos[0] = 0;
     _G.delta_pos[1] = 0;
-    _G.wheel[0] = 0;
-    _G.wheel[1] = 0;
+//    _G.wheel[0] = 0;
+//    _G.wheel[1] = 0;
 
 
     void* event = ct_ebus_a0.first_event(MOUSE_EBUS);
@@ -194,12 +194,13 @@ static void update(uint32_t bus_name, void *_event) {
 
             case EVENT_MOUSE_WHEEL: {
                 struct ct_mouse_wheel_event *ev = ((struct ct_mouse_wheel_event *) event);
-                _G.wheel[0] = ev->pos[0];// - _G.wheel_last[0];
-                _G.wheel[1] = ev->pos[1];// - _G.wheel_last[1];
+                _G.wheel[0] += ev->pos[0];// - _G.wheel_last[0];
+                _G.wheel[1] += ev->pos[1];// - _G.wheel_last[1];
 
                 _G.wheel_last[0] = ev->pos[0];
                 _G.wheel_last[1] = ev->pos[1];
             }
+                break;
 
             default:
                 break;
@@ -231,8 +232,7 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0.create_ebus(MOUSE_EBUS_NAME, MOUSE_EBUS);
 
-    ct_ebus_a0.connect(APPLICATION_EBUS,
-                                APP_UPDATE_EVENT, update, 0);
+    ct_ebus_a0.connect(APPLICATION_EBUS, APP_UPDATE_EVENT, update, 0);
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 }

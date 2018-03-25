@@ -5,13 +5,13 @@
 #include <cetech/engine/renderer/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/controlers/keyboard.h>
-#include <cetech/engine/application/application.h>
 #include <cetech/core/hashlib/hashlib.h>
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/core/os/vio.h>
 #include <cetech/core/fs/fs.h>
 #include <cetech/core/containers/array.h>
 #include <cetech/engine/controlers/mouse.h>
+#include <cetech/core/log/log.h>
 #include "cetech/core/containers/map.inl"
 
 #include "cetech/core/config/config.h"
@@ -22,6 +22,7 @@
 #include "imgui_wrap.inl"
 
 CETECH_DECL_API(ct_memory_a0);
+CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_keyboard_a0);
@@ -338,6 +339,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);
+            CETECH_GET_API(api, ct_log_a0);
         },
         {
             CT_UNUSED(reload);
