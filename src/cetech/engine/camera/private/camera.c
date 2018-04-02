@@ -19,6 +19,8 @@
 
 #include "cetech/core/module/module.h"
 
+#include <bgfx/c99/bgfx.h>
+
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -63,18 +65,23 @@ static void get_project_view(struct ct_world world,
                              int width,
                              int height) {
 
-    struct ct_transform_comp *transform= ct_ecs_a0.entity_data(
-            world, TRANSFORM_COMPONENT, camera);
+    struct ct_transform_comp *transform;
+    struct ct_camera_component *camera_data;
 
-    struct ct_camera_component *camera_data = ct_ecs_a0.entity_data(
-            world, CAMERA_COMPONENT, camera);
 
+    transform = ct_ecs_a0.entity_data(world, TRANSFORM_COMPONENT, camera);
+    camera_data = ct_ecs_a0.entity_data(world, CAMERA_COMPONENT, camera);
 
     float ratio = (float) (width) / (float) (height);
 
+//    ct_mat4_look_at(view, transform->position,
+//                    (float[]){0.0f, 0.0f, -1.0f},
+//                    (float[]){0.0f, 1.0f, 0.0f});
+
     ct_mat4_proj_fovy(proj,
                       camera_data->fov, ratio,
-                      camera_data->near, camera_data->far, true);
+                      camera_data->near, camera_data->far,
+                      bgfx_get_caps()->homogeneousDepth);
 
     ct_mat4_inverse(view, transform->world);
 }
@@ -120,6 +127,7 @@ static void render_simu(struct ct_world world,
     ct_ecs_a0.process(world,
                          ct_ecs_a0.component_mask(CAMERA_COMPONENT),
                          foreach_camera, &cameras);
+
 
     for (int i = 0; i < cameras.n; ++i) {
         ct_viewport_a0.render_world(world, cameras.ent[i],

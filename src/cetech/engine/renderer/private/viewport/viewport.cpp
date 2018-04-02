@@ -37,6 +37,7 @@
 #include <cetech/core/cdb/cdb.h>
 #include <cetech/core/containers/hash.h>
 #include <cetech/engine/controlers/mouse.h>
+#include <cetech/engine/debugdraw/debugdraw.h>
 #include "cetech/engine/renderer/scene.h"
 #include "cetech/engine/renderer/material.h"
 
@@ -56,6 +57,7 @@ CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ecs_a0);
+CETECH_DECL_API(ct_dd_a0);
 
 using namespace celib;
 
@@ -151,7 +153,11 @@ static void renderer_render_world(ct_world world,
             continue;
         }
 
-        on_pass(&vi, viewport, viewid_counter++, i, world, camera);
+        int viewid = ++viewid_counter;
+
+        ct_dd_a0.begin(viewid);
+        on_pass(&vi, viewport, viewid, i, world, camera);
+        ct_dd_a0.end();
     }
 }
 
@@ -879,6 +885,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ecs_a0);
+            CETECH_GET_API(api, ct_dd_a0);
         },
         {
 

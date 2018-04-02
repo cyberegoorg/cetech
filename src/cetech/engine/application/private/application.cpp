@@ -34,6 +34,7 @@
 #include <cetech/core/containers/hash.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/debugui/debugui.h>
+#include <cetech/engine/debugdraw/debugdraw.h>
 
 
 CETECH_DECL_API(ct_resource_a0);
@@ -56,6 +57,7 @@ CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_dd_a0);
 
 //==============================================================================
 // Definess
@@ -195,8 +197,8 @@ extern "C" void application_start() {
 
         ct_app_update_ev ev = {.dt=dt};
         ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_UPDATE_EVENT, &ev, sizeof(ev));
-
         ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_GAME_UPDATE_EVENT, &ev, sizeof(ev));
+
 
         if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_DAEMON, 0)) {
             ct_debugui_a0 CETECH_GET_API(&ct_api_a0, ct_debugui_a0);
@@ -257,6 +259,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_dd_a0);
 
             ct_api_a0 = *api;
         },

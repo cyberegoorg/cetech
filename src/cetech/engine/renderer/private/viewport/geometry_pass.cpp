@@ -14,6 +14,7 @@
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/renderer/mesh_renderer.h>
+#include <cetech/engine/debugdraw/debugdraw.h>
 
 #include "bgfx/platform.h"
 
@@ -23,6 +24,7 @@ CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_mesh_renderer_a0);
 CETECH_DECL_API(ct_camera_a0);
+CETECH_DECL_API(ct_dd_a0);
 
 
 static void geometry_pass(viewport_instance *viewport,
@@ -78,6 +80,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_mesh_renderer_a0);
             CETECH_GET_API(api, ct_camera_a0);
+            CETECH_GET_API(api, ct_dd_a0);
         },
         {
             CT_UNUSED(reload);

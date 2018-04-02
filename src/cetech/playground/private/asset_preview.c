@@ -4,9 +4,10 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/viewport.h>
 #include <cetech/engine/camera/camera.h>
-
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/controlers/keyboard.h>
+#include <cetech/engine/debugdraw/debugdraw.h>
+
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
@@ -32,6 +33,7 @@ CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_dd_a0);
 
 #define _G AssetPreviewGlobals
 
@@ -278,7 +280,7 @@ static void _shutdown() {
     ct_hash_free(&_G.preview_fce_map, _G.allocator);
     ct_array_free(_G.preview_fce, _G.allocator);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(
@@ -296,6 +298,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_dd_a0);
         },
         {
             CT_UNUSED(reload);

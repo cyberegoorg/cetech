@@ -19,6 +19,8 @@ void init_static_modules() {
     //==========================================================================
     // Engine
     //==========================================================================
+    CETECH_ADD_STATIC_MODULE(debugdraw);
+
     CETECH_ADD_STATIC_MODULE(application);
 
     CETECH_ADD_STATIC_MODULE(keyboard);

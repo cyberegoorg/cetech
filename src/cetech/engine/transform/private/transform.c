@@ -191,19 +191,25 @@ void transform_transform(struct ct_transform_comp *transform,
     float *rot = transform->rotation;
     float *sca = transform->scale;
 
-//    float rm[16];
+    float tm[16];
+    float rm[16];
+    float trm[16];
 //    float sm[16];
-    float m[16];
 
     float rot_rad[3];
     ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
 
-    ct_mat4_srt(m,
-                sca[0], sca[1], sca[2],
-                rot_rad[0], rot_rad[1], rot_rad[2],
-                pos[0], pos[1], pos[2]);
+    ct_mat4_translate(tm, pos[0], pos[1], pos[2]);
+//    ct_mat4_scale(sm, sca[0], sca[1], sca[2]);
+//    ct_mat4_rotate_xyz(sm, rot_rad[0], rot_rad[1], rot_rad[2]);
 
-    ct_mat4_move(transform->world, m);
+//    ct_mat4_srt(m,
+//                sca[0], sca[1], sca[2],
+//                rot_rad[0], rot_rad[1], rot_rad[2],
+//                pos[0], pos[1], pos[2]);
+    ct_mat4_mul(trm, tm, rm);
+    ct_mat4_mul(transform->world, trm, sca);
+    ct_mat4_move(transform->world, tm);
 }
 
 

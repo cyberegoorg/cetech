@@ -84,7 +84,7 @@ static uint32_t _get_reset_flags() {
 static void renderer_create() {
 
     if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
-        int w, h;
+        uint32_t w, h;
         w = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_X, 0);
         h = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
@@ -95,12 +95,13 @@ static void renderer_create() {
         char title[128] = {};
         snprintf(title, CT_ARRAY_LEN(title), "cetech");
 
-
         if (wid == 0) {
+            bool fullscreen = ct_cdb_a0.read_uint32(_G.config,
+                                                    CONFIG_SCREEN_FULLSCREEN, 0);
+
             uint32_t flags = WINDOW_NOFLAG;
-            flags |= ct_cdb_a0.read_uint32(_G.config,
-                                           CONFIG_SCREEN_FULLSCREEN, 0)
-                     ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
+
+            flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
             _G.main_window = ct_window_a0.create(
@@ -109,8 +110,8 @@ static void renderer_create() {
                     WINDOWPOS_UNDEFINED,
                     WINDOWPOS_UNDEFINED,
                     w, h,
-                    flags
-            );
+                    flags);
+
         } else {
             _G.main_window = ct_window_a0.create_from(_G.allocator,
                                                       (void *) wid);
@@ -129,7 +130,7 @@ static void renderer_create() {
     bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
     //_G.main_window->update(_G.main_window);
 
-    _G.need_reset = 1;
+    _G.need_reset = true;
 }
 
 
@@ -176,10 +177,10 @@ _DEF_ON_CLB_FCE(ct_render_on_render, on_render)
 
 static void on_resize(uint32_t bus_name,
                       void *event) {
-    ct_window_resized_event* ev = (ct_window_resized_event *) event;
-_G.need_reset = 1;
-_G.size_width = ev->width;
-_G.size_height = ev->height;
+    ct_window_resized_event *ev = (ct_window_resized_event *) event;
+    _G.need_reset = 1;
+    _G.size_width = ev->width;
+    _G.size_height = ev->height;
 
 }
 

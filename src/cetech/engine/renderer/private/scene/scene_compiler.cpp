@@ -497,7 +497,8 @@ static int _compile_assimp(const char *filename,
     char *input_path = NULL;
     ct_path_a0.join(&input_path, a, 2, source_dir, input_str);
 
-    uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality;
+    uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
+                                aiProcess_ConvertToLeftHanded;
 
     if (doc->get_bool(doc,
                       ct_yng_a0.key(

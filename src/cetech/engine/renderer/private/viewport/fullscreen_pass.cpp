@@ -192,13 +192,13 @@ static void fullscreen_pass(viewport_instance *viewport,
     bgfx::setViewFrameBuffer(viewid, {fb});
 
     float proj[16];
-    ct_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, true);
+    ct_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, bgfx::getCaps()->homogeneousDepth);
 
     bgfx::setViewTransform(viewid, NULL, proj);
 
     auto &layer_entry = viewport->layers[layerid];
 
-    screenspace_quad(viewport->size[0], viewport->size[1], 0.0f, true);
+    screenspace_quad(viewport->size[0], viewport->size[1], 0.0f, bgfx::getCaps()->originBottomLeft);
 
     fullscree_pass_data *pass_data = (fullscree_pass_data *) (&viewport->layers_data[viewport->layers_data_offset[layerid]]);
 

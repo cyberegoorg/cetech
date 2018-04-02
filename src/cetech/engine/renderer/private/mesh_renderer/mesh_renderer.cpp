@@ -23,7 +23,7 @@
 #include <cetech/core/yaml/ydb.h>
 #include <cetech/core/math/fmath.h>
 #include <cetech/core/ebus/ebus.h>
-
+#include <cetech/engine/debugdraw/debugdraw.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -38,6 +38,7 @@ CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_dd_a0);
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -144,6 +145,13 @@ void foreach_mesh_renderer(struct ct_world world,
 
             ct_material_a0.submit(m.geometries[j].material,
                                   data->layer_name, data->viewid);
+
+            ct_dd_a0.draw_axis(t.position[0],
+                                          t.position[1],
+                                          t.position[2],
+                                          1.0f,
+                                          DD_AXIS_COUNT,
+                                          0.0f);
         }
     }
 }
@@ -247,6 +255,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_dd_a0);
 
         },
         {

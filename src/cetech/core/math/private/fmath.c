@@ -1470,12 +1470,12 @@ void ct_mat4_ortho_rh(float *_result,
 }
 
 enum Handness {
-    Left,
+    Left = 0,
     Right,
 };
 
 enum NearFar {
-    Default,
+    Default = 0,
     Reverse,
 };
 
