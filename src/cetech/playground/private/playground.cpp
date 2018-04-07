@@ -1,28 +1,28 @@
 #include <stdio.h>
 
-#include <cetech/core/macros.h>
-#include <cetech/core/containers/map.inl>
+#include <cetech/kernel/macros.h>
+#include <cetech/kernel/containers/map.inl>
 
-#include <cetech/core/fs/fs.h>
-#include <cetech/core/os/vio.h>
-#include <cetech/core/yaml/ydb.h>
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include <cetech/kernel/fs/fs.h>
+#include <cetech/kernel/os/vio.h>
+#include <cetech/kernel/yaml/ydb.h>
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/application/application.h>
-#include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/camera/camera.h>
-#include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/viewport/viewport.h>
 #include <cetech/playground/command_system.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/playground/action_manager.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
@@ -43,6 +43,11 @@ using namespace celib;
 static struct PlaygroundGlobal {
     bool load_layout;
 } _G;
+
+void reload_layout() {
+    _G.load_layout = true;
+}
+
 
 static float draw_main_menu() {
     float menu_height = 0;
@@ -153,10 +158,6 @@ static void on_init(uint32_t ebus_name, void* event) {
 static void on_shutdown(uint32_t ebus_name, void* event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
 
-}
-
-void reload_layout() {
-    _G.load_layout = true;
 }
 
 static void on_update(uint32_t ebus_name, void* event) {

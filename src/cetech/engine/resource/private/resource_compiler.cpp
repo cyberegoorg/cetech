@@ -8,23 +8,23 @@
 #include "include/SDL2/SDL.h"
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/task/task.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/os/path.h>
-#include <cetech/core/log/log.h>
-#include <cetech/core/os/vio.h>
-#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/task/task.h>
+#include <cetech/kernel/config/config.h>
+#include <cetech/kernel/os/path.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/os/vio.h>
+#include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/os/watchdog.h>
-#include <cetech/core/containers/map.inl>
-#include <cetech/core/fs/fs.h>
-#include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/kernel/kernel.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/containers/buffer.h>
+#include <cetech/kernel/module/module.h>
+#include <cetech/kernel/os/watchdog.h>
+#include <cetech/kernel/containers/map.inl>
+#include <cetech/kernel/fs/fs.h>
+#include <cetech/kernel/yaml/ydb.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/containers/buffer.h>
 
 
 using namespace celib;

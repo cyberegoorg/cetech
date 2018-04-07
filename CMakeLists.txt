@@ -71,35 +71,35 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/cetech/core/memory/private/allocator_core.c
-        src/cetech/core/api/private/api_system.c
-        src/cetech/core/log/private/log_system.c
-        src/cetech/core/module/private/module.cpp
-        src/cetech/core/config/private/config.c
-        src/cetech/core/memory/private/memory.c
-        src/cetech/core/memory/private/allocator_malloc.c
+        src/cetech/kernel/memory/private/allocator_core.c
+        src/cetech/kernel/api/private/api_system.c
+        src/cetech/kernel/log/private/log_system.c
+        src/cetech/kernel/module/private/module.cpp
+        src/cetech/kernel/config/private/config.c
+        src/cetech/kernel/memory/private/memory.c
+        src/cetech/kernel/memory/private/allocator_malloc.c
         src/cetech/engine/application/private/application.cpp
-        src/cetech/core/task/private/task.c
-        src/cetech/core/log/private/log_stdout_handler.c
-        src/cetech/engine/kernel/private/kernel.c
-        src/cetech/core/hashlib/private/hashlib.c
-        src/cetech/core/os/private/error.c
-        src/cetech/core/os/private/object.c
-        src/cetech/core/os/private/path.cpp
-        src/cetech/core/os/private/process.c
-        src/cetech/core/os/private/cpu.c
-        src/cetech/core/os/private/thread.c
-        src/cetech/core/os/private/vio.c
-        src/cetech/core/os/private/watchdog.cpp
-        src/cetech/core/os/private/time.c
+        src/cetech/kernel/task/private/task.c
+        src/cetech/kernel/log/private/log_stdout_handler.c
+        src/cetech/kernel/kernel.c
+        src/cetech/kernel/hashlib/private/hashlib.c
+        src/cetech/kernel/os/private/error.c
+        src/cetech/kernel/os/private/object.c
+        src/cetech/kernel/os/private/path.cpp
+        src/cetech/kernel/os/private/process.c
+        src/cetech/kernel/os/private/cpu.c
+        src/cetech/kernel/os/private/thread.c
+        src/cetech/kernel/os/private/vio.c
+        src/cetech/kernel/os/private/watchdog.cpp
+        src/cetech/kernel/os/private/time.c
         src/cetech/engine/resource/private/resource.c
         src/cetech/engine/resource/private/resource_package.c
         src/cetech/engine/resource/private/resource_compiler.cpp
-        src/cetech/core/fs/private/fs.cpp
-        src/cetech/core/yaml/private/yng.c
-        src/cetech/core/yaml/private/ydb.cpp
-        src/cetech/core/cdb/private/cdb.c
-        src/cetech/core/ebus/private/ebus.c
+        src/cetech/kernel/fs/private/fs.cpp
+        src/cetech/kernel/yaml/private/yng.c
+        src/cetech/kernel/yaml/private/ydb.cpp
+        src/cetech/kernel/cdb/private/cdb.c
+        src/cetech/kernel/ebus/private/ebus.c
 
         src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/engine/debugui/private/ocornut-imgui/imgui.cpp
@@ -110,7 +110,7 @@ set(SOURCE_FILES
         src/cetech/engine/debugdraw/private/debugdraw/bounds.cpp
         src/cetech/engine/debugdraw/private/debugdraw.cpp
 
-        src/cetech/core/os/private/window_sdl2.cpp
+        src/cetech/kernel/os/private/window_sdl2.cpp
         src/cetech/engine/machine/private/machine_sdl2.cpp
 
         src/cetech/playground/private/entity_preview.c
@@ -119,29 +119,29 @@ set(SOURCE_FILES
         src/cetech/engine/controlers/private/mouse.c
         src/cetech/engine/controlers/private/gamepad.c
         src/cetech/engine/renderer/private/renderer.cpp
-        src/cetech/engine/renderer/private/texture/texture.cpp
-        src/cetech/engine/renderer/private/texture/texture_compiler.cpp
+        src/cetech/engine/texture/private/texture.cpp
+        src/cetech/engine/texture/private/texture_compiler.cpp
 
-        src/cetech/engine/renderer/private/shader/shader.cpp
-        src/cetech/engine/renderer/private/shader/shader_compiler.cpp
-        src/cetech/engine/renderer/private/material/material.cpp
-        src/cetech/engine/renderer/private/material/material_preview.cpp
-        src/cetech/engine/renderer/private/material/material_compiler.cpp
-        src/cetech/engine/renderer/private/material/material_property.cpp
-        src/cetech/engine/renderer/private/scene/scene.cpp
-        src/cetech/engine/renderer/private/scene/scene_compiler.cpp
-        src/cetech/engine/renderer/private/viewport/viewport.cpp
-        src/cetech/engine/renderer/private/viewport/fullscreen_pass.cpp
-        src/cetech/engine/renderer/private/viewport/geometry_pass.cpp
-        src/cetech/engine/renderer/private/mesh_renderer/mesh_renderer.cpp
-        src/cetech/engine/renderer/private/mesh_renderer/mesh_property.cpp
+        src/cetech/engine/shader/private/shader.cpp
+        src/cetech/engine/shader/private/shader_compiler.cpp
+        src/cetech/engine/material/private/material.cpp
+        src/cetech/engine/material/private/material_preview.cpp
+        src/cetech/engine/material/private/material_compiler.cpp
+        src/cetech/engine/material/private/material_property.cpp
+        src/cetech/engine/scene/private/scene.cpp
+        src/cetech/engine/scene/private/scene_compiler.cpp
+        src/cetech/engine/viewport/private/viewport.cpp
+        src/cetech/engine/viewport/private/fullscreen_pass.cpp
+        src/cetech/engine/viewport/private/geometry_pass.cpp
+        src/cetech/engine/mesh_renderer/mesh_renderer.cpp
+        src/cetech/engine/mesh_renderer/mesh_property.cpp
         src/cetech/engine/transform/private/transform.c
 
         src/cetech/engine/scenegraph/private/scenegraph.c
         src/cetech/engine/camera/private/camera.c
 
         src/cetech/engine/transform/private/transform_property.cpp
-        src/cetech/engine/renderer/private/texture/texture_property.cpp
+        src/cetech/engine/texture/private/texture_property.cpp
 
         src/cetech/playground/private/entity_editor.cpp
         src/cetech/playground/private/entity_property.cpp
@@ -155,13 +155,13 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_history.cpp
         src/cetech/playground/private/log_view.cpp
         src/cetech/playground/private/action_manager.c
-        src/cetech/core/math/private/fmath.c src/cetech/core/core.c)
+        src/cetech/kernel/math/private/fmath.c src/cetech/kernel/core.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES} src/cetech/core/math/private/fmath.c)
+        ${SOURCE_FILES} src/cetech/kernel/math/private/fmath.c)
 
 ################################################################################
 # Release sources
@@ -274,4 +274,7 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 add_library(example SHARED examples/module_example/example.cpp)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
+
+add_library(example_develop SHARED examples/develop/src/game.c)
+set_target_properties(example_develop PROPERTIES PREFIX "module_")
 

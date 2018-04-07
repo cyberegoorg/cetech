@@ -1,23 +1,23 @@
-#include "cetech/core/containers/map.inl"
+#include "cetech/kernel/containers/map.inl"
 
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/core/fs/fs.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/module/module.h>
+#include <cetech/kernel/fs/fs.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/config/config.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/module/module.h>
 #include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/core/yaml/yng.h>
-#include <cetech/core/yaml/ydb.h>
+#include <cetech/kernel/yaml/yng.h>
+#include <cetech/kernel/yaml/ydb.h>
 #include <cstdio>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);

@@ -33,7 +33,7 @@ namespace imgui_wrap {
     }
 
 
-    void Image2(struct ct_texture user_texture_id,
+    void Image2(struct ct_render_texture_handle user_texture_id,
                const _vec2 size,
                const _vec2 uv0,
                const _vec2 uv1,

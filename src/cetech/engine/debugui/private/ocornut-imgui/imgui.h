@@ -782,7 +782,7 @@ enum ImGuiConfigFlags_
     ImGuiConfigFlags_NavNoCaptureKeyboard   = 1 << 3,   // Do not set the io.WantCaptureKeyboard flag with io.NavActive is set. 
     ImGuiConfigFlags_NoSetMouseCursor       = 1 << 4,   // Request back-end to not alter mouse cursor configuration.
 
-    // User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core ImGui)
+    // User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by kernel ImGui)
     ImGuiConfigFlags_IsSRGB                 = 1 << 20,  // Application is SRGB-aware.
     ImGuiConfigFlags_IsTouchScreen          = 1 << 21   // Application is using a touch screen instead of a mouse.
 };

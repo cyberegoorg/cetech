@@ -1,17 +1,17 @@
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/renderer/texture.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/log/log.h>
+#include <cetech/engine/texture/texture.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/log/log.h>
 
-#include "cetech/core/memory/memory.h"
+#include "cetech/kernel/memory/memory.h"
 
 #include <cetech/engine/debugdraw/debugdraw.h>
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 #include <cetech/engine/debugdraw/private/debugdraw/debugdraw.h>
-#include <cetech/core/math/bounds.h>
+#include <cetech/kernel/math/bounds.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -146,7 +146,7 @@ void _ddDrawQuad_sprite(ct_dd_sprite _handle,
 }
 
 
-void _ddDrawQuad_texture(ct_texture _handle,
+void _ddDrawQuad_texture(ct_render_texture_handle _handle,
                          const float *_normal,
                          const float *_center,
                          float _size) {

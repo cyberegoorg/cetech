@@ -4,8 +4,8 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <cetech/core/yaml/yng.h>
-#include <cetech/core/cdb/cdb.h>
+#include <cetech/kernel/yaml/yng.h>
+#include <cetech/kernel/cdb/cdb.h>
 
 #define PROP_RESOURECE_DATA CT_ID64_0("data")
 
@@ -86,7 +86,7 @@ struct ct_compilator_api {
 // Api
 //==============================================================================
 
-//! Resource API V0
+
 struct ct_resource_a0 {
     void (*set_autoload)(bool enable);
 

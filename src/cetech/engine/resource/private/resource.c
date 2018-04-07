@@ -2,25 +2,25 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/containers/array.h>
-#include <cetech/core/containers/hash.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/containers/hash.h>
 
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/fs/fs.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/os/path.h>
-#include <cetech/core/os/vio.h>
-#include <cetech/core/log/log.h>
-#include <cetech/core/os/thread.h>
-#include <cetech/core/os/errors.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/fs/fs.h>
+#include <cetech/kernel/config/config.h>
+#include <cetech/kernel/os/path.h>
+#include <cetech/kernel/os/vio.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/os/thread.h>
+#include <cetech/kernel/os/errors.h>
 #include <cetech/engine/resource/package.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/cdb/cdb.h>
-#include <cetech/engine/kernel/kernel.h>
-#include <cetech/core/containers/buffer.h>
+#include <cetech/kernel/module/module.h>
+#include <cetech/kernel/cdb/cdb.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/kernel/containers/buffer.h>
 
 #include "include/SDL2/SDL.h"
 

@@ -1,13 +1,13 @@
-#include <cetech/core/macros.h>
+#include <cetech/kernel/macros.h>
 
-#include <cetech/core/log/log.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/hashlib/hashlib.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/config/config.h>
+#include <cetech/kernel/module/module.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/hashlib/hashlib.h>
 
 #include <cetech/engine/controlers/keyboard.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 #include <cetech/engine/application/application.h>
 #include <cetech/engine/ecs/ecs.h>
 
@@ -15,8 +15,8 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
-#include <cetech/engine/renderer/viewport.h>
-#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/viewport/viewport.h>
+#include <cetech/engine/texture/texture.h>
 #include <cstdlib>
 
 CETECH_DECL_API(ct_log_a0);
@@ -91,7 +91,7 @@ void module1(uint32_t ebus_name, void* event) {
         float size[2] = {};
         ct_debugui_a0.GetWindowSize(size);
         size[1] = size[0];
-        ct_debugui_a0.Image2(ct_texture_a0.get(ct_hashlib_a0.id64_from_str("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
+        ct_debugui_a0.Image2(ct_texture_a0.get(CT_ID32_0("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
                              size,
                              (float[2]) {0.0f, 0.0f},
                              (float[2]) {1.0f, 1.0f},

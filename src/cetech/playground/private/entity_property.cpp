@@ -1,11 +1,11 @@
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/config/config.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/yaml/ydb.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/module/module.h>
-#include "cetech/core/containers/map.inl"
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/config/config.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/yaml/ydb.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/module/module.h>
+#include "cetech/kernel/containers/map.inl"
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/resource/resource.h>
@@ -15,7 +15,7 @@
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 
 
 CETECH_DECL_API(ct_memory_a0);

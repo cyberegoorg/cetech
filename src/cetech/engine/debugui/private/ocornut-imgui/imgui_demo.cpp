@@ -7,7 +7,7 @@
 // During development, you can call ImGui::ShowDemoWindow() in your code to learn about various features of ImGui. Have it wired in a debug menu!
 // Removing this file from your project is hindering access to documentation for everyone in your team, likely leading you to poorer usage of the library.
 // Note that you can #define IMGUI_DISABLE_DEMO_WINDOWS in imconfig.h for the same effect.
-// If you want to link core ImGui in your final builds but not those demo windows, #define IMGUI_DISABLE_DEMO_WINDOWS in imconfig.h and those functions will be empty.
+// If you want to link kernel ImGui in your final builds but not those demo windows, #define IMGUI_DISABLE_DEMO_WINDOWS in imconfig.h and those functions will be empty.
 // In other situation, when you have ImGui available you probably want this to be available for reference and execution.
 // Thank you,
 // -Your beloved friend, imgui_demo.cpp (that you won't delete)

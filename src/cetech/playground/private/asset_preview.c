@@ -1,8 +1,8 @@
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/renderer/viewport.h>
+#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/controlers/keyboard.h>
@@ -11,15 +11,15 @@
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
-#include <cetech/core/containers/hash.h>
-#include <cetech/core/math/fmath.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/containers/hash.h>
+#include <cetech/kernel/math/fmath.h>
+#include <cetech/kernel/ebus/ebus.h>
 
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/config/config.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/config/config.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -119,7 +119,7 @@ static void on_debugui(uint32_t bus_name,
         camera_data = ct_ecs_a0.entity_data(_G.world, CAMERA_COMPONENT,
                                             _G.camera_ent);
 
-        struct ct_texture th = ct_viewport_a0.get_local_resource(
+        struct ct_render_texture_handle th = ct_viewport_a0.get_local_resource(
                 camera_data->viewport,
                 CT_ID64_0("bb_color"));
 

@@ -3,20 +3,20 @@
 //==============================================================================
 
 #include <stdio.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/memory/memory.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/memory/memory.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/os/path.h>
-#include <cetech/core/log/log.h>
-#include <cetech/core/os/vio.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/os/errors.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/yaml/ydb.h>
-#include <cetech/core/containers/hash.h>
+#include <cetech/kernel/os/path.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/os/vio.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/os/errors.h>
+#include <cetech/kernel/module/module.h>
+#include <cetech/kernel/yaml/ydb.h>
+#include <cetech/kernel/containers/hash.h>
 
-#include "cetech/core/containers/handler.h"
+#include "cetech/kernel/containers/handler.h"
 
 
 //==============================================================================

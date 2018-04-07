@@ -202,7 +202,7 @@ struct ct_dd_a0 {
                              float size);
 
 
-    void (*draw_quad_texture)(struct ct_texture handle,
+    void (*draw_quad_texture)(struct ct_render_texture_handle handle,
                               const float *normal,
                               const float *center,
                               float ßsize);

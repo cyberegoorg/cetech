@@ -2,29 +2,29 @@
 // Include
 //==============================================================================
 
-#include "cetech/core/memory/allocator.h"
-#include "cetech/core/containers/map.inl"
-#include "cetech/core/containers/buffer.h"
+#include "cetech/kernel/memory/allocator.h"
+#include "cetech/kernel/containers/map.inl"
+#include "cetech/kernel/containers/buffer.h"
 
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/log/log.h"
-#include "cetech/core/os/path.h"
-#include "cetech/core/os/vio.h"
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/log/log.h"
+#include "cetech/kernel/os/path.h"
+#include "cetech/kernel/os/vio.h"
 #include "cetech/engine/resource/resource.h"
-#include <cetech/core/module/module.h>
+#include <cetech/kernel/module/module.h>
 #include <cetech/playground//asset_property.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/texture/texture.h>
 #include <cetech/playground//entity_property.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/transform/transform.h>
 #include <cfloat>
 
-#include <cetech/core/yaml/ydb.h>
+#include <cetech/kernel/yaml/ydb.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/core/math/fmath.h>
+#include <cetech/kernel/math/fmath.h>
 
 using namespace celib;
 

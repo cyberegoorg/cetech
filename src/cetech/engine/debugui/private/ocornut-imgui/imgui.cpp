@@ -252,7 +252,7 @@
  Here is a change-log of API breaking changes, if you are using one of the functions listed, expect to have to fix some code.
  Also read releases logs https://github.com/ocornut/imgui/releases for more details.
 
- - 2018/03/20 (1.60) - Renamed io.WantMoveMouse to io.WantSetMousePos for consistency and ease of understanding (was added in 1.52, _not_ used by core and only honored by some binding ahead of merging the Nav branch).
+ - 2018/03/20 (1.60) - Renamed io.WantMoveMouse to io.WantSetMousePos for consistency and ease of understanding (was added in 1.52, _not_ used by kernel and only honored by some binding ahead of merging the Nav branch).
  - 2018/03/12 (1.60) - Removed ImGuiCol_CloseButton, ImGuiCol_CloseButtonActive, ImGuiCol_CloseButtonHovered as the closing cross uses regular button colors now.
  - 2018/03/08 (1.60) - Changed ImFont::DisplayOffset.y to default to 0 instead of +1. Fixed rounding of Ascent/Descent to match TrueType renderer. If you were adding or subtracting to ImFont::DisplayOffset check if your fonts are correctly aligned vertically.
  - 2018/03/03 (1.60) - Renamed ImGuiStyleVar_Count_ to ImGuiStyleVar_COUNT and ImGuiMouseCursor_Count_ to ImGuiMouseCursor_COUNT for consistency with other public enums.
@@ -2015,11 +2015,11 @@ static void SetNavID(ImGuiID id, int nav_layer)
     g.NavWindow->NavLastIds[nav_layer] = id;
 }
 
-static void SetNavIDWithRectRel(ImGuiID id, int nav_layer, const ImRect& rect_rel)
+static void SetNavIDWithRectRel(ImGuiID id, int nav_layer, const ImRect& rect_renderel)
 {
     ImGuiContext& g = *GImGui;
     SetNavID(id, nav_layer);
-    g.NavWindow->NavRectRel[nav_layer] = rect_rel;
+    g.NavWindow->NavRectRel[nav_layer] = rect_renderel;
     g.NavMousePosDirty = true;
     g.NavDisableHighlight = false;
     g.NavDisableMouseHover = true;
@@ -2710,8 +2710,8 @@ static ImVec2 NavCalcPreferredMousePos()
     ImGuiWindow* window = g.NavWindow;
     if (!window)
         return g.IO.MousePos;
-    const ImRect& rect_rel = window->NavRectRel[g.NavLayer];
-    ImVec2 pos = g.NavWindow->Pos + ImVec2(rect_rel.Min.x + ImMin(g.Style.FramePadding.x*4, rect_rel.GetWidth()), rect_rel.Max.y - ImMin(g.Style.FramePadding.y, rect_rel.GetHeight()));
+    const ImRect& rect_renderel = window->NavRectRel[g.NavLayer];
+    ImVec2 pos = g.NavWindow->Pos + ImVec2(rect_renderel.Min.x + ImMin(g.Style.FramePadding.x*4, rect_renderel.GetWidth()), rect_renderel.Max.y - ImMin(g.Style.FramePadding.y, rect_renderel.GetHeight()));
     ImRect visible_rect = GetViewportRect();
     return ImFloor(ImClamp(pos, visible_rect.Min, visible_rect.Max));   // ImFloor() is important because non-integer mouse position application in back-end might be lossy and result in undesirable non-zero delta.
 }
@@ -2920,40 +2920,40 @@ static void ImGui::NavUpdateWindowing()
     }
 }
 
-// NB: We modify rect_rel by the amount we scrolled for, so it is immediately updated.
-static void NavScrollToBringItemIntoView(ImGuiWindow* window, ImRect& item_rect_rel)
+// NB: We modify rect_renderel by the amount we scrolled for, so it is immediately updated.
+static void NavScrollToBringItemIntoView(ImGuiWindow* window, ImRect& item_rect_renderel)
 {
     // Scroll to keep newly navigated item fully into view
-    ImRect window_rect_rel(window->InnerRect.Min - window->Pos - ImVec2(1, 1), window->InnerRect.Max - window->Pos + ImVec2(1, 1));
-    //g.OverlayDrawList.AddRect(window->Pos + window_rect_rel.Min, window->Pos + window_rect_rel.Max, IM_COL32_WHITE); // [DEBUG]
-    if (window_rect_rel.Contains(item_rect_rel))
+    ImRect window_rect_renderel(window->InnerRect.Min - window->Pos - ImVec2(1, 1), window->InnerRect.Max - window->Pos + ImVec2(1, 1));
+    //g.OverlayDrawList.AddRect(window->Pos + window_rect_renderel.Min, window->Pos + window_rect_renderel.Max, IM_COL32_WHITE); // [DEBUG]
+    if (window_rect_renderel.Contains(item_rect_renderel))
         return;
 
     ImGuiContext& g = *GImGui;
-    if (window->ScrollbarX && item_rect_rel.Min.x < window_rect_rel.Min.x)
+    if (window->ScrollbarX && item_rect_renderel.Min.x < window_rect_renderel.Min.x)
     {
-        window->ScrollTarget.x = item_rect_rel.Min.x + window->Scroll.x - g.Style.ItemSpacing.x;
+        window->ScrollTarget.x = item_rect_renderel.Min.x + window->Scroll.x - g.Style.ItemSpacing.x;
         window->ScrollTargetCenterRatio.x = 0.0f;
     }
-    else if (window->ScrollbarX && item_rect_rel.Max.x >= window_rect_rel.Max.x)
+    else if (window->ScrollbarX && item_rect_renderel.Max.x >= window_rect_renderel.Max.x)
     {
-        window->ScrollTarget.x = item_rect_rel.Max.x + window->Scroll.x + g.Style.ItemSpacing.x;
+        window->ScrollTarget.x = item_rect_renderel.Max.x + window->Scroll.x + g.Style.ItemSpacing.x;
         window->ScrollTargetCenterRatio.x = 1.0f;
     }
-    if (item_rect_rel.Min.y < window_rect_rel.Min.y)
+    if (item_rect_renderel.Min.y < window_rect_renderel.Min.y)
     {
-        window->ScrollTarget.y = item_rect_rel.Min.y + window->Scroll.y - g.Style.ItemSpacing.y;
+        window->ScrollTarget.y = item_rect_renderel.Min.y + window->Scroll.y - g.Style.ItemSpacing.y;
         window->ScrollTargetCenterRatio.y = 0.0f;
     }
-    else if (item_rect_rel.Max.y >= window_rect_rel.Max.y)
+    else if (item_rect_renderel.Max.y >= window_rect_renderel.Max.y)
     {
-        window->ScrollTarget.y = item_rect_rel.Max.y + window->Scroll.y + g.Style.ItemSpacing.y;
+        window->ScrollTarget.y = item_rect_renderel.Max.y + window->Scroll.y + g.Style.ItemSpacing.y;
         window->ScrollTargetCenterRatio.y = 1.0f;
     }
 
     // Estimate upcoming scroll so we can offset our relative mouse position so mouse position can be applied immediately (under this block)
     ImVec2 next_scroll = CalcNextScrollFromScrollTargetAndClamp(window);
-    item_rect_rel.Translate(window->Scroll - next_scroll);
+    item_rect_renderel.Translate(window->Scroll - next_scroll);
 }
 
 static void ImGui::NavUpdate()
@@ -3206,20 +3206,20 @@ static void ImGui::NavUpdate()
     if (g.NavMoveRequest && g.NavMoveFromClampedRefRect && g.NavLayer == 0)
     {
         ImGuiWindow* window = g.NavWindow;
-        ImRect window_rect_rel(window->InnerRect.Min - window->Pos - ImVec2(1,1), window->InnerRect.Max - window->Pos + ImVec2(1,1));
-        if (!window_rect_rel.Contains(window->NavRectRel[g.NavLayer]))
+        ImRect window_rect_renderel(window->InnerRect.Min - window->Pos - ImVec2(1,1), window->InnerRect.Max - window->Pos + ImVec2(1,1));
+        if (!window_rect_renderel.Contains(window->NavRectRel[g.NavLayer]))
         {
             float pad = window->CalcFontSize() * 0.5f;
-            window_rect_rel.Expand(ImVec2(-ImMin(window_rect_rel.GetWidth(), pad), -ImMin(window_rect_rel.GetHeight(), pad))); // Terrible approximation for the intent of starting navigation from first fully visible item
-            window->NavRectRel[g.NavLayer].ClipWith(window_rect_rel);
+            window_rect_renderel.Expand(ImVec2(-ImMin(window_rect_renderel.GetWidth(), pad), -ImMin(window_rect_renderel.GetHeight(), pad))); // Terrible approximation for the intent of starting navigation from first fully visible item
+            window->NavRectRel[g.NavLayer].ClipWith(window_rect_renderel);
             g.NavId = 0;
         }
         g.NavMoveFromClampedRefRect = false;
     }
 
     // For scoring we use a single segment on the left side our current item bounding box (not touching the edge to avoid box overlap with zero-spaced items)
-    ImRect nav_rect_rel = (g.NavWindow && !g.NavWindow->NavRectRel[g.NavLayer].IsInverted()) ? g.NavWindow->NavRectRel[g.NavLayer] : ImRect(0,0,0,0);
-    g.NavScoringRectScreen = g.NavWindow ? ImRect(g.NavWindow->Pos + nav_rect_rel.Min, g.NavWindow->Pos + nav_rect_rel.Max) : GetViewportRect();
+    ImRect nav_rect_renderel = (g.NavWindow && !g.NavWindow->NavRectRel[g.NavLayer].IsInverted()) ? g.NavWindow->NavRectRel[g.NavLayer] : ImRect(0,0,0,0);
+    g.NavScoringRectScreen = g.NavWindow ? ImRect(g.NavWindow->Pos + nav_rect_renderel.Min, g.NavWindow->Pos + nav_rect_renderel.Max) : GetViewportRect();
     g.NavScoringRectScreen.Min.x = ImMin(g.NavScoringRectScreen.Min.x + 1.0f, g.NavScoringRectScreen.Max.x);
     g.NavScoringRectScreen.Max.x = g.NavScoringRectScreen.Min.x;
     IM_ASSERT(!g.NavScoringRectScreen.IsInverted()); // Ensure if we have a finite, non-inverted bounding box here will allows us to remove extraneous fabsf() calls in NavScoreItem().

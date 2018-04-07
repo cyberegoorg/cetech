@@ -3,30 +3,32 @@
 //==============================================================================
 #include <cstdio>
 
-#include <cetech/core/memory/allocator.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/containers/map.inl>
+#include <cetech/kernel/memory/allocator.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/containers/map.inl>
 
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/config/config.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/config/config.h>
 #include <cetech/macros.h>
-#include <cetech/core/module/module.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/engine/kernel/kernel.h>
+#include <cetech/kernel/module/module.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/kernel.h>
 
 #include <cetech/engine/application/application.h>
-#include <cetech/core/os/window.h>
+#include <cetech/kernel/os/window.h>
 #include <cetech/engine/resource/resource.h>
 
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/private/bgfx_imgui/imgui.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/core/api/private/api_private.h>
+#include <cetech/kernel/api/private/api_private.h>
 #include <cetech/engine/ecs/ecs.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 
 #include "bgfx/platform.h"
+#include "bgfx/c99/bgfx.h"
+#include "bgfx/c99/platform.h"
 
 CETECH_DECL_API(ct_config_a0);
 CETECH_DECL_API(ct_window_a0);
@@ -47,7 +49,7 @@ CETECH_DECL_API(ct_ebus_a0);
 
 #define _G RendererGlobals
 static struct _G {
-    ct_render_on_render *on_render;
+    ct_renderender_on_render *on_render;
     ct_window *main_window;
 
     uint64_t type;
@@ -97,7 +99,8 @@ static void renderer_create() {
 
         if (wid == 0) {
             bool fullscreen = ct_cdb_a0.read_uint32(_G.config,
-                                                    CONFIG_SCREEN_FULLSCREEN, 0);
+                                                    CONFIG_SCREEN_FULLSCREEN,
+                                                    0);
 
             uint32_t flags = WINDOW_NOFLAG;
 
@@ -118,16 +121,16 @@ static void renderer_create() {
         }
     }
 
-    bgfx::PlatformData pd = {NULL};
+    bgfx_platform_data_t pd = {NULL};
     pd.nwh = _G.main_window->native_window_ptr(_G.main_window->inst);
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
-    bgfx::setPlatformData(pd);
+    bgfx_set_platform_data(&pd);
 
     // TODO: from config
-    bgfx::init(bgfx::RendererType::OpenGL, 0, 0, NULL, NULL);
+    bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
-    bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
+    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     //_G.main_window->update(_G.main_window);
 
     _G.need_reset = true;
@@ -136,9 +139,9 @@ static void renderer_create() {
 
 static void renderer_set_debug(int debug) {
     if (debug) {
-        bgfx::setDebug(BGFX_DEBUG_STATS);
+        bgfx_set_debug(BGFX_DEBUG_STATS);
     } else {
-        bgfx::setDebug(BGFX_DEBUG_NONE);
+        bgfx_set_debug(BGFX_DEBUG_NONE);
     }
 }
 
@@ -171,7 +174,7 @@ static void renderer_get_size(uint32_t *width,
         }                                                                      \
     }
 
-_DEF_ON_CLB_FCE(ct_render_on_render, on_render)
+_DEF_ON_CLB_FCE(ct_renderender_on_render, on_render)
 
 #undef _DEF_ON_CLB_FCE
 
@@ -208,6 +211,562 @@ static ct_renderer_a0 rendderer_api = {
         .get_size = renderer_get_size,
         .register_on_render =register_on_render_,
         .unregister_on_render =unregister_on_render_,
+
+///
+        .vertex_decl_begin = reinterpret_cast<void (*)(ct_render_vertex_decl_t *,
+                                                       ct_render_renderer_type_t)>(bgfx_vertex_decl_begin),
+        .vertex_decl_add = reinterpret_cast<void (*)(ct_render_vertex_decl_t *,
+                                                     ct_render_attrib_t,
+                                                     uint8_t,
+                                                     ct_render_attrib_type_t,
+                                                     bool,
+                                                     bool)>(bgfx_vertex_decl_add),
+        .vertex_decl_skip = reinterpret_cast<void (*)(ct_render_vertex_decl_t *,
+                                                      uint8_t)>(bgfx_vertex_decl_skip),
+        .vertex_decl_end = reinterpret_cast<void (*)(ct_render_vertex_decl_t *)>(bgfx_vertex_decl_end),
+        .vertex_pack = reinterpret_cast<void (*)(const float *,
+                                                 bool,
+                                                 ct_render_attrib_t,
+                                                 const ct_render_vertex_decl_t *,
+                                                 void *,
+                                                 uint32_t)>(bgfx_vertex_pack),
+        .vertex_unpack = reinterpret_cast<void (*)(float *,
+                                                   ct_render_attrib_t,
+                                                   const ct_render_vertex_decl_t *,
+                                                   const void *,
+                                                   uint32_t)>(bgfx_vertex_unpack),
+        .vertex_convert = reinterpret_cast<void (*)(const ct_render_vertex_decl_t *,
+                                                    void *,
+                                                    const ct_render_vertex_decl_t *,
+                                                    const void *,
+                                                    uint32_t)>(bgfx_vertex_convert),
+        .weld_vertices = reinterpret_cast<uint16_t (*)(uint16_t *,
+                                                       const ct_render_vertex_decl_t *,
+                                                       const void *,
+                                                       uint16_t,
+                                                       float)>(bgfx_weld_vertices),
+        .topology_convert = reinterpret_cast<uint32_t (*)(ct_render_topology_convert_t,
+                                                          void *,
+                                                          uint32_t,
+                                                          const void *,
+                                                          uint32_t,
+                                                          bool)>(bgfx_topology_convert),
+        .topology_sort_tri_list = reinterpret_cast<void (*)(ct_render_topology_sort_t,
+                                                            void *,
+                                                            uint32_t,
+                                                            const float *,
+                                                            const float *,
+                                                            const void *,
+                                                            uint32_t,
+                                                            const void *,
+                                                            uint32_t,
+                                                            bool)>(bgfx_topology_sort_tri_list),
+        .get_supported_renderers = reinterpret_cast<uint8_t (*)(uint8_t,
+                                                                ct_render_renderer_type_t *)>(bgfx_get_supported_renderers),
+        .get_renderer_name = reinterpret_cast<const char *(*)(ct_render_renderer_type_t)>(bgfx_get_renderer_name),
+        .frame = bgfx_frame,
+        .get_renderer_type = reinterpret_cast<ct_render_renderer_type_t (*)()>(bgfx_get_renderer_type),
+        .get_caps = reinterpret_cast<const ct_render_caps_t *(*)()>(bgfx_get_caps),
+        .get_hmd = reinterpret_cast<const ct_render_hmd_t *(*)()>(bgfx_get_hmd),
+        .get_stats = reinterpret_cast<const ct_render_stats_t *(*)()>(bgfx_get_stats),
+        .alloc = reinterpret_cast<const ct_render_memory_t *(*)(uint32_t)>(bgfx_alloc),
+        .copy = reinterpret_cast<const ct_render_memory_t *(*)(const void *,
+                                                          uint32_t)>(bgfx_copy),
+        .make_ref = reinterpret_cast<const ct_render_memory_t *(*)(const void *,
+                                                              uint32_t)>(bgfx_make_ref),
+        .make_ref_release = reinterpret_cast<const ct_render_memory_t *(*)(const void *,
+                                                                      uint32_t,
+                                                                      ct_render_release_fn_t,
+                                                                      void *)>(bgfx_make_ref_release),
+        .dbg_text_clear = bgfx_dbg_text_clear,
+        .dbg_text_printf = bgfx_dbg_text_printf,
+        .dbg_text_vprintf = bgfx_dbg_text_vprintf,
+        .dbg_text_image = bgfx_dbg_text_image,
+        .create_index_buffer = reinterpret_cast<ct_render_index_buffer_handle_t (*)(const ct_render_memory_t *,
+                                                                               uint16_t)>(bgfx_create_index_buffer),
+        .destroy_index_buffer = reinterpret_cast<void (*)(ct_render_index_buffer_handle_t)>(bgfx_destroy_index_buffer),
+        .create_vertex_buffer = reinterpret_cast<ct_render_vertex_buffer_handle_t (*)(const ct_render_memory_t *,
+                                                                                 const ct_render_vertex_decl_t *,
+                                                                                 uint16_t)>(bgfx_create_vertex_buffer),
+        .destroy_vertex_buffer = reinterpret_cast<void (*)(ct_render_vertex_buffer_handle_t)>(bgfx_destroy_vertex_buffer),
+        .create_dynamic_index_buffer = reinterpret_cast<ct_render_dynamic_index_buffer_handle_t (*)(uint32_t,
+                                                                                               uint16_t)>(bgfx_create_dynamic_index_buffer),
+        .create_dynamic_index_buffer_mem = reinterpret_cast<ct_render_dynamic_index_buffer_handle_t (*)(const ct_render_memory_t *,
+                                                                                                   uint16_t)>(bgfx_create_dynamic_index_buffer_mem),
+        .update_dynamic_index_buffer = reinterpret_cast<void (*)(ct_render_dynamic_index_buffer_handle_t,
+                                                                 uint32_t,
+                                                                 const ct_render_memory_t *)>(bgfx_update_dynamic_index_buffer),
+        .destroy_dynamic_index_buffer = reinterpret_cast<void (*)(ct_render_dynamic_index_buffer_handle_t)>(bgfx_destroy_dynamic_index_buffer),
+        .create_dynamic_vertex_buffer = reinterpret_cast<ct_render_dynamic_vertex_buffer_handle_t (*)(uint32_t,
+                                                                                                 const ct_render_vertex_decl_t *,
+                                                                                                 uint16_t)>(bgfx_create_dynamic_vertex_buffer),
+        .create_dynamic_vertex_buffer_mem = reinterpret_cast<ct_render_dynamic_vertex_buffer_handle_t (*)(const ct_render_memory_t *,
+                                                                                                     const ct_render_vertex_decl_t *,
+                                                                                                     uint16_t)>(bgfx_create_dynamic_vertex_buffer_mem),
+        .update_dynamic_vertex_buffer = reinterpret_cast<void (*)(ct_render_dynamic_vertex_buffer_handle_t,
+                                                                  uint32_t,
+                                                                  const ct_render_memory_t *)>(bgfx_update_dynamic_vertex_buffer),
+        .destroy_dynamic_vertex_buffer = reinterpret_cast<void (*)(ct_render_dynamic_vertex_buffer_handle_t)>(bgfx_destroy_dynamic_vertex_buffer),
+        .get_avail_transient_index_buffer = bgfx_get_avail_transient_index_buffer,
+        .get_avail_transient_vertex_buffer = reinterpret_cast<uint32_t (*)(uint32_t,
+                                                                           const ct_render_vertex_decl_t *)>(bgfx_get_avail_transient_vertex_buffer),
+        .get_avail_instance_data_buffer = bgfx_get_avail_instance_data_buffer,
+        .alloc_transient_index_buffer = reinterpret_cast<void (*)(ct_render_transient_index_buffer_t *,
+                                                                  uint32_t)>(bgfx_alloc_transient_index_buffer),
+        .alloc_transient_vertex_buffer = reinterpret_cast<void (*)(ct_render_transient_vertex_buffer_t *,
+                                                                   uint32_t,
+                                                                   const ct_render_vertex_decl_t *)>(bgfx_alloc_transient_vertex_buffer),
+        .alloc_transient_buffers = reinterpret_cast<bool (*)(ct_render_transient_vertex_buffer_t *,
+                                                             const ct_render_vertex_decl_t *,
+                                                             uint32_t,
+                                                             ct_render_transient_index_buffer_t *,
+                                                             uint32_t)>(bgfx_alloc_transient_buffers),
+        .alloc_instance_data_buffer = reinterpret_cast<void (*)(ct_render_instance_data_buffer_t *,
+                                                                uint32_t,
+                                                                uint16_t)>(bgfx_alloc_instance_data_buffer),
+        .create_indirect_buffer = reinterpret_cast<ct_render_indirect_buffer_handle_t (*)(uint32_t)>(bgfx_create_indirect_buffer),
+        .destroy_indirect_buffer = reinterpret_cast<void (*)(ct_render_indirect_buffer_handle_t)>(bgfx_destroy_indirect_buffer),
+        .create_shader = reinterpret_cast<ct_render_shader_handle_t (*)(const ct_render_memory_t *)>(bgfx_create_shader),
+        .get_shader_uniforms = reinterpret_cast<uint16_t (*)(ct_render_shader_handle_t,
+                                                             ct_render_uniform_handle_t *,
+                                                             uint16_t)>(bgfx_get_shader_uniforms),
+        .set_shader_name = reinterpret_cast<void (*)(ct_render_shader_handle_t,
+                                                     const char *)>(bgfx_set_shader_name),
+        .destroy_shader = reinterpret_cast<void (*)(ct_render_shader_handle_t)>(bgfx_destroy_shader),
+        .create_program = reinterpret_cast<ct_render_program_handle_t (*)(ct_render_shader_handle_t,
+                                                                     ct_render_shader_handle_t,
+                                                                     bool)>(bgfx_create_program),
+        .create_compute_program = reinterpret_cast<ct_render_program_handle_t (*)(ct_render_shader_handle_t,
+                                                                             bool)>(bgfx_create_compute_program),
+        .destroy_program = reinterpret_cast<void (*)(ct_render_program_handle_t)>(bgfx_destroy_program),
+        .is_texture_valid = reinterpret_cast<bool (*)(uint16_t,
+                                                      bool,
+                                                      uint16_t,
+                                                      ct_render_texture_format_t,
+                                                      uint32_t)>(bgfx_is_texture_valid),
+        .calc_texture_size = reinterpret_cast<void (*)(ct_render_texture_info_t *,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       bool,
+                                                       bool,
+                                                       uint16_t,
+                                                       ct_render_texture_format_t)>(bgfx_calc_texture_size),
+        .create_texture = reinterpret_cast<ct_render_texture_handle_t (*)(const ct_render_memory_t *,
+                                                                     uint32_t,
+                                                                     uint8_t,
+                                                                     ct_render_texture_info_t *)>(bgfx_create_texture),
+        .create_texture_2d = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
+                                                                        uint16_t,
+                                                                        bool,
+                                                                        uint16_t,
+                                                                        ct_render_texture_format_t,
+                                                                        uint32_t,
+                                                                        const ct_render_memory_t *)>(bgfx_create_texture_2d),
+        .create_texture_2d_scaled = reinterpret_cast<ct_render_texture_handle_t (*)(ct_render_backbuffer_ratio_t,
+                                                                               bool,
+                                                                               uint16_t,
+                                                                               ct_render_texture_format_t,
+                                                                               uint32_t)>(bgfx_create_texture_2d_scaled),
+        .create_texture_3d = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
+                                                                        uint16_t,
+                                                                        uint16_t,
+                                                                        bool,
+                                                                        ct_render_texture_format_t,
+                                                                        uint32_t,
+                                                                        const ct_render_memory_t *)>(bgfx_create_texture_3d),
+        .create_texture_cube = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
+                                                                          bool,
+                                                                          uint16_t,
+                                                                          ct_render_texture_format_t,
+                                                                          uint32_t,
+                                                                          const ct_render_memory_t *)>(bgfx_create_texture_cube),
+        .update_texture_2d = reinterpret_cast<void (*)(ct_render_texture_handle_t,
+                                                       uint16_t,
+                                                       uint8_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       const ct_render_memory_t *,
+                                                       uint16_t)>(bgfx_update_texture_2d),
+        .update_texture_3d = reinterpret_cast<void (*)(ct_render_texture_handle_t,
+                                                       uint8_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       uint16_t,
+                                                       const ct_render_memory_t *)>(bgfx_update_texture_3d),
+        .update_texture_cube = reinterpret_cast<void (*)(ct_render_texture_handle_t,
+                                                         uint16_t,
+                                                         uint8_t,
+                                                         uint8_t,
+                                                         uint16_t,
+                                                         uint16_t,
+                                                         uint16_t,
+                                                         uint16_t,
+                                                         const ct_render_memory_t *,
+                                                         uint16_t)>(bgfx_update_texture_cube),
+        .read_texture = reinterpret_cast<uint32_t (*)(ct_render_texture_handle_t,
+                                                      void *,
+                                                      uint8_t)>(bgfx_read_texture),
+        .set_texture_name = reinterpret_cast<void (*)(ct_render_texture_handle_t,
+                                                      const char *)>(bgfx_set_texture_name),
+        .destroy_texture = reinterpret_cast<void (*)(ct_render_texture_handle_t)>(bgfx_destroy_texture),
+        .create_frame_buffer = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(uint16_t,
+                                                                               uint16_t,
+                                                                               ct_render_texture_format_t,
+                                                                               uint32_t)>(bgfx_create_frame_buffer),
+        .create_frame_buffer_scaled = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(ct_render_backbuffer_ratio_t,
+                                                                                      ct_render_texture_format_t,
+                                                                                      uint32_t)>(bgfx_create_frame_buffer_scaled),
+        .create_frame_buffer_from_attachment = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(uint8_t,
+                                                                                               const ct_render_attachment_t *,
+                                                                                               bool)>(bgfx_create_frame_buffer_from_attachment),
+        .create_frame_buffer_from_nwh = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(void *,
+                                                                                        uint16_t,
+                                                                                        uint16_t,
+                                                                                        ct_render_texture_format_t)>(bgfx_create_frame_buffer_from_nwh),
+        .get_texture = reinterpret_cast<ct_render_texture_handle_t (*)(ct_render_frame_buffer_handle_t,
+                                                                  uint8_t)>(bgfx_get_texture),
+        .destroy_frame_buffer = reinterpret_cast<void (*)(ct_render_frame_buffer_handle_t)>(bgfx_destroy_frame_buffer),
+        .create_uniform = reinterpret_cast<ct_render_uniform_handle_t (*)(const char *,
+                                                                     ct_render_uniform_type_t,
+                                                                     uint16_t)>(bgfx_create_uniform),
+        .get_uniform_info = reinterpret_cast<void (*)(ct_render_uniform_handle_t,
+                                                      ct_render_uniform_info_t *)>(bgfx_get_uniform_info),
+        .destroy_uniform = reinterpret_cast<void (*)(ct_render_uniform_handle_t)>(bgfx_destroy_uniform),
+        .create_occlusion_query = reinterpret_cast<ct_render_occlusion_query_handle_t (*)()>(bgfx_create_occlusion_query),
+        .get_result = reinterpret_cast<ct_render_occlusion_query_result_t (*)(ct_render_occlusion_query_handle_t,
+                                                                         int32_t *)>(bgfx_get_result),
+        .destroy_occlusion_query = reinterpret_cast<void (*)(ct_render_occlusion_query_handle_t)>(bgfx_destroy_occlusion_query),
+        .set_palette_color = bgfx_set_palette_color,
+        .set_view_name = bgfx_set_view_name,
+        .set_view_rect = bgfx_set_view_rect,
+        .set_view_scissor = bgfx_set_view_scissor,
+        .set_view_clear = bgfx_set_view_clear,
+        .set_view_clear_mrt = bgfx_set_view_clear_mrt,
+        .set_view_mode = reinterpret_cast<void (*)(ct_render_view_id_t,
+                                                   ct_render_view_mode_t)>(bgfx_set_view_mode),
+        .set_view_frame_buffer = reinterpret_cast<void (*)(ct_render_view_id_t,
+                                                           ct_render_frame_buffer_handle_t)>(bgfx_set_view_frame_buffer),
+        .set_view_transform = bgfx_set_view_transform,
+        .set_view_transform_stereo = bgfx_set_view_transform_stereo,
+        .set_view_order = bgfx_set_view_order,
+
+
+        .set_marker = reinterpret_cast<void (*)(
+                const char *)>(bgfx_set_marker),
+        .set_state = reinterpret_cast<void (*)(
+                uint64_t,
+                uint32_t)>(bgfx_set_state),
+        .set_condition = reinterpret_cast<void (*)(
+                ct_render_occlusion_query_handle_t,
+                bool)>(bgfx_set_condition),
+        .set_stencil = reinterpret_cast<void (*)(
+                uint32_t,
+                uint32_t)>(bgfx_set_stencil),
+        .set_scissor = reinterpret_cast<uint16_t (*)(
+                uint16_t,
+                uint16_t,
+                uint16_t,
+                uint16_t)>(bgfx_set_scissor),
+        .set_scissor_cached = reinterpret_cast<void (*)(
+                uint16_t)>(bgfx_set_scissor_cached),
+        .set_transform = reinterpret_cast<uint32_t (*)(
+                const void *,
+                uint16_t)>(bgfx_set_transform),
+        .alloc_transform = reinterpret_cast<uint32_t (*)(
+                ct_render_transform_t *,
+                uint16_t)>(bgfx_alloc_transform),
+        .set_transform_cached = reinterpret_cast<void (*)(
+                uint32_t,
+                uint16_t)>(bgfx_set_transform_cached),
+        .set_uniform = reinterpret_cast<void (*)(
+                ct_render_uniform_handle_t,
+                const void *,
+                uint16_t)>(bgfx_set_uniform),
+        .set_index_buffer = reinterpret_cast<void (*)(
+                ct_render_index_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_index_buffer),
+        .set_dynamic_index_buffer = reinterpret_cast<void (*)(
+                ct_render_dynamic_index_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_dynamic_index_buffer),
+        .set_transient_index_buffer = reinterpret_cast<void (*)(
+                const ct_render_transient_index_buffer_t *,
+                uint32_t,
+                uint32_t)>(bgfx_set_transient_index_buffer),
+        .set_vertex_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_vertex_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_vertex_buffer),
+        .set_dynamic_vertex_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_dynamic_vertex_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_dynamic_vertex_buffer),
+        .set_transient_vertex_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                const ct_render_transient_vertex_buffer_t *,
+                uint32_t,
+                uint32_t)>(bgfx_set_transient_vertex_buffer),
+        .set_instance_data_buffer = reinterpret_cast<void (*)(
+                const ct_render_instance_data_buffer_t *,
+                uint32_t,
+                uint32_t)>(bgfx_set_instance_data_buffer),
+        .set_instance_data_from_vertex_buffer = reinterpret_cast<void (*)(
+                ct_render_vertex_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_instance_data_from_vertex_buffer),
+        .set_instance_data_from_dynamic_vertex_buffer = reinterpret_cast<void (*)(
+                ct_render_dynamic_vertex_buffer_handle_t,
+                uint32_t,
+                uint32_t)>(bgfx_set_instance_data_from_dynamic_vertex_buffer),
+        .set_texture = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_uniform_handle_t,
+                ct_render_texture_handle_t,
+                uint32_t)>(bgfx_set_texture),
+        .touch = reinterpret_cast<void (*)(
+                ct_render_view_id_t)>(bgfx_touch),
+        .submit = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_program_handle_t,
+                int32_t,
+                bool)>(bgfx_submit),
+        .submit_occlusion_query = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_program_handle_t,
+                ct_render_occlusion_query_handle_t,
+                int32_t,
+                bool)>(bgfx_submit_occlusion_query),
+        .submit_indirect = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_program_handle_t,
+                ct_render_indirect_buffer_handle_t,
+                uint16_t,
+                uint16_t,
+                int32_t,
+                bool)>(bgfx_submit_indirect),
+        .set_image = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_texture_handle_t,
+                uint8_t,
+                ct_render_access_t,
+                ct_render_texture_format_t)>(bgfx_set_image),
+        .set_compute_index_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_index_buffer_handle_t,
+                ct_render_access_t)>(bgfx_set_compute_index_buffer),
+        .set_compute_vertex_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_vertex_buffer_handle_t,
+                ct_render_access_t)>(bgfx_set_compute_vertex_buffer),
+        .set_compute_dynamic_index_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_dynamic_index_buffer_handle_t,
+                ct_render_access_t)>(bgfx_set_compute_dynamic_index_buffer),
+        .set_compute_dynamic_vertex_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_dynamic_vertex_buffer_handle_t,
+                ct_render_access_t)>(bgfx_set_compute_dynamic_vertex_buffer),
+        .set_compute_indirect_buffer = reinterpret_cast<void (*)(
+                uint8_t,
+                ct_render_indirect_buffer_handle_t,
+                ct_render_access_t)>(bgfx_set_compute_indirect_buffer),
+        .dispatch = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_program_handle_t,
+                uint32_t,
+                uint32_t,
+                uint32_t,
+                uint8_t)>(bgfx_dispatch),
+        .dispatch_indirect = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_program_handle_t,
+                ct_render_indirect_buffer_handle_t,
+                uint16_t,
+                uint16_t,
+                uint8_t)>(bgfx_dispatch_indirect),
+        .discard = reinterpret_cast<void (*)()>(bgfx_discard),
+        .blit = reinterpret_cast<void (*)(
+                ct_render_view_id_t,
+                ct_render_texture_handle_t,
+                uint8_t,
+                uint16_t,
+                uint16_t,
+                uint16_t,
+                ct_render_texture_handle_t,
+                uint8_t,
+                uint16_t,
+                uint16_t,
+                uint16_t,
+                uint16_t,
+                uint16_t,
+                uint16_t)>(bgfx_blit),
+
+
+        .encoder_set_marker = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                        const char *)>(bgfx_encoder_set_marker),
+        .encoder_set_state = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                       uint64_t,
+                                                       uint32_t)>(bgfx_encoder_set_state),
+        .encoder_set_condition = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                           ct_render_occlusion_query_handle_t,
+                                                           bool)>(bgfx_encoder_set_condition),
+        .encoder_set_stencil = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                         uint32_t,
+                                                         uint32_t)>(bgfx_encoder_set_stencil),
+        .encoder_set_scissor = reinterpret_cast<uint16_t (*)(ct_render_encoder *,
+                                                             uint16_t,
+                                                             uint16_t,
+                                                             uint16_t,
+                                                             uint16_t)>(bgfx_encoder_set_scissor),
+        .encoder_set_scissor_cached = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                uint16_t)>(bgfx_encoder_set_scissor_cached),
+        .encoder_set_transform = reinterpret_cast<uint32_t (*)(ct_render_encoder *,
+                                                               const void *,
+                                                               uint16_t)>(bgfx_encoder_set_transform),
+        .encoder_alloc_transform = reinterpret_cast<uint32_t (*)(ct_render_encoder *,
+                                                                 ct_render_transform_t *,
+                                                                 uint16_t)>(bgfx_encoder_alloc_transform),
+        .encoder_set_transform_cached = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                  uint32_t,
+                                                                  uint16_t)>(bgfx_encoder_set_transform_cached),
+        .encoder_set_uniform = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                         ct_render_uniform_handle_t,
+                                                         const void *,
+                                                         uint16_t)>(bgfx_encoder_set_uniform),
+        .encoder_set_index_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                              ct_render_index_buffer_handle_t,
+                                                              uint32_t,
+                                                              uint32_t)>(bgfx_encoder_set_index_buffer),
+        .encoder_set_dynamic_index_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                      ct_render_dynamic_index_buffer_handle_t,
+                                                                      uint32_t,
+                                                                      uint32_t)>(bgfx_encoder_set_dynamic_index_buffer),
+        .encoder_set_transient_index_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                        const ct_render_transient_index_buffer_t *,
+                                                                        uint32_t,
+                                                                        uint32_t)>(bgfx_encoder_set_transient_index_buffer),
+        .encoder_set_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                               uint8_t,
+                                                               ct_render_vertex_buffer_handle_t,
+                                                               uint32_t,
+                                                               uint32_t)>(bgfx_encoder_set_vertex_buffer),
+        .encoder_set_dynamic_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                       uint8_t,
+                                                                       ct_render_dynamic_vertex_buffer_handle_t,
+                                                                       uint32_t,
+                                                                       uint32_t)>(bgfx_encoder_set_dynamic_vertex_buffer),
+        .encoder_set_transient_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                         uint8_t,
+                                                                         const ct_render_transient_vertex_buffer_t *,
+                                                                         uint32_t,
+                                                                         uint32_t)>(bgfx_encoder_set_transient_vertex_buffer),
+        .encoder_set_instance_data_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                      const ct_render_instance_data_buffer_t *,
+                                                                      uint32_t,
+                                                                      uint32_t)>(bgfx_encoder_set_instance_data_buffer),
+        .encoder_set_instance_data_from_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                                  ct_render_vertex_buffer_handle_t,
+                                                                                  uint32_t,
+                                                                                  uint32_t)>(bgfx_encoder_set_instance_data_from_vertex_buffer),
+        .encoder_set_instance_data_from_dynamic_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                                          ct_render_dynamic_vertex_buffer_handle_t,
+                                                                                          uint32_t,
+                                                                                          uint32_t)>(bgfx_encoder_set_instance_data_from_dynamic_vertex_buffer),
+        .encoder_set_texture = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                         uint8_t,
+                                                         ct_render_uniform_handle_t,
+                                                         ct_render_texture_handle_t,
+                                                         uint32_t)>(bgfx_encoder_set_texture),
+        .encoder_touch = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                   ct_render_view_id_t)>(bgfx_encoder_touch),
+        .encoder_submit = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                    ct_render_view_id_t,
+                                                    ct_render_program_handle_t,
+                                                    int32_t,
+                                                    bool)>(bgfx_encoder_submit),
+        .encoder_submit_occlusion_query = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                    ct_render_view_id_t,
+                                                                    ct_render_program_handle_t,
+                                                                    ct_render_occlusion_query_handle_t,
+                                                                    int32_t,
+                                                                    bool)>(bgfx_encoder_submit_occlusion_query),
+        .encoder_submit_indirect = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                             ct_render_view_id_t,
+                                                             ct_render_program_handle_t,
+                                                             ct_render_indirect_buffer_handle_t,
+                                                             uint16_t,
+                                                             uint16_t,
+                                                             int32_t,
+                                                             bool)>(bgfx_encoder_submit_indirect),
+        .encoder_set_image = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                       uint8_t,
+                                                       ct_render_texture_handle_t,
+                                                       uint8_t,
+                                                       ct_render_access_t,
+                                                       ct_render_texture_format_t)>(bgfx_encoder_set_image),
+        .encoder_set_compute_index_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                      uint8_t,
+                                                                      ct_render_index_buffer_handle_t,
+                                                                      ct_render_access_t)>(bgfx_encoder_set_compute_index_buffer),
+        .encoder_set_compute_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                       uint8_t,
+                                                                       ct_render_vertex_buffer_handle_t,
+                                                                       ct_render_access_t)>(bgfx_encoder_set_compute_vertex_buffer),
+        .encoder_set_compute_dynamic_index_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                              uint8_t,
+                                                                              ct_render_dynamic_index_buffer_handle_t,
+                                                                              ct_render_access_t)>(bgfx_encoder_set_compute_dynamic_index_buffer),
+        .encoder_set_compute_dynamic_vertex_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                               uint8_t,
+                                                                               ct_render_dynamic_vertex_buffer_handle_t,
+                                                                               ct_render_access_t)>(bgfx_encoder_set_compute_dynamic_vertex_buffer),
+        .encoder_set_compute_indirect_buffer = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                                         uint8_t,
+                                                                         ct_render_indirect_buffer_handle_t,
+                                                                         ct_render_access_t)>(bgfx_encoder_set_compute_indirect_buffer),
+        .encoder_dispatch = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                      ct_render_view_id_t,
+                                                      ct_render_program_handle_t,
+                                                      uint32_t,
+                                                      uint32_t,
+                                                      uint32_t,
+                                                      uint8_t)>(bgfx_encoder_dispatch),
+        .encoder_dispatch_indirect = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                               ct_render_view_id_t,
+                                                               ct_render_program_handle_t,
+                                                               ct_render_indirect_buffer_handle_t,
+                                                               uint16_t,
+                                                               uint16_t,
+                                                               uint8_t)>(bgfx_encoder_dispatch_indirect),
+        .encoder_discard = reinterpret_cast<void (*)(ct_render_encoder *)>(bgfx_encoder_discard),
+        .encoder_blit = reinterpret_cast<void (*)(ct_render_encoder *,
+                                                  ct_render_view_id_t,
+                                                  ct_render_texture_handle_t,
+                                                  uint8_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  ct_render_texture_handle_t,
+                                                  uint8_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  uint16_t,
+                                                  uint16_t)>(bgfx_encoder_blit),
+
+        .request_screen_shot = reinterpret_cast<void (*)(ct_render_frame_buffer_handle_t,
+                                                         const char *)>(bgfx_request_screen_shot),
+
 };
 
 static void _init_api(struct ct_api_a0 *api) {

@@ -1,13 +1,13 @@
-#include <cetech/core/log/log.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/module/module.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/module/module.h>
 
 #include <cetech/playground/action_manager.h>
 #include <cetech/engine/controlers/keyboard.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/containers/hash.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/containers/hash.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);

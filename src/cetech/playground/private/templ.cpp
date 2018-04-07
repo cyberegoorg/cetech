@@ -1,10 +1,10 @@
-#include "cetech/core/containers/map.inl"
+#include "cetech/kernel/containers/map.inl"
 
-#include <cetech/core/log/log.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/memory/memory.h>
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/module/module.h>
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/module/module.h>
 
 #include <cetech/playground/action_manager.h>
 

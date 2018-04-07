@@ -2,8 +2,8 @@
 
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/renderer/viewport.h>
-#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/viewport/viewport.h>
+#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 
 #include <cetech/engine/camera/camera.h>
@@ -16,14 +16,14 @@
 #include <cetech/engine/application/application.h>
 
 #include <cetech/playground/playground.h>
-#include <cetech/core/math/fmath.h>
+#include <cetech/kernel/math/fmath.h>
 #include <cetech/engine/resource/resource.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/ebus/ebus.h>
 
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);

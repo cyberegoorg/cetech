@@ -1,15 +1,15 @@
-#include "cetech/core/containers/map.inl"
+#include "cetech/kernel/containers/map.inl"
 
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/containers/hash.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/containers/hash.h>
 
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/config/config.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/config/config.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);

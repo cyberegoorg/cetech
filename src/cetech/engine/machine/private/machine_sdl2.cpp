@@ -2,23 +2,23 @@
 // Includes
 //==============================================================================
 
-#include "cetech/core/containers/eventstream.inl"
+#include "cetech/kernel/containers/eventstream.inl"
 
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/module/module.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/log/log.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/module/module.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/log/log.h"
 
 #include "cetech/engine/machine/machine.h"
 
 #include <include/SDL2/SDL.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/kernel/ebus/ebus.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/controlers/mouse.h>
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/engine/controlers/gamepad.h>
-#include <cetech/core/os/window.h>
+#include <cetech/kernel/os/window.h>
 #include <cetech/engine/application/application.h>
 
 
@@ -427,10 +427,10 @@ static void init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_ebus_a0);
 
-
-    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO |
-                 (SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC |
-                  SDL_INIT_JOYSTICK)) != 0) {
+    if (SDL_Init(SDL_INIT_VIDEO |
+                 SDL_INIT_GAMECONTROLLER |
+                 SDL_INIT_HAPTIC |
+                  SDL_INIT_JOYSTICK) != 0) {
         //if (SDL_Init(0) != 0) {
         ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s",
                         SDL_GetError());

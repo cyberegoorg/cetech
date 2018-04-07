@@ -2,17 +2,17 @@
 // Includes
 //==============================================================================
 
-#include <cetech/core/api/api_system.h>
-#include <cetech/core/log/log.h>
+#include <cetech/kernel/api/api_system.h>
+#include <cetech/kernel/log/log.h>
 #include <cetech/engine/machine/machine.h>
-#include <cetech/core/os/errors.h>
+#include <cetech/kernel/os/errors.h>
 #include <cetech/engine/controlers/gamepad.h>
-#include <cetech/core/module/module.h>
+#include <cetech/kernel/module/module.h>
 #include <cetech/engine/application/application.h>
 #include <string.h>
-#include <cetech/core/ebus/ebus.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include "cetech/core/memory/allocator.h"
+#include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include "cetech/kernel/memory/allocator.h"
 #include "gamepadstr.h"
 
 CETECH_DECL_API(ct_log_a0);

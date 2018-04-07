@@ -1,23 +1,23 @@
-#include <cetech/core/cdb/cdb.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
-#include <cetech/core/yaml/yng.h>
-#include <cetech/core/yaml/ydb.h>
-#include <cetech/engine/renderer/viewport.h>
+#include <cetech/kernel/yaml/yng.h>
+#include <cetech/kernel/yaml/ydb.h>
+#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/camera/camera.h>
 
 #include <cetech/macros.h>
-#include <cetech/core/containers/array.h>
-#include <cetech/core/math/fmath.h>
-#include <cetech/core/ebus/ebus.h>
+#include <cetech/kernel/containers/array.h>
+#include <cetech/kernel/math/fmath.h>
+#include <cetech/kernel/ebus/ebus.h>
 
-#include "cetech/core/hashlib/hashlib.h"
-#include "cetech/core/config/config.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
+#include "cetech/kernel/hashlib/hashlib.h"
+#include "cetech/kernel/config/config.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
 
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/module/module.h"
 
 #include <bgfx/c99/bgfx.h>
 

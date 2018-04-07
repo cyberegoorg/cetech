@@ -2,23 +2,23 @@
 
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/renderer/texture.h>
+#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/controlers/keyboard.h>
-#include <cetech/core/hashlib/hashlib.h>
-#include <cetech/engine/renderer/viewport.h>
-#include <cetech/core/os/vio.h>
-#include <cetech/core/fs/fs.h>
-#include <cetech/core/containers/array.h>
+#include <cetech/kernel/hashlib/hashlib.h>
+#include <cetech/engine/viewport/viewport.h>
+#include <cetech/kernel/os/vio.h>
+#include <cetech/kernel/fs/fs.h>
+#include <cetech/kernel/containers/array.h>
 #include <cetech/engine/controlers/mouse.h>
-#include <cetech/core/log/log.h>
-#include <cetech/core/ebus/ebus.h>
-#include "cetech/core/containers/map.inl"
+#include <cetech/kernel/log/log.h>
+#include <cetech/kernel/ebus/ebus.h>
+#include "cetech/kernel/containers/map.inl"
 
-#include "cetech/core/config/config.h"
-#include "cetech/core/memory/memory.h"
-#include "cetech/core/api/api_system.h"
-#include "cetech/core/module/module.h"
+#include "cetech/kernel/config/config.h"
+#include "cetech/kernel/memory/memory.h"
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
 
 #include "imgui_wrap.inl"
 
