@@ -20,6 +20,7 @@ __pycache__
 *.sln
 *.csproj
 *.speccache
+*.DS_Store
 
 perf.data*
 logsystem.db

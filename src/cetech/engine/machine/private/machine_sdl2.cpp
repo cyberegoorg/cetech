@@ -19,7 +19,7 @@
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/engine/controlers/gamepad.h>
 #include <cetech/kernel/os/window.h>
-#include <cetech/engine/application/application.h>
+#include <cetech/kernel/kernel.h>
 
 
 CETECH_DECL_API(ct_log_a0);
@@ -328,7 +328,7 @@ static void _update(float dt) {
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT:
-                ct_ebus_a0.broadcast(APPLICATION_EBUS, APP_QUIT_EVENT, NULL, 0);
+                ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
                 break;
 
             case SDL_WINDOWEVENT: {

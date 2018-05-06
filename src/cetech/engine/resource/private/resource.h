@@ -31,8 +31,7 @@ char *resource_compiler_get_tmp_dir(struct ct_alloc *alocator,
 char *resource_compiler_external_join(struct ct_alloc *alocator,
                                       const char *name);
 
-void resource_compiler_create_build_dir(struct ct_config_a0 config,
-                                        struct ct_app_a0 app);
+void resource_compiler_create_build_dir(struct ct_config_a0 config);
 
 const char *resource_compiler_get_core_dir();
 

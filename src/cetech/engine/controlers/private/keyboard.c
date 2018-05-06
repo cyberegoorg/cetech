@@ -8,16 +8,15 @@
 #include <cetech/kernel/os/errors.h>
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/module/module.h>
-#include <cetech/engine/application/application.h>
 #include <string.h>
 #include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/kernel.h>
 #include "cetech/kernel/memory/allocator.h"
 #include "keystr.h"
 
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 
@@ -154,14 +153,15 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0.create_ebus(KEYBOARD_EBUS_NAME, KEYBOARD_EBUS);
 
-    ct_ebus_a0.connect(APPLICATION_EBUS,
-                                APP_UPDATE_EVENT, _update, 0);
+    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
 
     ct_log_a0.debug(LOG_WHERE, "Init");
 }
 
 static void _shutdown() {
     ct_log_a0.debug(LOG_WHERE, "Shutdown");
+
+    ct_ebus_a0.disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update);
 
     _G = (struct G) {};
 }
@@ -171,7 +171,6 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_machine_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
         },

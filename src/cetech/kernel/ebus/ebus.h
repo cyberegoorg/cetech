@@ -53,6 +53,15 @@ struct ct_ebus_a0 {
                          ct_ebus_handler *handler,
                          uint32_t order);
 
+    void (*disconnect)(uint32_t bus_name,
+                       uint64_t event,
+                       ct_ebus_handler *handler);
+
+    void (*disconnect_addr)(uint32_t bus_name,
+                            uint64_t event,
+                            uint64_t addr,
+                            ct_ebus_handler *handler);
+
     void *(*first_event)(uint32_t bus_name);
 
     void *(*next_event)(uint32_t bus_name,

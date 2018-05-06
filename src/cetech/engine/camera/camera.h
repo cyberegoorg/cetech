@@ -22,15 +22,10 @@ extern "C" {
 #define PROP_PROJECTION CT_ID64_0("projection")
 #define PROP_VIEW CT_ID64_0("view")
 
-struct ct_viewport;
-
-
 struct ct_camera_component {
     float near;
     float far;
     float fov;
-
-    struct ct_viewport viewport;
 };
 
 //==============================================================================

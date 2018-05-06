@@ -6,7 +6,6 @@
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/hashlib/hashlib.h>
-#include <cetech/engine/viewport/viewport.h>
 #include <cetech/kernel/os/vio.h>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/containers/array.h>
@@ -28,7 +27,6 @@ CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_mouse_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
@@ -281,7 +279,6 @@ static void _init(ct_api_a0 *api) {
     io.KeyMap[ImGuiKey_X] = ct_keyboard_a0.button_index("x");
     io.KeyMap[ImGuiKey_Y] = ct_keyboard_a0.button_index("y");
     io.KeyMap[ImGuiKey_Z] = ct_keyboard_a0.button_index("z");
-
 }
 
 static void _shutdown() {
@@ -298,7 +295,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_yng_a0);

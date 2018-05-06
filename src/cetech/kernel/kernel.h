@@ -31,4 +31,26 @@
 
 #define CONFIG_RENDER_CONFIG_ID "renderer.config"
 
+enum {
+    KERNEL_EBUS = 0x6a0c4eb6
+};
+
+enum {
+    KERNEL_INVALID_EVNT = 0,
+    KERNEL_INIT_EVENT,
+    KERNEL_UPDATE_EVENT,
+    KERNEL_QUIT_EVENT,
+    KERNEL_SHUTDOWN_EVENT,
+};
+
+enum {
+    KERNEL_ORDER = 1024,
+    GAME_ORDER = KERNEL_ORDER + 1024,
+    RENDER = GAME_ORDER + 1024,
+};
+
+struct ct_app_update_ev {
+    float dt;
+};
+
 #endif //CETECH_KERNEL_H

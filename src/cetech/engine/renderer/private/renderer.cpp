@@ -15,7 +15,6 @@
 #include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/kernel/kernel.h>
 
-#include <cetech/engine/application/application.h>
 #include <cetech/kernel/os/window.h>
 #include <cetech/engine/resource/resource.h>
 
@@ -26,7 +25,6 @@
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/kernel/ebus/ebus.h>
 
-#include "bgfx/platform.h"
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
 
@@ -40,8 +38,6 @@ CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_ebus_a0);
-
-
 
 //==============================================================================
 // GLobals
@@ -153,64 +149,32 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-/////
-#define _DEF_ON_CLB_FCE(type, name)                                            \
-    static void register_ ## name ## _(type name) {                            \
-        ct_array_push(_G.name, name, _G.allocator);                           \
-    }                                                                          \
-    static void unregister_## name ## _(type name) {                           \
-        const auto size = ct_array_size(_G.name);                             \
-                                                                               \
-        for(uint32_t i = 0; i < size; ++i) {                                   \
-            if(_G.name[i] != name) {                                           \
-                continue;                                                      \
-            }                                                                  \
-                                                                               \
-            uint32_t last_idx = size - 1;                                      \
-            _G.name[i] = _G.name[last_idx];                                    \
-                                                                               \
-            ct_array_pop_back(_G.name);                                       \
-            break;                                                             \
-        }                                                                      \
-    }
-
-_DEF_ON_CLB_FCE(ct_renderender_on_render, on_render)
-
-#undef _DEF_ON_CLB_FCE
-
 static void on_resize(uint32_t bus_name,
                       void *event) {
     ct_window_resized_event *ev = (ct_window_resized_event *) event;
     _G.need_reset = 1;
     _G.size_width = ev->width;
     _G.size_height = ev->height;
-
 }
 
-
-static void on_render() {
+static void on_render(uint32_t bus_name,
+                      void *event) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        bgfx::reset(_G.size_width, _G.size_height, _get_reset_flags());
+        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
+    ct_ebus_a0.broadcast(RENDERER_EBUS, RENDERER_RENDER_EVENT, NULL, 0);
 
-    for (uint32_t i = 0; i < ct_array_size(_G.on_render); ++i) {
-        _G.on_render[i]();
-    }
-
-    bgfx::frame();
+    bgfx_frame(false);
 }
 
-
 static ct_renderer_a0 rendderer_api = {
-        .render = on_render,
         .create = renderer_create,
         .set_debug = renderer_set_debug,
         .get_size = renderer_get_size,
-        .register_on_render =register_on_render_,
-        .unregister_on_render =unregister_on_render_,
+
 
 ///
         .vertex_decl_begin = reinterpret_cast<void (*)(ct_render_vertex_decl_t *,
@@ -429,6 +393,9 @@ static ct_renderer_a0 rendderer_api = {
                                                                                         uint16_t,
                                                                                         uint16_t,
                                                                                         ct_render_texture_format_t)>(bgfx_create_frame_buffer_from_nwh),
+        .create_frame_buffer_from_handles = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(uint8_t,
+                                                                                                 const ct_render_texture_handle_t *,
+                                                                                                 bool)>(bgfx_create_frame_buffer_from_handles),
         .get_texture = reinterpret_cast<ct_render_texture_handle_t (*)(ct_render_frame_buffer_handle_t,
                                                                   uint8_t)>(bgfx_get_texture),
         .destroy_frame_buffer = reinterpret_cast<void (*)(ct_render_frame_buffer_handle_t)>(bgfx_destroy_frame_buffer),
@@ -785,6 +752,7 @@ static void _init(struct ct_api_a0 *api) {
 
 
     ct_ebus_a0.connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
+    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_render, 0);
 
     ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
 
@@ -819,6 +787,8 @@ static void _init(struct ct_api_a0 *api) {
 
     CETECH_GET_API(api, ct_window_a0);
 
+    ct_ebus_a0.create_ebus("renderer", RENDERER_EBUS);
+
     renderer_create();
 
 }
@@ -828,8 +798,12 @@ static void _shutdown() {
 
         ct_array_free(_G.on_render, _G.allocator);
 
-        bgfx::shutdown();
+        bgfx_shutdown();
     }
+
+
+    ct_ebus_a0.disconnect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
+
 
     _G = {};
 }

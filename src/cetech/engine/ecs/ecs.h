@@ -179,8 +179,8 @@ struct ct_ecs_a0 {
     void (*register_simulation)(const char *name,
                                 ct_simulate_fce_t simulation);
 
-    void (*add_simulation)(struct ct_world world,
-                           uint64_t name);
+//    void (*add_simulation)(struct ct_world world,
+//                           uint64_t name);
 };
 
 #ifdef __cplusplus

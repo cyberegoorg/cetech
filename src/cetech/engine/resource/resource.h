@@ -147,8 +147,7 @@ struct ct_resource_a0 {
     char *(*compiler_external_join)(struct ct_alloc *a,
                                     const char *name);
 
-    void (*compiler_create_build_dir)(struct ct_config_a0 config,
-                                      struct ct_app_a0 app);
+    void (*compiler_create_build_dir)(struct ct_config_a0 config);
 
     const char *(*compiler_get_source_dir)();
 

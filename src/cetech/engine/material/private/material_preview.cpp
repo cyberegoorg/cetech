@@ -43,7 +43,7 @@ CETECH_DECL_API(ct_material_a0);
 static void load(const char *filename,
                  struct ct_resource_id resourceid,
                  struct ct_world world) {
-    ct_entity ent = ct_ecs_a0.spawn_entity(world, CT_ID32_0("kernel/cube"));
+    ct_entity ent = ct_ecs_a0.spawn_entity(world, CT_ID32_0("core/cube"));
     _G.ent = ent;
 
     ct_mesh_renderer *component = static_cast<ct_mesh_renderer *>(ct_ecs_a0.entity_data(world, MESH_RENDERER_COMPONENT, ent));

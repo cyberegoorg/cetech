@@ -71,9 +71,6 @@ struct world_instance {
     // Storage
     struct ct_hash_t entity_storage_map;
     struct entity_storage *entity_storage;
-
-    // Simulations
-    uint64_t *simulations;
 };
 
 static struct _G {
@@ -85,7 +82,7 @@ static struct _G {
     struct ct_handler_t world_handler;
     struct world_instance *world_array;
 
-    struct ct_hash_t simulations;
+    ct_simulate_fce_t* simulations;
 
     uint32_t component_count;
     struct ct_hash_t component_types;
@@ -455,14 +452,7 @@ static void remove_components(struct ct_world world,
 
 static void register_simulation(const char *name,
                                 ct_simulate_fce_t simulation) {
-    uint64_t k = CT_ID64_0(name);
-    ct_hash_add(&_G.simulations, k, (uint64_t) simulation, _G.allocator);
-}
-
-static void add_simulation(struct ct_world world,
-                           uint64_t name) {
-    struct world_instance *w = get_world_instance(world);
-    ct_array_push(w->simulations, name, _G.allocator);
+    ct_array_push(_G.simulations, simulation, _G.allocator);
 }
 
 static void process(struct ct_world world,
@@ -486,17 +476,8 @@ static void process(struct ct_world world,
 
 static void simulate(struct ct_world world,
                      float dt) {
-    struct world_instance *w = get_world_instance(world);
-
-    for (int j = 0; j < ct_array_size(w->simulations); ++j) {
-        uint64_t name = w->simulations[j];
-        uint64_t simulation = ct_hash_lookup(&_G.simulations, name, 0);
-
-        if (!simulation) {
-            return;
-        }
-
-        ct_simulate_fce_t fce = (ct_simulate_fce_t) simulation;
+    for (int j = 0; j < ct_array_size(_G.simulations); ++j) {
+        ct_simulate_fce_t fce = (ct_simulate_fce_t) _G.simulations[j];
         fce(world, dt);
     }
 }
@@ -743,6 +724,8 @@ static void online(uint64_t name,
 
 static void offline(uint64_t name,
                     struct ct_cdb_obj_t *obj) {
+
+
     CT_UNUSED(name, obj);
 }
 
@@ -923,7 +906,6 @@ static struct ct_world create_world() {
     w->first_child = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
     w->next_sibling = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
 
-
     struct ct_ecs_world_ev ev = {.world=world};
 
     ct_ebus_a0.broadcast(ECS_EBUS, ECS_WORLD_CREATE, &ev, sizeof(ev));
@@ -964,7 +946,6 @@ static struct ct_ecs_a0 _api = {
         .process = process,
 
         .register_simulation = register_simulation,
-        .add_simulation = add_simulation,
 
         .create_world = create_world,
         .destroy_world = destroy_world,

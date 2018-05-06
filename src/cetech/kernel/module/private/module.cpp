@@ -247,9 +247,9 @@ static void load_dirs() {
     size_t len = strlen("load_module.");
     strcpy(key, "load_module.");
     const char *path = ct_cdb_a0.read_str(_G.config,
-                                                CONFIG_MODULE_DIR,
-                                                "bin/darwin64");
-    char* buffer = NULL;
+                                          CONFIG_MODULE_DIR,
+                                          "bin/darwin64");
+    char *buffer = NULL;
     for (int i = 0; true; ++i) {
         ct_buffer_clear(buffer);
 
@@ -262,11 +262,10 @@ static void load_dirs() {
         }
 
 
-        const char *module_file = ct_cdb_a0.read_str(_G.config,
-                                                           key_id, "");
+        const char *module_file = ct_cdb_a0.read_str(_G.config, key_id, "");
         ct_path_a0.join(&buffer,
-                                            ct_memory_a0.main_allocator(),
-                                            2, path, module_file);
+                        ct_memory_a0.main_allocator(),
+                        2, path, module_file);
         load(buffer);
 
         ct_buffer_free(buffer, _G.allocator);
@@ -342,7 +341,7 @@ static ct_module_a0 module_api = {
 //#endif
 //}
 
-static void _init(struct ct_api_a0* api){
+static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .config = ct_config_a0.config_object()
@@ -353,10 +352,10 @@ static void _init(struct ct_api_a0* api){
 
     static uint64_t root = CT_ID64_0("modules");
     ct_fs_a0.map_root_dir(root,
-                                  ct_cdb_a0.read_str(
-                                          _G.config,
-                                          CONFIG_MODULE_DIR,
-                                          "bin/darwin64"), true);
+                          ct_cdb_a0.read_str(
+                                  _G.config,
+                                  CONFIG_MODULE_DIR,
+                                  "bin/darwin64"), true);
 }
 
 CETECH_MODULE_DEF(
@@ -382,6 +381,6 @@ CETECH_MODULE_DEF(
             CT_UNUSED(api);
             ct_log_a0.debug(LOG_WHERE, "Shutdown");
 
-            _G = (struct _G){};
+            _G = (struct _G) {};
         }
 )

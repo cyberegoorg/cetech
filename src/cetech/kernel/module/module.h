@@ -35,6 +35,10 @@ struct ct_api_a0;
     extern void name ## _unload_module(struct ct_api_a0* api, int reload); \
     name ## _unload_module(api, 0)
 
+#define CETECH_MODULE_INITAPI(name) name##_initapi_module
+#define CETECH_MODULE_LOAD(name) name##_load_module
+#define CETECH_MODULE_UNLOAD(name) name##_unload_module
+
 #ifdef __cplusplus
 #define CETECH_MODULE_DEF(name, initapi, load, unload) \
     extern "C" void name##_initapi_module(struct ct_api_a0 *api) initapi \

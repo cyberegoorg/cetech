@@ -7,7 +7,6 @@
 
 #include "include/SDL2/SDL.h"
 
-#include <cetech/engine/application/application.h>
 #include <cetech/kernel/api/api_system.h>
 #include <cetech/kernel/memory/memory.h>
 #include <cetech/kernel/task/task.h>
@@ -270,9 +269,8 @@ void _compile_files(ct_task_item **tasks,
 //==============================================================================
 
 
-void resource_compiler_create_build_dir(struct ct_config_a0 config,
-                                        struct ct_app_a0 app) {
-    CT_UNUSED(config, app);
+void resource_compiler_create_build_dir(struct ct_config_a0 config) {
+    CT_UNUSED(config);
 
     char *build_dir_full = resource_compiler_get_build_dir(
             ct_memory_a0.main_allocator(),

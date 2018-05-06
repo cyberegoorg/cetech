@@ -147,6 +147,11 @@ ct_window *window_new(struct ct_alloc *alloc,
 
     auto *window = CT_ALLOC(alloc, ct_window, sizeof(ct_window));
 
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
     SDL_Window *w = SDL_CreateWindow(
             title,
             _sdl_pos(x), _sdl_pos(y),

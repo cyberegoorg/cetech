@@ -503,6 +503,12 @@ static void init(struct ct_api_a0 *api) {
 }
 
 static void shutdown() {
+    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            CT_ID64_0("scenegraph"), _component_spawner);
+
+    ct_ebus_a0.disconnect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
+    ct_ebus_a0.disconnect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);
+
     ct_hash_free(&_G.ent_map, _G.allocator);
     ct_hash_free(&_G.world_map, _G.allocator);
     ct_array_free(_G.world_instances, _G.allocator);

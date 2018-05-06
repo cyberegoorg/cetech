@@ -78,7 +78,6 @@ set(SOURCE_FILES
         src/cetech/kernel/config/private/config.c
         src/cetech/kernel/memory/private/memory.c
         src/cetech/kernel/memory/private/allocator_malloc.c
-        src/cetech/engine/application/private/application.cpp
         src/cetech/kernel/task/private/task.c
         src/cetech/kernel/log/private/log_stdout_handler.c
         src/cetech/kernel/kernel.c
@@ -119,6 +118,8 @@ set(SOURCE_FILES
         src/cetech/engine/controlers/private/mouse.c
         src/cetech/engine/controlers/private/gamepad.c
         src/cetech/engine/renderer/private/renderer.cpp
+        src/cetech/engine/render_graph/private/render_graph.c
+        src/cetech/engine/default_render_graph/private/default_render_graph.c
         src/cetech/engine/texture/private/texture.cpp
         src/cetech/engine/texture/private/texture_compiler.cpp
 
@@ -130,9 +131,6 @@ set(SOURCE_FILES
         src/cetech/engine/material/private/material_property.cpp
         src/cetech/engine/scene/private/scene.cpp
         src/cetech/engine/scene/private/scene_compiler.cpp
-        src/cetech/engine/viewport/private/viewport.cpp
-        src/cetech/engine/viewport/private/fullscreen_pass.cpp
-        src/cetech/engine/viewport/private/geometry_pass.cpp
         src/cetech/engine/mesh_renderer/mesh_renderer.cpp
         src/cetech/engine/mesh_renderer/mesh_property.cpp
         src/cetech/engine/transform/private/transform.c
@@ -274,7 +272,6 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 add_library(example SHARED examples/module_example/example.cpp)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
-
 add_library(example_develop SHARED examples/develop/src/game.c)
-set_target_properties(example_develop PROPERTIES PREFIX "module_")
+set_target_properties(example_develop PROPERTIES PREFIX "game_")
 

@@ -4,7 +4,6 @@
 #include <cetech/engine/transform/transform.h>
 #include <cetech/kernel/yaml/yng.h>
 #include <cetech/kernel/yaml/ydb.h>
-#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/camera/camera.h>
 
 #include <cetech/macros.h>
@@ -28,7 +27,6 @@ CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_ebus_a0);
 
 
@@ -91,62 +89,15 @@ static struct ct_camera_a0 camera_api = {
 };
 
 
-struct cameras {
-    struct ct_camera_component camera_data[32];
-    struct ct_entity ent[32];
-    uint32_t n;
-};
-
-void foreach_camera(struct ct_world world,
-                        struct ct_entity *ent,
-                        ct_entity_storage_t *item,
-                        uint32_t n,
-                        void *data) {
-    struct cameras* cameras = data;
-
-    struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0.component_data(CAMERA_COMPONENT, item);
-
-    for (int i = 1; i < n; ++i) {
-        uint32_t idx = cameras->n++;
-
-        cameras->ent[idx].h = ent[i].h;
-
-        memcpy(cameras->camera_data+idx,
-               camera_data+i,
-               sizeof(struct ct_camera_component));
-    }
-}
-
-
-static void render_simu(struct ct_world world,
-                        float dt) {
-
-    struct cameras cameras = {{{0}}};
-
-    ct_ecs_a0.process(world,
-                         ct_ecs_a0.component_mask(CAMERA_COMPONENT),
-                         foreach_camera, &cameras);
-
-
-    for (int i = 0; i < cameras.n; ++i) {
-        ct_viewport_a0.render_world(world, cameras.ent[i],
-                                    cameras.camera_data[i].viewport);
-    }
-}
-
 static void _component_spawner(uint32_t ebus,
                                void *event) {
     struct ct_ecs_component_spawn_ev *ev = event;
     struct ct_camera_component *camera = ev->data;
 
-    struct ct_viewport v = ct_viewport_a0.create(CT_ID64_0("default"), 0, 0);
-
     *camera = (struct ct_camera_component) {
             .fov = ct_cdb_a0.read_float(ev->obj, PROP_FOV, 0.0f),
             .near = ct_cdb_a0.read_float(ev->obj, PROP_NEAR, 0.0f),
             .far = ct_cdb_a0.read_float(ev->obj, PROP_FAR, 0.0f),
-            .viewport = v,
     };
 }
 
@@ -174,15 +125,20 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
                             CT_ID64_0("camera"), _component_spawner, 0);
 
-
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
                             CT_ID64_0("camera"), _camera_compiler, 0);
 
 
-    ct_ecs_a0.register_simulation("render", render_simu);
+//    ct_ecs_a0.register_simulation("render", render_simu);
 }
 
 static void _shutdown() {
+    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            CT_ID64_0("camera"), _component_spawner);
+
+
+    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
+                            CT_ID64_0("camera"), _camera_compiler);
 }
 
 
@@ -196,7 +152,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_ebus_a0);
         },
         {

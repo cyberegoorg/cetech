@@ -281,7 +281,13 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
+    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_spawner);
 
+    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_compiler);
+
+    ct_ebus_a0.disconnect(ECS_EBUS, ECS_COMPONENT_CHANGE, on_change);
 }
 
 CETECH_MODULE_DEF(

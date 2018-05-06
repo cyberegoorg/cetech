@@ -1,8 +1,6 @@
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/engine/controlers/keyboard.h>
@@ -14,6 +12,8 @@
 #include <cetech/kernel/containers/hash.h>
 #include <cetech/kernel/math/fmath.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/engine/render_graph/render_graph.h>
+#include <cetech/engine/default_render_graph/default_render_graph.h>
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/config/config.h"
@@ -28,12 +28,13 @@ CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_dd_a0);
+CETECH_DECL_API(ct_render_graph_a0);
+CETECH_DECL_API(ct_default_render_graph_a0);
 
 #define _G AssetPreviewGlobals
 
@@ -50,6 +51,8 @@ static struct _G {
     struct ct_entity camera_ent;
     bool visible;
     bool active;
+    struct ct_render_graph *render_graph;
+    struct ct_render_graph_builder *render_graph_builder;
 } _G;
 
 
@@ -119,13 +122,14 @@ static void on_debugui(uint32_t bus_name,
         camera_data = ct_ecs_a0.entity_data(_G.world, CAMERA_COMPONENT,
                                             _G.camera_ent);
 
-        struct ct_render_texture_handle th = ct_viewport_a0.get_local_resource(
-                camera_data->viewport,
-                CT_ID64_0("bb_color"));
+        ct_render_texture_handle_t th;
+        th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
+                                                        CT_ID64_0("color"));
+
 
         float size[2];
         ct_debugui_a0.GetWindowSize(size);
-        ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
+        _G.render_graph_builder->call->set_size(_G.render_graph_builder, size[0], size[1]);
         ct_debugui_a0.Image2(th,
                              size,
                              (float[2]) {0.0f, 0.0f},
@@ -185,9 +189,19 @@ static void init(uint32_t bus_name,
     _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
                                            CT_ID32_0("content/camera"));
 
-    ct_ecs_a0.add_simulation(_G.world, CT_ID64_0("render"));
+    _G.render_graph = ct_render_graph_a0.create_graph();
+    _G.render_graph_builder = ct_render_graph_a0.create_builder();
+    _G.render_graph->call->add_module(_G.render_graph,
+                                      ct_default_render_graph_a0.create(_G.world));
+
 }
 
+static void on_render(uint32_t bus_name,
+                      void *event) {
+    _G.render_graph_builder->call->clear(_G.render_graph_builder);
+    _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
+    _G.render_graph_builder->call->execute(_G.render_graph_builder);
+}
 
 static void update(uint32_t bus_name,
                    void *event) {
@@ -270,13 +284,24 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
                        on_menu_window, 0);
 
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
 
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
 
 static void _shutdown() {
+
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                          on_menu_window);
+
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
+
+
     ct_hash_free(&_G.preview_fce_map, _G.allocator);
     ct_array_free(_G.preview_fce, _G.allocator);
 
@@ -293,12 +318,13 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
-            CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_dd_a0);
+            CETECH_GET_API(api, ct_render_graph_a0);
+            CETECH_GET_API(api, ct_default_render_graph_a0);
         },
         {
             CT_UNUSED(reload);

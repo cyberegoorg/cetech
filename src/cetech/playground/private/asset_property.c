@@ -98,7 +98,7 @@ static void _shutdown() {
     ct_array_free(_G.on_asset, _G.allocator);
     ct_hash_free(&_G.on_asset_map, _G.allocator);
 
-
+    ct_ebus_a0.disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, set_asset);
 
     _G = (struct _G){};
 }

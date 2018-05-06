@@ -184,6 +184,8 @@ void _connect_addr(uint32_t bus_name,
         ct_array_insert(ev_handlers->handlers, i, h, _G.allocator);
         return;
     }
+
+    ct_array_push(ev_handlers->handlers, h, _G.allocator);
 }
 
 void _connect(uint32_t bus_name,
@@ -191,6 +193,52 @@ void _connect(uint32_t bus_name,
               ct_ebus_handler *handler,
               uint32_t order) {
     _connect_addr(bus_name, event, 0, handler, order);
+}
+
+void disconnect_addr(uint32_t bus_name,
+                     uint64_t event,
+                     uint64_t addr,
+                     ct_ebus_handler *handler){
+    uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
+
+    if (!ebus_idx) {
+        return;
+    }
+
+    struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
+
+    uint64_t event_idx = ct_hash_lookup(&ebus->handler_idx, event, UINT64_MAX);
+
+    if (UINT64_MAX == event_idx) {
+        return;
+    }
+
+    struct ebus_event_handlers *ev_handlers = &ebus->handlers[event_idx];
+    const uint32_t handlers_n = ct_array_size(ev_handlers->handlers);
+
+    if(0 == handlers_n) {
+        return;
+    }
+
+    for (int i = 0; i < handlers_n; ++i) {
+        if(ev_handlers->handlers[i].addr != addr) {
+            continue;
+        }
+
+        if(ev_handlers->handlers[i].handler != handler) {
+            continue;
+        }
+
+        memcpy(ev_handlers->handlers+i, ev_handlers->handlers+i+1, sizeof(struct ebus_event_handler) * (handlers_n-(i)));
+        ct_array_pop_back(ev_handlers->handlers);
+        return;
+    }
+}
+
+void disconnect(uint32_t bus_name,
+                   uint64_t event,
+                   ct_ebus_handler *handler) {
+    disconnect_addr(bus_name, event, 0, handler);
 }
 
 
@@ -245,6 +293,9 @@ static struct ct_ebus_a0 _api = {
         .connect = _connect,
         .connect_addr = _connect_addr,
         .begin_frame = begin_frame,
+
+        .disconnect = disconnect,
+        .disconnect_addr = disconnect_addr,
 
         .first_event = first_event,
         .next_event = next_event,

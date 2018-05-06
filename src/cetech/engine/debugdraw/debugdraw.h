@@ -12,6 +12,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
+
 struct ct_aabb;
 struct ct_cylinder;
 struct ct_capsule;

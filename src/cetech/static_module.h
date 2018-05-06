@@ -13,15 +13,13 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(shader);
     CETECH_ADD_STATIC_MODULE(texture);
     CETECH_ADD_STATIC_MODULE(material);
-
-
+    CETECH_ADD_STATIC_MODULE(debugdraw);
+    CETECH_ADD_STATIC_MODULE(render_graph);
 
     //==========================================================================
     // Engine
     //==========================================================================
-    CETECH_ADD_STATIC_MODULE(debugdraw);
 
-    CETECH_ADD_STATIC_MODULE(application);
 
     CETECH_ADD_STATIC_MODULE(keyboard);
     CETECH_ADD_STATIC_MODULE(gamepad);
@@ -32,15 +30,7 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(scene);
     CETECH_ADD_STATIC_MODULE(mesh_renderer);
 
-
-
-    //==========================================================================
-    // Viewport
-    //==========================================================================
-    CETECH_ADD_STATIC_MODULE(viewport);
     CETECH_ADD_STATIC_MODULE(camera);
-    CETECH_ADD_STATIC_MODULE(fullscreen_pass);
-    CETECH_ADD_STATIC_MODULE(geometry_pass);
 
     //==========================================================================
     // DebugUI
@@ -54,6 +44,8 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(action_manager);
 
     CETECH_ADD_STATIC_MODULE(playground);
+    CETECH_ADD_STATIC_MODULE(default_render_graph);
+
     CETECH_ADD_STATIC_MODULE(command_history);
 
     CETECH_ADD_STATIC_MODULE(property_inspector);
@@ -72,5 +64,7 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(entity_preview);
     CETECH_ADD_STATIC_MODULE(material_preview);
     CETECH_ADD_STATIC_MODULE(material_property);
+
+
 }
 

@@ -2,7 +2,6 @@
 
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 
@@ -13,12 +12,13 @@
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/engine/application/application.h>
 
 #include <cetech/playground/playground.h>
 #include <cetech/kernel/math/fmath.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/engine/render_graph/render_graph.h>
+#include <cetech/engine/default_render_graph/default_render_graph.h>
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -29,18 +29,18 @@ CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_renderer_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_viewport_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_explorer_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_render_graph_a0);
+CETECH_DECL_API(ct_default_render_graph_a0);
 
 #define MAX_EDITOR 8
 
@@ -53,6 +53,8 @@ static struct globals {
     uint64_t root[MAX_EDITOR];
     uint32_t entity_name[MAX_EDITOR];
     bool is_first[MAX_EDITOR];
+    struct ct_render_graph* render_graph[MAX_EDITOR];
+    struct ct_render_graph_builder* render_graph_builder[MAX_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
@@ -165,12 +167,15 @@ static void on_debugui(uint32_t bus_name,
                                                                                                CAMERA_COMPONENT,
                                                                                                _G.camera_ent[i]));
 
-            auto th = ct_viewport_a0.get_local_resource(camera_data->viewport,
-                                                        CT_ID64_0("bb_color"));
+            ct_render_texture_handle_t th;
+            th = _G.render_graph_builder[i]->call->get_texture(_G.render_graph_builder[i], CT_ID64_0("color"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
-            ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
+
+            _G.render_graph_builder[i]->call->set_size(_G.render_graph_builder[i], size[0], size[1]);
+
+//            ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
             ct_debugui_a0.Image2(th,
                                  size,
                                  (float[2]) {0.0f, 0.0f},
@@ -211,11 +216,15 @@ static void open(struct ct_resource_id asset,
         _G.world[idx] = _G.world[ent_idx];
     } else {
         _G.world[idx] = ct_ecs_a0.create_world();
-        ct_ecs_a0.add_simulation(_G.world[idx], CT_ID64_0("render"));
 
         _G.entity[idx] = ct_ecs_a0.spawn_entity(_G.world[idx], asset.name);
 
         _G.is_first[idx] = true;
+
+        _G.render_graph[idx] = ct_render_graph_a0.create_graph();
+        _G.render_graph_builder[idx] = ct_render_graph_a0.create_builder();
+        _G.render_graph[idx]->call->add_module(_G.render_graph[idx],
+                                               ct_default_render_graph_a0.create( _G.world[idx]));
     }
     _G.camera_ent[idx] = ct_ecs_a0.spawn_entity(_G.world[idx],
                                                   CT_ID32_0("content/camera"));
@@ -275,6 +284,19 @@ static void update(uint32_t bus_name,
     }
 }
 
+static void on_render(uint32_t bus_name,
+                      void *event) {
+    for (uint8_t i = 0; i < _G.editor_count; ++i) {
+        if (!_G.visible[i]) {
+            continue;
+        }
+
+        _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
+        _G.render_graph[i]->call->setup(_G.render_graph[i], _G.render_graph_builder[i]);
+        _G.render_graph_builder[i]->call->execute(_G.render_graph_builder[i]);
+    }
+}
+
 static ct_entity_editor_a0 level_api = {
 //            .register_module = playground::register_module,
 //            .unregister_module = playground::unregister_module,
@@ -299,13 +321,18 @@ static void _init(ct_api_a0 *api) {
 
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
     ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, on_asset_double_click, 0);
 
     api->register_api("ct_level_view_a0", &level_api);
 }
 
 static void _shutdown() {
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
+    ct_ebus_a0.disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, on_asset_double_click);
+
     _G = {};
 }
 
@@ -316,18 +343,18 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
-            CETECH_GET_API(api, ct_viewport_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_render_graph_a0);
+            CETECH_GET_API(api, ct_default_render_graph_a0);
         },
         {
             CT_UNUSED(reload);

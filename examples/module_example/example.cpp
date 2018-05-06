@@ -8,19 +8,18 @@
 
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/ebus/ebus.h>
-#include <cetech/engine/application/application.h>
 #include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground//playground.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
-#include <cetech/engine/viewport/viewport.h>
 #include <cetech/engine/texture/texture.h>
+#include <cetech/kernel/kernel.h>
+
 #include <cstdlib>
 
 CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_app_a0);
 CETECH_DECL_API(ct_keyboard_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_debugui_a0);
@@ -36,7 +35,6 @@ CETECH_DECL_API(ct_ebus_a0);
 
 
 static struct G {
-    ct_viewport viewport;
     ct_world world;
     ct_entity camera_ent;
     float dt;
@@ -128,7 +126,6 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_app_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
@@ -149,11 +146,8 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Init %d", reload);
 
-            ct_ebus_a0.connect(APPLICATION_EBUS,
-                                        APP_UPDATE_EVENT, update, 0);
-
-            ct_ebus_a0.connect(DEBUGUI_EBUS,
-                               DEBUGUI_EVENT, module1, 0);
+            ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 0);
+            ct_ebus_a0.connect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1, 0);
 
 //            ct_debugui_a0.register_on_debugui(module1);
             //ct_debugui_a0.register_on_debugui(module2);
@@ -167,6 +161,8 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.info("example", "Shutdown %d", reload);
 
+            ct_ebus_a0.disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
+            ct_ebus_a0.disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1);
 //            ct_debugui_a0.unregister_on_debugui(module1);
 //            ct_debugui_a0.unregister_on_debugui(module2);
         }

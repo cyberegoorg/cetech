@@ -28,7 +28,7 @@ struct ct_mesh_renderer {
     struct {
         uint64_t mesh_id;
         uint64_t node_id;
-        ct_cdb_obj_t* material;
+        struct ct_cdb_obj_t* material;
     } geometries[8];
 };
 

@@ -19,14 +19,7 @@ extern "C" {
 // Typedefs
 //==============================================================================
 
-struct ct_camera;
-struct ct_world;
-struct ct_entity;
-struct ct_window;
-struct ct_texture;
 ///
-
-
 typedef enum ct_render_renderer_type {
     CT_RENDER_RENDERER_TYPE_NOOP,
     CT_RENDER_RENDERER_TYPE_DIRECT3D9,
@@ -263,7 +256,7 @@ CT_RENDER_HANDLE_T(ct_render_vertex_decl_handle);
 
 /**/
 typedef void (*ct_render_release_fn_t)(void *_ptr,
-                                  void *_userData);
+                                       void *_userData);
 
 /**/
 typedef struct ct_render_memory {
@@ -1008,13 +1001,20 @@ typedef void (*ct_renderender_on_render)();
 //==============================================================================
 // Api
 //==============================================================================
+enum {
+    RENDERER_EBUS = 0x709f555c
+};
+
+enum {
+    RENDERER_INVALID_EVNT = 0,
+    RENDERER_RENDER_EVENT,
+};
+
 
 //! Render API V0
 struct ct_renderer_a0 {
     //! Create renderer.
     void (*create)();
-
-    void (*render)();
 
     //! Set debug mode on/off
     //! \param debug True/False
@@ -1024,10 +1024,6 @@ struct ct_renderer_a0 {
     //! \return Renderer window size
     void (*get_size)(uint32_t *width,
                      uint32_t *height);
-
-    void (*register_on_render)(ct_renderender_on_render on_render);
-
-    void (*unregister_on_render)(ct_renderender_on_render on_render);
 
     ///
     void (*vertex_decl_begin)(ct_render_vertex_decl_t *_decl,
@@ -1106,15 +1102,15 @@ struct ct_renderer_a0 {
     const ct_render_memory_t *(*alloc)(uint32_t _size);
 
     const ct_render_memory_t *(*copy)(const void *_data,
-                                 uint32_t _size);
+                                      uint32_t _size);
 
     const ct_render_memory_t *(*make_ref)(const void *_data,
-                                     uint32_t _size);
+                                          uint32_t _size);
 
     const ct_render_memory_t *(*make_ref_release)(const void *_data,
-                                             uint32_t _size,
-                                             ct_render_release_fn_t _releaseFn,
-                                             void *_userData);
+                                                  uint32_t _size,
+                                                  ct_render_release_fn_t _releaseFn,
+                                                  void *_userData);
 
     void (*dbg_text_clear)(uint8_t _attr,
                            bool _small);
@@ -1138,8 +1134,9 @@ struct ct_renderer_a0 {
                            const void *_data,
                            uint16_t _pitch);
 
-    ct_render_index_buffer_handle_t (*create_index_buffer)(const ct_render_memory_t *_mem,
-                                                      uint16_t _flags);
+    ct_render_index_buffer_handle_t
+    (*create_index_buffer)(const ct_render_memory_t *_mem,
+                           uint16_t _flags);
 
     void (*destroy_index_buffer)(ct_render_index_buffer_handle_t _handle);
 
@@ -1192,12 +1189,14 @@ struct ct_renderer_a0 {
     uint32_t (*get_avail_instance_data_buffer)(uint32_t _num,
                                                uint16_t _stride);
 
-    void (*alloc_transient_index_buffer)(ct_render_transient_index_buffer_t *_tib,
-                                         uint32_t _num);
+    void
+    (*alloc_transient_index_buffer)(ct_render_transient_index_buffer_t *_tib,
+                                    uint32_t _num);
 
-    void (*alloc_transient_vertex_buffer)(ct_render_transient_vertex_buffer_t *_tvb,
-                                          uint32_t _num,
-                                          const ct_render_vertex_decl_t *_decl);
+    void
+    (*alloc_transient_vertex_buffer)(ct_render_transient_vertex_buffer_t *_tvb,
+                                     uint32_t _num,
+                                     const ct_render_vertex_decl_t *_decl);
 
     bool (*alloc_transient_buffers)(ct_render_transient_vertex_buffer_t *_tvb,
                                     const ct_render_vertex_decl_t *_decl,
@@ -1225,11 +1224,12 @@ struct ct_renderer_a0 {
     void (*destroy_shader)(ct_render_shader_handle_t _handle);
 
     ct_render_program_handle_t (*create_program)(ct_render_shader_handle_t _vsh,
-                                            ct_render_shader_handle_t _fsh,
-                                            bool _destroyShaders);
+                                                 ct_render_shader_handle_t _fsh,
+                                                 bool _destroyShaders);
 
-    ct_render_program_handle_t (*create_compute_program)(ct_render_shader_handle_t _csh,
-                                                    bool _destroyShaders);
+    ct_render_program_handle_t
+    (*create_compute_program)(ct_render_shader_handle_t _csh,
+                              bool _destroyShaders);
 
     void (*destroy_program)(ct_render_program_handle_t _handle);
 
@@ -1249,17 +1249,17 @@ struct ct_renderer_a0 {
                               ct_render_texture_format_t _format);
 
     ct_render_texture_handle_t (*create_texture)(const ct_render_memory_t *_mem,
-                                            uint32_t _flags,
-                                            uint8_t _skip,
-                                            ct_render_texture_info_t *_info);
+                                                 uint32_t _flags,
+                                                 uint8_t _skip,
+                                                 ct_render_texture_info_t *_info);
 
     ct_render_texture_handle_t (*create_texture_2d)(uint16_t _width,
-                                               uint16_t _height,
-                                               bool _hasMips,
-                                               uint16_t _numLayers,
-                                               ct_render_texture_format_t _format,
-                                               uint32_t _flags,
-                                               const ct_render_memory_t *_mem);
+                                                    uint16_t _height,
+                                                    bool _hasMips,
+                                                    uint16_t _numLayers,
+                                                    ct_render_texture_format_t _format,
+                                                    uint32_t _flags,
+                                                    const ct_render_memory_t *_mem);
 
     ct_render_texture_handle_t
     (*create_texture_2d_scaled)(ct_render_backbuffer_ratio_t _ratio,
@@ -1269,19 +1269,19 @@ struct ct_renderer_a0 {
                                 uint32_t _flags);
 
     ct_render_texture_handle_t (*create_texture_3d)(uint16_t _width,
-                                               uint16_t _height,
-                                               uint16_t _depth,
-                                               bool _hasMips,
-                                               ct_render_texture_format_t _format,
-                                               uint32_t _flags,
-                                               const ct_render_memory_t *_mem);
+                                                    uint16_t _height,
+                                                    uint16_t _depth,
+                                                    bool _hasMips,
+                                                    ct_render_texture_format_t _format,
+                                                    uint32_t _flags,
+                                                    const ct_render_memory_t *_mem);
 
     ct_render_texture_handle_t (*create_texture_cube)(uint16_t _size,
-                                                 bool _hasMips,
-                                                 uint16_t _numLayers,
-                                                 ct_render_texture_format_t _format,
-                                                 uint32_t _flags,
-                                                 const ct_render_memory_t *_mem);
+                                                      bool _hasMips,
+                                                      uint16_t _numLayers,
+                                                      ct_render_texture_format_t _format,
+                                                      uint32_t _flags,
+                                                      const ct_render_memory_t *_mem);
 
     void (*update_texture_2d)(ct_render_texture_handle_t _handle,
                               uint16_t _layer,
@@ -1326,9 +1326,9 @@ struct ct_renderer_a0 {
     void (*destroy_texture)(ct_render_texture_handle_t _handle);
 
     ct_render_frame_buffer_handle_t (*create_frame_buffer)(uint16_t _width,
-                                                      uint16_t _height,
-                                                      ct_render_texture_format_t _format,
-                                                      uint32_t _textureFlags);
+                                                           uint16_t _height,
+                                                           ct_render_texture_format_t _format,
+                                                           uint32_t _textureFlags);
 
     ct_render_frame_buffer_handle_t
     (*create_frame_buffer_scaled)(ct_render_backbuffer_ratio_t _ratio,
@@ -1341,18 +1341,24 @@ struct ct_renderer_a0 {
                                            bool _destroyTextures);
 
     ct_render_frame_buffer_handle_t (*create_frame_buffer_from_nwh)(void *_nwh,
-                                                               uint16_t _width,
-                                                               uint16_t _height,
-                                                               ct_render_texture_format_t _depthFormat);
+                                                                    uint16_t _width,
+                                                                    uint16_t _height,
+                                                                    ct_render_texture_format_t _depthFormat);
 
-    ct_render_texture_handle_t (*get_texture)(ct_render_frame_buffer_handle_t _handle,
-                                         uint8_t _attachment);
+    ct_render_frame_buffer_handle_t
+    (*create_frame_buffer_from_handles)(uint8_t _num,
+                                        const ct_render_texture_handle_t *_handles,
+                                        bool _destroyTextures);
+
+    ct_render_texture_handle_t
+    (*get_texture)(ct_render_frame_buffer_handle_t _handle,
+                   uint8_t _attachment);
 
     void (*destroy_frame_buffer)(ct_render_frame_buffer_handle_t _handle);
 
     ct_render_uniform_handle_t (*create_uniform)(const char *_name,
-                                            ct_render_uniform_type_t _type,
-                                            uint16_t _num);
+                                                 ct_render_uniform_type_t _type,
+                                                 uint16_t _num);
 
     void (*get_uniform_info)(ct_render_uniform_handle_t _handle,
                              ct_render_uniform_info_t *_info);
@@ -1459,9 +1465,10 @@ struct ct_renderer_a0 {
                              uint32_t _firstIndex,
                              uint32_t _numIndices);
 
-    void (*set_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t _handle,
-                                     uint32_t _firstIndex,
-                                     uint32_t _numIndices);
+    void
+    (*set_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t _handle,
+                                uint32_t _firstIndex,
+                                uint32_t _numIndices);
 
     void
     (*set_transient_index_buffer)(const ct_render_transient_index_buffer_t *_tib,
@@ -1483,9 +1490,10 @@ struct ct_renderer_a0 {
                                         uint32_t _startVertex,
                                         uint32_t _numVertices);
 
-    void (*set_instance_data_buffer)(const ct_render_instance_data_buffer_t *_idb,
-                                     uint32_t _start,
-                                     uint32_t _num);
+    void
+    (*set_instance_data_buffer)(const ct_render_instance_data_buffer_t *_idb,
+                                uint32_t _start,
+                                uint32_t _num);
 
     void
     (*set_instance_data_from_vertex_buffer)(ct_render_vertex_buffer_handle_t _handle,
@@ -1631,10 +1639,11 @@ struct ct_renderer_a0 {
                                              uint32_t _firstIndex,
                                              uint32_t _numIndices);
 
-    void (*encoder_set_transient_index_buffer)(struct ct_render_encoder *_encoder,
-                                               const ct_render_transient_index_buffer_t *_tib,
-                                               uint32_t _firstIndex,
-                                               uint32_t _numIndices);
+    void
+    (*encoder_set_transient_index_buffer)(struct ct_render_encoder *_encoder,
+                                          const ct_render_transient_index_buffer_t *_tib,
+                                          uint32_t _firstIndex,
+                                          uint32_t _numIndices);
 
     void (*encoder_set_vertex_buffer)(struct ct_render_encoder *_encoder,
                                       uint8_t _stream,
@@ -1642,17 +1651,19 @@ struct ct_renderer_a0 {
                                       uint32_t _startVertex,
                                       uint32_t _numVertices);
 
-    void (*encoder_set_dynamic_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                              uint8_t _stream,
-                                              ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                              uint32_t _startVertex,
-                                              uint32_t _numVertices);
+    void
+    (*encoder_set_dynamic_vertex_buffer)(struct ct_render_encoder *_encoder,
+                                         uint8_t _stream,
+                                         ct_render_dynamic_vertex_buffer_handle_t _handle,
+                                         uint32_t _startVertex,
+                                         uint32_t _numVertices);
 
-    void (*encoder_set_transient_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                                uint8_t _stream,
-                                                const ct_render_transient_vertex_buffer_t *_tvb,
-                                                uint32_t _startVertex,
-                                                uint32_t _numVertices);
+    void
+    (*encoder_set_transient_vertex_buffer)(struct ct_render_encoder *_encoder,
+                                           uint8_t _stream,
+                                           const ct_render_transient_vertex_buffer_t *_tvb,
+                                           uint32_t _startVertex,
+                                           uint32_t _numVertices);
 
     void (*encoder_set_instance_data_buffer)(struct ct_render_encoder *_encoder,
                                              const ct_render_instance_data_buffer_t *_idb,
@@ -1714,10 +1725,11 @@ struct ct_renderer_a0 {
                                              ct_render_index_buffer_handle_t _handle,
                                              ct_render_access_t _access);
 
-    void (*encoder_set_compute_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                              uint8_t _stage,
-                                              ct_render_vertex_buffer_handle_t _handle,
-                                              ct_render_access_t _access);
+    void
+    (*encoder_set_compute_vertex_buffer)(struct ct_render_encoder *_encoder,
+                                         uint8_t _stage,
+                                         ct_render_vertex_buffer_handle_t _handle,
+                                         ct_render_access_t _access);
 
     void
     (*encoder_set_compute_dynamic_index_buffer)(struct ct_render_encoder *_encoder,
@@ -1731,10 +1743,11 @@ struct ct_renderer_a0 {
                                                  ct_render_dynamic_vertex_buffer_handle_t _handle,
                                                  ct_render_access_t _access);
 
-    void (*encoder_set_compute_indirect_buffer)(struct ct_render_encoder *_encoder,
-                                                uint8_t _stage,
-                                                ct_render_indirect_buffer_handle_t _handle,
-                                                ct_render_access_t _access);
+    void
+    (*encoder_set_compute_indirect_buffer)(struct ct_render_encoder *_encoder,
+                                           uint8_t _stage,
+                                           ct_render_indirect_buffer_handle_t _handle,
+                                           ct_render_access_t _access);
 
     void (*encoder_dispatch)(struct ct_render_encoder *_encoder,
                              ct_render_view_id_t _id,

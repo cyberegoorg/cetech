@@ -195,6 +195,9 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+
     ct_array_free(_G.log_items, _G.allocator);
     ct_array_free(_G.line_buffer, _G.allocator);
     _G = {};

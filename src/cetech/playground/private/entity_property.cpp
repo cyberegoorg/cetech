@@ -126,6 +126,8 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
+    ct_ebus_a0.disconnect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT, on_entity_click);
+
     _G = {};
 }
 
