@@ -1,8 +1,6 @@
-
 struct render_graph_inst {
     struct ct_render_graph_module **modules;
 };
-
 
 void add_module(void *inst,
                 struct ct_render_graph_module *module) {

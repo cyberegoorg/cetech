@@ -21,7 +21,9 @@ struct ct_render_graph_builder;
 // Pass
 //==============================================================================
 
-struct ct_render_graph_pass_fce {
+struct ct_render_graph_pass {
+    uint64_t size;
+
     void (*on_setup)(void *inst,
                      struct ct_render_graph_builder *builder);
 
@@ -31,24 +33,28 @@ struct ct_render_graph_pass_fce {
                     struct ct_render_graph_builder *builder);
 };
 
-struct ct_render_graph_pass {
-    void *inst;
-    struct ct_render_graph_pass_fce *call;
-};
-
 //==============================================================================
 // Builder
 //==============================================================================
+
+struct ct_render_graph_attachment {
+    enum ct_render_backbuffer_ratio ratio;
+    enum ct_render_texture_format format;
+};
 
 struct ct_render_graph_builder_fce {
     void (*add_pass)(void *inst,
                      struct ct_render_graph_pass *pass,
                      uint64_t layer);
 
-    void (*write)(void *inst,
-                  uint64_t name,
-                  enum ct_render_backbuffer_ratio ratio,
-                  enum ct_render_texture_format format);
+    void (*create)(void *inst,
+                   uint64_t name,
+                   struct ct_render_graph_attachment info);
+
+
+    void (*read)(void *inst,
+                 uint64_t name);
+
 
     struct ct_render_texture_handle (*get_texture)(void *inst,
                                                    uint64_t name);
@@ -76,7 +82,8 @@ struct ct_render_graph_builder {
 
 struct ct_render_graph_module_fce {
     void (*add_pass)(void *inst,
-                     struct ct_render_graph_pass *pass);
+                     void *pass,
+                     uint64_t size);
 
     void (*on_setup)(void *inst,
                      struct ct_render_graph_builder *builder);

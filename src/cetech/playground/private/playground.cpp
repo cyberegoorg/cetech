@@ -45,7 +45,7 @@ static struct _G {
     bool load_layout;
     struct ct_render_graph *render_graph;
     struct ct_render_graph_builder *render_graph_builder;
-    struct ct_render_graph_module* module;
+    struct ct_render_graph_module *module;
 } _G;
 
 void reload_layout() {
@@ -108,8 +108,8 @@ static float draw_main_menu() {
             if (ct_debugui_a0.BeginMenu("Layout", true)) {
                 if (ct_debugui_a0.MenuItem("Save", NULL, false, true)) {
                     ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"),
-                                                      "core/default.dock_layout",
-                                                      FS_OPEN_WRITE);
+                                              "core/default.dock_layout",
+                                              FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
                     ct_fs_a0.close(f);
                 }
@@ -122,8 +122,9 @@ static float draw_main_menu() {
 
             ImGui::Separator();
 
-            ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, NULL,
-                            0);
+            ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                                 NULL,
+                                 0);
 
             ct_debugui_a0.EndMenu();
         }
@@ -155,56 +156,59 @@ static void on_debugui() {
 }
 
 static void debugui_on_setup(void *inst,
-                           struct ct_render_graph_builder *builder) {
-    builder->call->add_pass(builder, static_cast<ct_render_graph_pass *>(inst), 0);
+                             struct ct_render_graph_builder *builder) {
+    builder->call->add_pass(builder, static_cast<ct_render_graph_pass *>(inst),
+                            0);
 }
 
 static void debugui_on_pass(void *inst,
-                          uint8_t viewid,
-                          uint64_t layer,
-                          struct ct_render_graph_builder *builder) {
+                            uint8_t viewid,
+                            uint64_t layer,
+                            struct ct_render_graph_builder *builder) {
     ct_debugui_a0.render(viewid);
 }
 
-static struct ct_render_graph_pass_fce debugui_pass_fce = {
-        .on_pass = debugui_on_pass,
-        .on_setup = debugui_on_setup
-};
 
-static struct ct_render_graph_pass debugui_pass = {
-        .call = &debugui_pass_fce
-};
-
-
-static void on_init(uint32_t ebus_name, void* event) {
+static void on_init(uint32_t ebus_name,
+                    void *event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
 
     _G.render_graph = ct_render_graph_a0.create_graph();
     _G.render_graph_builder = ct_render_graph_a0.create_builder();
     _G.module = ct_render_graph_a0.create_module();
 
-    _G.module->call->add_pass(_G.module, &debugui_pass);
+    static struct ct_render_graph_pass debugui_pass = {
+            .on_pass = debugui_on_pass,
+            .on_setup = debugui_on_setup
+    };
+
+    _G.module->call->add_pass(_G.module, &debugui_pass,
+                              sizeof(ct_render_graph_pass));
+
     _G.render_graph->call->add_module(_G.render_graph, _G.module);
 }
 
-static void on_shutdown(uint32_t ebus_name, void* event) {
+static void on_shutdown(uint32_t ebus_name,
+                        void *event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
 
 }
 
-static void on_update(uint32_t ebus_name, void* event) {
+static void on_update(uint32_t ebus_name,
+                      void *event) {
     ct_action_manager_a0.check();
 
-    ct_app_update_ev * app_ev = static_cast<ct_app_update_ev *>(event);
+    ct_app_update_ev *app_ev = static_cast<ct_app_update_ev *>(event);
 
-    ct_playground_update_ev ev= {.dt=app_ev->dt};
+    ct_playground_update_ev ev = {.dt=app_ev->dt};
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT,
                          &ev, sizeof(ev));
 }
 
-static void on_render(uint32_t ebus_name, void* event) {
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, NULL,0);
+static void on_render(uint32_t ebus_name,
+                      void *event) {
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, NULL, 0);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
     _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
@@ -212,7 +216,8 @@ static void on_render(uint32_t ebus_name, void* event) {
 }
 
 
-static void on_ui(uint32_t ebus_name, void* event) {
+static void on_ui(uint32_t ebus_name,
+                  void *event) {
     on_debugui();
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);
@@ -251,8 +256,10 @@ static void _init(ct_api_a0 *api) {
 
 
     ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_INIT_EVENT, on_init, GAME_ORDER);
-    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update, KERNEL_ORDER);
-    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown, KERNEL_ORDER);
+    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update,
+                       KERNEL_ORDER);
+    ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown,
+                       KERNEL_ORDER);
     ct_ebus_a0.connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render, 0);
     ct_ebus_a0.connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
 }

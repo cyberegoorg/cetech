@@ -13,8 +13,9 @@ extern "C" {
 
 struct ct_render_graph_module;
 struct ct_world;
+
 //==============================================================================
-// Api
+// Api (temporary solution)
 //==============================================================================
 
 struct ct_default_render_graph_a0 {

@@ -43,85 +43,6 @@ static struct G {
 } _G;
 
 
-struct PosTexCoord0Vertex {
-    float m_x;
-    float m_y;
-    float m_z;
-    float m_u;
-    float m_v;
-};
-
-static ct_render_vertex_decl_t ms_decl;
-
-static void init_decl() {
-    ct_renderer_a0.vertex_decl_begin(&ms_decl, CT_RENDER_RENDERER_TYPE_NOOP);
-    ct_renderer_a0.vertex_decl_add(&ms_decl, CT_RENDER_ATTRIB_POSITION, 3,
-                                   CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
-    ct_renderer_a0.vertex_decl_add(&ms_decl, CT_RENDER_ATTRIB_TEXCOORD0, 2,
-                                   CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
-    ct_renderer_a0.vertex_decl_end(&ms_decl);
-}
-
-
-void screenspace_quad(float _textureWidth,
-                      float _textureHeight,
-                      float _texelHalf,
-                      bool _originBottomLeft,
-                      float _width,
-                      float _height) {
-    if (3 ==
-        ct_renderer_a0.get_avail_transient_vertex_buffer(3, &ms_decl)) {
-        ct_render_transient_vertex_buffer_t vb;
-        ct_renderer_a0.alloc_transient_vertex_buffer(&vb, 3, &ms_decl);
-        struct PosTexCoord0Vertex *vertex = (struct PosTexCoord0Vertex *) vb.data;
-
-        const float minx = -_width;
-        const float maxx = _width;
-        const float miny = 0.0f;
-        const float maxy = _height * 2.0f;
-
-        const float texelHalfW = _texelHalf / _textureWidth;
-        const float texelHalfH = _texelHalf / _textureHeight;
-        const float minu = -1.0f + texelHalfW;
-        const float maxu = 1.0f + texelHalfH;
-
-        const float zz = 0.0f;
-
-        float minv = texelHalfH;
-        float maxv = 2.0f + texelHalfH;
-
-        if (_originBottomLeft) {
-            float temp = minv;
-            minv = maxv;
-            maxv = temp;
-
-            minv -= 1.0f;
-            maxv -= 1.0f;
-        }
-
-        vertex[0].m_x = minx;
-        vertex[0].m_y = miny;
-        vertex[0].m_z = zz;
-        vertex[0].m_u = minu;
-        vertex[0].m_v = minv;
-
-        vertex[1].m_x = maxx;
-        vertex[1].m_y = miny;
-        vertex[1].m_z = zz;
-        vertex[1].m_u = maxu;
-        vertex[1].m_v = minv;
-
-        vertex[2].m_x = maxx;
-        vertex[2].m_y = maxy;
-        vertex[2].m_z = zz;
-        vertex[2].m_u = maxu;
-        vertex[2].m_v = maxv;
-
-        ct_renderer_a0.set_transient_vertex_buffer(0, &vb, 0, 0);
-    }
-}
-
-
 
 void init(uint32_t bus_name,
           void *event) {
@@ -162,9 +83,6 @@ void update(uint32_t bus_name,
     w = h = 0;
 
     ct_renderer_a0.get_size(&w, &h);
-
-    screenspace_quad(w, h, 0.0f, ct_renderer_a0.get_caps()->originBottomLeft,
-                     1.0f, 1.0f);
 }
 
 //==============================================================================
@@ -174,7 +92,7 @@ void update(uint32_t bus_name,
 //==============================================================================
 // Init api
 //==============================================================================
-void CETECH_MODULE_INITAPI(MOUDLE_NAME)(struct ct_api_a0 *api) {
+void CETECH_MODULE_INITAPI(example_develop)(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_keyboard_a0);
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_debugui_a0);
@@ -191,13 +109,13 @@ void CETECH_MODULE_INITAPI(MOUDLE_NAME)(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_default_render_graph_a0);
 }
 
-void CETECH_MODULE_LOAD (MOUDLE_NAME)(struct ct_api_a0 *api,
+void CETECH_MODULE_LOAD (example_develop)(struct ct_api_a0 *api,
                                           int reload) {
     CT_UNUSED(api);
 
     ct_log_a0.info("example", "Init %d", reload);
 
-    init_decl();
+//    init_decl();
 
     ct_ebus_a0.connect(KERNEL_EBUS,
                        KERNEL_UPDATE_EVENT, update, KERNEL_ORDER);
@@ -209,7 +127,7 @@ void CETECH_MODULE_LOAD (MOUDLE_NAME)(struct ct_api_a0 *api,
                        KERNEL_SHUTDOWN_EVENT, shutdown, GAME_ORDER);
 }
 
-void CETECH_MODULE_UNLOAD (MOUDLE_NAME)(struct ct_api_a0 *api,
+void CETECH_MODULE_UNLOAD (example_develop)(struct ct_api_a0 *api,
                                             int reload) {
     CT_UNUSED(api);
 

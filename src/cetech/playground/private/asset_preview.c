@@ -124,7 +124,7 @@ static void on_debugui(uint32_t bus_name,
 
         ct_render_texture_handle_t th;
         th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
-                                                        CT_ID64_0("color"));
+                                                        CT_ID64_0("output"));
 
 
         float size[2];

@@ -23,11 +23,10 @@ static void builder_add_pass(void *inst,
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    uint8_t viewid = ++_G.viewid;
-
-    const uint8_t n = builder_inst->attachemnt_used;
+    uint8_t viewid = _G.viewid++;
 
     ct_render_frame_buffer_handle_t fb = {.idx = UINT16_MAX};
+    const uint8_t n = builder_inst->attachemnt_used;
 
     if (0 != n) {
         builder_inst->attachemnt_used = 0;
@@ -38,7 +37,11 @@ static void builder_add_pass(void *inst,
     }
 
     ct_array_push(builder_inst->pass,
-                  ((struct render_graph_builder_pass) {.pass = pass, .layer = layer, .viewid = viewid, .fb = fb}),
+                  ((struct render_graph_builder_pass) {
+                          .pass = pass,
+                          .layer = layer,
+                          .viewid = viewid,
+                          .fb = fb}),
                   _G.alloc);
 }
 
@@ -50,14 +53,17 @@ static void builder_execute(void *inst) {
     for (int i = 0; i < pass_n; ++i) {
         struct render_graph_builder_pass *pass = &builder_inst->pass[i];
 
-        ct_renderer_a0.set_view_frame_buffer(pass->viewid, pass->fb);
+        ct_renderer_a0.touch(pass->viewid);
 
-        ct_dd_a0.begin(pass->viewid);
-        pass->pass->call->on_pass(pass->pass,
-                                  pass->viewid,
-                                  pass->layer,
-                                  builder);
-        ct_dd_a0.end(pass->viewid);
+        if (UINT16_MAX != pass->fb.idx) {
+            ct_renderer_a0.set_view_frame_buffer(pass->viewid, pass->fb);
+        }
+
+        pass->pass->on_pass(pass->pass,
+                            pass->viewid,
+                            pass->layer,
+                            builder);
+
     }
 }
 
@@ -69,7 +75,7 @@ static void builder_clear(void *inst) {
     for (int i = 0; i < pass_n; ++i) {
         struct render_graph_builder_pass *pass = &builder_inst->pass[i];
 
-        if(UINT16_MAX == pass->fb.idx) {
+        if (UINT16_MAX == pass->fb.idx) {
             continue;
         }
 
@@ -96,8 +102,7 @@ float ratio_to_coef(ct_render_backbuffer_ratio_t ratio) {
 
 static void builder_write(void *inst,
                           uint64_t name,
-                          enum ct_render_backbuffer_ratio ratio,
-                          enum ct_render_texture_format format) {
+                          struct ct_render_graph_attachment info) {
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
@@ -109,12 +114,12 @@ static void builder_write(void *inst,
                                   | CT_RENDER_TEXTURE_U_CLAMP
                                   | CT_RENDER_TEXTURE_V_CLAMP;
 
-    float coef = ratio_to_coef(ratio);
+    const float coef = ratio_to_coef(info.ratio);
 
     ct_render_texture_handle_t th;
     th = ct_renderer_a0.create_texture_2d(builder_inst->size[0] * coef,
                                           builder_inst->size[1] * coef,
-                                          false, 1, format,
+                                          false, 1, info.format,
                                           samplerFlags, NULL);
 
     const uint8_t idx = builder_inst->attachemnt_used++;
@@ -122,6 +127,11 @@ static void builder_write(void *inst,
     builder_inst->attachemnt[idx] = th;
 
     ct_hash_add(&builder_inst->texture_map, name, th.idx, _G.alloc);
+}
+
+static void builder_read(void *inst,
+                         uint64_t name) {
+
 }
 
 struct ct_render_texture_handle builder_get_texture(void *inst,
@@ -133,7 +143,9 @@ struct ct_render_texture_handle builder_get_texture(void *inst,
             .idx = ct_hash_lookup(&builder_inst->texture_map, name, 0)};
 }
 
-void builder_set_size(void *inst, uint16_t w,  uint16_t h){
+void builder_set_size(void *inst,
+                      uint16_t w,
+                      uint16_t h) {
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
@@ -142,18 +154,20 @@ void builder_set_size(void *inst, uint16_t w,  uint16_t h){
 
 }
 
-void builder_get_size(void *inst, uint16_t *size){
+void builder_get_size(void *inst,
+                      uint16_t *size) {
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    memccpy(size, builder_inst->size, 1, sizeof(uint16_t)*2);
+    memcpy(size, builder_inst->size, sizeof(uint16_t) * 2);
 }
 
 struct ct_render_graph_builder_fce render_graph_builder_api = {
         .add_pass = builder_add_pass,
         .execute = builder_execute,
         .clear = builder_clear,
-        .write = builder_write,
+        .create = builder_write,
+        .read = builder_read,
         .set_size = builder_set_size,
         .get_size = builder_get_size,
         .get_texture = builder_get_texture,

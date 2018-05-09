@@ -102,11 +102,11 @@ void foreach_mesh_renderer(struct ct_world world,
     struct mesh_render_data *data = static_cast<mesh_render_data *>(_data);
 
     ct_mesh_renderer *mesh_renderers;
-    mesh_renderers = (ct_mesh_renderer *) ct_ecs_a0.component_data(
+    mesh_renderers = (ct_mesh_renderer *) ct_ecs_a0.entities_data(
             MESH_RENDERER_COMPONENT, item);
 
     ct_transform_comp *transforms;
-    transforms = (ct_transform_comp *) ct_ecs_a0.component_data(
+    transforms = (ct_transform_comp *) ct_ecs_a0.entities_data(
             TRANSFORM_COMPONENT, item);
 
     for (int i = 1; i < n; ++i) {

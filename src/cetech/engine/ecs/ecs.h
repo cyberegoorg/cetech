@@ -141,7 +141,7 @@ struct ct_ecs_a0 {
 
     uint64_t (*component_mask)(uint64_t component_name);
 
-    void *(*component_data)(uint64_t component_name,
+    void *(*entities_data)(uint64_t component_name,
                             ct_entity_storage_t *item);
 
     void *(*entity_data)(struct ct_world world,

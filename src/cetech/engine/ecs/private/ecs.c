@@ -936,7 +936,7 @@ static struct ct_ecs_a0 _api = {
         .has = has,
         .register_component = register_component,
         .component_mask = component_mask,
-        .component_data = component_data,
+        .entities_data = component_data,
         .entity_data = entity_data,
 
         .entity_component_change = entity_component_change,

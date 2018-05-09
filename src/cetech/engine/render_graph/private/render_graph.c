@@ -65,7 +65,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    ct_ebus_a0.connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render, 1024);
+    ct_ebus_a0.connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render, UINT32_MAX);
 
     api->register_api("ct_render_graph_a0", &render_graph_api);
 }

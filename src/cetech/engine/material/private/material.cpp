@@ -4,14 +4,12 @@
 
 #include "cetech/kernel/memory/allocator.h"
 #include "cetech/kernel/containers/map.inl"
-#include "cetech/kernel/containers/handler.h"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
 #include "cetech/kernel/api/api_system.h"
 
 
-#include "cetech/engine/machine/machine.h"
 #include "cetech/engine/resource/resource.h"
 
 #include <cetech/engine/renderer/renderer.h>
@@ -106,7 +104,7 @@ static void online(uint64_t name,
         struct ct_cdb_obj_t *layer_writer;
         layer_writer = ct_cdb_a0.write_begin(layer_object);
 
-        struct ct_resource_id rid = (struct ct_resource_id){
+        struct ct_resource_id rid = (struct ct_resource_id) {
                 .type = CT_ID32_0("shader"),
                 .name = static_cast<uint32_t>(shader),
         };
@@ -127,9 +125,10 @@ static void online(uint64_t name,
             const char *uname = &uniforms_names[j * 32];
             uint64_t name_id = CT_ID64_0(uname);
 
-            ct_render_uniform_handle_t handler = ct_renderer_a0.create_uniform(uname,
-                                                              _type_to_bgfx[type],
-                                                              1);
+            ct_render_uniform_handle_t handler = ct_renderer_a0.create_uniform(
+                    uname,
+                    _type_to_bgfx[type],
+                    1);
 
             ct_cdb_obj_t *var_obj = ct_cdb_a0.create_object(_G.db, 0);
             ct_cdb_obj_t *var_writer = ct_cdb_a0.write_begin(var_obj);
@@ -199,7 +198,7 @@ static const ct_resource_type_t callback = {
 //==============================================================================
 
 static struct ct_cdb_obj_t *create(uint32_t name) {
-    struct ct_resource_id rid = (struct ct_resource_id){
+    struct ct_resource_id rid = (struct ct_resource_id) {
             .type = _G.type,
             .name = name,
     };
@@ -288,14 +287,16 @@ static void submit(ct_cdb_obj_t *material,
                 uint64_t t = ct_cdb_a0.read_uint64(var,
                                                    MATERIAL_VAR_VALUE_PROP, 0);
                 auto texture = ct_texture_a0.get(t);
-                ct_renderer_a0.set_texture(texture_stage++, handle, {texture.idx}, 0);
+                ct_renderer_a0.set_texture(texture_stage++, handle,
+                                           {texture.idx}, 0);
             }
                 break;
 
             case MAT_VAR_TEXTURE_HANDLER: {
                 uint64_t t = ct_cdb_a0.read_uint64(var,
                                                    MATERIAL_VAR_VALUE_PROP, 0);
-                ct_renderer_a0.set_texture(texture_stage++, handle, {.idx=(uint16_t)t}, 0);
+                ct_renderer_a0.set_texture(texture_stage++, handle,
+                                           {.idx=(uint16_t) t}, 0);
             }
                 break;
 

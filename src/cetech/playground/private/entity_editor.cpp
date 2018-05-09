@@ -168,7 +168,7 @@ static void on_debugui(uint32_t bus_name,
                                                                                                _G.camera_ent[i]));
 
             ct_render_texture_handle_t th;
-            th = _G.render_graph_builder[i]->call->get_texture(_G.render_graph_builder[i], CT_ID64_0("color"));
+            th = _G.render_graph_builder[i]->call->get_texture(_G.render_graph_builder[i], CT_ID64_0("output"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);

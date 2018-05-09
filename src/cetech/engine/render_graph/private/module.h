@@ -1,23 +1,29 @@
 struct render_graph_module_inst {
-    struct ct_render_graph_pass **pass;
+    uint8_t *pass;
 };
 
 static void add_pass(void *inst,
-                     struct ct_render_graph_pass *pass) {
+                     void *pass, uint64_t size) {
     struct ct_render_graph_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
-    ct_array_push(module_inst->pass, pass, _G.alloc);
+    struct ct_render_graph_pass* p = pass;
+    p->size = size;
+
+    ct_array_push_n(module_inst->pass, pass, size, _G.alloc);
 }
 
 static void module_on_setup(void *inst,
                             struct ct_render_graph_builder *builder) {
     struct ct_render_graph_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
+
     const uint32_t pass_n = ct_array_size(module_inst->pass);
-    for (int i = 0; i < pass_n; ++i) {
-        struct ct_render_graph_pass *pass = module_inst->pass[i];
-        pass->call->on_setup(pass, builder);
+    for (int i = 0; i < pass_n;) {
+        struct ct_render_graph_pass *pass = (struct ct_render_graph_pass *) &module_inst->pass[i];
+        pass->on_setup(pass, builder);
+
+        i += pass->size;
     }
 }
 
