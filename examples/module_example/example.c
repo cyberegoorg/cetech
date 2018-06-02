@@ -42,7 +42,7 @@ static struct G {
 } _G;
 
 
-void update(uint32_t bus_name, void *event) {
+void update(void *event) {
     struct ct_app_update_ev *ev = event;
 
     _G.dt = ev->dt;
@@ -53,7 +53,9 @@ void update(uint32_t bus_name, void *event) {
     ///ct_log_a0.debug("example", "%f", dt);
 }
 
-void module1(uint32_t ebus_name, void* event) {
+void module1(void* event) {
+    CT_UNUSED(event)
+
     static bool visible = true;
     if (ct_debugui_a0.BeginDock("Module 1", &visible,
                                 DebugUIWindowFlags_Empty)) {

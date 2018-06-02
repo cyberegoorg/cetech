@@ -112,16 +112,11 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(uint32_t bus_name,
-                       void *event) {
+static void on_debugui(void *event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
 
         _G.active = ct_debugui_a0.IsMouseHoveringWindow();
-
-        struct ct_camera_component *camera_data;
-        camera_data = ct_ecs_a0.entity_data(_G.world, CAMERA_COMPONENT,
-                                            _G.camera_ent);
 
         ct_render_texture_handle_t th;
         th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
@@ -143,8 +138,7 @@ static void on_debugui(uint32_t bus_name,
 }
 
 
-static void set_asset(uint32_t bus_name,
-                      void *event) {
+static void set_asset(void *event) {
 
     struct ct_asset_browser_click_ev *ev = event;
     struct ct_resource_id rid = {.i64 = ev->asset};
@@ -183,8 +177,9 @@ static void set_asset(uint32_t bus_name,
     ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init(uint32_t bus_name,
-                 void *event) {
+static void init(void *event) {
+    CT_UNUSED(event);
+
     _G.visible = true;
     _G.world = ct_ecs_a0.create_world();
     _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
@@ -197,8 +192,9 @@ static void init(uint32_t bus_name,
 
 }
 
-static void on_render(uint32_t bus_name,
-                      void *event) {
+static void on_render(void *event) {
+    CT_UNUSED(event);
+
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
 
     if (!_G.visible) {
@@ -209,8 +205,7 @@ static void on_render(uint32_t bus_name,
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static void update(uint32_t bus_name,
-                   void *event) {
+static void update(void *event) {
     struct ct_playground_update_ev *ev = event;
     float dt = ev->dt;
 
@@ -269,8 +264,9 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(uint32_t bus_name,
-                           void *event) {
+static void on_menu_window(void *event) {
+    CT_UNUSED(event);
+
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
 }
 

@@ -74,6 +74,7 @@ static ct_render_uniform_type_t _type_to_bgfx[] = {
 static void online(uint64_t name,
                    struct ct_vio *input,
                    struct ct_cdb_obj_t *obj) {
+    CT_UNUSED(name);
 
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
@@ -93,7 +94,7 @@ static void online(uint64_t name,
 
     ct_cdb_a0.set_string(writer, CT_ID64_0("asset_name"), resource->asset_name);
 
-    for (int i = 0; i < material_blob::layer_count(resource); ++i) {
+    for (uint32_t i = 0; i < material_blob::layer_count(resource); ++i) {
         uint64_t layer_name = layer_names[i];
         uint64_t rstate = render_state[i];
         uint64_t shader = shader_names[i];

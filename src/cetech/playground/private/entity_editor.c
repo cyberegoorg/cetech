@@ -121,8 +121,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(uint32_t bus_name,
-                       void *event) {
+static void on_debugui(void *event) {
     char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -245,8 +244,7 @@ static void open(struct ct_resource_id asset,
                              _G.path[idx]);
 }
 
-static void update(uint32_t bus_name,
-                   void *event) {
+static void update(void *event) {
     struct ct_playground_update_ev *ev = event;
     float dt = ev->dt;
 
@@ -291,8 +289,7 @@ static void update(uint32_t bus_name,
     }
 }
 
-static void on_render(uint32_t bus_name,
-                      void *event) {
+static void on_render(void *event) {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
 
@@ -311,8 +308,7 @@ static struct ct_entity_editor_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
-static void on_asset_double_click(uint32_t bus_name,
-                                  void *event) {
+static void on_asset_double_click(void *event) {
     struct ct_asset_browser_click_ev *ev = event;
     struct ct_resource_id rid = {.i64 = ev->asset};
 

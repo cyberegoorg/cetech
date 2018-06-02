@@ -44,8 +44,9 @@ static struct _G {
 #include "builder.h"
 
 
-static void on_render(uint32_t bus_name,
-                      void *event) {
+static void on_render(void *event) {
+    CT_UNUSED(event);
+
     _G.viewid = 0;
 }
 

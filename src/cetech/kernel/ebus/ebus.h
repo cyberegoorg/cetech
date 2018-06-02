@@ -17,8 +17,7 @@ struct ebus_header_t {
     uint64_t size;
 };
 
-typedef void (ct_ebus_handler)(uint32_t bus_name,
-                               void *event);
+typedef void (ct_ebus_handler)(void *event);
 
 //==============================================================================
 // Api

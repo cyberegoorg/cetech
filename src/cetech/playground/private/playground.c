@@ -166,8 +166,7 @@ static void debugui_on_pass(void *inst,
 }
 
 
-static void on_init(uint32_t ebus_name,
-                    void *event) {
+static void on_init(void *event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
 
     _G.render_graph = ct_render_graph_a0.create_graph();
@@ -185,14 +184,12 @@ static void on_init(uint32_t ebus_name,
     _G.render_graph->call->add_module(_G.render_graph, _G.module);
 }
 
-static void on_shutdown(uint32_t ebus_name,
-                        void *event) {
+static void on_shutdown(void *event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
 
 }
 
-static void on_update(uint32_t ebus_name,
-                      void *event) {
+static void on_update(void *event) {
     ct_action_manager_a0.check();
 
     struct ct_app_update_ev *app_ev =event;
@@ -203,8 +200,7 @@ static void on_update(uint32_t ebus_name,
                          &ev, sizeof(ev));
 }
 
-static void on_render(uint32_t ebus_name,
-                      void *event) {
+static void on_render(void *event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, NULL, 0);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
@@ -213,8 +209,7 @@ static void on_render(uint32_t ebus_name,
 }
 
 
-static void on_ui(uint32_t ebus_name,
-                  void *event) {
+static void on_ui(void *event) {
     on_debugui();
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);

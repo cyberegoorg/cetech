@@ -51,7 +51,6 @@ pages:
   script:
     - export LC_ALL=C.UTF-8
     - export LANG=C.UTF-8
-#    - doxygen scripts/Doxyfile
     - mkdocs build -f scripts/mkdocs.yml -d public
 
   only:

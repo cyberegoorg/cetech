@@ -27,7 +27,7 @@ static struct _G {
 static ct_dd_sprite _ddCreateSprite(uint16_t _width,
                                     uint16_t _height,
                                     const void *_data) {
-    return {.idx = ddCreateSprite(_height, _height, _data).idx};
+    return {.idx = ddCreateSprite(_width, _height, _data).idx};
 }
 
 static void _ddDestroySprite(ct_dd_sprite _handle) {

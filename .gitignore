@@ -25,3 +25,5 @@ __pycache__
 perf.data*
 logsystem.db
 /TODO.md
+
+*.srctrl*

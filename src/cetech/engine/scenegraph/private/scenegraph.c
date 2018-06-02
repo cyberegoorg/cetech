@@ -116,8 +116,7 @@ static void allocate(struct WorldInstance *_data,
     *_data = new_data;
 }
 
-static void _new_world(uint32_t bus_name,
-                       void *event) {
+static void _new_world(void *event) {
     struct ct_world world = ((struct ct_ecs_world_ev*)event)->world;
 
     uint32_t idx = ct_array_size(_G.world_instances);
@@ -126,8 +125,7 @@ static void _new_world(uint32_t bus_name,
     ct_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
-static void _destroy_world(uint32_t bus_name,
-                           void *event) {
+static void _destroy_world(void *event) {
     struct ct_world world = ((struct ct_ecs_world_ev*)event)->world;
 
     uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
@@ -475,8 +473,8 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
 }
 
-static void _component_spawner(uint32_t ebus,
-                               void *event) {
+static void _component_spawner(void *event) {
+    CT_UNUSED(event);
 }
 
 static void init(struct ct_api_a0 *api) {

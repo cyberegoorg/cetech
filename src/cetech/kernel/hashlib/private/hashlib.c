@@ -131,6 +131,10 @@ uint64_t stringid64_from_string(const char *str) {
         return 0;
     }
 
+    if ('\0' == str[0]) {
+        return 0;
+    }
+
     return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
 }
 

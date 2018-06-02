@@ -59,6 +59,8 @@ static struct _G {
 
 static void online(uint64_t name,
                    struct ct_vio* input,struct ct_cdb_obj_t* obj) {
+    CT_UNUSED(name);
+
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -105,7 +107,7 @@ static void online(uint64_t name,
 
 static void offline(uint64_t name,
                     struct ct_cdb_obj_t* obj) {
-    CT_UNUSED(obj);
+    CT_UNUSED(name, obj);
 
 }
 

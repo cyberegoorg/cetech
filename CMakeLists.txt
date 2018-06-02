@@ -131,8 +131,7 @@ set(SOURCE_FILES
         src/cetech/engine/material/private/material_property.cpp
         src/cetech/engine/scene/private/scene.cpp
         src/cetech/engine/scene/private/scene_compiler.cpp
-        src/cetech/engine/mesh_renderer/mesh_renderer.c
-        src/cetech/engine/mesh_renderer/mesh_property.c
+        src/cetech/engine/mesh_renderer/private/mesh_renderer.c
         src/cetech/engine/transform/private/transform.c
 
         src/cetech/engine/scenegraph/private/scenegraph.c

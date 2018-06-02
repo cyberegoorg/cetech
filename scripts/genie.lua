@@ -22,7 +22,7 @@ solution "cetech"
 BGFX_DIR   = path.getabsolute("..")
 
 local BGFX_BUILD_DIR = path.join(BGFX_DIR, ".build")
-local EXTERNALS_DIR = path.join(BGFX_DIR, "externals", "build", "linux64", "release")
+local EXTERNALS_DIR = path.join(BGFX_DIR, "externals", "build", "darwin64", "release")
 
 dofile ("toolchain.lua")
 if not toolchain(BGFX_BUILD_DIR, EXTERNALS_DIR) then

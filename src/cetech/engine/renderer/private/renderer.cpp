@@ -148,16 +148,16 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(uint32_t bus_name,
-                      void *event) {
+static void on_resize(void *event) {
     ct_window_resized_event *ev = (ct_window_resized_event *) event;
     _G.need_reset = 1;
     _G.size_width = ev->width;
     _G.size_height = ev->height;
 }
 
-static void on_render(uint32_t bus_name,
-                      void *event) {
+static void on_render(void *event) {
+    CT_UNUSED(event);
+
     if (_G.need_reset) {
         _G.need_reset = 0;
 

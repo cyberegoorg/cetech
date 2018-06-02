@@ -92,7 +92,7 @@ static void ct_hash_add(struct ct_hash_t *hash,
         ct_array_resize(new_hash.values, new_size, allocator);
         ct_array_resize(new_hash.keys, new_size, allocator);
         memset(new_hash.keys, 255, sizeof(uint64_t) * new_size);
-        for (int i = 0; i < hash->n; ++i) {
+        for (uint32_t i = 0; i < hash->n; ++i) {
             if (hash->keys[i] == EMPTY_SLOT) {
                 continue;
             }

@@ -134,8 +134,8 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0.gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(uint32_t bus_name, void *_event) {
-
+static void update(void *_event) {
+    CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);

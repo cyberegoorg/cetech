@@ -1097,7 +1097,7 @@ namespace ImGui
 
         void loadFromYaml(const char* path, ct_ydb_a0* ydb, ct_yng_a0* yng) {
             const uint32_t size = m_docks.size();
-            for (int i = 0; i < size; ++i) {
+            for (uint32_t i = 0; i < size; ++i) {
                 m_docks[i]->~Dock();
                 MemFree(m_docks[i]);
             }

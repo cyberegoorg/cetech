@@ -257,8 +257,9 @@ static void _boot_unload() {
 }
 
 
-static void on_quit(uint32_t ebus,
-                    void *event) {
+static void on_quit(void *event) {
+    CT_UNUSED(event)
+
     application_quit();
 }
 

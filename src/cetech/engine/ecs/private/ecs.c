@@ -211,8 +211,6 @@ static void *component_data(uint64_t component_name,
 
     uint32_t comp_idx = component_idx(component_name);
     return item->entity_data[comp_idx];
-
-    return NULL;
 }
 
 static void *entity_data(struct ct_world world,
@@ -470,6 +468,8 @@ static void remove_components(struct ct_world world,
 
 static void register_simulation(const char *name,
                                 ct_simulate_fce_t simulation) {
+    CT_UNUSED(name);
+
     ct_array_push(_G.simulations, simulation, _G.allocator);
 }
 
@@ -577,8 +577,7 @@ static void destroy(struct ct_world world,
 // Resource
 //==============================================================================
 
-static void _on_obj_change(uint32_t bus_name,
-                           void *event) {
+static void _on_obj_change(void *event) {
 
     struct ct_cdb_obj_change_ev *ev = event;
 
@@ -629,7 +628,6 @@ static void _on_obj_change(uint32_t bus_name,
 
                 switch (type) {
                     case CDB_TYPE_NONE:
-                    case CDB_TYPE_REF:
                     case CDB_TYPE_STR:
                         break;
 
@@ -637,6 +635,11 @@ static void _on_obj_change(uint32_t bus_name,
                         dt->u32 = ct_cdb_a0.read_uint32(ev->obj, ev->prop[k],
                                                         0);
                         break;
+
+                    case CDB_TYPE_REF:
+                        dt->ptr = ct_cdb_a0.read_ref(ev->obj, ev->prop[k], 0);
+                        break;
+
                     case CDB_TYPE_UINT64:
                         dt->u64 = ct_cdb_a0.read_uint64(ev->obj, ev->prop[k],
                                                         0);

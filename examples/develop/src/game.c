@@ -7,6 +7,7 @@
 
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/ebus/ebus.h>
+
 #include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 
@@ -44,23 +45,21 @@ static struct G {
 } _G;
 
 
+void init(void *event) {
+    CT_UNUSED(event)
 
-void init(uint32_t bus_name,
-          void *event) {
     _G.world = ct_ecs_a0.create_world();
 
     _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
                                            CT_ID32_0("content/camera"));
-
 }
 
 
-void shutdown(uint32_t bus_name,
-              void *event) {
+void shutdown(void *event) {
+    CT_UNUSED(event)
 }
 
-void update(uint32_t bus_name,
-            void *event) {
+void update(void *event) {
     struct ct_app_update_ev *ev = event;
 
     _G.dt = ev->dt;

@@ -82,12 +82,14 @@ void foreach_camera(struct ct_world world,
                     ct_entity_storage_t *item,
                     uint32_t n,
                     void *data) {
+    CT_UNUSED(world);
+
     struct cameras *cameras = data;
 
     struct ct_camera_component *camera_data;
     camera_data = ct_ecs_a0.entities_data(CAMERA_COMPONENT, item);
 
-    for (int i = 1; i < n; ++i) {
+    for (uint32_t i = 1; i < n; ++i) {
         uint32_t idx = cameras->n++;
 
         cameras->ent[idx].h = ent[i].h;
@@ -116,7 +118,8 @@ static void geometry_pass_on_pass(void *inst,
                                  size[0],
                                  size[1]);
 
-    struct cameras cameras = {{{0}}};
+    struct cameras cameras;
+    memset(&cameras, 0, sizeof(struct cameras));
 
     ct_ecs_a0.process(pass->world,
                       ct_ecs_a0.component_mask(CAMERA_COMPONENT),

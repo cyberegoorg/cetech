@@ -20,6 +20,7 @@
 #include <cetech/engine/material/material.h>
 #include <cetech/engine/mesh_renderer/mesh_renderer.h>
 #include <cetech/engine/debugdraw/debugdraw.h>
+#include <cetech/macros.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
@@ -47,34 +48,38 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-void _mesh_component_compiler(uint32_t ebus,
-                              void *event) {
+void _mesh_component_compiler(void *event) {
     struct ct_ecs_component_compile_ev *ev = event;
 
     uint64_t keys[ev->component_key_count + 3];
     memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
 
     keys[ev->component_key_count] = ct_yng_a0.key("scene");
-    uint64_t scene = CT_ID32_0(ct_ydb_a0.get_str(ev->filename, keys,
-                                                 ev->component_key_count + 1,
-                                                 NULL));
+    const char *scene = ct_ydb_a0.get_str(ev->filename, keys,
+                                          ev->component_key_count + 1,
+                                          "");
 
     keys[ev->component_key_count] = ct_yng_a0.key("mesh");
     const char *mesh = ct_ydb_a0.get_str(ev->filename, keys,
-                                         ev->component_key_count + 1, NULL);
+                                         ev->component_key_count + 1, "");
 
     keys[ev->component_key_count] = ct_yng_a0.key("material");
     const char *mat = ct_ydb_a0.get_str(ev->filename, keys,
-                                        ev->component_key_count + 1, NULL);
+                                        ev->component_key_count + 1, "");
 
     keys[ev->component_key_count] = ct_yng_a0.key("node");
     const char *node = ct_ydb_a0.get_str(ev->filename, keys,
-                                         ev->component_key_count + 1, NULL);
+                                         ev->component_key_count + 1, "");
 
     ct_cdb_a0.set_uint64(ev->writer, PROP_MESH_ID, CT_ID64_0(mesh));
     ct_cdb_a0.set_uint64(ev->writer, PROP_NODE_ID, CT_ID64_0(node));
     ct_cdb_a0.set_uint64(ev->writer, PROP_MATERIAL_ID, CT_ID32_0(mat));
-    ct_cdb_a0.set_uint64(ev->writer, PROP_SCENE, scene);
+    ct_cdb_a0.set_uint64(ev->writer, PROP_SCENE_ID, CT_ID32_0(scene));
+
+    ct_cdb_a0.set_string(ev->writer, PROP_MESH, mesh);
+    ct_cdb_a0.set_string(ev->writer, PROP_NODE, node);
+    ct_cdb_a0.set_string(ev->writer, PROP_MATERIAL, mat);
+    ct_cdb_a0.set_string(ev->writer, PROP_SCENE, scene);
 }
 
 struct mesh_render_data {
@@ -94,13 +99,13 @@ void foreach_mesh_renderer(struct ct_world world,
     mesh_renderers = ct_ecs_a0.entities_data(MESH_RENDERER_COMPONENT, item);
 
     struct ct_transform_comp *transforms;
-    transforms =  ct_ecs_a0.entities_data(TRANSFORM_COMPONENT, item);
+    transforms = ct_ecs_a0.entities_data(TRANSFORM_COMPONENT, item);
 
     for (int i = 1; i < n; ++i) {
         struct ct_transform_comp t = transforms[i];
         struct ct_mesh_renderer m = mesh_renderers[i];
 
-        uint64_t scene = m.scene;
+        uint64_t scene = m.scene_id;
 
         float final_w[16];
         ct_mat4_identity(final_w);
@@ -114,8 +119,13 @@ void foreach_mesh_renderer(struct ct_world world,
         struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get_obj(rid);
 
         uint64_t mesh = m.mesh_id;
-        struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj, mesh,
+        struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj,
+                                                           mesh,
                                                            NULL);
+
+        if (!geom_obj) {
+            continue;
+        }
 
         uint64_t size = ct_cdb_a0.read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
         uint64_t ib = ct_cdb_a0.read_uint64(geom_obj, SCENE_IB_PROP, 0);
@@ -131,9 +141,8 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_material_a0.submit(m.material,
                               data->layer_name, data->viewid);
 
-        ct_dd_a0.draw_axis(t.position[0],
-                           t.position[1],
-                           t.position[2],
+        ct_dd_a0.set_transform_mtx(t.world);
+        ct_dd_a0.draw_axis(0, 0, 0,
                            1.0f,
                            DD_AXIS_COUNT,
                            0.0f);
@@ -160,36 +169,183 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
+static void _on_obj_change(void *event) {
 
-static void _component_spawner(uint32_t ebus,
-                               void *event) {
+    struct ct_cdb_obj_change_ev *ev = event;
+
+
+    struct ct_cdb_obj_t *writer = NULL;
+    for (int k = 0; k < ev->prop_count; ++k) {
+        if (ev->prop[k] == PROP_SCENE) {
+            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_SCENE, "");
+
+            if (!writer) {
+                writer = ct_cdb_a0.write_begin(ev->obj);
+            }
+
+            ct_cdb_a0.set_uint64(writer, PROP_SCENE_ID, CT_ID32_0(str));
+
+
+        } else if (ev->prop[k] == PROP_NODE) {
+            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_NODE, "");
+
+            if (!writer) {
+                writer = ct_cdb_a0.write_begin(ev->obj);
+            }
+
+            ct_cdb_a0.set_uint64(writer, PROP_NODE_ID, CT_ID64_0(str));
+
+        } else if (ev->prop[k] == PROP_MESH) {
+            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MESH, "");
+
+            if (!writer) {
+                writer = ct_cdb_a0.write_begin(ev->obj);
+            }
+
+            ct_cdb_a0.set_uint64(writer, PROP_MESH_ID, CT_ID64_0(str));
+
+
+        } else if (ev->prop[k] == PROP_MATERIAL) {
+            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MATERIAL, "");
+
+            if (!writer) {
+                writer = ct_cdb_a0.write_begin(ev->obj);
+            }
+
+            ct_cdb_a0.set_uint32(writer, PROP_MATERIAL_ID, CT_ID32_0(str));
+
+        } else if (ev->prop[k] == PROP_MATERIAL_ID) {
+            uint32_t material_id = ct_cdb_a0.read_uint32(ev->obj,
+                                                         PROP_MATERIAL_ID, 0);
+
+
+            if (!writer) {
+                writer = ct_cdb_a0.write_begin(ev->obj);
+            }
+
+            ct_cdb_a0.set_ref(writer,
+                              PROP_MATERIAL_REF,
+                              ct_material_a0.resource_create(material_id));
+
+        }
+    }
+
+    if (writer) {
+        ct_cdb_a0.write_commit(writer);
+    }
+}
+
+static void _component_spawner(void *event) {
     struct ct_ecs_component_spawn_ev *ev = (event);
 
     struct ct_mesh_renderer *mesh = (ev->data);
 
     *mesh = (struct ct_mesh_renderer) {
             .material = ct_material_a0.resource_create(
-                    ct_cdb_a0.read_uint64(ev->obj, PROP_MATERIAL_ID, 0)),
+                    ct_cdb_a0.read_uint32(ev->obj, PROP_MATERIAL_ID, 0)),
 
             .mesh_id = ct_cdb_a0.read_uint64(ev->obj, PROP_MESH_ID, 0),
             .node_id = ct_cdb_a0.read_uint64(ev->obj, PROP_NODE_ID, 0),
-            .scene = ct_cdb_a0.read_uint64(ev->obj, PROP_SCENE, 0),
+            .scene_id = ct_cdb_a0.read_uint32(ev->obj, PROP_SCENE_ID, 0),
     };
 
+    ct_ebus_a0.connect_addr(CDB_EBUS,
+                            CDB_OBJ_CHANGE, (uint64_t) ev->obj,
+                            _on_obj_change, 0);
+
+}
+
+
+void mesh_combo_items(struct ct_cdb_obj_t *obj,
+                      char **items,
+                      uint32_t *items_count) {
+    uint32_t scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0);
+    ct_scene_a0.get_all_geometries(scene_id, items, items_count);
+}
+
+void node_combo_items(struct ct_cdb_obj_t *obj,
+                      char **items,
+                      uint32_t *items_count) {
+    uint32_t scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0);
+    ct_scene_a0.get_all_nodes(scene_id, items, items_count);
 }
 
 static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
-    _G = (struct _G){
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .type = CT_ID64_0("mesh_renderer"),
+    };
+
+    static struct ct_component_prop_map prop_map[] = {
+            {
+                    .key = "scene",
+                    .ui_name = "scene",
+                    .type = CDB_TYPE_STR,
+                    .offset = UINT64_MAX,
+                    .resource.type = "scene",
+            },
+            {
+                    .key = "scene_id",
+                    .ui_name = "scene_id",
+                    .type = CDB_TYPE_UINT64,
+                    .offset = offsetof(struct ct_mesh_renderer, scene_id),
+            },
+            {
+                    .key = "mesh",
+                    .ui_name = "mesh",
+                    .type = CDB_TYPE_STR,
+                    .offset = UINT64_MAX,
+                    .combo.combo_items = mesh_combo_items
+            },
+            {
+                    .key = "mesh_id",
+                    .ui_name = "mesh_id",
+                    .type = CDB_TYPE_UINT64,
+                    .offset = offsetof(struct ct_mesh_renderer, mesh_id),
+            },
+            {
+                    .key = "node",
+                    .ui_name = "node",
+                    .type = CDB_TYPE_STR,
+                    .offset = UINT64_MAX,
+                    .combo.combo_items = node_combo_items
+            },
+            {
+                    .key = "node_id",
+                    .ui_name = "node_id",
+                    .type = CDB_TYPE_UINT64,
+                    .offset = offsetof(struct ct_mesh_renderer, node_id),
+            },
+            {
+                    .key = "material",
+                    .ui_name = "material",
+                    .type = CDB_TYPE_STR,
+                    .offset = UINT64_MAX,
+                    .resource.type = "material",
+            },
+            {
+                    .key = "material_id",
+                    .ui_name = "material id",
+                    .type = CDB_TYPE_UINT32,
+                    .offset = UINT64_MAX,
+            },
+            {
+                    .key = "material_ref",
+                    .ui_name = "material ref",
+                    .type = CDB_TYPE_REF,
+                    .offset = offsetof(struct ct_mesh_renderer, material),
+            },
+
     };
 
     ct_ecs_a0.register_component(
             (struct ct_component_info) {
                     .component_name = "mesh_renderer",
                     .size = sizeof(struct ct_mesh_renderer),
+                    .prop_map = prop_map,
+                    .prop_count = CT_ARRAY_LEN(prop_map),
             });
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,

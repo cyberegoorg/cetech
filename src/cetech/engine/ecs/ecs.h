@@ -75,10 +75,11 @@ struct ct_ecs_component_compile_ev {
 };
 
 struct ct_component_prop_map {
-    const char* ui_name;
-    const char* key;
+    const char *ui_name;
+    const char *key;
     uint64_t offset;
     enum ct_cdb_type type;
+
     struct {
         union {
             float min_f;
@@ -89,6 +90,13 @@ struct ct_component_prop_map {
         };
     } limit;
 
+    struct {
+        const char* type;
+    } resource;
+
+    struct {
+        void (*combo_items)(struct ct_cdb_obj_t* obj, char **items, uint32_t *items_count);
+    } combo ;
 };
 
 struct ct_component_info {
@@ -149,14 +157,14 @@ struct ct_ecs_a0 {
     // COMPONENT
     void (*register_component)(struct ct_component_info info);
 
-    const uint64_t* (*get_components)();
+    const uint64_t *(*get_components)();
 
-    struct ct_component_info* (*component_info)(uint64_t component_name);
+    struct ct_component_info *(*component_info)(uint64_t component_name);
 
     uint64_t (*component_mask)(uint64_t component_name);
 
     void *(*entities_data)(uint64_t component_name,
-                            ct_entity_storage_t *item);
+                           ct_entity_storage_t *item);
 
     void *(*entity_data)(struct ct_world world,
                          uint64_t component_name,

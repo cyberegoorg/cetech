@@ -12,8 +12,11 @@
 #include <cetech/kernel/containers/array.h>
 #include <cetech/kernel/math/fmath.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/log/log.h>
 
 #include "cetech/kernel/module/module.h"
+
+#define LOG_WHERE "transform"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -22,6 +25,7 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_ecs_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_log_a0);
 
 struct WorldInstance {
     struct ct_world world;
@@ -147,8 +151,7 @@ static struct _G {
 //    ct_array_pop_back(_G.world_instances);
 //}
 
-void _component_compiler(uint32_t ebus,
-                         void *event) {
+void _component_compiler(void *event) {
     struct ct_ecs_component_compile_ev *ev = event;
 
     struct ct_transform_comp t_data;
@@ -192,30 +195,30 @@ void transform_transform(struct ct_transform_comp *transform,
     float *rot = transform->rotation;
     float *sca = transform->scale;
 
-    float tm[16];
-    float rm[16];
-    float trm[16];
+//    float tm[16];
+//    float rm[16];
+//    float trm[16];
 //    float sm[16];
 
     float rot_rad[3];
     ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
 
-    ct_mat4_translate(tm, pos[0], pos[1], pos[2]);
+//    ct_mat4_translate(tm, pos[0], pos[1], pos[2]);
 //    ct_mat4_scale(sm, sca[0], sca[1], sca[2]);
-//    ct_mat4_rotate_xyz(sm, rot_rad[0], rot_rad[1], rot_rad[2]);
+//    ct_mat4_rotate_xyz(rm, rot_rad[0], rot_rad[1], rot_rad[2]);
 
-//    ct_mat4_srt(m,
-//                sca[0], sca[1], sca[2],
-//                rot_rad[0], rot_rad[1], rot_rad[2],
-//                pos[0], pos[1], pos[2]);
-    ct_mat4_mul(trm, tm, rm);
-    ct_mat4_mul(transform->world, trm, sca);
-    ct_mat4_move(transform->world, tm);
+    ct_mat4_srt(transform->world,
+                sca[0], sca[1], sca[2],
+                rot_rad[0], rot_rad[1], rot_rad[2],
+                pos[0], pos[1], pos[2]);
+
+    //    ct_mat4_mul(trm, tm, rm);
+//    ct_mat4_mul(transform->world, trm, sm);
+//    ct_mat4_move(transform->world, tm);
 }
 
 
-static void on_change(uint32_t bus_name,
-                      void *event) {
+static void on_change(void *event) {
     struct ct_ecs_component_ev *ev = event;
 
     if (!(ev->comp_mask & ct_ecs_a0.component_mask(_G.type))) {
@@ -233,8 +236,7 @@ static void on_change(uint32_t bus_name,
 static struct ct_transform_a0 _api = {
 };
 
-static void _component_spawner(uint32_t ebus,
-                               void *event) {
+static void _component_spawner(void *event) {
     struct ct_ecs_component_spawn_ev *ev = event;
 
     struct ct_transform_comp *transform = (struct ct_transform_comp *) (ev->data);
@@ -243,6 +245,11 @@ static void _component_spawner(uint32_t ebus,
     ct_cdb_a0.read_vec3(ev->obj, PROP_ROTATION, transform->rotation);
     ct_cdb_a0.read_vec3(ev->obj, PROP_SCALE, transform->scale);
 
+
+    ct_log_a0.debug(LOG_WHERE, "Spawn transform p[%f, %f, %f], r[%f, %f, %f], s[%f, %f, %f]",
+                    transform->position[0], transform->position[1],transform->position[2],
+                    transform->rotation[0], transform->rotation[1],transform->rotation[2],
+                    transform->scale[0], transform->scale[1],transform->scale[2]);
     transform_transform(transform, NULL);
 }
 
@@ -258,21 +265,21 @@ static void _init(struct ct_api_a0 *api) {
 
     static struct ct_component_prop_map prop_map[] = {
             {
-                    .ui_name = "POSITION",
+                    .ui_name = "position",
                     .key = "position",
                     .offset = offsetof(struct ct_transform_comp, position),
                     .type = CDB_TYPE_VEC3,
 
             },
             {
-                    .ui_name = "ROTATION",
+                    .ui_name = "rotation",
                     .key = "rotation",
                     .offset = offsetof(struct ct_transform_comp, rotation),
                     .type = CDB_TYPE_VEC3,
-                    .limit = {.min_f = 0, .max_f = 360}
+                    .limit = {.min_f = -360, .max_f = 360}
             },
             {
-                    .ui_name = "SCALE",
+                    .ui_name = "scale",
                     .key = "scale",
                     .offset = offsetof(struct ct_transform_comp, scale),
                     .type = CDB_TYPE_VEC3,
@@ -320,6 +327,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_log_a0);
         },
         {
             CT_UNUSED(reload);

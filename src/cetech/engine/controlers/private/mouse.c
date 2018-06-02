@@ -157,7 +157,9 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(uint32_t bus_name, void *_event) {
+static void update(void *_event) {
+    CT_UNUSED(_event);
+
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
     _G.delta_pos[0] = 0;
     _G.delta_pos[1] = 0;

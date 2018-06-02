@@ -70,6 +70,9 @@ static void compile_entitity(const char *filename,
                              struct ct_entity_compile_output *output,
                              struct ct_compilator_api *compilator_api) {
 
+    CT_UNUSED(parent_obj);
+    CT_UNUSED(compilator_api);
+
     uint32_t ent_id = output->ent_counter++;
 
     ct_hash_add(&output->entity_parent, ent_id, (uint32_t) parent,
@@ -192,6 +195,8 @@ static void compile_entity(struct ct_entity_compile_output *output,
 static void write_to_build(struct ct_entity_compile_output *output,
                            const char *filename,
                            char **build) {
+    CT_UNUSED(filename);
+
     struct entity_resource res = (struct entity_resource) {0};
     res.ent_count = (uint32_t) (output->ent_counter);
 

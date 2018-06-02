@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/hashlib/hashlib.h>
@@ -12,7 +14,6 @@
 #include <cetech/playground/explorer.h>
 #include <cetech/kernel/yaml/yng.h>
 #include <cetech/kernel/yaml/ydb.h>
-#include <cstdio>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/engine/resource/resource.h>
@@ -21,11 +22,6 @@
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_fs_a0);
-CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_ebus_a0);
@@ -75,7 +71,7 @@ static void ui_entity_item_end() {
     ct_debugui_a0.TreePop();
 }
 
-static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
+static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
@@ -92,15 +88,18 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
 
 
     char name[128] = {0};
+    uint64_t uid = ct_cdb_a0.read_uint64(obj, CT_ID64_0("uid"), 0);
     const char* ent_name = ct_cdb_a0.read_str(obj, CT_ID64_0("name"), NULL);
     if(ent_name) {
         strcpy(name, ent_name);
     } else {
-        uint64_t uid = ct_cdb_a0.read_uint64(obj, CT_ID64_0("uid"), 0);
         snprintf(name, CT_ARRAY_LEN(name), "%llu", uid);
     }
 
-    bool open = ct_debugui_a0.TreeNodeEx(name, flags);
+    char label[128] = {0};
+    snprintf(label, CT_ARRAY_LEN(label), "%s", name);
+
+    bool open = ct_debugui_a0.TreeNodeEx(label, flags);
     if (ct_debugui_a0.IsItemClicked(0)) {
         ct_ent_selected_ev ev = {
                 .world  = _G.world,
@@ -117,15 +116,14 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
 
     if (open) {
         for (uint32_t i = 0; i < ct_array_size(children); ++i) {
-            ui_entity_item_begin(children[i]);
+            ui_entity_item_begin(children[i], rand());
         }
         ui_entity_item_end();
     }
 }
 
 
-static void on_debugui(uint32_t bus_name,
-                       void *event) {
+static void on_debugui(void *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
@@ -141,15 +139,16 @@ static void on_debugui(uint32_t bus_name,
 
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
             obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
-            ui_entity_item_begin(obj);
+            ui_entity_item_begin(obj, rand());
         }
     }
 
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(uint32_t bus_name,
-                           void *event) {
+static void on_menu_window(void *event) {
+    CT_UNUSED(event);
+
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
@@ -180,11 +179,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_resource_a0);

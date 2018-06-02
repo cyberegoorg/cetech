@@ -1,7 +1,7 @@
 # Engine
 
 Engine is a kind of virtual steam engine that consists of many different subsystem eg. `Render system`,
-`Log system`, `Resource sytstem` etc. The very core of the engine is programmed in C. And it all takes care of it so that we to [kill many aliens][Doom], [hack cameras underwater][Bioshock],
+`Log system`, `Resource sytstem` etc. and it all takes care of it so that we to [kill many aliens][Doom], [hack cameras underwater][Bioshock],
 [save world][spellcross], [rampage in radiation][fallout], [hero of liberating the world][had] or [start a political career][mafie].
 
 ---

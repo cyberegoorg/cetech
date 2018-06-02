@@ -50,11 +50,11 @@ void execute(const struct ct_cmd *cmd) {
     if (_G.curent_pos != (size - 1)) {
         struct ct_cmd *cur_cmd = get_curent_cmd();
         if (cur_cmd) {
-//            uint32_t offset = _G.cmd[_G.curent_pos];
-//            uint32_t end_offset = offset + cur_cmd->size;
+            uint32_t offset = _G.cmd[_G.curent_pos];
+            uint32_t end_offset = offset + cur_cmd->size;
 
-//            array::resize(_G.cmd, _G.curent_pos + 1);
-//            array::resize(_G.cmd_buffer, end_offset);
+            ct_array_resize(_G.cmd, _G.curent_pos + 1, _G.allocator);
+            ct_array_resize(_G.cmd_buffer, end_offset, _G.allocator);
         }
     }
 

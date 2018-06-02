@@ -12,6 +12,7 @@
 #include <cetech/kernel/ebus/ebus.h>
 #include <cetech/kernel/hashlib/hashlib.h>
 
+
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -51,12 +52,13 @@ struct object_t {
     uint8_t *values;
 };
 
-struct type_item_t {
-    struct ct_hash_t object_hash;
-    struct ct_cdb_obj_t **objects;
-};
+//struct type_item_t {
+//    struct ct_hash_t object_hash;
+//    struct ct_cdb_obj_t **objects;
+//};
 
 struct db_t {
+    uint32_t idx;
     struct ct_hash_t type_hash;
     struct type_item_t *types;
 
@@ -99,9 +101,8 @@ static uint64_t _object_new_property(struct object_t *obj,
             .db = obj->db,
             .type = obj->type,
             .idx = obj->idx,
-            .parent = obj->parent,
-            .children = obj->children,
             .owner = obj->owner,
+            .parent = obj->parent,
             .orig_obj = obj->orig_obj,
             .buffer = CT_ALLOC(alloc, uint8_t, new_buffer_size),
             .buffer_size = new_buffer_size,
@@ -116,6 +117,18 @@ static uint64_t _object_new_property(struct object_t *obj,
 
     ct_hash_clone(&obj->prop_map, &new_obj.prop_map, alloc);
 
+    if (obj->instances)
+        ct_array_push_n(new_obj.instances, obj->instances,
+                        ct_array_size(obj->instances), _G.allocator);
+
+    if (obj->children)
+        ct_array_push_n(new_obj.children, obj->children,
+                        ct_array_size(obj->children), _G.allocator);
+
+//    if (obj->changed_prop)
+//        ct_array_push_n(new_obj.changed_prop, obj->changed_prop,
+//                        ct_array_size(obj->changed_prop), _G.allocator);
+
     memcpy(new_obj.keys, obj->keys, sizeof(uint64_t) * prop_count);
     memcpy(new_obj.offset, obj->offset, sizeof(uint64_t) * prop_count);
     memcpy(new_obj.ptype, obj->ptype, sizeof(uint8_t) * prop_count);
@@ -125,9 +138,7 @@ static uint64_t _object_new_property(struct object_t *obj,
     new_obj.offset[prop_count] = values_size;
     new_obj.ptype[prop_count] = type;
 
-    if (value) {
-        memcpy(new_obj.values + values_size, value, size);
-    }
+    memcpy(new_obj.values + values_size, value, size);
 
     CT_FREE(alloc, obj->buffer);
 
@@ -152,6 +163,8 @@ struct object_t *_new_object(struct db_t *db,
 
     struct object_t *obj = &db->object_pool[idx];
     obj->idx = idx;
+    obj->db.idx = db->idx;
+
     _object_new_property(obj, 0, CDB_TYPE_NONE, NULL, 0, a);
     return obj;
 }
@@ -165,17 +178,20 @@ static struct object_t *_object_clone(struct db_t *db,
 
     struct object_t *new_obj = _new_object(db, alloc);
 
+    new_obj->owner = obj->owner;
+    new_obj->parent = obj->parent;
+    new_obj->type = obj->type;
+
     new_obj->buffer = CT_ALLOC(alloc, uint8_t, buffer_size);
     new_obj->buffer_size = buffer_size;
     new_obj->properties_count = properties_count;
     new_obj->values_size = values_size;
-    new_obj->owner = obj->owner;
-    new_obj->parent = obj->parent;
 
     new_obj->keys = (uint64_t *) new_obj->buffer;
     new_obj->ptype = (uint8_t *) (new_obj->keys + properties_count);
     new_obj->offset = (uint64_t *) (new_obj->ptype + properties_count);
     new_obj->values = (uint8_t *) (new_obj->offset + properties_count);
+
 
     memcpy(new_obj->buffer, obj->buffer, sizeof(uint8_t) * buffer_size);
     ct_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
@@ -198,57 +214,6 @@ static uint64_t _find_prop_index(const struct object_t *obj,
     return ct_hash_lookup(&obj->prop_map, key, 0);
 }
 
-static void _add_to_type_slot(struct db_t *db,
-                              struct ct_cdb_obj_t *_obj,
-                              uint64_t type) {
-    struct object_t *obj = *(struct object_t **) _obj;
-
-    uint64_t type_idx = ct_hash_lookup(&db->type_hash, type, UINT64_MAX);
-
-    if (UINT64_MAX == type_idx) {
-        ct_array_push(db->types,
-                      (struct type_item_t) {{0}}, _G.allocator);
-
-        type_idx = ct_array_size(db->types) - 1;
-        ct_hash_add(&db->type_hash, type, type_idx, _G.allocator);
-    }
-
-
-    struct type_item_t *item = &db->types[type_idx];
-    ct_array_push(item->objects, _obj, _G.allocator);
-
-    uint32_t idx = ct_array_size(item->objects);
-    ct_hash_add(&item->object_hash, (uint64_t) _obj, idx, _G.allocator);
-
-
-    obj->type = type;
-}
-
-//static void _remove_from_type_slot(struct db_t *db,
-//                            struct ct_cdb_obj_t *_obj) {
-//    struct object_t *obj = *(struct object_t **) _obj;
-//
-//    uint64_t type_idx = ct_hash_lookup(&db->type_hash, obj->type, UINT64_MAX);
-//    obj->type = 0;
-//
-//    if (UINT64_MAX != type_idx) {
-//        struct type_item_t *item = &db->types[type_idx];
-//        uint64_t obj_idx = ct_hash_lookup(&item->object_hash,
-//                                          (uint64_t) _obj, UINT64_MAX);
-//
-//        uint32_t last_idx = ct_array_size(item->objects) - 1;
-//        struct ct_cdb_obj_t *last_obj = item->objects[last_idx];
-//
-//        item->objects[obj_idx] = item->objects[last_idx];
-//
-//        ct_array_pop_back(item->objects);
-//
-//        ct_hash_remove(&item->object_hash, (uint64_t) _obj);
-//        ct_hash_add(&item->object_hash,
-//                    (uint64_t) last_obj, obj_idx, _G.allocator);
-//    }
-//}
-
 static void _destroy_object(struct object_t *obj) {
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
     ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
@@ -263,7 +228,8 @@ static struct ct_cdb_t create_db() {
                     MAX_OBJECTS * sizeof(struct object_t *),
                     PROT_READ | PROT_WRITE,
                     MAP_PRIVATE | MAP_ANONYMOUS,
-                    -1, 0)
+                    -1, 0),
+            .idx = idx,
     };
 
     ct_array_push(_G.dbs, db, _G.allocator);
@@ -279,7 +245,6 @@ static struct ct_cdb_obj_t *create_object(struct ct_cdb_t db,
 
     *obj_addr = obj;
     obj->db = db;
-    _add_to_type_slot(db_inst, (struct ct_cdb_obj_t *) obj_addr, type);
 
     return (struct ct_cdb_obj_t *) obj_addr;
 }
@@ -294,7 +259,7 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
     inst->db = db;
 
     struct object_t **obj_addr = db_inst->objects + db_inst->object_used++;
-
+    
     *obj_addr = inst;
 
     inst->owner = _obj;
@@ -313,6 +278,8 @@ static void destroy_object(struct ct_cdb_obj_t *_obj) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
+//    _remove_from_type_slot(db_inst, _obj);
+
     ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
 }
 
@@ -326,12 +293,22 @@ static void gc() {
         for (int j = 0; j < to_free_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects[j];
 
-            struct object_t* obj = &db_inst->object_pool[idx];
+            struct object_t *obj = &db_inst->object_pool[idx];
+
             ct_array_clean(obj->children);
-            obj->parent = NULL;
+            ct_array_clean(obj->instances);
+            ct_hash_clean(&obj->prop_map);
+
+            CT_FREE(_G.allocator, obj->buffer);
+            ct_array_free(obj->changed_prop, _G.allocator);
+
+            *obj = (struct object_t) {
+                    .children = obj->children,
+                    .instances = obj->instances,
+                    .prop_map = obj->prop_map
+            };
 
             ct_array_push(db_inst->free_objects, idx, _G.allocator);
-            db_inst->object_pool[idx] = (struct object_t) {0};
         }
 
         if (to_free_n) {
@@ -462,12 +439,12 @@ static void _notify(struct ct_cdb_obj_t *_obj,
 
     struct ct_cdb_obj_change_ev ev = {
             .obj = _obj,
-            .prop_count = ct_array_any(changed_prop),
+            .prop_count = ct_array_size(changed_prop),
             .prop = changed_prop,
     };
 
     ct_ebus_a0.send(CDB_EBUS, CDB_OBJ_CHANGE,
-                   (uint64_t) _obj, &ev, sizeof(ev));
+                    (uint64_t) _obj, &ev, sizeof(ev));
 
     for (int i = 0; i < ct_array_size(obj->instances); ++i) {
         _notify(obj->instances[i], changed_prop);
@@ -482,11 +459,7 @@ static void write_commit(struct ct_cdb_obj_t *_writer) {
 
     _notify(writer->orig_obj, writer->changed_prop);
 
-    ct_hash_free(&orig_obj->prop_map, _G.allocator);
     _destroy_object(orig_obj);
-//    CT_FREE(_G.allocator, old_obj);
-//    ct_array_free(writer->changed_prop, _G.allocator);
-//    CT_FREE(_G.allocator, old_obj->buffer);
 }
 
 static void set_float(struct ct_cdb_obj_t *_writer,

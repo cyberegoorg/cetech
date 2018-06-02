@@ -11,15 +11,19 @@
 
 #define MESH_RENDERER_COMPONENT CT_ID64_0("mesh_renderer")
 
-#define PROP_SCENE CT_ID64_0("scene")
-
+#define PROP_SCENE_ID CT_ID64_0("scene_id")
 #define PROP_MESH_ID (CT_ID64_0("mesh_id"))
 #define PROP_NODE_ID (CT_ID64_0("node_id"))
-#define PROP_NODE (CT_ID64_0("node_id"))
 #define PROP_MATERIAL_ID (CT_ID64_0("material_id"))
+#define PROP_MATERIAL_REF (CT_ID64_0("material_ref"))
+
+#define PROP_SCENE CT_ID64_0("scene")
+#define PROP_NODE (CT_ID64_0("node"))
+#define PROP_MESH (CT_ID64_0("mesh"))
+#define PROP_MATERIAL (CT_ID64_0("material"))
 
 struct ct_mesh_renderer {
-    uint64_t scene;
+    uint64_t scene_id;
     uint64_t mesh_id;
     uint64_t node_id;
     struct ct_cdb_obj_t* material;

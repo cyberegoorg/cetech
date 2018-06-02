@@ -92,9 +92,8 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(uint32_t bus_name, void *_event) {
-
-
+static void _update(void *_event) {
+    CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
@@ -128,6 +127,8 @@ static void _update(uint32_t bus_name, void *_event) {
 }
 
 static char *text(uint32_t idx) {
+    CT_UNUSED(idx);
+
     return _G.text;
 }
 

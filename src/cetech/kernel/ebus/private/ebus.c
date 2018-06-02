@@ -113,9 +113,8 @@ void send_addr(uint32_t bus_name,
             continue;
         }
 
-        ev_handlers->handlers[i].handler(bus_name,
-                                         ebus->buffer + ev_offset +
-                                         sizeof(struct ebus_header_t));
+        ev_handlers->handlers[i].handler(
+                ebus->buffer + ev_offset + sizeof(struct ebus_header_t));
     }
 }
 
@@ -171,13 +170,13 @@ void _connect_addr(uint32_t bus_name,
 
     const uint32_t handlers_n = ct_array_size(ev_handlers->handlers);
 
-    if(0 == handlers_n) {
+    if (0 == handlers_n) {
         ct_array_push(ev_handlers->handlers, h, _G.allocator);
         return;
     }
 
     for (int i = 0; i < handlers_n; ++i) {
-        if(ev_handlers->handlers[i].order < order) {
+        if (ev_handlers->handlers[i].order < order) {
             continue;
         }
 
@@ -198,7 +197,7 @@ void _connect(uint32_t bus_name,
 void disconnect_addr(uint32_t bus_name,
                      uint64_t event,
                      uint64_t addr,
-                     ct_ebus_handler *handler){
+                     ct_ebus_handler *handler) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
@@ -216,28 +215,29 @@ void disconnect_addr(uint32_t bus_name,
     struct ebus_event_handlers *ev_handlers = &ebus->handlers[event_idx];
     const uint32_t handlers_n = ct_array_size(ev_handlers->handlers);
 
-    if(0 == handlers_n) {
+    if (0 == handlers_n) {
         return;
     }
 
     for (int i = 0; i < handlers_n; ++i) {
-        if(ev_handlers->handlers[i].addr != addr) {
+        if (ev_handlers->handlers[i].addr != addr) {
             continue;
         }
 
-        if(ev_handlers->handlers[i].handler != handler) {
+        if (ev_handlers->handlers[i].handler != handler) {
             continue;
         }
 
-        memcpy(ev_handlers->handlers+i, ev_handlers->handlers+i+1, sizeof(struct ebus_event_handler) * (handlers_n-(i)));
+        memcpy(ev_handlers->handlers + i, ev_handlers->handlers + i + 1,
+               sizeof(struct ebus_event_handler) * (handlers_n - (i)));
         ct_array_pop_back(ev_handlers->handlers);
         return;
     }
 }
 
 void disconnect(uint32_t bus_name,
-                   uint64_t event,
-                   ct_ebus_handler *handler) {
+                uint64_t event,
+                ct_ebus_handler *handler) {
     disconnect_addr(bus_name, event, 0, handler);
 }
 

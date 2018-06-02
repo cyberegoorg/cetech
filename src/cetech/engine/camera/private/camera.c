@@ -17,7 +17,7 @@
 
 #include "cetech/kernel/module/module.h"
 
-#include <bgfx/c99/bgfx.h>
+#include "bgfx/c99/bgfx.h"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_transform_a0);
@@ -35,8 +35,7 @@ static struct CameraGlobal {
     struct ct_alloc *allocator;
 } CameraGlobal;
 
-static void _camera_compiler(uint32_t ebus,
-                             void *event) {
+static void _camera_compiler(void *event) {
     struct ct_ecs_component_compile_ev *ev = event;
 
     uint64_t keys[ev->component_key_count + 1];
@@ -89,8 +88,7 @@ static struct ct_camera_a0 camera_api = {
 };
 
 
-static void _component_spawner(uint32_t ebus,
-                               void *event) {
+static void _component_spawner(void *event) {
     struct ct_ecs_component_spawn_ev *ev = event;
     struct ct_camera_component *camera = ev->data;
 
