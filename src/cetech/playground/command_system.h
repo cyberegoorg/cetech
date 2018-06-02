@@ -1,12 +1,6 @@
 #ifndef COMMAND_SYSTEM_H
 #define COMMAND_SYSTEM_H
 
-#ifdef __cplusplus
-
-
-extern "C" {
-#endif
-
 //==============================================================================
 // Includes
 //==============================================================================
@@ -41,32 +35,38 @@ struct ct_ydb_cmd_s {
 };
 
 struct ct_ent_cmd_s {
-    // CDB
-    struct ct_cdb_obj_t* obj;
+    struct ct_cmd header;
+
+    struct ct_cdb_obj_t *obj;
     uint64_t prop;
-};
-
-struct ct_ent_cmd_vec3_s {
-    ct_cmd header;
-    ct_ent_cmd_s ent;
 
     // VALUES
-    float new_value[3];
-    float old_value[3];
-};
+    union {
+        struct {
+            float new_value[3];
+            float old_value[3];
+        } vec3;
 
-struct ct_ent_cmd_str_s {
-    ct_cmd header;
-    ct_ent_cmd_s ent;
+        struct {
+            float new_value;
+            float old_value;
+        } f;
 
-    // VALUES
-    char new_value[128];
-    char old_value[128];
+        struct {
+            char new_value[128];
+            char old_value[128];
+        } str;
+
+        struct {
+            bool new_value;
+            bool old_value;
+        } b;
+    };
 };
 
 struct ct_ydb_cmd_bool_s {
-    ct_cmd header;
-    ct_ydb_cmd_s ydb;
+    struct ct_cmd header;
+    struct ct_ydb_cmd_s ydb;
 
     // VALUES
     bool new_value;
@@ -119,8 +119,5 @@ struct ct_cmd_system_a0 {
     void (*goto_idx)(uint32_t idx);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //COMMAND_SYSTEM_H

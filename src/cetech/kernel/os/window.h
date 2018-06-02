@@ -2,9 +2,7 @@
 #define CETECH_MACHINE_WINDOW_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 //==============================================================================
@@ -18,7 +16,7 @@ extern "C" {
 
 
 enum {
-    WINDOW_EBUS   = 0x7a0d633e
+    WINDOW_EBUS = 0x7a0d633e
 };
 
 enum {
@@ -90,23 +88,20 @@ struct ct_window {
 
 
 struct ct_window_a0 {
-    ct_window *(*create)(struct ct_alloc *alloc,
-                         const char *title,
-                         enum ct_window_pos x,
-                         enum ct_window_pos y,
-                         const int32_t width,
-                         const int32_t height,
-                         uint32_t flags);
+    struct ct_window *(*create)(struct ct_alloc *alloc,
+                                const char *title,
+                                enum ct_window_pos x,
+                                enum ct_window_pos y,
+                                const int32_t width,
+                                const int32_t height,
+                                uint32_t flags);
 
-    ct_window *(*create_from)(struct ct_alloc *alloc,
-                              void *hndl);
+    struct ct_window *(*create_from)(struct ct_alloc *alloc,
+                                     void *hndl);
 
     void (*destroy)(struct ct_alloc *alloc,
-                    ct_window *w);
+                    struct ct_window *w);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_MACHINE_WINDOW_H

@@ -1,6 +1,5 @@
 #include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
-#include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/kernel/yaml/yng.h>
 #include <cetech/kernel/yaml/ydb.h>
@@ -36,8 +35,9 @@ static struct CameraGlobal {
     struct ct_alloc *allocator;
 } CameraGlobal;
 
-static void _camera_compiler(uint32_t ebus,void *event) {
-    struct ct_ecs_component_compile_ev* ev = event;
+static void _camera_compiler(uint32_t ebus,
+                             void *event) {
+    struct ct_ecs_component_compile_ev *ev = event;
 
     uint64_t keys[ev->component_key_count + 1];
     memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
@@ -109,10 +109,25 @@ static void _init(struct ct_api_a0 *api) {
             .type = CAMERA_COMPONENT,
     };
 
-    struct ct_component_prop_map prop_map[] = {
-            {.key = PROP_FAR, .offset = offsetof(struct ct_camera_component, far)},
-            {.key = PROP_NEAR, .offset = offsetof(struct ct_camera_component, near)},
-            {.key = PROP_FOV, .offset = offsetof(struct ct_camera_component, fov)}
+    static struct ct_component_prop_map prop_map[] = {
+            {
+                    .key = "far",
+                    .ui_name = "far",
+                    .type = CDB_TYPE_FLOAT,
+                    .offset = offsetof(struct ct_camera_component, far)
+            },
+            {
+                    .key = "near",
+                    .ui_name = "near",
+                    .type = CDB_TYPE_FLOAT,
+                    .offset = offsetof(struct ct_camera_component, near)
+            },
+            {
+                    .key = "fov",
+                    .ui_name = "fov",
+                    .type = CDB_TYPE_FLOAT,
+                    .offset = offsetof(struct ct_camera_component, fov)
+            }
     };
 
     ct_ecs_a0.register_component((struct ct_component_info) {
@@ -122,23 +137,29 @@ static void _init(struct ct_api_a0 *api) {
             .prop_count = CT_ARRAY_LEN(prop_map)
     });
 
-    ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0("camera"), _component_spawner, 0);
+    ct_ebus_a0.connect_addr(ECS_EBUS,
+                            ECS_COMPONENT_SPAWN,
+                            _G.type, _component_spawner, 0);
 
-    ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0("camera"), _camera_compiler, 0);
+    ct_ebus_a0.connect_addr(ECS_EBUS,
+                            ECS_COMPONENT_COMPILE,
+                            _G.type, _camera_compiler, 0);
 
 
 //    ct_ecs_a0.register_simulation("render", render_simu);
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0("camera"), _component_spawner);
+    ct_ebus_a0.disconnect_addr(ECS_EBUS,
+                               ECS_COMPONENT_SPAWN,
+                               _G.type,
+                               _component_spawner);
 
 
-    ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0("camera"), _camera_compiler);
+    ct_ebus_a0.disconnect_addr(ECS_EBUS,
+                               ECS_COMPONENT_COMPILE,
+                               _G.type,
+                               _camera_compiler);
 }
 
 

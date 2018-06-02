@@ -8,6 +8,7 @@
 
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground//playground.h>
@@ -17,7 +18,7 @@
 #include <cetech/engine/texture/texture.h>
 #include <cetech/kernel/kernel.h>
 
-#include <cstdlib>
+#include <stdlib.h>
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_keyboard_a0);
@@ -35,14 +36,14 @@ CETECH_DECL_API(ct_ebus_a0);
 
 
 static struct G {
-    ct_world world;
-    ct_entity camera_ent;
+    struct ct_world world;
+    struct ct_entity camera_ent;
     float dt;
 } _G;
 
 
 void update(uint32_t bus_name, void *event) {
-    ct_app_update_ev *ev = static_cast<ct_app_update_ev *>(event);
+    struct ct_app_update_ev *ev = event;
 
     _G.dt = ev->dt;
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {
@@ -59,7 +60,7 @@ void module1(uint32_t ebus_name, void* event) {
 
         ct_debugui_a0.Text("DT: %f", _G.dt);
         ct_debugui_a0.Text("FPS: %f", 1.0f / _G.dt );
-        ct_debugui_a0.Text("Raddnddddom FPS: %f", static_cast<double>(rand()));
+        ct_debugui_a0.Text("Raddnddddom FPS: %f", (double) rand());
 
         float fps =  (1.0f / _G.dt);
 

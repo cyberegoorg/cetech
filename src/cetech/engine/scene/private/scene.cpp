@@ -6,7 +6,6 @@
 #include <cetech/engine/scene/scene.h>
 #include <cetech/kernel/containers/array.h>
 #include <cetech/kernel/containers/hash.h>
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"

@@ -1,9 +1,7 @@
 #ifndef CETECH_HASH_H
 #define CETECH_HASH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Include
@@ -37,8 +35,5 @@ struct ct_hashlib_a0 {
     uint32_t (*id32_from_str)(const char *str);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_HASH_H

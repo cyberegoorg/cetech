@@ -10,6 +10,7 @@
 #include "cetech/kernel/log/log.h"
 #include <cetech/kernel/module/module.h>
 #include <cetech/playground/entity_property.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/transform/transform.h>
 #include <cetech/playground/asset_preview.h>

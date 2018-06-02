@@ -4,9 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -126,8 +124,5 @@ struct ct_ydb_a0 {
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_YDB_H

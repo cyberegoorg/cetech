@@ -5,10 +5,8 @@ components:
     scale: [1.000000, 1.000000, 1.000000]
   mesh_renderer:
     scene: content/scene/m4a1/m4a1
-    geometries:
-      3321387978411:
-        mesh: geom_0
-        material: content/material1
+    mesh: geom_0
+    material: content/material1
 children:
   e432c0ed88dd461e81f50973ffb00263:
     components:

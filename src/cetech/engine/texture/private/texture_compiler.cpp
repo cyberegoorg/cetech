@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -24,7 +23,6 @@
 #include "cetech/kernel/os/process.h"
 #include "cetech/kernel/os/vio.h"
 
-using namespace celib;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -74,7 +72,7 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
 
-    auto a = ct_memory_a0.main_allocator();
+    struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     char dir[1024] = {};
     ct_path_a0.dir(dir, filename);
@@ -96,7 +94,7 @@ static void compiler(const char *filename,
                      char **output,
                      struct ct_compilator_api *compilator_api) {
 
-    auto a = ct_memory_a0.main_allocator();
+    struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     auto platform = ct_cdb_a0.read_str(ct_config_a0.config_object(),
                                              CT_ID64_0("kernel.platform"), "");

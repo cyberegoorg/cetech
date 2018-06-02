@@ -74,7 +74,7 @@ set(SOURCE_FILES
         src/cetech/kernel/memory/private/allocator_core.c
         src/cetech/kernel/api/private/api_system.c
         src/cetech/kernel/log/private/log_system.c
-        src/cetech/kernel/module/private/module.cpp
+        src/cetech/kernel/module/private/module.c
         src/cetech/kernel/config/private/config.c
         src/cetech/kernel/memory/private/memory.c
         src/cetech/kernel/memory/private/allocator_malloc.c
@@ -84,17 +84,17 @@ set(SOURCE_FILES
         src/cetech/kernel/hashlib/private/hashlib.c
         src/cetech/kernel/os/private/error.c
         src/cetech/kernel/os/private/object.c
-        src/cetech/kernel/os/private/path.cpp
+        src/cetech/kernel/os/private/path.c
         src/cetech/kernel/os/private/process.c
         src/cetech/kernel/os/private/cpu.c
         src/cetech/kernel/os/private/thread.c
         src/cetech/kernel/os/private/vio.c
-        src/cetech/kernel/os/private/watchdog.cpp
+        src/cetech/kernel/os/private/watchdog.c
         src/cetech/kernel/os/private/time.c
         src/cetech/engine/resource/private/resource.c
         src/cetech/engine/resource/private/resource_package.c
-        src/cetech/engine/resource/private/resource_compiler.cpp
-        src/cetech/kernel/fs/private/fs.cpp
+        src/cetech/engine/resource/private/resource_compiler.c
+        src/cetech/kernel/fs/private/fs.c
         src/cetech/kernel/yaml/private/yng.c
         src/cetech/kernel/yaml/private/ydb.cpp
         src/cetech/kernel/cdb/private/cdb.c
@@ -109,8 +109,8 @@ set(SOURCE_FILES
         src/cetech/engine/debugdraw/private/debugdraw/bounds.cpp
         src/cetech/engine/debugdraw/private/debugdraw.cpp
 
-        src/cetech/kernel/os/private/window_sdl2.cpp
-        src/cetech/engine/machine/private/machine_sdl2.cpp
+        src/cetech/kernel/os/private/window_sdl2.c
+        src/cetech/engine/machine/private/machine_sdl2.c
 
         src/cetech/playground/private/entity_preview.c
         src/cetech/engine/ecs/private/ecs.c
@@ -131,26 +131,25 @@ set(SOURCE_FILES
         src/cetech/engine/material/private/material_property.cpp
         src/cetech/engine/scene/private/scene.cpp
         src/cetech/engine/scene/private/scene_compiler.cpp
-        src/cetech/engine/mesh_renderer/mesh_renderer.cpp
-        src/cetech/engine/mesh_renderer/mesh_property.cpp
+        src/cetech/engine/mesh_renderer/mesh_renderer.c
+        src/cetech/engine/mesh_renderer/mesh_property.c
         src/cetech/engine/transform/private/transform.c
 
         src/cetech/engine/scenegraph/private/scenegraph.c
         src/cetech/engine/camera/private/camera.c
 
-        src/cetech/engine/transform/private/transform_property.cpp
         src/cetech/engine/texture/private/texture_property.cpp
 
-        src/cetech/playground/private/entity_editor.cpp
-        src/cetech/playground/private/entity_property.cpp
+        src/cetech/playground/private/entity_editor.c
+        src/cetech/playground/private/entity_property.c
         src/cetech/playground/private/explorer.cpp
         src/cetech/playground/private/asset_preview.c
         src/cetech/playground/private/asset_property.c
         src/cetech/playground/private/asset_browser.cpp
-        src/cetech/playground/private/playground.cpp
-        src/cetech/playground/private/property_editor.cpp
-        src/cetech/playground/private/command_system.cpp
-        src/cetech/playground/private/command_history.cpp
+        src/cetech/playground/private/playground.c
+        src/cetech/playground/private/property_editor.c
+        src/cetech/playground/private/command_system.c
+        src/cetech/playground/private/command_history.c
         src/cetech/playground/private/log_view.cpp
         src/cetech/playground/private/action_manager.c
         src/cetech/kernel/math/private/fmath.c src/cetech/kernel/core.c)
@@ -269,7 +268,7 @@ target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 #target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(example SHARED examples/module_example/example.cpp)
+add_library(example SHARED examples/module_example/example.c)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
 add_library(example_develop SHARED examples/develop/src/game.c)

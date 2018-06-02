@@ -18,15 +18,12 @@
 #include <cetech/engine/resource/resource.h>
 #include <cetech/kernel/module/module.h>
 #include <cetech/kernel/os/watchdog.h>
-#include <cetech/kernel/containers/map.inl>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/yaml/ydb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/kernel/containers/array.h>
 #include <cetech/kernel/containers/buffer.h>
 
-
-using namespace celib;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -66,7 +63,7 @@ struct compilator {
 struct compile_task_data {
     char *source_filename;
     char *build_filename;
-    ct_resource_id rid;
+    struct ct_resource_id rid;
     time_t mtime;
     struct compilator compilator;
     atomic_int completed;
@@ -75,10 +72,10 @@ struct compile_task_data {
 static struct _G {
     uint32_t count;
     uint32_t compilator_map_type[MAX_TYPES]; // TODO: MAP
-    compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
+    struct compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    ct_cdb_obj_t *config;
-    ct_alloc *allocator;
+    struct ct_cdb_obj_t *config;
+    struct ct_alloc *allocator;
 } _G;
 
 
@@ -122,12 +119,12 @@ void _add_dependency(const char *who_filename,
                              depend_on_filename));
 }
 
-static ct_compilator_api _compilator_api = {
+static struct ct_compilator_api _compilator_api = {
         .add_dependency = _add_dependency
 };
 
 static void _compile_task(void *data) {
-    struct compile_task_data *tdata = (compile_task_data *) data;
+    struct compile_task_data *tdata = (struct compile_task_data *) data;
 
     ct_log_a0.info("resource_compiler.task",
                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "\"",
@@ -163,11 +160,11 @@ static void _compile_task(void *data) {
         builddb_set_file(tdata->source_filename, tdata->mtime);
         builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
 
-        ct_vio *build_vio = ct_fs_a0.open(
+        struct ct_vio *build_vio = ct_fs_a0.open(
                 CT_ID64_0("build"),
                 tdata->build_filename, FS_OPEN_WRITE);
 
-        ct_buffer_free(tdata->build_filename, ct_memory_a0.main_allocator());
+        ct_buffer_free(tdata->build_filename, _G.allocator);
 
         if (build_vio == NULL) {
             goto end;
@@ -185,13 +182,13 @@ static void _compile_task(void *data) {
     end:
     ct_array_free(output_blob, _G.allocator);
 
-    CT_FREE(ct_memory_a0.main_allocator(),
+    CT_FREE(_G.allocator,
             tdata->source_filename);
 
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
-compilator _find_compilator(uint32_t type) {
+struct compilator _find_compilator(uint32_t type) {
     for (int i = 0; i < MAX_TYPES; ++i) {
         if (_G.compilator_map_type[i] != type) {
             continue;
@@ -200,20 +197,19 @@ compilator _find_compilator(uint32_t type) {
         return _G.compilator_map_compilator[i];
     }
 
-    return {.compilator = NULL};
+    return (struct compilator) {.compilator = NULL};
 }
 
 
-void _compile_files(ct_task_item **tasks,
+void _compile_files(struct ct_task_item **tasks,
                     char **files,
-                    uint32_t files_count,
-                    celib::Map<uint64_t> &compiled) {
+                    uint32_t files_count) {
     for (uint32_t i = 0; i < files_count; ++i) {
-        ct_resource_id rid;
+        struct ct_resource_id rid;
 
         type_name_from_filename(files[i], &rid, NULL);
 
-        compilator compilator = _find_compilator(rid.type);
+        struct compilator compilator = _find_compilator(rid.type);
         if (compilator.compilator == NULL) {
             continue;
         }
@@ -224,13 +220,14 @@ void _compile_files(ct_task_item **tasks,
 
         char build_name[33] = {};
         snprintf(build_name,
-                 CT_ARRAY_LEN(build_name), "%" SDL_PRIX64, rid.i64);
+                 CT_ARRAY_LEN(build_name), "%"
+                         SDL_PRIX64, rid.i64);
 
         builddb_set_file_hash(files[i], build_name);
 
         char *build_full = NULL;
         ct_path_a0.join(&build_full,
-                        ct_memory_a0.main_allocator(), 2,
+                        _G.allocator, 2,
                         ct_cdb_a0.read_str(_G.config,
                                            CONFIG_KERNEL_PLATFORM, ""),
                         build_name);
@@ -244,22 +241,20 @@ void _compile_files(ct_task_item **tasks,
                 .compilator = compilator,
                 .build_filename = build_full,
                 .source_filename = ct_memory_a0.str_dup(files[i],
-                                                        ct_memory_a0.main_allocator()),
-                .mtime = ct_fs_a0.file_mtime(
-                        CT_ID64_0("source"),
-                        files[i]),
+                                                        _G.allocator),
+                .mtime = ct_fs_a0.file_mtime(CT_ID64_0("source"), files[i]),
 
                 .completed = 0
         };
 
-        ct_task_item item = {
+        struct ct_task_item item = {
                 .name = "compiler_task",
                 .work = _compile_task,
                 .data = data
         };
 
         ct_array_push(*tasks, item, _G.allocator);
-        multi_map::insert(compiled, (uint64_t)rid.type, (uint64_t)rid.name);
+//        multi_map::insert(compiled, (uint64_t)rid.type, (uint64_t)rid.name);
     }
 }
 
@@ -273,59 +268,60 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config) {
     CT_UNUSED(config);
 
     char *build_dir_full = resource_compiler_get_build_dir(
-            ct_memory_a0.main_allocator(),
+            _G.allocator,
             ct_cdb_a0.read_str(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
     ct_path_a0.make_path(build_dir_full);
 
-    CT_FREE(ct_memory_a0.main_allocator(), build_dir_full);
+    CT_FREE(_G.allocator, build_dir_full);
 }
 
-void resource_compiler_register(const char* type,
+void resource_compiler_register(const char *type,
                                 ct_resource_compilator_t compilator,
                                 bool yaml_based) {
     const uint32_t idx = _G.count++;
 
     _G.compilator_map_type[idx] = CT_ID32_0(type);
-    _G.compilator_map_compilator[idx] = {.compilator = compilator, .yaml_based = yaml_based};
+    _G.compilator_map_compilator[idx] = (struct compilator) {.compilator = compilator, .yaml_based = yaml_based};
 }
 
-void _compile_all(celib::Map<uint64_t> &compiled) {
-    ct_task_item *tasks = NULL;
+void _compile_all() {
+    struct ct_task_item *tasks = NULL;
     const char *glob_patern = "**.*";
-    char **files = nullptr;
+    char **files = NULL;
     uint32_t files_count = 0;
 
     ct_fs_a0.listdir(CT_ID64_0("source"),
                      "", glob_patern, false, true, &files, &files_count,
-                     ct_memory_a0.main_allocator());
+                     _G.allocator);
 
-    _compile_files(&tasks, files, files_count, compiled);
+    _compile_files(&tasks, files, files_count);
 
     ct_fs_a0.listdir_free(files, files_count,
-                          ct_memory_a0.main_allocator());
+                          _G.allocator);
 
     struct ct_task_counter_t *counter = NULL;
     ct_task_a0.add(tasks, ct_array_size(tasks), &counter);
     ct_task_a0.wait_for_counter(counter, 0);
 
     for (uint32_t i = 0; i < ct_array_size(tasks); ++i) {
-        compile_task_data *data = (compile_task_data *) tasks[i].data;
-        CT_FREE(ct_memory_a0.main_allocator(), data);
+        struct compile_task_data *data = (struct compile_task_data *) tasks[i].data;
+        CT_FREE(_G.allocator, data);
     }
     ct_array_free(tasks, _G.allocator);
 }
 
 
 void resource_compiler_compile_all() {
-    Map<uint64_t> compieled(ct_memory_a0.main_allocator());
-    _compile_all(compieled);
+//    Map<uint64_t> compieled(_G.allocator);
 
+//    _compile_all(compieled);
+    _compile_all();
 }
 
 int resource_compiler_get_filename(char *filename,
                                    size_t max_ken,
-                                   ct_resource_id resource_id) {
+                                   struct ct_resource_id resource_id) {
     char build_name[33] = {};
     ct_resource_a0.type_name_string(build_name, CT_ARRAY_LEN(build_name),
                                     resource_id);
@@ -341,7 +337,7 @@ const char *resource_compiler_get_core_dir() {
     return ct_cdb_a0.read_str(_G.config, CONFIG_CORE_DIR, "");;
 }
 
-char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
+char *resource_compiler_get_tmp_dir(struct ct_alloc *alocator,
                                     const char *platform) {
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
@@ -351,7 +347,7 @@ char *resource_compiler_get_tmp_dir(ct_alloc *alocator,
     return buffer;
 }
 
-char *resource_compiler_external_join(ct_alloc *alocator,
+char *resource_compiler_external_join(struct ct_alloc *alocator,
                                       const char *name) {
     const char *external_dir_str = ct_cdb_a0.read_str(_G.config,
                                                       CONFIG_EXTERNAL_DIR,
@@ -373,7 +369,8 @@ char *resource_compiler_external_join(ct_alloc *alocator,
 }
 
 
-extern "C" void resource_memory_reload(ct_resource_id rid, char **blob);
+void resource_memory_reload(struct ct_resource_id rid,
+                            char **blob);
 
 void compile_and_reload(const char *filename) {
     char *output_blob = NULL;
@@ -382,7 +379,7 @@ void compile_and_reload(const char *filename) {
 
     type_name_from_filename(filename, &rid, NULL);
 
-    compilator compilator = _find_compilator(rid.type);
+    struct compilator compilator = _find_compilator(rid.type);
     if (compilator.compilator == NULL) {
         goto error;
     }
@@ -414,7 +411,7 @@ void compile_and_reload(const char *filename) {
 //    }
 //
 //    if (need_compile) {
-//        ct_alloc *alloc = ct_memory_a0.main_allocator();
+//        ct_alloc *alloc = _G.allocator;
 //        celib::Map<uint64_t> type_name(alloc);
 //
 //        _compile_all(type_name);
@@ -449,7 +446,7 @@ void compile_and_reload(const char *filename) {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
         ct_cdb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
     }
@@ -466,9 +463,9 @@ static void _init_cvar(struct ct_config_a0 config) {
 }
 
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
-    _G = {
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .config = ct_config_a0.config_object(),
     };
@@ -478,23 +475,23 @@ static void _init(ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 //    ct_app_a0.register_on_update(_update);
 
-    auto platform = ct_cdb_a0.read_str(_G.config, CONFIG_KERNEL_PLATFORM,
-                                       "");
+    const char *platform = ct_cdb_a0.read_str(_G.config,
+                                              CONFIG_KERNEL_PLATFORM, "");
 
     char *build_dir_full = ct_resource_a0.compiler_get_build_dir(
-            ct_memory_a0.main_allocator(), platform);
+            _G.allocator, platform);
 
     ct_path_a0.make_path(build_dir_full);
     builddb_init_db(build_dir_full, &ct_path_a0, &ct_memory_a0);
 
     char *tmp_dir_full = NULL;
-    ct_path_a0.join(&tmp_dir_full, ct_memory_a0.main_allocator(), 2,
+    ct_path_a0.join(&tmp_dir_full, _G.allocator, 2,
                     build_dir_full, "tmp");
 
     ct_path_a0.make_path(tmp_dir_full);
 
-    ct_buffer_free(tmp_dir_full, ct_memory_a0.main_allocator());
-    ct_buffer_free(build_dir_full, ct_memory_a0.main_allocator());
+    ct_buffer_free(tmp_dir_full, _G.allocator);
+    ct_buffer_free(build_dir_full, _G.allocator);
 
     const char *core_dir = ct_cdb_a0.read_str(_G.config, CONFIG_CORE_DIR,
                                               "");
@@ -516,7 +513,7 @@ static void _init(ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G = {};
+    _G = (struct _G) {};
 }
 
 

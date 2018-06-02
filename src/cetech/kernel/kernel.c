@@ -21,7 +21,6 @@
 #include <cetech/kernel/task/task.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/engine/resource/package.h>
-#include <cetech/kernel/task/task.h>
 #include <cetech/engine/machine/machine.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/renderer/renderer.h>
@@ -87,31 +86,30 @@ int init_config(int argc,
         return 0;
     }
 
-    struct ct_alloc *a = ct_memory_a0.main_allocator();
-
     const char *build_dir_str = ct_cdb_a0.read_str(object, CONFIG_BUILD, "");
     char *build_dir = NULL;
-    ct_path_a0.join(&build_dir, a, 2,
+    ct_path_a0.join(&build_dir, _G.allocator, 2,
                     build_dir_str,
                     ct_cdb_a0.read_str(object, CONFIG_NATIVE_PLATFORM, ""));
 
     char *build_config = NULL;
-    ct_path_a0.join(&build_config, a, 2, build_dir, "global.config");
+    ct_path_a0.join(&build_config, _G.allocator, 2, build_dir, "global.config");
 
     const char *source_dir_str = ct_cdb_a0.read_str(object, CONFIG_SRC, "");
     char *source_config = NULL;
-    ct_path_a0.join(&source_config, a, 2, source_dir_str, "global.config");
+    ct_path_a0.join(&source_config, _G.allocator, 2, source_dir_str,
+                    "global.config");
 
     if (ct_cdb_a0.read_uint32(object, CONFIG_COMPILE, 0)) {
         ct_path_a0.make_path(build_dir);
-        ct_path_a0.copy_file(a, source_config, build_config);
+        ct_path_a0.copy_file(_G.allocator, source_config, build_config);
     }
 
-    ct_config_a0.load_from_yaml_file(build_config, a);
+    ct_config_a0.load_from_yaml_file(build_config, _G.allocator);
 
-    ct_buffer_free(source_config, a);
-    ct_buffer_free(build_config, a);
-    ct_buffer_free(build_dir, a);
+    ct_buffer_free(source_config, _G.allocator);
+    ct_buffer_free(build_config, _G.allocator);
+    ct_buffer_free(build_dir, _G.allocator);
 
     if (!ct_config_a0.parse_args(argc, argv)) {
         return 0;
@@ -259,7 +257,8 @@ static void _boot_unload() {
 }
 
 
-static void on_quit(uint32_t ebus, void* event) {
+static void on_quit(uint32_t ebus,
+                    void *event) {
     application_quit();
 }
 
@@ -282,15 +281,15 @@ void application_start() {
 
     _G.is_running = 1;
 
-    uint64_t fq = ct_time_a0.perf_freq();
+    const uint64_t fq = ct_time_a0.perf_freq();
     uint64_t last_tick = ct_time_a0.perf_counter();
     while (_G.is_running) {
-        ct_ebus_a0.begin_frame();
-
         uint64_t now_ticks = ct_time_a0.perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
+
+        ct_ebus_a0.begin_frame();
         ct_machine_a0.update(dt);
 
         struct ct_app_update_ev ev = {.dt=dt};
@@ -300,13 +299,12 @@ void application_start() {
     }
 
     ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, NULL, 0);
-
     ct_ebus_a0.disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
 
     _boot_unload();
 }
 
-static void cetech_kernel_start(){
+static void cetech_kernel_start() {
     application_start();
 }
 

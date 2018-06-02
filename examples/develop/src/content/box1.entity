@@ -4,18 +4,42 @@ components:
     position: [0, 0, 5]
     scale: [1, 1, 1]
 
-  mesh_renderer:
-    scene: "content/scene/solider/ArmyPilot"
+children:
+  lknvln879879NJKK:
+    name: head
+    components:
+      transform:
+        rotation: [0, 0, 0]
+        position: [0, 0, 0]
+        scale: [1, 1, 1]
 
-    geometries:
-      3321387978411:
+      mesh_renderer:
+        scene: "content/scene/solider/ArmyPilot"
         mesh: "Mesh1Mesh"
         material: "content/scene/solider/head"
 
-      21389198798718:
+  lekrl00303NJKLln879879NJKK:
+    name: body
+    components:
+      transform:
+        rotation: [0, 0, 0]
+        position: [0, 0, 0]
+        scale: [1, 1, 1]
+
+      mesh_renderer:
+        scene: "content/scene/solider/ArmyPilot"
         mesh: "Mesh1Mesh1"
         material: "content/scene/solider/body"
 
-      132189797984986:
+  mnbmnmnb562468979879NJKK:
+    name: m4
+    components:
+      transform:
+        rotation: [0, 0, 0]
+        position: [0, 0, 0]
+        scale: [1, 1, 1]
+
+      mesh_renderer:
+        scene: "content/scene/solider/ArmyPilot"
         mesh: "Mesh1Mesh12"
         material: "content/scene/solider/m4"

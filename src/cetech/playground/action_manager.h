@@ -1,9 +1,7 @@
 #ifndef CETECH_ACTION_MANAGER_H
 #define CETECH_ACTION_MANAGER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -28,11 +26,7 @@ struct ct_action_manager_a0 {
     void (*execute)(uint64_t name);
 
     void (*check)();
-
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ACTION_MANAGER_H

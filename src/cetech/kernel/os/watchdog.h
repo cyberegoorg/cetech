@@ -3,9 +3,7 @@
 
 #include <cetech/kernel/memory/allocator.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Api
@@ -22,7 +20,7 @@ struct ct_watchdog_ev_header {
 };
 
 struct ct_wd_ev_file_write_end {
-    ct_watchdog_ev_header header;
+    struct ct_watchdog_ev_header header;
     const char *dir;
     char *filename;
 };
@@ -44,12 +42,12 @@ struct ct_watchdog {
 
     void (*fetch_events)(ct_watchdog_instance_t *inst);
 
-    ct_watchdog_ev_header *(*event_begin)(ct_watchdog_instance_t *inst);
+    struct ct_watchdog_ev_header *(*event_begin)(ct_watchdog_instance_t *inst);
 
-    ct_watchdog_ev_header *(*event_end)(ct_watchdog_instance_t *inst);
+    struct ct_watchdog_ev_header *(*event_end)(ct_watchdog_instance_t *inst);
 
-    ct_watchdog_ev_header *(*event_next)(ct_watchdog_instance_t *inst,
-                                         ct_watchdog_ev_header *header);
+    struct ct_watchdog_ev_header *(*event_next)(ct_watchdog_instance_t *inst,
+                                                struct ct_watchdog_ev_header *header);
 };
 
 struct ct_watchdog_a0 {
@@ -58,8 +56,5 @@ struct ct_watchdog_a0 {
     void (*destroy)(struct ct_watchdog *watchdog);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_CPU_Hs

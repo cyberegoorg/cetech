@@ -1,6 +1,9 @@
 
-#include <errno.h>
+#include <glob.h>
+#include <fnmatch.h>
+#include <stdlib.h>
 
+#include <errno.h>
 #if defined(CETECH_LINUX)
 #include <dirent.h>
 #include <sys/stat.h>
@@ -8,10 +11,8 @@
 #endif
 
 #if defined(CETECH_DARWIN)
-
 #include <dirent.h>
 #include <sys/stat.h>
-
 #endif
 
 #include <cetech/kernel/api/api_system.h>
@@ -19,8 +20,6 @@
 #include <cetech/kernel/os/vio.h>
 #include <cetech/kernel/os/path.h>
 #include <cetech/kernel/module/module.h>
-#include <glob.h>
-#include <fnmatch.h>
 #include "cetech/kernel/containers/buffer.h"
 
 
@@ -360,7 +359,7 @@ void path_join(char **buffer,
 void copy_file(struct ct_alloc *allocator,
                const char *from,
                const char *to) {
-    ct_vio *source_vio = ct_vio_a0.from_file(from, VIO_OPEN_READ);
+    struct ct_vio *source_vio = ct_vio_a0.from_file(from, VIO_OPEN_READ);
 
     char *data = CT_ALLOC(allocator, char,
                           source_vio->size(source_vio));
@@ -369,7 +368,7 @@ void copy_file(struct ct_alloc *allocator,
     source_vio->read(source_vio, data, sizeof(char), size);
     source_vio->close(source_vio);
 
-    ct_vio *build_vio = ct_vio_a0.from_file(to, VIO_OPEN_WRITE);
+    struct ct_vio *build_vio = ct_vio_a0.from_file(to, VIO_OPEN_WRITE);
 
     build_vio->write(build_vio, data, sizeof(char), size);
     build_vio->close(build_vio);
@@ -382,7 +381,7 @@ bool is_dir(const char *path) {
     return (stat(path, &sb) == 0) && S_ISDIR(sb.st_mode);
 }
 
-static ct_path_a0 path_api = {
+static struct ct_path_a0 path_api = {
         .list = dir_list,
         .list2 = dir_list2,
         .list_free = dir_list_free,

@@ -2,7 +2,7 @@
 // Includes
 //==============================================================================
 
-#include "cetech/kernel/containers/eventstream.inl"
+
 
 #include "cetech/kernel/memory/memory.h"
 #include "cetech/kernel/module/module.h"
@@ -20,6 +20,7 @@
 #include <cetech/engine/controlers/gamepad.h>
 #include <cetech/kernel/os/window.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/kernel/macros.h>
 
 
 CETECH_DECL_API(ct_log_a0);
@@ -27,7 +28,6 @@ CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_ebus_a0);
 
-using namespace celib;
 
 //==============================================================================
 // Extern functions
@@ -97,7 +97,7 @@ void sdl_mouse_process() {
     curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
-    ct_renderer_a0 *renderer_a0 = (ct_renderer_a0 *) ct_api_a0.first(
+    struct ct_renderer_a0 *renderer_a0 = (struct ct_renderer_a0 *) ct_api_a0.first(
             "ct_renderer_a0").api;
 
     uint32_t window_size[2] = {};
@@ -106,14 +106,14 @@ void sdl_mouse_process() {
     _G.mouse.position[0] = pos[0];
     _G.mouse.position[1] = window_size[1] - pos[1];
 
-    ct_mouse_move_event event;
+    struct ct_mouse_move_event event;
     event.pos[0] = pos[0];
     event.pos[1] = window_size[1] - pos[1];
 
     ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_MOVE, &event, sizeof(event));
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
-        ct_mouse_event event;
+        struct ct_mouse_event event;
         event.button = i;
 
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
@@ -131,7 +131,7 @@ void sdl_mouse_process() {
 
 void sdl_keyboard_process() {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
-    ct_keyboard_event keyboard_ev;
+    struct ct_keyboard_event keyboard_ev;
 
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
@@ -264,7 +264,7 @@ void sdl_gamepad_process() {
         }
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
-            ct_gamepad_btn_event event;
+            struct ct_gamepad_btn_event event;
             event.gamepad_id = i;
             event.button = j;
 
@@ -284,7 +284,7 @@ void sdl_gamepad_process() {
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            ct_gamepad_move_event event;
+            struct ct_gamepad_move_event event;
             event.gamepad_id = i;
             event.axis = j;
 
@@ -334,7 +334,7 @@ static void _update(float dt) {
             case SDL_WINDOWEVENT: {
                 switch (e.window.event) {
                     case SDL_WINDOWEVENT_SIZE_CHANGED: {
-                        ct_window_resized_event ev;
+                        struct ct_window_resized_event ev;
                         ev.window_id = e.window.windowID;
                         ev.width = e.window.data1;
                         ev.height = e.window.data2;
@@ -349,7 +349,7 @@ static void _update(float dt) {
                 break;
 
             case SDL_MOUSEWHEEL: {
-                ct_mouse_move_event ev;
+                struct ct_mouse_move_event ev;
                 ev.pos[0] = e.wheel.x;
                 ev.pos[1] = e.wheel.y;
                 ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev,
@@ -358,7 +358,7 @@ static void _update(float dt) {
                 break;
 
             case SDL_TEXTINPUT: {
-                ct_keyboard_text_event ev = {{0}};
+                struct ct_keyboard_text_event ev = {{0}};
                 memcpy(ev.text, e.text.text, sizeof(ev.text));
 
                 ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT, &ev,
@@ -369,7 +369,7 @@ static void _update(float dt) {
 
             case SDL_CONTROLLERDEVICEADDED: {
                 int idx = _create_controler(e.cdevice.which);
-                ct_gamepad_device_event ev;
+                struct ct_gamepad_device_event ev;
                 ev.gamepad_id = idx;
 
 
@@ -380,7 +380,7 @@ static void _update(float dt) {
                 break;
 
             case SDL_CONTROLLERDEVICEREMOVED: {
-                ct_gamepad_device_event ev;
+                struct ct_gamepad_device_event ev;
 
                 for (int i = 0; i < GAMEPAD_MAX; ++i) {
                     SDL_GameController *controller = SDL_GameControllerFromInstanceID(
@@ -413,7 +413,7 @@ static void _update(float dt) {
 
 }
 
-static ct_machine_a0 a0 = {
+static struct ct_machine_a0 a0 = {
         .update = _update,
         .gamepad_is_active = sdl_gamepad_is_active,
         .gamepad_play_rumble = sdl_gamepad_play_rumble,

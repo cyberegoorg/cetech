@@ -1,12 +1,6 @@
-//! \defgroup Config
-//! Config system
-//! \{
 #ifndef CETECH_CONFIG_H
 #define CETECH_CONFIG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //==============================================================================
 // Includes
@@ -49,10 +43,6 @@ struct ct_config_a0 {
     //! Dump all variables to log
     void (*log_all)();
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_CONFIG_H
 //! \}

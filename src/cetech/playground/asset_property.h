@@ -2,9 +2,7 @@
 #define CETECH_ASSET_PROPERTY_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -28,8 +26,5 @@ struct ct_asset_property_a0 {
                            ct_ap_on_asset on_asset);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ASSET_PROPERTY_H

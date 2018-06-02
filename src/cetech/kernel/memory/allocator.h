@@ -6,13 +6,6 @@
 
 #include "cetech/kernel/macros.h"
 
-#ifdef __cplusplus
-#include <new>
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //==============================================================================
 // Defines
@@ -79,8 +72,5 @@ struct ct_alloc {
     struct ct_alloc_fce *call;
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CECORE_ALLOCATOR_H

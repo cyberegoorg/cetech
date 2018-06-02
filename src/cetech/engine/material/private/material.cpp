@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -31,7 +30,6 @@ CETECH_DECL_API(ct_shader_a0);
 CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_renderer_a0);
 
-using namespace celib;
 
 #include "material.h"
 

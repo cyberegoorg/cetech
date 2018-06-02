@@ -4,11 +4,6 @@
 #include <cetech/macros.h>
 #include <stdarg.h>
 
-#ifdef __cplusplus
-
-extern "C" {
-#endif
-
 //==============================================================================
 // Includes
 //==============================================================================
@@ -773,11 +768,11 @@ struct ct_debugui_a0 {
                            bool repeat);
 
     bool (*IsMouseDoubleClicked)(int btn);
+
+    bool (*IsItemClicked)(int btn);
+    void (*Separator)();
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //!<CETECH_DEBUGUI_H
 

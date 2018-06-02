@@ -148,9 +148,7 @@ static void compile_entitity(const char *filename,
 }
 
 static struct ct_entity_compile_output *create_output() {
-    struct ct_alloc *a = ct_memory_a0.main_allocator();
-
-    struct ct_entity_compile_output *output = CT_ALLOC(a,
+    struct ct_entity_compile_output *output = CT_ALLOC(_G.allocator,
                                                        struct ct_entity_compile_output,
                                                        sizeof(struct ct_entity_compile_output));
     *output = (struct ct_entity_compile_output) {};
@@ -177,8 +175,7 @@ static void destroy_output(struct ct_entity_compile_output *output) {
 
     ct_hash_free(&output->component_body, _G.allocator);
 
-    struct ct_alloc *a = ct_memory_a0.main_allocator();
-    CT_FREE(a, output);
+    CT_FREE(_G.allocator, output);
 }
 
 static void compile_entity(struct ct_entity_compile_output *output,

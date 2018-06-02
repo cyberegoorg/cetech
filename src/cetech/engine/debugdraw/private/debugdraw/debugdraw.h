@@ -6,7 +6,6 @@
 #ifndef DEBUGDRAW_H_HEADER_GUARD
 #define DEBUGDRAW_H_HEADER_GUARD
 
-#include <bx/allocator.h>
 #include "bounds.h"
 #include "bgfx/bgfx.h"
 

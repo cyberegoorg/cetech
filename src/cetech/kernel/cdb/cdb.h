@@ -4,10 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //==============================================================================
 // Includes
 //==============================================================================
@@ -189,9 +185,5 @@ struct ct_cdb_a0 {
                                      struct ct_cdb_obj_t *defaultt);
 
 };
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_CDB_H

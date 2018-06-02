@@ -5,9 +5,7 @@
 #ifndef CETECH_TASKMANAGER_H
 #define CETECH_TASKMANAGER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -71,8 +69,5 @@ struct ct_task_a0 {
 
 #endif //CETECH_TASKMANAGER_H
 
-#ifdef __cplusplus
-}
-#endif
 
 //! \}

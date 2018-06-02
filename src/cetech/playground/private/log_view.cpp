@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include "cetech/kernel/containers/map.inl"
-
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
@@ -21,8 +19,6 @@ CETECH_DECL_API(ct_debugui_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_ebus_a0);
-
-using namespace celib;
 
 #define WINDOW_NAME "Log view"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")

@@ -2,9 +2,7 @@
 #define CETECH_OS_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 //==============================================================================
@@ -37,8 +35,5 @@ struct ct_machine_a0 {
                                 uint32_t length);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_OS_H

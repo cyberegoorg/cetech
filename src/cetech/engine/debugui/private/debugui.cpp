@@ -1,8 +1,7 @@
 #undef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
-#include <cetech/engine/ecs/ecs.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/hashlib/hashlib.h>
@@ -12,7 +11,6 @@
 #include <cetech/engine/controlers/mouse.h>
 #include <cetech/kernel/log/log.h>
 #include <cetech/kernel/ebus/ebus.h>
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/config/config.h"
 #include "cetech/kernel/memory/memory.h"
@@ -98,12 +96,12 @@ static void render(uint8_t viewid) {
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
-    ct_ebus_a0.broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, 0,0);
+    ct_ebus_a0.broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, 0, 0);
     imguiEndFrame();
 }
 
 static void SaveDock(struct ct_vio *output) {
-    char* buffer = NULL;
+    char *buffer = NULL;
     ImGui::saveToYaml(&buffer, _G.allocator);
 
     output->write(output, buffer, 1, strlen(buffer));
@@ -246,6 +244,8 @@ static ct_debugui_a0 debugui_api = {
         .RootDock = imgui_wrap::RootDock,
         .IsMouseClicked = ImGui::IsMouseClicked,
         .IsMouseDoubleClicked = ImGui::IsMouseDoubleClicked,
+        .IsItemClicked = ImGui::IsItemClicked,
+        .Separator = ImGui::Separator,
 };
 
 static void _init(ct_api_a0 *api) {

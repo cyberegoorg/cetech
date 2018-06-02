@@ -7,6 +7,7 @@
 
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/engine/debugui/debugui.h>

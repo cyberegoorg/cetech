@@ -245,12 +245,12 @@ void package_task(void *data) {
 
     ct_array_free(load_tasks, _G.allocator);
     ct_array_free(pkg_load_tasks, _G.allocator);
-    CT_FREE(ct_memory_a0.main_allocator(), task_data);
+    CT_FREE(_G.allocator, task_data);
 }
 
 struct ct_task_counter_t *package_load(uint32_t name) {
     struct package_task_data *task_data =
-            CT_ALLOC(ct_memory_a0.main_allocator(),
+            CT_ALLOC(_G.allocator,
                      struct package_task_data,
                      sizeof(struct package_task_data));
 

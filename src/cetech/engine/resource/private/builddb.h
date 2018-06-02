@@ -39,7 +39,7 @@ static int _step(sqlite3 *db,
     return rc;
 }
 
-static char *_logdb_path = nullptr;
+static char *_logdb_path = NULL;
 
 static sqlite3 *_opendb() {
     sqlite3 *_db;

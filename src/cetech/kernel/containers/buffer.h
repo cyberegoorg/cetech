@@ -7,9 +7,7 @@
 
 #include "array.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #define ct_buffer_clear(b) ct_array_clean(b)
 #define ct_buffer_size(b) ct_array_size(b)
@@ -39,8 +37,5 @@ static void ct_buffer_printf(char **b,
 
 static void *_ct_buffer_printf = (void *) &ct_buffer_printf; // UNUSED
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_BUFFER_H

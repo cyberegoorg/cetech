@@ -1,11 +1,6 @@
 #ifndef CETECH_GAMEPAD_H
 #define CETECH_GAMEPAD_H
 
-#ifdef __cplusplus
-
-
-extern "C" {
-#endif
 
 //==============================================================================
 // Includes
@@ -151,9 +146,6 @@ struct ct_gamepad_a0 {
                         uint32_t length);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_GAMEPAD_H
 //! \}

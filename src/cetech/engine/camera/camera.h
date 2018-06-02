@@ -3,9 +3,7 @@
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -18,7 +16,6 @@ extern "C" {
 #define PROP_FOV CT_ID64_0("fov")
 #define PROP_NEAR CT_ID64_0("near")
 #define PROP_FAR CT_ID64_0("far")
-#define PROP_CAMERA_VIEWPORT CT_ID64_0("camera.viewport")
 #define PROP_PROJECTION CT_ID64_0("projection")
 #define PROP_VIEW CT_ID64_0("view")
 
@@ -54,9 +51,6 @@ struct ct_camera_a0 {
                              int height);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_CAMERA_H
 

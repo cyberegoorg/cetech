@@ -2,9 +2,7 @@
 #define CETECH_TIME_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 //==============================================================================
@@ -28,8 +26,5 @@ struct ct_time_a0 {
 };
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_TIME_H

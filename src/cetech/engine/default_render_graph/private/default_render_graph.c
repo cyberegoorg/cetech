@@ -61,7 +61,6 @@ static void geometry_pass_on_setup(void *inst,
                           }
     );
 
-
     builder->call->create(builder, CT_ID64_0("depth"),
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_D24,

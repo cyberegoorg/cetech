@@ -5,9 +5,7 @@
 #ifndef CETECH_MEMSYS_H
 #define CETECH_MEMSYS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 struct ct_alloc;
 
@@ -31,9 +29,6 @@ struct ct_memory_a0 {
                      struct ct_alloc *allocator);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_MEMSYS_H
 

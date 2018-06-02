@@ -1,14 +1,12 @@
 #include <stdio.h>
-#include "cetech/kernel/containers/map.inl"
-
 
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <cetech/kernel/log/log.h>
 #include <cetech/playground/command_history.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include <cetech/kernel/macros.h>
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -22,8 +20,6 @@ CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_ebus_a0);
-
-using namespace celib;
 
 #define WINDOW_NAME "Command history"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
@@ -47,7 +43,7 @@ static void ui_command_list() {
 
         snprintf(buffer, CT_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
 
-        if (ImGui::Selectable(buffer, is_selected)) {
+        if (ct_debugui_a0.Selectable(buffer, is_selected, 0, (float[2]){0.0f})) {
             ct_cmd_system_a0.goto_idx(i);
             break;
         }
@@ -56,9 +52,7 @@ static void ui_command_list() {
 
 static void on_debugui(uint32_t bus_name,
                        void *event) {
-    if (ct_debugui_a0.BeginDock(WINDOW_NAME,
-                                &_G.visible,
-                                DebugUIWindowFlags_(0))) {
+    if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible, 0)) {
         ui_command_list();
     }
 
@@ -75,8 +69,8 @@ static void on_menu_window(uint32_t bus_name,
 static struct ct_command_history_a0 command_history_api = {
 };
 
-static void _init(ct_api_a0 *api) {
-    _G = {
+static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G){
             .visible = true,
     };
 
@@ -90,7 +84,7 @@ static void _shutdown() {
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

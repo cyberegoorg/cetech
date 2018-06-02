@@ -7,10 +7,6 @@
 
 #include "cetech/kernel/memory/allocator.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define ct_array_free(a, alloc) \
     ((a) ?  CT_FREE(alloc, ct_array_header(a)) : 0, a = NULL )
 
@@ -109,9 +105,5 @@ static void *ct_array_grow(void *a,
 }
 
 static void *_ = (void *) &ct_array_grow; // UNUSED
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ARRAY_H

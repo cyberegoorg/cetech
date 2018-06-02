@@ -456,12 +456,11 @@ void set_string(struct ct_yng_doc *_inst,
                 const char *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
-    struct ct_alloc *alloc = ct_memory_a0.main_allocator();
     char *str = inst->value[node.idx].string;
 
     //CT_FREE(alloc, str);
 
-    str = ct_memory_a0.str_dup(value, alloc);
+    str = ct_memory_a0.str_dup(value, _G.allocator);
     inst->value[node.idx].string = str;
     inst->modified = true;
 }
@@ -1006,7 +1005,7 @@ struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
                 inst->doc,
                 NODE_STRING,
                 (struct node_value) {.string = ct_memory_a0.str_dup(keys[i],
-                                                                    ct_memory_a0.main_allocator())},
+                                                                    _G.allocator)},
                 parent, key);
 
         uint32_t new_map_idx = new_node(
@@ -1026,7 +1025,7 @@ struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
             NODE_STRING,
             (struct node_value) {.string = ct_memory_a0.str_dup(
                     keys[keys_count - 1],
-                    ct_memory_a0.main_allocator())},
+                    _G.allocator)},
             parent, key_hash);
 
     return (struct ct_yamlng_node) {.idx = key_idx, .d = inst->doc};
@@ -1068,7 +1067,7 @@ void create_tree_bool(struct ct_yng_doc *_inst,
 
     uint32_t new_idx;
     char *str = ct_memory_a0.str_dup(value ? "yes" : "no",
-                                     ct_memory_a0.main_allocator());
+                                     _G.allocator);
     if (value) {
         new_idx = new_node(
                 d,
@@ -1116,7 +1115,7 @@ void create_tree_string(struct ct_yng_doc *_inst,
 
     uint32_t new_idx;
 
-    char *str = ct_memory_a0.str_dup(value, ct_memory_a0.main_allocator());
+    char *str = ct_memory_a0.str_dup(value, _G.allocator);
 
     new_idx = new_node(d,
                        NODE_STRING, (struct node_value) {.string = str},

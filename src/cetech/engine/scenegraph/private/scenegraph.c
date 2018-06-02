@@ -135,8 +135,7 @@ static void _destroy_world(uint32_t bus_name,
 
     struct ct_world last_world = _G.world_instances[last_idx].world;
 
-    CT_FREE(ct_memory_a0.main_allocator(),
-            _G.world_instances[idx].buffer);
+    CT_FREE(_G.allocator, _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
     ct_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
@@ -318,10 +317,10 @@ static struct ct_scene_node create(struct ct_world world,
     struct WorldInstance *data = _get_world_instance(world);
 
     uint32_t first_idx = data->n;
-    allocate(data, ct_memory_a0.main_allocator(), data->n + count);
+    allocate(data, _G.allocator, data->n + count);
     data->n += count;
 
-    struct ct_scene_node *nodes = CT_ALLOC(ct_memory_a0.main_allocator(),
+    struct ct_scene_node *nodes = CT_ALLOC(_G.allocator,
                                            struct ct_scene_node,
                                            sizeof(struct ct_scene_node) *
                                            count);
@@ -387,7 +386,7 @@ static struct ct_scene_node create(struct ct_world world,
     uint64_t hash = hash_combine(world.h, entity.h);
 
     ct_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
-    CT_FREE(ct_memory_a0.main_allocator(), nodes);
+    CT_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
     scene = ct_ecs_a0.entity_data(world, SCENEGRAPH_COMPONENT,

@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -21,8 +20,8 @@
 #include <cetech/playground/command_system.h>
 #include <cetech/engine/material/material.h>
 #include <cstdio>
+#include <cstring>
 
-using namespace celib;
 
 //==============================================================================
 // GLobals

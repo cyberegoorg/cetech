@@ -1,9 +1,7 @@
 #ifndef CETECH_PLAYGROUND_H
 #define CETECH_PLAYGROUND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -42,8 +40,5 @@ struct ct_playground_a0 {
     void (*reload_layout)();
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_PLAYGROUND_H

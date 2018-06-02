@@ -1,9 +1,7 @@
 #ifndef CETECH_LOG_VIEW_H
 #define CETECH_LOG_VIEW_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -19,8 +17,5 @@ struct ct_log_view_a0 {
     int _;
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_LOG_VIEW_H

@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 #include <cetech/kernel/macros.h>
-#include <cetech/kernel/containers/map.inl>
-
+#include <cetech/kernel/memory/allocator.h>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/os/vio.h>
 #include <cetech/kernel/yaml/ydb.h>
@@ -11,13 +10,13 @@
 #include "cetech/kernel/api/api_system.h"
 #include "cetech/kernel/module/module.h"
 
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <cetech/engine/camera/camera.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/playground/action_manager.h>
 #include <cetech/kernel/ebus/ebus.h>
 #include <cetech/kernel/kernel.h>
@@ -37,7 +36,6 @@ CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_render_graph_a0);
 
-using namespace celib;
 
 #define _G plaground_global
 
@@ -107,7 +105,7 @@ static float draw_main_menu() {
         if (ct_debugui_a0.BeginMenu("Window", true)) {
             if (ct_debugui_a0.BeginMenu("Layout", true)) {
                 if (ct_debugui_a0.MenuItem("Save", NULL, false, true)) {
-                    ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"),
+                    struct ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"),
                                               "core/default.dock_layout",
                                               FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
@@ -120,7 +118,7 @@ static float draw_main_menu() {
                 ct_debugui_a0.EndMenu();
             }
 
-            ImGui::Separator();
+            ct_debugui_a0.Separator();
 
             ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
                                  NULL,
@@ -145,20 +143,19 @@ static float draw_main_menu() {
 }
 
 static void on_debugui() {
-    auto menu_height = draw_main_menu();
+    float menu_height = draw_main_menu();
 
     uint32_t w, h;
     ct_renderer_a0.get_size(&w, &h);
     float pos[] = {0.0f, menu_height};
-    float size[] = {float(w), h - 25.0f};
+    float size[] = {(float)w, h - 25.0f};
 
     ct_debugui_a0.RootDock(pos, size);
 }
 
 static void debugui_on_setup(void *inst,
                              struct ct_render_graph_builder *builder) {
-    builder->call->add_pass(builder, static_cast<ct_render_graph_pass *>(inst),
-                            0);
+    builder->call->add_pass(builder, inst, 0);
 }
 
 static void debugui_on_pass(void *inst,
@@ -183,7 +180,7 @@ static void on_init(uint32_t ebus_name,
     };
 
     _G.module->call->add_pass(_G.module, &debugui_pass,
-                              sizeof(ct_render_graph_pass));
+                              sizeof(struct ct_render_graph_pass));
 
     _G.render_graph->call->add_module(_G.render_graph, _G.module);
 }
@@ -198,9 +195,9 @@ static void on_update(uint32_t ebus_name,
                       void *event) {
     ct_action_manager_a0.check();
 
-    ct_app_update_ev *app_ev = static_cast<ct_app_update_ev *>(event);
+    struct ct_app_update_ev *app_ev =event;
 
-    ct_playground_update_ev ev = {.dt=app_ev->dt};
+    struct ct_playground_update_ev ev = {.dt=app_ev->dt};
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT,
                          &ev, sizeof(ev));
@@ -229,12 +226,12 @@ static void on_ui(uint32_t ebus_name,
 }
 
 
-static ct_playground_a0 playground_api = {
+static struct ct_playground_a0 playground_api = {
         .reload_layout = reload_layout,
 };
 
-static void _init(ct_api_a0 *api) {
-    _G = {
+static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G){
             .load_layout = true,
     };
 
@@ -271,7 +268,7 @@ static void _shutdown() {
     ct_ebus_a0.disconnect(KERNEL_EBUS, RENDERER_RENDER_EVENT, on_render);
     ct_ebus_a0.disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

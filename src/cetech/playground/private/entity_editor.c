@@ -1,8 +1,9 @@
 #include <stdio.h>
 
+#include <cetech/kernel/cdb/cdb.h>
+#include <cetech/kernel/yaml/ydb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/texture/texture.h>
 #include <cetech/engine/debugui/debugui.h>
 
 #include <cetech/engine/camera/camera.h>
@@ -11,7 +12,6 @@
 #include <cetech/engine/controlers/keyboard.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
 
 #include <cetech/playground/playground.h>
 #include <cetech/kernel/math/fmath.h>
@@ -19,6 +19,8 @@
 #include <cetech/kernel/ebus/ebus.h>
 #include <cetech/engine/render_graph/render_graph.h>
 #include <cetech/engine/default_render_graph/default_render_graph.h>
+#include <cetech/kernel/macros.h>
+#include <string.h>
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -44,7 +46,9 @@ CETECH_DECL_API(ct_default_render_graph_a0);
 
 #define MAX_EDITOR 8
 
-static struct globals {
+#define _G entity_editor_globals
+
+static struct _G {
     bool visible[MAX_EDITOR];
     struct ct_world world[MAX_EDITOR];
     struct ct_entity camera_ent[MAX_EDITOR];
@@ -53,16 +57,16 @@ static struct globals {
     uint64_t root[MAX_EDITOR];
     uint32_t entity_name[MAX_EDITOR];
     bool is_first[MAX_EDITOR];
-    struct ct_render_graph* render_graph[MAX_EDITOR];
-    struct ct_render_graph_builder* render_graph_builder[MAX_EDITOR];
+    struct ct_render_graph *render_graph[MAX_EDITOR];
+    struct ct_render_graph_builder *render_graph_builder[MAX_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
 } _G;
 
 
-static void fps_camera_update(ct_world world,
-                              ct_entity camera_ent,
+static void fps_camera_update(struct ct_world world,
+                              struct ct_entity camera_ent,
                               float dt,
                               float dx,
                               float dy,
@@ -78,10 +82,10 @@ static void fps_camera_update(ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = static_cast<ct_transform_comp *>(ct_ecs_a0.entity_data(
+    transform = ct_ecs_a0.entity_data(
             world,
             TRANSFORM_COMPONENT,
-            camera_ent));
+            camera_ent);
 
     ct_mat4_move(wm, transform->world);
 
@@ -118,7 +122,7 @@ static void fps_camera_update(ct_world world,
 }
 
 static void on_debugui(uint32_t bus_name,
-                       void* event) {
+                       void *event) {
     char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -163,17 +167,19 @@ static void on_debugui(uint32_t bus_name,
 //                                                           _G.camera_ent[i]);
 //
             struct ct_camera_component *camera_data;
-            camera_data = static_cast<ct_camera_component *>(ct_ecs_a0.entity_data(_G.world[i],
-                                                                                               CAMERA_COMPONENT,
-                                                                                               _G.camera_ent[i]));
+            camera_data = ct_ecs_a0.entity_data(_G.world[i],
+                                          CAMERA_COMPONENT,
+                                          _G.camera_ent[i]);
 
             ct_render_texture_handle_t th;
-            th = _G.render_graph_builder[i]->call->get_texture(_G.render_graph_builder[i], CT_ID64_0("output"));
+            th = _G.render_graph_builder[i]->call->get_texture(
+                    _G.render_graph_builder[i], CT_ID64_0("output"));
 
             float size[2];
             ct_debugui_a0.GetWindowSize(size);
 
-            _G.render_graph_builder[i]->call->set_size(_G.render_graph_builder[i], size[0], size[1]);
+            _G.render_graph_builder[i]->call->set_size(
+                    _G.render_graph_builder[i], size[0], size[1]);
 
 //            ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
             ct_debugui_a0.Image2(th,
@@ -224,10 +230,11 @@ static void open(struct ct_resource_id asset,
         _G.render_graph[idx] = ct_render_graph_a0.create_graph();
         _G.render_graph_builder[idx] = ct_render_graph_a0.create_builder();
         _G.render_graph[idx]->call->add_module(_G.render_graph[idx],
-                                               ct_default_render_graph_a0.create( _G.world[idx]));
+                                               ct_default_render_graph_a0.create(
+                                                       _G.world[idx]));
     }
     _G.camera_ent[idx] = ct_ecs_a0.spawn_entity(_G.world[idx],
-                                                  CT_ID32_0("content/camera"));
+                                                CT_ID32_0("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
@@ -239,8 +246,8 @@ static void open(struct ct_resource_id asset,
 }
 
 static void update(uint32_t bus_name,
-                   void* event) {
-    ct_playground_update_ev *ev = static_cast<ct_playground_update_ev *>(event);
+                   void *event) {
+    struct ct_playground_update_ev *ev = event;
     float dt = ev->dt;
 
     if (UINT8_MAX != _G.active_editor) {
@@ -248,10 +255,10 @@ static void update(uint32_t bus_name,
         float updown = 0.0f;
         float leftright = 0.0f;
 
-        auto up_key = ct_keyboard_a0.button_index("w");
-        auto down_key = ct_keyboard_a0.button_index("s");
-        auto left_key = ct_keyboard_a0.button_index("a");
-        auto right_key = ct_keyboard_a0.button_index("d");
+        uint32_t up_key = ct_keyboard_a0.button_index("w");
+        uint32_t down_key = ct_keyboard_a0.button_index("s");
+        uint32_t left_key = ct_keyboard_a0.button_index("a");
+        uint32_t right_key = ct_keyboard_a0.button_index("d");
 
         if (ct_keyboard_a0.button_state(0, up_key) > 0) {
             updown = 1.0f;
@@ -287,25 +294,27 @@ static void update(uint32_t bus_name,
 static void on_render(uint32_t bus_name,
                       void *event) {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
+        _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
+
         if (!_G.visible[i]) {
             continue;
         }
 
-        _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
-        _G.render_graph[i]->call->setup(_G.render_graph[i], _G.render_graph_builder[i]);
+        _G.render_graph[i]->call->setup(_G.render_graph[i],
+                                        _G.render_graph_builder[i]);
         _G.render_graph_builder[i]->call->execute(_G.render_graph_builder[i]);
     }
 }
 
-static ct_entity_editor_a0 level_api = {
+static struct ct_entity_editor_a0 level_api = {
 //            .register_module = playground::register_module,
 //            .unregister_module = playground::unregister_module,
 };
 
 static void on_asset_double_click(uint32_t bus_name,
                                   void *event) {
-    ct_asset_browser_click_ev *ev = static_cast<ct_asset_browser_click_ev *>(event);
-    ct_resource_id rid = {.i64 = ev->asset};
+    struct ct_asset_browser_click_ev *ev = event;
+    struct ct_resource_id rid = {.i64 = ev->asset};
 
     if (CT_ID32_0("entity") == rid.type) {
         open(rid, ev->root, ev->path);
@@ -313,8 +322,8 @@ static void on_asset_double_click(uint32_t bus_name,
     }
 }
 
-static void _init(ct_api_a0 *api) {
-    _G = {
+static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G){
             .active_editor = UINT8_MAX
     };
 
@@ -322,7 +331,8 @@ static void _init(ct_api_a0 *api) {
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, on_asset_double_click, 0);
+    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+                       on_asset_double_click, 0);
 
     api->register_api("ct_level_view_a0", &level_api);
 }
@@ -331,9 +341,10 @@ static void _shutdown() {
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
-    ct_ebus_a0.disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, on_asset_double_click);
+    ct_ebus_a0.disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+                          on_asset_double_click);
 
-    _G = {};
+    _G = (struct _G){};
 }
 
 CETECH_MODULE_DEF(

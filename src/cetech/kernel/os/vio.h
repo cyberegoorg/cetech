@@ -1,9 +1,7 @@
 #ifndef CETECH_VIO_H
 #define CETECH_VIO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -56,8 +54,5 @@ struct ct_vio_a0 {
                                 enum ct_vio_open_mode mode);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_VIO_H

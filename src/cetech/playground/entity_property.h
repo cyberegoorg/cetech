@@ -1,9 +1,7 @@
 #ifndef CETECH_ENTITY_PROPERTY_H
 #define CETECH_ENTITY_PROPERTY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -31,8 +29,5 @@ struct ct_entity_property_a0 {
     void (*unregister_component)(uint64_t type);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ENTITY_PROPERTY_H

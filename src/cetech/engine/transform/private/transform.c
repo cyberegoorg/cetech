@@ -147,8 +147,9 @@ static struct _G {
 //    ct_array_pop_back(_G.world_instances);
 //}
 
-void _component_compiler(uint32_t ebus,void *event) {
-    struct ct_ecs_component_compile_ev* ev = event;
+void _component_compiler(uint32_t ebus,
+                         void *event) {
+    struct ct_ecs_component_compile_ev *ev = event;
 
     struct ct_transform_comp t_data;
 
@@ -254,13 +255,28 @@ static void _init(struct ct_api_a0 *api) {
             .type = CT_ID64_0("transform"),
     };
 
-    struct ct_component_prop_map prop_map[] = {
-            {.key = PROP_POSITION,
-                    .offset = offsetof(struct ct_transform_comp, position)},
-            {.key = PROP_ROTATION,
-                    .offset = offsetof(struct ct_transform_comp, rotation)},
-            {.key = PROP_SCALE,
-                    .offset = offsetof(struct ct_transform_comp, scale)}
+
+    static struct ct_component_prop_map prop_map[] = {
+            {
+                    .ui_name = "POSITION",
+                    .key = "position",
+                    .offset = offsetof(struct ct_transform_comp, position),
+                    .type = CDB_TYPE_VEC3,
+
+            },
+            {
+                    .ui_name = "ROTATION",
+                    .key = "rotation",
+                    .offset = offsetof(struct ct_transform_comp, rotation),
+                    .type = CDB_TYPE_VEC3,
+                    .limit = {.min_f = 0, .max_f = 360}
+            },
+            {
+                    .ui_name = "SCALE",
+                    .key = "scale",
+                    .offset = offsetof(struct ct_transform_comp, scale),
+                    .type = CDB_TYPE_VEC3,
+            }
     };
 
     ct_ecs_a0.register_component(
@@ -271,10 +287,12 @@ static void _init(struct ct_api_a0 *api) {
                     .prop_count = CT_ARRAY_LEN(prop_map)});
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_spawner, 0);
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
+                            _component_spawner, 0);
 
     ct_ebus_a0.connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_compiler, 0);
+                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
+                            _component_compiler, 0);
 
     ct_ebus_a0.connect(ECS_EBUS, ECS_COMPONENT_CHANGE, on_change, 0);
 
@@ -282,10 +300,12 @@ static void _init(struct ct_api_a0 *api) {
 
 static void _shutdown() {
     ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_spawner);
+                               CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
+                               _component_spawner);
 
     ct_ebus_a0.disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                            CT_ID64_0(TRANSFORMATION_COMPONENT_NAME), _component_compiler);
+                               CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
+                               _component_compiler);
 
     ct_ebus_a0.disconnect(ECS_EBUS, ECS_COMPONENT_CHANGE, on_change);
 }

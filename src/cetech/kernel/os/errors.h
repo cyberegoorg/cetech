@@ -1,9 +1,7 @@
 #ifndef CETECH_ERRORS_H
 #define CETECH_ERRORS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -44,8 +42,5 @@ void ct_error_assert(const char *where,
                      const char *filename,
                      int line);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ERRORS_H

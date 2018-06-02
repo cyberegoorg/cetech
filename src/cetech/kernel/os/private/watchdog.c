@@ -11,8 +11,7 @@
 #endif
 
 #include <cetech/kernel/macros.h>
-#include <cetech/kernel/containers/map.inl>
-#include <cetech/kernel/containers/eventstream.inl>
+
 
 #include <cetech/kernel/os/watchdog.h>
 #include <cetech/kernel/api/api_system.h>
@@ -24,6 +23,11 @@
 #include <cetech/kernel/os/path.h>
 
 #define LOG_WHERE "watchdog"
+#define _G watchdog_globals
+
+struct _G {
+   struct ct_alloc* allocator;
+}_G;
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_memory_a0);
@@ -31,12 +35,12 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_path_a0);
 
 struct watchdog_instance {
-    celib::EventStream event_stream;
+//    celib::EventStream event_stream;
 
-    celib::Map<char *> wd2dir;
-    celib::Map<int> dir2wd;
+//    celib::Map<char *> wd2dir;
+//    celib::Map<int> dir2wd;
 
-    ct_alloc *alloc;
+    struct ct_alloc *alloc;
 
 #ifdef CETECH_LINUX
     int inotify;
@@ -51,9 +55,9 @@ struct watchdog_instance {
 void add_dir(ct_watchdog_instance_t *inst,
              const char *path,
              bool recursive) {
-    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
+//    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
 
-    int wd = 0;
+//    int wd = 0;
 
 #ifdef CETECH_LINUX
     wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
@@ -66,71 +70,74 @@ void add_dir(ct_watchdog_instance_t *inst,
     }
 #endif
 
-    char *path_dup = ct_memory_a0.str_dup(path, wi->alloc);
-    uint64_t path_hash = CT_ID64_0(path_dup);
+//    char *path_dup = ct_memory_a0.str_dup(path, wi->alloc);
+//    uint64_t path_hash = CT_ID64_0(path_dup);
 
-    celib::map::set(wi->dir2wd, path_hash, wd);
-    celib::map::set(wi->wd2dir, wd, path_dup);
+//    celib::map::set(wi->dir2wd, path_hash, wd);
+//    celib::map::set(wi->wd2dir, wd, path_dup);
 
     if (recursive) {
         char **files;
         uint32_t files_count;
 
         ct_path_a0.list(path, "*", 1, 1, &files, &files_count,
-                        ct_memory_a0.main_allocator());
+                        _G.allocator);
 
         for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
         ct_path_a0.list_free(files, files_count,
-                             ct_memory_a0.main_allocator());
+                             _G.allocator);
     }
 }
 
-ct_watchdog_ev_header *event_begin(ct_watchdog_instance_t *inst) {
-    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
+struct ct_watchdog_ev_header *event_begin(ct_watchdog_instance_t *inst) {
+//    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
 
-    return celib::eventstream::begin<ct_watchdog_ev_header>(
-            wi->event_stream);
+//    return celib::eventstream::begin<ct_watchdog_ev_header>(
+//            wi->event_stream);
+    return NULL;
 }
 
-ct_watchdog_ev_header *event_end(ct_watchdog_instance_t *inst) {
-    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
+struct ct_watchdog_ev_header *event_end(ct_watchdog_instance_t *inst) {
+//    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
 
-    return celib::eventstream::end<ct_watchdog_ev_header>(wi->event_stream);
+//    return celib::eventstream::end<ct_watchdog_ev_header>(wi->event_stream);
+    return NULL;
 }
 
-ct_watchdog_ev_header *event_next(ct_watchdog_instance_t *inst,
-                                  ct_watchdog_ev_header *header) {
+struct ct_watchdog_ev_header *event_next(ct_watchdog_instance_t *inst,
+                                         struct ct_watchdog_ev_header *header) {
 
     CT_UNUSED(inst);
 
-    return celib::eventstream::next<ct_watchdog_ev_header>(header);
+//    return celib::eventstream::next<ct_watchdog_ev_header>(header);
+    return NULL;
 }
 
 
-void clean_events(watchdog_instance *wi) {
-    auto *wd_it = celib::eventstream::begin<ct_watchdog_ev_header>(
-            wi->event_stream);
-    const auto *wd_end = celib::eventstream::end<ct_watchdog_ev_header>(
-            wi->event_stream);
-
-    while (wd_it != wd_end) {
-        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
-            ct_wd_ev_file_write_end *ev = reinterpret_cast<ct_wd_ev_file_write_end *>(wd_it);
-            CT_FREE(wi->alloc, ev->filename);
-        }
-
-        wd_it = celib::eventstream::next<ct_watchdog_ev_header>(wd_it);
-    }
-
-
-    celib::eventstream::clear(wi->event_stream);
+void clean_events(struct watchdog_instance *wi) {
+//    auto *wd_it = celib::eventstream::begin<ct_watchdog_ev_header>(
+//            wi->event_stream);
+//    const auto *wd_end = celib::eventstream::end<ct_watchdog_ev_header>(
+//            wi->event_stream);
+//
+//    while (wd_it != wd_end) {
+//        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
+//            ct_wd_ev_file_write_end *ev = reinterpret_cast<ct_wd_ev_file_write_end *>(wd_it);
+//            CT_FREE(wi->alloc, ev->filename);
+//        }
+//
+//        wd_it = celib::eventstream::next<ct_watchdog_ev_header>(wd_it);
+//    }
+//
+//
+//    celib::eventstream::clear(wi->event_stream);
 }
 
 void fetch_events(ct_watchdog_instance_t *inst) {
-    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
+    struct watchdog_instance *wi = inst;
 
     clean_events(wi);
 
@@ -178,15 +185,18 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
 }
 
-ct_watchdog *create(struct ct_alloc *alloc) {
-    ct_watchdog *watchdog = CT_ALLOC(alloc, ct_watchdog,
-                                         sizeof(ct_watchdog));
-    watchdog_instance *watchdog_inst = CT_ALLOC(alloc, watchdog_instance,
-                                                    sizeof(watchdog_instance));
+struct ct_watchdog *create(struct ct_alloc *alloc) {
+    struct ct_watchdog *watchdog = CT_ALLOC(alloc,
+                                            struct ct_watchdog,
+                                            sizeof(struct ct_watchdog));
 
-    watchdog_inst->event_stream.init(alloc);
-    watchdog_inst->wd2dir.init(alloc);
-    watchdog_inst->dir2wd.init(alloc);
+    struct watchdog_instance *watchdog_inst = CT_ALLOC(alloc,
+                                                       struct watchdog_instance,
+                                                       sizeof(struct watchdog_instance));
+
+//    watchdog_inst->event_stream.init(alloc);
+//    watchdog_inst->wd2dir.init(alloc);
+//    watchdog_inst->dir2wd.init(alloc);
 
     if (NULL == watchdog) {
         return NULL;
@@ -203,7 +213,7 @@ ct_watchdog *create(struct ct_alloc *alloc) {
 
     watchdog_inst->alloc = alloc;
 
-    *watchdog = {
+    *watchdog = (struct ct_watchdog){
             .inst = watchdog_inst,
             .add_dir = add_dir,
             .fetch_events = fetch_events,
@@ -216,38 +226,37 @@ ct_watchdog *create(struct ct_alloc *alloc) {
 }
 
 void destroy(struct ct_watchdog *watchdog) {
-    watchdog_instance *wi = static_cast<watchdog_instance *>(watchdog->inst);
-
+    struct watchdog_instance *wi = (watchdog->inst);
     clean_events(wi);
-    wi->event_stream.destroy();
+//    wi->event_stream.destroy();
 
-    ct_alloc *alloc = wi->alloc;
+    struct ct_alloc *alloc = wi->alloc;
 
-    auto ct_it = celib::map::begin(wi->wd2dir);
-    auto ct_end = celib::map::end(wi->wd2dir);
-
-    while (ct_it != ct_end) {
-        CT_FREE(alloc, ct_it->value);
-
-#ifdef CETECH_LINUX
-        inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
-#endif
-
-        ++ct_it;
-    }
-
-#ifdef CETECH_LINUX
-    close(wi->inotify);
-#endif
-
-    wi->wd2dir.destroy();
-    wi->dir2wd.destroy();
+////    auto ct_it = celib::map::begin(wi->wd2dir);
+////    auto ct_end = celib::map::end(wi->wd2dir);
+//
+//    while (ct_it != ct_end) {
+//        CT_FREE(alloc, ct_it->value);
+//
+//#ifdef CETECH_LINUX
+//        inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
+//#endif
+//
+//        ++ct_it;
+//    }
+//
+//#ifdef CETECH_LINUX
+//    close(wi->inotify);
+//#endif
+//
+//    wi->wd2dir.destroy();
+//    wi->dir2wd.destroy();
 
 
     CT_FREE(alloc, watchdog);
 }
 
-static ct_watchdog_a0 wathdog_api = {
+static struct ct_watchdog_a0 wathdog_api = {
         .create = create,
         .destroy = destroy,
 };
@@ -263,6 +272,7 @@ CETECH_MODULE_DEF(
         {
             CT_UNUSED(reload);
             api->register_api("ct_watchdog_a0", &wathdog_api);
+            _G = (struct _G){.allocator = ct_memory_a0.main_allocator()};
         },
         {
             CT_UNUSED(reload);

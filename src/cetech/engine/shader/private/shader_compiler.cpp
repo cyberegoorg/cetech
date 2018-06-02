@@ -5,7 +5,6 @@
 #include <cstdio>
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 #include "cetech/kernel/containers/buffer.h"
 
 #include "cetech/kernel/api/api_system.h"
@@ -23,8 +22,6 @@
 #include "cetech/engine/resource/resource.h"
 
 #include "shader_blob.h"
-
-using namespace celib;
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_resource_a0);
@@ -78,7 +75,7 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
 
-    auto a = ct_memory_a0.main_allocator();
+    struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     char dir[1024] = {};
     ct_path_a0.dir(dir, filename);
@@ -113,7 +110,7 @@ const char* fs_profile = "ps_4_0";
 static void compiler(const char *filename,
                      char **output,
                      struct ct_compilator_api *compilator_api) {
-    auto a = ct_memory_a0.main_allocator();
+    struct ct_alloc *a = ct_memory_a0.main_allocator();
 
     uint64_t key[] = {
             ct_yng_a0.key("vs_input")

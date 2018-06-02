@@ -1,9 +1,7 @@
 #ifndef CETECH_ASSET_BROWSER_H
 #define CETECH_ASSET_BROWSER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -45,8 +43,5 @@ struct ct_asset_browser_a0 {
     void (*get_selected_asset_name)(char *asset_name);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ASSET_BROWSER_H

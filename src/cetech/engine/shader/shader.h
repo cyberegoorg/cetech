@@ -3,9 +3,7 @@
 
 #include <cetech/kernel/cdb/cdb.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -34,8 +32,5 @@ struct ct_shader_a0 {
     ct_shader (*get)(ct_cdb_obj_t* shader);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_SHADER_H

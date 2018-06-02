@@ -3,9 +3,7 @@
 
 #include <cetech/macros.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -139,8 +137,5 @@ struct ct_log_a0 {
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_LOG_API_H

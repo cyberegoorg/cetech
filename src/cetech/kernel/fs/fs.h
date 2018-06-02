@@ -1,9 +1,7 @@
 #ifndef CETECH_FILESYSTEM_TYPES_H
 #define CETECH_FILESYSTEM_TYPES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -69,9 +67,6 @@ struct ct_fs_a0 {
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_FILESYSTEM_TYPES_H
 //! |}

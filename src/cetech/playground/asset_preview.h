@@ -3,9 +3,7 @@
 
 #include <cetech/engine/resource/resource.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -35,8 +33,5 @@ struct ct_asset_preview_a0 {
     void (*unregister_type_preview)(const char* type);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_ASSET_PREVIEW_H

@@ -1,3 +1,4 @@
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugui/debugui.h>
@@ -179,7 +180,7 @@ static void set_asset(uint32_t bus_name,
                                       TRANSFORM_COMPONENT,
                                       _G.camera_ent);
 
-//    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
+    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
 static void init(uint32_t bus_name,
@@ -199,6 +200,11 @@ static void init(uint32_t bus_name,
 static void on_render(uint32_t bus_name,
                       void *event) {
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
+
+    if (!_G.visible) {
+        return;
+    }
+
     _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }

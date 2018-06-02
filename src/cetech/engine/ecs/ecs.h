@@ -2,9 +2,7 @@
 #define CETECH_WORLD_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -40,7 +38,7 @@ typedef void ct_entity_storage_t;
 //==============================================================================
 // Enums
 //==============================================================================
-
+enum ct_cdb_type;
 
 //==============================================================================
 // Typedefs
@@ -77,8 +75,20 @@ struct ct_ecs_component_compile_ev {
 };
 
 struct ct_component_prop_map {
-    uint64_t key;
+    const char* ui_name;
+    const char* key;
     uint64_t offset;
+    enum ct_cdb_type type;
+    struct {
+        union {
+            float min_f;
+        };
+
+        union {
+            float max_f;
+        };
+    } limit;
+
 };
 
 struct ct_component_info {
@@ -139,6 +149,10 @@ struct ct_ecs_a0 {
     // COMPONENT
     void (*register_component)(struct ct_component_info info);
 
+    const uint64_t* (*get_components)();
+
+    struct ct_component_info* (*component_info)(uint64_t component_name);
+
     uint64_t (*component_mask)(uint64_t component_name);
 
     void *(*entities_data)(uint64_t component_name,
@@ -183,9 +197,6 @@ struct ct_ecs_a0 {
 //                           uint64_t name);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_WORLD_H
 //! \}

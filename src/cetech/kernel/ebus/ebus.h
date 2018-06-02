@@ -1,13 +1,12 @@
 #ifndef CETECH_EBUS_H
 #define CETECH_EBUS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
 //==============================================================================
+#include <stdint.h>
 
 //==============================================================================
 // Structs
@@ -71,8 +70,5 @@ struct ct_ebus_a0 {
 };
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_EBUS_H

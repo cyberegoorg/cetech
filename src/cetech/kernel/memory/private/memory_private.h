@@ -1,9 +1,7 @@
 #ifndef CETECH__MEMORY_H
 #define CETECH__MEMORY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include <stdlib.h>
 
@@ -49,8 +47,5 @@ void fill(struct Header *header,
           void *data,
           uint32_t size);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH__MEMORY_H

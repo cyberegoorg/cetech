@@ -1,9 +1,7 @@
 #ifndef CETECH_SCENE_H
 #define CETECH_SCENE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -46,8 +44,5 @@ struct ct_scene_a0 {
                           uint32_t *count);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_SCENE_H

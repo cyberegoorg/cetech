@@ -1,9 +1,7 @@
 #ifndef CETECH_LEVEL_INSPECTOR_H
 #define CETECH_LEVEL_INSPECTOR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -33,23 +31,20 @@ struct ct_ent_selected_ev {
     struct ct_world world;
     struct ct_entity entity;
     const char *filename;
-    ct_cdb_obj_t* obj;
-};;
+    struct ct_cdb_obj_t* obj;
+};
 
 //==============================================================================
 // Api
 //==============================================================================
 
 struct ct_explorer_a0 {
-    void (*set_level)(ct_world world,
-                      ct_entity level,
+    void (*set_level)(struct ct_world world,
+                      struct ct_entity level,
                       uint64_t name,
                       uint64_t root,
                       const char *path);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_LEVEL_INSPECTOR_H

@@ -3,9 +3,7 @@
 
 #include <cetech/kernel/cdb/cdb.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -70,8 +68,5 @@ struct ct_material_a0 {
                                 struct ct_render_texture_handle texture);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_MATERIAL_H

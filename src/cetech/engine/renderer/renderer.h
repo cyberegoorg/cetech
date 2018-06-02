@@ -4,9 +4,7 @@
 #ifndef CETECH_RENDERER_H
 #define CETECH_RENDERER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -14,6 +12,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 //==============================================================================
 // Typedefs
@@ -526,7 +525,7 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_DEPTH_TEST_SHIFT        4                            //!< Depth test state bit shift.
 #define CT_RENDER_STATE_DEPTH_TEST_MASK         UINT64_C(0x00000000000000f0) //!< Depth test state bit mask.
 
-/// Use CT_RENDER_STATE_BLEND_FUNC(_src, _dst) or CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)
+/// Use CT_RENDER_STATE_BLEND_FUNC(_src, dst) or CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, dstRGB, srcA, dstA)
 /// helper macros.
 #define CT_RENDER_STATE_BLEND_ZERO              UINT64_C(0x0000000000001000) //!< 0, 0, 0, 0
 #define CT_RENDER_STATE_BLEND_ONE               UINT64_C(0x0000000000002000) //!< 1, 1, 1, 1
@@ -544,7 +543,7 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_BLEND_SHIFT             12                           //!< Blend state bit shift.
 #define CT_RENDER_STATE_BLEND_MASK              UINT64_C(0x000000000ffff000) //!< Blend state bit mask.
 
-/// Use CT_RENDER_STATE_BLEND_EQUATION(_equation) or CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)
+/// Use CT_RENDER_STATE_BLEND_EQUATION(_equation) or CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, equationA)
 /// helper macros.
 #define CT_RENDER_STATE_BLEND_EQUATION_ADD      UINT64_C(0x0000000000000000) //!< Blend add: src + dst.
 #define CT_RENDER_STATE_BLEND_EQUATION_SUB      UINT64_C(0x0000000010000000) //!< Blend subtract: src - dst.
@@ -609,19 +608,19 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_POINT_SIZE(_size) ( ( (uint64_t)(_size)<<CT_RENDER_STATE_POINT_SIZE_SHIFT)&CT_RENDER_STATE_POINT_SIZE_MASK)
 
 /// Blend function separate.
-#define CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
+#define CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, dstRGB, srcA, dstA) (UINT64_C(0) \
             | ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   )               \
             | ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8)               \
             )
 
 /// Blend equation separate.
-#define CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA) ( (uint64_t)(_equationRGB)|( (uint64_t)(_equationA)<<3) )
+#define CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, equationA) ( (uint64_t)(_equationRGB)|( (uint64_t)(_equationA)<<3) )
 
 /// Blend function.
-#define CT_RENDER_STATE_BLEND_FUNC(_src, _dst)    CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_src, _dst, _src, _dst)
+#define CT_RENDER_STATE_BLEND_FUNC(_src, dst)    CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_src, dst, src, dst)
 
 /// Blend equation.
-#define CT_RENDER_STATE_BLEND_EQUATION(_equation) CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equation, _equation)
+#define CT_RENDER_STATE_BLEND_EQUATION(_equation) CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equation, equation)
 
 /// Utility predefined blend modes.
 
@@ -669,23 +668,23 @@ typedef enum ct_render_fatal {
     )
 
 ///
-#define CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst) (0               \
+#define CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst) (0               \
             | ( (uint32_t)( (_src)>>CT_RENDER_STATE_BLEND_SHIFT)       \
             | ( (uint32_t)( (_dst)>>CT_RENDER_STATE_BLEND_SHIFT)<<4) ) \
             )
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation) (0               \
-            | CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)                        \
+#define CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation) (0               \
+            | CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)                        \
             | ( (uint32_t)( (_equation)>>CT_RENDER_STATE_BLEND_EQUATION_SHIFT)<<8) \
             )
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_1(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<< 0)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_2(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<<11)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_3(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<<22)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_1(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<< 0)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_2(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<<11)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_3(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<<22)
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_1E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<< 0)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_2E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<<11)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_3E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<<22)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_1E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<< 0)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_2E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<<11)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_3E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<<22)
 
 ///
 #define CT_RENDER_STENCIL_FUNC_REF_SHIFT      0                    //!<
@@ -1027,69 +1026,69 @@ struct ct_renderer_a0 {
 
     ///
     void (*vertex_decl_begin)(ct_render_vertex_decl_t *_decl,
-                              ct_render_renderer_type_t _renderer);
+                              ct_render_renderer_type_t renderer);
 
     void (*vertex_decl_add)(ct_render_vertex_decl_t *_decl,
-                            ct_render_attrib_t _attrib,
-                            uint8_t _num,
-                            ct_render_attrib_type_t _type,
-                            bool _normalized,
-                            bool _asInt);
+                            ct_render_attrib_t attrib,
+                            uint8_t num,
+                            ct_render_attrib_type_t type,
+                            bool normalized,
+                            bool asInt);
 
     void (*vertex_decl_skip)(ct_render_vertex_decl_t *_decl,
-                             uint8_t _num);
+                             uint8_t num);
 
     void (*vertex_decl_end)(ct_render_vertex_decl_t *_decl);
 
-    void (*vertex_pack)(const float _input[4],
-                        bool _inputNormalized,
-                        ct_render_attrib_t _attr,
+    void (*vertex_pack)(const float input[4],
+                        bool inputNormalized,
+                        ct_render_attrib_t attr,
                         const ct_render_vertex_decl_t *_decl,
                         void *_data,
-                        uint32_t _index);
+                        uint32_t index);
 
-    void (*vertex_unpack)(float _output[4],
-                          ct_render_attrib_t _attr,
+    void (*vertex_unpack)(float output[4],
+                          ct_render_attrib_t attr,
                           const ct_render_vertex_decl_t *_decl,
                           const void *_data,
-                          uint32_t _index);
+                          uint32_t index);
 
     void (*vertex_convert)(const ct_render_vertex_decl_t *_destDecl,
                            void *_destData,
                            const ct_render_vertex_decl_t *_srcDecl,
                            const void *_srcData,
-                           uint32_t _num);
+                           uint32_t num);
 
     uint16_t (*weld_vertices)(uint16_t *_output,
                               const ct_render_vertex_decl_t *_decl,
                               const void *_data,
-                              uint16_t _num,
-                              float _epsilon);
+                              uint16_t num,
+                              float epsilon);
 
-    uint32_t (*topology_convert)(ct_render_topology_convert_t _conversion,
+    uint32_t (*topology_convert)(ct_render_topology_convert_t conversion,
                                  void *_dst,
-                                 uint32_t _dstSize,
+                                 uint32_t dstSize,
                                  const void *_indices,
-                                 uint32_t _numIndices,
-                                 bool _index32);
+                                 uint32_t numIndices,
+                                 bool index32);
 
-    void (*topology_sort_tri_list)(ct_render_topology_sort_t _sort,
+    void (*topology_sort_tri_list)(ct_render_topology_sort_t sort,
                                    void *_dst,
-                                   uint32_t _dstSize,
-                                   const float _dir[3],
-                                   const float _pos[3],
+                                   uint32_t dstSize,
+                                   const float dir[3],
+                                   const float pos[3],
                                    const void *_vertices,
-                                   uint32_t _stride,
+                                   uint32_t stride,
                                    const void *_indices,
-                                   uint32_t _numIndices,
-                                   bool _index32);
+                                   uint32_t numIndices,
+                                   bool index32);
 
-    uint8_t (*get_supported_renderers)(uint8_t _max,
+    uint8_t (*get_supported_renderers)(uint8_t max,
                                        ct_render_renderer_type_t *_enum);
 
-    const char *(*get_renderer_name)(ct_render_renderer_type_t _type);
+    const char *(*get_renderer_name)(ct_render_renderer_type_t type);
 
-    uint32_t (*frame)(bool _capture);
+    uint32_t (*frame)(bool capture);
 
     ct_render_renderer_type_t (*get_renderer_type)();
 
@@ -1099,308 +1098,308 @@ struct ct_renderer_a0 {
 
     const ct_render_stats_t *(*get_stats)();
 
-    const ct_render_memory_t *(*alloc)(uint32_t _size);
+    const ct_render_memory_t *(*alloc)(uint32_t size);
 
     const ct_render_memory_t *(*copy)(const void *_data,
-                                      uint32_t _size);
+                                      uint32_t size);
 
     const ct_render_memory_t *(*make_ref)(const void *_data,
-                                          uint32_t _size);
+                                          uint32_t size);
 
     const ct_render_memory_t *(*make_ref_release)(const void *_data,
-                                                  uint32_t _size,
-                                                  ct_render_release_fn_t _releaseFn,
+                                                  uint32_t size,
+                                                  ct_render_release_fn_t releaseFn,
                                                   void *_userData);
 
-    void (*dbg_text_clear)(uint8_t _attr,
-                           bool _small);
+    void (*dbg_text_clear)(uint8_t attr,
+                           bool small);
 
-    void (*dbg_text_printf)(uint16_t _x,
-                            uint16_t _y,
-                            uint8_t _attr,
+    void (*dbg_text_printf)(uint16_t x,
+                            uint16_t y,
+                            uint8_t attr,
                             const char *_format,
                             ...);
 
-    void (*dbg_text_vprintf)(uint16_t _x,
-                             uint16_t _y,
-                             uint8_t _attr,
+    void (*dbg_text_vprintf)(uint16_t x,
+                             uint16_t y,
+                             uint8_t attr,
                              const char *_format,
-                             va_list _argList);
+                             va_list argList);
 
-    void (*dbg_text_image)(uint16_t _x,
-                           uint16_t _y,
-                           uint16_t _width,
-                           uint16_t _height,
+    void (*dbg_text_image)(uint16_t x,
+                           uint16_t y,
+                           uint16_t width,
+                           uint16_t height,
                            const void *_data,
-                           uint16_t _pitch);
+                           uint16_t pitch);
 
     ct_render_index_buffer_handle_t
     (*create_index_buffer)(const ct_render_memory_t *_mem,
-                           uint16_t _flags);
+                           uint16_t flags);
 
-    void (*destroy_index_buffer)(ct_render_index_buffer_handle_t _handle);
+    void (*destroy_index_buffer)(ct_render_index_buffer_handle_t handle);
 
     ct_render_vertex_buffer_handle_t
     (*create_vertex_buffer)(const ct_render_memory_t *_mem,
                             const ct_render_vertex_decl_t *_decl,
-                            uint16_t _flags);
+                            uint16_t flags);
 
-    void (*destroy_vertex_buffer)(ct_render_vertex_buffer_handle_t _handle);
+    void (*destroy_vertex_buffer)(ct_render_vertex_buffer_handle_t handle);
 
     ct_render_dynamic_index_buffer_handle_t
-    (*create_dynamic_index_buffer)(uint32_t _num,
-                                   uint16_t _flags);
+    (*create_dynamic_index_buffer)(uint32_t num,
+                                   uint16_t flags);
 
     ct_render_dynamic_index_buffer_handle_t
     (*create_dynamic_index_buffer_mem)(const ct_render_memory_t *_mem,
-                                       uint16_t _flags);
+                                       uint16_t flags);
 
     void
-    (*update_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t _handle,
-                                   uint32_t _startIndex,
+    (*update_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t handle,
+                                   uint32_t startIndex,
                                    const ct_render_memory_t *_mem);
 
     void
-    (*destroy_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t _handle);
+    (*destroy_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t handle);
 
     ct_render_dynamic_vertex_buffer_handle_t
-    (*create_dynamic_vertex_buffer)(uint32_t _num,
+    (*create_dynamic_vertex_buffer)(uint32_t num,
                                     const ct_render_vertex_decl_t *_decl,
-                                    uint16_t _flags);
+                                    uint16_t flags);
 
     ct_render_dynamic_vertex_buffer_handle_t
     (*create_dynamic_vertex_buffer_mem)(const ct_render_memory_t *_mem,
                                         const ct_render_vertex_decl_t *_decl,
-                                        uint16_t _flags);
+                                        uint16_t flags);
 
     void
-    (*update_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                    uint32_t _startVertex,
+    (*update_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t handle,
+                                    uint32_t startVertex,
                                     const ct_render_memory_t *_mem);
 
     void
-    (*destroy_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t _handle);
+    (*destroy_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t handle);
 
-    uint32_t (*get_avail_transient_index_buffer)(uint32_t _num);
+    uint32_t (*get_avail_transient_index_buffer)(uint32_t num);
 
-    uint32_t (*get_avail_transient_vertex_buffer)(uint32_t _num,
+    uint32_t (*get_avail_transient_vertex_buffer)(uint32_t num,
                                                   const ct_render_vertex_decl_t *_decl);
 
-    uint32_t (*get_avail_instance_data_buffer)(uint32_t _num,
-                                               uint16_t _stride);
+    uint32_t (*get_avail_instance_data_buffer)(uint32_t num,
+                                               uint16_t stride);
 
     void
     (*alloc_transient_index_buffer)(ct_render_transient_index_buffer_t *_tib,
-                                    uint32_t _num);
+                                    uint32_t num);
 
     void
     (*alloc_transient_vertex_buffer)(ct_render_transient_vertex_buffer_t *_tvb,
-                                     uint32_t _num,
+                                     uint32_t num,
                                      const ct_render_vertex_decl_t *_decl);
 
     bool (*alloc_transient_buffers)(ct_render_transient_vertex_buffer_t *_tvb,
                                     const ct_render_vertex_decl_t *_decl,
-                                    uint32_t _numVertices,
+                                    uint32_t numVertices,
                                     ct_render_transient_index_buffer_t *_tib,
-                                    uint32_t _numIndices);
+                                    uint32_t numIndices);
 
     void (*alloc_instance_data_buffer)(ct_render_instance_data_buffer_t *_idb,
-                                       uint32_t _num,
-                                       uint16_t _stride);
+                                       uint32_t num,
+                                       uint16_t stride);
 
-    ct_render_indirect_buffer_handle_t (*create_indirect_buffer)(uint32_t _num);
+    ct_render_indirect_buffer_handle_t (*create_indirect_buffer)(uint32_t num);
 
-    void (*destroy_indirect_buffer)(ct_render_indirect_buffer_handle_t _handle);
+    void (*destroy_indirect_buffer)(ct_render_indirect_buffer_handle_t handle);
 
     ct_render_shader_handle_t (*create_shader)(const ct_render_memory_t *_mem);
 
-    uint16_t (*get_shader_uniforms)(ct_render_shader_handle_t _handle,
+    uint16_t (*get_shader_uniforms)(ct_render_shader_handle_t handle,
                                     ct_render_uniform_handle_t *_uniforms,
-                                    uint16_t _max);
+                                    uint16_t max);
 
-    void (*set_shader_name)(ct_render_shader_handle_t _handle,
+    void (*set_shader_name)(ct_render_shader_handle_t handle,
                             const char *_name);
 
-    void (*destroy_shader)(ct_render_shader_handle_t _handle);
+    void (*destroy_shader)(ct_render_shader_handle_t handle);
 
-    ct_render_program_handle_t (*create_program)(ct_render_shader_handle_t _vsh,
-                                                 ct_render_shader_handle_t _fsh,
-                                                 bool _destroyShaders);
+    ct_render_program_handle_t (*create_program)(ct_render_shader_handle_t vsh,
+                                                 ct_render_shader_handle_t fsh,
+                                                 bool destroyShaders);
 
     ct_render_program_handle_t
-    (*create_compute_program)(ct_render_shader_handle_t _csh,
-                              bool _destroyShaders);
+    (*create_compute_program)(ct_render_shader_handle_t csh,
+                              bool destroyShaders);
 
-    void (*destroy_program)(ct_render_program_handle_t _handle);
+    void (*destroy_program)(ct_render_program_handle_t handle);
 
-    bool (*is_texture_valid)(uint16_t _depth,
-                             bool _cubeMap,
-                             uint16_t _numLayers,
-                             ct_render_texture_format_t _format,
-                             uint32_t _flags);
+    bool (*is_texture_valid)(uint16_t depth,
+                             bool cubeMap,
+                             uint16_t numLayers,
+                             ct_render_texture_format_t format,
+                             uint32_t flags);
 
     void (*calc_texture_size)(ct_render_texture_info_t *_info,
-                              uint16_t _width,
-                              uint16_t _height,
-                              uint16_t _depth,
-                              bool _cubeMap,
-                              bool _hasMips,
-                              uint16_t _numLayers,
-                              ct_render_texture_format_t _format);
+                              uint16_t width,
+                              uint16_t height,
+                              uint16_t depth,
+                              bool cubeMap,
+                              bool hasMips,
+                              uint16_t numLayers,
+                              ct_render_texture_format_t format);
 
     ct_render_texture_handle_t (*create_texture)(const ct_render_memory_t *_mem,
-                                                 uint32_t _flags,
-                                                 uint8_t _skip,
+                                                 uint32_t flags,
+                                                 uint8_t skip,
                                                  ct_render_texture_info_t *_info);
 
-    ct_render_texture_handle_t (*create_texture_2d)(uint16_t _width,
-                                                    uint16_t _height,
-                                                    bool _hasMips,
-                                                    uint16_t _numLayers,
-                                                    ct_render_texture_format_t _format,
-                                                    uint32_t _flags,
+    ct_render_texture_handle_t (*create_texture_2d)(uint16_t width,
+                                                    uint16_t height,
+                                                    bool hasMips,
+                                                    uint16_t numLayers,
+                                                    ct_render_texture_format_t format,
+                                                    uint32_t flags,
                                                     const ct_render_memory_t *_mem);
 
     ct_render_texture_handle_t
-    (*create_texture_2d_scaled)(ct_render_backbuffer_ratio_t _ratio,
-                                bool _hasMips,
-                                uint16_t _numLayers,
-                                ct_render_texture_format_t _format,
-                                uint32_t _flags);
+    (*create_texture_2d_scaled)(ct_render_backbuffer_ratio_t ratio,
+                                bool hasMips,
+                                uint16_t numLayers,
+                                ct_render_texture_format_t format,
+                                uint32_t flags);
 
-    ct_render_texture_handle_t (*create_texture_3d)(uint16_t _width,
-                                                    uint16_t _height,
-                                                    uint16_t _depth,
-                                                    bool _hasMips,
-                                                    ct_render_texture_format_t _format,
-                                                    uint32_t _flags,
+    ct_render_texture_handle_t (*create_texture_3d)(uint16_t width,
+                                                    uint16_t height,
+                                                    uint16_t depth,
+                                                    bool hasMips,
+                                                    ct_render_texture_format_t format,
+                                                    uint32_t flags,
                                                     const ct_render_memory_t *_mem);
 
-    ct_render_texture_handle_t (*create_texture_cube)(uint16_t _size,
-                                                      bool _hasMips,
-                                                      uint16_t _numLayers,
-                                                      ct_render_texture_format_t _format,
-                                                      uint32_t _flags,
+    ct_render_texture_handle_t (*create_texture_cube)(uint16_t size,
+                                                      bool hasMips,
+                                                      uint16_t numLayers,
+                                                      ct_render_texture_format_t format,
+                                                      uint32_t flags,
                                                       const ct_render_memory_t *_mem);
 
-    void (*update_texture_2d)(ct_render_texture_handle_t _handle,
-                              uint16_t _layer,
-                              uint8_t _mip,
-                              uint16_t _x,
-                              uint16_t _y,
-                              uint16_t _width,
-                              uint16_t _height,
+    void (*update_texture_2d)(ct_render_texture_handle_t handle,
+                              uint16_t layer,
+                              uint8_t mip,
+                              uint16_t x,
+                              uint16_t y,
+                              uint16_t width,
+                              uint16_t height,
                               const ct_render_memory_t *_mem,
-                              uint16_t _pitch);
+                              uint16_t pitch);
 
-    void (*update_texture_3d)(ct_render_texture_handle_t _handle,
-                              uint8_t _mip,
-                              uint16_t _x,
-                              uint16_t _y,
-                              uint16_t _z,
-                              uint16_t _width,
-                              uint16_t _height,
-                              uint16_t _depth,
+    void (*update_texture_3d)(ct_render_texture_handle_t handle,
+                              uint8_t mip,
+                              uint16_t x,
+                              uint16_t y,
+                              uint16_t z,
+                              uint16_t width,
+                              uint16_t height,
+                              uint16_t depth,
                               const ct_render_memory_t *_mem);
 
-    void (*update_texture_cube)(ct_render_texture_handle_t _handle,
-                                uint16_t _layer,
-                                uint8_t _side,
-                                uint8_t _mip,
-                                uint16_t _x,
-                                uint16_t _y,
-                                uint16_t _width,
-                                uint16_t _height,
+    void (*update_texture_cube)(ct_render_texture_handle_t handle,
+                                uint16_t layer,
+                                uint8_t side,
+                                uint8_t mip,
+                                uint16_t x,
+                                uint16_t y,
+                                uint16_t width,
+                                uint16_t height,
                                 const ct_render_memory_t *_mem,
-                                uint16_t _pitch);
+                                uint16_t pitch);
 
-    uint32_t (*read_texture)(ct_render_texture_handle_t _handle,
+    uint32_t (*read_texture)(ct_render_texture_handle_t handle,
                              void *_data,
-                             uint8_t _mip);
+                             uint8_t mip);
 
-    void (*set_texture_name)(ct_render_texture_handle_t _handle,
+    void (*set_texture_name)(ct_render_texture_handle_t handle,
                              const char *_name);
 
-    void *(*get_direct_access_ptr)(ct_render_texture_handle_t _handle);
+    void *(*get_direct_access_ptr)(ct_render_texture_handle_t handle);
 
-    void (*destroy_texture)(ct_render_texture_handle_t _handle);
+    void (*destroy_texture)(ct_render_texture_handle_t handle);
 
-    ct_render_frame_buffer_handle_t (*create_frame_buffer)(uint16_t _width,
-                                                           uint16_t _height,
-                                                           ct_render_texture_format_t _format,
-                                                           uint32_t _textureFlags);
-
-    ct_render_frame_buffer_handle_t
-    (*create_frame_buffer_scaled)(ct_render_backbuffer_ratio_t _ratio,
-                                  ct_render_texture_format_t _format,
-                                  uint32_t _textureFlags);
+    ct_render_frame_buffer_handle_t (*create_frame_buffer)(uint16_t width,
+                                                           uint16_t height,
+                                                           ct_render_texture_format_t format,
+                                                           uint32_t textureFlags);
 
     ct_render_frame_buffer_handle_t
-    (*create_frame_buffer_from_attachment)(uint8_t _num,
+    (*create_frame_buffer_scaled)(ct_render_backbuffer_ratio_t ratio,
+                                  ct_render_texture_format_t format,
+                                  uint32_t textureFlags);
+
+    ct_render_frame_buffer_handle_t
+    (*create_frame_buffer_from_attachment)(uint8_t num,
                                            const ct_render_attachment_t *_attachment,
-                                           bool _destroyTextures);
+                                           bool destroyTextures);
 
     ct_render_frame_buffer_handle_t (*create_frame_buffer_from_nwh)(void *_nwh,
-                                                                    uint16_t _width,
-                                                                    uint16_t _height,
-                                                                    ct_render_texture_format_t _depthFormat);
+                                                                    uint16_t width,
+                                                                    uint16_t height,
+                                                                    ct_render_texture_format_t depthFormat);
 
     ct_render_frame_buffer_handle_t
-    (*create_frame_buffer_from_handles)(uint8_t _num,
+    (*create_frame_buffer_from_handles)(uint8_t num,
                                         const ct_render_texture_handle_t *_handles,
-                                        bool _destroyTextures);
+                                        bool destroyTextures);
 
     ct_render_texture_handle_t
-    (*get_texture)(ct_render_frame_buffer_handle_t _handle,
-                   uint8_t _attachment);
+    (*get_texture)(ct_render_frame_buffer_handle_t handle,
+                   uint8_t attachment);
 
-    void (*destroy_frame_buffer)(ct_render_frame_buffer_handle_t _handle);
+    void (*destroy_frame_buffer)(ct_render_frame_buffer_handle_t handle);
 
     ct_render_uniform_handle_t (*create_uniform)(const char *_name,
-                                                 ct_render_uniform_type_t _type,
-                                                 uint16_t _num);
+                                                 ct_render_uniform_type_t type,
+                                                 uint16_t num);
 
-    void (*get_uniform_info)(ct_render_uniform_handle_t _handle,
+    void (*get_uniform_info)(ct_render_uniform_handle_t handle,
                              ct_render_uniform_info_t *_info);
 
-    void (*destroy_uniform)(ct_render_uniform_handle_t _handle);
+    void (*destroy_uniform)(ct_render_uniform_handle_t handle);
 
     ct_render_occlusion_query_handle_t (*create_occlusion_query)();
 
     ct_render_occlusion_query_result_t
-    (*get_result)(ct_render_occlusion_query_handle_t _handle,
+    (*get_result)(ct_render_occlusion_query_handle_t handle,
                   int32_t *_result);
 
-    void (*destroy_occlusion_query)(ct_render_occlusion_query_handle_t _handle);
+    void (*destroy_occlusion_query)(ct_render_occlusion_query_handle_t handle);
 
-    void (*set_palette_color)(uint8_t _index,
-                              const float _rgba[4]);
+    void (*set_palette_color)(uint8_t index,
+                              const float rgba[4]);
 
-    void (*set_view_name)(ct_render_view_id_t _id,
+    void (*set_view_name)(ct_render_view_id_t id,
                           const char *_name);
 
-    void (*set_view_rect)(ct_render_view_id_t _id,
-                          uint16_t _x,
-                          uint16_t _y,
-                          uint16_t _width,
-                          uint16_t _height);
+    void (*set_view_rect)(ct_render_view_id_t id,
+                          uint16_t x,
+                          uint16_t y,
+                          uint16_t width,
+                          uint16_t height);
 
-    void (*set_view_scissor)(ct_render_view_id_t _id,
-                             uint16_t _x,
-                             uint16_t _y,
-                             uint16_t _width,
-                             uint16_t _height);
+    void (*set_view_scissor)(ct_render_view_id_t id,
+                             uint16_t x,
+                             uint16_t y,
+                             uint16_t width,
+                             uint16_t height);
 
-    void (*set_view_clear)(ct_render_view_id_t _id,
-                           uint16_t _flags,
-                           uint32_t _rgba,
-                           float _depth,
-                           uint8_t _stencil);
+    void (*set_view_clear)(ct_render_view_id_t id,
+                           uint16_t flags,
+                           uint32_t rgba,
+                           float depth,
+                           uint8_t stencil);
 
-    void (*set_view_clear_mrt)(ct_render_view_id_t _id,
-                               uint16_t _flags,
-                               float _depth,
-                               uint8_t _stencil,
+    void (*set_view_clear_mrt)(ct_render_view_id_t id,
+                               uint16_t flags,
+                               float depth,
+                               uint8_t stencil,
                                uint8_t _0,
                                uint8_t _1,
                                uint8_t _2,
@@ -1410,387 +1409,384 @@ struct ct_renderer_a0 {
                                uint8_t _6,
                                uint8_t _7);
 
-    void (*set_view_mode)(ct_render_view_id_t _id,
-                          ct_render_view_mode_t _mode);
+    void (*set_view_mode)(ct_render_view_id_t id,
+                          ct_render_view_mode_t mode);
 
-    void (*set_view_frame_buffer)(ct_render_view_id_t _id,
-                                  ct_render_frame_buffer_handle_t _handle);
+    void (*set_view_frame_buffer)(ct_render_view_id_t id,
+                                  ct_render_frame_buffer_handle_t handle);
 
-    void (*set_view_transform)(ct_render_view_id_t _id,
+    void (*set_view_transform)(ct_render_view_id_t id,
                                const void *_view,
                                const void *_proj);
 
-    void (*set_view_transform_stereo)(ct_render_view_id_t _id,
+    void (*set_view_transform_stereo)(ct_render_view_id_t id,
                                       const void *_view,
                                       const void *_projL,
-                                      uint8_t _flags,
+                                      uint8_t flags,
                                       const void *_projR);
 
-    void (*set_view_order)(ct_render_view_id_t _id,
-                           uint16_t _num,
+    void (*set_view_order)(ct_render_view_id_t id,
+                           uint16_t num,
                            const ct_render_view_id_t *_order);
 
     void (*set_marker)(const char *_marker);
 
-    void (*set_state)(uint64_t _state,
-                      uint32_t _rgba);
+    void (*set_state)(uint64_t state,
+                      uint32_t rgba);
 
-    void (*set_condition)(ct_render_occlusion_query_handle_t _handle,
-                          bool _visible);
+    void (*set_condition)(ct_render_occlusion_query_handle_t handle,
+                          bool visible);
 
-    void (*set_stencil)(uint32_t _fstencil,
-                        uint32_t _bstencil);
+    void (*set_stencil)(uint32_t fstencil,
+                        uint32_t bstencil);
 
-    uint16_t (*set_scissor)(uint16_t _x,
-                            uint16_t _y,
-                            uint16_t _width,
-                            uint16_t _height);
+    uint16_t (*set_scissor)(uint16_t x,
+                            uint16_t y,
+                            uint16_t width,
+                            uint16_t height);
 
-    void (*set_scissor_cached)(uint16_t _cache);
+    void (*set_scissor_cached)(uint16_t cache);
 
     uint32_t (*set_transform)(const void *_mtx,
-                              uint16_t _num);
+                              uint16_t num);
 
     uint32_t (*alloc_transform)(ct_render_transform_t *_transform,
-                                uint16_t _num);
+                                uint16_t num);
 
-    void (*set_transform_cached)(uint32_t _cache,
-                                 uint16_t _num);
+    void (*set_transform_cached)(uint32_t cache,
+                                 uint16_t num);
 
-    void (*set_uniform)(ct_render_uniform_handle_t _handle,
+    void (*set_uniform)(ct_render_uniform_handle_t handle,
                         const void *_value,
-                        uint16_t _num);
+                        uint16_t num);
 
-    void (*set_index_buffer)(ct_render_index_buffer_handle_t _handle,
-                             uint32_t _firstIndex,
-                             uint32_t _numIndices);
+    void (*set_index_buffer)(ct_render_index_buffer_handle_t handle,
+                             uint32_t firstIndex,
+                             uint32_t numIndices);
 
     void
-    (*set_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t _handle,
-                                uint32_t _firstIndex,
-                                uint32_t _numIndices);
+    (*set_dynamic_index_buffer)(ct_render_dynamic_index_buffer_handle_t handle,
+                                uint32_t firstIndex,
+                                uint32_t numIndices);
 
     void
     (*set_transient_index_buffer)(const ct_render_transient_index_buffer_t *_tib,
-                                  uint32_t _firstIndex,
-                                  uint32_t _numIndices);
+                                  uint32_t firstIndex,
+                                  uint32_t numIndices);
 
-    void (*set_vertex_buffer)(uint8_t _stream,
-                              ct_render_vertex_buffer_handle_t _handle,
-                              uint32_t _startVertex,
-                              uint32_t _numVertices);
+    void (*set_vertex_buffer)(uint8_t stream,
+                              ct_render_vertex_buffer_handle_t handle,
+                              uint32_t startVertex,
+                              uint32_t numVertices);
 
-    void (*set_dynamic_vertex_buffer)(uint8_t _stream,
-                                      ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                      uint32_t _startVertex,
-                                      uint32_t _numVertices);
+    void (*set_dynamic_vertex_buffer)(uint8_t stream,
+                                      ct_render_dynamic_vertex_buffer_handle_t handle,
+                                      uint32_t startVertex,
+                                      uint32_t numVertices);
 
-    void (*set_transient_vertex_buffer)(uint8_t _stream,
+    void (*set_transient_vertex_buffer)(uint8_t stream,
                                         const ct_render_transient_vertex_buffer_t *_tvb,
-                                        uint32_t _startVertex,
-                                        uint32_t _numVertices);
+                                        uint32_t startVertex,
+                                        uint32_t numVertices);
 
     void
     (*set_instance_data_buffer)(const ct_render_instance_data_buffer_t *_idb,
-                                uint32_t _start,
-                                uint32_t _num);
+                                uint32_t start,
+                                uint32_t num);
 
     void
-    (*set_instance_data_from_vertex_buffer)(ct_render_vertex_buffer_handle_t _handle,
-                                            uint32_t _startVertex,
-                                            uint32_t _num);
+    (*set_instance_data_from_vertex_buffer)(ct_render_vertex_buffer_handle_t handle,
+                                            uint32_t startVertex,
+                                            uint32_t num);
 
     void
-    (*set_instance_data_from_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                                    uint32_t _startVertex,
-                                                    uint32_t _num);
+    (*set_instance_data_from_dynamic_vertex_buffer)(ct_render_dynamic_vertex_buffer_handle_t handle,
+                                                    uint32_t startVertex,
+                                                    uint32_t num);
 
-    void (*set_texture)(uint8_t _stage,
-                        ct_render_uniform_handle_t _sampler,
-                        ct_render_texture_handle_t _handle,
-                        uint32_t _flags);
+    void (*set_texture)(uint8_t stage,
+                        ct_render_uniform_handle_t sampler,
+                        ct_render_texture_handle_t handle,
+                        uint32_t flags);
 
-    void (*touch)(ct_render_view_id_t _id);
+    void (*touch)(ct_render_view_id_t id);
 
-    void (*submit)(ct_render_view_id_t _id,
-                   ct_render_program_handle_t _handle,
-                   int32_t _depth,
-                   bool _preserveState);
+    void (*submit)(ct_render_view_id_t id,
+                   ct_render_program_handle_t handle,
+                   int32_t depth,
+                   bool preserveState);
 
-    void (*submit_occlusion_query)(ct_render_view_id_t _id,
-                                   ct_render_program_handle_t _program,
-                                   ct_render_occlusion_query_handle_t _occlusionQuery,
-                                   int32_t _depth,
-                                   bool _preserveState);
+    void (*submit_occlusion_query)(ct_render_view_id_t id,
+                                   ct_render_program_handle_t program,
+                                   ct_render_occlusion_query_handle_t occlusionQuery,
+                                   int32_t depth,
+                                   bool preserveState);
 
-    void (*submit_indirect)(ct_render_view_id_t _id,
-                            ct_render_program_handle_t _handle,
-                            ct_render_indirect_buffer_handle_t _indirectHandle,
-                            uint16_t _start,
-                            uint16_t _num,
-                            int32_t _depth,
-                            bool _preserveState);
+    void (*submit_indirect)(ct_render_view_id_t id,
+                            ct_render_program_handle_t handle,
+                            ct_render_indirect_buffer_handle_t indirectHandle,
+                            uint16_t start,
+                            uint16_t num,
+                            int32_t depth,
+                            bool preserveState);
 
-    void (*set_image)(uint8_t _stage,
-                      ct_render_texture_handle_t _handle,
-                      uint8_t _mip,
-                      ct_render_access_t _access,
-                      ct_render_texture_format_t _format);
+    void (*set_image)(uint8_t stage,
+                      ct_render_texture_handle_t handle,
+                      uint8_t mip,
+                      ct_render_access_t access,
+                      ct_render_texture_format_t format);
 
-    void (*set_compute_index_buffer)(uint8_t _stage,
-                                     ct_render_index_buffer_handle_t _handle,
-                                     ct_render_access_t _access);
+    void (*set_compute_index_buffer)(uint8_t stage,
+                                     ct_render_index_buffer_handle_t handle,
+                                     ct_render_access_t access);
 
-    void (*set_compute_vertex_buffer)(uint8_t _stage,
-                                      ct_render_vertex_buffer_handle_t _handle,
-                                      ct_render_access_t _access);
+    void (*set_compute_vertex_buffer)(uint8_t stage,
+                                      ct_render_vertex_buffer_handle_t handle,
+                                      ct_render_access_t access);
 
-    void (*set_compute_dynamic_index_buffer)(uint8_t _stage,
-                                             ct_render_dynamic_index_buffer_handle_t _handle,
-                                             ct_render_access_t _access);
+    void (*set_compute_dynamic_index_buffer)(uint8_t stage,
+                                             ct_render_dynamic_index_buffer_handle_t handle,
+                                             ct_render_access_t access);
 
-    void (*set_compute_dynamic_vertex_buffer)(uint8_t _stage,
-                                              ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                              ct_render_access_t _access);
+    void (*set_compute_dynamic_vertex_buffer)(uint8_t stage,
+                                              ct_render_dynamic_vertex_buffer_handle_t handle,
+                                              ct_render_access_t access);
 
-    void (*set_compute_indirect_buffer)(uint8_t _stage,
-                                        ct_render_indirect_buffer_handle_t _handle,
-                                        ct_render_access_t _access);
+    void (*set_compute_indirect_buffer)(uint8_t stage,
+                                        ct_render_indirect_buffer_handle_t handle,
+                                        ct_render_access_t access);
 
-    void (*dispatch)(ct_render_view_id_t _id,
-                     ct_render_program_handle_t _handle,
-                     uint32_t _numX,
-                     uint32_t _numY,
-                     uint32_t _numZ,
-                     uint8_t _flags);
+    void (*dispatch)(ct_render_view_id_t id,
+                     ct_render_program_handle_t handle,
+                     uint32_t numX,
+                     uint32_t numY,
+                     uint32_t numZ,
+                     uint8_t flags);
 
-    void (*dispatch_indirect)(ct_render_view_id_t _id,
-                              ct_render_program_handle_t _handle,
-                              ct_render_indirect_buffer_handle_t _indirectHandle,
-                              uint16_t _start,
-                              uint16_t _num,
-                              uint8_t _flags);
+    void (*dispatch_indirect)(ct_render_view_id_t id,
+                              ct_render_program_handle_t handle,
+                              ct_render_indirect_buffer_handle_t indirectHandle,
+                              uint16_t start,
+                              uint16_t num,
+                              uint8_t flags);
 
     void (*discard)();
 
-    void (*blit)(ct_render_view_id_t _id,
-                 ct_render_texture_handle_t _dst,
-                 uint8_t _dstMip,
-                 uint16_t _dstX,
-                 uint16_t _dstY,
-                 uint16_t _dstZ,
-                 ct_render_texture_handle_t _src,
-                 uint8_t _srcMip,
-                 uint16_t _srcX,
-                 uint16_t _srcY,
-                 uint16_t _srcZ,
-                 uint16_t _width,
-                 uint16_t _height,
-                 uint16_t _depth);
+    void (*blit)(ct_render_view_id_t id,
+                 ct_render_texture_handle_t dst,
+                 uint8_t dstMip,
+                 uint16_t dstX,
+                 uint16_t dstY,
+                 uint16_t dstZ,
+                 ct_render_texture_handle_t src,
+                 uint8_t srcMip,
+                 uint16_t srcX,
+                 uint16_t srcY,
+                 uint16_t srcZ,
+                 uint16_t width,
+                 uint16_t height,
+                 uint16_t depth);
 
     void (*encoder_set_marker)(struct ct_render_encoder *_encoder,
                                const char *_marker);
 
     void (*encoder_set_state)(struct ct_render_encoder *_encoder,
-                              uint64_t _state,
-                              uint32_t _rgba);
+                              uint64_t state,
+                              uint32_t rgba);
 
     void (*encoder_set_condition)(struct ct_render_encoder *_encoder,
-                                  ct_render_occlusion_query_handle_t _handle,
-                                  bool _visible);
+                                  ct_render_occlusion_query_handle_t handle,
+                                  bool visible);
 
     void (*encoder_set_stencil)(struct ct_render_encoder *_encoder,
-                                uint32_t _fstencil,
-                                uint32_t _bstencil);
+                                uint32_t fstencil,
+                                uint32_t bstencil);
 
     uint16_t (*encoder_set_scissor)(struct ct_render_encoder *_encoder,
-                                    uint16_t _x,
-                                    uint16_t _y,
-                                    uint16_t _width,
-                                    uint16_t _height);
+                                    uint16_t x,
+                                    uint16_t y,
+                                    uint16_t width,
+                                    uint16_t height);
 
     void (*encoder_set_scissor_cached)(struct ct_render_encoder *_encoder,
-                                       uint16_t _cache);
+                                       uint16_t cache);
 
     uint32_t (*encoder_set_transform)(struct ct_render_encoder *_encoder,
                                       const void *_mtx,
-                                      uint16_t _num);
+                                      uint16_t num);
 
     uint32_t (*encoder_alloc_transform)(struct ct_render_encoder *_encoder,
                                         ct_render_transform_t *_transform,
-                                        uint16_t _num);
+                                        uint16_t num);
 
     void (*encoder_set_transform_cached)(struct ct_render_encoder *_encoder,
-                                         uint32_t _cache,
-                                         uint16_t _num);
+                                         uint32_t cache,
+                                         uint16_t num);
 
     void (*encoder_set_uniform)(struct ct_render_encoder *_encoder,
-                                ct_render_uniform_handle_t _handle,
+                                ct_render_uniform_handle_t handle,
                                 const void *_value,
-                                uint16_t _num);
+                                uint16_t num);
 
     void (*encoder_set_index_buffer)(struct ct_render_encoder *_encoder,
-                                     ct_render_index_buffer_handle_t _handle,
-                                     uint32_t _firstIndex,
-                                     uint32_t _numIndices);
+                                     ct_render_index_buffer_handle_t handle,
+                                     uint32_t firstIndex,
+                                     uint32_t numIndices);
 
     void (*encoder_set_dynamic_index_buffer)(struct ct_render_encoder *_encoder,
-                                             ct_render_dynamic_index_buffer_handle_t _handle,
-                                             uint32_t _firstIndex,
-                                             uint32_t _numIndices);
+                                             ct_render_dynamic_index_buffer_handle_t handle,
+                                             uint32_t firstIndex,
+                                             uint32_t numIndices);
 
     void
     (*encoder_set_transient_index_buffer)(struct ct_render_encoder *_encoder,
                                           const ct_render_transient_index_buffer_t *_tib,
-                                          uint32_t _firstIndex,
-                                          uint32_t _numIndices);
+                                          uint32_t firstIndex,
+                                          uint32_t numIndices);
 
     void (*encoder_set_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                      uint8_t _stream,
-                                      ct_render_vertex_buffer_handle_t _handle,
-                                      uint32_t _startVertex,
-                                      uint32_t _numVertices);
+                                      uint8_t stream,
+                                      ct_render_vertex_buffer_handle_t handle,
+                                      uint32_t startVertex,
+                                      uint32_t numVertices);
 
     void
     (*encoder_set_dynamic_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                         uint8_t _stream,
-                                         ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                         uint32_t _startVertex,
-                                         uint32_t _numVertices);
+                                         uint8_t stream,
+                                         ct_render_dynamic_vertex_buffer_handle_t handle,
+                                         uint32_t startVertex,
+                                         uint32_t numVertices);
 
     void
     (*encoder_set_transient_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                           uint8_t _stream,
+                                           uint8_t stream,
                                            const ct_render_transient_vertex_buffer_t *_tvb,
-                                           uint32_t _startVertex,
-                                           uint32_t _numVertices);
+                                           uint32_t startVertex,
+                                           uint32_t numVertices);
 
     void (*encoder_set_instance_data_buffer)(struct ct_render_encoder *_encoder,
                                              const ct_render_instance_data_buffer_t *_idb,
-                                             uint32_t _start,
-                                             uint32_t _num);
+                                             uint32_t start,
+                                             uint32_t num);
 
     void
     (*encoder_set_instance_data_from_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                                    ct_render_vertex_buffer_handle_t _handle,
-                                                    uint32_t _startVertex,
-                                                    uint32_t _num);
+                                                    ct_render_vertex_buffer_handle_t handle,
+                                                    uint32_t startVertex,
+                                                    uint32_t num);
 
     void
     (*encoder_set_instance_data_from_dynamic_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                                            ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                                            uint32_t _startVertex,
-                                                            uint32_t _num);
+                                                            ct_render_dynamic_vertex_buffer_handle_t handle,
+                                                            uint32_t startVertex,
+                                                            uint32_t num);
 
     void (*encoder_set_texture)(struct ct_render_encoder *_encoder,
-                                uint8_t _stage,
-                                ct_render_uniform_handle_t _sampler,
-                                ct_render_texture_handle_t _handle,
-                                uint32_t _flags);
+                                uint8_t stage,
+                                ct_render_uniform_handle_t sampler,
+                                ct_render_texture_handle_t handle,
+                                uint32_t flags);
 
     void (*encoder_touch)(struct ct_render_encoder *_encoder,
-                          ct_render_view_id_t _id);
+                          ct_render_view_id_t id);
 
     void (*encoder_submit)(struct ct_render_encoder *_encoder,
-                           ct_render_view_id_t _id,
-                           ct_render_program_handle_t _handle,
-                           int32_t _depth,
-                           bool _preserveState);
+                           ct_render_view_id_t id,
+                           ct_render_program_handle_t handle,
+                           int32_t depth,
+                           bool preserveState);
 
     void (*encoder_submit_occlusion_query)(struct ct_render_encoder *_encoder,
-                                           ct_render_view_id_t _id,
-                                           ct_render_program_handle_t _program,
-                                           ct_render_occlusion_query_handle_t _occlusionQuery,
-                                           int32_t _depth,
-                                           bool _preserveState);
+                                           ct_render_view_id_t id,
+                                           ct_render_program_handle_t program,
+                                           ct_render_occlusion_query_handle_t occlusionQuery,
+                                           int32_t depth,
+                                           bool preserveState);
 
     void (*encoder_submit_indirect)(struct ct_render_encoder *_encoder,
-                                    ct_render_view_id_t _id,
-                                    ct_render_program_handle_t _handle,
-                                    ct_render_indirect_buffer_handle_t _indirectHandle,
-                                    uint16_t _start,
-                                    uint16_t _num,
-                                    int32_t _depth,
-                                    bool _preserveState);
+                                    ct_render_view_id_t id,
+                                    ct_render_program_handle_t handle,
+                                    ct_render_indirect_buffer_handle_t indirectHandle,
+                                    uint16_t start,
+                                    uint16_t num,
+                                    int32_t depth,
+                                    bool preserveState);
 
     void (*encoder_set_image)(struct ct_render_encoder *_encoder,
-                              uint8_t _stage,
-                              ct_render_texture_handle_t _handle,
-                              uint8_t _mip,
-                              ct_render_access_t _access,
-                              ct_render_texture_format_t _format);
+                              uint8_t stage,
+                              ct_render_texture_handle_t handle,
+                              uint8_t mip,
+                              ct_render_access_t access,
+                              ct_render_texture_format_t format);
 
     void (*encoder_set_compute_index_buffer)(struct ct_render_encoder *_encoder,
-                                             uint8_t _stage,
-                                             ct_render_index_buffer_handle_t _handle,
-                                             ct_render_access_t _access);
+                                             uint8_t stage,
+                                             ct_render_index_buffer_handle_t handle,
+                                             ct_render_access_t access);
 
     void
     (*encoder_set_compute_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                         uint8_t _stage,
-                                         ct_render_vertex_buffer_handle_t _handle,
-                                         ct_render_access_t _access);
+                                         uint8_t stage,
+                                         ct_render_vertex_buffer_handle_t handle,
+                                         ct_render_access_t access);
 
     void
     (*encoder_set_compute_dynamic_index_buffer)(struct ct_render_encoder *_encoder,
-                                                uint8_t _stage,
-                                                ct_render_dynamic_index_buffer_handle_t _handle,
-                                                ct_render_access_t _access);
+                                                uint8_t stage,
+                                                ct_render_dynamic_index_buffer_handle_t handle,
+                                                ct_render_access_t access);
 
     void
     (*encoder_set_compute_dynamic_vertex_buffer)(struct ct_render_encoder *_encoder,
-                                                 uint8_t _stage,
-                                                 ct_render_dynamic_vertex_buffer_handle_t _handle,
-                                                 ct_render_access_t _access);
+                                                 uint8_t stage,
+                                                 ct_render_dynamic_vertex_buffer_handle_t handle,
+                                                 ct_render_access_t access);
 
     void
     (*encoder_set_compute_indirect_buffer)(struct ct_render_encoder *_encoder,
-                                           uint8_t _stage,
-                                           ct_render_indirect_buffer_handle_t _handle,
-                                           ct_render_access_t _access);
+                                           uint8_t stage,
+                                           ct_render_indirect_buffer_handle_t handle,
+                                           ct_render_access_t access);
 
     void (*encoder_dispatch)(struct ct_render_encoder *_encoder,
-                             ct_render_view_id_t _id,
-                             ct_render_program_handle_t _handle,
-                             uint32_t _numX,
-                             uint32_t _numY,
-                             uint32_t _numZ,
-                             uint8_t _flags);
+                             ct_render_view_id_t id,
+                             ct_render_program_handle_t handle,
+                             uint32_t numX,
+                             uint32_t numY,
+                             uint32_t numZ,
+                             uint8_t flags);
 
     void (*encoder_dispatch_indirect)(struct ct_render_encoder *_encoder,
-                                      ct_render_view_id_t _id,
-                                      ct_render_program_handle_t _handle,
-                                      ct_render_indirect_buffer_handle_t _indirectHandle,
-                                      uint16_t _start,
-                                      uint16_t _num,
-                                      uint8_t _flags);
+                                      ct_render_view_id_t id,
+                                      ct_render_program_handle_t handle,
+                                      ct_render_indirect_buffer_handle_t indirectHandle,
+                                      uint16_t start,
+                                      uint16_t num,
+                                      uint8_t flags);
 
     void (*encoder_discard)(struct ct_render_encoder *_encoder);
 
     void (*encoder_blit)(struct ct_render_encoder *_encoder,
-                         ct_render_view_id_t _id,
-                         ct_render_texture_handle_t _dst,
-                         uint8_t _dstMip,
-                         uint16_t _dstX,
-                         uint16_t _dstY,
-                         uint16_t _dstZ,
-                         ct_render_texture_handle_t _src,
-                         uint8_t _srcMip,
-                         uint16_t _srcX,
-                         uint16_t _srcY,
-                         uint16_t _srcZ,
-                         uint16_t _width,
-                         uint16_t _height,
-                         uint16_t _depth);
+                         ct_render_view_id_t id,
+                         ct_render_texture_handle_t dst,
+                         uint8_t dstMip,
+                         uint16_t dstX,
+                         uint16_t dstY,
+                         uint16_t dstZ,
+                         ct_render_texture_handle_t src,
+                         uint8_t srcMip,
+                         uint16_t srcX,
+                         uint16_t srcY,
+                         uint16_t srcZ,
+                         uint16_t width,
+                         uint16_t height,
+                         uint16_t depth);
 
-    void (*request_screen_shot)(ct_render_frame_buffer_handle_t _handle,
+    void (*request_screen_shot)(ct_render_frame_buffer_handle_t handle,
                                 const char *_filePath);
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_RENDERER_H
 //! \}

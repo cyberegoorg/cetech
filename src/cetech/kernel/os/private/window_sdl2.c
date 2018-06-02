@@ -1,15 +1,13 @@
 #include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/kernel/ebus/ebus.h>
+#include "cetech/kernel/log/log.h"
+#include "cetech/kernel/memory/allocator.h"
+#include "cetech/kernel/os/window.h"
+#include "cetech/kernel/api/api_system.h"
+
 #include "include/SDL2/SDL.h"
 #include "include/SDL2/SDL_syswm.h"
 
-#include "cetech/kernel/log/log.h"
-#include "cetech/kernel/api/api_system.h"
-
-#include "cetech/engine/machine/machine.h"
-#include "cetech/kernel/os/window.h"
-
-#include "cetech/kernel/memory/allocator.h"
 
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_ebus_a0);
@@ -37,7 +35,7 @@ static struct {
     enum ct_window_flags from;
     SDL_WindowFlags to;
 } _flag_to_sdl[] = {
-        {.from = WINDOW_NOFLAG, .to =  SDL_WindowFlags(0)},
+        {.from = WINDOW_NOFLAG, .to =  0},
         {.from = WINDOW_FULLSCREEN, .to = SDL_WINDOW_FULLSCREEN},
         {.from = WINDOW_SHOWN, .to = SDL_WINDOW_SHOWN},
         {.from = WINDOW_HIDDEN, .to = SDL_WINDOW_HIDDEN},
@@ -137,20 +135,21 @@ void *window_native_display_ptr(ct_window_ints *w) {
 #endif
 }
 
-ct_window *window_new(struct ct_alloc *alloc,
-                      const char *title,
-                      enum ct_window_pos x,
-                      enum ct_window_pos y,
-                      const int32_t width,
-                      const int32_t height,
-                      uint32_t flags) {
+struct ct_window *window_new(struct ct_alloc *alloc,
+                             const char *title,
+                             enum ct_window_pos x,
+                             enum ct_window_pos y,
+                             const int32_t width,
+                             const int32_t height,
+                             uint32_t flags) {
 
-    auto *window = CT_ALLOC(alloc, ct_window, sizeof(ct_window));
-
+    struct ct_window *window = CT_ALLOC(alloc, struct ct_window,
+                                        sizeof(struct ct_window));
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                        SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -164,7 +163,7 @@ ct_window *window_new(struct ct_alloc *alloc,
                         SDL_GetError());
     }
 
-    *window = (ct_window) {
+    *window = (struct ct_window) {
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
@@ -177,9 +176,12 @@ ct_window *window_new(struct ct_alloc *alloc,
     return window;
 }
 
-ct_window *window_new_from(struct ct_alloc *alloc,
-                           void *hndl) {
-    auto *window = CT_ALLOC(alloc, ct_window, sizeof(ct_window));
+struct ct_window *window_new_from(struct ct_alloc *alloc,
+                                  void *hndl) {
+
+    struct ct_window *window = CT_ALLOC(alloc,
+                                        struct ct_window,
+                                        sizeof(struct ct_window));
 
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
@@ -188,7 +190,7 @@ ct_window *window_new_from(struct ct_alloc *alloc,
                         SDL_GetError());
     }
 
-    *window = (ct_window) {
+    *window = (struct ct_window) {
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
@@ -201,20 +203,20 @@ ct_window *window_new_from(struct ct_alloc *alloc,
     return window;
 }
 
-void window_destroy(ct_alloc *alloc,
-                    ct_window *w) {
+void window_destroy(struct ct_alloc *alloc,
+                    struct ct_window *w) {
     SDL_DestroyWindow((SDL_Window *) w->inst);
     CT_FREE(alloc, w);
 }
 
-static ct_window_a0 window_api = {
+static struct ct_window_a0 window_api = {
         .create = window_new,
         .create_from = window_new_from,
         .destroy = window_destroy,
 };
 
 
-int sdl_window_init(ct_api_a0 *api) {
+int sdl_window_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_ebus_a0);
     CETECH_GET_API(api, ct_hashlib_a0);

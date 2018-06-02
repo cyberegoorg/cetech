@@ -6,6 +6,12 @@
 
 #include "cetech/kernel/macros.h"
 
+#define _G hashlib_global
+
+struct _G{
+
+} _G;
+
 uint64_t hash_murmur2_64(const void *key,
                          uint64_t len,
                          uint64_t seed) {

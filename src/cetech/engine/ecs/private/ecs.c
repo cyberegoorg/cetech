@@ -82,11 +82,12 @@ static struct _G {
     struct ct_handler_t world_handler;
     struct world_instance *world_array;
 
-    ct_simulate_fce_t* simulations;
+    ct_simulate_fce_t *simulations;
 
     uint32_t component_count;
     struct ct_hash_t component_types;
 
+    uint64_t* components_name;
     struct ct_component_info component_info[MAX_COMPONENTS];
     struct ct_hash_t component_param_offset[MAX_COMPONENTS];
     struct ct_hash_t prop_to_comp;
@@ -162,16 +163,23 @@ static void register_component(struct ct_component_info info) {
 
     _G.component_info[cid] = info;
     ct_hash_add(&_G.component_types, component_hash, cid, _G.allocator);
+    ct_array_push(_G.components_name, component_hash, _G.allocator);
 
     for (int i = 0; i < info.prop_count; ++i) {
-        const uint64_t prop_key = info.prop_map[i].key;
+        const char*  prop_key = info.prop_map[i].key;
         const uint64_t prop_offset = info.prop_map[i].offset;
 
-        ct_hash_add(&_G.component_param_offset[cid],
-                    prop_key, prop_offset, _G.allocator);
+        uint64_t prop_key_hash = CT_ID64_0(prop_key);
 
-        ct_hash_add(&_G.prop_to_comp, prop_key, component_hash, _G.allocator);
+        ct_hash_add(&_G.component_param_offset[cid],
+                    prop_key_hash, prop_offset, _G.allocator);
+
+        ct_hash_add(&_G.prop_to_comp, prop_key_hash, component_hash, _G.allocator);
     }
+}
+
+const uint64_t* (get_components)() {
+    return _G.components_name;
 }
 
 static uint64_t component_mask(uint64_t name) {
@@ -181,6 +189,16 @@ static uint64_t component_mask(uint64_t name) {
 static uint64_t component_idx(uint64_t component_name) {
     return ct_hash_lookup(&_G.component_types, component_name, UINT64_MAX);
 }
+
+struct ct_component_info *component_info(uint64_t component_name) {
+    uint64_t idx = component_idx(component_name);
+    if (UINT64_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.component_info[idx];
+}
+
 
 static void *component_data(uint64_t component_name,
                             ct_entity_storage_t *_item) {
@@ -935,6 +953,8 @@ static struct ct_ecs_a0 _api = {
         .link = link,
         .has = has,
         .register_component = register_component,
+        .get_components = get_components,
+        .component_info = component_info,
         .component_mask = component_mask,
         .entities_data = component_data,
         .entity_data = entity_data,

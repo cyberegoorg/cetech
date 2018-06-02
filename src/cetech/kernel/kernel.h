@@ -29,8 +29,6 @@
 #define CONFIG_SCREEN_VSYNC_ID "screen.vsync"
 #define CONFIG_SCREEN_FULLSCREEN_ID "screen.fullscreen"
 
-#define CONFIG_RENDER_CONFIG_ID "renderer.config"
-
 enum {
     KERNEL_EBUS = 0x6a0c4eb6
 };

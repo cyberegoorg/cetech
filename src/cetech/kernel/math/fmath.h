@@ -1,9 +1,7 @@
 #ifndef CETECH_FMATH_H
 #define CETECH_FMATH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -640,8 +638,5 @@ void ct_mat4_proj_rev_inf_rh_fovy(float *result,
                                   float near,
                                   bool oglNdc);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_FMATH_H

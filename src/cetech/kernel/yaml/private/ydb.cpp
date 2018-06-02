@@ -1,5 +1,4 @@
-#include "cetech/kernel/containers/map.inl"
-
+extern "C" {
 #include <cetech/kernel/api/api_system.h>
 #include <cetech/kernel/config/config.h>
 #include <cetech/kernel/memory/memory.h>
@@ -17,6 +16,7 @@
 #include <cetech/kernel/containers/hash.h>
 #include <cetech/kernel/containers/buffer.h>
 #include <cetech/kernel/os/thread.h>
+}
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_hashlib_a0);
@@ -25,8 +25,6 @@ CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_yng_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_thread_a0);
-
-using namespace celib;
 
 #define _G ydb_global
 #define LOG_WHERE "ydb"
@@ -70,7 +68,7 @@ ct_yng_doc *load_to_cache(const char *path,
         return NULL;
     }
 
-    doc = ct_yng_a0.from_vio(f, ct_memory_a0.main_allocator());
+    doc = ct_yng_a0.from_vio(f, _G.allocator);
     ct_fs_a0.close(f);
 
     if (!doc) {
@@ -531,7 +529,7 @@ void save(const char *path) {
     }
 
     ct_yng_doc *d = get(path);
-    ct_yng_a0.save_to_vio(ct_memory_a0.main_allocator(), f, d);
+    ct_yng_a0.save_to_vio(_G.allocator, f, d);
 
     ct_fs_a0.close(f);
     unmodified(path);

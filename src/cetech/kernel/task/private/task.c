@@ -65,6 +65,7 @@ static struct _G {
 
     struct queue_mpmc job_queue;
     int is_running;
+    struct ct_alloc *allocator;
 } _G;
 
 // Private
@@ -233,7 +234,7 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_task_a0", &_task_api);
     ct_log_a0.set_wid_clb(worker_id);
 
-    _G = (struct _G) {};
+    _G = (struct _G) {.allocator = ct_memory_a0.main_allocator()};
 
     int core_count = ct_cpu_a0.count();
 
@@ -245,9 +246,9 @@ static void _init(struct ct_api_a0 *api) {
 
     _G.workers_count = worker_count;
 
-    queue_task_init(&_G.job_queue, MAX_TASK, ct_memory_a0.main_allocator());
-    queue_task_init(&_G.free_task, MAX_TASK, ct_memory_a0.main_allocator());
-    queue_task_init(&_G.free_counter, MAX_TASK, ct_memory_a0.main_allocator());
+    queue_task_init(&_G.job_queue, MAX_TASK, _G.allocator);
+    queue_task_init(&_G.free_task, MAX_TASK, _G.allocator);
+    queue_task_init(&_G.free_counter, MAX_TASK, _G.allocator);
 
     atomic_init(&_G.counter_pool_idx, 1);
     atomic_init(&_G.task_pool_idx, 1);
@@ -272,7 +273,9 @@ static void _shutdown() {
     queue_task_destroy(&_G.free_task);
     queue_task_destroy(&_G.free_counter);
 
-    _G = (struct _G) {};
+    _G = (struct _G) {
+        .allocator = ct_memory_a0.main_allocator()
+    };
 }
 
 CETECH_MODULE_DEF(

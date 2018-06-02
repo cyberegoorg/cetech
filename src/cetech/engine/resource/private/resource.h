@@ -1,10 +1,6 @@
 #ifndef CETECH_RESOURCE_INTERNAL_H
 #define CETECH_RESOURCE_INTERNAL_H
 
-#ifdef __cplusplus
-
-extern "C" {
-#endif
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include <cetech/engine/resource/resource.h>
@@ -13,8 +9,6 @@ extern "C" {
 void resource_compiler_register(const char* type,
                                 ct_resource_compilator_t compilator,
                                 bool yaml_based);
-
-void resource_compiler_check_fs();
 
 void resource_compiler_compile_all();
 
@@ -55,10 +49,6 @@ void package_unload(uint64_t name);
 int package_is_loaded(uint64_t name);
 
 void package_flush(struct ct_task_counter_t *counter);
-
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif //CETECH_RESOURCE_INTERNAL_H

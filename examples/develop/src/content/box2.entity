@@ -5,11 +5,9 @@ components:
     scale: [1.000000, 1.000000, 1.000000]
   mesh_renderer:
     scene: content/cube
-    geometries:
-      3321387978411:
-        mesh: g_cube
-        node: n_cube
-        material: content/material1
+    mesh: g_cube
+    node: n_cube
+    material: content/material1
 children:
   23321321312dsaczx4234331453252:
     components:
@@ -19,8 +17,6 @@ children:
         scale: [1.000000, 1.000000, 1.000000]
       mesh_renderer:
         scene: content/cube
-        geometries:
-          3321387978411:
-            mesh: g_cube
-            node: n_cube
-            material: content/material1
+        mesh: g_cube
+        node: n_cube
+        material: content/material1

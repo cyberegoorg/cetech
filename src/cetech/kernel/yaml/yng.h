@@ -4,9 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -204,8 +202,5 @@ struct ct_yng_a0 {
                                 uint32_t count);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_YAMLNG_H

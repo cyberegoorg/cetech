@@ -325,6 +325,11 @@ static void gc() {
         const uint32_t to_free_n = ct_array_size(db_inst->to_free_objects);
         for (int j = 0; j < to_free_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects[j];
+
+            struct object_t* obj = &db_inst->object_pool[idx];
+            ct_array_clean(obj->children);
+            obj->parent = NULL;
+
             ct_array_push(db_inst->free_objects, idx, _G.allocator);
             db_inst->object_pool[idx] = (struct object_t) {0};
         }

@@ -2,6 +2,8 @@
 // Includes
 //==============================================================================
 
+#include <stdlib.h>
+
 #include <cetech/kernel/api/api_system.h>
 #include <cetech/kernel/os/path.h>
 #include <cetech/kernel/log/log.h>
@@ -9,20 +11,15 @@
 #include <cetech/kernel/memory/memory.h>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/module/module.h>
-#include <cstdlib>
 #include <cetech/kernel/os/watchdog.h>
-#include <cetech/kernel/containers/eventstream.inl>
 #include <cetech/kernel/containers/hash.h>
 #include <cetech/kernel/containers/buffer.h>
-#include "cetech/kernel/containers/map.inl"
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_vio_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_watchdog_a0);
-
-using namespace celib;
 
 //==============================================================================
 // Defines
@@ -40,18 +37,17 @@ using namespace celib;
 
 struct fs_mount_point {
     char *root_path;
-    ct_watchdog *wd;
+    struct ct_watchdog *wd;
 };
 
 struct fs_root {
-    fs_mount_point *mount_points;
-    celib::EventStream event_stream;
+    struct fs_mount_point *mount_points;
 };
 
 static struct _G {
-    ct_hash_t root_map;
-    fs_root *roots;
-    ct_alloc *allocator;
+    struct ct_hash_t root_map;
+    struct fs_root *roots;
+    struct ct_alloc *allocator;
 } _G;
 
 //==============================================================================
@@ -59,32 +55,31 @@ static struct _G {
 //==============================================================================
 
 static uint32_t new_fs_root(uint64_t root) {
-    ct_alloc *a = ct_memory_a0.main_allocator();
+//    ct_alloc *a = ct_memory_a0.main_allocator();
 
     uint32_t new_idx = ct_array_size(_G.roots);
 
-    ct_array_push(_G.roots, {}, _G.allocator);
+    ct_array_push(_G.roots, (struct fs_root) {0}, _G.allocator);
 
-    fs_root *root_inst = &_G.roots[new_idx];
-    root_inst->event_stream.init(a);
+//    fs_root *root_inst = &_G.roots[new_idx];
 
     ct_hash_add(&_G.root_map, root, new_idx, _G.allocator);
 
     return new_idx;
 }
 
-static fs_root *get_fs_root(uint64_t root) {
+static struct fs_root *get_fs_root(uint64_t root) {
     uint32_t idx = ct_hash_lookup(&_G.root_map, root, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
     }
 
-    fs_root *fs_inst = &_G.roots[idx];
+    struct fs_root *fs_inst = &_G.roots[idx];
     return fs_inst;
 }
 
-static fs_root *get_or_crate_root(uint64_t root) {
+static struct fs_root *get_or_crate_root(uint64_t root) {
     uint32_t idx = ct_hash_lookup(&_G.root_map, root, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
@@ -92,19 +87,17 @@ static fs_root *get_or_crate_root(uint64_t root) {
         return &_G.roots[root_idx];
     }
 
-    fs_root *fs_inst = &_G.roots[idx];
+    struct fs_root *fs_inst = &_G.roots[idx];
     return fs_inst;
 }
 
 
 static uint32_t new_fs_mount(uint64_t root,
-                             fs_mount_point mp) {
-    fs_root *fs_inst = get_or_crate_root(root);
+                             struct fs_mount_point mp) {
+    struct fs_root *fs_inst = get_or_crate_root(root);
 
-    auto &mount_points = fs_inst->mount_points;
-
-    uint32_t new_idx = ct_array_size(mount_points);
-    ct_array_push(mount_points, mp, _G.allocator);
+    uint32_t new_idx = ct_array_size(fs_inst->mount_points);
+    ct_array_push(fs_inst->mount_points, mp, _G.allocator);
     return new_idx;
 }
 
@@ -112,18 +105,18 @@ static uint32_t new_fs_mount(uint64_t root,
 static void map_root_dir(uint64_t root,
                          const char *base_path,
                          bool watch) {
-    ct_alloc *a = ct_memory_a0.main_allocator();
+    
 
-    fs_mount_point mp = {};
+    struct fs_mount_point mp = {};
 
     if (watch) {
-        ct_watchdog *wd = ct_watchdog_a0.create(a);
+        struct ct_watchdog *wd = ct_watchdog_a0.create(_G.allocator);
         wd->add_dir(wd->inst, base_path, true);
 
         mp.wd = wd;
     }
 
-    mp.root_path = ct_memory_a0.str_dup(base_path, a);
+    mp.root_path = ct_memory_a0.str_dup(base_path, _G.allocator);
     new_fs_mount(root, mp);
 }
 
@@ -134,7 +127,7 @@ static bool exist_dir(const char *full_path) {
 }
 
 static bool exist(const char *full_path) {
-    ct_vio *f = ct_vio_a0.from_file(full_path, VIO_OPEN_READ);
+    struct ct_vio *f = ct_vio_a0.from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         f->close(f);
         return true;
@@ -144,15 +137,15 @@ static bool exist(const char *full_path) {
 }
 
 static char *get_full_path(uint64_t root,
-                           ct_alloc *allocator,
+                           struct ct_alloc *allocator,
                            const char *filename,
                            bool test_dir) {
 
-    fs_root *fs_inst = get_fs_root(root);
+    struct fs_root *fs_inst = get_fs_root(root);
     const uint32_t mp_count = ct_array_size(fs_inst->mount_points);
 
     for (uint32_t i = 0; i < mp_count; ++i) {
-        fs_mount_point *mp = &fs_inst->mount_points[i];
+        struct fs_mount_point *mp = &fs_inst->mount_points[i];
 
         char *fullpath = NULL;
         ct_path_a0.join(&fullpath, allocator, 2, mp->root_path, filename);
@@ -166,38 +159,38 @@ static char *get_full_path(uint64_t root,
     return NULL;
 }
 
-static ct_vio *open(uint64_t root,
-                    const char *path,
-                    ct_fs_open_mode mode) {
-    auto a = ct_memory_a0.main_allocator();
+static struct ct_vio *open(uint64_t root,
+                           const char *path,
+                           enum ct_fs_open_mode mode) {
+    
 
-    char *full_path = get_full_path(root, a, path, mode == FS_OPEN_WRITE);
+    char *full_path = get_full_path(root, _G.allocator, path, mode == FS_OPEN_WRITE);
 
-    ct_vio *file = ct_vio_a0.from_file(full_path,
-                                       (ct_vio_open_mode) mode);
+    struct ct_vio *file = ct_vio_a0.from_file(full_path,
+                                              (enum ct_vio_open_mode) mode);
 
     if (!file) {
         ct_log_a0.error(LOG_WHERE, "Could not load file %s", full_path);
-        ct_buffer_free(full_path, a);
+        ct_buffer_free(full_path, _G.allocator);
         return NULL;
     }
 
-    ct_buffer_free(full_path, a);
+    ct_buffer_free(full_path, _G.allocator);
     return file;
 }
 
-static void close(ct_vio *file) {
+static void close(struct ct_vio *file) {
     file->close(file);
 }
 
 static int create_directory(uint64_t root,
                             const char *path) {
-    auto a = ct_memory_a0.main_allocator();
+    
 
-    char *full_path = get_full_path(root, a, path, true);
+    char *full_path = get_full_path(root, _G.allocator, path, true);
 
     int ret = ct_path_a0.make_path(full_path);
-    CT_FREE(a, full_path);
+    CT_FREE(_G.allocator, full_path);
 
     return ret;
 }
@@ -209,17 +202,15 @@ static void listdir(uint64_t root,
                     bool recursive,
                     char ***files,
                     uint32_t *count,
-                    ct_alloc *allocator) {
-
-    auto a = ct_memory_a0.main_allocator();
+                    struct ct_alloc *allocator) {
 
     char **all_files = NULL;
 
-    fs_root *fs_inst = get_fs_root(root);
+    struct fs_root *fs_inst = get_fs_root(root);
     const uint32_t mp_count = ct_array_size(fs_inst->mount_points);
 
     for (uint32_t i = 0; i < mp_count; ++i) {
-        fs_mount_point *mp = &fs_inst->mount_points[i];
+        struct fs_mount_point *mp = &fs_inst->mount_points[i];
 
         const char *mount_point_dir = mp->root_path;
         uint32_t mount_point_dir_len = strlen(mount_point_dir);
@@ -227,22 +218,22 @@ static void listdir(uint64_t root,
         uint32_t _count;
 
         char *final_path = NULL;
-        ct_path_a0.join(&final_path, a, 2, mount_point_dir, path);
+        ct_path_a0.join(&final_path, allocator, 2, mount_point_dir, path);
         ct_path_a0.list(final_path, filter, recursive, only_dir, &_files,
                         &_count, allocator);
 
         for (uint32_t i = 0; i < _count; ++i) {
             ct_array_push(all_files,
-                           strdup(_files[i] + mount_point_dir_len + 1),
-                           _G.allocator);
+                          strdup(_files[i] + mount_point_dir_len + 1),
+                          _G.allocator);
         }
 
         ct_path_a0.list_free(_files, _count, allocator);
-        ct_buffer_free(final_path, a);
+        ct_buffer_free(final_path, allocator);
     }
 
-    char **result_files = CT_ALLOC(a, char*,
-                                   sizeof(char *) *ct_array_size(all_files));
+    char **result_files = CT_ALLOC(allocator, char*,
+                                   sizeof(char *) * ct_array_size(all_files));
 
     for (uint32_t i = 0; i < ct_array_size(all_files); ++i) {
         result_files[i] = all_files[i];
@@ -256,7 +247,7 @@ static void listdir(uint64_t root,
 
 static void listdir_free(char **files,
                          uint32_t count,
-                         ct_alloc *allocator) {
+                         struct ct_alloc *allocator) {
     for (uint32_t i = 0; i < count; ++i) {
         free(files[i]);
     }
@@ -273,27 +264,27 @@ static void listdir2(uint64_t root,
 
     char **files;
     uint32_t count;
-    auto a = ct_memory_a0.main_allocator();
+    
 
-    listdir(root, path, filter, only_dir, recursive, &files, &count, a);
+    listdir(root, path, filter, only_dir, recursive, &files, &count, _G.allocator);
 
     for (uint32_t i = 0; i < count; ++i) {
         on_item(files[i]);
     }
 
-    listdir_free(files, count, a);
+    listdir_free(files, count, _G.allocator);
 }
 
 
 static int64_t get_file_mtime(uint64_t root,
                               const char *path) {
-    auto a = ct_memory_a0.main_allocator();
+    
 
-    char *full_path = get_full_path(root, a, path, false);
+    char *full_path = get_full_path(root, _G.allocator, path, false);
 
     time_t ret = ct_path_a0.file_mtime(full_path);
 
-    ct_buffer_free(full_path, a);
+    ct_buffer_free(full_path, _G.allocator);
 
     return ret;
 }
@@ -367,9 +358,9 @@ static void _get_full_path(uint64_t root,
                            const char *path,
                            char *fullpath,
                            uint32_t max_len) {
-    ct_alloc *a = ct_memory_a0.main_allocator();
+    
 
-    char *fp = get_full_path(root, a, path, false);
+    char *fp = get_full_path(root, _G.allocator, path, false);
 
     if (strlen(fp) > max_len) {
         goto end;
@@ -378,10 +369,10 @@ static void _get_full_path(uint64_t root,
     strcpy(fullpath, fp);
 
     end:
-    CT_FREE(a, fp);
+    CT_FREE(_G.allocator, fp);
 }
 
-static ct_fs_a0 _api = {
+static struct ct_fs_a0 _api = {
         .open = open,
         .map_root_dir = map_root_dir,
         .close = close,
@@ -393,15 +384,15 @@ static ct_fs_a0 _api = {
         .get_full_path = _get_full_path,
 };
 
-static void _init_api(ct_api_a0 *api) {
+static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_fs_a0", &_api);
 }
 
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
-    _G = {
+    _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
     };
 

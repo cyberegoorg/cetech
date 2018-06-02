@@ -1,5 +1,3 @@
-#include "cetech/kernel/containers/map.inl"
-
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/kernel/fs/fs.h>
 #include <cetech/kernel/hashlib/hashlib.h>
@@ -7,6 +5,7 @@
 #include <cetech/kernel/memory/memory.h>
 #include <cetech/kernel/api/api_system.h>
 #include <cetech/kernel/module/module.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 
 #include <cetech/playground/asset_browser.h>
@@ -102,7 +101,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj) {
     }
 
     bool open = ct_debugui_a0.TreeNodeEx(name, flags);
-    if (ImGui::IsItemClicked(0)) {
+    if (ct_debugui_a0.IsItemClicked(0)) {
         ct_ent_selected_ev ev = {
                 .world  = _G.world,
                 .entity = _G.entity,
@@ -143,7 +142,6 @@ static void on_debugui(uint32_t bus_name,
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
             obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
             ui_entity_item_begin(obj);
-
         }
     }
 

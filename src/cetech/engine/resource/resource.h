@@ -9,9 +9,7 @@
 
 #define PROP_RESOURECE_DATA CT_ID64_0("data")
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -162,9 +160,6 @@ struct ct_resource_a0 {
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_RESOURCE_H
 //! |}

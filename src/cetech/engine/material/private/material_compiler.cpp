@@ -42,13 +42,16 @@ struct material_compile_output {
     uint64_t curent_render_state;
 };
 
+#define _G material_compiler_globals
+
+struct _G {
+    ct_alloc *allocator;
+} _G;
 
 void _forach_variable_clb(const char *filename,
                           uint64_t root_key,
                           uint64_t key,
                           material_compile_output &output) {
-    ct_alloc *a = ct_memory_a0.main_allocator();
-
     uint64_t tmp_keys[] = {
             root_key,
             key,
@@ -100,9 +103,9 @@ void _forach_variable_clb(const char *filename,
                            (float[16]) {0.0f});
     }
 
-    ct_array_push_n(output.var, &mat_var, 1, a);
+    ct_array_push_n(output.var, &mat_var, 1, _G.allocator);
     ct_array_push_n(output.uniform_names, uniform_name,
-                    CT_ARRAY_LEN(uniform_name), a);
+                    CT_ARRAY_LEN(uniform_name), _G.allocator);
 }
 
 uint64_t render_state_to_enum(uint64_t name) {
@@ -137,7 +140,6 @@ void foreach_layer(const char *filename,
                    uint64_t root_key,
                    uint64_t key,
                    material_compile_output &output) {
-    ct_alloc *a = ct_memory_a0.main_allocator();
     uint64_t tmp_keys[] = {
             root_key,
             key,
@@ -149,7 +151,7 @@ void foreach_layer(const char *filename,
 
     const char *shader = ct_ydb_a0.get_str(filename, &tmp_key, 1, "");
     uint64_t shader_id = CT_ID32_0(shader);
-    ct_array_push(output.shader_name, shader_id, a);
+    ct_array_push(output.shader_name, shader_id, _G.allocator);
 
     auto layer_id = key;
     auto layer_offset = ct_array_size(output.var);
@@ -175,9 +177,9 @@ void foreach_layer(const char *filename,
         }
     }
 
-    ct_array_push(output.layer_names, layer_id, a);
-    ct_array_push(output.layer_offset, layer_offset, a);
-    ct_array_push(output.render_state, output.curent_render_state, a);
+    ct_array_push(output.layer_names, layer_id, _G.allocator);
+    ct_array_push(output.layer_offset, layer_offset, _G.allocator);
+    ct_array_push(output.render_state, output.curent_render_state, _G.allocator);
 
     tmp_keys[2] = ct_yng_a0.key("variables");
     tmp_key = ct_yng_a0.combine_key(tmp_keys,
@@ -197,7 +199,7 @@ void foreach_layer(const char *filename,
     }
 
     ct_array_push(output.uniform_count,
-                  ct_array_size(output.var) - layer_offset, a);
+                  ct_array_size(output.var) - layer_offset, _G.allocator);
 
 };
 
@@ -212,8 +214,6 @@ void compiler(const char *filename,
               char **output_blob,
               ct_compilator_api *compilator_api) {
     CT_UNUSED(compilator_api);
-
-    ct_alloc *a = ct_memory_a0.main_allocator();
 
     struct material_compile_output output = {};
 
@@ -242,37 +242,37 @@ void compiler(const char *filename,
 
     name_from_filename(filename, resource.asset_name);
 
-    ct_array_push_n(*output_blob, &resource, sizeof(resource), a);
+    ct_array_push_n(*output_blob, &resource, sizeof(resource), _G.allocator);
 
     ct_array_push_n(*output_blob, output.layer_names,
-                    sizeof(uint64_t) * ct_array_size(output.layer_names), a);
+                    sizeof(uint64_t) * ct_array_size(output.layer_names), _G.allocator);
 
     ct_array_push_n(*output_blob, output.shader_name,
-                    sizeof(uint64_t) * ct_array_size(output.shader_name), a);
+                    sizeof(uint64_t) * ct_array_size(output.shader_name), _G.allocator);
 
     ct_array_push_n(*output_blob, output.uniform_count,
                     sizeof(uint32_t) * ct_array_size(output.uniform_count),
-                    a);
+                    _G.allocator);
 
     ct_array_push_n(*output_blob, output.render_state,
-                    sizeof(uint64_t) * ct_array_size(output.render_state), a);
+                    sizeof(uint64_t) * ct_array_size(output.render_state), _G.allocator);
 
     ct_array_push_n(*output_blob, output.var,
-                    sizeof(material_variable) * ct_array_size(output.var), a);
+                    sizeof(material_variable) * ct_array_size(output.var), _G.allocator);
 
     ct_array_push_n(*output_blob, output.uniform_names,
-                    sizeof(char) * ct_array_size(output.uniform_names), a);
+                    sizeof(char) * ct_array_size(output.uniform_names), _G.allocator);
 
     ct_array_push_n(*output_blob, output.layer_offset,
-                    sizeof(uint32_t) * ct_array_size(output.layer_offset), a);
+                    sizeof(uint32_t) * ct_array_size(output.layer_offset), _G.allocator);
 
-    ct_array_free(output.uniform_names, a);
-    ct_array_free(output.layer_names, a);
-    ct_array_free(output.uniform_count, a);
-    ct_array_free(output.var, a);
-    ct_array_free(output.layer_offset, a);
-    ct_array_free(output.shader_name, a);
-    ct_array_free(output.render_state, a);
+    ct_array_free(output.uniform_names, _G.allocator);
+    ct_array_free(output.layer_names, _G.allocator);
+    ct_array_free(output.uniform_count, _G.allocator);
+    ct_array_free(output.var, _G.allocator);
+    ct_array_free(output.layer_offset, _G.allocator);
+    ct_array_free(output.shader_name, _G.allocator);
+    ct_array_free(output.render_state, _G.allocator);
 }
 
 int materialcompiler_init(ct_api_a0 *api) {
@@ -283,6 +283,10 @@ int materialcompiler_init(ct_api_a0 *api) {
     CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
+
+    _G = (struct _G) {
+        .allocator=ct_memory_a0.main_allocator()
+    };
 
     ct_resource_a0.compiler_register("material", compiler, true);
 

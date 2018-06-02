@@ -2,9 +2,7 @@
 #define CETECH_THREAD_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -62,8 +60,5 @@ struct ct_thread_a0 {
 };
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_THREAD_H

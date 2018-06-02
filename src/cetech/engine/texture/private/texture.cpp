@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 
 #include "cetech/kernel/hashlib/hashlib.h"
 #include "cetech/kernel/memory/memory.h"
@@ -22,8 +21,6 @@
 
 #include "texture_blob.h"
 #include "cetech/kernel/os/path.h"
-
-using namespace celib;
 
 int texturecompiler_init(ct_api_a0 *api);
 

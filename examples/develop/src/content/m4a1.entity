@@ -5,14 +5,27 @@ components:
     rotation: [90.000000, 180.000000, 0.000000]
     scale: [1.000000, 1.000000, 1.000000]
 
-  mesh_renderer:
-    scene: content/scene/m4a1/m4a1
+children:
+  lknvln879879NJKK:
+    components:
+      transform:
+        rotation: [0, 0, 0]
+        position: [0, 0, 0]
+        scale: [1, 1, 1]
 
-    geometries:
-      52641619861635165:
+      mesh_renderer:
+        scene: content/scene/m4a1/m4a1
         mesh: geom_0
         material: content/scene/m4a1/m4a1
 
-      12256165165165165:
+  NMNMFBDDMvln8779NJKK:
+    components:
+      transform:
+        rotation: [0, 0, 0]
+        position: [0, 0, 0]
+        scale: [1, 1, 1]
+
+      mesh_renderer:
+        scene: content/scene/m4a1/m4a1
         mesh: geom_1
         material: content/scene/m4a1/m4a1

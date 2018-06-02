@@ -1,9 +1,7 @@
 #ifndef CETECH_DEBUDRAW_H
 #define CETECH_DEBUDRAW_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -251,8 +249,5 @@ struct ct_dd_a0 {
                      enum ct_dd_axis highlight);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif // CETECH_DEBUDRAW_H

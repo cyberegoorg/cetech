@@ -173,8 +173,7 @@ static void load(uint32_t type,
         type_name_string(build_name, CT_ARRAY_LEN(build_name), rid);
 
         char filename[1024] = {};
-        resource_compiler_get_filename(filename, CT_ARRAY_LEN(filename),
-                                       rid);
+        resource_compiler_get_filename(filename, CT_ARRAY_LEN(filename), rid);
 
         ct_log_a0.debug("resource", "Loading resource %s from %s",
                         filename, build_name);

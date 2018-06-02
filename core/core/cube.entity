@@ -6,9 +6,6 @@ components:
 
   mesh_renderer:
     scene: "core/cube"
-
-    geometries:
-      3321387978411:
-        node: "n_cube"
-        mesh: "g_cube"
-        material: "core/cube"
+    node: "n_cube"
+    mesh: "g_cube"
+    material: "core/cube"

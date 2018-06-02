@@ -1,5 +1,3 @@
-#include "cetech/kernel/containers/map.inl"
-
 #include <cetech/engine/debugui/debugui.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
@@ -28,8 +26,6 @@ CETECH_DECL_API(ct_ebus_a0);
 
 #define WINDOW_NAME "Asset browser"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("asset_browser")
-
-using namespace celib;
 
 static struct asset_browser_global {
     float left_column_width;
@@ -130,10 +126,9 @@ static void ui_dir_list() {
     ImGui::PushItemWidth(180);
 
     if (!_G.dirtree_list) {
-        ct_alloc *a = ct_memory_a0.main_allocator();
         ct_fs_a0.listdir(CT_ID64_0("source"), "", "*",
                                  true, true, &_G.dirtree_list,
-                                 &_G.dirtree_list_count, a);
+                                 &_G.dirtree_list_count, _G.allocator);
     }
 
 
@@ -166,26 +161,24 @@ static void ui_asset_list() {
     ImGui::BeginChild("middle_col", size);
 
     if (_G.need_reaload) {
-        ct_alloc *a = ct_memory_a0.main_allocator();
-
         if (_G.asset_list) {
             ct_fs_a0.listdir_free(_G.asset_list, _G.asset_list_count,
-                                          a);
+                                  _G.allocator);
         }
 
         if (_G.dir_list) {
-            ct_fs_a0.listdir_free(_G.dir_list, _G.dir_list_count, a);
+            ct_fs_a0.listdir_free(_G.dir_list, _G.dir_list_count, _G.allocator);
         }
 
         ct_fs_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  false, false, &_G.asset_list,
-                                 &_G.asset_list_count, a);
+                                 &_G.asset_list_count, _G.allocator);
 
         ct_fs_a0.listdir(CT_ID64_0("source"),
                                  _G.current_dir, "*",
                                  true, false, &_G.dir_list,
-                                 &_G.dir_list_count, a);
+                                 &_G.dir_list_count, _G.allocator);
 
         _G.need_reaload = false;
     }

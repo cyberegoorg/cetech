@@ -2,9 +2,7 @@
 #define CETECH_OBJECT_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Object
@@ -19,8 +17,5 @@ struct ct_object_a0 {
                            const char *name);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_OBJECT_H

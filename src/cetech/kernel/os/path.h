@@ -2,9 +2,7 @@
 #define CETECH_PATH_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -96,8 +94,5 @@ struct ct_path_a0 {
     bool (*is_dir)(const char *path);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_PATH_H

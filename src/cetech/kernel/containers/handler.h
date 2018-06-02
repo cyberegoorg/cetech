@@ -7,9 +7,7 @@
 
 #include "array.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 struct ct_handler_t {
     uint64_t *_generation;
@@ -66,8 +64,5 @@ static void *_create = (void *) &ct_handler_create; // UNUSED
 static void *_free = (void *) &ct_handler_free; // UNUSED
 
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_HANDLER_H

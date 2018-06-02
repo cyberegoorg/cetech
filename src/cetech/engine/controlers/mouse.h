@@ -1,9 +1,7 @@
 #ifndef CETECH_MOUSE_H
 #define CETECH_MOUSE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -117,9 +115,6 @@ struct ct_mouse_a0 {
 
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_MOUSE_H
 //! \}

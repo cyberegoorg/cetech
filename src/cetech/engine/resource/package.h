@@ -4,9 +4,7 @@
 #ifndef CETECH_PACKAGE_H
 #define CETECH_PACKAGE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -28,9 +26,6 @@ struct ct_package_a0 {
     void (*flush)(struct ct_task_counter_t *counter);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_PACKAGE_H
 //! |}

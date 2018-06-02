@@ -1,17 +1,17 @@
-#include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/texture/texture.h>
+extern "C" {
+#include <cetech/kernel/math/bounds.h>
+#include "cetech/kernel/api/api_system.h"
+#include "cetech/kernel/module/module.h"
+#include "cetech/kernel/memory/memory.h"
 #include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/kernel/containers/array.h>
 #include <cetech/kernel/log/log.h>
 
-#include "cetech/kernel/memory/memory.h"
-
+#include <cetech/engine/renderer/renderer.h>
 #include <cetech/engine/debugdraw/debugdraw.h>
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
+}
 
 #include <cetech/engine/debugdraw/private/debugdraw/debugdraw.h>
-#include <cetech/kernel/math/bounds.h>
 
 CETECH_DECL_API(ct_memory_a0);
 CETECH_DECL_API(ct_log_a0);
@@ -25,8 +25,8 @@ static struct _G {
 
 
 static ct_dd_sprite _ddCreateSprite(uint16_t _width,
-                                uint16_t _height,
-                                const void *_data) {
+                                    uint16_t _height,
+                                    const void *_data) {
     return {.idx = ddCreateSprite(_height, _height, _data).idx};
 }
 
@@ -36,9 +36,9 @@ static void _ddDestroySprite(ct_dd_sprite _handle) {
 }
 
 static ct_dd_geometry _ddCreateGeometry(uint32_t _numVertices,
-                                    const ct_dd_vertex *_vertices,
-                                    uint32_t _numIndices = 0,
-                                    const uint16_t *_indices = NULL) {
+                                        const ct_dd_vertex *_vertices,
+                                        uint32_t _numIndices = 0,
+                                        const uint16_t *_indices = NULL) {
     return {.idx=ddCreateGeometry(
             _numVertices,
             reinterpret_cast<const DdVertex *>(_vertices),
@@ -132,7 +132,6 @@ void _ddDrawCircle_axis(ct_dd_axis _axis,
 }
 
 
-
 void _ddDrawQuad_sprite(ct_dd_sprite _handle,
                         const float *_normal,
                         const float *_center,
@@ -160,8 +159,6 @@ void _ddDrawQuad_texture(ct_render_texture_handle _handle,
 }
 
 
-
-
 void _ddDrawAxis(float _x,
                  float _y,
                  float _z,
@@ -177,7 +174,6 @@ void _ddDrawAxis(float _x,
                a,
                _thickness);
 }
-
 
 
 void _ddDrawGrid_axis(ct_dd_axis _axis,

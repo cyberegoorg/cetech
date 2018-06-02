@@ -1,11 +1,6 @@
-//! \addtogroup Plugin
-//! \{
 #ifndef CETECH_API_H
 #define CETECH_API_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 //==============================================================================
 // Defines
@@ -41,10 +36,6 @@ struct ct_api_a0 {
 };
 
 struct ct_api_a0 *ct_api_get();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_API_H
 //! \}

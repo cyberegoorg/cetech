@@ -1,9 +1,7 @@
 #ifndef CETECH_RENDER_GRAPH_H
 #define CETECH_RENDER_GRAPH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 //==============================================================================
 // Includes
@@ -132,8 +130,5 @@ struct ct_render_graph_a0 {
     void (*destroy_builder)(struct ct_render_graph_builder *builder);
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif //CETECH_RENDER_GRAPH_H

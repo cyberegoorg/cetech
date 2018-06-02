@@ -3,7 +3,6 @@
 //==============================================================================
 
 #include "cetech/kernel/memory/allocator.h"
-#include "cetech/kernel/containers/map.inl"
 #include "cetech/kernel/containers/buffer.h"
 
 #include "cetech/kernel/hashlib/hashlib.h"
@@ -11,7 +10,8 @@
 #include "cetech/kernel/api/api_system.h"
 #include "cetech/kernel/log/log.h"
 #include <cetech/kernel/module/module.h>
-#include <cetech/playground//entity_property.h>
+#include <cetech/playground/entity_property.h>
+#include <cetech/kernel/cdb/cdb.h>
 #include <cetech/engine/ecs/ecs.h>
 #include <cetech/engine/transform/transform.h>
 
@@ -19,7 +19,6 @@
 #include <cetech/engine/mesh_renderer/mesh_renderer.h>
 #include <cetech/engine/material/material.h>
 
-using namespace celib;
 
 //==============================================================================
 // GLobals
@@ -48,7 +47,7 @@ static void load(const char *filename,
 
     ct_mesh_renderer *component = static_cast<ct_mesh_renderer *>(ct_ecs_a0.entity_data(world, MESH_RENDERER_COMPONENT, ent));
 
-    component->geometries[0].material = ct_material_a0.resource_create(resourceid.name);
+    component->material = ct_material_a0.resource_create(resourceid.name);
     ct_ecs_a0.entity_component_change(world, MESH_RENDERER_COMPONENT, ent);
 }
 
