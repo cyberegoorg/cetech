@@ -30,17 +30,17 @@ build:
 ########
 # Test #
 ###############################################################################
-test:
-  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
-  stage: test
-  variables:
-    SDL_VIDEODRIVER: dummy
-
-  dependencies:
-    - build
-
-  script:
-    - py.test -v --color=yes engine/test
+#test:
+#  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
+#  stage: test
+#  variables:
+#    SDL_VIDEODRIVER: dummy
+#
+#  dependencies:
+#    - build
+#
+#  script:
+#    - py.test -v --color=yes engine/test
 
 #################
 # Gitlab pages  #
@@ -51,7 +51,6 @@ pages:
   script:
     - export LC_ALL=C.UTF-8
     - export LANG=C.UTF-8
-#    - doxygen scripts/Doxyfile
     - mkdocs build -f scripts/mkdocs.yml -d public
 
   only:

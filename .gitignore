@@ -6,6 +6,7 @@
 /docs/doxygen/
 /bin/
 /build/
+/.build/
 /cmake-build-debug/
 /cmake-build-release/
 /site/
@@ -19,8 +20,10 @@ __pycache__
 *.sln
 *.csproj
 *.speccache
-*.iml
+*.DS_Store
 
 perf.data*
-log.db
+logsystem.db
 /TODO.md
+
+*.srctrl*

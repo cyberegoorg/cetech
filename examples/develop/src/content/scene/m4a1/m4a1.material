@@ -1,5 +1,15 @@
-parent: material1
+PARENT: content/material1.material
 
-textures:
-  u_texColor: content/scene/m4a1/m4_diff
-  #u_texColor: content/scene/duck/duckCM
+layers:
+  default:
+    variables:
+      kdasdvxcvcxbxcbxbg435124asdkj:
+        name: u_texColor
+        type: texture
+        value: content/scene/m4a1/m4_diff
+        #value: texture2
+
+      k22cbxbg435124asdkj:
+        name: u_vec4
+        type: color
+        value: [1.0, 1.0, 1.0, 1.0]

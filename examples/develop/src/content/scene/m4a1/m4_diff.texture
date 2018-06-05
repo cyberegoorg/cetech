@@ -1,2 +1,2 @@
 input: content/scene/m4a1/m4_diff.tga
-#input: content/scene/duck/duckCM.bmp
+gen_mipmaps: yes

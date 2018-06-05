@@ -1,7 +1,0 @@
-name: lib
-description: |
-  Basic playground js libs
-
-extensions:
-  statics:
-    - prefix: lib

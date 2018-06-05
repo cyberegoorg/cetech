@@ -1,0 +1,22 @@
+components:
+  transform:
+    position: [10.000000, -6.000000, 0.000000]
+    rotation: [0.000000, 0.000000, 0.000000]
+    scale: [1.000000, 1.000000, 1.000000]
+  mesh_renderer:
+    scene: content/cube
+    mesh: g_cube
+    node: n_cube
+    material: content/material1
+children:
+  23321321312dsaczx4234331453252:
+    components:
+      transform:
+        position: [1.000000, -16.000000, 0.000000]
+        rotation: [125.000000, 275.000000, 129.000000]
+        scale: [1.000000, 1.000000, 1.000000]
+      mesh_renderer:
+        scene: content/cube
+        mesh: g_cube
+        node: n_cube
+        material: content/material1

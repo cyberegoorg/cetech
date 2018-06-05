@@ -4,11 +4,11 @@
 cmake_minimum_required(VERSION 3.5)
 project(cetech)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror -Wall")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 
-include_directories(engine/include)
+include_directories(src)
 
 add_definitions(-DCETECH_STATIC_PLUGINS)
 add_definitions(-DCETECH_USE_SDL)
@@ -26,6 +26,8 @@ if (APPLE)
 
     add_definitions(-DCETECH_COLORED_LOG)
     add_definitions(-DCETECH_DARWIN)
+
+
 
 elseif (UNIX)
     set(PLATFORM_ID linux64)
@@ -55,12 +57,13 @@ set(EXTERNAL_SOURCE_FILES
         ########################################################################
         # Externals: MPack
         ########################################################################
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
-        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c)
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
+#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
+        )
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
@@ -68,90 +71,119 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        engine/src/kernel/os_sdl2/os_sdl2.cpp
-        engine/src/kernel/os_linux/stacktrace_linux.cpp
-        engine/src/kernel/os_linux/os_linux.cpp
-        engine/src/kernel/os_sdl2/machine_sdl2.cpp
-        engine/src/kernel/os_sdl2/mouse_sdl2.cpp
-        engine/src/kernel/os_sdl2/keyboard_sdl2.cpp
-        engine/src/kernel/os_sdl2/gamepad_sdl2.cpp
+        src/cetech/kernel/memory/private/allocator_core.c
+        src/cetech/kernel/api/private/api_system.c
+        src/cetech/kernel/log/private/log_system.c
+        src/cetech/kernel/module/private/module.c
+        src/cetech/kernel/config/private/config.c
+        src/cetech/kernel/memory/private/memory.c
+        src/cetech/kernel/memory/private/allocator_malloc.c
+        src/cetech/kernel/task/private/task.c
+        src/cetech/kernel/log/private/log_stdout_handler.c
+        src/cetech/kernel/kernel.c
+        src/cetech/kernel/hashlib/private/hashlib.c
+        src/cetech/kernel/os/private/error.c
+        src/cetech/kernel/os/private/object.c
+        src/cetech/kernel/os/private/path.c
+        src/cetech/kernel/os/private/process.c
+        src/cetech/kernel/os/private/cpu.c
+        src/cetech/kernel/os/private/thread.c
+        src/cetech/kernel/os/private/vio.c
+        src/cetech/kernel/os/private/watchdog.c
+        src/cetech/kernel/os/private/time.c
+        src/cetech/engine/resource/private/resource.c
+        src/cetech/engine/resource/private/resource_package.c
+        src/cetech/engine/resource/private/resource_compiler.c
+        src/cetech/kernel/fs/private/fs.c
+        src/cetech/kernel/yaml/private/yng.c
+        src/cetech/kernel/yaml/private/ydb.cpp
+        src/cetech/kernel/cdb/private/cdb.c
+        src/cetech/kernel/ebus/private/ebus.c
 
-        engine/src/kernel/console_server.cpp
-        engine/src/kernel/allocator_core.cpp
-        engine/src/kernel/api_system.cpp
-        engine/src/kernel/log_system.cpp
-        engine/src/kernel/yaml.cpp
-        engine/src/kernel/module.cpp
-        engine/src/kernel/config.cpp
-        engine/src/kernel/memory.cpp
-        engine/src/kernel/allocator_malloc.cpp
-        engine/src/kernel/allocator_scratch.cpp
-        engine/src/modules/application/application.cpp
-        engine/src/kernel/task.cpp
-        engine/src/kernel/develop_system.cpp
-        engine/src/kernel/log_db_handler.cpp
-        engine/src/kernel/log_nanomsg_handler.cpp
-        engine/src/kernel/log_stdout_handler.cpp
-        engine/src/kernel/kernel.cpp
-        engine/src/kernel/hashlib.cpp
+        src/cetech/engine/debugui/private/bgfx_imgui/imgui.cpp
+        src/cetech/engine/debugui/private/ocornut-imgui/imgui.cpp
+        src/cetech/engine/debugui/private/ocornut-imgui/imgui_draw.cpp
+        src/cetech/engine/debugui/private/debugui.cpp
 
-        ########################################################################
-        # Modules
-        ########################################################################
+        src/cetech/engine/debugdraw/private/debugdraw/debugdraw.cpp
+        src/cetech/engine/debugdraw/private/debugdraw/bounds.cpp
+        src/cetech/engine/debugdraw/private/debugdraw.cpp
 
-        engine/src/modules/luasys/luasys_private.cpp
-        engine/src/modules/luasys/api/api_log.c
-        engine/src/modules/luasys/api/api_vec2f.c
-        engine/src/modules/luasys/api/api_vec3f.c
-        engine/src/modules/luasys/api/api_vec4f.c
-        engine/src/modules/luasys/api/api_quatf.c
-        engine/src/modules/luasys/api/api_mat44f.c
+        src/cetech/kernel/os/private/window_sdl2.c
+        src/cetech/engine/machine/private/machine_sdl2.c
 
-        engine/src/modules/resource/resource.cpp
-        engine/src/modules/resource/resource_package.cpp
-        engine/src/modules/resource/resource_compiler.cpp
+        src/cetech/playground/private/entity_preview.c
+        src/cetech/engine/ecs/private/ecs.c
+        src/cetech/engine/controlers/private/keyboard.c
+        src/cetech/engine/controlers/private/mouse.c
+        src/cetech/engine/controlers/private/gamepad.c
+        src/cetech/engine/renderer/private/renderer.cpp
+        src/cetech/engine/render_graph/private/render_graph.c
+        src/cetech/engine/default_render_graph/private/default_render_graph.c
+        src/cetech/engine/texture/private/texture.cpp
+        src/cetech/engine/texture/private/texture_compiler.cpp
 
-        engine/src/modules/filesystem/filesystem.cpp
-        engine/src/modules/entity/component.cpp
-        engine/src/modules/entity/entity.cpp
-        engine/src/modules/entity/world.cpp
-        engine/src/modules/level/level.cpp
+        src/cetech/engine/shader/private/shader.cpp
+        src/cetech/engine/shader/private/shader_compiler.cpp
+        src/cetech/engine/material/private/material.cpp
+        src/cetech/engine/material/private/material_preview.cpp
+        src/cetech/engine/material/private/material_compiler.cpp
+        src/cetech/engine/material/private/material_property.cpp
+        src/cetech/engine/scene/private/scene.cpp
+        src/cetech/engine/scene/private/scene_compiler.cpp
+        src/cetech/engine/mesh_renderer/private/mesh_renderer.c
+        src/cetech/engine/transform/private/transform.c
 
-        engine/src/modules/input/keyboard.cpp
-        engine/src/modules/input/mouse.cpp
-        engine/src/modules/input/gamepad.cpp
+        src/cetech/engine/scenegraph/private/scenegraph.c
+        src/cetech/engine/camera/private/camera.c
 
-        engine/src/modules/renderer_bgfx/renderer.cpp
-        engine/src/modules/renderer_bgfx/texture/texture.cpp
-        engine/src/modules/renderer_bgfx/shader/shader.cpp
-        engine/src/modules/renderer_bgfx/material/material.cpp
-        engine/src/modules/renderer_bgfx/scene/scene.cpp
-        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
-        engine/src/modules/renderer_bgfx/mesh_renderer/mesh_renderer.cpp
+        src/cetech/engine/texture/private/texture_property.cpp
 
-        engine/src/modules/transform/transform.cpp
-        engine/src/modules/scenegraph/scenegraph.cpp
-        engine/src/modules/camera/camera.cpp
-        engine/src/modules/blob/blob.cpp
-        engine/src/modules/renderer_bgfx/scene/scene_compiler.cpp
-        engine/src/modules/renderer_bgfx/shader/shader_compiler.cpp
-        engine/src/modules/renderer_bgfx/texture/texture_compiler.cpp
-        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
-        engine/src/modules/renderer_bgfx/material/material_compiler.cpp
-
-        )
+        src/cetech/playground/private/entity_editor.c
+        src/cetech/playground/private/entity_property.c
+        src/cetech/playground/private/explorer.cpp
+        src/cetech/playground/private/asset_preview.c
+        src/cetech/playground/private/asset_property.c
+        src/cetech/playground/private/asset_browser.cpp
+        src/cetech/playground/private/playground.c
+        src/cetech/playground/private/property_editor.c
+        src/cetech/playground/private/command_system.c
+        src/cetech/playground/private/command_history.c
+        src/cetech/playground/private/log_view.cpp
+        src/cetech/playground/private/action_manager.c
+        src/cetech/kernel/math/private/fmath.c src/cetech/kernel/core.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES})
+        ${SOURCE_FILES} src/cetech/kernel/math/private/fmath.c)
 
 ################################################################################
 # Release sources
 ################################################################################
 
-if (UNIX)
+if (APPLE)
+    set(RELEASE_LIBS_DARWIN
+            z
+            dl
+            m
+            iconv
+            objc
+
+            "-framework Cocoa"
+            "-framework CoreAudio"
+            "-framework AudioToolbox"
+            "-framework ForceFeedback"
+            #"-framework CoreVideo"
+            "-framework Carbon"
+            "-framework IOKit"
+            "-framework QuartzCore"
+            "-framework OpenGL"
+            "-weak_framework Metal"
+            )
+
+elseif(UNIX)
     set(RELEASE_LIBS_LINUX
             #jemalloc_pic.a
             pthread
@@ -172,22 +204,21 @@ endif ()
 set(RELEASE_LIBS
         ${RELEASE_LIBS_LINUX}
         ${RELEASE_LIBS_WINDOWS}
+        ${RELEASE_LIBS_DARWIN}
 
-        nanomsg.a
-        yaml-cpp.a
-
+#        nanomsg.a
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a
 
-        luajit.a
         sqlite3.a
         SDL2.a
 
         assimp.a
         IrrXML.a
         minizip.a
-        aes.a
+        yaml_static.a
+        #aes.a
         )
 
 set(RELEASE_LIBS2
@@ -199,8 +230,7 @@ set(RELEASE_LIBS2
         sqlite3
         assimp
         SDL2
-        yaml-cpp
-        luajit
+        #luajit
         )
 
 ################################################################################
@@ -216,27 +246,30 @@ include_directories(externals/build/${PLATFORM_ID}/release/include)
 ################################################################################
 # Cetech RUNTIME
 ################################################################################
-add_executable(cetech ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
-target_link_libraries(cetech ${RELEASE_LIBS})
-target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/)
-target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_executable(cetech ${MAIN_SOURCE_FILES})
+#target_compile_definitions(cetech PUBLIC -DCETECH_RELEASE)
+#target_link_libraries(cetech ${RELEASE_LIBS})
+#target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/release/)
+#target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 ################################################################################
 # Cetech DEVELOP
 ################################################################################
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
-target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
+target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
-target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
-target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+#add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+#target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
+#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
-add_library(module_example SHARED engine/examples/module_example/example.c)
-set_target_properties(module_example PROPERTIES PREFIX "")
+add_library(example SHARED examples/module_example/example.c)
+set_target_properties(example PROPERTIES PREFIX "module_")
+
+add_library(example_develop SHARED examples/develop/src/game.c)
+set_target_properties(example_develop PROPERTIES PREFIX "game_")
 

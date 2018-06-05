@@ -7,24 +7,24 @@
 
 ## [What is it?](https://cyberegoorg.gitlab.io/cetech/)
 
-CETech is Data-Driven game engine and toolbox inspired by [Bitsquid](http://bitsquid.blogspot.se/)/[Stingray](http://stingrayengine.com/) engine.
+CETech is game engine primary develop for internal use in CyberEg{o.o}rg.
 
 * [Release notes](http://cyberegoorg.gitlab.io/cetech/about/release-notes) (not released)
 * [Documentation](http://cyberegoorg.gitlab.io/cetech) (work in progress)
 
 ## Suported platforms
 
+* OSX (Runtime + Playground) - Work in progress
 * Linux (Runtime + Playground) - Work in progress
 
 ## Planned platforms
 * Windows (Runtime + Playground)
-* OSX (Runtime + Playground)
 * FreeBSD (Runtime + Playground)
 * RaspberryPi (Runtime + Playground)
-* asm.js/Emscripten (Runtime)
-* Android (Runtime)
-* XBox One (Runtime)
 * PS4 (Runtime)
+* XBox One (Runtime)
+* Android (Runtime)
+* asm.js/Emscripten (Runtime)
 
 ## Similar projects
 

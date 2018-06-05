@@ -1,0 +1,240 @@
+0: 
+  index: 0
+  label: Property inspector
+  x: 836
+  y: 22
+  location: ""
+  size_x: 188
+  size_y: 743
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+1: 
+  index: 1
+  label: Asset browser
+  x: 0
+  y: 504
+  location: ""
+  size_x: 762
+  size_y: 261
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: 9
+  child0: -1
+  child1: -1
+  parent: 11
+2: 
+  index: 2
+  label: Asset preview
+  x: 0
+  y: 263
+  location: ""
+  size_x: 245
+  size_y: 241
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 14
+3: 
+  index: 3
+  label: Level inspector
+  x: 836
+  y: 22
+  location: ""
+  size_x: 188
+  size_y: 187
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+4: 
+  index: 4
+  label: Entity content/box2.entity###level_editor_1
+  x: 245
+  y: 22
+  location: ""
+  size_x: 517
+  size_y: 482
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 13
+5: 
+  index: 5
+  label: Property editor
+  x: 762
+  y: 22
+  location: ""
+  size_x: 262
+  size_y: 601
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 8
+6: 
+  index: 6
+  label: Explorer
+  x: 0
+  y: 22
+  location: ""
+  size_x: 245
+  size_y: 241
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 14
+7: 
+  index: 7
+  label: ""
+  x: 0
+  y: 22
+  location: ""
+  size_x: 1024
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 11
+  child1: 8
+  parent: -1
+8: 
+  index: 8
+  label: ""
+  x: 762
+  y: 22
+  location: ""
+  size_x: 262
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 5
+  child1: 10
+  parent: 7
+9: 
+  index: 9
+  label: Log view
+  x: 0
+  y: 504
+  location: ""
+  size_x: 762
+  size_y: 261
+  status: 0
+  active: 0
+  opened: 1
+  prev: 1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 11
+10: 
+  index: 10
+  label: Command history
+  x: 762
+  y: 623
+  location: ""
+  size_x: 262
+  size_y: 142
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 8
+11: 
+  index: 11
+  label: ""
+  x: 0
+  y: 22
+  location: ""
+  size_x: 762
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 13
+  child1: 1
+  parent: 7
+12: 
+  index: 12
+  label: Level content/level1.level###level_editor_2
+  x: 199
+  y: 22
+  location: ""
+  size_x: 563
+  size_y: 482
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+13: 
+  index: 13
+  label: ""
+  x: 0
+  y: 22
+  location: ""
+  size_x: 762
+  size_y: 482
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 14
+  child1: 4
+  parent: 11
+14: 
+  index: 14
+  label: ""
+  x: 0
+  y: 22
+  location: ""
+  size_x: 245
+  size_y: 482
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 6
+  child1: 2
+  parent: 13

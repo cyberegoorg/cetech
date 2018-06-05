@@ -1,5 +1,0 @@
-shader: shader1
-
-textures:
-  u_texColor: texture2 # texture2.texture
-
