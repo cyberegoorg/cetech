@@ -122,7 +122,13 @@ static void renderer_create() {
     bgfx_set_platform_data(&pd);
 
     // TODO: from config
-    bgfx_init(BGFX_RENDERER_TYPE_OPENGL, 0, 0, NULL, NULL);
+
+    bgfx_init_t init = {
+            .type = BGFX_RENDERER_TYPE_OPENGL,
+    };
+    bgfx_init_ctor(&init);
+
+    bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
     bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());

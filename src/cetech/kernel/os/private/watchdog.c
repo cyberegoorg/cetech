@@ -57,17 +57,18 @@ void add_dir(ct_watchdog_instance_t *inst,
              bool recursive) {
 //    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
 
-//    int wd = 0;
+
 
 #ifdef CETECH_LINUX
-    wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
-    ct_log_a0.debug(LOG_WHERE, "New watch -> %s", path);
-
-    if (-1 == wd) {
-        ct_log_a0.error(LOG_WHERE, "Could not add watch -> %s",
-                        strerror(errno));
-        return;
-    }
+//    int wd = 0;
+//    wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
+//    ct_log_a0.debug(LOG_WHERE, "New watch -> %s", path);
+//
+//    if (-1 == wd) {
+//        ct_log_a0.error(LOG_WHERE, "Could not add watch -> %s",
+//                        strerror(errno));
+//        return;
+//    }
 #endif
 
 //    char *path_dup = ct_memory_a0.str_dup(path, wi->alloc);
@@ -162,20 +163,20 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
         } else {
             if (event->mask & (IN_CLOSE_WRITE | IN_MOVE)) {
-                ct_wd_ev_file_write_end ev = {};
+//                ct_wd_ev_file_write_end ev = {};
 
-                char *path = celib::map::get<char *>(
-                        wi->wd2dir,
-                        static_cast<uint64_t>(event->wd),
-                        NULL);
+//                char *path = celib::map::get<char *>(
+//                        wi->wd2dir,
+//                        static_cast<uint64_t>(event->wd),
+//                        NULL);
 
-                ev.dir = path;
-                ev.filename = ct_memory_a0.str_dup(event->name, wi->alloc);
+//                ev.dir = path;
+//                ev.filename = ct_memory_a0.str_dup(event->name, wi->alloc);
 
-                celib::eventstream::push<ct_watchdog_ev_header>(
-                        wi->event_stream,
-                        CT_WATCHDOG_EVENT_FILE_MODIFIED,
-                        ev);
+//                celib::eventstream::push<ct_watchdog_ev_header>(
+//                        wi->event_stream,
+//                        CT_WATCHDOG_EVENT_FILE_MODIFIED,
+//                        ev);
 
                 continue;
             }
