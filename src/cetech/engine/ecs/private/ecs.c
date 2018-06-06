@@ -577,15 +577,16 @@ static void destroy(struct ct_world world,
 // Resource
 //==============================================================================
 
-static void _on_obj_change(void *event) {
-
-    struct ct_cdb_obj_change_ev *ev = event;
+static void _on_obj_change(struct ct_cdb_obj_t *obj,
+                           const uint64_t *prop,
+                           uint32_t prop_count) {
+    
 
     for (int i = 0; i < ct_array_size(_G.world_array); ++i) {
         struct world_instance *w = &_G.world_array[i];
 
         uint64_t spawn_idx = ct_hash_lookup(&w->obj_spawn_idx_map,
-                                            (uint64_t) ev->obj, UINT64_MAX);
+                                            (uint64_t) obj, UINT64_MAX);
 
         if (UINT64_MAX == spawn_idx) {
             continue;
@@ -594,14 +595,14 @@ static void _on_obj_change(void *event) {
         struct ct_entity *ent = w->obj_spawn_ent[spawn_idx];
         const uint32_t ent_n = ct_array_size(ent);
 
-        for (int k = 0; k < ev->prop_count; ++k) {
-            uint64_t component = ct_hash_lookup(&_G.prop_to_comp, ev->prop[k],
+        for (int k = 0; k < prop_count; ++k) {
+            uint64_t component = ct_hash_lookup(&_G.prop_to_comp, prop[k],
                                                 0);
             uint64_t comp_idx = component_idx(component);
 
-            enum ct_cdb_type type = ct_cdb_a0.prop_type(ev->obj, ev->prop[k]);
+            enum ct_cdb_type type = ct_cdb_a0.prop_type(obj, prop[k]);
             uint64_t prop_offset = ct_hash_lookup(
-                    &_G.component_param_offset[comp_idx], ev->prop[k],
+                    &_G.component_param_offset[comp_idx], prop[k],
                     UINT64_MAX);
 
             if (prop_offset == UINT64_MAX) {
@@ -632,38 +633,38 @@ static void _on_obj_change(void *event) {
                         break;
 
                     case CDB_TYPE_UINT32:
-                        dt->u32 = ct_cdb_a0.read_uint32(ev->obj, ev->prop[k],
+                        dt->u32 = ct_cdb_a0.read_uint32(obj, prop[k],
                                                         0);
                         break;
 
                     case CDB_TYPE_REF:
-                        dt->ptr = ct_cdb_a0.read_ref(ev->obj, ev->prop[k], 0);
+                        dt->ptr = ct_cdb_a0.read_ref(obj, prop[k], 0);
                         break;
 
                     case CDB_TYPE_UINT64:
-                        dt->u64 = ct_cdb_a0.read_uint64(ev->obj, ev->prop[k],
+                        dt->u64 = ct_cdb_a0.read_uint64(obj, prop[k],
                                                         0);
                         break;
                     case CDB_TYPE_PTR:
-                        dt->ptr = ct_cdb_a0.read_ptr(ev->obj, ev->prop[k],
+                        dt->ptr = ct_cdb_a0.read_ptr(obj, prop[k],
                                                      NULL);
                         break;
 
                     case CDB_TYPE_FLOAT:
-                        dt->f = ct_cdb_a0.read_float(ev->obj, ev->prop[k],
+                        dt->f = ct_cdb_a0.read_float(obj, prop[k],
                                                      0.0f);
                         break;
 
                     case CDB_TYPE_VEC3:
-                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v3);
+                        ct_cdb_a0.read_vec3(obj, prop[k], dt->v3);
                         break;
 
                     case CDB_TYPE_VEC4:
-                        ct_cdb_a0.read_vec3(ev->obj, ev->prop[k], dt->v4);
+                        ct_cdb_a0.read_vec3(obj, prop[k], dt->v4);
                         break;
 
                     case CDB_TYPE_MAT4:
-                        ct_cdb_a0.read_mat4(ev->obj, ev->prop[k], dt->m16);
+                        ct_cdb_a0.read_mat4(obj, prop[k], dt->m16);
                         break;
                 }
                 entity_component_change(w->world, component, ent[l]);
@@ -714,9 +715,7 @@ static void online(uint64_t name,
                            _G.allocator);
         }
 
-        ct_ebus_a0.connect_addr(CDB_EBUS,
-                                CDB_OBJ_CHANGE, (uint64_t) eobj,
-                                _on_obj_change, 0);
+        ct_cdb_a0.register_notify(eobj, _on_obj_change);
 
 
         objs[i] = eobj;

@@ -16,20 +16,21 @@
 
 #define CDB_EBUS_NAME "cdb"
 
-enum {
-    CDB_EBUS = 0x6b6b9f5b
-};
+//enum {
+//    CDB_EBUS = 0x6b6b9f5b
+//};
 
-enum {
-    CDB_INVALID_EVENT = 0,
-    CDB_OBJ_CHANGE,
-};
+//enum {
+//    CDB_INVALID_EVENT = 0,
+//    CDB_OBJ_CHANGE,
+//};
 
-struct ct_cdb_obj_change_ev {
-    struct ct_cdb_obj_t *obj;
-    uint64_t *prop;
-    uint32_t prop_count;
-};
+//struct ct_cdb_obj_change_ev {
+//    struct ct_cdb_obj_t *obj;
+//    uint64_t *prop;
+//    uint32_t prop_count;
+//};
+
 
 //==============================================================================
 // Typedefs
@@ -43,6 +44,11 @@ struct ct_cdb_t {
 struct ct_cdb_obj_t {
     void *_;
 };
+
+typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
+                             const uint64_t *prop,
+                             uint32_t prop_count);
+
 
 //==============================================================================
 // Enums
@@ -67,12 +73,16 @@ enum ct_cdb_type {
 struct ct_cdb_a0 {
     struct ct_cdb_t (*create_db)();
 
-    struct ct_cdb_obj_t *(*create_object)(struct ct_cdb_t db, uint64_t type);
+    void (*register_notify)(struct ct_cdb_obj_t* obj, ct_cdb_notify notify);
+
+    struct ct_cdb_obj_t *(*create_object)(struct ct_cdb_t db,
+                                          uint64_t type);
 
     struct ct_cdb_obj_t *(*create_from)(struct ct_cdb_t db,
                                         struct ct_cdb_obj_t *obj);
 
     void (*destroy_db)(struct ct_cdb_t db);
+
     void (*destroy_object)(struct ct_cdb_obj_t *obj);
 
     void (*gc)();

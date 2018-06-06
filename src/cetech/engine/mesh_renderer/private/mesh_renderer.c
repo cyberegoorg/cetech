@@ -169,58 +169,57 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static void _on_obj_change(void *event) {
-
-    struct ct_cdb_obj_change_ev *ev = event;
-
+static void _on_obj_change(struct ct_cdb_obj_t *obj,
+                           uint64_t *prop,
+                           uint32_t prop_count) {
 
     struct ct_cdb_obj_t *writer = NULL;
-    for (int k = 0; k < ev->prop_count; ++k) {
-        if (ev->prop[k] == PROP_SCENE) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_SCENE, "");
+    for (int k = 0; k < prop_count; ++k) {
+        if (prop[k] == PROP_SCENE) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_SCENE, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_SCENE_ID, CT_ID32_0(str));
 
 
-        } else if (ev->prop[k] == PROP_NODE) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_NODE, "");
+        } else if (prop[k] == PROP_NODE) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_NODE, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_NODE_ID, CT_ID64_0(str));
 
-        } else if (ev->prop[k] == PROP_MESH) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MESH, "");
+        } else if (prop[k] == PROP_MESH) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_MESH, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_MESH_ID, CT_ID64_0(str));
 
 
-        } else if (ev->prop[k] == PROP_MATERIAL) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MATERIAL, "");
+        } else if (prop[k] == PROP_MATERIAL) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_MATERIAL, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint32(writer, PROP_MATERIAL_ID, CT_ID32_0(str));
 
-        } else if (ev->prop[k] == PROP_MATERIAL_ID) {
-            uint32_t material_id = ct_cdb_a0.read_uint32(ev->obj,
+        } else if (prop[k] == PROP_MATERIAL_ID) {
+            uint32_t material_id = ct_cdb_a0.read_uint32(obj,
                                                          PROP_MATERIAL_ID, 0);
 
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_ref(writer,
@@ -249,10 +248,7 @@ static void _component_spawner(void *event) {
             .scene_id = ct_cdb_a0.read_uint32(ev->obj, PROP_SCENE_ID, 0),
     };
 
-    ct_ebus_a0.connect_addr(CDB_EBUS,
-                            CDB_OBJ_CHANGE, (uint64_t) ev->obj,
-                            _on_obj_change, 0);
-
+    ct_cdb_a0.register_notify(ev->obj, (ct_cdb_notify) _on_obj_change);
 }
 
 
