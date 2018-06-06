@@ -27,6 +27,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_api_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 //==============================================================================
@@ -106,23 +107,38 @@ void sdl_mouse_process() {
     _G.mouse.position[0] = pos[0];
     _G.mouse.position[1] = window_size[1] - pos[1];
 
-    struct ct_mouse_move_event event;
-    event.pos[0] = pos[0];
-    event.pos[1] = window_size[1] - pos[1];
 
-    ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_MOVE, &event, sizeof(event));
+    struct ct_cdb_obj_t *event;
+    event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                    EVENT_MOUSE_MOVE);
+
+    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), _G.mouse.position);
+    ct_cdb_a0.write_commit(w);
+
+
+    ct_ebus_a0.broadcast(MOUSE_EBUS, event);
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
-        struct ct_mouse_event event;
-        event.button = i;
-
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_DOWN, &event,
-                                 sizeof(event));
+            event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                            EVENT_MOUSE_DOWN);
+
+            w = ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), i);
+            ct_cdb_a0.write_commit(w);
+
+            ct_ebus_a0.broadcast(MOUSE_EBUS, event);
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
-            ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_UP, &event,
-                                 sizeof(event));
+            event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                            EVENT_MOUSE_UP);
+
+            w = ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), i);
+            ct_cdb_a0.write_commit(w);
+
+            ct_ebus_a0.broadcast(MOUSE_EBUS, event);
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -131,19 +147,31 @@ void sdl_mouse_process() {
 
 void sdl_keyboard_process() {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
-    struct ct_keyboard_event keyboard_ev;
 
+
+    struct ct_cdb_obj_t *event;
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
-            keyboard_ev.keycode = i;
-            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN,
-                                 &keyboard_ev,
-                                 sizeof(keyboard_ev));
+            event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                            EVENT_KEYBOARD_DOWN);
+
+            struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint32(w, CT_ID64_0("keycode"), i);
+            ct_cdb_a0.write_commit(w);
+
+            ct_ebus_a0.broadcast(KEYBOARD_EBUS, event);
+
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
-            keyboard_ev.keycode = i;
-            ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, &keyboard_ev,
-                                 sizeof(keyboard_ev));
+            event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                            EVENT_KEYBOARD_UP);
+
+            struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint32(w, CT_ID64_0("keycode"), i);
+            ct_cdb_a0.write_commit(w);
+
+            ct_ebus_a0.broadcast(KEYBOARD_EBUS, event);
+
         }
 
         _G.keyboard.state[i] = state[i];
@@ -269,14 +297,30 @@ void sdl_gamepad_process() {
             event.button = j;
 
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
-                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, &event,
-                                     sizeof(event));
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_GAMEPAD_DOWN);
+
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), j);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
 
 
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
-                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, &event,
-                                     sizeof(event));
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_GAMEPAD_UP);
+
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), j);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
 
             }
 
@@ -284,10 +328,6 @@ void sdl_gamepad_process() {
         }
 
         for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
-            struct ct_gamepad_move_event event;
-            event.gamepad_id = i;
-            event.axis = j;
-
             float pos[2] = {curent_pos[i][j][0], curent_pos[i][j][1]};
 
 
@@ -297,11 +337,18 @@ void sdl_gamepad_process() {
                 _G.controlers.position[i][j][0] = pos[0];
                 _G.controlers.position[i][j][1] = pos[1];
 
-                event.position[0] = pos[0];
-                event.position[1] = pos[1];
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_GAMEPAD_MOVE);
 
-                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, &event,
-                                     sizeof(event));
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("axis"), j);
+                ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), pos);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
+
             }
         }
     }
@@ -327,21 +374,33 @@ static void _update(float dt) {
 
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
-            case SDL_QUIT:
-                ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
+            case SDL_QUIT: {
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        KERNEL_QUIT_EVENT);
+
+                ct_ebus_a0.broadcast(KERNEL_EBUS, event);
+            }
                 break;
 
             case SDL_WINDOWEVENT: {
                 switch (e.window.event) {
                     case SDL_WINDOWEVENT_SIZE_CHANGED: {
-                        struct ct_window_resized_event ev;
-                        ev.window_id = e.window.windowID;
-                        ev.width = e.window.data1;
-                        ev.height = e.window.data2;
+                        struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                                ct_cdb_a0.global_db(),
+                                EVENT_WINDOW_RESIZED);
 
-                        ct_ebus_a0.broadcast(WINDOW_EBUS, EVENT_WINDOW_RESIZED,
-                                             &ev,
-                                             sizeof(ev));
+                        struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                        ct_cdb_a0.set_uint32(w, CT_ID64_0("window_id"),
+                                             e.window.windowID);
+                        ct_cdb_a0.set_uint32(w, CT_ID64_0("width"),
+                                             e.window.data1);
+                        ct_cdb_a0.set_uint32(w, CT_ID64_0("height"),
+                                             e.window.data2);
+                        ct_cdb_a0.write_commit(w);
+
+                        ct_ebus_a0.broadcast(WINDOW_EBUS, event);
+
                     }
                         break;
                 }
@@ -349,52 +408,74 @@ static void _update(float dt) {
                 break;
 
             case SDL_MOUSEWHEEL: {
-                struct ct_mouse_move_event ev;
-                ev.pos[0] = e.wheel.x;
-                ev.pos[1] = e.wheel.y;
-                ct_ebus_a0.broadcast(MOUSE_EBUS, EVENT_MOUSE_WHEEL, &ev,
-                                     sizeof(ev));
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_MOUSE_WHEEL);
+
+                float pos[3] = {e.wheel.x, e.wheel.y};
+
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);;
+                ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), pos);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(MOUSE_EBUS, event);
+
             }
                 break;
 
-            case SDL_TEXTINPUT: {
-                struct ct_keyboard_text_event ev = {{0}};
-                memcpy(ev.text, e.text.text, sizeof(ev.text));
 
-                ct_ebus_a0.broadcast(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT, &ev,
-                                     sizeof(ev));
+            case SDL_TEXTINPUT: {
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_KEYBOARD_TEXT);
+
+
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_string(w, CT_ID64_0("text"), e.text.text);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(KEYBOARD_EBUS, event);
 
             }
                 break;
 
             case SDL_CONTROLLERDEVICEADDED: {
                 int idx = _create_controler(e.cdevice.which);
-                struct ct_gamepad_device_event ev;
-                ev.gamepad_id = idx;
 
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        EVENT_GAMEPAD_CONNECT);
 
-                ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT, &ev,
-                                     sizeof(ev));
+                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), idx);
+                ct_cdb_a0.write_commit(w);
+
+                ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
 
             }
                 break;
 
             case SDL_CONTROLLERDEVICEREMOVED: {
-                struct ct_gamepad_device_event ev;
-
                 for (int i = 0; i < GAMEPAD_MAX; ++i) {
-                    SDL_GameController *controller = SDL_GameControllerFromInstanceID(
+                    SDL_GameController *controller;
+                    controller = SDL_GameControllerFromInstanceID(
                             e.cdevice.which);
+
                     if (_G.controlers.controller[i] != controller) {
                         continue;
                     }
 
                     _remove_controler(i);
 
-                    ev.gamepad_id = i;
-                    ct_ebus_a0.broadcast(GAMEPAD_EBUS, EVENT_GAMEPAD_DISCONNECT,
-                                         &ev,
-                                         sizeof(ev));
+                    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                            ct_cdb_a0.global_db(),
+                            EVENT_GAMEPAD_DISCONNECT);
+
+                    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                    ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
+                    ct_cdb_a0.write_commit(w);
+
+                    ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
 
                     break;
                 }
@@ -426,11 +507,12 @@ static void init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_ebus_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
 
     if (SDL_Init(SDL_INIT_VIDEO |
                  SDL_INIT_GAMECONTROLLER |
                  SDL_INIT_HAPTIC |
-                  SDL_INIT_JOYSTICK) != 0) {
+                 SDL_INIT_JOYSTICK) != 0) {
         //if (SDL_Init(0) != 0) {
         ct_log_a0.error(LOG_WHERE, "Could not init sdl - %s",
                         SDL_GetError());

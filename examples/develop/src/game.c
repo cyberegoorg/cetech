@@ -35,6 +35,7 @@ CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_render_graph_a0);
 CETECH_DECL_API(ct_default_render_graph_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 #define MOUDLE_NAME example_develop
 
@@ -45,7 +46,7 @@ static struct G {
 } _G;
 
 
-void init(void *event) {
+void init(struct ct_cdb_obj_t* event) {
     CT_UNUSED(event)
 
     _G.world = ct_ecs_a0.create_world();
@@ -55,14 +56,13 @@ void init(void *event) {
 }
 
 
-void shutdown(void *event) {
+void shutdown(struct ct_cdb_obj_t* event) {
     CT_UNUSED(event)
 }
 
-void update(void *event) {
-    struct ct_app_update_ev *ev = event;
+void update(struct ct_cdb_obj_t* event) {
 
-    _G.dt = ev->dt;
+    _G.dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {
         ct_log_a0.info("example", "PO");
         ct_log_a0.error("example", "LICE");
@@ -107,6 +107,7 @@ void CETECH_MODULE_INITAPI(example_develop)(struct ct_api_a0 *api) {
 
     CETECH_GET_API(api, ct_render_graph_a0);
     CETECH_GET_API(api, ct_default_render_graph_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
 }
 
 void CETECH_MODULE_LOAD (example_develop)(struct ct_api_a0 *api,

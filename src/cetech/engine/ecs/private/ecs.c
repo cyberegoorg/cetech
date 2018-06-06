@@ -132,14 +132,18 @@ static int compile(uint64_t type,
                    uint64_t *component_key,
                    uint32_t component_key_count,
                    struct ct_cdb_obj_t *writer) {
-    struct ct_ecs_component_compile_ev ev = {
-            .filename = filename,
-            .writer = writer,
-            .component_key = component_key,
-            .component_key_count = component_key_count
-    };
 
-    ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_COMPILE, type, &ev, sizeof(ev));
+    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         ECS_COMPONENT_COMPILE);
+
+    struct ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_string(w, CT_ID64_0("filename"), filename);
+    ct_cdb_a0.set_ref(w, CT_ID64_0("writer"), writer);
+    ct_cdb_a0.set_ptr(w, CT_ID64_0("component_key"), component_key);
+    ct_cdb_a0.set_uint32(w, CT_ID64_0("component_key_count"), component_key_count);
+    ct_cdb_a0.write_commit(w);
+
+    ct_ebus_a0.send(ECS_EBUS, type, event);
 
     return 1;
 }
@@ -247,14 +251,16 @@ static void entity_component_change(struct ct_world world,
                                     struct ct_entity entity) {
     uint64_t com_mask = component_mask(component_name);
 
-    struct ct_ecs_component_ev ev = {
-            .world = world,
-            .ent = entity,
-            .comp_mask = com_mask,
-    };
+    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         ECS_COMPONENT_CHANGE);
 
-    ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_CHANGE,
-                    entity.h, &ev, sizeof(ev));
+    struct ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_uint64(w, CT_ID64_0("world"), world.h);
+    ct_cdb_a0.set_uint64(w, CT_ID64_0("ent"), entity.h);
+    ct_cdb_a0.set_uint64(w, CT_ID64_0("comp_mask"), com_mask);
+    ct_cdb_a0.write_commit(w);
+
+    ct_ebus_a0.broadcast(ECS_EBUS, event);
 }
 
 static void _remove_from_type_slot(struct world_instance *w,
@@ -436,13 +442,17 @@ static void add_components(struct ct_world world,
 
     uint64_t ent_type = w->entity_type[_idx(ent.h)];
 
-    struct ct_ecs_component_ev ev = {
-            .world = world,
-            .ent = ent,
-            .comp_mask = ent_type,
-    };
+    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         ECS_COMPONENT_ADD);
 
-    ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
+    struct ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0("ent"), ent.h);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0("comp_mask"), ent_type);
+    ct_cdb_a0.write_commit(wr);
+
+    ct_ebus_a0.broadcast(ECS_EBUS, event);
+
 }
 
 static void remove_components(struct ct_world world,
@@ -558,13 +568,16 @@ static void destroy(struct ct_world world,
 
         _remove_from_type_slot(w, entity[i], ent_type);
 
-        struct ct_ecs_component_ev ev = {
-                .world = world,
-                .ent = entity[i],
-                .comp_mask = ent_type,
-        };
+        struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                             ECS_COMPONENT_REMOVE);
 
-        ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_REMOVE, &ev, sizeof(ev));
+        struct ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(event);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("ent"), entity[i].h);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("comp_mask"), ent_type);
+        ct_cdb_a0.write_commit(wr);
+
+        ct_ebus_a0.broadcast(ECS_EBUS, event);
 
 
         ct_handler_destroy(&w->entity_handler, entity[i].h, _G.allocator);
@@ -877,23 +890,29 @@ static struct ct_entity spawn_entity(struct ct_world world,
 
             void *comp_data = item->entity_data[j];
 
-            struct ct_ecs_component_spawn_ev ev = {
-                    .obj = root,
-                    .data = comp_data + (info.size * idx),
-            };
 
-            ct_ebus_a0.send(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                            info.component_name_hash, &ev, sizeof(ev));
+            struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                                 ECS_COMPONENT_SPAWN);
+
+            struct ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_ref(wr, CT_ID64_0("obj"), root);
+            ct_cdb_a0.set_ptr(wr, CT_ID64_0("data"), comp_data + (info.size * idx));
+            ct_cdb_a0.write_commit(wr);
+
+            ct_ebus_a0.send(ECS_EBUS, info.component_name_hash, event);
+
         }
 
-        struct ct_ecs_component_ev ev = {
-                .world = world,
-                .ent = spawned[i],
-                .comp_mask = ent_type,
-        };
+        struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                             ECS_COMPONENT_ADD);
 
-        ct_ebus_a0.broadcast(ECS_EBUS, ECS_COMPONENT_ADD, &ev, sizeof(ev));
+        struct ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(event);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("ent"), spawned[i].h);
+        ct_cdb_a0.set_uint64(wr, CT_ID64_0("comp_mask"), ent_type);
+        ct_cdb_a0.write_commit(wr);
 
+        ct_ebus_a0.broadcast(ECS_EBUS, event);
     }
 
     return spawned[0];
@@ -926,16 +945,28 @@ static struct ct_world create_world() {
     w->first_child = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
     w->next_sibling = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
 
-    struct ct_ecs_world_ev ev = {.world=world};
 
-    ct_ebus_a0.broadcast(ECS_EBUS, ECS_WORLD_CREATE, &ev, sizeof(ev));
+    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         ECS_WORLD_CREATE);
+
+    struct ct_cdb_obj_t*  wr = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0.write_commit(wr);
+
+    ct_ebus_a0.broadcast(ECS_EBUS, event);
 
     return world;
 }
 
 static void destroy_world(struct ct_world world) {
-    struct ct_ecs_world_ev ev = {.world=world};
-    ct_ebus_a0.broadcast(ECS_EBUS, ECS_WORLD_DESTROY, &ev, sizeof(ev));
+    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         ECS_WORLD_DESTROY);
+
+    struct ct_cdb_obj_t*  wr = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0.write_commit(wr);
+
+    ct_ebus_a0.broadcast(ECS_EBUS, event);
 
     struct world_instance *w = _new_world(world);
     ct_handler_free(&w->entity_handler, _G.allocator);

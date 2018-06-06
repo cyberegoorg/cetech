@@ -148,15 +148,18 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(void *event) {
-    ct_window_resized_event *ev = (ct_window_resized_event *) event;
+static void on_resize(struct ct_cdb_obj_t* event) {
+
     _G.need_reset = 1;
-    _G.size_width = ev->width;
-    _G.size_height = ev->height;
+
+
+
+    _G.size_width = ct_cdb_a0.read_uint32(event, CT_ID64_0("width"), 0);
+    _G.size_height =ct_cdb_a0.read_uint32(event, CT_ID64_0("height"), 0);
 }
 
-static void on_render(void *event) {
-    CT_UNUSED(event);
+static void on_render(struct ct_cdb_obj_t *_event) {
+    CT_UNUSED(_event);
 
     if (_G.need_reset) {
         _G.need_reset = 0;
@@ -164,7 +167,13 @@ static void on_render(void *event) {
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    ct_ebus_a0.broadcast(RENDERER_EBUS, RENDERER_RENDER_EVENT, NULL, 0);
+
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+            ct_cdb_a0.global_db(),
+            RENDERER_RENDER_EVENT);
+
+    ct_ebus_a0.broadcast(RENDERER_EBUS, event);
+
 
     bgfx_frame(false);
 }

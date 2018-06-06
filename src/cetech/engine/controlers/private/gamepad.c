@@ -19,6 +19,7 @@ CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Defines
@@ -134,49 +135,51 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0.gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(void *_event) {
+static void update(struct ct_cdb_obj_t* _event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
-    void* event = ct_ebus_a0.first_event(GAMEPAD_EBUS);
-    struct ebus_header_t *header;
-    while (event) {
-        header = ct_ebus_a0.event_header(event);
 
-        struct ct_gamepad_move_event *move_event = (struct ct_gamepad_move_event *) event;
-        struct ct_gamepad_btn_event *btn_event = (struct ct_gamepad_btn_event *) event;
-        struct ct_gamepad_device_event *device_event = (struct ct_gamepad_device_event *) event;
+    struct ct_cdb_obj_t** events = ct_ebus_a0.events(GAMEPAD_EBUS);
+    uint32_t events_n = ct_ebus_a0.event_count(GAMEPAD_EBUS);
 
-        switch (header->type) {
+    for (int i = 0; i < events_n; ++i) {
+        struct ct_cdb_obj_t *event = events[i];
+        uint32_t button = ct_cdb_a0.read_uint32(event, CT_ID64_0("button"), 0);
+        uint32_t gamepad_id = ct_cdb_a0.read_uint32(event, CT_ID64_0("gamepad_id"), 0);
+        uint32_t axis = ct_cdb_a0.read_uint32(event, CT_ID64_0("axis"), 0);
+
+        float pos[3] = {};
+        ct_cdb_a0.read_vec3(event, CT_ID64_0("position"), pos);
+
+        switch (ct_cdb_a0.type(event)) {
             case EVENT_GAMEPAD_DOWN:
-                _G.state[btn_event->gamepad_id][btn_event->button] = 1;
+                _G.state[gamepad_id][button] = 1;
                 break;
 
             case EVENT_GAMEPAD_UP:
-                _G.state[btn_event->gamepad_id][btn_event->button] = 0;
+                _G.state[gamepad_id][button] = 0;
                 break;
 
             case EVENT_GAMEPAD_MOVE:
-                _G.position[move_event->gamepad_id][move_event->axis][0] = move_event->position[0];
-                _G.position[move_event->gamepad_id][move_event->axis][1] = move_event->position[1];
+                _G.position[gamepad_id][axis][0] = pos[0];
+                _G.position[gamepad_id][axis][1] = pos[1];
                 break;
 
             case EVENT_GAMEPAD_CONNECT:
-                _G.active[device_event->gamepad_id] = 1;
+                _G.active[gamepad_id] = 1;
                 break;
 
             case EVENT_GAMEPAD_DISCONNECT:
-                _G.active[device_event->gamepad_id] = 0;
+                _G.active[gamepad_id] = 0;
                 break;
 
 
             default:
                 break;
         }
-
-        event = ct_ebus_a0.next_event(GAMEPAD_EBUS, event);
     }
 }
 
@@ -227,6 +230,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

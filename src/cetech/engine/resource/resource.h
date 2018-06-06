@@ -1,6 +1,3 @@
-//! \defgroup Resource
-//! Resource system
-//! \{
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
@@ -28,11 +25,6 @@ struct ct_compilator_api;
 // Typedefs
 //==============================================================================
 
-//! Resource compilator fce
-//! \param filename Source filename
-//! \param source_vio Source vio
-//! \param build_vio Build vio
-//! \param compilator_api Compilator api
 typedef void (*ct_resource_compilator_t)(
         const char *filename,
         char **output,
@@ -55,16 +47,10 @@ struct ct_resource_id {
 
 //! Resource callbacks
 typedef struct {
-    //! Resource online callback
-    //! \param name Resource name
-    //! \param data Resource data
     void (*online)(uint64_t name,
                    struct ct_vio* input,
                    struct ct_cdb_obj_t *obj);
 
-    //! Resource offline callback
-    //! \param name Resource name
-    //! \param data Resource data
     void (*offline)(uint64_t name,
                     struct ct_cdb_obj_t *obj);
 } ct_resource_type_t;
@@ -72,9 +58,6 @@ typedef struct {
 
 //! Compilator api
 struct ct_compilator_api {
-    //! Add dependency
-    //! \param who_filname Source filename
-    //! \param depend_on_filename Depend on this file
     void (*add_dependency)(const char *who_filname,
                            const char *depend_on_filename);
 };

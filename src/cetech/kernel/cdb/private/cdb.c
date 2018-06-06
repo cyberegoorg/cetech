@@ -9,12 +9,10 @@
 #include <cetech/kernel/macros.h>
 #include <cetech/kernel/memory/allocator.h>
 #include <cetech/kernel/containers/hash.h>
-#include <cetech/kernel/ebus/ebus.h>
 #include <cetech/kernel/hashlib/hashlib.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 
 #define _G coredb_global
@@ -259,6 +257,7 @@ static struct ct_cdb_obj_t *create_object(struct ct_cdb_t db,
 
     *obj_addr = obj;
     obj->db = db;
+    obj->type = type;
 
     return (struct ct_cdb_obj_t *) obj_addr;
 }
@@ -835,8 +834,15 @@ void register_notify(struct ct_cdb_obj_t* _obj, ct_cdb_notify notify) {
 }
 
 
-struct ct_cdb_t global_db(){
+static struct ct_cdb_t global_db(){
     return _G.global_db;
+}
+
+
+static uint64_t type(struct ct_cdb_obj_t *_obj){
+    struct object_t *obj = *(struct object_t **) _obj;
+
+    return obj->type;
 }
 
 static struct ct_cdb_a0 cdb_api = {
@@ -845,6 +851,7 @@ static struct ct_cdb_a0 cdb_api = {
 
         . global_db  = global_db,
 
+                .type = type,
         .create_object = create_object,
         .create_from = create_from,
         .destroy_object = destroy_object,
@@ -905,7 +912,6 @@ CETECH_MODULE_DEF(
         cdb,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
         },
         {

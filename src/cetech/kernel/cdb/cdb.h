@@ -87,10 +87,12 @@ struct ct_cdb_a0 {
 
     void (*destroy_object)(struct ct_cdb_obj_t *obj);
 
-    void (*gc)();
+    uint64_t (*type)(struct ct_cdb_obj_t *obj);
 
     void (*add_child)(struct ct_cdb_obj_t *parent,
                       struct ct_cdb_obj_t *child);
+
+    void (*gc)();
 
     struct ct_cdb_obj_t **(*children)(struct ct_cdb_obj_t *obj);
 

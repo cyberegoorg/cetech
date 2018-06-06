@@ -19,6 +19,7 @@ CETECH_DECL_API(ct_thread_a0);
 CETECH_DECL_API(ct_cpu_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hashlib_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Defines
@@ -46,7 +47,7 @@ struct ebus_t {
 
     struct ct_hash_t handler_idx;
     struct ebus_event_handlers *handlers;
-    uint8_t *buffer;
+    struct ct_cdb_obj_t** events;
 };
 
 static struct _G {
@@ -75,10 +76,8 @@ void create_ebus(const char *name,
 }
 
 void send_addr(uint32_t bus_name,
-               uint64_t event_type,
                uint64_t addr,
-               void *event,
-               uint64_t event_size) {
+               struct ct_cdb_obj_t* event) {
 
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
@@ -88,16 +87,9 @@ void send_addr(uint32_t bus_name,
 
     struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
 
-    uint32_t event_full_size = sizeof(struct ebus_header_t) + event_size;
-    uint8_t eventdata[event_full_size];
-    struct ebus_header_t *ev = (struct ebus_header_t *) eventdata;
+    ct_array_push(ebus->events, event, _G.allocator);
 
-    ev->type = event_type;
-    ev->size = event_size;
-    memcpy(ev + 1, event, event_size);
-
-    uint64_t ev_offset = ct_array_size(ebus->buffer);
-    ct_array_push_n(ebus->buffer, eventdata, event_full_size, _G.allocator);
+    uint64_t event_type = ct_cdb_a0.type(event);
 
     uint64_t event_idx = ct_hash_lookup(&ebus->handler_idx, event_type,
                                         UINT64_MAX);
@@ -113,24 +105,25 @@ void send_addr(uint32_t bus_name,
             continue;
         }
 
-        ev_handlers->handlers[i].handler(
-                ebus->buffer + ev_offset + sizeof(struct ebus_header_t));
+        ev_handlers->handlers[i].handler(event);
     }
 }
 
 void broadcast(uint32_t bus_name,
-               uint64_t event_type,
-               void *event,
-               uint64_t event_size) {
-    send_addr(bus_name, event_type, 0, event, event_size);
+               struct ct_cdb_obj_t* event) {
+    send_addr(bus_name, 0, event);
 }
 
 void begin_frame() {
     uint32_t ebus_n = ct_array_size(_G.ebus_pool);
     for (int i = 0; i < ebus_n; ++i) {
         struct ebus_t *ebus = &_G.ebus_pool[i];
-        if (ct_array_any(ebus->buffer)) {
-            ct_array_resize(ebus->buffer, 0, _G.allocator);
+        if (ct_array_any(ebus->events)) {
+            for (int j = 0; j < ct_array_size(ebus->events); ++j) {
+                ct_cdb_a0.destroy_object(ebus->events[j]);
+            }
+
+            ct_array_resize(ebus->events, 0, _G.allocator);
         }
     }
 }
@@ -242,48 +235,28 @@ void disconnect(uint32_t bus_name,
 }
 
 
-void *first_event(uint32_t bus_name) {
+uint32_t event_count(uint32_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
-        return NULL;
+        return 0;
     }
 
     struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
 
-    if (!ct_array_size(ebus->buffer)) {
-        return NULL;
-    }
-
-    return ebus->buffer + sizeof(struct ebus_header_t);
+    return ct_array_size(ebus->events);
 }
 
-void *next_event(uint32_t bus_name,
-                 void *event) {
-    struct ebus_header_t *header = event - sizeof(struct ebus_header_t);
-
+struct ct_cdb_obj_t** events(uint32_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
-        return NULL;
+        return 0;
     }
 
     struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
 
-
-    void *last = ebus->buffer + ct_array_size(ebus->buffer);
-    void *next = event + header->size + sizeof(struct ebus_header_t);
-
-    if (next >= last) {
-        return NULL;
-    }
-
-    return next;
-}
-
-struct ebus_header_t *event_header(void *event) {
-    struct ebus_header_t *header = event - sizeof(struct ebus_header_t);
-    return header;
+    return ebus->events;
 }
 
 static struct ct_ebus_a0 _api = {
@@ -297,9 +270,8 @@ static struct ct_ebus_a0 _api = {
         .disconnect = disconnect,
         .disconnect_addr = disconnect_addr,
 
-        .first_event = first_event,
-        .next_event = next_event,
-        .event_header = event_header,
+        .event_count = event_count,
+        .events = events,
 };
 
 static void _init(struct ct_api_a0 *api) {
@@ -308,6 +280,7 @@ static void _init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_cpu_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
+    CETECH_GET_API(api, ct_cdb_a0);
 
 
     api->register_api("ct_ebus_a0", &_api);

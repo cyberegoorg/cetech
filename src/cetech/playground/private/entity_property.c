@@ -297,16 +297,18 @@ static void on_debugui() {
     }
 }
 
-void on_entity_click(void *event) {
-
-    struct ct_ent_selected_ev *ev = event;
-
+void on_entity_click(struct ct_cdb_obj_t *event) {
     ct_property_editor_a0.set_active(on_debugui);
 
-    _G.active_world = ev->world;
-    _G.top_entity = ev->entity;
-    _G.filename = ev->filename;
-    _G.obj = ev->obj;
+    struct ct_world world = {ct_cdb_a0.read_uint64(event, CT_ID64_0("world"), 0)};
+    const char* filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), 0);
+    struct ct_entity entity = {ct_cdb_a0.read_uint64(event, CT_ID64_0("ent"), 0)};
+    struct ct_cdb_obj_t* obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
+
+    _G.active_world = world;
+    _G.top_entity = entity;
+    _G.filename = filename;
+    _G.obj = obj;
 }
 
 
