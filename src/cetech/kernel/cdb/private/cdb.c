@@ -79,6 +79,7 @@ static struct _G {
     uint32_t *to_free_db;
 
     struct ct_alloc *allocator;
+    struct ct_cdb_t global_db;
 } _G;
 
 
@@ -833,9 +834,17 @@ void register_notify(struct ct_cdb_obj_t* _obj, ct_cdb_notify notify) {
     ct_array_push(obj->notify, notify, _G.allocator);
 }
 
+
+struct ct_cdb_t global_db(){
+    return _G.global_db;
+}
+
 static struct ct_cdb_a0 cdb_api = {
         .register_notify = register_notify,
-        .create_db = create_db,
+//        .create_db = create_db,
+
+        . global_db  = global_db,
+
         .create_object = create_object,
         .create_from = create_from,
         .destroy_object = destroy_object,
@@ -881,9 +890,10 @@ static struct ct_cdb_a0 cdb_api = {
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0.main_allocator()
+            .allocator = ct_memory_a0.main_allocator(),
     };
 
+    _G.global_db = create_db(),
     api->register_api("ct_cdb_a0", &cdb_api);
 }
 

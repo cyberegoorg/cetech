@@ -916,7 +916,7 @@ static struct ct_world create_world() {
     struct world_instance *w = _new_world(world);
 
     w->world = world;
-    w->db = ct_cdb_a0.create_db();
+    w->db = ct_cdb_a0.global_db();
     ct_handler_create(&w->entity_handler, _G.allocator);
 
     w->entity_data_idx = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
@@ -984,7 +984,7 @@ static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .type = CT_ID32_0("entity"),
-            .db = ct_cdb_a0.create_db()
+            .db = ct_cdb_a0.global_db()
     };
 
     ct_handler_create(&_G.world_handler, _G.allocator);

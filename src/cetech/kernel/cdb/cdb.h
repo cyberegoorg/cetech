@@ -71,7 +71,9 @@ enum ct_cdb_type {
 //==============================================================================
 
 struct ct_cdb_a0 {
-    struct ct_cdb_t (*create_db)();
+//    struct ct_cdb_t (*create_db)();
+
+    struct ct_cdb_t (*global_db)();
 
     void (*register_notify)(struct ct_cdb_obj_t* obj, ct_cdb_notify notify);
 

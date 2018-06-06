@@ -258,7 +258,7 @@ CETECH_MODULE_DEF(
 
             ct_log_a0.debug(LOG_WHERE, "Init");
 
-            _G.db = ct_cdb_a0.create_db();
+            _G.db = ct_cdb_a0.global_db();
             _G.config_object = ct_cdb_a0.create_object(_G.db, 0);
             _G.config_desc = ct_cdb_a0.create_object(_G.db, 1);
 
