@@ -1,10 +1,16 @@
+#ifdef CETECH_LINUX
+#define _GNU_SOURCE
+#endif
+
 #include <dlfcn.h>
+
 #include <cetech/kernel/api/api_system.h>
 #include <cetech/kernel/os/errors.h>
 #include <cetech/kernel/os/object.h>
 #include <cetech/kernel/module/module.h>
 
 #include "cetech/kernel/log/log.h"
+
 #include "cetech/kernel/macros.h"
 
 CETECH_DECL_API(ct_log_a0);
