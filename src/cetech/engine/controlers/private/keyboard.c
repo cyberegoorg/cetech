@@ -19,6 +19,7 @@ CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_hashlib_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 //==============================================================================
 // Defines
@@ -92,37 +93,36 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(void *_event) {
+static void _update(struct ct_cdb_obj_t* _event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    void* event = ct_ebus_a0.first_event(KEYBOARD_EBUS);
-    struct ebus_header_t *header;
-    while (event) {
-        header = ct_ebus_a0.event_header(event);
+    struct ct_cdb_obj_t** events = ct_ebus_a0.events(KEYBOARD_EBUS);
+    uint32_t events_n = ct_ebus_a0.event_count(KEYBOARD_EBUS);
 
-        switch (header->type) {
+    for (int i = 0; i < events_n; ++i) {
+        struct ct_cdb_obj_t* event = events[i];
+
+        switch (ct_cdb_a0.type(event)) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[((struct ct_keyboard_event *) event)->keycode] = 1;
+                _G.state[ct_cdb_a0.read_uint32(event, CT_ID64_0("keycode"), 0)] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[((struct ct_keyboard_event *) event)->keycode] = 0;
+                _G.state[ct_cdb_a0.read_uint32(event, CT_ID64_0("keycode"), 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                struct ct_keyboard_text_event *ev = (struct ct_keyboard_text_event *) event;
-                memcpy(_G.text, ev->text, sizeof(ev->text));
+                const char* str = ct_cdb_a0.read_str(event, CT_ID64_0("text"), 0);
+                memcpy(_G.text, str, strlen(str));
                 break;
             }
-
 
             default:
                 break;
         }
-        event = ct_ebus_a0.next_event(KEYBOARD_EBUS, event);
     }
 }
 
@@ -174,6 +174,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

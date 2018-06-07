@@ -101,15 +101,17 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 
     bool open = ct_debugui_a0.TreeNodeEx(label, flags);
     if (ct_debugui_a0.IsItemClicked(0)) {
-        ct_ent_selected_ev ev = {
-                .world  = _G.world,
-                .entity = _G.entity,
-                .filename = _G.path,
-                .obj = obj,
-        };
+        struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                             EXPLORER_ENTITY_SELECT_EVENT);
 
-        ct_ebus_a0.broadcast(EXPLORER_EBUS,
-                             EXPLORER_ENTITY_SELECT_EVENT, &ev, sizeof(ev));
+        ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+        ct_cdb_a0.set_uint64(w, CT_ID64_0("world"), _G.world.h);
+        ct_cdb_a0.set_string(w, CT_ID64_0("filename"), _G.path);
+        ct_cdb_a0.set_uint64(w, CT_ID64_0("ent"), _G.entity.h);
+        ct_cdb_a0.set_ref(w, CT_ID64_0("obj"), obj);
+        ct_cdb_a0.write_commit(w);
+
+        ct_ebus_a0.broadcast(EXPLORER_EBUS, event);
 
         _G.selected_obj = obj;
     }
@@ -123,7 +125,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 }
 
 
-static void on_debugui(void *event) {
+static void on_debugui(ct_cdb_obj_t *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
@@ -146,7 +148,7 @@ static void on_debugui(void *event) {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(void *event) {
+static void on_menu_window(ct_cdb_obj_t *event) {
     CT_UNUSED(event);
 
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);

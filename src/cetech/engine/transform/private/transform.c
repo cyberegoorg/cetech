@@ -151,40 +151,43 @@ static struct _G {
 //    ct_array_pop_back(_G.world_instances);
 //}
 
-void _component_compiler(void *event) {
-    struct ct_ecs_component_compile_ev *ev = event;
+void _component_compiler(struct ct_cdb_obj_t *event) {
+    const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
+    struct ct_cdb_obj_t *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
+    uint64_t *component_key = ct_cdb_a0.read_ptr(event, CT_ID64_0("component_key"), NULL);
+    uint32_t component_key_count = ct_cdb_a0.read_uint32(event, CT_ID64_0("component_key_count"), 0);
 
     struct ct_transform_comp t_data;
 
-    struct ct_yng_doc *d = ct_ydb_a0.get(ev->filename);
-    uint64_t keys[ev->component_key_count + 1];
-    memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
+    struct ct_yng_doc *d = ct_ydb_a0.get(filename);
+    uint64_t keys[component_key_count + 1];
+    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
     uint64_t key;
 
-    keys[ev->component_key_count] = ct_yng_a0.key("scale");
+    keys[component_key_count] = ct_yng_a0.key("scale");
     key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(ev->filename, keys, CT_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.scale, (float[3]) {0});
-        ct_cdb_a0.set_vec3(ev->writer, PROP_SCALE, t_data.scale);
+        ct_cdb_a0.set_vec3(writer, PROP_SCALE, t_data.scale);
     }
 
 
-    keys[ev->component_key_count] = ct_yng_a0.key("position");
+    keys[component_key_count] = ct_yng_a0.key("position");
     key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(ev->filename, keys, CT_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.position, (float[3]) {0});
-        ct_cdb_a0.set_vec3(ev->writer, PROP_POSITION, t_data.position);
+        ct_cdb_a0.set_vec3(writer, PROP_POSITION, t_data.position);
     }
 
-    keys[ev->component_key_count] = ct_yng_a0.key("rotation");
+    keys[component_key_count] = ct_yng_a0.key("rotation");
     key = ct_yng_a0.combine_key(keys, CT_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0.get_vec3(ev->filename, keys, CT_ARRAY_LEN(keys),
+        ct_ydb_a0.get_vec3(filename, keys, CT_ARRAY_LEN(keys),
                            t_data.rotation, (float[3]) {0});
-        ct_cdb_a0.set_vec3(ev->writer, PROP_ROTATION, t_data.rotation);
+        ct_cdb_a0.set_vec3(writer, PROP_ROTATION, t_data.rotation);
     }
 }
 
@@ -218,16 +221,19 @@ void transform_transform(struct ct_transform_comp *transform,
 }
 
 
-static void on_change(void *event) {
-    struct ct_ecs_component_ev *ev = event;
+static void on_change(struct ct_cdb_obj_t *event) {
 
-    if (!(ev->comp_mask & ct_ecs_a0.component_mask(_G.type))) {
+    struct ct_world world = {ct_cdb_a0.read_uint64(event, CT_ID64_0("world"), 0)};
+    struct ct_entity ent = {ct_cdb_a0.read_uint64(event, CT_ID64_0("ent"), 0)};
+    uint64_t comp_mask  = ct_cdb_a0.read_uint64(event, CT_ID64_0("comp_mask"), 0);
+
+    if (!(comp_mask & ct_ecs_a0.component_mask(_G.type))) {
         return;
     }
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0.entity_data(ev->world, TRANSFORM_COMPONENT,
-                                      ev->ent);
+    transform = ct_ecs_a0.entity_data(world, TRANSFORM_COMPONENT,
+                                      ent);
 
     transform_transform(transform, NULL);
 }
@@ -236,14 +242,13 @@ static void on_change(void *event) {
 static struct ct_transform_a0 _api = {
 };
 
-static void _component_spawner(void *event) {
-    struct ct_ecs_component_spawn_ev *ev = event;
+static void _component_spawner(struct ct_cdb_obj_t *event) {
+    struct ct_cdb_obj_t*obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), NULL);
+    struct ct_transform_comp *transform= ct_cdb_a0.read_ptr(event, CT_ID64_0("data"), NULL);
 
-    struct ct_transform_comp *transform = (struct ct_transform_comp *) (ev->data);
-
-    ct_cdb_a0.read_vec3(ev->obj, PROP_POSITION, transform->position);
-    ct_cdb_a0.read_vec3(ev->obj, PROP_ROTATION, transform->rotation);
-    ct_cdb_a0.read_vec3(ev->obj, PROP_SCALE, transform->scale);
+    ct_cdb_a0.read_vec3(obj, PROP_POSITION, transform->position);
+    ct_cdb_a0.read_vec3(obj, PROP_ROTATION, transform->rotation);
+    ct_cdb_a0.read_vec3(obj, PROP_SCALE, transform->scale);
 
 
     ct_log_a0.debug(LOG_WHERE, "Spawn transform p[%f, %f, %f], r[%f, %f, %f], s[%f, %f, %f]",

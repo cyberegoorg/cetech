@@ -112,7 +112,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(void *event) {
+static void on_debugui(struct ct_cdb_obj_t *event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
 
@@ -138,10 +138,11 @@ static void on_debugui(void *event) {
 }
 
 
-static void set_asset(void *event) {
+static void set_asset(struct ct_cdb_obj_t *event) {
+    uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
+    const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);
 
-    struct ct_asset_browser_click_ev *ev = event;
-    struct ct_resource_id rid = {.i64 = ev->asset};
+    struct ct_resource_id rid = {.i64 = asset};
 
     if (_G.active_asset.i64 == rid.i64) {
         return;
@@ -158,14 +159,14 @@ static void set_asset(void *event) {
     }
 
     _G.active_asset = rid;
-    _G.active_path = ev->path;
+    _G.active_path = path;
 
     idx = ct_hash_lookup(&_G.preview_fce_map, rid.type, UINT64_MAX);
     if (idx != UINT64_MAX) {
         struct ct_asset_preview_fce fce = _G.preview_fce[idx];
 
         if (fce.load) {
-            fce.load(ev->path, rid, _G.world);
+            fce.load(path, rid, _G.world);
         }
     }
 
@@ -177,7 +178,7 @@ static void set_asset(void *event) {
     ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init(void *event) {
+static void init(struct ct_cdb_obj_t *event) {
     CT_UNUSED(event);
 
     _G.visible = true;
@@ -192,7 +193,7 @@ static void init(void *event) {
 
 }
 
-static void on_render(void *event) {
+static void on_render(struct ct_cdb_obj_t *event) {
     CT_UNUSED(event);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
@@ -205,9 +206,8 @@ static void on_render(void *event) {
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static void update(void *event) {
-    struct ct_playground_update_ev *ev = event;
-    float dt = ev->dt;
+static void update(struct ct_cdb_obj_t *event) {
+    float dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
 
     if (_G.active) {
         float updown = 0.0f;
@@ -264,7 +264,7 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(void *event) {
+static void on_menu_window(struct ct_cdb_obj_t *event) {
     CT_UNUSED(event);
 
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);

@@ -48,38 +48,45 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-void _mesh_component_compiler(void *event) {
-    struct ct_ecs_component_compile_ev *ev = event;
+void _mesh_component_compiler(struct ct_cdb_obj_t *event) {
+    const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
+    struct ct_cdb_obj_t *writer = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"),
+                                                     NULL);
+    uint64_t *component_key = ct_cdb_a0.read_ptr(event,
+                                                 CT_ID64_0("component_key"),
+                                                 NULL);
+    uint32_t component_key_count = ct_cdb_a0.read_uint32(event, CT_ID64_0(
+            "component_key_count"), 0);
 
-    uint64_t keys[ev->component_key_count + 3];
-    memcpy(keys, ev->component_key, sizeof(uint64_t) * ev->component_key_count);
+    uint64_t keys[component_key_count + 3];
+    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
-    keys[ev->component_key_count] = ct_yng_a0.key("scene");
-    const char *scene = ct_ydb_a0.get_str(ev->filename, keys,
-                                          ev->component_key_count + 1,
+    keys[component_key_count] = ct_yng_a0.key("scene");
+    const char *scene = ct_ydb_a0.get_str(filename, keys,
+                                          component_key_count + 1,
                                           "");
 
-    keys[ev->component_key_count] = ct_yng_a0.key("mesh");
-    const char *mesh = ct_ydb_a0.get_str(ev->filename, keys,
-                                         ev->component_key_count + 1, "");
+    keys[component_key_count] = ct_yng_a0.key("mesh");
+    const char *mesh = ct_ydb_a0.get_str(filename, keys,
+                                         component_key_count + 1, "");
 
-    keys[ev->component_key_count] = ct_yng_a0.key("material");
-    const char *mat = ct_ydb_a0.get_str(ev->filename, keys,
-                                        ev->component_key_count + 1, "");
+    keys[component_key_count] = ct_yng_a0.key("material");
+    const char *mat = ct_ydb_a0.get_str(filename, keys,
+                                        component_key_count + 1, "");
 
-    keys[ev->component_key_count] = ct_yng_a0.key("node");
-    const char *node = ct_ydb_a0.get_str(ev->filename, keys,
-                                         ev->component_key_count + 1, "");
+    keys[component_key_count] = ct_yng_a0.key("node");
+    const char *node = ct_ydb_a0.get_str(filename, keys,
+                                         component_key_count + 1, "");
 
-    ct_cdb_a0.set_uint64(ev->writer, PROP_MESH_ID, CT_ID64_0(mesh));
-    ct_cdb_a0.set_uint64(ev->writer, PROP_NODE_ID, CT_ID64_0(node));
-    ct_cdb_a0.set_uint64(ev->writer, PROP_MATERIAL_ID, CT_ID32_0(mat));
-    ct_cdb_a0.set_uint64(ev->writer, PROP_SCENE_ID, CT_ID32_0(scene));
+    ct_cdb_a0.set_uint64(writer, PROP_MESH_ID, CT_ID64_0(mesh));
+    ct_cdb_a0.set_uint64(writer, PROP_NODE_ID, CT_ID64_0(node));
+    ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID, CT_ID32_0(mat));
+    ct_cdb_a0.set_uint64(writer, PROP_SCENE_ID, CT_ID32_0(scene));
 
-    ct_cdb_a0.set_string(ev->writer, PROP_MESH, mesh);
-    ct_cdb_a0.set_string(ev->writer, PROP_NODE, node);
-    ct_cdb_a0.set_string(ev->writer, PROP_MATERIAL, mat);
-    ct_cdb_a0.set_string(ev->writer, PROP_SCENE, scene);
+    ct_cdb_a0.set_string(writer, PROP_MESH, mesh);
+    ct_cdb_a0.set_string(writer, PROP_NODE, node);
+    ct_cdb_a0.set_string(writer, PROP_MATERIAL, mat);
+    ct_cdb_a0.set_string(writer, PROP_SCENE, scene);
 }
 
 struct mesh_render_data {
@@ -169,58 +176,57 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static void _on_obj_change(void *event) {
-
-    struct ct_cdb_obj_change_ev *ev = event;
-
+static void _on_obj_change(struct ct_cdb_obj_t *obj,
+                           uint64_t *prop,
+                           uint32_t prop_count) {
 
     struct ct_cdb_obj_t *writer = NULL;
-    for (int k = 0; k < ev->prop_count; ++k) {
-        if (ev->prop[k] == PROP_SCENE) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_SCENE, "");
+    for (int k = 0; k < prop_count; ++k) {
+        if (prop[k] == PROP_SCENE) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_SCENE, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_SCENE_ID, CT_ID32_0(str));
 
 
-        } else if (ev->prop[k] == PROP_NODE) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_NODE, "");
+        } else if (prop[k] == PROP_NODE) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_NODE, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_NODE_ID, CT_ID64_0(str));
 
-        } else if (ev->prop[k] == PROP_MESH) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MESH, "");
+        } else if (prop[k] == PROP_MESH) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_MESH, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint64(writer, PROP_MESH_ID, CT_ID64_0(str));
 
 
-        } else if (ev->prop[k] == PROP_MATERIAL) {
-            const char *str = ct_cdb_a0.read_str(ev->obj, PROP_MATERIAL, "");
+        } else if (prop[k] == PROP_MATERIAL) {
+            const char *str = ct_cdb_a0.read_str(obj, PROP_MATERIAL, "");
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_uint32(writer, PROP_MATERIAL_ID, CT_ID32_0(str));
 
-        } else if (ev->prop[k] == PROP_MATERIAL_ID) {
-            uint32_t material_id = ct_cdb_a0.read_uint32(ev->obj,
+        } else if (prop[k] == PROP_MATERIAL_ID) {
+            uint32_t material_id = ct_cdb_a0.read_uint32(obj,
                                                          PROP_MATERIAL_ID, 0);
 
 
             if (!writer) {
-                writer = ct_cdb_a0.write_begin(ev->obj);
+                writer = ct_cdb_a0.write_begin(obj);
             }
 
             ct_cdb_a0.set_ref(writer,
@@ -235,24 +241,25 @@ static void _on_obj_change(void *event) {
     }
 }
 
-static void _component_spawner(void *event) {
-    struct ct_ecs_component_spawn_ev *ev = (event);
+static void _component_spawner(struct ct_cdb_obj_t *event) {
+    struct ct_cdb_obj_t *obj = ct_cdb_a0.read_ref(event,
+                                                  CT_ID64_0("obj"),
+                                                  NULL);
 
-    struct ct_mesh_renderer *mesh = (ev->data);
+    struct ct_mesh_renderer *mesh = ct_cdb_a0.read_ptr(event,
+                                                       CT_ID64_0("data"),
+                                                       NULL);
 
     *mesh = (struct ct_mesh_renderer) {
             .material = ct_material_a0.resource_create(
-                    ct_cdb_a0.read_uint32(ev->obj, PROP_MATERIAL_ID, 0)),
+                    ct_cdb_a0.read_uint32(obj, PROP_MATERIAL_ID, 0)),
 
-            .mesh_id = ct_cdb_a0.read_uint64(ev->obj, PROP_MESH_ID, 0),
-            .node_id = ct_cdb_a0.read_uint64(ev->obj, PROP_NODE_ID, 0),
-            .scene_id = ct_cdb_a0.read_uint32(ev->obj, PROP_SCENE_ID, 0),
+            .mesh_id = ct_cdb_a0.read_uint64(obj, PROP_MESH_ID, 0),
+            .node_id = ct_cdb_a0.read_uint64(obj, PROP_NODE_ID, 0),
+            .scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0),
     };
 
-    ct_ebus_a0.connect_addr(CDB_EBUS,
-                            CDB_OBJ_CHANGE, (uint64_t) ev->obj,
-                            _on_obj_change, 0);
-
+    ct_cdb_a0.register_notify(obj, (ct_cdb_notify) _on_obj_change);
 }
 
 

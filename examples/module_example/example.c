@@ -33,6 +33,7 @@ CETECH_DECL_API(ct_ecs_a0);
 //CETECH_DECL_API(ct_camera_a0);
 CETECH_DECL_API(ct_texture_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 static struct G {
@@ -42,10 +43,10 @@ static struct G {
 } _G;
 
 
-void update(void *event) {
-    struct ct_app_update_ev *ev = event;
+void update(struct ct_cdb_obj_t* event) {
 
-    _G.dt = ev->dt;
+    _G.dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
+
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {
         ct_log_a0.info("example", "PO");
         ct_log_a0.error("example", "LICE");
@@ -53,7 +54,7 @@ void update(void *event) {
     ///ct_log_a0.debug("example", "%f", dt);
 }
 
-void module1(void* event) {
+void module1(struct ct_cdb_obj_t* event) {
     CT_UNUSED(event)
 
     static bool visible = true;
@@ -139,6 +140,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_ecs_a0);
 //            CETECH_GET_API(api, ct_camera_a0);
             CETECH_GET_API(api, ct_texture_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
 
 //==============================================================================

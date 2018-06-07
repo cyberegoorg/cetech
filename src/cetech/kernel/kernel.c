@@ -14,7 +14,6 @@
 #include "cetech/kernel/memory/private/allocator_core_private.h"
 
 #include <cetech/kernel/ebus/ebus.h>
-#include <cetech/kernel/cdb/cdb.h>
 
 #include <cetech/kernel/core.h>
 #include <cetech/kernel/containers/buffer.h>
@@ -257,7 +256,7 @@ static void _boot_unload() {
 }
 
 
-static void on_quit(void *event) {
+static void on_quit(struct ct_cdb_obj_t *event) {
     CT_UNUSED(event)
 
     application_quit();
@@ -278,7 +277,10 @@ void application_start() {
 
     ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 
-    ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_INIT_EVENT, NULL, 0);
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         KERNEL_INIT_EVENT);
+
+    ct_ebus_a0.broadcast(KERNEL_EBUS, event);
 
     _G.is_running = 1;
 
@@ -293,13 +295,23 @@ void application_start() {
         ct_ebus_a0.begin_frame();
         ct_machine_a0.update(dt);
 
-        struct ct_app_update_ev ev = {.dt=dt};
-        ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_UPDATE_EVENT, &ev, sizeof(ev));
+        struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                ct_cdb_a0.global_db(),
+                KERNEL_UPDATE_EVENT);
+        struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+        ct_cdb_a0.set_float(w, CT_ID64_0("dt"), dt);
+        ct_cdb_a0.write_commit(w);
+
+        ct_ebus_a0.broadcast(KERNEL_EBUS, event);
 
         ct_cdb_a0.gc();
     }
 
-    ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, NULL, 0);
+    event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                    KERNEL_SHUTDOWN_EVENT);
+
+    ct_ebus_a0.broadcast(KERNEL_EBUS, event);
+
     ct_ebus_a0.disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
 
     _boot_unload();

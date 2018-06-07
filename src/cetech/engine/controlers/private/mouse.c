@@ -21,6 +21,7 @@ CETECH_DECL_API(ct_machine_a0);
 CETECH_DECL_API(ct_log_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 //==============================================================================
@@ -39,10 +40,10 @@ CETECH_DECL_API(ct_ebus_a0);
 static struct _G {
     uint8_t state[MOUSE_BTN_MAX];
     uint8_t last_state[MOUSE_BTN_MAX];
-    float pos[2];
-    float delta_pos[2];
-    float wheel[2];
-    float wheel_last[2];
+    float pos[3];
+    float delta_pos[3];
+    float wheel[3];
+    float wheel_last[3];
 } _G = {};
 
 //==============================================================================
@@ -157,7 +158,7 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(void *_event) {
+static void update(struct ct_cdb_obj_t *_event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -166,48 +167,51 @@ static void update(void *_event) {
 //    _G.wheel[0] = 0;
 //    _G.wheel[1] = 0;
 
+    struct ct_cdb_obj_t **events = ct_ebus_a0.events(MOUSE_EBUS);
+    uint32_t events_n = ct_ebus_a0.event_count(MOUSE_EBUS);
 
-    void* event = ct_ebus_a0.first_event(MOUSE_EBUS);
-    struct ebus_header_t *header;
-    while (event) {
-        header = ct_ebus_a0.event_header(event);
-        struct ct_mouse_move_event *move_event;
+    for (int i = 0; i < events_n; ++i) {
+        struct ct_cdb_obj_t *event = events[i];
+        uint32_t button = ct_cdb_a0.read_uint32(event, CT_ID64_0("button"), 0);
 
-        switch (header->type) {
+        switch (ct_cdb_a0.type(event)) {
             case EVENT_MOUSE_DOWN:
-                _G.state[((struct ct_mouse_event *) event)->button] = 1;
+                _G.state[button] = 1;
                 break;
 
             case EVENT_MOUSE_UP:
-                _G.state[((struct ct_mouse_event *) event)->button] = 0;
+                _G.state[button] = 0;
                 break;
 
-            case EVENT_MOUSE_MOVE:
-                move_event = ((struct ct_mouse_move_event *) event);
+            case EVENT_MOUSE_MOVE: {
+                float pos[3];
 
-                _G.delta_pos[0] = move_event->pos[0] - _G.pos[0];
-                _G.delta_pos[1] = move_event->pos[1] - _G.pos[1];
+                ct_cdb_a0.read_vec3(event, CT_ID64_0("position"), pos);
 
-                _G.pos[0] = move_event->pos[0];
-                _G.pos[1] = move_event->pos[1];
+                _G.delta_pos[0] = pos[0] - _G.pos[0];
+                _G.delta_pos[1] = pos[1] - _G.pos[1];
 
+                _G.pos[0] = pos[0];
+                _G.pos[1] = pos[1];
+            }
                 break;
 
             case EVENT_MOUSE_WHEEL: {
-                struct ct_mouse_wheel_event *ev = ((struct ct_mouse_wheel_event *) event);
-                _G.wheel[0] += ev->pos[0];// - _G.wheel_last[0];
-                _G.wheel[1] += ev->pos[1];// - _G.wheel_last[1];
+                float pos[3];
 
-                _G.wheel_last[0] = ev->pos[0];
-                _G.wheel_last[1] = ev->pos[1];
+                ct_cdb_a0.read_vec3(event, CT_ID64_0("position"), pos);
+
+                _G.wheel[0] += pos[0];// - _G.wheel_last[0];
+                _G.wheel[1] += pos[1];// - _G.wheel_last[1];
+
+                _G.wheel_last[0] = pos[0];
+                _G.wheel_last[1] = pos[1];
             }
                 break;
 
             default:
                 break;
         }
-
-        event = ct_ebus_a0.next_event(MOUSE_EBUS, event);
     }
 }
 
@@ -253,6 +257,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
 
         },
         {
