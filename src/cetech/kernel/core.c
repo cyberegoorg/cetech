@@ -28,10 +28,10 @@ bool corelib_init() {
     CETECH_LOAD_STATIC_MODULE(api, time);
     CETECH_LOAD_STATIC_MODULE(api, thread);
     CETECH_LOAD_STATIC_MODULE(api, path);
-    CETECH_LOAD_STATIC_MODULE(api, ebus);
     CETECH_LOAD_STATIC_MODULE(api, task);
-    CETECH_LOAD_STATIC_MODULE(api, watchdog);
     CETECH_LOAD_STATIC_MODULE(api, cdb);
+    CETECH_LOAD_STATIC_MODULE(api, ebus);
+    CETECH_LOAD_STATIC_MODULE(api, watchdog);
     CETECH_LOAD_STATIC_MODULE(api, yamlng);
     CETECH_LOAD_STATIC_MODULE(api, config);
     CETECH_LOAD_STATIC_MODULE(api, object);

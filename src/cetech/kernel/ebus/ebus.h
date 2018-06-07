@@ -7,6 +7,7 @@
 // Includes
 //==============================================================================
 #include <stdint.h>
+#include <cetech/kernel/cdb/cdb.h>
 
 //==============================================================================
 // Structs
@@ -17,7 +18,7 @@ struct ebus_header_t {
     uint64_t size;
 };
 
-typedef void (ct_ebus_handler)(void *event);
+typedef void (ct_ebus_handler)(struct ct_cdb_obj_t *event);
 
 //==============================================================================
 // Api
@@ -29,16 +30,11 @@ struct ct_ebus_a0 {
 
     void (*begin_frame)();
 
-    void (*broadcast)(uint32_t bus_name,
-                      uint64_t event_type,
-                      void *event,
-                      uint64_t event_size);
+    void (*broadcast)(uint32_t bus_name, struct ct_cdb_obj_t* event);
 
     void (*send)(uint32_t bus_name,
-                 uint64_t event_type,
                  uint64_t addr,
-                 void *event,
-                 uint64_t event_size);
+                 struct ct_cdb_obj_t* event);
 
     void (*connect)(uint32_t bus_name,
                     uint64_t event,
@@ -60,12 +56,11 @@ struct ct_ebus_a0 {
                             uint64_t addr,
                             ct_ebus_handler *handler);
 
-    void *(*first_event)(uint32_t bus_name);
 
-    void *(*next_event)(uint32_t bus_name,
-                        void *event);
 
-    struct ebus_header_t *(*event_header)(void *event);
+    uint32_t (*event_count)(uint32_t bus_name);
+
+    struct ct_cdb_obj_t** (*events)(uint32_t bus_name);
 };
 
 

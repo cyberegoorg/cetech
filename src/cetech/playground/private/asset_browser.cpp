@@ -22,6 +22,7 @@ CETECH_DECL_API(ct_path_a0);
 CETECH_DECL_API(ct_resource_a0);
 CETECH_DECL_API(ct_playground_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 #define WINDOW_NAME "Asset browser"
@@ -223,18 +224,30 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
-                ct_asset_browser_click_ev ev = {
-                        .asset = resourceid.i64,
-                        .path=path,
-                        .root=CT_ID64_0("source")
-                };
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, &ev,
-                                    sizeof(ev));
+                    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                                         ASSET_DCLICK_EVENT);
+
+                    ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+                    ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
+                    ct_cdb_a0.set_string(w, CT_ID64_0("path"), path);
+                    ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
+                    ct_cdb_a0.write_commit(w);
+
+                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, event);
+
                 } else {
-                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, &ev,
-                                    sizeof(ev));
+                    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                                         ASSET_CLICK_EVENT);
+
+                    ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+                    ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
+                    ct_cdb_a0.set_string(w, CT_ID64_0("path"), path);
+                    ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
+                    ct_cdb_a0.write_commit(w);
+
+                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, event);
                 }
             }
         }
@@ -244,7 +257,7 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(void *event) {
+static void on_debugui(ct_cdb_obj_t *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -271,7 +284,7 @@ static void on_debugui(void *event) {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(void *event) {
+static void on_menu_window(ct_cdb_obj_t *event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
@@ -312,6 +325,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

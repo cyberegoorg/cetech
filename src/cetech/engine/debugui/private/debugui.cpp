@@ -28,6 +28,7 @@ CETECH_DECL_API(ct_hashlib_a0);
 CETECH_DECL_API(ct_fs_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_yng_a0);
+CETECH_DECL_API(ct_cdb_a0);
 CETECH_DECL_API(ct_ebus_a0);
 
 
@@ -96,7 +97,11 @@ static void render(uint8_t viewid) {
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
-    ct_ebus_a0.broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, 0, 0);
+
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         DEBUGUI_EVENT);
+
+    ct_ebus_a0.broadcast(DEBUGUI_EBUS, event);
     imguiEndFrame();
 }
 
@@ -300,6 +305,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

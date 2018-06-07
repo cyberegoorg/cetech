@@ -9,12 +9,10 @@
 #include <cetech/kernel/macros.h>
 #include <cetech/kernel/memory/allocator.h>
 #include <cetech/kernel/containers/hash.h>
-#include <cetech/kernel/ebus/ebus.h>
 #include <cetech/kernel/hashlib/hashlib.h>
 
 
 CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_hashlib_a0);
 
 #define _G coredb_global
@@ -22,7 +20,10 @@ CETECH_DECL_API(ct_hashlib_a0);
 
 #define MAX_OBJECTS 1000000000ULL
 
+// TODO: non optimal braindump code
+
 struct object_t {
+    ct_cdb_notify* notify;
     // prefab
     struct ct_cdb_obj_t *owner;
     struct ct_cdb_obj_t **instances;
@@ -76,6 +77,7 @@ static struct _G {
     uint32_t *to_free_db;
 
     struct ct_alloc *allocator;
+    struct ct_cdb_t global_db;
 } _G;
 
 
@@ -125,9 +127,13 @@ static uint64_t _object_new_property(struct object_t *obj,
         ct_array_push_n(new_obj.children, obj->children,
                         ct_array_size(obj->children), _G.allocator);
 
-//    if (obj->changed_prop)
-//        ct_array_push_n(new_obj.changed_prop, obj->changed_prop,
-//                        ct_array_size(obj->changed_prop), _G.allocator);
+    if (obj->children)
+        ct_array_push_n(new_obj.children, obj->children,
+                        ct_array_size(obj->children), _G.allocator);
+
+    if (obj->notify)
+        ct_array_push_n(new_obj.notify, obj->notify,
+                        ct_array_size(obj->notify), _G.allocator);
 
     memcpy(new_obj.keys, obj->keys, sizeof(uint64_t) * prop_count);
     memcpy(new_obj.offset, obj->offset, sizeof(uint64_t) * prop_count);
@@ -206,6 +212,12 @@ static struct object_t *_object_clone(struct db_t *db,
         ct_array_push_n(new_obj->children, obj->children, n, alloc);
     }
 
+    n = ct_array_size(obj->notify);
+    if (n) {
+        ct_array_push_n(new_obj->notify, obj->notify, n, alloc);
+    }
+
+
     return new_obj;
 }
 
@@ -245,6 +257,7 @@ static struct ct_cdb_obj_t *create_object(struct ct_cdb_t db,
 
     *obj_addr = obj;
     obj->db = db;
+    obj->type = type;
 
     return (struct ct_cdb_obj_t *) obj_addr;
 }
@@ -301,6 +314,7 @@ static void gc() {
 
             CT_FREE(_G.allocator, obj->buffer);
             ct_array_free(obj->changed_prop, _G.allocator);
+            ct_array_free(obj->notify, _G.allocator);
 
             *obj = (struct object_t) {
                     .children = obj->children,
@@ -437,14 +451,12 @@ static void _notify(struct ct_cdb_obj_t *_obj,
                     uint64_t *changed_prop) {
     struct object_t *obj = *(struct object_t **) _obj;
 
-    struct ct_cdb_obj_change_ev ev = {
-            .obj = _obj,
-            .prop_count = ct_array_size(changed_prop),
-            .prop = changed_prop,
-    };
 
-    ct_ebus_a0.send(CDB_EBUS, CDB_OBJ_CHANGE,
-                    (uint64_t) _obj, &ev, sizeof(ev));
+    const int notify_n = ct_array_size(obj->notify);
+
+    for (int i = 0; i < notify_n; ++i) {
+        obj->notify[i](_obj, changed_prop, ct_array_size(changed_prop));
+    }
 
     for (int i = 0; i < ct_array_size(obj->instances); ++i) {
         _notify(obj->instances[i], changed_prop);
@@ -815,8 +827,31 @@ static uint64_t prop_count(struct ct_cdb_obj_t *_obj) {
     return obj->properties_count - 1;
 }
 
+void register_notify(struct ct_cdb_obj_t* _obj, ct_cdb_notify notify) {
+    struct object_t *obj = *(struct object_t **) _obj;
+
+    ct_array_push(obj->notify, notify, _G.allocator);
+}
+
+
+static struct ct_cdb_t global_db(){
+    return _G.global_db;
+}
+
+
+static uint64_t type(struct ct_cdb_obj_t *_obj){
+    struct object_t *obj = *(struct object_t **) _obj;
+
+    return obj->type;
+}
+
 static struct ct_cdb_a0 cdb_api = {
-        .create_db = create_db,
+        .register_notify = register_notify,
+//        .create_db = create_db,
+
+        . global_db  = global_db,
+
+                .type = type,
         .create_object = create_object,
         .create_from = create_from,
         .destroy_object = destroy_object,
@@ -862,11 +897,10 @@ static struct ct_cdb_a0 cdb_api = {
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0.main_allocator()
+            .allocator = ct_memory_a0.main_allocator(),
     };
 
-    ct_ebus_a0.create_ebus(CDB_EBUS_NAME, CDB_EBUS);
-
+    _G.global_db = create_db(),
     api->register_api("ct_cdb_a0", &cdb_api);
 }
 
@@ -878,7 +912,6 @@ CETECH_MODULE_DEF(
         cdb,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
         },
         {

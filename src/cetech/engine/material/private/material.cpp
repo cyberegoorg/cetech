@@ -334,7 +334,7 @@ static int init(ct_api_a0 *api) {
     _G = {
             .allocator = ct_memory_a0.main_allocator(),
             .type = CT_ID32_0("material"),
-            .db = ct_cdb_a0.create_db()
+            .db = ct_cdb_a0.global_db()
     };
     api->register_api("ct_material_a0", &material_api);
 

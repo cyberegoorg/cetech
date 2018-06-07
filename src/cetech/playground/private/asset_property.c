@@ -22,6 +22,7 @@ CETECH_DECL_API(ct_property_editor_a0);
 CETECH_DECL_API(ct_asset_browser_a0);
 CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_ebus_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 #define _G asset_property_global
 static struct _G {
@@ -63,16 +64,20 @@ static void register_asset(uint32_t type,
                 _G.allocator);
 }
 
-static void set_asset(void *event) {
-    struct ct_asset_browser_click_ev *ev = event;
-    struct ct_resource_id rid = {.i64 = ev->asset};
+static void set_asset(struct ct_cdb_obj_t *event) {
+
+    uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
+    const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);
+
+    struct ct_resource_id rid = {.i64 = asset};
+
 
 
     uint32_t idx = ct_hash_lookup(&_G.on_asset_map, rid.type, UINT32_MAX);
 
     _G.active_on_asset = UINT32_MAX != idx ? _G.on_asset[idx] : NULL;
     _G.active_asset = rid;
-    _G.active_path = ev->path;
+    _G.active_path = path;
 
     ct_property_editor_a0.set_active(on_debugui);
 }
@@ -113,6 +118,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

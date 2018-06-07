@@ -50,7 +50,7 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui(void *event) {
+static void on_debugui(struct ct_cdb_obj_t *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible, 0)) {
         ui_command_list();
     }
@@ -59,7 +59,7 @@ static void on_debugui(void *event) {
 
 }
 
-static void on_menu_window(void *event) {
+static void on_menu_window(struct ct_cdb_obj_t *event) {
     CT_UNUSED(event);
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }

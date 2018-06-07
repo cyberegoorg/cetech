@@ -44,7 +44,7 @@ static struct _G {
 #include "builder.h"
 
 
-static void on_render(void *event) {
+static void on_render(struct ct_cdb_obj_t* event) {
     CT_UNUSED(event);
 
     _G.viewid = 0;

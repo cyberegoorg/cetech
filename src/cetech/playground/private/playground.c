@@ -35,6 +35,7 @@ CETECH_DECL_API(ct_action_manager_a0);
 CETECH_DECL_API(ct_module_a0);
 CETECH_DECL_API(ct_ebus_a0);
 CETECH_DECL_API(ct_render_graph_a0);
+CETECH_DECL_API(ct_cdb_a0);
 
 
 #define _G plaground_global
@@ -69,7 +70,11 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
-                ct_ebus_a0.broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
+                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        ct_cdb_a0.global_db(),
+                        KERNEL_QUIT_EVENT);
+                ct_ebus_a0.broadcast(KERNEL_EBUS, event);
+
             }
 
             ct_debugui_a0.EndMenu();
@@ -106,8 +111,8 @@ static float draw_main_menu() {
             if (ct_debugui_a0.BeginMenu("Layout", true)) {
                 if (ct_debugui_a0.MenuItem("Save", NULL, false, true)) {
                     struct ct_vio *f = ct_fs_a0.open(CT_ID64_0("source"),
-                                              "core/default.dock_layout",
-                                              FS_OPEN_WRITE);
+                                                     "core/default.dock_layout",
+                                                     FS_OPEN_WRITE);
                     ct_debugui_a0.SaveDock(f);
                     ct_fs_a0.close(f);
                 }
@@ -120,9 +125,11 @@ static float draw_main_menu() {
 
             ct_debugui_a0.Separator();
 
-            ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                                 NULL,
-                                 0);
+            struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                    ct_cdb_a0.global_db(),
+                    PLAYGROUND_UI_MAINMENU_EVENT);
+
+            ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 
             ct_debugui_a0.EndMenu();
         }
@@ -148,7 +155,7 @@ static void on_debugui() {
     uint32_t w, h;
     ct_renderer_a0.get_size(&w, &h);
     float pos[] = {0.0f, menu_height};
-    float size[] = {(float)w, h - 25.0f};
+    float size[] = {(float) w, h - 25.0f};
 
     ct_debugui_a0.RootDock(pos, size);
 }
@@ -166,8 +173,12 @@ static void debugui_on_pass(void *inst,
 }
 
 
-static void on_init(void *event) {
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, NULL, 0);
+static void on_init(struct ct_cdb_obj_t *_event) {
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         PLAYGROUND_INIT_EVENT);
+
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
+
 
     _G.render_graph = ct_render_graph_a0.create_graph();
     _G.render_graph_builder = ct_render_graph_a0.create_builder();
@@ -184,24 +195,34 @@ static void on_init(void *event) {
     _G.render_graph->call->add_module(_G.render_graph, _G.module);
 }
 
-static void on_shutdown(void *event) {
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_SHUTDOWN_EVENT, NULL, 0);
+static void on_shutdown(struct ct_cdb_obj_t *_event) {
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         PLAYGROUND_SHUTDOWN_EVENT);
 
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 }
 
-static void on_update(void *event) {
+static void on_update(struct ct_cdb_obj_t *app_event) {
     ct_action_manager_a0.check();
 
-    struct ct_app_update_ev *app_ev =event;
 
-    struct ct_playground_update_ev ev = {.dt=app_ev->dt};
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         PLAYGROUND_UPDATE_EVENT);
 
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT,
-                         &ev, sizeof(ev));
+
+    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+    ct_cdb_a0.set_float(w, CT_ID64_0("dt"),
+                        ct_cdb_a0.read_float(app_event, CT_ID64_0("dt"), 0.0f));
+    ct_cdb_a0.write_commit(w);
+
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 }
 
-static void on_render(void *event) {
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, NULL, 0);
+static void on_render(struct ct_cdb_obj_t *_event) {
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         PLAYGROUND_RENDER_EVENT);
+
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
     _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
@@ -209,10 +230,13 @@ static void on_render(void *event) {
 }
 
 
-static void on_ui(void *event) {
+static void on_ui(struct ct_cdb_obj_t *_event) {
     on_debugui();
 
-    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, NULL, 0);
+    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                         PLAYGROUND_UI_EVENT);
+
+    ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 
     if (_G.load_layout) {
         ct_debugui_a0.LoadDock("core/default.dock_layout");
@@ -226,7 +250,7 @@ static struct ct_playground_a0 playground_api = {
 };
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G){
+    _G = (struct _G) {
             .load_layout = true,
     };
 
@@ -263,7 +287,7 @@ static void _shutdown() {
     ct_ebus_a0.disconnect(KERNEL_EBUS, RENDERER_RENDER_EVENT, on_render);
     ct_ebus_a0.disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(
@@ -282,6 +306,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_module_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_render_graph_a0);
+            CETECH_GET_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

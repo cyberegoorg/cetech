@@ -389,7 +389,7 @@ static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0.main_allocator(),
             .config = ct_config_a0.config_object(),
-            .db = ct_cdb_a0.create_db()
+            .db = ct_cdb_a0.global_db()
     };
 
     ct_fs_a0.map_root_dir(CT_ID64_0("build"),
