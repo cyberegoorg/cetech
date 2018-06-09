@@ -210,7 +210,7 @@ static void on_update(struct ct_cdb_obj_t *app_event) {
                                                          PLAYGROUND_UPDATE_EVENT);
 
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+    ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
     ct_cdb_a0.set_float(w, CT_ID64_0("dt"),
                         ct_cdb_a0.read_float(app_event, CT_ID64_0("dt"), 0.0f));
     ct_cdb_a0.write_commit(w);

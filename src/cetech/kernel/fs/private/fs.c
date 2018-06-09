@@ -162,7 +162,6 @@ static char *get_full_path(uint64_t root,
 static struct ct_vio *open(uint64_t root,
                            const char *path,
                            enum ct_fs_open_mode mode) {
-    
 
     char *full_path = get_full_path(root, _G.allocator, path, mode == FS_OPEN_WRITE);
 

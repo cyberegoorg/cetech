@@ -35,7 +35,5 @@ struct ct_api_a0 {
     struct ct_api_entry (*next)(struct ct_api_entry *entry);
 };
 
-struct ct_api_a0 *ct_api_get();
-
 #endif //CETECH_API_H
 //! \}

@@ -37,11 +37,10 @@ static struct CameraGlobal {
 
 static void _camera_compiler(struct ct_cdb_obj_t *event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    struct ct_cdb_obj_t *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
+    ct_cdb_obj_o *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
     uint64_t *component_key = ct_cdb_a0.read_ptr(event, CT_ID64_0("component_key"), NULL);
-    uint32_t component_key_count = ct_cdb_a0.read_uint32(event, CT_ID64_0("component_key_count"), 0);
-    
-    
+    uint32_t component_key_count = ct_cdb_a0.read_uint64(event, CT_ID64_0("component_key_count"), 0);
+
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
@@ -58,6 +57,7 @@ static void _camera_compiler(struct ct_cdb_obj_t *event) {
     ct_cdb_a0.set_float(writer, PROP_FAR, far);
     ct_cdb_a0.set_float(writer, PROP_FOV, fov);
 }
+
 
 static void get_project_view(struct ct_world world,
                              struct ct_entity camera,
@@ -95,7 +95,6 @@ static struct ct_camera_a0 camera_api = {
 static void _component_spawner(struct ct_cdb_obj_t *event) {
     struct ct_cdb_obj_t*obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), NULL);
     struct ct_camera_component *camera= ct_cdb_a0.read_ptr(event, CT_ID64_0("data"), NULL);
-
 
     *camera = (struct ct_camera_component) {
             .fov = ct_cdb_a0.read_float(obj, PROP_FOV, 0.0f),

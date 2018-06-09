@@ -14,6 +14,8 @@
 
 #define ECS_EBUS_NAME "ecs"
 
+#define PREFAB_NAME_PROP CT_ID64_0("prefab_filename")
+
 enum {
     ECS_EBUS = 0x3c870dac
 };
@@ -23,15 +25,11 @@ enum {
     ECS_WORLD_CREATE,
     ECS_WORLD_DESTROY,
 
-    ECS_COMPONENT_ADD,
     ECS_COMPONENT_REMOVE,
-    ECS_COMPONENT_CHANGE,
     ECS_COMPONENT_SPAWN,
     ECS_COMPONENT_COMPILE,
 };
 
-struct ct_entity_compile_output;
-struct ct_compilator_api;
 struct ct_cdb_obj_t;
 typedef void ct_entity_storage_t;
 
@@ -50,28 +48,6 @@ struct ct_world {
 
 struct ct_entity {
     uint64_t h;
-};
-
-struct ct_ecs_world_ev {
-    struct ct_world world;
-};
-
-struct ct_ecs_component_ev {
-    struct ct_world world;
-    struct ct_entity ent;
-    uint64_t comp_mask;
-};
-
-struct ct_ecs_component_spawn_ev {
-    struct ct_cdb_obj_t *obj;
-    void *data;
-};
-
-struct ct_ecs_component_compile_ev {
-    const char *filename;
-    uint64_t *component_key;
-    uint32_t component_key_count;
-    struct ct_cdb_obj_t *writer;
 };
 
 struct ct_component_prop_map {
@@ -132,6 +108,8 @@ struct ct_ecs_a0 {
     void (*destroy_world)(struct ct_world world);
 
     // ENT
+    struct ct_cdb_obj_t* (*entity_object)(struct ct_world world,
+                                          struct ct_entity entity);
     void (*create_entity)(struct ct_world world,
                           struct ct_entity *entity,
                           uint32_t count);
@@ -170,10 +148,6 @@ struct ct_ecs_a0 {
                          uint64_t component_name,
                          struct ct_entity entity);
 
-
-    void (*entity_component_change)(struct ct_world world,
-                                    uint64_t component_name,
-                                    struct ct_entity entity);
 
     bool (*has)(struct ct_world world,
                 struct ct_entity ent,

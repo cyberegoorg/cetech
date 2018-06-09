@@ -80,7 +80,7 @@ static void online(uint64_t name,
 
     }
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_uint64(writer, SHADER_PROP, program.idx);
     ct_cdb_a0.write_commit(writer);
 }

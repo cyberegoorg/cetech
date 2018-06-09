@@ -2,12 +2,20 @@ name: Level 1
 children:
   5564343313252:
     name: box1
-    PARENT: content/box1.entity
+    PREFAB: content/box1.entity
+    components:
+      transform:
+        position: [0, 0, 25]
+    children:
+      lknvln879879NJKK:
+        components:
+          transform:
+            position: [0, 0, 35]
 
   55643433135454252:
     name: box2
-    PARENT: content/box2.entity
+    PREFAB: content/box2.entity
 
   55643423443313252:
     name: m4a1
-    PARENT: content/m4a1.entity
+    PREFAB: content/m4a1.entity

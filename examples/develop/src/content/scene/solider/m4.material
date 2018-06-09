@@ -1,4 +1,4 @@
-PARENT: content/material1.material
+PREFAB: content/material1.material
 
 layers:
   default:

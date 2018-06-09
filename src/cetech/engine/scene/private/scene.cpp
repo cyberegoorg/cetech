@@ -76,7 +76,7 @@ static void online(uint64_t name,
     uint32_t *ib = scene_blob::ib(resource);
     uint8_t *vb = scene_blob::vb(resource);
 
-    ct_cdb_obj_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_o* writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ptr(writer, SCENE_PROP, data);
 
     for (uint32_t i = 0; i < resource->geom_count; ++i) {
@@ -93,7 +93,7 @@ static void online(uint64_t name,
                                                  BGFX_BUFFER_INDEX32);
 
         ct_cdb_obj_t* geom_obj = ct_cdb_a0.create_object(_G.db, 0);
-        ct_cdb_obj_t* geom_writer = ct_cdb_a0.write_begin(geom_obj);
+        ct_cdb_obj_o* geom_writer = ct_cdb_a0.write_begin(geom_obj);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_SIZE_PROP, size);
@@ -152,7 +152,7 @@ static scene_blob::blob_t* resource_data(uint32_t name) {
             .name = name,
     };
 
-    auto object = ct_resource_a0.get_obj(rid);
+    auto object = ct_resource_a0.get(rid);
     return (scene_blob::blob_t*)(ct_cdb_a0.read_ptr(object, SCENE_PROP, NULL));
 }
 

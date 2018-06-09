@@ -137,7 +137,7 @@ static void ui_str(struct ct_cdb_obj_t *obj,
 
 
     if (prop->combo.combo_items) {
-        char* items = NULL;
+        char *items = NULL;
         uint32_t items_count = 0;
 
         prop->combo.combo_items(obj, &items, &items_count);
@@ -152,9 +152,10 @@ static void ui_str(struct ct_cdb_obj_t *obj,
         }
 
         sprintf(labelid, "%s##combo_%d", prop->ui_name, i);
-        change = ct_debugui_a0.Combo(labelid, &current_item, items2, items_count, -1);
+        change = ct_debugui_a0.Combo(labelid, &current_item, items2,
+                                     items_count, -1);
 
-        if(change) {
+        if (change) {
             strcpy(buffer, items2[current_item]);
         }
 
@@ -231,6 +232,10 @@ static void on_component(struct ct_world world,
                          uint64_t comp_name) {
     struct ct_component_info *info = ct_ecs_a0.component_info(comp_name);
 
+    if(!info){
+        return;
+    }
+
     if (!ct_debugui_a0.CollapsingHeader(info->component_name,
                                         DebugUITreeNodeFlags_DefaultOpen)) {
         return;
@@ -280,30 +285,39 @@ static void on_debugui() {
     struct ct_resource_id rid;
     ct_resource_a0.type_name_from_filename(_G.filename, &rid, NULL);
 
-    uint64_t ent_type = ct_cdb_a0.read_uint64(_G.obj, CT_ID64_0("ent_type"), 0);
+    struct ct_cdb_obj_t *components_obj;
+    components_obj = ct_cdb_a0.read_subobject(_G.obj, CT_ID64_0("components"),
+                                              NULL);
 
-    const uint64_t *components_name = ct_ecs_a0.get_components();
-    uint32_t n = ct_array_size(components_name);
-    for (int j = 0; j < n; ++j) {
+
+    uint64_t n = ct_cdb_a0.prop_count(components_obj);
+    uint64_t components_name[n];
+    ct_cdb_a0.prop_keys(components_obj, components_name);
+
+    for (uint64_t j = 0; j < n; ++j) {
         uint64_t name = components_name[j];
-        uint64_t cmask = ct_ecs_a0.component_mask(name);
 
-        if (ent_type & cmask) {
-            ct_ep_on_component clb = (ct_ep_on_component) ct_hash_lookup(
-                    &_G.components, name, 0);
-            clb ? clb(_G.active_world, _G.obj) : on_component(_G.active_world,
-                                                              _G.obj, name);
-        }
+        ct_ep_on_component clb;
+        clb = (ct_ep_on_component) ct_hash_lookup(&_G.components, name, 0);
+
+        struct ct_cdb_obj_t * c_obj;
+        c_obj = ct_cdb_a0.read_subobject(components_obj, name, NULL);
+
+        clb ? clb(_G.active_world, _G.obj) : on_component(_G.active_world,
+                                                          c_obj, name);
     }
 }
+
 
 void on_entity_click(struct ct_cdb_obj_t *event) {
     ct_property_editor_a0.set_active(on_debugui);
 
-    struct ct_world world = {ct_cdb_a0.read_uint64(event, CT_ID64_0("world"), 0)};
-    const char* filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), 0);
-    struct ct_entity entity = {ct_cdb_a0.read_uint64(event, CT_ID64_0("ent"), 0)};
-    struct ct_cdb_obj_t* obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
+    struct ct_world world = {
+            ct_cdb_a0.read_uint64(event, CT_ID64_0("world"), 0)};
+    const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), 0);
+    struct ct_entity entity = {
+            ct_cdb_a0.read_uint64(event, CT_ID64_0("entity"), 0)};
+    struct ct_cdb_obj_t *obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
 
     _G.active_world = world;
     _G.top_entity = entity;
@@ -334,7 +348,7 @@ static void set_vec3_cmd(const struct ct_cmd *cmd,
     const float *value = inverse ? pos_cmd->vec3.old_value
                                  : pos_cmd->vec3.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
+    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(pos_cmd->obj);
     ct_cdb_a0.set_vec3(w, pos_cmd->prop, value);
     ct_cdb_a0.write_commit(w);
 }
@@ -345,7 +359,7 @@ static void set_float_cmd(const struct ct_cmd *cmd,
 
     const float value = inverse ? pos_cmd->f.old_value : pos_cmd->f.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
+    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(pos_cmd->obj);
     ct_cdb_a0.set_float(w, pos_cmd->prop, value);
     ct_cdb_a0.write_commit(w);
 }
@@ -357,8 +371,8 @@ static void set_str_cmd(const struct ct_cmd *_cmd,
     const char *value = inverse ? pos_cmd->str.old_value
                                 : pos_cmd->str.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
-    ct_cdb_a0.set_string(w, pos_cmd->prop, value);
+    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(pos_cmd->obj);
+    ct_cdb_a0.set_str(w, pos_cmd->prop, value);
     ct_cdb_a0.write_commit(w);
 }
 

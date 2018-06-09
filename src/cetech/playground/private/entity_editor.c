@@ -105,9 +105,14 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
     ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    ct_vec3_add(transform->position, transform->position, x_dir_new);
-    ct_vec3_add(transform->position, transform->position, z_dir_new);
-    ct_ecs_a0.entity_component_change(world, TRANSFORM_COMPONENT, camera_ent);
+    float pos[3] = {0};
+    ct_vec3_add(pos, transform->position, x_dir_new);
+    ct_vec3_add(pos, pos, z_dir_new);
+
+    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(ct_ecs_a0.entity_object(world, camera_ent));
+    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0.write_commit(w);
+
     // ROT
 //    float rotation_around_world_up[4];
 //    float rotation_around_camera_right[4];
@@ -165,10 +170,6 @@ static void on_debugui(struct ct_cdb_obj_t* event) {
 //            struct ct_cdb_obj_t *obj = ct_ecs_a0.ent_obj(_G.world[i],
 //                                                           _G.camera_ent[i]);
 //
-            struct ct_camera_component *camera_data;
-            camera_data = ct_ecs_a0.entity_data(_G.world[i],
-                                          CAMERA_COMPONENT,
-                                          _G.camera_ent[i]);
 
             ct_render_texture_handle_t th;
             th = _G.render_graph_builder[i]->call->get_texture(

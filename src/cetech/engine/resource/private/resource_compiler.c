@@ -446,17 +446,17 @@ void compile_and_reload(const char *filename) {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config);
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
-        ct_cdb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
+        ct_cdb_a0.set_str(writer, CONFIG_SOURCE_DIR, "src");
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_CORE_DIR)) {
-        ct_cdb_a0.set_string(writer, CONFIG_CORE_DIR, "core");
+        ct_cdb_a0.set_str(writer, CONFIG_CORE_DIR, "core");
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_EXTERNAL_DIR)) {
-        ct_cdb_a0.set_string(writer, CONFIG_EXTERNAL_DIR, "externals/build");
+        ct_cdb_a0.set_str(writer, CONFIG_EXTERNAL_DIR, "externals/build");
     }
 
     ct_cdb_a0.write_commit(writer);

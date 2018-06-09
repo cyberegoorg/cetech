@@ -81,8 +81,11 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    ct_cdb_obj_t** children = ct_cdb_a0.children(obj);
-    if (ct_array_size(children) == 0) {
+    ct_cdb_obj_t *children = ct_cdb_a0.read_subobject(obj, CT_ID64_0("children"), NULL);
+
+    const uint32_t children_n = ct_cdb_a0.prop_count(children);
+
+    if (!children_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
@@ -104,10 +107,10 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
         struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                              EXPLORER_ENTITY_SELECT_EVENT);
 
-        ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+        ct_cdb_obj_o* w = ct_cdb_a0.write_begin(event);
         ct_cdb_a0.set_uint64(w, CT_ID64_0("world"), _G.world.h);
-        ct_cdb_a0.set_string(w, CT_ID64_0("filename"), _G.path);
-        ct_cdb_a0.set_uint64(w, CT_ID64_0("ent"), _G.entity.h);
+        ct_cdb_a0.set_str(w, CT_ID64_0("filename"), _G.path);
+        ct_cdb_a0.set_uint64(w, CT_ID64_0("entity"), _G.entity.h);
         ct_cdb_a0.set_ref(w, CT_ID64_0("obj"), obj);
         ct_cdb_a0.write_commit(w);
 
@@ -117,13 +120,20 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
     }
 
     if (open) {
-        for (uint32_t i = 0; i < ct_array_size(children); ++i) {
-            ui_entity_item_begin(children[i], rand());
+        uint64_t keys[children_n];
+        ct_cdb_a0.prop_keys(children, keys);
+
+        for (uint32_t i = 0; i < children_n; ++i) {
+            uint64_t key = keys[i];
+            ct_cdb_obj_t* child = ct_cdb_a0.read_subobject(children, key, NULL);
+            ui_entity_item_begin(child, rand());
         }
         ui_entity_item_end();
     }
 }
 
+
+#define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
 
 static void on_debugui(ct_cdb_obj_t *event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
@@ -137,10 +147,9 @@ static void on_debugui(ct_cdb_obj_t *event) {
                     .name = _G.ent_name,
             };
 
-            ct_cdb_obj_t* obj = ct_resource_a0.get_obj(rid);
-
-#define PROP_ENT_OBJ (CT_ID64_0("ent_obj") << 32)
+            ct_cdb_obj_t* obj = ct_resource_a0.get(rid);
             obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
+
             ui_entity_item_begin(obj, rand());
         }
     }

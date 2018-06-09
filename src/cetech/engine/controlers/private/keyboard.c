@@ -107,11 +107,11 @@ static void _update(struct ct_cdb_obj_t* _event) {
 
         switch (ct_cdb_a0.type(event)) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[ct_cdb_a0.read_uint32(event, CT_ID64_0("keycode"), 0)] = 1;
+                _G.state[ct_cdb_a0.read_uint64(event, CT_ID64_0("keycode"), 0)] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[ct_cdb_a0.read_uint32(event, CT_ID64_0("keycode"), 0)] = 0;
+                _G.state[ct_cdb_a0.read_uint64(event, CT_ID64_0("keycode"), 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {

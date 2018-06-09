@@ -147,9 +147,9 @@ static void update(struct ct_cdb_obj_t* _event) {
 
     for (int i = 0; i < events_n; ++i) {
         struct ct_cdb_obj_t *event = events[i];
-        uint32_t button = ct_cdb_a0.read_uint32(event, CT_ID64_0("button"), 0);
-        uint32_t gamepad_id = ct_cdb_a0.read_uint32(event, CT_ID64_0("gamepad_id"), 0);
-        uint32_t axis = ct_cdb_a0.read_uint32(event, CT_ID64_0("axis"), 0);
+        uint32_t button = ct_cdb_a0.read_uint64(event, CT_ID64_0("button"), 0);
+        uint32_t gamepad_id = ct_cdb_a0.read_uint64(event, CT_ID64_0("gamepad_id"), 0);
+        uint32_t axis = ct_cdb_a0.read_uint64(event, CT_ID64_0("axis"), 0);
 
         float pos[3] = {};
         ct_cdb_a0.read_vec3(event, CT_ID64_0("position"), pos);

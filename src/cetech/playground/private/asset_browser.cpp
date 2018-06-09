@@ -5,7 +5,6 @@
 #include <cetech/kernel/os/path.h>
 #include <cetech/engine/resource/resource.h>
 #include <cetech/playground/playground.h>
-#include <cetech/kernel/containers/array.h>
 #include <cetech/kernel/ebus/ebus.h>
 
 #include "cetech/kernel/hashlib/hashlib.h"
@@ -128,8 +127,8 @@ static void ui_dir_list() {
 
     if (!_G.dirtree_list) {
         ct_fs_a0.listdir(CT_ID64_0("source"), "", "*",
-                                 true, true, &_G.dirtree_list,
-                                 &_G.dirtree_list_count, _G.allocator);
+                         true, true, &_G.dirtree_list,
+                         &_G.dirtree_list_count, _G.allocator);
     }
 
 
@@ -172,14 +171,14 @@ static void ui_asset_list() {
         }
 
         ct_fs_a0.listdir(CT_ID64_0("source"),
-                                 _G.current_dir, "*",
-                                 false, false, &_G.asset_list,
-                                 &_G.asset_list_count, _G.allocator);
+                         _G.current_dir, "*",
+                         false, false, &_G.asset_list,
+                         &_G.asset_list_count, _G.allocator);
 
         ct_fs_a0.listdir(CT_ID64_0("source"),
-                                 _G.current_dir, "*",
-                                 true, false, &_G.dir_list,
-                                 &_G.dir_list_count, _G.allocator);
+                         _G.current_dir, "*",
+                         true, false, &_G.dir_list,
+                         &_G.dir_list_count, _G.allocator);
 
         _G.need_reaload = false;
     }
@@ -216,7 +215,7 @@ static void ui_asset_list() {
                 continue;
             }
 
-            struct ct_resource_id resourceid;
+            struct ct_resource_id resourceid = {.i64=0};
             ct_resource_a0.type_name_from_filename(path, &resourceid, NULL);
 
             if (ImGui::Selectable(filename, _G.selected_file == filename_hash,
@@ -224,31 +223,19 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
+                struct ct_cdb_obj_t *event;
+                event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                                ImGui::IsMouseDoubleClicked(0)
+                                                ? ASSET_DCLICK_EVENT
+                                                : ASSET_CLICK_EVENT);
 
-                if (ImGui::IsMouseDoubleClicked(0)) {
-                    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
-                                                                         ASSET_DCLICK_EVENT);
+                ct_cdb_obj_o *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
+                ct_cdb_a0.set_str(w, CT_ID64_0("path"), path);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
+                ct_cdb_a0.write_commit(w);
 
-                    ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
-                    ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
-                    ct_cdb_a0.set_string(w, CT_ID64_0("path"), path);
-                    ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
-                    ct_cdb_a0.write_commit(w);
-
-                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, event);
-
-                } else {
-                    struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
-                                                                         ASSET_CLICK_EVENT);
-
-                    ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
-                    ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
-                    ct_cdb_a0.set_string(w, CT_ID64_0("path"), path);
-                    ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
-                    ct_cdb_a0.write_commit(w);
-
-                    ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, event);
-                }
+                ct_ebus_a0.broadcast(ASSET_BROWSER_EBUS, event);
             }
         }
     }
@@ -293,7 +280,8 @@ static void _init(ct_api_a0 *api) {
 
 
     ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window, 0);
+    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                       on_menu_window, 0);
 
 
     _G = {
@@ -309,7 +297,8 @@ static void _init(ct_api_a0 *api) {
 
 static void _shutdown() {
     ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                          on_menu_window);
 
     _G = {};
 }

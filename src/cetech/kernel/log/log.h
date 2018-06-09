@@ -38,15 +38,6 @@ void ct_log_stdout_handler(enum ct_log_level level,
                            void *data);
 
 
-//! Nanomsg/mapack handler
-void ct_nano_log_handler(enum ct_log_level level,
-                         time_t time,
-                         char worker_id,
-                         const char *where,
-                         const char *msg,
-                         void *data);
-
-
 //==============================================================================
 // Typedefs
 //==============================================================================

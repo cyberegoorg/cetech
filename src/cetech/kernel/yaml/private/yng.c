@@ -722,7 +722,7 @@ bool parse_yaml(struct ct_alloc *alloc,
                 type_value_from_scalar(event.data.scalar.value,
                                        &type, &value, IS_KEY());
 
-                const uint64_t PARENT_KEY = CT_ID64_0("PARENT");
+                const uint64_t PREFAB_KEY = CT_ID64_0("PREFAB");
 
                 if (IS_KEY()) {
                     uint64_t key_hash = CT_ID64_0(value.string);
@@ -742,7 +742,7 @@ bool parse_yaml(struct ct_alloc *alloc,
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].key_hash;
 
-                    if (PARENT_KEY == parent_stack[parent_stack_top].str_hash) {
+                    if (PREFAB_KEY == parent_stack[parent_stack_top].str_hash) {
                         ct_array_push(inst->parent_file, value.string,
                                       _G.allocator);
                     }

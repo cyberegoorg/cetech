@@ -75,10 +75,10 @@ int init_config(int argc,
                 const char **argv,
                 struct ct_cdb_obj_t *object) {
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(object);
-    ct_cdb_a0.set_string(writer, CONFIG_PLATFORM, _platform());
-    ct_cdb_a0.set_string(writer, CONFIG_NATIVE_PLATFORM, _platform());
-    ct_cdb_a0.set_string(writer, CONFIG_BUILD, "build");
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(object);
+    ct_cdb_a0.set_str(writer, CONFIG_PLATFORM, _platform());
+    ct_cdb_a0.set_str(writer, CONFIG_NATIVE_PLATFORM, _platform());
+    ct_cdb_a0.set_str(writer, CONFIG_BUILD, "build");
     ct_cdb_a0.write_commit(writer);
 
     if (!ct_config_a0.parse_args(argc, argv)) {
@@ -101,7 +101,7 @@ int init_config(int argc,
 
     ct_cdb_a0.read_str(object, CONFIG_NATIVE_PLATFORM, ""); //TODO: REMOVGE
 
-    if (ct_cdb_a0.read_uint32(object, CONFIG_COMPILE, 0)) {
+    if (ct_cdb_a0.read_uint64(object, CONFIG_COMPILE, 0)) {
         ct_path_a0.make_path(build_dir);
         ct_path_a0.copy_file(_G.allocator, source_config, build_config);
     }
@@ -194,30 +194,30 @@ void application_quit() {
 void _init_config() {
     _G.config_object = ct_config_a0.config_object();
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config_object);
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_BOOT_PKG)) {
-        ct_cdb_a0.set_string(writer, CONFIG_BOOT_PKG, "boot");
+        ct_cdb_a0.set_str(writer, CONFIG_BOOT_PKG, "boot");
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_GAME)) {
-        ct_cdb_a0.set_string(writer, CONFIG_GAME, "playground");
+        ct_cdb_a0.set_str(writer, CONFIG_GAME, "playground");
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_DAEMON)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_DAEMON, 0);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_COMPILE)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_COMPILE, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_COMPILE, 0);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_CONTINUE)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_CONTINUE, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_CONTINUE, 0);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config_object, CONFIG_WAIT)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_WAIT, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_WAIT, 0);
     }
 
     ct_cdb_a0.write_commit(writer);
@@ -267,10 +267,33 @@ static void on_quit(struct ct_cdb_obj_t *event) {
 void application_start() {
     _init_config();
 
-    if (ct_cdb_a0.read_uint32(_G.config_object, CONFIG_COMPILE, 0)) {
+//    struct ct_cdb_obj_t* obj1 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//    struct ct_cdb_obj_t* obj2 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//    struct ct_cdb_obj_t* obj3 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//    struct ct_cdb_obj_t* obj4 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//
+//
+//    ct_cdb_obj_o* w1 = ct_cdb_a0.write_begin(obj1);
+//    ct_cdb_obj_o* w2 = ct_cdb_a0.write_begin(obj2);
+//    ct_cdb_obj_o* w3 = ct_cdb_a0.write_begin(obj3);
+//
+//    ct_cdb_a0.set_subobject(w1, CT_ID64_0("foo"), obj2);
+//    ct_cdb_a0.set_subobject(w2, CT_ID64_0("foo"), obj3);
+//    ct_cdb_a0.set_subobject(w3, CT_ID64_0("foo"), obj4);
+//
+//    ct_cdb_a0.write_commit(w1);
+//    ct_cdb_a0.write_commit(w2);
+//    ct_cdb_a0.write_commit(w3);
+//
+//    char* out = NULL;
+//    ct_cdb_a0.dump(obj1, &out, _G.allocator);
+//
+//    ct_cdb_a0.load(ct_cdb_a0.global_db(), out, _G.allocator);
+//
+    if (ct_cdb_a0.read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
         ct_resource_a0.compiler_compile_all();
 
-        if (!ct_cdb_a0.read_uint32(_G.config_object, CONFIG_CONTINUE, 0)) {
+        if (!ct_cdb_a0.read_uint64(_G.config_object, CONFIG_CONTINUE, 0)) {
             return;
         }
     }
@@ -300,7 +323,7 @@ void application_start() {
         struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
                 ct_cdb_a0.global_db(),
                 KERNEL_UPDATE_EVENT);
-        struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+        ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
         ct_cdb_a0.set_float(w, CT_ID64_0("dt"), dt);
         ct_cdb_a0.write_commit(w);
 

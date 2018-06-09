@@ -135,13 +135,13 @@ ct_yamlng_node get_first_node_recursive(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yng_a0.key("PARENT");
+    static const uint64_t PREFAB_KEY = ct_yng_a0.key("PREFAB");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < max_depth; ++i) {
         tmp_key = tmp_keys[i];
 
-        tmp_keys[i] = PARENT_KEY;
+        tmp_keys[i] = PREFAB_KEY;
         uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
         parent_file_str = d->get_str(d, k, "");
@@ -215,13 +215,13 @@ void get_map_keys(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PARENT_KEY = ct_yng_a0.key("PARENT");
+    static const uint64_t PREFAB_KEY = ct_yng_a0.key("PREFAB");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < keys_count; ++i) {
         tmp_key = tmp_keys[i];
 
-        tmp_keys[i] = PARENT_KEY;
+        tmp_keys[i] = PREFAB_KEY;
         uint64_t k = ct_yng_a0.combine_key(tmp_keys, i + 1);
 
         parent_file_str = d->get_str(d, k, "");
