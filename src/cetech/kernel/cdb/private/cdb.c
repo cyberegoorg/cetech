@@ -42,11 +42,8 @@ struct object_t {
     struct ct_cdb_t db;
     struct ct_hash_t prop_map; // TODO: STATIC HASH 128?
 
-    uint64_t buffer_size;
     uint64_t properties_count;
-    uint64_t values_size;
 
-    uint8_t *buffer;
     uint64_t *keys;
     uint8_t *ptype;
     uint64_t *offset;
@@ -89,69 +86,18 @@ static uint64_t _object_new_property(struct object_t *obj,
                                      const struct ct_alloc *alloc) {
 
     const uint64_t prop_count = obj->properties_count;
-    const uint64_t values_size = obj->values_size;
+    const uint64_t values_size = ct_array_size(obj->values);
 
-    const uint64_t new_prop_count = prop_count + 1;
-    const uint64_t new_value_size = values_size + size;
+    ct_array_push(obj->keys, key, alloc);
+    ct_array_push(obj->ptype, type, alloc);
+    ct_array_push(obj->offset, values_size, alloc);
 
-    const size_t new_buffer_size = ((sizeof(uint64_t) +
-                                     sizeof(uint8_t) +
-                                     sizeof(uint64_t)) * new_prop_count) +
-                                   (sizeof(uint8_t) * new_value_size);
+    if (size)
+        ct_array_resize(obj->values, values_size + size, alloc);
 
-    struct object_t new_obj = {
-            .db = obj->db,
-            .type = obj->type,
-            .idx = obj->idx,
-            .owner = obj->owner,
-            .parent = obj->parent,
-            .orig_obj = obj->orig_obj,
-            .buffer = CT_ALLOC(alloc, uint8_t, new_buffer_size),
-            .buffer_size = new_buffer_size,
-            .properties_count = new_prop_count,
-            .values_size = new_value_size
-    };
+    ct_hash_add(&obj->prop_map, key, prop_count, alloc);
 
-    new_obj.keys = (uint64_t *) new_obj.buffer;
-    new_obj.ptype = (uint8_t *) (new_obj.keys + new_prop_count);
-    new_obj.offset = (uint64_t *) (new_obj.ptype + new_prop_count);
-    new_obj.values = (uint8_t *) (new_obj.offset + new_prop_count);
-
-    ct_hash_clone(&obj->prop_map, &new_obj.prop_map, alloc);
-
-    if (obj->instances)
-        ct_array_push_n(new_obj.instances, obj->instances,
-                        ct_array_size(obj->instances), _G.allocator);
-
-    if (obj->children)
-        ct_array_push_n(new_obj.children, obj->children,
-                        ct_array_size(obj->children), _G.allocator);
-
-    if (obj->children)
-        ct_array_push_n(new_obj.children, obj->children,
-                        ct_array_size(obj->children), _G.allocator);
-
-    if (obj->notify)
-        ct_array_push_n(new_obj.notify, obj->notify,
-                        ct_array_size(obj->notify), _G.allocator);
-
-    memcpy(new_obj.keys, obj->keys, sizeof(uint64_t) * prop_count);
-    memcpy(new_obj.offset, obj->offset, sizeof(uint64_t) * prop_count);
-    memcpy(new_obj.ptype, obj->ptype, sizeof(uint8_t) * prop_count);
-    memcpy(new_obj.values, obj->values, sizeof(uint8_t) * values_size);
-
-    new_obj.keys[prop_count] = key;
-    new_obj.offset[prop_count] = values_size;
-    new_obj.ptype[prop_count] = type;
-
-    memcpy(new_obj.values + values_size, value, size);
-
-    CT_FREE(alloc, obj->buffer);
-
-    ct_hash_add(&new_obj.prop_map, key, prop_count, alloc);
-
-    *obj = new_obj;
-
+    obj->properties_count = obj->properties_count + 1;
     return prop_count;
 }
 
@@ -179,27 +125,29 @@ static struct object_t *_object_clone(struct db_t *db,
                                       struct object_t *obj,
                                       const struct ct_alloc *alloc) {
     const uint64_t properties_count = obj->properties_count;
-    const uint64_t values_size = obj->values_size;
-    const uint64_t buffer_size = obj->buffer_size;
+    const uint64_t values_size = ct_array_size(obj->values);
 
     struct object_t *new_obj = _new_object(db, alloc);
 
     new_obj->owner = obj->owner;
     new_obj->parent = obj->parent;
+
     new_obj->type = obj->type;
-
-    new_obj->buffer = CT_ALLOC(alloc, uint8_t, buffer_size);
-    new_obj->buffer_size = buffer_size;
     new_obj->properties_count = properties_count;
-    new_obj->values_size = values_size;
 
-    new_obj->keys = (uint64_t *) new_obj->buffer;
-    new_obj->ptype = (uint8_t *) (new_obj->keys + properties_count);
-    new_obj->offset = (uint64_t *) (new_obj->ptype + properties_count);
-    new_obj->values = (uint8_t *) (new_obj->offset + properties_count);
+    ct_array_push_n(new_obj->keys, obj->keys+1,
+                    ct_array_size(obj->keys)-1, alloc);
+
+    ct_array_push_n(new_obj->ptype, obj->ptype+1,
+                    ct_array_size(obj->ptype)-1, alloc);
+
+    ct_array_push_n(new_obj->offset, obj->offset+1,
+                    ct_array_size(obj->offset)-1, alloc);
+
+    if (values_size)
+        ct_array_push_n(new_obj->values, obj->values, values_size, alloc);
 
 
-    memcpy(new_obj->buffer, obj->buffer, sizeof(uint8_t) * buffer_size);
     ct_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
 
     uint32_t n = ct_array_size(obj->instances);
@@ -272,7 +220,7 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
     inst->db = db;
 
     struct object_t **obj_addr = db_inst->objects + db_inst->object_used++;
-    
+
     *obj_addr = inst;
 
     inst->owner = _obj;
@@ -291,8 +239,6 @@ static void destroy_object(struct ct_cdb_obj_t *_obj) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
-//    _remove_from_type_slot(db_inst, _obj);
-
     ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
 }
 
@@ -310,16 +256,27 @@ static void gc() {
 
             ct_array_clean(obj->children);
             ct_array_clean(obj->instances);
+
+            ct_array_clean(obj->ptype);
+            ct_array_clean(obj->keys);
+            ct_array_clean(obj->values);
+            ct_array_clean(obj->offset);
+
             ct_hash_clean(&obj->prop_map);
 
-            CT_FREE(_G.allocator, obj->buffer);
             ct_array_free(obj->changed_prop, _G.allocator);
             ct_array_free(obj->notify, _G.allocator);
 
             *obj = (struct object_t) {
                     .children = obj->children,
                     .instances = obj->instances,
-                    .prop_map = obj->prop_map
+
+                    .ptype = obj->ptype,
+                    .keys = obj->keys,
+                    .values = obj->values,
+                    .offset = obj->offset,
+
+                    .prop_map = obj->prop_map,
             };
 
             ct_array_push(db_inst->free_objects, idx, _G.allocator);
@@ -345,8 +302,8 @@ struct ct_cdb_obj_t **children(struct ct_cdb_obj_t *obj) {
     return _obj->children;
 }
 
-struct obj_header {
-    uint64_t buffer_size;
+struct cdb_binobj_header {
+    uint64_t version;
     uint64_t properties_count;
     uint64_t values_size;
     uint64_t string_buffer_size;
@@ -357,17 +314,13 @@ static void dump(struct ct_cdb_obj_t *_obj,
                  struct ct_alloc *allocator) {
     struct object_t *obj = *(struct object_t **) _obj;
 
-    uint8_t *buffer = CT_ALLOC(allocator, uint8_t,
-                               sizeof(uint8_t) * obj->buffer_size);
-    memcpy(buffer, obj->buffer, sizeof(uint8_t) * obj->buffer_size);
-
-    uint64_t *keys = (uint64_t *) buffer;
-    uint8_t *type = (uint8_t *) (keys + obj->properties_count);
-    uint64_t *offset = (uint64_t *) (type + obj->properties_count);
-    uint8_t *values = (uint8_t *) (offset + obj->properties_count);
+    uint64_t *keys = obj->keys;
+    uint8_t *type = obj->ptype;
+    uint64_t *offset = obj->offset;
+    uint8_t *values = obj->values;
 
     char *str_buffer = NULL;
-    for (int i = 0; i < obj->properties_count; ++i) {
+    for (int i = 1; i < obj->properties_count; ++i) {
         if (obj->ptype[i] != CDB_TYPE_STR) {
             continue;
         }
@@ -380,20 +333,36 @@ static void dump(struct ct_cdb_obj_t *_obj,
         *strptr = offset;
     }
 
-    struct obj_header header = {
-            .buffer_size = obj->buffer_size,
+    struct cdb_binobj_header header = {
             .properties_count = obj->properties_count,
-            .values_size = obj->values_size,
+            .values_size = ct_array_size(values),
             .string_buffer_size = ct_array_size(str_buffer)
     };
 
-    ct_array_push_n(*output, (char *) &header, sizeof(struct obj_header),
-                    allocator);
-    ct_array_push_n(*output, (char *) buffer, obj->buffer_size, allocator);
-    ct_array_push_n(*output, (char *) str_buffer, header.string_buffer_size,
+    ct_array_push_n(*output, (char *) &header, sizeof(struct cdb_binobj_header),
                     allocator);
 
-    CT_FREE(allocator, buffer);
+    ct_array_push_n(*output, (char *) keys,
+                    sizeof(uint64_t) * ct_array_size(keys),
+                    allocator);
+
+    ct_array_push_n(*output, (char *) type,
+                    sizeof(uint8_t) * ct_array_size(type),
+                    allocator);
+
+    ct_array_push_n(*output, (char *) offset,
+                    sizeof(uint64_t) * ct_array_size(offset),
+                    allocator);
+
+    ct_array_push_n(*output, (char *) values,
+                    sizeof(uint8_t) * ct_array_size(values),
+                    allocator);
+
+    ct_array_push_n(*output, (char *) str_buffer,
+                    header.string_buffer_size,
+                    allocator);
+
+
 }
 
 static void load(struct ct_cdb_obj_t *_obj,
@@ -401,33 +370,47 @@ static void load(struct ct_cdb_obj_t *_obj,
                  struct ct_alloc *allocator) {
     struct object_t *obj = *(struct object_t **) _obj;
 
-    struct obj_header *header = (struct obj_header *) input;
+    struct cdb_binobj_header *header = (struct cdb_binobj_header *) input;
 
-    obj->buffer_size = header->buffer_size;
-    obj->properties_count = header->properties_count;
-    obj->values_size = header->values_size;
+    uint64_t *keys = (uint64_t *) (header + 1);
+    uint8_t *ptype = (uint8_t *) (keys + header->properties_count);
+    uint64_t *offset = (uint64_t *) (ptype + header->properties_count);
+    uint8_t *values = (uint8_t *) (offset + header->properties_count);
 
-    obj->buffer = CT_ALLOC(allocator, uint8_t, header->buffer_size);
-    memcpy(obj->buffer, (uint8_t *) (header + 1), header->buffer_size);
+    keys += 1;
+    ptype += 1;
+    offset += 1;
 
-    obj->keys = (uint64_t *) obj->buffer;
-    obj->ptype = (uint8_t *) (obj->keys + header->properties_count);
-    obj->offset = (uint64_t *) (obj->ptype + header->properties_count);
-    obj->values = (uint8_t *) (obj->offset + header->properties_count);
+    obj->properties_count += (header->properties_count-1);
 
-    for (int i = 0; i < header->properties_count; ++i) {
+    ct_array_push_n(obj->keys, keys,
+                    header->properties_count-1, allocator);
+
+    ct_array_push_n(obj->ptype, ptype,
+                    header->properties_count-1, allocator);
+
+    ct_array_push_n(obj->offset, offset,
+                    header->properties_count-1, allocator);
+
+    ct_array_push_n(obj->values, values,
+                    header->values_size,
+                    allocator);
+
+    for (int i = 1; i < header->properties_count; ++i) {
         ct_hash_add(&obj->prop_map, obj->keys[i], i, allocator);
     }
 
-    char *strbuffer = (char *) ((uint8_t *) (header + 1) + obj->buffer_size);
-    for (int i = 0; i < obj->properties_count; ++i) {
+    const char *strbuffer = (char *) (values + header->values_size);
+    for (int i = 1; i < obj->properties_count; ++i) {
         if (obj->ptype[i] != CDB_TYPE_STR) {
             continue;
         }
 
         uint64_t offset = *(uint64_t *) (obj->values + obj->offset[i]);
-        *(char **) (obj->values + obj->offset[i]) = ct_memory_a0.str_dup(
-                strbuffer + offset, allocator);
+
+        char* dup_str = ct_memory_a0.str_dup(strbuffer + offset, allocator);
+
+        *(char **) (obj->values + obj->offset[i]) = dup_str;
     }
 }
 
@@ -451,11 +434,11 @@ static void _notify(struct ct_cdb_obj_t *_obj,
                     uint64_t *changed_prop) {
     struct object_t *obj = *(struct object_t **) _obj;
 
-
     const int notify_n = ct_array_size(obj->notify);
+    const int changed_prop_n = ct_array_size(changed_prop);
 
     for (int i = 0; i < notify_n; ++i) {
-        obj->notify[i](_obj, changed_prop, ct_array_size(changed_prop));
+        obj->notify[i](_obj, changed_prop, changed_prop_n);
     }
 
     for (int i = 0; i < ct_array_size(obj->instances); ++i) {

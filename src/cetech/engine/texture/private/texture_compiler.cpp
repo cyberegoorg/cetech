@@ -145,8 +145,8 @@ static void compiler(const char *filename,
             .size = (uint32_t) tmp_file->size(tmp_file)
     };
 
-    ct_array_push_n(*output, &resource, sizeof(resource), a);
-    ct_array_push_n(*output, tmp_data, sizeof(char) * resource.size, a);
+    ct_array_push_n(*output, &resource, sizeof(texture_blob::blob_t), a);
+    ct_array_push_n(*output, tmp_data, resource.size, a);
 
     tmp_file->close(tmp_file);
 

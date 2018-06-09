@@ -3,8 +3,6 @@
 [![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
 
-![Prototyp](docs/img/prototyp.png)
-
 ## [What is it?](https://cyberegoorg.gitlab.io/cetech/)
 
 CETech is game engine primary develop for internal use in CyberEg{o.o}rg.

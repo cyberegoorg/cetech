@@ -99,6 +99,8 @@ int init_config(int argc,
     ct_path_a0.join(&source_config, _G.allocator, 2, source_dir_str,
                     "global.config");
 
+    ct_cdb_a0.read_str(object, CONFIG_NATIVE_PLATFORM, ""); //TODO: REMOVGE
+
     if (ct_cdb_a0.read_uint32(object, CONFIG_COMPILE, 0)) {
         ct_path_a0.make_path(build_dir);
         ct_path_a0.copy_file(_G.allocator, source_config, build_config);

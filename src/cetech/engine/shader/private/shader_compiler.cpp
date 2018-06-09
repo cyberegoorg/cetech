@@ -99,8 +99,8 @@ const char *vs_profile = "120";
 const char *fs_profile = "120";
 #elif defined(CETECH_DARWIN)
 const char *platform = "osx";
-const char *vs_profile = "120";
-const char *fs_profile = "120";
+const char *vs_profile = "metal";
+const char *fs_profile = "metal";
 #else
 const char* platform = "windows";
 const char* vs_profile = "vs_4_0";

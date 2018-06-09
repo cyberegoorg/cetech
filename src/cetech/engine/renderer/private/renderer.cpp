@@ -123,10 +123,14 @@ static void renderer_create() {
 
     // TODO: from config
 
-    bgfx_init_t init = {
-            .type = BGFX_RENDERER_TYPE_OPENGL,
-    };
+    bgfx_init_t init;
     bgfx_init_ctor(&init);
+
+#if defined(CETECH_LINUX)
+    init.type = BGFX_RENDERER_TYPE_OPENGL,
+#elif defined(CETECH_DARWIN)
+    init.type = BGFX_RENDERER_TYPE_METAL,
+#endif
 
     bgfx_init(&init);
 

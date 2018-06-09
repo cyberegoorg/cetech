@@ -144,7 +144,7 @@ static void geometry_pass_on_pass(void *inst,
                                            layer);
         }
     }
-    ct_dd_a0.end(viewid);
+    ct_dd_a0.end();
 }
 
 
