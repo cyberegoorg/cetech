@@ -104,10 +104,10 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
         struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                              EXPLORER_ENTITY_SELECT_EVENT);
 
-        ct_cdb_obj_t* w = ct_cdb_a0.write_begin(event);
+        ct_cdb_obj_o* w = ct_cdb_a0.write_begin(event);
         ct_cdb_a0.set_uint64(w, CT_ID64_0("world"), _G.world.h);
         ct_cdb_a0.set_string(w, CT_ID64_0("filename"), _G.path);
-        ct_cdb_a0.set_uint64(w, CT_ID64_0("ent"), _G.entity.h);
+        ct_cdb_a0.set_uint64(w, CT_ID64_0("entity"), _G.entity.h);
         ct_cdb_a0.set_ref(w, CT_ID64_0("obj"), obj);
         ct_cdb_a0.write_commit(w);
 

@@ -3,13 +3,23 @@
 #include <cetech/kernel/hashlib/hashlib.h>
 #include <cetech/kernel/module/module.h>
 #include <cetech/kernel/api/api_system.h>
-
-#include "cetech/kernel/macros.h"
+#include <cetech/kernel/containers/hash.h>
+#include <cetech/kernel/memory/memory.h>
+#include <cetech/kernel/memory/private/allocator_core_private.h>
 
 #define _G hashlib_global
 
-struct _G{
+CETECH_DECL_API(ct_memory_a0);
 
+struct _G {
+    char *str_id64;
+    struct ct_hash_t id64_to_str;
+
+    char *str_id32;
+    struct ct_hash_t id32_to_str;
+
+
+    struct ct_alloc *allocator;
 } _G;
 
 uint64_t hash_murmur2_64(const void *key,
@@ -135,7 +145,19 @@ uint64_t stringid64_from_string(const char *str) {
         return 0;
     }
 
-    return hash_murmur2_64(str, strlen(str), STRINGID64_SEED);
+    struct ct_alloc *alloc = coreallocator_get();
+
+    const uint32_t str_len = strlen(str);
+
+    const uint64_t hash = hash_murmur2_64(str, str_len, STRINGID64_SEED);
+    if (!ct_hash_contain(&_G.id64_to_str, hash)) {
+        const uint32_t idx = ct_array_size(_G.str_id64);
+        ct_array_push_n(_G.str_id64, str, str_len + 1, alloc);
+
+        ct_hash_add(&_G.id64_to_str, hash, idx, alloc);
+    }
+
+    return hash;
 }
 
 uint32_t stringid32_from_string(const char *str) {
@@ -143,29 +165,70 @@ uint32_t stringid32_from_string(const char *str) {
         return 0;
     }
 
-    return hash_murmur2_32(str, strlen(str), STRINGID32_SEED);
+    struct ct_alloc *alloc = coreallocator_get();
+
+    const uint32_t str_len = strlen(str);
+
+    const uint32_t  hash = hash_murmur2_32(str, str_len, STRINGID32_SEED);
+    if (!ct_hash_contain(&_G.id32_to_str, hash)) {
+        const uint32_t idx = ct_array_size(_G.str_id32);
+        ct_array_push_n(_G.str_id32, str, str_len + 1, alloc);
+
+        ct_hash_add(&_G.id32_to_str, hash, idx, alloc);
+    }
+
+    return hash;
+}
+
+const char* str_from_id64(uint64_t key){
+    uint32_t idx = ct_hash_lookup(&_G.id64_to_str, key, UINT32_MAX);
+
+    if(UINT32_MAX != idx) {
+        return &_G.str_id64[idx];
+    }
+
+    return NULL;
+}
+
+const char* str_from_id32(uint32_t key){
+    uint32_t idx = ct_hash_lookup(&_G.id32_to_str, key, UINT32_MAX);
+
+    if(UINT32_MAX != idx) {
+        return &_G.str_id32[idx];
+    }
+
+    return NULL;
 }
 
 static struct ct_hashlib_a0 hash_api = {
-        .id64_from_str = stringid64_from_string,
-        .id32_from_str = stringid32_from_string,
         .hash_murmur2_64 = hash_murmur2_64,
         .hash_murmur2_32 = hash_murmur2_32,
+
+        .id64_from_str = stringid64_from_string,
+        .id32_from_str = stringid32_from_string,
+
+        .str_from_id32 = str_from_id32,
+        .str_from_id64 = str_from_id64,
 };
 
-CETECH_MODULE_DEF(
-        hashlib,
-        {
+void CETECH_MODULE_INITAPI(hashlib)(struct ct_api_a0 *api) {
+    CETECH_GET_API(api, ct_memory_a0);
+}
 
-            CT_UNUSED(api);
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_hashlib_a0", &hash_api);
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)
+void CETECH_MODULE_LOAD (hashlib)(struct ct_api_a0 *api,
+                                  int reload) {
+    CT_UNUSED(reload);
 
+    api->register_api("ct_hashlib_a0", &hash_api);
+
+    CETECH_GET_API(api, ct_memory_a0);
+
+    _G = (struct _G) {
+            .allocator = ct_memory_a0.main_allocator()
+    };
+}
+
+void CETECH_MODULE_UNLOAD (hashlib)(struct ct_api_a0 *api,
+                                    int reload) {
+    CT_UNUSED(api);
+}

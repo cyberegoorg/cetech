@@ -446,7 +446,7 @@ void compile_and_reload(const char *filename) {
 
 
 static void _init_cvar(struct ct_config_a0 config) {
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config);
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SOURCE_DIR)) {
         ct_cdb_a0.set_string(writer, CONFIG_SOURCE_DIR, "src");
     }

@@ -8,18 +8,17 @@
 bool corelib_init() {
     struct ct_alloc *core_alloc = coreallocator_get();
 
+    memory_init();
+
     api_init(core_alloc);
     struct ct_api_a0 *api = api_v0();
 
     CETECH_LOAD_STATIC_MODULE(api, log);
 
-    memory_init();
-
     coreallocator_register_api(api);
+    register_api(api);
 
     CETECH_LOAD_STATIC_MODULE(api, hashlib);
-
-    register_api(api);
 
     CETECH_LOAD_STATIC_MODULE(api, error);
     CETECH_LOAD_STATIC_MODULE(api, vio);

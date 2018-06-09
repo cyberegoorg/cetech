@@ -78,7 +78,7 @@ static void *ct_array_grow(void *a,
         return a;
     }
 
-    uint32_t new_capacity = ct_array_capacity(a) * 2 + 8;
+    uint32_t new_capacity = (ct_array_capacity(a) * 2) + 8;
     if (new_capacity < capacity) {
         new_capacity = capacity;
     }

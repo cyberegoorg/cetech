@@ -22,8 +22,8 @@
 #include <cetech/engine/debugdraw/debugdraw.h>
 #include <cetech/macros.h>
 
-
 CETECH_DECL_API(ct_memory_a0);
+
 CETECH_DECL_API(ct_scenegprah_a0);
 CETECH_DECL_API(ct_transform_a0);
 CETECH_DECL_API(ct_material_a0);
@@ -50,12 +50,12 @@ static struct _G {
 
 void _mesh_component_compiler(struct ct_cdb_obj_t *event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"),
+    ct_cdb_obj_o *writer = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"),
                                                      NULL);
     uint64_t *component_key = ct_cdb_a0.read_ptr(event,
                                                  CT_ID64_0("component_key"),
                                                  NULL);
-    uint32_t component_key_count = ct_cdb_a0.read_uint32(event, CT_ID64_0(
+    uint32_t component_key_count = ct_cdb_a0.read_uint64(event, CT_ID64_0(
             "component_key_count"), 0);
 
     uint64_t keys[component_key_count + 3];
@@ -180,7 +180,7 @@ static void _on_obj_change(struct ct_cdb_obj_t *obj,
                            uint64_t *prop,
                            uint32_t prop_count) {
 
-    struct ct_cdb_obj_t *writer = NULL;
+    ct_cdb_obj_o *writer = NULL;
     for (int k = 0; k < prop_count; ++k) {
         if (prop[k] == PROP_SCENE) {
             const char *str = ct_cdb_a0.read_str(obj, PROP_SCENE, "");
@@ -218,10 +218,10 @@ static void _on_obj_change(struct ct_cdb_obj_t *obj,
                 writer = ct_cdb_a0.write_begin(obj);
             }
 
-            ct_cdb_a0.set_uint32(writer, PROP_MATERIAL_ID, CT_ID32_0(str));
+            ct_cdb_a0.set_uint64(writer, PROP_MATERIAL_ID, CT_ID32_0(str));
 
         } else if (prop[k] == PROP_MATERIAL_ID) {
-            uint32_t material_id = ct_cdb_a0.read_uint32(obj,
+            uint32_t material_id = ct_cdb_a0.read_uint64(obj,
                                                          PROP_MATERIAL_ID, 0);
 
 
@@ -252,11 +252,11 @@ static void _component_spawner(struct ct_cdb_obj_t *event) {
 
     *mesh = (struct ct_mesh_renderer) {
             .material = ct_material_a0.resource_create(
-                    ct_cdb_a0.read_uint32(obj, PROP_MATERIAL_ID, 0)),
+                    ct_cdb_a0.read_uint64(obj, PROP_MATERIAL_ID, 0)),
 
             .mesh_id = ct_cdb_a0.read_uint64(obj, PROP_MESH_ID, 0),
             .node_id = ct_cdb_a0.read_uint64(obj, PROP_NODE_ID, 0),
-            .scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0),
+            .scene_id = ct_cdb_a0.read_uint64(obj, PROP_SCENE_ID, 0),
     };
 
     ct_cdb_a0.register_notify(obj, (ct_cdb_notify) _on_obj_change);
@@ -266,14 +266,14 @@ static void _component_spawner(struct ct_cdb_obj_t *event) {
 void mesh_combo_items(struct ct_cdb_obj_t *obj,
                       char **items,
                       uint32_t *items_count) {
-    uint32_t scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0);
+    uint32_t scene_id = ct_cdb_a0.read_uint64(obj, PROP_SCENE_ID, 0);
     ct_scene_a0.get_all_geometries(scene_id, items, items_count);
 }
 
 void node_combo_items(struct ct_cdb_obj_t *obj,
                       char **items,
                       uint32_t *items_count) {
-    uint32_t scene_id = ct_cdb_a0.read_uint32(obj, PROP_SCENE_ID, 0);
+    uint32_t scene_id = ct_cdb_a0.read_uint64(obj, PROP_SCENE_ID, 0);
     ct_scene_a0.get_all_nodes(scene_id, items, items_count);
 }
 
@@ -335,7 +335,7 @@ static void _init(struct ct_api_a0 *api) {
             {
                     .key = "material_id",
                     .ui_name = "material id",
-                    .type = CDB_TYPE_UINT32,
+                    .type = CDB_TYPE_UINT64,
                     .offset = UINT64_MAX,
             },
             {

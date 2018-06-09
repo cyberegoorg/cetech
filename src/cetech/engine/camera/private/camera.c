@@ -37,9 +37,9 @@ static struct CameraGlobal {
 
 static void _camera_compiler(struct ct_cdb_obj_t *event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    struct ct_cdb_obj_t *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
+    ct_cdb_obj_o *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
     uint64_t *component_key = ct_cdb_a0.read_ptr(event, CT_ID64_0("component_key"), NULL);
-    uint32_t component_key_count = ct_cdb_a0.read_uint32(event, CT_ID64_0("component_key_count"), 0);
+    uint32_t component_key_count = ct_cdb_a0.read_uint64(event, CT_ID64_0("component_key_count"), 0);
     
     
     uint64_t keys[component_key_count + 1];

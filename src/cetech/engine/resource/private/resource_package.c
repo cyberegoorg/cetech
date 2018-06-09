@@ -58,7 +58,7 @@ void online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ptr(writer, PROP_RESOURECE_DATA, data);
     ct_cdb_a0.write_commit(writer);
 

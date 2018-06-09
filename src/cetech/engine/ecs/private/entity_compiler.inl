@@ -52,7 +52,7 @@ static void foreach_component(const char *filename,
                               uint64_t *root_key,
                               uint32_t root_count,
                               uint64_t component_key,
-                              struct ct_cdb_obj_t *writer) {
+                              ct_cdb_obj_o *writer) {
 
     uint64_t tmp_keys[root_count + 1];
     memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
@@ -65,7 +65,7 @@ static void foreach_component(const char *filename,
 static void compile_entitity(const char *filename,
                              uint64_t *root_key,
                              uint32_t root_count,
-                             unsigned int parent,
+                             uint32_t parent_idx,
                              struct ct_cdb_obj_t* parent_obj,
                              struct ct_entity_compile_output *output,
                              struct ct_compilator_api *compilator_api) {
@@ -73,9 +73,10 @@ static void compile_entitity(const char *filename,
     CT_UNUSED(parent_obj);
     CT_UNUSED(compilator_api);
 
-    uint32_t ent_id = output->ent_counter++;
+    uint32_t ent_idx = output->ent_counter++;
 
-    ct_hash_add(&output->entity_parent, ent_id, (uint32_t) parent,
+    ct_hash_add(&output->entity_parent,
+                ent_idx, parent_idx,
                 _G.allocator);
 
     uint64_t uid = root_key[root_count - 1];
@@ -112,11 +113,12 @@ static void compile_entitity(const char *filename,
     ct_array_push(output->ent_type_count, components_keys_count, _G.allocator);
 
     struct ct_cdb_obj_t *obj = ct_cdb_a0.create_object(_G.db, 0);
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(obj);
 
     if(name_str) {
         ct_cdb_a0.set_string(writer, CT_ID64_0("name"), name_str);
     }
+
     ct_cdb_a0.set_uint64(writer, CT_ID64_0("uid"), uid);
 
     for (uint32_t i = 0; i < components_keys_count; ++i) {
@@ -124,6 +126,7 @@ static void compile_entitity(const char *filename,
                           tmp_keys, root_count + 1,
                           ck.keys[i], writer);
     }
+
     ct_cdb_a0.write_commit(writer);
 
     uint32_t offset = ct_array_size(output->entity_data);
@@ -141,10 +144,10 @@ static void compile_entitity(const char *filename,
                            &children_keys_count);
 
     for (uint32_t i = 0; i < children_keys_count; ++i) {
-        int parent_ent = ent_id;
+        int parent_ent_idx = ent_idx;
         tmp_keys[root_count + 1] = children_keys[i];
         compile_entitity(filename, tmp_keys, root_count + 2,
-                         parent_ent, obj, output, NULL);
+                         parent_ent_idx, obj, output, NULL);
     }
 
 

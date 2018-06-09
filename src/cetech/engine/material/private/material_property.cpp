@@ -54,7 +54,7 @@ static void ui_vec4(ct_cdb_obj_t *var) {
     ct_cdb_a0.read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
     if (ct_debugui_a0.DragFloat3(str, v, 0.1f, -1.0f, 1.0f, "%.5f", 1.0f)) {
-        ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
+        ct_cdb_obj_o* wr = ct_cdb_a0.write_begin(var);
         ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
         ct_cdb_a0.write_commit(wr);
     }
@@ -69,7 +69,7 @@ static void ui_color4(ct_cdb_obj_t *var) {
 
     ct_debugui_a0.ColorEdit4(str, v, true);
 
-    ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
+    ct_cdb_obj_o* wr = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
     ct_cdb_a0.write_commit(wr);
 

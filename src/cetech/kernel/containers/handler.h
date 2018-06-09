@@ -8,7 +8,6 @@
 #include "array.h"
 
 
-
 struct ct_handler_t {
     uint64_t *_generation;
     uint64_t *_freeIdx;

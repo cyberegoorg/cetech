@@ -80,22 +80,22 @@ static uint32_t _get_reset_flags() {
 
 static void renderer_create() {
 
-    if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ct_cdb_a0.read_uint64(_G.config, CONFIG_DAEMON, 0)) {
         uint32_t w, h;
-        w = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_X, 0);
-        h = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_Y, 0);
+        w = ct_cdb_a0.read_uint64(_G.config, CONFIG_SCREEN_X, 0);
+        h = ct_cdb_a0.read_uint64(_G.config, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ct_cdb_a0.read_uint32(_G.config, CONFIG_WID, 0);
+        intptr_t wid = ct_cdb_a0.read_uint64(_G.config, CONFIG_WID, 0);
 
         char title[128] = {};
         snprintf(title, CT_ARRAY_LEN(title), "cetech");
 
         if (wid == 0) {
-            bool fullscreen = ct_cdb_a0.read_uint32(_G.config,
+            bool fullscreen = ct_cdb_a0.read_uint64(_G.config,
                                                     CONFIG_SCREEN_FULLSCREEN,
-                                                    0);
+                                                    0) > 0;
 
             uint32_t flags = WINDOW_NOFLAG;
 
@@ -130,9 +130,10 @@ static void renderer_create() {
     init.type = BGFX_RENDERER_TYPE_OPENGL,
 #elif defined(CETECH_DARWIN)
     init.type = BGFX_RENDERER_TYPE_METAL,
+    init.type = BGFX_RENDERER_TYPE_OPENGL,
 #endif
 
-    bgfx_init(&init);
+            bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
     bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
@@ -158,14 +159,13 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(struct ct_cdb_obj_t* event) {
+static void on_resize(struct ct_cdb_obj_t *event) {
 
     _G.need_reset = 1;
 
 
-
-    _G.size_width = ct_cdb_a0.read_uint32(event, CT_ID64_0("width"), 0);
-    _G.size_height =ct_cdb_a0.read_uint32(event, CT_ID64_0("height"), 0);
+    _G.size_width = ct_cdb_a0.read_uint64(event, CT_ID64_0("width"), 0);
+    _G.size_height = ct_cdb_a0.read_uint64(event, CT_ID64_0("height"), 0);
 }
 
 static void on_render(struct ct_cdb_obj_t *_event) {
@@ -772,32 +772,32 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0.connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
     ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_render, 0);
 
-    ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config);
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_X)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_X, 1024);
+        ct_cdb_a0.set_uint64(writer, CONFIG_SCREEN_X, 1024);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_Y)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_Y, 768);
+        ct_cdb_a0.set_uint64(writer, CONFIG_SCREEN_Y, 768);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_SCREEN_FULLSCREEN, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_DAEMON)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_DAEMON, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_DAEMON, 0);
     }
 
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_WID)) {
-        ct_cdb_a0.set_uint32(writer, CONFIG_WID, 0);
+        ct_cdb_a0.set_uint64(writer, CONFIG_WID, 0);
     }
 
     ct_cdb_a0.write_commit(writer);
 
 
-    _G.vsync = ct_cdb_a0.read_uint32(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
+    _G.vsync = ct_cdb_a0.read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
     CETECH_GET_API(api, ct_window_a0);
 
@@ -808,7 +808,7 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    if (!ct_cdb_a0.read_uint32(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ct_cdb_a0.read_uint64(_G.config, CONFIG_DAEMON, 0)) {
 
         ct_array_free(_G.on_render, _G.allocator);
 

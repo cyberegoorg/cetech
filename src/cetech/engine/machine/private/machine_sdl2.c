@@ -112,7 +112,7 @@ void sdl_mouse_process() {
     event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                     EVENT_MOUSE_MOVE);
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+    ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
     ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), _G.mouse.position);
     ct_cdb_a0.write_commit(w);
 
@@ -125,7 +125,7 @@ void sdl_mouse_process() {
                                             EVENT_MOUSE_DOWN);
 
             w = ct_cdb_a0.write_begin(event);
-            ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), i);
+            ct_cdb_a0.set_uint64(w, CT_ID64_0("button"), i);
             ct_cdb_a0.write_commit(w);
 
             ct_ebus_a0.broadcast(MOUSE_EBUS, event);
@@ -135,7 +135,7 @@ void sdl_mouse_process() {
                                             EVENT_MOUSE_UP);
 
             w = ct_cdb_a0.write_begin(event);
-            ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), i);
+            ct_cdb_a0.set_uint64(w, CT_ID64_0("button"), i);
             ct_cdb_a0.write_commit(w);
 
             ct_ebus_a0.broadcast(MOUSE_EBUS, event);
@@ -155,8 +155,8 @@ void sdl_keyboard_process() {
             event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                             EVENT_KEYBOARD_DOWN);
 
-            struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-            ct_cdb_a0.set_uint32(w, CT_ID64_0("keycode"), i);
+            ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint64(w, CT_ID64_0("keycode"), i);
             ct_cdb_a0.write_commit(w);
 
             ct_ebus_a0.broadcast(KEYBOARD_EBUS, event);
@@ -166,8 +166,8 @@ void sdl_keyboard_process() {
             event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                             EVENT_KEYBOARD_UP);
 
-            struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-            ct_cdb_a0.set_uint32(w, CT_ID64_0("keycode"), i);
+            ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+            ct_cdb_a0.set_uint64(w, CT_ID64_0("keycode"), i);
             ct_cdb_a0.write_commit(w);
 
             ct_ebus_a0.broadcast(KEYBOARD_EBUS, event);
@@ -301,9 +301,9 @@ void sdl_gamepad_process() {
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_DOWN);
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), j);
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("button"), j);
                 ct_cdb_a0.write_commit(w);
 
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
@@ -315,9 +315,9 @@ void sdl_gamepad_process() {
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_UP);
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("button"), j);
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("button"), j);
                 ct_cdb_a0.write_commit(w);
 
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
@@ -341,9 +341,9 @@ void sdl_gamepad_process() {
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_MOVE);
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("axis"), j);
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("gamepad_id"), i);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("axis"), j);
                 ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), pos);
                 ct_cdb_a0.write_commit(w);
 
@@ -390,12 +390,12 @@ static void _update(float dt) {
                                 ct_cdb_a0.global_db(),
                                 EVENT_WINDOW_RESIZED);
 
-                        struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                        ct_cdb_a0.set_uint32(w, CT_ID64_0("window_id"),
+                        ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                        ct_cdb_a0.set_uint64(w, CT_ID64_0("window_id"),
                                              e.window.windowID);
-                        ct_cdb_a0.set_uint32(w, CT_ID64_0("width"),
+                        ct_cdb_a0.set_uint64(w, CT_ID64_0("width"),
                                              e.window.data1);
-                        ct_cdb_a0.set_uint32(w, CT_ID64_0("height"),
+                        ct_cdb_a0.set_uint64(w, CT_ID64_0("height"),
                                              e.window.data2);
                         ct_cdb_a0.write_commit(w);
 
@@ -414,7 +414,7 @@ static void _update(float dt) {
 
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);;
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
                 ct_cdb_a0.set_vec3(w, CT_ID64_0("position"), pos);
                 ct_cdb_a0.write_commit(w);
 
@@ -430,7 +430,7 @@ static void _update(float dt) {
                         EVENT_KEYBOARD_TEXT);
 
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
                 ct_cdb_a0.set_string(w, CT_ID64_0("text"), e.text.text);
                 ct_cdb_a0.write_commit(w);
 
@@ -446,8 +446,8 @@ static void _update(float dt) {
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_CONNECT);
 
-                struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), idx);
+                ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                ct_cdb_a0.set_uint64(w, CT_ID64_0("gamepad_id"), idx);
                 ct_cdb_a0.write_commit(w);
 
                 ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);
@@ -471,8 +471,8 @@ static void _update(float dt) {
                             ct_cdb_a0.global_db(),
                             EVENT_GAMEPAD_DISCONNECT);
 
-                    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(event);
-                    ct_cdb_a0.set_uint32(w, CT_ID64_0("gamepad_id"), i);
+                    ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);
+                    ct_cdb_a0.set_uint64(w, CT_ID64_0("gamepad_id"), i);
                     ct_cdb_a0.write_commit(w);
 
                     ct_ebus_a0.broadcast(GAMEPAD_EBUS, event);

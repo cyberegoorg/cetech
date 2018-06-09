@@ -374,7 +374,7 @@ static void _init_cvar(struct ct_config_a0 config) {
     ct_config_a0 = config;
     _G.config = ct_config_a0.config_object();
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config);
     if (!ct_cdb_a0.prop_exist(_G.config, CONFIG_BUILD_DIR)) {
         ct_cdb_a0.set_string(writer, CONFIG_BUILD_DIR, "build");
     }

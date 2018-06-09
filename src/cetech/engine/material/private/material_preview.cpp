@@ -45,10 +45,12 @@ static void load(const char *filename,
     ct_entity ent = ct_ecs_a0.spawn_entity(world, CT_ID32_0("core/cube"));
     _G.ent = ent;
 
-    ct_mesh_renderer *component = static_cast<ct_mesh_renderer *>(ct_ecs_a0.entity_data(world, MESH_RENDERER_COMPONENT, ent));
+    ct_cdb_obj_t* material_ref = ct_material_a0.resource_create(resourceid.name);
 
-    component->material = ct_material_a0.resource_create(resourceid.name);
-    ct_ecs_a0.entity_component_change(world, MESH_RENDERER_COMPONENT, ent);
+    ct_cdb_obj_t *obj = ct_ecs_a0.entity_object(world, ent);
+    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(obj);
+    ct_cdb_a0.set_ref(w, PROP_MATERIAL_REF, material_ref);
+    ct_cdb_a0.write_commit(w);
 }
 
 static void unload(const char *filename,

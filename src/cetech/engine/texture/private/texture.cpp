@@ -69,7 +69,7 @@ void _texture_resource_online(uint64_t name,
 
     ct_render_texture_handle_t texture = ct_renderer_a0.create_texture(mem, CT_RENDER_TEXTURE_NONE, 0, NULL);
 
-    ct_cdb_obj_t* writer = ct_cdb_a0.write_begin(obj);
+    ct_cdb_obj_o* writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ct_cdb_a0.write_commit(writer);
 }

@@ -82,18 +82,18 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
+    ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config_object);
 
     const uint64_t key = CT_ID64_0(name);
 
     if (value == NULL) {
-        ct_cdb_a0.set_uint32(writer, key, 1);
+        ct_cdb_a0.set_uint64(writer, key, 1);
         goto end;
     }
 
 
     if (sscanf(value, "%d", &d)) {
-        ct_cdb_a0.set_uint32(writer, key, d);
+        ct_cdb_a0.set_uint64(writer, key, d);
         goto end;
 
     } else if (sscanf(value, "%f", &f)) {
@@ -154,7 +154,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                 enum ct_cdb_type t = ct_cdb_a0.prop_type(
                         _G.config_object, key);
 
-                struct ct_cdb_obj_t *writer = ct_cdb_a0.write_begin(_G.config_object);
+                ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(_G.config_object);
 
                 switch (t) {
                     case CDB_TYPE_NONE:
@@ -165,9 +165,9 @@ static void foreach_config_clb(struct ct_yamlng_node key,
                         ct_cdb_a0.set_float(writer, key, tmp_f);
                         break;
 
-                    case CDB_TYPE_UINT32:
+                    case CDB_TYPE_UINT64:
                         tmp_int = (int) d->as_float(d, value, 0.0f);
-                        ct_cdb_a0.set_uint32(writer, key, tmp_int);
+                        ct_cdb_a0.set_uint64(writer, key, tmp_int);
                         break;
 
                     case CDB_TYPE_STR:
