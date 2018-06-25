@@ -231,7 +231,7 @@ static void ui_asset_list() {
 
                 ct_cdb_obj_o *w = ct_cdb_a0.write_begin(event);
                 ct_cdb_a0.set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
-                ct_cdb_a0.set_str(w, CT_ID64_0("path"), path);
+                ct_cdb_a0.set_string(w, CT_ID64_0("path"), path);
                 ct_cdb_a0.set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
                 ct_cdb_a0.write_commit(w);
 
