@@ -55,7 +55,7 @@ static struct _G {
     bool capture;
     bool vsync;
     bool need_reset;
-    ct_cdb_obj_t *config;
+    uint64_t  config;
     ct_alloc *allocator;
 } _G = {};
 
@@ -159,7 +159,7 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(struct ct_cdb_obj_t *event) {
+static void on_resize(uint64_t event) {
 
     _G.need_reset = 1;
 
@@ -168,7 +168,7 @@ static void on_resize(struct ct_cdb_obj_t *event) {
     _G.size_height = ct_cdb_a0.read_uint64(event, CT_ID64_0("height"), 0);
 }
 
-static void on_render(struct ct_cdb_obj_t *_event) {
+static void on_render(uint64_t _event) {
     CT_UNUSED(_event);
 
     if (_G.need_reset) {
@@ -178,7 +178,7 @@ static void on_render(struct ct_cdb_obj_t *_event) {
     }
 
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+    uint64_t event = ct_cdb_a0.create_object(
             ct_cdb_a0.global_db(),
             RENDERER_RENDER_EVENT);
 

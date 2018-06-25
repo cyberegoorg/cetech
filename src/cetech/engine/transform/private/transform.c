@@ -151,9 +151,9 @@ static struct _G {
 //    ct_array_pop_back(_G.world_instances);
 //}
 
-void _component_compiler(struct ct_cdb_obj_t *event) {
+void _component_compiler(uint64_t event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    ct_cdb_obj_o *writer = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
+    ct_cdb_obj_o *writer = ct_cdb_a0.read_ptr(event, CT_ID64_0("writer"), NULL);
 
     uint64_t *component_key = ct_cdb_a0.read_ptr(event,
                                                  CT_ID64_0("component_key"),
@@ -225,11 +225,11 @@ void transform_transform(struct ct_transform_comp *transform,
 }
 
 
-static void _on_component_obj_change(struct ct_cdb_obj_t *obj,
+static void _on_component_obj_change(uint64_t obj,
                                      const uint64_t *prop,
                                      uint32_t prop_count, void* data) {
 
-    struct ct_cdb_obj_t* ent_obj = ct_cdb_a0.parent(ct_cdb_a0.parent(obj));
+   uint64_t ent_obj = ct_cdb_a0.parent(ct_cdb_a0.parent(obj));
 
     struct ct_world world = {.h = ct_cdb_a0.read_uint64(ent_obj,
                                                         CT_ID64_0("world"), 0)};
@@ -251,9 +251,8 @@ static void _on_component_obj_change(struct ct_cdb_obj_t *obj,
 static struct ct_transform_a0 _api = {
 };
 
-static void _component_spawner(struct ct_cdb_obj_t *event) {
-    struct ct_cdb_obj_t *obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"),
-                                                  NULL);
+static void _component_spawner(uint64_t event) {
+    uint64_t obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0);
     struct ct_transform_comp *transform = ct_cdb_a0.read_ptr(event,
                                                              CT_ID64_0("data"),
                                                              NULL);

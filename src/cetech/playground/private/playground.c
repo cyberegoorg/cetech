@@ -70,7 +70,7 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0.MenuItem("Quit", "Alt+F4", false, true)) {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         KERNEL_QUIT_EVENT);
                 ct_ebus_a0.broadcast(KERNEL_EBUS, event);
@@ -125,7 +125,7 @@ static float draw_main_menu() {
 
             ct_debugui_a0.Separator();
 
-            struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+            uint64_t event = ct_cdb_a0.create_object(
                     ct_cdb_a0.global_db(),
                     PLAYGROUND_UI_MAINMENU_EVENT);
 
@@ -173,8 +173,8 @@ static void debugui_on_pass(void *inst,
 }
 
 
-static void on_init(struct ct_cdb_obj_t *_event) {
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+static void on_init(uint64_t _event) {
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          PLAYGROUND_INIT_EVENT);
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
@@ -195,18 +195,18 @@ static void on_init(struct ct_cdb_obj_t *_event) {
     _G.render_graph->call->add_module(_G.render_graph, _G.module);
 }
 
-static void on_shutdown(struct ct_cdb_obj_t *_event) {
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+static void on_shutdown(uint64_t _event) {
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          PLAYGROUND_SHUTDOWN_EVENT);
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 }
 
-static void on_update(struct ct_cdb_obj_t *app_event) {
+static void on_update(uint64_t app_event) {
     ct_action_manager_a0.check();
 
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          PLAYGROUND_UPDATE_EVENT);
 
 
@@ -218,8 +218,8 @@ static void on_update(struct ct_cdb_obj_t *app_event) {
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
 }
 
-static void on_render(struct ct_cdb_obj_t *_event) {
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+static void on_render(uint64_t _event) {
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          PLAYGROUND_RENDER_EVENT);
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);
@@ -230,10 +230,10 @@ static void on_render(struct ct_cdb_obj_t *_event) {
 }
 
 
-static void on_ui(struct ct_cdb_obj_t *_event) {
+static void on_ui(uint64_t _event) {
     on_debugui();
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          PLAYGROUND_UI_EVENT);
 
     ct_ebus_a0.broadcast(PLAYGROUND_EBUS, event);

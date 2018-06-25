@@ -115,7 +115,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(struct ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
     if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
                                 DebugUIWindowFlags_NoScrollbar)) {
 
@@ -141,7 +141,7 @@ static void on_debugui(struct ct_cdb_obj_t *event) {
 }
 
 
-static void set_asset(struct ct_cdb_obj_t *event) {
+static void set_asset(uint64_t event) {
     uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
     const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);
 
@@ -181,7 +181,7 @@ static void set_asset(struct ct_cdb_obj_t *event) {
 //    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init(struct ct_cdb_obj_t *event) {
+static void init(uint64_t event) {
     CT_UNUSED(event);
 
     _G.visible = true;
@@ -196,7 +196,7 @@ static void init(struct ct_cdb_obj_t *event) {
 
 }
 
-static void on_render(struct ct_cdb_obj_t *event) {
+static void on_render(uint64_t event) {
     CT_UNUSED(event);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
@@ -209,7 +209,7 @@ static void on_render(struct ct_cdb_obj_t *event) {
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static void update(struct ct_cdb_obj_t *event) {
+static void update(uint64_t event) {
     float dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
 
     if (_G.active) {
@@ -267,7 +267,7 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(struct ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
 
     ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);

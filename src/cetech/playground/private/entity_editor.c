@@ -126,7 +126,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(struct ct_cdb_obj_t* event) {
+static void on_debugui(uint64_t event) {
     char dock_id[128] = {};
 
     _G.active_editor = UINT8_MAX;
@@ -167,7 +167,7 @@ static void on_debugui(struct ct_cdb_obj_t* event) {
                 }
             }
 
-//            struct ct_cdb_obj_t *obj = ct_ecs_a0.ent_obj(_G.world[i],
+//            uint64_t obj = ct_ecs_a0.ent_obj(_G.world[i],
 //                                                           _G.camera_ent[i]);
 //
 
@@ -245,7 +245,7 @@ static void open(struct ct_resource_id asset,
                              _G.path[idx]);
 }
 
-static void update(struct ct_cdb_obj_t *event) {
+static void update(uint64_t event) {
     float dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
 
     if (UINT8_MAX != _G.active_editor) {
@@ -289,7 +289,7 @@ static void update(struct ct_cdb_obj_t *event) {
     }
 }
 
-static void on_render(struct ct_cdb_obj_t *event) {
+static void on_render(uint64_t event) {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
 
@@ -308,7 +308,7 @@ static struct ct_entity_editor_a0 level_api = {
 //            .unregister_module = playground::unregister_module,
 };
 
-static void on_asset_double_click(struct ct_cdb_obj_t *event) {
+static void on_asset_double_click(uint64_t event) {
     uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
     uint64_t root = ct_cdb_a0.read_uint64(event, CT_ID64_0("root"), 0);
     const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);

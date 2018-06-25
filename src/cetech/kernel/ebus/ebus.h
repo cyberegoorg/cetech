@@ -18,7 +18,7 @@ struct ebus_header_t {
     uint64_t size;
 };
 
-typedef void (ct_ebus_handler)(struct ct_cdb_obj_t *event);
+typedef void (ct_ebus_handler)(uint64_t event);
 
 //==============================================================================
 // Api
@@ -30,11 +30,11 @@ struct ct_ebus_a0 {
 
     void (*begin_frame)();
 
-    void (*broadcast)(uint32_t bus_name, struct ct_cdb_obj_t* event);
+    void (*broadcast)(uint32_t bus_name,uint64_t event);
 
     void (*send)(uint32_t bus_name,
                  uint64_t addr,
-                 struct ct_cdb_obj_t* event);
+                uint64_t event);
 
     void (*connect)(uint32_t bus_name,
                     uint64_t event,
@@ -60,7 +60,7 @@ struct ct_ebus_a0 {
 
     uint32_t (*event_count)(uint32_t bus_name);
 
-    struct ct_cdb_obj_t** (*events)(uint32_t bus_name);
+   uint64_t* (*events)(uint32_t bus_name);
 };
 
 

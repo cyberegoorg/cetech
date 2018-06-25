@@ -67,7 +67,7 @@ static void compile_entitity(const char *filename,
                              uint64_t *root_key,
                              uint32_t root_count,
                              int parent_idx,
-                             struct ct_cdb_obj_t *parent_obj,
+                             uint64_t parent_obj,
                              struct ct_entity_compile_output *output,
                              struct ct_compilator_api *compilator_api,
                              ct_cdb_obj_o *parent_children_writer) {
@@ -103,7 +103,7 @@ static void compile_entitity(const char *filename,
                            ck.keys, CT_ARRAY_LEN(ck.keys),
                            &components_keys_count);
 
-    struct ct_cdb_obj_t *obj = ct_cdb_a0.create_object(_G.db,
+    uint64_t obj = ct_cdb_a0.create_object(_G.db,
                                                        CT_ID64_0("entity"));
 
 
@@ -113,10 +113,10 @@ static void compile_entitity(const char *filename,
         ct_cdb_a0.set_str(writer, PREFAB_NAME_PROP, prefab);
     }
 
-    struct ct_cdb_obj_t *components_obj = ct_cdb_a0.create_object(_G.db, 0);
+    uint64_t components_obj = ct_cdb_a0.create_object(_G.db, 0);
     ct_cdb_a0.set_subobject(writer, CT_ID64_0("components"), components_obj);
 
-    struct ct_cdb_obj_t *children_obj = ct_cdb_a0.create_object(_G.db, 0);
+    uint64_t children_obj = ct_cdb_a0.create_object(_G.db, 0);
     ct_cdb_a0.set_subobject(writer, CT_ID64_0("children"), children_obj);
 
 
@@ -128,7 +128,7 @@ static void compile_entitity(const char *filename,
 
     ct_cdb_obj_o *components_writer = ct_cdb_a0.write_begin(components_obj);
     for (uint32_t i = 0; i < components_keys_count; ++i) {
-        struct ct_cdb_obj_t *comp_obj = ct_cdb_a0.create_object(_G.db,
+        uint64_t comp_obj = ct_cdb_a0.create_object(_G.db,
                                                                 ck.keys[i]);
         ct_cdb_obj_o *comp_writer = ct_cdb_a0.write_begin(comp_obj);
         foreach_component(filename,
@@ -187,7 +187,7 @@ static void compile_entity(struct ct_entity_compile_output *output,
                            uint32_t root_count,
                            const char *filename,
                            struct ct_compilator_api *compilator_api) {
-    compile_entitity(filename, root, root_count, UINT32_MAX, NULL, output,
+    compile_entitity(filename, root, root_count, UINT32_MAX, 0, output,
                      compilator_api, NULL);
 }
 

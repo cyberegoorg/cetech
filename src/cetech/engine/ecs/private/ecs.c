@@ -61,7 +61,7 @@ struct world_instance {
     uint64_t *entity_type;
     uint32_t *entity_data_idx;
     uint64_t *entity_uid;
-    struct ct_cdb_obj_t **ent_obj;
+    uint64_t *ent_obj;
 
     // Hiearchy
     struct ct_entity *first_child;
@@ -116,12 +116,12 @@ static int compile(uint64_t type,
                    uint32_t component_key_count,
                    ct_cdb_obj_o *writer) {
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
-                                                         ECS_COMPONENT_COMPILE);
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                             ECS_COMPONENT_COMPILE);
 
     ct_cdb_obj_o *w = ct_cdb_a0.write_begin(event);
     ct_cdb_a0.set_str(w, CT_ID64_0("filename"), filename);
-    ct_cdb_a0.set_ref(w, CT_ID64_0("writer"), writer);
+    ct_cdb_a0.set_ptr(w, CT_ID64_0("writer"), writer);
     ct_cdb_a0.set_ptr(w, CT_ID64_0("component_key"), component_key);
     ct_cdb_a0.set_uint64(w, CT_ID64_0("component_key_count"),
                          component_key_count);
@@ -497,6 +497,7 @@ static void destroy(struct ct_world world,
         uint64_t ent_idx = _idx(entity[i].h);
 
         uint64_t ent_type = w->entity_type[ent_idx];
+
         struct ct_entity child = w->first_child[ent_idx];
 
         while (child.h) {
@@ -526,7 +527,7 @@ static void destroy(struct ct_world world,
 
         _remove_from_type_slot(w, entity[i], ent_type);
 
-        struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+        uint64_t event = ct_cdb_a0.create_object(
                 ct_cdb_a0.global_db(),
                 ECS_COMPONENT_REMOVE);
 
@@ -538,6 +539,10 @@ static void destroy(struct ct_world world,
 
         ct_ebus_a0.broadcast(ECS_EBUS, event);
 
+        if(w->parent[ent_idx].h == 0) {
+            uint64_t ent_obj = w->ent_obj[ent_idx];
+            ct_cdb_a0.destroy_object(ent_obj);
+        }
 
         ct_handler_destroy(&w->entity_handler, entity[i].h, _G.allocator);
     }
@@ -550,7 +555,7 @@ static void destroy(struct ct_world world,
 //==============================================================================
 
 static void _change_prop(struct world_instance *w,
-                         struct ct_cdb_obj_t *obj,
+                         uint64_t obj,
                          uint64_t component,
                          struct ct_entity *ent,
                          uint32_t ent_n,
@@ -568,6 +573,7 @@ static void _change_prop(struct world_instance *w,
                 float m16[16];
                 uint32_t u32;
                 uint64_t u64;
+                uint64_t ref;
                 void *ptr;
             };
         };
@@ -580,7 +586,7 @@ static void _change_prop(struct world_instance *w,
                 break;
 
             case CDB_TYPE_REF:
-                dt->ptr = ct_cdb_a0.read_ref(obj, prop, 0);
+                dt->ref = ct_cdb_a0.read_ref(obj, prop, 0);
                 break;
 
             case CDB_TYPE_UINT64:
@@ -614,11 +620,11 @@ static void _change_prop(struct world_instance *w,
     }
 }
 
-static void _on_ent_comp_obj_change(struct ct_cdb_obj_t *obj,
+static void _on_ent_comp_obj_change(uint64_t obj,
                                     const uint64_t *prop,
                                     uint32_t prop_count,
                                     void *data) {
-    struct ct_cdb_obj_t *ent_obj = data;
+    uint64_t ent_obj = (uint64_t) data;
 
     struct ct_world world = {.h = ct_cdb_a0.read_uint64(ent_obj,
                                                         CT_ID64_0("world"), 0)};
@@ -648,8 +654,8 @@ static void _on_ent_comp_obj_change(struct ct_cdb_obj_t *obj,
     }
 }
 
-static void _load(struct ct_cdb_obj_t *from,
-                  struct ct_cdb_obj_t *parent) {
+static void _load(uint64_t from,
+                  uint64_t parent) {
 
     const uint32_t prop_count = ct_cdb_a0.prop_count(from);
     uint64_t keys[prop_count];
@@ -657,15 +663,15 @@ static void _load(struct ct_cdb_obj_t *from,
 
     const char *prefab = ct_cdb_a0.read_str(from, PREFAB_NAME_PROP, NULL);
 
-    struct ct_cdb_obj_t *prefab_obj = NULL;
+    uint64_t prefab_obj = 0;
     if (prefab) {
         struct ct_resource_id prefab_rid = {{{0}}};
         ct_resource_a0.type_name_from_filename(prefab, &prefab_rid, NULL);
 
-        struct ct_cdb_obj_t *prefab_res;
+        uint64_t prefab_res;
         prefab_res = ct_resource_a0.get(prefab_rid);
 
-        prefab_obj = ct_cdb_a0.read_ref(prefab_res, PROP_ENT_OBJ, NULL);
+        prefab_obj = ct_cdb_a0.read_ref(prefab_res, PROP_ENT_OBJ, 0);
 
         ct_cdb_a0.set_prefab(from, prefab_obj);
     }
@@ -675,10 +681,10 @@ static void _load(struct ct_cdb_obj_t *from,
         enum ct_cdb_type type = ct_cdb_a0.prop_type(from, keys[i]);
 
         if (type == CDB_TYPE_SUBOBJECT) {
-            struct ct_cdb_obj_t *from_subobj;
+            uint64_t from_subobj;
             from_subobj = ct_cdb_a0.read_subobject(from, key, 0);
 
-            struct ct_cdb_obj_t *parent_subobj = NULL;
+            uint64_t parent_subobj = 0;
 
             if (parent) {
                 parent_subobj = ct_cdb_a0.read_subobject(parent, key, 0);
@@ -697,18 +703,18 @@ static void _load(struct ct_cdb_obj_t *from,
 
 static void online(uint64_t name,
                    struct ct_vio *input,
-                   struct ct_cdb_obj_t *obj) {
+                   uint64_t obj) {
     CT_UNUSED(name);
 
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    struct ct_cdb_obj_t *eobj = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
-                                                        0);
+    uint64_t eobj = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+                                            0);
     ct_cdb_a0.load(_G.db, data, eobj, _G.allocator);
 
-    _load(eobj, NULL);
+    _load(eobj, 0);
 
     ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(obj);
     ct_cdb_a0.set_ref(writer, PROP_ENT_OBJ, eobj);
@@ -717,7 +723,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_obj_t *obj) {
+                    uint64_t obj) {
     CT_UNUSED(name, obj);
 }
 
@@ -778,8 +784,8 @@ static struct ct_entity find_by_uid(struct ct_world world,
 
 
 static struct ct_entity _spawn_entity(struct ct_world world,
-                                      struct ct_cdb_obj_t *resource_ent) {
-    struct ct_cdb_obj_t *root_obj;
+                                      uint64_t resource_ent) {
+    uint64_t root_obj;
     root_obj = ct_cdb_a0.create_from(ct_cdb_a0.global_db(), resource_ent);
 
     struct ct_entity root_ent;
@@ -794,10 +800,10 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     const uint32_t root_ent_idx = _idx(root_ent.h);
     w->ent_obj[root_ent_idx] = root_obj;
 
-    struct ct_cdb_obj_t *components;
+    uint64_t components;
     components = ct_cdb_a0.read_subobject(root_obj,
                                           CT_ID64_0("components"),
-                                          NULL);
+                                          0);
 
     uint32_t components_n = ct_cdb_a0.prop_count(components);
     uint64_t components_keys[components_n];
@@ -819,15 +825,15 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
         void *comp_data = item->entity_data[j];
 
-        struct ct_cdb_obj_t *component_obj;
+        uint64_t component_obj;
         component_obj = ct_cdb_a0.read_subobject(components,
                                                  component_type,
-                                                 NULL);
+                                                 0);
 
         ct_cdb_a0.register_notify(component_obj,
-                                  _on_ent_comp_obj_change, root_obj);
+                                  _on_ent_comp_obj_change, (void *) root_obj);
 
-        struct ct_cdb_obj_t *event;
+        uint64_t event;
         event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                         ECS_COMPONENT_SPAWN);
 
@@ -842,17 +848,17 @@ static struct ct_entity _spawn_entity(struct ct_world world,
         ct_ebus_a0.send(ECS_EBUS, component_type, event);
     }
 
-    struct ct_cdb_obj_t *children;
+    uint64_t children;
     children = ct_cdb_a0.read_subobject(root_obj,
                                         CT_ID64_0("children"),
-                                        NULL);
+                                        0);
     uint32_t children_n = ct_cdb_a0.prop_count(children);
     uint64_t children_keys[children_n];
     ct_cdb_a0.prop_keys(children, children_keys);
 
     for (int i = 0; i < children_n; ++i) {
-        struct ct_cdb_obj_t *child;
-        child = ct_cdb_a0.read_subobject(children, children_keys[i], NULL);
+        uint64_t child;
+        child = ct_cdb_a0.read_subobject(children, children_keys[i], 0);
 
         struct ct_entity child_ent = _spawn_entity(world, child);
 
@@ -869,12 +875,12 @@ static struct ct_entity spawn_entity(struct ct_world world,
             .name = name,
     };
 
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get(rid);
+    uint64_t obj = ct_resource_a0.get(rid);
 
 
-    struct ct_cdb_obj_t *resource_ent = ct_cdb_a0.read_ref(obj,
-                                                           PROP_ENT_OBJ,
-                                                           NULL);
+    uint64_t resource_ent = ct_cdb_a0.read_ref(obj,
+                                               PROP_ENT_OBJ,
+                                               0);
 
     struct world_instance *w = get_world_instance(world);
 
@@ -924,13 +930,13 @@ static struct ct_world create_world() {
     w->first_child = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
     w->next_sibling = virtual_alloc(sizeof(uint32_t) * MAX_ENTITIES);
     w->ent_obj = virtual_alloc(
-            sizeof(struct ct_cdb_obj_t *) * MAX_ENTITIES);
+            sizeof(uint64_t) * MAX_ENTITIES);
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+    uint64_t event = ct_cdb_a0.create_object(
             ct_cdb_a0.global_db(),
             ECS_WORLD_CREATE);
 
-    struct ct_cdb_obj_t *wr = ct_cdb_a0.write_begin(event);
+    ct_cdb_obj_o* wr = ct_cdb_a0.write_begin(event);
     ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
     ct_cdb_a0.write_commit(wr);
 
@@ -940,11 +946,11 @@ static struct ct_world create_world() {
 }
 
 static void destroy_world(struct ct_world world) {
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+    uint64_t event = ct_cdb_a0.create_object(
             ct_cdb_a0.global_db(),
             ECS_WORLD_DESTROY);
 
-    struct ct_cdb_obj_t *wr = ct_cdb_a0.write_begin(event);
+    ct_cdb_obj_o*  wr = ct_cdb_a0.write_begin(event);
     ct_cdb_a0.set_uint64(wr, CT_ID64_0("world"), world.h);
     ct_cdb_a0.write_commit(wr);
 
@@ -957,8 +963,8 @@ static void destroy_world(struct ct_world world) {
     ct_cdb_a0.destroy_db(w->db);
 }
 
-struct ct_cdb_obj_t *entity_object(struct ct_world world,
-                                   struct ct_entity entity) {
+uint64_t entity_object(struct ct_world world,
+                       struct ct_entity entity) {
     struct world_instance *w = get_world_instance(world);
     return w->ent_obj[_idx(entity.h)];
 }

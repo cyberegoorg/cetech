@@ -60,8 +60,8 @@ static struct ConfigSystemGlobals {
     uint32_t type;
 
     struct ct_cdb_t db;
-    struct ct_cdb_obj_t *config_object;
-    struct ct_cdb_obj_t *config_desc;
+    uint64_t config_object;
+    uint64_t config_desc;
 } _G;
 
 
@@ -229,7 +229,7 @@ static int parse_args(int argc,
 }
 
 
-static struct ct_cdb_obj_t *config_object() {
+static uint64_t config_object() {
     return _G.config_object;
 }
 

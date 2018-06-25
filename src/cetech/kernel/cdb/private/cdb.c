@@ -35,15 +35,15 @@ struct object_t {
     struct notify_pair *notify;
 
     // prefab
-    struct ct_cdb_obj_t *prefab;
-    struct ct_cdb_obj_t **instances;
+    uint64_t prefab;
+    uint64_t *instances;
 
     // hiearchy
-    struct ct_cdb_obj_t *parent;
-//    struct ct_cdb_obj_t **children;
+    uint64_t parent;
+//    uint64_t *children;
 
     // writer
-    struct ct_cdb_obj_t *obj;
+    uint64_t obj;
     uint64_t *changed_prop;
 
     // object
@@ -93,8 +93,8 @@ static struct _G {
 union type_u {
     uint64_t uint64;
     void *ptr;
-    struct ct_cdb_obj_t *ref;
-    struct ct_cdb_obj_t *subobj;
+    uint64_t ref;
+    uint64_t subobj;
 
     float f;
     char *str;
@@ -202,6 +202,7 @@ static uint64_t _find_prop_index(const struct object_t *obj,
 static void _destroy_object(struct object_t *obj) {
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
     ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
+
 }
 
 static struct ct_cdb_t create_db() {
@@ -233,7 +234,7 @@ static uint64_t _create_object(struct db_t *db_inst) {
     return idx;
 }
 
-static struct ct_cdb_obj_t *create_object(struct ct_cdb_t db,
+static uint64_t create_object(struct ct_cdb_t db,
                                           uint64_t type) {
     struct db_t *db_inst = &_G.dbs[db.idx];
     struct object_t *obj = _new_object(db_inst, _G.allocator);
@@ -246,19 +247,19 @@ static struct ct_cdb_obj_t *create_object(struct ct_cdb_t db,
     obj->db = db;
     obj->type = type;
 
-    return (struct ct_cdb_obj_t *) obj_addr;
+    return (uint64_t ) obj_addr;
 }
 
-static ct_cdb_obj_o *write_begin(struct ct_cdb_obj_t *_obj);
+static ct_cdb_obj_o *write_begin(uint64_t _obj);
 
 static void write_commit(ct_cdb_obj_o *_writer);
 
 void set_subobject(ct_cdb_obj_o *_writer,
                    uint64_t property,
-                   struct ct_cdb_obj_t *subobject);
+                   uint64_t subobject);
 
-static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
-                                        struct ct_cdb_obj_t *_obj) {
+static uint64_t create_from(struct ct_cdb_t db,
+                                        uint64_t _obj) {
     struct db_t *db_inst = &_G.dbs[db.idx];
 
     struct object_t *obj = *(struct object_t **) _obj;
@@ -276,10 +277,10 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
     inst->type = obj->type;
 
     ct_array_push(obj->instances,
-                  (struct ct_cdb_obj_t *) obj_addr,
+                  (uint64_t ) obj_addr,
                   _G.allocator);
 
-    struct object_t *wr = write_begin((struct ct_cdb_obj_t *) obj_addr);
+    struct object_t *wr = write_begin((uint64_t ) obj_addr);
 
     for (int i = 1; i < obj->properties_count; ++i) {
         switch (obj->property_type[i]) {
@@ -287,9 +288,9 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
                 union type_u *value_ptr = (union type_u *) (obj->values +
                                                             obj->offset[i]);
 
-                struct ct_cdb_obj_t *old_subobj = value_ptr->subobj;
+                uint64_t old_subobj = value_ptr->subobj;
 
-                struct ct_cdb_obj_t *new_subobj = create_from(db, old_subobj);
+                uint64_t new_subobj = create_from(db, old_subobj);
 
                 set_subobject(wr, obj->keys[i], new_subobj);
             }
@@ -299,25 +300,41 @@ static struct ct_cdb_obj_t *create_from(struct ct_cdb_t db,
             default:
                 break;
         }
-
     }
 
     write_commit(wr);
 
-    return (struct ct_cdb_obj_t *) obj_addr;
+    return (uint64_t ) obj_addr;
 }
 
 static void destroy_db(struct ct_cdb_t db) {
     ct_array_push(_G.to_free_db, db.idx, _G.allocator);
 }
 
-static void destroy_object(struct ct_cdb_obj_t *_obj) {
+static void destroy_object(uint64_t _obj) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
     ct_array_push(db_inst->to_free_objects_id,
                   (struct object_t **) _obj - db_inst->objects_mem,
                   _G.allocator);
+
+    for (int i = 1; i < obj->properties_count; ++i) {
+        switch (obj->property_type[i]) {
+            case CDB_TYPE_SUBOBJECT: {
+                union type_u *value_ptr = (union type_u *) (obj->values +
+                                                            obj->offset[i]);
+
+                uint64_t old_subobj = value_ptr->subobj;
+                destroy_object(old_subobj);
+            }
+
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 
@@ -326,13 +343,30 @@ static void gc() {
     for (int i = 0; i < db_n; ++i) {
         struct db_t *db_inst = &_G.dbs[i];
 
-        const uint32_t to_free_objects_id_n = ct_array_size(
-                db_inst->to_free_objects_id);
+        const uint32_t to_free_objects_id_n =
+                ct_array_size(db_inst->to_free_objects_id);
+
         for (int j = 0; j < to_free_objects_id_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects_id[j];
 
-
             struct object_t *obj = *(db_inst->objects_mem + idx);
+
+            if(obj->prefab) {
+                struct object_t *prefab_obj = *(struct object_t **) obj->prefab;
+                const uint32_t instances_n = ct_array_size(prefab_obj->instances);
+                const uint32_t last_idx = instances_n - 1;
+                for (int k = 0; k < instances_n; ++k) {
+                    if(prefab_obj->instances[k] != obj->obj) {
+                        continue;
+                    }
+
+                    prefab_obj->instances[k] = prefab_obj->instances[last_idx];
+                    ct_array_pop_back(prefab_obj->instances);
+
+                    break;
+                }
+            }
+
             _destroy_object(obj);
 
             ct_array_push(db_inst->free_objects_id, idx, _G.allocator);
@@ -392,7 +426,7 @@ struct cdb_binobj_header {
     uint64_t subobject_buffer_size;
 };
 
-static void dump(struct ct_cdb_obj_t *_obj,
+static void dump(uint64_t _obj,
                  char **output,
                  struct ct_alloc *allocator) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -411,8 +445,8 @@ static void dump(struct ct_cdb_obj_t *_obj,
         switch (obj->property_type[i]) {
             case CDB_TYPE_SUBOBJECT: {
                 uint64_t subobject_offset = ct_array_size(subobject_buffer);
-                struct ct_cdb_obj_t *subobject_ptr;
-                subobject_ptr = *(struct ct_cdb_obj_t **) (values_copy +
+                uint64_t subobject_ptr;
+                subobject_ptr = *(uint64_t *) (values_copy +
                                                            offset[i]);
 
                 dump(subobject_ptr, &subobject_buffer, allocator);
@@ -478,7 +512,7 @@ static void dump(struct ct_cdb_obj_t *_obj,
 
 static void load(struct ct_cdb_t db,
                  const char *input,
-                 struct ct_cdb_obj_t *_obj,
+                 uint64_t _obj,
                  struct ct_alloc *allocator) {
 
     const struct cdb_binobj_header *header;
@@ -530,7 +564,7 @@ static void load(struct ct_cdb_t db,
                 const char *subobj_data;
                 subobj_data = subobject_buffer + suboffset;
 
-                struct ct_cdb_obj_t *subobj = create_object(db, 0);
+                uint64_t subobj = create_object(db, 0);
                 load(obj->db, subobj_data, subobj, allocator);
 
                 struct object_t *sub_obj = *(struct object_t **) subobj;
@@ -561,7 +595,7 @@ static void load(struct ct_cdb_t db,
     }
 }
 
-static ct_cdb_obj_o *write_begin(struct ct_cdb_obj_t *_obj) {
+static ct_cdb_obj_o *write_begin(uint64_t _obj) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
@@ -573,7 +607,7 @@ static ct_cdb_obj_o *write_begin(struct ct_cdb_obj_t *_obj) {
     return (struct ct_cdb_obj_o *) new_obj;
 }
 
-static void _notify(struct ct_cdb_obj_t *_obj,
+static void _notify(uint64_t _obj,
                     uint64_t *changed_prop) {
     struct object_t *obj = *(struct object_t **) _obj;
 
@@ -747,15 +781,15 @@ static void set_ptr(ct_cdb_obj_o *_writer,
 
 static void set_ref(ct_cdb_obj_o *_writer,
                     uint64_t property,
-                    struct ct_cdb_obj_t *ref) {
+                    uint64_t ref) {
 
     struct object_t *writer = _writer;
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
         idx = _object_new_property(writer, property,
-                                   CDB_TYPE_REF, ref,
-                                   sizeof(struct ct_cdb_obj_t *),
+                                   CDB_TYPE_REF, &ref,
+                                   sizeof(uint64_t),
                                    _G.allocator);
     }
 
@@ -768,7 +802,7 @@ static void set_ref(ct_cdb_obj_o *_writer,
 
 void set_subobject(ct_cdb_obj_o *_writer,
                    uint64_t property,
-                   struct ct_cdb_obj_t *subobject) {
+                   uint64_t subobject) {
     CETECH_ASSERT(LOG_WHERE, subobject);
 
     struct object_t *writer = _writer;
@@ -776,8 +810,8 @@ void set_subobject(ct_cdb_obj_o *_writer,
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
         idx = _object_new_property(writer, property,
-                                   CDB_TYPE_SUBOBJECT, subobject,
-                                   sizeof(struct ct_cdb_obj_t *),
+                                   CDB_TYPE_SUBOBJECT, &subobject,
+                                   sizeof(uint64_t ),
                                    _G.allocator);
     }
 
@@ -791,8 +825,8 @@ void set_subobject(ct_cdb_obj_o *_writer,
     subobj->parent = writer->obj;
 }
 
-void set_prefab(struct ct_cdb_obj_t *_obj,
-                struct ct_cdb_obj_t *_prefab) {
+void set_prefab(uint64_t _obj,
+                uint64_t _prefab) {
     struct object_t *obj = *(struct object_t **) _obj;
     struct object_t *prefab = *(struct object_t **) _prefab;
 
@@ -802,13 +836,13 @@ void set_prefab(struct ct_cdb_obj_t *_obj,
                   _G.allocator);
 }
 
-static bool prop_exist(struct ct_cdb_obj_t *_object,
+static bool prop_exist(uint64_t _object,
                        uint64_t key) {
     struct object_t *obj = *(struct object_t **) _object;
     return _find_prop_index(obj, key) > 0;
 }
 
-static enum ct_cdb_type prop_type(struct ct_cdb_obj_t *_object,
+static enum ct_cdb_type prop_type(uint64_t _object,
                                   uint64_t key) {
     struct object_t *obj = *(struct object_t **) _object;
     uint64_t idx = _find_prop_index(obj, key);
@@ -824,7 +858,7 @@ static enum ct_cdb_type prop_type(struct ct_cdb_obj_t *_object,
     return CDB_TYPE_NONE;
 }
 
-static float read_float(struct ct_cdb_obj_t *_obj,
+static float read_float(uint64_t _obj,
                         uint64_t property,
                         float defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -841,7 +875,7 @@ static float read_float(struct ct_cdb_obj_t *_obj,
     return defaultt;
 }
 
-static void read_vec3(struct ct_cdb_obj_t *_obj,
+static void read_vec3(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -860,7 +894,7 @@ static void read_vec3(struct ct_cdb_obj_t *_obj,
     }
 }
 
-static void read_vec4(struct ct_cdb_obj_t *_obj,
+static void read_vec4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -879,7 +913,7 @@ static void read_vec4(struct ct_cdb_obj_t *_obj,
     }
 }
 
-static void read_mat4(struct ct_cdb_obj_t *_obj,
+static void read_mat4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -899,7 +933,7 @@ static void read_mat4(struct ct_cdb_obj_t *_obj,
 
 }
 
-static const char *read_string(struct ct_cdb_obj_t *_obj,
+static const char *read_string(uint64_t _obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -917,7 +951,7 @@ static const char *read_string(struct ct_cdb_obj_t *_obj,
 }
 
 
-static uint64_t read_uint64(struct ct_cdb_obj_t *_obj,
+static uint64_t read_uint64(uint64_t _obj,
                             uint64_t property,
                             uint64_t defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -934,7 +968,7 @@ static uint64_t read_uint64(struct ct_cdb_obj_t *_obj,
     return defaultt;
 }
 
-static void *read_ptr(struct ct_cdb_obj_t *_obj,
+static void *read_ptr(uint64_t _obj,
                       uint64_t property,
                       void *defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -951,43 +985,43 @@ static void *read_ptr(struct ct_cdb_obj_t *_obj,
     return defaultt;
 }
 
-static struct ct_cdb_obj_t *read_ref(struct ct_cdb_obj_t *_obj,
+static uint64_t read_ref(uint64_t _obj,
                                      uint64_t property,
-                                     struct ct_cdb_obj_t *defaultt) {
+                                     uint64_t defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
-        return *(struct ct_cdb_obj_t **) (obj->values + obj->offset[idx]);
+        return *(uint64_t *) (obj->values + obj->offset[idx]);
     }
 
     if (obj->prefab) {
-        return read_ptr(obj->prefab, property, defaultt);
+        return read_ref(obj->prefab, property, defaultt);
     }
 
     return defaultt;
 }
 
-static struct ct_cdb_obj_t *read_subobject(struct ct_cdb_obj_t *_obj,
+static uint64_t read_subobject(uint64_t _obj,
                                            uint64_t property,
-                                           struct ct_cdb_obj_t *defaultt) {
+                                           uint64_t defaultt) {
     struct object_t *obj = *(struct object_t **) _obj;
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
-        return *(struct ct_cdb_obj_t **) (obj->values + obj->offset[idx]);
+        return *(uint64_t *) (obj->values + obj->offset[idx]);
     }
 
     if (obj->prefab) {
-        return read_ptr(obj->prefab, property, defaultt);
+        return read_subobject(obj->prefab, property, defaultt);
     }
 
     return defaultt;
 }
 
-static uint64_t prop_count(struct ct_cdb_obj_t *_obj);
+static uint64_t prop_count(uint64_t _obj);
 
-static void prop_keys(struct ct_cdb_obj_t *_obj,
+static void prop_keys(uint64_t _obj,
                       uint64_t *keys) {
     struct object_t *obj = *(struct object_t **) _obj;
 
@@ -1016,7 +1050,7 @@ static void prop_keys(struct ct_cdb_obj_t *_obj,
     memcpy(keys, obj->keys + 1, sizeof(uint64_t) * (obj->properties_count - 1));
 }
 
-static uint64_t prop_count(struct ct_cdb_obj_t *_obj) {
+static uint64_t prop_count(uint64_t _obj) {
     struct object_t *obj = *(struct object_t **) _obj;
 
     uint64_t count = obj->properties_count - 1;
@@ -1042,7 +1076,7 @@ static uint64_t prop_count(struct ct_cdb_obj_t *_obj) {
     return count;
 }
 
-void register_notify(struct ct_cdb_obj_t *_obj,
+void register_notify(uint64_t _obj,
                      ct_cdb_notify notify,
                      void *data) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -1061,13 +1095,13 @@ static struct ct_cdb_t global_db() {
 }
 
 
-static uint64_t type(struct ct_cdb_obj_t *_obj) {
+static uint64_t type(uint64_t _obj) {
     struct object_t *obj = *(struct object_t **) _obj;
 
     return obj->type;
 }
 
-struct ct_cdb_obj_t *parent(struct ct_cdb_obj_t *object) {
+uint64_t parent(uint64_t object) {
     struct object_t *obj = *(struct object_t **) object;
     return obj->parent;
 }

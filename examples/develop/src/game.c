@@ -46,7 +46,7 @@ static struct G {
 } _G;
 
 
-void init(struct ct_cdb_obj_t* event) {
+void init(uint64_t event) {
     CT_UNUSED(event)
 
     _G.world = ct_ecs_a0.create_world();
@@ -56,11 +56,11 @@ void init(struct ct_cdb_obj_t* event) {
 }
 
 
-void shutdown(struct ct_cdb_obj_t* event) {
+void shutdown(uint64_t event) {
     CT_UNUSED(event)
 }
 
-void update(struct ct_cdb_obj_t* event) {
+void update(uint64_t event) {
 
     _G.dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
     if (ct_keyboard_a0.button_state(0, ct_keyboard_a0.button_index("v"))) {

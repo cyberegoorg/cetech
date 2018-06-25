@@ -74,7 +74,7 @@ static struct _G {
     uint32_t compilator_map_type[MAX_TYPES]; // TODO: MAP
     struct compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
 
-    struct ct_cdb_obj_t *config;
+    uint64_t config;
     struct ct_alloc *allocator;
 } _G;
 

@@ -34,7 +34,7 @@ CETECH_DECL_API(ct_ebus_a0);
 static struct _G {
     bool visible;
 
-    struct ct_cdb_obj_t* selected_obj;
+   uint64_t selected_obj;
     uint32_t ent_name;
     struct ct_entity entity;
     struct ct_world world;
@@ -71,7 +71,7 @@ static void ui_entity_item_end() {
     ct_debugui_a0.TreePop();
 }
 
-static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
+static void ui_entity_item_begin(uint64_t obj, uint32_t id) {
 
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
@@ -81,7 +81,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    ct_cdb_obj_t *children = ct_cdb_a0.read_subobject(obj, CT_ID64_0("children"), NULL);
+    uint64_t children = ct_cdb_a0.read_subobject(obj, CT_ID64_0("children"), 0);
 
     const uint32_t children_n = ct_cdb_a0.prop_count(children);
 
@@ -104,7 +104,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 
     bool open = ct_debugui_a0.TreeNodeEx(label, flags);
     if (ct_debugui_a0.IsItemClicked(0)) {
-        struct ct_cdb_obj_t* event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+       uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                              EXPLORER_ENTITY_SELECT_EVENT);
 
         ct_cdb_obj_o* w = ct_cdb_a0.write_begin(event);
@@ -125,7 +125,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
-            ct_cdb_obj_t* child = ct_cdb_a0.read_subobject(children, key, NULL);
+            uint64_t  child = ct_cdb_a0.read_subobject(children, key, 0);
             ui_entity_item_begin(child, rand());
         }
         ui_entity_item_end();
@@ -135,7 +135,7 @@ static void ui_entity_item_begin(ct_cdb_obj_t *obj, uint32_t id) {
 
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
 
-static void on_debugui(ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible,
                                 DebugUIWindowFlags_(0))) {
 
@@ -147,8 +147,8 @@ static void on_debugui(ct_cdb_obj_t *event) {
                     .name = _G.ent_name,
             };
 
-            ct_cdb_obj_t* obj = ct_resource_a0.get(rid);
-            obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, NULL);
+            uint64_t  obj = ct_resource_a0.get(rid);
+            obj = ct_cdb_a0.read_ref(obj, PROP_ENT_OBJ, 0);
 
             ui_entity_item_begin(obj, rand());
         }
@@ -157,7 +157,7 @@ static void on_debugui(ct_cdb_obj_t *event) {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
 
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);

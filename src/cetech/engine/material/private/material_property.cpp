@@ -46,7 +46,7 @@ CETECH_DECL_API(ct_ydb_a0);
 CETECH_DECL_API(ct_cmd_system_a0);
 CETECH_DECL_API(ct_cdb_a0);
 
-static void ui_vec4(ct_cdb_obj_t *var) {
+static void ui_vec4(uint64_t var) {
     const char *str;
     str = ct_cdb_a0.read_str(var, MATERIAL_VAR_NAME_PROP, "");
 
@@ -60,7 +60,7 @@ static void ui_vec4(ct_cdb_obj_t *var) {
     }
 }
 
-static void ui_color4(ct_cdb_obj_t *var) {
+static void ui_color4(uint64_t var) {
     const char *str;
     str = ct_cdb_a0.read_str(var, MATERIAL_VAR_NAME_PROP, "");
 
@@ -74,13 +74,13 @@ static void ui_color4(ct_cdb_obj_t *var) {
     ct_cdb_a0.write_commit(wr);
 
 //    if (ct_debugui_a0.ColorEdit3(str, v)) {
-//        ct_cdb_obj_t* wr = ct_cdb_a0.write_begin(var);
+//        uint64_t  wr = ct_cdb_a0.write_begin(var);
 //        ct_cdb_a0.set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
 //        ct_cdb_a0.write_commit(wr);
 //    }
 }
 
-static void ui_texture(ct_cdb_obj_t *variable) {
+static void ui_texture(uint64_t variable) {
     const char *str;
     str = ct_cdb_a0.read_str(variable, MATERIAL_VAR_NAME_PROP, "");
 
@@ -106,7 +106,7 @@ static void ui_texture(ct_cdb_obj_t *variable) {
 
 static void material_asset(struct ct_resource_id asset,
                            const char *path) {
-    ct_cdb_obj_t *material = ct_resource_a0.get(asset);
+    uint64_t material = ct_resource_a0.get(asset);
 
     uint64_t layer_count = ct_cdb_a0.prop_count(material);
     uint64_t layer_keys[layer_count];
@@ -120,19 +120,19 @@ static void material_asset(struct ct_resource_id asset,
 
         if (ct_debugui_a0.CollapsingHeader("Layer",
                                            DebugUITreeNodeFlags_DefaultOpen)) {
-            ct_cdb_obj_t *layer;
-            layer = ct_cdb_a0.read_ref(material, layer_keys[i], NULL);
+            uint64_t layer;
+            layer = ct_cdb_a0.read_ref(material, layer_keys[i], 0);
 
-            ct_cdb_obj_t *variables;
-            variables = ct_cdb_a0.read_ref(layer, MATERIAL_VARIABLES_PROP, NULL);
+            uint64_t variables;
+            variables = ct_cdb_a0.read_ref(layer, MATERIAL_VARIABLES_PROP, 0);
 
             uint64_t count = ct_cdb_a0.prop_count(variables);
             uint64_t keys[count];
             ct_cdb_a0.prop_keys(variables, keys);
 
             for (int j = 0; j < count; ++j) {
-                ct_cdb_obj_t *var;
-                var = ct_cdb_a0.read_ref(variables, keys[j], NULL);
+                uint64_t var;
+                var = ct_cdb_a0.read_ref(variables, keys[j], 0);
 
                 uint64_t var_type;
                 var_type = ct_cdb_a0.read_uint64(var, MATERIAL_VAR_TYPE_PROP, 0);

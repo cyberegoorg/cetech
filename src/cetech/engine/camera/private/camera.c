@@ -35,9 +35,9 @@ static struct CameraGlobal {
     struct ct_alloc *allocator;
 } CameraGlobal;
 
-static void _camera_compiler(struct ct_cdb_obj_t *event) {
+static void _camera_compiler(uint64_t event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    ct_cdb_obj_o *writer  = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"), NULL);
+    ct_cdb_obj_o *writer  = ct_cdb_a0.read_ptr(event, CT_ID64_0("writer"), NULL);
     uint64_t *component_key = ct_cdb_a0.read_ptr(event, CT_ID64_0("component_key"), NULL);
     uint32_t component_key_count = ct_cdb_a0.read_uint64(event, CT_ID64_0("component_key_count"), 0);
 
@@ -92,8 +92,8 @@ static struct ct_camera_a0 camera_api = {
 };
 
 
-static void _component_spawner(struct ct_cdb_obj_t *event) {
-    struct ct_cdb_obj_t*obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), NULL);
+static void _component_spawner(uint64_t event) {
+   uint64_t obj = ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0);
     struct ct_camera_component *camera= ct_cdb_a0.read_ptr(event, CT_ID64_0("data"), NULL);
 
     *camera = (struct ct_camera_component) {

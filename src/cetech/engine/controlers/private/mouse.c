@@ -158,7 +158,7 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(struct ct_cdb_obj_t *_event) {
+static void update(uint64_t _event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -167,11 +167,11 @@ static void update(struct ct_cdb_obj_t *_event) {
 //    _G.wheel[0] = 0;
 //    _G.wheel[1] = 0;
 
-    struct ct_cdb_obj_t **events = ct_ebus_a0.events(MOUSE_EBUS);
+    uint64_t *events = ct_ebus_a0.events(MOUSE_EBUS);
     uint32_t events_n = ct_ebus_a0.event_count(MOUSE_EBUS);
 
     for (int i = 0; i < events_n; ++i) {
-        struct ct_cdb_obj_t *event = events[i];
+        uint64_t event = events[i];
         uint32_t button = ct_cdb_a0.read_uint64(event, CT_ID64_0("button"), 0);
 
         switch (ct_cdb_a0.type(event)) {

@@ -36,7 +36,7 @@ static struct ct_property_editor_a0 property_inspector_api = {
 };
 
 
-static void on_debugui(struct ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible, 0)) {
         if (_G.on_debugui) {
             _G.on_debugui();
@@ -45,7 +45,7 @@ static void on_debugui(struct ct_cdb_obj_t *event) {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(struct ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 

@@ -64,7 +64,7 @@ static void register_asset(uint32_t type,
                 _G.allocator);
 }
 
-static void set_asset(struct ct_cdb_obj_t *event) {
+static void set_asset(uint64_t event) {
 
     uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
     const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);

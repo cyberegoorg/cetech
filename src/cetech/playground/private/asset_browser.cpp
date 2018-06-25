@@ -223,7 +223,7 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
-                struct ct_cdb_obj_t *event;
+                uint64_t event;
                 event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                 ImGui::IsMouseDoubleClicked(0)
                                                 ? ASSET_DCLICK_EVENT
@@ -244,7 +244,7 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
                                 DebugUIWindowFlags_(0))) {
@@ -271,7 +271,7 @@ static void on_debugui(ct_cdb_obj_t *event) {
     ct_debugui_a0.EndDock();
 }
 
-static void on_menu_window(ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 

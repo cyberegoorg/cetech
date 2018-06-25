@@ -60,7 +60,7 @@ struct _G {
 
     struct ct_cdb_t db;
 
-    struct ct_cdb_obj_t *config;
+    uint64_t config;
     struct ct_alloc *allocator;
 } _G = {};
 
@@ -161,7 +161,7 @@ static void load(uint32_t type,
             continue;
         };
 
-        struct ct_cdb_obj_t *object = ct_cdb_a0.create_object(_G.db, type);
+        uint64_t object = ct_cdb_a0.create_object(_G.db, type);
 
         char build_name[33] = {};
 
@@ -233,8 +233,8 @@ static void unload(uint32_t type,
 
             ct_log_a0.debug("resource", "Unload resource %s ", filename);
 
-            struct ct_cdb_obj_t *object;
-            object = (struct ct_cdb_obj_t *) ct_hash_lookup(&_G.resource_map,
+            uint64_t object;
+            object = (uint64_t ) ct_hash_lookup(&_G.resource_map,
                                                             rid.i64, 0);
 
             type_clb.offline(names[i], object);
@@ -243,9 +243,9 @@ static void unload(uint32_t type,
 
 }
 
-static struct ct_cdb_obj_t *get_obj(struct ct_resource_id resource_id) {
-    struct ct_cdb_obj_t *object;
-    object = (struct ct_cdb_obj_t *) ct_hash_lookup(&_G.resource_map,
+static uint64_t get_obj(struct ct_resource_id resource_id) {
+    uint64_t object;
+    object = (uint64_t ) ct_hash_lookup(&_G.resource_map,
                                                     resource_id.i64, 0);
 
     if (!object) {
@@ -265,7 +265,7 @@ static struct ct_cdb_obj_t *get_obj(struct ct_resource_id resource_id) {
             CETECH_ASSERT(LOG_WHERE, false);
         }
 
-        object = (struct ct_cdb_obj_t *) ct_hash_lookup(&_G.resource_map,
+        object = (uint64_t ) ct_hash_lookup(&_G.resource_map,
                                                         resource_id.i64, 0);
     }
 

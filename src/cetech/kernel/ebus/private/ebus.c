@@ -47,7 +47,7 @@ struct ebus_t {
 
     struct ct_hash_t handler_idx;
     struct ebus_event_handlers *handlers;
-    struct ct_cdb_obj_t** events;
+   uint64_t* events;
 };
 
 static struct _G {
@@ -77,7 +77,7 @@ void create_ebus(const char *name,
 
 void send_addr(uint32_t bus_name,
                uint64_t addr,
-               struct ct_cdb_obj_t* event) {
+              uint64_t event) {
 
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
@@ -110,7 +110,7 @@ void send_addr(uint32_t bus_name,
 }
 
 void broadcast(uint32_t bus_name,
-               struct ct_cdb_obj_t* event) {
+              uint64_t event) {
     send_addr(bus_name, 0, event);
 }
 
@@ -247,7 +247,7 @@ uint32_t event_count(uint32_t bus_name) {
     return ct_array_size(ebus->events);
 }
 
-struct ct_cdb_obj_t** events(uint32_t bus_name) {
+uint64_t* events(uint32_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {

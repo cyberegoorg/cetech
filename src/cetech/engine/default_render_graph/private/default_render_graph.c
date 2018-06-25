@@ -271,7 +271,7 @@ static void output_pass_on_pass(void *inst,
 
     ct_renderer_a0.set_view_transform(viewid, NULL, proj);
 
-    struct ct_cdb_obj_t *material;
+    uint64_t material;
     material = ct_material_a0.resource_create(CT_ID32_0("content/copy"));
 
     ct_render_texture_handle_t th;

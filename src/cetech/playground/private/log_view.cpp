@@ -153,7 +153,7 @@ static void ui_log_items() {
     ImGui::EndChild();
 }
 
-static void on_debugui(ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
 
     if (ct_debugui_a0.BeginDock(WINDOW_NAME,
                                 &_G.visible,
@@ -167,7 +167,7 @@ static void on_debugui(ct_cdb_obj_t *event) {
 
 }
 
-static void on_menu_window(ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
 
     ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);

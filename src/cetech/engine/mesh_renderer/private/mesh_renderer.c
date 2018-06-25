@@ -48,10 +48,9 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-void _mesh_component_compiler(struct ct_cdb_obj_t *event) {
+void _mesh_component_compiler(uint64_t event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), "");
-    ct_cdb_obj_o *writer = ct_cdb_a0.read_ref(event, CT_ID64_0("writer"),
-                                                     NULL);
+    ct_cdb_obj_o *writer = ct_cdb_a0.read_ptr(event, CT_ID64_0("writer"), 0);
     uint64_t *component_key = ct_cdb_a0.read_ptr(event,
                                                  CT_ID64_0("component_key"),
                                                  NULL);
@@ -128,12 +127,12 @@ void foreach_mesh_renderer(struct ct_world world,
                 .name = (uint32_t) scene,
         };
 
-        struct ct_cdb_obj_t *scene_obj = ct_resource_a0.get(rid);
+        uint64_t scene_obj = ct_resource_a0.get(rid);
 
         uint64_t mesh = m.mesh_id;
-        struct ct_cdb_obj_t *geom_obj = ct_cdb_a0.read_ref(scene_obj,
+        uint64_t geom_obj = ct_cdb_a0.read_ref(scene_obj,
                                                            mesh,
-                                                           NULL);
+                                                           0);
 
         if (!geom_obj) {
             continue;
@@ -181,7 +180,7 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static void _on_obj_change(struct ct_cdb_obj_t *obj,
+static void _on_obj_change(uint64_t obj,
                            uint64_t *prop,
                            uint32_t prop_count) {
 
@@ -246,14 +245,14 @@ static void _on_obj_change(struct ct_cdb_obj_t *obj,
     }
 }
 
-static void _component_spawner(struct ct_cdb_obj_t *event) {
-    struct ct_cdb_obj_t *obj = ct_cdb_a0.read_ref(event,
+static void _component_spawner(uint64_t event) {
+    uint64_t obj = ct_cdb_a0.read_ref(event,
                                                   CT_ID64_0("obj"),
-                                                  NULL);
+                                                  0);
 
     struct ct_mesh_renderer *mesh = ct_cdb_a0.read_ptr(event,
                                                        CT_ID64_0("data"),
-                                                       NULL);
+                                                       0);
 
     *mesh = (struct ct_mesh_renderer) {
             .material = ct_material_a0.resource_create(
@@ -268,14 +267,14 @@ static void _component_spawner(struct ct_cdb_obj_t *event) {
 }
 
 
-void mesh_combo_items(struct ct_cdb_obj_t *obj,
+void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     uint32_t scene_id = ct_cdb_a0.read_uint64(obj, PROP_SCENE_ID, 0);
     ct_scene_a0.get_all_geometries(scene_id, items, items_count);
 }
 
-void node_combo_items(struct ct_cdb_obj_t *obj,
+void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     uint32_t scene_id = ct_cdb_a0.read_uint64(obj, PROP_SCENE_ID, 0);

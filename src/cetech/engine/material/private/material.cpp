@@ -73,7 +73,7 @@ static ct_render_uniform_type_t _type_to_bgfx[] = {
 
 static void online(uint64_t name,
                    struct ct_vio *input,
-                   struct ct_cdb_obj_t *obj) {
+                   uint64_t obj) {
     CT_UNUSED(name);
 
     const uint64_t size = input->size(input);
@@ -99,7 +99,7 @@ static void online(uint64_t name,
         uint64_t rstate = render_state[i];
         uint64_t shader = shader_names[i];
 
-        ct_cdb_obj_t *layer_object = ct_cdb_a0.create_object(_G.db, 0);
+        uint64_t layer_object = ct_cdb_a0.create_object(_G.db, 0);
         ct_cdb_obj_o *layer_writer;
         layer_writer = ct_cdb_a0.write_begin(layer_object);
 
@@ -113,7 +113,7 @@ static void online(uint64_t name,
 
         ct_cdb_a0.set_uint64(layer_writer, MATERIAL_STATE_PROP, rstate);
 
-        ct_cdb_obj_t *vars_obj = ct_cdb_a0.create_object(_G.db, 0);
+        uint64_t vars_obj = ct_cdb_a0.create_object(_G.db, 0);
         ct_cdb_obj_o *vars_writer = ct_cdb_a0.write_begin(vars_obj);
         ct_cdb_a0.set_ref(layer_writer, MATERIAL_VARIABLES_PROP, vars_obj);
 
@@ -129,7 +129,7 @@ static void online(uint64_t name,
                     _type_to_bgfx[type],
                     1);
 
-            ct_cdb_obj_t *var_obj = ct_cdb_a0.create_object(_G.db, 0);
+            uint64_t var_obj = ct_cdb_a0.create_object(_G.db, 0);
             ct_cdb_obj_o *var_writer = ct_cdb_a0.write_begin(var_obj);
 
             ct_cdb_a0.set_uint64(var_writer, MATERIAL_VAR_HANDLER_PROP,
@@ -181,7 +181,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_obj_t *obj) {
+                    uint64_t obj) {
     CT_UNUSED(name, obj);
 }
 
@@ -196,7 +196,7 @@ static const ct_resource_type_t callback = {
 // Interface
 //==============================================================================
 
-static struct ct_cdb_obj_t *create(uint32_t name) {
+static uint64_t create(uint32_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
             .type = _G.type,
             .name = name,
@@ -206,15 +206,15 @@ static struct ct_cdb_obj_t *create(uint32_t name) {
     return object;
 }
 
-static void set_texture_handler(struct ct_cdb_obj_t *material,
+static void set_texture_handler(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
                                 ct_render_texture_handle texture) {
-    ct_cdb_obj_t *layer_obj = ct_cdb_a0.read_ref(material, layer, NULL);
-    ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer_obj,
+    uint64_t layer_obj = ct_cdb_a0.read_ref(material, layer, 0);
+    uint64_t variables = ct_cdb_a0.read_ref(layer_obj,
                                                  MATERIAL_VARIABLES_PROP,
-                                                 NULL);
-    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
+                                                 0);
+    uint64_t var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), 0);
     ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
@@ -222,16 +222,16 @@ static void set_texture_handler(struct ct_cdb_obj_t *material,
     ct_cdb_a0.write_commit(writer);
 }
 
-static void set_texture(ct_cdb_obj_t *material,
+static void set_texture(uint64_t material,
                         uint64_t layer,
                         const char *slot,
                         uint64_t texture) {
-    ct_cdb_obj_t *layer_obj = ct_cdb_a0.read_ref(material, layer, NULL);
-    ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer_obj,
+    uint64_t layer_obj = ct_cdb_a0.read_ref(material, layer, 0);
+    uint64_t variables = ct_cdb_a0.read_ref(layer_obj,
                                                  MATERIAL_VARIABLES_PROP,
-                                                 NULL);
+                                                 0);
 
-    ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), NULL);
+    uint64_t var = ct_cdb_a0.read_ref(variables, CT_ID64_0(slot), 0);
 
     ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(var);
     ct_cdb_a0.set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture);
@@ -240,23 +240,23 @@ static void set_texture(ct_cdb_obj_t *material,
 }
 
 
-static void set_mat44f(ct_cdb_obj_t *material,
+static void set_mat44f(uint64_t material,
                        uint64_t layer,
                        const char *slot,
                        float *value) {
 }
 
-static void submit(ct_cdb_obj_t *material,
+static void submit(uint64_t material,
                    uint64_t _layer,
                    uint8_t viewid) {
-    ct_cdb_obj_t *layer = ct_cdb_a0.read_ref(material, _layer, NULL);
+    uint64_t layer = ct_cdb_a0.read_ref(material, _layer, 0);
     if (!layer) {
         return;
     }
 
-    ct_cdb_obj_t *variables = ct_cdb_a0.read_ref(layer,
+    uint64_t variables = ct_cdb_a0.read_ref(layer,
                                                  MATERIAL_VARIABLES_PROP,
-                                                 NULL);
+                                                 0);
 
     uint64_t key_count = ct_cdb_a0.prop_count(variables);
     uint64_t keys[key_count];
@@ -265,7 +265,7 @@ static void submit(ct_cdb_obj_t *material,
     uint8_t texture_stage = 0;
 
     for (int j = 0; j < key_count; ++j) {
-        ct_cdb_obj_t *var = ct_cdb_a0.read_ref(variables, keys[j], NULL);
+        uint64_t var = ct_cdb_a0.read_ref(variables, keys[j], 0);
         uint64_t type = ct_cdb_a0.read_uint64(var, MATERIAL_VAR_TYPE_PROP, 0);
 
         ct_render_uniform_handle_t handle = {.idx = (uint16_t) ct_cdb_a0.read_uint64(
@@ -315,9 +315,9 @@ static void submit(ct_cdb_obj_t *material,
         }
     }
 
-    ct_cdb_obj_t *shader_obj = ct_cdb_a0.read_ref(layer,
+    uint64_t shader_obj = ct_cdb_a0.read_ref(layer,
                                                   MATERIAL_SHADER_PROP,
-                                                  NULL);
+                                                  0);
     auto shader = ct_shader_a0.get(shader_obj);
     uint64_t state = ct_cdb_a0.read_uint64(layer, MATERIAL_STATE_PROP, 0);
 

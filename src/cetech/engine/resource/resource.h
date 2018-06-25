@@ -47,10 +47,10 @@ struct ct_resource_id {
 typedef struct {
     void (*online)(uint64_t name,
                    struct ct_vio* input,
-                   struct ct_cdb_obj_t *obj);
+                   uint64_t obj);
 
     void (*offline)(uint64_t name,
-                    struct ct_cdb_obj_t *obj);
+                    uint64_t obj);
 } ct_resource_type_t;
 
 
@@ -102,7 +102,7 @@ struct ct_resource_a0 {
                        uint32_t *names,
                        size_t count);
 
-    struct ct_cdb_obj_t *(*get)(struct ct_resource_id resource_id);
+    uint64_t (*get)(struct ct_resource_id resource_id);
 
     int (*type_name_string)(char *str,
                             size_t max_len,

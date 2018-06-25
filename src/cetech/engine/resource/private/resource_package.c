@@ -53,7 +53,7 @@ struct _G {
 
 void online(uint64_t name,
             struct ct_vio *input,
-            struct ct_cdb_obj_t *obj) {
+            uint64_t obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -66,7 +66,7 @@ void online(uint64_t name,
 }
 
 void offline(uint64_t name,
-             struct ct_cdb_obj_t *obj) {
+             uint64_t obj) {
     CT_UNUSED(name, obj);
 }
 
@@ -212,7 +212,7 @@ void package_task(void *data) {
             .name = task_data->name
     };
 
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get(rid);
+    uint64_t obj = ct_resource_a0.get(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);
@@ -274,7 +274,7 @@ void package_unload(uint32_t name) {
             .name = name
     };
 
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get(rid);
+    uint64_t obj = ct_resource_a0.get(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);
@@ -294,7 +294,7 @@ int package_is_loaded(uint32_t name) {
             .name = name
     };
 
-    struct ct_cdb_obj_t *obj = ct_resource_a0.get(rid);
+    uint64_t obj = ct_resource_a0.get(rid);
     struct package_resource *package = ct_cdb_a0.read_ptr(obj,
                                                           PROP_RESOURECE_DATA,
                                                           NULL);

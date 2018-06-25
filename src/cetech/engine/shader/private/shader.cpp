@@ -56,7 +56,7 @@ CETECH_DECL_API(ct_cdb_a0);
 
 static void online(uint64_t name,
                    struct ct_vio* input,
-                   struct ct_cdb_obj_t *obj) {
+                   uint64_t obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -86,7 +86,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_obj_t *obj) {
+                    uint64_t obj) {
     CT_UNUSED(name);
 
     const uint64_t program = ct_cdb_a0.read_uint64(obj, SHADER_PROP, 0);
@@ -115,7 +115,7 @@ int shader_init(ct_api_a0 *api) {
 void shader_shutdown() {
 }
 
-ct_shader shader_get(ct_cdb_obj_t* shader) {
+ct_shader shader_get(uint64_t shader) {
     const uint64_t idx = ct_cdb_a0.read_uint64(shader, SHADER_PROP, 0);
     return (ct_shader){.idx=(uint16_t)idx};
 }

@@ -108,7 +108,7 @@ void sdl_mouse_process() {
     _G.mouse.position[1] = window_size[1] - pos[1];
 
 
-    struct ct_cdb_obj_t *event;
+    uint64_t event;
     event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                     EVENT_MOUSE_MOVE);
 
@@ -149,7 +149,7 @@ void sdl_keyboard_process() {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
 
 
-    struct ct_cdb_obj_t *event;
+    uint64_t event;
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
             event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
@@ -297,7 +297,7 @@ void sdl_gamepad_process() {
             event.button = j;
 
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_DOWN);
 
@@ -311,7 +311,7 @@ void sdl_gamepad_process() {
 
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_UP);
 
@@ -337,7 +337,7 @@ void sdl_gamepad_process() {
                 _G.controlers.position[i][j][0] = pos[0];
                 _G.controlers.position[i][j][1] = pos[1];
 
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_MOVE);
 
@@ -375,7 +375,7 @@ static void _update(float dt) {
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT: {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         KERNEL_QUIT_EVENT);
 
@@ -386,7 +386,7 @@ static void _update(float dt) {
             case SDL_WINDOWEVENT: {
                 switch (e.window.event) {
                     case SDL_WINDOWEVENT_SIZE_CHANGED: {
-                        struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                        uint64_t event = ct_cdb_a0.create_object(
                                 ct_cdb_a0.global_db(),
                                 EVENT_WINDOW_RESIZED);
 
@@ -408,7 +408,7 @@ static void _update(float dt) {
                 break;
 
             case SDL_MOUSEWHEEL: {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_MOUSE_WHEEL);
 
@@ -425,7 +425,7 @@ static void _update(float dt) {
 
 
             case SDL_TEXTINPUT: {
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_KEYBOARD_TEXT);
 
@@ -442,7 +442,7 @@ static void _update(float dt) {
             case SDL_CONTROLLERDEVICEADDED: {
                 int idx = _create_controler(e.cdevice.which);
 
-                struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                uint64_t event = ct_cdb_a0.create_object(
                         ct_cdb_a0.global_db(),
                         EVENT_GAMEPAD_CONNECT);
 
@@ -467,7 +467,7 @@ static void _update(float dt) {
 
                     _remove_controler(i);
 
-                    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+                    uint64_t event = ct_cdb_a0.create_object(
                             ct_cdb_a0.global_db(),
                             EVENT_GAMEPAD_DISCONNECT);
 

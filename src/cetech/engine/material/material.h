@@ -37,13 +37,13 @@ struct ct_material_a0 {
     //! Create new material
     //! \param name Material resource name
     //! \return Material
-    struct ct_cdb_obj_t* (*resource_create)(uint32_t name);
+   uint64_t (*resource_create)(uint32_t name);
 
     //! Set texture value
     //! \param material Material
     //! \param slot Slot Name
     //! \param texture Texture name
-    void (*set_texture)(struct ct_cdb_obj_t* material,
+    void (*set_texture)(uint64_t material,
                         uint64_t layer,
                         const char *slot,
                         uint64_t texture);
@@ -52,17 +52,17 @@ struct ct_material_a0 {
     //! \param material Material
     //! \param slot Variable name
     //! \param v Value
-    void (*set_mat44f)(struct ct_cdb_obj_t* material,
+    void (*set_mat44f)(uint64_t material,
                        uint64_t layer,
                        const char *slot,
                        float *value);
 
     //! Submit material for actual render
-    void (*submit)(struct ct_cdb_obj_t* material,
+    void (*submit)(uint64_t material,
                    uint64_t layer,
                    uint8_t viewid);
 
-    void (*set_texture_handler)(struct ct_cdb_obj_t* material,
+    void (*set_texture_handler)(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
                                 struct ct_render_texture_handle texture);

@@ -135,18 +135,18 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0.gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(struct ct_cdb_obj_t* _event) {
+static void update(uint64_t _event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
 
-    struct ct_cdb_obj_t** events = ct_ebus_a0.events(GAMEPAD_EBUS);
+   uint64_t* events = ct_ebus_a0.events(GAMEPAD_EBUS);
     uint32_t events_n = ct_ebus_a0.event_count(GAMEPAD_EBUS);
 
     for (int i = 0; i < events_n; ++i) {
-        struct ct_cdb_obj_t *event = events[i];
+        uint64_t event = events[i];
         uint32_t button = ct_cdb_a0.read_uint64(event, CT_ID64_0("button"), 0);
         uint32_t gamepad_id = ct_cdb_a0.read_uint64(event, CT_ID64_0("gamepad_id"), 0);
         uint32_t axis = ct_cdb_a0.read_uint64(event, CT_ID64_0("axis"), 0);

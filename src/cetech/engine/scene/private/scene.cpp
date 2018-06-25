@@ -58,7 +58,7 @@ static struct _G {
 //==============================================================================
 
 static void online(uint64_t name,
-                   struct ct_vio* input,struct ct_cdb_obj_t* obj) {
+                   struct ct_vio* input,uint64_t obj) {
     CT_UNUSED(name);
 
     const uint64_t size = input->size(input);
@@ -92,7 +92,7 @@ static void online(uint64_t name,
         auto ib_handle = ct_renderer_a0.create_index_buffer(ib_mem,
                                                  BGFX_BUFFER_INDEX32);
 
-        ct_cdb_obj_t* geom_obj = ct_cdb_a0.create_object(_G.db, 0);
+        uint64_t  geom_obj = ct_cdb_a0.create_object(_G.db, 0);
         ct_cdb_obj_o* geom_writer = ct_cdb_a0.write_begin(geom_obj);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ct_cdb_a0.set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
@@ -106,7 +106,7 @@ static void online(uint64_t name,
 }
 
 static void offline(uint64_t name,
-                    struct ct_cdb_obj_t* obj) {
+                   uint64_t obj) {
     CT_UNUSED(name, obj);
 
 }

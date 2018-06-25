@@ -46,7 +46,7 @@ static struct _G {
     struct module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
-    struct ct_cdb_obj_t *config;
+    uint64_t config;
     struct ct_alloc *allocator;
 } _G = {};
 

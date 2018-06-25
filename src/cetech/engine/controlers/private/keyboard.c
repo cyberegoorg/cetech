@@ -93,17 +93,17 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(struct ct_cdb_obj_t* _event) {
+static void _update(uint64_t _event) {
     CT_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    struct ct_cdb_obj_t** events = ct_ebus_a0.events(KEYBOARD_EBUS);
+   uint64_t* events = ct_ebus_a0.events(KEYBOARD_EBUS);
     uint32_t events_n = ct_ebus_a0.event_count(KEYBOARD_EBUS);
 
     for (int i = 0; i < events_n; ++i) {
-        struct ct_cdb_obj_t* event = events[i];
+       uint64_t event = events[i];
 
         switch (ct_cdb_a0.type(event)) {
             case EVENT_KEYBOARD_DOWN:

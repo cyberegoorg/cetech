@@ -71,7 +71,7 @@ struct ct_component_prop_map {
     } resource;
 
     struct {
-        void (*combo_items)(struct ct_cdb_obj_t* obj, char **items, uint32_t *items_count);
+        void (*combo_items)(uint64_t obj, char **items, uint32_t *items_count);
     } combo ;
 };
 
@@ -108,7 +108,7 @@ struct ct_ecs_a0 {
     void (*destroy_world)(struct ct_world world);
 
     // ENT
-    struct ct_cdb_obj_t* (*entity_object)(struct ct_world world,
+   uint64_t (*entity_object)(struct ct_world world,
                                           struct ct_entity entity);
     void (*create_entity)(struct ct_world world,
                           struct ct_entity *entity,

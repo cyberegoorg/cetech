@@ -43,7 +43,7 @@ static struct G {
 } _G;
 
 
-void update(struct ct_cdb_obj_t* event) {
+void update(uint64_t event) {
 
     _G.dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
 
@@ -54,7 +54,7 @@ void update(struct ct_cdb_obj_t* event) {
     ///ct_log_a0.debug("example", "%f", dt);
 }
 
-void module1(struct ct_cdb_obj_t* event) {
+void module1(uint64_t event) {
     CT_UNUSED(event)
 
     static bool visible = true;

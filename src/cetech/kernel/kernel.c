@@ -44,7 +44,7 @@ CETECH_DECL_API(ct_renderer_a0);
 
 
 static struct KernelGlobals {
-    struct ct_cdb_obj_t *config_object;
+    uint64_t config_object;
     int is_running;
     struct ct_alloc *allocator;
 } _G;
@@ -73,7 +73,7 @@ const char *_platform() {
 
 int init_config(int argc,
                 const char **argv,
-                struct ct_cdb_obj_t *object) {
+                uint64_t object) {
 
     ct_cdb_obj_o *writer = ct_cdb_a0.write_begin(object);
     ct_cdb_a0.set_str(writer, CONFIG_PLATFORM, _platform());
@@ -258,7 +258,7 @@ static void _boot_unload() {
 }
 
 
-static void on_quit(struct ct_cdb_obj_t *event) {
+static void on_quit(uint64_t event) {
     CT_UNUSED(event)
 
     application_quit();
@@ -267,10 +267,10 @@ static void on_quit(struct ct_cdb_obj_t *event) {
 void application_start() {
     _init_config();
 
-//    struct ct_cdb_obj_t* obj1 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
-//    struct ct_cdb_obj_t* obj2 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
-//    struct ct_cdb_obj_t* obj3 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
-//    struct ct_cdb_obj_t* obj4 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//   uint64_t obj1 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//   uint64_t obj2 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//   uint64_t obj3 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
+//   uint64_t obj4 = ct_cdb_a0.create_object(ct_cdb_a0.global_db(), 0);
 //
 //
 //    ct_cdb_obj_o* w1 = ct_cdb_a0.write_begin(obj1);
@@ -302,7 +302,7 @@ void application_start() {
 
     ct_ebus_a0.connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 
-    struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
+    uint64_t event = ct_cdb_a0.create_object(ct_cdb_a0.global_db(),
                                                          KERNEL_INIT_EVENT);
 
     ct_ebus_a0.broadcast(KERNEL_EBUS, event);
@@ -320,7 +320,7 @@ void application_start() {
         ct_ebus_a0.begin_frame();
         ct_machine_a0.update(dt);
 
-        struct ct_cdb_obj_t *event = ct_cdb_a0.create_object(
+        uint64_t event = ct_cdb_a0.create_object(
                 ct_cdb_a0.global_db(),
                 KERNEL_UPDATE_EVENT);
         ct_cdb_obj_o *w= ct_cdb_a0.write_begin(event);

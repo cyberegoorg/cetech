@@ -49,7 +49,7 @@ static struct _G {
 
     const char *filename;
     struct ct_alloc *allocator;
-    struct ct_cdb_obj_t *obj;
+    uint64_t obj;
 } _G;
 
 
@@ -76,7 +76,7 @@ static bool ui_select_asset(char *buffer,
     return false;
 }
 
-static void ui_float(struct ct_cdb_obj_t *obj,
+static void ui_float(uint64_t obj,
                      uint64_t prop_key_hash,
                      struct ct_component_prop_map *prop) {
     float value = 0;
@@ -111,7 +111,7 @@ static void ui_float(struct ct_cdb_obj_t *obj,
     }
 }
 
-static void ui_str(struct ct_cdb_obj_t *obj,
+static void ui_str(uint64_t obj,
                    uint64_t prop_key_hash,
                    struct ct_component_prop_map *prop,
                    uint32_t i) {
@@ -186,7 +186,7 @@ static void ui_str(struct ct_cdb_obj_t *obj,
     }
 }
 
-static void ui_vec3(struct ct_cdb_obj_t *obj,
+static void ui_vec3(uint64_t obj,
                     uint64_t prop_key_hash,
                     struct ct_component_prop_map *prop) {
     float value[3] = {0};
@@ -228,7 +228,7 @@ static void ui_vec3(struct ct_cdb_obj_t *obj,
 }
 
 static void on_component(struct ct_world world,
-                         struct ct_cdb_obj_t *obj,
+                         uint64_t obj,
                          uint64_t comp_name) {
     struct ct_component_info *info = ct_ecs_a0.component_info(comp_name);
 
@@ -285,9 +285,9 @@ static void on_debugui() {
     struct ct_resource_id rid;
     ct_resource_a0.type_name_from_filename(_G.filename, &rid, NULL);
 
-    struct ct_cdb_obj_t *components_obj;
+    uint64_t components_obj;
     components_obj = ct_cdb_a0.read_subobject(_G.obj, CT_ID64_0("components"),
-                                              NULL);
+                                              0);
 
 
     uint64_t n = ct_cdb_a0.prop_count(components_obj);
@@ -300,8 +300,8 @@ static void on_debugui() {
         ct_ep_on_component clb;
         clb = (ct_ep_on_component) ct_hash_lookup(&_G.components, name, 0);
 
-        struct ct_cdb_obj_t * c_obj;
-        c_obj = ct_cdb_a0.read_subobject(components_obj, name, NULL);
+        uint64_t  c_obj;
+        c_obj = ct_cdb_a0.read_subobject(components_obj, name, 0);
 
         clb ? clb(_G.active_world, _G.obj) : on_component(_G.active_world,
                                                           c_obj, name);
@@ -309,7 +309,7 @@ static void on_debugui() {
 }
 
 
-void on_entity_click(struct ct_cdb_obj_t *event) {
+void on_entity_click(uint64_t event) {
     ct_property_editor_a0.set_active(on_debugui);
 
     struct ct_world world = {
@@ -317,7 +317,7 @@ void on_entity_click(struct ct_cdb_obj_t *event) {
     const char *filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), 0);
     struct ct_entity entity = {
             ct_cdb_a0.read_uint64(event, CT_ID64_0("entity"), 0)};
-    struct ct_cdb_obj_t *obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
+    uint64_t obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
 
     _G.active_world = world;
     _G.top_entity = entity;

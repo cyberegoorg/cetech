@@ -31,7 +31,7 @@ struct ct_ent_selected_ev {
     struct ct_world world;
     struct ct_entity entity;
     const char *filename;
-    struct ct_cdb_obj_t* obj;
+   uint64_t obj;
 };
 
 //==============================================================================

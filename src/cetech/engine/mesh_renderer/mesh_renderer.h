@@ -26,7 +26,7 @@ struct ct_mesh_renderer {
     uint64_t scene_id;
     uint64_t mesh_id;
     uint64_t node_id;
-    struct ct_cdb_obj_t* material;
+   uint64_t material;
 };
 
 //==============================================================================

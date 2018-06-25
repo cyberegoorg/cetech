@@ -37,7 +37,7 @@ struct ct_ydb_cmd_s {
 struct ct_ent_cmd_s {
     struct ct_cmd header;
 
-    struct ct_cdb_obj_t *obj;
+    uint64_t obj;
     uint64_t prop;
 
     // VALUES

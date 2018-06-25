@@ -29,7 +29,7 @@ struct ct_shader {
 
 //! Shader API V0
 struct ct_shader_a0 {
-    ct_shader (*get)(ct_cdb_obj_t* shader);
+    ct_shader (*get)(uint64_t shader);
 };
 
 

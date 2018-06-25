@@ -57,7 +57,7 @@ CETECH_DECL_API(ct_renderer_a0);
 
 void _texture_resource_online(uint64_t name,
                               struct ct_vio* input,
-                              struct ct_cdb_obj_t *obj) {
+                              uint64_t obj) {
     const uint64_t size = input->size(input);
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
@@ -76,7 +76,7 @@ void _texture_resource_online(uint64_t name,
 
 
 void _texture_resource_offline(uint64_t name,
-                               struct ct_cdb_obj_t *obj) {
+                               uint64_t obj) {
     const uint64_t texture = ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
     ct_renderer_a0.destroy_texture((ct_render_texture_handle_t) {.idx=(uint16_t)texture});
 }
@@ -109,7 +109,7 @@ void texture_shutdown() {
 
 ct_render_texture_handle texture_get(uint32_t name) {
     ct_resource_id rid = {.type = _G.type, .name = name};
-    ct_cdb_obj_t* obj = ct_resource_a0.get(rid);
+   uint64_t obj = ct_resource_a0.get(rid);
 
     ct_render_texture_handle texture = {
             .idx = (uint16_t)ct_cdb_a0.read_uint64(obj, TEXTURE_HANDLER_PROP, 0)

@@ -24,13 +24,9 @@ struct ct_cdb_t {
     uint64_t idx;
 };
 
-struct ct_cdb_obj_t {
-    void *_;
-};
-
 typedef void ct_cdb_obj_o;
 
-typedef void (*ct_cdb_notify)(struct ct_cdb_obj_t *obj,
+typedef void (*ct_cdb_notify)(uint64_t obj,
                               const uint64_t *prop,
                               uint32_t prop_count, void* data);
 
@@ -62,48 +58,48 @@ struct ct_cdb_a0 {
 
     struct ct_cdb_t (*global_db)();
 
-    void (*register_notify)(struct ct_cdb_obj_t *obj,
+    void (*register_notify)(uint64_t obj,
                             ct_cdb_notify notify, void* data);
 
-    struct ct_cdb_obj_t *(*create_object)(struct ct_cdb_t db,
+    uint64_t (*create_object)(struct ct_cdb_t db,
                                           uint64_t type);
 
-    struct ct_cdb_obj_t *(*create_from)(struct ct_cdb_t db,
-                                        struct ct_cdb_obj_t *obj);
+    uint64_t (*create_from)(struct ct_cdb_t db,
+                                        uint64_t obj);
 
     void (*destroy_db)(struct ct_cdb_t db);
 
-    void (*destroy_object)(struct ct_cdb_obj_t *obj);
+    void (*destroy_object)(uint64_t obj);
 
-    uint64_t (*type)(struct ct_cdb_obj_t *obj);
+    uint64_t (*type)(uint64_t obj);
 
     void (*gc)();
 
-    void (*dump)(struct ct_cdb_obj_t *obj,
+    void (*dump)(uint64_t obj,
                  char **output,
                  struct ct_alloc *allocator);
 
     void (*load)(struct ct_cdb_t db,
                  const char *input,
-                 struct ct_cdb_obj_t * obj,
+                 uint64_t  obj,
                  struct ct_alloc *allocator);
 
     // PROP
-    bool (*prop_exist)(struct ct_cdb_obj_t *object,
+    bool (*prop_exist)(uint64_t object,
                        uint64_t key);
 
-    enum ct_cdb_type (*prop_type)(struct ct_cdb_obj_t *object,
+    enum ct_cdb_type (*prop_type)(uint64_t object,
                                   uint64_t key);
 
-    void (*prop_keys)(struct ct_cdb_obj_t *object,
+    void (*prop_keys)(uint64_t object,
                       uint64_t *keys);
 
-    uint64_t (*prop_count)(struct ct_cdb_obj_t *object);
+    uint64_t (*prop_count)(uint64_t object);
 
-    struct ct_cdb_obj_t *(*parent)(struct ct_cdb_obj_t *object);
+    uint64_t (*parent)(uint64_t object);
 
     // WRITE
-    ct_cdb_obj_o *(*write_begin)(struct ct_cdb_obj_t *object);
+    ct_cdb_obj_o *(*write_begin)(uint64_t object);
 
     void (*write_commit)(ct_cdb_obj_o *writer);
 
@@ -138,52 +134,52 @@ struct ct_cdb_a0 {
 
     void (*set_ref)(ct_cdb_obj_o *writer,
                     uint64_t property,
-                    struct ct_cdb_obj_t *ref);
+                    uint64_t ref);
 
     void (*set_subobject)(ct_cdb_obj_o *writer,
                           uint64_t property,
-                          struct ct_cdb_obj_t *subobject);
+                          uint64_t subobject);
 
-    void (*set_prefab)(struct ct_cdb_obj_t *obj,
-                       struct ct_cdb_obj_t *prefab);
+    void (*set_prefab)(uint64_t obj,
+                       uint64_t prefab);
 
 
     // READ
-    float (*read_float)(struct ct_cdb_obj_t *object,
+    float (*read_float)(uint64_t object,
                         uint64_t property,
                         float defaultt);
 
-    void (*read_vec3)(struct ct_cdb_obj_t *object,
+    void (*read_vec3)(uint64_t object,
                       uint64_t property,
                       float *value);
 
-    void (*read_vec4)(struct ct_cdb_obj_t *object,
+    void (*read_vec4)(uint64_t object,
                       uint64_t property,
                       float *value);
 
-    void (*read_mat4)(struct ct_cdb_obj_t *object,
+    void (*read_mat4)(uint64_t object,
                       uint64_t property,
                       float *value);
 
-    const char *(*read_str)(struct ct_cdb_obj_t *object,
+    const char *(*read_str)(uint64_t object,
                             uint64_t property,
                             const char *defaultt);
 
-    uint64_t (*read_uint64)(struct ct_cdb_obj_t *object,
+    uint64_t (*read_uint64)(uint64_t object,
                             uint64_t property,
                             uint64_t defaultt);
 
-    void *(*read_ptr)(struct ct_cdb_obj_t *object,
+    void *(*read_ptr)(uint64_t object,
                       uint64_t property,
                       void *defaultt);
 
-    struct ct_cdb_obj_t *(*read_ref)(struct ct_cdb_obj_t *object,
+    uint64_t (*read_ref)(uint64_t object,
                                      uint64_t property,
-                                     struct ct_cdb_obj_t *defaultt);
+                                     uint64_t defaultt);
 
-    struct ct_cdb_obj_t *(*read_subobject)(struct ct_cdb_obj_t *object,
+    uint64_t (*read_subobject)(uint64_t object,
                                            uint64_t property,
-                                           struct ct_cdb_obj_t *defaultt);
+                                           uint64_t defaultt);
 };
 
 #endif //CETECH_CDB_H

@@ -17,7 +17,7 @@ struct ct_cdb_obj_t;
 // Typedefs
 //==============================================================================
 typedef void (*ct_ep_on_component)(struct ct_world world,
-                                   struct ct_cdb_obj_t *obj);
+                                   uint64_t obj);
 
 //==============================================================================
 // Api
