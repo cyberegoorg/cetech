@@ -30,4 +30,6 @@ struct ct_entity_property_a0 {
 };
 
 
+CT_MODULE(ct_entity_property_a0);
+
 #endif //CETECH_ENTITY_PROPERTY_H

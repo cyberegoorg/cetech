@@ -40,5 +40,6 @@ struct ct_playground_a0 {
     void (*reload_layout)();
 };
 
+CT_MODULE(ct_playground_a0);
 
 #endif //CETECH_PLAYGROUND_H

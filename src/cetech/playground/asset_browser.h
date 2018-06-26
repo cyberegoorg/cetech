@@ -43,5 +43,6 @@ struct ct_asset_browser_a0 {
     void (*get_selected_asset_name)(char *asset_name);
 };
 
+CT_MODULE(ct_asset_browser_a0);
 
 #endif //CETECH_ASSET_BROWSER_H

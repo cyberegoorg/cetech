@@ -6,6 +6,7 @@
 //==============================================================================
 #include <stdint.h>
 #include <stddef.h>
+#include <corelib/module.inl>
 
 
 //==============================================================================
@@ -119,5 +120,6 @@ struct ct_cmd_system_a0 {
     void (*goto_idx)(uint32_t idx);
 };
 
+CT_MODULE(ct_cmd_system_a0);
 
 #endif //COMMAND_SYSTEM_H

@@ -22,5 +22,6 @@ struct ct_property_editor_a0 {
     void (*set_active)(ct_pi_on_debugui on_debugui);
 };
 
+CT_MODULE(ct_property_editor_a0);
 
 #endif //CETECH_PROPERTY_INSPECTOR_H

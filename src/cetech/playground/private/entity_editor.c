@@ -1,48 +1,31 @@
 #include <stdio.h>
 
-#include <cetech/kernel/cdb/cdb.h>
-#include <cetech/kernel/yaml/ydb.h>
-#include <cetech/engine/ecs/ecs.h>
-#include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/debugui/debugui.h>
+#include <corelib/cdb.h>
+#include <corelib/ydb.h>
+#include <cetech/ecs/ecs.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
 
-#include <cetech/engine/camera/camera.h>
+#include <cetech/camera/camera.h>
 #include <cetech/playground/entity_editor.h>
-#include <cetech/engine/transform/transform.h>
-#include <cetech/engine/controlers/keyboard.h>
+#include <cetech/transform/transform.h>
+#include <cetech/controlers/keyboard.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/explorer.h>
 
 #include <cetech/playground/playground.h>
-#include <cetech/kernel/math/fmath.h>
-#include <cetech/engine/resource/resource.h>
-#include <cetech/kernel/ebus/ebus.h>
-#include <cetech/engine/render_graph/render_graph.h>
-#include <cetech/engine/default_render_graph/default_render_graph.h>
-#include <cetech/kernel/macros.h>
+#include <corelib/fmath.inl>
+#include <cetech/resource/resource.h>
+#include <corelib/ebus.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/default_render_graph/default_render_graph.h>
+#include <corelib/macros.h>
 #include <string.h>
 
-#include "cetech/kernel/hashlib/hashlib.h"
-#include "cetech/kernel/memory/memory.h"
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
-
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_renderer_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_ecs_a0);
-CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_keyboard_a0);
-CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_explorer_a0);
-CETECH_DECL_API(ct_playground_a0);
-CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_ebus_a0);
-CETECH_DECL_API(ct_render_graph_a0);
-CETECH_DECL_API(ct_default_render_graph_a0);
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
 #define MAX_EDITOR 8
 
@@ -82,7 +65,7 @@ static void fps_camera_update(struct ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0.entity_data(
+    transform = ct_ecs_a0->entity_data(
             world,
             TRANSFORM_COMPONENT,
             camera_ent);
@@ -109,9 +92,10 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(pos, transform->position, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    ct_cdb_obj_o *w = ct_cdb_a0.write_begin(ct_ecs_a0.entity_object(world, camera_ent));
-    ct_cdb_a0.set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0.write_commit(w);
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(
+            ct_ecs_a0->entity_object(world, camera_ent));
+    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0->write_commit(w);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -135,17 +119,17 @@ static void on_debugui(uint64_t event) {
         snprintf(dock_id, CT_ARRAY_LEN(dock_id),
                  "Entity %s###level_editor_%d", _G.path[i], i + 1);
 
-        if (ct_debugui_a0.BeginDock(dock_id, &_G.visible[i],
-                                    DebugUIWindowFlags_NoScrollbar)) {
+        if (ct_debugui_a0->BeginDock(dock_id, &_G.visible[i],
+                                     DebugUIWindowFlags_NoScrollbar)) {
 
-            if (ct_debugui_a0.IsMouseHoveringWindow()) {
+            if (ct_debugui_a0->IsMouseHoveringWindow()) {
                 _G.active_editor = i;
 
 //                float proj[16], view[16];
 //                float size[2];
-//                ct_debugui_a0.GetWindowSize(size);
+//                ct_debugui_a0->GetWindowSize(size);
 //
-//                ct_camera_a0.get_project_view(_G.world[i], _G.camera_ent[i],
+//                ct_camera_a0->get_project_view(_G.world[i], _G.camera_ent[i],
 //                                              proj, view,
 //                                              static_cast<int>(size[0]),
 //                                              static_cast<int>(size[1]));
@@ -160,14 +144,14 @@ static void on_debugui(uint64_t event) {
 //                ImGuizmo::SetRect(origin.x, origin.y, size[0], size[1]);
 //                ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::WORLD, im);
 
-                if (ct_debugui_a0.IsMouseClicked(0, false)) {
-                    ct_explorer_a0.set_level(_G.world[i], _G.entity[i],
-                                             _G.entity_name[i],
-                                             _G.root[i], _G.path[i]);
+                if (ct_debugui_a0->IsMouseClicked(0, false)) {
+                    ct_explorer_a0->set_level(_G.world[i], _G.entity[i],
+                                              _G.entity_name[i],
+                                              _G.root[i], _G.path[i]);
                 }
             }
 
-//            uint64_t obj = ct_ecs_a0.ent_obj(_G.world[i],
+//            uint64_t obj = ct_ecs_a0->ent_obj(_G.world[i],
 //                                                           _G.camera_ent[i]);
 //
 
@@ -176,22 +160,22 @@ static void on_debugui(uint64_t event) {
                     _G.render_graph_builder[i], CT_ID64_0("output"));
 
             float size[2];
-            ct_debugui_a0.GetWindowSize(size);
+            ct_debugui_a0->GetWindowSize(size);
 
             _G.render_graph_builder[i]->call->set_size(
                     _G.render_graph_builder[i], size[0], size[1]);
 
-//            ct_viewport_a0.resize(camera_data->viewport, size[0], size[1]);
-            ct_debugui_a0.Image2(th,
-                                 size,
-                                 (float[2]) {0.0f, 0.0f},
-                                 (float[2]) {1.0f, 1.0f},
-                                 (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                                 (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+//            ct_viewport_a0->resize(camera_data->viewport, size[0], size[1]);
+            ct_debugui_a0->Image2(th,
+                                  size,
+                                  (float[2]) {0.0f, 0.0f},
+                                  (float[2]) {1.0f, 1.0f},
+                                  (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                                  (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
         } else {
 
         }
-        ct_debugui_a0.EndDock();
+        ct_debugui_a0->EndDock();
     }
 }
 
@@ -221,56 +205,56 @@ static void open(struct ct_resource_id asset,
     if (UINT32_MAX != ent_idx) {
         _G.world[idx] = _G.world[ent_idx];
     } else {
-        _G.world[idx] = ct_ecs_a0.create_world();
+        _G.world[idx] = ct_ecs_a0->create_world();
 
-        _G.entity[idx] = ct_ecs_a0.spawn_entity(_G.world[idx], asset.name);
+        _G.entity[idx] = ct_ecs_a0->spawn_entity(_G.world[idx], asset.name);
 
         _G.is_first[idx] = true;
 
-        _G.render_graph[idx] = ct_render_graph_a0.create_graph();
-        _G.render_graph_builder[idx] = ct_render_graph_a0.create_builder();
+        _G.render_graph[idx] = ct_render_graph_a0->create_graph();
+        _G.render_graph_builder[idx] = ct_render_graph_a0->create_builder();
         _G.render_graph[idx]->call->add_module(_G.render_graph[idx],
-                                               ct_default_render_graph_a0.create(
+                                               ct_default_render_graph_a0->create(
                                                        _G.world[idx]));
     }
-    _G.camera_ent[idx] = ct_ecs_a0.spawn_entity(_G.world[idx],
-                                                CT_ID32_0("content/camera"));
+    _G.camera_ent[idx] = ct_ecs_a0->spawn_entity(_G.world[idx],
+                                                 CT_ID32_0("content/camera"));
 
     _G.path[idx] = strdup(path);
     _G.root[idx] = root;
     _G.entity_name[idx] = asset.name;
 
-    ct_explorer_a0.set_level(_G.world[idx], _G.entity[idx],
-                             _G.entity_name[idx], _G.root[idx],
-                             _G.path[idx]);
+    ct_explorer_a0->set_level(_G.world[idx], _G.entity[idx],
+                              _G.entity_name[idx], _G.root[idx],
+                              _G.path[idx]);
 }
 
 static void update(uint64_t event) {
-    float dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
+    float dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
 
     if (UINT8_MAX != _G.active_editor) {
 
         float updown = 0.0f;
         float leftright = 0.0f;
 
-        uint32_t up_key = ct_keyboard_a0.button_index("w");
-        uint32_t down_key = ct_keyboard_a0.button_index("s");
-        uint32_t left_key = ct_keyboard_a0.button_index("a");
-        uint32_t right_key = ct_keyboard_a0.button_index("d");
+        uint32_t up_key = ct_keyboard_a0->button_index("w");
+        uint32_t down_key = ct_keyboard_a0->button_index("s");
+        uint32_t left_key = ct_keyboard_a0->button_index("a");
+        uint32_t right_key = ct_keyboard_a0->button_index("d");
 
-        if (ct_keyboard_a0.button_state(0, up_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, up_key) > 0) {
             updown = 1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, down_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, down_key) > 0) {
             updown = -1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, right_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, right_key) > 0) {
             leftright = 1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, left_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, left_key) > 0) {
             leftright = -1.0f;
         }
 
@@ -285,7 +269,7 @@ static void update(uint64_t event) {
             continue;
         }
 
-        ct_ecs_a0.simulate(_G.world[i], dt);
+        ct_ecs_a0->simulate(_G.world[i], dt);
     }
 }
 
@@ -303,15 +287,11 @@ static void on_render(uint64_t event) {
     }
 }
 
-static struct ct_entity_editor_a0 level_api = {
-//            .register_module = playground::register_module,
-//            .unregister_module = playground::unregister_module,
-};
 
 static void on_asset_double_click(uint64_t event) {
-    uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
-    uint64_t root = ct_cdb_a0.read_uint64(event, CT_ID64_0("root"), 0);
-    const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);
+    uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
+    uint64_t root = ct_cdb_a0->read_uint64(event, CT_ID64_0("root"), 0);
+    const char *path = ct_cdb_a0->read_str(event, CT_ID64_0("path"), 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 
@@ -322,28 +302,27 @@ static void on_asset_double_click(uint64_t event) {
 }
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G){
+    _G = (struct _G) {
             .active_editor = UINT8_MAX
     };
 
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
-                       on_asset_double_click, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
+    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+                        on_asset_double_click, 0);
 
-    api->register_api("ct_level_view_a0", &level_api);
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
-    ct_ebus_a0.disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
-                          on_asset_double_click);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
+    ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+                           on_asset_double_click);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(
@@ -355,7 +334,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_explorer_a0);

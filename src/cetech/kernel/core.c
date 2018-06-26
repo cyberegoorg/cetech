@@ -1,9 +1,9 @@
 #include <stdbool.h>
-#include <cetech/kernel/module/module.h>
-#include "cetech/kernel/memory/private/allocator_core_private.h"
-#include "cetech/kernel/api/private/api_private.h"
-#include "cetech/kernel/memory/private/memory_private.h"
-#include "cetech/kernel/log/private/log_system_private.h"
+#include <corelib/module.h>
+#include "corelib/private/allocator_core_private.h"
+#include "corelib/private/api_private.h"
+#include "corelib/private/memory_private.h"
+#include "corelib/private/log_system_private.h"
 
 bool corelib_init() {
     struct ct_alloc *core_alloc = coreallocator_get();
@@ -59,7 +59,7 @@ bool corelib_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(api, filesystem);
     CETECH_UNLOAD_STATIC_MODULE(api, cdb);
     CETECH_UNLOAD_STATIC_MODULE(api, module);
-   // CETECH_UNLOAD_STATIC_MODULE(api, ydb);
+    // CETECH_UNLOAD_STATIC_MODULE(api, ydb);
 
     api_shutdown();
     memsys_shutdown();
