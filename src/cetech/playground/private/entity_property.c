@@ -63,17 +63,19 @@ static bool ui_select_asset(char *buffer,
 
 static void ui_float(uint64_t obj,
                      uint64_t prop_key_hash,
-                     struct ct_component_prop_map *prop) {
+                     const char *label,
+                     float min_f,
+                     float max_f) {
     float value = 0;
     float value_new = 0;
 
     value_new = ct_cdb_a0->read_float(obj, prop_key_hash, value_new);
     value = value_new;
 
-    const float min = !prop->limit.max_f ? -FLT_MAX : prop->limit.min_f;
-    const float max = !prop->limit.max_f ? FLT_MAX : prop->limit.max_f;
+    const float min = !max_f ? -FLT_MAX : min_f;
+    const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0->DragFloat(prop->ui_name,
+    if (ct_debugui_a0->DragFloat(label,
                                  &value_new, 1.0f,
                                  min, max,
                                  "%.3f", 1.0f)) {
@@ -96,7 +98,7 @@ static void ui_float(uint64_t obj,
 
 static void ui_str(uint64_t obj,
                    uint64_t prop_key_hash,
-                   struct ct_component_prop_map *prop,
+                   const char *label,
                    uint32_t i) {
     char labelid[128] = {'\0'};
 
@@ -107,49 +109,121 @@ static void ui_str(uint64_t obj,
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
 
-    sprintf(labelid, "%s##prop_str_%d", prop->ui_name, i);
+    sprintf(labelid, "%s##prop_str_%d", label, i);
 
 
     bool change = false;
-    if (prop->resource.type) {
-        change = ui_select_asset(buffer, labelid,
-                                 CT_ID32_0(prop->resource.type),
-                                 prop_key_hash);
-        ct_debugui_a0->SameLine(0.0f, -1.0f);
+
+    change |= ct_debugui_a0->InputText(labelid,
+                                       buffer,
+                                       strlen(buffer),
+                                       DebugInputTextFlags_ReadOnly,
+                                       0, NULL);
+
+    if (change) {
+        struct ct_ent_cmd_s cmd = {
+                .header = {
+                        .size = sizeof(struct ct_ent_cmd_s),
+                        .type = CT_ID64_0("set_str"),
+                },
+
+                .prop = prop_key_hash,
+                .obj = obj,
+        };
+
+        strcpy(cmd.str.new_value, buffer);
+        strcpy(cmd.str.old_value, value);
+
+        ct_cmd_system_a0->execute(&cmd.header);
+    }
+}
+
+static void ui_str_combo(uint64_t obj,
+                         uint64_t prop_key_hash,
+                         const char *label,
+                         void (*combo_items)(uint64_t obj,
+                                             char **items,
+                                             uint32_t *items_count),
+                         uint32_t i) {
+    char labelid[128] = {'\0'};
+
+    const char *value = 0;
+
+    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+
+    char buffer[128] = {'\0'};
+    strcpy(buffer, value);
+
+    char *items = NULL;
+    uint32_t items_count = 0;
+
+    combo_items(obj, &items, &items_count);
+
+    int current_item = -1;
+    const char *items2[items_count];
+    for (int j = 0; j < items_count; ++j) {
+        items2[j] = &items[j * 128];
+        if (CT_ID64_0(items2[j]) == CT_ID64_0(value)) {
+            current_item = j;
+        }
     }
 
+    sprintf(labelid, "%s##combo_%d", label, i);
+    bool change = ct_debugui_a0->Combo(labelid,
+                                       &current_item, items2,
+                                       items_count, -1);
 
-    if (prop->combo.combo_items) {
-        char *items = NULL;
-        uint32_t items_count = 0;
-
-        prop->combo.combo_items(obj, &items, &items_count);
-
-        int current_item = -1;
-        const char *items2[items_count];
-        for (int j = 0; j < items_count; ++j) {
-            items2[j] = &items[j * 128];
-            if (CT_ID64_0(items2[j]) == CT_ID64_0(value)) {
-                current_item = j;
-            }
-        }
-
-        sprintf(labelid, "%s##combo_%d", prop->ui_name, i);
-        change = ct_debugui_a0->Combo(labelid, &current_item, items2,
-                                      items_count, -1);
-
-        if (change) {
-            strcpy(buffer, items2[current_item]);
-        }
-
-    } else {
-        change |= ct_debugui_a0->InputText(labelid,
-                                           buffer,
-                                           strlen(buffer),
-                                           DebugInputTextFlags_ReadOnly,
-                                           0, NULL);
+    if (change) {
+        strcpy(buffer, items2[current_item]);
     }
 
+    if (change) {
+        struct ct_ent_cmd_s cmd = {
+                .header = {
+                        .size = sizeof(struct ct_ent_cmd_s),
+                        .type = CT_ID64_0("set_str"),
+                },
+
+                .prop = prop_key_hash,
+                .obj = obj,
+        };
+
+        strcpy(cmd.str.new_value, buffer);
+        strcpy(cmd.str.old_value, value);
+
+        ct_cmd_system_a0->execute(&cmd.header);
+    }
+}
+
+static void ui_resource(uint64_t obj,
+                        uint64_t prop_key_hash,
+                        const char *label,
+                        uint32_t resource_type,
+                        uint32_t i) {
+    char labelid[128] = {'\0'};
+
+    const char *value = 0;
+
+    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+
+    char buffer[128] = {'\0'};
+    strcpy(buffer, value);
+
+    sprintf(labelid, "%s##prop_str_%d", label, i);
+
+
+    bool change = false;
+
+    change = ui_select_asset(buffer, labelid,
+                             resource_type,
+                             prop_key_hash);
+    ct_debugui_a0->SameLine(0.0f, -1.0f);
+
+    change |= ct_debugui_a0->InputText(labelid,
+                                       buffer,
+                                       strlen(buffer),
+                                       DebugInputTextFlags_ReadOnly,
+                                       0, NULL);
 
     if (change) {
         struct ct_ent_cmd_s cmd = {
@@ -171,19 +245,19 @@ static void ui_str(uint64_t obj,
 
 static void ui_vec3(uint64_t obj,
                     uint64_t prop_key_hash,
-                    struct ct_component_prop_map *prop) {
+                    const char *label,
+                    float min_f,
+                    float max_f) {
     float value[3] = {0};
     float value_new[3] = {0};
 
     ct_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
     ct_vec3_move(value, value_new);
 
-    const float min = !prop->limit.min_f ? -FLT_MAX
-                                         : prop->limit.min_f;
-    const float max = !prop->limit.max_f ? FLT_MAX
-                                         : prop->limit.max_f;
+    const float min = !min_f ? -FLT_MAX : min_f;
+    const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0->DragFloat3(prop->ui_name,
+    if (ct_debugui_a0->DragFloat3(label,
                                   value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
@@ -210,6 +284,21 @@ static void ui_vec3(uint64_t obj,
     }
 }
 
+static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
+    struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
+    while (it.api) {
+        struct ct_component_i0 *i = (it.api);
+
+        if (cdb_type == i->cdb_type()) {
+            return i;
+        }
+
+        it = ct_api_a0->next(it);
+    }
+
+    return NULL;
+};
+
 static void on_component(struct ct_world world,
                          uint64_t obj,
                          uint64_t comp_name) {
@@ -219,31 +308,26 @@ static void on_component(struct ct_world world,
         return;
     }
 
-    if (!ct_debugui_a0->CollapsingHeader(info->component_name,
+    uint64_t type = ct_cdb_a0->type(obj);
+
+    struct ct_component_i0 *c = get_component_inteface(type);
+    if (!c->get_interface) {
+        return;
+    }
+
+    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
+
+    if (!ct_debugui_a0->CollapsingHeader(editor->display_name(),
                                          DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
 
-    for (int i = 0; i < info->prop_count; ++i) {
-        struct ct_component_prop_map *prop = &info->prop_map[i];
-        uint64_t prop_key_hash = CT_ID64_0(prop->key);
-        switch (prop->type) {
-            case CDB_TYPE_VEC3:
-                ui_vec3(obj, prop_key_hash, prop);
-                break;
-
-            case CDB_TYPE_FLOAT:
-                ui_float(obj, prop_key_hash, prop);
-                break;
-
-            case CDB_TYPE_STR:
-                ui_str(obj, prop_key_hash, prop, i);
-                break;
-
-            default:
-                break;
-        }
+    if (!editor->property_editor) {
+        return;
     }
+
+
+    editor->property_editor(obj);
 }
 
 static void on_debugui() {
@@ -280,14 +364,10 @@ static void on_debugui() {
     for (uint64_t j = 0; j < n; ++j) {
         uint64_t name = components_name[j];
 
-        ct_ep_on_component clb;
-        clb = (ct_ep_on_component) ct_hash_lookup(&_G.components, name, 0);
-
         uint64_t c_obj;
         c_obj = ct_cdb_a0->read_subobject(components_obj, name, 0);
 
-        clb ? clb(_G.active_world, _G.obj) : on_component(_G.active_world,
-                                                          c_obj, name);
+        on_component(_G.active_world, c_obj, name);
     }
 }
 
@@ -309,18 +389,12 @@ void on_entity_click(uint64_t event) {
 }
 
 
-void register_on_component_(uint64_t type,
-                            ct_ep_on_component on_component) {
-    ct_hash_add(&_G.components, type, (uint64_t) on_component, _G.allocator);
-}
-
-void unregister_on_component_(uint64_t type) {
-}
-
-
 static struct ct_entity_property_a0 entity_property_a0 = {
-        .register_component = register_on_component_,
-        .unregister_component = unregister_on_component_,
+        .ui_float = ui_float,
+        .ui_str = ui_str,
+        .ui_str_combo = ui_str_combo,
+        .ui_resource = ui_resource,
+        .ui_vec3 = ui_vec3,
 };
 
 

@@ -11,7 +11,6 @@
 #include "memory_private.h"
 
 
-
 #define LOG_WHERE "memory"
 #define ALLOCATOR_WHERE "allocator"
 

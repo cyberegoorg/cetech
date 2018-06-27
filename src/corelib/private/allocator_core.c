@@ -42,7 +42,7 @@ static struct ct_alloc _allocator = {
 };
 
 static struct ct_core_allocator_a0 core_allocator_api = {
-      .alloc = &_allocator,
+        .alloc = &_allocator,
 };
 
 struct ct_core_allocator_a0 *ct_core_allocator_a0 = &core_allocator_api;

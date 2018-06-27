@@ -8,7 +8,11 @@
 //==============================================================================
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include <corelib/module.inl>
+
+struct ct_alloc;
 
 enum ct_fs_open_mode {
     FS_OPEN_READ,

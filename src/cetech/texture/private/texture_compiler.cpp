@@ -118,7 +118,7 @@ static void compiler(const char *filename,
     ct_vio *tmp_file = NULL;
 
     tmp_file = ct_os_a0->vio_a0->from_file(output_path,
-                                    VIO_OPEN_READ);
+                                           VIO_OPEN_READ);
 
     char *tmp_data =
             CT_ALLOC(ct_memory_a0->main_allocator(), char,

@@ -143,7 +143,7 @@ set(SOURCE_FILES
 
         src/cetech/playground/private/entity_editor.c
         src/cetech/playground/private/entity_property.c
-        src/cetech/playground/private/explorer.cpp
+        src/cetech/playground/private/explorer.c
         src/cetech/playground/private/asset_preview.c
         src/cetech/playground/private/asset_property.c
         src/cetech/playground/private/asset_browser.cpp

@@ -13,6 +13,7 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <corelib/log.h>
+#include <cetech/playground/entity_property.h>
 
 #include "corelib/module.h"
 
@@ -271,42 +272,56 @@ static void _component_spawner(uint64_t event) {
     ct_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
 }
 
+static uint64_t cdb_type() {
+    return CT_ID64_0("transform");
+}
+
+static const char *display_name() {
+    return "Transform";
+}
+
+static void property_editor(uint64_t obj) {
+    ct_entity_property_a0->ui_vec3(obj,
+                                   CT_ID64_0("position"), "Position", 0, 0);
+
+    ct_entity_property_a0->ui_vec3(obj,
+                                   CT_ID64_0("rotation"), "Rotation",
+                                   -360.0f, 360.0f);
+
+    ct_entity_property_a0->ui_vec3(obj, CT_ID64_0("scale"), "Scale", 0, 0);
+}
+
+static void *get_interface(uint64_t name_hash) {
+    if (EDITOR_COMPONENT == name_hash) {
+        static struct ct_editor_component_i0 ct_editor_component_i0 = {
+                .display_name = display_name,
+                .property_editor = property_editor,
+        };
+
+        return &ct_editor_component_i0;
+    }
+
+    return NULL;
+}
+
+static struct ct_component_i0 ct_component_i0 = {
+        .cdb_type = cdb_type,
+        .get_interface = get_interface,
+};
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->main_allocator(),
             .type = CT_ID64_0("transform"),
     };
 
-
-    static struct ct_component_prop_map prop_map[] = {
-            {
-                    .ui_name = "position",
-                    .key = "position",
-                    .offset = offsetof(struct ct_transform_comp, position),
-                    .type = CDB_TYPE_VEC3,
-
-            },
-            {
-                    .ui_name = "rotation",
-                    .key = "rotation",
-                    .offset = offsetof(struct ct_transform_comp, rotation),
-                    .type = CDB_TYPE_VEC3,
-                    .limit = {.min_f = -360, .max_f = 360}
-            },
-            {
-                    .ui_name = "scale",
-                    .key = "scale",
-                    .offset = offsetof(struct ct_transform_comp, scale),
-                    .type = CDB_TYPE_VEC3,
-            }
-    };
+    api->register_api("ct_component_i0", &ct_component_i0);
 
     ct_ecs_a0->register_component(
             (struct ct_component_info) {
                     .size = sizeof(struct ct_transform_comp),
                     .component_name = TRANSFORMATION_COMPONENT_NAME,
-                    .prop_map = prop_map,
-                    .prop_count = CT_ARRAY_LEN(prop_map)});
+            });
 
     ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
                              CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),

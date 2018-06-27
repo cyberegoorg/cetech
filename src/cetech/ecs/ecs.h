@@ -15,6 +15,7 @@
 #define ECS_EBUS_NAME "ecs"
 
 #define PREFAB_NAME_PROP CT_ID64_0("prefab_filename")
+#define EDITOR_COMPONENT CT_ID64_0("ct_editor_component_i0")
 
 enum {
     ECS_EBUS = 0x3c870dac
@@ -50,38 +51,8 @@ struct ct_entity {
     uint64_t h;
 };
 
-struct ct_component_prop_map {
-    const char *ui_name;
-    const char *key;
-    uint64_t offset;
-    enum ct_cdb_type type;
-
-    struct {
-        union {
-            float min_f;
-        };
-
-        union {
-            float max_f;
-        };
-    } limit;
-
-    struct {
-        const char *type;
-    } resource;
-
-    struct {
-        void (*combo_items)(uint64_t obj,
-                            char **items,
-                            uint32_t *items_count);
-    } combo;
-};
-
 struct ct_component_info {
     const char *component_name;
-    uint64_t component_name_hash;
-    struct ct_component_prop_map *prop_map;
-    uint32_t prop_count;
     uint64_t size;
 };
 
@@ -102,6 +73,17 @@ typedef void (*ct_simulate_fce_t)(struct ct_world world,
 // Api
 //==============================================================================
 
+struct ct_component_i0 {
+    uint64_t (*cdb_type)();
+
+    void *(*get_interface)(uint64_t name_hash);
+};
+
+struct ct_editor_component_i0 {
+    const char *(*display_name)();
+
+    void (*property_editor)(uint64_t obj);
+};
 
 struct ct_ecs_a0 {
     // WORLD

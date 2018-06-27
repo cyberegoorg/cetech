@@ -71,17 +71,18 @@ int init_config(int argc,
     const char *build_dir_str = ct_cdb_a0->read_str(object, CONFIG_BUILD, "");
     char *build_dir = NULL;
     ct_os_a0->path_a0->join(&build_dir, _G.allocator, 2,
-                     build_dir_str,
-                     ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM, ""));
+                            build_dir_str,
+                            ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM,
+                                                ""));
 
     char *build_config = NULL;
     ct_os_a0->path_a0->join(&build_config, _G.allocator, 2, build_dir,
-                     "global.config");
+                            "global.config");
 
     const char *source_dir_str = ct_cdb_a0->read_str(object, CONFIG_SRC, "");
     char *source_config = NULL;
     ct_os_a0->path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
-                     "global.config");
+                            "global.config");
 
     ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM, ""); //TODO: REMOVGE
 
@@ -304,7 +305,8 @@ void application_start() {
         ct_ebus_a0->begin_frame();
         ct_machine_a0->update(dt);
 
-        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), KERNEL_UPDATE_EVENT);
+        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+                                                  KERNEL_UPDATE_EVENT);
         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
         ct_cdb_a0->set_float(w, CT_ID64_0("dt"), dt);
         ct_cdb_a0->write_commit(w);

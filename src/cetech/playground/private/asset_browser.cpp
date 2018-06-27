@@ -62,7 +62,6 @@ void get_selected_asset_name(char *asset_name) {
 static struct ct_asset_browser_a0 asset_browser_api = {
         .get_selected_asset_name = get_selected_asset_name,
         .get_selected_asset_type = get_selected_asset_type
-
 };
 
 struct ct_asset_browser_a0 *ct_asset_browser_a0 = &asset_browser_api;
@@ -306,7 +305,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },

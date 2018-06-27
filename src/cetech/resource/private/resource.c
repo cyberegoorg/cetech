@@ -166,10 +166,10 @@ static void load(uint32_t type,
 
         char *build_full = NULL;
         ct_os_a0->path_a0->join(&build_full,
-                         _G.allocator, 2,
-                         ct_cdb_a0->read_str(_G.config,
-                                             CONFIG_KERNEL_PLATFORM, ""),
-                         build_name);
+                                _G.allocator, 2,
+                                ct_cdb_a0->read_str(_G.config,
+                                                    CONFIG_KERNEL_PLATFORM, ""),
+                                build_name);
 
         struct ct_vio *resource_file = ct_fs_a0->open(root_name,
                                                       build_full,

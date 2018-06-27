@@ -397,5 +397,4 @@ struct ct_os_a0 {
 CT_MODULE(ct_os_a0);
 
 
-
 #endif //CETECH_OS_H

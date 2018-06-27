@@ -35,8 +35,8 @@ struct ct_render_graph_module_fce render_graph_module_api = {
 
 static struct ct_render_graph_module *create_module() {
     struct ct_render_graph_module *obj = CT_ALLOC(_G.alloc,
-    struct ct_render_graph_module,
-    sizeof(struct ct_render_graph_module));
+                                                  struct ct_render_graph_module,
+                                                  sizeof(struct ct_render_graph_module));
 
     ct_array_push(_G.render_graph_module_pool,
                   (struct render_graph_module_inst) {0}, _G.alloc);

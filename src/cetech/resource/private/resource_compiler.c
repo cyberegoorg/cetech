@@ -211,10 +211,10 @@ void _compile_files(struct ct_task_item **tasks,
 
         char *build_full = NULL;
         ct_os_a0->path_a0->join(&build_full,
-                         _G.allocator, 2,
-                         ct_cdb_a0->read_str(_G.config,
-                                             CONFIG_KERNEL_PLATFORM, ""),
-                         build_name);
+                                _G.allocator, 2,
+                                ct_cdb_a0->read_str(_G.config,
+                                                    CONFIG_KERNEL_PLATFORM, ""),
+                                build_name);
 
         struct compile_task_data *data = CT_ALLOC(_G.allocator,
                                                   struct compile_task_data,
@@ -339,15 +339,17 @@ char *resource_compiler_external_join(struct ct_alloc *alocator,
 
     char *tmp_dir = NULL;
     ct_os_a0->path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
-                     ct_cdb_a0->read_str(_G.config, CONFIG_KERNEL_PLATFORM,
-                                         ""));
+                            ct_cdb_a0->read_str(_G.config,
+                                                CONFIG_KERNEL_PLATFORM,
+                                                ""));
 
     char *buffer = NULL;
     ct_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
     ct_buffer_free(tmp_dir, alocator);
 
     char *result = NULL;
-    ct_os_a0->path_a0->join(&result, alocator, 4, buffer, "release", "bin", name);
+    ct_os_a0->path_a0->join(&result, alocator, 4, buffer, "release", "bin",
+                            name);
     ct_buffer_free(buffer, alocator);
 
     return result;
@@ -471,7 +473,7 @@ static void _init(struct ct_api_a0 *api) {
 
     char *tmp_dir_full = NULL;
     ct_os_a0->path_a0->join(&tmp_dir_full, _G.allocator, 2,
-                     build_dir_full, "tmp");
+                            build_dir_full, "tmp");
 
     ct_os_a0->path_a0->make_path(tmp_dir_full);
 

@@ -68,21 +68,21 @@ void add_dir(ct_watchdog_instance_t *inst,
 //    celib::map::set(wi->dir2wd, path_hash, wd);
 //    celib::map::set(wi->wd2dir, wd, path_dup);
 
-    struct ct_alloc* allocator = ct_memory_a0->main_allocator();
+    struct ct_alloc *allocator = ct_memory_a0->main_allocator();
 
     if (recursive) {
         char **files;
         uint32_t files_count;
 
         ct_os_a0->path_a0->list(path, "*", 1, 1, &files, &files_count,
-        allocator);
+                                allocator);
 
         for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
         ct_os_a0->path_a0->list_free(files, files_count,
-                              allocator);
+                                     allocator);
     }
 }
 

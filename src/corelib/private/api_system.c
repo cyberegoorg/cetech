@@ -74,11 +74,11 @@ static struct ct_api_entry api_first(const char *name) {
 }
 
 static struct ct_api_entry api_next(struct ct_api_entry entry) {
-    struct impl_list* impl_list = entry.entry;
+    struct impl_list *impl_list = entry.entry;
 
     const uint32_t n = ct_array_size(impl_list->api);
 
-    if(entry.idx>= n) {
+    if (entry.idx >= n) {
         return (struct ct_api_entry) {0};
     }
 

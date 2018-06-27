@@ -247,8 +247,10 @@ static void _init(struct ct_api_a0 *api) {
     atomic_init(&_G.task_pool_idx, 1);
 
     for (uint32_t j = 0; j < worker_count; ++j) {
-        _G.workers[j] = ct_os_a0->thread_a0->create(_task_worker, "cetech_worker",
-                                             (void *) ((intptr_t) (j + 1)));
+        _G.workers[j] = ct_os_a0->thread_a0->create(_task_worker,
+                                                    "cetech_worker",
+                                                    (void *) ((intptr_t) (j +
+                                                                          1)));
     }
 
     _G.is_running = 1;

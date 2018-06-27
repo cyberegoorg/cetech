@@ -253,8 +253,8 @@ static void load_dirs() {
 
         const char *module_file = ct_cdb_a0->read_str(_G.config, key_id, "");
         ct_os_a0->path_a0->join(&buffer,
-                         _G.allocator,
-                         2, path, module_file);
+                                _G.allocator,
+                                2, path, module_file);
         load(buffer);
 
         ct_buffer_free(buffer, _G.allocator);

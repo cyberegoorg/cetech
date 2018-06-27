@@ -175,8 +175,8 @@ struct ct_render_graph_builder_fce render_graph_builder_api = {
 
 static struct ct_render_graph_builder *create_render_builder() {
     struct ct_render_graph_builder *obj = CT_ALLOC(_G.alloc,
-    struct ct_render_graph_builder,
-    sizeof(struct ct_render_graph_builder));
+                                                   struct ct_render_graph_builder,
+                                                   sizeof(struct ct_render_graph_builder));
 
     ct_array_push(_G.render_graph_builder_pool,
                   (struct render_graph_builder_inst) {0},

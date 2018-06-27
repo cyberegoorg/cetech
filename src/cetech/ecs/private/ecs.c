@@ -138,24 +138,10 @@ static void register_component(struct ct_component_info info) {
     const uint64_t cid = _G.component_count++;
 
     const uint64_t component_hash = CT_ID64_0(info.component_name);
-    info.component_name_hash = component_hash;
 
     _G.component_info[cid] = info;
     ct_hash_add(&_G.component_types, component_hash, cid, _G.allocator);
     ct_array_push(_G.components_name, component_hash, _G.allocator);
-
-    for (int i = 0; i < info.prop_count; ++i) {
-        const char *prop_key = info.prop_map[i].key;
-        const uint64_t prop_offset = info.prop_map[i].offset;
-
-        uint64_t prop_key_hash = CT_ID64_0(prop_key);
-
-        ct_hash_add(&_G.component_param_offset[cid],
-                    prop_key_hash, prop_offset, _G.allocator);
-
-        ct_hash_add(&_G.prop_to_comp, prop_key_hash, component_hash,
-                    _G.allocator);
-    }
 }
 
 const uint64_t *(get_components)() {

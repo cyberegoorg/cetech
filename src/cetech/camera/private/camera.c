@@ -9,6 +9,7 @@
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
+#include <cetech/playground/entity_property.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -107,11 +108,11 @@ static void _on_obj_change(uint64_t obj,
     camera = ct_ecs_a0->entity_data(world, CAMERA_COMPONENT, ent);
 
     for (int k = 0; k < prop_count; ++k) {
-        if(prop[k] == PROP_FOV) {
+        if (prop[k] == PROP_FOV) {
             camera->fov = ct_cdb_a0->read_float(obj, PROP_FOV, 0.0f);
-        } else if(prop[k] == PROP_NEAR) {
+        } else if (prop[k] == PROP_NEAR) {
             camera->near = ct_cdb_a0->read_float(obj, PROP_NEAR, 0.0f);
-        } else if(prop[k] == PROP_FAR) {
+        } else if (prop[k] == PROP_FAR) {
             camera->far = ct_cdb_a0->read_float(obj, PROP_FAR, 0.0f);
         }
     }
@@ -132,6 +133,41 @@ static void _component_spawner(uint64_t event) {
     ct_cdb_a0->register_notify(obj, _on_obj_change, NULL);
 }
 
+
+static uint64_t cdb_type() {
+    return CAMERA_COMPONENT;
+}
+
+static const char *display_name() {
+    return "Camera";
+}
+
+static void property_editor(uint64_t obj) {
+    ct_entity_property_a0->ui_float(obj, PROP_NEAR, "Near", 0, 0);
+    ct_entity_property_a0->ui_float(obj, PROP_FAR, "Far", 0, 0);
+    ct_entity_property_a0->ui_float(obj, PROP_FOV, "Fov", 0, 0);
+}
+
+static void *get_interface(uint64_t name_hash) {
+    if (EDITOR_COMPONENT == name_hash) {
+        static struct ct_editor_component_i0 ct_editor_component_i0 = {
+                .display_name = display_name,
+                .property_editor = property_editor,
+        };
+
+        return &ct_editor_component_i0;
+    }
+
+    return NULL;
+}
+
+
+static struct ct_component_i0 ct_component_i0 = {
+        .cdb_type = cdb_type,
+        .get_interface = get_interface
+};
+
+
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_camera_a0", &camera_api);
 
@@ -140,32 +176,11 @@ static void _init(struct ct_api_a0 *api) {
             .type = CAMERA_COMPONENT,
     };
 
-    static struct ct_component_prop_map prop_map[] = {
-            {
-                    .key = "far",
-                    .ui_name = "far",
-                    .type = CDB_TYPE_FLOAT,
-                    .offset = offsetof(struct ct_camera_component, far)
-            },
-            {
-                    .key = "near",
-                    .ui_name = "near",
-                    .type = CDB_TYPE_FLOAT,
-                    .offset = offsetof(struct ct_camera_component, near)
-            },
-            {
-                    .key = "fov",
-                    .ui_name = "fov",
-                    .type = CDB_TYPE_FLOAT,
-                    .offset = offsetof(struct ct_camera_component, fov)
-            }
-    };
+    api->register_api("ct_component_i0", &ct_component_i0);
 
     ct_ecs_a0->register_component((struct ct_component_info) {
             .component_name = "camera",
             .size = sizeof(struct ct_camera_component),
-            .prop_map = prop_map,
-            .prop_count = CT_ARRAY_LEN(prop_map)
     });
 
     ct_ebus_a0->connect_addr(ECS_EBUS,

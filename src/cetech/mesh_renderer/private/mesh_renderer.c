@@ -21,6 +21,8 @@
 #include <cetech/mesh_renderer/mesh_renderer.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <cetech/macros.h>
+#include <cetech/playground/entity_property.h>
+#include <stdlib.h>
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -237,7 +239,8 @@ static void _on_obj_change(uint64_t obj,
                                ct_material_a0->resource_create(material_id));
 
         } else if (prop[k] == PROP_MATERIAL_REF) {
-            uint64_t matrerial = ct_cdb_a0->read_uint64(obj, PROP_MATERIAL_REF, 0);
+            uint64_t matrerial = ct_cdb_a0->read_uint64(obj, PROP_MATERIAL_REF,
+                                                        0);
 
             mr->material = matrerial;
 
@@ -293,6 +296,55 @@ void node_combo_items(uint64_t obj,
     ct_scene_a0->get_all_nodes(scene_id, items, items_count);
 }
 
+static uint64_t cdb_type() {
+    return MESH_RENDERER_COMPONENT;
+}
+
+static const char *display_name() {
+    return "Mesh renderer";
+}
+
+static void property_editor(uint64_t obj) {
+    ct_entity_property_a0->ui_resource(obj,
+                                       PROP_SCENE, "Scene",
+                                       CT_ID32_0("scene"),
+                                       obj);
+
+    ct_entity_property_a0->ui_resource(obj,
+                                       PROP_MATERIAL, "Material",
+                                       CT_ID32_0("material"),
+                                       obj);
+
+    ct_entity_property_a0->ui_str_combo(obj,
+                                        PROP_MESH, "Mesh",
+                                        mesh_combo_items,
+                                        obj);
+
+    ct_entity_property_a0->ui_str_combo(obj,
+                                        PROP_NODE, "Node",
+                                        node_combo_items,
+                                        obj);
+}
+
+
+static void *get_interface(uint64_t name_hash) {
+    if (EDITOR_COMPONENT == name_hash) {
+        static struct ct_editor_component_i0 ct_editor_component_i0 = {
+                .display_name = display_name,
+                .property_editor = property_editor,
+        };
+
+        return &ct_editor_component_i0;
+    }
+
+    return NULL;
+}
+
+static struct ct_component_i0 ct_component_i0 = {
+        .cdb_type = cdb_type,
+        .get_interface = get_interface,
+};
+
 static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
@@ -301,74 +353,14 @@ static void _init(struct ct_api_a0 *api) {
             .type = MESH_RENDERER_COMPONENT,
     };
 
-    static struct ct_component_prop_map prop_map[] = {
-            {
-                    .key = "scene",
-                    .ui_name = "scene",
-                    .type = CDB_TYPE_STR,
-                    .offset = UINT64_MAX,
-                    .resource.type = "scene",
-            },
-            {
-                    .key = "scene_id",
-                    .ui_name = "scene_id",
-                    .type = CDB_TYPE_UINT64,
-                    .offset = offsetof(struct ct_mesh_renderer, scene_id),
-            },
-            {
-                    .key = "mesh",
-                    .ui_name = "mesh",
-                    .type = CDB_TYPE_STR,
-                    .offset = UINT64_MAX,
-                    .combo.combo_items = mesh_combo_items
-            },
-            {
-                    .key = "mesh_id",
-                    .ui_name = "mesh_id",
-                    .type = CDB_TYPE_UINT64,
-                    .offset = offsetof(struct ct_mesh_renderer, mesh_id),
-            },
-            {
-                    .key = "node",
-                    .ui_name = "node",
-                    .type = CDB_TYPE_STR,
-                    .offset = UINT64_MAX,
-                    .combo.combo_items = node_combo_items
-            },
-            {
-                    .key = "node_id",
-                    .ui_name = "node_id",
-                    .type = CDB_TYPE_UINT64,
-                    .offset = offsetof(struct ct_mesh_renderer, node_id),
-            },
-            {
-                    .key = "material",
-                    .ui_name = "material",
-                    .type = CDB_TYPE_STR,
-                    .offset = UINT64_MAX,
-                    .resource.type = "material",
-            },
-            {
-                    .key = "material_id",
-                    .ui_name = "material id",
-                    .type = CDB_TYPE_UINT64,
-                    .offset = UINT64_MAX,
-            },
-            {
-                    .key = "material_ref",
-                    .ui_name = "material ref",
-                    .type = CDB_TYPE_REF,
-                    .offset = offsetof(struct ct_mesh_renderer, material),
-            },
+    api->register_api("ct_component_i0", &ct_component_i0);
 
-    };
 
     ct_ecs_a0->register_component(
             (struct ct_component_info) {
                     .component_name = "mesh_renderer",
                     .size = sizeof(struct ct_mesh_renderer),
-                    .prop_map = prop_map,
-                    .prop_count = CT_ARRAY_LEN(prop_map),
+
             });
 
     ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,

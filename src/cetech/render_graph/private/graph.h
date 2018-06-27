@@ -30,8 +30,8 @@ struct ct_render_graph_fce render_graph_fce = {
 
 static struct ct_render_graph *create_render_graph() {
     struct ct_render_graph *obj = CT_ALLOC(_G.alloc,
-    struct ct_render_graph,
-    sizeof(struct ct_render_graph));
+                                           struct ct_render_graph,
+                                           sizeof(struct ct_render_graph));
 
     ct_array_push(_G.render_graph_pool, (struct render_graph_inst) {0},
                   _G.alloc);

@@ -1,23 +1,25 @@
-#include <cstdio>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-#include <cetech/debugui/debugui.h>
-#include <corelib/fs.h>
 #include <corelib/hashlib.h>
 #include <corelib/config.h>
 #include <corelib/memory.h>
 #include <corelib/api_system.h>
 #include <corelib/module.h>
 #include <corelib/cdb.h>
-#include <cetech/ecs/ecs.h>
-
-#include <cetech/playground/asset_browser.h>
-#include <cetech/playground/explorer.h>
 #include <corelib/yng.h>
 #include <corelib/ydb.h>
+#include <corelib/fs.h>
+
+#include <cetech/ecs/ecs.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/playground/asset_browser.h>
+#include <cetech/playground/explorer.h>
 #include <cetech/playground/playground.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/resource/resource.h>
 #include <corelib/ebus.h>
+#include <corelib/macros.h>
 
 #define WINDOW_NAME "Explorer"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("explorer")
@@ -32,7 +34,7 @@ static struct _G {
     struct ct_world world;
 
     const char *path;
-    ct_alloc *allocator;
+    struct ct_alloc *allocator;
 } _G;
 
 
@@ -63,6 +65,21 @@ struct ct_explorer_a0 *ct_explorer_a0 = &level_inspector_api;
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
 }
+
+static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
+    struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
+    while (it.api) {
+        struct ct_component_i0 *i = (it.api);
+
+        if (cdb_type == i->cdb_type()) {
+            return i;
+        }
+
+        it = ct_api_a0->next(it);
+    }
+
+    return NULL;
+};
 
 static void ui_entity_item_begin(uint64_t obj,
                                  uint32_t id) {
@@ -95,7 +112,7 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     char label[128] = {0};
-    snprintf(label, CT_ARRAY_LEN(label), "%s", name);
+    snprintf(label, CT_ARRAY_LEN(label), "%s##%d", name, 0);
 
     bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
@@ -115,6 +132,48 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     if (open) {
+        uint64_t components;
+        components = ct_cdb_a0->read_subobject(obj, CT_ID64_0("components"), 0);
+
+        const uint32_t component_n = ct_cdb_a0->prop_count(components);
+        uint64_t keys[component_n];
+        ct_cdb_a0->prop_keys(components, keys);
+
+        for (uint32_t i = 0; i < component_n; ++i) {
+            uint64_t key = keys[i];
+
+
+            uint64_t component = ct_cdb_a0->read_subobject(components, key, 0);
+            uint64_t type = ct_cdb_a0->type(component);
+
+            struct ct_component_i0 *c = get_component_inteface(type);
+            if (!c->get_interface) {
+                continue;
+            }
+
+            struct ct_editor_component_i0 *editor;
+            editor = c->get_interface(EDITOR_COMPONENT);
+
+            if (!editor) {
+                continue;
+            }
+
+            ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
+                                       DebugUITreeNodeFlags_OpenOnDoubleClick |
+                                       DebugUITreeNodeFlags_Leaf;
+
+            char label[128] = {0};
+            snprintf(label, CT_ARRAY_LEN(label), "%s##%d",
+                     editor->display_name(), rand());
+            bool open = ct_debugui_a0->TreeNodeEx(label, flags);
+
+            if (open) {
+                ct_debugui_a0->TreePop();
+            }
+        }
+    }
+
+    if (open) {
         uint64_t keys[children_n];
         ct_cdb_a0->prop_keys(children, keys);
 
@@ -131,8 +190,7 @@ static void ui_entity_item_begin(uint64_t obj,
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
 
 static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible,
-                                 DebugUIWindowFlags_(0))) {
+    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
 
         ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
 
@@ -159,7 +217,7 @@ static void on_menu_window(uint64_t event) {
 }
 
 static void _init(struct ct_api_a0 *api) {
-    _G = {
+    _G = (struct _G) {
             .allocator = ct_memory_a0->main_allocator(),
             .visible = true
     };
@@ -178,7 +236,7 @@ static void _shutdown() {
     ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
                            on_menu_window);
 
-    _G = {};
+    _G = (struct _G) {0};
 }
 
 CETECH_MODULE_DEF(

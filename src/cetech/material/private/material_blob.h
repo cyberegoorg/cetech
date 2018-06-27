@@ -62,7 +62,7 @@ namespace material_blob {
     }
 
     inline material_variable *uniforms(const blob_t *blob) {
-        return ((material_variable * )(render_state(blob) +
+        return ((material_variable *) (render_state(blob) +
                                        (blob->layer_count)));
     }
 

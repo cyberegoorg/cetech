@@ -101,7 +101,7 @@ static void renderer_create() {
 
         } else {
             _G.main_window = ct_os_a0->window_a0->create_from(_G.allocator,
-                                                       (void *) wid);
+                                                              (void *) wid);
         }
     }
 

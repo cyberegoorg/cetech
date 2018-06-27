@@ -358,7 +358,8 @@ void path_join(char **buffer,
 void copy_file(struct ct_alloc *allocator,
                const char *from,
                const char *to) {
-    struct ct_vio *source_vio = ct_os_a0->vio_a0->from_file(from, VIO_OPEN_READ);
+    struct ct_vio *source_vio = ct_os_a0->vio_a0->from_file(from,
+                                                            VIO_OPEN_READ);
 
     char *data = CT_ALLOC(allocator, char,
                           source_vio->size(source_vio));
