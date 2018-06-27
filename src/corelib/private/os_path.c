@@ -358,7 +358,7 @@ void path_join(char **buffer,
 void copy_file(struct ct_alloc *allocator,
                const char *from,
                const char *to) {
-    struct ct_vio *source_vio = ct_vio_a0->from_file(from, VIO_OPEN_READ);
+    struct ct_vio *source_vio = ct_os_a0->vio_a0->from_file(from, VIO_OPEN_READ);
 
     char *data = CT_ALLOC(allocator, char,
                           source_vio->size(source_vio));
@@ -367,7 +367,7 @@ void copy_file(struct ct_alloc *allocator,
     source_vio->read(source_vio, data, sizeof(char), size);
     source_vio->close(source_vio);
 
-    struct ct_vio *build_vio = ct_vio_a0->from_file(to, VIO_OPEN_WRITE);
+    struct ct_vio *build_vio = ct_os_a0->vio_a0->from_file(to, VIO_OPEN_WRITE);
 
     build_vio->write(build_vio, data, sizeof(char), size);
     build_vio->close(build_vio);
@@ -380,7 +380,7 @@ bool is_dir(const char *path) {
     return (stat(path, &sb) == 0) && S_ISDIR(sb.st_mode);
 }
 
-static struct ct_path_a0 path_api = {
+struct ct_path_a0 path_api = {
         .list = dir_list,
         .list2 = dir_list2,
         .list_free = dir_list_free,
@@ -397,19 +397,3 @@ static struct ct_path_a0 path_api = {
 };
 
 struct ct_path_a0 *ct_path_a0 = &path_api;
-
-CETECH_MODULE_DEF(
-        path,
-        {
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_vio_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_path_a0", ct_path_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)

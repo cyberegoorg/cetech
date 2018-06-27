@@ -45,7 +45,7 @@ static int _texturec(const char *input,
 
     ct_buffer_printf(&buffer, alloc, " %s", "2>&1");
 
-    int status = ct_process_a0->exec(buffer);
+    int status = ct_os_a0->process_a0->exec(buffer);
 
     ct_log_a0->info("application", "STATUS %d", status);
 
@@ -60,15 +60,15 @@ static int _gen_tmp_name(char *tmp_filename,
     struct ct_alloc *a = ct_memory_a0->main_allocator();
 
     char dir[1024] = {};
-    ct_path_a0->dir(dir, filename);
+    ct_os_a0->path_a0->dir(dir, filename);
 
     char *tmp_dirname = NULL;
-    ct_path_a0->join(&tmp_dirname, a, 2, tmp_dir, dir);
+    ct_os_a0->path_a0->join(&tmp_dirname, a, 2, tmp_dir, dir);
 
-    ct_path_a0->make_path(tmp_dirname);
+    ct_os_a0->path_a0->make_path(tmp_dirname);
 
     int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx", tmp_dirname,
-                       ct_path_a0->filename(filename));
+                       ct_os_a0->path_a0->filename(filename));
 
     ct_buffer_free(tmp_dirname, a);
 
@@ -103,7 +103,7 @@ static void compiler(const char *filename,
 
     char *tmp_dir = ct_resource_a0->compiler_get_tmp_dir(a, platform);
     char *input_path = NULL;
-    ct_path_a0->join(&input_path, a, 2, source_dir, input_str);
+    ct_os_a0->path_a0->join(&input_path, a, 2, source_dir, input_str);
 
     _gen_tmp_name(output_path, tmp_dir, CT_ARRAY_LEN(tmp_filename),
                   input_str);
@@ -117,7 +117,7 @@ static void compiler(const char *filename,
 
     ct_vio *tmp_file = NULL;
 
-    tmp_file = ct_vio_a0->from_file(output_path,
+    tmp_file = ct_os_a0->vio_a0->from_file(output_path,
                                     VIO_OPEN_READ);
 
     char *tmp_data =
@@ -145,9 +145,7 @@ static void compiler(const char *filename,
 int texturecompiler_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
-    CETECH_GET_API(api, ct_process_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_config_a0);

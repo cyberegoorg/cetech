@@ -185,4 +185,3 @@ struct ct_ecs_a0 {
 CT_MODULE(ct_ecs_a0);
 
 #endif //CETECH_WORLD_H
-//! \}

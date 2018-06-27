@@ -34,24 +34,8 @@ int exec(const char *argv) {
 #endif
 }
 
-static struct ct_process_a0 process_api = {
+struct ct_process_a0 process_api = {
         .exec = exec
 };
 
 struct ct_process_a0 *ct_process_a0 = &process_api;
-
-CETECH_MODULE_DEF(
-        process,
-        {
-            CETECH_GET_API(api, ct_log_a0);
-
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_process_a0", ct_process_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)

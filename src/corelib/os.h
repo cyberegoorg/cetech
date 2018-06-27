@@ -15,11 +15,11 @@ struct ct_alloc;
 //==============================================================================
 
 #ifdef CETECH_DEBUG
-#define CETECH_ASSERT(where, condition)                             \
-    do {                                                            \
-        if (!(condition)) {                                         \
-            ct_error_assert(where, #condition, __FILE__, __LINE__); \
-        }                                                           \
+#define CETECH_ASSERT(where, condition)                                 \
+    do {                                                                \
+        if (!(condition)) {                                             \
+            ct_os_a0->error_a0->assert(where, #condition, __FILE__, __LINE__); \
+        }                                                               \
     } while (0)
 #else
 #define CETECH_ASSERT(where, condition) do {} while (0)
@@ -31,12 +31,6 @@ struct ct_error_a0 {
                    const char *filename,
                    int line);
 };
-
-void ct_error_assert(const char *where,
-                     const char *condition,
-                     const char *filename,
-                     int line);
-
 
 struct ct_cpu_a0 {
     int (*count)();
@@ -387,29 +381,21 @@ struct ct_window_a0 {
                     struct ct_window *w);
 };
 
-CT_MODULE(ct_cpu_a0);
-CT_MODULE(ct_error_a0);
-CT_MODULE(ct_object_a0);
-CT_MODULE(ct_path_a0);
-CT_MODULE(ct_process_a0);
-CT_MODULE(ct_thread_a0);
-CT_MODULE(ct_time_a0);
-CT_MODULE(ct_vio_a0);
-CT_MODULE(ct_watchdog_a0);
-CT_MODULE(ct_window_a0);
-
 struct ct_os_a0 {
-    struct ct_cpu_a0 *cpu_api;
-    struct ct_error_a0 *error_api;
-    struct ct_object_a0 *object_api;
-    struct ct_path_a0 *path_api;
-    struct ct_process_a0 *process_api;
-    struct ct_thread_a0 *thread_api;
-    struct ct_time_a0 *time_api;
-    struct ct_vio_a0 *vio_api;
-    struct ct_watchdog_a0 *watchdog_api;
-    struct ct_window_a0 *window_api;
+    struct ct_cpu_a0 *cpu_a0;
+    struct ct_error_a0 *error_a0;
+    struct ct_object_a0 *object_a0;
+    struct ct_path_a0 *path_a0;
+    struct ct_process_a0 *process_a0;
+    struct ct_thread_a0 *thread_a0;
+    struct ct_time_a0 *time_a0;
+    struct ct_vio_a0 *vio_a0;
+    struct ct_watchdog_a0 *watchdog_a0;
+    struct ct_window_a0 *window_a0;
 };
+
+CT_MODULE(ct_os_a0);
+
 
 
 #endif //CETECH_OS_H

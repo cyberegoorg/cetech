@@ -5,7 +5,6 @@
 #include <corelib/api_system.h>
 #include <corelib/hash.inl>
 #include <corelib/memory.h>
-#include <corelib/private/allocator_core_private.h>
 #include <corelib/murmur_hash.inl>
 
 #define _G hashlib_global
@@ -38,7 +37,7 @@ uint64_t stringid64_from_string(const char *str) {
         return 0;
     }
 
-    struct ct_alloc *alloc = coreallocator_get();
+    struct ct_alloc *alloc = ct_core_allocator_a0->alloc;
 
     const uint32_t str_len = strlen(str);
 
@@ -58,7 +57,7 @@ uint32_t stringid32_from_string(const char *str) {
         return 0;
     }
 
-    struct ct_alloc *alloc = coreallocator_get();
+    struct ct_alloc *alloc = ct_core_allocator_a0->alloc;
 
     const uint32_t str_len = strlen(str);
 
@@ -104,7 +103,6 @@ static struct ct_hashlib_a0 hash_api = {
 struct ct_hashlib_a0 *ct_hashlib_a0 = &hash_api;
 
 void CETECH_MODULE_INITAPI(hashlib)(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
 }
 
 void CETECH_MODULE_LOAD (hashlib)(struct ct_api_a0 *api,
@@ -112,8 +110,6 @@ void CETECH_MODULE_LOAD (hashlib)(struct ct_api_a0 *api,
     CT_UNUSED(reload);
 
     api->register_api("ct_hashlib_a0", &hash_api);
-
-    CETECH_GET_API(api, ct_memory_a0);
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->main_allocator()

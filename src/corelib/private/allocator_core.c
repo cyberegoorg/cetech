@@ -41,15 +41,11 @@ static struct ct_alloc _allocator = {
         .call = &alloc_fce,
 };
 
-struct ct_alloc *coreallocator_get() {
-    return &_allocator;
-}
-
 static struct ct_core_allocator_a0 core_allocator_api = {
-        .get_allocator = coreallocator_get
+      .alloc = &_allocator,
 };
 
-static struct ct_core_allocator_a0 *ct_core_allocator_a0 = &core_allocator_api;
+struct ct_core_allocator_a0 *ct_core_allocator_a0 = &core_allocator_api;
 
 void coreallocator_register_api(struct ct_api_a0 *api) {
     api->register_api("ct_core_allocator_a0", ct_core_allocator_a0);

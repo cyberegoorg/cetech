@@ -1,7 +1,6 @@
 #ifndef CETECH__MEMORY_H
 #define CETECH__MEMORY_H
 
-
 #include <stdlib.h>
 
 void memory_init();

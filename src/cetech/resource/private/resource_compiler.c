@@ -78,7 +78,7 @@ void type_name_from_filename(const char *fullname,
                              struct ct_resource_id *resource_id,
                              char *short_name) {
 
-    const char *resource_type = ct_path_a0->extension(fullname);
+    const char *resource_type = ct_os_a0->path_a0->extension(fullname);
 
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
 
@@ -210,7 +210,7 @@ void _compile_files(struct ct_task_item **tasks,
         builddb_set_file_hash(files[i], build_name);
 
         char *build_full = NULL;
-        ct_path_a0->join(&build_full,
+        ct_os_a0->path_a0->join(&build_full,
                          _G.allocator, 2,
                          ct_cdb_a0->read_str(_G.config,
                                              CONFIG_KERNEL_PLATFORM, ""),
@@ -255,7 +255,7 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config) {
             _G.allocator,
             ct_cdb_a0->read_str(_G.config, CONFIG_KERNEL_PLATFORM, ""));
 
-    ct_path_a0->make_path(build_dir_full);
+    ct_os_a0->path_a0->make_path(build_dir_full);
 
     CT_FREE(_G.allocator, build_dir_full);
 }
@@ -327,7 +327,7 @@ char *resource_compiler_get_tmp_dir(struct ct_alloc *alocator,
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
 
     char *buffer = NULL;
-    ct_path_a0->join(&buffer, alocator, 2, build_dir, "tmp");
+    ct_os_a0->path_a0->join(&buffer, alocator, 2, build_dir, "tmp");
     return buffer;
 }
 
@@ -338,7 +338,7 @@ char *resource_compiler_external_join(struct ct_alloc *alocator,
                                                        "");
 
     char *tmp_dir = NULL;
-    ct_path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
+    ct_os_a0->path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
                      ct_cdb_a0->read_str(_G.config, CONFIG_KERNEL_PLATFORM,
                                          ""));
 
@@ -347,7 +347,7 @@ char *resource_compiler_external_join(struct ct_alloc *alocator,
     ct_buffer_free(tmp_dir, alocator);
 
     char *result = NULL;
-    ct_path_a0->join(&result, alocator, 4, buffer, "release", "bin", name);
+    ct_os_a0->path_a0->join(&result, alocator, 4, buffer, "release", "bin", name);
     ct_buffer_free(buffer, alocator);
 
     return result;
@@ -466,14 +466,14 @@ static void _init(struct ct_api_a0 *api) {
     char *build_dir_full = ct_resource_a0->compiler_get_build_dir(
             _G.allocator, platform);
 
-    ct_path_a0->make_path(build_dir_full);
-    builddb_init_db(build_dir_full, ct_path_a0, ct_memory_a0);
+    ct_os_a0->path_a0->make_path(build_dir_full);
+    builddb_init_db(build_dir_full, ct_os_a0->path_a0, ct_memory_a0);
 
     char *tmp_dir_full = NULL;
-    ct_path_a0->join(&tmp_dir_full, _G.allocator, 2,
+    ct_os_a0->path_a0->join(&tmp_dir_full, _G.allocator, 2,
                      build_dir_full, "tmp");
 
-    ct_path_a0->make_path(tmp_dir_full);
+    ct_os_a0->path_a0->make_path(tmp_dir_full);
 
     ct_buffer_free(tmp_dir_full, _G.allocator);
     ct_buffer_free(build_dir_full, _G.allocator);
@@ -508,12 +508,10 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_task_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_watchdog_a0);
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);

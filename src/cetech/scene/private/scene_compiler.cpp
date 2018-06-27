@@ -483,7 +483,7 @@ static int _compile_assimp(const char *filename,
 
     const char *source_dir = ct_resource_a0->compiler_get_source_dir();
     char *input_path = NULL;
-    ct_path_a0->join(&input_path, _G.allocator, 2, source_dir, input_str);
+    ct_os_a0->path_a0->join(&input_path, _G.allocator, 2, source_dir, input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
@@ -681,10 +681,8 @@ int scenecompiler_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_scenegprah_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_thread_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
     CETECH_GET_API(api, ct_renderer_a0);

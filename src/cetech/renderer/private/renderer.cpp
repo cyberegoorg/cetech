@@ -91,7 +91,7 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ct_window_a0->create(
+            _G.main_window = ct_os_a0->window_a0->create(
                     _G.allocator,
                     title,
                     WINDOWPOS_UNDEFINED,
@@ -100,7 +100,7 @@ static void renderer_create() {
                     flags);
 
         } else {
-            _G.main_window = ct_window_a0->create_from(_G.allocator,
+            _G.main_window = ct_os_a0->window_a0->create_from(_G.allocator,
                                                        (void *) wid);
         }
     }
@@ -790,7 +790,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G.vsync = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    CETECH_GET_API(api, ct_window_a0);
+    CETECH_GET_API(api, ct_os_a0);
 
     ct_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
 

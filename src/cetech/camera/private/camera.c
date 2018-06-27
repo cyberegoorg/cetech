@@ -64,7 +64,6 @@ static void get_project_view(struct ct_world world,
     struct ct_transform_comp *transform;
     struct ct_camera_component *camera_data;
 
-
     transform = ct_ecs_a0->entity_data(world, TRANSFORM_COMPONENT, camera);
     camera_data = ct_ecs_a0->entity_data(world, CAMERA_COMPONENT, camera);
 
@@ -89,6 +88,35 @@ static struct ct_camera_a0 camera_api = {
 
 struct ct_camera_a0 *ct_camera_a0 = &camera_api;
 
+static void _on_obj_change(uint64_t obj,
+                           const uint64_t *prop,
+                           uint32_t prop_count,
+                           void *data) {
+
+    uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
+
+    struct ct_world world = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+    };
+
+    struct ct_entity ent = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
+    };
+
+    struct ct_camera_component *camera;
+    camera = ct_ecs_a0->entity_data(world, CAMERA_COMPONENT, ent);
+
+    for (int k = 0; k < prop_count; ++k) {
+        if(prop[k] == PROP_FOV) {
+            camera->fov = ct_cdb_a0->read_float(obj, PROP_FOV, 0.0f);
+        } else if(prop[k] == PROP_NEAR) {
+            camera->near = ct_cdb_a0->read_float(obj, PROP_NEAR, 0.0f);
+        } else if(prop[k] == PROP_FAR) {
+            camera->far = ct_cdb_a0->read_float(obj, PROP_FAR, 0.0f);
+        }
+    }
+}
+
 static void _component_spawner(uint64_t event) {
     uint64_t obj = ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0);
     struct ct_camera_component *camera = ct_cdb_a0->read_ptr(event,
@@ -100,6 +128,8 @@ static void _component_spawner(uint64_t event) {
             .near = ct_cdb_a0->read_float(obj, PROP_NEAR, 0.0f),
             .far = ct_cdb_a0->read_float(obj, PROP_FAR, 0.0f),
     };
+
+    ct_cdb_a0->register_notify(obj, _on_obj_change, NULL);
 }
 
 static void _init(struct ct_api_a0 *api) {

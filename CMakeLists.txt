@@ -80,8 +80,8 @@ set(SOURCE_FILES
         src/corelib/private/allocator_malloc.c
         src/corelib/private/task.c
         src/corelib/private/log_stdout_handler.c
-        src/cetech/kernel/kernel.c
         src/corelib/private/hashlib.c
+        src/corelib/private/os.c
         src/corelib/private/os_error.c
         src/corelib/private/os_object.c
         src/corelib/private/os_path.c
@@ -91,15 +91,18 @@ set(SOURCE_FILES
         src/corelib/private/os_vio.c
         src/corelib/private/os_watchdog.c
         src/corelib/private/os_time.c
-        src/cetech/resource/private/resource.c
-        src/cetech/resource/private/resource_package.c
-        src/cetech/resource/private/resource_compiler.c
+        src/corelib/private/os_window_sdl2.c
         src/corelib/private/fs.c
         src/corelib/private/yng.c
         src/corelib/private/ydb.cpp
         src/corelib/private/cdb.c
         src/corelib/private/ebus.c
+        src/corelib/private/core.c
 
+        src/cetech/resource/private/resource.c
+        src/cetech/resource/private/resource_package.c
+        src/cetech/resource/private/resource_compiler.c
+        src/cetech/kernel/kernel.c
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/debugui/private/ocornut-imgui/imgui.cpp
         src/cetech/debugui/private/ocornut-imgui/imgui_draw.cpp
@@ -109,7 +112,6 @@ set(SOURCE_FILES
         src/cetech/debugdraw/private/debugdraw/bounds.cpp
         src/cetech/debugdraw/private/debugdraw.cpp
 
-        src/corelib/private/os_window_sdl2.c
         src/cetech/machine/private/machine_sdl2.c
 
         src/cetech/playground/private/entity_preview.c
@@ -150,8 +152,7 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_system.c
         src/cetech/playground/private/command_history.c
         src/cetech/playground/private/log_view.cpp
-        src/cetech/playground/private/action_manager.c
-        src/cetech/kernel/core.c)
+        src/cetech/playground/private/action_manager.c)
 
 ################################################################################
 # Main sources

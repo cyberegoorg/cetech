@@ -171,6 +171,19 @@ static void _on_obj_change(uint64_t obj,
                            uint64_t *prop,
                            uint32_t prop_count) {
 
+    uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
+
+    struct ct_world world = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+    };
+
+    struct ct_entity ent = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
+    };
+
+    struct ct_mesh_renderer *mr;
+    mr = ct_ecs_a0->entity_data(world, MESH_RENDERER_COMPONENT, ent);
+
     ct_cdb_obj_o *writer = NULL;
     for (int k = 0; k < prop_count; ++k) {
         if (prop[k] == PROP_SCENE) {
@@ -215,7 +228,6 @@ static void _on_obj_change(uint64_t obj,
             uint32_t material_id = ct_cdb_a0->read_uint64(obj,
                                                           PROP_MATERIAL_ID, 0);
 
-
             if (!writer) {
                 writer = ct_cdb_a0->write_begin(obj);
             }
@@ -224,7 +236,22 @@ static void _on_obj_change(uint64_t obj,
                                PROP_MATERIAL_REF,
                                ct_material_a0->resource_create(material_id));
 
+        } else if (prop[k] == PROP_MATERIAL_REF) {
+            uint64_t matrerial = ct_cdb_a0->read_uint64(obj, PROP_MATERIAL_REF, 0);
+
+            mr->material = matrerial;
+
+        } else if (prop[k] == PROP_MESH_ID) {
+            uint64_t mesh = ct_cdb_a0->read_uint64(obj, PROP_MESH_ID, 0);
+
+            mr->mesh_id = mesh;
+
+        } else if (prop[k] == PROP_SCENE_ID) {
+            uint64_t scene = ct_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
+
+            mr->scene_id = scene;
         }
+
     }
 
     if (writer) {
@@ -233,9 +260,7 @@ static void _on_obj_change(uint64_t obj,
 }
 
 static void _component_spawner(uint64_t event) {
-    uint64_t obj = ct_cdb_a0->read_ref(event,
-                                       CT_ID64_0("obj"),
-                                       0);
+    uint64_t obj = ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0);
 
     struct ct_mesh_renderer *mesh = ct_cdb_a0->read_ptr(event,
                                                         CT_ID64_0("data"),

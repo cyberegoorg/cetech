@@ -180,7 +180,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
 static int load_from_yaml_file(const char *yaml,
                                struct ct_alloc *alloc) {
 
-    struct ct_vio *f = ct_vio_a0->from_file(yaml, VIO_OPEN_READ);
+    struct ct_vio *f = ct_os_a0->vio_a0->from_file(yaml, VIO_OPEN_READ);
     struct ct_yng_doc *d = ct_yng_a0->from_vio(f, alloc);
     f->close(f);
 
@@ -237,13 +237,7 @@ struct ct_config_a0 *ct_config_a0 = &config_a0;
 CETECH_MODULE_DEF(
         config,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+
         },
         {
             CT_UNUSED(reload);

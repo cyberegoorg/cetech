@@ -76,7 +76,7 @@ static void add_module(const char *path,
 
 static const char *get_module_name(const char *path,
                                    uint32_t *len) {
-    const char *filename = ct_path_a0->filename(path);
+    const char *filename = ct_os_a0->path_a0->filename(path);
     const char *name = strchr(filename, '_');
     if (NULL == name) {
         return NULL;
@@ -106,12 +106,12 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_load_module");
 
-    void *obj = ct_object_a0->load(path);
+    void *obj = ct_os_a0->object_a0->load(path);
     if (obj == NULL) {
         return false;
     }
 
-    ct_load_module_t load_fce = (ct_load_module_t) ct_object_a0->load_function(
+    ct_load_module_t load_fce = (ct_load_module_t) ct_os_a0->object_a0->load_function(
             obj,
             (buffer));
     if (load_fce == NULL) {
@@ -120,7 +120,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_unload_module");
 
-    ct_unload_module_t unload_fce = (ct_unload_module_t) ct_object_a0->load_function(
+    ct_unload_module_t unload_fce = (ct_unload_module_t) ct_os_a0->object_a0->load_function(
             obj,
             buffer);
     if (unload_fce == NULL) {
@@ -129,7 +129,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_initapi_module");
 
-    ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_object_a0->load_function(
+    ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_os_a0->object_a0->load_function(
             obj, buffer);
     if (initapi_fce == NULL) {
         return false;
@@ -201,7 +201,7 @@ static void reload(const char *path) {
         old_module.unload(ct_api_a0, 1);
         _G.modules[i] = new_module;
 
-        ct_object_a0->unload(old_module.handler);
+        ct_os_a0->object_a0->unload(old_module.handler);
 
         break;
     }
@@ -252,7 +252,7 @@ static void load_dirs() {
 
 
         const char *module_file = ct_cdb_a0->read_str(_G.config, key_id, "");
-        ct_path_a0->join(&buffer,
+        ct_os_a0->path_a0->join(&buffer,
                          _G.allocator,
                          2, path, module_file);
         load(buffer);
@@ -352,15 +352,7 @@ static void _init(struct ct_api_a0 *api) {
 CETECH_MODULE_DEF(
         module,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_object_a0);
-            CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_watchdog_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+
         },
         {
             CT_UNUSED(reload);

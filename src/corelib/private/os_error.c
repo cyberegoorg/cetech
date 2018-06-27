@@ -5,7 +5,6 @@
 #include <corelib/allocator.h>
 
 #include <corelib/api_system.h>
-#include <corelib/private/allocator_core_private.h>
 #include <corelib/log.h>
 #include <corelib/os.h>
 #include <corelib/module.h>
@@ -14,13 +13,14 @@
 
 #include <execinfo.h>
 #include <corelib/macros.h>
+#include <corelib/memory.h>
 
 #endif
 
 
 char *stacktrace(int skip) {
 #if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
-    struct ct_alloc *a = coreallocator_get();
+    struct ct_alloc *a = ct_core_allocator_a0->alloc;
 
     char *return_str = CT_ALLOC(a, char, 4096);
     return_str[0] = '\0';
@@ -75,7 +75,7 @@ char *stacktrace(int skip) {
 }
 
 void stacktrace_free(char *st) {
-    struct ct_alloc *a = coreallocator_get();
+    struct ct_alloc *a = ct_core_allocator_a0->alloc;
 
     CT_FREE(a, st);
 }
@@ -96,23 +96,8 @@ void ct_error_assert(const char *where,
     abort();
 }
 
-static struct ct_error_a0 error_api = {
+struct ct_error_a0 error_api = {
         .assert = ct_error_assert
 };
 
 struct ct_error_a0 *ct_error_a0 = &error_api;
-
-CETECH_MODULE_DEF(
-        error,
-        {
-            CETECH_GET_API(api, ct_log_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_error_a0", ct_error_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)

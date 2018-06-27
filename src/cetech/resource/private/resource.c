@@ -64,7 +64,7 @@ char *resource_compiler_get_build_dir(struct ct_alloc *a,
                                                     CONFIG_BUILD_DIR, "");
 
     char *buffer = NULL;
-    ct_path_a0->join(&buffer, a, 2, build_dir_str, platform);
+    ct_os_a0->path_a0->join(&buffer, a, 2, build_dir_str, platform);
 
     return buffer;
 }
@@ -165,7 +165,7 @@ static void load(uint32_t type,
                          filename, build_name);
 
         char *build_full = NULL;
-        ct_path_a0->join(&build_full,
+        ct_os_a0->path_a0->join(&build_full,
                          _G.allocator, 2,
                          ct_cdb_a0->read_str(_G.config,
                                              CONFIG_KERNEL_PLATFORM, ""),
@@ -183,10 +183,10 @@ static void load(uint32_t type,
                                                    object);
 
 
-            ct_thread_a0->spin_lock(&_G.lock);
+            ct_os_a0->thread_a0->spin_lock(&_G.lock);
             ct_hash_add(&_G.resource_map, rid.i64,
                         (uint64_t) object, _G.allocator);
-            ct_thread_a0->spin_unlock(&_G.lock);
+            ct_os_a0->thread_a0->spin_unlock(&_G.lock);
             ct_fs_a0->close(resource_file);
         }
     }
@@ -402,11 +402,9 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_fs_a0);
             CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_thread_a0);
             CETECH_GET_API(api, ct_cdb_a0);
         },
         {

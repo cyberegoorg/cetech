@@ -71,7 +71,7 @@ void thread_spin_unlock(struct ct_spinlock *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }
 
-static struct ct_thread_a0 thread_api = {
+struct ct_thread_a0 thread_api = {
         .create = thread_create,
         .kill = thread_kill,
         .wait = thread_wait,
@@ -83,19 +83,3 @@ static struct ct_thread_a0 thread_api = {
 };
 
 struct ct_thread_a0 *ct_thread_a0 = &thread_api;
-
-CETECH_MODULE_DEF(
-        thread,
-        {
-            CT_UNUSED(api);
-
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_thread_a0", ct_thread_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)

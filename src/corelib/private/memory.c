@@ -9,7 +9,7 @@
 #include "corelib/log.h"
 
 #include "memory_private.h"
-#include "corelib/private/allocator_core_private.h"
+
 
 
 #define LOG_WHERE "memory"
@@ -80,8 +80,6 @@ void register_api(struct ct_api_a0 *api) {
 
 
     api->register_api("ct_memory_a0", &_api);
-
-    CETECH_GET_API(api, ct_log_a0);
 }
 
 void memory_init() {

@@ -545,107 +545,107 @@ static void destroy(struct ct_world world,
 // Resource
 //==============================================================================
 
-static void _change_prop(struct world_instance *w,
-                         uint64_t obj,
-                         uint64_t component,
-                         struct ct_entity *ent,
-                         uint32_t ent_n,
-                         uint64_t prop_offset,
-                         enum ct_cdb_type type,
-                         uint64_t prop) {
-    for (int l = 0; l < ent_n; ++l) {
-        uint8_t *comp_data = entity_data(w->world, component, ent[l]);
+//static void _change_prop(struct world_instance *w,
+//                         uint64_t obj,
+//                         uint64_t component,
+//                         struct ct_entity *ent,
+//                         uint32_t ent_n,
+//                         uint64_t prop_offset,
+//                         enum ct_cdb_type type,
+//                         uint64_t prop) {
+//    for (int l = 0; l < ent_n; ++l) {
+//        uint8_t *comp_data = entity_data(w->world, component, ent[l]);
+//
+//        struct data {
+//            union {
+//                float f;
+//                float v3[3];
+//                float v4[4];
+//                float m16[16];
+//                uint32_t u32;
+//                uint64_t u64;
+//                uint64_t ref;
+//                void *ptr;
+//            };
+//        };
+//
+//        struct data *dt = (struct data *) (comp_data + prop_offset);
+//
+//        switch (type) {
+//            case CDB_TYPE_NONE:
+//            case CDB_TYPE_STR:
+//                break;
+//
+//            case CDB_TYPE_REF:
+//                dt->ref = ct_cdb_a0->read_ref(obj, prop, 0);
+//                break;
+//
+//            case CDB_TYPE_UINT64:
+//                dt->u64 = ct_cdb_a0->read_uint64(obj, prop, 0);
+//                break;
+//            case CDB_TYPE_PTR:
+//                dt->ptr = ct_cdb_a0->read_ptr(obj, prop,
+//                                              NULL);
+//                break;
+//
+//            case CDB_TYPE_FLOAT:
+//                dt->f = ct_cdb_a0->read_float(obj, prop,
+//                                              0.0f);
+//                break;
+//
+//            case CDB_TYPE_VEC3:
+//                ct_cdb_a0->read_vec3(obj, prop, dt->v3);
+//                break;
+//
+//            case CDB_TYPE_VEC4:
+//                ct_cdb_a0->read_vec4(obj, prop, dt->v4);
+//                break;
+//
+//            case CDB_TYPE_MAT4:
+//                ct_cdb_a0->read_mat4(obj, prop, dt->m16);
+//                break;
+//
+//            default:
+//                break;
+//        }
+//    }
+//}
 
-        struct data {
-            union {
-                float f;
-                float v3[3];
-                float v4[4];
-                float m16[16];
-                uint32_t u32;
-                uint64_t u64;
-                uint64_t ref;
-                void *ptr;
-            };
-        };
-
-        struct data *dt = (struct data *) (comp_data + prop_offset);
-
-        switch (type) {
-            case CDB_TYPE_NONE:
-            case CDB_TYPE_STR:
-                break;
-
-            case CDB_TYPE_REF:
-                dt->ref = ct_cdb_a0->read_ref(obj, prop, 0);
-                break;
-
-            case CDB_TYPE_UINT64:
-                dt->u64 = ct_cdb_a0->read_uint64(obj, prop, 0);
-                break;
-            case CDB_TYPE_PTR:
-                dt->ptr = ct_cdb_a0->read_ptr(obj, prop,
-                                              NULL);
-                break;
-
-            case CDB_TYPE_FLOAT:
-                dt->f = ct_cdb_a0->read_float(obj, prop,
-                                              0.0f);
-                break;
-
-            case CDB_TYPE_VEC3:
-                ct_cdb_a0->read_vec3(obj, prop, dt->v3);
-                break;
-
-            case CDB_TYPE_VEC4:
-                ct_cdb_a0->read_vec4(obj, prop, dt->v4);
-                break;
-
-            case CDB_TYPE_MAT4:
-                ct_cdb_a0->read_mat4(obj, prop, dt->m16);
-                break;
-
-            default:
-                break;
-        }
-    }
-}
-
-static void _on_ent_comp_obj_change(uint64_t obj,
-                                    const uint64_t *prop,
-                                    uint32_t prop_count,
-                                    void *data) {
-    uint64_t ent_obj = (uint64_t) data;
-
-    struct ct_world world = {.h = ct_cdb_a0->read_uint64(ent_obj,
-                                                         CT_ID64_0("world"),
-                                                         0)};
-
-    struct ct_entity ent = {.h = ct_cdb_a0->read_uint64(ent_obj,
-                                                        CT_ID64_0("entity"),
-                                                        0)};
-
-    struct world_instance *w = get_world_instance(world);
-
-
-    uint64_t component = ct_cdb_a0->type(obj);
-    uint64_t comp_idx = component_idx(component);
-
-    for (int i = 0; i < prop_count; ++i) {
-        enum ct_cdb_type type = ct_cdb_a0->prop_type(obj, prop[i]);
-
-        uint64_t prop_offset;
-        prop_offset = ct_hash_lookup(&_G.component_param_offset[comp_idx],
-                                     prop[i],
-                                     UINT64_MAX);
-
-        if (prop_offset == UINT64_MAX) {
-            continue;
-        }
-
-        _change_prop(w, obj, component, &ent, 1, prop_offset, type, prop[i]);
-    }
-}
+//static void _on_ent_comp_obj_change(uint64_t obj,
+//                                    const uint64_t *prop,
+//                                    uint32_t prop_count,
+//                                    void *data) {
+//    uint64_t ent_obj = (uint64_t) data;
+//
+//    struct ct_world world = {.h = ct_cdb_a0->read_uint64(ent_obj,
+//                                                         CT_ID64_0("world"),
+//                                                         0)};
+//
+//    struct ct_entity ent = {.h = ct_cdb_a0->read_uint64(ent_obj,
+//                                                        CT_ID64_0("entity"),
+//                                                        0)};
+//
+//    struct world_instance *w = get_world_instance(world);
+//
+//
+//    uint64_t component = ct_cdb_a0->type(obj);
+//    uint64_t comp_idx = component_idx(component);
+//
+//    for (int i = 0; i < prop_count; ++i) {
+//        enum ct_cdb_type type = ct_cdb_a0->prop_type(obj, prop[i]);
+//
+//        uint64_t prop_offset;
+//        prop_offset = ct_hash_lookup(&_G.component_param_offset[comp_idx],
+//                                     prop[i],
+//                                     UINT64_MAX);
+//
+//        if (prop_offset == UINT64_MAX) {
+//            continue;
+//        }
+//
+//        _change_prop(w, obj, component, &ent, 1, prop_offset, type, prop[i]);
+//    }
+//}
 
 static void _load(uint64_t from,
                   uint64_t parent) {
@@ -823,8 +823,8 @@ static struct ct_entity _spawn_entity(struct ct_world world,
                                                   component_type,
                                                   0);
 
-        ct_cdb_a0->register_notify(component_obj,
-                                   _on_ent_comp_obj_change, (void *) root_obj);
+//        ct_cdb_a0->register_notify(component_obj,
+//                                   _on_ent_comp_obj_change, (void *) root_obj);
 
         uint64_t event;
         event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
@@ -996,7 +996,6 @@ struct ct_ecs_a0 *ct_ecs_a0 = &_api;
 
 static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_ecs_a0", &_api);
-
 }
 
 static void _init(struct ct_api_a0 *api) {
@@ -1026,10 +1025,8 @@ CETECH_MODULE_DEF(
         ecs,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);

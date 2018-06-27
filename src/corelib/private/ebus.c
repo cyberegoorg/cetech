@@ -269,13 +269,6 @@ static struct ct_ebus_a0 _api = {
 struct ct_ebus_a0 *ct_ebus_a0 = &_api;
 
 static void _init(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_thread_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_cpu_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_cdb_a0);
-
 
     api->register_api("ct_ebus_a0", &_api);
 

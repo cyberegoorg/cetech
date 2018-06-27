@@ -180,7 +180,7 @@ static void ui_asset_list() {
         char dirname[128] = {0};
         for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
             const char *path = _G.dir_list[i];
-            ct_path_a0->dirname(dirname, path);
+            ct_os_a0->path_a0->dirname(dirname, path);
             uint64_t filename_hash = CT_ID64_0(dirname);
 
             if (!_G.asset_filter.PassFilter(dirname)) {
@@ -201,7 +201,7 @@ static void ui_asset_list() {
     if (_G.asset_list) {
         for (uint32_t i = 0; i < _G.asset_list_count; ++i) {
             const char *path = _G.asset_list[i];
-            const char *filename = ct_path_a0->filename(path);
+            const char *filename = ct_os_a0->path_a0->filename(path);
             uint64_t filename_hash = CT_ID64_0(filename);
 
             if (!_G.asset_filter.PassFilter(filename)) {
@@ -304,7 +304,7 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_path_a0);
+            CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ebus_a0);

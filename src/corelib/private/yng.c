@@ -29,7 +29,7 @@ static struct _G {
 void add_key(const char *key,
              uint32_t key_len,
              uint64_t key_hash) {
-    ct_thread_a0->spin_lock(&_G.key_lock);
+    ct_os_a0->thread_a0->spin_lock(&_G.key_lock);
     const uint32_t idx = ct_array_size(_G.key_to_str_offset);
     const uint32_t offset = ct_array_size(_G.key_to_str_data);
 
@@ -38,7 +38,7 @@ void add_key(const char *key,
     ct_array_push(_G.key_to_str_offset, offset, _G.allocator);
 
     ct_hash_add(&_G.key_to_str, key_hash, idx, _G.allocator);
-    ct_thread_a0->spin_unlock(&_G.key_lock);
+    ct_os_a0->thread_a0->spin_unlock(&_G.key_lock);
 }
 
 const char *get_key(uint64_t hash) {
@@ -1250,10 +1250,7 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         yamlng,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_thread_a0);
+
         },
         {
             CT_UNUSED(reload);

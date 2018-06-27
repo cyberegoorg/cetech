@@ -113,10 +113,8 @@ int sceneinit(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
     CETECH_GET_API(api, ct_scenegprah_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_thread_a0);
 
     _G = {
             .allocator=ct_memory_a0->main_allocator(),
@@ -219,10 +217,8 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_scenegprah_a0);
-            CETECH_GET_API(api, ct_path_a0);
-            CETECH_GET_API(api, ct_vio_a0);
+            CETECH_GET_API(api, ct_os_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_thread_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_renderer_a0);
         },

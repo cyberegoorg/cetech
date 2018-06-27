@@ -1170,9 +1170,7 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         cdb,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_log_a0);
+
         },
         {
             CT_UNUSED(reload);

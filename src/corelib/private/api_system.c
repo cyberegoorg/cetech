@@ -89,10 +89,3 @@ void api_shutdown() {
     ct_hash_free(&_G.api_map, _G.allocator);
 }
 
-struct ct_api_a0 *api_v0() {
-    return &a0;
-}
-
-struct ct_api_a0 *ct_api_get() {
-    return &a0;
-}

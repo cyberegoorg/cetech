@@ -10,11 +10,10 @@
 #include "corelib/private/log_system_private.h"
 #include "corelib/private/memory_private.h"
 #include "corelib/private/api_private.h"
-#include "corelib/private/allocator_core_private.h"
 
 #include <corelib/ebus.h>
 
-#include <cetech/kernel/core.h>
+#include <corelib/core.h>
 #include <corelib/buffer.inl>
 #include <corelib/task.h>
 #include <cetech/resource/resource.h>
@@ -71,24 +70,24 @@ int init_config(int argc,
 
     const char *build_dir_str = ct_cdb_a0->read_str(object, CONFIG_BUILD, "");
     char *build_dir = NULL;
-    ct_path_a0->join(&build_dir, _G.allocator, 2,
+    ct_os_a0->path_a0->join(&build_dir, _G.allocator, 2,
                      build_dir_str,
                      ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM, ""));
 
     char *build_config = NULL;
-    ct_path_a0->join(&build_config, _G.allocator, 2, build_dir,
+    ct_os_a0->path_a0->join(&build_config, _G.allocator, 2, build_dir,
                      "global.config");
 
     const char *source_dir_str = ct_cdb_a0->read_str(object, CONFIG_SRC, "");
     char *source_config = NULL;
-    ct_path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
+    ct_os_a0->path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
                      "global.config");
 
     ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM, ""); //TODO: REMOVGE
 
     if (ct_cdb_a0->read_uint64(object, CONFIG_COMPILE, 0)) {
-        ct_path_a0->make_path(build_dir);
-        ct_path_a0->copy_file(_G.allocator, source_config, build_config);
+        ct_os_a0->path_a0->make_path(build_dir);
+        ct_os_a0->path_a0->copy_file(_G.allocator, source_config, build_config);
     }
 
     ct_config_a0->load_from_yaml_file(build_config, _G.allocator);
@@ -106,12 +105,13 @@ int init_config(int argc,
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
-    corelib_init();
-    struct ct_api_a0 *api = api_v0();
+    ct_corelib_init();
+
+    struct ct_api_a0 *api = ct_api_a0;
 
     CETECH_GET_API(api, ct_log_a0);
     CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_path_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_config_a0);
     CETECH_GET_API(api, ct_module_a0);
     CETECH_GET_API(api, ct_cdb_a0);
@@ -138,9 +138,8 @@ int cetech_kernel_init(int argc,
 
 
     CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_time_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_package_a0);
-
     CETECH_GET_API(api, ct_machine_a0);
     CETECH_GET_API(api, ct_debugui_a0);
     CETECH_GET_API(api, ct_renderer_a0);
@@ -160,7 +159,7 @@ int cetech_kernel_init(int argc,
 int cetech_kernel_shutdown() {
     ct_log_a0->debug(LOG_WHERE, "Shutdown");
     ct_module_a0->unload_all();
-    corelib_shutdown();
+    ct_corelib_shutdown();
 
     return 1;
 }
@@ -294,10 +293,10 @@ void application_start() {
 
     _G.is_running = 1;
 
-    const uint64_t fq = ct_time_a0->perf_freq();
-    uint64_t last_tick = ct_time_a0->perf_counter();
+    const uint64_t fq = ct_os_a0->time_a0->perf_freq();
+    uint64_t last_tick = ct_os_a0->time_a0->perf_counter();
     while (_G.is_running) {
-        uint64_t now_ticks = ct_time_a0->perf_counter();
+        uint64_t now_ticks = ct_os_a0->time_a0->perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
@@ -305,9 +304,7 @@ void application_start() {
         ct_ebus_a0->begin_frame();
         ct_machine_a0->update(dt);
 
-        uint64_t event = ct_cdb_a0->create_object(
-                ct_cdb_a0->global_db(),
-                KERNEL_UPDATE_EVENT);
+        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), KERNEL_UPDATE_EVENT);
         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
         ct_cdb_a0->set_float(w, CT_ID64_0("dt"), dt);
         ct_cdb_a0->write_commit(w);

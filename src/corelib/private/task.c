@@ -159,7 +159,7 @@ static int _task_worker(void *o) {
 
     while (_G.is_running) {
         if (!do_work()) {
-            ct_thread_a0->yield();
+            ct_os_a0->thread_a0->yield();
         }
     }
 
@@ -223,17 +223,13 @@ static struct ct_task_a0 _task_api = {
 struct ct_task_a0 *ct_task_a0 = &_task_api;
 
 static void _init(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_thread_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_cpu_a0);
 
     api->register_api("ct_task_a0", &_task_api);
     ct_log_a0->set_wid_clb(worker_id);
 
     _G = (struct _G) {.allocator = ct_memory_a0->main_allocator()};
 
-    int core_count = ct_cpu_a0->count();
+    int core_count = ct_os_a0->cpu_a0->count();
 
     static const uint32_t main_threads_count = 1 + 1/* Renderer */;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -251,7 +247,7 @@ static void _init(struct ct_api_a0 *api) {
     atomic_init(&_G.task_pool_idx, 1);
 
     for (uint32_t j = 0; j < worker_count; ++j) {
-        _G.workers[j] = ct_thread_a0->create(_task_worker, "cetech_worker",
+        _G.workers[j] = ct_os_a0->thread_a0->create(_task_worker, "cetech_worker",
                                              (void *) ((intptr_t) (j + 1)));
     }
 
@@ -263,7 +259,7 @@ static void _shutdown() {
     int status = 0;
 
     for (uint32_t i = 0; i < _G.workers_count; ++i) {
-        ct_thread_a0->wait(_G.workers[i], &status);
+        ct_os_a0->thread_a0->wait(_G.workers[i], &status);
     }
 
     queue_task_destroy(&_G.job_queue);

@@ -6,8 +6,10 @@
 struct ct_alloc;
 
 struct ct_core_allocator_a0 {
-    struct ct_alloc *(*get_allocator)();
+    struct ct_alloc* alloc;
 };
+
+CT_MODULE(ct_core_allocator_a0);
 
 //==============================================================================
 // Api

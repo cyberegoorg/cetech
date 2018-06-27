@@ -206,7 +206,7 @@ void window_destroy(struct ct_alloc *alloc,
     CT_FREE(alloc, w);
 }
 
-static struct ct_window_a0 window_api = {
+struct ct_window_a0 window_api = {
         .create = window_new,
         .create_from = window_new_from,
         .destroy = window_destroy,
@@ -217,9 +217,6 @@ struct ct_window_a0 *ct_window_a0 = &window_api;
 
 
 int sdl_window_init(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_ebus_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
 
     api->register_api("ct_window_a0", &window_api);
     ct_ebus_a0->create_ebus(WINDOW_EBUS_NAME, WINDOW_EBUS);

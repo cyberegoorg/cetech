@@ -67,13 +67,11 @@ static void ui_float(uint64_t obj,
     float value = 0;
     float value_new = 0;
 
-    ct_cdb_a0->read_float(obj, prop_key_hash, value_new);
+    value_new = ct_cdb_a0->read_float(obj, prop_key_hash, value_new);
     value = value_new;
 
-    const float min = !prop->limit.max_f ? -FLT_MAX
-                                         : prop->limit.min_f;
-    const float max = !prop->limit.max_f ? FLT_MAX
-                                         : prop->limit.max_f;
+    const float min = !prop->limit.max_f ? -FLT_MAX : prop->limit.min_f;
+    const float max = !prop->limit.max_f ? FLT_MAX : prop->limit.max_f;
 
     if (ct_debugui_a0->DragFloat(prop->ui_name,
                                  &value_new, 1.0f,

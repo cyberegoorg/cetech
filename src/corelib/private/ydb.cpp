@@ -37,11 +37,11 @@ void expire_document_in_cache(const char *path,
         return;
     }
 
-    ct_thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
     ct_yng_doc *doc = _G.document_cache[idx];
     ct_hash_remove(&_G.document_cache_map, path_key);
     ct_yng_a0->destroy(doc);
-    ct_thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
 }
 
 ct_yng_doc *load_to_cache(const char *path,
@@ -67,7 +67,7 @@ ct_yng_doc *load_to_cache(const char *path,
         return NULL;
     }
 
-    ct_thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
     uint32_t idx = ct_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
     if (UINT32_MAX == idx) {
         ct_array_push(_G.document_cache, doc, _G.allocator);
@@ -78,25 +78,25 @@ ct_yng_doc *load_to_cache(const char *path,
     } else {
         _G.document_cache[idx] = doc;
     }
-    ct_thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
 
     return doc;
 }
 
 ct_yng_doc *get(const char *path) {
-    ct_thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
 
     uint64_t path_key = CT_ID64_0(path);
 
     uint32_t idx = ct_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
     if (UINT32_MAX == idx) {
-        ct_thread_a0->spin_unlock(&_G.cache_lock);
+        ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
         return load_to_cache(path, path_key);
     }
 
     struct ct_yng_doc *doc;
     doc = _G.document_cache[idx];
-    ct_thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
     return doc;
 };
 
@@ -590,13 +590,7 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         ydb,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_thread_a0);
-            CETECH_GET_API(api, ct_path_a0);
+
         },
         {
             CT_UNUSED(reload);

@@ -22,11 +22,11 @@
 #include <corelib/hashlib.h>
 #include <corelib/allocator.h>
 
-#define LOG_WHERE "watchdog"
+#define LOG_WHERE_WATCHDOG "watchdog"
 #define _G watchdog_globals
 
 struct _G {
-    struct ct_alloc *allocator;
+
 } _G;
 
 
@@ -53,10 +53,10 @@ void add_dir(ct_watchdog_instance_t *inst,
 #ifdef CETECH_LINUX
     //    int wd = 0;
     //    wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
-    //    ct_log_a0->debug(LOG_WHERE, "New watch -> %s", path);
+    //    ct_log_a0->debug(LOG_WHERE_WATCHDOG, "New watch -> %s", path);
     //
     //    if (-1 == wd) {
-    //        ct_log_a0->error(LOG_WHERE, "Could not add watch -> %s",
+    //        ct_log_a0->error(LOG_WHERE_WATCHDOG, "Could not add watch -> %s",
     //                        strerror(errno));
     //        return;
     //    }
@@ -68,19 +68,21 @@ void add_dir(ct_watchdog_instance_t *inst,
 //    celib::map::set(wi->dir2wd, path_hash, wd);
 //    celib::map::set(wi->wd2dir, wd, path_dup);
 
+    struct ct_alloc* allocator = ct_memory_a0->main_allocator();
+
     if (recursive) {
         char **files;
         uint32_t files_count;
 
-        ct_path_a0->list(path, "*", 1, 1, &files, &files_count,
-                         _G.allocator);
+        ct_os_a0->path_a0->list(path, "*", 1, 1, &files, &files_count,
+        allocator);
 
         for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
-        ct_path_a0->list_free(files, files_count,
-                              _G.allocator);
+        ct_os_a0->path_a0->list_free(files, files_count,
+                              allocator);
     }
 }
 
@@ -197,7 +199,7 @@ struct ct_watchdog *create(struct ct_alloc *alloc) {
 #ifdef CETECH_LINUX
     int inotify = inotify_init1(IN_NONBLOCK);
     if (-1 == inotify) {
-        ct_log_a0->error(LOG_WHERE, "Could not init inotify");
+        ct_log_a0->error(LOG_WHERE_WATCHDOG, "Could not init inotify");
         return NULL;
     }
     watchdog_inst->inotify = inotify;
@@ -248,29 +250,10 @@ void destroy(struct ct_watchdog *watchdog) {
     CT_FREE(alloc, watchdog);
 }
 
-static struct ct_watchdog_a0 wathdog_api = {
+struct ct_watchdog_a0 wathdog_api = {
         .create = create,
         .destroy = destroy,
 };
 
 
 struct ct_watchdog_a0 *ct_watchdog_a0 = &wathdog_api;
-
-CETECH_MODULE_DEF(
-        watchdog,
-        {
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_path_a0);
-        },
-        {
-            CT_UNUSED(reload);
-            api->register_api("ct_watchdog_a0", &wathdog_api);
-            _G = (struct _G) {.allocator = ct_memory_a0->main_allocator()};
-        },
-        {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
-        }
-)

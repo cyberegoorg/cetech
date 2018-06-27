@@ -3,9 +3,10 @@
 
 #include <stdint.h>
 #include <corelib/hash.inl>
+#include <corelib/memory.h>
 
 #include "corelib/allocator.h"
-#include "allocator_core_private.h"
+#include "corelib/api_system.h"
 #include "memory_private.h"
 
 static uint32_t size_with_padding(uint32_t size,
@@ -24,7 +25,7 @@ void *malloc_allocator_allocate(const struct ct_alloc *allocator,
                                 const char *filename,
                                 uint32_t line) {
 
-    struct ct_alloc *core_alloc = coreallocator_get();
+    struct ct_alloc *core_alloc = ct_core_allocator_a0->alloc;
     struct allocator_malloc *a = (struct allocator_malloc *) allocator->inst;
 
     if (size) {
@@ -63,7 +64,7 @@ static struct ct_alloc_fce alloc_fce = {
 };
 
 struct ct_alloc *malloc_allocator_create() {
-    struct ct_alloc *core_alloc = coreallocator_get();
+    struct ct_alloc *core_alloc = ct_core_allocator_a0->alloc;
 
     struct ct_alloc *a = CT_ALLOC(core_alloc, struct ct_alloc,
                                   sizeof(struct ct_alloc));
@@ -82,7 +83,7 @@ struct ct_alloc *malloc_allocator_create() {
 }
 
 void malloc_allocator_destroy(struct ct_alloc *a) {
-    struct ct_alloc *core_alloc = coreallocator_get();
+    struct ct_alloc *core_alloc = ct_core_allocator_a0->alloc;
     struct allocator_malloc *m = (struct allocator_malloc *) a->inst;
 
     CT_FREE(core_alloc, m);

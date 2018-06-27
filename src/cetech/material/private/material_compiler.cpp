@@ -196,7 +196,7 @@ void foreach_layer(const char *filename,
 
 void name_from_filename(const char *fullname,
                         char *name) {
-    const char *resource_type = ct_path_a0->extension(fullname);
+    const char *resource_type = ct_os_a0->path_a0->extension(fullname);
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
     memcpy(name, fullname, size);
 }
@@ -275,8 +275,7 @@ void compiler(const char *filename,
 int materialcompiler_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_path_a0);
-    CETECH_GET_API(api, ct_vio_a0);
+    CETECH_GET_API(api, ct_os_a0);
     CETECH_GET_API(api, ct_hashlib_a0);
     CETECH_GET_API(api, ct_yng_a0);
     CETECH_GET_API(api, ct_ydb_a0);
