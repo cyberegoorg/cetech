@@ -21,6 +21,7 @@
 #include <corelib/fmath.inl>
 #include <cetech/playground/command_system.h>
 #include <corelib/hash.inl>
+#include <cetech/playground/selected_object.h>
 
 
 #define _G entity_property_global
@@ -32,7 +33,6 @@ static struct _G {
 
     struct ct_hash_t components;
 
-    const char *filename;
     struct ct_alloc *allocator;
     uint64_t obj;
 } _G;
@@ -299,15 +299,7 @@ static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
     return NULL;
 };
 
-static void on_component(struct ct_world world,
-                         uint64_t obj,
-                         uint64_t comp_name) {
-    struct ct_component_info *info = ct_ecs_a0->component_info(comp_name);
-
-    if (!info) {
-        return;
-    }
-
+static void on_component(uint64_t obj) {
     uint64_t type = ct_cdb_a0->type(obj);
 
     struct ct_component_i0 *c = get_component_inteface(type);
@@ -326,67 +318,61 @@ static void on_component(struct ct_world world,
         return;
     }
 
-
     editor->property_editor(obj);
 }
 
 static void on_debugui() {
-    if (!_G.filename) {
+    uint64_t obj = ct_selected_object_a0->selected_object();
+    if(!obj) {
         return;
     }
 
-    if (ct_debugui_a0->Button("Save", (float[2]) {0.0f})) {
-        ct_ydb_a0->save(_G.filename);
+    uint64_t obj_type = ct_cdb_a0->type(obj);
+
+    if (CT_ID64_0("entity") == obj_type) {
+        if (ct_debugui_a0->CollapsingHeader("Entity",
+                                            DebugUITreeNodeFlags_DefaultOpen)) {
+            ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
+        }
+
+        uint64_t components_obj;
+        components_obj = ct_cdb_a0->read_subobject(obj,
+                                                   CT_ID64_0("components"), 0);
+
+
+        uint64_t n = ct_cdb_a0->prop_count(components_obj);
+        uint64_t components_name[n];
+        ct_cdb_a0->prop_keys(components_obj, components_name);
+
+        for (uint64_t j = 0; j < n; ++j) {
+            uint64_t name = components_name[j];
+
+            uint64_t c_obj;
+            c_obj = ct_cdb_a0->read_subobject(components_obj, name, 0);
+
+            on_component(c_obj);
+        }
+
+    } else if (get_component_inteface(obj_type)) {
+        on_component(obj);
     }
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
 
-    ct_debugui_a0->InputText("asset",
-                             (char *) _G.filename, strlen(_G.filename),
-                             DebugInputTextFlags_ReadOnly, 0, NULL);
-
-    if (ct_debugui_a0->CollapsingHeader("Entity",
-                                        DebugUITreeNodeFlags_DefaultOpen)) {
-        ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
-    }
-
-    struct ct_resource_id rid;
-    ct_resource_a0->type_name_from_filename(_G.filename, &rid, NULL);
-
-    uint64_t components_obj;
-    components_obj = ct_cdb_a0->read_subobject(_G.obj, CT_ID64_0("components"),
-                                               0);
-
-
-    uint64_t n = ct_cdb_a0->prop_count(components_obj);
-    uint64_t components_name[n];
-    ct_cdb_a0->prop_keys(components_obj, components_name);
-
-    for (uint64_t j = 0; j < n; ++j) {
-        uint64_t name = components_name[j];
-
-        uint64_t c_obj;
-        c_obj = ct_cdb_a0->read_subobject(components_obj, name, 0);
-
-        on_component(_G.active_world, c_obj, name);
-    }
 }
 
-
-void on_entity_click(uint64_t event) {
-    ct_property_editor_a0->set_active(on_debugui);
-
-    struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
-    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"), 0);
-    struct ct_entity entity = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("entity"), 0)};
-    uint64_t obj = {ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0)};
-
-    _G.active_world = world;
-    _G.top_entity = entity;
-    _G.filename = filename;
-    _G.obj = obj;
-}
+//void on_entity_click(uint64_t event) {
+//    ct_property_editor_a0->set_active(on_debugui);
+//
+//    struct ct_world world = {
+//            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+//    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"), 0);
+//    struct ct_entity entity = {
+//            ct_cdb_a0->read_uint64(event, CT_ID64_0("entity"), 0)};
+//    uint64_t obj = {ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0)};
+//
+//    _G.active_world = world;
+//    _G.top_entity = entity;
+//    _G.obj = obj;
+//}
 
 
 static struct ct_entity_property_a0 entity_property_a0 = {
@@ -396,7 +382,6 @@ static struct ct_entity_property_a0 entity_property_a0 = {
         .ui_resource = ui_resource,
         .ui_vec3 = ui_vec3,
 };
-
 
 static void set_vec3_cmd(const struct ct_cmd *cmd,
                          bool inverse) {
@@ -409,6 +394,10 @@ static void set_vec3_cmd(const struct ct_cmd *cmd,
     ct_cdb_a0->set_vec3(w, pos_cmd->prop, value);
     ct_cdb_a0->write_commit(w);
 }
+
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .draw = on_debugui,
+};
 
 static void set_float_cmd(const struct ct_cmd *cmd,
                           bool inverse) {
@@ -465,10 +454,10 @@ static void _init(struct ct_api_a0 *api) {
             .allocator = ct_memory_a0->main_allocator()
     };
 
-    api->register_api("ct_entity_property_a0", &entity_property_a0);
+    api->register_api("ct_property_editor_i0", &ct_property_editor_i0);
+    api->register_api("on_debugui", &entity_property_a0);
 
-    ct_ebus_a0->connect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT,
-                        on_entity_click, 0);
+    ct_property_editor_a0->set_active(on_debugui);
 
     ct_cmd_system_a0->register_cmd_execute(
             CT_ID64_0("set_vec3"),
@@ -491,9 +480,6 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT,
-                           on_entity_click);
-
     _G = (struct _G) {};
 }
 

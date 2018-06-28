@@ -152,7 +152,8 @@ set(SOURCE_FILES
         src/cetech/playground/private/command_system.c
         src/cetech/playground/private/command_history.c
         src/cetech/playground/private/log_view.cpp
-        src/cetech/playground/private/action_manager.c)
+        src/cetech/playground/private/action_manager.c
+        src/cetech/playground/private/selected_object.c)
 
 ################################################################################
 # Main sources

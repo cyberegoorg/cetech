@@ -101,8 +101,7 @@ static void compile_entitity(const char *filename,
                             ck.keys, CT_ARRAY_LEN(ck.keys),
                             &components_keys_count);
 
-    uint64_t obj = ct_cdb_a0->create_object(_G.db,
-                                            CT_ID64_0("entity"));
+    uint64_t obj = ct_cdb_a0->create_object(_G.db, CT_ID64_0("entity"));
 
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(obj);

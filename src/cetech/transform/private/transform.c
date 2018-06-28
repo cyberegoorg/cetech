@@ -291,11 +291,37 @@ static void property_editor(uint64_t obj) {
     ct_entity_property_a0->ui_vec3(obj, CT_ID64_0("scale"), "Scale", 0, 0);
 }
 
+void gizmo_get_transform(uint64_t obj,
+                         float *world,
+                         float *local) {
+    float pos[3] = {0};
+    ct_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
+
+//    float w[16];
+    ct_mat4_srt(world,
+                1.0f, 1.0f, 1.0f,
+                0.0f, 0.0f, 0.0f,
+                pos[0], pos[1], pos[2]);
+}
+
+void gizmo_set_transform(uint64_t obj,
+                         float *world,
+                         float *local) {
+    float pos[3] = {world[12], world[13], world[14]};
+
+
+    struct ct_cdb_obj_t* w = ct_cdb_a0->write_begin(obj);
+    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0->write_commit(w);
+}
+
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
                 .property_editor = property_editor,
+                .gizmo_get_transform = gizmo_get_transform,
+                .gizmo_set_transform = gizmo_set_transform
         };
 
         return &ct_editor_component_i0;

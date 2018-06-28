@@ -36,10 +36,12 @@ void init_static_modules() {
     //==========================================================================
     CETECH_ADD_STATIC_MODULE(cmd_system);
     CETECH_ADD_STATIC_MODULE(action_manager);
+    CETECH_ADD_STATIC_MODULE(selected_object);
 
     CETECH_ADD_STATIC_MODULE(playground);
     CETECH_ADD_STATIC_MODULE(asset_browser);
     CETECH_ADD_STATIC_MODULE(level_inspector);
+    CETECH_ADD_STATIC_MODULE(property_inspector);
     CETECH_ADD_STATIC_MODULE(entity_property);
 
     CETECH_ADD_STATIC_MODULE(transform);
@@ -50,7 +52,7 @@ void init_static_modules() {
 
     CETECH_ADD_STATIC_MODULE(default_render_graph);
     CETECH_ADD_STATIC_MODULE(command_history);
-    CETECH_ADD_STATIC_MODULE(property_inspector);
+
 
     CETECH_ADD_STATIC_MODULE(asset_property);
     CETECH_ADD_STATIC_MODULE(asset_preview);

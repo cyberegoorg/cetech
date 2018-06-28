@@ -21,7 +21,6 @@ enum {
 
 enum {
     EXPLORER_INAVLID_EVENT = 0,
-    EXPLORER_ENTITY_SELECT_EVENT,
 };
 
 //==============================================================================

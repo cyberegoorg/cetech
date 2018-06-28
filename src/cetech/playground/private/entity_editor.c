@@ -21,6 +21,7 @@
 #include <cetech/default_render_graph/default_render_graph.h>
 #include <corelib/macros.h>
 #include <string.h>
+#include <cetech/playground/selected_object.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/memory.h"
@@ -92,8 +93,13 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(pos, transform->position, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(
-            ct_ecs_a0->entity_object(world, camera_ent));
+    uint64_t ent_obj = ct_ecs_a0->entity_object(world, camera_ent);
+    uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
+                                                    CT_ID64_0("components"), 0);
+    uint64_t component = ct_cdb_a0->read_subobject(components,
+                                                   TRANSFORM_COMPONENT, 0);
+
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
     ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
     ct_cdb_a0->write_commit(w);
 
@@ -110,10 +116,26 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
+static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
+    struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
+    while (it.api) {
+        struct ct_component_i0 *i = (it.api);
+
+        if (cdb_type == i->cdb_type()) {
+            return i;
+        }
+
+        it = ct_api_a0->next(it);
+    }
+
+    return NULL;
+};
+
+
 static void on_debugui(uint64_t event) {
     char dock_id[128] = {};
 
-    _G.active_editor = UINT8_MAX;
+//    _G.active_editor = UINT8_MAX;
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         snprintf(dock_id, CT_ARRAY_LEN(dock_id),
@@ -122,33 +144,106 @@ static void on_debugui(uint64_t event) {
         if (ct_debugui_a0->BeginDock(dock_id, &_G.visible[i],
                                      DebugUIWindowFlags_NoScrollbar)) {
 
+            float size[2];
+            ct_debugui_a0->GetWindowSize(size);
+
             if (ct_debugui_a0->IsMouseHoveringWindow()) {
                 _G.active_editor = i;
+            }
 
-//                float proj[16], view[16];
-//                float size[2];
-//                ct_debugui_a0->GetWindowSize(size);
-//
-//                ct_camera_a0->get_project_view(_G.world[i], _G.camera_ent[i],
-//                                              proj, view,
-//                                              static_cast<int>(size[0]),
-//                                              static_cast<int>(size[1]));
-//
-//                static float im[16] = {
-//                        1.0f, 0.0f, 0.0f, 0.0f,
-//                        0.0f, 1.0f, 0.0f, 0.0f,
-//                        0.0f, 0.0f, 1.0f, 0.0f,
-//                        0.0f, 0.0f, 0.0f, 1.0f,
-//                };
-//                auto origin = ImGui::GetItemRectMin();
-//                ImGuizmo::SetRect(origin.x, origin.y, size[0], size[1]);
-//                ImGuizmo::Manipulate(view, proj, ImGuizmo::TRANSLATE, ImGuizmo::WORLD, im);
 
-                if (ct_debugui_a0->IsMouseClicked(0, false)) {
-                    ct_explorer_a0->set_level(_G.world[i], _G.entity[i],
-                                              _G.entity_name[i],
-                                              _G.root[i], _G.path[i]);
+            if (_G.active_editor == i) {
+                float proj[16], view[16];
+
+                ct_camera_a0->get_project_view(_G.world[i],
+                                               _G.camera_ent[i],
+                                               proj, view,
+                                               size[0],
+                                               size[1]);
+
+
+                uint64_t obj = ct_selected_object_a0->selected_object();
+
+                if (obj) {
+                    uint64_t obj_type = ct_cdb_a0->type(obj);
+                    if (obj_type == CT_ID64_0("entity")) {
+
+                        uint64_t components;
+                        components = ct_cdb_a0->read_subobject(obj, CT_ID64_0(
+                                "components"), 0);
+
+                        const uint32_t component_n = ct_cdb_a0->prop_count(
+                                components);
+                        uint64_t keys[component_n];
+                        ct_cdb_a0->prop_keys(components, keys);
+
+                        for (uint32_t i = 0; i < component_n; ++i) {
+                            uint64_t key = keys[i];
+
+                            uint64_t component = ct_cdb_a0->read_subobject(
+                                    components,
+                                    key, 0);
+                            uint64_t type = ct_cdb_a0->type(component);
+
+                            struct ct_component_i0 *c = get_component_inteface(
+                                    type);
+                            if (!c->get_interface) {
+                                continue;
+                            }
+
+                            struct ct_editor_component_i0 *editor;
+                            editor = c->get_interface(EDITOR_COMPONENT);
+
+                            if (!editor) {
+                                continue;
+                            }
+
+                            if (!editor->gizmo_get_transform) {
+                                continue;
+                            }
+
+                            float world[16];
+                            float local[16];
+
+                            ct_mat4_identity(world);
+                            ct_mat4_identity(local);
+
+                            editor->gizmo_get_transform(component,
+                                                        world,
+                                                        local);
+
+                            float min[2];
+                            float max[2];
+                            ct_debugui_a0->GetWindowPos(min);
+                            ct_debugui_a0->GetWindowSize(max);
+
+                            ct_debugui_a0->guizmo_set_rect(min[0], min[1],
+                                                           max[0], max[1]);
+
+                            ct_debugui_a0->guizmo_manipulate(view,
+                                                             proj,
+                                                             TRANSLATE,
+                                                             WORLD, world,
+                                                             0, 0, NULL, NULL);
+
+                            if (!editor->gizmo_set_transform) {
+                                continue;
+                            }
+
+                            editor->gizmo_set_transform(component,
+                                                        world,
+                                                        local);
+                        }
+
+
+                    }
                 }
+            }
+
+            if (ct_debugui_a0->IsMouseClicked(0, false)) {
+                ct_explorer_a0->set_level(_G.world[i], _G.entity[i],
+                                          _G.entity_name[i],
+                                          _G.root[i], _G.path[i]);
             }
 
 //            uint64_t obj = ct_ecs_a0->ent_obj(_G.world[i],
@@ -158,9 +253,6 @@ static void on_debugui(uint64_t event) {
             ct_render_texture_handle_t th;
             th = _G.render_graph_builder[i]->call->get_texture(
                     _G.render_graph_builder[i], CT_ID64_0("output"));
-
-            float size[2];
-            ct_debugui_a0->GetWindowSize(size);
 
             _G.render_graph_builder[i]->call->set_size(
                     _G.render_graph_builder[i], size[0], size[1]);
@@ -172,8 +264,6 @@ static void on_debugui(uint64_t event) {
                                   (float[2]) {1.0f, 1.0f},
                                   (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                                   (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-        } else {
-
         }
         ct_debugui_a0->EndDock();
     }

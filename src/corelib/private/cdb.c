@@ -1053,8 +1053,6 @@ static uint64_t prop_count(uint64_t _obj) {
     uint64_t count = obj->properties_count - 1;
 
     if (obj->prefab) {
-
-
         uint32_t prefab_prop_count = prop_count(obj->prefab);
 
         uint64_t keys[prefab_prop_count];

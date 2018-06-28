@@ -225,6 +225,7 @@ static struct ct_debugui_a0 debugui_api = {
         .ColorWheel = ImGui::ColorWheel,
         .ColorWheel2 = imgui_wrap::ColorWheel2,
         .GetWindowSize = imgui_wrap::GetWindowSize,
+        .GetWindowPos = imgui_wrap::GetWindowPos,
         .BeginDock = imgui_wrap::BeginDock,
         .EndDock = ImGui::EndDock,
         .IsWindowFocused = ImGui::IsWindowFocused,
@@ -239,6 +240,11 @@ static struct ct_debugui_a0 debugui_api = {
         .IsMouseDoubleClicked = ImGui::IsMouseDoubleClicked,
         .IsItemClicked = ImGui::IsItemClicked,
         .Separator = ImGui::Separator,
+        .GetItemRectMin = imgui_wrap::GetItemRectMin,
+        .GetItemRectMax = imgui_wrap::GetItemRectMax,
+        .GetItemRectSize = imgui_wrap::GetItemRectSize,
+        .guizmo_set_rect = imgui_wrap::guizmo_set_rect,
+        .guizmo_manipulate = imgui_wrap::guizmo_manipulate,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

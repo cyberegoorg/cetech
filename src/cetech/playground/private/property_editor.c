@@ -33,9 +33,15 @@ struct ct_property_editor_a0 *ct_property_editor_a0 = &property_inspector_api;
 
 static void on_debugui(uint64_t event) {
     if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
-        if (_G.on_debugui) {
-            _G.on_debugui();
+
+        struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
+        while (it.api) {
+            struct ct_property_editor_i0 *i = (it.api);
+            i->draw();
+
+            it = ct_api_a0->next(it);
         }
+
     }
     ct_debugui_a0->EndDock();
 }

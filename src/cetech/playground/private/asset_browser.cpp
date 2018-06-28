@@ -6,6 +6,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/playground/playground.h>
 #include <corelib/ebus.h>
+#include <cetech/playground/selected_object.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -224,11 +225,21 @@ static void ui_asset_list() {
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
                 ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
                 ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("root"),
-                                      CT_ID64_0("source"));
+                ct_cdb_a0->set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+
+                uint64_t selected_asset;
+                selected_asset = ct_cdb_a0->create_object(
+                        ct_cdb_a0->global_db(), CT_ID64_0("asset"));
+
+                w = ct_cdb_a0->write_begin(selected_asset);
+                ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
+                ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
+                ct_cdb_a0->write_commit(w);
+
+                ct_selected_object_a0->set_selected_object(selected_asset);
             }
         }
     }

@@ -84,8 +84,11 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(transform->position, pos, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(
-            ct_ecs_a0->entity_object(world, camera_ent));
+    uint64_t ent_obj = ct_ecs_a0->entity_object(world, camera_ent);
+    uint64_t components = ct_cdb_a0->read_subobject(ent_obj, CT_ID64_0("components"), 0);
+    uint64_t component = ct_cdb_a0->read_subobject(components, TRANSFORM_COMPONENT, 0);
+
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
     ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
     ct_cdb_a0->write_commit(w);
 

@@ -10,6 +10,7 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <cetech/playground/entity_property.h>
+#include <cetech/renderer/renderer.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -17,8 +18,6 @@
 #include "corelib/api_system.h"
 
 #include "corelib/module.h"
-
-#include "bgfx/c99/bgfx.h"
 
 #define _G CameraGlobal
 static struct CameraGlobal {
@@ -75,9 +74,11 @@ static void get_project_view(struct ct_world world,
 //                    (float[]){0.0f, 1.0f, 0.0f});
 
     ct_mat4_proj_fovy(proj,
-                      camera_data->fov, ratio,
-                      camera_data->near, camera_data->far,
-                      bgfx_get_caps()->homogeneousDepth);
+                      camera_data->fov,
+                      ratio,
+                      camera_data->near,
+                      camera_data->far,
+                      ct_renderer_a0->get_caps()->homogeneousDepth);
 
     ct_mat4_inverse(view, transform->world);
 }

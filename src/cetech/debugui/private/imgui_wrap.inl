@@ -635,6 +635,12 @@ namespace imgui_wrap {
         size[1] = v.y;
     }
 
+    void GetWindowPos(float pos[2]) {
+        auto v = ImGui::GetWindowPos();
+        pos[0] = v.x;
+        pos[1] = v.y;
+    }
+
     bool BeginDock(const char *label,
                    bool *opened,
                    DebugUIWindowFlags_ extra_flags) {
@@ -685,5 +691,46 @@ namespace imgui_wrap {
         return ImGui::IsWindowHovered(
                 ImGuiHoveredFlags_AllowWhenBlockedByPopup |
                 ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+    }
+
+    void GetItemRectMin(float *min) {
+        auto origin = ImGui::GetItemRectMin();
+        min[0] = origin.x;
+        min[1] = origin.y;
+    }
+
+    void GetItemRectMax(float *max) {
+        auto origin = ImGui::GetItemRectMax();
+        max[0] = origin.x;
+        max[1] = origin.y;
+    }
+
+    void GetItemRectSize(float *size) {
+        auto origin = ImGui::GetItemRectSize();
+        size[0] = origin.x;
+        size[1] = origin.y;
+    }
+
+
+    void guizmo_set_rect(float x,
+                         float y,
+                         float width,
+                         float height) {
+        ImGuizmo::SetRect(x, y, width, height);
+    }
+
+    void guizmo_manipulate(const float *view,
+                           const float *projection,
+                           OPERATION operation,
+                           MODE mode,
+                           float *matrix,
+                           float *deltaMatrix = 0,
+                           float *snap = 0,
+                           float *localBounds = NULL,
+                           float *boundsSnap = NULL) {
+        ImGuizmo::Manipulate(view, projection,
+                             static_cast<ImGuizmo::OPERATION>(operation),
+                             static_cast<ImGuizmo::MODE>(mode), matrix,
+                             deltaMatrix, snap, localBounds, boundsSnap);
     }
 }

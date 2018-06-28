@@ -199,7 +199,17 @@ enum DebugUISetCond_ {
             << 3  //!< Set the variable if the window is appearing after being hidden/inactive (or the first time)
 };
 
-//!<! DebugUI API V0
+enum OPERATION {
+    TRANSLATE,
+    ROTATE,
+    SCALE,
+};
+
+enum MODE {
+    LOCAL,
+    WORLD
+};
+
 struct ct_debugui_a0 {
     void (*render)(uint8_t viewid);
 
@@ -744,6 +754,8 @@ struct ct_debugui_a0 {
 
     void (*GetWindowSize)(float size[2]);
 
+    void (*GetWindowPos)(float pos[2]);
+
 
     void (*RootDock)(float pos[2],
                      float size[2]);
@@ -775,6 +787,26 @@ struct ct_debugui_a0 {
     bool (*IsItemClicked)(int btn);
 
     void (*Separator)();
+
+    void (*GetItemRectMin)(float *min);
+    void (*GetItemRectMax)(float *max);
+    void (*GetItemRectSize)(float *size);
+
+    void (*guizmo_set_rect)(float x,
+                            float y,
+                            float width,
+                            float height);
+
+    void (*guizmo_manipulate)(const float *view,
+                              const float *projection,
+                              enum OPERATION operation,
+                              enum MODE mode,
+                              float *matrix,
+                              float *deltaMatrix,
+                              float *snap,
+                              float *localBounds,
+                              float *boundsSnap);
+
 };
 
 CT_MODULE(ct_debugui_a0);

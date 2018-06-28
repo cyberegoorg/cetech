@@ -1,8 +1,5 @@
-#ifndef CETECH_WORLD_H
-#define CETECH_WORLD_H
-
-
-
+#ifndef CETECH_ECS_H
+#define CETECH_ECS_H
 
 //==============================================================================
 // Includes
@@ -83,6 +80,9 @@ struct ct_editor_component_i0 {
     const char *(*display_name)();
 
     void (*property_editor)(uint64_t obj);
+
+    void (*gizmo_get_transform)(uint64_t obj, float* world, float* local);
+    void (*gizmo_set_transform)(uint64_t obj, float* world, float* local);
 };
 
 struct ct_ecs_a0 {
@@ -166,4 +166,4 @@ struct ct_ecs_a0 {
 
 CT_MODULE(ct_ecs_a0);
 
-#endif //CETECH_WORLD_H
+#endif //CETECH_ECS_H

@@ -20,6 +20,7 @@
 #include <cetech/resource/resource.h>
 #include <corelib/ebus.h>
 #include <corelib/macros.h>
+#include <cetech/playground/selected_object.h>
 
 #define WINDOW_NAME "Explorer"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("explorer")
@@ -28,7 +29,6 @@
 static struct _G {
     bool visible;
 
-    uint64_t selected_obj;
     uint32_t ent_name;
     struct ct_entity entity;
     struct ct_world world;
@@ -87,7 +87,7 @@ static void ui_entity_item_begin(uint64_t obj,
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
 
-    bool selected = _G.selected_obj == obj;
+    bool selected = ct_selected_object_a0->selected_object() == obj;
     if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
@@ -97,10 +97,14 @@ static void ui_entity_item_begin(uint64_t obj,
 
     const uint32_t children_n = ct_cdb_a0->prop_count(children);
 
-    if (!children_n) {
+
+    uint64_t components;
+    components = ct_cdb_a0->read_subobject(obj, CT_ID64_0("components"), 0);
+
+    const uint32_t component_n = ct_cdb_a0->prop_count(components);
+    if (!children_n && !component_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
-
 
     char name[128] = {0};
     uint64_t uid = ct_cdb_a0->read_uint64(obj, CT_ID64_0("uid"), 0);
@@ -112,28 +116,15 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     char label[128] = {0};
-    snprintf(label, CT_ARRAY_LEN(label), "%s##%d", name, 0);
+    snprintf(label, CT_ARRAY_LEN(label), "%s##%llu", name, uid);
 
     bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
-        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                                  EXPLORER_ENTITY_SELECT_EVENT);
-
-        ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-        ct_cdb_a0->set_uint64(w, CT_ID64_0("world"), _G.world.h);
-        ct_cdb_a0->set_str(w, CT_ID64_0("filename"), _G.path);
-        ct_cdb_a0->set_uint64(w, CT_ID64_0("entity"), _G.entity.h);
-        ct_cdb_a0->set_ref(w, CT_ID64_0("obj"), obj);
-        ct_cdb_a0->write_commit(w);
-
-        ct_ebus_a0->broadcast(EXPLORER_EBUS, event);
-
-        _G.selected_obj = obj;
+        ct_selected_object_a0->set_selected_object(obj);
     }
 
     if (open) {
-        uint64_t components;
-        components = ct_cdb_a0->read_subobject(obj, CT_ID64_0("components"), 0);
+
 
         const uint32_t component_n = ct_cdb_a0->prop_count(components);
         uint64_t keys[component_n];
@@ -141,7 +132,6 @@ static void ui_entity_item_begin(uint64_t obj,
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t key = keys[i];
-
 
             uint64_t component = ct_cdb_a0->read_subobject(components, key, 0);
             uint64_t type = ct_cdb_a0->type(component);
@@ -158,18 +148,22 @@ static void ui_entity_item_begin(uint64_t obj,
                 continue;
             }
 
-            ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
-                                       DebugUITreeNodeFlags_OpenOnDoubleClick |
-                                       DebugUITreeNodeFlags_Leaf;
+            ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
-            char label[128] = {0};
-            snprintf(label, CT_ARRAY_LEN(label), "%s##%d",
-                     editor->display_name(), rand());
-            bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-
-            if (open) {
-                ct_debugui_a0->TreePop();
+            bool c_selected =
+                    ct_selected_object_a0->selected_object() == component;
+            if (c_selected) {
+                c_flags |= DebugUITreeNodeFlags_Selected;
             }
+
+            char c_label[128] = {0};
+            snprintf(c_label, CT_ARRAY_LEN(c_label), "%s##component_%d",
+                     editor->display_name(), ++id);
+            ct_debugui_a0->TreeNodeEx(c_label, c_flags);
+            if (ct_debugui_a0->IsItemClicked(0)) {
+                ct_selected_object_a0->set_selected_object(component);
+            }
+            ct_debugui_a0->TreePop();
         }
     }
 
@@ -180,7 +174,7 @@ static void ui_entity_item_begin(uint64_t obj,
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
             uint64_t child = ct_cdb_a0->read_subobject(children, key, 0);
-            ui_entity_item_begin(child, rand());
+            ui_entity_item_begin(child, ++id);
         }
         ui_entity_item_end();
     }
