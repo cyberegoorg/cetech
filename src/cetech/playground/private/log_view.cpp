@@ -1,24 +1,18 @@
 #include <stdio.h>
 
-#include <cetech/engine/debugui/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/playground/playground.h>
-#include <cetech/kernel/log/log.h>
+#include <corelib/log.h>
 #include <cetech/playground/log_view.h>
-#include <cetech/engine/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/kernel/containers/array.h>
-#include <cetech/kernel/ebus/ebus.h>
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <corelib/array.inl>
+#include <corelib/ebus.h>
 
-#include "cetech/kernel/hashlib/hashlib.h"
-#include "cetech/kernel/memory/memory.h"
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_playground_a0);
-CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_ebus_a0);
 
 #define WINDOW_NAME "Log view"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")
@@ -62,8 +56,6 @@ static const char *_level_to_label[4] = {
         [LOG_DBG]     = "D (%d)",
 };
 
-static ct_log_view_a0 log_view_api = {
-};
 
 static void log_handler(enum ct_log_level level,
                         time_t time,
@@ -111,10 +103,10 @@ static void ui_level_mask() {
 
 
         if (i > 0) {
-            ct_debugui_a0.SameLine(0, -1);
+            ct_debugui_a0->SameLine(0, -1);
         }
 
-        if (ct_debugui_a0.RadioButton(buffer, active)) {
+        if (ct_debugui_a0->RadioButton(buffer, active)) {
             if (!active) {
                 _G.level_mask |= (1 << level);
             } else {
@@ -146,53 +138,54 @@ static void ui_log_items() {
         int len = strlen(line);
 
         ImGui::PushStyleColor(ImGuiCol_Text, _level_to_color[item->level][0]);
-        ct_debugui_a0.TextUnformatted(line, line + len);
+        ct_debugui_a0->TextUnformatted(line, line + len);
         ImGui::PopStyleColor();
     }
 
     ImGui::EndChild();
 }
 
-static void on_debugui(ct_cdb_obj_t *event) {
+static void on_debugui(uint64_t event) {
 
-    if (ct_debugui_a0.BeginDock(WINDOW_NAME,
-                                &_G.visible,
-                                DebugUIWindowFlags_(0))) {
+    if (ct_debugui_a0->BeginDock(WINDOW_NAME,
+                                 &_G.visible,
+                                 DebugUIWindowFlags_(0))) {
         ui_filter();
         ui_level_mask();
         ui_log_items();
     }
 
-    ct_debugui_a0.EndDock();
+    ct_debugui_a0->EndDock();
 
 }
 
-static void on_menu_window(ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
 
-    ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
-static void _init(ct_api_a0 *api) {
+static void _init(struct ct_api_a0 *api) {
     _G = {
             .visible = true,
             .level_mask = (uint8_t) ~0,
-            .allocator = ct_memory_a0.main_allocator(),
+            .allocator = ct_memory_a0->main_allocator(),
     };
 
-    api->register_api("ct_log_view_a0", &log_view_api);
 
-    ct_log_a0.register_handler(log_handler, NULL);
+    ct_log_a0->register_handler(log_handler, NULL);
 
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                        on_menu_window, 0);
 
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                           on_menu_window);
 
     ct_array_free(_G.log_items, _G.allocator);
     ct_array_free(_G.line_buffer, _G.allocator);

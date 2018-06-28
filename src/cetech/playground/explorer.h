@@ -21,7 +21,6 @@ enum {
 
 enum {
     EXPLORER_INAVLID_EVENT = 0,
-    EXPLORER_ENTITY_SELECT_EVENT,
 };
 
 //==============================================================================
@@ -31,7 +30,7 @@ struct ct_ent_selected_ev {
     struct ct_world world;
     struct ct_entity entity;
     const char *filename;
-    struct ct_cdb_obj_t* obj;
+    uint64_t obj;
 };
 
 //==============================================================================
@@ -46,5 +45,6 @@ struct ct_explorer_a0 {
                       const char *path);
 };
 
+CT_MODULE(ct_explorer_a0);
 
 #endif //CETECH_LEVEL_INSPECTOR_H

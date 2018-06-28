@@ -1,21 +1,15 @@
-#include <cetech/kernel/ebus/ebus.h>
-#include <cetech/kernel/macros.h>
-#include "cetech/kernel/hashlib/hashlib.h"
-#include "cetech/kernel/memory/memory.h"
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
+#include <corelib/ebus.h>
+#include <corelib/macros.h>
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
-#include <cetech/engine/debugui/debugui.h>
+#include <cetech/debugui/debugui.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/playground.h>
 
-
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_playground_a0);
-CETECH_DECL_API(ct_ebus_a0);
 
 #define WINDOW_NAME "Property editor"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("property_editor")
@@ -35,39 +29,46 @@ static struct ct_property_editor_a0 property_inspector_api = {
         .set_active = set_active
 };
 
+struct ct_property_editor_a0 *ct_property_editor_a0 = &property_inspector_api;
 
-static void on_debugui(struct ct_cdb_obj_t *event) {
-    if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible, 0)) {
-        if (_G.on_debugui) {
-            _G.on_debugui();
+static void on_debugui(uint64_t event) {
+    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
+
+        struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
+        while (it.api) {
+            struct ct_property_editor_i0 *i = (it.api);
+            i->draw();
+
+            it = ct_api_a0->next(it);
         }
+
     }
-    ct_debugui_a0.EndDock();
+    ct_debugui_a0->EndDock();
 }
 
-static void on_menu_window(struct ct_cdb_obj_t *event) {
-    ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+static void on_menu_window(uint64_t event) {
+    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G){
+    _G = (struct _G) {
             .visible = true
     };
 
     api->register_api("ct_property_editor_a0", &property_inspector_api);
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                       on_menu_window, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                        on_menu_window, 0);
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                          on_menu_window);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                           on_menu_window);
 
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

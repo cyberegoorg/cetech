@@ -28,5 +28,6 @@ struct ct_action_manager_a0 {
     void (*check)();
 };
 
+CT_MODULE(ct_action_manager_a0);
 
 #endif //CETECH_ACTION_MANAGER_H

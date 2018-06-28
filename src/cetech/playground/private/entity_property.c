@@ -1,41 +1,27 @@
 #include <float.h>
 #include <stdio.h>
 
-#include <cetech/kernel/hashlib/hashlib.h>
-#include <cetech/kernel/config/config.h>
-#include <cetech/kernel/memory/memory.h>
-#include <cetech/kernel/api/api_system.h>
-#include <cetech/kernel/yaml/ydb.h>
-#include <cetech/kernel/containers/array.h>
-#include <cetech/kernel/module/module.h>
+#include <corelib/hashlib.h>
+#include <corelib/config.h>
+#include <corelib/memory.h>
+#include <corelib/api_system.h>
+#include <corelib/ydb.h>
+#include <corelib/array.inl>
+#include <corelib/module.h>
 
-#include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/resource/resource.h>
-#include <cetech/engine/ecs/ecs.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/resource/resource.h>
+#include <cetech/ecs/ecs.h>
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/playground/explorer.h>
-#include <cetech/kernel/ebus/ebus.h>
-#include <cetech/kernel/math/fmath.h>
+#include <corelib/ebus.h>
+#include <corelib/fmath.inl>
 #include <cetech/playground/command_system.h>
-#include <cetech/kernel/containers/hash.h>
-
-
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_resource_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_property_editor_a0);
-CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_explorer_a0);
-CETECH_DECL_API(ct_ydb_a0);
-CETECH_DECL_API(ct_yng_a0);
-CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_ecs_a0);
-CETECH_DECL_API(ct_ebus_a0);
-CETECH_DECL_API(ct_cmd_system_a0);
+#include <corelib/hash.inl>
+#include <cetech/playground/selected_object.h>
 
 
 #define _G entity_property_global
@@ -47,9 +33,8 @@ static struct _G {
 
     struct ct_hash_t components;
 
-    const char *filename;
     struct ct_alloc *allocator;
-    struct ct_cdb_obj_t *obj;
+    uint64_t obj;
 } _G;
 
 
@@ -60,13 +45,13 @@ static bool ui_select_asset(char *buffer,
     char id_str[512] = {0};
     sprintf(id_str, ">>##%s", id);
 
-    if (ct_debugui_a0.Button(id_str, (float[2]) {0.0f})) {
-        if (ct_asset_browser_a0.get_selected_asset_type() != asset_type) {
+    if (ct_debugui_a0->Button(id_str, (float[2]) {0.0f})) {
+        if (ct_asset_browser_a0->get_selected_asset_type() != asset_type) {
             return false;
         }
 
         char selected_asset[128] = {0};
-        ct_asset_browser_a0.get_selected_asset_name(selected_asset);
+        ct_asset_browser_a0->get_selected_asset_name(selected_asset);
 
         strcpy(buffer, selected_asset);
 
@@ -76,24 +61,24 @@ static bool ui_select_asset(char *buffer,
     return false;
 }
 
-static void ui_float(struct ct_cdb_obj_t *obj,
+static void ui_float(uint64_t obj,
                      uint64_t prop_key_hash,
-                     struct ct_component_prop_map *prop) {
+                     const char *label,
+                     float min_f,
+                     float max_f) {
     float value = 0;
     float value_new = 0;
 
-    ct_cdb_a0.read_float(obj, prop_key_hash, value_new);
+    value_new = ct_cdb_a0->read_float(obj, prop_key_hash, value_new);
     value = value_new;
 
-    const float min = !prop->limit.max_f ? -FLT_MAX
-                                         : prop->limit.min_f;
-    const float max = !prop->limit.max_f ? FLT_MAX
-                                         : prop->limit.max_f;
+    const float min = !max_f ? -FLT_MAX : min_f;
+    const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0.DragFloat(prop->ui_name,
-                                &value_new, 1.0f,
-                                min, max,
-                                "%.3f", 1.0f)) {
+    if (ct_debugui_a0->DragFloat(label,
+                                 &value_new, 1.0f,
+                                 min, max,
+                                 "%.3f", 1.0f)) {
 
         struct ct_ent_cmd_s cmd = {
                 .header = {
@@ -107,65 +92,33 @@ static void ui_float(struct ct_cdb_obj_t *obj,
                 .f.old_value = value,
         };
 
-        ct_cmd_system_a0.execute(&cmd.header);
+        ct_cmd_system_a0->execute(&cmd.header);
     }
 }
 
-static void ui_str(struct ct_cdb_obj_t *obj,
+static void ui_str(uint64_t obj,
                    uint64_t prop_key_hash,
-                   struct ct_component_prop_map *prop,
+                   const char *label,
                    uint32_t i) {
     char labelid[128] = {'\0'};
 
     const char *value = 0;
 
-    value = ct_cdb_a0.read_str(obj, prop_key_hash, NULL);
+    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
 
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
 
-    sprintf(labelid, "%s##prop_str_%d", prop->ui_name, i);
+    sprintf(labelid, "%s##prop_str_%d", label, i);
 
 
     bool change = false;
-    if (prop->resource.type) {
-        change = ui_select_asset(buffer, labelid,
-                                 CT_ID32_0(prop->resource.type),
-                                 prop_key_hash);
-        ct_debugui_a0.SameLine(0.0f, -1.0f);
-    }
 
-
-    if (prop->combo.combo_items) {
-        char* items = NULL;
-        uint32_t items_count = 0;
-
-        prop->combo.combo_items(obj, &items, &items_count);
-
-        int current_item = -1;
-        const char *items2[items_count];
-        for (int j = 0; j < items_count; ++j) {
-            items2[j] = &items[j * 128];
-            if (CT_ID64_0(items2[j]) == CT_ID64_0(value)) {
-                current_item = j;
-            }
-        }
-
-        sprintf(labelid, "%s##combo_%d", prop->ui_name, i);
-        change = ct_debugui_a0.Combo(labelid, &current_item, items2, items_count, -1);
-
-        if(change) {
-            strcpy(buffer, items2[current_item]);
-        }
-
-    } else {
-        change |= ct_debugui_a0.InputText(labelid,
-                                          buffer,
-                                          strlen(buffer),
-                                          DebugInputTextFlags_ReadOnly,
-                                          0, NULL);
-    }
-
+    change |= ct_debugui_a0->InputText(labelid,
+                                       buffer,
+                                       strlen(buffer),
+                                       DebugInputTextFlags_ReadOnly,
+                                       0, NULL);
 
     if (change) {
         struct ct_ent_cmd_s cmd = {
@@ -181,28 +134,133 @@ static void ui_str(struct ct_cdb_obj_t *obj,
         strcpy(cmd.str.new_value, buffer);
         strcpy(cmd.str.old_value, value);
 
-        ct_cmd_system_a0.execute(&cmd.header);
+        ct_cmd_system_a0->execute(&cmd.header);
     }
 }
 
-static void ui_vec3(struct ct_cdb_obj_t *obj,
+static void ui_str_combo(uint64_t obj,
+                         uint64_t prop_key_hash,
+                         const char *label,
+                         void (*combo_items)(uint64_t obj,
+                                             char **items,
+                                             uint32_t *items_count),
+                         uint32_t i) {
+    char labelid[128] = {'\0'};
+
+    const char *value = 0;
+
+    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+
+    char buffer[128] = {'\0'};
+    strcpy(buffer, value);
+
+    char *items = NULL;
+    uint32_t items_count = 0;
+
+    combo_items(obj, &items, &items_count);
+
+    int current_item = -1;
+    const char *items2[items_count];
+    for (int j = 0; j < items_count; ++j) {
+        items2[j] = &items[j * 128];
+        if (CT_ID64_0(items2[j]) == CT_ID64_0(value)) {
+            current_item = j;
+        }
+    }
+
+    sprintf(labelid, "%s##combo_%d", label, i);
+    bool change = ct_debugui_a0->Combo(labelid,
+                                       &current_item, items2,
+                                       items_count, -1);
+
+    if (change) {
+        strcpy(buffer, items2[current_item]);
+    }
+
+    if (change) {
+        struct ct_ent_cmd_s cmd = {
+                .header = {
+                        .size = sizeof(struct ct_ent_cmd_s),
+                        .type = CT_ID64_0("set_str"),
+                },
+
+                .prop = prop_key_hash,
+                .obj = obj,
+        };
+
+        strcpy(cmd.str.new_value, buffer);
+        strcpy(cmd.str.old_value, value);
+
+        ct_cmd_system_a0->execute(&cmd.header);
+    }
+}
+
+static void ui_resource(uint64_t obj,
+                        uint64_t prop_key_hash,
+                        const char *label,
+                        uint32_t resource_type,
+                        uint32_t i) {
+    char labelid[128] = {'\0'};
+
+    const char *value = 0;
+
+    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+
+    char buffer[128] = {'\0'};
+    strcpy(buffer, value);
+
+    sprintf(labelid, "%s##prop_str_%d", label, i);
+
+
+    bool change = false;
+
+    change = ui_select_asset(buffer, labelid,
+                             resource_type,
+                             prop_key_hash);
+    ct_debugui_a0->SameLine(0.0f, -1.0f);
+
+    change |= ct_debugui_a0->InputText(labelid,
+                                       buffer,
+                                       strlen(buffer),
+                                       DebugInputTextFlags_ReadOnly,
+                                       0, NULL);
+
+    if (change) {
+        struct ct_ent_cmd_s cmd = {
+                .header = {
+                        .size = sizeof(struct ct_ent_cmd_s),
+                        .type = CT_ID64_0("set_str"),
+                },
+
+                .prop = prop_key_hash,
+                .obj = obj,
+        };
+
+        strcpy(cmd.str.new_value, buffer);
+        strcpy(cmd.str.old_value, value);
+
+        ct_cmd_system_a0->execute(&cmd.header);
+    }
+}
+
+static void ui_vec3(uint64_t obj,
                     uint64_t prop_key_hash,
-                    struct ct_component_prop_map *prop) {
+                    const char *label,
+                    float min_f,
+                    float max_f) {
     float value[3] = {0};
     float value_new[3] = {0};
 
-    ct_cdb_a0.read_vec3(obj, prop_key_hash, value_new);
+    ct_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
     ct_vec3_move(value, value_new);
 
-    const float min = !prop->limit.min_f ? -FLT_MAX
-                                         : prop->limit.min_f;
-    const float max = !prop->limit.max_f ? FLT_MAX
-                                         : prop->limit.max_f;
+    const float min = !min_f ? -FLT_MAX : min_f;
+    const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0.DragFloat3(prop->ui_name,
-                                 value_new, 1.0f,
-                                 min, max,
-                                 "%.3f", 1.0f)) {
+    if (ct_debugui_a0->DragFloat3(label,
+                                  value_new, 1.0f,
+                                  min, max,
+                                  "%.3f", 1.0f)) {
 
         struct ct_ent_cmd_s cmd = {
                 .header = {
@@ -222,110 +280,108 @@ static void ui_vec3(struct ct_cdb_obj_t *obj,
                                    value[2]},
         };
 
-        ct_cmd_system_a0.execute(&cmd.header);
+        ct_cmd_system_a0->execute(&cmd.header);
     }
 }
 
-static void on_component(struct ct_world world,
-                         struct ct_cdb_obj_t *obj,
-                         uint64_t comp_name) {
-    struct ct_component_info *info = ct_ecs_a0.component_info(comp_name);
+static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
+    struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
+    while (it.api) {
+        struct ct_component_i0 *i = (it.api);
 
-    if (!ct_debugui_a0.CollapsingHeader(info->component_name,
-                                        DebugUITreeNodeFlags_DefaultOpen)) {
+        if (cdb_type == i->cdb_type()) {
+            return i;
+        }
+
+        it = ct_api_a0->next(it);
+    }
+
+    return NULL;
+};
+
+static void on_component(uint64_t obj) {
+    uint64_t type = ct_cdb_a0->type(obj);
+
+    struct ct_component_i0 *c = get_component_inteface(type);
+    if (!c->get_interface) {
         return;
     }
 
-    for (int i = 0; i < info->prop_count; ++i) {
-        struct ct_component_prop_map *prop = &info->prop_map[i];
-        uint64_t prop_key_hash = CT_ID64_0(prop->key);
-        switch (prop->type) {
-            case CDB_TYPE_VEC3:
-                ui_vec3(obj, prop_key_hash, prop);
-                break;
+    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
-            case CDB_TYPE_FLOAT:
-                ui_float(obj, prop_key_hash, prop);
-                break;
-
-            case CDB_TYPE_STR:
-                ui_str(obj, prop_key_hash, prop, i);
-                break;
-
-            default:
-                break;
-        }
+    if (!ct_debugui_a0->CollapsingHeader(editor->display_name(),
+                                         DebugUITreeNodeFlags_DefaultOpen)) {
+        return;
     }
+
+    if (!editor->property_editor) {
+        return;
+    }
+
+    editor->property_editor(obj);
 }
 
 static void on_debugui() {
-    if (!_G.filename) {
+    uint64_t obj = ct_selected_object_a0->selected_object();
+    if(!obj) {
         return;
     }
 
-    if (ct_debugui_a0.Button("Save", (float[2]) {0.0f})) {
-        ct_ydb_a0.save(_G.filename);
-    }
-    ct_debugui_a0.SameLine(0.0f, -1.0f);
+    uint64_t obj_type = ct_cdb_a0->type(obj);
 
-    ct_debugui_a0.InputText("asset",
-                            (char *) _G.filename, strlen(_G.filename),
-                            DebugInputTextFlags_ReadOnly, 0, NULL);
-
-    if (ct_debugui_a0.CollapsingHeader("Entity",
-                                       DebugUITreeNodeFlags_DefaultOpen)) {
-        ct_debugui_a0.LabelText("Entity", "%llu", _G.active_entity);
-    }
-
-    struct ct_resource_id rid;
-    ct_resource_a0.type_name_from_filename(_G.filename, &rid, NULL);
-
-    uint64_t ent_type = ct_cdb_a0.read_uint64(_G.obj, CT_ID64_0("ent_type"), 0);
-
-    const uint64_t *components_name = ct_ecs_a0.get_components();
-    uint32_t n = ct_array_size(components_name);
-    for (int j = 0; j < n; ++j) {
-        uint64_t name = components_name[j];
-        uint64_t cmask = ct_ecs_a0.component_mask(name);
-
-        if (ent_type & cmask) {
-            ct_ep_on_component clb = (ct_ep_on_component) ct_hash_lookup(
-                    &_G.components, name, 0);
-            clb ? clb(_G.active_world, _G.obj) : on_component(_G.active_world,
-                                                              _G.obj, name);
+    if (CT_ID64_0("entity") == obj_type) {
+        if (ct_debugui_a0->CollapsingHeader("Entity",
+                                            DebugUITreeNodeFlags_DefaultOpen)) {
+            ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
         }
+
+        uint64_t components_obj;
+        components_obj = ct_cdb_a0->read_subobject(obj,
+                                                   CT_ID64_0("components"), 0);
+
+
+        uint64_t n = ct_cdb_a0->prop_count(components_obj);
+        uint64_t components_name[n];
+        ct_cdb_a0->prop_keys(components_obj, components_name);
+
+        for (uint64_t j = 0; j < n; ++j) {
+            uint64_t name = components_name[j];
+
+            uint64_t c_obj;
+            c_obj = ct_cdb_a0->read_subobject(components_obj, name, 0);
+
+            on_component(c_obj);
+        }
+
+    } else if (get_component_inteface(obj_type)) {
+        on_component(obj);
     }
+
 }
 
-void on_entity_click(struct ct_cdb_obj_t *event) {
-    ct_property_editor_a0.set_active(on_debugui);
-
-    struct ct_world world = {ct_cdb_a0.read_uint64(event, CT_ID64_0("world"), 0)};
-    const char* filename = ct_cdb_a0.read_str(event, CT_ID64_0("filename"), 0);
-    struct ct_entity entity = {ct_cdb_a0.read_uint64(event, CT_ID64_0("ent"), 0)};
-    struct ct_cdb_obj_t* obj = {ct_cdb_a0.read_ref(event, CT_ID64_0("obj"), 0)};
-
-    _G.active_world = world;
-    _G.top_entity = entity;
-    _G.filename = filename;
-    _G.obj = obj;
-}
-
-
-void register_on_component_(uint64_t type,
-                            ct_ep_on_component on_component) {
-    ct_hash_add(&_G.components, type, (uint64_t) on_component, _G.allocator);
-}
-
-void unregister_on_component_(uint64_t type) {
-}
+//void on_entity_click(uint64_t event) {
+//    ct_property_editor_a0->set_active(on_debugui);
+//
+//    struct ct_world world = {
+//            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+//    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"), 0);
+//    struct ct_entity entity = {
+//            ct_cdb_a0->read_uint64(event, CT_ID64_0("entity"), 0)};
+//    uint64_t obj = {ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0)};
+//
+//    _G.active_world = world;
+//    _G.top_entity = entity;
+//    _G.obj = obj;
+//}
 
 
 static struct ct_entity_property_a0 entity_property_a0 = {
-        .register_component = register_on_component_,
-        .unregister_component = unregister_on_component_,
+        .ui_float = ui_float,
+        .ui_str = ui_str,
+        .ui_str_combo = ui_str_combo,
+        .ui_resource = ui_resource,
+        .ui_vec3 = ui_vec3,
 };
-
 
 static void set_vec3_cmd(const struct ct_cmd *cmd,
                          bool inverse) {
@@ -334,10 +390,14 @@ static void set_vec3_cmd(const struct ct_cmd *cmd,
     const float *value = inverse ? pos_cmd->vec3.old_value
                                  : pos_cmd->vec3.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
-    ct_cdb_a0.set_vec3(w, pos_cmd->prop, value);
-    ct_cdb_a0.write_commit(w);
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
+    ct_cdb_a0->set_vec3(w, pos_cmd->prop, value);
+    ct_cdb_a0->write_commit(w);
 }
+
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .draw = on_debugui,
+};
 
 static void set_float_cmd(const struct ct_cmd *cmd,
                           bool inverse) {
@@ -345,9 +405,9 @@ static void set_float_cmd(const struct ct_cmd *cmd,
 
     const float value = inverse ? pos_cmd->f.old_value : pos_cmd->f.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
-    ct_cdb_a0.set_float(w, pos_cmd->prop, value);
-    ct_cdb_a0.write_commit(w);
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
+    ct_cdb_a0->set_float(w, pos_cmd->prop, value);
+    ct_cdb_a0->write_commit(w);
 }
 
 static void set_str_cmd(const struct ct_cmd *_cmd,
@@ -357,9 +417,9 @@ static void set_str_cmd(const struct ct_cmd *_cmd,
     const char *value = inverse ? pos_cmd->str.old_value
                                 : pos_cmd->str.new_value;
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0.write_begin(pos_cmd->obj);
-    ct_cdb_a0.set_string(w, pos_cmd->prop, value);
-    ct_cdb_a0.write_commit(w);
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
+    ct_cdb_a0->set_str(w, pos_cmd->prop, value);
+    ct_cdb_a0->write_commit(w);
 }
 
 static void cmd_description(char *buffer,
@@ -387,29 +447,31 @@ static void cmd_description(char *buffer,
     }
 }
 
+struct ct_entity_property_a0 *ct_entity_property_a0 = &entity_property_a0;
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0.main_allocator()
+            .allocator = ct_memory_a0->main_allocator()
     };
 
-    api->register_api("ct_entity_property_a0", &entity_property_a0);
+    api->register_api("ct_property_editor_i0", &ct_property_editor_i0);
+    api->register_api("on_debugui", &entity_property_a0);
 
-    ct_ebus_a0.connect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT,
-                       on_entity_click, 0);
+    ct_property_editor_a0->set_active(on_debugui);
 
-    ct_cmd_system_a0.register_cmd_execute(
+    ct_cmd_system_a0->register_cmd_execute(
             CT_ID64_0("set_vec3"),
             (struct ct_cmd_fce) {
                     .execute = set_vec3_cmd,
                     .description = cmd_description});
 
-    ct_cmd_system_a0.register_cmd_execute(
+    ct_cmd_system_a0->register_cmd_execute(
             CT_ID64_0("set_str"),
             (struct ct_cmd_fce) {
                     .execute = set_str_cmd,
                     .description = cmd_description});
 
-    ct_cmd_system_a0.register_cmd_execute(
+    ct_cmd_system_a0->register_cmd_execute(
             CT_ID64_0("set_float"),
             (struct ct_cmd_fce) {
                     .execute = set_float_cmd,
@@ -418,9 +480,6 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect(EXPLORER_EBUS, EXPLORER_ENTITY_SELECT_EVENT,
-                          on_entity_click);
-
     _G = (struct _G) {};
 }
 

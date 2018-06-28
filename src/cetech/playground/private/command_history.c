@@ -1,25 +1,18 @@
 #include <stdio.h>
 
-#include <cetech/engine/debugui/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/playground/playground.h>
-#include <cetech/kernel/log/log.h>
+#include <corelib/log.h>
 #include <cetech/playground/command_history.h>
 #include <cetech/playground/command_system.h>
-#include <cetech/kernel/ebus/ebus.h>
-#include <cetech/kernel/macros.h>
+#include <corelib/ebus.h>
+#include <corelib/macros.h>
 
-#include "cetech/kernel/hashlib/hashlib.h"
-#include "cetech/kernel/memory/memory.h"
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_playground_a0);
-CETECH_DECL_API(ct_log_a0);
-CETECH_DECL_API(ct_cmd_system_a0);
-CETECH_DECL_API(ct_ebus_a0);
 
 #define WINDOW_NAME "Command history"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
@@ -31,59 +24,58 @@ static struct _G {
 
 
 static void ui_command_list() {
-    const uint32_t command_count = ct_cmd_system_a0.command_count();
-    const uint32_t current_idx = ct_cmd_system_a0.curent_idx();
+    const uint32_t command_count = ct_cmd_system_a0->command_count();
+    const uint32_t current_idx = ct_cmd_system_a0->curent_idx();
 
     char buffer[128];
     char buffer2[128];
 
     for (uint32_t i = command_count; i > 0; --i) {
-        ct_cmd_system_a0.command_text(buffer2, CT_ARRAY_LEN(buffer2), i);
+        ct_cmd_system_a0->command_text(buffer2, CT_ARRAY_LEN(buffer2), i);
         const bool is_selected = current_idx == i;
 
         snprintf(buffer, CT_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
 
-        if (ct_debugui_a0.Selectable(buffer, is_selected, 0, (float[2]){0.0f})) {
-            ct_cmd_system_a0.goto_idx(i);
+        if (ct_debugui_a0->Selectable(buffer, is_selected, 0,
+                                      (float[2]) {0.0f})) {
+            ct_cmd_system_a0->goto_idx(i);
             break;
         }
     }
 }
 
-static void on_debugui(struct ct_cdb_obj_t *event) {
-    if (ct_debugui_a0.BeginDock(WINDOW_NAME, &_G.visible, 0)) {
+static void on_debugui(uint64_t event) {
+    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
         ui_command_list();
     }
 
-    ct_debugui_a0.EndDock();
+    ct_debugui_a0->EndDock();
 
 }
 
-static void on_menu_window(struct ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
-    ct_debugui_a0.MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
 }
 
-
-static struct ct_command_history_a0 command_history_api = {
-};
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G){
+    _G = (struct _G) {
             .visible = true,
     };
 
-    api->register_api("ct_command_history_a0", &command_history_api);
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                        on_menu_window, 0);
 }
 
 static void _shutdown() {
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT, on_menu_window);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                           on_menu_window);
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(

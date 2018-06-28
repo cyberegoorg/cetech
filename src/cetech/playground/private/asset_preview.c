@@ -1,41 +1,27 @@
-#include <cetech/kernel/cdb/cdb.h>
-#include <cetech/engine/ecs/ecs.h>
-#include <cetech/engine/renderer/renderer.h>
-#include <cetech/engine/debugui/debugui.h>
-#include <cetech/engine/camera/camera.h>
-#include <cetech/engine/transform/transform.h>
-#include <cetech/engine/controlers/keyboard.h>
-#include <cetech/engine/debugdraw/debugdraw.h>
+#include <corelib/cdb.h>
+#include <cetech/ecs/ecs.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/camera/camera.h>
+#include <cetech/transform/transform.h>
+#include <cetech/controlers/keyboard.h>
+#include <cetech/debugdraw/debugdraw.h>
 
 #include <cetech/playground/asset_preview.h>
 #include <cetech/playground/asset_browser.h>
 #include <cetech/playground/playground.h>
-#include <cetech/kernel/containers/hash.h>
-#include <cetech/kernel/math/fmath.h>
-#include <cetech/kernel/ebus/ebus.h>
-#include <cetech/engine/render_graph/render_graph.h>
-#include <cetech/engine/default_render_graph/default_render_graph.h>
+#include <corelib/hash.inl>
+#include <corelib/fmath.inl>
+#include <corelib/ebus.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/default_render_graph/default_render_graph.h>
 
-#include "cetech/kernel/hashlib/hashlib.h"
-#include "cetech/kernel/config/config.h"
-#include "cetech/kernel/memory/memory.h"
-#include "cetech/kernel/api/api_system.h"
-#include "cetech/kernel/module/module.h"
+#include "corelib/hashlib.h"
+#include "corelib/config.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
-CETECH_DECL_API(ct_memory_a0);
-CETECH_DECL_API(ct_hashlib_a0);
-CETECH_DECL_API(ct_debugui_a0);
-CETECH_DECL_API(ct_ecs_a0);
-CETECH_DECL_API(ct_transform_a0);
-CETECH_DECL_API(ct_keyboard_a0);
-CETECH_DECL_API(ct_camera_a0);
-CETECH_DECL_API(ct_asset_browser_a0);
-CETECH_DECL_API(ct_playground_a0);
-CETECH_DECL_API(ct_cdb_a0);
-CETECH_DECL_API(ct_ebus_a0);
-CETECH_DECL_API(ct_dd_a0);
-CETECH_DECL_API(ct_render_graph_a0);
-CETECH_DECL_API(ct_default_render_graph_a0);
 
 #define _G AssetPreviewGlobals
 
@@ -72,9 +58,8 @@ static void fps_camera_update(struct ct_world world,
 
     float wm[16];
 
-
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0.entity_data(world, TRANSFORM_COMPONENT, camera_ent);
+    transform = ct_ecs_a0->entity_data(world, TRANSFORM_COMPONENT, camera_ent);
 
     ct_mat4_move(wm, transform->world);
 
@@ -94,10 +79,18 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
     ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
-    ct_vec3_add(transform->position, transform->position, x_dir_new);
-    ct_vec3_add(transform->position, transform->position, z_dir_new);
 
-    ct_ecs_a0.entity_component_change(world, TRANSFORM_COMPONENT, camera_ent);
+    float pos[3] = {0};
+    ct_vec3_add(transform->position, pos, x_dir_new);
+    ct_vec3_add(pos, pos, z_dir_new);
+
+    uint64_t ent_obj = ct_ecs_a0->entity_object(world, camera_ent);
+    uint64_t components = ct_cdb_a0->read_subobject(ent_obj, CT_ID64_0("components"), 0);
+    uint64_t component = ct_cdb_a0->read_subobject(components, TRANSFORM_COMPONENT, 0);
+
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
+    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0->write_commit(w);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -112,11 +105,11 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(struct ct_cdb_obj_t *event) {
-    if (ct_debugui_a0.BeginDock("Asset preview", &_G.visible,
-                                DebugUIWindowFlags_NoScrollbar)) {
+static void on_debugui(uint64_t event) {
+    if (ct_debugui_a0->BeginDock("Asset preview", &_G.visible,
+                                 DebugUIWindowFlags_NoScrollbar)) {
 
-        _G.active = ct_debugui_a0.IsMouseHoveringWindow();
+        _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
         ct_render_texture_handle_t th;
         th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
@@ -124,23 +117,24 @@ static void on_debugui(struct ct_cdb_obj_t *event) {
 
 
         float size[2];
-        ct_debugui_a0.GetWindowSize(size);
-        _G.render_graph_builder->call->set_size(_G.render_graph_builder, size[0], size[1]);
-        ct_debugui_a0.Image2(th,
-                             size,
-                             (float[2]) {0.0f, 0.0f},
-                             (float[2]) {1.0f, 1.0f},
-                             (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                             (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+        ct_debugui_a0->GetWindowSize(size);
+        _G.render_graph_builder->call->set_size(_G.render_graph_builder,
+                                                size[0], size[1]);
+        ct_debugui_a0->Image2(th,
+                              size,
+                              (float[2]) {0.0f, 0.0f},
+                              (float[2]) {1.0f, 1.0f},
+                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
     }
-    ct_debugui_a0.EndDock();
+    ct_debugui_a0->EndDock();
 
 }
 
 
-static void set_asset(struct ct_cdb_obj_t *event) {
-    uint64_t asset = ct_cdb_a0.read_uint64(event, CT_ID64_0("asset"), 0);
-    const char* path = ct_cdb_a0.read_str(event, CT_ID64_0("path"), 0);
+static void set_asset(uint64_t event) {
+    uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
+    const char *path = ct_cdb_a0->read_str(event, CT_ID64_0("path"), 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 
@@ -169,31 +163,32 @@ static void set_asset(struct ct_cdb_obj_t *event) {
             fce.load(path, rid, _G.world);
         }
     }
-
-    struct ct_transform_comp *transform;
-    transform = ct_ecs_a0.entity_data(_G.world,
-                                      TRANSFORM_COMPONENT,
-                                      _G.camera_ent);
-
-    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
+//
+//    struct ct_transform_comp *transform;
+//    transform = ct_ecs_a0->entity_data(_G.world,
+//                                      TRANSFORM_COMPONENT,
+//                                      _G.camera_ent);
+//
+//    ct_vec3_move(transform->position, (float[3]) {0.0f, 0.0f, -10.0f});
 }
 
-static void init(struct ct_cdb_obj_t *event) {
+static void init(uint64_t event) {
     CT_UNUSED(event);
 
     _G.visible = true;
-    _G.world = ct_ecs_a0.create_world();
-    _G.camera_ent = ct_ecs_a0.spawn_entity(_G.world,
-                                           CT_ID32_0("content/camera"));
+    _G.world = ct_ecs_a0->create_world();
+    _G.camera_ent = ct_ecs_a0->spawn_entity(_G.world,
+                                            CT_ID32_0("content/camera"));
 
-    _G.render_graph = ct_render_graph_a0.create_graph();
-    _G.render_graph_builder = ct_render_graph_a0.create_builder();
+    _G.render_graph = ct_render_graph_a0->create_graph();
+    _G.render_graph_builder = ct_render_graph_a0->create_builder();
     _G.render_graph->call->add_module(_G.render_graph,
-                                      ct_default_render_graph_a0.create(_G.world));
+                                      ct_default_render_graph_a0->create(
+                                              _G.world));
 
 }
 
-static void on_render(struct ct_cdb_obj_t *event) {
+static void on_render(uint64_t event) {
     CT_UNUSED(event);
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
@@ -206,31 +201,31 @@ static void on_render(struct ct_cdb_obj_t *event) {
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static void update(struct ct_cdb_obj_t *event) {
-    float dt = ct_cdb_a0.read_float(event, CT_ID64_0("dt"), 0.0f);
+static void update(uint64_t event) {
+    float dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
 
     if (_G.active) {
         float updown = 0.0f;
         float leftright = 0.0f;
 
-        uint32_t up_key = ct_keyboard_a0.button_index("w");
-        uint32_t down_key = ct_keyboard_a0.button_index("s");
-        uint32_t left_key = ct_keyboard_a0.button_index("a");
-        uint32_t right_key = ct_keyboard_a0.button_index("d");
+        uint32_t up_key = ct_keyboard_a0->button_index("w");
+        uint32_t down_key = ct_keyboard_a0->button_index("s");
+        uint32_t left_key = ct_keyboard_a0->button_index("a");
+        uint32_t right_key = ct_keyboard_a0->button_index("d");
 
-        if (ct_keyboard_a0.button_state(0, up_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, up_key) > 0) {
             updown = 1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, down_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, down_key) > 0) {
             updown = -1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, right_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, right_key) > 0) {
             leftright = 1.0f;
         }
 
-        if (ct_keyboard_a0.button_state(0, left_key) > 0) {
+        if (ct_keyboard_a0->button_state(0, left_key) > 0) {
             leftright = -1.0f;
         }
 
@@ -239,7 +234,7 @@ static void update(struct ct_cdb_obj_t *event) {
     }
 
     if (_G.visible) {
-        ct_ecs_a0.simulate(_G.world, dt);
+        ct_ecs_a0->simulate(_G.world, dt);
     }
 }
 
@@ -264,10 +259,10 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(struct ct_cdb_obj_t *event) {
+static void on_menu_window(uint64_t event) {
     CT_UNUSED(event);
 
-    ct_debugui_a0.MenuItem2("Asset preview", NULL, &_G.visible, true);
+    ct_debugui_a0->MenuItem2("Asset preview", NULL, &_G.visible, true);
 }
 
 static struct ct_asset_preview_a0 asset_preview_api = {
@@ -275,33 +270,35 @@ static struct ct_asset_preview_a0 asset_preview_api = {
         .unregister_type_preview = unregister_type_preview
 };
 
+struct ct_asset_preview_a0 *ct_asset_preview_a0 = &asset_preview_api;
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0.main_allocator()
+            .allocator = ct_memory_a0->main_allocator()
     };
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                       on_menu_window, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                        on_menu_window, 0);
 
-    ct_ebus_a0.connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
+    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
 
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
+    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
 }
 
 static void _shutdown() {
 
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0.disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                          on_menu_window);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
+    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
+                           on_menu_window);
 
-    ct_ebus_a0.connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
+    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 
 
     ct_hash_free(&_G.preview_fce_map, _G.allocator);
@@ -318,7 +315,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_transform_a0);
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_playground_a0);

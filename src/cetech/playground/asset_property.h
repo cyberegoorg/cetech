@@ -15,7 +15,8 @@ struct ct_resource_id;
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_ap_on_asset)(struct ct_resource_id asset, const char *path);
+typedef void (*ct_ap_on_asset)(struct ct_resource_id asset,
+                               const char *path);
 
 //==============================================================================
 // Api
@@ -26,5 +27,6 @@ struct ct_asset_property_a0 {
                            ct_ap_on_asset on_asset);
 };
 
+CT_MODULE(ct_asset_property_a0);
 
 #endif //CETECH_ASSET_PROPERTY_H

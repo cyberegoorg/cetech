@@ -13,9 +13,5 @@
 // Api
 //==============================================================================
 
-struct ct_command_history_a0 {
-    int _;
-};
-
 
 #endif //CETECH_COMMAND_HISTORY_H

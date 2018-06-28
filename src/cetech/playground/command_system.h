@@ -6,13 +6,11 @@
 //==============================================================================
 #include <stdint.h>
 #include <stddef.h>
-
+#include <corelib/module.inl>
 
 //==============================================================================
 // Typedefs
 //==============================================================================
-
-struct ct_cdb_obj_t;
 
 //==============================================================================
 // Structs
@@ -37,7 +35,7 @@ struct ct_ydb_cmd_s {
 struct ct_ent_cmd_s {
     struct ct_cmd header;
 
-    struct ct_cdb_obj_t *obj;
+    uint64_t obj;
     uint64_t prop;
 
     // VALUES
@@ -91,7 +89,6 @@ struct ct_cmd_fce {
 // Api
 //==============================================================================
 
-//! Command system API V0
 struct ct_cmd_system_a0 {
     void (*execute)(const struct ct_cmd *cmd);
 
@@ -119,5 +116,6 @@ struct ct_cmd_system_a0 {
     void (*goto_idx)(uint32_t idx);
 };
 
+CT_MODULE(ct_cmd_system_a0);
 
 #endif //COMMAND_SYSTEM_H
