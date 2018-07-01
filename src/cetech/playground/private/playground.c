@@ -109,13 +109,31 @@ static float draw_main_menu() {
 
             ct_debugui_a0->Separator();
 
-            uint64_t event = ct_cdb_a0->create_object(
-                    ct_cdb_a0->global_db(),
-                    PLAYGROUND_UI_MAINMENU_EVENT);
+            struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+            while (it.api) {
+                struct ct_dock_i *i = (it.api);
 
-            ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
+                char title[128] = {0};
+
+                snprintf(title, CT_ARRAY_LEN(title), "%s %llu", i->title(i), i->id);
+
+                ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
+
+                it = ct_api_a0->next(it);
+            }
 
             ct_debugui_a0->EndMenu();
+        }
+
+
+        struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+        while (it.api) {
+            struct ct_dock_i *i = (it.api);
+
+            if(i->draw_main_menu) {
+                i->draw_main_menu();
+            }
+            it = ct_api_a0->next(it);
         }
 
         if (ct_debugui_a0->BeginMenu("Help", true)) {
@@ -133,15 +151,24 @@ static float draw_main_menu() {
     return menu_height;
 }
 
-static void on_debugui() {
-    float menu_height = draw_main_menu();
+static void draw_all_docks() {
+    struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+    while (it.api) {
+        struct ct_dock_i *i = (it.api);
 
-    uint32_t w, h;
-    ct_renderer_a0->get_size(&w, &h);
-    float pos[] = {0.0f, menu_height};
-    float size[] = {(float) w, h - 25.0f};
 
-    ct_debugui_a0->RootDock(pos, size);
+        char title[128] = {0};
+        snprintf(title, CT_ARRAY_LEN(title), "%s##dock%llu", i->title(i), i->id);
+
+        if (ct_debugui_a0->BeginDock(title, &i->visible, 0)) {
+            if(i->draw_ui) {
+                i->draw_ui(i);
+            }
+        }
+        ct_debugui_a0->EndDock();
+
+        it = ct_api_a0->next(it);
+    }
 }
 
 static void debugui_on_setup(void *inst,
@@ -216,12 +243,15 @@ static void on_render(uint64_t _event) {
 
 
 static void on_ui(uint64_t _event) {
-    on_debugui();
+    float menu_height = draw_main_menu();
 
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                              PLAYGROUND_UI_EVENT);
+    uint32_t w, h;
+    ct_renderer_a0->get_size(&w, &h);
+    float pos[] = {0.0f, menu_height};
+    float size[] = {(float) w, h - 25.0f};
 
-    ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
+    ct_debugui_a0->RootDock(pos, size);
+    draw_all_docks();
 
     if (_G.load_layout) {
         ct_debugui_a0->LoadDock("core/default.dock_layout");

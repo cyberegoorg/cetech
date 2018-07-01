@@ -44,19 +44,20 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
-        ui_command_list();
-    }
-
-    ct_debugui_a0->EndDock();
-
+static void on_debugui(struct ct_dock_i *dock) {
+    ui_command_list();
 }
 
-static void on_menu_window(uint64_t event) {
-    CT_UNUSED(event);
-    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+static const char *dock_title() {
+    return WINDOW_NAME;
 }
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
 
 
 static void _init(struct ct_api_a0 *api) {
@@ -65,16 +66,11 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
+    api->register_api("ct_dock_i", &ct_dock_i);
+
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
-
     _G = (struct _G) {};
 }
 

@@ -22,6 +22,7 @@
 #include <corelib/macros.h>
 #include <string.h>
 #include <cetech/playground/selected_object.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/memory.h"
@@ -32,17 +33,21 @@
 
 #define _G entity_editor_globals
 
+struct scene_editor {
+    struct ct_world world;
+    struct ct_entity camera_ent;
+    struct ct_entity entity;
+    const char *path;
+    uint64_t root;
+    uint32_t entity_name;
+    bool is_first;
+    struct ct_render_graph *render_graph;
+    struct ct_render_graph_builder *rg_builder;
+    struct ct_dock_i dock;
+};
+
 static struct _G {
-    bool visible[MAX_EDITOR];
-    struct ct_world world[MAX_EDITOR];
-    struct ct_entity camera_ent[MAX_EDITOR];
-    struct ct_entity entity[MAX_EDITOR];
-    const char *path[MAX_EDITOR];
-    uint64_t root[MAX_EDITOR];
-    uint32_t entity_name[MAX_EDITOR];
-    bool is_first[MAX_EDITOR];
-    struct ct_render_graph *render_graph[MAX_EDITOR];
-    struct ct_render_graph_builder *render_graph_builder[MAX_EDITOR];
+    struct scene_editor editor[MAX_EDITOR];
 
     uint8_t active_editor;
     uint8_t editor_count;
@@ -66,10 +71,9 @@ static void fps_camera_update(struct ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->entity_data(
-            world,
-            TRANSFORM_COMPONENT,
-            camera_ent);
+    transform = ct_ecs_a0->entity_data(world,
+                                       TRANSFORM_COMPONENT,
+                                       camera_ent);
 
     ct_mat4_move(wm, transform->world);
 
@@ -131,147 +135,170 @@ static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
     return NULL;
 };
 
+static void _guizmo(uint64_t component_obj,
+                    struct ct_editor_component_i0 *ceditor,
+                    enum OPERATION operation,
+                    const float *view,
+                    const float *proj) {
 
-static void on_debugui(uint64_t event) {
-    char dock_id[128] = {};
+    if (!ceditor->guizmo_get_transform) {
+        return;
+    }
 
+    if (!ceditor->guizmo_set_transform) {
+        return;
+    }
+
+    float world[16];
+    float local[16];
+
+    ct_mat4_identity(world);
+    ct_mat4_identity(local);
+
+    ceditor->guizmo_get_transform(component_obj, world, local);
+
+    float min[2];
+    float max[2];
+    ct_debugui_a0->GetWindowPos(min);
+    ct_debugui_a0->GetWindowSize(max);
+
+    ct_debugui_a0->guizmo_set_rect(min[0], min[1], max[0], max[1]);
+
+    float delta_matrix[16] = {0.0f};
+    ct_mat4_identity(delta_matrix);
+
+    ct_debugui_a0->guizmo_manipulate(view,
+                                     proj,
+                                     operation,
+                                     WORLD,
+                                     world, delta_matrix,
+                                     0,
+                                     NULL, NULL);
+
+    if (!ct_mat4_is_identity(delta_matrix)) {
+        ceditor->guizmo_set_transform(component_obj, world, local);
+    }
+}
+
+static void on_debugui(struct ct_dock_i *dock) {
 //    _G.active_editor = UINT8_MAX;
 
-    for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        snprintf(dock_id, CT_ARRAY_LEN(dock_id),
-                 "Entity %s###level_editor_%d", _G.path[i], i + 1);
+    struct scene_editor *editor = &_G.editor[dock->id];
 
-        if (ct_debugui_a0->BeginDock(dock_id, &_G.visible[i],
-                                     DebugUIWindowFlags_NoScrollbar)) {
+    float size[2];
+    ct_debugui_a0->GetWindowSize(size);
 
-            float size[2];
-            ct_debugui_a0->GetWindowSize(size);
+    if (ct_debugui_a0->IsMouseHoveringWindow()) {
+        _G.active_editor = dock->id;
+    }
 
-            if (ct_debugui_a0->IsMouseHoveringWindow()) {
-                _G.active_editor = i;
-            }
+    static enum OPERATION operation;
+    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT,
+                                (int *) &operation, TRANSLATE);
 
+    ct_debugui_a0->SameLine(0, 0);
+    ct_debugui_a0->RadioButton2(ICON_FA_UNDO,
+                                (int *) &operation, ROTATE);
 
-            if (_G.active_editor == i) {
-                float proj[16], view[16];
+    ct_debugui_a0->SameLine(0, 0);
+    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_H,
+                                (int *) &operation, SCALE);
 
-                ct_camera_a0->get_project_view(_G.world[i],
-                                               _G.camera_ent[i],
-                                               proj, view,
-                                               size[0],
-                                               size[1]);
+    float proj[16], view[16];
+    ct_camera_a0->get_project_view(editor->world,
+                                   editor->camera_ent,
+                                   proj, view,
+                                   size[0], size[1]);
 
+    if (_G.active_editor == dock->id) {
+        uint64_t obj = ct_selected_object_a0->selected_object();
 
-                uint64_t obj = ct_selected_object_a0->selected_object();
+        if (obj) {
+            uint64_t obj_type = ct_cdb_a0->type(obj);
+            if (obj_type == CT_ID64_0("entity")) {
 
-                if (obj) {
-                    uint64_t obj_type = ct_cdb_a0->type(obj);
-                    if (obj_type == CT_ID64_0("entity")) {
+                uint64_t components;
+                components = ct_cdb_a0->read_subobject(
+                        obj,
+                        CT_ID64_0("components"), 0);
 
-                        uint64_t components;
-                        components = ct_cdb_a0->read_subobject(obj, CT_ID64_0(
-                                "components"), 0);
+                const uint32_t component_n
+                        = ct_cdb_a0->prop_count(components);
 
-                        const uint32_t component_n = ct_cdb_a0->prop_count(
-                                components);
-                        uint64_t keys[component_n];
-                        ct_cdb_a0->prop_keys(components, keys);
+                uint64_t keys[component_n];
+                ct_cdb_a0->prop_keys(components, keys);
 
-                        for (uint32_t i = 0; i < component_n; ++i) {
-                            uint64_t key = keys[i];
+                for (uint32_t i = 0; i < component_n; ++i) {
+                    uint64_t key = keys[i];
 
-                            uint64_t component = ct_cdb_a0->read_subobject(
-                                    components,
-                                    key, 0);
-                            uint64_t type = ct_cdb_a0->type(component);
+                    uint64_t component;
+                    component = ct_cdb_a0->read_subobject(components,
+                                                          key, 0);
 
-                            struct ct_component_i0 *c = get_component_inteface(
-                                    type);
-                            if (!c->get_interface) {
-                                continue;
-                            }
+                    uint64_t type = ct_cdb_a0->type(component);
 
-                            struct ct_editor_component_i0 *editor;
-                            editor = c->get_interface(EDITOR_COMPONENT);
+                    struct ct_component_i0 *c;
+                    c = get_component_inteface(type);
 
-                            if (!editor) {
-                                continue;
-                            }
-
-                            if (!editor->gizmo_get_transform) {
-                                continue;
-                            }
-
-                            float world[16];
-                            float local[16];
-
-                            ct_mat4_identity(world);
-                            ct_mat4_identity(local);
-
-                            editor->gizmo_get_transform(component,
-                                                        world,
-                                                        local);
-
-                            float min[2];
-                            float max[2];
-                            ct_debugui_a0->GetWindowPos(min);
-                            ct_debugui_a0->GetWindowSize(max);
-
-                            ct_debugui_a0->guizmo_set_rect(min[0], min[1],
-                                                           max[0], max[1]);
-
-                            ct_debugui_a0->guizmo_manipulate(view,
-                                                             proj,
-                                                             TRANSLATE,
-                                                             WORLD, world,
-                                                             0, 0, NULL, NULL);
-
-                            if (!editor->gizmo_set_transform) {
-                                continue;
-                            }
-
-                            editor->gizmo_set_transform(component,
-                                                        world,
-                                                        local);
-                        }
-
-
+                    if (!c->get_interface) {
+                        continue;
                     }
+
+                    struct ct_editor_component_i0 *ceditor;
+                    ceditor = c->get_interface(EDITOR_COMPONENT);
+
+                    if (!ceditor) {
+                        continue;
+                    }
+
+
+                    _guizmo(component, ceditor, operation,
+                            view, proj);
+
+
                 }
             }
-
-            if (ct_debugui_a0->IsMouseClicked(0, false)) {
-                ct_explorer_a0->set_level(_G.world[i], _G.entity[i],
-                                          _G.entity_name[i],
-                                          _G.root[i], _G.path[i]);
-            }
-
-//            uint64_t obj = ct_ecs_a0->ent_obj(_G.world[i],
-//                                                           _G.camera_ent[i]);
-//
-
-            ct_render_texture_handle_t th;
-            th = _G.render_graph_builder[i]->call->get_texture(
-                    _G.render_graph_builder[i], CT_ID64_0("output"));
-
-            _G.render_graph_builder[i]->call->set_size(
-                    _G.render_graph_builder[i], size[0], size[1]);
-
-//            ct_viewport_a0->resize(camera_data->viewport, size[0], size[1]);
-            ct_debugui_a0->Image2(th,
-                                  size,
-                                  (float[2]) {0.0f, 0.0f},
-                                  (float[2]) {1.0f, 1.0f},
-                                  (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                                  (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
         }
-        ct_debugui_a0->EndDock();
     }
+
+    if (ct_debugui_a0->IsMouseClicked(0, false)) {
+        ct_explorer_a0->set_level(editor->world,
+                                  editor->entity,
+                                  editor->entity_name,
+                                  editor->root,
+                                  editor->path);
+    }
+
+    ct_render_texture_handle_t th;
+    th = editor->rg_builder->call->get_texture(editor->rg_builder,
+                                               CT_ID64_0("output"));
+
+    editor->rg_builder->call->set_size(editor->rg_builder,
+                                       size[0], size[1]);
+
+    if (ct_renderer_a0->get_caps()->originBottomLeft) {
+        ct_debugui_a0->Image2(th,
+                              size,
+                              (float[2]) {0.0f, 1.0f},
+                              (float[2]) {1.0f, 0.0f},
+                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    } else {
+        ct_debugui_a0->Image2(th,
+                              size,
+                              (float[2]) {0.0f, 0.0f},
+                              (float[2]) {1.0f, 1.0f},
+                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    }
+
 }
 
 static uint32_t find_entity(uint32_t name) {
     for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
-        if (_G.entity_name[i] != name) {
+        struct scene_editor *editor = &_G.editor[i];
+
+        if (editor->entity_name != name) {
             continue;
         }
 
@@ -280,6 +307,11 @@ static uint32_t find_entity(uint32_t name) {
 
     return UINT32_MAX;
 }
+
+static const char *dock_title(struct ct_dock_i* dock) {
+    return ICON_FA_CUBE " Entity editor";
+}
+
 
 static void open(struct ct_resource_id asset,
                  uint64_t root,
@@ -290,33 +322,50 @@ static void open(struct ct_resource_id asset,
     int idx = _G.editor_count;
     ++_G.editor_count;
 
-    _G.visible[idx] = true;
+    struct scene_editor *editor = &_G.editor[idx];
+
+    struct scene_editor *ent_editor = NULL;
+    if (ent_idx != UINT32_MAX) {
+        ent_editor = &_G.editor[idx];
+    }
+
+    editor->dock = (struct ct_dock_i){
+            .id = idx,
+            .visible = true,
+            .title = dock_title,
+            .draw_ui = on_debugui,
+    };
 
     if (UINT32_MAX != ent_idx) {
-        _G.world[idx] = _G.world[ent_idx];
+        editor->world = ent_editor->world;
     } else {
-        _G.world[idx] = ct_ecs_a0->create_world();
+        editor->world = ct_ecs_a0->create_world();
 
-        _G.entity[idx] = ct_ecs_a0->spawn_entity(_G.world[idx], asset.name);
+        editor->entity = ct_ecs_a0->spawn_entity(editor->world, asset.name);
 
-        _G.is_first[idx] = true;
+        editor->is_first = true;
 
-        _G.render_graph[idx] = ct_render_graph_a0->create_graph();
-        _G.render_graph_builder[idx] = ct_render_graph_a0->create_builder();
-        _G.render_graph[idx]->call->add_module(_G.render_graph[idx],
+        editor->render_graph = ct_render_graph_a0->create_graph();
+        editor->rg_builder = ct_render_graph_a0->create_builder();
+        editor->render_graph->call->add_module(editor->render_graph,
                                                ct_default_render_graph_a0->create(
-                                                       _G.world[idx]));
+                                                       editor->world));
+
+        ct_api_a0->register_api("ct_dock_i", &editor->dock);
     }
-    _G.camera_ent[idx] = ct_ecs_a0->spawn_entity(_G.world[idx],
+
+    editor->camera_ent = ct_ecs_a0->spawn_entity(editor->world,
                                                  CT_ID32_0("content/camera"));
 
-    _G.path[idx] = strdup(path);
-    _G.root[idx] = root;
-    _G.entity_name[idx] = asset.name;
+    editor->path = strdup(path);
+    editor->root = root;
+    editor->entity_name = asset.name;
 
-    ct_explorer_a0->set_level(_G.world[idx], _G.entity[idx],
-                              _G.entity_name[idx], _G.root[idx],
-                              _G.path[idx]);
+    ct_explorer_a0->set_level(editor->world,
+                              editor->entity,
+                              editor->entity_name,
+                              editor->root,
+                              editor->path);
 }
 
 static void update(uint64_t event) {
@@ -348,32 +397,39 @@ static void update(uint64_t event) {
             leftright = -1.0f;
         }
 
-        fps_camera_update(_G.world[_G.active_editor],
-                          _G.camera_ent[_G.active_editor],
+        struct scene_editor *editor = &_G.editor[_G.active_editor];
+        fps_camera_update(editor->world,
+                          editor->camera_ent,
                           dt, 0, 0, updown, leftright, 10.0f, false);
 
     }
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        if (!_G.visible[i]) {
+        struct scene_editor *editor = &_G.editor[i];
+
+        if (!editor->dock.visible) {
             continue;
         }
 
-        ct_ecs_a0->simulate(_G.world[i], dt);
+        ct_ecs_a0->simulate(editor->world, dt);
     }
 }
 
 static void on_render(uint64_t event) {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
-        _G.render_graph_builder[i]->call->clear(_G.render_graph_builder[i]);
+        struct scene_editor *editor = &_G.editor[i];
 
-        if (!_G.visible[i]) {
+        editor->rg_builder->call->clear(editor->rg_builder);
+
+        if (!editor->dock.visible) {
             continue;
         }
 
-        _G.render_graph[i]->call->setup(_G.render_graph[i],
-                                        _G.render_graph_builder[i]);
-        _G.render_graph_builder[i]->call->execute(_G.render_graph_builder[i]);
+        editor->render_graph->call->setup(editor->render_graph,
+                                          editor->rg_builder);
+
+        editor->rg_builder->call->execute(
+                editor->rg_builder);
     }
 }
 
@@ -398,7 +454,6 @@ static void _init(struct ct_api_a0 *api) {
 
 
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
@@ -407,7 +462,6 @@ static void _init(struct ct_api_a0 *api) {
 
 static void _shutdown() {
     ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
     ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
     ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                            on_asset_double_click);

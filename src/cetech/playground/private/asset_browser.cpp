@@ -7,6 +7,7 @@
 #include <cetech/playground/playground.h>
 #include <corelib/ebus.h>
 #include <cetech/playground/selected_object.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -99,6 +100,7 @@ static void ui_breadcrumb(const char *dir) {
             ct_debugui_a0->SameLine(0.0f, -1.0f);
             ct_debugui_a0->Text(">");
             ct_debugui_a0->SameLine(0.0f, -1.0f);
+
             if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
                 char tmp_dir[128] = {0};
                 strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
@@ -134,8 +136,19 @@ static void ui_dir_list() {
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
             dir_hash = CT_ID64_0(_G.dirtree_list[i]);
 
-            if (ImGui::Selectable(_G.dirtree_list[i],
-                                  _G.selected_dir_hash == dir_hash)) {
+            char label[128];
+
+            bool is_selected = _G.selected_dir_hash == dir_hash;
+
+            if (is_selected) {
+                snprintf(label, CT_ARRAY_LEN(label), ICON_FA_FOLDER_OPEN " %s",
+                         _G.dirtree_list[i]);
+            } else {
+                snprintf(label, CT_ARRAY_LEN(label), ICON_FA_FOLDER " %s",
+                         _G.dirtree_list[i]);
+            }
+
+            if (ImGui::Selectable(label, is_selected)) {
                 set_current_dir(_G.dirtree_list[i], dir_hash);
             }
         }
@@ -187,7 +200,13 @@ static void ui_asset_list() {
                 continue;
             }
 
-            if (ImGui::Selectable(dirname, _G.selected_file == filename_hash,
+            char label[128];
+
+            bool is_selected = _G.selected_file == filename_hash;
+
+            snprintf(label, CT_ARRAY_LEN(label), ICON_FA_FOLDER" %s", dirname);
+
+            if (ImGui::Selectable(label, is_selected,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
                 _G.selected_file = filename_hash;
 
@@ -211,7 +230,12 @@ static void ui_asset_list() {
             struct ct_resource_id resourceid = {.i64=0};
             ct_resource_a0->type_name_from_filename(path, &resourceid, NULL);
 
-            if (ImGui::Selectable(filename, _G.selected_file == filename_hash,
+
+            char label[128];
+
+            snprintf(label, CT_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
+
+            if (ImGui::Selectable(label, _G.selected_file == filename_hash,
                                   ImGuiSelectableFlags_AllowDoubleClick)) {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
@@ -225,7 +249,8 @@ static void ui_asset_list() {
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
                 ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
                 ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("root"), CT_ID64_0("source"));
+                ct_cdb_a0->set_uint64(w, CT_ID64_0("root"),
+                                      CT_ID64_0("source"));
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
@@ -248,44 +273,43 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME,
-                                 &_G.visible,
-                                 DebugUIWindowFlags_(0))) {
+static void on_debugui(struct ct_dock_i *dock) {
 
-        float content_w = ImGui::GetContentRegionAvailWidth();
+    float content_w = ImGui::GetContentRegionAvailWidth();
 
-        if (_G.midle_column_width < 0) {
-            _G.midle_column_width = content_w - _G.left_column_width - 180;
-        }
-
-        ui_breadcrumb(_G.current_dir);
-        ui_asset_filter();
-        ui_dir_list();
-
-        float left_size[] = {_G.left_column_width, 0.0f};
-        ct_debugui_a0->SameLine(0.0f, -1.0f);
-        ct_debugui_a0->VSplitter("vsplit1", left_size);
-        _G.left_column_width = left_size[0];
-        ct_debugui_a0->SameLine(0.0f, -1.0f);
-
-        ui_asset_list();
+    if (_G.midle_column_width < 0) {
+        _G.midle_column_width = content_w - _G.left_column_width - 180;
     }
 
-    ct_debugui_a0->EndDock();
+    ui_breadcrumb(_G.current_dir);
+    ui_asset_filter();
+    ui_dir_list();
+
+    float left_size[] = {_G.left_column_width, 0.0f};
+    ct_debugui_a0->SameLine(0.0f, -1.0f);
+    ct_debugui_a0->VSplitter("vsplit1", left_size);
+    _G.left_column_width = left_size[0];
+    ct_debugui_a0->SameLine(0.0f, -1.0f);
+
+    ui_asset_list();
 }
 
-static void on_menu_window(uint64_t event) {
-    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+
+static const char *dock_title(struct ct_dock_i *dock) {
+    return ICON_FA_FOLDER_OPEN " Asset browser";
 }
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
+
 
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_asset_browser_a0", &asset_browser_api);
-
-
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
+    api->register_api("ct_dock_i", &ct_dock_i);
 
 
     _G = {
@@ -299,11 +323,8 @@ static void _init(struct ct_api_a0 *api) {
 
 }
 
-static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
 
+static void _shutdown() {
     _G = {};
 }
 

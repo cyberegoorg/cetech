@@ -14,6 +14,8 @@
 #include <corelib/ebus.h>
 #include <corelib/log.h>
 #include <cetech/playground/entity_property.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/module.h"
 
@@ -196,26 +198,13 @@ void transform_transform(struct ct_transform_comp *transform,
     float *rot = transform->rotation;
     float *sca = transform->scale;
 
-//    float tm[16];
-//    float rm[16];
-//    float trm[16];
-//    float sm[16];
-
     float rot_rad[3];
     ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
-
-//    ct_mat4_translate(tm, pos[0], pos[1], pos[2]);
-//    ct_mat4_scale(sm, sca[0], sca[1], sca[2]);
-//    ct_mat4_rotate_xyz(rm, rot_rad[0], rot_rad[1], rot_rad[2]);
 
     ct_mat4_srt(transform->world,
                 sca[0], sca[1], sca[2],
                 rot_rad[0], rot_rad[1], rot_rad[2],
                 pos[0], pos[1], pos[2]);
-
-    //    ct_mat4_mul(trm, tm, rm);
-//    ct_mat4_mul(transform->world, trm, sm);
-//    ct_mat4_move(transform->world, tm);
 }
 
 
@@ -226,13 +215,13 @@ static void _on_component_obj_change(uint64_t obj,
 
     uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
 
-    struct ct_world world = {.h = ct_cdb_a0->read_uint64(ent_obj,
-                                                         CT_ID64_0("world"),
-                                                         0)};
+    struct ct_world world = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+    };
 
-    struct ct_entity ent = {.h = ct_cdb_a0->read_uint64(ent_obj,
-                                                        CT_ID64_0("entity"),
-                                                        0)};
+    struct ct_entity ent = {
+            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
+    };
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->entity_data(world, TRANSFORM_COMPONENT, ent);
@@ -255,18 +244,6 @@ static void _component_spawner(uint64_t event) {
     ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
     ct_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
 
-    ct_log_a0->debug(LOG_WHERE,
-                     "Spawn transform p[%f, %f, %f], r[%f, %f, %f], s[%f, %f, %f]",
-                     transform->position[0],
-                     transform->position[1],
-                     transform->position[2],
-                     transform->rotation[0],
-                     transform->rotation[1],
-                     transform->rotation[2],
-                     transform->scale[0],
-                     transform->scale[1],
-                     transform->scale[2]);
-
     transform_transform(transform, NULL);
 
     ct_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
@@ -277,7 +254,7 @@ static uint64_t cdb_type() {
 }
 
 static const char *display_name() {
-    return "Transform";
+    return ICON_FA_ARROWS " Transform";
 }
 
 static void property_editor(uint64_t obj) {
@@ -291,27 +268,39 @@ static void property_editor(uint64_t obj) {
     ct_entity_property_a0->ui_vec3(obj, CT_ID64_0("scale"), "Scale", 0, 0);
 }
 
-void gizmo_get_transform(uint64_t obj,
-                         float *world,
-                         float *local) {
-    float pos[3] = {0};
-    ct_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
+void guizmo_get_transform(uint64_t obj,
+                          float *world,
+                          float *local) {
 
-//    float w[16];
+    float pos[3] = {0};
+    float rot[3] = {0};
+    float sca[3] = {0};
+
+    ct_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
+    ct_cdb_a0->read_vec3(obj, PROP_ROTATION, rot);
+    ct_cdb_a0->read_vec3(obj, PROP_SCALE, sca);
+
+    float rot_rad[3];
+    ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
+
     ct_mat4_srt(world,
-                1.0f, 1.0f, 1.0f,
-                0.0f, 0.0f, 0.0f,
+                sca[0], sca[1], sca[2],
+                rot_rad[0], rot_rad[1], rot_rad[2],
                 pos[0], pos[1], pos[2]);
 }
 
-void gizmo_set_transform(uint64_t obj,
-                         float *world,
-                         float *local) {
-    float pos[3] = {world[12], world[13], world[14]};
+void guizmo_set_transform(uint64_t obj,
+                          float *world,
+                          float *local) {
+    float pos[3] = {0};
+    float rot_deg[3] = {0};
+    float scale[3] = {0};
+    ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
-
-    struct ct_cdb_obj_t* w = ct_cdb_a0->write_begin(obj);
+    struct ct_cdb_obj_t *w = ct_cdb_a0->write_begin(obj);
     ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ct_cdb_a0->set_vec3(w, PROP_ROTATION, rot_deg);
+    ct_cdb_a0->set_vec3(w, PROP_SCALE, scale);
     ct_cdb_a0->write_commit(w);
 }
 
@@ -320,8 +309,8 @@ static void *get_interface(uint64_t name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
                 .property_editor = property_editor,
-                .gizmo_get_transform = gizmo_get_transform,
-                .gizmo_set_transform = gizmo_set_transform
+                .guizmo_get_transform = guizmo_get_transform,
+                .guizmo_set_transform = guizmo_set_transform
         };
 
         return &ct_editor_component_i0;

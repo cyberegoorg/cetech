@@ -85,8 +85,10 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(pos, pos, z_dir_new);
 
     uint64_t ent_obj = ct_ecs_a0->entity_object(world, camera_ent);
-    uint64_t components = ct_cdb_a0->read_subobject(ent_obj, CT_ID64_0("components"), 0);
-    uint64_t component = ct_cdb_a0->read_subobject(components, TRANSFORM_COMPONENT, 0);
+    uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
+                                                    CT_ID64_0("components"), 0);
+    uint64_t component = ct_cdb_a0->read_subobject(components,
+                                                   TRANSFORM_COMPONENT, 0);
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
     ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
@@ -105,21 +107,27 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock("Asset preview", &_G.visible,
-                                 DebugUIWindowFlags_NoScrollbar)) {
+static void on_debugui(struct ct_dock_i *dock) {
+    _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
-        _G.active = ct_debugui_a0->IsMouseHoveringWindow();
-
-        ct_render_texture_handle_t th;
-        th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
-                                                        CT_ID64_0("output"));
+    ct_render_texture_handle_t th;
+    th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
+                                                    CT_ID64_0("output"));
 
 
-        float size[2];
-        ct_debugui_a0->GetWindowSize(size);
-        _G.render_graph_builder->call->set_size(_G.render_graph_builder,
-                                                size[0], size[1]);
+    float size[2];
+    ct_debugui_a0->GetWindowSize(size);
+    _G.render_graph_builder->call->set_size(_G.render_graph_builder,
+                                            size[0], size[1]);
+
+    if (ct_renderer_a0->get_caps()->originBottomLeft) {
+        ct_debugui_a0->Image2(th,
+                              size,
+                              (float[2]) {0.0f, 1.0f},
+                              (float[2]) {1.0f, 0.0f},
+                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    } else {
         ct_debugui_a0->Image2(th,
                               size,
                               (float[2]) {0.0f, 0.0f},
@@ -127,8 +135,6 @@ static void on_debugui(uint64_t event) {
                               (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                               (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
     }
-    ct_debugui_a0->EndDock();
-
 }
 
 
@@ -259,11 +265,6 @@ void unregister_type_preview(const char *type) {
     ct_hash_remove(&_G.preview_fce_map, id);
 }
 
-static void on_menu_window(uint64_t event) {
-    CT_UNUSED(event);
-
-    ct_debugui_a0->MenuItem2("Asset preview", NULL, &_G.visible, true);
-}
 
 static struct ct_asset_preview_a0 asset_preview_api = {
         .register_type_preview = register_type_preview,
@@ -272,6 +273,17 @@ static struct ct_asset_preview_a0 asset_preview_api = {
 
 struct ct_asset_preview_a0 *ct_asset_preview_a0 = &asset_preview_api;
 
+static const char *dock_title() {
+    return "Asset preview";
+}
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->main_allocator()
@@ -279,24 +291,20 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init, 0);
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
 
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
 
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
+    api->register_api("ct_dock_i", &ct_dock_i);
 }
 
 static void _shutdown() {
 
     ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
     ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
+
 
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
 

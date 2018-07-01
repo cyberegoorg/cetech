@@ -689,6 +689,14 @@ static inline void ct_mat4_identity(float *_result) {
     _result[0] = _result[5] = _result[10] = _result[15] = 1.0f;
 }
 
+static inline bool ct_mat4_is_identity(float *_result) {
+    return (_result[0] == 1.0f) && (_result[1] == 0.0f) && (_result[2] == 0.0f) && (_result[3] == 0.0f) &&
+           (_result[4] == 0.0f) && (_result[5] == 1.0f) && (_result[6] == 0.0f) && (_result[7] == 0.0f) &&
+           (_result[8] == 0.0f) && (_result[9] == 0.0f) && (_result[10] == 1.0f) && (_result[11] == 0.0f) &&
+           (_result[12] == 0.0f) && (_result[13] == 0.0f) && (_result[14] == 0.0f) && (_result[15] == 1.0f);
+
+}
+
 static inline void ct_mat4_translate(float *_result,
                                      float _tx,
                                      float _ty,

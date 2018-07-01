@@ -789,7 +789,9 @@ struct ct_debugui_a0 {
     void (*Separator)();
 
     void (*GetItemRectMin)(float *min);
+
     void (*GetItemRectMax)(float *max);
+
     void (*GetItemRectSize)(float *size);
 
     void (*guizmo_set_rect)(float x,
@@ -806,6 +808,11 @@ struct ct_debugui_a0 {
                               float *snap,
                               float *localBounds,
                               float *boundsSnap);
+
+    void (*guizmo_decompose_matrix)(const float *matrix,
+                                    float *translation,
+                                    float *rotation,
+                                    float *scale);
 
 };
 

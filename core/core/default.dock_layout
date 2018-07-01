@@ -18,18 +18,18 @@
   index: 1
   label: Asset browser
   x: 0
-  y: 504
+  y: 22
   location: ""
-  size_x: 762
-  size_y: 261
-  status: 0
-  active: 1
+  size_x: 1024
+  size_y: 743
+  status: 1
+  active: 0
   opened: 1
   prev: -1
-  next: 9
+  next: -1
   child0: -1
   child1: -1
-  parent: 11
+  parent: -1
 2: 
   index: 2
   label: Asset preview
@@ -38,14 +38,14 @@
   location: ""
   size_x: 245
   size_y: 241
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 14
+  parent: -1
 3: 
   index: 3
   label: Level inspector
@@ -65,19 +65,19 @@
 4: 
   index: 4
   label: Entity content/box2.entity###level_editor_1
-  x: 245
+  x: 0
   y: 22
   location: ""
-  size_x: 517
+  size_x: 1024
   size_y: 482
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 13
+  parent: -1
 5: 
   index: 5
   label: Property editor
@@ -85,15 +85,15 @@
   y: 22
   location: ""
   size_x: 262
-  size_y: 601
-  status: 0
-  active: 1
+  size_y: 743
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 8
+  parent: -1
 6: 
   index: 6
   label: Explorer
@@ -101,97 +101,49 @@
   y: 22
   location: ""
   size_x: 245
-  size_y: 241
-  status: 0
-  active: 1
+  size_y: 482
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 14
+  parent: -1
 7: 
   index: 7
-  label: ""
-  x: 0
-  y: 22
-  location: ""
-  size_x: 1024
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 11
-  child1: 8
-  parent: -1
-8: 
-  index: 8
-  label: ""
-  x: 762
-  y: 22
-  location: ""
-  size_x: 262
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 5
-  child1: 10
-  parent: 7
-9: 
-  index: 9
   label: Log view
   x: 0
   y: 504
   location: ""
   size_x: 762
   size_y: 261
-  status: 0
+  status: 1
   active: 0
   opened: 1
-  prev: 1
+  prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 11
-10: 
-  index: 10
+  parent: -1
+8: 
+  index: 8
   label: Command history
   x: 762
   y: 623
   location: ""
   size_x: 262
   size_y: 142
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 8
-11: 
-  index: 11
-  label: ""
-  x: 0
-  y: 22
-  location: ""
-  size_x: 762
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 13
-  child1: 1
-  parent: 7
-12: 
-  index: 12
+  parent: -1
+9: 
+  index: 9
   label: Level content/level1.level###level_editor_2
   x: 199
   y: 22
@@ -206,35 +158,243 @@
   child0: -1
   child1: -1
   parent: -1
+10: 
+  index: 10
+  label: Asset browser##dock0
+  x: 0
+  y: 513
+  location: ""
+  size_x: 695
+  size_y: 252
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+11: 
+  index: 11
+  label: Explorer##dock0
+  x: 0
+  y: 22
+  location: ""
+  size_x: 198
+  size_y: 491
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+12: 
+  index: 12
+  label: Property editor##dock0
+  x: 616
+  y: 22
+  location: ""
+  size_x: 408
+  size_y: 491
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
 13: 
   index: 13
-  label: ""
-  x: 0
+  label: Command history##dock0
+  x: 733
   y: 22
   location: ""
-  size_x: 762
-  size_y: 482
+  size_x: 291
+  size_y: 491
   status: 0
-  active: 1
-  opened: 0
+  active: 0
+  opened: 1
   prev: -1
-  next: -1
-  child0: 14
-  child1: 4
-  parent: 11
+  next: 21
+  child0: -1
+  child1: -1
+  parent: 24
 14: 
   index: 14
+  label: Asset preview##dock0
+  x: 695
+  y: 513
+  location: ""
+  size_x: 329
+  size_y: 252
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 18
+15: 
+  index: 15
+  label: Log view##dock0
+  x: 0
+  y: 513
+  location: ""
+  size_x: 695
+  size_y: 252
+  status: 0
+  active: 0
+  opened: 1
+  prev: -1
+  next: 19
+  child0: -1
+  child1: -1
+  parent: 18
+16: 
+  index: 16
+  label: Entity editor##dock0
+  x: 0
+  y: 22
+  location: ""
+  size_x: 616
+  size_y: 491
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+17: 
+  index: 17
   label: ""
   x: 0
   y: 22
   location: ""
-  size_x: 245
-  size_y: 482
+  size_x: 1024
+  size_y: 743
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 6
-  child1: 2
-  parent: 13
+  child0: 22
+  child1: 18
+  parent: -1
+18: 
+  index: 18
+  label: ""
+  x: 0
+  y: 513
+  location: ""
+  size_x: 1024
+  size_y: 252
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 15
+  child1: 14
+  parent: 17
+19: 
+  index: 19
+  label:  Asset browser##dock0
+  x: 0
+  y: 513
+  location: ""
+  size_x: 695
+  size_y: 252
+  status: 0
+  active: 1
+  opened: 1
+  prev: 15
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 18
+20: 
+  index: 20
+  label:  Explorer##dock0
+  x: 0
+  y: 22
+  location: ""
+  size_x: 195
+  size_y: 491
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 22
+21: 
+  index: 21
+  label:  Property editor##dock0
+  x: 733
+  y: 22
+  location: ""
+  size_x: 291
+  size_y: 491
+  status: 0
+  active: 1
+  opened: 1
+  prev: 13
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 24
+22: 
+  index: 22
+  label: ""
+  x: 0
+  y: 22
+  location: ""
+  size_x: 1024
+  size_y: 491
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 20
+  child1: 24
+  parent: 17
+23: 
+  index: 23
+  label:  Entity editor##dock0
+  x: 195
+  y: 22
+  location: ""
+  size_x: 538
+  size_y: 491
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 24
+24: 
+  index: 24
+  label: ""
+  x: 195
+  y: 22
+  location: ""
+  size_x: 829
+  size_y: 491
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 23
+  child1: 13
+  parent: 22

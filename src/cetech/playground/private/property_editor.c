@@ -9,6 +9,7 @@
 
 #include <cetech/playground/property_editor.h>
 #include <cetech/playground/playground.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 
 #define WINDOW_NAME "Property editor"
@@ -31,24 +32,26 @@ static struct ct_property_editor_a0 property_inspector_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_inspector_api;
 
-static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
+static void on_debugui(struct ct_dock_i *dock) {
+    struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
+    while (it.api) {
+        struct ct_property_editor_i0 *i = (it.api);
+        i->draw();
 
-        struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
-        while (it.api) {
-            struct ct_property_editor_i0 *i = (it.api);
-            i->draw();
-
-            it = ct_api_a0->next(it);
-        }
-
+        it = ct_api_a0->next(it);
     }
-    ct_debugui_a0->EndDock();
 }
 
-static void on_menu_window(uint64_t event) {
-    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+static const char *dock_title() {
+    return ICON_FA_TABLE " " WINDOW_NAME;
 }
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
@@ -56,18 +59,11 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     api->register_api("ct_property_editor_a0", &property_inspector_api);
+    api->register_api("ct_dock_i", &ct_dock_i);
 
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
-
-
     _G = (struct _G) {};
 }
 

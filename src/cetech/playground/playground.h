@@ -8,6 +8,7 @@
 //==============================================================================
 
 #include <stddef.h>
+#include <stdint.h>
 
 #define PLAYGROUND_EBUS_NAME "playground"
 
@@ -22,13 +23,16 @@ enum {
     PLAYGROUND_SHUTDOWN_EVENT,
     PLAYGROUND_UPDATE_EVENT,
     PLAYGROUND_RENDER_EVENT,
-    PLAYGROUND_UI_EVENT,
-    PLAYGROUND_UI_MAINMENU_EVENT,
 };
 
+struct ct_dock_i {
+    uint64_t id;
+    bool visible;
 
-struct ct_playground_update_ev {
-    float dt;
+    const char* (*title)(struct ct_dock_i* dock);
+
+    void (*draw_ui)(struct ct_dock_i* dock);
+    void (*draw_main_menu)();
 };
 
 //==============================================================================
