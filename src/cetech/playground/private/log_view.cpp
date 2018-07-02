@@ -7,6 +7,7 @@
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <corelib/array.inl>
 #include <corelib/ebus.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/memory.h"
@@ -85,7 +86,7 @@ static void log_handler(enum ct_log_level level,
 
 
 static void ui_filter() {
-    _G.filter.Draw();
+    _G.filter.Draw(ICON_FA_SEARCH);
 }
 
 static void ui_level_mask() {
@@ -145,25 +146,22 @@ static void ui_log_items() {
     ImGui::EndChild();
 }
 
-static void on_debugui(uint64_t event) {
-
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME,
-                                 &_G.visible,
-                                 DebugUIWindowFlags_(0))) {
-        ui_filter();
-        ui_level_mask();
-        ui_log_items();
-    }
-
-    ct_debugui_a0->EndDock();
-
+static void on_debugui(ct_dock_i *dock) {
+    ui_filter();
+    ui_level_mask();
+    ui_log_items();
 }
 
-static void on_menu_window(uint64_t event) {
-    CT_UNUSED(event);
-
-    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+static const char *dock_title(struct ct_dock_i* dock) {
+    return WINDOW_NAME;
 }
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
 
 static void _init(struct ct_api_a0 *api) {
     _G = {
@@ -176,17 +174,11 @@ static void _init(struct ct_api_a0 *api) {
     ct_log_a0->register_handler(log_handler, NULL);
 
 
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
+    ct_api_a0->register_api("ct_dock_i", &ct_dock_i);
 
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
-
     ct_array_free(_G.log_items, _G.allocator);
     ct_array_free(_G.line_buffer, _G.allocator);
     _G = {};

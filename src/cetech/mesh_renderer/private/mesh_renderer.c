@@ -23,6 +23,7 @@
 #include <cetech/macros.h>
 #include <cetech/playground/entity_property.h>
 #include <stdlib.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -301,7 +302,7 @@ static uint64_t cdb_type() {
 }
 
 static const char *display_name() {
-    return "Mesh renderer";
+    return ICON_FA_HOUZZ " Mesh renderer";
 }
 
 static void property_editor(uint64_t obj) {

@@ -15,7 +15,6 @@
 #define PROP_POSITION CT_ID64_0("position")
 #define PROP_ROTATION CT_ID64_0("rotation")
 #define PROP_SCALE CT_ID64_0("scale")
-#define PROP_WORLD CT_ID64_0("world")
 
 //==============================================================================
 // Typedefs

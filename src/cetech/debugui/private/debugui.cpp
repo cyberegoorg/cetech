@@ -245,6 +245,7 @@ static struct ct_debugui_a0 debugui_api = {
         .GetItemRectSize = imgui_wrap::GetItemRectSize,
         .guizmo_set_rect = imgui_wrap::guizmo_set_rect,
         .guizmo_manipulate = imgui_wrap::guizmo_manipulate,
+        .guizmo_decompose_matrix = imgui_wrap::guizmo_decompose_matrix,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

@@ -81,8 +81,8 @@ struct ct_editor_component_i0 {
 
     void (*property_editor)(uint64_t obj);
 
-    void (*gizmo_get_transform)(uint64_t obj, float* world, float* local);
-    void (*gizmo_set_transform)(uint64_t obj, float* world, float* local);
+    void (*guizmo_get_transform)(uint64_t obj, float* world, float* local);
+    void (*guizmo_set_transform)(uint64_t obj, float* world, float* local);
 };
 
 struct ct_ecs_a0 {

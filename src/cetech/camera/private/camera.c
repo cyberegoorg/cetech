@@ -11,6 +11,7 @@
 #include <corelib/ebus.h>
 #include <cetech/playground/entity_property.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -70,7 +71,7 @@ static void get_project_view(struct ct_world world,
     float ratio = (float) (width) / (float) (height);
 
 //    ct_mat4_look_at(view, transform->position,
-//                    (float[]){0.0f, 0.0f, -1.0f},
+//                    (float[]){0.0f, 0.0f, 1.0f},
 //                    (float[]){0.0f, 1.0f, 0.0f});
 
     ct_mat4_proj_fovy(proj,
@@ -80,7 +81,14 @@ static void get_project_view(struct ct_world world,
                       camera_data->far,
                       ct_renderer_a0->get_caps()->homogeneousDepth);
 
-    ct_mat4_inverse(view, transform->world);
+    float w[16];
+    ct_mat4_move(w, transform->world);
+
+    w[12] *= -1.0f;
+    w[13] *= -1.0f;
+    w[14] *= -1.0f;
+
+    ct_mat4_move(view, w);
 }
 
 static struct ct_camera_a0 camera_api = {
@@ -140,7 +148,7 @@ static uint64_t cdb_type() {
 }
 
 static const char *display_name() {
-    return "Camera";
+    return ICON_FA_CAMERA " Camera";
 }
 
 static void property_editor(uint64_t obj) {

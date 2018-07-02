@@ -728,9 +728,21 @@ namespace imgui_wrap {
                            float *snap = 0,
                            float *localBounds = NULL,
                            float *boundsSnap = NULL) {
+
         ImGuizmo::Manipulate(view, projection,
                              static_cast<ImGuizmo::OPERATION>(operation),
                              static_cast<ImGuizmo::MODE>(mode), matrix,
                              deltaMatrix, snap, localBounds, boundsSnap);
+    }
+
+    void guizmo_decompose_matrix(const float *matrix,
+                                 float *translation,
+                                 float *rotation,
+                                 float *scale) {
+
+        ImGuizmo::DecomposeMatrixToComponents(matrix,
+                                              translation,
+                                              rotation,
+                                              scale);
     }
 }

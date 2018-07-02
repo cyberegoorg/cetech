@@ -21,6 +21,7 @@
 #include <corelib/ebus.h>
 #include <corelib/macros.h>
 #include <cetech/playground/selected_object.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #define WINDOW_NAME "Explorer"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("explorer")
@@ -116,7 +117,7 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     char label[128] = {0};
-    snprintf(label, CT_ARRAY_LEN(label), "%s##%llu", name, uid);
+    snprintf(label, CT_ARRAY_LEN(label), ICON_FA_CUBE "%s##%llu", name, uid);
 
     bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
@@ -124,8 +125,6 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     if (open) {
-
-
         const uint32_t component_n = ct_cdb_a0->prop_count(components);
         uint64_t keys[component_n];
         ct_cdb_a0->prop_keys(components, keys);
@@ -183,32 +182,33 @@ static void ui_entity_item_begin(uint64_t obj,
 
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
 
-static void on_debugui(uint64_t event) {
-    if (ct_debugui_a0->BeginDock(WINDOW_NAME, &_G.visible, 0)) {
+static void on_debugui(struct ct_dock_i *dock) {
+    ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
 
-        ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
+    if (_G.path) {
+        struct ct_resource_id rid = (struct ct_resource_id) {
+                .type = CT_ID32_0("entity"),
+                .name = _G.ent_name,
+        };
 
-        if (_G.path) {
-            struct ct_resource_id rid = (struct ct_resource_id) {
-                    .type = CT_ID32_0("entity"),
-                    .name = _G.ent_name,
-            };
+        uint64_t obj = ct_resource_a0->get(rid);
+        obj = ct_cdb_a0->read_ref(obj, PROP_ENT_OBJ, 0);
 
-            uint64_t obj = ct_resource_a0->get(rid);
-            obj = ct_cdb_a0->read_ref(obj, PROP_ENT_OBJ, 0);
-
-            ui_entity_item_begin(obj, rand());
-        }
+        ui_entity_item_begin(obj, rand());
     }
-
-    ct_debugui_a0->EndDock();
 }
 
-static void on_menu_window(uint64_t event) {
-    CT_UNUSED(event);
 
-    ct_debugui_a0->MenuItem2(WINDOW_NAME, NULL, &_G.visible, true);
+static const char *dock_title() {
+    return ICON_FA_TREE " " WINDOW_NAME;
 }
+
+static struct ct_dock_i ct_dock_i = {
+        .id = 0,
+        .visible = true,
+        .title = dock_title,
+        .draw_ui = on_debugui,
+};
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
@@ -217,19 +217,11 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     api->register_api("ct_explorer_a0", &level_inspector_api);
+    api->register_api("ct_dock_i", &ct_dock_i);
 
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                        on_menu_window, 0);
-
-    ct_ebus_a0->create_ebus(EXPLORER_EBUS_NAME, EXPLORER_EBUS);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_EVENT, on_debugui);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UI_MAINMENU_EVENT,
-                           on_menu_window);
-
     _G = (struct _G) {0};
 }
 
