@@ -35,10 +35,10 @@ static struct G {
 void init(uint64_t event) {
     CT_UNUSED(event)
 
-    _G.world = ct_ecs_a0->create_world();
+    _G.world = ct_ecs_a0->entity->create_world();
 
-    _G.camera_ent = ct_ecs_a0->spawn_entity(_G.world,
-                                           CT_ID32_0("content/camera"));
+    _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
+                                            CT_ID32_0("content/camera"));
 }
 
 
@@ -58,8 +58,8 @@ void update(uint64_t event) {
     ct_ecs_a0->simulate(_G.world, _G.dt);
 
     struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->entity_data(_G.world, CAMERA_COMPONENT,
-                                        _G.camera_ent);
+    camera_data = ct_ecs_a0->component->entity_data(_G.world, CAMERA_COMPONENT,
+                                                    _G.camera_ent);
 
 //    struct ct_render_texture_handle th = ct_viewport_a0->get_local_resource(
 //            camera_data->viewport,
@@ -104,13 +104,13 @@ void CETECH_MODULE_LOAD (example_develop)(struct ct_api_a0 *api,
 //    init_decl();
 
     ct_ebus_a0->connect(KERNEL_EBUS,
-                       KERNEL_UPDATE_EVENT, update, KERNEL_ORDER);
+                        KERNEL_UPDATE_EVENT, update, KERNEL_ORDER);
 
     ct_ebus_a0->connect(KERNEL_EBUS,
-                       KERNEL_INIT_EVENT, init, GAME_ORDER);
+                        KERNEL_INIT_EVENT, init, GAME_ORDER);
 
     ct_ebus_a0->connect(KERNEL_EBUS,
-                       KERNEL_SHUTDOWN_EVENT, shutdown, GAME_ORDER);
+                        KERNEL_SHUTDOWN_EVENT, shutdown, GAME_ORDER);
 }
 
 void CETECH_MODULE_UNLOAD (example_develop)(struct ct_api_a0 *api,

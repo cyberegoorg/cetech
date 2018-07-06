@@ -181,7 +181,7 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_camera_a0", &camera_api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CAMERA_COMPONENT,
     };
 

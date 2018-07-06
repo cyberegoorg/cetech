@@ -9,7 +9,7 @@
 
 
 int exec(const char *argv) {
-#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
+#if CT_PLATFORM_LINUX || CT_PLATFORM_OSX
     char output[4096];
 
     ct_log_a0->debug("os_sdl", "exec %s", argv);

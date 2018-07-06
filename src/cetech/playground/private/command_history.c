@@ -52,10 +52,15 @@ static const char *dock_title() {
     return WINDOW_NAME;
 }
 
+static const char *name(struct ct_dock_i* dock) {
+    return "command_history";
+}
+
 static struct ct_dock_i ct_dock_i = {
         .id = 0,
         .visible = true,
-        .title = dock_title,
+        .display_title = dock_title,
+                .name = name,
         .draw_ui = on_debugui,
 };
 

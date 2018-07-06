@@ -28,8 +28,10 @@ enum {
 struct ct_dock_i {
     uint64_t id;
     bool visible;
+    enum DebugUIWindowFlags_ dock_flag;
 
-    const char* (*title)(struct ct_dock_i* dock);
+    const char* (*display_title)(struct ct_dock_i* dock);
+    const char* (*name)(struct ct_dock_i* dock);
 
     void (*draw_ui)(struct ct_dock_i* dock);
     void (*draw_main_menu)();

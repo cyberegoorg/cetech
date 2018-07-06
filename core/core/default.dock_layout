@@ -1,400 +1,176 @@
 0: 
   index: 0
-  label: Property inspector
-  x: 836
-  y: 22
+  label:  Asset browser##asset_browser_dock0
+  x: 0
+  y: 531
   location: ""
-  size_x: 188
-  size_y: 743
-  status: 1
-  active: 0
+  size_x: 746
+  size_y: 234
+  status: 0
+  active: 1
   opened: 1
   prev: -1
-  next: -1
+  next: 5
   child0: -1
   child1: -1
-  parent: -1
+  parent: 10
 1: 
   index: 1
-  label: Asset browser
+  label:  Explorer##explorer_dock0
   x: 0
   y: 22
   location: ""
-  size_x: 1024
-  size_y: 743
-  status: 1
-  active: 0
+  size_x: 196
+  size_y: 509
+  status: 0
+  active: 1
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: -1
+  parent: 9
 2: 
   index: 2
-  label: Asset preview
-  x: 0
-  y: 263
-  location: ""
-  size_x: 245
-  size_y: 241
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-3: 
-  index: 3
-  label: Level inspector
-  x: 836
+  label:  Property editor##property_editor_dock0
+  x: 715
   y: 22
   location: ""
-  size_x: 188
-  size_y: 187
-  status: 1
+  size_x: 309
+  size_y: 509
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: 3
+  child0: -1
+  child1: -1
+  parent: 8
+3: 
+  index: 3
+  label: Command history##command_history_dock0
+  x: 715
+  y: 22
+  location: ""
+  size_x: 309
+  size_y: 509
+  status: 0
   active: 0
+  opened: 1
+  prev: 2
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 8
+4: 
+  index: 4
+  label: Asset preview##asset_preview_dock0
+  x: 746
+  y: 531
+  location: ""
+  size_x: 278
+  size_y: 234
+  status: 0
+  active: 1
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: -1
-4: 
-  index: 4
-  label: Entity content/box2.entity###level_editor_1
+  parent: 10
+5: 
+  index: 5
+  label: Log view##log_view_dock0
+  x: 0
+  y: 531
+  location: ""
+  size_x: 746
+  size_y: 234
+  status: 0
+  active: 0
+  opened: 1
+  prev: 0
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 10
+6: 
+  index: 6
+  label:  Entity editor##entity_editor_dock0
+  x: 196
+  y: 22
+  location: ""
+  size_x: 519
+  size_y: 509
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 9
+7: 
+  index: 7
+  label: ""
   x: 0
   y: 22
   location: ""
   size_x: 1024
-  size_y: 482
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-5: 
-  index: 5
-  label: Property editor
-  x: 762
-  y: 22
-  location: ""
-  size_x: 262
   size_y: 743
-  status: 1
-  active: 0
-  opened: 1
+  status: 0
+  active: 1
+  opened: 0
   prev: -1
   next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-6: 
-  index: 6
-  label: Explorer
-  x: 0
-  y: 22
-  location: ""
-  size_x: 245
-  size_y: 482
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-7: 
-  index: 7
-  label: Log view
-  x: 0
-  y: 504
-  location: ""
-  size_x: 762
-  size_y: 261
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
+  child0: 8
+  child1: 10
   parent: -1
 8: 
   index: 8
-  label: Command history
-  x: 762
-  y: 623
+  label: ""
+  x: 0
+  y: 22
   location: ""
-  size_x: 262
-  size_y: 142
-  status: 1
-  active: 0
-  opened: 1
+  size_x: 1024
+  size_y: 509
+  status: 0
+  active: 1
+  opened: 0
   prev: -1
   next: -1
-  child0: -1
-  child1: -1
-  parent: -1
+  child0: 9
+  child1: 2
+  parent: 7
 9: 
   index: 9
-  label: Level content/level1.level###level_editor_2
-  x: 199
+  label: ""
+  x: 0
   y: 22
   location: ""
-  size_x: 563
-  size_y: 482
-  status: 1
-  active: 0
-  opened: 1
+  size_x: 715
+  size_y: 509
+  status: 0
+  active: 1
+  opened: 0
   prev: -1
   next: -1
-  child0: -1
-  child1: -1
-  parent: -1
+  child0: 1
+  child1: 6
+  parent: 8
 10: 
   index: 10
-  label: Asset browser##dock0
-  x: 0
-  y: 513
-  location: ""
-  size_x: 695
-  size_y: 252
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-11: 
-  index: 11
-  label: Explorer##dock0
-  x: 0
-  y: 22
-  location: ""
-  size_x: 198
-  size_y: 491
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-12: 
-  index: 12
-  label: Property editor##dock0
-  x: 616
-  y: 22
-  location: ""
-  size_x: 408
-  size_y: 491
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-13: 
-  index: 13
-  label: Command history##dock0
-  x: 733
-  y: 22
-  location: ""
-  size_x: 291
-  size_y: 491
-  status: 0
-  active: 0
-  opened: 1
-  prev: -1
-  next: 21
-  child0: -1
-  child1: -1
-  parent: 24
-14: 
-  index: 14
-  label: Asset preview##dock0
-  x: 695
-  y: 513
-  location: ""
-  size_x: 329
-  size_y: 252
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 18
-15: 
-  index: 15
-  label: Log view##dock0
-  x: 0
-  y: 513
-  location: ""
-  size_x: 695
-  size_y: 252
-  status: 0
-  active: 0
-  opened: 1
-  prev: -1
-  next: 19
-  child0: -1
-  child1: -1
-  parent: 18
-16: 
-  index: 16
-  label: Entity editor##dock0
-  x: 0
-  y: 22
-  location: ""
-  size_x: 616
-  size_y: 491
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-17: 
-  index: 17
   label: ""
   x: 0
-  y: 22
+  y: 531
   location: ""
   size_x: 1024
-  size_y: 743
+  size_y: 234
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 22
-  child1: 18
-  parent: -1
-18: 
-  index: 18
-  label: ""
-  x: 0
-  y: 513
-  location: ""
-  size_x: 1024
-  size_y: 252
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 15
-  child1: 14
-  parent: 17
-19: 
-  index: 19
-  label:  Asset browser##dock0
-  x: 0
-  y: 513
-  location: ""
-  size_x: 695
-  size_y: 252
-  status: 0
-  active: 1
-  opened: 1
-  prev: 15
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 18
-20: 
-  index: 20
-  label:  Explorer##dock0
-  x: 0
-  y: 22
-  location: ""
-  size_x: 195
-  size_y: 491
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 22
-21: 
-  index: 21
-  label:  Property editor##dock0
-  x: 733
-  y: 22
-  location: ""
-  size_x: 291
-  size_y: 491
-  status: 0
-  active: 1
-  opened: 1
-  prev: 13
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 24
-22: 
-  index: 22
-  label: ""
-  x: 0
-  y: 22
-  location: ""
-  size_x: 1024
-  size_y: 491
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 20
-  child1: 24
-  parent: 17
-23: 
-  index: 23
-  label:  Entity editor##dock0
-  x: 195
-  y: 22
-  location: ""
-  size_x: 538
-  size_y: 491
-  status: 0
-  active: 1
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 24
-24: 
-  index: 24
-  label: ""
-  x: 195
-  y: 22
-  location: ""
-  size_x: 829
-  size_y: 491
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 23
-  child1: 13
-  parent: 22
+  child0: 0
+  child1: 4
+  parent: 7

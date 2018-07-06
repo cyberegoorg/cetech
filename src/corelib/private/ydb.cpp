@@ -481,7 +481,7 @@ void parent_files(const char *path,
 }
 
 //void check_fs() {
-//    ct_alloc *alloc = ct_memory_a0->main_allocator();
+//    ct_alloc *alloc = ct_memory_a0->system;
 //
 //    static uint64_t root = CT_ID64_0("source");
 //
@@ -569,7 +569,7 @@ static struct ct_ydb_a0 ydb_api = {
 struct ct_ydb_a0 *ct_ydb_a0 = &ydb_api;
 
 static void _init(struct ct_api_a0 *api) {
-    _G = {.allocator = ct_memory_a0->main_allocator()};
+    _G = {.allocator = ct_memory_a0->system};
 
     api->register_api("ct_ydb_a0", &ydb_api);
 }

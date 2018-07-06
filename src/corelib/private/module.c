@@ -272,7 +272,7 @@ static void unload_all() {
 }
 
 //static void check_modules() {
-//    ct_alloc *alloc = ct_memory_a0->main_allocator();
+//    ct_alloc *alloc = ct_memory_a0->system;
 //
 //    static uint64_t root = CT_ID64_0("modules");
 //
@@ -325,16 +325,16 @@ static struct ct_module_a0 module_api = {
 struct ct_module_a0 *ct_module_a0 = &module_api;
 
 //static const char* _get_load_dir() {
-//#if defined(CETECH_LINUX)
+//#if CT_PLATFORM_LINUX
 //    return "./bin/linux64/";
-//#elif defined(CETECH_DARWIN)
+//#elif CT_PLATFORM_OSX
 //    return "./bin/darwin64/";
 //#endif
 //}
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object()
     };
 

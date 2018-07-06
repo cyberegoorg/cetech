@@ -69,10 +69,9 @@ void *reloader(uint64_t name,
     return new_data;
 }
 
-static const ct_resource_type_t package_resource_callback = {
-        .online =online,
-        .offline =offline,
-};
+static uint64_t cdb_type() {
+    return CT_ID32_0("package");
+}
 
 
 //==============================================================================
@@ -154,6 +153,13 @@ void _package_compiler(const char *filename,
                     _G.allocator);
 }
 
+static struct ct_resource_i0 ct_resource_i0 = {
+        .cdb_type = cdb_type,
+        .online = online,
+        .offline =offline,
+        .compilator = _package_compiler,
+};
+
 int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_memory_a0);
     CETECH_GET_API(api, ct_resource_a0);
@@ -165,14 +171,11 @@ int package_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_cdb_a0);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .package_typel = CT_ID32_0("package"),
     };
 
-    ct_resource_a0->register_type("package",
-                                  package_resource_callback);
-
-    ct_resource_a0->compiler_register("package", _package_compiler, true);
+    ct_api_a0->register_api("ct_resource_i0", &ct_resource_i0);
 
     return 1;
 }

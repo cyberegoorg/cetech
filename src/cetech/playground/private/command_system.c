@@ -243,7 +243,7 @@ struct ct_cmd_system_a0 *ct_cmd_system_a0 = &cmd_system_a0;
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .curent_pos = 0,
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
     };
 
     api->register_api("ct_cmd_system_a0", &cmd_system_a0);

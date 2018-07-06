@@ -1,4 +1,4 @@
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
 #define _GNU_SOURCE
 #endif
 
@@ -20,12 +20,12 @@ void *load_object(const char *path) {
     char buffer[128];
     uint32_t it = sprintf(buffer, "%s", path);
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
     it += sprintf(buffer+it, ".so");
     void *obj = dlmopen(LM_ID_NEWLM, buffer, RTLD_LOCAL | RTLD_NOW);
 #endif
 
-#ifdef CETECH_DARWIN
+#if CT_PLATFORM_OSX
     it += sprintf(buffer + it, ".dylib");
     void *obj = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
 #endif

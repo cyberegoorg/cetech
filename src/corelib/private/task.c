@@ -223,11 +223,9 @@ static struct ct_task_a0 _task_api = {
 struct ct_task_a0 *ct_task_a0 = &_task_api;
 
 static void _init(struct ct_api_a0 *api) {
+    _G = (struct _G) {.allocator = ct_memory_a0->system};
 
     api->register_api("ct_task_a0", &_task_api);
-    ct_log_a0->set_wid_clb(worker_id);
-
-    _G = (struct _G) {.allocator = ct_memory_a0->main_allocator()};
 
     int core_count = ct_os_a0->cpu_a0->count();
 
@@ -269,7 +267,7 @@ static void _shutdown() {
     queue_task_destroy(&_G.free_counter);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator()
+            .allocator = ct_memory_a0->system
     };
 }
 

@@ -2,23 +2,23 @@
 #include <corelib/module.h>
 #include <corelib/memory.h>
 #include <corelib/api_system.h>
+#include <corelib/log.h>
 #include "corelib/private/api_private.h"
-#include "corelib/private/memory_private.h"
-#include "corelib/private/log_system_private.h"
 
-void coreallocator_register_api(struct ct_api_a0 *api);
+void memory_register_api(struct ct_api_a0 *api);
+void logsystem_init();
+void logsystem_shutdown();
+
 
 bool ct_corelib_init() {
-    struct ct_alloc *core_alloc = ct_core_allocator_a0->alloc;
-
-    memory_init();
+    struct ct_alloc *core_alloc =ct_memory_a0->system;
 
     api_init(core_alloc);
 
     CETECH_LOAD_STATIC_MODULE(ct_api_a0, log);
+    ct_api_a0->register_api("ct_log_a0", ct_log_a0);
 
-    coreallocator_register_api(ct_api_a0);
-    register_api(ct_api_a0);
+    memory_register_api(ct_api_a0);
 
     CETECH_LOAD_STATIC_MODULE(ct_api_a0, hashlib);
 
@@ -47,8 +47,6 @@ bool ct_corelib_shutdown() {
     // CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, ydb);
 
     api_shutdown();
-    memsys_shutdown();
-    logsystem_shutdown();
 
     return true;
 }

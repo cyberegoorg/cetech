@@ -153,8 +153,8 @@ void mesh_render_all(struct ct_world world,
                      uint64_t layer_name) {
     struct mesh_render_data render_data = {.viewid = viewid, .layer_name = layer_name};
     ct_ecs_a0->process(world,
-                       ct_ecs_a0->component_mask(MESH_RENDERER_COMPONENT) |
-                       ct_ecs_a0->component_mask(TRANSFORM_COMPONENT),
+                       ct_ecs_a0->component->mask(MESH_RENDERER_COMPONENT) |
+                       ct_ecs_a0->component->mask(TRANSFORM_COMPONENT),
                        foreach_mesh_renderer, &render_data);
 }
 
@@ -350,7 +350,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = MESH_RENDERER_COMPONENT,
     };
 

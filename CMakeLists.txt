@@ -23,18 +23,8 @@ endif ()
 
 if (APPLE)
     set(PLATFORM_ID darwin64)
-
-    add_definitions(-DCETECH_COLORED_LOG)
-    add_definitions(-DCETECH_DARWIN)
-
-
-
 elseif (UNIX)
     set(PLATFORM_ID linux64)
-
-    add_definitions(-DCETECH_LINUX)
-    add_definitions(-DCETECH_COLORED_LOG)
-
 elseif (WIN32)
     set(PLATFORM_ID windows64)
 
@@ -71,13 +61,11 @@ set(SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/corelib/private/allocator_core.c
         src/corelib/private/api_system.c
-        src/corelib/private/log_system.c
+        src/corelib/private/log.c
         src/corelib/private/module.c
         src/corelib/private/config.c
         src/corelib/private/memory.c
-        src/corelib/private/allocator_malloc.c
         src/corelib/private/task.c
         src/corelib/private/log_stdout_handler.c
         src/corelib/private/hashlib.c
@@ -122,24 +110,19 @@ set(SOURCE_FILES
         src/cetech/renderer/private/renderer.cpp
         src/cetech/render_graph/private/render_graph.c
         src/cetech/default_render_graph/private/default_render_graph.c
-        src/cetech/texture/private/texture.cpp
-        src/cetech/texture/private/texture_compiler.cpp
+        src/cetech/texture/private/texture.c
 
-        src/cetech/shader/private/shader.cpp
-        src/cetech/shader/private/shader_compiler.cpp
+        src/cetech/shader/private/shader.c
         src/cetech/material/private/material.cpp
         src/cetech/material/private/material_preview.cpp
         src/cetech/material/private/material_compiler.cpp
-        src/cetech/material/private/material_property.cpp
-        src/cetech/scene/private/scene.cpp
+        src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
         src/cetech/mesh_renderer/private/mesh_renderer.c
         src/cetech/transform/private/transform.c
 
         src/cetech/scenegraph/private/scenegraph.c
         src/cetech/camera/private/camera.c
-
-        src/cetech/texture/private/texture_property.cpp
 
         src/cetech/playground/private/entity_editor.c
         src/cetech/playground/private/entity_property.c

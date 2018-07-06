@@ -107,9 +107,9 @@ void *window_native_window_ptr(ct_window_ints *w) {
 
 #if defined(CETECH_WINDOWS)
     return (void *) wmi.info.win.window;
-#elif defined(CETECH_LINUX)
+#elif CT_PLATFORM_LINUX
     return (void *) wmi.info.x11.window;
-#elif defined(CETECH_DARWIN)
+#elif CT_PLATFORM_OSX
     return (void *) wmi.info.cocoa.window;
 #endif
 }
@@ -125,9 +125,9 @@ void *window_native_display_ptr(ct_window_ints *w) {
 
 #if defined(CETECH_WINDOWS)
     return (void *) wmi.info.win.hdc;
-#elif defined(CETECH_LINUX)
+#elif CT_PLATFORM_LINUX
     return (void *) wmi.info.x11.display;
-#elif defined(CETECH_DARWIN)
+#elif CT_PLATFORM_OSX
     return (0);
 #endif
 }

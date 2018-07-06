@@ -115,9 +115,9 @@ static void renderer_create() {
     bgfx_init_t init;
     bgfx_init_ctor(&init);
 
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
     init.type = BGFX_RENDERER_TYPE_OPENGL,
-#elif defined(CETECH_DARWIN)
+#elif CT_PLATFORM_OSX
     init.type = BGFX_RENDERER_TYPE_METAL,
             init.type = BGFX_RENDERER_TYPE_OPENGL,
 #endif
@@ -755,7 +755,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_api_a0 = api;
 
     _G = {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object(),
     };
 

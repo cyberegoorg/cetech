@@ -5,6 +5,7 @@
 #include <corelib/api_system.h>
 #include <corelib/hash.inl>
 #include <corelib/hashlib.h>
+#include <corelib/ebus.h>
 
 //CETECH_DECL_API(ct_hashlib_a0)
 
@@ -25,7 +26,12 @@ struct impl_list {
 
 static struct _G {
     struct ct_hash_t api_map;
+
     struct impl_list *impl_list;
+
+    struct ct_hash_t api_on_add_map;
+    ct_api_on_add_t ***on_add;
+
     struct ct_alloc *allocator;
 } _G;
 
@@ -49,6 +55,16 @@ static void api_register_api(const char *name,
 
     ct_array_push(_G.impl_list[idx].api, api, _G.allocator);
 
+    uint64_t on_add_idx = ct_hash_lookup(&_G.api_on_add_map, name_id,
+                                         UINT64_MAX);
+
+    if (UINT64_MAX != on_add_idx) {
+        ct_api_on_add_t **on_add = _G.on_add[on_add_idx];
+        const uint32_t on_add_n = ct_array_size(on_add);
+        for (int i = 0; i < on_add_n; ++i) {
+            on_add[i](name_id, api);
+        }
+    }
 }
 
 static int api_exist(const char *name) {
@@ -89,11 +105,25 @@ static struct ct_api_entry api_next(struct ct_api_entry entry) {
     };
 }
 
+void register_on_add(uint64_t name,
+                     ct_api_on_add_t *on_add) {
+    uint64_t idx = ct_hash_lookup(&_G.api_map, name, UINT64_MAX);
+
+    if (UINT64_MAX == idx) {
+        idx = ct_array_size(_G.on_add);
+        ct_array_push(_G.on_add, 0, _G.allocator);
+    }
+
+    ct_hash_add(&_G.api_on_add_map, name, idx, _G.allocator);
+    ct_array_push(_G.on_add[idx], on_add, _G.allocator);
+}
+
 static struct ct_api_a0 a0 = {
         .register_api = api_register_api,
         .first = api_first,
         .next = api_next,
-        .exist = api_exist
+        .exist = api_exist,
+        .register_on_add = register_on_add,
 };
 
 struct ct_api_a0 *ct_api_a0 = &a0;

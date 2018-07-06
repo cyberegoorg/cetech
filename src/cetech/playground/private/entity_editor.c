@@ -1,28 +1,29 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <corelib/cdb.h>
 #include <corelib/ydb.h>
+#include <corelib/fmath.inl>
+#include <corelib/ebus.h>
+#include <corelib/macros.h>
+
+
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/debugui.h>
-
 #include <cetech/camera/camera.h>
-#include <cetech/playground/entity_editor.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/playground/asset_browser.h>
-#include <cetech/playground/explorer.h>
-
+#include <cetech/asset_browser/asset_browser.h>
+#include <cetech/explorer/explorer.h>
 #include <cetech/playground/playground.h>
-#include <corelib/fmath.inl>
 #include <cetech/resource/resource.h>
-#include <corelib/ebus.h>
+
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_render_graph/default_render_graph.h>
-#include <corelib/macros.h>
-#include <string.h>
 #include <cetech/playground/selected_object.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/debugui.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/memory.h"
@@ -40,16 +41,14 @@ struct scene_editor {
     const char *path;
     uint64_t root;
     uint32_t entity_name;
-    bool is_first;
     struct ct_render_graph *render_graph;
     struct ct_render_graph_builder *rg_builder;
     struct ct_dock_i dock;
+    bool mouse_hovering;
 };
 
 static struct _G {
     struct scene_editor editor[MAX_EDITOR];
-
-    uint8_t active_editor;
     uint8_t editor_count;
 } _G;
 
@@ -71,7 +70,7 @@ static void fps_camera_update(struct ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->entity_data(world,
+    transform = ct_ecs_a0->component->entity_data(world,
                                        TRANSFORM_COMPONENT,
                                        camera_ent);
 
@@ -97,7 +96,7 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(pos, transform->position, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    uint64_t ent_obj = ct_ecs_a0->entity_object(world, camera_ent);
+    uint64_t ent_obj = ct_ecs_a0->entity->cdb_object(world, camera_ent);
     uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
                                                     CT_ID64_0("components"), 0);
     uint64_t component = ct_cdb_a0->read_subobject(components,
@@ -120,7 +119,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static struct ct_component_i0 *get_component_inteface(uint64_t cdb_type) {
+static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
     struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
@@ -139,7 +138,7 @@ static void _guizmo(uint64_t component_obj,
                     struct ct_editor_component_i0 *ceditor,
                     enum OPERATION operation,
                     const float *view,
-                    const float *proj) {
+                    const float *proj, float* size) {
 
     if (!ceditor->guizmo_get_transform) {
         return;
@@ -158,11 +157,8 @@ static void _guizmo(uint64_t component_obj,
     ceditor->guizmo_get_transform(component_obj, world, local);
 
     float min[2];
-    float max[2];
     ct_debugui_a0->GetWindowPos(min);
-    ct_debugui_a0->GetWindowSize(max);
-
-    ct_debugui_a0->guizmo_set_rect(min[0], min[1], max[0], max[1]);
+    ct_debugui_a0->guizmo_set_rect(min[0], min[1], size[0], size[1]);
 
     float delta_matrix[16] = {0.0f};
     ct_mat4_identity(delta_matrix);
@@ -176,21 +172,23 @@ static void _guizmo(uint64_t component_obj,
                                      NULL, NULL);
 
     if (!ct_mat4_is_identity(delta_matrix)) {
-        ceditor->guizmo_set_transform(component_obj, world, local);
+        ceditor->guizmo_set_transform(component_obj, operation, world, local);
     }
 }
 
-static void on_debugui(struct ct_dock_i *dock) {
-//    _G.active_editor = UINT8_MAX;
-
+static void draw_editor(struct ct_dock_i *dock) {
     struct scene_editor *editor = &_G.editor[dock->id];
 
-    float size[2];
-    ct_debugui_a0->GetWindowSize(size);
-
-    if (ct_debugui_a0->IsMouseHoveringWindow()) {
-        _G.active_editor = dock->id;
+    if(!editor->world.h) {
+        return;
     }
+
+    float size[2];
+    ct_debugui_a0->GetContentRegionAvail(size);
+    size[1] -= ct_debugui_a0->GetTextLineHeightWithSpacing();
+
+    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
+    editor->mouse_hovering = is_mouse_hovering;
 
     static enum OPERATION operation;
     ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT,
@@ -210,53 +208,49 @@ static void on_debugui(struct ct_dock_i *dock) {
                                    proj, view,
                                    size[0], size[1]);
 
-    if (_G.active_editor == dock->id) {
-        uint64_t obj = ct_selected_object_a0->selected_object();
 
-        if (obj) {
-            uint64_t obj_type = ct_cdb_a0->type(obj);
-            if (obj_type == CT_ID64_0("entity")) {
+    uint64_t obj = ct_selected_object_a0->selected_object();
 
-                uint64_t components;
-                components = ct_cdb_a0->read_subobject(
-                        obj,
-                        CT_ID64_0("components"), 0);
+    if (obj) {
+        uint64_t obj_type = ct_cdb_a0->type(obj);
+        if (obj_type == CT_ID64_0("entity")) {
 
-                const uint32_t component_n
-                        = ct_cdb_a0->prop_count(components);
+            uint64_t components;
+            components = ct_cdb_a0->read_subobject(obj,
+                                                   CT_ID64_0("components"),
+                                                   0);
 
-                uint64_t keys[component_n];
-                ct_cdb_a0->prop_keys(components, keys);
+            const uint32_t component_n = ct_cdb_a0->prop_count(components);
 
-                for (uint32_t i = 0; i < component_n; ++i) {
-                    uint64_t key = keys[i];
+            uint64_t keys[component_n];
+            ct_cdb_a0->prop_keys(components, keys);
 
-                    uint64_t component;
-                    component = ct_cdb_a0->read_subobject(components,
-                                                          key, 0);
+            for (uint32_t i = 0; i < component_n; ++i) {
+                uint64_t key = keys[i];
 
-                    uint64_t type = ct_cdb_a0->type(component);
+                uint64_t component;
+                component = ct_cdb_a0->read_subobject(components, key, 0);
 
-                    struct ct_component_i0 *c;
-                    c = get_component_inteface(type);
+                uint64_t type = ct_cdb_a0->type(component);
 
-                    if (!c->get_interface) {
-                        continue;
-                    }
+                struct ct_component_i0 *c;
+                c = get_component_interface(type);
 
-                    struct ct_editor_component_i0 *ceditor;
-                    ceditor = c->get_interface(EDITOR_COMPONENT);
-
-                    if (!ceditor) {
-                        continue;
-                    }
-
-
-                    _guizmo(component, ceditor, operation,
-                            view, proj);
-
-
+                if (!c->get_interface) {
+                    continue;
                 }
+
+                struct ct_editor_component_i0 *ceditor;
+                ceditor = c->get_interface(EDITOR_COMPONENT);
+
+                if (!ceditor) {
+                    continue;
+                }
+
+                _guizmo(component, ceditor, operation,
+                        view, proj, size);
+
+
             }
         }
     }
@@ -276,139 +270,149 @@ static void on_debugui(struct ct_dock_i *dock) {
     editor->rg_builder->call->set_size(editor->rg_builder,
                                        size[0], size[1]);
 
-    if (ct_renderer_a0->get_caps()->originBottomLeft) {
-        ct_debugui_a0->Image2(th,
-                              size,
-                              (float[2]) {0.0f, 1.0f},
-                              (float[2]) {1.0f, 0.0f},
-                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-    } else {
-        ct_debugui_a0->Image2(th,
-                              size,
-                              (float[2]) {0.0f, 0.0f},
-                              (float[2]) {1.0f, 1.0f},
-                              (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                              (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-    }
+
+    ct_debugui_a0->Image(th,
+                          size,
+                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 
 }
 
 static uint32_t find_entity(uint32_t name) {
-    for (uint32_t i = 0; i < MAX_EDITOR; ++i) {
+    for (uint32_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
 
-        if (editor->entity_name != name) {
-            continue;
+        if (editor->entity_name == name) {
+            return i;
         }
 
-        return i;
+        if (!editor->entity_name) {
+            return i;
+        }
     }
 
     return UINT32_MAX;
 }
 
-static const char *dock_title(struct ct_dock_i* dock) {
+static const char *dock_title(struct ct_dock_i *dock) {
     return ICON_FA_CUBE " Entity editor";
 }
 
+static const char *name(struct ct_dock_i* dock) {
+    return "entity_editor";
+}
 
-static void open(struct ct_resource_id asset,
-                 uint64_t root,
-                 const char *path) {
-
+static struct scene_editor* _new_editor(struct ct_resource_id asset) {
     uint32_t ent_idx = find_entity(asset.name);
+
+    if (ent_idx != UINT32_MAX) {
+        struct scene_editor* editor = &_G.editor[ent_idx];
+        return editor;
+    }
 
     int idx = _G.editor_count;
     ++_G.editor_count;
 
     struct scene_editor *editor = &_G.editor[idx];
-
-    struct scene_editor *ent_editor = NULL;
-    if (ent_idx != UINT32_MAX) {
-        ent_editor = &_G.editor[idx];
-    }
-
-    editor->dock = (struct ct_dock_i){
+    editor->dock = (struct ct_dock_i) {
             .id = idx,
+            .dock_flag = DebugUIWindowFlags_NoNavInputs |
+                         DebugUIWindowFlags_NoScrollbar |
+                         DebugUIWindowFlags_NoScrollWithMouse,
             .visible = true,
-            .title = dock_title,
-            .draw_ui = on_debugui,
+            .display_title = dock_title,
+                    .name = name,
+            .draw_ui = draw_editor,
     };
 
-    if (UINT32_MAX != ent_idx) {
-        editor->world = ent_editor->world;
-    } else {
-        editor->world = ct_ecs_a0->create_world();
 
-        editor->entity = ct_ecs_a0->spawn_entity(editor->world, asset.name);
+    ct_api_a0->register_api("ct_dock_i", &editor->dock);
 
-        editor->is_first = true;
+    return editor;
+}
 
-        editor->render_graph = ct_render_graph_a0->create_graph();
-        editor->rg_builder = ct_render_graph_a0->create_builder();
-        editor->render_graph->call->add_module(editor->render_graph,
-                                               ct_default_render_graph_a0->create(
-                                                       editor->world));
+static void open(struct ct_resource_id asset,
+                 uint64_t root,
+                 const char *path) {
+    struct scene_editor *editor = _new_editor(asset);
 
-        ct_api_a0->register_api("ct_dock_i", &editor->dock);
+    if (editor->entity_name == asset.name) {
+        ct_explorer_a0->set_level(editor->world,
+                                  editor->entity,
+                                  editor->entity_name,
+                                  editor->root,
+                                  editor->path);
+        return;
     }
 
-    editor->camera_ent = ct_ecs_a0->spawn_entity(editor->world,
+    editor->world = ct_ecs_a0->entity->create_world();
+    editor->entity = ct_ecs_a0->entity->spawn(editor->world, asset.name);
+
+    editor->render_graph = ct_render_graph_a0->create_graph();
+    editor->rg_builder = ct_render_graph_a0->create_builder();
+    editor->render_graph->call->add_module(editor->render_graph,
+                                           ct_default_render_graph_a0->create(
+                                                   editor->world));
+
+
+    editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
                                                  CT_ID32_0("content/camera"));
 
     editor->path = strdup(path);
     editor->root = root;
     editor->entity_name = asset.name;
 
+
     ct_explorer_a0->set_level(editor->world,
                               editor->entity,
                               editor->entity_name,
                               editor->root,
                               editor->path);
+
 }
 
 static void update(uint64_t event) {
     float dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
 
-    if (UINT8_MAX != _G.active_editor) {
-
-        float updown = 0.0f;
-        float leftright = 0.0f;
-
-        uint32_t up_key = ct_keyboard_a0->button_index("w");
-        uint32_t down_key = ct_keyboard_a0->button_index("s");
-        uint32_t left_key = ct_keyboard_a0->button_index("a");
-        uint32_t right_key = ct_keyboard_a0->button_index("d");
-
-        if (ct_keyboard_a0->button_state(0, up_key) > 0) {
-            updown = 1.0f;
-        }
-
-        if (ct_keyboard_a0->button_state(0, down_key) > 0) {
-            updown = -1.0f;
-        }
-
-        if (ct_keyboard_a0->button_state(0, right_key) > 0) {
-            leftright = 1.0f;
-        }
-
-        if (ct_keyboard_a0->button_state(0, left_key) > 0) {
-            leftright = -1.0f;
-        }
-
-        struct scene_editor *editor = &_G.editor[_G.active_editor];
-        fps_camera_update(editor->world,
-                          editor->camera_ent,
-                          dt, 0, 0, updown, leftright, 10.0f, false);
-
-    }
-
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
 
+        if(!editor->world.h) {
+            continue;
+        }
+
         if (!editor->dock.visible) {
             continue;
+        }
+
+        if (editor->mouse_hovering) {
+            float updown = 0.0f;
+            float leftright = 0.0f;
+
+            uint32_t up_key = ct_keyboard_a0->button_index("w");
+            uint32_t down_key = ct_keyboard_a0->button_index("s");
+            uint32_t left_key = ct_keyboard_a0->button_index("a");
+            uint32_t right_key = ct_keyboard_a0->button_index("d");
+
+            if (ct_keyboard_a0->button_state(0, up_key) > 0) {
+                updown = 1.0f;
+            }
+
+            if (ct_keyboard_a0->button_state(0, down_key) > 0) {
+                updown = -1.0f;
+            }
+
+            if (ct_keyboard_a0->button_state(0, right_key) > 0) {
+                leftright = 1.0f;
+            }
+
+            if (ct_keyboard_a0->button_state(0, left_key) > 0) {
+                leftright = -1.0f;
+            }
+
+            fps_camera_update(editor->world,
+                              editor->camera_ent,
+                              dt, 0, 0, updown, leftright, 10.0f, false);
         }
 
         ct_ecs_a0->simulate(editor->world, dt);
@@ -418,6 +422,10 @@ static void update(uint64_t event) {
 static void on_render(uint64_t event) {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
+
+        if(!editor->world.h) {
+            continue;
+        }
 
         editor->rg_builder->call->clear(editor->rg_builder);
 
@@ -449,7 +457,6 @@ static void on_asset_double_click(uint64_t event) {
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .active_editor = UINT8_MAX
     };
 
 
@@ -457,6 +464,8 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
+
+    _new_editor((struct ct_resource_id){.i64=0});
 
 }
 

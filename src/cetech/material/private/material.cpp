@@ -20,6 +20,13 @@
 
 #include <corelib/os.h>
 #include <corelib/macros.h>
+#include <cetech/asset_property/asset_property.h>
+#include <cetech/debugui/debugui.h>
+#include <cstdio>
+#include <cstring>
+#include <cetech/ecs/ecs.h>
+#include <cetech/mesh_renderer/mesh_renderer.h>
+#include <cetech/asset_preview/asset_preview.h>
 
 
 #include "material.h"
@@ -50,8 +57,6 @@ static struct _G {
 //==============================================================================
 // Resource
 //==============================================================================
-
-
 
 static ct_render_uniform_type_t _type_to_bgfx[] = {
         [MAT_VAR_NONE] = CT_RENDER_UNIFORM_TYPE_COUNT,
@@ -180,6 +185,8 @@ static void offline(uint64_t name,
 static const ct_resource_type_t callback = {
         .online = online,
         .offline = offline,
+        .compilator = material_compiler,
+        .get_interface = get_interface
 };
 
 
@@ -259,10 +266,10 @@ static void submit(uint64_t material,
         uint64_t var = ct_cdb_a0->read_ref(variables, keys[j], 0);
         uint64_t type = ct_cdb_a0->read_uint64(var, MATERIAL_VAR_TYPE_PROP, 0);
 
-        ct_render_uniform_handle_t handle = {.idx = (uint16_t) ct_cdb_a0->read_uint64(
-                var,
-                MATERIAL_VAR_HANDLER_PROP,
-                0)
+        ct_render_uniform_handle_t handle = {
+                .idx = (uint16_t) ct_cdb_a0->read_uint64(var,
+                                                         MATERIAL_VAR_HANDLER_PROP,
+                                                         0)
         };
 
         switch (type) {
@@ -328,7 +335,7 @@ struct ct_material_a0 *ct_material_a0 = &material_api;
 
 static int init(struct ct_api_a0 *api) {
     _G = {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CT_ID32_0("material"),
             .db = ct_cdb_a0->global_db()
     };

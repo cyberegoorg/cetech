@@ -13,7 +13,6 @@
 #include <corelib/cdb.h>
 #include <cetech/ecs/ecs.h>
 
-#include <cetech/playground//playground.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/transform/transform.h>
@@ -44,8 +43,7 @@ void module1(uint64_t event) {
     CT_UNUSED(event)
 
     static bool visible = true;
-    if (ct_debugui_a0->BeginDock("Module 1", &visible,
-                                DebugUIWindowFlags_Empty)) {
+    if (ct_debugui_a0->BeginDock("Module 1", &visible, 0)) {
 
         ct_debugui_a0->Text("DT: %f", _G.dt);
         ct_debugui_a0->Text("FPS: %f", 1.0f / _G.dt );
@@ -92,8 +90,7 @@ void module1(uint64_t event) {
 
 void module2() {
     static bool visible = true;
-    if (ct_debugui_a0->BeginDock("Module 2", &visible,
-                                DebugUIWindowFlags_Empty)) {
+    if (ct_debugui_a0->BeginDock("Module 2", &visible, 0)) {
         ct_debugui_a0->Text("dear imgui, %d", 111);
         ct_debugui_a0->Text("By Omar Cornut and all github contributors.");
         ct_debugui_a0->Text(
@@ -116,7 +113,6 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_renderer_a0);

@@ -137,7 +137,7 @@ static struct _G {
 //
 //    struct ct_world last_world = _G.world_instances[last_idx].world;
 //
-//    CT_FREE(ct_memory_a0->main_allocator(),
+//    CT_FREE(ct_memory_a0->system,
 //            _G.world_instances[idx].buffer);
 //
 //    _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -326,7 +326,7 @@ static struct ct_component_i0 ct_component_i0 = {
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CT_ID64_0("transform"),
     };
 

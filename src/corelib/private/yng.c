@@ -1234,7 +1234,7 @@ static struct ct_yng_a0 yamlng_api = {
 struct ct_yng_a0 *ct_yng_a0 = &yamlng_api;
 
 static void _init(struct ct_api_a0 *api) {
-    _G = (struct _G) {.allocator = ct_memory_a0->main_allocator()};
+    _G = (struct _G) {.allocator = ct_memory_a0->system};
 
     api->register_api("ct_yng_a0", &yamlng_api);
 }

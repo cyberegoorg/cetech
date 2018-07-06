@@ -273,7 +273,7 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_ebus_a0", &_api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator()
+            .allocator = ct_memory_a0->system
     };
 
     create_ebus("", 0);

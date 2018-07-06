@@ -478,7 +478,7 @@ static void init(struct ct_api_a0 *api) {
 
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CT_ID64_0("scenegraph"),
     };
 

@@ -9,18 +9,18 @@
 #include <corelib/os.h>
 #include <corelib/module.h>
 
-#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
+#include <corelib/platform.h>
 
+#if CT_PLATFORM_LINUX || CT_PLATFORM_OSX
 #include <execinfo.h>
+#endif
+
 #include <corelib/macros.h>
 #include <corelib/memory.h>
 
-#endif
-
-
 char *stacktrace(int skip) {
-#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
-    struct ct_alloc *a = ct_core_allocator_a0->alloc;
+#if CT_PLATFORM_LINUX || CT_PLATFORM_OSX
+    struct ct_alloc *a = ct_memory_a0->system;
 
     char *return_str = CT_ALLOC(a, char, 4096);
     return_str[0] = '\0';
@@ -75,7 +75,7 @@ char *stacktrace(int skip) {
 }
 
 void stacktrace_free(char *st) {
-    struct ct_alloc *a = ct_core_allocator_a0->alloc;
+    struct ct_alloc *a = ct_memory_a0->system;
 
     CT_FREE(a, st);
 }

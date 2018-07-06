@@ -272,7 +272,7 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_dd_a0", &debugdraw_api);
 
     _G = {
-            .allocator = ct_memory_a0->main_allocator()
+            .allocator = ct_memory_a0->system
     };
 
     ddInit();

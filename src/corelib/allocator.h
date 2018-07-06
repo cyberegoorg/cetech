@@ -62,7 +62,7 @@ struct ct_alloc_fce {
                         const char *filename,
                         uint32_t line);
 
-    uint32_t (*total_allocated)(struct ct_alloc *allocator);
+    uint32_t (*total_allocated)(const struct ct_alloc *allocator);
 };
 
 struct ct_alloc {

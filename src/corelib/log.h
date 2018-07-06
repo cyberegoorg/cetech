@@ -3,8 +3,6 @@
 
 #include <cetech/macros.h>
 
-
-
 //==============================================================================
 // Includes
 //==============================================================================
@@ -26,18 +24,6 @@ enum ct_log_level {
     LOG_ERROR = 3,
 };
 
-//==============================================================================
-// Handlers
-//==============================================================================
-
-//! Stdout handler
-void ct_log_stdout_handler(enum ct_log_level level,
-                           time_t time,
-                           char worker_id,
-                           const char *where,
-                           const char *msg,
-                           void *data);
-
 
 //==============================================================================
 // Typedefs
@@ -51,15 +37,12 @@ typedef void (*ct_log_handler_t)(enum ct_log_level level,
                                  const char *msg,
                                  void *data);
 
-//! Worker id callback
-typedef char (*ct_log_get_wid_clb_t)();
-
 //==============================================================================
 // Api
 //==============================================================================
 
 struct ct_log_a0 {
-    void (*set_wid_clb)(ct_log_get_wid_clb_t get_wid_clb);
+    ct_log_handler_t stdout_handler;
 
     //! Register log handler
     //! \param handler Handler

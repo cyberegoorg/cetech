@@ -53,17 +53,12 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(default_render_graph);
     CETECH_ADD_STATIC_MODULE(command_history);
 
-
     CETECH_ADD_STATIC_MODULE(asset_property);
     CETECH_ADD_STATIC_MODULE(asset_preview);
-    CETECH_ADD_STATIC_MODULE(texture_property);
-
 
     CETECH_ADD_STATIC_MODULE(log_view);
     CETECH_ADD_STATIC_MODULE(entity_editor);
     CETECH_ADD_STATIC_MODULE(entity_preview);
     CETECH_ADD_STATIC_MODULE(material_preview);
-    CETECH_ADD_STATIC_MODULE(material_property);
-
 }
 

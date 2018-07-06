@@ -201,7 +201,7 @@ void name_from_filename(const char *fullname,
     memcpy(name, fullname, size);
 }
 
-void compiler(const char *filename,
+void material_compiler(const char *filename,
               char **output_blob,
               ct_compilator_api *compilator_api) {
     CT_UNUSED(compilator_api);
@@ -281,10 +281,9 @@ int materialcompiler_init(struct ct_api_a0 *api) {
     CETECH_GET_API(api, ct_ydb_a0);
 
     _G = (struct _G) {
-            .allocator=ct_memory_a0->main_allocator()
+            .allocator=ct_memory_a0->system
     };
 
-    ct_resource_a0->compiler_register("material", compiler, true);
 
     return 1;
 }

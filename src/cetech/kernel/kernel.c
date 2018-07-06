@@ -7,8 +7,6 @@
 #include "corelib/config.h"
 #include "corelib/module.h"
 #include "corelib/hashlib.h"
-#include "corelib/private/log_system_private.h"
-#include "corelib/private/memory_private.h"
 #include "corelib/private/api_private.h"
 
 #include <corelib/ebus.h>
@@ -24,6 +22,7 @@
 
 
 #include <cetech/static_module.h>
+#include <corelib/log.h>
 
 
 static struct KernelGlobals {
@@ -35,11 +34,11 @@ static struct KernelGlobals {
 void register_api(struct ct_api_a0 *api);
 
 const char *_platform() {
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
     return "linux";
 #elif defined(CETECH_WINDOWS)
     return "windows";
-#elif defined(CETECH_DARWIN)
+#elif CT_PLATFORM_OSX
     return "darwin";
 #endif
     return NULL;
@@ -106,21 +105,14 @@ int init_config(int argc,
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
+    ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
+
     ct_corelib_init();
 
     struct ct_api_a0 *api = ct_api_a0;
 
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_os_a0);
-    CETECH_GET_API(api, ct_config_a0);
-    CETECH_GET_API(api, ct_module_a0);
-    CETECH_GET_API(api, ct_cdb_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_task_a0);
-
     _G = (struct KernelGlobals) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config_object  = ct_config_a0->config_object(),
     };
 
@@ -249,32 +241,9 @@ static void on_quit(uint64_t event) {
     application_quit();
 }
 
-void application_start() {
+static void cetech_kernel_start() {
     _init_config();
 
-//   uint64_t obj1 = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), 0);
-//   uint64_t obj2 = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), 0);
-//   uint64_t obj3 = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), 0);
-//   uint64_t obj4 = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), 0);
-//
-//
-//    ct_cdb_obj_o* w1 = ct_cdb_a0->write_begin(obj1);
-//    ct_cdb_obj_o* w2 = ct_cdb_a0->write_begin(obj2);
-//    ct_cdb_obj_o* w3 = ct_cdb_a0->write_begin(obj3);
-//
-//    ct_cdb_a0->set_subobject(w1, CT_ID64_0("foo"), obj2);
-//    ct_cdb_a0->set_subobject(w2, CT_ID64_0("foo"), obj3);
-//    ct_cdb_a0->set_subobject(w3, CT_ID64_0("foo"), obj4);
-//
-//    ct_cdb_a0->write_commit(w1);
-//    ct_cdb_a0->write_commit(w2);
-//    ct_cdb_a0->write_commit(w3);
-//
-//    char* out = NULL;
-//    ct_cdb_a0->dump(obj1, &out, _G.allocator);
-//
-//    ct_cdb_a0->load(ct_cdb_a0->global_db(), out, _G.allocator);
-//
     if (ct_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
         ct_resource_a0->compiler_compile_all();
 
@@ -324,10 +293,6 @@ void application_start() {
     ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
 
     _boot_unload();
-}
-
-static void cetech_kernel_start() {
-    application_start();
 }
 
 int main(int argc,

@@ -47,6 +47,28 @@ namespace imgui_wrap {
                             _to_imvec4(border_col));
     }
 
+    void Image(struct ct_render_texture_handle user_texture_id,
+               const _vec2 size,
+               const _vec4 tint_col,
+               const _vec4 border_col) {
+
+        if (ct_renderer_a0->get_caps()->originBottomLeft) {
+            ct_debugui_a0->Image2(user_texture_id,
+                                  size,
+                                  (float[2]) {0.0f, 1.0f},
+                                  (float[2]) {1.0f, 0.0f},
+                                  tint_col,
+                                  border_col);
+        } else {
+            ct_debugui_a0->Image2(user_texture_id,
+                                  size,
+                                  (float[2]) {0.0f, 0.0f},
+                                  (float[2]) {1.0f, 1.0f},
+                                  tint_col,
+                                  border_col);
+        }
+    }
+
     bool ImageButton(ImTextureID user_texture_id,
                      const _vec2 size,
                      const _vec2 uv0,

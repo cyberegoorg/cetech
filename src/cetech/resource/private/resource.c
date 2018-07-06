@@ -33,8 +33,6 @@
 // Gloals
 //==============================================================================
 
-#define MAX_TYPES 64
-
 struct _G {
     struct ct_spinlock lock;
     struct ct_hash_t resource_map;
@@ -177,18 +175,17 @@ static void load(uint32_t type,
 
         ct_buffer_free(build_full, _G.allocator);
 
-        if (resource_file != NULL) {
-            _G.resource_callbacks[type_idx].online(names[i],
-                                                   resource_file,
-                                                   object);
-
-
-            ct_os_a0->thread_a0->spin_lock(&_G.lock);
-            ct_hash_add(&_G.resource_map, rid.i64,
-                        (uint64_t) object, _G.allocator);
-            ct_os_a0->thread_a0->spin_unlock(&_G.lock);
-            ct_fs_a0->close(resource_file);
+        if (!resource_file) {
+            continue;
         }
+
+        resource_i->online(names[i], resource_file, object);
+        ct_fs_a0->close(resource_file);
+
+
+        ct_os_a0->thread_a0->spin_lock(&_G.lock);
+        ct_hash_add(&_G.resource_map, rid.i64, (uint64_t) object, _G.allocator);
+        ct_os_a0->thread_a0->spin_unlock(&_G.lock);
     }
 }
 
@@ -226,7 +223,6 @@ static void unload(uint32_t type,
             type_clb.offline(names[i], object);
         }
     }
-
 }
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
@@ -312,6 +308,7 @@ void resource_memory_reload(struct ct_resource_id resource_id,
 }
 
 static struct ct_resource_a0 resource_api = {
+        .get_interface = get_resource_interface,
         .set_autoload = set_autoload,
         .register_type = resource_register_type,
         .load = load,
@@ -329,7 +326,6 @@ static struct ct_resource_a0 resource_api = {
 
         .compile_and_reload = compile_and_reload,
         .compiler_get_core_dir = resource_compiler_get_core_dir,
-        .compiler_register = resource_compiler_register,
         .compiler_compile_all = resource_compiler_compile_all,
         .compiler_get_filename = resource_compiler_get_filename,
         .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
@@ -375,7 +371,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object(),
             .db = ct_cdb_a0->global_db()
     };
