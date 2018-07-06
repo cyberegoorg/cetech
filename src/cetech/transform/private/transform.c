@@ -13,7 +13,7 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <corelib/log.h>
-#include <cetech/playground/entity_property.h>
+#include <cetech/ecs/entity_property.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
@@ -137,7 +137,7 @@ static struct _G {
 //
 //    struct ct_world last_world = _G.world_instances[last_idx].world;
 //
-//    CT_FREE(ct_memory_a0->main_allocator(),
+//    CT_FREE(ct_memory_a0->system,
 //            _G.world_instances[idx].buffer);
 //
 //    _G.world_instances[idx] = _G.world_instances[last_idx];
@@ -145,18 +145,10 @@ static struct _G {
 //    ct_array_pop_back(_G.world_instances);
 //}
 
-void _component_compiler(uint64_t event) {
-    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"),
-                                               "");
-    ct_cdb_obj_o *writer = ct_cdb_a0->read_ptr(event, CT_ID64_0("writer"),
-                                               NULL);
-
-    uint64_t *component_key = ct_cdb_a0->read_ptr(event,
-                                                  CT_ID64_0("component_key"),
-                                                  NULL);
-    uint32_t component_key_count = ct_cdb_a0->read_uint64(event, CT_ID64_0(
-            "component_key_count"), 0);
-
+void _component_compiler(const char *filename,
+                         uint64_t *component_key,
+                         uint32_t component_key_count,
+                         ct_cdb_obj_o *writer) {
     struct ct_transform_comp t_data;
 
     struct ct_yng_doc *d = ct_ydb_a0->get(filename);
@@ -224,7 +216,7 @@ static void _on_component_obj_change(uint64_t obj,
     };
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->entity_data(world, TRANSFORM_COMPONENT, ent);
+    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT, ent);
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
     ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
@@ -234,11 +226,8 @@ static void _on_component_obj_change(uint64_t obj,
 }
 
 
-static void _component_spawner(uint64_t event) {
-    uint64_t obj = ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0);
-    struct ct_transform_comp *transform = ct_cdb_a0->read_ptr(event,
-                                                              CT_ID64_0("data"),
-                                                              NULL);
+static void _component_spawner(uint64_t obj, void* data) {
+    struct ct_transform_comp *transform = data;
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
     ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
@@ -290,6 +279,7 @@ void guizmo_get_transform(uint64_t obj,
 }
 
 void guizmo_set_transform(uint64_t obj,
+                          uint8_t operation,
                           float *world,
                           float *local) {
     float pos[3] = {0};
@@ -298,9 +288,25 @@ void guizmo_set_transform(uint64_t obj,
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
     struct ct_cdb_obj_t *w = ct_cdb_a0->write_begin(obj);
-    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0->set_vec3(w, PROP_ROTATION, rot_deg);
-    ct_cdb_a0->set_vec3(w, PROP_SCALE, scale);
+
+    switch (operation) {
+        case TRANSLATE:
+            ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+            break;
+
+        case ROTATE:
+            ct_cdb_a0->set_vec3(w, PROP_ROTATION, rot_deg);
+            break;
+
+        case SCALE:
+            ct_cdb_a0->set_vec3(w, PROP_SCALE, scale);
+            break;
+
+        default:
+            break;
+    }
+
+
     ct_cdb_a0->write_commit(w);
 }
 
@@ -319,43 +325,30 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+
+static uint64_t size() {
+    return sizeof(struct ct_transform_comp);
+}
+
+
 static struct ct_component_i0 ct_component_i0 = {
+        .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+                .compiler = _component_compiler,
+                        .spawner = _component_spawner,
 };
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CT_ID64_0("transform"),
     };
 
     api->register_api("ct_component_i0", &ct_component_i0);
-
-    ct_ecs_a0->register_component(
-            (struct ct_component_info) {
-                    .size = sizeof(struct ct_transform_comp),
-                    .component_name = TRANSFORMATION_COMPONENT_NAME,
-            });
-
-    ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                             CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
-                             _component_spawner, 0);
-
-    ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                             CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
-                             _component_compiler, 0);
-
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                                CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
-                                _component_spawner);
-
-    ct_ebus_a0->disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                                CT_ID64_0(TRANSFORMATION_COMPONENT_NAME),
-                                _component_compiler);
 
 }
 

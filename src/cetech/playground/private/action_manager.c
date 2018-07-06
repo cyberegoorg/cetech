@@ -165,7 +165,7 @@ struct ct_action_manager_a0 *ct_action_manager_a0 = &action_manager_api;
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator()
+            .allocator = ct_memory_a0->system
     };
 
     api->register_api("ct_action_manager_a0", &action_manager_api);

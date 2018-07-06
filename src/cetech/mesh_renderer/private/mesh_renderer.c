@@ -21,7 +21,7 @@
 #include <cetech/mesh_renderer/mesh_renderer.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <cetech/macros.h>
-#include <cetech/playground/entity_property.h>
+#include <cetech/ecs/entity_property.h>
 #include <stdlib.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
@@ -35,15 +35,10 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-void _mesh_component_compiler(uint64_t event) {
-    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"),
-                                               "");
-    ct_cdb_obj_o *writer = ct_cdb_a0->read_ptr(event, CT_ID64_0("writer"), 0);
-    uint64_t *component_key = ct_cdb_a0->read_ptr(event,
-                                                  CT_ID64_0("component_key"),
-                                                  NULL);
-    uint32_t component_key_count = ct_cdb_a0->read_uint64(event, CT_ID64_0(
-            "component_key_count"), 0);
+void _mesh_component_compiler(const char *filename,
+                              uint64_t *component_key,
+                              uint32_t component_key_count,
+                              ct_cdb_obj_o *writer) {
 
     uint64_t keys[component_key_count + 3];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
@@ -91,10 +86,10 @@ void foreach_mesh_renderer(struct ct_world world,
     struct mesh_render_data *data = _data;
 
     struct ct_mesh_renderer *mesh_renderers;
-    mesh_renderers = ct_ecs_a0->entities_data(MESH_RENDERER_COMPONENT, item);
+    mesh_renderers = ct_ecs_a0->component->entities_data(MESH_RENDERER_COMPONENT, item);
 
     struct ct_transform_comp *transforms;
-    transforms = ct_ecs_a0->entities_data(TRANSFORM_COMPONENT, item);
+    transforms = ct_ecs_a0->component->entities_data(TRANSFORM_COMPONENT, item);
 
     for (int i = 1; i < n; ++i) {
         struct ct_transform_comp t = transforms[i];
@@ -153,8 +148,8 @@ void mesh_render_all(struct ct_world world,
                      uint64_t layer_name) {
     struct mesh_render_data render_data = {.viewid = viewid, .layer_name = layer_name};
     ct_ecs_a0->process(world,
-                       ct_ecs_a0->component_mask(MESH_RENDERER_COMPONENT) |
-                       ct_ecs_a0->component_mask(TRANSFORM_COMPONENT),
+                       ct_ecs_a0->component->mask(MESH_RENDERER_COMPONENT) |
+                       ct_ecs_a0->component->mask(TRANSFORM_COMPONENT),
                        foreach_mesh_renderer, &render_data);
 }
 
@@ -185,7 +180,7 @@ static void _on_obj_change(uint64_t obj,
     };
 
     struct ct_mesh_renderer *mr;
-    mr = ct_ecs_a0->entity_data(world, MESH_RENDERER_COMPONENT, ent);
+    mr = ct_ecs_a0->component->entity_data(world, MESH_RENDERER_COMPONENT, ent);
 
     ct_cdb_obj_o *writer = NULL;
     for (int k = 0; k < prop_count; ++k) {
@@ -263,12 +258,8 @@ static void _on_obj_change(uint64_t obj,
     }
 }
 
-static void _component_spawner(uint64_t event) {
-    uint64_t obj = ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0);
-
-    struct ct_mesh_renderer *mesh = ct_cdb_a0->read_ptr(event,
-                                                        CT_ID64_0("data"),
-                                                        0);
+static void _component_spawner(uint64_t obj, void* data) {
+    struct ct_mesh_renderer *mesh = data;
 
     *mesh = (struct ct_mesh_renderer) {
             .material = ct_material_a0->resource_create(
@@ -341,45 +332,31 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+static uint64_t size() {
+    return sizeof(struct ct_mesh_renderer);
+}
+
 static struct ct_component_i0 ct_component_i0 = {
+        .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+                .compiler = _mesh_component_compiler,
+                        .spawner = _component_spawner,
 };
 
 static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = MESH_RENDERER_COMPONENT,
     };
 
     api->register_api("ct_component_i0", &ct_component_i0);
 
-
-    ct_ecs_a0->register_component(
-            (struct ct_component_info) {
-                    .component_name = "mesh_renderer",
-                    .size = sizeof(struct ct_mesh_renderer),
-
-            });
-
-    ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                             MESH_RENDERER_COMPONENT, _component_spawner, 0);
-
-    ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                             MESH_RENDERER_COMPONENT,
-                             _mesh_component_compiler, 0);
-
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                                MESH_RENDERER_COMPONENT, _component_spawner);
-
-    ct_ebus_a0->disconnect_addr(ECS_EBUS, ECS_COMPONENT_COMPILE,
-                                MESH_RENDERER_COMPONENT,
-                                _mesh_component_compiler);
 }
 
 static void init(struct ct_api_a0 *api) {

@@ -1,8 +1,10 @@
 #include <unistd.h>
 
-#ifdef CETECH_LINUX
+#include <corelib/platform.h>
+
+#if CT_PLATFORM_LINUX
 #include <sys/inotify.h>
-#elif defined(CETECH_DARWIN)
+#elif CT_PLATFORM_OSX
 
 #include <CoreServices/CoreServices.h>
 
@@ -33,11 +35,11 @@ struct _G {
 struct watchdog_instance {
     struct ct_alloc *alloc;
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
     int inotify;
 #endif
 
-#ifdef CETECH_DARWIN
+#if CT_PLATFORM_OSX
 
 #endif
 
@@ -50,7 +52,7 @@ void add_dir(ct_watchdog_instance_t *inst,
 
 
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
     //    int wd = 0;
     //    wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
     //    ct_log_a0->debug(LOG_WHERE_WATCHDOG, "New watch -> %s", path);
@@ -68,7 +70,7 @@ void add_dir(ct_watchdog_instance_t *inst,
 //    celib::map::set(wi->dir2wd, path_hash, wd);
 //    celib::map::set(wi->wd2dir, wd, path_dup);
 
-    struct ct_alloc *allocator = ct_memory_a0->main_allocator();
+    struct ct_alloc *allocator = ct_memory_a0->system;
 
     if (recursive) {
         char **files;
@@ -135,7 +137,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
     clean_events(wi);
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
 #define BUF_LEN 1024
 
     char buf[BUF_LEN] __attribute__ ((aligned(8)));
@@ -196,7 +198,7 @@ struct ct_watchdog *create(struct ct_alloc *alloc) {
         return NULL;
     }
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
     int inotify = inotify_init1(IN_NONBLOCK);
     if (-1 == inotify) {
         ct_log_a0->error(LOG_WHERE_WATCHDOG, "Could not init inotify");
@@ -232,14 +234,14 @@ void destroy(struct ct_watchdog *watchdog) {
 //    while (ct_it != ct_end) {
 //        CT_FREE(alloc, ct_it->value);
 //
-//#ifdef CETECH_LINUX
+//#if CT_PLATFORM_LINUX
 //        inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
 //#endif
 //
 //        ++ct_it;
 //    }
 //
-//#ifdef CETECH_LINUX
+//#if CT_PLATFORM_LINUX
 //    close(wi->inotify);
 //#endif
 //

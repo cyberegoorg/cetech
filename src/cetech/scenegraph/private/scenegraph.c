@@ -291,7 +291,7 @@ static int has(struct ct_world world,
 static struct ct_scene_node get_root(struct ct_world world,
                                      struct ct_entity entity) {
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
                                    entity);
 
     return (struct ct_scene_node) {.idx = scene->idx, .world = world};
@@ -305,7 +305,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t count) {
     CT_UNUSED(pose);
 
-    ct_ecs_a0->add_components(world, entity, &_G.type, 1);
+    ct_ecs_a0->entity->add_components(world, entity, &_G.type, 1);
 
     struct WorldInstance *data = _get_world_instance(world);
 
@@ -382,7 +382,7 @@ static struct ct_scene_node create(struct ct_world world,
     CT_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
                                    entity);
 
     scene->idx = root.idx;
@@ -469,26 +469,26 @@ static void _init_api(struct ct_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
 }
 
-static void _component_spawner(uint64_t event) {
-    CT_UNUSED(event);
-}
+//static void _component_spawner(uint64_t event) {
+//    CT_UNUSED(event);
+//}
+//
+
+
 
 static void init(struct ct_api_a0 *api) {
     _init_api(api);
 
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CT_ID64_0("scenegraph"),
     };
-
-    ct_ecs_a0->register_component((struct ct_component_info) {
-            .size = sizeof(struct ct_scenegraph_component),
-            .component_name = "scenegraph",
-    });
-
-    ct_ebus_a0->connect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                             CT_ID64_0("scenegraph"), _component_spawner, 0);
+//
+//    ct_ecs_a0->register_component((struct ct_component_info) {
+//            .size = sizeof(struct ct_scenegraph_component),
+//            .component_name = "scenegraph",
+//    });
 
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
@@ -496,9 +496,6 @@ static void init(struct ct_api_a0 *api) {
 }
 
 static void shutdown() {
-    ct_ebus_a0->disconnect_addr(ECS_EBUS, ECS_COMPONENT_SPAWN,
-                                CT_ID64_0("scenegraph"), _component_spawner);
-
     ct_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
     ct_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);
 

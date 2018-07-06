@@ -1,7 +1,0 @@
-pyyaml
-nanomsg
-msgpack-python
-aiohttp
-colorlog
-watchdog
-jinja2

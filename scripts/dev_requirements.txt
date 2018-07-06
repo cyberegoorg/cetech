@@ -1,3 +1,0 @@
-cffi
-pytest
-pytest-bdd

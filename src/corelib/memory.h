@@ -5,23 +5,13 @@
 
 struct ct_alloc;
 
-struct ct_core_allocator_a0 {
-    struct ct_alloc *alloc;
-};
-
-CT_MODULE(ct_core_allocator_a0);
-
 //==============================================================================
 // Api
 //==============================================================================
 
 //! Memory system API V0
 struct ct_memory_a0 {
-
-    //! Main allcator
-    //! \return Main alocator
-    struct ct_alloc *(*main_allocator)();
-
+    struct ct_alloc *system;
 
     char *(*str_dup)(const char *s,
                      struct ct_alloc *allocator);

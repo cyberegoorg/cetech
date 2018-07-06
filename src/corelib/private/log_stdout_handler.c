@@ -4,7 +4,9 @@
 
 #include <stdio.h>
 
-#if defined(CETECH_LINUX)
+#include <corelib/platform.h>
+
+#if CT_PLATFORM_LINUX
 
 #include <sys/file.h>
 
@@ -35,6 +37,9 @@
     "worker: %d\n"   \
     "msg: |\n  %s\n"
 
+#if CT_PLATFORM_LINUX || CT_PLATFORM_OSX
+#define CETECH_COLORED_LOG
+#endif
 
 #ifdef CETECH_COLORED_LOG
 #define COLORED_TEXT(color, text) FBLACK color text NONE
@@ -81,18 +86,18 @@ void ct_log_stdout_handler(enum ct_log_level level,
     struct tm *gmtm = gmtime(&time);
     const char *time_str = _time_to_str(gmtm);
 
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
     flock(out->_fileno, LOCK_EX);
 #endif
 
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
-#ifdef CETECH_LINUX
+#if CT_PLATFORM_LINUX
     fflush_unlocked(out);
 #endif
 
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
     flock(out->_fileno, LOCK_UN);
 #endif
 }

@@ -78,7 +78,7 @@ void foreach_camera(struct ct_world world,
     struct cameras *cameras = data;
 
     struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->entities_data(CAMERA_COMPONENT, item);
+    camera_data = ct_ecs_a0->component->entities_data(CAMERA_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
         uint32_t idx = cameras->n++;
@@ -114,7 +114,7 @@ static void geometry_pass_on_pass(void *inst,
     memset(&cameras, 0, sizeof(struct cameras));
 
     ct_ecs_a0->process(pass->world,
-                       ct_ecs_a0->component_mask(CAMERA_COMPONENT),
+                       ct_ecs_a0->component->mask(CAMERA_COMPONENT),
                        foreach_camera, &cameras);
 
     ct_dd_a0->begin(viewid);
@@ -313,7 +313,7 @@ struct ct_default_render_graph_a0 *ct_default_render_graph_a0 = &default_render_
 static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
     _G = (struct _G) {
-            .alloc = ct_memory_a0->main_allocator(),
+            .alloc = ct_memory_a0->system,
     };
 
     init_decl();

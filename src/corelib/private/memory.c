@@ -1,59 +1,47 @@
 #include <memory.h>
+#include <stdlib.h>
+
 #include <corelib/api_system.h>
 #include <corelib/os.h>
-
 #include <corelib/memory.h>
 #include <corelib/macros.h>
-
 #include "corelib/allocator.h"
 #include "corelib/log.h"
-
-#include "memory_private.h"
-
 
 #define LOG_WHERE "memory"
 #define ALLOCATOR_WHERE "allocator"
 
-struct MemorySystemGlobals {
-    struct ct_alloc *default_allocator;
-} _G = {};
+static void *_reallocate(const struct ct_alloc *a,
+                         void *ptr,
+                         uint32_t size,
+                         uint32_t align,
+                         const char *filename,
+                         uint32_t line) {
+    CT_UNUSED(a);
+    CT_UNUSED(align);
+    CT_UNUSED(filename);
+    CT_UNUSED(line);
 
-void *data_pointer(struct Header *header,
-                   uint32_t align) {
-    const void *p = header + 1;
-    return (void *) pointer_align_forward(p, align);
+    void *new_ptr = NULL;
+
+    if (size) {
+        new_ptr = realloc(ptr, size);
+    } else {
+        free(ptr);
+    }
+
+    return new_ptr;
 }
 
-struct Header *header(void *data) {
-    uint32_t *p = (uint32_t *) data;
+static struct ct_alloc_fce alloc_fce = {
+        .reallocate = _reallocate
+};
 
-    while (p[-1] == HEADER_PAD_VALUE)
-        --p;
+static struct ct_alloc _allocator = {
+        .inst = NULL,
+        .call = &alloc_fce,
+};
 
-    return (struct Header *) p - 1;
-}
-
-void fill(struct Header *header,
-          void *data,
-          uint32_t size) {
-    header->size = size;
-    uint32_t *p = (uint32_t *) (header + 1);
-    while (p < (uint32_t *) data)
-        *p++ = HEADER_PAD_VALUE;
-}
-
-const void *pointer_align_forward(const void *p,
-                                  uint32_t align) {
-    uintptr_t pi = (uintptr_t) p;
-    const uint32_t mod = pi % align;
-    if (mod)
-        pi += (align - mod);
-    return (void *) pi;
-}
-
-struct ct_alloc *memsys_main_allocator() {
-    return _G.default_allocator;
-}
 
 char *str_dup(const char *s,
               struct ct_alloc *allocator) {
@@ -69,27 +57,21 @@ char *str_dup(const char *s,
 }
 
 static struct ct_memory_a0 _api = {
-        .main_allocator = memsys_main_allocator,
+        .system = &_allocator,
         .str_dup = str_dup,
 };
 
 struct ct_memory_a0 *ct_memory_a0 = &_api;
 
-void register_api(struct ct_api_a0 *api) {
-
-
+void memory_register_api(struct ct_api_a0 *api) {
     api->register_api("ct_memory_a0", &_api);
 }
 
 void memory_init() {
-    _G = (struct MemorySystemGlobals) {0};
-
-    _G.default_allocator = malloc_allocator_create();
 
 }
 
 void memsys_shutdown() {
-    malloc_allocator_destroy(_G.default_allocator);
 }
 
 

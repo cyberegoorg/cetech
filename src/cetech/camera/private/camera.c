@@ -9,7 +9,7 @@
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
-#include <cetech/playground/entity_property.h>
+#include <cetech/ecs/entity_property.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
@@ -26,16 +26,11 @@ static struct CameraGlobal {
     struct ct_alloc *allocator;
 } CameraGlobal;
 
-static void _camera_compiler(uint64_t event) {
-    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"),
-                                               "");
-    ct_cdb_obj_o *writer = ct_cdb_a0->read_ptr(event, CT_ID64_0("writer"),
-                                               NULL);
-    uint64_t *component_key = ct_cdb_a0->read_ptr(event,
-                                                  CT_ID64_0("component_key"),
-                                                  NULL);
-    uint32_t component_key_count = ct_cdb_a0->read_uint64(event, CT_ID64_0(
-            "component_key_count"), 0);
+static void _camera_compiler(const char *filename,
+                             uint64_t *component_key,
+                             uint32_t component_key_count,
+                             ct_cdb_obj_o *writer) {
+
 
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
@@ -65,8 +60,10 @@ static void get_project_view(struct ct_world world,
     struct ct_transform_comp *transform;
     struct ct_camera_component *camera_data;
 
-    transform = ct_ecs_a0->entity_data(world, TRANSFORM_COMPONENT, camera);
-    camera_data = ct_ecs_a0->entity_data(world, CAMERA_COMPONENT, camera);
+    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT,
+                                                  camera);
+    camera_data = ct_ecs_a0->component->entity_data(world, CAMERA_COMPONENT,
+                                                    camera);
 
     float ratio = (float) (width) / (float) (height);
 
@@ -114,7 +111,7 @@ static void _on_obj_change(uint64_t obj,
     };
 
     struct ct_camera_component *camera;
-    camera = ct_ecs_a0->entity_data(world, CAMERA_COMPONENT, ent);
+    camera = ct_ecs_a0->component->entity_data(world, CAMERA_COMPONENT, ent);
 
     for (int k = 0; k < prop_count; ++k) {
         if (prop[k] == PROP_FOV) {
@@ -127,11 +124,8 @@ static void _on_obj_change(uint64_t obj,
     }
 }
 
-static void _component_spawner(uint64_t event) {
-    uint64_t obj = ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0);
-    struct ct_camera_component *camera = ct_cdb_a0->read_ptr(event,
-                                                             CT_ID64_0("data"),
-                                                             NULL);
+static void _component_spawner(uint64_t obj, void* data) {
+    struct ct_camera_component *camera = data;
 
     *camera = (struct ct_camera_component) {
             .fov = ct_cdb_a0->read_float(obj, PROP_FOV, 0.0f),
@@ -171,9 +165,16 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 
+static uint64_t size() {
+    return sizeof(struct ct_camera_component);
+}
+
 static struct ct_component_i0 ct_component_i0 = {
+        .size = size,
         .cdb_type = cdb_type,
-        .get_interface = get_interface
+        .get_interface = get_interface,
+        .compiler = _camera_compiler,
+                .spawner = _component_spawner,
 };
 
 
@@ -181,40 +182,14 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_camera_a0", &camera_api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .type = CAMERA_COMPONENT,
     };
 
     api->register_api("ct_component_i0", &ct_component_i0);
-
-    ct_ecs_a0->register_component((struct ct_component_info) {
-            .component_name = "camera",
-            .size = sizeof(struct ct_camera_component),
-    });
-
-    ct_ebus_a0->connect_addr(ECS_EBUS,
-                             ECS_COMPONENT_SPAWN,
-                             _G.type, _component_spawner, 0);
-
-    ct_ebus_a0->connect_addr(ECS_EBUS,
-                             ECS_COMPONENT_COMPILE,
-                             _G.type, _camera_compiler, 0);
-
-
-//    ct_ecs_a0->register_simulation("render", render_simu);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect_addr(ECS_EBUS,
-                                ECS_COMPONENT_SPAWN,
-                                _G.type,
-                                _component_spawner);
-
-
-    ct_ebus_a0->disconnect_addr(ECS_EBUS,
-                                ECS_COMPONENT_COMPILE,
-                                _G.type,
-                                _camera_compiler);
 }
 
 

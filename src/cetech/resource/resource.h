@@ -16,17 +16,15 @@
 struct ct_vio;
 struct ct_alloc;
 struct ct_config_a0;
-struct ct_app_a0;
 struct ct_compilator_api;
 
 //==============================================================================
 // Typedefs
 //==============================================================================
 
-typedef void (*ct_resource_compilator_t)(
-        const char *filename,
-        char **output,
-        struct ct_compilator_api *compilator_api);
+typedef void (*ct_resource_compilator_t)(const char *filename,
+                                         char **output,
+                                         struct ct_compilator_api *compilator_api);
 
 
 //==============================================================================
@@ -44,14 +42,22 @@ struct ct_resource_id {
 };
 
 //! Resource callbacks
-typedef struct {
+struct ct_resource_i0 {
+    uint64_t (*cdb_type)();
+
+    void *(*get_interface)(uint64_t name_hash);
+
     void (*online)(uint64_t name,
                    struct ct_vio *input,
                    uint64_t obj);
 
     void (*offline)(uint64_t name,
                     uint64_t obj);
-} ct_resource_type_t;
+
+    void (*compilator)(const char *filename,
+                       char **output,
+                       struct ct_compilator_api *compilator_api);
+};
 
 
 //! Compilator api
@@ -67,11 +73,9 @@ struct ct_compilator_api {
 
 
 struct ct_resource_a0 {
+    struct ct_resource_i0* (*get_interface)(uint64_t type);
+
     void (*set_autoload)(bool enable);
-
-    void (*register_type)(const char *type,
-                          ct_resource_type_t callbacks);
-
 
     void (*load)(uint32_t type,
                  uint32_t *names,
@@ -108,10 +112,6 @@ struct ct_resource_a0 {
                             size_t max_len,
                             struct ct_resource_id resourceid);
 
-    void (*compiler_register)(const char *type,
-                              ct_resource_compilator_t compilator,
-                              bool yaml_based);
-
     void (*compiler_compile_all)();
 
     void (*compile_and_reload)(const char *filename);
@@ -144,4 +144,3 @@ struct ct_resource_a0 {
 CT_MODULE(ct_resource_a0);
 
 #endif //CETECH_RESOURCE_H
-//! |}

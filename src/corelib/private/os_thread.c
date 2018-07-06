@@ -1,10 +1,11 @@
 #include "include/SDL2/SDL.h"
+#include <corelib/platform.h>
 
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
 #include <sched.h>
 #endif
 
-#if defined(CETECH_DARWIN)
+#if CT_PLATFORM_OSX
 
 #include <sched.h>
 #include <unistd.h>
@@ -56,9 +57,9 @@ uint64_t thread_actual_id() {
 }
 
 void thread_yield() {
-#if defined(CETECH_DARWIN)
+#if CT_PLATFORM_OSX
     sched_yield();
-#elif defined(CETECH_LINUX)
+#elif CT_PLATFORM_LINUX
     sched_yield();
 #endif
 }

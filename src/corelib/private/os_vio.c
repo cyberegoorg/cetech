@@ -59,7 +59,7 @@ int vio_sdl_close(struct ct_vio *file) {
 struct ct_vio *vio_from_file(const char *path,
                              enum ct_vio_open_mode mode) {
 
-    struct ct_alloc *alloc = ct_core_allocator_a0->alloc;
+    struct ct_alloc *alloc =ct_memory_a0->system;
 
     struct ct_vio *vio = CT_ALLOC(alloc,
                                   struct ct_vio,

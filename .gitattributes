@@ -1,1 +1,6 @@
 externals/build/** linguist-vendored=true
+src/cetech/debugui/private/bgfx_imgui/** linguist-vendored=true
+src/cetech/debugui/private/iconfontheaders/** linguist-vendored=true
+src/cetech/debugui/private/ocornut-imgui/** linguist-vendored=true
+src/cetech/debugui/private/ocornut-imgui/bgfx_utils.h linguist-vendored=true
+src/cetech/debugdraw/private/debugdraw/** linguist-vendored=true

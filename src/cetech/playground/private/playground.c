@@ -115,7 +115,8 @@ static float draw_main_menu() {
 
                 char title[128] = {0};
 
-                snprintf(title, CT_ARRAY_LEN(title), "%s %llu", i->title(i), i->id);
+                snprintf(title, CT_ARRAY_LEN(title), "%s %llu",
+                         i->display_title(i), i->id);
 
                 ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
 
@@ -130,7 +131,7 @@ static float draw_main_menu() {
         while (it.api) {
             struct ct_dock_i *i = (it.api);
 
-            if(i->draw_main_menu) {
+            if (i->draw_main_menu) {
                 i->draw_main_menu();
             }
             it = ct_api_a0->next(it);
@@ -158,10 +159,11 @@ static void draw_all_docks() {
 
 
         char title[128] = {0};
-        snprintf(title, CT_ARRAY_LEN(title), "%s##dock%llu", i->title(i), i->id);
+        snprintf(title, CT_ARRAY_LEN(title), "%s##%s_dock%llu",
+                 i->display_title(i), i->name(i), i->id);
 
-        if (ct_debugui_a0->BeginDock(title, &i->visible, 0)) {
-            if(i->draw_ui) {
+        if (ct_debugui_a0->BeginDock(title, &i->visible, i->dock_flag)) {
+            if (i->draw_ui) {
                 i->draw_ui(i);
             }
         }

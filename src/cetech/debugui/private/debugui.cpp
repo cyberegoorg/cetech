@@ -125,6 +125,7 @@ static struct ct_debugui_a0 debugui_api = {
         .Button = imgui_wrap::Button,
         .SmallButton = ImGui::SmallButton,
         .InvisibleButton = imgui_wrap::InvisibleButton,
+                .Image = imgui_wrap::Image,
         .Image2 = imgui_wrap::Image2,
         .ImageButton = imgui_wrap::ImageButton,
         .Checkbox = ImGui::Checkbox,
@@ -246,16 +247,18 @@ static struct ct_debugui_a0 debugui_api = {
         .guizmo_set_rect = imgui_wrap::guizmo_set_rect,
         .guizmo_manipulate = imgui_wrap::guizmo_manipulate,
         .guizmo_decompose_matrix = imgui_wrap::guizmo_decompose_matrix,
+        .GetContentRegionAvail= imgui_wrap::GetContentRegionAvail,
+        .GetTextLineHeightWithSpacing = ImGui::GetTextLineHeightWithSpacing,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_debugui_a0", &debugui_api);
-    imguiCreate(16);
+    imguiCreate(11);
 
     _G = {
-            .allocator = ct_memory_a0->main_allocator()
+            .allocator = ct_memory_a0->system
     };
 
     ct_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);

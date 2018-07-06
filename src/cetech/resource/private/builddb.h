@@ -82,8 +82,7 @@ static int builddb_init_db(const char *build_dir,
                            struct ct_path_a0 *path,
                            struct ct_memory_a0 *memory) {
 
-    path->join(&_logdb_path, memory->main_allocator(), 2, build_dir,
-               "build.db");
+    path->join(&_logdb_path, memory->system, 2, build_dir, "build.db");
 
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"

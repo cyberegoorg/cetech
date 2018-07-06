@@ -29,8 +29,11 @@
 #define ct_array_resize(a, c, alloc) \
      (ct_array_set_capacity(a, c, alloc), ct_array_header(a)->size = (c))
 
-#define ct_array_empty(a) (ct_array_size(a) == 0)
-#define ct_array_any(a) (ct_array_size(a) > 0)
+#define ct_array_empty(a) \
+    (ct_array_size(a) == 0)
+
+#define ct_array_any(a) \
+    (ct_array_size(a) > 0)
 
 #define ct_array_full(a) \
     ct_array_full_n(a, 1)
@@ -61,8 +64,11 @@
         a[idx] = v;\
     } while(0)
 
-#define ct_array_front(a) a[0]
-#define ct_array_back(a) a[ct_array_size(a)-1]
+#define ct_array_front(a) \
+    a[0]
+
+#define ct_array_back(a) \
+    a[ct_array_size(a)-1]
 
 struct ct_array_header_t {
     uint32_t size;

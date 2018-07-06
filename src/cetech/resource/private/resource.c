@@ -33,14 +33,11 @@
 // Gloals
 //==============================================================================
 
-#define MAX_TYPES 64
-
 struct _G {
     struct ct_spinlock lock;
     struct ct_hash_t resource_map;
 
     struct ct_hash_t type_map;
-    ct_resource_type_t *resource_callbacks;
 
     bool autoload_enabled;
 
@@ -85,14 +82,13 @@ static void set_autoload(bool enable) {
     _G.autoload_enabled = enable;
 }
 
-void resource_register_type(const char *type,
-                            ct_resource_type_t callbacks) {
 
-    const uint32_t idx = ct_array_size(_G.resource_callbacks);
+static void _resource_api_add(uint64_t name,
+                              void *api) {
+    struct ct_resource_i0 *ct_resource_i = api;
 
-    uint32_t typeid = CT_ID32_0(type);
-    ct_array_push(_G.resource_callbacks, callbacks, _G.allocator);
-    ct_hash_add(&_G.type_map, typeid, idx, _G.allocator);
+    ct_hash_add(&_G.type_map, ct_resource_i->cdb_type(),
+                (uint64_t) api, _G.allocator);
 }
 
 static void load(uint32_t type,
@@ -129,12 +125,17 @@ static int can_get_all(uint32_t type,
     return 1;
 }
 
+static struct ct_resource_i0* get_resource_interface(uint64_t type) {
+    return (struct ct_resource_i0 *) ct_hash_lookup(&_G.type_map, type, 0);
+}
+
 static void load(uint32_t type,
                  uint32_t *names,
                  size_t count,
                  int force) {
-    const uint32_t type_idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
-    if (type_idx == UINT32_MAX) {
+    struct ct_resource_i0* resource_i = get_resource_interface(type);
+
+    if(!resource_i) {
         return;
     }
 
@@ -177,18 +178,17 @@ static void load(uint32_t type,
 
         ct_buffer_free(build_full, _G.allocator);
 
-        if (resource_file != NULL) {
-            _G.resource_callbacks[type_idx].online(names[i],
-                                                   resource_file,
-                                                   object);
-
-
-            ct_os_a0->thread_a0->spin_lock(&_G.lock);
-            ct_hash_add(&_G.resource_map, rid.i64,
-                        (uint64_t) object, _G.allocator);
-            ct_os_a0->thread_a0->spin_unlock(&_G.lock);
-            ct_fs_a0->close(resource_file);
+        if (!resource_file) {
+            continue;
         }
+
+        resource_i->online(names[i], resource_file, object);
+        ct_fs_a0->close(resource_file);
+
+
+        ct_os_a0->thread_a0->spin_lock(&_G.lock);
+        ct_hash_add(&_G.resource_map, rid.i64, (uint64_t) object, _G.allocator);
+        ct_os_a0->thread_a0->spin_unlock(&_G.lock);
     }
 }
 
@@ -196,11 +196,11 @@ static void unload(uint32_t type,
                    uint32_t *names,
                    size_t count) {
 
-    const uint32_t idx = ct_hash_lookup(&_G.type_map, type, UINT32_MAX);
-    if (idx == UINT32_MAX) {
+    struct ct_resource_i0* resource_i = get_resource_interface(type);
+
+    if(!resource_i) {
         return;
     }
-    ct_resource_type_t type_clb = _G.resource_callbacks[idx];
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
@@ -223,10 +223,9 @@ static void unload(uint32_t type,
             object = (uint64_t) ct_hash_lookup(&_G.resource_map,
                                                rid.i64, 0);
 
-            type_clb.offline(names[i], object);
+            resource_i->offline(names[i], object);
         }
     }
-
 }
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
@@ -312,8 +311,8 @@ void resource_memory_reload(struct ct_resource_id resource_id,
 }
 
 static struct ct_resource_a0 resource_api = {
+        .get_interface = get_resource_interface,
         .set_autoload = set_autoload,
-        .register_type = resource_register_type,
         .load = load,
         .load_now = load_now,
         .unload = unload,
@@ -321,7 +320,6 @@ static struct ct_resource_a0 resource_api = {
         .reload_all = reload_all,
         .can_get = can_get,
         .can_get_all = can_get_all,
-//        .get = get,
         .get = get_obj,
         .type_name_string = type_name_string,
 
@@ -329,7 +327,6 @@ static struct ct_resource_a0 resource_api = {
 
         .compile_and_reload = compile_and_reload,
         .compiler_get_core_dir = resource_compiler_get_core_dir,
-        .compiler_register = resource_compiler_register,
         .compiler_compile_all = resource_compiler_compile_all,
         .compiler_get_filename = resource_compiler_get_filename,
         .compiler_get_tmp_dir = resource_compiler_get_tmp_dir,
@@ -367,6 +364,7 @@ static void _init_cvar(struct ct_config_a0 *config) {
         ct_cdb_a0->set_str(writer, CONFIG_BUILD_DIR, "build");
     }
     ct_cdb_a0->write_commit(writer);
+
 }
 
 
@@ -375,7 +373,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_cvar(ct_config_a0);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object(),
             .db = ct_cdb_a0->global_db()
     };
@@ -383,6 +381,8 @@ static void _init(struct ct_api_a0 *api) {
     ct_fs_a0->map_root_dir(CT_ID64_0("build"),
                            ct_cdb_a0->read_str(_G.config, CONFIG_BUILD_DIR, ""),
                            false);
+
+    ct_api_a0->register_on_add(CT_ID64_0("ct_resource_i0"), _resource_api_add);
 
 }
 
@@ -392,7 +392,6 @@ static void _shutdown() {
     ct_cdb_a0->destroy_db(_G.db);
 
     ct_hash_free(&_G.type_map, _G.allocator);
-    ct_array_free(_G.resource_callbacks, _G.allocator);
 }
 
 

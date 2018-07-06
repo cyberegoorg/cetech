@@ -39,25 +39,16 @@
 // Globals
 //==============================================================================
 
-struct compilator {
-    ct_resource_compilator_t compilator;
-    bool yaml_based;
-};
-
 struct compile_task_data {
     char *source_filename;
     char *build_filename;
     struct ct_resource_id rid;
     time_t mtime;
-    struct compilator compilator;
+    ct_resource_compilator_t compilator;
     atomic_int completed;
 };
 
 static struct _G {
-    uint32_t count;
-    uint32_t compilator_map_type[MAX_TYPES]; // TODO: MAP
-    struct compilator compilator_map_compilator[MAX_TYPES]; // TODO: MAP
-
     uint64_t config;
     struct ct_alloc *allocator;
 } _G;
@@ -67,7 +58,6 @@ static struct _G {
 #include "resource.h"
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
-
 
 
 //==============================================================================
@@ -95,7 +85,7 @@ void type_name_from_filename(const char *fullname,
 }
 
 void _add_dependency(const char *who_filename,
-                     const char *depend_on_filename) {
+                      const char *depend_on_filename) {
     builddb_set_file_depend(who_filename, depend_on_filename);
     builddb_set_file(depend_on_filename,
                      ct_fs_a0->file_mtime(
@@ -116,23 +106,21 @@ static void _compile_task(void *data) {
 
     char *output_blob = NULL;
 
-    if (tdata->compilator.compilator) {
-        if (tdata->compilator.yaml_based) {
-            const char **files;
-            uint32_t files_count;
+    if (tdata->compilator) {
+        const char **files;
+        uint32_t files_count;
 
-            ct_ydb_a0->parent_files(tdata->source_filename, &files,
-                                    &files_count);
+        ct_ydb_a0->parent_files(tdata->source_filename, &files,
+                                &files_count);
 
-            for (int i = 0; i < files_count; ++i) {
-                _compilator_api.add_dependency(tdata->source_filename,
-                                               files[i]);
-            }
+        for (int i = 0; i < files_count; ++i) {
+            _compilator_api.add_dependency(tdata->source_filename,
+                                           files[i]);
         }
 
-        tdata->compilator.compilator(tdata->source_filename,
-                                     &output_blob,
-                                     &_compilator_api);
+        tdata->compilator(tdata->source_filename,
+                          &output_blob,
+                          &_compilator_api);
 
     }
 
@@ -172,16 +160,14 @@ static void _compile_task(void *data) {
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
-struct compilator _find_compilator(uint32_t type) {
-    for (int i = 0; i < MAX_TYPES; ++i) {
-        if (_G.compilator_map_type[i] != type) {
-            continue;
-        }
+ct_resource_compilator_t _find_compilator(uint32_t type) {
+    struct ct_resource_i0 *i = ct_resource_a0->get_interface(type);
 
-        return _G.compilator_map_compilator[i];
+    if(!i) {
+        return NULL;
     }
 
-    return (struct compilator) {.compilator = NULL};
+    return i->compilator;
 }
 
 
@@ -193,8 +179,8 @@ void _compile_files(struct ct_task_item **tasks,
 
         type_name_from_filename(files[i], &rid, NULL);
 
-        struct compilator compilator = _find_compilator(rid.type);
-        if (compilator.compilator == NULL) {
+        ct_resource_compilator_t compilator = _find_compilator(rid.type);
+        if (!compilator) {
             continue;
         }
 
@@ -260,14 +246,14 @@ void resource_compiler_create_build_dir(struct ct_config_a0 config) {
     CT_FREE(_G.allocator, build_dir_full);
 }
 
-void resource_compiler_register(const char *type,
-                                ct_resource_compilator_t compilator,
-                                bool yaml_based) {
-    const uint32_t idx = _G.count++;
-
-    _G.compilator_map_type[idx] = CT_ID32_0(type);
-    _G.compilator_map_compilator[idx] = (struct compilator) {.compilator = compilator, .yaml_based = yaml_based};
-}
+//void resource_compiler_register(const char *type,
+//                                ct_resource_compilator_t compilator,
+//                                bool yaml_based) {
+//    const uint32_t idx = _G.count++;
+//
+//    _G.compilator_map_type[idx] = CT_ID32_0(type);
+//    _G.compilator_map_compilator[idx] = (struct compilator) {.compilator = compilator, .yaml_based = yaml_based};
+//}
 
 void _compile_all() {
     struct ct_task_item *tasks = NULL;
@@ -366,12 +352,12 @@ void compile_and_reload(const char *filename) {
 
     type_name_from_filename(filename, &rid, NULL);
 
-    struct compilator compilator = _find_compilator(rid.type);
-    if (compilator.compilator == NULL) {
+    ct_resource_compilator_t compilator = _find_compilator(rid.type);
+    if (!compilator) {
         goto error;
     }
 
-    compilator.compilator(filename, &output_blob, &_compilator_api);
+    compilator(filename, &output_blob, &_compilator_api);
 
     resource_memory_reload(rid, &output_blob);
     ct_array_free(output_blob, _G.allocator);
@@ -453,7 +439,7 @@ static void _init_cvar(struct ct_config_a0 *config) {
 static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object(),
     };
 

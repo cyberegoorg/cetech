@@ -59,7 +59,7 @@ struct ct_render_graph_a0 *ct_render_graph_a0 = &render_graph_api;
 static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
     _G = (struct _G) {
-            .alloc = ct_memory_a0->main_allocator(),
+            .alloc = ct_memory_a0->system,
     };
 
 

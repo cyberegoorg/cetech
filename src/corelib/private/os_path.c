@@ -3,15 +3,17 @@
 #include <fnmatch.h>
 #include <stdlib.h>
 
+#include <corelib/platform.h>
+
 #include <errno.h>
 
-#if defined(CETECH_LINUX)
+#if CT_PLATFORM_LINUX
 #include <dirent.h>
 #include <sys/stat.h>
 #include <malloc.h>
 #endif
 
-#if defined(CETECH_DARWIN)
+#if CT_PLATFORM_OSX
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -25,7 +27,7 @@
 #include "corelib/buffer.inl"
 
 
-#if defined(CETECH_LINUX) || defined(CETECH_DARWIN)
+#if CT_PLATFORM_LINUX || CT_PLATFORM_OSX
 #define DIR_DELIM_CH '/'
 #define DIR_DELIM_STR "/"
 #endif

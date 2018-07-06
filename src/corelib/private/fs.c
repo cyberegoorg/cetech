@@ -47,7 +47,7 @@ static struct _G {
 //==============================================================================
 
 static uint32_t new_fs_root(uint64_t root) {
-//    ct_alloc *a = ct_memory_a0->main_allocator();
+//    ct_alloc *a = ct_memory_a0->system;
 
     uint32_t new_idx = ct_array_size(_G.roots);
 
@@ -287,7 +287,7 @@ static int64_t get_file_mtime(uint64_t root,
 
 
 //static void check_wd() {
-//    ct_alloc *alloc = ct_memory_a0->main_allocator();
+//    ct_alloc *alloc = ct_memory_a0->system;
 //    const uint32_t root_count = ct_array_size(_G.roots);
 //
 //    for (uint32_t i = 0; i < root_count; ++i) {
@@ -392,7 +392,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_api(api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
     };
 
     ct_log_a0->debug(LOG_WHERE, "Init");

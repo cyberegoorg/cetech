@@ -9,6 +9,7 @@
 #include <bx/math.h>
 #include <bx/timer.h>
 #include <cetech/debugui/private/bgfx_utils.h>
+#include <include/SDL2/SDL_video.h>
 
 #include "../ocornut-imgui/imgui.h"
 
@@ -295,9 +296,14 @@ struct OcornutImguiContext
 			config.MergeMode = false;
 //			config.MergeGlyphCenterV = true;
 
+			float ddpi;
+			float font_scale = 1;
+			if (SDL_GetDisplayDPI(0, &ddpi, nullptr, nullptr) == 0) font_scale = ddpi / 96;
+
+
 			const ImWchar* ranges = io.Fonts->GetGlyphRangesCyrillic();
-			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     _fontSize,      &config, ranges);
-			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize-3.0f, &config, ranges);
+			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     (_fontSize) * font_scale,      &config, ranges);
+			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), (_fontSize-3.0f) * font_scale, &config, ranges);
 
 			config.MergeMode = true;
 			config.DstFont   = m_font[ImGui::Font::Regular];
@@ -308,7 +314,7 @@ struct OcornutImguiContext
 
 				io.Fonts->AddFontFromMemoryTTF( (void*)frm.data
 						, (int)frm.size
-						, _fontSize-3.0f
+						, (_fontSize-3.0f) * font_scale
 						, &config
 						, frm.ranges
 						);
