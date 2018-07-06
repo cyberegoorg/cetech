@@ -1,0 +1,85 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+                    **CETech engine**
+
+
+# What is it?
+
+CETech is a Data-Driven game engine and toolset designed for develop games and other interactive applications.
+They are trying to be small, easily expandable and multiplatform (yes, typical bullshit = D).
+
+!!! ERROR
+    CETech is currently only prototype (many braindump and shity code)
+
+# Platforms
+
+[ ] OSX - **Work in progress**
+[ ] Linux - **Work in progress**
+[ ] Windows
+[ ] FreeBSD
+[ ] RaspberryPi
+[ ] PS4
+[ ] XBox One
+[ ] Android
+[ ] asm.js/Emscripten
+
+# Build
+
+## Linux / MacOS
+
+### Prerequisites
+* Install python and pip >= 3.4
+* Install requirements.txt
+    ~~~
+    $ pip3 install -r requirements.txt
+    ~~~
+
+### Build
+~~~
+$ python3 build.py
+~~~
+
+# Run
+~~~
+$ ./bin/{linux64,darwin64}/cetech_develop -compile -continue \
+    -src ./examples/develop/src -build ./examples/develop/build
+~~~
+
+# 3rd party
+
+## C/C++
+* [BGFX](https://github.com/bkaradzic/bgfx) - Cross-platform, graphics API agnostic rendering library.
+* [ImGUI](https://github.com/ocornut/imgui) - Bloat-free Immediate Mode Graphical User interface
+* [SDL2](https://www.libsdl.org) - Cross-platform development library.
+* [sqlite3](https://www.sqlite.org) - SQL database engine.
+* [assimp](http://www.assimp.org) - Open Asset Import Library
+* [libyaml](https://github.com/yaml/libyaml) - A C library for parsing and emitting YAML.
+
+## Python
+* [python](https://www.python.org/) - Multi-paradigm Programming language.
+* [pyaml](http://pyyaml.org/wiki/PyYAML) - YAML parser and emitter for Python.
+
+# Prototypes
+
+## 11.2015
+* C++ Engine
+* PyQT/JS playground
+* Linux
+
+![11.2015](img/old_prototype201511.png)
+
+## 4.2016
+* C# Engine
+* PyQT/JS playground
+* Linux, Windows
+
+![4.2016](img/old_prototype42016.png)
+
+## 11.2017
+* C/C++ Engine
+* PyQT/TypeScript playground
+* Linux
+
+![11.2017](img/old_prototype112017.png)
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

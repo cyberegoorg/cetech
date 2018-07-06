@@ -8,9 +8,9 @@ variables:
 # Stages #
 ###############################################################################
 stages:
+  - doc
   - build
   - test
-  - doc
 
 ########
 # Build #
@@ -49,9 +49,7 @@ pages:
   image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
   stage: doc
   script:
-    - export LC_ALL=C.UTF-8
-    - export LANG=C.UTF-8
-    - mkdocs build -f scripts/mkdocs.yml -d public
+    - cp -R docs public
 
   only:
     - master

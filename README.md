@@ -7,33 +7,28 @@
 
 CETech is game engine primary develop for internal use in CyberEg{o.o}rg.
 
-* [Release notes](http://cyberegoorg.gitlab.io/cetech/about/release-notes) (not released)
 * [Documentation](http://cyberegoorg.gitlab.io/cetech) (work in progress)
 
-## Suported platforms
+## Platforms
 
-* OSX (Runtime + Playground) - Work in progress
-* Linux (Runtime + Playground) - Work in progress
-
-## Planned platforms
-* Windows (Runtime + Playground)
-* FreeBSD (Runtime + Playground)
-* RaspberryPi (Runtime + Playground)
-* PS4 (Runtime)
-* XBox One (Runtime)
-* Android (Runtime)
-* asm.js/Emscripten (Runtime)
+[ ] OSX - **Work in progress**
+[ ] Linux - **Work in progress**
+[ ] Windows
+[ ] FreeBSD
+[ ] RaspberryPi
+[ ] PS4
+[ ] XBox One
+[ ] Android
+[ ] asm.js/Emscripten
 
 ## Similar projects
 
 * [crown](https://github.com/taylor001/crown) -  Lightweight and flexible cross-platform game engine. 
 * [lumix](https://github.com/nem0/LumixEngine) - Easy to use, fast and flexible 3D game engine.
 
-## [3rd party libraries and tools](https://cyberegoorg.gitlab.io/cetech/about/3rdparty/)
+## [3rd party libraries and tools](https://cyberegoorg.gitlab.io/cetech/index.html#3rdparty)
 
-## Build
-
-* [Linux](https://cyberegoorg.gitlab.io/cetech/engine/build#linux)
+## [Build](https://cyberegoorg.gitlab.io/cetech/index.html#Build)
 
 ## [License](http://creativecommons.org/publicdomain/zero/1.0/)
 
