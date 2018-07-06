@@ -761,10 +761,15 @@ namespace imgui_wrap {
                                  float *translation,
                                  float *rotation,
                                  float *scale) {
-
         ImGuizmo::DecomposeMatrixToComponents(matrix,
                                               translation,
                                               rotation,
                                               scale);
+    }
+
+    void GetContentRegionAvail(float *size) {
+        ImVec2 v = ImGui::GetContentRegionAvail();
+        size[0] = v.x;
+        size[1] = v.y;
     }
 }

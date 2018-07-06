@@ -102,7 +102,7 @@ set(SOURCE_FILES
 
         src/cetech/machine/private/machine_sdl2.c
 
-        src/cetech/playground/private/entity_preview.c
+        src/cetech/ecs/private/entity_preview.c
         src/cetech/ecs/private/ecs.c
         src/cetech/controlers/private/keyboard.c
         src/cetech/controlers/private/mouse.c
@@ -125,16 +125,16 @@ set(SOURCE_FILES
         src/cetech/camera/private/camera.c
 
         src/cetech/playground/private/entity_editor.c
-        src/cetech/playground/private/entity_property.c
-        src/cetech/playground/private/explorer.c
-        src/cetech/playground/private/asset_preview.c
-        src/cetech/playground/private/asset_property.c
-        src/cetech/playground/private/asset_browser.cpp
+        src/cetech/ecs/private/entity_property.c
+        src/cetech/explorer/private/explorer.c
+        src/cetech/asset_preview/private/asset_preview.c
+        src/cetech/asset_property/private/asset_property.c
+        src/cetech/asset_browser/private/asset_browser.cpp
         src/cetech/playground/private/playground.c
-        src/cetech/playground/private/property_editor.c
+        src/cetech/property_editor/private/property_editor.c
         src/cetech/playground/private/command_system.c
         src/cetech/playground/private/command_history.c
-        src/cetech/playground/private/log_view.cpp
+        src/cetech/log_view/log_view.cpp
         src/cetech/playground/private/action_manager.c
         src/cetech/playground/private/selected_object.c)
 

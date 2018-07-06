@@ -7,7 +7,7 @@
 
 CETech is game engine primary develop for internal use in CyberEg{o.o}rg.
 
-* [Documentation](http://cyberegoorg.gitlab.io/cetech) (work in progress)
+## [Documentation](http://cyberegoorg.gitlab.io/cetech) (work in progress)
 
 ## Platforms
 

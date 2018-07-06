@@ -56,55 +56,35 @@ typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 typedef void (*ImGuiSizeConstraintCallback)(struct ImGuiSizeConstraintCallbackData *data);
 
 enum DebugUIWindowFlags_ {
-    DebugUIWindowFlags_Empty = 0,
-    DebugUIWindowFlags_NoTitleBar = 1 << 0,   //!< Disable title-bar
-    DebugUIWindowFlags_NoResize =
-    1 << 1,   //!< Disable user resizing with the lower-right grip
-    DebugUIWindowFlags_NoMove = 1 << 2,   //!< Disable user moving the window
-    DebugUIWindowFlags_NoScrollbar = 1
-            << 3,   //!< Disable scrollbars (window can still scroll with mouse or programatically)
-    DebugUIWindowFlags_NoScrollWithMouse =
-    1 << 4,   //!< Disable user vertically scrolling with mouse wheel
-    DebugUIWindowFlags_NoCollapse =
-    1 << 5,   //!< Disable user collapsing window by double-clicking on it
-    DebugUIWindowFlags_AlwaysAutoResize =
-    1 << 6,   //!< Resize every window to its content every frame
-    DebugUIWindowFlags_ShowBorders =
-    1 << 7,   //!< Show borders around windows and items
-    DebugUIWindowFlags_NoSavedSettings =
-    1 << 8,   //!< Never load/save settings in .ini file
-    DebugUIWindowFlags_NoInputs =
-    1 << 9,   //!< Disable catching mouse or keyboard inputs
-    DebugUIWindowFlags_MenuBar = 1 << 10,  //!< Has a menu-bar
-    DebugUIWindowFlags_HorizontalScrollbar = 1
-            << 11,  //!< Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
-    DebugUIWindowFlags_NoFocusOnAppearing = 1
-            << 12,  //!< Disable taking focus when transitioning from hidden to visible state
-    DebugUIWindowFlags_NoBringToFrontOnFocus = 1
-            << 13,  //!< Disable bringing window to front when taking focus (e.g. clicking on it or programatically giving it focus)
-    DebugUIWindowFlags_AlwaysVerticalScrollbar = 1
-            << 14,  //!< Always show vertical scrollbar (even if ContentSize.y < Size.y)
-    DebugUIWindowFlags_AlwaysHorizontalScrollbar = 1
-            << 15,  //!< Always show horizontal scrollbar (even if ContentSize.x < Size.x)
-    DebugUIWindowFlags_AlwaysUseWindowPadding = 1
-            << 16,  //!< Ensure child windows without border uses style.WindowPadding (ignored by default for non-bordered child windows, because more convenient)
+    DebugUIWindowFlags_NoTitleBar             = 1 << 0,   // Disable title-bar
+    DebugUIWindowFlags_NoResize               = 1 << 1,   // Disable user resizing with the lower-right grip
+    DebugUIWindowFlags_NoMove                 = 1 << 2,   // Disable user moving the window
+    DebugUIWindowFlags_NoScrollbar            = 1 << 3,   // Disable scrollbars (window can still scroll with mouse or programatically)
+    DebugUIWindowFlags_NoScrollWithMouse      = 1 << 4,   // Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
+    DebugUIWindowFlags_NoCollapse             = 1 << 5,   // Disable user collapsing window by double-clicking on it
+    DebugUIWindowFlags_AlwaysAutoResize       = 1 << 6,   // Resize every window to its content every frame
+    //DebugUIWindowFlags_ShowBorders          = 1 << 7,   // Show borders around windows and items (OBSOLETE! Use e.g. style.FrameBorderSize=1.0f to enable borders).
+            DebugUIWindowFlags_NoSavedSettings        = 1 << 8,   // Never load/save settings in .ini file
+    DebugUIWindowFlags_NoInputs               = 1 << 9,   // Disable catching mouse or keyboard inputs, hovering test with pass through.
+    DebugUIWindowFlags_MenuBar                = 1 << 10,  // Has a menu-bar
+    DebugUIWindowFlags_HorizontalScrollbar    = 1 << 11,  // Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
+    DebugUIWindowFlags_NoFocusOnAppearing     = 1 << 12,  // Disable taking focus when transitioning from hidden to visible state
+    DebugUIWindowFlags_NoBringToFrontOnFocus  = 1 << 13,  // Disable bringing window to front when taking focus (e.g. clicking on it or programatically giving it focus)
+    DebugUIWindowFlags_AlwaysVerticalScrollbar= 1 << 14,  // Always show vertical scrollbar (even if ContentSize.y < Size.y)
+    DebugUIWindowFlags_AlwaysHorizontalScrollbar=1<< 15,  // Always show horizontal scrollbar (even if ContentSize.x < Size.x)
+    DebugUIWindowFlags_AlwaysUseWindowPadding = 1 << 16,  // Ensure child windows without border uses style.WindowPadding (ignored by default for non-bordered child windows, because more convenient)
+    DebugUIWindowFlags_ResizeFromAnySide      = 1 << 17,  // (WIP) Enable resize from any corners and borders. Your back-end needs to honor the different values of io.MouseCursor set by imgui.
+    DebugUIWindowFlags_NoNavInputs            = 1 << 18,  // No gamepad/keyboard navigation within the window
+    DebugUIWindowFlags_NoNavFocus             = 1 << 19,  // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
+    DebugUIWindowFlags_NoNav                  = DebugUIWindowFlags_NoNavInputs | DebugUIWindowFlags_NoNavFocus,
 
-    DebugUIWindowFlags_ChildWindow =
-    1 << 20,  //!< Don't use! For internal use by BeginChild()
-    DebugUIWindowFlags_ChildWindowAutoFitX =
-    1 << 21,  //!< Don't use! For internal use by BeginChild()
-    DebugUIWindowFlags_ChildWindowAutoFitY =
-    1 << 22,  //!< Don't use! For internal use by BeginChild()
-    DebugUIWindowFlags_ComboBox =
-    1 << 23,  //!< Don't use! For internal use by ComboBox()
-    DebugUIWindowFlags_Tooltip =
-    1 << 24,  //!< Don't use! For internal use by BeginTooltip()
-    DebugUIWindowFlags_Popup =
-    1 << 25,  //!< Don't use! For internal use by BeginPopup()
-    DebugUIWindowFlags_Modal =
-    1 << 26,  //!< Don't use! For internal use by BeginPopupModal()
-    DebugUIWindowFlags_ChildMenu =
-    1 << 27   //!< Don't use! For internal use by BeginMenu()
+    // [Internal]
+            DebugUIWindowFlags_NavFlattened           = 1 << 23,  // (WIP) Allow gamepad/keyboard navigation to cross over parent border to this child (only use on child that have no scrolling!)
+    DebugUIWindowFlags_ChildWindow            = 1 << 24,  // Don't use! For internal use by BeginChild()
+    DebugUIWindowFlags_Tooltip                = 1 << 25,  // Don't use! For internal use by BeginTooltip()
+    DebugUIWindowFlags_Popup                  = 1 << 26,  // Don't use! For internal use by BeginPopup()
+    DebugUIWindowFlags_Modal                  = 1 << 27,  // Don't use! For internal use by BeginPopupModal()
+    DebugUIWindowFlags_ChildMenu              = 1 << 28   // Don't use! For internal use by BeginMenu()
 };
 
 //!< Flags for ImGui::InputText()
@@ -818,6 +798,9 @@ struct ct_debugui_a0 {
                                     float *translation,
                                     float *rotation,
                                     float *scale);
+
+    void (*GetContentRegionAvail)(float* size);
+    float (*GetTextLineHeightWithSpacing)();
 
 };
 

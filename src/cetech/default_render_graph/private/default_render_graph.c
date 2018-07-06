@@ -78,7 +78,7 @@ void foreach_camera(struct ct_world world,
     struct cameras *cameras = data;
 
     struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->entities_data(CAMERA_COMPONENT, item);
+    camera_data = ct_ecs_a0->component->entities_data(CAMERA_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
         uint32_t idx = cameras->n++;
