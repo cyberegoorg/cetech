@@ -34,7 +34,6 @@ typedef void (*ct_cdb_notify)(uint64_t obj,
                               uint32_t prop_count,
                               void *data);
 
-
 //==============================================================================
 // Enums
 //==============================================================================
@@ -44,6 +43,7 @@ enum ct_cdb_type {
     CDB_TYPE_PTR,
     CDB_TYPE_REF,
     CDB_TYPE_FLOAT,
+    CDB_TYPE_BOOL,
     CDB_TYPE_STR,
 
     CDB_TYPE_VEC3,
@@ -51,6 +51,7 @@ enum ct_cdb_type {
     CDB_TYPE_MAT4,
 
     CDB_TYPE_SUBOBJECT,
+    CDB_TYPE_BLOB,
 };
 
 //==============================================================================
@@ -109,6 +110,10 @@ struct ct_cdb_a0 {
     void (*write_commit)(ct_cdb_obj_o *writer);
 
     // SET
+    void (*set_bool)(ct_cdb_obj_o *writer,
+                     uint64_t property,
+                     bool value);
+
     void (*set_float)(ct_cdb_obj_o *writer,
                       uint64_t property,
                       float value);
@@ -145,6 +150,12 @@ struct ct_cdb_a0 {
                           uint64_t property,
                           uint64_t subobject);
 
+    void (*set_blob)(ct_cdb_obj_o *writer,
+                     uint64_t property,
+                     void *blob,
+                     uint64_t blob_size);
+
+
     void (*set_prefab)(uint64_t obj,
                        uint64_t prefab);
 
@@ -153,6 +164,11 @@ struct ct_cdb_a0 {
     float (*read_float)(uint64_t object,
                         uint64_t property,
                         float defaultt);
+
+    bool (*read_bool)(uint64_t object,
+                        uint64_t property,
+                        bool defaultt);
+
 
     void (*read_vec3)(uint64_t object,
                       uint64_t property,
@@ -185,6 +201,11 @@ struct ct_cdb_a0 {
     uint64_t (*read_subobject)(uint64_t object,
                                uint64_t property,
                                uint64_t defaultt);
+
+    void *(*read_blob)(uint64_t object,
+                       uint64_t property,
+                       uint64_t *size,
+                       void *defaultt);
 };
 
 CT_MODULE(ct_cdb_a0);

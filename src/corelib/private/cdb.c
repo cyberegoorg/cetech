@@ -85,6 +85,10 @@ static struct _G {
     struct ct_cdb_t global_db;
 } _G;
 
+struct blob_t {
+    void *data;
+    uint64_t size;
+};
 
 union type_u {
     uint64_t uint64;
@@ -94,10 +98,12 @@ union type_u {
 
     float f;
     char *str;
+    bool b;
 
     float vec3[3];
     float vec4[4];
     float mat4[16];
+    struct blob_t blob;
 };
 
 static uint64_t _object_new_property(struct object_t *obj,
@@ -421,6 +427,7 @@ struct cdb_binobj_header {
     uint64_t values_size;
     uint64_t string_buffer_size;
     uint64_t subobject_buffer_size;
+    uint64_t blob_buffer_size;
 };
 
 static void dump(uint64_t _obj,
@@ -438,6 +445,7 @@ static void dump(uint64_t _obj,
 
     char *str_buffer = NULL;
     char *subobject_buffer = NULL;
+    char *blob_buffer = NULL;
     for (int i = 1; i < obj->properties_count; ++i) {
         switch (obj->property_type[i]) {
             case CDB_TYPE_SUBOBJECT: {
@@ -462,7 +470,23 @@ static void dump(uint64_t _obj,
                 uint64_t *strptr = (uint64_t *) (values_copy + offset[i]);
                 *strptr = stroffset;
             }
+                break;
 
+            case CDB_TYPE_BLOB: {
+                uint64_t bloboffset = ct_array_size(blob_buffer);
+
+                struct blob_t *blob;
+                blob = (struct blob_t *) (values_copy + offset[i]);
+
+                ct_array_push_n(blob_buffer, &blob->size, sizeof(uint64_t),
+                                allocator);
+
+                ct_array_push_n(blob_buffer, blob->data, blob->size, allocator);
+
+                uint64_t *blobptr = (uint64_t *) (values_copy + offset[i]);
+                *blobptr = bloboffset;
+            }
+                break;
             default:
                 break;
         }
@@ -474,6 +498,7 @@ static void dump(uint64_t _obj,
             .values_size = ct_array_size(values),
             .string_buffer_size = ct_array_size(str_buffer),
             .subobject_buffer_size = ct_array_size(subobject_buffer),
+            .blob_buffer_size = ct_array_size(blob_buffer),
     };
 
     ct_array_push_n(*output, (char *) &header,
@@ -504,6 +529,10 @@ static void dump(uint64_t _obj,
                     header.subobject_buffer_size,
                     allocator);
 
+    ct_array_push_n(*output, (char *) blob_buffer,
+                    header.blob_buffer_size,
+                    allocator);
+
     CT_FREE(allocator, values_copy);
 }
 
@@ -525,7 +554,8 @@ static void load(struct ct_cdb_t db,
     const char *strbuffer = (char *) (values + header->values_size);
     const char *subobject_buffer = (char *) (strbuffer +
                                              header->string_buffer_size);
-
+    const char *blob_buffer = (char *) (subobject_buffer +
+                                        header->subobject_buffer_size);
     if (!header->properties_count) {
         return;
     }
@@ -585,6 +615,26 @@ static void load(struct ct_cdb_t db,
                                                             obj->offset[i]);
                 value_ptr->str = dup_str;
             }
+
+                break;
+
+            case CDB_TYPE_BLOB: {
+                uint64_t blob_offset = *(uint64_t *) (obj->values +
+                                                      obj->offset[i]);
+
+                uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
+                const char *blob_data = ((blob_buffer +
+                                          blob_offset + sizeof(uint64_t)));
+
+                char *copy_blob_data = CT_ALLOC(allocator, char, size);
+                memcpy(copy_blob_data, blob_data, size);
+
+                union type_u *value_ptr = (union type_u *) (obj->values +
+                                                            obj->offset[i]);
+                value_ptr->blob.size = size;
+                value_ptr->blob.data = copy_blob_data;
+            }
+                break;
             default:
                 break;
         }
@@ -651,6 +701,26 @@ static void set_float(ct_cdb_obj_o *_writer,
     union type_u *value_ptr = (union type_u *) (writer->values +
                                                 writer->offset[idx]);
     value_ptr->f = value;
+}
+
+static void set_bool(ct_cdb_obj_o *_writer,
+                     uint64_t property,
+                     bool value) {
+    struct object_t *writer = _writer;
+
+    uint64_t idx = _find_prop_index(writer, property);
+    if (!idx) {
+        idx = _object_new_property(writer, property,
+                                   CDB_TYPE_BOOL, &value,
+                                   sizeof(bool),
+                                   _G.allocator);
+    }
+
+    ct_array_push(writer->changed_prop, property, _G.allocator);
+
+    union type_u *value_ptr = (union type_u *) (writer->values +
+                                                writer->offset[idx]);
+    value_ptr->b = value;
 }
 
 static void set_vec3(ct_cdb_obj_o *_writer,
@@ -822,6 +892,45 @@ void set_subobject(ct_cdb_obj_o *_writer,
     subobj->parent = writer->obj;
 }
 
+void set_blob(ct_cdb_obj_o *_writer,
+              uint64_t property,
+              void *blob_data,
+              uint64_t blob_size) {
+    struct ct_alloc *a = _G.allocator;
+
+    struct object_t *writer = _writer;
+
+    void *new_blob = CT_ALLOC(a, char, blob_size);
+
+    memcpy(new_blob, blob_data, blob_size);
+
+    struct blob_t blob = {
+            .size = blob_size,
+            .data = new_blob,
+    };
+
+
+    uint64_t idx = _find_prop_index(writer, property);
+    if (!idx) {
+        idx = _object_new_property(writer, property,
+                                   CDB_TYPE_BLOB,
+                                   &blob, sizeof(struct blob_t),
+                                   _G.allocator);
+    } else {
+        union type_u *value_ptr = (union type_u *) (writer->values +
+                                                    writer->offset[idx]);
+        CT_FREE(a, value_ptr->blob.data);
+    }
+
+    ct_array_push(writer->changed_prop, property, _G.allocator);
+
+
+    union type_u *value_ptr = (union type_u *) (writer->values +
+                                                writer->offset[idx]);
+
+    value_ptr->blob = blob;
+}
+
 void set_prefab(uint64_t _obj,
                 uint64_t _prefab) {
     struct object_t *obj = *(struct object_t **) _obj;
@@ -867,6 +976,23 @@ static float read_float(uint64_t _obj,
 
     if (obj->prefab) {
         return read_float(obj->prefab, property, defaultt);
+    }
+
+    return defaultt;
+}
+
+static bool read_bool(uint64_t _obj,
+                      uint64_t property,
+                      bool defaultt) {
+    struct object_t *obj = *(struct object_t **) _obj;
+    uint64_t idx = _find_prop_index(obj, property);
+
+    if (idx) {
+        return *(bool *) (obj->values + obj->offset[idx]);
+    }
+
+    if (obj->prefab) {
+        return read_bool(obj->prefab, property, defaultt);
     }
 
     return defaultt;
@@ -1016,6 +1142,33 @@ static uint64_t read_subobject(uint64_t _obj,
     return defaultt;
 }
 
+void *read_blob(uint64_t _obj,
+                uint64_t property,
+                uint64_t *size,
+                void *defaultt) {
+
+    struct object_t *obj = *(struct object_t **) _obj;
+    uint64_t idx = _find_prop_index(obj, property);
+
+    if (idx) {
+        void *data = (obj->values + obj->offset[idx]);
+
+        struct blob_t *blob = data;
+
+        if (size) {
+            *size = blob->size;
+        }
+
+        return blob->data;
+    }
+
+    if (obj->prefab) {
+        return read_blob(obj->prefab, property, size, defaultt);
+    }
+
+    return defaultt;
+}
+
 static uint64_t prop_count(uint64_t _obj);
 
 static void prop_keys(uint64_t _obj,
@@ -1125,6 +1278,7 @@ static struct ct_cdb_a0 cdb_api = {
         .parent = parent,
 
         .read_float = read_float,
+        .read_bool = read_bool,
         .read_vec3 = read_vec3,
         .read_vec4 = read_vec4,
         .read_mat4 = read_mat4,
@@ -1133,11 +1287,13 @@ static struct ct_cdb_a0 cdb_api = {
         .read_ptr = read_ptr,
         .read_ref = read_ref,
         .read_subobject = read_subobject,
+        .read_blob = read_blob,
 
         .write_begin = write_begin,
         .write_commit = write_commit,
 
         .set_float = set_float,
+        .set_bool = set_bool,
         .set_vec3 = set_vec3,
         .set_vec4 = set_vec4,
         .set_mat4 = set_mat4,
@@ -1147,13 +1303,14 @@ static struct ct_cdb_a0 cdb_api = {
         .set_ref = set_ref,
         .set_subobject = set_subobject,
         .set_prefab = set_prefab,
+        .set_blob = set_blob,
 };
 
 struct ct_cdb_a0 *ct_cdb_a0 = &cdb_api;
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->main_allocator(),
+            .allocator = ct_memory_a0->system,
     };
 
     _G.global_db = create_db();
