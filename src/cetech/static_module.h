@@ -20,6 +20,7 @@ void init_static_modules() {
     // Engine
     //==========================================================================
 
+    CETECH_ADD_STATIC_MODULE(controlers);
 
     CETECH_ADD_STATIC_MODULE(keyboard);
     CETECH_ADD_STATIC_MODULE(gamepad);
@@ -58,7 +59,6 @@ void init_static_modules() {
 
     CETECH_ADD_STATIC_MODULE(log_view);
     CETECH_ADD_STATIC_MODULE(entity_editor);
-    CETECH_ADD_STATIC_MODULE(entity_preview);
     CETECH_ADD_STATIC_MODULE(material_preview);
 }
 

@@ -14,15 +14,6 @@ enum {
     KEYBOARD_EBUS = 0x5712c6b9
 };
 
-//! Keyboard event
-struct ct_keyboard_event {
-    uint32_t keycode; //!< Key code
-};
-
-struct ct_keyboard_text_event {
-    char text[32];
-};
-
 enum {
     EVENT_INVALID = 0,   //!< Invalid type
 
@@ -34,42 +25,6 @@ enum {
 //==============================================================================
 // Api
 //==============================================================================
-
-//! Keyboard API V0
-struct ct_keyboard_a0 {
-    //! Return button index
-    //! \param button_name Button name
-    //! \return Button index
-    uint32_t (*button_index)(const char *button_name);
-
-    //! Return button name
-    //! \param button_index Button index
-    //! \return Button name
-    const char *(*button_name)(const uint32_t button_index);
-
-    //! Return button state
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame down else 0
-    int (*button_state)(uint32_t idx,
-                        const uint32_t button_index);
-
-    //! Is button pressed?
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame pressed else 0
-    int (*button_pressed)(uint32_t idx,
-                          const uint32_t button_index);
-
-    //! Is button released?
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame released else 0
-    int (*button_released)(uint32_t idx,
-                           const uint32_t button_index);
-
-
-    char *(*text)(uint32_t idx);
-};
-
-CT_MODULE(ct_keyboard_a0);
 
 enum {
     KEY_UNKNOWN = 0,

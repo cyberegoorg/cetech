@@ -1,5 +1,5 @@
 #include <cetech/resource/resource.h>
-#include <cetech/playground/command_system.h>
+#include <cetech/command_system/command_system.h>
 #include <corelib/array.inl>
 #include <corelib/hash.inl>
 

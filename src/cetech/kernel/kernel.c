@@ -107,6 +107,34 @@ int cetech_kernel_init(int argc,
                        const char **argv) {
     ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
 
+//    char* buffer = NULL;
+//    ct_array_push_n(buffer, "fooo", strlen("fooo"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
+//    ct_array_push_n(buffer, "ddddddddd", strlen("ddddddddd")+1, ct_memory_a0->system);
+
+
     ct_corelib_init();
 
     struct ct_api_a0 *api = ct_api_a0;

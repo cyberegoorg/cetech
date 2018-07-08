@@ -43,6 +43,7 @@ extern void sdl_window_shutdown();
 //==============================================================================
 
 #define LOG_WHERE "machine"
+#define GAMEPAD_MAX 8
 
 //==============================================================================
 // Globals
@@ -282,10 +283,6 @@ void sdl_gamepad_process() {
         }
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
-            struct ct_gamepad_btn_event event;
-            event.gamepad_id = i;
-            event.button = j;
-
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
                 uint64_t event = ct_cdb_a0->create_object(
                         ct_cdb_a0->global_db(),

@@ -61,25 +61,57 @@ $ ./bin/{linux64,darwin64}/cetech_develop -compile -continue \
 # Prototypes
 
 ## 11.2015
-* C++ Engine
-* PyQT/JS playground
-* Linux
 
 ![11.2015](img/old_prototype201511.png)
 
+* Linux
+* C++ Engine
+* PyQT/JS playground
+* Playground spawn many engine instance (Level editor, Compilator)
+* Plaground <=> Engine comunication over Nanomsg (msgpack for msg layer)
+* JS  comunicate with engine over nanomsg/websocket
+* LUA scripting
+
+*************************************************************
+*                                                           *
+*  + - - - - - - - - - - - - - - - - - - - - - - - - - - +  *
+*                    Playground process                     *
+*  |                                                     |  *
+*     +------------------+       +------------------+       *
+*  |  |                  |       |                  |    |  *
+*     |    QT widget     |<-+    |    QT widget     |<-+    *
+*  |  |                  |  |    |                  |  | |  *
+*     +------------------+  |    +------------------+  |    *
+*  |            ^           |              ^           | |  *
+*   - - - - - - + - - - - - + - - - - - - -|- - - - - -|-   *
+*               |           |              |           |    *
+*    Display in |   Nanomsg |   Display in |  Nanomsg  |    *
+*      widget   |   REQ/REP |     widget   |  REQ/REP  |    *
+*               |           |              |           |    *
+*               |           |              |           |    *
+*       +---------------+   |      +---------------+   |    *
+*       |               |   |      |               |   |    *
+*       |CETech process |---+      |CETech process |---+    *
+*       |               |          |               |        *
+*       +---------------+          +---------------+        *
+*************************************************************
+
 ## 4.2016
+
+![4.2016](img/old_prototype42016.png)
+
 * C# Engine
 * PyQT/JS playground
 * Linux, Windows
 
-![4.2016](img/old_prototype42016.png)
 
 ## 11.2017
+
+![11.2017](img/old_prototype112017.png)
+
 * C/C++ Engine
 * PyQT/TypeScript playground
 * Linux
-
-![11.2017](img/old_prototype112017.png)
 
 
 <!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

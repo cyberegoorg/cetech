@@ -15,6 +15,9 @@
 #include <corelib/ebus.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_render_graph/default_render_graph.h>
+#include <cetech/dock/dock.h>
+#include <cetech/selected_object/selected_object.h>
+#include <cetech/controlers/controlers.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -29,8 +32,6 @@ static struct _G {
     struct ct_alloc *allocator;
 
     struct ct_resource_id active_asset;
-
-    const char *active_path;
 
     struct ct_world world;
     struct ct_entity camera_ent;
@@ -111,7 +112,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(struct ct_dock_i *dock) {
+static void on_debugui(struct ct_dock_i0 *dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
     ct_render_texture_handle_t th;
@@ -134,7 +135,6 @@ static void on_debugui(struct ct_dock_i *dock) {
 
 static void set_asset(uint64_t event) {
     uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
-    const char *path = ct_cdb_a0->read_str(event, CT_ID64_0("path"), 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 
@@ -171,12 +171,9 @@ static void set_asset(uint64_t event) {
     }
 
     _G.active_asset = rid;
-    _G.active_path = path;
 }
 
-static void init(uint64_t event) {
-    CT_UNUSED(event);
-
+static bool init() {
     _G.visible = true;
     _G.world = ct_ecs_a0->entity->create_world();
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
@@ -185,14 +182,13 @@ static void init(uint64_t event) {
     _G.render_graph = ct_render_graph_a0->create_graph();
     _G.render_graph_builder = ct_render_graph_a0->create_builder();
     _G.render_graph->call->add_module(_G.render_graph,
-                                      ct_default_render_graph_a0->create(
+                                      ct_default_rg_a0->create(
                                               _G.world));
 
+    return true;
 }
 
-static void on_render(uint64_t event) {
-    CT_UNUSED(event);
-
+static void on_render() {
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
 
     if (!_G.visible) {
@@ -203,31 +199,38 @@ static void on_render(uint64_t event) {
     _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static void update(uint64_t event) {
-    float dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
+static void update(float dt) {
+    uint64_t selected_object = ct_selected_object_a0->selected_object();
+    if (selected_object &&
+        (ct_cdb_a0->type(selected_object) == CT_ID64_0("asset"))) {
+        set_asset(selected_object);
+    }
+
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
 
     if (_G.active) {
         float updown = 0.0f;
         float leftright = 0.0f;
 
-        uint32_t up_key = ct_keyboard_a0->button_index("w");
-        uint32_t down_key = ct_keyboard_a0->button_index("s");
-        uint32_t left_key = ct_keyboard_a0->button_index("a");
-        uint32_t right_key = ct_keyboard_a0->button_index("d");
+        uint32_t up_key = keyboard->button_index("w");
+        uint32_t down_key = keyboard->button_index("s");
+        uint32_t left_key = keyboard->button_index("a");
+        uint32_t right_key = keyboard->button_index("d");
 
-        if (ct_keyboard_a0->button_state(0, up_key) > 0) {
+        if (keyboard->button_state(0, up_key) > 0) {
             updown = 1.0f;
         }
 
-        if (ct_keyboard_a0->button_state(0, down_key) > 0) {
+        if (keyboard->button_state(0, down_key) > 0) {
             updown = -1.0f;
         }
 
-        if (ct_keyboard_a0->button_state(0, right_key) > 0) {
+        if (keyboard->button_state(0, right_key) > 0) {
             leftright = 1.0f;
         }
 
-        if (ct_keyboard_a0->button_state(0, left_key) > 0) {
+        if (keyboard->button_state(0, left_key) > 0) {
             leftright = -1.0f;
         }
 
@@ -249,11 +252,11 @@ static const char *dock_title() {
     return "Asset preview";
 }
 
-static const char *name(struct ct_dock_i *dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "asset_preview";
 }
 
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .display_title = dock_title,
@@ -261,27 +264,26 @@ static struct ct_dock_i ct_dock_i = {
         .draw_ui = on_debugui,
 };
 
+
+static struct ct_playground_module_i0 ct_playground_module_i0 = {
+        .init = init,
+        .update = update,
+        .render= on_render,
+};
+
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system
     };
 
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
-
-    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset, 0);
-
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
-    api->register_api("ct_dock_i", &ct_dock_i);
+    api->register_api("ct_dock_i0", &ct_dock_i0);
+    api->register_api("ct_playground_module_i0", &ct_playground_module_i0);
+
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_INIT_EVENT, init);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_CLICK_EVENT, set_asset);
-
     _G = (struct _G) {};
 }
 
@@ -293,14 +295,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_keyboard_a0);
-            CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_dd_a0);
             CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_default_render_graph_a0);
+            CETECH_GET_API(api, ct_default_rg_a0);
         },
         {
             CT_UNUSED(reload);

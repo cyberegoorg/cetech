@@ -6,6 +6,10 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <corelib/macros.h>
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include "corelib/module.h"
 
 
 #include <cetech/ecs/ecs.h>
@@ -18,32 +22,30 @@
 #include <cetech/explorer/explorer.h>
 #include <cetech/playground/playground.h>
 #include <cetech/resource/resource.h>
-
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_render_graph/default_render_graph.h>
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/debugui/debugui.h>
+#include <cetech/dock/dock.h>
+#include <cetech/controlers/controlers.h>
 
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
 
 #define MAX_EDITOR 8
 
 #define _G entity_editor_globals
 
 struct scene_editor {
+    uint64_t asset;
     struct ct_world world;
     struct ct_entity camera_ent;
     struct ct_entity entity;
-    const char *path;
+
     uint64_t root;
     uint32_t entity_name;
     struct ct_render_graph *render_graph;
     struct ct_render_graph_builder *rg_builder;
-    struct ct_dock_i dock;
+    struct ct_dock_i0 dock;
     bool mouse_hovering;
 };
 
@@ -176,7 +178,7 @@ static void _guizmo(uint64_t component_obj,
     }
 }
 
-static void draw_editor(struct ct_dock_i *dock) {
+static void draw_editor(struct ct_dock_i0 *dock) {
     struct scene_editor *editor = &_G.editor[dock->id];
 
     if(!editor->world.h) {
@@ -256,11 +258,12 @@ static void draw_editor(struct ct_dock_i *dock) {
     }
 
     if (ct_debugui_a0->IsMouseClicked(0, false)) {
-        ct_explorer_a0->set_level(editor->world,
-                                  editor->entity,
-                                  editor->entity_name,
-                                  editor->root,
-                                  editor->path);
+//        ct_selected_object_a0->set_selected_object(editor->asset);
+//        ct_explorer_a0->set_level(editor->world,
+//                                  editor->entity,
+//                                  editor->entity_name,
+//                                  editor->root,
+//                                  editor->path);
     }
 
     ct_render_texture_handle_t th;
@@ -294,11 +297,11 @@ static uint32_t find_entity(uint32_t name) {
     return UINT32_MAX;
 }
 
-static const char *dock_title(struct ct_dock_i *dock) {
+static const char *dock_title(struct ct_dock_i0 *dock) {
     return ICON_FA_CUBE " Entity editor";
 }
 
-static const char *name(struct ct_dock_i* dock) {
+static const char *name(struct ct_dock_i0* dock) {
     return "entity_editor";
 }
 
@@ -314,7 +317,7 @@ static struct scene_editor* _new_editor(struct ct_resource_id asset) {
     ++_G.editor_count;
 
     struct scene_editor *editor = &_G.editor[idx];
-    editor->dock = (struct ct_dock_i) {
+    editor->dock = (struct ct_dock_i0) {
             .id = idx,
             .dock_flag = DebugUIWindowFlags_NoNavInputs |
                          DebugUIWindowFlags_NoScrollbar |
@@ -326,7 +329,7 @@ static struct scene_editor* _new_editor(struct ct_resource_id asset) {
     };
 
 
-    ct_api_a0->register_api("ct_dock_i", &editor->dock);
+    ct_api_a0->register_api("ct_dock_i0", &editor->dock);
 
     return editor;
 }
@@ -336,12 +339,22 @@ static void open(struct ct_resource_id asset,
                  const char *path) {
     struct scene_editor *editor = _new_editor(asset);
 
+    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), CT_ID64_0("asset"));
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
+    ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), asset.i64);
+    ct_cdb_a0->set_uint64(w, CT_ID64_0("root"), root);
+    ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
+
+    ct_cdb_a0->write_commit(w);
+
     if (editor->entity_name == asset.name) {
-        ct_explorer_a0->set_level(editor->world,
-                                  editor->entity,
-                                  editor->entity_name,
-                                  editor->root,
-                                  editor->path);
+        editor->asset = obj;
+//        ct_selected_object_a0->set_selected_object(editor->asset);
+//        ct_explorer_a0->set_level(editor->world,
+//                                  editor->entity,
+//                                  editor->entity_name,
+//                                  editor->root,
+//                                  editor->path);
         return;
     }
 
@@ -351,28 +364,28 @@ static void open(struct ct_resource_id asset,
     editor->render_graph = ct_render_graph_a0->create_graph();
     editor->rg_builder = ct_render_graph_a0->create_builder();
     editor->render_graph->call->add_module(editor->render_graph,
-                                           ct_default_render_graph_a0->create(
-                                                   editor->world));
+                                           ct_default_rg_a0->create(editor->world));
 
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
                                                  CT_ID32_0("content/camera"));
 
-    editor->path = strdup(path);
     editor->root = root;
     editor->entity_name = asset.name;
 
-
-    ct_explorer_a0->set_level(editor->world,
-                              editor->entity,
-                              editor->entity_name,
-                              editor->root,
-                              editor->path);
+//    ct_selected_object_a0->set_selected_object(obj);
+//    ct_explorer_a0->set_level(editor->world,
+//                              editor->entity,
+//                              editor->entity_name,
+//                              editor->root,
+//                              editor->path);
 
 }
 
-static void update(uint64_t event) {
-    float dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
+static void update(float dt) {
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
@@ -389,24 +402,24 @@ static void update(uint64_t event) {
             float updown = 0.0f;
             float leftright = 0.0f;
 
-            uint32_t up_key = ct_keyboard_a0->button_index("w");
-            uint32_t down_key = ct_keyboard_a0->button_index("s");
-            uint32_t left_key = ct_keyboard_a0->button_index("a");
-            uint32_t right_key = ct_keyboard_a0->button_index("d");
+            uint32_t up_key = keyboard->button_index("w");
+            uint32_t down_key = keyboard->button_index("s");
+            uint32_t left_key = keyboard->button_index("a");
+            uint32_t right_key = keyboard->button_index("d");
 
-            if (ct_keyboard_a0->button_state(0, up_key) > 0) {
+            if (keyboard->button_state(0, up_key) > 0) {
                 updown = 1.0f;
             }
 
-            if (ct_keyboard_a0->button_state(0, down_key) > 0) {
+            if (keyboard->button_state(0, down_key) > 0) {
                 updown = -1.0f;
             }
 
-            if (ct_keyboard_a0->button_state(0, right_key) > 0) {
+            if (keyboard->button_state(0, right_key) > 0) {
                 leftright = 1.0f;
             }
 
-            if (ct_keyboard_a0->button_state(0, left_key) > 0) {
+            if (keyboard->button_state(0, left_key) > 0) {
                 leftright = -1.0f;
             }
 
@@ -419,7 +432,7 @@ static void update(uint64_t event) {
     }
 }
 
-static void on_render(uint64_t event) {
+static void on_render() {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
 
@@ -436,8 +449,7 @@ static void on_render(uint64_t event) {
         editor->render_graph->call->setup(editor->render_graph,
                                           editor->rg_builder);
 
-        editor->rg_builder->call->execute(
-                editor->rg_builder);
+        editor->rg_builder->call->execute(editor->rg_builder);
     }
 }
 
@@ -455,23 +467,26 @@ static void on_asset_double_click(uint64_t event) {
     }
 }
 
+
+static struct ct_playground_module_i0 ct_playground_module_i0 = {
+        .update = update,
+        .render= on_render,
+};
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
     };
 
-
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update, 0);
-    ct_ebus_a0->connect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render, 0);
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
+
+    ct_api_a0->register_api("ct_playground_module_i0", &ct_playground_module_i0);
 
     _new_editor((struct ct_resource_id){.i64=0});
 
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_UPDATE_EVENT, update);
-    ct_ebus_a0->disconnect(PLAYGROUND_EBUS, PLAYGROUND_RENDER_EVENT, on_render);
     ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                            on_asset_double_click);
 
@@ -487,15 +502,11 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_keyboard_a0);
-            CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_explorer_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_default_render_graph_a0);
+            CETECH_GET_API(api, ct_default_rg_a0);
         },
         {
             CT_UNUSED(reload);

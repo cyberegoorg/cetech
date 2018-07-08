@@ -1,5 +1,12 @@
+#include <corelib/platform.h>
+
 #if CT_PLATFORM_LINUX
-#define _GNU_SOURCE
+#define _GNU_SOURCE 0
+#include <dlfcn.h>
+#endif
+
+#if CT_PLATFORM_OSX
+#include <dlfcn.h>
 #endif
 
 #include <dlfcn.h>
@@ -29,7 +36,6 @@ void *load_object(const char *path) {
     it += sprintf(buffer + it, ".dylib");
     void *obj = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
 #endif
-
 
     if (obj == NULL) {
         ct_log_a0->error(LOG_WHERE, "Could not load object file %s", dlerror());

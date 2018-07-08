@@ -189,9 +189,7 @@ void _compile_files(struct ct_task_item **tasks,
         }
 
         char build_name[33] = {};
-        snprintf(build_name,
-                 CT_ARRAY_LEN(build_name), "%"
-                         SDL_PRIX64, rid.i64);
+        snprintf(build_name, CT_ARRAY_LEN(build_name), "%"SDL_PRIX64, rid.i64);
 
         builddb_set_file_hash(files[i], build_name);
 
@@ -466,22 +464,11 @@ static void _init(struct ct_api_a0 *api) {
     ct_buffer_free(tmp_dir_full, _G.allocator);
     ct_buffer_free(build_dir_full, _G.allocator);
 
-    const char *core_dir = ct_cdb_a0->read_str(_G.config, CONFIG_CORE_DIR,
-                                               "");
-    const char *source_dir = ct_cdb_a0->read_str(_G.config,
-                                                 CONFIG_SOURCE_DIR, "");
+    const char *core_dir = ct_cdb_a0->read_str(_G.config, CONFIG_CORE_DIR, "");
+    const char *source_dir = ct_cdb_a0->read_str(_G.config, CONFIG_SOURCE_DIR, "");
 
-    ct_fs_a0->map_root_dir(
-            CT_ID64_0("source"),
-            core_dir,
-            true
-    );
-
-    ct_fs_a0->map_root_dir(
-            CT_ID64_0("source"),
-            source_dir,
-            true
-    );
+    ct_fs_a0->map_root_dir(CT_ID64_0("source"), core_dir, true);
+    ct_fs_a0->map_root_dir(CT_ID64_0("source"), source_dir, true);
 
 }
 

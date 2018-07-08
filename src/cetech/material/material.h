@@ -40,24 +40,6 @@ struct ct_material_a0 {
     //! \return Material
     uint64_t (*resource_create)(uint32_t name);
 
-    //! Set texture value
-    //! \param material Material
-    //! \param slot Slot Name
-    //! \param texture Texture name
-    void (*set_texture)(uint64_t material,
-                        uint64_t layer,
-                        const char *slot,
-                        uint64_t texture);
-
-    //! Set mat44f value
-    //! \param material Material
-    //! \param slot Variable name
-    //! \param v Value
-    void (*set_mat44f)(uint64_t material,
-                       uint64_t layer,
-                       const char *slot,
-                       float *value);
-
     //! Submit material for actual render
     void (*submit)(uint64_t material,
                    uint64_t layer,

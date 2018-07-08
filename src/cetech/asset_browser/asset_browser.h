@@ -29,20 +29,11 @@ enum {
 
 enum {
     ASSET_INAVLID_EVENT = 0,
-    ASSET_CLICK_EVENT,
     ASSET_DCLICK_EVENT,
 };
 
 //==============================================================================
 // Api
 //==============================================================================
-
-struct ct_asset_browser_a0 {
-    uint64_t (*get_selected_asset_type)();
-
-    void (*get_selected_asset_name)(char *asset_name);
-};
-
-CT_MODULE(ct_asset_browser_a0);
 
 #endif //CETECH_ASSET_BROWSER_H

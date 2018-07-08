@@ -105,7 +105,7 @@ const char *platform = "linux";
 const char *vs_profile = "120";
 const char *fs_profile = "120";
 #elif CT_PLATFORM_OSX
-const char *platform = "osx";
+//const char *platform = "osx";
 //const char *vs_profile = "metal";
 //const char *fs_profile = "metal";
 const char *vs_profile = "120";
@@ -125,9 +125,7 @@ static void _compile(uint64_t obj) {
     const char *source_dir = ct_resource_a0->compiler_get_source_dir();
     const char *core_dir = ct_resource_a0->compiler_get_core_dir();
 
-
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
-
 
     char *include_dir = NULL;
     ct_os_a0->path_a0->join(&include_dir, a, 2, core_dir, "bgfxshaders");
@@ -158,7 +156,7 @@ static void _compile(uint64_t obj) {
     ct_buffer_free(input_path, a);
 
     if (result != 0) {
-        CT_FREE(a, include_dir);
+        ct_buffer_free(include_dir, a);
         return;
     }
 
@@ -337,7 +335,6 @@ static struct ct_shader_a0 shader_api = {
 struct ct_shader_a0 *ct_shader_a0 = &shader_api;
 
 static void _init_api(struct ct_api_a0 *api) {
-
     api->register_api("ct_shader_a0", &shader_api);
 }
 

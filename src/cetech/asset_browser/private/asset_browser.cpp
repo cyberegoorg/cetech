@@ -6,7 +6,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/playground/playground.h>
 #include <corelib/ebus.h>
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "corelib/hashlib.h"
@@ -14,10 +14,9 @@
 #include "corelib/memory.h"
 #include "corelib/api_system.h"
 #include "corelib/module.h"
-
+#include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Asset browser"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("asset_browser")
 
 static struct asset_browser_global {
     float left_column_width;
@@ -61,13 +60,6 @@ void get_selected_asset_name(char *asset_name) {
     ct_resource_a0->type_name_from_filename(path, &resourceid, asset_name);
 }
 
-static struct ct_asset_browser_a0 asset_browser_api = {
-        .get_selected_asset_name = get_selected_asset_name,
-        .get_selected_asset_type = get_selected_asset_type
-};
-
-struct ct_asset_browser_a0 *ct_asset_browser_a0 = &asset_browser_api;
-
 
 static void set_current_dir(const char *dir,
                             uint64_t dir_hash) {
@@ -104,7 +96,7 @@ static void ui_breadcrumb(const char *dir) {
             if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
                 char tmp_dir[128] = {0};
                 strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
-                uint64_t dir_hash = CT_ID64_0(tmp_dir);
+                uint64_t dir_hash = ct_hashlib_a0->id64_from_str(tmp_dir);
                 set_current_dir(tmp_dir, dir_hash);
             };
 
@@ -126,7 +118,7 @@ static void ui_dir_list() {
     }
 
 
-    if (ImGui::TreeNode("Source")) {
+    if (ct_debugui_a0->TreeNode("Source")) {
         uint64_t dir_hash = CT_ID64_0(".");
 
         if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
@@ -134,7 +126,7 @@ static void ui_dir_list() {
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
-            dir_hash = CT_ID64_0(_G.dirtree_list[i]);
+            dir_hash = ct_hashlib_a0->id64_from_str(_G.dirtree_list[i]);
 
             char label[128];
 
@@ -153,7 +145,7 @@ static void ui_dir_list() {
             }
         }
 
-        ImGui::TreePop();
+        ct_debugui_a0->TreePop();
     }
 
     ImGui::PopItemWidth();
@@ -240,26 +232,28 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
-                uint64_t event;
-                event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                                 ImGui::IsMouseDoubleClicked(0)
-                                                 ? ASSET_DCLICK_EVENT
-                                                 : ASSET_CLICK_EVENT);
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
-                ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("root"),
-                                      CT_ID64_0("source"));
-                ct_cdb_a0->write_commit(w);
+                if (ImGui::IsMouseDoubleClicked(0)) {
+                    uint64_t event;
+                    event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+                                                     ASSET_DCLICK_EVENT);
 
-                ct_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+                    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
+                    ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"),
+                                          resourceid.i64);
+                    ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
+                    ct_cdb_a0->set_uint64(w, CT_ID64_0("root"),
+                                          CT_ID64_0("source"));
+                    ct_cdb_a0->write_commit(w);
 
-                uint64_t selected_asset;
-                selected_asset = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(), CT_ID64_0("asset"));
+                    ct_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+                }
 
-                w = ct_cdb_a0->write_begin(selected_asset);
+                uint64_t selected_asset = ct_cdb_a0->create_object(
+                        ct_cdb_a0->global_db(),
+                        CT_ID64_0("asset"));
+
+                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(selected_asset);
                 ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), resourceid.i64);
                 ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
                 ct_cdb_a0->write_commit(w);
@@ -273,7 +267,7 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(struct ct_dock_i *dock) {
+static void on_debugui(struct ct_dock_i0 *dock) {
 
     float content_w = ImGui::GetContentRegionAvailWidth();
 
@@ -295,27 +289,25 @@ static void on_debugui(struct ct_dock_i *dock) {
 }
 
 
-static const char *dock_title(struct ct_dock_i *dock) {
+static const char *dock_title(struct ct_dock_i0 *dock) {
     return ICON_FA_FOLDER_OPEN " Asset browser";
 }
 
-static const char *name(struct ct_dock_i* dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "asset_browser";
 }
 
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .display_title = dock_title,
-                .name = name,
+        .name = name,
         .draw_ui = on_debugui,
 };
 
 
 static void _init(struct ct_api_a0 *api) {
-    api->register_api("ct_asset_browser_a0", &asset_browser_api);
-    api->register_api("ct_dock_i", &ct_dock_i);
-
+    api->register_api("ct_dock_i0", &ct_dock_i0);
 
     _G = {
             .allocator = ct_memory_a0->system,
