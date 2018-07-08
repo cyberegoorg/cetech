@@ -1,19 +1,22 @@
 //==============================================================================
 // Includes
 //==============================================================================
+#include <string.h>
 
 #include <corelib/api_system.h>
 #include <corelib/log.h>
-#include <cetech/machine/machine.h>
-#include <corelib/os.h>
-#include <cetech/controlers/gamepad.h>
 #include <corelib/module.h>
-#include <string.h>
 #include <corelib/ebus.h>
 #include <corelib/hashlib.h>
-#include <cetech/kernel/kernel.h>
 #include <corelib/macros.h>
+#include <corelib/os.h>
 #include "corelib/allocator.h"
+
+#include <cetech/machine/machine.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/controlers/gamepad.h>
+#include <cetech/controlers/controlers.h>
+
 #include "gamepadstr.h"
 
 
@@ -27,6 +30,8 @@
 //==============================================================================
 // Globals
 //==============================================================================
+
+#define GAMEPAD_MAX 8
 
 #define _G GamepadGlobals
 static struct _G {
@@ -181,7 +186,12 @@ static void update(uint64_t _event) {
     }
 }
 
-static struct ct_gamepad_a0 a0 = {
+static uint64_t name() {
+    return CT_ID64_0("gamepad");
+}
+
+static struct ct_controlers_i0 ct_controlers_i0 = {
+        .name = name,
         .is_active = is_active,
         .button_index = button_index,
         .button_name = button_name,
@@ -194,10 +204,8 @@ static struct ct_gamepad_a0 a0 = {
         .play_rumble = play_rumble,
 };
 
-struct ct_gamepad_a0 *ct_gamepad_a0 = &a0;
-
 static void _init_api(struct ct_api_a0 *api) {
-    api->register_api("ct_gamepad_a0", &a0);
+    api->register_api("ct_controlers_i0", &ct_controlers_i0);
 }
 
 static void _init(struct ct_api_a0 *api) {

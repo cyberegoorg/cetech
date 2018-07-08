@@ -15,10 +15,10 @@ struct ct_world;
 // Api (temporary solution)
 //==============================================================================
 
-struct ct_default_render_graph_a0 {
+struct ct_default_rg_a0 {
     struct ct_render_graph_module *(*create)(struct ct_world world);
 };
 
-CT_MODULE(ct_default_render_graph_a0);
+CT_MODULE(ct_default_rg_a0);
 
 #endif //CETECH_DEFAULT_RENDER_GRAPH_H

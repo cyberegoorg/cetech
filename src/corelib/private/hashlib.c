@@ -18,8 +18,6 @@ struct _G {
 
     char *str_id32;
     struct ct_hash_t id32_to_str;
-
-    struct ct_alloc *allocator;
 } _G;
 
 
@@ -44,13 +42,14 @@ uint64_t stringid64_from_string(const char *str) {
     const uint32_t str_len = strlen(str);
 
     const uint64_t hash = ct_hash_murmur2_64(str, str_len, STRINGID64_SEED);
+
+    ct_os_a0->thread_a0->spin_lock(&_G.id64_to_str_lock);
     if (!ct_hash_contain(&_G.id64_to_str, hash)) {
-        ct_os_a0->thread_a0->spin_lock(&_G.id64_to_str_lock);
         const uint32_t idx = ct_array_size(_G.str_id64);
         ct_array_push_n(_G.str_id64, str, str_len + 1, alloc);
         ct_hash_add(&_G.id64_to_str, hash, idx, alloc);
-        ct_os_a0->thread_a0->spin_unlock(&_G.id64_to_str_lock);
     }
+    ct_os_a0->thread_a0->spin_unlock(&_G.id64_to_str_lock);
 
     return hash;
 }
@@ -115,11 +114,19 @@ void CETECH_MODULE_LOAD (hashlib)(struct ct_api_a0 *api,
     api->register_api("ct_hashlib_a0", &hash_api);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system
     };
 }
 
 void CETECH_MODULE_UNLOAD (hashlib)(struct ct_api_a0 *api,
                                     int reload) {
+    struct ct_alloc *alloc = ct_memory_a0->system;
+
+
+    ct_array_free(_G.str_id64, alloc);
+    ct_array_free(_G.str_id32, alloc);
+
+    ct_hash_free(&_G.id64_to_str, alloc);
+    ct_hash_free(&_G.id32_to_str, alloc);
+
     CT_UNUSED(api);
 }

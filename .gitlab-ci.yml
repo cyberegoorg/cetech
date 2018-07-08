@@ -50,6 +50,7 @@ pages:
   stage: doc
   script:
     - cp -R docs public
+    - cp docs/index.md.html public/index.html
 
   only:
     - master

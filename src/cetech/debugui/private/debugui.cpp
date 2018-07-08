@@ -11,6 +11,7 @@
 #include <cetech/controlers/mouse.h>
 #include <corelib/log.h>
 #include <corelib/ebus.h>
+#include <cetech/controlers/controlers.h>
 
 #include "corelib/config.h"
 #include "corelib/memory.h"
@@ -25,62 +26,64 @@ static struct DebugUIGlobal {
 } _G;
 
 static void render(uint8_t viewid) {
+    struct ct_controlers_i0 *keyboard, *mouse;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    mouse = ct_controlers_a0->get_by_name(CT_ID64_0("mouse"));
+
+
     float mp[3] = {};
-    ct_mouse_a0->axis(0, ct_mouse_a0->axis_index("absolute"), mp);
+    mouse->axis(0, mouse->axis_index("absolute"), mp);
 
     uint8_t btn = 0;
 
-    if (ct_mouse_a0->button_state(0, ct_mouse_a0->button_index("left")) !=
-        0) {
+    if (mouse->button_state(0, mouse->button_index("left")) != 0) {
         btn |= IMGUI_MBUT_LEFT;
     }
 
-    if (ct_mouse_a0->button_state(0, ct_mouse_a0->button_index("right")) !=
-        0) {
+    if (mouse->button_state(0, mouse->button_index("right")) != 0) {
         btn |= IMGUI_MBUT_RIGHT;
     }
 
-    if (ct_mouse_a0->button_state(0, ct_mouse_a0->button_index("midle")) !=
-        0) {
+    if (mouse->button_state(0, mouse->button_index("midle")) != 0) {
         btn |= IMGUI_MBUT_MIDDLE;
     }
 
     uint32_t w, h;
     ct_renderer_a0->get_size(&w, &h);
 
-    const uint32_t axis = ct_mouse_a0->axis_index("wheel");
+    const uint32_t axis = mouse->axis_index("wheel");
     float wheel[2];
-    ct_mouse_a0->axis(0, axis, wheel);
+    mouse->axis(0, axis, wheel);
 
     ImGuiIO &io = ImGui::GetIO();
 
     for (uint32_t i = 0; i < 512; ++i) {
-        io.KeysDown[i] = ct_keyboard_a0->button_state(0, i) > 0;
+        io.KeysDown[i] = keyboard->button_state(0, i) > 0;
     }
 
     if (!io.KeysDown[40]) {
-        io.KeysDown[40] = ct_keyboard_a0->button_state(0, 88) > 0;
+        io.KeysDown[40] = keyboard->button_state(0, 88) > 0;
     }
 
-    io.KeyShift = (ct_keyboard_a0->button_state(0, ct_keyboard_a0->button_index(
-            "lshift")) > 0) || (ct_keyboard_a0->button_state(0,
-                                                             ct_keyboard_a0->button_index(
-                                                                     "rshift")) >
+    io.KeyShift = (keyboard->button_state(0, keyboard->button_index(
+            "lshift")) > 0) || (keyboard->button_state(0,
+                                                       keyboard->button_index(
+                                                               "rshift")) >
                                 0);
-    io.KeyCtrl = (ct_keyboard_a0->button_state(0, ct_keyboard_a0->button_index(
-            "lctrl")) > 0) || (ct_keyboard_a0->button_state(0,
-                                                            ct_keyboard_a0->button_index(
+    io.KeyCtrl = (keyboard->button_state(0, keyboard->button_index(
+            "lctrl")) > 0) || (keyboard->button_state(0,
+                                                      keyboard->button_index(
                                                                     "rctrl")) >
                                0);
-    io.KeyAlt = (ct_keyboard_a0->button_state(0, ct_keyboard_a0->button_index(
-            "lalt")) > 0) || (ct_keyboard_a0->button_state(0,
-                                                           ct_keyboard_a0->button_index(
+    io.KeyAlt = (keyboard->button_state(0, keyboard->button_index(
+            "lalt")) > 0) || (keyboard->button_state(0,
+                                                     keyboard->button_index(
                                                                    "ralt")) >
                               0);
-    io.KeySuper = (ct_keyboard_a0->button_state(0, ct_keyboard_a0->button_index(
+    io.KeySuper = (keyboard->button_state(0, keyboard->button_index(
             "super")) > 0);
 
-    char *txt = ct_keyboard_a0->text(0);
+    char *txt = keyboard->text(0);
     if (txt[0]) {
         io.AddInputCharactersUTF8(txt);
     }
@@ -125,7 +128,7 @@ static struct ct_debugui_a0 debugui_api = {
         .Button = imgui_wrap::Button,
         .SmallButton = ImGui::SmallButton,
         .InvisibleButton = imgui_wrap::InvisibleButton,
-                .Image = imgui_wrap::Image,
+        .Image = imgui_wrap::Image,
         .Image2 = imgui_wrap::Image2,
         .ImageButton = imgui_wrap::ImageButton,
         .Checkbox = ImGui::Checkbox,
@@ -255,7 +258,7 @@ struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_debugui_a0", &debugui_api);
-    imguiCreate(11);
+    imguiCreate(12);
 
     _G = {
             .allocator = ct_memory_a0->system
@@ -263,27 +266,32 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);
 
-    ImGuiIO &io = ImGui::GetIO();
-    io.KeyMap[ImGuiKey_Tab] = ct_keyboard_a0->button_index("tab");
-    io.KeyMap[ImGuiKey_LeftArrow] = ct_keyboard_a0->button_index("left");
-    io.KeyMap[ImGuiKey_RightArrow] = ct_keyboard_a0->button_index("right");
-    io.KeyMap[ImGuiKey_UpArrow] = ct_keyboard_a0->button_index("up");
-    io.KeyMap[ImGuiKey_DownArrow] = ct_keyboard_a0->button_index("down");
-    io.KeyMap[ImGuiKey_PageUp] = ct_keyboard_a0->button_index("pageup");
-    io.KeyMap[ImGuiKey_PageDown] = ct_keyboard_a0->button_index("pagedown");
-    io.KeyMap[ImGuiKey_Home] = ct_keyboard_a0->button_index("home");
-    io.KeyMap[ImGuiKey_End] = ct_keyboard_a0->button_index("end");
-    io.KeyMap[ImGuiKey_Delete] = ct_keyboard_a0->button_index("delete");
-    io.KeyMap[ImGuiKey_Backspace] = ct_keyboard_a0->button_index("backspace");
-    io.KeyMap[ImGuiKey_Enter] = ct_keyboard_a0->button_index("return");
-    io.KeyMap[ImGuiKey_Escape] = ct_keyboard_a0->button_index("escape");
 
-    io.KeyMap[ImGuiKey_A] = ct_keyboard_a0->button_index("a");
-    io.KeyMap[ImGuiKey_C] = ct_keyboard_a0->button_index("c");
-    io.KeyMap[ImGuiKey_V] = ct_keyboard_a0->button_index("v");
-    io.KeyMap[ImGuiKey_X] = ct_keyboard_a0->button_index("x");
-    io.KeyMap[ImGuiKey_Y] = ct_keyboard_a0->button_index("y");
-    io.KeyMap[ImGuiKey_Z] = ct_keyboard_a0->button_index("z");
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+
+
+    ImGuiIO &io = ImGui::GetIO();
+    io.KeyMap[ImGuiKey_Tab] = keyboard->button_index("tab");
+    io.KeyMap[ImGuiKey_LeftArrow] = keyboard->button_index("left");
+    io.KeyMap[ImGuiKey_RightArrow] = keyboard->button_index("right");
+    io.KeyMap[ImGuiKey_UpArrow] = keyboard->button_index("up");
+    io.KeyMap[ImGuiKey_DownArrow] = keyboard->button_index("down");
+    io.KeyMap[ImGuiKey_PageUp] = keyboard->button_index("pageup");
+    io.KeyMap[ImGuiKey_PageDown] = keyboard->button_index("pagedown");
+    io.KeyMap[ImGuiKey_Home] = keyboard->button_index("home");
+    io.KeyMap[ImGuiKey_End] = keyboard->button_index("end");
+    io.KeyMap[ImGuiKey_Delete] = keyboard->button_index("delete");
+    io.KeyMap[ImGuiKey_Backspace] = keyboard->button_index("backspace");
+    io.KeyMap[ImGuiKey_Enter] = keyboard->button_index("return");
+    io.KeyMap[ImGuiKey_Escape] = keyboard->button_index("escape");
+
+    io.KeyMap[ImGuiKey_A] = keyboard->button_index("a");
+    io.KeyMap[ImGuiKey_C] = keyboard->button_index("c");
+    io.KeyMap[ImGuiKey_V] = keyboard->button_index("v");
+    io.KeyMap[ImGuiKey_X] = keyboard->button_index("x");
+    io.KeyMap[ImGuiKey_Y] = keyboard->button_index("y");
+    io.KeyMap[ImGuiKey_Z] = keyboard->button_index("z");
 }
 
 static void _shutdown() {
@@ -296,8 +304,6 @@ CETECH_MODULE_DEF(
         debugui,
         {
             CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_mouse_a0);
-            CETECH_GET_API(api, ct_keyboard_a0);
             CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_fs_a0);

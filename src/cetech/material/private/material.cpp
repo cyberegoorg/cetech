@@ -229,14 +229,28 @@ static void ui_texture(uint64_t variable) {
 
     ct_debugui_a0->InputText(str, buff, strlen(buff),
                              DebugInputTextFlags_ReadOnly, 0, NULL);
+
     float size[2];
     ct_debugui_a0->GetWindowSize(size);
     size[1] = size[0];
 
-    ct_debugui_a0->Image(ct_texture_a0->get(name),
+    ct_render_texture_handle_t texture;
+
+    uint64_t var_type;
+    var_type = ct_cdb_a0->read_uint64(variable, MATERIAL_VAR_TYPE_PROP, 0);
+
+
+    if(var_type == MAT_VAR_TEXTURE_HANDLER) {
+        texture.idx = name;
+    } else {
+        texture = ct_texture_a0->get(name);
+    }
+
+    ct_debugui_a0->Image(texture,
                          size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+
 }
 
 static void draw_property(uint64_t obj) {
@@ -282,9 +296,9 @@ static void draw_property(uint64_t obj) {
                         ui_texture(var);
                         break;
 
-                    case MAT_VAR_TEXTURE_HANDLER:
-                        ui_texture(var);
-                        break;
+//                    case MAT_VAR_TEXTURE_HANDLER:
+//                        ui_texture(var);
+//                        break;
 
                     case MAT_VAR_VEC4:
                         ui_vec4(var);
@@ -374,7 +388,7 @@ static uint64_t create(uint32_t name) {
     };
 
     auto object = ct_resource_a0->get(rid);
-    return object;
+    return  ct_cdb_a0->create_from(ct_cdb_a0->global_db(), object);
 }
 
 static void set_texture_handler(uint64_t material,
@@ -391,30 +405,6 @@ static void set_texture_handler(uint64_t material,
     ct_cdb_a0->set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
                           MAT_VAR_TEXTURE_HANDLER);
     ct_cdb_a0->write_commit(writer);
-}
-
-static void set_texture(uint64_t material,
-                        uint64_t layer,
-                        const char *slot,
-                        uint64_t texture) {
-    uint64_t layer_obj = ct_cdb_a0->read_ref(material, layer, 0);
-    uint64_t variables = ct_cdb_a0->read_ref(layer_obj,
-                                             MATERIAL_VARIABLES_PROP,
-                                             0);
-
-    uint64_t var = ct_cdb_a0->read_ref(variables, CT_ID64_0(slot), 0);
-
-    ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(var);
-    ct_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture);
-    ct_cdb_a0->set_uint64(writer, MATERIAL_VAR_TYPE_PROP, MAT_VAR_TEXTURE);
-    ct_cdb_a0->write_commit(writer);
-}
-
-
-static void set_mat44f(uint64_t material,
-                       uint64_t layer,
-                       const char *slot,
-                       float *value) {
 }
 
 static void submit(uint64_t material,
@@ -498,9 +488,7 @@ static void submit(uint64_t material,
 
 static struct ct_material_a0 material_api = {
         .resource_create = create,
-        .set_texture = set_texture,
         .set_texture_handler = set_texture_handler,
-        .set_mat44f = set_mat44f,
         .submit = submit
 };
 

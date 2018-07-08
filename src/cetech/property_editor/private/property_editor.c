@@ -10,7 +10,7 @@
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/playground/playground.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-
+#include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Property editor"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("property_editor")
@@ -26,7 +26,7 @@ static struct ct_property_editor_a0 property_inspector_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_inspector_api;
 
-static void on_debugui(struct ct_dock_i *dock) {
+static void on_debugui(struct ct_dock_i0 *dock) {
     struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -40,11 +40,11 @@ static const char *dock_title() {
     return ICON_FA_TABLE " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i *dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "property_editor";
 }
 
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .name = name,
@@ -58,7 +58,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     api->register_api("ct_property_editor_a0", &property_inspector_api);
-    api->register_api("ct_dock_i", &ct_dock_i);
+    api->register_api("ct_dock_i0", &ct_dock_i0);
 
 }
 

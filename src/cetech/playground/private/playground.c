@@ -16,11 +16,12 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <cetech/camera/camera.h>
-#include <cetech/playground/command_system.h>
-#include <cetech/playground/action_manager.h>
+#include <cetech/command_system/command_system.h>
+#include <cetech/action_manager/action_manager.h>
 #include <corelib/ebus.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/render_graph/render_graph.h>
+#include <cetech/dock/dock.h>
 
 #define _G plaground_global
 
@@ -109,9 +110,9 @@ static float draw_main_menu() {
 
             ct_debugui_a0->Separator();
 
-            struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+            struct ct_api_entry it = ct_api_a0->first("ct_dock_i0");
             while (it.api) {
-                struct ct_dock_i *i = (it.api);
+                struct ct_dock_i0 *i = (it.api);
 
                 char title[128] = {0};
 
@@ -127,9 +128,9 @@ static float draw_main_menu() {
         }
 
 
-        struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+        struct ct_api_entry it = ct_api_a0->first("ct_dock_i0");
         while (it.api) {
-            struct ct_dock_i *i = (it.api);
+            struct ct_dock_i0 *i = (it.api);
 
             if (i->draw_main_menu) {
                 i->draw_main_menu();
@@ -153,9 +154,9 @@ static float draw_main_menu() {
 }
 
 static void draw_all_docks() {
-    struct ct_api_entry it = ct_api_a0->first("ct_dock_i");
+    struct ct_api_entry it = ct_api_a0->first("ct_dock_i0");
     while (it.api) {
-        struct ct_dock_i *i = (it.api);
+        struct ct_dock_i0 *i = (it.api);
 
 
         char title[128] = {0};
@@ -187,11 +188,14 @@ static void debugui_on_pass(void *inst,
 
 
 static void on_init(uint64_t _event) {
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                              PLAYGROUND_INIT_EVENT);
-
-    ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
-
+    struct ct_api_entry it = ct_api_a0->first("ct_playground_module_i0");
+    while (it.api) {
+        struct ct_playground_module_i0 *i = (it.api);
+        if(i->init) {
+            i->init();
+        }
+        it = ct_api_a0->next(it);
+    }
 
     _G.render_graph = ct_render_graph_a0->create_graph();
     _G.render_graph_builder = ct_render_graph_a0->create_builder();
@@ -209,34 +213,46 @@ static void on_init(uint64_t _event) {
 }
 
 static void on_shutdown(uint64_t _event) {
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                              PLAYGROUND_SHUTDOWN_EVENT);
+    struct ct_api_entry it = ct_api_a0->first("ct_playground_module_i0");
+    while (it.api) {
+        struct ct_playground_module_i0 *i = (it.api);
 
-    ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
+        if(i->shutdown) {
+            i->shutdown();
+        }
+
+        it = ct_api_a0->next(it);
+    }
 }
 
 static void on_update(uint64_t app_event) {
     ct_action_manager_a0->check();
 
+    float dt = ct_cdb_a0->read_float(app_event, CT_ID64_0("dt"), 0.0f);
 
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                              PLAYGROUND_UPDATE_EVENT);
+    struct ct_api_entry it = ct_api_a0->first("ct_playground_module_i0");
+    while (it.api) {
+        struct ct_playground_module_i0 *i = (it.api);
 
+        if(i->update) {
+            i->update(dt);
+        }
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-    ct_cdb_a0->set_float(w, CT_ID64_0("dt"),
-                         ct_cdb_a0->read_float(app_event, CT_ID64_0("dt"),
-                                               0.0f));
-    ct_cdb_a0->write_commit(w);
-
-    ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
+        it = ct_api_a0->next(it);
+    }
 }
 
-static void on_render(uint64_t _event) {
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
-                                              PLAYGROUND_RENDER_EVENT);
+static void on_render() {
+    struct ct_api_entry it = ct_api_a0->first("ct_playground_module_i0");
+    while (it.api) {
+        struct ct_playground_module_i0 *i = (it.api);
 
-    ct_ebus_a0->broadcast(PLAYGROUND_EBUS, event);
+        if(i->render) {
+            i->render();
+        }
+
+        it = ct_api_a0->next(it);
+    }
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
     _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
@@ -262,20 +278,11 @@ static void on_ui(uint64_t _event) {
 }
 
 
-static struct ct_playground_a0 playground_api = {
-        .reload_layout = reload_layout,
-};
-
-struct ct_playground_a0 *ct_playground_a0 = &playground_api;
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .load_layout = true,
     };
-
-    api->register_api("ct_playground_a0", &playground_api);
-
-    ct_ebus_a0->create_ebus(PLAYGROUND_EBUS_NAME, PLAYGROUND_EBUS);
 
     ct_action_manager_a0->register_action(
             CT_ID64_0("undo"),

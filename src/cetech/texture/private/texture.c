@@ -331,10 +331,13 @@ int texture_init(struct ct_api_a0 *api) {
 void texture_shutdown() {
 }
 
-struct ct_render_texture_handle texture_get(uint32_t name) {
+ct_render_texture_handle_t texture_get(uint32_t name) {
     struct ct_resource_id rid = {.type = _G.type, .name = name};
     uint64_t obj = ct_resource_a0->get(rid);
 
+    if(!obj) {
+        return (ct_render_texture_handle_t){.idx = UINT16_MAX};
+    }
     struct ct_render_texture_handle texture = {
             .idx = (uint16_t) ct_cdb_a0->read_uint64(obj, TEXTURE_HANDLER_PROP,
                                                      0)

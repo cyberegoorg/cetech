@@ -102,10 +102,10 @@ static void map_root_dir(uint64_t root,
     struct fs_mount_point mp = {};
 
     if (watch) {
-        struct ct_watchdog *wd = ct_os_a0->watchdog_a0->create(_G.allocator);
-        wd->add_dir(wd->inst, base_path, true);
+//        struct ct_watchdog *wd = ct_os_a0->watchdog_a0->create(_G.allocator);
+//        wd->add_dir(wd->inst, base_path, true);
 
-        mp.wd = wd;
+//        mp.wd = wd;
     }
 
     mp.root_path = ct_memory_a0->str_dup(base_path, _G.allocator);

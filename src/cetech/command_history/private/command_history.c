@@ -3,8 +3,8 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/playground/playground.h>
 #include <corelib/log.h>
-#include <cetech/playground/command_history.h>
-#include <cetech/playground/command_system.h>
+#include <cetech/command_history/command_history.h>
+#include <cetech/command_system/command_system.h>
 #include <corelib/ebus.h>
 #include <corelib/macros.h>
 
@@ -12,7 +12,7 @@
 #include "corelib/memory.h"
 #include "corelib/api_system.h"
 #include "corelib/module.h"
-
+#include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Command history"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
@@ -44,7 +44,7 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui(struct ct_dock_i *dock) {
+static void on_debugui(struct ct_dock_i0 *dock) {
     ui_command_list();
 }
 
@@ -52,15 +52,15 @@ static const char *dock_title() {
     return WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i* dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "command_history";
 }
 
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .display_title = dock_title,
-                .name = name,
+        .name = name,
         .draw_ui = on_debugui,
 };
 
@@ -71,7 +71,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    api->register_api("ct_dock_i", &ct_dock_i);
+    api->register_api("ct_dock_i0", &ct_dock_i0);
 
 }
 
@@ -85,7 +85,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_cmd_system_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);

@@ -15,7 +15,7 @@
 #include <corelib/macros.h>
 #include "corelib/allocator.h"
 #include "keystr.h"
-
+#include <cetech/controlers/controlers.h>
 
 
 //==============================================================================
@@ -132,7 +132,12 @@ static char *text(uint32_t idx) {
     return _G.text;
 }
 
-static struct ct_keyboard_a0 a0 = {
+static uint64_t name() {
+    return CT_ID64_0("keyboard");
+}
+
+static struct ct_controlers_i0 ct_controlers_i0 = {
+        .name = name,
         .button_index = button_index,
         .button_name = button_name,
         .button_state = button_state,
@@ -141,10 +146,9 @@ static struct ct_keyboard_a0 a0 = {
         .text = text,
 };
 
-struct ct_keyboard_a0 *ct_keyboard_a0 = &a0;
 
 static void _init_api(struct ct_api_a0 *api) {
-    api->register_api("ct_keyboard_a0", &a0);
+    api->register_api("ct_controlers_i0", &ct_controlers_i0);
 }
 
 static void _init(struct ct_api_a0 *api) {

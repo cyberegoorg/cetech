@@ -67,7 +67,7 @@ set(SOURCE_FILES
         src/corelib/private/config.c
         src/corelib/private/memory.c
         src/corelib/private/task.c
-        src/corelib/private/log_stdout_handler.c
+        src/corelib/private/log_stdout.c
         src/corelib/private/hashlib.c
         src/corelib/private/os.c
         src/corelib/private/os_error.c
@@ -102,9 +102,9 @@ set(SOURCE_FILES
 
         src/cetech/machine/private/machine_sdl2.c
 
-        src/cetech/ecs/private/entity_preview.c
         src/cetech/ecs/private/ecs.c
         src/cetech/controlers/private/keyboard.c
+        src/cetech/controlers/private/controlers.c
         src/cetech/controlers/private/mouse.c
         src/cetech/controlers/private/gamepad.c
         src/cetech/renderer/private/renderer.cpp
@@ -124,7 +124,7 @@ set(SOURCE_FILES
         src/cetech/scenegraph/private/scenegraph.c
         src/cetech/camera/private/camera.c
 
-        src/cetech/playground/private/entity_editor.c
+        src/cetech/entity_editor/private/entity_editor.c
         src/cetech/ecs/private/entity_property.c
         src/cetech/explorer/private/explorer.c
         src/cetech/asset_preview/private/asset_preview.c
@@ -132,11 +132,11 @@ set(SOURCE_FILES
         src/cetech/asset_browser/private/asset_browser.cpp
         src/cetech/playground/private/playground.c
         src/cetech/property_editor/private/property_editor.c
-        src/cetech/playground/private/command_system.c
-        src/cetech/playground/private/command_history.c
-        src/cetech/log_view/log_view.cpp
-        src/cetech/playground/private/action_manager.c
-        src/cetech/playground/private/selected_object.c)
+        src/cetech/command_system/private/command_system.c
+        src/cetech/command_history/private/command_history.c
+        src/cetech/log_view/private/log_view.cpp
+        src/cetech/action_manager/private/action_manager.c
+        src/cetech/selected_object/private/selected_object.c)
 
 ################################################################################
 # Main sources

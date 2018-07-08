@@ -244,7 +244,7 @@ static void load_dirs() {
 
         sprintf(key + len, "%d", i);
 
-        const uint64_t key_id = CT_ID64_0(key);
+        const uint64_t key_id = ct_hashlib_a0->id64_from_str(key);
 
         if (!ct_cdb_a0->prop_exist(_G.config, key_id)) {
             break;

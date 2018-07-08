@@ -119,7 +119,7 @@ static void renderer_create() {
     init.type = BGFX_RENDERER_TYPE_OPENGL,
 #elif CT_PLATFORM_OSX
     init.type = BGFX_RENDERER_TYPE_METAL,
-            init.type = BGFX_RENDERER_TYPE_OPENGL,
+    init.type = BGFX_RENDERER_TYPE_OPENGL,
 #endif
 
             bgfx_init(&init);

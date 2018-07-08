@@ -12,7 +12,7 @@
     ((a) ?  CT_FREE(alloc, ct_array_header(a)) : 0, a = NULL )
 
 #define ct_array_header(a) \
-    ((struct ct_array_header_t *)((char *)(a) - sizeof(struct ct_array_header_t)))
+    ((a) ? (struct ct_array_header_t *)((char *)(a) - sizeof(struct ct_array_header_t)): NULL)
 
 #define ct_array_size(a) \
     ((a) ? ct_array_header(a)->size : 0)
@@ -24,7 +24,7 @@
      ((a) ? ct_array_header(a)->size = 0 : 0)
 
 #define ct_array_set_capacity(a, c, alloc) \
-     ((a) = (__typeof(a)) ct_array_grow(a, c, sizeof(*(a)), alloc, __FILE__, __LINE__))
+     ((a) = (__typeof(a)) ct_array_grow(a, c, sizeof(*(a)), CT_ALIGNOF(*(a)), alloc, __FILE__, __LINE__))
 
 #define ct_array_resize(a, c, alloc) \
      (ct_array_set_capacity(a, c, alloc), ct_array_header(a)->size = (c))
@@ -41,15 +41,14 @@
 #define ct_array_full_n(a, n) \
      ((a) ? (ct_array_size(a) + (n)) >= ct_array_capacity(a) : 1)
 
-
 #define ct_array_push(a, item, alloc) \
-    ct_array_full(a) ? (a) = (__typeof(a))ct_array_grow(a, ct_array_size(a) + 1, sizeof(*(a)), alloc, __FILE__, __LINE__) : 0, \
-    (a)[ct_array_header(a)->size++] = item
+    (ct_array_full(a) ? (a) = (__typeof(a))ct_array_grow(a, ct_array_size(a) + 1, sizeof(*(a)), CT_ALIGNOF(*(a)), alloc, __FILE__, __LINE__) : 0, \
+    (a)[ct_array_header(a)->size++] = item)
 
 #define ct_array_push_n(a, items, n, alloc) \
-    ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + (n), sizeof(*(a)), alloc, __FILE__, __LINE__) : 0, \
+    (ct_array_full_n(a, n) ? (a) =  (__typeof(a))ct_array_grow(a, ct_array_size(a) + (n), sizeof(*(a)), CT_ALIGNOF(*(a)), alloc, __FILE__, __LINE__) : 0, \
     memcpy((a)+ct_array_header(a)->size, (items), sizeof(*(a)) * (n)), \
-    ct_array_header(a)->size += (n)
+    ct_array_header(a)->size += (n))
 
 #define ct_array_pop_front(a) \
     (ct_array_any(a) ? memmove(a, ((a)+1), sizeof(*(a)) * (ct_array_header(a)->size--)) : 0)
@@ -75,38 +74,36 @@ struct ct_array_header_t {
     uint32_t capacity;
 };
 
-static inline void *ct_array_grow(void *a,
+static inline void *ct_array_grow(void *array,
                                   uint32_t capacity,
                                   size_t type_size,
+                                  size_t type_align,
                                   const struct ct_alloc *alloc,
                                   const char *filename,
                                   uint32_t line) {
-    if (capacity <= ct_array_capacity(a)) {
-        return a;
+    if (capacity < ct_array_capacity(array)) {
+        return array;
     }
 
-    uint32_t new_capacity = (ct_array_capacity(a) * 2) + 8;
+    uint32_t new_capacity = (ct_array_capacity(array) * 2) + 8;
     if (new_capacity < capacity) {
         new_capacity = capacity;
     }
 
-    const uint32_t size = sizeof(struct ct_array_header_t) +
-                          (new_capacity * type_size);
+    const uint32_t orig_size = ct_array_size(array);
 
-    void *new_data = alloc->call->reallocate(alloc, NULL,
-                                             size, CT_ALIGNOF(void*),
-                                             filename, line);
+    const uint32_t size = sizeof(struct ct_array_header_t) + (new_capacity
+                                                              * type_size);
+
+    void *new_data = alloc->call->reallocate(alloc, ct_array_header(array),
+                                             size, type_align, filename, line);
 
     char *new_array = (char *) new_data + sizeof(struct ct_array_header_t);
 
-    memset(new_data, 0, size);
-
     *((struct ct_array_header_t *) new_data) = (struct ct_array_header_t) {
-            .size = ct_array_size(a),
+            .size = orig_size,
             .capacity = new_capacity
     };
-
-    memcpy(new_array, a, type_size * ct_array_size(a));
 
     return new_array;
 }

@@ -13,7 +13,7 @@
 #include "corelib/memory.h"
 #include "corelib/api_system.h"
 #include "corelib/module.h"
-
+#include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Log view"
 #define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")
@@ -77,8 +77,7 @@ static void log_handler(enum ct_log_level level,
     };
 
     char buffer[1024];
-    int len = snprintf(buffer, CT_ARRAY_LEN(buffer), LOG_FORMAT, where,
-                       msg);
+    int len = snprintf(buffer, CT_ARRAY_LEN(buffer), LOG_FORMAT, where, msg);
 
     ct_array_push(_G.log_items, item, _G.allocator);
     ct_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
@@ -146,21 +145,21 @@ static void ui_log_items() {
     ImGui::EndChild();
 }
 
-static void on_debugui(ct_dock_i *dock) {
+static void on_debugui(ct_dock_i0 *dock) {
     ui_filter();
     ui_level_mask();
     ui_log_items();
 }
 
-static const char *dock_title(struct ct_dock_i* dock) {
+static const char *dock_title(struct ct_dock_i0* dock) {
     return WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i* dock) {
+static const char *name(struct ct_dock_i0* dock) {
     return "log_view";
 }
 
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .display_title = dock_title,
@@ -179,7 +178,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_log_a0->register_handler(log_handler, NULL);
 
 
-    ct_api_a0->register_api("ct_dock_i", &ct_dock_i);
+    ct_api_a0->register_api("ct_dock_i0", &ct_dock_i0);
 
 }
 
@@ -195,7 +194,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
             CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_playground_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_ebus_a0);
         },

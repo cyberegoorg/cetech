@@ -341,7 +341,7 @@ void path_join(char **buffer,
     for (uint32_t i = 0; i < count; ++i) {
         const char *t = va_arg (arguments, const char*);
 
-        if (!t[0]) {
+        if (!t) {
             continue;
         }
 

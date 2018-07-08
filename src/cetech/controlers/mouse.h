@@ -15,20 +15,6 @@ enum {
     MOUSE_EBUS = 0x3ddd354d
 };
 
-
-//! Mouse button status
-struct ct_mouse_event {
-    uint32_t button;            //!< Button state
-};
-
-struct ct_mouse_wheel_event {
-    float pos[2];               //!< Actual position
-};
-
-struct ct_mouse_move_event {
-    float pos[2];       //!< Actual position
-};
-
 enum {
     EVENT_MOUSE_INVALID = 0,   //!< Invalid type
 
@@ -66,57 +52,6 @@ enum {
 //==============================================================================
 // Api
 //==============================================================================
-
-//! Mouse API V0
-struct ct_mouse_a0 {
-    //! Return button index
-    //! \param button_name Button name
-    //! \return Button index
-    uint32_t (*button_index)(const char *button_name);
-
-    //! Return button name
-    //! \param button_index Button index
-    //! \return Button name
-    const char *(*button_name)(const uint32_t button_index);
-
-    //! Return button state
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame down else 0
-    int (*button_state)(uint32_t idx,
-                        const uint32_t button_index);
-
-    //! Is button pressed?
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame pressed else 0
-    int (*button_pressed)(uint32_t idx,
-                          const uint32_t button_index);
-
-    //! Is button released?
-    //! \param button_index Button index
-    //! \return 1 if button is in current frame released else 0
-    int (*button_released)(uint32_t idx,
-                           const uint32_t button_index);
-
-    //! Return axis index
-    //! \param axis_name Axis name
-    //! \return Axis index
-    uint32_t (*axis_index)(const char *axis_name);
-
-    //! Return axis name
-    //! \param axis_index Axis index
-    //! \return Axis name
-    const char *(*axis_name)(const uint32_t axis_index);
-
-    //! Return axis value
-    //! \param axis_index Axis index
-    //! \return Axis value
-    void (*axis)(uint32_t idx,
-                 const uint32_t axis_index,
-                 float *value);
-
-};
-
-CT_MODULE(ct_mouse_a0);
 
 #endif //CETECH_MOUSE_H
 //! \}

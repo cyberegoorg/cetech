@@ -11,7 +11,7 @@
 #include "corelib/module.h"
 
 
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
 
 #define _G selected_object_global
 

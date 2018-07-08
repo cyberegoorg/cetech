@@ -244,6 +244,8 @@ static void output_pass_on_setup(void *inst,
     builder->call->add_pass(builder, inst, CT_ID64_0("default"));
 }
 
+static uint64_t copy_material = 0;
+
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
                                 uint64_t layer,
@@ -266,13 +268,14 @@ static void output_pass_on_pass(void *inst,
 
     ct_renderer_a0->set_view_transform(viewid, NULL, proj);
 
-    uint64_t material;
-    material = ct_material_a0->resource_create(CT_ID32_0("content/copy"));
+    if(!copy_material) {
+        copy_material = ct_material_a0->resource_create(CT_ID32_0("content/copy"));
+    }
 
     ct_render_texture_handle_t th;
     th = builder->call->get_texture(builder, CT_ID64_0("color"));
 
-    ct_material_a0->set_texture_handler(material,
+    ct_material_a0->set_texture_handler(copy_material,
                                         layer,
                                         "s_input_texture",
                                         th);
@@ -281,7 +284,7 @@ static void output_pass_on_pass(void *inst,
                      ct_renderer_a0->get_caps()->originBottomLeft,
                      1.f, 1.0f);
 
-    ct_material_a0->submit(material, layer, viewid);
+    ct_material_a0->submit(copy_material, layer, viewid);
 }
 
 static struct ct_render_graph_module *create(struct ct_world world) {
@@ -303,11 +306,11 @@ static struct ct_render_graph_module *create(struct ct_world world) {
     return m1;
 }
 
-static struct ct_default_render_graph_a0 default_render_graph_api = {
+static struct ct_default_rg_a0 default_render_graph_api = {
         .create= create,
 };
 
-struct ct_default_render_graph_a0 *ct_default_render_graph_a0 = &default_render_graph_api;
+struct ct_default_rg_a0 *ct_default_rg_a0 = &default_render_graph_api;
 
 
 static void _init(struct ct_api_a0 *api) {
@@ -318,7 +321,7 @@ static void _init(struct ct_api_a0 *api) {
 
     init_decl();
 
-    api->register_api("ct_default_render_graph_a0", &default_render_graph_api);
+    api->register_api("ct_default_rg_a0", &default_render_graph_api);
 }
 
 static void _shutdown() {

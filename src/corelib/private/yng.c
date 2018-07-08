@@ -128,10 +128,10 @@ uint64_t combine_key(const uint64_t *keys,
 
 uint64_t combine_key_str(const char **keys,
                          uint32_t count) {
-    uint64_t hash = CT_ID64_0(keys[0]);
+    uint64_t hash = ct_hashlib_a0->id64_from_str(keys[0]);
 
     for (uint32_t i = 1; i < count; ++i) {
-        hash = hash_combine(hash, CT_ID64_0(keys[i]));
+        hash = hash_combine(hash, ct_hashlib_a0->id64_from_str(keys[i]));
     }
 
     return hash;
@@ -609,8 +609,7 @@ bool parse_yaml(struct ct_alloc *alloc,
 
     ct_array_push(parent_stack, (struct parent_stack_state) {}, _G.allocator);
 
-    uint8_t *source_data = CT_ALLOC(alloc, uint8_t,
-                                    vio->size(vio) + 1);
+    uint8_t *source_data = CT_ALLOC(alloc, uint8_t, vio->size(vio) + 1);
     memset(source_data, 0, vio->size(vio) + 1);
     vio->read(vio, source_data, sizeof(char), vio->size(vio));
 
@@ -720,7 +719,7 @@ bool parse_yaml(struct ct_alloc *alloc,
                 const uint64_t PREFAB_KEY = CT_ID64_0("PREFAB");
 
                 if (IS_KEY()) {
-                    uint64_t key_hash = CT_ID64_0(value.string);
+                    uint64_t key_hash = ct_hashlib_a0->id64_from_str(value.string);
                     uint64_t parent_key = parent_stack[parent_stack_top].key_hash;
                     key = hash_combine(parent_key, key_hash);
 
@@ -1013,7 +1012,7 @@ struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
         parent = new_map_idx;
     }
 
-    uint64_t key_hash = CT_ID64_0(keys[keys_count - 1]);
+    uint64_t key_hash = ct_hashlib_a0->id64_from_str(keys[keys_count - 1]);
     inst->value[parent].node_count += 1;
     uint32_t key_idx = new_node(
             inst->doc,

@@ -11,16 +11,19 @@
 #include <corelib/yng.h>
 #include <corelib/ydb.h>
 #include <corelib/fs.h>
+#include <corelib/ebus.h>
+#include <corelib/macros.h>
+
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/debugui/debugui.h>
+#include <cetech/dock/dock.h>
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/explorer/explorer.h>
 #include <cetech/playground/playground.h>
 #include <cetech/resource/resource.h>
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
+
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #define WINDOW_NAME "Explorer"
@@ -31,37 +34,32 @@ static struct _G {
     bool visible;
 
     uint32_t ent_name;
-    struct ct_entity entity;
-    struct ct_world world;
 
     const char *path;
     struct ct_alloc *allocator;
 } _G;
 
 
-void set_level(struct ct_world world,
-               struct ct_entity level,
-               uint64_t name,
-               uint64_t root,
-               const char *path) {
+void set_level(uint64_t obj) {
+    uint64_t asset = ct_cdb_a0->read_uint64(obj, CT_ID64_0("asset"), 0);
+    const char *path = ct_cdb_a0->read_str(obj, CT_ID64_0("path"), 0);
 
-    CT_UNUSED(root);
+    struct ct_resource_id rid = {.i64 = asset};
 
-    if (_G.ent_name == name) {
+    if (_G.ent_name == rid.name) {
         return;
     }
 
-    _G.ent_name = name;
-    _G.entity = level;
-    _G.world = world;
+    if(rid.type != CT_ID32_0("entity")) {
+        _G.ent_name = 0;
+        _G.path = NULL;
+
+        return;
+    }
+
+    _G.ent_name = rid.name;
     _G.path = path;
 }
-
-static struct ct_explorer_a0 level_inspector_api = {
-        .set_level = set_level,
-};
-
-struct ct_explorer_a0 *ct_explorer_a0 = &level_inspector_api;
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
@@ -171,7 +169,13 @@ static void ui_entity_item_begin(uint64_t obj,
 
 #define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
 
-static void on_debugui(struct ct_dock_i *dock) {
+static void on_debugui(struct ct_dock_i0 *dock) {
+    uint64_t selected_object = ct_selected_object_a0->selected_object();
+    if (selected_object &&
+        (ct_cdb_a0->type(selected_object) == CT_ID64_0("asset"))) {
+        set_level(selected_object);
+    }
+
     ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
 
     if (_G.path) {
@@ -181,9 +185,12 @@ static void on_debugui(struct ct_dock_i *dock) {
         };
 
         uint64_t obj = ct_resource_a0->get(rid);
-        obj = ct_cdb_a0->read_ref(obj, PROP_ENT_OBJ, 0);
 
-        ui_entity_item_begin(obj, rand());
+        if(obj) {
+            obj = ct_cdb_a0->read_ref(obj, PROP_ENT_OBJ, 0);
+
+            ui_entity_item_begin(obj, rand());
+        }
     }
 }
 
@@ -192,13 +199,13 @@ static const char *dock_title() {
     return ICON_FA_TREE " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i* dock) {
+static const char *name(struct ct_dock_i0* dock) {
     return "explorer";
 }
-static struct ct_dock_i ct_dock_i = {
+static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
-                .name = name,
+        .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
 };
@@ -209,9 +216,7 @@ static void _init(struct ct_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api("ct_explorer_a0", &level_inspector_api);
-    api->register_api("ct_dock_i", &ct_dock_i);
-
+    api->register_api("ct_dock_i0", &ct_dock_i0);
 }
 
 static void _shutdown() {

@@ -20,6 +20,7 @@
 #include <cetech/kernel/kernel.h>
 
 #include <stdlib.h>
+#include <cetech/controlers/controlers.h>
 
 static struct G {
     struct ct_world world;
@@ -29,10 +30,13 @@ static struct G {
 
 
 void update(uint64_t event) {
-
     _G.dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
 
-    if (ct_keyboard_a0->button_state(0, ct_keyboard_a0->button_index("v"))) {
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+
+
+    if (keyboard->button_state(0, keyboard->button_index("v"))) {
         ct_log_a0->info("example", "PO");
         ct_log_a0->error("example", "LICE");
     }
@@ -111,7 +115,7 @@ CETECH_MODULE_DEF(
 // Init api
 //==============================================================================
         {
-            CETECH_GET_API(api, ct_keyboard_a0);
+            CETECH_GET_API(api, ct_controlers_a0);
             CETECH_GET_API(api, ct_log_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_hashlib_a0);

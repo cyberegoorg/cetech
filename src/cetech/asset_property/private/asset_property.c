@@ -7,7 +7,7 @@
 #include <corelib/hash.inl>
 #include <corelib/ebus.h>
 #include <corelib/ydb.h>
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -122,7 +122,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_property_editor_a0);
-            CETECH_GET_API(api, ct_asset_browser_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_cdb_a0);

@@ -232,8 +232,8 @@ static void _init(struct ct_api_a0 *api) {
     static const uint32_t main_threads_count = 1 + 1/* Renderer */;
     const uint32_t worker_count = core_count - main_threads_count;
 
-    ct_log_a0->info("task", "Core/Main/Worker: %d, %d, %d", core_count,
-                    main_threads_count, worker_count);
+    ct_log_a0->info("task", "Core/Main/Worker: %d, %d, %d",
+                    core_count, main_threads_count, worker_count);
 
     _G.workers_count = worker_count;
 

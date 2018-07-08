@@ -19,9 +19,9 @@
 #include <cetech/explorer/explorer.h>
 #include <corelib/ebus.h>
 #include <corelib/fmath.inl>
-#include <cetech/playground/command_system.h>
+#include <cetech/command_system/command_system.h>
 #include <corelib/hash.inl>
-#include <cetech/playground/selected_object.h>
+#include <cetech/selected_object/selected_object.h>
 
 
 #define _G entity_property_global
@@ -38,28 +38,28 @@ static struct _G {
 } _G;
 
 
-static bool ui_select_asset(char *buffer,
-                            const char *id,
-                            uint32_t asset_type,
-                            uint64_t key) {
-    char id_str[512] = {0};
-    sprintf(id_str, ">>##%s", id);
-
-    if (ct_debugui_a0->Button(id_str, (float[2]) {0.0f})) {
-        if (ct_asset_browser_a0->get_selected_asset_type() != asset_type) {
-            return false;
-        }
-
-        char selected_asset[128] = {0};
-        ct_asset_browser_a0->get_selected_asset_name(selected_asset);
-
-        strcpy(buffer, selected_asset);
-
-        return true;
-    }
-
-    return false;
-}
+//static bool ui_select_asset(char *buffer,
+//                            const char *id,
+//                            uint32_t asset_type,
+//                            uint64_t key) {
+//    char id_str[512] = {0};
+//    sprintf(id_str, ">>##%s", id);
+//
+//    if (ct_debugui_a0->Button(id_str, (float[2]) {0.0f})) {
+//        if (ct_asset_browser_a0->get_selected_asset_type() != asset_type) {
+//            return false;
+//        }
+//
+//        char selected_asset[128] = {0};
+//        ct_asset_browser_a0->get_selected_asset_name(selected_asset);
+//
+//        strcpy(buffer, selected_asset);
+//
+//        return true;
+//    }
+//
+//    return false;
+//}
 
 static void ui_float(uint64_t obj,
                      uint64_t prop_key_hash,
@@ -241,10 +241,11 @@ static void ui_resource(uint64_t obj,
 
     bool change = false;
 
-    change = ui_select_asset(buffer, labelid,
-                             resource_type,
-                             prop_key_hash);
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
+//    change = ui_select_asset(buffer, labelid,
+//                             resource_type,
+//                             prop_key_hash);
+//
+//    ct_debugui_a0->SameLine(0.0f, -1.0f);
 
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
@@ -528,8 +529,6 @@ CETECH_MODULE_DEF(
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_resource_a0);
             CETECH_GET_API(api, ct_property_editor_a0);
-            CETECH_GET_API(api, ct_asset_browser_a0);
-            CETECH_GET_API(api, ct_explorer_a0);
             CETECH_GET_API(api, ct_yng_a0);
             CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_ecs_a0);

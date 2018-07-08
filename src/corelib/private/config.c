@@ -76,7 +76,7 @@ static void _cvar_from_str(const char *name,
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config_object);
 
-    const uint64_t key = CT_ID64_0(name);
+    const uint64_t key = ct_hashlib_a0->id64_from_str(name);
 
     if (value == NULL) {
         ct_cdb_a0->set_uint64(writer, key, 1);
@@ -140,7 +140,7 @@ static void foreach_config_clb(struct ct_yamlng_node key,
             _cvar_from_str(name, str);
 
         } else {
-            const uint64_t key = CT_ID64_0(name);
+            const uint64_t key = ct_hashlib_a0->id64_from_str(name);
 
             if (ct_cdb_a0->prop_exist(_G.config_object, key)) {
                 enum ct_cdb_type t = ct_cdb_a0->prop_type(
@@ -234,30 +234,30 @@ static struct ct_config_a0 config_a0 = {
 
 struct ct_config_a0 *ct_config_a0 = &config_a0;
 
-CETECH_MODULE_DEF(
-        config,
-        {
 
-        },
-        {
-            CT_UNUSED(reload);
+void CETECH_MODULE_INITAPI(config)(struct ct_api_a0 *api) {
+}
 
-            _G = (struct _G) {0};
+void CETECH_MODULE_LOAD (config)(struct ct_api_a0 *api,
+                                  int reload) {
+    CT_UNUSED(reload);
+    _G = (struct _G) {0};
 
-            ct_log_a0->debug(LOG_WHERE, "Init");
+    ct_log_a0->debug(LOG_WHERE, "Init");
 
-            _G.db = ct_cdb_a0->global_db();
-            _G.config_object = ct_cdb_a0->create_object(_G.db, 0);
-            _G.config_desc = ct_cdb_a0->create_object(_G.db, 1);
+    _G.db = ct_cdb_a0->global_db();
+    _G.config_object = ct_cdb_a0->create_object(_G.db, 0);
+    _G.config_desc = ct_cdb_a0->create_object(_G.db, 1);
 
-            api->register_api("ct_config_a0", &config_a0);
+    api->register_api("ct_config_a0", &config_a0);
 
-            _G.type = CT_ID32_0("config");
-        },
-        {
-            CT_UNUSED(api, reload);
-            ct_log_a0->debug(LOG_WHERE, "Shutdown");
+    _G.type = CT_ID32_0("config");
+}
 
-            ct_cdb_a0->destroy_db(_G.db);
-        }
-)
+void CETECH_MODULE_UNLOAD (config)(struct ct_api_a0 *api,
+                                    int reload) {
+    CT_UNUSED(api, reload);
+    ct_log_a0->debug(LOG_WHERE, "Shutdown");
+
+    ct_cdb_a0->destroy_db(_G.db);
+}

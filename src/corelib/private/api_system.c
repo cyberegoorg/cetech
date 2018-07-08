@@ -41,7 +41,6 @@ static struct _G {
 
 static void api_register_api(const char *name,
                              void *api) {
-
     uint64_t name_id = ct_hashlib_a0->id64_from_str(name);
 
     uint64_t idx = ct_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
@@ -92,7 +91,7 @@ static struct ct_api_entry api_first(const char *name) {
 static struct ct_api_entry api_next(struct ct_api_entry entry) {
     struct impl_list *impl_list = entry.entry;
 
-    const uint32_t n = ct_array_size(impl_list->api);
+    const uint32_t n = ct_array_size(impl_list->api) - 1;
 
     if (entry.idx >= n) {
         return (struct ct_api_entry) {0};

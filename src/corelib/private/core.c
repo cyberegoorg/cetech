@@ -35,7 +35,10 @@ bool ct_corelib_init() {
     return true;
 }
 
+void memsys_shutdown();
+
 bool ct_corelib_shutdown() {
+
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, os);
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, task);
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, yamlng);
@@ -44,8 +47,10 @@ bool ct_corelib_shutdown() {
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, filesystem);
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, cdb);
     CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, module);
+    CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, hashlib);
     // CETECH_UNLOAD_STATIC_MODULE(ct_api_a0, ydb);
 
+    memsys_shutdown();
     api_shutdown();
 
     return true;

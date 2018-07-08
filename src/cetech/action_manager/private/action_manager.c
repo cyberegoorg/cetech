@@ -4,10 +4,11 @@
 #include <corelib/api_system.h>
 #include <corelib/module.h>
 
-#include <cetech/playground/action_manager.h>
+#include <cetech/action_manager/action_manager.h>
 #include <cetech/controlers/keyboard.h>
 #include <corelib/array.inl>
 #include <corelib/hash.inl>
+#include <cetech/controlers/controlers.h>
 
 typedef void (*action_fce_t)();
 
@@ -54,6 +55,9 @@ static void fill_button(struct shortcut *sc) {
         ++it;
     }
 
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+
     for (int i = 0; i < count; ++i) {
         if (!strcmp(begin[i], "shift")) {
             sc->mod.flags.shift = 1;
@@ -62,7 +66,7 @@ static void fill_button(struct shortcut *sc) {
         } else if (!strcmp(begin[i], "alt")) {
             sc->mod.flags.alt = 1;
         } else {
-            sc->key = ct_keyboard_a0->button_index(begin[i]);
+            sc->key = keyboard->button_index(begin[i]);
         }
     }
 }
@@ -97,27 +101,31 @@ static void execute(uint64_t name) {
 }
 
 static void check() {
-    const uint32_t lshift = ct_keyboard_a0->button_index("lshift");
-    const uint32_t rshift = ct_keyboard_a0->button_index("rshift");
-    const uint32_t lctrl = ct_keyboard_a0->button_index("lctrl");
-    const uint32_t rctrl = ct_keyboard_a0->button_index("rctrl");
-    const uint32_t lalt = ct_keyboard_a0->button_index("lalt");
-    const uint32_t ralt = ct_keyboard_a0->button_index("ralt");
+    struct ct_controlers_i0* keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+
+
+    const uint32_t lshift = keyboard->button_index("lshift");
+    const uint32_t rshift = keyboard->button_index("rshift");
+    const uint32_t lctrl = keyboard->button_index("lctrl");
+    const uint32_t rctrl = keyboard->button_index("rctrl");
+    const uint32_t lalt = keyboard->button_index("lalt");
+    const uint32_t ralt = keyboard->button_index("ralt");
 
     _G.mod = (union modifiactor) {};
 
-    if (ct_keyboard_a0->button_state(0, lshift) ||
-        ct_keyboard_a0->button_state(0, rshift)) {
+    if (keyboard->button_state(0, lshift) ||
+            keyboard->button_state(0, rshift)) {
         _G.mod.flags.shift = 1;
     }
 
-    if (ct_keyboard_a0->button_state(0, lctrl) ||
-        ct_keyboard_a0->button_state(0, rctrl)) {
+    if (keyboard->button_state(0, lctrl) ||
+            keyboard->button_state(0, rctrl)) {
         _G.mod.flags.ctrl = 1;
     }
 
-    if (ct_keyboard_a0->button_state(0, lalt) ||
-        ct_keyboard_a0->button_state(0, ralt)) {
+    if (keyboard->button_state(0, lalt) ||
+            keyboard->button_state(0, ralt)) {
         _G.mod.flags.alt = 1;
     }
 
@@ -129,7 +137,7 @@ static void check() {
             continue;
         }
 
-        bool active = ct_keyboard_a0->button_state(0, sc->key) > 0;
+        bool active = keyboard->button_state(0, sc->key) > 0;
 
         if (active && !_G.action_active[i]) {
             _G.action_fce[i]();
@@ -186,7 +194,6 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_keyboard_a0);
         },
         {
             CT_UNUSED(reload);
