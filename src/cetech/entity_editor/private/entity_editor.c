@@ -215,7 +215,7 @@ static void draw_editor(struct ct_dock_i0 *dock) {
 
     if (obj) {
         uint64_t obj_type = ct_cdb_a0->type(obj);
-        if (obj_type == CT_ID64_0("entity")) {
+        if (obj_type == ENTITY_RESOURCE) {
 
             uint64_t components;
             components = ct_cdb_a0->read_subobject(obj,
@@ -339,7 +339,7 @@ static void open(struct ct_resource_id asset,
                  const char *path) {
     struct scene_editor *editor = _new_editor(asset);
 
-    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->global_db(), CT_ID64_0("asset"));
+    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), CT_ID64_0("asset"));
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
     ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), asset.i64);
     ct_cdb_a0->set_uint64(w, CT_ID64_0("root"), root);
@@ -498,11 +498,9 @@ CETECH_MODULE_DEF(
         {
             CETECH_GET_API(api, ct_memory_a0);
             CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
             CETECH_GET_API(api, ct_debugui_a0);
             CETECH_GET_API(api, ct_ecs_a0);
             CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
             CETECH_GET_API(api, ct_cdb_a0);
             CETECH_GET_API(api, ct_ebus_a0);
             CETECH_GET_API(api, ct_render_graph_a0);

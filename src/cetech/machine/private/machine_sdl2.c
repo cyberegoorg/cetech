@@ -100,7 +100,7 @@ void sdl_mouse_process() {
 
 
     uint64_t event;
-    event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                      EVENT_MOUSE_MOVE);
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -112,7 +112,7 @@ void sdl_mouse_process() {
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                              EVENT_MOUSE_DOWN);
 
             w = ct_cdb_a0->write_begin(event);
@@ -122,7 +122,7 @@ void sdl_mouse_process() {
             ct_ebus_a0->broadcast(MOUSE_EBUS, event);
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                              EVENT_MOUSE_UP);
 
             w = ct_cdb_a0->write_begin(event);
@@ -143,7 +143,7 @@ void sdl_keyboard_process() {
     uint64_t event;
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                              EVENT_KEYBOARD_DOWN);
 
             ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -154,7 +154,7 @@ void sdl_keyboard_process() {
 
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                              EVENT_KEYBOARD_UP);
 
             ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -285,7 +285,7 @@ void sdl_gamepad_process() {
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_GAMEPAD_DOWN);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -299,7 +299,7 @@ void sdl_gamepad_process() {
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_GAMEPAD_UP);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -325,7 +325,7 @@ void sdl_gamepad_process() {
                 _G.controlers.position[i][j][1] = pos[1];
 
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_GAMEPAD_MOVE);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -363,7 +363,7 @@ static void _update(float dt) {
         switch (e.type) {
             case SDL_QUIT: {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         KERNEL_QUIT_EVENT);
 
                 ct_ebus_a0->broadcast(KERNEL_EBUS, event);
@@ -374,7 +374,7 @@ static void _update(float dt) {
                 switch (e.window.event) {
                     case SDL_WINDOWEVENT_SIZE_CHANGED: {
                         uint64_t event = ct_cdb_a0->create_object(
-                                ct_cdb_a0->global_db(),
+                                ct_cdb_a0->db(),
                                 EVENT_WINDOW_RESIZED);
 
                         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -396,7 +396,7 @@ static void _update(float dt) {
 
             case SDL_MOUSEWHEEL: {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_MOUSE_WHEEL);
 
                 float pos[3] = {e.wheel.x, e.wheel.y};
@@ -413,7 +413,7 @@ static void _update(float dt) {
 
             case SDL_TEXTINPUT: {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_KEYBOARD_TEXT);
 
 
@@ -430,7 +430,7 @@ static void _update(float dt) {
                 int idx = _create_controler(e.cdevice.which);
 
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         EVENT_GAMEPAD_CONNECT);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -455,7 +455,7 @@ static void _update(float dt) {
                     _remove_controler(i);
 
                     uint64_t event = ct_cdb_a0->create_object(
-                            ct_cdb_a0->global_db(),
+                            ct_cdb_a0->db(),
                             EVENT_GAMEPAD_DISCONNECT);
 
                     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);

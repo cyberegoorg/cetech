@@ -56,7 +56,7 @@ static float draw_main_menu() {
 
             if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
                 uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         KERNEL_QUIT_EVENT);
                 ct_ebus_a0->broadcast(KERNEL_EBUS, event);
 

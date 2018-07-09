@@ -8,7 +8,7 @@
 
 #include <corelib/api_system.h>
 #include <corelib/config.h>
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 #include <corelib/module.h>
 #include <corelib/memory.h>
 #include <corelib/hashlib.h>
@@ -168,7 +168,7 @@ static void on_render(uint64_t _event) {
 
 
     uint64_t event = ct_cdb_a0->create_object(
-            ct_cdb_a0->global_db(),
+            ct_cdb_a0->db(),
             RENDERER_RENDER_EVENT);
 
     ct_ebus_a0->broadcast(RENDERER_EBUS, event);

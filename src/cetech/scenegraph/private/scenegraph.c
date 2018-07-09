@@ -383,7 +383,7 @@ static struct ct_scene_node create(struct ct_world world,
 
     struct ct_scenegraph_component *scene;
     scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
-                                   entity);
+                                              entity);
 
     scene->idx = root.idx;
 

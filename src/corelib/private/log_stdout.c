@@ -95,9 +95,6 @@ void ct_log_stdout_handler(enum ct_log_level level,
 
 #if CT_PLATFORM_LINUX
     fflush_unlocked(out);
-#endif
-
-#if CT_PLATFORM_LINUX
     flock(out->_fileno, LOCK_UN);
 #endif
 }

@@ -167,8 +167,6 @@ static void ui_entity_item_begin(uint64_t obj,
 }
 
 
-#define PROP_ENT_OBJ (CT_ID64_0("ent_obj"))
-
 static void on_debugui(struct ct_dock_i0 *dock) {
     uint64_t selected_object = ct_selected_object_a0->selected_object();
     if (selected_object &&
@@ -187,8 +185,6 @@ static void on_debugui(struct ct_dock_i0 *dock) {
         uint64_t obj = ct_resource_a0->get(rid);
 
         if(obj) {
-            obj = ct_cdb_a0->read_ref(obj, PROP_ENT_OBJ, 0);
-
             ui_entity_item_begin(obj, rand());
         }
     }

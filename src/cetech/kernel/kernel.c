@@ -284,7 +284,7 @@ static void cetech_kernel_start() {
 
     ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                               KERNEL_INIT_EVENT);
 
     ct_ebus_a0->broadcast(KERNEL_EBUS, event);
@@ -302,7 +302,7 @@ static void cetech_kernel_start() {
         ct_ebus_a0->begin_frame();
         ct_machine_a0->update(dt);
 
-        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+        uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                                   KERNEL_UPDATE_EVENT);
         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
         ct_cdb_a0->set_float(w, CT_ID64_0("dt"), dt);
@@ -313,7 +313,7 @@ static void cetech_kernel_start() {
         ct_cdb_a0->gc();
     }
 
-    event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                      KERNEL_SHUTDOWN_EVENT);
 
     ct_ebus_a0->broadcast(KERNEL_EBUS, event);

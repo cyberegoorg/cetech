@@ -2,7 +2,6 @@
 // Include
 //==============================================================================
 #include <corelib/ydb.h>
-#include "cetech/macros.h"
 #include <corelib/os.h>
 #include "corelib/memory.h"
 #include "corelib/api_system.h"

@@ -5,7 +5,7 @@
 #include <corelib/ydb.h>
 #include <cetech/camera/camera.h>
 
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
@@ -107,7 +107,7 @@ static void _on_obj_change(uint64_t obj,
     };
 
     struct ct_entity ent = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
+            .h = ent_obj
     };
 
     struct ct_camera_component *camera;

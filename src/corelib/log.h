@@ -1,7 +1,7 @@
 #ifndef CETECH_LOG_API_H
 #define CETECH_LOG_API_H
 
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 
 //==============================================================================
 // Includes

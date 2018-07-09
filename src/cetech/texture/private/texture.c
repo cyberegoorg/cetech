@@ -58,7 +58,7 @@ void _texture_resource_online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    ct_cdb_a0->load(ct_cdb_a0->global_db(), data, obj, _G.allocator);
+    ct_cdb_a0->load(ct_cdb_a0->db(), data, obj, _G.allocator);
 
     ct_cdb_a0->register_notify(obj, _on_obj_change, NULL);
 
@@ -241,7 +241,7 @@ void texture_compiler(const char *filename,
     key[0] = ct_yng_a0->key("is_normalmap");
     bool is_normalmap = ct_ydb_a0->get_bool(filename, key, 1, false);
 
-    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                             CT_ID64_0("texture"));
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
@@ -253,7 +253,7 @@ void texture_compiler(const char *filename,
     _compile(obj);
 
     ct_cdb_a0->dump(obj, output, a);
-
+    ct_cdb_a0->destroy_object(obj);
     compilator_api->add_dependency(filename, input_str);
 }
 

@@ -1,15 +1,16 @@
 #ifndef CETECH_DEBUGUI_H
 #define CETECH_DEBUGUI_H
 
-#include <cetech/macros.h>
-#include <stdarg.h>
 
 //==============================================================================
 // Includes
 //==============================================================================
-
 #include <stddef.h>
+#include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
+
+#include <corelib/macros.h>
 #include <corelib/module.inl>
 
 struct ct_render_texture_handle;

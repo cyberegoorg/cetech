@@ -53,7 +53,7 @@ static void online(uint64_t name,
     char *data = CT_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    ct_cdb_a0->load(ct_cdb_a0->global_db(), data, obj, _G.allocator);
+    ct_cdb_a0->load(ct_cdb_a0->db(), data, obj, _G.allocator);
 
     uint64_t geom_count = ct_cdb_a0->read_uint64(obj, CT_ID64_0("geom_count"),
                                                  0);

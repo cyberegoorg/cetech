@@ -14,8 +14,6 @@ enum {
     MAX_HANDLERS = 32
 };
 
-#define G_INIT {}
-
 static struct global {
     ct_log_handler_t handlers[MAX_HANDLERS];
     void *handlers_data[MAX_HANDLERS];

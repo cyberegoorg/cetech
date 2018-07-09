@@ -10,7 +10,7 @@
 #include <corelib/os.h>
 #include <corelib/hashlib.h>
 #include <corelib/ydb.h>
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 #include <corelib/array.inl>
 
 struct package_resource {

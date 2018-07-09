@@ -48,19 +48,19 @@ enum node_type {
 
 struct ct_yng_doc;
 
-struct ct_yamlng_node {
+struct ct_yng_node {
     struct ct_yng_doc *d;
     uint32_t idx;
 };
 
-typedef void(*ct_yamlng_foreach_map_t)(
-        struct ct_yamlng_node key,
-        struct ct_yamlng_node value,
+typedef void(*ct_yng_foreach_map_t)(
+        struct ct_yng_node key,
+        struct ct_yng_node value,
         void *data);
 
-typedef void(*ct_yamlng_foreach_seq_t)(
+typedef void(*ct_yng_foreach_seq_t)(
         uint32_t idx,
-        struct ct_yamlng_node value,
+        struct ct_yng_node value,
         void *data);
 
 struct ct_yng_doc {
@@ -69,44 +69,44 @@ struct ct_yng_doc {
     bool (*has_key)(struct ct_yng_doc *doc,
                     uint64_t key);
 
-    struct ct_yamlng_node (*get)(struct ct_yng_doc *doc,
+    struct ct_yng_node (*get)(struct ct_yng_doc *doc,
                                  uint64_t key);
 
-    struct ct_yamlng_node (*get_seq)(struct ct_yng_doc *doc,
+    struct ct_yng_node (*get_seq)(struct ct_yng_doc *doc,
                                      uint64_t key,
                                      uint32_t idx);
 
     enum node_type (*type)(struct ct_yng_doc *doc,
-                           struct ct_yamlng_node node);
+                           struct ct_yng_node node);
 
     uint64_t (*hash)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node);
+                     struct ct_yng_node node);
 
     uint32_t (*size)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node);
+                     struct ct_yng_node node);
 
     const char *(*as_string)(struct ct_yng_doc *doc,
-                             struct ct_yamlng_node node,
+                             struct ct_yng_node node,
                              const char *defaultt);
 
     float (*as_float)(struct ct_yng_doc *doc,
-                      struct ct_yamlng_node node,
+                      struct ct_yng_node node,
                       float defaultt);
 
     bool (*as_bool)(struct ct_yng_doc *doc,
-                    struct ct_yamlng_node node,
+                    struct ct_yng_node node,
                     bool defaultt);
 
     void (*as_vec3)(struct ct_yng_doc *doc,
-                    struct ct_yamlng_node node,
+                    struct ct_yng_node node,
                     float *value);
 
     void (*as_vec4)(struct ct_yng_doc *doc,
-                    struct ct_yamlng_node node,
+                    struct ct_yng_node node,
                     float *value);
 
     void (*as_mat4)(struct ct_yng_doc *doc,
-                    struct ct_yamlng_node node,
+                    struct ct_yng_node node,
                     float *value);
 
     const char *(*get_str)(struct ct_yng_doc *doc,
@@ -122,28 +122,28 @@ struct ct_yng_doc {
                      bool defaultt);
 
     void (*set_float)(struct ct_yng_doc *doc,
-                      struct ct_yamlng_node node,
+                      struct ct_yng_node node,
                       float value);
 
     void (*set_bool)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node,
+                     struct ct_yng_node node,
                      bool value);
 
 
     void (*set_str)(struct ct_yng_doc *doc,
-                    struct ct_yamlng_node node,
+                    struct ct_yng_node node,
                     const char *value);
 
     void (*set_vec3)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node,
+                     struct ct_yng_node node,
                      float *value);
 
     void (*set_vec4)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node,
+                     struct ct_yng_node node,
                      float *value);
 
     void (*set_mat4)(struct ct_yng_doc *doc,
-                     struct ct_yamlng_node node,
+                     struct ct_yng_node node,
                      float *value);
 
     void (*create_tree_vec3)(struct ct_yng_doc *doc,
@@ -167,13 +167,13 @@ struct ct_yng_doc {
                                const char *value);
 
     void (*foreach_dict_node)(struct ct_yng_doc *doc,
-                              struct ct_yamlng_node node,
-                              ct_yamlng_foreach_map_t foreach_clb,
+                              struct ct_yng_node node,
+                              ct_yng_foreach_map_t foreach_clb,
                               void *data);
 
     void (*foreach_seq_node)(struct ct_yng_doc *doc,
-                             struct ct_yamlng_node node,
-                             ct_yamlng_foreach_seq_t foreach_clb,
+                             struct ct_yng_node node,
+                             ct_yng_foreach_seq_t foreach_clb,
                              void *data);
 
     void (*parent_files)(struct ct_yng_doc *doc,
