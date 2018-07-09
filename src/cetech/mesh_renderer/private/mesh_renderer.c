@@ -20,7 +20,7 @@
 #include <cetech/material/material.h>
 #include <cetech/mesh_renderer/mesh_renderer.h>
 #include <cetech/debugdraw/debugdraw.h>
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 #include <cetech/ecs/entity_property.h>
 #include <stdlib.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
@@ -69,7 +69,6 @@ void _mesh_component_compiler(const char *filename,
     ct_cdb_a0->set_str(writer, PROP_NODE, node);
     ct_cdb_a0->set_str(writer, PROP_MATERIAL, mat);
     ct_cdb_a0->set_str(writer, PROP_SCENE, scene);
-
 }
 
 struct mesh_render_data {
@@ -97,9 +96,9 @@ void foreach_mesh_renderer(struct ct_world world,
 
         uint64_t scene = m.scene_id;
 
-//        if(!scene) {
-//            continue;
-//        }
+        if(!scene) {
+            continue;
+        }
 
         float final_w[16];
         ct_mat4_identity(final_w);
@@ -113,9 +112,7 @@ void foreach_mesh_renderer(struct ct_world world,
         uint64_t scene_obj = ct_resource_a0->get(rid);
 
         uint64_t mesh = m.mesh_id;
-        uint64_t geom_obj = ct_cdb_a0->read_ref(scene_obj,
-                                                mesh,
-                                                0);
+        uint64_t geom_obj = ct_cdb_a0->read_ref(scene_obj, mesh, 0);
 
         if (!geom_obj) {
             continue;
@@ -132,14 +129,10 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_renderer_a0->set_vertex_buffer(0, vbh, 0, size);
         ct_renderer_a0->set_index_buffer(ibh, 0, size);
 
-        ct_material_a0->submit(m.material,
-                               data->layer_name, data->viewid);
+        ct_material_a0->submit(m.material, data->layer_name, data->viewid);
 
         ct_dd_a0->set_transform_mtx(t.world);
-        ct_dd_a0->draw_axis(0, 0, 0,
-                            1.0f,
-                            DD_AXIS_COUNT,
-                            0.0f);
+        ct_dd_a0->draw_axis(0, 0, 0, 1.0f, DD_AXIS_COUNT, 0.0f);
     }
 }
 
@@ -176,7 +169,7 @@ static void _on_obj_change(uint64_t obj,
     };
 
     struct ct_entity ent = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
+            .h = ent_obj
     };
 
     struct ct_mesh_renderer *mr;

@@ -104,8 +104,8 @@ struct foreach_config_data {
 };
 
 
-static void foreach_config_clb(struct ct_yamlng_node key,
-                               struct ct_yamlng_node value,
+static void foreach_config_clb(struct ct_yng_node key,
+                               struct ct_yng_node value,
                                void *_data) {
 
     struct foreach_config_data *output = (struct foreach_config_data *) _data;
@@ -245,7 +245,7 @@ void CETECH_MODULE_LOAD (config)(struct ct_api_a0 *api,
 
     ct_log_a0->debug(LOG_WHERE, "Init");
 
-    _G.db = ct_cdb_a0->global_db();
+    _G.db = ct_cdb_a0->db();
     _G.config_object = ct_cdb_a0->create_object(_G.db, 0);
     _G.config_desc = ct_cdb_a0->create_object(_G.db, 1);
 

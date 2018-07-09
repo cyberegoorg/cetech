@@ -213,15 +213,15 @@ bool has_key(struct ct_yng_doc *_inst,
 }
 
 
-struct ct_yamlng_node get(struct ct_yng_doc *_inst,
+struct ct_yng_node get(struct ct_yng_doc *_inst,
                           uint64_t key) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
-    return (struct ct_yamlng_node) {.idx =  (uint32_t) ct_hash_lookup(
+    return (struct ct_yng_node) {.idx =  (uint32_t) ct_hash_lookup(
             &inst->key_map, key, 0), .d = inst->doc};
 }
 
 
-struct ct_yamlng_node get_seq(struct ct_yng_doc *_inst,
+struct ct_yng_node get_seq(struct ct_yng_doc *_inst,
                               uint64_t key,
                               uint32_t idx) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
@@ -234,29 +234,29 @@ struct ct_yamlng_node get_seq(struct ct_yng_doc *_inst,
         it = inst->next_sibling[it];
     }
 
-    return (struct ct_yamlng_node) {.idx = it, .d = inst->doc};
+    return (struct ct_yng_node) {.idx = it, .d = inst->doc};
 }
 
 enum node_type type(struct ct_yng_doc *_inst,
-                    struct ct_yamlng_node node) {
+                    struct ct_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->type[node.idx];
 }
 
 uint64_t get_hash(struct ct_yng_doc *_inst,
-                  struct ct_yamlng_node node) {
+                  struct ct_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->hash[node.idx];
 }
 
 uint32_t get_size(struct ct_yng_doc *_inst,
-                  struct ct_yamlng_node node) {
+                  struct ct_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->value[node.idx].node_count;
 }
 
 const char *as_string(struct ct_yng_doc *_inst,
-                      struct ct_yamlng_node node,
+                      struct ct_yng_node node,
                       const char *defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -268,7 +268,7 @@ const char *as_string(struct ct_yng_doc *_inst,
 }
 
 float as_float(struct ct_yng_doc *_inst,
-               struct ct_yamlng_node node,
+               struct ct_yng_node node,
                float defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -281,7 +281,7 @@ float as_float(struct ct_yng_doc *_inst,
 }
 
 bool as_bool(struct ct_yng_doc *_inst,
-             struct ct_yamlng_node node,
+             struct ct_yng_node node,
              bool defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -294,7 +294,7 @@ bool as_bool(struct ct_yng_doc *_inst,
 }
 
 void as_vec3(struct ct_yng_doc *_inst,
-             struct ct_yamlng_node node,
+             struct ct_yng_node node,
              float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
@@ -315,7 +315,7 @@ void as_vec3(struct ct_yng_doc *_inst,
 }
 
 void as_vec4(struct ct_yng_doc *_inst,
-             struct ct_yamlng_node node,
+             struct ct_yng_node node,
              float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
@@ -339,7 +339,7 @@ void as_vec4(struct ct_yng_doc *_inst,
 }
 
 void as_mat4(struct ct_yng_doc *_inst,
-             struct ct_yamlng_node node,
+             struct ct_yng_node node,
              float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
@@ -403,7 +403,7 @@ const char *get_string(struct ct_yng_doc *_inst,
                        const char *defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
-    struct ct_yamlng_node node = {.idx = (uint32_t) ct_hash_lookup(
+    struct ct_yng_node node = {.idx = (uint32_t) ct_hash_lookup(
             &inst->key_map, key, 0)};
     return as_string(_inst, node, defaultt);
 }
@@ -413,7 +413,7 @@ float get_float(struct ct_yng_doc *_inst,
                 float defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
-    struct ct_yamlng_node node = {.idx = (uint32_t) ct_hash_lookup(
+    struct ct_yng_node node = {.idx = (uint32_t) ct_hash_lookup(
             &inst->key_map, key, 0)};
     return as_float(_inst, node, defaultt);
 }
@@ -423,13 +423,13 @@ bool get_bool(struct ct_yng_doc *_inst,
               bool defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
-    struct ct_yamlng_node node = {.idx = (uint32_t) ct_hash_lookup(
+    struct ct_yng_node node = {.idx = (uint32_t) ct_hash_lookup(
             &inst->key_map, key, 0)};
     return as_bool(_inst, node, defaultt);
 }
 
 void set_float(struct ct_yng_doc *_inst,
-               struct ct_yamlng_node node,
+               struct ct_yng_node node,
                float value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     inst->value[node.idx].f = value;
@@ -437,7 +437,7 @@ void set_float(struct ct_yng_doc *_inst,
 }
 
 void set_bool(struct ct_yng_doc *_inst,
-              struct ct_yamlng_node node,
+              struct ct_yng_node node,
               bool value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -447,7 +447,7 @@ void set_bool(struct ct_yng_doc *_inst,
 
 
 void set_string(struct ct_yng_doc *_inst,
-                struct ct_yamlng_node node,
+                struct ct_yng_node node,
                 const char *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -461,7 +461,7 @@ void set_string(struct ct_yng_doc *_inst,
 }
 
 void set_vec3(struct ct_yng_doc *_inst,
-              struct ct_yamlng_node node,
+              struct ct_yng_node node,
               float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -478,7 +478,7 @@ void set_vec3(struct ct_yng_doc *_inst,
 }
 
 void set_vec4(struct ct_yng_doc *_inst,
-              struct ct_yamlng_node node,
+              struct ct_yng_node node,
               float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -497,7 +497,7 @@ void set_vec4(struct ct_yng_doc *_inst,
 }
 
 void set_mat4(struct ct_yng_doc *_inst,
-              struct ct_yamlng_node node,
+              struct ct_yng_node node,
               float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -553,15 +553,15 @@ void set_mat4(struct ct_yng_doc *_inst,
 }
 
 void foreach_dict_node(struct ct_yng_doc *_inst,
-                       struct ct_yamlng_node node,
-                       ct_yamlng_foreach_map_t foreach_clb,
+                       struct ct_yng_node node,
+                       ct_yng_foreach_map_t foreach_clb,
                        void *data) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t it = inst->first_child[node.idx];
     while (0 != it) {
-        struct ct_yamlng_node key = {.idx=it, .d = inst->doc};
-        struct ct_yamlng_node value = {.idx=inst->first_child[it], .d = inst->doc};
+        struct ct_yng_node key = {.idx=it, .d = inst->doc};
+        struct ct_yng_node value = {.idx=inst->first_child[it], .d = inst->doc};
 
         foreach_clb(key, value, data);
 
@@ -570,15 +570,15 @@ void foreach_dict_node(struct ct_yng_doc *_inst,
 }
 
 void foreach_seq_node(struct ct_yng_doc *_inst,
-                      struct ct_yamlng_node node,
-                      ct_yamlng_foreach_seq_t foreach_clb,
+                      struct ct_yng_node node,
+                      ct_yng_foreach_seq_t foreach_clb,
                       void *data) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t idx = 0;
     uint32_t it = inst->first_child[node.idx];
     while (0 != it) {
-        struct ct_yamlng_node value = {.idx=it, .d = inst->doc};
+        struct ct_yng_node value = {.idx=it, .d = inst->doc};
 
         foreach_clb(idx, value, data);
 
@@ -931,7 +931,7 @@ bool save_yaml(struct ct_alloc *alloc,
 
     struct ct_yng_doc *d = doc;
     struct doc_inst *inst = (struct doc_inst *) (d->inst);
-    struct ct_yamlng_node root_node = d->get(d, 0);
+    struct ct_yng_node root_node = d->get(d, 0);
 
 
     if (!yaml_emitter_initialize(&emitter)) {
@@ -972,7 +972,7 @@ bool save_yaml(struct ct_alloc *alloc,
     return false;
 }
 
-struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
+struct ct_yng_node create_tree(struct ct_yng_doc *_inst,
                                   const char **keys,
                                   uint32_t keys_count) {
     uint32_t first_nonexist = 0;
@@ -987,7 +987,7 @@ struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
         }
     }
 
-    struct ct_yamlng_node n = get(_inst, last_exist_key);
+    struct ct_yng_node n = get(_inst, last_exist_key);
     struct doc_inst *inst = (struct doc_inst *) (_inst->inst);
 
     uint32_t parent = n.idx;
@@ -1022,7 +1022,7 @@ struct ct_yamlng_node create_tree(struct ct_yng_doc *_inst,
                     _G.allocator)},
             parent, key_hash);
 
-    return (struct ct_yamlng_node) {.idx = key_idx, .d = inst->doc};
+    return (struct ct_yng_node) {.idx = key_idx, .d = inst->doc};
 }
 
 void create_tree_vec3(struct ct_yng_doc *_inst,
@@ -1030,7 +1030,7 @@ void create_tree_vec3(struct ct_yng_doc *_inst,
                       uint32_t keys_count,
                       float *value) {
 
-    struct ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    struct ct_yng_node node = create_tree(_inst, keys, keys_count);
     struct ct_yng_doc *d = node.d;
 
     uint64_t key = combine_key_str(keys, keys_count);
@@ -1054,7 +1054,7 @@ void create_tree_bool(struct ct_yng_doc *_inst,
                       const char **keys,
                       uint32_t keys_count,
                       bool value) {
-    struct ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    struct ct_yng_node node = create_tree(_inst, keys, keys_count);
     struct ct_yng_doc *d = node.d;
 
     uint64_t key = combine_key_str(keys, keys_count);
@@ -1082,7 +1082,7 @@ void create_tree_float(struct ct_yng_doc *_inst,
                        const char **keys,
                        uint32_t keys_count,
                        float value) {
-    struct ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    struct ct_yng_node node = create_tree(_inst, keys, keys_count);
     struct ct_yng_doc *d = node.d;
 
     uint64_t key = combine_key_str(keys, keys_count);
@@ -1102,7 +1102,7 @@ void create_tree_string(struct ct_yng_doc *_inst,
                         const char **keys,
                         uint32_t keys_count,
                         const char *value) {
-    struct ct_yamlng_node node = create_tree(_inst, keys, keys_count);
+    struct ct_yng_node node = create_tree(_inst, keys, keys_count);
     struct ct_yng_doc *d = node.d;
 
     uint64_t key = combine_key_str(keys, keys_count);

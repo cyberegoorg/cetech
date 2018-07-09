@@ -388,7 +388,7 @@ static uint64_t create(uint32_t name) {
     };
 
     auto object = ct_resource_a0->get(rid);
-    return  ct_cdb_a0->create_from(ct_cdb_a0->global_db(), object);
+    return  ct_cdb_a0->create_from(ct_cdb_a0->db(), object);
 }
 
 static void set_texture_handler(uint64_t material,
@@ -498,7 +498,7 @@ static int init(struct ct_api_a0 *api) {
     _G = {
             .allocator = ct_memory_a0->system,
             .type = CT_ID32_0("material"),
-            .db = ct_cdb_a0->global_db()
+            .db = ct_cdb_a0->db()
     };
     api->register_api("ct_material_a0", &material_api);
 

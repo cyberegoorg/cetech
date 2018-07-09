@@ -10,6 +10,12 @@
 
 #include "corelib/platform.h"
 
+#define CT_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
+
+#define CETECH_ARR_ARG(a) a, CT_ARRAY_LEN(a)
+#define CTECH_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
+#define CT_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
+
 ///
 #if CT_COMPILER_MSVC
 // Workaround MSVS bug...

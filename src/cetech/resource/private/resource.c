@@ -148,7 +148,7 @@ static void load(uint32_t type,
             continue;
         };
 
-        uint64_t object = ct_cdb_a0->create_object(_G.db, type);
+        uint64_t object = ct_cdb_a0->create_object(_G.db, 0);
 
         char build_name[33] = {};
 
@@ -375,7 +375,7 @@ static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
             .config = ct_config_a0->config_object(),
-            .db = ct_cdb_a0->global_db()
+            .db = ct_cdb_a0->db()
     };
 
     ct_fs_a0->map_root_dir(CT_ID64_0("build"),

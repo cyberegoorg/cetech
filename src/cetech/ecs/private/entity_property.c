@@ -352,7 +352,7 @@ static void on_debugui() {
 
     uint64_t obj_type = ct_cdb_a0->type(obj);
 
-    if (CT_ID64_0("entity") == obj_type) {
+    if (ENTITY_RESOURCE == obj_type) {
         if (ct_debugui_a0->CollapsingHeader("Entity",
                                             DebugUITreeNodeFlags_DefaultOpen)) {
             ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
@@ -380,22 +380,6 @@ static void on_debugui() {
         on_component(obj);
     }
 }
-
-//void on_entity_click(uint64_t event) {
-//    ct_property_editor_a0->set_active(on_debugui);
-//
-//    struct ct_world world = {
-//            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
-//    const char *filename = ct_cdb_a0->read_str(event, CT_ID64_0("filename"), 0);
-//    struct ct_entity entity = {
-//            ct_cdb_a0->read_uint64(event, CT_ID64_0("entity"), 0)};
-//    uint64_t obj = {ct_cdb_a0->read_ref(event, CT_ID64_0("obj"), 0)};
-//
-//    _G.active_world = world;
-//    _G.top_entity = entity;
-//    _G.obj = obj;
-//}
-
 
 static struct ct_entity_property_a0 entity_property_a0 = {
         .ui_float = ui_float,

@@ -1,0 +1,28 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+                    **CETech architecture**
+
+# Resource
+
+*************************************************************************************
+*                                                                                   *
+*                                       |                         |                 *
+*                                                                                   *
+*                                       |                         |                 *
+*                                                                                   *
+*  +-----+   +-----------+  +---------+ | +----------+  +-------+ |  +------------+ *
+*  |Asset|   | Resource  |  |Compiled |   | Resource |  |       |    |  Resource  | *
+*  |YAML |-->| compiler  |->|  asset  |-+>|   load   |->|Online |-+->| CDB object | *
+*  |     |   |           |  |  blob   |   |          |  |       |    |            | *
+*  +-----+   +-----------+  +---------+ | +----------+  +-------+ |  +------------+ *
+*                  |                            |                                   *
+*                  |                    |       v                 |                 *
+*                  |                       +--------+                               *
+*                  |                    |  |        |             |                 *
+*                  +---------------------->|BuildDB |                               *
+*                                       |  |        |             |                 *
+*                                          +--------+                               *
+*                                       |                         |                 *
+*                                                                                   *
+*************************************************************************************
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>

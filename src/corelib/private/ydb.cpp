@@ -107,7 +107,7 @@ void free(const char *path) {
     // TODO: ref counting
 }
 
-ct_yamlng_node get_first_node_recursive(const char *path,
+ct_yng_node get_first_node_recursive(const char *path,
                                         const uint64_t *keys,
                                         uint32_t keys_count,
                                         uint32_t max_depth) {
@@ -116,7 +116,7 @@ ct_yamlng_node get_first_node_recursive(const char *path,
 
     uint64_t result_key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, result_key);
+    ct_yng_node n = d->get(d, result_key);
     if (n.idx) {
         return n;
     }
@@ -172,12 +172,12 @@ void get_map_keys(const char *path,
 
     uint64_t result_key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, result_key);
+    ct_yng_node n = d->get(d, result_key);
     if (n.idx) {
         d->foreach_dict_node(
                 d, n,
-                [](ct_yamlng_node k,
-                   ct_yamlng_node v,
+                [](ct_yng_node k,
+                   ct_yng_node v,
                    void *data) {
                     CT_UNUSED(v);
 
@@ -238,7 +238,7 @@ const char *get_string(const char *path,
                        uint64_t *keys,
                        uint32_t keys_count,
                        const char *defaultt) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -252,7 +252,7 @@ float get_float(const char *path,
                 uint64_t *keys,
                 uint32_t keys_count,
                 float defaultt) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -266,7 +266,7 @@ bool get_bool(const char *path,
               uint64_t *keys,
               uint32_t keys_count,
               bool defaultt) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -282,7 +282,7 @@ void get_vec3(const char *path,
               uint32_t keys_count,
               float v[3],
               float defaultt[3]) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -299,7 +299,7 @@ void get_vec4(const char *path,
               uint32_t keys_count,
               float v[4],
               float defaultt[4]) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -316,7 +316,7 @@ void get_mat4(const char *path,
               uint32_t keys_count,
               float v[16],
               float defaultt[16]) {
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
 
     if (0 == n.idx) {
@@ -345,7 +345,7 @@ void set_float(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, key);
+    ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -370,7 +370,7 @@ void set_bool(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, key);
+    ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -395,7 +395,7 @@ void set_string(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, key);
+    ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -419,7 +419,7 @@ void set_vec3(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yamlng_node n = d->get(d, key);
+    ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -440,7 +440,7 @@ void set_vec4(const char *path,
               uint32_t keys_count,
               float *value) {
 
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
     if (!n.idx) {
         return;
@@ -455,7 +455,7 @@ void set_mat4(const char *path,
               uint32_t keys_count,
               float *value) {
 
-    ct_yamlng_node n = get_first_node_recursive(path, keys, keys_count,
+    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                                 keys_count);
     if (!n.idx) {
         return;

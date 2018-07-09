@@ -14,6 +14,9 @@
 #define PREFAB_NAME_PROP CT_ID64_0("prefab_filename")
 #define EDITOR_COMPONENT CT_ID64_0("ct_editor_component_i0")
 
+#define ENTITY_INSTANCE CT_ID64_0("entity")
+#define ENTITY_RESOURCE CT_ID64_0("entity_resource")
+
 enum {
     ECS_EBUS = 0x3c870dac
 };
@@ -94,8 +97,6 @@ struct ct_editor_component_i0 {
 
 struct ct_component_a0 {
     struct ct_component_i0 *(*get_interface)(uint64_t name);
-
-    const uint64_t *(*component_names)();
 
     uint64_t (*mask)(uint64_t component_name);
 

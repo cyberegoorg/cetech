@@ -562,7 +562,9 @@ static void load(struct ct_cdb_t db,
     header = (const struct cdb_binobj_header *) input;
 
     struct object_t *obj = _get_object_from_objid(_obj);
-    obj->type = header->type;
+    if(!obj->type) {
+        obj->type = header->type;
+    }
 
     uint64_t *keys = (uint64_t *) (header + 1);
     uint8_t *ptype = (uint8_t *) (keys + header->properties_count);
@@ -1273,6 +1275,11 @@ static uint64_t type(uint64_t _obj) {
     return obj->type;
 }
 
+void set_type(uint64_t _obj, uint64_t type) {
+    struct object_t *obj = _get_object_from_objid(_obj);
+    obj->type = type;
+}
+
 uint64_t parent(uint64_t object) {
     struct object_t *obj = _get_object_from_objid(object);
     return obj->parent;
@@ -1282,9 +1289,10 @@ static struct ct_cdb_a0 cdb_api = {
         .register_notify = register_notify,
 //        .create_db = create_db,
 
-        . global_db  = global_db,
+        . db  = global_db,
 
         .type = type,
+        .set_type = set_type,
         .create_object = create_object,
         .create_from = create_from,
         .destroy_object = destroy_object,

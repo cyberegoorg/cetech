@@ -235,7 +235,7 @@ static void ui_asset_list() {
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     uint64_t event;
-                    event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+                    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                                      ASSET_DCLICK_EVENT);
 
                     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
@@ -250,7 +250,7 @@ static void ui_asset_list() {
                 }
 
                 uint64_t selected_asset = ct_cdb_a0->create_object(
-                        ct_cdb_a0->global_db(),
+                        ct_cdb_a0->db(),
                         CT_ID64_0("asset"));
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(selected_asset);

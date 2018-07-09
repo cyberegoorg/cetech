@@ -8,7 +8,7 @@
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
 #include <corelib/ydb.h>
-#include <cetech/macros.h>
+#include <corelib/macros.h>
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
@@ -211,9 +211,7 @@ static void _on_component_obj_change(uint64_t obj,
             .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
     };
 
-    struct ct_entity ent = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("entity"), 0)
-    };
+    struct ct_entity ent = {.h = ent_obj};
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT, ent);

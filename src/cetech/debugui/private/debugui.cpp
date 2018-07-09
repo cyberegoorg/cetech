@@ -90,7 +90,7 @@ static void render(uint8_t viewid) {
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->global_db(),
+    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                               DEBUGUI_EVENT);
 
     ct_ebus_a0->broadcast(DEBUGUI_EBUS, event);
