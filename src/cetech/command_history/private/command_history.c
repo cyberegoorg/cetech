@@ -15,7 +15,6 @@
 #include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Command history"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
 
 #define _G command_history_global
 static struct _G {

@@ -1,10 +1,6 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
-#include <corelib/yng.h>
-#include <corelib/cdb.h>
-
-#define PROP_RESOURECE_DATA CT_ID64_0("data")
 
 //==============================================================================
 // Includes
@@ -12,6 +8,18 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
+
+#include <corelib/module.inl>
+
+#define RESOURCE_I_NAME "ct_resource_i0"
+
+#define PROP_RESOURECE_DATA \
+    CT_ID64_0("data", 0x8fd0d44d20650b68ULL)
+
+#define RESOURCE_I \
+    CT_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
+
 
 struct ct_vio;
 struct ct_alloc;

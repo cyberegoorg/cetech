@@ -27,9 +27,8 @@ static struct DebugUIGlobal {
 
 static void render(uint8_t viewid) {
     struct ct_controlers_i0 *keyboard, *mouse;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
-    mouse = ct_controlers_a0->get_by_name(CT_ID64_0("mouse"));
-
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
+    mouse = ct_controlers_a0->get_by_name(CONTROLER_MOUSE);
 
     float mp[3] = {};
     mouse->axis(0, mouse->axis_index("absolute"), mp);
@@ -268,7 +267,7 @@ static void _init(struct ct_api_a0 *api) {
 
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
 
 
     ImGuiIO &io = ImGui::GetIO();

@@ -50,7 +50,8 @@ uint32_t file_mtime(const char *path) {
 //==============================================================================
 
 void _dir_list(const char *path,
-               const char *patern,
+               const char **patern,
+               uint32_t patern_n,
                int recursive,
                int only_dir,
                char ***tmp_files,
@@ -95,7 +96,7 @@ void _dir_list(const char *path,
             }
 
             if (recursive) {
-                _dir_list(tmp_path, patern, recursive,
+                _dir_list(tmp_path, patern, patern_n, recursive,
                           only_dir, tmp_files, allocator);
             }
 
@@ -110,11 +111,12 @@ void _dir_list(const char *path,
                 snprintf(new_path, size - 1, "%s%s", path, entry->d_name);
             }
 
-            if (0 != fnmatch(patern, new_path, 0)) {
-                continue;
+            for (int i = 0; i < patern_n; ++i) {
+                if(0 == fnmatch(patern[i], new_path, 0)) {
+                    ct_array_push(*tmp_files, new_path, allocator);
+                    break;
+                }
             }
-
-            ct_array_push(*tmp_files, new_path, allocator);
         }
 
     } while ((entry = readdir(dir)));
@@ -187,7 +189,8 @@ void _dir_list2(const char *path,
 }
 
 void dir_list(const char *path,
-              const char *patern,
+              const char **patern,
+              uint32_t patern_n,
               int recursive,
               int only_dir,
               char ***files,
@@ -196,7 +199,7 @@ void dir_list(const char *path,
 
     char **tmp_files = NULL;
 
-    _dir_list(path, patern, recursive, only_dir, &tmp_files, allocator);
+    _dir_list(path, patern, patern_n, recursive, only_dir, &tmp_files, allocator);
 
     char **new_files = CT_ALLOC(allocator, char*,
                                 sizeof(char *) * ct_buffer_size(tmp_files));
@@ -360,7 +363,7 @@ void path_join(char **buffer,
 void copy_file(struct ct_alloc *allocator,
                const char *from,
                const char *to) {
-    struct ct_vio *source_vio = ct_os_a0->vio_a0->from_file(from,
+    struct ct_vio *source_vio = ct_os_a0->vio->from_file(from,
                                                             VIO_OPEN_READ);
 
     char *data = CT_ALLOC(allocator, char,
@@ -370,7 +373,7 @@ void copy_file(struct ct_alloc *allocator,
     source_vio->read(source_vio, data, sizeof(char), size);
     source_vio->close(source_vio);
 
-    struct ct_vio *build_vio = ct_os_a0->vio_a0->from_file(to, VIO_OPEN_WRITE);
+    struct ct_vio *build_vio = ct_os_a0->vio->from_file(to, VIO_OPEN_WRITE);
 
     build_vio->write(build_vio, data, sizeof(char), size);
     build_vio->close(build_vio);
@@ -385,7 +388,6 @@ bool is_dir(const char *path) {
 
 struct ct_path_a0 path_api = {
         .list = dir_list,
-        .list2 = dir_list2,
         .list_free = dir_list_free,
         .make_path = dir_make_path,
         .filename = path_filename,

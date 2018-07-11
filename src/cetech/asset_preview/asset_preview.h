@@ -23,7 +23,8 @@ struct ct_asset_preview_fce {
 };
 
 
-#define ASSET_PREVIEW CT_ID64_0("ct_asset_preview_i0")
+#define ASSET_PREVIEW \
+    CT_ID64_0("ct_asset_preview_i0", 0xb3cba443e3ad0e60ULL)
 
 struct ct_asset_preview_i0 {
     struct ct_entity (*load)(struct ct_resource_id resourceid,

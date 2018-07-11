@@ -210,7 +210,7 @@ static int builddb_need_compile(const char *filename,
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
 
         time_t actual_mtime = fs->file_mtime(
-                CT_ID64_0("source"), dep_file);
+                SOURCE_ROOT, dep_file);
 
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 

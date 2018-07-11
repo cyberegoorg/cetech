@@ -111,7 +111,7 @@ static void allocate(struct WorldInstance *_data,
 
 static void _new_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
     uint32_t idx = ct_array_size(_G.world_instances);
     ct_array_push(_G.world_instances, (struct WorldInstance) {}, _G.allocator);
@@ -121,7 +121,7 @@ static void _new_world(uint64_t event) {
 
 static void _destroy_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
     uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = ct_array_size(_G.world_instances) - 1;
@@ -475,6 +475,8 @@ static void _init_api(struct ct_api_a0 *api) {
 //
 
 
+#define SCENEGRAPH_TYPE \
+    CT_ID64_0("scenegraph", 0xdeae50ee50cb5e3aULL)
 
 static void init(struct ct_api_a0 *api) {
     _init_api(api);
@@ -482,7 +484,7 @@ static void init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CT_ID64_0("scenegraph"),
+            .type = SCENEGRAPH_TYPE,
     };
 //
 //    ct_ecs_a0->register_component((struct ct_component_info) {

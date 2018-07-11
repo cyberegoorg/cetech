@@ -28,16 +28,16 @@ extern struct ct_window_a0 window_api;
 
 
 static struct ct_os_a0 ct_os_api = {
-        .cpu_a0 = &cpu_api,
-        .error_a0 = &error_api,
-        .object_a0 = &object_api,
-        .path_a0 = &path_api,
-        .process_a0 = &process_api,
-        .thread_a0 = &thread_api,
-        .time_a0 = &time_api,
-        .vio_a0 = &vio_api,
-        .watchdog_a0 = &wathdog_api,
-        .window_a0 = &window_api,
+        .cpu = &cpu_api,
+        .error = &error_api,
+        .object = &object_api,
+        .path = &path_api,
+        .process = &process_api,
+        .thread = &thread_api,
+        .time = &time_api,
+        .vio = &vio_api,
+        .watchdog = &wathdog_api,
+        .window = &window_api,
 };
 
 struct ct_os_a0 *ct_os_a0 = &ct_os_api;

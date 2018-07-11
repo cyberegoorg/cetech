@@ -55,9 +55,7 @@ set(EXTERNAL_SOURCE_FILES
 #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
         )
 
-set(SOURCE_FILES
-        ${EXTERNAL_SOURCE_FILES}
-
+set(CORELIB_SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
@@ -86,6 +84,11 @@ set(SOURCE_FILES
         src/corelib/private/cdb.c
         src/corelib/private/ebus.c
         src/corelib/private/core.c
+        )
+
+set(SOURCE_FILES
+        ${EXTERNAL_SOURCE_FILES}
+        ${CORELIB_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
         src/cetech/resource/private/resource_package.c
@@ -244,7 +247,6 @@ add_executable(cetech_develop ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 #add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
 #target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
@@ -258,3 +260,7 @@ set_target_properties(example PROPERTIES PREFIX "module_")
 add_library(example_develop SHARED examples/develop/src/game.c)
 set_target_properties(example_develop PROPERTIES PREFIX "game_")
 
+
+add_executable(hash ${CORELIB_SOURCE_FILES} src/hash/hash.c)
+target_link_libraries(hash ${DEVELOP_LIBS})
+target_include_directories(hash PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)

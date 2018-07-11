@@ -70,7 +70,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_api(api);
     _G = (struct _G) {};
 
-    ct_api_a0->register_on_add(CT_ID64_0("ct_controlers_i0"), _componet_api_add);
+    ct_api_a0->register_on_add(CONTROLERS_I, _componet_api_add);
 
 }
 

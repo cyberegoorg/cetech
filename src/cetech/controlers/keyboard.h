@@ -10,6 +10,9 @@
 
 #define KEYBOARD_EBUS_NAME "keyboard"
 
+#define CONTROLER_KEYBOARD \
+    CT_ID64_0("keyboard", 0x413d83f1d027f82eULL)
+
 enum {
     KEYBOARD_EBUS = 0x5712c6b9
 };

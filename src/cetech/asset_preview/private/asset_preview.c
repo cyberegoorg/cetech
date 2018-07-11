@@ -90,7 +90,7 @@ static void fps_camera_update(struct ct_world world,
 
     uint64_t ent_obj = ct_ecs_a0->entity->cdb_object(world, camera_ent);
     uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
-                                                    CT_ID64_0("components"), 0);
+                                                    ENTITY_COMPONENTS, 0);
 
     uint64_t component = ct_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
@@ -117,7 +117,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
     ct_render_texture_handle_t th;
     th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
-                                                    CT_ID64_0("output"));
+                                                    RG_OUTPUT_TEXTURE);
 
 
     float size[2];
@@ -134,7 +134,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
 
 static void set_asset(uint64_t event) {
-    uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
+    uint64_t asset = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET, 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 
@@ -202,12 +202,12 @@ static void on_render() {
 static void update(float dt) {
     uint64_t selected_object = ct_selected_object_a0->selected_object();
     if (selected_object &&
-        (ct_cdb_a0->type(selected_object) == CT_ID64_0("asset"))) {
+        (ct_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
         set_asset(selected_object);
     }
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
 
     if (_G.active) {
         float updown = 0.0f;

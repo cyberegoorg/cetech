@@ -73,8 +73,8 @@ static void fps_camera_update(struct ct_world world,
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->component->entity_data(world,
-                                       TRANSFORM_COMPONENT,
-                                       camera_ent);
+                                                  TRANSFORM_COMPONENT,
+                                                  camera_ent);
 
     ct_mat4_move(wm, transform->world);
 
@@ -100,7 +100,7 @@ static void fps_camera_update(struct ct_world world,
 
     uint64_t ent_obj = ct_ecs_a0->entity->cdb_object(world, camera_ent);
     uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
-                                                    CT_ID64_0("components"), 0);
+                                                    ENTITY_COMPONENTS, 0);
     uint64_t component = ct_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
 
@@ -140,7 +140,8 @@ static void _guizmo(uint64_t component_obj,
                     struct ct_editor_component_i0 *ceditor,
                     enum OPERATION operation,
                     const float *view,
-                    const float *proj, float* size) {
+                    const float *proj,
+                    float *size) {
 
     if (!ceditor->guizmo_get_transform) {
         return;
@@ -165,13 +166,8 @@ static void _guizmo(uint64_t component_obj,
     float delta_matrix[16] = {0.0f};
     ct_mat4_identity(delta_matrix);
 
-    ct_debugui_a0->guizmo_manipulate(view,
-                                     proj,
-                                     operation,
-                                     WORLD,
-                                     world, delta_matrix,
-                                     0,
-                                     NULL, NULL);
+    ct_debugui_a0->guizmo_manipulate(view, proj, operation, WORLD,
+                                     world, delta_matrix, 0, NULL, NULL);
 
     if (!ct_mat4_is_identity(delta_matrix)) {
         ceditor->guizmo_set_transform(component_obj, operation, world, local);
@@ -181,7 +177,7 @@ static void _guizmo(uint64_t component_obj,
 static void draw_editor(struct ct_dock_i0 *dock) {
     struct scene_editor *editor = &_G.editor[dock->id];
 
-    if(!editor->world.h) {
+    if (!editor->world.h) {
         return;
     }
 
@@ -218,9 +214,7 @@ static void draw_editor(struct ct_dock_i0 *dock) {
         if (obj_type == ENTITY_RESOURCE) {
 
             uint64_t components;
-            components = ct_cdb_a0->read_subobject(obj,
-                                                   CT_ID64_0("components"),
-                                                   0);
+            components = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
             const uint32_t component_n = ct_cdb_a0->prop_count(components);
 
@@ -268,16 +262,16 @@ static void draw_editor(struct ct_dock_i0 *dock) {
 
     ct_render_texture_handle_t th;
     th = editor->rg_builder->call->get_texture(editor->rg_builder,
-                                               CT_ID64_0("output"));
+                                               RG_OUTPUT_TEXTURE);
 
     editor->rg_builder->call->set_size(editor->rg_builder,
                                        size[0], size[1]);
 
 
     ct_debugui_a0->Image(th,
-                          size,
-                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+                         size,
+                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 
 }
 
@@ -301,15 +295,15 @@ static const char *dock_title(struct ct_dock_i0 *dock) {
     return ICON_FA_CUBE " Entity editor";
 }
 
-static const char *name(struct ct_dock_i0* dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "entity_editor";
 }
 
-static struct scene_editor* _new_editor(struct ct_resource_id asset) {
+static struct scene_editor *_new_editor(struct ct_resource_id asset) {
     uint32_t ent_idx = find_entity(asset.name);
 
     if (ent_idx != UINT32_MAX) {
-        struct scene_editor* editor = &_G.editor[ent_idx];
+        struct scene_editor *editor = &_G.editor[ent_idx];
         return editor;
     }
 
@@ -324,7 +318,7 @@ static struct scene_editor* _new_editor(struct ct_resource_id asset) {
                          DebugUIWindowFlags_NoScrollWithMouse,
             .visible = true,
             .display_title = dock_title,
-                    .name = name,
+            .name = name,
             .draw_ui = draw_editor,
     };
 
@@ -339,12 +333,13 @@ static void open(struct ct_resource_id asset,
                  const char *path) {
     struct scene_editor *editor = _new_editor(asset);
 
-    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), CT_ID64_0("asset"));
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
-    ct_cdb_a0->set_uint64(w, CT_ID64_0("asset"), asset.i64);
-    ct_cdb_a0->set_uint64(w, CT_ID64_0("root"), root);
-    ct_cdb_a0->set_str(w, CT_ID64_0("path"), path);
+    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+                                            ASSET_BROWSER_ASSET_TYPE);
 
+    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
+    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET, asset.i64);
+    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT, root);
+    ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
     ct_cdb_a0->write_commit(w);
 
     if (editor->entity_name == asset.name) {
@@ -364,11 +359,12 @@ static void open(struct ct_resource_id asset,
     editor->render_graph = ct_render_graph_a0->create_graph();
     editor->rg_builder = ct_render_graph_a0->create_builder();
     editor->render_graph->call->add_module(editor->render_graph,
-                                           ct_default_rg_a0->create(editor->world));
+                                           ct_default_rg_a0->create(
+                                                   editor->world));
 
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
-                                                 CT_ID32_0("content/camera"));
+                                                  CT_ID32_0("content/camera"));
 
     editor->root = root;
     editor->entity_name = asset.name;
@@ -383,14 +379,13 @@ static void open(struct ct_resource_id asset,
 }
 
 static void update(float dt) {
-    struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
-
+    struct ct_controlers_i0 *keyboard;
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
 
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
 
-        if(!editor->world.h) {
+        if (!editor->world.h) {
             continue;
         }
 
@@ -436,7 +431,7 @@ static void on_render() {
     for (uint8_t i = 0; i < _G.editor_count; ++i) {
         struct scene_editor *editor = &_G.editor[i];
 
-        if(!editor->world.h) {
+        if (!editor->world.h) {
             continue;
         }
 
@@ -455,13 +450,13 @@ static void on_render() {
 
 
 static void on_asset_double_click(uint64_t event) {
-    uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
-    uint64_t root = ct_cdb_a0->read_uint64(event, CT_ID64_0("root"), 0);
-    const char *path = ct_cdb_a0->read_str(event, CT_ID64_0("path"), 0);
+    uint64_t asset = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET, 0);
+    uint64_t root = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
+    const char *path = ct_cdb_a0->read_str(event, ASSET_BROWSER_PATH, 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 
-    if (CT_ID32_0("entity") == rid.type) {
+    if (ENTITY_RESOURCE_ID == rid.type) {
         open(rid, root, path);
         return;
     }
@@ -480,9 +475,10 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
 
-    ct_api_a0->register_api("ct_playground_module_i0", &ct_playground_module_i0);
+    ct_api_a0->register_api("ct_playground_module_i0",
+                            &ct_playground_module_i0);
 
-    _new_editor((struct ct_resource_id){.i64=0});
+    _new_editor((struct ct_resource_id) {.i64=0});
 
 }
 

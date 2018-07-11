@@ -22,6 +22,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/dock/dock.h>
+#include <cetech/asset_browser/asset_browser.h>
 
 #define _G plaground_global
 
@@ -35,6 +36,12 @@ static struct _G {
 void reload_layout() {
     _G.load_layout = true;
 }
+
+#define _UNDO \
+    CT_ID64_0("undo", 0xd9c7f03561492eecULL)
+
+#define _REDO \
+    CT_ID64_0("redo", 0x2b64b25d7febf67eULL)
 
 static float draw_main_menu() {
     float menu_height = 0;
@@ -74,19 +81,19 @@ static float draw_main_menu() {
 
             sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
 
-            shortcut = ct_action_manager_a0->shortcut_str(CT_ID64_0("undo"));
+            shortcut = ct_action_manager_a0->shortcut_str(_UNDO);
             if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
                                         buffer2[0] != '0')) {
-                ct_action_manager_a0->execute(CT_ID64_0("undo"));
+                ct_action_manager_a0->execute(_UNDO);
             }
 
 
             ct_cmd_system_a0->redo_text(buffer2, CT_ARRAY_LEN(buffer2));
-            shortcut = ct_action_manager_a0->shortcut_str(CT_ID64_0("redo"));
+            shortcut = ct_action_manager_a0->shortcut_str(_REDO);
             sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
             if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
                                         buffer2[0] != '0')) {
-                ct_action_manager_a0->execute(CT_ID64_0("redo"));
+                ct_action_manager_a0->execute(_REDO);
             }
 
             ct_debugui_a0->EndMenu();
@@ -95,7 +102,7 @@ static float draw_main_menu() {
         if (ct_debugui_a0->BeginMenu("Window", true)) {
             if (ct_debugui_a0->BeginMenu("Layout", true)) {
                 if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
-                    struct ct_vio *f = ct_fs_a0->open(CT_ID64_0("source"),
+                    struct ct_vio *f = ct_fs_a0->open(ASSET_BROWSER_SOURCE,
                                                       "core/default.dock_layout",
                                                       FS_OPEN_WRITE);
                     ct_debugui_a0->SaveDock(f);
@@ -228,7 +235,7 @@ static void on_shutdown(uint64_t _event) {
 static void on_update(uint64_t app_event) {
     ct_action_manager_a0->check();
 
-    float dt = ct_cdb_a0->read_float(app_event, CT_ID64_0("dt"), 0.0f);
+    float dt = ct_cdb_a0->read_float(app_event, KERNEL_EVENT_DT, 0.0f);
 
     struct ct_api_entry it = ct_api_a0->first("ct_playground_module_i0");
     while (it.api) {
@@ -285,13 +292,13 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     ct_action_manager_a0->register_action(
-            CT_ID64_0("undo"),
+            CT_ID64_0("undo", 0xd9c7f03561492eecULL),
             "ctrl+z",
             ct_cmd_system_a0->undo
     );
 
     ct_action_manager_a0->register_action(
-            CT_ID64_0("redo"),
+            CT_ID64_0("redo", 0x2b64b25d7febf67eULL),
             "ctrl+shift+z",
             ct_cmd_system_a0->redo
     );

@@ -103,7 +103,7 @@ static void _on_obj_change(uint64_t obj,
     uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
 
     struct ct_world world = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+            .h = ct_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
     };
 
     struct ct_entity ent = {

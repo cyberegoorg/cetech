@@ -102,7 +102,7 @@ static void map_root_dir(uint64_t root,
     struct fs_mount_point mp = {};
 
     if (watch) {
-//        struct ct_watchdog *wd = ct_os_a0->watchdog_a0->create(_G.allocator);
+//        struct ct_watchdog *wd = ct_os_a0->watchdog->create(_G.allocator);
 //        wd->add_dir(wd->inst, base_path, true);
 
 //        mp.wd = wd;
@@ -114,12 +114,12 @@ static void map_root_dir(uint64_t root,
 
 static bool exist_dir(const char *full_path) {
     char path_buffer[4096];
-    ct_os_a0->path_a0->dir(path_buffer, full_path);
-    return ct_os_a0->path_a0->is_dir(path_buffer);
+    ct_os_a0->path->dir(path_buffer, full_path);
+    return ct_os_a0->path->is_dir(path_buffer);
 }
 
 static bool exist(const char *full_path) {
-    struct ct_vio *f = ct_os_a0->vio_a0->from_file(full_path, VIO_OPEN_READ);
+    struct ct_vio *f = ct_os_a0->vio->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         f->close(f);
         return true;
@@ -140,8 +140,8 @@ static char *get_full_path(uint64_t root,
         struct fs_mount_point *mp = &fs_inst->mount_points[i];
 
         char *fullpath = NULL;
-        ct_os_a0->path_a0->join(&fullpath, allocator, 2, mp->root_path,
-                                filename);
+        ct_os_a0->path->join(&fullpath, allocator, 2, mp->root_path,
+                             filename);
 
         if (((!test_dir) && exist(fullpath)) ||
             (test_dir && exist_dir(fullpath))) {
@@ -159,8 +159,8 @@ static struct ct_vio *open(uint64_t root,
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
-    struct ct_vio *file = ct_os_a0->vio_a0->from_file(full_path,
-                                                      (enum ct_vio_open_mode) mode);
+    struct ct_vio *file = ct_os_a0->vio->from_file(full_path,
+                                                   (enum ct_vio_open_mode) mode);
 
     if (!file) {
         ct_log_a0->error(LOG_WHERE, "Could not load file %s", full_path);
@@ -182,7 +182,7 @@ static int create_directory(uint64_t root,
 
     char *full_path = get_full_path(root, _G.allocator, path, true);
 
-    int ret = ct_os_a0->path_a0->make_path(full_path);
+    int ret = ct_os_a0->path->make_path(full_path);
     CT_FREE(_G.allocator, full_path);
 
     return ret;
@@ -211,11 +211,10 @@ static void listdir(uint64_t root,
         uint32_t _count;
 
         char *final_path = NULL;
-        ct_os_a0->path_a0->join(&final_path, allocator, 2, mount_point_dir,
-                                path);
-        ct_os_a0->path_a0->list(final_path, filter, recursive, only_dir,
-                                &_files,
-                                &_count, allocator);
+        ct_os_a0->path->join(&final_path, allocator, 2, mount_point_dir,
+                             path);
+        ct_os_a0->path->list(final_path, (const char *[]) {filter}, 1,
+                             recursive, only_dir, &_files, &_count, allocator);
 
         for (uint32_t i = 0; i < _count; ++i) {
             ct_array_push(all_files,
@@ -223,7 +222,7 @@ static void listdir(uint64_t root,
                           _G.allocator);
         }
 
-        ct_os_a0->path_a0->list_free(_files, _count, allocator);
+        ct_os_a0->path->list_free(_files, _count, allocator);
         ct_buffer_free(final_path, allocator);
     }
 
@@ -278,7 +277,7 @@ static int64_t get_file_mtime(uint64_t root,
 
     char *full_path = get_full_path(root, _G.allocator, path, false);
 
-    time_t ret = ct_os_a0->path_a0->file_mtime(full_path);
+    time_t ret = ct_os_a0->path->file_mtime(full_path);
 
     ct_buffer_free(full_path, _G.allocator);
 

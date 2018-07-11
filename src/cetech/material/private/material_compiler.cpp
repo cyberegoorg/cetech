@@ -13,6 +13,7 @@
 
 #include <bgfx/defines.h>
 #include <corelib/array.inl>
+#include <corelib/yng.h>
 
 #include "material.h"
 
@@ -96,22 +97,42 @@ void _forach_variable_clb(const char *filename,
                     CT_ARRAY_LEN(uniform_name), _G.allocator);
 }
 
-uint64_t render_state_to_enum(uint64_t name) {
+#define RENDER_STATE_RGB_WRITE \
+    CT_ID64_0("rgb_write", 0xdad21ff8b23271ffULL)
 
-    static struct {
-        uint64_t name;
-        uint64_t e;
-    } _tbl[] = {
-            {.name = CT_ID64_0(""), .e = 0},
-            {.name = CT_ID64_0("rgb_write"), .e = BGFX_STATE_WRITE_RGB},
-            {.name = CT_ID64_0("alpha_write"), .e = BGFX_STATE_WRITE_A},
-            {.name = CT_ID64_0("depth_write"), .e = BGFX_STATE_WRITE_Z},
-            {.name = CT_ID64_0(
-                    "depth_test_less"), .e = BGFX_STATE_DEPTH_TEST_LESS},
-            {.name = CT_ID64_0("cull_ccw"), .e = BGFX_STATE_CULL_CCW},
-            {.name = CT_ID64_0("cull_cw"), .e = BGFX_STATE_CULL_CW},
-            {.name = CT_ID64_0("msaa"), .e = BGFX_STATE_MSAA},
-    };
+#define RENDER_STATE_ALPHA_WRITE \
+    CT_ID64_0("alpha_write", 0x93c0953aa6e40b10ULL)
+
+#define RENDER_STATE_DEPTH_WRITE \
+    CT_ID64_0("depth_write", 0x6d5cef63be1e7b46ULL)
+
+#define RENDER_STATE_DEPTH_TEST_LESS \
+    CT_ID64_0("depth_test_less", 0x25d531ce0f04418eULL)
+
+#define RENDER_STATE_CULL_CCW \
+    CT_ID64_0("cull_ccw", 0x8447d75aa845c612ULL)
+
+#define RENDER_STATE_CULL_CW \
+    CT_ID64_0("cull_cw", 0x6b5530bb1cba7b79ULL)
+
+#define RENDER_STATE_MSAA \
+    CT_ID64_0("msaa", 0xdc0268c3aab08183ULL)
+
+static struct {
+    uint64_t name;
+    uint64_t e;
+} _tbl[] = {
+        {.name = 0, .e = 0},
+        {.name = RENDER_STATE_RGB_WRITE, .e = BGFX_STATE_WRITE_RGB},
+        {.name = RENDER_STATE_ALPHA_WRITE, .e = BGFX_STATE_WRITE_A},
+        {.name = RENDER_STATE_DEPTH_WRITE, .e = BGFX_STATE_WRITE_Z},
+        {.name = RENDER_STATE_DEPTH_TEST_LESS, .e = BGFX_STATE_DEPTH_TEST_LESS},
+        {.name = RENDER_STATE_CULL_CCW, .e = BGFX_STATE_CULL_CCW},
+        {.name = RENDER_STATE_CULL_CW, .e = BGFX_STATE_CULL_CW},
+        {.name = RENDER_STATE_MSAA, .e = BGFX_STATE_MSAA},
+};
+
+uint64_t render_state_to_enum(uint64_t name) {
 
     for (uint32_t i = 1; i < CT_ARRAY_LEN(_tbl); ++i) {
         if (_tbl[i].name != name) {
@@ -195,14 +216,14 @@ void foreach_layer(const char *filename,
 
 void name_from_filename(const char *fullname,
                         char *name) {
-    const char *resource_type = ct_os_a0->path_a0->extension(fullname);
+    const char *resource_type = ct_os_a0->path->extension(fullname);
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
     memcpy(name, fullname, size);
 }
 
 void material_compiler(const char *filename,
-              char **output_blob,
-              ct_compilator_api *compilator_api) {
+                       char **output_blob,
+                       ct_compilator_api *compilator_api) {
     CT_UNUSED(compilator_api);
 
     struct material_compile_output output = {};

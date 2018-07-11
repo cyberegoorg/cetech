@@ -15,7 +15,7 @@
 // Api
 //==============================================================================
 
-#define CT_ID64_0(str) ct_hashlib_a0->id64_from_str(str)
+#define CT_ID64_0(str, hash) hash
 #define CT_ID32_0(str) ct_hashlib_a0->id32_from_str(str)
 
 #define CT_STR64_0(k) ct_hashlib_a0->str_from_id64(k)

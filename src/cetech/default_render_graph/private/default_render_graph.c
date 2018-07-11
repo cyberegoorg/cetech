@@ -39,27 +39,36 @@ struct geometry_pass {
     struct ct_world world;
 };
 
+#define _COLOR \
+    CT_ID64_0("color", 0x6776ddaf0290228ULL)
+
+#define _DEPTH \
+     CT_ID64_0("depth", 0x911ffdcbfa56fec1ULL)
+
+#define _DEFAULT \
+     CT_ID64_0("default", 0xf27605035974b5ecULL)
+
 //==============================================================================
 // Geometry pass
 //==============================================================================
 
 static void geometry_pass_on_setup(void *inst,
                                    struct ct_render_graph_builder *builder) {
-    builder->call->create(builder, CT_ID64_0("color"),
+    builder->call->create(builder, _COLOR,
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
                                   .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
                           }
     );
 
-    builder->call->create(builder, CT_ID64_0("depth"),
+    builder->call->create(builder, _DEPTH,
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_D24,
                                   .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
                           }
     );
 
-    builder->call->add_pass(builder, inst, CT_ID64_0("default"));
+    builder->call->add_pass(builder, inst, _DEFAULT);
 }
 
 struct cameras {
@@ -230,18 +239,17 @@ void screenspace_quad(float _textureWidth,
 static void output_pass_on_setup(void *inst,
                                  struct ct_render_graph_builder *builder) {
 
-    builder->call->create(
-            builder,
-            CT_ID64_0("output"),
-            (struct ct_render_graph_attachment) {
-                    .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
-                    .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-            }
+    builder->call->create(builder,
+                          RG_OUTPUT_TEXTURE,
+                          (struct ct_render_graph_attachment) {
+                                  .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
+                                  .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                          }
     );
 
-    builder->call->read(builder, CT_ID64_0("color"));
+    builder->call->read(builder, _COLOR);
 
-    builder->call->add_pass(builder, inst, CT_ID64_0("default"));
+    builder->call->add_pass(builder, inst, _DEFAULT);
 }
 
 static uint64_t copy_material = 0;
@@ -268,12 +276,13 @@ static void output_pass_on_pass(void *inst,
 
     ct_renderer_a0->set_view_transform(viewid, NULL, proj);
 
-    if(!copy_material) {
-        copy_material = ct_material_a0->resource_create(CT_ID32_0("content/copy"));
+    if (!copy_material) {
+        copy_material = ct_material_a0->resource_create(
+                CT_ID32_0("content/copy"));
     }
 
     ct_render_texture_handle_t th;
-    th = builder->call->get_texture(builder, CT_ID64_0("color"));
+    th = builder->call->get_texture(builder, _COLOR);
 
     ct_material_a0->set_texture_handler(copy_material,
                                         layer,

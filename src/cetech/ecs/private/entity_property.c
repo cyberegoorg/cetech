@@ -22,6 +22,7 @@
 #include <cetech/command_system/command_system.h>
 #include <corelib/hash.inl>
 #include <cetech/selected_object/selected_object.h>
+#include <corelib/yng.h>
 
 
 #define _G entity_property_global
@@ -37,6 +38,17 @@ static struct _G {
     uint64_t obj;
 } _G;
 
+#define _SET_BOOL \
+    CT_ID64_0("set_bool", 0xc7b18e7df0217558ULL)
+
+#define _SET_STR \
+    CT_ID64_0("set_str", 0x5096c6f990f09debULL)
+
+#define _SET_VEC3 \
+    CT_ID64_0("set_vec3", 0xc9710c4624eccfb0ULL)
+
+#define _SET_FLOAT \
+    CT_ID64_0("set_float", 0x3a22b9e23704ab12ULL)
 
 //static bool ui_select_asset(char *buffer,
 //                            const char *id,
@@ -83,7 +95,7 @@ static void ui_float(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_float"),
+                        .type = ct_hashlib_a0->id64_from_str("set_float"),
                 },
 
                 .prop = prop_key_hash,
@@ -110,7 +122,7 @@ static void ui_bool(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_bool"),
+                        .type = _SET_BOOL,
                 },
 
                 .prop = prop_key_hash,
@@ -151,7 +163,7 @@ static void ui_str(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_str"),
+                        .type = _SET_STR,
                 },
 
                 .prop = prop_key_hash,
@@ -190,7 +202,8 @@ static void ui_str_combo(uint64_t obj,
     const char *items2[items_count];
     for (int j = 0; j < items_count; ++j) {
         items2[j] = &items[j * 128];
-        if (CT_ID64_0(items2[j]) == CT_ID64_0(value)) {
+        if (ct_hashlib_a0->id64_from_str(items2[j]) ==
+            ct_hashlib_a0->id64_from_str(value)) {
             current_item = j;
         }
     }
@@ -208,7 +221,7 @@ static void ui_str_combo(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_str"),
+                        .type = _SET_STR,
                 },
 
                 .prop = prop_key_hash,
@@ -257,7 +270,7 @@ static void ui_resource(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_str"),
+                        .type = _SET_STR,
                 },
 
                 .prop = prop_key_hash,
@@ -293,14 +306,14 @@ static void ui_vec3(uint64_t obj,
         struct ct_ent_cmd_s cmd = {
                 .header = {
                         .size = sizeof(struct ct_ent_cmd_s),
-                        .type = CT_ID64_0("set_vec3"),
+                        .type = _SET_VEC3,
                 },
 
                 .prop = prop_key_hash,
                 .obj = obj,
 
                 .vec3.new_value = {value_new[0], value_new[1], value_new[2]},
-                .vec3.old_value = {value[0],value[1],value[2]},
+                .vec3.old_value = {value[0], value[1], value[2]},
         };
 
         ct_cmd_system_a0->execute(&cmd.header);
@@ -359,9 +372,7 @@ static void on_debugui() {
         }
 
         uint64_t components_obj;
-        components_obj = ct_cdb_a0->read_subobject(obj,
-                                                   CT_ID64_0("components"), 0);
-
+        components_obj = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
         uint64_t n = ct_cdb_a0->prop_count(components_obj);
         uint64_t components_name[n];
@@ -418,7 +429,7 @@ static void set_float_cmd(const struct ct_cmd *cmd,
 }
 
 static void set_bool_cmd(const struct ct_cmd *cmd,
-                          bool inverse) {
+                         bool inverse) {
     const struct ct_ent_cmd_s *pos_cmd = (const struct ct_ent_cmd_s *) cmd;
 
     const bool value = inverse ? pos_cmd->b.old_value : pos_cmd->b.new_value;
@@ -446,22 +457,29 @@ static void cmd_description(char *buffer,
                             bool inverse) {
     const struct ct_ent_cmd_s *pos_cmd = (const struct ct_ent_cmd_s *) cmd;
 
-    if (cmd->type == CT_ID64_0("set_vec3")) {
-        snprintf(buffer, buffer_size,
-                 "Set vec3 [%f, %f, %f]",
-                 pos_cmd->vec3.new_value[0],
-                 pos_cmd->vec3.new_value[1],
-                 pos_cmd->vec3.new_value[2]);
+    switch (cmd->type) {
+        case _SET_VEC3:
+            snprintf(buffer, buffer_size,
+                     "Set vec3 [%f, %f, %f]",
+                     pos_cmd->vec3.new_value[0],
+                     pos_cmd->vec3.new_value[1],
+                     pos_cmd->vec3.new_value[2]);
+            break;
 
-    } else if (cmd->type == CT_ID64_0("set_float")) {
-        snprintf(buffer, buffer_size,
-                 "Set float %f",
-                 pos_cmd->f.new_value);
+        case _SET_FLOAT:
+            snprintf(buffer, buffer_size,
+                     "Set float %f",
+                     pos_cmd->f.new_value);
+            break;
 
-    } else if (cmd->type == CT_ID64_0("set_str")) {
-        snprintf(buffer, buffer_size,
-                 "Set str %s",
-                 pos_cmd->str.new_value);
+        case _SET_STR:
+            snprintf(buffer, buffer_size,
+                     "Set str %s",
+                     pos_cmd->str.new_value);
+            break;
+
+        default:
+            break;
     }
 }
 
@@ -475,29 +493,25 @@ static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_property_editor_i0", &ct_property_editor_i0);
 
 
-    ct_cmd_system_a0->register_cmd_execute(
-            CT_ID64_0("set_vec3"),
-            (struct ct_cmd_fce) {
-                    .execute = set_vec3_cmd,
-                    .description = cmd_description});
+    ct_cmd_system_a0->register_cmd_execute(_SET_VEC3,
+                                           (struct ct_cmd_fce) {
+                                                   .execute = set_vec3_cmd,
+                                                   .description = cmd_description});
 
-    ct_cmd_system_a0->register_cmd_execute(
-            CT_ID64_0("set_str"),
-            (struct ct_cmd_fce) {
-                    .execute = set_str_cmd,
-                    .description = cmd_description});
+    ct_cmd_system_a0->register_cmd_execute(_SET_STR,
+                                           (struct ct_cmd_fce) {
+                                                   .execute = set_str_cmd,
+                                                   .description = cmd_description});
 
-    ct_cmd_system_a0->register_cmd_execute(
-            CT_ID64_0("set_bool"),
-            (struct ct_cmd_fce) {
-                    .execute = set_bool_cmd,
-                    .description = cmd_description});
+    ct_cmd_system_a0->register_cmd_execute(_SET_BOOL,
+                                           (struct ct_cmd_fce) {
+                                                   .execute = set_bool_cmd,
+                                                   .description = cmd_description});
 
-    ct_cmd_system_a0->register_cmd_execute(
-            CT_ID64_0("set_float"),
-            (struct ct_cmd_fce) {
-                    .execute = set_float_cmd,
-                    .description = cmd_description});
+    ct_cmd_system_a0->register_cmd_execute(_SET_FLOAT,
+                                           (struct ct_cmd_fce) {
+                                                   .execute = set_float_cmd,
+                                                   .description = cmd_description});
 
 }
 

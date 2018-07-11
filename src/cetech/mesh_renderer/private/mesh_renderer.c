@@ -24,6 +24,7 @@
 #include <cetech/ecs/entity_property.h>
 #include <stdlib.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <corelib/yng.h>
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -60,8 +61,8 @@ void _mesh_component_compiler(const char *filename,
     const char *node = ct_ydb_a0->get_str(filename, keys,
                                           component_key_count + 1, "");
 
-    ct_cdb_a0->set_uint64(writer, PROP_MESH_ID, CT_ID64_0(mesh));
-    ct_cdb_a0->set_uint64(writer, PROP_NODE_ID, CT_ID64_0(node));
+    ct_cdb_a0->set_uint64(writer, PROP_MESH_ID, ct_hashlib_a0->id64_from_str(mesh));
+    ct_cdb_a0->set_uint64(writer, PROP_NODE_ID, ct_hashlib_a0->id64_from_str(node));
     ct_cdb_a0->set_uint64(writer, PROP_MATERIAL_ID, CT_ID32_0(mat));
     ct_cdb_a0->set_uint64(writer, PROP_SCENE_ID, CT_ID32_0(scene));
 
@@ -165,7 +166,7 @@ static void _on_obj_change(uint64_t obj,
     uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
 
     struct ct_world world = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+            .h = ct_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
     };
 
     struct ct_entity ent = {
@@ -194,7 +195,7 @@ static void _on_obj_change(uint64_t obj,
                 writer = ct_cdb_a0->write_begin(obj);
             }
 
-            ct_cdb_a0->set_uint64(writer, PROP_NODE_ID, CT_ID64_0(str));
+            ct_cdb_a0->set_uint64(writer, PROP_NODE_ID, ct_hashlib_a0->id64_from_str(str));
 
         } else if (prop[k] == PROP_MESH) {
             const char *str = ct_cdb_a0->read_str(obj, PROP_MESH, "");
@@ -203,7 +204,7 @@ static void _on_obj_change(uint64_t obj,
                 writer = ct_cdb_a0->write_begin(obj);
             }
 
-            ct_cdb_a0->set_uint64(writer, PROP_MESH_ID, CT_ID64_0(str));
+            ct_cdb_a0->set_uint64(writer, PROP_MESH_ID, ct_hashlib_a0->id64_from_str(str));
 
 
         } else if (prop[k] == PROP_MATERIAL) {

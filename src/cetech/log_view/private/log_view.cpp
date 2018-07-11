@@ -16,7 +16,6 @@
 #include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Log view"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")
 #define LOG_FORMAT "%s -> %s"
 
 struct log_item {

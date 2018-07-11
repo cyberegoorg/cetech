@@ -166,7 +166,7 @@ static void update(uint64_t _event) {
 
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
-        uint32_t button = ct_cdb_a0->read_uint64(event, CT_ID64_0("button"), 0);
+        uint32_t button = ct_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
 
         switch (ct_cdb_a0->type(event)) {
             case EVENT_MOUSE_DOWN:
@@ -180,7 +180,7 @@ static void update(uint64_t _event) {
             case EVENT_MOUSE_MOVE: {
                 float pos[3];
 
-                ct_cdb_a0->read_vec3(event, CT_ID64_0("position"), pos);
+                ct_cdb_a0->read_vec3(event,CONTROLER_POSITION, pos);
 
                 _G.delta_pos[0] = pos[0] - _G.pos[0];
                 _G.delta_pos[1] = pos[1] - _G.pos[1];
@@ -193,7 +193,7 @@ static void update(uint64_t _event) {
             case EVENT_MOUSE_WHEEL: {
                 float pos[3];
 
-                ct_cdb_a0->read_vec3(event, CT_ID64_0("position"), pos);
+                ct_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
 
                 _G.wheel[0] += pos[0];// - _G.wheel_last[0];
                 _G.wheel[1] += pos[1];// - _G.wheel_last[1];
@@ -210,7 +210,7 @@ static void update(uint64_t _event) {
 }
 
 static uint64_t name() {
-    return CT_ID64_0("mouse");
+    return CONTROLER_MOUSE;
 }
 
 static struct ct_controlers_i0 ct_controlers_i0 = {

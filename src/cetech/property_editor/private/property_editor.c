@@ -13,7 +13,6 @@
 #include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Property editor"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("property_editor")
 
 #define _G property_inspector_global
 static struct _G {

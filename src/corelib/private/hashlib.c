@@ -21,8 +21,8 @@ struct _G {
 } _G;
 
 
-#define STRINGID64_SEED 22
-#define STRINGID32_SEED 22
+#define STRINGID64_SEED 0
+#define STRINGID32_SEED 0
 
 //==============================================================================
 // Interface
@@ -43,13 +43,13 @@ uint64_t stringid64_from_string(const char *str) {
 
     const uint64_t hash = ct_hash_murmur2_64(str, str_len, STRINGID64_SEED);
 
-    ct_os_a0->thread_a0->spin_lock(&_G.id64_to_str_lock);
+    ct_os_a0->thread->spin_lock(&_G.id64_to_str_lock);
     if (!ct_hash_contain(&_G.id64_to_str, hash)) {
         const uint32_t idx = ct_array_size(_G.str_id64);
         ct_array_push_n(_G.str_id64, str, str_len + 1, alloc);
         ct_hash_add(&_G.id64_to_str, hash, idx, alloc);
     }
-    ct_os_a0->thread_a0->spin_unlock(&_G.id64_to_str_lock);
+    ct_os_a0->thread->spin_unlock(&_G.id64_to_str_lock);
 
     return hash;
 }

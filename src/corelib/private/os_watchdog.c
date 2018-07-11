@@ -76,15 +76,14 @@ void add_dir(ct_watchdog_instance_t *inst,
         char **files;
         uint32_t files_count;
 
-        ct_os_a0->path_a0->list(path, "*", 1, 1, &files, &files_count,
-                                allocator);
+        ct_os_a0->path->list(path, (const char*[]){"*"}, 1, 1, 1,
+                             &files, &files_count, allocator);
 
         for (uint32_t i = 0; i < files_count; ++i) {
             add_dir(inst, files[i], false);
         }
 
-        ct_os_a0->path_a0->list_free(files, files_count,
-                                     allocator);
+        ct_os_a0->path->list_free(files, files_count, allocator);
     }
 }
 

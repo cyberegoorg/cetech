@@ -51,17 +51,14 @@ struct _G {
 // Private
 //==============================================================================
 
-#define CONFIG_BUILD_DIR CT_ID64_0(CONFIG_BUILD_ID)
-#define CONFIG_KERNEL_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
-
 char *resource_compiler_get_build_dir(struct ct_alloc *a,
                                       const char *platform) {
 
     const char *build_dir_str = ct_cdb_a0->read_str(_G.config,
-                                                    CONFIG_BUILD_DIR, "");
+                                                    CONFIG_BUILD, "");
 
     char *buffer = NULL;
-    ct_os_a0->path_a0->join(&buffer, a, 2, build_dir_str, platform);
+    ct_os_a0->path->join(&buffer, a, 2, build_dir_str, platform);
 
     return buffer;
 }
@@ -73,8 +70,7 @@ char *resource_compiler_get_build_dir(struct ct_alloc *a,
 static int type_name_string(char *str,
                             size_t max_len,
                             struct ct_resource_id resourceid) {
-    return snprintf(str, max_len, "%"
-            SDL_PRIX64, resourceid.i64);
+    return snprintf(str, max_len, "%" SDL_PRIX64, resourceid.i64);
 }
 
 
@@ -139,7 +135,7 @@ static void load(uint32_t type,
         return;
     }
 
-    const uint64_t root_name = CT_ID64_0("build");
+    const uint64_t root_name = BUILD_ROOT;
 
     for (uint32_t i = 0; i < count; ++i) {
         const uint32_t asset_name = names[i];
@@ -166,10 +162,10 @@ static void load(uint32_t type,
                          filename, build_name);
 
         char *build_full = NULL;
-        ct_os_a0->path_a0->join(&build_full,
+        ct_os_a0->path->join(&build_full,
                                 _G.allocator, 2,
                                 ct_cdb_a0->read_str(_G.config,
-                                                    CONFIG_KERNEL_PLATFORM, ""),
+                                                    CONFIG_PLATFORM, ""),
                                 build_name);
 
         struct ct_vio *resource_file = ct_fs_a0->open(root_name,
@@ -186,9 +182,9 @@ static void load(uint32_t type,
         ct_fs_a0->close(resource_file);
 
 
-        ct_os_a0->thread_a0->spin_lock(&_G.lock);
+        ct_os_a0->thread->spin_lock(&_G.lock);
         ct_hash_add(&_G.resource_map, rid.i64, (uint64_t) object, _G.allocator);
-        ct_os_a0->thread_a0->spin_unlock(&_G.lock);
+        ct_os_a0->thread->spin_unlock(&_G.lock);
     }
 }
 
@@ -250,8 +246,7 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
             CETECH_ASSERT(LOG_WHERE, false);
         }
 
-        object = (uint64_t) ct_hash_lookup(&_G.resource_map,
-                                           resource_id.i64, 0);
+        object = (uint64_t) ct_hash_lookup(&_G.resource_map, resource_id.i64, 0);
     }
 
     return object;
@@ -357,11 +352,11 @@ static void _init_cvar(struct ct_config_a0 *config) {
     _G = (struct _G) {};
 
     ct_config_a0 = config;
-    _G.config = ct_config_a0->config_object();
+    _G.config = ct_config_a0->object();
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config);
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_BUILD_DIR)) {
-        ct_cdb_a0->set_str(writer, CONFIG_BUILD_DIR, "build");
+    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_BUILD)) {
+        ct_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
     }
     ct_cdb_a0->write_commit(writer);
 
@@ -374,15 +369,15 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->config_object(),
+            .config = ct_config_a0->object(),
             .db = ct_cdb_a0->db()
     };
 
-    ct_fs_a0->map_root_dir(CT_ID64_0("build"),
-                           ct_cdb_a0->read_str(_G.config, CONFIG_BUILD_DIR, ""),
+    ct_fs_a0->map_root_dir(BUILD_ROOT,
+                           ct_cdb_a0->read_str(_G.config, CONFIG_BUILD, ""),
                            false);
 
-    ct_api_a0->register_on_add(CT_ID64_0("ct_resource_i0"), _resource_api_add);
+    ct_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
 
 }
 

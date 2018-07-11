@@ -88,7 +88,7 @@ static void online(uint64_t name,
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(obj);
 
-    ct_cdb_a0->set_str(writer, CT_ID64_0("asset_name"), resource->asset_name);
+    ct_cdb_a0->set_str(writer, MATERIAL_ASSET_NAME, resource->asset_name);
 
     for (uint32_t i = 0; i < material_blob::layer_count(resource); ++i) {
         uint64_t layer_name = layer_names[i];
@@ -118,7 +118,7 @@ static void online(uint64_t name,
             auto &uniform = uniforms[uniform_offset + j];
             auto type = uniform.type;
             const char *uname = &uniforms_names[j * 32];
-            uint64_t name_id = CT_ID64_0(uname);
+            uint64_t name_id = ct_hashlib_a0->id64_from_str(uname);
 
             ct_render_uniform_handle_t handler = ct_renderer_a0->create_uniform(
                     uname,
@@ -261,7 +261,7 @@ static void draw_property(uint64_t obj) {
     ct_cdb_a0->prop_keys(material, layer_keys);
 
     for (int i = 0; i < layer_count; ++i) {
-        if (layer_keys[i] == CT_ID64_0("asset_name")) {
+        if (layer_keys[i] == MATERIAL_ASSET_NAME) {
             continue;
         }
 
@@ -399,7 +399,7 @@ static void set_texture_handler(uint64_t material,
     uint64_t variables = ct_cdb_a0->read_ref(layer_obj,
                                              MATERIAL_VARIABLES_PROP,
                                              0);
-    uint64_t var = ct_cdb_a0->read_ref(variables, CT_ID64_0(slot), 0);
+    uint64_t var = ct_cdb_a0->read_ref(variables, ct_hashlib_a0->id64_from_str(slot), 0);
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(var);
     ct_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ct_cdb_a0->set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
@@ -502,7 +502,7 @@ static int init(struct ct_api_a0 *api) {
     };
     api->register_api("ct_material_a0", &material_api);
 
-    ct_api_a0->register_api("ct_resource_i0", &ct_resource_i0);
+    ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
 
     materialcompiler_init(api);
 

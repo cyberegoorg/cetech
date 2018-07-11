@@ -12,6 +12,8 @@
 #include <corelib/ydb.h>
 #include <corelib/macros.h>
 #include <corelib/array.inl>
+#include <corelib/cdb.h>
+#include <corelib/yng.h>
 
 struct package_resource {
     uint32_t type_count;
@@ -175,7 +177,7 @@ int package_init(struct ct_api_a0 *api) {
             .package_typel = CT_ID32_0("package"),
     };
 
-    ct_api_a0->register_api("ct_resource_i0", &ct_resource_i0);
+    ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
 
     return 1;
 }

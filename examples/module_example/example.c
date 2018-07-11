@@ -30,10 +30,10 @@ static struct G {
 
 
 void update(uint64_t event) {
-    _G.dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
+    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64_from_str("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {

@@ -14,6 +14,7 @@
 #include <corelib/module.h>
 #include <corelib/ydb.h>
 #include <corelib/hash.inl>
+#include <corelib/yng.h>
 
 #include "corelib/handler.h"
 
@@ -112,17 +113,18 @@ static void compile_entitity(const char *filename,
     }
 
     uint64_t components_obj = ct_cdb_a0->create_object(_G.db, 0);
-    ct_cdb_a0->set_subobject(writer, CT_ID64_0("components"), components_obj);
+    ct_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
 
     uint64_t children_obj = ct_cdb_a0->create_object(_G.db, 0);
-    ct_cdb_a0->set_subobject(writer, CT_ID64_0("children"), children_obj);
+    ct_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
 
 
     if (name_str) {
-        ct_cdb_a0->set_str(writer, CT_ID64_0("name"), name_str);
+        ct_cdb_a0->set_str(writer, ENTITY_NAME, name_str);
     }
 
-    ct_cdb_a0->set_uint64(writer, CT_ID64_0("uid"), uid);
+    ct_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
+
 
     ct_cdb_obj_o *components_writer = ct_cdb_a0->write_begin(components_obj);
     for (uint32_t i = 0; i < components_keys_count; ++i) {

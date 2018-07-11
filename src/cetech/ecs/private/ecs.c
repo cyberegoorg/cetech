@@ -32,10 +32,6 @@
 
 #define _G EntityMaagerGlobals
 
-#define ENTITY_TYPE CT_ID64_0("entity_type")
-#define ENTITY_DATA_IDX  CT_ID64_0("entity_data_idx")
-#define ENTITY_UID CT_ID64_0("entity_uid")
-
 struct entity_storage {
     uint64_t mask;
     uint32_t n;
@@ -470,9 +466,9 @@ static void destroy(struct ct_world world,
                                                   ECS_COMPONENT_REMOVE);
 
         ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(event);
-        ct_cdb_a0->set_uint64(wr, CT_ID64_0("world"), world.h);
-        ct_cdb_a0->set_uint64(wr, CT_ID64_0("entity"), entity[i].h);
-        ct_cdb_a0->set_uint64(wr, CT_ID64_0("comp_mask"), ent_type);
+        ct_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
+        ct_cdb_a0->set_uint64(wr, ENTITY_ENTITY, entity[i].h);
+        ct_cdb_a0->set_uint64(wr, ENTITY_COMP_MASK, ent_type);
         ct_cdb_a0->write_commit(wr);
 
         ct_ebus_a0->broadcast(ECS_EBUS, event);
@@ -549,7 +545,7 @@ static void offline(uint64_t name,
 }
 
 static uint64_t cdb_type() {
-    return CT_ID32_0("entity");
+    return ENTITY_RESOURCE_ID;
 }
 
 static struct ct_entity load(struct ct_resource_id resourceid,
@@ -646,14 +642,14 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
     struct world_instance *w = get_world_instance(world);
     ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(root_obj);
-    ct_cdb_a0->set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ct_cdb_a0->set_uint64(wr, ENTITY_TYPE, 0);
     ct_cdb_a0->set_uint64(wr, ENTITY_DATA_IDX, 0);
     ct_cdb_a0->set_uint64(wr, ENTITY_UID, 0);
     ct_cdb_a0->write_commit(wr);
 
     uint64_t components;
-    components = ct_cdb_a0->read_subobject(root_obj, CT_ID64_0("components"), 0);
+    components = ct_cdb_a0->read_subobject(root_obj, ENTITY_COMPONENTS, 0);
 
     uint32_t components_n = ct_cdb_a0->prop_count(components);
     uint64_t components_keys[components_n];
@@ -689,9 +685,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     }
 
     uint64_t children;
-    children = ct_cdb_a0->read_subobject(root_obj,
-                                         CT_ID64_0("children"),
-                                         0);
+    children = ct_cdb_a0->read_subobject(root_obj, ENTITY_CHILDREN, 0);
     uint32_t children_n = ct_cdb_a0->prop_count(children);
     uint64_t children_keys[children_n];
     ct_cdb_a0->prop_keys(children, children_keys);
@@ -745,7 +739,7 @@ static struct ct_world create_world() {
                                               ECS_WORLD_CREATE);
 
     ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(event);
-    ct_cdb_a0->set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ct_cdb_a0->write_commit(wr);
 
     ct_ebus_a0->broadcast(ECS_EBUS, event);
@@ -759,7 +753,7 @@ static void destroy_world(struct ct_world world) {
             ECS_WORLD_DESTROY);
 
     ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(event);
-    ct_cdb_a0->set_uint64(wr, CT_ID64_0("world"), world.h);
+    ct_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ct_cdb_a0->write_commit(wr);
 
     ct_ebus_a0->broadcast(ECS_EBUS, event);
@@ -837,7 +831,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CT_ID32_0("entity"),
+            .type = ENTITY_RESOURCE_ID,
             .db = ct_cdb_a0->db()
     };
 
@@ -845,8 +839,8 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0->create_ebus(ECS_EBUS_NAME, ECS_EBUS);
 
-    ct_api_a0->register_api("ct_resource_i0", &ct_resource_i0);
-    ct_api_a0->register_on_add(CT_ID64_0("ct_component_i0"), _componet_api_add);
+    ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ct_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 
 static void _shutdown() {

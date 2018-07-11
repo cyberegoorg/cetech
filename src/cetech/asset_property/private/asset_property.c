@@ -34,12 +34,11 @@ static void on_debugui() {
 
     uint64_t obj_type = ct_cdb_a0->type(obj);
 
-    if (obj_type != CT_ID64_0("asset")) {
+    if (obj_type != ASSET_BROWSER_ASSET_TYPE) {
         return;
     }
 
-    uint64_t asset = ct_cdb_a0->read_uint64(obj, CT_ID64_0("asset"), 0);
-//    const char *path = ct_cdb_a0->read_str(obj, CT_ID64_0("path"), 0);
+    uint64_t asset = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET, 0);
 
     struct ct_resource_id rid = {.i64 = asset};
 

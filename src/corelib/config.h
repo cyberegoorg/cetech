@@ -38,7 +38,7 @@ struct ct_config_a0 {
     int (*load_from_yaml_file)(const char *yaml,
                                struct ct_alloc *alloc);
 
-    uint64_t (*config_object)();
+    uint64_t (*object)();
 
     //! Dump all variables to log
     void (*log_all)();

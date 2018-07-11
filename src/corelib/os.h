@@ -18,7 +18,7 @@ struct ct_alloc;
 #define CETECH_ASSERT(where, condition)                                 \
     do {                                                                \
         if (!(condition)) {                                             \
-            ct_os_a0->error_a0->assert(where, #condition, __FILE__, __LINE__); \
+            ct_os_a0->error->assert(where, #condition, __FILE__, __LINE__); \
         }                                                               \
     } while (0)
 #else
@@ -65,18 +65,13 @@ struct ct_path_a0 {
     //! \param files Result files
     //! \param allocator Allocator
     void (*list)(const char *path,
-                 const char *patern,
+                 const char **patern,
+                 uint32_t patern_n,
                  int recursive,
                  int only_dir,
                  char ***files,
                  uint32_t *count,
                  struct ct_alloc *allocator);
-
-    void (*list2)(const char *path,
-                  const char *patern,
-                  int recursive,
-                  int only_dir,
-                  void(*on_item)(const char *filename));
 
     //! Free list dir array
     //! \param files Files array
@@ -382,16 +377,16 @@ struct ct_window_a0 {
 };
 
 struct ct_os_a0 {
-    struct ct_cpu_a0 *cpu_a0;
-    struct ct_error_a0 *error_a0;
-    struct ct_object_a0 *object_a0;
-    struct ct_path_a0 *path_a0;
-    struct ct_process_a0 *process_a0;
-    struct ct_thread_a0 *thread_a0;
-    struct ct_time_a0 *time_a0;
-    struct ct_vio_a0 *vio_a0;
-    struct ct_watchdog_a0 *watchdog_a0;
-    struct ct_window_a0 *window_a0;
+    struct ct_cpu_a0 *cpu;
+    struct ct_error_a0 *error;
+    struct ct_object_a0 *object;
+    struct ct_path_a0 *path;
+    struct ct_process_a0 *process;
+    struct ct_thread_a0 *thread;
+    struct ct_time_a0 *time;
+    struct ct_vio_a0 *vio;
+    struct ct_watchdog_a0 *watchdog;
+    struct ct_window_a0 *window;
 };
 
 CT_MODULE(ct_os_a0);

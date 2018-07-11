@@ -148,14 +148,13 @@ static void update(uint64_t _event) {
 
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
-        uint32_t button = ct_cdb_a0->read_uint64(event, CT_ID64_0("button"), 0);
+        uint32_t button = ct_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
+        uint32_t axis = ct_cdb_a0->read_uint64(event, CONTROLER_AXIS, 0);
         uint32_t gamepad_id = ct_cdb_a0->read_uint64(event,
-                                                     CT_ID64_0("gamepad_id"),
-                                                     0);
-        uint32_t axis = ct_cdb_a0->read_uint64(event, CT_ID64_0("axis"), 0);
+                                                     CONTROLER_GAMEPAD_ID, 0);
 
         float pos[3] = {};
-        ct_cdb_a0->read_vec3(event, CT_ID64_0("position"), pos);
+        ct_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
 
         switch (ct_cdb_a0->type(event)) {
             case EVENT_GAMEPAD_DOWN:
@@ -187,7 +186,7 @@ static void update(uint64_t _event) {
 }
 
 static uint64_t name() {
-    return CT_ID64_0("gamepad");
+    return CONTROLER_GAMEPAD;
 }
 
 static struct ct_controlers_i0 ct_controlers_i0 = {

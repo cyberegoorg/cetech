@@ -48,10 +48,10 @@ void shutdown(uint64_t event) {
 }
 
 void update(uint64_t event) {
-    _G.dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
+    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64_from_str("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {
@@ -69,7 +69,7 @@ void update(uint64_t event) {
 
 //    struct ct_render_texture_handle th = ct_viewport_a0->get_local_resource(
 //            camera_data->viewport,
-//            CT_ID64_0("bb_color"));
+//            CT_ID64_0("bb_color", 0xbc7954e9095ce3c9ULL));
 
     uint32_t w, h;
     w = h = 0;

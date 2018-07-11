@@ -19,6 +19,7 @@
 #include <corelib/os.h>
 #include <cetech/kernel/kernel.h>
 #include <corelib/macros.h>
+#include <cetech/controlers/controlers.h>
 
 
 //==============================================================================
@@ -104,7 +105,7 @@ void sdl_mouse_process() {
                                      EVENT_MOUSE_MOVE);
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-    ct_cdb_a0->set_vec3(w, CT_ID64_0("position"), _G.mouse.position);
+    ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, _G.mouse.position);
     ct_cdb_a0->write_commit(w);
 
 
@@ -116,7 +117,7 @@ void sdl_mouse_process() {
                                              EVENT_MOUSE_DOWN);
 
             w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CT_ID64_0("button"), i);
+            ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ct_cdb_a0->write_commit(w);
 
             ct_ebus_a0->broadcast(MOUSE_EBUS, event);
@@ -126,7 +127,7 @@ void sdl_mouse_process() {
                                              EVENT_MOUSE_UP);
 
             w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CT_ID64_0("button"), i);
+            ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ct_cdb_a0->write_commit(w);
 
             ct_ebus_a0->broadcast(MOUSE_EBUS, event);
@@ -147,7 +148,7 @@ void sdl_keyboard_process() {
                                              EVENT_KEYBOARD_DOWN);
 
             ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CT_ID64_0("keycode"), i);
+            ct_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ct_cdb_a0->write_commit(w);
 
             ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
@@ -158,7 +159,7 @@ void sdl_keyboard_process() {
                                              EVENT_KEYBOARD_UP);
 
             ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CT_ID64_0("keycode"), i);
+            ct_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ct_cdb_a0->write_commit(w);
 
             ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
@@ -289,8 +290,8 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_DOWN);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("button"), j);
+                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -303,8 +304,8 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_UP);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("button"), j);
+                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -329,9 +330,9 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_MOVE);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("gamepad_id"), i);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("axis"), j);
-                ct_cdb_a0->set_vec3(w, CT_ID64_0("position"), pos);
+                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
+                ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -378,11 +379,11 @@ static void _update(float dt) {
                                 EVENT_WINDOW_RESIZED);
 
                         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                        ct_cdb_a0->set_uint64(w, CT_ID64_0("window_id"),
+                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_ID,
                                               e.window.windowID);
-                        ct_cdb_a0->set_uint64(w, CT_ID64_0("width"),
+                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_WIDTH,
                                               e.window.data1);
-                        ct_cdb_a0->set_uint64(w, CT_ID64_0("height"),
+                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_HEIGHT,
                                               e.window.data2);
                         ct_cdb_a0->write_commit(w);
 
@@ -402,7 +403,7 @@ static void _update(float dt) {
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_vec3(w, CT_ID64_0("position"), pos);
+                ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(MOUSE_EBUS, event);
@@ -418,7 +419,7 @@ static void _update(float dt) {
 
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_str(w, CT_ID64_0("text"), e.text.text);
+                ct_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
@@ -434,7 +435,7 @@ static void _update(float dt) {
                         EVENT_GAMEPAD_CONNECT);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CT_ID64_0("gamepad_id"), idx);
+                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, idx);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -459,7 +460,7 @@ static void _update(float dt) {
                             EVENT_GAMEPAD_DISCONNECT);
 
                     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                    ct_cdb_a0->set_uint64(w, CT_ID64_0("gamepad_id"), i);
+                    ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
                     ct_cdb_a0->write_commit(w);
 
                     ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
