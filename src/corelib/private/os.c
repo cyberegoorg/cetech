@@ -3,18 +3,6 @@
 #include <corelib/api_system.h>
 #include "corelib/macros.h"
 
-
-//#include "os_cpu.inl"
-//#include "os_error.inl"
-//#include "os_object.inl"
-//#include "os_path.inl"
-//#include "os_process.inl"
-//#include "os_thread.inl"
-//#include "os_time.inl"
-//#include "os_vio.inl"
-//#include "os_watchdog.inl"
-//#include "os_window_sdl2.inl"
-
 extern struct ct_cpu_a0 cpu_api;
 extern struct ct_error_a0 error_api;
 extern struct ct_object_a0 object_api;

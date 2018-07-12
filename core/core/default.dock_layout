@@ -2,9 +2,9 @@
   index: 0
   label:  Asset browser##asset_browser_dock0
   x: 0
-  y: 531
+  y: 533
   location: ""
-  size_x: 746
+  size_x: 714
   size_y: 234
   status: 0
   active: 1
@@ -13,14 +13,14 @@
   next: 5
   child0: -1
   child1: -1
-  parent: 10
+  parent: 12
 1: 
   index: 1
   label:  Explorer##explorer_dock0
   x: 0
-  y: 22
+  y: 24
   location: ""
-  size_x: 196
+  size_x: 199
   size_y: 509
   status: 0
   active: 1
@@ -29,12 +29,12 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 9
+  parent: 10
 2: 
   index: 2
   label:  Property editor##property_editor_dock0
   x: 715
-  y: 22
+  y: 24
   location: ""
   size_x: 309
   size_y: 509
@@ -50,7 +50,7 @@
   index: 3
   label: Command history##command_history_dock0
   x: 715
-  y: 22
+  y: 24
   location: ""
   size_x: 309
   size_y: 509
@@ -65,10 +65,10 @@
 4: 
   index: 4
   label: Asset preview##asset_preview_dock0
-  x: 746
-  y: 531
+  x: 714
+  y: 533
   location: ""
-  size_x: 278
+  size_x: 310
   size_y: 234
   status: 0
   active: 1
@@ -77,14 +77,14 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 10
+  parent: 12
 5: 
   index: 5
   label: Log view##log_view_dock0
   x: 0
-  y: 531
+  y: 533
   location: ""
-  size_x: 746
+  size_x: 714
   size_y: 234
   status: 0
   active: 0
@@ -93,28 +93,28 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 10
+  parent: 12
 6: 
   index: 6
   label:  Entity editor##entity_editor_dock0
   x: 196
-  y: 22
+  y: 24
   location: ""
   size_x: 519
   size_y: 509
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 9
+  parent: -1
 7: 
   index: 7
   label: ""
   x: 0
-  y: 22
+  y: 24
   location: ""
   size_x: 1024
   size_y: 743
@@ -124,13 +124,13 @@
   prev: -1
   next: -1
   child0: 8
-  child1: 10
+  child1: 12
   parent: -1
 8: 
   index: 8
   label: ""
   x: 0
-  y: 22
+  y: 24
   location: ""
   size_x: 1024
   size_y: 509
@@ -139,14 +139,30 @@
   opened: 0
   prev: -1
   next: -1
-  child0: 9
+  child0: 10
   child1: 2
   parent: 7
 9: 
   index: 9
+  label:  Editor##editor_dock0
+  x: 199
+  y: 24
+  location: ""
+  size_x: 516
+  size_y: 509
+  status: 0
+  active: 0
+  opened: 1
+  prev: -1
+  next: 11
+  child0: -1
+  child1: -1
+  parent: 10
+10: 
+  index: 10
   label: ""
   x: 0
-  y: 22
+  y: 24
   location: ""
   size_x: 715
   size_y: 509
@@ -156,13 +172,29 @@
   prev: -1
   next: -1
   child0: 1
-  child1: 6
+  child1: 9
   parent: 8
-10: 
-  index: 10
+11: 
+  index: 11
+  label:  Editor##editor_dock1
+  x: 199
+  y: 24
+  location: ""
+  size_x: 516
+  size_y: 509
+  status: 0
+  active: 1
+  opened: 1
+  prev: 9
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 10
+12: 
+  index: 12
   label: ""
   x: 0
-  y: 531
+  y: 533
   location: ""
   size_x: 1024
   size_y: 234

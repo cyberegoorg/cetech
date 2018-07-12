@@ -128,6 +128,7 @@ set(SOURCE_FILES
         src/cetech/camera/private/camera.c
 
         src/cetech/entity_editor/private/entity_editor.c
+        src/cetech/editor/private/editor.c
         src/cetech/ecs/private/entity_property.c
         src/cetech/explorer/private/explorer.c
         src/cetech/asset_preview/private/asset_preview.c
