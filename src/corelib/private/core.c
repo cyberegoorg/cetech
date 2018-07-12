@@ -6,8 +6,6 @@
 #include "corelib/private/api_private.h"
 
 void memory_register_api(struct ct_api_a0 *api);
-void logsystem_init();
-void logsystem_shutdown();
 
 
 bool ct_corelib_init() {
