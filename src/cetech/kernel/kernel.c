@@ -104,11 +104,12 @@ int cetech_kernel_init(int argc,
 
     _G = (struct KernelGlobals) {
             .allocator = ct_memory_a0->system,
-            .config_object  = ct_config_a0->object(),
+            .config_object  = ct_config_a0->obj(),
     };
 
-    init_config(argc, argv, ct_config_a0->object());
+    init_config(argc, argv, ct_config_a0->obj());
 
+    CETECH_ADD_STATIC_MODULE(builddb);
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 
@@ -154,7 +155,7 @@ void application_quit() {
 
 
 void _init_config() {
-    _G.config_object = ct_config_a0->object();
+    _G.config_object = ct_config_a0->obj();
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config_object);
 
@@ -163,7 +164,7 @@ void _init_config() {
     }
 
     if (!ct_cdb_a0->prop_exist(_G.config_object, CONFIG_GAME)) {
-        ct_cdb_a0->set_str(writer, CONFIG_GAME, "playground");
+        ct_cdb_a0->set_str(writer, CONFIG_GAME, "editor");
     }
 
     if (!ct_cdb_a0->prop_exist(_G.config_object, CONFIG_DAEMON)) {
@@ -188,11 +189,11 @@ void _init_config() {
 static void _boot_stage() {
     const char *boot_pkg_str = ct_cdb_a0->read_str(_G.config_object,
                                                    CONFIG_BOOT_PKG, "");
-    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
-    uint32_t pkg = CT_ID32_0("package");
+    uint64_t boot_pkg = ct_hashlib_a0->id64(boot_pkg_str);
+    uint64_t pkg = PACKAGE_TYPE;
 
-    uint32_t core_pkg = CT_ID32_0("core/core");
-    uint32_t resources[] = {core_pkg, boot_pkg};
+    uint64_t core_pkg = ct_hashlib_a0->id64("core/core");
+    uint64_t resources[] = {core_pkg, boot_pkg};
 
     ct_resource_a0->load_now(pkg, resources, 2);
 
@@ -206,12 +207,12 @@ static void _boot_stage() {
 static void _boot_unload() {
     const char *boot_pkg_str = ct_cdb_a0->read_str(_G.config_object,
                                                    CONFIG_BOOT_PKG, "");
-    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
+    uint64_t boot_pkg = ct_hashlib_a0->id64(boot_pkg_str);
 
-    uint32_t core_pkg = CT_ID32_0("core/core");
-    uint32_t pkg = CT_ID32_0("package");
+    uint64_t core_pkg = ct_hashlib_a0->id64("core/core");
+    uint64_t pkg = ct_hashlib_a0->id64("package");
 
-    uint32_t resources[] = {core_pkg, boot_pkg};
+    uint64_t resources[] = {core_pkg, boot_pkg};
 
     ct_package_a0->unload(boot_pkg);
     ct_package_a0->unload(core_pkg);
@@ -227,6 +228,7 @@ static void on_quit(uint64_t event) {
 }
 
 static void cetech_kernel_start() {
+
     _init_config();
 
     if (ct_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
@@ -270,8 +272,7 @@ static void cetech_kernel_start() {
         ct_cdb_a0->gc();
     }
 
-    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
-                                     KERNEL_SHUTDOWN_EVENT);
+    event = ct_cdb_a0->create_object(ct_cdb_a0->db(), KERNEL_SHUTDOWN_EVENT);
 
     ct_ebus_a0->broadcast(KERNEL_EBUS, event);
 
