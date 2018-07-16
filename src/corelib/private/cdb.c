@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdatomic.h>
+
 #include <sys/mman.h>
 
 #include <corelib/macros.h>
@@ -10,7 +12,6 @@
 #include <corelib/module.h>
 #include <corelib/allocator.h>
 #include <corelib/hash.inl>
-#include <corelib/hashlib.h>
 #include <corelib/os.h>
 
 
@@ -18,6 +19,8 @@
 #define LOG_WHERE "coredb"
 
 #define MAX_OBJECTS 1000000000ULL
+#define MAX_FREE_OBJECT_POOL 10000
+#define MAX_FREE_OBJECT_ID_POOL 10000
 
 // TODO: non optimal braindump code
 // TODO: remove null element
@@ -39,6 +42,7 @@ struct object_t {
 //    uint64_t *children;
 
     // writer
+    uint64_t orig_data_idx;
     uint64_t obj;
     uint64_t *changed_prop;
 
@@ -60,10 +64,13 @@ struct db_t {
     uint32_t idx;
 
     // id pool
-    uint64_t* objects_mem;
-    uint64_t object_used;
+    uint64_t *objects_mem;
+    atomic_ullong object_used;
+
     uint32_t *free_objects_id;
     uint32_t *to_free_objects_id;
+    atomic_ullong to_free_objects_id_n;
+    atomic_ullong free_objects_id_n;
 
 //    // Hiearchy
 //    uint32_t *first_child;
@@ -74,6 +81,10 @@ struct db_t {
     struct object_t *object_pool;
     uint32_t *free_objects;
     uint32_t *to_free_objects;
+
+    atomic_ullong object_pool_n;
+    atomic_ullong free_objects_n;
+    atomic_ullong to_free_objects_n;
 };
 
 static struct _G {
@@ -106,13 +117,13 @@ union type_u {
     struct blob_t blob;
 };
 
-static struct object_t* _get_object_from_objid(uint64_t objid) {
+static struct object_t *_get_object_from_objid(uint64_t objid) {
     uint64_t idx = *(uint64_t *) objid;
 
     return &_G.dbs[0].object_pool[idx];
 }
 
-static struct object_t* _get_object_from_obj_o(ct_cdb_obj_o *obj_o) {
+static struct object_t *_get_object_from_obj_o(ct_cdb_obj_o *obj_o) {
     uint64_t idx = (uint64_t) obj_o;
 
     return &_G.dbs[0].object_pool[idx];
@@ -144,15 +155,17 @@ static uint64_t _object_new_property(struct object_t *obj,
 
 struct object_t *_new_object(struct db_t *db,
                              const struct ct_alloc *a) {
-    uint32_t idx;
 
-    if (ct_array_size(db->free_objects)) {
-        idx = ct_array_back(db->free_objects);
-        ct_array_pop_back(db->free_objects);
+    uint32_t idx;
+    if (db->free_objects_n) {
+        atomic_fetch_sub(&db->free_objects_n, 1);
+        idx = db->free_objects[db->free_objects_n];
     } else {
-        idx = ct_array_size(db->object_pool);
-        ct_array_push(db->object_pool, ((struct object_t) {0}), a);
+        idx = atomic_fetch_add(&db->object_pool_n, 1);
+
+        db->object_pool[idx] = (struct object_t) {0};
     }
+
 
     struct object_t *obj = &db->object_pool[idx];
     obj->idx = idx;
@@ -160,6 +173,18 @@ struct object_t *_new_object(struct db_t *db,
 
     _object_new_property(obj, 0, CDB_TYPE_NONE, NULL, 0, a);
     return obj;
+}
+
+static uint64_t _new_object_id(struct db_t *db_inst) {
+    uint64_t idx = 0;
+    if (db_inst->free_objects_id_n) {
+        atomic_fetch_sub(&db_inst->free_objects_id_n, 1);
+        idx = db_inst->free_objects_id[db_inst->free_objects_id_n];
+    } else {
+        idx = atomic_fetch_add(&db_inst->object_used, 1);
+    }
+
+    return idx;
 }
 
 static struct object_t *_object_clone(struct db_t *db,
@@ -216,37 +241,58 @@ static uint64_t _find_prop_index(const struct object_t *obj,
 
 static void _destroy_object(struct object_t *obj) {
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
-    ct_array_push(db_inst->to_free_objects, obj->idx, _G.allocator);
 
+    uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_n, 1);
+    db_inst->to_free_objects[idx] = obj->idx;
 }
 
 static struct ct_cdb_t create_db() {
     uint64_t idx = ct_array_size(_G.dbs);
 
     struct db_t db = (struct db_t) {
-            .objects_mem = (uint64_t*) mmap(
-                    NULL,
-                    MAX_OBJECTS * sizeof(uint64_t),
-                    PROT_READ | PROT_WRITE,
-                    MAP_PRIVATE | MAP_ANONYMOUS,
-                    -1, 0),
-            .idx = idx
+            .idx = idx,
+
+            .objects_mem = (uint64_t *) mmap(NULL,
+                                             MAX_OBJECTS * sizeof(uint64_t),
+                                             PROT_READ | PROT_WRITE,
+                                             MAP_PRIVATE | MAP_ANONYMOUS,
+                                             -1, 0),
+
+
+            .free_objects_id = (uint32_t *) mmap(NULL,
+                                                 MAX_OBJECTS * sizeof(uint32_t),
+                                                 PROT_READ | PROT_WRITE,
+                                                 MAP_PRIVATE | MAP_ANONYMOUS,
+                                                 -1, 0),
+
+            .to_free_objects_id = (uint32_t *) mmap(NULL,
+                                                    MAX_OBJECTS *
+                                                    sizeof(uint32_t),
+                                                    PROT_READ | PROT_WRITE,
+                                                    MAP_PRIVATE | MAP_ANONYMOUS,
+                                                    -1, 0),
+            .object_pool = (struct object_t *) mmap(NULL,
+                                                    MAX_OBJECTS *
+                                                    sizeof(struct object_t),
+                                                    PROT_READ | PROT_WRITE,
+                                                    MAP_PRIVATE | MAP_ANONYMOUS,
+                                                    -1, 0),
+            .free_objects = (uint32_t *) mmap(NULL,
+                                              MAX_OBJECTS * sizeof(uint32_t),
+                                              PROT_READ | PROT_WRITE,
+                                              MAP_PRIVATE | MAP_ANONYMOUS,
+                                              -1, 0),
+
+            .to_free_objects = (uint32_t *) mmap(NULL,
+                                                 MAX_OBJECTS * sizeof(uint32_t),
+                                                 PROT_READ | PROT_WRITE,
+                                                 MAP_PRIVATE | MAP_ANONYMOUS,
+                                                 -1, 0)
     };
 
     ct_array_push(_G.dbs, db, _G.allocator);
     return (struct ct_cdb_t) {.idx = idx};
 };
-
-static uint64_t _new_object_id(struct db_t *db_inst) {
-    uint64_t idx = 0;
-    if (ct_array_size(db_inst->free_objects_id)) {
-        idx = ct_array_back(db_inst->free_objects_id);
-        ct_array_pop_back(db_inst->free_objects_id);
-    } else {
-        idx = db_inst->object_used++;
-    }
-    return idx;
-}
 
 static uint64_t create_object(struct ct_cdb_t db,
                               uint64_t type) {
@@ -255,7 +301,7 @@ static uint64_t create_object(struct ct_cdb_t db,
 
     uint64_t idx = _new_object_id(db_inst);
 
-    uint64_t* obj_addr = db_inst->objects_mem + idx;
+    uint64_t *obj_addr = db_inst->objects_mem + idx;
 
     *obj_addr = obj->idx;
     obj->db = db;
@@ -277,13 +323,13 @@ static uint64_t create_from(struct ct_cdb_t db,
     struct db_t *db_inst = &_G.dbs[db.idx];
 
     struct object_t *obj = _get_object_from_objid(_obj);
-    
+
     struct object_t *inst = _new_object(db_inst, _G.allocator);
     inst->db = db;
 
     uint64_t idx = _new_object_id(db_inst);
 
-    uint64_t* obj_addr = db_inst->objects_mem + idx;
+    uint64_t *obj_addr = db_inst->objects_mem + idx;
 
     *obj_addr = inst->idx;
 
@@ -326,13 +372,14 @@ static void destroy_db(struct ct_cdb_t db) {
 }
 
 static void destroy_object(uint64_t _obj) {
+
     struct object_t *obj = _get_object_from_objid(_obj);
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
+    uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
 
-    ct_array_push(db_inst->to_free_objects_id,
-                  ((uint64_t*) _obj) - db_inst->objects_mem,
-                  _G.allocator);
+    db_inst->to_free_objects_id[idx] = \
+            ((uint64_t *) _obj) - db_inst->objects_mem;
 
     for (int i = 1; i < obj->properties_count; ++i) {
         switch (obj->property_type[i]) {
@@ -350,6 +397,7 @@ static void destroy_object(uint64_t _obj) {
                 break;
         }
     }
+
 }
 
 
@@ -358,20 +406,21 @@ static void gc() {
     for (int i = 0; i < db_n; ++i) {
         struct db_t *db_inst = &_G.dbs[i];
 
-        const uint32_t to_free_objects_id_n =
-                ct_array_size(db_inst->to_free_objects_id);
+        const uint32_t to_free_objects_id_n = db_inst->to_free_objects_id_n;
 
         for (int j = 0; j < to_free_objects_id_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects_id[j];
 
-            uint64_t* obj_addr = db_inst->objects_mem + idx;
+            uint64_t *obj_addr = db_inst->objects_mem + idx;
             struct object_t *obj = _get_object_from_objid((uint64_t) obj_addr);
 
             if (obj->prefab) {
-                struct object_t *prefab_obj = _get_object_from_objid(
-                        obj->prefab);
-                const uint32_t instances_n = ct_array_size(
-                        prefab_obj->instances);
+                struct object_t *prefab_obj = \
+                    _get_object_from_objid(obj->prefab);
+
+                const uint32_t instances_n = \
+                    ct_array_size(prefab_obj->instances);
+
                 const uint32_t last_idx = instances_n - 1;
                 for (int k = 0; k < instances_n; ++k) {
                     if (prefab_obj->instances[k] != obj->obj) {
@@ -387,15 +436,12 @@ static void gc() {
 
             _destroy_object(obj);
 
-            ct_array_push(db_inst->free_objects_id, idx, _G.allocator);
+            db_inst->free_objects_id[atomic_fetch_add(&db_inst->free_objects_id_n, 1)] = idx;
         }
 
-        if (to_free_objects_id_n) {
-            ct_array_resize(db_inst->to_free_objects_id, 0, _G.allocator);
-        }
+        db_inst->to_free_objects_id_n = 0;
 
-        const uint32_t to_free_objects_n = ct_array_size(
-                db_inst->to_free_objects);
+        const uint32_t to_free_objects_n = db_inst->to_free_objects_n;
         for (int j = 0; j < to_free_objects_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects[j];
 
@@ -426,12 +472,10 @@ static void gc() {
                     .notify = obj->notify,
             };
 
-            ct_array_push(db_inst->free_objects, idx, _G.allocator);
+            db_inst->free_objects[atomic_fetch_add(&db_inst->free_objects_n, 1)] = idx;
         }
 
-        if (to_free_objects_n) {
-            ct_array_clean(db_inst->to_free_objects);
-        }
+        db_inst->to_free_objects_n = 0;
     }
 }
 
@@ -562,7 +606,7 @@ static void load(struct ct_cdb_t db,
     header = (const struct cdb_binobj_header *) input;
 
     struct object_t *obj = _get_object_from_objid(_obj);
-    if(!obj->type) {
+    if (!obj->type) {
         obj->type = header->type;
     }
 
@@ -668,6 +712,8 @@ static ct_cdb_obj_o *write_begin(uint64_t _obj) {
     struct object_t *new_obj = _object_clone(db_inst,
                                              obj,
                                              _G.allocator);
+    new_obj->orig_data_idx = obj->idx;
+
     new_obj->obj = _obj;
 
     return (void *) new_obj->idx;
@@ -695,7 +741,7 @@ static void write_commit(ct_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
     struct object_t *orig_obj = _get_object_from_objid(writer->obj);
 
-    uint64_t* obj_addr = (uint64_t *) writer->obj;
+    uint64_t *obj_addr = (uint64_t *) writer->obj;
 
     *obj_addr = writer->idx;
 
@@ -705,6 +751,27 @@ static void write_commit(ct_cdb_obj_o *_writer) {
 
     _destroy_object(orig_obj);
 }
+
+static bool write_try_commit(ct_cdb_obj_o *_writer) {
+    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *orig_obj = _get_object_from_objid(writer->obj);
+
+    uint64_t *obj_addr = (uint64_t *) writer->obj;
+
+    bool ok = atomic_compare_exchange_weak((atomic_ullong *) obj_addr,
+                                           &writer->orig_data_idx, writer->idx);
+
+    if (!ok) {
+        goto end;
+    }
+
+    _notify(writer->obj, writer->changed_prop);
+
+    end:
+    _destroy_object(orig_obj);
+    return ok;
+}
+
 
 static void set_float(ct_cdb_obj_o *_writer,
                       uint64_t property,
@@ -897,8 +964,6 @@ static void set_ref(ct_cdb_obj_o *_writer,
 void set_subobject(ct_cdb_obj_o *_writer,
                    uint64_t property,
                    uint64_t subobject) {
-    CETECH_ASSERT(LOG_WHERE, subobject);
-
     struct object_t *writer = _get_object_from_obj_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
@@ -915,8 +980,13 @@ void set_subobject(ct_cdb_obj_o *_writer,
                                                 writer->offset[idx]);
     value_ptr->subobj = subobject;
 
-    struct object_t *subobj = _get_object_from_objid(subobject);
-    subobj->parent = writer->obj;
+    if (subobject) {
+        ct_cdb_obj_o *w = ct_cdb_a0->write_begin(subobject);
+        struct object_t *subobj = _get_object_from_obj_o(w);
+        subobj->parent = writer->obj;
+        ct_cdb_a0->write_commit(w);
+    }
+
 }
 
 void set_blob(ct_cdb_obj_o *_writer,
@@ -1275,7 +1345,8 @@ static uint64_t type(uint64_t _obj) {
     return obj->type;
 }
 
-void set_type(uint64_t _obj, uint64_t type) {
+void set_type(uint64_t _obj,
+              uint64_t type) {
     struct object_t *obj = _get_object_from_objid(_obj);
     obj->type = type;
 }
@@ -1323,6 +1394,7 @@ static struct ct_cdb_a0 cdb_api = {
 
         .write_begin = write_begin,
         .write_commit = write_commit,
+        .write_try_commit = write_try_commit,
 
         .set_float = set_float,
         .set_bool = set_bool,
