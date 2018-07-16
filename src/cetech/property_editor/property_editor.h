@@ -12,20 +12,21 @@
 //==============================================================================
 // Typedefs
 //==============================================================================
-typedef void (*ct_pi_on_debugui)();
 
 //==============================================================================
 // Api
 //==============================================================================
 
+#define PROPERTY_EDITOR_INTERFACE_NAME \
+    "ct_property_editor_i0"
+
+#define PROPERTY_EDITOR_INTERFACE \
+    CT_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)
+
+
 struct ct_property_editor_i0 {
-    void (*draw)();
+    void (*draw_ui)();
 };
 
-struct ct_property_editor_a0 {
-
-};
-
-CT_MODULE(ct_property_editor_a0);
 
 #endif //CETECH_PROPERTY_INSPECTOR_H

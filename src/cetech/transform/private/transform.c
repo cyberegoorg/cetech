@@ -16,6 +16,8 @@
 #include <cetech/ecs/entity_property.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <corelib/yng.h>
+#include <cetech/editor_ui/editor_ui.h>
 
 #include "corelib/module.h"
 
@@ -42,8 +44,6 @@ struct WorldInstance {
 
 #define _G TransformGlobal
 static struct _G {
-    uint64_t type;
-
 //    struct ct_hash_t world_map;
 //    struct WorldInstance *world_instances;
 //    struct ct_hash_t ent_map;
@@ -208,13 +208,14 @@ static void _on_component_obj_change(uint64_t obj,
     uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
 
     struct ct_world world = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, CT_ID64_0("world"), 0)
+            .h = ct_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
     };
 
     struct ct_entity ent = {.h = ent_obj};
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT, ent);
+    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
+                                                  ent);
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
     ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
@@ -224,7 +225,8 @@ static void _on_component_obj_change(uint64_t obj,
 }
 
 
-static void _component_spawner(uint64_t obj, void* data) {
+static void _component_spawner(uint64_t obj,
+                               void *data) {
     struct ct_transform_comp *transform = data;
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
@@ -237,7 +239,7 @@ static void _component_spawner(uint64_t obj, void* data) {
 }
 
 static uint64_t cdb_type() {
-    return CT_ID64_0("transform");
+    return TRANSFORM_COMPONENT;
 }
 
 static const char *display_name() {
@@ -245,14 +247,12 @@ static const char *display_name() {
 }
 
 static void property_editor(uint64_t obj) {
-    ct_entity_property_a0->ui_vec3(obj,
-                                   CT_ID64_0("position"), "Position", 0, 0);
+    ct_editor_ui_a0->ui_vec3(obj, PROP_POSITION, "Position", 0, 0);
 
-    ct_entity_property_a0->ui_vec3(obj,
-                                   CT_ID64_0("rotation"), "Rotation",
+    ct_editor_ui_a0->ui_vec3(obj, PROP_ROTATION, "Rotation",
                                    -360.0f, 360.0f);
 
-    ct_entity_property_a0->ui_vec3(obj, CT_ID64_0("scale"), "Scale", 0, 0);
+    ct_editor_ui_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
 }
 
 void guizmo_get_transform(uint64_t obj,
@@ -333,17 +333,17 @@ static struct ct_component_i0 ct_component_i0 = {
         .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
-                .compiler = _component_compiler,
-                        .spawner = _component_spawner,
+        .compiler = _component_compiler,
+        .spawner = _component_spawner,
 };
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CT_ID64_0("transform"),
+
     };
 
-    api->register_api("ct_component_i0", &ct_component_i0);
+    api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
 }
 
 static void _shutdown() {
@@ -353,14 +353,14 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         transform,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_yng_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_log_a0);
         },
         {
             CT_UNUSED(reload);

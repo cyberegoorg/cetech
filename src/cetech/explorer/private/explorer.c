@@ -20,20 +20,19 @@
 #include <cetech/dock/dock.h>
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/explorer/explorer.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/selected_object/selected_object.h>
 
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #define WINDOW_NAME "Explorer"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("explorer")
 
 #define _G explorer_globals
 static struct _G {
     bool visible;
 
-    uint32_t ent_name;
+    uint64_t ent_name;
 
     const char *path;
     struct ct_alloc *allocator;
@@ -41,16 +40,17 @@ static struct _G {
 
 
 void set_level(uint64_t obj) {
-    uint64_t asset = ct_cdb_a0->read_uint64(obj, CT_ID64_0("asset"), 0);
-    const char *path = ct_cdb_a0->read_str(obj, CT_ID64_0("path"), 0);
+    uint64_t asset_type = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t asset_name = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_NAME, 0);
+    const char *path = ct_cdb_a0->read_str(obj, ASSET_BROWSER_PATH, 0);
 
-    struct ct_resource_id rid = {.i64 = asset};
+    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
     if (_G.ent_name == rid.name) {
         return;
     }
 
-    if(rid.type != CT_ID32_0("entity")) {
+    if(rid.type != ENTITY_RESOURCE_ID) {
         _G.ent_name = 0;
         _G.path = NULL;
 
@@ -76,14 +76,13 @@ static void ui_entity_item_begin(uint64_t obj,
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    uint64_t children = ct_cdb_a0->read_subobject(obj, CT_ID64_0("children"),
-                                                  0);
+    uint64_t children = ct_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
 
     const uint32_t children_n = ct_cdb_a0->prop_count(children);
 
 
     uint64_t components;
-    components = ct_cdb_a0->read_subobject(obj, CT_ID64_0("components"), 0);
+    components = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
     const uint32_t component_n = ct_cdb_a0->prop_count(components);
     if (!children_n && !component_n) {
@@ -91,8 +90,8 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 
     char name[128] = {0};
-    uint64_t uid = ct_cdb_a0->read_uint64(obj, CT_ID64_0("uid"), 0);
-    const char *ent_name = ct_cdb_a0->read_str(obj, CT_ID64_0("name"), NULL);
+    uint64_t uid = ct_cdb_a0->read_uint64(obj, ENTITY_UID, 0);
+    const char *ent_name = ct_cdb_a0->read_str(obj, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
     } else {
@@ -170,15 +169,15 @@ static void ui_entity_item_begin(uint64_t obj,
 static void on_debugui(struct ct_dock_i0 *dock) {
     uint64_t selected_object = ct_selected_object_a0->selected_object();
     if (selected_object &&
-        (ct_cdb_a0->type(selected_object) == CT_ID64_0("asset"))) {
+        (ct_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
         set_level(selected_object);
     }
 
-    ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
+    ct_debugui_a0->LabelText("Entity", "%llu", _G.ent_name);
 
     if (_G.path) {
         struct ct_resource_id rid = (struct ct_resource_id) {
-                .type = CT_ID32_0("entity"),
+                .type = ENTITY_RESOURCE_ID,
                 .name = _G.ent_name,
         };
 
@@ -212,7 +211,7 @@ static void _init(struct ct_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api("ct_dock_i0", &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
@@ -222,12 +221,12 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         level_inspector,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_resource_a0);
         },
         {
             CT_UNUSED(reload);

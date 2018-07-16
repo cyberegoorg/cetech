@@ -56,7 +56,7 @@ static void fill_button(struct shortcut *sc) {
     }
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     for (int i = 0; i < count; ++i) {
         if (!strcmp(begin[i], "shift")) {
@@ -102,7 +102,7 @@ static void execute(uint64_t name) {
 
 static void check() {
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
     const uint32_t lshift = keyboard->button_index("lshift");
@@ -192,8 +192,8 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         action_manager,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
         },
         {
             CT_UNUSED(reload);

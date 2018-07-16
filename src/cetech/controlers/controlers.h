@@ -9,6 +9,29 @@
 #include <stdint.h>
 #include <corelib/module.inl>
 
+
+#define CONTROLERS_I \
+    CT_ID64_0("ct_controlers_i0", 0x38a3a48646b9f277ULL)
+
+#define CONTROLER_BUTTON \
+    CT_ID64_0("button", 0x1e232360426fac96ULL)
+
+#define CONTROLER_AXIS \
+    CT_ID64_0("axis", 0xeb6778864cd804e1ULL)
+
+#define CONTROLER_POSITION \
+    CT_ID64_0("position", 0x8bbeb160190f613aULL)
+
+#define CONTROLER_KEYCODE \
+    CT_ID64_0("keycode", 0xe8153a02000cbab3ULL)
+
+#define CONTROLER_TEXT \
+    CT_ID64_0("text", 0x887e193c80929e7ULL)
+
+#define CONTROLER_ID \
+    CT_ID64_0("id", 0xb0d09cc783d6a0ecULL)
+
+
 //==============================================================================
 // Api
 //==============================================================================
@@ -78,7 +101,7 @@ struct ct_controlers_i0 {
 };
 
 struct ct_controlers_a0 {
-    struct ct_controlers_i0* (*get_by_name)(uint64_t name);
+    struct ct_controlers_i0* (*get)(uint64_t name);
 };
 
 CT_MODULE(ct_controlers_a0);

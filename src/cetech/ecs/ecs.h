@@ -11,11 +11,51 @@
 
 #define ECS_EBUS_NAME "ecs"
 
-#define PREFAB_NAME_PROP CT_ID64_0("prefab_filename")
-#define EDITOR_COMPONENT CT_ID64_0("ct_editor_component_i0")
+#define PREFAB_NAME_PROP \
+    CT_ID64_0("prefab_filename", 0x74e7f49a67b7125fULL)
 
-#define ENTITY_INSTANCE CT_ID64_0("entity")
-#define ENTITY_RESOURCE CT_ID64_0("entity_resource")
+#define EDITOR_COMPONENT \
+    CT_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
+
+#define COMPONENT_I \
+    CT_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
+
+#define ENTITY_INSTANCE \
+    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
+
+#define ENTITY_RESOURCE \
+    CT_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
+
+#define ENTITY_TYPE \
+    CT_ID64_0("entity_type", 0x61c464fe6c327f9fULL)
+
+#define ENTITY_DATA_IDX  \
+    CT_ID64_0("entity_data_idx", 0x1fa649061369a0eeULL)
+
+#define ENTITY_UID \
+    CT_ID64_0("entity_uid", 0xa3b266878c572abdULL)
+
+#define ENTITY_NAME \
+    CT_ID64_0("name", 0xd4c943cba60c270bULL)
+
+#define ENTITY_WORLD \
+    CT_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
+
+#define ENTITY_ENTITY \
+    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
+
+#define ENTITY_COMP_MASK \
+    CT_ID64_0("comp_mask", 0xc0e85dc84a0c5297ULL)
+
+#define ENTITY_COMPONENTS \
+    CT_ID64_0("components", 0xe71d1687374e5a54ULL)
+
+#define ENTITY_CHILDREN \
+    CT_ID64_0("children", 0x6fbb13de0e1dce0dULL)
+
+#define ENTITY_RESOURCE_ID \
+    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
+
 
 enum {
     ECS_EBUS = 0x3c870dac
@@ -25,7 +65,6 @@ enum {
     ECS_INVALID_EVENT = 0,
     ECS_WORLD_CREATE,
     ECS_WORLD_DESTROY,
-    ECS_COMPONENT_REMOVE,
 };
 
 struct ct_cdb_obj_t;
@@ -60,9 +99,16 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
+typedef void ct_cdb_obj_o;
 //==============================================================================
 // Api
 //==============================================================================
+
+#define COMPONENT_INTERFACE_NAME \
+    "ct_component_i0"
+
+#define COMPONENT_INTERFACE \
+    CT_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
 struct ct_component_i0 {
     uint64_t (*size)();
@@ -100,22 +146,28 @@ struct ct_component_a0 {
 
     uint64_t (*mask)(uint64_t component_name);
 
-    void *(*entities_data)(uint64_t component_name,
-                           ct_entity_storage_t *item);
+    void *(*get_all)(uint64_t component_name,
+                     ct_entity_storage_t *item);
 
-    void *(*entity_data)(struct ct_world world,
-                         uint64_t component_name,
-                         struct ct_entity entity);
+    void *(*get_one)(struct ct_world world,
+                     uint64_t component_name,
+                     struct ct_entity entity);
+
+    void (*add)(struct ct_world world,
+                struct ct_entity ent,
+                uint64_t *component_name,
+                uint32_t name_count);
+
+    void (*remove)(struct ct_world world,
+                   struct ct_entity ent,
+                   uint64_t *component_name,
+                   uint32_t name_count);
 };
 
 struct ct_entity_a0 {
     struct ct_world (*create_world)();
 
     void (*destroy_world)(struct ct_world world);
-
-
-    uint64_t (*cdb_object)(struct ct_world world,
-                           struct ct_entity entity);
 
     void (*create)(struct ct_world world,
                    struct ct_entity *entity,
@@ -129,7 +181,7 @@ struct ct_entity_a0 {
                   struct ct_entity entity);
 
     struct ct_entity (*spawn)(struct ct_world world,
-                              uint32_t name);
+                              uint64_t name);
 
     struct ct_entity (*find_by_uid)(struct ct_world world,
                                     struct ct_entity root,
@@ -143,22 +195,9 @@ struct ct_entity_a0 {
                 struct ct_entity ent,
                 uint64_t *component_name,
                 uint32_t name_count);
-
-    void (*add_components)(struct ct_world world,
-                           struct ct_entity ent,
-                           uint64_t *component_name,
-                           uint32_t name_count);
-
-    void (*remove_components)(struct ct_world world,
-                              struct ct_entity ent,
-                              uint64_t *component_name,
-                              uint32_t name_count);
 };
 
-struct ct_ecs_a0 {
-    struct ct_component_a0 *component;
-    struct ct_entity_a0 *entity;
-
+struct ct_system_a0 {
     void (*simulate)(struct ct_world world,
                      float dt);
 
@@ -169,6 +208,12 @@ struct ct_ecs_a0 {
 
     void (*register_simulation)(const char *name,
                                 ct_simulate_fce_t simulation);
+};
+
+struct ct_ecs_a0 {
+    struct ct_entity_a0 *entity;
+    struct ct_component_a0 *component;
+    struct ct_system_a0 *system;
 };
 
 CT_MODULE(ct_ecs_a0);

@@ -9,7 +9,8 @@
 
 struct ct_resource_id;
 
-#define ASSET_PROPERTY CT_ID64_0("ct_asset_property_i0")
+#define ASSET_PROPERTY \
+    CT_ID64_0("ct_asset_property_i0", 0x4f214fca2968dbc1ULL)
 
 struct ct_asset_property_i0 {
     const char* (*display_name)();

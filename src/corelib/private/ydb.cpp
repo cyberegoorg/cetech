@@ -37,17 +37,17 @@ void expire_document_in_cache(const char *path,
         return;
     }
 
-    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread->spin_lock(&_G.cache_lock);
     ct_yng_doc *doc = _G.document_cache[idx];
     ct_hash_remove(&_G.document_cache_map, path_key);
     ct_yng_a0->destroy(doc);
-    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread->spin_unlock(&_G.cache_lock);
 }
 
 ct_yng_doc *load_to_cache(const char *path,
                           uint64_t path_key) {
 
-    static const uint64_t fs_root = CT_ID64_0("source");
+    static const uint64_t fs_root = ct_hashlib_a0->id64("source");
 
     ct_log_a0->debug(LOG_WHERE, "Load file %s to cache", path);
 
@@ -67,7 +67,7 @@ ct_yng_doc *load_to_cache(const char *path,
         return NULL;
     }
 
-    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread->spin_lock(&_G.cache_lock);
     uint32_t idx = ct_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
     if (UINT32_MAX == idx) {
         ct_array_push(_G.document_cache, doc, _G.allocator);
@@ -78,25 +78,25 @@ ct_yng_doc *load_to_cache(const char *path,
     } else {
         _G.document_cache[idx] = doc;
     }
-    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread->spin_unlock(&_G.cache_lock);
 
     return doc;
 }
 
 ct_yng_doc *get(const char *path) {
-    ct_os_a0->thread_a0->spin_lock(&_G.cache_lock);
+    ct_os_a0->thread->spin_lock(&_G.cache_lock);
 
-    uint64_t path_key = ct_hashlib_a0->id64_from_str(path);
+    uint64_t path_key = ct_hashlib_a0->id64(path);
 
     uint32_t idx = ct_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
     if (UINT32_MAX == idx) {
-        ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
+        ct_os_a0->thread->spin_unlock(&_G.cache_lock);
         return load_to_cache(path, path_key);
     }
 
     struct ct_yng_doc *doc;
     doc = _G.document_cache[idx];
-    ct_os_a0->thread_a0->spin_unlock(&_G.cache_lock);
+    ct_os_a0->thread->spin_unlock(&_G.cache_lock);
     return doc;
 };
 
@@ -108,9 +108,9 @@ void free(const char *path) {
 }
 
 ct_yng_node get_first_node_recursive(const char *path,
-                                        const uint64_t *keys,
-                                        uint32_t keys_count,
-                                        uint32_t max_depth) {
+                                     const uint64_t *keys,
+                                     uint32_t keys_count,
+                                     uint32_t max_depth) {
 
     struct ct_yng_doc *d = get(path);
 
@@ -239,7 +239,7 @@ const char *get_string(const char *path,
                        uint32_t keys_count,
                        const char *defaultt) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         return defaultt;
@@ -253,7 +253,7 @@ float get_float(const char *path,
                 uint32_t keys_count,
                 float defaultt) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         return defaultt;
@@ -267,7 +267,7 @@ bool get_bool(const char *path,
               uint32_t keys_count,
               bool defaultt) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         return defaultt;
@@ -283,7 +283,7 @@ void get_vec3(const char *path,
               float v[3],
               float defaultt[3]) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         ct_vec3_move(v, defaultt);
@@ -300,7 +300,7 @@ void get_vec4(const char *path,
               float v[4],
               float defaultt[4]) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         ct_vec4_move(v, defaultt);
@@ -317,7 +317,7 @@ void get_mat4(const char *path,
               float v[16],
               float defaultt[16]) {
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
 
     if (0 == n.idx) {
         ct_mat4_move(v, defaultt);
@@ -329,12 +329,12 @@ void get_mat4(const char *path,
 
 
 void modified(const char *path) {
-    uint64_t hash = ct_hashlib_a0->id64_from_str(path);
+    uint64_t hash = ct_hashlib_a0->id64(path);
     ct_hash_add(&_G.modified_files_set, hash, true, _G.allocator);
 }
 
 void unmodified(const char *path) {
-    uint64_t hash = ct_hashlib_a0->id64_from_str(path);
+    uint64_t hash = ct_hashlib_a0->id64(path);
     ct_hash_remove(&_G.modified_files_set, hash);
 }
 
@@ -441,7 +441,7 @@ void set_vec4(const char *path,
               float *value) {
 
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
     if (!n.idx) {
         return;
     }
@@ -456,7 +456,7 @@ void set_mat4(const char *path,
               float *value) {
 
     ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
-                                                keys_count);
+                                             keys_count);
     if (!n.idx) {
         return;
     }
@@ -483,7 +483,7 @@ void parent_files(const char *path,
 //void check_fs() {
 //    ct_alloc *alloc = ct_memory_a0->system;
 //
-//    static uint64_t root = CT_ID64_0("source");
+//    static uint64_t root = CT_ID64_0("source", 0x921f1370045bad6eULL);
 //
 //    auto *wd_it = ct_fs_a0->event_begin(root);
 //    const auto *wd_end = ct_fs_a0->event_end(root);
@@ -513,7 +513,8 @@ void parent_files(const char *path,
 
 
 void save(const char *path) {
-    ct_vio *f = ct_fs_a0->open(CT_ID64_0("source"), path, FS_OPEN_WRITE);
+    ct_vio *f = ct_fs_a0->open(ct_hashlib_a0->id64("source"), path,
+                               FS_OPEN_WRITE);
 
     if (!f) {
         ct_log_a0->error(LOG_WHERE, "Could not read file %s", path);

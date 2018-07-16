@@ -6,6 +6,7 @@
 //==============================================================================
 #include <stdint.h>
 #include <stddef.h>
+
 #include <corelib/module.inl>
 
 //==============================================================================
@@ -25,14 +26,7 @@ struct ct_cmd {
 // yDB CDB
 //==============================================================================
 
-struct ct_ydb_cmd_s {
-    // YAML
-    const char *filename;
-    uint64_t keys[32];
-    uint32_t keys_count;
-};
-
-struct ct_ent_cmd_s {
+struct ct_cdb_cmd_s {
     struct ct_cmd header;
 
     uint64_t obj;
@@ -51,6 +45,11 @@ struct ct_ent_cmd_s {
         } f;
 
         struct {
+            uint64_t new_value;
+            uint64_t old_value;
+        } u64;
+
+        struct {
             char new_value[128];
             char old_value[128];
         } str;
@@ -60,15 +59,6 @@ struct ct_ent_cmd_s {
             bool old_value;
         } b;
     };
-};
-
-struct ct_ydb_cmd_bool_s {
-    struct ct_cmd header;
-    struct ct_ydb_cmd_s ydb;
-
-    // VALUES
-    bool new_value;
-    bool old_value;
 };
 
 

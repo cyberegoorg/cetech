@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <cetech/debugui/debugui.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <corelib/log.h>
 #include <cetech/log_view/log_view.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
@@ -16,7 +16,6 @@
 #include <cetech/dock/dock.h>
 
 #define WINDOW_NAME "Log view"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("log_view")
 #define LOG_FORMAT "%s -> %s"
 
 struct log_item {
@@ -177,9 +176,7 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_log_a0->register_handler(log_handler, NULL);
 
-
-    ct_api_a0->register_api("ct_dock_i0", &ct_dock_i0);
-
+    ct_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
@@ -191,11 +188,11 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         log_view,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

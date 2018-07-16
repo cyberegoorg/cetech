@@ -51,8 +51,6 @@ static struct _G {
 } _G = {};
 
 
-#define CONFIG_MODULE_DIR CT_ID64_0(CONFIG_MODULE_DIR_ID)
-
 //==============================================================================
 // Private
 //==============================================================================
@@ -76,7 +74,7 @@ static void add_module(const char *path,
 
 static const char *get_module_name(const char *path,
                                    uint32_t *len) {
-    const char *filename = ct_os_a0->path_a0->filename(path);
+    const char *filename = ct_os_a0->path->filename(path);
     const char *name = strchr(filename, '_');
     if (NULL == name) {
         return NULL;
@@ -106,12 +104,12 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_load_module");
 
-    void *obj = ct_os_a0->object_a0->load(path);
+    void *obj = ct_os_a0->object->load(path);
     if (obj == NULL) {
         return false;
     }
 
-    ct_load_module_t load_fce = (ct_load_module_t) ct_os_a0->object_a0->load_function(
+    ct_load_module_t load_fce = (ct_load_module_t) ct_os_a0->object->load_function(
             obj,
             (buffer));
     if (load_fce == NULL) {
@@ -120,7 +118,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_unload_module");
 
-    ct_unload_module_t unload_fce = (ct_unload_module_t) ct_os_a0->object_a0->load_function(
+    ct_unload_module_t unload_fce = (ct_unload_module_t) ct_os_a0->object->load_function(
             obj,
             buffer);
     if (unload_fce == NULL) {
@@ -129,7 +127,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_initapi_module");
 
-    ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_os_a0->object_a0->load_function(
+    ct_initapi_module_t initapi_fce = (ct_initapi_module_t) ct_os_a0->object->load_function(
             obj, buffer);
     if (initapi_fce == NULL) {
         return false;
@@ -201,7 +199,7 @@ static void reload(const char *path) {
         old_module.unload(ct_api_a0, 1);
         _G.modules[i] = new_module;
 
-        ct_os_a0->object_a0->unload(old_module.handler);
+        ct_os_a0->object->unload(old_module.handler);
 
         break;
     }
@@ -244,7 +242,7 @@ static void load_dirs() {
 
         sprintf(key + len, "%d", i);
 
-        const uint64_t key_id = ct_hashlib_a0->id64_from_str(key);
+        const uint64_t key_id = ct_hashlib_a0->id64(key);
 
         if (!ct_cdb_a0->prop_exist(_G.config, key_id)) {
             break;
@@ -252,9 +250,9 @@ static void load_dirs() {
 
 
         const char *module_file = ct_cdb_a0->read_str(_G.config, key_id, "");
-        ct_os_a0->path_a0->join(&buffer,
-                                _G.allocator,
-                                2, path, module_file);
+        ct_os_a0->path->join(&buffer,
+                             _G.allocator,
+                             2, path, module_file);
         load(buffer);
 
         ct_buffer_free(buffer, _G.allocator);
@@ -274,7 +272,7 @@ static void unload_all() {
 //static void check_modules() {
 //    ct_alloc *alloc = ct_memory_a0->system;
 //
-//    static uint64_t root = CT_ID64_0("modules");
+//    static uint64_t root = CT_ID64_0("modules", 0x6fd8ce9161fffc7ULL);
 //
 //    auto *wd_it = ct_fs_a0->event_begin(root);
 //    const auto *wd_end = ct_fs_a0->event_end(root);
@@ -335,18 +333,16 @@ struct ct_module_a0 *ct_module_a0 = &module_api;
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->config_object()
+            .config = ct_config_a0->obj()
     };
 
     ct_api_a0 = api;
     api->register_api("ct_module_a0", &module_api);
 
-    uint64_t root = CT_ID64_0("modules");
-    ct_fs_a0->map_root_dir(root,
-                           ct_cdb_a0->read_str(
-                                   _G.config,
-                                   CONFIG_MODULE_DIR,
-                                   "bin/darwin64"), true);
+    uint64_t root = ct_hashlib_a0->id64("modules");
+    ct_fs_a0->map_root_dir(root, ct_cdb_a0->read_str(_G.config,
+                                                     CONFIG_MODULE_DIR,
+                                                     "bin/darwin64"), true);
 }
 
 CETECH_MODULE_DEF(

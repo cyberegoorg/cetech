@@ -11,7 +11,12 @@ texture:
 #package:
 #  - "core"
 
-#ecs:
+#entity:
+#  - "content/level1"
+#  - "content/level2"
+#  - "content/camera"
+
+#entity:
 #  - "content/camera"
 #  - "content/box1"
 #  - "content/box2"
@@ -23,6 +28,7 @@ texture:
 
 material:
   - "content/material1"
+  - "content/material2"
   - "content/scene/duck/duck"
   - "content/scene/m4a1/m4a1"
   - "content/scene/solider/body"
@@ -32,7 +38,6 @@ material:
 
 shader:
   - "content/shader1"
-
 
 scene:
   - "content/cube"

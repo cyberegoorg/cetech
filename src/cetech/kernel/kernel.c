@@ -46,13 +46,6 @@ const char *_platform() {
 
 #define LOG_WHERE "kernel"
 
-#define CONFIG_PLATFORM CT_ID64_0(CONFIG_PLATFORM_ID)
-#define CONFIG_NATIVE_PLATFORM CT_ID64_0(CONFIG_NATIVE_PLATFORM_ID)
-
-#define CONFIG_BUILD CT_ID64_0(CONFIG_BUILD_ID)
-#define CONFIG_SRC CT_ID64_0(CONFIG_SRC_ID)
-#define CONFIG_COMPILE CT_ID64_0(CONFIG_COMPILE_ID)
-
 int init_config(int argc,
                 const char **argv,
                 uint64_t object) {
@@ -69,25 +62,23 @@ int init_config(int argc,
 
     const char *build_dir_str = ct_cdb_a0->read_str(object, CONFIG_BUILD, "");
     char *build_dir = NULL;
-    ct_os_a0->path_a0->join(&build_dir, _G.allocator, 2,
+    ct_os_a0->path->join(&build_dir, _G.allocator, 2,
                             build_dir_str,
                             ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM,
                                                 ""));
 
     char *build_config = NULL;
-    ct_os_a0->path_a0->join(&build_config, _G.allocator, 2, build_dir,
+    ct_os_a0->path->join(&build_config, _G.allocator, 2, build_dir,
                             "global.config");
 
     const char *source_dir_str = ct_cdb_a0->read_str(object, CONFIG_SRC, "");
     char *source_config = NULL;
-    ct_os_a0->path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
+    ct_os_a0->path->join(&source_config, _G.allocator, 2, source_dir_str,
                             "global.config");
 
-    ct_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM, ""); //TODO: REMOVGE
-
     if (ct_cdb_a0->read_uint64(object, CONFIG_COMPILE, 0)) {
-        ct_os_a0->path_a0->make_path(build_dir);
-        ct_os_a0->path_a0->copy_file(_G.allocator, source_config, build_config);
+        ct_os_a0->path->make_path(build_dir);
+        ct_os_a0->path->copy_file(_G.allocator, source_config, build_config);
     }
 
     ct_config_a0->load_from_yaml_file(build_config, _G.allocator);
@@ -107,49 +98,22 @@ int cetech_kernel_init(int argc,
                        const char **argv) {
     ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
 
-//    char* buffer = NULL;
-//    ct_array_push_n(buffer, "fooo", strlen("fooo"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "smdlasmdlmsaldas", strlen("smdlasmdlmsaldas"), ct_memory_a0->system);
-//    ct_array_push_n(buffer, "ddddddddd", strlen("ddddddddd")+1, ct_memory_a0->system);
-
-
     ct_corelib_init();
 
     struct ct_api_a0 *api = ct_api_a0;
 
     _G = (struct KernelGlobals) {
             .allocator = ct_memory_a0->system,
-            .config_object  = ct_config_a0->config_object(),
+            .config_object  = ct_config_a0->obj(),
     };
 
-    init_config(argc, argv, ct_config_a0->config_object());
+    init_config(argc, argv, ct_config_a0->obj());
 
+    CETECH_ADD_STATIC_MODULE(builddb);
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 
-    CETECH_GET_API(api, ct_ebus_a0);
+    CT_INIT_API(api, ct_ebus_a0);
     ct_ebus_a0->create_ebus("kernel", KERNEL_EBUS);
 
     init_static_modules();
@@ -158,12 +122,12 @@ int cetech_kernel_init(int argc,
     ct_config_a0->log_all();
 
 
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_os_a0);
-    CETECH_GET_API(api, ct_package_a0);
-    CETECH_GET_API(api, ct_machine_a0);
-    CETECH_GET_API(api, ct_debugui_a0);
-    CETECH_GET_API(api, ct_renderer_a0);
+    CT_INIT_API(api, ct_resource_a0);
+    CT_INIT_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_package_a0);
+    CT_INIT_API(api, ct_machine_a0);
+    CT_INIT_API(api, ct_debugui_a0);
+    CT_INIT_API(api, ct_renderer_a0);
 
 
 #if defined(CETECH_DEVELOP)
@@ -189,15 +153,9 @@ void application_quit() {
     _G.is_running = 0;
 }
 
-#define CONFIG_BOOT_PKG CT_ID64_0(CONFIG_BOOT_PKG_ID)
-#define CONFIG_DAEMON CT_ID64_0(CONFIG_DAEMON_ID)
-#define CONFIG_COMPILE CT_ID64_0(CONFIG_COMPILE_ID)
-#define CONFIG_CONTINUE CT_ID64_0(CONFIG_CONTINUE_ID)
-#define CONFIG_WAIT CT_ID64_0(CONFIG_WAIT_ID)
-#define CONFIG_GAME CT_ID64_0(CONFIG_GAME_ID)
 
 void _init_config() {
-    _G.config_object = ct_config_a0->config_object();
+    _G.config_object = ct_config_a0->obj();
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config_object);
 
@@ -206,7 +164,7 @@ void _init_config() {
     }
 
     if (!ct_cdb_a0->prop_exist(_G.config_object, CONFIG_GAME)) {
-        ct_cdb_a0->set_str(writer, CONFIG_GAME, "playground");
+        ct_cdb_a0->set_str(writer, CONFIG_GAME, "editor");
     }
 
     if (!ct_cdb_a0->prop_exist(_G.config_object, CONFIG_DAEMON)) {
@@ -231,11 +189,11 @@ void _init_config() {
 static void _boot_stage() {
     const char *boot_pkg_str = ct_cdb_a0->read_str(_G.config_object,
                                                    CONFIG_BOOT_PKG, "");
-    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
-    uint32_t pkg = CT_ID32_0("package");
+    uint64_t boot_pkg = ct_hashlib_a0->id64(boot_pkg_str);
+    uint64_t pkg = PACKAGE_TYPE;
 
-    uint32_t core_pkg = CT_ID32_0("core/core");
-    uint32_t resources[] = {core_pkg, boot_pkg};
+    uint64_t core_pkg = ct_hashlib_a0->id64("core/core");
+    uint64_t resources[] = {core_pkg, boot_pkg};
 
     ct_resource_a0->load_now(pkg, resources, 2);
 
@@ -249,12 +207,12 @@ static void _boot_stage() {
 static void _boot_unload() {
     const char *boot_pkg_str = ct_cdb_a0->read_str(_G.config_object,
                                                    CONFIG_BOOT_PKG, "");
-    uint32_t boot_pkg = CT_ID32_0(boot_pkg_str);
+    uint64_t boot_pkg = ct_hashlib_a0->id64(boot_pkg_str);
 
-    uint32_t core_pkg = CT_ID32_0("core/core");
-    uint32_t pkg = CT_ID32_0("package");
+    uint64_t core_pkg = ct_hashlib_a0->id64("core/core");
+    uint64_t pkg = ct_hashlib_a0->id64("package");
 
-    uint32_t resources[] = {core_pkg, boot_pkg};
+    uint64_t resources[] = {core_pkg, boot_pkg};
 
     ct_package_a0->unload(boot_pkg);
     ct_package_a0->unload(core_pkg);
@@ -270,6 +228,7 @@ static void on_quit(uint64_t event) {
 }
 
 static void cetech_kernel_start() {
+
     _init_config();
 
     if (ct_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
@@ -291,10 +250,10 @@ static void cetech_kernel_start() {
 
     _G.is_running = 1;
 
-    const uint64_t fq = ct_os_a0->time_a0->perf_freq();
-    uint64_t last_tick = ct_os_a0->time_a0->perf_counter();
+    const uint64_t fq = ct_os_a0->time->perf_freq();
+    uint64_t last_tick = ct_os_a0->time->perf_counter();
     while (_G.is_running) {
-        uint64_t now_ticks = ct_os_a0->time_a0->perf_counter();
+        uint64_t now_ticks = ct_os_a0->time->perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
@@ -305,7 +264,7 @@ static void cetech_kernel_start() {
         uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
                                                   KERNEL_UPDATE_EVENT);
         ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-        ct_cdb_a0->set_float(w, CT_ID64_0("dt"), dt);
+        ct_cdb_a0->set_float(w, KERNEL_EVENT_DT, dt);
         ct_cdb_a0->write_commit(w);
 
         ct_ebus_a0->broadcast(KERNEL_EBUS, event);
@@ -313,8 +272,7 @@ static void cetech_kernel_start() {
         ct_cdb_a0->gc();
     }
 
-    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
-                                     KERNEL_SHUTDOWN_EVENT);
+    event = ct_cdb_a0->create_object(ct_cdb_a0->db(), KERNEL_SHUTDOWN_EVENT);
 
     ct_ebus_a0->broadcast(KERNEL_EBUS, event);
 

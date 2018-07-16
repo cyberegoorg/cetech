@@ -29,12 +29,12 @@ void *load_object(const char *path) {
 
 #if CT_PLATFORM_LINUX
     it += sprintf(buffer+it, ".so");
-    void *obj = dlmopen(LM_ID_NEWLM, buffer, RTLD_LOCAL | RTLD_NOW);
+    void *obj = dlmopen(LM_ID_NEWLM, buffer, RTLD_GLOBAL | RTLD_NOW);
 #endif
 
 #if CT_PLATFORM_OSX
     it += sprintf(buffer + it, ".dylib");
-    void *obj = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
+    void *obj = dlopen(buffer, RTLD_GLOBAL | RTLD_NOW);
 #endif
 
     if (obj == NULL) {

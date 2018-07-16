@@ -55,7 +55,6 @@ static struct _G {
     struct WorldInstance *world_instances;
     struct ct_hash_t ent_map;
 
-    uint64_t type;
     struct ct_alloc *allocator;
 } _G;
 
@@ -111,7 +110,7 @@ static void allocate(struct WorldInstance *_data,
 
 static void _new_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
     uint32_t idx = ct_array_size(_G.world_instances);
     ct_array_push(_G.world_instances, (struct WorldInstance) {}, _G.allocator);
@@ -121,7 +120,7 @@ static void _new_world(uint64_t event) {
 
 static void _destroy_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, CT_ID64_0("world"), 0)};
+            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
     uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = ct_array_size(_G.world_instances) - 1;
@@ -291,7 +290,7 @@ static int has(struct ct_world world,
 static struct ct_scene_node get_root(struct ct_world world,
                                      struct ct_entity entity) {
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
                                    entity);
 
     return (struct ct_scene_node) {.idx = scene->idx, .world = world};
@@ -305,7 +304,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t count) {
     CT_UNUSED(pose);
 
-    ct_ecs_a0->entity->add_components(world, entity, &_G.type, 1);
+    ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1);
 
     struct WorldInstance *data = _get_world_instance(world);
 
@@ -382,7 +381,7 @@ static struct ct_scene_node create(struct ct_world world,
     CT_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
                                               entity);
 
     scene->idx = root.idx;
@@ -475,6 +474,8 @@ static void _init_api(struct ct_api_a0 *api) {
 //
 
 
+#define SCENEGRAPH_TYPE \
+    CT_ID64_0("scenegraph", 0xdeae50ee50cb5e3aULL)
 
 static void init(struct ct_api_a0 *api) {
     _init_api(api);
@@ -482,13 +483,7 @@ static void init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CT_ID64_0("scenegraph"),
     };
-//
-//    ct_ecs_a0->register_component((struct ct_component_info) {
-//            .size = sizeof(struct ct_scenegraph_component),
-//            .component_name = "scenegraph",
-//    });
 
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
@@ -507,11 +502,11 @@ static void shutdown() {
 CETECH_MODULE_DEF(
         scenegraph,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

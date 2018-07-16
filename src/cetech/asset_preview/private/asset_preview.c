@@ -9,7 +9,7 @@
 
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/asset_browser/asset_browser.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <corelib/hash.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
@@ -62,7 +62,7 @@ static void fps_camera_update(struct ct_world world,
     float wm[16];
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT,
+    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
                                                   camera_ent);
 
     ct_mat4_move(wm, transform->world);
@@ -88,9 +88,9 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(transform->position, pos, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    uint64_t ent_obj = ct_ecs_a0->entity->cdb_object(world, camera_ent);
+    uint64_t ent_obj = camera_ent.h;
     uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
-                                                    CT_ID64_0("components"), 0);
+                                                    ENTITY_COMPONENTS, 0);
 
     uint64_t component = ct_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
@@ -117,7 +117,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
     ct_render_texture_handle_t th;
     th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
-                                                    CT_ID64_0("output"));
+                                                    RG_OUTPUT_TEXTURE);
 
 
     float size[2];
@@ -133,42 +133,50 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 }
 
 
+static struct ct_asset_preview_i0* _get_asset_preview(uint64_t asset_type) {
+    struct ct_resource_i0 *resource_i;
+    resource_i = ct_resource_a0->get_interface(asset_type);
+
+    if (!resource_i) {
+        return NULL;
+    }
+
+    if (!resource_i->get_interface) {
+        return NULL;
+    }
+
+    return resource_i->get_interface(ASSET_PREVIEW);
+}
+
 static void set_asset(uint64_t event) {
-    uint64_t asset = ct_cdb_a0->read_uint64(event, CT_ID64_0("asset"), 0);
+    uint64_t asset_type = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t asset_name = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
 
-    struct ct_resource_id rid = {.i64 = asset};
+    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
-    if (_G.active_asset.i64 == rid.i64) {
+    if (_G.active_asset.name == asset_name && _G.active_asset.type == asset_type) {
         return;
     }
 
     struct ct_resource_i0 *resource_i;
     resource_i = ct_resource_a0->get_interface(_G.active_asset.type);
 
-    if (resource_i) {
-        struct ct_asset_preview_i0 *i;
+    struct ct_asset_preview_i0 *i;
+    i = _get_asset_preview(_G.active_asset.type);
 
-        if (resource_i->get_interface) {
-            i = resource_i->get_interface(ASSET_PREVIEW);
-
-            if (i) {
-                i->unload(_G.active_asset, _G.world, _G.active_ent);
-            }
+    if (i) {
+        if(i->unload) {
+            i->unload(_G.active_asset, _G.world, _G.active_ent);
         }
     }
 
-    resource_i = ct_resource_a0->get_interface(rid.type);
-    if (resource_i) {
-        struct ct_asset_preview_i0 *i;
-
-        if (resource_i->get_interface) {
-            i = resource_i->get_interface(ASSET_PREVIEW);
-
-            if (i) {
-                _G.active_ent = i->load(rid, _G.world);
-            }
+    i = _get_asset_preview(rid.type);
+    if (i) {
+        if(i->load) {
+            _G.active_ent = i->load(rid, _G.world);
         }
     }
+
 
     _G.active_asset = rid;
 }
@@ -177,7 +185,7 @@ static bool init() {
     _G.visible = true;
     _G.world = ct_ecs_a0->entity->create_world();
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
-                                             CT_ID32_0("content/camera"));
+                                             ct_hashlib_a0->id64("content/camera"));
 
     _G.render_graph = ct_render_graph_a0->create_graph();
     _G.render_graph_builder = ct_render_graph_a0->create_builder();
@@ -202,12 +210,12 @@ static void on_render() {
 static void update(float dt) {
     uint64_t selected_object = ct_selected_object_a0->selected_object();
     if (selected_object &&
-        (ct_cdb_a0->type(selected_object) == CT_ID64_0("asset"))) {
+        (ct_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
         set_asset(selected_object);
     }
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     if (_G.active) {
         float updown = 0.0f;
@@ -239,7 +247,7 @@ static void update(float dt) {
     }
 
     if (_G.visible) {
-        ct_ecs_a0->simulate(_G.world, dt);
+        ct_ecs_a0->system->simulate(_G.world, dt);
     }
 }
 
@@ -265,7 +273,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
-static struct ct_playground_module_i0 ct_playground_module_i0 = {
+static struct ct_editor_module_i0 ct_editor_module_i0 = {
         .init = init,
         .update = update,
         .render= on_render,
@@ -278,8 +286,8 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
-    api->register_api("ct_dock_i0", &ct_dock_i0);
-    api->register_api("ct_playground_module_i0", &ct_playground_module_i0);
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
 
 }
 
@@ -290,16 +298,16 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         asset_preview,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_dd_a0);
-            CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_default_rg_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_camera_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_dd_a0);
+            CT_INIT_API(api, ct_render_graph_a0);
+            CT_INIT_API(api, ct_default_rg_a0);
         },
         {
             CT_UNUSED(reload);

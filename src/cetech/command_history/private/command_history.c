@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <cetech/debugui/debugui.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <corelib/log.h>
 #include <cetech/command_history/command_history.h>
 #include <cetech/command_system/command_system.h>
@@ -13,9 +13,9 @@
 #include "corelib/api_system.h"
 #include "corelib/module.h"
 #include <cetech/dock/dock.h>
+#include <string.h>
 
 #define WINDOW_NAME "Command history"
-#define PLAYGROUND_MODULE_NAME CT_ID64_0("command_history")
 
 #define _G command_history_global
 static struct _G {
@@ -71,8 +71,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
 
-    api->register_api("ct_dock_i0", &ct_dock_i0);
-
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
@@ -82,12 +81,12 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         command_history,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_cmd_system_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_cmd_system_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

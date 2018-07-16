@@ -21,6 +21,7 @@
 
 #include <stdlib.h>
 #include <cetech/controlers/controlers.h>
+#include <string.h>
 
 static struct G {
     struct ct_world world;
@@ -30,10 +31,10 @@ static struct G {
 
 
 void update(uint64_t event) {
-    _G.dt = ct_cdb_a0->read_float(event, CT_ID64_0("dt"), 0.0f);
+    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {
@@ -81,7 +82,7 @@ void module1(uint64_t event) {
         float size[2] = {};
         ct_debugui_a0->GetWindowSize(size);
         size[1] = size[0];
-        ct_debugui_a0->Image2(ct_texture_a0->get(CT_ID32_0("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
+        ct_debugui_a0->Image2(ct_texture_a0->get(ct_hashlib_a0->id64("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
                              size,
                              (float[2]) {0.0f, 0.0f},
                              (float[2]) {1.0f, 1.0f},
@@ -115,17 +116,18 @@ CETECH_MODULE_DEF(
 // Init api
 //==============================================================================
         {
-            CETECH_GET_API(api, ct_controlers_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_controlers_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_ebus_a0);
 
-            CETECH_GET_API(api, ct_ecs_a0);
-//            CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_texture_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+//            CT_INIT_API(api, ct_camera_a0);
+            CT_INIT_API(api, ct_texture_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+
         },
 
 //==============================================================================

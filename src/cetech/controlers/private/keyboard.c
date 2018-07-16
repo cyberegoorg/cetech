@@ -104,18 +104,17 @@ static void _update(uint64_t _event) {
 
         switch (ct_cdb_a0->type(event)) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[ct_cdb_a0->read_uint64(event, CT_ID64_0("keycode"),
+                _G.state[ct_cdb_a0->read_uint64(event, CONTROLER_KEYCODE,
                                                 0)] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[ct_cdb_a0->read_uint64(event, CT_ID64_0("keycode"),
+                _G.state[ct_cdb_a0->read_uint64(event, CONTROLER_KEYCODE,
                                                 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                const char *str = ct_cdb_a0->read_str(event, CT_ID64_0("text"),
-                                                      0);
+                const char *str = ct_cdb_a0->read_str(event, CONTROLER_TEXT, 0);
                 memcpy(_G.text, str, strlen(str));
                 break;
             }
@@ -133,7 +132,7 @@ static char *text(uint32_t idx) {
 }
 
 static uint64_t name() {
-    return CT_ID64_0("keyboard");
+    return CONTROLER_KEYBOARD;
 }
 
 static struct ct_controlers_i0 ct_controlers_i0 = {
@@ -176,11 +175,11 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         keyboard,
         {
-            CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_machine_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

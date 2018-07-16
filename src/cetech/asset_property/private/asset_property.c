@@ -25,7 +25,7 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-static void on_debugui() {
+static void draw_ui() {
     uint64_t obj = ct_selected_object_a0->selected_object();
 
     if (!obj) {
@@ -34,14 +34,14 @@ static void on_debugui() {
 
     uint64_t obj_type = ct_cdb_a0->type(obj);
 
-    if (obj_type != CT_ID64_0("asset")) {
+    if (obj_type != ASSET_BROWSER_ASSET_TYPE) {
         return;
     }
 
-    uint64_t asset = ct_cdb_a0->read_uint64(obj, CT_ID64_0("asset"), 0);
-//    const char *path = ct_cdb_a0->read_str(obj, CT_ID64_0("path"), 0);
+    uint64_t asset_type = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t asset_name = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_NAME, 0);
 
-    struct ct_resource_id rid = {.i64 = asset};
+    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
     char filename[512] = {};
     ct_resource_a0->compiler_get_filename(filename,
@@ -96,7 +96,7 @@ static struct ct_asset_property_a0 asset_property_api = {
 struct ct_asset_property_a0 *ct_asset_property_a0 = &asset_property_api;
 
 static struct ct_property_editor_i0 ct_property_editor_i0 = {
-        .draw = on_debugui,
+        .draw_ui = draw_ui,
 };
 
 static void _init(struct ct_api_a0 *api) {
@@ -105,7 +105,7 @@ static void _init(struct ct_api_a0 *api) {
     };
 
     api->register_api("ct_asset_property_a0", &asset_property_api);
-    api->register_api("ct_property_editor_i0", &ct_property_editor_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
 }
 
 static void _shutdown() {
@@ -117,14 +117,13 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         asset_property,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_property_editor_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

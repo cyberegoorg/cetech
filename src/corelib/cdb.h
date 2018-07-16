@@ -110,6 +110,8 @@ struct ct_cdb_a0 {
 
     void (*write_commit)(ct_cdb_obj_o *writer);
 
+    bool (*write_try_commit)(ct_cdb_obj_o *writer);
+
     // SET
     void (*set_bool)(ct_cdb_obj_o *writer,
                      uint64_t property,

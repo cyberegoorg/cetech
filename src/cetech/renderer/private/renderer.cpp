@@ -54,13 +54,7 @@ static uint32_t _get_reset_flags() {
            (_G.vsync ? BGFX_RESET_VSYNC : 0);
 }
 
-#define CONFIG_SCREEN_X CT_ID64_0(CONFIG_SCREEN_X_ID)
-#define CONFIG_SCREEN_Y CT_ID64_0(CONFIG_SCREEN_Y_ID)
-#define CONFIG_SCREEN_VSYNC CT_ID64_0(CONFIG_SCREEN_VSYNC_ID)
-#define CONFIG_SCREEN_FULLSCREEN CT_ID64_0(CONFIG_SCREEN_FULLSCREEN_ID)
-#define CONFIG_DAEMON CT_ID64_0(CONFIG_DAEMON_ID)
-#define CONFIG_WID CT_ID64_0(CONFIG_WID_ID)
-#define CONFIG_RENDER_CONFIG CT_ID64_0(CONFIG_RENDER_CONFIG_ID)
+
 
 
 //==============================================================================
@@ -91,7 +85,7 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ct_os_a0->window_a0->create(
+            _G.main_window = ct_os_a0->window->create(
                     _G.allocator,
                     title,
                     WINDOWPOS_UNDEFINED,
@@ -100,7 +94,7 @@ static void renderer_create() {
                     flags);
 
         } else {
-            _G.main_window = ct_os_a0->window_a0->create_from(_G.allocator,
+            _G.main_window = ct_os_a0->window->create_from(_G.allocator,
                                                               (void *) wid);
         }
     }
@@ -153,8 +147,8 @@ static void on_resize(uint64_t event) {
     _G.need_reset = 1;
 
 
-    _G.size_width = ct_cdb_a0->read_uint64(event, CT_ID64_0("width"), 0);
-    _G.size_height = ct_cdb_a0->read_uint64(event, CT_ID64_0("height"), 0);
+    _G.size_width = ct_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_WIDTH, 0);
+    _G.size_height = ct_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_HEIGHT, 0);
 }
 
 static void on_render(uint64_t _event) {
@@ -756,7 +750,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->config_object(),
+            .config = ct_config_a0->obj(),
     };
 
 
@@ -790,7 +784,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G.vsync = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    CETECH_GET_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_os_a0);
 
     ct_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
 
@@ -816,14 +810,14 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         renderer,
         {
-            CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_config_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_machine_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

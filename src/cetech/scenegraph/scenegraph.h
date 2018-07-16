@@ -18,7 +18,8 @@
 //==============================================================================
 
 
-#define SCENEGRAPH_COMPONENT CT_ID64_0("scenegraph")
+#define SCENEGRAPH_COMPONENT \
+    CT_ID64_0("scenegraph", 0xdeae50ee50cb5e3aULL)
 
 struct ct_world;
 struct ct_entity;

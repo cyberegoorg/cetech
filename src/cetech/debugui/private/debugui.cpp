@@ -27,9 +27,8 @@ static struct DebugUIGlobal {
 
 static void render(uint8_t viewid) {
     struct ct_controlers_i0 *keyboard, *mouse;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
-    mouse = ct_controlers_a0->get_by_name(CT_ID64_0("mouse"));
-
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+    mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
 
     float mp[3] = {};
     mouse->axis(0, mouse->axis_index("absolute"), mp);
@@ -252,6 +251,15 @@ static struct ct_debugui_a0 debugui_api = {
         .guizmo_decompose_matrix = imgui_wrap::guizmo_decompose_matrix,
         .GetContentRegionAvail= imgui_wrap::GetContentRegionAvail,
         .GetTextLineHeightWithSpacing = ImGui::GetTextLineHeightWithSpacing,
+
+
+        .BeginDragDropSource = reinterpret_cast<bool (*)(DebugUIDragDropFlags_)>(ImGui::BeginDragDropSource),
+        .SetDragDropPayload = reinterpret_cast<bool (*)(const char*, const void*, size_t, DebugUICond)>(ImGui::SetDragDropPayload),
+        .EndDragDropSource = ImGui::EndDragDropSource,
+        .BeginDragDropTarget = ImGui::BeginDragDropTarget,
+        .AcceptDragDropPayload = reinterpret_cast<const DebugUIPayload *(*)(const char *,
+                                                                            DebugUIDragDropFlags_)>(ImGui::AcceptDragDropPayload),
+        .EndDragDropTarget = ImGui::EndDragDropTarget,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
@@ -268,7 +276,7 @@ static void _init(struct ct_api_a0 *api) {
 
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CT_ID64_0("keyboard"));
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
     ImGuiIO &io = ImGui::GetIO();
@@ -303,15 +311,15 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         debugui,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_fs_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_yng_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

@@ -76,11 +76,11 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         render_graph,
         {
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_dd_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_dd_a0);
         },
         {
             CT_UNUSED(reload);

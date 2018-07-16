@@ -12,18 +12,8 @@
 
 struct ct_world;
 
-struct ct_asset_preview_fce {
-    void (*load)(const char *filename,
-                 struct ct_resource_id resourceid,
-                 struct ct_world world);
-
-    void (*unload)(const char *filename,
-                   struct ct_resource_id resourceid,
-                   struct ct_world world);
-};
-
-
-#define ASSET_PREVIEW CT_ID64_0("ct_asset_preview_i0")
+#define ASSET_PREVIEW \
+    CT_ID64_0("ct_asset_preview_i0", 0xb3cba443e3ad0e60ULL)
 
 struct ct_asset_preview_i0 {
     struct ct_entity (*load)(struct ct_resource_id resourceid,
@@ -32,6 +22,8 @@ struct ct_asset_preview_i0 {
     void (*unload)(struct ct_resource_id resourceid,
                    struct ct_world world,
                    struct ct_entity entity);
+
+    void (*tooltip)(struct ct_resource_id resourceid);
 };
 
 

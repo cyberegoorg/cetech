@@ -11,6 +11,9 @@
 
 #define MOUSE_EBUS_NAME "mouse"
 
+#define CONTROLER_MOUSE \
+    CT_ID64_0("mouse", 0x7c351278fe937928ULL)
+
 enum {
     MOUSE_EBUS = 0x3ddd354d
 };

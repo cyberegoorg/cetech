@@ -29,7 +29,7 @@ static struct _G {
 void add_key(const char *key,
              uint32_t key_len,
              uint64_t key_hash) {
-    ct_os_a0->thread_a0->spin_lock(&_G.key_lock);
+    ct_os_a0->thread->spin_lock(&_G.key_lock);
     const uint32_t idx = ct_array_size(_G.key_to_str_offset);
     const uint32_t offset = ct_array_size(_G.key_to_str_data);
 
@@ -38,7 +38,7 @@ void add_key(const char *key,
     ct_array_push(_G.key_to_str_offset, offset, _G.allocator);
 
     ct_hash_add(&_G.key_to_str, key_hash, idx, _G.allocator);
-    ct_os_a0->thread_a0->spin_unlock(&_G.key_lock);
+    ct_os_a0->thread->spin_unlock(&_G.key_lock);
 }
 
 const char *get_key(uint64_t hash) {
@@ -97,7 +97,7 @@ uint64_t calc_key(const char *key) {
             const uint32_t size = it - begin;
             const uint64_t part_hash = ct_hash_murmur2_64(begin,
                                                           size,
-                                                          22);
+                                                          0);
             add_key(begin, size, part_hash);
             hash = hash_combine(hash, part_hash);
             parse = false;
@@ -107,7 +107,7 @@ uint64_t calc_key(const char *key) {
     }
 
     const uint32_t size = it - begin;
-    const uint64_t part_hash = ct_hash_murmur2_64(begin, size, 22);
+    const uint64_t part_hash = ct_hash_murmur2_64(begin, size, 0);
     add_key(begin, size, part_hash);
     hash = hash_combine(hash, part_hash);
 
@@ -128,10 +128,10 @@ uint64_t combine_key(const uint64_t *keys,
 
 uint64_t combine_key_str(const char **keys,
                          uint32_t count) {
-    uint64_t hash = ct_hashlib_a0->id64_from_str(keys[0]);
+    uint64_t hash = ct_hashlib_a0->id64(keys[0]);
 
     for (uint32_t i = 1; i < count; ++i) {
-        hash = hash_combine(hash, ct_hashlib_a0->id64_from_str(keys[i]));
+        hash = hash_combine(hash, ct_hashlib_a0->id64(keys[i]));
     }
 
     return hash;
@@ -716,10 +716,10 @@ bool parse_yaml(struct ct_alloc *alloc,
                 type_value_from_scalar(event.data.scalar.value,
                                        &type, &value, IS_KEY());
 
-                const uint64_t PREFAB_KEY = CT_ID64_0("PREFAB");
+                const uint64_t PREFAB_KEY = ct_hashlib_a0->id64("PREFAB");
 
                 if (IS_KEY()) {
-                    uint64_t key_hash = ct_hashlib_a0->id64_from_str(value.string);
+                    uint64_t key_hash = ct_hashlib_a0->id64(value.string);
                     uint64_t parent_key = parent_stack[parent_stack_top].key_hash;
                     key = hash_combine(parent_key, key_hash);
 
@@ -1012,7 +1012,7 @@ struct ct_yng_node create_tree(struct ct_yng_doc *_inst,
         parent = new_map_idx;
     }
 
-    uint64_t key_hash = ct_hashlib_a0->id64_from_str(keys[keys_count - 1]);
+    uint64_t key_hash = ct_hashlib_a0->id64(keys[keys_count - 1]);
     inst->value[parent].node_count += 1;
     uint32_t key_idx = new_node(
             inst->doc,
