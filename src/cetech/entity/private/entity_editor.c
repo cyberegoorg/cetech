@@ -20,7 +20,7 @@
 #include <cetech/controlers/keyboard.h>
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/explorer/explorer.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_render_graph/default_render_graph.h>
@@ -29,7 +29,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/dock/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/editor/editor.h>
+#include <cetech/asset_editor/asset_editor.h>
 
 
 #define MAX_EDITOR 8
@@ -74,7 +74,7 @@ static void fps_camera_update(struct ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->entity_data(world,
+    transform = ct_ecs_a0->component->get_one(world,
                                                   TRANSFORM_COMPONENT,
                                                   camera_ent);
 
@@ -100,7 +100,7 @@ static void fps_camera_update(struct ct_world world,
     ct_vec3_add(pos, transform->position, x_dir_new);
     ct_vec3_add(pos, pos, z_dir_new);
 
-    uint64_t ent_obj = ct_ecs_a0->entity->cdb_object(world, camera_ent);
+    uint64_t ent_obj = camera_ent.h;
     uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
                                                     ENTITY_COMPONENTS, 0);
     uint64_t component = ct_cdb_a0->read_subobject(components,
@@ -124,7 +124,7 @@ static void fps_camera_update(struct ct_world world,
 }
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ct_api_entry it = ct_api_a0->first("ct_component_i0");
+    struct ct_api_entry it = ct_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -318,7 +318,7 @@ static void open(uint64_t context_obj) {
 
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
-                                                  CT_ID32_0("content/camera"));
+                                                  ct_hashlib_a0->id64("content/camera"));
 
     editor->entity_name = asset_name;
 
@@ -334,7 +334,7 @@ static void open(uint64_t context_obj) {
 static void update(uint64_t context_obj,
                    float dt) {
     struct ct_controlers_i0 *keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     uint64_t editor_idx = ct_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
@@ -373,7 +373,7 @@ static void update(uint64_t context_obj,
                           dt, 0, 0, updown, leftright, 10.0f, false);
     }
 
-    ct_ecs_a0->simulate(editor->world, dt);
+    ct_ecs_a0->system->simulate(editor->world, dt);
 
 }
 
@@ -398,12 +398,23 @@ uint64_t asset_type() {
     return ENTITY_RESOURCE_ID;
 }
 
+const char *display_icon() {
+    return ICON_FA_CUBE;
+}
+
+const char *display_name() {
+    return "Entity editor";
+}
+
+
 static struct ct_asset_editor_i0 ct_asset_editor_i0 = {
         .asset_type = asset_type,
         .open = open,
         .update = update,
         .render = on_render,
-        .draw = draw_editor,
+        .draw_ui = draw_editor,
+        .display_name = display_name,
+        .display_icon = display_icon,
 };
 
 static void _init(struct ct_api_a0 *api) {
@@ -421,15 +432,15 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         entity_editor,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_default_rg_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_camera_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_render_graph_a0);
+            CT_INIT_API(api, ct_default_rg_a0);
         },
         {
             CT_UNUSED(reload);

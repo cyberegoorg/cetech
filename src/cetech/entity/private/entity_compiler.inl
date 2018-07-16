@@ -27,21 +27,8 @@ struct compkey {
     uint64_t keys[64];
 };
 
-
 struct ct_entity_compile_output {
-//    struct ct_hash_t component_ent;
-//    uint32_t **component_ent_array;
-//    struct ct_hash_t entity_parent;
-//    struct ct_hash_t component_body;
-
     char *entity_data;
-//    uint32_t *entity_offset;
-//    struct compkey *ent_type;
-//    uint32_t *ent_type_count;
-//
-//    uint64_t *uid;
-//    uint32_t *prefab;
-//    uint32_t ent_counter;
 };
 
 
@@ -69,10 +56,8 @@ static void compile_entitity(const char *filename,
                              int parent_idx,
                              uint64_t parent_obj,
                              struct ct_entity_compile_output *output,
-                             struct ct_compilator_api *compilator_api,
                              ct_cdb_obj_o *parent_children_writer) {
 
-    CT_UNUSED(compilator_api);
 
     const uint64_t uid = root_key[root_count - 1] ? root_key[root_count - 1]
                                                   : UINT64_MAX;
@@ -155,7 +140,7 @@ static void compile_entitity(const char *filename,
     for (uint32_t i = 0; i < children_keys_count; ++i) {
         tmp_keys[root_count + 1] = children_keys[i];
         compile_entitity(filename, tmp_keys, root_count + 2, 0,
-                         parent_obj, output, compilator_api, children_writer);
+                         parent_obj, output, children_writer);
     }
     ct_cdb_a0->write_commit(children_writer);
 
@@ -164,7 +149,7 @@ static void compile_entitity(const char *filename,
     if (parent_children_writer) {
         ct_cdb_a0->set_subobject(parent_children_writer, uid, obj);
     } else {
-//        uint32_t offset = ct_array_size(output->entity_data);
+//        uint32_t offset = ct_array_size(output->get_one);
         ct_cdb_a0->dump(obj, &output->entity_data, _G.allocator);
     }
 }
@@ -185,10 +170,8 @@ static void destroy_output(struct ct_entity_compile_output *output) {
 static void compile_entity(struct ct_entity_compile_output *output,
                            uint64_t *root,
                            uint32_t root_count,
-                           const char *filename,
-                           struct ct_compilator_api *compilator_api) {
-    compile_entitity(filename, root, root_count, UINT32_MAX, 0, output,
-                     compilator_api, NULL);
+                           const char *filename) {
+    compile_entitity(filename, root, root_count, UINT32_MAX, 0, output, NULL);
 }
 
 static void write_to_build(struct ct_entity_compile_output *output,
@@ -202,16 +185,14 @@ static void write_to_build(struct ct_entity_compile_output *output,
 
 static void _entity_resource_compiler(uint64_t root,
                                       const char *filename,
-                                      char **build,
-                                      struct ct_compilator_api *compilator_api) {
+                                      char **build) {
     struct ct_entity_compile_output *output = create_output();
-    compile_entity(output, &root, 1, filename, compilator_api);
+    compile_entity(output, &root, 1, filename);
     write_to_build(output, filename, build);
     destroy_output(output);
 }
 
 static void resource_compiler(const char *filename,
-                              char **output,
-                              struct ct_compilator_api *compilator_api) {
-    _entity_resource_compiler(0, filename, output, compilator_api);
+                              char **output) {
+    _entity_resource_compiler(0, filename, output);
 }
