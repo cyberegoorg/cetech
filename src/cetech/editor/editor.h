@@ -1,23 +1,27 @@
-#ifndef CETECH_EDITOR_H
-#define CETECH_EDITOR_H
+#ifndef CETECH_PLAYGROUND_H
+#define CETECH_PLAYGROUND_H
 
+//==============================================================================
+// Includes
+//==============================================================================
+
+#include <stddef.h>
 #include <stdint.h>
 
+#define EDITOR_MODULE_INTERFACE_NAME \
+    "ct_editor_module_i0"
 
-#define _ASSET_TYPE \
-    CT_ID64_0("asset_type", 0x1f1f05db4e4dabbaULL)
+#define EDITOR_MODULE_INTERFACE \
+    CT_ID64_0("ct_editor_module_i0", 0x761dbf8cf91061a1ULL)
 
-#define _ASSET_NAME \
-    CT_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
+struct ct_editor_module_i0 {
+    bool (*init)();
 
+    bool (*shutdown)();
 
-struct ct_asset_editor_i0 {
-    uint64_t (*asset_type)();
-    void (*open)(uint64_t context_obj);
-    void (*close)(uint64_t context_obj);
-    void (*update)(uint64_t context_obj, float dt);
-    void (*render)(uint64_t context_obj);
-    void (*draw)(uint64_t context_obj);
+    void (*update)(float dt);
+
+    void (*render)();
 };
 
-#endif //CETECH_EDITOR_H
+#endif //CETECH_PLAYGROUND_H

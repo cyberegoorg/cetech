@@ -1,4 +1,4 @@
-#define CT_DYNAMIC_MODULE
+#define CT_DYNAMIC_MODULE 1
 
 #include <corelib/macros.h>
 
@@ -22,6 +22,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
+#include <string.h>
 
 
 #define MOUDLE_NAME example_develop
@@ -32,14 +33,15 @@ static struct G {
     float dt;
 } _G;
 
+#define _CAMERA_ASSET \
+    CT_ID64_0("content/camera", 0x2d0dc3c05bc23f4fULL)
 
 void init(uint64_t event) {
     CT_UNUSED(event)
 
     _G.world = ct_ecs_a0->entity->create_world();
 
-    _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
-                                            CT_ID32_0("content/camera"));
+    _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,_CAMERA_ASSET);
 }
 
 
@@ -48,10 +50,10 @@ void shutdown(uint64_t event) {
 }
 
 void update(uint64_t event) {
-    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64_from_str("dt"), 0.0f);
+    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get_by_name(CONTROLER_KEYBOARD);
+    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {
@@ -61,10 +63,10 @@ void update(uint64_t event) {
 
     ///ct_log_a0->debug("example", "%f", dt);
 
-    ct_ecs_a0->simulate(_G.world, _G.dt);
+    ct_ecs_a0->system->simulate(_G.world, _G.dt);
 
     struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->component->entity_data(_G.world, CAMERA_COMPONENT,
+    camera_data = ct_ecs_a0->component->get_one(_G.world, CAMERA_COMPONENT,
                                                     _G.camera_ent);
 
 //    struct ct_render_texture_handle th = ct_viewport_a0->get_local_resource(
@@ -85,20 +87,19 @@ void update(uint64_t event) {
 // Init api
 //==============================================================================
 void CETECH_MODULE_INITAPI(example_develop)(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_controlers_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_debugui_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_renderer_a0);
-    CETECH_GET_API(api, ct_ebus_a0);
-
-    CETECH_GET_API(api, ct_ecs_a0);
-//            CETECH_GET_API(api, ct_camera_a0);
-    CETECH_GET_API(api, ct_texture_a0);
-
-    CETECH_GET_API(api, ct_render_graph_a0);
-    CETECH_GET_API(api, ct_default_rg_a0);
-    CETECH_GET_API(api, ct_cdb_a0);
+    if(CT_DYNAMIC_MODULE) {
+        CT_INIT_API(api, ct_controlers_a0);
+        CT_INIT_API(api, ct_log_a0);
+        CT_INIT_API(api, ct_debugui_a0);
+        CT_INIT_API(api, ct_hashlib_a0);
+        CT_INIT_API(api, ct_renderer_a0);
+        CT_INIT_API(api, ct_ebus_a0);
+        CT_INIT_API(api, ct_ecs_a0);
+        CT_INIT_API(api, ct_texture_a0);
+        CT_INIT_API(api, ct_render_graph_a0);
+        CT_INIT_API(api, ct_default_rg_a0);
+        CT_INIT_API(api, ct_cdb_a0);
+    }
 }
 
 void CETECH_MODULE_LOAD (example_develop)(struct ct_api_a0 *api,

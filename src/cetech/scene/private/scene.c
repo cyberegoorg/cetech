@@ -36,7 +36,6 @@ int scenecompiler_init(struct ct_api_a0 *api);
 #define _G SceneResourceGlobals
 static struct _G {
     struct ct_cdb_t db;
-    uint32_t type;
     struct ct_alloc *allocator;
 } _G;
 
@@ -109,13 +108,12 @@ static void offline(uint64_t name,
 }
 
 static uint64_t cdb_type() {
-    return CT_ID32_0("scene");
+    return SCENE_TYPE;
 }
 
 
 void scene_compiler(const char *filename,
-                    char **output_blob,
-                    struct ct_compilator_api *compilator_api);
+                    char **output_blob);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -129,15 +127,14 @@ static struct ct_resource_i0 ct_resource_i0 = {
 // Interface
 //==============================================================================
 int sceneinit(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_scenegprah_a0);
-    CETECH_GET_API(api, ct_os_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
+    CT_INIT_API(api, ct_memory_a0);
+    CT_INIT_API(api, ct_resource_a0);
+    CT_INIT_API(api, ct_scenegprah_a0);
+    CT_INIT_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_hashlib_a0);
 
     _G = (struct _G) {
             .allocator=ct_memory_a0->system,
-            .type = _G.type = CT_ID32_0("scene"),
 
     };
 
@@ -152,9 +149,9 @@ static void shutdown() {
 
 }
 
-static uint64_t resource_data(uint32_t name) {
+static uint64_t resource_data(uint64_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
-            .type = _G.type,
+            .type = SCENE_TYPE,
             .name = name,
     };
 
@@ -248,13 +245,13 @@ static void _init_api(struct ct_api_a0 *api) {
 CETECH_MODULE_DEF(
         scene,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_scenegprah_a0);
-            CETECH_GET_API(api, ct_os_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_scenegprah_a0);
+            CT_INIT_API(api, ct_os_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_renderer_a0);
         },
         {
             CT_UNUSED(reload);

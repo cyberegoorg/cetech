@@ -52,7 +52,7 @@ static struct _G {
 } _G;
 
 
-#include "builddb.h"
+#include "cetech/builddb/builddb.h"
 #include "resource.h"
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);
@@ -73,8 +73,8 @@ void type_name_from_filename(const char *fullname,
     char resource_name[128] = {};
     memcpy(resource_name, fullname, size);
 
-    resource_id->name = CT_ID32_0(resource_name);
-    resource_id->type = CT_ID32_0(resource_type);
+    resource_id->name = ct_hashlib_a0->id64(resource_name);
+    resource_id->type = ct_hashlib_a0->id64(resource_type);
 
     if (short_name) {
         memcpy(short_name, fullname, sizeof(char) * size);
@@ -82,25 +82,15 @@ void type_name_from_filename(const char *fullname,
     }
 }
 
-void _add_dependency(const char *who_filename,
-                      const char *depend_on_filename) {
-    builddb_set_file_depend(who_filename, depend_on_filename);
-    builddb_set_file(depend_on_filename,
-                     ct_fs_a0->file_mtime(
-                             SOURCE_ROOT,
-                             depend_on_filename));
-}
 
-static struct ct_compilator_api _compilator_api = {
-        .add_dependency = _add_dependency
-};
 
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = (struct compile_task_data *) data;
 
     ct_log_a0->info("resource_compiler.task",
-                    "Compile resource \"%s\" to \"" "%" SDL_PRIX64 "\"",
-                    tdata->source_filename, tdata->rid.i64);
+                    "Compile resource \"%s\" to \"" "%" PRIx64 "%" PRIx64"\"",
+                    tdata->source_filename, tdata->rid.type,
+                    tdata->rid.name);
 
     char *output_blob = NULL;
 
@@ -112,13 +102,11 @@ static void _compile_task(void *data) {
                                 &files_count);
 
         for (int i = 0; i < files_count; ++i) {
-            _compilator_api.add_dependency(tdata->source_filename,
-                                           files[i]);
+            ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
         }
 
         tdata->compilator(tdata->source_filename,
-                          &output_blob,
-                          &_compilator_api);
+                          &output_blob);
 
     }
 
@@ -127,8 +115,9 @@ static void _compile_task(void *data) {
                          "Resource \"%s\" compilation fail",
                          tdata->source_filename);
     } else {
-        builddb_set_file(tdata->source_filename, tdata->mtime);
-        builddb_set_file_depend(tdata->source_filename, tdata->source_filename);
+        ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
+        ct_builddb_a0->set_file_depend(tdata->source_filename,
+                                       tdata->source_filename);
 
         struct ct_vio *build_vio = ct_fs_a0->open(
                 BUILD_ROOT,
@@ -158,10 +147,10 @@ static void _compile_task(void *data) {
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }
 
-ct_resource_compilator_t _find_compilator(uint32_t type) {
+ct_resource_compilator_t _find_compilator(uint64_t type) {
     struct ct_resource_i0 *i = ct_resource_a0->get_interface(type);
 
-    if(!i) {
+    if (!i) {
         return NULL;
     }
 
@@ -182,21 +171,19 @@ void _compile_files(struct ct_task_item **tasks,
             continue;
         }
 
-        if (!builddb_need_compile(files[i], ct_fs_a0)) {
+        if (!ct_builddb_a0->need_compile(files[i])) {
             continue;
         }
 
-        char build_name[33] = {};
-        snprintf(build_name, CT_ARRAY_LEN(build_name), "%"SDL_PRIX64, rid.i64);
-
-        builddb_set_file_hash(files[i], build_name);
+        char build_name[128] = {};
+        snprintf(build_name, CT_ARRAY_LEN(build_name), "%" PRIx64 "%" PRIx64, rid.type, rid.name);
 
         char *build_full = NULL;
         ct_os_a0->path->join(&build_full,
-                                _G.allocator, 2,
-                                ct_cdb_a0->read_str(_G.config,
-                                                    CONFIG_PLATFORM, ""),
-                                build_name);
+                             _G.allocator, 2,
+                             ct_cdb_a0->read_str(_G.config,
+                                                 CONFIG_PLATFORM, ""),
+                             build_name);
 
         struct compile_task_data *data = CT_ALLOC(_G.allocator,
                                                   struct compile_task_data,
@@ -288,20 +275,13 @@ void resource_compiler_compile_all() {
 int resource_compiler_get_filename(char *filename,
                                    size_t max_ken,
                                    struct ct_resource_id resource_id) {
-    char build_name[33] = {};
+    char build_name[128] = {};
     ct_resource_a0->type_name_string(build_name, CT_ARRAY_LEN(build_name),
                                      resource_id);
 
-    return builddb_get_filename_by_hash(filename, max_ken, build_name);
+    return ct_builddb_a0->get_filename_by_hash(filename, max_ken, build_name);
 }
 
-const char *resource_compiler_get_source_dir() {
-    return ct_cdb_a0->read_str(_G.config, CONFIG_SRC, "");
-}
-
-const char *resource_compiler_get_core_dir() {
-    return ct_cdb_a0->read_str(_G.config, CONFIG_CORE, "");
-}
 
 char *resource_compiler_get_tmp_dir(struct ct_alloc *alocator,
                                     const char *platform) {
@@ -321,9 +301,9 @@ char *resource_compiler_external_join(struct ct_alloc *alocator,
 
     char *tmp_dir = NULL;
     ct_os_a0->path->join(&tmp_dir, alocator, 2, external_dir_str,
-                            ct_cdb_a0->read_str(_G.config,
-                                                CONFIG_PLATFORM,
-                                                ""));
+                         ct_cdb_a0->read_str(_G.config,
+                                             CONFIG_PLATFORM,
+                                             ""));
 
     char *buffer = NULL;
     ct_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
@@ -331,7 +311,7 @@ char *resource_compiler_external_join(struct ct_alloc *alocator,
 
     char *result = NULL;
     ct_os_a0->path->join(&result, alocator, 4, buffer, "release", "bin",
-                            name);
+                         name);
     ct_buffer_free(buffer, alocator);
 
     return result;
@@ -353,7 +333,7 @@ void compile_and_reload(const char *filename) {
         goto error;
     }
 
-    compilator(filename, &output_blob, &_compilator_api);
+    compilator(filename, &output_blob);
 
     resource_memory_reload(rid, &output_blob);
     ct_array_free(output_blob, _G.allocator);
@@ -431,12 +411,24 @@ static void _init_cvar(struct ct_config_a0 *config) {
     ct_cdb_a0->write_commit(writer);
 }
 
+char *resource_compiler_get_build_dir(struct ct_alloc *a,
+                                      const char *platform) {
+
+    const char *build_dir_str = ct_cdb_a0->read_str(_G.config,
+                                                    CONFIG_BUILD, "");
+
+    char *buffer = NULL;
+    ct_os_a0->path->join(&buffer, a, 2, build_dir_str, platform);
+
+    return buffer;
+}
+
 
 static void _init(struct ct_api_a0 *api) {
     CT_UNUSED(api);
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->object(),
+            .config = ct_config_a0->obj(),
     };
 
     package_init(api);
@@ -447,15 +439,15 @@ static void _init(struct ct_api_a0 *api) {
     const char *platform = ct_cdb_a0->read_str(_G.config,
                                                CONFIG_PLATFORM, "");
 
-    char *build_dir_full = ct_resource_a0->compiler_get_build_dir(
-            _G.allocator, platform);
+    char *build_dir_full = resource_compiler_get_build_dir(_G.allocator,
+                                                           platform);
 
     ct_os_a0->path->make_path(build_dir_full);
-    builddb_init_db(build_dir_full, ct_os_a0->path, ct_memory_a0);
+
 
     char *tmp_dir_full = NULL;
     ct_os_a0->path->join(&tmp_dir_full, _G.allocator, 2,
-                            build_dir_full, "tmp");
+                         build_dir_full, "tmp");
 
     ct_os_a0->path->make_path(tmp_dir_full);
 
@@ -478,17 +470,17 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         resourcecompiler,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_task_a0);
-            CETECH_GET_API(api, ct_os_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_task_a0);
+            CT_INIT_API(api, ct_os_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_config_a0);
+            CT_INIT_API(api, ct_fs_a0);
+            CT_INIT_API(api, ct_yng_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

@@ -4,7 +4,7 @@
 #include <corelib/fs.h>
 #include <corelib/os.h>
 #include <cetech/resource/resource.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <corelib/ebus.h>
 #include <cetech/selected_object/selected_object.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
@@ -16,6 +16,9 @@
 #include "corelib/module.h"
 #include <cetech/dock/dock.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/texture/texture.h>
+#include <cetech/asset_property/asset_property.h>
+#include <cetech/asset_preview/asset_preview.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -46,21 +49,6 @@ static struct asset_browser_global {
 
     ct_alloc *allocator;
 } _G;
-
-
-uint64_t get_selected_asset_type() {
-    const char *path = _G.asset_list[_G.selected_file_idx];
-    struct ct_resource_id resourceid;
-    ct_resource_a0->type_name_from_filename(path, &resourceid, NULL);
-    return resourceid.type;
-}
-
-void get_selected_asset_name(char *asset_name) {
-    struct ct_resource_id resourceid;
-    const char *path = _G.asset_list[_G.selected_file_idx];
-    ct_resource_a0->type_name_from_filename(path, &resourceid, asset_name);
-}
-
 
 static void set_current_dir(const char *dir,
                             uint64_t dir_hash) {
@@ -100,7 +88,7 @@ static void ui_breadcrumb(const char *dir) {
             if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
                 char tmp_dir[128] = {0};
                 strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
-                uint64_t dir_hash = ct_hashlib_a0->id64_from_str(tmp_dir);
+                uint64_t dir_hash = ct_hashlib_a0->id64(tmp_dir);
                 set_current_dir(tmp_dir, dir_hash);
             };
 
@@ -130,7 +118,7 @@ static void ui_dir_list() {
         }
 
         for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
-            dir_hash = ct_hashlib_a0->id64_from_str(_G.dirtree_list[i]);
+            dir_hash = ct_hashlib_a0->id64(_G.dirtree_list[i]);
 
             char label[128];
 
@@ -154,6 +142,25 @@ static void ui_dir_list() {
 
     ImGui::PopItemWidth();
     ImGui::EndChild();
+}
+
+static void ui_asset_tooltip(ct_resource_id resourceid, const char* path) {
+    ImGui::Text("%s", path);
+
+    ct_resource_i0* ri = ct_resource_a0->get_interface(resourceid.type);
+
+    if(!ri || !ri->get_interface) {
+        return;
+    }
+
+    ct_asset_preview_i0* ai = \
+                (ct_asset_preview_i0*)(ri->get_interface(ASSET_PREVIEW));
+
+    if(!ai->tooltip) {
+        return;
+    }
+
+    ai->tooltip(resourceid);
 }
 
 static void ui_asset_list() {
@@ -190,7 +197,7 @@ static void ui_asset_list() {
         for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
             const char *path = _G.dir_list[i];
             ct_os_a0->path->dirname(dirname, path);
-            uint64_t filename_hash = ct_hashlib_a0->id64_from_str(dirname);
+            uint64_t filename_hash = ct_hashlib_a0->id64(dirname);
 
             if (!_G.asset_filter.PassFilter(dirname)) {
                 continue;
@@ -207,7 +214,7 @@ static void ui_asset_list() {
                 _G.selected_file = filename_hash;
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    set_current_dir(path, ct_hashlib_a0->id64_from_str(path));
+                    set_current_dir(path, ct_hashlib_a0->id64(path));
                 }
             }
         }
@@ -217,13 +224,13 @@ static void ui_asset_list() {
         for (uint32_t i = 0; i < _G.asset_list_count; ++i) {
             const char *path = _G.asset_list[i];
             const char *filename = ct_os_a0->path->filename(path);
-            uint64_t filename_hash = ct_hashlib_a0->id64_from_str(filename);
+            uint64_t filename_hash = ct_hashlib_a0->id64(filename);
 
             if (!_G.asset_filter.PassFilter(filename)) {
                 continue;
             }
 
-            struct ct_resource_id resourceid = {.i64=0};
+            struct ct_resource_id resourceid = {.i128={0}};
             ct_resource_a0->type_name_from_filename(path, &resourceid, NULL);
 
 
@@ -231,8 +238,17 @@ static void ui_asset_list() {
 
             snprintf(label, CT_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
 
-            if (ImGui::Selectable(label, _G.selected_file == filename_hash,
-                                  ImGuiSelectableFlags_AllowDoubleClick)) {
+            bool selected = ImGui::Selectable(label, _G.selected_file == filename_hash,
+                                              ImGuiSelectableFlags_AllowDoubleClick);
+
+
+            if(ImGui::IsItemHovered()) {
+                ct_debugui_a0->BeginTooltip();
+                ui_asset_tooltip(resourceid, path);
+                ct_debugui_a0->EndTooltip();
+            }
+
+            if (selected) {
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
@@ -243,8 +259,10 @@ static void ui_asset_list() {
                                                      ASSET_DCLICK_EVENT);
 
                     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET,
-                                          resourceid.i64);
+                    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
+                                          resourceid.name);
+                    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
+                                          resourceid.type);
                     ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
                     ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT,
                                           ASSET_BROWSER_SOURCE);
@@ -257,11 +275,37 @@ static void ui_asset_list() {
                         ct_cdb_a0->db(), ASSET_BROWSER_ASSET_TYPE);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(selected_asset);
-                ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET, resourceid.i64);
+                ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
+                                      resourceid.name);
+                ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
+                                      resourceid.type);
                 ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
                 ct_cdb_a0->write_commit(w);
 
                 ct_selected_object_a0->set_selected_object(selected_asset);
+            }
+
+            if (ImGui::BeginDragDropSource(
+                    ImGuiDragDropFlags_SourceAllowNullID)) {
+
+                ui_asset_tooltip(resourceid, path);
+
+                uint64_t selected_asset = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+                                                          ASSET_BROWSER_ASSET_TYPE);
+
+                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(selected_asset);
+                ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
+                                      resourceid.name);
+                ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
+                                      resourceid.type);
+                ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
+                ct_cdb_a0->write_commit(w);
+
+                ImGui::SetDragDropPayload("asset", &selected_asset,
+                                          sizeof(uint64_t),
+                                          ImGuiCond_Once);
+
+                ImGui::EndDragDropSource();
             }
         }
     }
@@ -310,7 +354,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 
 
 static void _init(struct ct_api_a0 *api) {
-    api->register_api("ct_dock_i0", &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
     _G = {
             .allocator = ct_memory_a0->system,
@@ -331,14 +375,14 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         asset_browser,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_fs_a0);
-            CETECH_GET_API(api, ct_os_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_fs_a0);
+            CT_INIT_API(api, ct_os_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

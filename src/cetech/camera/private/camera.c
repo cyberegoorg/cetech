@@ -12,6 +12,7 @@
 #include <cetech/ecs/entity_property.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/editor_ui/editor_ui.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -22,7 +23,6 @@
 
 #define _G CameraGlobal
 static struct CameraGlobal {
-    uint64_t type;
     struct ct_alloc *allocator;
 } CameraGlobal;
 
@@ -60,9 +60,9 @@ static void get_project_view(struct ct_world world,
     struct ct_transform_comp *transform;
     struct ct_camera_component *camera_data;
 
-    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT,
+    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
                                                   camera);
-    camera_data = ct_ecs_a0->component->entity_data(world, CAMERA_COMPONENT,
+    camera_data = ct_ecs_a0->component->get_one(world, CAMERA_COMPONENT,
                                                     camera);
 
     float ratio = (float) (width) / (float) (height);
@@ -111,7 +111,7 @@ static void _on_obj_change(uint64_t obj,
     };
 
     struct ct_camera_component *camera;
-    camera = ct_ecs_a0->component->entity_data(world, CAMERA_COMPONENT, ent);
+    camera = ct_ecs_a0->component->get_one(world, CAMERA_COMPONENT, ent);
 
     for (int k = 0; k < prop_count; ++k) {
         if (prop[k] == PROP_FOV) {
@@ -146,9 +146,9 @@ static const char *display_name() {
 }
 
 static void property_editor(uint64_t obj) {
-    ct_entity_property_a0->ui_float(obj, PROP_NEAR, "Near", 0, 0);
-    ct_entity_property_a0->ui_float(obj, PROP_FAR, "Far", 0, 0);
-    ct_entity_property_a0->ui_float(obj, PROP_FOV, "Fov", 0, 0);
+    ct_editor_ui_a0->ui_float(obj, PROP_NEAR, "Near", 0, 0);
+    ct_editor_ui_a0->ui_float(obj, PROP_FAR, "Far", 0, 0);
+    ct_editor_ui_a0->ui_float(obj, PROP_FOV, "Fov", 0, 0);
 }
 
 static void *get_interface(uint64_t name_hash) {
@@ -183,7 +183,6 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CAMERA_COMPONENT,
     };
 
     api->register_api("ct_component_i0", &ct_component_i0);
@@ -196,13 +195,13 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         camera,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_yng_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

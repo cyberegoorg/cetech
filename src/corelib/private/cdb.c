@@ -340,6 +340,11 @@ static uint64_t create_from(struct ct_cdb_t db,
                   (uint64_t) obj_addr,
                   _G.allocator);
 
+    uint32_t n = ct_array_size(obj->notify);
+    if (n) {
+        ct_array_push_n(inst->notify, obj->notify, n, _G.allocator);
+    }
+
     struct object_t *wr = write_begin((uint64_t) obj_addr);
 
     for (int i = 1; i < obj->properties_count; ++i) {

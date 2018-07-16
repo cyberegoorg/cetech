@@ -28,8 +28,8 @@
 #define CONTROLER_TEXT \
     CT_ID64_0("text", 0x887e193c80929e7ULL)
 
-#define CONTROLER_GAMEPAD_ID \
-    CT_ID64_0("gamepad_id", 0xc5ea6dc1179d6f0aULL)
+#define CONTROLER_ID \
+    CT_ID64_0("id", 0xb0d09cc783d6a0ecULL)
 
 
 //==============================================================================
@@ -101,7 +101,7 @@ struct ct_controlers_i0 {
 };
 
 struct ct_controlers_a0 {
-    struct ct_controlers_i0* (*get_by_name)(uint64_t name);
+    struct ct_controlers_i0* (*get)(uint64_t name);
 };
 
 CT_MODULE(ct_controlers_a0);

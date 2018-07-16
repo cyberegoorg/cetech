@@ -1,33 +1,27 @@
 #ifndef CETECH_ASSET_BROWSER_H
 #define CETECH_ASSET_BROWSER_H
 
-
-
 //==============================================================================
 // Includes
 //==============================================================================
 
 #include <stddef.h>
 
-struct ct_resource_id;
-
 //==============================================================================
 // Typedefs
 //==============================================================================
-
-struct ct_asset_browser_click_ev {
-    uint64_t asset;
-    uint64_t root;
-    const char *path;
-};
 
 #define ASSET_BROWSER_EBUS_NAME "asset_browser"
 
 #define ASSET_BROWSER_ASSET_TYPE \
     CT_ID64_0("asset", 0xc6ed95f9933c4734ULL)
 
-#define ASSET_BROWSER_ASSET \
-    CT_ID64_0("asset", 0xc6ed95f9933c4734ULL)
+// TODO: RENAME
+#define ASSET_BROWSER_ASSET_TYPE2 \
+    CT_ID64_0("asset_type", 0x1f1f05db4e4dabbaULL)
+
+#define ASSET_BROWSER_ASSET_NAME \
+    CT_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
 #define ASSET_BROWSER_PATH \
     CT_ID64_0("path", 0xae70259f6415b584ULL)

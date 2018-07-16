@@ -2,6 +2,7 @@
 #include <cetech/command_system/command_system.h>
 #include <corelib/array.inl>
 #include <corelib/hash.inl>
+#include <stdio.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"
@@ -152,6 +153,11 @@ void undo_text(char *buffer,
     }
 
     cmd_fce.description(buffer, buffer_size, curent_cmd, true);
+
+    if(!strlen(buffer)) {
+        snprintf(buffer, buffer_size, "%s", "<no description>");
+    }
+
 }
 
 void redo_text(char *buffer,
@@ -264,8 +270,8 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         cmd_system,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
 
         },
         {

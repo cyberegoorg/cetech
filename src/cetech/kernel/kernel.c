@@ -113,7 +113,7 @@ int cetech_kernel_init(int argc,
     CETECH_ADD_STATIC_MODULE(resourcesystem);
     CETECH_ADD_STATIC_MODULE(resourcecompiler);
 
-    CETECH_GET_API(api, ct_ebus_a0);
+    CT_INIT_API(api, ct_ebus_a0);
     ct_ebus_a0->create_ebus("kernel", KERNEL_EBUS);
 
     init_static_modules();
@@ -122,12 +122,12 @@ int cetech_kernel_init(int argc,
     ct_config_a0->log_all();
 
 
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_os_a0);
-    CETECH_GET_API(api, ct_package_a0);
-    CETECH_GET_API(api, ct_machine_a0);
-    CETECH_GET_API(api, ct_debugui_a0);
-    CETECH_GET_API(api, ct_renderer_a0);
+    CT_INIT_API(api, ct_resource_a0);
+    CT_INIT_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_package_a0);
+    CT_INIT_API(api, ct_machine_a0);
+    CT_INIT_API(api, ct_debugui_a0);
+    CT_INIT_API(api, ct_renderer_a0);
 
 
 #if defined(CETECH_DEVELOP)

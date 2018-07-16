@@ -55,7 +55,6 @@ static struct _G {
     struct WorldInstance *world_instances;
     struct ct_hash_t ent_map;
 
-    uint64_t type;
     struct ct_alloc *allocator;
 } _G;
 
@@ -291,7 +290,7 @@ static int has(struct ct_world world,
 static struct ct_scene_node get_root(struct ct_world world,
                                      struct ct_entity entity) {
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
                                    entity);
 
     return (struct ct_scene_node) {.idx = scene->idx, .world = world};
@@ -305,7 +304,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t count) {
     CT_UNUSED(pose);
 
-    ct_ecs_a0->entity->add_components(world, entity, &_G.type, 1);
+    ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1);
 
     struct WorldInstance *data = _get_world_instance(world);
 
@@ -382,7 +381,7 @@ static struct ct_scene_node create(struct ct_world world,
     CT_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->entity_data(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
                                               entity);
 
     scene->idx = root.idx;
@@ -484,13 +483,7 @@ static void init(struct ct_api_a0 *api) {
 
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = SCENEGRAPH_TYPE,
     };
-//
-//    ct_ecs_a0->register_component((struct ct_component_info) {
-//            .size = sizeof(struct ct_scenegraph_component),
-//            .component_name = "scenegraph",
-//    });
 
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
     ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
@@ -509,11 +502,11 @@ static void shutdown() {
 CETECH_MODULE_DEF(
         scenegraph,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

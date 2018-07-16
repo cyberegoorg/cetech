@@ -750,7 +750,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G = {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->object(),
+            .config = ct_config_a0->obj(),
     };
 
 
@@ -784,7 +784,7 @@ static void _init(struct ct_api_a0 *api) {
 
     _G.vsync = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    CETECH_GET_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_os_a0);
 
     ct_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
 
@@ -810,14 +810,14 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         renderer,
         {
-            CETECH_GET_API(api, ct_config_a0);
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_config_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_machine_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_ebus_a0);
         },
         {
             CT_UNUSED(reload);

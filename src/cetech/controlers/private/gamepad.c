@@ -150,8 +150,7 @@ static void update(uint64_t _event) {
         uint64_t event = events[i];
         uint32_t button = ct_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
         uint32_t axis = ct_cdb_a0->read_uint64(event, CONTROLER_AXIS, 0);
-        uint32_t gamepad_id = ct_cdb_a0->read_uint64(event,
-                                                     CONTROLER_GAMEPAD_ID, 0);
+        uint32_t gamepad_id = ct_cdb_a0->read_uint64(event, CONTROLER_ID, 0);
 
         float pos[3] = {};
         ct_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
@@ -233,11 +232,11 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         gamepad,
         {
-            CETECH_GET_API(api, ct_machine_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_machine_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

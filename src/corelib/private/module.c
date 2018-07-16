@@ -242,7 +242,7 @@ static void load_dirs() {
 
         sprintf(key + len, "%d", i);
 
-        const uint64_t key_id = ct_hashlib_a0->id64_from_str(key);
+        const uint64_t key_id = ct_hashlib_a0->id64(key);
 
         if (!ct_cdb_a0->prop_exist(_G.config, key_id)) {
             break;
@@ -333,13 +333,13 @@ struct ct_module_a0 *ct_module_a0 = &module_api;
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->object()
+            .config = ct_config_a0->obj()
     };
 
     ct_api_a0 = api;
     api->register_api("ct_module_a0", &module_api);
 
-    uint64_t root = ct_hashlib_a0->id64_from_str("modules");
+    uint64_t root = ct_hashlib_a0->id64("modules");
     ct_fs_a0->map_root_dir(root, ct_cdb_a0->read_str(_G.config,
                                                      CONFIG_MODULE_DIR,
                                                      "bin/darwin64"), true);

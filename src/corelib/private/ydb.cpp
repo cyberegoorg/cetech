@@ -47,7 +47,7 @@ void expire_document_in_cache(const char *path,
 ct_yng_doc *load_to_cache(const char *path,
                           uint64_t path_key) {
 
-    static const uint64_t fs_root = ct_hashlib_a0->id64_from_str("source");
+    static const uint64_t fs_root = ct_hashlib_a0->id64("source");
 
     ct_log_a0->debug(LOG_WHERE, "Load file %s to cache", path);
 
@@ -86,7 +86,7 @@ ct_yng_doc *load_to_cache(const char *path,
 ct_yng_doc *get(const char *path) {
     ct_os_a0->thread->spin_lock(&_G.cache_lock);
 
-    uint64_t path_key = ct_hashlib_a0->id64_from_str(path);
+    uint64_t path_key = ct_hashlib_a0->id64(path);
 
     uint32_t idx = ct_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
     if (UINT32_MAX == idx) {
@@ -329,12 +329,12 @@ void get_mat4(const char *path,
 
 
 void modified(const char *path) {
-    uint64_t hash = ct_hashlib_a0->id64_from_str(path);
+    uint64_t hash = ct_hashlib_a0->id64(path);
     ct_hash_add(&_G.modified_files_set, hash, true, _G.allocator);
 }
 
 void unmodified(const char *path) {
-    uint64_t hash = ct_hashlib_a0->id64_from_str(path);
+    uint64_t hash = ct_hashlib_a0->id64(path);
     ct_hash_remove(&_G.modified_files_set, hash);
 }
 
@@ -513,7 +513,7 @@ void parent_files(const char *path,
 
 
 void save(const char *path) {
-    ct_vio *f = ct_fs_a0->open(ct_hashlib_a0->id64_from_str("source"), path,
+    ct_vio *f = ct_fs_a0->open(ct_hashlib_a0->id64("source"), path,
                                FS_OPEN_WRITE);
 
     if (!f) {

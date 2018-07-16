@@ -39,7 +39,7 @@ static struct _G {
 
 static void api_register_api(const char *name,
                              void *api) {
-    uint64_t name_id = ct_hashlib_a0->id64_from_str(name);
+    uint64_t name_id = ct_hashlib_a0->id64(name);
 
     uint64_t idx = ct_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
 
@@ -65,15 +65,13 @@ static void api_register_api(const char *name,
 }
 
 static int api_exist(const char *name) {
-    uint64_t name_id = ct_hashlib_a0->id64_from_str(name);
+    uint64_t name_id = ct_hashlib_a0->id64(name);
 
     return ct_hash_contain(&_G.api_map, name_id);
 }
 
-static struct ct_api_entry api_first(const char *name) {
-    uint64_t name_id = ct_hashlib_a0->id64_from_str(name);
-
-    uint64_t first = ct_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
+static struct ct_api_entry api_first(uint64_t name) {
+    uint64_t first = ct_hash_lookup(&_G.api_map, name, UINT64_MAX);
 
     if (first == UINT64_MAX) {
         return (struct ct_api_entry) {0};

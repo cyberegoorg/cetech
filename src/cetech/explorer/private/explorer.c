@@ -20,7 +20,7 @@
 #include <cetech/dock/dock.h>
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/explorer/explorer.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/selected_object/selected_object.h>
 
@@ -32,7 +32,7 @@
 static struct _G {
     bool visible;
 
-    uint32_t ent_name;
+    uint64_t ent_name;
 
     const char *path;
     struct ct_alloc *allocator;
@@ -40,10 +40,11 @@ static struct _G {
 
 
 void set_level(uint64_t obj) {
-    uint64_t asset = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET, 0);
+    uint64_t asset_type = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t asset_name = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_NAME, 0);
     const char *path = ct_cdb_a0->read_str(obj, ASSET_BROWSER_PATH, 0);
 
-    struct ct_resource_id rid = {.i64 = asset};
+    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
     if (_G.ent_name == rid.name) {
         return;
@@ -172,7 +173,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
         set_level(selected_object);
     }
 
-    ct_debugui_a0->LabelText("Entity", "%u", _G.ent_name);
+    ct_debugui_a0->LabelText("Entity", "%llu", _G.ent_name);
 
     if (_G.path) {
         struct ct_resource_id rid = (struct ct_resource_id) {
@@ -210,7 +211,7 @@ static void _init(struct ct_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api("ct_dock_i0", &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
@@ -220,12 +221,12 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         level_inspector,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_resource_a0);
         },
         {
             CT_UNUSED(reload);

@@ -1,286 +1,346 @@
 #include <stdio.h>
-#include <string.h>
 
-#include <corelib/cdb.h>
-#include <corelib/ydb.h>
-#include <corelib/fmath.inl>
-#include <corelib/ebus.h>
 #include <corelib/macros.h>
+#include <corelib/allocator.h>
+#include <corelib/fs.h>
+#include <corelib/os.h>
+#include <corelib/ydb.h>
 #include "corelib/hashlib.h"
 #include "corelib/memory.h"
 #include "corelib/api_system.h"
 #include "corelib/module.h"
 
-
+#include <corelib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/camera/camera.h>
-#include <cetech/transform/transform.h>
-#include <cetech/controlers/keyboard.h>
-#include <cetech/asset_browser/asset_browser.h>
-#include <cetech/explorer/explorer.h>
-#include <cetech/playground/playground.h>
-#include <cetech/resource/resource.h>
-#include <cetech/render_graph/render_graph.h>
-#include <cetech/default_render_graph/default_render_graph.h>
-#include <cetech/selected_object/selected_object.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/dock/dock.h>
-#include <cetech/controlers/controlers.h>
-#include <corelib/array.inl>
 #include <cetech/editor/editor.h>
+#include <cetech/camera/camera.h>
+#include <cetech/command_system/command_system.h>
+#include <cetech/action_manager/action_manager.h>
+#include <corelib/ebus.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/dock/dock.h>
+#include <cetech/asset_browser/asset_browser.h>
+#include <string.h>
 
-#define _G editor_globals
-
-
-struct editor {
-    uint64_t type;
-    uint64_t context_obj;
-    struct ct_dock_i0 dock;
-};
+#define _G plaground_global
 
 static struct _G {
-    struct editor *editors;
+    bool load_layout;
+    struct ct_render_graph *render_graph;
+    struct ct_render_graph_builder *render_graph_builder;
+    struct ct_render_graph_module *module;
 } _G;
 
+void reload_layout() {
+    _G.load_layout = true;
+}
 
-static struct ct_asset_editor_i0 *get_asset_editor(uint64_t cdb_type) {
-    struct ct_api_entry it = ct_api_a0->first("ct_asset_editor_i0");
+#define _UNDO \
+    CT_ID64_0("undo", 0xd9c7f03561492eecULL)
+
+#define _REDO \
+    CT_ID64_0("redo", 0x2b64b25d7febf67eULL)
+
+static float draw_main_menu() {
+    float menu_height = 0;
+    static bool debug = false;
+
+    if (ct_debugui_a0->BeginMainMenuBar()) {
+        if (ct_debugui_a0->BeginMenu("File", true)) {
+            if (ct_debugui_a0->MenuItem("Reload", "Alt+r", false, true)) {
+                ct_module_a0->reload_all();
+            }
+
+            if (ct_debugui_a0->MenuItem("Save", "Alt+s", false, true)) {
+                ct_ydb_a0->save_all_modified();
+            }
+
+            if (ct_debugui_a0->MenuItem2("Debug", "F9", &debug, true)) {
+                ct_renderer_a0->set_debug(debug);
+            }
+
+            if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
+                uint64_t event = ct_cdb_a0->create_object(
+                        ct_cdb_a0->db(),
+                        KERNEL_QUIT_EVENT);
+                ct_ebus_a0->broadcast(KERNEL_EBUS, event);
+
+            }
+
+            ct_debugui_a0->EndMenu();
+        }
+
+        if (ct_debugui_a0->BeginMenu("Edit", true)) {
+            char buffer[128];
+            char buffer2[128];
+
+            ct_cmd_system_a0->undo_text(buffer2, CT_ARRAY_LEN(buffer2));
+            const char *shortcut;
+
+            sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
+
+            shortcut = ct_action_manager_a0->shortcut_str(_UNDO);
+            if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
+                                        buffer2[0] != '0')) {
+                ct_action_manager_a0->execute(_UNDO);
+            }
+
+
+            ct_cmd_system_a0->redo_text(buffer2, CT_ARRAY_LEN(buffer2));
+            shortcut = ct_action_manager_a0->shortcut_str(_REDO);
+            sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
+            if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
+                                        buffer2[0] != '0')) {
+                ct_action_manager_a0->execute(_REDO);
+            }
+
+            ct_debugui_a0->EndMenu();
+        }
+
+        if (ct_debugui_a0->BeginMenu("Window", true)) {
+            if (ct_debugui_a0->BeginMenu("Layout", true)) {
+                if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
+                    struct ct_vio *f = ct_fs_a0->open(ASSET_BROWSER_SOURCE,
+                                                      "core/default.dock_layout",
+                                                      FS_OPEN_WRITE);
+                    ct_debugui_a0->SaveDock(f);
+                    ct_fs_a0->close(f);
+                }
+
+                if (ct_debugui_a0->MenuItem("Load", NULL, false, true)) {
+                    ct_debugui_a0->LoadDock("core/default.dock_layout");
+                }
+                ct_debugui_a0->EndMenu();
+            }
+
+            ct_debugui_a0->Separator();
+
+            struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
+            while (it.api) {
+                struct ct_dock_i0 *i = (it.api);
+
+                char title[128] = {0};
+
+                snprintf(title, CT_ARRAY_LEN(title), "%s %llu",
+                         i->display_title(i), i->id);
+
+                ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
+
+                it = ct_api_a0->next(it);
+            }
+
+            ct_debugui_a0->EndMenu();
+        }
+
+
+        struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
+        while (it.api) {
+            struct ct_dock_i0 *i = (it.api);
+
+            if (i->draw_main_menu) {
+                i->draw_main_menu();
+            }
+            it = ct_api_a0->next(it);
+        }
+
+        if (ct_debugui_a0->BeginMenu("Help", true)) {
+            if (ct_debugui_a0->MenuItem("About", NULL, false, true)) {
+            }
+            ct_debugui_a0->EndMenu();
+        }
+
+        float v[2];
+        ct_debugui_a0->GetWindowSize(v);
+        menu_height = v[1];
+
+        ct_debugui_a0->EndMainMenuBar();
+    }
+    return menu_height;
+}
+
+static void draw_all_docks() {
+    struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
     while (it.api) {
-        struct ct_asset_editor_i0 *i = (it.api);
+        struct ct_dock_i0 *i = (it.api);
 
-        if (cdb_type == i->asset_type()) {
-            return i;
+
+        char title[128] = {0};
+        snprintf(title, CT_ARRAY_LEN(title), "%s##%s_dock%llu",
+                 i->display_title(i), i->name(i), i->id);
+
+        if (ct_debugui_a0->BeginDock(title, &i->visible, i->dock_flag)) {
+            if (i->draw_ui) {
+                i->draw_ui(i);
+            }
+        }
+        ct_debugui_a0->EndDock();
+
+        it = ct_api_a0->next(it);
+    }
+}
+
+static void debugui_on_setup(void *inst,
+                             struct ct_render_graph_builder *builder) {
+    builder->call->add_pass(builder, inst, 0);
+}
+
+static void debugui_on_pass(void *inst,
+                            uint8_t viewid,
+                            uint64_t layer,
+                            struct ct_render_graph_builder *builder) {
+    ct_debugui_a0->render(viewid);
+}
+
+
+static void on_init(uint64_t _event) {
+    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    while (it.api) {
+        struct ct_editor_module_i0 *i = (it.api);
+        if(i->init) {
+            i->init();
+        }
+        it = ct_api_a0->next(it);
+    }
+
+    _G.render_graph = ct_render_graph_a0->create_graph();
+    _G.render_graph_builder = ct_render_graph_a0->create_builder();
+    _G.module = ct_render_graph_a0->create_module();
+
+    static struct ct_render_graph_pass debugui_pass = {
+            .on_pass = debugui_on_pass,
+            .on_setup = debugui_on_setup
+    };
+
+    _G.module->call->add_pass(_G.module, &debugui_pass,
+                              sizeof(struct ct_render_graph_pass));
+
+    _G.render_graph->call->add_module(_G.render_graph, _G.module);
+}
+
+static void on_shutdown(uint64_t _event) {
+    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    while (it.api) {
+        struct ct_editor_module_i0 *i = (it.api);
+
+        if(i->shutdown) {
+            i->shutdown();
+        }
+
+        it = ct_api_a0->next(it);
+    }
+}
+
+static void on_update(uint64_t app_event) {
+    ct_action_manager_a0->check();
+
+    float dt = ct_cdb_a0->read_float(app_event, KERNEL_EVENT_DT, 0.0f);
+
+    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    while (it.api) {
+        struct ct_editor_module_i0 *i = (it.api);
+
+        if(i->update) {
+            i->update(dt);
+        }
+
+        it = ct_api_a0->next(it);
+    }
+}
+
+static void on_render() {
+    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    while (it.api) {
+        struct ct_editor_module_i0 *i = (it.api);
+
+        if(i->render) {
+            i->render();
         }
 
         it = ct_api_a0->next(it);
     }
 
-    return NULL;
-};
-
-static void draw_editor(struct ct_dock_i0 *dock) {
-    struct editor *editor = &_G.editors[dock->id];
-
-    struct ct_asset_editor_i0* i = get_asset_editor(editor->type);
-
-    if(!i) {
-        return;
-    }
-
-    i->draw(editor->context_obj);
-//    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
-
-    if (ct_debugui_a0->IsMouseClicked(0, false)) {
-//        ct_selected_object_a0->set_selected_object(editor->asset);
-//        ct_explorer_a0->set_level(editor->world,
-//                                  editor->entity,
-//                                  editor->entity_name,
-//                                  editor->root,
-//                                  editor->path);
-    }
-
-
+    _G.render_graph_builder->call->clear(_G.render_graph_builder);
+    _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
+    _G.render_graph_builder->call->execute(_G.render_graph_builder);
 }
 
-static uint32_t find_editor(struct ct_resource_id asset) {
-    const uint32_t editor_n = ct_array_size(_G.editors);
 
-    for (uint32_t i = 0; i < editor_n; ++i) {
-        struct editor *editor = &_G.editors[i];
+static void on_ui(uint64_t _event) {
+    float menu_height = draw_main_menu();
 
-        const uint64_t asset_name = ct_cdb_a0->read_uint64(editor->context_obj,
-                                                           _ASSET_NAME, 0);
+    uint32_t w, h;
+    ct_renderer_a0->get_size(&w, &h);
+    float pos[] = {0.0f, menu_height};
+    float size[] = {(float) w, h - 25.0f};
 
-        const uint64_t asset_type = ct_cdb_a0->read_uint64(editor->context_obj,
-                                                           _ASSET_TYPE, 0);
+    ct_debugui_a0->RootDock(pos, size);
+    draw_all_docks();
 
-        if(!asset_name && !asset_type) {
-            return i;
-        }
-
-        if ((asset_name == asset.name) && (asset_type == asset.type)) {
-            return i;
-        }
-    }
-
-    return UINT32_MAX;
-}
-
-static const char *dock_title(struct ct_dock_i0 *dock) {
-    return ICON_FA_CUBE " Editor";
-}
-
-static const char *name(struct ct_dock_i0 *dock) {
-    return "editor";
-}
-
-static struct editor *_new_editor(struct ct_resource_id asset) {
-    uint32_t ent_idx = find_editor(asset);
-
-    if (ent_idx != UINT32_MAX) {
-        struct editor *editor = &_G.editors[ent_idx];
-        return editor;
-    }
-
-    int idx = ct_array_size(_G.editors);
-    ct_array_push(_G.editors, (struct editor){}, ct_memory_a0->system);
-
-    struct editor *editor = &_G.editors[idx];
-
-    editor->context_obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), 0);
-
-    editor->dock = (struct ct_dock_i0) {
-            .id = idx,
-            .dock_flag = DebugUIWindowFlags_NoNavInputs |
-                         DebugUIWindowFlags_NoScrollbar |
-                         DebugUIWindowFlags_NoScrollWithMouse,
-            .visible = true,
-            .display_title = dock_title,
-            .name = name,
-            .draw_ui = draw_editor,
-    };
-
-
-    ct_api_a0->register_api("ct_dock_i0", &editor->dock);
-
-    struct ct_world* w = ct_cdb_a0->write_begin(editor->context_obj);
-    ct_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
-    ct_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
-    ct_cdb_a0->write_commit(w);
-
-    return editor;
-}
-
-static void open(struct ct_resource_id asset,
-                 uint64_t root,
-                 const char *path) {
-    struct ct_asset_editor_i0* i = get_asset_editor(asset.type);
-
-    if(!i) {
-        return;
-    }
-
-    struct editor* e = _new_editor(asset);
-    e->type = asset.type;
-
-    struct ct_world* w = ct_cdb_a0->write_begin(e->context_obj);
-    ct_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
-    ct_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
-    ct_cdb_a0->write_commit(w);
-
-    i->open(e->context_obj);
-
-//    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(),
-//                                            ASSET_BROWSER_ASSET_TYPE);
-//
-//    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
-//    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET, asset.i64);
-//    ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT, root);
-//    ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
-//    ct_cdb_a0->write_commit(w);
-//
-//    if (editor->entity_name == asset.name) {
-//        editor->asset = obj;
-////        ct_selected_object_a0->set_selected_object(editor->asset);
-////        ct_explorer_a0->set_level(editor->world,
-////                                  editor->entity,
-////                                  editor->entity_name,
-////                                  editor->root,
-////                                  editor->path);
-//        return;
-//    }
-
-}
-
-static void update(float dt) {
-    const uint32_t editor_n = ct_array_size(_G.editors);
-    for (uint8_t i = 0; i <editor_n; ++i) {
-        struct editor *editor = &_G.editors[i];
-
-        struct ct_asset_editor_i0* editor_i = get_asset_editor(editor->type);
-
-        if(!editor_i) {
-            return;
-        }
-
-        editor_i->update(editor->context_obj, dt);
-    }
-}
-
-static void on_render() {
-    const uint32_t editor_n = ct_array_size(_G.editors);
-    for (uint8_t i = 0; i <editor_n; ++i) {
-        struct editor *editor = &_G.editors[i];
-
-        if (!editor->dock.visible) {
-            continue;
-        }
-
-        struct ct_asset_editor_i0* editor_i = get_asset_editor(editor->type);
-
-        if(!editor_i) {
-            return;
-        }
-
-        editor_i->render(editor->context_obj);
+    if (_G.load_layout) {
+        ct_debugui_a0->LoadDock("core/default.dock_layout");
+        _G.load_layout = false;
     }
 }
 
 
-static void on_asset_double_click(uint64_t event) {
-    uint64_t asset = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET, 0);
-    uint64_t root = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
-    const char *path = ct_cdb_a0->read_str(event, ASSET_BROWSER_PATH, 0);
-
-    struct ct_resource_id rid = {.i64 = asset};
-
-    if (ENTITY_RESOURCE_ID == rid.type) {
-        open(rid, root, path);
-        return;
-    }
-}
-
-
-static struct ct_playground_module_i0 ct_playground_module_i0 = {
-        .update = update,
-        .render= on_render,
-};
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
+            .load_layout = true,
     };
 
-    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
-                        on_asset_double_click, 0);
+    ct_action_manager_a0->register_action(
+            CT_ID64_0("undo", 0xd9c7f03561492eecULL),
+            "ctrl+z",
+            ct_cmd_system_a0->undo
+    );
 
-    ct_api_a0->register_api("ct_playground_module_i0",
-                            &ct_playground_module_i0);
+    ct_action_manager_a0->register_action(
+            CT_ID64_0("redo", 0x2b64b25d7febf67eULL),
+            "ctrl+shift+z",
+            ct_cmd_system_a0->redo
+    );
 
-    _new_editor((struct ct_resource_id){.i64=0});
+
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT, on_init, GAME_ORDER);
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update,
+                        KERNEL_ORDER);
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown,
+                        KERNEL_ORDER);
+    ct_ebus_a0->connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render, 0);
+    ct_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
-                           on_asset_double_click);
+    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_INIT_EVENT, on_init);
+    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update);
+    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown);
+    ct_ebus_a0->disconnect(KERNEL_EBUS, RENDERER_RENDER_EVENT, on_render);
+    ct_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
 
     _G = (struct _G) {};
 }
 
 CETECH_MODULE_DEF(
-        editor,
+        playground,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_default_rg_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_camera_a0);
+            CT_INIT_API(api, ct_fs_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_action_manager_a0);
+            CT_INIT_API(api, ct_cmd_system_a0);
+            CT_INIT_API(api, ct_module_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_render_graph_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

@@ -6,7 +6,8 @@ project(cetech)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11 -Werror -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror -Wall")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
+set(EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
+set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
 
 include_directories(src)
 
@@ -47,12 +48,12 @@ set(EXTERNAL_SOURCE_FILES
         ########################################################################
         # Externals: MPack
         ########################################################################
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
-#        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
+        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
         )
 
 set(CORELIB_SOURCE_FILES
@@ -91,7 +92,7 @@ set(SOURCE_FILES
         ${CORELIB_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
-        src/cetech/resource/private/resource_package.c
+        src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/kernel.c
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
@@ -117,7 +118,6 @@ set(SOURCE_FILES
 
         src/cetech/shader/private/shader.c
         src/cetech/material/private/material.cpp
-        src/cetech/material/private/material_preview.cpp
         src/cetech/material/private/material_compiler.cpp
         src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
@@ -127,26 +127,28 @@ set(SOURCE_FILES
         src/cetech/scenegraph/private/scenegraph.c
         src/cetech/camera/private/camera.c
 
-        src/cetech/entity_editor/private/entity_editor.c
-        src/cetech/editor/private/editor.c
-        src/cetech/ecs/private/entity_property.c
+        src/cetech/entity/private/entity_editor.c
+        src/cetech/asset_editor/private/asset_editor.c
+        src/cetech/entity/private/entity_property.c
         src/cetech/explorer/private/explorer.c
         src/cetech/asset_preview/private/asset_preview.c
         src/cetech/asset_property/private/asset_property.c
         src/cetech/asset_browser/private/asset_browser.cpp
-        src/cetech/playground/private/playground.c
+        src/cetech/editor/private/editor.c
         src/cetech/property_editor/private/property_editor.c
         src/cetech/command_system/private/command_system.c
         src/cetech/command_history/private/command_history.c
         src/cetech/log_view/private/log_view.cpp
         src/cetech/action_manager/private/action_manager.c
-        src/cetech/selected_object/private/selected_object.c)
+        src/cetech/selected_object/private/selected_object.c
+        src/cetech/builddb/private/builddb.c
+        src/cetech/editor_ui/private/editor_ui.c)
 
 ################################################################################
 # Main sources
 ################################################################################
 set(MAIN_SOURCE_FILES
-        ${SOURCE_FILES} )
+        ${SOURCE_FILES})
 
 ################################################################################
 # Release sources
@@ -172,7 +174,7 @@ if (APPLE)
             "-weak_framework Metal"
             )
 
-elseif(UNIX)
+elseif (UNIX)
     set(RELEASE_LIBS_LINUX
             #jemalloc_pic.a
             pthread
@@ -195,7 +197,7 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
         ${RELEASE_LIBS_DARWIN}
 
-#        nanomsg.a
+        #        nanomsg.a
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a

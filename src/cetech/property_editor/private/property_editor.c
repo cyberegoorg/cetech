@@ -8,9 +8,10 @@
 #include <cetech/debugui/debugui.h>
 
 #include <cetech/property_editor/property_editor.h>
-#include <cetech/playground/playground.h>
+#include <cetech/editor/editor.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/dock/dock.h>
+#include <string.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -19,17 +20,13 @@ static struct _G {
     bool visible;
 } _G;
 
-static struct ct_property_editor_a0 property_inspector_api = {
 
-};
-
-struct ct_property_editor_a0 *ct_property_editor_a0 = &property_inspector_api;
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    struct ct_api_entry it = ct_api_a0->first("ct_property_editor_i0");
+    struct ct_api_entry it = ct_api_a0->first(PROPERTY_EDITOR_INTERFACE);
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
-        i->draw();
+        i->draw_ui();
 
         it = ct_api_a0->next(it);
     }
@@ -56,9 +53,7 @@ static void _init(struct ct_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api("ct_property_editor_a0", &property_inspector_api);
-    api->register_api("ct_dock_i0", &ct_dock_i0);
-
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
@@ -67,8 +62,8 @@ static void _shutdown() {
 
 CETECH_MODULE_DEF(
         property_inspector,
-        { ;
-            CETECH_GET_API(api, ct_hashlib_a0);
+        {
+            CT_INIT_API(api, ct_hashlib_a0);
         },
         {
             CT_UNUSED(reload);

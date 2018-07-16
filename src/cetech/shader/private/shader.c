@@ -25,6 +25,7 @@
 #include <corelib/config.h>
 #include <corelib/yng.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/builddb/builddb.h>
 
 //==============================================================================
 // GLobals
@@ -32,7 +33,6 @@
 
 #define _G ShaderResourceGlobals
 struct _G {
-    uint64_t type;
     struct ct_alloc *allocator;
 } _G;
 
@@ -116,14 +116,17 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static void _compile(uint64_t obj) {
+static void _compile(const char* filename, uint64_t obj) {
     const char *vs_input = ct_cdb_a0->read_str(obj, SHADER_VS_INPUT, "");
     const char *fs_input = ct_cdb_a0->read_str(obj, SHADER_FS_INPUT, "");
 
+    ct_builddb_a0->add_dependency(filename, vs_input);
+    ct_builddb_a0->add_dependency(filename, fs_input);
+
     struct ct_alloc *a = ct_memory_a0->system;
 
-    const char *source_dir = ct_resource_a0->compiler_get_source_dir();
-    const char *core_dir = ct_resource_a0->compiler_get_core_dir();
+    const char *source_dir =  ct_cdb_a0->read_str(ct_config_a0->obj(), CONFIG_SRC, "");
+    const char *core_dir = ct_cdb_a0->read_str(ct_config_a0->obj(), CONFIG_CORE, "");
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
 
@@ -136,7 +139,7 @@ static void _compile(uint64_t obj) {
 
 
     const char *platform;
-    platform = ct_cdb_a0->read_str(ct_config_a0->object(), CONFIG_PLATFORM, "");
+    platform = ct_cdb_a0->read_str(ct_config_a0->obj(), CONFIG_PLATFORM, "");
 
     char *tmp_dir = ct_resource_a0->compiler_get_tmp_dir(a, platform);
 
@@ -214,8 +217,7 @@ static void _compile(uint64_t obj) {
 }
 
 void shader_compiler(const char *filename,
-                     char **output,
-                     struct ct_compilator_api *compilator_api) {
+                     char **output) {
     struct ct_alloc *a = ct_memory_a0->system;
 
     uint64_t key[] = {
@@ -240,7 +242,7 @@ void shader_compiler(const char *filename,
 
     ct_cdb_a0->write_commit(w);
 
-    _compile(obj);
+    _compile(filename, obj);
 
     ct_cdb_a0->dump(obj, output, a);
     ct_cdb_a0->destroy_object(obj);
@@ -292,12 +294,11 @@ static void offline(uint64_t name,
 
 
 static uint64_t cdb_type() {
-    return CT_ID32_0("shader");
+    return SHADER_TYPE;
 }
 
 void shader_compiler(const char *filename,
-                     char **output,
-                     struct ct_compilator_api *compilator_api);
+                     char **output);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -311,8 +312,6 @@ static struct ct_resource_i0 ct_resource_i0 = {
 //==============================================================================
 int shader_init(struct ct_api_a0 *api) {
     _G = (struct _G){.allocator = ct_memory_a0->system};
-
-    _G.type = SHADER_TYPE;
 
     ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
 
@@ -340,13 +339,13 @@ static void _init_api(struct ct_api_a0 *api) {
 CETECH_MODULE_DEF(
         shader,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_os_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_os_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_renderer_a0);
         },
         {
             CT_UNUSED(reload);

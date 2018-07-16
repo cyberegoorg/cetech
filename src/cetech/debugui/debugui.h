@@ -180,6 +180,47 @@ enum DebugUISetCond_ {
             << 3  //!< Set the variable if the window is appearing after being hidden/inactive (or the first time)
 };
 
+
+enum DebugUIDragDropFlags_
+{
+    // BeginDragDropSource() flags
+    DebugUIDragDropFlags_SourceNoPreviewTooltip       = 1 << 0,   // By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disable this behavior.
+    DebugUIDragDropFlags_SourceNoDisableHover         = 1 << 1,   // By default, when dragging we clear data so that IsItemHovered() will return true, to avoid subsequent user code submitting tooltips. This flag disable this behavior so you can still call IsItemHovered() on the source item.
+    DebugUIDragDropFlags_SourceNoHoldToOpenOthers     = 1 << 2,   // Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item.
+    DebugUIDragDropFlags_SourceAllowNullID            = 1 << 3,   // Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit.
+    DebugUIDragDropFlags_SourceExtern                 = 1 << 4,   // External source (from outside of imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.
+    // AcceptDragDropPayload() flags
+    DebugUIDragDropFlags_AcceptBeforeDelivery         = 1 << 10,  // AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.
+    DebugUIDragDropFlags_AcceptNoDrawDefaultRect      = 1 << 11,  // Do not draw the default highlight rectangle when hovering over target.
+    DebugUIDragDropFlags_AcceptPeekOnly               = DebugUIDragDropFlags_AcceptBeforeDelivery | DebugUIDragDropFlags_AcceptNoDrawDefaultRect  // For peeking ahead and inspecting the payload before delivery.
+};
+
+struct DebugUIPayload
+{
+    // Members
+    const void*     Data;               // Data (copied and owned by dear imgui)
+    int             DataSize;           // Data size
+
+    // [Internal]
+    ImGuiID         SourceId;           // Source item id
+    ImGuiID         SourceParentId;     // Source parent id (if available)
+    int             DataFrameCount;     // Data timestamp
+    char            DataType[32+1];     // Data type tag (short user-supplied string, 32 characters max)
+    bool            Preview;            // Set when AcceptDragDropPayload() was called and mouse has been hovering the target item (nb: handle overlapping drag targets)
+    bool            Delivery;           // Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
+
+};
+
+enum DebugUICond {
+    DebugUICond_Always = 1 << 0,   // Set the variable
+    DebugUICond_Once = 1
+            << 1,   // Set the variable once per runtime session (only the first call with succeed)
+    DebugUICond_FirstUseEver = 1
+            << 2,   // Set the variable if the object/window has no persistently saved data (no entry in .ini file)
+    DebugUICond_Appearing = 1
+            << 3    // Set the variable if the object/window is appearing after being hidden/inactive (or the first time)
+};
+
 enum OPERATION {
     TRANSLATE,
     ROTATE,
@@ -802,6 +843,14 @@ struct ct_debugui_a0 {
 
     void (*GetContentRegionAvail)(float* size);
     float (*GetTextLineHeightWithSpacing)();
+
+    bool          (*BeginDragDropSource)(enum DebugUIDragDropFlags_ flags );
+    bool          (*SetDragDropPayload)(const char* type, const void* data, size_t size, enum DebugUICond cond);
+    void          (*EndDragDropSource)();
+    bool          (*BeginDragDropTarget)();
+    const struct DebugUIPayload* (*AcceptDragDropPayload)(const char* type, enum DebugUIDragDropFlags_ flags);
+    void          (*EndDragDropTarget)();
+
 
 };
 

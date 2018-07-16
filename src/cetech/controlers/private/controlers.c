@@ -11,20 +11,19 @@
 #include <corelib/macros.h>
 #include <corelib/os.h>
 #include "corelib/allocator.h"
+#include <corelib/memory.h>
+#include <corelib/hash.inl>
 
 #include <cetech/machine/machine.h>
 #include <cetech/kernel/kernel.h>
-
 #import <cetech/controlers/controlers.h>
-#include <corelib/memory.h>
-#include <corelib/hash.inl>
+
 
 //==============================================================================
 // Defines
 //==============================================================================
 
 #define LOG_WHERE "controlers"
-
 
 //==============================================================================
 // Globals
@@ -56,7 +55,7 @@ struct ct_controlers_i0* get_by_name(uint64_t name) {
 };
 
 static struct ct_controlers_a0 ct_controlers_api = {
-        .get_by_name = get_by_name,
+        .get = get_by_name,
 };
 
 struct ct_controlers_a0 *ct_controlers_a0 = &ct_controlers_api;
@@ -83,10 +82,10 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         controlers,
         {
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
         },
         {
             CT_UNUSED(reload);

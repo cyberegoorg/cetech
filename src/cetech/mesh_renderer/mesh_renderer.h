@@ -27,20 +27,14 @@
 #define PROP_MATERIAL_REF \
     (CT_ID64_0("material_ref", 0x1be2b88dca67f200ULL))
 
-#define PROP_SCENE \
-    CT_ID64_0("scene", 0x9d0a795bfe818d19ULL)
-
 #define PROP_NODE \
     (CT_ID64_0("node", 0x5ae0930b5138a928ULL))
 
 #define PROP_MESH \
     (CT_ID64_0("mesh", 0x48ff313713a997a1ULL))
 
-#define PROP_MATERIAL \
-    (CT_ID64_0("material", 0xeac0b497876adedfULL))
 
-
-struct ct_mesh_renderer {
+struct ct_mesh {
     uint64_t scene_id;
     uint64_t mesh_id;
     uint64_t node_id;

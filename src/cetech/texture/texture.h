@@ -39,7 +39,7 @@
 
 //! Texture API V0
 struct ct_texture_a0 {
-    struct ct_render_texture_handle (*get)(uint32_t name);
+    struct ct_render_texture_handle (*get)(uint64_t name);
 };
 
 CT_MODULE(ct_texture_a0);

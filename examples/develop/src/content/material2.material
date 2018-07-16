@@ -4,6 +4,4 @@ layers:
   default:
     variables:
       kdasdvxcvcxbxcbxbg435124asdkj:
-        name: u_texColor
-        type: texture
         value: content/texture2

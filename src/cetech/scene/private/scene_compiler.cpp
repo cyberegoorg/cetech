@@ -1,30 +1,34 @@
 //==============================================================================
 // Include
 //==============================================================================
+#include <time.h>
+
+#include <corelib/macros.h>
+#include <corelib/ydb.h>
+#include <corelib/array.inl>
+#include "corelib/hashlib.h"
+#include "corelib/memory.h"
+#include "corelib/api_system.h"
+#include <corelib/os.h>
+#include <corelib/yng.h>
+#include <corelib/cdb.h>
+#include <corelib/config.h>
+
+
+#include "cetech/machine/machine.h"
+#include "cetech/resource/resource.h"
+#include <cetech/renderer/renderer.h>
+#include "cetech/ecs/ecs.h"
+#include "cetech/scenegraph/scenegraph.h"
+#include <cetech/scene/scene.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/builddb/builddb.h>
 
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
-#include <corelib/macros.h>
-#include <corelib/ydb.h>
-#include <corelib/array.inl>
-
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "cetech/machine/machine.h"
 
 
-#include "cetech/resource/resource.h"
-#include "cetech/ecs/ecs.h"
-
-#include "cetech/scenegraph/scenegraph.h"
-
-#include <corelib/os.h>
-#include <cetech/renderer/renderer.h>
-#include <corelib/yng.h>
-#include <corelib/cdb.h>
-#include <cetech/scene/scene.h>
 
 #define _G scene_compiler_globals
 
@@ -258,7 +262,7 @@ static void foreach_geometries_clb(struct ct_yng_node key,
     ct_yng_doc *d = key.d;
 
     const char *name_str = d->as_string(d, key, "");
-    uint64_t name = ct_hashlib_a0->id64_from_str(name_str);
+    uint64_t name = ct_hashlib_a0->id64(name_str);
 
     char tmp_name[128];
     strncpy(tmp_name, name_str, 127);
@@ -349,7 +353,7 @@ static void foreach_graph_clb(struct ct_yng_node key,
     ct_yng_doc *d = key.d;
 
     const char *key_str = d->as_string(d, key, "");
-    uint64_t node_name = ct_hashlib_a0->id64_from_str(key_str);
+    uint64_t node_name = ct_hashlib_a0->id64(key_str);
 
 
     char tmp_name[128];
@@ -390,7 +394,7 @@ static void foreach_graph_clb(struct ct_yng_node key,
                                                       geometries_k, i);
             const char *geom_str = d->as_string(d, name_node, "");
 
-            uint64_t geom_name = ct_hashlib_a0->id64_from_str(geom_str);
+            uint64_t geom_name = ct_hashlib_a0->id64(geom_str);
             for (uint32_t j = 0;
                  j < ct_array_size(output->output->geom_name); ++j) {
                 if (geom_name != output->output->geom_name[j]) {
@@ -448,7 +452,7 @@ static void _compile_assimp_node(struct aiNode *root,
                                  uint32_t parent,
                                  struct compile_output *output) {
 
-    uint64_t name = ct_hashlib_a0->id64_from_str(root->mName.data);
+    uint64_t name = ct_hashlib_a0->id64(root->mName.data);
 
     char tmp_name[128] = {0};
     strncpy(tmp_name, root->mName.data, 127);
@@ -472,15 +476,14 @@ static void _compile_assimp_node(struct aiNode *root,
 
 static int _compile_assimp(const char *filename,
                            struct ct_yng_doc *doc,
-                           struct compile_output *output,
-                           ct_compilator_api *capi) {
+                           struct compile_output *output) {
 
     const char *input_str = doc->get_str(doc,
                                          ct_yng_a0->key("import.input"), "");
 
-    capi->add_dependency(filename, input_str);
+    ct_builddb_a0->add_dependency(filename, input_str);
 
-    const char *source_dir = ct_resource_a0->compiler_get_source_dir();
+    const char *source_dir = ct_cdb_a0->read_str(ct_config_a0->obj(), CONFIG_SRC, "");
     char *input_path = NULL;
     ct_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
                             input_str);
@@ -509,7 +512,7 @@ static int _compile_assimp(const char *filename,
             memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
         }
 
-        uint64_t name_id = ct_hashlib_a0->id64_from_str(tmp_buffer);
+        uint64_t name_id = ct_hashlib_a0->id64(tmp_buffer);
         for (uint32_t k = 0; k < ct_array_size(output->geom_name); ++k) {
             if (name_id == output->geom_name[k]) {
                 snprintf(tmp_buffer2, CT_ARRAY_LEN(tmp_buffer2), "%s%d",
@@ -525,7 +528,7 @@ static int _compile_assimp(const char *filename,
         strncpy(tmp_name, tmp_buffer, 127);
         ct_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
 
-        ct_array_push(output->geom_name, ct_hashlib_a0->id64_from_str(tmp_buffer), _G.allocator);
+        ct_array_push(output->geom_name, ct_hashlib_a0->id64(tmp_buffer), _G.allocator);
         ct_array_push(output->ib_offset, ct_array_size(output->ib),
                       _G.allocator);
         ct_array_push(output->vb_offset, ct_array_size(output->vb),
@@ -600,8 +603,7 @@ static int _compile_assimp(const char *filename,
 }
 
 extern "C" void scene_compiler(const char *filename,
-                               char **output_blob,
-                               struct ct_compilator_api *compilator_api) {
+                               char **output_blob) {
     struct compile_output *output = _crete_compile_output();
 
     ct_yng_doc *document = ct_ydb_a0->get(filename);
@@ -610,7 +612,7 @@ extern "C" void scene_compiler(const char *filename,
 
     if (document->has_key(document,
                           ct_yng_a0->key("import"))) {
-        ret = _compile_assimp(filename, document, output, compilator_api);
+        ret = _compile_assimp(filename, document, output);
     } else {
         ret = _compile_yaml(document, output);
     }
@@ -678,14 +680,14 @@ extern "C" void scene_compiler(const char *filename,
 }
 
 extern "C" int scenecompiler_init(struct ct_api_a0 *api) {
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_resource_a0);
-    CETECH_GET_API(api, ct_scenegprah_a0);
-    CETECH_GET_API(api, ct_os_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_yng_a0);
-    CETECH_GET_API(api, ct_ydb_a0);
-    CETECH_GET_API(api, ct_renderer_a0);
+    CT_INIT_API(api, ct_memory_a0);
+    CT_INIT_API(api, ct_resource_a0);
+    CT_INIT_API(api, ct_scenegprah_a0);
+    CT_INIT_API(api, ct_os_a0);
+    CT_INIT_API(api, ct_hashlib_a0);
+    CT_INIT_API(api, ct_yng_a0);
+    CT_INIT_API(api, ct_ydb_a0);
+    CT_INIT_API(api, ct_renderer_a0);
 
     _G = (struct _G) {.allocator=ct_memory_a0->system};
 

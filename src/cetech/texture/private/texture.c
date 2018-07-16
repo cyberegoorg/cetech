@@ -25,6 +25,9 @@
 #include <corelib/cdb.h>
 #include <corelib/yng.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/editor_ui/editor_ui.h>
+#include <cetech/builddb/builddb.h>
+#include <cetech/asset_preview/asset_preview.h>
 
 //==============================================================================
 // GLobals
@@ -32,7 +35,6 @@
 
 #define _G TextureResourceGlobals
 struct _G {
-    uint32_t type;
     struct ct_alloc *allocator;
 } _G;
 
@@ -149,14 +151,15 @@ static void _compile(uint64_t obj) {
 
     struct ct_alloc *a = ct_memory_a0->system;
 
-    const char *platform = ct_cdb_a0->read_str(ct_config_a0->object(),
+    const char *platform = ct_cdb_a0->read_str(ct_config_a0->obj(),
                                                CONFIG_PLATFORM,
                                                "");
 
     char output_path[1024] = {};
     char tmp_filename[1024] = {};
 
-    const char *source_dir = ct_resource_a0->compiler_get_source_dir();
+    const char *source_dir = ct_cdb_a0->read_str(ct_config_a0->obj(),
+                                                 CONFIG_SRC, "");
 
     char *tmp_dir = ct_resource_a0->compiler_get_tmp_dir(a, platform);
     char *input_path = NULL;
@@ -222,8 +225,7 @@ static void _on_obj_change(uint64_t obj,
 }
 
 void texture_compiler(const char *filename,
-                      char **output,
-                      struct ct_compilator_api *compilator_api) {
+                      char **output) {
 
     struct ct_alloc *a = ct_memory_a0->system;
 
@@ -249,18 +251,19 @@ void texture_compiler(const char *filename,
 
     ct_cdb_a0->dump(obj, output, a);
     ct_cdb_a0->destroy_object(obj);
-    compilator_api->add_dependency(filename, input_str);
+
+    ct_builddb_a0->add_dependency(filename, input_str);
 }
 
 static uint64_t cdb_type() {
-    return CT_ID32_0("texture");
+    return TEXTURE_TYPE;
 }
 
 static void draw_property(uint64_t obj) {
 
-    ct_entity_property_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
-    ct_entity_property_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_entity_property_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+    ct_editor_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
+    ct_editor_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
+    ct_editor_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
     ct_debugui_a0->LabelText("Texture preview", "");
     float size[2];
@@ -284,10 +287,36 @@ static struct ct_asset_property_i0 ct_asset_property_i0 = {
         .display_name = display_name,
 };
 
+static void tooltip(struct ct_resource_id resourceid) {
+    uint64_t tobj = ct_resource_a0->get(resourceid);
+
+    struct ct_render_texture_handle texture = {
+            .idx = (uint16_t) ct_cdb_a0->read_uint64(tobj,
+                                                     TEXTURE_HANDLER_PROP, 0)
+    };
+
+    ct_debugui_a0->Image(texture,
+                         (float[2]) {64.0f, 64.0f},
+                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+
+
+}
+
+static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
+        .tooltip = tooltip,
+};
+
+
 void *get_interface(uint64_t name_hash) {
     if (name_hash == ASSET_PROPERTY) {
         return &ct_asset_property_i0;
     }
+
+    if (name_hash == ASSET_PREVIEW) {
+        return &ct_asset_preview_i0;
+    }
+
     return NULL;
 }
 
@@ -306,7 +335,6 @@ static struct ct_resource_i0 ct_resource_i0 = {
 int texture_init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = CT_ID32_0("texture")
     };
 
     ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
@@ -317,8 +345,8 @@ int texture_init(struct ct_api_a0 *api) {
 void texture_shutdown() {
 }
 
-ct_render_texture_handle_t texture_get(uint32_t name) {
-    struct ct_resource_id rid = {.type = _G.type, .name = name};
+ct_render_texture_handle_t texture_get(uint64_t name) {
+    struct ct_resource_id rid = {.type = TEXTURE_TYPE, .name = name};
     uint64_t obj = ct_resource_a0->get(rid);
 
     if (!obj) {
@@ -347,13 +375,13 @@ static void _init_api(struct ct_api_a0 *api) {
 CETECH_MODULE_DEF(
         texture,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_resource_a0);
-            CETECH_GET_API(api, ct_os_a0);
-            CETECH_GET_API(api, ct_log_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_resource_a0);
+            CT_INIT_API(api, ct_os_a0);
+            CT_INIT_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_renderer_a0);
         },
         {
             CT_UNUSED(reload);

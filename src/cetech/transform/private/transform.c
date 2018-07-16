@@ -17,6 +17,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <corelib/yng.h>
+#include <cetech/editor_ui/editor_ui.h>
 
 #include "corelib/module.h"
 
@@ -43,8 +44,6 @@ struct WorldInstance {
 
 #define _G TransformGlobal
 static struct _G {
-    uint64_t type;
-
 //    struct ct_hash_t world_map;
 //    struct WorldInstance *world_instances;
 //    struct ct_hash_t ent_map;
@@ -215,7 +214,7 @@ static void _on_component_obj_change(uint64_t obj,
     struct ct_entity ent = {.h = ent_obj};
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->entity_data(world, TRANSFORM_COMPONENT,
+    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
                                                   ent);
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
@@ -248,12 +247,12 @@ static const char *display_name() {
 }
 
 static void property_editor(uint64_t obj) {
-    ct_entity_property_a0->ui_vec3(obj, PROP_POSITION, "Position", 0, 0);
+    ct_editor_ui_a0->ui_vec3(obj, PROP_POSITION, "Position", 0, 0);
 
-    ct_entity_property_a0->ui_vec3(obj, PROP_ROTATION, "Rotation",
+    ct_editor_ui_a0->ui_vec3(obj, PROP_ROTATION, "Rotation",
                                    -360.0f, 360.0f);
 
-    ct_entity_property_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
+    ct_editor_ui_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
 }
 
 void guizmo_get_transform(uint64_t obj,
@@ -338,16 +337,13 @@ static struct ct_component_i0 ct_component_i0 = {
         .spawner = _component_spawner,
 };
 
-#define TRANSFORM_TYPE \
-    CT_ID64_0("transform", 0x69e14b13ad9b5315ULL)
-
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ct_memory_a0->system,
-            .type = TRANSFORM_TYPE,
+
     };
 
-    api->register_api("ct_component_i0", &ct_component_i0);
+    api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
 }
 
 static void _shutdown() {
@@ -357,14 +353,14 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         transform,
         {
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_yng_a0);
-            CETECH_GET_API(api, ct_ydb_a0);
-            CETECH_GET_API(api, ct_cdb_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_ebus_a0);
-            CETECH_GET_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_yng_a0);
+            CT_INIT_API(api, ct_ydb_a0);
+            CT_INIT_API(api, ct_cdb_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_ebus_a0);
+            CT_INIT_API(api, ct_log_a0);
         },
         {
             CT_UNUSED(reload);

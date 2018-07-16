@@ -87,7 +87,7 @@ void foreach_camera(struct ct_world world,
     struct cameras *cameras = data;
 
     struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->component->entities_data(CAMERA_COMPONENT, item);
+    camera_data = ct_ecs_a0->component->get_all(CAMERA_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
         uint32_t idx = cameras->n++;
@@ -122,9 +122,9 @@ static void geometry_pass_on_pass(void *inst,
     struct cameras cameras;
     memset(&cameras, 0, sizeof(struct cameras));
 
-    ct_ecs_a0->process(pass->world,
-                       ct_ecs_a0->component->mask(CAMERA_COMPONENT),
-                       foreach_camera, &cameras);
+    ct_ecs_a0->system->process(pass->world,
+                               ct_ecs_a0->component->mask(CAMERA_COMPONENT),
+                               foreach_camera, &cameras);
 
     ct_dd_a0->begin(viewid);
     {
@@ -277,8 +277,8 @@ static void output_pass_on_pass(void *inst,
     ct_renderer_a0->set_view_transform(viewid, NULL, proj);
 
     if (!copy_material) {
-        copy_material = ct_material_a0->resource_create(
-                CT_ID32_0("content/copy"));
+        copy_material = ct_material_a0->create(
+                ct_hashlib_a0->id64("content/copy"));
     }
 
     ct_render_texture_handle_t th;
@@ -340,16 +340,16 @@ static void _shutdown() {
 CETECH_MODULE_DEF(
         default_render_graph,
         {
-            CETECH_GET_API(api, ct_hashlib_a0);
-            CETECH_GET_API(api, ct_memory_a0);
-            CETECH_GET_API(api, ct_renderer_a0);
-            CETECH_GET_API(api, ct_render_graph_a0);
-            CETECH_GET_API(api, ct_debugui_a0);
-            CETECH_GET_API(api, ct_ecs_a0);
-            CETECH_GET_API(api, ct_camera_a0);
-            CETECH_GET_API(api, ct_mesh_renderer_a0);
-            CETECH_GET_API(api, ct_dd_a0);
-            CETECH_GET_API(api, ct_material_a0);
+            CT_INIT_API(api, ct_hashlib_a0);
+            CT_INIT_API(api, ct_memory_a0);
+            CT_INIT_API(api, ct_renderer_a0);
+            CT_INIT_API(api, ct_render_graph_a0);
+            CT_INIT_API(api, ct_debugui_a0);
+            CT_INIT_API(api, ct_ecs_a0);
+            CT_INIT_API(api, ct_camera_a0);
+            CT_INIT_API(api, ct_mesh_renderer_a0);
+            CT_INIT_API(api, ct_dd_a0);
+            CT_INIT_API(api, ct_material_a0);
         },
         {
             CT_UNUSED(reload);

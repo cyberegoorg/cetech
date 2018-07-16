@@ -91,7 +91,7 @@ void sdl_mouse_process() {
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
     struct ct_renderer_a0 *renderer_a0 = (struct ct_renderer_a0 *) ct_api_a0->first(
-            "ct_renderer_a0").api;
+            ct_hashlib_a0->id64("ct_renderer_a0")).api;
 
     uint32_t window_size[2] = {};
     renderer_a0->get_size(&window_size[0], &window_size[1]);
@@ -285,12 +285,11 @@ void sdl_gamepad_process() {
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
-                        EVENT_GAMEPAD_DOWN);
+                uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+                                                          EVENT_GAMEPAD_DOWN);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ct_cdb_a0->write_commit(w);
 
@@ -304,7 +303,7 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_UP);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ct_cdb_a0->write_commit(w);
 
@@ -330,7 +329,7 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_MOVE);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ct_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
                 ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
                 ct_cdb_a0->write_commit(w);
@@ -435,7 +434,7 @@ static void _update(float dt) {
                         EVENT_GAMEPAD_CONNECT);
 
                 ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, idx);
+                ct_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ct_cdb_a0->write_commit(w);
 
                 ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -460,7 +459,7 @@ static void _update(float dt) {
                             EVENT_GAMEPAD_DISCONNECT);
 
                     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                    ct_cdb_a0->set_uint64(w, CONTROLER_GAMEPAD_ID, i);
+                    ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ct_cdb_a0->write_commit(w);
 
                     ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
@@ -493,11 +492,11 @@ struct ct_machine_a0 *ct_machine_a0 = &a0;
 static void init(struct ct_api_a0 *api) {
     api->register_api("ct_machine_a0", &a0);
 
-    CETECH_GET_API(api, ct_memory_a0);
-    CETECH_GET_API(api, ct_log_a0);
-    CETECH_GET_API(api, ct_hashlib_a0);
-    CETECH_GET_API(api, ct_ebus_a0);
-    CETECH_GET_API(api, ct_cdb_a0);
+    CT_INIT_API(api, ct_memory_a0);
+    CT_INIT_API(api, ct_log_a0);
+    CT_INIT_API(api, ct_hashlib_a0);
+    CT_INIT_API(api, ct_ebus_a0);
+    CT_INIT_API(api, ct_cdb_a0);
 
     if (SDL_Init(SDL_INIT_VIDEO |
                  SDL_INIT_GAMECONTROLLER |
@@ -522,7 +521,7 @@ static void shutdown() {
 CETECH_MODULE_DEF(
         machine,
         {
-            CETECH_GET_API(api, ct_log_a0);
+            CT_INIT_API(api, ct_log_a0);
 
             ct_api_a0 = api;
         },

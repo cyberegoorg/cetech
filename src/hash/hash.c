@@ -113,6 +113,15 @@ int main(int argc,
         process_file(files[i], a);
     }
 
+    ct_os_a0->path->list("./examples", CETECH_ARR_ARG(filter),
+                         1, 0, &files, &files_count, a);
+
+
+    for (uint32_t i = 0; i < files_count; ++i) {
+        process_file(files[i], a);
+    }
+
+
     ct_os_a0->path->list_free(files, files_count, a);
 
     ct_corelib_shutdown();

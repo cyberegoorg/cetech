@@ -1,16 +1,20 @@
-//! \defgroup Resource
-//! Resource system
-//! \{
 #ifndef CETECH_PACKAGE_H
 #define CETECH_PACKAGE_H
-
-
 
 //==============================================================================
 // Includes
 //==============================================================================
 
 #include <stdint.h>
+#include <corelib/module.inl>
+
+
+#define PACKAGE_TYPE \
+    CT_ID64_0("package", 0xad9c6d9ed1e5e77aULL)
+
+#define PACKAGE_TYPES_PROP \
+    CT_ID64_0("types", 0xe6e09632cf72fc79ULL)
+
 
 struct ct_task_counter_t;
 
@@ -18,7 +22,6 @@ struct ct_task_counter_t;
 // Api
 //==============================================================================
 
-//! Package API V!
 struct ct_package_a0 {
     struct ct_task_counter_t *(*load)(uint64_t name);
 
@@ -32,4 +35,3 @@ struct ct_package_a0 {
 CT_MODULE(ct_package_a0);
 
 #endif //CETECH_PACKAGE_H
-//! |}

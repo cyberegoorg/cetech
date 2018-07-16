@@ -43,8 +43,6 @@
 #define _G ConfigSystemGlobals
 
 static struct ConfigSystemGlobals {
-    uint32_t type;
-
     struct ct_cdb_t db;
     uint64_t config_object;
 } _G;
@@ -69,7 +67,7 @@ static void _cvar_from_str(const char *name,
 
     ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config_object);
 
-    const uint64_t key = ct_hashlib_a0->id64_from_str(name);
+    const uint64_t key = ct_hashlib_a0->id64(name);
 
     if (value == NULL) {
         ct_cdb_a0->set_uint64(writer, key, 1);
@@ -133,7 +131,7 @@ static void foreach_config_clb(struct ct_yng_node key,
             _cvar_from_str(name, str);
 
         } else {
-            const uint64_t key = ct_hashlib_a0->id64_from_str(name);
+            const uint64_t key = ct_hashlib_a0->id64(name);
 
             if (ct_cdb_a0->prop_exist(_G.config_object, key)) {
                 enum ct_cdb_type t = ct_cdb_a0->prop_type(
@@ -219,7 +217,7 @@ static uint64_t config_object() {
 }
 
 static struct ct_config_a0 config_a0 = {
-        .object = config_object,
+        .obj = config_object,
         .parse_args = parse_args,
         .log_all = log_all,
         .load_from_yaml_file = load_from_yaml_file
@@ -234,7 +232,7 @@ void CETECH_MODULE_INITAPI(config)(struct ct_api_a0 *api) {
 void CETECH_MODULE_LOAD (config)(struct ct_api_a0 *api,
                                   int reload) {
     CT_UNUSED(reload);
-    _G = (struct _G) {0};
+    _G = (struct _G) {{0}};
 
     ct_log_a0->debug(LOG_WHERE, "Init");
 
@@ -242,8 +240,6 @@ void CETECH_MODULE_LOAD (config)(struct ct_api_a0 *api,
     _G.config_object = ct_cdb_a0->create_object(_G.db, 0);
 
     api->register_api("ct_config_a0", &config_a0);
-
-    _G.type = CT_ID32_0("config");
 }
 
 void CETECH_MODULE_UNLOAD (config)(struct ct_api_a0 *api,

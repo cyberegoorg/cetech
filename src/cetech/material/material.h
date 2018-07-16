@@ -15,8 +15,10 @@
 // Typedefs
 //==============================================================================
 
-struct ct_texture;
 struct ct_cdb_obj_t;
+
+#define MATERIAL_TYPE \
+    CT_ID64_0("material", 0xeac0b497876adedfULL)
 
 #define MATERIAL_SHADER_PROP \
     CT_ID64_0("shader", 0xcce8d5b5f5ae333fULL)
@@ -42,20 +44,19 @@ struct ct_cdb_obj_t;
 #define MATERIAL_ASSET_NAME \
     CT_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
+#define MATERIAL_LAYERS \
+    CT_ID64_0("layers", 0x289219f856ee5cd6ULL)
+
+#define MATERIAL_LAYER_NAME \
+    CT_ID64_0("layer_name", 0x29aed2afaafefcc9ULL)
 
 //==============================================================================
 // Api
 //==============================================================================
 
-//! Material API V0
 struct ct_material_a0 {
+    uint64_t (*create)(uint64_t name);
 
-    //! Create new material
-    //! \param name Material resource name
-    //! \return Material
-    uint64_t (*resource_create)(uint32_t name);
-
-    //! Submit material for actual render
     void (*submit)(uint64_t material,
                    uint64_t layer,
                    uint8_t viewid);
