@@ -1,0 +1,124 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                         **Hash table**
+
+# Description
+
+Hash table that map uint64_t **key** to uint64_t **value**.
+
+***************************************
+*         +---+---+---+---+---+
+*  Keys   | O | 1 | 2 |...| n |
+*         +---+---+---+---+---+
+*  Values | O | 1 | 2 |...| n |
+*         +---+---+---+---+---+
+***************************************
+
+# Example
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+ct_hash_t hash = {0};
+
+ct_hash_add(&hash, 'h', 1, ct_memory_a0->system);
+ct_hash_add(&hash, 'e', 1, ct_memory_a0->system);
+ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
+ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
+ct_hash_add(&hash, 'o', 1, ct_memory_a0->system);
+
+printf("h in hash == %d", ct_hash_contain(&hash, 'h')); // h in hash == 1
+printf("H in hash == %d", ct_hash_contain(&hash, 'H')); // H in hash == 0
+
+printf("h -> %d", ct_hash_find(&hash, 'h', 0));  // h -> 1
+printf("H -> %d", ct_hash_find(&hash, 'H', 0));  // H -> 0
+
+ct_hash_free(buffer, ct_memory_a0->system);
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+# API
+
+
+### ct_hash_t
+~~~~~~~~~~~~~~~~~~~~
+struct ct_hash_t {
+    uint32_t n;
+    uint64_t *keys;
+    uint64_t *values;
+};
+
+~~~~~~~~~~~~~~~~~~~~
+Hash table struct
+
+- *n* - bucket size
+- *keys* - keys [array](array.md.html)
+- *values* - values [array](array.md.html)
+
+
+### ct_hash_clean
+~~~~~~~~~~~~~~~~~~~~
+static inline void ct_hash_clean(struct ct_hash_t *hash) {
+    memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
+
+~~~~~~~~~~~~~~~~~~~~
+Clean hash table
+
+
+### ct_hash_free
+~~~~~~~~~~~~~~~~~~~~
+static inline void ct_hash_free(struct ct_hash_t *hash,
+                                const struct ct_alloc *allocator) {
+
+~~~~~~~~~~~~~~~~~~~~
+Free hash table
+
+
+### ct_hash_find_slot
+~~~~~~~~~~~~~~~~~~~~
+static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
+                                         uint64_t k) {
+
+~~~~~~~~~~~~~~~~~~~~
+
+### ct_hash_lookup
+~~~~~~~~~~~~~~~~~~~~
+static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
+                                      uint64_t k,
+                                      uint64_t default_value) {
+
+~~~~~~~~~~~~~~~~~~~~
+Find *k* in hash table
+
+
+### ct_hash_contain
+~~~~~~~~~~~~~~~~~~~~
+static inline bool ct_hash_contain(const struct ct_hash_t *hash,
+                                   uint64_t k) {
+
+~~~~~~~~~~~~~~~~~~~~
+Is *k* hash table?
+
+
+### ct_hash_add
+~~~~~~~~~~~~~~~~~~~~
+static inline void ct_hash_add(struct ct_hash_t *hash,
+                               uint64_t k,
+                               uint64_t value,
+                               const struct ct_alloc *allocator) {
+
+~~~~~~~~~~~~~~~~~~~~
+Add *k* => *value*
+
+
+### ct_hash_remove
+~~~~~~~~~~~~~~~~~~~~
+static inline void ct_hash_remove(struct ct_hash_t *hash,
+                                  uint64_t k) {
+
+~~~~~~~~~~~~~~~~~~~~
+
+### ct_hash_clone
+~~~~~~~~~~~~~~~~~~~~
+static inline void ct_hash_clone(const struct ct_hash_t *from,
+                                 struct ct_hash_t *to,
+                                 const struct ct_alloc *alloc) {
+
+~~~~~~~~~~~~~~~~~~~~
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
