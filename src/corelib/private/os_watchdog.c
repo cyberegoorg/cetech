@@ -251,10 +251,10 @@ void destroy(struct ct_watchdog *watchdog) {
     CT_FREE(alloc, watchdog);
 }
 
-struct ct_watchdog_a0 wathdog_api = {
+struct ct_os_watchdog_a0 wathdog_api = {
         .create = create,
         .destroy = destroy,
 };
 
 
-struct ct_watchdog_a0 *ct_watchdog_a0 = &wathdog_api;
+struct ct_os_watchdog_a0 *ct_watchdog_a0 = &wathdog_api;

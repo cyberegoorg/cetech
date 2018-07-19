@@ -21,7 +21,6 @@
 #include <corelib/ydb.h>
 #include <cetech/asset_property/asset_property.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/ecs/entity_property.h>
 #include <corelib/cdb.h>
 #include <corelib/yng.h>
 #include <cetech/kernel/kernel.h>

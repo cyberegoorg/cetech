@@ -13,7 +13,6 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <corelib/log.h>
-#include <cetech/ecs/entity_property.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <corelib/yng.h>

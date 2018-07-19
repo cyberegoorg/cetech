@@ -1,3 +1,8 @@
+//
+// # OS layer abstraction
+//
+// # API
+
 #ifndef CETECH_OS_H
 #define CETECH_OS_H
 
@@ -8,11 +13,6 @@
 #include "module.inl"
 
 struct ct_alloc;
-
-
-//==============================================================================
-// Defines
-//==============================================================================
 
 #ifdef CETECH_DEBUG
 #define CETECH_ASSERT(where, condition)                                 \
@@ -25,22 +25,25 @@ struct ct_alloc;
 #define CETECH_ASSERT(where, condition) do {} while (0)
 #endif
 
-struct ct_error_a0 {
+// ## Error
+
+struct ct_os_error_a0 {
     void (*assert)(const char *where,
                    const char *condition,
                    const char *filename,
                    int line);
 };
 
-struct ct_cpu_a0 {
+// ## CPU
+
+struct ct_os_cpu_a0 {
     int (*count)();
 };
 
-//==============================================================================
-// Object
-//==============================================================================
 
-struct ct_object_a0 {
+// ## Object
+
+struct ct_os_object_a0 {
     void *(*load)(const char *path);
 
     void (*unload)(void *so);
@@ -49,14 +52,12 @@ struct ct_object_a0 {
                            const char *name);
 };
 
-//==============================================================================
-// Path
-//==============================================================================
 
-struct ct_path_a0 {
+// ## Path
+
+struct ct_os_path_a0 {
     //! Get file modified time
-    //! \param path File path
-    //! \return Modified time
+    //! - *param* path File path
     uint32_t (*file_mtime)(const char *path);
 
     //! List dir
@@ -125,17 +126,15 @@ struct ct_path_a0 {
 };
 
 
-//==============================================================================
-// Process
-//==============================================================================
 
-struct ct_process_a0 {
+// ## Process
+
+struct ct_os_process_a0 {
     int (*exec)(const char *argv);
 };
 
-//==============================================================================
-// Thread
-//==============================================================================
+
+// ## Thread
 
 typedef void ct_thread_t;
 
@@ -145,7 +144,7 @@ struct ct_spinlock {
     int lock;
 };
 
-struct ct_thread_a0 {
+struct ct_os_thread_a0 {
     //! Create new thread
     //! \param fce Thread fce
     //! \param name Thread name
@@ -182,11 +181,10 @@ struct ct_thread_a0 {
 };
 
 
-//==============================================================================
-// Time
-//==============================================================================
 
-struct ct_time_a0 {
+// ## Time
+
+struct ct_os_time_a0 {
     uint32_t (*ticks)();
 
     uint64_t (*perf_counter)();
@@ -195,9 +193,8 @@ struct ct_time_a0 {
 };
 
 
-//==============================================================================
-// VIO
-//==============================================================================
+
+// ## VIO
 
 enum ct_vio_open_mode {
     VIO_OPEN_READ,
@@ -234,14 +231,13 @@ struct ct_vio {
     int (*close)(struct ct_vio *vio);
 };
 
-struct ct_vio_a0 {
+struct ct_os_vio_a0 {
     struct ct_vio *(*from_file)(const char *path,
                                 enum ct_vio_open_mode mode);
 };
 
-//==============================================================================
-// Watchdog
-//==============================================================================
+
+// ## Watchdog
 
 enum ct_watchdog_ev_type {
     CT_WATCHDOG_EVENT_NONE = 0,
@@ -279,16 +275,15 @@ struct ct_watchdog {
                                                 struct ct_watchdog_ev_header *header);
 };
 
-struct ct_watchdog_a0 {
+struct ct_os_watchdog_a0 {
     struct ct_watchdog *(*create)(struct ct_alloc *alloc);
 
     void (*destroy)(struct ct_watchdog *watchdog);
 };
 
 
-//==============================================================================
-// Window
-//==============================================================================
+
+// ## Window
 
 #define WINDOW_EBUS_NAME "window"
 
@@ -360,7 +355,7 @@ struct ct_window {
 };
 
 
-struct ct_window_a0 {
+struct ct_os_window_a0 {
     struct ct_window *(*create)(struct ct_alloc *alloc,
                                 const char *title,
                                 enum ct_window_pos x,
@@ -377,16 +372,16 @@ struct ct_window_a0 {
 };
 
 struct ct_os_a0 {
-    struct ct_cpu_a0 *cpu;
-    struct ct_error_a0 *error;
-    struct ct_object_a0 *object;
-    struct ct_path_a0 *path;
-    struct ct_process_a0 *process;
-    struct ct_thread_a0 *thread;
-    struct ct_time_a0 *time;
-    struct ct_vio_a0 *vio;
-    struct ct_watchdog_a0 *watchdog;
-    struct ct_window_a0 *window;
+    struct ct_os_cpu_a0 *cpu;
+    struct ct_os_error_a0 *error;
+    struct ct_os_object_a0 *object;
+    struct ct_os_path_a0 *path;
+    struct ct_os_process_a0 *process;
+    struct ct_os_thread_a0 *thread;
+    struct ct_os_time_a0 *time;
+    struct ct_os_vio_a0 *vio;
+    struct ct_os_watchdog_a0 *watchdog;
+    struct ct_os_window_a0 *window;
 };
 
 CT_MODULE(ct_os_a0);

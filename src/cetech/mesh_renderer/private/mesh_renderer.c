@@ -21,7 +21,6 @@
 #include <cetech/mesh_renderer/mesh_renderer.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <corelib/macros.h>
-#include <cetech/ecs/entity_property.h>
 #include <stdlib.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <corelib/yng.h>

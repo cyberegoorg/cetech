@@ -68,10 +68,10 @@ void *load_function(void *so,
 }
 
 
-struct ct_object_a0 object_api = {
+struct ct_os_object_a0 object_api = {
         .load  = load_object,
         .unload  = unload_object,
         .load_function  = load_function
 };
 
-struct ct_object_a0 *ct_object_a0 = &object_api;
+struct ct_os_object_a0 *ct_object_a0 = &object_api;

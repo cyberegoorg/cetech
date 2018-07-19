@@ -87,9 +87,9 @@ struct ct_vio *vio_from_file(const char *path,
     return vio;
 }
 
-struct ct_vio_a0 vio_api = {
+struct ct_os_vio_a0 vio_api = {
         .from_file = vio_from_file,
 };
 
-struct ct_vio_a0 *ct_vio_a0 = &vio_api;
+struct ct_os_vio_a0 *ct_vio_a0 = &vio_api;
 

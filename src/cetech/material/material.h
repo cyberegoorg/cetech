@@ -17,6 +17,27 @@
 
 struct ct_cdb_obj_t;
 
+#define RENDER_STATE_RGB_WRITE \
+    CT_ID64_0("rgb_write", 0xdad21ff8b23271ffULL)
+
+#define RENDER_STATE_ALPHA_WRITE \
+    CT_ID64_0("alpha_write", 0x93c0953aa6e40b10ULL)
+
+#define RENDER_STATE_DEPTH_WRITE \
+    CT_ID64_0("depth_write", 0x6d5cef63be1e7b46ULL)
+
+#define RENDER_STATE_DEPTH_TEST_LESS \
+    CT_ID64_0("depth_test_less", 0x25d531ce0f04418eULL)
+
+#define RENDER_STATE_CULL_CCW \
+    CT_ID64_0("cull_ccw", 0x8447d75aa845c612ULL)
+
+#define RENDER_STATE_CULL_CW \
+    CT_ID64_0("cull_cw", 0x6b5530bb1cba7b79ULL)
+
+#define RENDER_STATE_MSAA \
+    CT_ID64_0("msaa", 0xdc0268c3aab08183ULL)
+
 #define MATERIAL_TYPE \
     CT_ID64_0("material", 0xeac0b497876adedfULL)
 
@@ -49,6 +70,7 @@ struct ct_cdb_obj_t;
 
 #define MATERIAL_LAYER_NAME \
     CT_ID64_0("layer_name", 0x29aed2afaafefcc9ULL)
+
 
 //==============================================================================
 // Api

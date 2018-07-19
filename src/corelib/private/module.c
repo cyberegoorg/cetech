@@ -281,13 +281,13 @@ static void unload_all() {
 //        if (wd_it->type == CT_WATCHDOG_EVENT_FILE_MODIFIED) {
 //            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
 //
-//            const char *ext = ct_path_a0->extension(ev->filename);
+//            const char *ext = ct_os_path_a0->extension(ev->filename);
 //
 //            if ((NULL != ext) && (strcmp(ext, "so") == 0)) {
 //
 //
 //                char *path = NULL;
-//                ct_path_a0->join(&path, alloc, 2, ev->dir, ev->filename);
+//                ct_os_path_a0->join(&path, alloc, 2, ev->dir, ev->filename);
 //
 //                char full_path[4096];
 //                ct_fs_a0->get_full_path(root, path, full_path,

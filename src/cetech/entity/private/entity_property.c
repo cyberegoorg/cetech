@@ -15,7 +15,6 @@
 
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/asset_browser/asset_browser.h>
-#include <cetech/ecs/entity_property.h>
 #include <cetech/explorer/explorer.h>
 #include <corelib/ebus.h>
 #include <corelib/fmath.inl>

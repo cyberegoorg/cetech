@@ -336,9 +336,7 @@ static uint64_t create_from(struct ct_cdb_t db,
     inst->prefab = _obj;
     inst->type = obj->type;
 
-    ct_array_push(obj->instances,
-                  (uint64_t) obj_addr,
-                  _G.allocator);
+    ct_array_push(obj->instances, (uint64_t) obj_addr, _G.allocator);
 
     uint32_t n = ct_array_size(obj->notify);
     if (n) {

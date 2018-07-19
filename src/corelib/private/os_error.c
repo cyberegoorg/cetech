@@ -96,8 +96,8 @@ void ct_error_assert(const char *where,
     abort();
 }
 
-struct ct_error_a0 error_api = {
+struct ct_os_error_a0 error_api = {
         .assert = ct_error_assert
 };
 
-struct ct_error_a0 *ct_error_a0 = &error_api;
+struct ct_os_error_a0 *ct_error_a0 = &error_api;

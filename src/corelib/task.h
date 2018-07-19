@@ -1,10 +1,5 @@
-//! \defgroup Task
-//! Task system
-//! \{
-
 #ifndef CETECH_TASKMANAGER_H
 #define CETECH_TASKMANAGER_H
-
 
 
 //==============================================================================

@@ -99,27 +99,6 @@ void _forach_variable_clb(const char *filename,
     ct_cdb_a0->write_commit(w);
 }
 
-#define RENDER_STATE_RGB_WRITE \
-    CT_ID64_0("rgb_write", 0xdad21ff8b23271ffULL)
-
-#define RENDER_STATE_ALPHA_WRITE \
-    CT_ID64_0("alpha_write", 0x93c0953aa6e40b10ULL)
-
-#define RENDER_STATE_DEPTH_WRITE \
-    CT_ID64_0("depth_write", 0x6d5cef63be1e7b46ULL)
-
-#define RENDER_STATE_DEPTH_TEST_LESS \
-    CT_ID64_0("depth_test_less", 0x25d531ce0f04418eULL)
-
-#define RENDER_STATE_CULL_CCW \
-    CT_ID64_0("cull_ccw", 0x8447d75aa845c612ULL)
-
-#define RENDER_STATE_CULL_CW \
-    CT_ID64_0("cull_cw", 0x6b5530bb1cba7b79ULL)
-
-#define RENDER_STATE_MSAA \
-    CT_ID64_0("msaa", 0xdc0268c3aab08183ULL)
-
 static struct {
     uint64_t name;
     uint64_t e;
@@ -144,7 +123,7 @@ uint64_t render_state_to_enum(uint64_t name) {
         return _tbl[i].e;
     }
 
-    return _tbl[0].e;
+    return 0;
 }
 
 
@@ -209,8 +188,6 @@ void foreach_layer(const char *filename,
         ct_cdb_obj_o *var_w = ct_cdb_a0->write_begin(variables_obj);
 
         for (uint32_t i = 0; i < layers_keys_count; ++i) {
-
-
             _forach_variable_clb(filename, tmp_key, layers_keys[i], var_w);
         }
         ct_cdb_a0->write_commit(var_w);

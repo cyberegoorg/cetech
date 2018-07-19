@@ -493,7 +493,7 @@ void parent_files(const char *path,
 //            ct_wd_ev_file_write_end *ev = (ct_wd_ev_file_write_end *) wd_it;
 //
 //            char *path = NULL;
-//            ct_path_a0->join(&path, alloc, 2, ev->dir, ev->filename);
+//            ct_os_path_a0->join(&path, alloc, 2, ev->dir, ev->filename);
 //
 //            uint64_t path_key = CT_ID64_0(path);
 //

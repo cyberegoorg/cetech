@@ -13,10 +13,15 @@
 #define ct_buffer_push_ch(a, ch, alloc) ct_array_push(a, ch, alloc)
 #define ct_buffer_free(a, alloc) ct_array_free(a, alloc)
 
-static inline void ct_buffer_printf(char **b,
+static inline int ct_buffer_printf(char **b,
                                     struct ct_alloc *alloc,
                                     const char *format,
-                                    ...) {
+                                    ...) CTECH_ATTR_FORMAT(3, 4);
+
+static inline int ct_buffer_printf(char **b,
+                                    struct ct_alloc *alloc,
+                                    const char *format,
+                                    ...){
     va_list args;
 
     va_start(args, format);
@@ -31,6 +36,8 @@ static inline void ct_buffer_printf(char **b,
     va_end(args);
 
     ct_array_resize(*b, end + n, alloc);
+
+    return n;
 }
 
 #endif //CETECH_BUFFER_H

@@ -206,19 +206,19 @@ void window_destroy(struct ct_alloc *alloc,
     CT_FREE(alloc, w);
 }
 
-struct ct_window_a0 window_api = {
+struct ct_os_window_a0 window_api = {
         .create = window_new,
         .create_from = window_new_from,
         .destroy = window_destroy,
 };
 
 
-struct ct_window_a0 *ct_window_a0 = &window_api;
+struct ct_os_window_a0 *ct_window_a0 = &window_api;
 
 
 int sdl_window_init(struct ct_api_a0 *api) {
 
-    api->register_api("ct_window_a0", &window_api);
+    api->register_api("ct_os_window_a0", &window_api);
     ct_ebus_a0->create_ebus(WINDOW_EBUS_NAME, WINDOW_EBUS);
     return 1;
 }

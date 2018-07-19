@@ -289,6 +289,7 @@ void path_basename(const char *path,
 
     const size_t basename_len = (ch - filename) / sizeof(char);
     memcpy(out, filename, basename_len);
+    out[basename_len] = '\0';
 }
 
 void path_dir(char *out,
@@ -386,7 +387,7 @@ bool is_dir(const char *path) {
     return (stat(path, &sb) == 0) && S_ISDIR(sb.st_mode);
 }
 
-struct ct_path_a0 path_api = {
+struct ct_os_path_a0 path_api = {
         .list = dir_list,
         .list_free = dir_list_free,
         .make_path = dir_make_path,
@@ -401,4 +402,4 @@ struct ct_path_a0 path_api = {
         .is_dir = is_dir,
 };
 
-struct ct_path_a0 *ct_path_a0 = &path_api;
+struct ct_os_path_a0 *ct_path_a0 = &path_api;

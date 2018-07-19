@@ -8,6 +8,6 @@ int cpu_count() {
     return SDL_GetCPUCount();
 }
 
-struct ct_cpu_a0 cpu_api = {
+struct ct_os_cpu_a0 cpu_api = {
         .count = cpu_count
 };

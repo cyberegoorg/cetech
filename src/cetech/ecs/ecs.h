@@ -41,12 +41,6 @@
 #define ENTITY_WORLD \
     CT_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
-#define ENTITY_ENTITY \
-    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
-
-#define ENTITY_COMP_MASK \
-    CT_ID64_0("comp_mask", 0xc0e85dc84a0c5297ULL)
-
 #define ENTITY_COMPONENTS \
     CT_ID64_0("components", 0xe71d1687374e5a54ULL)
 

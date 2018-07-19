@@ -9,7 +9,6 @@
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
-#include <cetech/ecs/entity_property.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor_ui/editor_ui.h>

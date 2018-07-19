@@ -139,8 +139,8 @@ static void *get_all(uint64_t component_name,
 }
 
 static void *get_one(struct ct_world world,
-                         uint64_t component_name,
-                         struct ct_entity entity) {
+                     uint64_t component_name,
+                     struct ct_entity entity) {
     if (!entity.h) {
         return NULL;
     }
@@ -347,7 +347,7 @@ static uint64_t combine_component(uint64_t *component_name,
     return new_type;
 }
 
-static void  _add_components(struct ct_world world,
+static void _add_components(struct ct_world world,
                             struct ct_entity ent,
                             uint64_t new_type) {
     struct world_instance *w = get_world_instance(world);
@@ -447,21 +447,24 @@ static void create_entities(struct ct_world world,
 }
 
 
-static void _destroy_with_child(struct world_instance *w, uint64_t ent) {
+static void _destroy_with_child(struct world_instance *w,
+                                uint64_t ent) {
     uint64_t childrens;
     childrens = ct_cdb_a0->read_subobject(ent, ENTITY_CHILDREN, 0);
     uint32_t children_n = ct_cdb_a0->prop_count(childrens);
     uint64_t children_keys[children_n];
     ct_cdb_a0->prop_keys(childrens, children_keys);
 
+    uint64_t ent_type = ct_cdb_a0->read_uint64(ent, ENTITY_TYPE, 0);
+    _remove_from_type_slot(w, (struct ct_entity) {.h=ent}, ent_type);
+
     for (int i = 0; i < children_n; ++i) {
-        uint64_t children = ct_cdb_a0->read_subobject(childrens, children_keys[i], 0);
+        uint64_t children = ct_cdb_a0->read_subobject(childrens,
+                                                      children_keys[i], 0);
         _destroy_with_child(w, children);
     }
 
-    uint64_t ent_type = ct_cdb_a0->read_uint64(ent, ENTITY_TYPE, 0);
-    _remove_from_type_slot(w, (struct ct_entity){.h=ent}, ent_type);
-
+    ct_cdb_a0->destroy_object(ent);
 }
 
 static void destroy(struct ct_world world,
@@ -471,7 +474,6 @@ static void destroy(struct ct_world world,
 
     for (uint32_t i = 0; i < count; ++i) {
         _destroy_with_child(w, entity[i].h);
-        ct_cdb_a0->destroy_object(entity[i].h);
     }
 }
 
@@ -671,8 +673,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
         uint64_t component_obj;
         component_obj = ct_cdb_a0->read_subobject(components,
-                                                  component_type,
-                                                  0);
+                                                  component_type, 0);
 
         component_i->spawner(component_obj,
                              comp_data + (component_i->size() * idx));
@@ -684,11 +685,17 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     uint64_t children_keys[children_n];
     ct_cdb_a0->prop_keys(children, children_keys);
 
+
     for (int i = 0; i < children_n; ++i) {
         uint64_t child;
         child = ct_cdb_a0->read_subobject(children, children_keys[i], 0);
 
-        _spawn_entity(world, child);
+        uint64_t new_obj = _spawn_entity(world, child).h;
+
+        ct_cdb_obj_o *ch_w  = ct_cdb_a0->write_begin(children);
+        ct_cdb_a0->set_subobject(ch_w, children_keys[i], new_obj);
+        ct_cdb_a0->write_commit(ch_w);
+
 //        link(world, root_ent, child_ent);
     }
 
@@ -768,7 +775,6 @@ struct ct_entity_a0 ct_entity_a0 = {
         .has = has,
 
 
-
         .create_world = create_world,
         .destroy_world = destroy_world,
 };
@@ -782,7 +788,7 @@ struct ct_component_a0 ct_component_a0 = {
         .remove = remove_components,
 };
 
-struct ct_system_a0 ct_system_a0  = {
+struct ct_system_a0 ct_system_a0 = {
         .register_simulation = register_simulation,
         .simulate = simulate,
         .process = process,

@@ -34,8 +34,8 @@ int exec(const char *argv) {
 #endif
 }
 
-struct ct_process_a0 process_api = {
+struct ct_os_process_a0 process_api = {
         .exec = exec
 };
 
-struct ct_process_a0 *ct_process_a0 = &process_api;
+struct ct_os_process_a0 *ct_process_a0 = &process_api;

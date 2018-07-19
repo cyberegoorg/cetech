@@ -72,7 +72,7 @@ void thread_spin_unlock(struct ct_spinlock *lock) {
     SDL_AtomicUnlock((SDL_SpinLock *) lock);
 }
 
-struct ct_thread_a0 thread_api = {
+struct ct_os_thread_a0 thread_api = {
         .create = thread_create,
         .kill = thread_kill,
         .wait = thread_wait,
@@ -83,4 +83,4 @@ struct ct_thread_a0 thread_api = {
         .spin_unlock = thread_spin_unlock
 };
 
-struct ct_thread_a0 *ct_thread_a0 = &thread_api;
+struct ct_os_thread_a0 *ct_thread_a0 = &thread_api;

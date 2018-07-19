@@ -115,9 +115,7 @@ static void geometry_pass_on_pass(void *inst,
     uint16_t size[2] = {0};
     builder->call->get_size(builder, size);
 
-    ct_renderer_a0->set_view_rect(viewid, 0, 0,
-                                  size[0],
-                                  size[1]);
+    ct_renderer_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
 
     struct cameras cameras;
     memset(&cameras, 0, sizeof(struct cameras));
@@ -142,8 +140,8 @@ static void geometry_pass_on_pass(void *inst,
 
             ct_renderer_a0->set_view_transform(viewid, view_matrix,
                                                proj_matrix);
-            ct_mesh_renderer_a0->render_all(pass->world, viewid,
-                                            layer);
+
+            ct_mesh_renderer_a0->render_all(pass->world, viewid, layer);
         }
     }
     ct_dd_a0->end();
@@ -290,8 +288,7 @@ static void output_pass_on_pass(void *inst,
                                         th);
 
     screenspace_quad(size[0], size[1], 0,
-                     ct_renderer_a0->get_caps()->originBottomLeft,
-                     1.f, 1.0f);
+                     ct_renderer_a0->get_caps()->originBottomLeft, 1.f, 1.0f);
 
     ct_material_a0->submit(copy_material, layer, viewid);
 }
