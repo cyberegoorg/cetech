@@ -14,9 +14,12 @@
 
 #define SEED 0
 
-#define HEADER "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\">\n"
-//#define HEADER "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\"><link rel=\"stylesheet\" href=\"https://casual-effects.com/markdeep/latest/apidoc.css?\">\n"
-#define FOOTER "<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"../markdeep.min.js\"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>\n"
+#define HEADER \
+    "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\">\n"
+//#define HEADER \
+//  "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\"><link rel=\"stylesheet\" href=\"https://casual-effects.com/markdeep/latest/apidoc.css?\">\n"
+#define FOOTER \
+    "<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"../markdeep.min.js\"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>\n"
 
 void process_file(void *data) {
     const char *filename = data;
@@ -48,15 +51,25 @@ void process_file(void *data) {
 
     bool block_parse = false;
     bool fce_parse = false;
+    bool macro_parse = false;
+
     while (c < end) {
         char line_buff[1024] = {0};
 
         if (!sscanf(c, "%[^\n]s", line_buff)) {
+            const uint32_t comment_n = ct_buffer_size(comment_buffer);
+            if (comment_n && ((!block_parse && !fce_parse && !macro_parse))) {
+                ct_buffer_printf(&output, ct_memory_a0->system, "%s\n",
+                                 comment_buffer);
+
+                ct_buffer_clear(comment_buffer);
+            }
+
             ++c;
             continue;
         }
 
-        size_t line_len = strlen(line_buff);
+        size_t line_len = strlen(line_buff) + 1;
 
         char tmp_buffer[128] = {0};
         char tmp_buffer2[128] = {0};
@@ -74,10 +87,16 @@ void process_file(void *data) {
             c += 3;
             continue;
 
-        } else if ((sscanf(c, "struct %s { \n", tmp_buffer)) != 0) {
+        } else if ((sscanf(line_buff, "struct %s {", tmp_buffer)) != 0) {
+
+            if(strrchr(line_buff, '{') == NULL) {
+                c += line_len;
+                continue;
+            }
+
 
             ct_buffer_printf(&output, ct_memory_a0->system,
-                             "\n## Struct %s\n", tmp_buffer);
+                             "\n### %s\n", tmp_buffer);
 
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
@@ -85,11 +104,11 @@ void process_file(void *data) {
 
             c += line_len;
             continue;
-        } else if ((sscanf(c, "static inline %s %[^(]s",
+        } else if ((sscanf(line_buff, "static inline %s %[^(]s",
                            tmp_buffer, tmp_buffer2)) != 0) {
 
             ct_buffer_printf(&output, ct_memory_a0->system,
-                             "\n## Function  **%s**\n", tmp_buffer2);
+                             "\n### %s\n", tmp_buffer2);
 
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
@@ -98,14 +117,31 @@ void process_file(void *data) {
 
             c += line_len;
             continue;
+        } else if (sscanf(line_buff, "#define %[^(]s)", tmp_buffer) == 1) {
+            if(strrchr(line_buff, ')') == NULL) {
+                c += line_len;
+                continue;
+            }
+
+            ct_buffer_printf(&output, ct_memory_a0->system,
+                             "\n### %s\n", tmp_buffer);
+
+            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+                             "%s\n", line_buff);
+
+//            macro_parse = true;
+
+            c += line_len;
+            continue;
         }
 
-        if (fce_parse) {
+        if (fce_parse || macro_parse) {
             ct_buffer_printf(&code_buffer, ct_memory_a0->system, "%s\n",
                              line_buff);
 
-            if (strstr(line_buff, ")") != NULL) {
+            if ((strstr(line_buff, ")") != NULL)) {
                 fce_parse = false;
+                macro_parse = false;
             }
 
         }
@@ -114,15 +150,14 @@ void process_file(void *data) {
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
 
-
             if (*c == '}') {
                 block_parse = false;
             }
         }
 
 
-        if (!block_parse && !fce_parse) {
-
+        if ((!block_parse && !fce_parse && !macro_parse)) {
+            const uint32_t comment_n = ct_buffer_size(comment_buffer);
             const uint32_t readbuf_n = ct_buffer_size(code_buffer);
             if (readbuf_n) {
                 ct_buffer_printf(
@@ -133,18 +168,13 @@ void process_file(void *data) {
                         code_buffer);
 
                 ct_buffer_clear(code_buffer);
-
-                continue;
             }
 
-            const uint32_t comment_n = ct_buffer_size(comment_buffer);
             if (comment_n) {
                 ct_buffer_printf(&output, ct_memory_a0->system, "%s\n",
                                  comment_buffer);
 
                 ct_buffer_clear(comment_buffer);
-
-                continue;
             }
         }
 
@@ -180,9 +210,14 @@ int main(int argc,
     char **files;
     uint32_t files_count;
 
-//    const char *filter[] = {"*/hash.inl"};
-//    const char *filter[] = {"*/mouse.h"};
-    const char *filter[] = {"*.inl", "*.h"};
+
+    const char *filter[] = {
+//            "*/hash.inl",
+//            "*/array.inl",
+//            "*/os.h",
+            "*.inl", "*.h"
+    };
+//    const char *filter[] = {"*.inl", "*.h"};
     ct_os_a0->path->list("./src", CETECH_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 

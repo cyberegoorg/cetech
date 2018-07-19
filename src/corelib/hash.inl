@@ -1,14 +1,54 @@
+//
+//                          **Hash table**
+//
+// # Description
+//
+// Hash table that map uint64_t **key** to uint64_t **value**.
+//
+// ***************************************
+// *         +---+---+---+---+---+
+// *  Keys   | O | 1 | 2 |...| n |
+// *         +---+---+---+---+---+
+// *  Values | O | 1 | 2 |...| n |
+// *         +---+---+---+---+---+
+// ***************************************
+//
+// # Example
+//
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ct_hash_t hash = {0};
+//
+// ct_hash_add(&hash, 'h', 1, ct_memory_a0->system);
+// ct_hash_add(&hash, 'e', 1, ct_memory_a0->system);
+// ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
+// ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
+// ct_hash_add(&hash, 'o', 1, ct_memory_a0->system);
+//
+// printf("h in hash == %d", ct_hash_contain(&hash, 'h')); // h in hash == 1
+// printf("H in hash == %d", ct_hash_contain(&hash, 'H')); // H in hash == 0
+//
+// printf("h -> %d", ct_hash_find(&hash, 'h', 0));  // h -> 1
+// printf("H -> %d", ct_hash_find(&hash, 'H', 0));  // H -> 0
+//
+// ct_hash_free(buffer, ct_memory_a0->system);
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// # API
+
 #ifndef CETECH_HASHH_H
 #define CETECH_HASHH_H
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
-#include <memory.h>
 
-#include "allocator.h"
 #include "array.inl"
 
+#define EMPTY_SLOT UINT64_MAX
+
+// Hash table struct
+//
+// - *n* - bucket size
+// - *keys* - keys [array](array.md.html)
+// - *values* - values [array](array.md.html)
 struct ct_hash_t {
     uint32_t n;
     uint64_t *keys;
@@ -16,6 +56,7 @@ struct ct_hash_t {
 };
 
 
+// Clean hash table
 static inline void ct_hash_clean(struct ct_hash_t *hash) {
     memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
     hash->n = 0;
@@ -24,14 +65,13 @@ static inline void ct_hash_clean(struct ct_hash_t *hash) {
     ct_array_clean(hash->values);
 }
 
+// Free hash table
 static inline void ct_hash_free(struct ct_hash_t *hash,
                                 const struct ct_alloc *allocator) {
     ct_array_free(hash->keys, allocator);
     ct_array_free(hash->values, allocator);
     hash->n = 0;
 }
-
-#define EMPTY_SLOT UINT64_MAX
 
 static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
                                          uint64_t k) {
@@ -48,6 +88,7 @@ static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
     return idx;
 }
 
+// Find *k* in hash table
 static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
                                       uint64_t k,
                                       uint64_t default_value) {
@@ -59,6 +100,7 @@ static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
     return hash->keys[idx] == k ? hash->values[idx] : default_value;
 }
 
+// Is *k* hash table?
 static inline bool ct_hash_contain(const struct ct_hash_t *hash,
                                    uint64_t k) {
     if (!hash->n) {
@@ -69,6 +111,7 @@ static inline bool ct_hash_contain(const struct ct_hash_t *hash,
     return hash->keys[idx] == k;
 }
 
+// Add *k* => *value*
 static inline void ct_hash_add(struct ct_hash_t *hash,
                                uint64_t k,
                                uint64_t value,
@@ -137,4 +180,4 @@ static inline void ct_hash_clone(const struct ct_hash_t *from,
     *to = tmp_hash;
 }
 
-#endif //CETECH_HASHH_H
+#endif // CETECH_HASHH_H

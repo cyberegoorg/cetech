@@ -37,7 +37,7 @@ link_directories(externals/build/${PLATFORM_ID}/release/lib/)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
+
 
 
 ################################################################################
@@ -89,7 +89,6 @@ set(CORELIB_SOURCE_FILES
 
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
-        ${CORELIB_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
         src/cetech/resource/private/package.c
@@ -210,6 +209,8 @@ set(RELEASE_LIBS
         minizip.a
         yaml_static.a
         #aes.a
+
+        corelib
         )
 
 set(RELEASE_LIBS2
@@ -244,26 +245,37 @@ include_directories(externals/build/${PLATFORM_ID}/release/include)
 #target_include_directories(cetech PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
 
 ################################################################################
+# Corelib
+################################################################################
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/tools/${PLATFORM_ID})
+
+add_library(corelib STATIC ${CORELIB_SOURCE_FILES})
+target_include_directories(corelib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+
+add_executable(doc src/tools/doc/doc.c)
+target_link_libraries(doc ${DEVELOP_LIBS})
+target_include_directories(doc PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+
+add_executable(hash src/tools/hash/hash.c)
+target_link_libraries(hash ${DEVELOP_LIBS})
+target_include_directories(hash PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
+
+################################################################################
 # Cetech DEVELOP
 ################################################################################
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
+
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
 target_link_libraries(cetech_develop ${DEVELOP_LIBS})
 target_include_directories(cetech_develop PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 
-#add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
-#target_link_libraries(cetech_develop_lib ${RELEASE_LIBS})
-#target_compile_definitions(cetech_develop_lib PUBLIC -DCETECH_DEVELOP -DCETECH_CAN_COMPILE=1)
-#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
-#target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/include)
+add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
+target_link_libraries(cetech_develop_lib ${DEVELOP_LIBS})
+target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
 
 add_library(example SHARED examples/module_example/example.c)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
 add_library(example_develop SHARED examples/develop/src/game.c)
 set_target_properties(example_develop PROPERTIES PREFIX "game_")
-
-
-add_executable(hash ${CORELIB_SOURCE_FILES} src/hash/hash.c)
-target_link_libraries(hash ${DEVELOP_LIBS})
-target_include_directories(hash PUBLIC externals/build/${PLATFORM_ID}/${CONFIGURATION}/)
