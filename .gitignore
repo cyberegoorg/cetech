@@ -2,6 +2,7 @@
 .gtm
 .vagrant
 .cache
+.vscode
 
 /docs/doxygen/
 /bin/

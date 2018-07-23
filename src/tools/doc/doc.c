@@ -16,17 +16,20 @@
 
 #define HEADER \
     "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\">\n"
+
 //#define HEADER \
 //  "<meta charset=\"utf-8\" emacsmode=\"-*- markdown -*-\"><link rel=\"stylesheet\" href=\"https://casual-effects.com/markdeep/latest/apidoc.css?\">\n"
+
 #define FOOTER \
-    "<!-- Markdeep: --><style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src=\"../markdeep.min.js\"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility=\"visible\")</script>\n"
+    "<!-- Markdeep: -->\n" \
+    "<style class=\"fallback\">body{visibility:hidden;white-space:pre;font-family:monospace}</style>\n"\
+    "<script src=\"../markdeep.min.js\"></script>\n"\
+    "<script>window.alreadyProcessedMarkdeep|| (document.body.style.visibility=\"visible\");</script>\n"
+
+typedef char **pString;
 
 void process_file(void *data) {
     const char *filename = data;
-
-    if (strstr(filename, "/private") != NULL) {
-        return;
-    }
 
     ct_log_a0->info("hash", "Process file: %s", filename);
 
@@ -38,27 +41,29 @@ void process_file(void *data) {
 
     input_data[size] = '\0';
 
-    char *output = NULL;
 
     char *c = input_data;
     char *end = &input_data[size];
 
-
-    ct_buffer_printf(&output, ct_memory_a0->system, "%s", HEADER);
-
+    char *output = NULL;
     char *comment_buffer = NULL;
     char *code_buffer = NULL;
 
-    bool block_parse = false;
+    char *struct_buffer = NULL;
+    char *struct_code_buffer = NULL;
+    char *struct_comment_buffer = NULL;
+
+    bool struct_parse = false;
     bool fce_parse = false;
-    bool macro_parse = false;
+
+    ct_buffer_printf(&output, ct_memory_a0->system, "%s", HEADER);
 
     while (c < end) {
         char line_buff[1024] = {0};
 
         if (!sscanf(c, "%[^\n]s", line_buff)) {
             const uint32_t comment_n = ct_buffer_size(comment_buffer);
-            if (comment_n && ((!block_parse && !fce_parse && !macro_parse))) {
+            if (comment_n && ((!struct_parse && !fce_parse))) {
                 ct_buffer_printf(&output, ct_memory_a0->system, "%s\n",
                                  comment_buffer);
 
@@ -74,107 +79,185 @@ void process_file(void *data) {
         char tmp_buffer[128] = {0};
         char tmp_buffer2[128] = {0};
 
-        if ((sscanf(c, "//%[^\n]s", tmp_buffer)) != 0) {
-            c += 3 + ct_buffer_printf(&comment_buffer, ct_memory_a0->system,
-                                      "%s\n",
-                                      tmp_buffer + (tmp_buffer[0] == ' '));
+        char *strit = NULL;
+        if ((strit = strstr(line_buff, "//")) != 0) {
+            ct_buffer_printf(
+                    (struct_parse ? &struct_comment_buffer : &comment_buffer),
+                    ct_memory_a0->system,
+                    "%s\n", strit + 3);
 
-            continue;
+            c += line_len;
 
-        } else if (strcmp(line_buff, "//") == 0) {
-            ct_buffer_printf(&comment_buffer, ct_memory_a0->system, "\n");
-
-            c += 3;
             continue;
 
         } else if ((sscanf(line_buff, "struct %s {", tmp_buffer)) != 0) {
 
-            if(strrchr(line_buff, '{') == NULL) {
+            if (strrchr(line_buff, '{') == NULL) {
                 c += line_len;
                 continue;
             }
 
-
             ct_buffer_printf(&output, ct_memory_a0->system,
-                             "\n### %s\n", tmp_buffer);
+                             "\n## %s\n", tmp_buffer);
 
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
-            block_parse = true;
+            struct_parse = true;
 
             c += line_len;
             continue;
         } else if ((sscanf(line_buff, "static inline %s %[^(]s",
                            tmp_buffer, tmp_buffer2)) != 0) {
-
-            ct_buffer_printf(&output, ct_memory_a0->system,
-                             "\n### %s\n", tmp_buffer2);
-
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
-                             "%s\n", line_buff);
-
-            fce_parse = true;
-
-            c += line_len;
-            continue;
-        } else if (sscanf(line_buff, "#define %[^(]s)", tmp_buffer) == 1) {
-            if(strrchr(line_buff, ')') == NULL) {
+            if (strrchr(line_buff, ';') != NULL) {
                 c += line_len;
                 continue;
             }
 
+
+            const char *fce_name = tmp_buffer2 + (tmp_buffer2[0] == '*');
+
             ct_buffer_printf(&output, ct_memory_a0->system,
-                             "\n### %s\n", tmp_buffer);
+                             "\n## %s\n", fce_name);
 
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
 
-//            macro_parse = true;
+            if (strrchr(line_buff, ')') == NULL) {
+                fce_parse = true;
+            }
 
             c += line_len;
             continue;
-        }
 
-        if (fce_parse || macro_parse) {
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system, "%s\n",
-                             line_buff);
+        } else if (!fce_parse
+                   && struct_parse
+                   && (strstr(line_buff, ")(") != NULL)) {
 
-            if ((strstr(line_buff, ")") != NULL)) {
-                fce_parse = false;
-                macro_parse = false;
+            if (strrchr(line_buff, ',') != NULL) {
+                fce_parse = true;
             }
 
-        }
+            ct_buffer_printf(&struct_code_buffer, ct_memory_a0->system,
+                             "%s\n", line_buff);
 
-        if (block_parse) {
             ct_buffer_printf(&code_buffer, ct_memory_a0->system,
                              "%s\n", line_buff);
 
-            if (*c == '}') {
-                block_parse = false;
+            char *begin = strstr(line_buff, "(");
+            if (begin) {
+                begin += 2;
+            }
+
+            char *end = strstr(begin, ")");
+            if (end) {
+                *end = 0;
+            }
+
+            const char *fce_name = begin + (begin[0] == '*');
+
+            ct_buffer_printf(&struct_buffer, ct_memory_a0->system,
+                             "\n### %s\n", fce_name);
+
+
+            goto flush_fce;
+
+        } else if (strstr(line_buff, "#define") != NULL) {
+            char token_buffer[1024] = {0};
+            memcpy(token_buffer, line_buff, CT_ARRAY_LEN(line_buff));
+
+            char *it = strtok(token_buffer, " ");
+            it = strtok(NULL, " ");
+
+            char *bracket = strrchr(it, '(');
+            if (bracket != NULL) {
+                *bracket = 0;
+            }
+
+            char name[128] = {0};
+            strncpy(name, it, CT_ARRAY_LEN(name));
+
+            it = strtok(NULL, " ");
+            if ((it != NULL) && (*it != '\n')) {
+                ct_buffer_printf(&output, ct_memory_a0->system,
+                                 "\n## %s\n", name);
+
+                char *r = strrchr(line_buff, '\\');
+                if (r) {
+                    *r = 0;
+                }
+
+                ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+                                 "%s\n", line_buff);
             }
         }
 
+        if (fce_parse) {
+            char **b_code = struct_parse ? &struct_code_buffer
+                                         : &code_buffer;
 
-        if ((!block_parse && !fce_parse && !macro_parse)) {
-            const uint32_t comment_n = ct_buffer_size(comment_buffer);
-            const uint32_t readbuf_n = ct_buffer_size(code_buffer);
+            char **b_com = struct_parse ? &struct_comment_buffer
+                                        : &comment_buffer;
+
+            ct_buffer_printf(b_code, ct_memory_a0->system, "%s\n", line_buff);
+
+            if ((strstr(line_buff, ")") != NULL)) {
+                if (!struct_parse) {
+                    if (strstr(line_buff, ";") != NULL) {
+                        ct_buffer_clear(*b_com);
+                        ct_buffer_clear(*b_code);
+                    }
+                }
+
+                fce_parse = false;
+            }
+
+        }
+
+        if (struct_parse) {
+            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+                             "%s\n", line_buff);
+        }
+
+        flush_fce:
+        if (!fce_parse) {
+            char **b_output = (struct_parse ? &struct_buffer : &output);
+            char **b_code = (struct_parse ? &struct_code_buffer : &code_buffer);
+            char **b_comment = (struct_parse ? &struct_comment_buffer
+                                             : &comment_buffer);
+
+            const uint32_t comment_n = ct_buffer_size(*b_comment);
+            const uint32_t readbuf_n = ct_buffer_size(*b_code);
             if (readbuf_n) {
                 ct_buffer_printf(
-                        &output, ct_memory_a0->system,
+                        b_output, ct_memory_a0->system,
                         "~~~~~~~~~~~~~~~~~~~~\n"
                         "%s\n"
                         "~~~~~~~~~~~~~~~~~~~~\n",
-                        code_buffer);
+                        *b_code);
 
-                ct_buffer_clear(code_buffer);
+                ct_buffer_clear(*b_code);
             }
 
             if (comment_n) {
-                ct_buffer_printf(&output, ct_memory_a0->system, "%s\n",
-                                 comment_buffer);
+                ct_buffer_printf(b_output, ct_memory_a0->system, "%s\n",
+                                 *b_comment);
 
-                ct_buffer_clear(comment_buffer);
+                ct_buffer_clear(*b_comment);
+            }
+
+            if (struct_parse) {
+                if (*c == '}') {
+                    struct_parse = false;
+
+                    goto flush_fce;
+                }
+            } else {
+                const uint32_t n = ct_buffer_size(struct_buffer);
+                if (n) {
+                    ct_buffer_printf(&output, ct_memory_a0->system,
+                                     "%s\n", struct_buffer);
+                    ct_buffer_clear(struct_buffer);
+                }
             }
         }
 
@@ -215,6 +298,7 @@ int main(int argc,
 //            "*/hash.inl",
 //            "*/array.inl",
 //            "*/os.h",
+//            "*/fmath.inl",
             "*.inl", "*.h"
     };
 //    const char *filter[] = {"*.inl", "*.h"};
@@ -225,12 +309,20 @@ int main(int argc,
 
     struct ct_task_counter_t *counter = NULL;
 
+    uint32_t add_it = 0;
     for (uint32_t i = 0; i < files_count; ++i) {
-        tasks[i].data = files[i];
-        tasks[i].work = process_file;
+        if (strstr(files[i], "/private") != NULL) {
+            continue;
+        }
+
+        tasks[add_it].data = files[i];
+        tasks[add_it].work = process_file;
+
+        ++add_it;
     }
 
-    ct_task_a0->add(tasks, files_count, &counter);
+
+    ct_task_a0->add(tasks, add_it, &counter);
     ct_task_a0->wait_for_counter(counter, 0);
 
     ct_corelib_shutdown();

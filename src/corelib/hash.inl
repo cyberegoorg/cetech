@@ -5,16 +5,10 @@
 //
 // Hash table that map uint64_t **key** to uint64_t **value**.
 //
-// ***************************************
-// *         +---+---+---+---+---+
-// *  Keys   | O | 1 | 2 |...| n |
-// *         +---+---+---+---+---+
-// *  Values | O | 1 | 2 |...| n |
-// *         +---+---+---+---+---+
-// ***************************************
 //
 // # Example
 //
+// ## Simple table char -> uint64_t
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ct_hash_t hash = {0};
 //
@@ -45,6 +39,13 @@
 #define EMPTY_SLOT UINT64_MAX
 
 // Hash table struct
+// ***************************************
+// *         +---+---+---+---+---+
+// *  Keys   | O | 1 | 2 |...| n |
+// *         +---+---+---+---+---+
+// *  Values | O | 1 | 2 |...| n |
+// *         +---+---+---+---+---+
+// ***************************************
 //
 // - *n* - bucket size
 // - *keys* - keys [array](array.md.html)
@@ -88,7 +89,7 @@ static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
     return idx;
 }
 
-// Find *k* in hash table
+// Find *k* in hash table. If key does not exist return *default_value*
 static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
                                       uint64_t k,
                                       uint64_t default_value) {
@@ -111,7 +112,7 @@ static inline bool ct_hash_contain(const struct ct_hash_t *hash,
     return hash->keys[idx] == k;
 }
 
-// Add *k* => *value*
+// Add *k* -> *value*
 static inline void ct_hash_add(struct ct_hash_t *hash,
                                uint64_t k,
                                uint64_t value,

@@ -12,7 +12,7 @@
 #include <corelib/hash.inl>
 #include <corelib/murmur_hash.inl>
 
-#include "yaml/yaml.h"
+#include "include/yaml/yaml.h"
 
 #define _G yamlng_global
 #define LOG_WHERE "yamlng"

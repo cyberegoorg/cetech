@@ -1,7 +1,5 @@
+//                          **OS layer abstraction**
 //
-// # OS layer abstraction
-//
-// # API
 
 #ifndef CETECH_OS_H
 #define CETECH_OS_H
@@ -22,49 +20,54 @@ struct ct_alloc;
         }                                                               \
     } while (0)
 #else
-#define CETECH_ASSERT(where, condition) do {} while (0)
+#define CETECH_ASSERT(where, condition) \
+    do {} while (0)
 #endif
 
-// ## Error
+// # Error
 
 struct ct_os_error_a0 {
+    // Assert
     void (*assert)(const char *where,
                    const char *condition,
                    const char *filename,
                    int line);
 };
 
-// ## CPU
+// # CPU
 
 struct ct_os_cpu_a0 {
+    // Get cpu core count
     int (*count)();
 };
 
 
-// ## Object
+// # Object
 
 struct ct_os_object_a0 {
+    // Load shared lib
     void *(*load)(const char *path);
 
+    // Unload shared lib
     void (*unload)(void *so);
 
+    // Load function from shared lib
     void *(*load_function)(void *so,
                            const char *name);
 };
 
 
-// ## Path
+// # Path
 
 struct ct_os_path_a0 {
-    //! Get file modified time
-    //! - *param* path File path
+    // Get file modified time
     uint32_t (*file_mtime)(const char *path);
 
-    //! List dir
-    //! \param path Dir path
-    //! \param recursive Resucrsive list?
-    //! \param files Result files
-    //! \param allocator Allocator
+    // List dir
+    // - path Dir path
+    // - recursive Resucrsive list?
+    // - files Result files
+    // - allocator Allocator
     void (*list)(const char *path,
                  const char **patern,
                  uint32_t patern_n,
@@ -74,27 +77,25 @@ struct ct_os_path_a0 {
                  uint32_t *count,
                  struct ct_alloc *allocator);
 
-    //! Free list dir array
-    //! \param files Files array
-    //! \param allocator Allocator
+    // Free list dir array
+    // - files Files array
+    // - allocator Allocator
     void (*list_free)(char **files,
                       uint32_t count,
                       struct ct_alloc *allocator);
 
-    //! Create dir path
-    //! \param path Path
-    //! \return 1 of ok else 0
+    // Create dir path
+    // - path Path
     int (*make_path)(const char *path);
 
-    //! Get filename from path
-    //! \param path Path
-    //! \return Filename
+    // Get filename from path
+    // - path Path
     const char *(*filename)(const char *path);
 
-    //! Get file basename (filename without extension)
-    //! \param path Path
-    //! \param out Out basename
-    //! \param size
+    // Get file basename (filename without extension)
+    // - path Path
+    // - out Out basename
+    // - size
     void (*basename)(const char *path,
                      char *out);
 
@@ -104,15 +105,13 @@ struct ct_os_path_a0 {
     void (*dirname)(char *out,
                     const char *path);
 
-    //! Get file extension
-    //! \param path Path
-    //! \return file extension
+    // Get file extension
+    // - path Path
     const char *(*extension)(const char *path);
 
-    //! Join paths
-    //! \param allocator Allocator
-    //! \param count Path count.
-    //! \return Result path len.
+    // Join paths and return path len.
+    // - allocator Allocator
+    // - count Path count.
     void (*join)(char **buffer,
                  struct ct_alloc *allocator,
                  uint32_t count,
@@ -127,14 +126,14 @@ struct ct_os_path_a0 {
 
 
 
-// ## Process
+// # Process
 
 struct ct_os_process_a0 {
     int (*exec)(const char *argv);
 };
 
 
-// ## Thread
+// # Thread
 
 typedef void ct_thread_t;
 
@@ -145,32 +144,29 @@ struct ct_spinlock {
 };
 
 struct ct_os_thread_a0 {
-    //! Create new thread
-    //! \param fce Thread fce
-    //! \param name Thread name
-    //! \param data Thread data
-    //! \return new thread
+    // Create new thread
+    // - fce Thread fce
+    // - name Thread name
+    // - data Thread data
     ct_thread_t *(*create)(ct_thread_fce_t fce,
                            const char *name,
                            void *data);
 
-    //! Kill thread
-    //! \param thread thread
+    // Kill thread
+    // - thread thread
     void (*kill)(ct_thread_t *thread);
 
-    //! Wait for thread
-    //! \param thread Thread
-    //! \param status Thread exit status
+    // Wait for thread
+    // - thread Thread
+    // - status Thread exit status
     void (*wait)(ct_thread_t *thread,
                  int *status);
 
-    //! Get id for thread
-    //! \param thread Thread
-    //! \return ID
+    // Get id for thread
+    // - thread Thread
     uint64_t (*get_id)(ct_thread_t *thread);
 
-    //! Get actual thread id
-    //! \return Thread id
+    // Get actual thread id
     uint64_t (*actual_id)();
 
     void (*yield)();
@@ -182,7 +178,7 @@ struct ct_os_thread_a0 {
 
 
 
-// ## Time
+// # Time
 
 struct ct_os_time_a0 {
     uint32_t (*ticks)();
@@ -194,7 +190,7 @@ struct ct_os_time_a0 {
 
 
 
-// ## VIO
+// # VIO
 
 enum ct_vio_open_mode {
     VIO_OPEN_READ,
@@ -237,7 +233,7 @@ struct ct_os_vio_a0 {
 };
 
 
-// ## Watchdog
+// # Watchdog
 
 enum ct_watchdog_ev_type {
     CT_WATCHDOG_EVENT_NONE = 0,
@@ -282,8 +278,7 @@ struct ct_os_watchdog_a0 {
 };
 
 
-
-// ## Window
+// # Window
 
 #define WINDOW_EBUS_NAME "window"
 
@@ -292,9 +287,9 @@ enum {
 };
 
 enum {
-    EVENT_WINDOW_INVALID = 0,   //!< Invalid type
+    EVENT_WINDOW_INVALID = 0,   //< Invalid type
 
-    EVENT_WINDOW_RESIZED, //!< Window resized
+    EVENT_WINDOW_RESIZED, //< Window resized
 };
 
 struct ct_window_resized_event {

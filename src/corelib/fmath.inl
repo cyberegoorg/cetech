@@ -1,3 +1,6 @@
+//                          **FPU math**
+//
+
 /* Bassed on bx math lib. license ---VVV
  * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
@@ -12,22 +15,41 @@
 #include <math.h>
 #include <string.h>
 
+// # Constant
+
+// $$ \pi $$
 #define CT_PI             (3.1415926535897932384626433832795f)
+
+// $$ \pi * 2 $$
 #define CT_PI2            (6.2831853071795864769252867665590f)
+
+// $$ \frac{1}{\pi} $$
 #define CT_INV_PI         (1.0f / CT_PI)
+
+// $$ \frac{\pi}{2} $$
 #define CT_PI_HALF        (1.5707963267948966192313216916398f)
+
+// $$ \frac{\pi}{2} $$
 #define CT_SQRT2          (1.4142135623730950488016887242097f)
+
 #define CT_INV_LOG_NAT_2  (1.4426950408889634073599246810019f)
+
+// $$ \frac{\pi}{180} $$
 #define CT_DEG_TO_RAD     (CT_PI / 180.0f)
+
+// $$ \frac{180}{\pi} $$
 #define CT_RAD_TO_DEG     (180.0f / CT_PI)
 
 #if CT_COMPILER_MSVC
-#define HUGEE = float(HUGE_VAL);
+#define HUGEE float(HUGE_VAL);
 #else
-#define HUGEE = HUGE_VALF;
+#define HUGEE HUGE_VALF;
 #endif // CT_COMPILER_MSVC
 
 
+// # Float
+
+// Convert float -> uint32_t
 static inline uint32_t ct_float_to_bits(float _a) {
     union {
         float f;
@@ -36,6 +58,7 @@ static inline uint32_t ct_float_to_bits(float _a) {
     return u.ui;
 }
 
+// Convert uint32_t -> float
 static inline float ct_bits_to_float(uint32_t _a) {
     union {
         uint32_t ui;
@@ -44,6 +67,7 @@ static inline float ct_bits_to_float(uint32_t _a) {
     return u.f;
 }
 
+// Convert double -> uint32_t
 static inline uint64_t ct_double_to_bits(double _a) {
     union {
         double f;
@@ -52,6 +76,7 @@ static inline uint64_t ct_double_to_bits(double _a) {
     return u.ui;
 }
 
+// Convert uint32_t -> double
 static inline double ct_bits_to_double(uint64_t _a) {
     union {
         uint64_t ui;
@@ -61,33 +86,9 @@ static inline double ct_bits_to_double(uint64_t _a) {
 }
 
 
+// $$ \|a\|  $$
 static inline float ct_fabsolute(float _a) {
     return fabsf(_a);
-}
-
-static inline float ct_fsin(float _a) {
-    return sinf(_a);
-}
-
-static inline float ct_fasin(float _a) {
-    return asinf(_a);
-}
-
-static inline float ct_fcos(float _a) {
-    return cosf(_a);
-}
-
-static inline float ct_ftan(float _a) {
-    return tanf(_a);
-}
-
-static inline float ct_facos(float _a) {
-    return acosf(_a);
-}
-
-static inline float ct_fatan2(float _y,
-                              float _x) {
-    return atan2f(_y, _x);
 }
 
 static inline float ct_fpow(float _a,
@@ -98,6 +99,7 @@ static inline float ct_fpow(float _a,
 static inline float ct_flog(float _a) {
     return logf(_a);
 }
+
 
 static inline float ct_fsqrt(float _a) {
     return sqrtf(_a);
@@ -270,21 +272,54 @@ static inline float ct_fgain(float _time,
 }
 
 
+// # Goniometry
+
+static inline float ct_fsin(float _a) {
+    return sinf(_a);
+}
+
+static inline float ct_fasin(float _a) {
+    return asinf(_a);
+}
+
+static inline float ct_fcos(float _a) {
+    return cosf(_a);
+}
+
+static inline float ct_ftan(float _a) {
+    return tanf(_a);
+}
+
+static inline float ct_facos(float _a) {
+    return acosf(_a);
+}
+
+static inline float ct_fatan2(float _y,
+                              float _x) {
+    return atan2f(_y, _x);
+}
+
+// # Angle
+
+// Convert degree -> radian
 static inline float ct_to_rad(float _deg) {
     return _deg * CT_DEG_TO_RAD;
 }
 
+// Convert radian -> degree
 static inline float ct_to_deg(float _rad) {
     return _rad * CT_RAD_TO_DEG;
 }
 
 
+// Calc angle diff
 static inline float ct_angle_diff(float _a,
                                   float _b) {
     const float dist = ct_fwrap(_b - _a, CT_PI * 2.0f);
     return ct_fwrap(dist * 2.0f, CT_PI * 2.0f) - dist;
 }
 
+// LERP
 static inline float ct_angle_lerp(float _a,
                                   float _b,
                                   float _t) {
@@ -292,7 +327,7 @@ static inline float ct_angle_lerp(float _a,
 }
 
 
-// Vec
+// # Vec3
 
 static inline void ct_vec3_move(float *_result,
                                 const float *_a) {
@@ -495,13 +530,7 @@ static inline void ct_vec3_to_lat_long(float *_u,
     *_v = theta * CT_INV_PI;
 }
 
-static inline void ct_vec4_move(float *_result,
-                                const float *_a) {
-    _result[0] = _a[0];
-    _result[1] = _a[1];
-    _result[2] = _a[2];
-    _result[3] = _a[3];
-}
+// # Quaternion
 
 static inline void ct_quat_identity(float *_result) {
     _result[0] = 0.0f;
@@ -684,18 +713,69 @@ static inline void ct_vec3_mul_quat(float *_result,
     ct_quat_mul_xyz(_result, tmp1, _quat);
 }
 
+// # Vec4
+
+static inline void ct_vec4_move(float *_result,
+                                const float *_a) {
+    _result[0] = _a[0];
+    _result[1] = _a[1];
+    _result[2] = _a[2];
+    _result[3] = _a[3];
+}
+
+// # Mat 3
+
+static inline void ct_mat3_inverse(float *_result,
+                                   const float *_a) {
+    float xx = _a[0];
+    float xy = _a[1];
+    float xz = _a[2];
+    float yx = _a[3];
+    float yy = _a[4];
+    float yz = _a[5];
+    float zx = _a[6];
+    float zy = _a[7];
+    float zz = _a[8];
+
+    float det = 0.0f;
+    det += xx * (yy * zz - yz * zy);
+    det -= xy * (yx * zz - yz * zx);
+    det += xz * (yx * zy - yy * zx);
+
+    float invDet = 1.0f / det;
+
+    _result[0] = +(yy * zz - yz * zy) * invDet;
+    _result[1] = -(xy * zz - xz * zy) * invDet;
+    _result[2] = +(xy * yz - xz * yy) * invDet;
+
+    _result[3] = -(yx * zz - yz * zx) * invDet;
+    _result[4] = +(xx * zz - xz * zx) * invDet;
+    _result[5] = -(xx * yz - xz * yx) * invDet;
+
+    _result[6] = +(yx * zy - yy * zx) * invDet;
+    _result[7] = -(xx * zy - xy * zx) * invDet;
+    _result[8] = +(xx * yy - xy * yx) * invDet;
+}
+
+// # Mat 4
+
 static inline void ct_mat4_identity(float *_result) {
     memset(_result, 0, sizeof(float) * 16);
     _result[0] = _result[5] = _result[10] = _result[15] = 1.0f;
 }
 
 static inline bool ct_mat4_is_identity(float *_result) {
-    return (_result[0] == 1.0f) && (_result[1] == 0.0f) && (_result[2] == 0.0f) && (_result[3] == 0.0f) &&
-           (_result[4] == 0.0f) && (_result[5] == 1.0f) && (_result[6] == 0.0f) && (_result[7] == 0.0f) &&
-           (_result[8] == 0.0f) && (_result[9] == 0.0f) && (_result[10] == 1.0f) && (_result[11] == 0.0f) &&
-           (_result[12] == 0.0f) && (_result[13] == 0.0f) && (_result[14] == 0.0f) && (_result[15] == 1.0f);
+    return (_result[0] == 1.0f) && (_result[1] == 0.0f) &&
+           (_result[2] == 0.0f) && (_result[3] == 0.0f) &&
+           (_result[4] == 0.0f) && (_result[5] == 1.0f) &&
+           (_result[6] == 0.0f) && (_result[7] == 0.0f) &&
+           (_result[8] == 0.0f) && (_result[9] == 0.0f) &&
+           (_result[10] == 1.0f) && (_result[11] == 0.0f) &&
+           (_result[12] == 0.0f) && (_result[13] == 0.0f) &&
+           (_result[14] == 0.0f) && (_result[15] == 1.0f);
 
 }
+
 
 static inline void ct_mat4_translate(float *_result,
                                      float _tx,
@@ -766,37 +846,6 @@ static inline void ct_mat4_from_normal_a(float *_result,
     _result[15] = 1.0f;
 }
 
-static inline void ct_mat3_inverse(float *_result,
-                                   const float *_a) {
-    float xx = _a[0];
-    float xy = _a[1];
-    float xz = _a[2];
-    float yx = _a[3];
-    float yy = _a[4];
-    float yz = _a[5];
-    float zx = _a[6];
-    float zy = _a[7];
-    float zz = _a[8];
-
-    float det = 0.0f;
-    det += xx * (yy * zz - yz * zy);
-    det -= xy * (yx * zz - yz * zx);
-    det += xz * (yx * zy - yy * zx);
-
-    float invDet = 1.0f / det;
-
-    _result[0] = +(yy * zz - yz * zy) * invDet;
-    _result[1] = -(xy * zz - xz * zy) * invDet;
-    _result[2] = +(xy * yz - xz * yy) * invDet;
-
-    _result[3] = -(yx * zz - yz * zx) * invDet;
-    _result[4] = +(xx * zz - xz * zx) * invDet;
-    _result[5] = -(xx * yz - xz * yx) * invDet;
-
-    _result[6] = +(yx * zy - yy * zx) * invDet;
-    _result[7] = -(xx * zy - xy * zx) * invDet;
-    _result[8] = +(xx * yy - xy * yx) * invDet;
-}
 
 static inline void ct_mat4_move(float *_result,
                                 const float *_a) {
@@ -1162,47 +1211,8 @@ static inline void ct_mat4_transpose(float *_result,
     _result[15] = _a[15];
 }
 
-/// Convert LH to RH projection matrix and vice versa.
-static inline void ct_mat4_proj_flip_handedness(float *_dst,
-                                                const float *_src) {
-    _dst[0] = -_src[0];
-    _dst[1] = -_src[1];
-    _dst[2] = -_src[2];
-    _dst[3] = -_src[3];
-    _dst[4] = _src[4];
-    _dst[5] = _src[5];
-    _dst[6] = _src[6];
-    _dst[7] = _src[7];
-    _dst[8] = -_src[8];
-    _dst[9] = -_src[9];
-    _dst[10] = -_src[10];
-    _dst[11] = -_src[11];
-    _dst[12] = _src[12];
-    _dst[13] = _src[13];
-    _dst[14] = _src[14];
-    _dst[15] = _src[15];
-}
 
-/// Convert LH to RH view matrix and vice versa.
-static inline void ct_mat4_view_flip_handedness(float *_dst,
-                                                const float *_src) {
-    _dst[0] = -_src[0];
-    _dst[1] = _src[1];
-    _dst[2] = -_src[2];
-    _dst[3] = _src[3];
-    _dst[4] = -_src[4];
-    _dst[5] = _src[5];
-    _dst[6] = -_src[6];
-    _dst[7] = _src[7];
-    _dst[8] = -_src[8];
-    _dst[9] = _src[9];
-    _dst[10] = -_src[10];
-    _dst[11] = _src[11];
-    _dst[12] = -_src[12];
-    _dst[13] = _src[13];
-    _dst[14] = -_src[14];
-    _dst[15] = _src[15];
-}
+// # Calc
 
 static inline void ct_calc_normal(float *_result,
                                   float *_va,
@@ -1311,6 +1321,8 @@ static inline void ct_calc_linear_fit_3d(float *_result,
     _result[2] = invMtx[6] * sumXZ + invMtx[7] * sumYZ + invMtx[8] * sumZ;
 }
 
+// # Color
+
 static inline void ct_rgb_to_hsv(float *_hsv,
                                  const float *_rgb) {
     const float rr = _rgb[0];
@@ -1354,6 +1366,50 @@ static inline void ct_hsv_to_rgb(float *_rgb,
     _rgb[0] = vv * ct_flerp(1.0f, ct_fsaturate(px - 1.0f), ss);
     _rgb[1] = vv * ct_flerp(1.0f, ct_fsaturate(py - 1.0f), ss);
     _rgb[2] = vv * ct_flerp(1.0f, ct_fsaturate(pz - 1.0f), ss);
+}
+
+// # Projection
+
+// Convert LH to RH projection matrix and vice versa.
+static inline void ct_mat4_proj_flip_handedness(float *_dst,
+                                                const float *_src) {
+    _dst[0] = -_src[0];
+    _dst[1] = -_src[1];
+    _dst[2] = -_src[2];
+    _dst[3] = -_src[3];
+    _dst[4] = _src[4];
+    _dst[5] = _src[5];
+    _dst[6] = _src[6];
+    _dst[7] = _src[7];
+    _dst[8] = -_src[8];
+    _dst[9] = -_src[9];
+    _dst[10] = -_src[10];
+    _dst[11] = -_src[11];
+    _dst[12] = _src[12];
+    _dst[13] = _src[13];
+    _dst[14] = _src[14];
+    _dst[15] = _src[15];
+}
+
+//Convert LH to RH view matrix and vice versa.
+static inline void ct_mat4_view_flip_handedness(float *_dst,
+                                                const float *_src) {
+    _dst[0] = -_src[0];
+    _dst[1] = _src[1];
+    _dst[2] = -_src[2];
+    _dst[3] = _src[3];
+    _dst[4] = -_src[4];
+    _dst[5] = _src[5];
+    _dst[6] = -_src[6];
+    _dst[7] = _src[7];
+    _dst[8] = -_src[8];
+    _dst[9] = _src[9];
+    _dst[10] = -_src[10];
+    _dst[11] = _src[11];
+    _dst[12] = -_src[12];
+    _dst[13] = _src[13];
+    _dst[14] = -_src[14];
+    _dst[15] = _src[15];
 }
 
 static inline void ct_mat4_look_at_impl(float *_result,

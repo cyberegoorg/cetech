@@ -1,22 +1,23 @@
+// # API
+
 #ifndef CETECH_API_H
 #define CETECH_API_H
 
-#import <stdint.h>
+#include <stdint.h>
 
 #include "murmur_hash.inl"
 #include "module.inl"
 
-//==============================================================================
-// Defines
-//==============================================================================
-
+// Init api
 #define CT_INIT_API(_api, name) \
     name = (struct name*) (_api)->first(ct_hash_murmur2_64(#name, strlen(#name), 0)).api
 
-//==============================================================================
-// Structs
-//==============================================================================
 
+// Api entry
+//
+// - *api* - Api pointer
+// - *idx* - private.
+// - *entry* - private.
 struct ct_api_entry {
     uint32_t idx;
     void *entry;
@@ -26,11 +27,8 @@ struct ct_api_entry {
 
 typedef void (ct_api_on_add_t)(uint64_t name, void* api);
 
-//==============================================================================
-// Api
-//==============================================================================
-
 struct ct_api_a0 {
+
     void (*register_api)(const char *name,
                          void *api);
 
@@ -42,6 +40,7 @@ struct ct_api_a0 {
 
     void (*register_on_add)(uint64_t name, ct_api_on_add_t *on_add);
 };
+
 
 CT_MODULE(ct_api_a0);
 

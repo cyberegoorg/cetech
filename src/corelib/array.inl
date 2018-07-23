@@ -4,7 +4,7 @@
 //
 // ****************************************************
 // *
-// * header            pointer    size  capacity
+// *  header            pointer    size  capacity
 // *    |                 |         |       |
 // *    v                 v         v       v
 // *    +-----------------+---+---+---+---+---+
@@ -14,8 +14,31 @@
 // *
 // ****************************************************
 //
+// !!! ERROR: Array must be set to NULL before first use[.](https://www.monkeyuser.com/2018/debugging/)
+//    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    TYPE* array = NULL;
+//    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
 // # Example
 //
+// ## Classic int array
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// char* array = NULL;
+//
+// ct_array_push(array, 1, ct_memory_a0->system);
+// ct_array_push(array, 2, ct_memory_a0->system);
+// ct_array_push(array, 3, ct_memory_a0->system);
+// ct_array_push(array, 4, ct_memory_a0->system);
+//
+// const uint32_t n = ct_array_size(array);
+// for(uint32_t i = i; i < n; ++i) {
+//     printf("%d\n", array[i]);
+// }
+//
+// ct_array_free(array, ct_memory_a0->system);
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// ## Array as char buffer
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 // char* buffer = NULL;
 //
@@ -31,7 +54,44 @@
 // ct_array_free(buffer, ct_memory_a0->system);
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// # API
+// ## Array as string buffer
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// char* buffer = NULL;
+//
+// ct_array_push_n(buffer, "Hello", strlen("Hello"), ct_memory_a0->system);
+// ct_array_push_n(buffer, ", ", strlen(", "), ct_memory_a0->system);
+// ct_array_push_n(buffer, "world.", strlen("world."), ct_memory_a0->system);
+//
+// printf("%s\n", buffer); // hello, world.
+//
+// ct_array_free(buffer, ct_memory_a0->system);
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// ## Struct memory "pool"
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+// struct object {
+//     uint64 id;
+// }
+//
+// object* pool = NULL;
+//
+// static uint32_t _new_object(struct object obj) {
+//     uint32_t idx = ct_array_size(pool);
+//     ct_array_push(pool, obj, ct_memory_a0->system);
+//     return idx;
+// }
+//
+// uint32_t obj1 = _new_object((struct object){.id = 1}));
+// uint32_t obj2 = _new_object((struct object){.id = 2}));
+// uint32_t obj3 = _new_object((struct object){.id = 3}));
+//
+// printf("%d\n", pool[obj1].id); // 1
+// printf("%d\n", pool[obj2].id); // 2
+// printf("%d\n", pool[obj3].id); // 3
+//
+// ct_array_free(pool, ct_memory_a0->system);
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
 
 #ifndef CETECH_ARRAY_H
 #define CETECH_ARRAY_H
@@ -43,17 +103,21 @@
 #include <corelib/macros.h>
 #include "allocator.h"
 
+// # Struct
+
 // Array header (pointer preambule)
 struct ct_array_header_t {
     uint32_t size;
     uint32_t capacity;
 };
 
+// # Macro
+
 // Free array.
 #define ct_array_free(a, alloc) \
     ((a) ?  CT_FREE(alloc, ct_array_header(a)) : 0, a = NULL )
 
-// Get array [header ](#ct_array_header_t).
+// Get array [header](#ct_array_header_t).
 #define ct_array_header(a) \
     ((a) ? (struct ct_array_header_t *)((char *)(a) - sizeof(struct ct_array_header_t)): NULL)
 
@@ -127,6 +191,8 @@ struct ct_array_header_t {
 // Get back element
 #define ct_array_back(a) \
     a[ct_array_size(a)-1]
+
+// # Function
 
 // Grow array if need.
 static inline void *ct_array_grow(void *array,

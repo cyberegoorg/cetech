@@ -5,7 +5,7 @@
 
 ****************************************************
 *
-* header            pointer    size  capacity
+*  header            pointer    size  capacity
 *    |                 |         |       |
 *    v                 v         v       v
 *    +-----------------+---+---+---+---+---+
@@ -15,8 +15,31 @@
 *
 ****************************************************
 
+!!! ERROR: Array must be set to NULL before first use[.](https://www.monkeyuser.com/2018/debugging/)
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   TYPE* array = NULL;
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 # Example
 
+## Classic int array
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+char* array = NULL;
+
+ct_array_push(array, 1, ct_memory_a0->system);
+ct_array_push(array, 2, ct_memory_a0->system);
+ct_array_push(array, 3, ct_memory_a0->system);
+ct_array_push(array, 4, ct_memory_a0->system);
+
+const uint32_t n = ct_array_size(array);
+for(uint32_t i = i; i < n; ++i) {
+    printf("%d\n", array[i]);
+}
+
+ct_array_free(array, ct_memory_a0->system);
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Array as char buffer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 char* buffer = NULL;
 
@@ -32,10 +55,49 @@ printf("%s\n", buffer);
 ct_array_free(buffer, ct_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# API
+## Array as string buffer
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+char* buffer = NULL;
+
+ct_array_push_n(buffer, "Hello", strlen("Hello"), ct_memory_a0->system);
+ct_array_push_n(buffer, ", ", strlen(", "), ct_memory_a0->system);
+ct_array_push_n(buffer, "world.", strlen("world."), ct_memory_a0->system);
+
+printf("%s\n", buffer); // hello, world.
+
+ct_array_free(buffer, ct_memory_a0->system);
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Struct memory "pool"
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+struct object {
+    uint64 id;
+}
+
+object* pool = NULL;
+
+static uint32_t _new_object(struct object obj) {
+    uint32_t idx = ct_array_size(pool);
+    ct_array_push(pool, obj, ct_memory_a0->system);
+    return idx;
+}
+
+uint32_t obj1 = _new_object((struct object){.id = 1}));
+uint32_t obj2 = _new_object((struct object){.id = 2}));
+uint32_t obj3 = _new_object((struct object){.id = 3}));
+
+printf("%d\n", pool[obj1].id); // 1
+printf("%d\n", pool[obj2].id); // 2
+printf("%d\n", pool[obj3].id); // 3
+
+ct_array_free(pool, ct_memory_a0->system);
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-### ct_array_header_t
+# Struct
+
+
+## ct_array_header_t
 ~~~~~~~~~~~~~~~~~~~~
 struct ct_array_header_t {
     uint32_t size;
@@ -45,152 +107,156 @@ struct ct_array_header_t {
 ~~~~~~~~~~~~~~~~~~~~
 Array header (pointer preambule)
 
+# Macro
 
-### ct_array_free
+
+## ct_array_free
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_free(a, alloc) \
+#define ct_array_free(a, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Free array.
 
 
-### ct_array_header
+## ct_array_header
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_header(a) \
+#define ct_array_header(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
-Get array [header ](#ct_array_header_t).
+Get array [header](#ct_array_header_t).
 
 
-### ct_array_size
+## ct_array_size
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_size(a) \
+#define ct_array_size(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get array size.
 
 
-### ct_array_capacity
+## ct_array_capacity
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_capacity(a) \
+#define ct_array_capacity(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get array capacity.
 
 
-### ct_array_clean
+## ct_array_clean
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_clean(a) \
+#define ct_array_clean(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Clean array (only set size = 0)
 
 
-### ct_array_set_capacity
+## ct_array_set_capacity
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_set_capacity(a, c, alloc) \
+#define ct_array_set_capacity(a, c, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Set array capacity
 
 
-### ct_array_resize
+## ct_array_resize
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_resize(a, c, alloc) \
+#define ct_array_resize(a, c, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Resize array
 
 
-### ct_array_empty
+## ct_array_empty
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_empty(a) \
+#define ct_array_empty(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Is array emty?
 
 
-### ct_array_any
+## ct_array_any
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_any(a) \
+#define ct_array_any(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Has array any element?
 
 
-### ct_array_full
+## ct_array_full
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_full(a) \
+#define ct_array_full(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Is array full?
 
 
-### ct_array_full_n
+## ct_array_full_n
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_full_n(a, n) \
+#define ct_array_full_n(a, n) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Is array full for n elemenets?
 
 
-### ct_array_push
+## ct_array_push
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_push(a, item, alloc) \
+#define ct_array_push(a, item, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Push value to array
 
 
-### ct_array_push_n
+## ct_array_push_n
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_push_n(a, items, n, alloc) \
+#define ct_array_push_n(a, items, n, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Push n values from items to array
 
 
-### ct_array_pop_front
+## ct_array_pop_front
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_pop_front(a) \
+#define ct_array_pop_front(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Pop element from front
 
 
-### ct_array_pop_back
+## ct_array_pop_back
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_pop_back(a) \
+#define ct_array_pop_back(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Pop element from back
 
 
-### ct_array_insert
+## ct_array_insert
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_insert(a, idx, v, alloc) \
+#define ct_array_insert(a, idx, v, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Insert element before element at *idx*
 
 
-### ct_array_front
+## ct_array_front
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_front(a) \
+#define ct_array_front(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get front element
 
 
-### ct_array_back
+## ct_array_back
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_back(a) \
+#define ct_array_back(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get back element
 
+# Function
 
-### *ct_array_grow
+
+## ct_array_grow
 ~~~~~~~~~~~~~~~~~~~~
 static inline void *ct_array_grow(void *array,
                                   uint32_t capacity,
@@ -203,4 +269,7 @@ static inline void *ct_array_grow(void *array,
 ~~~~~~~~~~~~~~~~~~~~
 Grow array if need.
 
-<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+<!-- Markdeep: -->
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style>
+<script src="../markdeep.min.js"></script>
+<script>window.alreadyProcessedMarkdeep|| (document.body.style.visibility="visible");</script>

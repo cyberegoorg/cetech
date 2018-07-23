@@ -6,16 +6,10 @@
 
 Hash table that map uint64_t **key** to uint64_t **value**.
 
-***************************************
-*         +---+---+---+---+---+
-*  Keys   | O | 1 | 2 |...| n |
-*         +---+---+---+---+---+
-*  Values | O | 1 | 2 |...| n |
-*         +---+---+---+---+---+
-***************************************
 
 # Example
 
+## Simple table char -> uint64_t
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ct_hash_t hash = {0};
 
@@ -36,7 +30,13 @@ ct_hash_free(buffer, ct_memory_a0->system);
 # API
 
 
-### ct_hash_t
+## EMPTY_SLOT
+~~~~~~~~~~~~~~~~~~~~
+#define EMPTY_SLOT UINT64_MAX
+
+~~~~~~~~~~~~~~~~~~~~
+
+## ct_hash_t
 ~~~~~~~~~~~~~~~~~~~~
 struct ct_hash_t {
     uint32_t n;
@@ -46,22 +46,28 @@ struct ct_hash_t {
 
 ~~~~~~~~~~~~~~~~~~~~
 Hash table struct
+***************************************
+*         +---+---+---+---+---+
+*  Keys   | O | 1 | 2 |...| n |
+*         +---+---+---+---+---+
+*  Values | O | 1 | 2 |...| n |
+*         +---+---+---+---+---+
+***************************************
 
 - *n* - bucket size
 - *keys* - keys [array](array.md.html)
 - *values* - values [array](array.md.html)
 
 
-### ct_hash_clean
+## ct_hash_clean
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ct_hash_clean(struct ct_hash_t *hash) {
-    memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
 
 ~~~~~~~~~~~~~~~~~~~~
 Clean hash table
 
 
-### ct_hash_free
+## ct_hash_free
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ct_hash_free(struct ct_hash_t *hash,
                                 const struct ct_alloc *allocator) {
@@ -70,24 +76,24 @@ static inline void ct_hash_free(struct ct_hash_t *hash,
 Free hash table
 
 
-### ct_hash_find_slot
+## ct_hash_find_slot
 ~~~~~~~~~~~~~~~~~~~~
 static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
                                          uint64_t k) {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-### ct_hash_lookup
+## ct_hash_lookup
 ~~~~~~~~~~~~~~~~~~~~
 static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
                                       uint64_t k,
                                       uint64_t default_value) {
 
 ~~~~~~~~~~~~~~~~~~~~
-Find *k* in hash table
+Find *k* in hash table. If key does not exist return *default_value*
 
 
-### ct_hash_contain
+## ct_hash_contain
 ~~~~~~~~~~~~~~~~~~~~
 static inline bool ct_hash_contain(const struct ct_hash_t *hash,
                                    uint64_t k) {
@@ -96,7 +102,7 @@ static inline bool ct_hash_contain(const struct ct_hash_t *hash,
 Is *k* hash table?
 
 
-### ct_hash_add
+## ct_hash_add
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ct_hash_add(struct ct_hash_t *hash,
                                uint64_t k,
@@ -104,21 +110,24 @@ static inline void ct_hash_add(struct ct_hash_t *hash,
                                const struct ct_alloc *allocator) {
 
 ~~~~~~~~~~~~~~~~~~~~
-Add *k* => *value*
+Add *k* -> *value*
 
 
-### ct_hash_remove
+## ct_hash_remove
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ct_hash_remove(struct ct_hash_t *hash,
                                   uint64_t k) {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-### ct_hash_clone
+## ct_hash_clone
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ct_hash_clone(const struct ct_hash_t *from,
                                  struct ct_hash_t *to,
                                  const struct ct_alloc *alloc) {
 
 ~~~~~~~~~~~~~~~~~~~~
-<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+<!-- Markdeep: -->
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style>
+<script src="../markdeep.min.js"></script>
+<script>window.alreadyProcessedMarkdeep|| (document.body.style.visibility="visible");</script>

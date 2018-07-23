@@ -25,7 +25,6 @@ enum ct_fs_open_mode {
 
 //! Filesystem API V0
 struct ct_fs_a0 {
-
     struct ct_vio *(*open)(uint64_t root,
                            const char *path,
                            enum ct_fs_open_mode mode);
