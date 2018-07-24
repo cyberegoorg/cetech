@@ -25,7 +25,7 @@ printf("H in hash == %d", ct_hash_contain(&hash, 'H')); // H in hash == 0
 printf("h -> %d", ct_hash_find(&hash, 'h', 0));  // h -> 1
 printf("H -> %d", ct_hash_find(&hash, 'H', 0));  // H -> 0
 
-ct_hash_free(buffer, ct_memory_a0->system);
+ct_hash_free(&hash, ct_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # API
 
