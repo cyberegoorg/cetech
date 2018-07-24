@@ -4,6 +4,7 @@
 stages:
   - docker_image
   - build
+  - test
   - documentation
 
 ################
