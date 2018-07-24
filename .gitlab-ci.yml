@@ -1,15 +1,10 @@
-########
-# Core #
-###############################################################################
-
 ##########
 # Stages #
 ###############################################################################
 stages:
   - docker_image
   - build
-  - doc
-  - test
+  - documentation
 
 ################
 # Docker image #
@@ -32,7 +27,7 @@ docker_image:
     - docker build -t $CI_REGISTRY_IMAGE/toolchain:master toolchain/
     - docker push $CI_REGISTRY_IMAGE/toolchain:master
 
-########
+#########
 # Build #
 ###############################################################################
 build:
@@ -49,29 +44,43 @@ build:
   script:
     - tools/linux64/genie --gcc=linux-clang gmake
     - make -C bin/projects/gmake-linux-clang/ config=debug64
+    - make -C bin/projects/gmake-linux-clang/ config=release64
 
 ########
 # Test #
 ###############################################################################
-#test:
-#  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
-#  stage: test
-#  variables:
-#    SDL_VIDEODRIVER: dummy
-#
-#  dependencies:
-#    - build
-#
-#  script:
-#    - py.test -v --color=yes engine/test
+test_release:
+  image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
+  stage: test
+  variables:
+    SDL_VIDEODRIVER: dummy
 
-#################
-# Gitlab pages  #
+  dependencies:
+    - build
+
+  script:
+    - bin/linux64_clang/bin/cetech_develop -compile -src ./examples/develop/src -build ./examples/develop/build
+
+test_debug:
+  image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
+  stage: test
+  variables:
+    SDL_VIDEODRIVER: dummy
+
+  dependencies:
+    - build
+
+  script:
+    - bin/linux64_clang/bin/cetech_develop_debug -compile -src ./examples/develop/src -build ./examples/develop/build
+
+################
+# Gitlab pages #
 ###############################################################################
 pages:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
-  stage: doc
+  stage: documentation
   script:
+    - tools/linux64/genie doc
     - cp -R docs public
     - cp docs/index.md.html public/index.html
 
