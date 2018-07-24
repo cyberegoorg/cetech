@@ -17,6 +17,7 @@
 #define MACRO_LEN 11
 #define MACRO_TEMPLATE "CT_ID64_0(\"%.*s\", 0x%" PRIx64 "ULL)"
 
+
 void process_file(void *data) {
     const char *filename = data;
 
@@ -97,10 +98,48 @@ void process_file(void *data) {
     CT_FREE(ct_memory_a0->system, input_data);
 }
 
+void print_usage() {
+    ct_log_a0->info(
+            "doc", "%s",
+
+            "usage: hash --source SOURCE_DIR\n"
+            "\n"
+            "  Find *.h, *.inl, *.c, *.cpp files in SOURCE_DIR and update static hash\n"
+            "  Ignore all 'private' folders.\n"
+            "\n"
+            "    --source SOURCE_DIR  - Source dir\n"
+            "    -h,--help            - Print this help\n"
+    );
+}
+
 int main(int argc,
          const char **argv) {
+
+    const char* source_dir = NULL;
+    bool printusage = false;
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--source") == 0) {
+            source_dir = argv[i + 1];
+            ++i;
+        } else if ((strcmp(argv[i], "-h") == 0) ||
+                   (strcmp(argv[i], "--help") == 0)) {
+            printusage = true;
+            break;
+        } else {
+            printusage = true;
+            break;
+        }
+    }
+
     struct ct_alloc *a = ct_memory_a0->system;
     ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
+
+    if (printusage) {
+        print_usage();
+        return 1;
+    }
+
+
 
     ct_corelib_init();
 
@@ -108,13 +147,12 @@ int main(int argc,
     uint32_t files_count;
 
     const char *filter[] = {"*.c", "*.h", "*.inl", "*.cpp"};
-    ct_os_a0->path->list("./src", CETECH_ARR_ARG(filter),
+    ct_os_a0->path->list(source_dir, CETECH_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
     struct ct_task_item tasks[files_count];
 
     struct ct_task_counter_t *counter = NULL;
-    struct ct_task_counter_t *counter2 = NULL;
 
     for (uint32_t i = 0; i < files_count; ++i) {
         tasks[i].data = files[i];
@@ -123,19 +161,6 @@ int main(int argc,
 
     ct_task_a0->add(tasks, files_count, &counter);
     ct_task_a0->wait_for_counter(counter, 0);
-
-    ct_os_a0->path->list("./examples", CETECH_ARR_ARG(filter),
-                         1, 0, &files, &files_count, a);
-
-    struct ct_task_item tasks2[files_count];
-    for (uint32_t i = 0; i < files_count; ++i) {
-        tasks2[i].data = files[i];
-        tasks2[i].work = process_file;
-    }
-
-    ct_task_a0->add(tasks2, files_count, &counter2);
-
-    ct_task_a0->wait_for_counter(counter2, 0);
 
     ct_os_a0->path->list_free(files, files_count, a);
 

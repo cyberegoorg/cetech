@@ -59,12 +59,12 @@ static char *_time_to_str(struct tm *gmtm) {
 **** Interface implementation
 ***********************************************************************/
 
-void ct_log_stdout_handler(enum ct_log_level level,
-                           time_t time,
-                           char worker_id,
-                           const char *where,
-                           const char *msg,
-                           void *data) {
+void ct_log_stdout_yaml_handler(enum ct_log_level level,
+                                time_t time,
+                                char worker_id,
+                                const char *where,
+                                const char *msg,
+                                void *data) {
     CT_UNUSED(data);
 
     static const char *_level_to_str[4] = {
@@ -92,6 +92,46 @@ void ct_log_stdout_handler(enum ct_log_level level,
 
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
+
+#if CT_PLATFORM_LINUX
+    fflush_unlocked(out);
+    flock(out->_fileno, LOCK_UN);
+#endif
+}
+
+
+#define LOG_FORMAT_SIMPLE   \
+    "[%s|%d]=> %s : %s\n"
+
+void ct_log_stdout_handler(enum ct_log_level level,
+                           time_t time,
+                           char worker_id,
+                           const char *where,
+                           const char *msg,
+                           void *data) {
+    CT_UNUSED(data);
+
+    static const char *_level_to_str[4] = {
+            [LOG_INFO]    = "I",
+            [LOG_WARNING] = "W",
+            [LOG_ERROR]   = "E",
+            [LOG_DBG]     = "D"
+    };
+
+    static const char *_level_format[4] = {
+            [LOG_INFO]    = LOG_FORMAT_SIMPLE,
+            [LOG_WARNING] = COLORED_TEXT(BYELLOW, LOG_FORMAT_SIMPLE),
+            [LOG_ERROR]   = COLORED_TEXT(BRED, LOG_FORMAT_SIMPLE),
+            [LOG_DBG]     = COLORED_TEXT(BGREEN, LOG_FORMAT_SIMPLE)
+    };
+
+    FILE *out = level == LOG_ERROR ? stderr : stdout;
+
+#if CT_PLATFORM_LINUX
+    flock(out->_fileno, LOCK_EX);
+#endif
+
+    fprintf(out, _level_format[level], _level_to_str[level], worker_id, where, msg);
 
 #if CT_PLATFORM_LINUX
     fflush_unlocked(out);

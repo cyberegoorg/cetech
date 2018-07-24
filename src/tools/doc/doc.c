@@ -26,7 +26,8 @@
     "<script src=\"../markdeep.min.js\"></script>\n"\
     "<script>window.alreadyProcessedMarkdeep|| (document.body.style.visibility=\"visible\");</script>\n"
 
-typedef char **pString;
+const char *source_dir = "./src";
+const char *build_dir = "./docs/gen";
 
 void process_file(void *data) {
     const char *filename = data;
@@ -272,7 +273,7 @@ void process_file(void *data) {
     char output_filename[128];
     ct_os_a0->path->basename(filename, basename);
     snprintf(output_filename, CT_ARRAY_LEN(output_filename),
-             "./docs/gen/%s.md.html", basename);
+             "%s/%s.md.html", build_dir, basename);
 
     file = ct_os_a0->vio->from_file(output_filename, VIO_OPEN_WRITE);
     file->write(file, output, ct_array_size(output), 1);
@@ -281,18 +282,56 @@ void process_file(void *data) {
     ct_array_free(output, ct_memory_a0->system);
 }
 
+void print_usage() {
+    ct_log_a0->info(
+            "doc", "%s",
+
+            "usage: doc --build BUILD_DIR --source SOURCE_DIR\n"
+            "\n"
+            "  Find *.h and *.inl files in SOURCE_DIR and generate doc to BUILD_DIR\n"
+            "  Ignore all 'private' folders.\n"
+            "\n"
+            "    --build BUILD_DIR    - Documentation output dir\n"
+            "    --source SOURCE_DIR  - Source dir\n"
+            "    -h,--help            - Print this help\n"
+    );
+}
+
 int main(int argc,
          const char **argv) {
+
+    bool printusage = false;
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--source") == 0) {
+            source_dir = argv[i + 1];
+            ++i;
+        } else if (strcmp(argv[i], "--build") == 0) {
+            build_dir = argv[i + 1];
+            ++i;
+        } else if ((strcmp(argv[i], "-h") == 0) ||
+                   (strcmp(argv[i], "--help") == 0)) {
+            printusage = true;
+            break;
+        } else {
+            printusage = true;
+            break;
+        }
+    }
+
     struct ct_alloc *a = ct_memory_a0->system;
     ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
 
+    if (printusage) {
+        print_usage();
+        return 1;
+    }
+
     ct_corelib_init();
 
-    ct_os_a0->path->make_path("./docs/gen/");
+    ct_os_a0->path->make_path(build_dir);
 
     char **files;
     uint32_t files_count;
-
 
     const char *filter[] = {
 //            "*/hash.inl",
@@ -301,8 +340,7 @@ int main(int argc,
 //            "*/fmath.inl",
             "*.inl", "*.h"
     };
-//    const char *filter[] = {"*.inl", "*.h"};
-    ct_os_a0->path->list("./src", CETECH_ARR_ARG(filter),
+    ct_os_a0->path->list(source_dir, CETECH_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
     struct ct_task_item tasks[files_count];

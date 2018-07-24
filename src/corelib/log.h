@@ -42,6 +42,7 @@ typedef void (*ct_log_handler_t)(enum ct_log_level level,
 //==============================================================================
 
 struct ct_log_a0 {
+    ct_log_handler_t stdout_yaml_handler;
     ct_log_handler_t stdout_handler;
 
     //! Register log handler

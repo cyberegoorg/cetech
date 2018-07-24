@@ -96,7 +96,7 @@ int init_config(int argc,
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
-    ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
+    ct_log_a0->register_handler(ct_log_a0->stdout_yaml_handler, NULL);
 
     ct_corelib_init();
 

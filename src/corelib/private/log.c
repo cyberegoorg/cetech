@@ -117,15 +117,24 @@ static void log_register_handler(ct_log_handler_t handler,
 
 
 
+void ct_log_stdout_yaml_handler(enum ct_log_level level,
+                                time_t time,
+                                char worker_id,
+                                const char *where,
+                                const char *msg,
+                                void *data);
+
 void ct_log_stdout_handler(enum ct_log_level level,
-                           time_t time,
-                           char worker_id,
-                           const char *where,
-                           const char *msg,
-                           void *data);
+                                time_t time,
+                                char worker_id,
+                                const char *where,
+                                const char *msg,
+                                void *data);
+
 
 static struct ct_log_a0 log_a0 = {
         .stdout_handler = &ct_log_stdout_handler,
+        .stdout_yaml_handler = &ct_log_stdout_yaml_handler,
         .register_handler = log_register_handler,
         .info_va = log_info_va,
         .info = log_info,
