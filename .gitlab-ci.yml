@@ -8,15 +8,31 @@ variables:
 # Stages #
 ###############################################################################
 stages:
+  - docker_image
   - doc
   - build
   - test
+
+################
+# Docker image #
+###############################################################################
+docker_image:
+  stage: docker_image
+  image: docker:latest
+
+  services:
+    - docker:dind
+
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/toolchain:$CI_BUILD_REF_NAME toolchain/
+    - docker push $CI_REGISTRY_IMAGE/toolchain:$CI_BUILD_REF_NAME
 
 ########
 # Build #
 ###############################################################################
 build:
-  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
+  image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
   stage: build
 
   artifacts:
@@ -46,7 +62,7 @@ build:
 # Gitlab pages  #
 ###############################################################################
 pages:
-  image: $CI_REGISTRY/cyberegoorg/cetech-docker-toolchain:master
+  image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
   stage: doc
   script:
     - cp -R docs public
@@ -58,3 +74,5 @@ pages:
   artifacts:
     paths:
       - public
+
+
