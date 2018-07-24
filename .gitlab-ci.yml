@@ -7,8 +7,8 @@
 ###############################################################################
 stages:
   - docker_image
-  - doc
   - build
+  - doc
   - test
 
 ################
@@ -18,13 +18,19 @@ docker_image:
   stage: docker_image
   image: docker:latest
 
+  only:
+    -  toolchain
+
+  except:
+    - branches
+
   services:
     - docker:dind
 
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/toolchain:$CI_BUILD_REF_NAME toolchain/
-    - docker push $CI_REGISTRY_IMAGE/toolchain:$CI_BUILD_REF_NAME
+    - docker build -t $CI_REGISTRY_IMAGE/toolchain:master toolchain/
+    - docker push $CI_REGISTRY_IMAGE/toolchain:master
 
 ########
 # Build #
@@ -41,10 +47,8 @@ build:
       - bin
 
   script:
-    - python3 scripts/build.py
-
-
-
+    - tools/linux64/genie --gcc=linux-clang gmake
+    - make -C bin/projects/gmake-linux-clang/ config=debug64
 
 ########
 # Test #
