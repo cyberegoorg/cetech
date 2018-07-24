@@ -7,21 +7,37 @@ project "cetech_develop"
 		"CETECH_DEVELOP=1"
 	}
 
-	links {
-		path.join(EXTERNALS_DIR, "lib", "libbgfxRelease.a"),
-		path.join(EXTERNALS_DIR, "lib", "libbimgRelease.a"),
-		path.join(EXTERNALS_DIR, "lib", "libbxRelease.a"),
-		path.join(EXTERNALS_DIR, "lib", "libsqlite3.a"),
-		path.join(EXTERNALS_DIR, "lib", "libIrrXML.a"),
-		path.join(EXTERNALS_DIR, "lib", "libminizip.a"),
-		path.join(EXTERNALS_DIR, "lib", "libassimp.a"),
+	files {
+		path.join(CETECH_DIR, "src/cetech/**.c"),
+		path.join(CETECH_DIR, "src/cetech/**.h"),
+		path.join(CETECH_DIR, "src/cetech/**.inl"),
+		path.join(CETECH_DIR, "src/cetech/**.cpp"),
 	}
 
-	files {
-		path.join(BX_DIR, "src/cetech/**.c"),
-		path.join(BX_DIR, "src/cetech/**.h"),
-		path.join(BX_DIR, "src/cetech/**.inl"),
-		path.join(BX_DIR, "src/cetech/**.cpp"),
+	links {
+		"bgfxRelease",
+		"bimgRelease",
+		"bxRelease",
+		"sqlite3",
+		"IrrXML",
+		"minizip",
+		"assimp",
 	}
+
+	configuration { "osx" }
+		links {
+			"iconv",
+            "objc",
+		}
+
+		linkoptions {
+		}
+
+	configuration { "linux" }
+		links {
+			"GL",
+			"X11"
+		}
+
 
 	configuration {}

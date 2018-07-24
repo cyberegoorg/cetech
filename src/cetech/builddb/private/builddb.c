@@ -15,7 +15,6 @@
 #include <corelib/cdb.h>
 #include <corelib/config.h>
 #include <corelib/buffer.inl>
-#include <lzma.h>
 #include <cetech/resource/resource.h>
 
 #include "../builddb.h"
