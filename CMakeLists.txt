@@ -81,7 +81,7 @@ set(CORELIB_SOURCE_FILES
         src/corelib/private/os_window_sdl2.c
         src/corelib/private/fs.c
         src/corelib/private/yng.c
-        src/corelib/private/ydb.cpp
+        src/corelib/private/ydb.c
         src/corelib/private/cdb.c
         src/corelib/private/ebus.c
         src/corelib/private/core.c

@@ -772,4 +772,10 @@ namespace imgui_wrap {
         size[0] = v.x;
         size[1] = v.y;
     }
+
+    bool BeginChild(const char* str_id, const float* size, bool border, DebugUIWindowFlags_ flags){
+        return ImGui::BeginChild(str_id, *(ImVec2*)size, border, flags);
+    }
+
+
 }

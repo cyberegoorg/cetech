@@ -7,4 +7,6 @@ project "hash"
 		path.join(CETECH_DIR, "src/tools/hash/**.c"),
 	}
 
+	copy_to_bin()
+
 	configuration {}

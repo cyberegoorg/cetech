@@ -101,7 +101,7 @@ void ct_log_stdout_yaml_handler(enum ct_log_level level,
 
 
 #define LOG_FORMAT_SIMPLE   \
-    "[%s|%d]=> %s : %s\n"
+    "[%s|%d|%s] => %s\n"
 
 void ct_log_stdout_handler(enum ct_log_level level,
                            time_t time,

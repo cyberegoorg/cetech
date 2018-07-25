@@ -44,8 +44,8 @@ build:
 
   script:
     - tools/linux64/genie --gcc=linux-clang gmake
-    - make -C bin/projects/gmake-linux-clang/ config=debug64
-    - make -C bin/projects/gmake-linux-clang/ config=release64
+    - make -C .build/projects/gmake-linux-clang/ config=debug64
+    - make -C .build/projects/gmake-linux-clang/ config=release64
 
 ########
 # Test #
@@ -60,7 +60,7 @@ test_release:
     - build
 
   script:
-    - bin/linux64_clang/bin/cetech_develop -compile -src ./examples/develop/src -build ./examples/develop/build
+    - bin/linux64/cetech_develop -compile -src ./examples/develop/src -build ./examples/develop/build
 
 test_debug:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
@@ -72,7 +72,7 @@ test_debug:
     - build
 
   script:
-    - bin/linux64_clang/bin/cetech_develop_debug -compile -src ./examples/develop/src -build ./examples/develop/build
+    - bin/linux64/cetech_develop_debug -compile -src ./examples/develop/src -build ./examples/develop/build
 
 ################
 # Gitlab pages #
@@ -84,6 +84,9 @@ pages:
     - tools/linux64/genie doc
     - cp -R docs public
     - cp docs/index.md.html public/index.html
+
+  dependencies:
+    - build
 
   only:
     - master

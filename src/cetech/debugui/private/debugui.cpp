@@ -72,12 +72,12 @@ static void render(uint8_t viewid) {
     io.KeyCtrl = (keyboard->button_state(0, keyboard->button_index(
             "lctrl")) > 0) || (keyboard->button_state(0,
                                                       keyboard->button_index(
-                                                                    "rctrl")) >
+                                                              "rctrl")) >
                                0);
     io.KeyAlt = (keyboard->button_state(0, keyboard->button_index(
             "lalt")) > 0) || (keyboard->button_state(0,
                                                      keyboard->button_index(
-                                                                   "ralt")) >
+                                                             "ralt")) >
                               0);
     io.KeySuper = (keyboard->button_state(0, keyboard->button_index(
             "super")) > 0);
@@ -254,12 +254,19 @@ static struct ct_debugui_a0 debugui_api = {
 
 
         .BeginDragDropSource = reinterpret_cast<bool (*)(DebugUIDragDropFlags_)>(ImGui::BeginDragDropSource),
-        .SetDragDropPayload = reinterpret_cast<bool (*)(const char*, const void*, size_t, DebugUICond)>(ImGui::SetDragDropPayload),
+        .SetDragDropPayload = reinterpret_cast<bool (*)(const char *,
+                                                        const void *,
+                                                        size_t,
+                                                        DebugUICond)>(ImGui::SetDragDropPayload),
         .EndDragDropSource = ImGui::EndDragDropSource,
         .BeginDragDropTarget = ImGui::BeginDragDropTarget,
         .AcceptDragDropPayload = reinterpret_cast<const DebugUIPayload *(*)(const char *,
                                                                             DebugUIDragDropFlags_)>(ImGui::AcceptDragDropPayload),
         .EndDragDropTarget = ImGui::EndDragDropTarget,
+        .BeginChild = imgui_wrap::BeginChild,
+
+        .PushItemWidth = ImGui::PushItemWidth,
+
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
@@ -275,7 +282,7 @@ static void _init(struct ct_api_a0 *api) {
     ct_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);
 
 
-    struct ct_controlers_i0* keyboard;
+    struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 

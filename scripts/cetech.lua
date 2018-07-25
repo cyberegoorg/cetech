@@ -14,6 +14,8 @@ project "cetech_develop"
 		path.join(CETECH_DIR, "src/cetech/**.cpp"),
 	}
 
+	copy_to_bin()
+
 	links {
 		"bgfxRelease",
 		"bimgRelease",
@@ -36,7 +38,8 @@ project "cetech_develop"
 	configuration { "linux" }
 		links {
 			"GL",
-			"X11"
+			"X11",
+            "z"
 		}
 
 

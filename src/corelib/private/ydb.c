@@ -1,4 +1,3 @@
-extern "C" {
 #include <corelib/api_system.h>
 #include <corelib/config.h>
 #include <corelib/memory.h>
@@ -15,19 +14,17 @@ extern "C" {
 #include <corelib/hash.inl>
 #include <corelib/buffer.inl>
 
-}
-
 #define _G ydb_global
 #define LOG_WHERE "ydb"
 
 static struct _G {
-    ct_hash_t document_cache_map;
-    ct_yng_doc **document_cache;
+    struct ct_hash_t document_cache_map;
+    struct ct_yng_doc **document_cache;
     char **document_path;
 
-    ct_spinlock cache_lock;
-    ct_hash_t modified_files_set;
-    ct_alloc *allocator;
+    struct ct_spinlock cache_lock;
+    struct ct_hash_t modified_files_set;
+    struct ct_alloc *allocator;
 } _G;
 
 void expire_document_in_cache(const char *path,
@@ -38,21 +35,21 @@ void expire_document_in_cache(const char *path,
     }
 
     ct_os_a0->thread->spin_lock(&_G.cache_lock);
-    ct_yng_doc *doc = _G.document_cache[idx];
+    struct ct_yng_doc *doc = _G.document_cache[idx];
     ct_hash_remove(&_G.document_cache_map, path_key);
     ct_yng_a0->destroy(doc);
     ct_os_a0->thread->spin_unlock(&_G.cache_lock);
 }
 
-ct_yng_doc *load_to_cache(const char *path,
+struct ct_yng_doc *load_to_cache(const char *path,
                           uint64_t path_key) {
 
-    static const uint64_t fs_root = ct_hashlib_a0->id64("source");
+    const uint64_t fs_root = ct_hashlib_a0->id64("source");
 
     ct_log_a0->debug(LOG_WHERE, "Load file %s to cache", path);
 
     struct ct_yng_doc *doc;
-    ct_vio *f = ct_fs_a0->open(fs_root, path, FS_OPEN_READ);
+    struct ct_vio *f = ct_fs_a0->open(fs_root, path, FS_OPEN_READ);
 
     if (!f) {
         ct_log_a0->error(LOG_WHERE, "Could not read file %s", path);
@@ -83,7 +80,7 @@ ct_yng_doc *load_to_cache(const char *path,
     return doc;
 }
 
-ct_yng_doc *get(const char *path) {
+struct ct_yng_doc *get(const char *path) {
     ct_os_a0->thread->spin_lock(&_G.cache_lock);
 
     uint64_t path_key = ct_hashlib_a0->id64(path);
@@ -107,7 +104,7 @@ void free(const char *path) {
     // TODO: ref counting
 }
 
-ct_yng_node get_first_node_recursive(const char *path,
+struct ct_yng_node get_first_node_recursive(const char *path,
                                      const uint64_t *keys,
                                      uint32_t keys_count,
                                      uint32_t max_depth) {
@@ -116,7 +113,7 @@ ct_yng_node get_first_node_recursive(const char *path,
 
     uint64_t result_key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, result_key);
+    struct ct_yng_node n = d->get(d, result_key);
     if (n.idx) {
         return n;
     }
@@ -127,7 +124,7 @@ ct_yng_node get_first_node_recursive(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PREFAB_KEY = ct_yng_a0->key("PREFAB");
+    const uint64_t PREFAB_KEY = ct_yng_a0->key("PREFAB");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < max_depth; ++i) {
@@ -147,9 +144,39 @@ ct_yng_node get_first_node_recursive(const char *path,
         tmp_keys[i] = tmp_key;
     }
 
-    return {0};
+    return (struct ct_yng_node){0};
 }
 
+
+struct out_keys_s {
+    uint64_t *keys;
+    uint32_t max_keys;
+    uint32_t *count;
+};
+
+static void _foreach_keys(struct ct_yng_node k,
+                          struct ct_yng_node v,
+                            void *data) {
+    CT_UNUSED(v);
+
+    struct out_keys_s *out = (struct out_keys_s *) data;
+
+    const char *string = k.d->as_string(k.d, k, NULL);
+    if (!string) {
+        return;
+    }
+
+    uint64_t str_key = ct_yng_a0->key(string);
+
+    const uint32_t s = *out->count;
+    for (uint32_t i = 0; i < s; ++i) {
+        if (out->keys[i] == str_key) {
+            return;
+        }
+    }
+
+    out->keys[(*out->count)++] = str_key;
+}
 
 void get_map_keys(const char *path,
                   uint64_t *keys,
@@ -158,11 +185,7 @@ void get_map_keys(const char *path,
                   uint32_t max_map_keys,
                   uint32_t *map_keys_count) {
 
-    struct out_keys_s {
-        uint64_t *keys;
-        uint32_t max_keys;
-        uint32_t *count;
-    } out_keys = {
+    struct out_keys_s out_keys = {
             .keys = map_keys,
             .max_keys = max_map_keys,
             .count = map_keys_count,
@@ -172,33 +195,9 @@ void get_map_keys(const char *path,
 
     uint64_t result_key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, result_key);
+    struct ct_yng_node n = d->get(d, result_key);
     if (n.idx) {
-        d->foreach_dict_node(
-                d, n,
-                [](ct_yng_node k,
-                   ct_yng_node v,
-                   void *data) {
-                    CT_UNUSED(v);
-
-                    auto *out = (out_keys_s *) data;
-
-                    const char *string = k.d->as_string(k.d, k, NULL);
-                    if (!string) {
-                        return;
-                    }
-
-                    uint64_t str_key = ct_yng_a0->key(string);
-
-                    const uint32_t s = *out->count;
-                    for (uint32_t i = 0; i < s; ++i) {
-                        if (out->keys[i] == str_key) {
-                            return;
-                        }
-                    }
-
-                    out->keys[(*out->count)++] = str_key;
-                }, &out_keys);
+        d->foreach_dict_node(d, n, _foreach_keys, &out_keys);
     }
 
     // Find parent
@@ -207,7 +206,7 @@ void get_map_keys(const char *path,
     uint64_t tmp_keys[keys_count];
     memcpy(tmp_keys, keys, sizeof(uint64_t) * keys_count);
 
-    static const uint64_t PREFAB_KEY = ct_yng_a0->key("PREFAB");
+    const uint64_t PREFAB_KEY = ct_yng_a0->key("PREFAB");
     uint64_t tmp_key;
 
     for (uint64_t i = 0; i < keys_count; ++i) {
@@ -238,7 +237,7 @@ const char *get_string(const char *path,
                        uint64_t *keys,
                        uint32_t keys_count,
                        const char *defaultt) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -252,7 +251,7 @@ float get_float(const char *path,
                 uint64_t *keys,
                 uint32_t keys_count,
                 float defaultt) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -266,7 +265,7 @@ bool get_bool(const char *path,
               uint64_t *keys,
               uint32_t keys_count,
               bool defaultt) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -282,7 +281,7 @@ void get_vec3(const char *path,
               uint32_t keys_count,
               float v[3],
               float defaultt[3]) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -299,7 +298,7 @@ void get_vec4(const char *path,
               uint32_t keys_count,
               float v[4],
               float defaultt[4]) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -316,7 +315,7 @@ void get_mat4(const char *path,
               uint32_t keys_count,
               float v[16],
               float defaultt[16]) {
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
 
     if (0 == n.idx) {
@@ -345,7 +344,7 @@ void set_float(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, key);
+    struct ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -370,7 +369,7 @@ void set_bool(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, key);
+    struct ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -395,7 +394,7 @@ void set_string(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, key);
+    struct ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -419,7 +418,7 @@ void set_vec3(const char *path,
     struct ct_yng_doc *d = get(path);
     uint64_t key = ct_yng_a0->combine_key(keys, keys_count);
 
-    ct_yng_node n = d->get(d, key);
+    struct ct_yng_node n = d->get(d, key);
 
     if (!n.idx) {
         const char *str_keys[keys_count];
@@ -440,7 +439,7 @@ void set_vec4(const char *path,
               uint32_t keys_count,
               float *value) {
 
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
     if (!n.idx) {
         return;
@@ -455,7 +454,7 @@ void set_mat4(const char *path,
               uint32_t keys_count,
               float *value) {
 
-    ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
+    struct ct_yng_node n = get_first_node_recursive(path, keys, keys_count,
                                              keys_count);
     if (!n.idx) {
         return;
@@ -513,7 +512,7 @@ void parent_files(const char *path,
 
 
 void save(const char *path) {
-    ct_vio *f = ct_fs_a0->open(ct_hashlib_a0->id64("source"), path,
+    struct ct_vio *f = ct_fs_a0->open(ct_hashlib_a0->id64("source"), path,
                                FS_OPEN_WRITE);
 
     if (!f) {
@@ -521,7 +520,7 @@ void save(const char *path) {
         return;
     }
 
-    ct_yng_doc *d = get(path);
+    struct ct_yng_doc *d = get(path);
     ct_yng_a0->save_to_vio(_G.allocator, f, d);
 
     ct_fs_a0->close(f);
@@ -570,7 +569,7 @@ static struct ct_ydb_a0 ydb_api = {
 struct ct_ydb_a0 *ct_ydb_a0 = &ydb_api;
 
 static void _init(struct ct_api_a0 *api) {
-    _G = {.allocator = ct_memory_a0->system};
+    _G = (struct _G){.allocator = ct_memory_a0->system};
 
     api->register_api("ct_ydb_a0", &ydb_api);
 }
@@ -585,7 +584,7 @@ static void _shutdown() {
     ct_hash_free(&_G.document_cache_map, _G.allocator);
     ct_hash_free(&_G.modified_files_set, _G.allocator);
 
-    _G = {};
+    _G = (struct _G){{0}};
 }
 
 CETECH_MODULE_DEF(

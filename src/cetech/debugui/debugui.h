@@ -57,35 +57,58 @@ typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 typedef void (*ImGuiSizeConstraintCallback)(struct ImGuiSizeConstraintCallbackData *data);
 
 enum DebugUIWindowFlags_ {
-    DebugUIWindowFlags_NoTitleBar             = 1 << 0,   // Disable title-bar
-    DebugUIWindowFlags_NoResize               = 1 << 1,   // Disable user resizing with the lower-right grip
-    DebugUIWindowFlags_NoMove                 = 1 << 2,   // Disable user moving the window
-    DebugUIWindowFlags_NoScrollbar            = 1 << 3,   // Disable scrollbars (window can still scroll with mouse or programatically)
-    DebugUIWindowFlags_NoScrollWithMouse      = 1 << 4,   // Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
-    DebugUIWindowFlags_NoCollapse             = 1 << 5,   // Disable user collapsing window by double-clicking on it
-    DebugUIWindowFlags_AlwaysAutoResize       = 1 << 6,   // Resize every window to its content every frame
+    DebugUIWindowFlags_NoTitleBar = 1 << 0,   // Disable title-bar
+    DebugUIWindowFlags_NoResize =
+    1 << 1,   // Disable user resizing with the lower-right grip
+    DebugUIWindowFlags_NoMove = 1 << 2,   // Disable user moving the window
+    DebugUIWindowFlags_NoScrollbar = 1
+            << 3,   // Disable scrollbars (window can still scroll with mouse or programatically)
+    DebugUIWindowFlags_NoScrollWithMouse = 1
+            << 4,   // Disable user vertically scrolling with mouse wheel. On child window, mouse wheel will be forwarded to the parent unless NoScrollbar is also set.
+    DebugUIWindowFlags_NoCollapse =
+    1 << 5,   // Disable user collapsing window by double-clicking on it
+    DebugUIWindowFlags_AlwaysAutoResize =
+    1 << 6,   // Resize every window to its content every frame
     //DebugUIWindowFlags_ShowBorders          = 1 << 7,   // Show borders around windows and items (OBSOLETE! Use e.g. style.FrameBorderSize=1.0f to enable borders).
-            DebugUIWindowFlags_NoSavedSettings        = 1 << 8,   // Never load/save settings in .ini file
-    DebugUIWindowFlags_NoInputs               = 1 << 9,   // Disable catching mouse or keyboard inputs, hovering test with pass through.
-    DebugUIWindowFlags_MenuBar                = 1 << 10,  // Has a menu-bar
-    DebugUIWindowFlags_HorizontalScrollbar    = 1 << 11,  // Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
-    DebugUIWindowFlags_NoFocusOnAppearing     = 1 << 12,  // Disable taking focus when transitioning from hidden to visible state
-    DebugUIWindowFlags_NoBringToFrontOnFocus  = 1 << 13,  // Disable bringing window to front when taking focus (e.g. clicking on it or programatically giving it focus)
-    DebugUIWindowFlags_AlwaysVerticalScrollbar= 1 << 14,  // Always show vertical scrollbar (even if ContentSize.y < Size.y)
-    DebugUIWindowFlags_AlwaysHorizontalScrollbar=1<< 15,  // Always show horizontal scrollbar (even if ContentSize.x < Size.x)
-    DebugUIWindowFlags_AlwaysUseWindowPadding = 1 << 16,  // Ensure child windows without border uses style.WindowPadding (ignored by default for non-bordered child windows, because more convenient)
-    DebugUIWindowFlags_ResizeFromAnySide      = 1 << 17,  // (WIP) Enable resize from any corners and borders. Your back-end needs to honor the different values of io.MouseCursor set by imgui.
-    DebugUIWindowFlags_NoNavInputs            = 1 << 18,  // No gamepad/keyboard navigation within the window
-    DebugUIWindowFlags_NoNavFocus             = 1 << 19,  // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
-    DebugUIWindowFlags_NoNav                  = DebugUIWindowFlags_NoNavInputs | DebugUIWindowFlags_NoNavFocus,
+            DebugUIWindowFlags_NoSavedSettings =
+            1 << 8,   // Never load/save settings in .ini file
+    DebugUIWindowFlags_NoInputs = 1
+            << 9,   // Disable catching mouse or keyboard inputs, hovering test with pass through.
+    DebugUIWindowFlags_MenuBar = 1 << 10,  // Has a menu-bar
+    DebugUIWindowFlags_HorizontalScrollbar = 1
+            << 11,  // Allow horizontal scrollbar to appear (off by default). You may use SetNextWindowContentSize(ImVec2(width,0.0f)); prior to calling Begin() to specify width. Read code in imgui_demo in the "Horizontal Scrolling" section.
+    DebugUIWindowFlags_NoFocusOnAppearing = 1
+            << 12,  // Disable taking focus when transitioning from hidden to visible state
+    DebugUIWindowFlags_NoBringToFrontOnFocus = 1
+            << 13,  // Disable bringing window to front when taking focus (e.g. clicking on it or programatically giving it focus)
+    DebugUIWindowFlags_AlwaysVerticalScrollbar =
+    1 << 14,  // Always show vertical scrollbar (even if ContentSize.y < Size.y)
+    DebugUIWindowFlags_AlwaysHorizontalScrollbar = 1
+            << 15,  // Always show horizontal scrollbar (even if ContentSize.x < Size.x)
+    DebugUIWindowFlags_AlwaysUseWindowPadding = 1
+            << 16,  // Ensure child windows without border uses style.WindowPadding (ignored by default for non-bordered child windows, because more convenient)
+    DebugUIWindowFlags_ResizeFromAnySide = 1
+            << 17,  // (WIP) Enable resize from any corners and borders. Your back-end needs to honor the different values of io.MouseCursor set by imgui.
+    DebugUIWindowFlags_NoNavInputs =
+    1 << 18,  // No gamepad/keyboard navigation within the window
+    DebugUIWindowFlags_NoNavFocus = 1
+            << 19,  // No focusing toward this window with gamepad/keyboard navigation (e.g. skipped by CTRL+TAB)
+    DebugUIWindowFlags_NoNav =
+    DebugUIWindowFlags_NoNavInputs | DebugUIWindowFlags_NoNavFocus,
 
     // [Internal]
-            DebugUIWindowFlags_NavFlattened           = 1 << 23,  // (WIP) Allow gamepad/keyboard navigation to cross over parent border to this child (only use on child that have no scrolling!)
-    DebugUIWindowFlags_ChildWindow            = 1 << 24,  // Don't use! For internal use by BeginChild()
-    DebugUIWindowFlags_Tooltip                = 1 << 25,  // Don't use! For internal use by BeginTooltip()
-    DebugUIWindowFlags_Popup                  = 1 << 26,  // Don't use! For internal use by BeginPopup()
-    DebugUIWindowFlags_Modal                  = 1 << 27,  // Don't use! For internal use by BeginPopupModal()
-    DebugUIWindowFlags_ChildMenu              = 1 << 28   // Don't use! For internal use by BeginMenu()
+            DebugUIWindowFlags_NavFlattened = 1
+            << 23,  // (WIP) Allow gamepad/keyboard navigation to cross over parent border to this child (only use on child that have no scrolling!)
+    DebugUIWindowFlags_ChildWindow =
+    1 << 24,  // Don't use! For internal use by BeginChild()
+    DebugUIWindowFlags_Tooltip =
+    1 << 25,  // Don't use! For internal use by BeginTooltip()
+    DebugUIWindowFlags_Popup =
+    1 << 26,  // Don't use! For internal use by BeginPopup()
+    DebugUIWindowFlags_Modal =
+    1 << 27,  // Don't use! For internal use by BeginPopupModal()
+    DebugUIWindowFlags_ChildMenu =
+    1 << 28   // Don't use! For internal use by BeginMenu()
 };
 
 //!< Flags for ImGui::InputText()
@@ -181,33 +204,41 @@ enum DebugUISetCond_ {
 };
 
 
-enum DebugUIDragDropFlags_
-{
+enum DebugUIDragDropFlags_ {
     // BeginDragDropSource() flags
-    DebugUIDragDropFlags_SourceNoPreviewTooltip       = 1 << 0,   // By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disable this behavior.
-    DebugUIDragDropFlags_SourceNoDisableHover         = 1 << 1,   // By default, when dragging we clear data so that IsItemHovered() will return true, to avoid subsequent user code submitting tooltips. This flag disable this behavior so you can still call IsItemHovered() on the source item.
-    DebugUIDragDropFlags_SourceNoHoldToOpenOthers     = 1 << 2,   // Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item.
-    DebugUIDragDropFlags_SourceAllowNullID            = 1 << 3,   // Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit.
-    DebugUIDragDropFlags_SourceExtern                 = 1 << 4,   // External source (from outside of imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.
+            DebugUIDragDropFlags_SourceNoPreviewTooltip = 1
+            << 0,   // By default, a successful call to BeginDragDropSource opens a tooltip so you can display a preview or description of the source contents. This flag disable this behavior.
+    DebugUIDragDropFlags_SourceNoDisableHover = 1
+            << 1,   // By default, when dragging we clear data so that IsItemHovered() will return true, to avoid subsequent user code submitting tooltips. This flag disable this behavior so you can still call IsItemHovered() on the source item.
+    DebugUIDragDropFlags_SourceNoHoldToOpenOthers = 1
+            << 2,   // Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item.
+    DebugUIDragDropFlags_SourceAllowNullID = 1
+            << 3,   // Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit.
+    DebugUIDragDropFlags_SourceExtern = 1
+            << 4,   // External source (from outside of imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.
     // AcceptDragDropPayload() flags
-    DebugUIDragDropFlags_AcceptBeforeDelivery         = 1 << 10,  // AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.
-    DebugUIDragDropFlags_AcceptNoDrawDefaultRect      = 1 << 11,  // Do not draw the default highlight rectangle when hovering over target.
-    DebugUIDragDropFlags_AcceptPeekOnly               = DebugUIDragDropFlags_AcceptBeforeDelivery | DebugUIDragDropFlags_AcceptNoDrawDefaultRect  // For peeking ahead and inspecting the payload before delivery.
+            DebugUIDragDropFlags_AcceptBeforeDelivery = 1
+            << 10,  // AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.
+    DebugUIDragDropFlags_AcceptNoDrawDefaultRect = 1
+            << 11,  // Do not draw the default highlight rectangle when hovering over target.
+    DebugUIDragDropFlags_AcceptPeekOnly =
+    DebugUIDragDropFlags_AcceptBeforeDelivery |
+    DebugUIDragDropFlags_AcceptNoDrawDefaultRect  // For peeking ahead and inspecting the payload before delivery.
 };
 
-struct DebugUIPayload
-{
+struct DebugUIPayload {
     // Members
-    const void*     Data;               // Data (copied and owned by dear imgui)
-    int             DataSize;           // Data size
+    const void *Data;               // Data (copied and owned by dear imgui)
+    int DataSize;           // Data size
 
     // [Internal]
-    ImGuiID         SourceId;           // Source item id
-    ImGuiID         SourceParentId;     // Source parent id (if available)
-    int             DataFrameCount;     // Data timestamp
-    char            DataType[32+1];     // Data type tag (short user-supplied string, 32 characters max)
-    bool            Preview;            // Set when AcceptDragDropPayload() was called and mouse has been hovering the target item (nb: handle overlapping drag targets)
-    bool            Delivery;           // Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
+    ImGuiID SourceId;           // Source item id
+    ImGuiID SourceParentId;     // Source parent id (if available)
+    int DataFrameCount;     // Data timestamp
+    char DataType[32 +
+                  1];     // Data type tag (short user-supplied string, 32 characters max)
+    bool Preview;            // Set when AcceptDragDropPayload() was called and mouse has been hovering the target item (nb: handle overlapping drag targets)
+    bool Delivery;           // Set when AcceptDragDropPayload() was called and mouse button is released over the target item.
 
 };
 
@@ -289,9 +320,9 @@ struct ct_debugui_a0 {
                             const _vec2 size);
 
     void (*Image)(struct ct_render_texture_handle user_texture_id,
-                   const _vec2 size,
-                   const _vec4 tint_col,
-                   const _vec4 border_col);
+                  const _vec2 size,
+                  const _vec4 tint_col,
+                  const _vec4 border_col);
 
     void (*Image2)(struct ct_render_texture_handle user_texture_id,
                    const _vec2 size,
@@ -841,18 +872,35 @@ struct ct_debugui_a0 {
                                     float *rotation,
                                     float *scale);
 
-    void (*GetContentRegionAvail)(float* size);
+    void (*GetContentRegionAvail)(float *size);
+
     float (*GetTextLineHeightWithSpacing)();
 
-    bool          (*BeginDragDropSource)(enum DebugUIDragDropFlags_ flags );
-    bool          (*SetDragDropPayload)(const char* type, const void* data, size_t size, enum DebugUICond cond);
-    void          (*EndDragDropSource)();
-    bool          (*BeginDragDropTarget)();
-    const struct DebugUIPayload* (*AcceptDragDropPayload)(const char* type, enum DebugUIDragDropFlags_ flags);
-    void          (*EndDragDropTarget)();
+    bool (*BeginDragDropSource)(enum DebugUIDragDropFlags_ flags);
 
+    bool (*SetDragDropPayload)(const char *type,
+                               const void *data,
+                               size_t size,
+                               enum DebugUICond cond);
+
+    void (*EndDragDropSource)();
+
+    bool (*BeginDragDropTarget)();
+
+    const struct DebugUIPayload *(*AcceptDragDropPayload)(const char *type,
+                                                          enum DebugUIDragDropFlags_ flags);
+
+    void (*EndDragDropTarget)();
+
+    bool (*BeginChild)(const char* str_id,
+                       const float *size,
+                       bool border,
+                       enum DebugUIWindowFlags_ flags);
+
+    void (*PushItemWidth)(float item_width);
 
 };
+
 
 CT_MODULE(ct_debugui_a0);
 

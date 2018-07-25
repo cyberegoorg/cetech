@@ -82,9 +82,9 @@ struct db_t {
     uint32_t *free_objects;
     uint32_t *to_free_objects;
 
-    atomic_ullong object_pool_n;
-    atomic_ullong free_objects_n;
-    atomic_ullong to_free_objects_n;
+    atomic_uint_least64_t object_pool_n;
+    atomic_uint_least64_t free_objects_n;
+    atomic_uint_least64_t to_free_objects_n;
 };
 
 static struct _G {
@@ -728,6 +728,10 @@ static void _notify(uint64_t _obj,
 
     const int notify_n = ct_array_size(obj->notify);
     const int changed_prop_n = ct_array_size(changed_prop);
+
+    if(!changed_prop_n) {
+        return;
+    }
 
     for (int i = 0; i < notify_n; ++i) {
         struct notify_pair *pair = &obj->notify[i];

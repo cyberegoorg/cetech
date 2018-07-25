@@ -4,9 +4,7 @@
 .cache
 .vscode
 
-/docs/doxygen/
 /bin/
-/build/
 /build*/
 /.build/
 /cmake-build-debug/

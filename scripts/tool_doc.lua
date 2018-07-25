@@ -8,4 +8,6 @@ project "doc"
 		path.join(CETECH_DIR, "src/tools/doc/**.c"),
 	}
 
+	copy_to_bin()
+
 	configuration {}

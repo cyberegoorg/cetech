@@ -8,12 +8,13 @@ end
 OS_ARCH = OS .. ARCH
 
 CETECH_DIR = path.getabsolute("..")
-BUILD_DIR = path.join(CETECH_DIR, "bin")
+BUILD_DIR = path.join(CETECH_DIR, ".build")
 SOURCE_DIR = path.join(CETECH_DIR, "src")
 EXAMPLES_DIR = path.join(CETECH_DIR, "examples")
 
 TOOLS_DIR = path.join(CETECH_DIR, "tools", OS_ARCH)
 EXTERNALS_DIR = path.join(CETECH_DIR, "externals", "build", OS_ARCH, "release")
+BIN_DIR = path.join(CETECH_DIR, "bin", OS_ARCH)
 
 newaction {
     trigger = "doc",
@@ -23,7 +24,7 @@ newaction {
                 " --source " .. SOURCE_DIR ..
                 " --build " .. path.join(CETECH_DIR, "docs", "gen")
 
-        return os.execute(path.join(TOOLS_DIR, "doc") .. args)
+        return os.execute(path.join(BIN_DIR, "doc") .. args)
     end
 }
 
@@ -34,13 +35,21 @@ newaction {
         local args = "" ..
                 " --source " .. SOURCE_DIR
 
-        os.execute(path.join(TOOLS_DIR, "hash") .. args)
+        os.execute(path.join(BIN_DIR, "hash") .. args)
 
         args = "" ..
                 " --source " .. EXAMPLES_DIR
-        os.execute(path.join(TOOLS_DIR, "hash") .. args)
+        os.execute(path.join(BIN_DIR, "hash") .. args)
     end
 }
+
+
+function copy_to_bin()
+    postbuildcommands {
+        "mkdir -p " .. BIN_DIR,
+        "cp -f $(TARGET) " .. BIN_DIR,
+    }
+end
 
 solution "cetech"
     configurations {

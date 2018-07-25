@@ -59,7 +59,7 @@ static struct _G {
     uint32_t workers_count;
 
     struct queue_mpmc job_queue;
-    int is_running;
+    atomic_bool is_running;
     struct ct_alloc *allocator;
 } _G;
 
