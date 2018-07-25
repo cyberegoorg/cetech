@@ -12,19 +12,20 @@ project "cetech_develop"
 		path.join(CETECH_DIR, "src/cetech/**.h"),
 		path.join(CETECH_DIR, "src/cetech/**.inl"),
 		path.join(CETECH_DIR, "src/cetech/**.cpp"),
+
+		path.join(EXTERNALS_DIR, "lib", "libIrrXML.a"),
+	}
+
+	links {
+		path.join(EXTERNALS_DIR, "lib", "libbgfxRelease.a"),
+		path.join(EXTERNALS_DIR, "lib", "libbimgRelease.a"),
+		path.join(EXTERNALS_DIR, "lib", "libbxRelease.a"),
+		path.join(EXTERNALS_DIR, "lib", "libsqlite3.a"),
+		path.join(EXTERNALS_DIR, "lib", "libminizip.a"),
+		path.join(EXTERNALS_DIR, "lib", "libassimp.a"),
 	}
 
 	copy_to_bin()
-
-	links {
-		"bgfxRelease",
-		"bimgRelease",
-		"bxRelease",
-		"sqlite3",
-		"IrrXML",
-		"minizip",
-		"assimp",
-	}
 
 	configuration { "osx" }
 		links {
