@@ -129,7 +129,7 @@ static void renderer_create() {
 #if CT_PLATFORM_LINUX
                     BGFX_RENDERER_TYPE_OPENGL
 #elif CT_PLATFORM_OSX
-                    BGFX_RENDERER_TYPE_OPENGL
+                    BGFX_RENDERER_TYPE_OPENGL // metal in future
 #endif
             },
     };
