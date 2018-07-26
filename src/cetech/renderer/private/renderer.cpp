@@ -124,7 +124,7 @@ static void renderer_create() {
             {.k = "opengl", .v = BGFX_RENDERER_TYPE_OPENGL},
             {.k = "metal", .v = BGFX_RENDERER_TYPE_METAL},
 
-            {.k = "default",
+            {.k = "",
                     .v =
 #if CT_PLATFORM_LINUX
                     BGFX_RENDERER_TYPE_OPENGL
@@ -135,14 +135,16 @@ static void renderer_create() {
     };
 
     for (int i = 0; i < CT_ARRAY_LEN(_str_to_render_type); ++i) {
-        if(strcmp(rtype, _str_to_render_type[i].k) == 0) {
+        if (strcmp(rtype, _str_to_render_type[i].k) == 0) {
             init.type = _str_to_render_type[i].v;
             invalid = false;
+            break;
         }
     }
 
     if (invalid) {
-        ct_log_a0->error("renderer", "Invalid render type, force to noop");
+        ct_log_a0->error("renderer", "Invalid render type '%s', force to noop",
+                         rtype);
         init.type = BGFX_RENDERER_TYPE_NOOP;
     }
 

@@ -235,6 +235,8 @@ set(DEVELOP_LIBS
 
 include_directories(externals/build/${PLATFORM_ID}/release/include)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
+
 ################################################################################
 # Cetech RUNTIME
 ################################################################################
@@ -247,7 +249,6 @@ include_directories(externals/build/${PLATFORM_ID}/release/include)
 ################################################################################
 # Corelib
 ################################################################################
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/tools/${PLATFORM_ID})
 
 add_library(corelib STATIC ${CORELIB_SOURCE_FILES})
 target_include_directories(corelib PUBLIC externals/build/${PLATFORM_ID}/release/)
@@ -263,7 +264,7 @@ target_include_directories(hash PUBLIC externals/build/${PLATFORM_ID}/release/)
 ################################################################################
 # Cetech DEVELOP
 ################################################################################
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
+
 
 add_executable(cetech_develop ${MAIN_SOURCE_FILES})
 target_compile_definitions(cetech_develop PUBLIC -DCETECH_DEVELOP)
