@@ -22,7 +22,9 @@
 
 #define WINDOW_NAME "Asset browser"
 
-static struct asset_browser_global {
+#define _G asset_browser_global
+
+static struct _G {
     float left_column_width;
     float midle_column_width;
     char current_dir[512];
@@ -98,7 +100,7 @@ static void ui_breadcrumb(const char *dir) {
 }
 
 static void ui_dir_list() {
-    ImVec2 size = {_G.left_column_width, 0.0f};
+    ImVec2 size(_G.left_column_width, 0.0f);
 
     ImGui::BeginChild("left_col", size);
     ImGui::PushItemWidth(180);
@@ -164,7 +166,7 @@ static void ui_asset_tooltip(ct_resource_id resourceid, const char* path) {
 }
 
 static void ui_asset_list() {
-    ImVec2 size = {_G.midle_column_width, 0.0f};
+    ImVec2 size(_G.midle_column_width,0.0f);
 
     ImGui::BeginChild("middle_col", size);
 
@@ -356,7 +358,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 static void _init(struct ct_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
-    _G = {
+    _G = (struct _G){
             .allocator = ct_memory_a0->system,
     };
 
@@ -369,7 +371,7 @@ static void _init(struct ct_api_a0 *api) {
 
 
 static void _shutdown() {
-    _G = {};
+    _G = (struct _G){0};
 }
 
 CETECH_MODULE_DEF(

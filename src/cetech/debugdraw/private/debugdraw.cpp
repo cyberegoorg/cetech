@@ -271,7 +271,7 @@ struct ct_dd_a0 *ct_dd_a0 = &debugdraw_api;
 static void _init(struct ct_api_a0 *api) {
     api->register_api("ct_dd_a0", &debugdraw_api);
 
-    _G = {
+    _G = (struct _G){
             .allocator = ct_memory_a0->system
     };
 
@@ -282,8 +282,7 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
     ddShutdown();
 
-    _G = {
-    };
+    _G = (struct _G){0};
 }
 
 CETECH_MODULE_DEF(

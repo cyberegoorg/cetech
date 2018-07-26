@@ -51,19 +51,6 @@ void add_dir(ct_watchdog_instance_t *inst,
 //    watchdog_instance *wi = static_cast<watchdog_instance *>(inst);
 
 
-
-#if CT_PLATFORM_LINUX
-    //    int wd = 0;
-    //    wd = inotify_add_watch(wi->inotify, path, IN_ALL_EVENTS);
-    //    ct_log_a0->debug(LOG_WHERE_WATCHDOG, "New watch -> %s", path);
-    //
-    //    if (-1 == wd) {
-    //        ct_log_a0->error(LOG_WHERE_WATCHDOG, "Could not add watch -> %s",
-    //                        strerror(errno));
-    //        return;
-    //    }
-#endif
-
 //    char *path_dup = ct_memory_a0->str_dup(path, wi->alloc);
 //    uint64_t path_hash = CT_ID64_0(path_dup);
 
@@ -136,47 +123,7 @@ void fetch_events(ct_watchdog_instance_t *inst) {
 
     clean_events(wi);
 
-#if CT_PLATFORM_LINUX
-#define BUF_LEN 1024
 
-    char buf[BUF_LEN] __attribute__ ((aligned(8)));
-
-    ssize_t numRead = read(wi->inotify, buf, BUF_LEN);
-    if (numRead <= 0) {
-        return;
-    }
-
-    struct inotify_event *event;
-
-    for (char *p = buf;
-         p < buf + numRead; p += sizeof(struct inotify_event) +
-                                 event->len) {
-        event = (struct inotify_event *) p;
-
-        if (event->mask & IN_ISDIR) {
-
-        } else {
-            if (event->mask & (IN_CLOSE_WRITE | IN_MOVE)) {
-//                ct_wd_ev_file_write_end ev = {};
-
-//                char *path = celib::map::get<char *>(
-//                        wi->wd2dir,
-//                        static_cast<uint64_t>(event->wd),
-//                        NULL);
-
-//                ev.dir = path;
-//                ev.filename = ct_memory_a0->str_dup(event->name, wi->alloc);
-
-//                celib::eventstream::push<ct_watchdog_ev_header>(
-//                        wi->event_stream,
-//                        CT_WATCHDOG_EVENT_FILE_MODIFIED,
-//                        ev);
-
-                continue;
-            }
-        }
-    }
-#endif
 
 }
 
@@ -197,15 +144,6 @@ struct ct_watchdog *create(struct ct_alloc *alloc) {
         return NULL;
     }
 
-#if CT_PLATFORM_LINUX
-    int inotify = inotify_init1(IN_NONBLOCK);
-    if (-1 == inotify) {
-        ct_log_a0->error(LOG_WHERE_WATCHDOG, "Could not init inotify");
-        return NULL;
-    }
-    watchdog_inst->inotify = inotify;
-#endif
-
     watchdog_inst->alloc = alloc;
 
     *watchdog = (struct ct_watchdog) {
@@ -223,30 +161,8 @@ struct ct_watchdog *create(struct ct_alloc *alloc) {
 void destroy(struct ct_watchdog *watchdog) {
     struct watchdog_instance *wi = (watchdog->inst);
     clean_events(wi);
-//    wi->event_stream.destroy();
 
     struct ct_alloc *alloc = wi->alloc;
-
-////    auto ct_it = celib::map::begin(wi->wd2dir);
-////    auto ct_end = celib::map::end(wi->wd2dir);
-//
-//    while (ct_it != ct_end) {
-//        CT_FREE(alloc, ct_it->value);
-//
-//#if CT_PLATFORM_LINUX
-//        inotify_rm_watch(wi->inotify, static_cast<int>(ct_it->key));
-//#endif
-//
-//        ++ct_it;
-//    }
-//
-//#if CT_PLATFORM_LINUX
-//    close(wi->inotify);
-//#endif
-//
-//    wi->wd2dir.destroy();
-//    wi->dir2wd.destroy();
-
 
     CT_FREE(alloc, watchdog);
 }

@@ -68,6 +68,7 @@ solution "cetech"
 dofile "toolchain.lua"
 toolchain(BUILD_DIR, "")
 
+    strip()
 function copyLib()
 end
 

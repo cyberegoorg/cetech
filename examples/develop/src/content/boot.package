@@ -41,7 +41,7 @@ shader:
 
 scene:
   - "content/cube"
-  - "content/scene/duck/duck"
+#  - "content/scene/duck/duck"
   - "content/scene/m4a1/m4a1"
   - "content/scene/solider/ArmyPilot"
 

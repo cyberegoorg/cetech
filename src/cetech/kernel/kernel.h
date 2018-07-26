@@ -47,6 +47,9 @@
 #define CONFIG_WID \
      CT_ID64_0("screen.wid", 0xd950bcde34e3e4d7ULL)
 
+#define CONFIG_RENDERER_TYPE \
+     CT_ID64_0("renderer.type", 0x3ee74a7da01daff0ULL)
+
 #define CONFIG_SCREEN_X \
      CT_ID64_0("screen.x", 0xa59339bef4754edaULL)
 

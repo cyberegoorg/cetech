@@ -32,6 +32,10 @@ struct ct_os_error_a0 {
                    const char *condition,
                    const char *filename,
                    int line);
+
+    char* (*stacktrace)(int skip);
+
+    void (*stacktrace_free)(char *st);
 };
 
 // # CPU

@@ -12,11 +12,10 @@ project "cetech_develop"
 		path.join(CETECH_DIR, "src/cetech/**.h"),
 		path.join(CETECH_DIR, "src/cetech/**.inl"),
 		path.join(CETECH_DIR, "src/cetech/**.cpp"),
-
-		path.join(EXTERNALS_DIR, "lib", "libIrrXML.a"),
 	}
 
 	links {
+		path.join(EXTERNALS_DIR, "lib", "libIrrXML.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbgfxRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbimgRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbxRelease.a"),

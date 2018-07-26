@@ -23,6 +23,7 @@
 #include <corelib/private/api_private.h>
 #include <cetech/ecs/ecs.h>
 #include <corelib/ebus.h>
+#include <corelib/log.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
@@ -95,7 +96,7 @@ static void renderer_create() {
 
         } else {
             _G.main_window = ct_os_a0->window->create_from(_G.allocator,
-                                                              (void *) wid);
+                                                           (void *) wid);
         }
     }
 
@@ -109,14 +110,44 @@ static void renderer_create() {
     bgfx_init_t init;
     bgfx_init_ctor(&init);
 
-#if CT_PLATFORM_LINUX
-    init.type = BGFX_RENDERER_TYPE_OPENGL,
-#elif CT_PLATFORM_OSX
-    init.type = BGFX_RENDERER_TYPE_METAL,
-    init.type = BGFX_RENDERER_TYPE_OPENGL,
-#endif
+    const char *rtype = ct_cdb_a0->read_str(ct_config_a0->obj(),
+                                            CONFIG_RENDERER_TYPE, "");
 
-            bgfx_init(&init);
+
+    bool invalid = true;
+
+    static struct {
+        const char *k;
+        bgfx_renderer_type_t v;
+    } _str_to_render_type[] = {
+            {.k = "noop", .v = BGFX_RENDERER_TYPE_NOOP},
+            {.k = "opengl", .v = BGFX_RENDERER_TYPE_OPENGL},
+            {.k = "metal", .v = BGFX_RENDERER_TYPE_METAL},
+
+            {.k = "default",
+                    .v =
+#if CT_PLATFORM_LINUX
+                    BGFX_RENDERER_TYPE_OPENGL
+#elif CT_PLATFORM_OSX
+                    BGFX_RENDERER_TYPE_OPENGL
+#endif
+            },
+    };
+
+    for (int i = 0; i < CT_ARRAY_LEN(_str_to_render_type); ++i) {
+        if(strcmp(rtype, _str_to_render_type[i].k) == 0) {
+            init.type = _str_to_render_type[i].v;
+            invalid = false;
+        }
+    }
+
+    if (invalid) {
+        ct_log_a0->error("renderer", "Invalid render type, force to noop");
+        init.type = BGFX_RENDERER_TYPE_NOOP;
+    }
+
+
+    bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
     bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
@@ -777,6 +808,10 @@ static void _init(struct ct_api_a0 *api) {
 
     if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_WID)) {
         ct_cdb_a0->set_uint64(writer, CONFIG_WID, 0);
+    }
+
+    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_RENDERER_TYPE)) {
+        ct_cdb_a0->set_str(writer, CONFIG_RENDERER_TYPE, "");
     }
 
     ct_cdb_a0->write_commit(writer);

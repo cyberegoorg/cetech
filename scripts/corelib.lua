@@ -1,7 +1,6 @@
 function use_corelib()
 	links {
 		"corelib",
-		--"iconv",
 		"pthread",
 		"z",
 
