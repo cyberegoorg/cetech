@@ -15,14 +15,15 @@
 #include <corelib/array.inl>
 #include <corelib/yng.h>
 #include <corelib/cdb.h>
-#include <cetech/material/material.h>
+#include <cetech/renderer/renderer.h>
 
+#include <cetech/material/material.h>
 #include "material.h"
 
 #define _G material_compiler_globals
 
 struct _G {
-    ct_alloc *allocator;
+    struct ct_alloc *allocator;
 } _G;
 
 void _forach_variable_clb(const char *filename,
@@ -54,7 +55,7 @@ void _forach_variable_clb(const char *filename,
     const char *type = ct_ydb_a0->get_str(filename, tmp_keys,
                                           CT_ARRAY_LEN(tmp_keys), "");
 
-    material_variable mat_var = {};
+    struct material_variable mat_var = {};
 
     tmp_keys[2] = ct_yng_a0->key("value");
     if (!strcmp(type, "texture")) {

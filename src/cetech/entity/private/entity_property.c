@@ -62,7 +62,7 @@ static void draw_component(uint64_t obj) {
 
     struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
-    if (!ct_debugui_a0->CollapsingHeader(editor->display_name(),
+    if (!ct_debugui_a0->TreeNodeEx(editor->display_name(),
                                          DebugUITreeNodeFlags_DefaultOpen)) {
         return;
     }
@@ -72,10 +72,11 @@ static void draw_component(uint64_t obj) {
     }
 
     editor->property_editor(obj);
+
+    ct_debugui_a0->TreePop();
 }
 
-static void draw_ui() {
-    uint64_t obj = ct_selected_object_a0->selected_object();
+static void draw_ui(uint64_t obj) {
     if (!obj) {
         return;
     }

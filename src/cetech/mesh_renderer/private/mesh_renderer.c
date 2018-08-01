@@ -284,11 +284,6 @@ static void property_editor(uint64_t obj) {
                                  ct_hashlib_a0->id64("scene"),
                                  obj);
 
-    ct_editor_ui_a0->ui_resource(obj,
-                                 PROP_MATERIAL_ID, "Material",
-                                 ct_hashlib_a0->id64("material"),
-                                 obj);
-
     ct_editor_ui_a0->ui_str_combo(obj,
                                   PROP_MESH, "Mesh",
                                   mesh_combo_items,
@@ -298,6 +293,12 @@ static void property_editor(uint64_t obj) {
                                   PROP_NODE, "Node",
                                   node_combo_items,
                                   obj);
+
+    ct_editor_ui_a0->ui_resource(obj,
+                                 PROP_MATERIAL_ID, "Material",
+                                 ct_hashlib_a0->id64("material"),
+                                 obj);
+
 }
 
 

@@ -25,39 +25,54 @@ static struct _G {
     struct ct_alloc *allocator;
 } _G;
 
-static void draw_ui() {
-    uint64_t obj = ct_selected_object_a0->selected_object();
-
+static void draw_ui(uint64_t obj) {
     if (!obj) {
         return;
     }
 
     uint64_t obj_type = ct_cdb_a0->type(obj);
 
-    if (obj_type != ASSET_BROWSER_ASSET_TYPE) {
+    uint64_t res_obj = 0;
+    if (obj_type == ASSET_BROWSER_ASSET_TYPE) {
+
+        uint64_t asset_type = ct_cdb_a0->read_uint64(obj,
+                                                     ASSET_BROWSER_ASSET_TYPE2,
+                                                     0);
+        uint64_t asset_name = ct_cdb_a0->read_uint64(obj,
+                                                     ASSET_BROWSER_ASSET_NAME,
+                                                     0);
+        struct ct_resource_id rid = (struct ct_resource_id){
+            .name = asset_name,
+            .type = asset_type
+        };
+
+        res_obj = ct_resource_a0->get(rid);
+    } else {
+        res_obj = obj;
+    }
+
+
+//    char filename[512] = {};
+//    ct_resource_a0->compiler_get_filename(filename,
+//                                          CT_ARRAY_LEN(filename),
+//                                          rid);
+
+//    if (ct_debugui_a0->Button("Save", (float[2]) {0.0f})) {
+//        ct_ydb_a0->save(filename);
+//    }
+//    ct_debugui_a0->SameLine(0.0f, -1.0f);
+//
+//    ct_debugui_a0->InputText("asset",
+//                             filename, strlen(filename),
+//                             DebugInputTextFlags_ReadOnly, 0, NULL);
+
+    if(!res_obj) {
         return;
     }
 
-    uint64_t asset_type = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t asset_name = ct_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t res_obj_type = ct_cdb_a0->type(res_obj);
 
-    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
-
-    char filename[512] = {};
-    ct_resource_a0->compiler_get_filename(filename,
-                                          CT_ARRAY_LEN(filename),
-                                          rid);
-
-    if (ct_debugui_a0->Button("Save", (float[2]) {0.0f})) {
-        ct_ydb_a0->save(filename);
-    }
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
-
-    ct_debugui_a0->InputText("asset",
-                             filename, strlen(filename),
-                             DebugInputTextFlags_ReadOnly, 0, NULL);
-
-    struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(rid.type);
+    struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(res_obj_type);
     if (!resource_i) {
         return;
     }
@@ -75,17 +90,17 @@ static void draw_ui() {
         return;
     }
 
-    uint64_t res_obj = ct_resource_a0->get(rid);
-
     const char* display_name = "";
 
     if(i->display_name) {
         display_name = i->display_name();
     }
 
-    if (ct_debugui_a0->CollapsingHeader(display_name,
-                                        DebugUITreeNodeFlags_DefaultOpen)) {
+    if (ct_debugui_a0->TreeNodeEx(display_name,
+                                  DebugUITreeNodeFlags_DefaultOpen)) {
         i->draw(res_obj);
+
+        ct_debugui_a0->TreePop();
     }
 }
 
@@ -94,6 +109,7 @@ static struct ct_asset_property_a0 asset_property_api = {
 };
 
 struct ct_asset_property_a0 *ct_asset_property_a0 = &asset_property_api;
+
 
 static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = draw_ui,

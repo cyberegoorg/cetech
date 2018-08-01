@@ -321,9 +321,9 @@ int shader_init(struct ct_api_a0 *api) {
 void shader_shutdown() {
 }
 
-ct_render_shader_handle_t shader_get(uint64_t shader) {
+ct_render_program_handle_t shader_get(uint64_t shader) {
     const uint64_t idx = ct_cdb_a0->read_uint64(shader, SHADER_PROP, 0);
-    return (ct_render_shader_handle_t) {.idx=(uint16_t) idx};
+    return (ct_render_program_handle_t) {.idx=(uint16_t) idx};
 }
 
 static struct ct_shader_a0 shader_api = {

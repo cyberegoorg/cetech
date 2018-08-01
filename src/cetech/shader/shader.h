@@ -40,7 +40,7 @@
 
 //! Shader API V0
 struct ct_shader_a0 {
-    struct ct_render_shader_handle (*get)(uint64_t shader);
+    ct_render_program_handle_t (*get)(uint64_t shader);
 };
 
 CT_MODULE(ct_shader_a0);

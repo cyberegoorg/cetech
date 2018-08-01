@@ -12,6 +12,7 @@
 #include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/dock/dock.h>
 #include <string.h>
+#include <cetech/selected_object/selected_object.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -20,16 +21,19 @@ static struct _G {
     bool visible;
 } _G;
 
-
-
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void draw(uint64_t obj) {
     struct ct_api_entry it = ct_api_a0->first(PROPERTY_EDITOR_INTERFACE);
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
-        i->draw_ui();
+        i->draw_ui(obj);
 
         it = ct_api_a0->next(it);
     }
+}
+
+static void on_debugui(struct ct_dock_i0 *dock) {
+    uint64_t obj = ct_selected_object_a0->selected_object();
+    draw(obj);
 }
 
 static const char *dock_title() {
@@ -48,12 +52,20 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .draw_ui = on_debugui,
 };
 
+
+struct ct_property_editor_a0 property_editor_api = {
+        .draw =draw,
+};
+
+struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
+
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
     };
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api("ct_property_editor_a0", ct_property_editor_a0);
 }
 
 static void _shutdown() {

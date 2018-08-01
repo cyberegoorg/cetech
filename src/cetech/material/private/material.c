@@ -1,6 +1,8 @@
 //==============================================================================
 // Include
 //==============================================================================
+#include <stdio.h>
+#include <string.h>
 
 #include "corelib/allocator.h"
 
@@ -22,8 +24,6 @@
 #include <corelib/macros.h>
 #include <cetech/asset_property/asset_property.h>
 #include <cetech/debugui/debugui.h>
-#include <cstdio>
-#include <cstring>
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh_renderer/mesh_renderer.h>
 #include <cetech/asset_preview/asset_preview.h>
@@ -46,8 +46,8 @@ int materialcompiler_init(struct ct_api_a0 *api);
 //==============================================================================
 
 static struct _G {
-    ct_cdb_t db;
-    ct_alloc *allocator;
+    struct ct_cdb_t db;
+    struct ct_alloc *allocator;
 } _G;
 
 
@@ -207,8 +207,8 @@ static void draw_property(uint64_t material) {
                                                      MATERIAL_LAYER_NAME, NULL);
 
         snprintf(label, CT_ARRAY_LEN(label), "Layer: %s", layer_name);
-        if (ct_debugui_a0->CollapsingHeader(label,
-                                            DebugUITreeNodeFlags_DefaultOpen)) {
+        if (ct_debugui_a0->TreeNodeEx(label,
+                                      DebugUITreeNodeFlags_DefaultOpen)) {
 
             ct_editor_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME, "Layer name",
                                     i);
@@ -261,6 +261,8 @@ static void draw_property(uint64_t material) {
                         break;
                 }
             }
+
+            ct_debugui_a0->TreePop();
         }
     }
 }
@@ -278,9 +280,9 @@ static struct ct_asset_property_i0 ct_asset_property_i0 = {
 static struct ct_entity load(struct ct_resource_id resourceid,
                              struct ct_world world) {
 
-    ct_entity ent = ct_ecs_a0->entity->spawn(world,
-                                             ct_hashlib_a0->id64(
-                                                     "core/cube"));
+    struct ct_entity ent = ct_ecs_a0->entity->spawn(world,
+                                                    ct_hashlib_a0->id64(
+                                                            "core/cube"));
 
     uint64_t obj = ent.h;
 
@@ -306,7 +308,7 @@ static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
         .unload = unload,
 };
 
-void *get_interface(uint64_t name_hash) {
+static void *get_interface(uint64_t name_hash) {
     if (name_hash == ASSET_PROPERTY) {
         return &ct_asset_property_i0;
     }
@@ -339,14 +341,14 @@ static uint64_t create(uint64_t name) {
             .name = name,
     };
 
-    auto object = ct_resource_a0->get(rid);
+    uint64_t object = ct_resource_a0->get(rid);
     return ct_cdb_a0->create_from(ct_cdb_a0->db(), object);
 }
 
 static void set_texture_handler(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
-                                ct_render_texture_handle texture) {
+                                struct ct_render_texture_handle texture) {
     uint64_t layers_obj = ct_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
     uint64_t layer_obj = ct_cdb_a0->read_ref(layers_obj, layer, 0);
     uint64_t variables = ct_cdb_a0->read_ref(layer_obj,
@@ -405,9 +407,9 @@ static void submit(uint64_t material,
             case MAT_VAR_TEXTURE: {
                 uint64_t t = ct_cdb_a0->read_uint64(var,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
-                auto texture = ct_texture_a0->get(t);
+                ct_render_texture_handle_t texture = ct_texture_a0->get(t);
                 ct_renderer_a0->set_texture(texture_stage++, handle,
-                                            {texture.idx}, 0);
+                                            texture, 0);
             }
                 break;
 
@@ -415,7 +417,8 @@ static void submit(uint64_t material,
                 uint64_t t = ct_cdb_a0->read_uint64(var,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
                 ct_renderer_a0->set_texture(texture_stage++, handle,
-                                            {.idx=(uint16_t) t}, 0);
+                                            (ct_render_texture_handle_t) {.idx=(uint16_t) t},
+                                            0);
             }
                 break;
 
@@ -444,12 +447,12 @@ static void submit(uint64_t material,
         return;
     }
 
-    auto shader = ct_shader_a0->get(shader_obj);
+    ct_render_program_handle_t shader = ct_shader_a0->get(shader_obj);
 
     uint64_t state = ct_cdb_a0->read_uint64(layer, MATERIAL_STATE_PROP, 0);
 
     ct_renderer_a0->set_state(state, 0);
-    ct_renderer_a0->submit(viewid, {shader.idx}, 0, false);
+    ct_renderer_a0->submit(viewid, shader, 0, false);
 }
 
 static struct ct_material_a0 material_api = {
@@ -461,7 +464,7 @@ static struct ct_material_a0 material_api = {
 struct ct_material_a0 *ct_material_a0 = &material_api;
 
 static int init(struct ct_api_a0 *api) {
-    _G = {
+    _G = (struct _G) {
             .allocator = ct_memory_a0->system,
             .db = ct_cdb_a0->db()
     };

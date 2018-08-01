@@ -243,6 +243,10 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
     uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db,
                                                   resource_id.type, 0);
 
+    if(!type_obj) {
+        return 0;
+    }
+
     uint64_t object;
     object = ct_cdb_a0->read_subobject(type_obj, resource_id.name, 0);
 

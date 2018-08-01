@@ -464,7 +464,7 @@ static void _destroy_with_child(struct world_instance *w,
         _destroy_with_child(w, children);
     }
 
-    ct_cdb_a0->destroy_object(ent);
+//    ct_cdb_a0->destroy_object(ent);
 }
 
 static void destroy(struct ct_world world,

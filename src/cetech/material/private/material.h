@@ -12,7 +12,7 @@ enum material_variable_type {
 };
 
 struct material_variable {
-    material_variable_type type;
+    enum  material_variable_type type;
     union {
         int i;
         float f;

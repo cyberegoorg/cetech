@@ -27,7 +27,7 @@
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
-
+#include <corelib/log.h>
 
 
 #define _G scene_compiler_globals
@@ -500,6 +500,11 @@ static int _compile_assimp(const char *filename,
     const struct aiScene *scene = aiImportFile(input_path,
                                                postprocess_flag);
 
+    if(!scene) {
+        ct_log_a0->error("scene_compiler", "Could not import %s", input_path);
+        return 0;
+    }
+
     char tmp_buffer[1024] = {};
     char tmp_buffer2[1024] = {};
     uint32_t unique = 0;
@@ -633,7 +638,8 @@ extern "C" void scene_compiler(const char *filename,
     ct_cdb_a0->set_uint64(w, SCENE_VB_LEN, ct_array_size(output->vb));
     ct_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
                         sizeof(*output->geom_name) *
-                        ct_array_size(output->geom_name));
+                                ct_array_size(output->geom_name));
+
     ct_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
                         sizeof(*output->ib_offset) *
                         ct_array_size(output->ib_offset));

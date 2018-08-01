@@ -116,8 +116,8 @@ set(SOURCE_FILES
         src/cetech/texture/private/texture.c
 
         src/cetech/shader/private/shader.c
-        src/cetech/material/private/material.cpp
-        src/cetech/material/private/material_compiler.cpp
+        src/cetech/material/private/material.c
+        src/cetech/material/private/material_compiler.c
         src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
         src/cetech/mesh_renderer/private/mesh_renderer.c

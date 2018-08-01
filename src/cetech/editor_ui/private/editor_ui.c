@@ -18,6 +18,8 @@
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/builddb/builddb.h>
 #include <corelib/os.h>
+#include <cetech/property_editor/property_editor.h>
+#include <cetech/resource/resource.h>
 
 #include "../editor_ui.h"
 
@@ -230,6 +232,11 @@ static void ui_resource(uint64_t obj,
 
     uint64_t value = ct_cdb_a0->read_uint64(obj, prop_key_hash, 0);
 
+    uint64_t resource_obj = ct_resource_a0->get((struct ct_resource_id) {
+            .type = resource_type,
+            .name = value
+    });
+
     char buffer[128] = {'\0'};
 
     ct_builddb_a0->get_filename_type_name(buffer, CT_ARRAY_LEN(buffer),
@@ -276,9 +283,11 @@ static void ui_resource(uint64_t obj,
             }
         }
 
-
         ct_debugui_a0->EndDragDropTarget();
     }
+
+
+    ct_property_editor_a0->draw(resource_obj);
 
     if (change) {
         struct ct_cdb_cmd_s cmd = {
@@ -372,10 +381,11 @@ static void set_float_cmd(const struct ct_cmd *cmd,
 }
 
 static void set_uint64_cmd(const struct ct_cmd *cmd,
-                          bool inverse) {
+                           bool inverse) {
     const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) cmd;
 
-    const uint64_t value = inverse ? pos_cmd->u64.old_value : pos_cmd->u64.new_value;
+    const uint64_t value = inverse ? pos_cmd->u64.old_value
+                                   : pos_cmd->u64.new_value;
 
     ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
     ct_cdb_a0->set_uint64(w, pos_cmd->prop, value);
