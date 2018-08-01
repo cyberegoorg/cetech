@@ -266,7 +266,16 @@ static struct ct_debugui_a0 debugui_api = {
         .BeginChild = imgui_wrap::BeginChild,
 
         .PushItemWidth = ImGui::PushItemWidth,
+        .PopItemWidth= ImGui::PopItemWidth,
 
+        .Columns = ImGui::Columns,
+        .NextColumn = ImGui::NextColumn,
+        .GetColumnIndex = ImGui::GetColumnIndex,
+        .GetColumnWidth = ImGui::GetColumnWidth,
+        .SetColumnWidth = ImGui::SetColumnWidth,
+        .GetColumnOffset = ImGui::GetColumnOffset,
+        .SetColumnOffset = ImGui::SetColumnOffset,
+        .GetColumnsCount = ImGui::GetColumnsCount,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

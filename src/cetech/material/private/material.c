@@ -130,11 +130,15 @@ static void ui_vec4(uint64_t var) {
     float v[4] = {0.0f};
     ct_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
+    ct_debugui_a0->Text("%s", str);
+    ct_debugui_a0->NextColumn();
+
     if (ct_debugui_a0->DragFloat3(str, v, 0.1f, -1.0f, 1.0f, "%.5f", 1.0f)) {
         ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(var);
         ct_cdb_a0->set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
         ct_cdb_a0->write_commit(wr);
     }
+    ct_debugui_a0->NextColumn();
 }
 
 static void ui_color4(uint64_t var) {
@@ -144,7 +148,11 @@ static void ui_color4(uint64_t var) {
     float v[4] = {0.0f};
     ct_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
 
+    ct_debugui_a0->Text("%s", str);
+    ct_debugui_a0->NextColumn();
+
     ct_debugui_a0->ColorEdit4(str, v, true);
+    ct_debugui_a0->NextColumn();
 
     ct_cdb_obj_o *wr = ct_cdb_a0->write_begin(var);
     ct_cdb_a0->set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
@@ -161,7 +169,6 @@ static void ui_texture(uint64_t variable) {
     const char *name = ct_cdb_a0->read_str(variable, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-
     float size[2];
     ct_debugui_a0->GetWindowSize(size);
     size[1] = size[0] = 64;
@@ -172,12 +179,12 @@ static void ui_texture(uint64_t variable) {
     ct_render_texture_handle_t texture;
     texture = ct_texture_a0->get(var_value);
 
-    ct_debugui_a0->Image(texture,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+//    ct_debugui_a0->Image(texture,
+//                         size,
+//                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+//                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+//    ct_debugui_a0->NextColumn();
 
-    ct_debugui_a0->SameLine(0, 0);
 
     ct_editor_ui_a0->ui_resource(variable, MATERIAL_VAR_VALUE_PROP, name,
                                  TEXTURE_TYPE, variable);
@@ -198,20 +205,19 @@ static void draw_property(uint64_t material) {
     ct_cdb_a0->prop_keys(layers_obj, layer_keys);
 
     for (int i = 0; i < layer_count; ++i) {
-        char label[128];
-
         uint64_t layer;
         layer = ct_cdb_a0->read_ref(layers_obj, layer_keys[i], 0);
 
         const char *layer_name = ct_cdb_a0->read_str(layer,
                                                      MATERIAL_LAYER_NAME, NULL);
 
-        snprintf(label, CT_ARRAY_LEN(label), "Layer: %s", layer_name);
-        if (ct_debugui_a0->TreeNodeEx(label,
+        if (ct_debugui_a0->TreeNodeEx("Layer",
                                       DebugUITreeNodeFlags_DefaultOpen)) {
+            ct_debugui_a0->NextColumn();
+            ct_debugui_a0->Text("%s", layer_name);
+            ct_debugui_a0->NextColumn();
 
-            ct_editor_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME, "Layer name",
-                                    i);
+            ct_editor_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME, "Layer name", i);
 
             ct_editor_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP, "Shader",
                                          SHADER_TYPE, i);
@@ -260,9 +266,15 @@ static void draw_property(uint64_t material) {
                     default:
                         break;
                 }
+
             }
 
             ct_debugui_a0->TreePop();
+
+        } else {
+            ct_debugui_a0->NextColumn();
+            ct_debugui_a0->Text("%s", layer_name);
+            ct_debugui_a0->NextColumn();
         }
     }
 }

@@ -75,7 +75,13 @@ static void ui_float(uint64_t obj,
     const float min = !max_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0->DragFloat(label,
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "##%sprop_float_%d", label, 0);
+
+    if (ct_debugui_a0->DragFloat(labelid,
                                  &value_new, 1.0f,
                                  min, max,
                                  "%.3f", 1.0f)) {
@@ -94,6 +100,7 @@ static void ui_float(uint64_t obj,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+    ct_debugui_a0->NextColumn();
 }
 
 static void ui_bool(uint64_t obj,
@@ -105,7 +112,13 @@ static void ui_bool(uint64_t obj,
     value_new = ct_cdb_a0->read_bool(obj, prop_key_hash, value_new);
     value = value_new;
 
-    if (ct_debugui_a0->Checkbox(label, &value_new)) {
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "##%sprop_float_%d", label, 0);
+
+    if (ct_debugui_a0->Checkbox(labelid, &value_new)) {
 
         struct ct_cdb_cmd_s cmd = {
                 .header = {
@@ -121,6 +134,8 @@ static void ui_bool(uint64_t obj,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+
+    ct_debugui_a0->NextColumn();
 }
 
 static void ui_str(uint64_t obj,
@@ -136,16 +151,22 @@ static void ui_str(uint64_t obj,
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
 
-    sprintf(labelid, "%s##prop_str_%d", label, i);
 
+    sprintf(labelid, "##%sprop_str_%d", label, i);
+
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
 
     bool change = false;
 
+
+    ct_debugui_a0->PushItemWidth(-1);
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
                                        strlen(buffer),
                                        DebugInputTextFlags_ReadOnly,
                                        0, NULL);
+    ct_debugui_a0->PopItemWidth();
 
     if (change) {
         struct ct_cdb_cmd_s cmd = {
@@ -163,6 +184,8 @@ static void ui_str(uint64_t obj,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+
+    ct_debugui_a0->NextColumn();
 }
 
 static void ui_str_combo(uint64_t obj,
@@ -196,10 +219,16 @@ static void ui_str_combo(uint64_t obj,
         }
     }
 
-    sprintf(labelid, "%s##combo_%d", label, i);
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+
+
+    sprintf(labelid, "##%scombo_%d", label, i);
+    ct_debugui_a0->PushItemWidth(-1);
     bool change = ct_debugui_a0->Combo(labelid,
                                        &current_item, items2,
                                        items_count, -1);
+    ct_debugui_a0->PopItemWidth();
 
     if (change) {
         strcpy(buffer, items2[current_item]);
@@ -221,6 +250,7 @@ static void ui_str_combo(uint64_t obj,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+    ct_debugui_a0->NextColumn();
 }
 
 static void ui_resource(uint64_t obj,
@@ -228,6 +258,7 @@ static void ui_resource(uint64_t obj,
                         const char *label,
                         uint64_t resource_type,
                         uint32_t i) {
+
     char labelid[128] = {'\0'};
 
     uint64_t value = ct_cdb_a0->read_uint64(obj, prop_key_hash, 0);
@@ -242,7 +273,7 @@ static void ui_resource(uint64_t obj,
     ct_builddb_a0->get_filename_type_name(buffer, CT_ARRAY_LEN(buffer),
                                           resource_type, value);
 
-    sprintf(labelid, "%s##prop_str_%d", label, i);
+    sprintf(labelid, "##%sprop_str_%d", label, i);
 
 
     bool change = false;
@@ -252,12 +283,18 @@ static void ui_resource(uint64_t obj,
 //                             prop_key_hash);
 //
 //    ct_debugui_a0->SameLine(0.0f, -1.0f);
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
 
+    ct_debugui_a0->PushItemWidth(-1);
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
                                        strlen(buffer),
                                        DebugInputTextFlags_ReadOnly,
                                        0, NULL);
+    ct_debugui_a0->PopItemWidth();
+
+    ct_debugui_a0->NextColumn();
 
     uint64_t new_value = 0;
     if (ct_debugui_a0->BeginDragDropTarget()) {
@@ -321,7 +358,14 @@ static void ui_vec3(uint64_t obj,
     const float min = !min_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
 
-    if (ct_debugui_a0->DragFloat3(label,
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "##%sprop_vec3_%d", label, 0);
+
+    ct_debugui_a0->PushItemWidth(-1);
+    if (ct_debugui_a0->DragFloat3(labelid,
                                   value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
@@ -341,6 +385,9 @@ static void ui_vec3(uint64_t obj,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+    ct_debugui_a0->PopItemWidth();
+
+    ct_debugui_a0->NextColumn();
 }
 
 

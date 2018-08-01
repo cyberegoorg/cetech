@@ -23,6 +23,7 @@ static struct _G {
 
 static void draw(uint64_t obj) {
     struct ct_api_entry it = ct_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
         i->draw_ui(obj);
@@ -33,7 +34,21 @@ static void draw(uint64_t obj) {
 
 static void on_debugui(struct ct_dock_i0 *dock) {
     uint64_t obj = ct_selected_object_a0->selected_object();
+
+    ct_debugui_a0->Columns(2, NULL, true);
+    ct_debugui_a0->Separator();
+
+    ct_debugui_a0->Text("Property");
+    ct_debugui_a0->NextColumn();
+
+    ct_debugui_a0->Text("Value");
+    ct_debugui_a0->NextColumn();
+
+    ct_debugui_a0->Separator();
+
     draw(obj);
+
+    ct_debugui_a0->Columns(1, NULL, true);
 }
 
 static const char *dock_title() {

@@ -214,7 +214,7 @@ static void _on_component_obj_change(uint64_t obj,
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
-                                                  ent);
+                                              ent);
 
     ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
     ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
@@ -247,10 +247,7 @@ static const char *display_name() {
 
 static void property_editor(uint64_t obj) {
     ct_editor_ui_a0->ui_vec3(obj, PROP_POSITION, "Position", 0, 0);
-
-    ct_editor_ui_a0->ui_vec3(obj, PROP_ROTATION, "Rotation",
-                                   -360.0f, 360.0f);
-
+    ct_editor_ui_a0->ui_vec3(obj, PROP_ROTATION, "Rotation", -360.0f, 360.0f);
     ct_editor_ui_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
 }
 

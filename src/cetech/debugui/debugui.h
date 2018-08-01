@@ -892,13 +892,34 @@ struct ct_debugui_a0 {
 
     void (*EndDragDropTarget)();
 
-    bool (*BeginChild)(const char* str_id,
+    bool (*BeginChild)(const char *str_id,
                        const float *size,
                        bool border,
                        enum DebugUIWindowFlags_ flags);
 
     void (*PushItemWidth)(float item_width);
+    void (*PopItemWidth)();
 
+
+    void (*Columns)(int count,
+                    const char *id,
+                    bool border);
+
+    void (*NextColumn)();
+
+    int (*GetColumnIndex)();
+
+    float (*GetColumnWidth)(int column_index);
+
+    void (*SetColumnWidth)(int column_index,
+                           float width);
+
+    float (*GetColumnOffset)(int column_index);
+
+    void (*SetColumnOffset)(int column_index,
+                            float offset_x);
+
+    int (*GetColumnsCount)();
 };
 
 

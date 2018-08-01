@@ -264,7 +264,9 @@ static void draw_property(uint64_t obj) {
     ct_editor_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
     ct_editor_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
-    ct_debugui_a0->LabelText("Texture preview", "");
+    ct_debugui_a0->Text("Texture preview");
+    ct_debugui_a0->NextColumn();
+
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
     size[1] = size[0];
@@ -275,7 +277,9 @@ static void draw_property(uint64_t obj) {
                          size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    ct_debugui_a0->NextColumn();
 }
+
 
 static const char *display_name() {
     return "Texture";

@@ -62,10 +62,20 @@ static void draw_component(uint64_t obj) {
 
     struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
+    ct_debugui_a0->Separator();
     if (!ct_debugui_a0->TreeNodeEx(editor->display_name(),
                                          DebugUITreeNodeFlags_DefaultOpen)) {
+        ct_debugui_a0->Separator();
+        ct_debugui_a0->NextColumn();
+        ct_debugui_a0->NextColumn();
+
+
         return;
     }
+
+    ct_debugui_a0->Separator();
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
 
     if (!editor->property_editor) {
         return;
@@ -74,6 +84,7 @@ static void draw_component(uint64_t obj) {
     editor->property_editor(obj);
 
     ct_debugui_a0->TreePop();
+
 }
 
 static void draw_ui(uint64_t obj) {
@@ -84,10 +95,12 @@ static void draw_ui(uint64_t obj) {
     uint64_t obj_type = ct_cdb_a0->type(obj);
 
     if (ENTITY_RESOURCE == obj_type) {
-        if (ct_debugui_a0->CollapsingHeader("Entity",
-                                            DebugUITreeNodeFlags_DefaultOpen)) {
-            ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
-        }
+//        if (ct_debugui_a0->CollapsingHeader("Entity",
+//                                            DebugUITreeNodeFlags_DefaultOpen)) {
+//            ct_debugui_a0->NextColumn();
+//
+//            ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
+//        }
 
         uint64_t components_obj;
         components_obj = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);

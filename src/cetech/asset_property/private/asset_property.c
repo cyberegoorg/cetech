@@ -41,9 +41,9 @@ static void draw_ui(uint64_t obj) {
         uint64_t asset_name = ct_cdb_a0->read_uint64(obj,
                                                      ASSET_BROWSER_ASSET_NAME,
                                                      0);
-        struct ct_resource_id rid = (struct ct_resource_id){
-            .name = asset_name,
-            .type = asset_type
+        struct ct_resource_id rid = (struct ct_resource_id) {
+                .name = asset_name,
+                .type = asset_type
         };
 
         res_obj = ct_resource_a0->get(rid);
@@ -66,13 +66,14 @@ static void draw_ui(uint64_t obj) {
 //                             filename, strlen(filename),
 //                             DebugInputTextFlags_ReadOnly, 0, NULL);
 
-    if(!res_obj) {
+    if (!res_obj) {
         return;
     }
 
     uint64_t res_obj_type = ct_cdb_a0->type(res_obj);
 
-    struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(res_obj_type);
+    struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(
+            res_obj_type);
     if (!resource_i) {
         return;
     }
@@ -90,18 +91,31 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-    const char* display_name = "";
+    const char *display_name = "";
 
-    if(i->display_name) {
+    if (i->display_name) {
         display_name = i->display_name();
     }
 
-    if (ct_debugui_a0->TreeNodeEx(display_name,
-                                  DebugUITreeNodeFlags_DefaultOpen)) {
-        i->draw(res_obj);
 
-        ct_debugui_a0->TreePop();
+    ct_debugui_a0->Separator();
+    if (!ct_debugui_a0->TreeNodeEx(display_name,
+                                   DebugUITreeNodeFlags_DefaultOpen)) {
+        ct_debugui_a0->Separator();
+        ct_debugui_a0->NextColumn();
+        ct_debugui_a0->NextColumn();
+
+        return;
+
     }
+
+    ct_debugui_a0->Separator();
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
+
+    i->draw(res_obj);
+
+    ct_debugui_a0->TreePop();
 }
 
 
