@@ -288,7 +288,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    ce_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);
+    ce_ebus_a0->create_ebus(DEBUGUI_EBUS);
 
 
     struct ct_controlers_i0 *keyboard;

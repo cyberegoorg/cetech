@@ -116,7 +116,7 @@ int cetech_kernel_init(int argc,
     CE_ADD_STATIC_MODULE(resourcecompiler);
 
     CE_INIT_API(api, ce_ebus_a0);
-    ce_ebus_a0->create_ebus("kernel", KERNEL_EBUS);
+    ce_ebus_a0->create_ebus(KERNEL_EBUS);
 
     init_static_modules();
 

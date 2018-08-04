@@ -55,8 +55,7 @@ static struct _G {
 //==============================================================================
 
 
-void create_ebus(const char *name,
-                 uint64_t id) {
+void create_ebus(uint64_t id) {
     uint64_t ebus_idx = ce_array_size(_G.ebus_pool);
 
     struct ebus_t ebus = {
@@ -276,7 +275,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    create_ebus("", 0);
+    create_ebus(0);
 }
 
 static void _shutdown() {

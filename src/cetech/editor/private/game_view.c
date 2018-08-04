@@ -10,7 +10,6 @@
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/editor/selected_object.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/editor/dock.h>

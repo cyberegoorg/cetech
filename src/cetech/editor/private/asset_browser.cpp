@@ -6,7 +6,6 @@
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
 #include <celib/ebus.h>
-#include <cetech/editor/selected_object.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
@@ -146,19 +145,20 @@ static void ui_dir_list() {
     ImGui::EndChild();
 }
 
-static void ui_asset_tooltip(ct_resource_id resourceid, const char* path) {
+static void ui_asset_tooltip(ct_resource_id resourceid,
+                             const char *path) {
     ImGui::Text("%s", path);
 
-    ct_resource_i0* ri = ct_resource_a0->get_interface(resourceid.type);
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(resourceid.type);
 
-    if(!ri || !ri->get_interface) {
+    if (!ri || !ri->get_interface) {
         return;
     }
 
-    ct_asset_preview_i0* ai = \
-                (ct_asset_preview_i0*)(ri->get_interface(ASSET_PREVIEW));
+    ct_asset_preview_i0 *ai = \
+                (ct_asset_preview_i0 *) (ri->get_interface(ASSET_PREVIEW));
 
-    if(!ai->tooltip) {
+    if (!ai->tooltip) {
         return;
     }
 
@@ -166,7 +166,7 @@ static void ui_asset_tooltip(ct_resource_id resourceid, const char* path) {
 }
 
 static void ui_asset_list() {
-    ImVec2 size(_G.midle_column_width,0.0f);
+    ImVec2 size(_G.midle_column_width, 0.0f);
 
     ImGui::BeginChild("middle_col", size);
 
@@ -240,11 +240,12 @@ static void ui_asset_list() {
 
             snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
 
-            bool selected = ImGui::Selectable(label, _G.selected_file == filename_hash,
+            bool selected = ImGui::Selectable(label,
+                                              _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_AllowDoubleClick);
 
 
-            if(ImGui::IsItemHovered()) {
+            if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
                 ui_asset_tooltip(resourceid, path);
                 ct_debugui_a0->EndTooltip();
@@ -271,29 +272,32 @@ static void ui_asset_list() {
                     ce_cdb_a0->write_commit(w);
 
                     ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+                } else {
+                    uint64_t selected_asset;
+                    selected_asset = ce_cdb_a0->create_object(
+                            ce_cdb_a0->db(), ASSET_BROWSER_ASSET_SELECTED);
+
+                    ce_cdb_obj_o *w;
+                    w = ce_cdb_a0->write_begin(selected_asset);
+                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
+                                          resourceid.name);
+                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
+                                          resourceid.type);
+                    ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
+                    ce_cdb_a0->write_commit(w);
+
+                    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, selected_asset);
                 }
-
-                uint64_t selected_asset = ce_cdb_a0->create_object(
-                        ce_cdb_a0->db(), ASSET_BROWSER_ASSET_TYPE);
-
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
-                ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
-                                      resourceid.name);
-                ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
-                                      resourceid.type);
-                ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
-                ce_cdb_a0->write_commit(w);
-
-                ct_selected_object_a0->set_selected_object(selected_asset);
             }
 
-            if (ImGui::BeginDragDropSource(
-                    ImGuiDragDropFlags_SourceAllowNullID)) {
+            if (ct_debugui_a0->BeginDragDropSource(
+                    DebugUIDragDropFlags_SourceAllowNullID)) {
 
                 ui_asset_tooltip(resourceid, path);
 
-                uint64_t selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                          ASSET_BROWSER_ASSET_TYPE);
+                uint64_t selected_asset = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
+                        ASSET_BROWSER_ASSET_TYPE);
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
                 ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
@@ -303,11 +307,12 @@ static void ui_asset_list() {
                 ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
                 ce_cdb_a0->write_commit(w);
 
-                ImGui::SetDragDropPayload("asset", &selected_asset,
-                                          sizeof(uint64_t),
-                                          ImGuiCond_Once);
+                ct_debugui_a0->SetDragDropPayload("asset",
+                                                  &selected_asset,
+                                                  sizeof(uint64_t),
+                                                  DebugUICond_Once);
 
-                ImGui::EndDragDropSource();
+                ct_debugui_a0->EndDragDropSource();
             }
         }
     }
@@ -358,20 +363,19 @@ static struct ct_dock_i0 ct_dock_i0 = {
 static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
-    _G = (struct _G){
+    _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_ebus_a0->create_ebus(ASSET_BROWSER_EBUS_NAME, ASSET_BROWSER_EBUS);
+    ce_ebus_a0->create_ebus(ASSET_BROWSER_EBUS);
 
     _G.visible = true;
     _G.left_column_width = 180.0f;
-
 }
 
 
 static void _shutdown() {
-    _G = (struct _G){0};
+    _G = (struct _G) {0};
 }
 
 CE_MODULE_DEF(

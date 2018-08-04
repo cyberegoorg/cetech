@@ -219,7 +219,7 @@ struct ce_os_window_a0 *ct_window_a0 = &window_api;
 int sdl_window_init(struct ce_api_a0 *api) {
 
     api->register_api("ce_os_window_a0", &window_api);
-    ce_ebus_a0->create_ebus(WINDOW_EBUS_NAME, WINDOW_EBUS);
+    ce_ebus_a0->create_ebus(WINDOW_EBUS);
     return 1;
 }
 

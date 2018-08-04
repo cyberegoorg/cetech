@@ -820,7 +820,7 @@ static void _init(struct ce_api_a0 *api) {
 
     CE_INIT_API(api, ce_os_a0);
 
-    ce_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
+    ce_ebus_a0->create_ebus(RENDERER_EBUS);
 
     renderer_create();
 

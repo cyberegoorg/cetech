@@ -820,7 +820,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_handler_create(&_G.world_handler, _G.allocator);
 
-    ce_ebus_a0->create_ebus(ECS_EBUS_NAME, ECS_EBUS);
+    ce_ebus_a0->create_ebus(ECS_EBUS);
 
     ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);

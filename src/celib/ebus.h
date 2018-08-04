@@ -8,8 +8,7 @@
 typedef void (ce_ebus_handler)(uint64_t event);
 
 struct ce_ebus_a0 {
-    void (*create_ebus)(const char *name,
-                        uint64_t id);
+    void (*create_ebus)(uint64_t id);
 
     void (*begin_frame)();
 

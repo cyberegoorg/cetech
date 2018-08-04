@@ -32,15 +32,14 @@
 #define ASSET_BROWSER_SOURCE \
     SOURCE_ROOT
 
+#define ASSET_BROWSER_EBUS \
+    CE_ID64_0("asset_browser", 0x41bbc9e4707d4c8dULL)
 
-enum {
-    ASSET_BROWSER_EBUS = 0x271fc190
-};
+#define ASSET_BROWSER_ASSET_SELECTED \
+    CE_ID64_0("asset_selected", 0x9214eb80da1c69d8ULL)
 
-enum {
-    ASSET_INAVLID_EVENT = 0,
-    ASSET_DCLICK_EVENT,
-};
+#define ASSET_DCLICK_EVENT \
+    CE_ID64_0("asset_dclic", 0xcb3f723dbc17db73ULL)
 
 //==============================================================================
 // Api

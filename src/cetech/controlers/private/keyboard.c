@@ -157,7 +157,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct G) {};
 
 
-    ce_ebus_a0->create_ebus(KEYBOARD_EBUS_NAME, KEYBOARD_EBUS);
+    ce_ebus_a0->create_ebus(KEYBOARD_EBUS);
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 1);
 

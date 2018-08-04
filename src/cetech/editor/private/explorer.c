@@ -22,9 +22,9 @@
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
-#include <cetech/editor/selected_object.h>
 
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/editor/asset_editor.h>
 
 #define WINDOW_NAME "Explorer"
 
@@ -32,34 +32,10 @@
 static struct _G {
     bool visible;
 
-    uint64_t ent_name;
+    uint64_t selected_object;
 
-    const char *path;
     struct ce_alloc *allocator;
 } _G;
-
-
-void set_level(uint64_t obj) {
-    uint64_t asset_type = ce_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t asset_name = ce_cdb_a0->read_uint64(obj, ASSET_BROWSER_ASSET_NAME, 0);
-    const char *path = ce_cdb_a0->read_str(obj, ASSET_BROWSER_PATH, 0);
-
-    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
-
-    if (_G.ent_name == rid.name) {
-        return;
-    }
-
-    if(rid.type != ENTITY_RESOURCE_ID) {
-        _G.ent_name = 0;
-        _G.path = NULL;
-
-        return;
-    }
-
-    _G.ent_name = rid.name;
-    _G.path = path;
-}
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
@@ -71,7 +47,7 @@ static void ui_entity_item_begin(uint64_t obj,
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
 
-    bool selected = ct_selected_object_a0->selected_object() == obj;
+    bool selected =_G.selected_object == obj;
     if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
@@ -104,7 +80,14 @@ static void ui_entity_item_begin(uint64_t obj,
 
     bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
-        ct_selected_object_a0->set_selected_object(obj);
+        uint64_t event;
+        event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
+
+        struct ct_cdb_obj_t*w = ce_cdb_a0->write_begin(event);
+        ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, obj);
+        ce_cdb_a0->write_commit(w);
+
+        ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
     }
 
     if (open) {
@@ -134,7 +117,7 @@ static void ui_entity_item_begin(uint64_t obj,
             ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
             bool c_selected;
-            c_selected = ct_selected_object_a0->selected_object() == component;
+            c_selected =_G.selected_object == component;
 
             if (c_selected) {
                 c_flags |= DebugUITreeNodeFlags_Selected;
@@ -146,7 +129,14 @@ static void ui_entity_item_begin(uint64_t obj,
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
             if (ct_debugui_a0->IsItemClicked(0)) {
-                ct_selected_object_a0->set_selected_object(component);
+                uint64_t event;
+                event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
+
+                struct ct_cdb_obj_t*w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, component);
+                ce_cdb_a0->write_commit(w);
+
+                ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
             }
             ct_debugui_a0->TreePop();
         }
@@ -167,26 +157,15 @@ static void ui_entity_item_begin(uint64_t obj,
 
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    uint64_t selected_object = ct_selected_object_a0->selected_object();
-    if (selected_object &&
-        (ce_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
-        set_level(selected_object);
+    uint64_t selected_object =_G.selected_object;
+    if (!selected_object) {
+        return;
     }
 
-    ct_debugui_a0->LabelText("Entity", "%llu", _G.ent_name);
 
-    if (_G.path) {
-        struct ct_resource_id rid = (struct ct_resource_id) {
-                .type = ENTITY_RESOURCE_ID,
-                .name = _G.ent_name,
-        };
+    ct_debugui_a0->LabelText("Entity", "");
 
-        uint64_t obj = ct_resource_a0->get(rid);
-
-        if(obj) {
-            ui_entity_item_begin(obj, rand());
-        }
-    }
+    ui_entity_item_begin(selected_object, rand());
 }
 
 
@@ -205,6 +184,35 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .draw_ui = on_debugui,
 };
 
+
+static void _on_asset_selected(uint64_t event) {
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = name,
+            .type = type,
+    };
+
+    if(type != ENTITY_RESOURCE_ID) {
+        return;
+    }
+
+    _G.selected_object = ct_resource_a0->get(rid);
+}
+
+static void _on_editor_asset_selected(uint64_t event) {
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = name,
+            .type = type,
+    };
+
+    _G.selected_object = ct_resource_a0->get(rid);
+}
+
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -212,6 +220,11 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+
+    ce_ebus_a0->create_ebus(EXPLORER_EBUS);
+
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
+    ce_ebus_a0->connect(ASSET_EDITOR_EBUS, ASSET_EDITOR_ASSET_SELECTED, _on_editor_asset_selected, 0);
 }
 
 static void _shutdown() {

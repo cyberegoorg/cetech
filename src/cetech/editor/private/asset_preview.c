@@ -16,7 +16,6 @@
 #include <cetech/gfx/render_graph.h>
 #include <cetech/gfx/default_render_graph.h>
 #include <cetech/editor/dock.h>
-#include <cetech/editor/selected_object.h>
 #include <cetech/controlers/controlers.h>
 
 #include "celib/hashlib.h"
@@ -31,6 +30,7 @@
 static struct _G {
     struct ce_alloc *allocator;
 
+    uint64_t selected_object;
     struct ct_resource_id active_asset;
 
     struct ct_world world;
@@ -208,10 +208,9 @@ static void on_render() {
 }
 
 static void update(float dt) {
-    uint64_t selected_object = ct_selected_object_a0->selected_object();
-    if (selected_object &&
-        (ce_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
-        set_asset(selected_object);
+    uint64_t selected_object = _G.selected_object;
+    if (!selected_object) {
+        return;
     }
 
     struct ct_controlers_i0* keyboard;
@@ -283,6 +282,20 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 };
 
 
+static void _on_asset_selected(uint64_t event) {
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = name,
+            .type = type,
+    };
+
+    _G.selected_object = ct_resource_a0->get(rid);
+
+    set_asset(event);
+}
+
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
@@ -291,6 +304,8 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
+
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
 
 }
 

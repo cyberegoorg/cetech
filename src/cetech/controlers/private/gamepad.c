@@ -212,7 +212,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 1);
 
-    ce_ebus_a0->create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
+    ce_ebus_a0->create_ebus(GAMEPAD_EBUS);
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 

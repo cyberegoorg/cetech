@@ -20,7 +20,6 @@
 #include <celib/fmath.inl>
 #include <cetech/editor/command_system.h>
 #include <celib/hash.inl>
-#include <cetech/editor/selected_object.h>
 #include <celib/yng.h>
 
 

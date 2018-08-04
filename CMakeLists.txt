@@ -138,7 +138,6 @@ set(SOURCE_FILES
         src/cetech/editor/private/command_history.c
         src/cetech/editor/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
-        src/cetech/editor/private/selected_object.c
         src/cetech/resource/private/builddb.c
         src/cetech/editor/private/editor_ui.c
         src/cetech/game_system/private/game_system.c

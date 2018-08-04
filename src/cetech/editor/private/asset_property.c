@@ -7,7 +7,6 @@
 #include <celib/hash.inl>
 #include <celib/ebus.h>
 #include <celib/ydb.h>
-#include <cetech/editor/selected_object.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"

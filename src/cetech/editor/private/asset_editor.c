@@ -24,7 +24,6 @@
 #include <cetech/resource/resource.h>
 #include <cetech/gfx/render_graph.h>
 #include <cetech/gfx/default_render_graph.h>
-#include <cetech/editor/selected_object.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/gfx/debugui.h>
 #include <cetech/editor/dock.h>
@@ -80,19 +79,22 @@ static void draw_editor(struct ct_dock_i0 *dock) {
         uint64_t type = ce_cdb_a0->read_uint64(editor->context_obj,
                                                _ASSET_TYPE, 0);
 
-        const char* path = ce_cdb_a0->read_str(editor->context_obj, _ASSET_PATH, 0);
+        const char *path = ce_cdb_a0->read_str(editor->context_obj, _ASSET_PATH,
+                                               0);
 
-        uint64_t selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                           ASSET_BROWSER_ASSET_TYPE);
 
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
+        uint64_t selected_asset;
+        selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                  ASSET_EDITOR_ASSET_SELECTED);
+
+        ce_cdb_obj_o *w;
+        w = ce_cdb_a0->write_begin(selected_asset);
         ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME, name);
         ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2, type);
         ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
         ce_cdb_a0->write_commit(w);
 
-
-        ct_selected_object_a0->set_selected_object(selected_asset);
+        ce_ebus_a0->broadcast(ASSET_EDITOR_EBUS, selected_asset);
     }
 
     i->draw_ui(editor->context_obj);
@@ -270,11 +272,14 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS,
+                        ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
 
     ce_api_a0->register_api("ct_editor_module_i0",
                             &ct_editor_module_i0);
+
+    ce_ebus_a0->create_ebus(ASSET_EDITOR_EBUS);
 
     _new_editor((struct ct_resource_id) {.i128={0}});
 }

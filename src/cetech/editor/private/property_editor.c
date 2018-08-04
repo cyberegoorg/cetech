@@ -12,13 +12,16 @@
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/dock.h>
 #include <string.h>
-#include <cetech/editor/selected_object.h>
+#include <cetech/editor/asset_browser.h>
+#include <cetech/resource/resource.h>
+#include <cetech/editor/explorer.h>
 
 #define WINDOW_NAME "Property editor"
 
 #define _G property_inspector_global
 static struct _G {
     bool visible;
+    uint64_t selected_object;
 } _G;
 
 static void draw(uint64_t obj) {
@@ -33,7 +36,7 @@ static void draw(uint64_t obj) {
 }
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    uint64_t obj = ct_selected_object_a0->selected_object();
+    uint64_t obj = _G.selected_object;
 
     ct_debugui_a0->Columns(2, NULL, true);
     ct_debugui_a0->Separator();
@@ -74,6 +77,22 @@ struct ct_property_editor_a0 property_editor_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 
+static void _on_asset_selected(uint64_t event) {
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = name,
+            .type = type,
+    };
+
+    _G.selected_object = ct_resource_a0->get(rid);
+}
+
+static void _on_explorer_selected(uint64_t event) {
+    _G.selected_object = ce_cdb_a0->read_ref(event, EXPLORER_OBJ_SELECTED, 0);
+}
+
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
@@ -81,6 +100,10 @@ static void _init(struct ce_api_a0 *api) {
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_property_editor_a0", ct_property_editor_a0);
+
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
+    ce_ebus_a0->connect(EXPLORER_EBUS, EXPLORER_OBJ_SELECTED, _on_explorer_selected, 0);
+
 }
 
 static void _shutdown() {

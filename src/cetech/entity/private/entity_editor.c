@@ -24,7 +24,6 @@
 #include <cetech/resource/resource.h>
 #include <cetech/gfx/render_graph.h>
 #include <cetech/gfx/default_render_graph.h>
-#include <cetech/editor/selected_object.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/gfx/debugui.h>
 #include <cetech/editor/dock.h>
@@ -210,7 +209,7 @@ static void draw_editor(uint64_t context_obj) {
                                    size[0], size[1]);
 
 
-    uint64_t obj = ct_selected_object_a0->selected_object();
+    uint64_t obj = 0;//ct_selected_object_a0->selected_object();
 
     if (obj) {
         uint64_t obj_type = ce_cdb_a0->type(obj);
@@ -248,8 +247,6 @@ static void draw_editor(uint64_t context_obj) {
 
                 _guizmo(component, ceditor, operation,
                         view, proj, size);
-
-
             }
         }
     }
