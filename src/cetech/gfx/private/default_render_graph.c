@@ -2,11 +2,11 @@
 // includes
 //==============================================================================
 
-#include <corelib/allocator.h>
-#include <corelib/api_system.h>
-#include <corelib/memory.h>
-#include <corelib/module.h>
-#include <corelib/hashlib.h>
+#include <celib/allocator.h>
+#include <celib/api_system.h>
+#include <celib/memory.h>
+#include <celib/module.h>
+#include <celib/hashlib.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/resource/resource.h>
 #include <cetech/gfx/material.h>
@@ -17,8 +17,8 @@
 #include <cetech/gfx/debugdraw.h>
 #include <cetech/gfx/mesh_renderer.h>
 #include <string.h>
-#include <corelib/fmath.inl>
-#include <corelib/macros.h>
+#include <celib/fmath.inl>
+#include <celib/macros.h>
 
 
 #include "cetech/gfx/default_render_graph.h"
@@ -31,7 +31,7 @@
 //==============================================================================
 
 static struct _G {
-    struct ct_alloc *alloc;
+    struct ce_alloc *alloc;
 } _G;
 
 struct geometry_pass {
@@ -40,13 +40,13 @@ struct geometry_pass {
 };
 
 #define _COLOR \
-    CT_ID64_0("color", 0x6776ddaf0290228ULL)
+    CE_ID64_0("color", 0x6776ddaf0290228ULL)
 
 #define _DEPTH \
-     CT_ID64_0("depth", 0x911ffdcbfa56fec1ULL)
+     CE_ID64_0("depth", 0x911ffdcbfa56fec1ULL)
 
 #define _DEFAULT \
-     CT_ID64_0("default", 0xf27605035974b5ecULL)
+     CE_ID64_0("default", 0xf27605035974b5ecULL)
 
 //==============================================================================
 // Geometry pass
@@ -82,7 +82,7 @@ void foreach_camera(struct ct_world world,
                     ct_entity_storage_t *item,
                     uint32_t n,
                     void *data) {
-    CT_UNUSED(world);
+    CE_UNUSED(world);
 
     struct cameras *cameras = data;
 
@@ -269,14 +269,14 @@ static void output_pass_on_pass(void *inst,
                                   size[0], size[1]);
 
     float proj[16];
-    ct_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f,
+    ce_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f,
                   ct_renderer_a0->get_caps()->homogeneousDepth);
 
     ct_renderer_a0->set_view_transform(viewid, NULL, proj);
 
     if (!copy_material) {
         copy_material = ct_material_a0->create(
-                ct_hashlib_a0->id64("content/copy"));
+                ce_id_a0->id64("content/copy"));
     }
 
     ct_render_texture_handle_t th;
@@ -319,10 +319,10 @@ static struct ct_default_rg_a0 default_render_graph_api = {
 struct ct_default_rg_a0 *ct_default_rg_a0 = &default_render_graph_api;
 
 
-static void _init(struct ct_api_a0 *api) {
-    CT_UNUSED(api);
+static void _init(struct ce_api_a0 *api) {
+    CE_UNUSED(api);
     _G = (struct _G) {
-            .alloc = ct_memory_a0->system,
+            .alloc = ce_memory_a0->system,
     };
 
     init_decl();
@@ -334,27 +334,27 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         default_render_graph,
         {
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_renderer_a0);
-            CT_INIT_API(api, ct_render_graph_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_mesh_renderer_a0);
-            CT_INIT_API(api, ct_dd_a0);
-            CT_INIT_API(api, ct_material_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ct_mesh_renderer_a0);
+            CE_INIT_API(api, ct_dd_a0);
+            CE_INIT_API(api, ct_material_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             _shutdown();
         }

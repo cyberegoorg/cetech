@@ -1,16 +1,16 @@
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 #include "cetech/ecs/ecs.h"
 #include <cetech/scenegraph/scenegraph.h>
-#include <corelib/array.inl>
-#include <corelib/hash.inl>
-#include <corelib/fmath.inl>
-#include <corelib/hashlib.h>
-#include <corelib/ebus.h>
-#include "corelib/config.h"
+#include <celib/array.inl>
+#include <celib/hash.inl>
+#include <celib/fmath.inl>
+#include <celib/hashlib.h>
+#include <celib/ebus.h>
+#include "celib/config.h"
 #include "cetech/resource/resource.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 static uint64_t hash_combine(uint32_t a,
                              uint32_t b) {
@@ -51,15 +51,15 @@ struct WorldInstance {
 
 #define _G ScenegraphGlobals
 static struct _G {
-    struct ct_hash_t world_map;
+    struct ce_hash_t world_map;
     struct WorldInstance *world_instances;
-    struct ct_hash_t ent_map;
+    struct ce_hash_t ent_map;
 
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
 } _G;
 
 static void allocate(struct WorldInstance *_data,
-                     struct ct_alloc *_allocator,
+                     struct ce_alloc *_allocator,
                      uint32_t sz) {
     //assert(sz > _data->n);
 
@@ -73,7 +73,7 @@ static void allocate(struct WorldInstance *_data,
             + sizeof(float) * 16
     );
 
-    new_data.buffer = CT_ALLOC(_allocator, char, bytes);
+    new_data.buffer = CE_ALLOC(_allocator, char, bytes);
     new_data.n = _data->n;
     new_data.allocated = sz;
 
@@ -103,39 +103,39 @@ static void allocate(struct WorldInstance *_data,
     memcpy(new_data.world_matrix, _data->world_matrix,
            _data->n * sizeof(float) * 16);
 
-    CT_FREE(_allocator, _data->buffer);
+    CE_FREE(_allocator, _data->buffer);
 
     *_data = new_data;
 }
 
 static void _new_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
+            ce_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
-    uint32_t idx = ct_array_size(_G.world_instances);
-    ct_array_push(_G.world_instances, (struct WorldInstance) {}, _G.allocator);
+    uint32_t idx = ce_array_size(_G.world_instances);
+    ce_array_push(_G.world_instances, (struct WorldInstance) {}, _G.allocator);
     _G.world_instances[idx].world = world;
-    ct_hash_add(&_G.world_map, world.h, idx, _G.allocator);
+    ce_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
 static void _destroy_world(uint64_t event) {
     struct ct_world world = {
-            ct_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
+            ce_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
 
-    uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
-    uint32_t last_idx = ct_array_size(_G.world_instances) - 1;
+    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
+    uint32_t last_idx = ce_array_size(_G.world_instances) - 1;
 
     struct ct_world last_world = _G.world_instances[last_idx].world;
 
-    CT_FREE(_G.allocator, _G.world_instances[idx].buffer);
+    CE_FREE(_G.allocator, _G.world_instances[idx].buffer);
 
     _G.world_instances[idx] = _G.world_instances[last_idx];
-    ct_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
-    ct_array_pop_back(_G.world_instances);
+    ce_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
+    ce_array_pop_back(_G.world_instances);
 }
 
 static struct WorldInstance *_get_world_instance(struct ct_world world) {
-    uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
+    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
 
     if (idx != UINT32_MAX) {
         return &_G.world_instances[idx];
@@ -161,16 +161,16 @@ static void transform(struct ct_scene_node node,
     float sm[16];
     float m[16];
 
-    ct_mat4_quat(rm, rot);
-    ct_mat4_scale(sm, sca[0], sca[1], sca[2]);
+    ce_mat4_quat(rm, rot);
+    ce_mat4_scale(sm, sca[0], sca[1], sca[2]);
 
-    ct_mat4_mul(m, rm, sm);
+    ce_mat4_mul(m, rm, sm);
 
     m[4 * 3 + 0] = pos[0];
     m[4 * 3 + 1] = pos[1];
     m[4 * 3 + 2] = pos[2];
 
-    ct_mat4_mul(&world_inst->world_matrix[16 * node.idx], m, parent);
+    ce_mat4_mul(&world_inst->world_matrix[16 * node.idx], m, parent);
 
     uint32_t child = world_inst->first_child[node.idx];
 
@@ -228,10 +228,10 @@ static void set_position(struct ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        ct_mat4_identity(p);
+        ce_mat4_identity(p);
     }
 
-    ct_vec3_move(&world_inst->position[3 * node.idx], pos);
+    ce_vec3_move(&world_inst->position[3 * node.idx], pos);
 
     transform(node, p);
 }
@@ -249,12 +249,12 @@ static void set_rotation(struct ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        ct_mat4_identity(p);
+        ce_mat4_identity(p);
     }
 
     float nq[4];
-    ct_quat_norm(nq, rot);
-    ct_quat_move(&world_inst->rotation[4 * node.idx], nq);
+    ce_quat_norm(nq, rot);
+    ce_quat_move(&world_inst->rotation[4 * node.idx], nq);
 
     transform(node, p);
 }
@@ -272,10 +272,10 @@ static void set_scale(struct ct_scene_node node,
     if (parent_idx != UINT32_MAX) {
         get_world_matrix(pt, p);
     } else {
-        ct_mat4_identity(p);
+        ce_mat4_identity(p);
     }
 
-    ct_vec3_move(&world_inst->scale[3 * node.idx], scale);
+    ce_vec3_move(&world_inst->scale[3 * node.idx], scale);
 
     transform(node, p);
 }
@@ -284,7 +284,7 @@ static int has(struct ct_world world,
                struct ct_entity entity) {
     uint64_t idx = hash_combine(world.h, entity.h);
 
-    return ct_hash_contain(&_G.ent_map, idx);
+    return ce_hash_contain(&_G.ent_map, idx);
 }
 
 static struct ct_scene_node get_root(struct ct_world world,
@@ -302,7 +302,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t *parent,
                                    float *pose,
                                    uint32_t count) {
-    CT_UNUSED(pose);
+    CE_UNUSED(pose);
 
     ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1);
 
@@ -312,7 +312,7 @@ static struct ct_scene_node create(struct ct_world world,
     allocate(data, _G.allocator, data->n + count);
     data->n += count;
 
-    struct ct_scene_node *nodes = CT_ALLOC(_G.allocator,
+    struct ct_scene_node *nodes = CE_ALLOC(_G.allocator,
                                            struct ct_scene_node,
                                            sizeof(struct ct_scene_node) *
                                            count);
@@ -328,21 +328,21 @@ static struct ct_scene_node create(struct ct_world world,
         float rotation[4];
         float scale[3] = {1.0f, 1.0f, 1.0f};
 
-        ct_quat_identity(rotation);
+        ce_quat_identity(rotation);
 
         data->entity[idx] = entity;
         data->name[idx] = names[i];
 
-        ct_vec3_move(&data->position[3 * idx], position);
-        ct_quat_move(&data->rotation[4 * idx], rotation);
-        ct_vec3_move(&data->scale[3 * idx], scale);
+        ce_vec3_move(&data->position[3 * idx], position);
+        ce_quat_move(&data->rotation[4 * idx], rotation);
+        ce_vec3_move(&data->scale[3 * idx], scale);
 
         data->parent[idx] = UINT32_MAX;
         data->first_child[idx] = UINT32_MAX;
         data->next_sibling[idx] = UINT32_MAX;
 
         float m[16];
-        ct_mat4_identity(m);
+        ce_mat4_identity(m);
         memcpy(&data->world_matrix[16 * idx], m, sizeof(float) * 16);
 
         struct ct_scene_node t = {.idx = idx, .world = world};
@@ -351,7 +351,7 @@ static struct ct_scene_node create(struct ct_world world,
         if (parent[i] != UINT32_MAX) {
             get_world_matrix(nodes[parent[i]], p);
         } else {
-            ct_mat4_identity(p);
+            ce_mat4_identity(p);
         }
         transform(t, p);
 
@@ -377,8 +377,8 @@ static struct ct_scene_node create(struct ct_world world,
 
     uint64_t hash = hash_combine(world.h, entity.h);
 
-    ct_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
-    CT_FREE(_G.allocator, nodes);
+    ce_hash_add(&_G.ent_map, hash, root.idx, _G.allocator);
+    CE_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
     scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
@@ -405,7 +405,7 @@ static void link(struct ct_scene_node parent,
     if (parent.idx != UINT32_MAX) {
         get_world_matrix(parent, p);
     } else {
-        ct_mat4_identity(p);
+        ce_mat4_identity(p);
     }
     transform(parent, p);
 
@@ -464,57 +464,57 @@ static struct ct_scenegprah_a0 scenegraph_api = {
 
 struct ct_scenegprah_a0 *ct_scenegprah_a0 = &scenegraph_api;
 
-static void _init_api(struct ct_api_a0 *api) {
+static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
 }
 
 //static void _component_spawner(uint64_t event) {
-//    CT_UNUSED(event);
+//    CE_UNUSED(event);
 //}
 //
 
 
 #define SCENEGRAPH_TYPE \
-    CT_ID64_0("scenegraph", 0xdeae50ee50cb5e3aULL)
+    CE_ID64_0("scenegraph", 0xdeae50ee50cb5e3aULL)
 
-static void init(struct ct_api_a0 *api) {
+static void init(struct ce_api_a0 *api) {
     _init_api(api);
 
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system,
+            .allocator = ce_memory_a0->system,
     };
 
-    ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
-    ct_ebus_a0->connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
+    ce_ebus_a0->connect(ECS_EBUS, ECS_WORLD_CREATE, _new_world, 0);
+    ce_ebus_a0->connect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world, 0);
 
 }
 
 static void shutdown() {
-    ct_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
-    ct_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);
+    ce_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_CREATE, _new_world);
+    ce_ebus_a0->disconnect(ECS_EBUS, ECS_WORLD_DESTROY, _destroy_world);
 
-    ct_hash_free(&_G.ent_map, _G.allocator);
-    ct_hash_free(&_G.world_map, _G.allocator);
-    ct_array_free(_G.world_instances, _G.allocator);
+    ce_hash_free(&_G.ent_map, _G.allocator);
+    ce_hash_free(&_G.world_map, _G.allocator);
+    ce_array_free(_G.world_instances, _G.allocator);
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         scenegraph,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_ebus_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_ebus_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             shutdown();
         }
 )

@@ -2,23 +2,23 @@
 // Includes
 //==============================================================================
 
-#include "corelib/memory.h"
-#include "corelib/module.h"
-#include "corelib/api_system.h"
-#include "corelib/log.h"
+#include "celib/memory.h"
+#include "celib/module.h"
+#include "celib/api_system.h"
+#include "celib/log.h"
 
 #include "cetech/machine/machine.h"
 
 #include <include/SDL2/SDL.h>
-#include <corelib/hashlib.h>
-#include <corelib/ebus.h>
+#include <celib/hashlib.h>
+#include <celib/ebus.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/controlers/gamepad.h>
-#include <corelib/os.h>
+#include <celib/os.h>
 #include <cetech/kernel/kernel.h>
-#include <corelib/macros.h>
+#include <celib/macros.h>
 #include <cetech/controlers/controlers.h>
 
 
@@ -35,7 +35,7 @@
 // Gamepad part
 //==============================================================================
 
-extern int sdl_window_init(struct ct_api_a0 *api);
+extern int sdl_window_init(struct ce_api_a0 *api);
 
 extern void sdl_window_shutdown();
 
@@ -90,8 +90,8 @@ void sdl_mouse_process() {
     curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
-    struct ct_renderer_a0 *renderer_a0 = (struct ct_renderer_a0 *) ct_api_a0->first(
-            ct_hashlib_a0->id64("ct_renderer_a0")).api;
+    struct ct_renderer_a0 *renderer_a0 = (struct ct_renderer_a0 *) ce_api_a0->first(
+            ce_id_a0->id64("ct_renderer_a0")).api;
 
     uint32_t window_size[2] = {};
     renderer_a0->get_size(&window_size[0], &window_size[1]);
@@ -101,36 +101,36 @@ void sdl_mouse_process() {
 
 
     uint64_t event;
-    event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+    event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                      EVENT_MOUSE_MOVE);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-    ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, _G.mouse.position);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+    ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, _G.mouse.position);
+    ce_cdb_a0->write_commit(w);
 
 
-    ct_ebus_a0->broadcast(MOUSE_EBUS, event);
+    ce_ebus_a0->broadcast(MOUSE_EBUS, event);
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+            event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_MOUSE_DOWN);
 
-            w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
-            ct_cdb_a0->write_commit(w);
+            w = ce_cdb_a0->write_begin(event);
+            ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
+            ce_cdb_a0->write_commit(w);
 
-            ct_ebus_a0->broadcast(MOUSE_EBUS, event);
+            ce_ebus_a0->broadcast(MOUSE_EBUS, event);
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+            event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_MOUSE_UP);
 
-            w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
-            ct_cdb_a0->write_commit(w);
+            w = ce_cdb_a0->write_begin(event);
+            ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
+            ce_cdb_a0->write_commit(w);
 
-            ct_ebus_a0->broadcast(MOUSE_EBUS, event);
+            ce_ebus_a0->broadcast(MOUSE_EBUS, event);
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -144,25 +144,25 @@ void sdl_keyboard_process() {
     uint64_t event;
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+            event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_DOWN);
 
-            ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
-            ct_cdb_a0->write_commit(w);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+            ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
+            ce_cdb_a0->write_commit(w);
 
-            ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+            ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
 
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
-            event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+            event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_UP);
 
-            ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-            ct_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
-            ct_cdb_a0->write_commit(w);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+            ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
+            ce_cdb_a0->write_commit(w);
 
-            ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+            ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
 
         }
 
@@ -183,7 +183,7 @@ int _new_controler() {
 }
 
 void _remove_controler(int idx) {
-    ct_log_a0->info("controlers.gamepad", "Remove gamepad %d.", idx);
+    ce_log_a0->info("controlers.gamepad", "Remove gamepad %d.", idx);
 
     SDL_HapticClose(_G.controlers.haptic[idx]);
     SDL_GameControllerClose(_G.controlers.controller[idx]);
@@ -202,14 +202,14 @@ int _create_controler(int i) {
 
     memset(_G.controlers.state[idx], 0, sizeof(int) * GAMEPAD_BTN_MAX);
 
-    ct_log_a0->info("controlers.gamepad", "Add gamepad %d.", i);
+    ce_log_a0->info("controlers.gamepad", "Add gamepad %d.", i);
 
     if (SDL_JoystickIsHaptic(joy) == 1) {
         SDL_Haptic *haptic = SDL_HapticOpenFromJoystick(joy);
         SDL_HapticRumbleInit(haptic);
         _G.controlers.haptic[idx] = haptic;
 
-        ct_log_a0->info("controlers.gamepad", "Gamepad %d has haptic support.",
+        ce_log_a0->info("controlers.gamepad", "Gamepad %d has haptic support.",
                         i);
     } else {
         _G.controlers.haptic[idx] = NULL;
@@ -285,29 +285,29 @@ void sdl_gamepad_process() {
 
         for (int j = 0; j < GAMEPAD_BTN_MAX; ++j) {
             if (is_button_down(curent_state[i][j], _G.controlers.state[i][j])) {
-                uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                           EVENT_GAMEPAD_DOWN);
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
-                ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
+                ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
 
 
             } else if (is_button_up(curent_state[i][j],
                                     _G.controlers.state[i][j])) {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         EVENT_GAMEPAD_UP);
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
-                ct_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
+                ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
 
             }
 
@@ -324,17 +324,17 @@ void sdl_gamepad_process() {
                 _G.controlers.position[i][j][0] = pos[0];
                 _G.controlers.position[i][j][1] = pos[1];
 
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         EVENT_GAMEPAD_MOVE);
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
-                ct_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
-                ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
+                ce_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
+                ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
 
             }
         }
@@ -360,31 +360,31 @@ static void _update(uint64_t  event ) {
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT: {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         KERNEL_QUIT_EVENT);
 
-                ct_ebus_a0->broadcast(KERNEL_EBUS, event);
+                ce_ebus_a0->broadcast(KERNEL_EBUS, event);
             }
                 break;
 
             case SDL_WINDOWEVENT: {
                 switch (e.window.event) {
                     case SDL_WINDOWEVENT_SIZE_CHANGED: {
-                        uint64_t event = ct_cdb_a0->create_object(
-                                ct_cdb_a0->db(),
+                        uint64_t event = ce_cdb_a0->create_object(
+                                ce_cdb_a0->db(),
                                 EVENT_WINDOW_RESIZED);
 
-                        ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_ID,
+                        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                        ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_ID,
                                               e.window.windowID);
-                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_WIDTH,
+                        ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_WIDTH,
                                               e.window.data1);
-                        ct_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_HEIGHT,
+                        ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_HEIGHT,
                                               e.window.data2);
-                        ct_cdb_a0->write_commit(w);
+                        ce_cdb_a0->write_commit(w);
 
-                        ct_ebus_a0->broadcast(WINDOW_EBUS, event);
+                        ce_ebus_a0->broadcast(WINDOW_EBUS, event);
 
                     }
                         break;
@@ -393,33 +393,33 @@ static void _update(uint64_t  event ) {
                 break;
 
             case SDL_MOUSEWHEEL: {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         EVENT_MOUSE_WHEEL);
 
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(MOUSE_EBUS, event);
+                ce_ebus_a0->broadcast(MOUSE_EBUS, event);
 
             }
                 break;
 
 
             case SDL_TEXTINPUT: {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         EVENT_KEYBOARD_TEXT);
 
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+                ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
 
             }
                 break;
@@ -427,15 +427,15 @@ static void _update(uint64_t  event ) {
             case SDL_CONTROLLERDEVICEADDED: {
                 int idx = _create_controler(e.cdevice.which);
 
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         EVENT_GAMEPAD_CONNECT);
 
-                ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                ct_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
-                ct_cdb_a0->write_commit(w);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
+                ce_cdb_a0->write_commit(w);
 
-                ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
 
             }
                 break;
@@ -452,15 +452,15 @@ static void _update(uint64_t  event ) {
 
                     _remove_controler(i);
 
-                    uint64_t event = ct_cdb_a0->create_object(
-                            ct_cdb_a0->db(),
+                    uint64_t event = ce_cdb_a0->create_object(
+                            ce_cdb_a0->db(),
                             EVENT_GAMEPAD_DISCONNECT);
 
-                    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(event);
-                    ct_cdb_a0->set_uint64(w, CONTROLER_ID, i);
-                    ct_cdb_a0->write_commit(w);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                    ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
+                    ce_cdb_a0->write_commit(w);
 
-                    ct_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                    ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
 
                     break;
                 }
@@ -486,28 +486,28 @@ static struct ct_machine_a0 a0 = {
 
 struct ct_machine_a0 *ct_machine_a0 = &a0;
 
-static void init(struct ct_api_a0 *api) {
+static void init(struct ce_api_a0 *api) {
     api->register_api("ct_machine_a0", &a0);
 
-    CT_INIT_API(api, ct_memory_a0);
-    CT_INIT_API(api, ct_log_a0);
-    CT_INIT_API(api, ct_hashlib_a0);
-    CT_INIT_API(api, ct_ebus_a0);
-    CT_INIT_API(api, ct_cdb_a0);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_ebus_a0);
+    CE_INIT_API(api, ce_cdb_a0);
 
     if (SDL_Init(SDL_INIT_VIDEO |
                  SDL_INIT_GAMECONTROLLER |
                  SDL_INIT_HAPTIC |
                  SDL_INIT_JOYSTICK) != 0) {
         //if (SDL_Init(0) != 0) {
-        ct_log_a0->error(LOG_WHERE, "Could not init sdl - %s",
+        ce_log_a0->error(LOG_WHERE, "Could not init sdl - %s",
                          SDL_GetError());
         return; // TODO: dksandasdnask FUCK init without return ptype?????
     }
 
     sdl_window_init(api);
 
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
 }
 
 static void shutdown() {
@@ -516,20 +516,20 @@ static void shutdown() {
     SDL_Quit();
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         machine,
         {
-            CT_INIT_API(api, ct_log_a0);
+            CE_INIT_API(api, ce_log_a0);
 
-            ct_api_a0 = api;
+            ce_api_a0 = api;
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             shutdown();
 
         }

@@ -1,7 +1,7 @@
 
-#include <corelib/buffer.inl>
-#include <corelib/ydb.h>
-#include <corelib/yng.h>
+#include <celib/buffer.inl>
+#include <celib/ydb.h>
+#include <celib/yng.h>
 
 namespace ImGui {
     ///
@@ -26,10 +26,10 @@ namespace ImGui {
     IMGUI_API void SetDockActive();
 
     ///
-    IMGUI_API void saveToYaml(char** buffer, ct_alloc* alloc);
+    IMGUI_API void saveToYaml(char** buffer, ce_alloc* alloc);
 
     IMGUI_API void loadFromYaml(const char *file,
-                                struct ct_ydb_a0 *ydb,
-                                struct ct_yng_a0 *yng);
+                                struct ce_ydb_a0 *ydb,
+                                struct ce_yng_a0 *yng);
 
 } // namespace ImGui

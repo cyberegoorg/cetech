@@ -10,28 +10,28 @@
 #include <stdint.h>
 
 #define MESH_RENDERER_COMPONENT \
-    CT_ID64_0("mesh_renderer", 0x345b95f8df017893ULL)
+    CE_ID64_0("mesh_renderer", 0x345b95f8df017893ULL)
 
 #define PROP_SCENE_ID \
-    CT_ID64_0("scene_id", 0x418627ebacb56f11ULL)
+    CE_ID64_0("scene_id", 0x418627ebacb56f11ULL)
 
 #define PROP_MESH_ID \
-    (CT_ID64_0("mesh_id", 0xba7a0a8001255d3fULL))
+    (CE_ID64_0("mesh_id", 0xba7a0a8001255d3fULL))
 
 #define PROP_NODE_ID \
-    (CT_ID64_0("node_id", 0xb0c5444873f5fc06ULL))
+    (CE_ID64_0("node_id", 0xb0c5444873f5fc06ULL))
 
 #define PROP_MATERIAL_ID \
-    (CT_ID64_0("material_id", 0xb6e42505bc1c2a3aULL))
+    (CE_ID64_0("material_id", 0xb6e42505bc1c2a3aULL))
 
 #define PROP_MATERIAL_REF \
-    (CT_ID64_0("material_ref", 0x1be2b88dca67f200ULL))
+    (CE_ID64_0("material_ref", 0x1be2b88dca67f200ULL))
 
 #define PROP_NODE \
-    (CT_ID64_0("node", 0x5ae0930b5138a928ULL))
+    (CE_ID64_0("node", 0x5ae0930b5138a928ULL))
 
 #define PROP_MESH \
-    (CT_ID64_0("mesh", 0x48ff313713a997a1ULL))
+    (CE_ID64_0("mesh", 0x48ff313713a997a1ULL))
 
 
 struct ct_mesh {
@@ -62,6 +62,6 @@ struct ct_mesh_renderer_a0 {
                        uint64_t layer_name);
 };
 
-CT_MODULE(ct_mesh_renderer_a0);
+CE_MODULE(ct_mesh_renderer_a0);
 
 #endif //CETECH_MESH_RENDERER_H

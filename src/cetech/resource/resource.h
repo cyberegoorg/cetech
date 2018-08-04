@@ -10,36 +10,36 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 #define CONFIG_BUILD \
-     CT_ID64_0("build", 0x4429661936ece1eaULL)
+     CE_ID64_0("build", 0x4429661936ece1eaULL)
 
 #define CONFIG_SRC \
-     CT_ID64_0("src", 0x1cdb3620898c588eULL)
+     CE_ID64_0("src", 0x1cdb3620898c588eULL)
 
 #define CONFIG_CORE \
-     CT_ID64_0("core", 0x6da99857e9315560ULL)
+     CE_ID64_0("core", 0x6da99857e9315560ULL)
 
 #define CONFIG_MODULE_DIR \
-     CT_ID64_0("module_dir", 0xa96daa49986032f4ULL)
+     CE_ID64_0("module_dir", 0xa96daa49986032f4ULL)
 
 #define CONFIG_EXTERNAL \
-     CT_ID64_0("external", 0x9fb8bb487a62dc4fULL)
+     CE_ID64_0("external", 0x9fb8bb487a62dc4fULL)
 
 #define RESOURCE_I_NAME \
     "ct_resource_i0"
 
 #define PROP_RESOURECE_DATA \
-    CT_ID64_0("data", 0x8fd0d44d20650b68ULL)
+    CE_ID64_0("data", 0x8fd0d44d20650b68ULL)
 
 #define RESOURCE_I \
-    CT_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
+    CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
 
 
-struct ct_vio;
-struct ct_alloc;
-struct ct_config_a0;
+struct ce_vio;
+struct ce_alloc;
+struct ce_config_a0;
 
 //==============================================================================
 // Typedefs
@@ -70,7 +70,7 @@ struct ct_resource_i0 {
     void *(*get_interface)(uint64_t name_hash);
 
     void (*online)(uint64_t name,
-                   struct ct_vio *input,
+                   struct ce_vio *input,
                    uint64_t obj);
 
     void (*offline)(uint64_t name,
@@ -134,10 +134,10 @@ struct ct_resource_a0 {
                                  size_t max_ken,
                                  struct ct_resource_id resourceid);
 
-    char *(*compiler_get_tmp_dir)(struct ct_alloc *a,
+    char *(*compiler_get_tmp_dir)(struct ce_alloc *a,
                                   const char *platform);
 
-    char *(*compiler_external_join)(struct ct_alloc *a,
+    char *(*compiler_external_join)(struct ce_alloc *a,
                                     const char *name);
 
     void (*type_name_from_filename)(const char *fullname,
@@ -147,6 +147,6 @@ struct ct_resource_a0 {
 
 };
 
-CT_MODULE(ct_resource_a0);
+CE_MODULE(ct_resource_a0);
 
 #endif //CETECH_RESOURCE_H

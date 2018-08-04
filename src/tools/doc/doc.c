@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include <corelib/core.h>
-#include <corelib/log.h>
-#include <corelib/os.h>
-#include <corelib/memory.h>
-#include <corelib/allocator.h>
-#include <corelib/murmur_hash.inl>
-#include <corelib/hash.inl>
-#include <corelib/task.h>
-#include <corelib/buffer.inl>
+#include <celib/core.h>
+#include <celib/log.h>
+#include <celib/os.h>
+#include <celib/memory.h>
+#include <celib/allocator.h>
+#include <celib/murmur_hash.inl>
+#include <celib/hash.inl>
+#include <celib/task.h>
+#include <celib/buffer.inl>
 
 #define SEED 0
 
@@ -32,11 +32,11 @@ const char *build_dir = "./docs/gen";
 void process_file(void *data) {
     const char *filename = data;
 
-    ct_log_a0->info("hash", "Process file: %s", filename);
+    ce_log_a0->info("hash", "Process file: %s", filename);
 
-    struct ct_vio *file = ct_os_a0->vio->from_file(filename, VIO_OPEN_READ);
+    struct ce_vio *file = ce_os_a0->vio->from_file(filename, VIO_OPEN_READ);
     uint64_t size = file->size(file);
-    char *input_data = CT_ALLOC(ct_memory_a0->system, char, size + 1);
+    char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
     file->read(file, input_data, 1, size);
     file->close(file);
 
@@ -57,18 +57,18 @@ void process_file(void *data) {
     bool struct_parse = false;
     bool fce_parse = false;
 
-    ct_buffer_printf(&output, ct_memory_a0->system, "%s", HEADER);
+    ce_buffer_printf(&output, ce_memory_a0->system, "%s", HEADER);
 
     while (c < end) {
         char line_buff[1024] = {0};
 
         if (!sscanf(c, "%[^\n]s", line_buff)) {
-            const uint32_t comment_n = ct_buffer_size(comment_buffer);
+            const uint32_t comment_n = ce_buffer_size(comment_buffer);
             if (comment_n && ((!struct_parse && !fce_parse))) {
-                ct_buffer_printf(&output, ct_memory_a0->system, "%s\n",
+                ce_buffer_printf(&output, ce_memory_a0->system, "%s\n",
                                  comment_buffer);
 
-                ct_buffer_clear(comment_buffer);
+                ce_buffer_clear(comment_buffer);
             }
 
             ++c;
@@ -82,9 +82,9 @@ void process_file(void *data) {
 
         char *strit = NULL;
         if ((strit = strstr(line_buff, "//")) != 0) {
-            ct_buffer_printf(
+            ce_buffer_printf(
                     (struct_parse ? &struct_comment_buffer : &comment_buffer),
-                    ct_memory_a0->system,
+                    ce_memory_a0->system,
                     "%s\n", strit + 3);
 
             c += line_len;
@@ -98,10 +98,10 @@ void process_file(void *data) {
                 continue;
             }
 
-            ct_buffer_printf(&output, ct_memory_a0->system,
+            ce_buffer_printf(&output, ce_memory_a0->system,
                              "\n## %s\n", tmp_buffer);
 
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&code_buffer, ce_memory_a0->system,
                              "%s\n", line_buff);
             struct_parse = true;
 
@@ -117,10 +117,10 @@ void process_file(void *data) {
 
             const char *fce_name = tmp_buffer2 + (tmp_buffer2[0] == '*');
 
-            ct_buffer_printf(&output, ct_memory_a0->system,
+            ce_buffer_printf(&output, ce_memory_a0->system,
                              "\n## %s\n", fce_name);
 
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&code_buffer, ce_memory_a0->system,
                              "%s\n", line_buff);
 
             if (strrchr(line_buff, ')') == NULL) {
@@ -138,10 +138,10 @@ void process_file(void *data) {
                 fce_parse = true;
             }
 
-            ct_buffer_printf(&struct_code_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&struct_code_buffer, ce_memory_a0->system,
                              "%s\n", line_buff);
 
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&code_buffer, ce_memory_a0->system,
                              "%s\n", line_buff);
 
             char *begin = strstr(line_buff, "(");
@@ -156,7 +156,7 @@ void process_file(void *data) {
 
             const char *fce_name = begin + (begin[0] == '*');
 
-            ct_buffer_printf(&struct_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&struct_buffer, ce_memory_a0->system,
                              "\n### %s\n", fce_name);
 
 
@@ -164,7 +164,7 @@ void process_file(void *data) {
 
         } else if (strstr(line_buff, "#define") != NULL) {
             char token_buffer[1024] = {0};
-            memcpy(token_buffer, line_buff, CT_ARRAY_LEN(line_buff));
+            memcpy(token_buffer, line_buff, CE_ARRAY_LEN(line_buff));
 
             char *it = strtok(token_buffer, " ");
             it = strtok(NULL, " ");
@@ -175,11 +175,11 @@ void process_file(void *data) {
             }
 
             char name[128] = {0};
-            strncpy(name, it, CT_ARRAY_LEN(name));
+            strncpy(name, it, CE_ARRAY_LEN(name));
 
             it = strtok(NULL, " ");
             if ((it != NULL) && (*it != '\n')) {
-                ct_buffer_printf(&output, ct_memory_a0->system,
+                ce_buffer_printf(&output, ce_memory_a0->system,
                                  "\n## %s\n", name);
 
                 char *r = strrchr(line_buff, '\\');
@@ -187,7 +187,7 @@ void process_file(void *data) {
                     *r = 0;
                 }
 
-                ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+                ce_buffer_printf(&code_buffer, ce_memory_a0->system,
                                  "%s\n", line_buff);
             }
         }
@@ -199,13 +199,13 @@ void process_file(void *data) {
             char **b_com = struct_parse ? &struct_comment_buffer
                                         : &comment_buffer;
 
-            ct_buffer_printf(b_code, ct_memory_a0->system, "%s\n", line_buff);
+            ce_buffer_printf(b_code, ce_memory_a0->system, "%s\n", line_buff);
 
             if ((strstr(line_buff, ")") != NULL)) {
                 if (!struct_parse) {
                     if (strstr(line_buff, ";") != NULL) {
-                        ct_buffer_clear(*b_com);
-                        ct_buffer_clear(*b_code);
+                        ce_buffer_clear(*b_com);
+                        ce_buffer_clear(*b_code);
                     }
                 }
 
@@ -215,7 +215,7 @@ void process_file(void *data) {
         }
 
         if (struct_parse) {
-            ct_buffer_printf(&code_buffer, ct_memory_a0->system,
+            ce_buffer_printf(&code_buffer, ce_memory_a0->system,
                              "%s\n", line_buff);
         }
 
@@ -226,24 +226,24 @@ void process_file(void *data) {
             char **b_comment = (struct_parse ? &struct_comment_buffer
                                              : &comment_buffer);
 
-            const uint32_t comment_n = ct_buffer_size(*b_comment);
-            const uint32_t readbuf_n = ct_buffer_size(*b_code);
+            const uint32_t comment_n = ce_buffer_size(*b_comment);
+            const uint32_t readbuf_n = ce_buffer_size(*b_code);
             if (readbuf_n) {
-                ct_buffer_printf(
-                        b_output, ct_memory_a0->system,
+                ce_buffer_printf(
+                        b_output, ce_memory_a0->system,
                         "~~~~~~~~~~~~~~~~~~~~\n"
                         "%s\n"
                         "~~~~~~~~~~~~~~~~~~~~\n",
                         *b_code);
 
-                ct_buffer_clear(*b_code);
+                ce_buffer_clear(*b_code);
             }
 
             if (comment_n) {
-                ct_buffer_printf(b_output, ct_memory_a0->system, "%s\n",
+                ce_buffer_printf(b_output, ce_memory_a0->system, "%s\n",
                                  *b_comment);
 
-                ct_buffer_clear(*b_comment);
+                ce_buffer_clear(*b_comment);
             }
 
             if (struct_parse) {
@@ -253,11 +253,11 @@ void process_file(void *data) {
                     goto flush_fce;
                 }
             } else {
-                const uint32_t n = ct_buffer_size(struct_buffer);
+                const uint32_t n = ce_buffer_size(struct_buffer);
                 if (n) {
-                    ct_buffer_printf(&output, ct_memory_a0->system,
+                    ce_buffer_printf(&output, ce_memory_a0->system,
                                      "%s\n", struct_buffer);
-                    ct_buffer_clear(struct_buffer);
+                    ce_buffer_clear(struct_buffer);
                 }
             }
         }
@@ -265,25 +265,25 @@ void process_file(void *data) {
         c += line_len;
     }
 
-    ct_buffer_printf(&output, ct_memory_a0->system, "%s", FOOTER);
+    ce_buffer_printf(&output, ce_memory_a0->system, "%s", FOOTER);
 
-    CT_FREE(ct_memory_a0->system, input_data);
+    CE_FREE(ce_memory_a0->system, input_data);
 
     char basename[128];
     char output_filename[128];
-    ct_os_a0->path->basename(filename, basename);
-    snprintf(output_filename, CT_ARRAY_LEN(output_filename),
+    ce_os_a0->path->basename(filename, basename);
+    snprintf(output_filename, CE_ARRAY_LEN(output_filename),
              "%s/%s.md.html", build_dir, basename);
 
-    file = ct_os_a0->vio->from_file(output_filename, VIO_OPEN_WRITE);
-    file->write(file, output, ct_array_size(output), 1);
+    file = ce_os_a0->vio->from_file(output_filename, VIO_OPEN_WRITE);
+    file->write(file, output, ce_array_size(output), 1);
     file->close(file);
 
-    ct_array_free(output, ct_memory_a0->system);
+    ce_array_free(output, ce_memory_a0->system);
 }
 
 void print_usage() {
-    ct_log_a0->info(
+    ce_log_a0->info(
             "doc", "%s",
 
             "usage: doc --build BUILD_DIR --source SOURCE_DIR\n"
@@ -318,17 +318,17 @@ int main(int argc,
         }
     }
 
-    struct ct_alloc *a = ct_memory_a0->system;
-    ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
+    struct ce_alloc *a = ce_memory_a0->system;
+    ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     if (printusage) {
         print_usage();
         return 1;
     }
 
-    ct_corelib_init();
+    ce_init();
 
-    ct_os_a0->path->make_path(build_dir);
+    ce_os_a0->path->make_path(build_dir);
 
     char **files;
     uint32_t files_count;
@@ -340,12 +340,12 @@ int main(int argc,
 //            "*/fmath.inl",
             "*.inl", "*.h"
     };
-    ct_os_a0->path->list(source_dir, CETECH_ARR_ARG(filter),
+    ce_os_a0->path->list(source_dir, CE_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
-    struct ct_task_item tasks[files_count];
+    struct ce_task_item tasks[files_count];
 
-    struct ct_task_counter_t *counter = NULL;
+    struct ce_task_counter_t *counter = NULL;
 
     uint32_t add_it = 0;
     for (uint32_t i = 0; i < files_count; ++i) {
@@ -360,8 +360,8 @@ int main(int argc,
     }
 
 
-    ct_task_a0->add(tasks, add_it, &counter);
-    ct_task_a0->wait_for_counter(counter, 0);
+    ce_task_a0->add(tasks, add_it, &counter);
+    ce_task_a0->wait_for_counter(counter, 0);
 
-    ct_corelib_shutdown();
+    ce_shutdown();
 }

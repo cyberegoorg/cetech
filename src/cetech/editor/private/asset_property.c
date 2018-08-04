@@ -4,25 +4,25 @@
 #include <cetech/resource/resource.h>
 #include <cetech/editor/asset_browser.h>
 
-#include <corelib/hash.inl>
-#include <corelib/ebus.h>
-#include <corelib/ydb.h>
+#include <celib/hash.inl>
+#include <celib/ebus.h>
+#include <celib/ydb.h>
 #include <cetech/editor/selected_object.h>
 
-#include "corelib/hashlib.h"
-#include "corelib/config.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/hashlib.h"
+#include "celib/config.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 #define _G asset_property_global
 static struct _G {
-    struct ct_hash_t on_asset_map;
+    struct ce_hash_t on_asset_map;
 
     struct ct_resource_id active_asset;
 
     const char *active_path;
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
 } _G;
 
 static void draw_ui(uint64_t obj) {
@@ -30,15 +30,15 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-    uint64_t obj_type = ct_cdb_a0->type(obj);
+    uint64_t obj_type = ce_cdb_a0->type(obj);
 
     uint64_t res_obj = 0;
     if (obj_type == ASSET_BROWSER_ASSET_TYPE) {
 
-        uint64_t asset_type = ct_cdb_a0->read_uint64(obj,
+        uint64_t asset_type = ce_cdb_a0->read_uint64(obj,
                                                      ASSET_BROWSER_ASSET_TYPE2,
                                                      0);
-        uint64_t asset_name = ct_cdb_a0->read_uint64(obj,
+        uint64_t asset_name = ce_cdb_a0->read_uint64(obj,
                                                      ASSET_BROWSER_ASSET_NAME,
                                                      0);
         struct ct_resource_id rid = (struct ct_resource_id) {
@@ -54,11 +54,11 @@ static void draw_ui(uint64_t obj) {
 
 //    char filename[512] = {};
 //    ct_resource_a0->compiler_get_filename(filename,
-//                                          CT_ARRAY_LEN(filename),
+//                                          CE_ARRAY_LEN(filename),
 //                                          rid);
 
 //    if (ct_debugui_a0->Button("Save", (float[2]) {0.0f})) {
-//        ct_ydb_a0->save(filename);
+//        ce_ydb_a0->save(filename);
 //    }
 //    ct_debugui_a0->SameLine(0.0f, -1.0f);
 //
@@ -70,7 +70,7 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-    uint64_t res_obj_type = ct_cdb_a0->type(res_obj);
+    uint64_t res_obj_type = ce_cdb_a0->type(res_obj);
 
     struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(
             res_obj_type);
@@ -128,9 +128,9 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = draw_ui,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system
+            .allocator = ce_memory_a0->system
     };
 
     api->register_api("ct_asset_property_a0", &asset_property_api);
@@ -138,29 +138,29 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_hash_free(&_G.on_asset_map, _G.allocator);
+    ce_hash_free(&_G.on_asset_map, _G.allocator);
 
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         asset_property,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_resource_a0);
-            CT_INIT_API(api, ct_ydb_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_resource_a0);
+            CE_INIT_API(api, ce_ydb_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ce_cdb_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

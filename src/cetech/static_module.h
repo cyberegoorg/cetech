@@ -3,65 +3,65 @@
 //==============================================================================
 
 void init_static_modules() {
-    CETECH_ADD_STATIC_MODULE(machine);
-    CETECH_ADD_STATIC_MODULE(ecs);
+    CE_ADD_STATIC_MODULE(machine);
+    CE_ADD_STATIC_MODULE(ecs);
 
     //==========================================================================
     // Renderer
     //==========================================================================
-    CETECH_ADD_STATIC_MODULE(renderer);
-    CETECH_ADD_STATIC_MODULE(shader);
-    CETECH_ADD_STATIC_MODULE(texture);
-    CETECH_ADD_STATIC_MODULE(material);
-    CETECH_ADD_STATIC_MODULE(debugdraw);
-    CETECH_ADD_STATIC_MODULE(render_graph);
+    CE_ADD_STATIC_MODULE(renderer);
+    CE_ADD_STATIC_MODULE(shader);
+    CE_ADD_STATIC_MODULE(texture);
+    CE_ADD_STATIC_MODULE(material);
+    CE_ADD_STATIC_MODULE(debugdraw);
+    CE_ADD_STATIC_MODULE(render_graph);
 
     //==========================================================================
     // Engine
     //==========================================================================
 
-    CETECH_ADD_STATIC_MODULE(controlers);
+    CE_ADD_STATIC_MODULE(controlers);
 
-    CETECH_ADD_STATIC_MODULE(keyboard);
-    CETECH_ADD_STATIC_MODULE(gamepad);
-    CETECH_ADD_STATIC_MODULE(mouse);
+    CE_ADD_STATIC_MODULE(keyboard);
+    CE_ADD_STATIC_MODULE(gamepad);
+    CE_ADD_STATIC_MODULE(mouse);
 
-    CETECH_ADD_STATIC_MODULE(game_system);
+    CE_ADD_STATIC_MODULE(game_system);
 
     //==========================================================================
     // DebugUI
     //==========================================================================
-    CETECH_ADD_STATIC_MODULE(debugui);
+    CE_ADD_STATIC_MODULE(debugui);
 
     //==========================================================================
     // Playground
     //==========================================================================
-    CETECH_ADD_STATIC_MODULE(cmd_system);
-    CETECH_ADD_STATIC_MODULE(action_manager);
-    CETECH_ADD_STATIC_MODULE(selected_object);
+    CE_ADD_STATIC_MODULE(cmd_system);
+    CE_ADD_STATIC_MODULE(action_manager);
+    CE_ADD_STATIC_MODULE(selected_object);
 
-    CETECH_ADD_STATIC_MODULE(playground);
-    CETECH_ADD_STATIC_MODULE(asset_browser);
-    CETECH_ADD_STATIC_MODULE(level_inspector);
-    CETECH_ADD_STATIC_MODULE(property_inspector);
-    CETECH_ADD_STATIC_MODULE(entity_property);
+    CE_ADD_STATIC_MODULE(playground);
+    CE_ADD_STATIC_MODULE(asset_browser);
+    CE_ADD_STATIC_MODULE(level_inspector);
+    CE_ADD_STATIC_MODULE(property_inspector);
+    CE_ADD_STATIC_MODULE(entity_property);
 
-    CETECH_ADD_STATIC_MODULE(transform);
-    CETECH_ADD_STATIC_MODULE(scenegraph);
-    CETECH_ADD_STATIC_MODULE(scene);
-    CETECH_ADD_STATIC_MODULE(mesh_renderer);
-    CETECH_ADD_STATIC_MODULE(camera);
+    CE_ADD_STATIC_MODULE(transform);
+    CE_ADD_STATIC_MODULE(scenegraph);
+    CE_ADD_STATIC_MODULE(scene);
+    CE_ADD_STATIC_MODULE(mesh_renderer);
+    CE_ADD_STATIC_MODULE(camera);
 
-    CETECH_ADD_STATIC_MODULE(default_render_graph);
-    CETECH_ADD_STATIC_MODULE(command_history);
+    CE_ADD_STATIC_MODULE(default_render_graph);
+    CE_ADD_STATIC_MODULE(command_history);
 
-    CETECH_ADD_STATIC_MODULE(asset_property);
-    CETECH_ADD_STATIC_MODULE(asset_preview);
+    CE_ADD_STATIC_MODULE(asset_property);
+    CE_ADD_STATIC_MODULE(asset_preview);
 
-    CETECH_ADD_STATIC_MODULE(log_view);
-    CETECH_ADD_STATIC_MODULE(entity_editor);
-    CETECH_ADD_STATIC_MODULE(editor);
-    CETECH_ADD_STATIC_MODULE(editor_ui);
-    CETECH_ADD_STATIC_MODULE(game_view);
+    CE_ADD_STATIC_MODULE(log_view);
+    CE_ADD_STATIC_MODULE(entity_editor);
+    CE_ADD_STATIC_MODULE(editor);
+    CE_ADD_STATIC_MODULE(editor_ui);
+    CE_ADD_STATIC_MODULE(game_view);
 }
 

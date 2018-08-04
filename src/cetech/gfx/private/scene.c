@@ -2,14 +2,14 @@
 // Include
 //==============================================================================
 
-#include <corelib/module.h>
+#include <celib/module.h>
 #include <cetech/gfx/scene.h>
-#include <corelib/array.inl>
-#include <corelib/hash.inl>
+#include <celib/array.inl>
+#include <celib/hash.inl>
 
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
 #include "cetech/machine/machine.h"
 
 
@@ -18,12 +18,12 @@
 
 #include "cetech/scenegraph/scenegraph.h"
 
-#include <corelib/os.h>
+#include <celib/os.h>
 #include <cetech/gfx/renderer.h>
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 
 
-int scenecompiler_init(struct ct_api_a0 *api);
+int scenecompiler_init(struct ce_api_a0 *api);
 
 //==============================================================================
 // Structs
@@ -35,8 +35,8 @@ int scenecompiler_init(struct ct_api_a0 *api);
 
 #define _G SceneResourceGlobals
 static struct _G {
-    struct ct_cdb_t db;
-    struct ct_alloc *allocator;
+    struct ce_cdb_t db;
+    struct ce_alloc *allocator;
 } _G;
 
 
@@ -45,31 +45,31 @@ static struct _G {
 //==============================================================================
 
 static void online(uint64_t name,
-                   struct ct_vio *input,
+                   struct ce_vio *input,
                    uint64_t obj) {
-    CT_UNUSED(name);
+    CE_UNUSED(name);
 
     const uint64_t size = input->size(input);
-    char *data = CT_ALLOC(_G.allocator, char, size);
+    char *data = CE_ALLOC(_G.allocator, char, size);
     input->read(input, data, 1, size);
 
-    ct_cdb_a0->load(ct_cdb_a0->db(), data, obj, _G.allocator);
+    ce_cdb_a0->load(ce_cdb_a0->db(), data, obj, _G.allocator);
 
-    uint64_t geom_count = ct_cdb_a0->read_uint64(obj, SCENE_GEOM_COUNT, 0);
-    ct_render_vertex_decl_t *vb_decl = (ct_cdb_a0->read_blob(obj, SCENE_VB_DECL,
+    uint64_t geom_count = ce_cdb_a0->read_uint64(obj, SCENE_GEOM_COUNT, 0);
+    ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(obj, SCENE_VB_DECL,
                                                              NULL, NULL));
-    uint64_t *geom_name = (ct_cdb_a0->read_blob(obj, SCENE_GEOM_NAME,
+    uint64_t *geom_name = (ce_cdb_a0->read_blob(obj, SCENE_GEOM_NAME,
                                                 NULL, NULL));
-    uint32_t *ib_offset = (ct_cdb_a0->read_blob(obj, SCENE_IB_OFFSET,
+    uint32_t *ib_offset = (ce_cdb_a0->read_blob(obj, SCENE_IB_OFFSET,
                                                 NULL, NULL));
-    uint32_t *vb_offset = (ct_cdb_a0->read_blob(obj, SCENE_VB_OFFSET,
+    uint32_t *vb_offset = (ce_cdb_a0->read_blob(obj, SCENE_VB_OFFSET,
                                                 NULL, NULL));
-    uint32_t *ib_size = (ct_cdb_a0->read_blob(obj, SCENE_IB_SIZE, NULL, NULL));
-    uint32_t *vb_size = (ct_cdb_a0->read_blob(obj, SCENE_VB_SIZE, NULL, NULL));
-    uint32_t *ib = (ct_cdb_a0->read_blob(obj, SCENE_IB_PROP, NULL, NULL));
-    uint8_t *vb = (ct_cdb_a0->read_blob(obj, SCENE_VB_PROP, NULL, NULL));
+    uint32_t *ib_size = (ce_cdb_a0->read_blob(obj, SCENE_IB_SIZE, NULL, NULL));
+    uint32_t *vb_size = (ce_cdb_a0->read_blob(obj, SCENE_VB_SIZE, NULL, NULL));
+    uint32_t *ib = (ce_cdb_a0->read_blob(obj, SCENE_IB_PROP, NULL, NULL));
+    uint8_t *vb = (ce_cdb_a0->read_blob(obj, SCENE_VB_PROP, NULL, NULL));
 
-    ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
         const ct_render_memory_t *vb_mem;
         vb_mem = ct_renderer_a0->make_ref((const void *) &vb[vb_offset[i]],
@@ -88,22 +88,22 @@ static void online(uint64_t name,
         ib_handle = ct_renderer_a0->create_index_buffer(ib_mem,
                                                         CT_RENDER_BUFFER_INDEX32);
 
-        uint64_t geom_obj = ct_cdb_a0->create_object(_G.db, 0);
-        ct_cdb_obj_o *geom_writer = ct_cdb_a0->write_begin(geom_obj);
-        ct_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
-        ct_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
-        ct_cdb_a0->set_uint64(geom_writer, SCENE_SIZE_PROP, size);
-        ct_cdb_a0->write_commit(geom_writer);
+        uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);
+        ce_cdb_obj_o *geom_writer = ce_cdb_a0->write_begin(geom_obj);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_SIZE_PROP, size);
+        ce_cdb_a0->write_commit(geom_writer);
 
-        ct_cdb_a0->set_ref(writer, geom_name[i], geom_obj);
+        ce_cdb_a0->set_ref(writer, geom_name[i], geom_obj);
     }
 
-    ct_cdb_a0->write_commit(writer);
+    ce_cdb_a0->write_commit(writer);
 }
 
 static void offline(uint64_t name,
                     uint64_t obj) {
-    CT_UNUSED(name, obj);
+    CE_UNUSED(name, obj);
 
 }
 
@@ -126,19 +126,19 @@ static struct ct_resource_i0 ct_resource_i0 = {
 //==============================================================================
 // Interface
 //==============================================================================
-int sceneinit(struct ct_api_a0 *api) {
-    CT_INIT_API(api, ct_memory_a0);
-    CT_INIT_API(api, ct_resource_a0);
-    CT_INIT_API(api, ct_scenegprah_a0);
-    CT_INIT_API(api, ct_os_a0);
-    CT_INIT_API(api, ct_hashlib_a0);
+int sceneinit(struct ce_api_a0 *api) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_scenegprah_a0);
+    CE_INIT_API(api, ce_os_a0);
+    CE_INIT_API(api, ce_id_a0);
 
     _G = (struct _G) {
-            .allocator=ct_memory_a0->system,
+            .allocator=ce_memory_a0->system,
 
     };
 
-    ct_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
 
     scenecompiler_init(api);
 
@@ -164,18 +164,18 @@ static void create_graph(struct ct_world world,
 
     uint64_t res = resource_data(scene);
 
-    uint64_t *node_name = (uint64_t *) (ct_cdb_a0->read_blob(res,
+    uint64_t *node_name = (uint64_t *) (ce_cdb_a0->read_blob(res,
                                                              SCENE_NODE_NAME,
                                                              NULL, NULL));
     
-    uint32_t *node_parent = (uint32_t *) (ct_cdb_a0->read_blob(res,
+    uint32_t *node_parent = (uint32_t *) (ce_cdb_a0->read_blob(res,
                                                                SCENE_NODE_PARENT,
                                                                NULL, NULL));
-    float *node_pose = (float *) (ct_cdb_a0->read_blob(res,
+    float *node_pose = (float *) (ce_cdb_a0->read_blob(res,
                                                        SCENE_NODE_POSE,
                                                        NULL, NULL));
 
-    uint64_t node_count = ct_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
+    uint64_t node_count = ce_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
 
     ct_scenegprah_a0->create(world,
                              entity,
@@ -189,13 +189,13 @@ static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
     uint64_t res = resource_data(scene);
 
-    uint64_t *geom_name = (uint64_t *) (ct_cdb_a0->read_blob(res,
+    uint64_t *geom_name = (uint64_t *) (ce_cdb_a0->read_blob(res,
                                                              SCENE_GEOM_NAME,
                                                              NULL, NULL));
-    uint64_t *geom_node = (uint64_t *) (ct_cdb_a0->read_blob(res,
+    uint64_t *geom_node = (uint64_t *) (ce_cdb_a0->read_blob(res,
                                                              SCENE_NODE_GEOM,
                                                              NULL, NULL));
-    uint64_t geom_count = ct_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
+    uint64_t geom_count = ce_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
 
     for (uint32_t i = 0; i < geom_count; ++i) {
         if (geom_name[i] != mesh) {
@@ -213,9 +213,9 @@ static void get_all_geometries(uint64_t scene,
                                uint32_t *count) {
     uint64_t res = resource_data(scene);
 
-    *geometries = (char *) (ct_cdb_a0->read_blob(res, SCENE_GEOM_STR, NULL,
+    *geometries = (char *) (ce_cdb_a0->read_blob(res, SCENE_GEOM_STR, NULL,
                                                  NULL));
-    *count = ct_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
+    *count = ce_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
 }
 
 static void get_all_nodes(uint64_t scene,
@@ -223,9 +223,9 @@ static void get_all_nodes(uint64_t scene,
                           uint32_t *count) {
     uint64_t res = resource_data(scene);
 
-    *geometries = (char *) (ct_cdb_a0->read_blob(res, SCENE_NODE_STR,
+    *geometries = (char *) (ce_cdb_a0->read_blob(res, SCENE_NODE_STR,
                                                  NULL, NULL));
-    *count = ct_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
+    *count = ce_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
 
 }
 
@@ -238,29 +238,29 @@ static struct ct_scene_a0 scene_api = {
 
 struct ct_scene_a0 *ct_scene_a0 = &scene_api;
 
-static void _init_api(struct ct_api_a0 *api) {
+static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_scene_a0", &scene_api);
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         scene,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_resource_a0);
-            CT_INIT_API(api, ct_scenegprah_a0);
-            CT_INIT_API(api, ct_os_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ct_resource_a0);
+            CE_INIT_API(api, ct_scenegprah_a0);
+            CE_INIT_API(api, ce_os_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ct_renderer_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init_api(api);
             sceneinit(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             shutdown();
         }

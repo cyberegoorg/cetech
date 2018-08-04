@@ -11,21 +11,21 @@ Hash table that map uint64_t **key** to uint64_t **value**.
 
 ## Simple table char -> uint64_t
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-ct_hash_t hash = {0};
+ce_hash_t hash = {0};
 
-ct_hash_add(&hash, 'h', 1, ct_memory_a0->system);
-ct_hash_add(&hash, 'e', 1, ct_memory_a0->system);
-ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
-ct_hash_add(&hash, 'l', 1, ct_memory_a0->system);
-ct_hash_add(&hash, 'o', 1, ct_memory_a0->system);
+ce_hash_add(&hash, 'h', 1, ce_memory_a0->system);
+ce_hash_add(&hash, 'e', 1, ce_memory_a0->system);
+ce_hash_add(&hash, 'l', 1, ce_memory_a0->system);
+ce_hash_add(&hash, 'l', 1, ce_memory_a0->system);
+ce_hash_add(&hash, 'o', 1, ce_memory_a0->system);
 
-printf("h in hash == %d", ct_hash_contain(&hash, 'h')); // h in hash == 1
-printf("H in hash == %d", ct_hash_contain(&hash, 'H')); // H in hash == 0
+printf("h in hash == %d", ce_hash_contain(&hash, 'h')); // h in hash == 1
+printf("H in hash == %d", ce_hash_contain(&hash, 'H')); // H in hash == 0
 
 printf("h -> %d", ct_hash_find(&hash, 'h', 0));  // h -> 1
 printf("H -> %d", ct_hash_find(&hash, 'H', 0));  // H -> 0
 
-ct_hash_free(&hash, ct_memory_a0->system);
+ce_hash_free(&hash, ce_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 # API
 
@@ -36,9 +36,9 @@ ct_hash_free(&hash, ct_memory_a0->system);
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_hash_t
+## ce_hash_t
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_hash_t {
+struct ce_hash_t {
     uint32_t n;
     uint64_t *keys;
     uint64_t *values;
@@ -59,33 +59,33 @@ Hash table struct
 - *values* - values [array](array.md.html)
 
 
-## ct_hash_clean
+## ce_hash_clean
 ~~~~~~~~~~~~~~~~~~~~
-static inline void ct_hash_clean(struct ct_hash_t *hash) {
+static inline void ce_hash_clean(struct ce_hash_t *hash) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Clean hash table
 
 
-## ct_hash_free
+## ce_hash_free
 ~~~~~~~~~~~~~~~~~~~~
-static inline void ct_hash_free(struct ct_hash_t *hash,
-                                const struct ct_alloc *allocator) {
+static inline void ce_hash_free(struct ce_hash_t *hash,
+                                const struct ce_alloc *allocator) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Free hash table
 
 
-## ct_hash_find_slot
+## ce_hash_find_slot
 ~~~~~~~~~~~~~~~~~~~~
-static inline uint32_t ct_hash_find_slot(const struct ct_hash_t *hash,
+static inline uint32_t ce_hash_find_slot(const struct ce_hash_t *hash,
                                          uint64_t k) {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_hash_lookup
+## ce_hash_lookup
 ~~~~~~~~~~~~~~~~~~~~
-static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
+static inline uint64_t ce_hash_lookup(const struct ce_hash_t *hash,
                                       uint64_t k,
                                       uint64_t default_value) {
 
@@ -93,38 +93,38 @@ static inline uint64_t ct_hash_lookup(const struct ct_hash_t *hash,
 Find *k* in hash table. If key does not exist return *default_value*
 
 
-## ct_hash_contain
+## ce_hash_contain
 ~~~~~~~~~~~~~~~~~~~~
-static inline bool ct_hash_contain(const struct ct_hash_t *hash,
+static inline bool ce_hash_contain(const struct ce_hash_t *hash,
                                    uint64_t k) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Is *k* hash table?
 
 
-## ct_hash_add
+## ce_hash_add
 ~~~~~~~~~~~~~~~~~~~~
-static inline void ct_hash_add(struct ct_hash_t *hash,
+static inline void ce_hash_add(struct ce_hash_t *hash,
                                uint64_t k,
                                uint64_t value,
-                               const struct ct_alloc *allocator) {
+                               const struct ce_alloc *allocator) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Add *k* -> *value*
 
 
-## ct_hash_remove
+## ce_hash_remove
 ~~~~~~~~~~~~~~~~~~~~
-static inline void ct_hash_remove(struct ct_hash_t *hash,
+static inline void ce_hash_remove(struct ce_hash_t *hash,
                                   uint64_t k) {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_hash_clone
+## ce_hash_clone
 ~~~~~~~~~~~~~~~~~~~~
-static inline void ct_hash_clone(const struct ct_hash_t *from,
-                                 struct ct_hash_t *to,
-                                 const struct ct_alloc *alloc) {
+static inline void ce_hash_clone(const struct ce_hash_t *from,
+                                 struct ce_hash_t *to,
+                                 const struct ce_alloc *alloc) {
 
 ~~~~~~~~~~~~~~~~~~~~
 <!-- Markdeep: -->

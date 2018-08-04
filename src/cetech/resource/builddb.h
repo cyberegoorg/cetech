@@ -24,6 +24,6 @@ struct ct_builddb_a0 {
     int (*need_compile)(const char *filename);
 };
 
-CT_MODULE(ct_builddb_a0);
+CE_MODULE(ct_builddb_a0);
 
 #endif //CETECH_BUILDDB_H

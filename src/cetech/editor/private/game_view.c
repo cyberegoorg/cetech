@@ -1,12 +1,12 @@
 #include <string.h>
 
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/module.h"
+#include <celib/ebus.h>
+#include <celib/macros.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/module.h"
 
-#include "corelib/api_system.h"
+#include "celib/api_system.h"
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
@@ -23,7 +23,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
 
-    uint64_t game_name = ct_hashlib_a0->id64("default");
+    uint64_t game_name = ce_id_a0->id64("default");
 
     struct ct_render_graph_builder* rgb = ct_game_system_a0->render_graph_builder(game_name);
     rgb->call->set_size(rgb, size[0], size[1]);
@@ -83,7 +83,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .draw_ui = on_debugui,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
 }
@@ -91,18 +91,18 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         game_view,
         {
-            CT_INIT_API(api, ct_hashlib_a0);
+            CE_INIT_API(api, ce_id_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

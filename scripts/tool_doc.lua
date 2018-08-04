@@ -1,7 +1,7 @@
 project "doc"
 	kind "ConsoleApp"
 
-	use_corelib()
+	use_celib()
 
 
 	files {

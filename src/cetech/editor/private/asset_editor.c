@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <corelib/cdb.h>
-#include <corelib/ydb.h>
-#include <corelib/fmath.inl>
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include <celib/cdb.h>
+#include <celib/ydb.h>
+#include <celib/fmath.inl>
+#include <celib/ebus.h>
+#include <celib/macros.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 
 #include <cetech/ecs/ecs.h>
@@ -29,7 +29,7 @@
 #include <cetech/gfx/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <corelib/array.inl>
+#include <celib/array.inl>
 #include <cetech/editor/asset_editor.h>
 
 #define _G editor_globals
@@ -48,7 +48,7 @@ static struct _G {
 
 
 static struct ct_asset_editor_i0 *get_asset_editor(uint64_t cdb_type) {
-    struct ct_api_entry it = ct_api_a0->first(ASSET_EDITOR_I);
+    struct ce_api_entry it = ce_api_a0->first(ASSET_EDITOR_I);
     while (it.api) {
         struct ct_asset_editor_i0 *i = (it.api);
 
@@ -56,7 +56,7 @@ static struct ct_asset_editor_i0 *get_asset_editor(uint64_t cdb_type) {
             return i;
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 
     return NULL;
@@ -75,21 +75,21 @@ static void draw_editor(struct ct_dock_i0 *dock) {
     bool click = ct_debugui_a0->IsMouseClicked(0, false);
 
     if (is_mouse_hovering && click) {
-        uint64_t name = ct_cdb_a0->read_uint64(editor->context_obj,
+        uint64_t name = ce_cdb_a0->read_uint64(editor->context_obj,
                                                _ASSET_NAME, 0);
-        uint64_t type = ct_cdb_a0->read_uint64(editor->context_obj,
+        uint64_t type = ce_cdb_a0->read_uint64(editor->context_obj,
                                                _ASSET_TYPE, 0);
 
-        const char* path = ct_cdb_a0->read_str(editor->context_obj, _ASSET_PATH, 0);
+        const char* path = ce_cdb_a0->read_str(editor->context_obj, _ASSET_PATH, 0);
 
-        uint64_t selected_asset = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+        uint64_t selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                            ASSET_BROWSER_ASSET_TYPE);
 
-        ct_cdb_obj_o *w = ct_cdb_a0->write_begin(selected_asset);
-        ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME, name);
-        ct_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2, type);
-        ct_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
-        ct_cdb_a0->write_commit(w);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
+        ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME, name);
+        ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2, type);
+        ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
+        ce_cdb_a0->write_commit(w);
 
 
         ct_selected_object_a0->set_selected_object(selected_asset);
@@ -101,15 +101,15 @@ static void draw_editor(struct ct_dock_i0 *dock) {
 }
 
 static uint32_t find_editor(struct ct_resource_id asset) {
-    const uint32_t editor_n = ct_array_size(_G.editors);
+    const uint32_t editor_n = ce_array_size(_G.editors);
 
     for (uint32_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
 
-        const uint64_t asset_name = ct_cdb_a0->read_uint64(editor->context_obj,
+        const uint64_t asset_name = ce_cdb_a0->read_uint64(editor->context_obj,
                                                            _ASSET_NAME, 0);
 
-        const uint64_t asset_type = ct_cdb_a0->read_uint64(editor->context_obj,
+        const uint64_t asset_type = ce_cdb_a0->read_uint64(editor->context_obj,
                                                            _ASSET_TYPE, 0);
 
         if (!asset_name && !asset_type) {
@@ -139,7 +139,7 @@ static const char *dock_title(struct ct_dock_i0 *dock) {
     const char *display_name = i->display_name ? i->display_name()
                                                : DEFAULT_EDITOR_NAME;
 
-    snprintf(editor->title, CT_ARRAY_LEN(editor->title),
+    snprintf(editor->title, CE_ARRAY_LEN(editor->title),
              "%s %s", display_icon, display_name);
 
     return editor->title;
@@ -157,12 +157,12 @@ static struct editor *_new_editor(struct ct_resource_id asset) {
         return editor;
     }
 
-    int idx = ct_array_size(_G.editors);
-    ct_array_push(_G.editors, (struct editor) {}, ct_memory_a0->system);
+    int idx = ce_array_size(_G.editors);
+    ce_array_push(_G.editors, (struct editor) {}, ce_memory_a0->system);
 
     struct editor *editor = &_G.editors[idx];
 
-    editor->context_obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), 0);
+    editor->context_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
     editor->dock = (struct ct_dock_i0) {
             .id = idx,
@@ -176,12 +176,12 @@ static struct editor *_new_editor(struct ct_resource_id asset) {
     };
 
 
-    ct_api_a0->register_api(DOCK_INTERFACE_NAME, &editor->dock);
+    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &editor->dock);
 
-    struct ct_world *w = ct_cdb_a0->write_begin(editor->context_obj);
-    ct_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
-    ct_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
-    ct_cdb_a0->write_commit(w);
+    struct ct_world *w = ce_cdb_a0->write_begin(editor->context_obj);
+    ce_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
+    ce_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
+    ce_cdb_a0->write_commit(w);
 
     return editor;
 }
@@ -198,18 +198,18 @@ static void open(struct ct_resource_id asset,
     struct editor *e = _new_editor(asset);
     e->type = asset.type;
 
-    struct ct_world *w = ct_cdb_a0->write_begin(e->context_obj);
-    ct_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
-    ct_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
-    ct_cdb_a0->set_str(w, _ASSET_PATH, path);
-    ct_cdb_a0->write_commit(w);
+    struct ct_world *w = ce_cdb_a0->write_begin(e->context_obj);
+    ce_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
+    ce_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
+    ce_cdb_a0->set_str(w, _ASSET_PATH, path);
+    ce_cdb_a0->write_commit(w);
 
     i->open(e->context_obj);
 
 }
 
 static void update(float dt) {
-    const uint32_t editor_n = ct_array_size(_G.editors);
+    const uint32_t editor_n = ce_array_size(_G.editors);
     for (uint8_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
 
@@ -224,7 +224,7 @@ static void update(float dt) {
 }
 
 static void on_render() {
-    const uint32_t editor_n = ct_array_size(_G.editors);
+    const uint32_t editor_n = ce_array_size(_G.editors);
     for (uint8_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
 
@@ -244,13 +244,13 @@ static void on_render() {
 
 
 static void on_asset_double_click(uint64_t event) {
-    uint64_t asset_type = ct_cdb_a0->read_uint64(event,
+    uint64_t asset_type = ce_cdb_a0->read_uint64(event,
                                                  ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t asset_name = ct_cdb_a0->read_uint64(event,
+    uint64_t asset_name = ce_cdb_a0->read_uint64(event,
                                                  ASSET_BROWSER_ASSET_NAME, 0);
 
-    uint64_t root = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
-    const char *path = ct_cdb_a0->read_str(event, ASSET_BROWSER_PATH, 0);
+    uint64_t root = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
+    const char *path = ce_cdb_a0->read_str(event, ASSET_BROWSER_PATH, 0);
 
     struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
@@ -266,46 +266,46 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
         .render= on_render,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    ct_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                         on_asset_double_click, 0);
 
-    ct_api_a0->register_api("ct_editor_module_i0",
+    ce_api_a0->register_api("ct_editor_module_i0",
                             &ct_editor_module_i0);
 
     _new_editor((struct ct_resource_id) {.i128={0}});
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+    ce_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
                            on_asset_double_click);
 
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         editor,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_render_graph_a0);
-            CT_INIT_API(api, ct_default_rg_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_default_rg_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

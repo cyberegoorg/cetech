@@ -12,43 +12,43 @@
 #define ECS_EBUS_NAME "ecs"
 
 #define PREFAB_NAME_PROP \
-    CT_ID64_0("prefab_filename", 0x74e7f49a67b7125fULL)
+    CE_ID64_0("prefab_filename", 0x74e7f49a67b7125fULL)
 
 #define EDITOR_COMPONENT \
-    CT_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
+    CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
 
 #define COMPONENT_I \
-    CT_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
+    CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
 #define ENTITY_INSTANCE \
-    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
+    CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
 #define ENTITY_RESOURCE \
-    CT_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
+    CE_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
 
 #define ENTITY_TYPE \
-    CT_ID64_0("entity_type", 0x61c464fe6c327f9fULL)
+    CE_ID64_0("entity_type", 0x61c464fe6c327f9fULL)
 
 #define ENTITY_DATA_IDX  \
-    CT_ID64_0("entity_data_idx", 0x1fa649061369a0eeULL)
+    CE_ID64_0("entity_data_idx", 0x1fa649061369a0eeULL)
 
 #define ENTITY_UID \
-    CT_ID64_0("entity_uid", 0xa3b266878c572abdULL)
+    CE_ID64_0("entity_uid", 0xa3b266878c572abdULL)
 
 #define ENTITY_NAME \
-    CT_ID64_0("name", 0xd4c943cba60c270bULL)
+    CE_ID64_0("name", 0xd4c943cba60c270bULL)
 
 #define ENTITY_WORLD \
-    CT_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
+    CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
 #define ENTITY_COMPONENTS \
-    CT_ID64_0("components", 0xe71d1687374e5a54ULL)
+    CE_ID64_0("components", 0xe71d1687374e5a54ULL)
 
 #define ENTITY_CHILDREN \
-    CT_ID64_0("children", 0x6fbb13de0e1dce0dULL)
+    CE_ID64_0("children", 0x6fbb13de0e1dce0dULL)
 
 #define ENTITY_RESOURCE_ID \
-    CT_ID64_0("entity", 0x9831ca893b0d087dULL)
+    CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
 
 enum {
@@ -93,7 +93,7 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
-typedef void ct_cdb_obj_o;
+typedef void ce_cdb_obj_o;
 //==============================================================================
 // Api
 //==============================================================================
@@ -102,7 +102,7 @@ typedef void ct_cdb_obj_o;
     "ct_component_i0"
 
 #define COMPONENT_INTERFACE \
-    CT_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
+    CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
 struct ct_component_i0 {
     uint64_t (*size)();
@@ -114,7 +114,7 @@ struct ct_component_i0 {
     void (*compiler)(const char *filename,
                      uint64_t *component_key,
                      uint32_t component_key_count,
-                     ct_cdb_obj_o *writer);
+                     ce_cdb_obj_o *writer);
 
     void (*spawner)(uint64_t obj,
                     void *data);
@@ -206,6 +206,6 @@ struct ct_ecs_a0 {
     struct ct_system_a0 *system;
 };
 
-CT_MODULE(ct_ecs_a0);
+CE_MODULE(ct_ecs_a0);
 
 #endif //CETECH_ECS_H

@@ -3,14 +3,14 @@
 //==============================================================================
 #include <string.h>
 
-#include <corelib/api_system.h>
-#include <corelib/log.h>
-#include <corelib/module.h>
-#include <corelib/ebus.h>
-#include <corelib/hashlib.h>
-#include <corelib/macros.h>
-#include <corelib/os.h>
-#include "corelib/allocator.h"
+#include <celib/api_system.h>
+#include <celib/log.h>
+#include <celib/module.h>
+#include <celib/ebus.h>
+#include <celib/hashlib.h>
+#include <celib/macros.h>
+#include <celib/os.h>
+#include "celib/allocator.h"
 
 #include <cetech/machine/machine.h>
 #include <cetech/kernel/kernel.h>
@@ -67,7 +67,7 @@ static uint32_t button_index(const char *button_name) {
 }
 
 static const char *button_name(const uint32_t button_index) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _btn_to_str[button_index];
@@ -75,7 +75,7 @@ static const char *button_name(const uint32_t button_index) {
 
 static int button_state(uint32_t idx,
                         const uint32_t button_index) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index];
@@ -83,7 +83,7 @@ static int button_state(uint32_t idx,
 
 static int button_pressed(uint32_t idx,
                           const uint32_t button_index) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
@@ -91,14 +91,14 @@ static int button_pressed(uint32_t idx,
 
 static int button_released(uint32_t idx,
                            const uint32_t button_index) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
     return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
 }
 
 static const char *axis_name(const uint32_t axis_index) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     return _axis_to_str[axis_index];
@@ -123,7 +123,7 @@ static uint32_t axis_index(const char *axis_name) {
 static void axis(uint32_t idx,
                  const uint32_t axis_index,
                  float *value) {
-    CETECH_ASSERT(LOG_WHERE,
+    CE_ASSERT(LOG_WHERE,
                   (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
     value[0] = _G.position[idx][axis_index][0];
@@ -137,25 +137,25 @@ static void play_rumble(uint32_t idx,
 }
 
 static void update(uint64_t _event) {
-    CT_UNUSED(_event);
+    CE_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
 
-    uint64_t *events = ct_ebus_a0->events(GAMEPAD_EBUS);
-    uint32_t events_n = ct_ebus_a0->event_count(GAMEPAD_EBUS);
+    uint64_t *events = ce_ebus_a0->events(GAMEPAD_EBUS);
+    uint32_t events_n = ce_ebus_a0->event_count(GAMEPAD_EBUS);
 
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
-        uint32_t button = ct_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
-        uint32_t axis = ct_cdb_a0->read_uint64(event, CONTROLER_AXIS, 0);
-        uint32_t gamepad_id = ct_cdb_a0->read_uint64(event, CONTROLER_ID, 0);
+        uint32_t button = ce_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
+        uint32_t axis = ce_cdb_a0->read_uint64(event, CONTROLER_AXIS, 0);
+        uint32_t gamepad_id = ce_cdb_a0->read_uint64(event, CONTROLER_ID, 0);
 
         float pos[3] = {};
-        ct_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
+        ce_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
 
-        switch (ct_cdb_a0->type(event)) {
+        switch (ce_cdb_a0->type(event)) {
             case EVENT_GAMEPAD_DOWN:
                 _G.state[gamepad_id][button] = 1;
                 break;
@@ -202,19 +202,19 @@ static struct ct_controlers_i0 ct_controlers_i0 = {
         .play_rumble = play_rumble,
 };
 
-static void _init_api(struct ct_api_a0 *api) {
+static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_controlers_i0", &ct_controlers_i0);
 }
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _init_api(api);
     _G = (struct _G) {};
 
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 1);
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 1);
 
-    ct_ebus_a0->create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
+    ce_ebus_a0->create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
 
-    ct_log_a0->debug(LOG_WHERE, "Init");
+    ce_log_a0->debug(LOG_WHERE, "Init");
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         _G.active[i] = ct_machine_a0->gamepad_is_active(i);
@@ -222,29 +222,29 @@ static void _init(struct ct_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ct_log_a0->debug(LOG_WHERE, "Shutdown");
+    ce_log_a0->debug(LOG_WHERE, "Shutdown");
 
-    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
+    ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
 
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         gamepad,
         {
-            CT_INIT_API(api, ct_machine_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ct_machine_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_cdb_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             _shutdown();
 

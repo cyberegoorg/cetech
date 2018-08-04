@@ -1,4 +1,4 @@
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/debugui.h>
@@ -10,26 +10,26 @@
 #include <cetech/editor/asset_preview.h>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/editor/editor.h>
-#include <corelib/hash.inl>
-#include <corelib/fmath.inl>
-#include <corelib/ebus.h>
+#include <celib/hash.inl>
+#include <celib/fmath.inl>
+#include <celib/ebus.h>
 #include <cetech/gfx/render_graph.h>
 #include <cetech/gfx/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/editor/selected_object.h>
 #include <cetech/controlers/controlers.h>
 
-#include "corelib/hashlib.h"
-#include "corelib/config.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/hashlib.h"
+#include "celib/config.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 
 #define _G AssetPreviewGlobals
 
 static struct _G {
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
 
     struct ct_resource_id active_asset;
 
@@ -56,8 +56,8 @@ static void fps_camera_update(struct ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CT_UNUSED(dx);
-    CT_UNUSED(dy);
+    CE_UNUSED(dx);
+    CE_UNUSED(dy);
 
     float wm[16];
 
@@ -65,12 +65,12 @@ static void fps_camera_update(struct ct_world world,
     transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
                                                   camera_ent);
 
-    ct_mat4_move(wm, transform->world);
+    ce_mat4_move(wm, transform->world);
 
     float x_dir[4];
     float z_dir[4];
-    ct_vec4_move(x_dir, &wm[0 * 4]);
-    ct_vec4_move(z_dir, &wm[2 * 4]);
+    ce_vec4_move(x_dir, &wm[0 * 4]);
+    ce_vec4_move(z_dir, &wm[2 * 4]);
 
     if (!fly_mode) {
         z_dir[1] = 0.0f;
@@ -80,24 +80,24 @@ static void fps_camera_update(struct ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
 
     float pos[3] = {0};
-    ct_vec3_add(transform->position, pos, x_dir_new);
-    ct_vec3_add(pos, pos, z_dir_new);
+    ce_vec3_add(transform->position, pos, x_dir_new);
+    ce_vec3_add(pos, pos, z_dir_new);
 
     uint64_t ent_obj = camera_ent.h;
-    uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
+    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
                                                     ENTITY_COMPONENTS, 0);
 
-    uint64_t component = ct_cdb_a0->read_subobject(components,
+    uint64_t component = ce_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
-    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ce_cdb_a0->write_commit(w);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -149,8 +149,8 @@ static struct ct_asset_preview_i0* _get_asset_preview(uint64_t asset_type) {
 }
 
 static void set_asset(uint64_t event) {
-    uint64_t asset_type = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t asset_name = ct_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t asset_type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
+    uint64_t asset_name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
 
     struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
@@ -185,7 +185,7 @@ static bool init() {
     _G.visible = true;
     _G.world = ct_ecs_a0->entity->create_world();
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
-                                             ct_hashlib_a0->id64("content/camera"));
+                                             ce_id_a0->id64("content/camera"));
 
     _G.render_graph = ct_render_graph_a0->create_graph();
     _G.render_graph_builder = ct_render_graph_a0->create_builder();
@@ -210,7 +210,7 @@ static void on_render() {
 static void update(float dt) {
     uint64_t selected_object = ct_selected_object_a0->selected_object();
     if (selected_object &&
-        (ct_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
+        (ce_cdb_a0->type(selected_object) == ASSET_BROWSER_ASSET_TYPE)) {
         set_asset(selected_object);
     }
 
@@ -283,9 +283,9 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 };
 
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system
+            .allocator = ce_memory_a0->system
     };
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
@@ -298,27 +298,27 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         asset_preview,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_dd_a0);
-            CT_INIT_API(api, ct_render_graph_a0);
-            CT_INIT_API(api, ct_default_rg_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_dd_a0);
+            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_default_rg_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

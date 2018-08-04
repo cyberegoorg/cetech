@@ -26,46 +26,46 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 int* array = NULL;
 
-ct_array_push(array, 1, ct_memory_a0->system);
-ct_array_push(array, 2, ct_memory_a0->system);
-ct_array_push(array, 3, ct_memory_a0->system);
-ct_array_push(array, 4, ct_memory_a0->system);
+ce_array_push(array, 1, ce_memory_a0->system);
+ce_array_push(array, 2, ce_memory_a0->system);
+ce_array_push(array, 3, ce_memory_a0->system);
+ce_array_push(array, 4, ce_memory_a0->system);
 
-const uint32_t n = ct_array_size(array);
+const uint32_t n = ce_array_size(array);
 for(uint32_t i = i; i < n; ++i) {
     printf("%d\n", array[i]);
 }
 
-ct_array_free(array, ct_memory_a0->system);
+ce_array_free(array, ce_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Array as char buffer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 char* buffer = NULL;
 
-ct_array_push(buffer, 'h', ct_memory_a0->system);
-ct_array_push(buffer, 'e', ct_memory_a0->system);
-ct_array_push(buffer, 'l', ct_memory_a0->system);
-ct_array_push(buffer, 'l', ct_memory_a0->system);
-ct_array_push(buffer, 'o', ct_memory_a0->system);
-ct_array_push(buffer, '\0', ct_memory_a0->system);
+ce_array_push(buffer, 'h', ce_memory_a0->system);
+ce_array_push(buffer, 'e', ce_memory_a0->system);
+ce_array_push(buffer, 'l', ce_memory_a0->system);
+ce_array_push(buffer, 'l', ce_memory_a0->system);
+ce_array_push(buffer, 'o', ce_memory_a0->system);
+ce_array_push(buffer, '\0', ce_memory_a0->system);
 
 printf("%s\n", buffer);
 
-ct_array_free(buffer, ct_memory_a0->system);
+ce_array_free(buffer, ce_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Array as string buffer
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 char* buffer = NULL;
 
-ct_array_push_n(buffer, "Hello", strlen("Hello"), ct_memory_a0->system);
-ct_array_push_n(buffer, ", ", strlen(", "), ct_memory_a0->system);
-ct_array_push_n(buffer, "world.", strlen("world."), ct_memory_a0->system);
+ce_array_push_n(buffer, "Hello", strlen("Hello"), ce_memory_a0->system);
+ce_array_push_n(buffer, ", ", strlen(", "), ce_memory_a0->system);
+ce_array_push_n(buffer, "world.", strlen("world."), ce_memory_a0->system);
 
 printf("%s\n", buffer); // hello, world.
 
-ct_array_free(buffer, ct_memory_a0->system);
+ce_array_free(buffer, ce_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Struct memory "pool"
@@ -77,8 +77,8 @@ struct object {
 object* pool = NULL;
 
 static uint32_t _new_object(struct object obj) {
-    uint32_t idx = ct_array_size(pool);
-    ct_array_push(pool, obj, ct_memory_a0->system);
+    uint32_t idx = ce_array_size(pool);
+    ce_array_push(pool, obj, ce_memory_a0->system);
     return idx;
 }
 
@@ -90,16 +90,16 @@ printf("%d\n", pool[obj1].id); // 1
 printf("%d\n", pool[obj2].id); // 2
 printf("%d\n", pool[obj3].id); // 3
 
-ct_array_free(pool, ct_memory_a0->system);
+ce_array_free(pool, ce_memory_a0->system);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 # Struct
 
 
-## ct_array_header_t
+## ce_array_header_t
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_array_header_t {
+struct ce_array_header_t {
     uint32_t size;
     uint32_t capacity;
 };
@@ -110,57 +110,57 @@ Array header (pointer preambule)
 # Macro
 
 
-## ct_array_free
+## ce_array_free
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_free(a, alloc) 
+#define ce_array_free(a, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Free array.
 
 
-## ct_array_header
+## ce_array_header
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_header(a) 
+#define ce_array_header(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
-Get array [header](#ct_array_header_t).
+Get array [header](#ce_array_header_t).
 
 
-## ct_array_size
+## ce_array_size
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_size(a) 
+#define ce_array_size(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get array size.
 
 
-## ct_array_capacity
+## ce_array_capacity
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_capacity(a) 
+#define ce_array_capacity(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get array capacity.
 
 
-## ct_array_clean
+## ce_array_clean
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_clean(a) 
+#define ce_array_clean(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Clean array (only set size = 0)
 
 
-## ct_array_set_capacity
+## ce_array_set_capacity
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_set_capacity(a, c, alloc) 
+#define ce_array_set_capacity(a, c, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Set array capacity
 
 
-## ct_array_resize
+## ce_array_resize
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_resize(a, c, alloc) 
+#define ce_array_resize(a, c, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Resize array
@@ -174,65 +174,65 @@ Resize array
 Is array emty?
 
 
-## ct_array_any
+## ce_array_any
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_any(a) 
+#define ce_array_any(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Has array any element?
 
 
-## ct_array_full
+## ce_array_full
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_full(a) 
+#define ce_array_full(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Is array full?
 
 
-## ct_array_full_n
+## ce_array_full_n
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_full_n(a, n) 
+#define ce_array_full_n(a, n) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Is array full for n elemenets?
 
 
-## ct_array_push
+## ce_array_push
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_push(a, item, alloc) 
+#define ce_array_push(a, item, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Push value to array
 
 
-## ct_array_push_n
+## ce_array_push_n
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_push_n(a, items, n, alloc) 
+#define ce_array_push_n(a, items, n, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Push n values from items to array
 
 
-## ct_array_pop_front
+## ce_array_pop_front
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_pop_front(a) 
+#define ce_array_pop_front(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Pop element from front
 
 
-## ct_array_pop_back
+## ce_array_pop_back
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_pop_back(a) 
+#define ce_array_pop_back(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Pop element from back
 
 
-## ct_array_insert
+## ce_array_insert
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_insert(a, idx, v, alloc) 
+#define ce_array_insert(a, idx, v, alloc) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Insert element before element at *idx*
@@ -246,9 +246,9 @@ Insert element before element at *idx*
 Get front element
 
 
-## ct_array_back
+## ce_array_back
 ~~~~~~~~~~~~~~~~~~~~
-#define ct_array_back(a) 
+#define ce_array_back(a) 
 
 ~~~~~~~~~~~~~~~~~~~~
 Get back element
@@ -256,13 +256,13 @@ Get back element
 # Function
 
 
-## ct_array_grow
+## ce_array_grow
 ~~~~~~~~~~~~~~~~~~~~
-static inline void *ct_array_grow(void *array,
+static inline void *ce_array_grow(void *array,
                                   uint32_t capacity,
                                   size_t type_size,
                                   size_t type_align,
-                                  const struct ct_alloc *alloc,
+                                  const struct ce_alloc *alloc,
                                   const char *filename,
                                   uint32_t line) {
 

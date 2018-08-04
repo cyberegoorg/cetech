@@ -1,7 +1,7 @@
 project "cetech_develop"
 	kind "ConsoleApp"
 
-	use_corelib()
+	use_celib()
 
 	defines {
 		"CETECH_DEVELOP=1"

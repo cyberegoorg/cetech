@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 //==============================================================================
 // Typedefs
@@ -56,6 +56,6 @@ struct ct_editor_ui_a0 {
 };
 
 
-CT_MODULE(ct_editor_ui_a0);
+CE_MODULE(ct_editor_ui_a0);
 
 #endif //CETECH_EDITOR_UI_H

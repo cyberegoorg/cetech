@@ -2,41 +2,41 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <corelib/hashlib.h>
-#include <corelib/config.h>
-#include <corelib/memory.h>
-#include <corelib/api_system.h>
-#include <corelib/ydb.h>
-#include <corelib/array.inl>
-#include <corelib/module.h>
+#include <celib/hashlib.h>
+#include <celib/config.h>
+#include <celib/memory.h>
+#include <celib/api_system.h>
+#include <celib/ydb.h>
+#include <celib/array.inl>
+#include <celib/module.h>
 
 #include <cetech/editor/command_system.h>
-#include <corelib/hash.inl>
-#include <corelib/cdb.h>
+#include <celib/hash.inl>
+#include <celib/cdb.h>
 #include <cetech/gfx/debugui.h>
-#include <corelib/fmath.inl>
+#include <celib/fmath.inl>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/resource/builddb.h>
-#include <corelib/os.h>
+#include <celib/os.h>
 #include <cetech/editor/property_editor.h>
 #include <cetech/resource/resource.h>
 
 #include "cetech/editor/editor_ui.h"
 
 #define _SET_BOOL \
-    CT_ID64_0("set_bool", 0xc7b18e7df0217558ULL)
+    CE_ID64_0("set_bool", 0xc7b18e7df0217558ULL)
 
 #define _SET_STR \
-    CT_ID64_0("set_str", 0x5096c6f990f09debULL)
+    CE_ID64_0("set_str", 0x5096c6f990f09debULL)
 
 #define _SET_UINT64 \
-    CT_ID64_0("set_uint64", 0xdf40f6493b54f476ULL)
+    CE_ID64_0("set_uint64", 0xdf40f6493b54f476ULL)
 
 #define _SET_VEC3 \
-    CT_ID64_0("set_vec3", 0xc9710c4624eccfb0ULL)
+    CE_ID64_0("set_vec3", 0xc9710c4624eccfb0ULL)
 
 #define _SET_FLOAT \
-    CT_ID64_0("set_float", 0x3a22b9e23704ab12ULL)
+    CE_ID64_0("set_float", 0x3a22b9e23704ab12ULL)
 
 //static bool ui_select_asset(char *buffer,
 //                            const char *id,
@@ -69,7 +69,7 @@ static void ui_float(uint64_t obj,
     float value = 0;
     float value_new = 0;
 
-    value_new = ct_cdb_a0->read_float(obj, prop_key_hash, value_new);
+    value_new = ce_cdb_a0->read_float(obj, prop_key_hash, value_new);
     value = value_new;
 
     const float min = !max_f ? -FLT_MAX : min_f;
@@ -109,7 +109,7 @@ static void ui_bool(uint64_t obj,
     bool value = false;
     bool value_new = false;
 
-    value_new = ct_cdb_a0->read_bool(obj, prop_key_hash, value_new);
+    value_new = ce_cdb_a0->read_bool(obj, prop_key_hash, value_new);
     value = value_new;
 
     ct_debugui_a0->Text("%s", label);
@@ -146,7 +146,7 @@ static void ui_str(uint64_t obj,
 
     const char *value = 0;
 
-    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+    value = ce_cdb_a0->read_str(obj, prop_key_hash, NULL);
 
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
@@ -199,7 +199,7 @@ static void ui_str_combo(uint64_t obj,
 
     const char *value = 0;
 
-    value = ct_cdb_a0->read_str(obj, prop_key_hash, NULL);
+    value = ce_cdb_a0->read_str(obj, prop_key_hash, NULL);
 
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
@@ -213,8 +213,8 @@ static void ui_str_combo(uint64_t obj,
     const char *items2[items_count];
     for (int j = 0; j < items_count; ++j) {
         items2[j] = &items[j * 128];
-        if (ct_hashlib_a0->id64(items2[j]) ==
-            ct_hashlib_a0->id64(value)) {
+        if (ce_id_a0->id64(items2[j]) ==
+            ce_id_a0->id64(value)) {
             current_item = j;
         }
     }
@@ -261,7 +261,7 @@ static void ui_resource(uint64_t obj,
 
     char labelid[128] = {'\0'};
 
-    uint64_t value = ct_cdb_a0->read_uint64(obj, prop_key_hash, 0);
+    uint64_t value = ce_cdb_a0->read_uint64(obj, prop_key_hash, 0);
 
     uint64_t resource_obj = ct_resource_a0->get((struct ct_resource_id) {
             .type = resource_type,
@@ -270,7 +270,7 @@ static void ui_resource(uint64_t obj,
 
     char buffer[128] = {'\0'};
 
-    ct_builddb_a0->get_filename_type_name(buffer, CT_ARRAY_LEN(buffer),
+    ct_builddb_a0->get_filename_type_name(buffer, CE_ARRAY_LEN(buffer),
                                           resource_type, value);
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
@@ -307,11 +307,11 @@ static void ui_resource(uint64_t obj,
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
             if (drag_obj) {
-                uint64_t asset_type = ct_cdb_a0->read_uint64(drag_obj,
+                uint64_t asset_type = ce_cdb_a0->read_uint64(drag_obj,
                                                              ASSET_BROWSER_ASSET_TYPE2,
                                                              0);
 
-                uint64_t asset_name = ct_cdb_a0->read_uint64(drag_obj,
+                uint64_t asset_name = ce_cdb_a0->read_uint64(drag_obj,
                                                              ASSET_BROWSER_ASSET_NAME,
                                                              0);
 
@@ -356,8 +356,8 @@ static void ui_vec3(uint64_t obj,
     float value[3] = {0};
     float value_new[3] = {0};
 
-    ct_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
-    ct_vec3_move(value, value_new);
+    ce_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
+    ce_vec3_move(value, value_new);
 
     const float min = !min_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
@@ -414,9 +414,9 @@ static void set_vec3_cmd(const struct ct_cmd *cmd,
     const float *value = inverse ? pos_cmd->vec3.old_value
                                  : pos_cmd->vec3.new_value;
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
-    ct_cdb_a0->set_vec3(w, pos_cmd->prop, value);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(pos_cmd->obj);
+    ce_cdb_a0->set_vec3(w, pos_cmd->prop, value);
+    ce_cdb_a0->write_commit(w);
 }
 
 
@@ -426,9 +426,9 @@ static void set_float_cmd(const struct ct_cmd *cmd,
 
     const float value = inverse ? pos_cmd->f.old_value : pos_cmd->f.new_value;
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
-    ct_cdb_a0->set_float(w, pos_cmd->prop, value);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(pos_cmd->obj);
+    ce_cdb_a0->set_float(w, pos_cmd->prop, value);
+    ce_cdb_a0->write_commit(w);
 }
 
 static void set_uint64_cmd(const struct ct_cmd *cmd,
@@ -438,9 +438,9 @@ static void set_uint64_cmd(const struct ct_cmd *cmd,
     const uint64_t value = inverse ? pos_cmd->u64.old_value
                                    : pos_cmd->u64.new_value;
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
-    ct_cdb_a0->set_uint64(w, pos_cmd->prop, value);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(pos_cmd->obj);
+    ce_cdb_a0->set_uint64(w, pos_cmd->prop, value);
+    ce_cdb_a0->write_commit(w);
 }
 
 static void set_bool_cmd(const struct ct_cmd *cmd,
@@ -449,9 +449,9 @@ static void set_bool_cmd(const struct ct_cmd *cmd,
 
     const bool value = inverse ? pos_cmd->b.old_value : pos_cmd->b.new_value;
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
-    ct_cdb_a0->set_bool(w, pos_cmd->prop, value);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(pos_cmd->obj);
+    ce_cdb_a0->set_bool(w, pos_cmd->prop, value);
+    ce_cdb_a0->write_commit(w);
 }
 
 static void set_str_cmd(const struct ct_cmd *_cmd,
@@ -461,9 +461,9 @@ static void set_str_cmd(const struct ct_cmd *_cmd,
     const char *value = inverse ? pos_cmd->str.old_value
                                 : pos_cmd->str.new_value;
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(pos_cmd->obj);
-    ct_cdb_a0->set_str(w, pos_cmd->prop, value);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(pos_cmd->obj);
+    ce_cdb_a0->set_str(w, pos_cmd->prop, value);
+    ce_cdb_a0->write_commit(w);
 }
 
 static void cmd_description(char *buffer,
@@ -498,7 +498,7 @@ static void cmd_description(char *buffer,
     }
 }
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     ct_cmd_system_a0->register_cmd_execute(_SET_VEC3,
                                            (struct ct_cmd_fce) {
                                                    .execute = set_vec3_cmd,
@@ -530,21 +530,21 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         editor_ui,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_cmd_system_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ct_cmd_system_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

@@ -11,13 +11,13 @@
 #include <stdbool.h>
 
 
-struct ct_aabb;
-struct ct_cylinder;
-struct ct_capsule;
-struct ct_disk;
-struct ct_obb;
-struct ct_sphere;
-struct ct_cone;
+struct ce_aabb;
+struct ce_cylinder;
+struct ce_capsule;
+struct ce_disk;
+struct ce_obb;
+struct ce_sphere;
+struct ce_cone;
 
 //==============================================================================
 // Enums
@@ -129,25 +129,25 @@ struct ct_dd_a0 {
     void (*close)();
 
 
-    void (*draw_aabb)(const struct ct_aabb aabb);
+    void (*draw_aabb)(const struct ce_aabb aabb);
 
 
-    void (*draw_cylinder)(const struct ct_cylinder cylinder);
+    void (*draw_cylinder)(const struct ce_cylinder cylinder);
 
 
-    void (*draw_capsule)(const struct ct_capsule capsule);
+    void (*draw_capsule)(const struct ce_capsule capsule);
 
 
-    void (*draw_disk)(const struct ct_disk disk);
+    void (*draw_disk)(const struct ce_disk disk);
 
 
-    void (*draw_obb)(const struct ct_obb obb);
+    void (*draw_obb)(const struct ce_obb obb);
 
 
-    void (*draw_sphere)(const struct ct_sphere sphere);
+    void (*draw_sphere)(const struct ce_sphere sphere);
 
 
-    void (*draw_cone)(const struct ct_cone cone);
+    void (*draw_cone)(const struct ce_cone cone);
 
 
     void (*draw_geometry)(struct ct_dd_geometry handle);
@@ -249,6 +249,6 @@ struct ct_dd_a0 {
                      enum ct_dd_axis highlight);
 };
 
-CT_MODULE(ct_dd_a0);
+CE_MODULE(ct_dd_a0);
 
 #endif // CETECH_DEBUDRAW_H

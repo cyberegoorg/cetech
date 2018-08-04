@@ -2,21 +2,21 @@
 // Includes
 //==============================================================================
 
-#include <corelib/array.inl>
-#include <corelib/hash.inl>
+#include <celib/array.inl>
+#include <celib/hash.inl>
 
-#include <corelib/ebus.h>
-#include <corelib/api_system.h>
-#include <corelib/memory.h>
-#include <corelib/fs.h>
-#include <corelib/config.h>
-#include <corelib/os.h>
-#include <corelib/log.h>
+#include <celib/ebus.h>
+#include <celib/api_system.h>
+#include <celib/memory.h>
+#include <celib/fs.h>
+#include <celib/config.h>
+#include <celib/os.h>
+#include <celib/log.h>
 #include <cetech/resource/package.h>
-#include <corelib/module.h>
-#include <corelib/cdb.h>
+#include <celib/module.h>
+#include <celib/cdb.h>
 #include <cetech/kernel/kernel.h>
-#include <corelib/buffer.inl>
+#include <celib/buffer.inl>
 
 #include "include/SDL2/SDL.h"
 
@@ -34,15 +34,15 @@
 //==============================================================================
 
 struct _G {
-    struct ct_hash_t type_map;
+    struct ce_hash_t type_map;
 
     bool autoload_enabled;
 
-    struct ct_cdb_t db;
+    struct ce_cdb_t db;
     uint64_t resource_db;
 
     uint64_t config;
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
 } _G = {};
 
 //==============================================================================
@@ -73,13 +73,13 @@ static void _resource_api_add(uint64_t name,
                               void *api) {
     struct ct_resource_i0 *ct_resource_i = api;
 
-    uint64_t type_obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), 0);
+    uint64_t type_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(_G.resource_db);
-    ct_cdb_a0->set_subobject(w, ct_resource_i->cdb_type(), type_obj);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_G.resource_db);
+    ce_cdb_a0->set_subobject(w, ct_resource_i->cdb_type(), type_obj);
+    ce_cdb_a0->write_commit(w);
 
-    ct_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
+    ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
                 _G.allocator);
 }
 
@@ -97,18 +97,18 @@ static void load_now(uint64_t type,
 static int can_get(uint64_t type,
                    uint64_t name) {
 
-    uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db, type, 0);
+    uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);
 
-    return ct_cdb_a0->prop_exist(type_obj, name);
+    return ce_cdb_a0->prop_exist(type_obj, name);
 }
 
 static int can_get_all(uint64_t type,
                        uint64_t *names,
                        size_t count) {
-    uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db, type, 0);
+    uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);
 
     for (size_t i = 0; i < count; ++i) {
-        if (!ct_cdb_a0->prop_exist(type_obj, names[i])) {
+        if (!ce_cdb_a0->prop_exist(type_obj, names[i])) {
             return 0;
         }
     }
@@ -117,7 +117,7 @@ static int can_get_all(uint64_t type,
 }
 
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
-    return (struct ct_resource_i0 *) ct_hash_lookup(&_G.type_map, type, 0);
+    return (struct ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
 
 static void load(uint64_t type,
@@ -143,7 +143,7 @@ static void load(uint64_t type,
             continue;
         };
 
-        uint64_t object = ct_cdb_a0->create_object(_G.db,
+        uint64_t object = ce_cdb_a0->create_object(_G.db,
                                                    resource_i->cdb_type());
         resource_objects[i] = object;
 
@@ -154,55 +154,55 @@ static void load(uint64_t type,
                 .type = type,
         };
 
-        type_name_string(build_name, CT_ARRAY_LEN(build_name), rid);
+        type_name_string(build_name, CE_ARRAY_LEN(build_name), rid);
 
         char filename[1024] = {};
-        resource_compiler_get_filename(filename, CT_ARRAY_LEN(filename), rid);
+        resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), rid);
 
-        ct_log_a0->debug("resource", "Loading resource %s from %s",
+        ce_log_a0->debug("resource", "Loading resource %s from %s",
                          filename, build_name);
 
 
         char *build_full = NULL;
-        ct_os_a0->path->join(&build_full,
+        ce_os_a0->path->join(&build_full,
                              _G.allocator, 2,
-                             ct_cdb_a0->read_str(_G.config,
+                             ce_cdb_a0->read_str(_G.config,
                                                  CONFIG_PLATFORM, ""),
                              build_name);
 
-        struct ct_vio *resource_file = ct_fs_a0->open(root_name,
+        struct ce_vio *resource_file = ce_fs_a0->open(root_name,
                                                       build_full,
                                                       FS_OPEN_READ);
 
-        ct_buffer_free(build_full, _G.allocator);
+        ce_buffer_free(build_full, _G.allocator);
 
         if (!resource_file) {
             continue;
         }
 
         resource_i->online(names[i], resource_file, object);
-        ct_fs_a0->close(resource_file);
+        ce_fs_a0->close(resource_file);
 
     }
 
-    uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db, type, 0);
-    ct_cdb_obj_o *w;
+    uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);
+    ce_cdb_obj_o *w;
     do {
-        w = ct_cdb_a0->write_begin(type_obj);
+        w = ce_cdb_a0->write_begin(type_obj);
         for (uint32_t i = 0; i < count; ++i) {
             if(!resource_objects[i]) continue;
 
             const uint64_t asset_name = names[i];
 
-            ct_cdb_a0->set_subobject(w, asset_name, resource_objects[i]);
+            ce_cdb_a0->set_subobject(w, asset_name, resource_objects[i]);
         }
-    } while (!ct_cdb_a0->write_try_commit(w));
+    } while (!ce_cdb_a0->write_try_commit(w));
 }
 
 static void unload(uint64_t type,
                    uint64_t *names,
                    size_t count) {
-    uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db, type, 0);
+    uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);
 
     struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
@@ -218,17 +218,17 @@ static void unload(uint64_t type,
                     .name = names[i],
             };
 
-            type_name_string(build_name, CT_ARRAY_LEN(build_name), rid);
+            type_name_string(build_name, CE_ARRAY_LEN(build_name), rid);
 
             char filename[1024] = {};
             resource_compiler_get_filename(filename,
-                                           CT_ARRAY_LEN(filename),
+                                           CE_ARRAY_LEN(filename),
                                            rid);
 
-            ct_log_a0->debug("resource", "Unload resource %s ", filename);
+            ce_log_a0->debug("resource", "Unload resource %s ", filename);
 
             uint64_t object;
-            object = ct_cdb_a0->read_subobject(type_obj, rid.name, 0);
+            object = ce_cdb_a0->read_subobject(type_obj, rid.name, 0);
 
             if (!object) {
                 continue;
@@ -240,7 +240,7 @@ static void unload(uint64_t type,
 }
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
-    uint64_t type_obj = ct_cdb_a0->read_subobject(_G.resource_db,
+    uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db,
                                                   resource_id.type, 0);
 
     if(!type_obj) {
@@ -248,26 +248,26 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
     }
 
     uint64_t object;
-    object = ct_cdb_a0->read_subobject(type_obj, resource_id.name, 0);
+    object = ce_cdb_a0->read_subobject(type_obj, resource_id.name, 0);
 
     if (!object) {
         char build_name[128] = {};
-        type_name_string(build_name, CT_ARRAY_LEN(build_name), resource_id);
+        type_name_string(build_name, CE_ARRAY_LEN(build_name), resource_id);
 
         if (_G.autoload_enabled) {
             char filename[1024] = {};
             resource_compiler_get_filename(filename,
-                                           CT_ARRAY_LEN(filename),
+                                           CE_ARRAY_LEN(filename),
                                            resource_id);
 
-            ct_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
+            ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
             load_now(resource_id.type, &resource_id.name, 1);
         } else {
             // TODO: fallback resource #205
-            CETECH_ASSERT(LOG_WHERE, false);
+            CE_ASSERT(LOG_WHERE, false);
         }
 
-        object = ct_cdb_a0->read_subobject(type_obj, resource_id.name, 0);
+        object = ce_cdb_a0->read_subobject(type_obj, resource_id.name, 0);
     }
 
     return object;
@@ -298,7 +298,7 @@ static void reload(uint64_t type,
 //
 //            char *filename = build_name;
 //#endif
-//            ct_log_a0->debug("resource", "Reload resource %s ", filename);
+//            ce_log_a0->debug("resource", "Reload resource %s ", filename);
 
 //            void *old_data = get(ptype, names[i]);
 //
@@ -358,74 +358,74 @@ static struct ct_package_a0 package_api = {
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 struct ct_package_a0 *ct_package_a0 = &package_api;
 
-static void _init_api(struct ct_api_a0 *api) {
+static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_resource_a0", &resource_api);
     api->register_api("ct_package_a0", &package_api);
 }
 
 
-static void _init_cvar(struct ct_config_a0 *config) {
+static void _init_cvar(struct ce_config_a0 *config) {
     _G = (struct _G) {};
 
-    ct_config_a0 = config;
-    _G.config = ct_config_a0->obj();
+    ce_config_a0 = config;
+    _G.config = ce_config_a0->obj();
 
-    ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config);
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_BUILD)) {
-        ct_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_BUILD)) {
+        ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
     }
-    ct_cdb_a0->write_commit(writer);
+    ce_cdb_a0->write_commit(writer);
 
 }
 
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _init_api(api);
-    _init_cvar(ct_config_a0);
+    _init_cvar(ce_config_a0);
 
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->obj(),
-            .db = ct_cdb_a0->db()
+            .allocator = ce_memory_a0->system,
+            .config = ce_config_a0->obj(),
+            .db = ce_cdb_a0->db()
     };
 
-    _G.resource_db = ct_cdb_a0->create_object(ct_cdb_a0->db(), 0);
+    _G.resource_db = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
-    ct_fs_a0->map_root_dir(BUILD_ROOT,
-                           ct_cdb_a0->read_str(_G.config, CONFIG_BUILD, ""),
+    ce_fs_a0->map_root_dir(BUILD_ROOT,
+                           ce_cdb_a0->read_str(_G.config, CONFIG_BUILD, ""),
                            false);
 
-    ct_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
+    ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
 
 }
 
 static void _shutdown() {
     package_shutdown();
 
-    ct_cdb_a0->destroy_db(_G.db);
+    ce_cdb_a0->destroy_db(_G.db);
 
-    ct_hash_free(&_G.type_map, _G.allocator);
+    ce_hash_free(&_G.type_map, _G.allocator);
 }
 
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         resourcesystem,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_fs_a0);
-            CT_INIT_API(api, ct_config_a0);
-            CT_INIT_API(api, ct_os_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_fs_a0);
+            CE_INIT_API(api, ce_config_a0);
+            CE_INIT_API(api, ce_os_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_cdb_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             _shutdown();
 

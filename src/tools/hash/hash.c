@@ -2,30 +2,30 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include <corelib/core.h>
-#include <corelib/log.h>
-#include <corelib/os.h>
-#include <corelib/memory.h>
-#include <corelib/allocator.h>
-#include <corelib/murmur_hash.inl>
-#include <corelib/hash.inl>
-#include <corelib/task.h>
+#include <celib/core.h>
+#include <celib/log.h>
+#include <celib/os.h>
+#include <celib/memory.h>
+#include <celib/allocator.h>
+#include <celib/murmur_hash.inl>
+#include <celib/hash.inl>
+#include <celib/task.h>
 
 #define SEED 0
 
-#define MACRO_BEGIN "CT_ID64_0(\""
+#define MACRO_BEGIN "CE_ID64_0(\""
 #define MACRO_LEN 11
-#define MACRO_TEMPLATE "CT_ID64_0(\"%.*s\", 0x%" PRIx64 "ULL)"
+#define MACRO_TEMPLATE "CE_ID64_0(\"%.*s\", 0x%" PRIx64 "ULL)"
 
 
 void process_file(void *data) {
     const char *filename = data;
 
-    ct_log_a0->info("hash", "Process file: %s", filename);
+    ce_log_a0->info("hash", "Process file: %s", filename);
 
-    struct ct_vio *file = ct_os_a0->vio->from_file(filename, VIO_OPEN_READ);
+    struct ce_vio *file = ce_os_a0->vio->from_file(filename, VIO_OPEN_READ);
     uint64_t size = file->size(file);
-    char *input_data = CT_ALLOC(ct_memory_a0->system, char, size + 1);
+    char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
     file->read(file, input_data, 1, size);
     file->close(file);
 
@@ -69,7 +69,7 @@ void process_file(void *data) {
         const uint32_t string_len = (uint32_t) (string_e - string_s);
         const uint32_t macro_len = (uint32_t) (macro_e - macro_s);
 
-        const uint64_t hash = ct_hash_murmur2_64(string_s, string_len, SEED);
+        const uint64_t hash = ce_hash_murmur2_64(string_s, string_len, SEED);
         sprintf(buffer, MACRO_TEMPLATE, string_len, string_s, hash);
 
         const uint32_t buffer_len = (uint32_t) strlen(buffer);
@@ -80,7 +80,7 @@ void process_file(void *data) {
 
         change = true;
         const int64_t extra = (int64_t) buffer_len - (int64_t) macro_len;
-        input_data = ct_memory_a0->system->call->reallocate(ct_memory_a0->system, input_data,
+        input_data = ce_memory_a0->system->call->reallocate(ce_memory_a0->system, input_data,
                                    (uint64_t) ((int64_t) size + extra + 1), 0,
                                    __FILE__, __LINE__);
         memmove(input_data + c + extra, input_data + c, size + 1 - c);
@@ -90,16 +90,16 @@ void process_file(void *data) {
     }
 
     if (change) {
-        file = ct_os_a0->vio->from_file(filename, VIO_OPEN_WRITE);
+        file = ce_os_a0->vio->from_file(filename, VIO_OPEN_WRITE);
         file->write(file, input_data, size, 1);
         file->close(file);
     }
 
-    CT_FREE(ct_memory_a0->system, input_data);
+    CE_FREE(ce_memory_a0->system, input_data);
 }
 
 void print_usage() {
-    ct_log_a0->info(
+    ce_log_a0->info(
             "doc", "%s",
 
             "usage: hash --source SOURCE_DIR\n"
@@ -131,8 +131,8 @@ int main(int argc,
         }
     }
 
-    struct ct_alloc *a = ct_memory_a0->system;
-    ct_log_a0->register_handler(ct_log_a0->stdout_handler, NULL);
+    struct ce_alloc *a = ce_memory_a0->system;
+    ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     if (printusage) {
         print_usage();
@@ -140,29 +140,28 @@ int main(int argc,
     }
 
 
-
-    ct_corelib_init();
+    ce_init();
 
     char **files;
     uint32_t files_count;
 
     const char *filter[] = {"*.c", "*.h", "*.inl", "*.cpp"};
-    ct_os_a0->path->list(source_dir, CETECH_ARR_ARG(filter),
+    ce_os_a0->path->list(source_dir, CE_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
-    struct ct_task_item tasks[files_count];
+    struct ce_task_item tasks[files_count];
 
-    struct ct_task_counter_t *counter = NULL;
+    struct ce_task_counter_t *counter = NULL;
 
     for (uint32_t i = 0; i < files_count; ++i) {
         tasks[i].data = files[i];
         tasks[i].work = process_file;
     }
 
-    ct_task_a0->add(tasks, files_count, &counter);
-    ct_task_a0->wait_for_counter(counter, 0);
+    ce_task_a0->add(tasks, files_count, &counter);
+    ce_task_a0->wait_for_counter(counter, 0);
 
-    ct_os_a0->path->list_free(files, files_count, a);
+    ce_os_a0->path->list_free(files, files_count, a);
 
-    ct_corelib_shutdown();
+    ce_shutdown();
 }

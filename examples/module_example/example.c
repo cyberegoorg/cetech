@@ -1,16 +1,16 @@
-#define CT_DYNAMIC_MODULE
+#define CE_DYNAMIC_MODULE
 
-#include <corelib/macros.h>
+#include <celib/macros.h>
 
-#include <corelib/log.h>
-#include <corelib/config.h>
-#include <corelib/module.h>
-#include <corelib/api_system.h>
-#include <corelib/hashlib.h>
+#include <celib/log.h>
+#include <celib/config.h>
+#include <celib/module.h>
+#include <celib/api_system.h>
+#include <celib/hashlib.h>
 
 #include <cetech/controlers/keyboard.h>
-#include <corelib/ebus.h>
-#include <corelib/cdb.h>
+#include <celib/ebus.h>
+#include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 
 #include <cetech/gfx/debugui.h>
@@ -31,21 +31,21 @@ static struct G {
 
 
 void update(uint64_t event) {
-    _G.dt = ct_cdb_a0->read_float(event, ct_hashlib_a0->id64("dt"), 0.0f);
+    _G.dt = ce_cdb_a0->read_float(event, ce_id_a0->id64("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {
-        ct_log_a0->info("example", "PO");
-        ct_log_a0->error("example", "LICE");
+        ce_log_a0->info("example", "PO");
+        ce_log_a0->error("example", "LICE");
     }
     ///ct_log_a0->debug("example", "%f", dt);
 }
 
 void module1(uint64_t event) {
-    CT_UNUSED(event)
+    CE_UNUSED(event);
 
     static bool visible = true;
     if (ct_debugui_a0->BeginDock("Module 1", &visible, 0)) {
@@ -62,7 +62,7 @@ void module1(uint64_t event) {
 
             static float v[2] = {100.0f, 100.0f};
             if(ct_debugui_a0->Button("sjdoiasjwww", v)) {
-                ct_log_a0->debug("dasdsa", "dsadsdsadsadsadasd");
+                ce_log_a0->debug("dasdsa", "dsadsdsadsadsadasd");
             }
 
 //        static float col[4] = {0.0f, 1.0f, 0.0f, 0.0f};
@@ -82,7 +82,7 @@ void module1(uint64_t event) {
         float size[2] = {};
         ct_debugui_a0->GetWindowSize(size);
         size[1] = size[0];
-        ct_debugui_a0->Image2(ct_texture_a0->get(ct_hashlib_a0->id64("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
+        ct_debugui_a0->Image2(ct_texture_a0->get(ce_id_a0->id64("content/scene/duck/duckCM")),//"content/scene/m4a1/m4_diff"
                              size,
                              (float[2]) {0.0f, 0.0f},
                              (float[2]) {1.0f, 1.0f},
@@ -109,24 +109,24 @@ void module2() {
 //==============================================================================
 // Module def
 //==============================================================================
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         example,
 
 //==============================================================================
 // Init api
 //==============================================================================
         {
-            CT_INIT_API(api, ct_controlers_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_renderer_a0);
-            CT_INIT_API(api, ct_ebus_a0);
+            CE_INIT_API(api, ct_controlers_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ce_ebus_a0);
 
-            CT_INIT_API(api, ct_ecs_a0);
-//            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_texture_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+//            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ct_texture_a0);
+            CE_INIT_API(api, ce_cdb_a0);
 
         },
 
@@ -134,12 +134,12 @@ CETECH_MODULE_DEF(
 // Load
 //==============================================================================
         {
-            CT_UNUSED(api);
+            CE_UNUSED(api);
 
-            ct_log_a0->info("example", "Init %d", reload);
+            ce_log_a0->info("example", "Init %d", reload);
 
-            ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 0);
-            ct_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1, 0);
+            ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 0);
+            ce_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1, 0);
 
 //            ct_debugui_a0->register_on_debugui(module1);
             //ct_debugui_a0->register_on_debugui(module2);
@@ -149,12 +149,12 @@ CETECH_MODULE_DEF(
 // Unload
 //==============================================================================
         {
-            CT_UNUSED(api);
+            CE_UNUSED(api);
 
-            ct_log_a0->info("example", "Shutdown %d", reload);
+            ce_log_a0->info("example", "Shutdown %d", reload);
 
-            ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
-            ct_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1);
+            ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
+            ce_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1);
 //            ct_debugui_a0->unregister_on_debugui(module1);
 //            ct_debugui_a0->unregister_on_debugui(module2);
         }

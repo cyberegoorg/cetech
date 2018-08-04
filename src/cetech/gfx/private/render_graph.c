@@ -2,16 +2,16 @@
 // includes
 //==============================================================================
 
-#include <corelib/allocator.h>
-#include <corelib/api_system.h>
-#include <corelib/memory.h>
-#include <corelib/module.h>
-#include <corelib/hashlib.h>
-#include <corelib/array.inl>
+#include <celib/allocator.h>
+#include <celib/api_system.h>
+#include <celib/memory.h>
+#include <celib/module.h>
+#include <celib/hashlib.h>
+#include <celib/array.inl>
 #include <cetech/gfx/renderer.h>
-#include <corelib/hash.inl>
+#include <celib/hash.inl>
 #include <cetech/gfx/renderer.h>
-#include <corelib/ebus.h>
+#include <celib/ebus.h>
 #include <cetech/gfx/debugdraw.h>
 
 
@@ -31,7 +31,7 @@ static struct _G {
 
     uint8_t viewid;
 
-    struct ct_alloc *alloc;
+    struct ce_alloc *alloc;
 } _G;
 
 #include "graph.h"
@@ -40,7 +40,7 @@ static struct _G {
 
 
 static void on_render(uint64_t event) {
-    CT_UNUSED(event);
+    CE_UNUSED(event);
 
     _G.viewid = 0;
 }
@@ -56,14 +56,14 @@ static struct ct_render_graph_a0 render_graph_api = {
 
 struct ct_render_graph_a0 *ct_render_graph_a0 = &render_graph_api;
 
-static void _init(struct ct_api_a0 *api) {
-    CT_UNUSED(api);
+static void _init(struct ce_api_a0 *api) {
+    CE_UNUSED(api);
     _G = (struct _G) {
-            .alloc = ct_memory_a0->system,
+            .alloc = ce_memory_a0->system,
     };
 
 
-    ct_ebus_a0->connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render,
+    ce_ebus_a0->connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render,
                         UINT32_MAX);
 
     api->register_api("ct_render_graph_a0", &render_graph_api);
@@ -73,22 +73,22 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         render_graph,
         {
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_renderer_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_dd_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_dd_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             _shutdown();
         }

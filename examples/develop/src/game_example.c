@@ -1,16 +1,16 @@
-#define CT_DYNAMIC_MODULE 1
+#define CE_DYNAMIC_MODULE 1
 
-#include <corelib/macros.h>
+#include <celib/macros.h>
 
-#include <corelib/log.h>
-#include <corelib/module.h>
-#include <corelib/api_system.h>
-#include <corelib/hashlib.h>
+#include <celib/log.h>
+#include <celib/module.h>
+#include <celib/api_system.h>
+#include <celib/hashlib.h>
 
 #include <cetech/controlers/keyboard.h>
-#include <corelib/ebus.h>
+#include <celib/ebus.h>
 
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 
 #include <cetech/gfx/debugui.h>
@@ -24,7 +24,7 @@
 #include <cetech/controlers/controlers.h>
 #include <string.h>
 #include <cetech/game_system/game_system.h>
-#include <corelib/fmath.inl>
+#include <celib/fmath.inl>
 
 static struct G {
     struct ct_world world;
@@ -36,10 +36,10 @@ static struct G {
 } _G;
 
 #define _CAMERA_ASSET \
-    CT_ID64_0("content/camera", 0x2d0dc3c05bc23f4fULL)
+    CE_ID64_0("content/camera", 0x2d0dc3c05bc23f4fULL)
 
 #define _LEVEL_ASSET \
-    CT_ID64_0("content/level2", 0x5da9fa42e78626dcULL)
+    CE_ID64_0("content/level2", 0x5da9fa42e78626dcULL)
 
 void init() {
     _G.world = ct_ecs_a0->entity->create_world();
@@ -66,28 +66,28 @@ void update(float dt) {
 
 
     if (keyboard->button_state(0, keyboard->button_index("v"))) {
-        ct_log_a0->info("example", "PO");
-        ct_log_a0->error("example", "LICE");
+        ce_log_a0->info("example", "PO");
+        ce_log_a0->error("example", "LICE");
     }
 
     struct ct_entity ent;
     ent = ct_ecs_a0->entity->find_by_name(_G.world, _G.level,
-                                          ct_hashlib_a0->id64("body"));
+                                          ce_id_a0->id64("body"));
 
     uint64_t ent_obj = ent.h;
-    uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
+    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
                                                     ENTITY_COMPONENTS, 0);
-    uint64_t component = ct_cdb_a0->read_subobject(components,
+    uint64_t component = ce_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
 
     float rot[3] = {0};
-    ct_cdb_a0->read_vec3(component, PROP_ROTATION, rot);
+    ce_cdb_a0->read_vec3(component, PROP_ROTATION, rot);
 
-    ct_vec3_add_s(rot, rot, 5.0f * dt);
+    ce_vec3_add_s(rot, rot, 5.0f * dt);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
-    ct_cdb_a0->set_vec3(w, PROP_ROTATION, rot);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+    ce_cdb_a0->set_vec3(w, PROP_ROTATION, rot);
+    ce_cdb_a0->write_commit(w);
 
     ct_ecs_a0->system->simulate(_G.world, dt);
 }
@@ -99,7 +99,7 @@ static void render() {
 }
 
 static uint64_t name() {
-    return ct_hashlib_a0->id64("default");
+    return ce_id_a0->id64("default");
 }
 
 static struct ct_render_graph_builder *render_graph_builder() {
@@ -122,35 +122,35 @@ struct ct_game_i0 game_i0 = {
 //==============================================================================
 // Init api
 //==============================================================================
-void CETECH_MODULE_INITAPI(example_develop)(struct ct_api_a0 *api) {
-    if (CT_DYNAMIC_MODULE) {
-        CT_INIT_API(api, ct_controlers_a0);
-        CT_INIT_API(api, ct_log_a0);
-        CT_INIT_API(api, ct_hashlib_a0);
-        CT_INIT_API(api, ct_renderer_a0);
-        CT_INIT_API(api, ct_ebus_a0);
-        CT_INIT_API(api, ct_ecs_a0);
-        CT_INIT_API(api, ct_render_graph_a0);
-        CT_INIT_API(api, ct_default_rg_a0);
-        CT_INIT_API(api, ct_cdb_a0);
-        CT_INIT_API(api, ct_game_system_a0);
+void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
+    if (CE_DYNAMIC_MODULE) {
+        CE_INIT_API(api, ct_controlers_a0);
+        CE_INIT_API(api, ce_log_a0);
+        CE_INIT_API(api, ce_id_a0);
+        CE_INIT_API(api, ct_renderer_a0);
+        CE_INIT_API(api, ce_ebus_a0);
+        CE_INIT_API(api, ct_ecs_a0);
+        CE_INIT_API(api, ct_render_graph_a0);
+        CE_INIT_API(api, ct_default_rg_a0);
+        CE_INIT_API(api, ce_cdb_a0);
+        CE_INIT_API(api, ct_game_system_a0);
     }
 }
 
-void CETECH_MODULE_LOAD (example_develop)(struct ct_api_a0 *api,
+void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
                                           int reload) {
-    CT_UNUSED(api);
+    CE_UNUSED(api);
 
-    ct_log_a0->info("example", "Init %d", reload);
+    ce_log_a0->info("example", "Init %d", reload);
 
     api->register_api(GAME_INTERFACE_NAME, &game_i0);
 
 }
 
-void CETECH_MODULE_UNLOAD (example_develop)(struct ct_api_a0 *api,
+void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,
                                             int reload) {
-    CT_UNUSED(api);
+    CE_UNUSED(api);
 
-    ct_log_a0->info("example", "Shutdown %d", reload);
+    ce_log_a0->info("example", "Shutdown %d", reload);
 }
 

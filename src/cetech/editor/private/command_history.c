@@ -2,16 +2,16 @@
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/editor/editor.h>
-#include <corelib/log.h>
+#include <celib/log.h>
 #include <cetech/editor/command_history.h>
 #include <cetech/editor/command_system.h>
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
+#include <celib/ebus.h>
+#include <celib/macros.h>
 
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 #include <cetech/editor/dock.h>
 #include <string.h>
 
@@ -31,10 +31,10 @@ static void ui_command_list() {
     char buffer2[128];
 
     for (uint32_t i = command_count; i > 0; --i) {
-        ct_cmd_system_a0->command_text(buffer2, CT_ARRAY_LEN(buffer2), i);
+        ct_cmd_system_a0->command_text(buffer2, CE_ARRAY_LEN(buffer2), i);
         const bool is_selected = current_idx == i;
 
-        snprintf(buffer, CT_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
+        snprintf(buffer, CE_ARRAY_LEN(buffer), "%s##cmd_%d", buffer2, i);
 
         if (ct_debugui_a0->Selectable(buffer, is_selected, 0,
                                       (float[2]) {0.0f})) {
@@ -65,7 +65,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true,
     };
@@ -78,23 +78,23 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         command_history,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_cmd_system_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_ebus_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_cmd_system_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ce_ebus_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

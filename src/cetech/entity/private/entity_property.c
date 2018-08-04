@@ -1,13 +1,13 @@
 #include <float.h>
 #include <stdio.h>
 
-#include <corelib/hashlib.h>
-#include <corelib/config.h>
-#include <corelib/memory.h>
-#include <corelib/api_system.h>
-#include <corelib/ydb.h>
-#include <corelib/array.inl>
-#include <corelib/module.h>
+#include <celib/hashlib.h>
+#include <celib/config.h>
+#include <celib/memory.h>
+#include <celib/api_system.h>
+#include <celib/ydb.h>
+#include <celib/array.inl>
+#include <celib/module.h>
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/resource/resource.h>
@@ -16,12 +16,12 @@
 #include <cetech/editor/property_editor.h>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
-#include <corelib/ebus.h>
-#include <corelib/fmath.inl>
+#include <celib/ebus.h>
+#include <celib/fmath.inl>
 #include <cetech/editor/command_system.h>
-#include <corelib/hash.inl>
+#include <celib/hash.inl>
 #include <cetech/editor/selected_object.h>
-#include <corelib/yng.h>
+#include <celib/yng.h>
 
 
 #define _G entity_property_global
@@ -31,14 +31,14 @@ static struct _G {
     struct ct_entity top_entity;
     struct ct_world active_world;
 
-    struct ct_hash_t components;
+    struct ce_hash_t components;
 
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
     uint64_t obj;
 } _G;
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ct_api_entry it = ct_api_a0->first(COMPONENT_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -46,14 +46,14 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
             return i;
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 
     return NULL;
 };
 
 static void draw_component(uint64_t obj) {
-    uint64_t type = ct_cdb_a0->type(obj);
+    uint64_t type = ce_cdb_a0->type(obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
     if (!c->get_interface) {
@@ -92,7 +92,7 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-    uint64_t obj_type = ct_cdb_a0->type(obj);
+    uint64_t obj_type = ce_cdb_a0->type(obj);
 
     if (ENTITY_RESOURCE == obj_type) {
 //        if (ct_debugui_a0->CollapsingHeader("Entity",
@@ -103,17 +103,17 @@ static void draw_ui(uint64_t obj) {
 //        }
 
         uint64_t components_obj;
-        components_obj = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+        components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
-        uint64_t n = ct_cdb_a0->prop_count(components_obj);
+        uint64_t n = ce_cdb_a0->prop_count(components_obj);
         uint64_t components_name[n];
-        ct_cdb_a0->prop_keys(components_obj, components_name);
+        ce_cdb_a0->prop_keys(components_obj, components_name);
 
         for (uint64_t j = 0; j < n; ++j) {
             uint64_t name = components_name[j];
 
             uint64_t c_obj;
-            c_obj = ct_cdb_a0->read_subobject(components_obj, name, 0);
+            c_obj = ce_cdb_a0->read_subobject(components_obj, name, 0);
 
             draw_component(c_obj);
         }
@@ -127,9 +127,9 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = draw_ui,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system
+            .allocator = ce_memory_a0->system
     };
 
     api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
@@ -139,27 +139,27 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         entity_property,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_resource_a0);
-            CT_INIT_API(api, ct_yng_a0);
-            CT_INIT_API(api, ct_ydb_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_cmd_system_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_resource_a0);
+            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_ydb_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_cmd_system_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

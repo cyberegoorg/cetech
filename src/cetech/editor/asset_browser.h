@@ -14,20 +14,20 @@
 #define ASSET_BROWSER_EBUS_NAME "asset_browser"
 
 #define ASSET_BROWSER_ASSET_TYPE \
-    CT_ID64_0("asset", 0xc6ed95f9933c4734ULL)
+    CE_ID64_0("asset", 0xc6ed95f9933c4734ULL)
 
 // TODO: RENAME
 #define ASSET_BROWSER_ASSET_TYPE2 \
-    CT_ID64_0("asset_type", 0x1f1f05db4e4dabbaULL)
+    CE_ID64_0("asset_type", 0x1f1f05db4e4dabbaULL)
 
 #define ASSET_BROWSER_ASSET_NAME \
-    CT_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
+    CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
 #define ASSET_BROWSER_PATH \
-    CT_ID64_0("path", 0xae70259f6415b584ULL)
+    CE_ID64_0("path", 0xae70259f6415b584ULL)
 
 #define ASSET_BROWSER_ROOT \
-    CT_ID64_0("root", 0xbccf91e5b6d543e9ULL)
+    CE_ID64_0("root", 0xbccf91e5b6d543e9ULL)
 
 #define ASSET_BROWSER_SOURCE \
     SOURCE_ROOT

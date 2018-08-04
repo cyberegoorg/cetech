@@ -1,9 +1,9 @@
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include <celib/ebus.h>
+#include <celib/macros.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 #include <cetech/gfx/debugui.h>
 
@@ -22,13 +22,13 @@ static struct _G {
 } _G;
 
 static void draw(uint64_t obj) {
-    struct ct_api_entry it = ct_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
         i->draw_ui(obj);
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 }
 
@@ -74,7 +74,7 @@ struct ct_property_editor_a0 property_editor_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
     };
@@ -87,18 +87,18 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         property_inspector,
         {
-            CT_INIT_API(api, ct_hashlib_a0);
+            CE_INIT_API(api, ce_id_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

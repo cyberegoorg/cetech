@@ -3,27 +3,27 @@
 //==============================================================================
 #include <cstdio>
 
-#include <corelib/allocator.h>
-#include <corelib/array.inl>
+#include <celib/allocator.h>
+#include <celib/array.inl>
 
-#include <corelib/api_system.h>
-#include <corelib/config.h>
-#include <corelib/macros.h>
-#include <corelib/module.h>
-#include <corelib/memory.h>
-#include <corelib/hashlib.h>
+#include <celib/api_system.h>
+#include <celib/config.h>
+#include <celib/macros.h>
+#include <celib/module.h>
+#include <celib/memory.h>
+#include <celib/hashlib.h>
 #include <cetech/kernel/kernel.h>
 
-#include <corelib/os.h>
+#include <celib/os.h>
 #include <cetech/resource/resource.h>
 
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/private/bgfx_imgui/imgui.h>
 #include <cetech/machine/machine.h>
-#include <corelib/private/api_private.h>
+#include <celib/private/api_private.h>
 #include <cetech/ecs/ecs.h>
-#include <corelib/ebus.h>
-#include <corelib/log.h>
+#include <celib/ebus.h>
+#include <celib/log.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
@@ -35,7 +35,7 @@
 #define _G RendererGlobals
 static struct _G {
     ct_renderender_on_render *on_render;
-    ct_window *main_window;
+    ce_window *main_window;
 
     uint64_t type;
 
@@ -46,7 +46,7 @@ static struct _G {
     bool vsync;
     bool need_reset;
     uint64_t config;
-    ct_alloc *allocator;
+    ce_alloc *allocator;
 } _G = {};
 
 
@@ -64,20 +64,20 @@ static uint32_t _get_reset_flags() {
 
 static void renderer_create() {
 
-    if (!ct_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ce_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
         uint32_t w, h;
-        w = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_X, 0);
-        h = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_Y, 0);
+        w = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_X, 0);
+        h = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ct_cdb_a0->read_uint64(_G.config, CONFIG_WID, 0);
+        intptr_t wid = ce_cdb_a0->read_uint64(_G.config, CONFIG_WID, 0);
 
         char title[128] = {};
-        snprintf(title, CT_ARRAY_LEN(title), "cetech");
+        snprintf(title, CE_ARRAY_LEN(title), "cetech");
 
         if (wid == 0) {
-            bool fullscreen = ct_cdb_a0->read_uint64(_G.config,
+            bool fullscreen = ce_cdb_a0->read_uint64(_G.config,
                                                      CONFIG_SCREEN_FULLSCREEN,
                                                      0) > 0;
 
@@ -86,7 +86,7 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ct_os_a0->window->create(
+            _G.main_window = ce_os_a0->window->create(
                     _G.allocator,
                     title,
                     WINDOWPOS_UNDEFINED,
@@ -95,7 +95,7 @@ static void renderer_create() {
                     flags);
 
         } else {
-            _G.main_window = ct_os_a0->window->create_from(_G.allocator,
+            _G.main_window = ce_os_a0->window->create_from(_G.allocator,
                                                            (void *) wid);
         }
     }
@@ -110,7 +110,7 @@ static void renderer_create() {
     bgfx_init_t init;
     bgfx_init_ctor(&init);
 
-    const char *rtype = ct_cdb_a0->read_str(ct_config_a0->obj(),
+    const char *rtype = ce_cdb_a0->read_str(ce_config_a0->obj(),
                                             CONFIG_RENDERER_TYPE, "");
 
 
@@ -126,15 +126,15 @@ static void renderer_create() {
 
             {.k = "",
                     .v =
-#if CT_PLATFORM_LINUX
+#if CE_PLATFORM_LINUX
                     BGFX_RENDERER_TYPE_OPENGL
-#elif CT_PLATFORM_OSX
+#elif CE_PLATFORM_OSX
                     BGFX_RENDERER_TYPE_OPENGL // metal in future
 #endif
             },
     };
 
-    for (int i = 0; i < CT_ARRAY_LEN(_str_to_render_type); ++i) {
+    for (int i = 0; i < CE_ARRAY_LEN(_str_to_render_type); ++i) {
         if (strcmp(rtype, _str_to_render_type[i].k) == 0) {
             init.type = _str_to_render_type[i].v;
             invalid = false;
@@ -143,7 +143,7 @@ static void renderer_create() {
     }
 
     if (invalid) {
-        ct_log_a0->error("renderer", "Invalid render type '%s', force to noop",
+        ce_log_a0->error("renderer", "Invalid render type '%s', force to noop",
                          rtype);
         init.type = BGFX_RENDERER_TYPE_NOOP;
     }
@@ -180,8 +180,8 @@ static void on_resize(uint64_t event) {
     _G.need_reset = 1;
 
 
-    _G.size_width = ct_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_WIDTH, 0);
-    _G.size_height = ct_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_HEIGHT, 0);
+    _G.size_width = ce_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_WIDTH, 0);
+    _G.size_height = ce_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_HEIGHT, 0);
 }
 
 static void on_render(uint64_t _event) {
@@ -191,11 +191,11 @@ static void on_render(uint64_t _event) {
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
 
-    uint64_t event = ct_cdb_a0->create_object(
-            ct_cdb_a0->db(),
+    uint64_t event = ce_cdb_a0->create_object(
+            ce_cdb_a0->db(),
             RENDERER_RENDER_EVENT);
 
-    ct_ebus_a0->broadcast(RENDERER_EBUS, event);
+    ce_ebus_a0->broadcast(RENDERER_EBUS, event);
 
 
     bgfx_frame(false);
@@ -769,95 +769,95 @@ static struct ct_renderer_a0 rendderer_api = {
 
 struct ct_renderer_a0 *ct_renderer_a0 = &rendderer_api;
 
-static void _init_api(struct ct_api_a0 *api) {
+static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_renderer_a0", &rendderer_api);
 }
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _init_api(api);
 
-    ct_api_a0 = api;
+    ce_api_a0 = api;
 
     _G = {
-            .allocator = ct_memory_a0->system,
-            .config = ct_config_a0->obj(),
+            .allocator = ce_memory_a0->system,
+            .config = ce_config_a0->obj(),
     };
 
-    ct_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
+    ce_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
                         on_render, RENDER_ORDER);
 
-    ct_cdb_obj_o *writer = ct_cdb_a0->write_begin(_G.config);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_X)) {
-        ct_cdb_a0->set_uint64(writer, CONFIG_SCREEN_X, 1024);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_X)) {
+        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_X, 1024);
     }
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_Y)) {
-        ct_cdb_a0->set_uint64(writer, CONFIG_SCREEN_Y, 768);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_Y)) {
+        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_Y, 768);
     }
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
-        ct_cdb_a0->set_uint64(writer, CONFIG_SCREEN_FULLSCREEN, 0);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
+        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_DAEMON)) {
-        ct_cdb_a0->set_uint64(writer, CONFIG_DAEMON, 0);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_DAEMON)) {
+        ce_cdb_a0->set_uint64(writer, CONFIG_DAEMON, 0);
     }
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_WID)) {
-        ct_cdb_a0->set_uint64(writer, CONFIG_WID, 0);
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_WID)) {
+        ce_cdb_a0->set_uint64(writer, CONFIG_WID, 0);
     }
 
-    if (!ct_cdb_a0->prop_exist(_G.config, CONFIG_RENDERER_TYPE)) {
-        ct_cdb_a0->set_str(writer, CONFIG_RENDERER_TYPE, "");
+    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_RENDERER_TYPE)) {
+        ce_cdb_a0->set_str(writer, CONFIG_RENDERER_TYPE, "");
     }
 
-    ct_cdb_a0->write_commit(writer);
+    ce_cdb_a0->write_commit(writer);
 
 
-    _G.vsync = ct_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
+    _G.vsync = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    CT_INIT_API(api, ct_os_a0);
+    CE_INIT_API(api, ce_os_a0);
 
-    ct_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
+    ce_ebus_a0->create_ebus("renderer", RENDERER_EBUS);
 
     renderer_create();
 
 }
 
 static void _shutdown() {
-    if (!ct_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
+    if (!ce_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
 
-        ct_array_free(_G.on_render, _G.allocator);
+        ce_array_free(_G.on_render, _G.allocator);
 
         bgfx_shutdown();
     }
 
-    ct_ebus_a0->disconnect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
+    ce_ebus_a0->disconnect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
 
     _G = {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         renderer,
         {
-            CT_INIT_API(api, ct_config_a0);
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_resource_a0);
-            CT_INIT_API(api, ct_machine_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_ebus_a0);
+            CE_INIT_API(api, ce_config_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_resource_a0);
+            CE_INIT_API(api, ct_machine_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ce_ebus_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
 
             _shutdown();
         }

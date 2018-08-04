@@ -26,7 +26,7 @@
 // For more information, please refer to <http://unlicense.org>
 
 #include <new> // placement new
-#include <corelib/macros.h>
+#include <celib/macros.h>
 
 namespace ImGui
 {
@@ -1050,7 +1050,7 @@ namespace ImGui
 			return idx < 0 ? NULL : m_docks[(int)idx];
 		}
 
-        void saveToYaml(char** buffer, ct_alloc* alloc) {
+        void saveToYaml(char** buffer, ce_alloc* alloc) {
             static const char *DOCK_ENTRY_TEMPLATE = "%d: \n"
                     "  index: %d\n"
                     "  label: %s\n"
@@ -1074,28 +1074,28 @@ namespace ImGui
                 const char* label = strlen(dock.label) > 0 ? dock.label : "\"\"";
                 const char* location = strlen(dock.location) > 0 ? dock.location : "\"\"";
 
-                ct_buffer_printf(buffer,alloc,
-                                 DOCK_ENTRY_TEMPLATE,
-                                 i,
-                                 i,
-                                 label,
-                                 (int) dock.pos.x,
-                                 (int) dock.pos.y,
-                                 location,
-                                 (int) dock.size.x,
-                                 (int) dock.size.y,
-                                 (int) dock.status,
-                                 (int) dock.active,
-                                 (int) dock.opened,
-                                 (int) getDockIndex(dock.prev_tab),
-                                 (int) getDockIndex(dock.next_tab),
-                                 (int) getDockIndex(dock.children[0]),
-                                 (int) getDockIndex(dock.children[1]),
-                                 (int) getDockIndex(dock.parent));
+				ce_buffer_printf(buffer, alloc,
+								 DOCK_ENTRY_TEMPLATE,
+								 i,
+								 i,
+								 label,
+								 (int) dock.pos.x,
+								 (int) dock.pos.y,
+								 location,
+								 (int) dock.size.x,
+								 (int) dock.size.y,
+								 (int) dock.status,
+								 (int) dock.active,
+								 (int) dock.opened,
+								 (int) getDockIndex(dock.prev_tab),
+								 (int) getDockIndex(dock.next_tab),
+								 (int) getDockIndex(dock.children[0]),
+								 (int) getDockIndex(dock.children[1]),
+								 (int) getDockIndex(dock.parent));
             }
         }
 
-        void loadFromYaml(const char* path, struct ct_ydb_a0* ydb, struct ct_yng_a0* yng) {
+        void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_yng_a0* yng) {
             const uint32_t size = m_docks.size();
             for (uint32_t i = 0; i < size; ++i) {
                 m_docks[i]->~Dock();
@@ -1108,7 +1108,7 @@ namespace ImGui
             uint32_t type_keys_count = 0;
             ydb->get_map_keys(path,
                               &tmp_keys,1,
-                              type_keys, CT_ARRAY_LEN(type_keys),
+                              type_keys, CE_ARRAY_LEN(type_keys),
                               &type_keys_count);
 
             for (uint32_t i = 0; i < type_keys_count; ++i) {
@@ -1226,11 +1226,11 @@ namespace ImGui
 		s_dock->setDockActive();
 	}
 
-    IMGUI_API void saveToYaml(char** buffer, ct_alloc* alloc) {
+    IMGUI_API void saveToYaml(char** buffer, ce_alloc* alloc) {
         s_dock->saveToYaml(buffer, alloc);
     }
 
-    IMGUI_API void loadFromYaml(const char* path, struct ct_ydb_a0* ydb, struct ct_yng_a0* yng) {
+    IMGUI_API void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_yng_a0* yng) {
         s_dock->loadFromYaml(path, ydb, yng);
     }
 

@@ -96,7 +96,7 @@ end
 
 
 
-    dofile "corelib.lua"
+    dofile "celib.lua"
 
     dofile "tool_hash.lua"
     dofile "tool_doc.lua"

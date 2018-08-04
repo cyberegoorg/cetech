@@ -11,7 +11,7 @@
 
 
 #define RG_OUTPUT_TEXTURE \
-    CT_ID64_0("output", 0x759d549788b7b7e0ULL)
+    CE_ID64_0("output", 0x759d549788b7b7e0ULL)
 
 //==============================================================================
 // Typedefs
@@ -134,7 +134,7 @@ struct ct_render_graph_a0 {
     void (*destroy_builder)(struct ct_render_graph_builder *builder);
 };
 
-CT_MODULE(ct_render_graph_a0);
+CE_MODULE(ct_render_graph_a0);
 
 
 #endif //CETECH_RENDER_GRAPH_H

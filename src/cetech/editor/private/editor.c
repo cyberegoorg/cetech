@@ -1,16 +1,16 @@
 #include <stdio.h>
 
-#include <corelib/macros.h>
-#include <corelib/allocator.h>
-#include <corelib/fs.h>
-#include <corelib/os.h>
-#include <corelib/ydb.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include <celib/macros.h>
+#include <celib/allocator.h>
+#include <celib/fs.h>
+#include <celib/os.h>
+#include <celib/ydb.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/debugui.h>
@@ -18,7 +18,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/editor/command_system.h>
 #include <cetech/editor/action_manager.h>
-#include <corelib/ebus.h>
+#include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/gfx/render_graph.h>
 #include <cetech/editor/dock.h>
@@ -40,10 +40,10 @@ void reload_layout() {
 }
 
 #define _UNDO \
-    CT_ID64_0("undo", 0xd9c7f03561492eecULL)
+    CE_ID64_0("undo", 0xd9c7f03561492eecULL)
 
 #define _REDO \
-    CT_ID64_0("redo", 0x2b64b25d7febf67eULL)
+    CE_ID64_0("redo", 0x2b64b25d7febf67eULL)
 
 static float draw_main_menu() {
     float menu_height = 0;
@@ -52,11 +52,11 @@ static float draw_main_menu() {
     if (ct_debugui_a0->BeginMainMenuBar()) {
         if (ct_debugui_a0->BeginMenu("File", true)) {
             if (ct_debugui_a0->MenuItem("Reload", "Alt+r", false, true)) {
-                ct_module_a0->reload_all();
+                ce_module_a0->reload_all();
             }
 
             if (ct_debugui_a0->MenuItem("Save", "Alt+s", false, true)) {
-                ct_ydb_a0->save_all_modified();
+                ce_ydb_a0->save_all_modified();
             }
 
             if (ct_debugui_a0->MenuItem2("Debug", "F9", &debug, true)) {
@@ -64,10 +64,10 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
-                uint64_t event = ct_cdb_a0->create_object(
-                        ct_cdb_a0->db(),
+                uint64_t event = ce_cdb_a0->create_object(
+                        ce_cdb_a0->db(),
                         KERNEL_QUIT_EVENT);
-                ct_ebus_a0->broadcast(KERNEL_EBUS, event);
+                ce_ebus_a0->broadcast(KERNEL_EBUS, event);
 
             }
 
@@ -78,7 +78,7 @@ static float draw_main_menu() {
             char buffer[128];
             char buffer2[128];
 
-            ct_cmd_system_a0->undo_text(buffer2, CT_ARRAY_LEN(buffer2));
+            ct_cmd_system_a0->undo_text(buffer2, CE_ARRAY_LEN(buffer2));
             const char *shortcut;
 
             sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
@@ -90,7 +90,7 @@ static float draw_main_menu() {
             }
 
 
-            ct_cmd_system_a0->redo_text(buffer2, CT_ARRAY_LEN(buffer2));
+            ct_cmd_system_a0->redo_text(buffer2, CE_ARRAY_LEN(buffer2));
             shortcut = ct_action_manager_a0->shortcut_str(_REDO);
             sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
             if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
@@ -104,11 +104,11 @@ static float draw_main_menu() {
         if (ct_debugui_a0->BeginMenu("Window", true)) {
             if (ct_debugui_a0->BeginMenu("Layout", true)) {
                 if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
-                    struct ct_vio *f = ct_fs_a0->open(ASSET_BROWSER_SOURCE,
+                    struct ce_vio *f = ce_fs_a0->open(ASSET_BROWSER_SOURCE,
                                                       "core/default.dock_layout",
                                                       FS_OPEN_WRITE);
                     ct_debugui_a0->SaveDock(f);
-                    ct_fs_a0->close(f);
+                    ce_fs_a0->close(f);
                 }
 
                 if (ct_debugui_a0->MenuItem("Load", NULL, false, true)) {
@@ -119,32 +119,32 @@ static float draw_main_menu() {
 
             ct_debugui_a0->Separator();
 
-            struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
+            struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
             while (it.api) {
                 struct ct_dock_i0 *i = (it.api);
 
                 char title[128] = {0};
 
-                snprintf(title, CT_ARRAY_LEN(title), "%s %llu",
+                snprintf(title, CE_ARRAY_LEN(title), "%s %llu",
                          i->display_title(i), i->id);
 
                 ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
 
-                it = ct_api_a0->next(it);
+                it = ce_api_a0->next(it);
             }
 
             ct_debugui_a0->EndMenu();
         }
 
 
-        struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
+        struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
         while (it.api) {
             struct ct_dock_i0 *i = (it.api);
 
             if (i->draw_main_menu) {
                 i->draw_main_menu();
             }
-            it = ct_api_a0->next(it);
+            it = ce_api_a0->next(it);
         }
 
         if (ct_debugui_a0->BeginMenu("Help", true)) {
@@ -163,13 +163,13 @@ static float draw_main_menu() {
 }
 
 static void draw_all_docks() {
-    struct ct_api_entry it = ct_api_a0->first(DOCK_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
 
 
         char title[128] = {0};
-        snprintf(title, CT_ARRAY_LEN(title), "%s##%s_dock%llu",
+        snprintf(title, CE_ARRAY_LEN(title), "%s##%s_dock%llu",
                  i->display_title(i), i->name(i), i->id);
 
         if (ct_debugui_a0->BeginDock(title, &i->visible, i->dock_flag)) {
@@ -179,7 +179,7 @@ static void draw_all_docks() {
         }
         ct_debugui_a0->EndDock();
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 }
 
@@ -197,13 +197,13 @@ static void debugui_on_pass(void *inst,
 
 
 static void on_init(uint64_t _event) {
-    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
         if(i->init) {
             i->init();
         }
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 
     _G.render_graph = ct_render_graph_a0->create_graph();
@@ -222,7 +222,7 @@ static void on_init(uint64_t _event) {
 }
 
 static void on_shutdown(uint64_t _event) {
-    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -230,14 +230,14 @@ static void on_shutdown(uint64_t _event) {
             i->shutdown();
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 }
 
 static void on_update(float dt) {
     ct_action_manager_a0->check();
 
-    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -245,12 +245,12 @@ static void on_update(float dt) {
             i->update(dt);
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 }
 
 static void on_render() {
-    struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -258,7 +258,7 @@ static void on_render() {
             i->render();
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 
     _G.render_graph_builder->call->clear(_G.render_graph_builder);
@@ -285,7 +285,7 @@ static void on_ui(uint64_t _event) {
 }
 
 static uint64_t name(){
-    return ct_hashlib_a0->id64("editor");
+    return ce_id_a0->id64("editor");
 }
 
 static struct ct_render_graph_builder *render_graph_builder(){
@@ -301,59 +301,59 @@ struct ct_game_i0 editor_game_i0 = {
         .render_graph_builder = render_graph_builder
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .load_layout = true,
     };
 
     ct_action_manager_a0->register_action(
-            CT_ID64_0("undo", 0xd9c7f03561492eecULL),
+            CE_ID64_0("undo", 0xd9c7f03561492eecULL),
             "ctrl+z",
             ct_cmd_system_a0->undo
     );
 
     ct_action_manager_a0->register_action(
-            CT_ID64_0("redo", 0x2b64b25d7febf67eULL),
+            CE_ID64_0("redo", 0x2b64b25d7febf67eULL),
             "ctrl+shift+z",
             ct_cmd_system_a0->redo
     );
 
-    ct_api_a0->register_api(GAME_INTERFACE_NAME, &editor_game_i0);
+    ce_api_a0->register_api(GAME_INTERFACE_NAME, &editor_game_i0);
 
-    ct_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
+    ce_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
+    ce_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
 
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         playground,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_renderer_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_fs_a0);
-            CT_INIT_API(api, ct_ydb_a0);
-            CT_INIT_API(api, ct_action_manager_a0);
-            CT_INIT_API(api, ct_cmd_system_a0);
-            CT_INIT_API(api, ct_module_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_render_graph_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ce_fs_a0);
+            CE_INIT_API(api, ce_ydb_a0);
+            CE_INIT_API(api, ct_action_manager_a0);
+            CE_INIT_API(api, ct_cmd_system_a0);
+            CE_INIT_API(api, ce_module_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ce_cdb_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

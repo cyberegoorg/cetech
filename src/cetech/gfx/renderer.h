@@ -15,22 +15,22 @@
 #include <stdbool.h>
 
 #define CONFIG_RENDERER_TYPE \
-     CT_ID64_0("renderer.type", 0x3ee74a7da01daff0ULL)
+     CE_ID64_0("renderer.type", 0x3ee74a7da01daff0ULL)
 
 #define CONFIG_WID \
-     CT_ID64_0("screen.wid", 0xd950bcde34e3e4d7ULL)
+     CE_ID64_0("screen.wid", 0xd950bcde34e3e4d7ULL)
 
 #define CONFIG_SCREEN_X \
-     CT_ID64_0("screen.x", 0xa59339bef4754edaULL)
+     CE_ID64_0("screen.x", 0xa59339bef4754edaULL)
 
 #define CONFIG_SCREEN_Y \
-     CT_ID64_0("screen.y", 0xc3492a4e07168b7aULL)
+     CE_ID64_0("screen.y", 0xc3492a4e07168b7aULL)
 
 #define CONFIG_SCREEN_VSYNC \
-     CT_ID64_0("screen.vsync", 0xfe469e6d1c14c940ULL)
+     CE_ID64_0("screen.vsync", 0xfe469e6d1c14c940ULL)
 
 #define CONFIG_SCREEN_FULLSCREEN \
-     CT_ID64_0("screen.fullscreen", 0x613e9a6a17148a72ULL)
+     CE_ID64_0("screen.fullscreen", 0x613e9a6a17148a72ULL)
 
 //==============================================================================
 // Typedefs
@@ -1806,7 +1806,7 @@ struct ct_renderer_a0 {
 
 };
 
-CT_MODULE(ct_renderer_a0);
+CE_MODULE(ct_renderer_a0);
 
 #endif //CETECH_RENDERER_H
 //! \}

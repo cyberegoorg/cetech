@@ -2,24 +2,24 @@
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/editor/editor.h>
-#include <corelib/log.h>
+#include <celib/log.h>
 #include <cetech/editor/log_view.h>
 #include <cetech/gfx/private/ocornut-imgui/imgui.h>
-#include <corelib/array.inl>
-#include <corelib/ebus.h>
+#include <celib/array.inl>
+#include <celib/ebus.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 #include <cetech/editor/dock.h>
 
 #define WINDOW_NAME "Log view"
 #define LOG_FORMAT "%s -> %s"
 
 struct log_item {
-    enum ct_log_level level;
+    enum ce_log_level level;
     int offset;
 };
 
@@ -33,7 +33,7 @@ static struct _G {
     uint8_t level_mask;
 
     bool visible;
-    ct_alloc *allocator;
+    ce_alloc *allocator;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -57,7 +57,7 @@ static const char *_level_to_label[4] = {
 };
 
 
-static void log_handler(enum ct_log_level level,
+static void log_handler(enum ce_log_level level,
                         time_t time,
                         char worker_id,
                         const char *where,
@@ -69,17 +69,17 @@ static void log_handler(enum ct_log_level level,
 
     ++_G.level_counters[level];
 
-    int offset = ct_array_size(_G.line_buffer);
+    int offset = ce_array_size(_G.line_buffer);
     log_item item = {
             .level = level,
             .offset = offset
     };
 
     char buffer[1024];
-    int len = snprintf(buffer, CT_ARRAY_LEN(buffer), LOG_FORMAT, where, msg);
+    int len = snprintf(buffer, CE_ARRAY_LEN(buffer), LOG_FORMAT, where, msg);
 
-    ct_array_push(_G.log_items, item, _G.allocator);
-    ct_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
+    ce_array_push(_G.log_items, item, _G.allocator);
+    ce_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
 }
 
 
@@ -89,9 +89,9 @@ static void ui_filter() {
 
 static void ui_level_mask() {
     char buffer[64];
-    for (int i = 0; i < CT_ARRAY_LEN(_levels); ++i) {
+    for (int i = 0; i < CE_ARRAY_LEN(_levels); ++i) {
         int level = _levels[i];
-        snprintf(buffer, CT_ARRAY_LEN(buffer),
+        snprintf(buffer, CE_ARRAY_LEN(buffer),
                  _level_to_label[level], _G.level_counters[level]);
 
         bool active = (_G.level_mask & (1 << level)) > 0;
@@ -121,7 +121,7 @@ static void ui_log_items() {
                       ImVec2(0, -ImGui::GetTextLineHeightWithSpacing()),
                       false, ImGuiWindowFlags_HorizontalScrollbar);
 
-    const int size = ct_array_size(_G.log_items);
+    const int size = ce_array_size(_G.log_items);
     for (int i = size - 1; i >= 0; --i) {
         log_item *item = &_G.log_items[i];
         const char *line = &_G.line_buffer[item->offset];
@@ -166,41 +166,41 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .draw_ui = on_debugui,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = {
             .visible = true,
             .level_mask = (uint8_t) ~0,
-            .allocator = ct_memory_a0->system,
+            .allocator = ce_memory_a0->system,
     };
 
 
-    ct_log_a0->register_handler(log_handler, NULL);
+    ce_log_a0->register_handler(log_handler, NULL);
 
-    ct_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }
 
 static void _shutdown() {
-    ct_array_free(_G.log_items, _G.allocator);
-    ct_array_free(_G.line_buffer, _G.allocator);
+    ce_array_free(_G.log_items, _G.allocator);
+    ce_array_free(_G.line_buffer, _G.allocator);
     _G = {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         log_view,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_ebus_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ce_ebus_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

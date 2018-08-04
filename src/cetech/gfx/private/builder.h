@@ -9,7 +9,7 @@ struct render_graph_builder_pass {
 struct render_graph_builder_inst {
     struct render_graph_builder_pass *pass;
 
-    struct ct_hash_t texture_map;
+    struct ce_hash_t texture_map;
 
     uint16_t size[2];
 
@@ -36,7 +36,7 @@ static void builder_add_pass(void *inst,
                                                               true);
     }
 
-    ct_array_push(builder_inst->pass,
+    ce_array_push(builder_inst->pass,
                   ((struct render_graph_builder_pass) {
                           .pass = pass,
                           .layer = layer,
@@ -49,7 +49,7 @@ static void builder_execute(void *inst) {
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    const uint32_t pass_n = ct_array_size(builder_inst->pass);
+    const uint32_t pass_n = ce_array_size(builder_inst->pass);
     for (int i = 0; i < pass_n; ++i) {
         struct render_graph_builder_pass *pass = &builder_inst->pass[i];
 
@@ -71,7 +71,7 @@ static void builder_clear(void *inst) {
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    const uint32_t pass_n = ct_array_size(builder_inst->pass);
+    const uint32_t pass_n = ce_array_size(builder_inst->pass);
     for (int i = 0; i < pass_n; ++i) {
         struct render_graph_builder_pass *pass = &builder_inst->pass[i];
 
@@ -82,8 +82,8 @@ static void builder_clear(void *inst) {
         ct_renderer_a0->destroy_frame_buffer(pass->fb);
     }
 
-    ct_array_clean(builder_inst->pass);
-    ct_hash_clean(&builder_inst->texture_map);
+    ce_array_clean(builder_inst->pass);
+    ce_hash_clean(&builder_inst->texture_map);
     builder_inst->attachemnt_used = 0;
 }
 
@@ -126,7 +126,7 @@ static void builder_write(void *inst,
 
     builder_inst->attachemnt[idx] = th;
 
-    ct_hash_add(&builder_inst->texture_map, name, th.idx, _G.alloc);
+    ce_hash_add(&builder_inst->texture_map, name, th.idx, _G.alloc);
 }
 
 static void builder_read(void *inst,
@@ -140,7 +140,7 @@ struct ct_render_texture_handle builder_get_texture(void *inst,
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     return (struct ct_render_texture_handle) {
-            .idx = ct_hash_lookup(&builder_inst->texture_map, name, 0)};
+            .idx = ce_hash_lookup(&builder_inst->texture_map, name, 0)};
 }
 
 void builder_set_size(void *inst,
@@ -174,14 +174,14 @@ struct ct_render_graph_builder_fce render_graph_builder_api = {
 };
 
 static struct ct_render_graph_builder *create_render_builder() {
-    struct ct_render_graph_builder *obj = CT_ALLOC(_G.alloc,
+    struct ct_render_graph_builder *obj = CE_ALLOC(_G.alloc,
                                                    struct ct_render_graph_builder,
                                                    sizeof(struct ct_render_graph_builder));
 
-    ct_array_push(_G.render_graph_builder_pool,
+    ce_array_push(_G.render_graph_builder_pool,
                   (struct render_graph_builder_inst) {0},
                   _G.alloc);
-    struct render_graph_builder_inst *inst = &ct_array_back(
+    struct render_graph_builder_inst *inst = &ce_array_back(
             _G.render_graph_builder_pool);
 
     *obj = (struct ct_render_graph_builder) {

@@ -12,7 +12,7 @@
     "ct_editor_module_i0"
 
 #define EDITOR_MODULE_INTERFACE \
-    CT_ID64_0("ct_editor_module_i0", 0x761dbf8cf91061a1ULL)
+    CE_ID64_0("ct_editor_module_i0", 0x761dbf8cf91061a1ULL)
 
 struct ct_editor_module_i0 {
     bool (*init)();

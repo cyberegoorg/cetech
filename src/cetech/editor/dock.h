@@ -14,7 +14,7 @@ enum DebugUIWindowFlags_;
     "ct_dock_i0"
 
 #define DOCK_INTERFACE \
-    CT_ID64_0("ct_dock_i0", 0x3a3181c12a9e109fULL)
+    CE_ID64_0("ct_dock_i0", 0x3a3181c12a9e109fULL)
 
 struct ct_dock_i0 {
     uint64_t id;

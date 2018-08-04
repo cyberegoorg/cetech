@@ -57,7 +57,7 @@
             uint32_t type_keys_count = 0;
             ydb->get_map_keys(path,
                               &tmp_keys,1,
-                              type_keys,CT_ARRAY_LEN(type_keys),
+                              type_keys,CE_ARRAY_LEN(type_keys),
                               &type_keys_count);
 
             for (uint32_t i = 0; i < type_keys_count; ++i) {

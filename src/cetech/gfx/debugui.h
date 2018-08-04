@@ -10,11 +10,11 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include <corelib/macros.h>
-#include <corelib/module.inl>
+#include <celib/macros.h>
+#include <celib/module.inl>
 
 struct ct_render_texture_handle;
-struct ct_vio;
+struct ce_vio;
 
 //==============================================================================
 //
@@ -833,7 +833,7 @@ struct ct_debugui_a0 {
     void (*VSplitter)(const char *str_id,
                       float size[2]);
 
-    void (*SaveDock)(struct ct_vio *output);
+    void (*SaveDock)(struct ce_vio *output);
 
     void (*LoadDock)(const char *path);
 
@@ -923,6 +923,6 @@ struct ct_debugui_a0 {
 };
 
 
-CT_MODULE(ct_debugui_a0);
+CE_MODULE(ct_debugui_a0);
 
 #endif //!<CETECH_DEBUGUI_H

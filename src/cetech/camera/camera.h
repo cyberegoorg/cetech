@@ -10,25 +10,25 @@
 //==============================================================================
 
 #include <stddef.h>
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 #define CAMERA_COMPONENT \
-    CT_ID64_0("camera", 0x60ed8c3931822dc7ULL)
+    CE_ID64_0("camera", 0x60ed8c3931822dc7ULL)
 
 #define PROP_FOV \
-    CT_ID64_0("fov", 0x805726a3c8974fbdULL)
+    CE_ID64_0("fov", 0x805726a3c8974fbdULL)
 
 #define PROP_NEAR \
-    CT_ID64_0("near", 0xa1840af4acd01e77ULL)
+    CE_ID64_0("near", 0xa1840af4acd01e77ULL)
 
 #define PROP_FAR \
-    CT_ID64_0("far", 0xe8d4ceded45dd6acULL)
+    CE_ID64_0("far", 0xe8d4ceded45dd6acULL)
 
 #define PROP_PROJECTION \
-    CT_ID64_0("projection", 0x765e7da8e9078d46ULL)
+    CE_ID64_0("projection", 0x765e7da8e9078d46ULL)
 
 #define PROP_VIEW \
-    CT_ID64_0("view", 0x3fce6c347b7f5eedULL)
+    CE_ID64_0("view", 0x3fce6c347b7f5eedULL)
 
 
 struct ct_camera_component {
@@ -64,6 +64,6 @@ struct ct_camera_a0 {
 };
 
 
-CT_MODULE(ct_camera_a0);
+CE_MODULE(ct_camera_a0);
 
 #endif //CETECH_CAMERA_H

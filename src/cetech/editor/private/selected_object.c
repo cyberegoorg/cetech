@@ -1,14 +1,14 @@
 #include <stdio.h>
 
-#include <corelib/macros.h>
-#include <corelib/allocator.h>
-#include <corelib/fs.h>
-#include <corelib/os.h>
-#include <corelib/ydb.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include <celib/macros.h>
+#include <celib/allocator.h>
+#include <celib/fs.h>
+#include <celib/os.h>
+#include <celib/ydb.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 
 #include <cetech/editor/selected_object.h>
@@ -34,7 +34,7 @@ static struct ct_selected_object_a0 selcted_object_api = {
 
 struct ct_selected_object_a0 *ct_selected_object_a0 = &selcted_object_api;
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {};
 
     api->register_api("ct_selected_object_a0", &selcted_object_api);
@@ -45,18 +45,18 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         selected_object,
         {
 
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

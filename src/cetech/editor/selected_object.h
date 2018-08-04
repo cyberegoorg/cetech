@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 
 //==============================================================================
@@ -20,6 +20,6 @@ struct ct_selected_object_a0 {
     void (*set_selected_object)(uint64_t object);
 };
 
-CT_MODULE(ct_selected_object_a0);
+CE_MODULE(ct_selected_object_a0);
 
 #endif //CETECH_SELECTED_OBJECT_H

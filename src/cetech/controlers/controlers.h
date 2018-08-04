@@ -7,29 +7,29 @@
 //==============================================================================
 
 #include <stdint.h>
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 
 #define CONTROLERS_I \
-    CT_ID64_0("ct_controlers_i0", 0x38a3a48646b9f277ULL)
+    CE_ID64_0("ct_controlers_i0", 0x38a3a48646b9f277ULL)
 
 #define CONTROLER_BUTTON \
-    CT_ID64_0("button", 0x1e232360426fac96ULL)
+    CE_ID64_0("button", 0x1e232360426fac96ULL)
 
 #define CONTROLER_AXIS \
-    CT_ID64_0("axis", 0xeb6778864cd804e1ULL)
+    CE_ID64_0("axis", 0xeb6778864cd804e1ULL)
 
 #define CONTROLER_POSITION \
-    CT_ID64_0("position", 0x8bbeb160190f613aULL)
+    CE_ID64_0("position", 0x8bbeb160190f613aULL)
 
 #define CONTROLER_KEYCODE \
-    CT_ID64_0("keycode", 0xe8153a02000cbab3ULL)
+    CE_ID64_0("keycode", 0xe8153a02000cbab3ULL)
 
 #define CONTROLER_TEXT \
-    CT_ID64_0("text", 0x887e193c80929e7ULL)
+    CE_ID64_0("text", 0x887e193c80929e7ULL)
 
 #define CONTROLER_ID \
-    CT_ID64_0("id", 0xb0d09cc783d6a0ecULL)
+    CE_ID64_0("id", 0xb0d09cc783d6a0ecULL)
 
 
 //==============================================================================
@@ -104,6 +104,6 @@ struct ct_controlers_a0 {
     struct ct_controlers_i0* (*get)(uint64_t name);
 };
 
-CT_MODULE(ct_controlers_a0);
+CE_MODULE(ct_controlers_a0);
 
 #endif //CETECH_CONTROLERS_H

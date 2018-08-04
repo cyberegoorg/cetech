@@ -10,7 +10,7 @@
 #define GAMEPAD_EBUS_NAME "gamepad"
 
 #define CONTROLER_GAMEPAD \
-    CT_ID64_0("gamepad", 0x6aa699de487f71eeULL)
+    CE_ID64_0("gamepad", 0x6aa699de487f71eeULL)
 
 enum {
     GAMEPAD_EBUS = 0x3913b95f

@@ -1,28 +1,28 @@
 #undef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
-#include <corelib/cdb.h>
+#include <celib/cdb.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/debugui.h>
 #include <cetech/controlers/keyboard.h>
-#include <corelib/hashlib.h>
-#include <corelib/os.h>
-#include <corelib/fs.h>
-#include <corelib/array.inl>
+#include <celib/hashlib.h>
+#include <celib/os.h>
+#include <celib/fs.h>
+#include <celib/array.inl>
 #include <cetech/controlers/mouse.h>
-#include <corelib/log.h>
-#include <corelib/ebus.h>
+#include <celib/log.h>
+#include <celib/ebus.h>
 #include <cetech/controlers/controlers.h>
 
-#include "corelib/config.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include "celib/config.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 #include "imgui_wrap.inl"
 
 
 static struct DebugUIGlobal {
-    ct_alloc *allocator;
+    ce_alloc *allocator;
 } _G;
 
 static void render(uint8_t viewid) {
@@ -89,14 +89,14 @@ static void render(uint8_t viewid) {
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 
-    uint64_t event = ct_cdb_a0->create_object(ct_cdb_a0->db(),
+    uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                               DEBUGUI_EVENT);
 
-    ct_ebus_a0->broadcast(DEBUGUI_EBUS, event);
+    ce_ebus_a0->broadcast(DEBUGUI_EBUS, event);
     imguiEndFrame();
 }
 
-static void SaveDock(struct ct_vio *output) {
+static void SaveDock(struct ce_vio *output) {
     char *buffer = NULL;
     ImGui::saveToYaml(&buffer, _G.allocator);
 
@@ -104,7 +104,7 @@ static void SaveDock(struct ct_vio *output) {
 }
 
 static void LoadDock(const char *path) {
-    ImGui::loadFromYaml(path, ct_ydb_a0, ct_yng_a0);
+    ImGui::loadFromYaml(path, ce_ydb_a0, ce_yng_a0);
 }
 
 static struct ct_debugui_a0 debugui_api = {
@@ -280,15 +280,15 @@ static struct ct_debugui_a0 debugui_api = {
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     api->register_api("ct_debugui_a0", &debugui_api);
     imguiCreate(12);
 
     _G = {
-            .allocator = ct_memory_a0->system
+            .allocator = ce_memory_a0->system
     };
 
-    ct_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);
+    ce_ebus_a0->create_ebus("debugui", DEBUGUI_EBUS);
 
 
     struct ct_controlers_i0 *keyboard;
@@ -324,26 +324,26 @@ static void _shutdown() {
     _G = {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         debugui,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_renderer_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_fs_a0);
-            CT_INIT_API(api, ct_ydb_a0);
-            CT_INIT_API(api, ct_yng_a0);
-            CT_INIT_API(api, ct_log_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_cdb_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ct_renderer_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_fs_a0);
+            CE_INIT_API(api, ce_ydb_a0);
+            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_log_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ce_cdb_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

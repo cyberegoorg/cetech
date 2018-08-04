@@ -1,24 +1,24 @@
-#include "corelib/config.h"
+#include "celib/config.h"
 #include "cetech/resource/resource.h"
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
 
 
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
-#include <corelib/ydb.h>
-#include <corelib/macros.h>
-#include <corelib/array.inl>
-#include <corelib/fmath.inl>
-#include <corelib/ebus.h>
-#include <corelib/log.h>
+#include <celib/ydb.h>
+#include <celib/macros.h>
+#include <celib/array.inl>
+#include <celib/fmath.inl>
+#include <celib/ebus.h>
+#include <celib/log.h>
 #include <cetech/gfx/debugui.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <corelib/yng.h>
+#include <celib/yng.h>
 #include <cetech/editor/editor_ui.h>
 
-#include "corelib/module.h"
+#include "celib/module.h"
 
 #define LOG_WHERE "transform"
 
@@ -43,10 +43,10 @@ struct WorldInstance {
 
 #define _G TransformGlobal
 static struct _G {
-//    struct ct_hash_t world_map;
+//    struct ce_hash_t world_map;
 //    struct WorldInstance *world_instances;
-//    struct ct_hash_t ent_map;
-    struct ct_alloc *allocator;
+//    struct ce_hash_t ent_map;
+    struct ce_alloc *allocator;
 } _G;
 
 
@@ -70,7 +70,7 @@ static struct _G {
 
 
 //static void allocate(WorldInstance &_data,
-//                     ct_alloc *_allocator,
+//                     ce_alloc *_allocator,
 //                     uint32_t sz) {
 //    //assert(sz > _data.n);
 //
@@ -80,7 +80,7 @@ static struct _G {
 //                                 (2 * sizeof(float) * 3) +
 //                                 (sizeof(float) * 4) +
 //                                 (sizeof(float) * 16));
-//    new_data.buffer = CT_ALLOC(_allocator, char, bytes);
+//    new_data.buffer = CE_ALLOC(_allocator, char, bytes);
 //    new_data.n = _data.n;
 //    new_data.allocated = sz;
 //
@@ -107,21 +107,21 @@ static struct _G {
 //    memcpy(new_data.world_matrix, _data.world_matrix,
 //           _data.n * sizeof(float) * 16);
 //
-//    CT_FREE(_allocator, _data.buffer);
+//    CE_FREE(_allocator, _data.buffer);
 //
 //    _data = new_data;
 //}
 
 //static void _new_world(struct ct_world world) {
-//    uint32_t idx = ct_array_size(_G.world_instances);
-//    ct_array_push(_G.world_instances, WorldInstance(), _G.allocator);
+//    uint32_t idx = ce_array_size(_G.world_instances);
+//    ce_array_push(_G.world_instances, WorldInstance(), _G.allocator);
 //    _G.world_instances[idx].world = world;
-//    ct_hash_add(&_G.world_map, world.h, idx, _G.allocator);
+//    ce_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 //}
 
 
 //static WorldInstance *_get_world_instance(ct_world world) {
-//    uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
+//    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
 //
 //    if (idx != UINT32_MAX) {
 //        return &_G.world_instances[idx];
@@ -131,54 +131,54 @@ static struct _G {
 //}
 
 //static void _destroy_world(struct ct_world world) {
-//    uint32_t idx = ct_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
-//    uint32_t last_idx = ct_array_size(_G.world_instances) - 1;
+//    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
+//    uint32_t last_idx = ce_array_size(_G.world_instances) - 1;
 //
 //    struct ct_world last_world = _G.world_instances[last_idx].world;
 //
-//    CT_FREE(ct_memory_a0->system,
+//    CE_FREE(ce_memory_a0->system,
 //            _G.world_instances[idx].buffer);
 //
 //    _G.world_instances[idx] = _G.world_instances[last_idx];
-//    ct_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
-//    ct_array_pop_back(_G.world_instances);
+//    ce_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
+//    ce_array_pop_back(_G.world_instances);
 //}
 
 void _component_compiler(const char *filename,
                          uint64_t *component_key,
                          uint32_t component_key_count,
-                         ct_cdb_obj_o *writer) {
+                         ce_cdb_obj_o *writer) {
     struct ct_transform_comp t_data;
 
-    struct ct_yng_doc *d = ct_ydb_a0->get(filename);
+    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
     uint64_t key;
 
-    keys[component_key_count] = ct_yng_a0->key("scale");
-    key = ct_yng_a0->combine_key(keys, CT_ARRAY_LEN(keys));
+    keys[component_key_count] = ce_yng_a0->key("scale");
+    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0->get_vec3(filename, keys, CT_ARRAY_LEN(keys),
+        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.scale, (float[3]) {0});
-        ct_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
+        ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
     }
 
 
-    keys[component_key_count] = ct_yng_a0->key("position");
-    key = ct_yng_a0->combine_key(keys, CT_ARRAY_LEN(keys));
+    keys[component_key_count] = ce_yng_a0->key("position");
+    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0->get_vec3(filename, keys, CT_ARRAY_LEN(keys),
+        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.position, (float[3]) {0});
-        ct_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
+        ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
     }
 
-    keys[component_key_count] = ct_yng_a0->key("rotation");
-    key = ct_yng_a0->combine_key(keys, CT_ARRAY_LEN(keys));
+    keys[component_key_count] = ce_yng_a0->key("rotation");
+    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
     if (d->has_key(d, key)) {
-        ct_ydb_a0->get_vec3(filename, keys, CT_ARRAY_LEN(keys),
+        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.rotation, (float[3]) {0});
-        ct_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
+        ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
     }
 }
 
@@ -190,9 +190,9 @@ void transform_transform(struct ct_transform_comp *transform,
     float *sca = transform->scale;
 
     float rot_rad[3];
-    ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
+    ce_vec3_mul_s(rot_rad, rot, CE_DEG_TO_RAD);
 
-    ct_mat4_srt(transform->world,
+    ce_mat4_srt(transform->world,
                 sca[0], sca[1], sca[2],
                 rot_rad[0], rot_rad[1], rot_rad[2],
                 pos[0], pos[1], pos[2]);
@@ -204,10 +204,10 @@ static void _on_component_obj_change(uint64_t obj,
                                      uint32_t prop_count,
                                      void *data) {
 
-    uint64_t ent_obj = ct_cdb_a0->parent(ct_cdb_a0->parent(obj));
+    uint64_t ent_obj = ce_cdb_a0->parent(ce_cdb_a0->parent(obj));
 
     struct ct_world world = {
-            .h = ct_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
+            .h = ce_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
     };
 
     struct ct_entity ent = {.h = ent_obj};
@@ -216,9 +216,9 @@ static void _on_component_obj_change(uint64_t obj,
     transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
                                               ent);
 
-    ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
-    ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
-    ct_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
+    ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
+    ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
+    ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
 
     transform_transform(transform, NULL);
 }
@@ -228,13 +228,13 @@ static void _component_spawner(uint64_t obj,
                                void *data) {
     struct ct_transform_comp *transform = data;
 
-    ct_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
-    ct_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
-    ct_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
+    ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
+    ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
+    ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
 
     transform_transform(transform, NULL);
 
-    ct_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
+    ce_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
 }
 
 static uint64_t cdb_type() {
@@ -259,14 +259,14 @@ void guizmo_get_transform(uint64_t obj,
     float rot[3] = {0};
     float sca[3] = {0};
 
-    ct_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
-    ct_cdb_a0->read_vec3(obj, PROP_ROTATION, rot);
-    ct_cdb_a0->read_vec3(obj, PROP_SCALE, sca);
+    ce_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
+    ce_cdb_a0->read_vec3(obj, PROP_ROTATION, rot);
+    ce_cdb_a0->read_vec3(obj, PROP_SCALE, sca);
 
     float rot_rad[3];
-    ct_vec3_mul_s(rot_rad, rot, CT_DEG_TO_RAD);
+    ce_vec3_mul_s(rot_rad, rot, CE_DEG_TO_RAD);
 
-    ct_mat4_srt(world,
+    ce_mat4_srt(world,
                 sca[0], sca[1], sca[2],
                 rot_rad[0], rot_rad[1], rot_rad[2],
                 pos[0], pos[1], pos[2]);
@@ -281,19 +281,19 @@ void guizmo_set_transform(uint64_t obj,
     float scale[3] = {0};
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
-    struct ct_cdb_obj_t *w = ct_cdb_a0->write_begin(obj);
+    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(obj);
 
     switch (operation) {
         case TRANSLATE:
-            ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+            ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
             break;
 
         case ROTATE:
-            ct_cdb_a0->set_vec3(w, PROP_ROTATION, rot_deg);
+            ce_cdb_a0->set_vec3(w, PROP_ROTATION, rot_deg);
             break;
 
         case SCALE:
-            ct_cdb_a0->set_vec3(w, PROP_SCALE, scale);
+            ce_cdb_a0->set_vec3(w, PROP_SCALE, scale);
             break;
 
         default:
@@ -301,7 +301,7 @@ void guizmo_set_transform(uint64_t obj,
     }
 
 
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_a0->write_commit(w);
 }
 
 static void *get_interface(uint64_t name_hash) {
@@ -333,9 +333,9 @@ static struct ct_component_i0 ct_component_i0 = {
         .spawner = _component_spawner,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ct_memory_a0->system,
+            .allocator = ce_memory_a0->system,
 
     };
 
@@ -346,25 +346,25 @@ static void _shutdown() {
 
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         transform,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_yng_a0);
-            CT_INIT_API(api, ct_ydb_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_log_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_ydb_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ce_log_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

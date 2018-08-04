@@ -11,7 +11,7 @@ static void add_pass(void *inst,
     struct ct_render_graph_pass *p = pass;
     p->size = size;
 
-    ct_array_push_n(module_inst->pass, pass, size, _G.alloc);
+    ce_array_push_n(module_inst->pass, pass, size, _G.alloc);
 }
 
 static void module_on_setup(void *inst,
@@ -19,7 +19,7 @@ static void module_on_setup(void *inst,
     struct ct_render_graph_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
-    const uint32_t pass_n = ct_array_size(module_inst->pass);
+    const uint32_t pass_n = ce_array_size(module_inst->pass);
     for (int i = 0; i < pass_n;) {
         struct ct_render_graph_pass *pass = (struct ct_render_graph_pass *) &module_inst->pass[i];
         pass->on_setup(pass, builder);
@@ -34,14 +34,14 @@ struct ct_render_graph_module_fce render_graph_module_api = {
 };
 
 static struct ct_render_graph_module *create_module() {
-    struct ct_render_graph_module *obj = CT_ALLOC(_G.alloc,
+    struct ct_render_graph_module *obj = CE_ALLOC(_G.alloc,
                                                   struct ct_render_graph_module,
                                                   sizeof(struct ct_render_graph_module));
 
-    ct_array_push(_G.render_graph_module_pool,
+    ce_array_push(_G.render_graph_module_pool,
                   (struct render_graph_module_inst) {0}, _G.alloc);
 
-    struct render_graph_module_inst *inst = &ct_array_back(
+    struct render_graph_module_inst *inst = &ce_array_back(
             _G.render_graph_module_pool);
 
     *obj = (struct ct_render_graph_module) {

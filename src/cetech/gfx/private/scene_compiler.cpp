@@ -3,16 +3,16 @@
 //==============================================================================
 #include <time.h>
 
-#include <corelib/macros.h>
-#include <corelib/ydb.h>
-#include <corelib/array.inl>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include <corelib/os.h>
-#include <corelib/yng.h>
-#include <corelib/cdb.h>
-#include <corelib/config.h>
+#include <celib/macros.h>
+#include <celib/ydb.h>
+#include <celib/array.inl>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include <celib/os.h>
+#include <celib/yng.h>
+#include <celib/cdb.h>
+#include <celib/config.h>
 
 
 #include "cetech/machine/machine.h"
@@ -27,13 +27,13 @@
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
-#include <corelib/log.h>
+#include <celib/log.h>
 
 
 #define _G scene_compiler_globals
 
 struct _G {
-    struct ct_alloc *allocator;
+    struct ce_alloc *allocator;
 } _G;
 
 static const struct {
@@ -93,7 +93,7 @@ struct compile_output {
 
 struct compile_output *_crete_compile_output() {
     struct compile_output *output =
-            CT_ALLOC(_G.allocator, struct compile_output,
+            CE_ALLOC(_G.allocator, struct compile_output,
                      sizeof(struct compile_output));
     *output = {0};
 
@@ -101,29 +101,29 @@ struct compile_output *_crete_compile_output() {
 }
 
 static void _destroy_compile_output(struct compile_output *output) {
-    ct_array_free(output->geom_name, _G.allocator);
-    ct_array_free(output->ib_offset, _G.allocator);
-    ct_array_free(output->vb_offset, _G.allocator);
-    ct_array_free(output->vb_decl, _G.allocator);
-    ct_array_free(output->ib_size, _G.allocator);
-    ct_array_free(output->vb_size, _G.allocator);
-    ct_array_free(output->ib, _G.allocator);
-    ct_array_free(output->vb, _G.allocator);
-    ct_array_free(output->node_name, _G.allocator);
-    ct_array_free(output->geom_node, _G.allocator);
-    ct_array_free(output->node_parent, _G.allocator);
-    ct_array_free(output->node_pose, _G.allocator);
-    ct_array_free(output->node_str, _G.allocator);
-    ct_array_free(output->geom_str, _G.allocator);
+    ce_array_free(output->geom_name, _G.allocator);
+    ce_array_free(output->ib_offset, _G.allocator);
+    ce_array_free(output->vb_offset, _G.allocator);
+    ce_array_free(output->vb_decl, _G.allocator);
+    ce_array_free(output->ib_size, _G.allocator);
+    ce_array_free(output->vb_size, _G.allocator);
+    ce_array_free(output->ib, _G.allocator);
+    ce_array_free(output->vb, _G.allocator);
+    ce_array_free(output->node_name, _G.allocator);
+    ce_array_free(output->geom_node, _G.allocator);
+    ce_array_free(output->node_parent, _G.allocator);
+    ce_array_free(output->node_pose, _G.allocator);
+    ce_array_free(output->node_str, _G.allocator);
+    ce_array_free(output->geom_str, _G.allocator);
 
-    CT_FREE(_G.allocator, output);
+    CE_FREE(_G.allocator, output);
 }
 
 static void _type_to_attr_type(const char *name,
                                ct_render_attrib_type_t *attr_type,
                                size_t *size) {
 
-    for (uint32_t i = 0; i < CT_ARRAY_LEN(_attrin_tbl); ++i) {
+    for (uint32_t i = 0; i < CE_ARRAY_LEN(_attrin_tbl); ++i) {
         if (strcmp(_attrin_tbl[i].name, name) != 0) {
             continue;
         }
@@ -141,23 +141,23 @@ static void _type_to_attr_type(const char *name,
 static void _parse_vertex_decl(ct_render_vertex_decl_t *decl,
                                uint32_t *vertex_size,
                                ct_render_attrib type,
-                               ct_yng_node decl_node) {
+                               ce_yng_node decl_node) {
 
-    ct_yng_doc *d = decl_node.d;
+    ce_yng_doc *d = decl_node.d;
 
     uint64_t keys[] = {
             d->hash(d, decl_node),
-            ct_yng_a0->key("type"),
+            ce_yng_a0->key("type"),
     };
     const char *type_str = d->get_str(d,
-                                      ct_yng_a0->combine_key(keys,
-                                                             CT_ARRAY_LEN(
+                                      ce_yng_a0->combine_key(keys,
+                                                             CE_ARRAY_LEN(
                                                                      keys)),
                                       "");
 
-    keys[1] = ct_yng_a0->key("size");
-    float size = d->get_float(d, ct_yng_a0->combine_key(keys,
-                                                        CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("size");
+    float size = d->get_float(d, ce_yng_a0->combine_key(keys,
+                                                        CE_ARRAY_LEN(
                                                                 keys)),
                               0.0f);
     ct_render_attrib_type_t attrib_type;
@@ -173,20 +173,20 @@ static void _parse_vertex_decl(ct_render_vertex_decl_t *decl,
 
 
 static void _parese_types(ct_render_vertex_decl_t *decl,
-                          ct_yng_node types,
+                          ce_yng_node types,
                           uint32_t *vertex_size) {
-    ct_yng_doc *d = types.d;
+    ce_yng_doc *d = types.d;
 
-    for (uint32_t i = 0; i < CT_ARRAY_LEN(_chanel_types); ++i) {
+    for (uint32_t i = 0; i < CE_ARRAY_LEN(_chanel_types); ++i) {
 
         uint64_t keys[] = {
                 d->hash(d, types),
-                ct_yng_a0->key(_chanel_types[i].name),
+                ce_yng_a0->key(_chanel_types[i].name),
         };
 
-        ct_yng_node node = d->get(d,
-                                  ct_yng_a0->combine_key(keys,
-                                                         CT_ARRAY_LEN(
+        ce_yng_node node = d->get(d,
+                                  ce_yng_a0->combine_key(keys,
+                                                         CE_ARRAY_LEN(
                                                                  keys)));
         if (0 != node.idx) {
             _parse_vertex_decl(decl, vertex_size,
@@ -195,19 +195,19 @@ static void _parese_types(ct_render_vertex_decl_t *decl,
     }
 }
 
-static void _write_chanel(struct ct_yng_node node,
-                          struct ct_yng_node types,
+static void _write_chanel(struct ce_yng_node node,
+                          struct ce_yng_node types,
                           size_t i,
                           const char *name,
-                          struct ct_yng_node chanels_n,
+                          struct ce_yng_node chanels_n,
                           struct compile_output *output) {
 
     ct_render_attrib_type_t attrib_type;
     size_t v_size;
 
-    ct_yng_doc *d = node.d;
+    ce_yng_doc *d = node.d;
 
-    struct ct_yng_node idx_n = d->get_seq(d,
+    struct ce_yng_node idx_n = d->get_seq(d,
                                           d->hash(d, node), i);
 
     uint32_t idx = (uint32_t) (d->as_float(d, idx_n, 0.0f));
@@ -217,18 +217,18 @@ static void _write_chanel(struct ct_yng_node node,
     {
         uint64_t keys[] = {
                 d->hash(d, types),
-                ct_yng_a0->key(name),
-                ct_yng_a0->key("type"),
+                ce_yng_a0->key(name),
+                ce_yng_a0->key("type"),
         };
         type_str = d->get_str(d,
-                              ct_yng_a0->combine_key(keys, CT_ARRAY_LEN(keys)),
+                              ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys)),
                               "");
 
-        keys[2] = ct_yng_a0->key("size"),
+        keys[2] = ce_yng_a0->key("size"),
                 size = (uint32_t) d->get_float(d,
-                                               ct_yng_a0->combine_key(
+                                               ce_yng_a0->combine_key(
                                                        keys,
-                                                       CT_ARRAY_LEN(
+                                                       CE_ARRAY_LEN(
                                                                keys)),
                                                0.0f);
     }
@@ -238,40 +238,40 @@ static void _write_chanel(struct ct_yng_node node,
 
     uint64_t keys[] = {
             d->hash(d, chanels_n),
-            ct_yng_a0->key(name),
+            ce_yng_a0->key(name),
     };
-    uint64_t chanel_data_n = ct_yng_a0->combine_key(keys,
-                                                    CT_ARRAY_LEN(
+    uint64_t chanel_data_n = ce_yng_a0->combine_key(keys,
+                                                    CE_ARRAY_LEN(
                                                             keys));
 
     for (uint32_t k = 0; k < size; ++k) {
-        struct ct_yng_node n = d->get_seq(d, chanel_data_n,
+        struct ce_yng_node n = d->get_seq(d, chanel_data_n,
                                           (idx * size) + k);
         // TODO: ptype
         float v = d->as_float(d, n, 0.0f);
 
-        ct_array_push_n(output->vb, (uint8_t *) &v, sizeof(v), _G.allocator);
+        ce_array_push_n(output->vb, (uint8_t *) &v, sizeof(v), _G.allocator);
     }
 }
 
-static void foreach_geometries_clb(struct ct_yng_node key,
-                                   struct ct_yng_node value,
+static void foreach_geometries_clb(struct ce_yng_node key,
+                                   struct ce_yng_node value,
                                    void *_data) {
 
     struct compile_output *output = (compile_output *) _data;
-    ct_yng_doc *d = key.d;
+    ce_yng_doc *d = key.d;
 
     const char *name_str = d->as_string(d, key, "");
-    uint64_t name = ct_hashlib_a0->id64(name_str);
+    uint64_t name = ce_id_a0->id64(name_str);
 
     char tmp_name[128];
     strncpy(tmp_name, name_str, 127);
 
-    ct_array_push(output->geom_name, name, _G.allocator);
-    ct_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
-    ct_array_push(output->geom_node, 0, _G.allocator);
-    ct_array_push(output->ib_offset, ct_array_size(output->ib), _G.allocator);
-    ct_array_push(output->vb_offset, ct_array_size(output->vb), _G.allocator);
+    ce_array_push(output->geom_name, name, _G.allocator);
+    ce_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
+    ce_array_push(output->geom_node, 0, _G.allocator);
+    ce_array_push(output->ib_offset, ce_array_size(output->ib), _G.allocator);
+    ce_array_push(output->vb_offset, ce_array_size(output->vb), _G.allocator);
 
     // DECL
     ct_render_vertex_decl_t vertex_decl;
@@ -280,62 +280,62 @@ static void foreach_geometries_clb(struct ct_yng_node key,
 
     uint64_t keys[] = {
             d->hash(d, value),
-            ct_yng_a0->key("types"),
+            ce_yng_a0->key("types"),
     };
-    ct_yng_node types = d->get(d, ct_yng_a0->combine_key(keys,
-                                                         CT_ARRAY_LEN(
+    ce_yng_node types = d->get(d, ce_yng_a0->combine_key(keys,
+                                                         CE_ARRAY_LEN(
                                                                  keys)));
 
     uint32_t vertex_size = 0;
     _parese_types(&vertex_decl, types, &vertex_size);
 
     ct_renderer_a0->vertex_decl_end(&vertex_decl);
-    ct_array_push(output->vb_decl, vertex_decl, _G.allocator);
+    ce_array_push(output->vb_decl, vertex_decl, _G.allocator);
 
     // IB, VB
-    keys[1] = ct_yng_a0->key("chanels");
-    ct_yng_node chanels_n = d->get(d,
-                                   ct_yng_a0->combine_key(keys,
-                                                          CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("chanels");
+    ce_yng_node chanels_n = d->get(d,
+                                   ce_yng_a0->combine_key(keys,
+                                                          CE_ARRAY_LEN(
                                                                   keys)));
 
 
-    keys[1] = ct_yng_a0->key("indices");
-    uint64_t k = ct_yng_a0->combine_key(keys,
-                                        CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("indices");
+    uint64_t k = ce_yng_a0->combine_key(keys,
+                                        CE_ARRAY_LEN(
                                                 keys));
-    ct_yng_node indices_n = d->get(d, k);
+    ce_yng_node indices_n = d->get(d, k);
 
     keys[0] = k;
-    keys[1] = ct_yng_a0->key("size");
-    ct_yng_node i_size = d->get(d, ct_yng_a0->combine_key(keys,
-                                                          CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("size");
+    ce_yng_node i_size = d->get(d, ce_yng_a0->combine_key(keys,
+                                                          CE_ARRAY_LEN(
                                                                   keys)));
 
     uint32_t vertex_count = (uint32_t) d->as_float(d, i_size, 0.0f);
 
-    ct_array_push(output->ib_size, vertex_count, _G.allocator);
-    ct_array_push(output->vb_size, vertex_size * vertex_count, _G.allocator);
+    ce_array_push(output->ib_size, vertex_count, _G.allocator);
+    ce_array_push(output->vb_size, vertex_size * vertex_count, _G.allocator);
 
     for (uint32_t i = 0; i < vertex_count; ++i) {
-        for (uint32_t j = 0; j < CT_ARRAY_LEN(_chanel_types); ++j) {
+        for (uint32_t j = 0; j < CE_ARRAY_LEN(_chanel_types); ++j) {
             const char *name = _chanel_types[j].name;
 
             uint64_t keys[] = {
                     d->hash(d, indices_n),
-                    ct_yng_a0->key(name),
+                    ce_yng_a0->key(name),
             };
 
-            ct_yng_node node = d->get(d,
-                                      ct_yng_a0->combine_key(keys,
-                                                             CT_ARRAY_LEN(
+            ce_yng_node node = d->get(d,
+                                      ce_yng_a0->combine_key(keys,
+                                                             CE_ARRAY_LEN(
                                                                      keys)));
             if (0 != node.idx) {
                 _write_chanel(node, types, i, name, chanels_n, output);
             }
         }
 
-        ct_array_push(output->ib, i, _G.allocator);
+        ce_array_push(output->ib, i, _G.allocator);
     }
 }
 
@@ -345,58 +345,58 @@ struct foreach_graph_data {
     uint32_t parent_idx;
 };
 
-static void foreach_graph_clb(struct ct_yng_node key,
-                              struct ct_yng_node value,
+static void foreach_graph_clb(struct ce_yng_node key,
+                              struct ce_yng_node value,
                               void *_data) {
 
     struct foreach_graph_data *output = (foreach_graph_data *) _data;
-    ct_yng_doc *d = key.d;
+    ce_yng_doc *d = key.d;
 
     const char *key_str = d->as_string(d, key, "");
-    uint64_t node_name = ct_hashlib_a0->id64(key_str);
+    uint64_t node_name = ce_id_a0->id64(key_str);
 
 
     char tmp_name[128];
     strncpy(tmp_name, key_str, 127);
-    ct_array_push_n(output->output->node_str, &tmp_name, 1, _G.allocator);
+    ce_array_push_n(output->output->node_str, &tmp_name, 1, _G.allocator);
 
     uint64_t keys[] = {
             d->hash(d, value),
-            ct_yng_a0->key("local"),
+            ce_yng_a0->key("local"),
     };
-    ct_yng_node local_pose = d->get(d,
-                                    ct_yng_a0->combine_key(keys,
-                                                           CT_ARRAY_LEN(
+    ce_yng_node local_pose = d->get(d,
+                                    ce_yng_a0->combine_key(keys,
+                                                           CE_ARRAY_LEN(
                                                                    keys)));
 
     float pose[16];
     d->as_mat4(d, local_pose, pose);
 
-    uint32_t idx = (uint32_t) ct_array_size(output->output->node_name);
+    uint32_t idx = (uint32_t) ce_array_size(output->output->node_name);
 
-    ct_array_push(output->output->node_name, node_name, _G.allocator);
-    ct_array_push(output->output->node_parent, output->parent_idx,
+    ce_array_push(output->output->node_name, node_name, _G.allocator);
+    ce_array_push(output->output->node_parent, output->parent_idx,
                   _G.allocator);
-    ct_array_push_n(output->output->node_pose, pose, 16, _G.allocator);
+    ce_array_push_n(output->output->node_pose, pose, 16, _G.allocator);
 
 
-    keys[1] = ct_yng_a0->key("geometries");
-    uint64_t geometries_k = ct_yng_a0->combine_key(keys,
-                                                   CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("geometries");
+    uint64_t geometries_k = ce_yng_a0->combine_key(keys,
+                                                   CE_ARRAY_LEN(
                                                            keys));
 
-    ct_yng_node geometries_n = d->get(d, geometries_k);
+    ce_yng_node geometries_n = d->get(d, geometries_k);
     if (0 != geometries_n.idx) {
         const size_t name_count = d->size(d, geometries_n);
 
         for (uint32_t i = 0; i < name_count; ++i) {
-            struct ct_yng_node name_node = d->get_seq(d,
+            struct ce_yng_node name_node = d->get_seq(d,
                                                       geometries_k, i);
             const char *geom_str = d->as_string(d, name_node, "");
 
-            uint64_t geom_name = ct_hashlib_a0->id64(geom_str);
+            uint64_t geom_name = ce_id_a0->id64(geom_str);
             for (uint32_t j = 0;
-                 j < ct_array_size(output->output->geom_name); ++j) {
+                 j < ce_array_size(output->output->geom_name); ++j) {
                 if (geom_name != output->output->geom_name[j]) {
                     continue;
                 }
@@ -409,11 +409,11 @@ static void foreach_graph_clb(struct ct_yng_node key,
     }
 
 
-    keys[1] = ct_yng_a0->key("children");
-    uint64_t children_k = ct_yng_a0->combine_key(keys,
-                                                 CT_ARRAY_LEN(
+    keys[1] = ce_yng_a0->key("children");
+    uint64_t children_k = ce_yng_a0->combine_key(keys,
+                                                 CE_ARRAY_LEN(
                                                          keys));
-    ct_yng_node children_n = d->get(d,
+    ce_yng_node children_n = d->get(d,
                                     children_k);
 
     if (idx != children_n.idx) {
@@ -427,13 +427,13 @@ static void foreach_graph_clb(struct ct_yng_node key,
     }
 }
 
-static int _compile_yaml(struct ct_yng_doc *document,
+static int _compile_yaml(struct ce_yng_doc *document,
                          struct compile_output *output) {
 
-    ct_yng_node geometries = document->get(document,
-                                           ct_yng_a0->key("geometries"));
-    ct_yng_node graph = document->get(document,
-                                      ct_yng_a0->key("graph"));
+    ce_yng_node geometries = document->get(document,
+                                           ce_yng_a0->key("geometries"));
+    ce_yng_node graph = document->get(document,
+                                      ce_yng_a0->key("graph"));
 
     document->foreach_dict_node(document, geometries,
                                 foreach_geometries_clb, output);
@@ -452,17 +452,17 @@ static void _compile_assimp_node(struct aiNode *root,
                                  uint32_t parent,
                                  struct compile_output *output) {
 
-    uint64_t name = ct_hashlib_a0->id64(root->mName.data);
+    uint64_t name = ce_id_a0->id64(root->mName.data);
 
     char tmp_name[128] = {0};
     strncpy(tmp_name, root->mName.data, 127);
-    ct_array_push_n(output->node_str, &tmp_name, 1, _G.allocator);
+    ce_array_push_n(output->node_str, &tmp_name, 1, _G.allocator);
 
-    uint32_t idx = ct_array_size(output->node_name);
+    uint32_t idx = ce_array_size(output->node_name);
 
-    ct_array_push(output->node_name, name, _G.allocator);
-    ct_array_push(output->node_parent, parent, _G.allocator);
-    ct_array_push_n(output->node_pose, &root->mTransformation.a1, 16,
+    ce_array_push(output->node_name, name, _G.allocator);
+    ce_array_push(output->node_parent, parent, _G.allocator);
+    ce_array_push_n(output->node_pose, &root->mTransformation.a1, 16,
                     _G.allocator);
 
     for (uint32_t i = 0; i < root->mNumChildren; ++i) {
@@ -470,29 +470,29 @@ static void _compile_assimp_node(struct aiNode *root,
     }
 
     for (uint32_t i = 0; i < root->mNumMeshes; ++i) {
-        ct_array_push(output->geom_node, name, _G.allocator);
+        ce_array_push(output->geom_node, name, _G.allocator);
     }
 }
 
 static int _compile_assimp(const char *filename,
-                           struct ct_yng_doc *doc,
+                           struct ce_yng_doc *doc,
                            struct compile_output *output) {
 
     const char *input_str = doc->get_str(doc,
-                                         ct_yng_a0->key("import.input"), "");
+                                         ce_yng_a0->key("import.input"), "");
 
     ct_builddb_a0->add_dependency(filename, input_str);
 
-    const char *source_dir = ct_cdb_a0->read_str(ct_config_a0->obj(), CONFIG_SRC, "");
+    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_SRC, "");
     char *input_path = NULL;
-    ct_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
+    ce_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
                             input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
 
     if (doc->get_bool(doc,
-                      ct_yng_a0->key("import.postprocess.flip_uvs"),
+                      ce_yng_a0->key("import.postprocess.flip_uvs"),
                       false)) {
         postprocess_flag |= aiProcess_FlipUVs;
     }
@@ -501,7 +501,7 @@ static int _compile_assimp(const char *filename,
                                                postprocess_flag);
 
     if(!scene) {
-        ct_log_a0->error("scene_compiler", "Could not import %s", input_path);
+        ce_log_a0->error("scene_compiler", "Could not import %s", input_path);
         return 0;
     }
 
@@ -512,17 +512,17 @@ static int _compile_assimp(const char *filename,
         struct aiMesh *mesh = scene->mMeshes[i];
 
         if (mesh->mName.length == 0) {
-            snprintf(tmp_buffer, CT_ARRAY_LEN(tmp_buffer), "geom_%d", i);
+            snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "geom_%d", i);
         } else {
             memcpy(tmp_buffer, mesh->mName.data, mesh->mName.length);
         }
 
-        uint64_t name_id = ct_hashlib_a0->id64(tmp_buffer);
-        for (uint32_t k = 0; k < ct_array_size(output->geom_name); ++k) {
+        uint64_t name_id = ce_id_a0->id64(tmp_buffer);
+        for (uint32_t k = 0; k < ce_array_size(output->geom_name); ++k) {
             if (name_id == output->geom_name[k]) {
-                snprintf(tmp_buffer2, CT_ARRAY_LEN(tmp_buffer2), "%s%d",
+                snprintf(tmp_buffer2, CE_ARRAY_LEN(tmp_buffer2), "%s%d",
                          tmp_buffer, ++unique);
-                snprintf(tmp_buffer, CT_ARRAY_LEN(tmp_buffer), "%s",
+                snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "%s",
                          tmp_buffer2);
                 break;
             }
@@ -531,14 +531,14 @@ static int _compile_assimp(const char *filename,
 
         char tmp_name[128] = {0};
         strncpy(tmp_name, tmp_buffer, 127);
-        ct_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
+        ce_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
 
-        ct_array_push(output->geom_name, ct_hashlib_a0->id64(tmp_buffer), _G.allocator);
-        ct_array_push(output->ib_offset, ct_array_size(output->ib),
+        ce_array_push(output->geom_name, ce_id_a0->id64(tmp_buffer), _G.allocator);
+        ce_array_push(output->ib_offset, ce_array_size(output->ib),
                       _G.allocator);
-        ct_array_push(output->vb_offset, ct_array_size(output->vb),
+        ce_array_push(output->vb_offset, ce_array_size(output->vb),
                       _G.allocator);
-        ct_array_push(output->ib_size, mesh->mNumFaces * 3, _G.allocator);
+        ce_array_push(output->ib_size, mesh->mNumFaces * 3, _G.allocator);
 
         ct_render_vertex_decl_t vertex_decl;
         ct_renderer_a0->vertex_decl_begin(&vertex_decl,
@@ -569,36 +569,36 @@ static int _compile_assimp(const char *filename,
         }
         ct_renderer_a0->vertex_decl_end(&vertex_decl);
 
-        ct_array_push(output->vb_decl, vertex_decl, _G.allocator);
-        ct_array_push(output->vb_size, v_size * mesh->mNumVertices,
+        ce_array_push(output->vb_decl, vertex_decl, _G.allocator);
+        ce_array_push(output->vb_size, v_size * mesh->mNumVertices,
                       _G.allocator);
 
         for (uint32_t j = 0; j < mesh->mNumVertices; ++j) {
             if (mesh->mVertices != NULL) {
-                ct_array_push_n(output->vb,
+                ce_array_push_n(output->vb,
                                 (uint8_t *) &mesh->mVertices[j],
                                 sizeof(float) * 3, _G.allocator);
             }
 
             if (mesh->mNormals != NULL) {
-                ct_array_push_n(output->vb,
+                ce_array_push_n(output->vb,
                                 (uint8_t *) &mesh->mNormals[j],
                                 sizeof(float) * 3, _G.allocator);
             }
 
             if (mesh->mTextureCoords[0] != NULL) {
-                ct_array_push_n(output->vb,
+                ce_array_push_n(output->vb,
                                 (uint8_t *) &mesh->mTextureCoords[0][j],
                                 sizeof(float) * 2, _G.allocator);
             }
         }
 
         for (uint32_t j = 0; j < mesh->mNumFaces; ++j) {
-            ct_array_push(output->ib, mesh->mFaces[j].mIndices[0],
+            ce_array_push(output->ib, mesh->mFaces[j].mIndices[0],
                           _G.allocator);
-            ct_array_push(output->ib, mesh->mFaces[j].mIndices[1],
+            ce_array_push(output->ib, mesh->mFaces[j].mIndices[1],
                           _G.allocator);
-            ct_array_push(output->ib, mesh->mFaces[j].mIndices[2],
+            ce_array_push(output->ib, mesh->mFaces[j].mIndices[2],
                           _G.allocator);
         }
     }
@@ -611,12 +611,12 @@ extern "C" void scene_compiler(const char *filename,
                                char **output_blob) {
     struct compile_output *output = _crete_compile_output();
 
-    ct_yng_doc *document = ct_ydb_a0->get(filename);
+    ce_yng_doc *document = ce_ydb_a0->get(filename);
 
     int ret = 1;
 
     if (document->has_key(document,
-                          ct_yng_a0->key("import"))) {
+                          ce_yng_a0->key("import"))) {
         ret = _compile_assimp(filename, document, output);
     } else {
         ret = _compile_yaml(document, output);
@@ -627,75 +627,75 @@ extern "C" void scene_compiler(const char *filename,
         return;
     }
 
-    uint64_t obj = ct_cdb_a0->create_object(ct_cdb_a0->db(), SCENE_TYPE);
+    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SCENE_TYPE);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(obj);
-    ct_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT,
-                          ct_array_size(output->geom_name));
-    ct_cdb_a0->set_uint64(w, SCENE_NODE_COUNT,
-                          ct_array_size(output->node_name));
-    ct_cdb_a0->set_uint64(w, SCENE_IB_LEN, ct_array_size(output->ib));
-    ct_cdb_a0->set_uint64(w, SCENE_VB_LEN, ct_array_size(output->vb));
-    ct_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    ce_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT,
+                          ce_array_size(output->geom_name));
+    ce_cdb_a0->set_uint64(w, SCENE_NODE_COUNT,
+                          ce_array_size(output->node_name));
+    ce_cdb_a0->set_uint64(w, SCENE_IB_LEN, ce_array_size(output->ib));
+    ce_cdb_a0->set_uint64(w, SCENE_VB_LEN, ce_array_size(output->vb));
+    ce_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
                         sizeof(*output->geom_name) *
-                                ct_array_size(output->geom_name));
+                                ce_array_size(output->geom_name));
 
-    ct_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
+    ce_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
                         sizeof(*output->ib_offset) *
-                        ct_array_size(output->ib_offset));
-    ct_cdb_a0->set_blob(w, SCENE_VB_OFFSET, output->vb_offset,
+                        ce_array_size(output->ib_offset));
+    ce_cdb_a0->set_blob(w, SCENE_VB_OFFSET, output->vb_offset,
                         sizeof(*output->vb_offset) *
-                        ct_array_size(output->vb_offset));
-    ct_cdb_a0->set_blob(w, SCENE_VB_DECL, output->vb_decl,
+                        ce_array_size(output->vb_offset));
+    ce_cdb_a0->set_blob(w, SCENE_VB_DECL, output->vb_decl,
                         sizeof(*output->vb_decl) *
-                        ct_array_size(output->vb_decl));
-    ct_cdb_a0->set_blob(w, SCENE_IB_SIZE, output->ib_size,
+                        ce_array_size(output->vb_decl));
+    ce_cdb_a0->set_blob(w, SCENE_IB_SIZE, output->ib_size,
                         sizeof(*output->ib_size) *
-                        ct_array_size(output->ib_size));
-    ct_cdb_a0->set_blob(w, SCENE_VB_SIZE, output->vb_size,
+                        ce_array_size(output->ib_size));
+    ce_cdb_a0->set_blob(w, SCENE_VB_SIZE, output->vb_size,
                         sizeof(*output->vb_size) *
-                        ct_array_size(output->vb_size));
-    ct_cdb_a0->set_blob(w, SCENE_IB_PROP, output->ib,
-                        sizeof(*output->ib) * ct_array_size(output->ib));
-    ct_cdb_a0->set_blob(w, SCENE_VB_PROP, output->vb,
-                        sizeof(*output->vb) * ct_array_size(output->vb));
-    ct_cdb_a0->set_blob(w, SCENE_NODE_NAME, output->node_name,
+                        ce_array_size(output->vb_size));
+    ce_cdb_a0->set_blob(w, SCENE_IB_PROP, output->ib,
+                        sizeof(*output->ib) * ce_array_size(output->ib));
+    ce_cdb_a0->set_blob(w, SCENE_VB_PROP, output->vb,
+                        sizeof(*output->vb) * ce_array_size(output->vb));
+    ce_cdb_a0->set_blob(w, SCENE_NODE_NAME, output->node_name,
                         sizeof(*output->node_name) *
-                        ct_array_size(output->node_name));
-    ct_cdb_a0->set_blob(w, SCENE_NODE_PARENT, output->node_parent,
+                        ce_array_size(output->node_name));
+    ce_cdb_a0->set_blob(w, SCENE_NODE_PARENT, output->node_parent,
                         sizeof(*output->node_parent) *
-                        ct_array_size(output->node_parent));
-    ct_cdb_a0->set_blob(w, SCENE_NODE_POSE, output->node_pose,
+                        ce_array_size(output->node_parent));
+    ce_cdb_a0->set_blob(w, SCENE_NODE_POSE, output->node_pose,
                         sizeof(*output->node_pose) *
-                        ct_array_size(output->node_pose));
-    ct_cdb_a0->set_blob(w, SCENE_NODE_GEOM, output->geom_node,
+                        ce_array_size(output->node_pose));
+    ce_cdb_a0->set_blob(w, SCENE_NODE_GEOM, output->geom_node,
                         sizeof(*output->geom_node) *
-                        ct_array_size(output->geom_node));
-    ct_cdb_a0->set_blob(w, SCENE_GEOM_STR, output->geom_str,
+                        ce_array_size(output->geom_node));
+    ce_cdb_a0->set_blob(w, SCENE_GEOM_STR, output->geom_str,
                         sizeof(*output->geom_str) *
-                        ct_array_size(output->geom_str));
-    ct_cdb_a0->set_blob(w, SCENE_NODE_STR, output->node_str,
+                        ce_array_size(output->geom_str));
+    ce_cdb_a0->set_blob(w, SCENE_NODE_STR, output->node_str,
                         sizeof(*output->node_str) *
-                        ct_array_size(output->node_str));
-    ct_cdb_a0->write_commit(w);
+                        ce_array_size(output->node_str));
+    ce_cdb_a0->write_commit(w);
 
-    ct_cdb_a0->dump(obj, output_blob, ct_memory_a0->system);
-    ct_cdb_a0->destroy_object(obj);
+    ce_cdb_a0->dump(obj, output_blob, ce_memory_a0->system);
+    ce_cdb_a0->destroy_object(obj);
 
     _destroy_compile_output(output);
 }
 
-extern "C" int scenecompiler_init(struct ct_api_a0 *api) {
-    CT_INIT_API(api, ct_memory_a0);
-    CT_INIT_API(api, ct_resource_a0);
-    CT_INIT_API(api, ct_scenegprah_a0);
-    CT_INIT_API(api, ct_os_a0);
-    CT_INIT_API(api, ct_hashlib_a0);
-    CT_INIT_API(api, ct_yng_a0);
-    CT_INIT_API(api, ct_ydb_a0);
-    CT_INIT_API(api, ct_renderer_a0);
+extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_scenegprah_a0);
+    CE_INIT_API(api, ce_os_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_yng_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_renderer_a0);
 
-    _G = (struct _G) {.allocator=ct_memory_a0->system};
+    _G = (struct _G) {.allocator=ce_memory_a0->system};
 
 
     return 1;

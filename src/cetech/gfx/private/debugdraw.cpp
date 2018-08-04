@@ -1,11 +1,11 @@
 extern "C" {
-#include <corelib/bounds.h>
-#include "corelib/api_system.h"
-#include "corelib/module.h"
-#include "corelib/memory.h"
-#include <corelib/hashlib.h>
-#include <corelib/array.inl>
-#include <corelib/log.h>
+#include <celib/bounds.h>
+#include "celib/api_system.h"
+#include "celib/module.h"
+#include "celib/memory.h"
+#include <celib/hashlib.h>
+#include <celib/array.inl>
+#include <celib/log.h>
 
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/debugdraw.h>
@@ -17,7 +17,7 @@ extern "C" {
 #define _G DebugDrawGLobal
 
 static struct _G {
-    ct_alloc *allocator;
+    ce_alloc *allocator;
 } _G;
 
 
@@ -49,43 +49,43 @@ static void _ddDestroyGeometry(ct_dd_geometry _handle) {
     ddDestroy(gh);
 }
 
-void _ddDraw_aabb(const struct ct_aabb _aabb) {
+void _ddDraw_aabb(const struct ce_aabb _aabb) {
     Aabb *aabb = (Aabb *) &_aabb;
     ddDraw(*aabb);
 };
 
 
-void _ddDraw_cylinder(const struct ct_cylinder _cylinder) {
+void _ddDraw_cylinder(const struct ce_cylinder _cylinder) {
     Cylinder *tmp = (Cylinder *) &_cylinder;
     ddDraw(*tmp);
 }
 
 
-void _ddDraw_capsule(const struct ct_capsule _capsule) {
+void _ddDraw_capsule(const struct ce_capsule _capsule) {
     Capsule *tmp = (Capsule *) &_capsule;
     ddDraw(*tmp);
 }
 
 
-void _ddDraw_disk(const struct ct_disk _disk) {
+void _ddDraw_disk(const struct ce_disk _disk) {
     Disk *tmp = (Disk *) &_disk;
     ddDraw(*tmp);
 }
 
 
-void _ddDraw_obb(const struct ct_obb _obb) {
+void _ddDraw_obb(const struct ce_obb _obb) {
     Obb *tmp = (Obb *) &_obb;
     ddDraw(*tmp);
 }
 
 
-void _ddDraw_sphere(const struct ct_sphere _sphere) {
+void _ddDraw_sphere(const struct ce_sphere _sphere) {
     Sphere *tmp = (Sphere *) &_sphere;
     ddDraw(*tmp);
 }
 
 
-void _ddDraw_cone(const struct ct_cone _cone) {
+void _ddDraw_cone(const struct ce_cone _cone) {
     Cone *tmp = (Cone *) &_cone;
     ddDraw(*tmp);
 }
@@ -268,11 +268,11 @@ static struct ct_dd_a0 debugdraw_api = {
 struct ct_dd_a0 *ct_dd_a0 = &debugdraw_api;
 
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     api->register_api("ct_dd_a0", &debugdraw_api);
 
     _G = (struct _G){
-            .allocator = ct_memory_a0->system
+            .allocator = ce_memory_a0->system
     };
 
     ddInit();
@@ -285,20 +285,20 @@ static void _shutdown() {
     _G = (struct _G){0};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         debugdraw,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_log_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ce_log_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

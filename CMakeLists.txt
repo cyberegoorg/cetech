@@ -60,31 +60,30 @@ set(CORELIB_SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/corelib/private/api_system.c
-        src/corelib/private/log.c
-        src/corelib/private/module.c
-        src/corelib/private/config.c
-        src/corelib/private/memory.c
-        src/corelib/private/task.c
-        src/corelib/private/log_stdout.c
-        src/corelib/private/hashlib.c
-        src/corelib/private/os.c
-        src/corelib/private/os_error.c
-        src/corelib/private/os_object.c
-        src/corelib/private/os_path.c
-        src/corelib/private/os_process.c
-        src/corelib/private/os_cpu.c
-        src/corelib/private/os_thread.c
-        src/corelib/private/os_vio.c
-        src/corelib/private/os_watchdog.c
-        src/corelib/private/os_time.c
-        src/corelib/private/os_window_sdl2.c
-        src/corelib/private/fs.c
-        src/corelib/private/yng.c
-        src/corelib/private/ydb.c
-        src/corelib/private/cdb.c
-        src/corelib/private/ebus.c
-        src/corelib/private/core.c
+        src/celib/private/api_system.c
+        src/celib/private/log.c
+        src/celib/private/module.c
+        src/celib/private/config.c
+        src/celib/private/memory.c
+        src/celib/private/task.c
+        src/celib/private/log_stdout.c
+        src/celib/private/hashlib.c
+        src/celib/private/os.c
+        src/celib/private/os_error.c
+        src/celib/private/os_object.c
+        src/celib/private/os_path.c
+        src/celib/private/os_process.c
+        src/celib/private/os_cpu.c
+        src/celib/private/os_thread.c
+        src/celib/private/os_vio.c
+        src/celib/private/os_time.c
+        src/celib/private/os_window_sdl2.c
+        src/celib/private/fs.c
+        src/celib/private/yng.c
+        src/celib/private/ydb.c
+        src/celib/private/cdb.c
+        src/celib/private/ebus.c
+        src/celib/private/core.c
         )
 
 set(SOURCE_FILES
@@ -212,7 +211,7 @@ set(RELEASE_LIBS
         yaml_static.a
         #aes.a
 
-        corelib
+        celib
         )
 
 set(RELEASE_LIBS2
@@ -252,8 +251,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 # Corelib
 ################################################################################
 
-add_library(corelib STATIC ${CORELIB_SOURCE_FILES})
-target_include_directories(corelib PUBLIC externals/build/${PLATFORM_ID}/release/)
+add_library(celib STATIC ${CORELIB_SOURCE_FILES})
+target_include_directories(celib PUBLIC externals/build/${PLATFORM_ID}/release/)
 
 add_executable(doc src/tools/doc/doc.c)
 target_link_libraries(doc ${DEVELOP_LIBS})

@@ -3,23 +3,23 @@
 
 
 
-## CETECH_ASSERT
+## CE_ASSERT
 ~~~~~~~~~~~~~~~~~~~~
-#define CETECH_ASSERT(where, condition)                                 
+#define CE_ASSERT(where, condition)                                 
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## CETECH_ASSERT
+## CE_ASSERT
 ~~~~~~~~~~~~~~~~~~~~
-#define CETECH_ASSERT(where, condition) 
+#define CE_ASSERT(where, condition) 
 
 ~~~~~~~~~~~~~~~~~~~~
 # Error
 
 
-## ct_os_error_a0
+## ce_os_error_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_error_a0 {
+struct ce_os_error_a0 {
     void (*assert)(const char *where,
                    const char *condition,
                    const char *filename,
@@ -42,9 +42,9 @@ Assert
 # CPU
 
 
-## ct_os_cpu_a0
+## ce_os_cpu_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_cpu_a0 {
+struct ce_os_cpu_a0 {
     int (*count)();
 };
 
@@ -61,9 +61,9 @@ Get cpu core count
 # Object
 
 
-## ct_os_object_a0
+## ce_os_object_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_object_a0 {
+struct ce_os_object_a0 {
     void *(*load)(const char *path);
     void (*unload)(void *so);
     void *(*load_function)(void *so,
@@ -100,9 +100,9 @@ Load function from shared lib
 # Path
 
 
-## ct_os_path_a0
+## ce_os_path_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_path_a0 {
+struct ce_os_path_a0 {
     uint32_t (*file_mtime)(const char *path);
     void (*list)(const char *path,
                  const char **patern,
@@ -111,10 +111,10 @@ struct ct_os_path_a0 {
                  int only_dir,
                  char ***files,
                  uint32_t *count,
-                 struct ct_alloc *allocator);
+                 struct ce_alloc *allocator);
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct ct_alloc *allocator);
+                      struct ce_alloc *allocator);
     int (*make_path)(const char *path);
     const char *(*filename)(const char *path);
     void (*basename)(const char *path,
@@ -125,10 +125,10 @@ struct ct_os_path_a0 {
                     const char *path);
     const char *(*extension)(const char *path);
     void (*join)(char **buffer,
-                 struct ct_alloc *allocator,
+                 struct ce_alloc *allocator,
                  uint32_t count,
                  ...);
-    void (*copy_file)(struct ct_alloc *allocator,
+    void (*copy_file)(struct ce_alloc *allocator,
                       const char *from,
                       const char *to);
     bool (*is_dir)(const char *path);
@@ -153,7 +153,7 @@ Get file modified time
                  int only_dir,
                  char ***files,
                  uint32_t *count,
-                 struct ct_alloc *allocator);
+                 struct ce_alloc *allocator);
 
 ~~~~~~~~~~~~~~~~~~~~
 List dir
@@ -167,7 +167,7 @@ List dir
 ~~~~~~~~~~~~~~~~~~~~
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct ct_alloc *allocator);
+                      struct ce_alloc *allocator);
 
 ~~~~~~~~~~~~~~~~~~~~
 Free list dir array
@@ -231,7 +231,7 @@ Get file extension
 ### join
 ~~~~~~~~~~~~~~~~~~~~
     void (*join)(char **buffer,
-                 struct ct_alloc *allocator,
+                 struct ce_alloc *allocator,
                  uint32_t count,
                  ...);
 
@@ -243,7 +243,7 @@ Join paths and return path len.
 
 ### copy_file
 ~~~~~~~~~~~~~~~~~~~~
-    void (*copy_file)(struct ct_alloc *allocator,
+    void (*copy_file)(struct ce_alloc *allocator,
                       const char *from,
                       const char *to);
 
@@ -258,9 +258,9 @@ Join paths and return path len.
 # Process
 
 
-## ct_os_process_a0
+## ce_os_process_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_process_a0 {
+struct ce_os_process_a0 {
     int (*exec)(const char *argv);
 };
 
@@ -275,35 +275,35 @@ struct ct_os_process_a0 {
 # Thread
 
 
-## ct_spinlock
+## ce_spinlock
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_spinlock {
+struct ce_spinlock {
     int lock;
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_os_thread_a0
+## ce_os_thread_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_thread_a0 {
-    ct_thread_t *(*create)(ct_thread_fce_t fce,
+struct ce_os_thread_a0 {
+    ce_thread_t *(*create)(ce_thread_fce_t fce,
                            const char *name,
                            void *data);
-    void (*kill)(ct_thread_t *thread);
-    void (*wait)(ct_thread_t *thread,
+    void (*kill)(ce_thread_t *thread);
+    void (*wait)(ce_thread_t *thread,
                  int *status);
-    uint64_t (*get_id)(ct_thread_t *thread);
+    uint64_t (*get_id)(ce_thread_t *thread);
     uint64_t (*actual_id)();
     void (*yield)();
-    void (*spin_lock)(struct ct_spinlock *lock);
-    void (*spin_unlock)(struct ct_spinlock *lock);
+    void (*spin_lock)(struct ce_spinlock *lock);
+    void (*spin_unlock)(struct ce_spinlock *lock);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    ct_thread_t *(*create)(ct_thread_fce_t fce,
+    ce_thread_t *(*create)(ce_thread_fce_t fce,
                            const char *name,
                            void *data);
 
@@ -316,7 +316,7 @@ Create new thread
 
 ### kill
 ~~~~~~~~~~~~~~~~~~~~
-    void (*kill)(ct_thread_t *thread);
+    void (*kill)(ce_thread_t *thread);
 
 ~~~~~~~~~~~~~~~~~~~~
 Kill thread
@@ -325,7 +325,7 @@ Kill thread
 
 ### wait
 ~~~~~~~~~~~~~~~~~~~~
-    void (*wait)(ct_thread_t *thread,
+    void (*wait)(ce_thread_t *thread,
                  int *status);
 
 ~~~~~~~~~~~~~~~~~~~~
@@ -336,7 +336,7 @@ Wait for thread
 
 ### get_id
 ~~~~~~~~~~~~~~~~~~~~
-    uint64_t (*get_id)(ct_thread_t *thread);
+    uint64_t (*get_id)(ce_thread_t *thread);
 
 ~~~~~~~~~~~~~~~~~~~~
 Get id for thread
@@ -359,22 +359,22 @@ Get actual thread id
 
 ### spin_lock
 ~~~~~~~~~~~~~~~~~~~~
-    void (*spin_lock)(struct ct_spinlock *lock);
+    void (*spin_lock)(struct ce_spinlock *lock);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### spin_unlock
 ~~~~~~~~~~~~~~~~~~~~
-    void (*spin_unlock)(struct ct_spinlock *lock);
+    void (*spin_unlock)(struct ce_spinlock *lock);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 # Time
 
 
-## ct_os_time_a0
+## ce_os_time_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_time_a0 {
+struct ce_os_time_a0 {
     uint32_t (*ticks)();
     uint64_t (*perf_counter)();
     uint64_t (*perf_freq)();
@@ -403,44 +403,44 @@ struct ct_os_time_a0 {
 # VIO
 
 
-## ct_vio
+## ce_vio
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_vio {
-    ct_vio_instance_t *inst;
-    int64_t (*size)(struct ct_vio *vio);
-    int64_t (*seek)(struct ct_vio *vio,
+struct ce_vio {
+    ce_vio_instance_t *inst;
+    int64_t (*size)(struct ce_vio *vio);
+    int64_t (*seek)(struct ce_vio *vio,
                     int64_t offset,
-                    enum ct_vio_seek whence);
-    size_t (*read)(struct ct_vio *vio,
+                    enum ce_vio_seek whence);
+    size_t (*read)(struct ce_vio *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
-    size_t (*write)(struct ct_vio *vio,
+    size_t (*write)(struct ce_vio *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
-    int (*close)(struct ct_vio *vio);
+    int (*close)(struct ce_vio *vio);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### size
 ~~~~~~~~~~~~~~~~~~~~
-    int64_t (*size)(struct ct_vio *vio);
+    int64_t (*size)(struct ce_vio *vio);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### seek
 ~~~~~~~~~~~~~~~~~~~~
-    int64_t (*seek)(struct ct_vio *vio,
+    int64_t (*seek)(struct ce_vio *vio,
                     int64_t offset,
-                    enum ct_vio_seek whence);
+                    enum ce_vio_seek whence);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### read
 ~~~~~~~~~~~~~~~~~~~~
-    size_t (*read)(struct ct_vio *vio,
+    size_t (*read)(struct ce_vio *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
@@ -449,7 +449,7 @@ struct ct_vio {
 
 ### write
 ~~~~~~~~~~~~~~~~~~~~
-    size_t (*write)(struct ct_vio *vio,
+    size_t (*write)(struct ce_vio *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
@@ -458,68 +458,68 @@ struct ct_vio {
 
 ### close
 ~~~~~~~~~~~~~~~~~~~~
-    int (*close)(struct ct_vio *vio);
+    int (*close)(struct ce_vio *vio);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 
-## ct_os_vio_a0
+## ce_os_vio_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_vio_a0 {
-    struct ct_vio *(*from_file)(const char *path,
-                                enum ct_vio_open_mode mode);
+struct ce_os_vio_a0 {
+    struct ce_vio *(*from_file)(const char *path,
+                                enum ce_vio_open_mode mode);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### from_file
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_vio *(*from_file)(const char *path,
-                                enum ct_vio_open_mode mode);
+    struct ce_vio *(*from_file)(const char *path,
+                                enum ce_vio_open_mode mode);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 # Watchdog
 
 
-## ct_watchdog_ev_header
+## ce_watchdog_ev_header
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_watchdog_ev_header {
+struct ce_watchdog_ev_header {
     uint32_t type;
     uint64_t size;
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_wd_ev_file_write_end
+## ce_wd_ev_file_write_end
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_wd_ev_file_write_end {
-    struct ct_watchdog_ev_header header;
+struct ce_wd_ev_file_write_end {
+    struct ce_watchdog_ev_header header;
     const char *dir;
     char *filename;
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_watchdog
+## ce_watchdog_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_watchdog {
-    ct_watchdog_instance_t *inst;
-    void (*add_dir)(ct_watchdog_instance_t *inst,
+struct ce_watchdog_a0 {
+    ce_watchdog_instance_t *inst;
+    void (*add_dir)(ce_watchdog_instance_t *inst,
                     const char *path,
                     bool recursive);
-    void (*fetch_events)(ct_watchdog_instance_t *inst);
-    struct ct_watchdog_ev_header *(*event_begin)(ct_watchdog_instance_t *inst);
-    struct ct_watchdog_ev_header *(*event_end)(ct_watchdog_instance_t *inst);
-    struct ct_watchdog_ev_header *(*event_next)(ct_watchdog_instance_t *inst,
-                                                struct ct_watchdog_ev_header *header);
+    void (*fetch_events)(ce_watchdog_instance_t *inst);
+    struct ce_watchdog_ev_header *(*event_begin)(ce_watchdog_instance_t *inst);
+    struct ce_watchdog_ev_header *(*event_end)(ce_watchdog_instance_t *inst);
+    struct ce_watchdog_ev_header *(*event_next)(ce_watchdog_instance_t *inst,
+                                                struct ce_watchdog_ev_header *header);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### add_dir
 ~~~~~~~~~~~~~~~~~~~~
-    void (*add_dir)(ct_watchdog_instance_t *inst,
+    void (*add_dir)(ce_watchdog_instance_t *inst,
                     const char *path,
                     bool recursive);
 
@@ -527,48 +527,48 @@ struct ct_watchdog {
 
 ### fetch_events
 ~~~~~~~~~~~~~~~~~~~~
-    void (*fetch_events)(ct_watchdog_instance_t *inst);
+    void (*fetch_events)(ce_watchdog_instance_t *inst);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### event_begin
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_watchdog_ev_header *(*event_begin)(ct_watchdog_instance_t *inst);
+    struct ce_watchdog_ev_header *(*event_begin)(ce_watchdog_instance_t *inst);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### event_end
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_watchdog_ev_header *(*event_end)(ct_watchdog_instance_t *inst);
+    struct ce_watchdog_ev_header *(*event_end)(ce_watchdog_instance_t *inst);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### event_next
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_watchdog_ev_header *(*event_next)(ct_watchdog_instance_t *inst,
-                                                struct ct_watchdog_ev_header *header);
+    struct ce_watchdog_ev_header *(*event_next)(ce_watchdog_instance_t *inst,
+                                                struct ce_watchdog_ev_header *header);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 
-## ct_os_watchdog_a0
+## ce_os_watchdog_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_watchdog_a0 {
-    struct ct_watchdog *(*create)(struct ct_alloc *alloc);
-    void (*destroy)(struct ct_watchdog *watchdog);
+struct ce_os_watchdog_a0 {
+    struct ce_watchdog_a0 *(*create)(struct ce_alloc *alloc);
+    void (*destroy)(struct ce_watchdog_a0 *watchdog);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_watchdog *(*create)(struct ct_alloc *alloc);
+    struct ce_watchdog_a0 *(*create)(struct ce_alloc *alloc);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### destroy
 ~~~~~~~~~~~~~~~~~~~~
-    void (*destroy)(struct ct_watchdog *watchdog);
+    void (*destroy)(struct ce_watchdog_a0 *watchdog);
 
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -585,9 +585,9 @@ struct ct_os_watchdog_a0 {
  Window resized
 
 
-## ct_window_resized_event
+## ce_window_resized_event
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_window_resized_event {
+struct ce_window_resized_event {
     uint32_t window_id;
     int32_t width;
     int32_t height;
@@ -595,41 +595,41 @@ struct ct_window_resized_event {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ct_window
+## ce_window
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_window {
-    ct_window_ints *inst;
-    void (*set_title)(ct_window_ints *w,
+struct ce_window {
+    ce_window_ints *inst;
+    void (*set_title)(ce_window_ints *w,
                       const char *title);
-    const char *(*get_title)(ct_window_ints *w);
-    void (*resize)(ct_window_ints *w,
+    const char *(*get_title)(ce_window_ints *w);
+    void (*resize)(ce_window_ints *w,
                    uint32_t width,
                    uint32_t height);
-    void (*size)(ct_window_ints *window,
+    void (*size)(ce_window_ints *window,
                  uint32_t *width,
                  uint32_t *height);
-    void *(*native_window_ptr)(ct_window_ints *w);
-    void *(*native_display_ptr)(ct_window_ints *w);
+    void *(*native_window_ptr)(ce_window_ints *w);
+    void *(*native_display_ptr)(ce_window_ints *w);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### set_title
 ~~~~~~~~~~~~~~~~~~~~
-    void (*set_title)(ct_window_ints *w,
+    void (*set_title)(ce_window_ints *w,
                       const char *title);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### get_title
 ~~~~~~~~~~~~~~~~~~~~
-    const char *(*get_title)(ct_window_ints *w);
+    const char *(*get_title)(ce_window_ints *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### resize
 ~~~~~~~~~~~~~~~~~~~~
-    void (*resize)(ct_window_ints *w,
+    void (*resize)(ce_window_ints *w,
                    uint32_t width,
                    uint32_t height);
 
@@ -637,7 +637,7 @@ struct ct_window {
 
 ### size
 ~~~~~~~~~~~~~~~~~~~~
-    void (*size)(ct_window_ints *window,
+    void (*size)(ce_window_ints *window,
                  uint32_t *width,
                  uint32_t *height);
 
@@ -645,41 +645,41 @@ struct ct_window {
 
 ### native_window_ptr
 ~~~~~~~~~~~~~~~~~~~~
-    void *(*native_window_ptr)(ct_window_ints *w);
+    void *(*native_window_ptr)(ce_window_ints *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### native_display_ptr
 ~~~~~~~~~~~~~~~~~~~~
-    void *(*native_display_ptr)(ct_window_ints *w);
+    void *(*native_display_ptr)(ce_window_ints *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 
-## ct_os_window_a0
+## ce_os_window_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_window_a0 {
-    struct ct_window *(*create)(struct ct_alloc *alloc,
+struct ce_os_window_a0 {
+    struct ce_window *(*create)(struct ce_alloc *alloc,
                                 const char *title,
-                                enum ct_window_pos x,
-                                enum ct_window_pos y,
+                                enum ce_window_pos x,
+                                enum ce_window_pos y,
                                 const int32_t width,
                                 const int32_t height,
                                 uint32_t flags);
-    struct ct_window *(*create_from)(struct ct_alloc *alloc,
+    struct ce_window *(*create_from)(struct ce_alloc *alloc,
                                      void *hndl);
-    void (*destroy)(struct ct_alloc *alloc,
-                    struct ct_window *w);
+    void (*destroy)(struct ce_alloc *alloc,
+                    struct ce_window *w);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_window *(*create)(struct ct_alloc *alloc,
+    struct ce_window *(*create)(struct ce_alloc *alloc,
                                 const char *title,
-                                enum ct_window_pos x,
-                                enum ct_window_pos y,
+                                enum ce_window_pos x,
+                                enum ce_window_pos y,
                                 const int32_t width,
                                 const int32_t height,
                                 uint32_t flags);
@@ -688,32 +688,32 @@ struct ct_os_window_a0 {
 
 ### create_from
 ~~~~~~~~~~~~~~~~~~~~
-    struct ct_window *(*create_from)(struct ct_alloc *alloc,
+    struct ce_window *(*create_from)(struct ce_alloc *alloc,
                                      void *hndl);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### destroy
 ~~~~~~~~~~~~~~~~~~~~
-    void (*destroy)(struct ct_alloc *alloc,
-                    struct ct_window *w);
+    void (*destroy)(struct ce_alloc *alloc,
+                    struct ce_window *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 
-## ct_os_a0
+## ce_os_a0
 ~~~~~~~~~~~~~~~~~~~~
-struct ct_os_a0 {
-    struct ct_os_cpu_a0 *cpu;
-    struct ct_os_error_a0 *error;
-    struct ct_os_object_a0 *object;
-    struct ct_os_path_a0 *path;
-    struct ct_os_process_a0 *process;
-    struct ct_os_thread_a0 *thread;
-    struct ct_os_time_a0 *time;
-    struct ct_os_vio_a0 *vio;
-    struct ct_os_watchdog_a0 *watchdog;
-    struct ct_os_window_a0 *window;
+struct ce_os_a0 {
+    struct ce_os_cpu_a0 *cpu;
+    struct ce_os_error_a0 *error;
+    struct ce_os_object_a0 *object;
+    struct ce_os_path_a0 *path;
+    struct ce_os_process_a0 *process;
+    struct ce_os_thread_a0 *thread;
+    struct ce_os_time_a0 *time;
+    struct ce_os_vio_a0 *vio;
+    struct ce_os_watchdog_a0 *watchdog;
+    struct ce_os_window_a0 *window;
 };
 
 ~~~~~~~~~~~~~~~~~~~~

@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <corelib/cdb.h>
-#include <corelib/ydb.h>
-#include <corelib/fmath.inl>
-#include <corelib/ebus.h>
-#include <corelib/macros.h>
-#include "corelib/hashlib.h"
-#include "corelib/memory.h"
-#include "corelib/api_system.h"
-#include "corelib/module.h"
+#include <celib/cdb.h>
+#include <celib/ydb.h>
+#include <celib/fmath.inl>
+#include <celib/ebus.h>
+#include <celib/macros.h>
+#include "celib/hashlib.h"
+#include "celib/memory.h"
+#include "celib/api_system.h"
+#include "celib/module.h"
 
 
 #include <cetech/ecs/ecs.h>
@@ -54,7 +54,7 @@ static struct _G {
 
 
 #define _EDITOR_IDX \
-    CT_ID64_0("editor_idx", 0x1b333d78a2ccaab7ULL)
+    CE_ID64_0("editor_idx", 0x1b333d78a2ccaab7ULL)
 
 
 static void fps_camera_update(struct ct_world world,
@@ -67,8 +67,8 @@ static void fps_camera_update(struct ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CT_UNUSED(dx);
-    CT_UNUSED(dy);
+    CE_UNUSED(dx);
+    CE_UNUSED(dy);
 
     float wm[16];
 
@@ -78,12 +78,12 @@ static void fps_camera_update(struct ct_world world,
                                                   TRANSFORM_COMPONENT,
                                                   camera_ent);
 
-    ct_mat4_move(wm, transform->world);
+    ce_mat4_move(wm, transform->world);
 
     float x_dir[4];
     float z_dir[4];
-    ct_vec4_move(x_dir, &wm[0 * 4]);
-    ct_vec4_move(z_dir, &wm[2 * 4]);
+    ce_vec4_move(x_dir, &wm[0 * 4]);
+    ce_vec4_move(z_dir, &wm[2 * 4]);
 
     if (!fly_mode) {
         z_dir[1] = 0.0f;
@@ -93,22 +93,22 @@ static void fps_camera_update(struct ct_world world,
     float x_dir_new[3];
     float z_dir_new[3];
 
-    ct_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    ct_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
     float pos[3] = {0};
-    ct_vec3_add(pos, transform->position, x_dir_new);
-    ct_vec3_add(pos, pos, z_dir_new);
+    ce_vec3_add(pos, transform->position, x_dir_new);
+    ce_vec3_add(pos, pos, z_dir_new);
 
     uint64_t ent_obj = camera_ent.h;
-    uint64_t components = ct_cdb_a0->read_subobject(ent_obj,
+    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
                                                     ENTITY_COMPONENTS, 0);
-    uint64_t component = ct_cdb_a0->read_subobject(components,
+    uint64_t component = ce_cdb_a0->read_subobject(components,
                                                    TRANSFORM_COMPONENT, 0);
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(component);
-    ct_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+    ce_cdb_a0->write_commit(w);
 
     // ROT
 //    float rotation_around_world_up[4];
@@ -124,7 +124,7 @@ static void fps_camera_update(struct ct_world world,
 }
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ct_api_entry it = ct_api_a0->first(COMPONENT_INTERFACE);
+    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -132,7 +132,7 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
             return i;
         }
 
-        it = ct_api_a0->next(it);
+        it = ce_api_a0->next(it);
     }
 
     return NULL;
@@ -156,8 +156,8 @@ static void _guizmo(uint64_t component_obj,
     float world[16];
     float local[16];
 
-    ct_mat4_identity(world);
-    ct_mat4_identity(local);
+    ce_mat4_identity(world);
+    ce_mat4_identity(local);
 
     ceditor->guizmo_get_transform(component_obj, world, local);
 
@@ -166,18 +166,18 @@ static void _guizmo(uint64_t component_obj,
     ct_debugui_a0->guizmo_set_rect(min[0], min[1], size[0], size[1]);
 
     float delta_matrix[16] = {0.0f};
-    ct_mat4_identity(delta_matrix);
+    ce_mat4_identity(delta_matrix);
 
     ct_debugui_a0->guizmo_manipulate(view, proj, operation, WORLD,
                                      world, delta_matrix, 0, NULL, NULL);
 
-    if (!ct_mat4_is_identity(delta_matrix)) {
+    if (!ce_mat4_is_identity(delta_matrix)) {
         ceditor->guizmo_set_transform(component_obj, operation, world, local);
     }
 }
 
 static void draw_editor(uint64_t context_obj) {
-    uint64_t editor_idx = ct_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
 
     if (!editor->world.h) {
@@ -213,24 +213,24 @@ static void draw_editor(uint64_t context_obj) {
     uint64_t obj = ct_selected_object_a0->selected_object();
 
     if (obj) {
-        uint64_t obj_type = ct_cdb_a0->type(obj);
+        uint64_t obj_type = ce_cdb_a0->type(obj);
         if (obj_type == ENTITY_RESOURCE) {
 
             uint64_t components;
-            components = ct_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+            components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
-            const uint32_t component_n = ct_cdb_a0->prop_count(components);
+            const uint32_t component_n = ce_cdb_a0->prop_count(components);
 
             uint64_t keys[component_n];
-            ct_cdb_a0->prop_keys(components, keys);
+            ce_cdb_a0->prop_keys(components, keys);
 
             for (uint32_t i = 0; i < component_n; ++i) {
                 uint64_t key = keys[i];
 
                 uint64_t component;
-                component = ct_cdb_a0->read_subobject(components, key, 0);
+                component = ce_cdb_a0->read_subobject(components, key, 0);
 
-                uint64_t type = ct_cdb_a0->type(component);
+                uint64_t type = ce_cdb_a0->type(component);
 
                 struct ct_component_i0 *c;
                 c = get_component_interface(type);
@@ -291,9 +291,9 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
     ++_G.editor_count;
 
 
-    ct_cdb_obj_o *w = ct_cdb_a0->write_begin(context_obj);
-    ct_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
-    ct_cdb_a0->write_commit(w);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(context_obj);
+    ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
+    ce_cdb_a0->write_commit(w);
 
     struct scene_editor *editor = &_G.editor[idx];
 
@@ -304,7 +304,7 @@ static void open(uint64_t context_obj) {
     struct scene_editor *editor = _new_editor(context_obj);
 
 
-    const uint64_t asset_name = ct_cdb_a0->read_uint64(context_obj, _ASSET_NAME,
+    const uint64_t asset_name = ce_cdb_a0->read_uint64(context_obj, _ASSET_NAME,
                                                        0);
 
     editor->world = ct_ecs_a0->entity->create_world();
@@ -318,7 +318,7 @@ static void open(uint64_t context_obj) {
 
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
-                                                  ct_hashlib_a0->id64("content/camera"));
+                                                  ce_id_a0->id64("content/camera"));
 
     editor->entity_name = asset_name;
 
@@ -336,7 +336,7 @@ static void update(uint64_t context_obj,
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
-    uint64_t editor_idx = ct_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
 
     if (!editor->world.h) {
@@ -378,7 +378,7 @@ static void update(uint64_t context_obj,
 }
 
 static void on_render(uint64_t context_obj) {
-    uint64_t editor_idx = ct_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
     if (!editor->world.h) {
         return;
@@ -417,7 +417,7 @@ static struct ct_asset_editor_i0 ct_asset_editor_i0 = {
         .display_icon = display_icon,
 };
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
@@ -429,26 +429,26 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         entity_editor,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
-            CT_INIT_API(api, ct_debugui_a0);
-            CT_INIT_API(api, ct_ecs_a0);
-            CT_INIT_API(api, ct_camera_a0);
-            CT_INIT_API(api, ct_cdb_a0);
-            CT_INIT_API(api, ct_ebus_a0);
-            CT_INIT_API(api, ct_render_graph_a0);
-            CT_INIT_API(api, ct_default_rg_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
+            CE_INIT_API(api, ct_debugui_a0);
+            CE_INIT_API(api, ct_ecs_a0);
+            CE_INIT_API(api, ct_camera_a0);
+            CE_INIT_API(api, ce_cdb_a0);
+            CE_INIT_API(api, ce_ebus_a0);
+            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_default_rg_a0);
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

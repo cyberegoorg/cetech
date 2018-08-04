@@ -4,17 +4,17 @@
 
 #include "include/sqlite3/sqlite3.h"
 
-#include <corelib/log.h>
-#include <corelib/os.h>
-#include <corelib/memory.h>
-#include <corelib/fs.h>
+#include <celib/log.h>
+#include <celib/os.h>
+#include <celib/memory.h>
+#include <celib/fs.h>
 #include <cetech/kernel/kernel.h>
-#include <corelib/hashlib.h>
-#include <corelib/module.h>
-#include <corelib/api_system.h>
-#include <corelib/cdb.h>
-#include <corelib/config.h>
-#include <corelib/buffer.inl>
+#include <celib/hashlib.h>
+#include <celib/module.h>
+#include <celib/api_system.h>
+#include <celib/cdb.h>
+#include <celib/config.h>
+#include <celib/buffer.inl>
 #include <cetech/resource/resource.h>
 
 #include "cetech/resource/builddb.h"
@@ -42,7 +42,7 @@ static int _step(sqlite3 *db,
                 break;
 
             default:
-                ct_log_a0->error("builddb", "SQL error '%s' (%d): %s",
+                ce_log_a0->error("builddb", "SQL error '%s' (%d): %s",
                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
 
                 run = 0;
@@ -95,19 +95,19 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db() {
-    const char *platform = ct_cdb_a0->read_str(ct_config_a0->obj(),
+    const char *platform = ce_cdb_a0->read_str(ce_config_a0->obj(),
                                                CONFIG_PLATFORM, "");
 
-    const char *build_dir_str = ct_cdb_a0->read_str(ct_config_a0->obj(),
+    const char *build_dir_str = ce_cdb_a0->read_str(ce_config_a0->obj(),
                                                     CONFIG_BUILD, "");
 
     char *build_dir_full = NULL;
-    ct_os_a0->path->join(&build_dir_full, ct_memory_a0->system, 2, build_dir_str, platform);
-    ct_os_a0->path->make_path(build_dir_full);
+    ce_os_a0->path->join(&build_dir_full, ce_memory_a0->system, 2, build_dir_str, platform);
+    ce_os_a0->path->make_path(build_dir_full);
 
-    ct_os_a0->path->join(&_logdb_path, ct_memory_a0->system, 2, build_dir_full, "build.db");
+    ce_os_a0->path->join(&_logdb_path, ce_memory_a0->system, 2, build_dir_full, "build.db");
 
-    ct_buffer_free(build_dir_full, ct_memory_a0->system);
+    ce_buffer_free(build_dir_full, ce_memory_a0->system);
 
     if (!_do_sql("CREATE TABLE IF NOT EXISTS files (\n"
                  "id       INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
@@ -135,15 +135,15 @@ static void type_name_from_filename(const char *fullname,
                              struct ct_resource_id *resource_id,
                              char *short_name) {
 
-    const char *resource_type = ct_os_a0->path->extension(fullname);
+    const char *resource_type = ce_os_a0->path->extension(fullname);
 
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
 
     char resource_name[128] = {};
     memcpy(resource_name, fullname, size);
 
-    resource_id->name = ct_hashlib_a0->id64(resource_name);
-    resource_id->type = ct_hashlib_a0->id64(resource_type);
+    resource_id->name = ce_id_a0->id64(resource_name);
+    resource_id->type = ce_id_a0->id64(resource_type);
 
     if (short_name) {
         memcpy(short_name, fullname, sizeof(char) * size);
@@ -165,7 +165,7 @@ static void builddb_set_file(const char *filename,
     type_name_from_filename(filename, &rid, NULL);
 
     char build_name[128] = {};
-    snprintf(build_name, CT_ARRAY_LEN(build_name), "%" PRIx64 "%" PRIx64, rid.type, rid.name);
+    snprintf(build_name, CE_ARRAY_LEN(build_name), "%" PRIx64 "%" PRIx64, rid.type, rid.name);
 
     sqlite3_bind_text(stmt, 1, filename, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 2, build_name, -1, SQLITE_TRANSIENT);
@@ -270,7 +270,7 @@ static int builddb_need_compile(const char *filename) {
         compile = 0;
         const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
 
-        time_t actual_mtime = ct_fs_a0->file_mtime(SOURCE_ROOT, dep_file);
+        time_t actual_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dep_file);
 
         time_t last_mtime = sqlite3_column_int64(stmt, 1);
 
@@ -290,7 +290,7 @@ void _add_dependency(const char *who_filename,
                      const char *depend_on_filename) {
 
     builddb_set_file_depend(who_filename, depend_on_filename);
-    builddb_set_file(depend_on_filename,ct_fs_a0->file_mtime(SOURCE_ROOT,
+    builddb_set_file(depend_on_filename,ce_fs_a0->file_mtime(SOURCE_ROOT,
                                                  depend_on_filename));
 }
 
@@ -305,7 +305,7 @@ static struct ct_builddb_a0 build_db_api = {
 
 struct ct_builddb_a0 *ct_builddb_a0 =  &build_db_api;
 
-static void _init(struct ct_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
     api->register_api("ct_builddb_a0", ct_builddb_a0);
 
     builddb_init_db();
@@ -314,20 +314,20 @@ static void _init(struct ct_api_a0 *api) {
 static void _shutdown() {
 }
 
-CETECH_MODULE_DEF(
+CE_MODULE_DEF(
         builddb,
         {
-            CT_INIT_API(api, ct_memory_a0);
-            CT_INIT_API(api, ct_hashlib_a0);
+            CE_INIT_API(api, ce_memory_a0);
+            CE_INIT_API(api, ce_id_a0);
 
         },
         {
-            CT_UNUSED(reload);
+            CE_UNUSED(reload);
             _init(api);
         },
         {
-            CT_UNUSED(reload);
-            CT_UNUSED(api);
+            CE_UNUSED(reload);
+            CE_UNUSED(api);
             _shutdown();
         }
 )

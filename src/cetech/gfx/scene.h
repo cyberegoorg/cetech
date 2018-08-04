@@ -8,7 +8,7 @@
 //==============================================================================
 
 #include <stdint.h>
-#include <corelib/module.inl>
+#include <celib/module.inl>
 
 //==============================================================================
 // Typedefs
@@ -19,64 +19,64 @@ struct ct_entity;
 
 
 #define SCENE_TYPE \
-    CT_ID64_0("scene", 0x9d0a795bfe818d19ULL)
+    CE_ID64_0("scene", 0x9d0a795bfe818d19ULL)
 
 #define SCENE_IB_PROP   \
-    CT_ID64_0("ib", 0xecb387261d2c25a3ULL)
+    CE_ID64_0("ib", 0xecb387261d2c25a3ULL)
 
 #define SCENE_VB_PROP   \
-    CT_ID64_0("vb", 0x483690c3614b4c35ULL)
+    CE_ID64_0("vb", 0x483690c3614b4c35ULL)
 
 #define SCENE_SIZE_PROP \
-    CT_ID64_0("size", 0x6687058679006e12ULL)
+    CE_ID64_0("size", 0x6687058679006e12ULL)
 
 #define SCENE_GEOM_COUNT \
-    CT_ID64_0("geom_count", 0x423934fe3be0af59ULL)
+    CE_ID64_0("geom_count", 0x423934fe3be0af59ULL)
 
 #define SCENE_VB_DECL \
-    CT_ID64_0("vb_decl", 0x1d8a0b163d414dbaULL)
+    CE_ID64_0("vb_decl", 0x1d8a0b163d414dbaULL)
 
 #define SCENE_GEOM_NAME \
-    CT_ID64_0("geom_name", 0x24fc37fc38807bbbULL)
+    CE_ID64_0("geom_name", 0x24fc37fc38807bbbULL)
 
 #define SCENE_IB_OFFSET \
-    CT_ID64_0("ib_offset", 0x728cf737dbc1e768ULL)
+    CE_ID64_0("ib_offset", 0x728cf737dbc1e768ULL)
 
 #define SCENE_VB_OFFSET \
-    CT_ID64_0("vb_offset", 0x1cf22db14206ad07ULL)
+    CE_ID64_0("vb_offset", 0x1cf22db14206ad07ULL)
 
 #define SCENE_IB_SIZE \
-    CT_ID64_0("ib_size", 0x9dcfa3f7770638d8ULL)
+    CE_ID64_0("ib_size", 0x9dcfa3f7770638d8ULL)
 
 #define SCENE_VB_SIZE \
-    CT_ID64_0("vb_size", 0xc5729c2a2f3777f9ULL)
+    CE_ID64_0("vb_size", 0xc5729c2a2f3777f9ULL)
 
 #define SCENE_IB_LEN \
-    CT_ID64_0("ib_len", 0x484276e7d0d8a15cULL)
+    CE_ID64_0("ib_len", 0x484276e7d0d8a15cULL)
 
 #define SCENE_VB_LEN \
-    CT_ID64_0("vb_len", 0x55671b5ab72a5c3dULL)
+    CE_ID64_0("vb_len", 0x55671b5ab72a5c3dULL)
 
 #define SCENE_GEOM_STR \
-    CT_ID64_0("geom_str", 0xe808ceb7d7398434ULL)
+    CE_ID64_0("geom_str", 0xe808ceb7d7398434ULL)
 
 #define SCENE_NODE_COUNT \
-    CT_ID64_0("node_count", 0x8289cc88f4fc1b8dULL)
+    CE_ID64_0("node_count", 0x8289cc88f4fc1b8dULL)
 
 #define SCENE_NODE_NAME \
-    CT_ID64_0("node_name", 0x9c24bc4702c0d052ULL)
+    CE_ID64_0("node_name", 0x9c24bc4702c0d052ULL)
 
 #define SCENE_NODE_PARENT \
-    CT_ID64_0("node_parent", 0x9a6f751ba923814cULL)
+    CE_ID64_0("node_parent", 0x9a6f751ba923814cULL)
 
 #define SCENE_NODE_POSE \
-    CT_ID64_0("node_pose", 0x367dd98b4afd211eULL)
+    CE_ID64_0("node_pose", 0x367dd98b4afd211eULL)
 
 #define SCENE_NODE_GEOM \
-    CT_ID64_0("geom_node", 0xc8167579ff5f9ee5ULL)
+    CE_ID64_0("geom_node", 0xc8167579ff5f9ee5ULL)
 
 #define SCENE_NODE_STR \
-    CT_ID64_0("node_str", 0x8449734a8dc39415ULL)
+    CE_ID64_0("node_str", 0x8449734a8dc39415ULL)
 
 
 //==============================================================================
@@ -101,6 +101,6 @@ struct ct_scene_a0 {
                           uint32_t *count);
 };
 
-CT_MODULE(ct_scene_a0);
+CE_MODULE(ct_scene_a0);
 
 #endif //CETECH_SCENE_H

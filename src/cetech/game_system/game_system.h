@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-#include <corelib/module.inl>
+#include <celib/module.inl>
 #include <cetech/gfx/render_graph.h>
 
 #define GAME_INTERFACE_NAME \
     "ct_game_i0"
 
 #define GAME_INTERFACE \
-    CT_ID64_0("ct_game_i0", 0x22500b95a05f8b37ULL)
+    CE_ID64_0("ct_game_i0", 0x22500b95a05f8b37ULL)
 
 
 struct ct_render_texture_handle;
@@ -42,6 +42,6 @@ struct ct_game_system_a0 {
     void (*step)(uint64_t name, float dt);
 };
 
-CT_MODULE(ct_game_system_a0);
+CE_MODULE(ct_game_system_a0);
 
 #endif //CETECH_GAME_H
