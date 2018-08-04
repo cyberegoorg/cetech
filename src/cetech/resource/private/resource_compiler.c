@@ -52,7 +52,7 @@ static struct _G {
 } _G;
 
 
-#include "cetech/builddb/builddb.h"
+#include "cetech/resource/builddb.h"
 #include "resource.h"
 
 //CE_STATIC_ASSERT(sizeof(struct compile_task_data) < 64);

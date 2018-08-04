@@ -159,7 +159,7 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_ebus_a0->create_ebus(KEYBOARD_EBUS_NAME, KEYBOARD_EBUS);
 
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 1);
 
     ct_log_a0->debug(LOG_WHERE, "Init");
 }

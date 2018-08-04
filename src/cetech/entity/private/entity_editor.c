@@ -13,23 +13,23 @@
 
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/debugui/debugui.h>
+#include <cetech/gfx/renderer.h>
+#include <cetech/gfx/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/asset_browser/asset_browser.h>
-#include <cetech/explorer/explorer.h>
+#include <cetech/editor/asset_browser.h>
+#include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
-#include <cetech/render_graph/render_graph.h>
-#include <cetech/default_render_graph/default_render_graph.h>
-#include <cetech/selected_object/selected_object.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/dock/dock.h>
+#include <cetech/gfx/render_graph.h>
+#include <cetech/gfx/default_render_graph.h>
+#include <cetech/editor/selected_object.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/gfx/debugui.h>
+#include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/asset_editor/asset_editor.h>
+#include <cetech/editor/asset_editor.h>
 
 
 #define MAX_EDITOR 8

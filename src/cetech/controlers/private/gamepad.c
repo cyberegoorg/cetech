@@ -210,7 +210,7 @@ static void _init(struct ct_api_a0 *api) {
     _init_api(api);
     _G = (struct _G) {};
 
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 0);
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 1);
 
     ct_ebus_a0->create_ebus(GAMEPAD_EBUS_NAME, GAMEPAD_EBUS);
 

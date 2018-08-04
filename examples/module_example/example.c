@@ -13,10 +13,10 @@
 #include <corelib/cdb.h>
 #include <cetech/ecs/ecs.h>
 
-#include <cetech/debugui/debugui.h>
-#include <cetech/renderer/renderer.h>
+#include <cetech/gfx/debugui.h>
+#include <cetech/gfx/renderer.h>
 #include <cetech/transform/transform.h>
-#include <cetech/texture/texture.h>
+#include <cetech/gfx/texture.h>
 #include <cetech/kernel/kernel.h>
 
 #include <stdlib.h>

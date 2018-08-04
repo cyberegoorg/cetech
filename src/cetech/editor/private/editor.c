@@ -12,18 +12,19 @@
 
 #include <corelib/cdb.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/debugui/debugui.h>
+#include <cetech/gfx/renderer.h>
+#include <cetech/gfx/debugui.h>
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
-#include <cetech/command_system/command_system.h>
-#include <cetech/action_manager/action_manager.h>
+#include <cetech/editor/command_system.h>
+#include <cetech/editor/action_manager.h>
 #include <corelib/ebus.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/render_graph/render_graph.h>
-#include <cetech/dock/dock.h>
-#include <cetech/asset_browser/asset_browser.h>
+#include <cetech/gfx/render_graph.h>
+#include <cetech/editor/dock.h>
+#include <cetech/editor/asset_browser.h>
 #include <string.h>
+#include <cetech/game_system/game_system.h>
 
 #define _G plaground_global
 
@@ -233,10 +234,8 @@ static void on_shutdown(uint64_t _event) {
     }
 }
 
-static void on_update(uint64_t app_event) {
+static void on_update(float dt) {
     ct_action_manager_a0->check();
-
-    float dt = ct_cdb_a0->read_float(app_event, KERNEL_EVENT_DT, 0.0f);
 
     struct ct_api_entry it = ct_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
@@ -285,7 +284,22 @@ static void on_ui(uint64_t _event) {
     }
 }
 
+static uint64_t name(){
+    return ct_hashlib_a0->id64("editor");
+}
 
+static struct ct_render_graph_builder *render_graph_builder(){
+    return _G.render_graph_builder;
+}
+
+struct ct_game_i0 editor_game_i0 = {
+        .init = on_init,
+        .shutdown = on_shutdown,
+        .render = on_render,
+        .update = on_update,
+        .name = name,
+        .render_graph_builder = render_graph_builder
+};
 
 static void _init(struct ct_api_a0 *api) {
     _G = (struct _G) {
@@ -304,21 +318,12 @@ static void _init(struct ct_api_a0 *api) {
             ct_cmd_system_a0->redo
     );
 
+    ct_api_a0->register_api(GAME_INTERFACE_NAME, &editor_game_i0);
 
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT, on_init, GAME_ORDER);
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update,
-                        KERNEL_ORDER);
-    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown,
-                        KERNEL_ORDER);
-    ct_ebus_a0->connect(RENDERER_EBUS, RENDERER_RENDER_EVENT, on_render, 0);
     ct_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
 }
 
 static void _shutdown() {
-    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_INIT_EVENT, on_init);
-    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_update);
-    ct_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, on_shutdown);
-    ct_ebus_a0->disconnect(KERNEL_EBUS, RENDERER_RENDER_EVENT, on_render);
     ct_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui);
 
     _G = (struct _G) {};

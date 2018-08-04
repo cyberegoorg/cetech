@@ -229,13 +229,11 @@ static void reload_all() {
 }
 
 
-static void load_dirs() {
+static void load_dirs(const char *path) {
     char key[64];
     size_t len = strlen("load_module.");
     strcpy(key, "load_module.");
-    const char *path = ct_cdb_a0->read_str(_G.config,
-                                           CONFIG_MODULE_DIR,
-                                           "bin/darwin64");
+
     char *buffer = NULL;
     for (int i = 0; true; ++i) {
         ct_buffer_clear(buffer);
@@ -330,11 +328,7 @@ static void _init(struct ct_api_a0 *api) {
 
     ct_api_a0 = api;
     api->register_api("ct_module_a0", &module_api);
-
-    uint64_t root = ct_hashlib_a0->id64("modules");
-    ct_fs_a0->map_root_dir(root, ct_cdb_a0->read_str(_G.config,
-                                                     CONFIG_MODULE_DIR,
-                                                     "bin/darwin64"), true);
+    
 }
 
 CETECH_MODULE_DEF(

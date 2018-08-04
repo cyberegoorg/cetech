@@ -26,6 +26,7 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(gamepad);
     CETECH_ADD_STATIC_MODULE(mouse);
 
+    CETECH_ADD_STATIC_MODULE(game_system);
 
     //==========================================================================
     // DebugUI
@@ -61,5 +62,6 @@ void init_static_modules() {
     CETECH_ADD_STATIC_MODULE(entity_editor);
     CETECH_ADD_STATIC_MODULE(editor);
     CETECH_ADD_STATIC_MODULE(editor_ui);
+    CETECH_ADD_STATIC_MODULE(game_view);
 }
 

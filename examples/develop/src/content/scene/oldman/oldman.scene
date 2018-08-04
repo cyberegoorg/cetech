@@ -1,0 +1,6 @@
+import:
+    input: content/scene/oldman/muro.fbx
+#    input: content/scene/duck/duck.dae
+
+    postprocess:
+      flip_uvs: true

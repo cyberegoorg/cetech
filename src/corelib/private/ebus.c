@@ -35,7 +35,7 @@ struct ebus_event_handlers {
 };
 
 struct ebus_t {
-    uint32_t bus_name;
+    uint64_t bus_name;
 
     struct ct_hash_t handler_idx;
     struct ebus_event_handlers *handlers;
@@ -56,7 +56,7 @@ static struct _G {
 
 
 void create_ebus(const char *name,
-                 uint32_t id) {
+                 uint64_t id) {
     uint64_t ebus_idx = ct_array_size(_G.ebus_pool);
 
     struct ebus_t ebus = {
@@ -67,7 +67,7 @@ void create_ebus(const char *name,
     ct_hash_add(&_G.ebus_idx, ebus.bus_name, ebus_idx, _G.allocator);
 }
 
-void send_addr(uint32_t bus_name,
+void send_addr(uint64_t bus_name,
                uint64_t addr,
                uint64_t event) {
 
@@ -101,7 +101,7 @@ void send_addr(uint32_t bus_name,
     }
 }
 
-void broadcast(uint32_t bus_name,
+void broadcast(uint64_t bus_name,
                uint64_t event) {
     send_addr(bus_name, 0, event);
 }
@@ -120,7 +120,7 @@ void begin_frame() {
     }
 }
 
-void _connect_addr(uint32_t bus_name,
+void _connect_addr(uint64_t bus_name,
                    uint64_t event,
                    uint64_t addr,
                    ct_ebus_handler *handler,
@@ -172,14 +172,14 @@ void _connect_addr(uint32_t bus_name,
     ct_array_push(ev_handlers->handlers, h, _G.allocator);
 }
 
-void _connect(uint32_t bus_name,
+void _connect(uint64_t bus_name,
               uint64_t event,
               ct_ebus_handler *handler,
               uint32_t order) {
     _connect_addr(bus_name, event, 0, handler, order);
 }
 
-void disconnect_addr(uint32_t bus_name,
+void disconnect_addr(uint64_t bus_name,
                      uint64_t event,
                      uint64_t addr,
                      ct_ebus_handler *handler) {
@@ -220,14 +220,14 @@ void disconnect_addr(uint32_t bus_name,
     }
 }
 
-void disconnect(uint32_t bus_name,
+void disconnect(uint64_t bus_name,
                 uint64_t event,
                 ct_ebus_handler *handler) {
     disconnect_addr(bus_name, event, 0, handler);
 }
 
 
-uint32_t event_count(uint32_t bus_name) {
+uint32_t event_count(uint64_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
@@ -239,7 +239,7 @@ uint32_t event_count(uint32_t bus_name) {
     return ct_array_size(ebus->events);
 }
 
-uint64_t *events(uint32_t bus_name) {
+uint64_t *events(uint64_t bus_name) {
     uint64_t ebus_idx = ct_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {

@@ -9,9 +9,9 @@
 #include <corelib/array.inl>
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
-#include <cetech/renderer/renderer.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/editor_ui/editor_ui.h>
+#include <cetech/gfx/renderer.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "corelib/hashlib.h"
 #include "corelib/config.h"

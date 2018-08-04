@@ -177,18 +177,14 @@ struct ct_entity_a0 {
     struct ct_entity (*spawn)(struct ct_world world,
                               uint64_t name);
 
-    struct ct_entity (*find_by_uid)(struct ct_world world,
-                                    struct ct_entity root,
-                                    uint64_t uid);
-
-    void (*link)(struct ct_world world,
-                 struct ct_entity parent,
-                 struct ct_entity child);
 
     bool (*has)(struct ct_world world,
                 struct ct_entity ent,
                 uint64_t *component_name,
                 uint32_t name_count);
+
+    struct ct_entity (*find_by_name)(struct ct_world world,
+                                     struct ct_entity ent, uint64_t name);
 };
 
 struct ct_system_a0 {

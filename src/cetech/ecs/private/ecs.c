@@ -20,7 +20,7 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
-#include <cetech/asset_preview/asset_preview.h>
+#include <cetech/editor/asset_preview.h>
 
 
 //==============================================================================
@@ -66,7 +66,6 @@ static struct _G {
 
     struct ct_alloc *allocator;
 } _G;
-
 
 static void *virtual_alloc(uint64_t size) {
     return mmap(NULL,
@@ -590,46 +589,6 @@ static bool alive(struct ct_world world,
     return true;
 }
 
-static void link(struct ct_world world,
-                 struct ct_entity parent,
-                 struct ct_entity child) {
-
-//    struct world_instance *w = get_world_instance(world);
-//
-//    w->parent[_idx(child.h)].h = parent.h;
-//
-//    uint64_t tmp = w->first_child[_idx(parent.h)].h;
-//
-//    w->first_child[_idx(parent.h)].h = child.h;
-//    w->next_sibling[_idx(child.h)].h = tmp;
-}
-
-static struct ct_entity find_by_uid(struct ct_world world,
-                                    struct ct_entity root,
-                                    uint64_t uid) {
-//    struct world_instance *w = get_world_instance(world);
-//
-//    const uint64_t ent_idx = _idx(root.h);
-//    const uint64_t ent_uid = w->entity_uid[ent_idx];
-//    if (uid == ent_uid) {
-//        return root;
-//    }
-//
-//    struct ct_entity child = w->first_child[ent_idx];
-//    while (child.h) {
-//        const uint64_t ent_idx = _idx(child.h);
-//        const uint64_t ent_uid = w->entity_uid[ent_idx];
-//
-//        if (uid == ent_uid) {
-//            return child;
-//        }
-//
-//        child = w->next_sibling[_idx(child.h)];
-//    }
-
-    return (struct ct_entity) {.h=0};
-}
-
 
 static struct ct_entity _spawn_entity(struct ct_world world,
                                       uint64_t resource_ent) {
@@ -692,7 +651,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
         uint64_t new_obj = _spawn_entity(world, child).h;
 
-        ct_cdb_obj_o *ch_w  = ct_cdb_a0->write_begin(children);
+        ct_cdb_obj_o *ch_w = ct_cdb_a0->write_begin(children);
         ct_cdb_a0->set_subobject(ch_w, children_keys[i], new_obj);
         ct_cdb_a0->write_commit(ch_w);
 
@@ -764,16 +723,45 @@ static void destroy_world(struct ct_world world) {
     ct_cdb_a0->destroy_db(w->db);
 }
 
+struct ct_entity find_by_name(struct ct_world world,
+                              struct ct_entity ent,
+                              uint64_t name) {
+    uint64_t obj = ent.h;
+    uint64_t chidren = ct_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
+    const uint64_t children_n = ct_cdb_a0->prop_count(chidren);
+
+    uint64_t children_key[children_n];
+    ct_cdb_a0->prop_keys(chidren, children_key);
+
+    for (int i = 0; i < children_n; ++i) {
+        uint64_t child_obj = ct_cdb_a0->read_subobject(chidren, children_key[i], 0);
+        const char *child_name = ct_cdb_a0->read_str(child_obj, ENTITY_NAME,
+                                                     "");
+
+        uint64_t name_hash = ct_hashlib_a0->id64(child_name);
+        if (name_hash == name) {
+            return (struct ct_entity) {.h = child_obj};
+        }
+
+        struct ct_entity find_ent;
+        find_ent = find_by_name(world,
+                                (struct ct_entity) {.h = child_obj}, name);
+
+        if (find_ent.h) {
+            return find_ent;
+        }
+    }
+
+    return (struct ct_entity) {.h = 0};
+}
 
 struct ct_entity_a0 ct_entity_a0 = {
         .create = create_entities,
         .destroy = destroy,
         .alive = alive,
         .spawn = spawn_entity,
-        .find_by_uid = find_by_uid,
-        .link = link,
         .has = has,
-
+        .find_by_name = find_by_name,
 
         .create_world = create_world,
         .destroy_world = destroy_world,

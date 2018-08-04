@@ -93,15 +93,15 @@ set(SOURCE_FILES
         src/cetech/resource/private/resource.c
         src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
-        src/cetech/kernel/kernel.c
-        src/cetech/debugui/private/bgfx_imgui/imgui.cpp
-        src/cetech/debugui/private/ocornut-imgui/imgui.cpp
-        src/cetech/debugui/private/ocornut-imgui/imgui_draw.cpp
-        src/cetech/debugui/private/debugui.cpp
+        src/cetech/kernel/private/kernel.c
+        src/cetech/gfx/private/bgfx_imgui/imgui.cpp
+        src/cetech/gfx/private/ocornut-imgui/imgui.cpp
+        src/cetech/gfx/private/ocornut-imgui/imgui_draw.cpp
+        src/cetech/gfx/private/debugui.cpp
 
-        src/cetech/debugdraw/private/debugdraw/debugdraw.cpp
-        src/cetech/debugdraw/private/debugdraw/bounds.cpp
-        src/cetech/debugdraw/private/debugdraw.cpp
+        src/cetech/gfx/private/debugdraw/debugdraw.cpp
+        src/cetech/gfx/private/debugdraw/bounds.cpp
+        src/cetech/gfx/private/debugdraw.cpp
 
         src/cetech/machine/private/machine_sdl2.c
 
@@ -110,38 +110,40 @@ set(SOURCE_FILES
         src/cetech/controlers/private/controlers.c
         src/cetech/controlers/private/mouse.c
         src/cetech/controlers/private/gamepad.c
-        src/cetech/renderer/private/renderer.cpp
-        src/cetech/render_graph/private/render_graph.c
-        src/cetech/default_render_graph/private/default_render_graph.c
-        src/cetech/texture/private/texture.c
+        src/cetech/gfx/private/renderer.cpp
+        src/cetech/gfx/private/render_graph.c
+        src/cetech/gfx/private/default_render_graph.c
+        src/cetech/gfx/private/texture.c
 
-        src/cetech/shader/private/shader.c
-        src/cetech/material/private/material.c
-        src/cetech/material/private/material_compiler.c
-        src/cetech/scene/private/scene.c
-        src/cetech/scene/private/scene_compiler.cpp
-        src/cetech/mesh_renderer/private/mesh_renderer.c
+        src/cetech/gfx/private/shader.c
+        src/cetech/gfx/private/material.c
+        src/cetech/gfx/private/material_compiler.c
+        src/cetech/gfx/private/scene.c
+        src/cetech/gfx/private/scene_compiler.cpp
+        src/cetech/gfx/private/mesh_renderer.c
         src/cetech/transform/private/transform.c
 
         src/cetech/scenegraph/private/scenegraph.c
         src/cetech/camera/private/camera.c
 
         src/cetech/entity/private/entity_editor.c
-        src/cetech/asset_editor/private/asset_editor.c
+        src/cetech/editor/private/asset_editor.c
         src/cetech/entity/private/entity_property.c
-        src/cetech/explorer/private/explorer.c
-        src/cetech/asset_preview/private/asset_preview.c
-        src/cetech/asset_property/private/asset_property.c
-        src/cetech/asset_browser/private/asset_browser.cpp
+        src/cetech/editor/private/explorer.c
+        src/cetech/editor/private/asset_preview.c
+        src/cetech/editor/private/asset_property.c
+        src/cetech/editor/private/asset_browser.cpp
         src/cetech/editor/private/editor.c
-        src/cetech/property_editor/private/property_editor.c
-        src/cetech/command_system/private/command_system.c
-        src/cetech/command_history/private/command_history.c
-        src/cetech/log_view/private/log_view.cpp
-        src/cetech/action_manager/private/action_manager.c
-        src/cetech/selected_object/private/selected_object.c
-        src/cetech/builddb/private/builddb.c
-        src/cetech/editor_ui/private/editor_ui.c)
+        src/cetech/editor/private/property_editor.c
+        src/cetech/editor/private/command_system.c
+        src/cetech/editor/private/command_history.c
+        src/cetech/editor/private/log_view.cpp
+        src/cetech/editor/private/action_manager.c
+        src/cetech/editor/private/selected_object.c
+        src/cetech/resource/private/builddb.c
+        src/cetech/editor/private/editor_ui.c
+        src/cetech/game_system/private/game_system.c
+        src/cetech/editor/private/game_view.c)
 
 ################################################################################
 # Main sources
@@ -278,5 +280,5 @@ target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_
 add_library(example SHARED examples/module_example/example.c)
 set_target_properties(example PROPERTIES PREFIX "module_")
 
-add_library(example_develop SHARED examples/develop/src/game.c)
+add_library(example_develop SHARED examples/develop/src/game_example.c)
 set_target_properties(example_develop PROPERTIES PREFIX "game_")

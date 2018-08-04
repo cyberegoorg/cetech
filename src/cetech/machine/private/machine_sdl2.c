@@ -12,7 +12,7 @@
 #include <include/SDL2/SDL.h>
 #include <corelib/hashlib.h>
 #include <corelib/ebus.h>
-#include <cetech/renderer/renderer.h>
+#include <cetech/gfx/renderer.h>
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/controlers/gamepad.h>
@@ -354,9 +354,7 @@ void sdl_gamepad_play_rumble(int gamepad,
     SDL_HapticRumblePlay(h, strength, length);
 }
 
-static void _update(float dt) {
-    CT_UNUSED(dt);
-
+static void _update(uint64_t  event ) {
     SDL_Event e = {0};
 
     while (SDL_PollEvent(&e) > 0) {
@@ -482,7 +480,6 @@ static void _update(float dt) {
 }
 
 static struct ct_machine_a0 a0 = {
-        .update = _update,
         .gamepad_is_active = sdl_gamepad_is_active,
         .gamepad_play_rumble = sdl_gamepad_play_rumble,
 };
@@ -510,6 +507,7 @@ static void init(struct ct_api_a0 *api) {
 
     sdl_window_init(api);
 
+    ct_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
 }
 
 static void shutdown() {

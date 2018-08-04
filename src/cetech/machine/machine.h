@@ -24,8 +24,6 @@
 
 //! Machine API V0
 struct ct_machine_a0 {
-    void (*update)(float dt);
-
     //! Is gamepad active?
     //! \param gamepad Gamepad ID
     //! \return 1 if is active else 0

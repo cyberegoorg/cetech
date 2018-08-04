@@ -12,7 +12,23 @@
 
 #include <corelib/module.inl>
 
-#define RESOURCE_I_NAME "ct_resource_i0"
+#define CONFIG_BUILD \
+     CT_ID64_0("build", 0x4429661936ece1eaULL)
+
+#define CONFIG_SRC \
+     CT_ID64_0("src", 0x1cdb3620898c588eULL)
+
+#define CONFIG_CORE \
+     CT_ID64_0("core", 0x6da99857e9315560ULL)
+
+#define CONFIG_MODULE_DIR \
+     CT_ID64_0("module_dir", 0xa96daa49986032f4ULL)
+
+#define CONFIG_EXTERNAL \
+     CT_ID64_0("external", 0x9fb8bb487a62dc4fULL)
+
+#define RESOURCE_I_NAME \
+    "ct_resource_i0"
 
 #define PROP_RESOURECE_DATA \
     CT_ID64_0("data", 0x8fd0d44d20650b68ULL)

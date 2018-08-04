@@ -26,41 +26,41 @@ typedef void (ct_ebus_handler)(uint64_t event);
 
 struct ct_ebus_a0 {
     void (*create_ebus)(const char *name,
-                        uint32_t id);
+                        uint64_t id);
 
     void (*begin_frame)();
 
-    void (*broadcast)(uint32_t bus_name,
+    void (*broadcast)(uint64_t bus_name,
                       uint64_t event);
 
-    void (*send)(uint32_t bus_name,
+    void (*send)(uint64_t bus_name,
                  uint64_t addr,
                  uint64_t event);
 
-    void (*connect)(uint32_t bus_name,
+    void (*connect)(uint64_t bus_name,
                     uint64_t event,
                     ct_ebus_handler *handler,
                     uint32_t order);
 
-    void (*connect_addr)(uint32_t bus_name,
+    void (*connect_addr)(uint64_t bus_name,
                          uint64_t event,
                          uint64_t addr,
                          ct_ebus_handler *handler,
                          uint32_t order);
 
-    void (*disconnect)(uint32_t bus_name,
+    void (*disconnect)(uint64_t bus_name,
                        uint64_t event,
                        ct_ebus_handler *handler);
 
-    void (*disconnect_addr)(uint32_t bus_name,
+    void (*disconnect_addr)(uint64_t bus_name,
                             uint64_t event,
                             uint64_t addr,
                             ct_ebus_handler *handler);
 
 
-    uint32_t (*event_count)(uint32_t bus_name);
+    uint32_t (*event_count)(uint64_t bus_name);
 
-    uint64_t *(*events)(uint32_t bus_name);
+    uint64_t *(*events)(uint64_t bus_name);
 };
 
 CT_MODULE(ct_ebus_a0);

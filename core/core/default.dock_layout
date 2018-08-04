@@ -1,4 +1,4 @@
-0:
+0: 
   index: 0
   label:  Asset browser##asset_browser_dock0
   x: 0
@@ -14,7 +14,7 @@
   child0: -1
   child1: -1
   parent: 9
-1:
+1: 
   index: 1
   label:  Explorer##explorer_dock0
   x: 0
@@ -30,7 +30,7 @@
   child0: -1
   child1: -1
   parent: 10
-2:
+2: 
   index: 2
   label:  Property editor##property_editor_dock0
   x: 699
@@ -46,7 +46,7 @@
   child0: -1
   child1: -1
   parent: 8
-3:
+3: 
   index: 3
   label: Command history##command_history_dock0
   x: 699
@@ -62,7 +62,7 @@
   child0: -1
   child1: -1
   parent: 8
-4:
+4: 
   index: 4
   label: Asset preview##asset_preview_dock0
   x: 698
@@ -78,7 +78,7 @@
   child0: -1
   child1: -1
   parent: 9
-5:
+5: 
   index: 5
   label: Log view##log_view_dock0
   x: 0
@@ -94,7 +94,7 @@
   child0: -1
   child1: -1
   parent: 9
-6:
+6: 
   index: 6
   label: Editor##editor_dock0
   x: 218
@@ -103,14 +103,14 @@
   size_x: 481
   size_y: 470
   status: 0
-  active: 1
+  active: 0
   opened: 1
   prev: -1
-  next: -1
+  next: 11
   child0: -1
   child1: -1
   parent: 10
-7:
+7: 
   index: 7
   label: ""
   x: 0
@@ -126,7 +126,7 @@
   child0: 8
   child1: 9
   parent: -1
-8:
+8: 
   index: 8
   label: ""
   x: 0
@@ -142,7 +142,7 @@
   child0: 10
   child1: 2
   parent: 7
-9:
+9: 
   index: 9
   label: ""
   x: 0
@@ -158,7 +158,7 @@
   child0: 0
   child1: 4
   parent: 7
-10:
+10: 
   index: 10
   label: ""
   x: 0
@@ -174,3 +174,20 @@
   child0: 1
   child1: 6
   parent: 8
+
+11:
+  index: 11
+  label:  Game view##game_view_dock0
+  x: 218
+  y: 24
+  location: ""
+  size_x: 481
+  size_y: 470
+  status: 0
+  active: 1
+  opened: 1
+  prev: 6
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 10

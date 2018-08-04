@@ -13,10 +13,10 @@
 #include <corelib/fmath.inl>
 #include <corelib/ebus.h>
 #include <corelib/log.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/gfx/debugui.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <corelib/yng.h>
-#include <cetech/editor_ui/editor_ui.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "corelib/module.h"
 

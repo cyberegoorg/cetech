@@ -77,7 +77,7 @@ struct ct_module_a0 {
 
     //! Load module from dir
     //! \param path Plugin dir path
-    void (*load_dirs)();
+    void (*load_dirs)(const char* path);
 
     void (*unload_all)();
 

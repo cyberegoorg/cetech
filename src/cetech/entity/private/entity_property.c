@@ -9,18 +9,18 @@
 #include <corelib/array.inl>
 #include <corelib/module.h>
 
-#include <cetech/debugui/debugui.h>
+#include <cetech/gfx/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
 
-#include <cetech/property_editor/property_editor.h>
-#include <cetech/asset_browser/asset_browser.h>
-#include <cetech/explorer/explorer.h>
+#include <cetech/editor/property_editor.h>
+#include <cetech/editor/asset_browser.h>
+#include <cetech/editor/explorer.h>
 #include <corelib/ebus.h>
 #include <corelib/fmath.inl>
-#include <cetech/command_system/command_system.h>
+#include <cetech/editor/command_system.h>
 #include <corelib/hash.inl>
-#include <cetech/selected_object/selected_object.h>
+#include <cetech/editor/selected_object.h>
 #include <corelib/yng.h>
 
 
