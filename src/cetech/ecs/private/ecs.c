@@ -15,7 +15,7 @@
 #include <celib/module.h>
 #include <celib/ydb.h>
 #include <celib/hash.inl>
-#include <celib/handler.h>
+#include <celib/handler.inl>
 #include <celib/task.h>
 
 #include <cetech/ecs/ecs.h>
@@ -42,6 +42,9 @@ struct entity_storage {
 struct world_instance {
     struct ct_world world;
     struct ce_cdb_t db;
+
+    // Entity
+    struct ce_handler_t entity_handler;
 
     // Storage
     struct ce_hash_t entity_storage_map;
@@ -92,6 +95,11 @@ static int compile(uint64_t type,
                    ce_cdb_obj_o *writer) {
 
     struct ct_component_i0 *component_i = get_interface(type);
+
+    if (!component_i) {
+        ce_log_a0->error("ecs", "could not find component");
+        return 0;
+    }
 
     component_i->compiler(filename, component_key, component_key_count, writer);
 
@@ -431,6 +439,8 @@ static void create_entities(struct ct_world world,
                             struct ct_entity *entity,
                             uint32_t count) {
 
+//    struct world_instance *w = get_world_instance(world);
+
     for (int i = 0; i < count; ++i) {
         uint64_t entity_obj;
         entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_INSTANCE);
@@ -442,6 +452,9 @@ static void create_entities(struct ct_world world,
         ce_cdb_a0->write_commit(ent_w);
 
         entity[i] = (struct ct_entity) {.h = entity_obj};
+
+//        struct ct_entity ent = ce_handler_create(&w->entity_handler,
+//                                                 _G.allocator);
     }
 }
 
@@ -628,6 +641,10 @@ static struct ct_entity _spawn_entity(struct ct_world world,
         struct ct_component_i0 *component_i;
         component_i = get_interface(component_type);
 
+        if (!component_i) {
+            continue;
+        }
+
         void *comp_data = item->entity_data[j];
 
         uint64_t component_obj;
@@ -680,8 +697,7 @@ static struct ct_entity spawn_entity(struct ct_world world,
 //==============================================================================
 static struct world_instance *_new_world(struct ct_world world) {
     uint32_t idx = ce_array_size(_G.world_array);
-    ce_array_push(_G.world_array, (struct world_instance) {{0}},
-                  _G.allocator);
+    ce_array_push(_G.world_array, (struct world_instance) {{0}}, _G.allocator);
     ce_hash_add(&_G.world_map, world.h, idx, _G.allocator);
     return &_G.world_array[idx];
 }
@@ -734,7 +750,8 @@ struct ct_entity find_by_name(struct ct_world world,
     ce_cdb_a0->prop_keys(chidren, children_key);
 
     for (int i = 0; i < children_n; ++i) {
-        uint64_t child_obj = ce_cdb_a0->read_subobject(chidren, children_key[i], 0);
+        uint64_t child_obj = ce_cdb_a0->read_subobject(chidren, children_key[i],
+                                                       0);
         const char *child_name = ce_cdb_a0->read_str(child_obj, ENTITY_NAME,
                                                      "");
 

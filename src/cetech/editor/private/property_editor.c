@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <celib/ebus.h>
 #include <celib/macros.h>
 #include "celib/hashlib.h"
@@ -5,15 +7,13 @@
 #include "celib/api_system.h"
 #include "celib/module.h"
 
+#include <cetech/resource/resource.h>
 #include <cetech/gfx/debugui.h>
-
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/property_editor.h>
 #include <cetech/editor/editor.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/dock.h>
-#include <string.h>
 #include <cetech/editor/asset_browser.h>
-#include <cetech/resource/resource.h>
 #include <cetech/editor/explorer.h>
 
 #define WINDOW_NAME "Property editor"
@@ -78,8 +78,8 @@ struct ct_property_editor_a0 property_editor_api = {
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 
 static void _on_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,

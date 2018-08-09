@@ -31,6 +31,9 @@ children:
         mesh: "Mesh1Mesh1"
         material: "content/scene/solider/body"
 
+      rotation:
+        speed: 2.9
+
   mnbmnmnb562468979879NJKK:
     name: m4
     components:

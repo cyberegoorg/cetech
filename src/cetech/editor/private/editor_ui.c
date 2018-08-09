@@ -308,11 +308,11 @@ static void ui_resource(uint64_t obj,
 
             if (drag_obj) {
                 uint64_t asset_type = ce_cdb_a0->read_uint64(drag_obj,
-                                                             ASSET_BROWSER_ASSET_TYPE2,
+                                                             ASSET_TYPE,
                                                              0);
 
                 uint64_t asset_name = ce_cdb_a0->read_uint64(drag_obj,
-                                                             ASSET_BROWSER_ASSET_NAME,
+                                                             ASSET_NAME,
                                                              0);
 
                 if (resource_type == asset_type) {
@@ -524,7 +524,7 @@ static void _init(struct ce_api_a0 *api) {
                                                    .execute = set_uint64_cmd,
                                                    .description = cmd_description});
 
-
+    api->register_api("ct_editor_ui_a0", ct_editor_ui_a0);
 }
 
 static void _shutdown() {

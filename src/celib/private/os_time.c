@@ -22,8 +22,8 @@ uint64_t get_perf_freq() {
 
 struct ce_os_time_a0 time_api = {
         .ticks =get_ticks,
-        .perf_counter =get_perf_counter,
-        .perf_freq =get_perf_freq
+        .perf_counter = get_perf_counter,
+        .perf_freq = get_perf_freq
 };
 
 struct ce_os_time_a0 *ct_time_a0 = &time_api;

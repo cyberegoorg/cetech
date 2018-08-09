@@ -98,7 +98,8 @@ int init_config(int argc,
 
 int cetech_kernel_init(int argc,
                        const char **argv) {
-    ce_log_a0->register_handler(ce_log_a0->stdout_yaml_handler, NULL);
+//    ce_log_a0->register_handler(ce_log_a0->stdout_yaml_handler, NULL);
+    ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     ce_init();
 

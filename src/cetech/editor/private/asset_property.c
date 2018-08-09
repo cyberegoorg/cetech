@@ -35,10 +35,10 @@ static void draw_ui(uint64_t obj) {
     if (obj_type == ASSET_BROWSER_ASSET_TYPE) {
 
         uint64_t asset_type = ce_cdb_a0->read_uint64(obj,
-                                                     ASSET_BROWSER_ASSET_TYPE2,
+                                                     ASSET_TYPE,
                                                      0);
         uint64_t asset_name = ce_cdb_a0->read_uint64(obj,
-                                                     ASSET_BROWSER_ASSET_NAME,
+                                                     ASSET_NAME,
                                                      0);
         struct ct_resource_id rid = (struct ct_resource_id) {
                 .name = asset_name,

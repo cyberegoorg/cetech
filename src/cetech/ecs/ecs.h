@@ -1,10 +1,6 @@
 #ifndef CETECH_ECS_H
 #define CETECH_ECS_H
 
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -64,14 +60,6 @@ enum {
 struct ct_cdb_obj_t;
 typedef void ct_entity_storage_t;
 
-//==============================================================================
-// Enums
-//==============================================================================
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
 struct ct_world {
     uint64_t h;
 };
@@ -79,10 +67,6 @@ struct ct_world {
 struct ct_entity {
     uint64_t h;
 };
-
-//==============================================================================
-// Structs
-//==============================================================================
 
 typedef void (*ct_process_fce_t)(struct ct_world world,
                                  struct ct_entity *ent,
@@ -93,10 +77,8 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
+enum ce_cdb_type;
 typedef void ce_cdb_obj_o;
-//==============================================================================
-// Api
-//==============================================================================
 
 #define COMPONENT_INTERFACE_NAME \
     "ct_component_i0"
@@ -104,8 +86,16 @@ typedef void ce_cdb_obj_o;
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
+struct ct_component_prop_desc {
+    uint32_t offset;
+    uint64_t prop;
+    uint64_t cdb_type;
+};
+
 struct ct_component_i0 {
     uint64_t (*size)();
+
+    const struct ct_component_prop_desc* (*prop_desc)(uint32_t* count);
 
     uint64_t (*cdb_type)();
 

@@ -31,6 +31,7 @@ static struct _G {
     uint64_t selected_dir_hash;
     uint64_t selected_file;
     uint32_t selected_file_idx;
+    ct_resource_id selected_asset;
 
     const char *root;
     bool visible;
@@ -58,13 +59,48 @@ static void set_current_dir(const char *dir,
     _G.need_reaload = true;
 }
 
-static void ui_asset_filter() {
-    _G.asset_filter.Draw(ICON_FA_SEARCH);
+static void _broadcast_edit() {
+    uint64_t event;
+    event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                     ASSET_DCLICK_EVENT);
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+    ce_cdb_a0->set_uint64(w, ASSET_NAME, _G.selected_asset.name);
+    ce_cdb_a0->set_uint64(w, ASSET_TYPE, _G.selected_asset.type);
+    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT, ASSET_BROWSER_SOURCE);
+    ce_cdb_a0->write_commit(w);
+
+    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+}
+
+static void _broadcast_selected() {
+    uint64_t selected_asset;
+    selected_asset = ce_cdb_a0->create_object(
+            ce_cdb_a0->db(), ASSET_BROWSER_ASSET_SELECTED);
+
+    ce_cdb_obj_o *w;
+    w = ce_cdb_a0->write_begin(selected_asset);
+    ce_cdb_a0->set_uint64(w, ASSET_NAME, _G.selected_asset.name);
+    ce_cdb_a0->set_uint64(w, ASSET_TYPE, _G.selected_asset.type);
+    ce_cdb_a0->write_commit(w);
+
+    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, selected_asset);
+}
+
+static void ui_asset_menu() {
+    ct_debugui_a0->Text(ICON_FA_SEARCH);
+    ct_debugui_a0->SameLine(0, 8);
+    _G.asset_filter.Draw("");
+
+    ct_debugui_a0->SameLine(0, -1);
+
+    if (ct_debugui_a0->Button("Edit asset", (float[2]) {0, 0})) {
+        _broadcast_edit();
+    }
 }
 
 #define CURENT_DIR \
     CE_ID64_0(".", 0x223b2df3c7671369ULL)
-
 
 static void ui_breadcrumb(const char *dir) {
     const size_t len = strlen(dir);
@@ -147,7 +183,7 @@ static void ui_dir_list() {
 
 static void ui_asset_tooltip(ct_resource_id resourceid,
                              const char *path) {
-    ImGui::Text("%s", path);
+    ct_debugui_a0->Text("%s", path);
 
     ct_resource_i0 *ri = ct_resource_a0->get_interface(resourceid.type);
 
@@ -252,41 +288,15 @@ static void ui_asset_list() {
             }
 
             if (selected) {
+                _G.selected_asset = resourceid;
                 _G.selected_file = filename_hash;
                 _G.selected_file_idx = i;
 
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    uint64_t event;
-                    event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                     ASSET_DCLICK_EVENT);
-
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
-                                          resourceid.name);
-                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
-                                          resourceid.type);
-                    ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
-                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT,
-                                          ASSET_BROWSER_SOURCE);
-                    ce_cdb_a0->write_commit(w);
-
-                    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+                    _broadcast_edit();
                 } else {
-                    uint64_t selected_asset;
-                    selected_asset = ce_cdb_a0->create_object(
-                            ce_cdb_a0->db(), ASSET_BROWSER_ASSET_SELECTED);
-
-                    ce_cdb_obj_o *w;
-                    w = ce_cdb_a0->write_begin(selected_asset);
-                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
-                                          resourceid.name);
-                    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
-                                          resourceid.type);
-                    ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
-                    ce_cdb_a0->write_commit(w);
-
-                    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, selected_asset);
+                    _broadcast_selected();
                 }
             }
 
@@ -300,11 +310,8 @@ static void ui_asset_list() {
                         ASSET_BROWSER_ASSET_TYPE);
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
-                ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME,
-                                      resourceid.name);
-                ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2,
-                                      resourceid.type);
-                ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
+                ce_cdb_a0->set_uint64(w, ASSET_NAME, resourceid.name);
+                ce_cdb_a0->set_uint64(w, ASSET_TYPE, resourceid.type);
                 ce_cdb_a0->write_commit(w);
 
                 ct_debugui_a0->SetDragDropPayload("asset",
@@ -330,7 +337,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     }
 
     ui_breadcrumb(_G.current_dir);
-    ui_asset_filter();
+    ui_asset_menu();
     ui_dir_list();
 
     float left_size[] = {_G.left_column_width, 0.0f};

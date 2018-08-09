@@ -3,151 +3,29 @@
 #include "celib/hashlib.h"
 #include "celib/memory.h"
 #include "celib/api_system.h"
-
-
-#include "cetech/ecs/ecs.h"
-#include <cetech/transform/transform.h>
+#include <celib/yng.h>
 #include <celib/ydb.h>
 #include <celib/macros.h>
 #include <celib/array.inl>
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
 #include <celib/log.h>
-#include <cetech/gfx/debugui.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <celib/yng.h>
-#include <cetech/editor/editor_ui.h>
+#include <celib/cdb.h>
 
 #include "celib/module.h"
+#include "cetech/ecs/ecs.h"
+#include <cetech/transform/transform.h>
+#include <cetech/gfx/debugui.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+
+#include <cetech/editor/editor_ui.h>
 
 #define LOG_WHERE "transform"
 
-struct WorldInstance {
-    struct ct_world world;
-    uint32_t n;
-    uint32_t allocated;
-    void *buffer;
-
-    struct ct_entity *entity;
-
-    uint32_t *first_child;
-    uint32_t *next_sibling;
-    uint32_t *parent;
-
-    float *position;
-    float *rotation;
-    float *scale;
-    float *world_matrix;
-};
-
-
-#define _G TransformGlobal
-static struct _G {
-//    struct ce_hash_t world_map;
-//    struct WorldInstance *world_instances;
-//    struct ce_hash_t ent_map;
-    struct ce_alloc *allocator;
-} _G;
-
-
-//static uint64_t hash_combine(uint32_t a,
-//                             uint32_t b) {
-//    union {
-//        struct {
-//            uint32_t a;
-//            uint32_t b;
-//        };
-//        uint64_t ab;
-//    } c{
-//            .a = a,
-//            .b = b,
-//    };
-//
-//    return c.ab;
-//}
-
-//#define hash_combine(a, b) (((a) * 11)^(b))
-
-
-//static void allocate(WorldInstance &_data,
-//                     ce_alloc *_allocator,
-//                     uint32_t sz) {
-//    //assert(sz > _data.n);
-//
-//    WorldInstance new_data;
-//    const unsigned bytes = sz * (sizeof(ct_entity) +
-//                                 (3 * sizeof(uint32_t)) +
-//                                 (2 * sizeof(float) * 3) +
-//                                 (sizeof(float) * 4) +
-//                                 (sizeof(float) * 16));
-//    new_data.buffer = CE_ALLOC(_allocator, char, bytes);
-//    new_data.n = _data.n;
-//    new_data.allocated = sz;
-//
-//    new_data.entity = (ct_entity *) (new_data.buffer);
-//    new_data.first_child = (uint32_t *) (new_data.entity + sz);
-//    new_data.next_sibling = (uint32_t *) (new_data.first_child + sz);
-//    new_data.parent = (uint32_t *) (new_data.next_sibling + sz);
-//    new_data.position = (float *) (new_data.parent + sz);
-//    new_data.rotation = (float *) (new_data.position + (sz * 3));
-//    new_data.scale = (float *) (new_data.rotation + (sz * 4));
-//    new_data.world_matrix = (float *) (new_data.scale + (sz * 3));
-//
-//    memcpy(new_data.entity, _data.entity, _data.n * sizeof(ct_entity));
-//
-//    memcpy(new_data.first_child, _data.first_child, _data.n * sizeof(uint32_t));
-//    memcpy(new_data.next_sibling, _data.next_sibling,
-//           _data.n * sizeof(uint32_t));
-//    memcpy(new_data.parent, _data.parent, _data.n * sizeof(uint32_t));
-//
-//    memcpy(new_data.position, _data.position, _data.n * sizeof(float) * 3);
-//    memcpy(new_data.rotation, _data.rotation, _data.n * sizeof(float) * 4);
-//    memcpy(new_data.scale, _data.scale, _data.n * sizeof(float) * 3);
-//
-//    memcpy(new_data.world_matrix, _data.world_matrix,
-//           _data.n * sizeof(float) * 16);
-//
-//    CE_FREE(_allocator, _data.buffer);
-//
-//    _data = new_data;
-//}
-
-//static void _new_world(struct ct_world world) {
-//    uint32_t idx = ce_array_size(_G.world_instances);
-//    ce_array_push(_G.world_instances, WorldInstance(), _G.allocator);
-//    _G.world_instances[idx].world = world;
-//    ce_hash_add(&_G.world_map, world.h, idx, _G.allocator);
-//}
-
-
-//static WorldInstance *_get_world_instance(ct_world world) {
-//    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
-//
-//    if (idx != UINT32_MAX) {
-//        return &_G.world_instances[idx];
-//    }
-//
-//    return nullptr;
-//}
-
-//static void _destroy_world(struct ct_world world) {
-//    uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
-//    uint32_t last_idx = ce_array_size(_G.world_instances) - 1;
-//
-//    struct ct_world last_world = _G.world_instances[last_idx].world;
-//
-//    CE_FREE(ce_memory_a0->system,
-//            _G.world_instances[idx].buffer);
-//
-//    _G.world_instances[idx] = _G.world_instances[last_idx];
-//    ce_hash_add(&_G.world_map, last_world.h, idx, _G.allocator);
-//    ce_array_pop_back(_G.world_instances);
-//}
-
-void _component_compiler(const char *filename,
-                         uint64_t *component_key,
-                         uint32_t component_key_count,
-                         ce_cdb_obj_o *writer) {
+static void component_compiler(const char *filename,
+                        uint64_t *component_key,
+                        uint32_t component_key_count,
+                        ce_cdb_obj_o *writer) {
     struct ct_transform_comp t_data;
 
     struct ce_yng_doc *d = ce_ydb_a0->get(filename);
@@ -182,7 +60,7 @@ void _component_compiler(const char *filename,
     }
 }
 
-void transform_transform(struct ct_transform_comp *transform,
+static void transform_transform(struct ct_transform_comp *transform,
                          float *parent) {
 
     float *pos = transform->position;
@@ -224,7 +102,7 @@ static void _on_component_obj_change(uint64_t obj,
 }
 
 
-static void _component_spawner(uint64_t obj,
+static void component_spawner(uint64_t obj,
                                void *data) {
     struct ct_transform_comp *transform = data;
 
@@ -251,7 +129,7 @@ static void property_editor(uint64_t obj) {
     ct_editor_ui_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
 }
 
-void guizmo_get_transform(uint64_t obj,
+static void guizmo_get_transform(uint64_t obj,
                           float *world,
                           float *local) {
 
@@ -272,7 +150,7 @@ void guizmo_get_transform(uint64_t obj,
                 pos[0], pos[1], pos[2]);
 }
 
-void guizmo_set_transform(uint64_t obj,
+static void guizmo_set_transform(uint64_t obj,
                           uint8_t operation,
                           float *world,
                           float *local) {
@@ -319,26 +197,19 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-
 static uint64_t size() {
     return sizeof(struct ct_transform_comp);
 }
-
 
 static struct ct_component_i0 ct_component_i0 = {
         .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
-        .compiler = _component_compiler,
-        .spawner = _component_spawner,
+        .compiler = component_compiler,
+        .spawner = component_spawner,
 };
 
 static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-
-    };
-
     api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
 }
 

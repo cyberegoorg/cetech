@@ -155,7 +155,7 @@ CE_MODULE_DEF(
         },
         {
             CE_UNUSED(reload);
-
+            ce_api_a0->register_api("ce_log_a0", ce_log_a0);
         },
         {
             CE_UNUSED(reload);

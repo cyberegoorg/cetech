@@ -38,8 +38,7 @@ bool ce_init() {
     api_init(core_alloc);
 
     CE_LOAD_STATIC_MODULE(ce_api_a0, log);
-    ce_api_a0->register_api("ce_log_a0", ce_log_a0);
-
+    
     memory_register_api(ce_api_a0);
 
     CE_LOAD_STATIC_MODULE(ce_api_a0, hashlib);

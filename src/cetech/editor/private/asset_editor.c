@@ -79,19 +79,14 @@ static void draw_editor(struct ct_dock_i0 *dock) {
         uint64_t type = ce_cdb_a0->read_uint64(editor->context_obj,
                                                _ASSET_TYPE, 0);
 
-        const char *path = ce_cdb_a0->read_str(editor->context_obj, _ASSET_PATH,
-                                               0);
-
-
         uint64_t selected_asset;
         selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   ASSET_EDITOR_ASSET_SELECTED);
 
         ce_cdb_obj_o *w;
         w = ce_cdb_a0->write_begin(selected_asset);
-        ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_NAME, name);
-        ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ASSET_TYPE2, type);
-        ce_cdb_a0->set_str(w, ASSET_BROWSER_PATH, path);
+        ce_cdb_a0->set_uint64(w, ASSET_NAME, name);
+        ce_cdb_a0->set_uint64(w, ASSET_TYPE, type);
         ce_cdb_a0->write_commit(w);
 
         ce_ebus_a0->broadcast(ASSET_EDITOR_EBUS, selected_asset);
@@ -189,8 +184,7 @@ static struct editor *_new_editor(struct ct_resource_id asset) {
 }
 
 static void open(struct ct_resource_id asset,
-                 uint64_t root,
-                 const char *path) {
+                 uint64_t root) {
     struct ct_asset_editor_i0 *i = get_asset_editor(asset.type);
 
     if (!i) {
@@ -203,7 +197,6 @@ static void open(struct ct_resource_id asset,
     struct ct_world *w = ce_cdb_a0->write_begin(e->context_obj);
     ce_cdb_a0->set_uint64(w, _ASSET_NAME, asset.name);
     ce_cdb_a0->set_uint64(w, _ASSET_TYPE, asset.type);
-    ce_cdb_a0->set_str(w, _ASSET_PATH, path);
     ce_cdb_a0->write_commit(w);
 
     i->open(e->context_obj);
@@ -247,17 +240,16 @@ static void on_render() {
 
 static void on_asset_double_click(uint64_t event) {
     uint64_t asset_type = ce_cdb_a0->read_uint64(event,
-                                                 ASSET_BROWSER_ASSET_TYPE2, 0);
+                                                 ASSET_TYPE, 0);
     uint64_t asset_name = ce_cdb_a0->read_uint64(event,
-                                                 ASSET_BROWSER_ASSET_NAME, 0);
+                                                 ASSET_NAME, 0);
 
     uint64_t root = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
-    const char *path = ce_cdb_a0->read_str(event, ASSET_BROWSER_PATH, 0);
 
     struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
     if (ENTITY_RESOURCE_ID == rid.type) {
-        open(rid, root, path);
+        open(rid, root);
         return;
     }
 }

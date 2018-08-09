@@ -16,7 +16,8 @@
 #include <cetech/editor/dock.h>
 
 #define WINDOW_NAME "Log view"
-#define LOG_FORMAT "%s -> %s"
+#define LOG_FORMAT "[%d|%s] -> %s"
+#define LOG_ARGS worker_id, where, msg
 
 struct log_item {
     enum ce_log_level level;
@@ -76,7 +77,7 @@ static void log_handler(enum ce_log_level level,
     };
 
     char buffer[1024];
-    int len = snprintf(buffer, CE_ARRAY_LEN(buffer), LOG_FORMAT, where, msg);
+    int len = snprintf(buffer, CE_ARRAY_LEN(buffer), LOG_FORMAT, LOG_ARGS);
 
     ce_array_push(_G.log_items, item, _G.allocator);
     ce_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
@@ -150,11 +151,11 @@ static void on_debugui(ct_dock_i0 *dock) {
     ui_log_items();
 }
 
-static const char *dock_title(struct ct_dock_i0* dock) {
+static const char *dock_title(struct ct_dock_i0 *dock) {
     return WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0* dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "log_view";
 }
 
@@ -162,8 +163,8 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
         .display_title = dock_title,
-                .name = name,
         .draw_ui = on_debugui,
+        .name = name,
 };
 
 static void _init(struct ce_api_a0 *api) {

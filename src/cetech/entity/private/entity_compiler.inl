@@ -16,7 +16,7 @@
 #include <celib/hash.inl>
 #include <celib/yng.h>
 
-#include "celib/handler.h"
+#include "celib/handler.inl"
 
 
 //==============================================================================

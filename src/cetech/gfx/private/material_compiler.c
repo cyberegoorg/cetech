@@ -6,16 +6,15 @@
 #include "celib/memory.h"
 #include "celib/api_system.h"
 #include "celib/hashlib.h"
-#include "cetech/resource/resource.h"
-
-#include "cetech/ecs/ecs.h"
-#include "cetech/machine/machine.h"
-
-#include <bgfx/defines.h>
 #include <celib/array.inl>
 #include <celib/yng.h>
 #include <celib/cdb.h>
+
+#include "cetech/ecs/ecs.h"
+#include "cetech/machine/machine.h"
+#include <bgfx/defines.h>
 #include <cetech/gfx/renderer.h>
+#include "cetech/resource/resource.h"
 
 #include <cetech/gfx/material.h>
 #include "material.h"

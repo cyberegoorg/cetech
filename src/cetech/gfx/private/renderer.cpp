@@ -3,6 +3,7 @@
 //==============================================================================
 #include <cstdio>
 
+extern "C" {
 #include <celib/allocator.h>
 #include <celib/array.inl>
 
@@ -12,19 +13,20 @@
 #include <celib/module.h>
 #include <celib/memory.h>
 #include <celib/hashlib.h>
-#include <cetech/kernel/kernel.h>
-
 #include <celib/os.h>
-#include <cetech/resource/resource.h>
-
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/private/bgfx_imgui/imgui.h>
-#include <cetech/machine/machine.h>
 #include <celib/private/api_private.h>
-#include <cetech/ecs/ecs.h>
+#include <celib/cdb.h>
 #include <celib/ebus.h>
 #include <celib/log.h>
 
+#include <cetech/kernel/kernel.h>
+#include <cetech/resource/resource.h>
+#include <cetech/gfx/renderer.h>
+#include <cetech/machine/machine.h>
+#include <cetech/ecs/ecs.h>
+}
+
+#include <cetech/gfx/private/bgfx_imgui/imgui.h>
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
 

@@ -6,21 +6,17 @@
 #include <cetech/gfx/scene.h>
 #include <celib/array.inl>
 #include <celib/hash.inl>
-
 #include "celib/hashlib.h"
 #include "celib/memory.h"
 #include "celib/api_system.h"
+#include <celib/cdb.h>
+#include <celib/os.h>
+
 #include "cetech/machine/machine.h"
-
-
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
-
 #include "cetech/scenegraph/scenegraph.h"
-
-#include <celib/os.h>
 #include <cetech/gfx/renderer.h>
-#include <celib/cdb.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);

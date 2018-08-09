@@ -63,7 +63,7 @@ static void fps_camera_update(struct ct_world world,
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
-                                                  camera_ent);
+                                              camera_ent);
 
     ce_mat4_move(wm, transform->world);
 
@@ -133,7 +133,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 }
 
 
-static struct ct_asset_preview_i0* _get_asset_preview(uint64_t asset_type) {
+static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     struct ct_resource_i0 *resource_i;
     resource_i = ct_resource_a0->get_interface(asset_type);
 
@@ -149,12 +149,13 @@ static struct ct_asset_preview_i0* _get_asset_preview(uint64_t asset_type) {
 }
 
 static void set_asset(uint64_t event) {
-    uint64_t asset_type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t asset_name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t asset_type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
+    uint64_t asset_name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 
-    if (_G.active_asset.name == asset_name && _G.active_asset.type == asset_type) {
+    if (_G.active_asset.name == asset_name &&
+        _G.active_asset.type == asset_type) {
         return;
     }
 
@@ -165,14 +166,14 @@ static void set_asset(uint64_t event) {
     i = _get_asset_preview(_G.active_asset.type);
 
     if (i) {
-        if(i->unload) {
+        if (i->unload) {
             i->unload(_G.active_asset, _G.world, _G.active_ent);
         }
     }
 
     i = _get_asset_preview(rid.type);
     if (i) {
-        if(i->load) {
+        if (i->load) {
             _G.active_ent = i->load(rid, _G.world);
         }
     }
@@ -213,7 +214,7 @@ static void update(float dt) {
         return;
     }
 
-    struct ct_controlers_i0* keyboard;
+    struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     if (_G.active) {
@@ -283,8 +284,8 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 
 
 static void _on_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
@@ -301,11 +302,12 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
 
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS,
+                        ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
 
 }
 

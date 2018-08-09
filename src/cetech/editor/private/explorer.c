@@ -35,6 +35,7 @@ static struct _G {
     uint64_t selected_object;
 
     struct ce_alloc *allocator;
+    uint64_t top_level_obj;
 } _G;
 
 static void ui_entity_item_end() {
@@ -78,8 +79,10 @@ static void ui_entity_item_begin(uint64_t obj,
     snprintf(label, CE_ARRAY_LEN(label),
              ICON_FA_CUBE " ""%s##%llu", name, uid);
 
-    bool open = ct_debugui_a0->TreeNodeEx(label, flags);
+    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
+        _G.selected_object = obj;
+
         uint64_t event;
         event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
 
@@ -129,6 +132,7 @@ static void ui_entity_item_begin(uint64_t obj,
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
             if (ct_debugui_a0->IsItemClicked(0)) {
+                _G.selected_object = component;
                 uint64_t event;
                 event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
 
@@ -157,14 +161,13 @@ static void ui_entity_item_begin(uint64_t obj,
 
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    uint64_t selected_object =_G.selected_object;
+    uint64_t selected_object =_G.top_level_obj;
+
     if (!selected_object) {
         return;
     }
 
-
     ct_debugui_a0->LabelText("Entity", "");
-
     ui_entity_item_begin(selected_object, rand());
 }
 
@@ -176,6 +179,7 @@ static const char *dock_title() {
 static const char *name(struct ct_dock_i0* dock) {
     return "explorer";
 }
+
 static struct ct_dock_i0 ct_dock_i0 = {
         .id = 0,
         .visible = true,
@@ -186,8 +190,8 @@ static struct ct_dock_i0 ct_dock_i0 = {
 
 
 static void _on_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
@@ -198,19 +202,19 @@ static void _on_asset_selected(uint64_t event) {
         return;
     }
 
-    _G.selected_object = ct_resource_a0->get(rid);
+    _G.top_level_obj = ct_resource_a0->get(rid);
 }
 
 static void _on_editor_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_TYPE2, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ASSET_NAME, 0);
+    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
             .type = type,
     };
 
-    _G.selected_object = ct_resource_a0->get(rid);
+    _G.top_level_obj = ct_resource_a0->get(rid);
 }
 
 static void _init(struct ce_api_a0 *api) {

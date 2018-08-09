@@ -2,12 +2,6 @@
 #define CETECH_ASSET_PREVIEW_H
 
 #include <cetech/resource/resource.h>
-
-
-
-//==============================================================================
-// Includes
-//==============================================================================
 #include <stddef.h>
 
 struct ct_world;
@@ -26,10 +20,6 @@ struct ct_asset_preview_i0 {
     void (*tooltip)(struct ct_resource_id resourceid);
 };
 
-
-//==============================================================================
-// Api
-//==============================================================================
 
 struct ct_asset_preview_a0 {
 };

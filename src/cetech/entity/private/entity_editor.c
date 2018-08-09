@@ -40,7 +40,7 @@ struct scene_editor {
     struct ct_entity camera_ent;
     struct ct_entity entity;
 
-    uint32_t entity_name;
+    uint64_t entity_name;
     struct ct_render_graph *render_graph;
     struct ct_render_graph_builder *rg_builder;
     bool mouse_hovering;
@@ -209,7 +209,7 @@ static void draw_editor(uint64_t context_obj) {
                                    size[0], size[1]);
 
 
-    uint64_t obj = 0;//ct_selected_object_a0->selected_object();
+    uint64_t obj = 0; //ct_selected_object_a0->selected_object();
 
     if (obj) {
         uint64_t obj_type = ce_cdb_a0->type(obj);

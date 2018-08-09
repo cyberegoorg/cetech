@@ -9,10 +9,6 @@
 #define _ASSET_NAME \
     CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
-#define _ASSET_PATH \
-    CE_ID64_0("asset_path", 0xd4a529db4b566f74ULL)
-
-
 #define ASSET_EDITOR_I \
     CE_ID64_0("ct_asset_editor_i0", 0xfd600fdf28336d2aULL)
 

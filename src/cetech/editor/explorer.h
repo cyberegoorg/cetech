@@ -1,17 +1,5 @@
-#ifndef CETECH_LEVEL_INSPECTOR_H
-#define CETECH_LEVEL_INSPECTOR_H
-
-
-
-//==============================================================================
-// Includes
-//==============================================================================
-
-#include <stddef.h>
-
-
-struct ct_entity;
-struct ct_world;
+#ifndef CETECH_EXPLORER_H
+#define CETECH_EXPLORER_H
 
 #define EXPLORER_EBUS \
     CE_ID64_0("explorer", 0xcf28ca0dccf09520ULL)
@@ -19,12 +7,4 @@ struct ct_world;
 #define EXPLORER_OBJ_SELECTED \
     CE_ID64_0("obj_selected", 0x3502c51790f963b1ULL)
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-//==============================================================================
-// Api
-//==============================================================================
-
-#endif //CETECH_LEVEL_INSPECTOR_H
+#endif //CETECH_EXPLORER_H
