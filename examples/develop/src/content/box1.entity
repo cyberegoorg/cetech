@@ -23,12 +23,16 @@ children:
     components:
       transform:
         rotation: [0, 0, 0]
-        position: [0, 0, 0]
+        position: [0, 0, 40]
         scale: [1, 1, 1]
 
       mesh_renderer:
-        scene: "content/scene/solider/ArmyPilot"
-        mesh: "Mesh1Mesh1"
+#        scene: "content/scene/solider/ArmyPilot"
+        #        mesh: "Mesh1Mesh1"
+
+        scene: "content/scene/oldman/oldman"
+        mesh: "muro_main"
+
         material: "content/scene/solider/body"
 
       rotation:

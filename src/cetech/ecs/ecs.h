@@ -22,11 +22,6 @@
 #define ENTITY_RESOURCE \
     CE_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
 
-#define ENTITY_TYPE \
-    CE_ID64_0("entity_type", 0x61c464fe6c327f9fULL)
-
-#define ENTITY_DATA_IDX  \
-    CE_ID64_0("entity_data_idx", 0x1fa649061369a0eeULL)
 
 #define ENTITY_UID \
     CE_ID64_0("entity_uid", 0xa3b266878c572abdULL)
@@ -95,7 +90,7 @@ struct ct_component_prop_desc {
 struct ct_component_i0 {
     uint64_t (*size)();
 
-    const struct ct_component_prop_desc* (*prop_desc)(uint32_t* count);
+    const struct ct_component_prop_desc *(*prop_desc)(uint32_t *count);
 
     uint64_t (*cdb_type)();
 
@@ -106,8 +101,16 @@ struct ct_component_i0 {
                      uint32_t component_key_count,
                      ce_cdb_obj_o *writer);
 
-    void (*spawner)(uint64_t obj,
+    void (*spawner)(struct ct_world world,
+                    uint64_t obj,
                     void *data);
+
+    void (*obj_change)(struct ct_world world,
+                       uint64_t obj,
+                       const uint64_t *prop,
+                       uint32_t prop_count,
+                       struct ct_entity *ents,
+                       uint32_t n);
 };
 
 struct ct_editor_component_i0 {
@@ -144,7 +147,7 @@ struct ct_component_a0 {
 
     void (*remove)(struct ct_world world,
                    struct ct_entity ent,
-                   uint64_t *component_name,
+                   const uint64_t *component_name,
                    uint32_t name_count);
 };
 
@@ -174,7 +177,8 @@ struct ct_entity_a0 {
                 uint32_t name_count);
 
     struct ct_entity (*find_by_name)(struct ct_world world,
-                                     struct ct_entity ent, uint64_t name);
+                                     struct ct_entity ent,
+                                     uint64_t name);
 };
 
 struct ct_system_a0 {

@@ -51,6 +51,7 @@ struct object_t {
     uint64_t idx;
     struct ce_cdb_t db;
     struct ce_hash_t prop_map;
+    struct ce_hash_t removed_prop_map;
 
     uint64_t properties_count;
 
@@ -439,7 +440,8 @@ static void gc() {
 
             _destroy_object(obj);
 
-            db_inst->free_objects_id[atomic_fetch_add(&db_inst->free_objects_id_n, 1)] = idx;
+            db_inst->free_objects_id[atomic_fetch_add(
+                    &db_inst->free_objects_id_n, 1)] = idx;
         }
 
         db_inst->to_free_objects_id_n = 0;
@@ -475,7 +477,8 @@ static void gc() {
                     .notify = obj->notify,
             };
 
-            db_inst->free_objects[atomic_fetch_add(&db_inst->free_objects_n, 1)] = idx;
+            db_inst->free_objects[atomic_fetch_add(&db_inst->free_objects_n,
+                                                   1)] = idx;
         }
 
         db_inst->to_free_objects_n = 0;
@@ -729,7 +732,7 @@ static void _notify(uint64_t _obj,
     const int notify_n = ce_array_size(obj->notify);
     const int changed_prop_n = ce_array_size(changed_prop);
 
-    if(!changed_prop_n) {
+    if (!changed_prop_n) {
         return;
     }
 
@@ -1047,9 +1050,49 @@ void set_prefab(uint64_t _obj,
 }
 
 static bool prop_exist(uint64_t _object,
+                       uint64_t key) ;
+
+void remove_property(ce_cdb_obj_o *_writer,
+                     uint64_t property) {
+    struct object_t *writer = _get_object_from_obj_o(_writer);
+
+    if(!prop_exist(writer->obj, property)) {
+        return;
+    }
+
+    uint64_t idx = _find_prop_index(writer, property);
+
+    if(idx) {
+        uint64_t last_idx = --writer->properties_count;
+        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx, _G.allocator);
+
+
+        writer->keys[idx] = writer->keys[last_idx];
+        writer->property_type[idx] = writer->property_type[last_idx];
+        writer->offset[idx] = writer->offset[last_idx];
+    }
+
+    ce_hash_add(&writer->removed_prop_map, property, 1, _G.allocator);
+    ce_hash_remove(&writer->prop_map, property);
+
+    ce_array_push(writer->changed_prop, property, _G.allocator);
+}
+
+static bool prop_exist(uint64_t _object,
                        uint64_t key) {
     struct object_t *obj = _get_object_from_objid(_object);
-    return _find_prop_index(obj, key) > 0;
+
+    uint32_t idx = _find_prop_index(obj, key);
+
+    if(idx) {
+        return true;
+    }
+
+    if (obj->prefab) {
+        return prop_exist(obj->prefab, key);
+    }
+
+    return false;
 }
 
 static enum ce_cdb_type prop_type(uint64_t _object,
@@ -1295,6 +1338,10 @@ static void prop_keys(uint64_t _obj,
                 continue;
             }
 
+            if (ce_hash_contain(&obj->removed_prop_map, prefab_keys[i])) {
+                continue;
+            }
+
             keys[i] = prefab_keys[i];
         }
 
@@ -1317,6 +1364,10 @@ static uint64_t prop_count(uint64_t _obj) {
 
         for (int i = 0; i < prefab_prop_count; ++i) {
             if (ce_hash_contain(&obj->prop_map, keys[i])) {
+                continue;
+            }
+
+            if (ce_hash_contain(&obj->removed_prop_map, keys[i])) {
                 continue;
             }
 
@@ -1415,6 +1466,7 @@ static struct ce_cdb_a0 cdb_api = {
         .set_subobject = set_subobject,
         .set_prefab = set_prefab,
         .set_blob = set_blob,
+        .remove_property = remove_property,
 };
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;

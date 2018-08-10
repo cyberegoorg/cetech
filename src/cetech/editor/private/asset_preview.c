@@ -88,17 +88,18 @@ static void fps_camera_update(struct ct_world world,
     ce_vec3_add(transform->position, pos, x_dir_new);
     ce_vec3_add(pos, pos, z_dir_new);
 
-    uint64_t ent_obj = camera_ent.h;
-    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
-                                                    ENTITY_COMPONENTS, 0);
-
-    uint64_t component = ce_cdb_a0->read_subobject(components,
-                                                   TRANSFORM_COMPONENT, 0);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
-    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-    ce_cdb_a0->write_commit(w);
-
+//
+//    uint64_t ent_obj = camera_ent.h;
+//    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
+//                                                    ENTITY_COMPONENTS, 0);
+//
+//    uint64_t component = ce_cdb_a0->read_subobject(components,
+//                                                   TRANSFORM_COMPONENT, 0);
+//
+//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+//    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
+//    ce_cdb_a0->write_commit(w);
+//
     // ROT
 //    float rotation_around_world_up[4];
 //    float rotation_around_camera_right[4];

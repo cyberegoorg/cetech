@@ -97,10 +97,10 @@ static void compile_entitity(const char *filename,
         ce_cdb_a0->set_str(writer, PREFAB_NAME_PROP, prefab);
     }
 
-    uint64_t components_obj = ce_cdb_a0->create_object(_G.db, 0);
+    uint64_t components_obj = ce_cdb_a0->create_object(_G.db, ENTITY_COMPONENTS);
     ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
 
-    uint64_t children_obj = ce_cdb_a0->create_object(_G.db, 0);
+    uint64_t children_obj = ce_cdb_a0->create_object(_G.db, ENTITY_CHILDREN);
     ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
 
 

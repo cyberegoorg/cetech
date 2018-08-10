@@ -38,33 +38,31 @@ static void component_compiler(const char *filename,
     }
 }
 
-static void _on_component_obj_change(uint64_t obj,
-                                     const uint64_t *prop,
-                                     uint32_t prop_count,
-                                     void *data) {
 
-    uint64_t ent_obj = ce_cdb_a0->parent(ce_cdb_a0->parent(obj));
+static void _obj_change(struct ct_world world,
+                        uint64_t obj,
+                        const uint64_t *prop,
+                        uint32_t prop_count,
+                        struct ct_entity *ents,
+                        uint32_t n) {
+    for (int i = 0; i < n; ++i) {
+        struct ct_entity ent = ents[i];
 
-    struct ct_world world = {
-            .h = ce_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
-    };
+        struct rotation_component *component;
+        component = ct_ecs_a0->component->get_one(world, ROTATION_COMPONENT,
+                                                  ent);
 
-    struct ct_entity ent = {.h = ent_obj};
-
-    struct rotation_component *component;
-    component = ct_ecs_a0->component->get_one(world, ROTATION_COMPONENT,
-                                              ent);
-
-    component->speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0.0f);
+        component->speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0.0f);
+    }
 }
 
 
-static void component_spawner(uint64_t obj,
+static void component_spawner(struct ct_world world,
+                              uint64_t obj,
                               void *data) {
     struct rotation_component *component = data;
 
     component->speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0);
-    ce_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
 }
 
 static uint64_t cdb_type() {
@@ -102,6 +100,7 @@ static struct ct_component_i0 rotation_component_i = {
         .compiler = component_compiler,
         .spawner = component_spawner,
         .get_interface = get_interface,
+        .obj_change = _obj_change,
 };
 
 
@@ -117,22 +116,12 @@ static void foreach_rotation(struct ct_world world,
     struct rotation_component *rotation;
     rotation = ct_ecs_a0->component->get_all(ROTATION_COMPONENT, item);
 
+    struct ct_transform_comp *transform;
+    transform = ct_ecs_a0->component->get_all(TRANSFORM_COMPONENT, item);
+
     for (uint32_t i = 1; i < n; ++i) {
-        uint64_t ent_obj = ent[i].h;
-        uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
-                                                        ENTITY_COMPONENTS, 0);
-
-        uint64_t component = ce_cdb_a0->read_subobject(components,
-                                                       TRANSFORM_COMPONENT, 0);
-
         float rot[3] = {0};
-        ce_cdb_a0->read_vec3(component, PROP_ROTATION, rot);
-
-        ce_vec3_add_s(rot, rot, rotation[i].speed * dt);
-
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
-        ce_cdb_a0->set_vec3(w, PROP_ROTATION, rot);
-        ce_cdb_a0->write_commit(w);
+        ce_vec3_add_s(rot, transform[i].position, rotation[i].speed * dt);
     }
 }
 

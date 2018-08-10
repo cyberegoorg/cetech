@@ -157,89 +157,52 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static void _on_obj_change(uint64_t obj,
-                           uint64_t *prop,
-                           uint32_t prop_count) {
+static void _obj_change(struct ct_world world,
+                        uint64_t obj,
+                        const uint64_t *prop,
+                        uint32_t prop_count,
+                        struct ct_entity *ents,
+                        uint32_t n) {
+    for (int i = 0; i < n; ++i) {
+        struct ct_entity ent = ents[i];
 
-    uint64_t ent_obj = ce_cdb_a0->parent(ce_cdb_a0->parent(obj));
-
-    struct ct_world world = {
-            .h = ce_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
-    };
-
-    struct ct_entity ent = {
-            .h = ent_obj
-    };
-
-    struct ct_mesh *mr;
-    mr = ct_ecs_a0->component->get_one(world, MESH_RENDERER_COMPONENT, ent);
-
-    ce_cdb_obj_o *writer = NULL;
-    for (int k = 0; k < prop_count; ++k) {
-        switch (prop[k]) {
-            case PROP_NODE : {
-                const char *str = ce_cdb_a0->read_str(obj, PROP_NODE, "");
-
-                if (!writer) {
-                    writer = ce_cdb_a0->write_begin(obj);
+        struct ct_mesh *mesh;
+        mesh = ct_ecs_a0->component->get_one(world, MESH_RENDERER_COMPONENT,
+                                             ent);
+        for (int j = 0; j < prop_count; ++j) {
+            switch (prop[j]) {
+                case PROP_NODE : {
+                    const char *str = ce_cdb_a0->read_str(obj, PROP_NODE, "");
+                    mesh->node_id = ce_id_a0->id64(str);
+                    break;
                 }
+                case PROP_MESH : {
+                    const char *str = ce_cdb_a0->read_str(obj, PROP_MESH, "");
+                    mesh->mesh_id = ce_id_a0->id64(str);
+                    break;
 
-                ce_cdb_a0->set_uint64(writer, PROP_NODE_ID,
-                                      ce_id_a0->id64(str));
-                break;
-            }
-            case PROP_MESH : {
-                const char *str = ce_cdb_a0->read_str(obj, PROP_MESH, "");
-
-                if (!writer) {
-                    writer = ce_cdb_a0->write_begin(obj);
                 }
+                case PROP_MATERIAL_ID: {
+                    uint64_t material_id;
+                    material_id = ce_cdb_a0->read_uint64(obj,
+                                                         PROP_MATERIAL_ID, 0);
 
-                ce_cdb_a0->set_uint64(writer, PROP_MESH_ID,
-                                      ce_id_a0->id64(str));
-                break;
-
-            }
-            case PROP_MATERIAL_ID: {
-                uint64_t material_id = ce_cdb_a0->read_uint64(obj,
-                                                              PROP_MATERIAL_ID,
-                                                              0);
-
-                if (!writer) {
-                    writer = ce_cdb_a0->write_begin(obj);
+                    mesh->material = ct_material_a0->create(material_id);
+                    break;
                 }
-
-                ce_cdb_a0->set_ref(writer,
-                                   PROP_MATERIAL_REF,
-                                   ct_material_a0->create(material_id));
-                break;
+                case PROP_SCENE_ID: {
+                    mesh->scene_id = ce_cdb_a0->read_uint64(obj,
+                                                            PROP_SCENE_ID, 0);
+                    break;
+                }
             }
-
-            case PROP_MATERIAL_REF: {
-                mr->material = ce_cdb_a0->read_uint64(obj,
-                                                      PROP_MATERIAL_REF, 0);
-                break;
-            }
-
-            case PROP_MESH_ID: {
-                mr->mesh_id = ce_cdb_a0->read_uint64(obj, PROP_MESH_ID, 0);
-                break;
-            }
-
-            case PROP_SCENE_ID: {
-                mr->scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
-                break;
-            }
-
         }
-    }
-
-    if (writer) {
-        ce_cdb_a0->write_commit(writer);
     }
 }
 
-static void _component_spawner(uint64_t obj,
+
+static void _component_spawner(struct ct_world world,
+                               uint64_t obj,
                                void *data) {
     struct ct_mesh *mesh = data;
 
@@ -252,9 +215,7 @@ static void _component_spawner(uint64_t obj,
             .scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0),
     };
 
-    ce_cdb_a0->register_notify(obj, (ce_cdb_notify) _on_obj_change, NULL);
 }
-
 
 void mesh_combo_items(uint64_t obj,
                       char **items,
@@ -325,6 +286,7 @@ static struct ct_component_i0 ct_component_i0 = {
         .get_interface = get_interface,
         .compiler = _mesh_component_compiler,
         .spawner = _component_spawner,
+        .obj_change = _obj_change,
 };
 
 static void _init(struct ce_api_a0 *api) {

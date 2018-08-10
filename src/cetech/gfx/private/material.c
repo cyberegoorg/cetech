@@ -296,15 +296,9 @@ static struct ct_entity load(struct ct_resource_id resourceid,
                                                     ce_id_a0->id64(
                                                             "core/cube"));
 
-    uint64_t obj = ent.h;
-
-    uint64_t components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
-    uint64_t mesh_c = ce_cdb_a0->read_subobject(components,
-                                                MESH_RENDERER_COMPONENT, 0);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(mesh_c);
-    ce_cdb_a0->set_uint64(w, PROP_MATERIAL_ID, resourceid.name);
-    ce_cdb_a0->write_commit(w);
+    struct ct_mesh *mesh;
+    mesh = ct_ecs_a0->component->get_one(world, MESH_RENDERER_COMPONENT, ent);
+    mesh->material = ct_material_a0->create(resourceid.name);
 
     return ent;
 }

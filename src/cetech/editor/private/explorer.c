@@ -161,14 +161,31 @@ static void ui_entity_item_begin(uint64_t obj,
 
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    uint64_t selected_object =_G.top_level_obj;
-
-    if (!selected_object) {
+    if (!_G.top_level_obj) {
         return;
     }
 
     ct_debugui_a0->LabelText("Entity", "");
-    ui_entity_item_begin(selected_object, rand());
+
+    uint64_t selected_object =_G.selected_object;
+    if(selected_object) {
+        uint64_t parent = ce_cdb_a0->parent(selected_object);
+
+        if(ce_cdb_a0->type(parent) == ENTITY_COMPONENTS) {
+            uint64_t comp_type = ce_cdb_a0->type(selected_object);
+
+            if(ct_debugui_a0->Button("Remove", (float[2]){0.0f})) {
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+                ce_cdb_a0->remove_property(w, comp_type);
+                ce_cdb_a0->write_commit(w);
+
+                uint64_t ent = ce_cdb_a0->parent(parent);
+                _G.selected_object = ent;
+            }
+        }
+    }
+
+    ui_entity_item_begin(_G.top_level_obj, rand());
 }
 
 

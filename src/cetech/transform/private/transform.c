@@ -23,9 +23,9 @@
 #define LOG_WHERE "transform"
 
 static void component_compiler(const char *filename,
-                        uint64_t *component_key,
-                        uint32_t component_key_count,
-                        ce_cdb_obj_o *writer) {
+                               uint64_t *component_key,
+                               uint32_t component_key_count,
+                               ce_cdb_obj_o *writer) {
     struct ct_transform_comp t_data;
 
     struct ce_yng_doc *d = ce_ydb_a0->get(filename);
@@ -61,7 +61,7 @@ static void component_compiler(const char *filename,
 }
 
 static void transform_transform(struct ct_transform_comp *transform,
-                         float *parent) {
+                                float *parent) {
 
     float *pos = transform->position;
     float *rot = transform->rotation;
@@ -77,33 +77,29 @@ static void transform_transform(struct ct_transform_comp *transform,
 }
 
 
-static void _on_component_obj_change(uint64_t obj,
-                                     const uint64_t *prop,
-                                     uint32_t prop_count,
-                                     void *data) {
+static void _obj_change(struct ct_world world,
+                        uint64_t obj,
+                        const uint64_t *prop,
+                        uint32_t prop_count,
+                        struct ct_entity *ents,
+                        uint32_t n) {
+    for (int i = 0; i < n; ++i) {
+        struct ct_entity ent = ents[i];
 
-    uint64_t ent_obj = ce_cdb_a0->parent(ce_cdb_a0->parent(obj));
+        struct ct_transform_comp *transform;
+        transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
+                                                  ent);
 
-    struct ct_world world = {
-            .h = ce_cdb_a0->read_uint64(ent_obj, ENTITY_WORLD, 0)
-    };
+        ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
+        ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
+        ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
 
-    struct ct_entity ent = {.h = ent_obj};
-
-    struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
-                                              ent);
-
-    ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
-    ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
-    ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
-
-    transform_transform(transform, NULL);
+    }
 }
 
-
-static void component_spawner(uint64_t obj,
-                               void *data) {
+static void component_spawner(struct ct_world world,
+                              uint64_t obj,
+                              void *data) {
     struct ct_transform_comp *transform = data;
 
     ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
@@ -112,7 +108,6 @@ static void component_spawner(uint64_t obj,
 
     transform_transform(transform, NULL);
 
-    ce_cdb_a0->register_notify(obj, _on_component_obj_change, NULL);
 }
 
 static uint64_t cdb_type() {
@@ -130,8 +125,8 @@ static void property_editor(uint64_t obj) {
 }
 
 static void guizmo_get_transform(uint64_t obj,
-                          float *world,
-                          float *local) {
+                                 float *world,
+                                 float *local) {
 
     float pos[3] = {0};
     float rot[3] = {0};
@@ -151,9 +146,9 @@ static void guizmo_get_transform(uint64_t obj,
 }
 
 static void guizmo_set_transform(uint64_t obj,
-                          uint8_t operation,
-                          float *world,
-                          float *local) {
+                                 uint8_t operation,
+                                 float *world,
+                                 float *local) {
     float pos[3] = {0};
     float rot_deg[3] = {0};
     float scale[3] = {0};
@@ -207,6 +202,7 @@ static struct ct_component_i0 ct_component_i0 = {
         .get_interface = get_interface,
         .compiler = component_compiler,
         .spawner = component_spawner,
+        .obj_change = _obj_change,
 };
 
 static void _init(struct ce_api_a0 *api) {

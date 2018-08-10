@@ -55,7 +55,9 @@ struct ce_cdb_a0 {
     void (*destroy_object)(uint64_t obj);
 
     uint64_t (*type)(uint64_t obj);
-    void (*set_type)(uint64_t obj, uint64_t type);
+
+    void (*set_type)(uint64_t obj,
+                     uint64_t type);
 
     void (*gc)();
 
@@ -135,6 +137,8 @@ struct ce_cdb_a0 {
                      void *blob,
                      uint64_t blob_size);
 
+    void (*remove_property)(ce_cdb_obj_o *writer,
+                            uint64_t property);
 
     void (*set_prefab)(uint64_t obj,
                        uint64_t prefab);
@@ -146,8 +150,8 @@ struct ce_cdb_a0 {
                         float defaultt);
 
     bool (*read_bool)(uint64_t object,
-                        uint64_t property,
-                        bool defaultt);
+                      uint64_t property,
+                      bool defaultt);
 
 
     void (*read_vec3)(uint64_t object,
