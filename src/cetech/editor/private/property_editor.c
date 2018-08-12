@@ -29,7 +29,24 @@ static void draw(uint64_t obj) {
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
-        i->draw_ui(obj);
+
+        if (i->draw_ui) {
+            i->draw_ui(obj);
+        }
+
+        it = ce_api_a0->next(it);
+    }
+}
+
+static void draw_menu(uint64_t obj) {
+    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+
+    while (it.api) {
+        struct ct_property_editor_i0 *i = (it.api);
+
+        if (i->draw_menu) {
+            i->draw_menu(obj);
+        }
 
         it = ce_api_a0->next(it);
     }
@@ -54,6 +71,12 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     ct_debugui_a0->Columns(1, NULL, true);
 }
 
+static void on_menu(struct ct_dock_i0 *dock) {
+    uint64_t obj = _G.selected_object;
+    draw_menu(obj);
+}
+
+
 static const char *dock_title() {
     return ICON_FA_TABLE " " WINDOW_NAME;
 }
@@ -68,6 +91,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
+        .draw_menu = on_menu,
 };
 
 
@@ -101,8 +125,10 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_property_editor_a0", ct_property_editor_a0);
 
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
-    ce_ebus_a0->connect(EXPLORER_EBUS, EXPLORER_OBJ_SELECTED, _on_explorer_selected, 0);
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED,
+                        _on_asset_selected, 0);
+    ce_ebus_a0->connect(EXPLORER_EBUS, EXPLORER_OBJ_SELECTED,
+                        _on_explorer_selected, 0);
 
 }
 

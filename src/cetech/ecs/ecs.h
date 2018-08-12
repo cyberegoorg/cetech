@@ -142,7 +142,7 @@ struct ct_component_a0 {
 
     void (*add)(struct ct_world world,
                 struct ct_entity ent,
-                uint64_t *component_name,
+                const uint64_t *component_name,
                 uint32_t name_count);
 
     void (*remove)(struct ct_world world,

@@ -21,6 +21,7 @@ struct ct_dock_i0 {
     const char* (*name)(struct ct_dock_i0* dock);
 
     void (*draw_ui)(struct ct_dock_i0* dock);
+    void (*draw_menu)(struct ct_dock_i0* dock);
     void (*draw_main_menu)();
 };
 

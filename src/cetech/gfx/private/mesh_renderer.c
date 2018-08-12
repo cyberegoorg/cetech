@@ -98,6 +98,10 @@ void foreach_mesh_renderer(struct ct_world world,
             continue;
         }
 
+        if (!m.material) {
+            continue;
+        }
+
         float final_w[16];
         ce_mat4_identity(final_w);
         ce_mat4_move(final_w, t.world);
@@ -221,6 +225,11 @@ void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
+
+    if(!scene_id) {
+        return;
+    }
+
     ct_scene_a0->get_all_geometries(scene_id, items, items_count);
 }
 
@@ -228,6 +237,12 @@ void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
+
+    if(!scene_id) {
+        return;
+    }
+
+
     ct_scene_a0->get_all_nodes(scene_id, items, items_count);
 }
 

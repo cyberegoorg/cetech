@@ -30,8 +30,10 @@ struct notify_pair {
     void *data;
 };
 
+// TODO: X(
 struct object_t {
     struct notify_pair *notify;
+    struct notify_pair *remove_notify;
 
     // prefab
     uint64_t prefab;
@@ -43,8 +45,9 @@ struct object_t {
 
     // writer
     uint64_t orig_data_idx;
-    uint64_t obj;
+    uint64_t orig_obj;
     uint64_t *changed_prop;
+    uint64_t *removed_prop;
 
     // object
     uint64_t type;
@@ -232,6 +235,11 @@ static struct object_t *_object_clone(struct db_t *db,
         ce_array_push_n(new_obj->notify, obj->notify, n, alloc);
     }
 
+    n = ce_array_size(obj->remove_notify);
+    if (n) {
+        ce_array_push_n(new_obj->remove_notify, obj->remove_notify, n, alloc);
+    }
+
     return new_obj;
 }
 
@@ -344,6 +352,11 @@ static uint64_t create_from(struct ce_cdb_t db,
         ce_array_push_n(inst->notify, obj->notify, n, _G.allocator);
     }
 
+    n = ce_array_size(obj->remove_notify);
+    if (n) {
+        ce_array_push_n(inst->remove_notify, obj->remove_notify, n, _G.allocator);
+    }
+
     struct object_t *wr = write_begin((uint64_t) obj_addr);
 
     for (int i = 1; i < obj->properties_count; ++i) {
@@ -427,7 +440,7 @@ static void gc() {
 
                 const uint32_t last_idx = instances_n - 1;
                 for (int k = 0; k < instances_n; ++k) {
-                    if (prefab_obj->instances[k] != obj->obj) {
+                    if (prefab_obj->instances[k] != obj->orig_obj) {
                         continue;
                     }
 
@@ -463,7 +476,9 @@ static void gc() {
             ce_hash_clean(&obj->prop_map);
 
             ce_array_clean(obj->changed_prop);
+            ce_array_clean(obj->removed_prop);
             ce_array_clean(obj->notify);
+            ce_array_clean(obj->remove_notify);
 
             *obj = (struct object_t) {
 //                    .children = obj->children,
@@ -474,11 +489,13 @@ static void gc() {
                     .offset = obj->offset,
                     .prop_map = obj->prop_map,
                     .changed_prop = obj->changed_prop,
+                    .removed_prop = obj->removed_prop,
                     .notify = obj->notify,
+                    .remove_notify = obj->remove_notify,
             };
 
-            db_inst->free_objects[atomic_fetch_add(&db_inst->free_objects_n,
-                                                   1)] = idx;
+
+            db_inst->free_objects[atomic_fetch_add(&db_inst->free_objects_n,1)] = idx;
         }
 
         db_inst->to_free_objects_n = 0;
@@ -720,16 +737,17 @@ static ce_cdb_obj_o *write_begin(uint64_t _obj) {
                                              _G.allocator);
     new_obj->orig_data_idx = obj->idx;
 
-    new_obj->obj = _obj;
+    new_obj->orig_obj = _obj;
 
     return (void *) new_obj->idx;
 }
 
-static void _notify(uint64_t _obj,
+static void _notify(struct object_t *obj,
+                    uint64_t notify_obj,
+                    struct notify_pair* notify,
                     uint64_t *changed_prop) {
-    struct object_t *obj = _get_object_from_objid(_obj);
 
-    const int notify_n = ce_array_size(obj->notify);
+    const int notify_n = ce_array_size(notify);
     const int changed_prop_n = ce_array_size(changed_prop);
 
     if (!changed_prop_n) {
@@ -737,36 +755,41 @@ static void _notify(uint64_t _obj,
     }
 
     for (int i = 0; i < notify_n; ++i) {
-        struct notify_pair *pair = &obj->notify[i];
-        pair->notify(_obj, changed_prop, changed_prop_n, pair->data);
+        struct notify_pair *pair = &notify[i];
+        pair->notify(notify_obj, changed_prop, changed_prop_n, pair->data);
     }
 
     const int instances_n = ce_array_size(obj->instances);
     for (int i = 0; i < instances_n; ++i) {
-        _notify(obj->instances[i], changed_prop);
+        struct object_t *instance_obj = _get_object_from_objid(obj->instances[i]);
+        _notify(instance_obj, notify_obj, notify, changed_prop);
     }
 }
 
 static void write_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
-    struct object_t *orig_obj = _get_object_from_objid(writer->obj);
+    struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
 
-    uint64_t *obj_addr = (uint64_t *) writer->obj;
+    _notify(orig_obj, writer->orig_obj, writer->remove_notify, writer->removed_prop);
+
+    uint64_t *obj_addr = (uint64_t *) writer->orig_obj;
 
     *obj_addr = writer->idx;
 
 //    (*(struct object_t **) writer->obj) = writer;
 
-    _notify(writer->obj, writer->changed_prop);
+    _notify(writer, writer->orig_obj, writer->notify, writer->changed_prop);
 
     _destroy_object(orig_obj);
 }
 
 static bool write_try_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
-    struct object_t *orig_obj = _get_object_from_objid(writer->obj);
+    struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
 
-    uint64_t *obj_addr = (uint64_t *) writer->obj;
+    _notify(orig_obj, writer->orig_obj, writer->remove_notify, writer->removed_prop);
+
+    uint64_t *obj_addr = (uint64_t *) writer->orig_obj;
 
     bool ok = atomic_compare_exchange_weak((atomic_ullong *) obj_addr,
                                            &writer->orig_data_idx, writer->idx);
@@ -775,7 +798,8 @@ static bool write_try_commit(ce_cdb_obj_o *_writer) {
         goto end;
     }
 
-    _notify(writer->obj, writer->changed_prop);
+
+    _notify(writer, writer->orig_obj, writer->notify, writer->changed_prop);
 
     end:
     _destroy_object(orig_obj);
@@ -993,7 +1017,7 @@ void set_subobject(ce_cdb_obj_o *_writer,
     if (subobject) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(subobject);
         struct object_t *subobj = _get_object_from_obj_o(w);
-        subobj->parent = writer->obj;
+        subobj->parent = writer->orig_obj;
         ce_cdb_a0->write_commit(w);
     }
 
@@ -1050,21 +1074,22 @@ void set_prefab(uint64_t _obj,
 }
 
 static bool prop_exist(uint64_t _object,
-                       uint64_t key) ;
+                       uint64_t key);
 
 void remove_property(ce_cdb_obj_o *_writer,
                      uint64_t property) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
 
-    if(!prop_exist(writer->obj, property)) {
+    if (!prop_exist(writer->orig_obj, property)) {
         return;
     }
 
     uint64_t idx = _find_prop_index(writer, property);
 
-    if(idx) {
+    if (idx) {
         uint64_t last_idx = --writer->properties_count;
-        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx, _G.allocator);
+        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
+                    _G.allocator);
 
 
         writer->keys[idx] = writer->keys[last_idx];
@@ -1075,16 +1100,21 @@ void remove_property(ce_cdb_obj_o *_writer,
     ce_hash_add(&writer->removed_prop_map, property, 1, _G.allocator);
     ce_hash_remove(&writer->prop_map, property);
 
-    ce_array_push(writer->changed_prop, property, _G.allocator);
+    ce_array_push(writer->removed_prop, property, _G.allocator);
 }
 
 static bool prop_exist(uint64_t _object,
                        uint64_t key) {
     struct object_t *obj = _get_object_from_objid(_object);
 
+    if (ce_hash_contain(&obj->removed_prop_map, key)) {
+        return false;
+    }
+
+
     uint32_t idx = _find_prop_index(obj, key);
 
-    if(idx) {
+    if (idx) {
         return true;
     }
 
@@ -1393,6 +1423,19 @@ void register_notify(uint64_t _obj,
 }
 
 
+static void register_remove_notify(uint64_t _obj,
+                            ce_cdb_notify notify,
+                            void *data) {
+    struct object_t *obj = _get_object_from_objid(_obj);
+
+    struct notify_pair pair = {
+            .notify = notify,
+            .data = data
+    };
+
+    ce_array_push(obj->remove_notify, pair, _G.allocator);
+}
+
 static struct ce_cdb_t global_db() {
     return _G.global_db;
 }
@@ -1416,6 +1459,7 @@ uint64_t parent(uint64_t object) {
 
 static struct ce_cdb_a0 cdb_api = {
         .register_notify = register_notify,
+        .register_remove_notify = register_remove_notify,
 //        .create_db = create_db,
 
         . db  = global_db,

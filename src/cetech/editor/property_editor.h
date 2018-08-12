@@ -14,6 +14,7 @@ struct ct_property_editor_i0 {
     uint64_t (*cdb_type)();
 
     void (*draw_ui)(uint64_t obj);
+    void (*draw_menu)(uint64_t obj);
 };
 
 

@@ -195,14 +195,9 @@ static void ui_str_combo(uint64_t obj,
                                              char **items,
                                              uint32_t *items_count),
                          uint32_t i) {
-    char labelid[128] = {'\0'};
 
     const char *value = 0;
-
     value = ce_cdb_a0->read_str(obj, prop_key_hash, NULL);
-
-    char buffer[128] = {'\0'};
-    strcpy(buffer, value);
 
     char *items = NULL;
     uint32_t items_count = 0;
@@ -210,18 +205,29 @@ static void ui_str_combo(uint64_t obj,
     combo_items(obj, &items, &items_count);
 
     int current_item = -1;
+
     const char *items2[items_count];
+    memset(items2, 0, sizeof(const char *)* items_count);
+
     for (int j = 0; j < items_count; ++j) {
         items2[j] = &items[j * 128];
-        if (ce_id_a0->id64(items2[j]) ==
-            ce_id_a0->id64(value)) {
-            current_item = j;
+        if(value) {
+            if (ce_id_a0->id64(items2[j]) == ce_id_a0->id64(value)) {
+                current_item = j;
+            }
         }
     }
 
     ct_debugui_a0->Text("%s", label);
     ct_debugui_a0->NextColumn();
 
+    char labelid[128] = {'\0'};
+
+    char buffer[128] = {'\0'};
+
+    if(value) {
+        strcpy(buffer, value);
+    }
 
     sprintf(labelid, "##%scombo_%d", label, i);
     ct_debugui_a0->PushItemWidth(-1);
@@ -246,7 +252,9 @@ static void ui_str_combo(uint64_t obj,
         };
 
         strcpy(cmd.str.new_value, buffer);
-        strcpy(cmd.str.old_value, value);
+        if(value) {
+            strcpy(cmd.str.old_value, value);
+        }
 
         ct_cmd_system_a0->execute(&cmd.header);
     }

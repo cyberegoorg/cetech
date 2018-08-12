@@ -21,6 +21,8 @@
 #include <cetech/editor/command_system.h>
 #include <celib/hash.inl>
 #include <celib/yng.h>
+#include <fcntl.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 
 
 #define _G entity_property_global
@@ -62,19 +64,27 @@ static void draw_component(uint64_t obj) {
     struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
     ct_debugui_a0->Separator();
-    if (!ct_debugui_a0->TreeNodeEx(editor->display_name(),
-                                         DebugUITreeNodeFlags_DefaultOpen)) {
-        ct_debugui_a0->Separator();
-        ct_debugui_a0->NextColumn();
-        ct_debugui_a0->NextColumn();
+    bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
+                                          DebugUITreeNodeFlags_DefaultOpen);
 
+    ct_debugui_a0->NextColumn();
 
-        return;
+    uint64_t parent = ce_cdb_a0->parent(obj);
+    uint64_t comp_type = ce_cdb_a0->type(obj);
+
+    if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+        ce_cdb_a0->remove_property(w, comp_type);
+        ce_cdb_a0->write_commit(w);
     }
 
     ct_debugui_a0->Separator();
+
     ct_debugui_a0->NextColumn();
-    ct_debugui_a0->NextColumn();
+
+    if (!open) {
+        return;
+    }
 
     if (!editor->property_editor) {
         return;
@@ -122,8 +132,59 @@ static void draw_ui(uint64_t obj) {
     }
 }
 
+void draw_menu(uint64_t obj) {
+    if (!obj) {
+        return;
+    }
+
+    uint64_t obj_type = ce_cdb_a0->type(obj);
+    if ((ENTITY_RESOURCE != obj_type)) {
+        return;
+    }
+
+    ct_debugui_a0->Button(ICON_FA_PLUS" component", (float[2]) {0.0f});
+    if (ct_debugui_a0->BeginPopupContextItem("add component context menu", 0)) {
+        struct ce_api_entry it = ce_api_a0->first(COMPONENT_I);
+        while (it.api) {
+            struct ct_component_i0 *i = (it.api);
+            struct ct_editor_component_i0 *ei;
+
+            ei = i->get_interface(EDITOR_COMPONENT);
+
+            uint64_t components;
+            components = ce_cdb_a0->read_subobject(obj,
+                                                   ENTITY_COMPONENTS,
+                                                   0);
+
+            uint64_t component_type = i->cdb_type();
+            if (ei->display_name &&
+                !ce_cdb_a0->prop_exist(components, component_type)) {
+                const char *label = ei->display_name();
+                bool add = ct_debugui_a0->Selectable(label, false, 0,
+                                                     (float[2]) {0.0f});
+
+                if (add) {
+                    uint64_t component;
+                    component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                         i->cdb_type());
+
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(components);
+                    ce_cdb_a0->set_subobject(w, component_type,
+                                             component);
+                    ce_cdb_a0->write_commit(w);
+                }
+            }
+
+            it = ce_api_a0->next(it);
+        }
+
+        ct_debugui_a0->EndPopup();
+    }
+}
+
 static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = draw_ui,
+        .draw_menu = draw_menu,
 };
 
 static void _init(struct ce_api_a0 *api) {

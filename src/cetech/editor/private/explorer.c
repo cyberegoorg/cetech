@@ -48,7 +48,7 @@ static void ui_entity_item_begin(uint64_t obj,
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
 
-    bool selected =_G.selected_object == obj;
+    bool selected = _G.selected_object == obj;
     if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
@@ -77,16 +77,18 @@ static void ui_entity_item_begin(uint64_t obj,
 
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label),
-             ICON_FA_CUBE " ""%s##%llu", name, uid);
+             ICON_FA_CUBE
+                     " ""%s##%llu", name, uid);
 
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
         _G.selected_object = obj;
 
         uint64_t event;
-        event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
+        event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                         EXPLORER_OBJ_SELECTED);
 
-        struct ct_cdb_obj_t*w = ce_cdb_a0->write_begin(event);
+        struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
         ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, obj);
         ce_cdb_a0->write_commit(w);
 
@@ -120,7 +122,7 @@ static void ui_entity_item_begin(uint64_t obj,
             ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
             bool c_selected;
-            c_selected =_G.selected_object == component;
+            c_selected = _G.selected_object == component;
 
             if (c_selected) {
                 c_flags |= DebugUITreeNodeFlags_Selected;
@@ -134,9 +136,10 @@ static void ui_entity_item_begin(uint64_t obj,
             if (ct_debugui_a0->IsItemClicked(0)) {
                 _G.selected_object = component;
                 uint64_t event;
-                event = ce_cdb_a0->create_object(ce_cdb_a0->db(), EXPLORER_OBJ_SELECTED);
+                event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                 EXPLORER_OBJ_SELECTED);
 
-                struct ct_cdb_obj_t*w = ce_cdb_a0->write_begin(event);
+                struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
                 ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, component);
                 ce_cdb_a0->write_commit(w);
 
@@ -167,24 +170,6 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
     ct_debugui_a0->LabelText("Entity", "");
 
-    uint64_t selected_object =_G.selected_object;
-    if(selected_object) {
-        uint64_t parent = ce_cdb_a0->parent(selected_object);
-
-        if(ce_cdb_a0->type(parent) == ENTITY_COMPONENTS) {
-            uint64_t comp_type = ce_cdb_a0->type(selected_object);
-
-            if(ct_debugui_a0->Button("Remove", (float[2]){0.0f})) {
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
-                ce_cdb_a0->remove_property(w, comp_type);
-                ce_cdb_a0->write_commit(w);
-
-                uint64_t ent = ce_cdb_a0->parent(parent);
-                _G.selected_object = ent;
-            }
-        }
-    }
-
     ui_entity_item_begin(_G.top_level_obj, rand());
 }
 
@@ -193,7 +178,7 @@ static const char *dock_title() {
     return ICON_FA_TREE " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0* dock) {
+static const char *name(struct ct_dock_i0 *dock) {
     return "explorer";
 }
 
@@ -215,7 +200,7 @@ static void _on_asset_selected(uint64_t event) {
             .type = type,
     };
 
-    if(type != ENTITY_RESOURCE_ID) {
+    if (type != ENTITY_RESOURCE_ID) {
         return;
     }
 
@@ -244,8 +229,10 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->create_ebus(EXPLORER_EBUS);
 
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
-    ce_ebus_a0->connect(ASSET_EDITOR_EBUS, ASSET_EDITOR_ASSET_SELECTED, _on_editor_asset_selected, 0);
+    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED,
+                        _on_asset_selected, 0);
+    ce_ebus_a0->connect(ASSET_EDITOR_EBUS, ASSET_EDITOR_ASSET_SELECTED,
+                        _on_editor_asset_selected, 0);
 }
 
 static void _shutdown() {

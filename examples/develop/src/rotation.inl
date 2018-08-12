@@ -121,7 +121,8 @@ static void foreach_rotation(struct ct_world world,
 
     for (uint32_t i = 1; i < n; ++i) {
         float rot[3] = {0};
-        ce_vec3_add_s(rot, transform[i].position, rotation[i].speed * dt);
+        ce_vec3_add_s(rot, transform[i].rotation, rotation[i].speed * dt);
+        ce_vec3_move(transform[i].rotation, rot);
     }
 }
 

@@ -59,9 +59,13 @@ struct world_instance {
     struct ce_hash_t entity_storage_map;
     struct entity_storage *entity_storage;
 
-    struct ce_hash_t component_objmap;
     struct ce_hash_t entity_objmap;
-    struct spawn_info *spawn_info;
+
+    struct ce_hash_t component_objmap;
+    struct spawn_info *component_spawn_info;
+
+    struct ce_hash_t obj_entmap;
+    struct spawn_info *obj_spawn_info;
 };
 
 #define _entity_data_idx(w, ent) \
@@ -101,27 +105,45 @@ static void *virtual_alloc(uint64_t size) {
 //}
 
 
-
-static void _add_spawn_obj(struct world_instance *world,
-                           uint64_t component_obj,
-                           struct ct_entity ent) {
+static void _add_spawn_component_obj(struct world_instance *world,
+                                     uint64_t component_obj,
+                                     struct ct_entity ent) {
 
     uint64_t idx = ce_hash_lookup(&world->component_objmap,
                                   component_obj,
                                   UINT64_MAX);
 
     if (idx == UINT64_MAX) {
-        idx = ce_array_size(world->spawn_info);
-        ce_array_push(world->spawn_info, (struct spawn_info) {0},
+        idx = ce_array_size(world->component_spawn_info);
+        ce_array_push(world->component_spawn_info, (struct spawn_info) {0},
                       ce_memory_a0->system);
 
         ce_hash_add(&world->component_objmap, component_obj, idx, _G.allocator);
     }
 
-    struct spawn_info *info = &world->spawn_info[idx];
+    struct spawn_info *info = &world->component_spawn_info[idx];
 
     ce_array_push(info->ents, ent, ce_memory_a0->system);
 }
+
+static void _add_spawn_entity_obj(struct world_instance *world,
+                                  uint64_t obj,
+                                  struct ct_entity ent) {
+    uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
+
+    if (idx == UINT64_MAX) {
+        idx = ce_array_size(world->obj_spawn_info);
+        ce_array_push(world->obj_spawn_info, (struct spawn_info) {0},
+                      ce_memory_a0->system);
+
+        ce_hash_add(&world->obj_entmap, obj, idx, _G.allocator);
+    }
+
+    struct spawn_info *info = &world->obj_spawn_info[idx];
+
+    ce_array_push(info->ents, ent, ce_memory_a0->system);
+}
+
 
 static void _remove_spawn_obj(struct world_instance *world,
                               uint64_t component_obj,
@@ -135,7 +157,7 @@ static void _remove_spawn_obj(struct world_instance *world,
         return;
     }
 
-    struct spawn_info *info = &world->spawn_info[idx];
+    struct spawn_info *info = &world->component_spawn_info[idx];
 
 
     const uint32_t n = ce_array_size(info->ents);
@@ -276,8 +298,8 @@ static void _remove_from_type_slot(struct world_instance *w,
             struct ct_component_i0 *component_i = get_interface(component_name);
             uint64_t size = component_i->size();
 
-            memcpy(item->entity_data[i] + (entity_data_idx * size),
-                   item->entity_data[i] + (last_idx * size), size);
+            memcpy(item->entity_data[comp_idx] + (entity_data_idx * size),
+                   item->entity_data[comp_idx] + (last_idx * size), size);
         }
 
         item->n = item->n - 1;
@@ -319,7 +341,7 @@ static void _add_to_type_slot(struct world_instance *w,
                 continue;
             }
 
-            item->entity_data[i] = virtual_alloc(MAX_ENTITIES * size);
+            item->entity_data[comp_idx] = virtual_alloc(MAX_ENTITIES * size);
         }
 
     }
@@ -347,12 +369,13 @@ static void _add_to_type_slot(struct world_instance *w,
             continue;
         }
 
-        memset(item->entity_data[i] + (size * ent_data_idx), 0, size);
+        memset(item->entity_data[comp_idx] + (size * ent_data_idx), 0, size);
     }
 }
 
 static void _move_from_type_slot(struct world_instance *w,
                                  struct ct_entity ent,
+                                 uint32_t last_idx,
                                  uint64_t ent_type,
                                  uint64_t new_type) {
 
@@ -385,8 +408,8 @@ static void _move_from_type_slot(struct world_instance *w,
             continue;
         }
 
-        memcpy(new_item->entity_data[i] + (idx * size),
-               item->entity_data[i] + (idx * size), size);
+        memcpy(new_item->entity_data[comp_idx] + (idx * size),
+               item->entity_data[comp_idx] + (last_idx * size), size);
     }
 
 }
@@ -428,17 +451,19 @@ static void _add_components(struct ct_world world,
 
     new_type = ent_type | new_type;
 
+    uint32_t idx = _entity_data_idx(w, ent);
+
     _add_to_type_slot(w, ent, new_type);
 
     if (ent_type) {
-        _move_from_type_slot(w, ent, ent_type, new_type);
+        _move_from_type_slot(w, ent, idx, ent_type, new_type);
         _remove_from_type_slot(w, ent, ent_type);
     }
 }
 
 static void add_components(struct ct_world world,
                            struct ct_entity ent,
-                           uint64_t *component_name,
+                           const uint64_t *component_name,
                            uint32_t name_count) {
     uint64_t new_type = combine_component(component_name, name_count);
     _add_components(world, ent, new_type);
@@ -452,15 +477,17 @@ static void remove_components(struct ct_world world,
     struct world_instance *w = get_world_instance(world);
 
     uint64_t ent_type = _entity_type(w, ent);
+    uint64_t new_type =  ent_type;
+    uint64_t comp_type = combine_component(component_name, name_count);
+    new_type &= ~(comp_type);
 
-    uint64_t new_type = combine_component(component_name, name_count);
-    new_type &= ~(1 << new_type);
+    uint32_t idx = _entity_data_idx(w, ent);
 
     _add_to_type_slot(w, ent, new_type);
 
     // REMOVE FROM PREVIOUS TYPESLOT
     if (ent_type) {
-        _move_from_type_slot(w, ent, new_type, ent_type);
+        _move_from_type_slot(w, ent, idx, ent_type, new_type);
     }
 
     _remove_from_type_slot(w, ent, ent_type);
@@ -545,7 +572,7 @@ static void destroy(struct ct_world world,
                                                                    components_keys[j],
                                                                    0);
 
-                if(!component_obj) {
+                if (!component_obj) {
                     continue;
                 }
 
@@ -713,7 +740,7 @@ static void _on_component_obj_change(uint64_t obj,
         return;
     }
 
-    struct spawn_info *info = &w->spawn_info[idx];
+    struct spawn_info *info = &w->component_spawn_info[idx];
 
     component_i->obj_change(world,
                             obj,
@@ -723,29 +750,60 @@ static void _on_component_obj_change(uint64_t obj,
                             ce_array_size(info->ents));
 }
 
-static void _on_components_obj_change(uint64_t obj,
-                                     const uint64_t *prop,
-                                     uint32_t prop_count,
-                                     void *data) {
+static void _on_components_obj_removed(uint64_t obj,
+                                       const uint64_t *prop,
+                                       uint32_t prop_count,
+                                       void *data) {
 
     for (int i = 0; i < prop_count; ++i) {
-        if(!ce_cdb_a0->prop_exist(obj, prop[i])) {
-            uint64_t component_obj = ce_cdb_a0->read_subobject(obj, prop[i], 0);
+        uint64_t component_obj = ce_cdb_a0->read_subobject(obj, prop[i], 0);
 
-            struct ct_world world = {.h= (uint64_t) data};
-            struct world_instance *w = get_world_instance(world);
-            uint64_t idx = ce_hash_lookup(&w->component_objmap, component_obj, UINT64_MAX);
+        struct ct_world world = {.h= (uint64_t) data};
+        struct world_instance *w = get_world_instance(world);
+        uint64_t idx = ce_hash_lookup(&w->component_objmap, component_obj,
+                                      UINT64_MAX);
 
-            if (UINT64_MAX == idx) {
-                return;
-            }
+        if (UINT64_MAX == idx) {
+            return;
+        }
 
-            struct spawn_info *info = &w->spawn_info[idx];
+        struct spawn_info *info = &w->component_spawn_info[idx];
 
-            const uint32_t ent_n = ce_array_size(info->ents);
-            for (int j = 0; j < ent_n; ++j) {
-                remove_components(world, info->ents[j], &prop[i], 1);
-            }
+        const uint32_t ent_n = ce_array_size(info->ents);
+        for (int j = 0; j < ent_n; ++j) {
+            remove_components(world, info->ents[j], &prop[i], 1);
+        }
+    }
+}
+
+static void _on_components_obj_add(uint64_t obj,
+                                   const uint64_t *prop,
+                                   uint32_t prop_count,
+                                   void *data) {
+    struct ct_world world = {.h= (uint64_t) data};
+    struct world_instance *w = get_world_instance(world);
+
+    for (int i = 0; i < prop_count; ++i) {
+        uint64_t idx = ce_hash_lookup(&w->obj_entmap, ce_cdb_a0->parent(obj),
+                                      UINT64_MAX);
+
+        if (UINT64_MAX == idx) {
+            return;
+        }
+
+        struct spawn_info *info = &w->obj_spawn_info[idx];
+
+        uint64_t component_type = prop[i];
+
+        uint64_t comp_obj = ce_cdb_a0->read_subobject(obj, component_type, 0);
+        ce_cdb_a0->register_notify(comp_obj, _on_component_obj_change,
+                                   (void *) world.h);
+
+        const uint32_t ent_n = ce_array_size(info->ents);
+        for (int j = 0; j < ent_n; ++j) {
+            add_components(world, info->ents[j], &component_type, 1);
+
+            _add_spawn_component_obj(w, comp_obj, info->ents[j]);
         }
     }
 }
@@ -793,9 +851,13 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
     ce_hash_add(&w->entity_objmap, root_ent.h, entity_obj, _G.allocator);
 
-    ce_cdb_a0->register_notify(components, _on_components_obj_change,
-                               (void *) world.h);
+    _add_spawn_entity_obj(w, entity_obj, root_ent);
 
+    ce_cdb_a0->register_remove_notify(components, _on_components_obj_removed,
+                                      (void *) world.h);
+
+    ce_cdb_a0->register_notify(components, _on_components_obj_add,
+                               (void *) world.h);
 
     for (int i = 0; i < components_n; ++i) {
         uint64_t component_type = components_keys[i];
@@ -814,7 +876,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
         component_obj = ce_cdb_a0->read_subobject(components,
                                                   component_type, 0);
 
-        _add_spawn_obj(w, component_obj, root_ent);
+        _add_spawn_component_obj(w, component_obj, root_ent);
 
         ce_cdb_a0->register_notify(component_obj, _on_component_obj_change,
                                    (void *) world.h);

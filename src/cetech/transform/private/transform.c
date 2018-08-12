@@ -205,8 +205,31 @@ static struct ct_component_i0 ct_component_i0 = {
         .obj_change = _obj_change,
 };
 
+
+static void foreach_transform(struct ct_world world,
+                              struct ct_entity *ent,
+                              ct_entity_storage_t *item,
+                              uint32_t n,
+                              void *data) {
+    struct ct_transform_comp *transform;
+    transform = ct_ecs_a0->component->get_all(TRANSFORM_COMPONENT, item);
+
+    for (uint32_t i = 1; i < n; ++i) {
+        transform_transform(&transform[i], NULL);
+    }
+}
+
+static void transform_system(struct ct_world world,
+                             float dt) {
+    uint64_t mask = ct_ecs_a0->component->mask(TRANSFORM_COMPONENT);
+
+    ct_ecs_a0->system->process(world, mask, foreach_transform, &dt);
+}
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
+
+    ct_ecs_a0->system->register_simulation("transform", transform_system);
 }
 
 static void _shutdown() {

@@ -44,6 +44,11 @@ struct ce_cdb_a0 {
                             ce_cdb_notify notify,
                             void *data);
 
+    void (*register_remove_notify)(uint64_t obj,
+                                   ce_cdb_notify notify,
+                                   void *data);
+
+
     uint64_t (*create_object)(struct ce_cdb_t db,
                               uint64_t type);
 

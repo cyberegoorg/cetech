@@ -173,6 +173,10 @@ static void draw_all_docks() {
                  i->display_title(i), i->name(i), i->id);
 
         if (ct_debugui_a0->BeginDock(title, &i->visible, i->dock_flag)) {
+            if (i->draw_menu) {
+                i->draw_menu(i);
+            }
+
             if (i->draw_ui) {
                 i->draw_ui(i);
             }
