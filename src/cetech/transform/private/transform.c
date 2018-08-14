@@ -37,26 +37,26 @@ static void component_compiler(const char *filename,
     keys[component_key_count] = ce_yng_a0->key("scale");
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
-        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                            t_data.scale, (float[3]) {0});
-        ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
+    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
+                        t_data.scale, (float[3]) {0});
+    ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
 //    }
 
 
     keys[component_key_count] = ce_yng_a0->key("position");
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
-        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                            t_data.position, (float[3]) {0});
-        ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
+    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
+                        t_data.position, (float[3]) {0});
+    ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
 //    }
 
     keys[component_key_count] = ce_yng_a0->key("rotation");
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
-        ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                            t_data.rotation, (float[3]) {0});
-        ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
+    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
+                        t_data.rotation, (float[3]) {0});
+    ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
 //    }
 }
 
@@ -177,13 +177,25 @@ static void guizmo_set_transform(uint64_t obj,
     ce_cdb_a0->write_commit(w);
 }
 
+static uint64_t create_new() {
+    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                  TRANSFORM_COMPONENT);
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+    ce_cdb_a0->set_vec3(w, PROP_SCALE, (float[3]){1.0f, 1.0f, 1.0f});
+    ce_cdb_a0->write_commit(w);
+
+    return component;
+}
+
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
                 .property_editor = property_editor,
                 .guizmo_get_transform = guizmo_get_transform,
-                .guizmo_set_transform = guizmo_set_transform
+                .guizmo_set_transform = guizmo_set_transform,
+                .create_new = create_new,
         };
 
         return &ct_editor_component_i0;
