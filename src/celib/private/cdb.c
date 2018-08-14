@@ -139,13 +139,14 @@ static uint64_t _object_new_property(struct object_t *obj,
                                      const void *value,
                                      size_t size,
                                      const struct ce_alloc *alloc) {
-
     const uint64_t prop_count = obj->properties_count;
     const uint64_t values_size = ce_array_size(obj->values);
 
     ce_array_push(obj->keys, key, alloc);
     ce_array_push(obj->property_type, type, alloc);
     ce_array_push(obj->offset, values_size, alloc);
+
+    ce_hash_remove(&obj->removed_prop_map, key);
 
     if (size) {
         ce_array_resize(obj->values, values_size + size, alloc);
@@ -219,6 +220,7 @@ static struct object_t *_object_clone(struct db_t *db,
 
 
     ce_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
+    ce_hash_clone(&obj->removed_prop_map, &new_obj->removed_prop_map, alloc);
 
     uint32_t n = ce_array_size(obj->instances);
     if (n) {
@@ -245,6 +247,10 @@ static struct object_t *_object_clone(struct db_t *db,
 
 static uint64_t _find_prop_index(const struct object_t *obj,
                                  uint64_t key) {
+    if(ce_hash_contain(&obj->removed_prop_map, key)) {
+        return 0;
+    }
+
     return ce_hash_lookup(&obj->prop_map, key, 0);
 }
 
@@ -474,6 +480,7 @@ static void gc() {
             ce_array_clean(obj->offset);
 
             ce_hash_clean(&obj->prop_map);
+            ce_hash_clean(&obj->removed_prop_map);
 
             ce_array_clean(obj->changed_prop);
             ce_array_clean(obj->removed_prop);
@@ -488,6 +495,7 @@ static void gc() {
                     .values = obj->values,
                     .offset = obj->offset,
                     .prop_map = obj->prop_map,
+                    .removed_prop_map = obj->removed_prop_map,
                     .changed_prop = obj->changed_prop,
                     .removed_prop = obj->removed_prop,
                     .notify = obj->notify,
@@ -779,6 +787,9 @@ static void write_commit(ce_cdb_obj_o *_writer) {
 //    (*(struct object_t **) writer->obj) = writer;
 
     _notify(writer, writer->orig_obj, writer->notify, writer->changed_prop);
+
+    ce_array_clean(writer->removed_prop);
+    ce_array_clean(writer->changed_prop);
 
     _destroy_object(orig_obj);
 }
@@ -1091,10 +1102,13 @@ void remove_property(ce_cdb_obj_o *_writer,
         ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
                     _G.allocator);
 
-
         writer->keys[idx] = writer->keys[last_idx];
         writer->property_type[idx] = writer->property_type[last_idx];
         writer->offset[idx] = writer->offset[last_idx];
+
+        ce_array_pop_back(writer->keys);
+        ce_array_pop_back(writer->property_type);
+        ce_array_pop_back(writer->offset);
     }
 
     ce_hash_add(&writer->removed_prop_map, property, 1, _G.allocator);
@@ -1110,7 +1124,6 @@ static bool prop_exist(uint64_t _object,
     if (ce_hash_contain(&obj->removed_prop_map, key)) {
         return false;
     }
-
 
     uint32_t idx = _find_prop_index(obj, key);
 
@@ -1145,6 +1158,11 @@ static float read_float(uint64_t _obj,
                         uint64_t property,
                         float defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1162,6 +1180,11 @@ static bool read_bool(uint64_t _obj,
                       uint64_t property,
                       bool defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1179,6 +1202,11 @@ static void read_vec3(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
 
@@ -1198,6 +1226,11 @@ static void read_vec4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
 
@@ -1217,6 +1250,11 @@ static void read_mat4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
 
@@ -1237,8 +1275,12 @@ static const char *read_string(uint64_t _obj,
                                uint64_t property,
                                const char *defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
-    uint64_t idx = _find_prop_index(obj, property);
 
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
+    uint64_t idx = _find_prop_index(obj, property);
     if (idx) {
         return *(const char **) (obj->values + obj->offset[idx]);
     }
@@ -1255,6 +1297,11 @@ static uint64_t read_uint64(uint64_t _obj,
                             uint64_t property,
                             uint64_t defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1272,6 +1319,11 @@ static void *read_ptr(uint64_t _obj,
                       uint64_t property,
                       void *defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1289,6 +1341,11 @@ static uint64_t read_ref(uint64_t _obj,
                          uint64_t property,
                          uint64_t defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1306,6 +1363,11 @@ static uint64_t read_subobject(uint64_t _obj,
                                uint64_t property,
                                uint64_t defaultt) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1325,6 +1387,11 @@ void *read_blob(uint64_t _obj,
                 void *defaultt) {
 
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(ce_hash_contain(&obj->removed_prop_map, property)) {
+        return defaultt;
+    }
+
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
@@ -1352,10 +1419,10 @@ static void prop_keys(uint64_t _obj,
                       uint64_t *keys) {
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (obj->prefab) {
-        memcpy(keys, obj->keys + 1,
-               sizeof(uint64_t) * (obj->properties_count - 1));
+    memcpy(keys, obj->keys + 1,
+           sizeof(uint64_t) * (obj->properties_count - 1));
 
+    if (obj->prefab) {
         keys += (obj->properties_count - 1);
 
         uint32_t prefab_prop_count = prop_count(obj->prefab);
@@ -1377,8 +1444,6 @@ static void prop_keys(uint64_t _obj,
 
         return;
     }
-
-    memcpy(keys, obj->keys + 1, sizeof(uint64_t) * (obj->properties_count - 1));
 }
 
 static uint64_t prop_count(uint64_t _obj) {

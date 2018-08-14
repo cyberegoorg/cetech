@@ -119,6 +119,8 @@ static void ui_entity_item_begin(uint64_t obj,
                 continue;
             }
 
+            const char* component_display_name = editor->display_name();
+
             ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
             bool c_selected;
@@ -130,7 +132,7 @@ static void ui_entity_item_begin(uint64_t obj,
 
             char c_label[128] = {0};
             snprintf(c_label, CE_ARRAY_LEN(c_label),
-                     "%s##component_%d", editor->display_name(), ++id);
+                     "%s##component_%d", component_display_name, ++id);
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
             if (ct_debugui_a0->IsItemClicked(0)) {

@@ -22,20 +22,20 @@ static void component_compiler(const char *filename,
                                ce_cdb_obj_o *writer) {
     struct rotation_component t_data;
 
-    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
+//    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
-    uint64_t key;
+//    uint64_t key;
 
     keys[component_key_count] = ce_yng_a0->key("speed");
-    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-    if (d->has_key(d, key)) {
+//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
+//    if (d->has_key(d, key)) {
         t_data.speed = ce_ydb_a0->get_float(filename, keys, CE_ARRAY_LEN(keys),
                                             0.0f);
 
         ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
-    }
+//    }
 }
 
 

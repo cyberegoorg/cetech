@@ -76,6 +76,10 @@ static inline void ce_hash_free(struct ce_hash_t *hash,
 
 static inline uint32_t ce_hash_find_slot(const struct ce_hash_t *hash,
                                          uint64_t k) {
+    if(!k) {
+        return 0;
+    }
+
     const uint32_t idx_first = k % hash->n;
     uint32_t idx = idx_first;
 
@@ -157,6 +161,10 @@ static inline void ce_hash_add(struct ce_hash_t *hash,
 
 static inline void ce_hash_remove(struct ce_hash_t *hash,
                                   uint64_t k) {
+    if(hash->n == 0) {
+        return;
+    }
+
     const uint32_t idx = ce_hash_find_slot(hash, k);
     if (hash->keys[idx] == k) {
         hash->keys[idx] = EMPTY_SLOT;

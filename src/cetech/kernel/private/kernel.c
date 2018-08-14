@@ -1,31 +1,26 @@
 #include "celib/allocator.h"
-
-#include "celib/api_system.h"
 #include <celib/os.h>
-#include "cetech/kernel/kernel.h"
+#include "celib/api_system.h"
 #include "celib/memory.h"
 #include "celib/config.h"
 #include "celib/module.h"
 #include "celib/hashlib.h"
 #include "celib/private/api_private.h"
-
 #include <celib/ebus.h>
-
 #include <celib/core.h>
 #include <celib/buffer.inl>
 #include <celib/task.h>
+#include <celib/log.h>
+#include <celib/fs.h>
 #include <cetech/resource/resource.h>
+
 #include <cetech/resource/package.h>
 #include <cetech/machine/machine.h>
 #include <cetech/gfx/debugui.h>
 #include <cetech/gfx/renderer.h>
-
-
-#include <cetech/static_module.h>
-#include <celib/log.h>
 #include <cetech/game_system/game_system.h>
-#include <celib/fs.h>
-
+#include <cetech/static_module.h>
+#include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
     uint64_t config_object;
@@ -102,6 +97,7 @@ int cetech_kernel_init(int argc,
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     ce_init();
+
 
     struct ce_api_a0 *api = ce_api_a0;
 

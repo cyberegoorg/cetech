@@ -28,36 +28,36 @@ static void component_compiler(const char *filename,
                                ce_cdb_obj_o *writer) {
     struct ct_transform_comp t_data;
 
-    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
+//    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
     uint64_t keys[component_key_count + 1];
     memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
 
-    uint64_t key;
+//    uint64_t key;
 
     keys[component_key_count] = ce_yng_a0->key("scale");
-    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-    if (d->has_key(d, key)) {
+//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
+//    if (d->has_key(d, key)) {
         ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.scale, (float[3]) {0});
         ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
-    }
+//    }
 
 
     keys[component_key_count] = ce_yng_a0->key("position");
-    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-    if (d->has_key(d, key)) {
+//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
+//    if (d->has_key(d, key)) {
         ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.position, (float[3]) {0});
         ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
-    }
+//    }
 
     keys[component_key_count] = ce_yng_a0->key("rotation");
-    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-    if (d->has_key(d, key)) {
+//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
+//    if (d->has_key(d, key)) {
         ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
                             t_data.rotation, (float[3]) {0});
         ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
-    }
+//    }
 }
 
 static void transform_transform(struct ct_transform_comp *transform,
