@@ -355,7 +355,7 @@ void sdl_gamepad_play_rumble(int gamepad,
 }
 
 static void _update(uint64_t  event ) {
-    SDL_Event e = {0};
+    SDL_Event e = {};
 
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {

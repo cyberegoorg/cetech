@@ -45,7 +45,7 @@ static void api_register_api(const char *name,
 
     if (idx == UINT64_MAX) {
         idx = ce_array_size(_G.impl_list);
-        ce_array_push(_G.impl_list, (struct impl_list) {0}, _G.allocator);
+        ce_array_push(_G.impl_list, (struct impl_list) {}, _G.allocator);
 
         ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
     }
@@ -74,7 +74,7 @@ static struct ce_api_entry api_first(uint64_t name) {
     uint64_t first = ce_hash_lookup(&_G.api_map, name, UINT64_MAX);
 
     if (first == UINT64_MAX) {
-        return (struct ce_api_entry) {0};
+        return (struct ce_api_entry) {};
     }
 
     return (struct ce_api_entry) {
@@ -90,7 +90,7 @@ static struct ce_api_entry api_next(struct ce_api_entry entry) {
     const uint32_t n = ce_array_size(impl_list->api) - 1;
 
     if (entry.idx >= n) {
-        return (struct ce_api_entry) {0};
+        return (struct ce_api_entry) {};
     }
 
     return (struct ce_api_entry) {

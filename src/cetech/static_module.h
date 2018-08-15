@@ -43,7 +43,9 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(asset_browser);
     CE_ADD_STATIC_MODULE(level_inspector);
     CE_ADD_STATIC_MODULE(property_inspector);
+
     CE_ADD_STATIC_MODULE(entity_property);
+    CE_ADD_STATIC_MODULE(entity_explorer);
 
     CE_ADD_STATIC_MODULE(transform);
     CE_ADD_STATIC_MODULE(scenegraph);

@@ -273,7 +273,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->create_ebus(ASSET_EDITOR_EBUS);
 
-    _new_editor((struct ct_resource_id) {.i128={0}});
+    _new_editor((struct ct_resource_id) {.i128={}});
 }
 
 static void _shutdown() {

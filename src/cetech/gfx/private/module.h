@@ -39,7 +39,7 @@ static struct ct_render_graph_module *create_module() {
                                                   sizeof(struct ct_render_graph_module));
 
     ce_array_push(_G.render_graph_module_pool,
-                  (struct render_graph_module_inst) {0}, _G.alloc);
+                  (struct render_graph_module_inst) {}, _G.alloc);
 
     struct render_graph_module_inst *inst = &ce_array_back(
             _G.render_graph_module_pool);

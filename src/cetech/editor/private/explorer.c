@@ -38,186 +38,35 @@ static struct _G {
     uint64_t top_level_obj;
 } _G;
 
-static void ui_entity_item_end() {
-    ct_debugui_a0->TreePop();
+static uint64_t draw(uint64_t top_level_obj, uint64_t selected_obj) {
+    struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
+
+    while (it.api) {
+        struct ct_explorer_i0 *i = (it.api);
+
+        if (i->draw_ui) {
+            uint64_t new_selected_obj = i->draw_ui(top_level_obj, selected_obj);
+            return new_selected_obj;
+        }
+
+        it = ce_api_a0->next(it);
+    }
+
+    return 0;
 }
 
-static void ui_entity_item_begin(uint64_t obj,
-                                 uint32_t id) {
+static void draw_menu(uint64_t top_level_obj, uint64_t selected_obj) {
+    struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
-    ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
-                               DebugUITreeNodeFlags_OpenOnDoubleClick;
+    while (it.api) {
+        struct ct_explorer_i0 *i = (it.api);
 
-    bool selected = _G.selected_object == obj;
-    if (selected) {
-        flags |= DebugUITreeNodeFlags_Selected;
-    }
-
-    uint64_t children = ce_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
-
-    const uint32_t children_n = ce_cdb_a0->prop_count(children);
-
-
-    uint64_t components;
-    components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
-
-    const uint32_t component_n = ce_cdb_a0->prop_count(components);
-    if (!children_n && !component_n) {
-        flags |= DebugUITreeNodeFlags_Leaf;
-    }
-
-    char name[128] = {0};
-    uint64_t uid = ce_cdb_a0->read_uint64(obj, ENTITY_UID, 0);
-    const char *ent_name = ce_cdb_a0->read_str(obj, ENTITY_NAME, NULL);
-    if (ent_name) {
-        strcpy(name, ent_name);
-    } else {
-        snprintf(name, CE_ARRAY_LEN(name), "%llu", uid);
-    }
-
-    char label[128] = {0};
-    snprintf(label, CE_ARRAY_LEN(label),
-             ICON_FA_CUBE
-                     " ""%s##%llu", name, uid);
-
-    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-    if (ct_debugui_a0->IsItemClicked(0)) {
-        _G.selected_object = obj;
-
-        uint64_t event;
-        event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                         EXPLORER_OBJ_SELECTED);
-
-        struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
-        ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, obj);
-        ce_cdb_a0->write_commit(w);
-
-        ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
-    }
-
-    if (open) {
-        const uint32_t component_n = ce_cdb_a0->prop_count(components);
-        uint64_t keys[component_n];
-        ce_cdb_a0->prop_keys(components, keys);
-
-        for (uint32_t i = 0; i < component_n; ++i) {
-            uint64_t key = keys[i];
-
-            uint64_t component = ce_cdb_a0->read_subobject(components, key, 0);
-            uint64_t type = ce_cdb_a0->type(component);
-
-            struct ct_component_i0 *component_i;
-            component_i = ct_ecs_a0->component->get_interface(type);
-            if (!component_i->get_interface) {
-                continue;
-            }
-
-            struct ct_editor_component_i0 *editor;
-            editor = component_i->get_interface(EDITOR_COMPONENT);
-
-            if (!editor) {
-                continue;
-            }
-
-            const char *component_display_name = editor->display_name();
-
-            ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
-
-            bool c_selected;
-            c_selected = _G.selected_object == component;
-
-            if (c_selected) {
-                c_flags |= DebugUITreeNodeFlags_Selected;
-            }
-
-            char c_label[128] = {0};
-            snprintf(c_label, CE_ARRAY_LEN(c_label),
-                     "%s##component_%d", component_display_name, ++id);
-
-            ct_debugui_a0->TreeNodeEx(c_label, c_flags);
-            if (ct_debugui_a0->IsItemClicked(0)) {
-                _G.selected_object = component;
-                uint64_t event;
-                event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                 EXPLORER_OBJ_SELECTED);
-
-                struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
-                ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, component);
-                ce_cdb_a0->write_commit(w);
-
-                ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
-            }
-            ct_debugui_a0->TreePop();
-        }
-    }
-
-    if (open) {
-        uint64_t keys[children_n];
-        ce_cdb_a0->prop_keys(children, keys);
-
-        for (uint32_t i = 0; i < children_n; ++i) {
-            uint64_t key = keys[i];
-            uint64_t child = ce_cdb_a0->read_subobject(children, key, 0);
-            ui_entity_item_begin(child, ++id);
-        }
-        ui_entity_item_end();
-    }
-}
-
-static void _draw_menu() {
-
-    if (!_G.selected_object) {
-        return;
-    }
-
-    ct_debugui_a0->SameLine(0, 10);
-
-    uint64_t type = ce_cdb_a0->type(_G.selected_object);
-
-    if ((type == ENTITY_RESOURCE) || (type == ENTITY_RESOURCE_ID)) {
-        uint64_t parent = ce_cdb_a0->parent(_G.selected_object);
-
-        uint64_t uid = ce_cdb_a0->read_uint64(_G.selected_object, ENTITY_UID,
-                                              UINT64_MAX);
-
-        if (uid == UINT64_MAX) {
-            return;
+        if (i->draw_menu) {
+            i->draw_menu(top_level_obj, selected_obj);
         }
 
-        bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
-
-        if (add) {
-            uint64_t entity_obj;
-            entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  ENTITY_RESOURCE);
-            uint64_t uid = rand();
-
-            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
-
-            uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                               ENTITY_COMPONENTS);
-            uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                             ENTITY_CHILDREN);
-
-            ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
-            ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
-            ce_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
-
-            ce_cdb_a0->write_commit(writer);
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
-            ce_cdb_a0->set_subobject(w, uid, entity_obj);
-            ce_cdb_a0->write_commit(w);
-        }
-        ct_debugui_a0->SameLine(0, 10);
-
-        if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
-            ce_cdb_a0->remove_property(w, uid);
-            ce_cdb_a0->write_commit(w);
-        }
+        it = ce_api_a0->next(it);
     }
-
 }
 
 static void on_debugui(struct ct_dock_i0 *dock) {
@@ -225,13 +74,24 @@ static void on_debugui(struct ct_dock_i0 *dock) {
         return;
     }
 
-    ct_debugui_a0->Text("Entity");
-
-    _draw_menu();
+    draw_menu(_G.top_level_obj, _G.selected_object);
 
     ct_debugui_a0->Separator();
 
-    ui_entity_item_begin(_G.top_level_obj, rand());
+    uint64_t selected_object = draw(_G.top_level_obj, _G.selected_object);
+    if(selected_object) {
+        _G.selected_object = selected_object;
+
+        uint64_t event;
+        event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                         EXPLORER_OBJ_SELECTED);
+
+        struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
+        ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, selected_object);
+        ce_cdb_a0->write_commit(w);
+
+        ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
+    }
 }
 
 
@@ -297,7 +157,7 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G = (struct _G) {0};
+    _G = (struct _G) {};
 }
 
 CE_MODULE_DEF(

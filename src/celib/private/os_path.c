@@ -305,7 +305,7 @@ void path_dir(char *out,
 
 void path_dirname(char *out,
                   const char *path) {
-    char buffer[128] = {0};
+    char buffer[128] = {};
     strcpy(buffer, path);
 
     const size_t path_len = strlen(path);

@@ -168,7 +168,7 @@ struct object_t *_new_object(struct db_t *db,
     } else {
         idx = atomic_fetch_add(&db->object_pool_n, 1);
 
-        db->object_pool[idx] = (struct object_t) {0};
+        db->object_pool[idx] = (struct object_t) {};
     }
 
 
@@ -1591,7 +1591,7 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    _G = (struct _G) {0};
+    _G = (struct _G) {};
 }
 
 CE_MODULE_DEF(

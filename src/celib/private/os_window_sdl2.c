@@ -97,7 +97,7 @@ void window_get_size(ce_window_ints *window,
 }
 
 void *window_native_window_ptr(ce_window_ints *w) {
-    SDL_SysWMinfo wmi = {{0}};
+    SDL_SysWMinfo wmi = {};
 
     SDL_VERSION(&wmi.version);
 

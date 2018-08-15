@@ -451,11 +451,7 @@ static void set_string(struct ce_yng_doc *_inst,
                 const char *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
-    char *str = inst->value[node.idx].string;
-
-    //CE_FREE(alloc, str);
-
-    str = ce_memory_a0->str_dup(value, _G.allocator);
+    char *str = ce_memory_a0->str_dup(value, _G.allocator);
     inst->value[node.idx].string = str;
     inst->modified = true;
 }

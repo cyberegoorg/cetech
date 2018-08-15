@@ -51,7 +51,7 @@ static uint32_t new_fs_root(uint64_t root) {
 
     uint32_t new_idx = ce_array_size(_G.roots);
 
-    ce_array_push(_G.roots, (struct fs_root) {0}, _G.allocator);
+    ce_array_push(_G.roots, (struct fs_root) {}, _G.allocator);
 
 //    fs_root *root_inst = &_G.roots[new_idx];
 

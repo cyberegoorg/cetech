@@ -107,7 +107,6 @@ static void _compile_task(void *data) {
 
         tdata->compilator(tdata->source_filename,
                           &output_blob);
-
     }
 
     if (!ce_array_size(output_blob)) {

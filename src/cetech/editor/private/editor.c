@@ -123,7 +123,7 @@ static float draw_main_menu() {
             while (it.api) {
                 struct ct_dock_i0 *i = (it.api);
 
-                char title[128] = {0};
+                char title[128] = {};
 
                 snprintf(title, CE_ARRAY_LEN(title), "%s %llu",
                          i->display_title(i), i->id);
@@ -168,7 +168,7 @@ static void draw_all_docks() {
         struct ct_dock_i0 *i = (it.api);
 
 
-        char title[128] = {0};
+        char title[128] = {};
         snprintf(title, CE_ARRAY_LEN(title), "%s##%s_dock%llu",
                  i->display_title(i), i->name(i), i->id);
 

@@ -282,7 +282,7 @@ static void _init(struct ce_api_a0 *api) {
 static void _shutdown() {
     ddShutdown();
 
-    _G = (struct _G){0};
+    _G = (struct _G){};
 }
 
 CE_MODULE_DEF(

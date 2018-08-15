@@ -84,7 +84,7 @@ static void fps_camera_update(struct ct_world world,
     ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
 
 
-    float pos[3] = {0};
+    float pos[3] = {};
     ce_vec3_add(transform->position, pos, x_dir_new);
     ce_vec3_add(pos, pos, z_dir_new);
 

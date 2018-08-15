@@ -60,7 +60,7 @@ void process_file(void *data) {
     ce_buffer_printf(&output, ce_memory_a0->system, "%s", HEADER);
 
     while (c < end) {
-        char line_buff[1024] = {0};
+        char line_buff[1024] = {};
 
         if (!sscanf(c, "%[^\n]s", line_buff)) {
             const uint32_t comment_n = ce_buffer_size(comment_buffer);
@@ -77,8 +77,8 @@ void process_file(void *data) {
 
         size_t line_len = strlen(line_buff) + 1;
 
-        char tmp_buffer[128] = {0};
-        char tmp_buffer2[128] = {0};
+        char tmp_buffer[128] = {};
+        char tmp_buffer2[128] = {};
 
         char *strit = NULL;
         if ((strit = strstr(line_buff, "//")) != 0) {
@@ -163,7 +163,7 @@ void process_file(void *data) {
             goto flush_fce;
 
         } else if (strstr(line_buff, "#define") != NULL) {
-            char token_buffer[1024] = {0};
+            char token_buffer[1024] = {};
             memcpy(token_buffer, line_buff, CE_ARRAY_LEN(line_buff));
 
             char *it = strtok(token_buffer, " ");
@@ -174,7 +174,7 @@ void process_file(void *data) {
                 *bracket = 0;
             }
 
-            char name[128] = {0};
+            char name[128] = {};
             strncpy(name, it, CE_ARRAY_LEN(name));
 
             it = strtok(NULL, " ");

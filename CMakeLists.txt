@@ -141,7 +141,8 @@ set(SOURCE_FILES
         src/cetech/resource/private/builddb.c
         src/cetech/editor/private/editor_ui.c
         src/cetech/game_system/private/game_system.c
-        src/cetech/editor/private/game_view.c)
+        src/cetech/editor/private/game_view.c
+        src/cetech/entity/private/entity_explorer.c)
 
 ################################################################################
 # Main sources

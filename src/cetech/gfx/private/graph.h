@@ -33,7 +33,7 @@ static struct ct_render_graph *create_render_graph() {
                                            struct ct_render_graph,
                                            sizeof(struct ct_render_graph));
 
-    ce_array_push(_G.render_graph_pool, (struct render_graph_inst) {0},
+    ce_array_push(_G.render_graph_pool, (struct render_graph_inst) {},
                   _G.alloc);
     struct render_graph_inst *inst = &ce_array_back(_G.render_graph_pool);
 

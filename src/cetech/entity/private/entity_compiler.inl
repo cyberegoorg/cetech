@@ -73,7 +73,7 @@ static void compile_entitity(const char *filename,
     const char *prefab = ce_ydb_a0->get_str(filename, tmp_keys,
                                             root_count + 1, NULL);
 
-    struct ct_resource_id rid = {{{0}}};
+    struct ct_resource_id rid = {};
     if (prefab) {
 //        compilator_api->add_dependency(filename, prefab);
         ct_resource_a0->type_name_from_filename(prefab, &rid, NULL);
@@ -81,7 +81,7 @@ static void compile_entitity(const char *filename,
     }
 
     tmp_keys[root_count] = ce_yng_a0->key("components");
-    struct compkey ck = {{0}};
+    struct compkey ck = {};
     uint32_t components_keys_count = 0;
 
     ce_ydb_a0->get_map_keys(filename, tmp_keys, root_count + 1,
@@ -128,7 +128,7 @@ static void compile_entitity(const char *filename,
 
     tmp_keys[root_count] = ce_yng_a0->key("children");
 
-    uint64_t children_keys[32] = {0};
+    uint64_t children_keys[32] = {};
     uint32_t children_keys_count = 0;
 
     ce_ydb_a0->get_map_keys(filename,

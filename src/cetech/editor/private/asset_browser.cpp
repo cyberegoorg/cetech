@@ -105,7 +105,7 @@ static void ui_asset_menu() {
 static void ui_breadcrumb(const char *dir) {
     const size_t len = strlen(dir);
 
-    char buffer[128] = {0};
+    char buffer[128] = {};
     uint32_t buffer_pos = 0;
 
     ct_debugui_a0->SameLine(0.0f, -1.0f);
@@ -123,7 +123,7 @@ static void ui_breadcrumb(const char *dir) {
             ct_debugui_a0->SameLine(0.0f, -1.0f);
 
             if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
-                char tmp_dir[128] = {0};
+                char tmp_dir[128] = {};
                 strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
                 uint64_t dir_hash = ce_id_a0->id64(tmp_dir);
                 set_current_dir(tmp_dir, dir_hash);
@@ -231,7 +231,7 @@ static void ui_asset_list() {
     }
 
     if (_G.dir_list) {
-        char dirname[128] = {0};
+        char dirname[128] = {};
         for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
             const char *path = _G.dir_list[i];
             ce_os_a0->path->dirname(dirname, path);
@@ -268,7 +268,7 @@ static void ui_asset_list() {
                 continue;
             }
 
-            struct ct_resource_id resourceid = {.i128={0}};
+            struct ct_resource_id resourceid = {.i128={}};
             ct_resource_a0->type_name_from_filename(path, &resourceid, NULL);
 
 
@@ -382,7 +382,7 @@ static void _init(struct ce_api_a0 *api) {
 
 
 static void _shutdown() {
-    _G = (struct _G) {0};
+    _G = (struct _G) {};
 }
 
 CE_MODULE_DEF(

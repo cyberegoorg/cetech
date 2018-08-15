@@ -28,7 +28,7 @@ static struct _G {
     struct ce_spinlock lock;
 #endif
     int _;
-} _G = {0};
+} _G = {};
 
 static void *_reallocate(const struct ce_alloc *a,
                          void *ptr,
@@ -173,5 +173,5 @@ void memsys_shutdown() {
     }
 #endif
 
-    _G = (struct _G){0};
+    _G = (struct _G){};
 }

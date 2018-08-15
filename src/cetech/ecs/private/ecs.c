@@ -115,7 +115,7 @@ static void _add_spawn_component_obj(struct world_instance *world,
 
     if (idx == UINT64_MAX) {
         idx = ce_array_size(world->component_spawn_info);
-        ce_array_push(world->component_spawn_info, (struct spawn_info) {0},
+        ce_array_push(world->component_spawn_info, (struct spawn_info) {},
                       ce_memory_a0->system);
 
         ce_hash_add(&world->component_objmap, component_obj, idx, _G.allocator);
@@ -136,7 +136,7 @@ static void _add_spawn_entity_obj(struct world_instance *world,
     if (idx == UINT64_MAX) {
         idx = ce_array_size(world->obj_spawn_info);
         ce_array_push(world->obj_spawn_info,
-                      (struct spawn_info) {0},
+                      (struct spawn_info) {},
                       ce_memory_a0->system);
         ce_hash_add(&world->obj_entmap, obj, idx, _G.allocator);
 
@@ -290,7 +290,7 @@ static void _add_to_type_slot(struct world_instance *w,
         ce_hash_add(&w->entity_storage_map, ent_type, type_idx, _G.allocator);
 
         struct entity_storage *item = &w->entity_storage[type_idx];
-        ce_array_push(item->entity, (struct ct_entity) {0}, _G.allocator);
+        ce_array_push(item->entity, (struct ct_entity) {}, _G.allocator);
 
         const uint32_t component_n = ce_array_size(_G.components_name);
         for (int i = 0; i < component_n; ++i) {
@@ -615,7 +615,7 @@ static void _load(uint64_t from,
 
     uint64_t prefab_res = 0;
     if (prefab) {
-        struct ct_resource_id prefab_rid = {{{0}}};
+        struct ct_resource_id prefab_rid = {};
         ct_resource_a0->type_name_from_filename(prefab, &prefab_rid, NULL);
 
         prefab_res = ct_resource_a0->get(prefab_rid);

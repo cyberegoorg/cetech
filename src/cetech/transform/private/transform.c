@@ -38,7 +38,7 @@ static void component_compiler(const char *filename,
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
     ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.scale, (float[3]) {0});
+                        t_data.scale, (float[3]) {});
     ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
 //    }
 
@@ -47,7 +47,7 @@ static void component_compiler(const char *filename,
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
     ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.position, (float[3]) {0});
+                        t_data.position, (float[3]) {});
     ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
 //    }
 
@@ -55,7 +55,7 @@ static void component_compiler(const char *filename,
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
     ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.rotation, (float[3]) {0});
+                        t_data.rotation, (float[3]) {});
     ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
 //    }
 }
@@ -128,9 +128,9 @@ static void guizmo_get_transform(uint64_t obj,
                                  float *world,
                                  float *local) {
 
-    float pos[3] = {0};
-    float rot[3] = {0};
-    float sca[3] = {0};
+    float pos[3] = {};
+    float rot[3] = {};
+    float sca[3] = {};
 
     ce_cdb_a0->read_vec3(obj, PROP_POSITION, pos);
     ce_cdb_a0->read_vec3(obj, PROP_ROTATION, rot);
@@ -149,9 +149,9 @@ static void guizmo_set_transform(uint64_t obj,
                                  uint8_t operation,
                                  float *world,
                                  float *local) {
-    float pos[3] = {0};
-    float rot_deg[3] = {0};
-    float scale[3] = {0};
+    float pos[3] = {};
+    float rot_deg[3] = {};
+    float scale[3] = {};
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
     struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(obj);

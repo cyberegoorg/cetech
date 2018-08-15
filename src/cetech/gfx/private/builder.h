@@ -179,7 +179,7 @@ static struct ct_render_graph_builder *create_render_builder() {
                                                    sizeof(struct ct_render_graph_builder));
 
     ce_array_push(_G.render_graph_builder_pool,
-                  (struct render_graph_builder_inst) {0},
+                  (struct render_graph_builder_inst) {},
                   _G.alloc);
     struct render_graph_builder_inst *inst = &ce_array_back(
             _G.render_graph_builder_pool);

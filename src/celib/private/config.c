@@ -232,7 +232,7 @@ void CE_MODULE_INITAPI(config)(struct ce_api_a0 *api) {
 void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
                                   int reload) {
     CE_UNUSED(reload);
-    _G = (struct _G) {{0}};
+    _G = (struct _G) {};
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 

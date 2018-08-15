@@ -42,7 +42,7 @@
 //                            const char *id,
 //                            uint32_t asset_type,
 //                            uint64_t key) {
-//    char id_str[512] = {0};
+//    char id_str[512] = {};
 //    sprintf(id_str, ">>##%s", id);
 //
 //    if (ct_debugui_a0->Button(id_str, (float[2]) {0.0f})) {
@@ -50,7 +50,7 @@
 //            return false;
 //        }
 //
-//        char selected_asset[128] = {0};
+//        char selected_asset[128] = {};
 //        ct_asset_browser_a0->get_selected_asset_name(selected_asset);
 //
 //        strcpy(buffer, selected_asset);
@@ -361,8 +361,8 @@ static void ui_vec3(uint64_t obj,
                     const char *label,
                     float min_f,
                     float max_f) {
-    float value[3] = {0};
-    float value_new[3] = {0};
+    float value[3] = {};
+    float value_new[3] = {};
 
     ce_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
     ce_vec3_move(value, value_new);

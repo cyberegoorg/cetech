@@ -19,7 +19,7 @@ static struct global {
     void *handlers_data[MAX_HANDLERS];
 
     char handlers_count;
-} _G = {{0}};
+} _G = {};
 
 
 static void vlog(const enum ce_log_level level,

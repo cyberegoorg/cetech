@@ -144,7 +144,7 @@ struct ce_yng_node get_first_node_recursive(const char *path,
         tmp_keys[i] = tmp_key;
     }
 
-    return (struct ce_yng_node){0};
+    return (struct ce_yng_node){};
 }
 
 
@@ -584,7 +584,7 @@ static void _shutdown() {
     ce_hash_free(&_G.document_cache_map, _G.allocator);
     ce_hash_free(&_G.modified_files_set, _G.allocator);
 
-    _G = (struct _G){{0}};
+    _G = (struct _G){};
 }
 
 CE_MODULE_DEF(

@@ -10,7 +10,7 @@
 //
 // ## Simple table char -> uint64_t
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
-// ce_hash_t hash = {0};
+// ce_hash_t hash = {};
 //
 // ce_hash_add(&hash, 'h', 1, ce_memory_a0->system);
 // ce_hash_add(&hash, 'e', 1, ce_memory_a0->system);
@@ -176,7 +176,7 @@ static inline void ce_hash_remove(struct ce_hash_t *hash,
 static inline void ce_hash_clone(const struct ce_hash_t *from,
                                  struct ce_hash_t *to,
                                  const struct ce_alloc *alloc) {
-    struct ce_hash_t tmp_hash = {0};
+    struct ce_hash_t tmp_hash = {};
     tmp_hash.n = from->n;
 
     if (tmp_hash.n) {

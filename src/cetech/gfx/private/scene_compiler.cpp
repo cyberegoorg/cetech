@@ -95,7 +95,7 @@ struct compile_output *_crete_compile_output() {
     struct compile_output *output =
             CE_ALLOC(_G.allocator, struct compile_output,
                      sizeof(struct compile_output));
-    *output = {0};
+    *output = {};
 
     return output;
 }
@@ -454,7 +454,7 @@ static void _compile_assimp_node(struct aiNode *root,
 
     uint64_t name = ce_id_a0->id64(root->mName.data);
 
-    char tmp_name[128] = {0};
+    char tmp_name[128] = {};
     strncpy(tmp_name, root->mName.data, 127);
     ce_array_push_n(output->node_str, &tmp_name, 1, _G.allocator);
 
@@ -529,7 +529,7 @@ static int _compile_assimp(const char *filename,
         }
 
 
-        char tmp_name[128] = {0};
+        char tmp_name[128] = {};
         strncpy(tmp_name, tmp_buffer, 127);
         ce_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
 

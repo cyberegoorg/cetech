@@ -32,7 +32,7 @@ void process_file(void *data) {
     input_data[size] = '\0';
 
     uint32_t c = 0;
-    char buffer[1024] = {0};
+    char buffer[1024] = {};
     bool change = false;
     while (c < size) {
         if (input_data[c] == '\n') {

@@ -112,7 +112,7 @@ static void geometry_pass_on_pass(void *inst,
                                    0x66CCFFff, 1.0f, 0);
 
 
-    uint16_t size[2] = {0};
+    uint16_t size[2] = {};
     builder->call->get_size(builder, size);
 
     ct_renderer_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
@@ -261,7 +261,7 @@ static void output_pass_on_pass(void *inst,
                                    CT_RENDER_CLEAR_DEPTH,
                                    0x66CCFFff, 1.0f, 0);
 
-    uint16_t size[2] = {0};
+    uint16_t size[2] = {};
     builder->call->get_size(builder, size);
 
     ct_renderer_a0->set_view_rect(viewid,
