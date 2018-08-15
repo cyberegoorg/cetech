@@ -153,8 +153,6 @@ static void draw_menu(uint64_t top_level_obj,
     uint64_t type = ce_cdb_a0->type(selected_obj);
 
     if ((type == ENTITY_RESOURCE) || (type == ENTITY_RESOURCE_ID)) {
-        uint64_t parent = ce_cdb_a0->parent(selected_obj);
-
         uint64_t uid = ce_cdb_a0->read_uint64(selected_obj, ENTITY_UID,
                                               UINT64_MAX);
 
@@ -168,28 +166,33 @@ static void draw_menu(uint64_t top_level_obj,
             uint64_t entity_obj;
             entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   ENTITY_RESOURCE);
-            uint64_t uid = rand();
 
-            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
+            uint64_t uid = rand(); // TODO: !!!!!
 
             uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                                ENTITY_COMPONENTS);
             uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              ENTITY_CHILDREN);
 
+            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
             ce_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
-
             ce_cdb_a0->write_commit(writer);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+            uint64_t add_children_obj;
+            add_children_obj = ce_cdb_a0->read_subobject(selected_obj,
+                                                         ENTITY_CHILDREN,
+                                                         0);
+
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(add_children_obj);
             ce_cdb_a0->set_subobject(w, uid, entity_obj);
             ce_cdb_a0->write_commit(w);
         }
         ct_debugui_a0->SameLine(0, 10);
 
         if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
+            uint64_t parent = ce_cdb_a0->parent(selected_obj);
             ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
             ce_cdb_a0->remove_property(w, uid);
             ce_cdb_a0->write_commit(w);
