@@ -1,12 +1,6 @@
 #ifndef CETECH_TRANSFORM_H
 #define CETECH_TRANSFORM_H
 
-
-
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stdint.h>
 
 #define TRANSFORMATION_COMPONENT_NAME "transform"
@@ -23,17 +17,11 @@
 #define PROP_SCALE \
     CE_ID64_0("scale", 0xeec8c5fba3c8bc0bULL)
 
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
 struct ct_transform_comp {
     float position[3];
     float rotation[3];
     float scale[3];
     float world[16];
 };
-
 
 #endif //CETECH_TRANSFORM_H

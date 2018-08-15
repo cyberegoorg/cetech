@@ -171,6 +171,7 @@ void draw_menu(uint64_t obj) {
                         component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              component_type);
                     }
+
                     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(components);
                     ce_cdb_a0->set_subobject(w, component_type, component);
                     ce_cdb_a0->write_commit(w);

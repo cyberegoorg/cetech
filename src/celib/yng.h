@@ -53,11 +53,11 @@ struct ce_yng_doc {
                     uint64_t key);
 
     struct ce_yng_node (*get)(struct ce_yng_doc *doc,
-                                 uint64_t key);
+                              uint64_t key);
 
     struct ce_yng_node (*get_seq)(struct ce_yng_doc *doc,
-                                     uint64_t key,
-                                     uint32_t idx);
+                                  uint64_t key,
+                                  uint32_t idx);
 
     enum node_type (*type)(struct ce_yng_doc *doc,
                            struct ce_yng_node node);

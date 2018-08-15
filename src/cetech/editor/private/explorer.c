@@ -119,7 +119,7 @@ static void ui_entity_item_begin(uint64_t obj,
                 continue;
             }
 
-            const char* component_display_name = editor->display_name();
+            const char *component_display_name = editor->display_name();
 
             ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
@@ -164,13 +164,72 @@ static void ui_entity_item_begin(uint64_t obj,
     }
 }
 
+static void _draw_menu() {
+
+    if (!_G.selected_object) {
+        return;
+    }
+
+    ct_debugui_a0->SameLine(0, 10);
+
+    uint64_t type = ce_cdb_a0->type(_G.selected_object);
+
+    if ((type == ENTITY_RESOURCE) || (type == ENTITY_RESOURCE_ID)) {
+        uint64_t parent = ce_cdb_a0->parent(_G.selected_object);
+
+        uint64_t uid = ce_cdb_a0->read_uint64(_G.selected_object, ENTITY_UID,
+                                              UINT64_MAX);
+
+        if (uid == UINT64_MAX) {
+            return;
+        }
+
+        bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
+
+        if (add) {
+            uint64_t entity_obj;
+            entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                  ENTITY_RESOURCE);
+            uint64_t uid = rand();
+
+            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
+
+            uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                               ENTITY_COMPONENTS);
+            uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                             ENTITY_CHILDREN);
+
+            ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
+            ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
+            ce_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
+
+            ce_cdb_a0->write_commit(writer);
+
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+            ce_cdb_a0->set_subobject(w, uid, entity_obj);
+            ce_cdb_a0->write_commit(w);
+        }
+        ct_debugui_a0->SameLine(0, 10);
+
+        if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+            ce_cdb_a0->remove_property(w, uid);
+            ce_cdb_a0->write_commit(w);
+        }
+    }
+
+}
 
 static void on_debugui(struct ct_dock_i0 *dock) {
     if (!_G.top_level_obj) {
         return;
     }
 
-    ct_debugui_a0->LabelText("Entity", "");
+    ct_debugui_a0->Text("Entity");
+
+    _draw_menu();
+
+    ct_debugui_a0->Separator();
 
     ui_entity_item_begin(_G.top_level_obj, rand());
 }
