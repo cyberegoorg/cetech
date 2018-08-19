@@ -304,7 +304,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t count) {
     CE_UNUSED(pose);
 
-    ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1);
+    ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1, NULL);
 
     struct WorldInstance *data = _get_world_instance(world);
 

@@ -180,6 +180,10 @@ void draw_menu(uint64_t obj) {
             struct ct_component_i0 *i = (it.api);
             struct ct_editor_component_i0 *ei;
 
+            if(!i->get_interface) {
+                goto next;
+            }
+
             ei = i->get_interface(EDITOR_COMPONENT);
 
             uint64_t components;
@@ -208,7 +212,7 @@ void draw_menu(uint64_t obj) {
                     ce_cdb_a0->write_commit(w);
                 }
             }
-
+            next:
             it = ce_api_a0->next(it);
         }
 

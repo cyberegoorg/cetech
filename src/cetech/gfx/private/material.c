@@ -377,6 +377,10 @@ static void submit(uint64_t material,
                    uint64_t _layer,
                    uint8_t viewid) {
     uint64_t layers_obj = ce_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
+    if (!layers_obj) {
+        return;
+    }
+
     uint64_t layer = ce_cdb_a0->read_ref(layers_obj, _layer, 0);
 
     if (!layer) {

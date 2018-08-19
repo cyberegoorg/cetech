@@ -27,7 +27,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     struct ct_render_graph_builder* rgb = ct_game_system_a0->render_graph_builder(game_name);
     rgb->call->set_size(rgb, size[0], size[1]);
 
-    const char* label[] = {
+    static const char* label[] = {
             ICON_FA_PAUSE,
             ICON_FA_PLAY,
     };
@@ -45,11 +45,11 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     if(is_paused) {
         ct_debugui_a0->SameLine(0.0f, 4.0f);
         if(ct_debugui_a0->Button(ICON_FA_FORWARD, (float[2]) {0.0f})) {
-            ct_game_system_a0->step(game_name, step_dt);
+            ct_game_system_a0->step(game_name, step_dt / 1000.0f);
         }
 
         ct_debugui_a0->SameLine(0.0f, 4.0f);
-        ct_debugui_a0->SliderFloat("delta", &step_dt, 0.0f, 33.0f, NULL, 1.0f);
+        ct_debugui_a0->InputFloat("delta", &step_dt, 0.0f, 0.0f, -1, 0);
     }
 
 

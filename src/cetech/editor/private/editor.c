@@ -201,7 +201,7 @@ static void on_init(uint64_t _event) {
 
     ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
     ct_ecs_a0->component->add(_G.world, _G.render_ent,
-                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1, NULL);
 
     struct ct_render_graph_component *rg_comp;
     rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,

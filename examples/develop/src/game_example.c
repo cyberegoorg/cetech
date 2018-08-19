@@ -48,19 +48,18 @@ void init() {
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world, _CAMERA_ASSET);
     _G.level = ct_ecs_a0->entity->spawn(_G.world, _LEVEL_ASSET);
 
+    struct ct_render_graph_component rgc = {
+            .builder = ct_render_graph_a0->create_builder(),
+            .graph = ct_render_graph_a0->create_graph(),
+    };
+
     ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
     ct_ecs_a0->component->add(_G.world, _G.render_ent,
-                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
-
-    struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
-                                            _G.render_ent);
-
-    rg_comp->builder = ct_render_graph_a0->create_builder();
-    rg_comp->graph = ct_render_graph_a0->create_graph();
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
+                              (void*[]){&rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    rg_comp->graph->call->add_module(rg_comp->graph, module);
+    rgc.graph->call->add_module(rgc.graph, module);
 
     ct_ecs_a0->system->register_simulation("rotation", rotation_system);
 }

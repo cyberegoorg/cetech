@@ -454,14 +454,14 @@ static uint64_t combine_component(const uint64_t *component_name,
 
 static void _add_components(struct ct_world world,
                             struct ct_entity ent,
-                            uint64_t new_type) {
+                            uint64_t new_type,
+                            void** data) {
     struct world_instance *w = get_world_instance(world);
 
     uint64_t ent_type = _entity_type(w, ent);
     uint32_t idx = _entity_data_idx(w, ent);
 
     new_type = ent_type | new_type;
-
 
     _add_to_type_slot(w, ent, new_type);
 
@@ -474,9 +474,20 @@ static void _add_components(struct ct_world world,
 static void add_components(struct ct_world world,
                            struct ct_entity ent,
                            const uint64_t *component_name,
-                           uint32_t name_count) {
+                           uint32_t name_count,
+                           void** data) {
     uint64_t new_type = combine_component(component_name, name_count);
-    _add_components(world, ent, new_type);
+    _add_components(world, ent, new_type, data);
+
+    if(data) {
+        for (int i = 0; i < name_count; ++i) {
+            uint64_t name = component_name[i];
+            struct ct_component_i0 *ci = get_interface(name);
+            void* new_comp_data = data[i];
+            void* comp_data = get_one(world, name, ent);
+            memcpy(comp_data, new_comp_data, ci->size());
+        }
+    }
 
 }
 
@@ -864,7 +875,7 @@ static void _on_components_obj_add(uint64_t obj,
 
         const uint32_t ent_n = ce_array_size(info->ents);
         for (int j = 0; j < ent_n; ++j) {
-            add_components(world, info->ents[j], &component_type, 1);
+            add_components(world, info->ents[j], &component_type, 1, NULL);
             _add_spawn_component_obj(w, comp_obj, info->ents[j]);
         }
     }
@@ -1003,7 +1014,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
     uint64_t ent_type = combine_component(components_keys, components_n);
 
-    _add_components(world, root_ent, ent_type);
+    _add_components(world, root_ent, ent_type, NULL);
 
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map,
                                        ent_type, UINT64_MAX);

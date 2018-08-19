@@ -8,7 +8,7 @@
     CE_ID64_0("output", 0x759d549788b7b7e0ULL)
 
 #define RENDER_GRAPH_COMPONENT \
-    CE_ID64_0("render_graph", 0)
+    CE_ID64_0("render_graph", 0x21bdb056bfd9b0aaULL)
 
 
 struct ct_render_graph_builder;
@@ -93,7 +93,7 @@ struct ct_render_graph {
 
 struct ct_render_graph_component {
     struct ct_render_graph *graph;
-    struct ct_render_graph_builder* builder;
+    struct ct_render_graph_builder *builder;
 };
 
 struct ct_render_graph_a0 {

@@ -146,11 +146,10 @@ static void ui_str(uint64_t obj,
 
     const char *value = 0;
 
-    value = ce_cdb_a0->read_str(obj, prop_key_hash, NULL);
+    value = ce_cdb_a0->read_str(obj, prop_key_hash, "");
 
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
-
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
@@ -158,7 +157,6 @@ static void ui_str(uint64_t obj,
     ct_debugui_a0->NextColumn();
 
     bool change = false;
-
 
     ct_debugui_a0->PushItemWidth(-1);
     change |= ct_debugui_a0->InputText(labelid,

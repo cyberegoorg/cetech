@@ -310,20 +310,18 @@ static void open(uint64_t context_obj) {
     editor->world = ct_ecs_a0->entity->create_world();
     editor->entity = ct_ecs_a0->entity->spawn(editor->world, asset_name);
 
+    struct ct_render_graph_component rgc = {
+            .builder = ct_render_graph_a0->create_builder(),
+            .graph = ct_render_graph_a0->create_graph(),
+    };
 
     ct_ecs_a0->entity->create(editor->world, &editor->render_ent, 1);
     ct_ecs_a0->component->add(editor->world, editor->render_ent,
-                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
-
-    struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(editor->world, RENDER_GRAPH_COMPONENT,
-                                            editor->render_ent);
-
-    rg_comp->builder = ct_render_graph_a0->create_builder();
-    rg_comp->graph = ct_render_graph_a0->create_graph();
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
+                              (void*[]){&rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(editor->world);
-    rg_comp->graph->call->add_module(rg_comp->graph, module);
+    rgc.graph->call->add_module(rgc.graph, module);
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
                                                   ce_id_a0->id64("content/camera"));
