@@ -94,44 +94,6 @@ static struct ct_camera_a0 camera_api = {
 
 struct ct_camera_a0 *ct_camera_a0 = &camera_api;
 
-static void _obj_change(struct ct_world world,
-                        uint64_t obj,
-                        const uint64_t *prop,
-                        uint32_t prop_count,
-                        struct ct_entity *ents,
-                        uint32_t n) {
-    for (int i = 0; i < n; ++i) {
-        struct ct_entity ent = ents[i];
-
-        struct ct_camera_component *camera;
-        camera = ct_ecs_a0->component->get_one(world, CAMERA_COMPONENT, ent);
-
-        for (int k = 0; k < prop_count; ++k) {
-            if (prop[k] == PROP_FOV) {
-                camera->fov = ce_cdb_a0->read_float(obj, PROP_FOV, 0.0f);
-            } else if (prop[k] == PROP_NEAR) {
-                camera->near = ce_cdb_a0->read_float(obj, PROP_NEAR, 0.0f);
-            } else if (prop[k] == PROP_FAR) {
-                camera->far = ce_cdb_a0->read_float(obj, PROP_FAR, 0.0f);
-            }
-        }
-    }
-}
-
-
-static void _component_spawner(struct ct_world world,
-                               uint64_t obj,
-                               void *data) {
-    struct ct_camera_component *camera = data;
-
-    *camera = (struct ct_camera_component) {
-            .fov = ce_cdb_a0->read_float(obj, PROP_FOV, 0.0f),
-            .near = ce_cdb_a0->read_float(obj, PROP_NEAR, 0.0f),
-            .far = ce_cdb_a0->read_float(obj, PROP_FAR, 0.0f),
-    };
-}
-
-
 static uint64_t cdb_type() {
     return CAMERA_COMPONENT;
 }
@@ -140,17 +102,53 @@ static const char *display_name() {
     return ICON_FA_CAMERA " Camera";
 }
 
-static void property_editor(uint64_t obj) {
-    ct_editor_ui_a0->ui_float(obj, PROP_NEAR, "Near", 0, 0);
-    ct_editor_ui_a0->ui_float(obj, PROP_FAR, "Far", 0, 0);
-    ct_editor_ui_a0->ui_float(obj, PROP_FOV, "Fov", 0, 0);
+static struct ct_comp_prop_decs ct_comp_prop_decs = {
+        .prop_decs = (struct ct_prop_decs[]) {
+                {
+                        .type = ECS_PROP_FLOAT,
+                        .name = PROP_NEAR,
+                        .offset = offsetof(struct ct_camera_component, near),
+                },
+                {
+                        .type = ECS_PROP_FLOAT,
+                        .name = PROP_FAR,
+                        .offset = offsetof(struct ct_camera_component, far),
+                },
+                {
+                        .type = ECS_PROP_FLOAT,
+                        .name = PROP_FOV,
+                        .offset = offsetof(struct ct_camera_component, fov),
+                },
+        },
+        .prop_n = 3,
+};
+
+static const struct ct_comp_prop_decs *prop_desc() {
+    return &ct_comp_prop_decs;
+}
+
+
+static const char *prop_display_name(uint64_t prop) {
+    switch (prop) {
+        case PROP_NEAR:
+            return "Near";
+
+        case PROP_FAR:
+            return "Far";
+
+        case PROP_FOV:
+            return "Fov";
+
+        default:
+            return NULL;
+    }
 }
 
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .property_editor = property_editor,
+                .prop_display_name = prop_display_name,
         };
 
         return &ct_editor_component_i0;
@@ -169,8 +167,8 @@ static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = _camera_compiler,
-        .spawner = _component_spawner,
-        .obj_change = _obj_change,
+        .prop_desc = prop_desc,
+
 };
 
 

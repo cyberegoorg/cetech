@@ -23,6 +23,7 @@
 #include <celib/yng.h>
 #include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/editor/editor_ui.h>
 
 
 #define _G entity_property_global
@@ -52,6 +53,34 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
 
     return NULL;
 };
+
+static void _generic_component_property(uint64_t obj,
+                                        struct ct_component_i0 *ci,
+                                        struct ct_editor_component_i0 *ec) {
+
+    const struct ct_comp_prop_decs* comp_decs = ci->prop_desc();
+
+    for (int i = 0; i < comp_decs->prop_n; ++i) {
+        const struct ct_prop_decs* desc = &comp_decs->prop_decs[i];
+        uint64_t prop = desc->name;
+
+        enum ct_ecs_prop_type type = desc->type;
+
+        const char *display_name = ec->prop_display_name(prop) ?: "";
+
+        switch (type) {
+            case ECS_PROP_FLOAT:
+                ct_editor_ui_a0->ui_float(obj, prop, display_name, 0.0f, 0.0f);
+                break;
+            case ECS_PROP_VEC3:
+                ct_editor_ui_a0->ui_vec3(obj, prop, display_name, 0.0f, 0.0f);
+
+            default:
+                break;
+        }
+
+    }
+}
 
 static void draw_component(uint64_t obj) {
     uint64_t type = ce_cdb_a0->type(obj);
@@ -87,10 +116,12 @@ static void draw_component(uint64_t obj) {
     }
 
     if (!editor->property_editor) {
-        return;
+        _generic_component_property(obj, c, editor);
+
+    } else {
+        editor->property_editor(obj);
     }
 
-    editor->property_editor(obj);
 
     ct_debugui_a0->TreePop();
 
@@ -165,7 +196,7 @@ void draw_menu(uint64_t obj) {
 
                 if (add) {
                     uint64_t component;
-                    if(ei->create_new) {
+                    if (ei->create_new) {
                         component = ei->create_new();
                     } else {
                         component = ce_cdb_a0->create_object(ce_cdb_a0->db(),

@@ -72,6 +72,7 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
+
 enum ce_cdb_type;
 typedef void ce_cdb_obj_o;
 
@@ -81,18 +82,31 @@ typedef void ce_cdb_obj_o;
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
-struct ct_component_prop_desc {
-    uint32_t offset;
-    uint64_t prop;
-    uint64_t cdb_type;
+enum ct_ecs_prop_type {
+    ECS_PROP_NONE = 0,
+    ECS_PROP_FLOAT,
+    ECS_PROP_VEC3,
+    ECS_PROP_RESOURCE_NAME,
+    ECS_PROP_STR_ID64,
+};
+
+struct ct_prop_decs {
+    enum ct_ecs_prop_type type;
+    uint64_t name;
+    uint64_t offset;
+};
+
+struct ct_comp_prop_decs {
+    uint64_t prop_n;
+    struct ct_prop_decs *prop_decs;
 };
 
 struct ct_component_i0 {
     uint64_t (*size)();
 
-    const struct ct_component_prop_desc *(*prop_desc)(uint32_t *count);
-
     uint64_t (*cdb_type)();
+
+    const struct ct_comp_prop_decs *(*prop_desc)();
 
     void *(*get_interface)(uint64_t name_hash);
 
@@ -119,6 +133,8 @@ struct ct_editor_component_i0 {
     uint64_t (*create_new)();
 
     void (*property_editor)(uint64_t obj);
+
+    const char *(*prop_display_name)(uint64_t prop);
 
     void (*guizmo_get_transform)(uint64_t obj,
                                  float *world,
@@ -151,6 +167,10 @@ struct ct_component_a0 {
                    struct ct_entity ent,
                    const uint64_t *component_name,
                    uint32_t name_count);
+
+    const struct ct_prop_decs *(*desc_by_name)(
+            const struct ct_comp_prop_decs *desc,
+            uint64_t name);
 };
 
 struct ct_entity_a0 {

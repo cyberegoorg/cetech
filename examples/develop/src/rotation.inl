@@ -31,38 +31,37 @@ static void component_compiler(const char *filename,
     keys[component_key_count] = ce_yng_a0->key("speed");
 //    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
 //    if (d->has_key(d, key)) {
-        t_data.speed = ce_ydb_a0->get_float(filename, keys, CE_ARRAY_LEN(keys),
-                                            0.0f);
+    t_data.speed = ce_ydb_a0->get_float(filename, keys, CE_ARRAY_LEN(keys),
+                                        0.0f);
 
-        ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
+    ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
 //    }
 }
 
 
-static void _obj_change(struct ct_world world,
-                        uint64_t obj,
-                        const uint64_t *prop,
-                        uint32_t prop_count,
-                        struct ct_entity *ents,
-                        uint32_t n) {
-    for (int i = 0; i < n; ++i) {
-        struct ct_entity ent = ents[i];
+static struct ct_comp_prop_decs ct_comp_prop_decs = {
+        .prop_decs = (struct ct_prop_decs[]) {
+                {
+                        .type = ECS_PROP_FLOAT,
+                        .name = PROP_SPEED,
+                        .offset = offsetof(struct rotation_component, speed),
+                },
+        },
+        .prop_n = 1,
 
-        struct rotation_component *component;
-        component = ct_ecs_a0->component->get_one(world, ROTATION_COMPONENT,
-                                                  ent);
+};
 
-        component->speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0.0f);
-    }
+static const struct ct_comp_prop_decs *prop_desc() {
+    return &ct_comp_prop_decs;
 }
 
-
-static void component_spawner(struct ct_world world,
-                              uint64_t obj,
-                              void *data) {
-    struct rotation_component *component = data;
-
-    component->speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0);
+static const char *prop_display_name(uint64_t prop) {
+    switch (prop) {
+        case PROP_SPEED:
+            return "Speed";
+        default:
+            return NULL;
+    }
 }
 
 static uint64_t cdb_type() {
@@ -73,17 +72,12 @@ static const char *display_name() {
     return "Rotation";
 }
 
-static void property_editor(uint64_t obj) {
-    ct_editor_ui_a0->ui_float(obj, PROP_SPEED, "Speed", 0, 0);
-}
-
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .property_editor = property_editor,
+                .prop_display_name = prop_display_name,
         };
-
         return &ct_editor_component_i0;
     }
 
@@ -98,9 +92,8 @@ static struct ct_component_i0 rotation_component_i = {
         .size = size,
         .cdb_type = cdb_type,
         .compiler = component_compiler,
-        .spawner = component_spawner,
         .get_interface = get_interface,
-        .obj_change = _obj_change,
+        .prop_desc = prop_desc,
 };
 
 

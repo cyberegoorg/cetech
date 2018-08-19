@@ -131,7 +131,10 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_renderer_a0->set_vertex_buffer(0, vbh, 0, size);
         ct_renderer_a0->set_index_buffer(ibh, 0, size);
 
-        ct_material_a0->submit(m.material, data->layer_name, data->viewid);
+        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE,.name = m.material};
+        uint64_t material_obj = ct_resource_a0->get(material_resource);
+
+        ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
 
         ct_dd_a0->set_transform_mtx(t.world);
         ct_dd_a0->draw_axis(0, 0, 0, 1.0f, DD_AXIS_COUNT, 0.0f);
@@ -161,72 +164,44 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static void _obj_change(struct ct_world world,
-                        uint64_t obj,
-                        const uint64_t *prop,
-                        uint32_t prop_count,
-                        struct ct_entity *ents,
-                        uint32_t n) {
-    for (int i = 0; i < n; ++i) {
-        struct ct_entity ent = ents[i];
+static struct ct_comp_prop_decs ct_comp_prop_decs = {
+        .prop_decs = (struct ct_prop_decs[]) {
+                {
+                        .type = ECS_PROP_STR_ID64,
+                        .name = PROP_NODE,
+                        .offset = offsetof(struct ct_mesh, node_id),
+                },
+                {
+                        .type = ECS_PROP_STR_ID64,
+                        .name = PROP_MESH,
+                        .offset = offsetof(struct ct_mesh, mesh_id),
+                },
+                {
+                        .type = ECS_PROP_RESOURCE_NAME,
+                        .name = PROP_MATERIAL_ID,
+                        .offset = offsetof(struct ct_mesh, material),
+                },
+                {
+                        .type = ECS_PROP_RESOURCE_NAME,
+                        .name = PROP_SCENE_ID,
+                        .offset = offsetof(struct ct_mesh, scene_id),
+                },
+        },
+        .prop_n = 4,
 
-        struct ct_mesh *mesh;
-        mesh = ct_ecs_a0->component->get_one(world, MESH_RENDERER_COMPONENT,
-                                             ent);
-        for (int j = 0; j < prop_count; ++j) {
-            switch (prop[j]) {
-                case PROP_NODE : {
-                    const char *str = ce_cdb_a0->read_str(obj, PROP_NODE, "");
-                    mesh->node_id = ce_id_a0->id64(str);
-                    break;
-                }
-                case PROP_MESH : {
-                    const char *str = ce_cdb_a0->read_str(obj, PROP_MESH, "");
-                    mesh->mesh_id = ce_id_a0->id64(str);
-                    break;
+};
 
-                }
-                case PROP_MATERIAL_ID: {
-                    uint64_t material_id;
-                    material_id = ce_cdb_a0->read_uint64(obj,
-                                                         PROP_MATERIAL_ID, 0);
-
-                    mesh->material = ct_material_a0->create(material_id);
-                    break;
-                }
-                case PROP_SCENE_ID: {
-                    mesh->scene_id = ce_cdb_a0->read_uint64(obj,
-                                                            PROP_SCENE_ID, 0);
-                    break;
-                }
-            }
-        }
-    }
+static const struct ct_comp_prop_decs *prop_desc() {
+    return &ct_comp_prop_decs;
 }
 
-
-static void _component_spawner(struct ct_world world,
-                               uint64_t obj,
-                               void *data) {
-    struct ct_mesh *mesh = data;
-
-    *mesh = (struct ct_mesh) {
-            .material = ct_material_a0->create(
-                    ce_cdb_a0->read_uint64(obj, PROP_MATERIAL_ID, 0)),
-
-            .mesh_id = ce_cdb_a0->read_uint64(obj, PROP_MESH_ID, 0),
-            .node_id = ce_cdb_a0->read_uint64(obj, PROP_NODE_ID, 0),
-            .scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0),
-    };
-
-}
 
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
 
-    if(!scene_id) {
+    if (!scene_id) {
         return;
     }
 
@@ -238,7 +213,7 @@ void node_combo_items(uint64_t obj,
                       uint32_t *items_count) {
     uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
 
-    if(!scene_id) {
+    if (!scene_id) {
         return;
     }
 
@@ -300,8 +275,7 @@ static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = _mesh_component_compiler,
-        .spawner = _component_spawner,
-        .obj_change = _obj_change,
+        .prop_desc = prop_desc,
 };
 
 static void _init(struct ce_api_a0 *api) {

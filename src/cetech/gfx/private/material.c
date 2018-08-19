@@ -200,6 +200,10 @@ static void ui_texture(uint64_t variable) {
 static void draw_property(uint64_t material) {
     uint64_t layers_obj = ce_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
 
+    if(!layers_obj) {
+        return;
+    }
+
     uint64_t layer_count = ce_cdb_a0->prop_count(layers_obj);
     uint64_t layer_keys[layer_count];
     ce_cdb_a0->prop_keys(layers_obj, layer_keys);

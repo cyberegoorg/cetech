@@ -501,6 +501,21 @@ static void remove_components(struct ct_world world,
     _remove_from_type_slot(w, ent, idx, ent_type);
 }
 
+static const struct ct_prop_decs *desc_by_name(
+        const struct ct_comp_prop_decs *desc,
+        uint64_t name) {
+
+    for (int i = 0; i < desc->prop_n; ++i) {
+        if (desc->prop_decs[i].name != name) {
+            continue;
+        }
+
+        return &desc->prop_decs[i];
+    }
+
+    return NULL;
+}
+
 static void register_simulation(const char *name,
                                 ct_simulate_fce_t simulation) {
     CE_UNUSED(name);
@@ -722,25 +737,71 @@ static bool alive(struct ct_world world,
     return ce_handler_alive(&w->entity_handler, entity.h);
 }
 
+static void _obj_to_prop(const struct ct_comp_prop_decs *comp_desc,
+                         uint64_t obj,
+                         uint64_t prop,
+                         void *data) {
+    const struct ct_prop_decs *decs = desc_by_name(comp_desc, prop);
+    if (!decs) {
+        return;
+    }
+
+    uint64_t offset = decs->offset;
+
+    enum ct_ecs_prop_type prop_type = decs->type;
+    switch (prop_type) {
+        case ECS_PROP_FLOAT:
+            *(float *) (data + offset) = ce_cdb_a0->read_float(obj,
+                                                               prop,
+                                                               0.0f);
+            break;
+
+        case ECS_PROP_VEC3: {
+            ce_cdb_a0->read_vec3(obj, prop,
+                                 ((float *) (data + offset)));
+            break;
+        }
+
+        case ECS_PROP_RESOURCE_NAME:
+            *(uint64_t *) (data + offset) = ce_cdb_a0->read_uint64(obj, prop,
+                                                                   0);
+            break;
+
+        case ECS_PROP_STR_ID64 : {
+            const char *str = ce_cdb_a0->read_str(obj, prop, "");
+            *(uint64_t *) (data + offset) = ce_id_a0->id64(str);
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+static void _obj_change_generic(struct ct_world world,
+                                struct ct_component_i0 *ci,
+                                uint64_t obj,
+                                const uint64_t *props,
+                                uint32_t prop_count,
+                                struct ct_entity *ents,
+                                uint32_t n) {
+    const struct ct_comp_prop_decs *comp_desc = ci->prop_desc();
+
+    for (int i = 0; i < n; ++i) {
+        struct ct_entity ent = ents[i];
+        void *data = ct_ecs_a0->component->get_one(world, ci->cdb_type(), ent);
+
+        for (int p = 0; p < prop_count; ++p) {
+            uint64_t prop = props[p];
+            _obj_to_prop(comp_desc, obj, prop, data);
+        }
+    }
+}
 
 static void _on_component_obj_change(uint64_t obj,
                                      const uint64_t *prop,
                                      uint32_t prop_count,
                                      void *data) {
-
-    uint64_t component_type = ce_cdb_a0->type(obj);
-
-    struct ct_component_i0 *component_i;
-    component_i = get_interface(component_type);
-
-    if (!component_i) {
-        return;
-    }
-
-    if (!component_i->obj_change) {
-        return;
-    }
-
     struct ct_world world = {.h= (uint64_t) data};
     struct world_instance *w = get_world_instance(world);
     uint64_t idx = ce_hash_lookup(&w->component_objmap, obj, UINT64_MAX);
@@ -751,12 +812,30 @@ static void _on_component_obj_change(uint64_t obj,
 
     struct spawn_info *info = &w->component_spawn_info[idx];
 
-    component_i->obj_change(world,
-                            obj,
-                            prop,
-                            prop_count,
-                            info->ents,
-                            ce_array_size(info->ents));
+
+    uint64_t component_type = ce_cdb_a0->type(obj);
+
+    struct ct_component_i0 *component_i;
+    component_i = get_interface(component_type);
+
+    if (!component_i) {
+        return;
+    }
+
+
+    if (!component_i->obj_change) {
+
+        _obj_change_generic(world, component_i, obj, prop, prop_count,
+                            info->ents, ce_array_size(info->ents));
+
+    } else {
+        component_i->obj_change(world,
+                                obj,
+                                prop,
+                                prop_count,
+                                info->ents,
+                                ce_array_size(info->ents));
+    }
 }
 
 
@@ -859,9 +938,11 @@ static void _on_entity_obj_add(uint64_t obj,
         _add_spawn_entity_obj(w, entity_obj, root_ent);
 
         uint64_t components;
-        components = ce_cdb_a0->read_subobject(entity_obj, ENTITY_COMPONENTS, 0);
+        components = ce_cdb_a0->read_subobject(entity_obj, ENTITY_COMPONENTS,
+                                               0);
 
-        ce_cdb_a0->register_remove_notify(components, _on_components_obj_removed,
+        ce_cdb_a0->register_remove_notify(components,
+                                          _on_components_obj_removed,
                                           (void *) world.h);
 
         ce_cdb_a0->register_notify(components, _on_components_obj_add,
@@ -892,6 +973,18 @@ static void link(struct ct_world world,
 
     w->first_child[parent_idx] = child;
     w->next_sibling[child_idx] = tmp;
+}
+
+static void _generic_spawner(const struct ct_component_i0 *ci,
+                             uint64_t obj,
+                             void *data) {
+    const struct ct_comp_prop_decs *comp_desc = ci->prop_desc();
+
+    for (int i = 0; i < comp_desc->prop_n; ++i) {
+        const struct ct_prop_decs *desc = &comp_desc->prop_decs[i];
+        uint64_t prop = desc->name;
+        _obj_to_prop(comp_desc, obj, prop, data);
+    }
 }
 
 static struct ct_entity _spawn_entity(struct ct_world world,
@@ -949,8 +1042,13 @@ static struct ct_entity _spawn_entity(struct ct_world world,
         ce_cdb_a0->register_notify(component_obj, _on_component_obj_change,
                                    (void *) world.h);
 
-        component_i->spawner(world, component_obj,
+        if (!component_i->spawner) {
+            _generic_spawner(component_i, component_obj,
                              comp_data + (component_i->size() * idx));
+        } else {
+            component_i->spawner(world, component_obj,
+                                 comp_data + (component_i->size() * idx));
+        }
     }
 
     uint64_t children;
@@ -1104,6 +1202,7 @@ struct ct_component_a0 ct_component_a0 = {
         .get_one = get_one,
         .add = add_components,
         .remove = remove_components,
+        .desc_by_name = desc_by_name,
 };
 
 struct ct_system_a0 ct_system_a0 = {

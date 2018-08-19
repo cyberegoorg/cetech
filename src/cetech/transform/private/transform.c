@@ -76,38 +76,42 @@ static void transform_transform(struct ct_transform_comp *transform,
                 pos[0], pos[1], pos[2]);
 }
 
+static struct ct_comp_prop_decs ct_comp_prop_decs = {
+        .prop_decs = (struct ct_prop_decs[]) {
+                {
+                        .type = ECS_PROP_VEC3,
+                        .name = PROP_POSITION,
+                        .offset = offsetof(struct ct_transform_comp, position),
+                },
+                {
+                        .type = ECS_PROP_VEC3,
+                        .name = PROP_ROTATION,
+                        .offset = offsetof(struct ct_transform_comp, rotation),
+                },
+                {
+                        .type = ECS_PROP_VEC3,
+                        .name = PROP_SCALE,
+                        .offset = offsetof(struct ct_transform_comp, scale),
+                },
+        },
+        .prop_n = 3,
+};
 
-static void _obj_change(struct ct_world world,
-                        uint64_t obj,
-                        const uint64_t *prop,
-                        uint32_t prop_count,
-                        struct ct_entity *ents,
-                        uint32_t n) {
-    for (int i = 0; i < n; ++i) {
-        struct ct_entity ent = ents[i];
-
-        struct ct_transform_comp *transform;
-        transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
-                                                  ent);
-
-        ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
-        ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
-        ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
-
-    }
+static const struct ct_comp_prop_decs *prop_desc() {
+    return &ct_comp_prop_decs;
 }
 
-static void component_spawner(struct ct_world world,
-                              uint64_t obj,
-                              void *data) {
-    struct ct_transform_comp *transform = data;
-
-    ce_cdb_a0->read_vec3(obj, PROP_POSITION, transform->position);
-    ce_cdb_a0->read_vec3(obj, PROP_ROTATION, transform->rotation);
-    ce_cdb_a0->read_vec3(obj, PROP_SCALE, transform->scale);
-
-    transform_transform(transform, NULL);
-
+static const char *prop_display_name(uint64_t prop) {
+    switch (prop) {
+        case PROP_POSITION:
+            return "Position";
+        case PROP_ROTATION:
+            return "Rotation";
+        case PROP_SCALE:
+            return "Scale";
+        default:
+            return NULL;
+    }
 }
 
 static uint64_t cdb_type() {
@@ -116,12 +120,6 @@ static uint64_t cdb_type() {
 
 static const char *display_name() {
     return ICON_FA_ARROWS " Transform";
-}
-
-static void property_editor(uint64_t obj) {
-    ct_editor_ui_a0->ui_vec3(obj, PROP_POSITION, "Position", 0, 0);
-    ct_editor_ui_a0->ui_vec3(obj, PROP_ROTATION, "Rotation", -360.0f, 360.0f);
-    ct_editor_ui_a0->ui_vec3(obj, PROP_SCALE, "Scale", 0, 0);
 }
 
 static void guizmo_get_transform(uint64_t obj,
@@ -182,7 +180,7 @@ static uint64_t create_new() {
                                                   TRANSFORM_COMPONENT);
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
-    ce_cdb_a0->set_vec3(w, PROP_SCALE, (float[3]){1.0f, 1.0f, 1.0f});
+    ce_cdb_a0->set_vec3(w, PROP_SCALE, (float[3]) {1.0f, 1.0f, 1.0f});
     ce_cdb_a0->write_commit(w);
 
     return component;
@@ -192,7 +190,7 @@ static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .property_editor = property_editor,
+                .prop_display_name = prop_display_name,
                 .guizmo_get_transform = guizmo_get_transform,
                 .guizmo_set_transform = guizmo_set_transform,
                 .create_new = create_new,
@@ -213,8 +211,7 @@ static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = component_compiler,
-        .spawner = component_spawner,
-        .obj_change = _obj_change,
+        .prop_desc = prop_desc
 };
 
 
