@@ -35,14 +35,13 @@ static struct _G {
 
     struct ct_world world;
     struct ct_entity camera_ent;
+    struct ct_entity render_ent;
 
     struct ct_entity active_ent;
 
     bool visible;
 
     bool active;
-    struct ct_render_graph *render_graph;
-    struct ct_render_graph_builder *render_graph_builder;
 } _G;
 
 
@@ -120,12 +119,15 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
 
-    _G.render_graph_builder->call->set_size(_G.render_graph_builder,
-                                            size[0], size[1]);
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
 
     ct_render_texture_handle_t th;
-    th = _G.render_graph_builder->call->get_texture(_G.render_graph_builder,
-                                                    RG_OUTPUT_TEXTURE);
+    th = rg_comp->builder->call->get_texture(rg_comp->builder,
+                                             RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -189,27 +191,26 @@ static bool init() {
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
                                              ce_id_a0->id64("content/camera"));
 
-    _G.render_graph = ct_render_graph_a0->create_graph();
-    _G.render_graph_builder = ct_render_graph_a0->create_builder();
-    _G.render_graph->call->add_module(_G.render_graph,
-                                      ct_default_rg_a0->create(
-                                              _G.world));
+    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
+
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    rg_comp->builder = ct_render_graph_a0->create_builder();
+    rg_comp->graph = ct_render_graph_a0->create_graph();
+
+    struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
+    rg_comp->graph->call->add_module(rg_comp->graph, module);
 
     return true;
 }
 
-static void on_render() {
-    _G.render_graph_builder->call->clear(_G.render_graph_builder);
-
-    if (!_G.visible) {
-        return;
-    }
-
-    _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
-    _G.render_graph_builder->call->execute(_G.render_graph_builder);
-}
-
 static void update(float dt) {
+    ct_ecs_a0->system->simulate(_G.world, dt);
+
     uint64_t selected_object = _G.selected_object;
     if (!selected_object) {
         return;
@@ -247,9 +248,6 @@ static void update(float dt) {
                           0, 0, updown, leftright, 10.0f, false);
     }
 
-    if (_G.visible) {
-        ct_ecs_a0->system->simulate(_G.world, dt);
-    }
 }
 
 static struct ct_asset_preview_a0 asset_preview_api = {
@@ -280,7 +278,6 @@ static struct ct_dock_i0 ct_dock_i0 = {
 static struct ct_editor_module_i0 ct_editor_module_i0 = {
         .init = init,
         .update = update,
-        .render= on_render,
 };
 
 

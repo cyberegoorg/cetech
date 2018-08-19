@@ -30,9 +30,8 @@
 
 static struct _G {
     bool load_layout;
-    struct ct_render_graph *render_graph;
-    struct ct_render_graph_builder *render_graph_builder;
-    struct ct_render_graph_module *module;
+    struct ct_world world;
+    struct ct_entity render_ent;
 } _G;
 
 void reload_layout() {
@@ -187,42 +186,33 @@ static void draw_all_docks() {
     }
 }
 
-static void debugui_on_setup(void *inst,
-                             struct ct_render_graph_builder *builder) {
-    builder->call->add_pass(builder, inst, 0);
-}
-
-static void debugui_on_pass(void *inst,
-                            uint8_t viewid,
-                            uint64_t layer,
-                            struct ct_render_graph_builder *builder) {
-    ct_debugui_a0->render(viewid);
-}
-
 
 static void on_init(uint64_t _event) {
     struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
-        if(i->init) {
+        if (i->init) {
             i->init();
         }
         it = ce_api_a0->next(it);
     }
 
-    _G.render_graph = ct_render_graph_a0->create_graph();
-    _G.render_graph_builder = ct_render_graph_a0->create_builder();
-    _G.module = ct_render_graph_a0->create_module();
+    _G.world = ct_ecs_a0->entity->create_world();
 
-    static struct ct_render_graph_pass debugui_pass = {
-            .on_pass = debugui_on_pass,
-            .on_setup = debugui_on_setup
-    };
+    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
 
-    _G.module->call->add_pass(_G.module, &debugui_pass,
-                              sizeof(struct ct_render_graph_pass));
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
 
-    _G.render_graph->call->add_module(_G.render_graph, _G.module);
+    rg_comp->builder = ct_render_graph_a0->create_builder();
+    rg_comp->graph = ct_render_graph_a0->create_graph();
+
+
+    struct ct_render_graph_module *module = ct_render_graph_a0->create_module();
+    rg_comp->graph->call->add_module(rg_comp->graph, module);
 }
 
 static void on_shutdown(uint64_t _event) {
@@ -230,7 +220,7 @@ static void on_shutdown(uint64_t _event) {
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
-        if(i->shutdown) {
+        if (i->shutdown) {
             i->shutdown();
         }
 
@@ -245,29 +235,14 @@ static void on_update(float dt) {
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
-        if(i->update) {
+        if (i->update) {
             i->update(dt);
         }
 
         it = ce_api_a0->next(it);
     }
-}
 
-static void on_render() {
-    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
-    while (it.api) {
-        struct ct_editor_module_i0 *i = (it.api);
-
-        if(i->render) {
-            i->render();
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    _G.render_graph_builder->call->clear(_G.render_graph_builder);
-    _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
-    _G.render_graph_builder->call->execute(_G.render_graph_builder);
+    ct_ecs_a0->system->simulate(_G.world, dt);
 }
 
 
@@ -288,18 +263,21 @@ static void on_ui(uint64_t _event) {
     }
 }
 
-static uint64_t name(){
+static uint64_t name() {
     return ce_id_a0->id64("editor");
 }
 
-static struct ct_render_graph_builder *render_graph_builder(){
-    return _G.render_graph_builder;
+static struct ct_render_graph_builder *render_graph_builder() {
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    return rg_comp->builder;
 }
 
 struct ct_game_i0 editor_game_i0 = {
         .init = on_init,
         .shutdown = on_shutdown,
-        .render = on_render,
         .update = on_update,
         .name = name,
         .render_graph_builder = render_graph_builder

@@ -1,27 +1,17 @@
 #ifndef CETECH_RENDER_GRAPH_H
 #define CETECH_RENDER_GRAPH_H
 
-
-
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stdint.h>
 
 
 #define RG_OUTPUT_TEXTURE \
     CE_ID64_0("output", 0x759d549788b7b7e0ULL)
 
-//==============================================================================
-// Typedefs
-//==============================================================================
+#define RENDER_GRAPH_COMPONENT \
+    CE_ID64_0("render_graph", 0)
+
+
 struct ct_render_graph_builder;
-
-
-//==============================================================================
-// Pass
-//==============================================================================
 
 struct ct_render_graph_pass {
     uint64_t size;
@@ -34,10 +24,6 @@ struct ct_render_graph_pass {
                     uint64_t layer,
                     struct ct_render_graph_builder *builder);
 };
-
-//==============================================================================
-// Builder
-//==============================================================================
 
 struct ct_render_graph_attachment {
     enum ct_render_backbuffer_ratio ratio;
@@ -78,10 +64,6 @@ struct ct_render_graph_builder {
     struct ct_render_graph_builder_fce *call;
 };
 
-//==============================================================================
-// Module
-//==============================================================================
-
 struct ct_render_graph_module_fce {
     void (*add_pass)(void *inst,
                      void *pass,
@@ -96,11 +78,6 @@ struct ct_render_graph_module {
     struct ct_render_graph_module_fce *call;
 };
 
-//==============================================================================
-// Graph
-//==============================================================================
-
-
 struct ct_render_graph_fce {
     void (*add_module)(void *inst,
                        struct ct_render_graph_module *module);
@@ -114,11 +91,10 @@ struct ct_render_graph {
     struct ct_render_graph_fce *call;
 };
 
-
-//==============================================================================
-// Api
-//==============================================================================
-
+struct ct_render_graph_component {
+    struct ct_render_graph *graph;
+    struct ct_render_graph_builder* builder;
+};
 
 struct ct_render_graph_a0 {
     struct ct_render_graph *(*create_graph)();

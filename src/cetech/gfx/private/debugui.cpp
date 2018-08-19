@@ -12,6 +12,7 @@
 #include <celib/log.h>
 #include <celib/ebus.h>
 #include <cetech/controlers/controlers.h>
+#include <cetech/kernel/kernel.h>
 
 #include "celib/config.h"
 #include "celib/memory.h"
@@ -25,7 +26,9 @@ static struct DebugUIGlobal {
     ce_alloc *allocator;
 } _G;
 
-static void render(uint8_t viewid) {
+static void on_begin_render(uint64_t event) {
+    uint8_t  viewid = 255;
+
     struct ct_controlers_i0 *keyboard, *mouse;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
     mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
@@ -88,13 +91,16 @@ static void render(uint8_t viewid) {
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
+}
 
+static void on_render(uint64_t _event) {
     uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                               DEBUGUI_EVENT);
 
     ce_ebus_a0->broadcast(DEBUGUI_EBUS, event);
     imguiEndFrame();
 }
+
 
 static void SaveDock(struct ce_vio *output) {
     char *buffer = NULL;
@@ -108,7 +114,7 @@ static void LoadDock(const char *path) {
 }
 
 static struct ct_debugui_a0 debugui_api = {
-        .render = render,
+//        .render = render,
 
         .Text = ImGui::Text,
         .TextV = ImGui::TextV,
@@ -289,6 +295,12 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_ebus_a0->create_ebus(DEBUGUI_EBUS);
+
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
+                        on_begin_render, KERNEL_ORDER + 2);
+
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
+                        on_render, RENDER_ORDER + 2);
 
 
     struct ct_controlers_i0 *keyboard;

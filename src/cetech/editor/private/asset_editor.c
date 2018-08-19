@@ -93,8 +93,6 @@ static void draw_editor(struct ct_dock_i0 *dock) {
     }
 
     i->draw_ui(editor->context_obj);
-
-
 }
 
 static uint32_t find_editor(struct ct_resource_id asset) {
@@ -218,26 +216,6 @@ static void update(float dt) {
     }
 }
 
-static void on_render() {
-    const uint32_t editor_n = ce_array_size(_G.editors);
-    for (uint8_t i = 0; i < editor_n; ++i) {
-        struct editor *editor = &_G.editors[i];
-
-        if (!editor->dock.visible) {
-            continue;
-        }
-
-        struct ct_asset_editor_i0 *editor_i = get_asset_editor(editor->type);
-
-        if (!editor_i) {
-            return;
-        }
-
-        editor_i->render(editor->context_obj);
-    }
-}
-
-
 static void on_asset_double_click(uint64_t event) {
     uint64_t asset_type = ce_cdb_a0->read_uint64(event,
                                                  ASSET_TYPE, 0);
@@ -257,7 +235,6 @@ static void on_asset_double_click(uint64_t event) {
 
 static struct ct_editor_module_i0 ct_editor_module_i0 = {
         .update = update,
-        .render= on_render,
 };
 
 static void _init(struct ce_api_a0 *api) {

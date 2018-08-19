@@ -26,11 +26,9 @@
 
 static struct G {
     struct ct_world world;
+    struct ct_entity render_ent;
     struct ct_entity camera_ent;
     struct ct_entity level;
-
-    struct ct_render_graph *render_graph;
-    struct ct_render_graph_builder *render_graph_builder;
 } _G;
 
 #define _CAMERA_ASSET \
@@ -45,22 +43,30 @@ static struct G {
 
 void init() {
     _G.world = ct_ecs_a0->entity->create_world();
+
+
     _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world, _CAMERA_ASSET);
     _G.level = ct_ecs_a0->entity->spawn(_G.world, _LEVEL_ASSET);
 
-    _G.render_graph = ct_render_graph_a0->create_graph();
-    _G.render_graph_builder = ct_render_graph_a0->create_builder();
+    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
+
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    rg_comp->builder = ct_render_graph_a0->create_builder();
+    rg_comp->graph = ct_render_graph_a0->create_graph();
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    _G.render_graph->call->add_module(_G.render_graph, module);
+    rg_comp->graph->call->add_module(rg_comp->graph, module);
 
     ct_ecs_a0->system->register_simulation("rotation", rotation_system);
 }
 
 
 void shutdown() {
-    ct_render_graph_a0->destroy_builder(_G.render_graph_builder);
-    ct_render_graph_a0->destroy_graph(_G.render_graph);
     ct_ecs_a0->entity->destroy_world(_G.world);
 }
 
@@ -76,24 +82,21 @@ void update(float dt) {
     ct_ecs_a0->system->simulate(_G.world, dt);
 }
 
-static void render() {
-    _G.render_graph_builder->call->clear(_G.render_graph_builder);
-    _G.render_graph->call->setup(_G.render_graph, _G.render_graph_builder);
-    _G.render_graph_builder->call->execute(_G.render_graph_builder);
-}
-
 static uint64_t name() {
     return ce_id_a0->id64("default");
 }
 
 static struct ct_render_graph_builder *render_graph_builder() {
-    return _G.render_graph_builder;
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    return rg_comp->builder;
 }
 
 struct ct_game_i0 game_i0 = {
         .init = init,
         .shutdown = shutdown,
-        .render = render,
         .update = update,
         .name = name,
         .render_graph_builder = render_graph_builder
@@ -125,7 +128,7 @@ void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
 }
 
 void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
-                                          int reload) {
+                                      int reload) {
     CE_UNUSED(api);
 
     ce_log_a0->info("example", "Init %d", reload);
@@ -136,7 +139,7 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,
-                                            int reload) {
+                                        int reload) {
     CE_UNUSED(api);
 
     ce_log_a0->info("example", "Shutdown %d", reload);

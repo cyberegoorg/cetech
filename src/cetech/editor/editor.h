@@ -17,7 +17,6 @@ struct ct_editor_module_i0 {
 
     void (*update)(float dt);
 
-    void (*render)();
 };
 
 #endif //CETECH_PLAYGROUND_H

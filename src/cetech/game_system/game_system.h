@@ -25,8 +25,6 @@ struct ct_game_i0 {
 
     void (*update)(float dt);
 
-    void (*render)();
-
     struct ct_render_graph_builder *(*render_graph_builder)();
 };
 

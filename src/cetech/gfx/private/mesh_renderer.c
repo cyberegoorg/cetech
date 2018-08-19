@@ -188,7 +188,6 @@ static struct ct_comp_prop_decs ct_comp_prop_decs = {
                 },
         },
         .prop_n = 4,
-
 };
 
 static const struct ct_comp_prop_decs *prop_desc() {

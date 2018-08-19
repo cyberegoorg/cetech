@@ -186,20 +186,15 @@ static void on_resize(uint64_t event) {
     _G.size_height = ce_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_HEIGHT, 0);
 }
 
-static void on_render(uint64_t _event) {
+static void on_begin_render(uint64_t _event) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
     }
+}
 
-    uint64_t event = ce_cdb_a0->create_object(
-            ce_cdb_a0->db(),
-            RENDERER_RENDER_EVENT);
-
-    ce_ebus_a0->broadcast(RENDERER_EBUS, event);
-
-
+static void on_render(uint64_t _event) {
     bgfx_frame(false);
 }
 
@@ -786,8 +781,12 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
+
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        on_render, RENDER_ORDER);
+                        on_begin_render, KERNEL_ORDER + 1);
+
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
+                    on_render, RENDER_ORDER + 1);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
 
@@ -821,8 +820,6 @@ static void _init(struct ce_api_a0 *api) {
     _G.vsync = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
 
     CE_INIT_API(api, ce_os_a0);
-
-    ce_ebus_a0->create_ebus(RENDERER_EBUS);
 
     renderer_create();
 

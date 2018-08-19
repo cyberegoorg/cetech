@@ -38,11 +38,10 @@
 struct scene_editor {
     struct ct_world world;
     struct ct_entity camera_ent;
+    struct ct_entity render_ent;
     struct ct_entity entity;
 
     uint64_t entity_name;
-    struct ct_render_graph *render_graph;
-    struct ct_render_graph_builder *rg_builder;
     bool mouse_hovering;
 };
 
@@ -260,13 +259,18 @@ static void draw_editor(uint64_t context_obj) {
 //                                  editor->path);
     }
 
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(editor->world, RENDER_GRAPH_COMPONENT,
+                                            editor->render_ent);
+
+    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
+
+
+    ct_ecs_a0->system->simulate(editor->world, 0.1f);
+
     ct_render_texture_handle_t th;
-    th = editor->rg_builder->call->get_texture(editor->rg_builder,
-                                               RG_OUTPUT_TEXTURE);
-
-    editor->rg_builder->call->set_size(editor->rg_builder,
-                                       size[0], size[1]);
-
+    th = rg_comp->builder->call->get_texture(rg_comp->builder,
+                                             RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -287,7 +291,6 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
     int idx = _G.editor_count;
     ++_G.editor_count;
 
-
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(context_obj);
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
     ce_cdb_a0->write_commit(w);
@@ -307,12 +310,20 @@ static void open(uint64_t context_obj) {
     editor->world = ct_ecs_a0->entity->create_world();
     editor->entity = ct_ecs_a0->entity->spawn(editor->world, asset_name);
 
-    editor->render_graph = ct_render_graph_a0->create_graph();
-    editor->rg_builder = ct_render_graph_a0->create_builder();
-    editor->render_graph->call->add_module(editor->render_graph,
-                                           ct_default_rg_a0->create(
-                                                   editor->world));
 
+    ct_ecs_a0->entity->create(editor->world, &editor->render_ent, 1);
+    ct_ecs_a0->component->add(editor->world, editor->render_ent,
+                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1);
+
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->component->get_one(editor->world, RENDER_GRAPH_COMPONENT,
+                                            editor->render_ent);
+
+    rg_comp->builder = ct_render_graph_a0->create_builder();
+    rg_comp->graph = ct_render_graph_a0->create_graph();
+
+    struct ct_render_graph_module *module = ct_default_rg_a0->create(editor->world);
+    rg_comp->graph->call->add_module(rg_comp->graph, module);
 
     editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
                                                   ce_id_a0->id64("content/camera"));
@@ -369,26 +380,6 @@ static void update(uint64_t context_obj,
                           editor->camera_ent,
                           dt, 0, 0, updown, leftright, 10.0f, false);
     }
-
-    ct_ecs_a0->system->simulate(editor->world, dt);
-
-}
-
-static void on_render(uint64_t context_obj) {
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
-    struct scene_editor *editor = &_G.editor[editor_idx];
-    if (!editor->world.h) {
-        return;
-    }
-
-    editor->rg_builder->call->clear(editor->rg_builder);
-
-
-    editor->render_graph->call->setup(editor->render_graph,
-                                      editor->rg_builder);
-
-    editor->rg_builder->call->execute(editor->rg_builder);
-
 }
 
 uint64_t asset_type() {
@@ -408,7 +399,6 @@ static struct ct_asset_editor_i0 ct_asset_editor_i0 = {
         .asset_type = asset_type,
         .open = open,
         .update = update,
-        .render = on_render,
         .draw_ui = draw_editor,
         .display_name = display_name,
         .display_icon = display_icon,

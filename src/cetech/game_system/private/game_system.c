@@ -82,27 +82,6 @@ static struct ct_render_graph_builder *game_render_graph_builder(uint64_t name) 
     return game_i->render_graph_builder();
 }
 
-
-static void game_render() {
-    const uint64_t game_n = ce_array_size(_G.game_interface);
-    for (int i = game_n-1; i >= 0; --i) {
-        struct ct_game_i0 *gi = _G.game_interface[i];
-        if (!gi->render) {
-            return;
-        }
-
-        if (!gi->render_graph_builder) {
-            continue;
-        }
-
-        if (!gi->render_graph_builder()) {
-            continue;
-        }
-
-        gi->render();
-    }
-}
-
 static void game_pause(uint64_t name) {
     ce_hash_add(&_G.game_paused, name, true, ce_memory_a0->system);
 }
@@ -144,9 +123,6 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                       int reload) {
 
     api->register_api("ct_game_system_a0", ct_game_system_a0);
-
-    ce_ebus_a0->connect(RENDERER_EBUS, RENDERER_RENDER_EVENT,
-                        game_render, GAME_ORDER);
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT,
                         game_init, GAME_ORDER);

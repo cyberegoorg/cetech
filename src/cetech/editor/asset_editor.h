@@ -27,7 +27,6 @@ struct ct_asset_editor_i0 {
     void (*open)(uint64_t context_obj);
     void (*close)(uint64_t context_obj);
     void (*update)(uint64_t context_obj, float dt);
-    void (*render)(uint64_t context_obj);
     void (*draw_ui)(uint64_t context_obj);
 };
 

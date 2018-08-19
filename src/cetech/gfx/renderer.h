@@ -1016,19 +1016,6 @@ typedef enum ct_render_fatal {
 typedef void (*ct_renderender_on_render)();
 
 
-//==============================================================================
-// Api
-//==============================================================================
-enum {
-    RENDERER_EBUS = 0x709f555c
-};
-
-enum {
-    RENDERER_INVALID_EVNT = 0,
-    RENDERER_RENDER_EVENT,
-};
-
-
 //! Render API V0
 struct ct_renderer_a0 {
     //! Create renderer.
