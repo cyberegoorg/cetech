@@ -270,38 +270,38 @@ static struct ce_cdb_t create_db() {
             .objects_mem = (uint64_t *) mmap(NULL,
                                              MAX_OBJECTS * sizeof(uint64_t),
                                              PROT_READ | PROT_WRITE,
-                                             MAP_PRIVATE | MAP_ANONYMOUS,
+                                             MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                              -1, 0),
 
 
             .free_objects_id = (uint32_t *) mmap(NULL,
                                                  MAX_OBJECTS * sizeof(uint32_t),
                                                  PROT_READ | PROT_WRITE,
-                                                 MAP_PRIVATE | MAP_ANONYMOUS,
+                                                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                                  -1, 0),
 
             .to_free_objects_id = (uint32_t *) mmap(NULL,
                                                     MAX_OBJECTS *
                                                     sizeof(uint32_t),
                                                     PROT_READ | PROT_WRITE,
-                                                    MAP_PRIVATE | MAP_ANONYMOUS,
+                                                    MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                                     -1, 0),
             .object_pool = (struct object_t *) mmap(NULL,
                                                     MAX_OBJECTS *
                                                     sizeof(struct object_t),
                                                     PROT_READ | PROT_WRITE,
-                                                    MAP_PRIVATE | MAP_ANONYMOUS,
+                                                    MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                                     -1, 0),
             .free_objects = (uint32_t *) mmap(NULL,
                                               MAX_OBJECTS * sizeof(uint32_t),
                                               PROT_READ | PROT_WRITE,
-                                              MAP_PRIVATE | MAP_ANONYMOUS,
+                                              MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                               -1, 0),
 
             .to_free_objects = (uint32_t *) mmap(NULL,
                                                  MAX_OBJECTS * sizeof(uint32_t),
                                                  PROT_READ | PROT_WRITE,
-                                                 MAP_PRIVATE | MAP_ANONYMOUS,
+                                                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE,
                                                  -1, 0)
     };
 

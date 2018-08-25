@@ -97,7 +97,7 @@ static void *virtual_alloc(uint64_t size) {
     return mmap(NULL,
                 size,
                 PROT_READ | PROT_WRITE,
-                MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
 }
 
 //static void virtual_free(void* ptr, uint64_t size) {
