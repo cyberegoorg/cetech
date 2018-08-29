@@ -106,13 +106,13 @@ static void builder_write(void *inst,
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    const uint32_t samplerFlags = 0
+    const uint64_t samplerFlags = 0
                                   | CT_RENDER_TEXTURE_RT
-                                  | CT_RENDER_TEXTURE_MIN_POINT
-                                  | CT_RENDER_TEXTURE_MAG_POINT
-                                  | CT_RENDER_TEXTURE_MIP_POINT
-                                  | CT_RENDER_TEXTURE_U_CLAMP
-                                  | CT_RENDER_TEXTURE_V_CLAMP;
+                                  | CT_RENDER_SAMPLER_MIN_POINT
+                                  | CT_RENDER_SAMPLER_MAG_POINT
+                                  | CT_RENDER_SAMPLER_MIP_POINT
+                                  | CT_RENDER_SAMPLER_U_CLAMP
+                                  | CT_RENDER_SAMPLER_V_CLAMP;
 
     const float coef = ratio_to_coef(info.ratio);
 

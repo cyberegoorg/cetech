@@ -1,14 +1,5 @@
-//! \defgroup Renderer
-//! Renderer system
-//! \{
 #ifndef CETECH_RENDERER_H
 #define CETECH_RENDERER_H
-
-
-
-//==============================================================================
-// Includes
-//==============================================================================
 
 #include <stdint.h>
 #include <stdarg.h>
@@ -31,484 +22,6 @@
 
 #define CONFIG_SCREEN_FULLSCREEN \
      CE_ID64_0("screen.fullscreen", 0x613e9a6a17148a72ULL)
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-///
-typedef enum ct_render_renderer_type {
-    CT_RENDER_RENDERER_TYPE_NOOP,
-    CT_RENDER_RENDERER_TYPE_DIRECT3D9,
-    CT_RENDER_RENDERER_TYPE_DIRECT3D11,
-    CT_RENDER_RENDERER_TYPE_DIRECT3D12,
-    CT_RENDER_RENDERER_TYPE_GNM,
-    CT_RENDER_RENDERER_TYPE_METAL,
-    CT_RENDER_RENDERER_TYPE_OPENGLES,
-    CT_RENDER_RENDERER_TYPE_OPENGL,
-    CT_RENDER_RENDERER_TYPE_VULKAN,
-
-    CT_RENDER_RENDERER_TYPE_COUNT
-
-} ct_render_renderer_type_t;
-
-typedef enum ct_render_access {
-    CT_RENDER_ACCESS_READ,
-    CT_RENDER_ACCESS_WRITE,
-    CT_RENDER_ACCESS_READWRITE,
-
-    CT_RENDER_ACCESS_COUNT
-
-} ct_render_access_t;
-
-typedef enum ct_render_attrib {
-    CT_RENDER_ATTRIB_POSITION,
-    CT_RENDER_ATTRIB_NORMAL,
-    CT_RENDER_ATTRIB_TANGENT,
-    CT_RENDER_ATTRIB_BITANGENT,
-    CT_RENDER_ATTRIB_COLOR0,
-    CT_RENDER_ATTRIB_COLOR1,
-    CT_RENDER_ATTRIB_COLOR2,
-    CT_RENDER_ATTRIB_COLOR3,
-    CT_RENDER_ATTRIB_INDICES,
-    CT_RENDER_ATTRIB_WEIGHT,
-    CT_RENDER_ATTRIB_TEXCOORD0,
-    CT_RENDER_ATTRIB_TEXCOORD1,
-    CT_RENDER_ATTRIB_TEXCOORD2,
-    CT_RENDER_ATTRIB_TEXCOORD3,
-    CT_RENDER_ATTRIB_TEXCOORD4,
-    CT_RENDER_ATTRIB_TEXCOORD5,
-    CT_RENDER_ATTRIB_TEXCOORD6,
-    CT_RENDER_ATTRIB_TEXCOORD7,
-
-    CT_RENDER_ATTRIB_COUNT
-
-} ct_render_attrib_t;
-
-typedef enum ct_render_attrib_type {
-    CT_RENDER_ATTRIB_TYPE_UINT8,
-    CT_RENDER_ATTRIB_TYPE_UINT10,
-    CT_RENDER_ATTRIB_TYPE_INT16,
-    CT_RENDER_ATTRIB_TYPE_HALF,
-    CT_RENDER_ATTRIB_TYPE_FLOAT,
-
-    CT_RENDER_ATTRIB_TYPE_COUNT
-
-} ct_render_attrib_type_t;
-
-typedef enum ct_render_texture_format {
-    CT_RENDER_TEXTURE_FORMAT_BC1,
-    CT_RENDER_TEXTURE_FORMAT_BC2,
-    CT_RENDER_TEXTURE_FORMAT_BC3,
-    CT_RENDER_TEXTURE_FORMAT_BC4,
-    CT_RENDER_TEXTURE_FORMAT_BC5,
-    CT_RENDER_TEXTURE_FORMAT_BC6H,
-    CT_RENDER_TEXTURE_FORMAT_BC7,
-    CT_RENDER_TEXTURE_FORMAT_ETC1,
-    CT_RENDER_TEXTURE_FORMAT_ETC2,
-    CT_RENDER_TEXTURE_FORMAT_ETC2A,
-    CT_RENDER_TEXTURE_FORMAT_ETC2A1,
-    CT_RENDER_TEXTURE_FORMAT_PTC12,
-    CT_RENDER_TEXTURE_FORMAT_PTC14,
-    CT_RENDER_TEXTURE_FORMAT_PTC12A,
-    CT_RENDER_TEXTURE_FORMAT_PTC14A,
-    CT_RENDER_TEXTURE_FORMAT_PTC22,
-    CT_RENDER_TEXTURE_FORMAT_PTC24,
-
-    CT_RENDER_TEXTURE_FORMAT_UNKNOWN,
-
-    CT_RENDER_TEXTURE_FORMAT_R1,
-    CT_RENDER_TEXTURE_FORMAT_A8,
-    CT_RENDER_TEXTURE_FORMAT_R8,
-    CT_RENDER_TEXTURE_FORMAT_R8I,
-    CT_RENDER_TEXTURE_FORMAT_R8U,
-    CT_RENDER_TEXTURE_FORMAT_R8S,
-    CT_RENDER_TEXTURE_FORMAT_R16,
-    CT_RENDER_TEXTURE_FORMAT_R16I,
-    CT_RENDER_TEXTURE_FORMAT_R16U,
-    CT_RENDER_TEXTURE_FORMAT_R16F,
-    CT_RENDER_TEXTURE_FORMAT_R16S,
-    CT_RENDER_TEXTURE_FORMAT_R32I,
-    CT_RENDER_TEXTURE_FORMAT_R32U,
-    CT_RENDER_TEXTURE_FORMAT_R32F,
-    CT_RENDER_TEXTURE_FORMAT_RG8,
-    CT_RENDER_TEXTURE_FORMAT_RG8I,
-    CT_RENDER_TEXTURE_FORMAT_RG8U,
-    CT_RENDER_TEXTURE_FORMAT_RG8S,
-    CT_RENDER_TEXTURE_FORMAT_RG16,
-    CT_RENDER_TEXTURE_FORMAT_RG16I,
-    CT_RENDER_TEXTURE_FORMAT_RG16U,
-    CT_RENDER_TEXTURE_FORMAT_RG16F,
-    CT_RENDER_TEXTURE_FORMAT_RG16S,
-    CT_RENDER_TEXTURE_FORMAT_RG32I,
-    CT_RENDER_TEXTURE_FORMAT_RG32U,
-    CT_RENDER_TEXTURE_FORMAT_RG32F,
-    CT_RENDER_TEXTURE_FORMAT_RGB8,
-    CT_RENDER_TEXTURE_FORMAT_RGB8I,
-    CT_RENDER_TEXTURE_FORMAT_RGB8U,
-    CT_RENDER_TEXTURE_FORMAT_RGB8S,
-    CT_RENDER_TEXTURE_FORMAT_RGB9E5F,
-    CT_RENDER_TEXTURE_FORMAT_BGRA8,
-    CT_RENDER_TEXTURE_FORMAT_RGBA8,
-    CT_RENDER_TEXTURE_FORMAT_RGBA8I,
-    CT_RENDER_TEXTURE_FORMAT_RGBA8U,
-    CT_RENDER_TEXTURE_FORMAT_RGBA8S,
-    CT_RENDER_TEXTURE_FORMAT_RGBA16,
-    CT_RENDER_TEXTURE_FORMAT_RGBA16I,
-    CT_RENDER_TEXTURE_FORMAT_RGBA16U,
-    CT_RENDER_TEXTURE_FORMAT_RGBA16F,
-    CT_RENDER_TEXTURE_FORMAT_RGBA16S,
-    CT_RENDER_TEXTURE_FORMAT_RGBA32I,
-    CT_RENDER_TEXTURE_FORMAT_RGBA32U,
-    CT_RENDER_TEXTURE_FORMAT_RGBA32F,
-    CT_RENDER_TEXTURE_FORMAT_R5G6B5,
-    CT_RENDER_TEXTURE_FORMAT_RGBA4,
-    CT_RENDER_TEXTURE_FORMAT_RGB5A1,
-    CT_RENDER_TEXTURE_FORMAT_RGB10A2,
-    CT_RENDER_TEXTURE_FORMAT_RG11B10F,
-
-    CT_RENDER_TEXTURE_FORMAT_UNKNOWN_DEPTH,
-
-    CT_RENDER_TEXTURE_FORMAT_D16,
-    CT_RENDER_TEXTURE_FORMAT_D24,
-    CT_RENDER_TEXTURE_FORMAT_D24S8,
-    CT_RENDER_TEXTURE_FORMAT_D32,
-    CT_RENDER_TEXTURE_FORMAT_D16F,
-    CT_RENDER_TEXTURE_FORMAT_D24F,
-    CT_RENDER_TEXTURE_FORMAT_D32F,
-    CT_RENDER_TEXTURE_FORMAT_D0S8,
-
-    CT_RENDER_TEXTURE_FORMAT_COUNT
-
-} ct_render_texture_format_t;
-
-typedef enum ct_render_uniform_type {
-    CT_RENDER_UNIFORM_TYPE_INT1,
-    CT_RENDER_UNIFORM_TYPE_END,
-
-    CT_RENDER_UNIFORM_TYPE_VEC4,
-    CT_RENDER_UNIFORM_TYPE_MAT3,
-    CT_RENDER_UNIFORM_TYPE_MAT4,
-
-    CT_RENDER_UNIFORM_TYPE_COUNT
-
-} ct_render_uniform_type_t;
-
-typedef enum ct_render_backbuffer_ratio {
-    CT_RENDER_BACKBUFFER_RATIO_EQUAL,
-    CT_RENDER_BACKBUFFER_RATIO_HALF,
-    CT_RENDER_BACKBUFFER_RATIO_QUARTER,
-    CT_RENDER_BACKBUFFER_RATIO_EIGHTH,
-    CT_RENDER_BACKBUFFER_RATIO_SIXTEENTH,
-    CT_RENDER_BACKBUFFER_RATIO_DOUBLE,
-
-    CT_RENDER_BACKBUFFER_RATIO_COUNT
-
-} ct_render_backbuffer_ratio_t;
-
-typedef enum ct_render_occlusion_query_result {
-    CT_RENDER_OCCLUSION_QUERY_RESULT_INVISIBLE,
-    CT_RENDER_OCCLUSION_QUERY_RESULT_VISIBLE,
-    CT_RENDER_OCCLUSION_QUERY_RESULT_NORESULT,
-
-    CT_RENDER_OCCLUSION_QUERY_RESULT_COUNT
-
-} ct_render_occlusion_query_result_t;
-
-typedef enum ct_render_topology_convert {
-    CT_RENDER_TOPOLOGY_CONVERT_TRI_LIST_FLIP_WINDING,
-    CT_RENDER_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST,
-    CT_RENDER_TOPOLOGY_CONVERT_TRI_STRIP_TO_TRI_LIST,
-    CT_RENDER_TOPOLOGY_CONVERT_LINE_STRIP_TO_LINE_LIST,
-
-    CT_RENDER_TOPOLOGY_CONVERT_COUNT
-
-} ct_render_topology_convert_t;
-
-typedef enum ct_render_topology_sort {
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_MIN,
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_AVG,
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_MAX,
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_MIN,
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_AVG,
-    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_MAX,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_MIN,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_AVG,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_MAX,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_MIN,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_AVG,
-    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_MAX,
-
-    CT_RENDER_TOPOLOGY_SORT_COUNT
-
-} ct_render_topology_sort_t;
-
-typedef enum ct_render_view_mode {
-    CT_RENDER_VIEW_MODE_DEFAULT,
-    CT_RENDER_VIEW_MODE_SEQUENTIAL,
-    CT_RENDER_VIEW_MODE_DEPTH_ASCENDING,
-    CT_RENDER_VIEW_MODE_DEPTH_DESCENDING,
-
-    CT_RENDER_VIEW_MODE_CCOUNT
-
-} ct_render_view_mode_t;
-
-#define CT_RENDER_HANDLE_T(_name) \
-    typedef struct _name { uint16_t idx; } _name##_t
-
-CT_RENDER_HANDLE_T(ct_render_dynamic_index_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_dynamic_vertex_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_frame_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_index_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_indirect_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_occlusion_query_handle);
-CT_RENDER_HANDLE_T(ct_render_program_handle);
-CT_RENDER_HANDLE_T(ct_render_shader_handle);
-CT_RENDER_HANDLE_T(ct_render_texture_handle);
-CT_RENDER_HANDLE_T(ct_render_uniform_handle);
-CT_RENDER_HANDLE_T(ct_render_vertex_buffer_handle);
-CT_RENDER_HANDLE_T(ct_render_vertex_decl_handle);
-
-#undef CT_RENDER_HANDLE_T
-
-/**/
-typedef void (*ct_render_release_fn_t)(void *_ptr,
-                                       void *_userData);
-
-/**/
-typedef struct ct_render_memory {
-    uint8_t *data;
-    uint32_t size;
-
-} ct_render_memory_t;
-
-/**/
-typedef struct ct_render_transform {
-    float *data;
-    uint16_t num;
-
-} ct_render_transform_t;
-
-/**/
-typedef struct ct_render_hmd_eye {
-    float rotation[4];
-    float translation[3];
-    float fov[4];
-    float viewOffset[3];
-    float projection[16];
-    float pixelsPerTanAngle[2];
-
-} ct_render_hmd_eye_t;
-
-/**/
-typedef struct ct_render_hmd {
-    ct_render_hmd_eye_t eye[2];
-    uint16_t width;
-    uint16_t height;
-    uint32_t deviceWidth;
-    uint32_t deviceHeight;
-    uint8_t flags;
-
-} ct_render_hmd_t;
-
-/**/
-typedef uint16_t ct_render_view_id_t;
-
-/**/
-typedef struct ct_render_view_stats {
-    char name[256];
-    ct_render_view_id_t view;
-    int64_t cpuTimeElapsed;
-    int64_t gpuTimeElapsed;
-
-} ct_render_view_stats_t;
-
-typedef struct ct_render_encoder_stats {
-    int64_t cpuTimeBegin;
-    int64_t cpuTimeEnd;
-
-} ct_render_encoder_stats_t;
-
-/**/
-typedef struct ct_render_stats {
-    int64_t cpuTimeFrame;
-    int64_t cpuTimeBegin;
-    int64_t cpuTimeEnd;
-    int64_t cpuTimerFreq;
-
-    int64_t gpuTimeBegin;
-    int64_t gpuTimeEnd;
-    int64_t gpuTimerFreq;
-
-    int64_t waitRender;
-    int64_t waitSubmit;
-
-    uint32_t numDraw;
-    uint32_t numCompute;
-    uint32_t maxGpuLatency;
-
-    uint16_t numDynamicIndexBuffers;
-    uint16_t numDynamicVertexBuffers;
-    uint16_t numFrameBuffers;
-    uint16_t numIndexBuffers;
-    uint16_t numOcclusionQueries;
-    uint16_t numPrograms;
-    uint16_t numShaders;
-    uint16_t numTextures;
-    uint16_t numUniforms;
-    uint16_t numVertexBuffers;
-    uint16_t numVertexDecls;
-
-    int64_t gpuMemoryMax;
-    int64_t gpuMemoryUsed;
-
-    uint16_t width;
-    uint16_t height;
-    uint16_t textWidth;
-    uint16_t textHeight;
-
-    uint16_t numViews;
-    ct_render_view_stats_t *viewStats;
-
-    uint8_t numEncoders;
-    ct_render_encoder_stats_t *encoderStats;
-
-} ct_render_stats_t;
-
-/**/
-struct ct_render_encoder;
-
-/**/
-typedef struct ct_render_vertex_decl {
-    uint32_t hash;
-    uint16_t stride;
-    uint16_t offset[CT_RENDER_ATTRIB_COUNT];
-    uint16_t attributes[CT_RENDER_ATTRIB_COUNT];
-
-} ct_render_vertex_decl_t;
-
-/**/
-typedef struct ct_render_transient_index_buffer {
-    uint8_t *data;
-    uint32_t size;
-    ct_render_index_buffer_handle_t handle;
-    uint32_t startIndex;
-
-} ct_render_transient_index_buffer_t;
-
-/**/
-typedef struct ct_render_transient_vertex_buffer {
-    uint8_t *data;
-    uint32_t size;
-    uint32_t startVertex;
-    uint16_t stride;
-    ct_render_vertex_buffer_handle_t handle;
-    ct_render_vertex_decl_handle_t decl;
-
-} ct_render_transient_vertex_buffer_t;
-
-/**/
-typedef struct ct_render_instance_data_buffer {
-    uint8_t *data;
-    uint32_t size;
-    uint32_t offset;
-    uint32_t num;
-    uint16_t stride;
-    ct_render_vertex_buffer_handle_t handle;
-
-} ct_render_instance_data_buffer_t;
-
-/**/
-typedef struct ct_render_texture_info {
-    ct_render_texture_format_t format;
-    uint32_t storageSize;
-    uint16_t width;
-    uint16_t height;
-    uint16_t depth;
-    uint16_t numLayers;
-    uint8_t numMips;
-    uint8_t bitsPerPixel;
-    bool cubeMap;
-
-} ct_render_texture_info_t;
-
-/**/
-typedef struct ct_render_uniform_info {
-    char name[256];
-    ct_render_uniform_type_t type;
-    uint16_t num;
-
-} ct_render_uniform_info_t;
-
-/**/
-typedef struct ct_render_attachment {
-    ct_render_texture_handle_t handle;
-    uint16_t mip;
-    uint16_t layer;
-
-} ct_render_attachment_t;
-
-/**/
-typedef struct ct_render_caps_gpu {
-    uint16_t vendorId;
-    uint16_t deviceId;
-
-} ct_render_caps_gpu_t;
-
-typedef struct ct_render_caps_limits {
-    uint32_t maxDrawCalls;
-    uint32_t maxBlits;
-    uint32_t maxTextureSize;
-    uint32_t maxTextureLayers;
-    uint32_t maxViews;
-    uint32_t maxFrameBuffers;
-    uint32_t maxFBAttachments;
-    uint32_t maxPrograms;
-    uint32_t maxShaders;
-    uint32_t maxTextures;
-    uint32_t maxTextureSamplers;
-    uint32_t maxVertexDecls;
-    uint32_t maxVertexStreams;
-    uint32_t maxIndexBuffers;
-    uint32_t maxVertexBuffers;
-    uint32_t maxDynamicIndexBuffers;
-    uint32_t maxDynamicVertexBuffers;
-    uint32_t maxUniforms;
-    uint32_t maxOcclusionQueries;
-    uint32_t maxEncoders;
-
-} ct_render_caps_limits_t;
-
-/**/
-typedef struct ct_render_caps {
-    ct_render_renderer_type_t rendererType;
-
-    uint64_t supported;
-
-    uint16_t vendorId;
-    uint16_t deviceId;
-    bool homogeneousDepth;
-    bool originBottomLeft;
-    uint8_t numGPUs;
-
-    ct_render_caps_gpu_t gpu[4];
-    ct_render_caps_limits_t limits;
-
-    uint16_t formats[CT_RENDER_TEXTURE_FORMAT_COUNT];
-
-} ct_render_caps_t;
-
-/**/
-typedef enum ct_render_fatal {
-    CT_RENDER_FATAL_DEBUG_CHECK,
-    CT_RENDER_FATAL_INVALID_SHADER,
-    CT_RENDER_FATAL_UNABLE_TO_INITIALIZE,
-    CT_RENDER_FATAL_UNABLE_TO_CREATE_TEXTURE,
-    CT_RENDER_FATAL_DEVICE_LOST,
-
-    CT_RENDER_FATAL_COUNT
-
-} ct_render_fatal_t;
 
 /// Color RGB/alpha/depth write. When it's not specified write will be disabled.
 #define CT_RENDER_STATE_WRITE_R                 UINT64_C(0x0000000000000001) //!< Enable R write.
@@ -543,7 +56,7 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_DEPTH_TEST_SHIFT        4                            //!< Depth test state bit shift.
 #define CT_RENDER_STATE_DEPTH_TEST_MASK         UINT64_C(0x00000000000000f0) //!< Depth test state bit mask.
 
-/// Use CT_RENDER_STATE_BLEND_FUNC(_src, dst) or CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, dstRGB, srcA, dstA)
+/// Use CT_RENDER_STATE_BLEND_FUNC(_src, _dst) or CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA)
 /// helper macros.
 #define CT_RENDER_STATE_BLEND_ZERO              UINT64_C(0x0000000000001000) //!< 0, 0, 0, 0
 #define CT_RENDER_STATE_BLEND_ONE               UINT64_C(0x0000000000002000) //!< 1, 1, 1, 1
@@ -561,7 +74,7 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_BLEND_SHIFT             12                           //!< Blend state bit shift.
 #define CT_RENDER_STATE_BLEND_MASK              UINT64_C(0x000000000ffff000) //!< Blend state bit mask.
 
-/// Use CT_RENDER_STATE_BLEND_EQUATION(_equation) or CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, equationA)
+/// Use CT_RENDER_STATE_BLEND_EQUATION(_equation) or CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA)
 /// helper macros.
 #define CT_RENDER_STATE_BLEND_EQUATION_ADD      UINT64_C(0x0000000000000000) //!< Blend add: src + dst.
 #define CT_RENDER_STATE_BLEND_EQUATION_SUB      UINT64_C(0x0000000010000000) //!< Blend subtract: src - dst.
@@ -626,19 +139,19 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_STATE_POINT_SIZE(_size) ( ( (uint64_t)(_size)<<CT_RENDER_STATE_POINT_SIZE_SHIFT)&CT_RENDER_STATE_POINT_SIZE_MASK)
 
 /// Blend function separate.
-#define CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, dstRGB, srcA, dstA) (UINT64_C(0) \
+#define CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_srcRGB, _dstRGB, _srcA, _dstA) (UINT64_C(0) \
             | ( ( (uint64_t)(_srcRGB)|( (uint64_t)(_dstRGB)<<4) )   )               \
             | ( ( (uint64_t)(_srcA  )|( (uint64_t)(_dstA  )<<4) )<<8)               \
             )
 
 /// Blend equation separate.
-#define CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, equationA) ( (uint64_t)(_equationRGB)|( (uint64_t)(_equationA)<<3) )
+#define CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equationRGB, _equationA) ( (uint64_t)(_equationRGB)|( (uint64_t)(_equationA)<<3) )
 
 /// Blend function.
-#define CT_RENDER_STATE_BLEND_FUNC(_src, dst)    CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_src, dst, src, dst)
+#define CT_RENDER_STATE_BLEND_FUNC(_src, _dst)    CT_RENDER_STATE_BLEND_FUNC_SEPARATE(_src, _dst, _src, _dst)
 
 /// Blend equation.
-#define CT_RENDER_STATE_BLEND_EQUATION(_equation) CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equation, equation)
+#define CT_RENDER_STATE_BLEND_EQUATION(_equation) CT_RENDER_STATE_BLEND_EQUATION_SEPARATE(_equation, _equation)
 
 /// Utility predefined blend modes.
 
@@ -686,23 +199,23 @@ typedef enum ct_render_fatal {
     )
 
 ///
-#define CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst) (0               \
+#define CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst) (0               \
             | ( (uint32_t)( (_src)>>CT_RENDER_STATE_BLEND_SHIFT)       \
             | ( (uint32_t)( (_dst)>>CT_RENDER_STATE_BLEND_SHIFT)<<4) ) \
             )
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation) (0               \
-            | CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)                        \
+#define CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation) (0               \
+            | CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)                        \
             | ( (uint32_t)( (_equation)>>CT_RENDER_STATE_BLEND_EQUATION_SHIFT)<<8) \
             )
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_1(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<< 0)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_2(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<<11)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_3(_src, dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, dst)<<22)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_1(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<< 0)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_2(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<<11)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_3(_src, _dst)  (CT_RENDER_STATE_BLEND_FUNC_RT_x(_src, _dst)<<22)
 
-#define CT_RENDER_STATE_BLEND_FUNC_RT_1E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<< 0)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_2E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<<11)
-#define CT_RENDER_STATE_BLEND_FUNC_RT_3E(_src, dst, equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, dst, equation)<<22)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_1E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<< 0)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_2E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<<11)
+#define CT_RENDER_STATE_BLEND_FUNC_RT_3E(_src, _dst, _equation) (CT_RENDER_STATE_BLEND_FUNC_RT_xE(_src, _dst, _equation)<<22)
 
 ///
 #define CT_RENDER_STENCIL_FUNC_REF_SHIFT      0                    //!<
@@ -836,73 +349,77 @@ typedef enum ct_render_fatal {
             | CT_RENDER_BUFFER_COMPUTE_WRITE   \
             )
 
-///
-#define CT_RENDER_TEXTURE_NONE                UINT32_C(0x00000000) //!<
-#define CT_RENDER_TEXTURE_U_MIRROR            UINT32_C(0x00000001) //!< Wrap U mode: Mirror
-#define CT_RENDER_TEXTURE_U_CLAMP             UINT32_C(0x00000002) //!< Wrap U mode: Clamp
-#define CT_RENDER_TEXTURE_U_BORDER            UINT32_C(0x00000003) //!< Wrap U mode: Border
-#define CT_RENDER_TEXTURE_U_SHIFT             0                    //!<
-#define CT_RENDER_TEXTURE_U_MASK              UINT32_C(0x00000003) //!<
-#define CT_RENDER_TEXTURE_V_MIRROR            UINT32_C(0x00000004) //!< Wrap V mode: Mirror
-#define CT_RENDER_TEXTURE_V_CLAMP             UINT32_C(0x00000008) //!< Wrap V mode: Clamp
-#define CT_RENDER_TEXTURE_V_BORDER            UINT32_C(0x0000000c) //!< Wrap V mode: Border
-#define CT_RENDER_TEXTURE_V_SHIFT             2                    //!<
-#define CT_RENDER_TEXTURE_V_MASK              UINT32_C(0x0000000c) //!<
-#define CT_RENDER_TEXTURE_W_MIRROR            UINT32_C(0x00000010) //!< Wrap W mode: Mirror
-#define CT_RENDER_TEXTURE_W_CLAMP             UINT32_C(0x00000020) //!< Wrap W mode: Clamp
-#define CT_RENDER_TEXTURE_W_BORDER            UINT32_C(0x00000030) //!< Wrap W mode: Border
-#define CT_RENDER_TEXTURE_W_SHIFT             4                    //!<
-#define CT_RENDER_TEXTURE_W_MASK              UINT32_C(0x00000030) //!<
-#define CT_RENDER_TEXTURE_MIN_POINT           UINT32_C(0x00000040) //!< Min sampling mode: Point
-#define CT_RENDER_TEXTURE_MIN_ANISOTROPIC     UINT32_C(0x00000080) //!< Min sampling mode: Anisotropic
-#define CT_RENDER_TEXTURE_MIN_SHIFT           6                    //!<
-#define CT_RENDER_TEXTURE_MIN_MASK            UINT32_C(0x000000c0) //!<
-#define CT_RENDER_TEXTURE_MAG_POINT           UINT32_C(0x00000100) //!< Mag sampling mode: Point
-#define CT_RENDER_TEXTURE_MAG_ANISOTROPIC     UINT32_C(0x00000200) //!< Mag sampling mode: Anisotropic
-#define CT_RENDER_TEXTURE_MAG_SHIFT           8                    //!<
-#define CT_RENDER_TEXTURE_MAG_MASK            UINT32_C(0x00000300) //!<
-#define CT_RENDER_TEXTURE_MIP_POINT           UINT32_C(0x00000400) //!< Mip sampling mode: Point
-#define CT_RENDER_TEXTURE_MIP_SHIFT           10                   //!<
-#define CT_RENDER_TEXTURE_MIP_MASK            UINT32_C(0x00000400) //!<
-#define CT_RENDER_TEXTURE_MSAA_SAMPLE         UINT32_C(0x00000800) //!< Texture will be used for MSAA sampling.
-#define CT_RENDER_TEXTURE_RT                  UINT32_C(0x00001000) //!<
-#define CT_RENDER_TEXTURE_RT_MSAA_X2          UINT32_C(0x00002000) //!< Render target MSAAx2 mode.
-#define CT_RENDER_TEXTURE_RT_MSAA_X4          UINT32_C(0x00003000) //!< Render target MSAAx4 mode.
-#define CT_RENDER_TEXTURE_RT_MSAA_X8          UINT32_C(0x00004000) //!< Render target MSAAx8 mode.
-#define CT_RENDER_TEXTURE_RT_MSAA_X16         UINT32_C(0x00005000) //!< Render target MSAAx16 mode.
-#define CT_RENDER_TEXTURE_RT_MSAA_SHIFT       12                   //!<
-#define CT_RENDER_TEXTURE_RT_MSAA_MASK        UINT32_C(0x00007000) //!<
-#define CT_RENDER_TEXTURE_RT_WRITE_ONLY       UINT32_C(0x00008000) //!< Render target will be used for writing only.
-#define CT_RENDER_TEXTURE_RT_MASK             UINT32_C(0x0000f000) //!<
-#define CT_RENDER_TEXTURE_COMPARE_LESS        UINT32_C(0x00010000) //!< Compare when sampling depth texture: less.
-#define CT_RENDER_TEXTURE_COMPARE_LEQUAL      UINT32_C(0x00020000) //!< Compare when sampling depth texture: less or equal.
-#define CT_RENDER_TEXTURE_COMPARE_EQUAL       UINT32_C(0x00030000) //!< Compare when sampling depth texture: equal.
-#define CT_RENDER_TEXTURE_COMPARE_GEQUAL      UINT32_C(0x00040000) //!< Compare when sampling depth texture: greater or equal.
-#define CT_RENDER_TEXTURE_COMPARE_GREATER     UINT32_C(0x00050000) //!< Compare when sampling depth texture: greater.
-#define CT_RENDER_TEXTURE_COMPARE_NOTEQUAL    UINT32_C(0x00060000) //!< Compare when sampling depth texture: not equal.
-#define CT_RENDER_TEXTURE_COMPARE_NEVER       UINT32_C(0x00070000) //!< Compare when sampling depth texture: never.
-#define CT_RENDER_TEXTURE_COMPARE_ALWAYS      UINT32_C(0x00080000) //!< Compare when sampling depth texture: always.
-#define CT_RENDER_TEXTURE_COMPARE_SHIFT       16                   //!<
-#define CT_RENDER_TEXTURE_COMPARE_MASK        UINT32_C(0x000f0000) //!<
-#define CT_RENDER_TEXTURE_COMPUTE_WRITE       UINT32_C(0x00100000) //!< Texture will be used for compute write.
-#define CT_RENDER_TEXTURE_SRGB                UINT32_C(0x00200000) //!< Sample texture as sRGB.
-#define CT_RENDER_TEXTURE_BLIT_DST            UINT32_C(0x00400000) //!< Texture will be used as blit destination.
-#define CT_RENDER_TEXTURE_READ_BACK           UINT32_C(0x00800000) //!< Texture will be used for read back from GPU.
-#define CT_RENDER_TEXTURE_BORDER_COLOR_SHIFT  24                   //!<
-#define CT_RENDER_TEXTURE_BORDER_COLOR_MASK   UINT32_C(0x0f000000) //!<
-#define CT_RENDER_TEXTURE_RESERVED_SHIFT      28                   //!<
-#define CT_RENDER_TEXTURE_RESERVED_MASK       UINT32_C(0xf0000000) //!<
+/// Texture creation flags.
+#define CT_RENDER_TEXTURE_NONE                UINT64_C(0x0000000000000000) //!<
+#define CT_RENDER_TEXTURE_MSAA_SAMPLE         UINT64_C(0x0000000800000000) //!< Texture will be used for MSAA sampling.
+#define CT_RENDER_TEXTURE_RT                  UINT64_C(0x0000001000000000) //!< Render target no MSAA.
+#define CT_RENDER_TEXTURE_RT_MSAA_X2          UINT64_C(0x0000002000000000) //!< Render target MSAAx2 mode.
+#define CT_RENDER_TEXTURE_RT_MSAA_X4          UINT64_C(0x0000003000000000) //!< Render target MSAAx4 mode.
+#define CT_RENDER_TEXTURE_RT_MSAA_X8          UINT64_C(0x0000004000000000) //!< Render target MSAAx8 mode.
+#define CT_RENDER_TEXTURE_RT_MSAA_X16         UINT64_C(0x0000005000000000) //!< Render target MSAAx16 mode.
+#define CT_RENDER_TEXTURE_RT_MSAA_SHIFT       36                           //!<
+#define CT_RENDER_TEXTURE_RT_MSAA_MASK        UINT64_C(0x0000007000000000) //!<
+#define CT_RENDER_TEXTURE_RT_WRITE_ONLY       UINT64_C(0x0000008000000000) //!< Render target will be used for writing only.
+#define CT_RENDER_TEXTURE_RT_MASK             UINT64_C(0x000000f000000000) //!<
+#define CT_RENDER_TEXTURE_COMPUTE_WRITE       UINT64_C(0x0000100000000000) //!< Texture will be used for compute write.
+#define CT_RENDER_TEXTURE_SRGB                UINT64_C(0x0000200000000000) //!< Sample texture as sRGB.
+#define CT_RENDER_TEXTURE_BLIT_DST            UINT64_C(0x0000400000000000) //!< Texture will be used as blit destination.
+#define CT_RENDER_TEXTURE_READ_BACK           UINT64_C(0x0000800000000000) //!< Texture will be used for read back from GPU.
 
-#define CT_RENDER_TEXTURE_BORDER_COLOR(_index) ( (_index << CT_RENDER_TEXTURE_BORDER_COLOR_SHIFT) & CT_RENDER_TEXTURE_BORDER_COLOR_MASK)
+/// Sampler flags.
+#define CT_RENDER_SAMPLER_NONE                UINT32_C(0x00000000) //!<
+#define CT_RENDER_SAMPLER_U_MIRROR            UINT32_C(0x00000001) //!< Wrap U mode: Mirror
+#define CT_RENDER_SAMPLER_U_CLAMP             UINT32_C(0x00000002) //!< Wrap U mode: Clamp
+#define CT_RENDER_SAMPLER_U_BORDER            UINT32_C(0x00000003) //!< Wrap U mode: Border
+#define CT_RENDER_SAMPLER_U_SHIFT             0                    //!<
+#define CT_RENDER_SAMPLER_U_MASK              UINT32_C(0x00000003) //!<
+#define CT_RENDER_SAMPLER_V_MIRROR            UINT32_C(0x00000004) //!< Wrap V mode: Mirror
+#define CT_RENDER_SAMPLER_V_CLAMP             UINT32_C(0x00000008) //!< Wrap V mode: Clamp
+#define CT_RENDER_SAMPLER_V_BORDER            UINT32_C(0x0000000c) //!< Wrap V mode: Border
+#define CT_RENDER_SAMPLER_V_SHIFT             2                    //!<
+#define CT_RENDER_SAMPLER_V_MASK              UINT32_C(0x0000000c) //!<
+#define CT_RENDER_SAMPLER_W_MIRROR            UINT32_C(0x00000010) //!< Wrap W mode: Mirror
+#define CT_RENDER_SAMPLER_W_CLAMP             UINT32_C(0x00000020) //!< Wrap W mode: Clamp
+#define CT_RENDER_SAMPLER_W_BORDER            UINT32_C(0x00000030) //!< Wrap W mode: Border
+#define CT_RENDER_SAMPLER_W_SHIFT             4                    //!<
+#define CT_RENDER_SAMPLER_W_MASK              UINT32_C(0x00000030) //!<
+#define CT_RENDER_SAMPLER_MIN_POINT           UINT32_C(0x00000040) //!< Min sampling mode: Point
+#define CT_RENDER_SAMPLER_MIN_ANISOTROPIC     UINT32_C(0x00000080) //!< Min sampling mode: Anisotropic
+#define CT_RENDER_SAMPLER_MIN_SHIFT           6                    //!<
+#define CT_RENDER_SAMPLER_MIN_MASK            UINT32_C(0x000000c0) //!<
+#define CT_RENDER_SAMPLER_MAG_POINT           UINT32_C(0x00000100) //!< Mag sampling mode: Point
+#define CT_RENDER_SAMPLER_MAG_ANISOTROPIC     UINT32_C(0x00000200) //!< Mag sampling mode: Anisotropic
+#define CT_RENDER_SAMPLER_MAG_SHIFT           8                    //!<
+#define CT_RENDER_SAMPLER_MAG_MASK            UINT32_C(0x00000300) //!<
+#define CT_RENDER_SAMPLER_MIP_POINT           UINT32_C(0x00000400) //!< Mip sampling mode: Point
+#define CT_RENDER_SAMPLER_MIP_SHIFT           10                   //!<
+#define CT_RENDER_SAMPLER_MIP_MASK            UINT32_C(0x00000400) //!<
+#define CT_RENDER_SAMPLER_COMPARE_LESS        UINT32_C(0x00010000) //!< Compare when sampling depth texture: less.
+#define CT_RENDER_SAMPLER_COMPARE_LEQUAL      UINT32_C(0x00020000) //!< Compare when sampling depth texture: less or equal.
+#define CT_RENDER_SAMPLER_COMPARE_EQUAL       UINT32_C(0x00030000) //!< Compare when sampling depth texture: equal.
+#define CT_RENDER_SAMPLER_COMPARE_GEQUAL      UINT32_C(0x00040000) //!< Compare when sampling depth texture: greater or equal.
+#define CT_RENDER_SAMPLER_COMPARE_GREATER     UINT32_C(0x00050000) //!< Compare when sampling depth texture: greater.
+#define CT_RENDER_SAMPLER_COMPARE_NOTEQUAL    UINT32_C(0x00060000) //!< Compare when sampling depth texture: not equal.
+#define CT_RENDER_SAMPLER_COMPARE_NEVER       UINT32_C(0x00070000) //!< Compare when sampling depth texture: never.
+#define CT_RENDER_SAMPLER_COMPARE_ALWAYS      UINT32_C(0x00080000) //!< Compare when sampling depth texture: always.
+#define CT_RENDER_SAMPLER_COMPARE_SHIFT       16                   //!<
+#define CT_RENDER_SAMPLER_COMPARE_MASK        UINT32_C(0x000f0000) //!<
+#define CT_RENDER_SAMPLER_SAMPLE_STENCIL      UINT32_C(0x00100000) //!< Sample stencil instead of depth.
+#define CT_RENDER_SAMPLER_BORDER_COLOR_SHIFT  24                   //!<
+#define CT_RENDER_SAMPLER_BORDER_COLOR_MASK   UINT32_C(0x0f000000) //!<
+#define CT_RENDER_SAMPLER_RESERVED_SHIFT      28                   //!<
+#define CT_RENDER_SAMPLER_RESERVED_MASK       UINT32_C(0xf0000000) //!<
 
-#define CT_RENDER_TEXTURE_SAMPLER_BITS_MASK (0 \
-            | CT_RENDER_TEXTURE_U_MASK         \
-            | CT_RENDER_TEXTURE_V_MASK         \
-            | CT_RENDER_TEXTURE_W_MASK         \
-            | CT_RENDER_TEXTURE_MIN_MASK       \
-            | CT_RENDER_TEXTURE_MAG_MASK       \
-            | CT_RENDER_TEXTURE_MIP_MASK       \
-            | CT_RENDER_TEXTURE_COMPARE_MASK   \
+#define CT_RENDER_SAMPLER_BORDER_COLOR(_index) ( (_index << CT_RENDER_SAMPLER_BORDER_COLOR_SHIFT) & CT_RENDER_SAMPLER_BORDER_COLOR_MASK)
+
+#define CT_RENDER_SAMPLER_BITS_MASK (0 \
+            | CT_RENDER_SAMPLER_U_MASK         \
+            | CT_RENDER_SAMPLER_V_MASK         \
+            | CT_RENDER_SAMPLER_W_MASK         \
+            | CT_RENDER_SAMPLER_MIN_MASK       \
+            | CT_RENDER_SAMPLER_MAG_MASK       \
+            | CT_RENDER_SAMPLER_MIP_MASK       \
+            | CT_RENDER_SAMPLER_COMPARE_MASK   \
             )
 
 ///
@@ -919,15 +436,13 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_RESET_VSYNC                 UINT32_C(0x00000080) //!< Enable V-Sync.
 #define CT_RENDER_RESET_MAXANISOTROPY         UINT32_C(0x00000100) //!< Turn on/off max anisotropy.
 #define CT_RENDER_RESET_CAPTURE               UINT32_C(0x00000200) //!< Begin screen capture.
-#define CT_RENDER_RESET_HMD                   UINT32_C(0x00000400) //!< HMD stereo rendering.
-#define CT_RENDER_RESET_HMD_DEBUG             UINT32_C(0x00000800) //!< HMD stereo rendering debug mode.
-#define CT_RENDER_RESET_HMD_RECENTER          UINT32_C(0x00001000) //!< HMD calibration.
 #define CT_RENDER_RESET_FLUSH_AFTER_RENDER    UINT32_C(0x00002000) //!< Flush rendering after submitting to GPU.
 #define CT_RENDER_RESET_FLIP_AFTER_RENDER     UINT32_C(0x00004000) //!< This flag  specifies where flip occurs. Default behavior is that flip occurs before rendering new frame. This flag only has effect when `CT_RENDER_CONFIG_MULTITHREADED=0`.
 #define CT_RENDER_RESET_SRGB_BACKBUFFER       UINT32_C(0x00008000) //!< Enable sRGB backbuffer.
-#define CT_RENDER_RESET_HIDPI                 UINT32_C(0x00010000) //!< Enable HiDPI rendering.
-#define CT_RENDER_RESET_DEPTH_CLAMP           UINT32_C(0x00020000) //!< Enable depth clamp.
-#define CT_RENDER_RESET_SUSPEND               UINT32_C(0x00040000) //!< Suspend rendering.
+#define CT_RENDER_RESET_HDR10                 UINT32_C(0x00010000) //!< Enable HDR10 rendering.
+#define CT_RENDER_RESET_HIDPI                 UINT32_C(0x00020000) //!< Enable HiDPI rendering.
+#define CT_RENDER_RESET_DEPTH_CLAMP           UINT32_C(0x00040000) //!< Enable depth clamp.
+#define CT_RENDER_RESET_SUSPEND               UINT32_C(0x00080000) //!< Suspend rendering.
 
 #define CT_RENDER_RESET_RESERVED_SHIFT        31                   //!< Internal bits shift.
 #define CT_RENDER_RESET_RESERVED_MASK         UINT32_C(0x80000000) //!< Internal bits mask.
@@ -941,23 +456,24 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_CAPS_FRAGMENT_DEPTH         UINT64_C(0x0000000000000020) //!< Fragment depth is accessible in fragment shader.
 #define CT_RENDER_CAPS_FRAGMENT_ORDERING      UINT64_C(0x0000000000000040) //!< Fragment ordering is available in fragment shader.
 #define CT_RENDER_CAPS_GRAPHICS_DEBUGGER      UINT64_C(0x0000000000000080) //!< Graphics debugger is present.
-#define CT_RENDER_CAPS_HIDPI                  UINT64_C(0x0000000000000100) //!< HiDPI rendering is supported.
-#define CT_RENDER_CAPS_HMD                    UINT64_C(0x0000000000000200) //!< Head Mounted Display is available.
-#define CT_RENDER_CAPS_INDEX32                UINT64_C(0x0000000000000400) //!< 32-bit indices are supported.
-#define CT_RENDER_CAPS_INSTANCING             UINT64_C(0x0000000000000800) //!< Instancing is supported.
-#define CT_RENDER_CAPS_OCCLUSION_QUERY        UINT64_C(0x0000000000001000) //!< Occlusion query is supported.
-#define CT_RENDER_CAPS_RENDERER_MULTITHREADED UINT64_C(0x0000000000002000) //!< Renderer is on separate thread.
-#define CT_RENDER_CAPS_SWAP_CHAIN             UINT64_C(0x0000000000004000) //!< Multiple windows are supported.
-#define CT_RENDER_CAPS_TEXTURE_2D_ARRAY       UINT64_C(0x0000000000008000) //!< 2D texture array is supported.
-#define CT_RENDER_CAPS_TEXTURE_3D             UINT64_C(0x0000000000010000) //!< 3D textures are supported.
-#define CT_RENDER_CAPS_TEXTURE_BLIT           UINT64_C(0x0000000000020000) //!< Texture blit is supported.
-#define CT_RENDER_CAPS_TEXTURE_COMPARE_ALL    UINT64_C(0x00000000000c0000) //!< All texture compare modes are supported.
-#define CT_RENDER_CAPS_TEXTURE_COMPARE_LEQUAL UINT64_C(0x0000000000080000) //!< Texture compare less equal mode is supported.
-#define CT_RENDER_CAPS_TEXTURE_CUBE_ARRAY     UINT64_C(0x0000000000100000) //!< Cubemap texture array is supported.
-#define CT_RENDER_CAPS_TEXTURE_DIRECT_ACCESS  UINT64_C(0x0000000000200000) //!< CPU direct access to GPU texture memory.
-#define CT_RENDER_CAPS_TEXTURE_READ_BACK      UINT64_C(0x0000000000400000) //!< Read-back texture is supported.
+#define CT_RENDER_CAPS_HDR10                  UINT64_C(0x0000000000000100) //!< HDR10 rendering is supported.
+#define CT_RENDER_CAPS_HIDPI                  UINT64_C(0x0000000000000400) //!< HiDPI rendering is supported.
+#define CT_RENDER_CAPS_INDEX32                UINT64_C(0x0000000000000800) //!< 32-bit indices are supported.
+#define CT_RENDER_CAPS_INSTANCING             UINT64_C(0x0000000000001000) //!< Instancing is supported.
+#define CT_RENDER_CAPS_OCCLUSION_QUERY        UINT64_C(0x0000000000002000) //!< Occlusion query is supported.
+#define CT_RENDER_CAPS_RENDERER_MULTITHREADED UINT64_C(0x0000000000004000) //!< Renderer is on separate thread.
+#define CT_RENDER_CAPS_SWAP_CHAIN             UINT64_C(0x0000000000008000) //!< Multiple windows are supported.
+#define CT_RENDER_CAPS_TEXTURE_2D_ARRAY       UINT64_C(0x0000000000010000) //!< 2D texture array is supported.
+#define CT_RENDER_CAPS_TEXTURE_3D             UINT64_C(0x0000000000020000) //!< 3D textures are supported.
+#define CT_RENDER_CAPS_TEXTURE_BLIT           UINT64_C(0x00000000000c0000) //!< Texture blit is supported.
+#define CT_RENDER_CAPS_TEXTURE_COMPARE_ALL    UINT64_C(0x0000000000080000) //!< All texture compare modes are supported.
+#define CT_RENDER_CAPS_TEXTURE_COMPARE_LEQUAL UINT64_C(0x0000000000100000) //!< Texture compare less equal mode is supported.
+#define CT_RENDER_CAPS_TEXTURE_CUBE_ARRAY     UINT64_C(0x0000000000200000) //!< Cubemap texture array is supported.
+#define CT_RENDER_CAPS_TEXTURE_DIRECT_ACCESS  UINT64_C(0x0000000000400000) //!< CPU direct access to GPU texture memory.
+#define CT_RENDER_CAPS_TEXTURE_READ_BACK      UINT64_C(0x0000000000800000) //!< Read-back texture is supported.
 #define CT_RENDER_CAPS_VERTEX_ATTRIB_HALF     UINT64_C(0x0000000000800000) //!< Vertex attribute half-float is supported.
-#define CT_RENDER_CAPS_VERTEX_ATTRIB_UINT10   UINT64_C(0x0000000000800000) //!< Vertex attribute 10_10_10_2 is supported.
+#define CT_RENDER_CAPS_VERTEX_ATTRIB_UINT10   UINT64_C(0x0000000001000000) //!< Vertex attribute 10_10_10_2 is supported.
+#define CT_RENDER_CAPS_VERTEX_ID              UINT64_C(0x0000000002000000) //!< Rendering with VertexID only is supported.
 
 ///
 #define CT_RENDER_CAPS_FORMAT_TEXTURE_NONE             UINT16_C(0x0000) //!< Texture format is not supported.
@@ -998,23 +514,485 @@ typedef enum ct_render_fatal {
 #define CT_RENDER_PCI_ID_NVIDIA              UINT16_C(0x10de) //!< nVidia adapter.
 
 ///
-#define CT_RENDER_HMD_NONE              UINT8_C(0x00) //!< None.
-#define CT_RENDER_HMD_DEVICE_RESOLUTION UINT8_C(0x01) //!< Has HMD native resolution.
-#define CT_RENDER_HMD_RENDERING         UINT8_C(0x02) //!< Rendering to HMD.
-
-///
 #define CT_RENDER_CUBE_MAP_POSITIVE_X UINT8_C(0x00) //!< Cubemap +x.
 #define CT_RENDER_CUBE_MAP_NEGATIVE_X UINT8_C(0x01) //!< Cubemap -x.
 #define CT_RENDER_CUBE_MAP_POSITIVE_Y UINT8_C(0x02) //!< Cubemap +y.
 #define CT_RENDER_CUBE_MAP_NEGATIVE_Y UINT8_C(0x03) //!< Cubemap -y.
 #define CT_RENDER_CUBE_MAP_POSITIVE_Z UINT8_C(0x04) //!< Cubemap +z.
 #define CT_RENDER_CUBE_MAP_NEGATIVE_Z UINT8_C(0x05) //!< Cubemap -z.
-//==============================================================================
-// Api
-//==============================================================================
+
+
+///
+
+typedef enum ct_render_renderer_type {
+    CT_RENDER_RENDERER_TYPE_NOOP,
+    CT_RENDER_RENDERER_TYPE_DIRECT3D9,
+    CT_RENDER_RENDERER_TYPE_DIRECT3D11,
+    CT_RENDER_RENDERER_TYPE_DIRECT3D12,
+    CT_RENDER_RENDERER_TYPE_GNM,
+    CT_RENDER_RENDERER_TYPE_METAL,
+    CT_RENDER_RENDERER_TYPE_OPENGLES,
+    CT_RENDER_RENDERER_TYPE_OPENGL,
+    CT_RENDER_RENDERER_TYPE_VULKAN,
+
+    CT_RENDER_RENDERER_TYPE_COUNT
+
+} ct_render_renderer_type_t;
+
+typedef enum ct_render_access {
+    CT_RENDER_ACCESS_READ,
+    CT_RENDER_ACCESS_WRITE,
+    CT_RENDER_ACCESS_READWRITE,
+
+    CT_RENDER_ACCESS_COUNT
+
+} ct_render_access_t;
+
+typedef enum ct_render_attrib {
+    CT_RENDER_ATTRIB_POSITION,
+    CT_RENDER_ATTRIB_NORMAL,
+    CT_RENDER_ATTRIB_TANGENT,
+    CT_RENDER_ATTRIB_BITANGENT,
+    CT_RENDER_ATTRIB_COLOR0,
+    CT_RENDER_ATTRIB_COLOR1,
+    CT_RENDER_ATTRIB_COLOR2,
+    CT_RENDER_ATTRIB_COLOR3,
+    CT_RENDER_ATTRIB_INDICES,
+    CT_RENDER_ATTRIB_WEIGHT,
+    CT_RENDER_ATTRIB_TEXCOORD0,
+    CT_RENDER_ATTRIB_TEXCOORD1,
+    CT_RENDER_ATTRIB_TEXCOORD2,
+    CT_RENDER_ATTRIB_TEXCOORD3,
+    CT_RENDER_ATTRIB_TEXCOORD4,
+    CT_RENDER_ATTRIB_TEXCOORD5,
+    CT_RENDER_ATTRIB_TEXCOORD6,
+    CT_RENDER_ATTRIB_TEXCOORD7,
+
+    CT_RENDER_ATTRIB_COUNT
+
+} ct_render_attrib_t;
+
+typedef enum ct_render_attrib_type {
+    CT_RENDER_ATTRIB_TYPE_UINT8,
+    CT_RENDER_ATTRIB_TYPE_UINT10,
+    CT_RENDER_ATTRIB_TYPE_INT16,
+    CT_RENDER_ATTRIB_TYPE_HALF,
+    CT_RENDER_ATTRIB_TYPE_FLOAT,
+
+    CT_RENDER_ATTRIB_TYPE_COUNT
+
+} ct_render_attrib_type_t;
+
+typedef enum ct_render_texture_format {
+    CT_RENDER_TEXTURE_FORMAT_BC1,
+    CT_RENDER_TEXTURE_FORMAT_BC2,
+    CT_RENDER_TEXTURE_FORMAT_BC3,
+    CT_RENDER_TEXTURE_FORMAT_BC4,
+    CT_RENDER_TEXTURE_FORMAT_BC5,
+    CT_RENDER_TEXTURE_FORMAT_BC6H,
+    CT_RENDER_TEXTURE_FORMAT_BC7,
+    CT_RENDER_TEXTURE_FORMAT_ETC1,
+    CT_RENDER_TEXTURE_FORMAT_ETC2,
+    CT_RENDER_TEXTURE_FORMAT_ETC2A,
+    CT_RENDER_TEXTURE_FORMAT_ETC2A1,
+    CT_RENDER_TEXTURE_FORMAT_PTC12,
+    CT_RENDER_TEXTURE_FORMAT_PTC14,
+    CT_RENDER_TEXTURE_FORMAT_PTC12A,
+    CT_RENDER_TEXTURE_FORMAT_PTC14A,
+    CT_RENDER_TEXTURE_FORMAT_PTC22,
+    CT_RENDER_TEXTURE_FORMAT_PTC24,
+    CT_RENDER_TEXTURE_FORMAT_ATC,
+    CT_RENDER_TEXTURE_FORMAT_ATCE,
+    CT_RENDER_TEXTURE_FORMAT_ATCI,
+    CT_RENDER_TEXTURE_FORMAT_ASTC4x4,
+    CT_RENDER_TEXTURE_FORMAT_ASTC5x5,
+    CT_RENDER_TEXTURE_FORMAT_ASTC6x6,
+    CT_RENDER_TEXTURE_FORMAT_ASTC8x5,
+    CT_RENDER_TEXTURE_FORMAT_ASTC8x6,
+    CT_RENDER_TEXTURE_FORMAT_ASTC10x5,
+
+    CT_RENDER_TEXTURE_FORMAT_UNKNOWN,
+
+    CT_RENDER_TEXTURE_FORMAT_R1,
+    CT_RENDER_TEXTURE_FORMAT_A8,
+    CT_RENDER_TEXTURE_FORMAT_R8,
+    CT_RENDER_TEXTURE_FORMAT_R8I,
+    CT_RENDER_TEXTURE_FORMAT_R8U,
+    CT_RENDER_TEXTURE_FORMAT_R8S,
+    CT_RENDER_TEXTURE_FORMAT_R16,
+    CT_RENDER_TEXTURE_FORMAT_R16I,
+    CT_RENDER_TEXTURE_FORMAT_R16U,
+    CT_RENDER_TEXTURE_FORMAT_R16F,
+    CT_RENDER_TEXTURE_FORMAT_R16S,
+    CT_RENDER_TEXTURE_FORMAT_R32I,
+    CT_RENDER_TEXTURE_FORMAT_R32U,
+    CT_RENDER_TEXTURE_FORMAT_R32F,
+    CT_RENDER_TEXTURE_FORMAT_RG8,
+    CT_RENDER_TEXTURE_FORMAT_RG8I,
+    CT_RENDER_TEXTURE_FORMAT_RG8U,
+    CT_RENDER_TEXTURE_FORMAT_RG8S,
+    CT_RENDER_TEXTURE_FORMAT_RG16,
+    CT_RENDER_TEXTURE_FORMAT_RG16I,
+    CT_RENDER_TEXTURE_FORMAT_RG16U,
+    CT_RENDER_TEXTURE_FORMAT_RG16F,
+    CT_RENDER_TEXTURE_FORMAT_RG16S,
+    CT_RENDER_TEXTURE_FORMAT_RG32I,
+    CT_RENDER_TEXTURE_FORMAT_RG32U,
+    CT_RENDER_TEXTURE_FORMAT_RG32F,
+    CT_RENDER_TEXTURE_FORMAT_RGB8,
+    CT_RENDER_TEXTURE_FORMAT_RGB8I,
+    CT_RENDER_TEXTURE_FORMAT_RGB8U,
+    CT_RENDER_TEXTURE_FORMAT_RGB8S,
+    CT_RENDER_TEXTURE_FORMAT_RGB9E5F,
+    CT_RENDER_TEXTURE_FORMAT_BGRA8,
+    CT_RENDER_TEXTURE_FORMAT_RGBA8,
+    CT_RENDER_TEXTURE_FORMAT_RGBA8I,
+    CT_RENDER_TEXTURE_FORMAT_RGBA8U,
+    CT_RENDER_TEXTURE_FORMAT_RGBA8S,
+    CT_RENDER_TEXTURE_FORMAT_RGBA16,
+    CT_RENDER_TEXTURE_FORMAT_RGBA16I,
+    CT_RENDER_TEXTURE_FORMAT_RGBA16U,
+    CT_RENDER_TEXTURE_FORMAT_RGBA16F,
+    CT_RENDER_TEXTURE_FORMAT_RGBA16S,
+    CT_RENDER_TEXTURE_FORMAT_RGBA32I,
+    CT_RENDER_TEXTURE_FORMAT_RGBA32U,
+    CT_RENDER_TEXTURE_FORMAT_RGBA32F,
+    CT_RENDER_TEXTURE_FORMAT_R5G6B5,
+    CT_RENDER_TEXTURE_FORMAT_RGBA4,
+    CT_RENDER_TEXTURE_FORMAT_RGB5A1,
+    CT_RENDER_TEXTURE_FORMAT_RGB10A2,
+    CT_RENDER_TEXTURE_FORMAT_RG11B10F,
+
+    CT_RENDER_TEXTURE_FORMAT_UNKNOWN_DEPTH,
+
+    CT_RENDER_TEXTURE_FORMAT_D16,
+    CT_RENDER_TEXTURE_FORMAT_D24,
+    CT_RENDER_TEXTURE_FORMAT_D24S8,
+    CT_RENDER_TEXTURE_FORMAT_D32,
+    CT_RENDER_TEXTURE_FORMAT_D16F,
+    CT_RENDER_TEXTURE_FORMAT_D24F,
+    CT_RENDER_TEXTURE_FORMAT_D32F,
+    CT_RENDER_TEXTURE_FORMAT_D0S8,
+
+    CT_RENDER_TEXTURE_FORMAT_COUNT
+
+} ct_render_texture_format_t;
+
+typedef enum ct_render_uniform_type {
+    CT_RENDER_UNIFORM_TYPE_INT1,
+    CT_RENDER_UNIFORM_TYPE_END,
+
+    CT_RENDER_UNIFORM_TYPE_VEC4,
+    CT_RENDER_UNIFORM_TYPE_MAT3,
+    CT_RENDER_UNIFORM_TYPE_MAT4,
+
+    CT_RENDER_UNIFORM_TYPE_COUNT
+
+} ct_render_uniform_type_t;
+
+typedef enum ct_render_backbuffer_ratio {
+    CT_RENDER_BACKBUFFER_RATIO_EQUAL,
+    CT_RENDER_BACKBUFFER_RATIO_HALF,
+    CT_RENDER_BACKBUFFER_RATIO_QUARTER,
+    CT_RENDER_BACKBUFFER_RATIO_EIGHTH,
+    CT_RENDER_BACKBUFFER_RATIO_SIXTEENTH,
+    CT_RENDER_BACKBUFFER_RATIO_DOUBLE,
+
+    CT_RENDER_BACKBUFFER_RATIO_COUNT
+
+} ct_render_backbuffer_ratio_t;
+
+typedef enum ct_render_occlusion_query_result {
+    CT_RENDER_OCCLUSION_QUERY_RESULT_INVISIBLE,
+    CT_RENDER_OCCLUSION_QUERY_RESULT_VISIBLE,
+    CT_RENDER_OCCLUSION_QUERY_RESULT_NORESULT,
+
+    CT_RENDER_OCCLUSION_QUERY_RESULT_COUNT
+
+} ct_render_occlusion_query_result_t;
+
+typedef enum ct_render_topology {
+    CT_RENDER_TOPOLOGY_TRI_LIST,
+    CT_RENDER_TOPOLOGY_TRI_STRIP,
+    CT_RENDER_TOPOLOGY_LINE_LIST,
+    CT_RENDER_TOPOLOGY_LINE_STRIP,
+    CT_RENDER_TOPOLOGY_POINT_LIST,
+
+    CT_RENDER_TOPOLOGY_COUNT
+
+} ct_render_topology_t;
+
+typedef enum ct_render_topology_convert {
+    CT_RENDER_TOPOLOGY_CONVERT_TRI_LIST_FLIP_WINDING,
+    CT_RENDER_TOPOLOGY_CONVERT_TRI_STRIP_FLIP_WINDING,
+    CT_RENDER_TOPOLOGY_CONVERT_TRI_LIST_TO_LINE_LIST,
+    CT_RENDER_TOPOLOGY_CONVERT_TRI_STRIP_TO_TRI_LIST,
+    CT_RENDER_TOPOLOGY_CONVERT_LINE_STRIP_TO_LINE_LIST,
+
+    CT_RENDER_TOPOLOGY_CONVERT_COUNT
+
+} ct_render_topology_convert_t;
+
+typedef enum ct_render_topology_sort {
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_MIN,
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_AVG,
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_FRONT_TO_BACK_MAX,
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_MIN,
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_AVG,
+    CT_RENDER_TOPOLOGY_SORT_DIRECTION_BACK_TO_FRONT_MAX,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_MIN,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_AVG,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_FRONT_TO_BACK_MAX,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_MIN,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_AVG,
+    CT_RENDER_TOPOLOGY_SORT_DISTANCE_BACK_TO_FRONT_MAX,
+
+    CT_RENDER_TOPOLOGY_SORT_COUNT
+
+} ct_render_topology_sort_t;
+
+typedef enum ct_render_view_mode {
+    CT_RENDER_VIEW_MODE_DEFAULT,
+    CT_RENDER_VIEW_MODE_SEQUENTIAL,
+    CT_RENDER_VIEW_MODE_DEPTH_ASCENDING,
+    CT_RENDER_VIEW_MODE_DEPTH_DESCENDING,
+
+    CT_RENDER_VIEW_MODE_CCOUNT
+
+} ct_render_view_mode_t;
+
+#define CT_RENDER_HANDLE_T(_name) \
+    typedef struct _name{ uint16_t idx; } _name##_t
+
+CT_RENDER_HANDLE_T(ct_render_dynamic_index_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_dynamic_vertex_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_frame_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_index_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_indirect_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_occlusion_query_handle);
+CT_RENDER_HANDLE_T(ct_render_program_handle);
+CT_RENDER_HANDLE_T(ct_render_shader_handle);
+CT_RENDER_HANDLE_T(ct_render_texture_handle);
+CT_RENDER_HANDLE_T(ct_render_uniform_handle);
+CT_RENDER_HANDLE_T(ct_render_vertex_buffer_handle);
+CT_RENDER_HANDLE_T(ct_render_vertex_decl_handle);
+
+#undef CT_RENDER_HANDLE_T
+
+
+typedef void (*ct_render_release_fn_t)(void *_ptr,
+                                       void *_userData);
+
+
+typedef struct ct_render_memory {
+    uint8_t *data;
+    uint32_t size;
+
+} ct_render_memory_t;
+
+
+typedef struct ct_render_transform {
+    float *data;
+    uint16_t num;
+
+} ct_render_transform_t;
+
+
+typedef uint16_t ct_render_view_id_t;
+
+
+typedef struct ct_render_view_stats {
+    char name[256];
+    ct_render_view_id_t view;
+    int64_t cpuTimeElapsed;
+    int64_t gpuTimeElapsed;
+
+} ct_render_view_stats_t;
+
+typedef struct ct_render_encoder_stats {
+    int64_t cpuTimeBegin;
+    int64_t cpuTimeEnd;
+
+} ct_render_encoder_stats_t;
+
+
+typedef struct ct_render_stats {
+    int64_t cpuTimeFrame;
+    int64_t cpuTimeBegin;
+    int64_t cpuTimeEnd;
+    int64_t cpuTimerFreq;
+
+    int64_t gpuTimeBegin;
+    int64_t gpuTimeEnd;
+    int64_t gpuTimerFreq;
+
+    int64_t waitRender;
+    int64_t waitSubmit;
+
+    uint32_t numDraw;
+    uint32_t numCompute;
+    uint32_t maxGpuLatency;
+
+    uint16_t numDynamicIndexBuffers;
+    uint16_t numDynamicVertexBuffers;
+    uint16_t numFrameBuffers;
+    uint16_t numIndexBuffers;
+    uint16_t numOcclusionQueries;
+    uint16_t numPrograms;
+    uint16_t numShaders;
+    uint16_t numTextures;
+    uint16_t numUniforms;
+    uint16_t numVertexBuffers;
+    uint16_t numVertexDecls;
+
+    int64_t textureMemoryUsed;
+    int64_t rtMemoryUsed;
+    int32_t transientVbUsed;
+    int32_t transientIbUsed;
+
+    uint32_t numPrims[CT_RENDER_TOPOLOGY_COUNT];
+
+    int64_t gpuMemoryMax;
+    int64_t gpuMemoryUsed;
+
+    uint16_t width;
+    uint16_t height;
+    uint16_t textWidth;
+    uint16_t textHeight;
+
+    uint16_t numViews;
+    ct_render_view_stats_t *viewStats;
+
+    uint8_t numEncoders;
+    ct_render_encoder_stats_t *encoderStats;
+
+} ct_render_stats_t;
+
+
+typedef struct ct_render_vertex_decl {
+    uint32_t hash;
+    uint16_t stride;
+    uint16_t offset[CT_RENDER_ATTRIB_COUNT];
+    uint16_t attributes[CT_RENDER_ATTRIB_COUNT];
+
+} ct_render_vertex_decl_t;
+
+
+typedef struct ct_render_transient_index_buffer {
+    uint8_t *data;
+    uint32_t size;
+    ct_render_index_buffer_handle_t handle;
+    uint32_t startIndex;
+
+} ct_render_transient_index_buffer_t;
+
+
+typedef struct ct_render_transient_vertex_buffer {
+    uint8_t *data;
+    uint32_t size;
+    uint32_t startVertex;
+    uint16_t stride;
+    ct_render_vertex_buffer_handle_t handle;
+    ct_render_vertex_decl_handle_t decl;
+
+} ct_render_transient_vertex_buffer_t;
+
+
+typedef struct ct_render_instance_data_buffer {
+    uint8_t *data;
+    uint32_t size;
+    uint32_t offset;
+    uint32_t num;
+    uint16_t stride;
+    ct_render_vertex_buffer_handle_t handle;
+
+} ct_render_instance_data_buffer_t;
+
+
+typedef struct ct_render_texture_info {
+    ct_render_texture_format_t format;
+    uint32_t storageSize;
+    uint16_t width;
+    uint16_t height;
+    uint16_t depth;
+    uint16_t numLayers;
+    uint8_t numMips;
+    uint8_t bitsPerPixel;
+    bool cubeMap;
+
+} ct_render_texture_info_t;
+
+
+typedef struct ct_render_uniform_info {
+    char name[256];
+    ct_render_uniform_type_t type;
+    uint16_t num;
+
+} ct_render_uniform_info_t;
+
+
+typedef struct ct_render_attachment {
+    ct_render_texture_handle_t handle;
+    uint16_t mip;
+    uint16_t layer;
+
+} ct_render_attachment_t;
+
+
+typedef struct ct_render_caps_gpu {
+    uint16_t vendorId;
+    uint16_t deviceId;
+
+} ct_render_caps_gpu_t;
+
+typedef struct ct_render_caps_limits {
+    uint32_t maxDrawCalls;
+    uint32_t maxBlits;
+    uint32_t maxTextureSize;
+    uint32_t maxTextureLayers;
+    uint32_t maxViews;
+    uint32_t maxFrameBuffers;
+    uint32_t maxFBAttachments;
+    uint32_t maxPrograms;
+    uint32_t maxShaders;
+    uint32_t maxTextures;
+    uint32_t maxTextureSamplers;
+    uint32_t maxVertexDecls;
+    uint32_t maxVertexStreams;
+    uint32_t maxIndexBuffers;
+    uint32_t maxVertexBuffers;
+    uint32_t maxDynamicIndexBuffers;
+    uint32_t maxDynamicVertexBuffers;
+    uint32_t maxUniforms;
+    uint32_t maxOcclusionQueries;
+    uint32_t maxEncoders;
+    uint32_t transientVbSize;
+    uint32_t transientIbSize;
+
+} ct_render_caps_limits_t;
+
+
+typedef struct ct_render_caps {
+    ct_render_renderer_type_t rendererType;
+
+    uint64_t supported;
+
+    uint16_t vendorId;
+    uint16_t deviceId;
+    bool homogeneousDepth;
+    bool originBottomLeft;
+    uint8_t numGPUs;
+
+    ct_render_caps_gpu_t gpu[4];
+    ct_render_caps_limits_t limits;
+
+    uint16_t formats[CT_RENDER_TEXTURE_FORMAT_COUNT];
+
+} ct_render_caps_t;
+
+struct ct_render_encoder;
 
 typedef void (*ct_renderender_on_render)();
-
 
 //! Render API V0
 struct ct_renderer_a0 {
@@ -1099,8 +1077,6 @@ struct ct_renderer_a0 {
     ct_render_renderer_type_t (*get_renderer_type)();
 
     const ct_render_caps_t *(*get_caps)();
-
-    const ct_render_hmd_t *(*get_hmd)();
 
     const ct_render_stats_t *(*get_stats)();
 
@@ -1254,7 +1230,7 @@ struct ct_renderer_a0 {
                               ct_render_texture_format_t format);
 
     ct_render_texture_handle_t (*create_texture)(const ct_render_memory_t *_mem,
-                                                 uint32_t flags,
+                                                 uint64_t flags,
                                                  uint8_t skip,
                                                  ct_render_texture_info_t *_info);
 
@@ -1263,7 +1239,7 @@ struct ct_renderer_a0 {
                                                     bool hasMips,
                                                     uint16_t numLayers,
                                                     ct_render_texture_format_t format,
-                                                    uint32_t flags,
+                                                    uint64_t flags,
                                                     const ct_render_memory_t *_mem);
 
     ct_render_texture_handle_t
@@ -1271,21 +1247,21 @@ struct ct_renderer_a0 {
                                 bool hasMips,
                                 uint16_t numLayers,
                                 ct_render_texture_format_t format,
-                                uint32_t flags);
+                                uint64_t flags);
 
     ct_render_texture_handle_t (*create_texture_3d)(uint16_t width,
                                                     uint16_t height,
                                                     uint16_t depth,
                                                     bool hasMips,
                                                     ct_render_texture_format_t format,
-                                                    uint32_t flags,
+                                                    uint64_t flags,
                                                     const ct_render_memory_t *_mem);
 
     ct_render_texture_handle_t (*create_texture_cube)(uint16_t size,
                                                       bool hasMips,
                                                       uint16_t numLayers,
                                                       ct_render_texture_format_t format,
-                                                      uint32_t flags,
+                                                      uint64_t flags,
                                                       const ct_render_memory_t *_mem);
 
     void (*update_texture_2d)(ct_render_texture_handle_t handle,
@@ -1333,12 +1309,12 @@ struct ct_renderer_a0 {
     ct_render_frame_buffer_handle_t (*create_frame_buffer)(uint16_t width,
                                                            uint16_t height,
                                                            ct_render_texture_format_t format,
-                                                           uint32_t textureFlags);
+                                                           uint64_t textureFlags);
 
     ct_render_frame_buffer_handle_t
     (*create_frame_buffer_scaled)(ct_render_backbuffer_ratio_t ratio,
                                   ct_render_texture_format_t format,
-                                  uint32_t textureFlags);
+                                  uint64_t textureFlags);
 
     ct_render_frame_buffer_handle_t
     (*create_frame_buffer_from_attachment)(uint8_t num,
@@ -1790,8 +1766,9 @@ struct ct_renderer_a0 {
 
     void (*request_screen_shot)(ct_render_frame_buffer_handle_t handle,
                                 const char *_filePath);
-
 };
+
+
 
 CE_MODULE(ct_renderer_a0);
 

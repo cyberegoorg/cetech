@@ -65,6 +65,12 @@ static void foreach_render_graph(struct ct_world world,
     for (uint32_t i = 1; i < n; ++i) {
         struct ct_render_graph_component rg = all_rg[i];
 
+        uint16_t size[2] = {};
+        rg.builder->call->get_size(rg.builder, size);
+        if((size[0] == 0) || (size[1] == 0)) {
+            continue;
+        }
+
         rg.builder->call->clear(rg.builder);
         rg.graph->call->setup(rg.graph, rg.builder);
         rg.builder->call->execute(rg.builder);

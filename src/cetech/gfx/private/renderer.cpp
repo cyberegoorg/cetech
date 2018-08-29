@@ -154,7 +154,7 @@ static void renderer_create() {
     bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
-    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
+    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     //_G.main_window->update(_G.main_window);
 
     _G.need_reset = true;
@@ -190,7 +190,7 @@ static void on_begin_render(uint64_t _event) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags());
+        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     }
 }
 
@@ -259,7 +259,6 @@ static struct ct_renderer_a0 rendderer_api = {
         .frame = bgfx_frame,
         .get_renderer_type = reinterpret_cast<ct_render_renderer_type_t (*)()>(bgfx_get_renderer_type),
         .get_caps = reinterpret_cast<const ct_render_caps_t *(*)()>(bgfx_get_caps),
-        .get_hmd = reinterpret_cast<const ct_render_hmd_t *(*)()>(bgfx_get_hmd),
         .get_stats = reinterpret_cast<const ct_render_stats_t *(*)()>(bgfx_get_stats),
         .alloc = reinterpret_cast<const ct_render_memory_t *(*)(uint32_t)>(bgfx_alloc),
         .copy = reinterpret_cast<const ct_render_memory_t *(*)(const void *,
@@ -345,7 +344,7 @@ static struct ct_renderer_a0 rendderer_api = {
                                                        uint16_t,
                                                        ct_render_texture_format_t)>(bgfx_calc_texture_size),
         .create_texture = reinterpret_cast<ct_render_texture_handle_t (*)(const ct_render_memory_t *,
-                                                                          uint32_t,
+                                                                          uint64_t,
                                                                           uint8_t,
                                                                           ct_render_texture_info_t *)>(bgfx_create_texture),
         .create_texture_2d = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
@@ -353,25 +352,25 @@ static struct ct_renderer_a0 rendderer_api = {
                                                                              bool,
                                                                              uint16_t,
                                                                              ct_render_texture_format_t,
-                                                                             uint32_t,
+                                                                             uint64_t,
                                                                              const ct_render_memory_t *)>(bgfx_create_texture_2d),
         .create_texture_2d_scaled = reinterpret_cast<ct_render_texture_handle_t (*)(ct_render_backbuffer_ratio_t,
                                                                                     bool,
                                                                                     uint16_t,
                                                                                     ct_render_texture_format_t,
-                                                                                    uint32_t)>(bgfx_create_texture_2d_scaled),
+                                                                                    uint64_t)>(bgfx_create_texture_2d_scaled),
         .create_texture_3d = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
                                                                              uint16_t,
                                                                              uint16_t,
                                                                              bool,
                                                                              ct_render_texture_format_t,
-                                                                             uint32_t,
+                                                                             uint64_t,
                                                                              const ct_render_memory_t *)>(bgfx_create_texture_3d),
         .create_texture_cube = reinterpret_cast<ct_render_texture_handle_t (*)(uint16_t,
                                                                                bool,
                                                                                uint16_t,
                                                                                ct_render_texture_format_t,
-                                                                               uint32_t,
+                                                                               uint64_t,
                                                                                const ct_render_memory_t *)>(bgfx_create_texture_cube),
         .update_texture_2d = reinterpret_cast<void (*)(ct_render_texture_handle_t,
                                                        uint16_t,
@@ -410,10 +409,10 @@ static struct ct_renderer_a0 rendderer_api = {
         .create_frame_buffer = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(uint16_t,
                                                                                     uint16_t,
                                                                                     ct_render_texture_format_t,
-                                                                                    uint32_t)>(bgfx_create_frame_buffer),
+                                                                                    uint64_t)>(bgfx_create_frame_buffer),
         .create_frame_buffer_scaled = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(ct_render_backbuffer_ratio_t,
                                                                                            ct_render_texture_format_t,
-                                                                                           uint32_t)>(bgfx_create_frame_buffer_scaled),
+                                                                                           uint64_t)>(bgfx_create_frame_buffer_scaled),
         .create_frame_buffer_from_attachment = reinterpret_cast<ct_render_frame_buffer_handle_t (*)(uint8_t,
                                                                                                     const ct_render_attachment_t *,
                                                                                                     bool)>(bgfx_create_frame_buffer_from_attachment),
