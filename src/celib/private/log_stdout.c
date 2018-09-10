@@ -86,17 +86,9 @@ void ct_log_stdout_yaml_handler(enum ce_log_level level,
     struct tm *gmtm = gmtime(&time);
     const char *time_str = _time_to_str(gmtm);
 
-#if CE_PLATFORM_LINUX
-    flock(out->_fileno, LOCK_EX);
-#endif
-
     fprintf(out, _level_format[level], _level_to_str[level],
             where, time_str, worker_id, msg);
 
-#if CE_PLATFORM_LINUX
-    fflush_unlocked(out);
-    flock(out->_fileno, LOCK_UN);
-#endif
 }
 
 
@@ -127,14 +119,6 @@ void ct_log_stdout_handler(enum ce_log_level level,
 
     FILE *out = level == LOG_ERROR ? stderr : stdout;
 
-#if CE_PLATFORM_LINUX
-    flock(out->_fileno, LOCK_EX);
-#endif
 
     fprintf(out, _level_format[level], _level_to_str[level], worker_id, where, msg);
-
-#if CE_PLATFORM_LINUX
-    fflush_unlocked(out);
-    flock(out->_fileno, LOCK_UN);
-#endif
 }

@@ -74,6 +74,16 @@ struct world_instance {
 #define _entity_type(w, ent) \
     w->entity_type[handler_idx((ent).h)]
 
+struct simulation_graph {
+    struct ce_hash_t graph_map;
+    struct ce_hash_t fce_map;
+    uint64_t **before;
+    uint64_t **after;
+    uint64_t *name;
+    uint64_t *input_simulations;
+    uint64_t *output_simulations;
+};
+
 static struct _G {
     struct ce_cdb_t db;
 
@@ -82,13 +92,14 @@ static struct _G {
     struct ce_handler_t world_handler;
     struct world_instance *world_array;
 
-    ct_simulate_fce_t *simulations;
-
     uint32_t component_count;
     struct ce_hash_t component_types;
 
     uint64_t *components_name;
     struct ce_hash_t component_interface_map;
+
+    // SIM
+    struct simulation_graph sg;
 
     struct ce_alloc *allocator;
 } _G;
@@ -455,7 +466,7 @@ static uint64_t combine_component(const uint64_t *component_name,
 static void _add_components(struct ct_world world,
                             struct ct_entity ent,
                             uint64_t new_type,
-                            void** data) {
+                            void **data) {
     struct world_instance *w = get_world_instance(world);
 
     uint64_t ent_type = _entity_type(w, ent);
@@ -475,16 +486,16 @@ static void add_components(struct ct_world world,
                            struct ct_entity ent,
                            const uint64_t *component_name,
                            uint32_t name_count,
-                           void** data) {
+                           void **data) {
     uint64_t new_type = combine_component(component_name, name_count);
     _add_components(world, ent, new_type, data);
 
-    if(data) {
+    if (data) {
         for (int i = 0; i < name_count; ++i) {
             uint64_t name = component_name[i];
             struct ct_component_i0 *ci = get_interface(name);
-            void* new_comp_data = data[i];
-            void* comp_data = get_one(world, name, ent);
+            void *new_comp_data = data[i];
+            void *comp_data = get_one(world, name, ent);
             memcpy(comp_data, new_comp_data, ci->size());
         }
     }
@@ -527,13 +538,6 @@ static const struct ct_prop_decs *desc_by_name(
     return NULL;
 }
 
-static void register_simulation(const char *name,
-                                ct_simulate_fce_t simulation) {
-    CE_UNUSED(name);
-
-    ce_array_push(_G.simulations, simulation, _G.allocator);
-}
-
 static void process(struct ct_world world,
                     uint64_t components_mask,
                     ct_process_fce_t fce,
@@ -553,12 +557,158 @@ static void process(struct ct_world world,
     }
 }
 
-static void simulate(struct ct_world world,
-                     float dt) {
-    for (int j = 0; j < ce_array_size(_G.simulations); ++j) {
-        ct_simulate_fce_t fce = (ct_simulate_fce_t) _G.simulations[j];
+void _sg_remove_(uint64_t *a,
+                 uint64_t item) {
+    uint64_t n = ce_array_size(a);
+    for (int i = 0; i < n; ++i) {
+        if (item != a[i]) {
+            continue;
+        }
+
+        a[i] = a[n - 1];
+        ce_array_pop_back(a);
+        break;
+    }
+}
+
+static uint64_t _sg_get_or_create(struct simulation_graph *sg,
+                                  uint64_t name) {
+    if (!ce_hash_contain(&sg->graph_map, name)) {
+        uint64_t idx = ce_array_size(sg->after);
+
+        ce_array_push(sg->after, NULL, _G.allocator);
+        ce_array_push(sg->before, NULL, _G.allocator);
+        ce_array_push(sg->name, name, _G.allocator);
+
+        ce_hash_add(&sg->graph_map, name, idx, _G.allocator);
+    }
+
+    uint64_t idx = ce_hash_lookup(&sg->graph_map, name, UINT64_MAX);
+    return idx;
+}
+
+static void _sg_clean(struct simulation_graph *sg) {
+    ce_array_clean(sg->output_simulations);
+    ce_array_clean(sg->input_simulations);
+    ce_array_clean(sg->name);
+
+    uint64_t n = ce_array_size(sg->after);
+    for (int i = 0; i < n; ++i) {
+        ce_array_clean(sg->after);
+        ce_array_clean(sg->before);
+    }
+
+    ce_hash_clean(&sg->graph_map);
+    ce_hash_clean(&sg->fce_map);
+}
+
+static void _sg_simulate(struct simulation_graph *sg,
+                         struct ct_world world,
+                         float dt) {
+
+    const uint64_t output_n = ce_array_size(sg->output_simulations);
+    for (int k = 0; k < output_n; ++k) {
+        ct_simulate_fce_t fce;
+        fce = (ct_simulate_fce_t) ce_hash_lookup(&sg->fce_map,
+                                                 sg->output_simulations[k], 0);
         fce(world, dt);
     }
+
+}
+
+static void _sg_build(struct simulation_graph *sg) {
+    uint64_t *input_simulations = NULL;
+
+    _sg_clean(sg);
+
+    struct ce_api_entry it = ce_api_a0->first(SIMULATION_INTERFACE);
+    while (it.api) {
+        struct ct_simulation_i0 *i = (it.api);
+
+        uint64_t name = i->name();
+
+        ce_hash_add(&sg->fce_map, name,
+                    (uint64_t) i->simulation, _G.allocator);
+
+        uint64_t idx = _sg_get_or_create(sg, name);
+
+        if (i->before) {
+            uint32_t before_n = 0;
+            const uint64_t *before = i->before(&before_n);
+
+            for (int b = 0; b < before_n; ++b) {
+                uint64_t b_name = before[b];
+
+                ce_array_push(sg->before[idx], b_name, _G.allocator);
+
+                uint64_t idx = _sg_get_or_create(sg, b_name);
+
+                ce_array_push(sg->after[idx], name, _G.allocator);
+            }
+        }
+
+        if (i->after) {
+            uint32_t after_n = 0;
+            const uint64_t *after = i->after(&after_n);
+            for (int a = 0; a < after_n; ++a) {
+                uint64_t a_name = after[a];
+
+                ce_array_push(sg->after[idx], a_name, _G.allocator);
+
+                uint64_t idx = _sg_get_or_create(sg, a_name);
+
+                ce_array_push(sg->before[idx], name, _G.allocator);
+            }
+        }
+
+        it = ce_api_a0->next(it);
+    }
+
+    uint64_t name_n = ce_array_size(sg->name);
+    for (int j = 0; j < name_n; ++j) {
+        if (ce_array_size(sg->before[j])) {
+            continue;
+        }
+
+        ce_array_push(input_simulations, sg->name[j], _G.allocator);
+    }
+
+    while (ce_array_size(input_simulations)) {
+        uint64_t item_name = ce_array_back(input_simulations);
+        ce_array_pop_back(input_simulations);
+
+        ce_array_insert(sg->output_simulations, 0, item_name, _G.allocator);
+
+        uint64_t dep_idx = ce_hash_lookup(&sg->graph_map, item_name,
+                                          UINT64_MAX);
+
+        uint64_t *dep_affter = sg->after[dep_idx];
+        uint64_t dep_affter_n = ce_array_size(dep_affter);
+
+        for (int i = 0; i < dep_affter_n; ++i) {
+            uint64_t after_name = dep_affter[i];
+            uint64_t after_idx = ce_hash_lookup(&sg->graph_map, after_name,
+                                                UINT64_MAX);
+
+            uint64_t *before = sg->before[after_idx];
+
+            _sg_remove_(before, item_name);
+
+            uint64_t before_n = ce_array_size(before);
+
+            if (!before_n) {
+                ce_array_push(input_simulations, after_name, _G.allocator);
+            }
+        }
+
+        ce_array_clean(dep_affter);
+    }
+}
+
+static void simulate(struct ct_world world,
+                     float dt) {
+    _sg_build(&_G.sg);
+    _sg_simulate(&_G.sg, world, dt);
 }
 
 static void create_entities(struct ct_world world,
@@ -1139,8 +1289,8 @@ static struct ct_world create_world() {
     ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(event);
     ce_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ce_cdb_a0->write_commit(wr);
-
     ce_ebus_a0->broadcast(ECS_EBUS, event);
+
 
     return world;
 }
@@ -1217,7 +1367,6 @@ struct ct_component_a0 ct_component_a0 = {
 };
 
 struct ct_system_a0 ct_system_a0 = {
-        .register_simulation = register_simulation,
         .simulate = simulate,
         .process = process,
 };

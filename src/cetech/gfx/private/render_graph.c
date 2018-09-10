@@ -15,6 +15,7 @@
 #include <cetech/gfx/debugdraw.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/transform/transform.h>
 
 
 #include "cetech/gfx/render_graph.h"
@@ -55,10 +56,10 @@ static struct ct_component_i0 render_graph_component_i = {
 
 
 static void foreach_render_graph(struct ct_world world,
-                             struct ct_entity *ent,
-                             ct_entity_storage_t *item,
-                             uint32_t n,
-                             void *data) {
+                                 struct ct_entity *ent,
+                                 ct_entity_storage_t *item,
+                                 uint32_t n,
+                                 void *data) {
     struct ct_render_graph_component *all_rg;
     all_rg = ct_ecs_a0->component->get_all(RENDER_GRAPH_COMPONENT, item);
 
@@ -67,7 +68,7 @@ static void foreach_render_graph(struct ct_world world,
 
         uint16_t size[2] = {};
         rg.builder->call->get_size(rg.builder, size);
-        if((size[0] == 0) || (size[1] == 0)) {
+        if ((size[0] == 0) || (size[1] == 0)) {
             continue;
         }
 
@@ -78,7 +79,7 @@ static void foreach_render_graph(struct ct_world world,
 }
 
 static void render_system(struct ct_world world,
-                            float dt) {
+                          float dt) {
     uint64_t mask = ct_ecs_a0->component->mask(RENDER_GRAPH_COMPONENT);
     ct_ecs_a0->system->process(world, mask, foreach_render_graph, &dt);
 }
@@ -100,6 +101,23 @@ static struct ct_render_graph_a0 render_graph_api = {
 
 struct ct_render_graph_a0 *ct_render_graph_a0 = &render_graph_api;
 
+
+static uint64_t render_system_name() {
+    return RENDER_SYSTEM;
+}
+
+static const uint64_t * rendersystem_after(uint32_t* n) {
+    static uint64_t _after[] = {TRANSFORM_SYSTEM};
+    *n = CE_ARRAY_LEN(_after);
+    return _after;
+}
+
+static struct ct_simulation_i0 render_simulation_i0 = {
+        .simulation = render_system,
+        .name = render_system_name,
+        .after = rendersystem_after,
+};
+
 static void _init(struct ce_api_a0 *api) {
     CE_UNUSED(api);
     _G = (struct _G) {
@@ -112,8 +130,8 @@ static void _init(struct ce_api_a0 *api) {
 
     api->register_api("ct_render_graph_a0", &render_graph_api);
     api->register_api(COMPONENT_INTERFACE_NAME, &render_graph_component_i);
+    api->register_api(SIMULATION_INTERFACE_NAME, &render_simulation_i0);
 
-    ct_ecs_a0->system->register_simulation("render", render_system);
 }
 
 static void _shutdown() {

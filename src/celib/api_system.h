@@ -28,7 +28,6 @@ struct ce_api_entry {
 typedef void (ce_api_on_add_t)(uint64_t name, void* api);
 
 struct ce_api_a0 {
-
     void (*register_api)(const char *name,
                          void *api);
 

@@ -69,6 +69,12 @@ typedef void (*ct_process_fce_t)(struct ct_world world,
                                  uint32_t n,
                                  void *data);
 
+#define SIMULATION_INTERFACE_NAME \
+    "ct_simulation_i0"
+
+#define SIMULATION_INTERFACE \
+    CE_ID64_0("ct_simulation_i0", 0xe944056f6e473ecdULL)
+
 typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
@@ -203,6 +209,17 @@ struct ct_entity_a0 {
                                      uint64_t name);
 };
 
+
+struct ct_simulation_i0 {
+    uint64_t (*name)();
+
+    const uint64_t* (*before)(uint32_t* n);
+    const uint64_t* (*after)(uint32_t* n);
+
+    ct_simulate_fce_t simulation;
+};
+
+
 struct ct_system_a0 {
     void (*simulate)(struct ct_world world,
                      float dt);
@@ -211,9 +228,6 @@ struct ct_system_a0 {
                     uint64_t components_mask,
                     ct_process_fce_t fce,
                     void *data);
-
-    void (*register_simulation)(const char *name,
-                                ct_simulate_fce_t simulation);
 };
 
 struct ct_ecs_a0 {

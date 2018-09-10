@@ -5,6 +5,9 @@
 
 #define TRANSFORMATION_COMPONENT_NAME "transform"
 
+#define TRANSFORM_SYSTEM \
+    CE_ID64_0("transform", 0x69e14b13ad9b5315ULL)
+
 #define TRANSFORM_COMPONENT \
     CE_ID64_0("transform", 0x69e14b13ad9b5315ULL)
 

@@ -10,6 +10,8 @@
 #define RENDER_GRAPH_COMPONENT \
     CE_ID64_0("render_graph", 0x21bdb056bfd9b0aaULL)
 
+#define RENDER_SYSTEM \
+    CE_ID64_0("rendersystem", 0x48b4a42e2ac861a4ULL)
 
 struct ct_render_graph_builder;
 

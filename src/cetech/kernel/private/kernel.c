@@ -261,6 +261,8 @@ static void cetech_kernel_start() {
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
+//        ce_log_a0->debug(LOG_WHERE, "dt %f", dt * 1000);
+
         ce_ebus_a0->begin_frame();
 
         uint64_t event;

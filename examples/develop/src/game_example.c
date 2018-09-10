@@ -60,8 +60,6 @@ void init() {
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
     rgc.graph->call->add_module(rgc.graph, module);
-
-    ct_ecs_a0->system->register_simulation("rotation", rotation_system);
 }
 
 
@@ -81,7 +79,7 @@ void update(float dt) {
     ct_ecs_a0->system->simulate(_G.world, dt);
 }
 
-static uint64_t name() {
+static uint64_t game_name() {
     return ce_id_a0->id64("default");
 }
 
@@ -97,7 +95,7 @@ struct ct_game_i0 game_i0 = {
         .init = init,
         .shutdown = shutdown,
         .update = update,
-        .name = name,
+        .name = game_name,
         .render_graph_builder = render_graph_builder
 };
 
@@ -105,9 +103,6 @@ struct ct_game_i0 game_i0 = {
 // Module def
 //==============================================================================
 
-//==============================================================================
-// Init api
-//==============================================================================
 void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
     if (CE_DYNAMIC_MODULE) {
         CE_INIT_API(api, ct_controlers_a0);
@@ -133,8 +128,10 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     ce_log_a0->info("example", "Init %d", reload);
 
     api->register_api(GAME_INTERFACE_NAME, &game_i0);
+
     api->register_api(COMPONENT_INTERFACE_NAME, &rotation_component_i);
 
+    api->register_api(SIMULATION_INTERFACE_NAME, &rotation_simulation_i0);
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,

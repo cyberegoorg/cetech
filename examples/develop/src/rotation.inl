@@ -8,6 +8,9 @@
 #define ROTATION_COMPONENT \
     CE_ID64_0("rotation", 0x2060566242789baaULL)
 
+#define ROTATION_SYSTEM \
+    CE_ID64_0("rotation", 0x2060566242789baaULL)
+
 #define PROP_SPEED \
     CE_ID64_0("speed", 0x2c1c82c87303ec5fULL)
 
@@ -99,6 +102,7 @@ static struct ct_component_i0 rotation_component_i = {
 
 // system
 
+
 static void foreach_rotation(struct ct_world world,
                              struct ct_entity *ent,
                              ct_entity_storage_t *item,
@@ -126,3 +130,21 @@ static void rotation_system(struct ct_world world,
 
     ct_ecs_a0->system->process(world, mask, foreach_rotation, &dt);
 }
+
+static uint64_t rotation_name() {
+    return ROTATION_SYSTEM;
+}
+
+static const uint64_t * rotation_before(uint32_t* n) {
+    static uint64_t _before[] = {TRANSFORM_SYSTEM};
+    *n = CE_ARRAY_LEN(_before);
+
+    return _before;
+}
+
+static struct ct_simulation_i0 rotation_simulation_i0 = {
+        .simulation = rotation_system,
+        .name = rotation_name,
+        .before = rotation_before,
+};
+

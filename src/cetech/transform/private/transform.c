@@ -235,10 +235,20 @@ static void transform_system(struct ct_world world,
     ct_ecs_a0->system->process(world, mask, foreach_transform, &dt);
 }
 
+
+static uint64_t name() {
+    return TRANSFORM_SYSTEM;
+}
+
+
+static struct ct_simulation_i0 transform_simulation_i0 = {
+        .simulation = transform_system,
+        .name = name,
+};
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
-
-    ct_ecs_a0->system->register_simulation("transform", transform_system);
+    api->register_api(SIMULATION_INTERFACE_NAME, &transform_simulation_i0);
 }
 
 static void _shutdown() {
