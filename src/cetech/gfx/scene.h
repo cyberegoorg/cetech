@@ -27,9 +27,6 @@ struct ct_entity;
 #define SCENE_VB_PROP   \
     CE_ID64_0("vb", 0x483690c3614b4c35ULL)
 
-#define SCENE_SIZE_PROP \
-    CE_ID64_0("size", 0x6687058679006e12ULL)
-
 #define SCENE_GEOM_COUNT \
     CE_ID64_0("geom_count", 0x423934fe3be0af59ULL)
 

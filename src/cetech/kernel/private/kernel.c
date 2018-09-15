@@ -194,8 +194,6 @@ static void _boot_stage() {
     const char *boot_pkg_str = ce_cdb_a0->read_str(_G.config_object,
                                                    CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = ce_id_a0->id64(boot_pkg_str);
-
-
     uint64_t core_pkg = ce_id_a0->id64("core/core");
     uint64_t resources[] = {core_pkg, boot_pkg};
 

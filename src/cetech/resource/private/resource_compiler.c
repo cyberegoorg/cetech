@@ -39,7 +39,6 @@
 
 struct compile_task_data {
     char *source_filename;
-    char *build_filename;
     struct ct_resource_id rid;
     time_t mtime;
     ct_resource_compilator_t compilator;
@@ -83,7 +82,6 @@ void type_name_from_filename(const char *fullname,
 }
 
 
-
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = (struct compile_task_data *) data;
 
@@ -114,30 +112,16 @@ static void _compile_task(void *data) {
                          "Resource \"%s\" compilation fail",
                          tdata->source_filename);
     } else {
-        ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
+        ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime,
+                                output_blob, ce_array_size(output_blob));
+
         ct_builddb_a0->set_file_depend(tdata->source_filename,
                                        tdata->source_filename);
-
-        struct ce_vio *build_vio = ce_fs_a0->open(
-                BUILD_ROOT,
-                tdata->build_filename, FS_OPEN_WRITE);
-
-        ce_buffer_free(tdata->build_filename, _G.allocator);
-
-        if (build_vio == NULL) {
-            goto end;
-        }
-
-        build_vio->write(build_vio, output_blob, sizeof(char),
-                         ce_array_size(output_blob));
-
-        ce_fs_a0->close(build_vio);
 
         ce_log_a0->info("resource_compiler.task",
                         "Resource \"%s\" compiled", tdata->source_filename);
     }
 
-    end:
     ce_array_free(output_blob, _G.allocator);
 
     CE_FREE(_G.allocator,
@@ -166,6 +150,7 @@ void _compile_files(struct ce_task_item **tasks,
         type_name_from_filename(files[i], &rid, NULL);
 
         ct_resource_compilator_t compilator = _find_compilator(rid.type);
+
         if (!compilator) {
             continue;
         }
@@ -174,16 +159,6 @@ void _compile_files(struct ce_task_item **tasks,
             continue;
         }
 
-        char build_name[128] = {};
-        snprintf(build_name, CE_ARRAY_LEN(build_name), "%" PRIx64 "%" PRIx64, rid.type, rid.name);
-
-        char *build_full = NULL;
-        ce_os_a0->path->join(&build_full,
-                             _G.allocator, 2,
-                             ce_cdb_a0->read_str(_G.config,
-                                                 CONFIG_PLATFORM, ""),
-                             build_name);
-
         struct compile_task_data *data = CE_ALLOC(_G.allocator,
                                                   struct compile_task_data,
                                                   sizeof(struct compile_task_data));
@@ -191,11 +166,9 @@ void _compile_files(struct ce_task_item **tasks,
         *data = (struct compile_task_data) {
                 .rid = rid,
                 .compilator = compilator,
-                .build_filename = build_full,
                 .source_filename = ce_memory_a0->str_dup(files[i],
                                                          _G.allocator),
                 .mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, files[i]),
-
                 .completed = 0
         };
 
@@ -206,7 +179,6 @@ void _compile_files(struct ce_task_item **tasks,
         };
 
         ce_array_push(*tasks, item, _G.allocator);
-//        multi_map::insert(compiled, (uint64_t)rid.type, (uint64_t)rid.name);
     }
 }
 
@@ -238,6 +210,8 @@ void resource_compiler_create_build_dir(struct ce_config_a0 config) {
 //}
 
 void _compile_all() {
+    uint32_t start_ticks = ce_os_a0->time->ticks();
+
     struct ce_task_item *tasks = NULL;
     const char *glob_patern = "**.*";
     char **files = NULL;
@@ -261,6 +235,10 @@ void _compile_all() {
         CE_FREE(_G.allocator, data);
     }
     ce_array_free(tasks, _G.allocator);
+
+    uint32_t now_ticks = ce_os_a0->time->ticks();
+    uint32_t dt = now_ticks - start_ticks;
+    ce_log_a0->debug("resource_compiler", "compile time %f", dt * 0.001);
 }
 
 
@@ -278,7 +256,9 @@ int resource_compiler_get_filename(char *filename,
     ct_resource_a0->type_name_string(build_name, CE_ARRAY_LEN(build_name),
                                      resource_id);
 
-    return ct_builddb_a0->get_filename_by_hash(filename, max_ken, build_name);
+    return ct_builddb_a0->get_filename_type_name(filename, max_ken,
+                                                 resource_id.type,
+                                                 resource_id.name);
 }
 
 

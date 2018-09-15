@@ -120,16 +120,17 @@ void foreach_mesh_renderer(struct ct_world world,
             continue;
         }
 
-        uint64_t size = ce_cdb_a0->read_uint64(geom_obj, SCENE_SIZE_PROP, 0);
         uint64_t ib = ce_cdb_a0->read_uint64(geom_obj, SCENE_IB_PROP, 0);
+        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_obj, SCENE_IB_SIZE, 0);
         uint64_t vb = ce_cdb_a0->read_uint64(geom_obj, SCENE_VB_PROP, 0);
+        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_obj, SCENE_VB_SIZE, 0);
 
         ct_render_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
         ct_render_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
 
         ct_renderer_a0->set_transform(&final_w, 1);
-        ct_renderer_a0->set_vertex_buffer(0, vbh, 0, size);
-        ct_renderer_a0->set_index_buffer(ibh, 0, size);
+        ct_renderer_a0->set_vertex_buffer(0, vbh, 0, vb_size);
+        ct_renderer_a0->set_index_buffer(ibh, 0, ib_size);
 
         struct ct_resource_id material_resource = {.type = MATERIAL_TYPE,.name = m.material};
         uint64_t material_obj = ct_resource_a0->get(material_resource);

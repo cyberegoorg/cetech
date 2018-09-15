@@ -825,20 +825,12 @@ static void _load(uint64_t from,
 }
 
 static void online(uint64_t name,
-                   struct ce_vio *input,
                    uint64_t obj) {
     CE_UNUSED(name);
-
-    const uint64_t size = input->size(input);
-    char *data = CE_ALLOC(_G.allocator, char, size);
-    input->read(input, data, 1, size);
-
-    ce_cdb_a0->load(_G.db, data, obj, _G.allocator);
 
     _load(obj, 0);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
-    ce_cdb_a0->set_ptr(writer, PROP_RESOURECE_DATA, data);
     ce_cdb_a0->write_commit(writer);
 }
 

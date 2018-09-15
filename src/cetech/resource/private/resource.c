@@ -17,6 +17,7 @@
 #include <celib/cdb.h>
 #include <cetech/kernel/kernel.h>
 #include <celib/buffer.inl>
+#include <cetech/resource/builddb.h>
 
 #include "include/SDL2/SDL.h"
 
@@ -27,7 +28,7 @@
 //==============================================================================
 
 #define _G ResourceManagerGlobals
-#define LOG_WHERE "resource_manager"
+#define LOG_WHERE "resource"
 
 //==============================================================================
 // Gloals
@@ -124,13 +125,13 @@ static void load(uint64_t type,
                  uint64_t *names,
                  size_t count,
                  int force) {
+    uint32_t start_ticks = ce_os_a0->time->ticks();
+
     struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
     if (!resource_i) {
         return;
     }
-
-    const uint64_t root_name = BUILD_ROOT;
 
     uint64_t resource_objects[count];
 
@@ -147,42 +148,21 @@ static void load(uint64_t type,
                                                    resource_i->cdb_type());
         resource_objects[i] = object;
 
-        char build_name[128] = {};
-
         struct ct_resource_id rid = (struct ct_resource_id) {
                 .name = asset_name,
                 .type = type,
         };
 
-        type_name_string(build_name, CE_ARRAY_LEN(build_name), rid);
-
         char filename[1024] = {};
         resource_compiler_get_filename(filename, CE_ARRAY_LEN(filename), rid);
 
-        ce_log_a0->debug("resource", "Loading resource %s from %s",
-                         filename, build_name);
-
-
-        char *build_full = NULL;
-        ce_os_a0->path->join(&build_full,
-                             _G.allocator, 2,
-                             ce_cdb_a0->read_str(_G.config,
-                                                 CONFIG_PLATFORM, ""),
-                             build_name);
-
-        struct ce_vio *resource_file = ce_fs_a0->open(root_name,
-                                                      build_full,
-                                                      FS_OPEN_READ);
-
-        ce_buffer_free(build_full, _G.allocator);
-
-        if (!resource_file) {
+        ce_log_a0->debug(LOG_WHERE, "Loading resource %s", filename);
+        if(!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
+            ce_log_a0->error(LOG_WHERE, "Could not load resource %s", filename);
             continue;
         }
 
-        resource_i->online(names[i], resource_file, object);
-        ce_fs_a0->close(resource_file);
-
+        resource_i->online(names[i], object);
     }
 
     uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);
@@ -197,6 +177,10 @@ static void load(uint64_t type,
             ce_cdb_a0->set_subobject(w, asset_name, resource_objects[i]);
         }
     } while (!ce_cdb_a0->write_try_commit(w));
+
+    uint32_t now_ticks = ce_os_a0->time->ticks();
+    uint32_t dt = now_ticks - start_ticks;
+    ce_log_a0->debug(LOG_WHERE, "load time %f for %zu resource", dt * 0.001, count);
 }
 
 static void unload(uint64_t type,
@@ -225,7 +209,7 @@ static void unload(uint64_t type,
                                            CE_ARRAY_LEN(filename),
                                            rid);
 
-            ce_log_a0->debug("resource", "Unload resource %s ", filename);
+            ce_log_a0->debug(LOG_WHERE, "Unload resource %s ", filename);
 
             uint64_t object;
             object = ce_cdb_a0->read_subobject(type_obj, rid.name, 0);
@@ -298,7 +282,7 @@ static void reload(uint64_t type,
 //
 //            char *filename = build_name;
 //#endif
-//            ce_log_a0->debug("resource", "Reload resource %s ", filename);
+//            ce_log_a0->debug(LOG_WHERE, "Reload resource %s ", filename);
 
 //            void *old_data = get(ptype, names[i]);
 //

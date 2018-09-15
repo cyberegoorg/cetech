@@ -65,16 +65,8 @@ static ct_render_uniform_type_t _type_to_bgfx[] = {
 };
 
 static void online(uint64_t name,
-                   struct ce_vio *input,
                    uint64_t obj) {
     CE_UNUSED(name);
-
-    const uint64_t size = input->size(input);
-    char *data = CE_ALLOC(_G.allocator, char, size);
-    input->read(input, data, 1, size);
-
-    ce_cdb_a0->load(ce_cdb_a0->db(), data, obj, _G.allocator);
-
     uint64_t layers_obj = ce_cdb_a0->read_subobject(obj, MATERIAL_LAYERS, 0);
 
     const uint64_t layers_n = ce_cdb_a0->prop_count(layers_obj);

@@ -53,15 +53,7 @@ static void _on_obj_change(uint64_t obj,
                            void *data);
 
 void _texture_resource_online(uint64_t name,
-                              struct ce_vio *input,
                               uint64_t obj) {
-
-    const uint64_t size = input->size(input);
-    char *data = CE_ALLOC(_G.allocator, char, size);
-    input->read(input, data, 1, size);
-
-    ce_cdb_a0->load(ce_cdb_a0->db(), data, obj, _G.allocator);
-
     ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
 
     uint64_t blob_size = 0;

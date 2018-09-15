@@ -70,7 +70,6 @@ struct ct_resource_i0 {
     void *(*get_interface)(uint64_t name_hash);
 
     void (*online)(uint64_t name,
-                   struct ce_vio *input,
                    uint64_t obj);
 
     void (*offline)(uint64_t name,

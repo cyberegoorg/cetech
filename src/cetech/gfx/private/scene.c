@@ -41,15 +41,8 @@ static struct _G {
 //==============================================================================
 
 static void online(uint64_t name,
-                   struct ce_vio *input,
                    uint64_t obj) {
     CE_UNUSED(name);
-
-    const uint64_t size = input->size(input);
-    char *data = CE_ALLOC(_G.allocator, char, size);
-    input->read(input, data, 1, size);
-
-    ce_cdb_a0->load(ce_cdb_a0->db(), data, obj, _G.allocator);
 
     uint64_t geom_count = ce_cdb_a0->read_uint64(obj, SCENE_GEOM_COUNT, 0);
     ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(obj, SCENE_VB_DECL,
@@ -88,7 +81,8 @@ static void online(uint64_t name,
         ce_cdb_obj_o *geom_writer = ce_cdb_a0->write_begin(geom_obj);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
-        ce_cdb_a0->set_uint64(geom_writer, SCENE_SIZE_PROP, size);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, ib_size[i]);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_SIZE, vb_size[i]);
         ce_cdb_a0->write_commit(geom_writer);
 
         ce_cdb_a0->set_ref(writer, geom_name[i], geom_obj);
