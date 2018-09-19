@@ -122,6 +122,8 @@ union type_u {
 };
 
 static struct object_t *_get_object_from_objid(uint64_t objid) {
+    CE_ASSERT(LOG_WHERE, objid != 0);
+
     uint64_t idx = *(uint64_t *) objid;
 
     return &_G.dbs[0].object_pool[idx];

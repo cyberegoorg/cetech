@@ -1,6 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "include/sqlite3/sqlite3.h"
 
@@ -20,11 +21,84 @@
 
 #include "cetech/resource/builddb.h"
 
+#define LOG_WHERE "builddb"
+#define MAX_WORKERS TASK_MAX_WORKERS
+
 #define _G BUILDDB_GLOBALS
+
+struct sqls_s {
+    sqlite3_stmt *put_file;
+    sqlite3_stmt *put_file_blob;
+    sqlite3_stmt *load_file_blob;
+    sqlite3_stmt *set_file_depend;
+    sqlite3_stmt *get_filename;
+    sqlite3_stmt *need_compile;
+};
+
 static struct _G {
-    sqlite3 *db[TASK_MAX_WORKERS];
+    sqlite3 *db[MAX_WORKERS];
+    struct sqls_s sqls[MAX_WORKERS];
     char *_logdb_path;
 } _G = {};
+
+
+static bool _init_sqls() {
+    for (int j = 0; j < MAX_WORKERS; ++j) {
+        sqlite3_open_v2(_G._logdb_path,
+                        &_G.db[j],
+                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE |
+                        SQLITE_OPEN_NOMUTEX,
+                        NULL);
+
+        sqlite3_exec(_G.db[j], "PRAGMA synchronous = NORMAL", NULL, NULL,
+                     NULL);
+        sqlite3_exec(_G.db[j], "PRAGMA journal_mode = WAL", NULL, NULL,
+                     NULL);
+
+        sqlite3 *_db = _G.db[j];
+        struct sqls_s *sqls = &_G.sqls[j];
+
+        sqlite3_prepare_v2(_db,
+                           "INSERT OR REPLACE INTO files VALUES(NULL, ?1, ?2, ?3, ?4);",
+                           -1, &sqls->put_file, NULL);
+
+        sqlite3_prepare_v2(_db,
+                           "INSERT OR REPLACE INTO resource_data VALUES(?1, ?2, ?3);",
+                           -1, &sqls->put_file_blob, NULL);
+
+        sqlite3_prepare_v2(_db,
+                           "SELECT data FROM resource_data WHERE type = ?1 AND name = ?2;",
+                           -1, &sqls->load_file_blob, NULL);
+
+        sqlite3_prepare_v2(_db,
+                           "INSERT INTO file_dependency (filename, depend_on)"
+                           " SELECT ?1, ?2"
+                           " WHERE NOT EXISTS("
+                           "  SELECT 1 FROM file_dependency"
+                           "   WHERE filename = ?1 AND depend_on = ?2"
+                           ");",
+                           -1, &sqls->set_file_depend, NULL);
+
+        sqlite3_prepare_v2(_db,
+                           "SELECT filename FROM files WHERE type = ?1 AND name = ?2;",
+                           -1, &sqls->get_filename, NULL);
+
+        sqlite3_prepare_v2(_db,
+                           "SELECT\n"
+                           "    file_dependency.depend_on, files.mtime\n"
+                           "FROM\n"
+                           "    file_dependency\n"
+                           "JOIN\n"
+                           "    files on files.filename == file_dependency.depend_on\n"
+                           "WHERE\n"
+                           "    file_dependency.filename = ?1\n",
+                           -1, &sqls->need_compile, NULL);
+
+    }
+
+    return true;
+}
+
 
 static int _step(sqlite3 *db,
                  sqlite3_stmt *stmt) {
@@ -35,32 +109,40 @@ static int _step(sqlite3 *db,
         rc = sqlite3_step(stmt);
         switch (rc) {
             case SQLITE_LOCKED:
-                ce_log_a0->warning("builddb", "SQL locked '%s' (%d): %s",
+                ce_log_a0->warning(LOG_WHERE, "SQL locked '%s' (%d): %s",
                                    sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
-
-                sqlite3_reset(stmt);
                 run = 1;
                 continue;
 
             case SQLITE_BUSY:
                 run = 1;
+                sqlite3_reset(stmt);
                 continue;
 
             case SQLITE_ROW:
             case SQLITE_DONE:
                 run = 0;
                 break;
-
             default:
                 ce_log_a0->error("builddb", "SQL error '%s' (%d): %s",
                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
-
                 run = 0;
                 break;
         }
     } while (run);
 
+    if ((rc != SQLITE_ROW)) {
+        sqlite3_reset(stmt);
+    }
+
+
     return rc;
+}
+
+static struct sqls_s *_get_sqls() {
+    uint32_t worker_idx = ce_task_a0->worker_id();
+    struct sqls_s *sqls = &_G.sqls[worker_idx];
+    return sqls;
 }
 
 static sqlite3 *_opendb() {
@@ -110,10 +192,9 @@ const char *CREATE_SQL[] = {
         "CREATE TABLE IF NOT EXISTS files (\n"
         "id       INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
         "filename TEXT    UNIQUE                          NOT NULL,\n"
-        "name     INTEGER                                 NOT NULL,\n"
         "type     INTEGER                                 NOT NULL,\n"
-        "mtime    INTEGER                                 NOT NULL,\n"
-        "data     BLOB                                            \n"
+        "name     INTEGER                                 NOT NULL,\n"
+        "mtime    INTEGER                                 NOT NULL\n"
         ");",
 
         "CREATE INDEX IF NOT EXISTS files_name_type_index ON files (name, type);",
@@ -122,7 +203,15 @@ const char *CREATE_SQL[] = {
         "id        INTEGER PRIMARY KEY    AUTOINCREMENT    NOT NULL,\n"
         "filename  TEXT                                    NOT NULL,\n"
         "depend_on TEXT                                    NOT NULL\n"
+        ");",
+
+        "CREATE TABLE IF NOT EXISTS resource_data (\n"
+        "type     INTEGER                                 NOT NULL,\n"
+        "name     INTEGER                                 NOT NULL,\n"
+        "data     BLOB,                                            \n"
+        "PRIMARY KEY (type, name)"
         ");"
+        ""
 };
 
 static int builddb_init_db() {
@@ -143,11 +232,15 @@ static int builddb_init_db() {
 
     ce_buffer_free(build_dir_full, ce_memory_a0->system);
 
+
     for (int i = 0; i < CE_ARRAY_LEN(CREATE_SQL); ++i) {
         if (!_do_sql(CREATE_SQL[i])) {
             return 0;
         }
     }
+
+    _init_sqls();
+
     return 1;
 }
 
@@ -171,71 +264,62 @@ static void type_name_from_filename(const char *fullname,
     }
 }
 
-static void builddb_set_file(const char *filename,
+static void builddb_put_file(const char *filename,
                              time_t mtime,
                              const char *data,
                              uint64_t size) {
-    static const char *sql = "INSERT OR REPLACE INTO files VALUES(NULL, ?1, ?2, ?3, ?4, ?5);";
 
     sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
-
+    struct sqls_s *sqls = _get_sqls();
 
     struct ct_resource_id rid;
 
     type_name_from_filename(filename, &rid, NULL);
 
-    sqlite3_bind_text(stmt, 1, filename, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int64(stmt, 2, rid.name);
-    sqlite3_bind_int64(stmt, 3, rid.type);
-    sqlite3_bind_int64(stmt, 4, mtime);
-    sqlite3_bind_blob(stmt, 5, data, size, NULL);
-    _step(_db, stmt);
+    sqlite3_bind_text(sqls->put_file, 1, filename, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(sqls->put_file, 2, rid.type);
+    sqlite3_bind_int64(sqls->put_file, 3, rid.name);
+    sqlite3_bind_int64(sqls->put_file, 4, mtime);
 
-    sqlite3_finalize(stmt);
+    _step(_db, sqls->put_file);
 
+    sqlite3_bind_int64(sqls->put_file_blob, 1, rid.type);
+    sqlite3_bind_int64(sqls->put_file_blob, 2, rid.name);
+    sqlite3_bind_blob(sqls->put_file_blob, 3, data, size, NULL);
+    _step(_db, sqls->put_file_blob);
 }
 
 bool builddb_load_cdb_file(struct ct_resource_id resource,
                            uint64_t object,
                            struct ce_alloc *allocator) {
-    static const char *sql = "SELECT data FROM files WHERE type = ?1 AND name = ?2;";
-
     sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
+    struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_int64(stmt, 1, resource.type);
-    sqlite3_bind_int64(stmt, 2, resource.name);
 
-    int ok = _step(_db, stmt) == SQLITE_ROW;
+    sqlite3_bind_int64(sqls->load_file_blob, 1, resource.type);
+    sqlite3_bind_int64(sqls->load_file_blob, 2, resource.name);
+
+    int ok = _step(_db, sqls->load_file_blob) == SQLITE_ROW;
+
     if (ok) {
-        const char *data = sqlite3_column_blob(stmt, 0);
+        const char *data = sqlite3_column_blob(sqls->load_file_blob, 0);
         ce_cdb_a0->load(ce_cdb_a0->db(), data, object, allocator);
+        _step(_db, sqls->load_file_blob);
     }
-
-    sqlite3_finalize(stmt);
-
 
     return ok != 0;
 }
 
 static void builddb_set_file_depend(const char *filename,
                                     const char *depend_on) {
-    static const char *sql = "INSERT INTO file_dependency (filename, depend_on) SELECT ?1, ?2 WHERE NOT EXISTS(SELECT 1 FROM file_dependency WHERE filename = ?1 AND depend_on = ?2);";
-
     sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
+    struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_text(stmt, 1, filename, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 2, depend_on, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->set_file_depend, 1, filename, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->set_file_depend, 2, depend_on, -1,
+                      SQLITE_TRANSIENT);
 
-    _step(_db, stmt);
-
-    sqlite3_finalize(stmt);
-
+    _step(_db, sqls->set_file_depend);
 }
 
 
@@ -244,63 +328,46 @@ static int buildb_get_filename_type_name(char *filename,
                                          uint64_t type,
                                          uint64_t name) {
 
-    static const char *sql = "SELECT filename FROM files WHERE type = ?1 AND name = ?2;";
-
     sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
+    struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_int64(stmt, 1, type);
-    sqlite3_bind_int64(stmt, 2, name);
+    sqlite3_bind_int64(sqls->get_filename, 1, type);
+    sqlite3_bind_int64(sqls->get_filename, 2, name);
 
     int ok = 0;
-    while (_step(_db, stmt) == SQLITE_ROW) {
-        const unsigned char *fn = sqlite3_column_text(stmt, 0);
+    while (_step(_db, sqls->get_filename) == SQLITE_ROW) {
+        const unsigned char *fn = sqlite3_column_text(sqls->get_filename, 0);
 
         snprintf(filename, max_len, "%s", fn);
     }
     ok = 1;
-
-    sqlite3_finalize(stmt);
 
 
     return ok;
 }
 
 static int builddb_need_compile(const char *filename) {
-    static const char *sql = "SELECT\n"
-                             "    file_dependency.depend_on, files.mtime\n"
-                             "FROM\n"
-                             "    file_dependency\n"
-                             "JOIN\n"
-                             "    files on files.filename == file_dependency.depend_on\n"
-                             "WHERE\n"
-                             "    file_dependency.filename = ?1\n";
-
     int compile = 1;
 
     sqlite3 *_db = _opendb();
-    sqlite3_stmt *stmt;
-    sqlite3_prepare_v2(_db, sql, -1, &stmt, NULL);
+    struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_text(stmt, 1, filename, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->need_compile, 1, filename, -1, SQLITE_TRANSIENT);
 
-    while (_step(_db, stmt) == SQLITE_ROW) {
+    while (_step(_db, sqls->need_compile) == SQLITE_ROW) {
         compile = 0;
-        const char *dep_file = (const char *) sqlite3_column_text(stmt, 0);
+        const char *dep_file = (const char *) sqlite3_column_text(
+                sqls->need_compile, 0);
 
         time_t actual_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dep_file);
 
-        time_t last_mtime = sqlite3_column_int64(stmt, 1);
+        time_t last_mtime = sqlite3_column_int64(sqls->need_compile, 1);
 
         if (actual_mtime != last_mtime) {
             compile = 1;
             break;
         }
     }
-
-    sqlite3_finalize(stmt);
-
 
     return compile;
 }
@@ -314,7 +381,7 @@ void _add_dependency(const char *who_filename,
 }
 
 static struct ct_builddb_a0 build_db_api = {
-        .put_file = builddb_set_file,
+        .put_file = builddb_put_file,
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
         .get_filename_type_name = buildb_get_filename_type_name,

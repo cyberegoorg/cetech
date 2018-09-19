@@ -16,7 +16,7 @@ add_definitions(-DCETECH_USE_SDL)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CONFIGURATION debug)
-    add_definitions(-DCETECH_DEBUG)
+    add_definitions(-DDEBUG)
 else ()
     set(CONFIGURATION release)
 endif ()
@@ -45,6 +45,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 ################################################################################
 
 set(EXTERNAL_SOURCE_FILES
+        src/sqlite/private/sqlite3.c
         ########################################################################
         # Externals: MPack
         ########################################################################
@@ -202,7 +203,6 @@ set(RELEASE_LIBS
         bimgRelease.a
         bxRelease.a
 
-        sqlite3.a
         SDL2.a
 
         assimp.a
@@ -220,7 +220,6 @@ set(RELEASE_LIBS2
 
         nanomsg
         bgfx-shared-libRelease
-        sqlite3
         assimp
         SDL2
         #luajit

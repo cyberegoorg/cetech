@@ -68,13 +68,13 @@ static void _trace_alloc(void *ptr,
 
     idx = ce_array_size(_G.memory_trace_pool);
     ce_array_push(_G.memory_trace_pool, trace, &_allocator);
-    ct_hash_add(&_G.memory_trace_map, (uint64_t) ptr, idx, &_allocator);
+    ce_hash_add(&_G.memory_trace_map, (uint64_t) ptr, idx, &_allocator);
 
     ce_os_a0->thread->spin_unlock(&_G.lock);
 }
 
 static void _trace_free(void *ptr) {
-    uint64_t idx = ct_hash_lookup(&_G.memory_trace_map,
+    uint64_t idx = ce_hash_lookup(&_G.memory_trace_map,
                                   (uint64_t) ptr,
                                   UINT64_MAX);
 
@@ -88,10 +88,10 @@ static void _trace_free(void *ptr) {
     _G.memory_trace_pool[idx] = _G.memory_trace_pool[last_idx];
     ce_array_pop_back(_G.memory_trace_pool);
 
-    ct_hash_add(&_G.memory_trace_map, (uint64_t) _G.memory_trace_pool[idx].ptr,
+    ce_hash_add(&_G.memory_trace_map, (uint64_t) _G.memory_trace_pool[idx].ptr,
                 idx, &_allocator);
 
-    ct_hash_remove(&_G.memory_trace_map, (uint64_t) ptr);
+    ce_hash_remove(&_G.memory_trace_map, (uint64_t) ptr);
     ce_os_a0->thread->spin_unlock(&_G.lock);
 }
 #endif

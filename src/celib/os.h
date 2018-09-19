@@ -12,7 +12,7 @@
 
 struct ce_alloc;
 
-#ifdef CE_DEBUG
+#ifdef DEBUG
 #define CE_ASSERT(where, condition)                                 \
     do {                                                                \
         if (!(condition)) {                                             \

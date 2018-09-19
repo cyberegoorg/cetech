@@ -4,6 +4,7 @@
 #include <celib/module.h>
 #include <celib/api_system.h>
 #include <celib/task.h>
+#include <celib/os.h>
 
 #include "celib/macros.h"
 
@@ -30,7 +31,13 @@ static void vlog(const enum ce_log_level level,
     //CE_ASSERT("logsystem", _globals.data != nullptr);
 
     char msg[4096];     //!< Final msg.
-    vsnprintf(msg, 4096, format, va);
+    int s = vsnprintf(msg, CE_ARRAY_LEN(msg), format, va);
+
+    if(level == LOG_ERROR) {
+        char *st = ce_os_a0->error->stacktrace(4);
+        snprintf(msg + s, CE_ARRAY_LEN(msg) - s, "\n    stacktrace:\n%s\n", st);
+        ce_os_a0->error->stacktrace_free(st);
+    }
 
     time_t tm = time(NULL);
 

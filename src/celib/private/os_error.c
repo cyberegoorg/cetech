@@ -85,14 +85,11 @@ void ct_error_assert(const char *where,
                      const char *condition,
                      const char *filename,
                      int line) {
-    char *st = stacktrace(1);
     ce_log_a0->error(where,
-                     "msg: \"%s\n  file: %s:%d\n  stacktrace:\n%s",
+                     "assert: %s %s:%d",
                      condition,
                      filename,
-                     line,
-                     st);
-    stacktrace_free(st);
+                     line);
     abort();
 }
 

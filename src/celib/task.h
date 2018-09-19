@@ -14,8 +14,8 @@
 
 //! Worker enum
 enum ce_workers {
-    TASK_WORKER_MAIN = 0, //!< Main worker
-    TASK_MAX_WORKERS = 255,     //!< Max workers
+    TASK_WORKER_MAIN = 0,  //!< Main worker
+    TASK_MAX_WORKERS = 32, //!< Max workers
 };
 
 

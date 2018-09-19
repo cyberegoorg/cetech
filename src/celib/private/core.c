@@ -14,11 +14,7 @@ struct sigaction sigact;
 
 static void signal_handler(int sig) {
     if (sig == SIGSEGV){
-        char* stacktrace = ce_os_a0->error->stacktrace(1);
-
-        ce_log_a0->error("hell", "%s", stacktrace);
-
-        ce_os_a0->error->stacktrace_free(stacktrace);
+        ce_log_a0->error("hell", "");
         exit(-1);
     }
 }
