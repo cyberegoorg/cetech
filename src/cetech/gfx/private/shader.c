@@ -106,11 +106,11 @@ const char *vs_profile = "120";
 const char *fs_profile = "120";
 #elif CE_PLATFORM_OSX
 //const char *platform = "osx";
-//const char *vs_profile = "metal";
-//const char *fs_profile = "metal";
-const char *vs_profile = "120";
-const char *fs_profile = "120";
-#else
+const char *vs_profile = "metal";
+const char *fs_profile = "metal";
+//const char *vs_profile = "120";
+//const char *fs_profile = "120";
+#elif CE_PLATFORM_WINDOWS
 const char* platform = "windows";
 const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";

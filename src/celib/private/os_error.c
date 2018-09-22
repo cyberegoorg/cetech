@@ -85,6 +85,7 @@ void ct_error_assert(const char *where,
                      const char *condition,
                      const char *filename,
                      int line) {
+
     ce_log_a0->error(where,
                      "assert: %s %s:%d",
                      condition,

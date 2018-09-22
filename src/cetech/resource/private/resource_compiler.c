@@ -112,8 +112,13 @@ static void _compile_task(void *data) {
                          "Resource \"%s\" compilation fail",
                          tdata->source_filename);
     } else {
+        struct ct_resource_id resource_id;
+        type_name_from_filename(tdata->source_filename, &resource_id, NULL);
+
         ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime,
                                 output_blob, ce_array_size(output_blob));
+
+        ct_builddb_a0->put_resource(resource_id, tdata->source_filename);
 
         ct_builddb_a0->set_file_depend(tdata->source_filename,
                                        tdata->source_filename);
@@ -124,8 +129,7 @@ static void _compile_task(void *data) {
 
     ce_array_free(output_blob, _G.allocator);
 
-    CE_FREE(_G.allocator,
-            tdata->source_filename);
+    CE_FREE(_G.allocator, tdata->source_filename);
 
     atomic_store_explicit(&tdata->completed, 1, memory_order_release);
 }

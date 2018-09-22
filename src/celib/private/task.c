@@ -235,7 +235,7 @@ static void _init(struct ce_api_a0 *api) {
     ce_log_a0->info("task", "Core/Main/Worker: %d, %d, %d",
                     core_count, main_threads_count, worker_count);
 
-    _G.workers_count = worker_count;
+    _G.workers_count = worker_count + 1;
 
     queue_task_init(&_G.job_queue, MAX_TASK, _G.allocator);
     queue_task_init(&_G.free_task, MAX_TASK, _G.allocator);
@@ -244,11 +244,10 @@ static void _init(struct ce_api_a0 *api) {
     atomic_init(&_G.counter_pool_idx, 1);
     atomic_init(&_G.task_pool_idx, 1);
 
-    for (uint32_t j = 0; j < worker_count; ++j) {
+    for (uint32_t j = 1; j < worker_count; ++j) {
         _G.workers[j] = ce_os_a0->thread->create(_task_worker,
-                                                    "cetech_worker",
-                                                    (void *) ((intptr_t) (j +
-                                                                          1)));
+                                                 "cetech_worker",
+                                                 (void *) ((intptr_t) (j)));
     }
 
     _G.is_running = 1;
@@ -258,7 +257,7 @@ static void _shutdown() {
     _G.is_running = 0;
     int status = 0;
 
-    for (uint32_t i = 0; i < _G.workers_count; ++i) {
+    for (uint32_t i = 1; i < _G.workers_count; ++i) {
         ce_os_a0->thread->wait(_G.workers[i], &status);
     }
 

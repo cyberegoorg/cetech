@@ -20,6 +20,7 @@
 #include <cetech/gfx/renderer.h>
 #include <cetech/game_system/game_system.h>
 #include <cetech/static_module.h>
+#include <cetech/resource/builddb.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {

@@ -131,7 +131,7 @@ static void renderer_create() {
 #if CE_PLATFORM_LINUX
                     BGFX_RENDERER_TYPE_OPENGL
 #elif CE_PLATFORM_OSX
-                    BGFX_RENDERER_TYPE_OPENGL // metal in future
+                    BGFX_RENDERER_TYPE_METAL// metal in future
 #endif
             },
     };

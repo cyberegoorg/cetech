@@ -11,11 +11,15 @@ struct ct_builddb_a0 {
                      const char *data,
                      uint64_t size);
 
+    void (*put_resource)(struct ct_resource_id resource,
+                         const char *filename);
+
     void (*set_file_depend)(const char *filename,
                             const char *depend_on);
 
     bool (*load_cdb_file)(struct ct_resource_id resource,
-                            uint64_t object, struct ce_alloc *allocator);
+                          uint64_t object,
+                          struct ce_alloc *allocator);
 
     int (*get_filename_type_name)(char *filename,
                                   size_t max_len,
