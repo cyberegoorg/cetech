@@ -1,10 +1,11 @@
-#include <stdio.h>
+
 #include <stdint.h>
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/api_system.h>
 #include <celib/task.h>
 #include <celib/os.h>
+#include <stdio.h>
 
 #include "celib/macros.h"
 

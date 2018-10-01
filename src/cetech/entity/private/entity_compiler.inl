@@ -15,6 +15,7 @@
 #include <celib/ydb.h>
 #include <celib/hash.inl>
 #include <celib/yng.h>
+#include <cetech/resource/builddb.h>
 
 #include "celib/handler.inl"
 
@@ -97,7 +98,8 @@ static void compile_entitity(const char *filename,
         ce_cdb_a0->set_str(writer, PREFAB_NAME_PROP, prefab);
     }
 
-    uint64_t components_obj = ce_cdb_a0->create_object(_G.db, ENTITY_COMPONENTS);
+    uint64_t components_obj = ce_cdb_a0->create_object(_G.db,
+                                                       ENTITY_COMPONENTS);
     ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
 
     uint64_t children_obj = ce_cdb_a0->create_object(_G.db, ENTITY_CHILDREN);
@@ -167,32 +169,13 @@ static void destroy_output(struct ct_entity_compile_output *output) {
     CE_FREE(_G.allocator, output);
 }
 
-static void compile_entity(struct ct_entity_compile_output *output,
-                           uint64_t *root,
-                           uint32_t root_count,
-                           const char *filename) {
-    compile_entitity(filename, root, root_count, UINT32_MAX, 0, output, NULL);
-}
 
-static void write_to_build(struct ct_entity_compile_output *output,
-                           const char *filename,
-                           char **build) {
-    CE_UNUSED(filename);
-
-    ce_array_push_n(*build, output->entity_data,
-                    ce_array_size(output->entity_data), _G.allocator);
-}
-
-static void _entity_resource_compiler(uint64_t root,
-                                      const char *filename,
-                                      char **build) {
+static bool resource_compiler(const char *filename, struct ct_resource_id rid) {
     struct ct_entity_compile_output *output = create_output();
-    compile_entity(output, &root, 1, filename);
-    write_to_build(output, filename, build);
-    destroy_output(output);
-}
+    compile_entitity(filename, NULL, 0, UINT32_MAX, 0, output, NULL);
 
-static void resource_compiler(const char *filename,
-                              char **output) {
-    _entity_resource_compiler(0, filename, output);
+    ct_builddb_a0->put_resource(rid, filename, output->entity_data,
+                                ce_array_size(output->entity_data));
+    destroy_output(output);
+    return true;
 }

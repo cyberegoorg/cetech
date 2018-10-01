@@ -6,18 +6,14 @@
 #include <memory.h>
 
 #include <celib/buffer.inl>
-
 #include <celib/api_system.h>
 #include <celib/os.h>
-
 #include <celib/module.h>
 #include <celib/memory.h>
 #include <celib/config.h>
-
 #include <celib/hashlib.h>
 #include <celib/fs.h>
 #include <celib/cdb.h>
-#include <cetech/kernel/kernel.h>
 
 #include "celib/log.h"
 

@@ -28,6 +28,7 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 #include <celib/log.h>
+#include <celib/buffer.inl>
 
 
 #define _G scene_compiler_globals
@@ -483,10 +484,11 @@ static int _compile_assimp(const char *filename,
 
     ct_builddb_a0->add_dependency(filename, input_str);
 
-    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_SRC, "");
+    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(),
+                                                 CONFIG_SRC, "");
     char *input_path = NULL;
     ce_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
-                            input_str);
+                         input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
@@ -500,7 +502,7 @@ static int _compile_assimp(const char *filename,
     const struct aiScene *scene = aiImportFile(input_path,
                                                postprocess_flag);
 
-    if(!scene) {
+    if (!scene) {
         ce_log_a0->error("scene_compiler", "Could not import %s", input_path);
         return 0;
     }
@@ -533,7 +535,8 @@ static int _compile_assimp(const char *filename,
         strncpy(tmp_name, tmp_buffer, 127);
         ce_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
 
-        ce_array_push(output->geom_name, ce_id_a0->id64(tmp_buffer), _G.allocator);
+        ce_array_push(output->geom_name, ce_id_a0->id64(tmp_buffer),
+                      _G.allocator);
         ce_array_push(output->ib_offset, ce_array_size(output->ib),
                       _G.allocator);
         ce_array_push(output->vb_offset, ce_array_size(output->vb),
@@ -607,8 +610,7 @@ static int _compile_assimp(const char *filename,
     return 1;
 }
 
-extern "C" void scene_compiler(const char *filename,
-                               char **output_blob) {
+extern "C" bool scene_compiler(const char *filename, struct ct_resource_id rid) {
     struct compile_output *output = _crete_compile_output();
 
     ce_yng_doc *document = ce_ydb_a0->get(filename);
@@ -624,7 +626,7 @@ extern "C" void scene_compiler(const char *filename,
 
     if (!ret) {
         _destroy_compile_output(output);
-        return;
+        return false;
     }
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SCENE_TYPE);
@@ -638,7 +640,7 @@ extern "C" void scene_compiler(const char *filename,
     ce_cdb_a0->set_uint64(w, SCENE_VB_LEN, ce_array_size(output->vb));
     ce_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
                         sizeof(*output->geom_name) *
-                                ce_array_size(output->geom_name));
+                        ce_array_size(output->geom_name));
 
     ce_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
                         sizeof(*output->ib_offset) *
@@ -679,10 +681,17 @@ extern "C" void scene_compiler(const char *filename,
                         ce_array_size(output->node_str));
     ce_cdb_a0->write_commit(w);
 
-    ce_cdb_a0->dump(obj, output_blob, ce_memory_a0->system);
+    char *output_blob = NULL;
+    ce_cdb_a0->dump(obj, &output_blob, ce_memory_a0->system);
     ce_cdb_a0->destroy_object(obj);
 
+    ct_builddb_a0->put_resource(rid, filename, output_blob,
+                                ce_array_size(output_blob));
+    ce_buffer_free(output_blob, _G.allocator);
+
     _destroy_compile_output(output);
+
+    return true;
 }
 
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {

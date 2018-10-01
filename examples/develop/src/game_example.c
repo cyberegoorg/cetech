@@ -1,6 +1,5 @@
 #define CE_DYNAMIC_MODULE 1
 
-#include <string.h>
 
 #include <celib/macros.h>
 #include <celib/log.h>

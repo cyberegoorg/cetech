@@ -17,6 +17,8 @@
 #include "cetech/resource/resource.h"
 
 #include <cetech/gfx/material.h>
+#include <cetech/resource/builddb.h>
+#include <celib/buffer.inl>
 #include "material.h"
 
 #define _G material_compiler_globals
@@ -203,8 +205,7 @@ void name_from_filename(const char *fullname,
     memcpy(name, fullname, size);
 }
 
-void material_compiler(const char *filename,
-                       char **output_blob) {
+bool material_compiler(const char *filename, struct ct_resource_id rid) {
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_TYPE);
 
@@ -235,10 +236,18 @@ void material_compiler(const char *filename,
         ce_cdb_a0->write_commit(w);
 
 //    name_from_filename(filename, resource.asset_name);
-        ce_cdb_a0->dump(obj, output_blob, ce_memory_a0->system);
+
+        char* output_blob = NULL;
+        ce_cdb_a0->dump(obj, &output_blob, ce_memory_a0->system);
+        ct_builddb_a0->put_resource(rid, filename, output_blob,
+                                    ce_array_size(output_blob));
+
+        ce_buffer_free(output_blob, _G.allocator);
     }
 
     ce_cdb_a0->destroy_object(obj);
+
+    return true;
 }
 
 int materialcompiler_init(struct ce_api_a0 *api) {

@@ -2,17 +2,18 @@
 #define CETECH_BUILDDB_H
 
 #include <stdint.h>
+#include <time.h>
 
 struct ct_resource_id;
 
 struct ct_builddb_a0 {
     void (*put_file)(const char *filename,
-                     time_t mtime,
-                     const char *data,
-                     uint64_t size);
+                     time_t mtime);
 
-    void (*put_resource)(struct ct_resource_id resource,
-                         const char *filename);
+    void (*put_resource)(struct ct_resource_id rid,
+                         const char *filename,
+                         const char *data,
+                         uint64_t size);
 
     void (*set_file_depend)(const char *filename,
                             const char *depend_on);

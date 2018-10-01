@@ -3,9 +3,9 @@
 //==============================================================================
 
 #include <stddef.h>
+
 #include <celib/api_system.h>
 #include <celib/memory.h>
-#include <cetech/resource/resource.h>
 #include <celib/task.h>
 #include <celib/os.h>
 #include <celib/hashlib.h>
@@ -14,7 +14,11 @@
 #include <celib/array.inl>
 #include <celib/cdb.h>
 #include <celib/yng.h>
+
+#include <cetech/resource/resource.h>
 #include <cetech/resource/package.h>
+#include <cetech/resource/builddb.h>
+#include <celib/buffer.inl>
 
 //==============================================================================
 // Public interface
@@ -57,8 +61,7 @@ static uint64_t cdb_type() {
 // Resource compiler
 //==============================================================================
 
-void _package_compiler(const char *filename,
-                       char **output) {
+bool _package_compiler(const char *filename, struct ct_resource_id rid) {
     uint64_t tmp_keys = 0;
 
     uint64_t type_keys[32] = {};
@@ -102,8 +105,14 @@ void _package_compiler(const char *filename,
 
     ce_cdb_a0->write_commit(w_types_obj);
 
-    ce_cdb_a0->dump(obj, output, _G.allocator);
+    char* output = NULL;
+    ce_cdb_a0->dump(obj, &output, _G.allocator);
     ce_cdb_a0->destroy_object(obj);
+
+    ct_builddb_a0->put_resource(rid, filename, output, ce_array_size(output));
+    ce_buffer_free(output, _G.allocator);
+
+    return true;
 }
 
 static struct ct_resource_i0 ct_resource_i0 = {

@@ -215,8 +215,7 @@ static void _on_obj_change(uint64_t obj,
     }
 }
 
-void texture_compiler(const char *filename,
-                      char **output) {
+bool texture_compiler(const char *filename, struct ct_resource_id rid) {
 
     struct ce_alloc *a = ce_memory_a0->system;
 
@@ -240,10 +239,16 @@ void texture_compiler(const char *filename,
 
     _compile(obj);
 
-    ce_cdb_a0->dump(obj, output, a);
+    char* output = NULL;
+    ce_cdb_a0->dump(obj, &output, a);
     ce_cdb_a0->destroy_object(obj);
 
+    ct_builddb_a0->put_resource(rid, filename, output, ce_array_size(output));
+    ce_buffer_free(output, _G.allocator);
+
     ct_builddb_a0->add_dependency(filename, input_str);
+
+    return true;
 }
 
 static uint64_t cdb_type() {

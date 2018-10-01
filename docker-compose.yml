@@ -1,8 +1,32 @@
 version: '3'
-services: 
+services:
   toolchain:
     build:
       context: ./toolchain/
 
-    volumes: 
-      - ./:/cetech/
+    working_dir: /cetech/
+
+    volumes:
+    - ./:/cetech/
+
+  build:
+    build:
+      context: ./toolchain/
+
+    working_dir: /cetech/
+
+    volumes:
+    - ./:/cetech/
+
+    command: bash -c 'tools/linux64/genie --gcc=linux-clang gmake && make -C .build/projects/gmake-linux-clang/ config=debug64'
+
+  build-externals:
+    build:
+      context: ./toolchain/
+
+    working_dir: /cetech/
+
+    volumes:
+    - ./:/cetech/
+
+    command: python3 externals/externals.py -v

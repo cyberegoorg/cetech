@@ -42,14 +42,6 @@ struct ce_alloc;
 struct ce_config_a0;
 
 //==============================================================================
-// Typedefs
-//==============================================================================
-
-typedef void (*ct_resource_compilator_t)(const char *filename,
-                                         char **output);
-
-
-//==============================================================================
 // Structs
 //==============================================================================
 
@@ -75,11 +67,16 @@ struct ct_resource_i0 {
     void (*offline)(uint64_t name,
                     uint64_t obj);
 
-    void (*compilator)(const char *filename,
-                       char **output);
+    bool (*compilator)(const char *filename,
+                       struct ct_resource_id rid);
 };
 
+//==============================================================================
+// Typedefs
+//==============================================================================
 
+typedef bool (*ct_resource_compilator_t)(const char *filename,
+                                         struct ct_resource_id rid);
 
 //==============================================================================
 // Api

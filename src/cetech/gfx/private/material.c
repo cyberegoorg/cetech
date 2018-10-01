@@ -321,8 +321,7 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-void material_compiler(const char *filename,
-                       char **output_blob);
+bool material_compiler(const char *filename, struct ct_resource_id rid);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,

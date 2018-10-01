@@ -9,6 +9,7 @@
 /.build/
 /cmake-build-debug/
 /cmake-build-release/
+/CMakeFiles/
 /site/
 
 __pycache__

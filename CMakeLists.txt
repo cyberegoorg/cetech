@@ -171,8 +171,7 @@ if (APPLE)
             "-framework Carbon"
             "-framework IOKit"
             "-framework QuartzCore"
-            "-framework OpenGL"
-            "-weak_framework Metal"
+            "-framework Metal"
             )
 
 elseif (UNIX)

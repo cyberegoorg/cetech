@@ -252,30 +252,8 @@ static int builddb_init_db() {
     return 1;
 }
 
-static void type_name_from_filename(const char *fullname,
-                                    struct ct_resource_id *resource_id,
-                                    char *short_name) {
-
-    const char *resource_type = ce_os_a0->path->extension(fullname);
-
-    size_t size = strlen(fullname) - strlen(resource_type) - 1;
-
-    char resource_name[128] = {};
-    memcpy(resource_name, fullname, size);
-
-    resource_id->name = ce_id_a0->id64(resource_name);
-    resource_id->type = ce_id_a0->id64(resource_type);
-
-    if (short_name) {
-        memcpy(short_name, fullname, sizeof(char) * size);
-        short_name[size] = '\0';
-    }
-}
-
 static void builddb_put_file(const char *filename,
-                             time_t mtime,
-                             const char *data,
-                             uint64_t size) {
+                             time_t mtime) {
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -284,25 +262,24 @@ static void builddb_put_file(const char *filename,
     sqlite3_bind_text(sqls->put_file, 2, filename, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int64(sqls->put_file, 3, mtime);
     _step(_db, sqls->put_file);
+}
 
-    struct ct_resource_id rid;
-    type_name_from_filename(filename, &rid, NULL);
+static void put_resource(struct ct_resource_id rid,
+                         const char *filename,
+                         const char *data,
+                         uint64_t size) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
 
     sqlite3_bind_int64(sqls->put_file_blob, 1, rid.type);
     sqlite3_bind_int64(sqls->put_file_blob, 2, rid.name);
     sqlite3_bind_blob(sqls->put_file_blob, 3, data, size, NULL);
     _step(_db, sqls->put_file_blob);
-}
-
-void buildb_put_resource(struct ct_resource_id resource,
-                         const char *filename) {
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
 
     uint64_t id = ce_id_a0->id64(filename);
 
-    sqlite3_bind_int64(sqls->put_resource, 1, resource.type);
-    sqlite3_bind_int64(sqls->put_resource, 2, resource.name);
+    sqlite3_bind_int64(sqls->put_resource, 1, rid.type);
+    sqlite3_bind_int64(sqls->put_resource, 2, rid.name);
     sqlite3_bind_int64(sqls->put_resource, 3, id);
     _step(_db, sqls->put_resource);
 }
@@ -374,7 +351,8 @@ static int builddb_need_compile(const char *filename) {
 
     while (_step(_db, sqls->need_compile) == SQLITE_ROW) {
         compile = 0;
-        const char *dep_file = (const char *) sqlite3_column_text(sqls->need_compile, 0);
+        const char *dep_file = (const char *) sqlite3_column_text(
+                sqls->need_compile, 0);
 
         time_t actual_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dep_file);
 
@@ -399,7 +377,7 @@ void _add_dependency(const char *who_filename,
 
 static struct ct_builddb_a0 build_db_api = {
         .put_file = builddb_put_file,
-        .put_resource = buildb_put_resource,
+        .put_resource = put_resource,
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
         .get_filename_type_name = buildb_get_filename_type_name,
