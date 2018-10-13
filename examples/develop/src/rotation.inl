@@ -135,7 +135,7 @@ static uint64_t rotation_name() {
     return ROTATION_SYSTEM;
 }
 
-static const uint64_t * rotation_before(uint32_t* n) {
+static const uint64_t *rotation_before(uint32_t *n) {
     static uint64_t _before[] = {TRANSFORM_SYSTEM};
     *n = CE_ARRAY_LEN(_before);
 

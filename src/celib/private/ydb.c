@@ -118,6 +118,7 @@ struct ce_yng_node get_first_node_recursive(const char *path,
         return n;
     }
 
+    return (struct ce_yng_node){} ;
     // Find parent
     // A.B.C , parent, A.parent, A.B.parent
     const char *parent_file_str;
@@ -199,7 +200,7 @@ void get_map_keys(const char *path,
     if (n.idx) {
         d->foreach_dict_node(d, n, _foreach_keys, &out_keys);
     }
-
+    return;
     // Find parent
     // A.B.C , parent, A.parent, A.B.parent
     const char *parent_file_str;

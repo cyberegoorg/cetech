@@ -1,0 +1,3 @@
+content/uv_checker.texture:
+  input: content/uv_checker.png
+  gen_mipmaps: true

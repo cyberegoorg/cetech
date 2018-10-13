@@ -55,7 +55,7 @@ void init() {
     ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
     ct_ecs_a0->component->add(_G.world, _G.render_ent,
                               (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                              (void*[]){&rgc});
+                              (void *[]) {&rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
     rgc.graph->call->add_module(rgc.graph, module);

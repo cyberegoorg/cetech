@@ -67,12 +67,12 @@ int init_config(int argc,
 
     char *build_config = NULL;
     ce_os_a0->path->join(&build_config, _G.allocator, 2, build_dir,
-                         "global.config");
+                         "global.yml");
 
     const char *source_dir_str = ce_cdb_a0->read_str(object, CONFIG_SRC, "");
     char *source_config = NULL;
     ce_os_a0->path->join(&source_config, _G.allocator, 2, source_dir_str,
-                         "global.config");
+                         "global.yml");
 
     if (ce_cdb_a0->read_uint64(object, CONFIG_COMPILE, 0)) {
         ce_os_a0->path->make_path(build_dir);

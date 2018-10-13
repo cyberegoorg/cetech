@@ -39,9 +39,7 @@
 
 struct compile_task_data {
     char *source_filename;
-    struct ct_resource_id rid;
     time_t mtime;
-    ct_resource_compilator_t compilator;
 };
 
 static struct _G {
@@ -101,60 +99,60 @@ static void _compile_task(void *data) {
     struct compile_task_data *tdata = (struct compile_task_data *) data;
 
     ce_log_a0->info("resource_compiler.task",
-                    "Compile resource \"%s\" to \"" "%" PRIx64 "%" PRIx64"\"",
-                    tdata->source_filename, tdata->rid.type,
-                    tdata->rid.name);
+                    "Compile resource \"%s\"", tdata->source_filename);
 
-    if (tdata->compilator) {
-        const char **files;
-        uint32_t files_count;
+    const char **files;
+    uint32_t files_count;
 
-        ce_ydb_a0->parent_files(tdata->source_filename, &files,
-                                &files_count);
+    ce_ydb_a0->parent_files(tdata->source_filename, &files,
+                            &files_count);
 
-        for (int i = 0; i < files_count; ++i) {
-            ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
+    for (int i = 0; i < files_count; ++i) {
+        ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
+    }
+
+    uint64_t tmp_keys = 0;
+
+    uint64_t type_keys[32] = {};
+    uint32_t type_keys_count = 0;
+    ce_ydb_a0->get_map_keys(tdata->source_filename,
+                            &tmp_keys, 1,
+                            type_keys, CE_ARRAY_LEN(type_keys),
+                            &type_keys_count);
+
+    for (uint32_t i = 0; i < type_keys_count; ++i) {
+        uint64_t k = type_keys[i];
+
+        const char *resource_name;
+        resource_name = ce_id_a0->str_from_id64(k);
+
+        struct ct_resource_id rid;
+        if (!type_name_from_filename(resource_name, &rid, NULL)) {
+            ce_log_a0->error(LOG_WHERE,
+                             "Invalid format for resource %s:%s ",
+                             tdata->source_filename, resource_name);
+            continue;
         }
 
-        uint64_t tmp_keys = 0;
+        ct_resource_compilator_t compilator = _find_compilator(rid.type);
 
-        uint64_t type_keys[32] = {};
-        uint32_t type_keys_count = 0;
-        ce_ydb_a0->get_map_keys(tdata->source_filename,
-                                &tmp_keys, 1,
-                                type_keys, CE_ARRAY_LEN(type_keys),
-                                &type_keys_count);
+        if(!compilator) {
+            continue;
+        }
 
-        for (uint32_t i = 0; i < type_keys_count; ++i) {
-            uint64_t k = type_keys[i];
+        if (!compilator(tdata->source_filename, k, rid, resource_name)) {
+            ce_log_a0->error("resource_compiler.task",
+                             "Resource \"%s\" compilation fail",
+                             tdata->source_filename);
+        } else {
+            ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
 
-            const char *resource_name;
-            resource_name = ce_id_a0->str_from_id64(k);
+            ct_builddb_a0->set_file_depend(tdata->source_filename,
+                                           tdata->source_filename);
 
-            struct ct_resource_id rid;
-            if (!type_name_from_filename(resource_name, &rid, NULL)) {
-                ce_log_a0->error(LOG_WHERE,
-                                 "Invalid format for resource %s:%s ",
-                                 tdata->source_filename, resource_name);
-                continue;
-            }
-
-            ct_resource_compilator_t compilator = _find_compilator(rid.type);
-
-            if (!compilator(tdata->source_filename, k, tdata->rid, resource_name)) {
-                ce_log_a0->error("resource_compiler.task",
-                                 "Resource \"%s\" compilation fail",
-                                 tdata->source_filename);
-            } else {
-                ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
-
-                ct_builddb_a0->set_file_depend(tdata->source_filename,
-                                               tdata->source_filename);
-
-                ce_log_a0->info("resource_compiler.task",
-                                "Resource \"%s\" compiled",
-                                tdata->source_filename);
-            }
+            ce_log_a0->info("resource_compiler.task",
+                            "Resource \"%s\" compiled",
+                            tdata->source_filename);
         }
     }
 
@@ -166,16 +164,6 @@ void _compile_files(struct ce_task_item **tasks,
                     char **files,
                     uint32_t files_count) {
     for (uint32_t i = 0; i < files_count; ++i) {
-        struct ct_resource_id rid;
-
-        type_name_from_filename(files[i], &rid, NULL);
-
-        ct_resource_compilator_t compilator = _find_compilator(rid.type);
-
-        if (!compilator) {
-            continue;
-        }
-
         if (!ct_builddb_a0->need_compile(files[i])) {
             continue;
         }
@@ -185,10 +173,7 @@ void _compile_files(struct ce_task_item **tasks,
                                                   sizeof(struct compile_task_data));
 
         *data = (struct compile_task_data) {
-                .rid = rid,
-                .compilator = compilator,
-                .source_filename = ce_memory_a0->str_dup(files[i],
-                                                         _G.allocator),
+                .source_filename = ce_memory_a0->str_dup(files[i], _G.allocator),
                 .mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, files[i]),
         };
 
@@ -233,7 +218,7 @@ void _compile_all() {
     uint32_t start_ticks = ce_os_a0->time->ticks();
 
     struct ce_task_item *tasks = NULL;
-    const char *glob_patern = "**.*";
+    const char *glob_patern = "**.yml";
     char **files = NULL;
     uint32_t files_count = 0;
 

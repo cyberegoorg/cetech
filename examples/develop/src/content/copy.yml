@@ -1,0 +1,21 @@
+content/copy.material:
+  layers:
+    default:
+      shader: content/copy
+
+      render_state:
+        rgb_write: true
+        alpha_write: true
+        depth_write: true
+        depth_test_less: true
+        cull_ccw: true
+        msaa: true
+
+      variables:
+        43243243423423:
+          name: s_input_texture
+          type: texture
+
+content/copy.shader:
+  vs_input: 'content/vs_copy.sc'
+  fs_input: 'content/fs_copy.sc'
