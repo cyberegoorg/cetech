@@ -1,35 +1,36 @@
-layers:
-  default:
-    shader: content/shader1
+content/material1.material:
+    layers:
+      default:
+        shader: content/shader1
 
-    render_state:
-      rgb_write: true
-      alpha_write: true
-      depth_write: true
-      depth_test_less: true
-      cull_ccw: true
-      msaa: true
+        render_state:
+          rgb_write: true
+          alpha_write: true
+          depth_write: true
+          depth_test_less: true
+          cull_ccw: true
+          msaa: true
 
-    variables:
-      kdasdvxcvcxbxcbxbg435124asdkj:
-        name: u_texColor
-        type: texture
-        value: content/scene/solider/body01
+        variables:
+          kdasdvxcvcxbxcbxbg435124asdkj:
+            name: u_texColor
+            type: texture
+            value: content/scene/solider/body01
 
-      k22cbxbg435124asdkj:
-        name: u_vec4
-        type: color
-        value: [1.0, 1.0, 1.0, 1.0]
+          k22cbxbg435124asdkj:
+            name: u_vec4
+            type: color
+            value: [1.0, 1.0, 1.0, 1.0]
 
-      fdsgfdsgfgfs:
-        name: u_vec42
-        type: vec4
-        value: [1.0, 1.0, 1.0, 1.0]
+          fdsgfdsgfgfs:
+            name: u_vec42
+            type: vec4
+            value: [1.0, 1.0, 1.0, 1.0]
 
-      kxbxcbxbg435124asdkj:
-        name: u_m44
-        type: mat4
-        value: [1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0]
+          kxbxcbxbg435124asdkj:
+            name: u_m44
+            type: mat4
+            value: [1.0, 1.0, 1.0, 1.0,
+                    1.0, 1.0, 1.0, 1.0,
+                    1.0, 1.0, 1.0, 1.0,
+                    1.0, 1.0, 1.0, 1.0]

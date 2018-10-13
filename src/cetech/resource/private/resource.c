@@ -159,10 +159,16 @@ static void load(uint64_t type,
         ce_log_a0->debug(LOG_WHERE, "Loading resource %s", filename);
         if(!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
             ce_log_a0->error(LOG_WHERE, "Could not load resource %s", filename);
+            ce_cdb_a0->destroy_object(object);
             continue;
         }
 
         resource_i->online(names[i], object);
+
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(object);
+        ce_cdb_a0->set_uint64(w, RESOURCE_NAME_PROP, names[i]);
+        ce_cdb_a0->set_uint64(w, RESOURCE_TYPE_PROP, type);
+        ce_cdb_a0->write_commit(w);
     }
 
     uint64_t type_obj = ce_cdb_a0->read_subobject(_G.resource_db, type, 0);

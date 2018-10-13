@@ -102,7 +102,7 @@ static uint64_t cdb_type() {
 }
 
 
-bool scene_compiler(const char *filename, struct ct_resource_id rid);
+bool scene_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,

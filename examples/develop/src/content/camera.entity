@@ -1,10 +1,11 @@
-components:
-  transform:
-    position: [0, 0, 10]
-    rotation: [0, 0, 0]
-    scale: [1, 1, 1]
+content/camera.entity:
+    components:
+      transform:
+        position: [0, 0, 10]
+        rotation: [0, 0, 0]
+        scale: [1, 1, 1]
 
-  camera:
-    near: 0.1
-    far: 1000.0
-    fov: 60
+      camera:
+        near: 0.1
+        far: 1000.0
+        fov: 60

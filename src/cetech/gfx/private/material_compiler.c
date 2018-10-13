@@ -130,29 +130,31 @@ uint64_t render_state_to_enum(uint64_t name) {
 
 
 void foreach_layer(const char *filename,
-                   uint64_t root_key,
+                   uint64_t *root_key,
+                   uint64_t key_count,
                    uint64_t key,
                    uint64_t layer_obj) {
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(layer_obj);
 
-    ce_cdb_a0->set_str(w, MATERIAL_LAYER_NAME, ce_yng_a0->get_key(key));
+    ce_cdb_a0->set_str(w, MATERIAL_LAYER_NAME, ce_id_a0->str_from_id64(key));
 
-    uint64_t tmp_keys[] = {
-            root_key,
-            key,
-            ce_yng_a0->key("shader"),
-    };
+    uint64_t tmp_key = 0;
+    uint64_t tmp_keys[32] = {};
+    tmp_keys[key_count] = key;
 
-    uint64_t tmp_key = ce_yng_a0->combine_key(tmp_keys,
-                                              CE_ARRAY_LEN(tmp_keys));
+    memcpy(tmp_keys, root_key, sizeof(uint64_t) * key_count);
 
-    const char *shader = ce_ydb_a0->get_str(filename, &tmp_key, 1, "");
+    tmp_keys[key_count + 1] = ce_yng_a0->key("shader");
+
+    const char *shader;
+    shader = ce_ydb_a0->get_str(filename, tmp_keys, CE_ARRAY_LEN(tmp_keys), "");
+
     uint64_t shader_id = ce_id_a0->id64(shader);
 
     ce_cdb_a0->set_uint64(w, MATERIAL_SHADER_PROP, shader_id);
 
-    tmp_keys[2] = ce_yng_a0->key("render_state");
+    tmp_keys[key_count + 1] = ce_yng_a0->key("render_state");
     tmp_key = ce_yng_a0->combine_key(tmp_keys, CE_ARRAY_LEN(tmp_keys));
     if (ce_ydb_a0->has_key(filename, &tmp_key, 1)) {
         uint64_t curent_render_state = 0;
@@ -176,7 +178,7 @@ void foreach_layer(const char *filename,
     uint64_t variables_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_a0->set_subobject(w, MATERIAL_VARIABLES_PROP, variables_obj);
 
-    tmp_keys[2] = ce_yng_a0->key("variables");
+    tmp_keys[key_count + 1] = ce_yng_a0->key("variables");
     tmp_key = ce_yng_a0->combine_key(tmp_keys, CE_ARRAY_LEN(tmp_keys));
     if (ce_ydb_a0->has_key(filename, &tmp_key, 1)) {
         uint64_t layers_keys[32] = {};
@@ -205,7 +207,10 @@ void name_from_filename(const char *fullname,
     memcpy(name, fullname, size);
 }
 
-bool material_compiler(const char *filename, struct ct_resource_id rid) {
+bool material_compiler(const char *filename,
+                       uint64_t k,
+                       struct ct_resource_id rid,
+                       const char *fullname) {
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_TYPE);
 
@@ -215,15 +220,18 @@ bool material_compiler(const char *filename, struct ct_resource_id rid) {
     ce_cdb_a0->set_subobject(w, MATERIAL_LAYERS, layers_obj);
     ce_cdb_a0->write_commit(w);
 
-    uint64_t key = ce_yng_a0->key("layers");
+    uint64_t key[] = {
+            k,
+            ce_yng_a0->key("layers")
+    };
 
-    if (ce_ydb_a0->has_key(filename, &key, 1)) {
+    if (ce_ydb_a0->has_key(filename, key, CE_ARRAY_LEN(key))) {
 
         uint64_t layers_keys[32] = {};
         uint32_t layers_keys_count = 0;
 
         ce_ydb_a0->get_map_keys(filename,
-                                &key, 1,
+                                key, CE_ARRAY_LEN(key),
                                 layers_keys, CE_ARRAY_LEN(layers_keys),
                                 &layers_keys_count);
 
@@ -231,15 +239,16 @@ bool material_compiler(const char *filename, struct ct_resource_id rid) {
         for (uint32_t i = 0; i < layers_keys_count; ++i) {
             uint64_t layer_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
             ce_cdb_a0->set_subobject(w, layers_keys[i], layer_obj);
-            foreach_layer(filename, key, layers_keys[i], layer_obj);
+            foreach_layer(filename, key, CE_ARRAY_LEN(key), layers_keys[i],
+                          layer_obj);
         }
         ce_cdb_a0->write_commit(w);
 
 //    name_from_filename(filename, resource.asset_name);
 
-        char* output_blob = NULL;
+        char *output_blob = NULL;
         ce_cdb_a0->dump(obj, &output_blob, ce_memory_a0->system);
-        ct_builddb_a0->put_resource(rid, filename, output_blob,
+        ct_builddb_a0->put_resource(fullname, rid, filename, output_blob,
                                     ce_array_size(output_blob));
 
         ce_buffer_free(output_blob, _G.allocator);

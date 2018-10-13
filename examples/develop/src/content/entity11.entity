@@ -1,1 +1,21 @@
-PREFAB: content/entity10.entity
+content/entity11.entity:
+    #PREFAB: content/entity10.entity
+    components:
+      transform:
+        position: [0, 0, 0]
+        rotation: [0, 0, 0]
+        scale: [1, 1, 1]
+
+      mesh_renderer:
+        scene: content/cube
+        mesh: "g_cube"
+        node: "n_cube"
+        material: "content/material1"
+
+    children:
+      "e432c0ed88dd461e81f50973ffb00263":
+        components:
+          transform:
+            position: [0, 10, 0]
+            rotation: [0, 0, 0]
+            scale: [72, 28, 414]

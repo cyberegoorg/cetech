@@ -31,7 +31,7 @@ const char *resource_compiler_get_core_dir();
 
 void compile_and_reload(const char *filename);
 
-void type_name_from_filename(const char *fullname,
+bool type_name_from_filename(const char *fullname,
                              struct ct_resource_id *resource_id,
                              char *short_name);
 

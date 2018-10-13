@@ -18,6 +18,7 @@
 #include <celib/buffer.inl>
 #include <cetech/resource/resource.h>
 #include <celib/task.h>
+#include <celib/hash.inl>
 
 #include "cetech/resource/builddb.h"
 
@@ -33,7 +34,10 @@ struct sqls_s {
     sqlite3_stmt *load_file_blob;
     sqlite3_stmt *set_file_depend;
     sqlite3_stmt *get_filename;
+    sqlite3_stmt *get_fullname;
     sqlite3_stmt *need_compile;
+    sqlite3_stmt *get_resource_dirs;
+    sqlite3_stmt *get_resource_from_dirs;
     sqlite3_stmt *get_file_id;
 };
 
@@ -51,6 +55,7 @@ const char *CREATE_SQL[] = {
         ");",
 
         "CREATE TABLE IF NOT EXISTS resource (\n"
+        "fullname TEXT    UNIQUE                          NOT NULL,\n"
         "type     INTEGER                                 NOT NULL,\n"
         "name     INTEGER                                 NOT NULL,\n"
         "file     INTEGER                                         ,\n"
@@ -89,7 +94,7 @@ static struct {
                   "INSERT OR REPLACE INTO resource_data (type, name, data) VALUES(?1, ?2, ?3);"),
 
         _STATMENT(put_resource,
-                  "INSERT OR REPLACE INTO resource (type, name, file) VALUES(?1, ?2, ?3);"),
+                  "INSERT OR REPLACE INTO resource (fullname, type, name, file) VALUES(?1, ?2, ?3, ?4);"),
 
         _STATMENT(load_file_blob,
                   "SELECT data FROM resource_data WHERE type = ?1 AND name = ?2;"),
@@ -103,6 +108,11 @@ static struct {
                   "JOIN files on files.id == resource.file\n"
                   "WHERE resource.type = ?1 and resource.name = ?2;"),
 
+        _STATMENT(get_fullname,
+                  "SELECT resource.fullname\n"
+                  "FROM resource\n"
+                  "WHERE resource.type = ?1 and resource.name = ?2;"),
+
         _STATMENT(need_compile,
                   "SELECT\n"
                   "     files.filename, files.mtime\n"
@@ -114,7 +124,13 @@ static struct {
                   "    file_dependency.file = ?1\n"),
 
         _STATMENT(get_file_id,
-                  "SELECT id FROM files WHERE filename = ?1")
+                  "SELECT id FROM files WHERE filename = ?1"),
+
+        _STATMENT(get_resource_dirs, "select fullname\n"
+                                     "from resource order by fullname"),
+
+        _STATMENT(get_resource_from_dirs, "select fullname\n"
+                                          "from resource where instr(fullname, ?1)")
 };
 
 static int _step(sqlite3 *db,
@@ -264,7 +280,8 @@ static void builddb_put_file(const char *filename,
     _step(_db, sqls->put_file);
 }
 
-static void put_resource(struct ct_resource_id rid,
+static void put_resource(const char *fullname,
+                         struct ct_resource_id rid,
                          const char *filename,
                          const char *data,
                          uint64_t size) {
@@ -278,9 +295,10 @@ static void put_resource(struct ct_resource_id rid,
 
     uint64_t id = ce_id_a0->id64(filename);
 
-    sqlite3_bind_int64(sqls->put_resource, 1, rid.type);
-    sqlite3_bind_int64(sqls->put_resource, 2, rid.name);
-    sqlite3_bind_int64(sqls->put_resource, 3, id);
+    sqlite3_bind_text(sqls->put_resource, 1, fullname, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(sqls->put_resource, 2, rid.type);
+    sqlite3_bind_int64(sqls->put_resource, 3, rid.name);
+    sqlite3_bind_int64(sqls->put_resource, 4, id);
     _step(_db, sqls->put_resource);
 }
 
@@ -341,6 +359,103 @@ static int buildb_get_filename_type_name(char *filename,
     return ok;
 }
 
+static int buildb_get_resource_dirs(char ***filename,
+                                    struct ce_alloc *alloc) {
+
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    struct ce_hash_t dir_set = {};
+
+    while (_step(_db, sqls->get_resource_dirs) == SQLITE_ROW) {
+        const unsigned char *fn = sqlite3_column_text(sqls->get_resource_dirs,
+                                                      0);
+        char tmp_fulllname[256] = {};
+
+        ce_os_a0->path->dir(tmp_fulllname, (const char *) fn);
+        uint64_t hash = ce_id_a0->id64(tmp_fulllname);
+
+        if (ce_hash_contain(&dir_set, hash)) {
+            continue;
+        }
+
+        ce_hash_add(&dir_set, hash, 1, alloc);
+
+        char *dup_str = ce_memory_a0->str_dup(tmp_fulllname, alloc);
+        ce_array_push(*filename, dup_str, alloc);
+
+        _step(_db, sqls->get_resource_dirs);
+    }
+
+
+    ce_hash_free(&dir_set, alloc);
+
+    return 1;
+}
+
+static void buildb_get_resource_dirs_clean(char **filename,
+                                           struct ce_alloc *alloc) {
+    const uint32_t n = ce_array_size(filename);
+    for (int i = 0; i < n; ++i) {
+        CE_FREE(alloc, filename[i]);
+    }
+}
+
+static int buildb_get_resource_from_dirs(const char *dir,
+                                         char ***filename,
+                                         struct ce_alloc *alloc) {
+    if(!strlen(dir)) {
+        return 0;
+    }
+
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_text(sqls->get_resource_from_dirs, 1, dir, -1, SQLITE_TRANSIENT);
+
+    while (_step(_db, sqls->get_resource_from_dirs) == SQLITE_ROW) {
+        const unsigned char *fn;
+        fn = sqlite3_column_text(sqls->get_resource_from_dirs, 0);
+
+        char *dup_str = ce_memory_a0->str_dup((const char *) fn, alloc);
+        ce_array_push(*filename, dup_str, alloc);
+    }
+
+    return 1;
+}
+
+static void buildb_get_resource_from_dirs_clean(char **filename,
+                                                struct ce_alloc *alloc) {
+    const uint32_t n = ce_array_size(filename);
+    for (int i = 0; i < n; ++i) {
+        CE_FREE(alloc, filename[i]);
+    }
+}
+
+
+static int buildb_get_fullname(char *fullname,
+                               size_t max_len,
+                               uint64_t type,
+                               uint64_t name) {
+
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_int64(sqls->get_fullname, 1, type);
+    sqlite3_bind_int64(sqls->get_fullname, 2, name);
+
+    int ok = _step(_db, sqls->get_fullname) == SQLITE_ROW;
+    if (ok) {
+        const unsigned char *fn = sqlite3_column_text(sqls->get_fullname, 0);
+
+        snprintf(fullname, max_len, "%s", fn);
+
+        _step(_db, sqls->get_fullname);
+    }
+
+    return ok;
+}
+
 static int builddb_need_compile(const char *filename) {
     int compile = 1;
 
@@ -381,8 +496,13 @@ static struct ct_builddb_a0 build_db_api = {
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
         .get_filename_type_name = buildb_get_filename_type_name,
+        .get_fullname= buildb_get_fullname,
         .need_compile = builddb_need_compile,
         .add_dependency = _add_dependency,
+        .get_resource_dirs = buildb_get_resource_dirs,
+        .get_resource_dirs_clean = buildb_get_resource_dirs_clean,
+        .get_resource_from_dirs = buildb_get_resource_from_dirs,
+        .get_resource_from_dirs_clean = buildb_get_resource_from_dirs_clean,
 };
 
 struct ct_builddb_a0 *ct_builddb_a0 = &build_db_api;

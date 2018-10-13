@@ -12,6 +12,12 @@
 
 #include <celib/module.inl>
 
+#define RESOURCE_TYPE_PROP \
+     CE_ID64_0("resource_type", 0x3ebcb3141c07b30ULL)
+
+#define RESOURCE_NAME_PROP \
+     CE_ID64_0("resource_name", 0x9137fb038470c85fULL)
+
 #define CONFIG_BUILD \
      CE_ID64_0("build", 0x4429661936ece1eaULL)
 
@@ -35,6 +41,7 @@
 
 #define RESOURCE_I \
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
+
 
 
 struct ce_vio;
@@ -68,7 +75,9 @@ struct ct_resource_i0 {
                     uint64_t obj);
 
     bool (*compilator)(const char *filename,
-                       struct ct_resource_id rid);
+                       uint64_t type_keys,
+                       struct ct_resource_id rid,
+                       const char *fullname);
 };
 
 //==============================================================================
@@ -76,7 +85,10 @@ struct ct_resource_i0 {
 //==============================================================================
 
 typedef bool (*ct_resource_compilator_t)(const char *filename,
-                                         struct ct_resource_id rid);
+                                         uint64_t key,
+                                         struct ct_resource_id rid,
+                                         const char *fullname);
+
 
 //==============================================================================
 // Api
@@ -136,7 +148,7 @@ struct ct_resource_a0 {
     char *(*compiler_external_join)(struct ce_alloc *a,
                                     const char *name);
 
-    void (*type_name_from_filename)(const char *fullname,
+    bool (*type_name_from_filename)(const char *fullname,
                                     struct ct_resource_id *resource_id,
                                     char *short_name);
 

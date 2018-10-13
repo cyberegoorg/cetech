@@ -1,1 +1,2 @@
-input: content/scene/solider/m4tex.tga
+content/scene/solider/m4tex.texture:
+    input: content/scene/solider/m4tex.tga

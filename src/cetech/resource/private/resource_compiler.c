@@ -31,6 +31,7 @@
 #define MAX_TYPES 128
 #define _G ResourceCompilerGlobal
 
+#define LOG_WHERE "resource_compiler"
 
 //==============================================================================
 // Globals
@@ -41,7 +42,6 @@ struct compile_task_data {
     struct ct_resource_id rid;
     time_t mtime;
     ct_resource_compilator_t compilator;
-    atomic_int completed;
 };
 
 static struct _G {
@@ -60,11 +60,15 @@ static struct _G {
 // Private
 //==============================================================================
 
-void type_name_from_filename(const char *fullname,
+bool type_name_from_filename(const char *fullname,
                              struct ct_resource_id *resource_id,
                              char *short_name) {
 
     const char *resource_type = ce_os_a0->path->extension(fullname);
+
+    if (!resource_type) {
+        return false;
+    }
 
     size_t size = strlen(fullname) - strlen(resource_type) - 1;
 
@@ -78,8 +82,20 @@ void type_name_from_filename(const char *fullname,
         memcpy(short_name, fullname, sizeof(char) * size);
         short_name[size] = '\0';
     }
+
+    return true;
 }
 
+
+ct_resource_compilator_t _find_compilator(uint64_t type) {
+    struct ct_resource_i0 *i = ct_resource_a0->get_interface(type);
+
+    if (!i) {
+        return NULL;
+    }
+
+    return i->compilator;
+}
 
 static void _compile_task(void *data) {
     struct compile_task_data *tdata = (struct compile_task_data *) data;
@@ -100,34 +116,49 @@ static void _compile_task(void *data) {
             ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
         }
 
-        if (!tdata->compilator(tdata->source_filename, tdata->rid)) {
-            ce_log_a0->error("resource_compiler.task",
-                             "Resource \"%s\" compilation fail",
-                             tdata->source_filename);
-        } else {
-            ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
+        uint64_t tmp_keys = 0;
 
-            ct_builddb_a0->set_file_depend(tdata->source_filename,
-                                           tdata->source_filename);
+        uint64_t type_keys[32] = {};
+        uint32_t type_keys_count = 0;
+        ce_ydb_a0->get_map_keys(tdata->source_filename,
+                                &tmp_keys, 1,
+                                type_keys, CE_ARRAY_LEN(type_keys),
+                                &type_keys_count);
 
-            ce_log_a0->info("resource_compiler.task",
-                            "Resource \"%s\" compiled", tdata->source_filename);
+        for (uint32_t i = 0; i < type_keys_count; ++i) {
+            uint64_t k = type_keys[i];
+
+            const char *resource_name;
+            resource_name = ce_id_a0->str_from_id64(k);
+
+            struct ct_resource_id rid;
+            if (!type_name_from_filename(resource_name, &rid, NULL)) {
+                ce_log_a0->error(LOG_WHERE,
+                                 "Invalid format for resource %s:%s ",
+                                 tdata->source_filename, resource_name);
+                continue;
+            }
+
+            ct_resource_compilator_t compilator = _find_compilator(rid.type);
+
+            if (!compilator(tdata->source_filename, k, tdata->rid, resource_name)) {
+                ce_log_a0->error("resource_compiler.task",
+                                 "Resource \"%s\" compilation fail",
+                                 tdata->source_filename);
+            } else {
+                ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
+
+                ct_builddb_a0->set_file_depend(tdata->source_filename,
+                                               tdata->source_filename);
+
+                ce_log_a0->info("resource_compiler.task",
+                                "Resource \"%s\" compiled",
+                                tdata->source_filename);
+            }
         }
     }
 
     CE_FREE(_G.allocator, tdata->source_filename);
-
-    atomic_store_explicit(&tdata->completed, 1, memory_order_release);
-}
-
-ct_resource_compilator_t _find_compilator(uint64_t type) {
-    struct ct_resource_i0 *i = ct_resource_a0->get_interface(type);
-
-    if (!i) {
-        return NULL;
-    }
-
-    return i->compilator;
 }
 
 
@@ -159,7 +190,6 @@ void _compile_files(struct ce_task_item **tasks,
                 .source_filename = ce_memory_a0->str_dup(files[i],
                                                          _G.allocator),
                 .mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, files[i]),
-                .completed = 0
         };
 
         struct ce_task_item item = {
@@ -300,7 +330,7 @@ void compile_and_reload(const char *filename) {
         return;
     }
 
-    compilator(filename, rid);
+//    compilator(filename, rid);
 
 //    resource_memory_reload(rid, &output_blob);
 //    ce_array_free(output_blob, _G.allocator);

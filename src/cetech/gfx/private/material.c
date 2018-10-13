@@ -28,6 +28,8 @@
 #include <cetech/gfx/mesh_renderer.h>
 #include <cetech/editor/asset_preview.h>
 #include <cetech/editor/editor_ui.h>
+#include <celib/log.h>
+#include <cetech/resource/builddb.h>
 
 #include "material.h"
 
@@ -321,7 +323,7 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-bool material_compiler(const char *filename, struct ct_resource_id rid);
+bool material_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -357,6 +359,16 @@ static void set_texture_handler(uint64_t material,
                                              0);
     uint64_t var = ce_cdb_a0->read_ref(variables,
                                        ce_id_a0->id64(slot), 0);
+    if(!var) {
+        uint64_t name = ce_cdb_a0->read_uint64(material, RESOURCE_NAME_PROP, 0);
+
+        char fullname[128] = {};
+        ct_builddb_a0->get_fullname(fullname, CE_ARRAY_LEN(fullname), MATERIAL_TYPE, name);
+
+        ce_log_a0->warning(LOG_WHERE, "invalid slot: %s for %s", slot, fullname);
+        return;
+    }
+
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(var);
     ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_TYPE_PROP,

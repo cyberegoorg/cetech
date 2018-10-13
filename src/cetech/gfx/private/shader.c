@@ -116,7 +116,8 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static void _compile(const char* filename, uint64_t obj) {
+static bool _compile(const char *filename,
+                     uint64_t obj) {
     const char *vs_input = ce_cdb_a0->read_str(obj, SHADER_VS_INPUT, "");
     const char *fs_input = ce_cdb_a0->read_str(obj, SHADER_FS_INPUT, "");
 
@@ -125,8 +126,10 @@ static void _compile(const char* filename, uint64_t obj) {
 
     struct ce_alloc *a = ce_memory_a0->system;
 
-    const char *source_dir =  ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_SRC, "");
-    const char *core_dir = ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_CORE, "");
+    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(),
+                                                 CONFIG_SRC, "");
+    const char *core_dir = ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_CORE,
+                                               "");
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
 
@@ -159,7 +162,7 @@ static void _compile(const char* filename, uint64_t obj) {
 
     if (result != 0) {
         ce_buffer_free(include_dir, a);
-        return;
+        return false;
     }
 
 
@@ -197,7 +200,7 @@ static void _compile(const char* filename, uint64_t obj) {
 
     if (result != 0) {
         ce_buffer_free(include_dir, a);
-        return;
+        return false;
     }
 
     tmp_file = ce_os_a0->vio->from_file(output_path, VIO_OPEN_READ);
@@ -214,19 +217,26 @@ static void _compile(const char* filename, uint64_t obj) {
     CE_FREE(a, vs_data);
     CE_FREE(a, fs_data);
     ce_buffer_free(include_dir, a);
+
+    return true;
 }
 
-bool shader_compiler(const char *filename, struct ct_resource_id rid) {
+bool shader_compiler(const char *filename,
+                     uint64_t k,
+                     struct ct_resource_id rid, const char *fullname) {
     struct ce_alloc *a = ce_memory_a0->system;
 
     uint64_t key[] = {
+            k,
             ce_yng_a0->key("vs_input")
     };
 
-    const char *vs_input = ce_ydb_a0->get_str(filename, key, 1, "");
+    const char *vs_input = ce_ydb_a0->get_str(filename,
+                                              key, CE_ARRAY_LEN(key), "");
 
-    key[0] = ce_yng_a0->key("fs_input");
-    const char *fs_input = ce_ydb_a0->get_str(filename, key, 1, "");
+    key[1] = ce_yng_a0->key("fs_input");
+    const char *fs_input = ce_ydb_a0->get_str(filename,
+                                              key, CE_ARRAY_LEN(key), "");
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SHADER_TYPE);
 
@@ -241,17 +251,20 @@ bool shader_compiler(const char *filename, struct ct_resource_id rid) {
 
     ce_cdb_a0->write_commit(w);
 
-    _compile(filename, obj);
+    bool res = _compile(filename, obj);
 
-    char* output = NULL;
-    ce_cdb_a0->dump(obj, &output, a);
-    ce_cdb_a0->destroy_object(obj);
+    if (res) {
+        char *output = NULL;
+        ce_cdb_a0->dump(obj, &output, a);
+        ce_cdb_a0->destroy_object(obj);
 
-    ct_builddb_a0->put_resource(rid, filename, output, ce_array_size(output));
-    ce_buffer_free(output, _G.allocator);
+        ct_builddb_a0->put_resource(fullname, rid, filename, output,
+                                    ce_array_size(output));
+        ce_buffer_free(output, _G.allocator);
+    }
 
 
-    return true;
+    return res;
 }
 
 
@@ -288,7 +301,8 @@ static void offline(uint64_t name,
     CE_UNUSED(name);
 
     const uint64_t program = ce_cdb_a0->read_uint64(obj, SHADER_PROP, 0);
-    ct_renderer_a0->destroy_program((ct_render_program_handle_t){.idx=(uint16_t) program});
+    ct_renderer_a0->destroy_program(
+            (ct_render_program_handle_t) {.idx=(uint16_t) program});
 }
 
 
@@ -308,7 +322,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 // Interface
 //==============================================================================
 int shader_init(struct ce_api_a0 *api) {
-    _G = (struct _G){.allocator = ce_memory_a0->system};
+    _G = (struct _G) {.allocator = ce_memory_a0->system};
 
     ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
 

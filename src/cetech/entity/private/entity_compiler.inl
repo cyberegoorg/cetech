@@ -170,11 +170,15 @@ static void destroy_output(struct ct_entity_compile_output *output) {
 }
 
 
-static bool resource_compiler(const char *filename, struct ct_resource_id rid) {
-    struct ct_entity_compile_output *output = create_output();
-    compile_entitity(filename, NULL, 0, UINT32_MAX, 0, output, NULL);
+static bool resource_compiler(const char *filename,
+                              uint64_t key,
+                              struct ct_resource_id rid,
+                              const char *fullname) {
 
-    ct_builddb_a0->put_resource(rid, filename, output->entity_data,
+    struct ct_entity_compile_output *output = create_output();
+    compile_entitity(filename, &key, 1, UINT32_MAX, 0, output, NULL);
+
+    ct_builddb_a0->put_resource(fullname, rid, filename, output->entity_data,
                                 ce_array_size(output->entity_data));
     destroy_output(output);
     return true;

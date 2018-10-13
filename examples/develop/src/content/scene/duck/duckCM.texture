@@ -1,1 +1,2 @@
-input: content/scene/duck/duckCM.bmp
+content/scene/duck/duckCM.texture:
+    input: content/scene/duck/duckCM.bmp

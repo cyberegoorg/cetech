@@ -61,8 +61,8 @@ static uint64_t cdb_type() {
 // Resource compiler
 //==============================================================================
 
-bool _package_compiler(const char *filename, struct ct_resource_id rid) {
-    uint64_t tmp_keys = 0;
+bool _package_compiler(const char *filename, uint64_t key, struct ct_resource_id rid, const char *fullname) {
+    uint64_t tmp_keys = key;
 
     uint64_t type_keys[32] = {};
     uint32_t type_keys_count = 0;
@@ -109,7 +109,7 @@ bool _package_compiler(const char *filename, struct ct_resource_id rid) {
     ce_cdb_a0->dump(obj, &output, _G.allocator);
     ce_cdb_a0->destroy_object(obj);
 
-    ct_builddb_a0->put_resource(rid, filename, output, ce_array_size(output));
+    ct_builddb_a0->put_resource(fullname, rid, filename, output, ce_array_size(output));
     ce_buffer_free(output, _G.allocator);
 
     return true;

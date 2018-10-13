@@ -1,31 +1,32 @@
-name: body
-components:
-  transform:
-    position: [0.000000, -13.000001, 0.000000]
-    rotation: [90.000000, 180.000000, 0.000000]
-    scale: [1.000000, 1.000000, 1.000000]
-
-children:
-  lknvln879879NJKK:
+content/m4a1.entity:
+    name: body
     components:
       transform:
-        rotation: [0, 0, 0]
-        position: [0, 0, 0]
-        scale: [1, 1, 1]
+        position: [0.000000, -13.000001, 0.000000]
+        rotation: [90.000000, 180.000000, 0.000000]
+        scale: [1.000000, 1.000000, 1.000000]
 
-      mesh_renderer:
-        scene: content/scene/m4a1/m4a1
-        mesh: geom_0
-        material: content/scene/m4a1/m4a1
+    children:
+      lknvln879879NJKK:
+        components:
+          transform:
+            rotation: [0, 0, 0]
+            position: [0, 0, 0]
+            scale: [1, 1, 1]
 
-  NMNMFBDDMvln8779NJKK:
-    components:
-      transform:
-        rotation: [0, 0, 0]
-        position: [0, 0, 0]
-        scale: [1, 1, 1]
+          mesh_renderer:
+            scene: content/scene/m4a1/m4a1
+            mesh: geom_0
+            material: content/scene/m4a1/m4a1
 
-      mesh_renderer:
-        scene: content/scene/m4a1/m4a1
-        mesh: geom_1
-        material: content/scene/m4a1/m4a1
+      NMNMFBDDMvln8779NJKK:
+        components:
+          transform:
+            rotation: [0, 0, 0]
+            position: [0, 0, 0]
+            scale: [1, 1, 1]
+
+          mesh_renderer:
+            scene: content/scene/m4a1/m4a1
+            mesh: geom_1
+            material: content/scene/m4a1/m4a1

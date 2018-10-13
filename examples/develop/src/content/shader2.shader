@@ -1,2 +1,3 @@
-vs_input: 'content/vs_shader1.sc'
-fs_input: 'content/fs_shader2.sc'
+content/shader2.shader:
+    vs_input: 'content/vs_shader1.sc'
+    fs_input: 'content/fs_shader2.sc'

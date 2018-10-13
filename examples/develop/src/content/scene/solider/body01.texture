@@ -1,1 +1,2 @@
-input: content/scene/solider/body01.tga
+content/scene/solider/body01.texture:
+    input: content/scene/solider/body01.tga

@@ -78,6 +78,7 @@ struct doc_inst {
 
 static uint64_t hash_combine(uint64_t lhs,
                       uint64_t rhs) {
+    if (rhs == 0) return lhs;
     if (lhs == 0) return rhs;
     lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
     return lhs;
@@ -115,7 +116,7 @@ static uint64_t calc_key(const char *key) {
 }
 
 static uint64_t combine_key(const uint64_t *keys,
-                     uint32_t count) {
+                            uint32_t count) {
     uint64_t hash = keys[0];
 
     for (uint32_t i = 1; i < count; ++i) {
@@ -728,6 +729,8 @@ bool parse_yaml(struct ce_alloc *alloc,
                     ++parent_stack[parent_stack_top].node_count;
                     ce_array_push(parent_stack, state, _G.allocator);
 
+//                    ce_hash_add(&inst->key_map, key, tmp_idx, _G.allocator);
+
                     // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].key_hash;
@@ -740,6 +743,7 @@ bool parse_yaml(struct ce_alloc *alloc,
                     uint32_t tmp_idx = new_node(inst->doc, type, value,
                                                 parent_stack[parent_stack_top].idx,
                                                 key);
+
                     ce_hash_add(&inst->key_map, key, tmp_idx, _G.allocator);
 
                     ce_array_pop_back(parent_stack);

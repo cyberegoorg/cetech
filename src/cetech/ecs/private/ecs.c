@@ -32,6 +32,8 @@
 
 #define _G EntityMaagerGlobals
 
+#define LOG_WHERE "ecs"
+
 struct entity_storage {
     uint64_t mask;
     uint32_t n;
@@ -782,6 +784,10 @@ static void destroy(struct ct_world world,
 
 static void _load(uint64_t from,
                   uint64_t parent) {
+    if(from==parent) {
+        ce_log_a0->error(LOG_WHERE, "from == parent, fix it");
+        return;
+    }
 
     const uint32_t prop_count = ce_cdb_a0->prop_count(from);
     uint64_t keys[prop_count];
@@ -829,9 +835,6 @@ static void online(uint64_t name,
     CE_UNUSED(name);
 
     _load(obj, 0);
-
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
-    ce_cdb_a0->write_commit(writer);
 }
 
 static void offline(uint64_t name,
@@ -1424,7 +1427,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_task_a0);
             CE_INIT_API(api, ce_ebus_a0);
-        },
+            },
 
         {
             CE_UNUSED(reload);

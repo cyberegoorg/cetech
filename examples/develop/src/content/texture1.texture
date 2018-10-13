@@ -1,3 +1,4 @@
-input: content/texture2.png
-gen_mipmaps: yes
-is_normalmap: no
+content/texture1.texture:
+    input: content/texture2.png
+    gen_mipmaps: yes
+    is_normalmap: no

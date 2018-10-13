@@ -166,7 +166,7 @@ static void _foreach_keys(struct ce_yng_node k,
         return;
     }
 
-    uint64_t str_key = ce_yng_a0->key(string);
+    uint64_t str_key = ce_id_a0->id64(string);
 
     const uint32_t s = *out->count;
     for (uint32_t i = 0; i < s; ++i) {

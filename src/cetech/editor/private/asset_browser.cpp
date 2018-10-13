@@ -18,6 +18,7 @@
 #include <cetech/gfx/texture.h>
 #include <cetech/editor/asset_property.h>
 #include <cetech/editor/asset_preview.h>
+#include <cetech/resource/builddb.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -154,8 +155,12 @@ static void ui_dir_list() {
             set_current_dir("", dir_hash);
         }
 
-        for (uint32_t i = 0; i < _G.dirtree_list_count; ++i) {
-            dir_hash = ce_id_a0->id64(_G.dirtree_list[i]);
+        char **dirs = NULL;
+        ct_builddb_a0->get_resource_dirs(&dirs, _G.allocator);
+        uint32_t dir_n = ce_array_size(dirs);
+        for (int j = 0; j < dir_n; ++j) {
+            const char *dirname = dirs[j];
+            dir_hash = ce_id_a0->id64(dirs[j]);
 
             char label[128];
 
@@ -163,16 +168,19 @@ static void ui_dir_list() {
 
             if (is_selected) {
                 snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER_OPEN " %s",
-                         _G.dirtree_list[i]);
+                         dirname);
             } else {
                 snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER " %s",
-                         _G.dirtree_list[i]);
+                         dirname);
             }
 
             if (ImGui::Selectable(label, is_selected)) {
-                set_current_dir(_G.dirtree_list[i], dir_hash);
+                set_current_dir(dirname, dir_hash);
             }
         }
+
+        ct_builddb_a0->get_resource_dirs_clean(dirs, _G.allocator);
+        ce_array_free(dirs, _G.allocator);
 
         ct_debugui_a0->TreePop();
     }
@@ -208,58 +216,21 @@ static void ui_asset_list() {
 
     if (_G.need_reaload) {
         if (_G.asset_list) {
-            ce_fs_a0->listdir_free(_G.asset_list, _G.asset_list_count,
-                                   _G.allocator);
+            ct_builddb_a0->get_resource_from_dirs_clean(_G.asset_list,
+                                                        _G.allocator);
+            ce_array_free(_G.asset_list, _G.allocator);
         }
 
-        if (_G.dir_list) {
-            ce_fs_a0->listdir_free(_G.dir_list, _G.dir_list_count,
-                                   _G.allocator);
-        }
 
-        ce_fs_a0->listdir(SOURCE_ROOT,
-                          _G.current_dir, "*",
-                          false, false, &_G.asset_list,
-                          &_G.asset_list_count, _G.allocator);
-
-        ce_fs_a0->listdir(SOURCE_ROOT,
-                          _G.current_dir, "*",
-                          true, false, &_G.dir_list,
-                          &_G.dir_list_count, _G.allocator);
+        ct_builddb_a0->get_resource_from_dirs(_G.current_dir, &_G.asset_list,
+                                              _G.allocator);
 
         _G.need_reaload = false;
     }
 
-    if (_G.dir_list) {
-        char dirname[128] = {};
-        for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
-            const char *path = _G.dir_list[i];
-            ce_os_a0->path->dirname(dirname, path);
-            uint64_t filename_hash = ce_id_a0->id64(dirname);
-
-            if (!_G.asset_filter.PassFilter(dirname)) {
-                continue;
-            }
-
-            char label[128];
-
-            bool is_selected = _G.selected_file == filename_hash;
-
-            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER" %s", dirname);
-
-            if (ImGui::Selectable(label, is_selected,
-                                  ImGuiSelectableFlags_AllowDoubleClick)) {
-                _G.selected_file = filename_hash;
-
-                if (ImGui::IsMouseDoubleClicked(0)) {
-                    set_current_dir(path, ce_id_a0->id64(path));
-                }
-            }
-        }
-    }
-
     if (_G.asset_list) {
-        for (uint32_t i = 0; i < _G.asset_list_count; ++i) {
+        uint32_t dir_n = ce_array_size(_G.asset_list);
+        for (int i = 0; i < dir_n; ++i) {
             const char *path = _G.asset_list[i];
             const char *filename = ce_os_a0->path->filename(path);
             uint64_t filename_hash = ce_id_a0->id64(filename);
@@ -322,7 +293,39 @@ static void ui_asset_list() {
                 ct_debugui_a0->EndDragDropSource();
             }
         }
+
     }
+
+
+
+//    if (_G.dir_list) {
+//        char dirname[128] = {};
+//        for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
+//            const char *path = _G.dir_list[i];
+//            ce_os_a0->path->dirname(dirname, path);
+//            uint64_t filename_hash = ce_id_a0->id64(dirname);
+//
+//            if (!_G.asset_filter.PassFilter(dirname)) {
+//                continue;
+//            }
+//
+//            char label[128];
+//
+//            bool is_selected = _G.selected_file == filename_hash;
+//
+//            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER" %s", dirname);
+//
+//            if (ImGui::Selectable(label, is_selected,
+//                                  ImGuiSelectableFlags_AllowDoubleClick)) {
+//                _G.selected_file = filename_hash;
+//
+//                if (ImGui::IsMouseDoubleClicked(0)) {
+//                    set_current_dir(path, ce_id_a0->id64(path));
+//                }
+//            }
+//        }
+//    }
+
 
     ImGui::EndChild();
 }

@@ -215,19 +215,19 @@ static void _on_obj_change(uint64_t obj,
     }
 }
 
-bool texture_compiler(const char *filename, struct ct_resource_id rid) {
+bool texture_compiler(const char *filename, uint64_t k, struct ct_resource_id rid,const char *fullname) {
 
     struct ce_alloc *a = ce_memory_a0->system;
 
-    uint64_t key[] = {ce_yng_a0->key("input")};
+    uint64_t key[] = {k, ce_yng_a0->key("input")};
 
-    const char *input_str = ce_ydb_a0->get_str(filename, key, 1, "");
+    const char *input_str = ce_ydb_a0->get_str(filename, key, CE_ARRAY_LEN(key), "");
 
-    key[0] = ce_yng_a0->key("gen_mipmaps");
-    bool gen_mipmaps = ce_ydb_a0->get_bool(filename, key, 1, true);
+    key[1] = ce_yng_a0->key("gen_mipmaps");
+    bool gen_mipmaps = ce_ydb_a0->get_bool(filename, key, CE_ARRAY_LEN(key), true);
 
-    key[0] = ce_yng_a0->key("is_normalmap");
-    bool is_normalmap = ce_ydb_a0->get_bool(filename, key, 1, false);
+    key[1] = ce_yng_a0->key("is_normalmap");
+    bool is_normalmap = ce_ydb_a0->get_bool(filename, key, CE_ARRAY_LEN(key), false);
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), TEXTURE_TYPE);
 
@@ -243,7 +243,7 @@ bool texture_compiler(const char *filename, struct ct_resource_id rid) {
     ce_cdb_a0->dump(obj, &output, a);
     ce_cdb_a0->destroy_object(obj);
 
-    ct_builddb_a0->put_resource(rid, filename, output, ce_array_size(output));
+    ct_builddb_a0->put_resource(fullname, rid, filename, output, ce_array_size(output));
     ce_buffer_free(output, _G.allocator);
 
     ct_builddb_a0->add_dependency(filename, input_str);
