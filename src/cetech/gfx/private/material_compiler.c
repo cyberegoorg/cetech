@@ -7,7 +7,7 @@
 #include "celib/api_system.h"
 #include "celib/hashlib.h"
 #include <celib/array.inl>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/cdb.h>
 
 #include "cetech/ecs/ecs.h"
@@ -125,10 +125,10 @@ void foreach_layer(const char *filename,
 
     ce_cdb_a0->set_uint64(w, MATERIAL_SHADER_PROP, shader_id);
 
-    if (ce_cdb_a0->prop_exist(root_key, ce_yng_a0->key("render_state"))) {
+    if (ce_cdb_a0->prop_exist(root_key, ce_ydb_a0->key("render_state"))) {
         uint64_t curent_render_state = 0;
 
-        uint64_t render_state = ce_cdb_a0->read_subobject(root_key, ce_yng_a0->key("render_state"), 0);
+        uint64_t render_state = ce_cdb_a0->read_subobject(root_key, ce_ydb_a0->key("render_state"), 0);
         const uint64_t render_state_count = ce_cdb_a0->prop_count(render_state);
         uint64_t render_state_keys[render_state_count];
         ce_cdb_a0->prop_keys(render_state, render_state_keys);
@@ -143,8 +143,8 @@ void foreach_layer(const char *filename,
     uint64_t variables_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_a0->set_subobject(w, MATERIAL_VARIABLES_PROP, variables_obj);
 
-    if (ce_cdb_a0->prop_exist(root_key, ce_yng_a0->key("variables"))) {
-        uint64_t variables = ce_cdb_a0->read_subobject(root_key, ce_yng_a0->key("variables"), 0);
+    if (ce_cdb_a0->prop_exist(root_key, ce_ydb_a0->key("variables"))) {
+        uint64_t variables = ce_cdb_a0->read_subobject(root_key, ce_ydb_a0->key("variables"), 0);
         const uint64_t variables_keys_count = ce_cdb_a0->prop_count(variables);
         uint64_t variables_keys[variables_keys_count];
         ce_cdb_a0->prop_keys(variables, variables_keys);
@@ -181,9 +181,9 @@ bool material_compiler(const char *filename,
     ce_cdb_a0->set_subobject(w, MATERIAL_LAYERS, layers_obj);
     ce_cdb_a0->write_commit(w);
 
-    if (ce_cdb_a0->prop_exist(k, ce_yng_a0->key("layers"))) {
+    if (ce_cdb_a0->prop_exist(k, ce_ydb_a0->key("layers"))) {
 
-        uint64_t layers = ce_cdb_a0->read_subobject(k, ce_yng_a0->key("layers"), 0);
+        uint64_t layers = ce_cdb_a0->read_subobject(k, ce_ydb_a0->key("layers"), 0);
         const uint64_t layers_keys_count = ce_cdb_a0->prop_count(layers);
         uint64_t layers_keys[layers_keys_count];
         ce_cdb_a0->prop_keys(layers, layers_keys);
@@ -219,7 +219,7 @@ int materialcompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_yng_a0);
+    CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_ydb_a0);
 
     _G = (struct _G) {

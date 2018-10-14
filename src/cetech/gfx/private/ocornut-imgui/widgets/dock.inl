@@ -1095,7 +1095,7 @@ namespace ImGui
             }
         }
 
-        void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_yng_a0* yng, struct ce_cdb_a0* cdb) {
+        void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_ydb_a0* yng, struct ce_cdb_a0* cdb) {
             const uint32_t size = m_docks.size();
             for (uint32_t i = 0; i < size; ++i) {
                 m_docks[i]->~Dock();
@@ -1201,7 +1201,7 @@ namespace ImGui
         s_dock->saveToYaml(buffer, alloc);
     }
 
-    IMGUI_API void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_yng_a0* yng, struct ce_cdb_a0* cdb) {
+    IMGUI_API void loadFromYaml(const char* path, struct ce_ydb_a0* ydb, struct ce_ydb_a0* yng, struct ce_cdb_a0* cdb) {
         s_dock->loadFromYaml(path, ydb, yng, cdb);
     }
 

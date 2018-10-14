@@ -1,6 +1,6 @@
-#include <celib/ydb.h>
-#include <celib/yng.h>
+
 #include <cetech/editor/editor_ui.h>
+#include <celib/ydb.h>
 
 
 // component
@@ -24,7 +24,7 @@ static void component_compiler(const char *filename,
                                ce_cdb_obj_o *writer) {
     struct rotation_component t_data;
 
-    t_data.speed = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("speed"), 0.0f);
+    t_data.speed = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("speed"), 0.0f);
     ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
 }
 

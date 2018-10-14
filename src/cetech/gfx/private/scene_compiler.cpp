@@ -10,7 +10,7 @@
 #include "celib/memory.h"
 #include "celib/api_system.h"
 #include <celib/os.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/cdb.h>
 #include <celib/config.h>
 
@@ -149,16 +149,16 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //    uint64_t keys[] = {
 //            d->hash(d, decl_node),
-//            ce_yng_a0->key("type"),
+//            ce_ydb_a0->key("type"),
 //    };
 //    const char *type_str = d->get_str(d,
-//                                      ce_yng_a0->combine_key(keys,
+//                                      ce_ydb_a0->combine_key(keys,
 //                                                             CE_ARRAY_LEN(
 //                                                                     keys)),
 //                                      "");
 //
-//    keys[1] = ce_yng_a0->key("size");
-//    float size = d->get_float(d, ce_yng_a0->combine_key(keys,
+//    keys[1] = ce_ydb_a0->key("size");
+//    float size = d->get_float(d, ce_ydb_a0->combine_key(keys,
 //                                                        CE_ARRAY_LEN(
 //                                                                keys)),
 //                              0.0f);
@@ -183,11 +183,11 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //        uint64_t keys[] = {
 //                d->hash(d, types),
-//                ce_yng_a0->key(_chanel_types[i].name),
+//                ce_ydb_a0->key(_chanel_types[i].name),
 //        };
 //
 //        ce_yng_node node = d->get(d,
-//                                  ce_yng_a0->combine_key(keys,
+//                                  ce_ydb_a0->combine_key(keys,
 //                                                         CE_ARRAY_LEN(
 //                                                                 keys)));
 //        if (0 != node.idx) {
@@ -219,16 +219,16 @@ static void _destroy_compile_output(struct compile_output *output) {
 //    {
 //        uint64_t keys[] = {
 //                d->hash(d, types),
-//                ce_yng_a0->key(name),
-//                ce_yng_a0->key("type"),
+//                ce_ydb_a0->key(name),
+//                ce_ydb_a0->key("type"),
 //        };
 //        type_str = d->get_str(d,
-//                              ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys)),
+//                              ce_ydb_a0->combine_key(keys, CE_ARRAY_LEN(keys)),
 //                              "");
 //
-//        keys[2] = ce_yng_a0->key("size"),
+//        keys[2] = ce_ydb_a0->key("size"),
 //                size = (uint32_t) d->get_float(d,
-//                                               ce_yng_a0->combine_key(
+//                                               ce_ydb_a0->combine_key(
 //                                                       keys,
 //                                                       CE_ARRAY_LEN(
 //                                                               keys)),
@@ -240,9 +240,9 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //    uint64_t keys[] = {
 //            d->hash(d, chanels_n),
-//            ce_yng_a0->key(name),
+//            ce_ydb_a0->key(name),
 //    };
-//    uint64_t chanel_data_n = ce_yng_a0->combine_key(keys,
+//    uint64_t chanel_data_n = ce_ydb_a0->combine_key(keys,
 //                                                    CE_ARRAY_LEN(
 //                                                            keys));
 //
@@ -282,9 +282,9 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //    uint64_t keys[] = {
 //            d->hash(d, value),
-//            ce_yng_a0->key("types"),
+//            ce_ydb_a0->key("types"),
 //    };
-//    ce_yng_node types = d->get(d, ce_yng_a0->combine_key(keys,
+//    ce_yng_node types = d->get(d, ce_ydb_a0->combine_key(keys,
 //                                                         CE_ARRAY_LEN(
 //                                                                 keys)));
 //
@@ -295,22 +295,22 @@ static void _destroy_compile_output(struct compile_output *output) {
 //    ce_array_push(output->vb_decl, vertex_decl, _G.allocator);
 //
 //    // IB, VB
-//    keys[1] = ce_yng_a0->key("chanels");
+//    keys[1] = ce_ydb_a0->key("chanels");
 //    ce_yng_node chanels_n = d->get(d,
-//                                   ce_yng_a0->combine_key(keys,
+//                                   ce_ydb_a0->combine_key(keys,
 //                                                          CE_ARRAY_LEN(
 //                                                                  keys)));
 //
 //
-//    keys[1] = ce_yng_a0->key("indices");
-//    uint64_t k = ce_yng_a0->combine_key(keys,
+//    keys[1] = ce_ydb_a0->key("indices");
+//    uint64_t k = ce_ydb_a0->combine_key(keys,
 //                                        CE_ARRAY_LEN(
 //                                                keys));
 //    ce_yng_node indices_n = d->get(d, k);
 //
 //    keys[0] = k;
-//    keys[1] = ce_yng_a0->key("size");
-//    ce_yng_node i_size = d->get(d, ce_yng_a0->combine_key(keys,
+//    keys[1] = ce_ydb_a0->key("size");
+//    ce_yng_node i_size = d->get(d, ce_ydb_a0->combine_key(keys,
 //                                                          CE_ARRAY_LEN(
 //                                                                  keys)));
 //
@@ -325,11 +325,11 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //            uint64_t keys[] = {
 //                    d->hash(d, indices_n),
-//                    ce_yng_a0->key(name),
+//                    ce_ydb_a0->key(name),
 //            };
 //
 //            ce_yng_node node = d->get(d,
-//                                      ce_yng_a0->combine_key(keys,
+//                                      ce_ydb_a0->combine_key(keys,
 //                                                             CE_ARRAY_LEN(
 //                                                                     keys)));
 //            if (0 != node.idx) {
@@ -364,10 +364,10 @@ static void _destroy_compile_output(struct compile_output *output) {
 //
 //    uint64_t keys[] = {
 //            d->hash(d, value),
-//            ce_yng_a0->key("local"),
+//            ce_ydb_a0->key("local"),
 //    };
 //    ce_yng_node local_pose = d->get(d,
-//                                    ce_yng_a0->combine_key(keys,
+//                                    ce_ydb_a0->combine_key(keys,
 //                                                           CE_ARRAY_LEN(
 //                                                                   keys)));
 //
@@ -382,8 +382,8 @@ static void _destroy_compile_output(struct compile_output *output) {
 //    ce_array_push_n(output->output->node_pose, pose, 16, _G.allocator);
 //
 //
-//    keys[1] = ce_yng_a0->key("geometries");
-//    uint64_t geometries_k = ce_yng_a0->combine_key(keys,
+//    keys[1] = ce_ydb_a0->key("geometries");
+//    uint64_t geometries_k = ce_ydb_a0->combine_key(keys,
 //                                                   CE_ARRAY_LEN(
 //                                                           keys));
 //
@@ -411,8 +411,8 @@ static void _destroy_compile_output(struct compile_output *output) {
 //    }
 //
 //
-//    keys[1] = ce_yng_a0->key("children");
-//    uint64_t children_k = ce_yng_a0->combine_key(keys,
+//    keys[1] = ce_ydb_a0->key("children");
+//    uint64_t children_k = ce_ydb_a0->combine_key(keys,
 //                                                 CE_ARRAY_LEN(
 //                                                         keys));
 //    ce_yng_node children_n = d->get(d,
@@ -433,9 +433,9 @@ static void _destroy_compile_output(struct compile_output *output) {
 //                         struct compile_output *output) {
 //
 //    ce_yng_node geometries = document->get(document,
-//                                           ce_yng_a0->key("geometries"));
+//                                           ce_ydb_a0->key("geometries"));
 //    ce_yng_node graph = document->get(document,
-//                                      ce_yng_a0->key("graph"));
+//                                      ce_ydb_a0->key("graph"));
 //
 //    document->foreach_dict_node(document, geometries,
 //                                foreach_geometries_clb, output);
@@ -700,7 +700,7 @@ extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ct_scenegprah_a0);
     CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_yng_a0);
+    CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_renderer_a0);
 

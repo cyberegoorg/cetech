@@ -23,7 +23,7 @@
 #include <celib/os.h>
 #include <celib/ydb.h>
 #include <celib/config.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
 

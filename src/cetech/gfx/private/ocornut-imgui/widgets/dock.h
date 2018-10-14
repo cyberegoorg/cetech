@@ -1,7 +1,6 @@
 
 #include <celib/buffer.inl>
 #include <celib/ydb.h>
-#include <celib/yng.h>
 #include <celib/cdb.h>
 
 namespace ImGui {
@@ -31,6 +30,6 @@ namespace ImGui {
 
     IMGUI_API void loadFromYaml(const char *file,
                                 struct ce_ydb_a0 *ydb,
-                                struct ce_yng_a0 *yng, struct ce_cdb_a0* cdb);
+                                struct ce_ydb_a0 *yng, struct ce_cdb_a0* cdb);
 
 } // namespace ImGui

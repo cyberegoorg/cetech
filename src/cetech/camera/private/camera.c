@@ -1,7 +1,7 @@
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/transform/transform.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/ydb.h>
 #include <cetech/camera/camera.h>
 
@@ -29,9 +29,9 @@ static void _camera_compiler(const char *filename,
                              uint64_t component_key,
                              ce_cdb_obj_o *writer) {
 
-    float near = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("near"), 0.0f);
-    float far = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("far"), 0.0f);
-    float fov = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("fov"), 0.0f);
+    float near = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("near"), 0.0f);
+    float far = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("far"), 0.0f);
+    float fov = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("fov"), 0.0f);
 
     ce_cdb_a0->set_float(writer, PROP_NEAR, near);
     ce_cdb_a0->set_float(writer, PROP_FAR, far);
@@ -181,7 +181,7 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);

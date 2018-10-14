@@ -20,7 +20,7 @@
 #include <celib/fmath.inl>
 #include <cetech/editor/command_system.h>
 #include <celib/hash.inl>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
@@ -244,7 +244,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_yng_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);

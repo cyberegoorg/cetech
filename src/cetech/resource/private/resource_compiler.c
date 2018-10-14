@@ -21,7 +21,6 @@
 #include <celib/array.inl>
 #include <celib/buffer.inl>
 #include <celib/cdb.h>
-#include <celib/yng.h>
 
 
 //==============================================================================
@@ -459,7 +458,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_config_a0);
             CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_yng_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },

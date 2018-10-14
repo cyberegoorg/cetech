@@ -3,7 +3,7 @@
 #include "celib/hashlib.h"
 #include "celib/memory.h"
 #include "celib/api_system.h"
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/ydb.h>
 #include <celib/macros.h>
 #include <celib/array.inl>
@@ -31,13 +31,13 @@ static void component_compiler(const char *filename,
             .scale = {1.0f, 1.0f, 1.0f}
     };
 
-    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("scale"), t_data.scale);
+    ce_cdb_a0->read_vec3(component_key, ce_ydb_a0->key("scale"), t_data.scale);
     ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
 
-    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("position"), t_data.position);
+    ce_cdb_a0->read_vec3(component_key, ce_ydb_a0->key("position"), t_data.position);
     ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
 
-    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("rotation"), t_data.rotation);
+    ce_cdb_a0->read_vec3(component_key, ce_ydb_a0->key("rotation"), t_data.rotation);
     ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
 }
 
@@ -241,7 +241,7 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ct_ecs_a0);

@@ -13,7 +13,6 @@
 #include <celib/macros.h>
 #include <celib/array.inl>
 #include <celib/cdb.h>
-#include <celib/yng.h>
 
 #include <cetech/resource/resource.h>
 #include <cetech/resource/package.h>
@@ -123,7 +122,6 @@ int package_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_yng_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
     _G = (struct _G) {

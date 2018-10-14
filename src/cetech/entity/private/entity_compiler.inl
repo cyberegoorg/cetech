@@ -14,7 +14,6 @@
 #include <celib/module.h>
 #include <celib/ydb.h>
 #include <celib/hash.inl>
-#include <celib/yng.h>
 #include <cetech/resource/builddb.h>
 
 #include "celib/handler.inl"
@@ -52,9 +51,9 @@ static void compile_entitity(const char *filename,
 //
 //    }
 
-    const char *name_str = ce_cdb_a0->read_str(root_key, ce_yng_a0->key("name"),
+    const char *name_str = ce_cdb_a0->read_str(root_key, ce_ydb_a0->key("name"),
                                                NULL);
-    const char *prefab = ce_cdb_a0->read_str(root_key, ce_yng_a0->key("PREFAB"),
+    const char *prefab = ce_cdb_a0->read_str(root_key, ce_ydb_a0->key("PREFAB"),
                                              NULL);
 
     struct ct_resource_id rid = {};
@@ -65,7 +64,7 @@ static void compile_entitity(const char *filename,
     }
 
     uint64_t components = ce_cdb_a0->read_subobject(root_key,
-                                                    ce_yng_a0->key(
+                                                    ce_ydb_a0->key(
                                                             "components"), 0);
 
     const uint64_t components_keys_count = ce_cdb_a0->prop_count(components);
@@ -109,7 +108,7 @@ static void compile_entitity(const char *filename,
     ce_cdb_a0->write_commit(components_writer);
 
     uint64_t children = ce_cdb_a0->read_subobject(root_key,
-                                                  ce_yng_a0->key(
+                                                  ce_ydb_a0->key(
                                                           "children"), 0);
 
     const uint64_t children_keys_count = ce_cdb_a0->prop_count(children);

@@ -115,7 +115,6 @@ void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
         CE_INIT_API(api, ce_cdb_a0);
         CE_INIT_API(api, ct_game_system_a0);
         CE_INIT_API(api, ce_ydb_a0);
-        CE_INIT_API(api, ce_yng_a0);
         CE_INIT_API(api, ct_editor_ui_a0);
     }
 }

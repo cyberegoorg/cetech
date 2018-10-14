@@ -2,7 +2,7 @@
 #include <celib/config.h>
 #include <celib/memory.h>
 #include <celib/module.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/hashlib.h>
 #include <celib/log.h>
 #include <celib/os.h>
@@ -13,32 +13,441 @@
 #include <celib/fmath.inl>
 #include <celib/hash.inl>
 #include <celib/buffer.inl>
+#include <yaml/yaml.h>
+#include <celib/cdb.h>
 
 #define _G ydb_global
 #define LOG_WHERE "ydb"
 
+enum node_type {
+    NODE_INVALID = 0,
+    NODE_FLOAT = 1,
+    NODE_STRING = 2,
+    NODE_TRUE = 3,
+    NODE_FALSE = 4,
+    NODE_MAP = 5,
+    NODE_SEQ = 6,
+};
+
 static struct _G {
-    struct ce_hash_t document_cache_map;
     struct ce_hash_t obj_cache_map;
-    struct ce_yng_doc **document_cache;
     char **document_path;
 
     struct ce_spinlock cache_lock;
     struct ce_hash_t modified_files_set;
+
+    //
+    struct ce_hash_t key_to_str;
+    uint32_t *key_to_str_offset;
+    char *key_to_str_data;
+    struct ce_spinlock key_lock;
+
     struct ce_alloc *allocator;
 } _G;
 
-void expire_document_in_cache(const char *path,
-                              uint64_t path_key) {
-    uint32_t idx = ce_hash_lookup(&_G.document_cache_map, path_key, UINT32_MAX);
+static void add_key(const char *key,
+                    uint32_t key_len,
+                    uint64_t key_hash) {
+    ce_os_a0->thread->spin_lock(&_G.key_lock);
+    const uint32_t idx = ce_array_size(_G.key_to_str_offset);
+    const uint32_t offset = ce_array_size(_G.key_to_str_data);
+
+    ce_array_push_n(_G.key_to_str_data, key, sizeof(char) * (key_len + 1),
+                    _G.allocator);
+    ce_array_push(_G.key_to_str_offset, offset, _G.allocator);
+
+    ce_hash_add(&_G.key_to_str, key_hash, idx, _G.allocator);
+    ce_os_a0->thread->spin_unlock(&_G.key_lock);
+}
+
+static const char *get_key(uint64_t hash) {
+    uint32_t idx = ce_hash_lookup(&_G.key_to_str, hash, UINT32_MAX);
     if (UINT32_MAX == idx) {
+        return NULL;
+    }
+
+    return &_G.key_to_str_data[_G.key_to_str_offset[idx]];
+}
+
+struct node_value {
+    union {
+        float f;
+        char *string;
+        uint32_t node_count;
+    };
+};
+
+
+
+static uint64_t hash_combine(uint64_t lhs,
+                             uint64_t rhs) {
+    if (rhs == 0) return lhs;
+    if (lhs == 0) return rhs;
+    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
+    return lhs;
+}
+
+static uint64_t calc_key(const char *key) {
+    uint64_t hash = 0;
+    bool parse = false;
+
+    char *begin;
+    char *it = (char *) key;
+    while (*it != '\0') {
+        if (!parse) {
+            begin = it;
+            parse = true;
+        } else if (*it == '.') {
+            const uint32_t size = it - begin;
+            const uint64_t part_hash = ce_hash_murmur2_64(begin,
+                                                          size,
+                                                          0);
+            add_key(begin, size, part_hash);
+            hash = hash_combine(hash, part_hash);
+            parse = false;
+        }
+
+        ++it;
+    }
+
+    const uint32_t size = it - begin;
+    const uint64_t part_hash = ce_hash_murmur2_64(begin, size, 0);
+    add_key(begin, size, part_hash);
+    hash = hash_combine(hash, part_hash);
+
+    return hash;
+}
+
+static uint64_t combine_key(const uint64_t *keys,
+                            uint32_t count) {
+    uint64_t hash = keys[0];
+
+    for (uint32_t i = 1; i < count; ++i) {
+        hash = hash_combine(hash, keys[i]);
+    }
+
+    return hash;
+}
+
+
+static uint64_t combine_key_str(const char **keys,
+                                uint32_t count) {
+    uint64_t hash = ce_id_a0->id64(keys[0]);
+
+    for (uint32_t i = 1; i < count; ++i) {
+        hash = hash_combine(hash, ce_id_a0->id64(keys[i]));
+    }
+
+    return hash;
+}
+
+static void type_value_from_scalar(const uint8_t *scalar,
+                                   enum node_type *type,
+                                   struct node_value *vallue,
+                                   bool is_key) {
+    const char *scalar_str = (const char *) scalar;
+
+    if (!strlen(scalar_str)) {
+        *type = NODE_STRING;
+        *vallue = (struct node_value) {.string = strdup(scalar_str)};
         return;
     }
 
+    float f;
+
+    if (!is_key) {
+        if (sscanf(scalar_str, "%f", &f)) {
+            *type = NODE_FLOAT;
+            *vallue = (struct node_value) {.f = f};
+            return;
+
+        } else if ((0 == strcmp(scalar_str, "y")) ||
+                   (0 == strcmp(scalar_str, "yes")) ||
+                   (0 == strcmp(scalar_str, "true"))) {
+            *type = NODE_TRUE;
+            return;
+        } else if ((0 == strcmp(scalar_str, "n")) ||
+                   (0 == strcmp(scalar_str, "no")) ||
+                   (0 == strcmp(scalar_str, "false"))) {
+            *type = NODE_FALSE;
+            return;
+        }
+    }
+
+    *type = NODE_STRING;
+    *vallue = (struct node_value) {.string = strdup(scalar_str)};
+}
+
+
+uint64_t cdb_from_vio(struct ce_vio *vio,
+                      struct ce_alloc *alloc) {
+    yaml_parser_t parser;
+    yaml_event_t event;
+
+    struct parent_stack_state {
+        uint64_t root_object;
+        ce_cdb_obj_o *writer;
+        enum node_type type;
+        uint32_t node_count;
+        uint64_t key_hash;
+        uint64_t str_hash;
+        char **str_array;
+        float *float_array;
+    };
+
+    struct parent_stack_state *parent_stack = NULL;
+    uint32_t parent_stack_top;
+    uint64_t key = 0;
+
+
+    uint64_t root_object = 0;
+    ce_array_push(parent_stack,
+                  ((struct parent_stack_state) {}),
+                  _G.allocator);
+
+    uint8_t *source_data = CE_ALLOC(alloc, uint8_t, vio->size(vio) + 1);
+    memset(source_data, 0, vio->size(vio) + 1);
+    vio->read(vio, source_data, sizeof(char), vio->size(vio));
+
+    if (!yaml_parser_initialize(&parser)) {
+        ce_log_a0->error(LOG_WHERE, "Failed to initialize parser");
+        goto error;
+    }
+
+    yaml_parser_set_input_string(&parser, source_data,
+                                 vio->size(vio));
+
+#define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
+#define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
+    do {
+        parent_stack_top = ce_array_size(parent_stack) - 1;
+
+        if (!yaml_parser_parse(&parser, &event)) {
+            ce_log_a0->error(LOG_WHERE, "Parser error %d\n", parser.error);
+            goto error;
+        }
+
+        struct parent_stack_state state = {};
+        switch (event.type) {
+            case YAML_NO_EVENT:
+                break;
+
+            case YAML_STREAM_START_EVENT:
+                break;
+
+            case YAML_STREAM_END_EVENT:
+                break;
+
+            case YAML_DOCUMENT_START_EVENT:
+                break;
+
+            case YAML_DOCUMENT_END_EVENT:
+                break;
+
+            case YAML_SEQUENCE_START_EVENT: {
+                key = parent_stack[parent_stack_top].str_hash;
+                state = (struct parent_stack_state) {
+                        .type = NODE_SEQ,
+                        .key_hash = key,
+                };
+
+
+                ++parent_stack[parent_stack_top].node_count;
+
+                if (HAS_KEY()) {
+                    ce_array_pop_back(parent_stack);
+                }
+
+                ce_array_push(parent_stack, state, _G.allocator);
+                break;
+            }
+
+            case YAML_SEQUENCE_END_EVENT: {
+                struct parent_stack_state *s = &parent_stack[parent_stack_top];
+
+                struct parent_stack_state *sm;
+                sm = &parent_stack[parent_stack_top - 1];
+
+                key = s->key_hash;
+
+                const uint32_t float_len = ce_array_size(s->float_array);
+                if (float_len) {
+                    switch (s->node_count) {
+                        case 3:
+                            ce_cdb_a0->set_vec3(sm->writer, key,
+                                                s->float_array);
+                            break;
+                        case 4:
+                            ce_cdb_a0->set_vec4(sm->writer, key,
+                                                s->float_array);
+                            break;
+
+                        case 16:
+                            ce_cdb_a0->set_mat4(sm->writer, key,
+                                                s->float_array);
+                            break;
+                    }
+
+                    ce_array_free(s->float_array, alloc);
+                }
+
+                const uint32_t len = ce_array_size(s->str_array);
+                if (len) {
+                    uint64_t array = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                              0);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(array);
+                    for (int i = 0; i < len; ++i) {
+                        const char *str = s->str_array[i];
+                        ce_cdb_a0->set_str(w, ce_id_a0->id64(str), str);
+                    }
+                    ce_cdb_a0->write_commit(w);
+
+                    ce_cdb_a0->set_subobject(sm->writer, key, array);
+
+                    ce_array_free(s->str_array, alloc);
+                }
+
+                ce_array_pop_back(parent_stack);
+                break;
+            }
+
+            case YAML_MAPPING_START_EVENT: {
+                key = parent_stack[parent_stack_top].str_hash;
+
+                uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+
+                if (!root_object) {
+                    root_object = obj;
+                }
+
+                state = (struct parent_stack_state) {
+                        .type = NODE_MAP,
+                        .root_object = obj,
+                        .key_hash = key,
+                        .writer = ce_cdb_a0->write_begin(obj)
+                };
+
+
+                ++parent_stack[parent_stack_top].node_count;
+
+                if (HAS_KEY()) {
+                    state.key_hash = parent_stack[parent_stack_top].str_hash;
+                    ce_cdb_a0->set_subobject(
+                            parent_stack[parent_stack_top - 1].writer,
+                            state.key_hash, obj);
+                    ce_array_pop_back(parent_stack);
+                }
+
+                ce_array_push(parent_stack, state, _G.allocator);
+                break;
+            }
+
+
+            case YAML_MAPPING_END_EVENT: {
+                struct parent_stack_state *s = &parent_stack[parent_stack_top];
+                ce_cdb_a0->write_commit(s->writer);
+                ce_array_pop_back(parent_stack);
+                break;
+            }
+
+            case YAML_ALIAS_EVENT:
+                break;
+
+            case YAML_SCALAR_EVENT: {
+                enum node_type type;
+                struct node_value value;
+                type_value_from_scalar(event.data.scalar.value,
+                                       &type, &value, IS_KEY());
+
+
+                if (IS_KEY()) {
+                    uint64_t key_hash = ce_id_a0->id64(value.string);
+
+                    state = (struct parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
+
+                    ++parent_stack[parent_stack_top].node_count;
+                    ce_array_push(parent_stack, state, _G.allocator);
+
+
+                    // VALUE_WITH_KEY
+                } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
+                    key = parent_stack[parent_stack_top].str_hash;
+                    ce_cdb_obj_o *w = parent_stack[parent_stack_top - 1].writer;
+
+                    switch (type) {
+                        case NODE_FLOAT:
+                            ce_cdb_a0->set_float(w, key, value.f);
+                            break;
+
+                        case NODE_STRING:
+                            ce_cdb_a0->set_str(w, key, value.string);
+                            break;
+
+                        case NODE_TRUE:
+                            ce_cdb_a0->set_bool(w, key, true);
+                            break;
+
+                        case NODE_FALSE:
+                            ce_cdb_a0->set_bool(w, key, false);
+                            break;
+
+                        case NODE_INVALID:
+                        case NODE_MAP:
+                        case NODE_SEQ:
+                            break;
+                    }
+//                    if (PREFAB_KEY == parent_stack[parent_stack_top].str_hash) {
+//                        ce_array_push(inst->parent_file, value.string,
+//                                      _G.allocator);
+//                    }
+
+                    ce_array_pop_back(parent_stack);
+
+                    // VALUE_IN_SEQ
+                } else if (parent_stack[parent_stack_top].type == NODE_SEQ) {
+                    struct parent_stack_state *s = &parent_stack[parent_stack_top];
+                    switch (type) {
+                        case NODE_FLOAT:
+                            ce_array_push(s->float_array, value.f, alloc);
+                            break;
+
+                        case NODE_STRING:
+                            ce_array_push(s->str_array, value.string, alloc);
+                            break;
+
+                        case NODE_INVALID:
+                        case NODE_TRUE:
+                        case NODE_FALSE:
+                        case NODE_MAP:
+                        case NODE_SEQ:
+                            break;
+                    }
+
+                    ++s->node_count;
+                }
+
+            }
+                break;
+        }
+
+        if (event.type != YAML_STREAM_END_EVENT) {
+            yaml_event_delete(&event);
+        }
+
+    } while (event.type != YAML_STREAM_END_EVENT);
+
+    return root_object;
+
+    error:
+    yaml_event_delete(&event);
+    yaml_parser_delete(&parser);
+
+    return 0;
+}
+
+void expire_document_in_cache(const char *path,
+                              uint64_t path_key) {
     ce_os_a0->thread->spin_lock(&_G.cache_lock);
-    struct ce_yng_doc *doc = _G.document_cache[idx];
-    ce_hash_remove(&_G.document_cache_map, path_key);
-    ce_yng_a0->destroy(doc);
     ce_os_a0->thread->spin_unlock(&_G.cache_lock);
 }
 
@@ -56,7 +465,7 @@ uint64_t load_obj_to_cache(const char *path,
         return 0;
     }
 
-    uint64_t obj = ce_yng_a0->cdb_from_vio(f, _G.allocator);
+    uint64_t obj = ce_ydb_a0->cdb_from_vio(f, _G.allocator);
     ce_fs_a0->close(f);
 
     if (!obj) {
@@ -84,13 +493,6 @@ uint64_t get_obj(const char *path) {
 
     return obj;
 };
-
-void free(const char *path) {
-    CE_UNUSED(path);
-    //expire_document_in_cache(path, CE_ID64_0(path));
-
-    // TODO: ref counting
-}
 
 
 struct out_keys_s {
@@ -168,7 +570,7 @@ void save(const char *path) {
     }
 
 //    struct ce_yng_doc *d = get(path);
-//    ce_yng_a0->save_to_vio(_G.allocator, f, d);
+//    ce_ydb_a0->save_to_vio(_G.allocator, f, d);
 
     ce_fs_a0->close(f);
     unmodified(path);
@@ -176,23 +578,28 @@ void save(const char *path) {
 
 
 void save_all_modified() {
-    for (int i = 0; i < _G.document_cache_map.n; ++i) {
-        if (!ce_hash_contain(&_G.modified_files_set,
-                             _G.document_cache_map.keys[i])) {
-            continue;
-        }
-
-        save(_G.document_path[_G.document_cache_map.values[i]]);
-        return;
-    }
+//    for (int i = 0; i < _G.document_cache_map.n; ++i) {
+//        if (!ce_hash_contain(&_G.modified_files_set,
+//                             _G.document_cache_map.keys[i])) {
+//            continue;
+//        }
+//
+//        save(_G.document_path[_G.document_cache_map.values[i]]);
+//        return;
+//    }
 }
 
 static struct ce_ydb_a0 ydb_api = {
         .get_obj = get_obj,
-        .free = free,
         .parent_files = parent_files,
         .save = save,
         .save_all_modified = save_all_modified,
+
+        .cdb_from_vio = cdb_from_vio,
+        .get_key = get_key ,
+        .key = calc_key,
+        .combine_key = combine_key ,
+        .combine_key_str = combine_key_str ,
 };
 
 struct ce_ydb_a0 *ce_ydb_a0 = &ydb_api;
@@ -204,13 +611,11 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    for (int i = 0; i < ce_array_size(_G.document_cache); ++i) {
-        ce_yng_a0->destroy(_G.document_cache[i]);
-    }
+//    for (int i = 0; i < ce_array_size(_G.document_cache); ++i) {
+////        ce_ydb_a0->destroy(_G.document_cache[i]);
+//    }
 
     ce_array_free(_G.document_path, _G.allocator);
-    ce_array_free(_G.document_cache, _G.allocator);
-    ce_hash_free(&_G.document_cache_map, _G.allocator);
     ce_hash_free(&_G.modified_files_set, _G.allocator);
 
     _G = (struct _G) {};

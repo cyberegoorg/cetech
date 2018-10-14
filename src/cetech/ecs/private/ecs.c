@@ -1421,7 +1421,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_resource_a0);
             CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_yng_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_task_a0);

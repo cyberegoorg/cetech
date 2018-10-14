@@ -23,7 +23,7 @@
 #include <celib/macros.h>
 #include <stdlib.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <cetech/editor/editor_ui.h>
 
 
@@ -38,10 +38,10 @@ static struct _G {
 void _mesh_component_compiler(const char *filename,
                               uint64_t component_key,
                               ce_cdb_obj_o *writer) {
-    const char *scene = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("scene"), "");
-    const char *mesh = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("mesh"), "");
-    const char *mat = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("material"), "");
-    const char *node = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("node"), "");
+    const char *scene = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("scene"), "");
+    const char *mesh = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("mesh"), "");
+    const char *mat = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("material"), "");
+    const char *node = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("node"), "");
 
 
     ce_cdb_a0->set_uint64(writer, PROP_MESH_ID, ce_id_a0->id64(mesh));
@@ -292,7 +292,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_scenegprah_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_material_a0);
-            CE_INIT_API(api, ce_yng_a0);
+            CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_scene_a0);
             CE_INIT_API(api, ct_ecs_a0);

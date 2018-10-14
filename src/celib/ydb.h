@@ -15,7 +15,6 @@
 
 struct ce_vio;
 struct ce_alloc;
-struct ce_yng_doc;
 
 //==============================================================================
 // Defines
@@ -37,9 +36,6 @@ struct ce_yng_doc;
 struct ce_ydb_a0 {
     uint64_t (*get_obj)(const char *path);
 
-
-    void (*free)(const char *path);
-
     void (*parent_files)(const char *path,
                          const char ***files,
                          uint32_t *count);
@@ -47,6 +43,15 @@ struct ce_ydb_a0 {
     void (*save)(const char *path);
 
     void (*save_all_modified)();
+
+
+    uint64_t (*cdb_from_vio)(struct ce_vio *vio, struct ce_alloc *alloc);
+    const char *(*get_key)(uint64_t hash);
+    uint64_t (*key)(const char *key);
+    uint64_t (*combine_key)(const uint64_t *keys,
+                            uint32_t count);
+    uint64_t (*combine_key_str)(const char **keys,
+                                uint32_t count);
 
 };
 

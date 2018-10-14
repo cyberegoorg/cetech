@@ -22,7 +22,7 @@
 #include <cetech/editor/asset_property.h>
 #include <cetech/gfx/debugui.h>
 #include <celib/cdb.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/builddb.h>

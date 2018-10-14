@@ -12,9 +12,9 @@
 #include <celib/hashlib.h>
 #include <celib/config.h>
 #include <celib/module.h>
-#include <celib/yng.h>
 #include <celib/cdb.h>
 #include <celib/macros.h>
+#include <celib/ydb.h>
 
 
 //==============================================================================
@@ -95,39 +95,41 @@ struct foreach_config_data {
 };
 
 
-static void foreach_config_clb(struct ce_yng_node key,
-                               struct ce_yng_node value,
-                               void *_data) {
+static void foreach_config_clb(uint64_t key,
+                               uint64_t value,
+                               char *root_name) {
 
-    struct foreach_config_data *output = (struct foreach_config_data *) _data;
-    struct ce_yng_doc *d = key.d;
 
-    const char *key_str = d->as_string(d, key, "");
+    const char *key_str = ce_id_a0->str_from_id64(key);
 
     char name[1024] = {};
-    if (output->root_name != NULL) {
+    if (root_name != NULL) {
         snprintf(name, CE_ARRAY_LEN(name),
-                 "%s.%s", output->root_name, key_str);
+                 "%s.%s", root_name, key_str);
     } else {
         snprintf(name, CE_ARRAY_LEN(name), "%s", key_str);
     }
 
-    enum node_type type = d->type(d, value);
 
-    if (type == NODE_MAP) {
-        struct foreach_config_data data = {
-                .root_name = name
-        };
+    enum ce_cdb_type type = ce_cdb_a0->prop_type(value, key);
 
-        d->foreach_dict_node(d, value, foreach_config_clb, &data);
+    if (type == CDB_TYPE_SUBOBJECT) {
+        uint64_t sub_obj = ce_cdb_a0->read_subobject(value, key, 0);
+        const uint64_t n = ce_cdb_a0->prop_count(sub_obj);
+        uint64_t keys[n];
+        ce_cdb_a0->prop_keys(sub_obj, keys);
 
-    } else if (type != NODE_SEQ) {
+        for (int i = 0; i < n; ++i) {
+            foreach_config_clb(keys[i], sub_obj, name);
+        }
+
+    } else {
         float tmp_f;
         int tmp_int;
         const char *str;
 
-        if (type == NODE_STRING) {
-            str = d->as_string(d, value, "");
+        if (type == CDB_TYPE_STR) {
+            str = ce_cdb_a0->read_str(value, key, "");
             _cvar_from_str(name, str);
 
         } else {
@@ -144,17 +146,17 @@ static void foreach_config_clb(struct ce_yng_node key,
                         break;
 
                     case CDB_TYPE_FLOAT:
-                        tmp_f = d->as_float(d, value, 0.0f);
+                        tmp_f = ce_cdb_a0->read_float(value, key, 0.0f);
                         ce_cdb_a0->set_float(writer, key, tmp_f);
                         break;
 
                     case CDB_TYPE_UINT64:
-                        tmp_int = (int) d->as_float(d, value, 0.0f);
+                        tmp_int =  (int)ce_cdb_a0->read_float(value, key, 0.0f);
                         ce_cdb_a0->set_uint64(writer, key, tmp_int);
                         break;
 
                     case CDB_TYPE_STR:
-                        str = d->as_string(d, value, "");
+                        str = ce_cdb_a0->read_str(value, key, "");
                         ce_cdb_a0->set_str(writer, key, str);
                         break;
                     default:
@@ -172,18 +174,18 @@ static int load_from_yaml_file(const char *path,
                                struct ce_alloc *alloc) {
 
     struct ce_vio *f = ce_os_a0->vio->from_file(path, VIO_OPEN_READ);
-    struct ce_yng_doc *d = ce_yng_a0->from_vio(f, alloc);
+    uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
     f->close(f);
 
-    struct foreach_config_data config_data = {
-            .root_name = NULL
-    };
+    const uint64_t n = ce_cdb_a0->prop_count(obj);
+    uint64_t keys[n];
+    ce_cdb_a0->prop_keys(obj, keys);
 
+    for (int i = 0; i < n; ++i) {
+        foreach_config_clb(keys[i], obj, NULL);
+    }
 
-    d->foreach_dict_node(d, d->get(d, 0), foreach_config_clb,
-                         &config_data);
-
-    ce_yng_a0->destroy(d);
+    ce_cdb_a0->destroy_object(obj);
 
     return 1;
 }

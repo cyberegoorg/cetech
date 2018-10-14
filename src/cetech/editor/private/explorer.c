@@ -8,7 +8,7 @@
 #include <celib/api_system.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
-#include <celib/yng.h>
+#include <celib/ydb.h>
 #include <celib/ydb.h>
 #include <celib/fs.h>
 #include <celib/ebus.h>

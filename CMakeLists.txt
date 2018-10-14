@@ -80,7 +80,6 @@ set(CORELIB_SOURCE_FILES
         src/celib/private/os_time.c
         src/celib/private/os_window_sdl2.c
         src/celib/private/fs.c
-        src/celib/private/yng.c
         src/celib/private/ydb.c
         src/celib/private/cdb.c
         src/celib/private/ebus.c
