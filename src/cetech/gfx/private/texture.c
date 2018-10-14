@@ -216,18 +216,11 @@ static void _on_obj_change(uint64_t obj,
 }
 
 bool texture_compiler(const char *filename, uint64_t k, struct ct_resource_id rid,const char *fullname) {
-
     struct ce_alloc *a = ce_memory_a0->system;
 
-    uint64_t key[] = {k, ce_yng_a0->key("input")};
-
-    const char *input_str = ce_ydb_a0->get_str(filename, key, CE_ARRAY_LEN(key), "");
-
-    key[1] = ce_yng_a0->key("gen_mipmaps");
-    bool gen_mipmaps = ce_ydb_a0->get_bool(filename, key, CE_ARRAY_LEN(key), true);
-
-    key[1] = ce_yng_a0->key("is_normalmap");
-    bool is_normalmap = ce_ydb_a0->get_bool(filename, key, CE_ARRAY_LEN(key), false);
+    const char *input_str = ce_cdb_a0->read_str(k, ce_id_a0->id64("input"), "");
+    bool gen_mipmaps = ce_cdb_a0->read_bool(k, ce_id_a0->id64("gen_mipmaps"), false);
+    bool is_normalmap = ce_cdb_a0->read_bool(k, ce_id_a0->id64("is_normalmap"), false);
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), TEXTURE_TYPE);
 

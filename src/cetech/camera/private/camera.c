@@ -26,22 +26,12 @@ static struct CameraGlobal {
 } CameraGlobal;
 
 static void _camera_compiler(const char *filename,
-                             uint64_t *component_key,
-                             uint32_t component_key_count,
+                             uint64_t component_key,
                              ce_cdb_obj_o *writer) {
 
-
-    uint64_t keys[component_key_count + 1];
-    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-
-    keys[component_key_count] = ce_yng_a0->key("near");
-    float near = ce_ydb_a0->get_float(filename, CE_ARR_ARG(keys), 0.0f);
-
-    keys[component_key_count] = ce_yng_a0->key("far");
-    float far = ce_ydb_a0->get_float(filename, CE_ARR_ARG(keys), 0.0f);
-
-    keys[component_key_count] = ce_yng_a0->key("fov");
-    float fov = ce_ydb_a0->get_float(filename, CE_ARR_ARG(keys), 0.0f);
+    float near = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("near"), 0.0f);
+    float far = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("far"), 0.0f);
+    float fov = ce_cdb_a0->read_float(component_key, ce_yng_a0->key("fov"), 0.0f);
 
     ce_cdb_a0->set_float(writer, PROP_NEAR, near);
     ce_cdb_a0->set_float(writer, PROP_FAR, far);

@@ -202,7 +202,7 @@ enum ce_vio_open_mode {
 };
 
 enum ce_vio_seek {
-    VIO_SEEK_SET,
+    VIO_SEEK_SET = 1,
     VIO_SEEK_CUR,
     VIO_SEEK_END
 };

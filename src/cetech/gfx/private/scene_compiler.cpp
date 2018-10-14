@@ -479,11 +479,10 @@ static void _compile_assimp_node(struct aiNode *root,
 static int _compile_assimp(const char *filename,
                            uint64_t k,
                            struct compile_output *output) {
-    uint64_t input_key[] = {k, ce_yng_a0->key("import"),
-                            ce_yng_a0->key("input")};
 
-    const char *input_str = ce_ydb_a0->get_str(filename, input_key,
-                                               CE_ARRAY_LEN(input_key), "");
+    uint64_t import_obj = ce_cdb_a0->read_subobject(k, ce_id_a0->id64("import"), 0);
+
+    const char *input_str = ce_cdb_a0->read_str(import_obj, ce_id_a0->id64("input"), "");
 
     ct_builddb_a0->add_dependency(filename, input_str);
 
@@ -496,15 +495,10 @@ static int _compile_assimp(const char *filename,
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
 
-    uint64_t flip_uvs_key[] = {
-            k,
-            ce_yng_a0->key("import"),
-            ce_yng_a0->key("postprocess"),
-            ce_yng_a0->key("flip_uvs")
-    };
+    uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_obj, ce_id_a0->id64("postprocess"), 0);
 
-    if (ce_ydb_a0->get_bool(filename,
-                            flip_uvs_key, CE_ARRAY_LEN(flip_uvs_key), false)) {
+
+    if (ce_cdb_a0->read_bool(postprocess_obj, ce_id_a0->id64("flip_uvs"), false)) {
         postprocess_flag |= aiProcess_FlipUVs;
     }
 
@@ -626,14 +620,9 @@ extern "C" bool scene_compiler(const char *filename,
 
     int ret = 1;
 
-    uint64_t keys[] = {k, ce_yng_a0->key("import")};
-
-    if (ce_ydb_a0->has_key(filename, keys, CE_ARRAY_LEN(keys))) {
+    if (ce_cdb_a0->prop_exist(k, ce_id_a0->id64("import"))) {
         ret = _compile_assimp(filename, k, output);
     }
-//    else {
-//        ret = _compile_yaml(document, output);
-//    }
 
     if (!ret) {
         _destroy_compile_output(output);

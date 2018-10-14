@@ -226,17 +226,8 @@ bool shader_compiler(const char *filename,
                      struct ct_resource_id rid, const char *fullname) {
     struct ce_alloc *a = ce_memory_a0->system;
 
-    uint64_t key[] = {
-            k,
-            ce_yng_a0->key("vs_input")
-    };
-
-    const char *vs_input = ce_ydb_a0->get_str(filename,
-                                              key, CE_ARRAY_LEN(key), "");
-
-    key[1] = ce_yng_a0->key("fs_input");
-    const char *fs_input = ce_ydb_a0->get_str(filename,
-                                              key, CE_ARRAY_LEN(key), "");
+    const char *vs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("vs_input"), "");
+    const char *fs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("fs_input"), "");
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SHADER_TYPE);
 

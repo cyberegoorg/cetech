@@ -23,41 +23,22 @@
 #define LOG_WHERE "transform"
 
 static void component_compiler(const char *filename,
-                               uint64_t *component_key,
-                               uint32_t component_key_count,
+                               uint64_t component_key,
                                ce_cdb_obj_o *writer) {
-    struct ct_transform_comp t_data;
+    struct ct_transform_comp t_data = {
+            .position = {},
+            .rotation = {},
+            .scale = {1.0f, 1.0f, 1.0f}
+    };
 
-//    struct ce_yng_doc *d = ce_ydb_a0->get(filename);
-    uint64_t keys[component_key_count + 1];
-    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-
-//    uint64_t key;
-
-    keys[component_key_count] = ce_yng_a0->key("scale");
-//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-//    if (d->has_key(d, key)) {
-    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.scale, (float[3]) {});
+    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("scale"), t_data.scale);
     ce_cdb_a0->set_vec3(writer, PROP_SCALE, t_data.scale);
-//    }
 
-
-    keys[component_key_count] = ce_yng_a0->key("position");
-//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-//    if (d->has_key(d, key)) {
-    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.position, (float[3]) {});
+    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("position"), t_data.position);
     ce_cdb_a0->set_vec3(writer, PROP_POSITION, t_data.position);
-//    }
 
-    keys[component_key_count] = ce_yng_a0->key("rotation");
-//    key = ce_yng_a0->combine_key(keys, CE_ARRAY_LEN(keys));
-//    if (d->has_key(d, key)) {
-    ce_ydb_a0->get_vec3(filename, keys, CE_ARRAY_LEN(keys),
-                        t_data.rotation, (float[3]) {});
+    ce_cdb_a0->read_vec3(component_key, ce_yng_a0->key("rotation"), t_data.rotation);
     ce_cdb_a0->set_vec3(writer, PROP_ROTATION, t_data.rotation);
-//    }
 }
 
 static void transform_transform(struct ct_transform_comp *transform,

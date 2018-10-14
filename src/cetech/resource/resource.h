@@ -43,7 +43,6 @@
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
 
 
-
 struct ce_vio;
 struct ce_alloc;
 struct ce_config_a0;
@@ -75,7 +74,7 @@ struct ct_resource_i0 {
                     uint64_t obj);
 
     bool (*compilator)(const char *filename,
-                       uint64_t type_keys,
+                       uint64_t obj,
                        struct ct_resource_id rid,
                        const char *fullname);
 };
@@ -85,7 +84,7 @@ struct ct_resource_i0 {
 //==============================================================================
 
 typedef bool (*ct_resource_compilator_t)(const char *filename,
-                                         uint64_t key,
+                                         uint64_t obj,
                                          struct ct_resource_id rid,
                                          const char *fullname);
 

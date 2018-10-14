@@ -24,9 +24,6 @@
 // Globals
 //==============================================================================
 
-struct compkey {
-    uint64_t keys[64];
-};
 
 struct ct_entity_compile_output {
     char *entity_data;
@@ -38,41 +35,27 @@ struct ct_entity_compile_output {
 //==============================================================================
 
 static void foreach_component(const char *filename,
-                              uint64_t *root_key,
-                              uint32_t root_count,
+                              uint64_t root_key,
                               uint64_t component_key,
                               ce_cdb_obj_o *writer) {
 
-    uint64_t tmp_keys[root_count + 1];
-    memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
-    tmp_keys[root_count] = component_key;
-
     uint64_t cid = component_key;
-    compile(cid, filename, tmp_keys, root_count + 1, writer);
+    compile(cid, filename, root_key, writer);
 }
 
 static void compile_entitity(const char *filename,
-                             uint64_t *root_key,
-                             uint32_t root_count,
-                             int parent_idx,
-                             uint64_t parent_obj,
+                             uint64_t root_key,
+                             uint64_t uid,
                              struct ct_entity_compile_output *output,
                              ce_cdb_obj_o *parent_children_writer) {
+//    if(parent_idx =! UINT32_MAX) {
+//
+//    }
 
-
-    const uint64_t uid = root_key[root_count - 1] ? root_key[root_count - 1]
-                                                  : UINT64_MAX;
-
-    uint64_t tmp_keys[root_count + 2];
-    memcpy(tmp_keys, root_key, sizeof(uint64_t) * root_count);
-
-    tmp_keys[root_count] = ce_yng_a0->key("name");
-    const char *name_str = ce_ydb_a0->get_str(filename, tmp_keys,
-                                              root_count + 1, NULL);
-
-    tmp_keys[root_count] = ce_yng_a0->key("PREFAB");
-    const char *prefab = ce_ydb_a0->get_str(filename, tmp_keys,
-                                            root_count + 1, NULL);
+    const char *name_str = ce_cdb_a0->read_str(root_key, ce_yng_a0->key("name"),
+                                               NULL);
+    const char *prefab = ce_cdb_a0->read_str(root_key, ce_yng_a0->key("PREFAB"),
+                                             NULL);
 
     struct ct_resource_id rid = {};
     if (prefab) {
@@ -81,16 +64,15 @@ static void compile_entitity(const char *filename,
 
     }
 
-    tmp_keys[root_count] = ce_yng_a0->key("components");
-    struct compkey ck = {};
-    uint32_t components_keys_count = 0;
+    uint64_t components = ce_cdb_a0->read_subobject(root_key,
+                                                    ce_yng_a0->key(
+                                                            "components"), 0);
 
-    ce_ydb_a0->get_map_keys(filename, tmp_keys, root_count + 1,
-                            ck.keys, CE_ARRAY_LEN(ck.keys),
-                            &components_keys_count);
+    const uint64_t components_keys_count = ce_cdb_a0->prop_count(components);
+    uint64_t ck[components_keys_count];
+    ce_cdb_a0->prop_keys(components, ck);
 
     uint64_t obj = ce_cdb_a0->create_object(_G.db, ENTITY_RESOURCE);
-
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
 
@@ -105,7 +87,6 @@ static void compile_entitity(const char *filename,
     uint64_t children_obj = ce_cdb_a0->create_object(_G.db, ENTITY_CHILDREN);
     ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
 
-
     if (name_str) {
         ce_cdb_a0->set_str(writer, ENTITY_NAME, name_str);
     }
@@ -115,34 +96,33 @@ static void compile_entitity(const char *filename,
 
     ce_cdb_obj_o *components_writer = ce_cdb_a0->write_begin(components_obj);
     for (uint32_t i = 0; i < components_keys_count; ++i) {
-        uint64_t comp_obj = ce_cdb_a0->create_object(_G.db,
-                                                     ck.keys[i]);
+        uint64_t comp_obj = ce_cdb_a0->create_object(_G.db, ck[i]);
         ce_cdb_obj_o *comp_writer = ce_cdb_a0->write_begin(comp_obj);
-        foreach_component(filename,
-                          tmp_keys, root_count + 1,
-                          ck.keys[i], comp_writer);
+
+        uint64_t _comp_obj = ce_cdb_a0->read_subobject(components, ck[i], 0);
+        foreach_component(filename, _comp_obj, ck[i], comp_writer);
 
         ce_cdb_a0->write_commit(comp_writer);
-        ce_cdb_a0->set_subobject(components_writer, ck.keys[i], comp_obj);
+        ce_cdb_a0->set_subobject(components_writer, ck[i], comp_obj);
     }
 
     ce_cdb_a0->write_commit(components_writer);
 
-    tmp_keys[root_count] = ce_yng_a0->key("children");
+    uint64_t children = ce_cdb_a0->read_subobject(root_key,
+                                                  ce_yng_a0->key(
+                                                          "children"), 0);
 
-    uint64_t children_keys[32] = {};
-    uint32_t children_keys_count = 0;
+    const uint64_t children_keys_count = ce_cdb_a0->prop_count(children);
 
-    ce_ydb_a0->get_map_keys(filename,
-                            tmp_keys, root_count + 1,
-                            children_keys, CE_ARRAY_LEN(children_keys),
-                            &children_keys_count);
+    uint64_t children_k[children_keys_count];
+
+    ce_cdb_a0->prop_keys(children, children_k);
+
 
     ce_cdb_obj_o *children_writer = ce_cdb_a0->write_begin(children_obj);
     for (uint32_t i = 0; i < children_keys_count; ++i) {
-        tmp_keys[root_count + 1] = children_keys[i];
-        compile_entitity(filename, tmp_keys, root_count + 2, 0,
-                         parent_obj, output, children_writer);
+        uint64_t ch = ce_cdb_a0->read_subobject(children, children_k[i], 0);
+        compile_entitity(filename, ch, children_k[i], output, children_writer);
     }
     ce_cdb_a0->write_commit(children_writer);
 
@@ -176,7 +156,7 @@ static bool resource_compiler(const char *filename,
                               const char *fullname) {
 
     struct ct_entity_compile_output *output = create_output();
-    compile_entitity(filename, &key, 1, UINT32_MAX, 0, output, NULL);
+    compile_entitity(filename, key,  0, output, NULL);
 
     ct_builddb_a0->put_resource(fullname, rid, filename, output->entity_data,
                                 ce_array_size(output->entity_data));

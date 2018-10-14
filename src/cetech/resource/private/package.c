@@ -61,16 +61,8 @@ static uint64_t cdb_type() {
 // Resource compiler
 //==============================================================================
 
-bool _package_compiler(const char *filename, uint64_t key, struct ct_resource_id rid, const char *fullname) {
-    uint64_t tmp_keys = key;
 
-    uint64_t type_keys[32] = {};
-    uint32_t type_keys_count = 0;
-    ce_ydb_a0->get_map_keys(filename,
-                            &tmp_keys, 1,
-                            type_keys, CE_ARRAY_LEN(type_keys),
-                            &type_keys_count);
-
+bool _package_compiler(const char *filename, uint64_t _obj, struct ct_resource_id rid, const char *fullname) {
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), PACKAGE_TYPE);
     uint64_t types_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), PACKAGE_TYPES_PROP);
 
@@ -80,8 +72,11 @@ bool _package_compiler(const char *filename, uint64_t key, struct ct_resource_id
 
     ce_cdb_obj_o *w_types_obj = ce_cdb_a0->write_begin(types_obj);
 
-    for (uint32_t i = 0; i < type_keys_count; ++i) {
-        uint64_t type_id = type_keys[i];
+    const uint64_t n = ce_cdb_a0->prop_count(_obj);
+    uint64_t asset_keys[n];
+    ce_cdb_a0->prop_keys(_obj, asset_keys);
+    for (uint32_t i = 0; i < n; ++i) {
+        uint64_t type_id = asset_keys[i];
 
         uint64_t type_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), type_id);
 
@@ -89,15 +84,14 @@ bool _package_compiler(const char *filename, uint64_t key, struct ct_resource_id
 
         ce_cdb_obj_o *w_type_obj = ce_cdb_a0->write_begin(type_obj);
 
-        uint64_t name_keys[32] = {};
-        uint32_t name_keys_count = 0;
-        ce_ydb_a0->get_map_keys(filename,
-                                &type_keys[i], 1,
-                                name_keys, CE_ARRAY_LEN(name_keys),
-                                &name_keys_count);
+        uint64_t array = ce_cdb_a0->read_subobject(_obj, type_id, 0);
 
-        for (uint32_t j = 0; j < name_keys_count; ++j) {
-            ce_cdb_a0->set_str(w_type_obj, name_keys[j], "");
+        const uint64_t asset_n = ce_cdb_a0->prop_count(array);
+        uint64_t array_keys[asset_n];
+        ce_cdb_a0->prop_keys(array, array_keys);
+
+        for (uint32_t j = 0; j < asset_n; ++j) {
+            ce_cdb_a0->set_str(w_type_obj, array_keys[j], "");
         }
 
         ce_cdb_a0->write_commit(w_type_obj);

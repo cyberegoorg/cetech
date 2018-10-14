@@ -111,17 +111,14 @@ static void _compile_task(void *data) {
         ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
     }
 
-    uint64_t tmp_keys = 0;
+    uint64_t obj = ce_ydb_a0->get_obj(tdata->source_filename);
 
-    uint64_t type_keys[32] = {};
-    uint32_t type_keys_count = 0;
-    ce_ydb_a0->get_map_keys(tdata->source_filename,
-                            &tmp_keys, 1,
-                            type_keys, CE_ARRAY_LEN(type_keys),
-                            &type_keys_count);
+    const uint64_t n = ce_cdb_a0->prop_count(obj);
+    uint64_t asset_keys[n];
+    ce_cdb_a0->prop_keys(obj, asset_keys);
 
-    for (uint32_t i = 0; i < type_keys_count; ++i) {
-        uint64_t k = type_keys[i];
+    for (uint32_t i = 0; i < n; ++i) {
+        uint64_t k = asset_keys[i];
 
         const char *resource_name;
         resource_name = ce_id_a0->str_from_id64(k);
@@ -136,14 +133,16 @@ static void _compile_task(void *data) {
 
         ct_resource_compilator_t compilator = _find_compilator(rid.type);
 
-        if(!compilator) {
+        if (!compilator) {
             continue;
         }
 
-        if (!compilator(tdata->source_filename, k, rid, resource_name)) {
+        uint64_t asset_obj = ce_cdb_a0->read_subobject(obj, k, 0);
+
+        if (!compilator(tdata->source_filename, asset_obj, rid,
+                        resource_name)) {
             ce_log_a0->error("resource_compiler.task",
-                             "Resource \"%s\" compilation fail",
-                             tdata->source_filename);
+                             "Resource \"%s\" compilation fail", resource_name);
         } else {
             ct_builddb_a0->put_file(tdata->source_filename, tdata->mtime);
 
@@ -151,8 +150,7 @@ static void _compile_task(void *data) {
                                            tdata->source_filename);
 
             ce_log_a0->info("resource_compiler.task",
-                            "Resource \"%s\" compiled",
-                            tdata->source_filename);
+                            "Resource \"%s\" compiled", resource_name);
         }
     }
 
@@ -173,7 +171,8 @@ void _compile_files(struct ce_task_item **tasks,
                                                   sizeof(struct compile_task_data));
 
         *data = (struct compile_task_data) {
-                .source_filename = ce_memory_a0->str_dup(files[i], _G.allocator),
+                .source_filename = ce_memory_a0->str_dup(files[i],
+                                                         _G.allocator),
                 .mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, files[i]),
         };
 
@@ -261,9 +260,9 @@ int resource_compiler_get_filename(char *filename,
     ct_resource_a0->type_name_string(build_name, CE_ARRAY_LEN(build_name),
                                      resource_id);
 
-    return ct_builddb_a0->get_filename_type_name(filename, max_ken,
-                                                 resource_id.type,
-                                                 resource_id.name);
+    return ct_builddb_a0->get_fullname(filename, max_ken,
+                                       resource_id.type,
+                                       resource_id.name);
 }
 
 

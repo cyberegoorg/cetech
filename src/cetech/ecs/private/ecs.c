@@ -195,8 +195,7 @@ static struct ct_component_i0 *get_interface(uint64_t name) {
 
 static int compile(uint64_t type,
                    const char *filename,
-                   uint64_t *component_key,
-                   uint32_t component_key_count,
+                   uint64_t component_key,
                    ce_cdb_obj_o *writer) {
 
     struct ct_component_i0 *component_i = get_interface(type);
@@ -206,7 +205,7 @@ static int compile(uint64_t type,
         return 0;
     }
 
-    component_i->compiler(filename, component_key, component_key_count, writer);
+    component_i->compiler(filename, component_key, writer);
 
     return 1;
 }

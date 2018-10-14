@@ -36,29 +36,13 @@ static struct _G {
 } _G;
 
 void _mesh_component_compiler(const char *filename,
-                              uint64_t *component_key,
-                              uint32_t component_key_count,
+                              uint64_t component_key,
                               ce_cdb_obj_o *writer) {
+    const char *scene = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("scene"), "");
+    const char *mesh = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("mesh"), "");
+    const char *mat = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("material"), "");
+    const char *node = ce_cdb_a0->read_str(component_key, ce_yng_a0->key("node"), "");
 
-    uint64_t keys[component_key_count + 3];
-    memcpy(keys, component_key, sizeof(uint64_t) * component_key_count);
-
-    keys[component_key_count] = ce_yng_a0->key("scene");
-    const char *scene = ce_ydb_a0->get_str(filename, keys,
-                                           component_key_count + 1,
-                                           "");
-
-    keys[component_key_count] = ce_yng_a0->key("mesh");
-    const char *mesh = ce_ydb_a0->get_str(filename, keys,
-                                          component_key_count + 1, "");
-
-    keys[component_key_count] = ce_yng_a0->key("material");
-    const char *mat = ce_ydb_a0->get_str(filename, keys,
-                                         component_key_count + 1, "");
-
-    keys[component_key_count] = ce_yng_a0->key("node");
-    const char *node = ce_ydb_a0->get_str(filename, keys,
-                                          component_key_count + 1, "");
 
     ce_cdb_a0->set_uint64(writer, PROP_MESH_ID, ce_id_a0->id64(mesh));
     ce_cdb_a0->set_uint64(writer, PROP_NODE_ID, ce_id_a0->id64(node));

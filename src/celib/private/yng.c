@@ -8,6 +8,7 @@
 #include <celib/hashlib.h>
 #include <celib/log.h>
 #include <celib/os.h>
+#include <celib/cdb.h>
 #include <celib/array.inl>
 #include <celib/hash.inl>
 #include <celib/murmur_hash.inl>
@@ -27,8 +28,8 @@ static struct _G {
 
 
 static void add_key(const char *key,
-             uint32_t key_len,
-             uint64_t key_hash) {
+                    uint32_t key_len,
+                    uint64_t key_hash) {
     ce_os_a0->thread->spin_lock(&_G.key_lock);
     const uint32_t idx = ce_array_size(_G.key_to_str_offset);
     const uint32_t offset = ce_array_size(_G.key_to_str_data);
@@ -77,7 +78,7 @@ struct doc_inst {
 
 
 static uint64_t hash_combine(uint64_t lhs,
-                      uint64_t rhs) {
+                             uint64_t rhs) {
     if (rhs == 0) return lhs;
     if (lhs == 0) return rhs;
     lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
@@ -128,7 +129,7 @@ static uint64_t combine_key(const uint64_t *keys,
 
 
 static uint64_t combine_key_str(const char **keys,
-                         uint32_t count) {
+                                uint32_t count) {
     uint64_t hash = ce_id_a0->id64(keys[0]);
 
     for (uint32_t i = 1; i < count; ++i) {
@@ -139,10 +140,10 @@ static uint64_t combine_key_str(const char **keys,
 }
 
 static uint32_t new_node(struct ce_yng_doc *doc,
-                  enum node_type type,
-                  struct node_value value,
-                  uint32_t parent,
-                  uint64_t hash) {
+                         enum node_type type,
+                         struct node_value value,
+                         uint32_t parent,
+                         uint64_t hash) {
 
     struct doc_inst *inst = (struct doc_inst *) doc->inst;
 
@@ -171,9 +172,9 @@ static uint32_t new_node(struct ce_yng_doc *doc,
 }
 
 static void type_value_from_scalar(const uint8_t *scalar,
-                            enum node_type *type,
-                            struct node_value *vallue,
-                            bool is_key) {
+                                   enum node_type *type,
+                                   struct node_value *vallue,
+                                   bool is_key) {
     const char *scalar_str = (const char *) scalar;
 
     if (!strlen(scalar_str)) {
@@ -208,14 +209,14 @@ static void type_value_from_scalar(const uint8_t *scalar,
 }
 
 static bool has_key(struct ce_yng_doc *_inst,
-             uint64_t key) {
+                    uint64_t key) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return ce_hash_contain(&inst->key_map, key);
 }
 
 
 static struct ce_yng_node get(struct ce_yng_doc *_inst,
-                          uint64_t key) {
+                              uint64_t key) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return (struct ce_yng_node) {.idx =  (uint32_t) ce_hash_lookup(
             &inst->key_map, key, 0), .d = inst->doc};
@@ -223,8 +224,8 @@ static struct ce_yng_node get(struct ce_yng_doc *_inst,
 
 
 static struct ce_yng_node get_seq(struct ce_yng_doc *_inst,
-                              uint64_t key,
-                              uint32_t idx) {
+                                  uint64_t key,
+                                  uint32_t idx) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t n_idx = ce_hash_lookup(&inst->key_map, key, (uint32_t) 0);
@@ -239,26 +240,26 @@ static struct ce_yng_node get_seq(struct ce_yng_doc *_inst,
 }
 
 static enum node_type type(struct ce_yng_doc *_inst,
-                    struct ce_yng_node node) {
+                           struct ce_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->type[node.idx];
 }
 
 static uint64_t get_hash(struct ce_yng_doc *_inst,
-                  struct ce_yng_node node) {
+                         struct ce_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->hash[node.idx];
 }
 
 static uint32_t get_size(struct ce_yng_doc *_inst,
-                  struct ce_yng_node node) {
+                         struct ce_yng_node node) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     return inst->value[node.idx].node_count;
 }
 
 static const char *as_string(struct ce_yng_doc *_inst,
-                      struct ce_yng_node node,
-                      const char *defaultt) {
+                             struct ce_yng_node node,
+                             const char *defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     if (!node.idx) {
@@ -269,8 +270,8 @@ static const char *as_string(struct ce_yng_doc *_inst,
 }
 
 static float as_float(struct ce_yng_doc *_inst,
-               struct ce_yng_node node,
-               float defaultt) {
+                      struct ce_yng_node node,
+                      float defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     if (!node.idx) {
@@ -282,8 +283,8 @@ static float as_float(struct ce_yng_doc *_inst,
 }
 
 static bool as_bool(struct ce_yng_doc *_inst,
-             struct ce_yng_node node,
-             bool defaultt) {
+                    struct ce_yng_node node,
+                    bool defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     if (!node.idx) {
@@ -295,8 +296,8 @@ static bool as_bool(struct ce_yng_doc *_inst,
 }
 
 static void as_vec3(struct ce_yng_doc *_inst,
-             struct ce_yng_node node,
-             float *value) {
+                    struct ce_yng_node node,
+                    float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -316,8 +317,8 @@ static void as_vec3(struct ce_yng_doc *_inst,
 }
 
 static void as_vec4(struct ce_yng_doc *_inst,
-             struct ce_yng_node node,
-             float *value) {
+                    struct ce_yng_node node,
+                    float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -340,8 +341,8 @@ static void as_vec4(struct ce_yng_doc *_inst,
 }
 
 static void as_mat4(struct ce_yng_doc *_inst,
-             struct ce_yng_node node,
-             float *value) {
+                    struct ce_yng_node node,
+                    float *value) {
 
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
@@ -400,8 +401,8 @@ static void as_mat4(struct ce_yng_doc *_inst,
 }
 
 static const char *get_string(struct ce_yng_doc *_inst,
-                       uint64_t key,
-                       const char *defaultt) {
+                              uint64_t key,
+                              const char *defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     struct ce_yng_node node = {.idx = (uint32_t) ce_hash_lookup(
@@ -410,8 +411,8 @@ static const char *get_string(struct ce_yng_doc *_inst,
 }
 
 static float get_float(struct ce_yng_doc *_inst,
-                uint64_t key,
-                float defaultt) {
+                       uint64_t key,
+                       float defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     struct ce_yng_node node = {.idx = (uint32_t) ce_hash_lookup(
@@ -420,8 +421,8 @@ static float get_float(struct ce_yng_doc *_inst,
 }
 
 static bool get_bool(struct ce_yng_doc *_inst,
-              uint64_t key,
-              bool defaultt) {
+                     uint64_t key,
+                     bool defaultt) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     struct ce_yng_node node = {.idx = (uint32_t) ce_hash_lookup(
@@ -430,16 +431,16 @@ static bool get_bool(struct ce_yng_doc *_inst,
 }
 
 static void set_float(struct ce_yng_doc *_inst,
-               struct ce_yng_node node,
-               float value) {
+                      struct ce_yng_node node,
+                      float value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
     inst->value[node.idx].f = value;
     inst->modified = true;
 }
 
 static void set_bool(struct ce_yng_doc *_inst,
-              struct ce_yng_node node,
-              bool value) {
+                     struct ce_yng_node node,
+                     bool value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     inst->type[node.idx] = value ? NODE_TRUE : NODE_FALSE;
@@ -448,8 +449,8 @@ static void set_bool(struct ce_yng_doc *_inst,
 
 
 static void set_string(struct ce_yng_doc *_inst,
-                struct ce_yng_node node,
-                const char *value) {
+                       struct ce_yng_node node,
+                       const char *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     char *str = ce_memory_a0->str_dup(value, _G.allocator);
@@ -458,8 +459,8 @@ static void set_string(struct ce_yng_doc *_inst,
 }
 
 static void set_vec3(struct ce_yng_doc *_inst,
-              struct ce_yng_node node,
-              float *value) {
+                     struct ce_yng_node node,
+                     float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t it = inst->first_child[node.idx];
@@ -475,8 +476,8 @@ static void set_vec3(struct ce_yng_doc *_inst,
 }
 
 static void set_vec4(struct ce_yng_doc *_inst,
-              struct ce_yng_node node,
-              float *value) {
+                     struct ce_yng_node node,
+                     float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t it = inst->first_child[node.idx];
@@ -494,8 +495,8 @@ static void set_vec4(struct ce_yng_doc *_inst,
 }
 
 static void set_mat4(struct ce_yng_doc *_inst,
-              struct ce_yng_node node,
-              float *value) {
+                     struct ce_yng_node node,
+                     float *value) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t it = inst->first_child[node.idx];
@@ -550,9 +551,9 @@ static void set_mat4(struct ce_yng_doc *_inst,
 }
 
 static void foreach_dict_node(struct ce_yng_doc *_inst,
-                       struct ce_yng_node node,
-                       ce_yng_foreach_map_t foreach_clb,
-                       void *data) {
+                              struct ce_yng_node node,
+                              ce_yng_foreach_map_t foreach_clb,
+                              void *data) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t it = inst->first_child[node.idx];
@@ -567,9 +568,9 @@ static void foreach_dict_node(struct ce_yng_doc *_inst,
 }
 
 static void foreach_seq_node(struct ce_yng_doc *_inst,
-                      struct ce_yng_node node,
-                      ce_yng_foreach_seq_t foreach_clb,
-                      void *data) {
+                             struct ce_yng_node node,
+                             ce_yng_foreach_seq_t foreach_clb,
+                             void *data) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     uint32_t idx = 0;
@@ -786,8 +787,8 @@ bool parse_yaml(struct ce_alloc *alloc,
 }
 
 static void save_recursive(struct doc_inst *inst,
-                    uint32_t root,
-                    yaml_emitter_t *emitter) {
+                           uint32_t root,
+                           yaml_emitter_t *emitter) {
     enum node_type type = inst->type[root];
     struct node_value value = inst->value[root];
     char buffer[128];
@@ -914,16 +915,16 @@ static void save_recursive(struct doc_inst *inst,
 }
 
 static int write_handler(void *ext,
-                  unsigned char *buffer,
-                  size_t size) {
+                         unsigned char *buffer,
+                         size_t size) {
     struct ce_vio *output = (struct ce_vio *) ext;
     output->write(output, buffer, sizeof(unsigned char), size);
     return 1;
 }
 
 static bool save_yaml(struct ce_alloc *alloc,
-               struct ce_vio *vio,
-               struct ce_yng_doc *doc) {
+                      struct ce_vio *vio,
+                      struct ce_yng_doc *doc) {
 //    unsigned char kim_nuke_shit[4096];
 
     yaml_emitter_t emitter;
@@ -973,8 +974,8 @@ static bool save_yaml(struct ce_alloc *alloc,
 }
 
 static struct ce_yng_node create_tree(struct ce_yng_doc *_inst,
-                                  const char **keys,
-                                  uint32_t keys_count) {
+                                      const char **keys,
+                                      uint32_t keys_count) {
     uint32_t first_nonexist = 0;
     uint64_t last_exist_key = 0;
     for (int i = 0; i < keys_count; ++i) {
@@ -1026,9 +1027,9 @@ static struct ce_yng_node create_tree(struct ce_yng_doc *_inst,
 }
 
 static void create_tree_vec3(struct ce_yng_doc *_inst,
-                      const char **keys,
-                      uint32_t keys_count,
-                      float *value) {
+                             const char **keys,
+                             uint32_t keys_count,
+                             float *value) {
 
     struct ce_yng_node node = create_tree(_inst, keys, keys_count);
     struct ce_yng_doc *d = node.d;
@@ -1051,9 +1052,9 @@ static void create_tree_vec3(struct ce_yng_doc *_inst,
 
 
 static void create_tree_bool(struct ce_yng_doc *_inst,
-                      const char **keys,
-                      uint32_t keys_count,
-                      bool value) {
+                             const char **keys,
+                             uint32_t keys_count,
+                             bool value) {
     struct ce_yng_node node = create_tree(_inst, keys, keys_count);
     struct ce_yng_doc *d = node.d;
 
@@ -1079,9 +1080,9 @@ static void create_tree_bool(struct ce_yng_doc *_inst,
 }
 
 static void create_tree_float(struct ce_yng_doc *_inst,
-                       const char **keys,
-                       uint32_t keys_count,
-                       float value) {
+                              const char **keys,
+                              uint32_t keys_count,
+                              float value) {
     struct ce_yng_node node = create_tree(_inst, keys, keys_count);
     struct ce_yng_doc *d = node.d;
 
@@ -1099,9 +1100,9 @@ static void create_tree_float(struct ce_yng_doc *_inst,
 }
 
 static void create_tree_string(struct ce_yng_doc *_inst,
-                        const char **keys,
-                        uint32_t keys_count,
-                        const char *value) {
+                               const char **keys,
+                               uint32_t keys_count,
+                               const char *value) {
     struct ce_yng_node node = create_tree(_inst, keys, keys_count);
     struct ce_yng_doc *d = node.d;
 
@@ -1138,17 +1139,282 @@ static void destroy(struct ce_yng_doc *document) {
 }
 
 static void parent_files(struct ce_yng_doc *_inst,
-                  const char ***files,
-                  uint32_t *count) {
+                         const char ***files,
+                         uint32_t *count) {
     struct doc_inst *inst = (struct doc_inst *) _inst->inst;
 
     *files = (const char **) inst->parent_file;
     *count = ce_array_size(inst->parent_file);
 }
 
-static struct ce_yng_doc *from_vio(struct ce_vio *vio,
-                            struct ce_alloc *alloc) {
+uint64_t cdb_from_vio(struct ce_vio *vio,
+                      struct ce_alloc *alloc) {
+    yaml_parser_t parser;
+    yaml_event_t event;
 
+    struct parent_stack_state {
+        uint64_t root_object;
+        ce_cdb_obj_o *writer;
+        enum node_type type;
+        uint32_t node_count;
+        uint64_t key_hash;
+        uint64_t str_hash;
+        char **str_array;
+        float *float_array;
+    };
+
+    struct parent_stack_state *parent_stack = NULL;
+    uint32_t parent_stack_top;
+    uint64_t key = 0;
+
+
+    uint64_t root_object = 0;
+    ce_array_push(parent_stack,
+                  ((struct parent_stack_state) {}),
+                  _G.allocator);
+
+    uint8_t *source_data = CE_ALLOC(alloc, uint8_t, vio->size(vio) + 1);
+    memset(source_data, 0, vio->size(vio) + 1);
+    vio->read(vio, source_data, sizeof(char), vio->size(vio));
+
+    if (!yaml_parser_initialize(&parser)) {
+        ce_log_a0->error(LOG_WHERE, "Failed to initialize parser");
+        goto error;
+    }
+
+    yaml_parser_set_input_string(&parser, source_data,
+                                 vio->size(vio));
+
+#define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
+#define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
+    do {
+        parent_stack_top = ce_array_size(parent_stack) - 1;
+
+        if (!yaml_parser_parse(&parser, &event)) {
+            ce_log_a0->error(LOG_WHERE, "Parser error %d\n", parser.error);
+            goto error;
+        }
+
+        struct parent_stack_state state = {};
+        switch (event.type) {
+            case YAML_NO_EVENT:
+                break;
+
+            case YAML_STREAM_START_EVENT:
+                break;
+
+            case YAML_STREAM_END_EVENT:
+                break;
+
+            case YAML_DOCUMENT_START_EVENT:
+                break;
+
+            case YAML_DOCUMENT_END_EVENT:
+                break;
+
+            case YAML_SEQUENCE_START_EVENT: {
+                key = parent_stack[parent_stack_top].str_hash;
+                state = (struct parent_stack_state) {
+                        .type = NODE_SEQ,
+                        .key_hash = key,
+                };
+
+
+                ++parent_stack[parent_stack_top].node_count;
+
+                if (HAS_KEY()) {
+                    ce_array_pop_back(parent_stack);
+                }
+
+                ce_array_push(parent_stack, state, _G.allocator);
+                break;
+            }
+
+            case YAML_SEQUENCE_END_EVENT: {
+                struct parent_stack_state *s = &parent_stack[parent_stack_top];
+
+                struct parent_stack_state *sm;
+                sm = &parent_stack[parent_stack_top - 1];
+
+                key = s->key_hash;
+
+                const uint32_t float_len = ce_array_size(s->float_array);
+                if (float_len) {
+                    switch (s->node_count) {
+                        case 3:
+                            ce_cdb_a0->set_vec3(sm->writer, key,
+                                                s->float_array);
+                            break;
+                        case 4:
+                            ce_cdb_a0->set_vec4(sm->writer, key,
+                                                s->float_array);
+                            break;
+
+                        case 16:
+                            ce_cdb_a0->set_mat4(sm->writer, key,
+                                                s->float_array);
+                            break;
+                    }
+
+                    ce_array_free(s->float_array, alloc);
+                }
+
+                const uint32_t len = ce_array_size(s->str_array);
+                if (len) {
+                    uint64_t array = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                              0);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(array);
+                    for (int i = 0; i < len; ++i) {
+                        const char *str = s->str_array[i];
+                        ce_cdb_a0->set_str(w, ce_id_a0->id64(str), str);
+                    }
+                    ce_cdb_a0->write_commit(w);
+
+                    ce_cdb_a0->set_subobject(sm->writer, key, array);
+
+                    ce_array_free(s->str_array, alloc);
+                }
+
+                ce_array_pop_back(parent_stack);
+                break;
+            }
+
+            case YAML_MAPPING_START_EVENT: {
+                key = parent_stack[parent_stack_top].str_hash;
+
+                uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+
+                if (!root_object) {
+                    root_object = obj;
+                }
+
+                state = (struct parent_stack_state) {
+                        .type = NODE_MAP,
+                        .root_object = obj,
+                        .key_hash = key,
+                        .writer = ce_cdb_a0->write_begin(obj)
+                };
+
+
+                ++parent_stack[parent_stack_top].node_count;
+
+                if (HAS_KEY()) {
+                    state.key_hash = parent_stack[parent_stack_top].str_hash;
+                    ce_cdb_a0->set_subobject(
+                            parent_stack[parent_stack_top - 1].writer,
+                            state.key_hash, obj);
+                    ce_array_pop_back(parent_stack);
+                }
+
+                ce_array_push(parent_stack, state, _G.allocator);
+                break;
+            }
+
+
+            case YAML_MAPPING_END_EVENT: {
+                struct parent_stack_state *s = &parent_stack[parent_stack_top];
+                ce_cdb_a0->write_commit(s->writer);
+                ce_array_pop_back(parent_stack);
+                break;
+            }
+
+            case YAML_ALIAS_EVENT:
+                break;
+
+            case YAML_SCALAR_EVENT: {
+                enum node_type type;
+                struct node_value value;
+                type_value_from_scalar(event.data.scalar.value,
+                                       &type, &value, IS_KEY());
+
+
+                if (IS_KEY()) {
+                    uint64_t key_hash = ce_id_a0->id64(value.string);
+
+                    state = (struct parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
+
+                    ++parent_stack[parent_stack_top].node_count;
+                    ce_array_push(parent_stack, state, _G.allocator);
+
+
+                    // VALUE_WITH_KEY
+                } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
+                    key = parent_stack[parent_stack_top].str_hash;
+                    ce_cdb_obj_o *w = parent_stack[parent_stack_top - 1].writer;
+
+                    switch (type) {
+                        case NODE_FLOAT:
+                            ce_cdb_a0->set_float(w, key, value.f);
+                            break;
+
+                        case NODE_STRING:
+                            ce_cdb_a0->set_str(w, key, value.string);
+                            break;
+
+                        case NODE_TRUE:
+                            ce_cdb_a0->set_bool(w, key, true);
+                            break;
+
+                        case NODE_FALSE:
+                            ce_cdb_a0->set_bool(w, key, false);
+                            break;
+
+                        case NODE_INVALID:
+                        case NODE_MAP:
+                        case NODE_SEQ:
+                            break;
+                    }
+//                    if (PREFAB_KEY == parent_stack[parent_stack_top].str_hash) {
+//                        ce_array_push(inst->parent_file, value.string,
+//                                      _G.allocator);
+//                    }
+
+                    ce_array_pop_back(parent_stack);
+
+                    // VALUE_IN_SEQ
+                } else if (parent_stack[parent_stack_top].type == NODE_SEQ) {
+                    struct parent_stack_state *s = &parent_stack[parent_stack_top];
+                    switch (type) {
+                        case NODE_FLOAT:
+                            ce_array_push(s->float_array, value.f, alloc);
+                            break;
+
+                        case NODE_STRING:
+                            ce_array_push(s->str_array, value.string, alloc);
+                            break;
+
+                        case NODE_INVALID:
+                        case NODE_TRUE:
+                        case NODE_FALSE:
+                        case NODE_MAP:
+                        case NODE_SEQ:
+                            break;
+                    }
+
+                    ++s->node_count;
+                }
+
+            }
+                break;
+        }
+
+        if (event.type != YAML_STREAM_END_EVENT) {
+            yaml_event_delete(&event);
+        }
+
+    } while (event.type != YAML_STREAM_END_EVENT);
+
+    return root_object;
+
+    error:
+    yaml_event_delete(&event);
+    yaml_parser_delete(&parser);
+
+    return 0;
+}
+
+static struct ce_yng_doc *from_vio(struct ce_vio *vio,
+                                   struct ce_alloc *alloc) {
     struct ce_yng_doc *d = CE_ALLOC(alloc,
                                     struct ce_yng_doc,
                                     sizeof(struct ce_yng_doc));
@@ -1219,8 +1485,10 @@ static struct ce_yng_doc *from_vio(struct ce_vio *vio,
     return d;
 }
 
+
 static struct ce_yng_a0 yamlng_api = {
         .from_vio = from_vio,
+        .cdb_from_vio = cdb_from_vio,
         .save_to_vio = save_yaml,
         .destroy = destroy,
 

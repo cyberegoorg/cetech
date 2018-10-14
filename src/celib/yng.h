@@ -169,6 +169,8 @@ struct ce_yng_a0 {
     struct ce_yng_doc *(*from_vio)(struct ce_vio *vio,
                                    struct ce_alloc *alloc);
 
+    uint64_t (*cdb_from_vio)(struct ce_vio *vio, struct ce_alloc *alloc);
+
     bool (*save_to_vio)(struct ce_alloc *alloc,
                         struct ce_vio *vio,
                         struct ce_yng_doc *doc);

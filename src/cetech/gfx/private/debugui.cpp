@@ -110,7 +110,7 @@ static void SaveDock(struct ce_vio *output) {
 }
 
 static void LoadDock(const char *path) {
-    ImGui::loadFromYaml(path, ce_ydb_a0, ce_yng_a0);
+    ImGui::loadFromYaml(path, ce_ydb_a0, ce_yng_a0, ce_cdb_a0);
 }
 
 static struct ct_debugui_a0 debugui_api = {

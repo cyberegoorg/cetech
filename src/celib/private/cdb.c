@@ -122,7 +122,9 @@ union type_u {
 };
 
 static struct object_t *_get_object_from_objid(uint64_t objid) {
-    CE_ASSERT(LOG_WHERE, objid != 0);
+    if(!objid) {
+        return NULL;
+    }
 
     uint64_t idx = *(uint64_t *) objid;
 
@@ -1421,6 +1423,10 @@ static void prop_keys(uint64_t _obj,
                       uint64_t *keys) {
     struct object_t *obj = _get_object_from_objid(_obj);
 
+    if(!obj) {
+        return;
+    }
+
     memcpy(keys, obj->keys + 1,
            sizeof(uint64_t) * (obj->properties_count - 1));
 
@@ -1450,6 +1456,10 @@ static void prop_keys(uint64_t _obj,
 
 static uint64_t prop_count(uint64_t _obj) {
     struct object_t *obj = _get_object_from_objid(_obj);
+
+    if(!obj) {
+        return 0;
+    }
 
     uint64_t count = obj->properties_count - 1;
 
