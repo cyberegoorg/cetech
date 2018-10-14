@@ -31,42 +31,15 @@ enum node_type {
 
 static struct _G {
     struct ce_hash_t obj_cache_map;
-    char **document_path;
-
     struct ce_spinlock cache_lock;
-    struct ce_hash_t modified_files_set;
 
-    //
-    struct ce_hash_t key_to_str;
-    uint32_t *key_to_str_offset;
-    char *key_to_str_data;
-    struct ce_spinlock key_lock;
+    struct ce_hash_t modified_files_set;
 
     struct ce_alloc *allocator;
 } _G;
 
-static void add_key(const char *key,
-                    uint32_t key_len,
-                    uint64_t key_hash) {
-    ce_os_a0->thread->spin_lock(&_G.key_lock);
-    const uint32_t idx = ce_array_size(_G.key_to_str_offset);
-    const uint32_t offset = ce_array_size(_G.key_to_str_data);
-
-    ce_array_push_n(_G.key_to_str_data, key, sizeof(char) * (key_len + 1),
-                    _G.allocator);
-    ce_array_push(_G.key_to_str_offset, offset, _G.allocator);
-
-    ce_hash_add(&_G.key_to_str, key_hash, idx, _G.allocator);
-    ce_os_a0->thread->spin_unlock(&_G.key_lock);
-}
-
 static const char *get_key(uint64_t hash) {
-    uint32_t idx = ce_hash_lookup(&_G.key_to_str, hash, UINT32_MAX);
-    if (UINT32_MAX == idx) {
-        return NULL;
-    }
-
-    return &_G.key_to_str_data[_G.key_to_str_offset[idx]];
+    return  ce_id_a0->str_from_id64(hash);
 }
 
 struct node_value {
@@ -78,67 +51,8 @@ struct node_value {
 };
 
 
-
-static uint64_t hash_combine(uint64_t lhs,
-                             uint64_t rhs) {
-    if (rhs == 0) return lhs;
-    if (lhs == 0) return rhs;
-    lhs ^= rhs + 0x9e3779b9 + (lhs << 6) + (lhs >> 2);
-    return lhs;
-}
-
 static uint64_t calc_key(const char *key) {
-    uint64_t hash = 0;
-    bool parse = false;
-
-    char *begin;
-    char *it = (char *) key;
-    while (*it != '\0') {
-        if (!parse) {
-            begin = it;
-            parse = true;
-        } else if (*it == '.') {
-            const uint32_t size = it - begin;
-            const uint64_t part_hash = ce_hash_murmur2_64(begin,
-                                                          size,
-                                                          0);
-            add_key(begin, size, part_hash);
-            hash = hash_combine(hash, part_hash);
-            parse = false;
-        }
-
-        ++it;
-    }
-
-    const uint32_t size = it - begin;
-    const uint64_t part_hash = ce_hash_murmur2_64(begin, size, 0);
-    add_key(begin, size, part_hash);
-    hash = hash_combine(hash, part_hash);
-
-    return hash;
-}
-
-static uint64_t combine_key(const uint64_t *keys,
-                            uint32_t count) {
-    uint64_t hash = keys[0];
-
-    for (uint32_t i = 1; i < count; ++i) {
-        hash = hash_combine(hash, keys[i]);
-    }
-
-    return hash;
-}
-
-
-static uint64_t combine_key_str(const char **keys,
-                                uint32_t count) {
-    uint64_t hash = ce_id_a0->id64(keys[0]);
-
-    for (uint32_t i = 1; i < count; ++i) {
-        hash = hash_combine(hash, ce_id_a0->id64(keys[i]));
-    }
-
-    return hash;
+    return ce_id_a0->id64(key);
 }
 
 static void type_value_from_scalar(const uint8_t *scalar,
@@ -181,9 +95,6 @@ static void type_value_from_scalar(const uint8_t *scalar,
 
 uint64_t cdb_from_vio(struct ce_vio *vio,
                       struct ce_alloc *alloc) {
-    yaml_parser_t parser;
-    yaml_event_t event;
-
     struct parent_stack_state {
         uint64_t root_object;
         ce_cdb_obj_o *writer;
@@ -209,6 +120,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
     memset(source_data, 0, vio->size(vio) + 1);
     vio->read(vio, source_data, sizeof(char), vio->size(vio));
 
+    yaml_parser_t parser;
     if (!yaml_parser_initialize(&parser)) {
         ce_log_a0->error(LOG_WHERE, "Failed to initialize parser");
         goto error;
@@ -219,6 +131,8 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
 #define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
+    yaml_event_t event;
+
     do {
         parent_stack_top = ce_array_size(parent_stack) - 1;
 
@@ -494,14 +408,6 @@ uint64_t get_obj(const char *path) {
     return obj;
 };
 
-
-struct out_keys_s {
-    uint64_t *keys;
-    uint32_t max_keys;
-    uint32_t *count;
-};
-
-
 void modified(const char *path) {
     uint64_t hash = ce_id_a0->id64(path);
     ce_hash_add(&_G.modified_files_set, hash, true, _G.allocator);
@@ -598,8 +504,6 @@ static struct ce_ydb_a0 ydb_api = {
         .cdb_from_vio = cdb_from_vio,
         .get_key = get_key ,
         .key = calc_key,
-        .combine_key = combine_key ,
-        .combine_key_str = combine_key_str ,
 };
 
 struct ce_ydb_a0 *ce_ydb_a0 = &ydb_api;
@@ -615,8 +519,8 @@ static void _shutdown() {
 ////        ce_ydb_a0->destroy(_G.document_cache[i]);
 //    }
 
-    ce_array_free(_G.document_path, _G.allocator);
     ce_hash_free(&_G.modified_files_set, _G.allocator);
+    ce_hash_free(&_G.obj_cache_map, _G.allocator);
 
     _G = (struct _G) {};
 }

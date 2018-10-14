@@ -3,35 +3,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
-
-
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stdbool.h>
+
 #include <celib/module.inl>
 
 struct ce_vio;
 struct ce_alloc;
-
-//==============================================================================
-// Defines
-//==============================================================================
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
-//==============================================================================
-// Enums
-//==============================================================================
-
-
-//==============================================================================
-// Interface
-//==============================================================================
 
 struct ce_ydb_a0 {
     uint64_t (*get_obj)(const char *path);
@@ -44,15 +21,12 @@ struct ce_ydb_a0 {
 
     void (*save_all_modified)();
 
+    uint64_t (*cdb_from_vio)(struct ce_vio *vio,
+                             struct ce_alloc *alloc);
 
-    uint64_t (*cdb_from_vio)(struct ce_vio *vio, struct ce_alloc *alloc);
     const char *(*get_key)(uint64_t hash);
-    uint64_t (*key)(const char *key);
-    uint64_t (*combine_key)(const uint64_t *keys,
-                            uint32_t count);
-    uint64_t (*combine_key_str)(const char **keys,
-                                uint32_t count);
 
+    uint64_t (*key)(const char *key);
 };
 
 CE_MODULE(ce_ydb_a0);
