@@ -96,12 +96,15 @@ static void type_value_from_scalar(const uint8_t *scalar,
 uint64_t cdb_from_vio(struct ce_vio *vio,
                       struct ce_alloc *alloc) {
     struct parent_stack_state {
-        uint64_t root_object;
-        ce_cdb_obj_o *writer;
         enum node_type type;
         uint32_t node_count;
+
         uint64_t key_hash;
         uint64_t str_hash;
+
+        uint64_t root_object;
+        ce_cdb_obj_o *writer;
+
         char **str_array;
         float *float_array;
     };
@@ -109,7 +112,6 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
     struct parent_stack_state *parent_stack = NULL;
     uint32_t parent_stack_top;
     uint64_t key = 0;
-
 
     uint64_t root_object = 0;
     ce_array_push(parent_stack,
@@ -126,8 +128,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
         goto error;
     }
 
-    yaml_parser_set_input_string(&parser, source_data,
-                                 vio->size(vio));
+    yaml_parser_set_input_string(&parser, source_data, vio->size(vio));
 
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
 #define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
@@ -246,9 +247,9 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
                 if (HAS_KEY()) {
                     state.key_hash = parent_stack[parent_stack_top].str_hash;
-                    ce_cdb_a0->set_subobject(
+                    ce_cdb_a0->set_subobjectw(
                             parent_stack[parent_stack_top - 1].writer,
-                            state.key_hash, obj);
+                            state.key_hash, state.writer);
                     ce_array_pop_back(parent_stack);
                 }
 

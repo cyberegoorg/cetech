@@ -46,9 +46,9 @@ void execute(const struct ct_cmd *cmd) {
     }
 
     uint32_t buffer_offset = ce_array_size(_G.cmd_buffer);
-    uint32_t size = ce_array_size(_G.cmd);
+    uint32_t end = ce_array_size(_G.cmd)-1;
 
-    if (_G.curent_pos != (size - 1)) {
+    if (_G.curent_pos != end) {
         struct ct_cmd *cur_cmd = get_curent_cmd();
         if (cur_cmd) {
             uint32_t offset = _G.cmd[_G.curent_pos];
@@ -57,10 +57,10 @@ void execute(const struct ct_cmd *cmd) {
             ce_array_resize(_G.cmd, _G.curent_pos + 1, _G.allocator);
             ce_array_resize(_G.cmd_buffer, end_offset, _G.allocator);
         }
+    } else {
+        ce_array_push_n(_G.cmd_buffer, (uint8_t *) cmd, cmd->size, _G.allocator);
+        ce_array_push(_G.cmd, buffer_offset, _G.allocator);
     }
-
-    ce_array_push_n(_G.cmd_buffer, (uint8_t *) cmd, cmd->size, _G.allocator);
-    ce_array_push(_G.cmd, buffer_offset, _G.allocator);
 
     _G.curent_pos += 1;
 

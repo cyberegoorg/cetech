@@ -9,7 +9,6 @@
 #define ASSET_NAME \
     CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
-
 #define ASSET_BROWSER_ASSET_TYPE \
     CE_ID64_0("asset", 0xc6ed95f9933c4734ULL)
 

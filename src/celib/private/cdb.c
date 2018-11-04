@@ -40,6 +40,7 @@ struct object_t {
     uint64_t *instances;
 
     // hiearchy
+    uint64_t key;
     uint64_t parent;
 //    uint64_t *children;
 
@@ -179,6 +180,7 @@ struct object_t *_new_object(struct db_t *db,
     struct object_t *obj = &db->object_pool[idx];
     obj->idx = idx;
     obj->db.idx = db->idx;
+    obj->key = 0;
 
     _object_new_property(obj, 0, CDB_TYPE_NONE, NULL, 0, a);
     return obj;
@@ -206,6 +208,7 @@ static struct object_t *_object_clone(struct db_t *db,
 
     new_obj->prefab = obj->prefab;
     new_obj->parent = obj->parent;
+    new_obj->key = obj->key;
 
     new_obj->type = obj->type;
     new_obj->properties_count = properties_count;
@@ -1003,6 +1006,8 @@ static void set_ref(ce_cdb_obj_o *_writer,
                                    _G.allocator);
     }
 
+    writer->key = property;
+
     ce_array_push(writer->changed_prop, property, _G.allocator);
 
     union type_u *value_ptr = (union type_u *) (writer->values +
@@ -1010,10 +1015,40 @@ static void set_ref(ce_cdb_obj_o *_writer,
     value_ptr->ref = ref;
 }
 
+uint64_t parent(uint64_t object) {
+    struct object_t *obj = _get_object_from_objid(object);
+    return obj->parent;
+}
+
+void set_subobjectw(ce_cdb_obj_o *_writer,
+                   uint64_t property,
+                    ce_cdb_obj_o * _subwriter) {
+    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *subwriter = _get_object_from_obj_o(_subwriter);
+
+    subwriter->key = property;
+
+    uint64_t idx = _find_prop_index(writer, property);
+    if (!idx) {
+        idx = _object_new_property(writer, property,
+                                   CDB_TYPE_SUBOBJECT, &subwriter->orig_obj,
+                                   sizeof(uint64_t),
+                                   _G.allocator);
+    }
+
+    ce_array_push(writer->changed_prop, property, _G.allocator);
+
+    union type_u *value_ptr = (union type_u *) (writer->values +
+                                                writer->offset[idx]);
+    value_ptr->subobj = subwriter->orig_obj;
+    subwriter->parent = writer->orig_obj;
+}
+
 void set_subobject(ce_cdb_obj_o *_writer,
                    uint64_t property,
                    uint64_t subobject) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
+    writer->key = property;
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -1030,12 +1065,9 @@ void set_subobject(ce_cdb_obj_o *_writer,
     value_ptr->subobj = subobject;
 
     if (subobject) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(subobject);
-        struct object_t *subobj = _get_object_from_obj_o(w);
+        struct object_t *subobj = _get_object_from_objid(subobject);
         subobj->parent = writer->orig_obj;
-        ce_cdb_a0->write_commit(w);
     }
-
 }
 
 void set_blob(ce_cdb_obj_o *_writer,
@@ -1137,6 +1169,23 @@ static bool prop_exist(uint64_t _object,
 
     if (obj->prefab) {
         return prop_exist(obj->prefab, key);
+    }
+
+    return false;
+}
+
+static bool prop_exist2(uint64_t _object,
+                       uint64_t key) {
+    struct object_t *obj = _get_object_from_objid(_object);
+
+    if (ce_hash_contain(&obj->removed_prop_map, key)) {
+        return false;
+    }
+
+    uint32_t idx = _find_prop_index(obj, key);
+
+    if (idx) {
+        return true;
     }
 
     return false;
@@ -1374,12 +1423,17 @@ static uint64_t read_subobject(uint64_t _obj,
 
     uint64_t idx = _find_prop_index(obj, property);
 
+    uint64_t subobj = 0;
+
     if (idx) {
-        return *(uint64_t *) (obj->values + obj->offset[idx]);
+        subobj = *(uint64_t *) (obj->values + obj->offset[idx]);
+    } else if (obj->prefab) {
+        subobj = read_subobject(obj->prefab, property, defaultt);
     }
 
-    if (obj->prefab) {
-        return read_subobject(obj->prefab, property, defaultt);
+    if(subobj) {
+//        CE_ASSERT(LOG_WHERE, parent(subobj) != 0);
+        return subobj;
     }
 
     return defaultt;
@@ -1427,12 +1481,11 @@ static void prop_keys(uint64_t _obj,
         return;
     }
 
+    uint32_t prop_n =  (obj->properties_count - 1);
     memcpy(keys, obj->keys + 1,
-           sizeof(uint64_t) * (obj->properties_count - 1));
+           sizeof(uint64_t) * prop_n);
 
     if (obj->prefab) {
-        keys += (obj->properties_count - 1);
-
         uint32_t prefab_prop_count = prop_count(obj->prefab);
 
         uint64_t prefab_keys[prefab_prop_count];
@@ -1447,10 +1500,8 @@ static void prop_keys(uint64_t _obj,
                 continue;
             }
 
-            keys[i] = prefab_keys[i];
+            keys[prop_n++] = prefab_keys[i];
         }
-
-        return;
     }
 }
 
@@ -1529,9 +1580,16 @@ void set_type(uint64_t _obj,
     obj->type = type;
 }
 
-uint64_t parent(uint64_t object) {
-    struct object_t *obj = _get_object_from_objid(object);
-    return obj->parent;
+
+uint64_t key(uint64_t _obj) {
+    struct object_t *obj = _get_object_from_objid(_obj);
+    return obj->key;
+}
+
+void move(uint64_t _from_obj, uint64_t _to) {
+    struct object_t *from = _get_object_from_objid(_from_obj);
+    uint64_t *obj_addr = (uint64_t *) _to;
+    *obj_addr = from->idx;
 }
 
 static struct ce_cdb_a0 cdb_api = {
@@ -1543,6 +1601,8 @@ static struct ce_cdb_a0 cdb_api = {
 
         .type = type,
         .set_type = set_type,
+        .key= key,
+        .move = move,
         .create_object = create_object,
         .create_from = create_from,
         .destroy_object = destroy_object,
@@ -1554,6 +1614,7 @@ static struct ce_cdb_a0 cdb_api = {
         .load = load,
 
         .prop_exist = prop_exist,
+        .prop_exist2 = prop_exist2,
         .prop_type = prop_type,
         .prop_keys = prop_keys,
         .prop_count = prop_count,
@@ -1585,6 +1646,7 @@ static struct ce_cdb_a0 cdb_api = {
         .set_ptr = set_ptr,
         .set_ref = set_ref,
         .set_subobject = set_subobject,
+        .set_subobjectw = set_subobjectw,
         .set_prefab = set_prefab,
         .set_blob = set_blob,
         .remove_property = remove_property,

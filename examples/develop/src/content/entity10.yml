@@ -6,10 +6,9 @@ content/entity10.entity:
       scale: [1, 1, 1]
 
     mesh_renderer:
-      scene: content/cube
-      mesh: "g_cube"
-      node: "n_cube"
-      material: "content/material1"
+      scene: "content/scene/oldman/oldman"
+      mesh: "muro_main"
+      material: "content/scene/solider/head"
 
   children:
     "e432c0ed88dd461e81f50973ffb00263":

@@ -11,7 +11,6 @@
 #include "celib/api_system.h"
 #include "celib/module.h"
 
-
 #include <cetech/ecs/ecs.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/gfx/debugui.h>

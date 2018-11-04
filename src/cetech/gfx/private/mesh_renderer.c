@@ -38,11 +38,14 @@ static struct _G {
 void _mesh_component_compiler(const char *filename,
                               uint64_t component_key,
                               ce_cdb_obj_o *writer) {
-    const char *scene = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("scene"), "");
-    const char *mesh = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("mesh"), "");
-    const char *mat = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("material"), "");
-    const char *node = ce_cdb_a0->read_str(component_key, ce_ydb_a0->key("node"), "");
-
+    const char *scene = ce_cdb_a0->read_str(component_key,
+                                            ce_ydb_a0->key("scene"), "");
+    const char *mesh = ce_cdb_a0->read_str(component_key,
+                                           ce_ydb_a0->key("mesh"), "");
+    const char *mat = ce_cdb_a0->read_str(component_key,
+                                          ce_ydb_a0->key("material"), "");
+    const char *node = ce_cdb_a0->read_str(component_key,
+                                           ce_ydb_a0->key("node"), "");
 
     ce_cdb_a0->set_uint64(writer, PROP_MESH_ID, ce_id_a0->id64(mesh));
     ce_cdb_a0->set_uint64(writer, PROP_NODE_ID, ce_id_a0->id64(node));
@@ -116,7 +119,7 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_renderer_a0->set_vertex_buffer(0, vbh, 0, vb_size);
         ct_renderer_a0->set_index_buffer(ibh, 0, ib_size);
 
-        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE,.name = m.material};
+        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE, .name = m.material};
         uint64_t material_obj = ct_resource_a0->get(material_resource);
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
@@ -213,24 +216,26 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Mesh renderer";
 }
 
-static void property_editor(uint64_t obj) {
-    ct_editor_ui_a0->ui_resource(obj,
-                                 PROP_SCENE_ID, "Scene",
+static void property_editor(struct ct_resource_id rid,
+                            uint64_t obj) {
+    ct_editor_ui_a0->ui_resource(rid, obj,
+                                 ce_id_a0->id64("scene"), "Scene",
                                  ce_id_a0->id64("scene"),
                                  obj);
 
-    ct_editor_ui_a0->ui_str_combo(obj,
+    ct_editor_ui_a0->ui_str_combo(rid, obj,
                                   PROP_MESH, "Mesh",
                                   mesh_combo_items,
                                   obj);
 
-    ct_editor_ui_a0->ui_str_combo(obj,
+    ct_editor_ui_a0->ui_str_combo(rid, obj,
                                   PROP_NODE, "Node",
                                   node_combo_items,
                                   obj);
 
-    ct_editor_ui_a0->ui_resource(obj,
-                                 PROP_MATERIAL_ID, "Material",
+    ct_editor_ui_a0->ui_resource(rid, obj,
+                                 ce_id_a0->id64("material"),
+                                 "Material",
                                  ce_id_a0->id64("material"),
                                  obj);
 

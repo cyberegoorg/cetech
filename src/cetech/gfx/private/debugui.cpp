@@ -26,7 +26,7 @@ static struct DebugUIGlobal {
     ce_alloc *allocator;
 } _G;
 
-static void on_begin_render(uint64_t event) {
+static void on_begin_render(uint64_t type, void* event) {
     uint8_t  viewid = 255;
 
     struct ct_controlers_i0 *keyboard, *mouse;
@@ -93,11 +93,8 @@ static void on_begin_render(uint64_t event) {
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 }
 
-static void on_render(uint64_t _event) {
-    uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                              DEBUGUI_EVENT);
-
-    ce_ebus_a0->broadcast(DEBUGUI_EBUS, event);
+static void on_render(uint64_t type, void* _event) {
+    ce_ebus_a0->broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, NULL, 0);
     imguiEndFrame();
 }
 

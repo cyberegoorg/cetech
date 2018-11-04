@@ -16,6 +16,7 @@
 #include "celib/allocator.h"
 #include "keystr.h"
 #include <cetech/controlers/controlers.h>
+#include <celib/cdb.h>
 
 
 //==============================================================================
@@ -90,31 +91,33 @@ static int button_released(uint32_t idx,
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
-static void _update(uint64_t _event) {
+static void _update(uint64_t type, void* _event) {
     CE_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    uint64_t *events = ce_ebus_a0->events(KEYBOARD_EBUS);
-    uint32_t events_n = ce_ebus_a0->event_count(KEYBOARD_EBUS);
+    struct ebus_event_header *it = ce_ebus_a0->events(KEYBOARD_EBUS);
+    struct ebus_event_header *end_it = ce_ebus_a0->events_end(KEYBOARD_EBUS);
 
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
+    while (it != end_it) {
+        struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
 
-        switch (ce_cdb_a0->type(event)) {
+        switch (it->type) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[ce_cdb_a0->read_uint64(event, CONTROLER_KEYCODE,
-                                                0)] = 1;
+                _G.state[ce_cdb_a0->read_uint64(obj_event->obj,
+                                                CONTROLER_KEYCODE, 0)] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[ce_cdb_a0->read_uint64(event, CONTROLER_KEYCODE,
+                _G.state[ce_cdb_a0->read_uint64(obj_event->obj,
+                                                CONTROLER_KEYCODE,
                                                 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                const char *str = ce_cdb_a0->read_str(event, CONTROLER_TEXT, 0);
+                const char *str = ce_cdb_a0->read_str(obj_event->obj,
+                                                      CONTROLER_TEXT, 0);
                 memcpy(_G.text, str, strlen(str));
                 break;
             }
@@ -122,7 +125,10 @@ static void _update(uint64_t _event) {
             default:
                 break;
         }
+
+        it = CE_EBUS_NEXT(it);
     }
+
 }
 
 static char *text(uint32_t idx) {

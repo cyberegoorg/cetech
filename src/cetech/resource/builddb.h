@@ -11,9 +11,11 @@ struct ct_builddb_a0 {
     void (*put_file)(const char *filename,
                      time_t mtime);
 
-    void (*put_resource)(const char *fullname,
-                         struct ct_resource_id rid,
-                         const char *filename,
+    void (*put_resource_2)(const char *fullname,
+                           struct ct_resource_id rid,
+                           const char *filename);
+
+    void (*put_resource)(struct ct_resource_id rid,
                          const char *data,
                          uint64_t size);
 
@@ -46,11 +48,12 @@ struct ct_builddb_a0 {
     void (*get_resource_dirs_clean)(char **filename,
                                     struct ce_alloc *alloc);
 
-    int (*get_resource_from_dirs)(const char* dir, char ***filename,
-                             struct ce_alloc *alloc);
+    int (*get_resource_from_dirs)(const char *dir,
+                                  char ***filename,
+                                  struct ce_alloc *alloc);
 
     void (*get_resource_from_dirs_clean)(char **filename,
-                                    struct ce_alloc *alloc);
+                                         struct ce_alloc *alloc);
 };
 
 CE_MODULE(ct_builddb_a0);

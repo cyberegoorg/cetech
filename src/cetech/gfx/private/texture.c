@@ -27,6 +27,9 @@
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/editor/asset_preview.h>
+#include <cetech/resource/sourcedb.h>
+#include <celib/ebus.h>
+#include <cetech/resource/resource_compiler.h>
 
 //==============================================================================
 // GLobals
@@ -46,16 +49,8 @@ struct _G {
 // Resource
 //==============================================================================
 
-
-static void _on_obj_change(uint64_t obj,
-                           const uint64_t *prop,
-                           uint32_t prop_count,
-                           void *data);
-
 void _texture_resource_online(uint64_t name,
                               uint64_t obj) {
-    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
-
     uint64_t blob_size = 0;
     void *blob;
     blob = ce_cdb_a0->read_blob(obj, TEXTURE_DATA, &blob_size, 0);
@@ -72,7 +67,6 @@ void _texture_resource_online(uint64_t name,
     ce_cdb_a0->write_commit(writer);
 }
 
-
 void _texture_resource_offline(uint64_t name,
                                uint64_t obj) {
     const uint64_t texture = ce_cdb_a0->read_uint64(obj, TEXTURE_HANDLER_PROP,
@@ -88,7 +82,7 @@ static int _texturec(const char *input,
     struct ce_alloc *alloc = ce_memory_a0->system;
     char *buffer = NULL;
 
-    char *texturec = ct_resource_a0->compiler_external_join(alloc, "texturec");
+    char *texturec = ct_resource_compiler_a0->external_join(alloc, "texturec");
 
     ce_buffer_printf(&buffer, alloc, "%s", texturec);
     ce_buffer_free(texturec, alloc);
@@ -135,7 +129,7 @@ static int _gen_tmp_name(char *tmp_filename,
     return ret;
 }
 
-static void _compile(uint64_t obj) {
+static uint64_t _compile(uint64_t obj) {
     const char *input = ce_cdb_a0->read_str(obj, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(obj, TEXTURE_GEN_MIPMAPS, false);
     bool is_normalmap = ce_cdb_a0->read_bool(obj, TEXTURE_IS_NORMALMAP, false);
@@ -152,7 +146,7 @@ static void _compile(uint64_t obj) {
     const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(),
                                                  CONFIG_SRC, "");
 
-    char *tmp_dir = ct_resource_a0->compiler_get_tmp_dir(a, platform);
+    char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
     char *input_path = NULL;
     ce_os_a0->path->join(&input_path, a, 2, source_dir, input);
 
@@ -161,7 +155,7 @@ static void _compile(uint64_t obj) {
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
     if (result != 0) {
-        return;
+        return 0;
     }
 
     struct ce_vio *tmp_file = NULL;
@@ -172,97 +166,44 @@ static void _compile(uint64_t obj) {
     tmp_file->read(tmp_file, tmp_data, sizeof(char), size);
     tmp_file->close(tmp_file);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    uint64_t texture_resource = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                         TEXTURE_TYPE);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(texture_resource);
     ce_cdb_a0->set_blob(w, TEXTURE_DATA, tmp_data, size);
     ce_cdb_a0->write_commit(w);
+
+    return texture_resource;
 }
 
 
-static void _on_obj_change(uint64_t obj,
-                           const uint64_t *prop,
-                           uint32_t prop_count,
-                           void *data) {
-    bool change = false;
-    for (int i = 0; i < prop_count; ++i) {
-        if (prop[i] == TEXTURE_GEN_MIPMAPS) {
-            change = true;
-            break;
-        }
+uint64_t texture_compiler(const char *filename,
+                          uint64_t k,
+                          struct ct_resource_id rid,
+                          const char *fullname) {
+    const char *input = ce_cdb_a0->read_str(k, TEXTURE_INPUT, "");
 
-        if (prop[i] == TEXTURE_IS_NORMALMAP) {
-            change = true;
-            break;
-        }
-    }
+    uint64_t output = _compile(k);
+    ct_builddb_a0->add_dependency(filename, input);
 
-    if (change) {
-        _compile(obj);
-
-        uint64_t blob_size = 0;
-        void *blob;
-        blob = ce_cdb_a0->read_blob(obj, TEXTURE_DATA, &blob_size, 0);
-        const ct_render_memory_t *mem = ct_renderer_a0->make_ref(blob,
-                                                                 blob_size);
-
-        ct_render_texture_handle_t texture;
-        texture = ct_renderer_a0->create_texture(mem,
-                                                 CT_RENDER_TEXTURE_NONE,
-                                                 0, NULL);
-
-        ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
-        ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
-        ce_cdb_a0->write_commit(writer);
-    }
-}
-
-bool texture_compiler(const char *filename, uint64_t k, struct ct_resource_id rid,const char *fullname) {
-    struct ce_alloc *a = ce_memory_a0->system;
-
-    const char *input_str = ce_cdb_a0->read_str(k, ce_id_a0->id64("input"), "");
-    bool gen_mipmaps = ce_cdb_a0->read_bool(k, ce_id_a0->id64("gen_mipmaps"), false);
-    bool is_normalmap = ce_cdb_a0->read_bool(k, ce_id_a0->id64("is_normalmap"), false);
-
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), TEXTURE_TYPE);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-    ce_cdb_a0->set_str(w, TEXTURE_INPUT, input_str);
-    ce_cdb_a0->set_bool(w, TEXTURE_GEN_MIPMAPS, gen_mipmaps);
-    ce_cdb_a0->set_bool(w, TEXTURE_IS_NORMALMAP, is_normalmap);
-    ce_cdb_a0->write_commit(w);
-
-    _compile(obj);
-
-    char* output = NULL;
-    ce_cdb_a0->dump(obj, &output, a);
-    ce_cdb_a0->destroy_object(obj);
-
-    ct_builddb_a0->put_resource(fullname, rid, filename, output, ce_array_size(output));
-    ce_buffer_free(output, _G.allocator);
-
-    ct_builddb_a0->add_dependency(filename, input_str);
-
-    return true;
+    return output;
 }
 
 static uint64_t cdb_type() {
     return TEXTURE_TYPE;
 }
 
-static void draw_property(uint64_t obj) {
-
-    ct_editor_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
-    ct_editor_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_editor_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+static void draw_property(struct ct_resource_id rid, uint64_t obj) {
+    ct_editor_ui_a0->ui_str(rid, obj, TEXTURE_INPUT, "Input", 0);
+    ct_editor_ui_a0->ui_bool(rid, obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
+    ct_editor_ui_a0->ui_bool(rid, obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
     ct_debugui_a0->Text("Texture preview");
     ct_debugui_a0->NextColumn();
 
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-    size[1] = size[0];
+    float size[2] = {64, 64};
 
     ct_render_texture_handle_t texture;
-    texture.idx = ce_cdb_a0->read_uint64(obj, TEXTURE_HANDLER_PROP, 0);
+    texture = ct_texture_a0->get(ce_cdb_a0->read_uint64(obj, ASSET_NAME, 0));
     ct_debugui_a0->Image(texture,
                          size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
@@ -292,8 +233,6 @@ static void tooltip(struct ct_resource_id resourceid) {
                          (float[2]) {64.0f, 64.0f},
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-
-
 }
 
 static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
@@ -360,7 +299,6 @@ static struct ct_texture_a0 texture_api = {
 struct ct_texture_a0 *ct_texture_a0 = &texture_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-
     api->register_api("ct_texture_a0", &texture_api);
 }
 

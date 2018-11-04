@@ -6,19 +6,20 @@
 #include "celib/module.h"
 #include "celib/api_system.h"
 #include "celib/log.h"
+#include "celib/cdb.h"
+#include <celib/hashlib.h>
+#include <celib/ebus.h>
+#include <celib/os.h>
+#include <celib/macros.h>
 
 #include "cetech/machine/machine.h"
 
 #include <include/SDL2/SDL.h>
-#include <celib/hashlib.h>
-#include <celib/ebus.h>
 #include <cetech/gfx/renderer.h>
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/controlers/gamepad.h>
-#include <celib/os.h>
 #include <cetech/kernel/kernel.h>
-#include <celib/macros.h>
 #include <cetech/controlers/controlers.h>
 
 
@@ -109,7 +110,7 @@ void sdl_mouse_process() {
     ce_cdb_a0->write_commit(w);
 
 
-    ce_ebus_a0->broadcast(MOUSE_EBUS, event);
+    ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_MOVE, event);
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
@@ -120,7 +121,7 @@ void sdl_mouse_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast(MOUSE_EBUS, event);
+            ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_DOWN, event);
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
@@ -130,7 +131,7 @@ void sdl_mouse_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast(MOUSE_EBUS, event);
+            ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_UP, event);
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -151,7 +152,7 @@ void sdl_keyboard_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN, event);
 
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
@@ -162,7 +163,7 @@ void sdl_keyboard_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, event);
 
         }
 
@@ -293,7 +294,7 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, event);
 
 
             } else if (is_button_up(curent_state[i][j],
@@ -307,7 +308,7 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, event);
 
             }
 
@@ -334,7 +335,7 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, event);
 
             }
         }
@@ -354,18 +355,13 @@ void sdl_gamepad_play_rumble(int gamepad,
     SDL_HapticRumblePlay(h, strength, length);
 }
 
-static void _update(uint64_t  event ) {
+static void _update(uint64_t type, void* event) {
     SDL_Event e = {};
 
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
-            case SDL_QUIT: {
-                uint64_t event = ce_cdb_a0->create_object(
-                        ce_cdb_a0->db(),
-                        KERNEL_QUIT_EVENT);
-
-                ce_ebus_a0->broadcast(KERNEL_EBUS, event);
-            }
+            case SDL_QUIT:
+                ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
                 break;
 
             case SDL_WINDOWEVENT: {
@@ -384,7 +380,8 @@ static void _update(uint64_t  event ) {
                                               e.window.data2);
                         ce_cdb_a0->write_commit(w);
 
-                        ce_ebus_a0->broadcast(WINDOW_EBUS, event);
+                        ce_ebus_a0->broadcast_obj(WINDOW_EBUS,
+                                              EVENT_WINDOW_RESIZED, event);
 
                     }
                         break;
@@ -403,7 +400,7 @@ static void _update(uint64_t  event ) {
                 ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(MOUSE_EBUS, event);
+                ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_WHEEL, event);
 
             }
                 break;
@@ -419,7 +416,8 @@ static void _update(uint64_t  event ) {
                 ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(KEYBOARD_EBUS, event);
+                ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT,
+                                      event);
 
             }
                 break;
@@ -435,7 +433,8 @@ static void _update(uint64_t  event ) {
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT,
+                                      event);
 
             }
                 break;
@@ -460,7 +459,8 @@ static void _update(uint64_t  event ) {
                     ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ce_cdb_a0->write_commit(w);
 
-                    ce_ebus_a0->broadcast(GAMEPAD_EBUS, event);
+                    ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS,
+                                          EVENT_GAMEPAD_DISCONNECT, event);
 
                     break;
                 }

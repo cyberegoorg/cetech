@@ -177,16 +177,16 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(uint64_t event) {
-
+static void on_resize(uint64_t type, void* event) {
     _G.need_reset = 1;
 
+    struct ebus_cdb_event* ev = (struct ebus_cdb_event*)event;
 
-    _G.size_width = ce_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_WIDTH, 0);
-    _G.size_height = ce_cdb_a0->read_uint64(event, CT_MACHINE_WINDOW_HEIGHT, 0);
+    _G.size_width = ce_cdb_a0->read_uint64(ev->obj, CT_MACHINE_WINDOW_WIDTH, 0);
+    _G.size_height = ce_cdb_a0->read_uint64(ev->obj, CT_MACHINE_WINDOW_HEIGHT, 0);
 }
 
-static void on_begin_render(uint64_t _event) {
+static void on_begin_render(uint64_t type, void* _event) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
@@ -194,7 +194,7 @@ static void on_begin_render(uint64_t _event) {
     }
 }
 
-static void on_render(uint64_t _event) {
+static void on_render(uint64_t type, void* _event) {
     bgfx_frame(false);
 }
 

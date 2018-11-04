@@ -104,14 +104,14 @@ static void foreach_rotation(struct ct_world world,
     transform = ct_ecs_a0->component->get_all(TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
-        float rot[3] = {0};
+        float rot[3] = {};
         ce_vec3_add_s(rot, transform[i].rotation, rotation[i].speed * dt);
         ce_vec3_move(transform[i].rotation, rot);
     }
 }
 
 static void rotation_system(struct ct_world world,
-                            float dt) {
+                             float dt) {
     uint64_t mask = ct_ecs_a0->component->mask(ROTATION_COMPONENT)
                     | ct_ecs_a0->component->mask(TRANSFORM_COMPONENT);
 
@@ -125,7 +125,6 @@ static uint64_t rotation_name() {
 static const uint64_t *rotation_before(uint32_t *n) {
     static uint64_t _before[] = {TRANSFORM_SYSTEM};
     *n = CE_ARRAY_LEN(_before);
-
     return _before;
 }
 

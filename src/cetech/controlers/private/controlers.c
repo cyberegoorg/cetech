@@ -6,6 +6,7 @@
 #include <celib/api_system.h>
 #include <celib/log.h>
 #include <celib/module.h>
+#include <celib/cdb.h>
 #include <celib/ebus.h>
 #include <celib/hashlib.h>
 #include <celib/macros.h>

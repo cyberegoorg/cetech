@@ -69,7 +69,7 @@ struct ct_cdb_obj_t;
     CE_ID64_0("layers", 0x289219f856ee5cd6ULL)
 
 #define MATERIAL_LAYER_NAME \
-    CE_ID64_0("layer_name", 0x29aed2afaafefcc9ULL)
+    CE_ID64_0("name", 0xd4c943cba60c270bULL)
 
 
 //==============================================================================

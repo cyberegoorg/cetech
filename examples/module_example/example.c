@@ -29,9 +29,9 @@ static struct G {
     float dt;
 } _G;
 
-
-void update(uint64_t event) {
-    _G.dt = ce_cdb_a0->read_float(event, ce_id_a0->id64("dt"), 0.0f);
+void update(uint64_t type, void* event) {
+    struct ebus_cdb_event *ev = event;
+    _G.dt = ce_cdb_a0->read_float(ev->obj, ce_id_a0->id64("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
@@ -44,7 +44,7 @@ void update(uint64_t event) {
     ///ct_log_a0->debug("example", "%f", dt);
 }
 
-void module1(uint64_t event) {
+void module1(uint64_t type, void* event) {
     CE_UNUSED(event);
 
     static bool visible = true;

@@ -1,6 +1,7 @@
 content/copy.material:
   layers:
     default:
+      name: default
       shader: content/copy
 
       render_state:

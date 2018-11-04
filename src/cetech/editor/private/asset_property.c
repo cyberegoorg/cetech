@@ -7,6 +7,8 @@
 #include <celib/hash.inl>
 #include <celib/ebus.h>
 #include <celib/ydb.h>
+#include <cetech/resource/sourcedb.h>
+#include <celib/cdb.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -24,52 +26,12 @@ static struct _G {
     struct ce_alloc *allocator;
 } _G;
 
-static void draw_ui(uint64_t obj) {
+static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
     if (!obj) {
         return;
     }
 
-    uint64_t obj_type = ce_cdb_a0->type(obj);
-
-    uint64_t res_obj = 0;
-    if (obj_type == ASSET_BROWSER_ASSET_TYPE) {
-
-        uint64_t asset_type = ce_cdb_a0->read_uint64(obj,
-                                                     ASSET_TYPE,
-                                                     0);
-        uint64_t asset_name = ce_cdb_a0->read_uint64(obj,
-                                                     ASSET_NAME,
-                                                     0);
-        struct ct_resource_id rid = (struct ct_resource_id) {
-                .name = asset_name,
-                .type = asset_type
-        };
-
-        res_obj = ct_resource_a0->get(rid);
-    } else {
-        res_obj = obj;
-    }
-
-
-//    char filename[512] = {};
-//    ct_resource_a0->compiler_get_filename(filename,
-//                                          CE_ARRAY_LEN(filename),
-//                                          rid);
-
-//    if (ct_debugui_a0->Button("Save", (float[2]) {0.0f})) {
-//        ce_ydb_a0->save(filename);
-//    }
-//    ct_debugui_a0->SameLine(0.0f, -1.0f);
-//
-//    ct_debugui_a0->InputText("asset",
-//                             filename, strlen(filename),
-//                             DebugInputTextFlags_ReadOnly, 0, NULL);
-
-    if (!res_obj) {
-        return;
-    }
-
-    uint64_t res_obj_type = ce_cdb_a0->type(res_obj);
+    uint64_t res_obj_type = ce_cdb_a0->type(obj);
 
     struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(
             res_obj_type);
@@ -90,30 +52,8 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-//    const char *display_name = "";
-//
-//    if (i->display_name) {
-//        display_name = i->display_name();
-//    }
+    i->draw(rid, obj);
 
-
-//    ct_debugui_a0->Separator();
-//    if (!ct_debugui_a0->TreeNodeEx(display_name,
-//                                   DebugUITreeNodeFlags_DefaultOpen)) {
-//        ct_debugui_a0->Separator();
-//        ct_debugui_a0->NextColumn();
-//        ct_debugui_a0->NextColumn();
-//
-//        return;
-//
-//    }
-//    ct_debugui_a0->Separator();
-//    ct_debugui_a0->NextColumn();
-//    ct_debugui_a0->NextColumn();
-
-    i->draw(res_obj);
-
-//    ct_debugui_a0->TreePop();
 }
 
 

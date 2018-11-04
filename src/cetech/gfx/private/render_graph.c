@@ -84,7 +84,7 @@ static void render_system(struct ct_world world,
     ct_ecs_a0->system->process(world, mask, foreach_render_graph, &dt);
 }
 
-static void on_render(uint64_t event) {
+static void on_render(uint64_t type, void* event) {
     CE_UNUSED(event);
 
     _G.viewid = 0;

@@ -4,11 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <cetech/resource/resource.h>
 
 #define ECS_EBUS_NAME "ecs"
-
-#define PREFAB_NAME_PROP \
-    CE_ID64_0("prefab_filename", 0x74e7f49a67b7125fULL)
 
 #define EDITOR_COMPONENT \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
@@ -132,12 +130,15 @@ struct ct_component_i0 {
                        uint32_t n);
 };
 
+struct ct_resource_id;
+
 struct ct_editor_component_i0 {
     const char *(*display_name)();
 
     uint64_t (*create_new)();
 
-    void (*property_editor)(uint64_t obj);
+    void (*property_editor)(struct ct_resource_id rid,
+                            uint64_t obj);
 
     const char *(*prop_display_name)(uint64_t prop);
 
@@ -166,7 +167,8 @@ struct ct_component_a0 {
     void (*add)(struct ct_world world,
                 struct ct_entity ent,
                 const uint64_t *component_name,
-                uint32_t name_count, void**);
+                uint32_t name_count,
+                void **);
 
     void (*remove)(struct ct_world world,
                    struct ct_entity ent,
@@ -212,8 +214,9 @@ struct ct_entity_a0 {
 struct ct_simulation_i0 {
     uint64_t (*name)();
 
-    const uint64_t* (*before)(uint32_t* n);
-    const uint64_t* (*after)(uint32_t* n);
+    const uint64_t *(*before)(uint32_t *n);
+
+    const uint64_t *(*after)(uint32_t *n);
 
     ct_simulate_fce_t simulation;
 };

@@ -32,24 +32,6 @@ struct _G {
     struct ce_alloc *allocator;
 } _G = {};
 
-void online(uint64_t name,
-            uint64_t obj) {
-}
-
-void offline(uint64_t name,
-             uint64_t obj) {
-    CE_UNUSED(name, obj);
-}
-
-void *reloader(uint64_t name,
-               void *old_data,
-               void *new_data,
-               struct ce_alloc *allocator) {
-    CE_UNUSED(name);
-
-    CE_FREE(allocator, old_data);
-    return new_data;
-}
 
 static uint64_t cdb_type() {
     return PACKAGE_TYPE;
@@ -59,60 +41,8 @@ static uint64_t cdb_type() {
 //==============================================================================
 // Resource compiler
 //==============================================================================
-
-
-bool _package_compiler(const char *filename, uint64_t _obj, struct ct_resource_id rid, const char *fullname) {
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), PACKAGE_TYPE);
-    uint64_t types_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), PACKAGE_TYPES_PROP);
-
-    ce_cdb_obj_o *w_obj = ce_cdb_a0->write_begin(obj);
-    ce_cdb_a0->set_subobject(w_obj, PACKAGE_TYPES_PROP, types_obj);
-    ce_cdb_a0->write_commit(w_obj);
-
-    ce_cdb_obj_o *w_types_obj = ce_cdb_a0->write_begin(types_obj);
-
-    const uint64_t n = ce_cdb_a0->prop_count(_obj);
-    uint64_t asset_keys[n];
-    ce_cdb_a0->prop_keys(_obj, asset_keys);
-    for (uint32_t i = 0; i < n; ++i) {
-        uint64_t type_id = asset_keys[i];
-
-        uint64_t type_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), type_id);
-
-        ce_cdb_a0->set_subobject(w_types_obj, type_id, type_obj);
-
-        ce_cdb_obj_o *w_type_obj = ce_cdb_a0->write_begin(type_obj);
-
-        uint64_t array = ce_cdb_a0->read_subobject(_obj, type_id, 0);
-
-        const uint64_t asset_n = ce_cdb_a0->prop_count(array);
-        uint64_t array_keys[asset_n];
-        ce_cdb_a0->prop_keys(array, array_keys);
-
-        for (uint32_t j = 0; j < asset_n; ++j) {
-            ce_cdb_a0->set_str(w_type_obj, array_keys[j], "");
-        }
-
-        ce_cdb_a0->write_commit(w_type_obj);
-    }
-
-    ce_cdb_a0->write_commit(w_types_obj);
-
-    char* output = NULL;
-    ce_cdb_a0->dump(obj, &output, _G.allocator);
-    ce_cdb_a0->destroy_object(obj);
-
-    ct_builddb_a0->put_resource(fullname, rid, filename, output, ce_array_size(output));
-    ce_buffer_free(output, _G.allocator);
-
-    return true;
-}
-
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
-        .online = online,
-        .offline =offline,
-        .compilator = _package_compiler,
 };
 
 int package_init(struct ce_api_a0 *api) {

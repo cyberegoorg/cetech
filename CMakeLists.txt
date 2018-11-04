@@ -90,6 +90,7 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
+        src/cetech/resource/private/sourcedb.c
         src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/private/kernel.c

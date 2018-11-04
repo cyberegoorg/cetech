@@ -13,37 +13,7 @@ struct ct_cmd {
 
 struct ct_cdb_cmd_s {
     struct ct_cmd header;
-
-    uint64_t obj;
-    uint64_t prop;
-
-    // VALUES
-    union {
-        struct {
-            float new_value[3];
-            float old_value[3];
-        } vec3;
-
-        struct {
-            float new_value;
-            float old_value;
-        } f;
-
-        struct {
-            uint64_t new_value;
-            uint64_t old_value;
-        } u64;
-
-        struct {
-            char new_value[128];
-            char old_value[128];
-        } str;
-
-        struct {
-            bool new_value;
-            bool old_value;
-        } b;
-    };
+    uint64_t cmd;
 };
 
 

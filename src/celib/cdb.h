@@ -64,6 +64,10 @@ struct ce_cdb_a0 {
     void (*set_type)(uint64_t obj,
                      uint64_t type);
 
+    uint64_t (*key)(uint64_t obj);
+
+    void (*move)(uint64_t from_obj, uint64_t to);
+
     void (*gc)();
 
     void (*dump)(uint64_t obj,
@@ -77,6 +81,9 @@ struct ce_cdb_a0 {
 
     // PROP
     bool (*prop_exist)(uint64_t object,
+                       uint64_t key);
+
+    bool (*prop_exist2)(uint64_t object,
                        uint64_t key);
 
     enum ce_cdb_type (*prop_type)(uint64_t object,
@@ -136,6 +143,10 @@ struct ce_cdb_a0 {
     void (*set_subobject)(ce_cdb_obj_o *writer,
                           uint64_t property,
                           uint64_t subobject);
+
+    void (*set_subobjectw)(ce_cdb_obj_o *writer,
+                          uint64_t property,
+                          ce_cdb_obj_o *sub_writer);
 
     void (*set_blob)(ce_cdb_obj_o *writer,
                      uint64_t property,

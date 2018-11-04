@@ -25,6 +25,7 @@
 
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/asset_editor.h>
+#include <cetech/resource/sourcedb.h>
 
 #define WINDOW_NAME "Explorer"
 
@@ -38,7 +39,8 @@ static struct _G {
     uint64_t top_level_obj;
 } _G;
 
-static uint64_t draw(uint64_t top_level_obj, uint64_t selected_obj) {
+static uint64_t draw(uint64_t top_level_obj,
+                     uint64_t selected_obj) {
     struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
@@ -55,7 +57,8 @@ static uint64_t draw(uint64_t top_level_obj, uint64_t selected_obj) {
     return 0;
 }
 
-static void draw_menu(uint64_t top_level_obj, uint64_t selected_obj) {
+static void draw_menu(uint64_t top_level_obj,
+                      uint64_t selected_obj) {
     struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
@@ -79,18 +82,25 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     ct_debugui_a0->Separator();
 
     uint64_t selected_object = draw(_G.top_level_obj, _G.selected_object);
-    if(selected_object) {
+    if (selected_object) {
         _G.selected_object = selected_object;
 
         uint64_t event;
         event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                          EXPLORER_OBJ_SELECTED);
 
+        uint64_t asset_type = ce_cdb_a0->type(_G.top_level_obj);
+        uint64_t asset_name = ce_cdb_a0->read_uint64(_G.top_level_obj, ASSET_NAME, 0);
+
         struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
         ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, selected_object);
+        ce_cdb_a0->set_uint64(w, ASSET_NAME, asset_name);
+        ce_cdb_a0->set_uint64(w, ASSET_TYPE, asset_type);
         ce_cdb_a0->write_commit(w);
 
-        ce_ebus_a0->broadcast(EXPLORER_EBUS, event);
+        ce_ebus_a0->broadcast_obj(EXPLORER_EBUS,
+                                  EXPLORER_OBJ_SELECTED,
+                                  event);
     }
 }
 
@@ -112,9 +122,12 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
-static void _on_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
+static void _on_asset_selected(uint64_t _type,
+                               void *event) {
+    struct ebus_cdb_event *ev = event;
+
+    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
@@ -125,19 +138,22 @@ static void _on_asset_selected(uint64_t event) {
         return;
     }
 
-    _G.top_level_obj = ct_resource_a0->get(rid);
+    _G.top_level_obj = ct_sourcedb_a0->get(rid);
 }
 
-static void _on_editor_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
+static void _on_editor_asset_selected(uint64_t _type,
+                                      void *event) {
+    struct ebus_cdb_event *ev = event;
+
+    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
             .type = type,
     };
 
-    _G.top_level_obj = ct_resource_a0->get(rid);
+    _G.top_level_obj = ct_sourcedb_a0->get(rid);
 }
 
 static void _init(struct ce_api_a0 *api) {

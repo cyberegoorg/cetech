@@ -21,6 +21,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/asset_preview.h>
+#include <cetech/resource/sourcedb.h>
 
 
 //==============================================================================
@@ -781,59 +782,9 @@ static void destroy(struct ct_world world,
     }
 }
 
-static void _load(uint64_t from,
-                  uint64_t parent) {
-    if(from==parent) {
-        ce_log_a0->error(LOG_WHERE, "from == parent, fix it");
-        return;
-    }
-
-    const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-    uint64_t keys[prop_count];
-    ce_cdb_a0->prop_keys(from, keys);
-
-    const char *prefab = ce_cdb_a0->read_str(from, PREFAB_NAME_PROP, NULL);
-
-    uint64_t prefab_res = 0;
-    if (prefab) {
-        struct ct_resource_id prefab_rid = {};
-        ct_resource_a0->type_name_from_filename(prefab, &prefab_rid, NULL);
-
-        prefab_res = ct_resource_a0->get(prefab_rid);
-
-        ce_cdb_a0->set_prefab(from, prefab_res);
-    }
-
-    for (int i = 0; i < prop_count; ++i) {
-        uint64_t key = keys[i];
-        enum ce_cdb_type type = ce_cdb_a0->prop_type(from, keys[i]);
-
-        if (type == CDB_TYPE_SUBOBJECT) {
-            uint64_t from_subobj;
-            from_subobj = ce_cdb_a0->read_subobject(from, key, 0);
-
-            uint64_t parent_subobj = 0;
-
-            if (parent) {
-                parent_subobj = ce_cdb_a0->read_subobject(parent, key, 0);
-            } else if (prefab_res) {
-                parent_subobj = ce_cdb_a0->read_subobject(prefab_res, key, 0);
-            }
-
-            if (parent_subobj) {
-                ce_cdb_a0->set_prefab(from_subobj, parent_subobj);
-            }
-
-            _load(from_subobj, parent_subobj);
-        }
-    }
-}
-
 static void online(uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
-
-    _load(obj, 0);
 }
 
 static void offline(uint64_t name,
@@ -860,16 +811,22 @@ static void unload(struct ct_resource_id resourceid,
     ct_ecs_a0->entity->destroy(world, &entity, 1);
 }
 
-
-static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
-        .load = load,
-        .unload = unload,
-};
-
 void *get_resource_interface(uint64_t name_hash) {
+    static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
+            .load = load,
+            .unload = unload,
+    };
+
+    static struct ct_sourcedb_asset_i0 ct_sourcedb_asset_i0 = {
+            .anotate = entity_resource_anotate,
+    };
+
     if (name_hash == ASSET_PREVIEW) {
         return &ct_asset_preview_i0;
+    } else if (name_hash == SOURCEDB_I) {
+        return &ct_sourcedb_asset_i0;
     }
+
     return NULL;
 }
 
@@ -1283,7 +1240,7 @@ static struct ct_world create_world() {
     ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(event);
     ce_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ce_cdb_a0->write_commit(wr);
-    ce_ebus_a0->broadcast(ECS_EBUS, event);
+    ce_ebus_a0->broadcast_obj(ECS_EBUS, ECS_WORLD_CREATE, event);
 
 
     return world;
@@ -1297,7 +1254,7 @@ static void destroy_world(struct ct_world world) {
     ce_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
     ce_cdb_a0->write_commit(wr);
 
-    ce_ebus_a0->broadcast(ECS_EBUS, event);
+    ce_ebus_a0->broadcast_obj(ECS_EBUS, ECS_WORLD_DESTROY, event);
 
     struct world_instance *w = _new_world(world);
     ce_handler_destroy(&_G.world_handler, world.h, _G.allocator);

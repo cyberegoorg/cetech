@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
+#include <celib/cdb.h>
 
 
 #define _G entity_property_global
@@ -54,14 +55,15 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
     return NULL;
 };
 
-static void _generic_component_property(uint64_t obj,
+static void _generic_component_property(struct ct_resource_id rid,
+                                        uint64_t obj,
                                         struct ct_component_i0 *ci,
                                         struct ct_editor_component_i0 *ec) {
 
-    const struct ct_comp_prop_decs* comp_decs = ci->prop_desc();
+    const struct ct_comp_prop_decs *comp_decs = ci->prop_desc();
 
     for (int i = 0; i < comp_decs->prop_n; ++i) {
-        const struct ct_prop_decs* desc = &comp_decs->prop_decs[i];
+        const struct ct_prop_decs *desc = &comp_decs->prop_decs[i];
         uint64_t prop = desc->name;
 
         enum ct_ecs_prop_type type = desc->type;
@@ -70,10 +72,10 @@ static void _generic_component_property(uint64_t obj,
 
         switch (type) {
             case ECS_PROP_FLOAT:
-                ct_editor_ui_a0->ui_float(obj, prop, display_name, 0.0f, 0.0f);
+                ct_editor_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f, 0.0f);
                 break;
             case ECS_PROP_VEC3:
-                ct_editor_ui_a0->ui_vec3(obj, prop, display_name, 0.0f, 0.0f);
+                ct_editor_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f, 0.0f);
 
             default:
                 break;
@@ -82,7 +84,7 @@ static void _generic_component_property(uint64_t obj,
     }
 }
 
-static void draw_component(uint64_t obj) {
+static void draw_component(struct ct_resource_id rid, uint64_t obj) {
     uint64_t type = ce_cdb_a0->type(obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
@@ -116,10 +118,10 @@ static void draw_component(uint64_t obj) {
     }
 
     if (!editor->property_editor) {
-        _generic_component_property(obj, c, editor);
+        _generic_component_property(rid, obj, c, editor);
 
     } else {
-        editor->property_editor(obj);
+        editor->property_editor(rid, obj);
     }
 
 
@@ -127,21 +129,14 @@ static void draw_component(uint64_t obj) {
 
 }
 
-static void draw_ui(uint64_t obj) {
+static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
     if (!obj) {
         return;
     }
 
     uint64_t obj_type = ce_cdb_a0->type(obj);
 
-    if (ENTITY_RESOURCE == obj_type) {
-//        if (ct_debugui_a0->CollapsingHeader("Entity",
-//                                            DebugUITreeNodeFlags_DefaultOpen)) {
-//            ct_debugui_a0->NextColumn();
-//
-//            ct_debugui_a0->LabelText("Entity", "%llu", _G.active_entity);
-//        }
-
+    if (ENTITY_RESOURCE_ID == obj_type) {
         uint64_t components_obj;
         components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
@@ -155,11 +150,11 @@ static void draw_ui(uint64_t obj) {
             uint64_t c_obj;
             c_obj = ce_cdb_a0->read_subobject(components_obj, name, 0);
 
-            draw_component(c_obj);
+            draw_component(rid, c_obj);
         }
 
     } else if (get_component_interface(obj_type)) {
-        draw_component(obj);
+        draw_component(rid, obj);
     }
 }
 
@@ -169,7 +164,7 @@ void draw_menu(uint64_t obj) {
     }
 
     uint64_t obj_type = ce_cdb_a0->type(obj);
-    if ((ENTITY_RESOURCE != obj_type)) {
+    if ((ENTITY_RESOURCE_ID != obj_type)) {
         return;
     }
 
@@ -180,7 +175,7 @@ void draw_menu(uint64_t obj) {
             struct ct_component_i0 *i = (it.api);
             struct ct_editor_component_i0 *ei;
 
-            if(!i->get_interface) {
+            if (!i->get_interface) {
                 goto next;
             }
 

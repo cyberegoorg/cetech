@@ -1,6 +1,7 @@
 content/material1.material:
   layers:
     default:
+      name: default
       shader: content/shader1
 
       render_state:

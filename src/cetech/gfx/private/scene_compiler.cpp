@@ -29,6 +29,7 @@
 #include <include/assimp/cimport.h>
 #include <celib/log.h>
 #include <celib/buffer.inl>
+#include <cetech/resource/resource_compiler.h>
 
 
 #define _G scene_compiler_globals
@@ -480,9 +481,11 @@ static int _compile_assimp(const char *filename,
                            uint64_t k,
                            struct compile_output *output) {
 
-    uint64_t import_obj = ce_cdb_a0->read_subobject(k, ce_id_a0->id64("import"), 0);
+    uint64_t import_obj = ce_cdb_a0->read_subobject(k, ce_id_a0->id64("import"),
+                                                    0);
 
-    const char *input_str = ce_cdb_a0->read_str(import_obj, ce_id_a0->id64("input"), "");
+    const char *input_str = ce_cdb_a0->read_str(import_obj,
+                                                ce_id_a0->id64("input"), "");
 
     ct_builddb_a0->add_dependency(filename, input_str);
 
@@ -495,10 +498,14 @@ static int _compile_assimp(const char *filename,
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
 
-    uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_obj, ce_id_a0->id64("postprocess"), 0);
+    uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_obj,
+                                                         ce_id_a0->id64(
+                                                                 "postprocess"),
+                                                         0);
 
 
-    if (ce_cdb_a0->read_bool(postprocess_obj, ce_id_a0->id64("flip_uvs"), false)) {
+    if (ce_cdb_a0->read_bool(postprocess_obj, ce_id_a0->id64("flip_uvs"),
+                             false)) {
         postprocess_flag |= aiProcess_FlipUVs;
     }
 
@@ -613,9 +620,10 @@ static int _compile_assimp(const char *filename,
     return 1;
 }
 
-extern "C" bool scene_compiler(const char *filename,
-                               uint64_t k,
-                               struct ct_resource_id rid, const char *fullname) {
+extern "C" uint64_t scene_compiler(const char *filename,
+                                   uint64_t k,
+                                   struct ct_resource_id rid,
+                                   const char *fullname) {
     struct compile_output *output = _crete_compile_output();
 
     int ret = 1;
@@ -681,17 +689,10 @@ extern "C" bool scene_compiler(const char *filename,
                         ce_array_size(output->node_str));
     ce_cdb_a0->write_commit(w);
 
-    char *output_blob = NULL;
-    ce_cdb_a0->dump(obj, &output_blob, ce_memory_a0->system);
-    ce_cdb_a0->destroy_object(obj);
-
-    ct_builddb_a0->put_resource(fullname, rid, filename, output_blob,
-                                ce_array_size(output_blob));
-    ce_buffer_free(output_blob, _G.allocator);
 
     _destroy_compile_output(output);
 
-    return true;
+    return obj;
 }
 
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {

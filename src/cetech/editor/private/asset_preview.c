@@ -17,6 +17,7 @@
 #include <cetech/gfx/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
+#include <cetech/resource/sourcedb.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -151,7 +152,7 @@ static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     return resource_i->get_interface(ASSET_PREVIEW);
 }
 
-static void set_asset(uint64_t event) {
+static void set_asset(uint64_t type, uint64_t event) {
     uint64_t asset_type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
     uint64_t asset_name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
 
@@ -280,18 +281,20 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 };
 
 
-static void _on_asset_selected(uint64_t event) {
-    uint64_t type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
+static void _on_asset_selected(uint64_t _type, void* event) {
+    struct ebus_cdb_event* ev = event;
+
+    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
+    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
 
     struct ct_resource_id rid = {
             .name = name,
             .type = type,
     };
 
-    _G.selected_object = ct_resource_a0->get(rid);
+    _G.selected_object = ct_sourcedb_a0->get(rid);
 
-    set_asset(event);
+    set_asset(_type, ev->obj);
 }
 
 static void _init(struct ce_api_a0 *api) {

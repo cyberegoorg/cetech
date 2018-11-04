@@ -63,10 +63,7 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
-                uint64_t event = ce_cdb_a0->create_object(
-                        ce_cdb_a0->db(),
-                        KERNEL_QUIT_EVENT);
-                ce_ebus_a0->broadcast(KERNEL_EBUS, event);
+                ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
 
             }
 
@@ -246,7 +243,7 @@ static void on_update(float dt) {
 }
 
 
-static void on_ui(uint64_t _event) {
+static void on_ui(uint64_t _type, void* _event) {
     float menu_height = draw_main_menu();
 
     uint32_t w, h;

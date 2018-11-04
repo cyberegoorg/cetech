@@ -9,6 +9,7 @@
 #include <celib/ebus.h>
 #include <celib/core.h>
 #include <celib/buffer.inl>
+#include <celib/cdb.h>
 #include <celib/task.h>
 #include <celib/log.h>
 #include <celib/fs.h>
@@ -21,6 +22,7 @@
 #include <cetech/game_system/game_system.h>
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
+#include <cetech/resource/resource_compiler.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
@@ -47,6 +49,33 @@ const char *_platform() {
 int init_config(int argc,
                 const char **argv,
                 uint64_t object) {
+
+//    {
+//        uint64_t obj1 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//        uint64_t obj2 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//        uint64_t obj3 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//        uint64_t obj4 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//        uint64_t obj5 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//
+//        ce_cdb_obj_o *writer1 = ce_cdb_a0->write_begin(obj1);
+//        ce_cdb_obj_o *writer2 = ce_cdb_a0->write_begin(obj2);
+//        ce_cdb_obj_o *writer3 = ce_cdb_a0->write_begin(obj3);
+//        ce_cdb_obj_o *writer4 = ce_cdb_a0->write_begin(obj4);
+//        ce_cdb_a0->set_subobject(writer1, 1, obj2);
+//        ce_cdb_a0->write_commit(writer1);
+//
+//        ce_cdb_a0->set_subobject(writer2, 1, obj3);
+//        ce_cdb_a0->write_commit(writer2);
+//
+//        ce_cdb_a0->set_subobject(writer3, 1, obj4);
+//        ce_cdb_a0->write_commit(writer3);
+//
+//        ce_cdb_a0->set_subobject(writer4, 1, obj5);
+//        ce_cdb_a0->write_commit(writer4);
+//
+//        uint64_t parent1 = ce_cdb_a0->parent(obj2);
+////        CE_ASSERT(LOG_WHERE, parent1 == obj1);
+//    }
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(object);
     ce_cdb_a0->set_str(writer, CONFIG_PLATFORM, _platform());
@@ -110,6 +139,7 @@ int cetech_kernel_init(int argc,
     init_config(argc, argv, ce_config_a0->obj());
 
     CE_ADD_STATIC_MODULE(builddb);
+    CE_ADD_STATIC_MODULE(sourcedb);
     CE_ADD_STATIC_MODULE(resourcesystem);
     CE_ADD_STATIC_MODULE(resourcecompiler);
 
@@ -223,7 +253,8 @@ static void _boot_unload() {
 }
 
 
-static void on_quit(uint64_t event) {
+static void on_quit(uint64_t type,
+                    void *event) {
     CE_UNUSED(event)
 
     application_quit();
@@ -234,7 +265,7 @@ static void cetech_kernel_start() {
     _init_config();
 
     if (ce_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
-        ct_resource_a0->compiler_compile_all();
+        ct_resource_compiler_a0->compile_all();
 
         if (!ce_cdb_a0->read_uint64(_G.config_object, CONFIG_CONTINUE, 0)) {
             return;
@@ -245,10 +276,7 @@ static void cetech_kernel_start() {
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 
-    uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                              KERNEL_INIT_EVENT);
-
-    ce_ebus_a0->broadcast(KERNEL_EBUS, event);
+    ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_INIT_EVENT, NULL, 0);
 
     _G.is_running = 1;
 
@@ -270,13 +298,12 @@ static void cetech_kernel_start() {
         ce_cdb_a0->set_float(w, KERNEL_EVENT_DT, dt);
         ce_cdb_a0->write_commit(w);
 
-        ce_ebus_a0->broadcast(KERNEL_EBUS, event);
+        ce_ebus_a0->broadcast_obj(KERNEL_EBUS, KERNEL_UPDATE_EVENT, event);
 
         ce_cdb_a0->gc();
     }
 
-    event = ce_cdb_a0->create_object(ce_cdb_a0->db(), KERNEL_SHUTDOWN_EVENT);
-    ce_ebus_a0->broadcast(KERNEL_EBUS, event);
+    ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, NULL, 0);
 
     ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
 

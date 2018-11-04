@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <stdlib.h>
+#include <celib/cdb.h>
 
 
 static void ui_entity_item_end() {
@@ -89,7 +90,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
             struct ct_component_i0 *component_i;
             component_i = ct_ecs_a0->component->get_interface(type);
-            if (!component_i->get_interface) {
+            if (!component_i || !component_i->get_interface) {
                 continue;
             }
 
@@ -152,20 +153,15 @@ static void draw_menu(uint64_t top_level_obj,
 
     uint64_t type = ce_cdb_a0->type(selected_obj);
 
-    if ((type == ENTITY_RESOURCE) || (type == ENTITY_RESOURCE_ID)) {
-        uint64_t uid = ce_cdb_a0->read_uint64(selected_obj, ENTITY_UID,
-                                              UINT64_MAX);
-
-        if (uid == UINT64_MAX) {
-            return;
-        }
+    if (type == ENTITY_RESOURCE_ID) {
+        uint64_t uid = ce_cdb_a0->key(selected_obj);
 
         bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
 
         if (add) {
             uint64_t entity_obj;
             entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  ENTITY_RESOURCE);
+                                                  ENTITY_RESOURCE_ID);
 
             uint64_t uid = rand(); // TODO: !!!!!
 

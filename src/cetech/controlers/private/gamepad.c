@@ -16,6 +16,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/gamepad.h>
 #include <cetech/controlers/controlers.h>
+#include <celib/cdb.h>
 
 #include "gamepadstr.h"
 
@@ -136,26 +137,26 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0->gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(uint64_t _event) {
+static void update(uint64_t type, void* _event) {
     CE_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
+    struct ebus_event_header *it = ce_ebus_a0->events(GAMEPAD_EBUS);
+    struct ebus_event_header *end_it = ce_ebus_a0->events_end(GAMEPAD_EBUS);
 
-    uint64_t *events = ce_ebus_a0->events(GAMEPAD_EBUS);
-    uint32_t events_n = ce_ebus_a0->event_count(GAMEPAD_EBUS);
+    while (it != end_it) {
+        struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
 
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        uint32_t button = ce_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
-        uint32_t axis = ce_cdb_a0->read_uint64(event, CONTROLER_AXIS, 0);
-        uint32_t gamepad_id = ce_cdb_a0->read_uint64(event, CONTROLER_ID, 0);
+        uint32_t button = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_BUTTON, 0);
+        uint32_t axis = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_AXIS, 0);
+        uint32_t gamepad_id = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_ID, 0);
 
         float pos[3] = {};
-        ce_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
+        ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
 
-        switch (ce_cdb_a0->type(event)) {
+        switch (it->type) {
             case EVENT_GAMEPAD_DOWN:
                 _G.state[gamepad_id][button] = 1;
                 break;
@@ -181,7 +182,10 @@ static void update(uint64_t _event) {
             default:
                 break;
         }
+
+        it = CE_EBUS_NEXT(it);
     }
+
 }
 
 static uint64_t name() {

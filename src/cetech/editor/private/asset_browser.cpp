@@ -19,6 +19,7 @@
 #include <cetech/editor/asset_property.h>
 #include <cetech/editor/asset_preview.h>
 #include <cetech/resource/builddb.h>
+#include <cetech/resource/resource_compiler.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -71,7 +72,7 @@ static void _broadcast_edit() {
     ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT, ASSET_BROWSER_SOURCE);
     ce_cdb_a0->write_commit(w);
 
-    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, event);
+    ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, event);
 }
 
 static void _broadcast_selected() {
@@ -85,7 +86,9 @@ static void _broadcast_selected() {
     ce_cdb_a0->set_uint64(w, ASSET_TYPE, _G.selected_asset.type);
     ce_cdb_a0->write_commit(w);
 
-    ce_ebus_a0->broadcast(ASSET_BROWSER_EBUS, selected_asset);
+    ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS,
+                              ASSET_BROWSER_ASSET_SELECTED,
+                              selected_asset);
 }
 
 static void ui_asset_menu() {
@@ -240,7 +243,8 @@ static void ui_asset_list() {
             }
 
             struct ct_resource_id resourceid = {.i128={}};
-            ct_resource_a0->type_name_from_filename(path, &resourceid, NULL);
+            ct_resource_compiler_a0->type_name_from_filename(path, &resourceid,
+                                                             NULL);
 
 
             char label[128];

@@ -9,6 +9,7 @@
 #include <cetech/kernel/kernel.h>
 #include <celib/hash.inl>
 #include <celib/memory.h>
+#include <celib/cdb.h>
 
 #include "../game_system.h"
 
@@ -57,8 +58,10 @@ static bool game_is_paused(uint64_t name) {
     return ce_hash_contain(&_G.game_paused, name);
 }
 
-static void game_update(uint64_t event) {
-    float dt = ce_cdb_a0->read_float(event, KERNEL_EVENT_DT, 0.0f);
+static void game_update(uint64_t type, void* event) {
+    struct ebus_cdb_event* ev = event;
+
+    float dt = ce_cdb_a0->read_float(ev->obj, KERNEL_EVENT_DT, 0.0f);
 
     const uint64_t game_n = ce_array_size(_G.game_interface);
     for (int i = 0; i < game_n; ++i) {

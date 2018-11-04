@@ -26,6 +26,7 @@
 #include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
+#include <cetech/resource/resource_compiler.h>
 
 //==============================================================================
 // GLobals
@@ -52,7 +53,7 @@ static int _shaderc(const char *input,
 
     char *buffer = NULL;
 
-    char *shaderc = ct_resource_a0->compiler_external_join(a, "shaderc");
+    char *shaderc = ct_resource_compiler_a0->external_join(a, "shaderc");
 
     ce_buffer_printf(&buffer, a, "%s", shaderc);
 
@@ -144,7 +145,7 @@ static bool _compile(const char *filename,
     const char *platform;
     platform = ce_cdb_a0->read_str(ce_config_a0->obj(), CONFIG_PLATFORM, "");
 
-    char *tmp_dir = ct_resource_a0->compiler_get_tmp_dir(a, platform);
+    char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
 
     //////// VS
 //    compilator_api->add_dependency(filename, vs_input);
@@ -221,13 +222,14 @@ static bool _compile(const char *filename,
     return true;
 }
 
-bool shader_compiler(const char *filename,
+uint64_t shader_compiler(const char *filename,
                      uint64_t k,
-                     struct ct_resource_id rid, const char *fullname) {
-    struct ce_alloc *a = ce_memory_a0->system;
-
-    const char *vs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("vs_input"), "");
-    const char *fs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("fs_input"), "");
+                     struct ct_resource_id rid,
+                     const char *fullname) {
+    const char *vs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("vs_input"),
+                                               "");
+    const char *fs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("fs_input"),
+                                               "");
 
     uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SHADER_TYPE);
 
@@ -245,17 +247,11 @@ bool shader_compiler(const char *filename,
     bool res = _compile(filename, obj);
 
     if (res) {
-        char *output = NULL;
-        ce_cdb_a0->dump(obj, &output, a);
-        ce_cdb_a0->destroy_object(obj);
-
-        ct_builddb_a0->put_resource(fullname, rid, filename, output,
-                                    ce_array_size(output));
-        ce_buffer_free(output, _G.allocator);
+        return obj;
     }
 
 
-    return res;
+    return 0;
 }
 
 

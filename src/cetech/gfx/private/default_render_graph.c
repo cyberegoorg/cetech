@@ -275,8 +275,7 @@ static void output_pass_on_pass(void *inst,
     ct_renderer_a0->set_view_transform(viewid, NULL, proj);
 
     if (!copy_material) {
-        copy_material = ct_material_a0->create(
-                ce_id_a0->id64("content/copy"));
+        copy_material = ct_material_a0->create(ce_id_a0->id64("content/copy"));
     }
 
     ct_render_texture_handle_t th;

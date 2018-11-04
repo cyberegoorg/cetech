@@ -9,6 +9,7 @@
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/ebus.h>
+#include <celib/cdb.h>
 #include <celib/macros.h>
 #include <celib/hash.inl>
 #include <celib/hashlib.h>
@@ -39,7 +40,7 @@ struct ebus_t {
 
     struct ce_hash_t handler_idx;
     struct ebus_event_handlers *handlers;
-    uint64_t *events;
+    uint8_t *events;
 };
 
 static struct _G {
@@ -66,9 +67,12 @@ void create_ebus(uint64_t id) {
     ce_hash_add(&_G.ebus_idx, ebus.bus_name, ebus_idx, _G.allocator);
 }
 
+
 void send_addr(uint64_t bus_name,
                uint64_t addr,
-               uint64_t event) {
+               uint64_t type,
+               void *event,
+               uint32_t size) {
 
     uint64_t ebus_idx = ce_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
@@ -77,10 +81,20 @@ void send_addr(uint64_t bus_name,
     }
 
     struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
+    const size_t event_size = sizeof(struct ebus_event_header) + size;
 
-    ce_array_push(ebus->events, event, _G.allocator);
+    char ev[event_size];
+    *((struct ebus_event_header *) ev) = (struct ebus_event_header) {
+            .type = type,
+            .size = event_size,
+    };
+    memcpy(ev + sizeof(struct ebus_event_header), event, size);
 
-    uint64_t event_type = ce_cdb_a0->type(event);
+    ce_array_push_n(ebus->events,
+                    ev,
+                    event_size, _G.allocator);
+
+    uint64_t event_type = type;
 
     uint64_t event_idx = ce_hash_lookup(&ebus->handler_idx, event_type,
                                         UINT64_MAX);
@@ -96,13 +110,30 @@ void send_addr(uint64_t bus_name,
             continue;
         }
 
-        ev_handlers->handlers[i].handler(event);
+        ev_handlers->handlers[i].handler(type, event);
     }
 }
 
+void send_addr_obj(uint64_t bus_name,
+                   uint64_t addr,
+                   uint64_t type,
+                   uint64_t event) {
+    struct ebus_cdb_event ev = {event};
+    send_addr(bus_name, addr, type, &ev, sizeof(ev));
+}
+
+void broadcast_obj(uint64_t bus_name,
+                   uint64_t type,
+                   uint64_t event) {
+    struct ebus_cdb_event ev = {event};
+    send_addr(bus_name, 0, type, &ev, sizeof(ev));
+}
+
 void broadcast(uint64_t bus_name,
-               uint64_t event) {
-    send_addr(bus_name, 0, event);
+               uint64_t type,
+               void *event,
+               uint32_t size) {
+    send_addr(bus_name, 0, type, event, size);
 }
 
 void begin_frame() {
@@ -110,8 +141,19 @@ void begin_frame() {
     for (int i = 0; i < ebus_n; ++i) {
         struct ebus_t *ebus = &_G.ebus_pool[i];
         if (ce_array_any(ebus->events)) {
-            for (int j = 0; j < ce_array_size(ebus->events); ++j) {
-                ce_cdb_a0->destroy_object(ebus->events[j]);
+
+            struct ebus_event_header *it = ce_ebus_a0->events(ebus->bus_name);
+            struct ebus_event_header *end_it = ce_ebus_a0->events_end(
+                    ebus->bus_name);
+
+            while (it != end_it) {
+
+                if (it->size != sizeof(struct ebus_event_header)) {
+                    struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
+                    ce_cdb_a0->destroy_object(obj_event->obj);
+                }
+
+                it = CE_EBUS_NEXT(it);
             }
 
             ce_array_resize(ebus->events, 0, _G.allocator);
@@ -238,7 +280,7 @@ uint32_t event_count(uint64_t bus_name) {
     return ce_array_size(ebus->events);
 }
 
-uint64_t *events(uint64_t bus_name) {
+struct ebus_event_header *events(uint64_t bus_name) {
     uint64_t ebus_idx = ce_hash_lookup(&_G.ebus_idx, bus_name, 0);
 
     if (!ebus_idx) {
@@ -247,13 +289,28 @@ uint64_t *events(uint64_t bus_name) {
 
     struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
 
-    return ebus->events;
+    return (struct ebus_event_header *) ebus->events;
+}
+
+struct ebus_event_header *events_end(uint64_t bus_name) {
+    uint64_t ebus_idx = ce_hash_lookup(&_G.ebus_idx, bus_name, 0);
+
+    if (!ebus_idx) {
+        return 0;
+    }
+
+    struct ebus_t *ebus = &_G.ebus_pool[ebus_idx];
+
+    return (struct ebus_event_header *) (((char *) ebus->events) +
+                                         ce_array_size(ebus->events));
 }
 
 static struct ce_ebus_a0 _api = {
         .create_ebus = create_ebus,
         .broadcast = broadcast,
         .send = send_addr,
+        .broadcast_obj = broadcast_obj,
+        .send_obj = send_addr_obj,
         .connect = _connect,
         .connect_addr = _connect_addr,
         .begin_frame = begin_frame,
@@ -261,8 +318,9 @@ static struct ce_ebus_a0 _api = {
         .disconnect = disconnect,
         .disconnect_addr = disconnect_addr,
 
-        .event_count = event_count,
+//        .event_count = event_count,
         .events = events,
+        .events_end = events_end,
 };
 
 struct ce_ebus_a0 *ce_ebus_a0 = &_api;

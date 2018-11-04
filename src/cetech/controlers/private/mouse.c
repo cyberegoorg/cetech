@@ -15,6 +15,7 @@
 #include <cetech/controlers/mouse.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
+#include <celib/cdb.h>
 
 #include "mousebtnstr.h"
 
@@ -61,7 +62,7 @@ static uint32_t button_index(const char *button_name) {
 
 static const char *button_name(const uint32_t button_index) {
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+              (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _btn_to_str[button_index];
 }
@@ -70,7 +71,7 @@ static int button_state(uint32_t idx,
                         const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+              (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index];
 }
@@ -79,7 +80,7 @@ static int button_pressed(uint32_t idx,
                           const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+              (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
@@ -88,14 +89,14 @@ static int button_released(uint32_t idx,
                            const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
+              (button_index >= 0) && (button_index < MOUSE_BTN_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
 
 static const char *axis_name(const uint32_t axis_index) {
     CE_ASSERT(LOG_WHERE,
-                  (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+              (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     return _axis_to_str[axis_index];
 }
@@ -121,7 +122,7 @@ static void axis(uint32_t idx,
                  float *value) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
+              (axis_index >= 0) && (axis_index < MOUSE_AXIS_MAX));
 
     switch (axis_index) {
         case MOUSE_AXIS_ABSOULTE:
@@ -152,7 +153,7 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(uint64_t _event) {
+static void update(uint64_t type, void* _event) {
     CE_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -161,14 +162,16 @@ static void update(uint64_t _event) {
 //    _G.wheel[0] = 0;
 //    _G.wheel[1] = 0;
 
-    uint64_t *events = ce_ebus_a0->events(MOUSE_EBUS);
-    uint32_t events_n = ce_ebus_a0->event_count(MOUSE_EBUS);
 
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        uint32_t button = ce_cdb_a0->read_uint64(event, CONTROLER_BUTTON, 0);
+    struct ebus_event_header *it = ce_ebus_a0->events(MOUSE_EBUS);
+    struct ebus_event_header *end_it = ce_ebus_a0->events_end(MOUSE_EBUS);
 
-        switch (ce_cdb_a0->type(event)) {
+    while (it != end_it) {
+        struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
+        uint32_t button = ce_cdb_a0->read_uint64(obj_event->obj,
+                                                 CONTROLER_BUTTON, 0);
+
+        switch (it->type) {
             case EVENT_MOUSE_DOWN:
                 _G.state[button] = 1;
                 break;
@@ -180,7 +183,7 @@ static void update(uint64_t _event) {
             case EVENT_MOUSE_MOVE: {
                 float pos[3];
 
-                ce_cdb_a0->read_vec3(event,CONTROLER_POSITION, pos);
+                ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
 
                 _G.delta_pos[0] = pos[0] - _G.pos[0];
                 _G.delta_pos[1] = pos[1] - _G.pos[1];
@@ -193,7 +196,7 @@ static void update(uint64_t _event) {
             case EVENT_MOUSE_WHEEL: {
                 float pos[3];
 
-                ce_cdb_a0->read_vec3(event, CONTROLER_POSITION, pos);
+                ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
 
                 _G.wheel[0] += pos[0];// - _G.wheel_last[0];
                 _G.wheel[1] += pos[1];// - _G.wheel_last[1];
@@ -206,7 +209,10 @@ static void update(uint64_t _event) {
             default:
                 break;
         }
+
+        it = CE_EBUS_NEXT(it);
     }
+
 }
 
 static uint64_t name() {

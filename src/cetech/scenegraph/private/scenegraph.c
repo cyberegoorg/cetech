@@ -108,9 +108,10 @@ static void allocate(struct WorldInstance *_data,
     *_data = new_data;
 }
 
-static void _new_world(uint64_t event) {
+static void _new_world(uint64_t type, void* event) {
+    struct ebus_cdb_event* ev = event;
     struct ct_world world = {
-            ce_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
+            ce_cdb_a0->read_uint64(ev->obj, ENTITY_WORLD, 0)};
 
     uint32_t idx = ce_array_size(_G.world_instances);
     ce_array_push(_G.world_instances, (struct WorldInstance) {}, _G.allocator);
@@ -118,9 +119,11 @@ static void _new_world(uint64_t event) {
     ce_hash_add(&_G.world_map, world.h, idx, _G.allocator);
 }
 
-static void _destroy_world(uint64_t event) {
+static void _destroy_world(uint64_t type, void* event) {
+    struct ebus_cdb_event* ev = event;
+
     struct ct_world world = {
-            ce_cdb_a0->read_uint64(event, ENTITY_WORLD, 0)};
+            ce_cdb_a0->read_uint64(ev->obj, ENTITY_WORLD, 0)};
 
     uint32_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT32_MAX);
     uint32_t last_idx = ce_array_size(_G.world_instances) - 1;
@@ -468,7 +471,7 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_scenegprah_a0", &scenegraph_api);
 }
 
-//static void _component_spawner(uint64_t event) {
+//static void _component_spawner(uint64_t type, uint64_t event) {
 //    CE_UNUSED(event);
 //}
 //

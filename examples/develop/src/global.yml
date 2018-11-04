@@ -5,9 +5,6 @@ screen:
   x: 800
   y: 600
 
-renderer:
-  config: core/renderer/default
-
 #load_module.1: module_property_inspector
 #load_module.2: module_asset_browser
 #load_module.3: module_asset_property

@@ -89,7 +89,9 @@ static void draw_editor(struct ct_dock_i0 *dock) {
         ce_cdb_a0->set_uint64(w, ASSET_TYPE, type);
         ce_cdb_a0->write_commit(w);
 
-        ce_ebus_a0->broadcast(ASSET_EDITOR_EBUS, selected_asset);
+        ce_ebus_a0->broadcast_obj(ASSET_EDITOR_EBUS,
+                                  ASSET_EDITOR_ASSET_SELECTED,
+                                  selected_asset);
     }
 
     i->draw_ui(editor->context_obj);
@@ -216,13 +218,16 @@ static void update(float dt) {
     }
 }
 
-static void on_asset_double_click(uint64_t event) {
-    uint64_t asset_type = ce_cdb_a0->read_uint64(event,
+static void on_asset_double_click(uint64_t type,
+                                  void *event) {
+    struct ebus_cdb_event *ev = event;
+
+    uint64_t asset_type = ce_cdb_a0->read_uint64(ev->obj,
                                                  ASSET_TYPE, 0);
-    uint64_t asset_name = ce_cdb_a0->read_uint64(event,
+    uint64_t asset_name = ce_cdb_a0->read_uint64(ev->obj,
                                                  ASSET_NAME, 0);
 
-    uint64_t root = ce_cdb_a0->read_uint64(event, ASSET_BROWSER_ROOT, 0);
+    uint64_t root = ce_cdb_a0->read_uint64(ev->obj, ASSET_BROWSER_ROOT, 0);
 
     struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
 

@@ -280,9 +280,7 @@ static void builddb_put_file(const char *filename,
     _step(_db, sqls->put_file);
 }
 
-static void put_resource(const char *fullname,
-                         struct ct_resource_id rid,
-                         const char *filename,
+static void put_resource(struct ct_resource_id rid,
                          const char *data,
                          uint64_t size) {
     sqlite3 *_db = _opendb();
@@ -292,7 +290,14 @@ static void put_resource(const char *fullname,
     sqlite3_bind_int64(sqls->put_file_blob, 2, rid.name);
     sqlite3_bind_blob(sqls->put_file_blob, 3, data, size, NULL);
     _step(_db, sqls->put_file_blob);
+}
 
+static void put_resource_2(const char *fullname,
+                         struct ct_resource_id rid,
+                         const char *filename) {
+    sqlite3 *_db = _opendb();
+
+    struct sqls_s *sqls = _get_sqls();
     uint64_t id = ce_id_a0->id64(filename);
 
     sqlite3_bind_text(sqls->put_resource, 1, fullname, -1, SQLITE_TRANSIENT);
@@ -493,6 +498,7 @@ void _add_dependency(const char *who_filename,
 static struct ct_builddb_a0 build_db_api = {
         .put_file = builddb_put_file,
         .put_resource = put_resource,
+        .put_resource_2 = put_resource_2,
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
         .get_filename_type_name = buildb_get_filename_type_name,

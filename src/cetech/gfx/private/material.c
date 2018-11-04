@@ -117,81 +117,25 @@ static uint64_t cdb_type() {
     return MATERIAL_TYPE;
 }
 
-static void ui_vec4(uint64_t var) {
-    const char *str;
-    str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-
-    float v[4] = {0.0f};
-    ce_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
-
-    ct_debugui_a0->Text("%s", str);
-    ct_debugui_a0->NextColumn();
-
-    if (ct_debugui_a0->DragFloat3(str, v, 0.1f, -1.0f, 1.0f, "%.5f", 1.0f)) {
-        ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(var);
-        ce_cdb_a0->set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
-        ce_cdb_a0->write_commit(wr);
-    }
-    ct_debugui_a0->NextColumn();
+static void ui_vec4(struct ct_resource_id rid, uint64_t var) {
+    const char*str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
+    ct_editor_ui_a0->ui_vec4(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
-static void ui_color4(uint64_t var) {
-    const char *str;
-    str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-
-    float v[4] = {0.0f};
-    ce_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
-
-    ct_debugui_a0->Text("%s", str);
-    ct_debugui_a0->NextColumn();
-
-    ct_debugui_a0->ColorEdit4(str, v, true);
-    ct_debugui_a0->NextColumn();
-
-    ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(var);
-    ce_cdb_a0->set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
-    ce_cdb_a0->write_commit(wr);
-
-//    if (ct_debugui_a0->ColorEdit3(str, v)) {
-//        uint64_t  wr = ce_cdb_a0->write_begin(var);
-//        ce_cdb_a0->set_vec4(wr, MATERIAL_VAR_VALUE_PROP, v);
-//        ce_cdb_a0->write_commit(wr);
-//    }
+static void ui_color4(struct ct_resource_id rid, uint64_t var) {
+    const char*str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
+    ct_editor_ui_a0->ui_color(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
-static void ui_texture(uint64_t variable) {
+static void ui_texture(struct ct_resource_id rid, uint64_t variable) {
     const char *name = ce_cdb_a0->read_str(variable, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    float size[2];
-    ct_debugui_a0->GetWindowSize(size);
-    size[1] = size[0] = 64;
-
-    uint64_t var_value = ce_cdb_a0->read_uint64(variable,
-                                                MATERIAL_VAR_VALUE_PROP, 0);
-
-    ct_render_texture_handle_t texture;
-    texture = ct_texture_a0->get(var_value);
-
-//    ct_debugui_a0->Image(texture,
-//                         size,
-//                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-//                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-//    ct_debugui_a0->NextColumn();
-
-
-    ct_editor_ui_a0->ui_resource(variable, MATERIAL_VAR_VALUE_PROP, name,
+    ct_editor_ui_a0->ui_resource(rid, variable, MATERIAL_VAR_VALUE_PROP, name,
                                  TEXTURE_TYPE, variable);
-
-//    ct_debugui_a0->InputText(str, buff, strlen(buff),
-//                             DebugInputTextFlags_ReadOnly, 0, NULL);
-//
-
-
-
 }
 
-static void draw_property(uint64_t material) {
+static void draw_property(struct ct_resource_id rid, uint64_t material) {
     uint64_t layers_obj = ce_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
 
     if(!layers_obj) {
@@ -204,7 +148,7 @@ static void draw_property(uint64_t material) {
 
     for (int i = 0; i < layer_count; ++i) {
         uint64_t layer;
-        layer = ce_cdb_a0->read_ref(layers_obj, layer_keys[i], 0);
+        layer = ce_cdb_a0->read_subobject(layers_obj, layer_keys[i], 0);
 
         const char *layer_name = ce_cdb_a0->read_str(layer,
                                                      MATERIAL_LAYER_NAME, NULL);
@@ -215,9 +159,9 @@ static void draw_property(uint64_t material) {
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_editor_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME, "Layer name", i);
+            ct_editor_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME, "Layer name", i);
 
-            ct_editor_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP, "Shader",
+            ct_editor_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP, "Shader",
                                          SHADER_TYPE, i);
 
             uint64_t variables;
@@ -229,42 +173,23 @@ static void draw_property(uint64_t material) {
 
             for (int j = 0; j < count; ++j) {
                 uint64_t var;
-                var = ce_cdb_a0->read_ref(variables, keys[j], 0);
+                var = ce_cdb_a0->read_subobject(variables, keys[j], 0);
 
-                uint64_t var_type;
-                var_type = ce_cdb_a0->read_uint64(var, MATERIAL_VAR_TYPE_PROP,
-                                                  0);
-
-                switch (var_type) {
-                    case MAT_VAR_NONE:
-                        break;
-
-                    case MAT_VAR_INT:
-                        break;
-
-                    case MAT_VAR_TEXTURE:
-                        ui_texture(var);
-                        break;
-
-//                    case MAT_VAR_TEXTURE_HANDLER:
-////                        ui_texture(var);
-////                        break;
-
-                    case MAT_VAR_VEC4:
-                        ui_vec4(var);
-                        break;
-
-                    case MAT_VAR_COLOR4:
-                        ui_color4(var);
-                        break;
-
-                    case MAT_VAR_MAT44:
-                        break;
-
-                    default:
-                        break;
+                if(!var) {
+                    continue;
                 }
 
+                const char *type = ce_cdb_a0->read_str(var, MATERIAL_VAR_TYPE_PROP, 0);
+                if(!type) continue;
+
+                if (!strcmp(type, "texture")) {
+                    ui_texture(rid, var);
+                } else if (!strcmp(type, "vec4")) {
+                    ui_vec4(rid, var);
+                } else if (!strcmp(type, "color")) {
+                    ui_color4(rid, var);
+                } else if (!strcmp(type, "mat4")) {
+                }
             }
 
             ct_debugui_a0->TreePop();
@@ -323,7 +248,7 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-bool material_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
+uint64_t material_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -345,7 +270,7 @@ static uint64_t create(uint64_t name) {
     };
 
     uint64_t object = ct_resource_a0->get(rid);
-    return ce_cdb_a0->create_from(ce_cdb_a0->db(), object);
+    return object;
 }
 
 static void set_texture_handler(uint64_t material,
