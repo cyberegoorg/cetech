@@ -25,6 +25,8 @@
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <celib/ydb.h>
 #include <cetech/editor/editor_ui.h>
+#include <celib/log.h>
+#include <celib/buffer.inl>
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -47,13 +49,10 @@ void _mesh_component_compiler(const char *filename,
     const char *node = ce_cdb_a0->read_str(component_key,
                                            ce_ydb_a0->key("node"), "");
 
-    ce_cdb_a0->set_uint64(writer, PROP_MESH_ID, ce_id_a0->id64(mesh));
-    ce_cdb_a0->set_uint64(writer, PROP_NODE_ID, ce_id_a0->id64(node));
-    ce_cdb_a0->set_uint64(writer, PROP_MATERIAL_ID, ce_id_a0->id64(mat));
-    ce_cdb_a0->set_uint64(writer, PROP_SCENE_ID, ce_id_a0->id64(scene));
-
     ce_cdb_a0->set_str(writer, PROP_MESH, mesh);
     ce_cdb_a0->set_str(writer, PROP_NODE, node);
+    ce_cdb_a0->set_str(writer, PROP_SCENE_ID, scene);
+    ce_cdb_a0->set_str(writer, PROP_MATERIAL, mat);
 }
 
 struct mesh_render_data {
@@ -164,13 +163,18 @@ static struct ct_comp_prop_decs ct_comp_prop_decs = {
                         .name = PROP_MESH,
                         .offset = offsetof(struct ct_mesh, mesh_id),
                 },
+//                {
+//                        .type = ECS_PROP_RESOURCE_NAME,
+//                        .name = PROP_MATERIAL_ID,
+//                        .offset = offsetof(struct ct_mesh, material),
+//                },
                 {
-                        .type = ECS_PROP_RESOURCE_NAME,
-                        .name = PROP_MATERIAL_ID,
+                        .type = ECS_PROP_STR_ID64,
+                        .name = PROP_MATERIAL,
                         .offset = offsetof(struct ct_mesh, material),
                 },
                 {
-                        .type = ECS_PROP_RESOURCE_NAME,
+                        .type = ECS_PROP_STR_ID64,
                         .name = PROP_SCENE_ID,
                         .offset = offsetof(struct ct_mesh, scene_id),
                 },
@@ -218,6 +222,7 @@ static const char *display_name() {
 
 static void property_editor(struct ct_resource_id rid,
                             uint64_t obj) {
+
     ct_editor_ui_a0->ui_resource(rid, obj,
                                  ce_id_a0->id64("scene"), "Scene",
                                  ce_id_a0->id64("scene"),

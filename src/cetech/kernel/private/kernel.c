@@ -23,6 +23,10 @@
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
+#include <cetech/resource/sourcedb.h>
+#include <cetech/ecs/ecs.h>
+#include <stdlib.h>
+#include <celib/ydb.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
@@ -256,12 +260,10 @@ static void _boot_unload() {
 static void on_quit(uint64_t type,
                     void *event) {
     CE_UNUSED(event)
-
     application_quit();
 }
 
 static void cetech_kernel_start() {
-
     _init_config();
 
     if (ce_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
@@ -273,6 +275,23 @@ static void cetech_kernel_start() {
     }
 
     _boot_stage();
+
+    char *buf = NULL;
+    uint64_t r = ct_sourcedb_a0->get((struct ct_resource_id) {
+            .type = ENTITY_RESOURCE_ID,
+            .name = ce_id_a0->id64("content/level2")
+    });
+    ce_cdb_a0->dump_str(&buf, r, 0);
+    ce_log_a0->debug(LOG_WHERE, "%s", buf);
+
+    ce_buffer_clear(buf);
+    r = ct_sourcedb_a0->get((struct ct_resource_id) {
+            .type = ce_id_a0->id64("material"),
+            .name = ce_id_a0->id64("content/material2")
+    });
+    ce_cdb_a0->dump_str(&buf, r, 0);
+    ce_log_a0->debug(LOG_WHERE, "%s", buf);
+//    abort();
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 

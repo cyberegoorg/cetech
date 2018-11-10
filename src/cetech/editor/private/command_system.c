@@ -193,14 +193,11 @@ void command_text(char *buffer,
                     NULL});
 
     if (!cmd_fce.description) {
-        goto invalid;
+        buffer[0] = '\0';
+        return;
     }
 
     cmd_fce.description(buffer, buffer_size, cmd, true);
-
-    return;
-    invalid:
-    buffer[0] = '\0';
 }
 
 uint32_t command_count() {

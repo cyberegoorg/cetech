@@ -211,7 +211,7 @@ static int compile(uint64_t type,
     return 1;
 }
 
-#include "cetech/entity/private/entity_compiler.inl"
+#include "entity_compiler.inl"
 
 
 static struct world_instance *get_world_instance(struct ct_world world) {
@@ -525,9 +525,9 @@ static void remove_components(struct ct_world world,
     _remove_from_type_slot(w, ent, idx, ent_type);
 }
 
-static const struct ct_prop_decs *desc_by_name(
-        const struct ct_comp_prop_decs *desc,
-        uint64_t name) {
+static const struct ct_prop_decs *
+desc_by_name(const struct ct_comp_prop_decs *desc,
+             uint64_t name) {
 
     for (int i = 0; i < desc->prop_n; ++i) {
         if (desc->prop_decs[i].name != name) {
@@ -799,11 +799,22 @@ static uint64_t cdb_type() {
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint64_t name);
 
+static void entity_resource_changed(uint64_t asset_obj,
+                                    uint64_t obj,
+                                    const uint64_t *prop,
+                                    uint32_t prop_count);
+
+static void entity_resource_removed(uint64_t asset_obj,
+                                    uint64_t obj,
+                                    const uint64_t *prop,
+                                    uint32_t prop_count);
+
 static struct ct_entity load(struct ct_resource_id resourceid,
                              struct ct_world world) {
     struct ct_entity ent = spawn_entity(world, resourceid.name);
     return ent;
 }
+
 
 static void unload(struct ct_resource_id resourceid,
                    struct ct_world world,
@@ -819,6 +830,8 @@ void *get_resource_interface(uint64_t name_hash) {
 
     static struct ct_sourcedb_asset_i0 ct_sourcedb_asset_i0 = {
             .anotate = entity_resource_anotate,
+            .changed = entity_resource_changed,
+            .removed = entity_resource_removed,
     };
 
     if (name_hash == ASSET_PREVIEW) {
@@ -880,7 +893,7 @@ static void _obj_to_prop(const struct ct_comp_prop_decs *comp_desc,
             break;
 
         case ECS_PROP_STR_ID64 : {
-            const char *str = ce_cdb_a0->read_str(obj, prop, "");
+            const char *str = ce_cdb_a0->read_str(obj, prop, 0);
             *(uint64_t *) (data + offset) = ce_id_a0->id64(str);
             break;
         }
@@ -1069,6 +1082,169 @@ static void _on_entity_obj_add(uint64_t obj,
         ce_cdb_a0->register_notify(children, _on_entity_obj_add,
                                    (void *) world.h);
     }
+}
+
+///
+
+static void _collect_keys(struct ct_resource_id rid,
+                          uint64_t obj,
+                          ce_cdb_obj_o *w,
+                          uint32_t idx) {
+    if (ce_cdb_a0->read_uint64(obj, ASSET_NAME, 0) == rid.name) {
+        return;
+    }
+
+    uint64_t k = ce_cdb_a0->key(obj);
+    ce_cdb_a0->set_uint64(w, idx, k);
+
+    uint64_t parent = ce_cdb_a0->parent(obj);
+    _collect_keys(rid, parent, w, idx + 1);
+}
+
+static uint64_t _find_recursive_create(uint64_t obj,
+                                       uint64_t keys) {
+    uint64_t n = ce_cdb_a0->prop_count(keys);
+
+    uint64_t it_obj = obj;
+    for (int i = 0; i < n; ++i) {
+        uint64_t k = ce_cdb_a0->read_uint64(keys, n - 1 - i, 0);
+
+        if (!ce_cdb_a0->prop_exist_norecursive(it_obj, k)) {
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(it_obj);
+            it_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+            ce_cdb_a0->set_subobject(w, k, it_obj);
+            ce_cdb_a0->write_commit(w);
+        } else {
+            it_obj = ce_cdb_a0->read_subobject(it_obj, k, 0);
+        }
+    }
+
+    return it_obj;
+}
+
+static void entity_resource_changed(uint64_t asset_obj,
+                                    uint64_t obj,
+                                    const uint64_t *prop,
+                                    uint32_t prop_count) {
+    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = asset_name,
+            .type = ENTITY_RESOURCE_ID,
+    };
+
+    uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
+    _collect_keys(rid, obj, w, 0);
+    ce_cdb_a0->write_commit(w);
+
+    uint64_t resource_obj = ct_resource_a0->get(rid);
+    uint64_t robj = _find_recursive_create(resource_obj, keys);
+    w = ce_cdb_a0->write_begin(robj);
+
+    for (int i = 0; i < prop_count; ++i) {
+        uint64_t p = prop[i];
+        enum ce_cdb_type type = ce_cdb_a0->prop_type(obj, p);
+
+        switch (type) {
+            case CDB_TYPE_UINT64: {
+                uint64_t ui = ce_cdb_a0->read_uint64(obj, p, 0);
+                ce_cdb_a0->set_uint64(w, p, ui);
+            }
+                break;
+
+
+            case CDB_TYPE_REF: {
+                uint64_t ui = ce_cdb_a0->read_uint64(obj, p, 0);
+                ce_cdb_a0->set_ref(w, p, ui);
+            }
+                break;
+
+            case CDB_TYPE_FLOAT: {
+                float f = ce_cdb_a0->read_float(obj, p, 0.0f);
+                ce_cdb_a0->set_float(w, p, f);
+            }
+                break;
+
+            case CDB_TYPE_BOOL: {
+                bool b = ce_cdb_a0->read_bool(obj, p, false);
+                ce_cdb_a0->set_bool(w, p, b);
+            }
+                break;
+
+            case CDB_TYPE_STR: {
+                const char *str = ce_cdb_a0->read_str(obj, p, "");
+                ce_cdb_a0->set_str(w, p, str);
+            }
+
+                break;
+            case CDB_TYPE_VEC3: {
+                float v[3] = {};
+                ce_cdb_a0->read_vec3(obj, p, v);
+                ce_cdb_a0->set_vec3(w, p, v);
+            }
+                break;
+
+            case CDB_TYPE_VEC4: {
+                float v[4] = {};
+                ce_cdb_a0->read_vec4(obj, p, v);
+                ce_cdb_a0->set_vec4(w, p, v);
+            }
+
+                break;
+
+            case CDB_TYPE_SUBOBJECT: {
+                uint64_t subobj;
+                subobj = ce_cdb_a0->read_subobject(obj, p, 0);
+
+                uint64_t new_subobj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                                             subobj);
+
+                ce_cdb_a0->set_subobject(w, p, new_subobj);
+            }
+                break;
+
+            case CDB_TYPE_MAT4:
+                break;
+            case CDB_TYPE_NONE:
+                break;
+            case CDB_TYPE_PTR:
+                break;
+            case CDB_TYPE_BLOB:
+                break;
+        }
+
+    }
+
+    ce_cdb_a0->write_commit(w);
+}
+
+static void entity_resource_removed(uint64_t asset_obj,
+                                    uint64_t obj,
+                                    const uint64_t *prop,
+                                    uint32_t prop_count) {
+    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
+
+    struct ct_resource_id rid = {
+            .name = asset_name,
+            .type = ENTITY_RESOURCE_ID,
+    };
+
+    uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
+    _collect_keys(rid, obj, w, 0);
+    ce_cdb_a0->write_commit(w);
+
+    uint64_t resource_obj = ct_resource_a0->get(rid);
+    uint64_t robj = _find_recursive_create(resource_obj, keys);
+    w = ce_cdb_a0->write_begin(robj);
+
+    for (int i = 0; i < prop_count; ++i) {
+        uint64_t p = prop[i];
+        ce_cdb_a0->remove_property(w, p);
+    }
+
+    ce_cdb_a0->write_commit(w);
 }
 
 static void link(struct ct_world world,
@@ -1382,7 +1558,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_task_a0);
             CE_INIT_API(api, ce_ebus_a0);
-            },
+        },
 
         {
             CE_UNUSED(reload);

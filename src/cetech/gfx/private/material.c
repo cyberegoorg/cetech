@@ -117,17 +117,20 @@ static uint64_t cdb_type() {
     return MATERIAL_TYPE;
 }
 
-static void ui_vec4(struct ct_resource_id rid, uint64_t var) {
-    const char*str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
+static void ui_vec4(struct ct_resource_id rid,
+                    uint64_t var) {
+    const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->ui_vec4(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
-static void ui_color4(struct ct_resource_id rid, uint64_t var) {
-    const char*str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
+static void ui_color4(struct ct_resource_id rid,
+                      uint64_t var) {
+    const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->ui_color(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
-static void ui_texture(struct ct_resource_id rid, uint64_t variable) {
+static void ui_texture(struct ct_resource_id rid,
+                       uint64_t variable) {
     const char *name = ce_cdb_a0->read_str(variable, MATERIAL_VAR_NAME_PROP,
                                            "");
 
@@ -135,10 +138,11 @@ static void ui_texture(struct ct_resource_id rid, uint64_t variable) {
                                  TEXTURE_TYPE, variable);
 }
 
-static void draw_property(struct ct_resource_id rid, uint64_t material) {
+static void draw_property(struct ct_resource_id rid,
+                          uint64_t material) {
     uint64_t layers_obj = ce_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
 
-    if(!layers_obj) {
+    if (!layers_obj) {
         return;
     }
 
@@ -159,9 +163,11 @@ static void draw_property(struct ct_resource_id rid, uint64_t material) {
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_editor_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME, "Layer name", i);
+            ct_editor_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME,
+                                    "Layer name", i);
 
-            ct_editor_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP, "Shader",
+            ct_editor_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP,
+                                         "Shader",
                                          SHADER_TYPE, i);
 
             uint64_t variables;
@@ -175,12 +181,14 @@ static void draw_property(struct ct_resource_id rid, uint64_t material) {
                 uint64_t var;
                 var = ce_cdb_a0->read_subobject(variables, keys[j], 0);
 
-                if(!var) {
+                if (!var) {
                     continue;
                 }
 
-                const char *type = ce_cdb_a0->read_str(var, MATERIAL_VAR_TYPE_PROP, 0);
-                if(!type) continue;
+                const char *type = ce_cdb_a0->read_str(var,
+                                                       MATERIAL_VAR_TYPE_PROP,
+                                                       0);
+                if (!type) continue;
 
                 if (!strcmp(type, "texture")) {
                     ui_texture(rid, var);
@@ -248,7 +256,10 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-uint64_t material_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
+uint64_t material_compiler(const char *filename,
+                           uint64_t k,
+                           struct ct_resource_id rid,
+                           const char *fullname);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -284,13 +295,15 @@ static void set_texture_handler(uint64_t material,
                                              0);
     uint64_t var = ce_cdb_a0->read_ref(variables,
                                        ce_id_a0->id64(slot), 0);
-    if(!var) {
+    if (!var) {
         uint64_t name = ce_cdb_a0->read_uint64(material, RESOURCE_NAME_PROP, 0);
 
         char fullname[128] = {};
-        ct_builddb_a0->get_fullname(fullname, CE_ARRAY_LEN(fullname), MATERIAL_TYPE, name);
+        ct_builddb_a0->get_fullname(fullname, CE_ARRAY_LEN(fullname),
+                                    MATERIAL_TYPE, name);
 
-        ce_log_a0->warning(LOG_WHERE, "invalid slot: %s for %s", slot, fullname);
+        ce_log_a0->warning(LOG_WHERE, "invalid slot: %s for %s", slot,
+                           fullname);
         return;
     }
 
@@ -367,8 +380,8 @@ static void submit(uint64_t material,
             case MAT_VAR_COLOR4:
             case MAT_VAR_VEC4: {
                 float v[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-                ce_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v),
-                        ct_renderer_a0->set_uniform(handle, &v, 1);
+                ce_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
+                ct_renderer_a0->set_uniform(handle, &v, 1);
             }
                 break;
 

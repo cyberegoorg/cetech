@@ -25,11 +25,6 @@
 //==============================================================================
 
 
-struct ct_entity_compile_output {
-    char *entity_data;
-};
-
-
 //==============================================================================
 // Compiler private
 //==============================================================================
@@ -74,7 +69,6 @@ static uint64_t compile_entitity(const char *filename,
     }
 
     ce_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
-
 
     ce_cdb_obj_o *components_writer = ce_cdb_a0->write_begin(components_obj);
     for (uint32_t i = 0; i < components_keys_count; ++i) {

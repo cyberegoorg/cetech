@@ -35,6 +35,10 @@ struct ct_sourcedb_asset_i0 {
                     uint64_t obj,
                     const uint64_t *prop,
                     uint32_t prop_count);
+    void (*removed)(uint64_t asset_obj,
+                    uint64_t obj,
+                    const uint64_t *prop,
+                    uint32_t prop_count);
 };
 
 struct ct_sourcedb_a0 {

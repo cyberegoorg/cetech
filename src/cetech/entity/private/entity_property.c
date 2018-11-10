@@ -25,6 +25,8 @@
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
 #include <celib/cdb.h>
+#include <celib/log.h>
+#include <celib/buffer.inl>
 
 
 #define _G entity_property_global
@@ -76,7 +78,7 @@ static void _generic_component_property(struct ct_resource_id rid,
                 break;
             case ECS_PROP_VEC3:
                 ct_editor_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f, 0.0f);
-
+                break;
             default:
                 break;
         }
@@ -88,7 +90,9 @@ static void draw_component(struct ct_resource_id rid, uint64_t obj) {
     uint64_t type = ce_cdb_a0->type(obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
-    if (!c->get_interface) {
+
+
+    if (!c || !c->get_interface) {
         return;
     }
 

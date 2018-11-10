@@ -24,6 +24,8 @@ struct ce_os_error_a0 {
                    const char *condition,
                    const char *filename,
                    int line);
+    char* (*stacktrace)(int skip);
+    void (*stacktrace_free)(char *st);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
@@ -38,6 +40,18 @@ struct ce_os_error_a0 {
 ~~~~~~~~~~~~~~~~~~~~
 Assert
 
+
+### stacktrace
+~~~~~~~~~~~~~~~~~~~~
+    char* (*stacktrace)(int skip);
+
+~~~~~~~~~~~~~~~~~~~~
+
+### stacktrace_free
+~~~~~~~~~~~~~~~~~~~~
+    void (*stacktrace_free)(char *st);
+
+~~~~~~~~~~~~~~~~~~~~
 
 # CPU
 
@@ -479,99 +493,6 @@ struct ce_os_vio_a0 {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-# Watchdog
-
-
-## ce_watchdog_ev_header
-~~~~~~~~~~~~~~~~~~~~
-struct ce_watchdog_ev_header {
-    uint32_t type;
-    uint64_t size;
-};
-
-~~~~~~~~~~~~~~~~~~~~
-
-## ce_wd_ev_file_write_end
-~~~~~~~~~~~~~~~~~~~~
-struct ce_wd_ev_file_write_end {
-    struct ce_watchdog_ev_header header;
-    const char *dir;
-    char *filename;
-};
-
-~~~~~~~~~~~~~~~~~~~~
-
-## ce_watchdog_a0
-~~~~~~~~~~~~~~~~~~~~
-struct ce_watchdog_a0 {
-    ce_watchdog_instance_t *inst;
-    void (*add_dir)(ce_watchdog_instance_t *inst,
-                    const char *path,
-                    bool recursive);
-    void (*fetch_events)(ce_watchdog_instance_t *inst);
-    struct ce_watchdog_ev_header *(*event_begin)(ce_watchdog_instance_t *inst);
-    struct ce_watchdog_ev_header *(*event_end)(ce_watchdog_instance_t *inst);
-    struct ce_watchdog_ev_header *(*event_next)(ce_watchdog_instance_t *inst,
-                                                struct ce_watchdog_ev_header *header);
-};
-
-~~~~~~~~~~~~~~~~~~~~
-
-### add_dir
-~~~~~~~~~~~~~~~~~~~~
-    void (*add_dir)(ce_watchdog_instance_t *inst,
-                    const char *path,
-                    bool recursive);
-
-~~~~~~~~~~~~~~~~~~~~
-
-### fetch_events
-~~~~~~~~~~~~~~~~~~~~
-    void (*fetch_events)(ce_watchdog_instance_t *inst);
-
-~~~~~~~~~~~~~~~~~~~~
-
-### event_begin
-~~~~~~~~~~~~~~~~~~~~
-    struct ce_watchdog_ev_header *(*event_begin)(ce_watchdog_instance_t *inst);
-
-~~~~~~~~~~~~~~~~~~~~
-
-### event_end
-~~~~~~~~~~~~~~~~~~~~
-    struct ce_watchdog_ev_header *(*event_end)(ce_watchdog_instance_t *inst);
-
-~~~~~~~~~~~~~~~~~~~~
-
-### event_next
-~~~~~~~~~~~~~~~~~~~~
-    struct ce_watchdog_ev_header *(*event_next)(ce_watchdog_instance_t *inst,
-                                                struct ce_watchdog_ev_header *header);
-
-~~~~~~~~~~~~~~~~~~~~
-
-
-## ce_os_watchdog_a0
-~~~~~~~~~~~~~~~~~~~~
-struct ce_os_watchdog_a0 {
-    struct ce_watchdog_a0 *(*create)(struct ce_alloc *alloc);
-    void (*destroy)(struct ce_watchdog_a0 *watchdog);
-};
-
-~~~~~~~~~~~~~~~~~~~~
-
-### create
-~~~~~~~~~~~~~~~~~~~~
-    struct ce_watchdog_a0 *(*create)(struct ce_alloc *alloc);
-
-~~~~~~~~~~~~~~~~~~~~
-
-### destroy
-~~~~~~~~~~~~~~~~~~~~
-    void (*destroy)(struct ce_watchdog_a0 *watchdog);
-
-~~~~~~~~~~~~~~~~~~~~
-
 # Window
 
 
@@ -712,7 +633,6 @@ struct ce_os_a0 {
     struct ce_os_thread_a0 *thread;
     struct ce_os_time_a0 *time;
     struct ce_os_vio_a0 *vio;
-    struct ce_os_watchdog_a0 *watchdog;
     struct ce_os_window_a0 *window;
 };
 

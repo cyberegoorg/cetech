@@ -39,7 +39,6 @@
 #define _SET_VEC4 \
     CE_ID64_0("set_vec4", 0x5d3fca6c7467c890ULL)
 
-
 #define _SET_FLOAT \
     CE_ID64_0("set_float", 0x3a22b9e23704ab12ULL)
 
@@ -80,17 +79,19 @@
 //}
 
 
-static void _collect_keys(uint64_t obj,
+static void _collect_keys(struct ct_resource_id rid,
+                          uint64_t obj,
                           ce_cdb_obj_o *w,
                           uint32_t idx) {
-    if (ce_cdb_a0->prop_exist(obj, ASSET_NAME)) {
+    if (ce_cdb_a0->read_uint64(obj, ASSET_NAME, 0) == rid.name) {
         return;
     }
 
-    ce_cdb_a0->set_uint64(w, idx, ce_cdb_a0->key(obj));
+    uint64_t k = ce_cdb_a0->key(obj);
+    ce_cdb_a0->set_uint64(w, idx, k);
 
     uint64_t parent = ce_cdb_a0->parent(obj);
-    _collect_keys(parent, w, idx + 1);
+    _collect_keys(rid, parent, w, idx + 1);
 }
 
 static uint64_t _find_recursive(uint64_t obj,
@@ -106,19 +107,37 @@ static uint64_t _find_recursive(uint64_t obj,
     return it_obj;
 }
 
+
+static uint64_t _create_recursive(uint64_t obj,
+                                  uint64_t keys,
+                                  uint64_t kidx) {
+    uint64_t k = ce_cdb_a0->read_uint64(keys, kidx, 0);
+    if (!k) {
+        return obj;
+    }
+
+    uint64_t root = ce_cdb_a0->read_subobject(obj, k, 0);
+
+    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), root);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    ce_cdb_a0->set_subobject(w, k, new_obj);
+    ce_cdb_a0->write_commit(w);
+
+    return _create_recursive(new_obj, keys, kidx - 1);
+}
+
 static uint64_t _find_recursive_create(uint64_t obj,
-                                uint64_t keys) {
+                                       uint64_t keys) {
     uint64_t n = ce_cdb_a0->prop_count(keys);
 
     uint64_t it_obj = obj;
     for (int i = 0; i < n; ++i) {
-        uint64_t k = ce_cdb_a0->read_uint64(keys, n - 1 - i, 0);
+        uint64_t kidx = n - 1 - i;
+        uint64_t k = ce_cdb_a0->read_uint64(keys, kidx, 0);
 
-        if (!ce_cdb_a0->prop_exist2(it_obj, k)) {
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(it_obj);
-            it_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-            ce_cdb_a0->set_subobject(w, k, it_obj);
-            ce_cdb_a0->write_commit(w);
+        if (!ce_cdb_a0->prop_exist_norecursive(it_obj, k)) {
+            it_obj = _create_recursive(it_obj, keys, kidx);
+            break;
         } else {
             it_obj = ce_cdb_a0->read_subobject(it_obj, k, 0);
         }
@@ -138,12 +157,12 @@ static void ui_float(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    if(!obj) {
+    if (!obj) {
         return;
     }
 
@@ -179,7 +198,7 @@ static void ui_float(struct ct_resource_id rid,
                         .size = sizeof(struct ct_cdb_cmd_s),
                         .type = _SET_FLOAT,
                 },
-                .cmd= cmd_obj,
+                .cmd=cmd_obj,
         };
 
         ct_cmd_system_a0->execute(&cmd.header);
@@ -196,7 +215,7 @@ static void ui_bool(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
@@ -248,7 +267,7 @@ static void ui_str(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
@@ -311,12 +330,12 @@ static void ui_str_combo(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    if(!obj) {
+    if (!obj) {
         return;
     }
 
@@ -396,13 +415,12 @@ static void ui_resource(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    if(!obj) {
-        obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
+    if (!obj) {
         return;
     }
 
@@ -509,12 +527,12 @@ static void ui_vec3(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(_obj, w, 0);
+    _collect_keys(rid, _obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     uint64_t obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    if(!obj) {
+    if (!obj) {
         return;
     }
 
@@ -556,9 +574,11 @@ static void ui_vec3(struct ct_resource_id rid,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+
     ct_debugui_a0->PopItemWidth();
 
     ct_debugui_a0->NextColumn();
+
 }
 
 static void ui_vec4(struct ct_resource_id rid,
@@ -572,13 +592,13 @@ static void ui_vec4(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    ce_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
-    ce_vec3_move(value, value_new);
+    ce_cdb_a0->read_vec4(obj, prop_key_hash, value_new);
+    ce_vec4_move(value, value_new);
 
     const float min = !min_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
@@ -590,7 +610,7 @@ static void ui_vec4(struct ct_resource_id rid,
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
 
     ct_debugui_a0->PushItemWidth(-1);
-    if (ct_debugui_a0->DragFloat3(labelid,
+    if (ct_debugui_a0->DragFloat4(labelid,
                                   value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
@@ -631,13 +651,13 @@ static void ui_color(struct ct_resource_id rid,
 
     uint64_t keys = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(keys);
-    _collect_keys(obj, w, 0);
+    _collect_keys(rid, obj, w, 0);
     ce_cdb_a0->write_commit(w);
 
     obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    ce_cdb_a0->read_vec3(obj, prop_key_hash, value_new);
-    ce_vec3_move(value, value_new);
+    ce_cdb_a0->read_vec4(obj, prop_key_hash, value_new);
+    ce_vec4_move(value, value_new);
 
     ct_debugui_a0->Text("%s", label);
     ct_debugui_a0->NextColumn();
@@ -721,7 +741,6 @@ static void set_vec4_cmd(const struct ct_cmd *cmd,
             .name=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_NAME, 0),
             .type=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_TYPE, 0),
     };
-
 
     uint64_t asset_obj = ct_sourcedb_a0->get(rid);
     uint64_t keys = ce_cdb_a0->read_subobject(pos_cmd->cmd, _KEYS, 0);

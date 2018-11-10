@@ -290,7 +290,7 @@ static void unload(uint64_t type,
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
     uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db,
-                                                  resource_id.type, 0);
+                                            resource_id.type, 0);
 
     if (!type_obj) {
         return 0;
@@ -306,8 +306,8 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
         if (_G.autoload_enabled) {
             char filename[1024] = {};
             ct_resource_compiler_a0->get_filename(filename,
-                                           CE_ARRAY_LEN(filename),
-                                           resource_id);
+                                                  CE_ARRAY_LEN(filename),
+                                                  resource_id);
 
             ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
             load_now(resource_id.type, &resource_id.name, 1);
@@ -334,7 +334,7 @@ static void put(struct ct_resource_id resource_id,
                 uint64_t obj) {
 
     uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db,
-                                                  resource_id.type, 0);
+                                            resource_id.type, 0);
 
     if (!type_obj) {
         return;

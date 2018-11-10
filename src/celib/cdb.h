@@ -66,9 +66,14 @@ struct ce_cdb_a0 {
 
     uint64_t (*key)(uint64_t obj);
 
-    void (*move)(uint64_t from_obj, uint64_t to);
+    void (*move)(uint64_t from_obj,
+                 uint64_t to);
 
     void (*gc)();
+
+    void (*dump_str)(char **buffer,
+                     uint64_t obj,
+                     uint32_t level);
 
     void (*dump)(uint64_t obj,
                  char **output,
@@ -83,8 +88,8 @@ struct ce_cdb_a0 {
     bool (*prop_exist)(uint64_t object,
                        uint64_t key);
 
-    bool (*prop_exist2)(uint64_t object,
-                       uint64_t key);
+    bool (*prop_exist_norecursive)(uint64_t object,
+                                   uint64_t key);
 
     enum ce_cdb_type (*prop_type)(uint64_t object,
                                   uint64_t key);
@@ -145,8 +150,8 @@ struct ce_cdb_a0 {
                           uint64_t subobject);
 
     void (*set_subobjectw)(ce_cdb_obj_o *writer,
-                          uint64_t property,
-                          ce_cdb_obj_o *sub_writer);
+                           uint64_t property,
+                           ce_cdb_obj_o *sub_writer);
 
     void (*set_blob)(ce_cdb_obj_o *writer,
                      uint64_t property,

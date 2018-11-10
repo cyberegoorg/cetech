@@ -11,7 +11,7 @@ Hash table that map uint64_t **key** to uint64_t **value**.
 
 ## Simple table char -> uint64_t
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-ce_hash_t hash = {0};
+ce_hash_t hash = {};
 
 ce_hash_add(&hash, 'h', 1, ce_memory_a0->system);
 ce_hash_add(&hash, 'e', 1, ce_memory_a0->system);

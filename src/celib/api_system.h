@@ -33,9 +33,9 @@ struct ce_api_a0 {
 
     int (*exist)(const char *name);
 
-    struct ce_api_entry (*next)(struct ce_api_entry entry);
-
     struct ce_api_entry (*first)(uint64_t name);
+
+    struct ce_api_entry (*next)(struct ce_api_entry entry);
 
     void (*register_on_add)(uint64_t name, ce_api_on_add_t *on_add);
 };

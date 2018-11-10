@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <cetech/resource/resource.h>
 
 #define ECS_EBUS_NAME "ecs"
 
@@ -19,7 +18,6 @@
 
 #define ENTITY_RESOURCE \
     CE_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
-
 
 #define ENTITY_UID \
     CE_ID64_0("entity_uid", 0xa3b266878c572abdULL)
