@@ -25,6 +25,7 @@
 #include <cetech/editor/asset_browser.h>
 #include <string.h>
 #include <cetech/game_system/game_system.h>
+#include <cetech/resource/sourcedb.h>
 
 #define _G plaground_global
 
@@ -55,7 +56,7 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0->MenuItem("Save", "Alt+s", false, true)) {
-                ce_ydb_a0->save_all_modified();
+                ct_sourcedb_a0->save_all();
             }
 
             if (ct_debugui_a0->MenuItem2("Debug", "F9", &debug, true)) {

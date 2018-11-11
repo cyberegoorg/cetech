@@ -856,25 +856,25 @@ static void cmd_description(char *buffer,
 //    const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) cmd;
 
     switch (cmd->type) {
-        case _SET_VEC3:
-//            snprintf(buffer, buffer_size,
-//                     "Set vec3 [%f, %f, %f]",
-//                     pos_cmd->vec3.new_value[0],
-//                     pos_cmd->vec3.new_value[1],
-//                     pos_cmd->vec3.new_value[2]);
-            break;
-
-        case _SET_FLOAT:
-//            snprintf(buffer, buffer_size,
-//                     "Set float %f",
-//                     pos_cmd->f.new_value);
-            break;
-
-        case _SET_STR:
-//            snprintf(buffer, buffer_size,
-//                     "Set str %s",
-//                     pos_cmd->str.new_value);
-            break;
+//        case _SET_VEC3:
+////            snprintf(buffer, buffer_size,
+////                     "Set vec3 [%f, %f, %f]",
+////                     pos_cmd->vec3.new_value[0],
+////                     pos_cmd->vec3.new_value[1],
+////                     pos_cmd->vec3.new_value[2]);
+//            break;
+//
+//        case _SET_FLOAT:
+////            snprintf(buffer, buffer_size,
+////                     "Set float %f",
+////                     pos_cmd->f.new_value);
+//            break;
+//
+//        case _SET_STR:
+////            snprintf(buffer, buffer_size,
+////                     "Set str %s",
+////                     pos_cmd->str.new_value);
+//            break;
 
         default:
             snprintf(buffer, buffer_size, "(no description)");

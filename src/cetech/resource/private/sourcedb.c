@@ -324,12 +324,41 @@ static bool save(struct ct_resource_id resource_id) {
                                                resource_id.name);
 
     ce_ydb_a0->save(filename);
+
+    uint64_t obj = get(resource_id);
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_G.modified);
+    ce_cdb_a0->remove_property(w, obj);
+    ce_cdb_a0->write_commit(w);
+
+    return true;
+}
+
+static bool save_all() {
+    uint64_t n = ce_cdb_a0->prop_count(_G.modified);
+    uint64_t k[n];
+
+    ce_cdb_a0->prop_keys(_G.modified, k);
+    for (int i = 0; i < n; ++i) {
+        uint64_t p = k[i];
+
+        uint64_t asset_name = ce_cdb_a0->read_uint64(p, ASSET_NAME, 0);
+
+        struct ct_resource_id rid = {
+                .name = asset_name,
+                .type = ce_cdb_a0->type(p),
+        };
+
+        save(rid);
+    }
+
     return true;
 }
 
 static struct ct_sourcedb_a0 source_db_api = {
         .get = get,
         .save = save,
+        .save_all = save_all,
 };
 
 struct ct_sourcedb_a0 *ct_sourcedb_a0 = &source_db_api;

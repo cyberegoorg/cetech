@@ -33,8 +33,6 @@ static struct _G {
     struct ce_hash_t obj_cache_map;
     struct ce_spinlock cache_lock;
 
-    struct ce_hash_t modified_files_set;
-
     struct ce_alloc *allocator;
 } _G;
 
@@ -410,32 +408,6 @@ uint64_t get_obj(const char *path) {
     return obj;
 };
 
-void modified(const char *path) {
-    uint64_t hash = ce_id_a0->id64(path);
-    ce_hash_add(&_G.modified_files_set, hash, true, _G.allocator);
-}
-
-void unmodified(const char *path) {
-    uint64_t hash = ce_id_a0->id64(path);
-    ce_hash_remove(&_G.modified_files_set, hash);
-}
-
-void parent_files(const char *path,
-                  const char ***files,
-                  uint32_t *count) {
-    *count = 0;
-
-//    struct ce_yng_doc *d = get(path);
-//
-//    if (!d) {
-//        *files = NULL;
-//        *count = 0;
-//        return;
-//    }
-//
-//    d->parent_files(d, files, count);
-}
-
 //void check_fs() {
 //    ce_alloc *alloc = ce_memory_a0->system;
 //
@@ -606,7 +578,6 @@ void save(const char *path) {
     ce_buffer_free(b, ce_memory_a0->system);
 
     ce_fs_a0->close(f);
-    unmodified(path);
 }
 
 
@@ -624,10 +595,7 @@ void save_all_modified() {
 
 static struct ce_ydb_a0 ydb_api = {
         .get_obj = get_obj,
-        .parent_files = parent_files,
         .save = save,
-        .save_all_modified = save_all_modified,
-
         .cdb_from_vio = cdb_from_vio,
         .get_key = get_key,
         .key = calc_key,
@@ -646,7 +614,6 @@ static void _shutdown() {
 ////        ce_ydb_a0->destroy(_G.document_cache[i]);
 //    }
 
-    ce_hash_free(&_G.modified_files_set, _G.allocator);
     ce_hash_free(&_G.obj_cache_map, _G.allocator);
 
     _G = (struct _G) {};

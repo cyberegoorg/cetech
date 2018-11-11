@@ -104,15 +104,6 @@ static void _compile_task(void *data) {
 
     ce_log_a0->info("resource_compiler.task",
                     "Compile resource \"%s\"", tdata->source_filename);
-    const char **files;
-    uint32_t files_count;
-
-    ce_ydb_a0->parent_files(tdata->source_filename, &files,
-                            &files_count);
-
-    for (int i = 0; i < files_count; ++i) {
-        ct_builddb_a0->add_dependency(tdata->source_filename, files[i]);
-    }
 
     uint64_t obj = ce_ydb_a0->get_obj(tdata->source_filename);
 
@@ -360,7 +351,8 @@ char *resource_compiler_external_join(struct ce_alloc *alocator,
 }
 
 
-void compile_and_reload(uint64_t type, uint64_t name) {
+void compile_and_reload(uint64_t type,
+                        uint64_t name) {
     struct ct_resource_id rid = {.type=type, .name=name};
 
     uint64_t asset_obj = ct_sourcedb_a0->get(rid);

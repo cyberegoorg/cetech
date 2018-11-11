@@ -25,16 +25,19 @@
 #define ASSET_CHANGED_PROP \
     CE_ID64_0("asset_changed_prop", 0x30a907b464c2f909ULL)
 
-
 #define PREFAB_NAME_PROP \
     CE_ID64_0("PREFAB", 0xde35cfdab4ef591dULL)
 
+struct ct_resource_id;
+
 struct ct_sourcedb_asset_i0 {
     void (*anotate)(uint64_t obj);
+
     void (*changed)(uint64_t asset_obj,
                     uint64_t obj,
                     const uint64_t *prop,
                     uint32_t prop_count);
+
     void (*removed)(uint64_t asset_obj,
                     uint64_t obj,
                     const uint64_t *prop,
@@ -44,6 +47,7 @@ struct ct_sourcedb_asset_i0 {
 struct ct_sourcedb_a0 {
     uint64_t (*get)(struct ct_resource_id resource_id);
     bool (*save)(struct ct_resource_id resource_id);
+    bool (*save_all)();
 };
 
 CE_MODULE(ct_sourcedb_a0);

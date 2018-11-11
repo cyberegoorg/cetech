@@ -13,13 +13,8 @@ struct ce_alloc;
 struct ce_ydb_a0 {
     uint64_t (*get_obj)(const char *path);
 
-    void (*parent_files)(const char *path,
-                         const char ***files,
-                         uint32_t *count);
 
     void (*save)(const char *path);
-
-    void (*save_all_modified)();
 
     uint64_t (*cdb_from_vio)(struct ce_vio *vio,
                              struct ce_alloc *alloc);

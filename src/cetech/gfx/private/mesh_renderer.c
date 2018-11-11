@@ -190,7 +190,8 @@ static const struct ct_comp_prop_decs *prop_desc() {
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
+    const char* scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {
         return;
@@ -202,7 +203,8 @@ void mesh_combo_items(uint64_t obj,
 void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    uint64_t scene_id = ce_cdb_a0->read_uint64(obj, PROP_SCENE_ID, 0);
+    const char* scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {
         return;
