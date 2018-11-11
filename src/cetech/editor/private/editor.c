@@ -55,7 +55,7 @@ static float draw_main_menu() {
                 ce_module_a0->reload_all();
             }
 
-            if (ct_debugui_a0->MenuItem("Save", "Alt+s", false, true)) {
+            if (ct_debugui_a0->MenuItem("Save all", "Alt+s", false, true)) {
                 ct_sourcedb_a0->save_all();
             }
 

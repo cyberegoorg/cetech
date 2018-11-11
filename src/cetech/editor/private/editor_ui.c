@@ -287,8 +287,8 @@ static void ui_str(struct ct_resource_id rid,
     ct_debugui_a0->PushItemWidth(-1);
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
-                                       strlen(buffer),
-                                       DebugInputTextFlags_ReadOnly,
+                                       CE_ARRAY_LEN(buffer),
+                                       0,
                                        0, NULL);
     ct_debugui_a0->PopItemWidth();
 

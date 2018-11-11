@@ -21,7 +21,6 @@
 #include <cetech/editor/command_system.h>
 #include <celib/hash.inl>
 #include <celib/ydb.h>
-#include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
 #include <celib/cdb.h>
@@ -74,10 +73,12 @@ static void _generic_component_property(struct ct_resource_id rid,
 
         switch (type) {
             case ECS_PROP_FLOAT:
-                ct_editor_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f, 0.0f);
+                ct_editor_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f,
+                                          0.0f);
                 break;
             case ECS_PROP_VEC3:
-                ct_editor_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f, 0.0f);
+                ct_editor_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f,
+                                         0.0f);
                 break;
             default:
                 break;
@@ -86,7 +87,8 @@ static void _generic_component_property(struct ct_resource_id rid,
     }
 }
 
-static void draw_component(struct ct_resource_id rid, uint64_t obj) {
+static void draw_component(struct ct_resource_id rid,
+                           uint64_t obj) {
     uint64_t type = ce_cdb_a0->type(obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
@@ -133,7 +135,40 @@ static void draw_component(struct ct_resource_id rid, uint64_t obj) {
 
 }
 
-static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
+static void _entity_ui(struct ct_resource_id rid,
+                       uint64_t obj) {
+    bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_CUBE" Entity",
+                                          DebugUITreeNodeFlags_DefaultOpen);
+
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
+
+    if (!open) {
+        return;
+    }
+
+    char buffer[128] = {};
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "%llu", ce_cdb_a0->key(obj));
+
+    ct_debugui_a0->Text("UID");
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->PushItemWidth(-1);
+    ct_debugui_a0->InputText("##EntityUID",
+                             buffer,
+                             strlen(buffer),
+                             DebugInputTextFlags_ReadOnly,
+                             0, NULL);
+    ct_debugui_a0->PopItemWidth();
+    ct_debugui_a0->NextColumn();
+
+    ct_editor_ui_a0->ui_str(rid, obj, ENTITY_NAME, "Name", rid.name);
+
+
+    ct_debugui_a0->TreePop();
+}
+
+static void draw_ui(struct ct_resource_id rid,
+                    uint64_t obj) {
     if (!obj) {
         return;
     }
@@ -141,6 +176,8 @@ static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
     uint64_t obj_type = ce_cdb_a0->type(obj);
 
     if (ENTITY_RESOURCE_ID == obj_type) {
+        _entity_ui(rid, obj);
+
         uint64_t components_obj;
         components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
