@@ -59,7 +59,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     char name[128] = {0};
-    uint64_t uid = ce_cdb_a0->read_uint64(obj, ENTITY_UID, 0);
+    uint64_t uid = ce_cdb_a0->key(obj);
     const char *ent_name = ce_cdb_a0->read_str(obj, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
@@ -163,7 +163,7 @@ static void draw_menu(uint64_t top_level_obj,
             entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   ENTITY_RESOURCE_ID);
 
-            uint64_t uid = rand(); // TODO: !!!!!
+            uint64_t uid = ((uint64_t)rand() << 32) | rand(); // TODO: !!!!!
 
             uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                                ENTITY_COMPONENTS);
@@ -173,7 +173,6 @@ static void draw_menu(uint64_t top_level_obj,
             ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
-            ce_cdb_a0->set_uint64(writer, ENTITY_UID, uid);
             ce_cdb_a0->write_commit(writer);
 
             uint64_t add_children_obj;

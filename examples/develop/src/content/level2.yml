@@ -1,5 +1,5 @@
 content/level2.entity:
-  name: Level 2
+  name: "Level 2"
   components:
     transform:
       position: [0.000000, 0.000000, 0.000000]
@@ -7,5 +7,5 @@ content/level2.entity:
       scale: [1.000000, 1.000000, 1.000000]
   children:
     5564343313252:
-      name: box1
-      PREFAB: content/box1.entity
+      name: "box1"
+      PREFAB: "content/box1.entity"

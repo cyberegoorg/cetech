@@ -26,10 +26,10 @@ struct ct_builddb_a0 {
                           uint64_t object,
                           struct ce_alloc *allocator);
 
-    int (*get_filename_type_name)(char *filename,
-                                  size_t max_len,
-                                  uint64_t type,
-                                  uint64_t name);
+    int (*get_filename_from_type_name)(char *filename,
+                                       size_t max_len,
+                                       uint64_t type,
+                                       uint64_t name);
 
 
     int (*get_fullname)(char *fullname,

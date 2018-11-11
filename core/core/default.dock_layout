@@ -1,10 +1,10 @@
 0: 
   index: 0
   label:  Asset browser##asset_browser_dock0
-  x: 0
+  x: 234
   y: 494
   location: ""
-  size_x: 698
+  size_x: 517
   size_y: 273
   status: 0
   active: 1
@@ -20,8 +20,8 @@
   x: 0
   y: 24
   location: ""
-  size_x: 218
-  size_y: 470
+  size_x: 234
+  size_y: 743
   status: 0
   active: 1
   opened: 1
@@ -29,14 +29,14 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 10
+  parent: 11
 2: 
   index: 2
   label:  Property editor##property_editor_dock0
-  x: 699
+  x: 751
   y: 24
   location: ""
-  size_x: 325
+  size_x: 273
   size_y: 470
   status: 0
   active: 1
@@ -49,10 +49,10 @@
 3: 
   index: 3
   label: Command history##command_history_dock0
-  x: 699
+  x: 751
   y: 24
   location: ""
-  size_x: 325
+  size_x: 273
   size_y: 470
   status: 0
   active: 0
@@ -65,10 +65,10 @@
 4: 
   index: 4
   label: Asset preview##asset_preview_dock0
-  x: 698
+  x: 751
   y: 494
   location: ""
-  size_x: 326
+  size_x: 273
   size_y: 273
   status: 0
   active: 1
@@ -81,10 +81,10 @@
 5: 
   index: 5
   label: Log view##log_view_dock0
-  x: 0
+  x: 234
   y: 494
   location: ""
-  size_x: 698
+  size_x: 517
   size_y: 273
   status: 0
   active: 0
@@ -97,26 +97,26 @@
 6: 
   index: 6
   label: Editor##editor_dock0
-  x: 218
+  x: 234
   y: 24
   location: ""
-  size_x: 481
+  size_x: 517
   size_y: 470
   status: 0
   active: 0
   opened: 1
   prev: -1
-  next: 11
+  next: 10
   child0: -1
   child1: -1
-  parent: 10
+  parent: 8
 7: 
   index: 7
   label: ""
-  x: 0
+  x: 234
   y: 24
   location: ""
-  size_x: 1024
+  size_x: 790
   size_y: 743
   status: 0
   active: 1
@@ -125,30 +125,30 @@
   next: -1
   child0: 8
   child1: 9
-  parent: -1
+  parent: 11
 8: 
   index: 8
   label: ""
-  x: 0
+  x: 234
   y: 24
   location: ""
-  size_x: 1024
+  size_x: 790
   size_y: 470
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 10
+  child0: 6
   child1: 2
   parent: 7
 9: 
   index: 9
   label: ""
-  x: 0
+  x: 234
   y: 494
   location: ""
-  size_x: 1024
+  size_x: 790
   size_y: 273
   status: 0
   active: 1
@@ -160,28 +160,11 @@
   parent: 7
 10: 
   index: 10
-  label: ""
-  x: 0
-  y: 24
-  location: ""
-  size_x: 699
-  size_y: 470
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 1
-  child1: 6
-  parent: 8
-
-11:
-  index: 11
   label:  Game view##game_view_dock0
-  x: 218
+  x: 234
   y: 24
   location: ""
-  size_x: 481
+  size_x: 517
   size_y: 470
   status: 0
   active: 1
@@ -190,4 +173,20 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 10
+  parent: 8
+11: 
+  index: 11
+  label: ""
+  x: 0
+  y: 24
+  location: ""
+  size_x: 1024
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 1
+  child1: 7
+  parent: -1

@@ -39,7 +39,7 @@ static struct _G {
 } _G;
 
 static const char *get_key(uint64_t hash) {
-    return  ce_id_a0->str_from_id64(hash);
+    return ce_id_a0->str_from_id64(hash);
 }
 
 struct node_value {
@@ -384,7 +384,8 @@ uint64_t load_obj_to_cache(const char *path,
     ce_fs_a0->close(f);
 
     if (!obj) {
-        ce_log_a0->error(LOG_WHERE, "Could not load yaml to cdb parse file %s", path);
+        ce_log_a0->error(LOG_WHERE, "Could not load yaml to cdb parse file %s",
+                         path);
         return 0;
     }
 
@@ -467,6 +468,126 @@ void parent_files(const char *path,
 //}
 
 
+static void _indent(char **buffer,
+                    int level) {
+    for (int j = 0; j < level; ++j) {
+        ce_buffer_printf(buffer, _G.allocator, "  ");
+    }
+}
+
+static void dump_yaml(char **buffer,
+                      uint64_t from,
+                      uint32_t level) {
+    const uint32_t prop_count = ce_cdb_a0->prop_count(from);
+    uint64_t keys[prop_count];
+    ce_cdb_a0->prop_keys(from, keys);
+
+    for (int i = 0; i < prop_count; ++i) {
+        uint64_t key = keys[i];
+
+        const char *k = ce_id_a0->str_from_id64(key);
+
+        if (!k) {
+            continue;
+        }
+
+        if (!ce_cdb_a0->prop_exist_norecursive(from, key)) {
+            continue;
+        }
+
+        enum ce_cdb_type type = ce_cdb_a0->prop_type(from, key);
+
+        switch (type) {
+            case CDB_TYPE_SUBOBJECT: {
+                uint64_t s = ce_cdb_a0->read_subobject(from, key, 0);
+                char *b = NULL;
+                dump_yaml(&b, s, level + 1);
+                if (ce_buffer_size(b)) {
+                    _indent(buffer, level);
+                    ce_buffer_printf(buffer, _G.allocator, "%s:\n", k);
+                    ce_buffer_printf(buffer, _G.allocator, "%s", b);
+                }
+            }
+                break;
+
+            case CDB_TYPE_FLOAT: {
+                float f = ce_cdb_a0->read_float(from, key, 0);
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, " %f", f);
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+
+            case CDB_TYPE_STR: {
+                const char *s = ce_cdb_a0->read_str(from, key, 0);
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, " \"%s\"", s);
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+            case CDB_TYPE_VEC3: {
+                float v[3] = {};
+                ce_cdb_a0->read_vec3(from, key, v);
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f]", v[0],
+                                 v[1], v[2]);
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+            case CDB_TYPE_VEC4: {
+                float v[4] = {};
+                ce_cdb_a0->read_vec3(from, key, v);
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f, %f]",
+                                 v[0], v[1], v[2], v[3]);
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+
+            case CDB_TYPE_BOOL: {
+                bool b = ce_cdb_a0->read_bool(from, key, 0);
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                if (b) {
+                    ce_buffer_printf(buffer, _G.allocator, "true");
+                } else {
+                    ce_buffer_printf(buffer, _G.allocator, "false");
+                }
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+
+            case CDB_TYPE_NONE: {
+                _indent(buffer, level);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, "none");
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+
+            case CDB_TYPE_UINT64: {
+                _indent(buffer, level);
+                uint64_t i = ce_cdb_a0->read_uint64(from, key, 0);
+                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+                ce_buffer_printf(buffer, _G.allocator, "%llu", i);
+                ce_buffer_printf(buffer, _G.allocator, "\n");
+            }
+                break;
+
+            case CDB_TYPE_PTR:
+            case CDB_TYPE_REF:
+            case CDB_TYPE_MAT4:
+            case CDB_TYPE_BLOB:
+            default:
+                break;
+        }
+    }
+}
+
 void save(const char *path) {
     struct ce_vio *f = ce_fs_a0->open(ce_id_a0->id64("source"), path,
                                       FS_OPEN_WRITE);
@@ -476,8 +597,13 @@ void save(const char *path) {
         return;
     }
 
-//    struct ce_yng_doc *d = get(path);
-//    ce_ydb_a0->save_to_vio(_G.allocator, f, d);
+    uint64_t obj = get_obj(path);
+
+    char *b = NULL;
+    dump_yaml(&b, obj, 0);
+
+    f->write(f, b, sizeof(char), ce_buffer_size(b));
+    ce_buffer_free(b, ce_memory_a0->system);
 
     ce_fs_a0->close(f);
     unmodified(path);
@@ -503,7 +629,7 @@ static struct ce_ydb_a0 ydb_api = {
         .save_all_modified = save_all_modified,
 
         .cdb_from_vio = cdb_from_vio,
-        .get_key = get_key ,
+        .get_key = get_key,
         .key = calc_key,
 };
 

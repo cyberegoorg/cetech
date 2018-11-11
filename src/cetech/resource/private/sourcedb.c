@@ -32,21 +32,36 @@ static struct _G {
     struct ce_hash_t cache_map;
     struct ce_spinlock cache_lock;
 
+    uint64_t modified;
+
     struct ce_alloc *allocator;
 } _G;
 
 
-uint64_t _find_root( uint64_t obj) {
-
-    uint64_t ret = 0;
-
-    while(true) {
+uint64_t _find_root2(uint64_t obj) {
+    while (true) {
         uint64_t parent = ce_cdb_a0->parent(obj);
         if (!parent) {
             break;
         }
 
-        if(ce_cdb_a0->prop_exist(obj, ASSET_NAME)) {
+        obj = parent;
+    }
+
+    return obj;
+}
+
+uint64_t _find_root(uint64_t obj) {
+
+    uint64_t ret = 0;
+
+    while (true) {
+        uint64_t parent = ce_cdb_a0->parent(obj);
+        if (!parent) {
+            break;
+        }
+
+        if (ce_cdb_a0->prop_exist(obj, ASSET_NAME)) {
             ret = obj;
         }
 
@@ -54,6 +69,14 @@ uint64_t _find_root( uint64_t obj) {
     }
 
     return ret;
+}
+
+static void _put_modified(uint64_t asset_obj) {
+    ce_cdb_obj_o *w;
+    do {
+        w = ce_cdb_a0->write_begin(_G.modified);
+        ce_cdb_a0->set_uint64(w, asset_obj, asset_obj);
+    } while (!ce_cdb_a0->write_try_commit(w));
 }
 
 static void _on_obj_removed(uint64_t obj,
@@ -64,6 +87,8 @@ static void _on_obj_removed(uint64_t obj,
     uint64_t asset_obj = _find_root(obj);
     uint64_t asset_type = ce_cdb_a0->type(asset_obj);
     uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
+
+    _put_modified(asset_obj);
 
     struct ct_resource_i0 *ri = ct_resource_a0->get_interface(asset_type);
     if (ri && ri->get_interface) {
@@ -114,9 +139,12 @@ static void _on_obj_change(uint64_t obj,
 
     uint64_t asset_obj = _find_root(obj);
 
-    if(!asset_obj) {
+    if (!asset_obj) {
+        ce_log_a0->error(LOG_WHERE, "Could not find asset from obj");
         return;
     }
+
+    _put_modified(asset_obj);
 
     uint64_t asset_type = ce_cdb_a0->type(asset_obj);
     uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
@@ -142,7 +170,7 @@ static void _on_obj_change(uint64_t obj,
     for (int i = 0; i < prop_count; ++i) {
         uint64_t p = prop[i];
         enum ce_cdb_type t = ce_cdb_a0->prop_type(obj, p);
-        if(CDB_TYPE_SUBOBJECT==t) {
+        if (CDB_TYPE_SUBOBJECT == t) {
             uint64_t o = ce_cdb_a0->read_subobject(obj, p, 0);
             ce_cdb_a0->register_notify(o, _on_obj_change, NULL);
             ce_cdb_a0->register_remove_notify(o, _on_obj_removed, NULL);
@@ -169,7 +197,8 @@ static void _on_obj_change(uint64_t obj,
 
 static uint64_t get(struct ct_resource_id resource_id);
 
-static void _load(struct ct_resource_id rid, uint64_t from,
+static void _load(struct ct_resource_id rid,
+                  uint64_t from,
                   uint64_t parent) {
     uint64_t prefab_res = 0;
     const char *prefab = ce_cdb_a0->read_str(from, PREFAB_NAME_PROP, NULL);
@@ -244,9 +273,9 @@ static uint64_t get(struct ct_resource_id resource_id) {
         ce_log_a0->debug(LOG_WHERE, "Load resource %s to cache.", fullname);
 
         char filename[256] = {0};
-        ct_builddb_a0->get_filename_type_name(CE_ARR_ARG(filename),
-                                              resource_id.type,
-                                              resource_id.name);
+        ct_builddb_a0->get_filename_from_type_name(CE_ARR_ARG(filename),
+                                                   resource_id.type,
+                                                   resource_id.name);
 
         uint64_t obj = ce_ydb_a0->get_obj(filename);
         if (!obj) {
@@ -287,15 +316,28 @@ static uint64_t get(struct ct_resource_id resource_id) {
     return resource_obj;
 }
 
+
+static bool save(struct ct_resource_id resource_id) {
+    char filename[256] = {};
+    ct_builddb_a0->get_filename_from_type_name(CE_ARR_ARG(filename),
+                                               resource_id.type,
+                                               resource_id.name);
+
+    ce_ydb_a0->save(filename);
+    return true;
+}
+
 static struct ct_sourcedb_a0 source_db_api = {
         .get = get,
+        .save = save,
 };
 
 struct ct_sourcedb_a0 *ct_sourcedb_a0 = &source_db_api;
 
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
-            .allocator = ce_memory_a0->system
+            .allocator = ce_memory_a0->system,
+            .modified = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0),
     };
 
     ce_ebus_a0->create_ebus(SOURCEDB_EBUS);

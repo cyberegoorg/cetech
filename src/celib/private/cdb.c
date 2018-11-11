@@ -1702,6 +1702,7 @@ static void dump_str(char **buffer,
     }
 }
 
+
 static struct ce_cdb_a0 cdb_api = {
         .register_notify = register_notify,
         .register_remove_notify = register_remove_notify,

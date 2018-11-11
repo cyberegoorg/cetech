@@ -43,6 +43,7 @@ struct ct_sourcedb_asset_i0 {
 
 struct ct_sourcedb_a0 {
     uint64_t (*get)(struct ct_resource_id resource_id);
+    bool (*save)(struct ct_resource_id resource_id);
 };
 
 CE_MODULE(ct_sourcedb_a0);

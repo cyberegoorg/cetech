@@ -26,6 +26,7 @@
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/asset_editor.h>
 #include <cetech/resource/sourcedb.h>
+#include <cetech/resource/builddb.h>
 
 #define WINDOW_NAME "Explorer"
 
@@ -59,6 +60,26 @@ static uint64_t draw(uint64_t top_level_obj,
 
 static void draw_menu(uint64_t top_level_obj,
                       uint64_t selected_obj) {
+
+    if(ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
+        struct ct_resource_id rid = {
+                .type=ce_cdb_a0->type(top_level_obj),
+                .name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0),
+        };
+
+        char fullname[256] = {};
+        ct_builddb_a0->get_fullname(CE_ARR_ARG(fullname), rid.type, rid.name);
+        ct_debugui_a0->Text("Asset: %s", fullname);
+
+        bool save = ct_debugui_a0->Button("save", (float[2]) {0.0f});
+
+        if(save) {
+            ct_sourcedb_a0->save(rid);
+        }
+
+        ct_debugui_a0->SameLine(0, 10);
+    }
+
     struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
