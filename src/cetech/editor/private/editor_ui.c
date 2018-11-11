@@ -56,30 +56,6 @@
     CE_ID64_0("property", 0xcbd168fb77919b23ULL)
 
 
-//static bool ui_select_asset(char *buffer,
-//                            const char *id,
-//                            uint32_t asset_type,
-//                            uint64_t key) {
-//    char id_str[512] = {};
-//    sprintf(id_str, ">>##%s", id);
-//
-//    if (ct_debugui_a0->Button(id_str, (float[2]) {0.0f})) {
-//        if (ct_asset_browser_a0->get_selected_asset_type() != asset_type) {
-//            return false;
-//        }
-//
-//        char selected_asset[128] = {};
-//        ct_asset_browser_a0->get_selected_asset_name(selected_asset);
-//
-//        strcpy(buffer, selected_asset);
-//
-//        return true;
-//    }
-//
-//    return false;
-//}
-
-
 static void _collect_keys(struct ct_resource_id rid,
                           uint64_t obj,
                           ce_cdb_obj_o *w,
@@ -148,10 +124,17 @@ static uint64_t _find_recursive_create(uint64_t obj,
 }
 
 
-static void _prop_label(const char* label, uint64_t _obj, uint64_t prop_key_hash) {
+static void _prop_label(const char *label,
+                        uint64_t _obj,
+                        uint64_t prop_key_hash) {
     if (ce_cdb_a0->prefab(_obj)
         && ce_cdb_a0->prop_exist_norecursive(_obj, prop_key_hash)) {
-        bool remove_change = ct_debugui_a0->Button(ICON_FA_RECYCLE,
+
+        char lbl[256] = {};
+        snprintf(lbl, CE_ARRAY_LEN(lbl), "%s##revert_%llu_%llu",
+                 ICON_FA_RECYCLE, _obj, prop_key_hash);
+
+        bool remove_change = ct_debugui_a0->Button(lbl,
                                                    (float[2]) {});
         if (remove_change) {
             ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_obj);
