@@ -46,14 +46,12 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     uint64_t children = ce_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
-
-    const uint32_t children_n = ce_cdb_a0->prop_count(children);
-
+    uint64_t children_n = ce_cdb_a0->prop_count(children);
 
     uint64_t components;
     components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+    uint64_t component_n = ce_cdb_a0->prop_count(components);
 
-    const uint32_t component_n = ce_cdb_a0->prop_count(components);
     if (!children_n && !component_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }

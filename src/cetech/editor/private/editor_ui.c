@@ -390,7 +390,11 @@ static void ui_str_combo(struct ct_resource_id rid,
         ce_cdb_a0->set_uint64(w, _PROP, prop_key_hash);
         ce_cdb_a0->set_subobject(w, _KEYS, keys);
         ce_cdb_a0->set_str(w, _NEW_VALUE, buffer);
-        ce_cdb_a0->set_str(w, _OLD_VALUE, value);
+
+        if(value) {
+            ce_cdb_a0->set_str(w, _OLD_VALUE, value);
+        }
+
         ce_cdb_a0->write_commit(w);
 
         struct ct_cdb_cmd_s cmd = {
@@ -501,7 +505,10 @@ static void ui_resource(struct ct_resource_id rid,
         ce_cdb_a0->set_uint64(w, _PROP, prop_key_hash);
         ce_cdb_a0->set_subobject(w, _KEYS, keys);
         ce_cdb_a0->set_str(w, _NEW_VALUE, new_value_str);
-        ce_cdb_a0->set_str(w, _OLD_VALUE, value);
+
+        if(value) {
+            ce_cdb_a0->set_str(w, _OLD_VALUE, value);
+        }
         ce_cdb_a0->write_commit(w);
 
         struct ct_cdb_cmd_s cmd = {
