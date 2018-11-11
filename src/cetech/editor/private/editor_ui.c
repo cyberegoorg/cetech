@@ -21,6 +21,7 @@
 #include <cetech/editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/resource/sourcedb.h>
+#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 
 #include "cetech/editor/editor_ui.h"
 
@@ -146,6 +147,24 @@ static uint64_t _find_recursive_create(uint64_t obj,
     return it_obj;
 }
 
+
+static void _prop_label(const char* label, uint64_t _obj, uint64_t prop_key_hash) {
+    if (ce_cdb_a0->prefab(_obj)
+        && ce_cdb_a0->prop_exist_norecursive(_obj, prop_key_hash)) {
+        bool remove_change = ct_debugui_a0->Button(ICON_FA_RECYCLE,
+                                                   (float[2]) {});
+        if (remove_change) {
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_obj);
+            ce_cdb_a0->delete_property(w, prop_key_hash);
+            ce_cdb_a0->write_commit(w);
+        }
+        ct_debugui_a0->SameLine(0, 4);
+    }
+
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+}
+
 static void ui_float(struct ct_resource_id rid,
                      uint64_t obj,
                      uint64_t prop_key_hash,
@@ -172,8 +191,7 @@ static void ui_float(struct ct_resource_id rid,
     const float min = !max_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
@@ -203,6 +221,7 @@ static void ui_float(struct ct_resource_id rid,
 
         ct_cmd_system_a0->execute(&cmd.header);
     }
+
     ct_debugui_a0->NextColumn();
 }
 
@@ -223,8 +242,7 @@ static void ui_bool(struct ct_resource_id rid,
     value_new = ce_cdb_a0->read_bool(obj, prop_key_hash, value_new);
     value = value_new;
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
@@ -279,8 +297,7 @@ static void ui_str(struct ct_resource_id rid,
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     bool change = false;
 
@@ -360,8 +377,7 @@ static void ui_str_combo(struct ct_resource_id rid,
         }
     }
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
 
@@ -391,7 +407,7 @@ static void ui_str_combo(struct ct_resource_id rid,
         ce_cdb_a0->set_subobject(w, _KEYS, keys);
         ce_cdb_a0->set_str(w, _NEW_VALUE, buffer);
 
-        if(value) {
+        if (value) {
             ce_cdb_a0->set_str(w, _OLD_VALUE, value);
         }
 
@@ -506,7 +522,7 @@ static void ui_resource(struct ct_resource_id rid,
         ce_cdb_a0->set_subobject(w, _KEYS, keys);
         ce_cdb_a0->set_str(w, _NEW_VALUE, new_value_str);
 
-        if(value) {
+        if (value) {
             ce_cdb_a0->set_str(w, _OLD_VALUE, value);
         }
         ce_cdb_a0->write_commit(w);
@@ -549,8 +565,7 @@ static void ui_vec3(struct ct_resource_id rid,
     const float min = !min_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -584,6 +599,7 @@ static void ui_vec3(struct ct_resource_id rid,
 
     ct_debugui_a0->PopItemWidth();
 
+
     ct_debugui_a0->NextColumn();
 
 }
@@ -610,8 +626,7 @@ static void ui_vec4(struct ct_resource_id rid,
     const float min = !min_f ? -FLT_MAX : min_f;
     const float max = !max_f ? FLT_MAX : max_f;
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -666,8 +681,7 @@ static void ui_color(struct ct_resource_id rid,
     ce_cdb_a0->read_vec4(obj, prop_key_hash, value_new);
     ce_vec4_move(value, value_new);
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
+    _prop_label(label, obj, prop_key_hash);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);

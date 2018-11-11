@@ -1034,6 +1034,11 @@ uint64_t parent(uint64_t object) {
     return obj->parent;
 }
 
+uint64_t prefab(uint64_t object) {
+    struct object_t *obj = _get_object_from_objid(object);
+    return obj->prefab;
+}
+
 void set_subobjectw(ce_cdb_obj_o *_writer,
                     uint64_t property,
                     ce_cdb_obj_o *_subwriter) {
@@ -1165,6 +1170,35 @@ void remove_property(ce_cdb_obj_o *_writer,
     ce_hash_remove(&writer->prop_map, property);
 
     ce_array_push(writer->removed_prop, property, _G.allocator);
+}
+
+void delete_property(ce_cdb_obj_o *_writer,
+                     uint64_t property) {
+    struct object_t *writer = _get_object_from_obj_o(_writer);
+
+    if (!prop_exist(writer->orig_obj, property)) {
+        return;
+    }
+
+    uint64_t idx = _find_prop_index(writer, property);
+
+    if (idx) {
+        uint64_t last_idx = --writer->properties_count;
+        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
+                    _G.allocator);
+
+        writer->keys[idx] = writer->keys[last_idx];
+        writer->property_type[idx] = writer->property_type[last_idx];
+        writer->offset[idx] = writer->offset[last_idx];
+
+        ce_array_pop_back(writer->keys);
+        ce_array_pop_back(writer->property_type);
+        ce_array_pop_back(writer->offset);
+    }
+
+    ce_hash_remove(&writer->prop_map, property);
+
+    ce_array_push(writer->changed_prop, property, _G.allocator);
 }
 
 static bool prop_exist(uint64_t _object,
@@ -1731,6 +1765,7 @@ static struct ce_cdb_a0 cdb_api = {
         .prop_keys = prop_keys,
         .prop_count = prop_count,
         .parent = parent,
+        .prefab = prefab,
 
         .read_float = read_float,
         .read_bool = read_bool,
@@ -1762,6 +1797,7 @@ static struct ce_cdb_a0 cdb_api = {
         .set_prefab = set_prefab,
         .set_blob = set_blob,
         .remove_property = remove_property,
+        .delete_property = delete_property,
 };
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;

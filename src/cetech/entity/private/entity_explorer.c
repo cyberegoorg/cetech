@@ -1,5 +1,6 @@
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <celib/hashlib.h>
 #include <celib/config.h>
@@ -8,23 +9,20 @@
 #include <celib/ydb.h>
 #include <celib/array.inl>
 #include <celib/module.h>
+#include <celib/ebus.h>
+#include <celib/fmath.inl>
+#include <celib/hash.inl>
+#include <celib/ydb.h>
+#include <celib/cdb.h>
 
 #include <cetech/gfx/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
-
 #include <cetech/editor/property_editor.h>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
-#include <celib/ebus.h>
-#include <celib/fmath.inl>
 #include <cetech/editor/command_system.h>
-#include <celib/hash.inl>
-#include <celib/ydb.h>
-#include <fcntl.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <stdlib.h>
-#include <celib/cdb.h>
 
 
 static void ui_entity_item_end() {
@@ -67,8 +65,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label),
-             ICON_FA_CUBE
-                     " ""%s##%llu", name, uid);
+             ICON_FA_CUBE" ""%s##%llu", name, uid);
 
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
@@ -161,10 +158,14 @@ static void draw_menu(uint64_t top_level_obj,
             entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   ENTITY_RESOURCE_ID);
 
-            uint64_t uid = ((uint64_t)rand() << 32) | rand(); // TODO: !!!!!
+            uint64_t uid = (((uint64_t) rand() << 32) | rand()); // TODO: !!!!!
+            char uid_str[128] = {};
+            snprintf(uid_str, CE_ARRAY_LEN(uid_str), "%llu", uid);
+            uid = ce_id_a0->id64(uid_str);
 
             uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                                ENTITY_COMPONENTS);
+
             uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              ENTITY_CHILDREN);
 

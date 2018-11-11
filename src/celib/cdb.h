@@ -101,6 +101,8 @@ struct ce_cdb_a0 {
 
     uint64_t (*parent)(uint64_t object);
 
+    uint64_t (*prefab)(uint64_t object);
+
     // WRITE
     ce_cdb_obj_o *(*write_begin)(uint64_t object);
 
@@ -160,6 +162,10 @@ struct ce_cdb_a0 {
 
     void (*remove_property)(ce_cdb_obj_o *writer,
                             uint64_t property);
+
+    void (*delete_property)(ce_cdb_obj_o *writer,
+                            uint64_t property);
+
 
     void (*set_prefab)(uint64_t obj,
                        uint64_t prefab);
