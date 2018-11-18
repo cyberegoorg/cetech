@@ -1035,6 +1035,10 @@ uint64_t parent(uint64_t object) {
 }
 
 uint64_t prefab(uint64_t object) {
+    if(!object) {
+        return 0;
+    }
+
     struct object_t *obj = _get_object_from_objid(object);
     return obj->prefab;
 }
@@ -1258,6 +1262,10 @@ static enum ce_cdb_type prop_type(uint64_t _object,
 static float read_float(uint64_t _obj,
                         uint64_t property,
                         float defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1280,6 +1288,10 @@ static float read_float(uint64_t _obj,
 static bool read_bool(uint64_t _obj,
                       uint64_t property,
                       bool defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1302,6 +1314,11 @@ static bool read_bool(uint64_t _obj,
 static void read_vec3(uint64_t _obj,
                       uint64_t property,
                       float *value) {
+
+    if(!_obj) {
+        return;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1326,6 +1343,10 @@ static void read_vec3(uint64_t _obj,
 static void read_vec4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
+    if(!_obj) {
+        return;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1350,6 +1371,10 @@ static void read_vec4(uint64_t _obj,
 static void read_mat4(uint64_t _obj,
                       uint64_t property,
                       float *value) {
+    if(!_obj) {
+        return;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1375,6 +1400,10 @@ static void read_mat4(uint64_t _obj,
 static const char *read_string(uint64_t _obj,
                                uint64_t property,
                                const char *defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1397,6 +1426,10 @@ static const char *read_string(uint64_t _obj,
 static uint64_t read_uint64(uint64_t _obj,
                             uint64_t property,
                             uint64_t defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1419,6 +1452,10 @@ static uint64_t read_uint64(uint64_t _obj,
 static void *read_ptr(uint64_t _obj,
                       uint64_t property,
                       void *defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1441,6 +1478,10 @@ static void *read_ptr(uint64_t _obj,
 static uint64_t read_ref(uint64_t _obj,
                          uint64_t property,
                          uint64_t defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1463,6 +1504,10 @@ static uint64_t read_ref(uint64_t _obj,
 static uint64_t read_subobject(uint64_t _obj,
                                uint64_t property,
                                uint64_t defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (ce_hash_contain(&obj->removed_prop_map, property)) {
@@ -1487,10 +1532,31 @@ static uint64_t read_subobject(uint64_t _obj,
     return defaultt;
 }
 
+static uint64_t read_subobject_deep(uint64_t object,
+                                    uint64_t *keys,
+                                    uint64_t keys_n,
+                                    uint64_t defaultt) {
+
+    uint64_t it_obj = object;
+    for (int i = 0; i < keys_n; ++i) {
+        uint64_t k = keys[i];
+        it_obj = ce_cdb_a0->read_subobject(it_obj, k, defaultt);
+
+        if (it_obj == defaultt) {
+            return defaultt;
+        }
+    }
+
+    return it_obj;
+}
+
 void *read_blob(uint64_t _obj,
                 uint64_t property,
                 uint64_t *size,
                 void *defaultt) {
+    if(!_obj) {
+        return defaultt;
+    }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
@@ -1777,6 +1843,7 @@ static struct ce_cdb_a0 cdb_api = {
         .read_ptr = read_ptr,
         .read_ref = read_ref,
         .read_subobject = read_subobject,
+        .read_subobject_deep = read_subobject_deep,
         .read_blob = read_blob,
 
         .write_begin = write_begin,

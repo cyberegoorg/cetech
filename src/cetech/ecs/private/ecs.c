@@ -21,7 +21,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/asset_preview.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 
 
 //==============================================================================

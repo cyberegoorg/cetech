@@ -90,7 +90,7 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
-        src/cetech/resource/private/sourcedb.c
+        src/cetech/sourcedb/private/sourcedb.c
         src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/private/kernel.c
@@ -140,7 +140,7 @@ set(SOURCE_FILES
         src/cetech/editor/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
         src/cetech/resource/private/builddb.c
-        src/cetech/editor/private/editor_ui.c
+        src/cetech/sourcedb/private/sourcedb_ui.c
         src/cetech/game_system/private/game_system.c
         src/cetech/editor/private/game_view.c
         src/cetech/entity/private/entity_explorer.c)

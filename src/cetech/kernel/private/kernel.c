@@ -23,7 +23,7 @@
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 #include <cetech/ecs/ecs.h>
 #include <stdlib.h>
 #include <celib/ydb.h>
@@ -142,10 +142,6 @@ int cetech_kernel_init(int argc,
 
     init_config(argc, argv, ce_config_a0->obj());
 
-    CE_ADD_STATIC_MODULE(builddb);
-    CE_ADD_STATIC_MODULE(sourcedb);
-    CE_ADD_STATIC_MODULE(resourcesystem);
-    CE_ADD_STATIC_MODULE(resourcecompiler);
 
     CE_INIT_API(api, ce_ebus_a0);
     ce_ebus_a0->create_ebus(KERNEL_EBUS);
@@ -161,7 +157,6 @@ int cetech_kernel_init(int argc,
 
     ce_module_a0->load_dirs(module_path);
     ce_config_a0->log_all();
-
 
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ce_os_a0);

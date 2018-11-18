@@ -202,21 +202,26 @@ static void _on_entity_obj_add(uint64_t obj,
         components = ce_cdb_a0->read_subobject(entity_obj, ENTITY_COMPONENTS,
                                                0);
 
-        ce_cdb_a0->register_remove_notify(components,
-                                          _on_components_obj_removed,
-                                          (void *) world.h);
+        if (components) {
+            ce_cdb_a0->register_remove_notify(components,
+                                              _on_components_obj_removed,
+                                              (void *) world.h);
 
-        ce_cdb_a0->register_notify(components, _on_components_obj_add,
-                                   (void *) world.h);
+            ce_cdb_a0->register_notify(components, _on_components_obj_add,
+                                       (void *) world.h);
+        }
 
         uint64_t children;
         children = ce_cdb_a0->read_subobject(entity_obj, ENTITY_CHILDREN, 0);
 
-        ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
-                                          (void *) world.h);
+        if (children) {
+            ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
+                                              (void *) world.h);
 
-        ce_cdb_a0->register_notify(children, _on_entity_obj_add,
-                                   (void *) world.h);
+            ce_cdb_a0->register_notify(children, _on_entity_obj_add,
+                                       (void *) world.h);
+        }
+
     }
 }
 

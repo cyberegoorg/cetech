@@ -17,7 +17,7 @@
 #include <cetech/gfx/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"

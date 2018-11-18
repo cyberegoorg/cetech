@@ -25,7 +25,7 @@
 
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/editor/asset_editor.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 #include <cetech/resource/builddb.h>
 
 #define WINDOW_NAME "Explorer"

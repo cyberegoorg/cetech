@@ -213,6 +213,11 @@ struct ce_cdb_a0 {
                                uint64_t property,
                                uint64_t defaultt);
 
+    uint64_t (*read_subobject_deep)(uint64_t object,
+                                    uint64_t* keys,
+                                    uint64_t keys_n,
+                                    uint64_t defaultt);
+
     void *(*read_blob)(uint64_t object,
                        uint64_t property,
                        uint64_t *size,

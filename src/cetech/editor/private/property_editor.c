@@ -15,7 +15,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 #include <celib/cdb.h>
 
 #define WINDOW_NAME "Property editor"

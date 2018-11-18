@@ -3,7 +3,14 @@
 //==============================================================================
 
 void init_static_modules() {
+    CE_ADD_STATIC_MODULE(cmd_system);
     CE_ADD_STATIC_MODULE(machine);
+
+    CE_ADD_STATIC_MODULE(builddb);
+    CE_ADD_STATIC_MODULE(sourcedb);
+    CE_ADD_STATIC_MODULE(resourcesystem);
+    CE_ADD_STATIC_MODULE(resourcecompiler);
+
     CE_ADD_STATIC_MODULE(ecs);
 
     //==========================================================================
@@ -34,9 +41,8 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(debugui);
 
     //==========================================================================
-    // Playground
+    // Editor
     //==========================================================================
-    CE_ADD_STATIC_MODULE(cmd_system);
     CE_ADD_STATIC_MODULE(action_manager);
 
     CE_ADD_STATIC_MODULE(playground);
@@ -62,7 +68,7 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(log_view);
     CE_ADD_STATIC_MODULE(entity_editor);
     CE_ADD_STATIC_MODULE(editor);
-    CE_ADD_STATIC_MODULE(editor_ui);
+    CE_ADD_STATIC_MODULE(sourcedb_ui);
     CE_ADD_STATIC_MODULE(game_view);
 }
 

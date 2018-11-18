@@ -27,7 +27,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/gfx/mesh_renderer.h>
 #include <cetech/editor/asset_preview.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/sourcedb/sourcedb_ui.h>
 #include <celib/log.h>
 #include <cetech/resource/builddb.h>
 
@@ -120,13 +120,13 @@ static uint64_t cdb_type() {
 static void ui_vec4(struct ct_resource_id rid,
                     uint64_t var) {
     const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-    ct_editor_ui_a0->ui_vec4(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
+    ct_sourcedb_ui_a0->ui_vec4(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
 static void ui_color4(struct ct_resource_id rid,
                       uint64_t var) {
     const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-    ct_editor_ui_a0->ui_color(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
+    ct_sourcedb_ui_a0->ui_color(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
 }
 
 static void ui_texture(struct ct_resource_id rid,
@@ -134,7 +134,7 @@ static void ui_texture(struct ct_resource_id rid,
     const char *name = ce_cdb_a0->read_str(variable, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_editor_ui_a0->ui_resource(rid, variable, MATERIAL_VAR_VALUE_PROP, name,
+    ct_sourcedb_ui_a0->ui_resource(rid, variable, MATERIAL_VAR_VALUE_PROP, name,
                                  TEXTURE_TYPE, variable);
 }
 
@@ -163,10 +163,10 @@ static void draw_property(struct ct_resource_id rid,
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_editor_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME,
+            ct_sourcedb_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME,
                                     "Layer name", i);
 
-            ct_editor_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP,
+            ct_sourcedb_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP,
                                          "Shader",
                                          SHADER_TYPE, i);
 

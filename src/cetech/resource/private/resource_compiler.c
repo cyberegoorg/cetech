@@ -21,7 +21,7 @@
 #include <celib/cdb.h>
 
 #include <cetech/resource/resource.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
 #include "cetech/resource/builddb.h"

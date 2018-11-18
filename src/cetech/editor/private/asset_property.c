@@ -7,7 +7,7 @@
 #include <celib/hash.inl>
 #include <celib/ebus.h>
 #include <celib/ydb.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/sourcedb/sourcedb.h>
 #include <celib/cdb.h>
 
 #include "celib/hashlib.h"

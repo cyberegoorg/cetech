@@ -22,10 +22,11 @@
 #include <celib/hash.inl>
 #include <celib/ydb.h>
 #include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/sourcedb/sourcedb_ui.h>
 #include <celib/cdb.h>
 #include <celib/log.h>
 #include <celib/buffer.inl>
+#include <cetech/sourcedb/sourcedb.h>
 
 
 #define _G entity_property_global
@@ -73,11 +74,11 @@ static void _generic_component_property(struct ct_resource_id rid,
 
         switch (type) {
             case ECS_PROP_FLOAT:
-                ct_editor_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f,
+                ct_sourcedb_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f,
                                           0.0f);
                 break;
             case ECS_PROP_VEC3:
-                ct_editor_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f,
+                ct_sourcedb_ui_a0->ui_vec3(rid, obj, prop, display_name, 0.0f,
                                          0.0f);
                 break;
             default:
@@ -110,9 +111,12 @@ static void draw_component(struct ct_resource_id rid,
     uint64_t comp_type = ce_cdb_a0->type(obj);
 
     if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
-        ce_cdb_a0->remove_property(w, comp_type);
-        ce_cdb_a0->write_commit(w);
+        uint64_t *keys = NULL;
+        ct_sourcedb_a0->collect_keys(rid, parent, &keys, _G.allocator);
+        uint64_t keys_n = ce_array_size(keys);
+
+        ct_sourcedb_a0->remove_prop(rid, keys, keys_n, comp_type);
+        ce_array_free(keys, _G.allocator);
     }
 
     ct_debugui_a0->Separator();
@@ -161,7 +165,7 @@ static void _entity_ui(struct ct_resource_id rid,
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
 
-    ct_editor_ui_a0->ui_str(rid, obj, ENTITY_NAME, "Name", rid.name);
+    ct_sourcedb_ui_a0->ui_str(rid, obj, ENTITY_NAME, "Name", rid.name);
 
 
     ct_debugui_a0->TreePop();
@@ -209,6 +213,13 @@ void draw_menu(uint64_t obj) {
         return;
     }
 
+    struct ct_resource_id rid = {
+            .name=ce_cdb_a0->read_uint64(ct_sourcedb_a0->find_root(obj),
+                                         ASSET_NAME, 0),
+            .type=obj_type,
+    };
+
+
     ct_debugui_a0->Button(ICON_FA_PLUS" component", (float[2]) {0.0f});
     if (ct_debugui_a0->BeginPopupContextItem("add component context menu", 0)) {
         struct ce_api_entry it = ce_api_a0->first(COMPONENT_I);
@@ -242,10 +253,14 @@ void draw_menu(uint64_t obj) {
                         component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              component_type);
                     }
+                    uint64_t *keys = NULL;
+                    ct_sourcedb_a0->collect_keys(rid, obj, &keys, _G.allocator);
+                    ce_array_push(keys, ENTITY_COMPONENTS, _G.allocator);
+                    uint64_t keys_n = ce_array_size(keys);
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(components);
-                    ce_cdb_a0->set_subobject(w, component_type, component);
-                    ce_cdb_a0->write_commit(w);
+                    ct_sourcedb_a0->add_subobj(rid, component_type,
+                                               keys, keys_n, 0, component);
+                    ce_array_free(keys, _G.allocator);
                 }
             }
             next:

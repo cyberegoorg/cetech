@@ -90,10 +90,6 @@ static void _cvar_from_str(const char *name,
     ce_cdb_a0->write_commit(writer);
 }
 
-struct foreach_config_data {
-    char *root_name;
-};
-
 
 static void foreach_config_clb(uint64_t key,
                                uint64_t value,
