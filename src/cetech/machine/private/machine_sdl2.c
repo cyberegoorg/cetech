@@ -15,7 +15,7 @@
 #include "cetech/machine/machine.h"
 
 #include <include/SDL2/SDL.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/controlers/gamepad.h>

@@ -8,17 +8,15 @@
 #include <celib/module.h>
 #include <celib/hashlib.h>
 #include <celib/array.inl>
-#include <cetech/gfx/renderer.h>
 #include <celib/hash.inl>
-#include <cetech/gfx/renderer.h>
 #include <celib/ebus.h>
-#include <cetech/gfx/debugdraw.h>
+
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugdraw/debugdraw.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/transform/transform.h>
-
-
-#include "cetech/gfx/render_graph.h"
+#include "cetech/render_graph/render_graph.h"
 
 
 #define _G render_graph_global

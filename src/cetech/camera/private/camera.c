@@ -9,8 +9,8 @@
 #include <celib/array.inl>
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/sourcedb/sourcedb_ui.h>
 
 #include "celib/hashlib.h"

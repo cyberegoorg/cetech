@@ -3,7 +3,7 @@
 //==============================================================================
 
 #include <celib/module.h>
-#include <cetech/gfx/scene.h>
+#include <cetech/scene/scene.h>
 #include <celib/array.inl>
 #include <celib/hash.inl>
 #include "celib/hashlib.h"
@@ -16,7 +16,7 @@
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
 #include "cetech/scenegraph/scenegraph.h"
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/sourcedb/sourcedb.h>
 
 

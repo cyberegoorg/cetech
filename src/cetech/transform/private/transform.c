@@ -15,8 +15,8 @@
 #include "celib/module.h"
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
-#include <cetech/gfx/debugui.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include <cetech/sourcedb/sourcedb_ui.h>
 

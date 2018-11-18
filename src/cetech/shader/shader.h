@@ -10,7 +10,7 @@
 //==============================================================================
 
 #include <stdint.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 
 #define SHADER_TYPE \
     CE_ID64_0("shader", 0xcce8d5b5f5ae333fULL)

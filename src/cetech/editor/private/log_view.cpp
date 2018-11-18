@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
 #include <cetech/editor/log_view.h>
-#include <cetech/gfx/private/ocornut-imgui/imgui.h>
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/array.inl>
 #include <celib/ebus.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
 #include "celib/memory.h"

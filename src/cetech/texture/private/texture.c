@@ -15,12 +15,12 @@
 #include "celib/buffer.inl"
 
 #include <celib/module.h>
-#include <cetech/gfx/texture.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/texture/texture.h>
+#include <cetech/renderer/renderer.h>
 #include <celib/config.h>
 #include <celib/ydb.h>
 #include <cetech/editor/asset_property.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>

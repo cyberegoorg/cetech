@@ -3,7 +3,7 @@
 #include <celib/macros.h>
 #include <celib/hashlib.h>
 
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <stddef.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>

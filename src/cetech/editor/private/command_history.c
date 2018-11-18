@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
 #include <cetech/editor/command_system.h>

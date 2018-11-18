@@ -13,7 +13,7 @@
 #include <cetech/editor/command_system.h>
 #include <celib/hash.inl>
 #include <celib/cdb.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <celib/fmath.inl>
 #include <cetech/editor/asset_browser.h>
 #include <cetech/resource/builddb.h>
@@ -21,7 +21,7 @@
 #include <cetech/editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/sourcedb/sourcedb.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "cetech/sourcedb/sourcedb_ui.h"
 

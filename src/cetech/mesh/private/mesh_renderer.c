@@ -15,14 +15,14 @@
 
 #include "cetech/transform/transform.h"
 #include "cetech/scenegraph/scenegraph.h"
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/scene.h>
-#include <cetech/gfx/material.h>
-#include <cetech/gfx/mesh_renderer.h>
-#include <cetech/gfx/debugdraw.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/scene/scene.h>
+#include <cetech/material/material.h>
+#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/debugdraw/debugdraw.h>
 #include <celib/macros.h>
 #include <stdlib.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <celib/ydb.h>
 #include <cetech/sourcedb/sourcedb_ui.h>
 #include <celib/log.h>

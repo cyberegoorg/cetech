@@ -12,12 +12,12 @@
 #include <celib/fmath.inl>
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/debugui.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/render_graph.h>
-#include <cetech/gfx/default_render_graph.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/render_graph/default_render_graph.h>
 #include <cetech/transform/transform.h>
-#include <cetech/gfx/texture.h>
+#include <cetech/texture/texture.h>
 #include <cetech/camera/camera.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>

@@ -21,12 +21,11 @@ extern "C" {
 
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/machine/machine.h>
 #include <cetech/ecs/ecs.h>
 }
 
-#include <cetech/gfx/private/bgfx_imgui/imgui.h>
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
 

@@ -17,8 +17,8 @@
 
 #include <cetech/resource/package.h>
 #include <cetech/machine/machine.h>
-#include <cetech/gfx/debugui.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/game_system/game_system.h>
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>

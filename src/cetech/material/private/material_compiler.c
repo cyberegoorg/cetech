@@ -13,10 +13,10 @@
 #include "cetech/ecs/ecs.h"
 #include "cetech/machine/machine.h"
 #include <bgfx/defines.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include "cetech/resource/resource.h"
 
-#include <cetech/gfx/material.h>
+#include <cetech/material/material.h>
 #include <cetech/resource/builddb.h>
 #include <celib/buffer.inl>
 #include "material.h"

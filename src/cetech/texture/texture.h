@@ -1,7 +1,6 @@
 #ifndef CETECH_TEXTURE_H
 #define CETECH_TEXTURE_H
 
-#include <cetech/gfx/renderer.h>
 
 #define TEXTURE_TYPE \
     CE_ID64_0("texture", 0xcd4238c6a0c69e32ULL)

@@ -17,8 +17,8 @@
 #include "cetech/resource/resource.h"
 
 #include <celib/module.h>
-#include <cetech/gfx/shader.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/shader/shader.h>
+#include <cetech/renderer/renderer.h>
 
 #include <celib/os.h>
 #include <celib/ydb.h>

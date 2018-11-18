@@ -7,21 +7,21 @@
 #include <celib/memory.h>
 #include <celib/module.h>
 #include <celib/hashlib.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/resource/resource.h>
-#include <cetech/gfx/material.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/material/material.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/render_graph.h>
+#include <cetech/render_graph/render_graph.h>
 #include <cetech/camera/camera.h>
-#include <cetech/gfx/debugdraw.h>
-#include <cetech/gfx/mesh_renderer.h>
+#include <cetech/debugdraw/debugdraw.h>
+#include <cetech/mesh/mesh_renderer.h>
 #include <string.h>
 #include <celib/fmath.inl>
 #include <celib/macros.h>
 
 
-#include "cetech/gfx/default_render_graph.h"
+#include "cetech/render_graph/default_render_graph.h"
 
 
 #define _G render_graph_global

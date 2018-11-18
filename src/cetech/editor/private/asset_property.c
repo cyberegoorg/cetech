@@ -1,4 +1,4 @@
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/property_editor.h>
 #include <cetech/editor/asset_property.h>
 #include <cetech/resource/resource.h>

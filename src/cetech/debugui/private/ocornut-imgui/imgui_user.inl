@@ -71,11 +71,11 @@ namespace ImGui
     }
 } // namespace
 
-#include "cetech/gfx/private/ocornut-imgui/widgets/color_picker.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/color_wheel.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/dock.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/file_list.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/gizmo.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/memory_editor.inl"
-#include "cetech/gfx/private/ocornut-imgui/widgets/range_slider.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/color_picker.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/color_wheel.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/dock.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/file_list.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/gizmo.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/memory_editor.inl"
+#include "cetech/debugui/private/ocornut-imgui/widgets/range_slider.inl"
 

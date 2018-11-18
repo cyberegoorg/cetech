@@ -8,10 +8,9 @@
 #include <bx/allocator.h>
 #include <bx/math.h>
 #include <bx/timer.h>
-#include <cetech/gfx/private/bgfx_utils.h>
+#include <cetech/renderer/private/bgfx_utils.h>
 #include <include/SDL2/SDL_video.h>
 
-#include "cetech/gfx/private/ocornut-imgui/imgui.h"
 
 #include "imgui.h"
 

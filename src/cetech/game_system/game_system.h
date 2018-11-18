@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include <celib/module.inl>
-#include <cetech/gfx/render_graph.h>
+#include <cetech/render_graph/render_graph.h>
 
 #define GAME_INTERFACE_NAME \
     "ct_game_i0"

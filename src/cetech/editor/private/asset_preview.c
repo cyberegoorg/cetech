@@ -1,11 +1,11 @@
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/gfx/debugdraw.h>
+#include <cetech/debugdraw/debugdraw.h>
 
 #include <cetech/editor/asset_preview.h>
 #include <cetech/editor/asset_browser.h>
@@ -13,8 +13,8 @@
 #include <celib/hash.inl>
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
-#include <cetech/gfx/render_graph.h>
-#include <cetech/gfx/default_render_graph.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/render_graph/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/sourcedb/sourcedb.h>

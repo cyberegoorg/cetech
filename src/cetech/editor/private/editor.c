@@ -12,15 +12,15 @@
 
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
 #include <cetech/editor/command_system.h>
 #include <cetech/editor/action_manager.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/gfx/render_graph.h>
+#include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/editor/asset_browser.h>
 #include <string.h>

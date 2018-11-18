@@ -94,14 +94,14 @@ set(SOURCE_FILES
         src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/private/kernel.c
-        src/cetech/gfx/private/bgfx_imgui/imgui.cpp
-        src/cetech/gfx/private/ocornut-imgui/imgui.cpp
-        src/cetech/gfx/private/ocornut-imgui/imgui_draw.cpp
-        src/cetech/gfx/private/debugui.cpp
+        src/cetech/debugui/private/bgfx_imgui/imgui.cpp
+        src/cetech/debugui/private/ocornut-imgui/imgui.cpp
+        src/cetech/debugui/private/ocornut-imgui/imgui_draw.cpp
+        src/cetech/debugui/private/debugui.cpp
 
-        src/cetech/gfx/private/debugdraw/debugdraw.cpp
-        src/cetech/gfx/private/debugdraw/bounds.cpp
-        src/cetech/gfx/private/debugdraw.cpp
+        src/cetech/debugdraw/private/debugdraw/debugdraw.cpp
+        src/cetech/debugdraw/private/debugdraw/bounds.cpp
+        src/cetech/debugdraw/private/debugdraw.cpp
 
         src/cetech/machine/private/machine_sdl2.c
 
@@ -110,17 +110,17 @@ set(SOURCE_FILES
         src/cetech/controlers/private/controlers.c
         src/cetech/controlers/private/mouse.c
         src/cetech/controlers/private/gamepad.c
-        src/cetech/gfx/private/renderer.cpp
-        src/cetech/gfx/private/render_graph.c
-        src/cetech/gfx/private/default_render_graph.c
-        src/cetech/gfx/private/texture.c
+        src/cetech/renderer/private/renderer.cpp
+        src/cetech/render_graph/private/render_graph.c
+        src/cetech/render_graph/private/default_render_graph.c
+        src/cetech/texture/private/texture.c
 
-        src/cetech/gfx/private/shader.c
-        src/cetech/gfx/private/material.c
-        src/cetech/gfx/private/material_compiler.c
-        src/cetech/gfx/private/scene.c
-        src/cetech/gfx/private/scene_compiler.cpp
-        src/cetech/gfx/private/mesh_renderer.c
+        src/cetech/shader/private/shader.c
+        src/cetech/material/private/material.c
+        src/cetech/material/private/material_compiler.c
+        src/cetech/scene/private/scene.c
+        src/cetech/scene/private/scene_compiler.cpp
+        src/cetech/mesh/private/mesh_renderer.c
         src/cetech/transform/private/transform.c
 
         src/cetech/scenegraph/private/scenegraph.c

@@ -7,11 +7,11 @@ extern "C" {
 #include <celib/array.inl>
 #include <celib/log.h>
 
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/debugdraw.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugdraw/debugdraw.h>
 }
 
-#include <cetech/gfx/private/debugdraw/debugdraw.h>
+#include <cetech/debugdraw/private/debugdraw/debugdraw.h>
 
 
 #define _G DebugDrawGLobal

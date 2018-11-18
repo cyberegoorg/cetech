@@ -1,5 +1,5 @@
-#include <cetech/gfx/private/bgfx_imgui/imgui.h>
-#include <cetech/gfx/private/ocornut-imgui/imgui_internal.h>
+#include "bgfx_imgui/imgui.h"
+#include "ocornut-imgui/imgui_internal.h"
 
 #define  _to_imvec2(a) (*((ImVec2*) (a)))
 #define  _to_imvec4(a) (*((ImVec4*) (a)))

@@ -1,8 +1,8 @@
 #undef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
 #include <celib/cdb.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/controlers/keyboard.h>
 #include <celib/hashlib.h>
 #include <celib/os.h>

@@ -1,12 +1,12 @@
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/asset_browser.h>
-#include <cetech/gfx/private/ocornut-imgui/imgui.h>
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/fs.h>
 #include <celib/os.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
 #include <celib/ebus.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -15,7 +15,7 @@
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/gfx/texture.h>
+#include <cetech/texture/texture.h>
 #include <cetech/editor/asset_property.h>
 #include <cetech/editor/asset_preview.h>
 #include <cetech/resource/builddb.h>

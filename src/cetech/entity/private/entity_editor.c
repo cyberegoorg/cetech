@@ -12,8 +12,8 @@
 #include "celib/module.h"
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
@@ -21,10 +21,10 @@
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
-#include <cetech/gfx/render_graph.h>
-#include <cetech/gfx/default_render_graph.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/render_graph/default_render_graph.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/asset_editor.h>

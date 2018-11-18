@@ -13,19 +13,19 @@
 
 #include "cetech/resource/resource.h"
 
-#include <cetech/gfx/renderer.h>
-#include <cetech/gfx/material.h>
-#include <cetech/gfx/shader.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/material/material.h>
+#include <cetech/shader/shader.h>
 
-#include <cetech/gfx/texture.h>
+#include <cetech/texture/texture.h>
 #include <celib/module.h>
 
 #include <celib/os.h>
 #include <celib/macros.h>
 #include <cetech/editor/asset_property.h>
-#include <cetech/gfx/debugui.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/gfx/mesh_renderer.h>
+#include <cetech/mesh/mesh_renderer.h>
 #include <cetech/editor/asset_preview.h>
 #include <cetech/sourcedb/sourcedb_ui.h>
 #include <celib/log.h>

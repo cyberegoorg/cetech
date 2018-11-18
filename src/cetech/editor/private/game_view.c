@@ -8,10 +8,10 @@
 
 #include "celib/api_system.h"
 
-#include <cetech/gfx/debugui.h>
-#include <cetech/gfx/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/gfx/renderer.h>
+#include <cetech/renderer/renderer.h>
 #include <cetech/editor/dock.h>
 #include <cetech/game_system/game_system.h>
 
