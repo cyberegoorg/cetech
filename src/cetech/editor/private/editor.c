@@ -16,16 +16,16 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
-#include <cetech/editor/command_system.h>
+#include <cetech/command_system/command_system.h>
 #include <cetech/editor/action_manager.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <string.h>
-#include <cetech/game_system/game_system.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/game/game_system.h>
+#include <cetech/resource/sourcedb.h>
 
 #define _G plaground_global
 
@@ -195,14 +195,14 @@ static void on_init(uint64_t _event) {
         it = ce_api_a0->next(it);
     }
 
-    _G.world = ct_ecs_a0->entity->create_world();
+    _G.world = ct_ecs_a0->create_world();
 
-    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
-    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->add(_G.world, _G.render_ent,
                               (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1, NULL);
 
     struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
                                             _G.render_ent);
 
     rg_comp->builder = ct_render_graph_a0->create_builder();
@@ -240,7 +240,7 @@ static void on_update(float dt) {
         it = ce_api_a0->next(it);
     }
 
-    ct_ecs_a0->system->simulate(_G.world, dt);
+    ct_ecs_a0->simulate(_G.world, dt);
 }
 
 
@@ -267,7 +267,7 @@ static uint64_t name() {
 
 static struct ct_render_graph_builder *render_graph_builder() {
     struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
                                             _G.render_ent);
 
     return rg_comp->builder;

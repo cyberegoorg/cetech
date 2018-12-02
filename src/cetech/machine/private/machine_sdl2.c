@@ -22,20 +22,6 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
 
-
-//==============================================================================
-// Extern functions
-//==============================================================================
-
-//==============================================================================
-// Keyboard part
-//==============================================================================
-
-
-//==============================================================================
-// Gamepad part
-//==============================================================================
-
 extern int sdl_window_init(struct ce_api_a0 *api);
 
 extern void sdl_window_shutdown();
@@ -106,7 +92,8 @@ void sdl_mouse_process() {
                                      EVENT_MOUSE_MOVE);
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-    ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, _G.mouse.position);
+    ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, _G.mouse.position[0]);
+    ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, _G.mouse.position[1]);
     ce_cdb_a0->write_commit(w);
 
 
@@ -152,7 +139,8 @@ void sdl_keyboard_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN, event);
+            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN,
+                                      event);
 
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
@@ -294,7 +282,8 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN,
+                                          event);
 
 
             } else if (is_button_up(curent_state[i][j],
@@ -308,7 +297,8 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_UP, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_UP,
+                                          event);
 
             }
 
@@ -332,10 +322,15 @@ void sdl_gamepad_process() {
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
-                ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
+
+                ce_cdb_a0->set_float(w,
+                                     CONTROLER_POSITION_X, pos[0]);
+                ce_cdb_a0->set_float(w,
+                                     CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE, event);
+                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE,
+                                          event);
 
             }
         }
@@ -355,7 +350,8 @@ void sdl_gamepad_play_rumble(int gamepad,
     SDL_HapticRumblePlay(h, strength, length);
 }
 
-static void _update(uint64_t type, void* event) {
+static void _update(uint64_t type,
+                    void *event) {
     SDL_Event e = {};
 
     while (SDL_PollEvent(&e) > 0) {
@@ -381,7 +377,7 @@ static void _update(uint64_t type, void* event) {
                         ce_cdb_a0->write_commit(w);
 
                         ce_ebus_a0->broadcast_obj(WINDOW_EBUS,
-                                              EVENT_WINDOW_RESIZED, event);
+                                                  EVENT_WINDOW_RESIZED, event);
 
                     }
                         break;
@@ -397,7 +393,8 @@ static void _update(uint64_t type, void* event) {
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-                ce_cdb_a0->set_vec3(w, CONTROLER_POSITION, pos);
+                ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, pos[0]);
+                ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
 
                 ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_WHEEL, event);
@@ -417,7 +414,7 @@ static void _update(uint64_t type, void* event) {
                 ce_cdb_a0->write_commit(w);
 
                 ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT,
-                                      event);
+                                          event);
 
             }
                 break;
@@ -434,7 +431,7 @@ static void _update(uint64_t type, void* event) {
                 ce_cdb_a0->write_commit(w);
 
                 ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT,
-                                      event);
+                                          event);
 
             }
                 break;
@@ -460,7 +457,7 @@ static void _update(uint64_t type, void* event) {
                     ce_cdb_a0->write_commit(w);
 
                     ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS,
-                                          EVENT_GAMEPAD_DISCONNECT, event);
+                                              EVENT_GAMEPAD_DISCONNECT, event);
 
                     break;
                 }
@@ -476,7 +473,6 @@ static void _update(uint64_t type, void* event) {
     sdl_gamepad_process();
     sdl_mouse_process();
     sdl_keyboard_process();
-
 }
 
 static struct ct_machine_a0 a0 = {

@@ -21,7 +21,7 @@
 #include <celib/cdb.h>
 
 #include <cetech/resource/resource.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
 #include "cetech/resource/builddb.h"
@@ -108,8 +108,7 @@ static void _compile_task(void *data) {
     uint64_t obj = ce_ydb_a0->get_obj(tdata->source_filename);
 
     const uint64_t n = ce_cdb_a0->prop_count(obj);
-    uint64_t asset_keys[n];
-    ce_cdb_a0->prop_keys(obj, asset_keys);
+    const uint64_t* asset_keys = ce_cdb_a0->prop_keys(obj);
 
     for (uint32_t i = 0; i < n; ++i) {
         uint64_t k = asset_keys[i];
@@ -140,6 +139,8 @@ static void _compile_task(void *data) {
             ce_log_a0->error("resource_compiler.task",
                              "Resource \"%s\" compilation fail", resource_name);
         } else {
+            ce_cdb_a0->set_type(output_obj, rid.type);
+
             char *output = NULL;
             ce_cdb_a0->dump(output_obj, &output, _G.allocator);
             ct_builddb_a0->put_resource(rid,
@@ -199,8 +200,7 @@ void _scan_files(char **files,
         uint64_t obj = ce_ydb_a0->get_obj(filename);
 
         const uint64_t n = ce_cdb_a0->prop_count(obj);
-        uint64_t asset_keys[n];
-        ce_cdb_a0->prop_keys(obj, asset_keys);
+        const uint64_t* asset_keys = ce_cdb_a0->prop_keys(obj);
 
         for (uint32_t i = 0; i < n; ++i) {
             uint64_t k = asset_keys[i];

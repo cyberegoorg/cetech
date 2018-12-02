@@ -1105,8 +1105,7 @@ namespace ImGui
 
             uint64_t obj = ydb->get_obj(path);
 			const uint64_t type_keys_count = cdb->prop_count(obj);
-			uint64_t type_keys[type_keys_count];
-			cdb->prop_keys(obj, type_keys);
+			const uint64_t* type_keys = cdb->prop_keys(obj);
 
             for (uint32_t i = 0; i < type_keys_count; ++i) {
                 Dock *new_dock = (Dock *) MemAlloc(sizeof(Dock));

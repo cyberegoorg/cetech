@@ -21,7 +21,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/game_system/game_system.h>
+#include <cetech/game/game_system.h>
 
 static struct G {
     struct ct_world world;
@@ -41,19 +41,19 @@ static struct G {
 
 
 void init() {
-    _G.world = ct_ecs_a0->entity->create_world();
+    _G.world = ct_ecs_a0->create_world();
 
 
-    _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world, _CAMERA_ASSET);
-    _G.level = ct_ecs_a0->entity->spawn(_G.world, _LEVEL_ASSET);
+    _G.camera_ent = ct_ecs_a0->spawn(_G.world, _CAMERA_ASSET);
+    _G.level = ct_ecs_a0->spawn(_G.world, _LEVEL_ASSET);
 
     struct ct_render_graph_component rgc = {
             .builder = ct_render_graph_a0->create_builder(),
             .graph = ct_render_graph_a0->create_graph(),
     };
 
-    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
-    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->add(_G.world, _G.render_ent,
                               (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
                               (void *[]) {&rgc});
 
@@ -63,7 +63,7 @@ void init() {
 
 
 void shutdown() {
-    ct_ecs_a0->entity->destroy_world(_G.world);
+    ct_ecs_a0->destroy_world(_G.world);
 }
 
 void update(float dt) {
@@ -75,7 +75,7 @@ void update(float dt) {
         ce_log_a0->error("example", "LICE");
     }
 
-    ct_ecs_a0->system->simulate(_G.world, dt);
+    ct_ecs_a0->simulate(_G.world, dt);
 }
 
 static uint64_t game_name() {
@@ -84,7 +84,7 @@ static uint64_t game_name() {
 
 static struct ct_render_graph_builder *render_graph_builder() {
     struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
                                             _G.render_ent);
 
     return rg_comp->builder;

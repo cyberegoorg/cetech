@@ -3,7 +3,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
-#include <cetech/editor/command_system.h>
+#include <cetech/command_system/command_system.h>
 #include <celib/ebus.h>
 #include <celib/macros.h>
 

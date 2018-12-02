@@ -1,3 +1,4 @@
+
 //==============================================================================
 // Includes
 //==============================================================================
@@ -148,9 +149,15 @@ void begin_frame() {
 
             while (it != end_it) {
 
-                if (it->size != sizeof(struct ebus_event_header)) {
+                // TODO: SHITTTTTTT
+                if (it->size == (sizeof(struct ebus_event_header) +
+                                 (sizeof(struct ebus_cdb_event)))) {
                     struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-                    ce_cdb_a0->destroy_object(obj_event->obj);
+
+                    if(it->type == ce_cdb_a0->obj_type(obj_event->obj)) {
+                        ce_cdb_a0->destroy_object(obj_event->obj);
+                    }
+
                 }
 
                 it = CE_EBUS_NEXT(it);
@@ -313,7 +320,7 @@ static struct ce_ebus_a0 _api = {
         .send_obj = send_addr_obj,
         .connect = _connect,
         .connect_addr = _connect_addr,
-        .begin_frame = begin_frame,
+        .gc = begin_frame,
 
         .disconnect = disconnect,
         .disconnect_addr = disconnect_addr,

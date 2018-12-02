@@ -1,5 +1,5 @@
 
-#include <cetech/sourcedb/sourcedb_ui.h>
+#include <cetech/asset_editor/sourcedb_ui.h>
 #include <celib/ydb.h>
 
 
@@ -24,34 +24,9 @@ static void component_compiler(const char *filename,
                                ce_cdb_obj_o *writer) {
     struct rotation_component t_data;
 
-    t_data.speed = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("speed"), 0.0f);
+    t_data.speed = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("speed"),
+                                         0.0f);
     ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
-}
-
-
-static struct ct_comp_prop_decs ct_comp_prop_decs = {
-        .prop_decs = (struct ct_prop_decs[]) {
-                {
-                        .type = ECS_PROP_FLOAT,
-                        .name = PROP_SPEED,
-                        .offset = offsetof(struct rotation_component, speed),
-                },
-        },
-        .prop_n = 1,
-
-};
-
-static const struct ct_comp_prop_decs *prop_desc() {
-    return &ct_comp_prop_decs;
-}
-
-static const char *prop_display_name(uint64_t prop) {
-    switch (prop) {
-        case PROP_SPEED:
-            return "Speed";
-        default:
-            return NULL;
-    }
 }
 
 static uint64_t cdb_type() {
@@ -66,7 +41,6 @@ static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .prop_display_name = prop_display_name,
         };
         return &ct_editor_component_i0;
     }
@@ -78,12 +52,23 @@ static uint64_t size() {
     return sizeof(struct rotation_component);
 }
 
+static void rotation_spawner(struct ct_world world,
+                             uint64_t obj,
+                             void *data) {
+    struct rotation_component *r = data;
+
+    *r = (struct rotation_component) {
+        .speed = ce_cdb_a0->read_float(obj, PROP_SPEED, 0.0f),
+    };
+}
+
+
 static struct ct_component_i0 rotation_component_i = {
         .size = size,
         .cdb_type = cdb_type,
         .compiler = component_compiler,
         .get_interface = get_interface,
-        .prop_desc = prop_desc,
+        .spawner = rotation_spawner,
 };
 
 
@@ -98,10 +83,10 @@ static void foreach_rotation(struct ct_world world,
     float dt = *(float *) (data);
 
     struct rotation_component *rotation;
-    rotation = ct_ecs_a0->component->get_all(ROTATION_COMPONENT, item);
+    rotation = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->get_all(TRANSFORM_COMPONENT, item);
+    transform = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
         float rot[3] = {};
@@ -111,11 +96,11 @@ static void foreach_rotation(struct ct_world world,
 }
 
 static void rotation_system(struct ct_world world,
-                             float dt) {
-    uint64_t mask = ct_ecs_a0->component->mask(ROTATION_COMPONENT)
-                    | ct_ecs_a0->component->mask(TRANSFORM_COMPONENT);
+                            float dt) {
+    uint64_t mask = ct_ecs_a0->mask(ROTATION_COMPONENT)
+                    | ct_ecs_a0->mask(TRANSFORM_COMPONENT);
 
-    ct_ecs_a0->system->process(world, mask, foreach_rotation, &dt);
+    ct_ecs_a0->process(world, mask, foreach_rotation, &dt);
 }
 
 static uint64_t rotation_name() {

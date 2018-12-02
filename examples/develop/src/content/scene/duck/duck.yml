@@ -8,7 +8,10 @@ content/scene/duck/duck.material:
         k22cbxbg435124asdkj:
           name: u_vec4
           type: color
-          value: [0.0, 0.0, 0.0, 0.0]
+          value.x: 0.000000
+          value.y: 0.000000
+          value.z: 0.000000
+          value.w: 0.000000
 
 content/scene/duck/duckCM.texture:
   input: content/scene/duck/duckCM.bmp

@@ -43,8 +43,8 @@ bool ce_init() {
     init_signals();
 
     CE_LOAD_STATIC_MODULE(ce_api_a0, task);
-    CE_LOAD_STATIC_MODULE(ce_api_a0, cdb);
     CE_LOAD_STATIC_MODULE(ce_api_a0, ebus);
+    CE_LOAD_STATIC_MODULE(ce_api_a0, cdb);
     CE_LOAD_STATIC_MODULE(ce_api_a0, config);
     CE_LOAD_STATIC_MODULE(ce_api_a0, filesystem);
     CE_LOAD_STATIC_MODULE(ce_api_a0, module);

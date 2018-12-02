@@ -71,24 +71,21 @@ typedef uint64_t (*ct_resource_compilator_t)(const char *filename,
 
 struct ct_resource_a0 {
     struct ct_resource_i0 *(*get_interface)(uint64_t type);
-
-    void (*set_autoload)(bool enable);
-
     void (*load)(uint64_t type,
-                 uint64_t *names,
+                 const uint64_t *names,
                  size_t count,
                  int force);
 
     void (*load_now)(uint64_t type,
-                     uint64_t *names,
+                     const uint64_t *names,
                      size_t count);
 
     void (*unload)(uint64_t type,
-                   uint64_t *names,
+                   const uint64_t *names,
                    size_t count);
 
     void (*reload)(uint64_t type,
-                   uint64_t *names,
+                   const uint64_t *names,
                    size_t count);
 
 
@@ -99,7 +96,7 @@ struct ct_resource_a0 {
                    uint64_t names);
 
     int (*can_get_all)(uint64_t type,
-                       uint64_t *names,
+                       const uint64_t *names,
                        size_t count);
 
     uint64_t (*get)(struct ct_resource_id resource_id);

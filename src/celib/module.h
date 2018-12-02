@@ -5,10 +5,6 @@
 
 struct ce_api_a0;
 
-//==============================================================================
-// Defines
-//==============================================================================
-
 //! Add static module and load it
 //! \param name Module name
 #define CE_ADD_STATIC_MODULE(name)                                     \
@@ -48,10 +44,6 @@ struct ce_api_a0;
     void name##_unload_module(struct ce_api_a0 *api, int reload) unload
 #endif
 
-//==============================================================================
-// Typedefs
-//==============================================================================
-
 typedef void (*ce_load_module_t)(struct ce_api_a0 *api,
                                  int reload);
 
@@ -73,7 +65,7 @@ struct ce_module_a0 {
 
     //! Load module from dir
     //! \param path Plugin dir path
-    void (*load_dirs)(const char* path);
+    void (*load_dirs)(const char *path);
 
     void (*unload_all)();
 

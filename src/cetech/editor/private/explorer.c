@@ -18,14 +18,14 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/editor/asset_editor.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/asset_editor/asset_editor.h>
+#include <cetech/resource/sourcedb.h>
 #include <cetech/resource/builddb.h>
 
 #define WINDOW_NAME "Explorer"
@@ -35,20 +35,17 @@ static struct _G {
     bool visible;
 
     uint64_t selected_object;
-
     struct ce_alloc *allocator;
-    uint64_t top_level_obj;
 } _G;
 
-static uint64_t draw(uint64_t top_level_obj,
-                     uint64_t selected_obj) {
+static uint64_t draw(uint64_t selected_obj) {
     struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
 
         if (i->draw_ui) {
-            uint64_t new_selected_obj = i->draw_ui(top_level_obj, selected_obj);
+            uint64_t new_selected_obj = i->draw_ui(selected_obj);
             return new_selected_obj;
         }
 
@@ -58,12 +55,12 @@ static uint64_t draw(uint64_t top_level_obj,
     return 0;
 }
 
-static void draw_menu(uint64_t top_level_obj,
-                      uint64_t selected_obj) {
+static void draw_menu(uint64_t selected_obj) {
+    uint64_t top_level_obj = ce_cdb_a0->find_root(selected_obj);
 
     if(ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
         struct ct_resource_id rid = {
-                .type=ce_cdb_a0->type(top_level_obj),
+                .type=ce_cdb_a0->obj_type(top_level_obj),
                 .name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0),
         };
 
@@ -86,7 +83,7 @@ static void draw_menu(uint64_t top_level_obj,
         struct ct_explorer_i0 *i = (it.api);
 
         if (i->draw_menu) {
-            i->draw_menu(top_level_obj, selected_obj);
+            i->draw_menu(selected_obj);
         }
 
         it = ce_api_a0->next(it);
@@ -94,15 +91,17 @@ static void draw_menu(uint64_t top_level_obj,
 }
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    if (!_G.top_level_obj) {
+    if (!_G.selected_object) {
         return;
     }
 
-    draw_menu(_G.top_level_obj, _G.selected_object);
+    uint64_t top_level_obj = ce_cdb_a0->find_root(_G.selected_object);
+
+    draw_menu(_G.selected_object);
 
     ct_debugui_a0->Separator();
 
-    uint64_t selected_object = draw(_G.top_level_obj, _G.selected_object);
+    uint64_t selected_object = draw(_G.selected_object);
     if (selected_object) {
         _G.selected_object = selected_object;
 
@@ -110,8 +109,8 @@ static void on_debugui(struct ct_dock_i0 *dock) {
         event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                          EXPLORER_OBJ_SELECTED);
 
-        uint64_t asset_type = ce_cdb_a0->type(_G.top_level_obj);
-        uint64_t asset_name = ce_cdb_a0->read_uint64(_G.top_level_obj, ASSET_NAME, 0);
+        uint64_t asset_type = ce_cdb_a0->obj_type(top_level_obj);
+        uint64_t asset_name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0);
 
         struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
         ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, selected_object);
@@ -147,19 +146,11 @@ static void _on_asset_selected(uint64_t _type,
                                void *event) {
     struct ebus_cdb_event *ev = event;
 
-    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {
-            .name = name,
-            .type = type,
-    };
-
-    if (type != ENTITY_RESOURCE_ID) {
+    if (ENTITY_RESOURCE_ID != ce_cdb_a0->obj_type(ev->obj)) {
         return;
     }
 
-    _G.top_level_obj = ct_sourcedb_a0->get(rid);
+    _G.selected_object = ev->obj;
 }
 
 static void _on_editor_asset_selected(uint64_t _type,
@@ -174,7 +165,7 @@ static void _on_editor_asset_selected(uint64_t _type,
             .type = type,
     };
 
-    _G.top_level_obj = ct_sourcedb_a0->get(rid);
+    _G.selected_object = ct_resource_a0->get(rid);
 }
 
 static void _init(struct ce_api_a0 *api) {

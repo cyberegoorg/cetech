@@ -9,13 +9,13 @@
 
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/editor/property_editor.h>
+#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/editor/property.h>
 #include <cetech/editor/editor.h>
 #include <cetech/editor/dock.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 #include <celib/cdb.h>
 
 #define WINDOW_NAME "Property editor"
@@ -24,17 +24,16 @@
 static struct _G {
     bool visible;
     uint64_t selected_object;
-    struct ct_resource_id resource;
 } _G;
 
-static void draw(struct ct_resource_id rid, uint64_t obj) {
+static void draw(uint64_t obj) {
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i->draw_ui) {
-            i->draw_ui(rid, obj);
+            i->draw_ui(obj);
         }
 
         it = ce_api_a0->next(it);
@@ -69,7 +68,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
     ct_debugui_a0->Separator();
 
-    draw(_G.resource, obj);
+    draw(obj);
 
     ct_debugui_a0->Columns(1, NULL, true);
 }
@@ -107,32 +106,11 @@ struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 static void _on_asset_selected(uint64_t _type, void* event) {
     struct ebus_cdb_event* ev = event;
 
-    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {
-            .name = name,
-            .type = type,
-    };
-
-
-    _G.resource = rid;
-    _G.selected_object = ct_sourcedb_a0->get(rid);
+    _G.selected_object = ev->obj;
 }
 
 static void _on_explorer_selected(uint64_t _type, void* event) {
     struct ebus_cdb_event* ev = event;
-
-    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {
-            .name = name,
-            .type = type,
-    };
-
-    _G.resource = rid;
-
     _G.selected_object =  ce_cdb_a0->read_ref(ev->obj, EXPLORER_OBJ_SELECTED, 0);
 }
 

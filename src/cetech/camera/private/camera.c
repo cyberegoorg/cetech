@@ -10,8 +10,8 @@
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/sourcedb/sourcedb_ui.h>
+#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/asset_editor/sourcedb_ui.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -29,9 +29,12 @@ static void _camera_compiler(const char *filename,
                              uint64_t component_key,
                              ce_cdb_obj_o *writer) {
 
-    float near = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("near"), 0.0f);
-    float far = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("far"), 0.0f);
-    float fov = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("fov"), 0.0f);
+    float near = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("near"),
+                                       0.0f);
+    float far = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("far"),
+                                      0.0f);
+    float fov = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("fov"),
+                                      0.0f);
 
     ce_cdb_a0->set_float(writer, PROP_NEAR, near);
     ce_cdb_a0->set_float(writer, PROP_FAR, far);
@@ -49,9 +52,9 @@ static void get_project_view(struct ct_world world,
     struct ct_transform_comp *transform;
     struct ct_camera_component *camera_data;
 
-    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
+    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
                                               camera);
-    camera_data = ct_ecs_a0->component->get_one(world, CAMERA_COMPONENT,
+    camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
                                                 camera);
 
     float ratio = (float) (width) / (float) (height);
@@ -92,53 +95,10 @@ static const char *display_name() {
     return ICON_FA_CAMERA " Camera";
 }
 
-static struct ct_comp_prop_decs ct_comp_prop_decs = {
-        .prop_decs = (struct ct_prop_decs[]) {
-                {
-                        .type = ECS_PROP_FLOAT,
-                        .name = PROP_NEAR,
-                        .offset = offsetof(struct ct_camera_component, near),
-                },
-                {
-                        .type = ECS_PROP_FLOAT,
-                        .name = PROP_FAR,
-                        .offset = offsetof(struct ct_camera_component, far),
-                },
-                {
-                        .type = ECS_PROP_FLOAT,
-                        .name = PROP_FOV,
-                        .offset = offsetof(struct ct_camera_component, fov),
-                },
-        },
-        .prop_n = 3,
-};
-
-static const struct ct_comp_prop_decs *prop_desc() {
-    return &ct_comp_prop_decs;
-}
-
-
-static const char *prop_display_name(uint64_t prop) {
-    switch (prop) {
-        case PROP_NEAR:
-            return "Near";
-
-        case PROP_FAR:
-            return "Far";
-
-        case PROP_FOV:
-            return "Fov";
-
-        default:
-            return NULL;
-    }
-}
-
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .prop_display_name = prop_display_name,
         };
 
         return &ct_editor_component_i0;
@@ -152,13 +112,25 @@ static uint64_t size() {
     return sizeof(struct ct_camera_component);
 }
 
+static void camera_spawner(struct ct_world world,
+                              uint64_t obj,
+                              void *data) {
+    struct ct_camera_component *c = data;
+
+    *c = (struct ct_camera_component) {
+            .far = ce_cdb_a0->read_float(obj, PROP_FAR, 100.0f),
+            .near = ce_cdb_a0->read_float(obj, PROP_NEAR, 0.0f),
+            .fov = ce_cdb_a0->read_float(obj, PROP_FOV, 0.0f),
+    };
+}
+
+
 static struct ct_component_i0 ct_component_i0 = {
         .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = _camera_compiler,
-        .prop_desc = prop_desc,
-
+        .spawner = camera_spawner,
 };
 
 

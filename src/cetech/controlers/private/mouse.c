@@ -153,7 +153,8 @@ static void axis(uint32_t idx,
 //        //TODO: implement
 //    }
 
-static void update(uint64_t type, void* _event) {
+static void update(uint64_t type,
+                   void *_event) {
     CE_UNUSED(_event);
 
     memcpy(_G.last_state, _G.state, MOUSE_BTN_MAX);
@@ -181,9 +182,15 @@ static void update(uint64_t type, void* _event) {
                 break;
 
             case EVENT_MOUSE_MOVE: {
-                float pos[3];
+                float pos[3] = {
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_X, 0.0f),
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_Y, 0.0f),
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_Z, 0.0f),
+                };
 
-                ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
 
                 _G.delta_pos[0] = pos[0] - _G.pos[0];
                 _G.delta_pos[1] = pos[1] - _G.pos[1];
@@ -194,9 +201,14 @@ static void update(uint64_t type, void* _event) {
                 break;
 
             case EVENT_MOUSE_WHEEL: {
-                float pos[3];
-
-                ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
+                float pos[3] = {
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_X, 0.0f),
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_Y, 0.0f),
+                        ce_cdb_a0->read_float(obj_event->obj,
+                                              CONTROLER_POSITION_Z, 0.0f),
+                };
 
                 _G.wheel[0] += pos[0];// - _G.wheel_last[0];
                 _G.wheel[1] += pos[1];// - _G.wheel_last[1];

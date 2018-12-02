@@ -20,8 +20,9 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
-#include <cetech/editor/asset_preview.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/resource/sourcedb.h>
+#include <cetech/kernel/kernel.h>
 
 
 //==============================================================================
@@ -194,22 +195,22 @@ static struct ct_component_i0 *get_interface(uint64_t name) {
             &_G.component_interface_map, name, 0);
 }
 
-static int compile(uint64_t type,
-                   const char *filename,
-                   uint64_t component_key,
-                   ce_cdb_obj_o *writer) {
-
-    struct ct_component_i0 *component_i = get_interface(type);
-
-    if (!component_i) {
-        ce_log_a0->error("ecs", "could not find component");
-        return 0;
-    }
-
-    component_i->compiler(filename, component_key, writer);
-
-    return 1;
-}
+//static int compile(uint64_t type,
+//                   const char *filename,
+//                   uint64_t component_key,
+//                   ce_cdb_obj_o *writer) {
+//
+//    struct ct_component_i0 *component_i = get_interface(type);
+//
+//    if (!component_i) {
+//        ce_log_a0->error("ecs", "could not find component");
+//        return 0;
+//    }
+//
+//    component_i->compiler(filename, component_key, writer);
+//
+//    return 1;
+//}
 
 #include "entity_compiler.inl"
 
@@ -362,6 +363,10 @@ static void _remove_from_type_slot(struct world_instance *w,
     }
 
     struct entity_storage *item = &w->entity_storage[type_idx];
+
+    if (!item->n) {
+        return;
+    }
 
     uint32_t last_idx = --item->n;
 
@@ -523,21 +528,6 @@ static void remove_components(struct ct_world world,
     }
 
     _remove_from_type_slot(w, ent, idx, ent_type);
-}
-
-static const struct ct_prop_decs *
-desc_by_name(const struct ct_comp_prop_decs *desc,
-             uint64_t name) {
-
-    for (int i = 0; i < desc->prop_n; ++i) {
-        if (desc->prop_decs[i].name != name) {
-            continue;
-        }
-
-        return &desc->prop_decs[i];
-    }
-
-    return NULL;
 }
 
 static void process(struct ct_world world,
@@ -751,8 +741,7 @@ static void destroy(struct ct_world world,
                                                             0);
 
             const uint32_t components_n = ce_cdb_a0->prop_count(components);
-            uint64_t components_keys[components_n];
-            ce_cdb_a0->prop_keys(components, components_keys);
+            const uint64_t *components_keys = ce_cdb_a0->prop_keys(components);
 
             for (int j = 0; j < components_n; ++j) {
                 uint64_t component_obj = ce_cdb_a0->read_subobject(components,
@@ -799,27 +788,21 @@ static uint64_t cdb_type() {
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint64_t name);
 
-static void entity_resource_changed(uint64_t asset_obj,
-                                    uint64_t obj,
-                                    const uint64_t *prop,
-                                    uint32_t prop_count);
 
-static void entity_resource_removed(uint64_t asset_obj,
-                                    uint64_t obj,
-                                    const uint64_t *prop,
-                                    uint32_t prop_count);
+static struct ct_entity _spawn_entity(struct ct_world world,
+                                      uint64_t entity_obj) ;
 
-static struct ct_entity load(struct ct_resource_id resourceid,
+static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
-    struct ct_entity ent = spawn_entity(world, resourceid.name);
+    struct ct_entity ent = _spawn_entity(world, resource);
     return ent;
 }
 
 
-static void unload(struct ct_resource_id resourceid,
+static void unload(uint64_t resource,
                    struct ct_world world,
                    struct ct_entity entity) {
-    ct_ecs_a0->entity->destroy(world, &entity, 1);
+    ct_ecs_a0->destroy(world, &entity, 1);
 }
 
 void *get_resource_interface(uint64_t name_hash) {
@@ -830,8 +813,6 @@ void *get_resource_interface(uint64_t name_hash) {
 
     static struct ct_sourcedb_asset_i0 ct_sourcedb_asset_i0 = {
             .anotate = entity_resource_anotate,
-            .changed = entity_resource_changed,
-            .removed = entity_resource_removed,
     };
 
     if (name_hash == ASSET_PREVIEW) {
@@ -879,18 +860,6 @@ static void link(struct ct_world world,
     w->next_sibling[child_idx] = tmp;
 }
 
-static void _generic_spawner(const struct ct_component_i0 *ci,
-                             uint64_t obj,
-                             void *data) {
-    const struct ct_comp_prop_decs *comp_desc = ci->prop_desc();
-
-    for (int i = 0; i < comp_desc->prop_n; ++i) {
-        const struct ct_prop_decs *desc = &comp_desc->prop_decs[i];
-        uint64_t prop = desc->name;
-        _obj_to_prop(comp_desc, obj, prop, data);
-    }
-}
-
 static struct ct_entity _spawn_entity(struct ct_world world,
                                       uint64_t entity_obj) {
     struct world_instance *w = get_world_instance(world);
@@ -902,8 +871,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     components = ce_cdb_a0->read_subobject(entity_obj, ENTITY_COMPONENTS, 0);
 
     uint32_t components_n = ce_cdb_a0->prop_count(components);
-    uint64_t components_keys[components_n];
-    ce_cdb_a0->prop_keys(components, components_keys);
+    const uint64_t* components_keys = ce_cdb_a0->prop_keys(components);
 
     uint64_t ent_type = combine_component(components_keys, components_n);
 
@@ -917,12 +885,12 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     const uint64_t idx = _entity_data_idx(w, root_ent);
 
     _add_spawn_entity_obj(w, entity_obj, root_ent);
-
-    ce_cdb_a0->register_remove_notify(components, _on_components_obj_removed,
-                                      (void *) world.h);
-
-    ce_cdb_a0->register_notify(components, _on_components_obj_add,
-                               (void *) world.h);
+//
+//    ce_cdb_a0->register_remove_notify(components, _on_components_obj_removed,
+//                                      (void *) world.h);
+//
+//    ce_cdb_a0->register_notify(components, _on_components_obj_add,
+//                               (void *) world.h);
 
     for (int i = 0; i < components_n; ++i) {
         uint64_t component_type = components_keys[i];
@@ -943,13 +911,10 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
         _add_spawn_component_obj(w, component_obj, root_ent);
 
-        ce_cdb_a0->register_notify(component_obj, _on_component_obj_change,
-                                   (void *) world.h);
+//        ce_cdb_a0->register_notify(component_obj, _on_component_obj_change,
+//                                   (void *) world.h);
 
-        if (!component_i->spawner) {
-            _generic_spawner(component_i, component_obj,
-                             comp_data + (component_i->size() * idx));
-        } else {
+        if (component_i->spawner) {
             component_i->spawner(world, component_obj,
                                  comp_data + (component_i->size() * idx));
         }
@@ -958,15 +923,14 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     uint64_t children;
     children = ce_cdb_a0->read_subobject(entity_obj, ENTITY_CHILDREN, 0);
 
-    ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
-                                      (void *) world.h);
-
-    ce_cdb_a0->register_notify(children, _on_entity_obj_add,
-                               (void *) world.h);
+//    ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
+//                                      (void *) world.h);
+//
+//    ce_cdb_a0->register_notify(children, _on_entity_obj_add,
+//                               (void *) world.h);
 
     uint32_t children_n = ce_cdb_a0->prop_count(children);
-    uint64_t children_keys[children_n];
-    ce_cdb_a0->prop_keys(children, children_keys);
+    const uint64_t* children_keys = ce_cdb_a0->prop_keys(children);
     for (int i = 0; i < children_n; ++i) {
         uint64_t child;
         child = ce_cdb_a0->read_subobject(children, children_keys[i], 0);
@@ -1034,7 +998,6 @@ static struct ct_world create_world() {
     ce_cdb_a0->write_commit(wr);
     ce_ebus_a0->broadcast_obj(ECS_EBUS, ECS_WORLD_CREATE, event);
 
-
     return world;
 }
 
@@ -1061,8 +1024,7 @@ struct ct_entity find_by_name(struct ct_world world,
     uint64_t chidren = ce_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
     const uint64_t children_n = ce_cdb_a0->prop_count(chidren);
 
-    uint64_t children_key[children_n];
-    ce_cdb_a0->prop_keys(chidren, children_key);
+    const uint64_t* children_key = ce_cdb_a0->prop_keys(chidren);
 
     for (int i = 0; i < children_n; ++i) {
         uint64_t child_obj = ce_cdb_a0->read_subobject(chidren, children_key[i],
@@ -1087,7 +1049,8 @@ struct ct_entity find_by_name(struct ct_world world,
     return (struct ct_entity) {.h = 0};
 }
 
-struct ct_entity_a0 ct_entity_a0 = {
+static struct ct_ecs_a0 _api = {
+        //ENT
         .create = create_entities,
         .destroy = destroy,
         .alive = alive,
@@ -1097,28 +1060,18 @@ struct ct_entity_a0 ct_entity_a0 = {
 
         .create_world = create_world,
         .destroy_world = destroy_world,
-};
 
-struct ct_component_a0 ct_component_a0 = {
+        //SIMU
+        .simulate = simulate,
+        .process = process,
+
+        //COMP
         .get_interface = get_interface,
         .mask = component_mask,
         .get_all = get_all,
         .get_one = get_one,
         .add = add_components,
         .remove = remove_components,
-        .desc_by_name = desc_by_name,
-};
-
-struct ct_system_a0 ct_system_a0 = {
-        .simulate = simulate,
-        .process = process,
-};
-
-
-static struct ct_ecs_a0 _api = {
-        .component = &ct_component_a0,
-        .entity = &ct_entity_a0,
-        .system = &ct_system_a0,
 };
 
 struct ct_ecs_a0 *ct_ecs_a0 = &_api;
@@ -1156,6 +1109,9 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
+
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT,
+                        on_post_update, 0);
 }
 
 static void _shutdown() {

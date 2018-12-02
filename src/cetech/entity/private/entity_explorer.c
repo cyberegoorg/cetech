@@ -18,12 +18,12 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/editor/property_editor.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/editor/property.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/editor/command_system.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/command_system/command_system.h>
+#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/resource/sourcedb.h>
 
 
 static void ui_entity_item_end() {
@@ -56,7 +56,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     char name[128] = {0};
-    uint64_t uid = ce_cdb_a0->key(obj);
+    uint64_t uid = ce_cdb_a0->obj_key(obj);
     const char *ent_name = ce_cdb_a0->read_str(obj, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
@@ -76,17 +76,16 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     if (open) {
         const uint32_t component_n = ce_cdb_a0->prop_count(components);
-        uint64_t keys[component_n];
-        ce_cdb_a0->prop_keys(components, keys);
+        const uint64_t* keys = ce_cdb_a0->prop_keys(components);
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t key = keys[i];
 
             uint64_t component = ce_cdb_a0->read_subobject(components, key, 0);
-            uint64_t type = ce_cdb_a0->type(component);
+            uint64_t type = ce_cdb_a0->obj_type(component);
 
             struct ct_component_i0 *component_i;
-            component_i = ct_ecs_a0->component->get_interface(type);
+            component_i = ct_ecs_a0->get_interface(type);
             if (!component_i || !component_i->get_interface) {
                 continue;
             }
@@ -122,8 +121,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        uint64_t keys[children_n];
-        ce_cdb_a0->prop_keys(children, keys);
+        const uint64_t* keys = ce_cdb_a0->prop_keys(children);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
@@ -140,23 +138,17 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     return new_selected_object;
 }
 
-static void draw_menu(uint64_t top_level_obj,
-                      uint64_t selected_obj) {
+static void draw_menu(uint64_t selected_obj) {
     if (!selected_obj) {
         return;
     }
 
     ct_debugui_a0->SameLine(0, 10);
 
-    uint64_t type = ce_cdb_a0->type(selected_obj);
+    uint64_t type = ce_cdb_a0->obj_type(selected_obj);
 
     if (type == ENTITY_RESOURCE_ID) {
-        struct ct_resource_id rid = {
-                .name=ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0),
-                .type=type,
-        };
-
-        uint64_t uid = ce_cdb_a0->key(selected_obj);
+        uint64_t uid = ce_cdb_a0->obj_key(selected_obj);
 
         bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
 
@@ -194,38 +186,31 @@ static void draw_menu(uint64_t top_level_obj,
                                          add_children_obj);
                 ce_cdb_a0->write_commit(writer);
             }
-            uint64_t *keys = NULL;
-            ct_sourcedb_a0->collect_keys(rid, add_children_obj, &keys,
-                                         ce_memory_a0->system);
-            uint64_t keys_n = ce_array_size(keys);
 
-            ct_sourcedb_a0->add_subobj(rid, uid, keys, keys_n, 0, entity_obj);
-
-            ce_array_free(keys, ce_memory_a0->system);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(add_children_obj);
+            ce_cdb_a0->set_subobject(w, uid, entity_obj);
+            ce_cdb_a0->write_commit(w);
         }
         ct_debugui_a0->SameLine(0, 10);
 
         if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
             uint64_t parent = ce_cdb_a0->parent(selected_obj);
-            uint64_t *keys = NULL;
-            ct_sourcedb_a0->collect_keys(rid, parent, &keys,
-                                         ce_memory_a0->system);
-            uint64_t keys_n = ce_array_size(keys);
 
-            ct_sourcedb_a0->remove_prop(rid, keys, keys_n, uid);
-            ce_array_free(keys, ce_memory_a0->system);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+            ce_cdb_a0->remove_property(w, uid);
+            ce_cdb_a0->write_commit(w);
         }
     }
 
 }
 
-static uint64_t draw_ui(uint64_t top_level_obj,
-                        uint64_t selected_obj) {
-    if (!top_level_obj) {
+static uint64_t draw_ui(uint64_t selected_obj) {
+    if (!selected_obj) {
         return 0;
     }
 
-    return ui_entity_item_begin(selected_obj, top_level_obj, rand());
+    uint64_t root = ce_cdb_a0->find_root(selected_obj);
+    return ui_entity_item_begin(selected_obj, root, rand());
 }
 
 static struct ct_explorer_i0 ct_explorer_i0 = {

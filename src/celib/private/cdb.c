@@ -15,7 +15,7 @@
 #include <celib/os.h>
 #include <celib/buffer.inl>
 #include <celib/hashlib.h>
-
+#include <celib/ebus.h>
 
 #define _G coredb_global
 #define LOG_WHERE "coredb"
@@ -26,17 +26,10 @@
 
 // TODO: non optimal braindump code
 // TODO: remove null element
-
-struct notify_pair {
-    ce_cdb_notify notify;
-    void *data;
-};
+;
 
 // TODO: X(
 struct object_t {
-    struct notify_pair *notify;
-    struct notify_pair *remove_notify;
-
     // prefab
     uint64_t prefab;
     uint64_t *instances;
@@ -44,7 +37,6 @@ struct object_t {
     // hiearchy
     uint64_t key;
     uint64_t parent;
-//    uint64_t *children;
 
     // writer
     uint64_t orig_data_idx;
@@ -57,7 +49,6 @@ struct object_t {
     uint64_t idx;
     struct ce_cdb_t db;
     struct ce_hash_t prop_map;
-    struct ce_hash_t removed_prop_map;
 
     uint64_t properties_count;
 
@@ -79,19 +70,14 @@ struct db_t {
     atomic_ullong to_free_objects_id_n;
     atomic_ullong free_objects_id_n;
 
-//    // Hiearchy
-//    uint32_t *first_child;
-//    uint32_t *next_sibling;
-//    uint32_t *parent;
-
     // objects
     struct object_t *object_pool;
     uint32_t *free_objects;
     uint32_t *to_free_objects;
 
-    atomic_uint_least64_t object_pool_n;
-    atomic_uint_least64_t free_objects_n;
-    atomic_uint_least64_t to_free_objects_n;
+    atomic_ullong object_pool_n;
+    atomic_ullong free_objects_n;
+    atomic_ullong to_free_objects_n;
 };
 
 static struct _G {
@@ -117,10 +103,6 @@ union type_u {
     float f;
     char *str;
     bool b;
-
-    float vec3[3];
-    float vec4[4];
-    float mat4[16];
     struct blob_t blob;
 };
 
@@ -152,8 +134,6 @@ static uint64_t _object_new_property(struct object_t *obj,
     ce_array_push(obj->keys, key, alloc);
     ce_array_push(obj->property_type, type, alloc);
     ce_array_push(obj->offset, values_size, alloc);
-
-    ce_hash_remove(&obj->removed_prop_map, key);
 
     if (size) {
         ce_array_resize(obj->values, values_size + size, alloc);
@@ -229,26 +209,10 @@ static struct object_t *_object_clone(struct db_t *db,
 
 
     ce_hash_clone(&obj->prop_map, &new_obj->prop_map, alloc);
-    ce_hash_clone(&obj->removed_prop_map, &new_obj->removed_prop_map, alloc);
 
     uint32_t n = ce_array_size(obj->instances);
     if (n) {
         ce_array_push_n(new_obj->instances, obj->instances, n, alloc);
-    }
-
-//    n = ce_array_size(obj->children);
-//    if (n) {
-//        ce_array_push_n(new_obj->children, obj->children, n, alloc);
-//    }
-
-    n = ce_array_size(obj->notify);
-    if (n) {
-        ce_array_push_n(new_obj->notify, obj->notify, n, alloc);
-    }
-
-    n = ce_array_size(obj->remove_notify);
-    if (n) {
-        ce_array_push_n(new_obj->remove_notify, obj->remove_notify, n, alloc);
     }
 
     return new_obj;
@@ -256,10 +220,6 @@ static struct object_t *_object_clone(struct db_t *db,
 
 static uint64_t _find_prop_index(const struct object_t *obj,
                                  uint64_t key) {
-    if (ce_hash_contain(&obj->removed_prop_map, key)) {
-        return 0;
-    }
-
     return ce_hash_lookup(&obj->prop_map, key, 0);
 }
 
@@ -370,33 +330,59 @@ static uint64_t create_from(struct ce_cdb_t db,
 
     ce_array_push(obj->instances, (uint64_t) obj_addr, _G.allocator);
 
-//    uint32_t n = ce_array_size(obj->notify);
-//    if (n) {
-//        ce_array_push_n(inst->notify, obj->notify, n, _G.allocator);
-//    }
-//
-//    n = ce_array_size(obj->remove_notify);
-//    if (n) {
-//        ce_array_push_n(inst->remove_notify, obj->remove_notify, n, _G.allocator);
-//    }
 
     struct object_t *wr = write_begin((uint64_t) obj_addr);
 
     for (int i = 1; i < obj->properties_count; ++i) {
+        uint64_t key = obj->keys[i];
         switch (obj->property_type[i]) {
             case CDB_TYPE_SUBOBJECT: {
                 union type_u *value_ptr = (union type_u *) (obj->values +
                                                             obj->offset[i]);
 
                 uint64_t old_subobj = value_ptr->subobj;
-
                 uint64_t new_subobj = create_from(db, old_subobj);
-
                 set_subobject(wr, obj->keys[i], new_subobj);
             }
-
                 break;
 
+            case CDB_TYPE_UINT64: {
+                uint64_t v = ce_cdb_a0->read_uint64(_obj, key, 0);
+                ce_cdb_a0->set_uint64(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_PTR: {
+                void *v = ce_cdb_a0->read_ptr(_obj, key, 0);
+                ce_cdb_a0->set_ptr(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_REF: {
+                uint64_t v = ce_cdb_a0->read_uint64(_obj, key, 0);
+                ce_cdb_a0->set_ref(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_FLOAT: {
+                float v = ce_cdb_a0->read_float(_obj, key, 0);
+                ce_cdb_a0->set_float(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_BOOL: {
+                bool v = ce_cdb_a0->read_bool(_obj, key, 0);
+                ce_cdb_a0->set_bool(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_STR: {
+                const char *v = ce_cdb_a0->read_str(_obj, key, NULL);
+                ce_cdb_a0->set_str(wr, key, v);
+            }
+                break;
+            case CDB_TYPE_BLOB: {
+                uint64_t size = 0;
+                void *v = ce_cdb_a0->read_blob(_obj, key, &size,
+                                               NULL);
+                ce_cdb_a0->set_blob(wr, key, v, size);
+            }
+                break;
             default:
                 break;
         }
@@ -440,7 +426,6 @@ static void destroy_object(uint64_t _obj) {
 
 }
 
-
 static void gc() {
     const uint32_t db_n = ce_array_size(_G.dbs);
     for (int i = 0; i < db_n; ++i) {
@@ -482,13 +467,12 @@ static void gc() {
 
         db_inst->to_free_objects_id_n = 0;
 
-        const uint32_t to_free_objects_n = db_inst->to_free_objects_n;
-        for (int j = 0; j < to_free_objects_n; ++j) {
+        atomic_ullong to_free_object_n = db_inst->to_free_objects_n;
+        for (int j = 0; j < to_free_object_n; ++j) {
             const uint32_t idx = db_inst->to_free_objects[j];
 
             struct object_t *obj = &db_inst->object_pool[idx];
 
-//            ce_array_clean(obj->children);
             ce_array_clean(obj->instances);
 
             ce_array_clean(obj->property_type);
@@ -497,26 +481,19 @@ static void gc() {
             ce_array_clean(obj->offset);
 
             ce_hash_clean(&obj->prop_map);
-            ce_hash_clean(&obj->removed_prop_map);
 
             ce_array_clean(obj->changed_prop);
             ce_array_clean(obj->removed_prop);
-            ce_array_clean(obj->notify);
-            ce_array_clean(obj->remove_notify);
 
             *obj = (struct object_t) {
-//                    .children = obj->children,
                     .instances = obj->instances,
                     .property_type = obj->property_type,
                     .keys = obj->keys,
                     .values = obj->values,
                     .offset = obj->offset,
                     .prop_map = obj->prop_map,
-                    .removed_prop_map = obj->removed_prop_map,
                     .changed_prop = obj->changed_prop,
                     .removed_prop = obj->removed_prop,
-                    .notify = obj->notify,
-                    .remove_notify = obj->remove_notify,
             };
 
 
@@ -525,6 +502,25 @@ static void gc() {
         }
 
         db_inst->to_free_objects_n = 0;
+    }
+
+    struct ebus_event_header *it = ce_ebus_a0->events(CDB_EBUS);
+    struct ebus_event_header *end_it = ce_ebus_a0->events_end(CDB_EBUS);
+
+    while (it != end_it) {
+        struct ce_cdb_prop_ev0 *ev = CE_EBUS_BODY(it);
+        ce_array_free(ev->prop, _G.allocator);
+//
+//        switch(it->type) {
+//            case CDB_PROP_REMOVED_EVENT:
+//            case CDB_PROP_CHANGED_EVENT:
+//                break;
+//
+//            default:
+//                break;
+//        }
+
+        it = CE_EBUS_NEXT(it);
     }
 }
 
@@ -708,6 +704,7 @@ static void load(struct ce_cdb_t db,
 
                 struct object_t *sub_obj = _get_object_from_objid(subobj);
                 sub_obj->parent = _obj;
+                sub_obj->key = obj->keys[i];
 
                 union type_u *value_ptr = (union type_u *) (obj->values +
                                                             obj->offset[i]);
@@ -758,9 +755,7 @@ static ce_cdb_obj_o *write_begin(uint64_t _obj) {
     struct object_t *obj = _get_object_from_objid(_obj);
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
-    struct object_t *new_obj = _object_clone(db_inst,
-                                             obj,
-                                             _G.allocator);
+    struct object_t *new_obj = _object_clone(db_inst, obj, _G.allocator);
     new_obj->orig_data_idx = obj->idx;
 
     new_obj->orig_obj = _obj;
@@ -770,26 +765,30 @@ static ce_cdb_obj_o *write_begin(uint64_t _obj) {
 
 static void _notify(struct object_t *obj,
                     uint64_t notify_obj,
-                    struct notify_pair *notify,
-                    uint64_t *changed_prop) {
-
-    const int notify_n = ce_array_size(notify);
+                    uint64_t *changed_prop,
+                    uint64_t event) {
     const int changed_prop_n = ce_array_size(changed_prop);
 
     if (!changed_prop_n) {
         return;
     }
 
-    for (int i = 0; i < notify_n; ++i) {
-        struct notify_pair *pair = &notify[i];
-        pair->notify(notify_obj, changed_prop, changed_prop_n, pair->data);
-    }
+
+    struct ce_cdb_prop_ev0 ev = {
+            .obj = notify_obj,
+            .prop=  ce_array_clone(changed_prop, sizeof(uint64_t),
+                                   _G.allocator),
+            .prop_count = changed_prop_n,
+
+    };
+
+    ce_ebus_a0->broadcast(CDB_EBUS, event,
+                          &ev, sizeof(struct ce_cdb_prop_ev0));
 
     const int instances_n = ce_array_size(obj->instances);
     for (int i = 0; i < instances_n; ++i) {
-        struct object_t *instance_obj = _get_object_from_objid(
-                obj->instances[i]);
-        _notify(instance_obj, obj->instances[i], notify, changed_prop);
+        struct object_t *inst_obj = _get_object_from_objid(obj->instances[i]);
+        _notify(inst_obj, obj->instances[i], changed_prop, event);
     }
 }
 
@@ -797,16 +796,15 @@ static void write_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
     struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
 
-    _notify(orig_obj, writer->orig_obj, writer->remove_notify,
-            writer->removed_prop);
-
     uint64_t *obj_addr = (uint64_t *) writer->orig_obj;
 
     *obj_addr = writer->idx;
 
-//    (*(struct object_t **) writer->obj) = writer;
+    _notify(orig_obj, writer->orig_obj,
+            writer->removed_prop, CDB_PROP_REMOVED_EVENT);
 
-    _notify(orig_obj, writer->orig_obj, writer->notify, writer->changed_prop);
+    _notify(orig_obj, writer->orig_obj,
+            writer->changed_prop, CDB_PROP_CHANGED_EVENT);
 
     ce_array_clean(writer->removed_prop);
     ce_array_clean(writer->changed_prop);
@@ -818,8 +816,6 @@ static bool write_try_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_obj_o(_writer);
     struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
 
-    _notify(orig_obj, writer->orig_obj, writer->remove_notify,
-            writer->removed_prop);
 
     uint64_t *obj_addr = (uint64_t *) writer->orig_obj;
 
@@ -830,8 +826,11 @@ static bool write_try_commit(ce_cdb_obj_o *_writer) {
         goto end;
     }
 
+    _notify(orig_obj, writer->orig_obj,
+            writer->removed_prop, CDB_PROP_REMOVED_EVENT);
 
-    _notify(writer, writer->orig_obj, writer->notify, writer->changed_prop);
+    _notify(writer, writer->orig_obj,
+            writer->changed_prop, CDB_PROP_CHANGED_EVENT);
 
     end:
     _destroy_object(orig_obj);
@@ -877,68 +876,6 @@ static void set_bool(ce_cdb_obj_o *_writer,
     union type_u *value_ptr = (union type_u *) (writer->values +
                                                 writer->offset[idx]);
     value_ptr->b = value;
-}
-
-static void set_vec3(ce_cdb_obj_o *_writer,
-                     uint64_t property,
-                     const float *value) {
-    const size_t size = sizeof(float) * 3;
-
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-
-    uint64_t idx = _find_prop_index(writer, property);
-    if (!idx) {
-        idx = _object_new_property(writer, property,
-                                   CDB_TYPE_VEC3, value,
-                                   size, _G.allocator);
-    }
-
-    ce_array_push(writer->changed_prop, property, _G.allocator);
-
-    union type_u *value_ptr = (union type_u *) (writer->values +
-                                                writer->offset[idx]);
-    memcpy(value_ptr->vec3, value, size);
-}
-
-static void set_vec4(ce_cdb_obj_o *_writer,
-                     uint64_t property,
-                     const float *value) {
-    const size_t size = sizeof(float) * 4;
-
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-
-    uint64_t idx = _find_prop_index(writer, property);
-    if (!idx) {
-        idx = _object_new_property(writer, property,
-                                   CDB_TYPE_VEC4, value,
-                                   size, _G.allocator);
-    }
-
-    ce_array_push(writer->changed_prop, property, _G.allocator);
-
-    union type_u *value_ptr = (union type_u *) (writer->values +
-                                                writer->offset[idx]);
-    memcpy(value_ptr->vec4, value, size);
-}
-
-static void set_mat4(ce_cdb_obj_o *_writer,
-                     uint64_t property,
-                     const float *value) {
-    const size_t size = sizeof(float) * 16;
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-
-    uint64_t idx = _find_prop_index(writer, property);
-    if (!idx) {
-        idx = _object_new_property(writer, property,
-                                   CDB_TYPE_MAT4, value,
-                                   size, _G.allocator);
-    }
-
-    ce_array_push(writer->changed_prop, property, _G.allocator);
-
-    union type_u *value_ptr = (union type_u *) (writer->values +
-                                                writer->offset[idx]);
-    memcpy(value_ptr->mat4, value, size);
 }
 
 static void set_string(ce_cdb_obj_o *_writer,
@@ -1035,7 +972,7 @@ uint64_t parent(uint64_t object) {
 }
 
 uint64_t prefab(uint64_t object) {
-    if(!object) {
+    if (!object) {
         return 0;
     }
 
@@ -1170,10 +1107,36 @@ void remove_property(ce_cdb_obj_o *_writer,
         ce_array_pop_back(writer->offset);
     }
 
-    ce_hash_add(&writer->removed_prop_map, property, 1, _G.allocator);
     ce_hash_remove(&writer->prop_map, property);
 
     ce_array_push(writer->removed_prop, property, _G.allocator);
+
+//    struct object_t *writer = _get_object_from_obj_o(_writer);
+//
+//    if (!prop_exist(writer->orig_obj, property)) {
+//        return;
+//    }
+//
+//    uint64_t idx = _find_prop_index(writer, property);
+//
+//    if (idx) {
+//        uint64_t last_idx = --writer->properties_count;
+//        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
+//                    _G.allocator);
+//
+//        writer->keys[idx] = writer->keys[last_idx];
+//        writer->property_type[idx] = writer->property_type[last_idx];
+//        writer->offset[idx] = writer->offset[last_idx];
+//
+//        ce_array_pop_back(writer->keys);
+//        ce_array_pop_back(writer->property_type);
+//        ce_array_pop_back(writer->offset);
+//    }
+//
+//    ce_hash_add(&writer->removed_prop_map, property, 1, _G.allocator);
+//    ce_hash_remove(&writer->prop_map, property);
+//
+//    ce_array_push(writer->removed_prop, property, _G.allocator);
 }
 
 void delete_property(ce_cdb_obj_o *_writer,
@@ -1209,31 +1172,6 @@ static bool prop_exist(uint64_t _object,
                        uint64_t key) {
     struct object_t *obj = _get_object_from_objid(_object);
 
-    if (ce_hash_contain(&obj->removed_prop_map, key)) {
-        return false;
-    }
-
-    uint32_t idx = _find_prop_index(obj, key);
-
-    if (idx) {
-        return true;
-    }
-
-    if (obj->prefab) {
-        return prop_exist(obj->prefab, key);
-    }
-
-    return false;
-}
-
-static bool prop_exist2(uint64_t _object,
-                        uint64_t key) {
-    struct object_t *obj = _get_object_from_objid(_object);
-
-    if (ce_hash_contain(&obj->removed_prop_map, key)) {
-        return false;
-    }
-
     uint32_t idx = _find_prop_index(obj, key);
 
     if (idx) {
@@ -1252,34 +1190,22 @@ static enum ce_cdb_type prop_type(uint64_t _object,
         return (enum ce_cdb_type) obj->property_type[idx];
     }
 
-    if (obj->prefab) {
-        return prop_type(obj->prefab, key);
-    }
-
     return CDB_TYPE_NONE;
 }
 
 static float read_float(uint64_t _obj,
                         uint64_t property,
                         float defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
-
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
         return *(float *) (obj->values + obj->offset[idx]);
-    }
-
-    if (obj->prefab) {
-        return read_float(obj->prefab, property, defaultt);
     }
 
     return defaultt;
@@ -1288,15 +1214,12 @@ static float read_float(uint64_t _obj,
 static bool read_bool(uint64_t _obj,
                       uint64_t property,
                       bool defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1304,119 +1227,21 @@ static bool read_bool(uint64_t _obj,
         return *(bool *) (obj->values + obj->offset[idx]);
     }
 
-    if (obj->prefab) {
-        return read_bool(obj->prefab, property, defaultt);
-    }
-
     return defaultt;
-}
-
-static void read_vec3(uint64_t _obj,
-                      uint64_t property,
-                      float *value) {
-
-    if(!_obj) {
-        return;
-    }
-
-    struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return;
-    }
-
-    uint64_t idx = _find_prop_index(obj, property);
-
-
-    if (idx) {
-        const float *f = (const float *) (obj->values + obj->offset[idx]);
-        memcpy(value, f, sizeof(float) * 3);
-
-        return;
-    }
-
-    if (obj->prefab) {
-        read_vec3(obj->prefab, property, value);
-    }
-}
-
-static void read_vec4(uint64_t _obj,
-                      uint64_t property,
-                      float *value) {
-    if(!_obj) {
-        return;
-    }
-
-    struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return;
-    }
-
-    uint64_t idx = _find_prop_index(obj, property);
-
-
-    if (idx) {
-        const float *f = (const float *) (obj->values + obj->offset[idx]);
-        memcpy(value, f, sizeof(float) * 4);
-
-        return;
-    }
-
-    if (obj->prefab) {
-        read_vec4(obj->prefab, property, value);
-    }
-}
-
-static void read_mat4(uint64_t _obj,
-                      uint64_t property,
-                      float *value) {
-    if(!_obj) {
-        return;
-    }
-
-    struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return;
-    }
-
-    uint64_t idx = _find_prop_index(obj, property);
-
-
-    if (idx) {
-        const float *f = (const float *) (obj->values + obj->offset[idx]);
-        memcpy(value, f, sizeof(float) * 16);
-
-        return;
-    }
-
-    if (obj->prefab) {
-        read_mat4(obj->prefab, property, value);
-    }
-
 }
 
 static const char *read_string(uint64_t _obj,
                                uint64_t property,
                                const char *defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
-
     uint64_t idx = _find_prop_index(obj, property);
     if (idx) {
         return *(const char **) (obj->values + obj->offset[idx]);
-    }
-
-    if (obj->prefab) {
-        return read_string(obj->prefab, property, defaultt);
     }
 
     return defaultt;
@@ -1426,24 +1251,17 @@ static const char *read_string(uint64_t _obj,
 static uint64_t read_uint64(uint64_t _obj,
                             uint64_t property,
                             uint64_t defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
 
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
         return *(uint64_t *) (obj->values + obj->offset[idx]);
-    }
-
-    if (obj->prefab) {
-        return read_uint64(obj->prefab, property, defaultt);
     }
 
     return defaultt;
@@ -1452,15 +1270,11 @@ static uint64_t read_uint64(uint64_t _obj,
 static void *read_ptr(uint64_t _obj,
                       uint64_t property,
                       void *defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1468,9 +1282,6 @@ static void *read_ptr(uint64_t _obj,
         return *(void **) (obj->values + obj->offset[idx]);
     }
 
-    if (obj->prefab) {
-        return read_ptr(obj->prefab, property, defaultt);
-    }
 
     return defaultt;
 }
@@ -1478,24 +1289,16 @@ static void *read_ptr(uint64_t _obj,
 static uint64_t read_ref(uint64_t _obj,
                          uint64_t property,
                          uint64_t defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
 
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
-
     uint64_t idx = _find_prop_index(obj, property);
 
     if (idx) {
         return *(uint64_t *) (obj->values + obj->offset[idx]);
-    }
-
-    if (obj->prefab) {
-        return read_ref(obj->prefab, property, defaultt);
     }
 
     return defaultt;
@@ -1504,15 +1307,11 @@ static uint64_t read_ref(uint64_t _obj,
 static uint64_t read_subobject(uint64_t _obj,
                                uint64_t property,
                                uint64_t defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1520,12 +1319,6 @@ static uint64_t read_subobject(uint64_t _obj,
 
     if (idx) {
         subobj = *(uint64_t *) (obj->values + obj->offset[idx]);
-    } else if (obj->prefab) {
-        subobj = read_subobject(obj->prefab, property, defaultt);
-    }
-
-    if (subobj) {
-//        CE_ASSERT(LOG_WHERE, parent(subobj) != 0);
         return subobj;
     }
 
@@ -1554,15 +1347,11 @@ void *read_blob(uint64_t _obj,
                 uint64_t property,
                 uint64_t *size,
                 void *defaultt) {
-    if(!_obj) {
+    if (!_obj) {
         return defaultt;
     }
 
     struct object_t *obj = _get_object_from_objid(_obj);
-
-    if (ce_hash_contain(&obj->removed_prop_map, property)) {
-        return defaultt;
-    }
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1578,45 +1367,19 @@ void *read_blob(uint64_t _obj,
         return blob->data;
     }
 
-    if (obj->prefab) {
-        return read_blob(obj->prefab, property, size, defaultt);
-    }
-
     return defaultt;
 }
 
 static uint64_t prop_count(uint64_t _obj);
 
-static void prop_keys(uint64_t _obj,
-                      uint64_t *keys) {
+static const uint64_t *prop_keys(uint64_t _obj) {
     struct object_t *obj = _get_object_from_objid(_obj);
 
     if (!obj) {
-        return;
+        return NULL;
     }
 
-    uint32_t prop_n = (obj->properties_count - 1);
-    memcpy(keys, obj->keys + 1,
-           sizeof(uint64_t) * prop_n);
-
-    if (obj->prefab) {
-        uint32_t prefab_prop_count = prop_count(obj->prefab);
-
-        uint64_t prefab_keys[prefab_prop_count];
-        prop_keys(obj->prefab, prefab_keys);
-
-        for (int i = 0; i < prefab_prop_count; ++i) {
-            if (ce_hash_contain(&obj->prop_map, prefab_keys[i])) {
-                continue;
-            }
-
-            if (ce_hash_contain(&obj->removed_prop_map, prefab_keys[i])) {
-                continue;
-            }
-
-            keys[prop_n++] = prefab_keys[i];
-        }
-    }
+    return obj->keys + 1;
 }
 
 static uint64_t prop_count(uint64_t _obj) {
@@ -1628,54 +1391,7 @@ static uint64_t prop_count(uint64_t _obj) {
 
     uint64_t count = obj->properties_count - 1;
 
-    if (obj->prefab) {
-        uint32_t prefab_prop_count = prop_count(obj->prefab);
-
-        uint64_t keys[prefab_prop_count];
-        prop_keys(obj->prefab, keys);
-
-        for (int i = 0; i < prefab_prop_count; ++i) {
-            if (ce_hash_contain(&obj->prop_map, keys[i])) {
-                continue;
-            }
-
-            if (ce_hash_contain(&obj->removed_prop_map, keys[i])) {
-                continue;
-            }
-
-            count += 1;
-        }
-
-    }
-
     return count;
-}
-
-void register_notify(uint64_t _obj,
-                     ce_cdb_notify notify,
-                     void *data) {
-    struct object_t *obj = _get_object_from_objid(_obj);
-
-    struct notify_pair pair = {
-            .notify = notify,
-            .data = data
-    };
-
-    ce_array_push(obj->notify, pair, _G.allocator);
-}
-
-
-static void register_remove_notify(uint64_t _obj,
-                                   ce_cdb_notify notify,
-                                   void *data) {
-    struct object_t *obj = _get_object_from_objid(_obj);
-
-    struct notify_pair pair = {
-            .notify = notify,
-            .data = data
-    };
-
-    ce_array_push(obj->remove_notify, pair, _G.allocator);
 }
 
 static struct ce_cdb_t global_db() {
@@ -1690,6 +1406,10 @@ static uint64_t type(uint64_t _obj) {
 
 void set_type(uint64_t _obj,
               uint64_t type) {
+    if (!_obj) {
+        return;
+    }
+
     struct object_t *obj = _get_object_from_objid(_obj);
     obj->type = type;
 }
@@ -1706,18 +1426,15 @@ void move(uint64_t _from_obj,
     uint64_t *obj_addr = (uint64_t *) _to;
     *obj_addr = from->idx;
 
-//    ce_cdb_a0->destroy_object(_from_obj);
+    ce_cdb_a0->destroy_object(_from_obj);
 }
 
 
 static void dump_str(char **buffer,
                      uint64_t from,
                      uint32_t level) {
-//    const char *prefab = ce_cdb_a0->read_str(from, PREFAB_NAME_PROP, NULL);
-
     const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-    uint64_t keys[prop_count];
-    ce_cdb_a0->prop_keys(from, keys);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(from);
 
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
@@ -1729,8 +1446,6 @@ static void dump_str(char **buffer,
         for (int j = 0; j < level; ++j) {
             ce_buffer_printf(buffer, _G.allocator, "  ");
         }
-
-        bool from_parent = !ce_cdb_a0->prop_exist_norecursive(from, key);
 
         ce_buffer_printf(buffer, _G.allocator, "%s:", k);
 
@@ -1751,20 +1466,6 @@ static void dump_str(char **buffer,
             case CDB_TYPE_STR: {
                 const char *s = ce_cdb_a0->read_str(from, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, " %s", s);
-            }
-                break;
-            case CDB_TYPE_VEC3: {
-                float v[3] = {};
-                ce_cdb_a0->read_vec3(from, key, v);
-                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f]", v[0],
-                                 v[1], v[2]);
-            }
-                break;
-            case CDB_TYPE_VEC4: {
-                float v[4] = {};
-                ce_cdb_a0->read_vec3(from, key, v);
-                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f, %f]",
-                                 v[0], v[1], v[2], v[3]);
             }
                 break;
 
@@ -1791,28 +1492,30 @@ static void dump_str(char **buffer,
 
             case CDB_TYPE_PTR:
             case CDB_TYPE_REF:
-            case CDB_TYPE_MAT4:
             case CDB_TYPE_BLOB:
             default:
                 break;
         }
 
-        ce_buffer_printf(buffer, _G.allocator, " %s\n",
-                         from_parent ? " # from_parents" : "");
+        ce_buffer_printf(buffer, _G.allocator, " %s\n", "");
     }
+
 }
 
+static uint64_t find_root(uint64_t obj) {
+    while (parent(obj)) {
+        obj = parent(obj);
+    }
+
+    return obj;
+}
 
 static struct ce_cdb_a0 cdb_api = {
-        .register_notify = register_notify,
-        .register_remove_notify = register_remove_notify,
 //        .create_db = create_db,
-
-        . db  = global_db,
-
-        .type = type,
+        .db  = global_db,
+        .obj_type = type,
         .set_type = set_type,
-        .key= key,
+        .obj_key= key,
         .move = move,
         .create_object = create_object,
         .create_from = create_from,
@@ -1825,26 +1528,25 @@ static struct ce_cdb_a0 cdb_api = {
         .dump = dump,
         .load = load,
 
+        .find_root = find_root,
         .prop_exist = prop_exist,
-        .prop_exist_norecursive = prop_exist2,
         .prop_type = prop_type,
         .prop_keys = prop_keys,
         .prop_count = prop_count,
+
         .parent = parent,
         .prefab = prefab,
 
         .read_float = read_float,
         .read_bool = read_bool,
-        .read_vec3 = read_vec3,
-        .read_vec4 = read_vec4,
-        .read_mat4 = read_mat4,
         .read_str = read_string,
         .read_uint64 = read_uint64,
         .read_ptr = read_ptr,
         .read_ref = read_ref,
+        .read_blob = read_blob,
         .read_subobject = read_subobject,
         .read_subobject_deep = read_subobject_deep,
-        .read_blob = read_blob,
+
 
         .write_begin = write_begin,
         .write_commit = write_commit,
@@ -1852,9 +1554,6 @@ static struct ce_cdb_a0 cdb_api = {
 
         .set_float = set_float,
         .set_bool = set_bool,
-        .set_vec3 = set_vec3,
-        .set_vec4 = set_vec4,
-        .set_mat4 = set_mat4,
         .set_str = set_string,
         .set_uint64 = set_uint64,
         .set_ptr = set_ptr,
@@ -1863,6 +1562,7 @@ static struct ce_cdb_a0 cdb_api = {
         .set_subobjectw = set_subobjectw,
         .set_prefab = set_prefab,
         .set_blob = set_blob,
+
         .remove_property = remove_property,
         .delete_property = delete_property,
 };
@@ -1877,6 +1577,8 @@ static void _init(struct ce_api_a0 *api) {
     _G.global_db = create_db();
 
     api->register_api("ce_cdb_a0", &cdb_api);
+
+    ce_ebus_a0->create_ebus(CDB_EBUS);
 }
 
 static void _shutdown() {

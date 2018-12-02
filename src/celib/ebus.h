@@ -26,7 +26,7 @@ typedef void (ce_ebus_handler)(uint64_t type,
 struct ce_ebus_a0 {
     void (*create_ebus)(uint64_t id);
 
-    void (*begin_frame)();
+    void (*gc)();
 
     void (*send)(uint64_t bus_name,
                  uint64_t addr,

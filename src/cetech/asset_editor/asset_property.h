@@ -14,7 +14,7 @@ struct ct_resource_id;
 
 struct ct_asset_property_i0 {
     const char* (*display_name)();
-    void (*draw)(struct ct_resource_id rid, uint64_t obj);
+    void (*draw)(uint64_t obj);
 };
 
 struct ct_asset_property_a0 {

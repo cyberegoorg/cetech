@@ -8,27 +8,27 @@
 #include "celib/memory.h"
 #include "celib/api_system.h"
 #include "celib/log.h"
-#include "cetech/machine/machine.h"
 #include <celib/os.h>
-
-#include "cetech/resource/resource.h"
 #include "celib/buffer.inl"
-
 #include <celib/module.h>
-#include <cetech/texture/texture.h>
-#include <cetech/renderer/renderer.h>
+
 #include <celib/config.h>
 #include <celib/ydb.h>
-#include <cetech/editor/asset_property.h>
-#include <cetech/debugui/debugui.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
-#include <cetech/kernel/kernel.h>
-#include <cetech/sourcedb/sourcedb_ui.h>
-#include <cetech/resource/builddb.h>
-#include <cetech/editor/asset_preview.h>
-#include <cetech/sourcedb/sourcedb.h>
 #include <celib/ebus.h>
+
+#include "cetech/machine/machine.h"
+#include "cetech/resource/resource.h"
+#include <cetech/texture/texture.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/asset_editor/asset_property.h>
+#include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/resource/builddb.h>
+#include <cetech/resource/sourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 
 //==============================================================================
@@ -166,13 +166,11 @@ static uint64_t _compile(uint64_t obj) {
     tmp_file->read(tmp_file, tmp_data, sizeof(char), size);
     tmp_file->close(tmp_file);
 
-    uint64_t texture_resource = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                         TEXTURE_TYPE);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(texture_resource);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
     ce_cdb_a0->set_blob(w, TEXTURE_DATA, tmp_data, size);
     ce_cdb_a0->write_commit(w);
 
-    return texture_resource;
+    return obj;
 }
 
 
@@ -181,10 +179,8 @@ uint64_t texture_compiler(const char *filename,
                           struct ct_resource_id rid,
                           const char *fullname) {
     const char *input = ce_cdb_a0->read_str(k, TEXTURE_INPUT, "");
-
     uint64_t output = _compile(k);
     ct_builddb_a0->add_dependency(filename, input);
-
     return output;
 }
 
@@ -192,10 +188,10 @@ static uint64_t cdb_type() {
     return TEXTURE_TYPE;
 }
 
-static void draw_property(struct ct_resource_id rid, uint64_t obj) {
-    ct_sourcedb_ui_a0->ui_str(rid, obj, TEXTURE_INPUT, "Input", 0);
-    ct_sourcedb_ui_a0->ui_bool(rid, obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_sourcedb_ui_a0->ui_bool(rid, obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+static void draw_property(uint64_t obj) {
+    ct_sourcedb_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
+    ct_sourcedb_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
+    ct_sourcedb_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
     ct_debugui_a0->Text("Texture preview");
     ct_debugui_a0->NextColumn();
@@ -221,11 +217,9 @@ static struct ct_asset_property_i0 ct_asset_property_i0 = {
         .display_name = display_name,
 };
 
-static void tooltip(struct ct_resource_id resourceid) {
-    uint64_t tobj = ct_resource_a0->get(resourceid);
-
+static void tooltip(uint64_t resource) {
     struct ct_render_texture_handle texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(tobj,
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(resource,
                                                      TEXTURE_HANDLER_PROP, 0)
     };
 

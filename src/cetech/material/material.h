@@ -62,7 +62,19 @@ struct ct_cdb_obj_t;
 #define MATERIAL_VAR_VALUE_PROP \
     CE_ID64_0("value", 0x920b430f38928dc9ULL)
 
-#define MATERIAL_ASSET_NAME \
+#define MATERIAL_VAR_VALUE_PROP_X \
+    CE_ID64_0("value.x", 0xfa204d422e6d6299ULL)
+
+#define MATERIAL_VAR_VALUE_PROP_Y \
+    CE_ID64_0("value.y", 0xe5776873c594fbf5ULL)
+
+#define MATERIAL_VAR_VALUE_PROP_Z \
+    CE_ID64_0("value.z", 0x150e7a91a060d411ULL)
+
+#define MATERIAL_VAR_VALUE_PROP_W \
+    CE_ID64_0("value.w", 0x7e696a767c2af865ULL)
+
+            #define MATERIAL_ASSET_NAME \
     CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
 #define MATERIAL_LAYERS \

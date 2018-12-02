@@ -14,7 +14,6 @@
 #define CONFIG_COMPILE \
      CE_ID64_0("compile", 0x3c797c340e1e5467ULL)
 
-
 #define CONFIG_BOOT_PKG \
      CE_ID64_0("core.boot_pkg", 0xd065c28a0c45037eULL)
 
@@ -44,6 +43,9 @@
 
 #define KERNEL_UPDATE_EVENT \
     CE_ID64_0("update", 0xb09bdf90e8a56b76ULL)
+
+#define KERNEL_POST_UPDATE_EVENT \
+    CE_ID64_0("gc", 0xf7e41039a96af360ULL)
 
 #define KERNEL_QUIT_EVENT \
     CE_ID64_0("quit", 0x666ffde8529c8bc9ULL)

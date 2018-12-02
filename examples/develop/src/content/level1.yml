@@ -2,7 +2,9 @@ content/level1.entity:
   name: Level 1
   components:
     transform:
-      position: [0, 0, 0]
+      position.x: 0.000000
+      position.y: 0.000000
+      position.z: 0.000000
 
   children:
     5564343313252:
@@ -10,12 +12,16 @@ content/level1.entity:
       PREFAB: content/box1.entity
       components:
         transform:
-          position: [0, 0, 25]
+          position.x: 0.000000
+          position.y: 0.000000
+          position.z: 25.000000
       children:
         lknvln879879NJKK:
           components:
             transform:
-              position: [0, 0, 35]
+              position.x: 0.000000
+              position.y: 0.000000
+              position.z: 35.000000
 
     55643433135454252:
       name: box2

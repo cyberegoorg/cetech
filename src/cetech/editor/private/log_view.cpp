@@ -7,7 +7,7 @@
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/array.inl>
 #include <celib/ebus.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
 #include "celib/memory.h"

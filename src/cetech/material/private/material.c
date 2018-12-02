@@ -22,14 +22,15 @@
 
 #include <celib/os.h>
 #include <celib/macros.h>
-#include <cetech/editor/asset_property.h>
+#include <cetech/asset_editor/asset_property.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh/mesh_renderer.h>
-#include <cetech/editor/asset_preview.h>
-#include <cetech/sourcedb/sourcedb_ui.h>
+#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/asset_editor/sourcedb_ui.h>
 #include <celib/log.h>
 #include <cetech/resource/builddb.h>
+#include <bgfx/defines.h>
 
 #include "material.h"
 
@@ -63,8 +64,18 @@ static ct_render_uniform_type_t _type_to_bgfx[] = {
         [MAT_VAR_TEXTURE] = CT_RENDER_UNIFORM_TYPE_INT1,
         [MAT_VAR_TEXTURE_HANDLER] = CT_RENDER_UNIFORM_TYPE_INT1,
         [MAT_VAR_VEC4] = CT_RENDER_UNIFORM_TYPE_VEC4,
-        [MAT_VAR_MAT44] = CT_RENDER_UNIFORM_TYPE_MAT4,
 };
+
+static uint64_t _str_to_type(const char *type) {
+    if (!strcmp(type, "texture")) {
+        return MAT_VAR_TEXTURE;
+    } else if (!strcmp(type, "texture_handler")) {
+        return MAT_VAR_TEXTURE_HANDLER;
+    } else if ((!strcmp(type, "color")) || (!strcmp(type, "vec4"))) {
+        return (!strcmp(type, "color")) ? MAT_VAR_COLOR4 : MAT_VAR_VEC4;
+    }
+    return MAT_VAR_NONE;
+}
 
 static void online(uint64_t name,
                    uint64_t obj) {
@@ -72,8 +83,7 @@ static void online(uint64_t name,
     uint64_t layers_obj = ce_cdb_a0->read_subobject(obj, MATERIAL_LAYERS, 0);
 
     const uint64_t layers_n = ce_cdb_a0->prop_count(layers_obj);
-    uint64_t layers_keys[layers_n];
-    ce_cdb_a0->prop_keys(layers_obj, layers_keys);
+    const uint64_t *layers_keys = ce_cdb_a0->prop_keys(layers_obj);
 
     for (int i = 0; i < layers_n; ++i) {
         uint64_t layer_obj = ce_cdb_a0->read_subobject(layers_obj,
@@ -83,8 +93,7 @@ static void online(uint64_t name,
                                                            MATERIAL_VARIABLES_PROP,
                                                            0);
         const uint64_t variables_n = ce_cdb_a0->prop_count(variables_obj);
-        uint64_t variables_keys[variables_n];
-        ce_cdb_a0->prop_keys(variables_obj, variables_keys);
+        const uint64_t *variables_keys = ce_cdb_a0->prop_keys(variables_obj);
 
         for (int k = 0; k < variables_n; ++k) {
             uint64_t var_obj = ce_cdb_a0->read_subobject(variables_obj,
@@ -93,12 +102,16 @@ static void online(uint64_t name,
             const char *uniform_name = ce_cdb_a0->read_str(var_obj,
                                                            MATERIAL_VAR_NAME_PROP,
                                                            0);
-            uint64_t type = ce_cdb_a0->read_uint64(var_obj,
-                                                   MATERIAL_VAR_TYPE_PROP, 0);
+            uint64_t type = _str_to_type(
+                    ce_cdb_a0->read_str(var_obj, MATERIAL_VAR_TYPE_PROP, ""));
+
+            if (!type) {
+                continue;
+            }
 
             const ct_render_uniform_handle_t handler = \
-                ct_renderer_a0->create_uniform(uniform_name,
-                                               _type_to_bgfx[type], 1);
+            ct_renderer_a0->create_uniform(uniform_name,
+                                           _type_to_bgfx[type], 1);
 
             ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(var_obj);
             ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP,
@@ -117,29 +130,35 @@ static uint64_t cdb_type() {
     return MATERIAL_TYPE;
 }
 
-static void ui_vec4(struct ct_resource_id rid,
-                    uint64_t var) {
+static void ui_vec4(uint64_t var) {
     const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-    ct_sourcedb_ui_a0->ui_vec4(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
+    ct_sourcedb_ui_a0->ui_vec4(var,
+                               (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
+                                             MATERIAL_VAR_VALUE_PROP_Y,
+                                             MATERIAL_VAR_VALUE_PROP_Z,
+                                             MATERIAL_VAR_VALUE_PROP_W},
+                               str, (struct ui_vec4_p0) {});
 }
 
-static void ui_color4(struct ct_resource_id rid,
-                      uint64_t var) {
+static void ui_color4(uint64_t var) {
     const char *str = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP, "");
-    ct_sourcedb_ui_a0->ui_color(rid, var, MATERIAL_VAR_VALUE_PROP, str, 0, 0);
+    ct_sourcedb_ui_a0->ui_vec4(var,
+                               (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
+                                             MATERIAL_VAR_VALUE_PROP_Y,
+                                             MATERIAL_VAR_VALUE_PROP_Z,
+                                             MATERIAL_VAR_VALUE_PROP_W}, str,
+                               (struct ui_vec4_p0) {.color=true});
 }
 
-static void ui_texture(struct ct_resource_id rid,
-                       uint64_t variable) {
+static void ui_texture(uint64_t variable) {
     const char *name = ce_cdb_a0->read_str(variable, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_sourcedb_ui_a0->ui_resource(rid, variable, MATERIAL_VAR_VALUE_PROP, name,
-                                 TEXTURE_TYPE, variable);
+    ct_sourcedb_ui_a0->ui_resource(variable, MATERIAL_VAR_VALUE_PROP, name,
+                                   TEXTURE_TYPE, variable);
 }
 
-static void draw_property(struct ct_resource_id rid,
-                          uint64_t material) {
+static void draw_property(uint64_t material) {
     uint64_t layers_obj = ce_cdb_a0->read_ref(material, MATERIAL_LAYERS, 0);
 
     if (!layers_obj) {
@@ -147,8 +166,7 @@ static void draw_property(struct ct_resource_id rid,
     }
 
     uint64_t layer_count = ce_cdb_a0->prop_count(layers_obj);
-    uint64_t layer_keys[layer_count];
-    ce_cdb_a0->prop_keys(layers_obj, layer_keys);
+    const uint64_t *layer_keys = ce_cdb_a0->prop_keys(layers_obj);
 
     for (int i = 0; i < layer_count; ++i) {
         uint64_t layer;
@@ -163,19 +181,18 @@ static void draw_property(struct ct_resource_id rid,
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_sourcedb_ui_a0->ui_str(rid, layer, MATERIAL_LAYER_NAME,
-                                    "Layer name", i);
+            ct_sourcedb_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME,
+                                      "Layer name", i);
 
-            ct_sourcedb_ui_a0->ui_resource(rid, layer, MATERIAL_SHADER_PROP,
-                                         "Shader",
-                                         SHADER_TYPE, i);
+            ct_sourcedb_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP,
+                                           "Shader",
+                                           SHADER_TYPE, i);
 
             uint64_t variables;
             variables = ce_cdb_a0->read_ref(layer, MATERIAL_VARIABLES_PROP, 0);
 
             uint64_t count = ce_cdb_a0->prop_count(variables);
-            uint64_t keys[count];
-            ce_cdb_a0->prop_keys(variables, keys);
+            const uint64_t *keys = ce_cdb_a0->prop_keys(variables);
 
             for (int j = 0; j < count; ++j) {
                 uint64_t var;
@@ -191,11 +208,11 @@ static void draw_property(struct ct_resource_id rid,
                 if (!type) continue;
 
                 if (!strcmp(type, "texture")) {
-                    ui_texture(rid, var);
+                    ui_texture(var);
                 } else if (!strcmp(type, "vec4")) {
-                    ui_vec4(rid, var);
+                    ui_vec4(var);
                 } else if (!strcmp(type, "color")) {
-                    ui_color4(rid, var);
+                    ui_color4(var);
                 } else if (!strcmp(type, "mat4")) {
                 }
             }
@@ -220,24 +237,24 @@ static struct ct_asset_property_i0 ct_asset_property_i0 = {
         .draw = draw_property,
 };
 
-static struct ct_entity load(struct ct_resource_id resourceid,
+static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
 
-    struct ct_entity ent = ct_ecs_a0->entity->spawn(world,
-                                                    ce_id_a0->id64(
-                                                            "core/cube"));
+    struct ct_entity ent = ct_ecs_a0->spawn(world,
+                                            ce_id_a0->id64(
+                                                    "core/cube"));
 
     struct ct_mesh *mesh;
-    mesh = ct_ecs_a0->component->get_one(world, MESH_RENDERER_COMPONENT, ent);
-    mesh->material = ct_material_a0->create(resourceid.name);
+    mesh = ct_ecs_a0->get_one(world, MESH_RENDERER_COMPONENT, ent);
+    mesh->material = resource;
 
     return ent;
 }
 
-static void unload(struct ct_resource_id resourceid,
+static void unload(uint64_t resource,
                    struct ct_world world,
                    struct ct_entity entity) {
-    ct_ecs_a0->entity->destroy(world, &entity, 1);
+    ct_ecs_a0->destroy(world, &entity, 1);
 }
 
 static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
@@ -284,6 +301,27 @@ static uint64_t create(uint64_t name) {
     return object;
 }
 
+static uint64_t _find_slot_by_name(uint64_t variables,
+                                   const char *name) {
+    uint64_t k_n = ce_cdb_a0->prop_count(variables);
+    const uint64_t *k = ce_cdb_a0->prop_keys(variables);
+    for (int i = 0; i < k_n; ++i) {
+        uint64_t key = k[i];
+
+        uint64_t var = ce_cdb_a0->read_subobject(variables, key, 0);
+
+        const char *var_name = ce_cdb_a0->read_str(var, MATERIAL_VAR_NAME_PROP,
+                                                   "");
+
+        if (!strcmp(name, var_name)) {
+            return var;
+        }
+
+    }
+
+    return 0;
+}
+
 static void set_texture_handler(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
@@ -293,8 +331,8 @@ static void set_texture_handler(uint64_t material,
     uint64_t variables = ce_cdb_a0->read_ref(layer_obj,
                                              MATERIAL_VARIABLES_PROP,
                                              0);
-    uint64_t var = ce_cdb_a0->read_ref(variables,
-                                       ce_id_a0->id64(slot), 0);
+
+    uint64_t var = _find_slot_by_name(variables, slot);
     if (!var) {
         uint64_t name = ce_cdb_a0->read_uint64(material, RESOURCE_NAME_PROP, 0);
 
@@ -309,10 +347,60 @@ static void set_texture_handler(uint64_t material,
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(var);
     ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
-    ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_TYPE_PROP,
-                          MAT_VAR_TEXTURE_HANDLER);
+    ce_cdb_a0->set_str(writer, MATERIAL_VAR_TYPE_PROP, "texture_handler");
     ce_cdb_a0->write_commit(writer);
 }
+
+static struct {
+    uint64_t name;
+    uint64_t e;
+} _tbl[] = {
+        {.name = 0, .e = 0},
+        {.name = RENDER_STATE_RGB_WRITE, .e = BGFX_STATE_WRITE_RGB},
+        {.name = RENDER_STATE_ALPHA_WRITE, .e = BGFX_STATE_WRITE_A},
+        {.name = RENDER_STATE_DEPTH_WRITE, .e = BGFX_STATE_WRITE_Z},
+        {.name = RENDER_STATE_DEPTH_TEST_LESS, .e = BGFX_STATE_DEPTH_TEST_LESS},
+        {.name = RENDER_STATE_CULL_CCW, .e = BGFX_STATE_CULL_CCW},
+        {.name = RENDER_STATE_CULL_CW, .e = BGFX_STATE_CULL_CW},
+        {.name = RENDER_STATE_MSAA, .e = BGFX_STATE_MSAA},
+};
+
+uint64_t render_state_to_enum(uint64_t name) {
+
+    for (uint32_t i = 1; i < CE_ARRAY_LEN(_tbl); ++i) {
+        if (_tbl[i].name != name) {
+            continue;
+        }
+
+        return _tbl[i].e;
+    }
+
+    return 0;
+}
+
+
+uint64_t _get_render_state(uint64_t layer) {
+    uint64_t render_state = ce_cdb_a0->read_subobject(layer,
+                                                      ce_id_a0->id64(
+                                                              "render_state"),
+                                                      0);
+
+    if (render_state) {
+        uint64_t curent_render_state = 0;
+
+        const uint64_t render_state_count = ce_cdb_a0->prop_count(render_state);
+        const uint64_t *render_state_keys = ce_cdb_a0->prop_keys(render_state);
+
+        for (uint32_t i = 0; i < render_state_count; ++i) {
+            curent_render_state |= render_state_to_enum(render_state_keys[i]);
+        }
+
+        return curent_render_state;
+    }
+
+    return 0;
+}
+
 
 static void submit(uint64_t material,
                    uint64_t _layer,
@@ -333,14 +421,15 @@ static void submit(uint64_t material,
                                              0);
 
     uint64_t key_count = ce_cdb_a0->prop_count(variables);
-    uint64_t keys[key_count];
-    ce_cdb_a0->prop_keys(variables, keys);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(variables);
 
     uint8_t texture_stage = 0;
 
     for (int j = 0; j < key_count; ++j) {
         uint64_t var = ce_cdb_a0->read_ref(variables, keys[j], 0);
-        uint64_t type = ce_cdb_a0->read_uint64(var, MATERIAL_VAR_TYPE_PROP, 0);
+
+        uint64_t type = _str_to_type(
+                ce_cdb_a0->read_str(var, MATERIAL_VAR_TYPE_PROP, ""));
 
         ct_render_uniform_handle_t handle = {
                 .idx = (uint16_t) ce_cdb_a0->read_uint64(var,
@@ -353,18 +442,19 @@ static void submit(uint64_t material,
                 break;
 
             case MAT_VAR_INT: {
-                uint32_t v = ce_cdb_a0->read_uint64(var,
+                uint64_t v = ce_cdb_a0->read_uint64(var,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
                 ct_renderer_a0->set_uniform(handle, &v, 1);
             }
                 break;
 
             case MAT_VAR_TEXTURE: {
-                uint64_t t = ce_cdb_a0->read_uint64(var,
-                                                    MATERIAL_VAR_VALUE_PROP, 0);
-                ct_render_texture_handle_t texture = ct_texture_a0->get(t);
+                uint64_t tn = ce_id_a0->id64(ce_cdb_a0->read_str(var,
+                                                                 MATERIAL_VAR_VALUE_PROP,
+                                                                 0));
+
                 ct_renderer_a0->set_texture(texture_stage++, handle,
-                                            texture, 0);
+                                            ct_texture_a0->get(tn), 0);
             }
                 break;
 
@@ -379,22 +469,31 @@ static void submit(uint64_t material,
 
             case MAT_VAR_COLOR4:
             case MAT_VAR_VEC4: {
-                float v[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-                ce_cdb_a0->read_vec4(var, MATERIAL_VAR_VALUE_PROP, v);
+                float v[4] = {
+                        ce_cdb_a0->read_float(var,
+                                              MATERIAL_VAR_VALUE_PROP_X, 1.0f),
+                        ce_cdb_a0->read_float(var,
+                                              MATERIAL_VAR_VALUE_PROP_Y, 1.0f),
+                        ce_cdb_a0->read_float(var,
+                                              MATERIAL_VAR_VALUE_PROP_Z, 1.0f),
+                        ce_cdb_a0->read_float(var,
+                                              MATERIAL_VAR_VALUE_PROP_W, 1.0f)
+                };
+
                 ct_renderer_a0->set_uniform(handle, &v, 1);
             }
                 break;
 
-            case MAT_VAR_MAT44:
-                break;
         }
     }
 
+    const char *shader = ce_cdb_a0->read_str(layer,
+                                             MATERIAL_SHADER_PROP,
+                                             0);
+
     uint64_t shader_obj = ct_resource_a0->get(
             (struct ct_resource_id) {
-                    .name = ce_cdb_a0->read_uint64(layer,
-                                                   MATERIAL_SHADER_PROP,
-                                                   0),
+                    .name = ce_id_a0->id64(shader),
                     .type = SHADER_TYPE,
             });
 
@@ -402,12 +501,12 @@ static void submit(uint64_t material,
         return;
     }
 
-    ct_render_program_handle_t shader = ct_shader_a0->get(shader_obj);
+    ct_render_program_handle_t shaderp = ct_shader_a0->get(shader_obj);
 
-    uint64_t state = ce_cdb_a0->read_uint64(layer, MATERIAL_STATE_PROP, 0);
+    uint64_t state = _get_render_state(layer);
 
     ct_renderer_a0->set_state(state, 0);
-    ct_renderer_a0->submit(viewid, shader, 0, false);
+    ct_renderer_a0->submit(viewid, shaderp, 0, false);
 }
 
 static struct ct_material_a0 material_api = {

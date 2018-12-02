@@ -71,10 +71,8 @@ void package_load_task(void *data) {
     uint64_t type_obj = (uint64_t) data;
 
     const uint64_t name_n = ce_cdb_a0->prop_count(type_obj);
-    uint64_t names[name_n];
-    ce_cdb_a0->prop_keys(type_obj, names);
-
-    ct_resource_a0->load_now(ce_cdb_a0->type(type_obj), names, name_n);
+    const uint64_t* names = ce_cdb_a0->prop_keys(type_obj);
+    ct_resource_a0->load_now(ce_cdb_a0->obj_type(type_obj), names, name_n);
 }
 
 void package_task(void *data) {
@@ -90,8 +88,7 @@ void package_task(void *data) {
 
     struct ce_task_item *load_tasks = NULL;
     const uint64_t type_n = ce_cdb_a0->prop_count(types_obj);
-    uint64_t types[type_n];
-    ce_cdb_a0->prop_keys(types_obj, types);
+    const uint64_t* types = ce_cdb_a0->prop_keys(types_obj);
 
     for (uint32_t j = 0; j < type_n; ++j) {
         uint64_t type_obj = ce_cdb_a0->read_subobject(types_obj, types[j], 0);
@@ -143,15 +140,13 @@ void package_unload(uint64_t name) {
     uint64_t types_obj = ce_cdb_a0->read_subobject(obj, PACKAGE_TYPES_PROP, 0);
 
     const uint64_t type_n = ce_cdb_a0->prop_count(types_obj);
-    uint64_t types[type_n];
-    ce_cdb_a0->prop_keys(types_obj, types);
+    const uint64_t* types = ce_cdb_a0->prop_keys(types_obj);
 
     for (uint32_t j = 0; j < type_n; ++j) {
         uint64_t type_obj = ce_cdb_a0->read_subobject(types_obj, types[j], 0);
 
         const uint64_t name_n = ce_cdb_a0->prop_count(type_obj);
-        uint64_t names[name_n];
-        ce_cdb_a0->prop_keys(type_obj, names);
+        const uint64_t* names = ce_cdb_a0->prop_keys(type_obj);
 
         ct_resource_a0->unload(types[j], names, name_n);
     }
@@ -172,15 +167,13 @@ int package_is_loaded(uint64_t name) {
     uint64_t types_obj = ce_cdb_a0->read_subobject(obj, PACKAGE_TYPES_PROP, 0);
 
     const uint64_t type_n = ce_cdb_a0->prop_count(types_obj);
-    uint64_t types[type_n];
-    ce_cdb_a0->prop_keys(types_obj, types);
+    const uint64_t* types = ce_cdb_a0->prop_keys(types_obj);
 
     for (uint32_t j = 0; j < type_n; ++j) {
         uint64_t type_obj = ce_cdb_a0->read_subobject(types_obj, types[j], 0);
 
         const uint64_t name_n = ce_cdb_a0->prop_count(type_obj);
-        uint64_t names[name_n];
-        ce_cdb_a0->prop_keys(type_obj, names);
+        const uint64_t* names = ce_cdb_a0->prop_keys(type_obj);
 
         if (!ct_resource_a0->can_get_all(types[j], names, name_n)) {
             return 0;

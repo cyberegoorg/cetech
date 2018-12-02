@@ -293,7 +293,7 @@ static int has(struct ct_world world,
 static struct ct_scene_node get_root(struct ct_world world,
                                      struct ct_entity entity) {
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->get_one(world, SCENEGRAPH_COMPONENT,
                                    entity);
 
     return (struct ct_scene_node) {.idx = scene->idx, .world = world};
@@ -307,7 +307,7 @@ static struct ct_scene_node create(struct ct_world world,
                                    uint32_t count) {
     CE_UNUSED(pose);
 
-    ct_ecs_a0->component->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1, NULL);
+    ct_ecs_a0->add(world, entity, (uint64_t[]){SCENEGRAPH_COMPONENT}, 1, NULL);
 
     struct WorldInstance *data = _get_world_instance(world);
 
@@ -384,7 +384,7 @@ static struct ct_scene_node create(struct ct_world world,
     CE_FREE(_G.allocator, nodes);
 
     struct ct_scenegraph_component *scene;
-    scene = ct_ecs_a0->component->get_one(world, SCENEGRAPH_COMPONENT,
+    scene = ct_ecs_a0->get_one(world, SCENEGRAPH_COMPONENT,
                                               entity);
 
     scene->idx = root.idx;

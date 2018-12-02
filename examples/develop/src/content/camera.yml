@@ -1,10 +1,15 @@
 content/camera.entity:
   components:
     transform:
-      position: [0, 0, 10]
-      rotation: [0, 0, 0]
-      scale: [1, 1, 1]
-
+      position.x: 0.000000
+      position.y: 0.000000
+      position.z: 10.000000
+      rotation.x: 0.000000
+      rotation.y: 0.000000
+      rotation.z: 0.000000
+      scale.x: 1.000000
+      scale.y: 1.000000
+      scale.z: 1.000000
     camera:
       near: 0.1
       far: 1000.0

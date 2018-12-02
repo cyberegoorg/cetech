@@ -7,8 +7,8 @@
 #include <cetech/controlers/keyboard.h>
 #include <cetech/debugdraw/debugdraw.h>
 
-#include <cetech/editor/asset_preview.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/editor.h>
 #include <celib/hash.inl>
 #include <celib/fmath.inl>
@@ -17,7 +17,7 @@
 #include <cetech/render_graph/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -32,7 +32,6 @@ static struct _G {
     struct ce_alloc *allocator;
 
     uint64_t selected_object;
-    struct ct_resource_id active_asset;
 
     struct ct_world world;
     struct ct_entity camera_ent;
@@ -62,7 +61,7 @@ static void fps_camera_update(struct ct_world world,
     float wm[16];
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->get_one(world, TRANSFORM_COMPONENT,
+    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
                                               camera_ent);
 
     ce_mat4_move(wm, transform->world);
@@ -121,7 +120,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     ct_debugui_a0->GetContentRegionAvail(size);
 
     struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
                                             _G.render_ent);
 
     rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
@@ -152,44 +151,45 @@ static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     return resource_i->get_interface(ASSET_PREVIEW);
 }
 
-static void set_asset(uint64_t type, uint64_t event) {
-    uint64_t asset_type = ce_cdb_a0->read_uint64(event, ASSET_TYPE, 0);
-    uint64_t asset_name = ce_cdb_a0->read_uint64(event, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {.name = asset_name, .type = asset_type};
-
-    if (_G.active_asset.name == asset_name &&
-        _G.active_asset.type == asset_type) {
+static void set_asset(uint64_t obj) {
+    if(_G.selected_object == obj) {
         return;
     }
 
-    struct ct_resource_i0 *resource_i;
-    resource_i = ct_resource_a0->get_interface(_G.active_asset.type);
+    if(_G.selected_object) {
+        uint64_t prev_type = ce_cdb_a0->obj_type(_G.selected_object);
 
-    struct ct_asset_preview_i0 *i;
-    i = _get_asset_preview(_G.active_asset.type);
+        struct ct_resource_i0 *resource_i;
+        resource_i = ct_resource_a0->get_interface(prev_type);
 
-    if (i) {
-        if (i->unload) {
-            i->unload(_G.active_asset, _G.world, _G.active_ent);
+        struct ct_asset_preview_i0 *i;
+        i = _get_asset_preview(prev_type);
+
+        if (i) {
+            if (i->unload) {
+                i->unload(_G.selected_object, _G.world, _G.active_ent);
+            }
         }
+
     }
 
-    i = _get_asset_preview(rid.type);
+
+    uint64_t type = ce_cdb_a0->obj_type(obj);
+    struct ct_asset_preview_i0 *i;
+    i = _get_asset_preview(type);
     if (i) {
         if (i->load) {
-            _G.active_ent = i->load(rid, _G.world);
+            _G.active_ent = i->load(obj, _G.world);
         }
     }
 
-
-    _G.active_asset = rid;
+    _G.selected_object = obj;
 }
 
 static bool init() {
     _G.visible = true;
-    _G.world = ct_ecs_a0->entity->create_world();
-    _G.camera_ent = ct_ecs_a0->entity->spawn(_G.world,
+    _G.world = ct_ecs_a0->create_world();
+    _G.camera_ent = ct_ecs_a0->spawn(_G.world,
                                              ce_id_a0->id64("content/camera"));
 
     struct ct_render_graph_component rgc = {
@@ -197,8 +197,8 @@ static bool init() {
             .graph = ct_render_graph_a0->create_graph(),
     };
 
-    ct_ecs_a0->entity->create(_G.world, &_G.render_ent, 1);
-    ct_ecs_a0->component->add(_G.world, _G.render_ent,
+    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
+    ct_ecs_a0->add(_G.world, _G.render_ent,
                               (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
                               (void*[]){&rgc});
 
@@ -209,7 +209,7 @@ static bool init() {
 }
 
 static void update(float dt) {
-    ct_ecs_a0->system->simulate(_G.world, dt);
+    ct_ecs_a0->simulate(_G.world, dt);
 
     uint64_t selected_object = _G.selected_object;
     if (!selected_object) {
@@ -283,18 +283,7 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 
 static void _on_asset_selected(uint64_t _type, void* event) {
     struct ebus_cdb_event* ev = event;
-
-    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {
-            .name = name,
-            .type = type,
-    };
-
-    _G.selected_object = ct_sourcedb_a0->get(rid);
-
-    set_asset(_type, ev->obj);
+    set_asset(ev->obj);
 }
 
 static void _init(struct ce_api_a0 *api) {

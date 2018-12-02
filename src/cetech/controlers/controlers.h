@@ -19,8 +19,14 @@
 #define CONTROLER_AXIS \
     CE_ID64_0("axis", 0xeb6778864cd804e1ULL)
 
-#define CONTROLER_POSITION \
-    CE_ID64_0("position", 0x8bbeb160190f613aULL)
+#define CONTROLER_POSITION_X \
+    CE_ID64_0("position.x", 0x46b9c080961061caULL)
+
+#define CONTROLER_POSITION_Y \
+    CE_ID64_0("position.y", 0xca45b3734c0b3e81ULL)
+
+#define CONTROLER_POSITION_Z \
+    CE_ID64_0("position.z", 0x1c9cfdf1ce5b0b7aULL)
 
 #define CONTROLER_KEYCODE \
     CE_ID64_0("keycode", 0xe8153a02000cbab3ULL)

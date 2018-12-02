@@ -38,7 +38,7 @@
     "msg: |\n  %s\n"
 
 #if CE_PLATFORM_LINUX || CE_PLATFORM_OSX
-#define CE_COLORED_LOG
+#define CE_COLORED_LOG 1
 #endif
 
 #ifdef CE_COLORED_LOG
@@ -117,8 +117,12 @@ void ct_log_stdout_handler(enum ce_log_level level,
             [LOG_DBG]     = COLORED_TEXT(BGREEN, LOG_FORMAT_SIMPLE)
     };
 
-    FILE *out = level == LOG_ERROR ? stderr : stdout;
+    FILE *out = ((level == LOG_ERROR) || (level == LOG_WARNING)) ? stderr
+                                                                 : stdout;
 
 
-    fprintf(out, _level_format[level], _level_to_str[level], worker_id, where, msg);
+    fprintf(out,
+            _level_format[level], _level_to_str[level],
+            worker_id, where,
+            msg);
 }

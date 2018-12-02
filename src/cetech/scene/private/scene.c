@@ -17,7 +17,7 @@
 #include "cetech/ecs/ecs.h"
 #include "cetech/scenegraph/scenegraph.h"
 #include <cetech/renderer/renderer.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);

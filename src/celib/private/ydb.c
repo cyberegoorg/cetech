@@ -183,26 +183,26 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
                 key = s->key_hash;
 
-                const uint32_t float_len = ce_array_size(s->float_array);
-                if (float_len) {
-                    switch (s->node_count) {
-                        case 3:
-                            ce_cdb_a0->set_vec3(sm->writer, key,
-                                                s->float_array);
-                            break;
-                        case 4:
-                            ce_cdb_a0->set_vec4(sm->writer, key,
-                                                s->float_array);
-                            break;
-
-                        case 16:
-                            ce_cdb_a0->set_mat4(sm->writer, key,
-                                                s->float_array);
-                            break;
-                    }
-
-                    ce_array_free(s->float_array, alloc);
-                }
+//                const uint32_t float_len = ce_array_size(s->float_array);
+//                if (float_len) {
+//                    switch (s->node_count) {
+//                        case 3:
+//                            ce_cdb_a0->set_vec3(sm->writer, key,
+//                                                s->float_array);
+//                            break;
+//                        case 4:
+//                            ce_cdb_a0->set_vec4(sm->writer, key,
+//                                                s->float_array);
+//                            break;
+//
+//                        case 16:
+//                            ce_cdb_a0->set_mat4(sm->writer, key,
+//                                                s->float_array);
+//                            break;
+//                    }
+//
+//                    ce_array_free(s->float_array, alloc);
+//                }
 
                 const uint32_t len = ce_array_size(s->str_array);
                 if (len) {
@@ -451,8 +451,7 @@ static void dump_yaml(char **buffer,
                       uint64_t from,
                       uint32_t level) {
     const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-    uint64_t keys[prop_count];
-    ce_cdb_a0->prop_keys(from, keys);
+    const uint64_t* keys = ce_cdb_a0->prop_keys(from);
 
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
@@ -463,9 +462,9 @@ static void dump_yaml(char **buffer,
             continue;
         }
 
-        if (!ce_cdb_a0->prop_exist_norecursive(from, key)) {
-            continue;
-        }
+//        if (!ce_cdb_a0->prop_exist_norecursive(from, key)) {
+//            continue;
+//        }
 
         enum ce_cdb_type type = ce_cdb_a0->prop_type(from, key);
 
@@ -496,26 +495,6 @@ static void dump_yaml(char **buffer,
                 _indent(buffer, level);
                 ce_buffer_printf(buffer, _G.allocator, "%s:", k);
                 ce_buffer_printf(buffer, _G.allocator, " \"%s\"", s);
-                ce_buffer_printf(buffer, _G.allocator, "\n");
-            }
-                break;
-            case CDB_TYPE_VEC3: {
-                float v[3] = {};
-                ce_cdb_a0->read_vec3(from, key, v);
-                _indent(buffer, level);
-                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
-                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f]", v[0],
-                                 v[1], v[2]);
-                ce_buffer_printf(buffer, _G.allocator, "\n");
-            }
-                break;
-            case CDB_TYPE_VEC4: {
-                float v[4] = {};
-                ce_cdb_a0->read_vec3(from, key, v);
-                _indent(buffer, level);
-                ce_buffer_printf(buffer, _G.allocator, "%s:", k);
-                ce_buffer_printf(buffer, _G.allocator, " [%f, %f, %f, %f]",
-                                 v[0], v[1], v[2], v[3]);
                 ce_buffer_printf(buffer, _G.allocator, "\n");
             }
                 break;
@@ -552,7 +531,6 @@ static void dump_yaml(char **buffer,
 
             case CDB_TYPE_PTR:
             case CDB_TYPE_REF:
-            case CDB_TYPE_MAT4:
             case CDB_TYPE_BLOB:
             default:
                 break;

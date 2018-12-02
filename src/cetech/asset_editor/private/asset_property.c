@@ -1,13 +1,13 @@
 #include <cetech/debugui/debugui.h>
-#include <cetech/editor/property_editor.h>
-#include <cetech/editor/asset_property.h>
+#include <cetech/editor/property.h>
+#include <cetech/asset_editor/asset_property.h>
 #include <cetech/resource/resource.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 
 #include <celib/hash.inl>
 #include <celib/ebus.h>
 #include <celib/ydb.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 #include <celib/cdb.h>
 
 #include "celib/hashlib.h"
@@ -26,12 +26,12 @@ static struct _G {
     struct ce_alloc *allocator;
 } _G;
 
-static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
+static void draw_ui(uint64_t obj) {
     if (!obj) {
         return;
     }
 
-    uint64_t res_obj_type = ce_cdb_a0->type(obj);
+    uint64_t res_obj_type = ce_cdb_a0->obj_type(obj);
 
     struct ct_resource_i0 *resource_i = ct_resource_a0->get_interface(
             res_obj_type);
@@ -52,7 +52,7 @@ static void draw_ui(struct ct_resource_id rid, uint64_t obj) {
         return;
     }
 
-    i->draw(rid, obj);
+    i->draw( obj);
 
 }
 

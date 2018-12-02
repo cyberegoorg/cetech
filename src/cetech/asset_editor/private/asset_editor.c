@@ -18,18 +18,18 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/render_graph/default_render_graph.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <celib/array.inl>
-#include <cetech/editor/asset_editor.h>
+#include <cetech/asset_editor/asset_editor.h>
 
 #define _G editor_globals
 

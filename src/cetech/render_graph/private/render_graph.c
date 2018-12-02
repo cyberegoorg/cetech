@@ -59,7 +59,7 @@ static void foreach_render_graph(struct ct_world world,
                                  uint32_t n,
                                  void *data) {
     struct ct_render_graph_component *all_rg;
-    all_rg = ct_ecs_a0->component->get_all(RENDER_GRAPH_COMPONENT, item);
+    all_rg = ct_ecs_a0->get_all(RENDER_GRAPH_COMPONENT, item);
 
     for (uint32_t i = 1; i < n; ++i) {
         struct ct_render_graph_component rg = all_rg[i];
@@ -78,8 +78,8 @@ static void foreach_render_graph(struct ct_world world,
 
 static void render_system(struct ct_world world,
                           float dt) {
-    uint64_t mask = ct_ecs_a0->component->mask(RENDER_GRAPH_COMPONENT);
-    ct_ecs_a0->system->process(world, mask, foreach_render_graph, &dt);
+    uint64_t mask = ct_ecs_a0->mask(RENDER_GRAPH_COMPONENT);
+    ct_ecs_a0->process(world, mask, foreach_render_graph, &dt);
 }
 
 static void on_render(uint64_t type, void* event) {

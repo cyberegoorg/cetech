@@ -22,9 +22,9 @@
 #include <cetech/debugdraw/debugdraw.h>
 #include <celib/macros.h>
 #include <stdlib.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 #include <celib/ydb.h>
-#include <cetech/sourcedb/sourcedb_ui.h>
+#include <cetech/asset_editor/sourcedb_ui.h>
 #include <celib/log.h>
 #include <celib/buffer.inl>
 
@@ -69,10 +69,10 @@ void foreach_mesh_renderer(struct ct_world world,
     struct mesh_render_data *data = _data;
 
     struct ct_mesh *mesh_renderers = \
-        ct_ecs_a0->component->get_all(MESH_RENDERER_COMPONENT, item);
+        ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
 
     struct ct_transform_comp *transforms;
-    transforms = ct_ecs_a0->component->get_all(TRANSFORM_COMPONENT, item);
+    transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (int i = 1; i < n; ++i) {
         struct ct_transform_comp t = transforms[i];
@@ -131,11 +131,16 @@ void foreach_mesh_renderer(struct ct_world world,
 void mesh_render_all(struct ct_world world,
                      uint8_t viewid,
                      uint64_t layer_name) {
-    struct mesh_render_data render_data = {.viewid = viewid, .layer_name = layer_name};
-    ct_ecs_a0->system->process(
+
+    struct mesh_render_data render_data = {
+            .viewid = viewid,
+            .layer_name = layer_name
+    };
+
+    ct_ecs_a0->process(
             world,
-            ct_ecs_a0->component->mask(MESH_RENDERER_COMPONENT) |
-            ct_ecs_a0->component->mask(TRANSFORM_COMPONENT),
+            ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
+            ct_ecs_a0->mask(TRANSFORM_COMPONENT),
             foreach_mesh_renderer, &render_data);
 }
 
@@ -151,46 +156,10 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_mesh_renderer_a0", &_api);
 }
 
-static struct ct_comp_prop_decs ct_comp_prop_decs = {
-        .prop_decs = (struct ct_prop_decs[]) {
-                {
-                        .type = ECS_PROP_STR_ID64,
-                        .name = PROP_NODE,
-                        .offset = offsetof(struct ct_mesh, node_id),
-                },
-                {
-                        .type = ECS_PROP_STR_ID64,
-                        .name = PROP_MESH,
-                        .offset = offsetof(struct ct_mesh, mesh_id),
-                },
-//                {
-//                        .type = ECS_PROP_RESOURCE_NAME,
-//                        .name = PROP_MATERIAL_ID,
-//                        .offset = offsetof(struct ct_mesh, material),
-//                },
-                {
-                        .type = ECS_PROP_STR_ID64,
-                        .name = PROP_MATERIAL,
-                        .offset = offsetof(struct ct_mesh, material),
-                },
-                {
-                        .type = ECS_PROP_STR_ID64,
-                        .name = PROP_SCENE_ID,
-                        .offset = offsetof(struct ct_mesh, scene_id),
-                },
-        },
-        .prop_n = 4,
-};
-
-static const struct ct_comp_prop_decs *prop_desc() {
-    return &ct_comp_prop_decs;
-}
-
-
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const char* scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    const char *scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
     uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {
@@ -203,7 +172,7 @@ void mesh_combo_items(uint64_t obj,
 void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const char* scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    const char *scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
     uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {
@@ -222,29 +191,28 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Mesh renderer";
 }
 
-static void property_editor(struct ct_resource_id rid,
-                            uint64_t obj) {
+static void property_editor(uint64_t obj) {
 
-    ct_sourcedb_ui_a0->ui_resource(rid, obj,
-                                 ce_id_a0->id64("scene"), "Scene",
-                                 ce_id_a0->id64("scene"),
-                                 obj);
+    ct_sourcedb_ui_a0->ui_resource(obj,
+                                   ce_id_a0->id64("scene"), "Scene",
+                                   ce_id_a0->id64("scene"),
+                                   obj);
 
-    ct_sourcedb_ui_a0->ui_str_combo(rid, obj,
-                                  PROP_MESH, "Mesh",
-                                  mesh_combo_items,
-                                  obj);
+    ct_sourcedb_ui_a0->ui_str_combo(obj,
+                                    PROP_MESH, "Mesh",
+                                    mesh_combo_items,
+                                    obj);
 
-    ct_sourcedb_ui_a0->ui_str_combo(rid, obj,
-                                  PROP_NODE, "Node",
-                                  node_combo_items,
-                                  obj);
+    ct_sourcedb_ui_a0->ui_str_combo(obj,
+                                    PROP_NODE, "Node",
+                                    node_combo_items,
+                                    obj);
 
-    ct_sourcedb_ui_a0->ui_resource(rid, obj,
-                                 ce_id_a0->id64("material"),
-                                 "Material",
-                                 ce_id_a0->id64("material"),
-                                 obj);
+    ct_sourcedb_ui_a0->ui_resource(obj,
+                                   ce_id_a0->id64("material"),
+                                   "Material",
+                                   ce_id_a0->id64("material"),
+                                   obj);
 
 }
 
@@ -266,12 +234,27 @@ static uint64_t size() {
     return sizeof(struct ct_mesh);
 }
 
+static void mesh_spawner(struct ct_world world,
+                         uint64_t obj,
+                         void *data) {
+    struct ct_mesh *m = data;
+    *m = (struct ct_mesh) {
+            .mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_MESH, 0)),
+            .node_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_NODE, 0)),
+            .scene_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
+                                                           PROP_SCENE_ID, 0)),
+            .material = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
+                                                           PROP_MATERIAL, 0)),
+    };
+}
+
+
 static struct ct_component_i0 ct_component_i0 = {
         .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = _mesh_component_compiler,
-        .prop_desc = prop_desc,
+        .spawner = mesh_spawner,
 };
 
 static void _init(struct ce_api_a0 *api) {

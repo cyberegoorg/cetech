@@ -1,5 +1,5 @@
 #include <cetech/resource/resource.h>
-#include <cetech/editor/command_system.h>
+#include <cetech/command_system/command_system.h>
 #include <celib/array.inl>
 #include <celib/hash.inl>
 #include <stdio.h>

@@ -1,12 +1,12 @@
 #include <cetech/debugui/debugui.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/fs.h>
 #include <celib/os.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
 #include <celib/ebus.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -16,8 +16,8 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/editor/asset_property.h>
-#include <cetech/editor/asset_preview.h>
+#include <cetech/asset_editor/asset_property.h>
+#include <cetech/asset_editor/asset_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
 
@@ -76,19 +76,10 @@ static void _broadcast_edit() {
 }
 
 static void _broadcast_selected() {
-    uint64_t selected_asset;
-    selected_asset = ce_cdb_a0->create_object(
-            ce_cdb_a0->db(), ASSET_BROWSER_ASSET_SELECTED);
-
-    ce_cdb_obj_o *w;
-    w = ce_cdb_a0->write_begin(selected_asset);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, _G.selected_asset.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, _G.selected_asset.type);
-    ce_cdb_a0->write_commit(w);
-
+    uint64_t obj = ct_resource_a0->get(_G.selected_asset);
     ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS,
                               ASSET_BROWSER_ASSET_SELECTED,
-                              selected_asset);
+                              obj);
 }
 
 static void ui_asset_menu() {
@@ -209,7 +200,8 @@ static void ui_asset_tooltip(ct_resource_id resourceid,
         return;
     }
 
-    ai->tooltip(resourceid);
+    uint64_t obj = ct_resource_a0->get(resourceid);
+    ai->tooltip(obj);
 }
 
 static void ui_asset_list() {

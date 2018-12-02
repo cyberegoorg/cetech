@@ -61,6 +61,8 @@ void thread_yield() {
     sched_yield();
 #elif CE_PLATFORM_LINUX
     sched_yield();
+#else
+#error "Implement this"
 #endif
 }
 

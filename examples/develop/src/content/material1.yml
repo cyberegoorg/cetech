@@ -21,17 +21,15 @@ content/material1.material:
         k22cbxbg435124asdkj:
           name: u_vec4
           type: color
-          value: [1.0, 1.0, 1.0, 1.0]
+          value.x: 1.000000
+          value.y: 1.000000
+          value.z: 1.000000
+          value.w: 1.000000
 
         fdsgfdsgfgfs:
           name: u_vec42
           type: vec4
-          value: [1.0, 1.0, 1.0, 1.0]
-
-        kxbxcbxbg435124asdkj:
-          name: u_m44
-          type: mat4
-          value: [1.0, 1.0, 1.0, 1.0,
-                  1.0, 1.0, 1.0, 1.0,
-                  1.0, 1.0, 1.0, 1.0,
-                  1.0, 1.0, 1.0, 1.0]
+          value.x: 1.000000
+          value.y: 1.000000
+          value.z: 1.000000
+          value.w: 1.000000

@@ -27,8 +27,7 @@
 #define CE_FREE(a, p) \
     ((a)->call->reallocate((a),p,0,0, __FILE__, __LINE__))
 
-typedef void ce_alloc_inst;
-
+struct ce_alloc_inst;
 struct ce_alloc;
 
 struct ce_alloc_fce {
@@ -43,7 +42,7 @@ struct ce_alloc_fce {
 };
 
 struct ce_alloc {
-    ce_alloc_inst *inst;
+    struct ce_alloc_inst *inst;
     struct ce_alloc_fce *call;
 };
 

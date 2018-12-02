@@ -9,11 +9,11 @@
 #include "celib/api_system.h"
 
 #include <cetech/debugui/debugui.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/editor/dock.h>
-#include <cetech/game_system/game_system.h>
+#include <cetech/game/game_system.h>
 
 #define WINDOW_NAME "Game view"
 

@@ -112,8 +112,7 @@ static void foreach_config_clb(uint64_t key,
     if (type == CDB_TYPE_SUBOBJECT) {
         uint64_t sub_obj = ce_cdb_a0->read_subobject(value, key, 0);
         const uint64_t n = ce_cdb_a0->prop_count(sub_obj);
-        uint64_t keys[n];
-        ce_cdb_a0->prop_keys(sub_obj, keys);
+        const uint64_t* keys = ce_cdb_a0->prop_keys(sub_obj);
 
         for (int i = 0; i < n; ++i) {
             foreach_config_clb(keys[i], sub_obj, name);
@@ -174,8 +173,7 @@ static int load_from_yaml_file(const char *path,
     f->close(f);
 
     const uint64_t n = ce_cdb_a0->prop_count(obj);
-    uint64_t keys[n];
-    ce_cdb_a0->prop_keys(obj, keys);
+    const uint64_t* keys = ce_cdb_a0->prop_keys(obj);
 
     for (int i = 0; i < n; ++i) {
         foreach_config_clb(keys[i], obj, NULL);

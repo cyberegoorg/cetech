@@ -153,8 +153,14 @@ static void update(uint64_t type, void* _event) {
         uint32_t axis = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_AXIS, 0);
         uint32_t gamepad_id = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_ID, 0);
 
-        float pos[3] = {};
-        ce_cdb_a0->read_vec3(obj_event->obj, CONTROLER_POSITION, pos);
+        float pos[3] = {
+                ce_cdb_a0->read_float(obj_event->obj,
+                                      CONTROLER_POSITION_X, 0.0f),
+                ce_cdb_a0->read_float(obj_event->obj,
+                                      CONTROLER_POSITION_Y, 0.0f),
+                ce_cdb_a0->read_float(obj_event->obj,
+                                      CONTROLER_POSITION_Z, 0.0f),
+        };
 
         switch (it->type) {
             case EVENT_GAMEPAD_DOWN:

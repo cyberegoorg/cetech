@@ -1,18 +1,27 @@
 content/box1.entity:
   components:
     transform:
-      position: [0, 0, 5]
-      rotation: [0, 0, 0]
-      scale: [1, 1, 1]
+      position.x: 0.000000
+      position.y: 0.000000
+      position.z: 5.000000
+      scale.x: 1.000000
+      scale.y: 1.000000
+      scale.z: 1.000000
 
   children:
     lknvln879879NJKK:
       name: head
       components:
         transform:
-          rotation: [0, 0, 0]
-          position: [0, 0, 0]
-          scale: [1, 1, 1]
+          position.x: 0.000000
+          position.y: 0.000000
+          position.z: 0.000000
+          rotation.x: 0.000000
+          rotation.y: 0.000000
+          rotation.z: 0.000000
+          scale.x: 1.000000
+          scale.y: 1.000000
+          scale.z: 1.000000
 
         mesh_renderer:
           scene: "content/scene/oldman/oldman"
@@ -26,9 +35,15 @@ content/box1.entity:
       name: body
       components:
         transform:
-          rotation: [0, 0, 0]
-          position: [0, 0, 40]
-          scale: [1, 1, 1]
+          position.x: 0.000000
+          position.y: 0.000000
+          position.z: 40.000000
+          rotation.x: 0.000000
+          rotation.y: 0.000000
+          rotation.z: 0.000000
+          scale.x: 1.000000
+          scale.y: 1.000000
+          scale.z: 1.000000
 
         mesh_renderer:
           #        scene: "content/scene/solider/ArmyPilot"
@@ -46,9 +61,15 @@ content/box1.entity:
       name: m4
       components:
         transform:
-          rotation: [0, 0, 0]
-          position: [0, 0, 0]
-          scale: [1, 1, 1]
+          position.x: 0.000000
+          position.y: 0.000000
+          position.z: 0.000000
+          rotation.x: 0.000000
+          rotation.y: 0.000000
+          rotation.z: 0.000000
+          scale.x: 1.000000
+          scale.y: 1.000000
+          scale.z: 1.000000
 
         mesh_renderer:
           scene: "content/scene/solider/ArmyPilot"

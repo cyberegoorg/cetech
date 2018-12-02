@@ -16,8 +16,8 @@
     CE_ID64_0("ct_explorer_i0", 0xdaa9b6ac2664c06dULL)
 
 struct ct_explorer_i0 {
-    uint64_t (*draw_ui)(uint64_t top_level_obj, uint64_t selected_obj);
-    void (*draw_menu)(uint64_t top_level_obj, uint64_t selected_obj);
+    uint64_t (*draw_ui)(uint64_t selected_obj);
+    void (*draw_menu)(uint64_t selected_obj);
 };
 
 #endif //CETECH_EXPLORER_H

@@ -17,17 +17,17 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/editor/asset_browser.h>
+#include <cetech/asset_editor/asset_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/render_graph/default_render_graph.h>
-#include <cetech/debugui/private/iconfontheaders/icons_font_awesome.h>
+#include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/editor/asset_editor.h>
+#include <cetech/asset_editor/asset_editor.h>
 
 
 #define MAX_EDITOR 8
@@ -71,7 +71,7 @@ static void fps_camera_update(struct ct_world world,
 
 
     struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->component->get_one(world,
+    transform = ct_ecs_a0->get_one(world,
                                                   TRANSFORM_COMPONENT,
                                                   camera_ent);
 
@@ -210,7 +210,7 @@ static void draw_editor(uint64_t context_obj) {
     uint64_t obj = 0; //ct_selected_object_a0->selected_object();
 
     if (obj) {
-        uint64_t obj_type = ce_cdb_a0->type(obj);
+        uint64_t obj_type = ce_cdb_a0->obj_type(obj);
         if (obj_type == ENTITY_RESOURCE) {
 
             uint64_t components;
@@ -218,8 +218,7 @@ static void draw_editor(uint64_t context_obj) {
 
             const uint32_t component_n = ce_cdb_a0->prop_count(components);
 
-            uint64_t keys[component_n];
-            ce_cdb_a0->prop_keys(components, keys);
+            const uint64_t* keys = ce_cdb_a0->prop_keys(components);
 
             for (uint32_t i = 0; i < component_n; ++i) {
                 uint64_t key = keys[i];
@@ -227,7 +226,7 @@ static void draw_editor(uint64_t context_obj) {
                 uint64_t component;
                 component = ce_cdb_a0->read_subobject(components, key, 0);
 
-                uint64_t type = ce_cdb_a0->type(component);
+                uint64_t type = ce_cdb_a0->obj_type(component);
 
                 struct ct_component_i0 *c;
                 c = get_component_interface(type);
@@ -259,13 +258,13 @@ static void draw_editor(uint64_t context_obj) {
     }
 
     struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->component->get_one(editor->world, RENDER_GRAPH_COMPONENT,
+    rg_comp = ct_ecs_a0->get_one(editor->world, RENDER_GRAPH_COMPONENT,
                                             editor->render_ent);
 
     rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
 
 
-    ct_ecs_a0->system->simulate(editor->world, 0.1f);
+    ct_ecs_a0->simulate(editor->world, 0.1f);
 
     ct_render_texture_handle_t th;
     th = rg_comp->builder->call->get_texture(rg_comp->builder,
@@ -306,23 +305,23 @@ static void open(uint64_t context_obj) {
     const uint64_t asset_name = ce_cdb_a0->read_uint64(context_obj, _ASSET_NAME,
                                                        0);
 
-    editor->world = ct_ecs_a0->entity->create_world();
-    editor->entity = ct_ecs_a0->entity->spawn(editor->world, asset_name);
+    editor->world = ct_ecs_a0->create_world();
+    editor->entity = ct_ecs_a0->spawn(editor->world, asset_name);
 
     struct ct_render_graph_component rgc = {
             .builder = ct_render_graph_a0->create_builder(),
             .graph = ct_render_graph_a0->create_graph(),
     };
 
-    ct_ecs_a0->entity->create(editor->world, &editor->render_ent, 1);
-    ct_ecs_a0->component->add(editor->world, editor->render_ent,
+    ct_ecs_a0->create(editor->world, &editor->render_ent, 1);
+    ct_ecs_a0->add(editor->world, editor->render_ent,
                               (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
                               (void*[]){&rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(editor->world);
     rgc.graph->call->add_module(rgc.graph, module);
 
-    editor->camera_ent = ct_ecs_a0->entity->spawn(editor->world,
+    editor->camera_ent = ct_ecs_a0->spawn(editor->world,
                                                   ce_id_a0->id64("content/camera"));
 
     editor->entity_name = asset_name;

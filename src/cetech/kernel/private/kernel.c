@@ -19,11 +19,11 @@
 #include <cetech/machine/machine.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/game_system/game_system.h>
+#include <cetech/game/game_system.h>
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 #include <cetech/ecs/ecs.h>
 #include <stdlib.h>
 #include <celib/ydb.h>
@@ -125,7 +125,7 @@ int init_config(int argc,
     return 1;
 }
 
-int cetech_kernel_init(int argc,
+bool cetech_kernel_init(int argc,
                        const char **argv) {
 //    ce_log_a0->register_handler(ce_log_a0->stdout_yaml_handler, NULL);
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
@@ -165,13 +165,7 @@ int cetech_kernel_init(int argc,
     CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
-#if defined(CETECH_DEVELOP)
-    ct_resource_a0->set_autoload(true);
-#else
-    ct_resource_a0->set_autoload(0);
-#endif
-
-    return 1;
+    return true;
 }
 
 
@@ -271,6 +265,7 @@ static void cetech_kernel_start() {
 
     _boot_stage();
 
+#if 1
     char *buf = NULL;
     uint64_t r = ct_sourcedb_a0->get((struct ct_resource_id) {
             .type = ENTITY_RESOURCE_ID,
@@ -286,7 +281,8 @@ static void cetech_kernel_start() {
     });
     ce_cdb_a0->dump_str(&buf, r, 0);
     ce_log_a0->debug(LOG_WHERE, "%s", buf);
-//    abort();
+// abort();
+#endif
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
 
@@ -304,16 +300,16 @@ static void cetech_kernel_start() {
 
 //        ce_log_a0->debug(LOG_WHERE, "dt %f", dt * 1000);
 
-        ce_ebus_a0->begin_frame();
-
-        uint64_t event;
-        event = ce_cdb_a0->create_object(ce_cdb_a0->db(), KERNEL_UPDATE_EVENT);
+        uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                  KERNEL_UPDATE_EVENT);
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
         ce_cdb_a0->set_float(w, KERNEL_EVENT_DT, dt);
         ce_cdb_a0->write_commit(w);
 
         ce_ebus_a0->broadcast_obj(KERNEL_EBUS, KERNEL_UPDATE_EVENT, event);
+        ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT, NULL, 0);
 
+        ce_ebus_a0->gc();
         ce_cdb_a0->gc();
     }
 

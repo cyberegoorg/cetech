@@ -1,9 +1,15 @@
 content/box2.entity:
   components:
     transform:
-      position: [10.000000, -6.000000, 0.000000]
-      rotation: [0.000000, 0.000000, 0.000000]
-      scale: [1.000000, 1.000000, 1.000000]
+      position.x: 10.000000
+      position.y: -6.000000
+      position.z: 0.000000
+      rotation.x: 0.000000
+      rotation.y: 0.000000
+      rotation.z: 0.000000
+      scale.x: 1.000000
+      scale.y: 1.000000
+      scale.z: 1.000000
     mesh_renderer:
       scene: "content/scene/oldman/oldman"
       mesh: "muro_main"

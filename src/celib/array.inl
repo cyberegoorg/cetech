@@ -229,4 +229,13 @@ static inline void *ce_array_grow(void *array,
     return new_array;
 }
 
+// Clone array.
+static inline void *ce_array_clone(void *array,
+                                   size_t type_size,
+                                   const struct ce_alloc *alloc) {
+    char *new_array = NULL;
+    ce_array_push_n(new_array, array, ce_array_size(array)* type_size, alloc);
+    return new_array;
+}
+
 #endif //CE_ARRAY_H

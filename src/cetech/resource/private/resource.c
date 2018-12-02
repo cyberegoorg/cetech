@@ -21,7 +21,7 @@
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <celib/hashlib.h>
-#include <cetech/sourcedb/sourcedb.h>
+#include <cetech/resource/sourcedb.h>
 
 #include "../resource.h"
 
@@ -38,8 +38,6 @@
 
 struct _G {
     struct ce_hash_t type_map;
-
-    bool autoload_enabled;
 
     struct ce_cdb_t db;
     uint64_t resource_db;
@@ -66,12 +64,6 @@ static int type_name_string(char *str,
             PRIx64, resourceid.type, resourceid.name);
 }
 
-
-static void set_autoload(bool enable) {
-    _G.autoload_enabled = enable;
-}
-
-
 static void _resource_api_add(uint64_t name,
                               void *api) {
     struct ct_resource_i0 *ct_resource_i = api;
@@ -87,14 +79,14 @@ static void _resource_api_add(uint64_t name,
 }
 
 static void load(uint64_t type,
-                 uint64_t *names,
+                 const uint64_t *names,
                  size_t count,
                  int force);
 
 static uint64_t get_obj(struct ct_resource_id resource_id);
 
 static void load_now(uint64_t type,
-                     uint64_t *names,
+                     const uint64_t *names,
                      size_t count) {
     load(type, names, count, 0);
 }
@@ -108,7 +100,7 @@ static int can_get(uint64_t type,
 }
 
 static int can_get_all(uint64_t type,
-                       uint64_t *names,
+                       const uint64_t *names,
                        size_t count) {
     uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
 
@@ -175,7 +167,7 @@ static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
 
 
 static void load(uint64_t type,
-                 uint64_t *names,
+                 const uint64_t *names,
                  size_t count,
                  int force) {
     uint32_t start_ticks = ce_os_a0->time->ticks();
@@ -247,7 +239,7 @@ static void load(uint64_t type,
 }
 
 static void unload(uint64_t type,
-                   uint64_t *names,
+                   const uint64_t *names,
                    size_t count) {
     uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
 
@@ -303,18 +295,13 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
         char build_name[128] = {};
         type_name_string(build_name, CE_ARRAY_LEN(build_name), resource_id);
 
-        if (_G.autoload_enabled) {
-            char filename[1024] = {};
-            ct_resource_compiler_a0->get_filename(filename,
-                                                  CE_ARRAY_LEN(filename),
-                                                  resource_id);
+        char filename[1024] = {};
+        ct_resource_compiler_a0->get_filename(filename,
+                                              CE_ARRAY_LEN(filename),
+                                              resource_id);
 
-            ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
-            load_now(resource_id.type, &resource_id.name, 1);
-        } else {
-            // TODO: fallback resource #205
-            CE_ASSERT(LOG_WHERE, false);
-        }
+        ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
+        load_now(resource_id.type, &resource_id.name, 1);
 
         object = ce_cdb_a0->read_ref(type_obj, resource_id.name, 0);
     }
@@ -323,7 +310,7 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
 }
 
 static void reload(uint64_t type,
-                   uint64_t *names,
+                   const uint64_t *names,
                    size_t count) {
 }
 
@@ -367,7 +354,6 @@ static void put(struct ct_resource_id resource_id,
 
 static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
-        .set_autoload = set_autoload,
         .load = load,
         .load_now = load_now,
         .unload = unload,
