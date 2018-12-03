@@ -30,6 +30,7 @@
 #include <cetech/controlers/controlers.h>
 #include <celib/array.inl>
 #include <cetech/asset_editor/asset_editor.h>
+#include <cetech/editor/selcted_object.h>
 
 #define _G editor_globals
 
@@ -79,19 +80,11 @@ static void draw_editor(struct ct_dock_i0 *dock) {
         uint64_t type = ce_cdb_a0->read_uint64(editor->context_obj,
                                                _ASSET_TYPE, 0);
 
-        uint64_t selected_asset;
-        selected_asset = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  ASSET_EDITOR_ASSET_SELECTED);
+        uint64_t obj = ct_resource_a0->get((struct ct_resource_id) {
+                .type=type,
+                .name=name});
 
-        ce_cdb_obj_o *w;
-        w = ce_cdb_a0->write_begin(selected_asset);
-        ce_cdb_a0->set_uint64(w, ASSET_NAME, name);
-        ce_cdb_a0->set_uint64(w, ASSET_TYPE, type);
-        ce_cdb_a0->write_commit(w);
-
-        ce_ebus_a0->broadcast_obj(ASSET_EDITOR_EBUS,
-                                  ASSET_EDITOR_ASSET_SELECTED,
-                                  selected_asset);
+        ct_selected_object_a0->set_selected_object(obj);
     }
 
     i->draw_ui(editor->context_obj);

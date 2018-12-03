@@ -21,9 +21,6 @@
 #define ASSET_BROWSER_EBUS \
     CE_ID64_0("asset_browser", 0x41bbc9e4707d4c8dULL)
 
-#define ASSET_BROWSER_ASSET_SELECTED \
-    CE_ID64_0("asset_selected", 0x9214eb80da1c69d8ULL)
-
 #define ASSET_DCLICK_EVENT \
     CE_ID64_0("asset_dclic", 0xcb3f723dbc17db73ULL)
 

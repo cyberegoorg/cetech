@@ -27,14 +27,13 @@
 #include <cetech/asset_editor/asset_editor.h>
 #include <cetech/resource/sourcedb.h>
 #include <cetech/resource/builddb.h>
+#include <cetech/editor/selcted_object.h>
 
 #define WINDOW_NAME "Explorer"
 
 #define _G explorer_globals
 static struct _G {
     bool visible;
-
-    uint64_t selected_object;
     struct ce_alloc *allocator;
 } _G;
 
@@ -58,7 +57,7 @@ static uint64_t draw(uint64_t selected_obj) {
 static void draw_menu(uint64_t selected_obj) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(selected_obj);
 
-    if(ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
+    if (ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
         struct ct_resource_id rid = {
                 .type=ce_cdb_a0->obj_type(top_level_obj),
                 .name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0),
@@ -70,7 +69,7 @@ static void draw_menu(uint64_t selected_obj) {
 
         bool save = ct_debugui_a0->Button("save", (float[2]) {0.0f});
 
-        if(save) {
+        if (save) {
             ct_sourcedb_a0->save(rid);
         }
 
@@ -91,36 +90,19 @@ static void draw_menu(uint64_t selected_obj) {
 }
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    if (!_G.selected_object) {
+    if (!ct_selected_object_a0->selected_object()) {
         return;
     }
 
-    uint64_t top_level_obj = ce_cdb_a0->find_root(_G.selected_object);
+    uint64_t selected_object = ct_selected_object_a0->selected_object();
 
-    draw_menu(_G.selected_object);
+    draw_menu(selected_object);
 
     ct_debugui_a0->Separator();
 
-    uint64_t selected_object = draw(_G.selected_object);
-    if (selected_object) {
-        _G.selected_object = selected_object;
-
-        uint64_t event;
-        event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                         EXPLORER_OBJ_SELECTED);
-
-        uint64_t asset_type = ce_cdb_a0->obj_type(top_level_obj);
-        uint64_t asset_name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0);
-
-        struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(event);
-        ce_cdb_a0->set_ref(w, EXPLORER_OBJ_SELECTED, selected_object);
-        ce_cdb_a0->set_uint64(w, ASSET_NAME, asset_name);
-        ce_cdb_a0->set_uint64(w, ASSET_TYPE, asset_type);
-        ce_cdb_a0->write_commit(w);
-
-        ce_ebus_a0->broadcast_obj(EXPLORER_EBUS,
-                                  EXPLORER_OBJ_SELECTED,
-                                  event);
+    uint64_t new_selected_object = draw(selected_object);
+    if (new_selected_object) {
+        ct_selected_object_a0->set_selected_object(new_selected_object);
     }
 }
 
@@ -142,32 +124,6 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
-static void _on_asset_selected(uint64_t _type,
-                               void *event) {
-    struct ebus_cdb_event *ev = event;
-
-    if (ENTITY_RESOURCE_ID != ce_cdb_a0->obj_type(ev->obj)) {
-        return;
-    }
-
-    _G.selected_object = ev->obj;
-}
-
-static void _on_editor_asset_selected(uint64_t _type,
-                                      void *event) {
-    struct ebus_cdb_event *ev = event;
-
-    uint64_t type = ce_cdb_a0->read_uint64(ev->obj, ASSET_TYPE, 0);
-    uint64_t name = ce_cdb_a0->read_uint64(ev->obj, ASSET_NAME, 0);
-
-    struct ct_resource_id rid = {
-            .name = name,
-            .type = type,
-    };
-
-    _G.selected_object = ct_resource_a0->get(rid);
-}
-
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -177,11 +133,6 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
     ce_ebus_a0->create_ebus(EXPLORER_EBUS);
-
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED,
-                        _on_asset_selected, 0);
-    ce_ebus_a0->connect(ASSET_EDITOR_EBUS, ASSET_EDITOR_ASSET_SELECTED,
-                        _on_editor_asset_selected, 0);
 }
 
 static void _shutdown() {

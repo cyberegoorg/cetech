@@ -143,7 +143,7 @@ set(SOURCE_FILES
         src/cetech/asset_editor/private/sourcedb_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
-        src/cetech/entity/private/entity_explorer.c)
+        src/cetech/entity/private/entity_explorer.c src/cetech/editor/private/selected_object.c)
 
 ################################################################################
 # Main sources

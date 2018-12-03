@@ -18,6 +18,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/resource/sourcedb.h>
+#include <cetech/editor/selcted_object.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -112,30 +113,6 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static void on_debugui(struct ct_dock_i0 *dock) {
-    _G.active = ct_debugui_a0->IsMouseHoveringWindow();
-
-
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-
-    struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
-                                            _G.render_ent);
-
-    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
-
-    ct_render_texture_handle_t th;
-    th = rg_comp->builder->call->get_texture(rg_comp->builder,
-                                             RG_OUTPUT_TEXTURE);
-
-    ct_debugui_a0->Image(th,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-}
-
-
 static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     struct ct_resource_i0 *resource_i;
     resource_i = ct_resource_a0->get_interface(asset_type);
@@ -173,7 +150,6 @@ static void set_asset(uint64_t obj) {
 
     }
 
-
     uint64_t type = ce_cdb_a0->obj_type(obj);
     struct ct_asset_preview_i0 *i;
     i = _get_asset_preview(type);
@@ -185,6 +161,31 @@ static void set_asset(uint64_t obj) {
 
     _G.selected_object = obj;
 }
+
+static void on_debugui(struct ct_dock_i0 *dock) {
+    _G.active = ct_debugui_a0->IsMouseHoveringWindow();
+
+    set_asset(ct_selected_object_a0->selected_object());
+
+    float size[2];
+    ct_debugui_a0->GetContentRegionAvail(size);
+
+    struct ct_render_graph_component *rg_comp;
+    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
+                                            _G.render_ent);
+
+    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
+
+    ct_render_texture_handle_t th;
+    th = rg_comp->builder->call->get_texture(rg_comp->builder,
+                                             RG_OUTPUT_TEXTURE);
+
+    ct_debugui_a0->Image(th,
+                         size,
+                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+}
+
 
 static bool init() {
     _G.visible = true;
@@ -281,11 +282,6 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 };
 
 
-static void _on_asset_selected(uint64_t _type, void* event) {
-    struct ebus_cdb_event* ev = event;
-    set_asset(ev->obj);
-}
-
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
@@ -294,10 +290,6 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
-
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS,
-                        ASSET_BROWSER_ASSET_SELECTED, _on_asset_selected, 0);
-
 }
 
 static void _shutdown() {

@@ -17,13 +17,13 @@
 #include <cetech/editor/explorer.h>
 #include <cetech/resource/sourcedb.h>
 #include <celib/cdb.h>
+#include <cetech/editor/selcted_object.h>
 
 #define WINDOW_NAME "Property editor"
 
 #define _G property_inspector_global
 static struct _G {
     bool visible;
-    uint64_t selected_object;
 } _G;
 
 static void draw(uint64_t obj) {
@@ -55,7 +55,7 @@ static void draw_menu(uint64_t obj) {
 }
 
 static void on_debugui(struct ct_dock_i0 *dock) {
-    uint64_t obj = _G.selected_object;
+    uint64_t obj = ct_selected_object_a0->selected_object();
 
     ct_debugui_a0->Columns(2, NULL, true);
     ct_debugui_a0->Separator();
@@ -74,7 +74,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 }
 
 static void on_menu(struct ct_dock_i0 *dock) {
-    uint64_t obj = _G.selected_object;
+    uint64_t obj = ct_selected_object_a0->selected_object();
     draw_menu(obj);
 }
 
@@ -103,17 +103,6 @@ struct ct_property_editor_a0 property_editor_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 
-static void _on_asset_selected(uint64_t _type, void* event) {
-    struct ebus_cdb_event* ev = event;
-
-    _G.selected_object = ev->obj;
-}
-
-static void _on_explorer_selected(uint64_t _type, void* event) {
-    struct ebus_cdb_event* ev = event;
-    _G.selected_object =  ce_cdb_a0->read_ref(ev->obj, EXPLORER_OBJ_SELECTED, 0);
-}
-
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
@@ -121,12 +110,6 @@ static void _init(struct ce_api_a0 *api) {
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_property_editor_a0", ct_property_editor_a0);
-
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS, ASSET_BROWSER_ASSET_SELECTED,
-                        _on_asset_selected, 0);
-    ce_ebus_a0->connect(EXPLORER_EBUS, EXPLORER_OBJ_SELECTED,
-                        _on_explorer_selected, 0);
-
 }
 
 static void _shutdown() {

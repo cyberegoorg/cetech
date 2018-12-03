@@ -20,6 +20,7 @@
 #include <cetech/asset_editor/asset_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
+#include <cetech/editor/selcted_object.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -77,9 +78,7 @@ static void _broadcast_edit() {
 
 static void _broadcast_selected() {
     uint64_t obj = ct_resource_a0->get(_G.selected_asset);
-    ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS,
-                              ASSET_BROWSER_ASSET_SELECTED,
-                              obj);
+    ct_selected_object_a0->set_selected_object(obj);
 }
 
 static void ui_asset_menu() {

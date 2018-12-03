@@ -15,9 +15,6 @@
 #define ASSET_EDITOR_EBUS \
     CE_ID64_0("asset_editor", 0xd7ecca607e454ce9ULL)
 
-#define ASSET_EDITOR_ASSET_SELECTED \
-    CE_ID64_0("asset_selected", 0x9214eb80da1c69d8ULL)
-
 struct ct_asset_editor_i0 {
     uint64_t (*asset_type)();
 

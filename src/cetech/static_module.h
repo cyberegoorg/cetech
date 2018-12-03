@@ -44,6 +44,7 @@ void init_static_modules() {
     // Editor
     //==========================================================================
     CE_ADD_STATIC_MODULE(action_manager);
+    CE_ADD_STATIC_MODULE(selected_object);
 
     CE_ADD_STATIC_MODULE(playground);
     CE_ADD_STATIC_MODULE(asset_browser);
