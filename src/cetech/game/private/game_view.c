@@ -18,7 +18,7 @@
 #define WINDOW_NAME "Game view"
 
 static float step_dt = 16.0f;
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
 
@@ -63,20 +63,22 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
 }
 
-static const char *dock_title() {
+static const char *dock_title(uint64_t dock) {
     return ICON_FA_GAMEPAD " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock){
     return "game_view";
 }
 
+
+static uint64_t cdb_type() {
+    return GAME_INTERFACE;
+};
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .dock_flag = DebugUIWindowFlags_NoNavInputs |
-                     DebugUIWindowFlags_NoScrollbar |
-                     DebugUIWindowFlags_NoScrollWithMouse,
-        .visible = true,
+        .cdb_type =cdb_type,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -84,6 +86,12 @@ static struct ct_dock_i0 ct_dock_i0 = {
 
 static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+
+    ct_dock_a0->create_dock(GAME_INTERFACE,
+                            DebugUIWindowFlags_NoNavInputs |
+                            DebugUIWindowFlags_NoScrollbar |
+                            DebugUIWindowFlags_NoScrollWithMouse,
+                            true);
 
 }
 

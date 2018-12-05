@@ -12,6 +12,9 @@
 #define ASSET_EDITOR_I \
     CE_ID64_0("ct_asset_editor_i0", 0xfd600fdf28336d2aULL)
 
+#define ASSET_EDITOR_OBJ \
+    CE_ID64_0("asset_obj", 0x755d033f781be94ULL)
+
 #define ASSET_EDITOR_EBUS \
     CE_ID64_0("asset_editor", 0xd7ecca607e454ce9ULL)
 

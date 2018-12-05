@@ -12,17 +12,34 @@ enum DebugUIWindowFlags_;
 #define DOCK_INTERFACE \
     CE_ID64_0("ct_dock_i0", 0x3a3181c12a9e109fULL)
 
+
+
+#define PROP_DOCK_VISIBLE\
+    CE_ID64_0("visible", 0x24b77991b5d39298ULL)
+
+#define PROP_DOCK_flags\
+    CE_ID64_0("flags", 0x6def9a496b03ba91ULL)
+
+
 struct ct_dock_i0 {
-    uint64_t id;
-    bool visible;
-    enum DebugUIWindowFlags_ dock_flag;
+    uint64_t (*cdb_type)();
 
-    const char* (*display_title)(struct ct_dock_i0* dock);
-    const char* (*name)(struct ct_dock_i0* dock);
+    const char *(*display_title)(uint64_t dock);
+    const char *(*name)(uint64_t dock);
 
-    void (*draw_ui)(struct ct_dock_i0* dock);
-    void (*draw_menu)(struct ct_dock_i0* dock);
-    void (*draw_main_menu)();
+    void (*draw_ui)(uint64_t dock);
+    void (*draw_menu)(uint64_t dock);
 };
+
+
+struct ct_dock_a0 {
+    uint64_t (*create_dock)(uint64_t type,
+                            enum DebugUIWindowFlags_ flags,
+                            bool visible);
+
+    void (*draw_all)();
+};
+
+CE_MODULE(ct_dock_a0);
 
 #endif //CETECH_DOCK_H

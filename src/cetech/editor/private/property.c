@@ -27,13 +27,22 @@ static struct _G {
 } _G;
 
 static void draw(uint64_t obj) {
+    if(!obj) {
+        return;
+    }
+
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
-        if (i->draw_ui) {
-            i->draw_ui(obj);
+        if (i && i->cdb_type
+            && (i->cdb_type() == ce_cdb_a0->obj_type(obj))) {
+
+            if (i->draw_ui) {
+                i->draw_ui(obj);
+            }
+            return;
         }
 
         it = ce_api_a0->next(it);
@@ -41,20 +50,29 @@ static void draw(uint64_t obj) {
 }
 
 static void draw_menu(uint64_t obj) {
+    if(!obj) {
+        return;
+    }
+
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
-        if (i->draw_menu) {
-            i->draw_menu(obj);
+        if (i && i->cdb_type
+            && (i->cdb_type() == ce_cdb_a0->obj_type(obj))) {
+
+            if (i->draw_menu) {
+                i->draw_menu(obj);
+            }
+            return;
         }
 
         it = ce_api_a0->next(it);
     }
 }
 
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     uint64_t obj = ct_selected_object_a0->selected_object();
 
     ct_debugui_a0->Columns(2, NULL, true);
@@ -73,7 +91,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
     ct_debugui_a0->Columns(1, NULL, true);
 }
 
-static void on_menu(struct ct_dock_i0 *dock) {
+static void on_menu(uint64_t dock) {
     uint64_t obj = ct_selected_object_a0->selected_object();
     draw_menu(obj);
 }
@@ -83,13 +101,17 @@ static const char *dock_title() {
     return ICON_FA_TABLE " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "property_editor";
 }
 
+static uint64_t cdb_type() {
+    return PROPERTY_EDITOR_INTERFACE;
+};
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .visible = true,
+        .cdb_type = cdb_type,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -107,6 +129,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
     };
+    ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, 0, true);
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_property_editor_a0", ct_property_editor_a0);

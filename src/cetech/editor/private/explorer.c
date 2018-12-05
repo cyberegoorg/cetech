@@ -37,20 +37,30 @@ static struct _G {
     struct ce_alloc *allocator;
 } _G;
 
-static uint64_t draw(uint64_t selected_obj) {
+static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
     struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
 
-        if (i->draw_ui) {
-            uint64_t new_selected_obj = i->draw_ui(selected_obj);
-            return new_selected_obj;
+        if (i->cdb_type && (i->cdb_type() == type)) {
+            return it.api;
         }
 
         it = ce_api_a0->next(it);
     }
 
+    return NULL;
+}
+
+static uint64_t draw(uint64_t selected_obj) {
+    uint64_t top_level = ce_cdb_a0->find_root(selected_obj);
+
+    struct ct_explorer_i0 *i;
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(top_level));
+    if (i && i->draw_ui) {
+        return i->draw_ui(top_level, selected_obj);
+    }
     return 0;
 }
 
@@ -58,38 +68,19 @@ static void draw_menu(uint64_t selected_obj) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(selected_obj);
 
     if (ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
-        struct ct_resource_id rid = {
-                .type=ce_cdb_a0->obj_type(top_level_obj),
-                .name = ce_cdb_a0->read_uint64(top_level_obj, ASSET_NAME, 0),
-        };
-
-        char fullname[256] = {};
-        ct_builddb_a0->get_fullname(CE_ARR_ARG(fullname), rid.type, rid.name);
-        ct_debugui_a0->Text("Asset: %s", fullname);
-
-        bool save = ct_debugui_a0->Button("save", (float[2]) {0.0f});
-
-        if (save) {
-            ct_sourcedb_a0->save(rid);
-        }
-
+        const char *name = ce_cdb_a0->read_str(top_level_obj, ASSET_NAME, "");
+        ct_debugui_a0->Text("Asset: %s", name);
         ct_debugui_a0->SameLine(0, 10);
     }
 
-    struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
-
-    while (it.api) {
-        struct ct_explorer_i0 *i = (it.api);
-
-        if (i->draw_menu) {
-            i->draw_menu(selected_obj);
-        }
-
-        it = ce_api_a0->next(it);
+    struct ct_explorer_i0 *i;
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(selected_obj));
+    if (i && i->draw_menu) {
+        i->draw_menu(selected_obj);
     }
 }
 
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     if (!ct_selected_object_a0->selected_object()) {
         return;
     }
@@ -111,13 +102,17 @@ static const char *dock_title() {
     return ICON_FA_TREE " " WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "explorer";
 }
 
+
+static uint64_t cdb_type() {
+    return EXPLORER_INTERFACE;
+};
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .visible = true,
+        .cdb_type = cdb_type,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -129,6 +124,8 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
             .visible = true
     };
+
+    ct_dock_a0->create_dock(EXPLORER_INTERFACE, 0, true);
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 

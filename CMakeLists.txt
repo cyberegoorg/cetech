@@ -131,7 +131,6 @@ set(SOURCE_FILES
         src/cetech/entity/private/entity_property.c
         src/cetech/editor/private/explorer.c
         src/cetech/asset_editor/private/asset_preview.c
-        src/cetech/asset_editor/private/asset_property.c
         src/cetech/asset_editor/private/asset_browser.cpp
         src/cetech/editor/private/editor.c
         src/cetech/editor/private/property.c
@@ -143,7 +142,7 @@ set(SOURCE_FILES
         src/cetech/asset_editor/private/sourcedb_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
-        src/cetech/entity/private/entity_explorer.c src/cetech/editor/private/selected_object.c)
+        src/cetech/entity/private/entity_explorer.c src/cetech/editor/private/selected_object.c src/cetech/editor/private/dock.c)
 
 ################################################################################
 # Main sources

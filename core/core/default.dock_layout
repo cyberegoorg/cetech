@@ -1,19 +1,19 @@
 0: 
   index: 0
   label:  Asset browser##asset_browser_dock0
-  x: 234
-  y: 494
+  x: 223
+  y: 509
   location: ""
-  size_x: 517
-  size_y: 273
+  size_x: 489
+  size_y: 258
   status: 0
   active: 1
   opened: 1
   prev: -1
-  next: 5
+  next: 11
   child0: -1
   child1: -1
-  parent: 9
+  parent: 14
 1: 
   index: 1
   label:  Explorer##explorer_dock0
@@ -22,54 +22,118 @@
   location: ""
   size_x: 234
   size_y: 743
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 11
+  parent: -1
 2: 
   index: 2
   label:  Property editor##property_editor_dock0
-  x: 751
+  x: 670
   y: 24
   location: ""
-  size_x: 273
+  size_x: 354
   size_y: 470
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
-  next: 3
+  next: -1
   child0: -1
   child1: -1
-  parent: 8
+  parent: -1
 3: 
   index: 3
   label: Command history##command_history_dock0
-  x: 751
+  x: 670
   y: 24
   location: ""
-  size_x: 273
+  size_x: 354
   size_y: 470
-  status: 0
+  status: 1
   active: 0
   opened: 1
-  prev: 2
+  prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 8
+  parent: -1
 4: 
   index: 4
   label: Asset preview##asset_preview_dock0
-  x: 751
+  x: 670
   y: 494
   location: ""
-  size_x: 273
+  size_x: 354
   size_y: 273
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+5: 
+  index: 5
+  label: Log view##log_view_dock0
+  x: 0
+  y: 494
+  location: ""
+  size_x: 1024
+  size_y: 273
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+6: 
+  index: 6
+  label: Editor##editor_dock0
+  x: 0
+  y: 24
+  location: ""
+  size_x: 1024
+  size_y: 470
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+7: 
+  index: 7
+  label:  Game view##game_view_dock0
+  x: 0
+  y: 24
+  location: ""
+  size_x: 1024
+  size_y: 470
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+8: 
+  index: 8
+  label:  Explorer##explorer_dock1
+  x: 0
+  y: 24
+  location: ""
+  size_x: 223
+  size_y: 743
   status: 0
   active: 1
   opened: 1
@@ -77,15 +141,47 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 9
-5: 
-  index: 5
-  label: Log view##log_view_dock0
-  x: 234
-  y: 494
+  parent: 15
+9: 
+  index: 9
+  label:  Property editor##property_editor_dock2
+  x: 712
+  y: 24
   location: ""
-  size_x: 517
-  size_y: 273
+  size_x: 312
+  size_y: 485
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 17
+10: 
+  index: 10
+  label: Asset preview##asset_preview_dock3
+  x: 712
+  y: 509
+  location: ""
+  size_x: 312
+  size_y: 258
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 17
+11: 
+  index: 11
+  label: Log view##log_view_dock4
+  x: 223
+  y: 509
+  location: ""
+  size_x: 489
+  size_y: 258
   status: 0
   active: 0
   opened: 1
@@ -93,30 +189,62 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 9
-6: 
-  index: 6
-  label: Editor##editor_dock0
-  x: 234
+  parent: 14
+12: 
+  index: 12
+  label: Editor##editor_dock5
+  x: 223
   y: 24
   location: ""
-  size_x: 517
-  size_y: 470
+  size_x: 489
+  size_y: 485
   status: 0
   active: 0
   opened: 1
-  prev: -1
-  next: 10
+  prev: 13
+  next: -1
   child0: -1
   child1: -1
-  parent: 8
-7: 
-  index: 7
-  label: ""
-  x: 234
+  parent: 14
+13: 
+  index: 13
+  label:  Game view##game_view_dock6
+  x: 223
   y: 24
   location: ""
-  size_x: 790
+  size_x: 489
+  size_y: 485
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: 12
+  child0: -1
+  child1: -1
+  parent: 14
+14: 
+  index: 14
+  label: ""
+  x: 223
+  y: 24
+  location: ""
+  size_x: 489
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 13
+  child1: 0
+  parent: 15
+15: 
+  index: 15
+  label: ""
+  x: 0
+  y: 24
+  location: ""
+  size_x: 712
   size_y: 743
   status: 0
   active: 1
@@ -124,58 +252,10 @@
   prev: -1
   next: -1
   child0: 8
-  child1: 9
-  parent: 11
-8: 
-  index: 8
-  label: ""
-  x: 234
-  y: 24
-  location: ""
-  size_x: 790
-  size_y: 470
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 6
-  child1: 2
-  parent: 7
-9: 
-  index: 9
-  label: ""
-  x: 234
-  y: 494
-  location: ""
-  size_x: 790
-  size_y: 273
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 0
-  child1: 4
-  parent: 7
-10: 
-  index: 10
-  label:  Game view##game_view_dock0
-  x: 234
-  y: 24
-  location: ""
-  size_x: 517
-  size_y: 470
-  status: 0
-  active: 1
-  opened: 1
-  prev: 6
-  next: -1
-  child0: -1
-  child1: -1
-  parent: 8
-11: 
-  index: 11
+  child1: 14
+  parent: 16
+16: 
+  index: 16
   label: ""
   x: 0
   y: 24
@@ -187,6 +267,22 @@
   opened: 0
   prev: -1
   next: -1
-  child0: 1
-  child1: 7
+  child0: 15
+  child1: 17
   parent: -1
+17: 
+  index: 17
+  label: ""
+  x: 712
+  y: 24
+  location: ""
+  size_x: 312
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 9
+  child1: 10
+  parent: 16

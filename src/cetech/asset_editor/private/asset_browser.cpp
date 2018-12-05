@@ -16,11 +16,11 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/asset_editor/asset_property.h>
 #include <cetech/asset_editor/asset_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/editor/log_view.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -326,7 +326,7 @@ static void ui_asset_list() {
 }
 
 
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
 
     float content_w = ImGui::GetContentRegionAvailWidth();
 
@@ -348,17 +348,21 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 }
 
 
-static const char *dock_title(struct ct_dock_i0 *dock) {
+static const char *dock_title(uint64_t dock) {
     return ICON_FA_FOLDER_OPEN " Asset browser";
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "asset_browser";
 }
 
+static uint64_t cdb_type() {
+    return ASSET_BROWSER;
+};
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .visible = true,
+        .cdb_type = cdb_type,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
@@ -373,6 +377,9 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_ebus_a0->create_ebus(ASSET_BROWSER_EBUS);
+
+    ct_dock_a0->create_dock(ASSET_BROWSER,
+                            static_cast<DebugUIWindowFlags_>(0), true);
 
     _G.visible = true;
     _G.left_column_width = 180.0f;

@@ -24,4 +24,7 @@
 #define ASSET_DCLICK_EVENT \
     CE_ID64_0("asset_dclic", 0xcb3f723dbc17db73ULL)
 
+#define ASSET_BROWSER  \
+    CE_ID64_0("asset_browser", 0x41bbc9e4707d4c8dULL)
+
 #endif //CETECH_ASSET_BROWSER_H

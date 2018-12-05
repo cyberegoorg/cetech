@@ -98,7 +98,7 @@ static float draw_main_menu() {
             ct_debugui_a0->EndMenu();
         }
 
-        if (ct_debugui_a0->BeginMenu("Window", true)) {
+        if (ct_debugui_a0->BeginMenu("Docks", true)) {
             if (ct_debugui_a0->BeginMenu("Layout", true)) {
                 if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
                     struct ce_vio *f = ce_fs_a0->open(ASSET_BROWSER_SOURCE,
@@ -116,32 +116,21 @@ static float draw_main_menu() {
 
             ct_debugui_a0->Separator();
 
-            struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
-            while (it.api) {
-                struct ct_dock_i0 *i = (it.api);
-
-                char title[128] = {};
-
-                snprintf(title, CE_ARRAY_LEN(title), "%s %llu",
-                         i->display_title(i), i->id);
-
-                ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
-
-                it = ce_api_a0->next(it);
-            }
+//            struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
+//            while (it.api) {
+//                struct ct_dock_i0 *i = (it.api);
+//
+//                char title[128] = {};
+//
+//                snprintf(title, CE_ARRAY_LEN(title), "%s %llu",
+//                         i->display_title(i), i->id);
+//
+//                ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
+//
+//                it = ce_api_a0->next(it);
+//            }
 
             ct_debugui_a0->EndMenu();
-        }
-
-
-        struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
-        while (it.api) {
-            struct ct_dock_i0 *i = (it.api);
-
-            if (i->draw_main_menu) {
-                i->draw_main_menu();
-            }
-            it = ce_api_a0->next(it);
         }
 
         if (ct_debugui_a0->BeginMenu("Help", true)) {
@@ -158,32 +147,6 @@ static float draw_main_menu() {
     }
     return menu_height;
 }
-
-static void draw_all_docks() {
-    struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
-    while (it.api) {
-        struct ct_dock_i0 *i = (it.api);
-
-
-        char title[128] = {};
-        snprintf(title, CE_ARRAY_LEN(title), "%s##%s_dock%llu",
-                 i->display_title(i), i->name(i), i->id);
-
-        if (ct_debugui_a0->BeginDock(title, &i->visible, i->dock_flag)) {
-            if (i->draw_menu) {
-                i->draw_menu(i);
-            }
-
-            if (i->draw_ui) {
-                i->draw_ui(i);
-            }
-        }
-        ct_debugui_a0->EndDock();
-
-        it = ce_api_a0->next(it);
-    }
-}
-
 
 static void on_init(uint64_t _event) {
     struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
@@ -253,7 +216,7 @@ static void on_ui(uint64_t _type, void* _event) {
     float size[] = {(float) w, h - 25.0f};
 
     ct_debugui_a0->RootDock(pos, size);
-    draw_all_docks();
+    ct_dock_a0->draw_all();
 
     if (_G.load_layout) {
         ct_debugui_a0->LoadDock("core/default.dock_layout");

@@ -22,7 +22,6 @@
 
 #include <celib/os.h>
 #include <celib/macros.h>
-#include <cetech/asset_editor/asset_property.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh/mesh_renderer.h>
@@ -31,6 +30,7 @@
 #include <celib/log.h>
 #include <cetech/resource/builddb.h>
 #include <bgfx/defines.h>
+#include <cetech/editor/property.h>
 
 #include "material.h"
 
@@ -227,16 +227,6 @@ static void draw_property(uint64_t material) {
     }
 }
 
-
-static const char *display_name() {
-    return "Material";
-}
-
-static struct ct_asset_property_i0 ct_asset_property_i0 = {
-        .display_name = display_name,
-        .draw = draw_property,
-};
-
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
 
@@ -263,10 +253,6 @@ static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == ASSET_PROPERTY) {
-        return &ct_asset_property_i0;
-    }
-
     if (name_hash == ASSET_PREVIEW) {
         return &ct_asset_preview_i0;
     }
@@ -517,6 +503,11 @@ static struct ct_material_a0 material_api = {
 
 struct ct_material_a0 *ct_material_a0 = &material_api;
 
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .cdb_type = cdb_type,
+        .draw_ui = draw_property,
+};
+
 static int init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -525,6 +516,7 @@ static int init(struct ce_api_a0 *api) {
     api->register_api("ct_material_a0", &material_api);
 
     ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
 
     materialcompiler_init(api);
 

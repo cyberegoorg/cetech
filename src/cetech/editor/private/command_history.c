@@ -43,7 +43,7 @@ static void ui_command_list() {
     }
 }
 
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     ui_command_list();
 }
 
@@ -51,13 +51,11 @@ static const char *dock_title() {
     return WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "command_history";
 }
 
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .visible = true,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,

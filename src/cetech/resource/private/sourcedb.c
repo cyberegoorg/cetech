@@ -355,7 +355,8 @@ static uint64_t get(struct ct_resource_id resource_id) {
         ce_cdb_a0->set_type(resource_obj, resource_id.type);
 
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(resource_obj);
-        ce_cdb_a0->set_uint64(w, ASSET_NAME, resource_id.name);
+        ce_cdb_a0->set_str(w, ASSET_NAME,
+                           ce_id_a0->str_from_id64(resource_id.name));
         ce_cdb_a0->write_commit(w);
 
 

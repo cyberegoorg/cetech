@@ -63,7 +63,7 @@ static void fps_camera_update(struct ct_world world,
 
     struct ct_transform_comp *transform;
     transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
-                                              camera_ent);
+                                   camera_ent);
 
     ce_mat4_move(wm, transform->world);
 
@@ -129,11 +129,11 @@ static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
 }
 
 static void set_asset(uint64_t obj) {
-    if(_G.selected_object == obj) {
+    if (_G.selected_object == obj) {
         return;
     }
 
-    if(_G.selected_object) {
+    if (_G.selected_object) {
         uint64_t prev_type = ce_cdb_a0->obj_type(_G.selected_object);
 
         struct ct_resource_i0 *resource_i;
@@ -150,19 +150,21 @@ static void set_asset(uint64_t obj) {
 
     }
 
-    uint64_t type = ce_cdb_a0->obj_type(obj);
-    struct ct_asset_preview_i0 *i;
-    i = _get_asset_preview(type);
-    if (i) {
-        if (i->load) {
-            _G.active_ent = i->load(obj, _G.world);
+    if (obj) {
+        uint64_t type = ce_cdb_a0->obj_type(obj);
+        struct ct_asset_preview_i0 *i;
+        i = _get_asset_preview(type);
+        if (i) {
+            if (i->load) {
+                _G.active_ent = i->load(obj, _G.world);
+            }
         }
     }
 
     _G.selected_object = obj;
 }
 
-static void on_debugui(struct ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
     set_asset(ct_selected_object_a0->selected_object());
@@ -172,7 +174,7 @@ static void on_debugui(struct ct_dock_i0 *dock) {
 
     struct ct_render_graph_component *rg_comp;
     rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
-                                            _G.render_ent);
+                                 _G.render_ent);
 
     rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
 
@@ -191,7 +193,7 @@ static bool init() {
     _G.visible = true;
     _G.world = ct_ecs_a0->create_world();
     _G.camera_ent = ct_ecs_a0->spawn(_G.world,
-                                             ce_id_a0->id64("content/camera"));
+                                     ce_id_a0->id64("content/camera"));
 
     struct ct_render_graph_component rgc = {
             .builder = ct_render_graph_a0->create_builder(),
@@ -200,8 +202,8 @@ static bool init() {
 
     ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
     ct_ecs_a0->add(_G.world, _G.render_ent,
-                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                              (void*[]){&rgc});
+                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
+                   (void *[]) {&rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
     rgc.graph->call->add_module(rgc.graph, module);
@@ -260,16 +262,17 @@ static const char *dock_title() {
     return "Asset preview";
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "asset_preview";
 }
 
+static uint64_t cdb_type() {
+    return ASSET_PREVIEW;
+};
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .dock_flag = DebugUIWindowFlags_NoNavInputs |
-                     DebugUIWindowFlags_NoScrollbar |
-                     DebugUIWindowFlags_NoScrollWithMouse,
-        .visible = true,
+        .cdb_type = cdb_type,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
@@ -286,6 +289,12 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
     };
+
+    ct_dock_a0->create_dock(ASSET_PREVIEW,
+                            DebugUIWindowFlags_NoNavInputs |
+                            DebugUIWindowFlags_NoScrollbar |
+                            DebugUIWindowFlags_NoScrollWithMouse,
+                            true);
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_asset_preview_a0", &asset_preview_api);

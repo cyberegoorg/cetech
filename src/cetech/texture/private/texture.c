@@ -24,12 +24,12 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/asset_editor/asset_property.h>
 #include <cetech/asset_editor/sourcedb_ui.h>
 #include <cetech/asset_editor/asset_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/sourcedb.h>
 #include <cetech/resource/resource_compiler.h>
+#include <cetech/editor/property.h>
 
 //==============================================================================
 // GLobals
@@ -198,8 +198,10 @@ static void draw_property(uint64_t obj) {
 
     float size[2] = {64, 64};
 
+    const char* name = ce_cdb_a0->read_str(obj, ASSET_NAME, 0);
+
     ct_render_texture_handle_t texture;
-    texture = ct_texture_a0->get(ce_cdb_a0->read_uint64(obj, ASSET_NAME, 0));
+    texture = ct_texture_a0->get(ce_id_a0->id64(name));
     ct_debugui_a0->Image(texture,
                          size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
@@ -208,14 +210,11 @@ static void draw_property(uint64_t obj) {
 }
 
 
-static const char *display_name() {
-    return "Texture";
-}
-
-static struct ct_asset_property_i0 ct_asset_property_i0 = {
-        .draw = draw_property,
-        .display_name = display_name,
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .cdb_type = cdb_type,
+        .draw_ui = draw_property,
 };
+
 
 static void tooltip(uint64_t resource) {
     struct ct_render_texture_handle texture = {
@@ -235,10 +234,6 @@ static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
 
 
 void *get_interface(uint64_t name_hash) {
-    if (name_hash == ASSET_PROPERTY) {
-        return &ct_asset_property_i0;
-    }
-
     if (name_hash == ASSET_PREVIEW) {
         return &ct_asset_preview_i0;
     }
@@ -294,6 +289,7 @@ struct ct_texture_a0 *ct_texture_a0 = &texture_api;
 
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_texture_a0", &texture_api);
+    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
 }
 
 

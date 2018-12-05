@@ -145,23 +145,27 @@ static void ui_log_items() {
     ImGui::EndChild();
 }
 
-static void on_debugui(ct_dock_i0 *dock) {
+static void on_debugui(uint64_t dock) {
     ui_filter();
     ui_level_mask();
     ui_log_items();
 }
 
-static const char *dock_title(struct ct_dock_i0 *dock) {
+static const char *dock_title(uint64_t dock) {
     return WINDOW_NAME;
 }
 
-static const char *name(struct ct_dock_i0 *dock) {
+static const char *name(uint64_t dock) {
     return "log_view";
 }
 
+static uint64_t cdb_type() {
+    return LOG_VIEW;
+};
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .id = 0,
-        .visible = true,
+        .cdb_type = cdb_type,
         .display_title = dock_title,
         .draw_ui = on_debugui,
         .name = name,
@@ -176,6 +180,9 @@ static void _init(struct ce_api_a0 *api) {
 
 
     ce_log_a0->register_handler(log_handler, NULL);
+
+    ct_dock_a0->create_dock(LOG_VIEW,
+                            static_cast<DebugUIWindowFlags_>(0), true);
 
     ce_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 }

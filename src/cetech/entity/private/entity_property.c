@@ -32,10 +32,6 @@
 #define _G entity_property_global
 
 static struct _G {
-    uint64_t active_entity;
-    struct ct_entity top_entity;
-    struct ct_world active_world;
-
     struct ce_hash_t components;
 
     struct ce_alloc *allocator;
@@ -56,36 +52,6 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
 
     return NULL;
 };
-
-//static void _generic_component_property(struct ct_resource_id rid,
-//                                        uint64_t obj,
-//                                        struct ct_component_i0 *ci,
-//                                        struct ct_editor_component_i0 *ec) {
-//
-//    const struct ct_comp_prop_decs *comp_decs = ci->prop_desc();
-//
-//    for (int i = 0; i < comp_decs->prop_n; ++i) {
-//        const struct ct_prop_decs *desc = &comp_decs->prop_decs[i];
-//        uint64_t prop = desc->name;
-//
-//        enum ct_ecs_prop_type type = desc->type;
-//
-//        const char *display_name = ec->prop_display_name(prop) ?: "";
-//
-//        switch (type) {
-//            case ECS_PROP_FLOAT:
-//                ct_sourcedb_ui_a0->ui_float(rid, obj, prop, display_name, 0.0f,
-//                                          0.0f);
-//                break;
-//            case ECS_PROP_VEC3:
-//                ct_sourcedb_ui_a0->ui_vec3(rid, obj, desc->names, display_name, 0.0f, 0.0f);
-//                break;
-//            default:
-//                break;
-//        }
-//
-//    }
-//}
 
 static void draw_component(uint64_t obj) {
     uint64_t type = ce_cdb_a0->obj_type(obj);
@@ -122,9 +88,7 @@ static void draw_component(uint64_t obj) {
         return;
     }
 
-    if (editor->property_editor) {
-        editor->property_editor(obj);
-    }
+    ct_property_editor_a0->draw(obj);
 
     ct_debugui_a0->TreePop();
 
@@ -166,38 +130,26 @@ static void draw_ui(uint64_t obj) {
         return;
     }
 
-    uint64_t obj_type = ce_cdb_a0->obj_type(obj);
+    _entity_ui(obj);
 
-    if (ENTITY_RESOURCE_ID == obj_type) {
-        _entity_ui(obj);
+    uint64_t components_obj;
+    components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
 
-        uint64_t components_obj;
-        components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+    uint64_t n = ce_cdb_a0->prop_count(components_obj);
+    const uint64_t *components_name = ce_cdb_a0->prop_keys(components_obj);
 
-        uint64_t n = ce_cdb_a0->prop_count(components_obj);
-        const uint64_t * components_name = ce_cdb_a0->prop_keys(components_obj);
+    for (uint64_t j = 0; j < n; ++j) {
+        uint64_t name = components_name[j];
 
-        for (uint64_t j = 0; j < n; ++j) {
-            uint64_t name = components_name[j];
+        uint64_t c_obj;
+        c_obj = ce_cdb_a0->read_subobject(components_obj, name, 0);
 
-            uint64_t c_obj;
-            c_obj = ce_cdb_a0->read_subobject(components_obj, name, 0);
-
-            draw_component(c_obj);
-        }
-
-    } else if (get_component_interface(obj_type)) {
-        draw_component(obj);
+        draw_component(c_obj);
     }
 }
 
 void draw_menu(uint64_t obj) {
     if (!obj) {
-        return;
-    }
-
-    uint64_t obj_type = ce_cdb_a0->obj_type(obj);
-    if ((ENTITY_RESOURCE_ID != obj_type)) {
         return;
     }
 
@@ -249,7 +201,12 @@ void draw_menu(uint64_t obj) {
     }
 }
 
+static uint64_t cdb_type() {
+    return ENTITY_RESOURCE_ID;
+}
+
 static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .cdb_type = cdb_type,
         .draw_ui = draw_ui,
         .draw_menu = draw_menu,
 };

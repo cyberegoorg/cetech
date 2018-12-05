@@ -112,8 +112,6 @@ struct ct_editor_component_i0 {
 
     uint64_t (*create_new)();
 
-    void (*property_editor)(uint64_t obj);
-
     void (*guizmo_get_transform)(uint64_t obj,
                                  float *world,
                                  float *local);

@@ -45,6 +45,7 @@ void init_static_modules() {
     //==========================================================================
     CE_ADD_STATIC_MODULE(action_manager);
     CE_ADD_STATIC_MODULE(selected_object);
+    CE_ADD_STATIC_MODULE(dock);
 
     CE_ADD_STATIC_MODULE(playground);
     CE_ADD_STATIC_MODULE(asset_browser);
@@ -63,7 +64,6 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(default_render_graph);
     CE_ADD_STATIC_MODULE(command_history);
 
-    CE_ADD_STATIC_MODULE(asset_property);
     CE_ADD_STATIC_MODULE(asset_preview);
 
     CE_ADD_STATIC_MODULE(log_view);

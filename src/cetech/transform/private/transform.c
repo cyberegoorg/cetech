@@ -19,6 +19,7 @@
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/editor/property.h>
 
 #define LOG_WHERE "transform"
 
@@ -187,6 +188,12 @@ static void property_editor(uint64_t obj) {
                                (struct ui_vec3_p0) {});
 }
 
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .cdb_type = cdb_type,
+        .draw_ui = property_editor,
+};
+
+
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
@@ -194,7 +201,6 @@ static void *get_interface(uint64_t name_hash) {
                 .guizmo_get_transform = guizmo_get_transform,
                 .guizmo_set_transform = guizmo_set_transform,
                 .create_new = create_new,
-                .property_editor = property_editor,
         };
 
         return &ct_editor_component_i0;
@@ -311,6 +317,7 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
 static void _init(struct ce_api_a0 *api) {
     api->register_api(COMPONENT_INTERFACE_NAME, &ct_component_i0);
     api->register_api(SIMULATION_INTERFACE_NAME, &transform_simulation_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
 }
 
 static void _shutdown() {

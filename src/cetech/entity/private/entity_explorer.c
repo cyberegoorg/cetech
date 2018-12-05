@@ -66,8 +66,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label),
-             ICON_FA_CUBE
-                     " ""%s##%llu", name, uid);
+            (ICON_FA_CUBE" ""%s##%llu"), name, uid);
 
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
@@ -76,7 +75,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     if (open) {
         const uint32_t component_n = ce_cdb_a0->prop_count(components);
-        const uint64_t* keys = ce_cdb_a0->prop_keys(components);
+        const uint64_t *keys = ce_cdb_a0->prop_keys(components);
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t key = keys[i];
@@ -121,7 +120,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        const uint64_t* keys = ce_cdb_a0->prop_keys(children);
+        const uint64_t *keys = ce_cdb_a0->prop_keys(children);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
@@ -204,22 +203,30 @@ static void draw_menu(uint64_t selected_obj) {
 
 }
 
-static uint64_t draw_ui(uint64_t selected_obj) {
+static uint64_t cdb_type() {
+    return ENTITY_RESOURCE_ID;
+}
+
+static uint64_t draw_ui(uint64_t top_level_obj, uint64_t selected_obj) {
+    if (!top_level_obj) {
+        return 0;
+    }
+
     if (!selected_obj) {
         return 0;
     }
 
-    uint64_t root = ce_cdb_a0->find_root(selected_obj);
-    return ui_entity_item_begin(selected_obj, root, rand());
+    return ui_entity_item_begin(selected_obj, top_level_obj, rand());
 }
 
-static struct ct_explorer_i0 ct_explorer_i0 = {
-        .draw_ui = draw_ui,
-        .draw_menu = draw_menu,
-};
-
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(EXPLORER_INTERFACE_NAME, &ct_explorer_i0);
+    static struct ct_explorer_i0 entity_explorer = {
+            .cdb_type = cdb_type,
+            .draw_ui = draw_ui,
+            .draw_menu = draw_menu,
+    };
+
+    api->register_api(EXPLORER_INTERFACE_NAME, &entity_explorer);
 }
 
 static void _shutdown() {
