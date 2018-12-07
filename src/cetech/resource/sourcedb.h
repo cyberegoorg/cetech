@@ -35,7 +35,6 @@ struct ce_alloc;
 
 struct ct_sourcedb_asset_i0 {
     void (*anotate)(uint64_t obj);
-
 };
 
 struct ct_sourcedb_a0 {

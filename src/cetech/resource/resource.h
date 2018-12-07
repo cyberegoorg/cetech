@@ -45,7 +45,7 @@ struct ct_resource_id {
     };
 };
 
-//! Resource callbacks
+//! Resource interface
 struct ct_resource_i0 {
     uint64_t (*cdb_type)();
 

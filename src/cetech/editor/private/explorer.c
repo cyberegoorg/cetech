@@ -81,11 +81,13 @@ static void draw_menu(uint64_t selected_obj) {
 }
 
 static void on_debugui(uint64_t dock) {
-    if (!ct_selected_object_a0->selected_object()) {
+    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+
+    if (!ct_selected_object_a0->selected_object(context)) {
         return;
     }
 
-    uint64_t selected_object = ct_selected_object_a0->selected_object();
+    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
     draw_menu(selected_object);
 
@@ -93,7 +95,8 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t new_selected_object = draw(selected_object);
     if (new_selected_object) {
-        ct_selected_object_a0->set_selected_object(new_selected_object);
+        ct_selected_object_a0->set_selected_object(context,
+                                                   new_selected_object);
     }
 }
 
@@ -111,8 +114,14 @@ static uint64_t cdb_type() {
     return EXPLORER_INTERFACE;
 };
 
+static uint64_t dock_flags() {
+    return 0;
+}
+
+
 static struct ct_dock_i0 ct_dock_i0 = {
         .cdb_type = cdb_type,
+        .dock_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -125,9 +134,9 @@ static void _init(struct ce_api_a0 *api) {
             .visible = true
     };
 
-    ct_dock_a0->create_dock(EXPLORER_INTERFACE, 0, true);
-
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+
+    ct_dock_a0->create_dock(EXPLORER_INTERFACE, true);
 
     ce_ebus_a0->create_ebus(EXPLORER_EBUS);
 }

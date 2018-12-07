@@ -18,33 +18,35 @@
 #define WINDOW_NAME "Game view"
 
 static float step_dt = 16.0f;
+
 static void on_debugui(uint64_t dock) {
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
 
     uint64_t game_name = ce_id_a0->id64("default");
 
-    struct ct_render_graph_builder* rgb = ct_game_system_a0->render_graph_builder(game_name);
+    struct ct_render_graph_builder *rgb = ct_game_system_a0->render_graph_builder(
+            game_name);
     rgb->call->set_size(rgb, size[0], size[1]);
 
-    static const char* label[] = {
+    static const char *label[] = {
             ICON_FA_PAUSE,
             ICON_FA_PLAY,
     };
 
     bool is_paused = ct_game_system_a0->is_paused(game_name);
 
-    if(ct_debugui_a0->Button(label[is_paused], (float[2]) {0.0f})) {
-        if(is_paused) {
+    if (ct_debugui_a0->Button(label[is_paused], (float[2]) {0.0f})) {
+        if (is_paused) {
             ct_game_system_a0->play(game_name);
         } else {
             ct_game_system_a0->pause(game_name);
         }
     }
 
-    if(is_paused) {
+    if (is_paused) {
         ct_debugui_a0->SameLine(0.0f, 4.0f);
-        if(ct_debugui_a0->Button(ICON_FA_FORWARD, (float[2]) {0.0f})) {
+        if (ct_debugui_a0->Button(ICON_FA_FORWARD, (float[2]) {0.0f})) {
             ct_game_system_a0->step(game_name, step_dt / 1000.0f);
         }
 
@@ -67,7 +69,7 @@ static const char *dock_title(uint64_t dock) {
     return ICON_FA_GAMEPAD " " WINDOW_NAME;
 }
 
-static const char *name(uint64_t dock){
+static const char *name(uint64_t dock) {
     return "game_view";
 }
 
@@ -77,8 +79,15 @@ static uint64_t cdb_type() {
 };
 
 
+static uint64_t dock_flags() {
+    return DebugUIWindowFlags_NoNavInputs |
+           DebugUIWindowFlags_NoScrollbar |
+           DebugUIWindowFlags_NoScrollWithMouse;
+}
+
 static struct ct_dock_i0 ct_dock_i0 = {
-        .cdb_type =cdb_type,
+        .dock_flags = dock_flags,
+        .cdb_type = cdb_type,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -87,12 +96,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
 
-    ct_dock_a0->create_dock(GAME_INTERFACE,
-                            DebugUIWindowFlags_NoNavInputs |
-                            DebugUIWindowFlags_NoScrollbar |
-                            DebugUIWindowFlags_NoScrollWithMouse,
-                            true);
-
+    ct_dock_a0->create_dock(GAME_INTERFACE, true);
 }
 
 static void _shutdown() {

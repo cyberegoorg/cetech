@@ -16,7 +16,7 @@
     CE_ID64_0("root", 0xbccf91e5b6d543e9ULL)
 
 #define ASSET_BROWSER_SOURCE \
-    SOURCE_ROOT
+    CE_ID64_0("source", 0x921f1370045bad6eULL)
 
 #define ASSET_BROWSER_EBUS \
     CE_ID64_0("asset_browser", 0x41bbc9e4707d4c8dULL)

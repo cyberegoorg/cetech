@@ -72,6 +72,10 @@ static struct ct_asset_editor_i0 *get_asset_editor(uint64_t cdb_type) {
 static void draw_editor(uint64_t dock) {
     struct editor *editor = ce_cdb_a0->read_ptr(dock, _PROP_EDITOR, NULL);
 
+    if(!editor) {
+        return;
+    }
+
     struct ct_asset_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
@@ -91,7 +95,8 @@ static void draw_editor(uint64_t dock) {
                 .type=type,
                 .name=name});
 
-        ct_selected_object_a0->set_selected_object(obj);
+        const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+        ct_selected_object_a0->set_selected_object(context, obj);
     }
 
     i->draw_ui(editor->context_obj);
@@ -156,11 +161,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
     editor->context_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
-    uint64_t dock = ct_dock_a0->create_dock(_ASSET_EDITOR,
-                                            DebugUIWindowFlags_NoNavInputs |
-                                            DebugUIWindowFlags_NoScrollbar |
-                                            DebugUIWindowFlags_NoScrollWithMouse,
-                                            true);
+    uint64_t dock = ct_dock_a0->create_dock(_ASSET_EDITOR, true);
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(dock);
     ce_cdb_a0->set_ptr(w, _PROP_EDITOR, editor);
@@ -227,9 +228,16 @@ static uint64_t cdb_type() {
     return _ASSET_EDITOR;
 };
 
+static uint64_t dock_flags() {
+    return DebugUIWindowFlags_NoNavInputs |
+           DebugUIWindowFlags_NoScrollbar |
+           DebugUIWindowFlags_NoScrollWithMouse;
+}
+
 
 static struct ct_dock_i0 dock_i = {
         .cdb_type = cdb_type,
+        .dock_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_editor,
@@ -238,6 +246,8 @@ static struct ct_dock_i0 dock_i = {
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
+
+    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &dock_i);
 
     ce_ebus_a0->connect(ASSET_BROWSER_EBUS,
                         ASSET_DCLICK_EVENT,
@@ -249,7 +259,6 @@ static void _init(struct ce_api_a0 *api) {
     ce_ebus_a0->create_ebus(ASSET_EDITOR_EBUS);
 
 
-    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &dock_i);
 
 
     _get_or_create_editor(0);

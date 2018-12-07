@@ -98,40 +98,7 @@ static float draw_main_menu() {
             ct_debugui_a0->EndMenu();
         }
 
-        if (ct_debugui_a0->BeginMenu("Docks", true)) {
-            if (ct_debugui_a0->BeginMenu("Layout", true)) {
-                if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
-                    struct ce_vio *f = ce_fs_a0->open(ASSET_BROWSER_SOURCE,
-                                                      "core/default.dock_layout",
-                                                      FS_OPEN_WRITE);
-                    ct_debugui_a0->SaveDock(f);
-                    ce_fs_a0->close(f);
-                }
-
-                if (ct_debugui_a0->MenuItem("Load", NULL, false, true)) {
-                    ct_debugui_a0->LoadDock("core/default.dock_layout");
-                }
-                ct_debugui_a0->EndMenu();
-            }
-
-            ct_debugui_a0->Separator();
-
-//            struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
-//            while (it.api) {
-//                struct ct_dock_i0 *i = (it.api);
-//
-//                char title[128] = {};
-//
-//                snprintf(title, CE_ARRAY_LEN(title), "%s %llu",
-//                         i->display_title(i), i->id);
-//
-//                ct_debugui_a0->MenuItem2(title, NULL, &i->visible, true);
-//
-//                it = ce_api_a0->next(it);
-//            }
-
-            ct_debugui_a0->EndMenu();
-        }
+        ct_dock_a0->draw_menu();
 
         if (ct_debugui_a0->BeginMenu("Help", true)) {
             if (ct_debugui_a0->MenuItem("About", NULL, false, true)) {

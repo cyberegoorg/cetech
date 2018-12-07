@@ -10,8 +10,8 @@
 #include "celib/module.inl"
 
 struct ct_selected_object_a0 {
-    void (*set_selected_object)(uint64_t obj);
-    uint64_t (*selected_object)();
+    void (*set_selected_object)(uint64_t context, uint64_t obj);
+    uint64_t (*selected_object)(uint64_t context);
 };
 
 

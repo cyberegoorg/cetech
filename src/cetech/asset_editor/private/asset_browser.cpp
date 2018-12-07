@@ -76,9 +76,11 @@ static void _broadcast_edit() {
     ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, event);
 }
 
-static void _broadcast_selected() {
+static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = ct_resource_a0->get(_G.selected_asset);
-    ct_selected_object_a0->set_selected_object(obj);
+
+    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    ct_selected_object_a0->set_selected_object(context, obj);
 }
 
 static void ui_asset_menu() {
@@ -203,7 +205,7 @@ static void ui_asset_tooltip(ct_resource_id resourceid,
     ai->tooltip(obj);
 }
 
-static void ui_asset_list() {
+static void ui_asset_list(uint64_t dock) {
     ImVec2 size(_G.midle_column_width, 0.0f);
 
     ImGui::BeginChild("middle_col", size);
@@ -262,7 +264,7 @@ static void ui_asset_list() {
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     _broadcast_edit();
                 } else {
-                    _broadcast_selected();
+                    _broadcast_selected(dock);
                 }
             }
 
@@ -344,7 +346,7 @@ static void on_debugui(uint64_t dock) {
     _G.left_column_width = left_size[0];
     ct_debugui_a0->SameLine(0.0f, -1.0f);
 
-    ui_asset_list();
+    ui_asset_list(dock);
 }
 
 
@@ -360,9 +362,13 @@ static uint64_t cdb_type() {
     return ASSET_BROWSER;
 };
 
+static uint64_t dock_flags() {
+    return 0;
+}
 
 static struct ct_dock_i0 ct_dock_i0 = {
         .cdb_type = cdb_type,
+        .dock_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
@@ -378,8 +384,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->create_ebus(ASSET_BROWSER_EBUS);
 
-    ct_dock_a0->create_dock(ASSET_BROWSER,
-                            static_cast<DebugUIWindowFlags_>(0), true);
+    ct_dock_a0->create_dock(ASSET_BROWSER, true);
 
     _G.visible = true;
     _G.left_column_width = 180.0f;

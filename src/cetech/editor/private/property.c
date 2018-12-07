@@ -73,7 +73,8 @@ static void draw_menu(uint64_t obj) {
 }
 
 static void on_debugui(uint64_t dock) {
-    uint64_t obj = ct_selected_object_a0->selected_object();
+    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    uint64_t obj = ct_selected_object_a0->selected_object(context);
 
     ct_debugui_a0->Columns(2, NULL, true);
     ct_debugui_a0->Separator();
@@ -92,7 +93,8 @@ static void on_debugui(uint64_t dock) {
 }
 
 static void on_menu(uint64_t dock) {
-    uint64_t obj = ct_selected_object_a0->selected_object();
+    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    uint64_t obj = ct_selected_object_a0->selected_object(context);
     draw_menu(obj);
 }
 
@@ -129,10 +131,11 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .visible = true
     };
-    ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, 0, true);
 
     api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_property_editor_a0", ct_property_editor_a0);
+
+    ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, true);
 }
 
 static void _shutdown() {

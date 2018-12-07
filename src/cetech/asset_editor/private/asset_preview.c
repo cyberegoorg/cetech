@@ -167,7 +167,8 @@ static void set_asset(uint64_t obj) {
 static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
-    set_asset(ct_selected_object_a0->selected_object());
+    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    set_asset(ct_selected_object_a0->selected_object(context));
 
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
@@ -286,17 +287,14 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 
 
 static void _init(struct ce_api_a0 *api) {
+    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
     };
 
-    ct_dock_a0->create_dock(ASSET_PREVIEW,
-                            DebugUIWindowFlags_NoNavInputs |
-                            DebugUIWindowFlags_NoScrollbar |
-                            DebugUIWindowFlags_NoScrollWithMouse,
-                            true);
+    ct_dock_a0->create_dock(ASSET_PREVIEW, true);
 
-    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
 }

@@ -181,10 +181,10 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_log_a0->register_handler(log_handler, NULL);
 
-    ct_dock_a0->create_dock(LOG_VIEW,
-                            static_cast<DebugUIWindowFlags_>(0), true);
-
     ce_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+
+    ct_dock_a0->create_dock(LOG_VIEW, true);
+
 }
 
 static void _shutdown() {
