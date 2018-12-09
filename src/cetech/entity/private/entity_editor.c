@@ -64,38 +64,38 @@ static void fps_camera_update(struct ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CE_UNUSED(dx);
-    CE_UNUSED(dy);
-
-    float wm[16];
-
-
-    struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->get_one(world,
-                                                  TRANSFORM_COMPONENT,
-                                                  camera_ent);
-
-    ce_mat4_move(wm, transform->world);
-
-    float x_dir[4];
-    float z_dir[4];
-    ce_vec4_move(x_dir, &wm[0 * 4]);
-    ce_vec4_move(z_dir, &wm[2 * 4]);
-
-    if (!fly_mode) {
-        z_dir[1] = 0.0f;
-    }
-
-    // POS
-    float x_dir_new[3];
-    float z_dir_new[3];
-
-    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
-
-    float pos[3] = {};
-    ce_vec3_add(pos, transform->position, x_dir_new);
-    ce_vec3_add(pos, pos, z_dir_new);
+//    CE_UNUSED(dx);
+//    CE_UNUSED(dy);
+//
+//    float wm[16];
+//
+//
+//    struct ct_transform_comp *transform;
+//    transform = ct_ecs_a0->get_one(world,
+//                                                  TRANSFORM_COMPONENT,
+//                                                  camera_ent);
+//
+//    ce_mat4_move(wm, transform->world);
+//
+//    float x_dir[4];
+//    float z_dir[4];
+//    ce_vec4_move(x_dir, &wm[0 * 4]);
+//    ce_vec4_move(z_dir, &wm[2 * 4]);
+//
+//    if (!fly_mode) {
+//        z_dir[1] = 0.0f;
+//    }
+//
+//    // POS
+//    float x_dir_new[3];
+//    float z_dir_new[3];
+//
+//    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+//    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+//
+//    float pos[3] = {};
+//    ce_vec3_add(pos, transform->position, x_dir_new);
+//    ce_vec3_add(pos, pos, z_dir_new);
 
 //    uint64_t ent_obj = camera_ent.h;
 //    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
@@ -257,18 +257,23 @@ static void draw_editor(uint64_t context_obj) {
 //                                  editor->path);
     }
 
-    struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->get_one(editor->world, RENDER_GRAPH_COMPONENT,
-                                            editor->render_ent);
+    uint64_t rgc = ct_ecs_a0->get_one(editor->world,
+                                      RENDER_GRAPH_COMPONENT,
+                                      editor->render_ent);
 
-    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
+    const ce_cdb_obj_o *rgc_reader = ce_cdb_a0->read(rgc);
+    struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(rgc_reader,
+                                                                  PROP_RENDER_GRAPH_BUILDER,
+                                                                  NULL);
+
+    builder->call->set_size(builder, size[0], size[1]);
 
 
     ct_ecs_a0->simulate(editor->world, 0.1f);
 
     ct_render_texture_handle_t th;
-    th = rg_comp->builder->call->get_texture(rg_comp->builder,
-                                             RG_OUTPUT_TEXTURE);
+    th = builder->call->get_texture(builder,
+                                    RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -305,24 +310,28 @@ static void open(uint64_t context_obj) {
     const uint64_t asset_name = ce_cdb_a0->read_uint64(context_obj, _ASSET_NAME,
                                                        0);
 
-    editor->world = ct_ecs_a0->create_world();
-    editor->entity = ct_ecs_a0->spawn(editor->world, asset_name);
+    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
+    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
 
-    struct ct_render_graph_component rgc = {
-            .builder = ct_render_graph_a0->create_builder(),
-            .graph = ct_render_graph_a0->create_graph(),
-    };
+    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                            RENDER_GRAPH_COMPONENT);
 
-    ct_ecs_a0->create(editor->world, &editor->render_ent, 1);
-    ct_ecs_a0->add(editor->world, editor->render_ent,
-                              (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                              (void*[]){&rgc});
 
-    struct ct_render_graph_module *module = ct_default_rg_a0->create(editor->world);
-    rgc.graph->call->add_module(rgc.graph, module);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
+    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
+    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
+    ce_cdb_a0->write_commit(w);
 
+    ct_ecs_a0->create(editor->world, &editor->entity, 1);
+    ct_ecs_a0->add(editor->world, editor->entity,
+                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
+                   (uint64_t[]) {rgc});
+
+    struct ct_render_graph_module *module = ct_default_rg_a0->create(
+            editor->world);
+    graph->call->add_module(graph, module);
     editor->camera_ent = ct_ecs_a0->spawn(editor->world,
-                                                  ce_id_a0->id64("content/camera"));
+                                          ce_id_a0->id64("content/camera"));
 
     editor->entity_name = asset_name;
 

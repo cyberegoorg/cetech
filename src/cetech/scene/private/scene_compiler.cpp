@@ -19,7 +19,6 @@
 #include "cetech/resource/resource.h"
 #include <cetech/renderer/renderer.h>
 #include "cetech/ecs/ecs.h"
-#include "cetech/scenegraph/scenegraph.h"
 #include <cetech/scene/scene.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
@@ -698,7 +697,6 @@ extern "C" uint64_t scene_compiler(const char *filename,
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ct_scenegprah_a0);
     CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_ydb_a0);

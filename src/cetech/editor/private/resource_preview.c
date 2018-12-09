@@ -56,37 +56,37 @@ static void fps_camera_update(struct ct_world world,
                               float speed,
                               bool fly_mode) {
 
-    CE_UNUSED(dx);
-    CE_UNUSED(dy);
-
-    float wm[16];
-
-    struct ct_transform_comp *transform;
-    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
-                                   camera_ent);
-
-    ce_mat4_move(wm, transform->world);
-
-    float x_dir[4];
-    float z_dir[4];
-    ce_vec4_move(x_dir, &wm[0 * 4]);
-    ce_vec4_move(z_dir, &wm[2 * 4]);
-
-    if (!fly_mode) {
-        z_dir[1] = 0.0f;
-    }
-
-    // POS
-    float x_dir_new[3];
-    float z_dir_new[3];
-
-    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
-
-
-    float pos[3] = {};
-    ce_vec3_add(transform->position, pos, x_dir_new);
-    ce_vec3_add(pos, pos, z_dir_new);
+//    CE_UNUSED(dx);
+//    CE_UNUSED(dy);
+//
+//    float wm[16];
+//
+//    struct ct_transform_comp *transform;
+//    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
+//                                   camera_ent);
+//
+//    ce_mat4_move(wm, transform->world);
+//
+//    float x_dir[4];
+//    float z_dir[4];
+//    ce_vec4_move(x_dir, &wm[0 * 4]);
+//    ce_vec4_move(z_dir, &wm[2 * 4]);
+//
+//    if (!fly_mode) {
+//        z_dir[1] = 0.0f;
+//    }
+//
+//    // POS
+//    float x_dir_new[3];
+//    float z_dir_new[3];
+//
+//    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
+//    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
+//
+//
+//    float pos[3] = {};
+//    ce_vec3_add(transform->position, pos, x_dir_new);
+//    ce_vec3_add(pos, pos, z_dir_new);
 
 //
 //    uint64_t ent_obj = camera_ent.h;
@@ -173,15 +173,21 @@ static void on_debugui(uint64_t dock) {
     float size[2];
     ct_debugui_a0->GetContentRegionAvail(size);
 
-    struct ct_render_graph_component *rg_comp;
-    rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
-                                 _G.render_ent);
 
-    rg_comp->builder->call->set_size(rg_comp->builder, size[0], size[1]);
+    uint64_t rgc = ct_ecs_a0->get_one(_G.world,
+                                      RENDER_GRAPH_COMPONENT,
+                                      _G.render_ent);
+
+    const ce_cdb_obj_o *rgc_reader = ce_cdb_a0->read(rgc);
+
+    struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(rgc_reader,
+                                                                  PROP_RENDER_GRAPH_BUILDER,
+                                                                  NULL);
+
+    builder->call->set_size(builder, size[0], size[1]);
 
     ct_render_texture_handle_t th;
-    th = rg_comp->builder->call->get_texture(rg_comp->builder,
-                                             RG_OUTPUT_TEXTURE);
+    th = builder->call->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -196,18 +202,25 @@ static bool init() {
     _G.camera_ent = ct_ecs_a0->spawn(_G.world,
                                      ce_id_a0->id64("content/camera"));
 
-    struct ct_render_graph_component rgc = {
-            .builder = ct_render_graph_a0->create_builder(),
-            .graph = ct_render_graph_a0->create_graph(),
-    };
+    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
+    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
+
+    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                            RENDER_GRAPH_COMPONENT);
+
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
+    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
+    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
+    ce_cdb_a0->write_commit(w);
 
     ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
     ct_ecs_a0->add(_G.world, _G.render_ent,
                    (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                   (void *[]) {&rgc});
+                   (uint64_t[]) {rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    rgc.graph->call->add_module(rgc.graph, module);
+    graph->call->add_module(graph, module);
 
     return true;
 }

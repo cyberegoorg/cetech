@@ -15,7 +15,6 @@
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
-#include "cetech/scenegraph/scenegraph.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/resource/sourcedb.h>
 
@@ -119,7 +118,6 @@ static struct ct_resource_i0 ct_resource_i0 = {
 int sceneinit(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ct_scenegprah_a0);
     CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
 
@@ -148,32 +146,6 @@ static uint64_t resource_data(uint64_t name) {
     return ct_resource_a0->get(rid);
 }
 
-static void create_graph(struct ct_world world,
-                         struct ct_entity entity,
-                         uint64_t scene) {
-
-    uint64_t res = resource_data(scene);
-
-    uint64_t *node_name = (uint64_t *) (ce_cdb_a0->read_blob(res,
-                                                             SCENE_NODE_NAME,
-                                                             NULL, NULL));
-    
-    uint32_t *node_parent = (uint32_t *) (ce_cdb_a0->read_blob(res,
-                                                               SCENE_NODE_PARENT,
-                                                               NULL, NULL));
-    float *node_pose = (float *) (ce_cdb_a0->read_blob(res,
-                                                       SCENE_NODE_POSE,
-                                                       NULL, NULL));
-
-    uint64_t node_count = ce_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
-
-    ct_scenegprah_a0->create(world,
-                             entity,
-                             node_name,
-                             node_parent,
-                             node_pose,
-                             node_count);
-}
 
 static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
@@ -220,7 +192,6 @@ static void get_all_nodes(uint64_t scene,
 }
 
 static struct ct_scene_a0 scene_api = {
-        .create_graph =create_graph,
         .get_mesh_node =get_mesh_node,
         .get_all_geometries =get_all_geometries,
         .get_all_nodes = get_all_nodes,
@@ -237,7 +208,6 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ct_scenegprah_a0);
             CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);

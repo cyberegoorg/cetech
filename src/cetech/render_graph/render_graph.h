@@ -10,6 +10,12 @@
 #define RENDER_GRAPH_COMPONENT \
     CE_ID64_0("render_graph", 0x21bdb056bfd9b0aaULL)
 
+#define PROP_RENDER_GRAPH_BUILDER \
+    CE_ID64_0("buiulder", 0x9046b1ec2a3d7973ULL)
+
+#define PROP_RENDER_GRAPH_GRAPH \
+    CE_ID64_0("graph", 0x8cd7d4181ba14d2fULL)
+
 #define RENDER_SYSTEM \
     CE_ID64_0("rendersystem", 0x48b4a42e2ac861a4ULL)
 

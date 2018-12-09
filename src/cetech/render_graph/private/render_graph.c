@@ -16,6 +16,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/transform/transform.h>
+#include <celib/cdb.h>
 #include "cetech/render_graph/render_graph.h"
 
 
@@ -43,12 +44,12 @@ static uint64_t cdb_type() {
     return RENDER_GRAPH_COMPONENT;
 }
 
-static uint64_t size() {
-    return sizeof(struct ct_render_graph_component);
-}
+//static uint64_t size() {
+//    return sizeof(struct ct_render_graph_component);
+//}
 
 static struct ct_component_i0 render_graph_component_i = {
-        .size = size,
+//        .size = size,
         .cdb_type = cdb_type,
 };
 
@@ -58,21 +59,28 @@ static void foreach_render_graph(struct ct_world world,
                                  ct_entity_storage_t *item,
                                  uint32_t n,
                                  void *data) {
-    struct ct_render_graph_component *all_rg;
-    all_rg = ct_ecs_a0->get_all(RENDER_GRAPH_COMPONENT, item);
-
     for (uint32_t i = 1; i < n; ++i) {
-        struct ct_render_graph_component rg = all_rg[i];
+        uint64_t rg = ct_ecs_a0->get_one(world, RENDER_GRAPH_COMPONENT, ent[i]);
+
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(rg);
+
+        struct ct_render_graph *graph = ce_cdb_a0->read_ptr(reader,
+                                                            PROP_RENDER_GRAPH_GRAPH,
+                                                            NULL);
+
+        struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(reader,
+                                                                      PROP_RENDER_GRAPH_BUILDER,
+                                                                      NULL);
 
         uint16_t size[2] = {};
-        rg.builder->call->get_size(rg.builder, size);
+        builder->call->get_size(builder, size);
         if ((size[0] == 0) || (size[1] == 0)) {
             continue;
         }
 
-        rg.builder->call->clear(rg.builder);
-        rg.graph->call->setup(rg.graph, rg.builder);
-        rg.builder->call->execute(rg.builder);
+        builder->call->clear(builder);
+        graph->call->setup(graph, builder);
+        builder->call->execute(builder);
     }
 }
 
@@ -82,7 +90,8 @@ static void render_system(struct ct_world world,
     ct_ecs_a0->process(world, mask, foreach_render_graph, &dt);
 }
 
-static void on_render(uint64_t type, void* event) {
+static void on_render(uint64_t type,
+                      void *event) {
     CE_UNUSED(event);
 
     _G.viewid = 0;
@@ -104,7 +113,7 @@ static uint64_t render_system_name() {
     return RENDER_SYSTEM;
 }
 
-static const uint64_t * rendersystem_after(uint32_t* n) {
+static const uint64_t *rendersystem_after(uint32_t *n) {
     static uint64_t _after[] = {TRANSFORM_SYSTEM};
     *n = CE_ARRAY_LEN(_after);
     return _after;

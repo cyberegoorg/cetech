@@ -279,7 +279,7 @@ static uint64_t create_from(struct ce_cdb_t db,
                             uint64_t _obj) {
     struct db_t *db_inst = &_G.dbs[db.idx];
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
 
     struct object_t *inst = _new_object(db_inst, _G.allocator);
     inst->db = db;
@@ -362,7 +362,7 @@ static void destroy_db(struct ce_cdb_t db) {
 
 static void destroy_object(uint64_t _obj) {
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
@@ -399,9 +399,10 @@ static void gc() {
             struct object_t **objid = db_inst->to_free_objects_id[j];
             struct object_t *obj = _get_object_from_id((uint64_t) objid);
 
-            if (obj->prefab) {
+            // remove from instance from parent instance
+            if (obj->instance_of) {
                 struct object_t *prefab_obj = \
-                    _get_object_from_objid(obj->prefab);
+                    _get_object_from_id(obj->instance_of);
 
                 const uint32_t instances_n = \
                     ce_array_size(prefab_obj->instances);
@@ -495,7 +496,7 @@ struct cdb_binobj_header {
 static void dump(uint64_t _obj,
                  char **output,
                  struct ce_alloc *allocator) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
 
     uint64_t *keys = obj->keys;
     uint8_t *type = obj->property_type;
@@ -608,7 +609,7 @@ static void load(struct ce_cdb_t db,
     const struct cdb_binobj_header *header;
     header = (const struct cdb_binobj_header *) input;
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
     if (!obj->type) {
         obj->type = header->type;
     }
@@ -660,7 +661,7 @@ static void load(struct ce_cdb_t db,
                 uint64_t subobj = create_object(db, 0);
                 load(obj->db, subobj_data, subobj, allocator);
 
-                struct object_t *sub_obj = _get_object_from_objid(subobj);
+                struct object_t *sub_obj = _get_object_from_id(subobj);
                 sub_obj->parent = _obj;
                 sub_obj->key = obj->keys[i];
 
@@ -710,7 +711,7 @@ static void load(struct ce_cdb_t db,
 }
 
 static ce_cdb_obj_o *write_begin(uint64_t _obj) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
     struct object_t *new_obj = _object_clone(db_inst, obj, _G.allocator);
@@ -720,48 +721,45 @@ static ce_cdb_obj_o *write_begin(uint64_t _obj) {
     return new_obj;
 }
 
+static enum ce_cdb_type prop_type(uint64_t _object,
+                                  uint64_t key) {
+    struct object_t *obj = _get_object_from_id(_object);
+    uint64_t idx = _find_prop_index(obj, key);
+
+    if (idx) {
+        return (enum ce_cdb_type) obj->property_type[idx];
+    }
+
+    return CDB_TYPE_NONE;
+}
+
 static void _notify(struct object_t *obj,
                     uint64_t notify_obj,
                     uint64_t *changed_prop,
-                    uint64_t event) {
-    const int changed_prop_n = ce_array_size(changed_prop);
+                    uint64_t event);
 
-    if (!changed_prop_n) {
-        return;
-    }
-
-
-    struct ce_cdb_prop_ev0 ev = {
-            .obj = notify_obj,
-            .prop=  ce_array_clone(changed_prop, sizeof(uint64_t),
-                                   _G.allocator),
-            .prop_count = changed_prop_n,
-
-    };
-
-    ce_ebus_a0->broadcast(CDB_EBUS, event,
-                          &ev, sizeof(struct ce_cdb_prop_ev0));
-
-    const int instances_n = ce_array_size(obj->instances);
-    for (int i = 0; i < instances_n; ++i) {
-        struct object_t *inst_obj = _get_object_from_objid(obj->instances[i]);
-        _notify(inst_obj, obj->instances[i], changed_prop, event);
-    }
-}
+//static void _dispatch_instances(struct object_t *obj,
+//                                struct object_t *writer,
+//                                uint64_t *changed_prop,
+//                                uint64_t event);
 
 static void write_commit(ce_cdb_obj_o *_writer) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-    struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
+    struct object_t *writer = _get_object_from_o(_writer);
+    struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
 
     struct object_t **obj_addr = (struct object_t **) writer->orig_obj;
-
-    *obj_addr = writer->idx;
 
     _notify(orig_obj, writer->orig_obj,
             writer->removed_prop, CDB_PROP_REMOVED_EVENT);
 
     _notify(orig_obj, writer->orig_obj,
             writer->changed_prop, CDB_PROP_CHANGED_EVENT);
+
+
+//    _dispatch_instances(orig_obj, writer,
+//                        writer->changed_prop, CDB_PROP_CHANGED_EVENT);
+
+    *obj_addr = writer;
 
     ce_array_clean(writer->removed_prop);
     ce_array_clean(writer->changed_prop);
@@ -770,8 +768,8 @@ static void write_commit(ce_cdb_obj_o *_writer) {
 }
 
 static bool write_try_commit(ce_cdb_obj_o *_writer) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-    struct object_t *orig_obj = _get_object_from_objid(writer->orig_obj);
+    struct object_t *writer = _get_object_from_o(_writer);
+    struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
 
 
     struct object_t **obj_addr = (struct object_t **) writer->orig_obj;
@@ -799,7 +797,7 @@ static bool write_try_commit(ce_cdb_obj_o *_writer) {
 static void set_float(ce_cdb_obj_o *_writer,
                       uint64_t property,
                       float value) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -819,7 +817,7 @@ static void set_float(ce_cdb_obj_o *_writer,
 static void set_bool(ce_cdb_obj_o *_writer,
                      uint64_t property,
                      bool value) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -841,7 +839,7 @@ static void set_string(ce_cdb_obj_o *_writer,
                        const char *value) {
     struct ce_alloc *a = _G.allocator;
 
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
 
@@ -870,7 +868,7 @@ static void set_string(ce_cdb_obj_o *_writer,
 static void set_uint64(ce_cdb_obj_o *_writer,
                        uint64_t property,
                        uint64_t value) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -888,7 +886,7 @@ static void set_uint64(ce_cdb_obj_o *_writer,
 static void set_ptr(ce_cdb_obj_o *_writer,
                     uint64_t property,
                     const void *value) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -905,7 +903,7 @@ static void set_ref(ce_cdb_obj_o *_writer,
                     uint64_t property,
                     uint64_t ref) {
 
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -925,7 +923,7 @@ static void set_ref(ce_cdb_obj_o *_writer,
 }
 
 uint64_t parent(uint64_t object) {
-    struct object_t *obj = _get_object_from_objid(object);
+    struct object_t *obj = _get_object_from_id(object);
     return obj->parent;
 }
 
@@ -934,15 +932,15 @@ uint64_t prefab(uint64_t object) {
         return 0;
     }
 
-    struct object_t *obj = _get_object_from_objid(object);
-    return obj->prefab;
+    struct object_t *obj = _get_object_from_id(object);
+    return obj->instance_of;
 }
 
 void set_subobjectw(ce_cdb_obj_o *_writer,
                     uint64_t property,
                     ce_cdb_obj_o *_subwriter) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
-    struct object_t *subwriter = _get_object_from_obj_o(_subwriter);
+    struct object_t *writer = _get_object_from_o(_writer);
+    struct object_t *subwriter = _get_object_from_o(_subwriter);
 
     subwriter->key = property;
 
@@ -965,7 +963,7 @@ void set_subobjectw(ce_cdb_obj_o *_writer,
 void set_subobject(ce_cdb_obj_o *_writer,
                    uint64_t property,
                    uint64_t subobject) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     uint64_t idx = _find_prop_index(writer, property);
     if (!idx) {
@@ -982,7 +980,7 @@ void set_subobject(ce_cdb_obj_o *_writer,
     value_ptr->subobj = subobject;
 
     if (subobject) {
-        struct object_t *subobj = _get_object_from_objid(subobject);
+        struct object_t *subobj = _get_object_from_id(subobject);
         subobj->parent = writer->orig_obj;
         subobj->key = property;
     }
@@ -994,7 +992,7 @@ void set_blob(ce_cdb_obj_o *_writer,
               uint64_t blob_size) {
     struct ce_alloc *a = _G.allocator;
 
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     void *new_blob = CE_ALLOC(a, char, blob_size);
 
@@ -1029,8 +1027,8 @@ void set_blob(ce_cdb_obj_o *_writer,
 
 void set_prefab(uint64_t _obj,
                 uint64_t _prefab) {
-    struct object_t *obj = _get_object_from_objid(_obj);
-    struct object_t *prefab = _get_object_from_objid(_prefab);
+    struct object_t *obj = _get_object_from_id(_obj);
+    struct object_t *prefab = _get_object_from_id(_prefab);
 
     obj->prefab = _prefab;
     ce_array_push(prefab->instances,
@@ -1043,7 +1041,7 @@ static bool prop_exist(uint64_t _object,
 
 void remove_property(ce_cdb_obj_o *_writer,
                      uint64_t property) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     if (!prop_exist(writer->orig_obj, property)) {
         return;
@@ -1099,7 +1097,7 @@ void remove_property(ce_cdb_obj_o *_writer,
 
 void delete_property(ce_cdb_obj_o *_writer,
                      uint64_t property) {
-    struct object_t *writer = _get_object_from_obj_o(_writer);
+    struct object_t *writer = _get_object_from_o(_writer);
 
     if (!prop_exist(writer->orig_obj, property)) {
         return;
@@ -1128,7 +1126,7 @@ void delete_property(ce_cdb_obj_o *_writer,
 
 static bool prop_exist(uint64_t _object,
                        uint64_t key) {
-    struct object_t *obj = _get_object_from_objid(_object);
+    struct object_t *obj = _get_object_from_id(_object);
 
     uint32_t idx = _find_prop_index(obj, key);
 
@@ -1158,7 +1156,7 @@ static float read_float(uint64_t _obj,
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1172,12 +1170,11 @@ static float read_float(uint64_t _obj,
 static bool read_bool(uint64_t _obj,
                       uint64_t property,
                       bool defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
-
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1191,11 +1188,11 @@ static bool read_bool(uint64_t _obj,
 static const char *read_string(uint64_t _obj,
                                uint64_t property,
                                const char *defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
     if (idx) {
@@ -1209,12 +1206,11 @@ static const char *read_string(uint64_t _obj,
 static uint64_t read_uint64(uint64_t _obj,
                             uint64_t property,
                             uint64_t defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
-
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1228,11 +1224,11 @@ static uint64_t read_uint64(uint64_t _obj,
 static void *read_ptr(uint64_t _obj,
                       uint64_t property,
                       void *defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1247,11 +1243,11 @@ static void *read_ptr(uint64_t _obj,
 static uint64_t read_ref(uint64_t _obj,
                          uint64_t property,
                          uint64_t defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1265,11 +1261,11 @@ static uint64_t read_ref(uint64_t _obj,
 static uint64_t read_subobject(uint64_t _obj,
                                uint64_t property,
                                uint64_t defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1305,11 +1301,11 @@ void *read_blob(uint64_t _obj,
                 uint64_t property,
                 uint64_t *size,
                 void *defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_o(reader);
 
     uint64_t idx = _find_prop_index(obj, property);
 
@@ -1331,7 +1327,7 @@ void *read_blob(uint64_t _obj,
 static uint64_t prop_count(uint64_t _obj);
 
 static const uint64_t *prop_keys(uint64_t _obj) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
 
     if (!obj) {
         return NULL;
@@ -1341,7 +1337,7 @@ static const uint64_t *prop_keys(uint64_t _obj) {
 }
 
 static uint64_t prop_count(uint64_t _obj) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
 
     if (!obj) {
         return 0;
@@ -1357,7 +1353,7 @@ static struct ce_cdb_t global_db() {
 }
 
 static uint64_t type(uint64_t _obj) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
 
     return obj->type;
 }
@@ -1368,13 +1364,13 @@ void set_type(uint64_t _obj,
         return;
     }
 
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
     obj->type = type;
 }
 
 
 uint64_t key(uint64_t _obj) {
-    struct object_t *obj = _get_object_from_objid(_obj);
+    struct object_t *obj = _get_object_from_id(_obj);
     return obj->key;
 }
 
@@ -1468,6 +1464,83 @@ static uint64_t find_root(uint64_t obj) {
     }
 
     return obj;
+}
+
+//static void _dispatch_instances(struct object_t *orig_obj,
+//                                struct object_t *writer,
+//                                uint64_t *changed_prop,
+//                                uint64_t event) {
+//    const int changed_prop_n = ce_array_size(changed_prop);
+//
+//    if (!changed_prop_n) {
+//        return;
+//    }
+//
+//
+//    const int instances_n = ce_array_size(orig_obj->instances);
+//    for (int i = 0; i < instances_n; ++i) {
+//        uint64_t inst_obj = orig_obj->instances[i];
+//
+//        if (event == CDB_PROP_CHANGED_EVENT) {
+//            ce_cdb_obj_o *w = write_begin(inst_obj);
+//            for (int j = 0; j < changed_prop_n; ++j) {
+//                uint64_t prop = changed_prop[j];
+//                enum ce_cdb_type t = prop_type(notify_obj, prop);
+//                switch (t) {
+//                    case CDB_TYPE_NONE:
+//                        break;
+//                    case CDB_TYPE_UINT64:
+//                        break;
+//                    case CDB_TYPE_PTR:
+//                        break;
+//                    case CDB_TYPE_REF:
+//                        break;
+//                    case CDB_TYPE_FLOAT: {
+//                        float v = read_float(notify_obj, prop, 0.0f);
+//                        float inst_v = read_float(inst_obj, prop, 0.0f);
+//
+//                        ce_cdb_a0->set_float(w, prop, v);
+//                    }
+//                        break;
+//                    case CDB_TYPE_BOOL:
+//                        break;
+//                    case CDB_TYPE_STR:
+//                        break;
+//                    case CDB_TYPE_SUBOBJECT:
+//                        break;
+//                    case CDB_TYPE_BLOB:
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//            write_commit(w);
+//        }
+//    }
+//}
+
+static void _notify(struct object_t *obj,
+                    uint64_t notify_obj,
+                    uint64_t *changed_prop,
+                    uint64_t event) {
+    const int changed_prop_n = ce_array_size(changed_prop);
+
+    if (!changed_prop_n) {
+        return;
+    }
+
+
+    struct ce_cdb_prop_ev0 ev = {
+            .obj = notify_obj,
+            .prop=  ce_array_clone(changed_prop, sizeof(uint64_t),
+                                   _G.allocator),
+            .prop_count = changed_prop_n,
+    };
+
+    ce_ebus_a0->broadcast(CDB_EBUS, event,
+                          &ev, sizeof(struct ce_cdb_prop_ev0));
+
+
 }
 
 static struct ce_cdb_a0 cdb_api = {

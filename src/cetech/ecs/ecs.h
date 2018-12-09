@@ -84,8 +84,6 @@ typedef void (*ct_simulate_fce_t)(struct ct_world world,
                                   float dt);
 
 struct ct_component_i0 {
-    uint64_t (*size)();
-
     uint64_t (*cdb_type)();
 
     void *(*get_interface)(uint64_t name_hash);
@@ -95,8 +93,7 @@ struct ct_component_i0 {
                      ce_cdb_obj_o *writer);
 
     void (*spawner)(struct ct_world world,
-                    uint64_t obj,
-                    void *data);
+                    uint64_t obj);
 
     void (*obj_change)(struct ct_world world,
                        uint64_t obj,
@@ -179,18 +176,18 @@ struct ct_ecs_a0 {
 
     uint64_t (*mask)(uint64_t component_name);
 
-    void *(*get_all)(uint64_t component_name,
-                     ct_entity_storage_t *item);
+//    void *(*get_all)(uint64_t component_name,
+//                     ct_entity_storage_t *item);
 
-    void *(*get_one)(struct ct_world world,
-                     uint64_t component_name,
-                     struct ct_entity entity);
+    uint64_t (*get_one)(struct ct_world world,
+                        uint64_t component_name,
+                        struct ct_entity entity);
 
     void (*add)(struct ct_world world,
                 struct ct_entity ent,
                 const uint64_t *component_name,
                 uint32_t name_count,
-                void **);
+                uint64_t *data);
 
     void (*remove)(struct ct_world world,
                    struct ct_entity ent,

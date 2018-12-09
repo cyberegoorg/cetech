@@ -34,11 +34,7 @@
 #define PROP_SCALE_Z \
     CE_ID64_0("scale.z", 0x6cbb9d53bbfbb80fULL)
 
-struct ct_transform_comp {
-    float position[3];
-    float rotation[3];
-    float scale[3];
-    float world[16];
-};
+#define PROP_WORLD \
+    CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
 #endif //CETECH_TRANSFORM_H

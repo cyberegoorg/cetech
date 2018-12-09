@@ -81,11 +81,6 @@ struct ct_entity;
 //==============================================================================
 
 struct ct_scene_a0 {
-
-    void (*create_graph)(struct ct_world world,
-                         struct ct_entity entity,
-                         uint64_t scene);
-
     uint64_t (*get_mesh_node)(uint64_t scene,
                               uint64_t mesh);
 

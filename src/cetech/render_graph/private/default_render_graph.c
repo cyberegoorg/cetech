@@ -72,7 +72,7 @@ static void geometry_pass_on_setup(void *inst,
 }
 
 struct cameras {
-    struct ct_camera_component camera_data[32];
+    uint64_t camera_data[32];
     struct ct_entity ent[32];
     uint32_t n;
 };
@@ -86,17 +86,15 @@ void foreach_camera(struct ct_world world,
 
     struct cameras *cameras = data;
 
-    struct ct_camera_component *camera_data;
-    camera_data = ct_ecs_a0->get_all(CAMERA_COMPONENT, item);
-
     for (uint32_t i = 1; i < n; ++i) {
         uint32_t idx = cameras->n++;
 
         cameras->ent[idx].h = ent[i].h;
 
-        memcpy(cameras->camera_data + idx,
-               camera_data + i,
-               sizeof(struct ct_camera_component));
+        uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
+                                                  ent[i]);
+
+        cameras->camera_data[idx] = camera_data;
     }
 }
 
@@ -121,8 +119,8 @@ static void geometry_pass_on_pass(void *inst,
     memset(&cameras, 0, sizeof(struct cameras));
 
     ct_ecs_a0->process(pass->world,
-                               ct_ecs_a0->mask(CAMERA_COMPONENT),
-                               foreach_camera, &cameras);
+                       ct_ecs_a0->mask(CAMERA_COMPONENT),
+                       foreach_camera, &cameras);
 
     ct_dd_a0->begin(viewid);
     {

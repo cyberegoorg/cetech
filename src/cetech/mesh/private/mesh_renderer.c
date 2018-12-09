@@ -14,7 +14,6 @@
 #include "cetech/ecs/ecs.h"
 
 #include "cetech/transform/transform.h"
-#include "cetech/scenegraph/scenegraph.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/scene/scene.h>
 #include <cetech/material/material.h>
@@ -66,32 +65,43 @@ void foreach_mesh_renderer(struct ct_world world,
                            ct_entity_storage_t *item,
                            uint32_t n,
                            void *_data) {
-
     struct mesh_render_data *data = _data;
 
-    struct ct_mesh *mesh_renderers = \
-        ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
-
-    struct ct_transform_comp *transforms;
-    transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (int i = 1; i < n; ++i) {
-        struct ct_transform_comp t = transforms[i];
-        struct ct_mesh m = mesh_renderers[i];
+        uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
+                                                entities[i]);
+        uint64_t mesh_renderer = ct_ecs_a0->get_one(world,
+                                                    MESH_RENDERER_COMPONENT,
+                                                    entities[i]);
 
-        uint64_t scene = m.scene_id;
+        const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(transform);
+        const ce_cdb_obj_o *mr_reader = ce_cdb_a0->read(mesh_renderer);
+
+        uint64_t scene = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
+                                                            PROP_SCENE_ID,
+                                                            0));
 
         if (!scene) {
             continue;
         }
 
-        if (!m.material) {
+        uint64_t material = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
+                                                               PROP_MATERIAL,
+                                                               0));
+
+        if (!material) {
             continue;
         }
 
+        float *world = ce_cdb_a0->read_blob(t_reader, PROP_WORLD, NULL, 0);
+
         float final_w[16];
         ce_mat4_identity(final_w);
-        ce_mat4_move(final_w, t.world);
+
+        if(world) {
+            ce_mat4_move(final_w, world);
+        }
 
         struct ct_resource_id rid = (struct ct_resource_id) {
                 .type = SCENE_TYPE,
@@ -100,8 +110,15 @@ void foreach_mesh_renderer(struct ct_world world,
 
         uint64_t scene_obj = ct_resource_a0->get(rid);
 
-        uint64_t mesh = m.mesh_id;
-        uint64_t geom_obj = ce_cdb_a0->read_ref(scene_obj, mesh, 0);
+        uint64_t mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
+                                                           PROP_MESH,
+                                                           0));
+
+        const ce_cdb_obj_o *scene_reader = ce_cdb_a0->read(scene_obj);
+
+
+        uint64_t mesh = mesh_id;
+        uint64_t geom_obj = ce_cdb_a0->read_ref(scene_reader, mesh, 0);
 
         if (!geom_obj) {
             continue;
@@ -119,12 +136,12 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_renderer_a0->set_vertex_buffer(0, vbh, 0, vb_size);
         ct_renderer_a0->set_index_buffer(ibh, 0, ib_size);
 
-        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE, .name = m.material};
+        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE, .name = material};
         uint64_t material_obj = ct_resource_a0->get(material_resource);
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
 
-        ct_dd_a0->set_transform_mtx(t.world);
+        ct_dd_a0->set_transform_mtx(world);
         ct_dd_a0->draw_axis(0, 0, 0, 1.0f, DD_AXIS_COUNT, 0.0f);
     }
 }
@@ -235,27 +252,25 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static uint64_t size() {
-    return sizeof(struct ct_mesh);
-}
+//static uint64_t size() {
+//    return sizeof(struct ct_mesh);
+//}
 
 static void mesh_spawner(struct ct_world world,
-                         uint64_t obj,
-                         void *data) {
-    struct ct_mesh *m = data;
-    *m = (struct ct_mesh) {
-            .mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_MESH, 0)),
-            .node_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_NODE, 0)),
-            .scene_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
-                                                           PROP_SCENE_ID, 0)),
-            .material = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
-                                                           PROP_MATERIAL, 0)),
-    };
+                         uint64_t obj) {
+//    struct ct_mesh *m = data;
+//    *m = (struct ct_mesh) {
+//            .mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_MESH, 0)),
+//            .node_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj, PROP_NODE, 0)),
+//            .scene_id = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
+//                                                           PROP_SCENE_ID, 0)),
+//            .material = ce_id_a0->id64(ce_cdb_a0->read_str(obj,
+//                                                           PROP_MATERIAL, 0)),
+//    };
 }
 
 
 static struct ct_component_i0 ct_component_i0 = {
-        .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .compiler = _mesh_component_compiler,
@@ -290,7 +305,6 @@ CE_MODULE_DEF(
         mesh_renderer,
         {
             CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_scenegprah_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_material_a0);
             CE_INIT_API(api, ce_ydb_a0);

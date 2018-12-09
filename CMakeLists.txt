@@ -122,10 +122,7 @@ set(SOURCE_FILES
         src/cetech/scene/private/scene_compiler.cpp
         src/cetech/mesh/private/mesh_renderer.c
         src/cetech/transform/private/transform.c
-
-        src/cetech/scenegraph/private/scenegraph.c
         src/cetech/camera/private/camera.c
-
         src/cetech/entity/private/entity_editor.c
         src/cetech/asset_editor/private/asset_editor.c
         src/cetech/entity/private/entity_property.c
@@ -142,7 +139,9 @@ set(SOURCE_FILES
         src/cetech/asset_editor/private/sourcedb_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
-        src/cetech/entity/private/entity_explorer.c src/cetech/editor/private/selected_object.c src/cetech/editor/private/dock.c)
+        src/cetech/entity/private/entity_explorer.c
+        src/cetech/editor/private/selected_object.c
+        src/cetech/editor/private/dock.c)
 
 ################################################################################
 # Main sources

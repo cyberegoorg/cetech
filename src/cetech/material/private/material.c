@@ -234,9 +234,9 @@ static struct ct_entity load(uint64_t resource,
                                             ce_id_a0->id64(
                                                     "core/cube"));
 
-    struct ct_mesh *mesh;
-    mesh = ct_ecs_a0->get_one(world, MESH_RENDERER_COMPONENT, ent);
-    mesh->material = resource;
+//    struct ct_mesh *mesh;
+//    mesh = ct_ecs_a0->get_one(world, MESH_RENDERER_COMPONENT, ent);
+//    mesh->material = resource;
 
     return ent;
 }
