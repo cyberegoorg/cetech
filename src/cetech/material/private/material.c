@@ -25,8 +25,8 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh/mesh_renderer.h>
-#include <cetech/asset_editor/asset_preview.h>
-#include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/editor/resource_preview.h>
+#include <cetech/editor/resource_ui.h>
 #include <celib/log.h>
 #include <cetech/resource/builddb.h>
 #include <bgfx/defines.h>
@@ -170,8 +170,8 @@ static void ui_texture(uint64_t var) {
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_sourcedb_ui_a0->ui_resource(variable, MATERIAL_VAR_VALUE_PROP, name,
-                                   TEXTURE_TYPE, variable);
+    ct_resource_ui_a0->ui_resource(var, MATERIAL_VAR_VALUE_PROP, name,
+                                   TEXTURE_TYPE, var);
 }
 
 static void draw_property(uint64_t material) {
@@ -204,10 +204,10 @@ static void draw_property(uint64_t material) {
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_sourcedb_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME,
+            ct_resource_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME,
                                       "Layer name", i);
 
-            ct_sourcedb_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP,
+            ct_resource_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP,
                                            "Shader",
                                            SHADER_TYPE, i);
 
@@ -274,20 +274,19 @@ static void unload(uint64_t resource,
     ct_ecs_a0->destroy(world, &entity, 1);
 }
 
-static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
+static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
         .load = load,
         .unload = unload,
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == ASSET_PREVIEW) {
-        return &ct_asset_preview_i0;
+    if (name_hash == RESOURCE_PREVIEW_I) {
+        return &ct_resource_preview_i0;
     }
     return NULL;
 }
 
-uint64_t material_compiler(const char *filename,
-                           uint64_t k,
+uint64_t material_compiler(uint64_t k,
                            struct ct_resource_id rid,
                            const char *fullname);
 

@@ -15,15 +15,15 @@
 #include <celib/cdb.h>
 #include <cetech/debugui/debugui.h>
 #include <celib/fmath.inl>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/resource/builddb.h>
 #include <celib/os.h>
 #include <cetech/editor/property.h>
 #include <cetech/resource/resource.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/debugui/icons_font_awesome.h>
 
-#include "cetech/asset_editor/sourcedb_ui.h"
+#include "cetech/editor/resource_ui.h"
 
 
 static void _prop_label(const char *label,
@@ -270,12 +270,12 @@ static void ui_resource(uint64_t obj,
             const ce_cdb_obj_o *dreader = ce_cdb_a0->read(drag_obj);
 
             if (drag_obj) {
-                uint64_t asset_type = ce_cdb_a0->read_uint64(drag_obj,
-                                                             ASSET_TYPE,
+                uint64_t asset_type = ce_cdb_a0->read_uint64(dreader,
+                                                             RESOURCE_TYPE,
                                                              0);
 
-                uint64_t asset_name = ce_cdb_a0->read_uint64(drag_obj,
-                                                             ASSET_NAME,
+                uint64_t asset_name = ce_cdb_a0->read_uint64(dreader,
+                                                             RESOURCE_NAME,
                                                              0);
 
                 if (resource_type == asset_type) {
@@ -402,7 +402,7 @@ static void ui_vec4(uint64_t obj,
     ct_debugui_a0->NextColumn();
 }
 
-static struct ct_sourcedb_ui_a0 editor_ui_a0 = {
+static struct ct_resource_ui_a0 editor_ui_a0 = {
         .ui_float = ui_float,
         .ui_str = ui_str,
         .ui_str_combo = ui_str_combo,
@@ -412,11 +412,11 @@ static struct ct_sourcedb_ui_a0 editor_ui_a0 = {
         .ui_bool = ui_bool,
 };
 
-struct ct_sourcedb_ui_a0 *ct_sourcedb_ui_a0 = &editor_ui_a0;
+struct ct_resource_ui_a0 *ct_resource_ui_a0 = &editor_ui_a0;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api("ct_sourcedb_ui_a0", ct_sourcedb_ui_a0);
+    api->register_api("ct_resource_ui_a0", ct_resource_ui_a0);
 }
 
 static void _shutdown() {

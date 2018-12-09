@@ -21,10 +21,10 @@
 #include <cetech/resource/resource.h>
 #include <cetech/resource/resource_compiler.h>
 #include "cetech/resource/builddb.h"
-#include "cetech/resource/sourcedb.h"
+#include "cetech/asset/sourcedb.h"
 #include <cetech/kernel/kernel.h>
 #include <cetech/command_system/command_system.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 
 #define LOG_WHERE "sourcedb"
 
@@ -59,7 +59,7 @@ static struct _G {
 //                          struct ce_alloc *alloc) {
 //
 //    do {
-//        if (ce_cdb_a0->read_uint64(obj, ASSET_NAME, 0) == rid.name) {
+//        if (ce_cdb_a0->read_uint64(obj, RESOURCE_NAME, 0) == rid.name) {
 //            break;
 //        }
 //
@@ -82,7 +82,7 @@ uint64_t _find_root(uint64_t obj) {
             break;
         }
 
-        if (ce_cdb_a0->prop_exist(obj, ASSET_NAME)) {
+        if (ce_cdb_a0->prop_exist(obj, RESOURCE_NAME)) {
             ret = obj;
         }
 
@@ -107,7 +107,7 @@ uint64_t _find_root(uint64_t obj) {
 //
 //    uint64_t asset_obj = _find_root(obj);
 //    uint64_t asset_type = ce_cdb_a0->type(asset_obj);
-//    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
+//    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, RESOURCE_NAME, 0);
 //
 //    _put_modified(asset_obj);
 //
@@ -168,7 +168,7 @@ uint64_t _find_root(uint64_t obj) {
 //    _put_modified(asset_obj);
 //
 //    uint64_t asset_type = ce_cdb_a0->type(asset_obj);
-//    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, ASSET_NAME, 0);
+//    uint64_t asset_name = ce_cdb_a0->read_uint64(asset_obj, RESOURCE_NAME, 0);
 //
 //    struct ct_resource_i0 *ri = ct_resource_a0->get_interface(asset_type);
 //    if (ri && ri->get_interface) {
@@ -361,10 +361,9 @@ static uint64_t get(struct ct_resource_id resource_id) {
         ce_cdb_a0->set_type(resource_obj, resource_id.type);
 
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(resource_obj);
-        ce_cdb_a0->set_str(w, ASSET_NAME,
+        ce_cdb_a0->set_str(w, RESOURCE_NAME,
                            ce_id_a0->str_from_id64(resource_id.name));
         ce_cdb_a0->write_commit(w);
-
 
         _expand(resource_obj, 0);
 
@@ -374,8 +373,9 @@ static uint64_t get(struct ct_resource_id resource_id) {
             const struct ct_sourcedb_asset_i0 *sa;
             sa = ri->get_interface(SOURCEDB_I);
 
-            if (sa && sa->anotate) {
-                sa->anotate(resource_obj);
+            if (sa && sa->load) {
+                uint64_t new_obj = sa->load(resource_obj);
+                resource_obj = new_obj;
             }
         }
 
@@ -413,7 +413,9 @@ static bool save_all() {
     for (int i = 0; i < n; ++i) {
         uint64_t p = k[i];
 
-        uint64_t asset_name = ce_cdb_a0->read_uint64(p, ASSET_NAME, 0);
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(p);
+
+        uint64_t asset_name = ce_cdb_a0->read_uint64(reader, RESOURCE_NAME, 0);
 
         struct ct_resource_id rid = {
                 .name = asset_name,
@@ -457,8 +459,8 @@ void set_str(struct ct_resource_id rid,
 
     uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, rid.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
+    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
     ce_cdb_a0->set_uint64(w, _PROP, prop);
     ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
     ce_cdb_a0->set_str(w, _NEW_VALUE, new_value);
@@ -488,8 +490,8 @@ void set_float(struct ct_resource_id rid,
                float new_value) {
     uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, rid.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
+    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
     ce_cdb_a0->set_uint64(w, _PROP, prop);
     ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
     ce_cdb_a0->set_float(w, _NEW_VALUE, new_value);
@@ -517,8 +519,8 @@ void add_subobj(struct ct_resource_id rid,
 
     uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, rid.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
+    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
     ce_cdb_a0->set_uint64(w, _PROP, prop);
     ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
     ce_cdb_a0->set_ref(w, _NEW_VALUE, new_value);
@@ -590,8 +592,8 @@ void set_bool(struct ct_resource_id rid,
 
     uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, rid.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
+    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
     ce_cdb_a0->set_uint64(w, _PROP, prop);
     ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
     ce_cdb_a0->set_bool(w, _NEW_VALUE, new_value);

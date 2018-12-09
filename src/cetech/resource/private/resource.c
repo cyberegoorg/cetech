@@ -21,7 +21,7 @@
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <celib/hashlib.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 
 #include "../resource.h"
 

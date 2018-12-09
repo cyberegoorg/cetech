@@ -18,14 +18,14 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/asset_editor/asset_editor.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/editor/resource_editor.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/editor/selcted_object.h>
 
@@ -67,8 +67,10 @@ static uint64_t draw(uint64_t selected_obj) {
 static void draw_menu(uint64_t selected_obj) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(selected_obj);
 
-    if (ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME)) {
-        const char *name = ce_cdb_a0->read_str(top_level_obj, ASSET_NAME, "");
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(top_level_obj);
+
+    if (ce_cdb_a0->prop_exist(top_level_obj, RESOURCE_NAME)) {
+        const char *name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, "");
         ct_debugui_a0->Text("Asset: %s", name);
         ct_debugui_a0->SameLine(0, 10);
     }

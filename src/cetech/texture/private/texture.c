@@ -24,10 +24,10 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/asset_editor/sourcedb_ui.h>
-#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/resource_preview.h>
 #include <cetech/resource/builddb.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/property.h>
 
@@ -182,14 +182,10 @@ static uint64_t _compile(uint64_t obj) {
 }
 
 
-uint64_t texture_compiler(const char *filename,
-                          uint64_t k,
-                          struct ct_resource_id rid,
-                          const char *fullname) {
-    const char *input = ce_cdb_a0->read_str(k, TEXTURE_INPUT, "");
-    uint64_t output = _compile(k);
-    ct_builddb_a0->add_dependency(filename, input);
-    return output;
+uint64_t texture_compiler(uint64_t k,
+                           struct ct_resource_id rid,
+                           const char *fullname) {
+    return _compile(k);
 }
 
 static uint64_t cdb_type() {
@@ -197,16 +193,17 @@ static uint64_t cdb_type() {
 }
 
 static void draw_property(uint64_t obj) {
-    ct_sourcedb_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
-    ct_sourcedb_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_sourcedb_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+    ct_resource_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
+    ct_resource_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
+    ct_resource_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
     ct_debugui_a0->Text("Texture preview");
     ct_debugui_a0->NextColumn();
 
     float size[2] = {64, 64};
 
-    const char* name = ce_cdb_a0->read_str(obj, ASSET_NAME, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const char* name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, 0);
 
     ct_render_texture_handle_t texture;
     texture = ct_texture_a0->get(ce_id_a0->id64(name));
@@ -238,14 +235,14 @@ static void tooltip(uint64_t resource) {
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
+static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
         .tooltip = tooltip,
 };
 
 
 void *get_interface(uint64_t name_hash) {
-    if (name_hash == ASSET_PREVIEW) {
-        return &ct_asset_preview_i0;
+    if (name_hash == RESOURCE_PREVIEW_I) {
+        return &ct_resource_preview_i0;
     }
 
     return NULL;

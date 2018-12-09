@@ -117,13 +117,11 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static bool _compile(const char *filename,
-                     uint64_t obj) {
-    const char *vs_input = ce_cdb_a0->read_str(obj, SHADER_VS_INPUT, "");
-    const char *fs_input = ce_cdb_a0->read_str(obj, SHADER_FS_INPUT, "");
+static bool _compile(uint64_t obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
-    ct_builddb_a0->add_dependency(filename, vs_input);
-    ct_builddb_a0->add_dependency(filename, fs_input);
+    const char *vs_input = ce_cdb_a0->read_str(reader, SHADER_VS_INPUT, "");
+    const char *fs_input = ce_cdb_a0->read_str(reader, SHADER_FS_INPUT, "");
 
     struct ce_alloc *a = ce_memory_a0->system;
 
@@ -223,11 +221,13 @@ static bool _compile(const char *filename,
     return true;
 }
 
-uint64_t shader_compiler(const char *filename,
-                     uint64_t k,
-                     struct ct_resource_id rid,
-                     const char *fullname) {
-    const char *vs_input = ce_cdb_a0->read_str(k, ce_id_a0->id64("vs_input"),
+uint64_t shader_compiler(uint64_t k,
+                         struct ct_resource_id rid,
+                         const char *fullname) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(k);
+
+    const char *vs_input = ce_cdb_a0->read_str(reader,
+                                               ce_id_a0->id64("vs_input"),
                                                "");
     const char *fs_input = ce_cdb_a0->read_str(reader,
                                                ce_id_a0->id64("fs_input"),
@@ -246,7 +246,7 @@ uint64_t shader_compiler(const char *filename,
 
     ce_cdb_a0->write_commit(w);
 
-    bool res = _compile(filename, obj);
+    bool res = _compile(obj);
 
     if (res) {
         return obj;

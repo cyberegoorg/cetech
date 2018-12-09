@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <celib/ydb.h>
-#include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/editor/resource_ui.h>
 #include <celib/log.h>
 #include <celib/buffer.inl>
 #include <cetech/editor/property.h>
@@ -199,22 +199,22 @@ static const char *display_name() {
 
 static void property_editor(uint64_t obj) {
 
-    ct_sourcedb_ui_a0->ui_resource(obj,
-                                   ce_id_a0->id64("scene"), "Scene",
-                                   ce_id_a0->id64("scene"),
+    ct_resource_ui_a0->ui_resource(obj,
+                                   PROP_SCENE_ID, "Scene",
+                                   PROP_SCENE_ID,
                                    obj);
 
-    ct_sourcedb_ui_a0->ui_str_combo(obj,
+    ct_resource_ui_a0->ui_str_combo(obj,
                                     PROP_MESH, "Mesh",
                                     mesh_combo_items,
                                     obj);
 
-    ct_sourcedb_ui_a0->ui_str_combo(obj,
+    ct_resource_ui_a0->ui_str_combo(obj,
                                     PROP_NODE, "Node",
                                     node_combo_items,
                                     obj);
 
-    ct_sourcedb_ui_a0->ui_resource(obj,
+    ct_resource_ui_a0->ui_resource(obj,
                                    ce_id_a0->id64("material"),
                                    "Material",
                                    ce_id_a0->id64("material"),

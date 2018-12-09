@@ -19,12 +19,11 @@
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/editor/property.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/command_system/command_system.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource/sourcedb.h>
-
+#include <cetech/asset/sourcedb.h>
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();

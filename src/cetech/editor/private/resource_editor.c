@@ -18,7 +18,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
@@ -29,7 +29,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <celib/array.inl>
-#include <cetech/asset_editor/asset_editor.h>
+#include <cetech/editor/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/dock.h>
 
@@ -54,12 +54,12 @@ static struct _G {
 } _G;
 
 
-static struct ct_asset_editor_i0 *get_asset_editor(uint64_t cdb_type) {
-    struct ce_api_entry it = ce_api_a0->first(ASSET_EDITOR_I);
+static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
+    struct ce_api_entry it = ce_api_a0->first(RESOURCE_EDITOR_I);
     while (it.api) {
-        struct ct_asset_editor_i0 *i = (it.api);
+        struct ct_resource_editor_i0 *i = (it.api);
 
-        if (cdb_type == i->asset_type()) {
+        if (cdb_type == i->cdb_type()) {
             return i;
         }
 
@@ -78,7 +78,7 @@ static void draw_editor(uint64_t dock) {
         return;
     }
 
-    struct ct_asset_editor_i0 *i = get_asset_editor(editor->type);
+    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
         return;
@@ -129,7 +129,7 @@ static const char *dock_title(uint64_t dock) {
         return NULL;
     }
 
-    struct ct_asset_editor_i0 *i = get_asset_editor(editor->type);
+    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
         return DEFAULT_EDITOR_NAME;
@@ -176,7 +176,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
 static void open(uint64_t obj) {
     uint64_t type = ce_cdb_a0->obj_type(obj);
-    struct ct_asset_editor_i0 *i = get_asset_editor(type);
+    struct ct_resource_editor_i0 *i = get_asset_editor(type);
 
     if (!i) {
         return;
@@ -187,7 +187,7 @@ static void open(uint64_t obj) {
     e->obj = obj;
 
     struct ct_world *w = ce_cdb_a0->write_begin(e->context_obj);
-    ce_cdb_a0->set_ref(w, ASSET_EDITOR_OBJ, obj);
+    ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
     i->open(e->context_obj);
 
 }
@@ -197,7 +197,7 @@ static void update(float dt) {
     for (uint8_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
 
-        struct ct_asset_editor_i0 *editor_i = get_asset_editor(editor->type);
+        struct ct_resource_editor_i0 *editor_i = get_asset_editor(editor->type);
 
         if (!editor_i) {
             return;
@@ -255,14 +255,14 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_api_a0->register_api(DOCK_INTERFACE_NAME, &dock_i);
 
-    ce_ebus_a0->connect(ASSET_BROWSER_EBUS,
-                        ASSET_DCLICK_EVENT,
+    ce_ebus_a0->connect(RESOURCE_BROWSER_EBUS,
+                        RESOURCE_DCLICK_EVENT,
                         on_asset_double_click, 0);
 
     ce_api_a0->register_api("ct_editor_module_i0",
                             &ct_editor_module_i0);
 
-    ce_ebus_a0->create_ebus(ASSET_EDITOR_EBUS);
+    ce_ebus_a0->create_ebus(RESOURCE_EDITOR_EBUS);
 
 
 
@@ -271,7 +271,7 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ce_ebus_a0->disconnect(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT,
+    ce_ebus_a0->disconnect(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT,
                            on_asset_double_click);
 
     _G = (struct _G) {};

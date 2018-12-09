@@ -90,7 +90,7 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
-        src/cetech/resource/private/sourcedb.c
+        src/cetech/asset/private/sourcedb.c
         src/cetech/resource/private/package.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/private/kernel.c
@@ -124,11 +124,11 @@ set(SOURCE_FILES
         src/cetech/transform/private/transform.c
         src/cetech/camera/private/camera.c
         src/cetech/entity/private/entity_editor.c
-        src/cetech/asset_editor/private/asset_editor.c
+        src/cetech/editor/private/resource_editor.c
         src/cetech/entity/private/entity_property.c
         src/cetech/editor/private/explorer.c
-        src/cetech/asset_editor/private/asset_preview.c
-        src/cetech/asset_editor/private/asset_browser.cpp
+        src/cetech/editor/private/resource_preview.c
+        src/cetech/editor/private/resource_browser.cpp
         src/cetech/editor/private/editor.c
         src/cetech/editor/private/property.c
         src/cetech/command_system/private/command_system.c
@@ -136,7 +136,7 @@ set(SOURCE_FILES
         src/cetech/editor/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
         src/cetech/resource/private/builddb.c
-        src/cetech/asset_editor/private/sourcedb_ui.c
+        src/cetech/editor/private/resource_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
         src/cetech/entity/private/entity_explorer.c

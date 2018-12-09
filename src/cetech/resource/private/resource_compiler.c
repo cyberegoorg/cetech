@@ -21,7 +21,7 @@
 #include <celib/cdb.h>
 
 #include <cetech/resource/resource.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
 #include "cetech/resource/builddb.h"
@@ -131,7 +131,7 @@ static void _compile_task(void *data) {
         if (!compilator) {
             output_obj = asset_obj;
         } else {
-            output_obj = compilator(tdata->source_filename, asset_obj, rid,
+            output_obj = compilator(asset_obj, rid,
                                     resource_name);
         }
 
@@ -367,7 +367,7 @@ void compile_and_reload(uint64_t type,
     if (!compilator) {
         output_obj = asset_obj;
     } else {
-        output_obj = compilator(NULL, asset_obj, rid, NULL);
+        output_obj = compilator(asset_obj, rid, NULL);
     }
 
     ct_resource_a0->reload_from_obj(rid, output_obj);

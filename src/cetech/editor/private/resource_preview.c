@@ -7,8 +7,8 @@
 #include <cetech/controlers/keyboard.h>
 #include <cetech/debugdraw/debugdraw.h>
 
-#include <cetech/asset_editor/asset_preview.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_preview.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/editor.h>
 #include <celib/hash.inl>
 #include <celib/fmath.inl>
@@ -17,7 +17,7 @@
 #include <cetech/render_graph/default_render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/editor/selcted_object.h>
 
 #include "celib/hashlib.h"
@@ -113,7 +113,7 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
+static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     struct ct_resource_i0 *resource_i;
     resource_i = ct_resource_a0->get_interface(asset_type);
 
@@ -125,7 +125,7 @@ static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
         return NULL;
     }
 
-    return resource_i->get_interface(ASSET_PREVIEW);
+    return resource_i->get_interface(RESOURCE_PREVIEW_I);
 }
 
 static void set_asset(uint64_t obj) {
@@ -139,7 +139,7 @@ static void set_asset(uint64_t obj) {
         struct ct_resource_i0 *resource_i;
         resource_i = ct_resource_a0->get_interface(prev_type);
 
-        struct ct_asset_preview_i0 *i;
+        struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(prev_type);
 
         if (i) {
@@ -152,7 +152,7 @@ static void set_asset(uint64_t obj) {
 
     if (obj) {
         uint64_t type = ce_cdb_a0->obj_type(obj);
-        struct ct_asset_preview_i0 *i;
+        struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(type);
         if (i) {
             if (i->load) {
@@ -284,7 +284,7 @@ static const char *name(uint64_t dock) {
 }
 
 static uint64_t cdb_type() {
-    return ASSET_PREVIEW;
+    return RESOURCE_PREVIEW_I;
 };
 
 
@@ -309,7 +309,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    ct_dock_a0->create_dock(ASSET_PREVIEW, true);
+    ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
 
     api->register_api("ct_asset_preview_a0", &asset_preview_api);
     api->register_api("ct_editor_module_i0", &ct_editor_module_i0);

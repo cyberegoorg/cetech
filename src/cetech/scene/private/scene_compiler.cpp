@@ -476,8 +476,7 @@ static void _compile_assimp_node(struct aiNode *root,
     }
 }
 
-static int _compile_assimp(const char *filename,
-                           uint64_t k,
+static int _compile_assimp(uint64_t k,
                            struct compile_output *output) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(k);
 
@@ -622,8 +621,7 @@ static int _compile_assimp(const char *filename,
     return 1;
 }
 
-extern "C" uint64_t scene_compiler(const char *filename,
-                                   uint64_t k,
+extern "C" uint64_t scene_compiler(uint64_t k,
                                    struct ct_resource_id rid,
                                    const char *fullname) {
     struct compile_output *output = _crete_compile_output();
@@ -631,7 +629,7 @@ extern "C" uint64_t scene_compiler(const char *filename,
     int ret = 1;
 
     if (ce_cdb_a0->prop_exist(k, ce_id_a0->id64("import"))) {
-        ret = _compile_assimp(filename, k, output);
+        ret = _compile_assimp(k, output);
     }
 
     if (!ret) {

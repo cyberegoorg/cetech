@@ -16,7 +16,7 @@
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -107,7 +107,9 @@ static uint64_t cdb_type() {
 }
 
 
-uint64_t scene_compiler(const char *filename, uint64_t k, struct ct_resource_id rid, const char *fullname);
+uint64_t scene_compiler(uint64_t k,
+                        struct ct_resource_id rid,
+                        const char *fullname);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,

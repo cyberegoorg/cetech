@@ -23,7 +23,7 @@
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/ecs/ecs.h>
 #include <stdlib.h>
 #include <celib/ydb.h>

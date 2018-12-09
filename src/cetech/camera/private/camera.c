@@ -11,7 +11,7 @@
 #include <celib/ebus.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/editor/resource_ui.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"

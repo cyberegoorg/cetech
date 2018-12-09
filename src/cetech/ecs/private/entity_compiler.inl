@@ -108,8 +108,7 @@
 //}
 
 
-static uint64_t resource_compiler(const char *filename,
-                                  uint64_t key,
+static uint64_t resource_compiler(uint64_t key,
                                   struct ct_resource_id rid,
                                   const char *fullname) {
 //    return compile_entitity(filename, key, 0, NULL);
@@ -117,7 +116,7 @@ static uint64_t resource_compiler(const char *filename,
 }
 
 
-void entity_resource_anotate(uint64_t obj) {
+uint64_t entity_asset_load(uint64_t obj) {
     ce_cdb_a0->set_type(obj, ENTITY_RESOURCE_ID);
 
     const ce_cdb_obj_o *obj_reader = ce_cdb_a0->read(obj);
@@ -151,7 +150,10 @@ void entity_resource_anotate(uint64_t obj) {
     const uint64_t children_keys_count = ce_cdb_a0->prop_count(children);
     const uint64_t *children_k = ce_cdb_a0->prop_keys(children);
     for (uint32_t i = 0; i < children_keys_count; ++i) {
-        uint64_t ch = ce_cdb_a0->read_subobject(children, children_k[i], 0);
-        entity_resource_anotate(ch);
+        uint64_t ch = ce_cdb_a0->read_subobject(chuildren_reader,
+                                                children_k[i], 0);
+        entity_asset_load(ch);
     }
+
+    return obj;
 }

@@ -1,13 +1,11 @@
-#ifndef CETECH_SOURCEDB_UI_H
-#define CETECH_SOURCEDB_UI_H
+#ifndef CETECH_RESOURCE_UI_H
+#define CETECH_RESOURCE_UI_H
 
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include <celib/module.inl>
-
-struct ct_resource_id;
 
 struct ui_vec4_p0 {
     float min_f;
@@ -26,7 +24,7 @@ struct ui_float_p0 {
     float max_f;
 };
 
-struct ct_sourcedb_ui_a0 {
+struct ct_resource_ui_a0 {
     void (*ui_float)(uint64_t obj,
                      uint64_t property,
                      const char *label,
@@ -66,6 +64,6 @@ struct ct_sourcedb_ui_a0 {
                     struct ui_vec4_p0 params);
 };
 
-CE_MODULE(ct_sourcedb_ui_a0);
+CE_MODULE(ct_resource_ui_a0);
 
-#endif //CETECH_SOURCEDB_UI_H
+#endif //CETECH_RESOURCE_UI_H

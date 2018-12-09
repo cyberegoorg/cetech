@@ -14,7 +14,7 @@
 #include <cetech/ecs/ecs.h>
 
 #include <cetech/editor/property.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
 #include <celib/ebus.h>
 #include <celib/fmath.inl>
@@ -22,11 +22,11 @@
 #include <celib/hash.inl>
 #include <celib/ydb.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/asset_editor/sourcedb_ui.h>
+#include <cetech/editor/resource_ui.h>
 #include <celib/cdb.h>
 #include <celib/log.h>
 #include <celib/buffer.inl>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 
 
 #define _G entity_property_global
@@ -119,7 +119,7 @@ static void _entity_ui(uint64_t obj) {
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
 
-    ct_sourcedb_ui_a0->ui_str(obj, ENTITY_NAME, "Name", 11111111);
+    ct_resource_ui_a0->ui_str(obj, ENTITY_NAME, "Name", 11111111);
 
 
     ct_debugui_a0->TreePop();

@@ -20,8 +20,8 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
-#include <cetech/asset_editor/asset_preview.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/editor/resource_preview.h>
+#include <cetech/asset/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 
 
@@ -826,17 +826,17 @@ static void unload(uint64_t resource,
 }
 
 void *get_resource_interface(uint64_t name_hash) {
-    static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
+    static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
             .load = load,
             .unload = unload,
     };
 
     static struct ct_sourcedb_asset_i0 ct_sourcedb_asset_i0 = {
-            .anotate = entity_resource_anotate,
+            .load = entity_asset_load,
     };
 
-    if (name_hash == ASSET_PREVIEW) {
-        return &ct_asset_preview_i0;
+    if (name_hash == RESOURCE_PREVIEW_I) {
+        return &ct_resource_preview_i0;
     } else if (name_hash == SOURCEDB_I) {
         return &ct_sourcedb_asset_i0;
     }

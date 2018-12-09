@@ -22,10 +22,11 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <string.h>
 #include <cetech/game/game_system.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
+#include <cetech/render_graph/default_render_graph.h>
 
 #define _G plaground_global
 

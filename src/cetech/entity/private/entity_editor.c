@@ -17,7 +17,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
@@ -27,7 +27,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/asset_editor/asset_editor.h>
+#include <cetech/editor/resource_editor.h>
 
 
 #define MAX_EDITOR 8
@@ -390,7 +390,7 @@ static void update(uint64_t context_obj,
     }
 }
 
-uint64_t asset_type() {
+uint64_t cdb_type() {
     return ENTITY_RESOURCE_ID;
 }
 
@@ -403,8 +403,8 @@ const char *display_name() {
 }
 
 
-static struct ct_asset_editor_i0 ct_asset_editor_i0 = {
-        .asset_type = asset_type,
+static struct ct_resource_editor_i0 ct_resource_editor_i0 = {
+        .cdb_type = cdb_type,
         .open = open,
         .update = update,
         .draw_ui = draw_editor,
@@ -416,7 +416,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api("ct_asset_editor_i0", &ct_asset_editor_i0);
+    api->register_api("ct_resource_editor_i0", &ct_resource_editor_i0);
 }
 
 static void _shutdown() {

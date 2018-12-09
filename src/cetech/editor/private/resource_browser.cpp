@@ -1,5 +1,5 @@
 #include <cetech/debugui/debugui.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/fs.h>
 #include <celib/os.h>
@@ -16,7 +16,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/asset_editor/asset_preview.h>
+#include <cetech/editor/resource_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
@@ -65,15 +65,15 @@ static void set_current_dir(const char *dir,
 static void _broadcast_edit() {
     uint64_t event;
     event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                     ASSET_DCLICK_EVENT);
+                                     RESOURCE_DCLICK_EVENT);
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, _G.selected_asset.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, _G.selected_asset.type);
-    ce_cdb_a0->set_uint64(w, ASSET_BROWSER_ROOT, ASSET_BROWSER_SOURCE);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, _G.selected_asset.name);
+    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, _G.selected_asset.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_BROWSER_ROOT, RESOURCE_BROWSER_SOURCE);
     ce_cdb_a0->write_commit(w);
 
-    ce_ebus_a0->broadcast_obj(ASSET_BROWSER_EBUS, ASSET_DCLICK_EVENT, event);
+    ce_ebus_a0->broadcast_obj(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT, event);
 }
 
 static void _broadcast_selected(uint64_t dock) {
@@ -196,8 +196,8 @@ static void ui_asset_tooltip(ct_resource_id resourceid,
         return;
     }
 
-    ct_asset_preview_i0 *ai = \
-                (ct_asset_preview_i0 *) (ri->get_interface(ASSET_PREVIEW));
+    ct_resource_preview_i0 *ai = \
+                (ct_resource_preview_i0 *) (ri->get_interface(RESOURCE_PREVIEW_I));
 
     if (!ai->tooltip) {
         return;
@@ -277,11 +277,11 @@ static void ui_asset_list(uint64_t dock) {
 
                 uint64_t selected_asset = ce_cdb_a0->create_object(
                         ce_cdb_a0->db(),
-                        ASSET_BROWSER_ASSET_TYPE);
+                        RESOURCE_BROWSER_ASSET_TYPE);
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
-                ce_cdb_a0->set_uint64(w, ASSET_NAME, resourceid.name);
-                ce_cdb_a0->set_uint64(w, ASSET_TYPE, resourceid.type);
+                ce_cdb_a0->set_uint64(w, RESOURCE_NAME, resourceid.name);
+                ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, resourceid.type);
                 ce_cdb_a0->write_commit(w);
 
                 ct_debugui_a0->SetDragDropPayload("asset",
@@ -361,7 +361,7 @@ static const char *name(uint64_t dock) {
 }
 
 static uint64_t cdb_type() {
-    return ASSET_BROWSER;
+    return RESOURCE_BROWSER;
 };
 
 static uint64_t dock_flags() {
@@ -384,9 +384,9 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_ebus_a0->create_ebus(ASSET_BROWSER_EBUS);
+    ce_ebus_a0->create_ebus(RESOURCE_BROWSER_EBUS);
 
-    ct_dock_a0->create_dock(ASSET_BROWSER, true);
+    ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
 
     _G.visible = true;
     _G.left_column_width = 180.0f;

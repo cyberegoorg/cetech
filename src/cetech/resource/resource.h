@@ -45,6 +45,12 @@ struct ct_resource_id {
     };
 };
 
+
+typedef uint64_t (*ct_resource_compilator_t)(uint64_t obj,
+                                             struct ct_resource_id rid,
+                                             const char *fullname);
+
+
 //! Resource interface
 struct ct_resource_i0 {
     uint64_t (*cdb_type)();
@@ -57,16 +63,9 @@ struct ct_resource_i0 {
     void (*offline)(uint64_t name,
                     uint64_t obj);
 
-    uint64_t (*compilator)(const char *filename,
-                           uint64_t obj,
-                           struct ct_resource_id rid,
-                           const char *fullname);
+    ct_resource_compilator_t compilator;
 };
 
-typedef uint64_t (*ct_resource_compilator_t)(const char *filename,
-                                             uint64_t obj,
-                                             struct ct_resource_id rid,
-                                             const char *fullname);
 
 
 struct ct_resource_a0 {

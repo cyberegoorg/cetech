@@ -13,9 +13,9 @@
 #include <cetech/editor/property.h>
 #include <cetech/editor/editor.h>
 #include <cetech/editor/dock.h>
-#include <cetech/asset_editor/asset_browser.h>
+#include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/resource/sourcedb.h>
+#include <cetech/asset/sourcedb.h>
 #include <celib/cdb.h>
 #include <cetech/editor/selcted_object.h>
 

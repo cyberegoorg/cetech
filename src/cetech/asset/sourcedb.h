@@ -15,7 +15,7 @@
 #define SOURCEDB_I \
     CE_ID64_0("ct_sourcedb_asset_i0", 0x78a6425ce161b913ULL)
 
-#define ASSET_NAME \
+#define RESOURCE_NAME \
     CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
 
 #define ASSET_OBJ \
@@ -34,7 +34,7 @@ struct ct_resource_id;
 struct ce_alloc;
 
 struct ct_sourcedb_asset_i0 {
-    void (*anotate)(uint64_t obj);
+    uint64_t (*load)(uint64_t obj);
 };
 
 struct ct_sourcedb_a0 {

@@ -6,10 +6,10 @@
 
 struct ct_world;
 
-#define ASSET_PREVIEW \
-    CE_ID64_0("ct_asset_preview_i0", 0xb3cba443e3ad0e60ULL)
+#define RESOURCE_PREVIEW_I \
+    CE_ID64_0("ct_resource_preview_i0", 0x5e8a61eef5a43b61ULL)
 
-struct ct_asset_preview_i0 {
+struct ct_resource_preview_i0 {
     struct ct_entity (*load)(uint64_t resource,
                              struct ct_world world);
 
