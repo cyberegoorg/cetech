@@ -23,42 +23,7 @@
 
 #define LOG_WHERE "transform"
 
-static void component_compiler(const char *filename,
-                               uint64_t component_key,
-                               ce_cdb_obj_o *writer) {
-
-    ce_cdb_a0->set_float(writer, PROP_SCALE_X,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_SCALE_X, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_SCALE_Y,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_SCALE_Y, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_SCALE_Z,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_SCALE_Z, 1.0f));
-
-    ce_cdb_a0->set_float(writer, PROP_POSITION_X,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_POSITION_X, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_POSITION_Y,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_POSITION_Y, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_POSITION_Z,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_POSITION_Z, 1.0f));
-
-    ce_cdb_a0->set_float(writer, PROP_ROTATION_X,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_ROTATION_X, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_ROTATION_Y,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_ROTATION_Y, 1.0f));
-    ce_cdb_a0->set_float(writer, PROP_ROTATION_Z,
-                         ce_cdb_a0->read_float(component_key,
-                                               PROP_ROTATION_Z, 1.0f));
-}
-
-static void transform_transform(struct ct_transform_comp *transform,
+static void transform_transform(uint64_t transform,
                                 float *parent) {
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(transform);
@@ -297,7 +262,6 @@ void obj_change(struct ct_world world,
 static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
-        .compiler = component_compiler,
         .spawner = transform_spawner,
         .obj_change = obj_change,
 };

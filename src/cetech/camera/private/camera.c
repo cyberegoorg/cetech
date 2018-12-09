@@ -118,7 +118,6 @@ static void camera_spawner(struct ct_world world,
 static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
-        .compiler = _camera_compiler,
         .spawner = camera_spawner,
 };
 

@@ -88,10 +88,6 @@ struct ct_component_i0 {
 
     void *(*get_interface)(uint64_t name_hash);
 
-    void (*compiler)(const char *filename,
-                     uint64_t component_key,
-                     ce_cdb_obj_o *writer);
-
     void (*spawner)(struct ct_world world,
                     uint64_t obj);
 

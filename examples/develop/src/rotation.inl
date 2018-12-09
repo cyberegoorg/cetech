@@ -39,9 +39,8 @@ static void *get_interface(uint64_t name_hash) {
 //}
 
 static struct ct_component_i0 rotation_component_i = {
-        .size = size,
+//        .size = size,
         .cdb_type = cdb_type,
-        .compiler = component_compiler,
         .get_interface = get_interface,
 };
 
