@@ -120,61 +120,63 @@ static void fps_camera_update(struct ct_world world,
 //    end
 }
 
-static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
-    while (it.api) {
-        struct ct_component_i0 *i = (it.api);
+//static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
+//    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+//    while (it.api) {
+//        struct ct_component_i0 *i = (it.api);
+//
+//        if (cdb_type == i->cdb_type()) {
+//            return i;
+//        }
+//
+//        it = ce_api_a0->next(it);
+//    }
+//
+//    return NULL;
+//};
 
-        if (cdb_type == i->cdb_type()) {
-            return i;
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    return NULL;
-};
-
-static void _guizmo(uint64_t component_obj,
-                    struct ct_editor_component_i0 *ceditor,
-                    enum OPERATION operation,
-                    const float *view,
-                    const float *proj,
-                    float *size) {
-
-    if (!ceditor->guizmo_get_transform) {
-        return;
-    }
-
-    if (!ceditor->guizmo_set_transform) {
-        return;
-    }
-
-    float world[16];
-    float local[16];
-
-    ce_mat4_identity(world);
-    ce_mat4_identity(local);
-
-    ceditor->guizmo_get_transform(component_obj, world, local);
-
-    float min[2];
-    ct_debugui_a0->GetWindowPos(min);
-    ct_debugui_a0->guizmo_set_rect(min[0], min[1], size[0], size[1]);
-
-    float delta_matrix[16] = {0.0f};
-    ce_mat4_identity(delta_matrix);
-
-    ct_debugui_a0->guizmo_manipulate(view, proj, operation, WORLD,
-                                     world, delta_matrix, 0, NULL, NULL);
-
-    if (!ce_mat4_is_identity(delta_matrix)) {
-        ceditor->guizmo_set_transform(component_obj, operation, world, local);
-    }
-}
+//static void _guizmo(uint64_t component_obj,
+//                    struct ct_editor_component_i0 *ceditor,
+//                    enum OPERATION operation,
+//                    const float *view,
+//                    const float *proj,
+//                    float *size) {
+//
+//    if (!ceditor->guizmo_get_transform) {
+//        return;
+//    }
+//
+//    if (!ceditor->guizmo_set_transform) {
+//        return;
+//    }
+//
+//    float world[16];
+//    float local[16];
+//
+//    ce_mat4_identity(world);
+//    ce_mat4_identity(local);
+//
+//    ceditor->guizmo_get_transform(component_obj, world, local);
+//
+//    float min[2];
+//    ct_debugui_a0->GetWindowPos(min);
+//    ct_debugui_a0->guizmo_set_rect(min[0], min[1], size[0], size[1]);
+//
+//    float delta_matrix[16] = {0.0f};
+//    ce_mat4_identity(delta_matrix);
+//
+//    ct_debugui_a0->guizmo_manipulate(view, proj, operation, WORLD,
+//                                     world, delta_matrix, 0, NULL, NULL);
+//
+//    if (!ce_mat4_is_identity(delta_matrix)) {
+//        ceditor->guizmo_set_transform(component_obj, operation, world, local);
+//    }
+//}
 
 static void draw_editor(uint64_t context_obj) {
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
+
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
 
     if (!editor->world.h) {
@@ -207,46 +209,46 @@ static void draw_editor(uint64_t context_obj) {
                                    size[0], size[1]);
 
 
-    uint64_t obj = 0; //ct_selected_object_a0->selected_object();
+//    uint64_t obj = 0; //ct_selected_object_a0->selected_object();
 
-    if (obj) {
-        uint64_t obj_type = ce_cdb_a0->obj_type(obj);
-        if (obj_type == ENTITY_RESOURCE) {
-
-            uint64_t components;
-            components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
-
-            const uint32_t component_n = ce_cdb_a0->prop_count(components);
-
-            const uint64_t* keys = ce_cdb_a0->prop_keys(components);
-
-            for (uint32_t i = 0; i < component_n; ++i) {
-                uint64_t key = keys[i];
-
-                uint64_t component;
-                component = ce_cdb_a0->read_subobject(components, key, 0);
-
-                uint64_t type = ce_cdb_a0->obj_type(component);
-
-                struct ct_component_i0 *c;
-                c = get_component_interface(type);
-
-                if (!c->get_interface) {
-                    continue;
-                }
-
-                struct ct_editor_component_i0 *ceditor;
-                ceditor = c->get_interface(EDITOR_COMPONENT);
-
-                if (!ceditor) {
-                    continue;
-                }
-
-                _guizmo(component, ceditor, operation,
-                        view, proj, size);
-            }
-        }
-    }
+//    if (obj) {
+//        uint64_t obj_type = ce_cdb_a0->obj_type(obj);
+//        if (obj_type == ENTITY_RESOURCE) {
+//
+//            uint64_t components;
+//            components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+//
+//            const uint32_t component_n = ce_cdb_a0->prop_count(components);
+//
+//            const uint64_t *keys = ce_cdb_a0->prop_keys(components);
+//
+//            for (uint32_t i = 0; i < component_n; ++i) {
+//                uint64_t key = keys[i];
+//
+//                uint64_t component;
+//                component = ce_cdb_a0->read_subobject(components, key, 0);
+//
+//                uint64_t type = ce_cdb_a0->obj_type(component);
+//
+//                struct ct_component_i0 *c;
+//                c = get_component_interface(type);
+//
+//                if (!c->get_interface) {
+//                    continue;
+//                }
+//
+//                struct ct_editor_component_i0 *ceditor;
+//                ceditor = c->get_interface(EDITOR_COMPONENT);
+//
+//                if (!ceditor) {
+//                    continue;
+//                }
+//
+//                _guizmo(component, ceditor, operation,
+//                        view, proj, size);
+//            }
+//        }
+//    }
 
     if (ct_debugui_a0->IsMouseClicked(0, false)) {
 //        ct_selected_object_a0->set_selected_object(editor->asset);
@@ -306,8 +308,8 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
 static void open(uint64_t context_obj) {
     struct scene_editor *editor = _new_editor(context_obj);
 
-
-    const uint64_t asset_name = ce_cdb_a0->read_uint64(context_obj, _ASSET_NAME,
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
+    const uint64_t asset_name = ce_cdb_a0->read_uint64(reader, _ASSET_NAME,
                                                        0);
 
     struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
@@ -349,7 +351,8 @@ static void update(uint64_t context_obj,
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(context_obj, _EDITOR_IDX, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
 
     if (!editor->world.h) {

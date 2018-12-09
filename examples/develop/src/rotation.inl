@@ -15,20 +15,6 @@
     CE_ID64_0("speed", 0x2c1c82c87303ec5fULL)
 
 
-struct rotation_component {
-    float speed;
-};
-
-static void component_compiler(const char *filename,
-                               uint64_t component_key,
-                               ce_cdb_obj_o *writer) {
-    struct rotation_component t_data;
-
-    t_data.speed = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("speed"),
-                                         0.0f);
-    ce_cdb_a0->set_float(writer, PROP_SPEED, t_data.speed);
-}
-
 static uint64_t cdb_type() {
     return ROTATION_COMPONENT;
 }

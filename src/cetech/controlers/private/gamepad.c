@@ -149,16 +149,18 @@ static void update(uint64_t type, void* _event) {
     while (it != end_it) {
         struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
 
-        uint32_t button = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_BUTTON, 0);
-        uint32_t axis = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_AXIS, 0);
-        uint32_t gamepad_id = ce_cdb_a0->read_uint64(obj_event->obj, CONTROLER_ID, 0);
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj_event->obj);
+
+        uint32_t button = ce_cdb_a0->read_uint64(reader, CONTROLER_BUTTON, 0);
+        uint32_t axis = ce_cdb_a0->read_uint64(reader, CONTROLER_AXIS, 0);
+        uint32_t gamepad_id = ce_cdb_a0->read_uint64(reader, CONTROLER_ID, 0);
 
         float pos[3] = {
-                ce_cdb_a0->read_float(obj_event->obj,
+                ce_cdb_a0->read_float(reader,
                                       CONTROLER_POSITION_X, 0.0f),
-                ce_cdb_a0->read_float(obj_event->obj,
+                ce_cdb_a0->read_float(reader,
                                       CONTROLER_POSITION_Y, 0.0f),
-                ce_cdb_a0->read_float(obj_event->obj,
+                ce_cdb_a0->read_float(reader,
                                       CONTROLER_POSITION_Z, 0.0f),
         };
 

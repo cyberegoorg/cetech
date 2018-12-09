@@ -106,22 +106,23 @@ static const char *display_name() {
 static void guizmo_get_transform(uint64_t obj,
                                  float *world,
                                  float *local) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
     float pos[3] = {
-            ce_cdb_a0->read_float(obj, PROP_POSITION_X, 0.0f),
-            ce_cdb_a0->read_float(obj, PROP_POSITION_Y, 0.0f),
-            ce_cdb_a0->read_float(obj, PROP_POSITION_Z, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_POSITION_Y, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_POSITION_Z, 0.0f),
     };
 
     float rot[3] = {
-            ce_cdb_a0->read_float(obj, PROP_ROTATION_X, 0.0f),
-            ce_cdb_a0->read_float(obj, PROP_ROTATION_Y, 0.0f),
-            ce_cdb_a0->read_float(obj, PROP_ROTATION_Z, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_ROTATION_X, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_ROTATION_Y, 0.0f),
+            ce_cdb_a0->read_float(reader, PROP_ROTATION_Z, 0.0f),
     };
     float sca[3] = {
-            ce_cdb_a0->read_float(obj, PROP_SCALE_X, 1.0f),
-            ce_cdb_a0->read_float(obj, PROP_SCALE_Y, 1.0f),
-            ce_cdb_a0->read_float(obj, PROP_SCALE_Z, 1.0f),
+            ce_cdb_a0->read_float(reader, PROP_SCALE_X, 1.0f),
+            ce_cdb_a0->read_float(reader, PROP_SCALE_Y, 1.0f),
+            ce_cdb_a0->read_float(reader, PROP_SCALE_Z, 1.0f),
     };
 
 

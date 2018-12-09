@@ -231,8 +231,9 @@ void _scan_files(char **files,
 
 char *resource_compiler_get_build_dir(struct ce_alloc *a,
                                       const char *platform) {
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
 
-    const char *build_dir_str = ce_cdb_a0->read_str(_G.config,
+    const char *build_dir_str = ce_cdb_a0->read_str(reader,
                                                     CONFIG_BUILD, "");
 
     char *buffer = NULL;
@@ -244,9 +245,11 @@ char *resource_compiler_get_build_dir(struct ce_alloc *a,
 void resource_compiler_create_build_dir(struct ce_config_a0 config) {
     CE_UNUSED(config);
 
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+
     char *build_dir_full = resource_compiler_get_build_dir(
             _G.allocator,
-            ce_cdb_a0->read_str(_G.config, CONFIG_PLATFORM, ""));
+            ce_cdb_a0->read_str(reader, CONFIG_PLATFORM, ""));
 
     ce_os_a0->path->make_path(build_dir_full);
 
@@ -328,13 +331,16 @@ char *resource_compiler_get_tmp_dir(struct ce_alloc *alocator,
 
 char *resource_compiler_external_join(struct ce_alloc *alocator,
                                       const char *name) {
-    const char *external_dir_str = ce_cdb_a0->read_str(_G.config,
+
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+
+    const char *external_dir_str = ce_cdb_a0->read_str(reader,
                                                        CONFIG_EXTERNAL,
                                                        "");
 
     char *tmp_dir = NULL;
     ce_os_a0->path->join(&tmp_dir, alocator, 2, external_dir_str,
-                         ce_cdb_a0->read_str(_G.config,
+                         ce_cdb_a0->read_str(reader,
                                              CONFIG_PLATFORM,
                                              ""));
 
@@ -407,7 +413,9 @@ static void _init(struct ce_api_a0 *api) {
     _init_cvar(ce_config_a0);
     api->register_api("ct_resource_compiler_a0", &resource_compiler_api);
 
-    const char *platform = ce_cdb_a0->read_str(_G.config,
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+
+    const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");
 
     char *build_dir_full = resource_compiler_get_build_dir(_G.allocator,
@@ -425,8 +433,8 @@ static void _init(struct ce_api_a0 *api) {
     ce_buffer_free(tmp_dir_full, _G.allocator);
     ce_buffer_free(build_dir_full, _G.allocator);
 
-    const char *core_dir = ce_cdb_a0->read_str(_G.config, CONFIG_CORE, "");
-    const char *source_dir = ce_cdb_a0->read_str(_G.config, CONFIG_SRC, "");
+    const char *core_dir = ce_cdb_a0->read_str(reader, CONFIG_CORE, "");
+    const char *source_dir = ce_cdb_a0->read_str(reader, CONFIG_SRC, "");
 
     ce_fs_a0->map_root_dir(SOURCE_ROOT, core_dir, true);
     ce_fs_a0->map_root_dir(SOURCE_ROOT, source_dir, true);

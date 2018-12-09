@@ -93,8 +93,8 @@ static void load_now(uint64_t type,
 
 static int can_get(uint64_t type,
                    uint64_t name) {
-
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
 
     return ce_cdb_a0->prop_exist(type_obj, name);
 }
@@ -102,7 +102,8 @@ static int can_get(uint64_t type,
 static int can_get_all(uint64_t type,
                        const uint64_t *names,
                        size_t count) {
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
 
     for (size_t i = 0; i < count; ++i) {
         if (!ce_cdb_a0->prop_exist(type_obj, names[i])) {
@@ -219,7 +220,8 @@ static void load(uint64_t type,
         ce_cdb_a0->write_commit(w);
     }
 
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
     ce_cdb_obj_o *w;
     do {
         w = ce_cdb_a0->write_begin(type_obj);
@@ -241,7 +243,9 @@ static void load(uint64_t type,
 static void unload(uint64_t type,
                    const uint64_t *names,
                    size_t count) {
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db, type, 0);
+
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
 
     struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
@@ -266,8 +270,10 @@ static void unload(uint64_t type,
 
             ce_log_a0->debug(LOG_WHERE, "Unload resource %s ", filename);
 
+
+            const ce_cdb_obj_o * reader = ce_cdb_a0->read(type_obj);
             uint64_t object;
-            object = ce_cdb_a0->read_ref(type_obj, rid.name, 0);
+            object = ce_cdb_a0->read_ref(reader, rid.name, 0);
 
             if (!object) {
                 continue;
@@ -281,15 +287,19 @@ static void unload(uint64_t type,
 }
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db,
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader,
                                             resource_id.type, 0);
 
     if (!type_obj) {
         return 0;
     }
 
+
+    const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
+
     uint64_t object;
-    object = ce_cdb_a0->read_ref(type_obj, resource_id.name, 0);
+    object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
 
     if (!object) {
         char build_name[128] = {};
@@ -303,7 +313,8 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
         ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
         load_now(resource_id.type, &resource_id.name, 1);
 
-        object = ce_cdb_a0->read_ref(type_obj, resource_id.name, 0);
+        const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
+        object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
     }
 
     return object;
@@ -319,16 +330,17 @@ static void reload_all() {
 
 static void put(struct ct_resource_id resource_id,
                 uint64_t obj) {
-
-    uint64_t type_obj = ce_cdb_a0->read_ref(_G.resource_db,
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
+    uint64_t type_obj = ce_cdb_a0->read_ref(reader,
                                             resource_id.type, 0);
 
     if (!type_obj) {
         return;
     }
 
+    const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
     uint64_t object;
-    object = ce_cdb_a0->read_ref(type_obj, resource_id.name, 0);
+    object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
 
     if (!object) {
         return;
@@ -421,8 +433,10 @@ static void _init(struct ce_api_a0 *api) {
 
     _G.resource_db = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+
     ce_fs_a0->map_root_dir(BUILD_ROOT,
-                           ce_cdb_a0->read_str(_G.config, CONFIG_BUILD, ""),
+                           ce_cdb_a0->read_str(reader, CONFIG_BUILD, ""),
                            false);
 
     ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);

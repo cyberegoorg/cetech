@@ -61,7 +61,8 @@ static bool game_is_paused(uint64_t name) {
 static void game_update(uint64_t type, void* event) {
     struct ebus_cdb_event* ev = event;
 
-    float dt = ce_cdb_a0->read_float(ev->obj, KERNEL_EVENT_DT, 0.0f);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ev->obj);
+    float dt = ce_cdb_a0->read_float(reader, KERNEL_EVENT_DT, 0.0f);
 
     const uint64_t game_n = ce_array_size(_G.game_interface);
     for (int i = 0; i < game_n; ++i) {

@@ -91,23 +91,25 @@ int init_config(int argc,
         return 0;
     }
 
-    const char *build_dir_str = ce_cdb_a0->read_str(object, CONFIG_BUILD, "");
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(object);
+
+    const char *build_dir_str = ce_cdb_a0->read_str(reader, CONFIG_BUILD, "");
     char *build_dir = NULL;
     ce_os_a0->path->join(&build_dir, _G.allocator, 2,
                          build_dir_str,
-                         ce_cdb_a0->read_str(object, CONFIG_NATIVE_PLATFORM,
+                         ce_cdb_a0->read_str(reader, CONFIG_NATIVE_PLATFORM,
                                              ""));
 
     char *build_config = NULL;
     ce_os_a0->path->join(&build_config, _G.allocator, 2, build_dir,
                          "global.yml");
 
-    const char *source_dir_str = ce_cdb_a0->read_str(object, CONFIG_SRC, "");
+    const char *source_dir_str = ce_cdb_a0->read_str(reader, CONFIG_SRC, "");
     char *source_config = NULL;
     ce_os_a0->path->join(&source_config, _G.allocator, 2, source_dir_str,
                          "global.yml");
 
-    if (ce_cdb_a0->read_uint64(object, CONFIG_COMPILE, 0)) {
+    if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
         ce_os_a0->path->make_path(build_dir);
         ce_os_a0->path->copy_file(_G.allocator, source_config, build_config);
     }
@@ -149,7 +151,10 @@ bool cetech_kernel_init(int argc,
     init_static_modules();
 
     uint64_t root = ce_id_a0->id64("modules");
-    const char *module_path = ce_cdb_a0->read_str(ce_config_a0->obj(),
+
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(ce_config_a0->obj());
+
+    const char *module_path = ce_cdb_a0->read_str(reader,
                                                   CONFIG_MODULE_DIR,
                                                   "bin/darwin64");
 
@@ -215,7 +220,9 @@ void _init_config() {
 }
 
 static void _boot_stage() {
-    const char *boot_pkg_str = ce_cdb_a0->read_str(_G.config_object,
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
+
+    const char *boot_pkg_str = ce_cdb_a0->read_str(reader,
                                                    CONFIG_BOOT_PKG, "");
     uint64_t boot_pkg = ce_id_a0->id64(boot_pkg_str);
     uint64_t core_pkg = ce_id_a0->id64("core/core");
@@ -231,8 +238,11 @@ static void _boot_stage() {
 }
 
 static void _boot_unload() {
-    const char *boot_pkg_str = ce_cdb_a0->read_str(_G.config_object,
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
+
+    const char *boot_pkg_str = ce_cdb_a0->read_str(reader,
                                                    CONFIG_BOOT_PKG, "");
+
     uint64_t boot_pkg = ce_id_a0->id64(boot_pkg_str);
 
     uint64_t core_pkg = ce_id_a0->id64("core/core");
@@ -255,10 +265,12 @@ static void on_quit(uint64_t type,
 static void cetech_kernel_start() {
     _init_config();
 
-    if (ce_cdb_a0->read_uint64(_G.config_object, CONFIG_COMPILE, 0)) {
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
+
+    if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
         ct_resource_compiler_a0->compile_all();
 
-        if (!ce_cdb_a0->read_uint64(_G.config_object, CONFIG_CONTINUE, 0)) {
+        if (!ce_cdb_a0->read_uint64(reader, CONFIG_CONTINUE, 0)) {
             return;
         }
     }

@@ -45,6 +45,7 @@ enum ce_cdb_type {
 
 struct ce_cdb_a0 {
     struct ce_cdb_t (*db)();
+
     void (*destroy_db)(struct ce_cdb_t db);
 
 
@@ -57,6 +58,7 @@ struct ce_cdb_a0 {
     void (*destroy_object)(uint64_t obj);
 
     uint64_t (*obj_type)(uint64_t obj);
+
     void (*set_type)(uint64_t obj,
                      uint64_t type);
 
@@ -94,22 +96,20 @@ struct ce_cdb_a0 {
     enum ce_cdb_type (*prop_type)(uint64_t object,
                                   uint64_t key);
 
-    const uint64_t * (*prop_keys)(uint64_t object);
+    const uint64_t *(*prop_keys)(uint64_t object);
 
     uint64_t (*prop_count)(uint64_t object);
 
     uint64_t (*parent)(uint64_t object);
 
-    uint64_t (*prefab)(uint64_t object);
-
-    // WRITE
+    // SET
     ce_cdb_obj_o *(*write_begin)(uint64_t object);
 
     void (*write_commit)(ce_cdb_obj_o *writer);
 
     bool (*write_try_commit)(ce_cdb_obj_o *writer);
 
-    // SET
+
     void (*set_bool)(ce_cdb_obj_o *writer,
                      uint64_t property,
                      bool value);
@@ -155,49 +155,41 @@ struct ce_cdb_a0 {
     void (*delete_property)(ce_cdb_obj_o *writer,
                             uint64_t property);
 
-
-    void (*set_prefab)(uint64_t obj,
-                       uint64_t prefab);
-
-
     // READ
-    float (*read_float)(uint64_t object,
+    const ce_cdb_obj_o *(*read)(uint64_t object);
+
+    float (*read_float)(const ce_cdb_obj_o *reader,
                         uint64_t property,
                         float defaultt);
 
-    bool (*read_bool)(uint64_t object,
+    bool (*read_bool)(const ce_cdb_obj_o *reader,
                       uint64_t property,
                       bool defaultt);
 
-    const char *(*read_str)(uint64_t object,
+    const char *(*read_str)(const ce_cdb_obj_o *reader,
                             uint64_t property,
                             const char *defaultt);
 
-    uint64_t (*read_uint64)(uint64_t object,
+    uint64_t (*read_uint64)(const ce_cdb_obj_o *reader,
                             uint64_t property,
                             uint64_t defaultt);
 
-    void *(*read_ptr)(uint64_t object,
+    void *(*read_ptr)(const ce_cdb_obj_o *reader,
                       uint64_t property,
                       void *defaultt);
 
-    void *(*read_blob)(uint64_t object,
+    void *(*read_blob)(const ce_cdb_obj_o *reader,
                        uint64_t property,
                        uint64_t *size,
                        void *defaultt);
 
-    uint64_t (*read_ref)(uint64_t object,
+    uint64_t (*read_ref)(const ce_cdb_obj_o *reader,
                          uint64_t property,
                          uint64_t defaultt);
 
-    uint64_t (*read_subobject)(uint64_t object,
+    uint64_t (*read_subobject)(const ce_cdb_obj_o *reader,
                                uint64_t property,
                                uint64_t defaultt);
-
-    uint64_t (*read_subobject_deep)(uint64_t object,
-                                    uint64_t *keys,
-                                    uint64_t keys_n,
-                                    uint64_t defaultt);
 };
 
 CE_MODULE(ce_cdb_a0);

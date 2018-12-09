@@ -79,7 +79,9 @@ static void _broadcast_edit() {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = ct_resource_a0->get(_G.selected_asset);
 
-    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 

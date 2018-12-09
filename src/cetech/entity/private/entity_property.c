@@ -132,17 +132,21 @@ static void draw_ui(uint64_t obj) {
 
     _entity_ui(obj);
 
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
     uint64_t components_obj;
-    components_obj = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+    components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
     uint64_t n = ce_cdb_a0->prop_count(components_obj);
     const uint64_t *components_name = ce_cdb_a0->prop_keys(components_obj);
+
+    const ce_cdb_obj_o *creader = ce_cdb_a0->read(components_obj);
 
     for (uint64_t j = 0; j < n; ++j) {
         uint64_t name = components_name[j];
 
         uint64_t c_obj;
-        c_obj = ce_cdb_a0->read_subobject(components_obj, name, 0);
+        c_obj = ce_cdb_a0->read_subobject(creader, name, 0);
 
         draw_component(c_obj);
     }
@@ -152,6 +156,8 @@ void draw_menu(uint64_t obj) {
     if (!obj) {
         return;
     }
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
     ct_debugui_a0->Button(ICON_FA_PLUS" component", (float[2]) {0.0f});
     if (ct_debugui_a0->BeginPopupContextItem("add component context menu", 0)) {
@@ -167,7 +173,7 @@ void draw_menu(uint64_t obj) {
             ei = i->get_interface(EDITOR_COMPONENT);
 
             uint64_t components;
-            components = ce_cdb_a0->read_subobject(obj,
+            components = ce_cdb_a0->read_subobject(reader,
                                                    ENTITY_COMPONENTS,
                                                    0);
 

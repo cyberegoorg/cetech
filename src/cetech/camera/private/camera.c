@@ -25,23 +25,6 @@ static struct CameraGlobal {
     struct ce_alloc *allocator;
 } CameraGlobal;
 
-static void _camera_compiler(const char *filename,
-                             uint64_t component_key,
-                             ce_cdb_obj_o *writer) {
-
-    float near = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("near"),
-                                       0.0f);
-    float far = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("far"),
-                                      0.0f);
-    float fov = ce_cdb_a0->read_float(component_key, ce_ydb_a0->key("fov"),
-                                      0.0f);
-
-    ce_cdb_a0->set_float(writer, PROP_NEAR, near);
-    ce_cdb_a0->set_float(writer, PROP_FAR, far);
-    ce_cdb_a0->set_float(writer, PROP_FOV, fov);
-}
-
-
 static void get_project_view(struct ct_world world,
                              struct ct_entity camera,
                              float *proj,

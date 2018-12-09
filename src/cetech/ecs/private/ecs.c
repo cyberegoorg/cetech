@@ -752,15 +752,19 @@ static void destroy(struct ct_world world,
 
         uint64_t entity_obj = ce_hash_lookup(&w->entity_objmap, ent.h, 0);
         if (entity_obj) {
-            uint64_t components = ce_cdb_a0->read_subobject(entity_obj,
+            const ce_cdb_obj_o * ent_reader = ce_cdb_a0->read(entity_obj);
+
+            uint64_t components = ce_cdb_a0->read_subobject(ent_reader,
                                                             ENTITY_COMPONENTS,
                                                             0);
+
+            const ce_cdb_obj_o * component_reader = ce_cdb_a0->read(components);
 
             const uint32_t components_n = ce_cdb_a0->prop_count(components);
             const uint64_t *components_keys = ce_cdb_a0->prop_keys(components);
 
             for (int j = 0; j < components_n; ++j) {
-                uint64_t component_obj = ce_cdb_a0->read_subobject(components,
+                uint64_t component_obj = ce_cdb_a0->read_subobject(component_reader,
                                                                    components_keys[j],
                                                                    0);
 
@@ -887,7 +891,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     const ce_cdb_obj_o * ent_reader = ce_cdb_a0->read(entity_obj);
 
     uint64_t components;
-    components = ce_cdb_a0->read_subobject(entity_obj, ENTITY_COMPONENTS, 0);
+    components = ce_cdb_a0->read_subobject(ent_reader, ENTITY_COMPONENTS, 0);
 
     uint32_t components_n = ce_cdb_a0->prop_count(components);
     const uint64_t *components_keys = ce_cdb_a0->prop_keys(components);
@@ -904,6 +908,9 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 //    ce_cdb_a0->register_notify(components, _on_components_obj_add,
 //                               (void *) world.h);
 
+
+    const ce_cdb_obj_o * comp_reader = ce_cdb_a0->read(components);
+
     for (int i = 0; i < components_n; ++i) {
         uint64_t component_type = components_keys[i];
 
@@ -915,7 +922,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
         }
 
         uint64_t component_obj;
-        component_obj = ce_cdb_a0->read_subobject(components,
+        component_obj = ce_cdb_a0->read_subobject(comp_reader,
                                                   component_type, 0);
 
         _add_spawn_component_obj(w, component_obj, root_ent);
@@ -929,7 +936,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     }
 
     uint64_t children;
-    children = ce_cdb_a0->read_subobject(entity_obj, ENTITY_CHILDREN, 0);
+    children = ce_cdb_a0->read_subobject(ent_reader, ENTITY_CHILDREN, 0);
 
 //    ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
 //                                      (void *) world.h);
@@ -937,11 +944,13 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 //    ce_cdb_a0->register_notify(children, _on_entity_obj_add,
 //                               (void *) world.h);
 
+    const ce_cdb_obj_o * ch_reader = ce_cdb_a0->read(children);
+
     uint32_t children_n = ce_cdb_a0->prop_count(children);
     const uint64_t *children_keys = ce_cdb_a0->prop_keys(children);
     for (int i = 0; i < children_n; ++i) {
         uint64_t child;
-        child = ce_cdb_a0->read_subobject(children, children_keys[i], 0);
+        child = ce_cdb_a0->read_subobject(ch_reader, children_keys[i], 0);
 
         struct ct_entity child_ent = _spawn_entity(world, child);
 
@@ -1029,37 +1038,6 @@ static void destroy_world(struct ct_world world) {
     ce_cdb_a0->destroy_db(w->db);
 }
 
-struct ct_entity find_by_name(struct ct_world world,
-                              struct ct_entity ent,
-                              uint64_t name) {
-    uint64_t obj = ent.h;
-    uint64_t chidren = ce_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
-    const uint64_t children_n = ce_cdb_a0->prop_count(chidren);
-
-    const uint64_t* children_key = ce_cdb_a0->prop_keys(chidren);
-
-    for (int i = 0; i < children_n; ++i) {
-        uint64_t child_obj = ce_cdb_a0->read_subobject(chidren, children_key[i],
-                                                       0);
-        const char *child_name = ce_cdb_a0->read_str(child_obj, ENTITY_NAME,
-                                                     "");
-
-        uint64_t name_hash = ce_id_a0->id64(child_name);
-        if (name_hash == name) {
-            return (struct ct_entity) {.h = child_obj};
-        }
-
-        struct ct_entity find_ent;
-        find_ent = find_by_name(world,
-                                (struct ct_entity) {.h = child_obj}, name);
-
-        if (find_ent.h) {
-            return find_ent;
-        }
-    }
-
-    return (struct ct_entity) {.h = 0};
-}
 
 static struct ct_ecs_a0 _api = {
         //ENT
@@ -1068,7 +1046,6 @@ static struct ct_ecs_a0 _api = {
         .alive = alive,
         .spawn = spawn_entity,
         .has = has,
-        .find_by_name = find_by_name,
 
         .create_world = create_world,
         .destroy_world = destroy_world,

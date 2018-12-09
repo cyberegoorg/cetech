@@ -468,9 +468,11 @@ static void dump_yaml(char **buffer,
 
         enum ce_cdb_type type = ce_cdb_a0->prop_type(from, key);
 
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(from);
+
         switch (type) {
             case CDB_TYPE_SUBOBJECT: {
-                uint64_t s = ce_cdb_a0->read_subobject(from, key, 0);
+                uint64_t s = ce_cdb_a0->read_subobject(reader, key, 0);
                 char *b = NULL;
                 dump_yaml(&b, s, level + 1);
                 if (ce_buffer_size(b)) {
@@ -482,7 +484,7 @@ static void dump_yaml(char **buffer,
                 break;
 
             case CDB_TYPE_FLOAT: {
-                float f = ce_cdb_a0->read_float(from, key, 0);
+                float f = ce_cdb_a0->read_float(reader, key, 0);
                 _indent(buffer, level);
                 ce_buffer_printf(buffer, _G.allocator, "%s:", k);
                 ce_buffer_printf(buffer, _G.allocator, " %f", f);
@@ -491,7 +493,7 @@ static void dump_yaml(char **buffer,
                 break;
 
             case CDB_TYPE_STR: {
-                const char *s = ce_cdb_a0->read_str(from, key, 0);
+                const char *s = ce_cdb_a0->read_str(reader, key, 0);
                 _indent(buffer, level);
                 ce_buffer_printf(buffer, _G.allocator, "%s:", k);
                 ce_buffer_printf(buffer, _G.allocator, " \"%s\"", s);
@@ -500,7 +502,7 @@ static void dump_yaml(char **buffer,
                 break;
 
             case CDB_TYPE_BOOL: {
-                bool b = ce_cdb_a0->read_bool(from, key, 0);
+                bool b = ce_cdb_a0->read_bool(reader, key, 0);
                 _indent(buffer, level);
                 ce_buffer_printf(buffer, _G.allocator, "%s:", k);
                 if (b) {
@@ -522,7 +524,7 @@ static void dump_yaml(char **buffer,
 
             case CDB_TYPE_UINT64: {
                 _indent(buffer, level);
-                uint64_t i = ce_cdb_a0->read_uint64(from, key, 0);
+                uint64_t i = ce_cdb_a0->read_uint64(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, "%s:", k);
                 ce_buffer_printf(buffer, _G.allocator, "%llu", i);
                 ce_buffer_printf(buffer, _G.allocator, "\n");

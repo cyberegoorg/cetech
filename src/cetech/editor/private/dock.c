@@ -87,13 +87,14 @@ void draw_all() {
         struct ct_dock_i0 *di = _find_dock_i(type);
 
         if (di) {
-            uint64_t id = ce_cdb_a0->read_uint64(dock, _PROP_DOCK_ID, 0);
+            const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+            uint64_t id = ce_cdb_a0->read_uint64(reader, _PROP_DOCK_ID, 0);
             char title[128] = {};
             snprintf(title, CE_ARRAY_LEN(title), "%s##%s_dock%llu",
                      di->display_title(dock), di->name(dock), id);
 
-            uint64_t flags = ce_cdb_a0->read_uint64(dock, PROP_DOCK_flags, 0);
-            bool visible = ce_cdb_a0->read_bool(dock, PROP_DOCK_VISIBLE, false);
+            uint64_t flags = ce_cdb_a0->read_uint64(reader, PROP_DOCK_flags, 0);
+            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE, false);
 
             if (ct_debugui_a0->BeginDock(title, &visible, flags)) {
                 if (di->draw_menu) {
@@ -167,7 +168,8 @@ static void draw_menu() {
             uint64_t type = ce_cdb_a0->obj_type(dock);
             struct ct_dock_i0 *di = _find_dock_i(type);
 
-            uint64_t contextid = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+            const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+            uint64_t contextid = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
 
             const char *name = display_name(di);
             if (ct_debugui_a0->BeginMenu(name, true)) {

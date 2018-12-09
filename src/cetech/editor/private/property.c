@@ -73,7 +73,9 @@ static void draw_menu(uint64_t obj) {
 }
 
 static void on_debugui(uint64_t dock) {
-    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
 
     ct_debugui_a0->Columns(2, NULL, true);
@@ -93,7 +95,8 @@ static void on_debugui(uint64_t dock) {
 }
 
 static void on_menu(uint64_t dock) {
-    const uint64_t context = ce_cdb_a0->read_uint64(dock, PROP_DOCK_CONTEXT, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
     draw_menu(obj);
 }

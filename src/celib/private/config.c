@@ -109,8 +109,9 @@ static void foreach_config_clb(uint64_t key,
 
     enum ce_cdb_type type = ce_cdb_a0->prop_type(value, key);
 
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(value);
     if (type == CDB_TYPE_SUBOBJECT) {
-        uint64_t sub_obj = ce_cdb_a0->read_subobject(value, key, 0);
+        uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, key, 0);
         const uint64_t n = ce_cdb_a0->prop_count(sub_obj);
         const uint64_t* keys = ce_cdb_a0->prop_keys(sub_obj);
 
@@ -124,7 +125,7 @@ static void foreach_config_clb(uint64_t key,
         const char *str;
 
         if (type == CDB_TYPE_STR) {
-            str = ce_cdb_a0->read_str(value, key, "");
+            str = ce_cdb_a0->read_str(reader, key, "");
             _cvar_from_str(name, str);
 
         } else {
@@ -141,17 +142,17 @@ static void foreach_config_clb(uint64_t key,
                         break;
 
                     case CDB_TYPE_FLOAT:
-                        tmp_f = ce_cdb_a0->read_float(value, key, 0.0f);
+                        tmp_f = ce_cdb_a0->read_float(reader, key, 0.0f);
                         ce_cdb_a0->set_float(writer, key, tmp_f);
                         break;
 
                     case CDB_TYPE_UINT64:
-                        tmp_int =  (int)ce_cdb_a0->read_float(value, key, 0.0f);
+                        tmp_int =  (int)ce_cdb_a0->read_float(reader, key, 0.0f);
                         ce_cdb_a0->set_uint64(writer, key, tmp_int);
                         break;
 
                     case CDB_TYPE_STR:
-                        str = ce_cdb_a0->read_str(value, key, "");
+                        str = ce_cdb_a0->read_str(reader, key, "");
                         ce_cdb_a0->set_str(writer, key, str);
                         break;
                     default:

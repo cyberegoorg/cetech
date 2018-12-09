@@ -26,12 +26,29 @@
 
 // TODO: non optimal braindump code
 // TODO: remove null element
-;
+
+
+struct blob_t {
+    void *data;
+    uint64_t size;
+};
+
+union type_u {
+    uint64_t uint64;
+    void *ptr;
+    uint64_t ref;
+    uint64_t subobj;
+
+    float f;
+    char *str;
+    bool b;
+    struct blob_t blob;
+};
 
 // TODO: X(
 struct object_t {
     // prefab
-    uint64_t prefab;
+    uint64_t instance_of;
     uint64_t *instances;
 
     // hiearchy
@@ -87,10 +104,6 @@ static struct _G {
     struct ce_cdb_t global_db;
 } _G;
 
-struct blob_t {
-    void *data;
-    uint64_t size;
-};
 
 static struct object_t *_get_object_from_id(uint64_t objid) {
     if (!objid) {
@@ -170,7 +183,7 @@ static struct object_t *_object_clone(struct db_t *db,
 
     struct object_t *new_obj = _new_object(db, alloc);
 
-    new_obj->prefab = obj->prefab;
+    new_obj->instance_of = obj->instance_of;
     new_obj->parent = obj->parent;
     new_obj->key = obj->key;
 
@@ -288,13 +301,16 @@ static uint64_t create_from(struct ce_cdb_t db,
 
     *obj_addr = inst;
 
-    inst->prefab = _obj;
+    inst->instance_of = _obj;
     inst->type = obj->type;
 
     ce_array_push(obj->instances, (uint64_t) obj_addr, _G.allocator);
 
 
     struct object_t *wr = write_begin((uint64_t) obj_addr);
+
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_obj);
 
     for (int i = 1; i < obj->properties_count; ++i) {
         uint64_t key = obj->keys[i];
@@ -310,38 +326,38 @@ static uint64_t create_from(struct ce_cdb_t db,
                 break;
 
             case CDB_TYPE_UINT64: {
-                uint64_t v = ce_cdb_a0->read_uint64(_obj, key, 0);
+                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
                 ce_cdb_a0->set_uint64(wr, key, v);
             }
                 break;
             case CDB_TYPE_PTR: {
-                void *v = ce_cdb_a0->read_ptr(_obj, key, 0);
+                void *v = ce_cdb_a0->read_ptr(reader, key, 0);
                 ce_cdb_a0->set_ptr(wr, key, v);
             }
                 break;
             case CDB_TYPE_REF: {
-                uint64_t v = ce_cdb_a0->read_uint64(_obj, key, 0);
+                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
                 ce_cdb_a0->set_ref(wr, key, v);
             }
                 break;
             case CDB_TYPE_FLOAT: {
-                float v = ce_cdb_a0->read_float(_obj, key, 0);
+                float v = ce_cdb_a0->read_float(reader, key, 0);
                 ce_cdb_a0->set_float(wr, key, v);
             }
                 break;
             case CDB_TYPE_BOOL: {
-                bool v = ce_cdb_a0->read_bool(_obj, key, 0);
+                bool v = ce_cdb_a0->read_bool(reader, key, 0);
                 ce_cdb_a0->set_bool(wr, key, v);
             }
                 break;
             case CDB_TYPE_STR: {
-                const char *v = ce_cdb_a0->read_str(_obj, key, NULL);
+                const char *v = ce_cdb_a0->read_str(reader, key, NULL);
                 ce_cdb_a0->set_str(wr, key, v);
             }
                 break;
             case CDB_TYPE_BLOB: {
                 uint64_t size = 0;
-                void *v = ce_cdb_a0->read_blob(_obj, key, &size,
+                void *v = ce_cdb_a0->read_blob(reader, key, &size,
                                                NULL);
                 ce_cdb_a0->set_blob(wr, key, v, size);
             }
@@ -1030,7 +1046,7 @@ void set_prefab(uint64_t _obj,
     struct object_t *obj = _get_object_from_id(_obj);
     struct object_t *prefab = _get_object_from_id(_prefab);
 
-    obj->prefab = _prefab;
+    obj->instance_of = _prefab;
     ce_array_push(prefab->instances,
                   _obj,
                   _G.allocator);
@@ -1137,22 +1153,19 @@ static bool prop_exist(uint64_t _object,
     return false;
 }
 
-static enum ce_cdb_type prop_type(uint64_t _object,
-                                  uint64_t key) {
-    struct object_t *obj = _get_object_from_objid(_object);
-    uint64_t idx = _find_prop_index(obj, key);
-
-    if (idx) {
-        return (enum ce_cdb_type) obj->property_type[idx];
+const ce_cdb_obj_o *read(uint64_t object) {
+    if (!object) {
+        return NULL;
     }
 
-    return CDB_TYPE_NONE;
+    struct object_t *obj = _get_object_from_id(object);
+    return obj;
 }
 
-static float read_float(uint64_t _obj,
+static float read_float(const ce_cdb_obj_o *reader,
                         uint64_t property,
                         float defaultt) {
-    if (!_obj) {
+    if (!reader) {
         return defaultt;
     }
 
@@ -1167,7 +1180,7 @@ static float read_float(uint64_t _obj,
     return defaultt;
 }
 
-static bool read_bool(uint64_t _obj,
+static bool read_bool(const ce_cdb_obj_o *reader,
                       uint64_t property,
                       bool defaultt) {
     if (!reader) {
@@ -1185,7 +1198,7 @@ static bool read_bool(uint64_t _obj,
     return defaultt;
 }
 
-static const char *read_string(uint64_t _obj,
+static const char *read_string(const ce_cdb_obj_o *reader,
                                uint64_t property,
                                const char *defaultt) {
     if (!reader) {
@@ -1203,7 +1216,7 @@ static const char *read_string(uint64_t _obj,
 }
 
 
-static uint64_t read_uint64(uint64_t _obj,
+static uint64_t read_uint64(const ce_cdb_obj_o *reader,
                             uint64_t property,
                             uint64_t defaultt) {
     if (!reader) {
@@ -1221,7 +1234,7 @@ static uint64_t read_uint64(uint64_t _obj,
     return defaultt;
 }
 
-static void *read_ptr(uint64_t _obj,
+static void *read_ptr(const ce_cdb_obj_o *reader,
                       uint64_t property,
                       void *defaultt) {
     if (!reader) {
@@ -1240,7 +1253,7 @@ static void *read_ptr(uint64_t _obj,
     return defaultt;
 }
 
-static uint64_t read_ref(uint64_t _obj,
+static uint64_t read_ref(const ce_cdb_obj_o *reader,
                          uint64_t property,
                          uint64_t defaultt) {
     if (!reader) {
@@ -1258,7 +1271,7 @@ static uint64_t read_ref(uint64_t _obj,
     return defaultt;
 }
 
-static uint64_t read_subobject(uint64_t _obj,
+static uint64_t read_subobject(const ce_cdb_obj_o *reader,
                                uint64_t property,
                                uint64_t defaultt) {
     if (!reader) {
@@ -1279,25 +1292,7 @@ static uint64_t read_subobject(uint64_t _obj,
     return defaultt;
 }
 
-static uint64_t read_subobject_deep(uint64_t object,
-                                    uint64_t *keys,
-                                    uint64_t keys_n,
-                                    uint64_t defaultt) {
-
-    uint64_t it_obj = object;
-    for (int i = 0; i < keys_n; ++i) {
-        uint64_t k = keys[i];
-        it_obj = ce_cdb_a0->read_subobject(it_obj, k, defaultt);
-
-        if (it_obj == defaultt) {
-            return defaultt;
-        }
-    }
-
-    return it_obj;
-}
-
-void *read_blob(uint64_t _obj,
+void *read_blob(const ce_cdb_obj_o *reader,
                 uint64_t property,
                 uint64_t *size,
                 void *defaultt) {
@@ -1405,28 +1400,29 @@ static void dump_str(char **buffer,
 
         ce_buffer_printf(buffer, _G.allocator, "%s:", k);
 
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(from);
         switch (type) {
             case CDB_TYPE_SUBOBJECT: {
-                uint64_t s = ce_cdb_a0->read_subobject(from, key, 0);
+                uint64_t s = ce_cdb_a0->read_subobject(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, "\n");
                 dump_str(buffer, s, level + 1);
             }
                 break;
 
             case CDB_TYPE_FLOAT: {
-                float f = ce_cdb_a0->read_float(from, key, 0);
+                float f = ce_cdb_a0->read_float(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, " %f", f);
             }
                 break;
 
             case CDB_TYPE_STR: {
-                const char *s = ce_cdb_a0->read_str(from, key, 0);
+                const char *s = ce_cdb_a0->read_str(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, " %s", s);
             }
                 break;
 
             case CDB_TYPE_BOOL: {
-                bool b = ce_cdb_a0->read_bool(from, key, 0);
+                bool b = ce_cdb_a0->read_bool(reader, key, 0);
                 if (b) {
                     ce_buffer_printf(buffer, _G.allocator, "true");
                 } else {
@@ -1441,7 +1437,7 @@ static void dump_str(char **buffer,
                 break;
 
             case CDB_TYPE_UINT64: {
-                uint64_t i = ce_cdb_a0->read_uint64(from, key, 0);
+                uint64_t i = ce_cdb_a0->read_uint64(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, "%llu", i);
             }
                 break;
@@ -1568,8 +1564,8 @@ static struct ce_cdb_a0 cdb_api = {
         .prop_count = prop_count,
 
         .parent = parent,
-        .prefab = prefab,
 
+        .read = read,
         .read_float = read_float,
         .read_bool = read_bool,
         .read_str = read_string,
@@ -1578,8 +1574,6 @@ static struct ce_cdb_a0 cdb_api = {
         .read_ref = read_ref,
         .read_blob = read_blob,
         .read_subobject = read_subobject,
-        .read_subobject_deep = read_subobject_deep,
-
 
         .write_begin = write_begin,
         .write_commit = write_commit,
@@ -1593,7 +1587,6 @@ static struct ce_cdb_a0 cdb_api = {
         .set_ref = set_ref,
         .set_subobject = set_subobject,
         .set_subobjectw = set_subobjectw,
-        .set_prefab = set_prefab,
         .set_blob = set_blob,
 
         .remove_property = remove_property,

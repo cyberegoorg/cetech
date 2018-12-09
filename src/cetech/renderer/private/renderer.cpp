@@ -64,21 +64,21 @@ static uint32_t _get_reset_flags() {
 //==============================================================================
 
 static void renderer_create() {
-
-    if (!ce_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
         uint32_t w, h;
-        w = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_X, 0);
-        h = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_Y, 0);
+        w = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_X, 0);
+        h = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ce_cdb_a0->read_uint64(_G.config, CONFIG_WID, 0);
+        intptr_t wid = ce_cdb_a0->read_uint64(reader, CONFIG_WID, 0);
 
         char title[128] = {};
         snprintf(title, CE_ARRAY_LEN(title), "cetech");
 
         if (wid == 0) {
-            bool fullscreen = ce_cdb_a0->read_uint64(_G.config,
+            bool fullscreen = ce_cdb_a0->read_uint64(reader,
                                                      CONFIG_SCREEN_FULLSCREEN,
                                                      0) > 0;
 
@@ -111,7 +111,7 @@ static void renderer_create() {
     bgfx_init_t init;
     bgfx_init_ctor(&init);
 
-    const char *rtype = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const char *rtype = ce_cdb_a0->read_str(reader,
                                             CONFIG_RENDERER_TYPE, "");
 
 
@@ -153,7 +153,8 @@ static void renderer_create() {
     bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
-    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
+    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(),
+               BGFX_TEXTURE_FORMAT_COUNT);
     //_G.main_window->update(_G.main_window);
 
     _G.need_reset = true;
@@ -176,24 +177,31 @@ static void renderer_get_size(uint32_t *width,
 }
 
 
-static void on_resize(uint64_t type, void* event) {
+static void on_resize(uint64_t type,
+                      void *event) {
     _G.need_reset = 1;
 
-    struct ebus_cdb_event* ev = (struct ebus_cdb_event*)event;
+    struct ebus_cdb_event *ev = (struct ebus_cdb_event *) event;
 
-    _G.size_width = ce_cdb_a0->read_uint64(ev->obj, CT_MACHINE_WINDOW_WIDTH, 0);
-    _G.size_height = ce_cdb_a0->read_uint64(ev->obj, CT_MACHINE_WINDOW_HEIGHT, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ev->obj);
+
+    _G.size_width = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_WIDTH, 0);
+    _G.size_height = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_HEIGHT,
+                                            0);
 }
 
-static void on_begin_render(uint64_t type, void* _event) {
+static void on_begin_render(uint64_t type,
+                            void *_event) {
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
+        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(),
+                   BGFX_TEXTURE_FORMAT_COUNT);
     }
 }
 
-static void on_render(uint64_t type, void* _event) {
+static void on_render(uint64_t type,
+                      void *_event) {
     bgfx_frame(false);
 }
 
@@ -784,7 +792,7 @@ static void _init(struct ce_api_a0 *api) {
                         on_begin_render, KERNEL_ORDER + 1);
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                    on_render, RENDER_ORDER + 1);
+                        on_render, RENDER_ORDER + 1);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
 
@@ -814,8 +822,9 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_cdb_a0->write_commit(writer);
 
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
-    _G.vsync = ce_cdb_a0->read_uint64(_G.config, CONFIG_SCREEN_VSYNC, 1) > 0;
+    _G.vsync = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_VSYNC, 1) > 0;
 
     CE_INIT_API(api, ce_os_a0);
 
@@ -824,7 +833,8 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    if (!ce_cdb_a0->read_uint64(_G.config, CONFIG_DAEMON, 0)) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
 
         ce_array_free(_G.on_render, _G.allocator);
 

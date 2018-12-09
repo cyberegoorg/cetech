@@ -157,10 +157,6 @@ struct ct_ecs_a0 {
                 uint64_t *component_name,
                 uint32_t name_count);
 
-    struct ct_entity (*find_by_name)(struct ct_world world,
-                                     struct ct_entity ent,
-                                     uint64_t name);
-
 
     //SIMU
     void (*simulate)(struct ct_world world,

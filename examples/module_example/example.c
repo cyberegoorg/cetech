@@ -31,7 +31,9 @@ static struct G {
 
 void update(uint64_t type, void* event) {
     struct ebus_cdb_event *ev = event;
-    _G.dt = ce_cdb_a0->read_float(ev->obj, ce_id_a0->id64("dt"), 0.0f);
+
+    const ce_cdb_obj_o * reader = ce_cdb_a0->read(ev->obj);
+    _G.dt = ce_cdb_a0->read_float(reader, ce_id_a0->id64("dt"), 0.0f);
 
     struct ct_controlers_i0* keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);

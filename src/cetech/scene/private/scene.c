@@ -44,19 +44,24 @@ static void online(uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
-    uint64_t geom_count = ce_cdb_a0->read_uint64(obj, SCENE_GEOM_COUNT, 0);
-    ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(obj, SCENE_VB_DECL,
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+    uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
+    ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
+                                                             SCENE_VB_DECL,
                                                              NULL, NULL));
-    uint64_t *geom_name = (ce_cdb_a0->read_blob(obj, SCENE_GEOM_NAME,
+    uint64_t *geom_name = (ce_cdb_a0->read_blob(reader, SCENE_GEOM_NAME,
                                                 NULL, NULL));
-    uint32_t *ib_offset = (ce_cdb_a0->read_blob(obj, SCENE_IB_OFFSET,
+    uint32_t *ib_offset = (ce_cdb_a0->read_blob(reader, SCENE_IB_OFFSET,
                                                 NULL, NULL));
-    uint32_t *vb_offset = (ce_cdb_a0->read_blob(obj, SCENE_VB_OFFSET,
+    uint32_t *vb_offset = (ce_cdb_a0->read_blob(reader, SCENE_VB_OFFSET,
                                                 NULL, NULL));
-    uint32_t *ib_size = (ce_cdb_a0->read_blob(obj, SCENE_IB_SIZE, NULL, NULL));
-    uint32_t *vb_size = (ce_cdb_a0->read_blob(obj, SCENE_VB_SIZE, NULL, NULL));
-    uint32_t *ib = (ce_cdb_a0->read_blob(obj, SCENE_IB_PROP, NULL, NULL));
-    uint8_t *vb = (ce_cdb_a0->read_blob(obj, SCENE_VB_PROP, NULL, NULL));
+    uint32_t *ib_size = (ce_cdb_a0->read_blob(reader, SCENE_IB_SIZE, NULL,
+                                              NULL));
+    uint32_t *vb_size = (ce_cdb_a0->read_blob(reader, SCENE_VB_SIZE, NULL,
+                                              NULL));
+    uint32_t *ib = (ce_cdb_a0->read_blob(reader, SCENE_IB_PROP, NULL, NULL));
+    uint8_t *vb = (ce_cdb_a0->read_blob(reader, SCENE_VB_PROP, NULL, NULL));
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
@@ -151,13 +156,15 @@ static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
     uint64_t res = resource_data(scene);
 
-    uint64_t *geom_name = (uint64_t *) (ce_cdb_a0->read_blob(res,
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
+
+    uint64_t *geom_name = (uint64_t *) (ce_cdb_a0->read_blob(reader,
                                                              SCENE_GEOM_NAME,
                                                              NULL, NULL));
-    uint64_t *geom_node = (uint64_t *) (ce_cdb_a0->read_blob(res,
+    uint64_t *geom_node = (uint64_t *) (ce_cdb_a0->read_blob(reader,
                                                              SCENE_NODE_GEOM,
                                                              NULL, NULL));
-    uint64_t geom_count = ce_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
+    uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
 
     for (uint32_t i = 0; i < geom_count; ++i) {
         if (geom_name[i] != mesh) {
@@ -174,20 +181,22 @@ static void get_all_geometries(uint64_t scene,
                                char **geometries,
                                uint32_t *count) {
     uint64_t res = resource_data(scene);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
 
-    *geometries = (char *) (ce_cdb_a0->read_blob(res, SCENE_GEOM_STR, NULL,
+    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL,
                                                  NULL));
-    *count = ce_cdb_a0->read_uint64(res, SCENE_GEOM_COUNT, 0);
+    *count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
 }
 
 static void get_all_nodes(uint64_t scene,
                           char **geometries,
                           uint32_t *count) {
     uint64_t res = resource_data(scene);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
 
-    *geometries = (char *) (ce_cdb_a0->read_blob(res, SCENE_NODE_STR,
+    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR,
                                                  NULL, NULL));
-    *count = ce_cdb_a0->read_uint64(res, SCENE_NODE_COUNT, 0);
+    *count = ce_cdb_a0->read_uint64(reader, SCENE_NODE_COUNT, 0);
 
 }
 

@@ -119,27 +119,37 @@ static uint64_t resource_compiler(const char *filename,
 
 void entity_resource_anotate(uint64_t obj) {
     ce_cdb_a0->set_type(obj, ENTITY_RESOURCE_ID);
-    uint64_t components = ce_cdb_a0->read_subobject(obj,
+
+    const ce_cdb_obj_o *obj_reader = ce_cdb_a0->read(obj);
+
+    uint64_t components = ce_cdb_a0->read_subobject(obj_reader,
                                                     ce_ydb_a0->key(
                                                             "components"), 0);
 
     ce_cdb_a0->set_type(components, ENTITY_COMPONENTS);
 
     const uint64_t components_keys_count = ce_cdb_a0->prop_count(components);
-    const uint64_t* ck = ce_cdb_a0->prop_keys(components);
+    const uint64_t *ck = ce_cdb_a0->prop_keys(components);
+
+
+    const ce_cdb_obj_o *components_reader = ce_cdb_a0->read(components);
 
     for (uint32_t i = 0; i < components_keys_count; ++i) {
-        uint64_t _comp_obj = ce_cdb_a0->read_subobject(components, ck[i], 0);
+        uint64_t _comp_obj = ce_cdb_a0->read_subobject(components_reader, ck[i],
+                                                       0);
         ce_cdb_a0->set_type(_comp_obj, ck[i]);
     }
 
 
-    uint64_t children = ce_cdb_a0->read_subobject(obj,
+    uint64_t children = ce_cdb_a0->read_subobject(obj_reader,
                                                   ce_ydb_a0->key(
                                                           "children"), 0);
+
+    const ce_cdb_obj_o *chuildren_reader = ce_cdb_a0->read(children);
+
     ce_cdb_a0->set_type(children, ENTITY_CHILDREN);
     const uint64_t children_keys_count = ce_cdb_a0->prop_count(children);
-    const uint64_t* children_k = ce_cdb_a0->prop_keys(children);
+    const uint64_t *children_k = ce_cdb_a0->prop_keys(children);
     for (uint32_t i = 0; i < children_keys_count; ++i) {
         uint64_t ch = ce_cdb_a0->read_subobject(children, children_k[i], 0);
         entity_resource_anotate(ch);

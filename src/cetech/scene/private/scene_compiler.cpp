@@ -479,16 +479,18 @@ static void _compile_assimp_node(struct aiNode *root,
 static int _compile_assimp(const char *filename,
                            uint64_t k,
                            struct compile_output *output) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(k);
 
-    uint64_t import_obj = ce_cdb_a0->read_subobject(k, ce_id_a0->id64("import"),
+    uint64_t import_obj = ce_cdb_a0->read_subobject(reader, ce_id_a0->id64("import"),
                                                     0);
 
-    const char *input_str = ce_cdb_a0->read_str(import_obj,
+    const ce_cdb_obj_o *import_reader = ce_cdb_a0->read(import_obj);
+
+    const char *input_str = ce_cdb_a0->read_str(import_reader,
                                                 ce_id_a0->id64("input"), "");
 
-    ct_builddb_a0->add_dependency(filename, input_str);
-
-    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_config_a0->obj());
+    const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     char *input_path = NULL;
     ce_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
@@ -497,13 +499,14 @@ static int _compile_assimp(const char *filename,
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
                                 aiProcess_ConvertToLeftHanded;
 
-    uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_obj,
+    uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_reader,
                                                          ce_id_a0->id64(
                                                                  "postprocess"),
                                                          0);
 
+    const ce_cdb_obj_o *pp_reader = ce_cdb_a0->read(postprocess_obj);
 
-    if (ce_cdb_a0->read_bool(postprocess_obj, ce_id_a0->id64("flip_uvs"),
+    if (ce_cdb_a0->read_bool(pp_reader, ce_id_a0->id64("flip_uvs"),
                              false)) {
         postprocess_flag |= aiProcess_FlipUVs;
     }

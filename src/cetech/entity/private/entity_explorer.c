@@ -44,11 +44,12 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    uint64_t children = ce_cdb_a0->read_subobject(obj, ENTITY_CHILDREN, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    uint64_t children = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
     uint64_t children_n = ce_cdb_a0->prop_count(children);
 
     uint64_t components;
-    components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
+    components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
     uint64_t component_n = ce_cdb_a0->prop_count(components);
 
     if (!children_n && !component_n) {
@@ -57,7 +58,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     char name[128] = {0};
     uint64_t uid = ce_cdb_a0->obj_key(obj);
-    const char *ent_name = ce_cdb_a0->read_str(obj, ENTITY_NAME, NULL);
+    const char *ent_name = ce_cdb_a0->read_str(reader, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
     } else {
@@ -74,13 +75,14 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
+        const ce_cdb_obj_o *cs_reader = ce_cdb_a0->read(components);
         const uint32_t component_n = ce_cdb_a0->prop_count(components);
         const uint64_t *keys = ce_cdb_a0->prop_keys(components);
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t key = keys[i];
 
-            uint64_t component = ce_cdb_a0->read_subobject(components, key, 0);
+            uint64_t component = ce_cdb_a0->read_subobject(cs_reader, key, 0);
             uint64_t type = ce_cdb_a0->obj_type(component);
 
             struct ct_component_i0 *component_i;
@@ -120,11 +122,12 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
+        const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(children);
         const uint64_t *keys = ce_cdb_a0->prop_keys(children);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
-            uint64_t child = ce_cdb_a0->read_subobject(children, key, 0);
+            uint64_t child = ce_cdb_a0->read_subobject(ch_reader, key, 0);
             uint64_t new_selected_object2 = ui_entity_item_begin(selected_obj,
                                                                  child, ++id);
             if (new_selected_object2) {
@@ -141,6 +144,8 @@ static void draw_menu(uint64_t selected_obj) {
     if (!selected_obj) {
         return;
     }
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(selected_obj);
 
     ct_debugui_a0->SameLine(0, 10);
 
@@ -172,8 +177,9 @@ static void draw_menu(uint64_t selected_obj) {
             ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
             ce_cdb_a0->write_commit(writer);
 
+
             uint64_t add_children_obj;
-            add_children_obj = ce_cdb_a0->read_subobject(selected_obj,
+            add_children_obj = ce_cdb_a0->read_subobject(reader,
                                                          ENTITY_CHILDREN,
                                                          0);
 

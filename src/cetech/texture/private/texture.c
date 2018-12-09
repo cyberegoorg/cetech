@@ -51,9 +51,12 @@ struct _G {
 
 void _texture_resource_online(uint64_t name,
                               uint64_t obj) {
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
     uint64_t blob_size = 0;
     void *blob;
-    blob = ce_cdb_a0->read_blob(obj, TEXTURE_DATA, &blob_size, 0);
+    blob = ce_cdb_a0->read_blob(reader, TEXTURE_DATA, &blob_size, 0);
 
     const ct_render_memory_t *mem = ct_renderer_a0->make_ref(blob, blob_size);
 
@@ -69,7 +72,9 @@ void _texture_resource_online(uint64_t name,
 
 void _texture_resource_offline(uint64_t name,
                                uint64_t obj) {
-    const uint64_t texture = ce_cdb_a0->read_uint64(obj, TEXTURE_HANDLER_PROP,
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+    const uint64_t texture = ce_cdb_a0->read_uint64(reader, TEXTURE_HANDLER_PROP,
                                                     0);
     ct_renderer_a0->destroy_texture(
             (ct_render_texture_handle_t) {.idx=(uint16_t) texture});
@@ -130,20 +135,23 @@ static int _gen_tmp_name(char *tmp_filename,
 }
 
 static uint64_t _compile(uint64_t obj) {
-    const char *input = ce_cdb_a0->read_str(obj, TEXTURE_INPUT, "");
-    bool gen_mipmaps = ce_cdb_a0->read_bool(obj, TEXTURE_GEN_MIPMAPS, false);
-    bool is_normalmap = ce_cdb_a0->read_bool(obj, TEXTURE_IS_NORMALMAP, false);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_config_a0->obj());
+
+    const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
+    bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
+    bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP, false);
 
     struct ce_alloc *a = ce_memory_a0->system;
 
-    const char *platform = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const char *platform = ce_cdb_a0->read_str(c_reader,
                                                CONFIG_PLATFORM,
                                                "");
 
     char output_path[1024] = {};
     char tmp_filename[1024] = {};
 
-    const char *source_dir = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
 
     char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
@@ -217,8 +225,10 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 
 
 static void tooltip(uint64_t resource) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(resource);
+
     struct ct_render_texture_handle texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(resource,
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
     };
 
@@ -273,8 +283,10 @@ ct_render_texture_handle_t texture_get(uint64_t name) {
     if (!obj) {
         return (ct_render_texture_handle_t) {.idx = UINT16_MAX};
     }
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
     struct ct_render_texture_handle texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(obj,
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
     };
 

@@ -206,10 +206,12 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db() {
-    const char *platform = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_config_a0->obj());
+
+    const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");
 
-    const char *build_dir_str = ce_cdb_a0->read_str(ce_config_a0->obj(),
+    const char *build_dir_str = ce_cdb_a0->read_str(reader,
                                                     CONFIG_BUILD, "");
 
     char *build_dir_full = NULL;
@@ -293,8 +295,8 @@ static void put_resource(struct ct_resource_id rid,
 }
 
 static void put_resource_2(const char *fullname,
-                         struct ct_resource_id rid,
-                         const char *filename) {
+                           struct ct_resource_id rid,
+                           const char *filename) {
     sqlite3 *_db = _opendb();
 
     struct sqls_s *sqls = _get_sqls();
@@ -409,14 +411,15 @@ static void buildb_get_resource_dirs_clean(char **filename,
 static int buildb_get_resource_from_dirs(const char *dir,
                                          char ***filename,
                                          struct ce_alloc *alloc) {
-    if(!strlen(dir)) {
+    if (!strlen(dir)) {
         return 0;
     }
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_text(sqls->get_resource_from_dirs, 1, dir, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_resource_from_dirs, 1, dir, -1,
+                      SQLITE_TRANSIENT);
 
     while (_step(_db, sqls->get_resource_from_dirs) == SQLITE_ROW) {
         const unsigned char *fn;

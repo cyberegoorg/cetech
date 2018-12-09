@@ -169,7 +169,9 @@ static void update(uint64_t type,
 
     while (it != end_it) {
         struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-        uint32_t button = ce_cdb_a0->read_uint64(obj_event->obj,
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj_event->obj);
+
+        uint32_t button = ce_cdb_a0->read_uint64(reader,
                                                  CONTROLER_BUTTON, 0);
 
         switch (it->type) {
@@ -183,11 +185,11 @@ static void update(uint64_t type,
 
             case EVENT_MOUSE_MOVE: {
                 float pos[3] = {
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_X, 0.0f),
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_Y, 0.0f),
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_Z, 0.0f),
                 };
 
@@ -202,11 +204,11 @@ static void update(uint64_t type,
 
             case EVENT_MOUSE_WHEEL: {
                 float pos[3] = {
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_X, 0.0f),
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_Y, 0.0f),
-                        ce_cdb_a0->read_float(obj_event->obj,
+                        ce_cdb_a0->read_float(reader,
                                               CONTROLER_POSITION_Z, 0.0f),
                 };
 

@@ -218,7 +218,10 @@ static uint64_t get(struct ct_resource_id resource_id);
 
 static void _expand(uint64_t to,
                     uint64_t from) {
-    const char *prefab = ce_cdb_a0->read_str(to, PREFAB_NAME_PROP, NULL);
+
+    const ce_cdb_obj_o * to_reader = ce_cdb_a0->read(to);
+
+    const char *prefab = ce_cdb_a0->read_str(to_reader, PREFAB_NAME_PROP, NULL);
 
     if (prefab) {
         struct ct_resource_id prefab_rid = {};
@@ -226,8 +229,9 @@ static void _expand(uint64_t to,
                                                          &prefab_rid,
                                                          NULL);
         from = get(prefab_rid);
-        ce_cdb_a0->set_prefab(to, from);
     }
+
+    const ce_cdb_obj_o * from_reader = ce_cdb_a0->read(from);
 
     const uint32_t prop_count = ce_cdb_a0->prop_count(from);
     const uint64_t *keys = ce_cdb_a0->prop_keys(from);
@@ -239,11 +243,11 @@ static void _expand(uint64_t to,
 
         if (type == CDB_TYPE_SUBOBJECT) {
             if (ce_cdb_a0->prop_exist(to, key)) {
-                uint64_t v = ce_cdb_a0->read_subobject(to, key, 0);
-                uint64_t f = ce_cdb_a0->read_subobject(from, key, 0);
+                uint64_t v = ce_cdb_a0->read_subobject(to_reader, key, 0);
+                uint64_t f = ce_cdb_a0->read_subobject(from_reader, key, 0);
                 _expand(v, f);
             } else {
-                uint64_t v = ce_cdb_a0->read_subobject(from, key, 0);
+                uint64_t v = ce_cdb_a0->read_subobject(from_reader, key, 0);
                 uint64_t new_v = ce_cdb_a0->create_from(ce_cdb_a0->db(), v);
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(to);
                 ce_cdb_a0->set_subobject(w, key, new_v);
@@ -260,38 +264,38 @@ static void _expand(uint64_t to,
 
         switch (type) {
             case CDB_TYPE_UINT64: {
-                uint64_t v = ce_cdb_a0->read_uint64(from, key, 0);
+                uint64_t v = ce_cdb_a0->read_uint64(from_reader, key, 0);
                 ce_cdb_a0->set_uint64(w, key, v);
             }
                 break;
             case CDB_TYPE_PTR: {
-                void *v = ce_cdb_a0->read_ptr(from, key, 0);
+                void *v = ce_cdb_a0->read_ptr(from_reader, key, 0);
                 ce_cdb_a0->set_ptr(w, key, v);
             }
                 break;
             case CDB_TYPE_REF: {
-                uint64_t v = ce_cdb_a0->read_uint64(from, key, 0);
+                uint64_t v = ce_cdb_a0->read_uint64(from_reader, key, 0);
                 ce_cdb_a0->set_ref(w, key, v);
             }
                 break;
             case CDB_TYPE_FLOAT: {
-                float v = ce_cdb_a0->read_float(from, key, 0);
+                float v = ce_cdb_a0->read_float(from_reader, key, 0);
                 ce_cdb_a0->set_float(w, key, v);
             }
                 break;
             case CDB_TYPE_BOOL: {
-                bool v = ce_cdb_a0->read_bool(from, key, 0);
+                bool v = ce_cdb_a0->read_bool(from_reader, key, 0);
                 ce_cdb_a0->set_bool(w, key, v);
             }
                 break;
             case CDB_TYPE_STR: {
-                const char *v = ce_cdb_a0->read_str(from, key, NULL);
+                const char *v = ce_cdb_a0->read_str(from_reader, key, NULL);
                 ce_cdb_a0->set_str(w, key, v);
             }
                 break;
             case CDB_TYPE_BLOB: {
                 uint64_t size = 0;
-                void *v = ce_cdb_a0->read_blob(from, key, &size,
+                void *v = ce_cdb_a0->read_blob(from_reader, key, &size,
                                                NULL);
                 ce_cdb_a0->set_blob(w, key, v, size);
             }
@@ -305,6 +309,7 @@ static void _expand(uint64_t to,
 
 
     {
+        const ce_cdb_obj_o * to_reader = ce_cdb_a0->read(to);
         const uint32_t prop_count = ce_cdb_a0->prop_count(to);
         const uint64_t *keys = ce_cdb_a0->prop_keys(to);
 
@@ -313,7 +318,7 @@ static void _expand(uint64_t to,
             enum ce_cdb_type type = ce_cdb_a0->prop_type(to, key);
 
             if (type == CDB_TYPE_SUBOBJECT) {
-                uint64_t v = ce_cdb_a0->read_subobject(to, key, 0);
+                uint64_t v = ce_cdb_a0->read_subobject(to_reader, key, 0);
                 _expand(v, 0);
             }
         }
@@ -347,7 +352,8 @@ static uint64_t get(struct ct_resource_id resource_id) {
             return 0;
         }
 
-        resource_obj = ce_cdb_a0->read_subobject(obj, resource_key, 0);
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj);
+        resource_obj = ce_cdb_a0->read_subobject(reader, resource_key, 0);
         if (!resource_obj) {
             return 0;
         }
@@ -536,42 +542,42 @@ void remove_prop(struct ct_resource_id rid,
                  uint64_t keys_n,
                  uint64_t prop) {
 
-    uint64_t obj = get(rid);
-    obj = ce_cdb_a0->read_subobject_deep(obj, keys, keys_n, 0);
-
-    enum ce_cdb_type t = ce_cdb_a0->prop_type(obj, prop);
-
-    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, ASSET_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, ASSET_TYPE, rid.type);
-    ce_cdb_a0->set_uint64(w, _PROP, prop);
-    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-
-    switch (t) {
-        case CDB_TYPE_SUBOBJECT:
-        case CDB_TYPE_REF: {
-            uint64_t value = ce_cdb_a0->read_ref(obj, prop, 0);
-            ce_cdb_a0->set_ref(w, _OLD_VALUE, value);
-        }
-            break;
-
-        default:
-            break;
-
-    }
-
-    ce_cdb_a0->write_commit(w);
-
-    struct ct_cdb_cmd_s cmd = {
-            .header = {
-                    .size = sizeof(struct ct_cdb_cmd_s),
-                    .type = _REMOVE_PROP,
-            },
-            .cmd= cmd_obj,
-    };
-
-    ct_cmd_system_a0->execute(&cmd.header);
+//    uint64_t obj = get(rid);
+//    obj = ce_cdb_a0->read_subobject_deep(obj, keys, keys_n, 0);
+//
+//    enum ce_cdb_type t = ce_cdb_a0->prop_type(obj, prop);
+//
+//    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
+//    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
+//    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
+//    ce_cdb_a0->set_uint64(w, _PROP, prop);
+//    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
+//
+//    switch (t) {
+//        case CDB_TYPE_SUBOBJECT:
+//        case CDB_TYPE_REF: {
+//            uint64_t value = ce_cdb_a0->read_ref(obj, prop, 0);
+//            ce_cdb_a0->set_ref(w, _OLD_VALUE, value);
+//        }
+//            break;
+//
+//        default:
+//            break;
+//
+//    }
+//
+//    ce_cdb_a0->write_commit(w);
+//
+//    struct ct_cdb_cmd_s cmd = {
+//            .header = {
+//                    .size = sizeof(struct ct_cdb_cmd_s),
+//                    .type = _REMOVE_PROP,
+//            },
+//            .cmd= cmd_obj,
+//    };
+//
+//    ct_cmd_system_a0->execute(&cmd.header);
 }
 
 
@@ -618,235 +624,6 @@ static struct ct_sourcedb_a0 source_db_api = {
 
 struct ct_sourcedb_a0 *ct_sourcedb_a0 = &source_db_api;
 
-//static uint64_t _create_recursive(uint64_t obj,
-//                                  uint64_t *keys,
-//                                  uint64_t keys_n,
-//                                  uint64_t kidx) {
-//    uint64_t k = keys[kidx];
-//    if (!k) {
-//        return obj;
-//    }
-//
-//    uint64_t root = ce_cdb_a0->read_subobject(obj, k, 0);
-//
-//    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), root);
-//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-//    ce_cdb_a0->set_subobject(w, k, new_obj);
-//    ce_cdb_a0->write_commit(w);
-//
-//    return _create_recursive(new_obj, keys, keys_n, kidx + 1);
-//}
-
-static uint64_t _find_recursive_create(uint64_t obj,
-                                       uint64_t *keys,
-                                       uint64_t keys_n) {
-
-    uint64_t it_obj = obj;
-    for (int i = 0; i < keys_n; ++i) {
-        uint64_t k = keys[i];
-
-//        if (!ce_cdb_a0->prop_exist_norecursive(it_obj, k)) {
-//            it_obj = _create_recursive(it_obj, keys, keys_n, i + 1);
-//            break;
-//        } else {
-        it_obj = ce_cdb_a0->read_subobject(it_obj, k, 0);
-//        }
-    }
-
-    return it_obj;
-}
-
-static void set_cmd(const struct ct_cmd *_cmd,
-                    bool inverse) {
-    const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) _cmd;
-
-    struct ct_resource_id rid = {
-            .name=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_NAME, 0),
-            .type=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_TYPE, 0),
-    };
-
-    uint64_t asset_obj = ct_sourcedb_a0->get(rid);
-
-    uint64_t keys_n = 0;
-    uint64_t *keys = ce_cdb_a0->read_blob(pos_cmd->cmd, _KEYS, &keys_n, NULL);
-    keys_n = keys_n / sizeof(uint64_t);
-
-    uint64_t prop = ce_cdb_a0->read_uint64(pos_cmd->cmd, _PROP, 0);
-
-    uint64_t obj = _find_recursive_create(asset_obj, keys, keys_n);
-
-    enum ce_cdb_type t = ce_cdb_a0->prop_type(pos_cmd->cmd, inverse ? _OLD_VALUE
-                                                                    : _NEW_VALUE);
-
-    switch (t) {
-        case CDB_TYPE_STR: {
-            const char *f = ce_cdb_a0->read_str(pos_cmd->cmd,
-                                                inverse ? _OLD_VALUE
-                                                        : _NEW_VALUE, 0);
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-            ce_cdb_a0->set_str(w, prop, f);
-            ce_cdb_a0->write_commit(w);
-        }
-            break;
-
-        case CDB_TYPE_BOOL: {
-            bool f = ce_cdb_a0->read_bool(pos_cmd->cmd,
-                                          inverse ? _OLD_VALUE : _NEW_VALUE, 0);
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-            ce_cdb_a0->set_bool(w, prop, f);
-            ce_cdb_a0->write_commit(w);
-        }
-            break;
-
-
-        case CDB_TYPE_UINT64: {
-            uint64_t f = ce_cdb_a0->read_uint64(pos_cmd->cmd,
-                                                inverse ? _OLD_VALUE
-                                                        : _NEW_VALUE, 0);
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-            ce_cdb_a0->set_uint64(w, prop, f);
-            ce_cdb_a0->write_commit(w);
-        }
-            break;
-
-        case CDB_TYPE_FLOAT: {
-            float f = ce_cdb_a0->read_float(pos_cmd->cmd,
-                                            inverse ? _OLD_VALUE : _NEW_VALUE,
-                                            0);
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-            ce_cdb_a0->set_float(w, prop, f);
-            ce_cdb_a0->write_commit(w);
-        }
-            break;
-
-        case CDB_TYPE_NONE:
-            break;
-        case CDB_TYPE_PTR:
-            break;
-        case CDB_TYPE_REF:
-            break;
-        case CDB_TYPE_SUBOBJECT:
-            break;
-        case CDB_TYPE_BLOB:
-            break;
-    }
-
-}
-
-static void add_suobj_cmd(const struct ct_cmd *_cmd,
-                          bool inverse) {
-    const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) _cmd;
-
-    struct ct_resource_id rid = {
-            .name=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_NAME, 0),
-            .type=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_TYPE, 0),
-    };
-
-    uint64_t asset_obj = ct_sourcedb_a0->get(rid);
-
-    uint64_t keys_n = 0;
-    uint64_t *keys = ce_cdb_a0->read_blob(pos_cmd->cmd, _KEYS, &keys_n, NULL);
-    keys_n = keys_n / sizeof(uint64_t);
-
-    uint64_t prop = ce_cdb_a0->read_uint64(pos_cmd->cmd, _PROP, 0);
-
-    uint64_t obj = _find_recursive_create(asset_obj, keys, keys_n);
-
-    uint64_t subobj = ce_cdb_a0->read_ref(pos_cmd->cmd,
-                                          inverse ? _OLD_VALUE : _NEW_VALUE, 0);
-
-    if (subobj) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-        ce_cdb_a0->set_subobject(w, prop, subobj);
-        ce_cdb_a0->write_commit(w);
-    } else {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-        ce_cdb_a0->remove_property(w, prop);
-        ce_cdb_a0->write_commit(w);
-    }
-}
-
-static void remove_prop_cmd(const struct ct_cmd *_cmd,
-                            bool inverse) {
-    const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) _cmd;
-
-    struct ct_resource_id rid = {
-            .name=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_NAME, 0),
-            .type=ce_cdb_a0->read_uint64(pos_cmd->cmd, ASSET_TYPE, 0),
-    };
-
-    uint64_t asset_obj = ct_sourcedb_a0->get(rid);
-
-    uint64_t keys_n = 0;
-    uint64_t *keys = ce_cdb_a0->read_blob(pos_cmd->cmd, _KEYS, &keys_n, NULL);
-    keys_n = keys_n / sizeof(uint64_t);
-
-    uint64_t prop = ce_cdb_a0->read_uint64(pos_cmd->cmd, _PROP, 0);
-
-    uint64_t obj = _find_recursive_create(asset_obj, keys, keys_n);
-
-    if (!inverse) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-        ce_cdb_a0->remove_property(w, prop);
-        ce_cdb_a0->write_commit(w);
-    } else {
-        enum ce_cdb_type t = ce_cdb_a0->prop_type(pos_cmd->cmd, _OLD_VALUE);
-
-        switch (t) {
-            case CDB_TYPE_REF: {
-                uint64_t subobj = ce_cdb_a0->read_ref(pos_cmd->cmd, _OLD_VALUE,
-                                                      0);
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-                ce_cdb_a0->set_subobject(w, prop, subobj);
-                ce_cdb_a0->write_commit(w);
-            }
-                break;
-
-            default:
-                break;
-
-        }
-    }
-}
-
-static void cmd_description(char *buffer,
-                            uint32_t buffer_size,
-                            const struct ct_cmd *cmd,
-                            bool inverse) {
-//    const struct ct_cdb_cmd_s *pos_cmd = (const struct ct_cdb_cmd_s *) cmd;
-
-    switch (cmd->type) {
-//        case _SET_VEC3:
-////            snprintf(buffer, buffer_size,
-////                     "Set vec3 [%f, %f, %f]",
-////                     pos_cmd->vec3.new_value[0],
-////                     pos_cmd->vec3.new_value[1],
-////                     pos_cmd->vec3.new_value[2]);
-//            break;
-//
-//        case _SET_FLOAT:
-////            snprintf(buffer, buffer_size,
-////                     "Set float %f",
-////                     pos_cmd->f.new_value);
-//            break;
-//
-//        case _SET_STR:
-////            snprintf(buffer, buffer_size,
-////                     "Set str %s",
-////                     pos_cmd->str.new_value);
-//            break;
-
-        default:
-            snprintf(buffer, buffer_size, "(no description)");
-            break;
-    }
-}
-
-
 static void on_post_update(uint64_t type,
                            void *event) {
 
@@ -881,21 +658,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT,
                         on_post_update, 0);
-
-    ct_cmd_system_a0->register_cmd_execute(_SET_PROP,
-                                           (struct ct_cmd_fce) {
-                                                   .execute = set_cmd,
-                                                   .description = cmd_description});
-
-    ct_cmd_system_a0->register_cmd_execute(_ADD_SUBOBJ,
-                                           (struct ct_cmd_fce) {
-                                                   .execute = add_suobj_cmd,
-                                                   .description = cmd_description});
-
-    ct_cmd_system_a0->register_cmd_execute(_REMOVE_PROP,
-                                           (struct ct_cmd_fce) {
-                                                   .execute = remove_prop_cmd,
-                                                   .description = cmd_description});
 }
 
 static void _shutdown() {

@@ -37,23 +37,6 @@ static struct _G {
     struct ce_alloc *allocator;
 } _G;
 
-void _mesh_component_compiler(const char *filename,
-                              uint64_t component_key,
-                              ce_cdb_obj_o *writer) {
-    const char *scene = ce_cdb_a0->read_str(component_key,
-                                            ce_ydb_a0->key("scene"), "");
-    const char *mesh = ce_cdb_a0->read_str(component_key,
-                                           ce_ydb_a0->key("mesh"), "");
-    const char *mat = ce_cdb_a0->read_str(component_key,
-                                          ce_ydb_a0->key("material"), "");
-    const char *node = ce_cdb_a0->read_str(component_key,
-                                           ce_ydb_a0->key("node"), "");
-
-    ce_cdb_a0->set_str(writer, PROP_MESH, mesh);
-    ce_cdb_a0->set_str(writer, PROP_NODE, node);
-    ce_cdb_a0->set_str(writer, PROP_SCENE_ID, scene);
-    ce_cdb_a0->set_str(writer, PROP_MATERIAL, mat);
-}
 
 struct mesh_render_data {
     uint8_t viewid;
@@ -124,10 +107,12 @@ void foreach_mesh_renderer(struct ct_world world,
             continue;
         }
 
-        uint64_t ib = ce_cdb_a0->read_uint64(geom_obj, SCENE_IB_PROP, 0);
-        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_obj, SCENE_IB_SIZE, 0);
-        uint64_t vb = ce_cdb_a0->read_uint64(geom_obj, SCENE_VB_PROP, 0);
-        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_obj, SCENE_VB_SIZE, 0);
+        const ce_cdb_obj_o *geom_reader = ce_cdb_a0->read(geom_obj);
+
+        uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
+        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE, 0);
+        uint64_t vb = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_PROP, 0);
+        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE, 0);
 
         ct_render_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
         ct_render_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
@@ -177,7 +162,9 @@ static void _init_api(struct ce_api_a0 *api) {
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const char *scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+    const char *scene = ce_cdb_a0->read_str(reader, PROP_SCENE_ID, 0);
     uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {
@@ -190,7 +177,8 @@ void mesh_combo_items(uint64_t obj,
 void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const char *scene = ce_cdb_a0->read_str(obj, PROP_SCENE_ID, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const char *scene = ce_cdb_a0->read_str(reader, PROP_SCENE_ID, 0);
     uint64_t scene_id = ce_id_a0->id64(scene);
 
     if (!scene_id) {

@@ -1112,29 +1112,31 @@ namespace ImGui
                 m_docks.push_back(IM_PLACEMENT_NEW(new_dock) Dock());
             }
 
+			const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
             for (uint32_t i = 0; i < type_keys_count; ++i) {
-            	uint64_t dock_obj = cdb->read_subobject(obj, type_keys[i], 0);
+            	uint64_t dock_obj = cdb->read_subobject(reader, type_keys[i], 0);
 
+				const ce_cdb_obj_o *d_reader = ce_cdb_a0->read(dock_obj);
 
-                int index_n = (int)(cdb->read_float(dock_obj, yng->key("index"), 0));
+                int index_n = (int)(cdb->read_float(d_reader, yng->key("index"), 0));
 
-				const char* label_n = cdb->read_str(dock_obj,  yng->key("label"), "");
-                const char* location_n = cdb->read_str(dock_obj,  yng->key("location"), "");
+				const char* label_n = cdb->read_str(d_reader,  yng->key("label"), "");
+                const char* location_n = cdb->read_str(d_reader,  yng->key("location"), "");
 
-				int x_n = (int) cdb->read_float(dock_obj, yng->key("x"), 0);
-				int y_n = (int) cdb->read_float(dock_obj, yng->key("y"), 0);
-                int size_x_n = (int) cdb->read_float(dock_obj, yng->key("size_x"), 0);
-                int size_y_n = (int) cdb->read_float(dock_obj, yng->key("size_y"), 0);
-                int status_n = (int) cdb->read_float(dock_obj, yng->key("status"), 0);
-                int active_n = (int) cdb->read_float(dock_obj, yng->key("active"), 0);
-                int opened_n = (int) cdb->read_float(dock_obj, yng->key("opened"), 0);
-                int prev_n = (int) cdb->read_float(dock_obj, yng->key("prev"), 0);
+				int x_n = (int) cdb->read_float(d_reader, yng->key("x"), 0);
+				int y_n = (int) cdb->read_float(d_reader, yng->key("y"), 0);
+                int size_x_n = (int) cdb->read_float(d_reader, yng->key("size_x"), 0);
+                int size_y_n = (int) cdb->read_float(d_reader, yng->key("size_y"), 0);
+                int status_n = (int) cdb->read_float(d_reader, yng->key("status"), 0);
+                int active_n = (int) cdb->read_float(d_reader, yng->key("active"), 0);
+                int opened_n = (int) cdb->read_float(d_reader, yng->key("opened"), 0);
+                int prev_n = (int) cdb->read_float(d_reader, yng->key("prev"), 0);
 
-                int next_n = (int) cdb->read_float(dock_obj, yng->key("next"), 0);
+                int next_n = (int) cdb->read_float(d_reader, yng->key("next"), 0);
 
-                int child0_n = (int) cdb->read_float(dock_obj, yng->key("child0"), 0);
-                int child1_n = (int) cdb->read_float(dock_obj, yng->key("child1"), 0);
-                int parent_n = (int) cdb->read_float(dock_obj, yng->key("parent"), 0);
+                int child0_n = (int) cdb->read_float(d_reader, yng->key("child0"), 0);
+                int child1_n = (int) cdb->read_float(d_reader, yng->key("child1"), 0);
+                int parent_n = (int) cdb->read_float(d_reader, yng->key("parent"), 0);
 
                 Dock* dock =  this->getDockByIndex(index_n);
 

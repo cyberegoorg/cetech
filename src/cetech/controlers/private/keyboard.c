@@ -102,21 +102,21 @@ static void _update(uint64_t type, void* _event) {
 
     while (it != end_it) {
         struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj_event->obj);
         switch (it->type) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[ce_cdb_a0->read_uint64(obj_event->obj,
+                _G.state[ce_cdb_a0->read_uint64(reader,
                                                 CONTROLER_KEYCODE, 0)] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[ce_cdb_a0->read_uint64(obj_event->obj,
+                _G.state[ce_cdb_a0->read_uint64(reader,
                                                 CONTROLER_KEYCODE,
                                                 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                const char *str = ce_cdb_a0->read_str(obj_event->obj,
+                const char *str = ce_cdb_a0->read_str(reader,
                                                       CONTROLER_TEXT, 0);
                 memcpy(_G.text, str, strlen(str));
                 break;
