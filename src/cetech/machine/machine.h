@@ -1,10 +1,6 @@
 #ifndef CETECH_MACHINE_H
 #define CETECH_MACHINE_H
 
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stdint.h>
 #include <stddef.h>
 #include <celib/module.inl>
@@ -18,21 +14,11 @@
 #define CT_MACHINE_WINDOW_HEIGHT \
     CE_ID64_0("height", 0xef1c29a0b6d24e92ULL)
 
-//==============================================================================
-// Machine
-//==============================================================================
-
 //! Machine API V0
 struct ct_machine_a0 {
     //! Is gamepad active?
-    //! \param gamepad Gamepad ID
-    //! \return 1 if is active else 0
     int (*gamepad_is_active)(int gamepad);
 
-    //!
-    //! \param gamepad
-    //! \param strength
-    //! \param length
     void (*gamepad_play_rumble)(int gamepad,
                                 float strength,
                                 uint32_t length);

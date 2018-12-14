@@ -1,10 +1,6 @@
 #ifndef CETECH_SELECTED_OBJECT_H
 #define CETECH_SELECTED_OBJECT_H
 
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stdint.h>
 
 #include "celib/module.inl"

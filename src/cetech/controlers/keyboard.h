@@ -1,11 +1,6 @@
 #ifndef CETECH_KEYBOARD_H
 #define CETECH_KEYBOARD_H
 
-
-
-//==============================================================================
-// Includes
-//==============================================================================
 #include <stdint.h>
 
 #define KEYBOARD_EBUS_NAME "keyboard"
@@ -24,10 +19,6 @@ enum {
     EVENT_KEYBOARD_DOWN, //!< Keyboard button down
     EVENT_KEYBOARD_TEXT, //!< Keyboard button down
 };
-
-//==============================================================================
-// Api
-//==============================================================================
 
 enum {
     KEY_UNKNOWN = 0,

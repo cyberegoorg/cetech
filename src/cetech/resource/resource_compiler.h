@@ -1,11 +1,6 @@
 #ifndef CETECH_RESOURCE_COMPILER_H
 #define CETECH_RESOURCE_COMPILER_H
 
-
-//==============================================================================
-// Includes
-//==============================================================================
-
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>

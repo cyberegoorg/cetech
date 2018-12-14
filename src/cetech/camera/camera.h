@@ -1,13 +1,5 @@
-//! \addtogroup World
-//! \{
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
-
-
-
-//==============================================================================
-// Includes
-//==============================================================================
 
 #include <stddef.h>
 #include <celib/module.inl>
@@ -31,30 +23,12 @@
     CE_ID64_0("view", 0x3fce6c347b7f5eedULL)
 
 
-struct ct_camera_component {
-    float near;
-    float far;
-    float fov;
-};
-
-//==============================================================================
-// Typedefs
-//==============================================================================
-
 struct ct_world;
 struct ct_entity;
-
-//==============================================================================
-// Api
-//==============================================================================
 
 //! Camera API V0
 struct ct_camera_a0 {
     //! Get camera project and view matrix
-    //! \param world World
-    //! \param camera Camera
-    //! \param proj Project matrix
-    //! \param view View Matrix
     void (*get_project_view)(struct ct_world world,
                              struct ct_entity entity,
                              float *proj,

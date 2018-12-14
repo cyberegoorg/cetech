@@ -43,39 +43,6 @@ struct ct_sourcedb_a0 {
     bool (*save)(struct ct_resource_id resource_id);
 
     bool (*save_all)();
-
-//    void (*set_str)(struct ct_resource_id rid,
-//                    uint64_t prop,
-//                    uint64_t *keys,
-//                    uint64_t keys_n,
-//                    const char *value,
-//                    const char *new_value);
-//
-//    void (*set_float)(struct ct_resource_id rid,
-//                      uint64_t prop,
-//                      uint64_t *keys,
-//                      uint64_t keys_n,
-//                      float value,
-//                      float new_value);
-//
-//    void (*set_bool)(struct ct_resource_id rid,
-//                     uint64_t prop,
-//                     uint64_t *keys,
-//                     uint64_t keys_n,
-//                     bool value,
-//                     bool new_value);
-//
-//    void (*add_subobj)(struct ct_resource_id rid,
-//                       uint64_t prop,
-//                       uint64_t *keys,
-//                       uint64_t keys_n,
-//                       uint64_t value,
-//                       uint64_t new_value);
-//
-//    void (*remove_prop)(struct ct_resource_id rid,
-//                        uint64_t *keys,
-//                        uint64_t keys_n,
-//                        uint64_t prop);
 };
 
 CE_MODULE(ct_sourcedb_a0);

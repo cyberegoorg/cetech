@@ -1,10 +1,6 @@
 #ifndef CETECH_KERNEL_H
 #define CETECH_KERNEL_H
 
-//==============================================================================
-// Include
-//==============================================================================
-
 #define CONFIG_PLATFORM \
      CE_ID64_0("kernel.platform", 0xa2e788cf39b7339bULL)
 
@@ -56,15 +52,11 @@
 #define KERNEL_EBUS \
     CE_ID64_0("kernel", 0x146c2a8f5727f34ULL)
 
-
 enum {
     KERNEL_ORDER = 1024,
     GAME_ORDER = KERNEL_ORDER + 1024,
     RENDER_ORDER = GAME_ORDER + 1024,
 };
 
-struct ct_app_update_ev {
-    float dt;
-};
 
 #endif //CETECH_KERNEL_H

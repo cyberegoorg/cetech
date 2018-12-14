@@ -4,5 +4,4 @@
 #include <stddef.h>
 #include <stdint.h>
 
-
 #endif //CETECH_GAME_VIEW_H
