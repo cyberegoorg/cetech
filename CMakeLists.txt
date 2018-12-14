@@ -130,8 +130,6 @@ set(SOURCE_FILES
         src/cetech/editor/private/resource_browser.cpp
         src/cetech/editor/private/editor.c
         src/cetech/editor/private/property.c
-        src/cetech/command_system/private/command_system.c
-        src/cetech/editor/private/command_history.c
         src/cetech/editor/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
         src/cetech/resource/private/builddb.c

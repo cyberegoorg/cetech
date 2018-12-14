@@ -10,7 +10,7 @@
 #include <celib/array.inl>
 #include <celib/module.h>
 
-#include <cetech/command_system/command_system.h>
+
 #include <celib/hash.inl>
 #include <celib/cdb.h>
 #include <cetech/debugui/debugui.h>
@@ -428,7 +428,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_cmd_system_a0);
         },
         {
             CE_UNUSED(reload);

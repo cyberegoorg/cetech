@@ -21,7 +21,7 @@
 #include <cetech/editor/property.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/command_system/command_system.h>
+
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/asset/sourcedb.h>
 
@@ -248,7 +248,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_ebus_a0);
-            CE_INIT_API(api, ct_cmd_system_a0);
         },
         {
             CE_UNUSED(reload);

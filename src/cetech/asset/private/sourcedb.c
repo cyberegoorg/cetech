@@ -23,7 +23,6 @@
 #include "cetech/resource/builddb.h"
 #include "cetech/asset/sourcedb.h"
 #include <cetech/kernel/kernel.h>
-#include <cetech/command_system/command_system.h>
 #include <cetech/editor/resource_browser.h>
 
 #define LOG_WHERE "sourcedb"
@@ -450,178 +449,13 @@ static bool save_all() {
 #define _PROP \
     CE_ID64_0("property", 0xcbd168fb77919b23ULL)
 
-void set_str(struct ct_resource_id rid,
-             uint64_t prop,
-             uint64_t *keys,
-             uint64_t keys_n,
-             const char *value,
-             const char *new_value) {
 
-    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
-    ce_cdb_a0->set_uint64(w, _PROP, prop);
-    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-    ce_cdb_a0->set_str(w, _NEW_VALUE, new_value);
-
-    if (value) {
-        ce_cdb_a0->set_str(w, _OLD_VALUE, value);
-    }
-
-    ce_cdb_a0->write_commit(w);
-
-    struct ct_cdb_cmd_s cmd = {
-            .header = {
-                    .size = sizeof(struct ct_cdb_cmd_s),
-                    .type = _SET_PROP,
-            },
-            .cmd= cmd_obj,
-    };
-
-    ct_cmd_system_a0->execute(&cmd.header);
-}
-
-void set_float(struct ct_resource_id rid,
-               uint64_t prop,
-               uint64_t *keys,
-               uint64_t keys_n,
-               float value,
-               float new_value) {
-    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
-    ce_cdb_a0->set_uint64(w, _PROP, prop);
-    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-    ce_cdb_a0->set_float(w, _NEW_VALUE, new_value);
-    ce_cdb_a0->set_float(w, _OLD_VALUE, value);
-
-    ce_cdb_a0->write_commit(w);
-
-    struct ct_cdb_cmd_s cmd = {
-            .header = {
-                    .size = sizeof(struct ct_cdb_cmd_s),
-                    .type = _SET_PROP,
-            },
-            .cmd= cmd_obj,
-    };
-
-    ct_cmd_system_a0->execute(&cmd.header);
-}
-
-void add_subobj(struct ct_resource_id rid,
-                uint64_t prop,
-                uint64_t *keys,
-                uint64_t keys_n,
-                uint64_t value,
-                uint64_t new_value) {
-
-    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
-    ce_cdb_a0->set_uint64(w, _PROP, prop);
-    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-    ce_cdb_a0->set_ref(w, _NEW_VALUE, new_value);
-    ce_cdb_a0->set_ref(w, _OLD_VALUE, value);
-
-    ce_cdb_a0->write_commit(w);
-
-    struct ct_cdb_cmd_s cmd = {
-            .header = {
-                    .size = sizeof(struct ct_cdb_cmd_s),
-                    .type = _ADD_SUBOBJ,
-            },
-            .cmd= cmd_obj,
-    };
-
-    ct_cmd_system_a0->execute(&cmd.header);
-}
-
-void remove_prop(struct ct_resource_id rid,
-                 uint64_t *keys,
-                 uint64_t keys_n,
-                 uint64_t prop) {
-
-//    uint64_t obj = get(rid);
-//    obj = ce_cdb_a0->read_subobject_deep(obj, keys, keys_n, 0);
-//
-//    enum ce_cdb_type t = ce_cdb_a0->prop_type(obj, prop);
-//
-//    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-//    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
-//    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
-//    ce_cdb_a0->set_uint64(w, _PROP, prop);
-//    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-//
-//    switch (t) {
-//        case CDB_TYPE_SUBOBJECT:
-//        case CDB_TYPE_REF: {
-//            uint64_t value = ce_cdb_a0->read_ref(obj, prop, 0);
-//            ce_cdb_a0->set_ref(w, _OLD_VALUE, value);
-//        }
-//            break;
-//
-//        default:
-//            break;
-//
-//    }
-//
-//    ce_cdb_a0->write_commit(w);
-//
-//    struct ct_cdb_cmd_s cmd = {
-//            .header = {
-//                    .size = sizeof(struct ct_cdb_cmd_s),
-//                    .type = _REMOVE_PROP,
-//            },
-//            .cmd= cmd_obj,
-//    };
-//
-//    ct_cmd_system_a0->execute(&cmd.header);
-}
-
-
-void set_bool(struct ct_resource_id rid,
-              uint64_t prop,
-              uint64_t *keys,
-              uint64_t keys_n,
-              bool value,
-              bool new_value) {
-
-    uint64_t cmd_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(cmd_obj);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, rid.name);
-    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, rid.type);
-    ce_cdb_a0->set_uint64(w, _PROP, prop);
-    ce_cdb_a0->set_blob(w, _KEYS, keys, sizeof(uint64_t) * keys_n);
-    ce_cdb_a0->set_bool(w, _NEW_VALUE, new_value);
-    ce_cdb_a0->set_bool(w, _OLD_VALUE, value);
-
-    ce_cdb_a0->write_commit(w);
-
-    struct ct_cdb_cmd_s cmd = {
-            .header = {
-                    .size = sizeof(struct ct_cdb_cmd_s),
-                    .type = _SET_PROP,
-            },
-            .cmd= cmd_obj,
-    };
-
-    ct_cmd_system_a0->execute(&cmd.header);
-}
 
 static struct ct_sourcedb_a0 source_db_api = {
         .get = get,
         .save = save,
         .save_all = save_all,
 
-//        .set_str = set_str,
-//        .set_bool = set_bool,
-//        .set_float = set_float,
-//        .add_subobj = add_subobj,
-//        .remove_prop = remove_prop,
 };
 
 struct ct_sourcedb_a0 *ct_sourcedb_a0 = &source_db_api;

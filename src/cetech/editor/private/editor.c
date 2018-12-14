@@ -16,7 +16,6 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
-#include <cetech/command_system/command_system.h>
 #include <cetech/editor/action_manager.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>
@@ -73,29 +72,6 @@ static float draw_main_menu() {
         }
 
         if (ct_debugui_a0->BeginMenu("Edit", true)) {
-            char buffer[128];
-            char buffer2[128];
-
-            ct_cmd_system_a0->undo_text(buffer2, CE_ARRAY_LEN(buffer2));
-            const char *shortcut;
-
-            sprintf(buffer, "Undo %s", buffer2[0] != '0' ? buffer2 : "");
-
-            shortcut = ct_action_manager_a0->shortcut_str(_UNDO);
-            if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
-                                        buffer2[0] != '0')) {
-                ct_action_manager_a0->execute(_UNDO);
-            }
-
-
-            ct_cmd_system_a0->redo_text(buffer2, CE_ARRAY_LEN(buffer2));
-            shortcut = ct_action_manager_a0->shortcut_str(_REDO);
-            sprintf(buffer, "Redo %s", buffer2[0] != '0' ? buffer2 : "");
-            if (ct_debugui_a0->MenuItem(buffer, shortcut, false,
-                                        buffer2[0] != '0')) {
-                ct_action_manager_a0->execute(_REDO);
-            }
-
             ct_debugui_a0->EndMenu();
         }
 
@@ -229,17 +205,6 @@ static void _init(struct ce_api_a0 *api) {
             .load_layout = true,
     };
 
-    ct_action_manager_a0->register_action(
-            CE_ID64_0("undo", 0xd9c7f03561492eecULL),
-            "ctrl+z",
-            ct_cmd_system_a0->undo
-    );
-
-    ct_action_manager_a0->register_action(
-            CE_ID64_0("redo", 0x2b64b25d7febf67eULL),
-            "ctrl+shift+z",
-            ct_cmd_system_a0->redo
-    );
 
     ce_api_a0->register_api(GAME_INTERFACE_NAME, &editor_game_i0);
 
@@ -264,7 +229,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_fs_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_action_manager_a0);
-            CE_INIT_API(api, ct_cmd_system_a0);
             CE_INIT_API(api, ce_module_a0);
             CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ct_render_graph_a0);
