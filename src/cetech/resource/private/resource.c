@@ -16,7 +16,6 @@
 #include <celib/cdb.h>
 #include <celib/buffer.inl>
 
-#include <cetech/resource/package.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
@@ -117,54 +116,6 @@ static int can_get_all(uint64_t type,
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
     return (struct ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
-
-//static void _load_obj(uint64_t from,
-//                      uint64_t parent) {
-//    if (from == parent) {
-//        ce_log_a0->error(LOG_WHERE, "from == parent, fix it");
-//        return;
-//    }
-//
-//    const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-//    uint64_t keys[prop_count];
-//    ce_cdb_a0->prop_keys(from, keys);
-//
-//    const char *prefab = ce_cdb_a0->read_str(from, PREFAB_NAME_PROP, NULL);
-//
-//    uint64_t prefab_res = 0;
-//    if (prefab) {
-//        struct ct_resource_id prefab_rid = {};
-//        ct_resource_compiler_a0->type_name_from_filename(prefab, &prefab_rid, NULL);
-//
-//        prefab_res = get_obj(prefab_rid);
-//
-//        ce_cdb_a0->set_prefab(from, prefab_res);
-//    }
-//
-//    for (int i = 0; i < prop_count; ++i) {
-//        uint64_t key = keys[i];
-//        enum ce_cdb_type type = ce_cdb_a0->prop_type(from, keys[i]);
-//
-//        if (type == CDB_TYPE_SUBOBJECT) {
-//            uint64_t from_subobj;
-//            from_subobj = ce_cdb_a0->read_ref(from, key, 0);
-//
-//            uint64_t parent_subobj = 0;
-//
-//            if (parent) {
-//                parent_subobj = ce_cdb_a0->read_ref(parent, key, 0);
-//            } else if (prefab_res) {
-//                parent_subobj = ce_cdb_a0->read_ref(prefab_res, key, 0);
-//            }
-//
-//            if (parent_subobj) {
-//                ce_cdb_a0->set_prefab(from_subobj, parent_subobj);
-//            }
-//
-//            _load_obj(from_subobj, parent_subobj);
-//        }
-//    }
-//}
 
 
 static void load(uint64_t type,
@@ -310,7 +261,7 @@ static uint64_t get_obj(struct ct_resource_id resource_id) {
                                               CE_ARRAY_LEN(filename),
                                               resource_id);
 
-        ce_log_a0->warning(LOG_WHERE, "Autoloading resource %s", filename);
+        ce_log_a0->warning(LOG_WHERE, "Loading resource %s", filename);
         load_now(resource_id.type, &resource_id.name, 1);
 
         const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
@@ -378,31 +329,11 @@ static struct ct_resource_a0 resource_api = {
         .type_name_string = type_name_string,
 };
 
-int package_init(struct ce_api_a0 *api);
-
-void package_shutdown();
-
-struct ce_task_counter_t *package_load(uint64_t name);
-
-void package_unload(uint64_t name);
-
-int package_is_loaded(uint64_t name);
-
-void package_flush(struct ce_task_counter_t *counter);
-
-static struct ct_package_a0 package_api = {
-        .load = package_load,
-        .unload = package_unload,
-        .is_loaded = package_is_loaded,
-        .flush = package_flush,
-};
 
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
-struct ct_package_a0 *ct_package_a0 = &package_api;
 
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_resource_a0", &resource_api);
-    api->register_api("ct_package_a0", &package_api);
 
 }
 
@@ -440,13 +371,9 @@ static void _init(struct ce_api_a0 *api) {
                            false);
 
     ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
-
-    package_init(api);
 }
 
 static void _shutdown() {
-    package_shutdown();
-
     ce_cdb_a0->destroy_db(_G.db);
 
     ce_hash_free(&_G.type_map, _G.allocator);

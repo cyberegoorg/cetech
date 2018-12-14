@@ -15,7 +15,7 @@
 #include <celib/fs.h>
 #include <cetech/resource/resource.h>
 
-#include <cetech/resource/package.h>
+
 #include <cetech/machine/machine.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
@@ -165,7 +165,6 @@ bool cetech_kernel_init(int argc,
 
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ce_os_a0);
-    CE_INIT_API(api, ct_package_a0);
     CE_INIT_API(api, ct_machine_a0);
     CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_renderer_a0);
@@ -220,39 +219,9 @@ void _init_config() {
 }
 
 static void _boot_stage() {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
-
-    const char *boot_pkg_str = ce_cdb_a0->read_str(reader,
-                                                   CONFIG_BOOT_PKG, "");
-    uint64_t boot_pkg = ce_id_a0->id64(boot_pkg_str);
-    uint64_t core_pkg = ce_id_a0->id64("core/core");
-    uint64_t resources[] = {core_pkg, boot_pkg};
-
-    ct_resource_a0->load_now(PACKAGE_TYPE, resources, 2);
-
-    struct ce_task_counter_t *boot_pkg_cnt = ct_package_a0->load(boot_pkg);
-    ct_package_a0->flush(boot_pkg_cnt);
-
-    struct ce_task_counter_t *core_pkg_cnt = ct_package_a0->load(core_pkg);
-    ct_package_a0->flush(core_pkg_cnt);
 }
 
 static void _boot_unload() {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
-
-    const char *boot_pkg_str = ce_cdb_a0->read_str(reader,
-                                                   CONFIG_BOOT_PKG, "");
-
-    uint64_t boot_pkg = ce_id_a0->id64(boot_pkg_str);
-
-    uint64_t core_pkg = ce_id_a0->id64("core/core");
-
-    uint64_t resources[] = {core_pkg, boot_pkg};
-
-    ct_package_a0->unload(boot_pkg);
-    ct_package_a0->unload(core_pkg);
-
-    ct_resource_a0->unload(PACKAGE_TYPE, resources, 2);
 }
 
 
