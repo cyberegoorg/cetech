@@ -72,11 +72,11 @@ static void game_update(float dt) {
     }
 }
 
-static struct ct_render_graph_builder *game_render_graph_builder(uint64_t name) {
+static struct ct_viewport0 game_render_graph_builder(uint64_t name) {
     struct ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
-        return NULL;
+        return (struct ct_viewport0){0};
     }
 
     return game_i->render_graph_builder();

@@ -26,9 +26,9 @@
 
 static struct G {
     struct ct_world world;
-    struct ct_entity render_ent;
     struct ct_entity camera_ent;
     struct ct_entity level;
+    struct ct_viewport0 viewport;
 } _G;
 
 #define _CAMERA_ASSET \
@@ -48,26 +48,7 @@ void init() {
     _G.camera_ent = ct_ecs_a0->spawn(_G.world, _CAMERA_ASSET);
     _G.level = ct_ecs_a0->spawn(_G.world, _LEVEL_ASSET);
 
-
-    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
-    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
-
-    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                            RENDER_GRAPH_COMPONENT);
-
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
-    ce_cdb_a0->write_commit(w);
-
-    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
-    ct_ecs_a0->add(_G.world, _G.render_ent,
-                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                   (uint64_t[]) {rgc});
-
-    struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    graph->add_module(graph, module);
+    _G.viewport = ct_renderer_a0->create_viewport(_G.world, _G.camera_ent);
 }
 
 
@@ -91,13 +72,8 @@ static uint64_t game_name() {
     return ce_id_a0->id64("default");
 }
 
-static struct ct_render_graph_builder *render_graph_builder() {
-    uint64_t rg_comp = ct_ecs_a0->get_one(_G.world, RENDER_GRAPH_COMPONENT,
-                                          _G.render_ent);
-
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(rg_comp);
-
-    return ce_cdb_a0->read_ptr(reader, PROP_RENDER_GRAPH_BUILDER, NULL);
+static struct ct_viewport0 render_graph_builder() {
+    return _G.viewport;
 }
 
 struct ct_game_i0 game_i0 = {

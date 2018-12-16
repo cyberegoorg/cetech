@@ -39,55 +39,35 @@ static struct _G {
 #include "builder.h"
 
 
-static uint64_t cdb_type() {
-    return RENDER_GRAPH_COMPONENT;
-}
-
 //static uint64_t size() {
 //    return sizeof(struct ct_render_graph_component);
 //}
 
-static struct ct_component_i0 render_graph_component_i = {
-//        .size = size,
-        .cdb_type = cdb_type,
-};
-
-
-static void foreach_render_graph(struct ct_world world,
-                                 struct ct_entity *ent,
-                                 ct_entity_storage_t *item,
-                                 uint32_t n,
-                                 void *data) {
-    for (uint32_t i = 1; i < n; ++i) {
-        uint64_t rg = ct_ecs_a0->get_one(world, RENDER_GRAPH_COMPONENT, ent[i]);
-
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(rg);
-
-        struct ct_render_graph *graph = ce_cdb_a0->read_ptr(reader,
-                                                            PROP_RENDER_GRAPH_GRAPH,
-                                                            NULL);
-
-        struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(reader,
-                                                                      PROP_RENDER_GRAPH_BUILDER,
-                                                                      NULL);
-
-        uint16_t size[2] = {};
-        builder->get_size(builder, size);
-        if ((size[0] == 0) || (size[1] == 0)) {
-            continue;
-        }
-
-        builder->clear(builder);
-        graph->setup(graph, builder);
-        builder->execute(builder);
-    }
-}
-
-static void render_system(struct ct_world world,
-                          float dt) {
-    uint64_t mask = ct_ecs_a0->mask(RENDER_GRAPH_COMPONENT);
-    ct_ecs_a0->process(world, mask, foreach_render_graph, &dt);
-}
+//static void foreach_render_graph(struct ct_world world,
+//                                 struct ct_entity *ent,
+//                                 ct_entity_storage_t *item,
+//                                 uint32_t n,
+//                                 void *data) {
+//    for (uint32_t i = 1; i < n; ++i) {
+////        struct ct_render_graph *graph = ce_cdb_a0->read_ptr(reader,
+////                                                            PROP_RENDER_GRAPH_GRAPH,
+////                                                            NULL);
+////
+////        struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(reader,
+////                                                                      PROP_RENDER_GRAPH_BUILDER,
+////                                                                      NULL);
+////
+////        uint16_t size[2] = {};
+////        builder->get_size(builder, size);
+////        if ((size[0] == 0) || (size[1] == 0)) {
+////            continue;
+////        }
+////
+////        builder->clear(builder);
+////        graph->setup(graph, builder);
+////        builder->execute(builder);
+//    }
+//}
 
 static struct ct_render_graph_a0 render_graph_api = {
         .create_graph = create_render_graph,
@@ -101,21 +81,6 @@ static struct ct_render_graph_a0 render_graph_api = {
 struct ct_render_graph_a0 *ct_render_graph_a0 = &render_graph_api;
 
 
-static uint64_t render_system_name() {
-    return RENDER_SYSTEM;
-}
-
-static const uint64_t *rendersystem_after(uint32_t *n) {
-    static uint64_t _after[] = {TRANSFORM_SYSTEM};
-    *n = CE_ARRAY_LEN(_after);
-    return _after;
-}
-
-static struct ct_simulation_i0 render_simulation_i0 = {
-        .simulation = render_system,
-        .name = render_system_name,
-        .after = rendersystem_after,
-};
 
 static void _init(struct ce_api_a0 *api) {
     CE_UNUSED(api);
@@ -124,8 +89,6 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     api->register_api("ct_render_graph_a0", &render_graph_api);
-    api->register_api(COMPONENT_INTERFACE_NAME, &render_graph_component_i);
-    api->register_api(SIMULATION_INTERFACE_NAME, &render_simulation_i0);
 
 }
 

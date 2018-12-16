@@ -26,9 +26,11 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t game_name = ce_id_a0->id64("default");
 
-    struct ct_render_graph_builder *rgb = ct_game_system_a0->render_graph_builder(
-            game_name);
-    rgb->set_size(rgb, size[0], size[1]);
+    struct ct_viewport0 v = ct_game_system_a0->render_graph_builder(game_name);
+    struct ct_render_graph_builder* builder;
+    builder = ct_renderer_a0->viewport_builder(v);
+
+    builder->set_size(builder, size[0], size[1]);
 
     static const char *label[] = {
             ICON_FA_PAUSE,
@@ -57,7 +59,7 @@ static void on_debugui(uint64_t dock) {
 
 
     ct_render_texture_handle_t th;
-    th = rgb->get_texture(rgb, RG_OUTPUT_TEXTURE);
+    th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,

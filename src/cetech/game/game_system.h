@@ -18,6 +18,8 @@
 struct ct_render_texture_handle;
 struct ct_render_graph_builder;
 
+struct ct_viewport0;
+
 struct ct_game_i0 {
     uint64_t (*name)();
 
@@ -27,11 +29,11 @@ struct ct_game_i0 {
 
     void (*update)(float dt);
 
-    struct ct_render_graph_builder *(*render_graph_builder)();
+    struct ct_viewport0 (*render_graph_builder)();
 };
 
 struct ct_game_system_a0 {
-    struct ct_render_graph_builder *(*render_graph_builder)(uint64_t name);
+    struct ct_viewport0 (*render_graph_builder)(uint64_t name);
 
     void (*pause)(uint64_t name);
 

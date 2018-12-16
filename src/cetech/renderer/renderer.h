@@ -29,6 +29,13 @@
 
 typedef void (*ct_renderender_on_render)();
 
+struct ct_viewport0 {
+    uint32_t idx;
+};
+
+struct ct_world;
+struct ct_entity;
+
 //! Render API V0
 struct ct_renderer_a0 {
     //! Create renderer.
@@ -44,6 +51,12 @@ struct ct_renderer_a0 {
                      uint32_t *height);
 
     uint64_t (*new_viewid)();
+
+    struct ct_viewport0 (*create_viewport)(struct ct_world world,
+                                           struct ct_entity main_camera);
+
+    struct ct_render_graph_builder *
+    (*viewport_builder)(struct ct_viewport0 viewport);
 };
 
 CE_MODULE(ct_renderer_a0);

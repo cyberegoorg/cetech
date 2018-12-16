@@ -37,7 +37,7 @@ static struct _G {
 
     struct ct_world world;
     struct ct_entity camera_ent;
-    struct ct_entity render_ent;
+    struct ct_viewport0 viewport;
 
     struct ct_entity active_ent;
 
@@ -178,15 +178,8 @@ static void on_debugui(uint64_t dock) {
     ct_debugui_a0->GetContentRegionAvail(size);
 
 
-    uint64_t rgc = ct_ecs_a0->get_one(_G.world,
-                                      RENDER_GRAPH_COMPONENT,
-                                      _G.render_ent);
-
-    const ce_cdb_obj_o *rgc_reader = ce_cdb_a0->read(rgc);
-
-    struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(rgc_reader,
-                                                                  PROP_RENDER_GRAPH_BUILDER,
-                                                                  NULL);
+    struct ct_render_graph_builder *builder;
+    builder = ct_renderer_a0->viewport_builder(_G.viewport);
 
     builder->set_size(builder, size[0], size[1]);
 
@@ -205,26 +198,7 @@ static bool init() {
     _G.world = ct_ecs_a0->create_world();
     _G.camera_ent = ct_ecs_a0->spawn(_G.world,
                                      ce_id_a0->id64("content/camera"));
-
-    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
-    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
-
-    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                            RENDER_GRAPH_COMPONENT);
-
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
-    ce_cdb_a0->write_commit(w);
-
-    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
-    ct_ecs_a0->add(_G.world, _G.render_ent,
-                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                   (uint64_t[]) {rgc});
-
-    struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    graph->add_module(graph, module);
+    _G.viewport = ct_renderer_a0->create_viewport(_G.world, _G.camera_ent);
 
     return true;
 }

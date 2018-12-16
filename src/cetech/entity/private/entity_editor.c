@@ -38,8 +38,8 @@
 struct scene_editor {
     struct ct_world world;
     struct ct_entity camera_ent;
-    struct ct_entity render_ent;
     struct ct_entity entity;
+    struct ct_viewport0 viewport;
 
     uint64_t entity_name;
     bool mouse_hovering;
@@ -260,14 +260,9 @@ static void draw_editor(uint64_t context_obj) {
 //                                  editor->path);
     }
 
-    uint64_t rgc = ct_ecs_a0->get_one(editor->world,
-                                      RENDER_GRAPH_COMPONENT,
-                                      editor->render_ent);
 
-    const ce_cdb_obj_o *rgc_reader = ce_cdb_a0->read(rgc);
-    struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(rgc_reader,
-                                                                  PROP_RENDER_GRAPH_BUILDER,
-                                                                  NULL);
+    struct ct_render_graph_builder *builder = \
+    ct_renderer_a0->viewport_builder(editor->viewport);
 
     builder->set_size(builder, size[0], size[1]);
 
@@ -275,8 +270,7 @@ static void draw_editor(uint64_t context_obj) {
     ct_ecs_a0->simulate(editor->world, 0.1f);
 
     ct_render_texture_handle_t th;
-    th = builder->get_texture(builder,
-                                    RG_OUTPUT_TEXTURE);
+    th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -313,28 +307,9 @@ static void open(uint64_t context_obj) {
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader, _ASSET_NAME,
                                                        0);
 
-    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
-    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
-
-    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                            RENDER_GRAPH_COMPONENT);
-
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
-    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
-    ce_cdb_a0->write_commit(w);
-
-    ct_ecs_a0->create(editor->world, &editor->entity, 1);
-    ct_ecs_a0->add(editor->world, editor->entity,
-                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-                   (uint64_t[]) {rgc});
-
-    struct ct_render_graph_module *module = ct_default_rg_a0->create(
-            editor->world);
-    graph->add_module(graph, module);
     editor->camera_ent = ct_ecs_a0->spawn(editor->world,
                                           ce_id_a0->id64("content/camera"));
+    editor->viewport = ct_renderer_a0->create_viewport(editor->world, editor->camera_ent);
 
     editor->entity_name = asset_name;
 
