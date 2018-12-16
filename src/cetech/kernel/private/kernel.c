@@ -218,13 +218,6 @@ void _init_config() {
     ce_cdb_a0->write_commit(writer);
 }
 
-static void _boot_stage() {
-}
-
-static void _boot_unload() {
-}
-
-
 static void on_quit(uint64_t type,
                     void *event) {
     CE_UNUSED(event)
@@ -243,8 +236,6 @@ static void cetech_kernel_start() {
             return;
         }
     }
-
-    _boot_stage();
 
 #if 1
     char *buf = NULL;
@@ -297,8 +288,6 @@ static void cetech_kernel_start() {
     ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, NULL, 0);
 
     ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
-
-    _boot_unload();
 }
 
 int main(int argc,
