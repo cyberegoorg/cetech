@@ -14,6 +14,7 @@
 #include "cetech/machine/machine.h"
 #include <bgfx/defines.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include "cetech/resource/resource.h"
 
 #include <cetech/material/material.h>

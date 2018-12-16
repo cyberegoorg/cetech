@@ -13,6 +13,7 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>

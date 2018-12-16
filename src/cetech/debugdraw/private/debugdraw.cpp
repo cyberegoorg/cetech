@@ -8,6 +8,7 @@ extern "C" {
 #include <celib/log.h>
 
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugdraw/debugdraw.h>
 }
 

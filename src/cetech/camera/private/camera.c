@@ -10,6 +10,7 @@
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/resource_ui.h>
 
@@ -57,7 +58,7 @@ static void get_project_view(struct ct_world world,
                       ratio,
                       near,
                       far,
-                      ct_renderer_a0->get_caps()->homogeneousDepth);
+                      ct_gfx_a0->get_caps()->homogeneousDepth);
 
     float w[16] = {};
     if(wworld) {

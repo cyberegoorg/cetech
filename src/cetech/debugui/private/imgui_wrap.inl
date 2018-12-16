@@ -52,7 +52,7 @@ namespace imgui_wrap {
                const _vec4 tint_col,
                const _vec4 border_col) {
 
-        if (ct_renderer_a0->get_caps()->originBottomLeft) {
+        if (ct_gfx_a0->get_caps()->originBottomLeft) {
             ct_debugui_a0->Image2(user_texture_id,
                                   size,
                                   (float[2]) {0.0f, 1.0f},

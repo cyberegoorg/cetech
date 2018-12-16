@@ -15,6 +15,7 @@
 
 #include "cetech/transform/transform.h"
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/scene/scene.h>
 #include <cetech/material/material.h>
 #include <cetech/mesh/mesh_renderer.h>
@@ -117,9 +118,9 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_render_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
         ct_render_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
 
-        ct_renderer_a0->set_transform(&final_w, 1);
-        ct_renderer_a0->set_vertex_buffer(0, vbh, 0, vb_size);
-        ct_renderer_a0->set_index_buffer(ibh, 0, ib_size);
+        ct_gfx_a0->set_transform(&final_w, 1);
+        ct_gfx_a0->set_vertex_buffer(0, vbh, 0, vb_size);
+        ct_gfx_a0->set_index_buffer(ibh, 0, ib_size);
 
         struct ct_resource_id material_resource = {.type = MATERIAL_TYPE, .name = material};
         uint64_t material_obj = ct_resource_a0->get(material_resource);

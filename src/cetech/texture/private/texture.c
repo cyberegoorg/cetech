@@ -22,6 +22,7 @@
 #include "cetech/resource/resource.h"
 #include <cetech/texture/texture.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/resource_ui.h>
@@ -58,10 +59,10 @@ void _texture_resource_online(uint64_t name,
     void *blob;
     blob = ce_cdb_a0->read_blob(reader, TEXTURE_DATA, &blob_size, 0);
 
-    const ct_render_memory_t *mem = ct_renderer_a0->make_ref(blob, blob_size);
+    const ct_render_memory_t *mem = ct_gfx_a0->make_ref(blob, blob_size);
 
     ct_render_texture_handle_t texture;
-    texture = ct_renderer_a0->create_texture(mem,
+    texture = ct_gfx_a0->create_texture(mem,
                                              CT_RENDER_TEXTURE_NONE,
                                              0, NULL);
 
@@ -76,7 +77,7 @@ void _texture_resource_offline(uint64_t name,
 
     const uint64_t texture = ce_cdb_a0->read_uint64(reader, TEXTURE_HANDLER_PROP,
                                                     0);
-    ct_renderer_a0->destroy_texture(
+    ct_gfx_a0->destroy_texture(
             (ct_render_texture_handle_t) {.idx=(uint16_t) texture});
 }
 

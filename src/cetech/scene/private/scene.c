@@ -16,6 +16,7 @@
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/asset/sourcedb.h>
 
 
@@ -66,20 +67,20 @@ static void online(uint64_t name,
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
         const ct_render_memory_t *vb_mem;
-        vb_mem = ct_renderer_a0->make_ref((const void *) &vb[vb_offset[i]],
+        vb_mem = ct_gfx_a0->make_ref((const void *) &vb[vb_offset[i]],
                                           vb_size[i]);
 
         const ct_render_memory_t *ib_mem;
-        ib_mem = ct_renderer_a0->make_ref((const void *) &ib[ib_offset[i]],
+        ib_mem = ct_gfx_a0->make_ref((const void *) &ib[ib_offset[i]],
                                           sizeof(uint32_t) * ib_size[i]);
 
         ct_render_vertex_buffer_handle_t bv_handle;
-        bv_handle = ct_renderer_a0->create_vertex_buffer(vb_mem,
+        bv_handle = ct_gfx_a0->create_vertex_buffer(vb_mem,
                                                          &vb_decl[i],
                                                          CT_RENDER_BUFFER_NONE);
 
         ct_render_index_buffer_handle_t ib_handle;
-        ib_handle = ct_renderer_a0->create_index_buffer(ib_mem,
+        ib_handle = ct_gfx_a0->create_index_buffer(ib_mem,
                                                         CT_RENDER_BUFFER_INDEX32);
 
         uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);

@@ -12,6 +12,7 @@
 #include <celib/ebus.h>
 
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/kernel/kernel.h>

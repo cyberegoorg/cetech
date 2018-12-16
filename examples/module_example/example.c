@@ -15,6 +15,7 @@
 
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/transform/transform.h>
 #include <cetech/texture/texture.h>
 #include <cetech/kernel/kernel.h>

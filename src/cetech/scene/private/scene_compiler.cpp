@@ -18,6 +18,7 @@
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include "cetech/ecs/ecs.h"
 #include <cetech/scene/scene.h>
 #include <cetech/kernel/kernel.h>
@@ -555,19 +556,19 @@ static int _compile_assimp(uint64_t k,
         ce_array_push(output->ib_size, mesh->mNumFaces * 3, _G.allocator);
 
         ct_render_vertex_decl_t vertex_decl;
-        ct_renderer_a0->vertex_decl_begin(&vertex_decl,
+        ct_gfx_a0->vertex_decl_begin(&vertex_decl,
                                           CT_RENDER_RENDERER_TYPE_COUNT);
 
         uint32_t v_size = 0;
         if (mesh->mVertices != NULL) {
-            ct_renderer_a0->vertex_decl_add(&vertex_decl,
+            ct_gfx_a0->vertex_decl_add(&vertex_decl,
                                             CT_RENDER_ATTRIB_POSITION, 3,
                                             CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mNormals != NULL) {
-            ct_renderer_a0->vertex_decl_add(&vertex_decl,
+            ct_gfx_a0->vertex_decl_add(&vertex_decl,
                                             CT_RENDER_ATTRIB_NORMAL, 3,
                                             CT_RENDER_ATTRIB_TYPE_FLOAT, true,
                                             0);
@@ -575,13 +576,13 @@ static int _compile_assimp(uint64_t k,
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
-            ct_renderer_a0->vertex_decl_add(&vertex_decl,
+            ct_gfx_a0->vertex_decl_add(&vertex_decl,
                                             CT_RENDER_ATTRIB_TEXCOORD0, 2,
                                             CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
 
             v_size += 2 * sizeof(float);
         }
-        ct_renderer_a0->vertex_decl_end(&vertex_decl);
+        ct_gfx_a0->vertex_decl_end(&vertex_decl);
 
         ce_array_push(output->vb_decl, vertex_decl, _G.allocator);
         ce_array_push(output->vb_size, v_size * mesh->mNumVertices,

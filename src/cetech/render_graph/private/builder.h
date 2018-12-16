@@ -31,7 +31,7 @@ static void builder_add_pass(void *inst,
     if (0 != n) {
         builder_inst->attachemnt_used = 0;
 
-        fb = ct_renderer_a0->create_frame_buffer_from_handles(n,
+        fb = ct_gfx_a0->create_frame_buffer_from_handles(n,
                                                               builder_inst->attachemnt,
                                                               true);
     }
@@ -53,10 +53,10 @@ static void builder_execute(void *inst) {
     for (int i = 0; i < pass_n; ++i) {
         struct render_graph_builder_pass *pass = &builder_inst->pass[i];
 
-        ct_renderer_a0->touch(pass->viewid);
+        ct_gfx_a0->touch(pass->viewid);
 
         if (UINT16_MAX != pass->fb.idx) {
-            ct_renderer_a0->set_view_frame_buffer(pass->viewid, pass->fb);
+            ct_gfx_a0->set_view_frame_buffer(pass->viewid, pass->fb);
         }
 
         pass->pass->on_pass(pass->pass,
@@ -79,7 +79,7 @@ static void builder_clear(void *inst) {
             continue;
         }
 
-        ct_renderer_a0->destroy_frame_buffer(pass->fb);
+        ct_gfx_a0->destroy_frame_buffer(pass->fb);
     }
 
     ce_array_clean(builder_inst->pass);
@@ -117,7 +117,7 @@ static void builder_write(void *inst,
     const float coef = ratio_to_coef(info.ratio);
 
     ct_render_texture_handle_t th;
-    th = ct_renderer_a0->create_texture_2d(builder_inst->size[0] * coef,
+    th = ct_gfx_a0->create_texture_2d(builder_inst->size[0] * coef,
                                            builder_inst->size[1] * coef,
                                            false, 1, info.format,
                                            samplerFlags, NULL);

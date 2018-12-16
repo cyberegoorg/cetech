@@ -13,6 +13,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/editor/dock.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/game/game_system.h>
 
 #define WINDOW_NAME "Game view"

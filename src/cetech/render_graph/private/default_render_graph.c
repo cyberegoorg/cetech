@@ -8,6 +8,7 @@
 #include <celib/module.h>
 #include <celib/hashlib.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/resource/resource.h>
 #include <cetech/material/material.h>
 #include <cetech/debugui/debugui.h>
@@ -55,17 +56,17 @@ struct geometry_pass {
 static void geometry_pass_on_setup(void *inst,
                                    struct ct_render_graph_builder *builder) {
     builder->create(builder, _COLOR,
-                          (struct ct_render_graph_attachment) {
-                                  .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
-                                  .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-                          }
+                    (struct ct_render_graph_attachment) {
+                            .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
+                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                    }
     );
 
     builder->create(builder, _DEPTH,
-                          (struct ct_render_graph_attachment) {
-                                  .format = CT_RENDER_TEXTURE_FORMAT_D24,
-                                  .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-                          }
+                    (struct ct_render_graph_attachment) {
+                            .format = CT_RENDER_TEXTURE_FORMAT_D24,
+                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                    }
     );
 
     builder->add_pass(builder, inst, _DEFAULT);
@@ -104,16 +105,16 @@ static void geometry_pass_on_pass(void *inst,
                                   struct ct_render_graph_builder *builder) {
     struct geometry_pass *pass = inst;
 
-    ct_renderer_a0->set_view_clear(viewid,
-                                   CT_RENDER_CLEAR_COLOR |
-                                   CT_RENDER_CLEAR_DEPTH,
-                                   0x66CCFFff, 1.0f, 0);
+    ct_gfx_a0->set_view_clear(viewid,
+                                    CT_RENDER_CLEAR_COLOR |
+                                    CT_RENDER_CLEAR_DEPTH,
+                                    0x66CCFFff, 1.0f, 0);
 
 
     uint16_t size[2] = {};
     builder->get_size(builder, size);
 
-    ct_renderer_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
+    ct_gfx_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
 
     struct cameras cameras;
     memset(&cameras, 0, sizeof(struct cameras));
@@ -136,8 +137,8 @@ static void geometry_pass_on_pass(void *inst,
                                            size[0],
                                            size[1]);
 
-            ct_renderer_a0->set_view_transform(viewid, view_matrix,
-                                               proj_matrix);
+            ct_gfx_a0->set_view_transform(viewid, view_matrix,
+                                                proj_matrix);
 
             ct_mesh_renderer_a0->render_all(pass->world, viewid, layer);
         }
@@ -160,17 +161,17 @@ struct PosTexCoord0Vertex {
 static ct_render_vertex_decl_t ms_decl;
 
 static void init_decl() {
-    ct_renderer_a0->vertex_decl_begin(&ms_decl,
-                                      ct_renderer_a0->get_renderer_type());
-    ct_renderer_a0->vertex_decl_add(&ms_decl,
-                                    CT_RENDER_ATTRIB_POSITION, 3,
-                                    CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
+    ct_gfx_a0->vertex_decl_begin(&ms_decl,
+                                       ct_gfx_a0->get_renderer_type());
+    ct_gfx_a0->vertex_decl_add(&ms_decl,
+                                     CT_RENDER_ATTRIB_POSITION, 3,
+                                     CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_renderer_a0->vertex_decl_add(&ms_decl,
-                                    CT_RENDER_ATTRIB_TEXCOORD0, 2,
-                                    CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
+    ct_gfx_a0->vertex_decl_add(&ms_decl,
+                                     CT_RENDER_ATTRIB_TEXCOORD0, 2,
+                                     CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_renderer_a0->vertex_decl_end(&ms_decl);
+    ct_gfx_a0->vertex_decl_end(&ms_decl);
 }
 
 
@@ -180,9 +181,9 @@ void screenspace_quad(float _textureWidth,
                       bool _originBottomLeft,
                       float _width,
                       float _height) {
-    if (3 == ct_renderer_a0->get_avail_transient_vertex_buffer(3, &ms_decl)) {
+    if (3 == ct_gfx_a0->get_avail_transient_vertex_buffer(3, &ms_decl)) {
         ct_render_transient_vertex_buffer_t vb;
-        ct_renderer_a0->alloc_transient_vertex_buffer(&vb, 3, &ms_decl);
+        ct_gfx_a0->alloc_transient_vertex_buffer(&vb, 3, &ms_decl);
         struct PosTexCoord0Vertex *vertex = (struct PosTexCoord0Vertex *) vb.data;
 
         const float minx = -_width;
@@ -227,7 +228,7 @@ void screenspace_quad(float _textureWidth,
         vertex[2].m_u = maxu;
         vertex[2].m_v = maxv;
 
-        ct_renderer_a0->set_transient_vertex_buffer(0, &vb, 0, 3);
+        ct_gfx_a0->set_transient_vertex_buffer(0, &vb, 0, 3);
     }
 }
 
@@ -236,11 +237,11 @@ static void output_pass_on_setup(void *inst,
                                  struct ct_render_graph_builder *builder) {
 
     builder->create(builder,
-                          RG_OUTPUT_TEXTURE,
-                          (struct ct_render_graph_attachment) {
-                                  .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
-                                  .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-                          }
+                    RG_OUTPUT_TEXTURE,
+                    (struct ct_render_graph_attachment) {
+                            .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
+                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                    }
     );
 
     builder->read(builder, _COLOR);
@@ -254,7 +255,7 @@ static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
                                 uint64_t layer,
                                 struct ct_render_graph_builder *builder) {
-    ct_renderer_a0->set_view_clear(viewid,
+    ct_gfx_a0->set_view_clear(viewid,
                                    CT_RENDER_CLEAR_COLOR |
                                    CT_RENDER_CLEAR_DEPTH,
                                    0x66CCFFff, 1.0f, 0);
@@ -262,15 +263,15 @@ static void output_pass_on_pass(void *inst,
     uint16_t size[2] = {};
     builder->get_size(builder, size);
 
-    ct_renderer_a0->set_view_rect(viewid,
+    ct_gfx_a0->set_view_rect(viewid,
                                   0, 0,
                                   size[0], size[1]);
 
     float proj[16];
     ce_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f,
-                  ct_renderer_a0->get_caps()->homogeneousDepth);
+                  ct_gfx_a0->get_caps()->homogeneousDepth);
 
-    ct_renderer_a0->set_view_transform(viewid, NULL, proj);
+    ct_gfx_a0->set_view_transform(viewid, NULL, proj);
 
     if (!copy_material) {
         copy_material = ct_material_a0->create(ce_id_a0->id64("content/copy"));
@@ -285,7 +286,7 @@ static void output_pass_on_pass(void *inst,
                                         th);
 
     screenspace_quad(size[0], size[1], 0,
-                     ct_renderer_a0->get_caps()->originBottomLeft, 1.f, 1.0f);
+                     ct_gfx_a0->get_caps()->originBottomLeft, 1.f, 1.0f);
 
     ct_material_a0->submit(copy_material, layer, viewid);
 }

@@ -16,6 +16,8 @@
 
 #include "cetech/resource/resource.h"
 
+#include <cetech/renderer/gfx.h>
+
 #include <celib/module.h>
 #include <cetech/shader/shader.h>
 #include <cetech/renderer/renderer.h>
@@ -270,16 +272,16 @@ static void online(uint64_t name,
     void *vs_blob;
     vs_blob = ce_cdb_a0->read_blob(reader, SHADER_VS_DATA, &vs_blob_size, 0);
 
-    const ct_render_memory_t *vs_mem = ct_renderer_a0->make_ref(vs_blob,
+    const ct_render_memory_t *vs_mem = ct_gfx_a0->make_ref(vs_blob,
                                                                 vs_blob_size);
-    const ct_render_memory_t *fs_mem = ct_renderer_a0->make_ref(fs_blob,
+    const ct_render_memory_t *fs_mem = ct_gfx_a0->make_ref(fs_blob,
                                                                 fs_blob_size);
 
-    ct_render_shader_handle_t vs_shader = ct_renderer_a0->create_shader(vs_mem);
-    ct_render_shader_handle_t fs_shader = ct_renderer_a0->create_shader(fs_mem);
+    ct_render_shader_handle_t vs_shader = ct_gfx_a0->create_shader(vs_mem);
+    ct_render_shader_handle_t fs_shader = ct_gfx_a0->create_shader(fs_mem);
 
     ct_render_program_handle_t program;
-    program = ct_renderer_a0->create_program(vs_shader, fs_shader, true);
+    program = ct_gfx_a0->create_program(vs_shader, fs_shader, true);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
     ce_cdb_a0->set_uint64(writer, SHADER_PROP, program.idx);
@@ -293,7 +295,7 @@ static void offline(uint64_t name,
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
     const uint64_t program = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
-    ct_renderer_a0->destroy_program(
+    ct_gfx_a0->destroy_program(
             (ct_render_program_handle_t) {.idx=(uint16_t) program});
 }
 

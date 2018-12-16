@@ -44,4 +44,3 @@ struct ce_api_a0 {
 CE_MODULE(ce_api_a0);
 
 #endif //CE_API_H
-

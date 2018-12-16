@@ -13,6 +13,7 @@
 #include <celib/hash.inl>
 #include <celib/fmath.inl>
 #include <celib/ebus.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/render_graph/default_render_graph.h>
 #include <cetech/editor/dock.h>

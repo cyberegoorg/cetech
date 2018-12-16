@@ -19,6 +19,7 @@
 #include <cetech/editor/action_manager.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
 #include <cetech/editor/resource_browser.h>

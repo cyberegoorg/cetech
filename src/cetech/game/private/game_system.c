@@ -4,6 +4,7 @@
 #include <celib/hashlib.h>
 
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <stddef.h>
 #include <celib/ebus.h>
 #include <cetech/kernel/kernel.h>

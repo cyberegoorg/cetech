@@ -14,6 +14,7 @@
 #include "cetech/resource/resource.h"
 
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
 #include <cetech/shader/shader.h>
 
@@ -121,7 +122,7 @@ static void online(uint64_t name,
             }
 
             const ct_render_uniform_handle_t handler = \
-            ct_renderer_a0->create_uniform(uniform_name,
+            ct_gfx_a0->create_uniform(uniform_name,
                                            _type_to_bgfx[type], 1);
 
             ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(var_obj);
@@ -475,7 +476,7 @@ static void submit(uint64_t material,
             case MAT_VAR_INT: {
                 uint64_t v = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
-                ct_renderer_a0->set_uniform(handle, &v, 1);
+                ct_gfx_a0->set_uniform(handle, &v, 1);
             }
                 break;
 
@@ -484,7 +485,7 @@ static void submit(uint64_t material,
                                                                  MATERIAL_VAR_VALUE_PROP,
                                                                  0));
 
-                ct_renderer_a0->set_texture(texture_stage++, handle,
+                ct_gfx_a0->set_texture(texture_stage++, handle,
                                             ct_texture_a0->get(tn), 0);
             }
                 break;
@@ -492,7 +493,7 @@ static void submit(uint64_t material,
             case MAT_VAR_TEXTURE_HANDLER: {
                 uint64_t t = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
-                ct_renderer_a0->set_texture(texture_stage++, handle,
+                ct_gfx_a0->set_texture(texture_stage++, handle,
                                             (ct_render_texture_handle_t) {.idx=(uint16_t) t},
                                             0);
             }
@@ -511,7 +512,7 @@ static void submit(uint64_t material,
                                               MATERIAL_VAR_VALUE_PROP_W, 1.0f)
                 };
 
-                ct_renderer_a0->set_uniform(handle, &v, 1);
+                ct_gfx_a0->set_uniform(handle, &v, 1);
             }
                 break;
 
@@ -536,8 +537,8 @@ static void submit(uint64_t material,
 
     uint64_t state = _get_render_state(layer);
 
-    ct_renderer_a0->set_state(state, 0);
-    ct_renderer_a0->submit(viewid, shaderp, 0, false);
+    ct_gfx_a0->set_state(state, 0);
+    ct_gfx_a0->submit(viewid, shaderp, 0, false);
 }
 
 static struct ct_material_a0 material_api = {

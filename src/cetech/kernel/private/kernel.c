@@ -20,6 +20,7 @@
 #include <cetech/machine/machine.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/game/game_system.h>
 #include <cetech/static_module.h>
 #include <cetech/resource/builddb.h>
