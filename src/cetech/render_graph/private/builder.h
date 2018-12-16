@@ -162,16 +162,6 @@ void builder_get_size(void *inst,
     memcpy(size, builder_inst->size, sizeof(uint16_t) * 2);
 }
 
-struct ct_render_graph_builder_fce render_graph_builder_api = {
-        .add_pass = builder_add_pass,
-        .execute = builder_execute,
-        .clear = builder_clear,
-        .create = builder_write,
-        .read = builder_read,
-        .set_size = builder_set_size,
-        .get_size = builder_get_size,
-        .get_texture = builder_get_texture,
-};
 
 static struct ct_render_graph_builder *create_render_builder() {
     struct ct_render_graph_builder *obj = CE_ALLOC(_G.alloc,
@@ -185,7 +175,14 @@ static struct ct_render_graph_builder *create_render_builder() {
             _G.render_graph_builder_pool);
 
     *obj = (struct ct_render_graph_builder) {
-            .call = &render_graph_builder_api,
+            .add_pass = builder_add_pass,
+            .execute = builder_execute,
+            .clear = builder_clear,
+            .create = builder_write,
+            .read = builder_read,
+            .set_size = builder_set_size,
+            .get_size = builder_get_size,
+            .get_texture = builder_get_texture,
             .inst = inst
     };
 

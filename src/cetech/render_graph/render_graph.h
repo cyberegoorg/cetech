@@ -38,7 +38,8 @@ struct ct_render_graph_attachment {
     enum ct_render_texture_format format;
 };
 
-struct ct_render_graph_builder_fce {
+struct ct_render_graph_builder {
+    void *inst;
     void (*add_pass)(void *inst,
                      struct ct_render_graph_pass *pass,
                      uint64_t layer);
@@ -67,12 +68,9 @@ struct ct_render_graph_builder_fce {
     void (*execute)(void *inst);
 };
 
-struct ct_render_graph_builder {
+struct ct_render_graph_module {
     void *inst;
-    struct ct_render_graph_builder_fce *call;
-};
 
-struct ct_render_graph_module_fce {
     void (*add_pass)(void *inst,
                      void *pass,
                      uint64_t size);
@@ -81,22 +79,13 @@ struct ct_render_graph_module_fce {
                      struct ct_render_graph_builder *builder);
 };
 
-struct ct_render_graph_module {
+struct ct_render_graph {
     void *inst;
-    struct ct_render_graph_module_fce *call;
-};
-
-struct ct_render_graph_fce {
     void (*add_module)(void *inst,
                        struct ct_render_graph_module *module);
 
     void (*setup)(void *inst,
                   struct ct_render_graph_builder *builder);
-};
-
-struct ct_render_graph {
-    void *inst;
-    struct ct_render_graph_fce *call;
 };
 
 struct ct_render_graph_component {

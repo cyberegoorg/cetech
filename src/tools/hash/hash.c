@@ -80,7 +80,7 @@ void process_file(void *data) {
 
         change = true;
         const int64_t extra = (int64_t) buffer_len - (int64_t) macro_len;
-        input_data = ce_memory_a0->system->call->reallocate(ce_memory_a0->system, input_data,
+        input_data = ce_memory_a0->system->reallocate(ce_memory_a0->system, input_data,
                                    (uint64_t) ((int64_t) size + extra + 1), 0,
                                    __FILE__, __LINE__);
         memmove(input_data + c + extra, input_data + c, size + 1 - c);

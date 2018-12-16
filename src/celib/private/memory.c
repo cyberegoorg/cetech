@@ -122,13 +122,10 @@ static void *_reallocate_traced(const struct ce_alloc *a,
 }
 
 
-static struct ce_alloc_fce traced_alloc_fce = {
-        .reallocate = _reallocate_traced
-};
 
 static struct ce_alloc _traced_allocator = {
         .inst = NULL,
-        .call = &traced_alloc_fce,
+        .reallocate = _reallocate_traced
 };
 
 char *str_dup(const char *s,

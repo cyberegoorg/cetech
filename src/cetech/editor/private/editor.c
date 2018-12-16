@@ -123,7 +123,7 @@ static void on_init(uint64_t _event) {
                    (uint64_t[]) {rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    graph->call->add_module(graph, module);
+    graph->add_module(graph, module);
 }
 
 static void on_shutdown(uint64_t _event) {

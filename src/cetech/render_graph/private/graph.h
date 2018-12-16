@@ -18,15 +18,9 @@ void graph_setup(void *inst,
     const uint32_t modules_n = ce_array_size(rg_inst->modules);
     for (int i = 0; i < modules_n; ++i) {
         struct ct_render_graph_module *module = rg_inst->modules[i];
-        module->call->on_setup(module, builder);
+        module->on_setup(module, builder);
     }
 }
-
-struct ct_render_graph_fce render_graph_fce = {
-        .add_module = add_module,
-        .setup = graph_setup,
-};
-
 
 static struct ct_render_graph *create_render_graph() {
     struct ct_render_graph *obj = CE_ALLOC(_G.alloc,
@@ -38,8 +32,9 @@ static struct ct_render_graph *create_render_graph() {
     struct render_graph_inst *inst = &ce_array_back(_G.render_graph_pool);
 
     *obj = (struct ct_render_graph) {
-            .call = &render_graph_fce,
-            .inst = inst
+            .inst = inst,
+            .add_module = add_module,
+            .setup = graph_setup,
     };
 
     return obj;

@@ -54,21 +54,21 @@ struct geometry_pass {
 
 static void geometry_pass_on_setup(void *inst,
                                    struct ct_render_graph_builder *builder) {
-    builder->call->create(builder, _COLOR,
+    builder->create(builder, _COLOR,
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
                                   .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
                           }
     );
 
-    builder->call->create(builder, _DEPTH,
+    builder->create(builder, _DEPTH,
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_D24,
                                   .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
                           }
     );
 
-    builder->call->add_pass(builder, inst, _DEFAULT);
+    builder->add_pass(builder, inst, _DEFAULT);
 }
 
 struct cameras {
@@ -111,7 +111,7 @@ static void geometry_pass_on_pass(void *inst,
 
 
     uint16_t size[2] = {};
-    builder->call->get_size(builder, size);
+    builder->get_size(builder, size);
 
     ct_renderer_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
 
@@ -235,7 +235,7 @@ void screenspace_quad(float _textureWidth,
 static void output_pass_on_setup(void *inst,
                                  struct ct_render_graph_builder *builder) {
 
-    builder->call->create(builder,
+    builder->create(builder,
                           RG_OUTPUT_TEXTURE,
                           (struct ct_render_graph_attachment) {
                                   .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
@@ -243,9 +243,9 @@ static void output_pass_on_setup(void *inst,
                           }
     );
 
-    builder->call->read(builder, _COLOR);
+    builder->read(builder, _COLOR);
 
-    builder->call->add_pass(builder, inst, _DEFAULT);
+    builder->add_pass(builder, inst, _DEFAULT);
 }
 
 static uint64_t copy_material = 0;
@@ -260,7 +260,7 @@ static void output_pass_on_pass(void *inst,
                                    0x66CCFFff, 1.0f, 0);
 
     uint16_t size[2] = {};
-    builder->call->get_size(builder, size);
+    builder->get_size(builder, size);
 
     ct_renderer_a0->set_view_rect(viewid,
                                   0, 0,
@@ -277,7 +277,7 @@ static void output_pass_on_pass(void *inst,
     }
 
     ct_render_texture_handle_t th;
-    th = builder->call->get_texture(builder, _COLOR);
+    th = builder->get_texture(builder, _COLOR);
 
     ct_material_a0->set_texture_handler(copy_material,
                                         layer,
@@ -293,7 +293,7 @@ static void output_pass_on_pass(void *inst,
 static struct ct_render_graph_module *create(struct ct_world world) {
     struct ct_render_graph_module *m1 = ct_render_graph_a0->create_module();
 
-    m1->call->add_pass(m1, &(struct geometry_pass) {
+    m1->add_pass(m1, &(struct geometry_pass) {
             .world = world,
             .pass = (struct ct_render_graph_pass) {
                     .on_pass = geometry_pass_on_pass,
@@ -301,7 +301,7 @@ static struct ct_render_graph_module *create(struct ct_world world) {
             }
     }, sizeof(struct geometry_pass));
 
-    m1->call->add_pass(m1, &(struct ct_render_graph_pass) {
+    m1->add_pass(m1, &(struct ct_render_graph_pass) {
             .on_pass = output_pass_on_pass,
             .on_setup = output_pass_on_setup
     }, sizeof(struct ct_render_graph_pass));

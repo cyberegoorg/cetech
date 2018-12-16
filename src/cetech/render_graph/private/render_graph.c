@@ -73,14 +73,14 @@ static void foreach_render_graph(struct ct_world world,
                                                                       NULL);
 
         uint16_t size[2] = {};
-        builder->call->get_size(builder, size);
+        builder->get_size(builder, size);
         if ((size[0] == 0) || (size[1] == 0)) {
             continue;
         }
 
-        builder->call->clear(builder);
-        graph->call->setup(graph, builder);
-        builder->call->execute(builder);
+        builder->clear(builder);
+        graph->setup(graph, builder);
+        builder->execute(builder);
     }
 }
 

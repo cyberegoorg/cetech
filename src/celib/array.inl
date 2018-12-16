@@ -216,7 +216,7 @@ static inline void *ce_array_grow(void *array,
     const uint32_t size = sizeof(struct ce_array_header_t) + (new_capacity
                                                               * type_size);
 
-    void *new_data = alloc->call->reallocate(alloc, ce_array_header(array),
+    void *new_data = alloc->reallocate(alloc, ce_array_header(array),
                                              size, type_align, filename, line);
 
     char *new_array = (char *) new_data + sizeof(struct ce_array_header_t);

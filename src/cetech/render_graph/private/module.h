@@ -28,10 +28,6 @@ static void module_on_setup(void *inst,
     }
 }
 
-struct ct_render_graph_module_fce render_graph_module_api = {
-        .add_pass= add_pass,
-        .on_setup = module_on_setup,
-};
 
 static struct ct_render_graph_module *create_module() {
     struct ct_render_graph_module *obj = CE_ALLOC(_G.alloc,
@@ -45,7 +41,8 @@ static struct ct_render_graph_module *create_module() {
             _G.render_graph_module_pool);
 
     *obj = (struct ct_render_graph_module) {
-            .call = &render_graph_module_api,
+            .add_pass= add_pass,
+            .on_setup = module_on_setup,
             .inst = inst,
     };
 

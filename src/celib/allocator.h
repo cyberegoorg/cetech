@@ -9,7 +9,7 @@
 
 
 #define CE_ALLOC(a, T, size)                        \
-    (T*)((a)->call->reallocate((a),                 \
+    (T*)((a)->reallocate((a),                 \
                                NULL,                \
                                size,                \
                                CE_ALIGNOF(T),       \
@@ -17,7 +17,7 @@
                                __LINE__))
 
 #define CE_ALLOCATE_ALIGN(a, T, size, align) \
-    (T*)((a)->call->reallocate((a),   \
+    (T*)((a)->reallocate((a),   \
                                NULL,                \
                                size,                \
                                align,               \
@@ -25,12 +25,13 @@
                                __LINE__))
 
 #define CE_FREE(a, p) \
-    ((a)->call->reallocate((a),p,0,0, __FILE__, __LINE__))
+    ((a)->reallocate((a),p,0,0, __FILE__, __LINE__))
 
 struct ce_alloc_inst;
 struct ce_alloc;
 
-struct ce_alloc_fce {
+struct ce_alloc {
+    struct ce_alloc_inst *inst;
     void *(*reallocate)(const struct ce_alloc *a,
                         void *ptr,
                         uint32_t size,
@@ -39,11 +40,6 @@ struct ce_alloc_fce {
                         uint32_t line);
 
     uint32_t (*total_allocated)(const struct ce_alloc *allocator);
-};
-
-struct ce_alloc {
-    struct ce_alloc_inst *inst;
-    struct ce_alloc_fce *call;
 };
 
 

@@ -268,13 +268,13 @@ static void draw_editor(uint64_t context_obj) {
                                                                   PROP_RENDER_GRAPH_BUILDER,
                                                                   NULL);
 
-    builder->call->set_size(builder, size[0], size[1]);
+    builder->set_size(builder, size[0], size[1]);
 
 
     ct_ecs_a0->simulate(editor->world, 0.1f);
 
     ct_render_texture_handle_t th;
-    th = builder->call->get_texture(builder,
+    th = builder->get_texture(builder,
                                     RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
@@ -331,7 +331,7 @@ static void open(uint64_t context_obj) {
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(
             editor->world);
-    graph->call->add_module(graph, module);
+    graph->add_module(graph, module);
     editor->camera_ent = ct_ecs_a0->spawn(editor->world,
                                           ce_id_a0->id64("content/camera"));
 

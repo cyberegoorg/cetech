@@ -187,10 +187,10 @@ static void on_debugui(uint64_t dock) {
                                                                   PROP_RENDER_GRAPH_BUILDER,
                                                                   NULL);
 
-    builder->call->set_size(builder, size[0], size[1]);
+    builder->set_size(builder, size[0], size[1]);
 
     ct_render_texture_handle_t th;
-    th = builder->call->get_texture(builder, RG_OUTPUT_TEXTURE);
+    th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
                          size,
@@ -223,7 +223,7 @@ static bool init() {
                    (uint64_t[]) {rgc});
 
     struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
-    graph->call->add_module(graph, module);
+    graph->add_module(graph, module);
 
     return true;
 }
