@@ -58,12 +58,7 @@ static bool game_is_paused(uint64_t name) {
     return ce_hash_contain(&_G.game_paused, name);
 }
 
-static void game_update(uint64_t type, void* event) {
-    struct ebus_cdb_event* ev = event;
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ev->obj);
-    float dt = ce_cdb_a0->read_float(reader, KERNEL_EVENT_DT, 0.0f);
-
+static void game_update(float dt) {
     const uint64_t game_n = ce_array_size(_G.game_interface);
     for (int i = 0; i < game_n; ++i) {
         struct ct_game_i0* gi = _G.game_interface[i];
@@ -116,6 +111,26 @@ struct ct_game_system_a0 game_system_api = {
 struct ct_game_system_a0 *ct_game_system_a0 = &game_system_api;
 
 
+static uint64_t task_name() {
+    return CT_GAME_TASK;
+}
+
+static uint64_t * update_after(uint64_t* n) {
+    static uint64_t a[] = {
+            CT_INPUT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+
+static struct ct_kernel_task_i0 game_task = {
+        .name = task_name,
+        .update = game_update,
+        .update_after = update_after,
+};
+
 //==============================================================================
 // Module def
 //==============================================================================
@@ -127,15 +142,13 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                       int reload) {
 
     api->register_api("ct_game_system_a0", ct_game_system_a0);
+    api->register_api("ct_kernel_task_i0", &game_task);
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT,
                         game_init, GAME_ORDER);
 
     ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT,
                         game_shutdown, GAME_ORDER);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        game_update, GAME_ORDER);
 
     ce_api_a0->register_on_add(GAME_INTERFACE, _game_api_add);
 

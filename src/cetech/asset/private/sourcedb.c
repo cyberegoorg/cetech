@@ -460,29 +460,6 @@ static struct ct_sourcedb_a0 source_db_api = {
 
 struct ct_sourcedb_a0 *ct_sourcedb_a0 = &source_db_api;
 
-static void on_post_update(uint64_t type,
-                           void *event) {
-
-//    struct ebus_event_header *it = ce_ebus_a0->events(CDB_EBUS);
-//    struct ebus_event_header *end_it = ce_ebus_a0->events_end(CDB_EBUS);
-//
-//    while (it != end_it) {
-//        if (it->type == CDB_PROP_CHANGED_EVENT) {
-//            struct ce_cdb_prop_ev0 *ev = CE_EBUS_BODY(it);
-//            if (ce_hash_contain(&_G.objects, ev->obj)) {
-//                _on_obj_change(ev->obj, ev->prop, ev->prop_count, NULL);
-//            }
-//        } else if (it->type == CDB_PROP_REMOVED_EVENT) {
-//            struct ce_cdb_prop_ev0 *ev = CE_EBUS_BODY(it);
-//            if (ce_hash_contain(&_G.objects, ev->obj)) {
-//                _on_obj_removed(ev->obj, ev->prop, ev->prop_count, NULL);
-//            }
-//        }
-//
-//        it = CE_EBUS_NEXT(it);
-//    }
-}
-
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -492,8 +469,6 @@ static void _init(struct ce_api_a0 *api) {
     ce_ebus_a0->create_ebus(SOURCEDB_EBUS);
     api->register_api("ct_sourcedb_a0", ct_sourcedb_a0);
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT,
-                        on_post_update, 0);
 }
 
 static void _shutdown() {

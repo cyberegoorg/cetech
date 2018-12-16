@@ -3,6 +3,7 @@
 //==============================================================================
 #include <cstdio>
 
+
 extern "C" {
 #include <celib/allocator.h>
 #include <celib/array.inl>
@@ -24,6 +25,8 @@ extern "C" {
 #include <cetech/renderer/renderer.h>
 #include <cetech/machine/machine.h>
 #include <cetech/ecs/ecs.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/game/game_system.h>
 }
 
 #include "bgfx/c99/bgfx.h"
@@ -42,6 +45,8 @@ static struct _G {
 
     uint32_t size_width;
     uint32_t size_height;
+
+    uint64_t viewid;
 
     bool capture;
     bool vsync;
@@ -190,26 +195,29 @@ static void on_resize(uint64_t type,
                                             0);
 }
 
-static void on_begin_render(uint64_t type,
-                            void *_event) {
+static void render(float dt) {
+    _G.viewid = 0;
     if (_G.need_reset) {
         _G.need_reset = 0;
 
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(),
                    BGFX_TEXTURE_FORMAT_COUNT);
     }
+
+    ct_debugui_a0->begin();
+    ct_debugui_a0->end();
+    bgfx_frame(false);
 }
 
-static void on_render(uint64_t type,
-                      void *_event) {
-    bgfx_frame(false);
+uint64_t new_viewid() {
+    return _G.viewid++;
 }
 
 static struct ct_renderer_a0 rendderer_api = {
         .create = renderer_create,
         .set_debug = renderer_set_debug,
         .get_size = renderer_get_size,
-
+        .new_viewid = new_viewid,
 
 ///
         .vertex_decl_begin = reinterpret_cast<void (*)(ct_render_vertex_decl_t *,
@@ -772,8 +780,30 @@ static struct ct_renderer_a0 rendderer_api = {
 
 struct ct_renderer_a0 *ct_renderer_a0 = &rendderer_api;
 
+
+static uint64_t task_name() {
+    return CT_RENDER_TASK;
+}
+
+static uint64_t * update_after(uint64_t* n) {
+    static uint64_t a[] = {
+            CT_GAME_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+
+static struct ct_kernel_task_i0 render_task = {
+        .name = task_name,
+        .update = render,
+        .update_after = update_after,
+};
+
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_renderer_a0", &rendderer_api);
+    api->register_api("ct_kernel_task_i0", &render_task);
 }
 
 static void _init(struct ce_api_a0 *api) {
@@ -788,11 +818,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        on_begin_render, KERNEL_ORDER + 1);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        on_render, RENDER_ORDER + 1);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
 

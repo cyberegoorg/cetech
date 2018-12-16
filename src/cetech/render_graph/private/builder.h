@@ -23,7 +23,7 @@ static void builder_add_pass(void *inst,
     struct ct_render_graph_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    uint8_t viewid = _G.viewid++;
+    uint8_t viewid = ct_renderer_a0->new_viewid();
 
     ct_render_frame_buffer_handle_t fb = {.idx = UINT16_MAX};
     const uint8_t n = builder_inst->attachemnt_used;

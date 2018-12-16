@@ -26,7 +26,7 @@ static struct DebugUIGlobal {
     ce_alloc *allocator;
 } _G;
 
-static void on_begin_render(uint64_t type, void* event) {
+static void begin() {
     uint8_t  viewid = 255;
 
     struct ct_controlers_i0 *keyboard, *mouse;
@@ -93,7 +93,7 @@ static void on_begin_render(uint64_t type, void* event) {
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 }
 
-static void on_render(uint64_t type, void* _event) {
+static void end() {
     ce_ebus_a0->broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, NULL, 0);
     imguiEndFrame();
 }
@@ -111,7 +111,8 @@ static void LoadDock(const char *path) {
 }
 
 static struct ct_debugui_a0 debugui_api = {
-//        .render = render,
+        .begin = begin,
+        .end = end,
 
         .Text = ImGui::Text,
         .TextV = ImGui::TextV,
@@ -293,11 +294,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->create_ebus(DEBUGUI_EBUS);
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        on_begin_render, KERNEL_ORDER + 2);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT,
-                        on_render, RENDER_ORDER + 2);
 
 
     struct ct_controlers_i0 *keyboard;

@@ -137,9 +137,7 @@ static void play_rumble(uint32_t idx,
     ct_machine_a0->gamepad_play_rumble(idx, strength, length);
 }
 
-static void update(uint64_t type, void* _event) {
-    CE_UNUSED(_event);
-
+static void update(float dt) {
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
@@ -214,15 +212,44 @@ static struct ct_controlers_i0 ct_controlers_i0 = {
         .play_rumble = play_rumble,
 };
 
+static uint64_t task_name() {
+    return CT_GAMEPAD_TASK;
+}
+
+static uint64_t * update_before(uint64_t* n) {
+    static uint64_t a[] = {
+            CT_INPUT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static uint64_t * update_after(uint64_t* n) {
+    static uint64_t a[] = {
+            CT_MACHINE_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+
+static struct ct_kernel_task_i0 gamepad_task = {
+        .name = task_name,
+        .update = update,
+        .update_before= update_before,
+        .update_after = update_after,
+};
+
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_controlers_i0", &ct_controlers_i0);
+    api->register_api("ct_kernel_task_i0", &gamepad_task);
 }
 
 static void _init(struct ce_api_a0 *api) {
     _init_api(api);
     _G = (struct _G) {};
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 1);
 
     ce_ebus_a0->create_ebus(GAMEPAD_EBUS);
 
@@ -235,8 +262,6 @@ static void _init(struct ce_api_a0 *api) {
 
 static void _shutdown() {
     ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
 
     _G = (struct _G) {};
 }

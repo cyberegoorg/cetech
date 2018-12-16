@@ -23,6 +23,9 @@
 #define CONFIG_SCREEN_FULLSCREEN \
      CE_ID64_0("screen.fullscreen", 0x613e9a6a17148a72ULL)
 
+#define CT_RENDER_TASK \
+     CE_ID64_0("render_task", 0x193bb679e415e81bULL)
+
 /// Color RGB/alpha/depth write. When it's not specified write will be disabled.
 #define CT_RENDER_STATE_WRITE_R                 UINT64_C(0x0000000000000001) //!< Enable R write.
 #define CT_RENDER_STATE_WRITE_G                 UINT64_C(0x0000000000000002) //!< Enable G write.
@@ -1007,6 +1010,9 @@ struct ct_renderer_a0 {
     //! \return Renderer window size
     void (*get_size)(uint32_t *width,
                      uint32_t *height);
+
+    uint64_t (*new_viewid)();
+
 
     ///
     void (*vertex_decl_begin)(ct_render_vertex_decl_t *_decl,

@@ -253,7 +253,8 @@ enum MODE {
 };
 
 struct ct_debugui_a0 {
-//    void (*render)(uint8_t viewid);
+    void (*begin)();
+    void (*end)();
 
     void (*Text)(const char *fmt,
                  ...) CTECH_ATTR_FORMAT(1, 2);

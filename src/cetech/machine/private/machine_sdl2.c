@@ -350,8 +350,7 @@ void sdl_gamepad_play_rumble(int gamepad,
     SDL_HapticRumblePlay(h, strength, length);
 }
 
-static void _update(uint64_t type,
-                    void *event) {
+static void _update(float dt) {
     SDL_Event e = {};
 
     while (SDL_PollEvent(&e) > 0) {
@@ -482,8 +481,28 @@ static struct ct_machine_a0 a0 = {
 
 struct ct_machine_a0 *ct_machine_a0 = &a0;
 
+static uint64_t task_name() {
+    return CT_MACHINE_TASK;
+}
+
+static uint64_t * update_before(uint64_t* n) {
+    static uint64_t a[] = {
+        CT_INPUT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static struct ct_kernel_task_i0 machine_task = {
+        .name = task_name,
+        .update = _update,
+        .update_before = update_before,
+};
+
 static void init(struct ce_api_a0 *api) {
     api->register_api("ct_machine_a0", &a0);
+    api->register_api("ct_kernel_task_i0", &machine_task);
 
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_log_a0);
@@ -502,8 +521,6 @@ static void init(struct ce_api_a0 *api) {
     }
 
     sdl_window_init(api);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, _update, 0);
 }
 
 static void shutdown() {

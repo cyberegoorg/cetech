@@ -553,12 +553,13 @@ static void _build_sim_graph(struct ce_ba_graph *sg) {
 
         it = ce_api_a0->next(it);
     }
+
+    ce_bag_build(&_G.sg, _G.allocator);
 }
 
 static void simulate(struct ct_world world,
                      float dt) {
     _build_sim_graph(&_G.sg);
-    ce_bag_build(&_G.sg, _G.allocator);
     _simulate_world(&_G.sg, world, dt);
 }
 
@@ -993,9 +994,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT,
-                        on_post_update, 0);
 }
 
 static void _shutdown() {

@@ -12,6 +12,8 @@
 #define GAME_INTERFACE \
     CE_ID64_0("ct_game_i0", 0x22500b95a05f8b37ULL)
 
+#define CT_GAME_TASK \
+    CE_ID64_0("game_task", 0x56c73acaa12b1278ULL)
 
 struct ct_render_texture_handle;
 struct ct_render_graph_builder;

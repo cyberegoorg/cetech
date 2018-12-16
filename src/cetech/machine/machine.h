@@ -14,6 +14,9 @@
 #define CT_MACHINE_WINDOW_HEIGHT \
     CE_ID64_0("height", 0xef1c29a0b6d24e92ULL)
 
+#define CT_MACHINE_TASK \
+    CE_ID64_0("machine_task", 0x9497ae794e838591ULL)
+
 //! Machine API V0
 struct ct_machine_a0 {
     //! Is gamepad active?
@@ -23,6 +26,7 @@ struct ct_machine_a0 {
                                 float strength,
                                 uint32_t length);
 };
+
 
 CE_MODULE(ct_machine_a0);
 

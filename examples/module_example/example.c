@@ -29,22 +29,22 @@ static struct G {
     float dt;
 } _G;
 
-void update(uint64_t type, void* event) {
-    struct ebus_cdb_event *ev = event;
-
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(ev->obj);
-    _G.dt = ce_cdb_a0->read_float(reader, ce_id_a0->id64("dt"), 0.0f);
-
-    struct ct_controlers_i0* keyboard;
-    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
-
-
-    if (keyboard->button_state(0, keyboard->button_index("v"))) {
-        ce_log_a0->info("example", "PO");
-        ce_log_a0->error("example", "LICE");
-    }
-    ///ct_log_a0->debug("example", "%f", dt);
-}
+//void update(uint64_t type, void* event) {
+//    struct ebus_cdb_event *ev = event;
+//
+//    const ce_cdb_obj_o * reader = ce_cdb_a0->read(ev->obj);
+//    _G.dt = ce_cdb_a0->read_float(reader, ce_id_a0->id64("dt"), 0.0f);
+//
+//    struct ct_controlers_i0* keyboard;
+//    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+//
+//
+//    if (keyboard->button_state(0, keyboard->button_index("v"))) {
+//        ce_log_a0->info("example", "PO");
+//        ce_log_a0->error("example", "LICE");
+//    }
+//    ///ct_log_a0->debug("example", "%f", dt);
+//}
 
 void module1(uint64_t type, void* event) {
     CE_UNUSED(event);
@@ -140,7 +140,6 @@ CE_MODULE_DEF(
 
             ce_log_a0->info("example", "Init %d", reload);
 
-            ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update, 0);
             ce_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1, 0);
 
 //            ct_debugui_a0->register_on_debugui(module1);
@@ -155,7 +154,6 @@ CE_MODULE_DEF(
 
             ce_log_a0->info("example", "Shutdown %d", reload);
 
-            ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, update);
             ce_ebus_a0->disconnect(DEBUGUI_EBUS, DEBUGUI_EVENT, module1);
 //            ct_debugui_a0->unregister_on_debugui(module1);
 //            ct_debugui_a0->unregister_on_debugui(module2);

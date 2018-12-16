@@ -37,12 +37,6 @@
 #define KERNEL_INIT_EVENT \
     CE_ID64_0("init", 0x44181d1a66341876ULL)
 
-#define KERNEL_UPDATE_EVENT \
-    CE_ID64_0("update", 0xb09bdf90e8a56b76ULL)
-
-#define KERNEL_POST_UPDATE_EVENT \
-    CE_ID64_0("gc", 0xf7e41039a96af360ULL)
-
 #define KERNEL_QUIT_EVENT \
     CE_ID64_0("quit", 0x666ffde8529c8bc9ULL)
 
@@ -56,6 +50,22 @@ enum {
     KERNEL_ORDER = 1024,
     GAME_ORDER = KERNEL_ORDER + 1024,
     RENDER_ORDER = GAME_ORDER + 1024,
+};
+
+#define CT_INPUT_TASK \
+    CE_ID64_0("input_task", 0xba6140c0d9e00706ULL)
+
+#define KERNEL_TASK_INTERFACE \
+    CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
+
+typedef void (*ce_kernel_taks_update_t)(float dt);
+
+
+struct ct_kernel_task_i0 {
+    uint64_t (*name)();
+    void (*update)(float dt);
+    uint64_t* (*update_before)(uint64_t* n);
+    uint64_t* (*update_after)(uint64_t* n);
 };
 
 

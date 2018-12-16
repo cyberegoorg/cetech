@@ -13,6 +13,7 @@
 #include <celib/task.h>
 #include <celib/log.h>
 #include <celib/fs.h>
+#include <celib/bagraph.h>
 #include <cetech/resource/resource.h>
 
 
@@ -31,7 +32,11 @@
 
 static struct KernelGlobals {
     uint64_t config_object;
-    int is_running;
+    bool is_running;
+
+    struct ce_ba_graph updateg;
+    struct ce_hash_t update_map;
+
     struct ce_alloc *allocator;
 } _G;
 
@@ -91,7 +96,7 @@ int init_config(int argc,
         return 0;
     }
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(object);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(object);
 
     const char *build_dir_str = ce_cdb_a0->read_str(reader, CONFIG_BUILD, "");
     char *build_dir = NULL;
@@ -127,8 +132,9 @@ int init_config(int argc,
     return 1;
 }
 
+
 bool cetech_kernel_init(int argc,
-                       const char **argv) {
+                        const char **argv) {
 //    ce_log_a0->register_handler(ce_log_a0->stdout_yaml_handler, NULL);
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
@@ -152,7 +158,7 @@ bool cetech_kernel_init(int argc,
 
     uint64_t root = ce_id_a0->id64("modules");
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(ce_config_a0->obj());
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_config_a0->obj());
 
     const char *module_path = ce_cdb_a0->read_str(reader,
                                                   CONFIG_MODULE_DIR,
@@ -182,7 +188,7 @@ int cetech_kernel_shutdown() {
 }
 
 void application_quit() {
-    _G.is_running = 0;
+    _G.is_running = false;
 }
 
 
@@ -224,10 +230,70 @@ static void on_quit(uint64_t type,
     application_quit();
 }
 
+static void _build_update_graph(struct ce_ba_graph *sg) {
+    ce_bag_clean(sg);
+    ce_hash_clean(&_G.update_map);
+
+    struct ce_api_entry it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
+    while (it.api) {
+        struct ct_kernel_task_i0 *i = (it.api);
+
+        uint64_t name = i->name();
+
+        ce_hash_add(&_G.update_map, name,
+                    (uint64_t) i->update, _G.allocator);
+
+        uint64_t before_n = 0;
+        const uint64_t *before = NULL;
+        if (i->update_before) {
+            before = i->update_before(&before_n);
+        }
+
+        uint64_t after_n = 0;
+        const uint64_t *after;
+        if (i->update_after) {
+            after = i->update_after(&after_n);
+        }
+
+        ce_bag_add(&_G.updateg, name,
+                   before, before_n,
+                   after, after_n, _G.allocator);
+
+        it = ce_api_a0->next(it);
+    }
+
+    ce_bag_build(sg, _G.allocator);
+}
+
+static void _update(struct ce_ba_graph *sg,
+                    float dt) {
+    const uint64_t output_n = ce_array_size(sg->output);
+    for (int k = 0; k < output_n; ++k) {
+        ce_kernel_taks_update_t fce;
+        fce = (ce_kernel_taks_update_t) ce_hash_lookup(&_G.update_map,
+                                                       sg->output[k], 0);
+        fce(dt);
+    }
+}
+
+static void _nop_update(float dt) {
+}
+
+static uint64_t input_task_name() {
+    return CT_INPUT_TASK;
+}
+
+static struct ct_kernel_task_i0 input_task = {
+        .name = input_task_name,
+        .update = _nop_update,
+};
+
 static void cetech_kernel_start() {
+    ce_api_a0->register_api("ct_kernel_task_i0", &input_task);
+
     _init_config();
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config_object);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config_object);
 
     if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
         ct_resource_compiler_a0->compile_all();
@@ -270,16 +336,8 @@ static void cetech_kernel_start() {
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
-//        ce_log_a0->debug(LOG_WHERE, "dt %f", dt * 1000);
-
-        uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  KERNEL_UPDATE_EVENT);
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-        ce_cdb_a0->set_float(w, KERNEL_EVENT_DT, dt);
-        ce_cdb_a0->write_commit(w);
-
-        ce_ebus_a0->broadcast_obj(KERNEL_EBUS, KERNEL_UPDATE_EVENT, event);
-        ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_POST_UPDATE_EVENT, NULL, 0);
+        _build_update_graph(&_G.updateg);
+        _update(&_G.updateg, dt);
 
         ce_ebus_a0->gc();
         ce_cdb_a0->gc();

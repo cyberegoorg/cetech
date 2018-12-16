@@ -30,8 +30,6 @@ static struct _G {
     struct render_graph_inst *render_graph_pool;
     struct render_graph_module_inst *render_graph_module_pool;
     struct render_graph_builder_inst *render_graph_builder_pool;
-
-    uint8_t viewid;
     struct ce_alloc *alloc;
 } _G;
 
@@ -90,13 +88,6 @@ static void render_system(struct ct_world world,
     ct_ecs_a0->process(world, mask, foreach_render_graph, &dt);
 }
 
-static void on_render(uint64_t type,
-                      void *event) {
-    CE_UNUSED(event);
-
-    _G.viewid = 0;
-}
-
 static struct ct_render_graph_a0 render_graph_api = {
         .create_graph = create_render_graph,
         .destroy_graph = destroy_render_graph,
@@ -130,10 +121,6 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .alloc = ce_memory_a0->system,
     };
-
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_UPDATE_EVENT, on_render,
-                        KERNEL_ORDER + 1);
 
     api->register_api("ct_render_graph_a0", &render_graph_api);
     api->register_api(COMPONENT_INTERFACE_NAME, &render_graph_component_i);
