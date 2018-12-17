@@ -1,7 +1,7 @@
 content/material1.material:
   layers:
-    default:
-      name: default
+    gbuffer:
+      name: gbuffer
       shader: content/shader1
 
       render_state:

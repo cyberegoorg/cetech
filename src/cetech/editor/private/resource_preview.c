@@ -15,7 +15,7 @@
 #include <celib/ebus.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_render_graph.h>
+#include <cetech/render_graph/default_rg.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/asset/sourcedb.h>
@@ -178,7 +178,7 @@ static void on_debugui(uint64_t dock) {
     ct_debugui_a0->GetContentRegionAvail(size);
 
 
-    struct ct_render_graph_builder *builder;
+    struct ct_rg_builder *builder;
     builder = ct_renderer_a0->viewport_builder(_G.viewport);
 
     builder->set_size(builder, size[0], size[1]);
@@ -305,7 +305,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ct_dd_a0);
-            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
         },
         {

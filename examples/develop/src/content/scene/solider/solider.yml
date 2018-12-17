@@ -1,7 +1,7 @@
 content/scene/solider/solider.material:
   PREFAB: content/material1.material
   layers:
-    default:
+    gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
           value: content/scene/solider/body01
@@ -9,7 +9,7 @@ content/scene/solider/solider.material:
 content/scene/solider/body.material:
   PREFAB: content/material1.material
   layers:
-    default:
+    gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
           value: content/scene/solider/body01

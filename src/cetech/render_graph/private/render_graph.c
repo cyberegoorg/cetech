@@ -28,9 +28,6 @@
 //==============================================================================
 
 static struct _G {
-    struct render_graph_inst *render_graph_pool;
-    struct render_graph_module_inst *render_graph_module_pool;
-    struct render_graph_builder_inst *render_graph_builder_pool;
     struct ce_alloc *alloc;
 } _G;
 
@@ -38,38 +35,7 @@ static struct _G {
 #include "module.h"
 #include "builder.h"
 
-
-//static uint64_t size() {
-//    return sizeof(struct ct_render_graph_component);
-//}
-
-//static void foreach_render_graph(struct ct_world world,
-//                                 struct ct_entity *ent,
-//                                 ct_entity_storage_t *item,
-//                                 uint32_t n,
-//                                 void *data) {
-//    for (uint32_t i = 1; i < n; ++i) {
-////        struct ct_render_graph *graph = ce_cdb_a0->read_ptr(reader,
-////                                                            PROP_RENDER_GRAPH_GRAPH,
-////                                                            NULL);
-////
-////        struct ct_render_graph_builder *builder = ce_cdb_a0->read_ptr(reader,
-////                                                                      PROP_RENDER_GRAPH_BUILDER,
-////                                                                      NULL);
-////
-////        uint16_t size[2] = {};
-////        builder->get_size(builder, size);
-////        if ((size[0] == 0) || (size[1] == 0)) {
-////            continue;
-////        }
-////
-////        builder->clear(builder);
-////        graph->setup(graph, builder);
-////        builder->execute(builder);
-//    }
-//}
-
-static struct ct_render_graph_a0 render_graph_api = {
+static struct ct_rg_a0 render_graph_api = {
         .create_graph = create_render_graph,
         .destroy_graph = destroy_render_graph,
         .create_module = create_module,
@@ -78,8 +44,7 @@ static struct ct_render_graph_a0 render_graph_api = {
         .destroy_builder = destroy_render_builder,
 };
 
-struct ct_render_graph_a0 *ct_render_graph_a0 = &render_graph_api;
-
+struct ct_rg_a0 *ct_rg_a0 = &render_graph_api;
 
 
 static void _init(struct ce_api_a0 *api) {
@@ -88,7 +53,7 @@ static void _init(struct ce_api_a0 *api) {
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api("ct_render_graph_a0", &render_graph_api);
+    api->register_api("ct_rg_a0", &render_graph_api);
 
 }
 

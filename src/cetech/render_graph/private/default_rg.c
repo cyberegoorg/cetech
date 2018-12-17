@@ -22,7 +22,7 @@
 #include <celib/macros.h>
 
 
-#include "cetech/render_graph/default_render_graph.h"
+#include "cetech/render_graph/default_rg.h"
 
 
 #define _G render_graph_global
@@ -34,118 +34,6 @@
 static struct _G {
     struct ce_alloc *alloc;
 } _G;
-
-struct geometry_pass {
-    struct ct_render_graph_pass pass;
-    struct ct_world world;
-};
-
-#define _COLOR \
-    CE_ID64_0("color", 0x6776ddaf0290228ULL)
-
-#define _DEPTH \
-     CE_ID64_0("depth", 0x911ffdcbfa56fec1ULL)
-
-#define _DEFAULT \
-     CE_ID64_0("default", 0xf27605035974b5ecULL)
-
-//==============================================================================
-// Geometry pass
-//==============================================================================
-
-static void geometry_pass_on_setup(void *inst,
-                                   struct ct_render_graph_builder *builder) {
-    builder->create(builder, _COLOR,
-                    (struct ct_render_graph_attachment) {
-                            .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
-                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-                    }
-    );
-
-    builder->create(builder, _DEPTH,
-                    (struct ct_render_graph_attachment) {
-                            .format = CT_RENDER_TEXTURE_FORMAT_D24,
-                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
-                    }
-    );
-
-    builder->add_pass(builder, inst, _DEFAULT);
-}
-
-struct cameras {
-    uint64_t camera_data[32];
-    struct ct_entity ent[32];
-    uint32_t n;
-};
-
-void foreach_camera(struct ct_world world,
-                    struct ct_entity *ent,
-                    ct_entity_storage_t *item,
-                    uint32_t n,
-                    void *data) {
-    CE_UNUSED(world);
-
-    struct cameras *cameras = data;
-
-    for (uint32_t i = 1; i < n; ++i) {
-        uint32_t idx = cameras->n++;
-
-        cameras->ent[idx].h = ent[i].h;
-
-        uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
-                                                  ent[i]);
-
-        cameras->camera_data[idx] = camera_data;
-    }
-}
-
-static void geometry_pass_on_pass(void *inst,
-                                  uint8_t viewid,
-                                  uint64_t layer,
-                                  struct ct_render_graph_builder *builder) {
-    struct geometry_pass *pass = inst;
-
-    ct_gfx_a0->set_view_clear(viewid,
-                                    CT_RENDER_CLEAR_COLOR |
-                                    CT_RENDER_CLEAR_DEPTH,
-                                    0x66CCFFff, 1.0f, 0);
-
-
-    uint16_t size[2] = {};
-    builder->get_size(builder, size);
-
-    ct_gfx_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
-
-    struct cameras cameras;
-    memset(&cameras, 0, sizeof(struct cameras));
-
-    ct_ecs_a0->process(pass->world,
-                       ct_ecs_a0->mask(CAMERA_COMPONENT),
-                       foreach_camera, &cameras);
-
-    ct_dd_a0->begin(viewid);
-    {
-
-        for (int i = 0; i < cameras.n; ++i) {
-            float view_matrix[16];
-            float proj_matrix[16];
-
-            ct_camera_a0->get_project_view(pass->world,
-                                           cameras.ent[i],
-                                           proj_matrix,
-                                           view_matrix,
-                                           size[0],
-                                           size[1]);
-
-            ct_gfx_a0->set_view_transform(viewid, view_matrix,
-                                                proj_matrix);
-
-            ct_mesh_renderer_a0->render_all(pass->world, viewid, layer);
-        }
-    }
-    ct_dd_a0->end();
-}
-
 
 //==============================================================================
 // output pass
@@ -162,14 +50,14 @@ static ct_render_vertex_decl_t ms_decl;
 
 static void init_decl() {
     ct_gfx_a0->vertex_decl_begin(&ms_decl,
-                                       ct_gfx_a0->get_renderer_type());
+                                 ct_gfx_a0->get_renderer_type());
     ct_gfx_a0->vertex_decl_add(&ms_decl,
-                                     CT_RENDER_ATTRIB_POSITION, 3,
-                                     CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
+                               CT_RENDER_ATTRIB_POSITION, 3,
+                               CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->vertex_decl_add(&ms_decl,
-                                     CT_RENDER_ATTRIB_TEXCOORD0, 2,
-                                     CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
+                               CT_RENDER_ATTRIB_TEXCOORD0, 2,
+                               CT_RENDER_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->vertex_decl_end(&ms_decl);
 }
@@ -234,19 +122,18 @@ void screenspace_quad(float _textureWidth,
 
 
 static void output_pass_on_setup(void *inst,
-                                 struct ct_render_graph_builder *builder) {
+                                 struct ct_rg_builder *builder) {
 
     builder->create(builder,
                     RG_OUTPUT_TEXTURE,
-                    (struct ct_render_graph_attachment) {
+                    (struct ct_rg_attachment) {
                             .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
                             .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
                     }
     );
 
     builder->read(builder, _COLOR);
-
-    builder->add_pass(builder, inst, _DEFAULT);
+    builder->add_pass(builder, inst, 0);
 }
 
 static uint64_t copy_material = 0;
@@ -254,18 +141,18 @@ static uint64_t copy_material = 0;
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
                                 uint64_t layer,
-                                struct ct_render_graph_builder *builder) {
+                                struct ct_rg_builder *builder) {
     ct_gfx_a0->set_view_clear(viewid,
-                                   CT_RENDER_CLEAR_COLOR |
-                                   CT_RENDER_CLEAR_DEPTH,
-                                   0x66CCFFff, 1.0f, 0);
+                              CT_RENDER_CLEAR_COLOR |
+                              CT_RENDER_CLEAR_DEPTH,
+                              0x66CCFFff, 1.0f, 0);
 
     uint16_t size[2] = {};
     builder->get_size(builder, size);
 
     ct_gfx_a0->set_view_rect(viewid,
-                                  0, 0,
-                                  size[0], size[1]);
+                             0, 0,
+                             size[0], size[1]);
 
     float proj[16];
     ce_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f,
@@ -281,37 +168,51 @@ static void output_pass_on_pass(void *inst,
     th = builder->get_texture(builder, _COLOR);
 
     ct_material_a0->set_texture_handler(copy_material,
-                                        layer,
+                                        _DEFAULT,
                                         "s_input_texture",
                                         th);
 
     screenspace_quad(size[0], size[1], 0,
                      ct_gfx_a0->get_caps()->originBottomLeft, 1.f, 1.0f);
 
-    ct_material_a0->submit(copy_material, layer, viewid);
+    ct_material_a0->submit(copy_material, _DEFAULT, viewid);
 }
 
-static struct ct_render_graph_module *create(struct ct_world world) {
-    struct ct_render_graph_module *m1 = ct_render_graph_a0->create_module();
+static void gbuffer_pass_on_setup(void *inst,
+                                  struct ct_rg_builder *builder) {
 
-    m1->add_pass(m1, &(struct geometry_pass) {
-            .world = world,
-            .pass = (struct ct_render_graph_pass) {
-                    .on_pass = geometry_pass_on_pass,
-                    .on_setup = geometry_pass_on_setup
-            }
-    }, sizeof(struct geometry_pass));
+    builder->create(builder, _COLOR,
+                    (struct ct_rg_attachment) {
+                            .format = CT_RENDER_TEXTURE_FORMAT_RGBA8,
+                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                    }
+    );
 
-    m1->add_pass(m1, &(struct ct_render_graph_pass) {
+    builder->create(builder, _DEPTH,
+                    (struct ct_rg_attachment) {
+                            .format = CT_RENDER_TEXTURE_FORMAT_D24,
+                            .ratio = CT_RENDER_BACKBUFFER_RATIO_EQUAL
+                    }
+    );
+
+    builder->add_pass(builder, inst, 0);
+}
+
+static void create(struct ct_rg_module *m1) {
+    m1->add_pass(m1, &(struct ct_rg_pass) {
+            .on_setup = gbuffer_pass_on_setup
+    }, sizeof(struct ct_rg_pass));
+
+    m1->add_extension_point(m1, _GBUFFER);
+
+    m1->add_pass(m1, &(struct ct_rg_pass) {
             .on_pass = output_pass_on_pass,
             .on_setup = output_pass_on_setup
-    }, sizeof(struct ct_render_graph_pass));
-
-    return m1;
+    }, sizeof(struct ct_rg_pass));
 }
 
 static struct ct_default_rg_a0 default_render_graph_api = {
-        .create= create,
+        .feed_module= create,
 };
 
 struct ct_default_rg_a0 *ct_default_rg_a0 = &default_render_graph_api;
@@ -338,7 +239,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_renderer_a0);
-            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);

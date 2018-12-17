@@ -26,7 +26,7 @@
 #include <string.h>
 #include <cetech/game/game_system.h>
 #include <cetech/asset/sourcedb.h>
-#include <cetech/render_graph/default_render_graph.h>
+#include <cetech/render_graph/default_rg.h>
 
 #define _G plaground_global
 
@@ -106,8 +106,8 @@ static void on_init(uint64_t _event) {
     _G.world = ct_ecs_a0->create_world();
 
 //
-//    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
-//    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
+//    struct ct_rg_builder *builder = ct_rg_a0->create_builder();
+//    struct ct_rg *graph = ct_rg_a0->create_graph();
 //
 //    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
 //                                            RENDER_GRAPH_COMPONENT);
@@ -123,7 +123,7 @@ static void on_init(uint64_t _event) {
 //                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
 //                   (uint64_t[]) {rgc});
 //
-//    struct ct_render_graph_module *module = ct_default_rg_a0->create(_G.world);
+//    struct ct_rg_module *module = ct_default_rg_a0->create(_G.world);
 //    graph->add_module(graph, module);
 }
 
@@ -167,6 +167,7 @@ static void on_ui(uint64_t _type, void* _event) {
     float size[] = {(float) w, h - 25.0f};
 
     ct_debugui_a0->RootDock(pos, size);
+
     ct_dock_a0->draw_all();
 
     if (_G.load_layout) {
@@ -222,7 +223,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_action_manager_a0);
             CE_INIT_API(api, ce_module_a0);
             CE_INIT_API(api, ce_ebus_a0);
-            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },
         {

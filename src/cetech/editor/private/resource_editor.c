@@ -24,7 +24,7 @@
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_render_graph.h>
+#include <cetech/render_graph/default_rg.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
@@ -288,7 +288,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_camera_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ce_ebus_a0);
-            CE_INIT_API(api, ct_render_graph_a0);
+            CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
         },
         {

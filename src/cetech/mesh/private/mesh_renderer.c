@@ -28,6 +28,9 @@
 #include <celib/log.h>
 #include <celib/buffer.inl>
 #include <cetech/editor/property.h>
+#include <cetech/render_graph/render_graph.h>
+#include <cetech/render_graph/default_rg.h>
+#include <cetech/camera/camera.h>
 
 
 #define LOG_WHERE "mesh_renderer"
@@ -83,7 +86,7 @@ void foreach_mesh_renderer(struct ct_world world,
         float final_w[16];
         ce_mat4_identity(final_w);
 
-        if(world) {
+        if (world) {
             ce_mat4_move(final_w, world);
         }
 
@@ -95,8 +98,8 @@ void foreach_mesh_renderer(struct ct_world world,
         uint64_t scene_obj = ct_resource_a0->get(rid);
 
         uint64_t mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
-                                                           PROP_MESH,
-                                                           0));
+                                                              PROP_MESH,
+                                                              0));
 
         const ce_cdb_obj_o *scene_reader = ce_cdb_a0->read(scene_obj);
 
@@ -111,9 +114,11 @@ void foreach_mesh_renderer(struct ct_world world,
         const ce_cdb_obj_o *geom_reader = ce_cdb_a0->read(geom_obj);
 
         uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
-        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE, 0);
+        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE,
+                                                  0);
         uint64_t vb = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_PROP, 0);
-        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE, 0);
+        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE,
+                                                  0);
 
         ct_render_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
         ct_render_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
@@ -141,16 +146,14 @@ void mesh_render_all(struct ct_world world,
             .layer_name = layer_name
     };
 
-    ct_ecs_a0->process(
-            world,
-            ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
-            ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-            foreach_mesh_renderer, &render_data);
+    ct_ecs_a0->process(world,
+                       ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
+                       ct_ecs_a0->mask(TRANSFORM_COMPONENT),
+                       foreach_mesh_renderer, &render_data);
 }
 
 
 static struct ct_mesh_renderer_a0 _api = {
-        .render_all = mesh_render_all,
 };
 
 struct ct_mesh_renderer_a0 *ct_mesh_renderer_a0 = &_api;
@@ -229,6 +232,113 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = property_editor,
 };
 
+
+struct geometry_pass {
+    struct ct_rg_pass pass;
+    struct ct_world world;
+};
+
+
+void geometry_pass_on_setup(void *inst,
+                            struct ct_rg_builder *builder) {
+    builder->write(builder, _COLOR);
+    builder->write(builder, _DEPTH);
+    builder->add_pass(builder, inst, _GBUFFER);
+}
+
+struct cameras {
+    uint64_t camera_data[32];
+    struct ct_entity ent[32];
+    uint32_t n;
+};
+
+void foreach_camera(struct ct_world world,
+                    struct ct_entity *ent,
+                    ct_entity_storage_t *item,
+                    uint32_t n,
+                    void *data) {
+    CE_UNUSED(world);
+
+    struct cameras *cameras = (struct cameras *) (data);
+
+    for (uint32_t i = 1; i < n; ++i) {
+        uint32_t idx = cameras->n++;
+
+        cameras->ent[idx].h = ent[i].h;
+
+        uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
+                                                  ent[i]);
+
+        cameras->camera_data[idx] = camera_data;
+    }
+}
+
+void geometry_pass_on_pass(void *inst,
+                           uint8_t viewid,
+                           uint64_t layer,
+                           struct ct_rg_builder *builder) {
+    struct geometry_pass *pass = (struct geometry_pass *) inst;
+
+    ct_gfx_a0->set_view_clear(viewid,
+                              CT_RENDER_CLEAR_COLOR |
+                              CT_RENDER_CLEAR_DEPTH,
+                              0x66CCFFff, 1.0f, 0);
+
+    uint16_t size[2] = {};
+    builder->get_size(builder, size);
+
+    ct_gfx_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
+
+    struct cameras cameras;
+    memset(&cameras, 0, sizeof(struct cameras));
+
+    ct_ecs_a0->process(pass->world,
+                       ct_ecs_a0->mask(CAMERA_COMPONENT),
+                       foreach_camera, &cameras);
+
+
+    {
+
+        for (int i = 0; i < cameras.n; ++i) {
+            float view_matrix[16];
+            float proj_matrix[16];
+
+            ct_camera_a0->get_project_view(pass->world,
+                                           cameras.ent[i],
+                                           proj_matrix,
+                                           view_matrix,
+                                           size[0],
+                                           size[1]);
+
+            ct_gfx_a0->set_view_transform(viewid, view_matrix,
+                                          proj_matrix);
+
+            mesh_render_all(pass->world, viewid, layer);
+        }
+    }
+}
+
+
+void feed_module(struct ct_world world,
+                 struct ct_rg_module *module) {
+    struct ct_rg_module *m2;
+    m2 = module->get_extension_point(module, _GBUFFER);
+
+    struct geometry_pass gp = {
+            .world = world,
+            .pass = (struct ct_rg_pass) {
+                    .on_pass = geometry_pass_on_pass,
+                    .on_setup = geometry_pass_on_setup
+            }
+    };
+
+    m2->add_pass(m2, &gp, sizeof(struct geometry_pass));
+}
+
+static struct ct_renderer_component_i0 ct_renderer_component_i = {
+        .feed_module = feed_module
+};
+
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
@@ -236,6 +346,8 @@ static void *get_interface(uint64_t name_hash) {
         };
 
         return &ct_editor_component_i0;
+    } else if (CT_RENDERER_COMPONENT_I == name_hash) {
+        return &ct_renderer_component_i;
     }
 
     return NULL;

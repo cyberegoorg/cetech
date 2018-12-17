@@ -1,9 +1,8 @@
 //==============================================================================
 // includes
 //==============================================================================
-#include <cstdio>
+#include <stdio.h>
 
-extern "C" {
 #include <celib/allocator.h>
 #include <celib/array.inl>
 
@@ -27,8 +26,10 @@ extern "C" {
 #include <cetech/ecs/ecs.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/game/game_system.h>
-#include <cetech/render_graph/default_render_graph.h>
-}
+#include <cetech/render_graph/default_rg.h>
+#include <cetech/camera/camera.h>
+#include <cetech/debugdraw/debugdraw.h>
+#include <cetech/mesh/mesh_renderer.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
@@ -38,9 +39,7 @@ extern "C" {
 //==============================================================================
 
 struct viewport {
-    struct ct_render_graph_builder *builder;
-    struct ct_render_graph *graph;
-    struct ct_render_graph_module *module;
+    struct ct_rg_builder *builder;
     struct ct_world world;
     struct ct_entity entity;
 };
@@ -48,9 +47,9 @@ struct viewport {
 #define _G RendererGlobals
 static struct _G {
     ct_renderender_on_render *on_render;
-    ce_window *main_window;
+    struct ce_window *main_window;
 
-    struct viewport* viewports;
+    struct viewport *viewports;
 
     uint64_t type;
 
@@ -63,7 +62,7 @@ static struct _G {
     bool vsync;
     bool need_reset;
     uint64_t config;
-    ce_alloc *allocator;
+    struct ce_alloc *allocator;
 } _G = {};
 
 
@@ -206,23 +205,53 @@ static void on_resize(uint64_t type,
                                             0);
 }
 
+static void _feed_module(struct ct_world world,
+                         struct ct_rg_module *module) {
+    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+    while (it.api) {
+        struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
+
+        struct ct_renderer_component_i0 *ci;
+        ci = i->get_interface(CT_RENDERER_COMPONENT_I);
+
+        if (ci && ci->feed_module) {
+            ci->feed_module(world, module);
+        }
+
+        it = ce_api_a0->next(it);
+    }
+}
+
 static void render(float dt) {
     _G.viewid = 0;
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(),
-                   BGFX_TEXTURE_FORMAT_COUNT);
+        bgfx_reset(_G.size_width, _G.size_height,
+                   _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     }
 
     ct_debugui_a0->begin();
 
     const uint32_t v_n = ce_array_size(_G.viewports);
     for (int i = 0; i < v_n; ++i) {
-        viewport* v = &_G.viewports[i];
+        struct viewport *v = &_G.viewports[i];
+
         v->builder->clear(v->builder);
-        v->graph->setup(v->graph, v->builder);
+
+        struct ct_rg *graph = ct_rg_a0->create_graph();
+        struct ct_rg_module *module = ct_rg_a0->create_module();
+
+        ct_default_rg_a0->feed_module(module);
+        _feed_module(v->world, module);
+
+        graph->set_module(graph, module);
+        graph->setup(graph, v->builder);
+
         v->builder->execute(v->builder);
+
+        ct_rg_a0->destroy_module(module);
+        ct_rg_a0->destroy_graph(graph);
     }
 
     ct_debugui_a0->end();
@@ -235,7 +264,7 @@ uint64_t new_viewid() {
 
 static uint32_t _new_viewport() {
     uint32_t idx = ce_array_size(_G.viewports);
-    ce_array_push(_G.viewports, (struct viewport){}, _G.allocator);
+    ce_array_push(_G.viewports, (struct viewport) {}, _G.allocator);
     return idx;
 }
 
@@ -243,24 +272,18 @@ struct ct_viewport0 create_viewport(struct ct_world world,
                                     struct ct_entity main_camera) {
     uint32_t idx = _new_viewport();
 
-    struct viewport* v = &_G.viewports[idx];
+    struct viewport *v = &_G.viewports[idx];
 
-    struct ct_render_graph_builder *builder = ct_render_graph_a0->create_builder();
-    struct ct_render_graph *graph = ct_render_graph_a0->create_graph();
-
-    struct ct_render_graph_module *module = ct_default_rg_a0->create(world);
-    graph->add_module(graph, module);
+    struct ct_rg_builder *builder = ct_rg_a0->create_builder();
 
     v->world = world;
     v->entity = main_camera;
     v->builder = builder;
-    v->graph = graph;
-    v->module = module;
 
-    return (struct ct_viewport0){.idx=idx};
+    return (struct ct_viewport0) {.idx=idx};
 }
 
-struct ct_render_graph_builder *
+struct ct_rg_builder *
 viewport_builder(struct ct_viewport0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
@@ -310,7 +333,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_api_a0 = api;
 
-    _G = {
+    _G = (struct _G) {
             .allocator = ce_memory_a0->system,
             .config = ce_config_a0->obj(),
     };
@@ -367,7 +390,7 @@ static void _shutdown() {
 
     ce_ebus_a0->disconnect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
 
-    _G = {};
+    _G = (struct _G) {};
 }
 
 CE_MODULE_DEF(

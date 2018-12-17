@@ -1,7 +1,7 @@
 content/material2.material:
   PREFAB: content/material1.material
   layers:
-    default:
+    gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
           value: content/texture2

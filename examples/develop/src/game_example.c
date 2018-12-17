@@ -16,7 +16,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_render_graph.h>
+#include <cetech/render_graph/default_rg.h>
 #include <cetech/transform/transform.h>
 #include <cetech/texture/texture.h>
 #include <cetech/camera/camera.h>
@@ -96,7 +96,7 @@ void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
         CE_INIT_API(api, ct_renderer_a0);
         CE_INIT_API(api, ce_ebus_a0);
         CE_INIT_API(api, ct_ecs_a0);
-        CE_INIT_API(api, ct_render_graph_a0);
+        CE_INIT_API(api, ct_rg_a0);
         CE_INIT_API(api, ct_default_rg_a0);
         CE_INIT_API(api, ce_cdb_a0);
         CE_INIT_API(api, ct_game_system_a0);

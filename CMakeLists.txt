@@ -109,9 +109,9 @@ set(SOURCE_FILES
         src/cetech/controlers/private/controlers.c
         src/cetech/controlers/private/mouse.c
         src/cetech/controlers/private/gamepad.c
-        src/cetech/renderer/private/renderer.cpp
+        src/cetech/renderer/private/renderer.c
         src/cetech/render_graph/private/render_graph.c
-        src/cetech/render_graph/private/default_render_graph.c
+        src/cetech/render_graph/private/default_rg.c
         src/cetech/texture/private/texture.c
 
         src/cetech/shader/private/shader.c

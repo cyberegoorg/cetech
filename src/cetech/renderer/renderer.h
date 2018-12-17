@@ -26,15 +26,24 @@
 #define CT_RENDER_TASK \
      CE_ID64_0("render_task", 0x193bb679e415e81bULL)
 
+#define CT_RENDERER_COMPONENT_I \
+     CE_ID64_0("ct_renderer_component_i0", 0xe832f6a0542ec6a0ULL)
 
 typedef void (*ct_renderender_on_render)();
+
+struct ct_world;
+struct ct_entity;
+struct ct_rg_module;
+
+struct ct_renderer_component_i0 {
+    void (*feed_module)(struct ct_world world,
+                        struct ct_rg_module *module);
+};
 
 struct ct_viewport0 {
     uint32_t idx;
 };
 
-struct ct_world;
-struct ct_entity;
 
 //! Render API V0
 struct ct_renderer_a0 {
@@ -55,7 +64,7 @@ struct ct_renderer_a0 {
     struct ct_viewport0 (*create_viewport)(struct ct_world world,
                                            struct ct_entity main_camera);
 
-    struct ct_render_graph_builder *
+    struct ct_rg_builder *
     (*viewport_builder)(struct ct_viewport0 viewport);
 };
 

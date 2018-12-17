@@ -16,7 +16,7 @@
     CE_ID64_0("game_task", 0x56c73acaa12b1278ULL)
 
 struct ct_render_texture_handle;
-struct ct_render_graph_builder;
+struct ct_rg_builder;
 
 struct ct_viewport0;
 
