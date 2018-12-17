@@ -22,7 +22,9 @@ struct ct_world;
 
 
 struct ct_default_rg_a0 {
-    void (*feed_module)(struct ct_rg_module *m);
+    void (*feed_module)(struct ct_rg_module *m,
+                        struct ct_world world,
+                        struct ct_entity camera);
 };
 
 CE_MODULE(ct_default_rg_a0);

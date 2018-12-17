@@ -22,7 +22,7 @@
 #include <celib/macros.h>
 
 
-#include "cetech/render_graph/default_rg.h"
+#include "cetech/default_rg/default_rg.h"
 
 
 #define _G render_graph_global
@@ -195,15 +195,59 @@ static void gbuffer_pass_on_setup(void *inst,
                     }
     );
 
-    builder->add_pass(builder, inst, 0);
+    builder->add_pass(builder, inst, _GBUFFER);
 }
 
-static void create(struct ct_rg_module *m1) {
-    m1->add_pass(m1, &(struct ct_rg_pass) {
-            .on_setup = gbuffer_pass_on_setup
-    }, sizeof(struct ct_rg_pass));
+struct gbuffer_pass {
+    struct ct_rg_pass pass;
+    struct ct_entity camera;
+    struct ct_world world;
+};
 
-    m1->add_extension_point(m1, _GBUFFER);
+static void gbuffer_pass_on_pass(void *inst,
+                                 uint8_t viewid,
+                                 uint64_t layer,
+                                 struct ct_rg_builder *builder) {
+    struct gbuffer_pass *pass = inst;
+
+    ct_gfx_a0->set_view_clear(viewid,
+                              CT_RENDER_CLEAR_COLOR |
+                              CT_RENDER_CLEAR_DEPTH,
+                              0x66CCFFff, 1.0f, 0);
+
+    uint16_t size[2] = {};
+    builder->get_size(builder, size);
+
+    ct_gfx_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
+
+    float view_matrix[16];
+    float proj_matrix[16];
+
+    ct_camera_a0->get_project_view(pass->world,
+                                   pass->camera,
+                                   proj_matrix,
+                                   view_matrix,
+                                   size[0],
+                                   size[1]);
+
+    ct_gfx_a0->set_view_transform(viewid, view_matrix,
+                                  proj_matrix);
+}
+
+
+static void feed_module(struct ct_rg_module *m1,
+                        struct ct_world world,
+                        struct ct_entity camera) {
+    struct ct_rg_module* gm = m1->add_extension_point(m1, _GBUFFER);
+
+    gm->add_pass(gm, &(struct gbuffer_pass) {
+            .camera = camera,
+            .world = world,
+            .pass = {
+                    .on_setup = gbuffer_pass_on_setup,
+                    .on_pass = gbuffer_pass_on_pass,
+            }
+    }, sizeof(struct gbuffer_pass));
 
     m1->add_pass(m1, &(struct ct_rg_pass) {
             .on_pass = output_pass_on_pass,
@@ -212,7 +256,7 @@ static void create(struct ct_rg_module *m1) {
 }
 
 static struct ct_default_rg_a0 default_render_graph_api = {
-        .feed_module= create,
+        .feed_module= feed_module,
 };
 
 struct ct_default_rg_a0 *ct_default_rg_a0 = &default_render_graph_api;

@@ -23,7 +23,7 @@
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_rg.h>
+#include <cetech/default_rg/default_rg.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>

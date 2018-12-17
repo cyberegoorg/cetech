@@ -34,10 +34,14 @@ typedef void (*ct_renderender_on_render)();
 struct ct_world;
 struct ct_entity;
 struct ct_rg_module;
+struct ct_rg_builder;
 
 struct ct_renderer_component_i0 {
     void (*feed_module)(struct ct_world world,
                         struct ct_rg_module *module);
+
+    void (*render)(struct ct_world world,
+                   struct ct_rg_builder *builder);
 };
 
 struct ct_viewport0 {

@@ -57,7 +57,7 @@ static void module_add_module(void *inst,
     ce_array_push(module_inst->modules, new_module, _G.alloc);
 }
 
-void add_extension_point(void *inst,
+struct ct_rg_module* add_extension_point(void *inst,
                          uint64_t name) {
     struct ct_rg_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
@@ -66,6 +66,8 @@ void add_extension_point(void *inst,
 
     module_add_module(module, m);
     ce_hash_add(&module_inst->extension_points, name, (uint64_t) m, _G.alloc);
+
+    return m;
 }
 
 struct ct_rg_module *get_extension_point(void *inst,

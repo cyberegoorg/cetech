@@ -26,7 +26,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/game/game_system.h>
-#include <cetech/render_graph/default_rg.h>
+#include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <cetech/mesh/mesh_renderer.h>
@@ -222,6 +222,23 @@ static void _feed_module(struct ct_world world,
     }
 }
 
+ void _render_components(struct ct_world world,
+                               struct ct_rg_builder *builder) {
+    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+    while (it.api) {
+        struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
+
+        struct ct_renderer_component_i0 *ci;
+        ci = i->get_interface(CT_RENDERER_COMPONENT_I);
+
+        if (ci && ci->render) {
+            ci->render(world, builder);
+        }
+
+        it = ce_api_a0->next(it);
+    }
+}
+
 static void render(float dt) {
     _G.viewid = 0;
     if (_G.need_reset) {
@@ -237,18 +254,21 @@ static void render(float dt) {
     for (int i = 0; i < v_n; ++i) {
         struct viewport *v = &_G.viewports[i];
 
-        v->builder->clear(v->builder);
-
         struct ct_rg *graph = ct_rg_a0->create_graph();
         struct ct_rg_module *module = ct_rg_a0->create_module();
+        struct ct_rg_builder *builder = v->builder;
 
-        ct_default_rg_a0->feed_module(module);
+        builder->clear(builder);
+
+        ct_default_rg_a0->feed_module(module, v->world, v->entity);
         _feed_module(v->world, module);
 
         graph->set_module(graph, module);
         graph->setup(graph, v->builder);
 
         v->builder->execute(v->builder);
+
+        _render_components(v->world, v->builder);
 
         ct_rg_a0->destroy_module(module);
         ct_rg_a0->destroy_graph(graph);

@@ -29,7 +29,7 @@
 #include <celib/buffer.inl>
 #include <cetech/editor/property.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_rg.h>
+#include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
 
 
@@ -137,22 +137,6 @@ void foreach_mesh_renderer(struct ct_world world,
     }
 }
 
-void mesh_render_all(struct ct_world world,
-                     uint8_t viewid,
-                     uint64_t layer_name) {
-
-    struct mesh_render_data render_data = {
-            .viewid = viewid,
-            .layer_name = layer_name
-    };
-
-    ct_ecs_a0->process(world,
-                       ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
-                       ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                       foreach_mesh_renderer, &render_data);
-}
-
-
 static struct ct_mesh_renderer_a0 _api = {
 };
 
@@ -232,111 +216,25 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = property_editor,
 };
 
+void render(struct ct_world world,
+            struct ct_rg_builder *builder) {
 
-struct geometry_pass {
-    struct ct_rg_pass pass;
-    struct ct_world world;
-};
-
-
-void geometry_pass_on_setup(void *inst,
-                            struct ct_rg_builder *builder) {
-    builder->write(builder, _COLOR);
-    builder->write(builder, _DEPTH);
-    builder->add_pass(builder, inst, _GBUFFER);
-}
-
-struct cameras {
-    uint64_t camera_data[32];
-    struct ct_entity ent[32];
-    uint32_t n;
-};
-
-void foreach_camera(struct ct_world world,
-                    struct ct_entity *ent,
-                    ct_entity_storage_t *item,
-                    uint32_t n,
-                    void *data) {
-    CE_UNUSED(world);
-
-    struct cameras *cameras = (struct cameras *) (data);
-
-    for (uint32_t i = 1; i < n; ++i) {
-        uint32_t idx = cameras->n++;
-
-        cameras->ent[idx].h = ent[i].h;
-
-        uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
-                                                  ent[i]);
-
-        cameras->camera_data[idx] = camera_data;
-    }
-}
-
-void geometry_pass_on_pass(void *inst,
-                           uint8_t viewid,
-                           uint64_t layer,
-                           struct ct_rg_builder *builder) {
-    struct geometry_pass *pass = (struct geometry_pass *) inst;
-
-    ct_gfx_a0->set_view_clear(viewid,
-                              CT_RENDER_CLEAR_COLOR |
-                              CT_RENDER_CLEAR_DEPTH,
-                              0x66CCFFff, 1.0f, 0);
-
-    uint16_t size[2] = {};
-    builder->get_size(builder, size);
-
-    ct_gfx_a0->set_view_rect(viewid, 0, 0, size[0], size[1]);
-
-    struct cameras cameras;
-    memset(&cameras, 0, sizeof(struct cameras));
-
-    ct_ecs_a0->process(pass->world,
-                       ct_ecs_a0->mask(CAMERA_COMPONENT),
-                       foreach_camera, &cameras);
+    uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
 
 
-    {
-
-        for (int i = 0; i < cameras.n; ++i) {
-            float view_matrix[16];
-            float proj_matrix[16];
-
-            ct_camera_a0->get_project_view(pass->world,
-                                           cameras.ent[i],
-                                           proj_matrix,
-                                           view_matrix,
-                                           size[0],
-                                           size[1]);
-
-            ct_gfx_a0->set_view_transform(viewid, view_matrix,
-                                          proj_matrix);
-
-            mesh_render_all(pass->world, viewid, layer);
-        }
-    }
-}
-
-
-void feed_module(struct ct_world world,
-                 struct ct_rg_module *module) {
-    struct ct_rg_module *m2;
-    m2 = module->get_extension_point(module, _GBUFFER);
-
-    struct geometry_pass gp = {
-            .world = world,
-            .pass = (struct ct_rg_pass) {
-                    .on_pass = geometry_pass_on_pass,
-                    .on_setup = geometry_pass_on_setup
-            }
+    struct mesh_render_data render_data = {
+            .viewid = viewid,
+            .layer_name = _GBUFFER,
     };
 
-    m2->add_pass(m2, &gp, sizeof(struct geometry_pass));
+    ct_ecs_a0->process(world,
+                       ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
+                       ct_ecs_a0->mask(TRANSFORM_COMPONENT),
+                       foreach_mesh_renderer, &render_data);
 }
 
 static struct ct_renderer_component_i0 ct_renderer_component_i = {
-        .feed_module = feed_module
+        .render = render
 };
 
 static void *get_interface(uint64_t name_hash) {
@@ -352,10 +250,6 @@ static void *get_interface(uint64_t name_hash) {
 
     return NULL;
 }
-
-//static uint64_t size() {
-//    return sizeof(struct ct_mesh);
-//}
 
 static void mesh_spawner(struct ct_world world,
                          uint64_t obj) {

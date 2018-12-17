@@ -16,7 +16,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
-#include <cetech/render_graph/default_rg.h>
+#include <cetech/default_rg/default_rg.h>
 #include <cetech/transform/transform.h>
 #include <cetech/texture/texture.h>
 #include <cetech/camera/camera.h>

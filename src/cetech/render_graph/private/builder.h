@@ -33,8 +33,8 @@ static void builder_add_pass(void *inst,
     if (!layer) {
         viewid = ct_renderer_a0->new_viewid();
     } else {
-        viewid = ce_hash_lookup(&builder_inst->layer_map, layer, 0);
-        if (!viewid) {
+        viewid = ce_hash_lookup(&builder_inst->layer_map, layer, UINT8_MAX);
+        if (UINT8_MAX == viewid) {
             viewid = ct_renderer_a0->new_viewid();
             ce_hash_add(&builder_inst->layer_map, layer, viewid, _G.alloc);
         }
@@ -79,7 +79,6 @@ static void builder_execute(void *inst) {
         ct_dd_a0->begin(pass->viewid);
         pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, builder);
         ct_dd_a0->end();
-
     }
 }
 
@@ -187,18 +186,25 @@ void builder_get_size(void *inst,
     memcpy(size, builder_inst->size, sizeof(uint16_t) * 2);
 }
 
+static uint8_t get_layer_viewid(void *inst,
+                                uint64_t layer_name) {
+    struct ct_rg_builder *builder = inst;
+    struct render_graph_builder_inst *builder_inst = builder->inst;
+
+    return ce_hash_lookup(&builder_inst->layer_map, layer_name, 0);
+}
 
 static struct ct_rg_builder *create_render_builder() {
     struct ct_rg_builder *obj = CE_ALLOC(_G.alloc,
-                                                   struct ct_rg_builder,
-                                                   sizeof(struct ct_rg_builder));
+                                         struct ct_rg_builder,
+                                         sizeof(struct ct_rg_builder));
 
     struct render_graph_builder_inst *inst = CE_ALLOC(_G.alloc,
                                                       struct render_graph_builder_inst,
                                                       sizeof(struct render_graph_builder_inst));
 
 
-    *inst = (struct render_graph_builder_inst){};
+    *inst = (struct render_graph_builder_inst) {};
 
     *obj = (struct ct_rg_builder) {
             .add_pass = builder_add_pass,
@@ -209,6 +215,7 @@ static struct ct_rg_builder *create_render_builder() {
             .read = builder_read,
             .set_size = builder_set_size,
             .get_size = builder_get_size,
+            .get_layer_viewid = get_layer_viewid,
             .get_texture = builder_get_texture,
             .inst = inst
     };

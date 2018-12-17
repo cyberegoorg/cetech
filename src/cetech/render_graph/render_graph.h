@@ -53,6 +53,8 @@ struct ct_rg_builder {
     void (*get_size)(void *inst,
                      uint16_t *size);
 
+    uint8_t (*get_layer_viewid)(void *inst, uint64_t layer_name);
+
     void (*clear)(void *inst);
 
     void (*execute)(void *inst);
@@ -68,11 +70,11 @@ struct ct_rg_module {
                      void *pass,
                      uint64_t size);
 
-    void (*add_extension_point)(void *inst,
+    struct ct_rg_module* (*add_extension_point)(void *inst,
                                 uint64_t name);
 
     struct ct_rg_module *(*get_extension_point)(void *inst,
-                                                          uint64_t name);
+                                                uint64_t name);
 
     void (*on_setup)(void *inst,
                      struct ct_rg_builder *builder);
