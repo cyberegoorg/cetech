@@ -716,8 +716,8 @@ static struct ct_entity load(uint64_t resource,
 
 
 static void unload(uint64_t resource,
-                   struct ct_world world,
-                   struct ct_entity entity) {
+                    struct ct_world world,
+                    struct ct_entity entity) {
     ct_ecs_a0->destroy(world, &entity, 1);
 }
 
@@ -907,31 +907,11 @@ static struct ct_world create_world() {
     w->world = world;
     w->db = ce_cdb_a0->db();
 
-    uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                              ECS_WORLD_CREATE);
-
-    ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(event);
-    ce_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
-    ce_cdb_a0->write_commit(wr);
-    ce_ebus_a0->broadcast_obj(ECS_EBUS, ECS_WORLD_CREATE, event);
-
     return world;
 }
 
 static void destroy_world(struct ct_world world) {
-    uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                              ECS_WORLD_DESTROY);
-
-    ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(event);
-    ce_cdb_a0->set_uint64(wr, ENTITY_WORLD, world.h);
-    ce_cdb_a0->write_commit(wr);
-
-    ce_ebus_a0->broadcast_obj(ECS_EBUS, ECS_WORLD_DESTROY, event);
-
-    struct world_instance *w = _new_world(world);
     ce_handler_destroy(&_G.world_handler, world.h, _G.allocator);
-
-    ce_cdb_a0->destroy_db(w->db);
 }
 
 

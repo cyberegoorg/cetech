@@ -7,14 +7,12 @@
 
 #include <celib/module.inl>
 
-#define CDB_EBUS \
-    CE_ID64_0("cdb", 0xb3ba1f728bc75cb0ULL)
 
-#define CDB_PROP_CHANGED_EVENT \
-    CE_ID64_0("PROP_changed", 0x86fe145b8d24153fULL)
+#define CE_CDB_CHANGE \
+    CE_ID64_0("change", 0x8694ed4881bfb631ULL)
 
-#define CDB_PROP_REMOVED_EVENT \
-    CE_ID64_0("prop_removed", 0x7e393749202ab34eULL)
+#define CE_CDB_REMOVE \
+    CE_ID64_0("change", 0x8694ed4881bfb631ULL)
 
 struct ce_alloc;
 
@@ -22,10 +20,30 @@ struct ce_cdb_t {
     uint64_t idx;
 };
 
-struct ce_cdb_prop_ev0 {
+struct ce_cdb_blob_t0 {
+    void *data;
+    uint64_t size;
+};
+
+union ce_cdb_value_u0 {
+    uint64_t uint64;
+    void *ptr;
+    uint64_t ref;
+    uint64_t subobj;
+
+    float f;
+    char *str;
+    bool b;
+    struct ce_cdb_blob_t0 blob;
+};
+
+
+struct ce_cdb_change_ev0 {
+    const uint64_t type;
     uint64_t obj;
-    const uint64_t *prop;
-    uint32_t prop_count;
+    const uint64_t prop;
+    union ce_cdb_value_u0 new_value;
+    union ce_cdb_value_u0 old_value;
 };
 
 typedef void ce_cdb_obj_o;
@@ -157,6 +175,9 @@ struct ce_cdb_a0 {
 
     // READ
     const ce_cdb_obj_o *(*read)(uint64_t object);
+
+    const struct ce_cdb_change_ev0 *(*changed)(const ce_cdb_obj_o *reader,
+                                               uint32_t *n);
 
     float (*read_float)(const ce_cdb_obj_o *reader,
                         uint64_t property,

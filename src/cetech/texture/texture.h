@@ -2,6 +2,10 @@
 #define CETECH_TEXTURE_H
 
 
+#define TEXTURE_TASK \
+    CE_ID64_0("texture_task", 0xcfe0d7ae816cf881ULL)
+
+
 #define TEXTURE_TYPE \
     CE_ID64_0("texture", 0xcd4238c6a0c69e32ULL)
 

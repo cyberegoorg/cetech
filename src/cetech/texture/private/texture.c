@@ -39,6 +39,7 @@
 #define _G TextureResourceGlobals
 struct _G {
     struct ce_alloc *allocator;
+    uint64_t *all_textures;
 } _G;
 
 //==============================================================================
@@ -50,9 +51,7 @@ struct _G {
 // Resource
 //==============================================================================
 
-void _texture_resource_online(uint64_t name,
-                              uint64_t obj) {
-
+void texture_online(uint64_t obj) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
     uint64_t blob_size = 0;
@@ -63,22 +62,34 @@ void _texture_resource_online(uint64_t name,
 
     ct_render_texture_handle_t texture;
     texture = ct_gfx_a0->create_texture(mem,
-                                             CT_RENDER_TEXTURE_NONE,
-                                             0, NULL);
+                                        CT_RENDER_TEXTURE_NONE,
+                                        0, NULL);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
     ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ce_cdb_a0->write_commit(writer);
+
+}
+
+void texture_offline(uint64_t obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+    const uint64_t texture = ce_cdb_a0->read_uint64(reader,
+                                                    TEXTURE_HANDLER_PROP,
+                                                    0);
+    ct_gfx_a0->destroy_texture(
+            (ct_render_texture_handle_t) {.idx=(uint16_t) texture});
+}
+
+void _texture_resource_online(uint64_t name,
+                              uint64_t obj) {
+    texture_online(obj);
+    ce_array_push(_G.all_textures, obj, _G.allocator);
 }
 
 void _texture_resource_offline(uint64_t name,
                                uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
-
-    const uint64_t texture = ce_cdb_a0->read_uint64(reader, TEXTURE_HANDLER_PROP,
-                                                    0);
-    ct_gfx_a0->destroy_texture(
-            (ct_render_texture_handle_t) {.idx=(uint16_t) texture});
+    texture_offline(obj);
 }
 
 static int _texturec(const char *input,
@@ -141,7 +152,8 @@ static uint64_t _compile(uint64_t obj) {
 
     const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
-    bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP, false);
+    bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP,
+                                             false);
 
     struct ce_alloc *a = ce_memory_a0->system;
 
@@ -184,8 +196,8 @@ static uint64_t _compile(uint64_t obj) {
 
 
 uint64_t texture_compiler(uint64_t k,
-                           struct ct_resource_id rid,
-                           const char *fullname) {
+                          struct ct_resource_id rid,
+                          const char *fullname) {
     return _compile(k);
 }
 
@@ -204,7 +216,7 @@ static void draw_property(uint64_t obj) {
     float size[2] = {64, 64};
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
-    const char* name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, 0);
+    const char *name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, 0);
 
     ct_render_texture_handle_t texture;
     texture = ct_texture_a0->get(ce_id_a0->id64(name));
@@ -297,11 +309,51 @@ static struct ct_texture_a0 texture_api = {
 
 struct ct_texture_a0 *ct_texture_a0 = &texture_api;
 
+
+static uint64_t task_name() {
+    return TEXTURE_TASK;
+}
+
+static uint64_t *update_after(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_RENDER_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static void _update(float dt) {
+    uint32_t tn = ce_array_size(_G.all_textures);
+    for (int i = 0; i < tn; ++i) {
+        uint64_t obj = _G.all_textures[i];
+
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+        uint32_t change_n = 0;
+        const struct ce_cdb_change_ev0 *changes;
+        changes = ce_cdb_a0->changed(reader, &change_n);
+
+        if (changes) {
+            texture_offline(obj);
+            _compile(obj);
+            texture_online(obj);
+        }
+    }
+}
+
+static struct ct_kernel_task_i0 texture_task = {
+        .name = task_name,
+        .update = _update,
+        .update_after = update_after,
+};
+
+
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api("ct_texture_a0", &texture_api);
     api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
+    api->register_api("ct_kernel_task_i0", &texture_task);
 }
-
 
 CE_MODULE_DEF(
         texture,

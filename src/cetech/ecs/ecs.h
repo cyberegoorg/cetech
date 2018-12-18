@@ -54,11 +54,6 @@ enum {
     ECS_EBUS = 0x3c870dac
 };
 
-enum {
-    ECS_INVALID_EVENT = 0,
-    ECS_WORLD_CREATE,
-    ECS_WORLD_DESTROY,
-};
 
 struct ct_cdb_obj_t;
 enum ce_cdb_type;
