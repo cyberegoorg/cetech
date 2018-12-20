@@ -22,6 +22,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/asset/sourcedb.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <stdlib.h>
 
 #include "cetech/editor/resource_ui.h"
 
@@ -227,16 +228,17 @@ static void ui_resource(uint64_t obj,
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
-    const char *value = ce_cdb_a0->read_str(reader, prop_key_hash, 0);
-    uint64_t value_id = ce_id_a0->id64(value);
+    uint64_t uid = ce_cdb_a0->read_ref(reader, prop_key_hash, 0);
 
     uint64_t resource_obj = ct_resource_a0->get((struct ct_resource_id) {
-            .type = resource_type,
-            .name = value_id,
+            .uid = uid,
     });
 
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(resource_obj);
+    const char* resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");
+
     char buffer[128] = {'\0'};
-    sprintf(buffer, "%s", value);
+    sprintf(buffer, "%s", resource_name);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_str_%d", label, i);
@@ -245,8 +247,7 @@ static void ui_resource(uint64_t obj,
     bool change = false;
 
     ct_debugui_a0->Separator();
-    bool resource_open = ct_debugui_a0->TreeNodeEx(label,
-                                                   0);
+    bool resource_open = ct_debugui_a0->TreeNodeEx(label,0);
 
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->PushItemWidth(-1);

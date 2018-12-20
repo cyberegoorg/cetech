@@ -27,12 +27,7 @@ struct ct_resource_id;
 struct ct_resource_compiler_a0 {
     void (*compile_all)();
 
-    void (*compile_and_reload)(uint64_t type,
-                               uint64_t name);
-
-    int (*get_filename)(char *filename,
-                        size_t max_ken,
-                        struct ct_resource_id resourceid);
+    void (*compile_and_reload)(uint64_t name);
 
     char *(*get_tmp_dir)(struct ce_alloc *a,
                          const char *platform);
@@ -40,9 +35,9 @@ struct ct_resource_compiler_a0 {
     char *(*external_join)(struct ce_alloc *a,
                            const char *name);
 
-    bool (*type_name_from_filename)(const char *fullname,
-                                    struct ct_resource_id *resource_id,
-                                    char *short_name);
+//    bool (*type_name_from_filename)(const char *fullname,
+//                                    struct ct_resource_id *resource_id,
+//                                    char *short_name);
 };
 
 CE_MODULE(ct_resource_compiler_a0);

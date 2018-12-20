@@ -1,10 +1,12 @@
-content/scene/duck/duck.material:
-  PREFAB: content/material1.material
+"0xa7d23f7b4caea16": #content/scene/duck/duck.material:
+  asset_name: "content/scene/duck/duck"
+  asset_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value:  content/scene/duck/duckCM
+          value: "0xa4053ffff8ffc601"
         k22cbxbg435124asdkj:
           name: u_vec4
           type: color
@@ -13,5 +15,7 @@ content/scene/duck/duck.material:
           value.z: 0.000000
           value.w: 0.000000
 
-content/scene/duck/duckCM.texture:
+"0xa4053ffff8ffc601": #content/scene/duck/duckCM.texture:
+  asset_name: "content/scene/duck/duckCM"
+  asset_type: "texture"
   input: content/scene/duck/duckCM.bmp

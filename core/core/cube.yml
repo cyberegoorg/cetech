@@ -1,4 +1,6 @@
-core/cube.entity:
+"0x68373d25a0b84f58":
+  asset_name: "core/cube"
+  asset_type: "entity"
   components:
     transform:
       position: [0, 0, 0]
@@ -11,7 +13,9 @@ core/cube.entity:
       mesh: "g_cube"
       material: "core/cube"
 
-core/cube.material:
+"0x8b73c8d507e579eb":
+  asset_name: "core/cube"
+  asset_type: "material"
   PREFAB: content/material1.material
   layers:
     default:

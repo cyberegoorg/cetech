@@ -39,6 +39,7 @@ struct sqls_s {
     sqlite3_stmt *get_resource_dirs;
     sqlite3_stmt *get_resource_from_dirs;
     sqlite3_stmt *get_file_id;
+    sqlite3_stmt *resource_type;
 };
 
 static struct _G {
@@ -55,12 +56,12 @@ const char *CREATE_SQL[] = {
         ");",
 
         "CREATE TABLE IF NOT EXISTS resource (\n"
-        "fullname TEXT    UNIQUE                          NOT NULL,\n"
-        "type     INTEGER                                 NOT NULL,\n"
-        "name     INTEGER                                 NOT NULL,\n"
+        "uid      INTEGER                                 NOT NULL,\n"
+        "type     TEXT                                    NOT NULL,\n"
+        "name     TEXT                                    NOT NULL,\n"
         "file     INTEGER                                         ,\n"
         "FOREIGN KEY(file) REFERENCES files(id),                   \n"
-        "PRIMARY KEY (type, name)"
+        "PRIMARY KEY (uid)"
         ");",
 
         "CREATE TABLE IF NOT EXISTS file_dependency ("
@@ -71,10 +72,9 @@ const char *CREATE_SQL[] = {
         ");",
 
         "CREATE TABLE IF NOT EXISTS resource_data (\n"
-        "type     INTEGER                                 NOT NULL,\n"
-        "name     INTEGER                                 NOT NULL,\n"
+        "uid      INTEGER                                 NOT NULL,\n"
         "data     BLOB,                                            \n"
-        "PRIMARY KEY (type, name)"
+        "PRIMARY KEY (uid)"
         ");"
         ""
 };
@@ -91,13 +91,13 @@ static struct {
                   "INSERT OR REPLACE INTO files (id, filename, mtime) VALUES(?1, ?2, ?3);"),
 
         _STATMENT(put_file_blob,
-                  "INSERT OR REPLACE INTO resource_data (type, name, data) VALUES(?1, ?2, ?3);"),
+                  "INSERT OR REPLACE INTO resource_data (uid, data) VALUES(?1, ?2);"),
 
         _STATMENT(put_resource,
-                  "INSERT OR REPLACE INTO resource (fullname, type, name, file) VALUES(?1, ?2, ?3, ?4);"),
+                  "INSERT OR REPLACE INTO resource (uid, type, name, file) VALUES(?1, ?2, ?3, ?4);"),
 
         _STATMENT(load_file_blob,
-                  "SELECT data FROM resource_data WHERE type = ?1 AND name = ?2;"),
+                  "SELECT data FROM resource_data WHERE uid = ?1"),
 
         _STATMENT(set_file_depend,
                   "INSERT INTO file_dependency (file, depend_on) VALUES (?1, ?2);"),
@@ -106,10 +106,15 @@ static struct {
                   "SELECT files.filename\n"
                   "FROM resource\n"
                   "JOIN files on files.id == resource.file\n"
-                  "WHERE resource.type = ?1 and resource.name = ?2;"),
+                  "WHERE resource.uid = ?1;"),
+
+        _STATMENT(resource_type,
+                  "SELECT resource.type\n"
+                  "FROM resource\n"
+                  "WHERE resource.uid = ?1;"),
 
         _STATMENT(get_fullname,
-                  "SELECT resource.fullname\n"
+                  "SELECT resource.uid\n"
                   "FROM resource\n"
                   "WHERE resource.type = ?1 and resource.name = ?2;"),
 
@@ -126,11 +131,11 @@ static struct {
         _STATMENT(get_file_id,
                   "SELECT id FROM files WHERE filename = ?1"),
 
-        _STATMENT(get_resource_dirs, "select fullname\n"
-                                     "from resource order by fullname"),
+        _STATMENT(get_resource_dirs, "select name, type\n"
+                                     "from resource order by name"),
 
-        _STATMENT(get_resource_from_dirs, "select fullname\n"
-                                          "from resource where instr(fullname, ?1)")
+        _STATMENT(get_resource_from_dirs, "select name, type\n"
+                                          "from resource where instr(name, ?1)")
 };
 
 static int _step(sqlite3 *db,
@@ -282,29 +287,29 @@ static void builddb_put_file(const char *filename,
     _step(_db, sqls->put_file);
 }
 
-static void put_resource(struct ct_resource_id rid,
-                         const char *data,
-                         uint64_t size) {
+static void put_resource_blob(struct ct_resource_id rid,
+                              const char *data,
+                              uint64_t size) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_int64(sqls->put_file_blob, 1, rid.type);
-    sqlite3_bind_int64(sqls->put_file_blob, 2, rid.name);
-    sqlite3_bind_blob(sqls->put_file_blob, 3, data, size, NULL);
+    sqlite3_bind_int64(sqls->put_file_blob, 1, rid.uid);
+    sqlite3_bind_blob(sqls->put_file_blob, 2, data, size, NULL);
     _step(_db, sqls->put_file_blob);
 }
 
-static void put_resource_2(const char *fullname,
-                           struct ct_resource_id rid,
-                           const char *filename) {
+static void put_resource(struct ct_resource_id rid,
+                         const char *type,
+                         const char *filename,
+                         const char *name) {
     sqlite3 *_db = _opendb();
 
     struct sqls_s *sqls = _get_sqls();
     uint64_t id = ce_id_a0->id64(filename);
 
-    sqlite3_bind_text(sqls->put_resource, 1, fullname, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int64(sqls->put_resource, 2, rid.type);
-    sqlite3_bind_int64(sqls->put_resource, 3, rid.name);
+    sqlite3_bind_int64(sqls->put_resource, 1, rid.uid);
+    sqlite3_bind_text(sqls->put_resource, 2, type, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->put_resource, 3, name, -1, SQLITE_TRANSIENT);
     sqlite3_bind_int64(sqls->put_resource, 4, id);
     _step(_db, sqls->put_resource);
 }
@@ -316,8 +321,7 @@ bool builddb_load_cdb_file(struct ct_resource_id resource,
     struct sqls_s *sqls = _get_sqls();
 
 
-    sqlite3_bind_int64(sqls->load_file_blob, 1, resource.type);
-    sqlite3_bind_int64(sqls->load_file_blob, 2, resource.name);
+    sqlite3_bind_int64(sqls->load_file_blob, 1, resource.uid);
 
     int ok = _step(_db, sqls->load_file_blob) == SQLITE_ROW;
 
@@ -339,31 +343,6 @@ static void builddb_set_file_depend(const char *filename,
     sqlite3_bind_int64(sqls->set_file_depend, 2, ce_id_a0->id64(depend_on));
 
     _step(_db, sqls->set_file_depend);
-}
-
-
-static int buildb_get_filename_type_name(char *filename,
-                                         size_t max_len,
-                                         uint64_t type,
-                                         uint64_t name) {
-
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    sqlite3_bind_int64(sqls->get_filename, 1, type);
-    sqlite3_bind_int64(sqls->get_filename, 2, name);
-
-    int ok = _step(_db, sqls->get_filename) == SQLITE_ROW;
-    if (ok) {
-
-        const unsigned char *fn = sqlite3_column_text(sqls->get_filename, 0);
-
-        snprintf(filename, max_len, "%s", fn);
-
-        _step(_db, sqls->get_filename);
-    }
-
-    return ok;
 }
 
 static int buildb_get_resource_dirs(char ***filename,
@@ -422,11 +401,18 @@ static int buildb_get_resource_from_dirs(const char *dir,
                       SQLITE_TRANSIENT);
 
     while (_step(_db, sqls->get_resource_from_dirs) == SQLITE_ROW) {
-        const unsigned char *fn;
-        fn = sqlite3_column_text(sqls->get_resource_from_dirs, 0);
+        const char *name;
+        name = (const char *)sqlite3_column_text(sqls->get_resource_from_dirs, 0);
 
-        char *dup_str = ce_memory_a0->str_dup((const char *) fn, alloc);
-        ce_array_push(*filename, dup_str, alloc);
+        const char *type;
+        type = (const char *)sqlite3_column_text(sqls->get_resource_from_dirs, 1);
+
+        const size_t len = strlen(name) + strlen(type) + 2;
+
+        char* fn = CE_ALLOC(alloc, char, len);
+        snprintf(fn, len, "%s.%s", name, type);
+
+        ce_array_push(*filename, fn, alloc);
     }
 
     return 1;
@@ -440,29 +426,6 @@ static void buildb_get_resource_from_dirs_clean(char **filename,
     }
 }
 
-
-static int buildb_get_fullname(char *fullname,
-                               size_t max_len,
-                               uint64_t type,
-                               uint64_t name) {
-
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    sqlite3_bind_int64(sqls->get_fullname, 1, type);
-    sqlite3_bind_int64(sqls->get_fullname, 2, name);
-
-    int ok = _step(_db, sqls->get_fullname) == SQLITE_ROW;
-    if (ok) {
-        const unsigned char *fn = sqlite3_column_text(sqls->get_fullname, 0);
-
-        snprintf(fullname, max_len, "%s", fn);
-
-        _step(_db, sqls->get_fullname);
-    }
-
-    return ok;
-}
 
 static int builddb_need_compile(const char *filename) {
     int compile = 1;
@@ -498,16 +461,104 @@ void _add_dependency(const char *who_filename,
 //                                                 depend_on_filename));
 }
 
+
+uint64_t resource_type(struct ct_resource_id resource) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_int64(sqls->resource_type, 1, resource.uid);
+
+    uint64_t type = 0;
+
+    int ok = _step(_db, sqls->resource_type) == SQLITE_ROW;
+    if (ok) {
+        const char* type_str = (const char*)sqlite3_column_text(sqls->resource_type, 0);
+        type = ce_id_a0->id64(type_str);
+        _step(_db, sqls->resource_type);
+    }
+
+    return type;
+}
+
+uint64_t resource_filename(struct ct_resource_id resource,
+                           char *filename,
+                           size_t max_len) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_int64(sqls->get_filename, 1, resource.uid);
+
+    int ok = _step(_db, sqls->get_filename) == SQLITE_ROW;
+    if (ok) {
+
+        const unsigned char *fn = sqlite3_column_text(sqls->get_filename, 0);
+
+        snprintf(filename, max_len, "%s", fn);
+
+        _step(_db, sqls->get_filename);
+    }
+
+    return ok;
+}
+
+bool _type_name_from_filename(const char *fullname,
+                              char *type,
+                              char *short_name) {
+
+    const char *resource_type = ce_os_a0->path->extension(fullname);
+
+    if (!resource_type) {
+        return false;
+    }
+
+    memcpy(type, resource_type, strlen(resource_type));
+
+    size_t size = strlen(fullname) - strlen(resource_type) - 1;
+
+    if (short_name) {
+        memcpy(short_name, fullname, sizeof(char) * size);
+        short_name[size] = '\0';
+    }
+
+    return true;
+}
+
+void fullname_resource(const char *fullname,
+                       struct ct_resource_id *resource) {
+
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    char name[128] = {};
+    char type[128] = {};
+
+    _type_name_from_filename(fullname, type, name);
+
+    sqlite3_bind_text(sqls->get_fullname, 1, type, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_fullname, 2, name, -1, SQLITE_TRANSIENT);
+
+    uint64_t uid = 0;
+    int ok = _step(_db, sqls->get_fullname) == SQLITE_ROW;
+    if (ok) {
+        uid = sqlite3_column_int64(sqls->get_fullname, 0);
+
+        _step(_db, sqls->get_fullname);
+    }
+
+    resource->uid = uid;
+}
+
 static struct ct_builddb_a0 build_db_api = {
         .put_file = builddb_put_file,
+        .put_resource_blob = put_resource_blob,
         .put_resource = put_resource,
-        .put_resource_2 = put_resource_2,
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
-        .get_filename_from_type_name = buildb_get_filename_type_name,
-        .get_fullname= buildb_get_fullname,
         .need_compile = builddb_need_compile,
         .add_dependency = _add_dependency,
+        .get_resource_type = resource_type,
+        .get_resource_filename = resource_filename,
+        .get_resource_by_fullname = fullname_resource,
         .get_resource_dirs = buildb_get_resource_dirs,
         .get_resource_dirs_clean = buildb_get_resource_dirs_clean,
         .get_resource_from_dirs = buildb_get_resource_from_dirs,

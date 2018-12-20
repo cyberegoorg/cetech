@@ -56,10 +56,6 @@ static float draw_main_menu() {
                 ce_module_a0->reload_all();
             }
 
-            if (ct_debugui_a0->MenuItem("Save all", "Alt+s", false, true)) {
-                ct_sourcedb_a0->save_all();
-            }
-
             if (ct_debugui_a0->MenuItem2("Debug", "F9", &debug, true)) {
                 ct_renderer_a0->set_debug(debug);
             }

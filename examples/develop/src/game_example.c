@@ -31,12 +31,9 @@ static struct G {
     struct ct_viewport0 viewport;
 } _G;
 
-#define _CAMERA_ASSET \
-    CE_ID64_0("content/camera", 0x2d0dc3c05bc23f4fULL)
+#define _CAMERA_ASSET 0x57899875c4457313
 
-#define _LEVEL_ASSET \
-    CE_ID64_0("content/level2", 0x5da9fa42e78626dcULL)
-
+#define _LEVEL_ASSET 0x588f56dc4e82f7b2
 
 #include "rotation.inl"
 

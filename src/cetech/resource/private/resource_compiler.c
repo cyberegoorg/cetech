@@ -24,6 +24,7 @@
 #include <cetech/asset/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
+#include <stdlib.h>
 #include "cetech/resource/builddb.h"
 
 
@@ -31,7 +32,6 @@
 // Defines
 //==============================================================================
 
-#define MAX_TYPES 128
 #define _G ResourceCompilerGlobal
 
 #define LOG_WHERE "resource_compiler"
@@ -51,37 +51,9 @@ static struct _G {
 } _G;
 
 
-
-
 //==============================================================================
 // Private
 //==============================================================================
-
-bool type_name_from_filename(const char *fullname,
-                             struct ct_resource_id *resource_id,
-                             char *short_name) {
-
-    const char *resource_type = ce_os_a0->path->extension(fullname);
-
-    if (!resource_type) {
-        return false;
-    }
-
-    size_t size = strlen(fullname) - strlen(resource_type) - 1;
-
-    char resource_name[128] = {};
-    memcpy(resource_name, fullname, size);
-
-    resource_id->name = ce_id_a0->id64(resource_name);
-    resource_id->type = ce_id_a0->id64(resource_type);
-
-    if (short_name) {
-        memcpy(short_name, fullname, sizeof(char) * size);
-        short_name[size] = '\0';
-    }
-
-    return true;
-}
 
 
 ct_resource_compilator_t _find_compilator(uint64_t type) {
@@ -108,7 +80,7 @@ static void _compile_task(void *data) {
     uint64_t obj = ce_ydb_a0->get_obj(tdata->source_filename);
 
     const uint64_t n = ce_cdb_a0->prop_count(obj);
-    const uint64_t* asset_keys = ce_cdb_a0->prop_keys(obj);
+    const uint64_t *asset_keys = ce_cdb_a0->prop_keys(obj);
 
     for (uint32_t i = 0; i < n; ++i) {
         uint64_t k = asset_keys[i];
@@ -116,18 +88,26 @@ static void _compile_task(void *data) {
         const char *resource_name;
         resource_name = ce_id_a0->str_from_id64(k);
 
-        struct ct_resource_id rid;
-        if (!type_name_from_filename(resource_name, &rid, NULL)) {
-            ce_log_a0->error(LOG_WHERE,
-                             "Invalid format for resource %s:%s ",
-                             tdata->source_filename, resource_name);
-            continue;
-        }
+        uint64_t uid = strtoul(resource_name, NULL, 0);
+        struct ct_resource_id rid = {.uid=uid};
 
         uint64_t asset_obj = ct_sourcedb_a0->get(rid);
 
+        const ce_cdb_obj_o *asset_r = ce_cdb_a0->read(asset_obj);
+        const char *type_s = ce_cdb_a0->read_str(asset_r, ASSET_TYPE_PROP, 0);
+
+        const char *name_str = ce_cdb_a0->read_str(asset_r, ASSET_NAME_PROP,
+                                                     "");
+
+        char asset_type[128] = {0};
+        char asset_name[128] = {0};
+        strcpy(asset_type, type_s);
+        strcpy(asset_name, name_str);
+
+        uint64_t type = ce_id_a0->id64(type_s);
+
         uint64_t output_obj = 0;
-        ct_resource_compilator_t compilator = _find_compilator(rid.type);
+        ct_resource_compilator_t compilator = _find_compilator(type);
         if (!compilator) {
             output_obj = asset_obj;
         } else {
@@ -139,13 +119,18 @@ static void _compile_task(void *data) {
             ce_log_a0->error("resource_compiler.task",
                              "Resource \"%s\" compilation fail", resource_name);
         } else {
-            ce_cdb_a0->set_type(output_obj, rid.type);
+            ce_cdb_a0->set_type(output_obj, type);
+
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(output_obj);
+            ce_cdb_a0->set_str(w, ASSET_NAME_PROP, asset_name);
+            ce_cdb_a0->set_str(w, ASSET_TYPE_PROP, asset_type);
+            ce_cdb_a0->write_commit(w);
 
             char *output = NULL;
             ce_cdb_a0->dump(output_obj, &output, _G.allocator);
-            ct_builddb_a0->put_resource(rid,
-                                        output,
-                                        ce_array_size(output));
+            ct_builddb_a0->put_resource_blob(rid,
+                                             output,
+                                             ce_array_size(output));
             ce_buffer_free(output, _G.allocator);
 
             ct_builddb_a0->set_file_depend(tdata->source_filename,
@@ -200,7 +185,7 @@ void _scan_files(char **files,
         uint64_t obj = ce_ydb_a0->get_obj(filename);
 
         const uint64_t n = ce_cdb_a0->prop_count(obj);
-        const uint64_t* asset_keys = ce_cdb_a0->prop_keys(obj);
+        const uint64_t *asset_keys = ce_cdb_a0->prop_keys(obj);
 
         for (uint32_t i = 0; i < n; ++i) {
             uint64_t k = asset_keys[i];
@@ -208,18 +193,19 @@ void _scan_files(char **files,
             const char *resource_name;
             resource_name = ce_id_a0->str_from_id64(k);
 
-            struct ct_resource_id rid;
-            if (!type_name_from_filename(resource_name, &rid, NULL)) {
-                ce_log_a0->error(LOG_WHERE,
-                                 "Invalid format for resource %s:%s ",
-                                 filename, resource_name);
-                continue;
-            }
+            uint64_t uid = strtoul(resource_name, NULL, 0);
+            struct ct_resource_id rid = {.uid = uid};
 
+            const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+            uint64_t res_obj = ce_cdb_a0->read_subobject(reader, k, 0);
+
+            reader = ce_cdb_a0->read(res_obj);
+            const char *type = ce_cdb_a0->read_str(reader, ASSET_TYPE_PROP, "");
+            const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
 
             int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
             ct_builddb_a0->put_file(filename, mtime);
-            ct_builddb_a0->put_resource_2(resource_name, rid, filename);
+            ct_builddb_a0->put_resource(rid, type, filename, name);
         }
     }
 }
@@ -231,7 +217,7 @@ void _scan_files(char **files,
 
 char *resource_compiler_get_build_dir(struct ce_alloc *a,
                                       const char *platform) {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
     const char *build_dir_str = ce_cdb_a0->read_str(reader,
                                                     CONFIG_BUILD, "");
@@ -245,7 +231,7 @@ char *resource_compiler_get_build_dir(struct ce_alloc *a,
 void resource_compiler_create_build_dir(struct ce_config_a0 config) {
     CE_UNUSED(config);
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
     char *build_dir_full = resource_compiler_get_build_dir(
             _G.allocator,
@@ -300,24 +286,8 @@ void _compile_all() {
 
 
 void resource_compiler_compile_all() {
-//    Map<uint64_t> compieled(_G.allocator);
-
-//    _compile_all(compieled);
     _compile_all();
 }
-
-int resource_compiler_get_filename(char *filename,
-                                   size_t max_ken,
-                                   struct ct_resource_id resource_id) {
-    char build_name[128] = {};
-    ct_resource_a0->type_name_string(build_name, CE_ARRAY_LEN(build_name),
-                                     resource_id);
-
-    return ct_builddb_a0->get_fullname(filename, max_ken,
-                                       resource_id.type,
-                                       resource_id.name);
-}
-
 
 char *resource_compiler_get_tmp_dir(struct ce_alloc *alocator,
                                     const char *platform) {
@@ -332,7 +302,7 @@ char *resource_compiler_get_tmp_dir(struct ce_alloc *alocator,
 char *resource_compiler_external_join(struct ce_alloc *alocator,
                                       const char *name) {
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
     const char *external_dir_str = ce_cdb_a0->read_str(reader,
                                                        CONFIG_EXTERNAL,
@@ -357,13 +327,14 @@ char *resource_compiler_external_join(struct ce_alloc *alocator,
 }
 
 
-void compile_and_reload(uint64_t type,
-                        uint64_t name) {
-    struct ct_resource_id rid = {.type=type, .name=name};
+void compile_and_reload(uint64_t name) {
+    struct ct_resource_id rid = {.uid = name};
 
+    uint64_t type = ct_builddb_a0->get_resource_type(rid);
     uint64_t asset_obj = ct_sourcedb_a0->get(rid);
     uint64_t output_obj = 0;
-    ct_resource_compilator_t compilator = _find_compilator(rid.type);
+
+    ct_resource_compilator_t compilator = _find_compilator(type);
     if (!compilator) {
         output_obj = asset_obj;
     } else {
@@ -394,10 +365,8 @@ static void _init_cvar(struct ce_config_a0 *config) {
 static struct ct_resource_compiler_a0 resource_compiler_api = {
         .compile_and_reload = compile_and_reload,
         .compile_all = resource_compiler_compile_all,
-        .get_filename = resource_compiler_get_filename,
         .get_tmp_dir = resource_compiler_get_tmp_dir,
         .external_join = resource_compiler_external_join,
-        .type_name_from_filename = type_name_from_filename,
 };
 
 
@@ -413,7 +382,7 @@ static void _init(struct ce_api_a0 *api) {
     _init_cvar(ce_config_a0);
     api->register_api("ct_resource_compiler_a0", &resource_compiler_api);
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
     const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");

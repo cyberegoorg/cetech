@@ -304,7 +304,7 @@ static void cetech_kernel_start() {
         }
     }
 
-#if 1
+#if 0
     char *buf = NULL;
     uint64_t r = ct_sourcedb_a0->get((struct ct_resource_id) {
             .type = ENTITY_RESOURCE_ID,

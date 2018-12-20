@@ -1,10 +1,14 @@
-content/scene/solider/head.material:
-  PREFAB: content/material1.material
+"0x6c8bca84fa0d4431": #content/scene/solider/head.material:
+  asset_name: "content/scene/solider/head"
+  asset_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/scene/solider/head01
+          value: 0x8beb8d2b20191aba
 
-content/scene/solider/head01.texture:
+"0x8beb8d2b20191aba": #content/scene/solider/head01.texture:
+  asset_name: "content/scene/solider/head01"
+  asset_type: "texture"
   input: content/scene/solider/head01.tga

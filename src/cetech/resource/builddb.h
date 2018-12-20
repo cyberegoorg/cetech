@@ -11,13 +11,14 @@ struct ct_builddb_a0 {
     void (*put_file)(const char *filename,
                      time_t mtime);
 
-    void (*put_resource_2)(const char *fullname,
-                           struct ct_resource_id rid,
-                           const char *filename);
-
     void (*put_resource)(struct ct_resource_id rid,
-                         const char *data,
-                         uint64_t size);
+                         const char *type,
+                         const char *filename,
+                         const char *name);
+
+    void (*put_resource_blob)(struct ct_resource_id rid,
+                              const char *data,
+                              uint64_t size);
 
     void (*set_file_depend)(const char *filename,
                             const char *depend_on);
@@ -26,21 +27,19 @@ struct ct_builddb_a0 {
                           uint64_t object,
                           struct ce_alloc *allocator);
 
-    int (*get_filename_from_type_name)(char *filename,
-                                       size_t max_len,
-                                       uint64_t type,
-                                       uint64_t name);
-
-
-    int (*get_fullname)(char *fullname,
-                        size_t max_len,
-                        uint64_t type,
-                        uint64_t name);
-
     void (*add_dependency)(const char *who_filename,
                            const char *depend_on_filename);
 
     int (*need_compile)(const char *filename);
+
+    uint64_t (*get_resource_type)(struct ct_resource_id resource);
+
+    uint64_t (*get_resource_filename)(struct ct_resource_id resource,
+                                      char *filename,
+                                      size_t max_len);
+
+    void (*get_resource_by_fullname)(const char *fullname,
+                                     struct ct_resource_id *resource);
 
     int (*get_resource_dirs)(char ***filename,
                              struct ce_alloc *alloc);

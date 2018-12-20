@@ -36,10 +36,10 @@
 //==============================================================================
 
 struct _G {
+    struct ce_hash_t res_map;
     struct ce_hash_t type_map;
 
     struct ce_cdb_t db;
-    uint64_t resource_db;
 
     uint64_t config;
     struct ce_alloc *allocator;
@@ -54,58 +54,32 @@ struct _G {
 // Public interface
 //==============================================================================
 
-static int type_name_string(char *str,
-                            size_t max_len,
-                            struct ct_resource_id resourceid) {
-    return snprintf(str, max_len, "%"
-            PRIx64
-            "%"
-            PRIx64, resourceid.type, resourceid.name);
-}
-
 static void _resource_api_add(uint64_t name,
                               void *api) {
     struct ct_resource_i0 *ct_resource_i = api;
-
-    uint64_t type_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_G.resource_db);
-    ce_cdb_a0->set_subobject(w, ct_resource_i->cdb_type(), type_obj);
-    ce_cdb_a0->write_commit(w);
-
     ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
                 _G.allocator);
 }
 
-static void load(uint64_t type,
-                 const uint64_t *names,
+static void load(const uint64_t *names,
                  size_t count,
                  int force);
 
 static uint64_t get_obj(struct ct_resource_id resource_id);
 
-static void load_now(uint64_t type,
-                     const uint64_t *names,
+static void load_now(const uint64_t *names,
                      size_t count) {
-    load(type, names, count, 0);
+    load(names, count, 0);
 }
 
-static int can_get(uint64_t type,
-                   uint64_t name) {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
-
-    return ce_cdb_a0->prop_exist(type_obj, name);
+static int can_get(uint64_t name) {
+    return ce_hash_contain(&_G.res_map, name);
 }
 
-static int can_get_all(uint64_t type,
-                       const uint64_t *names,
+static int can_get_all(const uint64_t *names,
                        size_t count) {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
-
     for (size_t i = 0; i < count; ++i) {
-        if (!ce_cdb_a0->prop_exist(type_obj, names[i])) {
+        if (!ce_hash_contain(&_G.res_map, names[i])) {
             return 0;
         }
     }
@@ -118,17 +92,10 @@ static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
 }
 
 
-static void load(uint64_t type,
-                 const uint64_t *names,
+static void load(const uint64_t *names,
                  size_t count,
                  int force) {
     uint32_t start_ticks = ce_os_a0->time->ticks();
-
-    struct ct_resource_i0 *resource_i = get_resource_interface(type);
-
-    if (!resource_i) {
-        return;
-    }
 
     uint64_t resource_objects[count];
 
@@ -137,26 +104,29 @@ static void load(uint64_t type,
 
         const uint64_t asset_name = names[i];
 
-        if (!force && can_get(type, asset_name)) {
+        if (!force && can_get(asset_name)) {
             continue;
         };
+
+        uint64_t type = ct_builddb_a0->get_resource_type(
+                (struct ct_resource_id) {.uid=asset_name});
+
+        struct ct_resource_i0 *resource_i = get_resource_interface(type);
+
+        if (!resource_i) {
+            return;
+        }
 
         uint64_t object = ce_cdb_a0->create_object(_G.db,
                                                    resource_i->cdb_type());
         resource_objects[i] = object;
 
-        struct ct_resource_id rid = (struct ct_resource_id) {
-                .name = asset_name,
-                .type = type,
-        };
+        struct ct_resource_id rid = {.uid = asset_name};
 
-        char filename[1024] = {};
-        ct_resource_compiler_a0->get_filename(filename, CE_ARRAY_LEN(filename),
-                                              rid);
-
-        ce_log_a0->debug(LOG_WHERE, "Loading resource %s", filename);
+        ce_log_a0->debug(LOG_WHERE, "Loading resource 0x%llx", rid.uid);
         if (!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
-            ce_log_a0->error(LOG_WHERE, "Could not load resource %s", filename);
+            ce_log_a0->error(LOG_WHERE,
+                             "Could not load resource 0x%llx", rid.uid);
             ce_cdb_a0->destroy_object(object);
             continue;
         }
@@ -164,68 +134,41 @@ static void load(uint64_t type,
         if (resource_i->online) {
             resource_i->online(names[i], object);
         }
-
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(object);
-        ce_cdb_a0->set_uint64(w, RESOURCE_NAME_PROP, names[i]);
-        ce_cdb_a0->set_uint64(w, RESOURCE_TYPE_PROP, type);
-        ce_cdb_a0->write_commit(w);
-    }
-
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
-    ce_cdb_obj_o *w;
-    do {
-        w = ce_cdb_a0->write_begin(type_obj);
-        for (uint32_t i = 0; i < count; ++i) {
-            if (!resource_objects[i]) continue;
-
-            const uint64_t asset_name = names[i];
-
-            ce_cdb_a0->set_ref(w, asset_name, resource_objects[i]);
-        }
-    } while (!ce_cdb_a0->write_try_commit(w));
-
-    uint32_t now_ticks = ce_os_a0->time->ticks();
-    uint32_t dt = now_ticks - start_ticks;
-    ce_log_a0->debug(LOG_WHERE, "load time %f for %zu resource", dt * 0.001,
-                     count);
-}
-
-static void unload(uint64_t type,
-                   const uint64_t *names,
-                   size_t count) {
-
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader, type, 0);
-
-    struct ct_resource_i0 *resource_i = get_resource_interface(type);
-
-    if (!resource_i) {
-        return;
     }
 
     for (uint32_t i = 0; i < count; ++i) {
+        if (!resource_objects[i]) continue;
+
+        const uint64_t asset_name = names[i];
+
+        ce_hash_add(&_G.res_map, asset_name, resource_objects[i], _G.allocator);
+    }
+
+    uint32_t now_ticks = ce_os_a0->time->ticks();
+    uint32_t dt = now_ticks - start_ticks;
+    ce_log_a0->debug(LOG_WHERE,
+                     "load time %f for %zu resource", dt * 0.001, count);
+}
+
+static void unload(const uint64_t *names,
+                   size_t count) {
+
+    for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
-            char build_name[128] = {};
             struct ct_resource_id rid = (struct ct_resource_id) {
-                    .type = type,
-                    .name = names[i],
+                    .uid = names[i],
             };
 
-            type_name_string(build_name, CE_ARRAY_LEN(build_name), rid);
+            uint64_t type = ct_builddb_a0->get_resource_type(rid);
 
-            char filename[1024] = {};
-            ct_resource_compiler_a0->get_filename(filename,
-                                                  CE_ARRAY_LEN(filename),
-                                                  rid);
+            struct ct_resource_i0 *resource_i = get_resource_interface(type);
+            if (!resource_i) {
+                continue;
+            }
 
-            ce_log_a0->debug(LOG_WHERE, "Unload resource %s ", filename);
+            ce_log_a0->debug(LOG_WHERE, "Unload resource %llux ", rid.uid);
 
-
-            const ce_cdb_obj_o * reader = ce_cdb_a0->read(type_obj);
-            uint64_t object;
-            object = ce_cdb_a0->read_ref(reader, rid.name, 0);
-
+            uint64_t object = ce_hash_lookup(&_G.res_map, rid.uid, 0);
             if (!object) {
                 continue;
             }
@@ -238,41 +181,19 @@ static void unload(uint64_t type,
 }
 
 static uint64_t get_obj(struct ct_resource_id resource_id) {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader,
-                                            resource_id.type, 0);
-
-    if (!type_obj) {
-        return 0;
-    }
-
-
-    const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
-
-    uint64_t object;
-    object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
-
+    uint64_t object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
     if (!object) {
-        char build_name[128] = {};
-        type_name_string(build_name, CE_ARRAY_LEN(build_name), resource_id);
+        ce_log_a0->warning(LOG_WHERE, "Loading resource 0x%llx",
+                           resource_id.uid);
+        load_now(&resource_id.uid, 1);
 
-        char filename[1024] = {};
-        ct_resource_compiler_a0->get_filename(filename,
-                                              CE_ARRAY_LEN(filename),
-                                              resource_id);
-
-        ce_log_a0->warning(LOG_WHERE, "Loading resource %s", filename);
-        load_now(resource_id.type, &resource_id.name, 1);
-
-        const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
-        object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
+        object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
     }
 
     return object;
 }
 
-static void reload(uint64_t type,
-                   const uint64_t *names,
+static void reload(const uint64_t *names,
                    size_t count) {
 }
 
@@ -281,35 +202,27 @@ static void reload_all() {
 
 static void put(struct ct_resource_id resource_id,
                 uint64_t obj) {
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.resource_db);
-    uint64_t type_obj = ce_cdb_a0->read_ref(reader,
-                                            resource_id.type, 0);
 
-    if (!type_obj) {
-        return;
-    }
-
-    const ce_cdb_obj_o * type_reader = ce_cdb_a0->read(type_obj);
-    uint64_t object;
-    object = ce_cdb_a0->read_ref(type_reader, resource_id.name, 0);
+    uint64_t object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
 
     if (!object) {
         return;
     }
 
-    struct ct_resource_i0 *resource_i = get_resource_interface(
-            resource_id.type);
+    uint64_t type = ct_builddb_a0->get_resource_type(resource_id);
+
+    struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
     if (!resource_i) {
         return;
     }
 
     if (resource_i->online) {
-        resource_i->online(resource_id.name, obj);
+        resource_i->online(resource_id.uid, obj);
     }
 
     if (resource_i->offline) {
-        resource_i->offline(resource_id.name, object);
+        resource_i->offline(resource_id.uid, object);
     }
 
     ce_cdb_a0->move(obj, object);
@@ -326,7 +239,7 @@ static struct ct_resource_a0 resource_api = {
         .can_get_all = can_get_all,
         .get = get_obj,
         .reload_from_obj = put,
-        .type_name_string = type_name_string,
+//        .type_name_string = type_name_string,
 };
 
 
@@ -362,9 +275,8 @@ static void _init(struct ce_api_a0 *api) {
             .db = ce_cdb_a0->db()
     };
 
-    _G.resource_db = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
 
     ce_fs_a0->map_root_dir(BUILD_ROOT,
                            ce_cdb_a0->read_str(reader, CONFIG_BUILD, ""),

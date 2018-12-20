@@ -196,8 +196,7 @@ static void on_debugui(uint64_t dock) {
 static bool init() {
     _G.visible = true;
     _G.world = ct_ecs_a0->create_world();
-    _G.camera_ent = ct_ecs_a0->spawn(_G.world,
-                                     ce_id_a0->id64("content/camera"));
+    _G.camera_ent = ct_ecs_a0->spawn(_G.world, 0x57899875c4457313);
     _G.viewport = ct_renderer_a0->create_viewport(_G.world, _G.camera_ent);
 
     return true;

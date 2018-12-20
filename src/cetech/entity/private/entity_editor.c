@@ -307,9 +307,9 @@ static void open(uint64_t context_obj) {
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader, _ASSET_NAME,
                                                        0);
 
-    editor->camera_ent = ct_ecs_a0->spawn(editor->world,
-                                          ce_id_a0->id64("content/camera"));
-    editor->viewport = ct_renderer_a0->create_viewport(editor->world, editor->camera_ent);
+    editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
+    editor->viewport = ct_renderer_a0->create_viewport(editor->world,
+                                                       editor->camera_ent);
 
     editor->entity_name = asset_name;
 

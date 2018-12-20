@@ -859,8 +859,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint64_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
-            .type = ENTITY_RESOURCE_ID,
-            .name = name,
+            .uid= name
     };
 
     uint64_t obj = ct_resource_a0->get(rid);

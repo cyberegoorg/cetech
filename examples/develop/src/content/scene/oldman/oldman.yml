@@ -1,4 +1,6 @@
-content/scene/oldman/oldman.scene:
+"0xb7baa30d19deb859": #content/scene/oldman/oldman.scene:
+  asset_name: "content/scene/oldman/oldman"
+  asset_type: "scene"
   import:
     input: content/scene/oldman/muro.fbx
     #    input: content/scene/duck/duck.dae

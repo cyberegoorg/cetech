@@ -147,8 +147,7 @@ static void shutdown() {
 
 static uint64_t resource_data(uint64_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
-            .type = SCENE_TYPE,
-            .name = name,
+            .uid = name,
     };
 
     return ct_resource_a0->get(rid);

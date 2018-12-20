@@ -161,7 +161,7 @@ static void output_pass_on_pass(void *inst,
     ct_gfx_a0->set_view_transform(viewid, NULL, proj);
 
     if (!copy_material) {
-        copy_material = ct_material_a0->create(ce_id_a0->id64("content/copy"));
+        copy_material = ct_material_a0->create(0xe27880f9fbb28b8d);
     }
 
     ct_render_texture_handle_t th;

@@ -1,4 +1,6 @@
-content/level1.entity:
+"0x760e8bb947748608": #content/level1.entity:
+  asset_name: "content/level1"
+  asset_type: "entity"
   name: Level 1
   components:
     transform:
@@ -9,7 +11,7 @@ content/level1.entity:
   children:
     5564343313252:
       name: box1
-      PREFAB: content/box1.entity
+      PREFAB: "0x758816087ff520e8"
       components:
         transform:
           position.x: 0.000000
@@ -25,8 +27,8 @@ content/level1.entity:
 
     55643433135454252:
       name: box2
-      PREFAB: content/box2.entity
+      PREFAB: "0xf7f5289f75e5f044"
 
     55643423443313252:
       name: m4a1
-      PREFAB: content/m4a1.entity
+      PREFAB: "0xa5b5b7d709edff98"

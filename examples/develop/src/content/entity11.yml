@@ -1,5 +1,7 @@
-content/entity11.entity:
-  PREFAB: content/entity10.entity
+"0x28de171dc70e95fe": #content/entity11.entity:
+  asset_name: "content/entity11"
+  asset_type: "entity"
+  PREFAB: 0x302b4d0ffd1a296c
   components:
     transform:
       position.x: 0.000000

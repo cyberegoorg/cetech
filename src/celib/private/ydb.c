@@ -21,12 +21,13 @@
 
 enum node_type {
     NODE_INVALID = 0,
-    NODE_FLOAT = 1,
-    NODE_STRING = 2,
-    NODE_TRUE = 3,
-    NODE_FALSE = 4,
-    NODE_MAP = 5,
-    NODE_SEQ = 6,
+    NODE_FLOAT,
+    NODE_UINT,
+    NODE_STRING,
+    NODE_TRUE,
+    NODE_FALSE,
+    NODE_MAP,
+    NODE_SEQ,
 };
 
 static struct _G {
@@ -43,6 +44,7 @@ static const char *get_key(uint64_t hash) {
 struct node_value {
     union {
         float f;
+        uint64_t ui;
         char *string;
         uint32_t node_count;
     };
@@ -68,7 +70,13 @@ static void type_value_from_scalar(const uint8_t *scalar,
     float f;
 
     if (!is_key) {
-        if (sscanf(scalar_str, "%f", &f)) {
+        if ((scalar_str[0] == '0') && (scalar_str[1] == 'x')) {
+            uint64_t v = strtoul(scalar_str, NULL, 0);
+            *type = NODE_UINT;
+            *vallue = (struct node_value) {.ui = v};
+            return;
+
+        } else if (sscanf(scalar_str, "%f", &f)) {
             *type = NODE_FLOAT;
             *vallue = (struct node_value) {.f = f};
             return;
@@ -84,6 +92,7 @@ static void type_value_from_scalar(const uint8_t *scalar,
             *type = NODE_FALSE;
             return;
         }
+
     }
 
     *type = NODE_STRING;
@@ -292,6 +301,10 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                             ce_cdb_a0->set_float(w, key, value.f);
                             break;
 
+                        case NODE_UINT:
+                            ce_cdb_a0->set_uint64(w, key, value.ui);
+                            break;
+
                         case NODE_STRING:
                             ce_cdb_a0->set_str(w, key, value.string);
                             break;
@@ -328,11 +341,12 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                             ce_array_push(s->str_array, value.string, alloc);
                             break;
 
-                        case NODE_INVALID:
+                        case NODE_UINT:
                         case NODE_TRUE:
                         case NODE_FALSE:
                         case NODE_MAP:
                         case NODE_SEQ:
+                        case NODE_INVALID:
                             break;
                     }
 
@@ -451,7 +465,7 @@ static void dump_yaml(char **buffer,
                       uint64_t from,
                       uint32_t level) {
     const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-    const uint64_t* keys = ce_cdb_a0->prop_keys(from);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(from);
 
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
@@ -468,7 +482,7 @@ static void dump_yaml(char **buffer,
 
         enum ce_cdb_type type = ce_cdb_a0->prop_type(from, key);
 
-        const ce_cdb_obj_o * reader = ce_cdb_a0->read(from);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(from);
 
         switch (type) {
             case CDB_TYPE_SUBOBJECT: {

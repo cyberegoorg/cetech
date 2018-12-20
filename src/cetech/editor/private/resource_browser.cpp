@@ -68,12 +68,12 @@ static void _broadcast_edit() {
                                      RESOURCE_DCLICK_EVENT);
 
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, _G.selected_asset.name);
-    ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, _G.selected_asset.type);
+    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, _G.selected_asset.uid);
     ce_cdb_a0->set_uint64(w, RESOURCE_BROWSER_ROOT, RESOURCE_BROWSER_SOURCE);
     ce_cdb_a0->write_commit(w);
 
-    ce_ebus_a0->broadcast_obj(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT, event);
+    ce_ebus_a0->broadcast_obj(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT,
+                              event);
 }
 
 static void _broadcast_selected(uint64_t dock) {
@@ -81,7 +81,8 @@ static void _broadcast_selected(uint64_t dock) {
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                    0);
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 
@@ -190,14 +191,17 @@ static void ui_asset_tooltip(ct_resource_id resourceid,
                              const char *path) {
     ct_debugui_a0->Text("%s", path);
 
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(resourceid.type);
+    uint64_t type = ct_builddb_a0->get_resource_type(resourceid);
+
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
 
     if (!ri || !ri->get_interface) {
         return;
     }
 
     ct_resource_preview_i0 *ai = \
-                (ct_resource_preview_i0 *) (ri->get_interface(RESOURCE_PREVIEW_I));
+                (ct_resource_preview_i0 *) (ri->get_interface(
+            RESOURCE_PREVIEW_I));
 
     if (!ai->tooltip) {
         return;
@@ -237,10 +241,8 @@ static void ui_asset_list(uint64_t dock) {
                 continue;
             }
 
-            struct ct_resource_id resourceid = {.i128={}};
-            ct_resource_compiler_a0->type_name_from_filename(path, &resourceid,
-                                                             NULL);
-
+            struct ct_resource_id resourceid = {};
+            ct_builddb_a0->get_resource_by_fullname(path, &resourceid);
 
             char label[128];
 
@@ -280,15 +282,13 @@ static void ui_asset_list(uint64_t dock) {
                         RESOURCE_BROWSER_ASSET_TYPE);
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
-                ce_cdb_a0->set_uint64(w, RESOURCE_NAME, resourceid.name);
-                ce_cdb_a0->set_uint64(w, RESOURCE_TYPE, resourceid.type);
+                ce_cdb_a0->set_uint64(w, RESOURCE_NAME, resourceid.uid);
                 ce_cdb_a0->write_commit(w);
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &selected_asset,
                                                   sizeof(uint64_t),
                                                   DebugUICond_Once);
-
                 ct_debugui_a0->EndDragDropSource();
             }
         }

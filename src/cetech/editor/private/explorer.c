@@ -69,8 +69,8 @@ static void draw_menu(uint64_t selected_obj) {
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(top_level_obj);
 
-    if (ce_cdb_a0->prop_exist(top_level_obj, RESOURCE_NAME)) {
-        const char *name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, "");
+    if (ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME_PROP)) {
+        const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
         ct_debugui_a0->Text("Asset: %s", name);
         ct_debugui_a0->SameLine(0, 10);
     }

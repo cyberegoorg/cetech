@@ -1,3 +1,5 @@
-content/shader2.shader:
+"0xa6ad6fe0a13cd90e": #content/shader2.shader:
+  asset_name: "content/shader2"
+  asset_type: "shader"
   vs_input: 'content/vs_shader1.sc'
   fs_input: 'content/fs_shader2.sc'

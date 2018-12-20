@@ -1,6 +1,8 @@
 #version: 0
 #kind: cetech_asset_def
-content/entity1.entity:
+"0x5014fc2ca4146206": #content/entity1.entity:
+  asset_name: "content/entity1"
+  asset_type: "entity"
   components:
     transform:
       position.x: 0.000000
@@ -13,9 +15,9 @@ content/entity1.entity:
       scale.y: 1.000000
       scale.z: 1.000000
     mesh_renderer:
-      scene: content/scene/m4a1/m4a1
+      scene: "0xd3276608fb728ffb"
       mesh: geom_0
-      material: content/material1
+      material: 0x24c9413e88ebaaa8
 
   children:
     e432c0ed88dd461e81f50973ffb00263:

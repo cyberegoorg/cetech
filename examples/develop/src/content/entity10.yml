@@ -1,4 +1,6 @@
-content/entity10.entity:
+"0x302b4d0ffd1a296c": #content/entity10.entity:
+  asset_name: "content/entity10"
+  asset_type: "entity"
   components:
     transform:
       position.x: 0.000000
@@ -12,9 +14,9 @@ content/entity10.entity:
       scale.z: 1.000000
 
     mesh_renderer:
-      scene: "content/scene/oldman/oldman"
+      scene: "0xb7baa30d19deb859"
       mesh: "muro_main"
-      material: "content/scene/solider/head"
+      material: "0x6c8bca84fa0d4431"
 
   children:
     "e432c0ed88dd461e81f50973ffb00263":

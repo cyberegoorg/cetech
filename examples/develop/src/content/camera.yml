@@ -1,4 +1,6 @@
-content/camera.entity:
+"0x57899875c4457313": #content/camera.entity:
+  asset_name: "content/camera"
+  asset_type: "entity"
   components:
     transform:
       position.x: 0.000000

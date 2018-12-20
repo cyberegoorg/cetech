@@ -1,7 +1,9 @@
-content/material2.material:
-  PREFAB: content/material1.material
+"0xa457c59ab73492aa": #content/material2.material:
+  asset_name: "content/material2"
+  asset_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/texture2
+          value: "0xe1ab713dde582de1"

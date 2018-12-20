@@ -1,4 +1,6 @@
-content/m4a1.entity:
+"0xa5b5b7d709edff98": #content/m4a1.entity:
+  asset_name: "content/m4a1"
+  asset_type: "entity"
   name: body
   components:
     transform:
@@ -27,9 +29,9 @@ content/m4a1.entity:
           scale.z: 1.000000
 
         mesh_renderer:
-          scene: content/scene/m4a1/m4a1
+          scene: "0xd3276608fb728ffb"
           mesh: geom_0
-          material: content/scene/m4a1/m4a1
+          material: "0x24c9413e88ebaaa8"
 
     NMNMFBDDMvln8779NJKK:
       components:
@@ -45,6 +47,6 @@ content/m4a1.entity:
           scale.z: 1.000000
 
         mesh_renderer:
-          scene: content/scene/m4a1/m4a1
+          scene: "0xd3276608fb728ffb"
           mesh: geom_1
-          material: content/scene/m4a1/m4a1
+          material: "0x24c9413e88ebaaa8"

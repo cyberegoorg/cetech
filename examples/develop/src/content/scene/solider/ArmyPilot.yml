@@ -1,4 +1,6 @@
-content/scene/solider/ArmyPilot.scene:
+"0xdb8022af117db75b": #content/scene/solider/ArmyPilot.scene:
+  asset_name: "content/scene/solider/ArmyPilot"
+  asset_type: "scene"
   import:
     input: content/scene/solider/ArmyPilot.dae
 

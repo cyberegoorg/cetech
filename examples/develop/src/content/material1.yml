@@ -1,8 +1,10 @@
-content/material1.material:
+"0x24c9413e88ebaaa8": #content/material1.material:
+  asset_name: "content/material1"
+  asset_type: "material"
   layers:
     gbuffer:
       name: gbuffer
-      shader: content/shader1
+      shader: "0x7ecb3362fa2b019c"
 
       render_state:
         rgb_write: true
@@ -16,7 +18,7 @@ content/material1.material:
         kdasdvxcvcxbxcbxbg435124asdkj:
           name: u_texColor
           type: texture
-          value: content/scene/solider/body01
+          value: "0x7276a6db35892341"
 
         k22cbxbg435124asdkj:
           name: u_vec4

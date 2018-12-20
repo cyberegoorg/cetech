@@ -216,10 +216,11 @@ static void draw_property(uint64_t obj) {
     float size[2] = {64, 64};
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
-    const char *name = ce_cdb_a0->read_str(reader, RESOURCE_NAME, 0);
+    struct ct_render_texture_handle texture = {
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
+                                                     TEXTURE_HANDLER_PROP, 0)
+    };
 
-    ct_render_texture_handle_t texture;
-    texture = ct_texture_a0->get(ce_id_a0->id64(name));
     ct_debugui_a0->Image(texture,
                          size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
@@ -287,7 +288,7 @@ void texture_shutdown() {
 }
 
 ct_render_texture_handle_t texture_get(uint64_t name) {
-    struct ct_resource_id rid = {.type = TEXTURE_TYPE, .name = name};
+    struct ct_resource_id rid = {.uid = name};
     uint64_t obj = ct_resource_a0->get(rid);
 
     if (!obj) {

@@ -1,12 +1,16 @@
-content/scene/m4a1/m4a1.material:
-  PREFAB: content/material1.material
+"0xb064b7debf827845": #content/scene/m4a1/m4a1.material:
+  asset_name: "content/scene/m4a1/m4a1"
+  asset_type: "texture"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/scene/m4a1/m4_diff
+          value: "0x1c80b5de261dcdce"
 
-content/scene/m4a1/m4a1.scene:
+"0xd3276608fb728ffb": #content/scene/m4a1/m4a1.scene:
+  asset_name: "content/scene/m4a1/m4a1"
+  asset_type: "scene"
   import:
     input: content/scene/m4a1/M4A1.fbx
     #    input: content/scene/duck/duck.dae
@@ -14,6 +18,8 @@ content/scene/m4a1/m4a1.scene:
     postprocess:
       flip_uvs: true
 
-content/scene/m4a1/m4_diff.texture:
+"0x1c80b5de261dcdce": #content/scene/m4a1/m4_diff.texture:
+  asset_name: "content/scene/m4a1/m4_diff"
+  asset_type: "texture"
   input: content/scene/m4a1/m4_diff.tga
   gen_mipmaps: yes

@@ -1,4 +1,6 @@
-content/texture1.texture:
+"0x2d523a81d1791140": #content/texture1.texture:
+  asset_name: "content/texture1"
+  asset_type: "texture"
   input: content/texture2.png
   gen_mipmaps: yes
   is_normalmap: no

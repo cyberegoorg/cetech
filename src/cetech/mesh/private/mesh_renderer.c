@@ -65,17 +65,16 @@ void foreach_mesh_renderer(struct ct_world world,
         const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(transform);
         const ce_cdb_obj_o *mr_reader = ce_cdb_a0->read(mesh_renderer);
 
-        uint64_t scene = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
-                                                            PROP_SCENE_ID,
-                                                            0));
+        uint64_t scene = ce_cdb_a0->read_ref(mr_reader,
+                                             PROP_SCENE_ID, 0);
 
         if (!scene) {
             continue;
         }
 
-        uint64_t material = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
-                                                               PROP_MATERIAL,
-                                                               0));
+        uint64_t material = ce_cdb_a0->read_ref(mr_reader,
+                                                PROP_MATERIAL,
+                                                0);
 
         if (!material) {
             continue;
@@ -91,8 +90,7 @@ void foreach_mesh_renderer(struct ct_world world,
         }
 
         struct ct_resource_id rid = (struct ct_resource_id) {
-                .type = SCENE_TYPE,
-                .name = scene,
+                .uid = scene,
         };
 
         uint64_t scene_obj = ct_resource_a0->get(rid);
@@ -127,7 +125,7 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_gfx_a0->set_vertex_buffer(0, vbh, 0, vb_size);
         ct_gfx_a0->set_index_buffer(ibh, 0, ib_size);
 
-        struct ct_resource_id material_resource = {.type = MATERIAL_TYPE, .name = material};
+        struct ct_resource_id material_resource = {.uid = material};
         uint64_t material_obj = ct_resource_a0->get(material_resource);
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
@@ -152,8 +150,7 @@ void mesh_combo_items(uint64_t obj,
                       uint32_t *items_count) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
 
-    const char *scene = ce_cdb_a0->read_str(reader, PROP_SCENE_ID, 0);
-    uint64_t scene_id = ce_id_a0->id64(scene);
+    uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 
     if (!scene_id) {
         return;
@@ -166,8 +163,8 @@ void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
-    const char *scene = ce_cdb_a0->read_str(reader, PROP_SCENE_ID, 0);
-    uint64_t scene_id = ce_id_a0->id64(scene);
+
+    uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 
     if (!scene_id) {
         return;
@@ -188,25 +185,17 @@ static const char *display_name() {
 static void property_editor(uint64_t obj) {
 
     ct_resource_ui_a0->ui_resource(obj,
-                                   PROP_SCENE_ID, "Scene",
-                                   PROP_SCENE_ID,
-                                   obj);
+                                   PROP_SCENE_ID, "Scene", PROP_SCENE_ID, obj);
 
     ct_resource_ui_a0->ui_str_combo(obj,
-                                    PROP_MESH, "Mesh",
-                                    mesh_combo_items,
-                                    obj);
+                                    PROP_MESH, "Mesh", mesh_combo_items, obj);
 
     ct_resource_ui_a0->ui_str_combo(obj,
-                                    PROP_NODE, "Node",
-                                    node_combo_items,
-                                    obj);
+                                    PROP_NODE, "Node", node_combo_items, obj);
 
     ct_resource_ui_a0->ui_resource(obj,
-                                   ce_id_a0->id64("material"),
-                                   "Material",
-                                   ce_id_a0->id64("material"),
-                                   obj);
+                                   ce_id_a0->id64("material"), "Material",
+                                   ce_id_a0->id64("material"), obj);
 
 }
 

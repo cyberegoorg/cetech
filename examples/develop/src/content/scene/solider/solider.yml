@@ -1,18 +1,24 @@
-content/scene/solider/solider.material:
-  PREFAB: content/material1.material
+"0x17cc459fd7aabb62": #content/scene/solider/solider.material:
+  asset_name: "content/scene/solider/solider"
+  asset_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/scene/solider/body01
+          value: "0xac2be8f79389febc"
 
-content/scene/solider/body.material:
-  PREFAB: content/material1.material
+"0xac2be8f79389febc": #content/scene/solider/body.material:
+  asset_name: "content/scene/solider/body"
+  asset_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
     gbuffer:
       variables:
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/scene/solider/body01
+          value: "0x7276a6db35892341"
 
-content/scene/solider/body01.texture:
+"0x7276a6db35892341": #content/scene/solider/body01.texture:
+  asset_name: "content/scene/solider/body01"
+  asset_type: "texture"
   input: content/scene/solider/body01.tga

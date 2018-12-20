@@ -1,4 +1,6 @@
-content/box1.entity:
+"0x758816087ff520e8": #content/box1.entity:
+  asset_name: "content/box1"
+  asset_type: "entity"
   components:
     transform:
       position.x: 0.000000
@@ -24,9 +26,9 @@ content/box1.entity:
           scale.z: 1.000000
 
         mesh_renderer:
-          scene: "content/scene/oldman/oldman"
+          scene: "0xb7baa30d19deb859"
           mesh: "muro_main"
-          material: "content/scene/solider/head"
+          material: "0x6c8bca84fa0d4431"
 
         rotation:
           speed: 2.9
@@ -49,10 +51,10 @@ content/box1.entity:
           #        scene: "content/scene/solider/ArmyPilot"
           #        mesh: "Mesh1Mesh1"
 
-          scene: "content/scene/oldman/oldman"
+          scene: "0xb7baa30d19deb859"
           mesh: "muro_main"
 
-          material: "content/scene/solider/body"
+          material: "0xac2be8f79389febc"
 
         rotation:
           speed: 2.9
@@ -72,6 +74,6 @@ content/box1.entity:
           scale.z: 1.000000
 
         mesh_renderer:
-          scene: "content/scene/solider/ArmyPilot"
+          scene: "0xdb8022af117db75b"
           mesh: "Mesh1Mesh12"
-          material: "content/scene/solider/m4"
+          material: "0x52b240fd8003d4f8"

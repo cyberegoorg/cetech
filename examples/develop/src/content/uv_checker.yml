@@ -1,3 +1,5 @@
-content/uv_checker.texture:
+"0x8027fcdfa6ddd00b": #content/uv_checker.texture:
+  asset_name: "content/uv_checker"
+  asset_type: "texture"
   input: content/uv_checker.png
   gen_mipmaps: true

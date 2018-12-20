@@ -1,4 +1,6 @@
-content/box2.entity:
+"0xf7f5289f75e5f044": #content/box2.entity:
+  asset_name: "content/box2"
+  asset_type: "entity"
   components:
     transform:
       position.x: 10.000000
@@ -11,6 +13,6 @@ content/box2.entity:
       scale.y: 1.000000
       scale.z: 1.000000
     mesh_renderer:
-      scene: "content/scene/oldman/oldman"
+      scene: "0xb7baa30d19deb859"
       mesh: "muro_main"
-      material: "content/scene/solider/head"
+      material: "0x6c8bca84fa0d4431"

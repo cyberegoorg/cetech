@@ -32,6 +32,7 @@
 #include <cetech/resource/builddb.h>
 #include <bgfx/defines.h>
 #include <cetech/editor/property.h>
+#include <stdlib.h>
 
 #include "material.h"
 
@@ -123,7 +124,7 @@ static void online(uint64_t name,
 
             const ct_render_uniform_handle_t handler = \
             ct_gfx_a0->create_uniform(uniform_name,
-                                           _type_to_bgfx[type], 1);
+                                      _type_to_bgfx[type], 1);
 
             ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(var_obj);
             ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP,
@@ -258,9 +259,7 @@ static void draw_property(uint64_t material) {
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
 
-    struct ct_entity ent = ct_ecs_a0->spawn(world,
-                                            ce_id_a0->id64(
-                                                    "core/cube"));
+    struct ct_entity ent = ct_ecs_a0->spawn(world, 0x68373d25a0b84f58);
 
 //    struct ct_mesh *mesh;
 //    mesh = ct_ecs_a0->get_one(world, MESH_RENDERER_COMPONENT, ent);
@@ -306,8 +305,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 
 static uint64_t create(uint64_t name) {
     struct ct_resource_id rid = (struct ct_resource_id) {
-            .type = MATERIAL_TYPE,
-            .name = name,
+            .uid = name,
     };
 
     uint64_t object = ct_resource_a0->get(rid);
@@ -356,14 +354,9 @@ static void set_texture_handler(uint64_t material,
 
     uint64_t var = _find_slot_by_name(variables, slot);
     if (!var) {
-        uint64_t name = ce_cdb_a0->read_uint64(mat_reader, RESOURCE_NAME_PROP, 0);
+//        uint64_t name = ce_cdb_a0->read_uint64(mat_reader, RESOURCE_NAME_PROP, 0);
 
-        char fullname[128] = {};
-        ct_builddb_a0->get_fullname(fullname, CE_ARRAY_LEN(fullname),
-                                    MATERIAL_TYPE, name);
-
-        ce_log_a0->warning(LOG_WHERE, "invalid slot: %s for %s", slot,
-                           fullname);
+        ce_log_a0->warning(LOG_WHERE, "invalid slot: %s", slot);
         return;
     }
 
@@ -481,12 +474,12 @@ static void submit(uint64_t material,
                 break;
 
             case MAT_VAR_TEXTURE: {
-                uint64_t tn = ce_id_a0->id64(ce_cdb_a0->read_str(var_reader,
-                                                                 MATERIAL_VAR_VALUE_PROP,
-                                                                 0));
+                uint64_t tn = ce_cdb_a0->read_uint64(var_reader,
+                                                     MATERIAL_VAR_VALUE_PROP,
+                                                     0);
 
                 ct_gfx_a0->set_texture(texture_stage++, handle,
-                                            ct_texture_a0->get(tn), 0);
+                                       ct_texture_a0->get(tn), 0);
             }
                 break;
 
@@ -494,8 +487,8 @@ static void submit(uint64_t material,
                 uint64_t t = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
                 ct_gfx_a0->set_texture(texture_stage++, handle,
-                                            (ct_render_texture_handle_t) {.idx=(uint16_t) t},
-                                            0);
+                                       (ct_render_texture_handle_t) {.idx=(uint16_t) t},
+                                       0);
             }
                 break;
 
@@ -519,14 +512,13 @@ static void submit(uint64_t material,
         }
     }
 
-    const char *shader = ce_cdb_a0->read_str(layer_reader,
-                                             MATERIAL_SHADER_PROP,
-                                             0);
+    uint64_t shader = ce_cdb_a0->read_ref(layer_reader,
+                                          MATERIAL_SHADER_PROP,
+                                          0);
 
     uint64_t shader_obj = ct_resource_a0->get(
             (struct ct_resource_id) {
-                    .name = ce_id_a0->id64(shader),
-                    .type = SHADER_TYPE,
+                    .uid = shader,
             });
 
     if (!shader_obj) {

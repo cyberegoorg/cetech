@@ -63,9 +63,6 @@ struct ct_cdb_obj_t;
 #define MATERIAL_VAR_VALUE_PROP_W \
     CE_ID64_0("value.w", 0x7e696a767c2af865ULL)
 
-            #define MATERIAL_ASSET_NAME \
-    CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
-
 #define MATERIAL_LAYERS \
     CE_ID64_0("layers", 0x289219f856ee5cd6ULL)
 

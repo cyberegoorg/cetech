@@ -1,8 +1,10 @@
-content/copy.material:
+"0xe27880f9fbb28b8d": #content/copy.material:
+  asset_name: "content/copy"
+  asset_type: "material"
   layers:
     default:
       name: default
-      shader: content/copy
+      shader: "0xd693a02d1669a559"
 
       render_state:
         rgb_write: true
@@ -17,6 +19,8 @@ content/copy.material:
           name: s_input_texture
           type: texture
 
-content/copy.shader:
+"0xd693a02d1669a559": #content/copy.shader:
+  asset_name: "content/copy"
+  asset_type: "shader"
   vs_input: 'content/vs_copy.sc'
   fs_input: 'content/fs_copy.sc'
