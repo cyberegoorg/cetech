@@ -176,6 +176,7 @@ bool cetech_kernel_init(int argc,
     CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
+    ce_cdb_a0->set_loader(ct_resource_a0->cdb_loader);
     return true;
 }
 

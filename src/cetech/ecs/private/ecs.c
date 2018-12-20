@@ -862,9 +862,7 @@ static struct ct_entity spawn_entity(struct ct_world world,
             .uid= name
     };
 
-    uint64_t obj = ct_resource_a0->get(rid);
-
-    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), obj);
+    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), rid.uid);
 
     struct ct_entity root_ent = _spawn_entity(world, new_obj);
 

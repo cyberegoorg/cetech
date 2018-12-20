@@ -308,7 +308,7 @@ static uint64_t create(uint64_t name) {
             .uid = name,
     };
 
-    uint64_t object = ct_resource_a0->get(rid);
+    uint64_t object = rid.uid;
     return object;
 }
 
@@ -516,10 +516,7 @@ static void submit(uint64_t material,
                                           MATERIAL_SHADER_PROP,
                                           0);
 
-    uint64_t shader_obj = ct_resource_a0->get(
-            (struct ct_resource_id) {
-                    .uid = shader,
-            });
+    uint64_t shader_obj = shader;
 
     if (!shader_obj) {
         return;

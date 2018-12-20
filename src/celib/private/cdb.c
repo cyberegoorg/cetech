@@ -16,6 +16,8 @@
 #include <celib/buffer.inl>
 #include <celib/hashlib.h>
 #include <celib/ebus.h>
+#include <sys/time.h>
+#include <uuid/uuid.h>
 
 #define _G coredb_global
 #define LOG_WHERE "coredb"
@@ -26,9 +28,6 @@
 
 // TODO: non optimal braindump code
 // TODO: remove null element
-
-
-
 
 // TODO: X(
 struct object_t {
@@ -69,9 +68,7 @@ struct db_t {
     struct object_t ***free_objects_id;
     struct object_t ***to_free_objects_id;
 
-    atomic_ullong object_used;
     atomic_ullong to_free_objects_id_n;
-    atomic_ullong free_objects_id_n;
 
     // objects
     struct object_t *object_pool;
@@ -90,15 +87,55 @@ static struct _G {
 
     struct ce_alloc *allocator;
     struct ce_cdb_t global_db;
+
+    struct ce_spinlock id_map_lock;
+    struct ce_hash_t id_map;
+
+    ct_cdb_obj_loader loader;
 } _G;
 
+void set_loader(ct_cdb_obj_loader loader) {
+    _G.loader = loader;
+}
+
+static uint64_t _gen_uid() {
+
+    union {
+        uint64_t ui;
+    } id;
+
+    arc4random_buf(&id.ui, 8);
+
+//    ce_log_a0->debug(LOG_WHERE, "New UID 0x%llx", id.ui);
+
+    return id.ui;
+}
 
 static struct object_t *_get_object_from_id(uint64_t objid) {
     if (!objid) {
         return NULL;
     }
 
-    return *((struct object_t **) objid);
+begin:
+    ce_os_a0->thread->spin_lock(&_G.id_map_lock);
+    uint64_t obj = ce_hash_lookup(&_G.id_map, objid, 0);
+    ce_os_a0->thread->spin_unlock(&_G.id_map_lock);
+
+    if (!obj) {
+        if(_G.loader(objid)) {
+            goto begin;
+        }
+        return NULL;
+    }
+
+    return ((struct object_t *) obj);
+}
+
+static void _set_uid_obj(uint64_t uid,
+                         ce_cdb_obj_o *obj) {
+    ce_os_a0->thread->spin_lock(&_G.id_map_lock);
+    ce_hash_add(&_G.id_map, uid, (uint64_t) obj, _G.allocator);
+    ce_os_a0->thread->spin_unlock(&_G.id_map_lock);
 }
 
 static struct object_t *_get_object_from_o(const ce_cdb_obj_o *obj_o) {
@@ -173,18 +210,18 @@ struct object_t *_new_object(struct db_t *db,
     return obj;
 }
 
-static struct object_t **_new_object_id(struct db_t *db_inst) {
-    struct object_t **obj;
-    if (db_inst->free_objects_id_n) {
-        atomic_fetch_sub(&db_inst->free_objects_id_n, 1);
-        obj = db_inst->free_objects_id[db_inst->free_objects_id_n];
-    } else {
-        uint64_t idx = atomic_fetch_add(&db_inst->object_used, 1);
-        obj = db_inst->objects_mem + idx;
-    }
-
-    return obj;
-}
+//static struct object_t **_new_object_id(struct db_t *db_inst) {
+//    struct object_t **obj;
+//    if (db_inst->free_objects_id_n) {
+//        atomic_fetch_sub(&db_inst->free_objects_id_n, 1);
+//        obj = db_inst->free_objects_id[db_inst->free_objects_id_n];
+//    } else {
+//        uint64_t idx = atomic_fetch_add(&db_inst->object_used, 1);
+//        obj = db_inst->objects_mem + idx;
+//    }
+//
+//    return obj;
+//}
 
 static struct object_t *_object_clone(struct db_t *db,
                                       struct object_t *obj,
@@ -275,6 +312,7 @@ static struct ce_cdb_t create_db() {
                                                                sizeof(struct object_t *))
     };
 
+
     ce_array_push(_G.dbs, db, _G.allocator);
     return (struct ce_cdb_t) {.idx = idx};
 };
@@ -284,15 +322,27 @@ static uint64_t create_object(struct ce_cdb_t db,
     struct db_t *db_inst = &_G.dbs[db.idx];
     struct object_t *obj = _new_object(db_inst, _G.allocator);
 
-    struct object_t **obj_addr = _new_object_id(db_inst);
+    uint64_t uid = _gen_uid();
+    _set_uid_obj(uid, obj);
 
     obj->db = db;
     obj->type = type;
 
-    *obj_addr = obj;
-
-    return (uint64_t) obj_addr;
+    return uid;
 }
+
+static void create_object_uid(struct ce_cdb_t db,
+                              uint64_t uid,
+                              uint64_t type) {
+    struct db_t *db_inst = &_G.dbs[db.idx];
+    struct object_t *obj = _new_object(db_inst, _G.allocator);
+
+    _set_uid_obj(uid, obj);
+
+    obj->db = db;
+    obj->type = type;
+}
+
 
 static ce_cdb_obj_o *write_begin(uint64_t _obj);
 
@@ -311,18 +361,17 @@ static uint64_t create_from(struct ce_cdb_t db,
     struct object_t *inst = _new_object(db_inst, _G.allocator);
     inst->db = db;
 
-    struct object_t **obj_addr = _new_object_id(db_inst);
 
-    *obj_addr = inst;
+    uint64_t uid = _gen_uid();
+    _set_uid_obj(uid, inst);
 
     inst->instance_of = _obj;
     inst->type = obj->type;
 
-    ce_array_push(obj->instances, (uint64_t) obj_addr, _G.allocator);
+    ce_array_push(obj->instances, uid, _G.allocator);
 
 
-    struct object_t *wr = write_begin((uint64_t) obj_addr);
-
+    struct object_t *wr = write_begin(uid);
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(_obj);
 
@@ -384,7 +433,7 @@ static uint64_t create_from(struct ce_cdb_t db,
 
     write_commit(wr);
 
-    return (uint64_t) obj_addr;
+    return (uint64_t) uid;
 }
 
 static void destroy_db(struct ce_cdb_t db) {
@@ -461,9 +510,6 @@ static void gc() {
             }
 
             _destroy_object(obj);
-
-            uint64_t fidx = atomic_fetch_add(&db_inst->free_objects_id_n, 1);
-            db_inst->free_objects_id[fidx] = objid;
         }
 
         db_inst->to_free_objects_id_n = 0;
@@ -766,30 +812,27 @@ static void write_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_o(_writer);
     struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
 
-    struct object_t **obj_addr = (struct object_t **) writer->orig_obj;
-
 //    _dispatch_instances(orig_obj, writer,
 //                        writer->changed_prop, CDB_PROP_CHANGED_EVENT);
 
-    *obj_addr = writer;
+    _set_uid_obj(writer->orig_obj, writer);
 
     _destroy_object(orig_obj);
 }
 
-static bool write_try_commit(ce_cdb_obj_o *_writer) {
-    struct object_t *writer = _get_object_from_o(_writer);
-    struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
-
-    struct object_t **obj_addr = (struct object_t **) writer->orig_obj;
-
-    bool ok = atomic_compare_exchange_weak((atomic_ullong *) obj_addr,
-                                           ((uint64_t *) &orig_obj),
-                                           ((uint64_t) writer));
-
-    _destroy_object(orig_obj);
-    return ok;
-}
-
+//static bool write_try_commit(ce_cdb_obj_o *_writer) {
+//    struct object_t *writer = _get_object_from_o(_writer);
+//    struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
+//
+//    struct object_t **obj_addr = (struct object_t **) writer->orig_obj;
+//
+//    bool ok = atomic_compare_exchange_weak((atomic_ullong *) obj_addr,
+//                                           ((uint64_t *) &orig_obj),
+//                                           ((uint64_t) writer));
+//
+//    _destroy_object(orig_obj);
+//    return ok;
+//}
 
 static void set_float(ce_cdb_obj_o *_writer,
                       uint64_t property,
@@ -1578,7 +1621,7 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
                                         uint32_t *n) {
     struct object_t *obj = (struct object_t *) reader;
     *n = ce_array_size(obj->changed);
-    if(*n) {
+    if (*n) {
         return obj->changed;
     }
     return NULL;
@@ -1586,12 +1629,14 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
 
 static struct ce_cdb_a0 cdb_api = {
 //        .create_db = create_db,
+        .set_loader = set_loader,
         .db  = global_db,
         .obj_type = type,
         .set_type = set_type,
         .obj_key= key,
         .move = move,
         .create_object = create_object,
+        .create_object_uid = create_object_uid,
         .create_from = create_from,
         .destroy_object = destroy_object,
         .destroy_db = destroy_db,
@@ -1623,7 +1668,7 @@ static struct ce_cdb_a0 cdb_api = {
 
         .write_begin = write_begin,
         .write_commit = write_commit,
-        .write_try_commit = write_try_commit,
+//        .write_try_commit = write_try_commit,
 
         .set_float = set_float,
         .set_bool = set_bool,
@@ -1645,6 +1690,10 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
+
+//    _G.id_map.n = MAX_OBJECTS;
+//    _G.id_map.values = (uint64_t *) virt_alloc(MAX_OBJECTS * sizeof(uint64_t));
+//    _G.id_map.keys = (uint64_t *) virt_alloc(MAX_OBJECTS * sizeof(uint64_t));
 
     _G.global_db = create_db();
 

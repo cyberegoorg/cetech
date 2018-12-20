@@ -93,7 +93,7 @@ static void draw_editor(uint64_t dock) {
         uint64_t name = ce_cdb_a0->read_uint64(creader,
                                                _ASSET_NAME, 0);
 
-        uint64_t obj = ct_resource_a0->get((struct ct_resource_id) {.uid=name});
+        uint64_t obj = name;
 
         const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
         ct_selected_object_a0->set_selected_object(context, obj);
@@ -213,9 +213,7 @@ static void on_asset_double_click(uint64_t type,
     uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
                                                  RESOURCE_NAME, 0);
 
-    struct ct_resource_id rid = {.uid = asset_name};
-
-    uint64_t obj = ct_resource_a0->get(rid);
+    uint64_t obj = asset_name;
 
     open(obj);
 }

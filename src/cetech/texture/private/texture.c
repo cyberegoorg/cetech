@@ -289,7 +289,7 @@ void texture_shutdown() {
 
 ct_render_texture_handle_t texture_get(uint64_t name) {
     struct ct_resource_id rid = {.uid = name};
-    uint64_t obj = ct_resource_a0->get(rid);
+    uint64_t obj = rid.uid;
 
     if (!obj) {
         return (ct_render_texture_handle_t) {.idx = UINT16_MAX};

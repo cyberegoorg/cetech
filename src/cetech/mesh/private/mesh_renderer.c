@@ -89,11 +89,7 @@ void foreach_mesh_renderer(struct ct_world world,
             ce_mat4_move(final_w, world);
         }
 
-        struct ct_resource_id rid = (struct ct_resource_id) {
-                .uid = scene,
-        };
-
-        uint64_t scene_obj = ct_resource_a0->get(rid);
+        uint64_t scene_obj = scene;
 
         uint64_t mesh_id = ce_id_a0->id64(ce_cdb_a0->read_str(mr_reader,
                                                               PROP_MESH,
@@ -125,8 +121,7 @@ void foreach_mesh_renderer(struct ct_world world,
         ct_gfx_a0->set_vertex_buffer(0, vbh, 0, vb_size);
         ct_gfx_a0->set_index_buffer(ibh, 0, ib_size);
 
-        struct ct_resource_id material_resource = {.uid = material};
-        uint64_t material_obj = ct_resource_a0->get(material_resource);
+        uint64_t material_obj = material;
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
 

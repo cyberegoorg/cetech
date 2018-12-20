@@ -111,8 +111,7 @@ static void _compile_task(void *data) {
         if (!compilator) {
             output_obj = asset_obj;
         } else {
-            output_obj = compilator(asset_obj, rid,
-                                    resource_name);
+            output_obj = compilator(asset_obj, rid, resource_name);
         }
 
         if (!output_obj) {

@@ -61,13 +61,21 @@ enum ce_cdb_type {
     CDB_TYPE_BLOB,
 };
 
+typedef bool (*ct_cdb_obj_loader)(uint64_t uid);
+
 struct ce_cdb_a0 {
+    void (*set_loader)(ct_cdb_obj_loader loader);
+
     struct ce_cdb_t (*db)();
 
     void (*destroy_db)(struct ce_cdb_t db);
 
 
     uint64_t (*create_object)(struct ce_cdb_t db,
+                              uint64_t type);
+
+    void (*create_object_uid)(struct ce_cdb_t db,
+                              uint64_t uid,
                               uint64_t type);
 
     uint64_t (*create_from)(struct ce_cdb_t db,
@@ -125,7 +133,7 @@ struct ce_cdb_a0 {
 
     void (*write_commit)(ce_cdb_obj_o *writer);
 
-    bool (*write_try_commit)(ce_cdb_obj_o *writer);
+//    bool (*write_try_commit)(ce_cdb_obj_o *writer);
 
 
     void (*set_bool)(ce_cdb_obj_o *writer,

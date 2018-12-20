@@ -230,9 +230,7 @@ static void ui_resource(uint64_t obj,
 
     uint64_t uid = ce_cdb_a0->read_ref(reader, prop_key_hash, 0);
 
-    uint64_t resource_obj = ct_resource_a0->get((struct ct_resource_id) {
-            .uid = uid,
-    });
+    uint64_t resource_obj = uid;
 
     const ce_cdb_obj_o *r = ce_cdb_a0->read(resource_obj);
     const char* resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");

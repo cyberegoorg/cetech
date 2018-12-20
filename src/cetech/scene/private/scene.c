@@ -150,7 +150,7 @@ static uint64_t resource_data(uint64_t name) {
             .uid = name,
     };
 
-    return ct_resource_a0->get(rid);
+    return rid.uid;
 }
 
 

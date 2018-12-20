@@ -77,7 +77,7 @@ static void _broadcast_edit() {
 }
 
 static void _broadcast_selected(uint64_t dock) {
-    uint64_t obj = ct_resource_a0->get(_G.selected_asset);
+    uint64_t obj = _G.selected_asset.uid;
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
 
@@ -207,7 +207,7 @@ static void ui_asset_tooltip(ct_resource_id resourceid,
         return;
     }
 
-    uint64_t obj = ct_resource_a0->get(resourceid);
+    uint64_t obj = resourceid.uid;
     ai->tooltip(obj);
 }
 

@@ -60,37 +60,11 @@ struct ct_resource_i0 {
 
 struct ct_resource_a0 {
     struct ct_resource_i0 *(*get_interface)(uint64_t type);
-    void (*load)(const uint64_t *names,
-                 size_t count,
-                 int force);
 
-    void (*load_now)(const uint64_t *names,
-                     size_t count);
-
-    void (*unload)(const uint64_t *names,
-                   size_t count);
-
-    void (*reload)(const uint64_t *names,
-                   size_t count);
-
-    void (*reload_all)();
-
-
-    int (*can_get)(uint64_t names);
-
-    int (*can_get_all)(const uint64_t *names,
-                       size_t count);
-
-    uint64_t (*get)(struct ct_resource_id resource_id);
-
-    void (*reload_from_obj)(struct ct_resource_id resource_id,
-                            uint64_t obj);
-
-//    int (*type_name_string)(char *str,
-//                            size_t max_len,
-//                            struct ct_resource_id resourceid);
-
+    bool (*cdb_loader)(uint64_t uid);
+    void (*reload_from_obj)(struct ct_resource_id resource_id, uint64_t obj);
 };
+
 CE_MODULE(ct_resource_a0);
 
 

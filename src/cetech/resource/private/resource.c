@@ -65,8 +65,6 @@ static void load(const uint64_t *names,
                  size_t count,
                  int force);
 
-static uint64_t get_obj(struct ct_resource_id resource_id);
-
 static void load_now(const uint64_t *names,
                      size_t count) {
     load(names, count, 0);
@@ -76,16 +74,6 @@ static int can_get(uint64_t name) {
     return ce_hash_contain(&_G.res_map, name);
 }
 
-static int can_get_all(const uint64_t *names,
-                       size_t count) {
-    for (size_t i = 0; i < count; ++i) {
-        if (!ce_hash_contain(&_G.res_map, names[i])) {
-            return 0;
-        }
-    }
-
-    return 1;
-}
 
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
     return (struct ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
@@ -117,8 +105,12 @@ static void load(const uint64_t *names,
             return;
         }
 
-        uint64_t object = ce_cdb_a0->create_object(_G.db,
-                                                   resource_i->cdb_type());
+        ce_cdb_a0->create_object_uid(_G.db,
+                                     asset_name,
+                                     resource_i->cdb_type());
+
+        uint64_t object = asset_name;
+
         resource_objects[i] = object;
 
         struct ct_resource_id rid = {.uid = asset_name};
@@ -150,7 +142,7 @@ static void load(const uint64_t *names,
                      "load time %f for %zu resource", dt * 0.001, count);
 }
 
-static void unload(const uint64_t *names,
+void unload(const uint64_t *names,
                    size_t count) {
 
     for (uint32_t i = 0; i < count; ++i) {
@@ -180,24 +172,17 @@ static void unload(const uint64_t *names,
     }
 }
 
-static uint64_t get_obj(struct ct_resource_id resource_id) {
-    uint64_t object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
+static bool get_obj(uint64_t uid) {
+    uint64_t object = ce_hash_lookup(&_G.res_map, uid, 0);
     if (!object) {
-        ce_log_a0->warning(LOG_WHERE, "Loading resource 0x%llx",
-                           resource_id.uid);
-        load_now(&resource_id.uid, 1);
+        ce_log_a0->warning(LOG_WHERE, "Loading resource 0x%llx", uid);
+        load_now(&uid, 1);
 
-        object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
+        uint64_t new_object = ce_hash_lookup(&_G.res_map, uid, 0);
+        return new_object != 0;
     }
 
-    return object;
-}
-
-static void reload(const uint64_t *names,
-                   size_t count) {
-}
-
-static void reload_all() {
+    return true;
 }
 
 static void put(struct ct_resource_id resource_id,
@@ -230,16 +215,8 @@ static void put(struct ct_resource_id resource_id,
 
 static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
-        .load = load,
-        .load_now = load_now,
-        .unload = unload,
-        .reload = reload,
-        .reload_all = reload_all,
-        .can_get = can_get,
-        .can_get_all = can_get_all,
-        .get = get_obj,
+        .cdb_loader = get_obj,
         .reload_from_obj = put,
-//        .type_name_string = type_name_string,
 };
 
 
