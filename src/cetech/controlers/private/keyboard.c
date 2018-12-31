@@ -59,7 +59,7 @@ static uint32_t button_index(const char *button_name) {
 
 static const char *button_name(const uint32_t button_index) {
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < KEY_MAX));
+              (button_index >= 0) && (button_index < KEY_MAX));
 
     return _key_to_str[button_index];
 }
@@ -68,7 +68,7 @@ static int button_state(uint32_t idx,
                         const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < KEY_MAX));
+              (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index];
 }
@@ -77,7 +77,7 @@ static int button_pressed(uint32_t idx,
                           const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < KEY_MAX));
+              (button_index >= 0) && (button_index < KEY_MAX));
 
     return _G.state[button_index] && !_G.last_state[button_index];
 }
@@ -86,7 +86,7 @@ static int button_released(uint32_t idx,
                            const uint32_t button_index) {
     CE_UNUSED(idx);
     CE_ASSERT(LOG_WHERE,
-                  (button_index >= 0) && (button_index < KEY_MAX));
+              (button_index >= 0) && (button_index < KEY_MAX));
 
     return !_G.state[button_index] && _G.last_state[button_index];
 }
@@ -100,7 +100,8 @@ static void update(float dt) {
 
     while (it != end_it) {
         struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj_event->obj);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     obj_event->obj);
         switch (it->type) {
             case EVENT_KEYBOARD_DOWN:
                 _G.state[ce_cdb_a0->read_uint64(reader,
@@ -154,7 +155,7 @@ static uint64_t task_name() {
     return CT_KEYBOARD_TASK;
 }
 
-static uint64_t * update_before(uint64_t* n) {
+static uint64_t *update_before(uint64_t *n) {
     static uint64_t a[] = {
             CT_INPUT_TASK,
     };
@@ -163,7 +164,7 @@ static uint64_t * update_before(uint64_t* n) {
     return a;
 }
 
-static uint64_t * update_after(uint64_t* n) {
+static uint64_t *update_after(uint64_t *n) {
     static uint64_t a[] = {
             CT_MACHINE_TASK,
     };

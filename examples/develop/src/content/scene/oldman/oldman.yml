@@ -1,9 +1,14 @@
 "0xb7baa30d19deb859": #content/scene/oldman/oldman.scene:
+  cdb_uid: "0xb7baa30d19deb859"
   asset_name: "content/scene/oldman/oldman"
-  asset_type: "scene"
+  cdb_type: "scene"
   import:
+    cdb_uid: "0xffe2059226d692e5"
+
     input: content/scene/oldman/muro.fbx
     #    input: content/scene/duck/duck.dae
 
     postprocess:
+      cdb_uid: "0x8426488f2e17928c"
+
       flip_uvs: true

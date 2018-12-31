@@ -79,7 +79,7 @@ static uint32_t _get_reset_flags() {
 //==============================================================================
 
 static void renderer_create() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
         uint32_t w, h;
         w = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_X, 0);
@@ -102,13 +102,12 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ce_os_a0->window->create(
-                    _G.allocator,
-                    title,
-                    WINDOWPOS_UNDEFINED,
-                    WINDOWPOS_UNDEFINED,
-                    w, h,
-                    flags);
+            _G.main_window = ce_os_a0->window->create(_G.allocator,
+                                                      title,
+                                                      WINDOWPOS_UNDEFINED,
+                                                      WINDOWPOS_UNDEFINED,
+                                                      w, h,
+                                                      flags);
 
         } else {
             _G.main_window = ce_os_a0->window->create_from(_G.allocator,
@@ -145,7 +144,7 @@ static void renderer_create() {
 #if CE_PLATFORM_LINUX
                     BGFX_RENDERER_TYPE_OPENGL
 #elif CE_PLATFORM_OSX
-                    BGFX_RENDERER_TYPE_METAL// metal in future
+                    BGFX_RENDERER_TYPE_METAL
 #endif
             },
     };
@@ -198,7 +197,7 @@ static void on_resize(uint64_t type,
 
     struct ebus_cdb_event *ev = (struct ebus_cdb_event *) event;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ev->obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), ev->obj);
 
     _G.size_width = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_WIDTH, 0);
     _G.size_height = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_HEIGHT,
@@ -222,8 +221,8 @@ static void _feed_module(struct ct_world world,
     }
 }
 
- void _render_components(struct ct_world world,
-                               struct ct_rg_builder *builder) {
+void _render_components(struct ct_world world,
+                        struct ct_rg_builder *builder) {
     struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
@@ -361,35 +360,35 @@ static void _init(struct ce_api_a0 *api) {
     ce_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
 
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_X)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_X)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_X, 1024);
     }
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_Y)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_Y)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_Y, 768);
     }
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_SCREEN_FULLSCREEN)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_FULLSCREEN)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_DAEMON)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_DAEMON)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_DAEMON, 0);
     }
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_WID)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_WID)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_WID, 0);
     }
 
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_RENDERER_TYPE)) {
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_RENDERER_TYPE)) {
         ce_cdb_a0->set_str(writer, CONFIG_RENDERER_TYPE, "");
     }
 
     ce_cdb_a0->write_commit(writer);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     _G.vsync = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_VSYNC, 1) > 0;
 
@@ -400,7 +399,7 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
 
         ce_array_free(_G.on_render, _G.allocator);

@@ -166,7 +166,8 @@ static void update(float dt) {
 
     while (it != end_it) {
         struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-        const ce_cdb_obj_o * reader = ce_cdb_a0->read(obj_event->obj);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     obj_event->obj);
 
         uint32_t button = ce_cdb_a0->read_uint64(reader,
                                                  CONTROLER_BUTTON, 0);
@@ -247,7 +248,7 @@ static uint64_t task_name() {
     return CT_MOUSE_TASK;
 }
 
-static uint64_t * update_before(uint64_t* n) {
+static uint64_t *update_before(uint64_t *n) {
     static uint64_t a[] = {
             CT_INPUT_TASK,
     };
@@ -256,7 +257,7 @@ static uint64_t * update_before(uint64_t* n) {
     return a;
 }
 
-static uint64_t * update_after(uint64_t* n) {
+static uint64_t *update_after(uint64_t *n) {
     static uint64_t a[] = {
             CT_MACHINE_TASK,
     };

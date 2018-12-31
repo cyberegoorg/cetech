@@ -1,8 +1,13 @@
 "0xf7f5289f75e5f044": #content/box2.entity:
+  cdb_uid: "0xf7f5289f75e5f044"
   asset_name: "content/box2"
-  asset_type: "entity"
+  cdb_type: "entity"
   components:
+    cdb_uid: "0x1db40df93b12f88f"
+
     transform:
+      cdb_uid: "0xe92a6c7185d73f6c"
+      cdb_type: "transform"
       position.x: 10.000000
       position.y: -6.000000
       position.z: 0.000000
@@ -12,7 +17,11 @@
       scale.x: 1.000000
       scale.y: 1.000000
       scale.z: 1.000000
+
     mesh_renderer:
+      cdb_uid: "0x503ef52859bc3e3b"
+      cdb_type: "mesh_renderer"
+
       scene: "0xb7baa30d19deb859"
       mesh: "muro_main"
       material: "0x6c8bca84fa0d4431"

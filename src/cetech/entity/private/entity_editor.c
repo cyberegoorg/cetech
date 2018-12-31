@@ -30,7 +30,6 @@
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/resource_editor.h>
 
-
 #define MAX_EDITOR 8
 
 #define _G entity_editor_globals
@@ -175,7 +174,7 @@ static void fps_camera_update(struct ct_world world,
 //}
 
 static void draw_editor(uint64_t context_obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
 
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
@@ -291,7 +290,7 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
     int idx = _G.editor_count;
     ++_G.editor_count;
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(context_obj);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),context_obj);
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
     ce_cdb_a0->write_commit(w);
 
@@ -303,9 +302,9 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
 static void open(uint64_t context_obj) {
     struct scene_editor *editor = _new_editor(context_obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
-    const uint64_t asset_name = ce_cdb_a0->read_uint64(reader, _ASSET_NAME,
-                                                       0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
+    const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
+                                                       ASSET_NAME_PROP, 0);
 
     editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
     editor->viewport = ct_renderer_a0->create_viewport(editor->world,
@@ -327,7 +326,7 @@ static void update(uint64_t context_obj,
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(context_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct scene_editor *editor = &_G.editor[editor_idx];
 

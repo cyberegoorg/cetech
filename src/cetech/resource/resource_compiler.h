@@ -27,8 +27,6 @@ struct ct_resource_id;
 struct ct_resource_compiler_a0 {
     void (*compile_all)();
 
-    void (*compile_and_reload)(uint64_t name);
-
     char *(*get_tmp_dir)(struct ce_alloc *a,
                          const char *platform);
 

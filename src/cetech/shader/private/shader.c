@@ -119,21 +119,23 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static bool _compile(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+static bool _compile(struct ce_cdb_t db,
+                     uint64_t obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, obj);
 
     const char *vs_input = ce_cdb_a0->read_str(reader, SHADER_VS_INPUT, "");
     const char *fs_input = ce_cdb_a0->read_str(reader, SHADER_FS_INPUT, "");
 
     struct ce_alloc *a = ce_memory_a0->system;
 
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_config_a0->obj());
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                   ce_config_a0->obj());
     const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     const char *core_dir = ce_cdb_a0->read_str(c_reader, CONFIG_CORE,
                                                "");
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(db, obj);
 
     char *include_dir = NULL;
     ce_os_a0->path->join(&include_dir, a, 2, core_dir, "bgfxshaders");
@@ -195,7 +197,8 @@ static bool _compile(uint64_t obj) {
     _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename),
                   fs_input);
 
-    result = _shaderc(input_path, output_path, include_dir, "fragment",
+    result = _shaderc(input_path, output_path,
+                      include_dir, "fragment",
                       platform, fs_profile);
 
     ce_buffer_free(input_path, a);
@@ -223,46 +226,16 @@ static bool _compile(uint64_t obj) {
     return true;
 }
 
-uint64_t shader_compiler(uint64_t k,
-                         struct ct_resource_id rid,
-                         const char *fullname) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(k);
-
-    const char *vs_input = ce_cdb_a0->read_str(reader,
-                                               ce_id_a0->id64("vs_input"),
-                                               "");
-    const char *fs_input = ce_cdb_a0->read_str(reader,
-                                               ce_id_a0->id64("fs_input"),
-                                               "");
-
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SHADER_TYPE);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
-    if (vs_input) {
-        ce_cdb_a0->set_str(w, SHADER_VS_INPUT, vs_input);
-    }
-
-    if (fs_input) {
-        ce_cdb_a0->set_str(w, SHADER_FS_INPUT, fs_input);
-    }
-
-    ce_cdb_a0->write_commit(w);
-
-    bool res = _compile(obj);
-
-    if (res) {
-        return obj;
-    }
-
-
-    return 0;
+bool shader_compiler(struct ce_cdb_t db,
+                     uint64_t k) {
+    return _compile(db, k);
 }
 
 
 static void online(uint64_t name,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t fs_blob_size = 0;
     void *fs_blob;
@@ -273,9 +246,9 @@ static void online(uint64_t name,
     vs_blob = ce_cdb_a0->read_blob(reader, SHADER_VS_DATA, &vs_blob_size, 0);
 
     const ct_render_memory_t *vs_mem = ct_gfx_a0->make_ref(vs_blob,
-                                                                vs_blob_size);
+                                                           vs_blob_size);
     const ct_render_memory_t *fs_mem = ct_gfx_a0->make_ref(fs_blob,
-                                                                fs_blob_size);
+                                                           fs_blob_size);
 
     ct_render_shader_handle_t vs_shader = ct_gfx_a0->create_shader(vs_mem);
     ct_render_shader_handle_t fs_shader = ct_gfx_a0->create_shader(fs_mem);
@@ -283,7 +256,7 @@ static void online(uint64_t name,
     ct_render_program_handle_t program;
     program = ct_gfx_a0->create_program(vs_shader, fs_shader, true);
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     ce_cdb_a0->set_uint64(writer, SHADER_PROP, program.idx);
     ce_cdb_a0->write_commit(writer);
 }
@@ -292,7 +265,7 @@ static void offline(uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     const uint64_t program = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
     ct_gfx_a0->destroy_program(
@@ -327,7 +300,7 @@ void shader_shutdown() {
 }
 
 ct_render_program_handle_t shader_get(uint64_t shader) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(shader);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), shader);
 
     const uint64_t idx = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
     return (ct_render_program_handle_t) {.idx=(uint16_t) idx};

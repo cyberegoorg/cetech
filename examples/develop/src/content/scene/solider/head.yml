@@ -1,14 +1,24 @@
 "0x6c8bca84fa0d4431": #content/scene/solider/head.material:
+  cdb_uid: "0x6c8bca84fa0d4431"
   asset_name: "content/scene/solider/head"
-  asset_type: "material"
+  cdb_type: "material"
   PREFAB: "0x24c9413e88ebaaa8"
   layers:
+    cdb_uid: "0x6bbb4a30fb55b08d"
+
     gbuffer:
+      cdb_uid: "0x524eee29c74b6c04"
+
       variables:
+        cdb_uid: "0x404c5a175cc2903b"
+
         kdasdvxcvcxbxcbxbg435124asdkj:
+          cdb_uid: "0x44f23ca59c937287"
+
           value: 0x8beb8d2b20191aba
 
 "0x8beb8d2b20191aba": #content/scene/solider/head01.texture:
+  cdb_uid: "0x8beb8d2b20191aba"
   asset_name: "content/scene/solider/head01"
-  asset_type: "texture"
+  cdb_type: "texture"
   input: content/scene/solider/head01.tga

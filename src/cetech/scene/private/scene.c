@@ -17,7 +17,6 @@
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/asset/sourcedb.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -45,7 +44,7 @@ static void online(uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
     ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
@@ -64,27 +63,28 @@ static void online(uint64_t name,
     uint32_t *ib = (ce_cdb_a0->read_blob(reader, SCENE_IB_PROP, NULL, NULL));
     uint8_t *vb = (ce_cdb_a0->read_blob(reader, SCENE_VB_PROP, NULL, NULL));
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
         const ct_render_memory_t *vb_mem;
         vb_mem = ct_gfx_a0->make_ref((const void *) &vb[vb_offset[i]],
-                                          vb_size[i]);
+                                     vb_size[i]);
 
         const ct_render_memory_t *ib_mem;
         ib_mem = ct_gfx_a0->make_ref((const void *) &ib[ib_offset[i]],
-                                          sizeof(uint32_t) * ib_size[i]);
+                                     sizeof(uint32_t) * ib_size[i]);
 
         ct_render_vertex_buffer_handle_t bv_handle;
         bv_handle = ct_gfx_a0->create_vertex_buffer(vb_mem,
-                                                         &vb_decl[i],
-                                                         CT_RENDER_BUFFER_NONE);
+                                                    &vb_decl[i],
+                                                    CT_RENDER_BUFFER_NONE);
 
         ct_render_index_buffer_handle_t ib_handle;
         ib_handle = ct_gfx_a0->create_index_buffer(ib_mem,
-                                                        CT_RENDER_BUFFER_INDEX32);
+                                                   CT_RENDER_BUFFER_INDEX32);
 
         uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);
-        ce_cdb_obj_o *geom_writer = ce_cdb_a0->write_begin(geom_obj);
+        ce_cdb_obj_o *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                           geom_obj);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, ib_size[i]);
@@ -108,9 +108,7 @@ static uint64_t cdb_type() {
 }
 
 
-uint64_t scene_compiler(uint64_t k,
-                        struct ct_resource_id rid,
-                        const char *fullname);
+bool scene_compiler(struct ce_cdb_t db, uint64_t k);
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -158,7 +156,7 @@ static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
     uint64_t res = resource_data(scene);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     uint64_t *geom_name = (uint64_t *) (ce_cdb_a0->read_blob(reader,
                                                              SCENE_GEOM_NAME,
@@ -183,7 +181,7 @@ static void get_all_geometries(uint64_t scene,
                                char **geometries,
                                uint32_t *count) {
     uint64_t res = resource_data(scene);
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL,
                                                  NULL));
@@ -194,7 +192,7 @@ static void get_all_nodes(uint64_t scene,
                           char **geometries,
                           uint32_t *count) {
     uint64_t res = resource_data(scene);
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(res);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR,
                                                  NULL, NULL));

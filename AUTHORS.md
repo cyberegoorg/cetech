@@ -1,3 +1,3 @@
 # Authors
 
-* Ondra Voves [o.voves@gmail.com]
+* Ondra Voves [ondra.voves@cyberego.org]

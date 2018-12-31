@@ -154,8 +154,12 @@ void begin_frame() {
                                  (sizeof(struct ebus_cdb_event)))) {
                     struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
 
-                    if(it->type == ce_cdb_a0->obj_type(obj_event->obj)) {
-                        ce_cdb_a0->destroy_object(obj_event->obj);
+                    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                           obj_event->obj);
+
+                    if (it->type == ce_cdb_a0->obj_type(reader)) {
+                        ce_cdb_a0->destroy_object(ce_cdb_a0->db(),
+                                                  obj_event->obj);
                     }
 
                 }

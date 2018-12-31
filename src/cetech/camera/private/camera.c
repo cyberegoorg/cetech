@@ -39,8 +39,8 @@ static void get_project_view(struct ct_world world,
     uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
                                               camera);
 
-    const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(transform);
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(camera_data);
+    const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),transform);
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),camera_data);
 
 
     float fov = ce_cdb_a0->read_float(c_reader, PROP_FOV, 0);

@@ -25,7 +25,6 @@
 #include <cetech/editor/resource_browser.h>
 #include <string.h>
 #include <cetech/game/game_system.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/default_rg/default_rg.h>
 
 #define _G plaground_global

@@ -22,7 +22,6 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/resource_preview.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/kernel/kernel.h>
 
 
@@ -191,25 +190,6 @@ static struct ct_component_i0 *get_interface(uint64_t name) {
             &_G.component_interface_map, name, 0);
 }
 
-//static int compile(uint64_t type,
-//                   const char *filename,
-//                   uint64_t component_key,
-//                   ce_cdb_obj_o *writer) {
-//
-//    struct ct_component_i0 *component_i = get_interface(type);
-//
-//    if (!component_i) {
-//        ce_log_a0->error("ecs", "could not find component");
-//        return 0;
-//    }
-//
-//    component_i->compiler(filename, component_key, writer);
-//
-//    return 1;
-//}
-
-#include "entity_compiler.inl"
-
 
 static struct world_instance *get_world_instance(struct ct_world world) {
     uint64_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT64_MAX);
@@ -229,23 +209,6 @@ const uint64_t *component_names() {
 static uint64_t component_mask(uint64_t name) {
     return (uint64_t) (1llu << ce_hash_lookup(&_G.component_types, name, 0));
 }
-
-//static uint64_t component_idx(uint64_t component_name) {
-//    return ce_hash_lookup(&_G.component_types, component_name, UINT64_MAX);
-//}
-
-//static void *get_all(uint64_t component_name,
-//                     ct_entity_storage_t *_item) {
-//    struct entity_storage *item = _item;
-//    uint64_t com_mask = component_mask(component_name);
-//
-//    if (!(com_mask & item->mask)) {
-//        return NULL;
-//    }
-//
-//    uint32_t comp_idx = component_idx(component_name);
-//    return item->entity_data[comp_idx];
-//}
 
 
 static uint64_t get_one(struct ct_world world,
@@ -274,13 +237,14 @@ static uint64_t get_one(struct ct_world world,
 
     uint64_t ent_obj = _entity_data(w, entity);
 
-    const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(ent_obj);
+    const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(), ent_obj);
 
     uint64_t components = ce_cdb_a0->read_subobject(ent_reader,
                                                     ENTITY_COMPONENTS,
                                                     0);
 
-    const ce_cdb_obj_o *components_reader = ce_cdb_a0->read(components);
+    const ce_cdb_obj_o *components_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                            components);
     uint64_t component = ce_cdb_a0->read_subobject(components_reader,
                                                    component_name,
                                                    0);
@@ -450,12 +414,14 @@ static void add_components(struct ct_world world,
         struct world_instance *w = get_world_instance(world);
         uint64_t ent_obj = _entity_data(w, ent);
 
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ent_obj);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     ent_obj);
+
         uint64_t components = ce_cdb_a0->read_subobject(reader,
                                                         ENTITY_COMPONENTS,
                                                         0);
 
-        ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(components);
+        ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(ce_cdb_a0->db(), components);
 
         for (int i = 0; i < name_count; ++i) {
             uint64_t name = component_name[i];
@@ -586,7 +552,7 @@ static void create_entities(struct ct_world world,
                                                       ENTITY_CHILDREN);
         uint64_t components = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                        ENTITY_COMPONENTS);
-        ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_subobject(wr, ENTITY_CHILDREN, childrens);
         ce_cdb_a0->set_subobject(wr, ENTITY_COMPONENTS, components);
         ce_cdb_a0->write_commit(wr);
@@ -623,7 +589,7 @@ static void create_entities_objs(struct ct_world world,
                                                           ENTITY_CHILDREN);
             uint64_t components = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                            ENTITY_COMPONENTS);
-            ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(obj);
+            ce_cdb_obj_o *wr = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
             ce_cdb_a0->set_subobject(wr, ENTITY_CHILDREN, childrens);
             ce_cdb_a0->set_subobject(wr, ENTITY_COMPONENTS, components);
             ce_cdb_a0->write_commit(wr);
@@ -647,16 +613,22 @@ static void destroy(struct ct_world world,
 
         uint64_t entity_obj = ce_hash_lookup(&w->entity_objmap, ent.h, 0);
         if (entity_obj) {
-            const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(entity_obj);
+            const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                             entity_obj);
 
             uint64_t components = ce_cdb_a0->read_subobject(ent_reader,
                                                             ENTITY_COMPONENTS,
                                                             0);
 
-            const ce_cdb_obj_o *component_reader = ce_cdb_a0->read(components);
+            const ce_cdb_obj_o *component_reader = ce_cdb_a0->read(
+                    ce_cdb_a0->db(),
+                    components);
 
-            const uint32_t components_n = ce_cdb_a0->prop_count(components);
-            const uint64_t *components_keys = ce_cdb_a0->prop_keys(components);
+            const uint64_t components_n = ce_cdb_a0->prop_count(
+                    component_reader);
+
+            const uint64_t *components_keys = ce_cdb_a0->prop_keys(
+                    component_reader);
 
             for (int j = 0; j < components_n; ++j) {
                 uint64_t component_obj = ce_cdb_a0->read_subobject(
@@ -716,8 +688,8 @@ static struct ct_entity load(uint64_t resource,
 
 
 static void unload(uint64_t resource,
-                    struct ct_world world,
-                    struct ct_entity entity) {
+                   struct ct_world world,
+                   struct ct_entity entity) {
     ct_ecs_a0->destroy(world, &entity, 1);
 }
 
@@ -727,15 +699,9 @@ void *get_resource_interface(uint64_t name_hash) {
             .unload = unload,
     };
 
-    static struct ct_sourcedb_asset_i0 ct_sourcedb_asset_i0 = {
-            .load = entity_asset_load,
-    };
-
     if (name_hash == RESOURCE_PREVIEW_I) {
         return &ct_resource_preview_i0;
-    } else if (name_hash == SOURCEDB_I) {
-        return &ct_sourcedb_asset_i0;
-    }
+    };
 
     return NULL;
 }
@@ -744,11 +710,8 @@ static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
         .online = online,
         .offline = offline,
-        .compilator = resource_compiler,
         .get_interface = get_resource_interface,
 };
-
-#include "entity_resource_sync.inl"
 
 //==============================================================================
 // Public interface
@@ -784,13 +747,17 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     create_entities_objs(world, &root_ent, 1, &entity_obj);
 
 
-    const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(entity_obj);
+    const ce_cdb_obj_o *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     entity_obj);
 
     uint64_t components;
     components = ce_cdb_a0->read_subobject(ent_reader, ENTITY_COMPONENTS, 0);
 
-    uint32_t components_n = ce_cdb_a0->prop_count(components);
-    const uint64_t *components_keys = ce_cdb_a0->prop_keys(components);
+    const ce_cdb_obj_o *comp_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                      components);
+
+    uint32_t components_n = ce_cdb_a0->prop_count(comp_reader);
+    const uint64_t *components_keys = ce_cdb_a0->prop_keys(comp_reader);
 
     uint64_t ent_type = combine_component(components_keys, components_n);
 
@@ -805,7 +772,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 //                               (void *) world.h);
 
 
-    const ce_cdb_obj_o *comp_reader = ce_cdb_a0->read(components);
+
 
     for (int i = 0; i < components_n; ++i) {
         uint64_t component_type = components_keys[i];
@@ -840,10 +807,10 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 //    ce_cdb_a0->register_notify(children, _on_entity_obj_add,
 //                               (void *) world.h);
 
-    const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(children);
+    const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
 
-    uint32_t children_n = ce_cdb_a0->prop_count(children);
-    const uint64_t *children_keys = ce_cdb_a0->prop_keys(children);
+    uint32_t children_n = ce_cdb_a0->prop_count(ch_reader);
+    const uint64_t *children_keys = ce_cdb_a0->prop_keys(ch_reader);
     for (int i = 0; i < children_n; ++i) {
         uint64_t child;
         child = ce_cdb_a0->read_subobject(ch_reader, children_keys[i], 0);

@@ -26,7 +26,7 @@
 static void transform_transform(uint64_t transform,
                                 float *parent) {
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(transform);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
 
     float pos[3] ={
             ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
@@ -55,7 +55,7 @@ static void transform_transform(uint64_t transform,
                 rot_rad[0], rot_rad[1], rot_rad[2],
                 pos[0], pos[1], pos[2]);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(transform);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),transform);
     ce_cdb_a0->set_blob(w, PROP_WORLD, world, sizeof(world));
     ce_cdb_a0->write_commit(w);
 }
@@ -71,7 +71,7 @@ static const char *display_name() {
 static void guizmo_get_transform(uint64_t obj,
                                  float *world,
                                  float *local) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     float pos[3] = {
             ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
@@ -109,7 +109,7 @@ static void guizmo_set_transform(uint64_t obj,
     float scale[3] = {};
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
-    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(obj);
+    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
 
     switch (operation) {
         case TRANSLATE:
@@ -141,7 +141,7 @@ static uint64_t create_new() {
     uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   TRANSFORM_COMPONENT);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),component);
     ce_cdb_a0->set_float(w, PROP_SCALE_X, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Y, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Z, 1.0f);

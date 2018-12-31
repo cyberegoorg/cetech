@@ -91,7 +91,7 @@ void sdl_mouse_process() {
     event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                      EVENT_MOUSE_MOVE);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
     ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, _G.mouse.position[0]);
     ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, _G.mouse.position[1]);
     ce_cdb_a0->write_commit(w);
@@ -104,7 +104,7 @@ void sdl_mouse_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_MOUSE_DOWN);
 
-            w = ce_cdb_a0->write_begin(event);
+            w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
@@ -114,7 +114,7 @@ void sdl_mouse_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_MOUSE_UP);
 
-            w = ce_cdb_a0->write_begin(event);
+            w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
@@ -135,7 +135,7 @@ void sdl_keyboard_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_DOWN);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
@@ -147,7 +147,7 @@ void sdl_keyboard_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_UP);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
@@ -277,7 +277,8 @@ void sdl_gamepad_process() {
                 uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                           EVENT_GAMEPAD_DOWN);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
@@ -292,7 +293,8 @@ void sdl_gamepad_process() {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_UP);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
@@ -319,7 +321,8 @@ void sdl_gamepad_process() {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_MOVE);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
 
@@ -366,7 +369,9 @@ static void _update(float dt) {
                                 ce_cdb_a0->db(),
                                 EVENT_WINDOW_RESIZED);
 
-                        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
+                                ce_cdb_a0->db(), event);
+
                         ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_ID,
                                               e.window.windowID);
                         ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_WIDTH,
@@ -391,7 +396,8 @@ static void _update(float dt) {
 
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, pos[0]);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
@@ -408,7 +414,8 @@ static void _update(float dt) {
                         EVENT_KEYBOARD_TEXT);
 
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ce_cdb_a0->write_commit(w);
 
@@ -425,7 +432,8 @@ static void _update(float dt) {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_CONNECT);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ce_cdb_a0->write_commit(w);
 
@@ -451,7 +459,8 @@ static void _update(float dt) {
                             ce_cdb_a0->db(),
                             EVENT_GAMEPAD_DISCONNECT);
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             event);
                     ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ce_cdb_a0->write_commit(w);
 
@@ -485,9 +494,9 @@ static uint64_t task_name() {
     return CT_MACHINE_TASK;
 }
 
-static uint64_t * update_before(uint64_t* n) {
+static uint64_t *update_before(uint64_t *n) {
     static uint64_t a[] = {
-        CT_INPUT_TASK,
+            CT_INPUT_TASK,
     };
 
     *n = CE_ARRAY_LEN(a);

@@ -18,7 +18,6 @@
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/editor/selcted_object.h>
 
 #include "celib/hashlib.h"
@@ -135,7 +134,11 @@ static void set_asset(uint64_t obj) {
     }
 
     if (_G.selected_object) {
-        uint64_t prev_type = ce_cdb_a0->obj_type(_G.selected_object);
+
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     _G.selected_object);
+
+        uint64_t prev_type = ce_cdb_a0->obj_type(reader);
 
         struct ct_resource_i0 *resource_i;
         resource_i = ct_resource_a0->get_interface(prev_type);
@@ -152,7 +155,9 @@ static void set_asset(uint64_t obj) {
     }
 
     if (obj) {
-        uint64_t type = ce_cdb_a0->obj_type(obj);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                     obj);
+        uint64_t type = ce_cdb_a0->obj_type(reader);
         struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(type);
         if (i) {
@@ -169,9 +174,10 @@ static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                    0);
     set_asset(ct_selected_object_a0->selected_object(context));
 
     float size[2];

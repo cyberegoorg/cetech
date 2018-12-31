@@ -14,6 +14,7 @@
 #include "celib/api_system.h"
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
+#include <celib/os.h>
 
 #define WINDOW_NAME "Log view"
 #define LOG_FORMAT "[%d|%s] -> %s"
@@ -35,6 +36,8 @@ static struct _G {
 
     bool visible;
     ce_alloc *allocator;
+
+    ce_spinlock lock;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -79,8 +82,10 @@ static void log_handler(enum ce_log_level level,
     char buffer[1024];
     int len = snprintf(buffer, CE_ARRAY_LEN(buffer), LOG_FORMAT, LOG_ARGS);
 
+    ce_os_a0->thread->spin_lock(&_G.lock);
     ce_array_push(_G.log_items, item, _G.allocator);
     ce_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
+    ce_os_a0->thread->spin_unlock(&_G.lock);
 }
 
 

@@ -148,19 +148,23 @@ static void _compile_assimp_node(struct aiNode *root,
     }
 }
 
-static int _compile_assimp(uint64_t k,
+static int _compile_assimp(struct ce_cdb_t db,
+                           uint64_t k,
                            struct compile_output *output) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(k);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, k);
 
-    uint64_t import_obj = ce_cdb_a0->read_subobject(reader, ce_id_a0->id64("import"),
+    uint64_t import_obj = ce_cdb_a0->read_subobject(reader,
+                                                    ce_id_a0->id64("import"),
                                                     0);
 
-    const ce_cdb_obj_o *import_reader = ce_cdb_a0->read(import_obj);
+    const ce_cdb_obj_o *import_reader = ce_cdb_a0->read(db,
+                                                        import_obj);
 
     const char *input_str = ce_cdb_a0->read_str(import_reader,
                                                 ce_id_a0->id64("input"), "");
 
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_config_a0->obj());
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                   ce_config_a0->obj());
     const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     char *input_path = NULL;
@@ -175,7 +179,8 @@ static int _compile_assimp(uint64_t k,
                                                                  "postprocess"),
                                                          0);
 
-    const ce_cdb_obj_o *pp_reader = ce_cdb_a0->read(postprocess_obj);
+    const ce_cdb_obj_o *pp_reader = ce_cdb_a0->read(db,
+                                                    postprocess_obj);
 
     if (ce_cdb_a0->read_bool(pp_reader, ce_id_a0->id64("flip_uvs"),
                              false)) {
@@ -228,28 +233,28 @@ static int _compile_assimp(uint64_t k,
 
         ct_render_vertex_decl_t vertex_decl;
         ct_gfx_a0->vertex_decl_begin(&vertex_decl,
-                                          CT_RENDER_RENDERER_TYPE_COUNT);
+                                     CT_RENDER_RENDERER_TYPE_COUNT);
 
         uint32_t v_size = 0;
         if (mesh->mVertices != NULL) {
             ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                            CT_RENDER_ATTRIB_POSITION, 3,
-                                            CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
+                                       CT_RENDER_ATTRIB_POSITION, 3,
+                                       CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mNormals != NULL) {
             ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                            CT_RENDER_ATTRIB_NORMAL, 3,
-                                            CT_RENDER_ATTRIB_TYPE_FLOAT, true,
-                                            0);
+                                       CT_RENDER_ATTRIB_NORMAL, 3,
+                                       CT_RENDER_ATTRIB_TYPE_FLOAT, true,
+                                       0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
             ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                            CT_RENDER_ATTRIB_TEXCOORD0, 2,
-                                            CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
+                                       CT_RENDER_ATTRIB_TEXCOORD0, 2,
+                                       CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
 
             v_size += 2 * sizeof(float);
         }
@@ -293,15 +298,16 @@ static int _compile_assimp(uint64_t k,
     return 1;
 }
 
-extern "C" uint64_t scene_compiler(uint64_t k,
-                                   struct ct_resource_id rid,
-                                   const char *fullname) {
+extern "C" bool scene_compiler(struct ce_cdb_t db,
+                               uint64_t obj) {
     struct compile_output *output = _crete_compile_output();
 
     int ret = 1;
 
-    if (ce_cdb_a0->prop_exist(k, ce_id_a0->id64("import"))) {
-        ret = _compile_assimp(k, output);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, obj);
+
+    if (ce_cdb_a0->prop_exist(reader, ce_id_a0->id64("import"))) {
+        ret = _compile_assimp(db, obj, output);
     }
 
     if (!ret) {
@@ -309,9 +315,7 @@ extern "C" uint64_t scene_compiler(uint64_t k,
         return false;
     }
 
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), SCENE_TYPE);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT,
                           ce_array_size(output->geom_name));
     ce_cdb_a0->set_uint64(w, SCENE_NODE_COUNT,
@@ -364,7 +368,7 @@ extern "C" uint64_t scene_compiler(uint64_t k,
 
     _destroy_compile_output(output);
 
-    return obj;
+    return true;
 }
 
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {

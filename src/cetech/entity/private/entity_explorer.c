@@ -23,7 +23,6 @@
 #include <cetech/editor/explorer.h>
 
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/asset/sourcedb.h>
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
@@ -43,30 +42,38 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t children = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
-    uint64_t children_n = ce_cdb_a0->prop_count(children);
+    const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
+
 
     uint64_t components;
     components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
-    uint64_t component_n = ce_cdb_a0->prop_count(components);
+    const ce_cdb_obj_o *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                    components);
+
+
+    uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
+    uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
 
     if (!children_n && !component_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
     char name[128] = {0};
-    uint64_t uid = ce_cdb_a0->obj_key(obj);
+    uint64_t uid = obj;
     const char *ent_name = ce_cdb_a0->read_str(reader, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
     } else {
-        snprintf(name, CE_ARRAY_LEN(name), "%llu", uid);
+        snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
     }
 
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label),
-            (ICON_FA_CUBE" ""%s##%llu"), name, uid);
+             (ICON_FA_CUBE
+                     " ""%s##%llu"), name, uid);
 
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
@@ -74,15 +81,17 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        const ce_cdb_obj_o *cs_reader = ce_cdb_a0->read(components);
-        const uint32_t component_n = ce_cdb_a0->prop_count(components);
-        const uint64_t *keys = ce_cdb_a0->prop_keys(components);
+        const uint32_t component_n = ce_cdb_a0->prop_count(cs_reader);
+        const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t key = keys[i];
 
             uint64_t component = ce_cdb_a0->read_subobject(cs_reader, key, 0);
-            uint64_t type = ce_cdb_a0->obj_type(component);
+            const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                           component);
+
+            uint64_t type = ce_cdb_a0->obj_type(c_reader);
 
             struct ct_component_i0 *component_i;
             component_i = ct_ecs_a0->get_interface(type);
@@ -121,8 +130,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(children);
-        const uint64_t *keys = ce_cdb_a0->prop_keys(children);
+        const uint64_t *keys = ce_cdb_a0->prop_keys(ch_reader);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
@@ -144,14 +152,14 @@ static void draw_menu(uint64_t selected_obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(selected_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),selected_obj);
 
     ct_debugui_a0->SameLine(0, 10);
 
-    uint64_t type = ce_cdb_a0->obj_type(selected_obj);
+    uint64_t type = ce_cdb_a0->obj_type(reader);
 
     if (type == ENTITY_RESOURCE_ID) {
-        uint64_t uid = ce_cdb_a0->obj_key(selected_obj);
+        uint64_t uid = selected_obj;
 
         bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
 
@@ -171,7 +179,7 @@ static void draw_menu(uint64_t selected_obj) {
             uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              ENTITY_CHILDREN);
 
-            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(entity_obj);
+            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),entity_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
             ce_cdb_a0->write_commit(writer);
@@ -185,22 +193,22 @@ static void draw_menu(uint64_t selected_obj) {
             if (!add_children_obj) {
                 add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                             ENTITY_CHILDREN);
-                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(selected_obj);
+                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),selected_obj);
                 ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
                                          add_children_obj);
                 ce_cdb_a0->write_commit(writer);
             }
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(add_children_obj);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),add_children_obj);
             ce_cdb_a0->set_subobject(w, uid, entity_obj);
             ce_cdb_a0->write_commit(w);
         }
         ct_debugui_a0->SameLine(0, 10);
 
         if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-            uint64_t parent = ce_cdb_a0->parent(selected_obj);
+            uint64_t parent = ce_cdb_a0->parent(reader);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
             ce_cdb_a0->remove_property(w, uid);
             ce_cdb_a0->write_commit(w);
         }
@@ -212,7 +220,8 @@ static uint64_t cdb_type() {
     return ENTITY_RESOURCE_ID;
 }
 
-static uint64_t draw_ui(uint64_t top_level_obj, uint64_t selected_obj) {
+static uint64_t draw_ui(uint64_t top_level_obj,
+                        uint64_t selected_obj) {
     if (!top_level_obj) {
         return 0;
     }

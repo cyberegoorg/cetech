@@ -25,7 +25,6 @@
 
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/resource_editor.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/editor/selcted_object.h>
 
@@ -54,10 +53,11 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
 }
 
 static uint64_t draw(uint64_t selected_obj) {
-    uint64_t top_level = ce_cdb_a0->find_root(selected_obj);
+    uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
 
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(top_level));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
     if (i && i->draw_ui) {
         return i->draw_ui(top_level, selected_obj);
     }
@@ -65,26 +65,28 @@ static uint64_t draw(uint64_t selected_obj) {
 }
 
 static void draw_menu(uint64_t selected_obj) {
-    uint64_t top_level_obj = ce_cdb_a0->find_root(selected_obj);
+    uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
+                                                  selected_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                 top_level_obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(top_level_obj);
-
-    if (ce_cdb_a0->prop_exist(top_level_obj, ASSET_NAME_PROP)) {
+    if (ce_cdb_a0->prop_exist(reader, ASSET_NAME_PROP)) {
         const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
         ct_debugui_a0->Text("Asset: %s", name);
         ct_debugui_a0->SameLine(0, 10);
     }
 
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(selected_obj));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
     if (i && i->draw_menu) {
         i->draw_menu(selected_obj);
     }
 }
 
 static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                    0);
 
     if (!ct_selected_object_a0->selected_object(context)) {
         return;

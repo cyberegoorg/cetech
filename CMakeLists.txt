@@ -90,7 +90,6 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
-        src/cetech/asset/private/sourcedb.c
         src/cetech/resource/private/resource_compiler.c
         src/cetech/kernel/private/kernel.c
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
@@ -116,7 +115,6 @@ set(SOURCE_FILES
 
         src/cetech/shader/private/shader.c
         src/cetech/material/private/material.c
-        src/cetech/material/private/material_compiler.c
         src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
         src/cetech/mesh/private/mesh_renderer.c

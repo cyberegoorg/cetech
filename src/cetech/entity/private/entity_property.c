@@ -24,7 +24,6 @@
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/resource_ui.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/asset/sourcedb.h>
 
 
 #define _G entity_property_global
@@ -52,7 +51,8 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
 };
 
 static void draw_component(uint64_t obj) {
-    uint64_t type = ce_cdb_a0->obj_type(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t type = ce_cdb_a0->obj_type(reader);
 
     struct ct_component_i0 *c = get_component_interface(type);
 
@@ -69,11 +69,11 @@ static void draw_component(uint64_t obj) {
 
     ct_debugui_a0->NextColumn();
 
-    uint64_t parent = ce_cdb_a0->parent(obj);
-    uint64_t comp_type = ce_cdb_a0->obj_type(obj);
+    uint64_t parent = ce_cdb_a0->parent(reader);
+    uint64_t comp_type = ce_cdb_a0->obj_type(reader);
 
     if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(parent);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
         ce_cdb_a0->write_commit(w);
     }
@@ -104,7 +104,7 @@ static void _entity_ui(uint64_t obj) {
     }
 
     char buffer[128] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "%llu", ce_cdb_a0->obj_key(obj));
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
 
     ct_debugui_a0->Text("UID");
     ct_debugui_a0->NextColumn();
@@ -130,15 +130,17 @@ static void draw_ui(uint64_t obj) {
 
     _entity_ui(obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t components_obj;
     components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
-    uint64_t n = ce_cdb_a0->prop_count(components_obj);
-    const uint64_t *components_name = ce_cdb_a0->prop_keys(components_obj);
+    const ce_cdb_obj_o *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                  components_obj);
 
-    const ce_cdb_obj_o *creader = ce_cdb_a0->read(components_obj);
+    uint64_t n = ce_cdb_a0->prop_count(creader);
+    const uint64_t *components_name = ce_cdb_a0->prop_keys(creader);
+
 
     for (uint64_t j = 0; j < n; ++j) {
         uint64_t name = components_name[j];
@@ -155,7 +157,7 @@ void draw_menu(uint64_t obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     ct_debugui_a0->Button(ICON_FA_PLUS" component", (float[2]) {0.0f});
     if (ct_debugui_a0->BeginPopupContextItem("add component context menu", 0)) {
@@ -175,9 +177,12 @@ void draw_menu(uint64_t obj) {
                                                    ENTITY_COMPONENTS,
                                                    0);
 
+            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                         components);
+
             uint64_t component_type = i->cdb_type();
             if (ei->display_name &&
-                !ce_cdb_a0->prop_exist(components, component_type)) {
+                !ce_cdb_a0->prop_exist(reader, component_type)) {
                 const char *label = ei->display_name();
                 bool add = ct_debugui_a0->Selectable(label, false, 0,
                                                      (float[2]) {0.0f});
@@ -191,7 +196,8 @@ void draw_menu(uint64_t obj) {
                                                              component_type);
                     }
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(components);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             components);
                     ce_cdb_a0->set_subobject(w, component_type, component);
                     ce_cdb_a0->write_commit(w);
 

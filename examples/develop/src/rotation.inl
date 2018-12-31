@@ -61,8 +61,10 @@ static void foreach_rotation(struct ct_world world,
         uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
                                                 ent[i]);
 
-        const ce_cdb_obj_o * t_reader = ce_cdb_a0->read(transform);
-        const ce_cdb_obj_o * r_reader = ce_cdb_a0->read(rotation);
+        const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                       transform);
+        const ce_cdb_obj_o *r_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                       rotation);
 
         float speed = ce_cdb_a0->read_float(r_reader, PROP_SPEED, 0);
 
@@ -75,7 +77,7 @@ static void foreach_rotation(struct ct_world world,
         float rot[3] = {};
         ce_vec3_add_s(rot, rotc, speed * dt);
 
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(transform);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), transform);
         ce_cdb_a0->set_float(w, PROP_ROTATION_X, rot[0]);
         ce_cdb_a0->set_float(w, PROP_ROTATION_Y, rot[1]);
         ce_cdb_a0->set_float(w, PROP_ROTATION_Z, rot[2]);

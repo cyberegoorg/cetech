@@ -57,8 +57,8 @@ const char *CREATE_SQL[] = {
 
         "CREATE TABLE IF NOT EXISTS resource (\n"
         "uid      INTEGER                                 NOT NULL,\n"
-        "type     TEXT                                    NOT NULL,\n"
-        "name     TEXT                                    NOT NULL,\n"
+        "type     TEXT                                    ,\n"
+        "name     TEXT                                    ,\n"
         "file     INTEGER                                         ,\n"
         "FOREIGN KEY(file) REFERENCES files(id),                   \n"
         "PRIMARY KEY (uid)"
@@ -211,7 +211,8 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_config_a0->obj());
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                 ce_config_a0->obj());
 
     const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");
@@ -356,19 +357,23 @@ static int buildb_get_resource_dirs(char ***filename,
     while (_step(_db, sqls->get_resource_dirs) == SQLITE_ROW) {
         const unsigned char *fn = sqlite3_column_text(sqls->get_resource_dirs,
                                                       0);
-        char tmp_fulllname[256] = {};
 
-        ce_os_a0->path->dir(tmp_fulllname, (const char *) fn);
-        uint64_t hash = ce_id_a0->id64(tmp_fulllname);
+        if (fn) {
+            char tmp_fulllname[256] = {};
 
-        if (ce_hash_contain(&dir_set, hash)) {
-            continue;
+            ce_os_a0->path->dir(tmp_fulllname, (const char *) fn);
+            uint64_t hash = ce_id_a0->id64(tmp_fulllname);
+
+            if (ce_hash_contain(&dir_set, hash)) {
+                continue;
+            }
+
+            ce_hash_add(&dir_set, hash, 1, alloc);
+
+            char *dup_str = ce_memory_a0->str_dup(tmp_fulllname, alloc);
+            ce_array_push(*filename, dup_str, alloc);
         }
 
-        ce_hash_add(&dir_set, hash, 1, alloc);
-
-        char *dup_str = ce_memory_a0->str_dup(tmp_fulllname, alloc);
-        ce_array_push(*filename, dup_str, alloc);
 
         _step(_db, sqls->get_resource_dirs);
     }
@@ -402,17 +407,21 @@ static int buildb_get_resource_from_dirs(const char *dir,
 
     while (_step(_db, sqls->get_resource_from_dirs) == SQLITE_ROW) {
         const char *name;
-        name = (const char *)sqlite3_column_text(sqls->get_resource_from_dirs, 0);
+        name = (const char *) sqlite3_column_text(sqls->get_resource_from_dirs,
+                                                  0);
 
         const char *type;
-        type = (const char *)sqlite3_column_text(sqls->get_resource_from_dirs, 1);
+        type = (const char *) sqlite3_column_text(sqls->get_resource_from_dirs,
+                                                  1);
 
-        const size_t len = strlen(name) + strlen(type) + 2;
+        if (name) {
+            const size_t len = strlen(name) + strlen(type) + 2;
 
-        char* fn = CE_ALLOC(alloc, char, len);
-        snprintf(fn, len, "%s.%s", name, type);
+            char *fn = CE_ALLOC(alloc, char, len);
+            snprintf(fn, len, "%s.%s", name, type);
 
-        ce_array_push(*filename, fn, alloc);
+            ce_array_push(*filename, fn, alloc);
+        }
     }
 
     return 1;
@@ -472,7 +481,8 @@ uint64_t resource_type(struct ct_resource_id resource) {
 
     int ok = _step(_db, sqls->resource_type) == SQLITE_ROW;
     if (ok) {
-        const char* type_str = (const char*)sqlite3_column_text(sqls->resource_type, 0);
+        const char *type_str = (const char *) sqlite3_column_text(
+                sqls->resource_type, 0);
         type = ce_id_a0->id64(type_str);
         _step(_db, sqls->resource_type);
     }

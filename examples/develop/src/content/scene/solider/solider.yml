@@ -1,24 +1,25 @@
-"0x17cc459fd7aabb62": #content/scene/solider/solider.material:
-  asset_name: "content/scene/solider/solider"
-  asset_type: "material"
-  PREFAB: "0x24c9413e88ebaaa8"
-  layers:
-    gbuffer:
-      variables:
-        kdasdvxcvcxbxcbxbg435124asdkj:
-          value: "0xac2be8f79389febc"
-
 "0xac2be8f79389febc": #content/scene/solider/body.material:
+  cdb_uid: "0xac2be8f79389febc"
   asset_name: "content/scene/solider/body"
-  asset_type: "material"
+  cdb_type: "material"
   PREFAB: "0x24c9413e88ebaaa8"
+
   layers:
+    cdb_uid: "0x958312a9bf6f58fd"
+
     gbuffer:
+      cdb_uid: "0x5d2783e85b77b02f"
+
       variables:
+        cdb_uid: "0xde56456009609a50"
+
         kdasdvxcvcxbxcbxbg435124asdkj:
+          cdb_uid: "0xe2071c4327ff82f7"
+
           value: "0x7276a6db35892341"
 
 "0x7276a6db35892341": #content/scene/solider/body01.texture:
+  cdb_uid: "0x7276a6db35892341"
   asset_name: "content/scene/solider/body01"
-  asset_type: "texture"
+  cdb_type: "texture"
   input: content/scene/solider/body01.tga

@@ -6,10 +6,12 @@
 
 /bin/
 /build*/
-/.build/
+/*.build/
+/*.xcodeproj/
 /cmake-build-debug/
 /cmake-build-release/
 /CMakeFiles/
+/CMakeScripts/
 /site/
 
 __pycache__
@@ -28,3 +30,6 @@ logsystem.db
 /TODO.md
 
 *.srctrl*
+
+*.cmake
+CMakeCache.txt

@@ -21,6 +21,7 @@
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/log_view.h>
+#include <celib/log.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -67,7 +68,7 @@ static void _broadcast_edit() {
     event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                      RESOURCE_DCLICK_EVENT);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(event);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),event);
     ce_cdb_a0->set_uint64(w, RESOURCE_NAME, _G.selected_asset.uid);
     ce_cdb_a0->set_uint64(w, RESOURCE_BROWSER_ROOT, RESOURCE_BROWSER_SOURCE);
     ce_cdb_a0->write_commit(w);
@@ -79,7 +80,13 @@ static void _broadcast_edit() {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+
+    char *buf = NULL;
+    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
+    ce_log_a0->debug("resource browser", "\n%s", buf);
+    ce_buffer_free(buf, _G.allocator);
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
@@ -281,7 +288,7 @@ static void ui_asset_list(uint64_t dock) {
                         ce_cdb_a0->db(),
                         RESOURCE_BROWSER_ASSET_TYPE);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(selected_asset);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),selected_asset);
                 ce_cdb_a0->set_uint64(w, RESOURCE_NAME, resourceid.uid);
                 ce_cdb_a0->write_commit(w);
 

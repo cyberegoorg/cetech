@@ -20,7 +20,6 @@
 #include <celib/os.h>
 #include <cetech/editor/property.h>
 #include <cetech/resource/resource.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <stdlib.h>
 
@@ -63,7 +62,7 @@ static void ui_float(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     value_new = ce_cdb_a0->read_float(reader, prop_key_hash, value_new);
     value = value_new;
@@ -81,7 +80,7 @@ static void ui_float(uint64_t obj,
                                  min, max,
                                  "%.3f", 1.0f)) {
 
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_float(w, prop_key_hash, value_new);
         ce_cdb_a0->write_commit(w);
     }
@@ -95,7 +94,7 @@ static void ui_bool(uint64_t obj,
     bool value = false;
     bool value_new = false;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     value_new = ce_cdb_a0->read_bool(reader, prop_key_hash, value_new);
     value = value_new;
@@ -106,7 +105,7 @@ static void ui_bool(uint64_t obj,
     sprintf(labelid, "##%sprop_float_%d", label, 0);
 
     if (ct_debugui_a0->Checkbox(labelid, &value_new)) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_bool(w, prop_key_hash, value_new);
         ce_cdb_a0->write_commit(w);
     }
@@ -123,7 +122,7 @@ static void ui_str(uint64_t obj,
 
     const char *value = 0;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     value = ce_cdb_a0->read_str(reader, prop_key_hash, "");
 
     char buffer[128] = {'\0'};
@@ -144,7 +143,7 @@ static void ui_str(uint64_t obj,
     ct_debugui_a0->PopItemWidth();
 
     if (change) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
         ce_cdb_a0->set_str(w, prop_key_hash, buffer);
         ce_cdb_a0->write_commit(w);
     }
@@ -166,7 +165,7 @@ static void ui_str_combo(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
     value = ce_cdb_a0->read_str(reader, prop_key_hash, NULL);
 
     char *items = NULL;
@@ -210,7 +209,7 @@ static void ui_str_combo(uint64_t obj,
     }
 
     if (change) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
         ce_cdb_a0->set_str(w, prop_key_hash, buffer);
         ce_cdb_a0->write_commit(w);
     }
@@ -226,13 +225,13 @@ static void ui_resource(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     uint64_t uid = ce_cdb_a0->read_ref(reader, prop_key_hash, 0);
 
     uint64_t resource_obj = uid;
 
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(resource_obj);
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(),resource_obj);
     const char* resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");
 
     char buffer[128] = {'\0'};
@@ -266,7 +265,7 @@ static void ui_resource(uint64_t obj,
         if (payload) {
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
-            const ce_cdb_obj_o *dreader = ce_cdb_a0->read(drag_obj);
+            const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),drag_obj);
 
             if (drag_obj) {
                 uint64_t asset_type = ce_cdb_a0->read_uint64(dreader,
@@ -294,7 +293,7 @@ static void ui_resource(uint64_t obj,
 
     if (change) {
         const char *new_value_str = ce_id_a0->str_from_id64(new_value);
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
         ce_cdb_a0->set_str(w, prop_key_hash, new_value_str);
         ce_cdb_a0->write_commit(w);
     }
@@ -308,7 +307,7 @@ static void ui_vec3(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     float value[3] = {
             ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
@@ -332,7 +331,7 @@ static void ui_vec3(uint64_t obj,
                                   value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
         ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
         ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
         ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);
@@ -355,7 +354,7 @@ static void ui_vec4(uint64_t obj,
 //
 //    obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     float value[4] = {
             ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
@@ -389,7 +388,7 @@ static void ui_vec4(uint64_t obj,
     }
 
     if (changed) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
         ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
         ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
         ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);

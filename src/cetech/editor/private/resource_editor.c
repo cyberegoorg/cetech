@@ -71,7 +71,7 @@ static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
 };
 
 static void draw_editor(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
 
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
@@ -89,9 +89,9 @@ static void draw_editor(uint64_t dock) {
     bool click = ct_debugui_a0->IsMouseClicked(0, false);
 
     if (is_mouse_hovering && click) {
-        const ce_cdb_obj_o *creader = ce_cdb_a0->read(editor->context_obj);
+        const ce_cdb_obj_o *creader = ce_cdb_a0->read(ce_cdb_a0->db(),editor->context_obj);
         uint64_t name = ce_cdb_a0->read_uint64(creader,
-                                               _ASSET_NAME, 0);
+                                               ASSET_NAME_PROP, 0);
 
         uint64_t obj = name;
 
@@ -119,7 +119,7 @@ static uint32_t find_editor(uint64_t obj) {
 #define DEFAULT_EDITOR_NAME  "Editor"
 
 static const char *dock_title(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
@@ -164,7 +164,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
     uint64_t dock = ct_dock_a0->create_dock(_ASSET_EDITOR, true);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(dock);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),dock);
     ce_cdb_a0->set_ptr(w, _PROP_EDITOR, editor);
     ce_cdb_a0->write_commit(w);
 
@@ -172,7 +172,9 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 }
 
 static void open(uint64_t obj) {
-    uint64_t type = ce_cdb_a0->obj_type(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+
+    uint64_t type = ce_cdb_a0->obj_type(reader);
     struct ct_resource_editor_i0 *i = get_asset_editor(type);
 
     if (!i) {
@@ -183,7 +185,7 @@ static void open(uint64_t obj) {
     e->type = type;
     e->obj = obj;
 
-    struct ct_world *w = ce_cdb_a0->write_begin(e->context_obj);
+    struct ct_world *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
     ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
     i->open(e->context_obj);
 
@@ -208,7 +210,7 @@ static void on_asset_double_click(uint64_t type,
                                   void *event) {
     struct ebus_cdb_event *ev = event;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ev->obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),ev->obj);
 
     uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
                                                  RESOURCE_NAME, 0);

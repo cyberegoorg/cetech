@@ -238,12 +238,13 @@ static void load_dirs(const char *path) {
 
         const uint64_t key_id = ce_id_a0->id64(key);
 
-        if (!ce_cdb_a0->prop_exist(_G.config, key_id)) {
+        const ce_cdb_obj_o * reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+
+        if (!ce_cdb_a0->prop_exist(reader, key_id)) {
             break;
         }
 
 
-        const ce_cdb_obj_o * reader = ce_cdb_a0->read(_G.config);
         const char *module_file = ce_cdb_a0->read_str(reader, key_id, "");
         ce_os_a0->path->join(&buffer,
                              _G.allocator,

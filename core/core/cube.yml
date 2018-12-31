@@ -1,24 +1,37 @@
 "0x68373d25a0b84f58":
+  cdb_uid: "0x68373d25a0b84f58"
   asset_name: "core/cube"
-  asset_type: "entity"
+  cdb_type: "entity"
   components:
+    cdb_uid: "0x6ff3df6c430cc8cc"
+
     transform:
+      cdb_uid: "0x5966dbaab41f3b2a"
+
       position: [0, 0, 0]
       rotation: [0, 0, 0]
       scale: [1, 1, 1]
 
     mesh_renderer:
-      scene: "core/cube"
-      node: "n_cube"
-      mesh: "g_cube"
-      material: "core/cube"
+      cdb_uid: "0x1dee6c89b15dc2f"
+      scene: "0xb7baa30d19deb859"
+      mesh: "muro_main"
+      material: "0x6c8bca84fa0d4431"
 
 "0x8b73c8d507e579eb":
+  cdb_uid: "0x8b73c8d507e579eb"
   asset_name: "core/cube"
-  asset_type: "material"
-  PREFAB: content/material1.material
+  cdb_type: "material"
+  PREFAB: "0x24c9413e88ebaaa8"
   layers:
+    cdb_uid: "0x915dcd5404b32631"
+
     default:
+      cdb_uid: "0x32434d235d57c22d"
+
       variables:
+        cdb_uid: "0xdc6fdef07eefdfca"
+
         kdasdvxcvcxbxcbxbg435124asdkj:
-          value: content/scene/solider/body01
+          cdb_uid: "0x09d7f978a498de11"
+          value: "0x7276a6db35892341"

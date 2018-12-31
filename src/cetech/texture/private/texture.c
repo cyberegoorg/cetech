@@ -28,7 +28,6 @@
 #include <cetech/editor/resource_ui.h>
 #include <cetech/editor/resource_preview.h>
 #include <cetech/resource/builddb.h>
-#include <cetech/asset/sourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/property.h>
 
@@ -52,7 +51,7 @@ struct _G {
 //==============================================================================
 
 void texture_online(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t blob_size = 0;
     void *blob;
@@ -65,14 +64,14 @@ void texture_online(uint64_t obj) {
                                         CT_RENDER_TEXTURE_NONE,
                                         0, NULL);
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
     ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ce_cdb_a0->write_commit(writer);
 
 }
 
 void texture_offline(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     const uint64_t texture = ce_cdb_a0->read_uint64(reader,
                                                     TEXTURE_HANDLER_PROP,
@@ -146,9 +145,9 @@ static int _gen_tmp_name(char *tmp_filename,
     return ret;
 }
 
-static uint64_t _compile(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_config_a0->obj());
+static bool _compile(struct ce_cdb_t db, uint64_t obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, obj);
+    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(), ce_config_a0->obj());
 
     const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
@@ -176,7 +175,7 @@ static uint64_t _compile(uint64_t obj) {
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
     if (result != 0) {
-        return 0;
+        return false;
     }
 
     struct ce_vio *tmp_file = NULL;
@@ -187,18 +186,16 @@ static uint64_t _compile(uint64_t obj) {
     tmp_file->read(tmp_file, tmp_data, sizeof(char), size);
     tmp_file->close(tmp_file);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(obj);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_blob(w, TEXTURE_DATA, tmp_data, size);
     ce_cdb_a0->write_commit(w);
 
-    return obj;
+    return true;
 }
 
 
-uint64_t texture_compiler(uint64_t k,
-                          struct ct_resource_id rid,
-                          const char *fullname) {
-    return _compile(k);
+static bool texture_compiler(struct ce_cdb_t db, uint64_t k) {
+    return _compile(db, k);
 }
 
 static uint64_t cdb_type() {
@@ -215,7 +212,7 @@ static void draw_property(uint64_t obj) {
 
     float size[2] = {64, 64};
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
     struct ct_render_texture_handle texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
@@ -236,7 +233,7 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 
 
 static void tooltip(uint64_t resource) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(resource);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
 
     struct ct_render_texture_handle texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
@@ -295,7 +292,7 @@ ct_render_texture_handle_t texture_get(uint64_t name) {
         return (ct_render_texture_handle_t) {.idx = UINT16_MAX};
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
     struct ct_render_texture_handle texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
@@ -329,7 +326,7 @@ static void _update(float dt) {
     for (int i = 0; i < tn; ++i) {
         uint64_t obj = _G.all_textures[i];
 
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
         uint32_t change_n = 0;
         const struct ce_cdb_change_ev0 *changes;
@@ -337,7 +334,7 @@ static void _update(float dt) {
 
         if (changes) {
             texture_offline(obj);
-            _compile(obj);
+            _compile(ce_cdb_a0->db(), obj);
             texture_online(obj);
         }
     }

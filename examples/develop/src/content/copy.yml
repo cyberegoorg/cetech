@@ -1,12 +1,19 @@
 "0xe27880f9fbb28b8d": #content/copy.material:
+  cdb_uid: "0xe27880f9fbb28b8d"
   asset_name: "content/copy"
-  asset_type: "material"
+  cdb_type: "material"
   layers:
+    cdb_uid: "0x8987d9391ec29ecd"
+
     default:
+      cdb_uid: "0x2b41c78abb6dbba9"
+
       name: default
       shader: "0xd693a02d1669a559"
 
       render_state:
+        cdb_uid: "0x1280ea4b02aee59a"
+
         rgb_write: true
         alpha_write: true
         depth_write: true
@@ -15,12 +22,16 @@
         msaa: true
 
       variables:
+        cdb_uid: "0xfa1eea078615bfeb"
+
         43243243423423:
+          cdb_uid: "0x945f5b924d402d13"
           name: s_input_texture
           type: texture
 
 "0xd693a02d1669a559": #content/copy.shader:
+  cdb_uid: "0xd693a02d1669a559"
   asset_name: "content/copy"
-  asset_type: "shader"
+  cdb_type: "shader"
   vs_input: 'content/vs_copy.sc'
   fs_input: 'content/fs_copy.sc'

@@ -15,12 +15,12 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/buffer.inl>
+#include <celib/hashlib.h>
 
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <celib/hashlib.h>
-#include <cetech/asset/sourcedb.h>
+
 
 #include "../resource.h"
 
@@ -99,15 +99,7 @@ static void load(const uint64_t *names,
         uint64_t type = ct_builddb_a0->get_resource_type(
                 (struct ct_resource_id) {.uid=asset_name});
 
-        struct ct_resource_i0 *resource_i = get_resource_interface(type);
-
-        if (!resource_i) {
-            return;
-        }
-
-        ce_cdb_a0->create_object_uid(_G.db,
-                                     asset_name,
-                                     resource_i->cdb_type());
+        ce_cdb_a0->create_object_uid(_G.db, asset_name, type);
 
         uint64_t object = asset_name;
 
@@ -119,7 +111,13 @@ static void load(const uint64_t *names,
         if (!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
             ce_log_a0->error(LOG_WHERE,
                              "Could not load resource 0x%llx", rid.uid);
-            ce_cdb_a0->destroy_object(object);
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), object);
+            continue;
+        }
+
+        struct ct_resource_i0 *resource_i = get_resource_interface(type);
+
+        if (!resource_i) {
             continue;
         }
 
@@ -143,7 +141,7 @@ static void load(const uint64_t *names,
 }
 
 void unload(const uint64_t *names,
-                   size_t count) {
+            size_t count) {
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
@@ -158,7 +156,7 @@ void unload(const uint64_t *names,
                 continue;
             }
 
-            ce_log_a0->debug(LOG_WHERE, "Unload resource %llux ", rid.uid);
+            ce_log_a0->debug(LOG_WHERE, "Unload resource 0x%llx", rid.uid);
 
             uint64_t object = ce_hash_lookup(&_G.res_map, rid.uid, 0);
             if (!object) {
@@ -172,13 +170,28 @@ void unload(const uint64_t *names,
     }
 }
 
-static bool get_obj(uint64_t uid) {
+static bool cdb_loader(uint64_t uid) {
     uint64_t object = ce_hash_lookup(&_G.res_map, uid, 0);
     if (!object) {
-        ce_log_a0->warning(LOG_WHERE, "Loading resource 0x%llx", uid);
+        ce_log_a0->debug(LOG_WHERE, "Load obj 0x%llx", uid);
         load_now(&uid, 1);
 
         uint64_t new_object = ce_hash_lookup(&_G.res_map, uid, 0);
+
+        if (new_object) {
+            const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), new_object);
+            uint64_t prebaf = ce_cdb_a0->read_ref(r, PREFAB_NAME_PROP, 0);
+            if(prebaf) {
+                ce_cdb_a0->set_from(ce_cdb_a0->db(), prebaf, new_object);
+            }
+
+            char *buf = NULL;
+            ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, new_object, 0);
+            ce_log_a0->debug(LOG_WHERE, "Loaded new obj\n%s", buf);
+            ce_buffer_free(buf, _G.allocator);
+
+        }
+
         return new_object != 0;
     }
 
@@ -210,12 +223,12 @@ static void put(struct ct_resource_id resource_id,
         resource_i->offline(resource_id.uid, object);
     }
 
-    ce_cdb_a0->move(obj, object);
+    ce_cdb_a0->move(ce_cdb_a0->db(), obj, object);
 }
 
 static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
-        .cdb_loader = get_obj,
+        .cdb_loader = cdb_loader,
         .reload_from_obj = put,
 };
 
@@ -234,8 +247,8 @@ static void _init_cvar(struct ce_config_a0 *config) {
     ce_config_a0 = config;
     _G.config = ce_config_a0->obj();
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config);
-    if (!ce_cdb_a0->prop_exist(_G.config, CONFIG_BUILD)) {
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
+    if (!ce_cdb_a0->prop_exist(writer, CONFIG_BUILD)) {
         ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
     }
     ce_cdb_a0->write_commit(writer);
@@ -253,7 +266,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_G.config);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     ce_fs_a0->map_root_dir(BUILD_ROOT,
                            ce_cdb_a0->read_str(reader, CONFIG_BUILD, ""),

@@ -65,7 +65,8 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config_object);
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                  _G.config_object);
 
     const uint64_t key = ce_id_a0->id64(name);
 
@@ -107,13 +108,16 @@ static void foreach_config_clb(uint64_t key,
     }
 
 
-    enum ce_cdb_type type = ce_cdb_a0->prop_type(value, key);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), value);
+    enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
 
-    const ce_cdb_obj_o * reader = ce_cdb_a0->read(value);
     if (type == CDB_TYPE_SUBOBJECT) {
         uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, key, 0);
-        const uint64_t n = ce_cdb_a0->prop_count(sub_obj);
-        const uint64_t* keys = ce_cdb_a0->prop_keys(sub_obj);
+
+        const ce_cdb_obj_o *subr = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
+
+        const uint64_t n = ce_cdb_a0->prop_count(subr);
+        const uint64_t *keys = ce_cdb_a0->prop_keys(subr);
 
         for (int i = 0; i < n; ++i) {
             foreach_config_clb(keys[i], sub_obj, name);
@@ -131,11 +135,14 @@ static void foreach_config_clb(uint64_t key,
         } else {
             const uint64_t key = ce_id_a0->id64(name);
 
-            if (ce_cdb_a0->prop_exist(_G.config_object, key)) {
-                enum ce_cdb_type t = ce_cdb_a0->prop_type(
-                        _G.config_object, key);
+            const ce_cdb_obj_o *conf_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                         _G.config_object);
 
-                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(_G.config_object);
+            if (ce_cdb_a0->prop_exist(conf_r, key)) {
+                enum ce_cdb_type t = ce_cdb_a0->prop_type(conf_r, key);
+
+                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                              _G.config_object);
 
                 switch (t) {
                     case CDB_TYPE_NONE:
@@ -147,7 +154,8 @@ static void foreach_config_clb(uint64_t key,
                         break;
 
                     case CDB_TYPE_UINT64:
-                        tmp_int =  (int)ce_cdb_a0->read_float(reader, key, 0.0f);
+                        tmp_int = (int) ce_cdb_a0->read_float(reader, key,
+                                                              0.0f);
                         ce_cdb_a0->set_uint64(writer, key, tmp_int);
                         break;
 
@@ -159,7 +167,7 @@ static void foreach_config_clb(uint64_t key,
                         break;
                 }
 
-                ce_cdb_a0->write_begin(_G.config_object);
+                ce_cdb_a0->write_commit(writer);
             }
         }
     }
@@ -173,14 +181,16 @@ static int load_from_yaml_file(const char *path,
     uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
     f->close(f);
 
-    const uint64_t n = ce_cdb_a0->prop_count(obj);
-    const uint64_t* keys = ce_cdb_a0->prop_keys(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    const uint64_t n = ce_cdb_a0->prop_count(reader);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
     for (int i = 0; i < n; ++i) {
         foreach_config_clb(keys[i], obj, NULL);
     }
 
-    ce_cdb_a0->destroy_object(obj);
+    ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
 
     return 1;
 }
@@ -227,7 +237,7 @@ void CE_MODULE_INITAPI(config)(struct ce_api_a0 *api) {
 }
 
 void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
-                                  int reload) {
+                             int reload) {
     CE_UNUSED(reload);
     _G = (struct _G) {};
 
@@ -240,7 +250,7 @@ void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD (config)(struct ce_api_a0 *api,
-                                    int reload) {
+                               int reload) {
     CE_UNUSED(api, reload);
     ce_log_a0->debug(LOG_WHERE, "Shutdown");
 

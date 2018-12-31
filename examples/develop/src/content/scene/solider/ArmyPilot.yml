@@ -1,8 +1,12 @@
 "0xdb8022af117db75b": #content/scene/solider/ArmyPilot.scene:
+  cdb_uid: "0xdb8022af117db75b"
   asset_name: "content/scene/solider/ArmyPilot"
-  asset_type: "scene"
+  cdb_type: "scene"
   import:
+    cdb_uid: "0x29824f6b4b84e021"
+
     input: content/scene/solider/ArmyPilot.dae
 
     postprocess:
+      cdb_uid: "0x6bfc9b75bedab4a2"
       flip_uvs: true

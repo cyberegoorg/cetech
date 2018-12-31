@@ -62,8 +62,8 @@ void foreach_mesh_renderer(struct ct_world world,
                                                     MESH_RENDERER_COMPONENT,
                                                     entities[i]);
 
-        const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(transform);
-        const ce_cdb_obj_o *mr_reader = ce_cdb_a0->read(mesh_renderer);
+        const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),transform);
+        const ce_cdb_obj_o *mr_reader = ce_cdb_a0->read(ce_cdb_a0->db(),mesh_renderer);
 
         uint64_t scene = ce_cdb_a0->read_ref(mr_reader,
                                              PROP_SCENE_ID, 0);
@@ -95,7 +95,7 @@ void foreach_mesh_renderer(struct ct_world world,
                                                               PROP_MESH,
                                                               0));
 
-        const ce_cdb_obj_o *scene_reader = ce_cdb_a0->read(scene_obj);
+        const ce_cdb_obj_o *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(),scene_obj);
 
 
         uint64_t mesh = mesh_id;
@@ -105,7 +105,7 @@ void foreach_mesh_renderer(struct ct_world world,
             continue;
         }
 
-        const ce_cdb_obj_o *geom_reader = ce_cdb_a0->read(geom_obj);
+        const ce_cdb_obj_o *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(),geom_obj);
 
         uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
         uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE,
@@ -143,7 +143,7 @@ static void _init_api(struct ce_api_a0 *api) {
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 
@@ -157,7 +157,7 @@ void mesh_combo_items(uint64_t obj,
 void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
     uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 

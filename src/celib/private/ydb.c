@@ -70,27 +70,23 @@ static void type_value_from_scalar(const uint8_t *scalar,
     float f;
 
     if (!is_key) {
-        if ((scalar_str[0] == '0') && (scalar_str[1] == 'x')) {
-            uint64_t v = strtoul(scalar_str, NULL, 0);
-            *type = NODE_UINT;
-            *vallue = (struct node_value) {.ui = v};
-            return;
+        if (!((scalar_str[0] == '0') && (scalar_str[1] == 'x'))) {
+            if (sscanf(scalar_str, "%f", &f)) {
+                *type = NODE_FLOAT;
+                *vallue = (struct node_value) {.f = f};
+                return;
 
-        } else if (sscanf(scalar_str, "%f", &f)) {
-            *type = NODE_FLOAT;
-            *vallue = (struct node_value) {.f = f};
-            return;
-
-        } else if ((0 == strcmp(scalar_str, "y")) ||
-                   (0 == strcmp(scalar_str, "yes")) ||
-                   (0 == strcmp(scalar_str, "true"))) {
-            *type = NODE_TRUE;
-            return;
-        } else if ((0 == strcmp(scalar_str, "n")) ||
-                   (0 == strcmp(scalar_str, "no")) ||
-                   (0 == strcmp(scalar_str, "false"))) {
-            *type = NODE_FALSE;
-            return;
+            } else if ((0 == strcmp(scalar_str, "y")) ||
+                       (0 == strcmp(scalar_str, "yes")) ||
+                       (0 == strcmp(scalar_str, "true"))) {
+                *type = NODE_TRUE;
+                return;
+            } else if ((0 == strcmp(scalar_str, "n")) ||
+                       (0 == strcmp(scalar_str, "no")) ||
+                       (0 == strcmp(scalar_str, "false"))) {
+                *type = NODE_FALSE;
+                return;
+            }
         }
 
     }
@@ -217,7 +213,9 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                 if (len) {
                     uint64_t array = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                               0);
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(array);
+
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             array);
                     for (int i = 0; i < len; ++i) {
                         const char *str = s->str_array[i];
                         ce_cdb_a0->set_str(w, ce_id_a0->id64(str), str);
@@ -246,7 +244,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                         .type = NODE_MAP,
                         .root_object = obj,
                         .key_hash = key,
-                        .writer = ce_cdb_a0->write_begin(obj)
+                        .writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj)
                 };
 
 
@@ -464,8 +462,10 @@ static void _indent(char **buffer,
 static void dump_yaml(char **buffer,
                       uint64_t from,
                       uint32_t level) {
-    const uint32_t prop_count = ce_cdb_a0->prop_count(from);
-    const uint64_t *keys = ce_cdb_a0->prop_keys(from);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), from);
+
+    const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
@@ -476,13 +476,7 @@ static void dump_yaml(char **buffer,
             continue;
         }
 
-//        if (!ce_cdb_a0->prop_exist_norecursive(from, key)) {
-//            continue;
-//        }
-
-        enum ce_cdb_type type = ce_cdb_a0->prop_type(from, key);
-
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(from);
+        enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
 
         switch (type) {
             case CDB_TYPE_SUBOBJECT: {

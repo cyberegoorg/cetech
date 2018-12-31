@@ -1,6 +1,7 @@
 "0xe1ab713dde582de1": #content/texture2.texture:
+  cdb_uid: "0xe1ab713dde582de1"
   asset_name: "content/texture2"
-  asset_type: "texture"
+  cdb_type: "texture"
   input: content/texture2.png
   gen_mipmaps: yes
   is_normalmap: no

@@ -3,12 +3,6 @@
 
 #include <stdint.h>
 
-#define _ASSET_TYPE \
-    CE_ID64_0("asset_type", 0x1f1f05db4e4dabbaULL)
-
-#define _ASSET_NAME \
-    CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
-
 #define RESOURCE_EDITOR_I \
     CE_ID64_0("ct_resource_editor_i0", 0x1271656210cd7528ULL)
 

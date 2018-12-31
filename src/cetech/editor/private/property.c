@@ -15,7 +15,6 @@
 #include <cetech/editor/dock.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/asset/sourcedb.h>
 #include <celib/cdb.h>
 #include <cetech/editor/selcted_object.h>
 
@@ -31,13 +30,15 @@ static void draw(uint64_t obj) {
         return;
     }
 
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(obj))) {
+            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
 
             if (i->draw_ui) {
                 i->draw_ui(obj);
@@ -54,13 +55,15 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(obj))) {
+            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
 
             if (i->draw_menu) {
                 i->draw_menu(obj);
@@ -73,7 +76,7 @@ static void draw_menu(uint64_t obj) {
 }
 
 static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
@@ -95,7 +98,7 @@ static void on_debugui(uint64_t dock) {
 }
 
 static void on_menu(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
     draw_menu(obj);
