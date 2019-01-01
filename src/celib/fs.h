@@ -6,6 +6,9 @@
 
 #include <celib/module.inl>
 
+#define CE_FS_API \
+    CE_ID64_0("ce_fs_a0", 0xb833e93306ececb0ULL)
+
 struct ce_alloc;
 
 enum ce_fs_open_mode {

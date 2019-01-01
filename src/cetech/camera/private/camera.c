@@ -124,13 +124,13 @@ static struct ct_component_i0 ct_component_i0 = {
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api("ct_camera_a0", &camera_api);
+    api->register_api(CT_CAMERA_API, &camera_api);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api("ct_component_i0", &ct_component_i0);
+    api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
 }
 
 static void _shutdown() {

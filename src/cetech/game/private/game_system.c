@@ -19,11 +19,12 @@
 struct _G {
     struct ce_hash_t game_interface_map;
     struct ce_hash_t game_paused;
-    struct ct_game_i0** game_interface;
+    struct ct_game_i0 **game_interface;
 } _G;
 
 static struct ct_game_i0 *_get_game(uint64_t name) {
-    return (struct ct_game_i0*) ce_hash_lookup(&_G.game_interface_map, name, 0);
+    return (struct ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name,
+                                                0);
 }
 
 static void game_init() {
@@ -40,7 +41,8 @@ static void game_shutdown() {
     }
 }
 
-static void game_step(uint64_t name, float dt) {
+static void game_step(uint64_t name,
+                      float dt) {
     struct ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
@@ -62,7 +64,7 @@ static bool game_is_paused(uint64_t name) {
 static void game_update(float dt) {
     const uint64_t game_n = ce_array_size(_G.game_interface);
     for (int i = 0; i < game_n; ++i) {
-        struct ct_game_i0* gi = _G.game_interface[i];
+        struct ct_game_i0 *gi = _G.game_interface[i];
 
         if (game_is_paused(gi->name())) {
             continue;
@@ -76,7 +78,7 @@ static struct ct_viewport0 game_render_graph_builder(uint64_t name) {
     struct ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
-        return (struct ct_viewport0){0};
+        return (struct ct_viewport0) {0};
     }
 
     return game_i->render_graph_builder();
@@ -116,7 +118,7 @@ static uint64_t task_name() {
     return CT_GAME_TASK;
 }
 
-static uint64_t * update_after(uint64_t* n) {
+static uint64_t *update_after(uint64_t *n) {
     static uint64_t a[] = {
             CT_INPUT_TASK,
     };
@@ -140,16 +142,14 @@ void CE_MODULE_INITAPI(game_system)(struct ce_api_a0 *api) {
 }
 
 void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
-                                      int reload) {
+                                  int reload) {
 
-    api->register_api("ct_game_system_a0", ct_game_system_a0);
-    api->register_api("ct_kernel_task_i0", &game_task);
+    api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0);
+    api->register_api(KERNEL_TASK_INTERFACE, &game_task);
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT,
-                        game_init, GAME_ORDER);
-
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT,
-                        game_shutdown, GAME_ORDER);
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT, game_init, GAME_ORDER);
+    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, game_shutdown,
+                        GAME_ORDER);
 
     ce_api_a0->register_on_add(GAME_INTERFACE, _game_api_add);
 
@@ -157,7 +157,7 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD (game_system)(struct ce_api_a0 *api,
-                                        int reload) {
+                                    int reload) {
     CE_UNUSED(api);
 }
 

@@ -4,8 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PROPERTY_EDITOR_INTERFACE_NAME \
-    "ct_property_editor_i0"
+#define CT_PROP_EDITOR_API \
+    CE_ID64_0("ct_property_editor_a0", 0x10996d5471937b8aULL)
+
 
 #define PROPERTY_EDITOR_INTERFACE \
     CE_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)

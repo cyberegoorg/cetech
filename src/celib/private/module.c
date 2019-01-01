@@ -325,7 +325,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_api_a0 = api;
-    api->register_api("ce_module_a0", &module_api);
+    api->register_api(CE_MODULE0_API, &module_api);
     
 }
 

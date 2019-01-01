@@ -5,6 +5,9 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#define CT_RENDERER_API \
+    CE_ID64_0("ct_renderer_a0", 0xfe29b15a8b749c94ULL)
+
 #define CONFIG_RENDERER_TYPE \
      CE_ID64_0("renderer.type", 0x3ee74a7da01daff0ULL)
 

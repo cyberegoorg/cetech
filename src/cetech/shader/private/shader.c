@@ -291,7 +291,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 int shader_init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
 
     return 1;
 }
@@ -313,7 +313,7 @@ static struct ct_shader_a0 shader_api = {
 struct ct_shader_a0 *ct_shader_a0 = &shader_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_shader_a0", &shader_api);
+    api->register_api(CT_SHADER_API, &shader_api);
 }
 
 CE_MODULE_DEF(

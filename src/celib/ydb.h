@@ -7,6 +7,9 @@
 
 #include <celib/module.inl>
 
+#define CE_YDB_API \
+    CE_ID64_0("ce_ydb_a0", 0xf5be4873d4ac8920ULL)
+
 struct ce_vio;
 struct ce_alloc;
 

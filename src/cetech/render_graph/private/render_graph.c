@@ -53,7 +53,7 @@ static void _init(struct ce_api_a0 *api) {
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api("ct_rg_a0", &render_graph_api);
+    api->register_api(CT_RG_API, &render_graph_api);
 
 }
 

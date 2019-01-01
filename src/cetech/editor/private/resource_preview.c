@@ -283,7 +283,7 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
@@ -291,8 +291,8 @@ static void _init(struct ce_api_a0 *api) {
 
     ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
 
-    api->register_api("ct_asset_preview_a0", &asset_preview_api);
-    api->register_api("ct_editor_module_i0", &ct_editor_module_i0);
+    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api);
+    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
 }
 
 static void _shutdown() {

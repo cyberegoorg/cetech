@@ -270,7 +270,7 @@ static void _init(struct ce_api_a0 *api) {
 
     init_decl();
 
-    api->register_api("ct_default_rg_a0", &default_render_graph_api);
+    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api);
 }
 
 static void _shutdown() {
@@ -287,7 +287,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ct_mesh_renderer_a0);
             CE_INIT_API(api, ct_dd_a0);
             CE_INIT_API(api, ct_material_a0);
         },

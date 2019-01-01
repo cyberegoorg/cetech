@@ -414,7 +414,7 @@ struct ct_resource_ui_a0 *ct_resource_ui_a0 = &editor_ui_a0;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api("ct_resource_ui_a0", ct_resource_ui_a0);
+    api->register_api(CT_RESOURCE_UI_API, ct_resource_ui_a0);
 }
 
 static void _shutdown() {

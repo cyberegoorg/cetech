@@ -186,7 +186,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_log_a0->register_handler(log_handler, NULL);
 
-    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    ce_api_a0->register_api(DOCK_INTERFACE, &ct_dock_i0);
 
     ct_dock_a0->create_dock(LOG_VIEW, true);
 

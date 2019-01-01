@@ -240,7 +240,7 @@ static void _init(struct ce_api_a0 *api) {
             .draw_menu = draw_menu,
     };
 
-    api->register_api(EXPLORER_INTERFACE_NAME, &entity_explorer);
+    api->register_api(EXPLORER_INTERFACE, &entity_explorer);
 }
 
 static void _shutdown() {

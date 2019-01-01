@@ -9,6 +9,7 @@
 #include <celib/log.h>
 #include <celib/task.h>
 #include <celib/module.h>
+#include <celib/hashlib.h>
 
 #include "queue_mpmc.h"
 
@@ -225,7 +226,7 @@ struct ce_task_a0 *ce_task_a0 = &_task_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api("ce_task_a0", &_task_api);
+    api->register_api(CE_TASK_API, &_task_api);
 
     int core_count = ce_os_a0->cpu->count();
 

@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <celib/module.inl>
 
+
+#define CE_CONFIG_API \
+    CE_ID64_0("ce_config_a0", 0xd75a5088e70ad1bbULL)
+
 struct ce_alloc;
 
 struct ce_config_a0 {

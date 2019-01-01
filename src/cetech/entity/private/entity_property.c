@@ -226,7 +226,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
 }
 
 static void _shutdown() {

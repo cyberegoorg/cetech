@@ -8,6 +8,9 @@
 #include "murmur_hash.inl"
 #include "module.inl"
 
+#define CE_API_API \
+    CE_ID64_0("ce_api_a0", 0x95b23cc231103112ULL)
+
 // Init api
 #define CE_INIT_API(_api, name) \
     name = (struct name*) (_api)->first(ce_hash_murmur2_64(#name, strlen(#name), 0)).api
@@ -28,7 +31,7 @@ struct ce_api_entry {
 typedef void (ce_api_on_add_t)(uint64_t name, void* api);
 
 struct ce_api_a0 {
-    void (*register_api)(const char *name,
+    void (*register_api)(uint64_t name_id,
                          void *api);
 
     int (*exist)(const char *name);

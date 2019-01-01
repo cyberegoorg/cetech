@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define CT_ACTION_MANAGER_API \
+    CE_ID64_0("ct_action_manager_a0", 0xcdad2ddf745f6c55ULL)
+
 struct ct_action_manager_a0 {
     void (*register_action)(uint64_t name,
                             const char *shortcut,

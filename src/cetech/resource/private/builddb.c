@@ -580,7 +580,7 @@ struct ct_builddb_a0 *ct_builddb_a0 = &build_db_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {};
 
-    api->register_api("ct_builddb_a0", ct_builddb_a0);
+    api->register_api(CT_BUILDDB_API, ct_builddb_a0);
 
     builddb_init_db();
 }

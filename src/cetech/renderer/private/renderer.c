@@ -342,9 +342,9 @@ static struct ct_kernel_task_i0 render_task = {
 };
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_renderer_a0", &rendderer_api);
-    api->register_api("ct_gfx_a0", &rendderapi_api);
-    api->register_api("ct_kernel_task_i0", &render_task);
+    api->register_api(CT_RENDERER_API, &rendderer_api);
+    api->register_api(CT_GFX_API, &rendderapi_api);
+    api->register_api(KERNEL_TASK_INTERFACE, &render_task);
 }
 
 static void _init(struct ce_api_a0 *api) {

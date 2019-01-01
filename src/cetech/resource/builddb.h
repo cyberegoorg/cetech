@@ -4,6 +4,9 @@
 #include <stdint.h>
 #include <time.h>
 
+#define CT_BUILDDB_API \
+    CE_ID64_0("ct_builddb_a0", 0xe682eb268876882aULL)
+
 struct ct_resource_id;
 struct ce_alloc;
 

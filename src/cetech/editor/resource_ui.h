@@ -7,6 +7,10 @@
 
 #include <celib/module.inl>
 
+#define CT_RESOURCE_UI_API \
+    CE_ID64_0("ct_resource_ui_a0", 0x10f2e96255f3d740ULL)
+
+
 struct ui_vec4_p0 {
     float min_f;
     float max_f;

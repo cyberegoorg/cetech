@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define ECS_EBUS_NAME "ecs"
+#define CT_ECS_API \
+    CE_ID64_0("ct_ecs_a0", 0x2abf54879e52240fULL)
 
 #define EDITOR_COMPONENT \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
@@ -16,17 +17,8 @@
 #define ENTITY_INSTANCE \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
-#define ENTITY_RESOURCE \
-    CE_ID64_0("entity_resource", 0xf8623393c111abd5ULL)
-
-#define ENTITY_UID \
-    CE_ID64_0("entity_uid", 0xa3b266878c572abdULL)
-
 #define ENTITY_NAME \
     CE_ID64_0("name", 0xd4c943cba60c270bULL)
-
-#define ENTITY_WORLD \
-    CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
 #define ENTITY_COMPONENTS \
     CE_ID64_0("components", 0xe71d1687374e5a54ULL)

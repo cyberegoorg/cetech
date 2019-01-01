@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define CT_DD_API \
+    CE_ID64_0("ct_dd_a0", 0xfdd19bc6b2e51af8ULL)
 
 struct ce_aabb;
 struct ce_cylinder;

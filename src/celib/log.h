@@ -1,11 +1,14 @@
 #ifndef CE_LOG_API_H
 #define CE_LOG_API_H
 
-#include <celib/macros.h>
-
 #include <time.h>
 #include <stdarg.h>
+
+#include <celib/macros.h>
 #include "module.inl"
+
+#define CE_LOG_API \
+    CE_ID64_0("ce_log_a0", 0x1e2a79ce44a2031cULL)
 
 struct ce_api_a0;
 

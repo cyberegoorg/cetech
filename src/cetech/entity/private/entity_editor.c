@@ -391,7 +391,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api("ct_resource_editor_i0", &ct_resource_editor_i0);
+    api->register_api(RESOURCE_EDITOR_I, &ct_resource_editor_i0);
 }
 
 static void _shutdown() {

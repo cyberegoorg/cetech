@@ -192,9 +192,7 @@ static void _init(struct ce_api_a0 *api) {
             .load_layout = true,
     };
 
-
-    ce_api_a0->register_api(GAME_INTERFACE_NAME, &editor_game_i0);
-
+    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0);
     ce_ebus_a0->connect(DEBUGUI_EBUS, DEBUGUI_EVENT, on_ui, 1);
 }
 

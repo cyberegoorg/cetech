@@ -246,7 +246,7 @@ void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
     _G.db = ce_cdb_a0->db();
     _G.config_object = ce_cdb_a0->create_object(_G.db, 0);
 
-    api->register_api("ct_config_a0", &config_a0);
+    api->register_api(CE_CONFIG_API, &config_a0);
 }
 
 void CE_MODULE_UNLOAD (config)(struct ce_api_a0 *api,

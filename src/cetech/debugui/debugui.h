@@ -10,6 +10,9 @@
 #include <celib/macros.h>
 #include <celib/module.inl>
 
+#define CT_DEBUGUI_API \
+    CE_ID64_0("ct_debugui_a0", 0xdd1adfe792cc040fULL)
+
 struct ct_render_texture_handle;
 struct ce_vio;
 

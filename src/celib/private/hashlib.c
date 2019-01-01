@@ -96,9 +96,6 @@ const char *str_from_id32(uint32_t key) {
 
 static struct ce_id_a0 hash_api = {
         .id64 = stringid64_from_string,
-//        .id32_from_str = stringid32_from_string,
-
-        .str_from_id32 = str_from_id32,
         .str_from_id64 = str_from_id64,
 };
 
@@ -111,7 +108,7 @@ void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
                                   int reload) {
     CE_UNUSED(reload);
 
-    api->register_api("ce_id_a0", &hash_api);
+    api->register_api(CE_ID_API, &hash_api);
 
     _G = (struct _G) {
     };

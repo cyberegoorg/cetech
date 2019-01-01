@@ -1,6 +1,8 @@
+
 #include <celib/os.h>
 #include <celib/module.h>
 #include <celib/api_system.h>
+#include <celib/hashlib.h>
 #include "celib/macros.h"
 
 extern struct ce_os_cpu_a0 cpu_api;
@@ -35,7 +37,7 @@ CE_MODULE_DEF(
         },
         {
             CE_UNUSED(reload);
-            api->register_api("ce_os_a0", ce_os_a0);
+            api->register_api(CE_OS_API, ce_os_a0);
         },
         {
             CE_UNUSED(reload);

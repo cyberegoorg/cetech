@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <celib/module.inl>
 
+#define CT_CAMERA_API \
+    CE_ID64_0("ct_camera_a0", 0x66ecb4e7c5973115ULL)
+
 #define CAMERA_COMPONENT \
     CE_ID64_0("camera", 0x60ed8c3931822dc7ULL)
 

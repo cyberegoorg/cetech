@@ -176,7 +176,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api("ct_action_manager_a0", &action_manager_api);
+    api->register_api(CT_ACTION_MANAGER_API, &action_manager_api);
 }
 
 static void _shutdown() {

@@ -4,6 +4,9 @@
 
 #include <stdint.h>
 
+#define CT_DEFAULT_RG_API \
+    CE_ID64_0("ct_default_rg_a0", 0xe909f984404895b4ULL)
+
 struct ct_rg_module;
 struct ct_world;
 

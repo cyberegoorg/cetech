@@ -248,20 +248,17 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    ce_api_a0->register_api(DOCK_INTERFACE_NAME, &dock_i);
+    ce_api_a0->register_api(DOCK_INTERFACE, &dock_i);
 
     ce_ebus_a0->connect(RESOURCE_BROWSER_EBUS,
                         RESOURCE_DCLICK_EVENT,
                         on_asset_double_click, 0);
 
-    ce_api_a0->register_api("ct_editor_module_i0",
-                            &ct_editor_module_i0);
+    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
 
     ce_ebus_a0->create_ebus(RESOURCE_EDITOR_EBUS);
 
-
-
-
+    
     _get_or_create_editor(0);
 }
 

@@ -97,7 +97,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
 
     ct_dock_a0->create_dock(GAME_INTERFACE, true);
 }

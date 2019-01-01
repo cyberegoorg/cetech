@@ -10,9 +10,11 @@
 
 #include "module.inl"
 
-struct ce_alloc;
+#define CE_OS_API \
+    CE_ID64_0("ce_os_a0", 0x1f1e6d0d81d750baULL)
 
 #ifdef DEBUG
+
 #define CE_ASSERT(where, condition)                                 \
     do {                                                                \
         if (!(condition)) {                                             \
@@ -23,6 +25,8 @@ struct ce_alloc;
 #define CE_ASSERT(where, condition) \
     do {} while (0)
 #endif
+
+struct ce_alloc;
 
 // # Error
 

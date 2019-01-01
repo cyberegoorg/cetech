@@ -907,7 +907,7 @@ struct ct_ecs_a0 *ct_ecs_a0 = &_api;
 
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_ecs_a0", &_api);
+    api->register_api(CT_ECS_API, &_api);
 }
 
 static void _componet_api_add(uint64_t name,
@@ -936,7 +936,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_ebus_a0->create_ebus(ECS_EBUS);
 
-    ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 

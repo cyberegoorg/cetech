@@ -37,10 +37,8 @@ static struct _G {
 // Private
 //==============================================================================
 
-static void api_register_api(const char *name,
+static void api_register_api(uint64_t name_id,
                              void *api) {
-    uint64_t name_id = ce_id_a0->id64(name);
-
     uint64_t idx = ce_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
 
     if (idx == UINT64_MAX) {
@@ -128,7 +126,7 @@ void api_init(struct ce_alloc *allocator) {
             .allocator = allocator
     };
 
-    api_register_api("ce_api_a0", &a0);
+    api_register_api(CE_API_API, &a0);
 }
 
 void api_shutdown() {

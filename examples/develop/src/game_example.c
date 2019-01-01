@@ -108,11 +108,9 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Init %d", reload);
 
-    api->register_api(GAME_INTERFACE_NAME, &game_i0);
-
-    api->register_api(COMPONENT_INTERFACE_NAME, &rotation_component_i);
-
-    api->register_api(SIMULATION_INTERFACE_NAME, &rotation_simulation_i0);
+    api->register_api(GAME_INTERFACE, &game_i0);
+    api->register_api(COMPONENT_INTERFACE, &rotation_component_i);
+    api->register_api(SIMULATION_INTERFACE, &rotation_simulation_i0);
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,

@@ -276,7 +276,7 @@ int texture_init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
 
     return 1;
 }
@@ -348,9 +348,9 @@ static struct ct_kernel_task_i0 texture_task = {
 
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_texture_a0", &texture_api);
-    api->register_api(PROPERTY_EDITOR_INTERFACE_NAME, &ct_property_editor_i0);
-    api->register_api("ct_kernel_task_i0", &texture_task);
+    api->register_api(CT_TEXTURE_API, &texture_api);
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(KERNEL_TASK_INTERFACE, &texture_task);
 }
 
 CE_MODULE_DEF(

@@ -265,7 +265,7 @@ static struct ct_kernel_task_i0 input_task = {
 };
 
 static void cetech_kernel_start() {
-    ce_api_a0->register_api("ct_kernel_task_i0", &input_task);
+    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &input_task);
 
     _init_config();
 

@@ -285,7 +285,7 @@ static struct ct_debugui_a0 debugui_api = {
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api("ct_debugui_a0", &debugui_api);
+    api->register_api(CT_DEBUGUI_API, &debugui_api);
     imguiCreate(12);
 
     _G = {

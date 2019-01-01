@@ -1801,7 +1801,7 @@ static void _init(struct ce_api_a0 *api) {
 
     _G.global_db = create_db();
 
-    api->register_api("ce_cdb_a0", &cdb_api);
+    api->register_api(CE_CDB_API, &cdb_api);
 }
 
 static void _shutdown() {

@@ -7,6 +7,9 @@
 
 #include <celib/module.inl>
 
+#define CT_RESOURCE_API \
+    CE_ID64_0("ct_resource_a0", 0x60a25ca5a83c2ac2ULL)
+
 #define CDB_UID_PROP \
      CE_ID64_0("cdb_uid", 0x644d24512264abb2ULL)
 
@@ -21,9 +24,6 @@
 
 #define CONFIG_BUILD \
      CE_ID64_0("build", 0x4429661936ece1eaULL)
-
-#define RESOURCE_I_NAME \
-    "ct_resource_i0"
 
 #define RESOURCE_I \
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)

@@ -7,6 +7,7 @@
 #include <celib/macros.h>
 #include <celib/hash.inl>
 #include <celib/buffer.inl>
+#include <celib/hashlib.h>
 #include "celib/allocator.h"
 #include "celib/log.h"
 
@@ -149,7 +150,7 @@ static struct ce_memory_a0 _api = {
 struct ce_memory_a0 *ce_memory_a0 = &_api;
 
 void memory_register_api(struct ce_api_a0 *api) {
-    api->register_api("ce_memory_a0", &_api);
+    api->register_api(CE_MEMORY_API, &_api);
 }
 
 void memory_init() {

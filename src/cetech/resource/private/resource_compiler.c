@@ -396,7 +396,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     _init_cvar(ce_config_a0);
-    api->register_api("ct_resource_compiler_a0", &resource_compiler_api);
+    api->register_api(CT_RESOURCE_COMPILER_API, &resource_compiler_api);
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 

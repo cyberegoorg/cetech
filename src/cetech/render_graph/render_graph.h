@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#define CT_RG_API \
+    CE_ID64_0("ct_rg_a0", 0xa4e3156b3079009bULL)
+
+
 #define RG_OUTPUT_TEXTURE \
     CE_ID64_0("output", 0x759d549788b7b7e0ULL)
 

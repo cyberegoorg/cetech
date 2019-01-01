@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <celib/module.inl>
 
+#define CE_EBUS_API \
+    CE_ID64_0("ce_ebus_a0", 0x656df72ca8d751b3ULL)
+
 struct ebus_event_header {
     uint64_t type;
     uint64_t size;

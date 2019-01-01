@@ -25,9 +25,6 @@
 #define CONFIG_DAEMON \
      CE_ID64_0("daemon", 0xc3b953e09c1d1f60ULL)
 
-#define KERNEL_EVENT_DT \
-    CE_ID64_0("dt", 0xbd04987fa96a9de5ULL)
-
 #define SOURCE_ROOT \
     CE_ID64_0("source", 0x921f1370045bad6eULL)
 
@@ -49,7 +46,6 @@
 enum {
     KERNEL_ORDER = 1024,
     GAME_ORDER = KERNEL_ORDER + 1024,
-    RENDER_ORDER = GAME_ORDER + 1024,
 };
 
 #define CT_INPUT_TASK \

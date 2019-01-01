@@ -7,6 +7,9 @@
 
 #include <celib/module.inl>
 
+#define CT_RESOURCE_COMPILER_API \
+    CE_ID64_0("ct_resource_compiler_a0", 0xc084f9ae737212dcULL)
+
 #define CONFIG_SRC \
      CE_ID64_0("src", 0x1cdb3620898c588eULL)
 
@@ -32,10 +35,6 @@ struct ct_resource_compiler_a0 {
 
     char *(*external_join)(struct ce_alloc *a,
                            const char *name);
-
-//    bool (*type_name_from_filename)(const char *fullname,
-//                                    struct ct_resource_id *resource_id,
-//                                    char *short_name);
 };
 
 CE_MODULE(ct_resource_compiler_a0);

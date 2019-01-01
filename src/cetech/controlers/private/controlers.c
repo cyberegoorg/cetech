@@ -64,7 +64,7 @@ struct ct_controlers_a0 *ct_controlers_a0 = &ct_controlers_api;
 
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_controlers_a0", ct_controlers_a0);
+    api->register_api(CT_CONTROLERS_API, ct_controlers_a0);
 }
 
 static void _init(struct ce_api_a0 *api) {

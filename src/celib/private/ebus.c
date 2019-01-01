@@ -338,7 +338,7 @@ struct ce_ebus_a0 *ce_ebus_a0 = &_api;
 
 static void _init(struct ce_api_a0 *api) {
 
-    api->register_api("ce_ebus_a0", &_api);
+    api->register_api(CE_EBUS_API, &_api);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system

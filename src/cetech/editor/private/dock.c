@@ -235,7 +235,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_api_a0->register_api("ct_dock_a0", ct_dock_a0);
+    ce_api_a0->register_api(CT_DOCK_API, ct_dock_a0);
 
     create_context("");
 }

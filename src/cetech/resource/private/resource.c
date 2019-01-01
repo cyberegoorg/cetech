@@ -236,7 +236,7 @@ static struct ct_resource_a0 resource_api = {
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_resource_a0", &resource_api);
+    api->register_api(CT_RESOURCE_API, &resource_api);
 
 }
 

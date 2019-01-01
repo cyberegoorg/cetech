@@ -1,14 +1,15 @@
 
 #include <stdint.h>
+#include <stdio.h>
+
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/api_system.h>
 #include <celib/task.h>
 #include <celib/os.h>
-#include <stdio.h>
-
 #include "celib/macros.h"
 
+#include "celib/hashlib.h"
 
 #define LOG_WHERE "log_system"
 
@@ -163,7 +164,7 @@ CE_MODULE_DEF(
         },
         {
             CE_UNUSED(reload);
-            ce_api_a0->register_api("ce_log_a0", ce_log_a0);
+            ce_api_a0->register_api(CE_LOG_API, ce_log_a0);
         },
         {
             CE_UNUSED(reload);

@@ -6,6 +6,9 @@
 
 struct ct_cdb_obj_t;
 
+#define CT_MATERIAL_API \
+    CE_ID64_0("ct_material_a0", 0xdfd0a5e43df0846dULL)
+
 #define RENDER_STATE_RGB_WRITE \
     CE_ID64_0("rgb_write", 0xdad21ff8b23271ffULL)
 

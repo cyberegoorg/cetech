@@ -594,7 +594,7 @@ struct ce_ydb_a0 *ce_ydb_a0 = &ydb_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api("ce_ydb_a0", &ydb_api);
+    api->register_api(CE_YDB_API, &ydb_api);
 }
 
 static void _shutdown() {

@@ -5,6 +5,10 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#define CT_GFX_API \
+    CE_ID64_0("ct_gfx_a0", 0x945b4a9e424eaecULL)
+
+
 /// Color RGB/alpha/depth write. When it's not specified write will be disabled.
 #define CT_RENDER_STATE_WRITE_R                 UINT64_C(0x0000000000000001) //!< Enable R write.
 #define CT_RENDER_STATE_WRITE_G                 UINT64_C(0x0000000000000002) //!< Enable G write.

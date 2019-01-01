@@ -5,6 +5,9 @@
 
 struct ce_api_a0;
 
+#define CE_MODULE0_API \
+    CE_ID64_0("ce_module_a0", 0x23a8afeb527d63dcULL)
+
 //! Add static module and load it
 //! \param name Module name
 #define CE_ADD_STATIC_MODULE(name)                                     \

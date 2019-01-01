@@ -18,14 +18,4 @@
 #define PROP_MESH \
     (CE_ID64_0("mesh", 0x48ff313713a997a1ULL))
 
-struct ct_world;
-struct ct_entity;
-
-//! Mesh API V0
-struct ct_mesh_renderer_a0 {
-    void (*_)();
-};
-
-CE_MODULE(ct_mesh_renderer_a0);
-
 #endif //CETECH_MESH_RENDERER_H

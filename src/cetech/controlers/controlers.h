@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <celib/module.inl>
 
+#define CT_CONTROLERS_API \
+    CE_ID64_0("ct_controlers_a0", 0x81e928c4fbba526dULL)
 
 #define CONTROLERS_I \
     CE_ID64_0("ct_controlers_i0", 0x38a3a48646b9f277ULL)

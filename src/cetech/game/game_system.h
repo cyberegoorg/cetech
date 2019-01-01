@@ -6,8 +6,8 @@
 #include <celib/module.inl>
 #include <cetech/render_graph/render_graph.h>
 
-#define GAME_INTERFACE_NAME \
-    "ct_game_i0"
+#define CT_GAME_SYSTEM_API \
+    CE_ID64_0("ct_game_system_a0", 0x1a5b2ed4808612b9ULL)
 
 #define GAME_INTERFACE \
     CE_ID64_0("ct_game_i0", 0x22500b95a05f8b37ULL)

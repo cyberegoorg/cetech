@@ -7,6 +7,8 @@
 struct ct_world;
 struct ct_entity;
 
+#define CT_SCENE_API \
+    CE_ID64_0("ct_scene_a0", 0x2ee97ac6b2e2386eULL)
 
 #define SCENE_TYPE \
     CE_ID64_0("scene", 0x9d0a795bfe818d19ULL)

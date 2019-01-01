@@ -510,8 +510,8 @@ static struct ct_kernel_task_i0 machine_task = {
 };
 
 static void init(struct ce_api_a0 *api) {
-    api->register_api("ct_machine_a0", &a0);
-    api->register_api("ct_kernel_task_i0", &machine_task);
+    api->register_api(CT_MACHINE_API, &a0);
+    api->register_api(KERNEL_TASK_INTERFACE, &machine_task);
 
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_log_a0);

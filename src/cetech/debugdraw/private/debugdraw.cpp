@@ -270,7 +270,7 @@ struct ct_dd_a0 *ct_dd_a0 = &debugdraw_api;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api("ct_dd_a0", &debugdraw_api);
+    api->register_api(CT_DD_API, &debugdraw_api);
 
     _G = (struct _G){
             .allocator = ce_memory_a0->system

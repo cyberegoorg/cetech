@@ -12,6 +12,7 @@
 #include <celib/module.h>
 #include <celib/hash.inl>
 #include <celib/buffer.inl>
+#include <celib/hashlib.h>
 
 //==============================================================================
 // Defines
@@ -383,7 +384,7 @@ static struct ce_fs_a0 _api = {
 struct ce_fs_a0 *ce_fs_a0 = &_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ce_fs_a0", &_api);
+    api->register_api(CE_FS_API, &_api);
 }
 
 

@@ -1,5 +1,6 @@
 #include <celib/hash.inl>
 #include <celib/memory.h>
+#include <celib/hashlib.h>
 #include "celib/macros.h"
 #include "celib/module.h"
 #include "celib/api_system.h"
@@ -32,7 +33,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api("ct_selected_object_a0", &ct_selected_object_api0);
+    api->register_api(CT_SELECTED_OBJECT_API, &ct_selected_object_api0);
 }
 
 static void _shutdown() {

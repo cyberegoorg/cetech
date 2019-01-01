@@ -9,15 +9,15 @@
 
 
 #define CE_ALLOC(a, T, size)                        \
-    (T*)((a)->reallocate((a),                 \
+    (T*)((a)->reallocate((a),                       \
                                NULL,                \
                                size,                \
                                CE_ALIGNOF(T),       \
                                __FILE__,            \
                                __LINE__))
 
-#define CE_ALLOCATE_ALIGN(a, T, size, align) \
-    (T*)((a)->reallocate((a),   \
+#define CE_ALLOCATE_ALIGN(a, T, size, align)        \
+    (T*)((a)->reallocate((a),                       \
                                NULL,                \
                                size,                \
                                align,               \

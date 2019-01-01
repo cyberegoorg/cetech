@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include <celib/module.inl>
 
+#define CT_MACHINE_API \
+    CE_ID64_0("ct_machine_a0", 0xce8b7f45bc305909ULL)
+
 #define CT_MACHINE_WINDOW_ID \
     CE_ID64_0("window_id", 0x78420ff4a407edc5ULL)
 

@@ -182,8 +182,8 @@ static struct ct_kernel_task_i0 keyboard_task = {
 };
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_controlers_i0", &ct_controlers_i0);
-    api->register_api("ct_kernel_task_i0", &keyboard_task);
+    api->register_api(CONTROLERS_I, &ct_controlers_i0);
+    api->register_api(KERNEL_TASK_INTERFACE, &keyboard_task);
 }
 
 static void _init(struct ce_api_a0 *api) {

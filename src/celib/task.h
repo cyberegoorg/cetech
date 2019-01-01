@@ -1,7 +1,8 @@
 #ifndef CE_TASKMANAGER_H
 #define CE_TASKMANAGER_H
 
-#include <stdatomic.h>
+#define CE_TASK_API \
+    CE_ID64_0("ce_task_a0", 0x4dbd12f32a50782eULL)
 
 //! Worker enum
 enum ce_workers {

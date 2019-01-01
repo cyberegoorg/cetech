@@ -132,7 +132,7 @@ int sceneinit(struct ce_api_a0 *api) {
 
     };
 
-    ce_api_a0->register_api(RESOURCE_I_NAME, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
 
     scenecompiler_init(api);
 
@@ -209,7 +209,7 @@ static struct ct_scene_a0 scene_api = {
 struct ct_scene_a0 *ct_scene_a0 = &scene_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api("ct_scene_a0", &scene_api);
+    api->register_api(CT_SCENE_API, &scene_api);
 }
 
 CE_MODULE_DEF(

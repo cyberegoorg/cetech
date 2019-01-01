@@ -385,7 +385,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE_NAME, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
