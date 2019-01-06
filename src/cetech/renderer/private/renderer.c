@@ -72,8 +72,6 @@ static uint32_t _get_reset_flags() {
 }
 
 
-
-
 //==============================================================================
 // Interface
 //==============================================================================
@@ -254,8 +252,6 @@ static void render(float dt) {
                    _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     }
 
-    ct_debugui_a0->begin();
-
     const uint32_t v_n = ce_array_size(_G.viewports);
     for (int i = 0; i < v_n; ++i) {
         struct viewport *v = &_G.viewports[i];
@@ -280,7 +276,7 @@ static void render(float dt) {
         ct_rg_a0->destroy_graph(graph);
     }
 
-    ct_debugui_a0->end();
+    ct_debugui_a0->render();
     bgfx_frame(false);
 }
 

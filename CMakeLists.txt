@@ -266,8 +266,5 @@ add_library(cetech_develop_lib SHARED ${SOURCE_FILES})
 target_link_libraries(cetech_develop_lib ${DEVELOP_LIBS})
 target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_ID}/release/)
 
-add_library(example SHARED examples/module_example/example.c)
-set_target_properties(example PROPERTIES PREFIX "module_")
-
 add_library(example_develop SHARED examples/develop/src/game_example.c)
 set_target_properties(example_develop PROPERTIES PREFIX "game_")

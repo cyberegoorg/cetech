@@ -13,17 +13,11 @@
 #define CT_DEBUGUI_API \
     CE_ID64_0("ct_debugui_a0", 0xdd1adfe792cc040fULL)
 
+#define CT_DEBUGUI_TASK \
+    CE_ID64_0("debugui_task", 0x6bb280451f793471ULL)
+
 struct ct_render_texture_handle;
 struct ce_vio;
-
-enum {
-    DEBUGUI_EBUS = 0x5ae1e5c8
-};
-
-enum {
-    DEBUGUI_INVALID_EVENT = 0,
-    DEBUGUI_EVENT
-};
 
 typedef float _vec4[4];
 typedef float _vec2[2];
@@ -256,8 +250,7 @@ enum MODE {
 };
 
 struct ct_debugui_a0 {
-    void (*begin)();
-    void (*end)();
+    void (*render)();
 
     void (*Text)(const char *fmt,
                  ...) CTECH_ATTR_FORMAT(1, 2);

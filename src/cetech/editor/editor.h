@@ -7,6 +7,9 @@
 #define EDITOR_MODULE_INTERFACE \
     CE_ID64_0("ct_editor_module_i0", 0x761dbf8cf91061a1ULL)
 
+#define CT_EDITOR_TASK \
+    CE_ID64_0("editor_task", 0x5eb9f56061f23532ULL)
+
 struct ct_editor_module_i0 {
     bool (*init)();
 

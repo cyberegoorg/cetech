@@ -93,8 +93,7 @@ static void begin() {
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
 }
 
-static void end() {
-    ce_ebus_a0->broadcast(DEBUGUI_EBUS, DEBUGUI_EVENT, NULL, 0);
+static void render() {
     imguiEndFrame();
 }
 
@@ -111,8 +110,7 @@ static void LoadDock(const char *path) {
 }
 
 static struct ct_debugui_a0 debugui_api = {
-        .begin = begin,
-        .end = end,
+        .render = render,
 
         .Text = ImGui::Text,
         .TextV = ImGui::TextV,
@@ -284,17 +282,49 @@ static struct ct_debugui_a0 debugui_api = {
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
+
+static uint64_t task_name() {
+    return CT_DEBUGUI_TASK;
+}
+
+static uint64_t *update_after(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_INPUT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static uint64_t *update_before(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_RENDER_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static void debugui_update(float dt) {
+    begin();
+}
+
+static struct ct_kernel_task_i0 debugui_task = {
+        .name = task_name,
+        .update = debugui_update,
+        .update_after = update_after,
+        .update_before= update_before,
+};
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(CT_DEBUGUI_API, &debugui_api);
+    api->register_api(KERNEL_TASK_INTERFACE, &debugui_task);
+
     imguiCreate(12);
 
     _G = {
             .allocator = ce_memory_a0->system
     };
-
-    ce_ebus_a0->create_ebus(DEBUGUI_EBUS);
-
-
 
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
