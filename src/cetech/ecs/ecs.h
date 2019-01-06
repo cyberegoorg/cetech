@@ -29,23 +29,11 @@
 #define ENTITY_RESOURCE_ID \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
-#define SIMULATION_INTERFACE_NAME \
-    "ct_simulation_i0"
-
 #define SIMULATION_INTERFACE \
     CE_ID64_0("ct_simulation_i0", 0xe944056f6e473ecdULL)
 
-#define COMPONENT_INTERFACE_NAME \
-    "ct_component_i0"
-
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
-
-
-enum {
-    ECS_EBUS = 0x3c870dac
-};
-
 
 struct ct_cdb_obj_t;
 enum ce_cdb_type;

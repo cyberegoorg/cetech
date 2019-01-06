@@ -67,6 +67,7 @@ static uint64_t draw(uint64_t selected_obj) {
 static void draw_menu(uint64_t selected_obj) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
                                                   selected_obj);
+
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                  top_level_obj);
 

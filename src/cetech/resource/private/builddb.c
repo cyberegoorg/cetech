@@ -75,7 +75,8 @@ const char *CREATE_SQL[] = {
         "CREATE TABLE IF NOT EXISTS resource_data (\n"
         "uid      INTEGER                                 NOT NULL,\n"
         "data     BLOB,                                            \n"
-        "PRIMARY KEY (uid)"
+        "FOREIGN KEY(uid) REFERENCES resource(uid),                \n"
+        "PRIMARY KEY (uid)                                         \n"
         ");"
         ""
 };

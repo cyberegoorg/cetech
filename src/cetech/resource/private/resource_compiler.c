@@ -167,14 +167,6 @@ uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
         compilator(db, obj);
     }
 
-    char *output = NULL;
-    ce_cdb_a0->dump(db, obj, &output, _G.allocator);
-    ct_builddb_a0->put_resource_blob((struct ct_resource_id) {.uid=uid},
-                                     output,
-                                     ce_array_size(output));
-
-    ce_buffer_free(output, _G.allocator);
-
     return obj;
 }
 
@@ -281,6 +273,18 @@ void _scan_files(char **files,
 
         uint64_t cobj = ce_hash_lookup(&obj_hash, obj, 0);
         compile_obj(db, cobj);
+    }
+
+    for (int k = 0; k < output_n; ++k) {
+        uint64_t obj = obj_graph.output[k];
+
+        char *output = NULL;
+        ce_cdb_a0->dump(db, obj, &output, _G.allocator);
+        ct_builddb_a0->put_resource_blob((struct ct_resource_id) {.uid=obj},
+                                         output,
+                                         ce_array_size(output));
+
+        ce_buffer_free(output, _G.allocator);
     }
 
     ce_cdb_a0->destroy_db(db);

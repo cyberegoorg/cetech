@@ -143,7 +143,7 @@ static void ui_str(uint64_t obj,
     ct_debugui_a0->PopItemWidth();
 
     if (change) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_str(w, prop_key_hash, buffer);
         ce_cdb_a0->write_commit(w);
     }
@@ -165,7 +165,7 @@ static void ui_str_combo(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     value = ce_cdb_a0->read_str(reader, prop_key_hash, NULL);
 
     char *items = NULL;
@@ -209,7 +209,7 @@ static void ui_str_combo(uint64_t obj,
     }
 
     if (change) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_str(w, prop_key_hash, buffer);
         ce_cdb_a0->write_commit(w);
     }
@@ -225,14 +225,14 @@ static void ui_resource(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t uid = ce_cdb_a0->read_ref(reader, prop_key_hash, 0);
 
     uint64_t resource_obj = uid;
 
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(),resource_obj);
-    const char* resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), resource_obj);
+    const char *resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");
 
     char buffer[128] = {'\0'};
     sprintf(buffer, "%s", resource_name);
@@ -244,7 +244,7 @@ static void ui_resource(uint64_t obj,
     bool change = false;
 
     ct_debugui_a0->Separator();
-    bool resource_open = ct_debugui_a0->TreeNodeEx(label,0);
+    bool resource_open = ct_debugui_a0->TreeNodeEx(label, 0);
 
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->PushItemWidth(-1);
@@ -265,19 +265,13 @@ static void ui_resource(uint64_t obj,
         if (payload) {
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
-            const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),drag_obj);
-
             if (drag_obj) {
-                uint64_t asset_type = ce_cdb_a0->read_uint64(dreader,
-                                                             RESOURCE_TYPE,
-                                                             0);
-
-                uint64_t asset_name = ce_cdb_a0->read_uint64(dreader,
-                                                             RESOURCE_NAME,
-                                                             0);
+                const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                              drag_obj);
+                uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
 
                 if (resource_type == asset_type) {
-                    new_value = asset_name;
+                    new_value = drag_obj;
                     change = true;
                 }
             }
@@ -292,9 +286,8 @@ static void ui_resource(uint64_t obj,
     }
 
     if (change) {
-        const char *new_value_str = ce_id_a0->str_from_id64(new_value);
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
-        ce_cdb_a0->set_str(w, prop_key_hash, new_value_str);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_a0->set_ref(w, prop_key_hash, new_value);
         ce_cdb_a0->write_commit(w);
     }
 }
@@ -307,7 +300,7 @@ static void ui_vec3(uint64_t obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float value[3] = {
             ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
@@ -331,7 +324,7 @@ static void ui_vec3(uint64_t obj,
                                   value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
         ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
         ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);
@@ -349,12 +342,7 @@ static void ui_vec4(uint64_t obj,
                     const uint64_t prop_key_hash[4],
                     const char *label,
                     struct ui_vec4_p0 params) {
-//    uint64_t *keys = NULL;
-//    _collect_keys(rid, obj, &keys, ce_memory_a0->system);
-//
-//    obj = _find_recursive(ct_sourcedb_a0->get(rid), keys);
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float value[4] = {
             ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
@@ -364,7 +352,7 @@ static void ui_vec4(uint64_t obj,
     };
 
     float value_new[4] = {};
-    ce_vec3_move(value_new, value);
+    ce_vec4_move(value_new, value);
 
     const float min = !params.min_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
@@ -388,7 +376,7 @@ static void ui_vec4(uint64_t obj,
     }
 
     if (changed) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
         ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
         ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);

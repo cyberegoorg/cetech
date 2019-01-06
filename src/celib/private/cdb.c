@@ -24,10 +24,12 @@
 
 #define MAX_OBJECTS 1000000000ULL
 
-// TODO: non optimal braindump code
+// TODO: X( non optimal braindump code
 // TODO: remove null element
+// TODO: only 64bit values => remove offset
+// TODO: remove locks
+// TODO: split object_t
 
-// TODO: X(
 struct object_t {
     // prefab
     uint64_t instance_of;
@@ -104,8 +106,7 @@ static uint64_t _gen_uid() {
     } id = {.ui = 0};
 
     arc4random_buf(&id.l, 4);
-    id.h1 = 0;
-    id.h2 = (uint16_t)ce_os_a0->time->ticks();
+    id.h = (uint16_t) ce_os_a0->time->ticks();
 
 //    ce_log_a0->debug(LOG_WHERE, "New UID 0x%llx", id.ui);
 
@@ -232,19 +233,6 @@ struct object_t *_new_object(struct db_t *db,
     _object_new_property(obj, 0, CDB_TYPE_NONE, NULL, 0, a);
     return obj;
 }
-
-//static struct object_t **_new_object_id(struct db_t *db_inst) {
-//    struct object_t **obj;
-//    if (db_inst->free_objects_id_n) {
-//        atomic_fetch_sub(&db_inst->free_objects_id_n, 1);
-//        obj = db_inst->free_objects_id[db_inst->free_objects_id_n];
-//    } else {
-//        uint64_t idx = atomic_fetch_add(&db_inst->object_used, 1);
-//        obj = db_inst->objects_mem + idx;
-//    }
-//
-//    return obj;
-//}
 
 static struct object_t *_object_clone(struct db_t *db,
                                       struct object_t *obj,
@@ -501,7 +489,6 @@ static uint64_t create_from(struct ce_cdb_t db,
     inst->type = obj->type;
 
     ce_array_push(obj->instances, uid, _G.allocator);
-
 
     struct object_t *wr = write_begin(db, uid);
 
@@ -945,10 +932,8 @@ static enum ce_cdb_type prop_type(const ce_cdb_obj_o *reader,
     return CDB_TYPE_NONE;
 }
 
-//static void _dispatch_instances(struct object_t *obj,
-//                                struct object_t *writer,
-//                                uint64_t *changed_prop,
-//                                uint64_t event);
+static void _dispatch_instances(struct ce_cdb_t db,
+                                struct object_t *orig_obj);
 
 static void write_commit(ce_cdb_obj_o *_writer) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -957,8 +942,7 @@ static void write_commit(ce_cdb_obj_o *_writer) {
 
     struct object_t *orig_obj = _get_object_from_id(db, writer->orig_obj);
 
-//    _dispatch_instances(orig_obj, writer,
-//                        writer->changed_prop, CDB_PROP_CHANGED_EVENT);
+    _dispatch_instances(writer->db, writer);
 
     _set_uid_obj(db, writer->orig_obj, writer);
     _destroy_object(db, orig_obj);
@@ -1670,58 +1654,87 @@ static uint64_t find_root(struct ce_cdb_t _db,
     return find_root(_db, obj->parent);
 }
 
-//static void _dispatch_instances(struct object_t *orig_obj,
-//                                struct object_t *writer,
-//                                uint64_t *changed_prop,
-//                                uint64_t event) {
-//    const int changed_prop_n = ce_array_size(changed_prop);
-//
-//    if (!changed_prop_n) {
-//        return;
-//    }
-//
-//
-//    const int instances_n = ce_array_size(orig_obj->instances);
-//    for (int i = 0; i < instances_n; ++i) {
-//        uint64_t inst_obj = orig_obj->instances[i];
-//
-//        if (event == CDB_PROP_CHANGED_EVENT) {
-//            ce_cdb_obj_o *w = write_begin(inst_obj);
-//            for (int j = 0; j < changed_prop_n; ++j) {
-//                uint64_t prop = changed_prop[j];
-//                enum ce_cdb_type t = prop_type(notify_obj, prop);
-//                switch (t) {
-//                    case CDB_TYPE_NONE:
-//                        break;
-//                    case CDB_TYPE_UINT64:
-//                        break;
-//                    case CDB_TYPE_PTR:
-//                        break;
-//                    case CDB_TYPE_REF:
-//                        break;
-//                    case CDB_TYPE_FLOAT: {
-//                        float v = read_float(notify_obj, prop, 0.0f);
-//                        float inst_v = read_float(inst_obj, prop, 0.0f);
-//
-//                        ce_cdb_a0->set_float(w, prop, v);
-//                    }
-//                        break;
-//                    case CDB_TYPE_BOOL:
-//                        break;
-//                    case CDB_TYPE_STR:
-//                        break;
-//                    case CDB_TYPE_SUBOBJECT:
-//                        break;
-//                    case CDB_TYPE_BLOB:
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//            write_commit(w);
-//        }
-//    }
-//}
+static void _dispatch_instances(struct ce_cdb_t db,
+                                struct object_t *orig_obj) {
+    const int changed_prop_n = ce_array_size(orig_obj->changed);
+
+    if (!changed_prop_n) {
+        return;
+    }
+
+    const int instances_n = ce_array_size(orig_obj->instances);
+    for (int i = 0; i < instances_n; ++i) {
+        uint64_t inst_obj = orig_obj->instances[i];
+
+        ce_cdb_obj_o *w = write_begin(db, inst_obj);
+        const uint32_t chn = ce_array_size(orig_obj->changed);
+        for (int j = 0; j < chn; ++j) {
+            struct ce_cdb_change_ev0 *ev = &orig_obj->changed[j];
+            enum ce_cdb_type t = prop_type(orig_obj, ev->prop);
+
+            if (ev->type == CE_CDB_CHANGE) {
+                switch (t) {
+                    case CDB_TYPE_NONE:
+                        break;
+
+                    case CDB_TYPE_UINT64: {
+                        uint64_t u = read_uint64(w, ev->prop, 0);
+                        if (u == ev->old_value.uint64) {
+                            set_uint64(w, ev->prop, ev->new_value.uint64);
+                        }
+                    }
+                        break;
+
+                    case CDB_TYPE_FLOAT: {
+                        float f = read_float(w, ev->prop, 0);
+                        if (f == ev->old_value.f) {
+                            set_float(w, ev->prop, ev->new_value.f);
+                        }
+                    }
+                        break;
+
+                    case CDB_TYPE_BOOL: {
+                        bool b = read_bool(w, ev->prop, 0);
+                        if (b == ev->old_value.b) {
+                            set_bool(w, ev->prop, ev->new_value.b);
+                        }
+                    }
+                        break;
+
+                    case CDB_TYPE_STR: {
+                        const char *str = read_string(w, ev->prop, 0);
+                        if (str == ev->old_value.str) {
+                            set_string(w, ev->prop, ev->new_value.str);
+                        }
+                    }
+                        break;
+
+                    case CDB_TYPE_PTR: {
+                        void *ptr = read_ptr(w, ev->prop, 0);
+                        if (ptr == ev->old_value.ptr) {
+                            set_ptr(w, ev->prop, ev->new_value.ptr);
+                        }
+                    }
+                        break;
+
+                    case CDB_TYPE_SUBOBJECT:
+                        break;
+
+                    case CDB_TYPE_REF:
+                        break;
+
+                    case CDB_TYPE_BLOB:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+        }
+        write_commit(w);
+    }
+}
 
 const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
                                         uint32_t *n) {

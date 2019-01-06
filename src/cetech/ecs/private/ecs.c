@@ -682,7 +682,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
-    struct ct_entity ent = _spawn_entity(world, resource);
+    struct ct_entity ent = spawn_entity(world, resource);
     return ent;
 }
 
@@ -762,16 +762,7 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     uint64_t ent_type = combine_component(components_keys, components_n);
 
     _add_components(world, root_ent, ent_type);
-
     _add_spawn_entity_obj(w, entity_obj, root_ent);
-//
-//    ce_cdb_a0->register_remove_notify(components, _on_components_obj_removed,
-//                                      (void *) world.h);
-//
-//    ce_cdb_a0->register_notify(components, _on_components_obj_add,
-//                               (void *) world.h);
-
-
 
 
     for (int i = 0; i < components_n; ++i) {
@@ -790,9 +781,6 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
         _add_spawn_component_obj(w, component_obj, root_ent);
 
-//        ce_cdb_a0->register_notify(component_obj, _on_component_obj_change,
-//                                   (void *) world.h);
-
         if (component_i->spawner) {
             component_i->spawner(world, component_obj);
         }
@@ -800,12 +788,6 @@ static struct ct_entity _spawn_entity(struct ct_world world,
 
     uint64_t children;
     children = ce_cdb_a0->read_subobject(ent_reader, ENTITY_CHILDREN, 0);
-
-//    ce_cdb_a0->register_remove_notify(children, _on_entity_obj_removed,
-//                                      (void *) world.h);
-//
-//    ce_cdb_a0->register_notify(children, _on_entity_obj_add,
-//                               (void *) world.h);
 
     const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
 
@@ -933,8 +915,6 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_handler_create(&_G.world_handler, _G.allocator);
-
-    ce_ebus_a0->create_ebus(ECS_EBUS);
 
     ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);

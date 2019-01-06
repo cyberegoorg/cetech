@@ -274,16 +274,8 @@ static void ui_asset_list(uint64_t dock) {
 
                 ui_asset_tooltip(resourceid, path);
 
-                uint64_t selected_asset = ce_cdb_a0->create_object(
-                        ce_cdb_a0->db(),
-                        RESOURCE_BROWSER_ASSET_TYPE);
-
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),selected_asset);
-                ce_cdb_a0->set_uint64(w, RESOURCE_NAME, resourceid.uid);
-                ce_cdb_a0->write_commit(w);
-
                 ct_debugui_a0->SetDragDropPayload("asset",
-                                                  &selected_asset,
+                                                  &resourceid.uid,
                                                   sizeof(uint64_t),
                                                   DebugUICond_Once);
                 ct_debugui_a0->EndDragDropSource();
