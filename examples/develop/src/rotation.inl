@@ -55,11 +55,12 @@ static void foreach_rotation(struct ct_world world,
                              void *data) {
     float dt = *(float *) (data);
 
-    for (uint32_t i = 1; i < n; ++i) {
-        uint64_t rotation = ct_ecs_a0->get_one(world, ROTATION_COMPONENT,
-                                               ent[i]);
-        uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
-                                                ent[i]);
+    uint64_t* rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
+    uint64_t* transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+
+    for (uint32_t i = 0; i < n; ++i) {
+        uint64_t rotation = rotations[i];
+        uint64_t transform = transforms[i];
 
         const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        transform);

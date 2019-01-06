@@ -272,8 +272,9 @@ static void foreach_transform(struct ct_world world,
                               ct_entity_storage_t *item,
                               uint32_t n,
                               void *data) {
-    for (uint32_t i = 1; i < n; ++i) {
-        uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT, ent[i]);
+    uint64_t* transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    for (uint32_t i = 0; i < n; ++i) {
+        uint64_t transform = transforms[i];
         transform_transform(transform, NULL);
     }
 }

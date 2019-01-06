@@ -17,7 +17,6 @@
 #include <celib/hashlib.h>
 
 #include <sys/time.h>
-#include <uuid/uuid.h>
 
 #define _G coredb_global
 #define LOG_WHERE "coredb"
@@ -1144,7 +1143,7 @@ static void set_ref(ce_cdb_obj_o *_writer,
 }
 
 uint64_t parent(const ce_cdb_obj_o *reader) {
-    struct object_t *obj = _get_object_from_o(parent);
+    struct object_t *obj = _get_object_from_o(reader);
     return obj->parent;
 }
 

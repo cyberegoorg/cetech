@@ -46,13 +46,9 @@ static void *_reallocate(const struct ce_alloc *a,
 }
 
 #if CE_TRACE_MEMORY
-static struct ce_alloc_fce alloc_fce = {
-        .reallocate = _reallocate
-};
-
 static struct ce_alloc _allocator = {
         .inst = NULL,
-        .call = &alloc_fce,
+        .reallocate = _reallocate
 };
 
 static void _trace_alloc(void *ptr,
@@ -95,6 +91,7 @@ static void _trace_free(void *ptr) {
     ce_hash_remove(&_G.memory_trace_map, (uint64_t) ptr);
     ce_os_a0->thread->spin_unlock(&_G.lock);
 }
+
 #endif
 
 static void *_reallocate_traced(const struct ce_alloc *a,
@@ -121,7 +118,6 @@ static void *_reallocate_traced(const struct ce_alloc *a,
 
     return new_ptr;
 }
-
 
 
 static struct ce_alloc _traced_allocator = {
@@ -166,10 +162,10 @@ void memsys_shutdown() {
     for (int i = 0; i < size; ++i) {
         struct memory_trace entry = _G.memory_trace_pool[i];
 
-        ce_log_a0->error(LOG_WHERE, "leak from %s:%d\n",
-                         entry.filename, entry.line);
+        ce_log_a0->warning(LOG_WHERE, "leak from %s:%d",
+                           entry.filename, entry.line);
     }
 #endif
 
-    _G = (struct _G){};
+    _G = (struct _G) {};
 }
