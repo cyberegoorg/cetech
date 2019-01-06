@@ -41,9 +41,9 @@ union ce_cdb_value_u0 {
 
 
 struct ce_cdb_change_ev0 {
-    const uint64_t type;
+    uint64_t type;
     uint64_t obj;
-    const uint64_t prop;
+    uint64_t prop;
     union ce_cdb_value_u0 new_value;
     union ce_cdb_value_u0 old_value;
 };
