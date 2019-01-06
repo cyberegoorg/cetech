@@ -8,6 +8,9 @@
 #define CT_ECS_API \
     CE_ID64_0("ct_ecs_a0", 0x2abf54879e52240fULL)
 
+#define CT_ECS_SYNC_TASK \
+    CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
+
 #define EDITOR_COMPONENT \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
 

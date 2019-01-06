@@ -14,7 +14,7 @@
     CE_ID64_0("change", 0x8694ed4881bfb631ULL)
 
 #define CE_CDB_REMOVE \
-    CE_ID64_0("change", 0x8694ed4881bfb631ULL)
+    CE_ID64_0("remove", 0x36f36c7f8cda6d13ULL)
 
 struct ce_alloc;
 
@@ -197,12 +197,12 @@ struct ce_cdb_a0 {
     void (*remove_property)(ce_cdb_obj_o *writer,
                             uint64_t property);
 
-    void (*delete_property)(ce_cdb_obj_o *writer,
-                            uint64_t property);
 
     // READ
     const ce_cdb_obj_o *(*read)(struct ce_cdb_t db,
                                 uint64_t object);
+
+    uint64_t (*read_instance_of)(const ce_cdb_obj_o *reader);
 
     const struct ce_cdb_change_ev0 *(*changed)(const ce_cdb_obj_o *reader,
                                                uint32_t *n);

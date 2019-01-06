@@ -67,7 +67,7 @@ static void foreach_rotation(struct ct_world world,
         const ce_cdb_obj_o *r_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        rotation);
 
-        float speed = ce_cdb_a0->read_float(r_reader, PROP_SPEED, 0);
+        float speed = ce_cdb_a0->read_float(r_reader, PROP_SPEED, 60);
 
         float rotc[3] = {
                 ce_cdb_a0->read_float(t_reader, PROP_ROTATION_X, 0),

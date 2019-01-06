@@ -23,6 +23,7 @@
 #include <cetech/resource/resource.h>
 #include <cetech/editor/resource_preview.h>
 #include <cetech/kernel/kernel.h>
+#include <cetech/renderer/renderer.h>
 
 
 //==============================================================================
@@ -44,6 +45,7 @@ struct entity_storage {
 };
 
 struct spawn_info {
+    uint64_t obj;
     struct ct_entity *ents;
 };
 
@@ -147,10 +149,9 @@ static void _add_spawn_entity_obj(struct world_instance *world,
     if (idx == UINT64_MAX) {
         idx = ce_array_size(world->obj_spawn_info);
         ce_array_push(world->obj_spawn_info,
-                      (struct spawn_info) {},
+                      (struct spawn_info) {.obj = obj},
                       ce_memory_a0->system);
         ce_hash_add(&world->obj_entmap, obj, idx, _G.allocator);
-
     }
 
     struct spawn_info *info = &world->obj_spawn_info[idx];
@@ -226,7 +227,7 @@ static uint64_t *get_all(uint64_t component_name,
     }
 
     uint32_t comp_idx = component_idx(component_name);
-    return item->entity_data[comp_idx]+1;
+    return item->entity_data[comp_idx] + 1;
 }
 
 static uint64_t get_one(struct ct_world world,
@@ -516,11 +517,15 @@ static void process(struct ct_world world,
     for (int i = 0; i < type_count; ++i) {
         struct entity_storage *item = &w->entity_storage[i];
 
+        if (!item->n) {
+            continue;
+        }
+
         if ((item->mask & components_mask) != components_mask) {
             continue;
         }
 
-        fce(world, item->entity+1, item, item->n-1, data);
+        fce(world, item->entity + 1, item, item->n - 1, data);
     }
 }
 
@@ -813,8 +818,11 @@ static struct ct_entity _spawn_entity(struct ct_world world,
     uint64_t ent_type = combine_component(components_keys, components_n);
 
     _add_components(world, root_ent, ent_type);
-    _add_spawn_entity_obj(w, entity_obj, root_ent);
 
+    uint64_t instance_of = ce_cdb_a0->read_instance_of(ent_reader);
+    if (instance_of) {
+        _add_spawn_entity_obj(w, instance_of, root_ent);
+    }
 
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map,
                                        ent_type, UINT64_MAX);
@@ -923,7 +931,6 @@ static void destroy_world(struct ct_world world) {
     ce_handler_destroy(&_G.world_handler, world.h, _G.allocator);
 }
 
-
 static struct ct_ecs_a0 _api = {
         //ENT
         .create = create_entities,
@@ -969,6 +976,105 @@ static void _componet_api_add(uint64_t name,
                 _G.allocator);
 }
 
+
+static uint64_t task_name() {
+    return CT_ECS_SYNC_TASK;
+}
+
+static uint64_t *update_after(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_RENDER_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static void _update(float dt) {
+    uint32_t n = ce_array_size(_G.world_array);
+    for (uint32_t i = 0; i < n; ++i) {
+        struct world_instance *world = &_G.world_array[i];
+
+        uint32_t objs_n = ce_array_size(world->obj_spawn_info);
+        for (uint32_t j = 0; j < objs_n; ++j) {
+            struct spawn_info *si = &world->obj_spawn_info[j];
+
+            const ce_cdb_obj_o *ent_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                        si->obj);
+
+            uint64_t comps = ce_cdb_a0->read_subobject(ent_r,
+                                                       ENTITY_COMPONENTS, 0);
+
+            if (!comps) {
+                continue;
+            }
+
+            const ce_cdb_obj_o *comps_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                          comps);
+
+            uint32_t change_n = 0;
+            const struct ce_cdb_change_ev0 *changes;
+            changes = ce_cdb_a0->changed(comps_r, &change_n);
+
+            for (int ch = 0; ch < change_n; ++ch) {
+                struct ce_cdb_change_ev0 ev = changes[ch];
+                if (ev.type == CE_CDB_REMOVE) {
+                    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                            ev.old_value.subobj);
+                    uint64_t k = ce_cdb_a0->obj_type(r);
+
+                    struct ct_entity *ents = si->ents;
+                    uint32_t ents_n = ce_array_size(ents);
+                    for (int e = 0; e < ents_n; ++e) {
+
+
+                        struct ct_entity ent = ents[e];
+                        remove_components(world->world,
+                                          ent, &k, 1);
+                    }
+
+                } else if (ev.type == CE_CDB_CHANGE) {
+                    uint64_t new_commp = ev.new_value.subobj;
+                    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                            new_commp);
+                    uint64_t k = ce_cdb_a0->obj_type(r);
+
+                    struct ct_entity *ents = si->ents;
+                    uint32_t ents_n = ce_array_size(ents);
+                    for (int e = 0; e < ents_n; ++e) {
+
+
+                        struct ct_entity ent = ents[e];
+                        add_components(world->world,
+                                       ent, &k, 1, &new_commp);
+                    }
+                }
+            }
+        }
+
+    }
+
+//    uint32_t tn = ce_array_size(_G.all_textures);
+//    for (int i = 0; i < tn; ++i) {
+//        uint32_t change_n = 0;
+//        const struct ce_cdb_change_ev0 *changes;
+//        changes = ce_cdb_a0->changed(reader, &change_n);
+//
+//        if (changes) {
+//            texture_offline(obj);
+//            _compile(ce_cdb_a0->db(), obj);
+//            texture_online(obj);
+//        }
+//    }
+}
+
+static struct ct_kernel_task_i0 ecs_sync_task = {
+        .name = task_name,
+        .update = _update,
+        .update_after = update_after,
+};
+
+
 static void _init(struct ce_api_a0 *api) {
     _init_api(api);
 
@@ -980,6 +1086,7 @@ static void _init(struct ce_api_a0 *api) {
     ce_handler_create(&_G.world_handler, _G.allocator);
 
     ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
+    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task);
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 

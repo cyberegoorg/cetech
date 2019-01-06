@@ -1279,33 +1279,21 @@ void remove_property(ce_cdb_obj_o *_writer,
     uint64_t idx = _find_prop_index(writer, property);
 
     if (idx) {
-        uint64_t last_idx = --writer->properties_count;
-        ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
-                    _G.allocator);
+        if(writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
+            union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+                    writer->values +
+                    writer->offset[idx]);
 
-        writer->keys[idx] = writer->keys[last_idx];
-        writer->property_type[idx] = writer->property_type[last_idx];
-        writer->offset[idx] = writer->offset[last_idx];
+            destroy_object(writer->db, value_ptr->subobj);
 
-        ce_array_pop_back(writer->keys);
-        ce_array_pop_back(writer->property_type);
-        ce_array_pop_back(writer->offset);
-    }
+            _add_change(writer, (struct ce_cdb_change_ev0) {
+                    .obj = writer->orig_obj,
+                    .prop=property,
+                    .type =CE_CDB_REMOVE,
+                    .old_value = *value_ptr,
+            });
+        }
 
-    ce_hash_remove(&writer->prop_map, property);
-}
-
-void delete_property(ce_cdb_obj_o *_writer,
-                     uint64_t property) {
-    struct object_t *writer = _get_object_from_o(_writer);
-
-    if (!prop_exist(writer, property)) {
-        return;
-    }
-
-    uint64_t idx = _find_prop_index(writer, property);
-
-    if (idx) {
         uint64_t last_idx = --writer->properties_count;
         ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
                     _G.allocator);
@@ -1755,6 +1743,11 @@ void set_parent(struct ce_cdb_t _db,
     from->parent = parent;
 }
 
+uint64_t read_instance_of(const ce_cdb_obj_o *reader) {
+    struct object_t *obj = _get_object_from_o(reader);
+    return obj->instance_of;
+}
+
 static struct ce_cdb_a0 cdb_api = {
         .create_db = create_db,
         .destroy_db = destroy_db,
@@ -1788,6 +1781,7 @@ static struct ce_cdb_a0 cdb_api = {
         .set_parent = set_parent,
 
         .read = read,
+        .read_instance_of = read_instance_of,
         .changed = changed,
         .read_float = read_float,
         .read_bool = read_bool,
@@ -1813,7 +1807,6 @@ static struct ce_cdb_a0 cdb_api = {
         .set_blob = set_blob,
 
         .remove_property = remove_property,
-        .delete_property = delete_property,
 };
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;
