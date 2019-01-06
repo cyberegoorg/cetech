@@ -28,6 +28,8 @@ struct ct_machine_a0 {
     void (*gamepad_play_rumble)(int gamepad,
                                 float strength,
                                 uint32_t length);
+
+    const uint64_t * (*events)(uint64_t* n);
 };
 
 

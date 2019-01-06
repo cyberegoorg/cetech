@@ -11,7 +11,7 @@
 #include <celib/ydb.h>
 #include <celib/ydb.h>
 #include <celib/fs.h>
-#include <celib/ebus.h>
+
 #include <celib/macros.h>
 
 
@@ -143,7 +143,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ct_dock_a0->create_dock(EXPLORER_INTERFACE, true);
 
-    ce_ebus_a0->create_ebus(EXPLORER_EBUS);
 }
 
 static void _shutdown() {
@@ -157,7 +156,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_resource_a0);
         },
         {

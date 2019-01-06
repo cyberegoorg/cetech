@@ -17,7 +17,7 @@
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
 #include <cetech/editor/action_manager.h>
-#include <celib/ebus.h>
+
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
@@ -60,7 +60,7 @@ static float draw_main_menu() {
             }
 
             if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
-                ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
+                ct_kernel_a0->quit();
 
             }
 
@@ -215,7 +215,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_action_manager_a0);
             CE_INIT_API(api, ce_module_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },

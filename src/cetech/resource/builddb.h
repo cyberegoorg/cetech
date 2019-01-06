@@ -35,6 +35,9 @@ struct ct_builddb_a0 {
 
     int (*need_compile)(const char *filename);
 
+
+    bool (*obj_exist)(struct ct_resource_id resource);
+
     uint64_t (*get_resource_type)(struct ct_resource_id resource);
 
     uint64_t (*get_resource_filename)(struct ct_resource_id resource,

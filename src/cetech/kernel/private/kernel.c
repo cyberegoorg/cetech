@@ -6,7 +6,7 @@
 #include "celib/module.h"
 #include "celib/hashlib.h"
 #include "celib/private/api_private.h"
-#include <celib/ebus.h>
+
 #include <celib/core.h>
 #include <celib/buffer.inl>
 #include <celib/cdb.h>
@@ -36,6 +36,10 @@ static struct KernelGlobals {
 
     struct ce_ba_graph updateg;
     struct ce_hash_t update_map;
+
+    struct ce_ba_graph initg;
+    struct ce_hash_t init_map;
+    struct ce_hash_t shutdown_map;
 
     struct ce_alloc *allocator;
 } _G;
@@ -106,6 +110,17 @@ int init_config(int argc,
 }
 
 
+void application_quit() {
+    _G.is_running = false;
+}
+
+static struct ct_kernel_a0 kernel_api = {
+        .quit = application_quit,
+};
+
+struct ct_kernel_a0 *ct_kernel_a0 = &kernel_api;
+
+
 bool cetech_kernel_init(int argc,
                         const char **argv) {
 //    ce_log_a0->register_handler(ce_log_a0->stdout_yaml_handler, NULL);
@@ -115,6 +130,8 @@ bool cetech_kernel_init(int argc,
 
     struct ce_api_a0 *api = ce_api_a0;
 
+    api->register_api(CT_KERNEL_API, ct_kernel_a0);
+
     _G = (struct KernelGlobals) {
             .allocator = ce_memory_a0->system,
             .config_object  = ce_config_a0->obj(),
@@ -122,9 +139,6 @@ bool cetech_kernel_init(int argc,
 
     init_config(argc, argv, ce_config_a0->obj());
 
-
-    CE_INIT_API(api, ce_ebus_a0);
-    ce_ebus_a0->create_ebus(KERNEL_EBUS);
 
     init_static_modules();
 
@@ -161,10 +175,6 @@ int cetech_kernel_shutdown() {
     return 1;
 }
 
-void application_quit() {
-    _G.is_running = false;
-}
-
 
 void _init_config() {
     _G.config_object = ce_config_a0->obj();
@@ -199,11 +209,7 @@ void _init_config() {
     ce_cdb_a0->write_commit(writer);
 }
 
-static void on_quit(uint64_t type,
-                    void *event) {
-    CE_UNUSED(event)
-    application_quit();
-}
+
 
 static void _build_update_graph(struct ce_ba_graph *sg) {
     ce_bag_clean(sg);
@@ -230,7 +236,7 @@ static void _build_update_graph(struct ce_ba_graph *sg) {
             after = i->update_after(&after_n);
         }
 
-        ce_bag_add(&_G.updateg, name,
+        ce_bag_add(sg, name,
                    before, before_n,
                    after, after_n,
                    _G.allocator);
@@ -249,6 +255,78 @@ static void _update(struct ce_ba_graph *sg,
         fce = (ce_kernel_taks_update_t) ce_hash_lookup(&_G.update_map,
                                                        sg->output[k], 0);
         fce(dt);
+    }
+}
+
+static void _build_init_graph(struct ce_ba_graph *sg) {
+    ce_bag_clean(sg);
+    ce_hash_clean(&_G.init_map);
+    ce_hash_clean(&_G.shutdown_map);
+
+    struct ce_api_entry it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
+    while (it.api) {
+        struct ct_kernel_task_i0 *i = (it.api);
+
+        if (!i->init) {
+            it = ce_api_a0->next(it);
+            continue;
+        }
+
+        uint64_t name = i->name();
+
+        ce_hash_add(&_G.init_map, name,
+                    (uint64_t) i->init, _G.allocator);
+
+        if (i->shutdown) {
+            ce_hash_add(&_G.shutdown_map, name,
+                        (uint64_t) i->shutdown, _G.allocator);
+        }
+
+        uint64_t before_n = 0;
+        const uint64_t *before = NULL;
+        if (i->init_before) {
+            before = i->init_before(&before_n);
+        }
+
+        uint64_t after_n = 0;
+        const uint64_t *after;
+        if (i->init_after) {
+            after = i->init_after(&after_n);
+        }
+
+        ce_bag_add(sg, name,
+                   before, before_n,
+                   after, after_n,
+                   _G.allocator);
+
+        it = ce_api_a0->next(it);
+    }
+
+    ce_bag_build(sg, _G.allocator);
+}
+
+static void _init(struct ce_ba_graph *sg) {
+    const uint64_t output_n = ce_array_size(sg->output);
+    for (int k = 0; k < output_n; ++k) {
+        ce_kernel_taks_init_t fce;
+        fce = (ce_kernel_taks_init_t) ce_hash_lookup(&_G.init_map,
+                                                     sg->output[k], 0);
+        fce();
+    }
+}
+
+static void _shutdown(struct ce_ba_graph *sg) {
+    const uint64_t output_n = ce_array_size(sg->output);
+    for (int32_t k = output_n; k < 0; --k) {
+        ce_kernel_taks_shutdown_t fce;
+        fce = (ce_kernel_taks_shutdown_t) ce_hash_lookup(&_G.shutdown_map,
+                                                         sg->output[k], 0);
+
+        if(!fce) {
+            continue;
+        }
+
+        fce();
     }
 }
 
@@ -280,8 +358,8 @@ static void cetech_kernel_start() {
         }
     }
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit, 0);
-    ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_INIT_EVENT, NULL, 0);
+    _build_init_graph(&_G.initg);
+    _init(&_G.initg);
 
     _G.is_running = 1;
 
@@ -296,12 +374,10 @@ static void cetech_kernel_start() {
         _build_update_graph(&_G.updateg);
         _update(&_G.updateg, dt);
 
-        ce_ebus_a0->gc();
         ce_cdb_a0->gc();
     }
 
-    ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, NULL, 0);
-    ce_ebus_a0->disconnect(KERNEL_EBUS, KERNEL_QUIT_EVENT, on_quit);
+    _shutdown(&_G.initg);
 }
 
 int main(int argc,

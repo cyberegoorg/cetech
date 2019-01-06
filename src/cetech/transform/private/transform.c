@@ -8,7 +8,7 @@
 #include <celib/macros.h>
 #include <celib/array.inl>
 #include <celib/fmath.inl>
-#include <celib/ebus.h>
+
 #include <celib/log.h>
 #include <celib/cdb.h>
 
@@ -315,7 +315,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ce_log_a0);
         },
         {

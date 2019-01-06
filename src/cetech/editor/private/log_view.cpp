@@ -6,7 +6,7 @@
 #include <cetech/editor/log_view.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/array.inl>
-#include <celib/ebus.h>
+
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
@@ -205,7 +205,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
         },
         {
             CE_UNUSED(reload);

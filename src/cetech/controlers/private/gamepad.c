@@ -6,7 +6,7 @@
 #include <celib/api_system.h>
 #include <celib/log.h>
 #include <celib/module.h>
-#include <celib/ebus.h>
+
 #include <celib/hashlib.h>
 #include <celib/macros.h>
 #include <celib/os.h>
@@ -141,14 +141,13 @@ static void update(float dt) {
     memcpy(_G.last_state, _G.state,
            sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
-    struct ebus_event_header *it = ce_ebus_a0->events(GAMEPAD_EBUS);
-    struct ebus_event_header *end_it = ce_ebus_a0->events_end(GAMEPAD_EBUS);
 
-    while (it != end_it) {
-        struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     obj_event->obj);
+    uint64_t events_n = 0;
+    const uint64_t *events = ct_machine_a0->events(&events_n);
+    for (int i = 0; i < events_n; ++i) {
+        uint64_t event = events[i];
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
+        uint64_t event_type = ce_cdb_a0->obj_type(reader);
 
         uint32_t button = ce_cdb_a0->read_uint64(reader, CONTROLER_BUTTON, 0);
         uint32_t axis = ce_cdb_a0->read_uint64(reader, CONTROLER_AXIS, 0);
@@ -163,7 +162,7 @@ static void update(float dt) {
                                       CONTROLER_POSITION_Z, 0.0f),
         };
 
-        switch (it->type) {
+        switch (event_type) {
             case EVENT_GAMEPAD_DOWN:
                 _G.state[gamepad_id][button] = 1;
                 break;
@@ -189,8 +188,6 @@ static void update(float dt) {
             default:
                 break;
         }
-
-        it = CE_EBUS_NEXT(it);
     }
 
 }
@@ -252,8 +249,6 @@ static void _init(struct ce_api_a0 *api) {
     _init_api(api);
     _G = (struct _G) {};
 
-    ce_ebus_a0->create_ebus(GAMEPAD_EBUS);
-
     ce_log_a0->debug(LOG_WHERE, "Init");
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
@@ -272,7 +267,6 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ct_machine_a0);
             CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },

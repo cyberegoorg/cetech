@@ -82,7 +82,6 @@ set(CORELIB_SOURCE_FILES
         src/celib/private/fs.c
         src/celib/private/ydb.c
         src/celib/private/cdb.c
-        src/celib/private/ebus.c
         src/celib/private/core.c
         )
 

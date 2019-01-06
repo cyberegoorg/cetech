@@ -6,7 +6,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <stddef.h>
-#include <celib/ebus.h>
+
 #include <cetech/kernel/kernel.h>
 #include <celib/hash.inl>
 #include <celib/memory.h>
@@ -132,6 +132,8 @@ static struct ct_kernel_task_i0 game_task = {
         .name = task_name,
         .update = game_update,
         .update_after = update_after,
+        .init = game_init,
+        .shutdown = game_shutdown,
 };
 
 //==============================================================================
@@ -147,9 +149,6 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
     api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0);
     api->register_api(KERNEL_TASK_INTERFACE, &game_task);
 
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_INIT_EVENT, game_init, GAME_ORDER);
-    ce_ebus_a0->connect(KERNEL_EBUS, KERNEL_SHUTDOWN_EVENT, game_shutdown,
-                        GAME_ORDER);
 
     ce_api_a0->register_on_add(GAME_INTERFACE, _game_api_add);
 

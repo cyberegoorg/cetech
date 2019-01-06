@@ -10,7 +10,7 @@
 #include <celib/module.h>
 #include <string.h>
 #include <celib/hashlib.h>
-#include <celib/ebus.h>
+
 #include <cetech/kernel/kernel.h>
 #include <celib/macros.h>
 #include "celib/allocator.h"
@@ -95,14 +95,14 @@ static void update(float dt) {
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    struct ebus_event_header *it = ce_ebus_a0->events(KEYBOARD_EBUS);
-    struct ebus_event_header *end_it = ce_ebus_a0->events_end(KEYBOARD_EBUS);
+    uint64_t events_n = 0;
+    const uint64_t *events = ct_machine_a0->events(&events_n);
+    for (int i = 0; i < events_n; ++i) {
+        uint64_t event = events[i];
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
+        uint64_t event_type = ce_cdb_a0->obj_type(reader);
 
-    while (it != end_it) {
-        struct ebus_cdb_event *obj_event = CE_EBUS_BODY(it);
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     obj_event->obj);
-        switch (it->type) {
+        switch (event_type) {
             case EVENT_KEYBOARD_DOWN:
                 _G.state[ce_cdb_a0->read_uint64(reader,
                                                 CONTROLER_KEYCODE, 0)] = 1;
@@ -110,8 +110,7 @@ static void update(float dt) {
 
             case EVENT_KEYBOARD_UP:
                 _G.state[ce_cdb_a0->read_uint64(reader,
-                                                CONTROLER_KEYCODE,
-                                                0)] = 0;
+                                                CONTROLER_KEYCODE, 0)] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
@@ -124,10 +123,7 @@ static void update(float dt) {
             default:
                 break;
         }
-
-        it = CE_EBUS_NEXT(it);
     }
-
 }
 
 static char *text(uint32_t idx) {
@@ -192,9 +188,6 @@ static void _init(struct ce_api_a0 *api) {
 
     _G = (struct G) {};
 
-
-    ce_ebus_a0->create_ebus(KEYBOARD_EBUS);
-
     ce_log_a0->debug(LOG_WHERE, "Init");
 }
 
@@ -209,7 +202,6 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ct_machine_a0);
             CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },

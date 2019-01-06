@@ -1,5 +1,5 @@
 #include <celib/hashlib.h>
-#include <celib/ebus.h>
+
 #include <celib/os.h>
 #include <celib/macros.h>
 #include "celib/log.h"
@@ -213,7 +213,6 @@ struct ce_os_window_a0 window_api = {
 };
 
 int sdl_window_init(struct ce_api_a0 *api) {
-    ce_ebus_a0->create_ebus(WINDOW_EBUS);
     return 1;
 }
 

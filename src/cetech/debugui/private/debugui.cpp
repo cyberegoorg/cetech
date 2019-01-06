@@ -10,7 +10,7 @@
 #include <celib/array.inl>
 #include <cetech/controlers/mouse.h>
 #include <celib/log.h>
-#include <celib/ebus.h>
+
 #include <cetech/controlers/controlers.h>
 #include <cetech/kernel/kernel.h>
 
@@ -339,7 +339,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },
         {

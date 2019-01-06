@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-#define EXPLORER_EBUS \
-    CE_ID64_0("explorer", 0xcf28ca0dccf09520ULL)
-
 #define EXPLORER_INTERFACE \
     CE_ID64_0("ct_explorer_i0", 0xdaa9b6ac2664c06dULL)
 

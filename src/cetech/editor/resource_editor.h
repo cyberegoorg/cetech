@@ -9,9 +9,6 @@
 #define RESOURCE_EDITOR_OBJ \
     CE_ID64_0("asset_obj", 0x755d033f781be94ULL)
 
-#define RESOURCE_EDITOR_EBUS \
-    CE_ID64_0("asset_editor", 0xd7ecca607e454ce9ULL)
-
 struct ct_resource_editor_i0 {
     uint64_t (*cdb_type)();
 

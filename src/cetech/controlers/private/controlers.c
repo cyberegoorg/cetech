@@ -7,7 +7,7 @@
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
-#include <celib/ebus.h>
+
 #include <celib/hashlib.h>
 #include <celib/macros.h>
 #include <celib/os.h>
@@ -85,7 +85,6 @@ CE_MODULE_DEF(
         controlers,
         {
             CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_ebus_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);
         },

@@ -4,7 +4,7 @@
 #include <celib/cdb.h>
 #include <celib/ydb.h>
 #include <celib/fmath.inl>
-#include <celib/ebus.h>
+
 #include <celib/macros.h>
 #include "celib/hashlib.h"
 #include "celib/memory.h"
@@ -305,6 +305,7 @@ static void open(uint64_t context_obj) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
                                                        ASSET_NAME_PROP, 0);
+    editor->world = ct_ecs_a0->create_world();
 
     editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
     editor->viewport = ct_renderer_a0->create_viewport(editor->world,
@@ -408,7 +409,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
         },

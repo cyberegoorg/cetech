@@ -15,7 +15,7 @@
 #include <celib/os.h>
 #include <celib/buffer.inl>
 #include <celib/hashlib.h>
-#include <celib/ebus.h>
+
 #include <sys/time.h>
 #include <uuid/uuid.h>
 
@@ -98,11 +98,10 @@ static uint64_t _gen_uid() {
     union {
         uint64_t ui;
         struct {
-            uint16_t h1;
-            uint16_t h2;
+            uint32_t h;
             uint32_t l;
         };
-    } id;
+    } id = {.ui = 0};
 
     arc4random_buf(&id.l, 4);
     id.h1 = 0;
@@ -123,15 +122,15 @@ static struct object_t *_get_object_from_id(struct db_t *db,
         return NULL;
     }
 
-    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+//    ce_os_a0->thread->spin_lock(&db->id_map_lock);
     uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+//    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
     if (!obj) {
         if (_G.loader(objid)) {
-            ce_os_a0->thread->spin_lock(&db->id_map_lock);
+//            ce_os_a0->thread->spin_lock(&db->id_map_lock);
             uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+//            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
             return ((struct object_t *) obj);
         }
@@ -153,9 +152,9 @@ static void _set_uid_obj(struct db_t *db,
 
 void _remove_uid_obj(struct db_t *db,
                      uint64_t uid) {
-    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+//    ce_os_a0->thread->spin_lock(&db->id_map_lock);
     ce_hash_remove(&db->id_map, uid);
-    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+//    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 }
 
 static struct object_t *_get_object_from_o(const ce_cdb_obj_o *obj_o) {
@@ -573,6 +572,25 @@ static void destroy_db(struct ce_cdb_t db) {
     ce_array_push(_G.to_free_db, db.idx, _G.allocator);
 }
 
+static void _add_obj_to_destroy_list(struct db_t *db_inst,
+                                     uint64_t _obj) {
+    bool contain = false;
+    const uint64_t n = db_inst->to_free_objects_id_n;
+    for (int i = 0; i < n; ++i) {
+        if(db_inst->to_free_objects_id[i] != _obj) {
+            continue;
+        }
+
+        contain = true;
+        break;
+    }
+
+    CE_ASSERT(LOG_WHERE, !contain);
+
+    uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
+    db_inst->to_free_objects_id[idx] = _obj;
+}
+
 static void destroy_object(struct ce_cdb_t db,
                            uint64_t _obj) {
     struct db_t *db_inst = _get_db(db);
@@ -581,9 +599,7 @@ static void destroy_object(struct ce_cdb_t db,
 
     CE_ASSERT(LOG_WHERE, obj);
 
-    uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
-
-    db_inst->to_free_objects_id[idx] = _obj;
+    _add_obj_to_destroy_list(db_inst, _obj);
 
     for (int i = 1; i < obj->properties_count; ++i) {
         switch (obj->property_type[i]) {
@@ -636,9 +652,9 @@ static void gc() {
         }
 
         uint32_t changed_obj_n = ce_array_size(db_inst->changed_obj);
-        for (int i = 0; i < changed_obj_n; ++i) {
+        for (int j = 0; j < changed_obj_n; ++j) {
             struct object_t *obj = _get_object_from_id(db_inst,
-                                                       db_inst->changed_obj[i]);
+                                                       db_inst->changed_obj[j]);
             ce_array_clean(obj->changed);
         }
         ce_array_clean(db_inst->changed_obj);

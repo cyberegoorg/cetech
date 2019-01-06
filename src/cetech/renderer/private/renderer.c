@@ -15,7 +15,7 @@
 #include <celib/os.h>
 #include <celib/private/api_private.h>
 #include <celib/cdb.h>
-#include <celib/ebus.h>
+
 #include <celib/log.h>
 
 #include <cetech/kernel/kernel.h>
@@ -190,20 +190,6 @@ static void renderer_get_size(uint32_t *width,
     *height = _G.size_height;
 }
 
-
-static void on_resize(uint64_t type,
-                      void *event) {
-    _G.need_reset = 1;
-
-    struct ebus_cdb_event *ev = (struct ebus_cdb_event *) event;
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), ev->obj);
-
-    _G.size_width = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_WIDTH, 0);
-    _G.size_height = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_HEIGHT,
-                                            0);
-}
-
 static void _feed_module(struct ct_world world,
                          struct ct_rg_module *module) {
     struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
@@ -240,6 +226,27 @@ void _render_components(struct ct_world world,
 
 static void render(float dt) {
     _G.viewid = 0;
+
+
+    uint64_t events_n = 0;
+    const uint64_t *events = ct_machine_a0->events(&events_n);
+    for (int i = 0; i < events_n; ++i) {
+        uint64_t event = events[i];
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
+        uint64_t event_type = ce_cdb_a0->obj_type(reader);
+
+        if (event_type != EVENT_WINDOW_RESIZED) {
+            continue;
+        }
+
+        _G.need_reset = 1;
+        _G.size_width = ce_cdb_a0->read_uint64(reader,
+                                               CT_MACHINE_WINDOW_WIDTH, 0);
+
+        _G.size_height = ce_cdb_a0->read_uint64(reader,
+                                                CT_MACHINE_WINDOW_HEIGHT, 0);
+    }
+
     if (_G.need_reset) {
         _G.need_reset = 0;
 
@@ -357,9 +364,6 @@ static void _init(struct ce_api_a0 *api) {
             .config = ce_config_a0->obj(),
     };
 
-    ce_ebus_a0->connect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize, 0);
-
-
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
 
     if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_X)) {
@@ -407,8 +411,6 @@ static void _shutdown() {
         bgfx_shutdown();
     }
 
-    ce_ebus_a0->disconnect(WINDOW_EBUS, EVENT_WINDOW_RESIZED, on_resize);
-
     _G = (struct _G) {};
 }
 
@@ -422,7 +424,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_machine_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_ebus_a0);
         },
         {
             CE_UNUSED(reload);

@@ -7,7 +7,7 @@
 #include <celib/api_system.h>
 #include <celib/hashlib.h>
 #include <cetech/controlers/keyboard.h>
-#include <celib/ebus.h>
+
 #include <celib/cdb.h>
 #include <celib/fmath.inl>
 
@@ -91,7 +91,6 @@ void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
         CE_INIT_API(api, ce_log_a0);
         CE_INIT_API(api, ce_id_a0);
         CE_INIT_API(api, ct_renderer_a0);
-        CE_INIT_API(api, ce_ebus_a0);
         CE_INIT_API(api, ct_ecs_a0);
         CE_INIT_API(api, ct_rg_a0);
         CE_INIT_API(api, ct_default_rg_a0);

@@ -8,7 +8,7 @@
 #include "celib/log.h"
 #include "celib/cdb.h"
 #include <celib/hashlib.h>
-#include <celib/ebus.h>
+
 #include <celib/os.h>
 #include <celib/macros.h>
 
@@ -21,6 +21,7 @@
 #include <cetech/controlers/gamepad.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
+#include <celib/array.inl>
 
 extern int sdl_window_init(struct ce_api_a0 *api);
 
@@ -58,6 +59,8 @@ static struct MachineGlobals {
     struct {
         uint8_t state[KEY_MAX];
     } keyboard;
+
+    uint64_t *events;
 } _G = {};
 
 
@@ -65,6 +68,10 @@ static struct MachineGlobals {
 // Interface
 //==============================================================================
 
+
+static void _add_events(uint64_t event) {
+    ce_array_push(_G.events, event, ce_memory_a0->system);
+}
 
 void sdl_mouse_process() {
     int pos[2] = {};
@@ -96,8 +103,7 @@ void sdl_mouse_process() {
     ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, _G.mouse.position[1]);
     ce_cdb_a0->write_commit(w);
 
-
-    ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_MOVE, event);
+    _add_events(event);
 
     for (uint32_t i = 0; i < MOUSE_BTN_MAX; ++i) {
         if (is_button_down(curent_state[i], _G.mouse.state[i])) {
@@ -108,7 +114,7 @@ void sdl_mouse_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_DOWN, event);
+            _add_events(event);
 
         } else if (is_button_up(curent_state[i], _G.mouse.state[i])) {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
@@ -118,7 +124,7 @@ void sdl_mouse_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_UP, event);
+            _add_events(event);
         }
 
         _G.mouse.state[i] = curent_state[i];
@@ -139,8 +145,7 @@ void sdl_keyboard_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_DOWN,
-                                      event);
+            _add_events(event);
 
 
         } else if (is_button_up(state[i], _G.keyboard.state[i])) {
@@ -151,7 +156,7 @@ void sdl_keyboard_process() {
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
-            ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_UP, event);
+            _add_events(event);
 
         }
 
@@ -283,8 +288,7 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_DOWN,
-                                          event);
+                _add_events(event);
 
 
             } else if (is_button_up(curent_state[i][j],
@@ -299,8 +303,7 @@ void sdl_gamepad_process() {
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_UP,
-                                          event);
+                _add_events(event);
 
             }
 
@@ -332,8 +335,7 @@ void sdl_gamepad_process() {
                                      CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_MOVE,
-                                          event);
+                _add_events(event);
 
             }
         }
@@ -354,12 +356,18 @@ void sdl_gamepad_play_rumble(int gamepad,
 }
 
 static void _update(float dt) {
+    const uint32_t event_n = ce_array_size(_G.events);
+    for (int j = 0; j < event_n; ++j) {
+        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), _G.events[j]);
+    }
+    ce_array_clean(_G.events);
+
     SDL_Event e = {};
 
     while (SDL_PollEvent(&e) > 0) {
         switch (e.type) {
             case SDL_QUIT:
-                ce_ebus_a0->broadcast(KERNEL_EBUS, KERNEL_QUIT_EVENT, NULL, 0);
+                ct_kernel_a0->quit();
                 break;
 
             case SDL_WINDOWEVENT: {
@@ -380,8 +388,7 @@ static void _update(float dt) {
                                               e.window.data2);
                         ce_cdb_a0->write_commit(w);
 
-                        ce_ebus_a0->broadcast_obj(WINDOW_EBUS,
-                                                  EVENT_WINDOW_RESIZED, event);
+                        _add_events(event);
 
                     }
                         break;
@@ -402,7 +409,7 @@ static void _update(float dt) {
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(MOUSE_EBUS, EVENT_MOUSE_WHEEL, event);
+                _add_events(event);
 
             }
                 break;
@@ -419,8 +426,7 @@ static void _update(float dt) {
                 ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(KEYBOARD_EBUS, EVENT_KEYBOARD_TEXT,
-                                          event);
+                _add_events(event);
 
             }
                 break;
@@ -437,8 +443,7 @@ static void _update(float dt) {
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ce_cdb_a0->write_commit(w);
 
-                ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS, EVENT_GAMEPAD_CONNECT,
-                                          event);
+                _add_events(event);
 
             }
                 break;
@@ -464,8 +469,7 @@ static void _update(float dt) {
                     ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ce_cdb_a0->write_commit(w);
 
-                    ce_ebus_a0->broadcast_obj(GAMEPAD_EBUS,
-                                              EVENT_GAMEPAD_DISCONNECT, event);
+                    _add_events(event);
 
                     break;
                 }
@@ -483,9 +487,16 @@ static void _update(float dt) {
     sdl_keyboard_process();
 }
 
+
+static const uint64_t *events(uint64_t *n) {
+    *n = ce_array_size(_G.events);
+    return _G.events;
+}
+
 static struct ct_machine_a0 a0 = {
         .gamepad_is_active = sdl_gamepad_is_active,
         .gamepad_play_rumble = sdl_gamepad_play_rumble,
+        .events = events,
 };
 
 struct ct_machine_a0 *ct_machine_a0 = &a0;
@@ -516,7 +527,6 @@ static void init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_ebus_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
     if (SDL_Init(SDL_INIT_VIDEO |

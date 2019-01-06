@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <celib/module.inl>
 
-#define MOUSE_EBUS_NAME "mouse"
-
 #define CONTROLER_MOUSE \
     CE_ID64_0("mouse", 0x7c351278fe937928ULL)
 
@@ -13,16 +11,12 @@
     CE_ID64_0("mouse_task", 0x143aa2eadb0ac19eULL)
 
 enum {
-    MOUSE_EBUS = 0x3ddd354d
-};
-
-enum {
     EVENT_MOUSE_INVALID = 0,   //!< Invalid type
 
-    EVENT_MOUSE_MOVE,    //!< Mouse move
-    EVENT_MOUSE_UP,      //!< Mouse button up
-    EVENT_MOUSE_DOWN,    //!< Mouse button down
-    EVENT_MOUSE_WHEEL,    //!< Mouse wheel move
+    EVENT_MOUSE_MOVE = 9,    //!< Mouse move
+    EVENT_MOUSE_UP = 10,      //!< Mouse button up
+    EVENT_MOUSE_DOWN = 11,    //!< Mouse button down
+    EVENT_MOUSE_WHEEL = 12,    //!< Mouse wheel move
 
 };
 

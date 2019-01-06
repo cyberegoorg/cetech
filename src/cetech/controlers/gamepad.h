@@ -4,8 +4,6 @@
 
 #include <stdint.h>
 
-#define GAMEPAD_EBUS_NAME "gamepad"
-
 #define CONTROLER_GAMEPAD \
     CE_ID64_0("gamepad", 0x6aa699de487f71eeULL)
 
@@ -13,17 +11,13 @@
     CE_ID64_0("gamepad_task", 0x120510962813be6fULL)
 
 enum {
-    GAMEPAD_EBUS = 0x3913b95f
-};
-
-enum {
     EVENT_GAMEPAD_NVALID = 0,   //!< Invalid type
 
-    EVENT_GAMEPAD_MOVE,       //!< Gamepad move
-    EVENT_GAMEPAD_UP,         //!< Gamepad button up
-    EVENT_GAMEPAD_DOWN,       //!< Gamepad button down
-    EVENT_GAMEPAD_CONNECT,    //!< Gamepad connected
-    EVENT_GAMEPAD_DISCONNECT, //!< Gamepad disconected
+    EVENT_GAMEPAD_MOVE = 1,       //!< Gamepad move
+    EVENT_GAMEPAD_UP = 2,         //!< Gamepad button up
+    EVENT_GAMEPAD_DOWN = 3,       //!< Gamepad button down
+    EVENT_GAMEPAD_CONNECT = 4,    //!< Gamepad connected
+    EVENT_GAMEPAD_DISCONNECT = 5, //!< Gamepad disconected
 };
 
 //! Gamepad button enum

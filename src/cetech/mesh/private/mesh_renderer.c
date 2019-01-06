@@ -6,7 +6,7 @@
 #include <celib/module.h>
 #include <celib/ydb.h>
 #include <celib/fmath.inl>
-#include <celib/ebus.h>
+
 #include <celib/macros.h>
 #include "celib/api_system.h"
 
@@ -284,7 +284,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_dd_a0);
             CE_INIT_API(api, ct_renderer_a0);
 

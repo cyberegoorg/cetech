@@ -9,7 +9,7 @@
 #include <celib/ydb.h>
 #include <celib/array.inl>
 #include <celib/module.h>
-#include <celib/ebus.h>
+
 #include <celib/fmath.inl>
 #include <celib/hash.inl>
 #include <celib/ydb.h>
@@ -256,7 +256,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
         },
         {
             CE_UNUSED(reload);

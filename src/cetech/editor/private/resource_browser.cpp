@@ -5,7 +5,7 @@
 #include <celib/os.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
-#include <celib/ebus.h>
+
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include "celib/hashlib.h"
@@ -36,6 +36,7 @@ static struct _G {
     uint64_t selected_file;
     uint32_t selected_file_idx;
     ct_resource_id selected_asset;
+    ct_resource_id edit_asset;
 
     const char *root;
     bool visible;
@@ -63,23 +64,12 @@ static void set_current_dir(const char *dir,
     _G.need_reaload = true;
 }
 
-static void _broadcast_edit() {
-    uint64_t event;
-    event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                     RESOURCE_DCLICK_EVENT);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),event);
-    ce_cdb_a0->set_uint64(w, RESOURCE_NAME, _G.selected_asset.uid);
-    ce_cdb_a0->set_uint64(w, RESOURCE_BROWSER_ROOT, RESOURCE_BROWSER_SOURCE);
-    ce_cdb_a0->write_commit(w);
-
-    ce_ebus_a0->broadcast_obj(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT,
-                              event);
+static void _broadcast_edit(uint64_t dock) {
+    _G.edit_asset = _G.selected_asset;
 }
 
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
-
 
     char *buf = NULL;
     ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
@@ -93,7 +83,7 @@ static void _broadcast_selected(uint64_t dock) {
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 
-static void ui_asset_menu() {
+static void ui_asset_menu(uint64_t dock) {
     ct_debugui_a0->Text(ICON_FA_SEARCH);
     ct_debugui_a0->SameLine(0, 8);
     _G.asset_filter.Draw("");
@@ -101,7 +91,7 @@ static void ui_asset_menu() {
     ct_debugui_a0->SameLine(0, -1);
 
     if (ct_debugui_a0->Button("Edit asset", (float[2]) {0, 0})) {
-        _broadcast_edit();
+        _broadcast_edit(dock);
     }
 }
 
@@ -273,7 +263,7 @@ static void ui_asset_list(uint64_t dock) {
 
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
-                    _broadcast_edit();
+                    _broadcast_edit(dock);
                 } else {
                     _broadcast_selected(dock);
                 }
@@ -338,6 +328,7 @@ static void ui_asset_list(uint64_t dock) {
 
 
 static void on_debugui(uint64_t dock) {
+    _G.edit_asset.uid = 0;
 
     float content_w = ImGui::GetContentRegionAvailWidth();
 
@@ -346,7 +337,7 @@ static void on_debugui(uint64_t dock) {
     }
 
     ui_breadcrumb(_G.current_dir);
-    ui_asset_menu();
+    ui_asset_menu(dock);
     ui_dir_list();
 
     float left_size[] = {_G.left_column_width, 0.0f};
@@ -384,14 +375,23 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
+static uint64_t edited() {
+    return _G.edit_asset.uid;
+}
+
+static struct ct_resource_browser_a0 resource_browser_api = {
+        .edited = edited,
+};
+
+struct ct_resource_browser_a0 *ct_resource_browser_a0 = &resource_browser_api;
+
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE, &ct_dock_i0);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
-
-    ce_ebus_a0->create_ebus(RESOURCE_BROWSER_EBUS);
 
     ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
 
@@ -413,7 +413,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_fs_a0);
             CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ce_cdb_a0);
         },
         {

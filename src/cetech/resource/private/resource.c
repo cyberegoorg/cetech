@@ -5,7 +5,7 @@
 
 #include <celib/array.inl>
 #include <celib/hash.inl>
-#include <celib/ebus.h>
+
 #include <celib/api_system.h>
 #include <celib/memory.h>
 #include <celib/fs.h>
@@ -96,16 +96,20 @@ static void load(const uint64_t *names,
             continue;
         };
 
+        struct ct_resource_id rid = {.uid = asset_name};
+
+        if(!ct_builddb_a0->obj_exist(rid)) {
+            ce_log_a0->error(LOG_WHERE,
+                             "Obj 0x%llx does not exist in DB", rid.uid);
+            continue;
+        };
+
         uint64_t type = ct_builddb_a0->get_resource_type(
                 (struct ct_resource_id) {.uid=asset_name});
 
         ce_cdb_a0->create_object_uid(_G.db, asset_name, type);
 
         uint64_t object = asset_name;
-
-        resource_objects[i] = object;
-
-        struct ct_resource_id rid = {.uid = asset_name};
 
         ce_log_a0->debug(LOG_WHERE, "Loading resource 0x%llx", rid.uid);
         if (!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
@@ -114,6 +118,8 @@ static void load(const uint64_t *names,
             ce_cdb_a0->destroy_object(ce_cdb_a0->db(), object);
             continue;
         }
+
+        resource_objects[i] = object;
 
         struct ct_resource_i0 *resource_i = get_resource_interface(type);
 

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include <celib/ebus.h>
+
 #include <celib/macros.h>
 #include "celib/hashlib.h"
 #include "celib/memory.h"

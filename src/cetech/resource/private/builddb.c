@@ -40,6 +40,7 @@ struct sqls_s {
     sqlite3_stmt *get_resource_from_dirs;
     sqlite3_stmt *get_file_id;
     sqlite3_stmt *resource_type;
+    sqlite3_stmt *resource_exist;
 };
 
 static struct _G {
@@ -106,6 +107,11 @@ static struct {
                   "SELECT files.filename\n"
                   "FROM resource\n"
                   "JOIN files on files.id == resource.file\n"
+                  "WHERE resource.uid = ?1;"),
+
+        _STATMENT(resource_exist,
+                  "SELECT 1\n"
+                  "FROM resource\n"
                   "WHERE resource.uid = ?1;"),
 
         _STATMENT(resource_type,
@@ -436,6 +442,23 @@ static void buildb_get_resource_from_dirs_clean(char **filename,
 }
 
 
+static bool builddb_obj_exist(struct ct_resource_id resource) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_int64(sqls->resource_exist, 1, resource.uid);
+
+
+    int ok = _step(_db, sqls->resource_exist) == SQLITE_ROW;
+    if (ok) {
+        _step(_db, sqls->resource_exist);
+
+        return true;
+    }
+
+    return false;
+}
+
 static int builddb_need_compile(const char *filename) {
     int compile = 1;
 
@@ -565,6 +588,7 @@ static struct ct_builddb_a0 build_db_api = {
         .load_cdb_file = builddb_load_cdb_file,
         .set_file_depend = builddb_set_file_depend,
         .need_compile = builddb_need_compile,
+        .obj_exist = builddb_obj_exist,
         .add_dependency = _add_dependency,
         .get_resource_type = resource_type,
         .get_resource_filename = resource_filename,

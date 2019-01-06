@@ -4,7 +4,7 @@
 #include <celib/cdb.h>
 #include <celib/ydb.h>
 #include <celib/fmath.inl>
-#include <celib/ebus.h>
+
 #include <celib/macros.h>
 #include "celib/hashlib.h"
 #include "celib/memory.h"
@@ -185,13 +185,20 @@ static void open(uint64_t obj) {
     e->type = type;
     e->obj = obj;
 
-    struct ct_world *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
     ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
+    ce_cdb_a0->write_commit(w);
+
     i->open(e->context_obj);
 
 }
 
 static void update(float dt) {
+    uint64_t edited = ct_resource_browser_a0->edited();
+    if (edited) {
+        open(edited);
+    }
+
     const uint32_t editor_n = ce_array_size(_G.editors);
     for (uint8_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
@@ -204,20 +211,6 @@ static void update(float dt) {
 
         editor_i->update(editor->context_obj, dt);
     }
-}
-
-static void on_asset_double_click(uint64_t type,
-                                  void *event) {
-    struct ebus_cdb_event *ev = event;
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),ev->obj);
-
-    uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
-                                                 RESOURCE_NAME, 0);
-
-    uint64_t obj = asset_name;
-
-    open(obj);
 }
 
 
@@ -250,22 +243,13 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_api_a0->register_api(DOCK_INTERFACE, &dock_i);
 
-    ce_ebus_a0->connect(RESOURCE_BROWSER_EBUS,
-                        RESOURCE_DCLICK_EVENT,
-                        on_asset_double_click, 0);
 
     ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
 
-    ce_ebus_a0->create_ebus(RESOURCE_EDITOR_EBUS);
-
-    
     _get_or_create_editor(0);
 }
 
 static void _shutdown() {
-    ce_ebus_a0->disconnect(RESOURCE_BROWSER_EBUS, RESOURCE_DCLICK_EVENT,
-                           on_asset_double_click);
-
     _G = (struct _G) {};
 }
 
@@ -278,7 +262,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
         },

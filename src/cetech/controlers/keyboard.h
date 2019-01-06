@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define KEYBOARD_EBUS_NAME "keyboard"
-
 #define CONTROLER_KEYBOARD \
     CE_ID64_0("keyboard", 0x413d83f1d027f82eULL)
 
@@ -12,15 +10,11 @@
     CE_ID64_0("keyboard_task", 0x905ae7202b55aafcULL)
 
 enum {
-    KEYBOARD_EBUS = 0x5712c6b9
-};
-
-enum {
     EVENT_INVALID = 0,   //!< Invalid type
 
-    EVENT_KEYBOARD_UP,   //!< Keyboard button up
-    EVENT_KEYBOARD_DOWN, //!< Keyboard button down
-    EVENT_KEYBOARD_TEXT, //!< Keyboard button down
+    EVENT_KEYBOARD_UP = 6,   //!< Keyboard button up
+    EVENT_KEYBOARD_DOWN = 7, //!< Keyboard button down
+    EVENT_KEYBOARD_TEXT = 8, //!< Keyboard button down
 };
 
 enum {

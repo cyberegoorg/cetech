@@ -1,6 +1,9 @@
 #ifndef CETECH_KERNEL_H
 #define CETECH_KERNEL_H
 
+#define CT_KERNEL_API \
+    CE_ID64_0("ct_kernel_a0", 0xdb873264c27eedf3ULL)
+
 #define CONFIG_PLATFORM \
      CE_ID64_0("kernel.platform", 0xa2e788cf39b7339bULL)
 
@@ -31,23 +34,6 @@
 #define BUILD_ROOT \
     CE_ID64_0("build", 0x4429661936ece1eaULL)
 
-#define KERNEL_INIT_EVENT \
-    CE_ID64_0("init", 0x44181d1a66341876ULL)
-
-#define KERNEL_QUIT_EVENT \
-    CE_ID64_0("quit", 0x666ffde8529c8bc9ULL)
-
-#define KERNEL_SHUTDOWN_EVENT \
-    CE_ID64_0("shutdown", 0xe1649d1d8b13d056ULL)
-
-#define KERNEL_EBUS \
-    CE_ID64_0("kernel", 0x146c2a8f5727f34ULL)
-
-enum {
-    KERNEL_ORDER = 1024,
-    GAME_ORDER = KERNEL_ORDER + 1024,
-};
-
 #define CT_INPUT_TASK \
     CE_ID64_0("input_task", 0xba6140c0d9e00706ULL)
 
@@ -55,14 +41,27 @@ enum {
     CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
 
 typedef void (*ce_kernel_taks_update_t)(float dt);
-
+typedef void (*ce_kernel_taks_init_t)();
+typedef void (*ce_kernel_taks_shutdown_t)();
 
 struct ct_kernel_task_i0 {
     uint64_t (*name)();
+
     void (*update)(float dt);
     uint64_t* (*update_before)(uint64_t* n);
     uint64_t* (*update_after)(uint64_t* n);
+
+    void (*init)();
+    void (*shutdown)();
+    uint64_t* (*init_before)(uint64_t* n);
+    uint64_t* (*init_after)(uint64_t* n);
 };
 
+struct ct_kernel_a0 {
+    void (*quit)();
+};
+
+
+CE_MODULE(ct_kernel_a0);
 
 #endif //CETECH_KERNEL_H

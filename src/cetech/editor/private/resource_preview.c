@@ -12,7 +12,7 @@
 #include <cetech/editor/editor.h>
 #include <celib/hash.inl>
 #include <celib/fmath.inl>
-#include <celib/ebus.h>
+
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
@@ -308,7 +308,7 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);
             CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_ebus_a0);
+
             CE_INIT_API(api, ct_dd_a0);
             CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
