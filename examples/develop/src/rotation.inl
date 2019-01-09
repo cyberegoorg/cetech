@@ -55,8 +55,8 @@ static void foreach_rotation(struct ct_world world,
                              void *data) {
     float dt = *(float *) (data);
 
-    uint64_t* rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
-    uint64_t* transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    uint64_t *rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
+    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
         uint64_t rotation = rotations[i];

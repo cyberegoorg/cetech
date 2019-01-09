@@ -168,11 +168,6 @@ static void draw_menu(uint64_t selected_obj) {
             entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   ENTITY_RESOURCE_ID);
 
-            uint64_t uid = (((uint64_t) rand() << 32) | rand()); // TODO: !!!!!
-            char uid_str[128] = {};
-            snprintf(uid_str, CE_ARRAY_LEN(uid_str), "%llu", uid);
-            uid = ce_id_a0->id64(uid_str);
-
             uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                                ENTITY_COMPONENTS);
 
@@ -200,7 +195,7 @@ static void draw_menu(uint64_t selected_obj) {
             }
 
             ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),add_children_obj);
-            ce_cdb_a0->set_subobject(w, uid, entity_obj);
+            ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
             ce_cdb_a0->write_commit(w);
         }
         ct_debugui_a0->SameLine(0, 10);

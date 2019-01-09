@@ -225,45 +225,10 @@ static void transform_spawner(struct ct_world world,
 //    };
 }
 
-void obj_change(struct ct_world world,
-                uint64_t obj,
-                const uint64_t *prop,
-                uint32_t prop_count,
-                struct ct_entity *ents,
-                uint32_t n) {
-//    for (int i = 0; i < n; ++i) {
-//        struct ct_entity ent = ents[i];
-//        struct ct_transform_comp *t = ct_ecs_a0->get_one(world,
-//                                                         TRANSFORM_COMPONENT,
-//                                                         ent);
-//
-//        *t = (struct ct_transform_comp) {
-//                .position = {
-//                        ce_cdb_a0->read_float(obj, PROP_POSITION_X, 0.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_POSITION_Y, 0.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_POSITION_Z, 0.0f),
-//                },
-//
-//                .rotation = {
-//                        ce_cdb_a0->read_float(obj, PROP_ROTATION_X, 0.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_ROTATION_Y, 0.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_ROTATION_Z, 0.0f),
-//                },
-//
-//                .scale = {
-//                        ce_cdb_a0->read_float(obj, PROP_SCALE_X, 1.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_SCALE_Y, 1.0f),
-//                        ce_cdb_a0->read_float(obj, PROP_SCALE_Z, 1.0f),
-//                },
-//        };
-//    }
-}
-
 static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .spawner = transform_spawner,
-        .obj_change = obj_change,
 };
 
 

@@ -68,13 +68,6 @@ struct ct_component_i0 {
 
     void (*spawner)(struct ct_world world,
                     uint64_t obj);
-
-    void (*obj_change)(struct ct_world world,
-                       uint64_t obj,
-                       const uint64_t *prop,
-                       uint32_t prop_count,
-                       struct ct_entity *ents,
-                       uint32_t n);
 };
 
 
@@ -130,7 +123,6 @@ struct ct_ecs_a0 {
                 struct ct_entity ent,
                 uint64_t *component_name,
                 uint32_t name_count);
-
 
     //SIMU
     void (*simulate)(struct ct_world world,

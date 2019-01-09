@@ -122,15 +122,15 @@ static struct object_t *_get_object_from_id(struct db_t *db,
         return NULL;
     }
 
-//    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+    ce_os_a0->thread->spin_lock(&db->id_map_lock);
     uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-//    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
     if (!obj) {
         if (_G.loader(objid)) {
-//            ce_os_a0->thread->spin_lock(&db->id_map_lock);
+            ce_os_a0->thread->spin_lock(&db->id_map_lock);
             uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-//            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
             return ((struct object_t *) obj);
         }
@@ -653,7 +653,7 @@ static void gc() {
 
             struct object_t *obj = _get_object_from_id(db_inst, objid);
 
-            _remove_uid_obj(db_inst, objid);
+//            _remove_uid_obj(db_inst, objid);
 
             // remove from instance from parent instance
             if (obj->instance_of) {
@@ -677,6 +677,12 @@ static void gc() {
             }
 
             _destroy_object(db_inst, obj);
+        }
+
+        for (int j = 0; j < to_free_objects_id_n; ++j) {
+            uint64_t objid = db_inst->to_free_objects_id[j];
+            _remove_uid_obj(db_inst, objid);
+
         }
 
         db_inst->to_free_objects_id_n = 0;
@@ -1666,7 +1672,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_UINT64: {
                         uint64_t u = read_uint64(w, ev->prop, 0);
-                        if (u == ev->old_value.uint64) {
+                        if (u != ev->old_value.uint64) {
                             set_uint64(w, ev->prop, ev->new_value.uint64);
                         }
                     }
@@ -1674,7 +1680,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_FLOAT: {
                         float f = read_float(w, ev->prop, 0);
-                        if (f == ev->old_value.f) {
+                        if (f != ev->old_value.f) {
                             set_float(w, ev->prop, ev->new_value.f);
                         }
                     }
@@ -1682,7 +1688,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_BOOL: {
                         bool b = read_bool(w, ev->prop, 0);
-                        if (b == ev->old_value.b) {
+                        if (b != ev->old_value.b) {
                             set_bool(w, ev->prop, ev->new_value.b);
                         }
                     }
@@ -1690,7 +1696,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_STR: {
                         const char *str = read_string(w, ev->prop, 0);
-                        if (str == ev->old_value.str) {
+                        if (str != ev->old_value.str) {
                             set_string(w, ev->prop, ev->new_value.str);
                         }
                     }
@@ -1698,7 +1704,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_PTR: {
                         void *ptr = read_ptr(w, ev->prop, 0);
-                        if (ptr == ev->old_value.ptr) {
+                        if (ptr != ev->old_value.ptr) {
                             set_ptr(w, ev->prop, ev->new_value.ptr);
                         }
                     }
