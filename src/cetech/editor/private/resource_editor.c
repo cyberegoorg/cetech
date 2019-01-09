@@ -91,7 +91,7 @@ static void draw_editor(uint64_t dock) {
     if (is_mouse_hovering && click) {
         const ce_cdb_obj_o *creader = ce_cdb_a0->read(ce_cdb_a0->db(),editor->context_obj);
         uint64_t name = ce_cdb_a0->read_uint64(creader,
-                                               ASSET_NAME_PROP, 0);
+                                               RESOURCE_EDITOR_OBJ, 0);
 
         uint64_t obj = name;
 

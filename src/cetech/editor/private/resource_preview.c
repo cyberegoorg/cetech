@@ -140,9 +140,6 @@ static void set_asset(uint64_t obj) {
 
         uint64_t prev_type = ce_cdb_a0->obj_type(reader);
 
-        struct ct_resource_i0 *resource_i;
-        resource_i = ct_resource_a0->get_interface(prev_type);
-
         struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(prev_type);
 

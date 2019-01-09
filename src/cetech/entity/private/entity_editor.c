@@ -302,16 +302,16 @@ static struct scene_editor *_new_editor(uint64_t context_obj) {
 static void open(uint64_t context_obj) {
     struct scene_editor *editor = _new_editor(context_obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
-                                                       ASSET_NAME_PROP, 0);
+                                                       RESOURCE_EDITOR_OBJ, 0);
     editor->world = ct_ecs_a0->create_world();
 
     editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
     editor->viewport = ct_renderer_a0->create_viewport(editor->world,
                                                        editor->camera_ent);
 
-    editor->entity_name = asset_name;
+    editor->entity = ct_ecs_a0->spawn(editor->world, asset_name);
 
 //    ct_selected_object_a0->set_selected_object(obj);
 //    ct_explorer_a0->set_level(editor->world,
