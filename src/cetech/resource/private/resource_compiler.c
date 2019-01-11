@@ -72,7 +72,8 @@ static bool _is_ref(const char *str) {
     return (str[0] == '0') && (str[1] == 'x');
 }
 
-uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
+uint64_t compile_obj(struct ce_cdb_t db,
+                     uint64_t input_obj) {
 
     const ce_cdb_obj_o *input_r = ce_cdb_a0->read(ce_cdb_a0->db(), input_obj);
 
@@ -80,7 +81,13 @@ uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
     const char *uid_s = ce_cdb_a0->read_str(input_r, CDB_UID_PROP, NULL);
 
     uint64_t type = ce_id_a0->id64(type_s);
-    uint64_t uid = _uid_from_str(uid_s);
+
+    uint64_t uid = 0;
+    if (uid_s) {
+        uid = _uid_from_str(uid_s);
+    } else {
+        uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), input_obj);
+    }
 
     uint64_t obj = 0;
     ce_cdb_a0->create_object_uid(db, uid, type);
@@ -94,7 +101,7 @@ uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
     for (int i = 0; i < n; ++i) {
         uint64_t p = k[i];
 
-        if(CDB_UID_PROP == p) {
+        if (CDB_UID_PROP == p) {
             continue;
         }
 
@@ -137,8 +144,15 @@ uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
                 const ce_cdb_obj_o *sr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                          subobj);
                 const char *suid_s = ce_cdb_a0->read_str(sr, CDB_UID_PROP,
+
                                                          NULL);
-                uint64_t ref_uid = _uid_from_str(suid_s);
+                uint64_t ref_uid = 0;
+                if (suid_s) {
+                    ref_uid = _uid_from_str(suid_s);
+                } else {
+                    ref_uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), subobj);
+                }
+
                 ce_cdb_a0->set_subobject(obj_w, p, ref_uid);
             }
                 break;
@@ -171,6 +185,7 @@ uint64_t compile_obj(struct ce_cdb_t db, uint64_t input_obj) {
 }
 
 void _scan_obj(const char *filename,
+               uint64_t key,
                uint64_t obj,
                struct ce_ba_graph *obj_graph,
                struct ce_hash_t *obj_hash) {
@@ -184,7 +199,14 @@ void _scan_obj(const char *filename,
     const uint64_t n = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
-    uint64_t uid = strtoul(uid_s, NULL, 0);
+
+    uint64_t uid = 0;
+    if (uid_s) {
+        uid = strtoul(uid_s, NULL, 0);
+    } else {
+        uid = key;
+    }
+
     struct ct_resource_id rid = {.uid = uid};
     ct_builddb_a0->put_resource(rid, type, filename, name);
 
@@ -208,13 +230,19 @@ void _scan_obj(const char *filename,
 
         if (t == CDB_TYPE_SUBOBJECT) {
             uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, k, 0);
-            _scan_obj(filename, sub_obj, obj_graph, obj_hash);
+            _scan_obj(filename, k, sub_obj, obj_graph, obj_hash);
 
             const ce_cdb_obj_o *subr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        sub_obj);
             const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
 
-            uint64_t ref_uid = _uid_from_str(uid_s);
+            uint64_t ref_uid = 0;
+            if (uid_s) {
+                ref_uid = strtoul(uid_s, NULL, 0);
+            } else {
+                ref_uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), sub_obj);
+            }
+
             ce_array_push(after, ref_uid, _G.allocator);
 
         } else if (t == CDB_TYPE_STR) {
@@ -260,7 +288,7 @@ void _scan_files(char **files,
 
             uint64_t res_obj = ce_cdb_a0->read_subobject(reader, k, 0);
 
-            _scan_obj(filename, res_obj, &obj_graph, &obj_hash);
+            _scan_obj(filename, k, res_obj, &obj_graph, &obj_hash);
         }
     }
 

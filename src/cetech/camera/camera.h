@@ -29,6 +29,12 @@
 struct ct_world;
 struct ct_entity;
 
+struct ct_camera_component {
+    float near;
+    float far;
+    float fov;
+};
+
 //! Camera API V0
 struct ct_camera_a0 {
     //! Get camera project and view matrix

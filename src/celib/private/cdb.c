@@ -1572,7 +1572,11 @@ static void dump_str(struct ce_cdb_t _db,
             ce_buffer_printf(buffer, _G.allocator, "  ");
         }
 
-        ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+        if(k) {
+            ce_buffer_printf(buffer, _G.allocator, "%s:", k);
+        } else {
+            ce_buffer_printf(buffer, _G.allocator, "0x%llu:", key);
+        }
 
 
         switch (type) {

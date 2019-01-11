@@ -8,8 +8,13 @@
 
 struct ct_explorer_i0 {
     uint64_t (*cdb_type)();
-    uint64_t (*draw_ui)(uint64_t top_level_obj, uint64_t selected_obj);
-    void (*draw_menu)(uint64_t selected_obj);
+
+    uint64_t (*draw_ui)(uint64_t top_level_obj,
+                        uint64_t selected_obj,
+                        uint64_t context);
+
+    void (*draw_menu)(uint64_t selected_obj,
+                      uint64_t context);
 };
 
 #endif //CETECH_EXPLORER_H

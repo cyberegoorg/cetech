@@ -23,15 +23,12 @@
       variables:
         cdb_uid: "0x89a49d1dd195d569"
 
-        kdasdvxcvcxbxcbxbg435124asdkj:
-          cdb_uid: "0xf81a1ce60b9ba9e8"
+        0xf81a1ce60b9ba9e8:
           name: u_texColor
           type: texture
           value: "0x7276a6db35892341"
 
-        k22cbxbg435124asdkj:
-          cdb_uid: "0x3e8302bae4fce293"
-
+        0x3e8302bae4fce293:
           name: u_vec4
           type: color
           value.x: 1.000000
@@ -39,9 +36,7 @@
           value.z: 1.000000
           value.w: 1.000000
 
-        fdsgfdsgfgfs:
-          cdb_uid: "0xe66d5daf1a451dbf"
-
+        0xe66d5daf1a451dbf:
           name: u_vec42
           type: vec4
           value.x: 1.000000

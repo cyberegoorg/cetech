@@ -33,20 +33,19 @@ static void get_project_view(struct ct_world world,
                              int width,
                              int height) {
 
-    uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
-                                              camera);
+    struct ct_transform_comp *transform = ct_ecs_a0->get_one(world,
+                                                             TRANSFORM_COMPONENT,
+                                                             camera);
 
-    uint64_t camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT,
-                                              camera);
-
-    const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),transform);
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),camera_data);
+    struct ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
+                                                                 CAMERA_COMPONENT,
+                                                                 camera);
 
 
-    float fov = ce_cdb_a0->read_float(c_reader, PROP_FOV, 0);
-    float near = ce_cdb_a0->read_float(c_reader, PROP_NEAR, 0);
-    float far = ce_cdb_a0->read_float(c_reader, PROP_FAR, 0);
-    float *wworld = ce_cdb_a0->read_blob(t_reader, PROP_WORLD, NULL, 0);
+    float fov = camera_data->fov;
+    float near = camera_data->near;
+    float far = camera_data->far;
+    float *wworld = transform->world;
 
     float ratio = (float) (width) / (float) (height);
 
@@ -54,14 +53,14 @@ static void get_project_view(struct ct_world world,
 //                    (float[]){0.0f, 0.0f, 1.0f},
 //                    (float[]){0.0f, 1.0f, 0.0f});
 
-    ce_mat4_proj_fovy(proj,fov,
+    ce_mat4_proj_fovy(proj, fov,
                       ratio,
                       near,
                       far,
                       ct_gfx_a0->get_caps()->homogeneousDepth);
 
     float w[16] = {};
-    if(wworld) {
+    if (wworld) {
         ce_mat4_move(w, wworld);
     }
 
@@ -100,24 +99,28 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 
-//static uint64_t size() {
-//    return sizeof(struct ct_camera_component);
-//}
+static uint64_t size() {
+    return sizeof(struct ct_camera_component);
+}
 
 static void camera_spawner(struct ct_world world,
-                              uint64_t obj) {
-//    struct ct_camera_component *c = data;
-//
-//    *c = (struct ct_camera_component) {
-//            .far = ce_cdb_a0->read_float(obj, PROP_FAR, 100.0f),
-//            .near = ce_cdb_a0->read_float(obj, PROP_NEAR, 0.0f),
-//            .fov = ce_cdb_a0->read_float(obj, PROP_FOV, 0.0f),
-//    };
+                           uint64_t obj,
+                           void* data) {
+
+    const ce_cdb_obj_o * r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    struct ct_camera_component *c = data;
+
+    *c = (struct ct_camera_component) {
+            .far = ce_cdb_a0->read_float(r, PROP_FAR, 100.0f),
+            .near = ce_cdb_a0->read_float(r, PROP_NEAR, 0.0f),
+            .fov = ce_cdb_a0->read_float(r, PROP_FOV, 0.0f),
+    };
 }
 
 
 static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
+        .size = size,
         .get_interface = get_interface,
         .spawner = camera_spawner,
 };

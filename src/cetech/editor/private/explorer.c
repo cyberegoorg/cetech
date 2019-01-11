@@ -52,19 +52,19 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
     return NULL;
 }
 
-static uint64_t draw(uint64_t selected_obj) {
+static uint64_t draw(uint64_t selected_obj, uint64_t context) {
     uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
 
     struct ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
     if (i && i->draw_ui) {
-        return i->draw_ui(top_level, selected_obj);
+        return i->draw_ui(top_level, selected_obj, context);
     }
     return 0;
 }
 
-static void draw_menu(uint64_t selected_obj) {
+static void draw_menu(uint64_t selected_obj, uint64_t context) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
                                                   selected_obj);
 
@@ -80,7 +80,7 @@ static void draw_menu(uint64_t selected_obj) {
     struct ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
     if (i && i->draw_menu) {
-        i->draw_menu(selected_obj);
+        i->draw_menu(selected_obj, context);
     }
 }
 
@@ -95,11 +95,11 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
-    draw_menu(selected_object);
+    draw_menu(selected_object, context);
 
     ct_debugui_a0->Separator();
 
-    uint64_t new_selected_object = draw(selected_object);
+    uint64_t new_selected_object = draw(selected_object, context);
     if (new_selected_object) {
         ct_selected_object_a0->set_selected_object(context,
                                                    new_selected_object);

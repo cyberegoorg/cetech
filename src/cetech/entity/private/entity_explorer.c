@@ -23,6 +23,7 @@
 #include <cetech/editor/explorer.h>
 
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/editor/selcted_object.h>
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
@@ -30,7 +31,8 @@ static void ui_entity_item_end() {
 
 static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                      uint64_t obj,
-                                     uint32_t id) {
+                                     uint32_t id,
+                                     uint64_t context) {
 
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
                                DebugUITreeNodeFlags_OpenOnDoubleClick;
@@ -136,7 +138,8 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t key = keys[i];
             uint64_t child = ce_cdb_a0->read_subobject(ch_reader, key, 0);
             uint64_t new_selected_object2 = ui_entity_item_begin(selected_obj,
-                                                                 child, ++id);
+                                                                 child, ++id,
+                                                                 context);
             if (new_selected_object2) {
                 new_selected_object = new_selected_object2;
             }
@@ -147,12 +150,13 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     return new_selected_object;
 }
 
-static void draw_menu(uint64_t selected_obj) {
+static void draw_menu(uint64_t selected_obj,
+                      uint64_t context) {
     if (!selected_obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),selected_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
 
     ct_debugui_a0->SameLine(0, 10);
 
@@ -174,7 +178,8 @@ static void draw_menu(uint64_t selected_obj) {
             uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                              ENTITY_CHILDREN);
 
-            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),entity_obj);
+            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                          entity_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
             ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
             ce_cdb_a0->write_commit(writer);
@@ -188,13 +193,15 @@ static void draw_menu(uint64_t selected_obj) {
             if (!add_children_obj) {
                 add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                             ENTITY_CHILDREN);
-                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),selected_obj);
+                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                              selected_obj);
                 ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
                                          add_children_obj);
                 ce_cdb_a0->write_commit(writer);
             }
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),add_children_obj);
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                     add_children_obj);
             ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
             ce_cdb_a0->write_commit(w);
         }
@@ -206,6 +213,12 @@ static void draw_menu(uint64_t selected_obj) {
             ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
             ce_cdb_a0->remove_property(w, uid);
             ce_cdb_a0->write_commit(w);
+
+            const ce_cdb_obj_o *p_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                           parent);
+            uint64_t parent_ent = ce_cdb_a0->parent(p_reader);
+
+            ct_selected_object_a0->set_selected_object(context, parent_ent);
         }
     }
 
@@ -216,7 +229,8 @@ static uint64_t cdb_type() {
 }
 
 static uint64_t draw_ui(uint64_t top_level_obj,
-                        uint64_t selected_obj) {
+                        uint64_t selected_obj,
+                        uint64_t context) {
     if (!top_level_obj) {
         return 0;
     }
@@ -225,7 +239,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
         return 0;
     }
 
-    return ui_entity_item_begin(selected_obj, top_level_obj, rand());
+    return ui_entity_item_begin(selected_obj, top_level_obj, rand(), context);
 }
 
 static void _init(struct ce_api_a0 *api) {

@@ -1,5 +1,4 @@
-"0xf7f5289f75e5f044": #content/box2.entity:
-  cdb_uid: "0xf7f5289f75e5f044"
+0xf7f5289f75e5f044: #content/box2.entity:
   asset_name: "content/box2"
   cdb_type: "entity"
   components:

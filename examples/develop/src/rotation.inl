@@ -5,6 +5,10 @@
 
 // component
 
+struct rotation_component {
+    float speed;
+};
+
 #define ROTATION_COMPONENT \
     CE_ID64_0("rotation", 0x2060566242789baaULL)
 
@@ -34,14 +38,28 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-//static uint64_t size() {
-//    return sizeof(struct rotation_component);
-//}
+static uint64_t size() {
+    return sizeof(struct rotation_component);
+}
+
+static void spawner(struct ct_world world,
+                    uint64_t obj,
+                    void *data) {
+
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    struct rotation_component *c = data;
+
+    *c = (struct rotation_component) {
+            .speed = ce_cdb_a0->read_float(r, PROP_SPEED, 60.0f),
+    };
+}
+
 
 static struct ct_component_i0 rotation_component_i = {
-//        .size = size,
+        .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+        .spawner = spawner,
 };
 
 
@@ -55,34 +73,18 @@ static void foreach_rotation(struct ct_world world,
                              void *data) {
     float dt = *(float *) (data);
 
-    uint64_t *rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
-    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    struct rotation_component *rotations = ct_ecs_a0->get_all(
+            ROTATION_COMPONENT, item);
+    struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
+            TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
-        uint64_t rotation = rotations[i];
-        uint64_t transform = transforms[i];
-
-        const ce_cdb_obj_o *t_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                       transform);
-        const ce_cdb_obj_o *r_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                       rotation);
-
-        float speed = ce_cdb_a0->read_float(r_reader, PROP_SPEED, 60);
-
-        float rotc[3] = {
-                ce_cdb_a0->read_float(t_reader, PROP_ROTATION_X, 0),
-                ce_cdb_a0->read_float(t_reader, PROP_ROTATION_Y, 0),
-                ce_cdb_a0->read_float(t_reader, PROP_ROTATION_Z, 0),
-        };
+        struct rotation_component *rotation = &rotations[i];
+        struct ct_transform_comp *transform = &transforms[i];
 
         float rot[3] = {};
-        ce_vec3_add_s(rot, rotc, speed * dt);
-
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), transform);
-        ce_cdb_a0->set_float(w, PROP_ROTATION_X, rot[0]);
-        ce_cdb_a0->set_float(w, PROP_ROTATION_Y, rot[1]);
-        ce_cdb_a0->set_float(w, PROP_ROTATION_Z, rot[2]);
-        ce_cdb_a0->write_commit(w);
+        ce_vec3_add_s(rot, transform->rot, rotation->speed * dt);
+        ce_vec3_move(transform->rot, rot);
     }
 }
 

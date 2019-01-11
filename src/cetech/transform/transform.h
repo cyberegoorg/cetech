@@ -37,4 +37,11 @@
 #define PROP_WORLD \
     CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
+struct ct_transform_comp {
+    float pos[3];
+    float rot[3];
+    float scale[3];
+    float world[16];
+};
+
 #endif //CETECH_TRANSFORM_H

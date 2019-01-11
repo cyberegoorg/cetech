@@ -12,13 +12,10 @@
       variables:
         cdb_uid: "0x404c5a175cc2903b"
 
-        kdasdvxcvcxbxcbxbg435124asdkj:
-          cdb_uid: "0x44f23ca59c937287"
-
+        0x44f23ca59c937287:
           value: 0x8beb8d2b20191aba
 
 "0x8beb8d2b20191aba": #content/scene/solider/head01.texture:
-  cdb_uid: "0x8beb8d2b20191aba"
   asset_name: "content/scene/solider/head01"
   cdb_type: "texture"
   input: content/scene/solider/head01.tga

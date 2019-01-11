@@ -1,5 +1,4 @@
 "0x758816087ff520e8": #content/box1.entity:
-  cdb_uid: "0x758816087ff520e8"
   asset_name: "content/box1"
   cdb_type: "entity"
   components:
@@ -18,8 +17,7 @@
   children:
     cdb_uid: "0x1f477575303b404c"
 
-    lknvln879879NJKK:
-      cdb_uid: "0xe861c4016085bf98"
+    0xe861c4016085bf98:
       cdb_type: "entity"
       name: head
 
@@ -53,8 +51,7 @@
           cdb_type: "rotation"
           speed: 2.9
 
-    lekrl00303NJKLln879879NJKK:
-      cdb_uid: "0x353f39ca5ddc1001"
+    0x353f39ca5ddc1001:
       cdb_type: "entity"
       name: body
 
@@ -88,8 +85,7 @@
           cdb_type: "rotation"
           speed: 2.9
 
-    mnbmnmnb562468979879NJKK:
-      cdb_uid: "0x2da4e65c0153162f"
+    0x2da4e65c0153162f:
       cdb_type: "entity"
       name: m4
 

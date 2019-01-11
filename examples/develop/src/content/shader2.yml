@@ -1,5 +1,4 @@
 "0xa6ad6fe0a13cd90e": #content/shader2.shader:
-  cdb_uid: "0xa6ad6fe0a13cd90e"
   asset_name: "content/shader2"
   cdb_type: "shader"
   vs_input: 'content/vs_shader1.sc'

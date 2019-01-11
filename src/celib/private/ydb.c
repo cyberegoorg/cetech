@@ -23,6 +23,7 @@ enum node_type {
     NODE_INVALID = 0,
     NODE_FLOAT,
     NODE_UINT,
+    NODE_REF,
     NODE_STRING,
     NODE_TRUE,
     NODE_FALSE,
@@ -53,6 +54,15 @@ struct node_value {
 
 static uint64_t calc_key(const char *key) {
     return ce_id_a0->id64(key);
+}
+
+static bool _is_ref(const char *str) {
+    return (str[0] == '0') && (str[1] == 'x');
+}
+
+static uint64_t _uid_from_str(const char *str) {
+    uint64_t v = strtoul(str, NULL, 0);
+    return v;
 }
 
 static void type_value_from_scalar(const uint8_t *scalar,
@@ -89,6 +99,11 @@ static void type_value_from_scalar(const uint8_t *scalar,
             }
         }
 
+    } else if (_is_ref(scalar_str)) {
+        uint64_t uid = _uid_from_str(scalar_str);
+        *type = NODE_REF;
+        *vallue = (struct node_value) {.ui = uid};
+        return;
     }
 
     *type = NODE_STRING;
@@ -134,7 +149,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
     yaml_parser_set_input_string(&parser, source_data, vio->size(vio));
 
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
-#define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING)
+#define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING) || (parent_stack[parent_stack_top].type == NODE_REF)
     yaml_event_t event;
 
     do {
@@ -279,9 +294,15 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                 type_value_from_scalar(event.data.scalar.value,
                                        &type, &value, IS_KEY());
 
-
                 if (IS_KEY()) {
-                    uint64_t key_hash = ce_id_a0->id64(value.string);
+
+                    uint64_t key_hash = 0;
+
+                    if (type == NODE_REF) {
+                        key_hash  = value.ui;
+                    } else {
+                        key_hash = ce_id_a0->id64(value.string);
+                    }
 
                     state = (struct parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
 
@@ -318,12 +339,9 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                         case NODE_INVALID:
                         case NODE_MAP:
                         case NODE_SEQ:
+                        case NODE_REF:
                             break;
                     }
-//                    if (PREFAB_KEY == parent_stack[parent_stack_top].str_hash) {
-//                        ce_array_push(inst->parent_file, value.string,
-//                                      _G.allocator);
-//                    }
 
                     ce_array_pop_back(parent_stack);
 
@@ -345,6 +363,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                         case NODE_MAP:
                         case NODE_SEQ:
                         case NODE_INVALID:
+                        case NODE_REF:
                             break;
                     }
 

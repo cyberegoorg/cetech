@@ -23,41 +23,15 @@
 
 #define LOG_WHERE "transform"
 
-static void transform_transform(uint64_t transform,
+static void transform_transform(struct ct_transform_comp *transform,
                                 float *parent) {
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
-
-    float pos[3] ={
-            ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_POSITION_Y, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_POSITION_Z, 0.0f),
-    };
-
-    float rot[3] = {
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_X, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_Y, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_Z, 0.0f),
-    };
-
-    float sca[3] =  {
-            ce_cdb_a0->read_float(reader, PROP_SCALE_X, 1.0f),
-            ce_cdb_a0->read_float(reader, PROP_SCALE_Y, 1.0f),
-            ce_cdb_a0->read_float(reader, PROP_SCALE_Z, 1.0f),
-    };
-
     float rot_rad[3];
-    ce_vec3_mul_s(rot_rad, rot, CE_DEG_TO_RAD);
+    ce_vec3_mul_s(rot_rad, transform->rot, CE_DEG_TO_RAD);
 
-    float world[16] = {};
-    ce_mat4_srt(world,
-                sca[0], sca[1], sca[2],
+    ce_mat4_srt(transform->world,
+                transform->scale[0], transform->scale[1], transform->scale[2],
                 rot_rad[0], rot_rad[1], rot_rad[2],
-                pos[0], pos[1], pos[2]);
-
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),transform);
-    ce_cdb_a0->set_blob(w, PROP_WORLD, world, sizeof(world));
-    ce_cdb_a0->write_commit(w);
+                transform->pos[0], transform->pos[1], transform->pos[2]);
 }
 
 static uint64_t cdb_type() {
@@ -71,7 +45,7 @@ static const char *display_name() {
 static void guizmo_get_transform(uint64_t obj,
                                  float *world,
                                  float *local) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float pos[3] = {
             ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
@@ -109,7 +83,7 @@ static void guizmo_set_transform(uint64_t obj,
     float scale[3] = {};
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
-    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
+    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
 
     switch (operation) {
         case TRANSLATE:
@@ -141,7 +115,7 @@ static uint64_t create_new() {
     uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   TRANSFORM_COMPONENT);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),component);
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
     ce_cdb_a0->set_float(w, PROP_SCALE_X, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Y, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Z, 1.0f);
@@ -196,37 +170,40 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-//static uint64_t size() {
-//    return sizeof(struct ct_transform_comp);
-//}
+static uint64_t size() {
+    return sizeof(struct ct_transform_comp);
+}
 
 static void transform_spawner(struct ct_world world,
-                              uint64_t obj) {
-//    struct ct_transform_comp *t = data;
-//
-//    *t = (struct ct_transform_comp) {
-//            .position = {
-//                    ce_cdb_a0->read_float(obj, PROP_POSITION_X, 0.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_POSITION_Y, 0.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_POSITION_Z, 0.0f),
-//            },
-//
-//            .rotation = {
-//                    ce_cdb_a0->read_float(obj, PROP_ROTATION_X, 0.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_ROTATION_Y, 0.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_ROTATION_Z, 0.0f),
-//            },
-//
-//            .scale = {
-//                    ce_cdb_a0->read_float(obj, PROP_SCALE_X, 1.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_SCALE_Y, 1.0f),
-//                    ce_cdb_a0->read_float(obj, PROP_SCALE_Z, 1.0f),
-//            },
-//    };
+                              uint64_t obj,
+                              void *data) {
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    struct ct_transform_comp *t = data;
+
+    *t = (struct ct_transform_comp) {
+            .pos = {
+                    ce_cdb_a0->read_float(r, PROP_POSITION_X, 0.0f),
+                    ce_cdb_a0->read_float(r, PROP_POSITION_Y, 0.0f),
+                    ce_cdb_a0->read_float(r, PROP_POSITION_Z, 0.0f),
+            },
+
+            .rot = {
+                    ce_cdb_a0->read_float(r, PROP_ROTATION_X, 0.0f),
+                    ce_cdb_a0->read_float(r, PROP_ROTATION_Y, 0.0f),
+                    ce_cdb_a0->read_float(r, PROP_ROTATION_Z, 0.0f),
+            },
+
+            .scale = {
+                    ce_cdb_a0->read_float(r, PROP_SCALE_X, 1.0f),
+                    ce_cdb_a0->read_float(r, PROP_SCALE_Y, 1.0f),
+                    ce_cdb_a0->read_float(r, PROP_SCALE_Z, 1.0f),
+            },
+    };
 }
 
 static struct ct_component_i0 ct_component_i0 = {
         .cdb_type = cdb_type,
+        .size = size,
         .get_interface = get_interface,
         .spawner = transform_spawner,
 };
@@ -237,9 +214,11 @@ static void foreach_transform(struct ct_world world,
                               ct_entity_storage_t *item,
                               uint32_t n,
                               void *data) {
-    uint64_t* transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
+            TRANSFORM_COMPONENT, item);
+
     for (uint32_t i = 0; i < n; ++i) {
-        uint64_t transform = transforms[i];
+        struct ct_transform_comp *transform = &transforms[i];
         transform_transform(transform, NULL);
     }
 }

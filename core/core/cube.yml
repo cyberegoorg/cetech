@@ -1,5 +1,4 @@
-"0x68373d25a0b84f58":
-  cdb_uid: "0x68373d25a0b84f58"
+0x68373d25a0b84f58:
   asset_name: "core/cube"
   cdb_type: "entity"
   components:
@@ -18,8 +17,7 @@
       mesh: "muro_main"
       material: "0x6c8bca84fa0d4431"
 
-"0x8b73c8d507e579eb":
-  cdb_uid: "0x8b73c8d507e579eb"
+0x8b73c8d507e579eb:
   asset_name: "core/cube"
   cdb_type: "material"
   PREFAB: "0x24c9413e88ebaaa8"
@@ -32,6 +30,5 @@
       variables:
         cdb_uid: "0xdc6fdef07eefdfca"
 
-        kdasdvxcvcxbxcbxbg435124asdkj:
-          cdb_uid: "0x09d7f978a498de11"
+        0x09d7f978a498de11:
           value: "0x7276a6db35892341"

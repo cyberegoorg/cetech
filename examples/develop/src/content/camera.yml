@@ -1,5 +1,4 @@
 "0x57899875c4457313": #content/camera.entity:
-  cdb_uid: "0x57899875c4457313"
   asset_name: "content/camera"
   cdb_type: "entity"
   components:

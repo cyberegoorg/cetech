@@ -1,5 +1,4 @@
-"0x588f56dc4e82f7b2": #content/level2.entity:
-  cdb_uid: "0x588f56dc4e82f7b2"
+0x588f56dc4e82f7b2: #content/level2.entity:
   asset_name: "content/level2"
   cdb_type: "entity"
   name: "Level 2"
@@ -24,9 +23,8 @@
   children:
     cdb_uid: "0xd6745c61766e99f5"
 
-    5564343313252:
+    0x236bdc9357cc2baf:
       cdb_type: "entity"
-      cdb_uid: "0x236bdc9357cc2baf"
 
       name: "box1"
       PREFAB: "0x758816087ff520e8"

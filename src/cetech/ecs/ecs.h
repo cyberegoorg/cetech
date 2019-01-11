@@ -40,6 +40,7 @@
 
 struct ct_cdb_obj_t;
 enum ce_cdb_type;
+struct ce_cdb_change_ev0;
 typedef void ce_cdb_obj_o;
 typedef void ct_entity_storage_t;
 struct ct_resource_id;
@@ -64,10 +65,18 @@ typedef void (*ct_simulate_fce_t)(struct ct_world world,
 struct ct_component_i0 {
     uint64_t (*cdb_type)();
 
+    uint64_t (*size)();
+
     void *(*get_interface)(uint64_t name_hash);
 
     void (*spawner)(struct ct_world world,
-                    uint64_t obj);
+                    uint64_t obj,
+                    void *data);
+
+    void (*changer)(struct ct_world world,
+                    const struct ce_cdb_change_ev0* changes,
+                    uint32_t changes_n,
+                    void *data);
 };
 
 
@@ -138,18 +147,18 @@ struct ct_ecs_a0 {
 
     uint64_t (*mask)(uint64_t component_name);
 
-    uint64_t *(*get_all)(uint64_t component_name,
-                         ct_entity_storage_t *item);
+    void *(*get_all)(uint64_t component_name,
+                     ct_entity_storage_t *item);
 
-    uint64_t (*get_one)(struct ct_world world,
-                        uint64_t component_name,
-                        struct ct_entity entity);
+    void *(*get_one)(struct ct_world world,
+                     uint64_t component_name,
+                     struct ct_entity entity);
 
     void (*add)(struct ct_world world,
                 struct ct_entity ent,
                 const uint64_t *component_name,
                 uint32_t name_count,
-                uint64_t *data);
+                void **data);
 
     void (*remove)(struct ct_world world,
                    struct ct_entity ent,
