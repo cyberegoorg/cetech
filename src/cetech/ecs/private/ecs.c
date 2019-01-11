@@ -973,6 +973,49 @@ static void _sync_ent_obj(struct world_instance *world) {
         const ce_cdb_obj_o *ent_r = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     si->obj);
 
+        // Children
+        uint64_t children = ce_cdb_a0->read_subobject(ent_r,
+                                                      ENTITY_CHILDREN, 0);
+
+        if (children) {
+            const ce_cdb_obj_o *ents_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                         children);
+            uint32_t change_n = 0;
+            const struct ce_cdb_change_ev0 *changes;
+            changes = ce_cdb_a0->changed(ents_r, &change_n);
+
+            for (int ch = 0; ch < change_n; ++ch) {
+                struct ce_cdb_change_ev0 ev = changes[ch];
+                if (ev.type == CE_CDB_REMOVE) {
+                    uint64_t ent_obj = ev.old_value.subobj;
+
+                    uint64_t idx = ce_hash_lookup(&world->obj_entmap, ent_obj,
+                                                  UINT64_MAX);
+                    if(idx == UINT64_MAX) {
+                        continue;
+                    }
+
+                    struct spawn_info *ch_si = &world->obj_spawn_info[idx];
+
+                    struct ct_entity *ents = ch_si->ents;
+                    uint32_t ents_n = ce_array_size(ents);
+                    if (ents_n) {
+                        destroy(world->world, ents, ents_n);
+                    }
+
+                    ce_array_push(empty_si, ent_obj, _G.allocator);
+
+                } else if (ev.type == CE_CDB_CHANGE) {
+                    uint64_t ent_obj = ev.new_value.subobj;
+                    struct ct_entity *ents = si->ents;
+                    uint32_t ents_n = ce_array_size(ents);
+                    for (int e = 0; e < ents_n; ++e) {
+                        spawn_entity(world->world, ent_obj);
+                    }
+                }
+            }
+        }
+
         // Components
         uint64_t comps = ce_cdb_a0->read_subobject(ent_r,
                                                    ENTITY_COMPONENTS, 0);
@@ -1012,49 +1055,6 @@ static void _sync_ent_obj(struct world_instance *world) {
                     for (int e = 0; e < ents_n; ++e) {
                         struct ct_entity ent = ents[e];
                         _add_components_from_obj(world, ent, k, comp_obj);
-                    }
-                }
-            }
-        }
-
-        // Children
-        uint64_t children = ce_cdb_a0->read_subobject(ent_r,
-                                                      ENTITY_CHILDREN, 0);
-
-        if (children) {
-            const ce_cdb_obj_o *ents_r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         children);
-            uint32_t change_n = 0;
-            const struct ce_cdb_change_ev0 *changes;
-            changes = ce_cdb_a0->changed(ents_r, &change_n);
-
-            for (int ch = 0; ch < change_n; ++ch) {
-                struct ce_cdb_change_ev0 ev = changes[ch];
-                if (ev.type == CE_CDB_REMOVE) {
-                    uint64_t ent_obj = ev.old_value.subobj;
-
-                    uint64_t idx = ce_hash_lookup(&world->obj_entmap, ent_obj,
-                                                  UINT64_MAX);
-                    if(idx == UINT64_MAX) {
-                        continue;
-                    }
-
-                    struct spawn_info *ch_si = &world->obj_spawn_info[idx];
-
-                    struct ct_entity *ents = ch_si->ents;
-                    uint32_t ents_n = ce_array_size(ents);
-                    if (ents_n) {
-                        destroy(world->world, ents, ents_n);
-                    }
-
-                    ce_array_push(empty_si, ent_obj, _G.allocator);
-
-                } else if (ev.type == CE_CDB_CHANGE) {
-                    uint64_t ent_obj = ev.new_value.subobj;
-                    struct ct_entity *ents = si->ents;
-                    uint32_t ents_n = ce_array_size(ents);
-                    for (int e = 0; e < ents_n; ++e) {
-                        spawn_entity(world->world, ent_obj);
                     }
                 }
             }
@@ -1103,6 +1103,11 @@ static void _sync_comp_obj(struct world_instance *world) {
             for (int e = 0; e < ents_n; ++e) {
                 struct ct_entity ent = ents[e];
                 void *data = get_one(world->world, component_type, ent);
+
+                if(!data) {
+                    continue;
+                }
+
                 if (ci->changer) {
                     ci->changer(world->world, changes, change_n, data);
                 } else if (ci->spawner) {

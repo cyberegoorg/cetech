@@ -653,8 +653,6 @@ static void gc() {
 
             struct object_t *obj = _get_object_from_id(db_inst, objid);
 
-//            _remove_uid_obj(db_inst, objid);
-
             // remove from instance from parent instance
             if (obj->instance_of) {
                 struct object_t *prefab_obj = \

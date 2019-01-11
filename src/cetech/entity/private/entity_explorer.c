@@ -35,7 +35,8 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                      uint64_t context) {
 
     ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
-                               DebugUITreeNodeFlags_OpenOnDoubleClick;
+                               DebugUITreeNodeFlags_OpenOnDoubleClick |
+                               DebugUITreeNodeFlags_DefaultOpen;
 
     uint64_t new_selected_object = 0;
 
@@ -52,14 +53,14 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     uint64_t components;
     components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
+
     const ce_cdb_obj_o *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     components);
 
 
     uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
-    uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
 
-    if (!children_n && !component_n) {
+    if (!children_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
@@ -82,7 +83,57 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         new_selected_object = obj;
     }
 
-    if (open) {
+    if (ct_debugui_a0->BeginDragDropTarget()) {
+
+        const struct DebugUIPayload *payload;
+        payload = ct_debugui_a0->AcceptDragDropPayload("asset", 0);
+
+        if (payload) {
+            uint64_t drag_obj = *((uint64_t *) payload->Data);
+
+            if (drag_obj) {
+                const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                              drag_obj);
+                const ce_cdb_obj_o *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                                obj);
+
+                uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
+                uint64_t selecled_type = ce_cdb_a0->obj_type(selectedr);
+
+                if ((ENTITY_RESOURCE_ID == asset_type) &&
+                    (ENTITY_RESOURCE_ID == selecled_type)) {
+                    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                                              drag_obj);
+
+                    uint64_t add_children_obj;
+                    add_children_obj = ce_cdb_a0->read_subobject(selectedr,
+                                                                 ENTITY_CHILDREN,
+                                                                 0);
+
+                    if (!add_children_obj) {
+                        add_children_obj = ce_cdb_a0->create_object(
+                                ce_cdb_a0->db(),
+                                ENTITY_CHILDREN);
+                        ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(
+                                ce_cdb_a0->db(),
+                                obj);
+                        ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
+                                                 add_children_obj);
+                        ce_cdb_a0->write_commit(writer);
+                    }
+
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             add_children_obj);
+                    ce_cdb_a0->set_subobject(w, new_obj, new_obj);
+                    ce_cdb_a0->write_commit(w);
+
+                }
+            }
+        }
+        ct_debugui_a0->EndDragDropTarget();
+    }
+
+    if (selected & open) {
         const uint32_t component_n = ce_cdb_a0->prop_count(cs_reader);
         const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
 
