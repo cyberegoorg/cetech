@@ -183,15 +183,6 @@ static bool cdb_loader(uint64_t uid) {
         load_now(&uid, 1);
 
         uint64_t new_object = ce_hash_lookup(&_G.res_map, uid, 0);
-
-        if (new_object) {
-            const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), new_object);
-            uint64_t prebaf = ce_cdb_a0->read_ref(r, PREFAB_NAME_PROP, 0);
-            if(prebaf) {
-                ce_cdb_a0->set_from(ce_cdb_a0->db(), prebaf, new_object);
-            }
-        }
-
         return new_object != 0;
     }
 

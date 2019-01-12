@@ -210,7 +210,7 @@ static void draw_property(uint64_t obj) {
     ct_debugui_a0->Text("Texture preview");
     ct_debugui_a0->NextColumn();
 
-    float size[2] = {64, 64};
+    float size[2] = {128, 128};
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
     struct ct_render_texture_handle texture = {
@@ -232,7 +232,7 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 };
 
 
-static void tooltip(uint64_t resource) {
+static void tooltip(uint64_t resource,float size[2]) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
 
     struct ct_render_texture_handle texture = {
@@ -241,7 +241,7 @@ static void tooltip(uint64_t resource) {
     };
 
     ct_debugui_a0->Image(texture,
-                         (float[2]) {64.0f, 64.0f},
+                         size,
                          (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
                          (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
@@ -332,7 +332,20 @@ static void _update(float dt) {
         const struct ce_cdb_change_ev0 *changes;
         changes = ce_cdb_a0->changed(reader, &change_n);
 
-        if (changes) {
+        bool compile = false;
+
+        if(change_n) {
+            for (int j = 0; j < change_n; ++j) {
+                struct ce_cdb_change_ev0 ev = changes[j];
+                if(ev.prop == TEXTURE_HANDLER_PROP) {
+                    compile = false;
+                    break;
+                }
+                compile = true;
+            }
+        }
+
+        if (compile) {
             texture_offline(obj);
             _compile(ce_cdb_a0->db(), obj);
             texture_online(obj);

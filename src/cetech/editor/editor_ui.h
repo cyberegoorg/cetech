@@ -73,7 +73,8 @@ struct ct_editor_ui_a0 {
                             uint64_t props_n);
 
     void (*resource_tooltip)(struct ct_resource_id resourceid,
-                             const char *path);
+                             const char *path,
+                             float size[2]);
 
     bool (*resource_select_modal)(const char *modal_id,
                                   uint64_t id,

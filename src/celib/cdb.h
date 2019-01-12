@@ -16,6 +16,9 @@
 #define CE_CDB_REMOVE \
     CE_ID64_0("remove", 0x36f36c7f8cda6d13ULL)
 
+#define CDB_INSTANCE_PROP \
+    CE_ID64_0("cdb_instance", 0xb0f74f1d9d7c645dULL)
+
 struct ce_alloc;
 
 struct ce_cdb_t {

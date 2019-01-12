@@ -334,6 +334,8 @@ static struct ct_debugui_a0 debugui_api = {
         .GetColumnOffset = ImGui::GetColumnOffset,
         .SetColumnOffset = ImGui::SetColumnOffset,
         .GetColumnsCount = ImGui::GetColumnsCount,
+        .SetNextWindowSize = reinterpret_cast<void (*)(const float *,
+                                                       DebugUICond)>(ImGui::SetNextWindowSize),
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

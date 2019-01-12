@@ -830,6 +830,7 @@ struct ct_debugui_a0 {
     bool (*IsMouseDoubleClicked)(int btn);
 
     bool (*IsItemClicked)(int btn);
+
     bool (*IsItemHovered)(DebugUIHoveredFlags flags);
 
     void (*Separator)();
@@ -886,6 +887,7 @@ struct ct_debugui_a0 {
                        enum DebugUIWindowFlags_ flags);
 
     void (*PushItemWidth)(float item_width);
+
     void (*PopItemWidth)();
 
 
@@ -908,6 +910,9 @@ struct ct_debugui_a0 {
                             float offset_x);
 
     int (*GetColumnsCount)();
+
+    void (*SetNextWindowSize)(const float size[2],
+                              enum DebugUICond cond);
 };
 
 

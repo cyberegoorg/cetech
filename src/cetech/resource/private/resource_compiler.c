@@ -175,9 +175,9 @@ uint64_t compile_obj(struct ce_cdb_t db,
     ce_cdb_a0->write_commit(obj_w);
 
     const ce_cdb_obj_o *r = ce_cdb_a0->read(db, obj);
-    uint64_t prefab = ce_cdb_a0->read_ref(r, PREFAB_NAME_PROP, 0);
-    if (prefab) {
-        ce_cdb_a0->set_from(db, prefab, obj);
+    uint64_t cdb_instance = ce_cdb_a0->read_ref(r, CDB_INSTANCE_PROP, 0);
+    if (cdb_instance) {
+        ce_cdb_a0->set_from(db, cdb_instance, obj);
     }
 
     ct_resource_compilator_t compilator = _find_compilator(type);
@@ -195,7 +195,7 @@ void _scan_obj(const char *filename,
                struct ce_hash_t *obj_hash) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    const char *prefab = ce_cdb_a0->read_str(reader, PREFAB_NAME_PROP, NULL);
+    const char *cdb_instance = ce_cdb_a0->read_str(reader, CDB_INSTANCE_PROP, NULL);
     const char *type = ce_cdb_a0->read_str(reader, CDB_TYPE_PROP, "");
     const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
     const char *uid_s = ce_cdb_a0->read_str(reader, CDB_UID_PROP, NULL);
@@ -218,9 +218,9 @@ void _scan_obj(const char *filename,
 
     uint64_t *after = NULL;
 
-    if (prefab) {
-        uint64_t prefab_uid = strtoul(prefab, NULL, 0);
-        ce_array_push(after, prefab_uid, _G.allocator);
+    if (cdb_instance) {
+        uint64_t cdb_instance_uid = strtoul(cdb_instance, NULL, 0);
+        ce_array_push(after, cdb_instance_uid, _G.allocator);
     }
 
     for (uint32_t i = 0; i < n; ++i) {

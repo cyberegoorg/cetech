@@ -77,7 +77,7 @@ static void _broadcast_selected(uint64_t dock) {
     ce_log_a0->debug("resource browser", "\n%s", buf);
     ce_buffer_free(buf, _G.allocator);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
@@ -186,7 +186,6 @@ static void ui_dir_list() {
 }
 
 
-
 static void ui_asset_list(uint64_t dock) {
     ImVec2 size(_G.midle_column_width, 0.0f);
 
@@ -231,7 +230,8 @@ static void ui_asset_list(uint64_t dock) {
 
             if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(resourceid, path);
+                ct_editor_ui_a0->resource_tooltip(resourceid, path,
+                                                  (float[2]) {128, 128});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -251,7 +251,8 @@ static void ui_asset_list(uint64_t dock) {
             if (ct_debugui_a0->BeginDragDropSource(
                     DebugUIDragDropFlags_SourceAllowNullID)) {
 
-                ct_editor_ui_a0->resource_tooltip(resourceid, path);
+                ct_editor_ui_a0->resource_tooltip(resourceid, path,
+                                                  (float[2]) {128, 128});
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &resourceid.uid,

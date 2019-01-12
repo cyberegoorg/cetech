@@ -23,6 +23,8 @@
 #include <cetech/debugui/icons_font_awesome.h>
 #include <stdlib.h>
 #include <cetech/editor/resource_preview.h>
+#include <cetech/controlers/controlers.h>
+#include <cetech/controlers/keyboard.h>
 
 #include "cetech/editor/editor_ui.h"
 
@@ -80,7 +82,8 @@ static void _prop_label(const char *label,
 
 
 static void resource_tooltip(struct ct_resource_id resourceid,
-                             const char *path) {
+                             const char *path,
+                             float size[2]) {
     ct_debugui_a0->Text("%s", path);
 
     uint64_t type = ct_builddb_a0->get_resource_type(resourceid);
@@ -100,7 +103,7 @@ static void resource_tooltip(struct ct_resource_id resourceid,
     }
 
     uint64_t obj = resourceid.uid;
-    ai->tooltip(obj);
+    ai->tooltip(obj, size);
 }
 
 static void ui_float(uint64_t obj,
@@ -278,7 +281,17 @@ static bool resource_select_modal(const char *modal_id,
                                   uint32_t *count) {
     bool changed = false;
     bool open = true;
+
+    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+
+        if (kb->button_pressed(0, kb->button_index("escape"))) {
+            ct_debugui_a0->CloseCurrentPopup();
+            ct_debugui_a0->EndPopup();
+            return false;
+        }
+
         char labelidi[128] = {'\0'};
         sprintf(labelidi, "##modal_input%llu", id);
 
@@ -317,7 +330,8 @@ static bool resource_select_modal(const char *modal_id,
                 };
 
                 ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(r, name);
+                ct_editor_ui_a0->resource_tooltip(r, name,
+                                                  (float[2]) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 

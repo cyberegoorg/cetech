@@ -20,7 +20,7 @@
 0x8b73c8d507e579eb:
   asset_name: "core/cube"
   cdb_type: "material"
-  PREFAB: "0x24c9413e88ebaaa8"
+  cdb_instance: "0x24c9413e88ebaaa8"
   layers:
     cdb_uid: "0x915dcd5404b32631"
 

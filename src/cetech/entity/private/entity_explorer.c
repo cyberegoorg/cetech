@@ -30,7 +30,8 @@ static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
 }
 
-static uint64_t _spawn_to(uint64_t from, uint64_t to) {
+static uint64_t _spawn_to(uint64_t from,
+                          uint64_t to) {
     const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                   from);
     const ce_cdb_obj_o *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
@@ -42,8 +43,8 @@ static uint64_t _spawn_to(uint64_t from, uint64_t to) {
     uint64_t new_obj = 0;
     if ((ENTITY_RESOURCE_ID == asset_type) &&
         (ENTITY_RESOURCE_ID == selecled_type)) {
-         new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
-                                                  from);
+        new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                         from);
 
         uint64_t add_children_obj;
         add_children_obj = ce_cdb_a0->read_subobject(selectedr,
@@ -76,8 +77,9 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                      uint32_t id,
                                      uint64_t context) {
 
-    ImGuiTreeNodeFlags flags = DebugUITreeNodeFlags_OpenOnArrow |
-                               DebugUITreeNodeFlags_OpenOnDoubleClick |
+    ImGuiTreeNodeFlags flags = 0 |
+                               DebugUITreeNodeFlags_OpenOnArrow |
+                               //                               DebugUITreeNodeFlags_OpenOnDoubleClick |
                                DebugUITreeNodeFlags_DefaultOpen;
 
     uint64_t new_selected_object = 0;
@@ -92,18 +94,16 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     uint64_t children = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
     const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
 
-
     uint64_t components;
     components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
     const ce_cdb_obj_o *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     components);
 
-
     uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
     uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
 
-    if ((!children_n) && (selected && !component_n)) {
+    if (!children_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
@@ -117,12 +117,17 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     char label[128] = {0};
+    snprintf(label, CE_ARRAY_LEN(label), "##%llu", uid);
+
+    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
+
+    ct_debugui_a0->SameLine(0, 10);
+
     snprintf(label, CE_ARRAY_LEN(label),
              (ICON_FA_CUBE
                      " ""%s##%llu"), name, uid);
 
-    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-    if (ct_debugui_a0->IsItemClicked(0)) {
+    if (ct_debugui_a0->Selectable(label, false, 0, (float[2]) {0, 0})) {
         new_selected_object = obj;
     }
 
@@ -179,12 +184,20 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
             char c_label[128] = {0};
             snprintf(c_label, CE_ARRAY_LEN(c_label),
-                     "%s##component_%d", component_display_name, ++id);
+                     "##component_%llu", key);
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
-            if (ct_debugui_a0->IsItemClicked(0)) {
+
+            ct_debugui_a0->SameLine(0, 0);
+
+            snprintf(c_label, CE_ARRAY_LEN(c_label),
+                     "%s##component_%llu", component_display_name, key);
+
+            if (ct_debugui_a0->Selectable(c_label, false, 0,
+                                          (float[2]) {0, 0})) {
                 new_selected_object = component;
             }
+
             ct_debugui_a0->TreePop();
         }
     }
@@ -265,8 +278,9 @@ static void draw_menu(uint64_t selected_obj,
         }
         ct_debugui_a0->SameLine(0, 10);
 
-        bool add_from = ct_debugui_a0->Button(ICON_FA_PLUS ICON_FA_FOLDER_OPEN,
-                                              (float[2]) {0.0f});
+        bool add_from = ct_debugui_a0->Button(
+                ICON_FA_PLUS " " ICON_FA_FOLDER_OPEN,
+                (float[2]) {0.0f});
 
         char modal_id[128] = {'\0'};
         sprintf(modal_id, "select...##select_resource_%llu", selected_obj);
@@ -274,14 +288,16 @@ static void draw_menu(uint64_t selected_obj,
         uint64_t new_value = 0;
 
         static uint32_t count = 1;
-        bool changed = ct_editor_ui_a0->resource_select_modal(modal_id, selected_obj,
-                                               ENTITY_RESOURCE_ID,
-                                               &new_value, &count);
+        bool changed = ct_editor_ui_a0->resource_select_modal(modal_id,
+                                                              selected_obj,
+                                                              ENTITY_RESOURCE_ID,
+                                                              &new_value,
+                                                              &count);
         if (add_from) {
             ct_debugui_a0->OpenPopup(modal_id);
         }
 
-        if(changed && new_value) {
+        if (changed && new_value) {
             for (int i = 0; i < count; ++i) {
                 _spawn_to(new_value, selected_obj);
             }

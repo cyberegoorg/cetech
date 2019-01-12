@@ -2,7 +2,7 @@
   cdb_uid: "0xac2be8f79389febc"
   asset_name: "content/scene/solider/body"
   cdb_type: "material"
-  PREFAB: "0x24c9413e88ebaaa8"
+  cdb_instance: "0x24c9413e88ebaaa8"
 
   layers:
     cdb_uid: "0x958312a9bf6f58fd"

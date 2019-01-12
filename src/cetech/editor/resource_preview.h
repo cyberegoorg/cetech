@@ -20,7 +20,7 @@ struct ct_resource_preview_i0 {
                    struct ct_world world,
                    struct ct_entity entity);
 
-    void (*tooltip)(uint64_t resource);
+    void (*tooltip)(uint64_t resource, float size[2]);
 };
 
 

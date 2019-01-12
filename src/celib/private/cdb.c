@@ -1684,7 +1684,7 @@ static void dump_str(struct ce_cdb_t _db,
     uint64_t instance_of = ce_cdb_a0->read_instance_of(reader);
     if (instance_of) {
         _push_space(buffer, level);
-        ce_buffer_printf(buffer, _G.allocator, "PREFAB: 0x%llx\n", instance_of);
+        ce_buffer_printf(buffer, _G.allocator, "cdb_instance: 0x%llx\n", instance_of);
     }
 
     for (int i = 0; i < prop_count; ++i) {
