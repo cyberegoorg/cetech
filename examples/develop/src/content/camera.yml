@@ -1,27 +1,27 @@
-"0x57899875c4457313": #content/camera.entity:
-  asset_name: "content/camera"
-  cdb_type: "entity"
-  components:
-    cdb_uid: "0xf43bc7cdac7106ad"
+asset_name: "content/camera"
+cdb_type: "entity"
+cdb_uid: 0x57899875c4457313
+components:
+  cdb_uid: "0xf43bc7cdac7106ad"
 
-    transform:
-      cdb_uid: "0x1ea4d40ad3a179e1"
-      cdb_type: "transform"
+  transform:
+    cdb_uid: "0x1ea4d40ad3a179e1"
+    cdb_type: "transform"
 
-      position.x: 0.000000
-      position.y: 0.000000
-      position.z: 10.000000
-      rotation.x: 0.000000
-      rotation.y: 0.000000
-      rotation.z: 0.000000
-      scale.x: 1.000000
-      scale.y: 1.000000
-      scale.z: 1.000000
+    position.x: 0.000000
+    position.y: 0.000000
+    position.z: 10.000000
+    rotation.x: 0.000000
+    rotation.y: 0.000000
+    rotation.z: 0.000000
+    scale.x: 1.000000
+    scale.y: 1.000000
+    scale.z: 1.000000
 
-    camera:
-      cdb_uid: "0xd72994c74e847f5b"
-      cdb_type: "camera"
+  camera:
+    cdb_uid: "0xd72994c74e847f5b"
+    cdb_type: "camera"
 
-      near: 0.1
-      far: 1000.0
-      fov: 60
+    near: 0.1
+    far: 1000.0
+    fov: 60

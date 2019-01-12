@@ -72,10 +72,12 @@ static void _broadcast_edit(uint64_t dock) {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-    char *buf = NULL;
-    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
-    ce_log_a0->debug("resource browser", "\n%s", buf);
-    ce_buffer_free(buf, _G.allocator);
+    if(obj) {
+        char *buf = NULL;
+        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
+        ce_log_a0->debug("resource browser", "\n%s", buf);
+        ce_buffer_free(buf, _G.allocator);
+    }
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 

@@ -1,20 +1,13 @@
-"0x52b240fd8003d4f8": #content/scene/solider/m4.material:
-  asset_name: "content/scene/solider/m4"
-  cdb_type: "material"
-  cdb_instance: "0x24c9413e88ebaaa8"
-  layers:
-    cdb_uid: "0xbbf95d67ed645eec"
-
-    gbuffer:
-      cdb_uid: "0x86db08f2762173ec"
-
-      variables:
-        cdb_uid: "0xa72486750ddb851b"
-
-        0x9bc71970e735abd8:
-          value: "0xe918b8b9d6e08e45"
-
-"0xe918b8b9d6e08e45": #content/scene/solider/m4tex.texture:
-  asset_name: "content/scene/solider/m4tex"
-  cdb_type: "texture"
-  input: content/scene/solider/m4tex.tga
+cdb_uid: 0x52b240fd8003d4f8
+asset_name: "content/scene/solider/m4"
+cdb_type: "material"
+cdb_instance: "0x24c9413e88ebaaa8"
+layers:
+  cdb_uid: "0xbbf95d67ed645eec"
+  gbuffer:
+    cdb_uid: "0x86db08f2762173ec"
+    variables:
+      cdb_uid: "0xa72486750ddb851b"
+      0x9bc71970e735abd8:
+        cdb_uid: 0x9bc71970e735abd8
+        value: "0xe918b8b9d6e08e45"

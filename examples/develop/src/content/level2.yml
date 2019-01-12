@@ -1,88 +1,87 @@
-0x588f56dc4e82f7b2: #content/level2.entity:
-  cdb_uid: 0x588f56dc4e82f7b2
-  cdb_type: entity
-  asset_name: content/level2
-  name: Level 2
-  components:
-    cdb_uid: 0x69cef5784f198c62
-    transform:
-      cdb_uid: 0x38a1e9c2481e8f31
-      cdb_type: transform
-      position.x: 0.000000
-      position.y: 0.000000
-      position.z: 0.000000
-      rotation.x: 0.000000
-      rotation.y: 0.000000
-      rotation.z: 0.000000
-      scale.x: 1.000000
-      scale.y: 1.000000
-      scale.z: 1.000000
-  children:
-    cdb_uid: 0xd6745c61766e99f5
-    0x2c61001e9:
-      cdb_uid: 0x2c61001e9
-      cdb_type: entity
-      cdb_instance: 0x758816087ff520e8
-      components:
-        cdb_uid: 0x2c61001ea
-        cdb_instance: 0xa0ef45c8183eac08
-        transform:
-          cdb_uid: 0x2c61001eb
-          cdb_type: transform
-          cdb_instance: 0x1c6bb48199c7ab33
-      children:
-        cdb_uid: 0x2c61001ec
-        cdb_instance: 0x1f477575303b404c
-        0xe861c4016085bf98:
-          cdb_uid: 0x2c61001ed
-          cdb_type: entity
-          cdb_instance: 0xe861c4016085bf98
-          components:
-            cdb_uid: 0x2c61001ee
-            cdb_instance: 0x6269b340849d55a0
-            transform:
-              cdb_uid: 0x2c61001ef
-              cdb_type: transform
-              cdb_instance: 0x79d4524dbbd23c53
-            mesh_renderer:
-              cdb_uid: 0x2c61001f0
-              cdb_type: mesh_renderer
-              cdb_instance: 0xdd6dea51dabadcc0
-            rotation:
-              cdb_uid: 0x2c61001f1
-              cdb_type: rotation
-              cdb_instance: 0xaf5a30d98f0f23bc
-        0x353f39ca5ddc1001:
-          cdb_uid: 0x2c61001f2
-          cdb_type: entity
-          cdb_instance: 0x353f39ca5ddc1001
-          components:
-            cdb_uid: 0x2c61001f3
-            cdb_instance: 0xd35f7f10b41443d4
-            transform:
-              cdb_uid: 0x2c61001f4
-              cdb_type: transform
-              cdb_instance: 0x9519445d55e6c950
-            mesh_renderer:
-              cdb_uid: 0x2c61001f5
-              cdb_type: mesh_renderer
-              cdb_instance: 0xbe73c8b1b3e0426
-            rotation:
-              cdb_uid: 0x2c61001f6
-              cdb_type: rotation
-              cdb_instance: 0x503eea652ab45d15
-        0x2da4e65c0153162f:
-          cdb_uid: 0x2c61001f7
-          cdb_type: entity
-          cdb_instance: 0x2da4e65c0153162f
-          components:
-            cdb_uid: 0x2c61001f8
-            cdb_instance: 0x333852d44070d23a
-            transform:
-              cdb_uid: 0x2c61001f9
-              cdb_type: transform
-              cdb_instance: 0xf10156d9bb85fc45
-            mesh_renderer:
-              cdb_uid: 0x2c61001fa
-              cdb_type: mesh_renderer
-              cdb_instance: 0x3ce8fa251728a409
+cdb_uid: 0x588f56dc4e82f7b2
+cdb_type: entity
+asset_name: content/level2
+name: Level 2
+components:
+  cdb_uid: 0x69cef5784f198c62
+  transform:
+    cdb_uid: 0x38a1e9c2481e8f31
+    cdb_type: transform
+    position.x: 0.000000
+    position.y: 0.000000
+    position.z: 0.000000
+    rotation.x: 0.000000
+    rotation.y: 0.000000
+    rotation.z: 0.000000
+    scale.x: 1.000000
+    scale.y: 1.000000
+    scale.z: 1.000000
+children:
+  cdb_uid: 0xd6745c61766e99f5
+  0x2c61001e9:
+    cdb_uid: 0x2c61001e9
+    cdb_type: entity
+    cdb_instance: 0x758816087ff520e8
+    components:
+      cdb_uid: 0x2c61001ea
+      cdb_instance: 0xa0ef45c8183eac08
+      transform:
+        cdb_uid: 0x2c61001eb
+        cdb_type: transform
+        cdb_instance: 0x1c6bb48199c7ab33
+    children:
+      cdb_uid: 0x2c61001ec
+      cdb_instance: 0x1f477575303b404c
+      0xe861c4016085bf98:
+        cdb_uid: 0x2c61001ed
+        cdb_type: entity
+        cdb_instance: 0xe861c4016085bf98
+        components:
+          cdb_uid: 0x2c61001ee
+          cdb_instance: 0x6269b340849d55a0
+          transform:
+            cdb_uid: 0x2c61001ef
+            cdb_type: transform
+            cdb_instance: 0x79d4524dbbd23c53
+          mesh_renderer:
+            cdb_uid: 0x2c61001f0
+            cdb_type: mesh_renderer
+            cdb_instance: 0xdd6dea51dabadcc0
+          rotation:
+            cdb_uid: 0x2c61001f1
+            cdb_type: rotation
+            cdb_instance: 0xaf5a30d98f0f23bc
+      0x353f39ca5ddc1001:
+        cdb_uid: 0x2c61001f2
+        cdb_type: entity
+        cdb_instance: 0x353f39ca5ddc1001
+        components:
+          cdb_uid: 0x2c61001f3
+          cdb_instance: 0xd35f7f10b41443d4
+          transform:
+            cdb_uid: 0x2c61001f4
+            cdb_type: transform
+            cdb_instance: 0x9519445d55e6c950
+          mesh_renderer:
+            cdb_uid: 0x2c61001f5
+            cdb_type: mesh_renderer
+            cdb_instance: 0xbe73c8b1b3e0426
+          rotation:
+            cdb_uid: 0x2c61001f6
+            cdb_type: rotation
+            cdb_instance: 0x503eea652ab45d15
+      0x2da4e65c0153162f:
+        cdb_uid: 0x2c61001f7
+        cdb_type: entity
+        cdb_instance: 0x2da4e65c0153162f
+        components:
+          cdb_uid: 0x2c61001f8
+          cdb_instance: 0x333852d44070d23a
+          transform:
+            cdb_uid: 0x2c61001f9
+            cdb_type: transform
+            cdb_instance: 0xf10156d9bb85fc45
+          mesh_renderer:
+            cdb_uid: 0x2c61001fa
+            cdb_type: mesh_renderer
+            cdb_instance: 0x3ce8fa251728a409

@@ -179,7 +179,6 @@ void unload(const uint64_t *names,
 static bool cdb_loader(uint64_t uid) {
     uint64_t object = ce_hash_lookup(&_G.res_map, uid, 0);
     if (!object) {
-        ce_log_a0->debug(LOG_WHERE, "Load obj 0x%llx", uid);
         load_now(&uid, 1);
 
         uint64_t new_object = ce_hash_lookup(&_G.res_map, uid, 0);

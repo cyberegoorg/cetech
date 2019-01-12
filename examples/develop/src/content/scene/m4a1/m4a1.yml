@@ -1,18 +1,12 @@
-"0xd3276608fb728ffb": #content/scene/m4a1/m4a1.scene:
-  asset_name: "content/scene/m4a1/m4a1"
-  cdb_type: "scene"
-  import:
-    cdb_uid: "0x461cf24d0eb14029"
+cdb_uid: 0xd3276608fb728ffb
+asset_name: "content/scene/m4a1/m4a1"
+cdb_type: "scene"
+import:
+  cdb_uid: "0x461cf24d0eb14029"
 
-    input: content/scene/m4a1/M4A1.fbx
-    #    input: content/scene/duck/duck.dae
+  input: content/scene/m4a1/M4A1.fbx
+  #    input: content/scene/duck/duck.dae
 
-    postprocess:
-      cdb_uid: "0xec0faea94926d06e"
-      flip_uvs: true
-
-"0x1c80b5de261dcdce": #content/scene/m4a1/m4_diff.texture:
-  asset_name: "content/scene/m4a1/m4_diff"
-  cdb_type: "texture"
-  input: content/scene/m4a1/m4_diff.tga
-  gen_mipmaps: yes
+  postprocess:
+    cdb_uid: "0xec0faea94926d06e"
+    flip_uvs: true

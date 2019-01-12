@@ -195,7 +195,8 @@ void _scan_obj(const char *filename,
                struct ce_hash_t *obj_hash) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    const char *cdb_instance = ce_cdb_a0->read_str(reader, CDB_INSTANCE_PROP, NULL);
+    const char *cdb_instance = ce_cdb_a0->read_str(reader, CDB_INSTANCE_PROP,
+                                                   NULL);
     const char *type = ce_cdb_a0->read_str(reader, CDB_TYPE_PROP, "");
     const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
     const char *uid_s = ce_cdb_a0->read_str(reader, CDB_UID_PROP, NULL);
@@ -203,13 +204,13 @@ void _scan_obj(const char *filename,
     const uint64_t n = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
-
-    uint64_t uid = 0;
-    if (uid_s) {
-        uid = strtoul(uid_s, NULL, 0);
-    } else {
-        uid = key;
+    if (!uid_s) {
+        ce_log_a0->warning(LOG_WHERE, "In %s exist element without cdb_uid",
+                           filename);
+        return;
     }
+
+    uint64_t uid = strtoul(uid_s, NULL, 0);
 
     struct ct_resource_id rid = {.uid = uid};
     ct_builddb_a0->put_resource(rid, type, filename, name);
@@ -238,7 +239,14 @@ void _scan_obj(const char *filename,
 
             const ce_cdb_obj_o *subr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        sub_obj);
+
             const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
+
+//            if (!uid_s) {
+//                ce_log_a0->warning(LOG_WHERE, "In %s exist element without cdb_uid",
+//                                   filename);
+//                continue;
+//            }
 
             uint64_t ref_uid = 0;
             if (uid_s) {
@@ -281,19 +289,7 @@ void _scan_files(char **files,
         ct_builddb_a0->put_file(filename, mtime);
 
         uint64_t obj = ce_ydb_a0->get_obj(filename);
-
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
-        const uint64_t n = ce_cdb_a0->prop_count(reader);
-        const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
-
-        for (uint32_t j = 0; j < n; ++j) {
-            uint64_t k = keys[j];
-
-            uint64_t res_obj = ce_cdb_a0->read_subobject(reader, k, 0);
-
-            _scan_obj(filename, k, res_obj, &obj_graph, &obj_hash);
-        }
+        _scan_obj(filename, 0, obj, &obj_graph, &obj_hash);
     }
 
     ce_bag_build(&obj_graph, _G.allocator);
