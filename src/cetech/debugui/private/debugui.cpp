@@ -140,9 +140,9 @@ static void begin() {
                                                                      "left_shoulder"));
 
 
-    if(io.WantSetMousePos) {
-        ce_window* win = ct_renderer_a0->get_main_window();
-        win->warp_mouse(win->inst, (int)io.MousePos.x, (int)io.MousePos.y);
+    if (io.WantSetMousePos) {
+        ce_window *win = ct_renderer_a0->get_main_window();
+        win->warp_mouse(win->inst, (int) io.MousePos.x, (int) io.MousePos.y);
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
@@ -414,6 +414,29 @@ static void _init(struct ce_api_a0 *api) {
 
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+
+    ImVec4 *colors = ImGui::GetStyle().Colors;
+    colors[ImGuiCol_Text] = ImVec4(0.00f, 1.00f, 0.00f, 1.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(0.26f, 0.59f, 0.00f, 0.40f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(0.26f, 0.59f, 0.00f, 0.40f);
+    colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_Button] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_Header] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(0.26f, 0.59f, 0.00f, 0.40f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(0.26f, 0.59f, 0.00f, 0.40f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
 }
 
 static void _shutdown() {
