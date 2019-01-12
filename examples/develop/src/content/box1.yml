@@ -1,6 +1,7 @@
 "0x758816087ff520e8": #content/box1.entity:
-  asset_name: "content/box1"
+  cdb_uid: "0x758816087ff520e8"
   cdb_type: "entity"
+  asset_name: "content/box1"
   components:
     cdb_uid: "0xa0ef45c8183eac08"
 

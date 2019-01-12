@@ -119,6 +119,24 @@ static void _entity_ui(uint64_t obj) {
 
     ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
 
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t instance_of = ce_cdb_a0->read_instance_of(r);
+
+    if(instance_of) {
+        snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", instance_of);
+
+        ct_debugui_a0->Text("Instance of");
+        ct_debugui_a0->NextColumn();
+        ct_debugui_a0->PushItemWidth(-1);
+        ct_debugui_a0->InputText("##InstanceOfUID",
+                                 buffer,
+                                 strlen(buffer),
+                                 DebugInputTextFlags_ReadOnly,
+                                 0, NULL);
+        ct_debugui_a0->PopItemWidth();
+        ct_debugui_a0->NextColumn();
+    }
+
 
     ct_debugui_a0->TreePop();
 }

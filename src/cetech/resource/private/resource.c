@@ -190,12 +190,6 @@ static bool cdb_loader(uint64_t uid) {
             if(prebaf) {
                 ce_cdb_a0->set_from(ce_cdb_a0->db(), prebaf, new_object);
             }
-
-            char *buf = NULL;
-            ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, new_object, 0);
-            ce_log_a0->debug(LOG_WHERE, "Loaded new obj\n%s", buf);
-            ce_buffer_free(buf, _G.allocator);
-
         }
 
         return new_object != 0;

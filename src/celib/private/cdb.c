@@ -1846,10 +1846,22 @@ static void _dispatch_instances(struct ce_cdb_t db,
                     }
                         break;
 
-                    case CDB_TYPE_SUBOBJECT:
+                    case CDB_TYPE_SUBOBJECT: {
+                        void *ptr = read_ptr(w, ev->prop, 0);
+                        if (ptr != ev->old_value.ptr) {
+                            uint64_t new_so = create_from(db, ev->new_value.subobj);
+                            set_subobject(w, ev->prop, new_so);
+                        }
+                    }
+
                         break;
 
-                    case CDB_TYPE_REF:
+                    case CDB_TYPE_REF: {
+                        uint64_t ref = read_ref(w, ev->prop, 0);
+                        if (ref != ev->old_value.ref) {
+                            set_ref(w, ev->prop, ev->new_value.ref);
+                        }
+                    }
                         break;
 
                     case CDB_TYPE_BLOB:
