@@ -73,8 +73,8 @@ static void draw_menu(uint64_t selected_obj, uint64_t context) {
 
     if (ce_cdb_a0->prop_exist(reader, ASSET_NAME_PROP)) {
         const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
-        ct_debugui_a0->Text("Asset: %s", name);
-        ct_debugui_a0->SameLine(0, 10);
+        ct_debugui_a0->Text("Resource: %s", name);
+//        ct_debugui_a0->SameLine(0, 10);
     }
 
     struct ct_explorer_i0 *i;

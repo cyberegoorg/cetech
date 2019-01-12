@@ -271,6 +271,67 @@ static void ui_str_combo(uint64_t obj,
 
 static char modal_buffer[128] = {};
 
+static bool resource_select_modal(const char *modal_id,
+                                  uint64_t id,
+                                  uint64_t resource_type,
+                                  uint64_t *selected_resource) {
+    bool changed = false;
+    bool open = true;
+    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        char labelidi[128] = {'\0'};
+        sprintf(labelidi, "##modal_input%llu", id);
+
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer,
+                                 CE_ARRAY_LEN(modal_buffer),
+                                 0,
+                                 0, NULL);
+
+
+        const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
+        char **resources = NULL;
+
+        ct_builddb_a0->get_resource_by_type(modal_buffer, resource_type_s,
+                                            &resources, ce_memory_a0->system);
+
+        uint32_t dir_n = ce_array_size(resources);
+        for (int i = 0; i < dir_n; ++i) {
+            const char *name = resources[i];
+
+            if(!strlen(name)) {
+                continue;
+            }
+
+            bool selected = ct_debugui_a0->Selectable(name, false, 0,
+                                                      (float[2]) {0.0f});
+
+            if (ct_debugui_a0->IsItemHovered(0)) {
+                struct ct_resource_id r = {
+                        .uid=ct_builddb_a0->get_uid(name,resource_type_s)
+                };
+
+                ct_debugui_a0->BeginTooltip();
+                ct_editor_ui_a0->resource_tooltip(r, name);
+                ct_debugui_a0->EndTooltip();
+            }
+
+            if (selected || ct_debugui_a0->IsItemClicked(0)) {
+                *selected_resource = ct_builddb_a0->get_uid(name,
+                                                            resource_type_s);
+                changed = true;
+
+                modal_buffer[0] = '\0';
+            }
+        }
+
+        ct_builddb_a0->get_resource_by_type_clean(resources,
+                                                  ce_memory_a0->system);
+        ct_debugui_a0->EndPopup();
+    }
+
+    return changed;
+}
+
 static void ui_resource(uint64_t obj,
                         uint64_t prop_key_hash,
                         const char *label,
@@ -313,48 +374,9 @@ static void ui_resource(uint64_t obj,
 
     uint64_t new_value = 0;
 
-    bool open = true;
-    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
-        char labelidi[128] = {'\0'};
-        sprintf(labelidi, "##modal_input%llu", obj + prop_key_hash);
+    change = resource_select_modal(modal_id, obj + prop_key_hash,
+                                   resource_type, &new_value);
 
-        ct_debugui_a0->InputText(labelidi,
-                                 modal_buffer,
-                                 CE_ARRAY_LEN(modal_buffer),
-                                 0,
-                                 0, NULL);
-
-
-        const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
-        char **resources = NULL;
-
-        ct_builddb_a0->get_resource_by_type(modal_buffer, resource_type_s,
-                                            &resources, ce_memory_a0->system);
-
-        uint32_t dir_n = ce_array_size(resources);
-        for (int i = 0; i < dir_n; ++i) {
-            const char *name = resources[i];
-            bool selected = ct_debugui_a0->Selectable(name, false, 0,
-                                                      (float[2]) {0.0f});
-
-            if (ct_debugui_a0->IsItemHovered(0)) {
-                struct ct_resource_id r = {.uid=ct_builddb_a0->get_uid(name,
-                                                                       resource_type_s)};
-                ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(r, name);
-                ct_debugui_a0->EndTooltip();
-            }
-
-            if (selected || ct_debugui_a0->IsItemClicked(0)) {
-                new_value = ct_builddb_a0->get_uid(name, resource_type_s);
-                change = true;
-            }
-        }
-
-        ct_builddb_a0->get_resource_by_type_clean(resources,
-                                                  ce_memory_a0->system);
-        ct_debugui_a0->EndPopup();
-    }
 
     ct_debugui_a0->SameLine(0.0f, 0.0f);
 
@@ -368,7 +390,6 @@ static void ui_resource(uint64_t obj,
 
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
-
 
     if (ct_debugui_a0->BeginDragDropTarget()) {
         const struct DebugUIPayload *payload;
@@ -511,6 +532,8 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_bool = ui_bool,
         .prop_revert_btn = prop_revert_btn,
         .resource_tooltip = resource_tooltip,
+        .resource_select_modal = resource_select_modal,
+
 };
 
 struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;

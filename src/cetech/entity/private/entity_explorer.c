@@ -24,9 +24,51 @@
 
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/editor/editor_ui.h>
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
+}
+
+static uint64_t _spawn_to(uint64_t from, uint64_t to) {
+    const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                  from);
+    const ce_cdb_obj_o *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                    to);
+
+    uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
+    uint64_t selecled_type = ce_cdb_a0->obj_type(selectedr);
+
+    uint64_t new_obj = 0;
+    if ((ENTITY_RESOURCE_ID == asset_type) &&
+        (ENTITY_RESOURCE_ID == selecled_type)) {
+         new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                                  from);
+
+        uint64_t add_children_obj;
+        add_children_obj = ce_cdb_a0->read_subobject(selectedr,
+                                                     ENTITY_CHILDREN,
+                                                     0);
+
+        if (!add_children_obj) {
+            add_children_obj = ce_cdb_a0->create_object(
+                    ce_cdb_a0->db(),
+                    ENTITY_CHILDREN);
+            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(
+                    ce_cdb_a0->db(),
+                    to);
+            ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
+                                     add_children_obj);
+            ce_cdb_a0->write_commit(writer);
+        }
+
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                 add_children_obj);
+        ce_cdb_a0->set_subobject(w, new_obj, new_obj);
+        ce_cdb_a0->write_commit(w);
+    }
+
+    return new_obj;
 }
 
 static uint64_t ui_entity_item_begin(uint64_t selected_obj,
@@ -93,42 +135,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
             if (drag_obj) {
-                const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                              drag_obj);
-                const ce_cdb_obj_o *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                                obj);
-
-                uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
-                uint64_t selecled_type = ce_cdb_a0->obj_type(selectedr);
-
-                if ((ENTITY_RESOURCE_ID == asset_type) &&
-                    (ENTITY_RESOURCE_ID == selecled_type)) {
-                    uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
-                                                              drag_obj);
-
-                    uint64_t add_children_obj;
-                    add_children_obj = ce_cdb_a0->read_subobject(selectedr,
-                                                                 ENTITY_CHILDREN,
-                                                                 0);
-
-                    if (!add_children_obj) {
-                        add_children_obj = ce_cdb_a0->create_object(
-                                ce_cdb_a0->db(),
-                                ENTITY_CHILDREN);
-                        ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(
-                                ce_cdb_a0->db(),
-                                obj);
-                        ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
-                                                 add_children_obj);
-                        ce_cdb_a0->write_commit(writer);
-                    }
-
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             add_children_obj);
-                    ce_cdb_a0->set_subobject(w, new_obj, new_obj);
-                    ce_cdb_a0->write_commit(w);
-
-                }
+                _spawn_to(drag_obj, obj);
             }
         }
         ct_debugui_a0->EndDragDropTarget();
@@ -209,7 +216,7 @@ static void draw_menu(uint64_t selected_obj,
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
 
-    ct_debugui_a0->SameLine(0, 10);
+//    ct_debugui_a0->SameLine(0, 10);
 
     uint64_t type = ce_cdb_a0->obj_type(reader);
 
@@ -256,6 +263,29 @@ static void draw_menu(uint64_t selected_obj,
             ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
             ce_cdb_a0->write_commit(w);
         }
+        ct_debugui_a0->SameLine(0, 10);
+
+        bool add_from = ct_debugui_a0->Button(ICON_FA_PLUS ICON_FA_FOLDER_OPEN,
+                                              (float[2]) {0.0f});
+
+        char modal_id[128] = {'\0'};
+        sprintf(modal_id, "select...#select_resource_%llu", selected_obj);
+
+        uint64_t new_value = 0;
+        ct_editor_ui_a0->resource_select_modal(modal_id, selected_obj,
+                                               ENTITY_RESOURCE_ID,
+                                               &new_value);
+        if (add_from) {
+            ct_debugui_a0->OpenPopup(modal_id);
+        }
+
+        if(new_value) {
+            uint64_t new_obj = _spawn_to(new_value, selected_obj);
+            if(new_obj) {
+                ct_selected_object_a0->set_selected_object(context, new_obj);
+            }
+        }
+
         ct_debugui_a0->SameLine(0, 10);
 
         if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
