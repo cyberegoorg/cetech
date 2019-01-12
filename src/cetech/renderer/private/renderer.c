@@ -310,6 +310,10 @@ viewport_builder(struct ct_viewport0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
 
+struct ce_window* get_main_window() {
+    return _G.main_window;
+}
+
 static struct ct_renderer_a0 rendderer_api = {
         .create = renderer_create,
         .set_debug = renderer_set_debug,
@@ -317,6 +321,7 @@ static struct ct_renderer_a0 rendderer_api = {
         .new_viewid = new_viewid,
         .create_viewport = create_viewport,
         .viewport_builder = viewport_builder,
+        .get_main_window = get_main_window,
 };
 
 

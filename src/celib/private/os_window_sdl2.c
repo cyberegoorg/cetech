@@ -132,6 +132,10 @@ void *window_native_display_ptr(ce_window_ints *w) {
 #endif
 }
 
+void warp_mouse(ce_window_ints *w, int x, int y) {
+    SDL_WarpMouseInWindow((SDL_Window*)w, x, y);
+}
+
 struct ce_window *window_new(struct ce_alloc *alloc,
                              const char *title,
                              enum ce_window_pos x,
@@ -167,11 +171,13 @@ struct ce_window *window_new(struct ce_alloc *alloc,
             .resize = window_resize,
             .size = window_get_size,
             .native_window_ptr = window_native_window_ptr,
-            .native_display_ptr = window_native_display_ptr
+            .native_display_ptr = window_native_display_ptr,
+            .warp_mouse = warp_mouse,
     };
 
     return window;
 }
+
 
 struct ce_window *window_new_from(struct ce_alloc *alloc,
                                   void *hndl) {
@@ -194,7 +200,8 @@ struct ce_window *window_new_from(struct ce_alloc *alloc,
             .resize = window_resize,
             .size = window_get_size,
             .native_window_ptr = window_native_window_ptr,
-            .native_display_ptr = window_native_display_ptr
+            .native_display_ptr = window_native_display_ptr,
+            .warp_mouse = warp_mouse,
     };
 
     return window;

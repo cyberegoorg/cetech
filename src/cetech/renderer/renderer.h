@@ -73,6 +73,8 @@ struct ct_renderer_a0 {
 
     struct ct_rg_builder *
     (*viewport_builder)(struct ct_viewport0 viewport);
+
+    struct ce_window* (*get_main_window)();
 };
 
 CE_MODULE(ct_renderer_a0);

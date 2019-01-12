@@ -19,6 +19,7 @@
 #include "celib/api_system.h"
 #include "celib/module.h"
 #include <cetech/renderer/gfx.h>
+#include <cetech/controlers/gamepad.h>
 #include "imgui_wrap.inl"
 
 
@@ -27,11 +28,12 @@ static struct DebugUIGlobal {
 } _G;
 
 static void begin() {
-    uint8_t  viewid = 255;
+    uint8_t viewid = 255;
 
-    struct ct_controlers_i0 *keyboard, *mouse;
+    struct ct_controlers_i0 *keyboard, *mouse, *gp;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
     mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
+    gp = ct_controlers_a0->get(CONTROLER_GAMEPAD);
 
     float mp[3] = {};
     mouse->axis(0, mouse->axis_index("absolute"), mp);
@@ -88,6 +90,59 @@ static void begin() {
     char *txt = keyboard->text(0);
     if (txt[0]) {
         io.AddInputCharactersUTF8(txt);
+    }
+
+
+    io.NavInputs[ImGuiNavInput_Activate] = gp->button_state(0, gp->button_index(
+            "a"));
+    io.NavInputs[ImGuiNavInput_Cancel] = gp->button_state(0, gp->button_index(
+            "b"));
+    io.NavInputs[ImGuiNavInput_Input] = gp->button_state(0,
+                                                         gp->button_index("y"));
+    io.NavInputs[ImGuiNavInput_Menu] = gp->button_state(0,
+                                                        gp->button_index("x"));
+
+    io.NavInputs[ImGuiNavInput_DpadLeft] = gp->button_state(0,
+                                                            gp->button_index(
+                                                                    "dpad_left"));
+    io.NavInputs[ImGuiNavInput_DpadRight] = gp->button_state(0,
+                                                             gp->button_index(
+                                                                     "dpad_right"));
+    io.NavInputs[ImGuiNavInput_DpadUp] = gp->button_state(0,
+                                                          gp->button_index(
+                                                                  "dpad_up"));
+    io.NavInputs[ImGuiNavInput_DpadDown] = gp->button_state(0,
+                                                            gp->button_index(
+                                                                    "dpad_down"));
+
+    io.NavInputs[ImGuiNavInput_DpadDown] = gp->button_state(0,
+                                                            gp->button_index(
+                                                                    "dpad_down"));
+
+    float left_axis[2] = {0};
+    gp->axis(0, gp->axis_index("left"), left_axis);
+
+    io.NavInputs[ImGuiNavInput_LStickUp] = left_axis[1] > 0 ? left_axis[1] : 0;
+    io.NavInputs[ImGuiNavInput_LStickDown] =
+            left_axis[1] < 0 ? -left_axis[1] : 0;
+    io.NavInputs[ImGuiNavInput_LStickLeft] =
+            left_axis[0] < 0 ? -left_axis[0] : 0;
+    io.NavInputs[ImGuiNavInput_LStickRight] =
+            left_axis[0] > 0 ? left_axis[0] : 0;
+
+
+    io.NavInputs[ImGuiNavInput_FocusPrev] = gp->button_state(0,
+                                                             gp->button_index(
+                                                                     "right_shoulder"));
+
+    io.NavInputs[ImGuiNavInput_FocusNext] = gp->button_state(0,
+                                                             gp->button_index(
+                                                                     "left_shoulder"));
+
+
+    if(io.WantSetMousePos) {
+        ce_window* win = ct_renderer_a0->get_main_window();
+        win->warp_mouse(win->inst, (int)io.MousePos.x, (int)io.MousePos.y);
     }
 
     imguiBeginFrame(mp[0], h - mp[1], btn, wheel[1], w, h, 0, viewid);
@@ -355,6 +410,10 @@ static void _init(struct ce_api_a0 *api) {
     io.KeyMap[ImGuiKey_Z] = keyboard->button_index("z");
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
+
+    io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
+    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 }
 
 static void _shutdown() {

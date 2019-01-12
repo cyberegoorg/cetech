@@ -305,6 +305,8 @@ struct ce_window {
     void *(*native_window_ptr)(ce_window_ints *w);
 
     void *(*native_display_ptr)(ce_window_ints *w);
+
+    void (*warp_mouse)(ce_window_ints *window, int x, int y);
 };
 
 
