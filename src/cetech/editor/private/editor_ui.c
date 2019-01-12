@@ -22,34 +22,86 @@
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <stdlib.h>
+#include <cetech/editor/resource_preview.h>
 
-#include "cetech/editor/resource_ui.h"
+#include "cetech/editor/editor_ui.h"
+
+static bool prop_revert_btn(uint64_t _obj,
+                            const uint64_t *props,
+                            uint64_t props_n) {
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), _obj);
+    uint64_t instance_of = ce_cdb_a0->read_instance_of(r);
+
+    if (instance_of) {
+        const ce_cdb_obj_o *ir = ce_cdb_a0->read(ce_cdb_a0->db(), instance_of);
+
+        bool need_revert = false;
+        for (int i = 0; i < props_n; ++i) {
+            if (!ce_cdb_a0->prop_equal(r, ir, props[i])) {
+                need_revert = true;
+                break;
+            }
+        }
+
+        if (need_revert) {
+            char lbl[256] = {};
+            snprintf(lbl, CE_ARRAY_LEN(lbl), "%s##revert_%llu_%llu",
+                     ICON_FA_RECYCLE, _obj, props[0]);
+
+            bool remove_change = ct_debugui_a0->Button(lbl,
+                                                       (float[2]) {});
+
+            if (remove_change) {
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _obj);
+                for (int i = 0; i < props_n; ++i) {
+                    ce_cdb_a0->prop_copy(ir, w, props[i]);
+                }
+                ce_cdb_a0->write_commit(w);
+            }
+
+            return true;
+        }
+    }
+    return false;
+}
 
 
 static void _prop_label(const char *label,
                         uint64_t _obj,
-                        uint64_t prop_key_hash) {
-//    if (ce_cdb_a0->prefab(_obj)
-//        && ce_cdb_a0->prop_exist_norecursive(_obj, prop_key_hash)) {
-//
-//        char lbl[256] = {};
-//        snprintf(lbl, CE_ARRAY_LEN(lbl), "%s##revert_%llu_%llu",
-//                 ICON_FA_RECYCLE, _obj, prop_key_hash);
-//
-//        bool remove_change = ct_debugui_a0->Button(lbl,
-//                                                   (float[2]) {});
-//        if (remove_change) {
-//            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(_obj);
-//            ce_cdb_a0->delete_property(w, prop_key_hash);
-//            ce_cdb_a0->write_commit(w);
-//        }
-//        ct_debugui_a0->SameLine(0, 4);
-//    }
+                        const uint64_t *props,
+                        uint64_t props_n) {
+    if (prop_revert_btn(_obj, props, props_n)) {
+        ct_debugui_a0->SameLine(0, 4);
+    }
 
     ct_debugui_a0->Text("%s", label);
     ct_debugui_a0->NextColumn();
 }
 
+
+static void resource_tooltip(struct ct_resource_id resourceid,
+                             const char *path) {
+    ct_debugui_a0->Text("%s", path);
+
+    uint64_t type = ct_builddb_a0->get_resource_type(resourceid);
+
+    struct ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
+
+    if (!ri || !ri->get_interface) {
+        return;
+    }
+
+    struct ct_resource_preview_i0 *ai = \
+                (struct ct_resource_preview_i0 *) (ri->get_interface(
+            RESOURCE_PREVIEW_I));
+
+    if (!ai->tooltip) {
+        return;
+    }
+
+    uint64_t obj = resourceid.uid;
+    ai->tooltip(obj);
+}
 
 static void ui_float(uint64_t obj,
                      uint64_t prop_key_hash,
@@ -70,7 +122,7 @@ static void ui_float(uint64_t obj,
     const float min = !params.max_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, prop_key_hash);
+    _prop_label(label, obj, &prop_key_hash, 1);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
@@ -99,7 +151,7 @@ static void ui_bool(uint64_t obj,
     value_new = ce_cdb_a0->read_bool(reader, prop_key_hash, value_new);
     value = value_new;
 
-    _prop_label(label, obj, prop_key_hash);
+    _prop_label(label, obj, &prop_key_hash, 1);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
@@ -130,7 +182,7 @@ static void ui_str(uint64_t obj,
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
-    _prop_label(label, obj, prop_key_hash);
+    _prop_label(label, obj, &prop_key_hash, 1);
 
     bool change = false;
 
@@ -187,7 +239,7 @@ static void ui_str_combo(uint64_t obj,
         }
     }
 
-    _prop_label(label, obj, prop_key_hash);
+    _prop_label(label, obj, &prop_key_hash, 1);
 
     char labelid[128] = {'\0'};
 
@@ -216,6 +268,9 @@ static void ui_str_combo(uint64_t obj,
     ct_debugui_a0->NextColumn();
 }
 
+
+static char modal_buffer[128] = {};
+
 static void ui_resource(uint64_t obj,
                         uint64_t prop_key_hash,
                         const char *label,
@@ -238,8 +293,7 @@ static void ui_resource(uint64_t obj,
     sprintf(buffer, "%s", resource_name);
 
     char labelid[128] = {'\0'};
-    sprintf(labelid, "##%sprop_str_%d", label, i);
-
+    char modal_id[128] = {'\0'};
 
     bool change = false;
 
@@ -249,15 +303,73 @@ static void ui_resource(uint64_t obj,
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->PushItemWidth(-1);
 
+    sprintf(modal_id, "select...##%sselect_resource_%d", label, i);
+
+    sprintf(labelid, ICON_FA_FOLDER_OPEN
+            "##%sprop_select_resource_%d", label, i);
+    if (ct_debugui_a0->Button(labelid, (float[2]) {0.0f})) {
+        ct_debugui_a0->OpenPopup(modal_id);
+    };
+
+    uint64_t new_value = 0;
+
+    bool open = true;
+    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        char labelidi[128] = {'\0'};
+        sprintf(labelidi, "##modal_input%llu", obj + prop_key_hash);
+
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer,
+                                 CE_ARRAY_LEN(modal_buffer),
+                                 0,
+                                 0, NULL);
+
+
+        const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
+        char **resources = NULL;
+
+        ct_builddb_a0->get_resource_by_type(modal_buffer, resource_type_s,
+                                            &resources, ce_memory_a0->system);
+
+        uint32_t dir_n = ce_array_size(resources);
+        for (int i = 0; i < dir_n; ++i) {
+            const char *name = resources[i];
+            bool selected = ct_debugui_a0->Selectable(name, false, 0,
+                                                      (float[2]) {0.0f});
+
+            if (ct_debugui_a0->IsItemHovered(0)) {
+                struct ct_resource_id r = {.uid=ct_builddb_a0->get_uid(name,
+                                                                       resource_type_s)};
+                ct_debugui_a0->BeginTooltip();
+                ct_editor_ui_a0->resource_tooltip(r, name);
+                ct_debugui_a0->EndTooltip();
+            }
+
+            if (selected || ct_debugui_a0->IsItemClicked(0)) {
+                new_value = ct_builddb_a0->get_uid(name, resource_type_s);
+                change = true;
+            }
+        }
+
+        ct_builddb_a0->get_resource_by_type_clean(resources,
+                                                  ce_memory_a0->system);
+        ct_debugui_a0->EndPopup();
+    }
+
+    ct_debugui_a0->SameLine(0.0f, 0.0f);
+
+    sprintf(labelid, "##%sprop_str_%d", label, i);
+
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
                                        strlen(buffer),
                                        DebugInputTextFlags_ReadOnly,
                                        0, NULL);
+
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
 
-    uint64_t new_value = 0;
+
     if (ct_debugui_a0->BeginDragDropTarget()) {
         const struct DebugUIPayload *payload;
         payload = ct_debugui_a0->AcceptDragDropPayload("asset", 0);
@@ -290,6 +402,7 @@ static void ui_resource(uint64_t obj,
         ce_cdb_a0->set_ref(w, prop_key_hash, new_value);
         ce_cdb_a0->write_commit(w);
     }
+
 }
 
 static void ui_vec3(uint64_t obj,
@@ -314,7 +427,7 @@ static void ui_vec3(uint64_t obj,
     const float min = !params.min_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, prop_key_hash[0]);
+    _prop_label(label, obj, prop_key_hash, 3);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -357,7 +470,7 @@ static void ui_vec4(uint64_t obj,
     const float min = !params.min_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, prop_key_hash[0]);
+    _prop_label(label, obj, prop_key_hash, 4);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -388,21 +501,23 @@ static void ui_vec4(uint64_t obj,
     ct_debugui_a0->NextColumn();
 }
 
-static struct ct_resource_ui_a0 editor_ui_a0 = {
-        .ui_float = ui_float,
-        .ui_str = ui_str,
-        .ui_str_combo = ui_str_combo,
-        .ui_resource = ui_resource,
-        .ui_vec3 = ui_vec3,
-        .ui_vec4 = ui_vec4,
-        .ui_bool = ui_bool,
+static struct ct_editor_ui_a0 editor_ui_a0 = {
+        .prop_float = ui_float,
+        .prop_str = ui_str,
+        .prop_str_combo = ui_str_combo,
+        .prop_resource = ui_resource,
+        .prop_vec3 = ui_vec3,
+        .prop_vec4 = ui_vec4,
+        .prop_bool = ui_bool,
+        .prop_revert_btn = prop_revert_btn,
+        .resource_tooltip = resource_tooltip,
 };
 
-struct ct_resource_ui_a0 *ct_resource_ui_a0 = &editor_ui_a0;
+struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(CT_RESOURCE_UI_API, ct_resource_ui_a0);
+    api->register_api(CT_RESOURCE_UI_API, ct_editor_ui_a0);
 }
 
 static void _shutdown() {

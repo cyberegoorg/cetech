@@ -25,7 +25,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 #include <cetech/editor/resource_preview.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
@@ -203,9 +203,9 @@ static uint64_t cdb_type() {
 }
 
 static void draw_property(uint64_t obj) {
-    ct_resource_ui_a0->ui_str(obj, TEXTURE_INPUT, "Input", 0);
-    ct_resource_ui_a0->ui_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_resource_ui_a0->ui_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+    ct_editor_ui_a0->prop_str(obj, TEXTURE_INPUT, "Input", 0);
+    ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
+    ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
     ct_debugui_a0->Text("Texture preview");
     ct_debugui_a0->NextColumn();

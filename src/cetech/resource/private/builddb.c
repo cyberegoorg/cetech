@@ -37,7 +37,9 @@ struct sqls_s {
     sqlite3_stmt *get_fullname;
     sqlite3_stmt *need_compile;
     sqlite3_stmt *get_resource_dirs;
+    sqlite3_stmt *get_resource_by_type;
     sqlite3_stmt *get_resource_from_dirs;
+    sqlite3_stmt *get_uid;
     sqlite3_stmt *get_file_id;
     sqlite3_stmt *resource_type;
     sqlite3_stmt *resource_exist;
@@ -138,8 +140,16 @@ static struct {
         _STATMENT(get_file_id,
                   "SELECT id FROM files WHERE filename = ?1"),
 
+        _STATMENT(get_uid,
+                  "SELECT uid FROM resource WHERE name = ?1 and type = ?2"),
+
         _STATMENT(get_resource_dirs, "select name, type\n"
                                      "from resource order by name"),
+
+        _STATMENT(get_resource_by_type, "select name\n"
+                                        "from resource\n"
+                                        "where name like ?1 and type = ?2\n"
+                                        "order by name"),
 
         _STATMENT(get_resource_from_dirs, "select name, type\n"
                                           "from resource where instr(name, ?1)")
@@ -391,14 +401,6 @@ static int buildb_get_resource_dirs(char ***filename,
     return 1;
 }
 
-static void buildb_get_resource_dirs_clean(char **filename,
-                                           struct ce_alloc *alloc) {
-    const uint32_t n = ce_array_size(filename);
-    for (int i = 0; i < n; ++i) {
-        CE_FREE(alloc, filename[i]);
-    }
-}
-
 static int buildb_get_resource_from_dirs(const char *dir,
                                          char ***filename,
                                          struct ce_alloc *alloc) {
@@ -432,14 +434,6 @@ static int buildb_get_resource_from_dirs(const char *dir,
     }
 
     return 1;
-}
-
-static void buildb_get_resource_from_dirs_clean(char **filename,
-                                                struct ce_alloc *alloc) {
-    const uint32_t n = ce_array_size(filename);
-    for (int i = 0; i < n; ++i) {
-        CE_FREE(alloc, filename[i]);
-    }
 }
 
 
@@ -582,6 +576,65 @@ void fullname_resource(const char *fullname,
     resource->uid = uid;
 }
 
+int get_resource_by_type(const char *name,
+                         const char *type,
+                         char ***filename,
+                         struct ce_alloc *alloc) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    char tmp_name[256] = {};
+    snprintf(tmp_name, CE_ARRAY_LEN(tmp_name), "%%%s%%", name);
+
+    sqlite3_bind_text(sqls->get_resource_by_type, 1, tmp_name, -1,
+                      SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_resource_by_type, 2, type, -1,
+                      SQLITE_TRANSIENT);
+
+    while (_step(_db, sqls->get_resource_by_type) == SQLITE_ROW) {
+        const unsigned char *fn = sqlite3_column_text(
+                sqls->get_resource_by_type,
+                0);
+
+        if (fn) {
+            char *dup_str = ce_memory_a0->str_dup((const char*)fn, alloc);
+            ce_array_push(*filename, dup_str, alloc);
+        }
+
+        //_step(_db, sqls->get_resource_by_type);
+    }
+
+    return 1;
+}
+
+void get_resource_clean(char **filename,
+                        struct ce_alloc *alloc) {
+    const uint32_t n = ce_array_size(filename);
+    for (int i = 0; i < n; ++i) {
+        CE_FREE(alloc, filename[i]);
+    }
+}
+
+uint64_t get_uid(const char *name,
+                 const char *type) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    sqlite3_bind_text(sqls->get_uid, 1, name, -1,
+                      SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_uid, 2, type, -1,
+                      SQLITE_TRANSIENT);
+
+    uint64_t uid = 0;
+    int ok = _step(_db, sqls->get_uid) == SQLITE_ROW;
+    if (ok) {
+        uid = (uint64_t) sqlite3_column_int64(sqls->get_uid, 0);
+        _step(_db, sqls->get_uid);
+    }
+
+    return uid;
+}
+
 static struct ct_builddb_a0 build_db_api = {
         .put_file = builddb_put_file,
         .put_resource_blob = put_resource_blob,
@@ -595,9 +648,13 @@ static struct ct_builddb_a0 build_db_api = {
         .get_resource_filename = resource_filename,
         .get_resource_by_fullname = fullname_resource,
         .get_resource_dirs = buildb_get_resource_dirs,
-        .get_resource_dirs_clean = buildb_get_resource_dirs_clean,
+        .get_resource_dirs_clean = get_resource_clean,
         .get_resource_from_dirs = buildb_get_resource_from_dirs,
-        .get_resource_from_dirs_clean = buildb_get_resource_from_dirs_clean,
+        .get_resource_from_dirs_clean = get_resource_clean,
+        .get_resource_by_type = get_resource_by_type,
+        .get_resource_by_type_clean = get_resource_clean,
+
+        .get_uid= get_uid,
 };
 
 struct ct_builddb_a0 *ct_builddb_a0 = &build_db_api;

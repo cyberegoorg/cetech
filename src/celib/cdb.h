@@ -86,8 +86,8 @@ struct ce_cdb_a0 {
                             uint64_t obj);
 
     void (*set_from)(struct ce_cdb_t db,
-                         uint64_t from,
-                         uint64_t to);
+                     uint64_t from,
+                     uint64_t to);
 
 
     void (*destroy_object)(struct ce_cdb_t db,
@@ -141,6 +141,14 @@ struct ce_cdb_a0 {
     const uint64_t *(*prop_keys)(const ce_cdb_obj_o *reader);
 
     uint64_t (*prop_count)(const ce_cdb_obj_o *reader);
+
+    bool (*prop_equal)(const ce_cdb_obj_o *r1,
+                       const ce_cdb_obj_o *r2,
+                       uint64_t prorp);
+
+    void (*prop_copy)(const ce_cdb_obj_o *from,
+                      ce_cdb_obj_o *to,
+                      uint64_t prorp);
 
     uint64_t (*parent)(const ce_cdb_obj_o *reader);
 

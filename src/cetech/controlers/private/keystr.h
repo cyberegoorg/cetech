@@ -77,7 +77,7 @@ static const char *_key_to_str[512] = {
         [KEY_PAUSE] = "pause",
 
         [KEY_INSERT] = "insert",
-        [KEY_RETURN] = "return",
+        [KEY_RETURN] = "enter",
         [KEY_ESCAPE] = "escape",
         [KEY_BACKSPACE] = "backspace",
         [KEY_TAB] = "tab",

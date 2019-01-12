@@ -37,6 +37,7 @@ typedef int ImGuiSelectableFlags;
 typedef int ImGuiTreeNodeFlags;
 typedef int ImGuiFocusedFlags;
 typedef int ImGuiColorEditFlags;
+typedef int DebugUIHoveredFlags;
 
 typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 
@@ -829,6 +830,7 @@ struct ct_debugui_a0 {
     bool (*IsMouseDoubleClicked)(int btn);
 
     bool (*IsItemClicked)(int btn);
+    bool (*IsItemHovered)(DebugUIHoveredFlags flags);
 
     void (*Separator)();
 

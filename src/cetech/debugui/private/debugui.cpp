@@ -244,6 +244,7 @@ static struct ct_debugui_a0 debugui_api = {
         .IsMouseClicked = ImGui::IsMouseClicked,
         .IsMouseDoubleClicked = ImGui::IsMouseDoubleClicked,
         .IsItemClicked = ImGui::IsItemClicked,
+        .IsItemHovered =ImGui::IsItemHovered,
         .Separator = ImGui::Separator,
         .GetItemRectMin = imgui_wrap::GetItemRectMin,
         .GetItemRectMax = imgui_wrap::GetItemRectMax,
@@ -342,8 +343,9 @@ static void _init(struct ce_api_a0 *api) {
     io.KeyMap[ImGuiKey_End] = keyboard->button_index("end");
     io.KeyMap[ImGuiKey_Delete] = keyboard->button_index("delete");
     io.KeyMap[ImGuiKey_Backspace] = keyboard->button_index("backspace");
-    io.KeyMap[ImGuiKey_Enter] = keyboard->button_index("return");
+    io.KeyMap[ImGuiKey_Enter] = keyboard->button_index("enter");
     io.KeyMap[ImGuiKey_Escape] = keyboard->button_index("escape");
+    io.KeyMap[ImGuiKey_Space] = keyboard->button_index("space");
 
     io.KeyMap[ImGuiKey_A] = keyboard->button_index("a");
     io.KeyMap[ImGuiKey_C] = keyboard->button_index("c");
@@ -351,6 +353,8 @@ static void _init(struct ce_api_a0 *api) {
     io.KeyMap[ImGuiKey_X] = keyboard->button_index("x");
     io.KeyMap[ImGuiKey_Y] = keyboard->button_index("y");
     io.KeyMap[ImGuiKey_Z] = keyboard->button_index("z");
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 }
 
 static void _shutdown() {

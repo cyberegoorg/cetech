@@ -22,7 +22,7 @@
 #include <cetech/editor/property.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/editor/explorer.h>
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 #include <cetech/debugui/icons_font_awesome.h>
 
 
@@ -117,7 +117,7 @@ static void _entity_ui(uint64_t obj) {
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
 
-    ct_resource_ui_a0->ui_str(obj, ENTITY_NAME, "Name", 11111111);
+    ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
 
 
     ct_debugui_a0->TreePop();

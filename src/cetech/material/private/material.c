@@ -24,7 +24,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh/mesh_renderer.h>
 #include <cetech/editor/resource_preview.h>
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/editor/property.h>
 
@@ -160,7 +160,7 @@ static void ui_vec4(uint64_t var) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
-    ct_resource_ui_a0->ui_vec4(var,
+    ct_editor_ui_a0->prop_vec4(var,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
@@ -171,7 +171,7 @@ static void ui_vec4(uint64_t var) {
 static void ui_color4(uint64_t var) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
-    ct_resource_ui_a0->ui_vec4(var,
+    ct_editor_ui_a0->prop_vec4(var,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
@@ -185,7 +185,7 @@ static void ui_texture(uint64_t var) {
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_resource_ui_a0->ui_resource(var, MATERIAL_VAR_VALUE_PROP, name,
+    ct_editor_ui_a0->prop_resource(var, MATERIAL_VAR_VALUE_PROP, name,
                                    TEXTURE_TYPE, var);
 }
 
@@ -221,10 +221,10 @@ static void draw_property(uint64_t material) {
             ct_debugui_a0->Text("%s", layer_name);
             ct_debugui_a0->NextColumn();
 
-            ct_resource_ui_a0->ui_str(layer, MATERIAL_LAYER_NAME,
+            ct_editor_ui_a0->prop_str(layer, MATERIAL_LAYER_NAME,
                                       "Layer name", i);
 
-            ct_resource_ui_a0->ui_resource(layer, MATERIAL_SHADER_PROP,
+            ct_editor_ui_a0->prop_resource(layer, MATERIAL_SHADER_PROP,
                                            "Shader",
                                            SHADER_TYPE, i);
 

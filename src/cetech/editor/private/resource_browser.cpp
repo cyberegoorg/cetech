@@ -22,6 +22,7 @@
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/log_view.h>
 #include <celib/log.h>
+#include <cetech/editor/editor_ui.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -184,29 +185,7 @@ static void ui_dir_list() {
     ImGui::EndChild();
 }
 
-static void ui_asset_tooltip(ct_resource_id resourceid,
-                             const char *path) {
-    ct_debugui_a0->Text("%s", path);
 
-    uint64_t type = ct_builddb_a0->get_resource_type(resourceid);
-
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
-
-    if (!ri || !ri->get_interface) {
-        return;
-    }
-
-    ct_resource_preview_i0 *ai = \
-                (ct_resource_preview_i0 *) (ri->get_interface(
-            RESOURCE_PREVIEW_I));
-
-    if (!ai->tooltip) {
-        return;
-    }
-
-    uint64_t obj = resourceid.uid;
-    ai->tooltip(obj);
-}
 
 static void ui_asset_list(uint64_t dock) {
     ImVec2 size(_G.midle_column_width, 0.0f);
@@ -252,7 +231,7 @@ static void ui_asset_list(uint64_t dock) {
 
             if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
-                ui_asset_tooltip(resourceid, path);
+                ct_editor_ui_a0->resource_tooltip(resourceid, path);
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -272,7 +251,7 @@ static void ui_asset_list(uint64_t dock) {
             if (ct_debugui_a0->BeginDragDropSource(
                     DebugUIDragDropFlags_SourceAllowNullID)) {
 
-                ui_asset_tooltip(resourceid, path);
+                ct_editor_ui_a0->resource_tooltip(resourceid, path);
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &resourceid.uid,

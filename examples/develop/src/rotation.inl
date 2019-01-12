@@ -1,5 +1,5 @@
 
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 #include <celib/ydb.h>
 
 

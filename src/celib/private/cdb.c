@@ -563,7 +563,7 @@ static void _add_obj_to_destroy_list(struct db_t *db_inst,
     bool contain = false;
     const uint64_t n = db_inst->to_free_objects_id_n;
     for (int i = 0; i < n; ++i) {
-        if(db_inst->to_free_objects_id[i] != _obj) {
+        if (db_inst->to_free_objects_id[i] != _obj) {
             continue;
         }
 
@@ -1283,7 +1283,7 @@ void remove_property(ce_cdb_obj_o *_writer,
     uint64_t idx = _find_prop_index(writer, property);
 
     if (idx) {
-        if(writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
+        if (writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
             union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
                     writer->values +
                     writer->offset[idx]);
@@ -1505,6 +1505,94 @@ static uint64_t prop_count(const ce_cdb_obj_o *reader) {
     return count;
 }
 
+
+bool prop_equal(const ce_cdb_obj_o *r1,
+                const ce_cdb_obj_o *r2,
+                uint64_t prorp) {
+    enum ce_cdb_type t = prop_type(r1, prorp);
+
+    if (!prop_exist(r1, prorp) || !prop_exist(r2, prorp)) {
+        return false;
+    }
+
+    switch (t) {
+        case CDB_TYPE_NONE:
+            break;
+        case CDB_TYPE_UINT64:
+            return read_uint64(r1, prorp, 0) == read_uint64(r2, prorp, 0);
+            break;
+        case CDB_TYPE_PTR:
+            return read_ptr(r1, prorp, 0) == read_ptr(r2, prorp, 0);
+            break;
+        case CDB_TYPE_REF:
+            return read_ref(r1, prorp, 0) == read_ref(r2, prorp, 0);
+            break;
+        case CDB_TYPE_FLOAT:
+            return read_float(r1, prorp, 0) == read_float(r2, prorp, 0);
+            break;
+        case CDB_TYPE_BOOL:
+            return read_bool(r1, prorp, 0) == read_bool(r2, prorp, 0);
+            break;
+
+        case CDB_TYPE_STR:
+            return !strcmp(read_string(r1, prorp, 0),
+                           read_string(r2, prorp, 0));
+            break;
+        case CDB_TYPE_SUBOBJECT:
+            return read_subobject(r1, prorp, 0) == read_subobject(r2, prorp, 0);
+            break;
+        case CDB_TYPE_BLOB:
+            break;
+    }
+
+    return false;
+}
+
+void prop_copy(const ce_cdb_obj_o *from,
+               ce_cdb_obj_o *to,
+               uint64_t prorp) {
+    enum ce_cdb_type t = prop_type(from, prorp);
+    union ce_cdb_value_u0 v;
+    switch (t) {
+        case CDB_TYPE_NONE:
+            break;
+
+        case CDB_TYPE_UINT64:
+            v.uint64 = read_uint64(from, prorp, 0);
+            set_uint64(to, prorp, v.uint64);
+            break;
+        case CDB_TYPE_PTR:
+            v.ptr = read_ptr(from, prorp, 0);
+            set_ptr(to, prorp, v.ptr);
+            break;
+        case CDB_TYPE_REF:
+            v.ref = read_ref(from, prorp, 0);
+            set_ref(to, prorp, v.ref);
+            break;
+        case CDB_TYPE_FLOAT:
+            v.f = read_float(from, prorp, 0);
+            set_float(to, prorp, v.f);
+            break;
+        case CDB_TYPE_BOOL:
+            v.b = read_bool(from, prorp, 0);
+            set_bool(to, prorp, v.b);
+            break;
+
+        case CDB_TYPE_STR:
+            v.str = (char*)read_string(from, prorp, 0);
+            set_string(to, prorp, v.str);
+            break;
+
+        case CDB_TYPE_SUBOBJECT:
+            v.subobj = read_subobject(from, prorp, 0);
+            set_uint64(to, prorp, v.subobj);
+            break;
+
+        case CDB_TYPE_BLOB:
+            break;
+    }
+}
+
 static struct ce_cdb_t global_db() {
     return _G.global_db;
 }
@@ -1570,7 +1658,7 @@ static void dump_str(struct ce_cdb_t _db,
             ce_buffer_printf(buffer, _G.allocator, "  ");
         }
 
-        if(k) {
+        if (k) {
             ce_buffer_printf(buffer, _G.allocator, "%s:", k);
         } else {
             ce_buffer_printf(buffer, _G.allocator, "0x%llu:", key);
@@ -1784,6 +1872,8 @@ static struct ce_cdb_a0 cdb_api = {
         .prop_type = prop_type,
         .prop_keys = prop_keys,
         .prop_count = prop_count,
+        .prop_equal = prop_equal,
+        .prop_copy = prop_copy,
 
         .parent = parent,
         .set_parent = set_parent,

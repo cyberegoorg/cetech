@@ -12,7 +12,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"

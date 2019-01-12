@@ -991,7 +991,7 @@ static void _sync_ent_obj(struct world_instance *world) {
 
                     uint64_t idx = ce_hash_lookup(&world->obj_entmap, ent_obj,
                                                   UINT64_MAX);
-                    if(idx == UINT64_MAX) {
+                    if (idx == UINT64_MAX) {
                         continue;
                     }
 
@@ -1009,9 +1009,14 @@ static void _sync_ent_obj(struct world_instance *world) {
                     uint64_t ent_obj = ev.new_value.subobj;
                     struct ct_entity *ents = si->ents;
                     uint32_t ents_n = ce_array_size(ents);
+
                     for (int e = 0; e < ents_n; ++e) {
-                        spawn_entity(world->world, ent_obj);
+                        struct ct_entity new_ents;
+                        new_ents = spawn_entity(world->world, ent_obj);
+
+                        link(world->world, ents[e],  new_ents);
                     }
+
                 }
             }
         }
@@ -1104,7 +1109,7 @@ static void _sync_comp_obj(struct world_instance *world) {
                 struct ct_entity ent = ents[e];
                 void *data = get_one(world->world, component_type, ent);
 
-                if(!data) {
+                if (!data) {
                     continue;
                 }
 

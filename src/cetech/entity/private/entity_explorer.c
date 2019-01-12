@@ -59,8 +59,9 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
 
     uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
+    uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
 
-    if (!children_n) {
+    if ((!children_n) && (selected && !component_n)) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
@@ -134,7 +135,6 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (selected & open) {
-        const uint32_t component_n = ce_cdb_a0->prop_count(cs_reader);
         const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
 
         for (uint32_t i = 0; i < component_n; ++i) {

@@ -59,6 +59,17 @@ struct ct_builddb_a0 {
 
     void (*get_resource_from_dirs_clean)(char **filename,
                                          struct ce_alloc *alloc);
+
+    uint64_t (*get_uid)(const char *name,
+                        const char *type);
+
+    int (*get_resource_by_type)(const char *name,
+                                const char *type,
+                                char ***filename,
+                                struct ce_alloc *alloc);
+
+    void (*get_resource_by_type_clean)(char **filename,
+                                       struct ce_alloc *alloc);
 };
 
 CE_MODULE(ct_builddb_a0);

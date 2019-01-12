@@ -18,7 +18,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/icons_font_awesome.h>
 
-#include <cetech/editor/resource_ui.h>
+#include <cetech/editor/editor_ui.h>
 #include <cetech/editor/property.h>
 
 #define LOG_WHERE "transform"
@@ -126,14 +126,14 @@ static uint64_t create_new() {
 
 static void property_editor(uint64_t obj) {
 
-    ct_resource_ui_a0->ui_vec3(obj,
+    ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_POSITION_X,
                                               PROP_POSITION_Y,
                                               PROP_POSITION_Z},
                                "Position",
                                (struct ui_vec3_p0) {});
 
-    ct_resource_ui_a0->ui_vec3(obj,
+    ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_ROTATION_X,
                                               PROP_ROTATION_Y,
                                               PROP_ROTATION_Z},
@@ -141,7 +141,7 @@ static void property_editor(uint64_t obj) {
                                (struct ui_vec3_p0) {});
 
 
-    ct_resource_ui_a0->ui_vec3(obj,
+    ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_SCALE_X,
                                               PROP_SCALE_Y,
                                               PROP_SCALE_Z},

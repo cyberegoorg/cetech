@@ -130,7 +130,7 @@ set(SOURCE_FILES
         src/cetech/editor/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
         src/cetech/resource/private/builddb.c
-        src/cetech/editor/private/resource_ui.c
+        src/cetech/editor/private/editor_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
         src/cetech/entity/private/entity_explorer.c
