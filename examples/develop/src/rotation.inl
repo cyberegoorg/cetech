@@ -1,6 +1,7 @@
 
 #include <cetech/editor/editor_ui.h>
 #include <celib/ydb.h>
+#include <stdlib.h>
 
 
 // component
@@ -42,15 +43,21 @@ static uint64_t size() {
     return sizeof(struct rotation_component);
 }
 
+static float _rnd_speed(uint32_t max) {
+    return (((float)rand())/RAND_MAX) * max;
+}
+
 static void spawner(struct ct_world world,
                     uint64_t obj,
                     void *data) {
 
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+//    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct rotation_component *c = data;
 
+
+
     *c = (struct rotation_component) {
-            .speed = ce_cdb_a0->read_float(r, PROP_SPEED, 60.0f),
+            .speed = _rnd_speed(100.0f),
     };
 }
 

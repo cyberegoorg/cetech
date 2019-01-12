@@ -274,7 +274,8 @@ static char modal_buffer[128] = {};
 static bool resource_select_modal(const char *modal_id,
                                   uint64_t id,
                                   uint64_t resource_type,
-                                  uint64_t *selected_resource) {
+                                  uint64_t *selected_resource,
+                                  uint32_t *count) {
     bool changed = false;
     bool open = true;
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
@@ -287,6 +288,11 @@ static bool resource_select_modal(const char *modal_id,
                                  0,
                                  0, NULL);
 
+        if (count) {
+            int c = *count;
+            ct_debugui_a0->InputInt("Count", &c, 1, 1, 0);
+            *count = (uint32_t) c;
+        }
 
         const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
         char **resources = NULL;
@@ -298,7 +304,7 @@ static bool resource_select_modal(const char *modal_id,
         for (int i = 0; i < dir_n; ++i) {
             const char *name = resources[i];
 
-            if(!strlen(name)) {
+            if (!strlen(name)) {
                 continue;
             }
 
@@ -307,7 +313,7 @@ static bool resource_select_modal(const char *modal_id,
 
             if (ct_debugui_a0->IsItemHovered(0)) {
                 struct ct_resource_id r = {
-                        .uid=ct_builddb_a0->get_uid(name,resource_type_s)
+                        .uid=ct_builddb_a0->get_uid(name, resource_type_s)
                 };
 
                 ct_debugui_a0->BeginTooltip();
@@ -375,7 +381,7 @@ static void ui_resource(uint64_t obj,
     uint64_t new_value = 0;
 
     change = resource_select_modal(modal_id, obj + prop_key_hash,
-                                   resource_type, &new_value);
+                                   resource_type, &new_value, NULL);
 
 
     ct_debugui_a0->SameLine(0.0f, 0.0f);

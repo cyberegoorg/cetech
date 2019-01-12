@@ -269,20 +269,21 @@ static void draw_menu(uint64_t selected_obj,
                                               (float[2]) {0.0f});
 
         char modal_id[128] = {'\0'};
-        sprintf(modal_id, "select...#select_resource_%llu", selected_obj);
+        sprintf(modal_id, "select...##select_resource_%llu", selected_obj);
 
         uint64_t new_value = 0;
-        ct_editor_ui_a0->resource_select_modal(modal_id, selected_obj,
+
+        static uint32_t count = 1;
+        bool changed = ct_editor_ui_a0->resource_select_modal(modal_id, selected_obj,
                                                ENTITY_RESOURCE_ID,
-                                               &new_value);
+                                               &new_value, &count);
         if (add_from) {
             ct_debugui_a0->OpenPopup(modal_id);
         }
 
-        if(new_value) {
-            uint64_t new_obj = _spawn_to(new_value, selected_obj);
-            if(new_obj) {
-                ct_selected_object_a0->set_selected_object(context, new_obj);
+        if(changed && new_value) {
+            for (int i = 0; i < count; ++i) {
+                _spawn_to(new_value, selected_obj);
             }
         }
 
@@ -302,7 +303,6 @@ static void draw_menu(uint64_t selected_obj,
             ct_selected_object_a0->set_selected_object(context, parent_ent);
         }
     }
-
 }
 
 static uint64_t cdb_type() {

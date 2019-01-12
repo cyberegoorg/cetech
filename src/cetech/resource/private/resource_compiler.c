@@ -105,6 +105,10 @@ uint64_t compile_obj(struct ce_cdb_t db,
             continue;
         }
 
+        if (CDB_TYPE_PROP == p) {
+            continue;
+        }
+
         enum ce_cdb_type t = ce_cdb_a0->prop_type(input_r, p);
 
         switch (t) {

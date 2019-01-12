@@ -78,7 +78,8 @@ struct ct_editor_ui_a0 {
     bool (*resource_select_modal)(const char *modal_id,
                                   uint64_t id,
                                   uint64_t resource_type,
-                                  uint64_t *selected_resource);
+                                  uint64_t *selected_resource,
+                                  uint32_t *count);
 };
 
 CE_MODULE(ct_editor_ui_a0);

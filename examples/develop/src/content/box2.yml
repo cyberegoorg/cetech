@@ -20,7 +20,9 @@
     mesh_renderer:
       cdb_uid: "0x503ef52859bc3e3b"
       cdb_type: "mesh_renderer"
-
       scene: "0xb7baa30d19deb859"
       mesh: "muro_main"
-      material: "0x6c8bca84fa0d4431"
+      material: "0x24c9413e88ebaaa8"
+    rotation:
+        cdb_uid: "0xaf5a41d98f0f23bc"
+        cdb_type: "rotation"

@@ -262,13 +262,17 @@ static void *get_one(struct ct_world world,
         return NULL;
     }
 
+    struct ct_component_i0 *c = get_interface(component_name);
+
+    if(!c) {
+        return NULL;
+    }
+
     uint64_t com_mask = component_mask(component_name);
 
     if (!(com_mask & ent_type)) {
         return NULL;
     }
-
-    struct ct_component_i0 *c = get_interface(component_name);
 
     uint64_t com_idx = component_idx(component_name);
     struct entity_storage *item = &w->entity_storage[type_idx];

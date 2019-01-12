@@ -94,7 +94,7 @@
 
         transform:
           cdb_uid: "0xf10156d9bb85fc45"
-          cdb_type: "rotation"
+          cdb_type: "transform"
 
           position.x: 0.000000
           position.y: 0.000000

@@ -95,21 +95,30 @@ void set_loader(ct_cdb_obj_loader loader) {
     _G.loader = loader;
 }
 
-static uint64_t _gen_uid() {
+
+static uint64_t _next_uid(uint64_t epoch_offset, uint32_t session) {
+    static atomic_int g_seq;
     union {
         uint64_t ui;
         struct {
-            uint32_t h;
-            uint32_t l;
+            uint64_t seq:8;
+            uint64_t session:12;
+            uint64_t timestamp:44;
         };
     } id = {.ui = 0};
 
-    arc4random_buf(&id.l, 4);
-    id.h = (uint16_t) ce_os_a0->time->ticks();
+    id.timestamp = (uint64_t) (time(NULL) - epoch_offset);
+    id.session  = session;
+    id.seq = atomic_fetch_add(&g_seq, 1) + 1;
 
 //    ce_log_a0->debug(LOG_WHERE, "New UID 0x%llx", id.ui);
 
     return id.ui;
+}
+
+
+static uint64_t _gen_uid() {
+    return _next_uid(1547316500ULL, 1);
 }
 
 static struct db_t *_get_db(struct ce_cdb_t db) {
@@ -571,7 +580,10 @@ static void _add_obj_to_destroy_list(struct db_t *db_inst,
         break;
     }
 
-    CE_ASSERT(LOG_WHERE, !contain);
+    if(contain) {
+        return;
+    }
+//    CE_ASSERT(LOG_WHERE, !contain);
 
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
     db_inst->to_free_objects_id[idx] = _obj;
@@ -1579,7 +1591,7 @@ void prop_copy(const ce_cdb_obj_o *from,
             break;
 
         case CDB_TYPE_STR:
-            v.str = (char*)read_string(from, prorp, 0);
+            v.str = (char *) read_string(from, prorp, 0);
             set_string(to, prorp, v.str);
             break;
 
@@ -1638,6 +1650,13 @@ void move(struct ce_cdb_t _db,
 }
 
 
+static void _push_space(char **buffer,
+                        uint32_t level) {
+    for (int j = 0; j < level; ++j) {
+        ce_buffer_printf(buffer, _G.allocator, "  ");
+    }
+}
+
 static void dump_str(struct ce_cdb_t _db,
                      char **buffer,
                      uint64_t from,
@@ -1647,21 +1666,53 @@ static void dump_str(struct ce_cdb_t _db,
     const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
+    _push_space(buffer, level);
+    ce_buffer_printf(buffer, _G.allocator, "cdb_uid: 0x%llx\n", from);
+
+    uint64_t type = ce_cdb_a0->obj_type(reader);
+    const char *type_str = ce_id_a0->str_from_id64(type);
+    if (type_str) {
+        _push_space(buffer, level);
+        ce_buffer_printf(buffer, _G.allocator, "cdb_type: %s\n", type_str);
+    } else {
+        if (type) {
+            _push_space(buffer, level);
+            ce_buffer_printf(buffer, _G.allocator, "cdb_type: 0x%llx\n", type);
+        }
+    }
+
+    uint64_t instance_of = ce_cdb_a0->read_instance_of(reader);
+    if (instance_of) {
+        _push_space(buffer, level);
+        ce_buffer_printf(buffer, _G.allocator, "PREFAB: 0x%llx\n", instance_of);
+    }
+
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
+
+        if (instance_of) {
+            const ce_cdb_obj_o *ir = ce_cdb_a0->read(_db, instance_of);
+            if (prop_equal(ir, reader, key)) {
+                continue;
+            }
+        }
 
         const char *k = ce_id_a0->str_from_id64(key);
 
         enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
 
-        for (int j = 0; j < level; ++j) {
-            ce_buffer_printf(buffer, _G.allocator, "  ");
+
+        if ((type == CDB_TYPE_BLOB) || (type == CDB_TYPE_PTR)) {
+            continue;
         }
+
+
+        _push_space(buffer, level);
 
         if (k) {
             ce_buffer_printf(buffer, _G.allocator, "%s:", k);
         } else {
-            ce_buffer_printf(buffer, _G.allocator, "0x%llu:", key);
+            ce_buffer_printf(buffer, _G.allocator, "0x%llx:", key);
         }
 
 
@@ -1710,11 +1761,6 @@ static void dump_str(struct ce_cdb_t _db,
                 uint64_t ref = ce_cdb_a0->read_ref(reader, key, 0);
                 ce_buffer_printf(buffer, _G.allocator, " 0x%llx\n", ref);
             }
-                break;
-
-            case CDB_TYPE_PTR:
-            case CDB_TYPE_BLOB:
-                ce_buffer_printf(buffer, _G.allocator, "\n");
                 break;
 
             default:

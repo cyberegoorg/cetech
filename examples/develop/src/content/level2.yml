@@ -1,15 +1,13 @@
 0x588f56dc4e82f7b2: #content/level2.entity:
-  asset_name: "content/level2"
-  cdb_type: "entity"
-  name: "Level 2"
-
+  cdb_uid: 0x588f56dc4e82f7b2
+  cdb_type: entity
+  asset_name: content/level2
+  name: Level 2
   components:
-    cdb_uid: "0x69cef5784f198c62"
-
+    cdb_uid: 0x69cef5784f198c62
     transform:
-      cdb_uid: "0x38a1e9c2481e8f31"
-      cdb_type: "transform"
-
+      cdb_uid: 0x38a1e9c2481e8f31
+      cdb_type: transform
       position.x: 0.000000
       position.y: 0.000000
       position.z: 0.000000
@@ -19,12 +17,72 @@
       scale.x: 1.000000
       scale.y: 1.000000
       scale.z: 1.000000
-
   children:
-    cdb_uid: "0xd6745c61766e99f5"
-
-    0x236bdc9357cc2baf:
-      cdb_type: "entity"
-
-      name: "box1"
-      PREFAB: "0x758816087ff520e8"
+    cdb_uid: 0xd6745c61766e99f5
+    0x9ae4ed00000449c:
+      cdb_uid: 0x9ae4ed00000449c
+      cdb_type: entity
+      PREFAB: 0x758816087ff520e8
+      components:
+        cdb_uid: 0xb7bb52740000449c
+        PREFAB: 0xa0ef45c8183eac08
+        transform:
+          cdb_uid: 0xed4d50bf0000449c
+          cdb_type: transform
+          PREFAB: 0x1c6bb48199c7ab33
+      children:
+        cdb_uid: 0x63cbaa90000449d
+        PREFAB: 0x1f477575303b404c
+        0xe861c4016085bf98:
+          cdb_uid: 0x8c7d3d790000449d
+          cdb_type: entity
+          PREFAB: 0xe861c4016085bf98
+          components:
+            cdb_uid: 0x1326fdec0000449d
+            PREFAB: 0x6269b340849d55a0
+            transform:
+              cdb_uid: 0xc5ead00e0000449d
+              cdb_type: transform
+              PREFAB: 0x79d4524dbbd23c53
+            mesh_renderer:
+              cdb_uid: 0x3a9f492f0000449d
+              cdb_type: mesh_renderer
+              PREFAB: 0xdd6dea51dabadcc0
+            rotation:
+              cdb_uid: 0x7daea02d0000449d
+              cdb_type: rotation
+              PREFAB: 0xaf5a30d98f0f23bc
+        0x353f39ca5ddc1001:
+          cdb_uid: 0xca0b0b6d0000449d
+          cdb_type: entity
+          PREFAB: 0x353f39ca5ddc1001
+          components:
+            cdb_uid: 0xd70f2a9b0000449d
+            PREFAB: 0xd35f7f10b41443d4
+            transform:
+              cdb_uid: 0xdc0515640000449d
+              cdb_type: transform
+              PREFAB: 0x9519445d55e6c950
+            mesh_renderer:
+              cdb_uid: 0x12d7f1510000449d
+              cdb_type: mesh_renderer
+              PREFAB: 0xbe73c8b1b3e0426
+            rotation:
+              cdb_uid: 0xbd078c7c0000449d
+              cdb_type: rotation
+              PREFAB: 0x503eea652ab45d15
+        0x2da4e65c0153162f:
+          cdb_uid: 0x163ecee00000449d
+          cdb_type: entity
+          PREFAB: 0x2da4e65c0153162f
+          components:
+            cdb_uid: 0xff02eac50000449d
+            PREFAB: 0x333852d44070d23a
+            transform:
+              cdb_uid: 0xb55e67d00000449d
+              cdb_type: transform
+              PREFAB: 0xf10156d9bb85fc45
+            mesh_renderer:
+              cdb_uid: 0x7ceb6b20000449d
+              cdb_type: mesh_renderer
+              PREFAB: 0x3ce8fa251728a409
