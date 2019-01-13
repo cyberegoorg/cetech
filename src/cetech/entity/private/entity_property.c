@@ -24,6 +24,9 @@
 #include <cetech/editor/explorer.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/controlers/controlers.h>
+#include <cetech/controlers/keyboard.h>
+#include <fnmatch.h>
 
 
 #define _G entity_property_global
@@ -122,7 +125,7 @@ static void _entity_ui(uint64_t obj) {
     const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t instance_of = ce_cdb_a0->read_instance_of(r);
 
-    if(instance_of) {
+    if (instance_of) {
         snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", instance_of);
 
         ct_debugui_a0->Text("Instance of");
@@ -170,15 +173,33 @@ static void draw_ui(uint64_t obj) {
     }
 }
 
-void draw_menu(uint64_t obj) {
-    if (!obj) {
-        return;
-    }
 
+static char modal_buffer[128] = {};
+
+static void _add_comp_modal(const char *modal_id,
+                            uint64_t obj) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    ct_debugui_a0->Button(ICON_FA_PLUS" component", (float[2]) {0.0f});
-    if (ct_debugui_a0->BeginPopupContextItem("add component context menu", 0)) {
+    bool open = true;
+    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512}, 0);
+    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+
+        if (kb->button_pressed(0, kb->button_index("escape"))) {
+            ct_debugui_a0->CloseCurrentPopup();
+            ct_debugui_a0->EndPopup();
+            return;
+        }
+        char labelidi[128] = {'\0'};
+        sprintf(labelidi, "##modal_comp_input%llu", obj);
+
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer,
+                                 CE_ARRAY_LEN(modal_buffer),
+                                 0,
+                                 0, NULL);
+
+
         struct ce_api_entry it = ce_api_a0->first(COMPONENT_I);
         while (it.api) {
             struct ct_component_i0 *i = (it.api);
@@ -202,6 +223,19 @@ void draw_menu(uint64_t obj) {
             if (ei->display_name &&
                 !ce_cdb_a0->prop_exist(reader, component_type)) {
                 const char *label = ei->display_name();
+
+
+                if (modal_buffer[0]) {
+                    char filter[256] = {};
+                    snprintf(filter, CE_ARRAY_LEN(filter),
+                             "*%s*", modal_buffer);
+
+                    if (0 != fnmatch(filter, label, FNM_CASEFOLD)) {
+                        goto next;
+                    }
+                }
+
+
                 bool add = ct_debugui_a0->Selectable(label, false, 0,
                                                      (float[2]) {0.0f});
 
@@ -210,15 +244,17 @@ void draw_menu(uint64_t obj) {
                     if (ei->create_new) {
                         component = ei->create_new();
                     } else {
-                        component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                             component_type);
+                        component = ce_cdb_a0->create_object(
+                                ce_cdb_a0->db(),
+                                component_type);
                     }
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             components);
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
+                            ce_cdb_a0->db(),
+                            components);
                     ce_cdb_a0->set_subobject(w, component_type, component);
                     ce_cdb_a0->write_commit(w);
-
+                    modal_buffer[0] = '\0';
                 }
             }
             next:
@@ -228,6 +264,30 @@ void draw_menu(uint64_t obj) {
         ct_debugui_a0->EndPopup();
     }
 }
+
+
+void draw_menu(uint64_t obj) {
+    if (!obj) {
+        return;
+    }
+
+
+    bool add = ct_debugui_a0->Button(ICON_FA_PLUS" "ICON_FA_FOLDER_OPEN,
+                                     (float[2]) {0.0f});
+
+
+    char modal_id[128] = {'\0'};
+    sprintf(modal_id, "select...##select_comp_%llu", obj);
+
+
+    _add_comp_modal(modal_id, obj);
+
+    if (add) {
+        ct_debugui_a0->OpenPopup(modal_id);
+    }
+
+}
+
 
 static uint64_t cdb_type() {
     return ENTITY_RESOURCE_ID;
