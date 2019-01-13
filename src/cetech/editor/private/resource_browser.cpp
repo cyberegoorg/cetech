@@ -87,11 +87,7 @@ static void _broadcast_selected(uint64_t dock) {
 }
 
 static void ui_asset_menu(uint64_t dock) {
-    ct_debugui_a0->Text(ICON_FA_SEARCH);
-    ct_debugui_a0->SameLine(0, 8);
-    _G.asset_filter.Draw("");
-
-    ct_debugui_a0->SameLine(0, -1);
+    //    ct_debugui_a0->SameLine(0, -1);
 
     if (ct_debugui_a0->Button(ICON_FA_PENCIL, (float[2]) {0, 0})) {
         _broadcast_edit(dock);
@@ -203,6 +199,12 @@ static void ui_asset_list(uint64_t dock) {
     ImVec2 size(_G.midle_column_width, 0.0f);
 
     ImGui::BeginChild("middle_col", size);
+
+
+    ct_debugui_a0->Text(ICON_FA_SEARCH);
+    ct_debugui_a0->SameLine(0, 8);
+    _G.asset_filter.Draw("");
+
 
     if (_G.need_reaload) {
         if (_G.asset_list) {
