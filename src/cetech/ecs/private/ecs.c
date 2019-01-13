@@ -265,7 +265,7 @@ static void *get_one(struct ct_world world,
 
     struct ct_component_i0 *c = get_interface(component_name);
 
-    if(!c) {
+    if (!c) {
         return NULL;
     }
 
@@ -756,11 +756,30 @@ void *get_resource_interface(uint64_t name_hash) {
     return NULL;
 }
 
+void create_new(uint64_t obj) {
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+
+    if (ce_cdb_a0->prop_exist(w, ENTITY_CHILDREN)) {
+        uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                               ENTITY_CHILDREN);
+        ce_cdb_a0->set_subobject(w, ENTITY_CHILDREN, ch);
+    }
+
+    if (ce_cdb_a0->prop_exist(w, ENTITY_COMPONENTS)) {
+        uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                               ENTITY_COMPONENTS);
+        ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, ch);
+    }
+
+    ce_cdb_a0->write_commit(w);
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
         .online = online,
         .offline = offline,
         .get_interface = get_resource_interface,
+        .create_new = create_new,
 };
 
 //==============================================================================
@@ -1025,7 +1044,7 @@ static void _sync_ent_obj(struct world_instance *world) {
                         struct ct_entity new_ents;
                         new_ents = spawn_entity(world->world, ent_obj);
 
-                        link(world->world, ents[e],  new_ents);
+                        link(world->world, ents[e], new_ents);
                     }
 
                 }

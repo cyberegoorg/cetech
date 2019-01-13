@@ -35,7 +35,8 @@ struct ct_resource_id {
 };
 
 
-typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t db, uint64_t obj);
+typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t db,
+                                         uint64_t obj);
 
 //! Resource interface
 struct ct_resource_i0 {
@@ -49,15 +50,19 @@ struct ct_resource_i0 {
     void (*offline)(uint64_t name,
                     uint64_t obj);
 
+    void (*create_new)(uint64_t obj);
+
     ct_resource_compilator_t compilator;
 };
 
 
-
 struct ct_resource_a0 {
     struct ct_resource_i0 *(*get_interface)(uint64_t type);
+
     bool (*cdb_loader)(uint64_t uid);
+
     bool (*save)(uint64_t uid);
+
     bool (*save_to_db)(uint64_t uid);
 };
 

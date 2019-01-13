@@ -213,6 +213,12 @@ static void _create_from_modal(const char *modal_id) {
                 ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
                 ce_cdb_a0->write_commit(w);
 
+                ct_resource_i0*  ri = ct_resource_a0->get_interface(type);
+
+                if(ri && ri->create_new) {
+                    ri->create_new(new_res);
+                }
+
                 ct_resource_a0->save(new_res);
 
                 _G.need_reaload = true;
