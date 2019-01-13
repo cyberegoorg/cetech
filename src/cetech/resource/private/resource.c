@@ -189,7 +189,9 @@ static bool cdb_loader(uint64_t uid) {
 }
 
 static bool save(uint64_t uid) {
-    struct ct_resource_id r = {.uid=uid};
+    uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
+
+    struct ct_resource_id r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_builddb_a0->get_resource_filename(r,
                                                       filename,
