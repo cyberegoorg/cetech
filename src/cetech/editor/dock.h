@@ -28,6 +28,9 @@ struct ct_dock_i0 {
     uint64_t (*cdb_type)();
     uint64_t (*dock_flags)();
 
+    void (*open)(uint64_t dock);
+    void (*close)(uint64_t dock);
+
     const char *(*display_title)(uint64_t dock);
     const char *(*name)(uint64_t dock);
 

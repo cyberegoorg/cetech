@@ -35,16 +35,6 @@ static struct _G {
     struct ct_viewport0 viewport;
 } _G;
 
-void reload_layout() {
-    _G.load_layout = true;
-}
-
-#define _UNDO \
-    CE_ID64_0("undo", 0xd9c7f03561492eecULL)
-
-#define _REDO \
-    CE_ID64_0("redo", 0x2b64b25d7febf67eULL)
-
 static float draw_main_menu() {
     float menu_height = 0;
     static bool debug = false;
@@ -99,27 +89,6 @@ static void on_init(uint64_t _event) {
     }
 
     _G.world = ct_ecs_a0->create_world();
-
-//
-//    struct ct_rg_builder *builder = ct_rg_a0->create_builder();
-//    struct ct_rg *graph = ct_rg_a0->create_graph();
-//
-//    uint64_t rgc = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-//                                            RENDER_GRAPH_COMPONENT);
-//
-//
-//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(rgc);
-//    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_BUILDER, builder);
-//    ce_cdb_a0->set_ptr(w, PROP_RENDER_GRAPH_GRAPH, graph);
-//    ce_cdb_a0->write_commit(w);
-//
-//    ct_ecs_a0->create(_G.world, &_G.render_ent, 1);
-//    ct_ecs_a0->add(_G.world, _G.render_ent,
-//                   (uint64_t[]) {RENDER_GRAPH_COMPONENT}, 1,
-//                   (uint64_t[]) {rgc});
-//
-//    struct ct_rg_module *module = ct_default_rg_a0->create(_G.world);
-//    graph->add_module(graph, module);
 }
 
 static void on_shutdown(uint64_t _event) {

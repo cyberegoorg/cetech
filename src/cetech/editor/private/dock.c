@@ -74,9 +74,34 @@ uint64_t create_dock(uint64_t type,
 
     ce_array_push(_G.docks, obj, _G.allocator);
 
+    if(i->open) {
+        i->open(obj);
+    }
+
     return obj;
 }
 
+void close_dock(uint64_t dock) {
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    uint64_t type = ce_cdb_a0->obj_type(r);
+
+    struct ct_dock_i0 *i = _find_dock_i(type);
+
+    if (i && i->close) {
+        i->close(dock);
+    }
+
+    uint32_t dock_n = ce_array_size(_G.docks);
+    for (int u = 0; u < dock_n; ++u) {
+        if(_G.docks[u] != dock) {
+            continue;
+        }
+
+        uint32_t last_idx = dock_n - 1;
+        _G.docks[u] = _G.docks[last_idx];
+        ce_array_pop_back(_G.docks);
+    }
+}
 
 void draw_all() {
     uint64_t n = ce_array_size(_G.docks);
@@ -108,6 +133,15 @@ void draw_all() {
                 }
             }
             ct_debugui_a0->EndDock();
+
+            if(!visible) {
+                close_dock(dock);
+            }
+
+//            ce_cdb_obj_o *w=ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+//            ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
+//            ce_cdb_a0->write_commit(w);
+
         }
     }
 }
