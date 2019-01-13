@@ -1624,7 +1624,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_UINT64: {
                         uint64_t u = read_uint64(w, ev->prop, 0);
-                        if (u != ev->old_value.uint64) {
+                        if (u == ev->old_value.uint64) {
                             set_uint64(w, ev->prop, ev->new_value.uint64);
                         }
                     }
@@ -1632,7 +1632,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_FLOAT: {
                         float f = read_float(w, ev->prop, 0);
-                        if (f != ev->old_value.f) {
+                        if (f == ev->old_value.f) {
                             set_float(w, ev->prop, ev->new_value.f);
                         }
                     }
@@ -1640,7 +1640,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_BOOL: {
                         bool b = read_bool(w, ev->prop, 0);
-                        if (b != ev->old_value.b) {
+                        if (b == ev->old_value.b) {
                             set_bool(w, ev->prop, ev->new_value.b);
                         }
                     }
@@ -1648,7 +1648,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_STR: {
                         const char *str = read_string(w, ev->prop, 0);
-                        if (str != ev->old_value.str) {
+                        if (str == ev->old_value.str) {
                             set_string(w, ev->prop, ev->new_value.str);
                         }
                     }
@@ -1656,7 +1656,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_PTR: {
                         void *ptr = read_ptr(w, ev->prop, 0);
-                        if (ptr != ev->old_value.ptr) {
+                        if (ptr == ev->old_value.ptr) {
                             set_ptr(w, ev->prop, ev->new_value.ptr);
                         }
                     }
@@ -1664,7 +1664,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_SUBOBJECT: {
                         void *ptr = read_ptr(w, ev->prop, 0);
-                        if (ptr != ev->old_value.ptr) {
+                        if (ptr == ev->old_value.ptr) {
                             uint64_t new_so = create_from(db,
                                                           ev->new_value.subobj);
                             set_subobject(w, ev->prop, new_so);
@@ -1675,7 +1675,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_REF: {
                         uint64_t ref = read_ref(w, ev->prop, 0);
-                        if (ref != ev->old_value.ref) {
+                        if (ref == ev->old_value.ref) {
                             set_ref(w, ev->prop, ev->new_value.ref);
                         }
                     }
@@ -1889,8 +1889,6 @@ static void load(struct ce_cdb_t db,
                     fakeop->offset[i]);
 
             switch (t) {
-                case CDB_TYPE_NONE:
-                    break;
                 case CDB_TYPE_UINT64:
                     set_uint64(obj, name, value_ptr->uint64);
                     break;
@@ -1913,6 +1911,8 @@ static void load(struct ce_cdb_t db,
                     set_uint64(obj, name, value_ptr->subobj);
                     break;
                 case CDB_TYPE_BLOB:
+                    break;
+                case CDB_TYPE_NONE:
                     break;
                 default:
                     break;
