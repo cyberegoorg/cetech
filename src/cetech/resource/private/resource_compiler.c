@@ -73,21 +73,13 @@ static bool _is_ref(const char *str) {
 }
 
 uint64_t compile_obj(struct ce_cdb_t db,
-                     uint64_t input_obj) {
+                     uint64_t input_obj, uint64_t uid) {
 
     const ce_cdb_obj_o *input_r = ce_cdb_a0->read(ce_cdb_a0->db(), input_obj);
 
     const char *type_s = ce_cdb_a0->read_str(input_r, CDB_TYPE_PROP, NULL);
-    const char *uid_s = ce_cdb_a0->read_str(input_r, CDB_UID_PROP, NULL);
 
     uint64_t type = ce_id_a0->id64(type_s);
-
-    uint64_t uid = 0;
-    if (uid_s) {
-        uid = _uid_from_str(uid_s);
-    } else {
-        uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), input_obj);
-    }
 
     uint64_t obj = 0;
     ce_cdb_a0->create_object_uid(db, uid, type);
@@ -153,8 +145,6 @@ uint64_t compile_obj(struct ce_cdb_t db,
                 uint64_t ref_uid = 0;
                 if (suid_s) {
                     ref_uid = _uid_from_str(suid_s);
-                } else {
-                    ref_uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), subobj);
                 }
 
                 ce_cdb_a0->set_subobject(obj_w, p, ref_uid);
@@ -231,6 +221,14 @@ void _scan_obj(const char *filename,
             continue;
         }
 
+        if (CDB_INSTANCE_PROP == k) {
+            continue;
+        }
+
+        if (CDB_TYPE_PROP == k) {
+            continue;
+        }
+
         enum ce_cdb_type t = ce_cdb_a0->prop_type(reader, k);
 
         if (t == CDB_TYPE_SUBOBJECT) {
@@ -242,19 +240,15 @@ void _scan_obj(const char *filename,
 
             const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
 
-//            if (!uid_s) {
-//                ce_log_a0->warning(LOG_WHERE, "In %s exist element without cdb_uid",
-//                                   filename);
-//                continue;
-//            }
-
-            uint64_t ref_uid = 0;
-            if (uid_s) {
-                ref_uid = strtoul(uid_s, NULL, 0);
-            } else {
-                ref_uid = ce_cdb_a0->obj_key(ce_cdb_a0->db(), sub_obj);
+            if (!uid_s) {
+                ce_log_a0->warning(LOG_WHERE,
+                                   "In %s exist element without cdb_uid",
+                                   filename);
+                continue;
             }
 
+            uint64_t ref_uid = 0;
+            ref_uid = strtoul(uid_s, NULL, 0);
             ce_array_push(after, ref_uid, _G.allocator);
 
         } else if (t == CDB_TYPE_STR) {
@@ -263,6 +257,9 @@ void _scan_obj(const char *filename,
                 uint64_t ref_uid = _uid_from_str(str);
                 ce_array_push(after, ref_uid, _G.allocator);
             }
+        } else if (t == CDB_TYPE_REF) {
+            uint64_t ref = ce_cdb_a0->read_ref(reader, k, 0);
+            ce_array_push(after, ref, _G.allocator);
         }
     }
 
@@ -297,11 +294,22 @@ void _scan_files(char **files,
     const uint64_t output_n = ce_array_size(obj_graph.output);
     for (int k = 0; k < output_n; ++k) {
         uint64_t obj = obj_graph.output[k];
-        ce_log_a0->info(LOG_WHERE, "Compile 0x%llx", obj);
+
+        char filename[256] = {};
+        ct_builddb_a0->get_resource_filename((struct ct_resource_id) {.uid=obj},
+                                             filename, CE_ARRAY_LEN(filename));
+
+        ce_log_a0->info(LOG_WHERE, "Compile 0x%llx from %s", obj, filename);
 
         uint64_t cobj = ce_hash_lookup(&obj_hash, obj, 0);
-        compile_obj(db, cobj);
+        compile_obj(db, cobj, obj);
     }
+
+    uint32_t diff = ce_array_size(obj_graph.output) - ce_array_size(obj_graph.name);
+    uint32_t diff2 = ce_array_size(obj_graph.name) - (ce_array_size(obj_graph.output));
+
+    CE_UNUSED(diff)
+    CE_UNUSED(diff2)
 
     for (int k = 0; k < output_n; ++k) {
         uint64_t obj = obj_graph.output[k];

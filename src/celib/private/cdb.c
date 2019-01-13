@@ -96,7 +96,8 @@ void set_loader(ct_cdb_obj_loader loader) {
 }
 
 
-static uint64_t _next_uid(uint64_t epoch_offset, uint32_t session) {
+static uint64_t _next_uid(uint64_t epoch_offset,
+                          uint32_t session) {
     static atomic_int g_seq;
     union {
         uint64_t ui;
@@ -108,7 +109,7 @@ static uint64_t _next_uid(uint64_t epoch_offset, uint32_t session) {
     } id = {.ui = 0};
 
     id.timestamp = (uint64_t) (time(NULL) - epoch_offset);
-    id.session  = session;
+    id.session = session;
     id.seq = atomic_fetch_add(&g_seq, 1) + 1;
 
 //    ce_log_a0->debug(LOG_WHERE, "New UID 0x%llx", id.ui);
@@ -395,12 +396,15 @@ static bool prop_exist(const ce_cdb_obj_o *reader,
     return false;
 }
 
+void prop_copy(const ce_cdb_obj_o *from,
+               ce_cdb_obj_o *to,
+               uint64_t prorp);
+
 static void set_from(struct ce_cdb_t _db,
                      uint64_t from,
                      uint64_t to) {
     struct db_t *db = _get_db(_db);
 
-    struct object_t *obj = _get_object_from_id(db, from);
     struct object_t *inst = _get_object_from_id(db, to);
 
     inst->db = _db;
@@ -409,73 +413,23 @@ static void set_from(struct ce_cdb_t _db,
     _set_uid_obj(db, uid, inst);
 
     inst->instance_of = from;
-    inst->type = obj->type;
 
-    ce_array_push(obj->instances, uid, _G.allocator);
+    struct object_t *obj = _get_object_from_id(db, from);
 
-
-    struct object_t *wr = write_begin(_db, uid);
+    if (obj) {
+        ce_array_push(obj->instances, uid, _G.allocator);
+    }
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(_db, from);
-    const ce_cdb_obj_o *to_reader = ce_cdb_a0->read(_db, to);
+    const ce_cdb_obj_o *to_reader = ce_cdb_a0->read(_db, uid);
 
+    struct object_t *wr = write_begin(_db, uid);
     for (int i = 1; i < obj->properties_count; ++i) {
         uint64_t key = obj->keys[i];
         if (prop_exist(to_reader, key)) {
             continue;
         }
-
-        switch (obj->property_type[i]) {
-            case CDB_TYPE_SUBOBJECT: {
-                union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                        obj->values +
-                        obj->offset[i]);
-
-                uint64_t old_subobj = value_ptr->subobj;
-                set_subobject(wr, obj->keys[i], old_subobj);
-            }
-                break;
-
-            case CDB_TYPE_UINT64: {
-                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
-                ce_cdb_a0->set_uint64(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_PTR: {
-                void *v = ce_cdb_a0->read_ptr(reader, key, 0);
-                ce_cdb_a0->set_ptr(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_REF: {
-                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
-                ce_cdb_a0->set_ref(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_FLOAT: {
-                float v = ce_cdb_a0->read_float(reader, key, 0);
-                ce_cdb_a0->set_float(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_BOOL: {
-                bool v = ce_cdb_a0->read_bool(reader, key, 0);
-                ce_cdb_a0->set_bool(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_STR: {
-                const char *v = ce_cdb_a0->read_str(reader, key, NULL);
-                ce_cdb_a0->set_str(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_BLOB: {
-                uint64_t size = 0;
-                void *v = ce_cdb_a0->read_blob(reader, key, &size,
-                                               NULL);
-                ce_cdb_a0->set_blob(wr, key, v, size);
-            }
-                break;
-            default:
-                break;
-        }
+        prop_copy(reader, wr, key);
     }
 
     write_commit(wr);
@@ -498,64 +452,21 @@ static uint64_t create_from(struct ce_cdb_t db,
 
     ce_array_push(obj->instances, uid, _G.allocator);
 
-    struct object_t *wr = write_begin(db, uid);
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, _obj);
-
+    struct object_t *wr = write_begin(db, uid);
     for (int i = 1; i < obj->properties_count; ++i) {
         uint64_t key = obj->keys[i];
-        switch (obj->property_type[i]) {
-            case CDB_TYPE_SUBOBJECT: {
-                union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                        obj->values +
-                        obj->offset[i]);
+        if (obj->property_type[i] == CDB_TYPE_SUBOBJECT) {
+            union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+                    obj->values +
+                    obj->offset[i]);
 
-                uint64_t old_subobj = value_ptr->subobj;
-                uint64_t new_subobj = create_from(db, old_subobj);
-                set_subobject(wr, obj->keys[i], new_subobj);
-            }
-                break;
-
-            case CDB_TYPE_UINT64: {
-                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
-                ce_cdb_a0->set_uint64(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_PTR: {
-                void *v = ce_cdb_a0->read_ptr(reader, key, 0);
-                ce_cdb_a0->set_ptr(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_REF: {
-                uint64_t v = ce_cdb_a0->read_uint64(reader, key, 0);
-                ce_cdb_a0->set_ref(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_FLOAT: {
-                float v = ce_cdb_a0->read_float(reader, key, 0);
-                ce_cdb_a0->set_float(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_BOOL: {
-                bool v = ce_cdb_a0->read_bool(reader, key, 0);
-                ce_cdb_a0->set_bool(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_STR: {
-                const char *v = ce_cdb_a0->read_str(reader, key, NULL);
-                ce_cdb_a0->set_str(wr, key, v);
-            }
-                break;
-            case CDB_TYPE_BLOB: {
-                uint64_t size = 0;
-                void *v = ce_cdb_a0->read_blob(reader, key, &size,
-                                               NULL);
-                ce_cdb_a0->set_blob(wr, key, v, size);
-            }
-                break;
-            default:
-                break;
+            uint64_t old_subobj = value_ptr->subobj;
+            uint64_t new_subobj = create_from(db, old_subobj);
+            set_subobject(wr, obj->keys[i], new_subobj);
         }
+        prop_copy(reader, inst, key);
     }
 
     write_commit(wr);
@@ -580,7 +491,7 @@ static void _add_obj_to_destroy_list(struct db_t *db_inst,
         break;
     }
 
-    if(contain) {
+    if (contain) {
         return;
     }
 //    CE_ASSERT(LOG_WHERE, !contain);
@@ -736,6 +647,7 @@ struct cdb_binobj_header {
     uint64_t version;
     uint64_t type;
     uint64_t parent;
+    uint64_t instance_of;
     uint64_t properties_count;
     uint64_t values_size;
     uint64_t string_buffer_size;
@@ -795,6 +707,7 @@ static void dump(struct ce_cdb_t db,
     struct cdb_binobj_header header = {
             .type = obj->type,
             .parent = obj->parent,
+            .instance_of = obj->instance_of,
             .properties_count = obj->properties_count - 1,
             .values_size = ce_array_size(values),
             .string_buffer_size = ce_array_size(str_buffer),
@@ -838,7 +751,6 @@ static void load(struct ce_cdb_t db,
                  struct ce_alloc *allocator) {
     struct db_t *db_inst = _get_db(db);
 
-
     const struct cdb_binobj_header *header;
     header = (const struct cdb_binobj_header *) input;
 
@@ -848,6 +760,13 @@ static void load(struct ce_cdb_t db,
     }
 
     obj->parent = header->parent;
+    obj->instance_of = header->instance_of;
+
+//    if (header->instance_of) {
+//        struct object_t *instance_obj = _get_object_from_id(db_inst,
+//                                                            header->instance_of);
+//        ce_array_push(instance_obj->instances, _obj, _G.allocator);
+//    }
 
     uint64_t *keys = (uint64_t *) (header + 1);
     uint8_t *ptype = (uint8_t *) (keys + header->properties_count);
@@ -1684,11 +1603,16 @@ static void dump_str(struct ce_cdb_t _db,
     uint64_t instance_of = ce_cdb_a0->read_instance_of(reader);
     if (instance_of) {
         _push_space(buffer, level);
-        ce_buffer_printf(buffer, _G.allocator, "cdb_instance: 0x%llx\n", instance_of);
+        ce_buffer_printf(buffer, _G.allocator, "cdb_instance: 0x%llx\n",
+                         instance_of);
     }
 
     for (int i = 0; i < prop_count; ++i) {
         uint64_t key = keys[i];
+
+        if(key == CDB_INSTANCE_PROP) {
+            continue;
+        }
 
         if (instance_of) {
             const ce_cdb_obj_o *ir = ce_cdb_a0->read(_db, instance_of);
@@ -1849,7 +1773,8 @@ static void _dispatch_instances(struct ce_cdb_t db,
                     case CDB_TYPE_SUBOBJECT: {
                         void *ptr = read_ptr(w, ev->prop, 0);
                         if (ptr != ev->old_value.ptr) {
-                            uint64_t new_so = create_from(db, ev->new_value.subobj);
+                            uint64_t new_so = create_from(db,
+                                                          ev->new_value.subobj);
                             set_subobject(w, ev->prop, new_so);
                         }
                     }

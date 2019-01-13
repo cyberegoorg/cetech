@@ -57,7 +57,7 @@ struct ct_resource_i0 {
 struct ct_resource_a0 {
     struct ct_resource_i0 *(*get_interface)(uint64_t type);
     bool (*cdb_loader)(uint64_t uid);
-    void (*reload_from_obj)(struct ct_resource_id resource_id, uint64_t obj);
+    bool (*save)(uint64_t uid);
 };
 
 CE_MODULE(ct_resource_a0);

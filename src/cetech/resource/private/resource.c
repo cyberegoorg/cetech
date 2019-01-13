@@ -98,7 +98,7 @@ static void load(const uint64_t *names,
 
         struct ct_resource_id rid = {.uid = asset_name};
 
-        if(!ct_builddb_a0->obj_exist(rid)) {
+        if (!ct_builddb_a0->obj_exist(rid)) {
             ce_log_a0->error(LOG_WHERE,
                              "Obj 0x%llx does not exist in DB", rid.uid);
             continue;
@@ -113,8 +113,8 @@ static void load(const uint64_t *names,
 
         ce_log_a0->debug(LOG_WHERE, "Loading resource 0x%llx", rid.uid);
         if (!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
-            ce_log_a0->error(LOG_WHERE,
-                             "Could not load resource 0x%llx", rid.uid);
+            ce_log_a0->warning(LOG_WHERE,
+                               "Could not load resource 0x%llx", rid.uid);
             ce_cdb_a0->destroy_object(ce_cdb_a0->db(), object);
             continue;
         }
@@ -188,38 +188,32 @@ static bool cdb_loader(uint64_t uid) {
     return true;
 }
 
-static void put(struct ct_resource_id resource_id,
-                uint64_t obj) {
+static bool save(uint64_t uid) {
+    struct ct_resource_id r = {.uid=uid};
+    char filename[256] = {};
+    bool exist = ct_builddb_a0->get_resource_filename(r,
+                                                      filename,
+                                                      CE_ARRAY_LEN(filename));
 
-    uint64_t object = ce_hash_lookup(&_G.res_map, resource_id.uid, 0);
+    if (exist) {
+        char *buf = NULL;
+        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uid, 0);
 
-    if (!object) {
-        return;
+        struct ce_vio *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
+        f->write(f, buf, ce_buffer_size(buf), 1);
+        ce_fs_a0->close(f);
+        ce_buffer_free(buf, _G.allocator);
+
+        return true;
     }
 
-    uint64_t type = ct_builddb_a0->get_resource_type(resource_id);
-
-    struct ct_resource_i0 *resource_i = get_resource_interface(type);
-
-    if (!resource_i) {
-        return;
-    }
-
-    if (resource_i->online) {
-        resource_i->online(resource_id.uid, obj);
-    }
-
-    if (resource_i->offline) {
-        resource_i->offline(resource_id.uid, object);
-    }
-
-    ce_cdb_a0->move(ce_cdb_a0->db(), obj, object);
+    return false;
 }
 
 static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
         .cdb_loader = cdb_loader,
-        .reload_from_obj = put,
+        .save = save,
 };
 
 

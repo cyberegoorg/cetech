@@ -11,6 +11,7 @@ struct ce_ba_graph {
     uint64_t *name;
     uint64_t *input;
     uint64_t *output;
+    uint64_t *output_no_dep;
 };
 
 static inline void _ce_bag_remove(uint64_t *a,
@@ -69,10 +70,10 @@ static inline void ce_bag_add(struct ce_ba_graph *sg,
         uint64_t idx = ce_bag_get_or_create(sg, a_name, alloc);
         ce_array_push(sg->before[idx], name, alloc);
     }
-
 }
 
 static inline void ce_bag_clean(struct ce_ba_graph *sg) {
+    ce_array_clean(sg->output_no_dep);
     ce_array_clean(sg->output);
     ce_array_clean(sg->input);
     ce_array_clean(sg->name);
@@ -92,6 +93,7 @@ static inline void ce_bag_build(struct ce_ba_graph *sg,
 
     uint64_t name_n = ce_array_size(sg->name);
     for (int j = 0; j < name_n; ++j) {
+
         if (ce_array_size(sg->before[j])) {
             continue;
         }

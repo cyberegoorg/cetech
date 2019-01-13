@@ -180,7 +180,7 @@ struct ce_array_header_t {
 #define ce_array_insert(a, idx, v, alloc) \
     do {\
         ce_array_resize(a, ce_array_size(a) + 1, alloc);\
-        memcpy(a+idx+1,a+idx, (ce_array_size(a)-idx)*sizeof(*(a)));\
+        memmove(a+idx+1,a+idx, (ce_array_size(a)-idx)*sizeof(*(a)));\
         a[idx] = v;\
     } while(0)
 

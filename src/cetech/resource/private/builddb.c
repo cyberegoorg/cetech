@@ -508,7 +508,7 @@ uint64_t resource_type(struct ct_resource_id resource) {
     return type;
 }
 
-uint64_t resource_filename(struct ct_resource_id resource,
+bool resource_filename(struct ct_resource_id resource,
                            char *filename,
                            size_t max_len) {
     sqlite3 *_db = _opendb();

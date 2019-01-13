@@ -51,7 +51,7 @@
 // - *n* - bucket size
 // - *keys* - keys [array](array.md.html)
 // - *values* - values [array](array.md.html)
-struct ce_hash_t {
+struct  ce_hash_t {
     uint32_t n;
     uint64_t *keys;
     uint64_t *values;

@@ -40,7 +40,7 @@ struct ct_builddb_a0 {
 
     uint64_t (*get_resource_type)(struct ct_resource_id resource);
 
-    uint64_t (*get_resource_filename)(struct ct_resource_id resource,
+    bool (*get_resource_filename)(struct ct_resource_id resource,
                                       char *filename,
                                       size_t max_len);
 

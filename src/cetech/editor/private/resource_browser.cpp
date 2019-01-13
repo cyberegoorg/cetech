@@ -93,8 +93,19 @@ static void ui_asset_menu(uint64_t dock) {
 
     ct_debugui_a0->SameLine(0, -1);
 
-    if (ct_debugui_a0->Button("Edit asset", (float[2]) {0, 0})) {
+    if (ct_debugui_a0->Button(ICON_FA_PENCIL, (float[2]) {0, 0})) {
         _broadcast_edit(dock);
+    }
+
+    ct_debugui_a0->SameLine(0, -1);
+    if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, (float[2]) {0, 0})) {
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+
+        const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                        0);
+
+        uint64_t selected = ct_selected_object_a0->selected_object(context);
+        ct_resource_a0->save(selected);
     }
 }
 
