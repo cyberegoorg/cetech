@@ -413,9 +413,9 @@ static int buildb_get_resource_dirs(char ***filename,
 static int buildb_get_resource_from_dirs(const char *dir,
                                          char ***filename,
                                          struct ce_alloc *alloc) {
-    if (!strlen(dir)) {
-        return 0;
-    }
+//    if (!strlen(dir)) {
+//        return 0;
+//    }
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -432,7 +432,7 @@ static int buildb_get_resource_from_dirs(const char *dir,
         type = (const char *) sqlite3_column_text(sqls->get_resource_from_dirs,
                                                   1);
 
-        if (name) {
+        if (name && name[0]) {
             const size_t len = strlen(name) + strlen(type) + 2;
 
             char *fn = CE_ALLOC(alloc, char, len);

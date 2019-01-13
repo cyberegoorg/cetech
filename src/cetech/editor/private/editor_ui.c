@@ -335,12 +335,13 @@ static bool resource_select_modal(const char *modal_id,
                 ct_debugui_a0->EndTooltip();
             }
 
-            if (selected || ct_debugui_a0->IsItemClicked(0)) {
+            if (selected) {
                 *selected_resource = ct_builddb_a0->get_uid(name,
                                                             resource_type_s);
                 changed = true;
 
                 modal_buffer[0] = '\0';
+                break;
             }
         }
 
@@ -402,11 +403,11 @@ static void ui_resource(uint64_t obj,
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
-    change |= ct_debugui_a0->InputText(labelid,
-                                       buffer,
-                                       strlen(buffer),
-                                       DebugInputTextFlags_ReadOnly,
-                                       0, NULL);
+    ct_debugui_a0->InputText(labelid,
+                             buffer,
+                             strlen(buffer),
+                             DebugInputTextFlags_ReadOnly,
+                             0, NULL);
 
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();

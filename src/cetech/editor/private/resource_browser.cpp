@@ -23,6 +23,9 @@
 #include <cetech/editor/log_view.h>
 #include <celib/log.h>
 #include <cetech/editor/editor_ui.h>
+#include <cetech/controlers/controlers.h>
+#include <cetech/controlers/keyboard.h>
+#include <fnmatch.h>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -72,7 +75,7 @@ static void _broadcast_edit(uint64_t dock) {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-    if(obj) {
+    if (obj) {
         char *buf = NULL;
         ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
         ce_log_a0->debug("resource browser", "\n%s", buf);
@@ -86,6 +89,142 @@ static void _broadcast_selected(uint64_t dock) {
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 
+
+
+static char modal_buffer[128] = {};
+static char modal_buffer_name[128] = {};
+static char modal_buffer_type[128] = {};
+static char modal_buffer_from[128] = {};
+
+static void _create_from_modal(const char *modal_id) {
+    bool open = true;
+    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
+                                     static_cast<DebugUICond>(0));
+
+
+    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+
+        if (kb->button_pressed(0, kb->button_index("escape"))) {
+            ct_debugui_a0->CloseCurrentPopup();
+            ct_debugui_a0->EndPopup();
+            return;
+        }
+
+        char labelidi[128] = {'\0'};
+
+        sprintf(labelidi, "Name##modal_create_from_name%llu", 1ULL);
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer_name,
+                                 CE_ARRAY_LEN(modal_buffer_name),
+                                 0, 0, NULL);
+
+
+        sprintf(labelidi, "##modal_create_from_input%llu", 1ULL);
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer,
+                                 CE_ARRAY_LEN(modal_buffer),
+                                 0, 0, NULL);
+
+        bool add = ct_debugui_a0->Button(ICON_FA_PLUS,
+                                         (float[2]) {0.0f});
+
+        if (add) {
+            uint64_t uid = ct_builddb_a0->get_uid(modal_buffer_from,
+                                                  modal_buffer_type);
+
+            if (uid) {
+                uint64_t new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                                          uid);
+
+                char filename[256] = {};
+                snprintf(filename, CE_ARRAY_LEN(filename),
+                         "%s.%s.yml", modal_buffer_name, modal_buffer_type);
+
+
+                ct_resource_id rid = {.uid = new_res};
+
+                ct_builddb_a0->put_resource(rid, modal_buffer_type,
+                                            filename, modal_buffer_name);
+
+                ct_builddb_a0->put_file(filename, 0);
+
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         new_res);
+                ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
+                ce_cdb_a0->write_commit(w);
+            }
+
+            _G.need_reaload = true;
+
+            ct_debugui_a0->CloseCurrentPopup();
+            ct_debugui_a0->EndPopup();
+            return;
+        }
+
+        char **asset_list = NULL;
+
+        ct_builddb_a0->get_resource_from_dirs("", &asset_list,
+                                              _G.allocator);
+
+        uint32_t dir_n = ce_array_size(asset_list);
+        for (int i = 0; i < dir_n; ++i) {
+            const char *path = asset_list[i];
+
+            if (!path || !path[0]) {
+                continue;
+            }
+
+            const char *filename = ce_os_a0->path->filename(path);
+            uint64_t filename_hash = ce_id_a0->id64(filename);
+
+            char filter[256] = {};
+            snprintf(filter, CE_ARRAY_LEN(filter),
+                     "*%s*", modal_buffer);
+
+            if (0 != fnmatch(filter, path, FNM_CASEFOLD)) {
+                continue;
+            }
+
+            char label[128];
+
+            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", path);
+
+            bool selected = ImGui::Selectable(label,
+                                              _G.selected_file == filename_hash,
+                                              ImGuiSelectableFlags_DontClosePopups);
+
+            if (selected) {
+                const char *type = ce_os_a0->path->extension(path);
+
+                char name[256] = {};
+                uint32_t path_len = snprintf(name, CE_ARRAY_LEN(name),
+                                             "%s", path);
+                uint32_t type_len = strlen(type);
+
+                name[path_len - type_len - 1] = '\0';
+
+
+                snprintf(modal_buffer_name, CE_ARRAY_LEN(modal_buffer_name),
+                         "%s", name);
+
+                snprintf(modal_buffer_type, CE_ARRAY_LEN(modal_buffer_type),
+                         "%s", type);
+
+                snprintf(modal_buffer_from, CE_ARRAY_LEN(modal_buffer_from),
+                         "%s", name);
+
+            }
+        }
+
+        ct_builddb_a0->get_resource_from_dirs_clean(asset_list,
+                                                    _G.allocator);
+
+
+        ct_debugui_a0->EndPopup();
+    }
+}
+
 static void ui_asset_menu(uint64_t dock) {
     //    ct_debugui_a0->SameLine(0, -1);
 
@@ -97,11 +236,27 @@ static void ui_asset_menu(uint64_t dock) {
     if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, (float[2]) {0, 0})) {
         const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-        const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+        const uint64_t context = ce_cdb_a0->read_uint64(reader,
+                                                        PROP_DOCK_CONTEXT,
                                                         0);
 
         uint64_t selected = ct_selected_object_a0->selected_object(context);
         ct_resource_a0->save(selected);
+    }
+
+
+    ct_debugui_a0->SameLine(0, -1);
+    bool create_from = ct_debugui_a0->Button(
+            ICON_FA_PLUS" " ICON_FA_FOLDER_OPEN,
+            (float[2]) {0, 0});
+
+    char modal_id[128] = {'\0'};
+    sprintf(modal_id, "select...##select_comp_%llu", 1ULL);
+
+    _create_from_modal(modal_id);
+
+    if (create_from) {
+        ct_debugui_a0->OpenPopup(modal_id);
     }
 }
 
