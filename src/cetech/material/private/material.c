@@ -580,7 +580,6 @@ static int init(struct ce_api_a0 *api) {
 }
 
 static void shutdown() {
-    ce_cdb_a0->destroy_db(_G.db);
 }
 
 CE_MODULE_DEF(

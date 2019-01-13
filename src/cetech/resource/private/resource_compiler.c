@@ -305,12 +305,6 @@ void _scan_files(char **files,
         compile_obj(db, cobj, obj);
     }
 
-    uint32_t diff = ce_array_size(obj_graph.output) - ce_array_size(obj_graph.name);
-    uint32_t diff2 = ce_array_size(obj_graph.name) - (ce_array_size(obj_graph.output));
-
-    CE_UNUSED(diff)
-    CE_UNUSED(diff2)
-
     for (int k = 0; k < output_n; ++k) {
         uint64_t obj = obj_graph.output[k];
 

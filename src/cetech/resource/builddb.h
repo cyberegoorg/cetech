@@ -28,6 +28,7 @@ struct ct_builddb_a0 {
 
     bool (*load_cdb_file)(struct ct_resource_id resource,
                           uint64_t object,
+                          uint64_t type,
                           struct ce_alloc *allocator);
 
     void (*add_dependency)(const char *who_filename,

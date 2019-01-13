@@ -20,6 +20,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/builddb.h>
 #include <cetech/resource/resource_compiler.h>
+#include <stdlib.h>
 
 
 #include "../resource.h"
@@ -36,7 +37,6 @@
 //==============================================================================
 
 struct _G {
-    struct ce_hash_t res_map;
     struct ce_hash_t type_map;
 
     struct ce_cdb_t db;
@@ -65,16 +65,6 @@ static void load(const uint64_t *names,
                  size_t count,
                  int force);
 
-static void load_now(const uint64_t *names,
-                     size_t count) {
-    load(names, count, 0);
-}
-
-static int can_get(uint64_t name) {
-    return ce_hash_contain(&_G.res_map, name);
-}
-
-
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
     return (struct ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
@@ -85,20 +75,14 @@ static void load(const uint64_t *names,
                  int force) {
     uint32_t start_ticks = ce_os_a0->time->ticks();
 
-    uint64_t resource_objects[count];
 
     for (uint32_t i = 0; i < count; ++i) {
-        resource_objects[i] = 0;
-
         const uint64_t asset_name = names[i];
-
-        if (!force && can_get(asset_name)) {
-            continue;
-        };
 
         struct ct_resource_id rid = {.uid = asset_name};
 
         if (!ct_builddb_a0->obj_exist(rid)) {
+//            abort();
             ce_log_a0->error(LOG_WHERE,
                              "Obj 0x%llx does not exist in DB", rid.uid);
             continue;
@@ -107,19 +91,12 @@ static void load(const uint64_t *names,
         uint64_t type = ct_builddb_a0->get_resource_type(
                 (struct ct_resource_id) {.uid=asset_name});
 
-        ce_cdb_a0->create_object_uid(_G.db, asset_name, type);
-
-        uint64_t object = asset_name;
-
-        ce_log_a0->debug(LOG_WHERE, "Loading resource 0x%llx", rid.uid);
-        if (!ct_builddb_a0->load_cdb_file(rid, object, _G.allocator)) {
+        if (!ct_builddb_a0->load_cdb_file(rid, asset_name, type,
+                                          _G.allocator)) {
             ce_log_a0->warning(LOG_WHERE,
                                "Could not load resource 0x%llx", rid.uid);
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), object);
             continue;
         }
-
-        resource_objects[i] = object;
 
         struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
@@ -128,16 +105,8 @@ static void load(const uint64_t *names,
         }
 
         if (resource_i->online) {
-            resource_i->online(names[i], object);
+            resource_i->online(names[i], asset_name);
         }
-    }
-
-    for (uint32_t i = 0; i < count; ++i) {
-        if (!resource_objects[i]) continue;
-
-        const uint64_t asset_name = names[i];
-
-        ce_hash_add(&_G.res_map, asset_name, resource_objects[i], _G.allocator);
     }
 
     uint32_t now_ticks = ce_os_a0->time->ticks();
@@ -164,27 +133,16 @@ void unload(const uint64_t *names,
 
             ce_log_a0->debug(LOG_WHERE, "Unload resource 0x%llx", rid.uid);
 
-            uint64_t object = ce_hash_lookup(&_G.res_map, rid.uid, 0);
-            if (!object) {
-                continue;
-            }
 
             if (resource_i->offline) {
-                resource_i->offline(names[i], object);
+                resource_i->offline(names[i], rid.uid);
             }
         }
     }
 }
 
 static bool cdb_loader(uint64_t uid) {
-    uint64_t object = ce_hash_lookup(&_G.res_map, uid, 0);
-    if (!object) {
-        load_now(&uid, 1);
-
-        uint64_t new_object = ce_hash_lookup(&_G.res_map, uid, 0);
-        return new_object != 0;
-    }
-
+    load(&uid, 1, 0);
     return true;
 }
 
@@ -262,8 +220,6 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ce_cdb_a0->destroy_db(_G.db);
-
     ce_hash_free(&_G.type_map, _G.allocator);
 }
 

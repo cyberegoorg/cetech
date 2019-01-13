@@ -334,6 +334,7 @@ static void put_resource(struct ct_resource_id rid,
 
 bool builddb_load_cdb_file(struct ct_resource_id resource,
                            uint64_t object,
+                           uint64_t type,
                            struct ce_alloc *allocator) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -343,10 +344,18 @@ bool builddb_load_cdb_file(struct ct_resource_id resource,
 
     int ok = _step(_db, sqls->load_file_blob) == SQLITE_ROW;
 
+    char *buff = NULL;
+
     if (ok) {
         const char *data = sqlite3_column_blob(sqls->load_file_blob, 0);
-        ce_cdb_a0->load(ce_cdb_a0->db(), data, object, allocator);
+        int s = sqlite3_column_bytes(sqls->load_file_blob, 0);
+        ce_array_push_n(buff, data, s, allocator);
+
         _step(_db, sqls->load_file_blob);
+
+        ce_cdb_a0->load(ce_cdb_a0->db(), buff, object, allocator);
+
+        ce_array_free(buff, allocator);
     }
 
     return ok != 0;
@@ -443,11 +452,9 @@ static bool builddb_obj_exist(struct ct_resource_id resource) {
 
     sqlite3_bind_int64(sqls->resource_exist, 1, resource.uid);
 
-
     int ok = _step(_db, sqls->resource_exist) == SQLITE_ROW;
     if (ok) {
         _step(_db, sqls->resource_exist);
-
         return true;
     }
 
@@ -509,8 +516,8 @@ uint64_t resource_type(struct ct_resource_id resource) {
 }
 
 bool resource_filename(struct ct_resource_id resource,
-                           char *filename,
-                           size_t max_len) {
+                       char *filename,
+                       size_t max_len) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -597,7 +604,7 @@ int get_resource_by_type(const char *name,
                 0);
 
         if (fn) {
-            char *dup_str = ce_memory_a0->str_dup((const char*)fn, alloc);
+            char *dup_str = ce_memory_a0->str_dup((const char *) fn, alloc);
             ce_array_push(*filename, dup_str, alloc);
         }
 

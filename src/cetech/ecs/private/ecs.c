@@ -24,6 +24,7 @@
 #include <cetech/editor/resource_preview.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
+#include <celib/buffer.inl>
 
 
 //==============================================================================
@@ -790,6 +791,12 @@ static void link(struct ct_world world,
 
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint64_t name) {
+
+//    char *buf = NULL;
+//    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, name, 0);
+//    ce_log_a0->debug(LOG_WHERE, "\n%s", buf);
+//    ce_buffer_free(buf, _G.allocator);
+
     struct world_instance *w = get_world_instance(world);
 
     struct ct_entity root_ent;
@@ -1167,7 +1174,6 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static void _shutdown() {
-    ce_cdb_a0->destroy_db(_G.db);
 }
 
 

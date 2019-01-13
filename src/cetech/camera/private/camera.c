@@ -40,7 +40,8 @@ static void get_project_view(struct ct_world world,
     struct ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
                                                                  CAMERA_COMPONENT,
                                                                  camera);
-
+    if(!transform) return;
+    if(!camera_data) return;
 
     float fov = camera_data->fov;
     float near = camera_data->near;
