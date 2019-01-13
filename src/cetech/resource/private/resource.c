@@ -146,6 +146,50 @@ static bool cdb_loader(uint64_t uid) {
     return true;
 }
 
+static bool dump_recursive(const char* filename, uint64_t obj) {
+    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const uint64_t k_n = ce_cdb_a0->prop_count(r);
+    const uint64_t *ks = ce_cdb_a0->prop_keys(r);
+
+    char *output = NULL;
+    ce_cdb_a0->dump(ce_cdb_a0->db(),
+                    obj, &output, _G.allocator);
+
+    struct ct_resource_id rid={.uid=obj};
+    ct_builddb_a0->put_resource_blob(rid,
+                                     output,
+                                     ce_array_size(output));
+    ce_buffer_free(output, _G.allocator);
+
+    for (int i = 0; i < k_n; ++i) {
+        uint64_t k = ks[i];
+        if(ce_cdb_a0->prop_type(r, k) != CDB_TYPE_SUBOBJECT) {
+            continue;
+        }
+        uint64_t subobj = ce_cdb_a0->read_subobject(r, k, 0);
+        dump_recursive(filename, subobj);
+    }
+
+    return true;
+}
+
+static bool save_to_db(uint64_t uid) {
+    uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
+
+    struct ct_resource_id r = {.uid=root};
+    char filename[256] = {};
+    bool exist = ct_builddb_a0->get_resource_filename(r,
+                                                      filename,
+                                                      CE_ARRAY_LEN(filename));
+
+    if (exist) {
+        dump_recursive(filename, root);
+        return true;
+    }
+
+    return false;
+}
+
 static bool save(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
@@ -164,6 +208,8 @@ static bool save(uint64_t uid) {
         ce_fs_a0->close(f);
         ce_buffer_free(buf, _G.allocator);
 
+        dump_recursive(filename, root);
+
         return true;
     }
 
@@ -174,6 +220,7 @@ static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
         .cdb_loader = cdb_loader,
         .save = save,
+        .save_to_db = save_to_db,
 };
 
 

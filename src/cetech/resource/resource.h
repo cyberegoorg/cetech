@@ -58,6 +58,7 @@ struct ct_resource_a0 {
     struct ct_resource_i0 *(*get_interface)(uint64_t type);
     bool (*cdb_loader)(uint64_t uid);
     bool (*save)(uint64_t uid);
+    bool (*save_to_db)(uint64_t uid);
 };
 
 CE_MODULE(ct_resource_a0);

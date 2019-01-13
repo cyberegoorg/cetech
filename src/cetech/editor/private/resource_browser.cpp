@@ -2,6 +2,7 @@
 #include <cetech/editor/resource_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/fs.h>
+#include <celib/buffer.inl>
 #include <celib/os.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
@@ -26,6 +27,7 @@
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 #include <fnmatch.h>
+#include <celib/hash.inl>
 
 #define WINDOW_NAME "Asset browser"
 
@@ -90,7 +92,6 @@ static void _broadcast_selected(uint64_t dock) {
 }
 
 
-
 static char modal_buffer[128] = {};
 static char modal_buffer_name[128] = {};
 static char modal_buffer_type[128] = {};
@@ -101,6 +102,10 @@ static void _create_from_modal(const char *modal_id) {
     ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
                                      static_cast<DebugUICond>(0));
 
+    if (!modal_buffer_name[0]) {
+        snprintf(modal_buffer_name, CE_ARRAY_LEN(modal_buffer_name), "%s",
+                 _G.current_dir);
+    }
 
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
         struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
@@ -113,12 +118,60 @@ static void _create_from_modal(const char *modal_id) {
 
         char labelidi[128] = {'\0'};
 
-        sprintf(labelidi, "Name##modal_create_from_name%llu", 1ULL);
+        sprintf(labelidi, "##modal_create_from_name%llu", 1ULL);
         ct_debugui_a0->InputText(labelidi,
                                  modal_buffer_name,
                                  CE_ARRAY_LEN(modal_buffer_name),
                                  0, 0, NULL);
 
+        uint64_t type = ce_id_a0->id64(modal_buffer_type);
+
+        int cur_type_idx = 1;
+        char *buffer = NULL;
+        ce_hash_t type_hash = {};
+
+        struct ce_api_entry it = ce_api_a0->first(RESOURCE_I);
+        uint32_t idx = 1;
+        while (it.api) {
+            struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
+
+            if (i->cdb_type() == type) {
+                cur_type_idx = idx - 1;
+            }
+
+            const char *type = ce_id_a0->str_from_id64(i->cdb_type());
+            ce_hash_add(&type_hash, idx, i->cdb_type(), _G.allocator);
+
+            ce_array_push_n(buffer, type, strlen(type) + 1, _G.allocator);
+
+            ++idx;
+
+            it = ce_api_a0->next(it);
+        }
+        ce_array_push(buffer, '\0', _G.allocator);
+
+
+        ct_debugui_a0->SameLine(0, 5);
+        sprintf(labelidi, "##modal_create_from_type_combo%llu", 1ULL);
+        bool type_change = ct_debugui_a0->Combo2(labelidi, &cur_type_idx,
+                                                 buffer, -1);
+
+        if (type_change) {
+            uint64_t type_id = ce_hash_lookup(&type_hash,
+                                              cur_type_idx + 1,
+                                              UINT64_MAX);
+            const char *tn = ce_id_a0->str_from_id64(type_id);
+            snprintf(modal_buffer_type, CE_ARRAY_LEN(modal_buffer_type),
+                     "%s", tn);
+        }
+
+        ce_hash_free(&type_hash, _G.allocator);
+
+        sprintf(labelidi, "Instance of##modal_create_from_name%llu", 1ULL);
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer_from,
+                                 CE_ARRAY_LEN(modal_buffer_from),
+                                 ImGuiInputTextFlags_ReadOnly, 0, NULL);
 
         sprintf(labelidi, "##modal_create_from_input%llu", 1ULL);
         ct_debugui_a0->InputText(labelidi,
@@ -130,17 +183,23 @@ static void _create_from_modal(const char *modal_id) {
                                          (float[2]) {0.0f});
 
         if (add) {
-            uint64_t uid = ct_builddb_a0->get_uid(modal_buffer_from,
-                                                  modal_buffer_type);
+            uint64_t new_res = 0;
 
-            if (uid) {
-                uint64_t new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
-                                                          uid);
+            if (modal_buffer_from[0]) {
+                uint64_t uid = ct_builddb_a0->get_uid(modal_buffer_from,
+                                                      modal_buffer_type);
+                if (uid) {
+                    new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
+                                                     uid);
+                }
+            } else {
+                new_res = ce_cdb_a0->create_object(ce_cdb_a0->db(), type);
+            }
 
+            if (new_res) {
                 char filename[256] = {};
                 snprintf(filename, CE_ARRAY_LEN(filename),
                          "%s.%s.yml", modal_buffer_name, modal_buffer_type);
-
 
                 ct_resource_id rid = {.uid = new_res};
 
@@ -153,12 +212,14 @@ static void _create_from_modal(const char *modal_id) {
                                                          new_res);
                 ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
                 ce_cdb_a0->write_commit(w);
+
+                ct_resource_a0->save(new_res);
+
+                _G.need_reaload = true;
+                ct_debugui_a0->CloseCurrentPopup();
+                ct_debugui_a0->EndPopup();
             }
 
-            _G.need_reaload = true;
-
-            ct_debugui_a0->CloseCurrentPopup();
-            ct_debugui_a0->EndPopup();
             return;
         }
 
