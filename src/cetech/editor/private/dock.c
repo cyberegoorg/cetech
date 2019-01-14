@@ -210,7 +210,11 @@ static void draw_menu() {
                                                         PROP_DOCK_CONTEXT, 0);
 
             const char *name = display_name(di);
+
+            char label[256] = {};
+
             if (ct_debugui_a0->BeginMenu(name, true)) {
+                snprintf(label, CE_ARRAY_LEN(label), "Context##%llx", dock);
                 if (ct_debugui_a0->BeginMenu("Context", true)) {
                     for (int j = 0; j < MAX_CONTEXT; ++j) {
                         char context_str[2] = {'0' + j};

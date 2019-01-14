@@ -47,6 +47,7 @@ struct ce_cdb_change_ev0 {
     uint64_t type;
     uint64_t obj;
     uint64_t prop;
+    uint64_t prop_type;
     union ce_cdb_value_u0 new_value;
     union ce_cdb_value_u0 old_value;
 };
@@ -87,6 +88,10 @@ struct ce_cdb_a0 {
 
     uint64_t (*create_from)(struct ce_cdb_t db,
                             uint64_t obj);
+
+    uint64_t (*clone)(struct ce_cdb_t db,
+                      uint64_t obj);
+
 
     void (*set_from)(struct ce_cdb_t db,
                      uint64_t from,

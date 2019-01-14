@@ -77,12 +77,12 @@ static void _broadcast_edit(uint64_t dock) {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-    if (obj) {
-        char *buf = NULL;
-        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
-        ce_log_a0->debug("resource browser", "\n%s", buf);
-        ce_buffer_free(buf, _G.allocator);
-    }
+//    if (obj) {
+//        char *buf = NULL;
+//        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
+//        ce_log_a0->debug("resource browser", "\n%s", buf);
+//        ce_buffer_free(buf, _G.allocator);
+//    }
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
@@ -427,7 +427,6 @@ static void ui_asset_list(uint64_t dock) {
     ct_debugui_a0->SameLine(0, 8);
     _G.asset_filter.Draw("");
 
-
     if (_G.need_reaload) {
         if (_G.asset_list) {
             ct_builddb_a0->get_resource_from_dirs_clean(_G.asset_list,
@@ -500,37 +499,6 @@ static void ui_asset_list(uint64_t dock) {
         }
 
     }
-
-
-
-//    if (_G.dir_list) {
-//        char dirname[128] = {};
-//        for (uint32_t i = 0; i < _G.dir_list_count; ++i) {
-//            const char *path = _G.dir_list[i];
-//            ce_os_a0->path->dirname(dirname, path);
-//            uint64_t filename_hash = ce_id_a0->id64(dirname);
-//
-//            if (!_G.asset_filter.PassFilter(dirname)) {
-//                continue;
-//            }
-//
-//            char label[128];
-//
-//            bool is_selected = _G.selected_file == filename_hash;
-//
-//            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER" %s", dirname);
-//
-//            if (ImGui::Selectable(label, is_selected,
-//                                  ImGuiSelectableFlags_AllowDoubleClick)) {
-//                _G.selected_file = filename_hash;
-//
-//                if (ImGui::IsMouseDoubleClicked(0)) {
-//                    set_current_dir(path, ce_id_a0->id64(path));
-//                }
-//            }
-//        }
-//    }
-
 
     ImGui::EndChild();
 }

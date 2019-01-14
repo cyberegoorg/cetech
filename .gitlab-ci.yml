@@ -34,7 +34,7 @@ docker_image:
 build:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
   stage: build
-
+  allow_failure: true
   variables:
     GIT_SUBMODULE_STRATEGY: normal
 
@@ -53,6 +53,7 @@ build:
 test_release:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
   stage: test
+  allow_failure: true
   variables:
     SDL_VIDEODRIVER: dummy
 
@@ -65,6 +66,7 @@ test_release:
 test_debug:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
   stage: test
+  allow_failure: true
   variables:
     SDL_VIDEODRIVER: dummy
 
