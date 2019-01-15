@@ -30,6 +30,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/debugdraw/debugdraw.h>
 #include <cetech/mesh/mesh_renderer.h>
+#include <celib/task.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
@@ -76,6 +77,11 @@ static uint32_t _get_reset_flags() {
 // Interface
 //==============================================================================
 
+static void _render_task(void* data) {
+    while(bgfx_render_frame(-1) != BGFX_RENDER_FRAME_EXITING) {
+    }
+}
+
 static void renderer_create() {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
@@ -117,6 +123,11 @@ static void renderer_create() {
     pd.nwh = _G.main_window->native_window_ptr(_G.main_window->inst);
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx_set_platform_data(&pd);
+
+    ce_task_a0->add(&(struct ce_task_item){
+            .work = _render_task,
+            .name = "Renderer worker",
+    }, 1, NULL);
 
     // TODO: from config
 

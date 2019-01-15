@@ -141,7 +141,7 @@ int do_work() {
 
     struct task_t *task = &_G.task_pool[t.id];
 
-    task->task_work(_G.task_pool[t.id].data);
+    task->task_work(task->data);
 
     atomic_fetch_sub(&_G.counter_pool[task->counter], 1);
     queue_task_push(&_G.free_task, t.id);
@@ -178,7 +178,9 @@ void add(struct ce_task_item *items,
          struct ce_task_counter_t **counter) {
     uint32_t new_counter = _new_counter_task(count);
 
-    *counter = (struct ce_task_counter_t *) &_G.counter_pool[new_counter];
+    if(counter) {
+        *counter = (struct ce_task_counter_t *) &_G.counter_pool[new_counter];
+    }
 
     for (uint32_t i = 0; i < count; ++i) {
         task_id_t task = _new_task();
@@ -230,7 +232,7 @@ static void _init(struct ce_api_a0 *api) {
 
     int core_count = ce_os_a0->cpu->count();
 
-    static const uint32_t main_threads_count = 1 ;//+ 1/* Renderer */;
+    static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
 
     ce_log_a0->info("task", "Core/Main/Worker: %d, %d, %d",
@@ -245,7 +247,7 @@ static void _init(struct ce_api_a0 *api) {
     atomic_init(&_G.counter_pool_idx, 1);
     atomic_init(&_G.task_pool_idx, 1);
 
-    for (uint32_t j = 1; j < worker_count; ++j) {
+    for (uint32_t j = 1; j < worker_count+1; ++j) {
         _G.workers[j] = ce_os_a0->thread->create(_task_worker,
                                                  "cetech_worker",
                                                  (void *) ((intptr_t) (j)));
