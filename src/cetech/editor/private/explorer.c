@@ -31,6 +31,7 @@
 #define WINDOW_NAME "Explorer"
 
 #define _G explorer_globals
+typedef const uint64_t i1;
 static struct _G {
     bool visible;
     struct ce_alloc *allocator;
@@ -52,7 +53,8 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
     return NULL;
 }
 
-static uint64_t draw(uint64_t selected_obj, uint64_t context) {
+static uint64_t draw(uint64_t selected_obj,
+                     uint64_t context) {
     uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
 
@@ -64,22 +66,30 @@ static uint64_t draw(uint64_t selected_obj, uint64_t context) {
     return 0;
 }
 
-static void draw_menu(uint64_t selected_obj, uint64_t context) {
-    uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
-                                                  selected_obj);
+static void draw_menu(uint64_t dock) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    i1 context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    if (!selected_object) {
+        return;
+    }
+
+    uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
+                                                  selected_object);
+
+    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                  top_level_obj);
 
-    if (ce_cdb_a0->prop_exist(reader, ASSET_NAME_PROP)) {
-        const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
+    if (ce_cdb_a0->prop_exist(tlreader, ASSET_NAME_PROP)) {
+        const char *name = ce_cdb_a0->read_str(tlreader, ASSET_NAME_PROP, "");
         ct_debugui_a0->Text("Resource: %s", name);
     }
 
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(tlreader));
     if (i && i->draw_menu) {
-        i->draw_menu(selected_obj, context);
+        i->draw_menu(selected_object, context);
     }
 }
 
@@ -88,13 +98,14 @@ static void on_debugui(uint64_t dock) {
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
 
-    if (!ct_selected_object_a0->selected_object(context)) {
+    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
+
+    if (!selected_object) {
         return;
     }
 
-    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
-    draw_menu(selected_object, context);
+//    draw_menu(selected_object, context);
 
     ct_debugui_a0->Separator();
 
@@ -130,6 +141,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
+        .draw_menu = draw_menu,
 };
 
 

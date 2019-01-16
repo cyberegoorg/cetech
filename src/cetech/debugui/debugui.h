@@ -913,6 +913,8 @@ struct ct_debugui_a0 {
 
     void (*SetNextWindowSize)(const float size[2],
                               enum DebugUICond cond);
+
+    void (*EndChild)();
 };
 
 

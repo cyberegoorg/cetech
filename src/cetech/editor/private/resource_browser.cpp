@@ -1,19 +1,22 @@
-#include <cetech/debugui/debugui.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <fnmatch.h>
+
 #include <celib/fs.h>
 #include <celib/buffer.inl>
 #include <celib/os.h>
-#include <cetech/resource/resource.h>
-#include <cetech/editor/editor.h>
-
-#include <cetech/debugui/icons_font_awesome.h>
-
 #include "celib/hashlib.h"
 #include "celib/config.h"
 #include "celib/memory.h"
 #include "celib/api_system.h"
 #include "celib/module.h"
+#include <celib/hash.inl>
+#include <celib/log.h>
+
+#include <cetech/debugui/debugui.h>
+#include <cetech/editor/resource_browser.h>
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/resource/resource.h>
+#include <cetech/editor/editor.h>
+#include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
@@ -22,12 +25,11 @@
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/log_view.h>
-#include <celib/log.h>
+
 #include <cetech/editor/editor_ui.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
-#include <fnmatch.h>
-#include <celib/hash.inl>
+
 
 #define WINDOW_NAME "Asset browser"
 
@@ -77,13 +79,6 @@ static void _broadcast_edit(uint64_t dock) {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-//    if (obj) {
-//        char *buf = NULL;
-//        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, obj, 0);
-//        ce_log_a0->debug("resource browser", "\n%s", buf);
-//        ce_buffer_free(buf, _G.allocator);
-//    }
-
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
@@ -103,8 +98,8 @@ static void _create_from_modal(const char *modal_id) {
                                      static_cast<DebugUICond>(0));
 
     if (!modal_buffer_name[0]) {
-        snprintf(modal_buffer_name, CE_ARRAY_LEN(modal_buffer_name), "%s",
-                 _G.current_dir);
+        snprintf(modal_buffer_name, CE_ARRAY_LEN(modal_buffer_name),
+                 "%s", _G.current_dir);
     }
 
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
@@ -150,8 +145,6 @@ static void _create_from_modal(const char *modal_id) {
         }
         ce_array_push(buffer, '\0', _G.allocator);
 
-
-        ct_debugui_a0->SameLine(0, 5);
         sprintf(labelidi, "##modal_create_from_type_combo%llu", 1ULL);
         bool type_change = ct_debugui_a0->Combo2(labelidi, &cur_type_idx,
                                                  buffer, -1);
@@ -213,9 +206,9 @@ static void _create_from_modal(const char *modal_id) {
                 ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
                 ce_cdb_a0->write_commit(w);
 
-                ct_resource_i0*  ri = ct_resource_a0->get_interface(type);
+                ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
 
-                if(ri && ri->create_new) {
+                if (ri && ri->create_new) {
                     ri->create_new(new_res);
                 }
 
@@ -229,8 +222,14 @@ static void _create_from_modal(const char *modal_id) {
             return;
         }
 
-        char **asset_list = NULL;
 
+        char title[256] = {};
+        snprintf(title, CE_ARRAY_LEN(title), "##child_new_asset_ab");
+
+        ct_debugui_a0->BeginChild(title, (float[2]) {}, false,
+                                  (DebugUIWindowFlags_) (0));
+
+        char **asset_list = NULL;
         ct_builddb_a0->get_resource_from_dirs("", &asset_list,
                                               _G.allocator);
 
@@ -287,7 +286,7 @@ static void _create_from_modal(const char *modal_id) {
         ct_builddb_a0->get_resource_from_dirs_clean(asset_list,
                                                     _G.allocator);
 
-
+        ct_debugui_a0->EndChild();
         ct_debugui_a0->EndPopup();
     }
 }

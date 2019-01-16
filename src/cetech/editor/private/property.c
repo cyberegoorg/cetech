@@ -17,6 +17,7 @@
 #include <cetech/editor/explorer.h>
 #include <celib/cdb.h>
 #include <cetech/editor/selcted_object.h>
+#include <stdio.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -26,11 +27,11 @@ static struct _G {
 } _G;
 
 static void draw(uint64_t obj) {
-    if(!obj) {
+    if (!obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
@@ -51,11 +52,11 @@ static void draw(uint64_t obj) {
 }
 
 static void draw_menu(uint64_t obj) {
-    if(!obj) {
+    if (!obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
@@ -78,8 +79,10 @@ static void draw_menu(uint64_t obj) {
 static void on_debugui(uint64_t dock) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                    0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
+
 
     ct_debugui_a0->Columns(2, NULL, true);
     ct_debugui_a0->Separator();
@@ -92,6 +95,48 @@ static void on_debugui(uint64_t dock) {
 
     ct_debugui_a0->Separator();
 
+    bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_FILE" Resource",
+                                          DebugUITreeNodeFlags_DefaultOpen);
+
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
+
+    if (open) {
+        if (obj) {
+            const ce_cdb_obj_o *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                             obj);
+            uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
+            if (instance_of) {
+                const char *name = ce_cdb_a0->read_str(reader_obj,
+                                                       ASSET_NAME_PROP,
+                                                       NULL);
+
+                char buffer[256];
+
+                if (name) {
+                    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
+                } else {
+                    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx",
+                             instance_of);
+                }
+
+                ct_debugui_a0->Text("Inst. of");
+                ct_debugui_a0->NextColumn();
+                ct_debugui_a0->PushItemWidth(-1);
+                ct_debugui_a0->InputText("##InstanceOfResourceProp",
+                                         buffer,
+                                         strlen(buffer),
+                                         DebugInputTextFlags_ReadOnly,
+                                         0, NULL);
+                ct_debugui_a0->PopItemWidth();
+                ct_debugui_a0->NextColumn();
+            }
+        }
+        ct_debugui_a0->TreePop();
+    }
+
+    ct_debugui_a0->Separator();
+
     draw(obj);
 
     ct_debugui_a0->Columns(1, NULL, true);
@@ -99,7 +144,8 @@ static void on_debugui(uint64_t dock) {
 
 static void on_menu(uint64_t dock) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
+                                                    0);
     uint64_t obj = ct_selected_object_a0->selected_object(context);
     draw_menu(obj);
 }

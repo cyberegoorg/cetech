@@ -128,9 +128,15 @@ void draw_all() {
                     di->draw_menu(dock);
                 }
 
+                snprintf(title, CE_ARRAY_LEN(title), "%s##%s_child_dock%llu",
+                         di->display_title(dock), di->name(dock), id);
+
+                ct_debugui_a0->BeginChild(title, (float[2]){}, false, 0);
+
                 if (di->draw_ui) {
                     di->draw_ui(dock);
                 }
+                ct_debugui_a0->EndChild();
             }
             ct_debugui_a0->EndDock();
 

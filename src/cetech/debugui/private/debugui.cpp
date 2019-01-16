@@ -336,6 +336,8 @@ static struct ct_debugui_a0 debugui_api = {
         .GetColumnsCount = ImGui::GetColumnsCount,
         .SetNextWindowSize = reinterpret_cast<void (*)(const float *,
                                                        DebugUICond)>(ImGui::SetNextWindowSize),
+
+        .EndChild = ImGui::EndChild,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

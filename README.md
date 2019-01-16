@@ -13,7 +13,10 @@ CETech is game engine primary develop for internal use in CyberEg{o.o}rg.
 
 ## Platforms
 
-* [ ] OSX - **Work in progress**
+* [x] OSX
+
+## Planned platforms
+
 * [ ] Linux
 * [ ] Windows
 * [ ] FreeBSD
