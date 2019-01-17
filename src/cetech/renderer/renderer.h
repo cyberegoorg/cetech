@@ -71,10 +71,11 @@ struct ct_renderer_a0 {
     struct ct_viewport0 (*create_viewport)(struct ct_world world,
                                            struct ct_entity main_camera);
 
-    struct ct_rg_builder *
-    (*viewport_builder)(struct ct_viewport0 viewport);
+    void (*destroy_viewport)(struct ct_viewport0 viewport);
 
-    struct ce_window* (*get_main_window)();
+    struct ct_rg_builder *(*viewport_builder)(struct ct_viewport0 viewport);
+
+    struct ce_window *(*get_main_window)();
 };
 
 CE_MODULE(ct_renderer_a0);

@@ -218,8 +218,9 @@ static void draw_menu() {
             const char *name = display_name(di);
 
             char label[256] = {};
+            snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, dock);
 
-            if (ct_debugui_a0->BeginMenu(name, true)) {
+            if (ct_debugui_a0->BeginMenu(label, true)) {
                 snprintf(label, CE_ARRAY_LEN(label), "Context##%llx", dock);
                 if (ct_debugui_a0->BeginMenu("Context", true)) {
                     for (int j = 0; j < MAX_CONTEXT; ++j) {

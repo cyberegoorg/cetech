@@ -102,6 +102,24 @@ static void draw_editor(uint64_t dock) {
     i->draw_ui(editor->context_obj);
 }
 
+static void draw_editor_menu(uint64_t dock) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+
+    struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
+
+    if(!editor) {
+        return;
+    }
+
+    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
+
+    if (!i) {
+        return;
+    }
+
+    i->draw_menu(editor->context_obj);
+}
+
 static uint32_t find_editor(uint64_t obj) {
     const uint32_t editor_n = ce_array_size(_G.editors);
 
@@ -206,7 +224,7 @@ static void update(float dt) {
         struct ct_resource_editor_i0 *editor_i = get_asset_editor(editor->type);
 
         if (!editor_i) {
-            return;
+            continue;
         }
 
         editor_i->update(editor->context_obj, dt);
@@ -235,6 +253,7 @@ static struct ct_dock_i0 dock_i = {
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_editor,
+        .draw_menu = draw_editor_menu,
 };
 
 static void _init(struct ce_api_a0 *api) {
@@ -245,8 +264,6 @@ static void _init(struct ce_api_a0 *api) {
 
 
     ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
-
-    _get_or_create_editor(0);
 }
 
 static void _shutdown() {

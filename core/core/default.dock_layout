@@ -13,7 +13,7 @@
   next: 11
   child0: -1
   child1: -1
-  parent: 14
+  parent: 18
 1: 
   index: 1
   label:  Explorer##explorer_dock0
@@ -141,7 +141,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 15
+  parent: 14
 9: 
   index: 9
   label:  Property editor##property_editor_dock2
@@ -157,7 +157,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 17
+  parent: 16
 10: 
   index: 10
   label: Asset preview##asset_preview_dock3
@@ -173,7 +173,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 17
+  parent: 16
 11: 
   index: 11
   label: Log view##log_view_dock4
@@ -189,7 +189,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 14
+  parent: 18
 12: 
   index: 12
   label: Editor##editor_dock5
@@ -198,14 +198,14 @@
   location: ""
   size_x: 489
   size_y: 485
-  status: 0
+  status: 1
   active: 0
   opened: 1
-  prev: 13
+  prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 14
+  parent: -1
 13: 
   index: 13
   label:  Game view##game_view_dock6
@@ -214,32 +214,16 @@
   location: ""
   size_x: 489
   size_y: 485
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
-  next: 12
+  next: -1
   child0: -1
   child1: -1
-  parent: 14
+  parent: -1
 14: 
   index: 14
-  label: ""
-  x: 223
-  y: 24
-  location: ""
-  size_x: 489
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 13
-  child1: 0
-  parent: 15
-15: 
-  index: 15
   label: ""
   x: 0
   y: 24
@@ -252,10 +236,10 @@
   prev: -1
   next: -1
   child0: 8
-  child1: 14
-  parent: 16
-16: 
-  index: 16
+  child1: 18
+  parent: 15
+15: 
+  index: 15
   label: ""
   x: 0
   y: 24
@@ -267,11 +251,11 @@
   opened: 0
   prev: -1
   next: -1
-  child0: 15
-  child1: 17
+  child0: 14
+  child1: 16
   parent: -1
-17: 
-  index: 17
+16: 
+  index: 16
   label: ""
   x: 712
   y: 24
@@ -285,4 +269,36 @@
   next: -1
   child0: 9
   child1: 10
-  parent: 16
+  parent: 15
+17: 
+  index: 17
+  label:  Game view##game_view_dock5
+  x: 223
+  y: 24
+  location: ""
+  size_x: 489
+  size_y: 485
+  status: 0
+  active: 1
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 18
+18: 
+  index: 18
+  label: ""
+  x: 223
+  y: 24
+  location: ""
+  size_x: 489
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 17
+  child1: 0
+  parent: 14

@@ -19,6 +19,7 @@ struct ct_resource_editor_i0 {
     void (*close)(uint64_t context_obj);
     void (*update)(uint64_t context_obj, float dt);
     void (*draw_ui)(uint64_t context_obj);
+    void (*draw_menu)(uint64_t context_obj);
 };
 
 #endif //CETECH_EDITOR_H

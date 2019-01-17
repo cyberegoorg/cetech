@@ -29,12 +29,14 @@
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/resource_editor.h>
+#include <cetech/editor/selcted_object.h>
+#include <celib/array.inl>
 
 #define MAX_EDITOR 8
 
 #define _G entity_editor_globals
 
-struct scene_editor {
+struct entity_editor {
     struct ct_world world;
     struct ct_entity camera_ent;
     struct ct_entity entity;
@@ -42,11 +44,11 @@ struct scene_editor {
 
     uint64_t entity_name;
     bool mouse_hovering;
+    bool free;
 };
 
 static struct _G {
-    struct scene_editor editor[MAX_EDITOR];
-    uint8_t editor_count;
+    struct entity_editor *editors;
 } _G;
 
 
@@ -173,23 +175,7 @@ static void fps_camera_update(struct ct_world world,
 //    }
 //}
 
-static void draw_editor(uint64_t context_obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
-
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    struct scene_editor *editor = &_G.editor[editor_idx];
-
-    if (!editor->world.h) {
-        return;
-    }
-
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-    size[1] -= ct_debugui_a0->GetTextLineHeightWithSpacing();
-
-    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
-    editor->mouse_hovering = is_mouse_hovering;
-
+static void draw_menu(uint64_t context_obj) {
     static enum OPERATION operation;
     ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT,
                                 (int *) &operation, TRANSLATE);
@@ -201,6 +187,24 @@ static void draw_editor(uint64_t context_obj) {
     ct_debugui_a0->SameLine(0, 0);
     ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_H,
                                 (int *) &operation, SCALE);
+}
+
+static void draw_editor(uint64_t context_obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
+    struct entity_editor *editor = &_G.editors[editor_idx];
+
+    if (!editor->world.h) {
+        return;
+    }
+
+    float size[2];
+    ct_debugui_a0->GetContentRegionAvail(size);
+    size[1] -= ct_debugui_a0->GetTextLineHeightWithSpacing();
+
+    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
+    editor->mouse_hovering = is_mouse_hovering;
 
     float proj[16], view[16];
     ct_camera_a0->get_project_view(editor->world,
@@ -250,23 +254,11 @@ static void draw_editor(uint64_t context_obj) {
 //        }
 //    }
 
-    if (ct_debugui_a0->IsMouseClicked(0, false)) {
-//        ct_selected_object_a0->set_selected_object(editor->asset);
-//        ct_explorer_a0->set_level(editor->world,
-//                                  editor->entity,
-//                                  editor->entity_name,
-//                                  editor->root,
-//                                  editor->path);
-    }
-
 
     struct ct_rg_builder *builder = \
     ct_renderer_a0->viewport_builder(editor->viewport);
 
     builder->set_size(builder, size[0], size[1]);
-
-
-    ct_ecs_a0->simulate(editor->world, 0.1f);
 
     ct_render_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
@@ -286,21 +278,44 @@ static void draw_editor(uint64_t context_obj) {
 //    return "entity_editor";
 //}
 
-static struct scene_editor *_new_editor(uint64_t context_obj) {
-    int idx = _G.editor_count;
-    ++_G.editor_count;
+static struct entity_editor *_new_editor(uint64_t context_obj) {
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),context_obj);
+    const uint32_t n = ce_array_size(_G.editors);
+    for (uint32_t i = 0; i < n; ++i) {
+        struct entity_editor *e = &_G.editors[i];
+
+        if (!e->free) {
+            continue;
+        }
+
+        return e;
+    }
+
+    uint32_t idx = n;
+    ce_array_push(_G.editors, (struct entity_editor) {}, ce_memory_a0->system);
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), context_obj);
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
     ce_cdb_a0->write_commit(w);
 
-    struct scene_editor *editor = &_G.editor[idx];
+    struct entity_editor *editor = &_G.editors[idx];
 
     return editor;
 }
 
+static void close(uint64_t context_obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
+    struct entity_editor *editor = &_G.editors[editor_idx];
+
+    ct_ecs_a0->destroy_world(editor->world);
+    ct_renderer_a0->destroy_viewport(editor->viewport);
+
+    editor->free = true;
+}
+
 static void open(uint64_t context_obj) {
-    struct scene_editor *editor = _new_editor(context_obj);
+    struct entity_editor *editor = _new_editor(context_obj);
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
@@ -312,14 +327,6 @@ static void open(uint64_t context_obj) {
                                                        editor->camera_ent);
 
     editor->entity = ct_ecs_a0->spawn(editor->world, asset_name);
-
-//    ct_selected_object_a0->set_selected_object(obj);
-//    ct_explorer_a0->set_level(editor->world,
-//                              editor->entity,
-//                              editor->entity_name,
-//                              editor->root,
-//                              editor->path);
-
 }
 
 static void update(uint64_t context_obj,
@@ -327,9 +334,9 @@ static void update(uint64_t context_obj,
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),context_obj);
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    struct scene_editor *editor = &_G.editor[editor_idx];
+    struct entity_editor *editor = &_G.editors[editor_idx];
 
     if (!editor->world.h) {
         return;
@@ -364,6 +371,8 @@ static void update(uint64_t context_obj,
                           editor->camera_ent,
                           dt, 0, 0, updown, leftright, 10.0f, false);
     }
+
+    ct_ecs_a0->simulate(editor->world, dt);
 }
 
 uint64_t cdb_type() {
@@ -382,8 +391,10 @@ const char *display_name() {
 static struct ct_resource_editor_i0 ct_resource_editor_i0 = {
         .cdb_type = cdb_type,
         .open = open,
+        .close = close,
         .update = update,
         .draw_ui = draw_editor,
+        .draw_menu = draw_menu,
         .display_name = display_name,
         .display_icon = display_icon,
 };

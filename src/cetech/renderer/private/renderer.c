@@ -43,6 +43,7 @@ struct viewport {
     struct ct_rg_builder *builder;
     struct ct_world world;
     struct ct_entity entity;
+    bool free;
 };
 
 #define _G RendererGlobals
@@ -77,8 +78,8 @@ static uint32_t _get_reset_flags() {
 // Interface
 //==============================================================================
 
-static void _render_task(void* data) {
-    while(bgfx_render_frame(-1) != BGFX_RENDER_FRAME_EXITING) {
+static void _render_task(void *data) {
+    while (bgfx_render_frame(-1) != BGFX_RENDER_FRAME_EXITING) {
     }
 }
 
@@ -124,7 +125,7 @@ static void renderer_create() {
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx_set_platform_data(&pd);
 
-    ce_task_a0->add(&(struct ce_task_item){
+    ce_task_a0->add(&(struct ce_task_item) {
             .work = _render_task,
             .name = "Renderer worker",
     }, 1, NULL);
@@ -267,6 +268,10 @@ static void render(float dt) {
     for (int i = 0; i < v_n; ++i) {
         struct viewport *v = &_G.viewports[i];
 
+        if(v->free) {
+            continue;
+        }
+
         struct ct_rg *graph = ct_rg_a0->create_graph();
         struct ct_rg_module *module = ct_rg_a0->create_module();
         struct ct_rg_builder *builder = v->builder;
@@ -296,7 +301,18 @@ uint64_t new_viewid() {
 }
 
 static uint32_t _new_viewport() {
-    uint32_t idx = ce_array_size(_G.viewports);
+    const uint32_t n = ce_array_size(_G.viewports);
+    for (uint32_t i = 0; i < n; ++i) {
+        struct viewport *v = &_G.viewports[i];
+
+        if(!v->free) {
+            continue;
+        }
+
+        return i;
+    }
+
+    uint32_t idx = n;
     ce_array_push(_G.viewports, (struct viewport) {}, _G.allocator);
     return idx;
 }
@@ -316,12 +332,17 @@ struct ct_viewport0 create_viewport(struct ct_world world,
     return (struct ct_viewport0) {.idx=idx};
 }
 
-struct ct_rg_builder *
-viewport_builder(struct ct_viewport0 viewport) {
+
+void destroy_viewport(struct ct_viewport0 viewport) {
+    struct viewport *v = &_G.viewports[viewport.idx];
+    v->free = true;
+}
+
+struct ct_rg_builder *viewport_builder(struct ct_viewport0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
 
-struct ce_window* get_main_window() {
+struct ce_window *get_main_window() {
     return _G.main_window;
 }
 
@@ -331,6 +352,7 @@ static struct ct_renderer_a0 rendderer_api = {
         .get_size = renderer_get_size,
         .new_viewid = new_viewid,
         .create_viewport = create_viewport,
+        .destroy_viewport = destroy_viewport,
         .viewport_builder = viewport_builder,
         .get_main_window = get_main_window,
 };
