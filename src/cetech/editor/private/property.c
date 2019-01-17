@@ -105,13 +105,36 @@ static void on_debugui(uint64_t dock) {
         if (obj) {
             const ce_cdb_obj_o *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                              obj);
+            char buffer[256];
+
+            const char *name = ce_cdb_a0->read_str(reader_obj,
+                                                   ASSET_NAME_PROP,
+                                                   NULL);
+            if (name) {
+                snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
+
+                ct_debugui_a0->Text("Name");
+                ct_debugui_a0->NextColumn();
+                ct_debugui_a0->PushItemWidth(-1);
+                ct_debugui_a0->InputText("##NameResourceProp",
+                                         buffer,
+                                         strlen(buffer),
+                                         DebugInputTextFlags_ReadOnly,
+                                         0, NULL);
+                ct_debugui_a0->PopItemWidth();
+                ct_debugui_a0->NextColumn();
+            }
+
+
+
             uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
             if (instance_of) {
-                const char *name = ce_cdb_a0->read_str(reader_obj,
+                const ce_cdb_obj_o *inst_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                             instance_of);
+
+                const char *name = ce_cdb_a0->read_str(inst_r,
                                                        ASSET_NAME_PROP,
                                                        NULL);
-
-                char buffer[256];
 
                 if (name) {
                     snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
