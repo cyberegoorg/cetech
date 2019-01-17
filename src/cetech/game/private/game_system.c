@@ -108,7 +108,7 @@ struct ct_game_system_a0 game_system_api = {
         .is_paused = game_is_paused,
         .play = game_play,
         .step = game_step,
-        .render_graph_builder = game_render_graph_builder,
+        .viewport = game_render_graph_builder,
 };
 
 struct ct_game_system_a0 *ct_game_system_a0 = &game_system_api;

@@ -20,17 +20,8 @@
 
 static float step_dt = 16.0f;
 
-static void on_debugui(uint64_t dock) {
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-
+static void on_menu(uint64_t dock) {
     uint64_t game_name = ce_id_a0->id64("default");
-
-    struct ct_viewport0 v = ct_game_system_a0->render_graph_builder(game_name);
-    struct ct_rg_builder* builder;
-    builder = ct_renderer_a0->viewport_builder(v);
-
-    builder->set_size(builder, size[0], size[1]);
 
     static const char *label[] = {
             ICON_FA_PAUSE,
@@ -56,6 +47,20 @@ static void on_debugui(uint64_t dock) {
         ct_debugui_a0->SameLine(0.0f, 4.0f);
         ct_debugui_a0->InputFloat("delta", &step_dt, 0.0f, 0.0f, -1, 0);
     }
+
+}
+
+static void on_debugui(uint64_t dock) {
+    float size[2];
+    ct_debugui_a0->GetContentRegionAvail(size);
+
+    uint64_t game_name = ce_id_a0->id64("default");
+
+    struct ct_viewport0 v = ct_game_system_a0->viewport(game_name);
+    struct ct_rg_builder *builder;
+    builder = ct_renderer_a0->viewport_builder(v);
+
+    builder->set_size(builder, size[0], size[1]);
 
 
     ct_render_texture_handle_t th;
@@ -94,6 +99,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
+        .draw_menu = on_menu,
 };
 
 static void _init(struct ce_api_a0 *api) {

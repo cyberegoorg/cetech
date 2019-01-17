@@ -33,7 +33,7 @@ struct ct_game_i0 {
 };
 
 struct ct_game_system_a0 {
-    struct ct_viewport0 (*render_graph_builder)(uint64_t name);
+    struct ct_viewport0 (*viewport)(uint64_t name);
 
     void (*pause)(uint64_t name);
 

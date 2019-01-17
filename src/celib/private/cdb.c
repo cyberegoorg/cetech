@@ -1708,7 +1708,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
 
                     case CDB_TYPE_STR: {
                         const char *str = read_string(w, ev->prop, 0);
-                        if (!strcmp(str, ev->old_value.str)) {
+                        if (!str || !strcmp(str, ev->old_value.str)) {
                             set_string(w, ev->prop, ev->new_value.str);
                         }
                     }
