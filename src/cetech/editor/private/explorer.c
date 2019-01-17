@@ -25,7 +25,7 @@
 
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/resource_editor.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/editor/selcted_object.h>
 
 #define WINDOW_NAME "Explorer"

@@ -27,7 +27,7 @@
 #include <celib/config.h>
 #include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 
 //==============================================================================

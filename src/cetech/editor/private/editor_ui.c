@@ -16,7 +16,7 @@
 #include <cetech/debugui/debugui.h>
 #include <celib/fmath.inl>
 #include <cetech/editor/resource_browser.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <celib/os.h>
 #include <cetech/editor/property.h>
 #include <cetech/resource/resource.h>
@@ -86,7 +86,7 @@ static void resource_tooltip(struct ct_resource_id resourceid,
                              float size[2]) {
     ct_debugui_a0->Text("%s", path);
 
-    uint64_t type = ct_builddb_a0->get_resource_type(resourceid);
+    uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
 
     struct ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
 
@@ -310,7 +310,7 @@ static bool resource_select_modal(const char *modal_id,
         const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
         char **resources = NULL;
 
-        ct_builddb_a0->get_resource_by_type(modal_buffer, resource_type_s,
+        ct_resourcedb_a0->get_resource_by_type(modal_buffer, resource_type_s,
                                             &resources, ce_memory_a0->system);
 
         uint32_t dir_n = ce_array_size(resources);
@@ -326,7 +326,7 @@ static bool resource_select_modal(const char *modal_id,
 
             if (ct_debugui_a0->IsItemHovered(0)) {
                 struct ct_resource_id r = {
-                        .uid=ct_builddb_a0->get_uid(name, resource_type_s)
+                        .uid=ct_resourcedb_a0->get_uid(name, resource_type_s)
                 };
 
                 ct_debugui_a0->BeginTooltip();
@@ -336,7 +336,7 @@ static bool resource_select_modal(const char *modal_id,
             }
 
             if (selected) {
-                *selected_resource = ct_builddb_a0->get_uid(name,
+                *selected_resource = ct_resourcedb_a0->get_uid(name,
                                                             resource_type_s);
                 changed = true;
 
@@ -345,7 +345,7 @@ static bool resource_select_modal(const char *modal_id,
             }
         }
 
-        ct_builddb_a0->get_resource_by_type_clean(resources,
+        ct_resourcedb_a0->get_resource_by_type_clean(resources,
                                                   ce_memory_a0->system);
         ct_debugui_a0->EndPopup();
     }

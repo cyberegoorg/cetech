@@ -22,7 +22,7 @@
 #include "cetech/ecs/ecs.h"
 #include <cetech/scene/scene.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 
 #include <include/assimp/scene.h>
 #include <include/assimp/postprocess.h>

@@ -20,7 +20,7 @@
 #include <celib/task.h>
 #include <celib/hash.inl>
 
-#include "cetech/resource/builddb.h"
+#include "cetech/resource/resourcedb.h"
 
 #define LOG_WHERE "builddb"
 #define MAX_WORKERS TASK_MAX_WORKERS
@@ -244,7 +244,7 @@ static int builddb_init_db() {
 
     ce_os_a0->path->join(&_G._logdb_path, ce_memory_a0->system, 2,
                          build_dir_full,
-                         "build.db");
+                         "resource.db");
 
     ce_buffer_free(build_dir_full, ce_memory_a0->system);
 
@@ -642,7 +642,7 @@ uint64_t get_uid(const char *name,
     return uid;
 }
 
-static struct ct_builddb_a0 build_db_api = {
+static struct ct_resourcedb_a0 build_db_api = {
         .put_file = builddb_put_file,
         .put_resource_blob = put_resource_blob,
         .put_resource = put_resource,
@@ -664,12 +664,12 @@ static struct ct_builddb_a0 build_db_api = {
         .get_uid= get_uid,
 };
 
-struct ct_builddb_a0 *ct_builddb_a0 = &build_db_api;
+struct ct_resourcedb_a0 *ct_resourcedb_a0 = &build_db_api;
 
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {};
 
-    api->register_api(CT_BUILDDB_API, ct_builddb_a0);
+    api->register_api(CT_BUILDDB_API, ct_resourcedb_a0);
 
     builddb_init_db();
 }

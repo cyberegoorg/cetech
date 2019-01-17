@@ -27,7 +27,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/editor/resource_preview.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/property.h>
 

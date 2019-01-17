@@ -21,7 +21,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
 #include <cetech/editor/resource_preview.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/log_view.h>
@@ -179,7 +179,7 @@ static void _create_from_modal(const char *modal_id) {
             uint64_t new_res = 0;
 
             if (modal_buffer_from[0]) {
-                uint64_t uid = ct_builddb_a0->get_uid(modal_buffer_from,
+                uint64_t uid = ct_resourcedb_a0->get_uid(modal_buffer_from,
                                                       modal_buffer_type);
                 if (uid) {
                     new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
@@ -196,10 +196,10 @@ static void _create_from_modal(const char *modal_id) {
 
                 ct_resource_id rid = {.uid = new_res};
 
-                ct_builddb_a0->put_resource(rid, modal_buffer_type,
+                ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
                                             filename, modal_buffer_name);
 
-                ct_builddb_a0->put_file(filename, 0);
+                ct_resourcedb_a0->put_file(filename, 0);
 
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          new_res);
@@ -230,7 +230,7 @@ static void _create_from_modal(const char *modal_id) {
                                   (DebugUIWindowFlags_) (0));
 
         char **asset_list = NULL;
-        ct_builddb_a0->get_resource_from_dirs("", &asset_list,
+        ct_resourcedb_a0->get_resource_from_dirs("", &asset_list,
                                               _G.allocator);
 
         uint32_t dir_n = ce_array_size(asset_list);
@@ -283,7 +283,7 @@ static void _create_from_modal(const char *modal_id) {
             }
         }
 
-        ct_builddb_a0->get_resource_from_dirs_clean(asset_list,
+        ct_resourcedb_a0->get_resource_from_dirs_clean(asset_list,
                                                     _G.allocator);
 
         ct_debugui_a0->EndChild();
@@ -382,7 +382,7 @@ static void ui_dir_list() {
         }
 
         char **dirs = NULL;
-        ct_builddb_a0->get_resource_dirs(&dirs, _G.allocator);
+        ct_resourcedb_a0->get_resource_dirs(&dirs, _G.allocator);
         uint32_t dir_n = ce_array_size(dirs);
         for (int j = 0; j < dir_n; ++j) {
             const char *dirname = dirs[j];
@@ -405,7 +405,7 @@ static void ui_dir_list() {
             }
         }
 
-        ct_builddb_a0->get_resource_dirs_clean(dirs, _G.allocator);
+        ct_resourcedb_a0->get_resource_dirs_clean(dirs, _G.allocator);
         ce_array_free(dirs, _G.allocator);
 
         ct_debugui_a0->TreePop();
@@ -428,13 +428,13 @@ static void ui_asset_list(uint64_t dock) {
 
     if (_G.need_reaload) {
         if (_G.asset_list) {
-            ct_builddb_a0->get_resource_from_dirs_clean(_G.asset_list,
+            ct_resourcedb_a0->get_resource_from_dirs_clean(_G.asset_list,
                                                         _G.allocator);
             ce_array_free(_G.asset_list, _G.allocator);
         }
 
 
-        ct_builddb_a0->get_resource_from_dirs(_G.current_dir, &_G.asset_list,
+        ct_resourcedb_a0->get_resource_from_dirs(_G.current_dir, &_G.asset_list,
                                               _G.allocator);
 
         _G.need_reaload = false;
@@ -452,7 +452,7 @@ static void ui_asset_list(uint64_t dock) {
             }
 
             struct ct_resource_id resourceid = {};
-            ct_builddb_a0->get_resource_by_fullname(path, &resourceid);
+            ct_resourcedb_a0->get_resource_by_fullname(path, &resourceid);
 
             char label[128];
 

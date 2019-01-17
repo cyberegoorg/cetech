@@ -18,7 +18,7 @@
 #include <celib/hashlib.h>
 
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <stdlib.h>
 
@@ -81,17 +81,17 @@ static void load(const uint64_t *names,
 
         struct ct_resource_id rid = {.uid = asset_name};
 
-        if (!ct_builddb_a0->obj_exist(rid)) {
+        if (!ct_resourcedb_a0->obj_exist(rid)) {
 //            abort();
             ce_log_a0->error(LOG_WHERE,
                              "Obj 0x%llx does not exist in DB", rid.uid);
             continue;
         };
 
-        uint64_t type = ct_builddb_a0->get_resource_type(
+        uint64_t type = ct_resourcedb_a0->get_resource_type(
                 (struct ct_resource_id) {.uid=asset_name});
 
-        if (!ct_builddb_a0->load_cdb_file(rid, asset_name, type,
+        if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
                                           _G.allocator)) {
             ce_log_a0->warning(LOG_WHERE,
                                "Could not load resource 0x%llx", rid.uid);
@@ -124,7 +124,7 @@ void unload(const uint64_t *names,
                     .uid = names[i],
             };
 
-            uint64_t type = ct_builddb_a0->get_resource_type(rid);
+            uint64_t type = ct_resourcedb_a0->get_resource_type(rid);
 
             struct ct_resource_i0 *resource_i = get_resource_interface(type);
             if (!resource_i) {
@@ -156,7 +156,7 @@ static bool dump_recursive(const char* filename, uint64_t obj) {
                     obj, &output, _G.allocator);
 
     struct ct_resource_id rid={.uid=obj};
-    ct_builddb_a0->put_resource_blob(rid,
+    ct_resourcedb_a0->put_resource_blob(rid,
                                      output,
                                      ce_array_size(output));
     ce_buffer_free(output, _G.allocator);
@@ -178,7 +178,7 @@ static bool save_to_db(uint64_t uid) {
 
     struct ct_resource_id r = {.uid=root};
     char filename[256] = {};
-    bool exist = ct_builddb_a0->get_resource_filename(r,
+    bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                       filename,
                                                       CE_ARRAY_LEN(filename));
 
@@ -195,7 +195,7 @@ static bool save(uint64_t uid) {
 
     struct ct_resource_id r = {.uid=root};
     char filename[256] = {};
-    bool exist = ct_builddb_a0->get_resource_filename(r,
+    bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                       filename,
                                                       CE_ARRAY_LEN(filename));
 

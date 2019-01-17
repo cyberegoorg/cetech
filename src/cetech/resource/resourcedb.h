@@ -5,12 +5,12 @@
 #include <time.h>
 
 #define CT_BUILDDB_API \
-    CE_ID64_0("ct_builddb_a0", 0xe682eb268876882aULL)
+   CE_ID64_0("ct_resourcedb_a0", 0xc81a8d961ebf878ULL)
 
 struct ct_resource_id;
 struct ce_alloc;
 
-struct ct_builddb_a0 {
+struct ct_resourcedb_a0 {
     void (*put_file)(const char *filename,
                      time_t mtime);
 
@@ -42,8 +42,8 @@ struct ct_builddb_a0 {
     uint64_t (*get_resource_type)(struct ct_resource_id resource);
 
     bool (*get_resource_filename)(struct ct_resource_id resource,
-                                      char *filename,
-                                      size_t max_len);
+                                  char *filename,
+                                  size_t max_len);
 
     void (*get_resource_by_fullname)(const char *fullname,
                                      struct ct_resource_id *resource);
@@ -73,6 +73,6 @@ struct ct_builddb_a0 {
                                        struct ce_alloc *alloc);
 };
 
-CE_MODULE(ct_builddb_a0);
+CE_MODULE(ct_resourcedb_a0);
 
 #endif //CETECH_BUILDDB_H

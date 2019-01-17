@@ -23,7 +23,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/game/game_system.h>
 #include <cetech/static_module.h>
-#include <cetech/resource/builddb.h>
+#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/ecs/ecs.h>
 #include <stdlib.h>
