@@ -208,6 +208,17 @@ void wait_atomic(struct ce_task_counter_t *signal,
     queue_task_push(&_G.free_counter, counter_idx);
 }
 
+void wait_for_counter_no_work(struct ce_task_counter_t *signal,
+                         int32_t value) {
+    while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
+           value) {
+        ce_os_a0->thread->yield();
+    }
+
+    uint32_t counter_idx = ((atomic_int *) signal) - _G.counter_pool;
+    queue_task_push(&_G.free_counter, counter_idx);
+}
+
 char worker_id() {
     return _worker_id;
 }
@@ -220,7 +231,8 @@ static struct ce_task_a0 _task_api = {
         .worker_id = worker_id,
         .worker_count = worker_count,
         .add = add,
-        .wait_for_counter = wait_atomic
+        .wait_for_counter = wait_atomic,
+        .wait_for_counter_no_work = wait_for_counter_no_work,
 };
 
 struct ce_task_a0 *ce_task_a0 = &_task_api;

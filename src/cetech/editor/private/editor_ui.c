@@ -311,7 +311,8 @@ static bool resource_select_modal(const char *modal_id,
         char **resources = NULL;
 
         ct_resourcedb_a0->get_resource_by_type(modal_buffer, resource_type_s,
-                                            &resources, ce_memory_a0->system);
+                                               &resources,
+                                               ce_memory_a0->system);
 
         uint32_t dir_n = ce_array_size(resources);
         for (int i = 0; i < dir_n; ++i) {
@@ -337,7 +338,7 @@ static bool resource_select_modal(const char *modal_id,
 
             if (selected) {
                 *selected_resource = ct_resourcedb_a0->get_uid(name,
-                                                            resource_type_s);
+                                                               resource_type_s);
                 changed = true;
 
                 modal_buffer[0] = '\0';
@@ -346,7 +347,7 @@ static bool resource_select_modal(const char *modal_id,
         }
 
         ct_resourcedb_a0->get_resource_by_type_clean(resources,
-                                                  ce_memory_a0->system);
+                                                     ce_memory_a0->system);
         ct_debugui_a0->EndPopup();
     }
 
@@ -543,6 +544,25 @@ static void ui_vec4(uint64_t obj,
     ct_debugui_a0->NextColumn();
 }
 
+static uint64_t lock_selected_obj(uint64_t dock,
+                                  uint64_t selected_obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+
+    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
+    bool checked = locked_object != 0;
+    if (ct_debugui_a0->Checkbox(ICON_FA_LOCK, &checked)) {
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+        if (checked) {
+            ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, selected_obj);
+        } else {
+            ce_cdb_a0->remove_property(w, CT_LOCKED_OBJ);
+        }
+        ce_cdb_a0->write_commit(w);
+    }
+
+    return locked_object;
+}
+
 static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_float = ui_float,
         .prop_str = ui_str,
@@ -554,6 +574,7 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_revert_btn = prop_revert_btn,
         .resource_tooltip = resource_tooltip,
         .resource_select_modal = resource_select_modal,
+        .lock_selected_obj = lock_selected_obj,
 
 };
 

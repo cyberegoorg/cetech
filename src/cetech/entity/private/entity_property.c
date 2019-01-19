@@ -252,6 +252,7 @@ void draw_menu(uint64_t obj) {
         return;
     }
 
+    ct_debugui_a0->SameLine(0.0f, -1);
 
     bool add = ct_debugui_a0->Button(ICON_FA_PLUS" "ICON_FA_FOLDER_OPEN,
                                      (float[2]) {0.0f});

@@ -18,6 +18,7 @@
 #include <celib/cdb.h>
 #include <cetech/editor/selcted_object.h>
 #include <stdio.h>
+#include <cetech/editor/editor_ui.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -81,8 +82,12 @@ static void on_debugui(uint64_t dock) {
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
-    uint64_t obj = ct_selected_object_a0->selected_object(context);
 
+    uint64_t obj = ct_selected_object_a0->selected_object(context);
+    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
+    if (locked_object) {
+        obj = locked_object;
+    }
 
     ct_debugui_a0->Columns(2, NULL, true);
     ct_debugui_a0->Separator();
@@ -95,6 +100,10 @@ static void on_debugui(uint64_t dock) {
 
     ct_debugui_a0->Separator();
 
+    char buffer[256];
+
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
+
     bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_FILE" Resource",
                                           DebugUITreeNodeFlags_DefaultOpen);
 
@@ -105,7 +114,6 @@ static void on_debugui(uint64_t dock) {
         if (obj) {
             const ce_cdb_obj_o *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                              obj);
-            char buffer[256];
 
             const char *name = ce_cdb_a0->read_str(reader_obj,
                                                    ASSET_NAME_PROP,
@@ -124,7 +132,6 @@ static void on_debugui(uint64_t dock) {
                 ct_debugui_a0->PopItemWidth();
                 ct_debugui_a0->NextColumn();
             }
-
 
 
             uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
@@ -169,8 +176,19 @@ static void on_menu(uint64_t dock) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
+
+    ct_dock_a0->context_btn(dock);
+    ct_debugui_a0->SameLine(0, -1);
+
     uint64_t obj = ct_selected_object_a0->selected_object(context);
+
+    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock, obj);
+    if (locked_object) {
+        obj = locked_object;
+    }
+
     draw_menu(obj);
+
 }
 
 

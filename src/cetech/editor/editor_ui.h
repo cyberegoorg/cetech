@@ -10,6 +10,8 @@
 #define CT_RESOURCE_UI_API \
     CE_ID64_0("ct_editor_ui_a0", 0x864e3516a3c025aeULL)
 
+#define CT_LOCKED_OBJ \
+    CE_ID64_0("locked_obj", 0xa0bd856b4fcd25aeULL)
 
 struct ui_vec4_p0 {
     float min_f;
@@ -81,6 +83,9 @@ struct ct_editor_ui_a0 {
                                   uint64_t resource_type,
                                   uint64_t *selected_resource,
                                   uint32_t *count);
+
+    uint64_t (*lock_selected_obj)(uint64_t dock,
+                                  uint64_t selected_obj);
 };
 
 CE_MODULE(ct_editor_ui_a0);

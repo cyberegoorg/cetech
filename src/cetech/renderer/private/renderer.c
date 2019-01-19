@@ -83,6 +83,15 @@ static void _render_task(void *data) {
     }
 }
 
+static void _render_init_task(void *data) {
+    bgfx_render_frame(-1);
+
+    ce_task_a0->add(&(struct ce_task_item) {
+            .work = _render_task,
+            .name = "Renderer worker",
+    }, 1, NULL);
+}
+
 static void renderer_create() {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
@@ -125,11 +134,13 @@ static void renderer_create() {
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx_set_platform_data(&pd);
 
+    struct ce_task_counter_t* render_init_c = NULL;
     ce_task_a0->add(&(struct ce_task_item) {
-            .work = _render_task,
-            .name = "Renderer worker",
-    }, 1, NULL);
+            .work = _render_init_task,
+            .name = "Renderer init worker",
+    }, 1, &render_init_c);
 
+    ce_task_a0->wait_for_counter_no_work(render_init_c, 0);
     // TODO: from config
 
     bgfx_init_t init;

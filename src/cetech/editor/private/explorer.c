@@ -27,6 +27,7 @@
 #include <cetech/editor/resource_editor.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/editor/editor_ui.h>
 
 #define WINDOW_NAME "Explorer"
 
@@ -53,13 +54,20 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
     return NULL;
 }
 
-static uint64_t draw(uint64_t selected_obj,
+static uint64_t draw(uint64_t dock,
+                     uint64_t selected_obj,
                      uint64_t context) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
+    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
+    if (locked_object) {
+        top_level = locked_object;
+    }
+
+    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
 
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(reader));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(tlreader));
     if (i && i->draw_ui) {
         return i->draw_ui(top_level, selected_obj, context);
     }
@@ -104,12 +112,9 @@ static void on_debugui(uint64_t dock) {
         return;
     }
 
-
-//    draw_menu(selected_object, context);
-
     ct_debugui_a0->Separator();
 
-    uint64_t new_selected_object = draw(selected_object, context);
+    uint64_t new_selected_object = draw(dock, selected_object, context);
     if (new_selected_object) {
         ct_selected_object_a0->set_selected_object(context,
                                                    new_selected_object);

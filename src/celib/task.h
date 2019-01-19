@@ -38,6 +38,9 @@ struct ce_task_a0 {
 
     void (*wait_for_counter)(struct ce_task_counter_t *signal,
                              int32_t value);
+
+    void (*wait_for_counter_no_work)(struct ce_task_counter_t *signal,
+                                     int32_t value);
 };
 
 CE_MODULE(ce_task_a0);
