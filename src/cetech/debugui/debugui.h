@@ -16,7 +16,6 @@
 #define CT_DEBUGUI_TASK \
     CE_ID64_0("debugui_task", 0x6bb280451f793471ULL)
 
-struct ct_render_texture_handle;
 struct ce_vio;
 
 typedef float _vec4[4];
@@ -306,12 +305,12 @@ struct ct_debugui_a0 {
     bool (*InvisibleButton)(const char *str_id,
                             const _vec2 size);
 
-    void (*Image)(struct ct_render_texture_handle user_texture_id,
+    void (*Image)(bgfx_texture_handle_t user_texture_id,
                   const _vec2 size,
                   const _vec4 tint_col,
                   const _vec4 border_col);
 
-    void (*Image2)(struct ct_render_texture_handle user_texture_id,
+    void (*Image2)(bgfx_texture_handle_t user_texture_id,
                    const _vec2 size,
                    const _vec2 uv0,
                    const _vec2 uv1,

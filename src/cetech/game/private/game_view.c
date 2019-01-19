@@ -8,13 +8,15 @@
 
 #include "celib/api_system.h"
 
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/editor/dock.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/game/game_system.h>
+
+#include <cetech/debugui/debugui.h>
 
 #define WINDOW_NAME "Game view"
 
@@ -63,7 +65,7 @@ static void on_debugui(uint64_t dock) {
     builder->set_size(builder, size[0], size[1]);
 
 
-    ct_render_texture_handle_t th;
+    bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,

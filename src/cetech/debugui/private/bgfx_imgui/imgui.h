@@ -6,7 +6,8 @@
 #ifndef IMGUI_H_HEADER_GUARD
 #define IMGUI_H_HEADER_GUARD
 
-#include <bgfx/bgfx.h>
+//#include <bgfx/bgfx.h>
+#include <bgfx/c99/bgfx.h>
 #include "../ocornut-imgui/imgui.h"
 #include "cetech/debugui/private/iconfontheaders/icons_kenney.h"
 #include "cetech/debugui/icons_font_awesome.h"
@@ -30,7 +31,7 @@ namespace bx { struct AllocatorI; }
 void imguiCreate(float _fontSize = 18.0f, bx::AllocatorI* _allocator = NULL);
 void imguiDestroy();
 
-void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar = 0, bgfx::ViewId _view = 255);
+void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, char _inputChar = 0, bgfx_view_id_t _view = 255);
 void imguiEndFrame();
 
 namespace entry { class AppI; }
@@ -42,7 +43,7 @@ namespace ImGui
 #define IMGUI_FLAGS_ALPHA_BLEND UINT8_C(0x01)
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::Image.
-	inline void Image(bgfx::TextureHandle _handle
+	inline void Image(bgfx_texture_handle_t _handle
 		, uint8_t _flags
 		, uint8_t _mip
 		, const ImVec2& _size
@@ -52,7 +53,7 @@ namespace ImGui
 		, const ImVec4& _borderCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f)
 		)
 	{
-		union { struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
+		union { struct { bgfx_texture_handle_t handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
 		texture.s.handle = _handle;
 		texture.s.flags  = _flags;
 		texture.s.mip    = _mip;
@@ -60,7 +61,7 @@ namespace ImGui
 	}
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::Image.
-	inline void Image(bgfx::TextureHandle _handle
+	inline void Image(bgfx_texture_handle_t _handle
 		, const ImVec2& _size
 		, const ImVec2& _uv0       = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1       = ImVec2(1.0f, 1.0f)
@@ -72,7 +73,7 @@ namespace ImGui
 	}
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::ImageButton.
-	inline bool ImageButton(bgfx::TextureHandle _handle
+	inline bool ImageButton(bgfx_texture_handle_t _handle
 		, uint8_t _flags
 		, uint8_t _mip
 		, const ImVec2& _size
@@ -83,7 +84,7 @@ namespace ImGui
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 		)
 	{
-		union { struct { bgfx::TextureHandle handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
+		union { struct { bgfx_texture_handle_t handle; uint8_t flags; uint8_t mip; } s; ImTextureID ptr; } texture;
 		texture.s.handle = _handle;
 		texture.s.flags  = _flags;
 		texture.s.mip    = _mip;
@@ -91,7 +92,7 @@ namespace ImGui
 	}
 
 	// Helper function for passing bgfx::TextureHandle to ImGui::ImageButton.
-	inline bool ImageButton(bgfx::TextureHandle _handle
+	inline bool ImageButton(bgfx_texture_handle_t _handle
 		, const ImVec2& _size
 		, const ImVec2& _uv0     = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1     = ImVec2(1.0f, 1.0f)

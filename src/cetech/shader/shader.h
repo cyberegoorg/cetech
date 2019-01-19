@@ -30,7 +30,7 @@
 
 //! Shader API V0
 struct ct_shader_a0 {
-    ct_render_program_handle_t (*get)(uint64_t shader);
+    bgfx_program_handle_t (*get)(uint64_t shader);
 };
 
 CE_MODULE(ct_shader_a0);

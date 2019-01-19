@@ -19,7 +19,7 @@
 #include <cetech/scene/scene.h>
 #include <cetech/material/material.h>
 #include <cetech/mesh/mesh_renderer.h>
-#include <cetech/debugdraw/debugdraw.h>
+
 #include <celib/macros.h>
 #include <stdlib.h>
 #include <cetech/debugui/icons_font_awesome.h>
@@ -100,19 +100,16 @@ void foreach_mesh_renderer(struct ct_world world,
         uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE,
                                                   0);
 
-        ct_render_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
-        ct_render_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
+        bgfx_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
+        bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
 
-        ct_gfx_a0->set_transform(&final_w, 1);
-        ct_gfx_a0->set_vertex_buffer(0, vbh, 0, vb_size);
-        ct_gfx_a0->set_index_buffer(ibh, 0, ib_size);
+        ct_gfx_a0->bgfx_set_transform(&final_w, 1);
+        ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, vb_size);
+        ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, ib_size);
 
         uint64_t material_obj = m->material;
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
-
-        ct_dd_a0->set_transform_mtx(final_w);
-        ct_dd_a0->draw_axis(0, 0, 0, 1.0f, DD_AXIS_COUNT, 0.0f);
     }
 }
 
@@ -277,8 +274,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);
             CE_INIT_API(api, ct_resource_a0);
-
-            CE_INIT_API(api, ct_dd_a0);
             CE_INIT_API(api, ct_renderer_a0);
 
         },

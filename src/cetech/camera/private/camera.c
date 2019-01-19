@@ -58,7 +58,7 @@ static void get_project_view(struct ct_world world,
                       ratio,
                       near,
                       far,
-                      ct_gfx_a0->get_caps()->homogeneousDepth);
+                      ct_gfx_a0->bgfx_get_caps()->homogeneousDepth);
 
     float w[16] = {};
     if (wworld) {

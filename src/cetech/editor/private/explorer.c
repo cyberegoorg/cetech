@@ -16,6 +16,7 @@
 
 
 #include <cetech/ecs/ecs.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/editor/resource_browser.h>

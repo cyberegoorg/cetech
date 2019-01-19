@@ -13,7 +13,7 @@
 
 #include <celib/hash.inl>
 #include <celib/cdb.h>
-#include <cetech/debugui/debugui.h>
+
 #include <celib/fmath.inl>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/resource/resourcedb.h>
@@ -25,6 +25,9 @@
 #include <cetech/editor/resource_preview.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
+
+#include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
 
 #include "cetech/editor/editor_ui.h"
 

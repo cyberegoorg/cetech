@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 project(cetech)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Werror -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Werror -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Werror -Wall")
 set(EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
 set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
 
@@ -95,10 +95,6 @@ set(SOURCE_FILES
         src/cetech/debugui/private/ocornut-imgui/imgui.cpp
         src/cetech/debugui/private/ocornut-imgui/imgui_draw.cpp
         src/cetech/debugui/private/debugui.cpp
-
-        src/cetech/debugdraw/private/debugdraw/debugdraw.cpp
-        src/cetech/debugdraw/private/debugdraw/bounds.cpp
-        src/cetech/debugdraw/private/debugdraw.cpp
 
         src/cetech/machine/private/machine_sdl2.c
 

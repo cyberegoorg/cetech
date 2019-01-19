@@ -8,6 +8,7 @@
 #include "celib/module.h"
 
 #include <cetech/resource/resource.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/property.h>

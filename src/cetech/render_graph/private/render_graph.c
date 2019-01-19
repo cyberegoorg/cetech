@@ -13,7 +13,7 @@
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugdraw/debugdraw.h>
+
 #include <cetech/ecs/ecs.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/transform/transform.h>
@@ -67,7 +67,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_renderer_a0);
-            CE_INIT_API(api, ct_dd_a0);
         },
         {
             CE_UNUSED(reload);

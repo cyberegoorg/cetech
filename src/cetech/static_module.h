@@ -18,7 +18,6 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(shader);
     CE_ADD_STATIC_MODULE(texture);
     CE_ADD_STATIC_MODULE(material);
-    CE_ADD_STATIC_MODULE(debugdraw);
     CE_ADD_STATIC_MODULE(render_graph);
 
     //==========================================================================

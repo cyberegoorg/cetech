@@ -11,6 +11,7 @@
 #include <celib/hash.inl>
 #include <celib/log.h>
 
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>

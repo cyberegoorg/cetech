@@ -57,11 +57,11 @@ void texture_online(uint64_t obj) {
     void *blob;
     blob = ce_cdb_a0->read_blob(reader, TEXTURE_DATA, &blob_size, 0);
 
-    const ct_render_memory_t *mem = ct_gfx_a0->make_ref(blob, blob_size);
+    const bgfx_memory_t *mem = ct_gfx_a0->bgfx_make_ref(blob, blob_size);
 
-    ct_render_texture_handle_t texture;
-    texture = ct_gfx_a0->create_texture(mem,
-                                        CT_RENDER_TEXTURE_NONE,
+    bgfx_texture_handle_t texture;
+    texture = ct_gfx_a0->bgfx_create_texture(mem,
+                                        BGFX_TEXTURE_NONE,
                                         0, NULL);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),obj);
@@ -76,8 +76,8 @@ void texture_offline(uint64_t obj) {
     const uint64_t texture = ce_cdb_a0->read_uint64(reader,
                                                     TEXTURE_HANDLER_PROP,
                                                     0);
-    ct_gfx_a0->destroy_texture(
-            (ct_render_texture_handle_t) {.idx=(uint16_t) texture});
+    ct_gfx_a0->bgfx_destroy_texture(
+            (bgfx_texture_handle_t) {.idx=(uint16_t) texture});
 }
 
 void _texture_resource_online(uint64_t name,
@@ -213,7 +213,7 @@ static void draw_property(uint64_t obj) {
     float size[2] = {128, 128};
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
-    struct ct_render_texture_handle texture = {
+    bgfx_texture_handle_t texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
     };
@@ -235,7 +235,7 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 static void tooltip(uint64_t resource,float size[2]) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
 
-    struct ct_render_texture_handle texture = {
+    bgfx_texture_handle_t texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
     };
@@ -284,16 +284,16 @@ int texture_init(struct ce_api_a0 *api) {
 void texture_shutdown() {
 }
 
-ct_render_texture_handle_t texture_get(uint64_t name) {
+bgfx_texture_handle_t texture_get(uint64_t name) {
     struct ct_resource_id rid = {.uid = name};
     uint64_t obj = rid.uid;
 
     if (!obj) {
-        return (ct_render_texture_handle_t) {.idx = UINT16_MAX};
+        return (bgfx_texture_handle_t) {.idx = UINT16_MAX};
     }
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
-    struct ct_render_texture_handle texture = {
+    bgfx_texture_handle_t texture = {
             .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
                                                      TEXTURE_HANDLER_PROP, 0)
     };

@@ -33,13 +33,13 @@ namespace imgui_wrap {
     }
 
 
-    void Image2(struct ct_render_texture_handle user_texture_id,
+    void Image2(bgfx_texture_handle_t user_texture_id,
                 const _vec2 size,
                 const _vec2 uv0,
                 const _vec2 uv1,
                 const _vec4 tint_col,
                 const _vec4 border_col) {
-        return ImGui::Image((bgfx::TextureHandle) {user_texture_id.idx},
+        return ImGui::Image((bgfx_texture_handle_t) {user_texture_id.idx},
                             _to_imvec2(size),
                             _to_imvec2(uv0),
                             _to_imvec2(uv1),
@@ -47,12 +47,12 @@ namespace imgui_wrap {
                             _to_imvec4(border_col));
     }
 
-    void Image(struct ct_render_texture_handle user_texture_id,
+    void Image(bgfx_texture_handle_t user_texture_id,
                const _vec2 size,
                const _vec4 tint_col,
                const _vec4 border_col) {
 
-        if (ct_gfx_a0->get_caps()->originBottomLeft) {
+        if (ct_gfx_a0->bgfx_get_caps()->originBottomLeft) {
             ct_debugui_a0->Image2(user_texture_id,
                                   size,
                                   (float[2]) {0.0f, 1.0f},

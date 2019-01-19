@@ -15,11 +15,12 @@
 #include "celib/module.h"
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
-#include <cetech/debugui/debugui.h>
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include <cetech/editor/editor_ui.h>
 #include <cetech/editor/property.h>
+#include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
 
 #define LOG_WHERE "transform"
 

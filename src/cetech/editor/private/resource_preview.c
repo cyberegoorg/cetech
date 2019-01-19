@@ -1,11 +1,12 @@
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/debugdraw/debugdraw.h>
+
 
 #include <cetech/editor/resource_preview.h>
 #include <cetech/editor/resource_browser.h>
@@ -196,7 +197,7 @@ static void on_debugui(uint64_t dock) {
 
     builder->set_size(builder, size[0], size[1]);
 
-    ct_render_texture_handle_t th;
+    bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
@@ -316,8 +317,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ct_camera_a0);
             CE_INIT_API(api, ce_cdb_a0);
-
-            CE_INIT_API(api, ct_dd_a0);
             CE_INIT_API(api, ct_rg_a0);
             CE_INIT_API(api, ct_default_rg_a0);
         },

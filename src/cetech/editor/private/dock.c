@@ -7,12 +7,14 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 
-#include <cetech/debugui/debugui.h>
 #include <cetech/editor/property.h>
 #include <stdio.h>
 #include <celib/fs.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/debugui/icons_font_awesome.h>
+
+#include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
 
 #include "../dock.h"
 

@@ -245,16 +245,16 @@ static void online(uint64_t name,
     void *vs_blob;
     vs_blob = ce_cdb_a0->read_blob(reader, SHADER_VS_DATA, &vs_blob_size, 0);
 
-    const ct_render_memory_t *vs_mem = ct_gfx_a0->make_ref(vs_blob,
+    const bgfx_memory_t *vs_mem = ct_gfx_a0->bgfx_make_ref(vs_blob,
                                                            vs_blob_size);
-    const ct_render_memory_t *fs_mem = ct_gfx_a0->make_ref(fs_blob,
+    const bgfx_memory_t *fs_mem = ct_gfx_a0->bgfx_make_ref(fs_blob,
                                                            fs_blob_size);
 
-    ct_render_shader_handle_t vs_shader = ct_gfx_a0->create_shader(vs_mem);
-    ct_render_shader_handle_t fs_shader = ct_gfx_a0->create_shader(fs_mem);
+    bgfx_shader_handle_t vs_shader = ct_gfx_a0->bgfx_create_shader(vs_mem);
+    bgfx_shader_handle_t fs_shader = ct_gfx_a0->bgfx_create_shader(fs_mem);
 
-    ct_render_program_handle_t program;
-    program = ct_gfx_a0->create_program(vs_shader, fs_shader, true);
+    bgfx_program_handle_t program;
+    program = ct_gfx_a0->bgfx_create_program(vs_shader, fs_shader, true);
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     ce_cdb_a0->set_uint64(writer, SHADER_PROP, program.idx);
@@ -268,8 +268,8 @@ static void offline(uint64_t name,
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     const uint64_t program = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
-    ct_gfx_a0->destroy_program(
-            (ct_render_program_handle_t) {.idx=(uint16_t) program});
+    ct_gfx_a0->bgfx_destroy_program(
+            (bgfx_program_handle_t) {.idx=(uint16_t) program});
 }
 
 
@@ -299,11 +299,11 @@ int shader_init(struct ce_api_a0 *api) {
 void shader_shutdown() {
 }
 
-ct_render_program_handle_t shader_get(uint64_t shader) {
+bgfx_program_handle_t shader_get(uint64_t shader) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), shader);
 
     const uint64_t idx = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
-    return (ct_render_program_handle_t) {.idx=(uint16_t) idx};
+    return (bgfx_program_handle_t) {.idx=(uint16_t) idx};
 }
 
 static struct ct_shader_a0 shader_api = {

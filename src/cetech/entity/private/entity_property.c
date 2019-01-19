@@ -16,6 +16,7 @@
 #include <celib/log.h>
 #include <celib/buffer.inl>
 
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>

@@ -15,6 +15,7 @@
 #include <celib/ydb.h>
 #include <celib/cdb.h>
 
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>

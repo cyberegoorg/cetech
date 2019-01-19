@@ -260,7 +260,7 @@ static void draw_editor(uint64_t context_obj) {
 
     builder->set_size(builder, size[0], size[1]);
 
-    ct_render_texture_handle_t th;
+    bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,

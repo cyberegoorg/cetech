@@ -82,7 +82,7 @@ struct ct_material_a0 {
     void (*set_texture_handler)(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
-                                struct ct_render_texture_handle texture);
+                                bgfx_texture_handle_t texture);
 };
 
 CE_MODULE(ct_material_a0);

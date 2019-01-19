@@ -62,12 +62,12 @@ enum material_variable_type {
 };
 
 
-static ct_render_uniform_type_t _type_to_bgfx[] = {
-        [MAT_VAR_NONE] = CT_RENDER_UNIFORM_TYPE_COUNT,
-        [MAT_VAR_INT] = CT_RENDER_UNIFORM_TYPE_INT1,
-        [MAT_VAR_TEXTURE] = CT_RENDER_UNIFORM_TYPE_INT1,
-        [MAT_VAR_TEXTURE_HANDLER] = CT_RENDER_UNIFORM_TYPE_INT1,
-        [MAT_VAR_VEC4] = CT_RENDER_UNIFORM_TYPE_VEC4,
+static bgfx_uniform_type_t _type_to_bgfx[] = {
+        [MAT_VAR_NONE] = BGFX_UNIFORM_TYPE_COUNT,
+        [MAT_VAR_INT] = BGFX_UNIFORM_TYPE_SAMPLER,
+        [MAT_VAR_TEXTURE] = BGFX_UNIFORM_TYPE_SAMPLER,
+        [MAT_VAR_TEXTURE_HANDLER] = BGFX_UNIFORM_TYPE_SAMPLER,
+        [MAT_VAR_VEC4] = BGFX_UNIFORM_TYPE_VEC4,
 };
 
 static uint64_t _str_to_type(const char *type) {
@@ -135,8 +135,8 @@ static void online(uint64_t name,
                 continue;
             }
 
-            const ct_render_uniform_handle_t handler = \
-            ct_gfx_a0->create_uniform(uniform_name, _type_to_bgfx[type], 1);
+            const bgfx_uniform_handle_t handler = \
+            ct_gfx_a0->bgfx_create_uniform(uniform_name, _type_to_bgfx[type], 1);
 
             ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          var_obj);
@@ -354,7 +354,7 @@ static uint64_t _find_slot_by_name(uint64_t variables,
 static void set_texture_handler(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
-                                struct ct_render_texture_handle texture) {
+                                bgfx_texture_handle_t texture) {
     const ce_cdb_obj_o *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layers_obj = ce_cdb_a0->read_ref(mat_reader, MATERIAL_LAYERS, 0);
@@ -479,7 +479,7 @@ static void submit(uint64_t material,
         uint64_t type = _str_to_type(
                 ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
 
-        ct_render_uniform_handle_t handle = {
+        bgfx_uniform_handle_t handle = {
                 .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader,
                                                          MATERIAL_VAR_HANDLER_PROP,
                                                          0)
@@ -492,7 +492,7 @@ static void submit(uint64_t material,
             case MAT_VAR_INT: {
                 uint64_t v = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
-                ct_gfx_a0->set_uniform(handle, &v, 1);
+                ct_gfx_a0->bgfx_set_uniform(handle, &v, 1);
             }
                 break;
 
@@ -501,7 +501,7 @@ static void submit(uint64_t material,
                                                      MATERIAL_VAR_VALUE_PROP,
                                                      0);
 
-                ct_gfx_a0->set_texture(texture_stage++, handle,
+                ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
                                        ct_texture_a0->get(tn), 0);
             }
                 break;
@@ -509,8 +509,8 @@ static void submit(uint64_t material,
             case MAT_VAR_TEXTURE_HANDLER: {
                 uint64_t t = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
-                ct_gfx_a0->set_texture(texture_stage++, handle,
-                                       (ct_render_texture_handle_t) {.idx=(uint16_t) t},
+                ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
+                                       (bgfx_texture_handle_t) {.idx=(uint16_t) t},
                                        0);
             }
                 break;
@@ -528,7 +528,7 @@ static void submit(uint64_t material,
                                               MATERIAL_VAR_VALUE_PROP_W, 1.0f)
                 };
 
-                ct_gfx_a0->set_uniform(handle, &v, 1);
+                ct_gfx_a0->bgfx_set_uniform(handle, &v, 1);
             }
                 break;
 
@@ -545,12 +545,12 @@ static void submit(uint64_t material,
         return;
     }
 
-    ct_render_program_handle_t shaderp = ct_shader_a0->get(shader_obj);
+    bgfx_program_handle_t shaderp = ct_shader_a0->get(shader_obj);
 
     uint64_t state = _get_render_state(layer);
 
-    ct_gfx_a0->set_state(state, 0);
-    ct_gfx_a0->submit(viewid, shaderp, 0, false);
+    ct_gfx_a0->bgfx_set_state(state, 0);
+    ct_gfx_a0->bgfx_submit(viewid, shaderp, 0, false);
 }
 
 static struct ct_material_a0 material_api = {

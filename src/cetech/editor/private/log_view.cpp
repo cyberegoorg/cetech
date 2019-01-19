@@ -1,20 +1,23 @@
 #include <stdio.h>
 
-#include <cetech/debugui/debugui.h>
+
+extern "C" {
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
 #include <cetech/editor/log_view.h>
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/array.inl>
-
 #include <cetech/debugui/icons_font_awesome.h>
-
 #include "celib/hashlib.h"
 #include "celib/memory.h"
 #include "celib/api_system.h"
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
 #include <celib/os.h>
+#include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
+}
+
+#include <cetech/debugui/private/ocornut-imgui/imgui.h>
 
 #define WINDOW_NAME "Log view"
 #define LOG_FORMAT "[%d|%s] -> %s"

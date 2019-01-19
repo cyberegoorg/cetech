@@ -21,19 +21,23 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/renderer/gfx.h>
 #include <cetech/machine/machine.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/game/game_system.h>
+
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
-#include <cetech/debugdraw/debugdraw.h>
+
 #include <cetech/mesh/mesh_renderer.h>
 #include <celib/task.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
+
+#include <cetech/debugui/debugui.h>
+
+#include "cetech/render_graph/render_graph.h"
+#include <cetech/game/game_system.h>
+#include <cetech/renderer/gfx.h>
 
 //==============================================================================
 // GLobals
@@ -371,8 +375,6 @@ static struct ct_renderer_a0 rendderer_api = {
 
 struct ct_renderer_a0 *ct_renderer_a0 = &rendderer_api;
 
-#include "gfx.inl"
-
 static uint64_t task_name() {
     return CT_RENDER_TASK;
 }
@@ -392,6 +394,8 @@ static struct ct_kernel_task_i0 render_task = {
         .update = render,
         .update_after = update_after,
 };
+
+#include "gfx.inl"
 
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api(CT_RENDERER_API, &rendderer_api);

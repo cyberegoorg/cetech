@@ -2,7 +2,7 @@
 
 #include <celib/cdb.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/controlers/keyboard.h>
 #include <celib/hashlib.h>
 #include <celib/os.h>
@@ -19,6 +19,7 @@
 #include "celib/api_system.h"
 #include "celib/module.h"
 #include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
 #include <cetech/controlers/gamepad.h>
 #include "imgui_wrap.inl"
 

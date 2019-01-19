@@ -13,6 +13,7 @@
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
@@ -147,7 +148,7 @@ static uint64_t *update_after(uint64_t *n) {
 
 static uint64_t *update_before(uint64_t *n) {
     static uint64_t a[] = {
-            CT_RENDER_TASK,
+        CT_RENDER_TASK,
     };
 
     *n = CE_ARRAY_LEN(a);

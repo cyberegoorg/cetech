@@ -11,6 +11,8 @@
     CE_ID64_0("output", 0x759d549788b7b7e0ULL)
 
 struct ct_rg_builder;
+typedef enum bgfx_backbuffer_ratio bgfx_backbuffer_ratio_t;
+typedef enum bgfx_texture_format bgfx_texture_format_t;
 
 struct ct_rg_pass {
     uint64_t size;
@@ -25,8 +27,8 @@ struct ct_rg_pass {
 };
 
 struct ct_rg_attachment {
-    enum ct_render_backbuffer_ratio ratio;
-    enum ct_render_texture_format format;
+    bgfx_backbuffer_ratio_t ratio;
+    bgfx_texture_format_t format;
 };
 
 struct ct_rg_builder {
@@ -47,7 +49,7 @@ struct ct_rg_builder {
     void (*write)(void *inst,
                   uint64_t name);
 
-    struct ct_render_texture_handle (*get_texture)(void *inst,
+    bgfx_texture_handle_t (*get_texture)(void *inst,
                                                    uint64_t name);
 
     void (*set_size)(void *inst,

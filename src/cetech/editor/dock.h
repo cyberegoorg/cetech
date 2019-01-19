@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-enum DebugUIWindowFlags_;
 
 #define CT_DOCK_API \
     CE_ID64_0("ct_dock_a0", 0x90cc2a5b4273931aULL)

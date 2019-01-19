@@ -47,7 +47,7 @@ static void online(uint64_t name,
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
-    ct_render_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
+    bgfx_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
                                                              SCENE_VB_DECL,
                                                              NULL, NULL));
     uint64_t *geom_name = (ce_cdb_a0->read_blob(reader, SCENE_GEOM_NAME,
@@ -65,22 +65,22 @@ static void online(uint64_t name,
 
     ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     for (uint32_t i = 0; i < geom_count; ++i) {
-        const ct_render_memory_t *vb_mem;
-        vb_mem = ct_gfx_a0->make_ref((const void *) &vb[vb_offset[i]],
+        const bgfx_memory_t *vb_mem;
+        vb_mem = ct_gfx_a0->bgfx_make_ref((const void *) &vb[vb_offset[i]],
                                      vb_size[i]);
 
-        const ct_render_memory_t *ib_mem;
-        ib_mem = ct_gfx_a0->make_ref((const void *) &ib[ib_offset[i]],
+        const bgfx_memory_t *ib_mem;
+        ib_mem = ct_gfx_a0->bgfx_make_ref((const void *) &ib[ib_offset[i]],
                                      sizeof(uint32_t) * ib_size[i]);
 
-        ct_render_vertex_buffer_handle_t bv_handle;
-        bv_handle = ct_gfx_a0->create_vertex_buffer(vb_mem,
+        bgfx_vertex_buffer_handle_t bv_handle;
+        bv_handle = ct_gfx_a0->bgfx_create_vertex_buffer(vb_mem,
                                                     &vb_decl[i],
-                                                    CT_RENDER_BUFFER_NONE);
+                                                    BGFX_BUFFER_NONE);
 
-        ct_render_index_buffer_handle_t ib_handle;
-        ib_handle = ct_gfx_a0->create_index_buffer(ib_mem,
-                                                   CT_RENDER_BUFFER_INDEX32);
+        bgfx_index_buffer_handle_t ib_handle;
+        ib_handle = ct_gfx_a0->bgfx_create_index_buffer(ib_mem,
+                                                   BGFX_BUFFER_INDEX32);
 
         uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);
         ce_cdb_obj_o *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),

@@ -44,7 +44,7 @@ struct compile_output {
     uint64_t *geom_name;
     uint32_t *ib_offset;
     uint32_t *vb_offset;
-    ct_render_vertex_decl_t *vb_decl;
+    bgfx_vertex_decl_t *vb_decl;
     uint32_t *ib_size;
     uint32_t *vb_size;
     uint32_t *ib;
@@ -59,37 +59,37 @@ struct compile_output {
 
 //static const struct {
 //    const char *name;
-//    ct_render_attrib_t attrib;
+//    bgfx_attrib_t attrib;
 //} _chanel_types[] = {
-//        {.name="position", .attrib=CT_RENDER_ATTRIB_POSITION},
-//        {.name="normal", .attrib=CT_RENDER_ATTRIB_NORMAL},
-//        {.name="tangent", .attrib=CT_RENDER_ATTRIB_TANGENT},
-//        {.name="bitangent", .attrib=CT_RENDER_ATTRIB_BITANGENT},
-//        {.name="color0", .attrib=CT_RENDER_ATTRIB_COLOR0},
-//        {.name="color1", .attrib=CT_RENDER_ATTRIB_COLOR1},
-//        {.name="color2", .attrib=CT_RENDER_ATTRIB_COLOR2},
-//        {.name="color3", .attrib=CT_RENDER_ATTRIB_COLOR3},
-//        {.name="indices", .attrib=CT_RENDER_ATTRIB_INDICES},
-//        {.name="weight", .attrib=CT_RENDER_ATTRIB_INDICES},
-//        {.name="texcoord0", .attrib=CT_RENDER_ATTRIB_TEXCOORD0},
-//        {.name="texcoord1", .attrib=CT_RENDER_ATTRIB_TEXCOORD1},
-//        {.name="texcoord2", .attrib=CT_RENDER_ATTRIB_TEXCOORD2},
-//        {.name="texcoord3", .attrib=CT_RENDER_ATTRIB_TEXCOORD3},
-//        {.name="texcoord4", .attrib=CT_RENDER_ATTRIB_TEXCOORD4},
-//        {.name="texcoord5", .attrib=CT_RENDER_ATTRIB_TEXCOORD5},
-//        {.name="texcoord6", .attrib=CT_RENDER_ATTRIB_TEXCOORD6},
-//        {.name="texcoord7", .attrib=CT_RENDER_ATTRIB_TEXCOORD7},
+//        {.name="position", .attrib=BGFX_ATTRIB_POSITION},
+//        {.name="normal", .attrib=BGFX_ATTRIB_NORMAL},
+//        {.name="tangent", .attrib=BGFX_ATTRIB_TANGENT},
+//        {.name="bitangent", .attrib=BGFX_ATTRIB_BITANGENT},
+//        {.name="color0", .attrib=BGFX_ATTRIB_COLOR0},
+//        {.name="color1", .attrib=BGFX_ATTRIB_COLOR1},
+//        {.name="color2", .attrib=BGFX_ATTRIB_COLOR2},
+//        {.name="color3", .attrib=BGFX_ATTRIB_COLOR3},
+//        {.name="indices", .attrib=BGFX_ATTRIB_INDICES},
+//        {.name="weight", .attrib=BGFX_ATTRIB_INDICES},
+//        {.name="texcoord0", .attrib=BGFX_ATTRIB_TEXCOORD0},
+//        {.name="texcoord1", .attrib=BGFX_ATTRIB_TEXCOORD1},
+//        {.name="texcoord2", .attrib=BGFX_ATTRIB_TEXCOORD2},
+//        {.name="texcoord3", .attrib=BGFX_ATTRIB_TEXCOORD3},
+//        {.name="texcoord4", .attrib=BGFX_ATTRIB_TEXCOORD4},
+//        {.name="texcoord5", .attrib=BGFX_ATTRIB_TEXCOORD5},
+//        {.name="texcoord6", .attrib=BGFX_ATTRIB_TEXCOORD6},
+//        {.name="texcoord7", .attrib=BGFX_ATTRIB_TEXCOORD7},
 //};
 //
 //static const struct {
 //    const char *name;
 //    size_t size;
-//    ct_render_attrib_type_t attrib_type;
+//    bgfx_attrib_type_t attrib_type;
 //} _attrin_tbl[] = {
-//        {.name="f32", .size=sizeof(float), .attrib_type=CT_RENDER_ATTRIB_TYPE_FLOAT},
-//        {.name="int16_t", .size=sizeof(int16_t), .attrib_type=CT_RENDER_ATTRIB_TYPE_INT16},
-//        {.name="uint8_t", .size=sizeof(uint8_t), .attrib_type=CT_RENDER_ATTRIB_TYPE_UINT8},
-////        {.name="float16_t", .size=sizeof(float16_t), .attrib_type=CT_RENDER_ATTRIB_TYPE_HALF},
+//        {.name="f32", .size=sizeof(float), .attrib_type=BGFX_ATTRIB_TYPE_FLOAT},
+//        {.name="int16_t", .size=sizeof(int16_t), .attrib_type=BGFX_ATTRIB_TYPE_INT16},
+//        {.name="uint8_t", .size=sizeof(uint8_t), .attrib_type=BGFX_ATTRIB_TYPE_UINT8},
+////        {.name="float16_t", .size=sizeof(float16_t), .attrib_type=BGFX_ATTRIB_TYPE_HALF},
 //        // TODO: {.name="u10", .size=sizeof(u10), .attrib_type=BGFX_ATTRIB_TYPE_UINT10},
 //};
 //
@@ -231,34 +231,34 @@ static int _compile_assimp(struct ce_cdb_t db,
                       _G.allocator);
         ce_array_push(output->ib_size, mesh->mNumFaces * 3, _G.allocator);
 
-        ct_render_vertex_decl_t vertex_decl;
-        ct_gfx_a0->vertex_decl_begin(&vertex_decl,
-                                     CT_RENDER_RENDERER_TYPE_COUNT);
+        bgfx_vertex_decl_t vertex_decl;
+        ct_gfx_a0->bgfx_vertex_decl_begin(&vertex_decl,
+                                     BGFX_RENDERER_TYPE_COUNT);
 
         uint32_t v_size = 0;
         if (mesh->mVertices != NULL) {
-            ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                       CT_RENDER_ATTRIB_POSITION, 3,
-                                       CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
+            ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
+                                       BGFX_ATTRIB_POSITION, 3,
+                                       BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mNormals != NULL) {
-            ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                       CT_RENDER_ATTRIB_NORMAL, 3,
-                                       CT_RENDER_ATTRIB_TYPE_FLOAT, true,
+            ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
+                                       BGFX_ATTRIB_NORMAL, 3,
+                                       BGFX_ATTRIB_TYPE_FLOAT, true,
                                        0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
-            ct_gfx_a0->vertex_decl_add(&vertex_decl,
-                                       CT_RENDER_ATTRIB_TEXCOORD0, 2,
-                                       CT_RENDER_ATTRIB_TYPE_FLOAT, 0, 0);
+            ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
+                                       BGFX_ATTRIB_TEXCOORD0, 2,
+                                       BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
 
             v_size += 2 * sizeof(float);
         }
-        ct_gfx_a0->vertex_decl_end(&vertex_decl);
+        ct_gfx_a0->bgfx_vertex_decl_end(&vertex_decl);
 
         ce_array_push(output->vb_decl, vertex_decl, _G.allocator);
         ce_array_push(output->vb_size, v_size * mesh->mNumVertices,

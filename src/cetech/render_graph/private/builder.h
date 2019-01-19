@@ -2,7 +2,7 @@ struct render_graph_builder_pass {
     struct ct_rg_pass *pass;
     uint8_t viewid;
     uint64_t layer;
-    ct_render_frame_buffer_handle_t fb;
+    bgfx_frame_buffer_handle_t fb;
 };
 
 #define MAX_ATTACHMENTS 8+2
@@ -16,7 +16,7 @@ struct render_graph_builder_inst {
     uint16_t size[2];
 
     uint8_t attachemnt_used;
-    ct_render_texture_handle_t attachemnt[MAX_ATTACHMENTS];
+    bgfx_texture_handle_t attachemnt[MAX_ATTACHMENTS];
 };
 
 #define _DEFAULT \
@@ -40,11 +40,11 @@ static void builder_add_pass(void *inst,
         }
     }
 
-    ct_render_frame_buffer_handle_t fb = {.idx = UINT16_MAX};
+    bgfx_frame_buffer_handle_t fb = {.idx = UINT16_MAX};
     if (pass->on_pass) {
         const uint8_t n = builder_inst->attachemnt_used;
         if (0 != n) {
-            fb = ct_gfx_a0->create_frame_buffer_from_handles(n,
+            fb = ct_gfx_a0->bgfx_create_frame_buffer_from_handles(n,
                                                              builder_inst->attachemnt,
                                                              true);
         }
@@ -74,11 +74,9 @@ static void builder_execute(void *inst) {
             continue;
         }
 
-        ct_gfx_a0->set_view_frame_buffer(pass->viewid, pass->fb);
-        ct_gfx_a0->touch(pass->viewid);
-        ct_dd_a0->begin(pass->viewid);
+        ct_gfx_a0->bgfx_set_view_frame_buffer(pass->viewid, pass->fb);
+        ct_gfx_a0->bgfx_touch(pass->viewid);
         pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, builder);
-        ct_dd_a0->end();
     }
 }
 
@@ -94,7 +92,7 @@ static void builder_clear(void *inst) {
             continue;
         }
 
-        ct_gfx_a0->destroy_frame_buffer(pass->fb);
+        ct_gfx_a0->bgfx_destroy_frame_buffer(pass->fb);
     }
 
     ce_array_clean(builder_inst->pass);
@@ -103,14 +101,14 @@ static void builder_clear(void *inst) {
     builder_inst->attachemnt_used = 0;
 }
 
-float ratio_to_coef(ct_render_backbuffer_ratio_t ratio) {
+float ratio_to_coef(bgfx_backbuffer_ratio_t ratio) {
     static float _table[] = {
-            [CT_RENDER_BACKBUFFER_RATIO_EQUAL] = 1.0f,
-            [CT_RENDER_BACKBUFFER_RATIO_HALF] = 1.0f,
-            [CT_RENDER_BACKBUFFER_RATIO_QUARTER] = 1.0f / 2.0f,
-            [CT_RENDER_BACKBUFFER_RATIO_EIGHTH] = 1.0f / 4.0f,
-            [CT_RENDER_BACKBUFFER_RATIO_SIXTEENTH] = 1.0f / 8.0f,
-            [CT_RENDER_BACKBUFFER_RATIO_DOUBLE] = 1.0f / 16.0f,
+            [BGFX_BACKBUFFER_RATIO_EQUAL] = 1.0f,
+            [BGFX_BACKBUFFER_RATIO_HALF] = 1.0f,
+            [BGFX_BACKBUFFER_RATIO_QUARTER] = 1.0f / 2.0f,
+            [BGFX_BACKBUFFER_RATIO_EIGHTH] = 1.0f / 4.0f,
+            [BGFX_BACKBUFFER_RATIO_SIXTEENTH] = 1.0f / 8.0f,
+            [BGFX_BACKBUFFER_RATIO_DOUBLE] = 1.0f / 16.0f,
     };
 
     return _table[ratio];
@@ -123,17 +121,17 @@ static void builder_create(void *inst,
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     const uint64_t samplerFlags = 0
-                                  | CT_RENDER_TEXTURE_RT
-                                  | CT_RENDER_SAMPLER_MIN_POINT
-                                  | CT_RENDER_SAMPLER_MAG_POINT
-                                  | CT_RENDER_SAMPLER_MIP_POINT
-                                  | CT_RENDER_SAMPLER_U_CLAMP
-                                  | CT_RENDER_SAMPLER_V_CLAMP;
+                                  | BGFX_TEXTURE_RT
+                                  | BGFX_SAMPLER_MIN_POINT
+                                  | BGFX_SAMPLER_MAG_POINT
+                                  | BGFX_SAMPLER_MIP_POINT
+                                  | BGFX_SAMPLER_U_CLAMP
+                                  | BGFX_SAMPLER_V_CLAMP;
 
     const float coef = ratio_to_coef(info.ratio);
 
-    ct_render_texture_handle_t th;
-    th = ct_gfx_a0->create_texture_2d(builder_inst->size[0] * coef,
+    bgfx_texture_handle_t th;
+    th = ct_gfx_a0->bgfx_create_texture_2d(builder_inst->size[0] * coef,
                                       builder_inst->size[1] * coef,
                                       false, 1, info.format,
                                       samplerFlags, NULL);
@@ -151,19 +149,19 @@ static void builder_write(void *inst,
 
     uint32_t tidx = ce_hash_lookup(&builder_inst->texture_map, name, 0);
     const uint8_t idx = builder_inst->attachemnt_used++;
-    builder_inst->attachemnt[idx] = (ct_render_texture_handle_t) {.idx=tidx};
+    builder_inst->attachemnt[idx] = (bgfx_texture_handle_t) {.idx=tidx};
 }
 
 static void builder_read(void *inst,
                          uint64_t name) {
 }
 
-struct ct_render_texture_handle builder_get_texture(void *inst,
+bgfx_texture_handle_t builder_get_texture(void *inst,
                                                     uint64_t name) {
     struct ct_rg_builder *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
-    return (struct ct_render_texture_handle) {
+    return (bgfx_texture_handle_t) {
             .idx = ce_hash_lookup(&builder_inst->texture_map, name, 0)};
 }
 

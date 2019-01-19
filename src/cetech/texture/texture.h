@@ -28,9 +28,11 @@
 
 #include <stdint.h>
 
+typedef struct bgfx_texture_handle_s bgfx_texture_handle_t;
+
 //! Texture API V0
 struct ct_texture_a0 {
-    struct ct_render_texture_handle (*get)(uint64_t name);
+    bgfx_texture_handle_t (*get)(uint64_t name);
 };
 
 CE_MODULE(ct_texture_a0);
