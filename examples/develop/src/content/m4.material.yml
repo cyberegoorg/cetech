@@ -1,0 +1,26 @@
+cdb_uid: 0x1680b59ec410011b
+cdb_type: material
+cdb_instance: 0x24c9413e88ebaaa8
+asset_name: content/m4
+layers:
+  cdb_uid: 0x1680b59ec410011c
+  cdb_instance: 0x5fdd15ad67957032
+  gbuffer:
+    cdb_uid: 0x1680b59ec410011d
+    cdb_instance: 0x9b2e443e0dddcdd9
+    render_state:
+      cdb_uid: 0x1680b59ec410011e
+      cdb_instance: 0x78ccc53d72122491
+    variables:
+      cdb_uid: 0x1680b59ec410011f
+      cdb_instance: 0x89a49d1dd195d569
+      0xf81a1ce60b9ba9e8:
+        cdb_uid: 0x1680b59ec4100120
+        cdb_instance: 0xf81a1ce60b9ba9e8
+        value: 0x1c80b5de261dcdce
+      0x3e8302bae4fce293:
+        cdb_uid: 0x1680b59ec4100121
+        cdb_instance: 0x3e8302bae4fce293
+      0xe66d5daf1a451dbf:
+        cdb_uid: 0x1680b59ec4200122
+        cdb_instance: 0xe66d5daf1a451dbf

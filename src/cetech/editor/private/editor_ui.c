@@ -101,12 +101,17 @@ static void resource_tooltip(struct ct_resource_id resourceid,
                 (struct ct_resource_preview_i0 *) (ri->get_interface(
             RESOURCE_PREVIEW_I));
 
-    if (!ai->tooltip) {
-        return;
+    uint64_t obj = resourceid.uid;
+
+    if(ai) {
+        if (ai->tooltip) {
+            ai->tooltip(obj, size);
+        }
+
+        ct_resource_preview_a0->set_background_resource(resourceid);
+        ct_resource_preview_a0->draw_background_texture(size);
     }
 
-    uint64_t obj = resourceid.uid;
-    ai->tooltip(obj, size);
 }
 
 static void ui_float(uint64_t obj,

@@ -1,0 +1,24 @@
+cdb_uid: 0x1680afa75da0014d
+cdb_type: entity
+asset_name: content/m4
+components:
+  cdb_uid: 0x1680b564ce400109
+  cdb_type: components
+  transform:
+    cdb_uid: 0x1680b5652a000164
+    cdb_type: transform
+    scale.x: 1.000000
+    scale.y: 1.000000
+    scale.z: 1.000000
+    position.x: 0.000000
+    position.y: 0.000000
+    position.z: 123.000008
+    rotation.x: -90.000008
+    rotation.y: -90.000008
+    rotation.z: 0.000000
+  mesh_renderer:
+    cdb_uid: 0x1680b5662820015d
+    cdb_type: mesh_renderer
+    scene: 0xd3276608fb728ffb
+    mesh: M4A1
+    material: 0x1680b59ec410011b

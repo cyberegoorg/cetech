@@ -255,25 +255,43 @@ static void _create_from_modal(const char *modal_id) {
                 continue;
             }
 
+            const char *type = ce_os_a0->path->extension(path);
+            uint64_t  resource_type = ce_id_a0->id64(type);
+
+            char name[256] = {};
+            uint32_t path_len = snprintf(name, CE_ARRAY_LEN(name),
+                                         "%s", path);
+            uint32_t type_len = strlen(type);
+
+            name[path_len - type_len - 1] = '\0';
+
             char label[128];
 
-            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", path);
+            ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+            const char *icon = ri->display_icon ? ri->display_icon() : NULL;
+
+            if (icon) {
+                sprintf(label, "%s %s##modal_type_item_%s", icon, path, path);
+            } else {
+                sprintf(label, "%s##modal_type_item_%s", path, path);
+            }
 
             bool selected = ImGui::Selectable(label,
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_DontClosePopups);
 
+            if (ImGui::IsItemHovered()) {
+                ct_resource_id rid = {
+                        .uid = ct_resourcedb_a0->get_uid(name, type)
+                };
+
+                ct_debugui_a0->BeginTooltip();
+                ct_editor_ui_a0->resource_tooltip(rid, path,
+                                                  (float[2]) {256, 256});
+                ct_debugui_a0->EndTooltip();
+            }
+
             if (selected) {
-                const char *type = ce_os_a0->path->extension(path);
-
-                char name[256] = {};
-                uint32_t path_len = snprintf(name, CE_ARRAY_LEN(name),
-                                             "%s", path);
-                uint32_t type_len = strlen(type);
-
-                name[path_len - type_len - 1] = '\0';
-
-
                 snprintf(modal_buffer_name, CE_ARRAY_LEN(modal_buffer_name),
                          "%s", name);
 
@@ -282,7 +300,6 @@ static void _create_from_modal(const char *modal_id) {
 
                 snprintf(modal_buffer_from, CE_ARRAY_LEN(modal_buffer_from),
                          "%s", name);
-
             }
         }
 
@@ -341,14 +358,14 @@ static void _select_type_modal(const char *modal_id) {
 
             const char *type = ce_id_a0->str_from_id64(i->cdb_type());
 
-            const char* icon = i->display_icon? i->display_icon() : NULL;
+            const char *icon = i->display_icon ? i->display_icon() : NULL;
 
             if (0 != fnmatch(filter, type, FNM_CASEFOLD)) {
                 it = ce_api_a0->next(it);
                 continue;
             }
 
-            if(icon) {
+            if (icon) {
                 sprintf(labelidi, "%s %s##modal_type_%s", icon, type, type);
             } else {
                 sprintf(labelidi, "%s##modal_type_%s", type, type);
@@ -409,11 +426,11 @@ static void ui_asset_menu(uint64_t dock) {
 
     char title[128] = {'\0'};
 
-    if(ri && ri->display_icon) {
+    if (ri && ri->display_icon) {
         snprintf(title, CE_ARRAY_LEN(title),
                  "T: %s##select_type_%llx", ri->display_icon(), dock);
     } else {
-        if(_selected_type[0]) {
+        if (_selected_type[0]) {
             snprintf(title, CE_ARRAY_LEN(title),
                      "T: %s##select_type_%llx", _selected_type, dock);
         } else {
@@ -582,11 +599,12 @@ static void ui_resource_list(uint64_t dock) {
             uint64_t rtype = ct_resourcedb_a0->get_resource_type(resourceid);
             ct_resource_i0 *ri = ct_resource_a0->get_interface(rtype);
 
-            if(ri && ri->display_icon) {
+            if (ri && ri->display_icon) {
                 snprintf(label, CE_ARRAY_LEN(label),
                          "%s %s", ri->display_icon(), filename);
             } else {
-                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
+                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s",
+                         filename);
             }
 
             bool selected = ImGui::Selectable(label,

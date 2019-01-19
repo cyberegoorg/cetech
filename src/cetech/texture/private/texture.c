@@ -234,17 +234,17 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 
 
 static void tooltip(uint64_t resource,float size[2]) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
-
-    bgfx_texture_handle_t texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
-                                                     TEXTURE_HANDLER_PROP, 0)
-    };
-
-    ct_debugui_a0->Image(texture,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+//    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
+//
+//    bgfx_texture_handle_t texture = {
+//            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
+//                                                     TEXTURE_HANDLER_PROP, 0)
+//    };
+//
+//    ct_debugui_a0->Image(texture,
+//                         size,
+//                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+//                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
 static struct ct_resource_preview_i0 ct_resource_preview_i0 = {

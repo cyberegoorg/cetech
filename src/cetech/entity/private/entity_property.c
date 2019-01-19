@@ -198,6 +198,15 @@ static void _add_comp_modal(const char *modal_id,
                                                    ENTITY_COMPONENTS,
                                                    0);
 
+            if (!components) {
+                components = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                      ENTITY_COMPONENTS);
+
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+                ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, components);
+                ce_cdb_a0->write_commit(w);
+            }
+
             const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                          components);
 

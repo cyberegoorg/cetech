@@ -126,7 +126,7 @@ static void output_pass_on_setup(void *inst,
     builder->create(builder,
                     RG_OUTPUT_TEXTURE,
                     (struct ct_rg_attachment) {
-                            .format = BGFX_TEXTURE_FORMAT_RGBA8,
+                            .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
     );
@@ -182,7 +182,7 @@ static void gbuffer_pass_on_setup(void *inst,
 
     builder->create(builder, _COLOR,
                     (struct ct_rg_attachment) {
-                            .format = BGFX_TEXTURE_FORMAT_RGBA8,
+                            .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
     );

@@ -37,3 +37,19 @@ children:
         cdb_uid: 0x110e500101
         cdb_type: rotation
         cdb_instance: 0xaf5a41d98f0f23bc
+  0x1680b5d73310014a:
+    cdb_uid: 0x1680b5d73310014a
+    cdb_type: entity
+    cdb_instance: 0x1680afa75da0014d
+    components:
+      cdb_uid: 0x1680b5d73310014b
+      cdb_type: components
+      cdb_instance: 0x1680b564ce400109
+      transform:
+        cdb_uid: 0x1680b5d73310014c
+        cdb_type: transform
+        cdb_instance: 0x1680b5652a000164
+      mesh_renderer:
+        cdb_uid: 0x1680b5d73310014d
+        cdb_type: mesh_renderer
+        cdb_instance: 0x1680b5662820015d
