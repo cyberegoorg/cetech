@@ -171,8 +171,8 @@ static int _compile_assimp(struct ce_cdb_t db,
     ce_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
                          input_str);
 
-    uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality |
-                                aiProcess_ConvertToLeftHanded;
+    uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality
+                                | aiProcess_ConvertToLeftHanded;
 
     uint64_t postprocess_obj = ce_cdb_a0->read_subobject(import_reader,
                                                          ce_id_a0->id64(
@@ -233,28 +233,28 @@ static int _compile_assimp(struct ce_cdb_t db,
 
         bgfx_vertex_decl_t vertex_decl;
         ct_gfx_a0->bgfx_vertex_decl_begin(&vertex_decl,
-                                     BGFX_RENDERER_TYPE_COUNT);
+                                          BGFX_RENDERER_TYPE_COUNT);
 
         uint32_t v_size = 0;
         if (mesh->mVertices != NULL) {
             ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
-                                       BGFX_ATTRIB_POSITION, 3,
-                                       BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
+                                            BGFX_ATTRIB_POSITION, 3,
+                                            BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mNormals != NULL) {
             ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
-                                       BGFX_ATTRIB_NORMAL, 3,
-                                       BGFX_ATTRIB_TYPE_FLOAT, true,
-                                       0);
+                                            BGFX_ATTRIB_NORMAL, 3,
+                                            BGFX_ATTRIB_TYPE_FLOAT, true,
+                                            0);
             v_size += 3 * sizeof(float);
         }
 
         if (mesh->mTextureCoords[0] != NULL) {
             ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
-                                       BGFX_ATTRIB_TEXCOORD0, 2,
-                                       BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
+                                            BGFX_ATTRIB_TEXCOORD0, 2,
+                                            BGFX_ATTRIB_TYPE_FLOAT, 0, 0);
 
             v_size += 2 * sizeof(float);
         }

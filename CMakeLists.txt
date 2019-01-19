@@ -114,6 +114,8 @@ set(SOURCE_FILES
         src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
         src/cetech/mesh/private/mesh_renderer.c
+        src/cetech/mesh/private/mesh_renderer.c
+        src/cetech/mesh/private/primitive_mesh.c
         src/cetech/transform/private/transform.c
         src/cetech/camera/private/camera.c
         src/cetech/entity/private/entity_editor.c

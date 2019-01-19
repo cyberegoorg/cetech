@@ -30,6 +30,8 @@
 
 #include <bgfx/defines.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/transform/transform.h>
+#include <cetech/mesh/primitive_mesh.h>
 
 //==============================================================================
 // Defines
@@ -137,7 +139,8 @@ static void online(uint64_t name,
             }
 
             const bgfx_uniform_handle_t handler = \
-            ct_gfx_a0->bgfx_create_uniform(uniform_name, _type_to_bgfx[type], 1);
+            ct_gfx_a0->bgfx_create_uniform(uniform_name, _type_to_bgfx[type],
+                                           1);
 
             ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          var_obj);
@@ -277,12 +280,25 @@ static void draw_property(uint64_t material) {
 
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
+    struct ct_entity ent = {};
+    ct_ecs_a0->create(world, &ent, 1);
 
-    struct ct_entity ent = ct_ecs_a0->spawn(world, 0x68373d25a0b84f58);
+    ct_ecs_a0->add(
+            world, ent,
+            (uint64_t[]) {
+                    TRANSFORM_COMPONENT,
+                    PRIMITIVE_MESH_COMPONENT,
+            }, 2,
+            (void *[]) {
+                    &(struct ct_transform_comp) {
+                            .pos = {0.0f, 0.0f, 13.0f},
+                            .scale = {1.0f, 1.0f, 1.0f}
+                    },
 
-//    struct ct_mesh *mesh;
-//    mesh = ct_ecs_a0->get_one(world, MESH_RENDERER_COMPONENT, ent);
-//    mesh->material = resource;
+                    &(struct ct_primitive_mesh) {
+                            .material = resource
+                    }}
+    );
 
     return ent;
 }
@@ -305,9 +321,10 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static const char* display_icon() {
+static const char *display_icon() {
     return ICON_FA_FILE_IMAGE_O;
 }
+
 
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
@@ -508,7 +525,7 @@ static void submit(uint64_t material,
                                                      0);
 
                 ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
-                                       ct_texture_a0->get(tn), 0);
+                                            ct_texture_a0->get(tn), 0);
             }
                 break;
 
@@ -516,8 +533,8 @@ static void submit(uint64_t material,
                 uint64_t t = ce_cdb_a0->read_uint64(var_reader,
                                                     MATERIAL_VAR_VALUE_PROP, 0);
                 ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
-                                       (bgfx_texture_handle_t) {.idx=(uint16_t) t},
-                                       0);
+                                            (bgfx_texture_handle_t) {.idx=(uint16_t) t},
+                                            0);
             }
                 break;
 
