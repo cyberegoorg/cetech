@@ -25,6 +25,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <celib/buffer.inl>
+#include <cetech/debugui/icons_font_awesome.h>
 
 
 //==============================================================================
@@ -774,8 +775,13 @@ void create_new(uint64_t obj) {
     ce_cdb_a0->write_commit(w);
 }
 
+static const char* display_icon() {
+    return ICON_FA_CUBES;
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
+        .display_icon = display_icon,
         .online = online,
         .offline = offline,
         .get_interface = get_resource_interface,

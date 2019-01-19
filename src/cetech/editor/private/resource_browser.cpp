@@ -32,7 +32,7 @@
 #include <cetech/controlers/keyboard.h>
 
 
-#define WINDOW_NAME "Asset browser"
+#define WINDOW_NAME "Resource browser"
 
 #define _G asset_browser_global
 
@@ -167,6 +167,8 @@ static void _create_from_modal(const char *modal_id) {
                                  CE_ARRAY_LEN(modal_buffer_from),
                                  ImGuiInputTextFlags_ReadOnly, 0, NULL);
 
+        ct_debugui_a0->Text(ICON_FA_SEARCH);
+        ct_debugui_a0->SameLine(0, -1);
         sprintf(labelidi, "##modal_create_from_input%llu", 1ULL);
         ct_debugui_a0->InputText(labelidi,
                                  modal_buffer,
@@ -181,7 +183,7 @@ static void _create_from_modal(const char *modal_id) {
 
             if (modal_buffer_from[0]) {
                 uint64_t uid = ct_resourcedb_a0->get_uid(modal_buffer_from,
-                                                      modal_buffer_type);
+                                                         modal_buffer_type);
                 if (uid) {
                     new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
                                                      uid);
@@ -198,7 +200,7 @@ static void _create_from_modal(const char *modal_id) {
                 ct_resource_id rid = {.uid = new_res};
 
                 ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
-                                            filename, modal_buffer_name);
+                                               filename, modal_buffer_name);
 
                 ct_resourcedb_a0->put_file(filename, 0);
 
@@ -232,7 +234,7 @@ static void _create_from_modal(const char *modal_id) {
 
         char **asset_list = NULL;
         ct_resourcedb_a0->get_resource_from_dirs("", &asset_list,
-                                              _G.allocator);
+                                                 _G.allocator);
 
         uint32_t dir_n = ce_array_size(asset_list);
         for (int i = 0; i < dir_n; ++i) {
@@ -285,9 +287,83 @@ static void _create_from_modal(const char *modal_id) {
         }
 
         ct_resourcedb_a0->get_resource_from_dirs_clean(asset_list,
-                                                    _G.allocator);
+                                                       _G.allocator);
 
         ct_debugui_a0->EndChild();
+        ct_debugui_a0->EndPopup();
+    }
+}
+
+
+static char _selected_type[256] = {};
+
+static void _select_type_modal(const char *modal_id) {
+    bool open = true;
+    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
+                                     static_cast<DebugUICond>(0));
+
+
+    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+
+        if (kb->button_pressed(0, kb->button_index("escape"))) {
+            ct_debugui_a0->CloseCurrentPopup();
+            ct_debugui_a0->EndPopup();
+            return;
+        }
+
+
+        char labelidi[128] = {'\0'};
+
+
+        ct_debugui_a0->Text(ICON_FA_SEARCH);
+        ct_debugui_a0->SameLine(0, -1);
+        sprintf(labelidi, "##modal_create_from_input%llu", 1ULL);
+        ct_debugui_a0->InputText(labelidi,
+                                 modal_buffer,
+                                 CE_ARRAY_LEN(modal_buffer),
+                                 0, 0, NULL);
+
+        char filter[256] = {};
+        snprintf(filter, CE_ARRAY_LEN(filter),
+                 "*%s*", modal_buffer);
+
+
+        if (ct_debugui_a0->Selectable("All types", false, 0,
+                                      (float[2]) {0.0f})) {
+            _selected_type[0] = '\0';
+        };
+
+        struct ce_api_entry it = ce_api_a0->first(RESOURCE_I);
+        while (it.api) {
+            struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
+
+
+            const char *type = ce_id_a0->str_from_id64(i->cdb_type());
+
+            const char* icon = i->display_icon? i->display_icon() : NULL;
+
+            if (0 != fnmatch(filter, type, FNM_CASEFOLD)) {
+                it = ce_api_a0->next(it);
+                continue;
+            }
+
+            if(icon) {
+                sprintf(labelidi, "%s %s##modal_type_%s", icon, type, type);
+            } else {
+                sprintf(labelidi, "%s##modal_type_%s", type, type);
+            }
+
+            if (ct_debugui_a0->Selectable(labelidi, false, 0,
+                                          (float[2]) {0.0f})) {
+                snprintf(_selected_type,
+                         CE_ARRAY_LEN(_selected_type), "%s", type);
+            };
+
+            it = ce_api_a0->next(it);
+        }
+
+
         ct_debugui_a0->EndPopup();
     }
 }
@@ -325,42 +401,76 @@ static void ui_asset_menu(uint64_t dock) {
     if (create_from) {
         ct_debugui_a0->OpenPopup(modal_id);
     }
+
+    ct_debugui_a0->SameLine(0, -1);
+
+    uint64_t resource_type = ce_id_a0->id64(_selected_type);
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+
+    char title[128] = {'\0'};
+
+    if(ri && ri->display_icon) {
+        snprintf(title, CE_ARRAY_LEN(title),
+                 "T: %s##select_type_%llx", ri->display_icon(), dock);
+    } else {
+        if(_selected_type[0]) {
+            snprintf(title, CE_ARRAY_LEN(title),
+                     "T: %s##select_type_%llx", _selected_type, dock);
+        } else {
+            snprintf(title, CE_ARRAY_LEN(title),
+                     "T##select_type_%llx", dock);
+        }
+    }
+
+
+    sprintf(modal_id, "select...##select_type_%llx", dock);
+    if (ct_debugui_a0->Button(title, (float[2]) {})) {
+        ct_debugui_a0->OpenPopup(modal_id);
+    }
+    _select_type_modal(modal_id);
+
+    ct_debugui_a0->SameLine(0, -1);
+
+    ct_debugui_a0->Text(ICON_FA_SEARCH);
+    ct_debugui_a0->SameLine(0, -1);
+    _G.asset_filter.Draw("");
+
 }
 
 #define CURENT_DIR \
     CE_ID64_0(".", 0x223b2df3c7671369ULL)
 
-static void ui_breadcrumb(const char *dir) {
-    const size_t len = strlen(dir);
-
-    char buffer[128] = {};
-    uint32_t buffer_pos = 0;
-
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
-    if (ct_debugui_a0->Button("Source", (float[2]) {0.0f})) {
-        set_current_dir("", CURENT_DIR);
-    }
-
-    for (int i = 0; i < len; ++i) {
-        if (dir[i] != '/') {
-            buffer[buffer_pos++] = dir[i];
-        } else {
-            buffer[buffer_pos] = '\0';
-            ct_debugui_a0->SameLine(0.0f, -1.0f);
-            ct_debugui_a0->Text(">");
-            ct_debugui_a0->SameLine(0.0f, -1.0f);
-
-            if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
-                char tmp_dir[128] = {};
-                strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
-                uint64_t dir_hash = ce_id_a0->id64(tmp_dir);
-                set_current_dir(tmp_dir, dir_hash);
-            };
-
-            buffer_pos = 0;
-        }
-    }
-}
+//static void ui_breadcrumb(const char *dir) {
+//    const size_t len = strlen(dir);
+//
+//    char buffer[128] = {};
+//    uint32_t buffer_pos = 0;
+//
+//    ct_debugui_a0->SameLine(0.0f, -1.0f);
+//    if (ct_debugui_a0->Button("Source", (float[2]) {0.0f})) {
+//        set_current_dir("", CURENT_DIR);
+//    }
+//
+//    for (int i = 0; i < len; ++i) {
+//        if (dir[i] != '/') {
+//            buffer[buffer_pos++] = dir[i];
+//        } else {
+//            buffer[buffer_pos] = '\0';
+//            ct_debugui_a0->SameLine(0.0f, -1.0f);
+//            ct_debugui_a0->Text(">");
+//            ct_debugui_a0->SameLine(0.0f, -1.0f);
+//
+//            if (ct_debugui_a0->Button(buffer, (float[2]) {0.0f})) {
+//                char tmp_dir[128] = {};
+//                strncpy(tmp_dir, dir, sizeof(char) * (i + 1));
+//                uint64_t dir_hash = ce_id_a0->id64(tmp_dir);
+//                set_current_dir(tmp_dir, dir_hash);
+//            };
+//
+//            buffer_pos = 0;
+//        }
+//    }
+//}
 
 static void ui_dir_list() {
     ImVec2 size(_G.left_column_width, 0.0f);
@@ -417,30 +527,32 @@ static void ui_dir_list() {
 }
 
 
-static void ui_asset_list(uint64_t dock) {
-    ImVec2 size(_G.midle_column_width, 0.0f);
+static void ui_resource_list(uint64_t dock) {
+    float size[2] = {_G.midle_column_width, 0.0f};
 
-    ImGui::BeginChild("middle_col", size);
+    ct_debugui_a0->BeginChild("middle_col", size, false,
+                              (DebugUIWindowFlags_) (0));
 
-
-    ct_debugui_a0->Text(ICON_FA_SEARCH);
-    ct_debugui_a0->SameLine(0, 8);
-    _G.asset_filter.Draw("");
 
     if (_G.need_reaload) {
         if (_G.asset_list) {
             ct_resourcedb_a0->get_resource_from_dirs_clean(_G.asset_list,
-                                                        _G.allocator);
+                                                           _G.allocator);
             ce_array_free(_G.asset_list, _G.allocator);
         }
 
-
-        ct_resourcedb_a0->get_resource_from_dirs(_G.current_dir, &_G.asset_list,
-                                              _G.allocator);
+        ct_resourcedb_a0->get_resource_from_dirs(_G.current_dir,
+                                                 &_G.asset_list,
+                                                 _G.allocator);
 
         _G.need_reaload = false;
     }
 
+    char buffer[256] = {};
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "##asset_list_child%llx", dock);
+
+    ct_debugui_a0->BeginChild("#asset_", (float[2]) {},
+                              false, (DebugUIWindowFlags_) (0));
     if (_G.asset_list) {
         uint32_t dir_n = ce_array_size(_G.asset_list);
         for (int i = 0; i < dir_n; ++i) {
@@ -452,17 +564,34 @@ static void ui_asset_list(uint64_t dock) {
                 continue;
             }
 
+
+            char filter[256] = {};
+            snprintf(filter, CE_ARRAY_LEN(filter),
+                     "*%s*", _selected_type);
+
+            if (0 != fnmatch(filter, filename, FNM_CASEFOLD)) {
+                continue;
+            }
+
             struct ct_resource_id resourceid = {};
             ct_resourcedb_a0->get_resource_by_fullname(path, &resourceid);
 
             char label[128];
 
-            snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
+
+            uint64_t rtype = ct_resourcedb_a0->get_resource_type(resourceid);
+            ct_resource_i0 *ri = ct_resource_a0->get_interface(rtype);
+
+            if(ri && ri->display_icon) {
+                snprintf(label, CE_ARRAY_LEN(label),
+                         "%s %s", ri->display_icon(), filename);
+            } else {
+                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", filename);
+            }
 
             bool selected = ImGui::Selectable(label,
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_AllowDoubleClick);
-
 
             if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
@@ -499,8 +628,9 @@ static void ui_asset_list(uint64_t dock) {
         }
 
     }
+    ct_debugui_a0->EndChild();
 
-    ImGui::EndChild();
+    ct_debugui_a0->EndChild();
 }
 
 
@@ -513,7 +643,7 @@ static void on_debugui(uint64_t dock) {
         _G.midle_column_width = content_w - _G.left_column_width - 180;
     }
 
-    ui_breadcrumb(_G.current_dir);
+//    ui_breadcrumb(_G.current_dir);
     ui_dir_list();
 
     float left_size[] = {_G.left_column_width, 0.0f};
@@ -522,12 +652,12 @@ static void on_debugui(uint64_t dock) {
     _G.left_column_width = left_size[0];
     ct_debugui_a0->SameLine(0.0f, -1.0f);
 
-    ui_asset_list(dock);
+    ui_resource_list(dock);
 }
 
 
 static const char *dock_title(uint64_t dock) {
-    return ICON_FA_FOLDER_OPEN " Asset browser";
+    return ICON_FA_FOLDER_OPEN " Resource browser";
 }
 
 static const char *name(uint64_t dock) {

@@ -30,6 +30,7 @@
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/property.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 //==============================================================================
 // GLobals
@@ -259,8 +260,13 @@ void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+static const char* display_icon() {
+    return ICON_FA_PICTURE_O;
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
+        .display_icon = display_icon,
         .get_interface = get_interface,
         .online =_texture_resource_online,
         .offline =_texture_resource_offline,

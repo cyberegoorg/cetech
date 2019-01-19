@@ -17,6 +17,7 @@
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -110,8 +111,13 @@ static uint64_t cdb_type() {
 
 bool scene_compiler(struct ce_cdb_t db, uint64_t k);
 
+static const char* display_icon() {
+    return ICON_FA_SHARE_ALT_SQUARE;
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
+        .display_icon = display_icon,
         .online = online,
         .offline = offline,
         .compilator = scene_compiler,

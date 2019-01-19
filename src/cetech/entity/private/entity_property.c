@@ -82,7 +82,7 @@ static void draw_component(uint64_t obj) {
         ce_cdb_a0->write_commit(w);
     }
 
-    ct_debugui_a0->Separator();
+//    ct_debugui_a0->Separator();
 
     ct_debugui_a0->NextColumn();
 

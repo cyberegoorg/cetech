@@ -41,6 +41,7 @@ typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t db,
 //! Resource interface
 struct ct_resource_i0 {
     uint64_t (*cdb_type)();
+    const char* (*display_icon)();
 
     void *(*get_interface)(uint64_t name_hash);
 

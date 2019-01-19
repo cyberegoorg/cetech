@@ -13,6 +13,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
+#include <cetech/editor/property.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -114,7 +115,7 @@ static void camera_spawner(struct ct_world world,
     *c = (struct ct_camera_component) {
             .far = ce_cdb_a0->read_float(r, PROP_FAR, 100.0f),
             .near = ce_cdb_a0->read_float(r, PROP_NEAR, 0.0f),
-            .fov = ce_cdb_a0->read_float(r, PROP_FOV, 0.0f),
+            .fov = ce_cdb_a0->read_float(r, PROP_FOV, 60.0f),
     };
 }
 
@@ -127,6 +128,29 @@ static struct ct_component_i0 ct_component_i0 = {
 };
 
 
+static void property_editor(uint64_t obj) {
+
+    ct_editor_ui_a0->prop_float(obj,
+                               PROP_NEAR,
+                               "Near",
+                               (struct ui_float_p0) {});
+
+    ct_editor_ui_a0->prop_float(obj,
+                                PROP_FAR,
+                                "Far",
+                                (struct ui_float_p0) {});
+
+    ct_editor_ui_a0->prop_float(obj,
+                                PROP_FOV,
+                                "Fov",
+                                (struct ui_float_p0) {});
+}
+
+static struct ct_property_editor_i0 ct_property_editor_i0 = {
+        .cdb_type = cdb_type,
+        .draw_ui = property_editor,
+};
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(CT_CAMERA_API, &camera_api);
 
@@ -135,6 +159,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
 }
 
 static void _shutdown() {

@@ -29,6 +29,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 //==============================================================================
 // GLobals
@@ -277,9 +278,12 @@ static uint64_t cdb_type() {
     return SHADER_TYPE;
 }
 
-
+static const char* display_icon() {
+    return ICON_FA_COG;
+}
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
+        .display_icon = display_icon,
         .online = online,
         .offline = offline,
         .compilator = shader_compiler,

@@ -231,7 +231,6 @@ static void _init_api(struct ce_api_a0 *api) {
 
 }
 
-
 static void _init_cvar(struct ce_config_a0 *config) {
     _G = (struct _G) {};
 

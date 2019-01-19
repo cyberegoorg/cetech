@@ -394,6 +394,10 @@ void set_subobject(ce_cdb_obj_o *_writer,
 static bool prop_exist(const ce_cdb_obj_o *reader,
                        uint64_t key) {
 
+    if(!reader) {
+        return false;
+    }
+
     struct object_t *obj = _get_object_from_o(reader);
 
     uint32_t idx = _find_prop_index(obj, key);

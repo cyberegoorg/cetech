@@ -29,6 +29,7 @@
 #include <cetech/editor/property.h>
 
 #include <bgfx/defines.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 //==============================================================================
 // Defines
@@ -304,8 +305,13 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+static const char* display_icon() {
+    return ICON_FA_FILE_IMAGE_O;
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
+        .display_icon = display_icon,
         .online = online,
         .offline = offline,
         .get_interface = get_interface
