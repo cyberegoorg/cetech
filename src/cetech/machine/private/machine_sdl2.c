@@ -134,7 +134,6 @@ void sdl_mouse_process() {
 void sdl_keyboard_process() {
     const uint8_t *state = SDL_GetKeyboardState(NULL);
 
-
     uint64_t event;
     for (uint32_t i = 0; i < KEY_MAX; ++i) {
         if (is_button_down(state[i], _G.keyboard.state[i])) {

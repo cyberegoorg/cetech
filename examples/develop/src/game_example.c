@@ -57,11 +57,11 @@ void shutdown() {
 void update(float dt) {
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
-
-    if (keyboard->button_state(0, keyboard->button_index("v"))) {
-        ce_log_a0->info("example", "PO");
-        ce_log_a0->error("example", "LICE");
-    }
+//
+//    if (keyboard->button_state(0, keyboard->button_index("c"))) {
+//        ce_log_a0->info("example", "PO");
+//        ce_log_a0->error("example", "LICE");
+//    }
 
     ct_ecs_a0->simulate(_G.world, dt);
 }

@@ -28,6 +28,15 @@ static struct DebugUIGlobal {
     ce_alloc *allocator;
 } _G;
 
+static uint32_t lshift;
+static uint32_t rshift;
+static uint32_t lctrl;
+static uint32_t rctrl;
+static uint32_t lalt;
+static uint32_t ralt;
+static uint32_t lsuper;
+static uint32_t rsuper;
+
 static void begin() {
     uint8_t viewid = 255;
 
@@ -70,29 +79,22 @@ static void begin() {
         io.KeysDown[40] = keyboard->button_state(0, 88) > 0;
     }
 
-    io.KeyShift = (keyboard->button_state(0, keyboard->button_index(
-            "lshift")) > 0) || (keyboard->button_state(0,
-                                                       keyboard->button_index(
-                                                               "rshift")) >
-                                0);
-    io.KeyCtrl = (keyboard->button_state(0, keyboard->button_index(
-            "lctrl")) > 0) || (keyboard->button_state(0,
-                                                      keyboard->button_index(
-                                                              "rctrl")) >
-                               0);
-    io.KeyAlt = (keyboard->button_state(0, keyboard->button_index(
-            "lalt")) > 0) || (keyboard->button_state(0,
-                                                     keyboard->button_index(
-                                                             "ralt")) >
-                              0);
-    io.KeySuper = (keyboard->button_state(0, keyboard->button_index(
-            "super")) > 0);
+    io.KeyShift = (keyboard->button_state(0, lshift) > 0)
+                  || (keyboard->button_state(0, rshift) > 0);
+
+    io.KeyCtrl = (keyboard->button_state(0, lctrl) > 0)
+                 || (keyboard->button_state(0, rctrl) > 0);
+
+    io.KeyAlt = (keyboard->button_state(0, lalt) > 0)
+                || (keyboard->button_state(0, ralt) > 0);
+
+    io.KeySuper = (keyboard->button_state(0, lsuper) > 0)
+                  || (keyboard->button_state(0, rsuper) > 0);
 
     char *txt = keyboard->text(0);
     if (txt[0]) {
         io.AddInputCharactersUTF8(txt);
     }
-
 
     io.NavInputs[ImGuiNavInput_Activate] = gp->button_state(0, gp->button_index(
             "a"));
@@ -377,6 +379,15 @@ static struct ct_kernel_task_i0 debugui_task = {
         .update_before= update_before,
 };
 
+static const char *_get_clipboard_text(void *data) {
+    return ce_os_a0->input->get_clipboard_text();
+}
+
+static void _set_clipboard_text(void *data,
+                                const char *text) {
+    ce_os_a0->input->set_clipboard_text(text);
+}
+
 static void _init(struct ce_api_a0 *api) {
     api->register_api(CT_DEBUGUI_API, &debugui_api);
     api->register_api(KERNEL_TASK_INTERFACE, &debugui_task);
@@ -390,8 +401,22 @@ static void _init(struct ce_api_a0 *api) {
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
+    lshift = keyboard->button_index("lshift");
+    rshift = keyboard->button_index("rshift");
+    lctrl = keyboard->button_index("lctrl");
+    rctrl = keyboard->button_index("rctrl");
+    lalt = keyboard->button_index("lalt");
+    ralt = keyboard->button_index("ralt");
+    lsuper = keyboard->button_index("lsuper");
+    rsuper = keyboard->button_index("rsuper");
 
     ImGuiIO &io = ImGui::GetIO();
+
+
+    io.SetClipboardTextFn = _set_clipboard_text;
+    io.GetClipboardTextFn = _get_clipboard_text;
+    io.ClipboardUserData = NULL;
+
     io.KeyMap[ImGuiKey_Tab] = keyboard->button_index("tab");
     io.KeyMap[ImGuiKey_LeftArrow] = keyboard->button_index("left");
     io.KeyMap[ImGuiKey_RightArrow] = keyboard->button_index("right");
@@ -401,6 +426,7 @@ static void _init(struct ce_api_a0 *api) {
     io.KeyMap[ImGuiKey_PageDown] = keyboard->button_index("pagedown");
     io.KeyMap[ImGuiKey_Home] = keyboard->button_index("home");
     io.KeyMap[ImGuiKey_End] = keyboard->button_index("end");
+    io.KeyMap[ImGuiKey_Insert] = keyboard->button_index("insert");
     io.KeyMap[ImGuiKey_Delete] = keyboard->button_index("delete");
     io.KeyMap[ImGuiKey_Backspace] = keyboard->button_index("backspace");
     io.KeyMap[ImGuiKey_Enter] = keyboard->button_index("enter");
@@ -413,6 +439,7 @@ static void _init(struct ce_api_a0 *api) {
     io.KeyMap[ImGuiKey_X] = keyboard->button_index("x");
     io.KeyMap[ImGuiKey_Y] = keyboard->button_index("y");
     io.KeyMap[ImGuiKey_Z] = keyboard->button_index("z");
+
 
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;

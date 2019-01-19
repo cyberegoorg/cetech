@@ -37,7 +37,7 @@ struct ce_os_error_a0 {
                    const char *filename,
                    int line);
 
-    char* (*stacktrace)(int skip);
+    char *(*stacktrace)(int skip);
 
     void (*stacktrace_free)(char *st);
 };
@@ -306,7 +306,9 @@ struct ce_window {
 
     void *(*native_display_ptr)(ce_window_ints *w);
 
-    void (*warp_mouse)(ce_window_ints *window, int x, int y);
+    void (*warp_mouse)(ce_window_ints *window,
+                       int x,
+                       int y);
 };
 
 
@@ -326,6 +328,11 @@ struct ce_os_window_a0 {
                     struct ce_window *w);
 };
 
+struct ce_os_input_a0 {
+    const char *(*get_clipboard_text)();
+    void (*set_clipboard_text)(const char *text);
+};
+
 struct ce_os_a0 {
     struct ce_os_cpu_a0 *cpu;
     struct ce_os_error_a0 *error;
@@ -336,6 +343,7 @@ struct ce_os_a0 {
     struct ce_os_time_a0 *time;
     struct ce_os_vio_a0 *vio;
     struct ce_os_window_a0 *window;
+    struct ce_os_input_a0 *input;
 };
 
 CE_MODULE(ce_os_a0);

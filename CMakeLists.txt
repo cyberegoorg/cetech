@@ -79,6 +79,7 @@ set(CORELIB_SOURCE_FILES
         src/celib/private/os_vio.c
         src/celib/private/os_time.c
         src/celib/private/os_window_sdl2.c
+        src/celib/private/os_input_sdl.c
         src/celib/private/fs.c
         src/celib/private/ydb.c
         src/celib/private/cdb.c

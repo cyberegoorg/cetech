@@ -233,10 +233,10 @@ static const char *_key_to_str[512] = {
         [KEY_LALT] = "lalt",
         [KEY_RALT] = "ralt",
 
-        [KEY_LGUI] = "lgui",
-        [KEY_RGUI] = "rgui",
+        [KEY_LGUI] = "lsuper",
+        [KEY_RGUI] = "rsuper",
 
-        [KEY_MODE] = "super",
+        [KEY_MODE] = "",
 
         [KEY_AUDIONEXT] = "",
         [KEY_AUDIOPREV] = "",

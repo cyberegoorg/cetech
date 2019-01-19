@@ -14,6 +14,7 @@ extern struct ce_os_thread_a0 thread_api;
 extern struct ce_os_time_a0 time_api;
 extern struct ce_os_vio_a0 vio_api;
 extern struct ce_os_window_a0 window_api;
+extern struct ce_os_input_a0 input_api;
 
 
 static struct ce_os_a0 ct_os_api = {
@@ -26,6 +27,7 @@ static struct ce_os_a0 ct_os_api = {
         .time = &time_api,
         .vio = &vio_api,
         .window = &window_api,
+        .input = &input_api,
 };
 
 struct ce_os_a0 *ce_os_a0 = &ct_os_api;
