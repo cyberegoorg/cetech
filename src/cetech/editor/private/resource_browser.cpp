@@ -513,7 +513,6 @@ static void on_debugui(uint64_t dock) {
     }
 
     ui_breadcrumb(_G.current_dir);
-    ui_asset_menu(dock);
     ui_dir_list();
 
     float left_size[] = {_G.left_column_width, 0.0f};
@@ -542,12 +541,19 @@ static uint64_t dock_flags() {
     return 0;
 }
 
+static void on_draw_menu(uint64_t dock) {
+    ct_dock_a0->context_btn(dock);
+    ct_debugui_a0->SameLine(0, -1);
+    ui_asset_menu(dock);
+}
+
 static struct ct_dock_i0 ct_dock_i0 = {
         .cdb_type = cdb_type,
         .dock_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
+        .draw_menu = on_draw_menu,
 };
 
 

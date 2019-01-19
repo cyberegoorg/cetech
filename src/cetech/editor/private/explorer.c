@@ -86,13 +86,16 @@ static void draw_menu(uint64_t dock) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
                                                   selected_object);
 
-    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                 top_level_obj);
-
-    if (ce_cdb_a0->prop_exist(tlreader, ASSET_NAME_PROP)) {
-        const char *name = ce_cdb_a0->read_str(tlreader, ASSET_NAME_PROP, "");
-        ct_debugui_a0->Text("Resource: %s", name);
+    ct_dock_a0->context_btn(dock);
+    ct_debugui_a0->SameLine(0, -1);
+    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
+                                                                top_level_obj);
+    if (locked_object) {
+        top_level_obj = locked_object;
     }
+
+    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                   top_level_obj);
 
     struct ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(tlreader));
@@ -138,7 +141,6 @@ static uint64_t cdb_type() {
 static uint64_t dock_flags() {
     return 0;
 }
-
 
 static struct ct_dock_i0 ct_dock_i0 = {
         .cdb_type = cdb_type,

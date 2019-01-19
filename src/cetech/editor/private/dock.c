@@ -74,7 +74,7 @@ uint64_t create_dock(uint64_t type,
 
     ce_array_push(_G.docks, obj, _G.allocator);
 
-    if(i->open) {
+    if (i->open) {
         i->open(obj);
     }
 
@@ -93,7 +93,7 @@ void close_dock(uint64_t dock) {
 
     uint32_t dock_n = ce_array_size(_G.docks);
     for (int u = 0; u < dock_n; ++u) {
-        if(_G.docks[u] != dock) {
+        if (_G.docks[u] != dock) {
             continue;
         }
 
@@ -124,6 +124,27 @@ void draw_all() {
                                                 false);
 
             if (ct_debugui_a0->BeginDock(title, &visible, flags)) {
+
+                uint64_t context = ce_cdb_a0->read_uint64(reader,
+                                                          PROP_DOCK_CONTEXT, 0);
+
+                if (ct_debugui_a0->BeginPopup("select_dock_context", 0)) {
+                    for (int j = 0; j < MAX_CONTEXT; ++j) {
+                        snprintf(title, CE_ARRAY_LEN(title), "%d", j);
+
+                        bool selected = context == j;
+
+                        if (ct_debugui_a0->MenuItem(title, NULL,
+                                                    selected, true)) {
+                            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
+                                    ce_cdb_a0->db(), dock);
+                            ce_cdb_a0->set_uint64(w, PROP_DOCK_CONTEXT, j);
+                            ce_cdb_a0->write_commit(w);
+                        }
+                    }
+                    ct_debugui_a0->EndPopup();
+                }
+
                 if (di->draw_menu) {
                     di->draw_menu(dock);
                 }
@@ -131,7 +152,7 @@ void draw_all() {
                 snprintf(title, CE_ARRAY_LEN(title), "%s##%s_child_dock%llu",
                          di->display_title(dock), di->name(dock), id);
 
-                ct_debugui_a0->BeginChild(title, (float[2]){}, false, 0);
+                ct_debugui_a0->BeginChild(title, (float[2]) {}, false, 0);
 
                 if (di->draw_ui) {
                     di->draw_ui(dock);
@@ -140,7 +161,7 @@ void draw_all() {
             }
             ct_debugui_a0->EndDock();
 
-            if(!visible) {
+            if (!visible) {
                 close_dock(dock);
             }
 
@@ -207,13 +228,10 @@ static void draw_menu() {
 
         for (int i = 0; i < n; ++i) {
             uint64_t dock = _G.docks[i];
-            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
             uint64_t type = ce_cdb_a0->obj_type(reader);
             struct ct_dock_i0 *di = _find_dock_i(type);
-
-            uint64_t contextid = ce_cdb_a0->read_uint64(reader,
-                                                        PROP_DOCK_CONTEXT, 0);
 
             const char *name = display_name(di);
 
@@ -221,24 +239,6 @@ static void draw_menu() {
             snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, dock);
 
             if (ct_debugui_a0->BeginMenu(label, true)) {
-                snprintf(label, CE_ARRAY_LEN(label), "Context##%llx", dock);
-                if (ct_debugui_a0->BeginMenu("Context", true)) {
-                    for (int j = 0; j < MAX_CONTEXT; ++j) {
-                        char context_str[2] = {'0' + j};
-
-                        bool selected = contextid == j;
-
-                        if (ct_debugui_a0->MenuItem(context_str, NULL,
-                                                    selected, true)) {
-                            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
-                                    ce_cdb_a0->db(), dock);
-                            ce_cdb_a0->set_uint64(w, PROP_DOCK_CONTEXT, j);
-                            ce_cdb_a0->write_commit(w);
-                        }
-                    }
-
-                    ct_debugui_a0->EndMenu();
-                }
                 ct_debugui_a0->EndMenu();
             }
         }
@@ -248,7 +248,7 @@ static void draw_menu() {
 
     for (int i = 0; i < n; ++i) {
         uint64_t dock = _G.docks[i];
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
         uint64_t type = ce_cdb_a0->obj_type(reader);
         struct ct_dock_i0 *di = _find_dock_i(type);
@@ -267,10 +267,29 @@ static uint64_t create_context(const char *name) {
     return context_idx;
 }
 
+static bool context_btn(uint64_t dock) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    uint64_t context = ce_cdb_a0->read_uint64(reader,
+                                              PROP_DOCK_CONTEXT, 0);
+    char title[256]  = {};
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_MAP_SIGNS
+                     " %llu##dock_context_btn_%llx",
+             context, dock);
+
+    if (ct_debugui_a0->Button(title, (float[2]) {})) {
+        ct_debugui_a0->OpenPopup("select_dock_context");
+        return true;
+    };
+
+    return false;
+}
+
 struct ct_dock_a0 dock_a0 = {
         .draw_all = draw_all,
         .draw_menu = draw_menu,
         .create_dock = create_dock,
+        .context_btn = context_btn,
 };
 
 struct ct_dock_a0 *ct_dock_a0 = &dock_a0;

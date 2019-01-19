@@ -43,6 +43,8 @@ struct ct_dock_i0 {
 struct ct_dock_a0 {
     uint64_t (*create_dock)(uint64_t type,
                             bool visible);
+    bool (*context_btn)(uint64_t dock);
+
     void (*draw_all)();
     void (*draw_menu)();
 };

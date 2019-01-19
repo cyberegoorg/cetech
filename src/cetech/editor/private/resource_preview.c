@@ -19,6 +19,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "celib/hashlib.h"
 #include "celib/config.h"
@@ -167,9 +168,18 @@ static void set_asset(uint64_t obj) {
     _G.selected_object = obj;
 }
 
+static void draw_menu(uint64_t dock) {
+    ct_dock_a0->context_btn(dock);
+    ct_debugui_a0->SameLine(0, -1);
+    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
+                                                                _G.selected_object);
+    if (locked_object) {
+        _G.selected_object = locked_object;
+    }
+}
+
 static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
-
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
@@ -270,6 +280,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
+        .draw_menu = draw_menu
 };
 
 
