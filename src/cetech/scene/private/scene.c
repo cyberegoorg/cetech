@@ -18,6 +18,10 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/editor/resource_preview.h>
+#include <cetech/transform/transform.h>
+#include <cetech/mesh/primitive_mesh.h>
+#include <cetech/mesh/mesh_renderer.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -115,12 +119,66 @@ static const char* display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
 }
 
+
+static struct ct_entity load(uint64_t resource,
+                             struct ct_world world) {
+
+    char *items = NULL;
+    uint32_t items_count = 0;
+    ct_scene_a0->get_all_geometries(resource, &items, &items_count);
+
+    uint64_t first_geom = ce_id_a0->id64(items);
+
+    struct ct_entity ent = {};
+    ct_ecs_a0->create(world, &ent, 1);
+
+    ct_ecs_a0->add(
+            world, ent,
+            (uint64_t[]) {
+                    TRANSFORM_COMPONENT,
+                    MESH_RENDERER_COMPONENT,
+            }, 2,
+            (void *[]) {
+                    &(struct ct_transform_comp) {
+                            .pos = {0.0f, 0.0f, 100.0f},
+                            .scale = {1.0f, 1.0f, 1.0f}
+                    },
+
+                    &(struct ct_mesh_component) {
+                            .material = 0x24c9413e88ebaaa8,
+                            .scene = resource,
+                            .mesh = first_geom,
+                    }}
+    );
+
+    return ent;
+}
+
+static void unload(uint64_t resource,
+                   struct ct_world world,
+                   struct ct_entity entity) {
+    ct_ecs_a0->destroy(world, &entity, 1);
+}
+
+static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
+        .load = load,
+        .unload = unload,
+};
+
+static void *get_interface(uint64_t name_hash) {
+    if (name_hash == RESOURCE_PREVIEW_I) {
+        return &ct_resource_preview_i0;
+    }
+    return NULL;
+}
+
 static struct ct_resource_i0 ct_resource_i0 = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,
         .offline = offline,
         .compilator = scene_compiler,
+        .get_interface = get_interface,
 };
 
 
