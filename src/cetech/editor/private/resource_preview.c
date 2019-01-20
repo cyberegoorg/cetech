@@ -37,8 +37,10 @@ struct preview_instance {
     struct ct_world world;
     struct ct_entity camera_ent;
     struct ct_viewport0 viewport;
-    struct ct_entity active_ent;
+    struct ct_entity ent;
     uint64_t selected_object;
+    bool locked;
+
     bool free;
 };
 
@@ -65,7 +67,9 @@ static struct preview_instance *_new_preview() {
     }
 
     uint32_t idx = n;
-    ce_array_push(_G.instances, (struct preview_instance) {},
+    ce_array_push(_G.instances,
+                  ((struct preview_instance) {
+                  }),
                   ce_memory_a0->system);
 
     struct preview_instance *pi = &_G.instances[idx];
@@ -162,11 +166,15 @@ static void set_asset(struct preview_instance *pi,
         return;
     }
 
+    if(pi->locked) {
+        return;
+    }
+
     if (pi->selected_object == obj) {
         return;
     }
 
-    if (pi->selected_object && pi->active_ent.h) {
+    if (pi->selected_object && pi->ent.h) {
 
         const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                      pi->selected_object);
@@ -178,11 +186,13 @@ static void set_asset(struct preview_instance *pi,
 
         if (i) {
             if (i->unload) {
-                i->unload(pi->selected_object, pi->world, pi->active_ent);
+                i->unload(pi->selected_object, pi->world, pi->ent);
             }
         }
 
-        pi->active_ent.h = 0;
+        ct_ecs_a0->destroy(pi->world, &pi->ent, 1);
+
+        pi->ent.h = 0;
     }
 
     if (obj) {
@@ -193,7 +203,7 @@ static void set_asset(struct preview_instance *pi,
         i = _get_asset_preview(type);
         if (i) {
             if (i->load) {
-                pi->active_ent = i->load(obj, pi->world);
+                pi->ent = i->load(obj, pi->world);
             }
         }
     }
@@ -210,8 +220,12 @@ static void draw_menu(uint64_t dock) {
     ct_debugui_a0->SameLine(0, -1);
     uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
                                                                 pi->selected_object);
+
+    pi->locked = false;
+
     if (locked_object) {
         pi->selected_object = locked_object;
+        pi->locked = true;
     }
 }
 

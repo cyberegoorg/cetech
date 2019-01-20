@@ -130,6 +130,18 @@ static struct ct_entity load(uint64_t resource,
     struct ct_entity ent[items_count+1];
     ct_ecs_a0->create(world, ent, items_count);
 
+    ct_ecs_a0->add(
+            world, ent[0],
+            (uint64_t[]) {
+                    TRANSFORM_COMPONENT,
+            }, 1,
+            (void *[]) {
+                    &(struct ct_transform_comp) {
+                            .scale = {1.0f, 1.0f, 1.0f}
+                    },
+            }
+    );
+
     for (int i = 0; i < items_count; ++i) {
         uint64_t geom = ce_id_a0->id64(&items[i*128]);
         ct_ecs_a0->add(
@@ -157,15 +169,9 @@ static struct ct_entity load(uint64_t resource,
     return ent[0];
 }
 
-static void unload(uint64_t resource,
-                   struct ct_world world,
-                   struct ct_entity entity) {
-    ct_ecs_a0->destroy(world, &entity, 1);
-}
 
 static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
         .load = load,
-        .unload = unload,
 };
 
 static void *get_interface(uint64_t name_hash) {

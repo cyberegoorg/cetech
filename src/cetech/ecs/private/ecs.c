@@ -781,40 +781,16 @@ static struct ct_entity spawn_entity(struct ct_world world,
 
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
-    struct ct_entity root_ent;
-    ct_ecs_a0->create(world, &root_ent, 1);
-
-    ct_ecs_a0->add(
-            world, root_ent,
-            (uint64_t[]) {
-                    TRANSFORM_COMPONENT,
-            }, 1,
-            (void *[]) {
-                    &(struct ct_transform_comp) {
-                            .pos = {0.0f, 0.0f, 13.0f},
-                            .scale = {1.0f, 1.0f, 1.0f}
-                    },
-            }
-    );
 
     struct ct_entity ent = spawn_entity(world, resource);
 
-    ct_ecs_a0->link(world, root_ent, ent);
-
-    return root_ent;
+    return ent;
 }
 
-
-static void unload(uint64_t resource,
-                   struct ct_world world,
-                   struct ct_entity entity) {
-    ct_ecs_a0->destroy(world, &entity, 1);
-}
 
 void *get_resource_interface(uint64_t name_hash) {
     static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
             .load = load,
-            .unload = unload,
     };
 
     if (name_hash == RESOURCE_PREVIEW_I) {

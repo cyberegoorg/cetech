@@ -305,15 +305,8 @@ static struct ct_entity load(uint64_t resource,
     return ent;
 }
 
-static void unload(uint64_t resource,
-                   struct ct_world world,
-                   struct ct_entity entity) {
-    ct_ecs_a0->destroy(world, &entity, 1);
-}
-
 static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
         .load = load,
-        .unload = unload,
 };
 
 static void *get_interface(uint64_t name_hash) {
