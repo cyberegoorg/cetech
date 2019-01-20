@@ -23,6 +23,9 @@
 #define PROP_DOCK_CONTEXT\
     CE_ID64_0("context", 0x1349eedc2838510ULL)
 
+#define PROP_DOCK_SELECTED_OBJ\
+    CE_ID64_0("selected_object", 0x7cc97924b2b963b1ULL)
+
 struct ct_dock_i0 {
     uint64_t (*cdb_type)();
     uint64_t (*dock_flags)();

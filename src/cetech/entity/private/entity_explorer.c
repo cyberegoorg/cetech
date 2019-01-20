@@ -78,20 +78,22 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                      uint32_t id,
                                      uint64_t context) {
 
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
     ImGuiTreeNodeFlags flags = 0 |
                                DebugUITreeNodeFlags_OpenOnArrow |
                                //                               DebugUITreeNodeFlags_OpenOnDoubleClick |
-                               DebugUITreeNodeFlags_DefaultOpen;
-
+                               //                               DebugUITreeNodeFlags_DefaultOpen;
+                               0;
     uint64_t new_selected_object = 0;
 
     bool selected = selected_obj == obj;
+
     if (selected) {
         flags |= DebugUITreeNodeFlags_Selected;
     }
 
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t children = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
     const ce_cdb_obj_o *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
 
@@ -104,7 +106,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
     uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
 
-    if (!children_n) {
+    if (!children_n && !component_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
     }
 
@@ -147,7 +149,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         ct_debugui_a0->EndDragDropTarget();
     }
 
-    if (selected & open) {
+    if (open) {
         const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
 
         for (uint32_t i = 0; i < component_n; ++i) {

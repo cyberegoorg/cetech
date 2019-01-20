@@ -92,7 +92,7 @@ static void draw_menu(uint64_t dock) {
     uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
                                                                 top_level_obj);
     if (locked_object) {
-        top_level_obj = locked_object;
+        top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), locked_object);
     }
 
     const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(),
@@ -110,9 +110,23 @@ static void on_debugui(uint64_t dock) {
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
 
-    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
+    uint64_t locked_obj = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
 
-    if (!selected_object) {
+
+    uint64_t selected_object = 0;
+
+
+    if (!locked_obj) {
+        selected_object = ct_selected_object_a0->selected_object(context);
+    } else {
+        selected_object = ce_cdb_a0->read_ref(reader, PROP_DOCK_SELECTED_OBJ, 0);
+
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, selected_object);
+        ce_cdb_a0->write_commit(w);
+    }
+
+    if(!selected_object) {
         return;
     }
 
@@ -120,6 +134,10 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t new_selected_object = draw(dock, selected_object, context);
     if (new_selected_object) {
+        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, new_selected_object);
+        ce_cdb_a0->write_commit(w);
+
         ct_selected_object_a0->set_selected_object(context,
                                                    new_selected_object);
     }
