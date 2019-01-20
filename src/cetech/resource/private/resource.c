@@ -82,9 +82,10 @@ static void load(const uint64_t *names,
         struct ct_resource_id rid = {.uid = asset_name};
 
         if (!ct_resourcedb_a0->obj_exist(rid)) {
-//            abort();
             ce_log_a0->error(LOG_WHERE,
                              "Obj 0x%llx does not exist in DB", rid.uid);
+
+            abort();
             continue;
         };
 

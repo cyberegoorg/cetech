@@ -167,6 +167,7 @@ static void _remove_ent_from_spawn_info(struct spawn_info *spawn_info,
         uint32_t last_idx = n - 1;
         spawn_info->ents[i] = spawn_info->ents[last_idx];
         ce_array_pop_back(spawn_info->ents);
+        return;
     }
 }
 
@@ -1101,10 +1102,18 @@ static uint64_t *update_after(uint64_t *n) {
 static void _sync_ent_obj(struct world_instance *world) {
     uint64_t *empty_si = NULL;
 
+    struct ct_entity *ent_to_des = NULL;
+
     // OBJS
     uint32_t objs_n = ce_array_size(world->obj_spawn_info);
     for (uint32_t j = 0; j < objs_n; ++j) {
         struct spawn_info *si = &world->obj_spawn_info[j];
+
+        uint32_t ents_n = ce_array_size(si->ents);
+        if(!ents_n) {
+            ce_array_push(empty_si, si->obj, _G.allocator);
+            continue;
+        }
 
         const ce_cdb_obj_o *ent_r = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     si->obj);
@@ -1136,10 +1145,8 @@ static void _sync_ent_obj(struct world_instance *world) {
                     struct ct_entity *ents = ch_si->ents;
                     uint32_t ents_n = ce_array_size(ents);
                     if (ents_n) {
-                        destroy(world->world, ents, ents_n);
+                        ce_array_push_n(ent_to_des, ents, ents_n, _G.allocator);
                     }
-
-                    ce_array_push(empty_si, ent_obj, _G.allocator);
 
                 } else if (ev.type == CE_CDB_CHANGE) {
                     uint64_t ent_obj = ev.new_value.subobj;
@@ -1201,6 +1208,13 @@ static void _sync_ent_obj(struct world_instance *world) {
             }
         }
     }
+
+    uint64_t ent_to_des_n = ce_array_size(ent_to_des);
+    if(ent_to_des_n) {
+        destroy(world->world, ent_to_des, ent_to_des_n);
+    }
+    ce_array_free(ent_to_des, _G.allocator);
+
 
     uint32_t empty_si_n = ce_array_size(empty_si);
     for (int i = 0; i < empty_si_n; ++i) {

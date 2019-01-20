@@ -1176,21 +1176,18 @@ void remove_property(ce_cdb_obj_o *_writer,
     uint64_t idx = _find_prop_index(writer, property);
 
     if (idx) {
-        if (writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
-            union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                    writer->values +
-                    writer->offset[idx]);
+        union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+                writer->values +
+                writer->offset[idx]);
 
-            destroy_object(writer->db, value_ptr->subobj);
 
-            _add_change(writer, (struct ce_cdb_change_ev0) {
-                    .obj = writer->orig_obj,
-                    .prop=property,
-                    .type =CE_CDB_REMOVE,
-                    .prop_type = writer->property_type[idx],
-                    .old_value = *value_ptr,
-            });
-        }
+        _add_change(writer, (struct ce_cdb_change_ev0) {
+                .obj = writer->orig_obj,
+                .prop=property,
+                .type =CE_CDB_REMOVE,
+                .prop_type = writer->property_type[idx],
+                .old_value = *value_ptr,
+        });
 
         uint64_t last_idx = --writer->properties_count;
         ce_hash_add(&writer->prop_map, writer->keys[last_idx], idx,
@@ -1203,9 +1200,13 @@ void remove_property(ce_cdb_obj_o *_writer,
         ce_array_pop_back(writer->keys);
         ce_array_pop_back(writer->property_type);
         ce_array_pop_back(writer->offset);
-    }
 
-    ce_hash_remove(&writer->prop_map, property);
+        if (writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
+            destroy_object(writer->db, value_ptr->subobj);
+        }
+
+        ce_hash_remove(&writer->prop_map, property);
+    }
 }
 
 const ce_cdb_obj_o *read(struct ce_cdb_t _db,
