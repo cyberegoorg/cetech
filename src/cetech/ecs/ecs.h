@@ -137,6 +137,15 @@ struct ct_ecs_a0 {
                  struct ct_entity parent,
                  struct ct_entity child);
 
+    struct ct_entity (*parent)(struct ct_world world,
+                               struct ct_entity entity);
+
+    struct ct_entity (*first_child)(struct ct_world world,
+                                    struct ct_entity entity);
+
+    struct ct_entity (*next_sibling)(struct ct_world world,
+                                     struct ct_entity entity);
+
     //SIMU
     void (*simulate)(struct ct_world world,
                      float dt);

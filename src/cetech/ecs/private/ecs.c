@@ -26,6 +26,7 @@
 #include <cetech/renderer/renderer.h>
 #include <celib/buffer.inl>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/transform/transform.h>
 
 
 //==============================================================================
@@ -59,10 +60,11 @@ struct world_instance {
     struct ce_handler_t entity_handler;
     uint64_t *entity_type;
     uint64_t *entity_idx;
-    uint64_t *entity_data;
+    uint64_t *entity_obj;
     struct ct_entity *parent;
     struct ct_entity *first_child;
     struct ct_entity *next_sibling;
+    struct ct_entity *prev_sibling;
 
     // Storage
     struct ce_hash_t entity_storage_map;
@@ -301,7 +303,7 @@ static void _add_to_type_slot(struct world_instance *w,
         ce_hash_add(&w->entity_storage_map, ent_type, type_idx, _G.allocator);
 
         struct entity_storage *item = &w->entity_storage[type_idx];
-        ce_array_push(item->entity, (struct ct_entity) {}, _G.allocator);
+        item->entity = virtual_alloc(MAX_ENTITIES * sizeof(struct ct_entity));
 
         const uint32_t component_n = ce_array_size(_G.components_name);
         for (int i = 0; i < component_n; ++i) {
@@ -327,7 +329,7 @@ static void _add_to_type_slot(struct world_instance *w,
     _entity_data_idx(w, ent) = ent_data_idx;
     _entity_type(w, ent) = ent_type;
 
-    ce_array_push(item->entity, ent, _G.allocator);
+    item->entity[ent_data_idx] = ent;
 
     const uint32_t component_n = ce_array_size(_G.components_name);
     for (int i = 0; i < component_n; ++i) {
@@ -349,7 +351,7 @@ static void _add_to_type_slot(struct world_instance *w,
 
 static void _remove_from_type_slot(struct world_instance *w,
                                    struct ct_entity ent,
-                                   uint64_t last_data_idx,
+                                   uint64_t ent_idx,
                                    uint64_t ent_type) {
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map,
                                        ent_type, UINT64_MAX);
@@ -360,13 +362,13 @@ static void _remove_from_type_slot(struct world_instance *w,
 
     struct entity_storage *item = &w->entity_storage[type_idx];
 
-    if (!item->n) {
+    if (item->n <= 1) {
         return;
     }
 
     uint32_t last_idx = --item->n;
 
-    uint64_t entity_data_idx = last_data_idx;
+    uint64_t entity_data_idx = ent_idx;
 
     if (last_idx == entity_data_idx) {
         return;
@@ -395,11 +397,11 @@ static void _remove_from_type_slot(struct world_instance *w,
     }
 }
 
-static void _move_from_type_slot(struct world_instance *w,
-                                 struct ct_entity ent,
-                                 uint32_t old_idx,
-                                 uint64_t ent_type,
-                                 uint64_t new_type) {
+static void _move_data_from_type_slot(struct world_instance *w,
+                                      struct ct_entity ent,
+                                      uint32_t old_idx,
+                                      uint64_t ent_type,
+                                      uint64_t new_type) {
 
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map, ent_type,
                                        UINT64_MAX);
@@ -477,7 +479,7 @@ static void _add_components(struct ct_world world,
     _add_to_type_slot(w, ent, new_type);
 
     if (ent_type) {
-        _move_from_type_slot(w, ent, idx, ent_type, new_type);
+        _move_data_from_type_slot(w, ent, idx, ent_type, new_type);
         _remove_from_type_slot(w, ent, idx, ent_type);
     }
 }
@@ -545,7 +547,7 @@ static void remove_components(struct ct_world world,
 
     if (new_type) {
         _add_to_type_slot(w, ent, new_type);
-        _move_from_type_slot(w, ent, idx, ent_type, new_type);
+        _move_data_from_type_slot(w, ent, idx, ent_type, new_type);
     }
 
     _remove_from_type_slot(w, ent, idx, ent_type);
@@ -650,9 +652,10 @@ static void create_entities(struct ct_world world,
 
         w->parent[idx].h = 0;
         w->next_sibling[idx].h = 0;
+        w->prev_sibling[idx].h = 0;
         w->first_child[idx].h = 0;
 
-        w->entity_data[idx] = 0;
+        w->entity_obj[idx] = 0;
     }
 }
 
@@ -672,6 +675,7 @@ static void create_entities_objs(struct ct_world world,
 
         w->parent[idx].h = 0;
         w->next_sibling[idx].h = 0;
+        w->prev_sibling[idx].h = 0;
         w->first_child[idx].h = 0;
 
         uint64_t obj = 0;
@@ -679,7 +683,43 @@ static void create_entities_objs(struct ct_world world,
             obj = objs[i];
         }
 
-        w->entity_data[idx] = obj;
+        w->entity_obj[idx] = obj;
+    }
+}
+
+void unlink(struct ct_world world,
+            struct ct_entity ent) {
+    struct world_instance *w = get_world_instance(world);
+
+    uint64_t ent_idx = handler_idx(ent.h);
+
+    struct ct_entity parent = w->parent[ent_idx];
+    if (!parent.h) {
+        return;
+    }
+
+    uint64_t parent_idx = handler_idx(ent.h);
+
+    struct ct_entity prev_ent = w->prev_sibling[ent_idx];
+    uint64_t prev_ent_idx = handler_idx(prev_ent.h);
+
+    struct ct_entity next_ent = w->next_sibling[ent_idx];
+    uint64_t nex_ent_idx = handler_idx(next_ent.h);
+
+    w->prev_sibling[ent_idx].h = 0;
+    w->next_sibling[ent_idx].h = 0;
+
+    // first in root
+    if (!prev_ent.h) {
+        w->first_child[parent_idx] = next_ent;
+        w->prev_sibling[nex_ent_idx].h = 0;
+        return;
+    }
+
+    if (next_ent.h) {
+        w->next_sibling[prev_ent_idx] = next_ent;
+        w->prev_sibling[nex_ent_idx] = prev_ent;
+        return;
     }
 }
 
@@ -700,16 +740,23 @@ static void destroy(struct ct_world world,
         uint64_t ent_idx = handler_idx(ent.h);
         struct ct_entity ent_it = w->first_child[ent_idx];
 
-        while (ent_it.h != 0) {
-            destroy(world, &ent_it, 1);
 
+        struct ct_entity* ent_to_dest = NULL;
+        while (ent_it.h != 0) {
             uint64_t idx = handler_idx(ent_it.h);
+
+            ce_array_push(ent_to_dest, ent_it, _G.allocator);
+
             ent_it = w->next_sibling[idx];
         }
+
+        destroy(world, ent_to_dest, ce_array_size(ent_to_dest));
+        ce_array_free(ent_to_dest, _G.allocator);
 
         _remove_ent_from_spawn_infos(w->comp_spawn_info, ent);
         _remove_ent_from_spawn_infos(w->obj_spawn_info, ent);
 
+        unlink(world, ent);
         ce_handler_destroy(&w->entity_handler, ent.h, _G.allocator);
     }
 }
@@ -733,8 +780,27 @@ static struct ct_entity spawn_entity(struct ct_world world,
 
 static struct ct_entity load(uint64_t resource,
                              struct ct_world world) {
+    struct ct_entity root_ent;
+    ct_ecs_a0->create(world, &root_ent, 1);
+
+    ct_ecs_a0->add(
+            world, root_ent,
+            (uint64_t[]) {
+                    TRANSFORM_COMPONENT,
+            }, 1,
+            (void *[]) {
+                    &(struct ct_transform_comp) {
+                            .pos = {0.0f, 0.0f, 13.0f},
+                            .scale = {1.0f, 1.0f, 1.0f}
+                    },
+            }
+    );
+
     struct ct_entity ent = spawn_entity(world, resource);
-    return ent;
+
+    ct_ecs_a0->link(world, root_ent, ent);
+
+    return root_ent;
 }
 
 
@@ -775,7 +841,7 @@ void create_new(uint64_t obj) {
     ce_cdb_a0->write_commit(w);
 }
 
-static const char* display_icon() {
+static const char *display_icon() {
     return ICON_FA_CUBES;
 }
 
@@ -809,18 +875,46 @@ static void link(struct ct_world world,
     w->parent[child_idx] = parent;
 
     struct ct_entity tmp = w->first_child[parent_idx];
+    uint64_t tmp_idx = handler_idx(tmp.h);
 
     w->first_child[parent_idx] = child;
     w->next_sibling[child_idx] = tmp;
+    w->prev_sibling[child_idx].h = 0;
+
+    if (tmp.h) {
+        w->prev_sibling[tmp_idx] = child;
+    }
+}
+
+static struct ct_entity parent(struct ct_world world,
+                               struct ct_entity entity) {
+    struct world_instance *w = get_world_instance(world);
+
+    uint64_t ent_idx = handler_idx(entity.h);
+
+    return w->parent[ent_idx];
+}
+
+static struct ct_entity first_child(struct ct_world world,
+                                    struct ct_entity entity) {
+    struct world_instance *w = get_world_instance(world);
+
+    uint64_t ent_idx = handler_idx(entity.h);
+
+    return w->first_child[ent_idx];
+}
+
+static struct ct_entity next_sibling(struct ct_world world,
+                                     struct ct_entity entity) {
+    struct world_instance *w = get_world_instance(world);
+
+    uint64_t ent_idx = handler_idx(entity.h);
+
+    return w->next_sibling[ent_idx];
 }
 
 static struct ct_entity spawn_entity(struct ct_world world,
                                      uint64_t name) {
-
-//    char *buf = NULL;
-//    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, name, 0);
-//    ce_log_a0->debug(LOG_WHERE, "\n%s", buf);
-//    ce_buffer_free(buf, _G.allocator);
 
     struct world_instance *w = get_world_instance(world);
 
@@ -906,12 +1000,14 @@ static struct world_instance *_new_world(struct ct_world world) {
     struct world_instance wi = {
             .entity_type = virtual_alloc(sizeof(uint64_t) * MAX_ENTITIES),
             .entity_idx  = virtual_alloc(sizeof(uint64_t) * MAX_ENTITIES),
-            .entity_data = virtual_alloc(sizeof(uint64_t) * MAX_ENTITIES),
+            .entity_obj = virtual_alloc(sizeof(uint64_t) * MAX_ENTITIES),
 
             .parent = virtual_alloc(sizeof(struct ct_entity) * MAX_ENTITIES),
             .first_child = virtual_alloc(
                     sizeof(struct ct_entity) * MAX_ENTITIES),
             .next_sibling = virtual_alloc(
+                    sizeof(struct ct_entity) * MAX_ENTITIES),
+            .prev_sibling = virtual_alloc(
                     sizeof(struct ct_entity) * MAX_ENTITIES),
     };
 
@@ -940,6 +1036,9 @@ static void destroy_world(struct ct_world world) {
 }
 
 static struct ct_ecs_a0 _api = {
+        .create_world = create_world,
+        .destroy_world = destroy_world,
+
         //ENT
         .create = create_entities,
         .destroy = destroy,
@@ -947,8 +1046,9 @@ static struct ct_ecs_a0 _api = {
         .spawn = spawn_entity,
         .has = has,
         .link = link,
-        .create_world = create_world,
-        .destroy_world = destroy_world,
+        .parent= parent,
+        .first_child = first_child,
+        .next_sibling = next_sibling,
 
         //SIMU
         .simulate = simulate,

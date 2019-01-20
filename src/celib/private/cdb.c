@@ -155,8 +155,15 @@ static struct object_t *_get_object_from_id(struct db_t *db,
 
     if (!obj) {
         if (_G.loader(objid)) {
-            return _get_object_from_id(db, objid);
+            ce_os_a0->thread->spin_lock(&db->id_map_lock);
+            uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
+            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
+            if(obj) {
+                return _get_object_from_id(db, objid);
+            }
+
+            return NULL;
         }
         return NULL; // and destroy earth.
     }

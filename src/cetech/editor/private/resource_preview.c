@@ -45,14 +45,10 @@ struct preview_instance {
 static struct _G {
     struct ce_alloc *allocator;
 
-
-
     struct preview_instance *instances;
-
     struct preview_instance *baground;
 
     bool visible;
-
     bool active;
 } _G;
 
@@ -162,15 +158,15 @@ static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
 
 static void set_asset(struct preview_instance *pi,
                       uint64_t obj) {
-    if (pi->selected_object == obj) {
-        return;
-    }
-
     if (!pi) {
         return;
     }
 
-    if (pi->selected_object) {
+    if (pi->selected_object == obj) {
+        return;
+    }
+
+    if (pi->selected_object && pi->active_ent.h) {
 
         const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                      pi->selected_object);
@@ -186,6 +182,7 @@ static void set_asset(struct preview_instance *pi,
             }
         }
 
+        pi->active_ent.h = 0;
     }
 
     if (obj) {

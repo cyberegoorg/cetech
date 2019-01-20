@@ -29,10 +29,19 @@ static void transform_transform(struct ct_transform_comp *transform,
     float rot_rad[3];
     ce_vec3_mul_s(rot_rad, transform->rot, CE_DEG_TO_RAD);
 
-    ce_mat4_srt(transform->world,
+    float obj[16] = {};
+
+    ce_mat4_srt(obj,
                 transform->scale[0], transform->scale[1], transform->scale[2],
                 rot_rad[0], rot_rad[1], rot_rad[2],
                 transform->pos[0], transform->pos[1], transform->pos[2]);
+
+
+    if (parent) {
+        ce_mat4_mul(transform->world, obj, parent);
+    } else {
+        ce_mat4_move(transform->world, obj);
+    }
 }
 
 static uint64_t cdb_type() {
@@ -210,18 +219,57 @@ static struct ct_component_i0 ct_component_i0 = {
 };
 
 
+static void _transform_root_naive(struct ct_world world,
+                                  struct ct_entity ent,
+                                  float *w) {
+    struct ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
+                                                          TRANSFORM_COMPONENT,
+                                                          ent);
+
+    float *rootw = w;
+    if (root_t) {
+        rootw = root_t->world;
+        transform_transform(root_t, w);
+    }
+
+    struct ct_entity ent_it = ct_ecs_a0->first_child(world, ent);
+    while (ent_it.h) {
+        _transform_root_naive(world, ent_it, rootw);
+        ent_it = ct_ecs_a0->next_sibling(world, ent_it);
+    }
+}
+
 static void foreach_transform(struct ct_world world,
-                              struct ct_entity *ent,
+                              struct ct_entity *ents,
                               ct_entity_storage_t *item,
                               uint32_t n,
                               void *data) {
-    struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
-            TRANSFORM_COMPONENT, item);
-
+    struct ct_entity *roots = NULL;
     for (uint32_t i = 0; i < n; ++i) {
-        struct ct_transform_comp *transform = &transforms[i];
-        transform_transform(transform, NULL);
+        struct ct_entity ent = ents[i];
+
+        struct ct_entity parent_ent = ct_ecs_a0->parent(world, ent);
+
+        if (!parent_ent.h) {
+            ce_array_push(roots, ent, ce_memory_a0->system);
+        }
+
+
+        if (!ct_ecs_a0->has(world, parent_ent,
+                            (uint64_t[]) {TRANSFORM_COMPONENT}, 1)) {
+            ce_array_push(roots, ent, ce_memory_a0->system);
+        }
     }
+
+    uint32_t roots_n = ce_array_size(roots);
+    for (int i = 0; i < roots_n; ++i) {
+        struct ct_entity ent = roots[i];
+
+        _transform_root_naive(world, ent, NULL);
+    }
+
+
+    ce_array_free(roots, ce_memory_a0->system);
 }
 
 static void transform_system(struct ct_world world,

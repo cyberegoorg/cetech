@@ -127,10 +127,8 @@ static struct ct_entity load(uint64_t resource,
     uint32_t items_count = 0;
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
-
     struct ct_entity ent[items_count+1];
     ct_ecs_a0->create(world, ent, items_count);
-
 
     for (int i = 0; i < items_count; ++i) {
         uint64_t geom = ce_id_a0->id64(&items[i*128]);

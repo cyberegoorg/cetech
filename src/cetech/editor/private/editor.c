@@ -32,8 +32,8 @@
 
 static struct _G {
     bool load_layout;
-    struct ct_world world;
-    struct ct_viewport0 viewport;
+//    struct ct_world world;
+//    struct ct_viewport0 viewport;
 } _G;
 
 static float draw_main_menu() {
@@ -89,7 +89,7 @@ static void on_init(uint64_t _event) {
         it = ce_api_a0->next(it);
     }
 
-    _G.world = ct_ecs_a0->create_world();
+//    _G.world = ct_ecs_a0->create_world();
 }
 
 static void on_shutdown(uint64_t _event) {
@@ -119,7 +119,7 @@ static void on_update(float dt) {
         it = ce_api_a0->next(it);
     }
 
-    ct_ecs_a0->simulate(_G.world, dt);
+//    ct_ecs_a0->simulate(_G.world, dt);
 }
 
 static uint64_t name() {
