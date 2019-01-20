@@ -127,31 +127,36 @@ static struct ct_entity load(uint64_t resource,
     uint32_t items_count = 0;
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
-    uint64_t first_geom = ce_id_a0->id64(items);
 
-    struct ct_entity ent = {};
-    ct_ecs_a0->create(world, &ent, 1);
+    struct ct_entity ent[items_count+1];
+    ct_ecs_a0->create(world, ent, items_count);
 
-    ct_ecs_a0->add(
-            world, ent,
-            (uint64_t[]) {
-                    TRANSFORM_COMPONENT,
-                    MESH_RENDERER_COMPONENT,
-            }, 2,
-            (void *[]) {
-                    &(struct ct_transform_comp) {
-                            .pos = {0.0f, 0.0f, 100.0f},
-                            .scale = {1.0f, 1.0f, 1.0f}
-                    },
 
-                    &(struct ct_mesh_component) {
-                            .material = 0x24c9413e88ebaaa8,
-                            .scene = resource,
-                            .mesh = first_geom,
-                    }}
-    );
+    for (int i = 0; i < items_count; ++i) {
+        uint64_t geom = ce_id_a0->id64(&items[i*128]);
+        ct_ecs_a0->add(
+                world, ent[i+1],
+                (uint64_t[]) {
+                        TRANSFORM_COMPONENT,
+                        MESH_RENDERER_COMPONENT,
+                }, 2,
+                (void *[]) {
+                        &(struct ct_transform_comp) {
+                                .pos = {0.0f, 0.0f, 100.0f},
+                                .scale = {1.0f, 1.0f, 1.0f}
+                        },
 
-    return ent;
+                        &(struct ct_mesh_component) {
+                                .material = 0x24c9413e88ebaaa8,
+                                .scene = resource,
+                                .mesh = geom,
+                        }}
+        );
+
+        ct_ecs_a0->link(world, ent[0], ent[i+1]);
+    }
+
+    return ent[0];
 }
 
 static void unload(uint64_t resource,
