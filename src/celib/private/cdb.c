@@ -1775,6 +1775,19 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
     return NULL;
 }
 
+const uint64_t * changed_objects(struct ce_cdb_t _db, uint32_t* n) {
+    struct db_t *db = _get_db(_db);
+
+
+    uint32_t ch_n = ce_array_size(db->changed_obj);
+    if(!ch_n) {
+        *n = 0;
+        return NULL;
+    }
+
+    *n = ch_n;
+    return db->changed_obj;
+}
 
 void set_parent(struct ce_cdb_t _db,
                 uint64_t object,
@@ -2029,6 +2042,7 @@ static struct ce_cdb_a0 cdb_api = {
         .read = read,
         .read_instance_of = read_instance_of,
         .changed = changed,
+        .changed_objects = changed_objects,
         .read_float = read_float,
         .read_bool = read_bool,
         .read_str = read_string,

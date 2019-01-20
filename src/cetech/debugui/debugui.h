@@ -914,6 +914,8 @@ struct ct_debugui_a0 {
                               enum DebugUICond cond);
 
     void (*EndChild)();
+    void (*Unindent)(float indent_w);
+    void (*Indent)(float indent_w);
 };
 
 

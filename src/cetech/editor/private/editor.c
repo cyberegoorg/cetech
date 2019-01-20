@@ -27,6 +27,7 @@
 #include <string.h>
 #include <cetech/game/game_system.h>
 #include <cetech/default_rg/default_rg.h>
+#include <cetech/debugui/icons_font_awesome.h>
 
 #define _G plaground_global
 
@@ -50,7 +51,7 @@ static float draw_main_menu() {
                 ct_renderer_a0->set_debug(debug);
             }
 
-            if (ct_debugui_a0->MenuItem("Quit", "Alt+F4", false, true)) {
+            if (ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Quit", "Alt+F4", false, true)) {
                 ct_kernel_a0->quit();
 
             }

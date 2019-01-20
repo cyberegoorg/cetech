@@ -342,6 +342,8 @@ static struct ct_debugui_a0 debugui_api = {
                                                        DebugUICond)>(ImGui::SetNextWindowSize),
 
         .EndChild = ImGui::EndChild,
+        .Unindent= ImGui::Unindent,
+        .Indent= ImGui::Indent,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

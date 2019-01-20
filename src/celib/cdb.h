@@ -223,6 +223,9 @@ struct ce_cdb_a0 {
     const struct ce_cdb_change_ev0 *(*changed)(const ce_cdb_obj_o *reader,
                                                uint32_t *n);
 
+    const uint64_t *(*changed_objects)(struct ce_cdb_t db,
+                                       uint32_t *n);
+
     float (*read_float)(const ce_cdb_obj_o *reader,
                         uint64_t property,
                         float defaultt);

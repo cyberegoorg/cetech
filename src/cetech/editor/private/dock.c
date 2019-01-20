@@ -241,6 +241,9 @@ static void draw_menu() {
             snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, dock);
 
             if (ct_debugui_a0->BeginMenu(label, true)) {
+                if(ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Close", "", false, true)  ) {
+                    close_dock(dock);
+                }
                 ct_debugui_a0->EndMenu();
             }
         }

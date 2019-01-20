@@ -86,7 +86,6 @@ static void load(const uint64_t *names,
                              "Obj 0x%llx does not exist in DB", rid.uid);
 
             abort();
-            continue;
         };
 
         uint64_t type = ct_resourcedb_a0->get_resource_type(

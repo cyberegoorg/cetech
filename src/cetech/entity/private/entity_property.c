@@ -70,9 +70,7 @@ static void draw_component(uint64_t obj) {
     ct_debugui_a0->Separator();
     bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
                                           DebugUITreeNodeFlags_DefaultOpen);
-
     ct_debugui_a0->NextColumn();
-
     uint64_t parent = ce_cdb_a0->parent(reader);
     uint64_t comp_type = ce_cdb_a0->obj_type(reader);
 
@@ -82,7 +80,6 @@ static void draw_component(uint64_t obj) {
         ce_cdb_a0->write_commit(w);
     }
 
-//    ct_debugui_a0->Separator();
 
     ct_debugui_a0->NextColumn();
 
@@ -90,18 +87,19 @@ static void draw_component(uint64_t obj) {
         return;
     }
 
+    ct_debugui_a0->Separator();
+
     ct_property_editor_a0->draw(obj);
-
     ct_debugui_a0->TreePop();
-
 }
 
 static void _entity_ui(uint64_t obj) {
+    ct_debugui_a0->Separator();
     bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_CUBE" Entity",
                                           DebugUITreeNodeFlags_DefaultOpen);
-
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->NextColumn();
+    ct_debugui_a0->Separator();
 
     if (!open) {
         return;

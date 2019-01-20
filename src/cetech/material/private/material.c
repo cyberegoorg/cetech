@@ -203,15 +203,21 @@ static void draw_property(uint64_t material) {
         return;
     }
 
-
+    char labelid [128] = {};
     const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
     uint64_t layer_count = ce_cdb_a0->prop_count(layers_reader);
     const uint64_t *layer_keys = ce_cdb_a0->prop_keys(layers_reader);
     for (int i = 0; i < layer_count; ++i) {
+        if (CDB_INSTANCE_PROP == layer_keys[i]) {
+            continue;
+        }
+
         uint64_t layer;
         layer = ce_cdb_a0->read_subobject(layers_reader, layer_keys[i], 0);
+
+
 
 
         const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
@@ -220,7 +226,10 @@ static void draw_property(uint64_t material) {
         const char *layer_name = ce_cdb_a0->read_str(layer_reader,
                                                      MATERIAL_LAYER_NAME, NULL);
 
-        if (ct_debugui_a0->TreeNodeEx("Layer",
+        snprintf(labelid, CE_ARRAY_LEN(labelid),
+                 "Layer##prop_select_resource_%llx%llx", material, layer);
+
+        if (ct_debugui_a0->TreeNodeEx(labelid,
                                       DebugUITreeNodeFlags_DefaultOpen)) {
             ct_debugui_a0->NextColumn();
             ct_debugui_a0->Text("%s", layer_name);

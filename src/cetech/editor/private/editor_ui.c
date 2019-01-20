@@ -75,12 +75,14 @@ static void _prop_label(const char *label,
                         uint64_t _obj,
                         const uint64_t *props,
                         uint64_t props_n) {
+
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
+
     if (prop_revert_btn(_obj, props, props_n)) {
         ct_debugui_a0->SameLine(0, 4);
     }
 
-    ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->NextColumn();
 }
 
 
@@ -103,7 +105,7 @@ static void resource_tooltip(struct ct_resource_id resourceid,
 
     uint64_t obj = resourceid.uid;
 
-    if(ai) {
+    if (ai) {
         if (ai->tooltip) {
             ai->tooltip(obj, size);
         }
@@ -388,17 +390,44 @@ static void ui_resource(uint64_t obj,
 
     bool change = false;
 
-    ct_debugui_a0->Separator();
-    bool resource_open = ct_debugui_a0->TreeNodeEx(label, 0);
+    struct ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+    const char *icon = ri->display_icon ? ri->display_icon() : NULL;
+
+    if (icon) {
+        snprintf(labelid, CE_ARRAY_LEN(labelid),
+                 "%s %s##prop_select_resource_%llx%llx", icon, label, obj,
+                 prop_key_hash);
+    } else {
+        snprintf(labelid, CE_ARRAY_LEN(labelid),
+                 "%s##prop_select_resource_%llx%llx", label, obj,
+                 prop_key_hash);
+    }
+
+    bool is_leaf = !ct_property_editor_a0->get_interface(resource_obj);
+    ImGuiTreeNodeFlags flags = 0;
+    if (is_leaf) {
+        flags |= DebugUITreeNodeFlags_Leaf;
+    } else {
+        ct_debugui_a0->Separator();
+    }
+
+    bool resource_open = ct_debugui_a0->TreeNodeEx(labelid, flags);
 
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->PushItemWidth(-1);
 
-    sprintf(modal_id, "select...##%sselect_resource_%d", label, i);
+    sprintf(modal_id, ICON_FA_FOLDER_OPEN
+            " ""select...##%sselect_resource_%d", label, i);
 
     sprintf(labelid, ICON_FA_FOLDER_OPEN
             "##%sprop_select_resource_%d", label, i);
+
+    if (prop_revert_btn(obj, &prop_key_hash, 1)) {
+        ct_debugui_a0->SameLine(0, 4);
+    }
+
     if (ct_debugui_a0->Button(labelid, (float[2]) {0.0f})) {
+
         ct_debugui_a0->OpenPopup(modal_id);
     };
 
@@ -410,7 +439,7 @@ static void ui_resource(uint64_t obj,
 
     ct_debugui_a0->SameLine(0.0f, 0.0f);
 
-    sprintf(labelid, "##%sprop_str_%d", label, i);
+    sprintf(labelid, "##%sresource_prop_str_%d", label, i);
 
     ct_debugui_a0->InputText(labelid,
                              buffer,
@@ -420,6 +449,7 @@ static void ui_resource(uint64_t obj,
 
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->NextColumn();
+
 
     if (ct_debugui_a0->BeginDragDropTarget()) {
         const struct DebugUIPayload *payload;
@@ -443,10 +473,19 @@ static void ui_resource(uint64_t obj,
         ct_debugui_a0->EndDragDropTarget();
     }
 
-    if (resource_open) {
+    if(!is_leaf) {
+        ct_debugui_a0->Separator();
+    }
+
+    if (resource_open && !is_leaf) {
         ct_property_editor_a0->draw(resource_obj);
+        ct_debugui_a0->Separator();
+    }
+
+    if (resource_open) {
         ct_debugui_a0->TreePop();
     }
+
 
     if (change) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);

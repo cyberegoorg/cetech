@@ -53,6 +53,30 @@ static void draw(uint64_t obj) {
     }
 }
 
+static struct ct_property_editor_i0 * get_interface(uint64_t obj) {
+    if (!obj) {
+        return NULL;
+    }
+
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+
+    while (it.api) {
+        struct ct_property_editor_i0 *i = (it.api);
+
+        if (i && i->cdb_type
+            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
+
+            return i;
+        }
+
+        it = ce_api_a0->next(it);
+    }
+
+    return NULL;
+}
+
 static void draw_menu(uint64_t obj) {
     if (!obj) {
         return;
@@ -112,6 +136,7 @@ static void on_debugui(uint64_t dock) {
     ct_debugui_a0->NextColumn();
 
     if (open) {
+        ct_debugui_a0->Separator();
         if (obj) {
             const ce_cdb_obj_o *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                              obj);
@@ -166,8 +191,6 @@ static void on_debugui(uint64_t dock) {
         ct_debugui_a0->TreePop();
     }
 
-    ct_debugui_a0->Separator();
-
     draw(obj);
 
     ct_debugui_a0->Columns(1, NULL, true);
@@ -217,6 +240,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 
 struct ct_property_editor_a0 property_editor_api = {
         .draw =draw,
+        .get_interface = get_interface,
 };
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
