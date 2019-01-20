@@ -946,7 +946,7 @@ static struct ct_ecs_a0 _api = {
         .alive = alive,
         .spawn = spawn_entity,
         .has = has,
-
+        .link = link,
         .create_world = create_world,
         .destroy_world = destroy_world,
 

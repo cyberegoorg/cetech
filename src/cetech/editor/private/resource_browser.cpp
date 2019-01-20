@@ -346,7 +346,7 @@ static void _select_type_modal(const char *modal_id) {
                  "*%s*", modal_buffer);
 
 
-        if (ct_debugui_a0->Selectable("All types", false, 0,
+        if (ct_debugui_a0->Selectable("All", false, 0,
                                       (float[2]) {0.0f})) {
             _selected_type[0] = '\0';
         };
@@ -435,7 +435,7 @@ static void ui_asset_menu(uint64_t dock) {
                      "T: %s##select_type_%llx", _selected_type, dock);
         } else {
             snprintf(title, CE_ARRAY_LEN(title),
-                     "T##select_type_%llx", dock);
+                     "T: All##select_type_%llx", dock);
         }
     }
 
@@ -489,68 +489,62 @@ static void ui_asset_menu(uint64_t dock) {
 //    }
 //}
 
-static void ui_dir_list() {
-    ImVec2 size(_G.left_column_width, 0.0f);
-
-    ImGui::BeginChild("left_col", size);
-    ImGui::PushItemWidth(180);
-
-    if (!_G.dirtree_list) {
-        ce_fs_a0->listdir(SOURCE_ROOT, "", "*",
-                          true, true, &_G.dirtree_list,
-                          &_G.dirtree_list_count, _G.allocator);
-    }
-
-
-    if (ct_debugui_a0->TreeNode("Source")) {
-        uint64_t dir_hash = CURENT_DIR;
-
-        if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
-            set_current_dir("", dir_hash);
-        }
-
-        char **dirs = NULL;
-        ct_resourcedb_a0->get_resource_dirs(&dirs, _G.allocator);
-        uint32_t dir_n = ce_array_size(dirs);
-        for (int j = 0; j < dir_n; ++j) {
-            const char *dirname = dirs[j];
-            dir_hash = ce_id_a0->id64(dirs[j]);
-
-            char label[128];
-
-            bool is_selected = _G.selected_dir_hash == dir_hash;
-
-            if (is_selected) {
-                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER_OPEN " %s",
-                         dirname);
-            } else {
-                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER " %s",
-                         dirname);
-            }
-
-            if (ImGui::Selectable(label, is_selected)) {
-                set_current_dir(dirname, dir_hash);
-            }
-        }
-
-        ct_resourcedb_a0->get_resource_dirs_clean(dirs, _G.allocator);
-        ce_array_free(dirs, _G.allocator);
-
-        ct_debugui_a0->TreePop();
-    }
-
-    ImGui::PopItemWidth();
-    ImGui::EndChild();
-}
+//static void ui_dir_list() {
+//    ImVec2 size(_G.left_column_width, 0.0f);
+//
+//    ImGui::BeginChild("left_col", size);
+//    ImGui::PushItemWidth(180);
+//
+//    if (!_G.dirtree_list) {
+//        ce_fs_a0->listdir(SOURCE_ROOT, "", "*",
+//                          true, true, &_G.dirtree_list,
+//                          &_G.dirtree_list_count, _G.allocator);
+//    }
+//
+//
+//    if (ct_debugui_a0->TreeNode("Source")) {
+//        uint64_t dir_hash = CURENT_DIR;
+//
+//        if (ImGui::Selectable(".", _G.selected_dir_hash == dir_hash)) {
+//            set_current_dir("", dir_hash);
+//        }
+//
+//        char **dirs = NULL;
+//        ct_resourcedb_a0->get_resource_dirs(&dirs, _G.allocator);
+//        uint32_t dir_n = ce_array_size(dirs);
+//        for (int j = 0; j < dir_n; ++j) {
+//            const char *dirname = dirs[j];
+//            dir_hash = ce_id_a0->id64(dirs[j]);
+//
+//            char label[128];
+//
+//            bool is_selected = _G.selected_dir_hash == dir_hash;
+//
+//            if (is_selected) {
+//                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER_OPEN " %s",
+//                         dirname);
+//            } else {
+//                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FOLDER " %s",
+//                         dirname);
+//            }
+//
+//            if (ImGui::Selectable(label, is_selected)) {
+//                set_current_dir(dirname, dir_hash);
+//            }
+//        }
+//
+//        ct_resourcedb_a0->get_resource_dirs_clean(dirs, _G.allocator);
+//        ce_array_free(dirs, _G.allocator);
+//
+//        ct_debugui_a0->TreePop();
+//    }
+//
+//    ImGui::PopItemWidth();
+//    ImGui::EndChild();
+//}
 
 
 static void ui_resource_list(uint64_t dock) {
-    float size[2] = {_G.midle_column_width, 0.0f};
-
-    ct_debugui_a0->BeginChild("middle_col", size, false,
-                              (DebugUIWindowFlags_) (0));
-
-
     if (_G.need_reaload) {
         if (_G.asset_list) {
             ct_resourcedb_a0->get_resource_from_dirs_clean(_G.asset_list,
@@ -568,8 +562,6 @@ static void ui_resource_list(uint64_t dock) {
     char buffer[256] = {};
     snprintf(buffer, CE_ARRAY_LEN(buffer), "##asset_list_child%llx", dock);
 
-    ct_debugui_a0->BeginChild("#asset_", (float[2]) {},
-                              false, (DebugUIWindowFlags_) (0));
     if (_G.asset_list) {
         uint32_t dir_n = ce_array_size(_G.asset_list);
         for (int i = 0; i < dir_n; ++i) {
@@ -577,7 +569,7 @@ static void ui_resource_list(uint64_t dock) {
             const char *filename = ce_os_a0->path->filename(path);
             uint64_t filename_hash = ce_id_a0->id64(filename);
 
-            if (!_G.asset_filter.PassFilter(filename)) {
+            if (!_G.asset_filter.PassFilter(path)) {
                 continue;
             }
 
@@ -601,10 +593,10 @@ static void ui_resource_list(uint64_t dock) {
 
             if (ri && ri->display_icon) {
                 snprintf(label, CE_ARRAY_LEN(label),
-                         "%s %s", ri->display_icon(), filename);
+                         "%s %s", ri->display_icon(), path);
             } else {
                 snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s",
-                         filename);
+                         path);
             }
 
             bool selected = ImGui::Selectable(label,
@@ -614,7 +606,7 @@ static void ui_resource_list(uint64_t dock) {
             if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (float[2]) {128, 128});
+                                                  (float[2]) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -646,29 +638,26 @@ static void ui_resource_list(uint64_t dock) {
         }
 
     }
-    ct_debugui_a0->EndChild();
-
-    ct_debugui_a0->EndChild();
 }
 
 
 static void on_debugui(uint64_t dock) {
     _G.edit_asset.uid = 0;
 
-    float content_w = ImGui::GetContentRegionAvailWidth();
-
-    if (_G.midle_column_width < 0) {
-        _G.midle_column_width = content_w - _G.left_column_width - 180;
-    }
+//    float content_w = ImGui::GetContentRegionAvailWidth();
+//
+//    if (_G.midle_column_width < 0) {
+//        _G.midle_column_width = content_w - _G.left_column_width - 180;
+//    }
 
 //    ui_breadcrumb(_G.current_dir);
-    ui_dir_list();
+//    ui_dir_list();
 
-    float left_size[] = {_G.left_column_width, 0.0f};
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
-    ct_debugui_a0->VSplitter("vsplit1", left_size);
-    _G.left_column_width = left_size[0];
-    ct_debugui_a0->SameLine(0.0f, -1.0f);
+//    float left_size[] = {_G.left_column_width, 0.0f};
+//    ct_debugui_a0->SameLine(0.0f, -1.0f);
+//    ct_debugui_a0->VSplitter("vsplit1", left_size);
+//    _G.left_column_width = left_size[0];
+//    ct_debugui_a0->SameLine(0.0f, -1.0f);
 
     ui_resource_list(dock);
 }
@@ -724,6 +713,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
+    set_current_dir("", ce_id_a0->id64(""));
     ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
 
     _G.visible = true;

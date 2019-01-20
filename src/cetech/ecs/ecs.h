@@ -74,7 +74,7 @@ struct ct_component_i0 {
                     void *data);
 
     void (*changer)(struct ct_world world,
-                    const struct ce_cdb_change_ev0* changes,
+                    const struct ce_cdb_change_ev0 *changes,
                     uint32_t changes_n,
                     void *data);
 };
@@ -132,6 +132,10 @@ struct ct_ecs_a0 {
                 struct ct_entity ent,
                 uint64_t *component_name,
                 uint32_t name_count);
+
+    void (*link)(struct ct_world world,
+                 struct ct_entity parent,
+                 struct ct_entity child);
 
     //SIMU
     void (*simulate)(struct ct_world world,

@@ -33,6 +33,7 @@
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/primitive_mesh.h>
 
+
 //==============================================================================
 // Defines
 //==============================================================================
@@ -297,7 +298,8 @@ static struct ct_entity load(uint64_t resource,
 
                     &(struct ct_primitive_mesh) {
                             .material = resource
-                    }}
+                    },
+            }
     );
 
     return ent;

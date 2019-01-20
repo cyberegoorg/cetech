@@ -2,7 +2,7 @@
 #include <cetech/editor/editor_ui.h>
 #include <celib/ydb.h>
 #include <stdlib.h>
-
+#include <celib/fmath.inl>
 
 // component
 
