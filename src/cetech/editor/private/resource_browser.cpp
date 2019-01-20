@@ -606,7 +606,7 @@ static void ui_resource_list(uint64_t dock) {
             if (ImGui::IsItemHovered()) {
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (float[2]) {256, 256});
+                                                  (float[2]) {128, 128});
                 ct_debugui_a0->EndTooltip();
             }
 
