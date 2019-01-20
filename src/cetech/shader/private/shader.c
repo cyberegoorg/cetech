@@ -30,6 +30,7 @@
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <celib/fs.h>
 
 //==============================================================================
 // GLobals

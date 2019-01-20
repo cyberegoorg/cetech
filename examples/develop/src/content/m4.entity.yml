@@ -39,7 +39,7 @@ children:
         scale.z: 1.000000
         position.x: 0.000000
         position.y: 0.000000
-        position.z: -18.000000
+        position.z: 0.000000
       mesh_renderer:
         cdb_uid: 0x1680ea0700e00121
         cdb_type: mesh_renderer

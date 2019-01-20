@@ -1,0 +1,26 @@
+cdb_uid: 0x16810eb6a8b0019d
+cdb_type: material
+cdb_instance: 0x24c9413e88ebaaa8
+asset_name: core/texture_preview
+layers:
+  cdb_uid: 0x16810eb6a8b0019e
+  cdb_instance: 0x5fdd15ad67957032
+  gbuffer:
+    cdb_uid: 0x16810eb6a8b0019f
+    cdb_instance: 0x9b2e443e0dddcdd9
+    shader: 0x4ecb3362fa2b018c
+    render_state:
+      cdb_uid: 0x16810eb6a8b001a0
+      cdb_instance: 0x78ccc53d72122491
+    variables:
+      cdb_uid: 0x16810eb6a8b001a1
+      cdb_instance: 0x89a49d1dd195d569
+      0xf81a1ce60b9ba9e8:
+        cdb_uid: 0x16810eb6a8b001a2
+        cdb_instance: 0xf81a1ce60b9ba9e8
+      0x3e8302bae4fce293:
+        cdb_uid: 0x16810eb6a8b001a3
+        cdb_instance: 0x3e8302bae4fce293
+      0xe66d5daf1a451dbf:
+        cdb_uid: 0x16810eb6a8b001a4
+        cdb_instance: 0xe66d5daf1a451dbf

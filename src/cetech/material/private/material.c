@@ -217,9 +217,6 @@ static void draw_property(uint64_t material) {
         uint64_t layer;
         layer = ce_cdb_a0->read_subobject(layers_reader, layer_keys[i], 0);
 
-
-
-
         const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                            layer);
 
