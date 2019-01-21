@@ -1142,8 +1142,13 @@ static void _update(float dt) {
 
     // changed
     uint32_t changed_n = 0;
-    const uint64_t *changed = ce_cdb_a0->changed_objects(ce_cdb_a0->db(),
-                                                         &changed_n);
+    const uint64_t *orig_changed = ce_cdb_a0->changed_objects(ce_cdb_a0->db(),
+                                                              &changed_n);
+
+    uint64_t *changed = CE_ALLOC(_G.allocator, uint64_t,
+                                 sizeof(uint64_t) * changed_n);
+
+    memcpy(changed, orig_changed, sizeof(uint64_t) * changed_n);
 
     for (int j = 0; j < changed_n; ++j) {
         uint64_t obj = changed[j];
@@ -1254,6 +1259,9 @@ static void _update(float dt) {
             }
         }
     }
+
+    CE_FREE(_G.allocator, changed);
+    ce_array_free(ents, _G.allocator);
 }
 
 static struct ct_kernel_task_i0 ecs_sync_task = {
