@@ -84,8 +84,7 @@ uint64_t create_dock(uint64_t type,
 }
 
 void close_dock(uint64_t dock) {
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    uint64_t type = ce_cdb_a0->obj_type(r);
+    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
 
     struct ct_dock_i0 *i = _find_dock_i(type);
 
@@ -112,7 +111,7 @@ void draw_all() {
         uint64_t dock = _G.docks[i];
         const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-        uint64_t type = ce_cdb_a0->obj_type(reader);
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
         struct ct_dock_i0 *di = _find_dock_i(type);
 
         if (di) {
@@ -230,9 +229,8 @@ static void draw_menu() {
 
         for (int i = 0; i < n; ++i) {
             uint64_t dock = _G.docks[i];
-            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-            uint64_t type = ce_cdb_a0->obj_type(reader);
+            uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
             struct ct_dock_i0 *di = _find_dock_i(type);
 
             const char *name = display_name(di);
@@ -253,9 +251,8 @@ static void draw_menu() {
 
     for (int i = 0; i < n; ++i) {
         uint64_t dock = _G.docks[i];
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-        uint64_t type = ce_cdb_a0->obj_type(reader);
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
         struct ct_dock_i0 *di = _find_dock_i(type);
 
         if (di && di->draw_main_menu) {

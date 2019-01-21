@@ -258,7 +258,7 @@ static void render(float dt) {
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
         const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
-        uint64_t event_type = ce_cdb_a0->obj_type(reader);
+        uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
 
         if (event_type != EVENT_WINDOW_RESIZED) {
             continue;

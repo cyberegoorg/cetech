@@ -65,10 +65,8 @@ static uint64_t draw(uint64_t dock,
         top_level = locked_object;
     }
 
-    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(), top_level);
-
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(tlreader));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(), top_level));
     if (i && i->draw_ui) {
         return i->draw_ui(top_level, selected_obj, context);
     }
@@ -95,11 +93,9 @@ static void draw_menu(uint64_t dock) {
         top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), locked_object);
     }
 
-    const ce_cdb_obj_o *tlreader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                   top_level_obj);
-
     struct ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(tlreader));
+    i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                  top_level_obj));
     if (i && i->draw_menu) {
         i->draw_menu(selected_object, context);
     }

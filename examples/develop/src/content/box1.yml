@@ -3,6 +3,7 @@ cdb_type: "entity"
 asset_name: "content/box1"
 components:
   cdb_uid: "0xa0ef45c8183eac08"
+  cdb_type: components
   transform:
     cdb_uid: "0x1c6bb48199c7ab33"
     cdb_type: "transform"
@@ -13,12 +14,14 @@ components:
     scale.y: 1.000000
     scale.z: 1.000000
 children:
+  cdb_type: children
   cdb_uid: "0x1f477575303b404c"
   0xe861c4016085bf98:
     cdb_uid: "0xe861c4016085bf98"
     cdb_type: "entity"
     name: head
     components:
+      cdb_type: components
       cdb_uid: "0x6269b340849d55a0"
       transform:
         cdb_uid: "0x79d4524dbbd23c53"
@@ -47,6 +50,7 @@ children:
     cdb_type: "entity"
     name: body
     components:
+      cdb_type: components
       cdb_uid: "0xd35f7f10b41443d4"
       transform:
         cdb_uid: "0x9519445d55e6c950"
@@ -75,6 +79,7 @@ children:
     cdb_type: "entity"
     name: m4
     components:
+      cdb_type: components
       cdb_uid: "0x333852d44070d23a"
       transform:
         cdb_uid: "0xf10156d9bb85fc45"

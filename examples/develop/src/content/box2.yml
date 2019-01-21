@@ -2,6 +2,7 @@ cdb_uid: 0xf7f5289f75e5f044
 asset_name: "content/box2"
 cdb_type: "entity"
 components:
+  cdb_type: components
   cdb_uid: "0x1db40df93b12f88f"
 
   transform:

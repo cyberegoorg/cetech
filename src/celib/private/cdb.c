@@ -63,8 +63,11 @@ struct db_t {
 
     // changed
     struct ce_spinlock change_lock;
-    uint64_t *changed_obj;
     struct ce_hash_t changed_obj_set;
+
+    uint64_t *changed_obj;
+    struct ce_spinlock destroy_lock;
+    uint64_t *destroyed_obj;
 
     // id pool
     uint64_t *to_free_objects_id;
@@ -101,7 +104,7 @@ uint64_t _get_ms() {
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
 
-    time_t  s = spec.tv_sec;
+    time_t s = spec.tv_sec;
     uint64_t ms = round(spec.tv_nsec / 1.0e6);
     if (ms > 999) {
         s++;
@@ -159,7 +162,7 @@ static struct object_t *_get_object_from_id(struct db_t *db,
             uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
             ce_os_a0->thread->spin_unlock(&db->id_map_lock);
 
-            if(obj) {
+            if (obj) {
                 return _get_object_from_id(db, objid);
             }
 
@@ -312,7 +315,7 @@ static uint64_t _find_prop_index(const struct object_t *obj,
 }
 
 static void _destroy_object(struct db_t *db_inst,
-                            struct object_t *obj) {
+                             struct object_t *obj) {
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_n, 1);
     db_inst->to_free_objects[idx] = obj;
 }
@@ -401,7 +404,7 @@ void set_subobject(ce_cdb_obj_o *_writer,
 static bool prop_exist(const ce_cdb_obj_o *reader,
                        uint64_t key) {
 
-    if(!reader) {
+    if (!reader) {
         return false;
     }
 
@@ -522,21 +525,14 @@ static void destroy_db(struct ce_cdb_t db) {
 
 static void _add_obj_to_destroy_list(struct db_t *db_inst,
                                      uint64_t _obj) {
-    bool contain = false;
     const uint64_t n = db_inst->to_free_objects_id_n;
     for (int i = 0; i < n; ++i) {
         if (db_inst->to_free_objects_id[i] != _obj) {
             continue;
         }
-
-        contain = true;
-        break;
-    }
-
-    if (contain) {
+//    CE_ASSERT(LOG_WHERE, !contain);
         return;
     }
-//    CE_ASSERT(LOG_WHERE, !contain);
 
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_id_n, 1);
     db_inst->to_free_objects_id[idx] = _obj;
@@ -1036,8 +1032,11 @@ static void set_ref(ce_cdb_obj_o *_writer,
     value_ptr->ref = ref;
 }
 
-uint64_t parent(const ce_cdb_obj_o *reader) {
-    struct object_t *obj = _get_object_from_o(reader);
+uint64_t parent(struct ce_cdb_t _db,
+                uint64_t object) {
+    struct db_t *db = _get_db(_db);
+
+    struct object_t *obj = _get_object_from_id(db, object);
     return obj->parent;
 }
 
@@ -1492,8 +1491,10 @@ static struct ce_cdb_t global_db() {
     return _G.global_db;
 }
 
-static uint64_t type(const ce_cdb_obj_o *reader) {
-    struct object_t *obj = _get_object_from_o(reader);
+static uint64_t type(struct ce_cdb_t _db,
+                     uint64_t _obj) {
+    struct db_t *db = _get_db(_db);
+    struct object_t *obj = _get_object_from_id(db, _obj);
 
     return obj->type;
 }
@@ -1552,7 +1553,7 @@ static void dump_str(struct ce_cdb_t _db,
     _push_space(buffer, level);
     ce_buffer_printf(buffer, _G.allocator, "cdb_uid: 0x%llx\n", from);
 
-    uint64_t type = ce_cdb_a0->obj_type(reader);
+    uint64_t type = ce_cdb_a0->obj_type(_db, from);
     const char *type_str = ce_id_a0->str_from_id64(type);
     if (type_str) {
         _push_space(buffer, level);
@@ -1775,12 +1776,22 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
     return NULL;
 }
 
-const uint64_t * changed_objects(struct ce_cdb_t _db, uint32_t* n) {
+const uint64_t *destroyed(struct ce_cdb_t _db,
+                                   uint32_t *n) {
+    struct db_t *db = _get_db(_db);
+
+    *n = db->to_free_objects_id_n;
+
+    return db->to_free_objects_id;
+}
+
+const uint64_t *changed_objects(struct ce_cdb_t _db,
+                                uint32_t *n) {
     struct db_t *db = _get_db(_db);
 
 
     uint32_t ch_n = ce_array_size(db->changed_obj);
-    if(!ch_n) {
+    if (!ch_n) {
         *n = 0;
         return NULL;
     }
@@ -2042,6 +2053,7 @@ static struct ce_cdb_a0 cdb_api = {
         .read = read,
         .read_instance_of = read_instance_of,
         .changed = changed,
+        .destroyed = destroyed,
         .changed_objects = changed_objects,
         .read_float = read_float,
         .read_bool = read_bool,

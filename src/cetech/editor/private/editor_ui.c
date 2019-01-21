@@ -459,9 +459,9 @@ static void ui_resource(uint64_t obj,
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
             if (drag_obj) {
-                const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                              drag_obj);
-                uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
+
+                uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                          drag_obj);
 
                 if (resource_type == asset_type) {
                     new_value = drag_obj;

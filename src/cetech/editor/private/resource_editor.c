@@ -192,9 +192,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 }
 
 static void open(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
-
-    uint64_t type = ce_cdb_a0->obj_type(reader);
+    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
     struct ct_resource_editor_i0 *i = get_asset_editor(type);
 
     if (!i) {

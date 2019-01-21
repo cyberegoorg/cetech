@@ -33,13 +33,15 @@ static void ui_entity_item_end() {
 
 static uint64_t _spawn_to(uint64_t from,
                           uint64_t to) {
-    const ce_cdb_obj_o *dreader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                  from);
+
     const ce_cdb_obj_o *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     to);
 
-    uint64_t asset_type = ce_cdb_a0->obj_type(dreader);
-    uint64_t selecled_type = ce_cdb_a0->obj_type(selectedr);
+    uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                              from);
+
+    uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                 to);
 
     uint64_t new_obj = 0;
     if ((ENTITY_RESOURCE_ID == asset_type) &&
@@ -156,10 +158,9 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t key = keys[i];
 
             uint64_t component = ce_cdb_a0->read_subobject(cs_reader, key, 0);
-            const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                           component);
 
-            uint64_t type = ce_cdb_a0->obj_type(c_reader);
+            uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                component);
 
             struct ct_component_i0 *component_i;
             component_i = ct_ecs_a0->get_interface(type);
@@ -234,7 +235,7 @@ static void draw_menu(uint64_t selected_obj,
 
 //    ct_debugui_a0->SameLine(0, 10);
 
-    uint64_t type = ce_cdb_a0->obj_type(reader);
+    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), selected_obj);
 
     if (type == ENTITY_RESOURCE_ID) {
         uint64_t uid = selected_obj;
@@ -306,20 +307,25 @@ static void draw_menu(uint64_t selected_obj,
             }
         }
 
-        ct_debugui_a0->SameLine(0, 10);
+        uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), selected_obj);
 
-        if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-            uint64_t parent = ce_cdb_a0->parent(reader);
+        if (parent) {
+            ct_debugui_a0->SameLine(0, 10);
+            if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
-            ce_cdb_a0->remove_property(w, uid);
-            ce_cdb_a0->write_commit(w);
 
-            const ce_cdb_obj_o *p_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                           parent);
-            uint64_t parent_ent = ce_cdb_a0->parent(p_reader);
+                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                         parent);
+                ce_cdb_a0->remove_property(w, uid);
+                ce_cdb_a0->write_commit(w);
 
-            ct_selected_object_a0->set_selected_object(context, parent_ent);
+                ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
+
+                uint64_t parent_ent = ce_cdb_a0->parent(ce_cdb_a0->db(),
+                                                        parent);
+
+                ct_selected_object_a0->set_selected_object(context, parent_ent);
+            }
         }
     }
 }

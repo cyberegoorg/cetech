@@ -55,8 +55,7 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
 };
 
 static void draw_component(uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    uint64_t type = ce_cdb_a0->obj_type(reader);
+    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
 
@@ -71,13 +70,15 @@ static void draw_component(uint64_t obj) {
     bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
                                           DebugUITreeNodeFlags_DefaultOpen);
     ct_debugui_a0->NextColumn();
-    uint64_t parent = ce_cdb_a0->parent(reader);
-    uint64_t comp_type = ce_cdb_a0->obj_type(reader);
+    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
+    uint64_t comp_type = type;
 
     if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
         ce_cdb_a0->write_commit(w);
+
+        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
 
 

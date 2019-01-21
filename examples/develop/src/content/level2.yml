@@ -4,6 +4,7 @@ asset_name: content/level2
 name: Level 2
 components:
   cdb_uid: 0x69cef5784f198c62
+  cdb_type: components
   transform:
     cdb_uid: 0x38a1e9c2481e8f31
     cdb_type: transform
@@ -18,11 +19,13 @@ components:
     scale.z: 1.000000
 children:
   cdb_uid: 0xd6745c61766e99f5
+  cdb_type: children
   0x110e5001fd:
     cdb_uid: 0x110e5001fd
     cdb_type: entity
     cdb_instance: 0xf7f5289f75e5f044
     components:
+      cdb_type: components
       cdb_uid: 0x110e5001fe
       cdb_instance: 0x1db40df93b12f88f
       transform:

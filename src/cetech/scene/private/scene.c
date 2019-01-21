@@ -128,7 +128,7 @@ static struct ct_entity load(uint64_t resource,
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
     struct ct_entity ent[items_count+1];
-    ct_ecs_a0->create(world, ent, items_count);
+    ct_ecs_a0->create(world, ent, items_count+1);
 
     ct_ecs_a0->add(
             world, ent[0],

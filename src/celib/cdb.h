@@ -39,9 +39,8 @@ union ce_cdb_value_u0 {
     float f;
     char *str;
     bool b;
-    struct ce_cdb_blob_t0 blob;
+    struct ce_cdb_blob_t0 blob; //TODO: Move out => uniform size
 };
-
 
 struct ce_cdb_change_ev0 {
     uint64_t type;
@@ -101,7 +100,8 @@ struct ce_cdb_a0 {
     void (*destroy_object)(struct ce_cdb_t db,
                            uint64_t obj);
 
-    uint64_t (*obj_type)(const ce_cdb_obj_o *reader);
+    uint64_t (*obj_type)(struct ce_cdb_t db,
+                         uint64_t obj);
 
     void (*set_type)(struct ce_cdb_t db,
                      uint64_t obj,
@@ -158,7 +158,8 @@ struct ce_cdb_a0 {
                       ce_cdb_obj_o *to,
                       uint64_t prorp);
 
-    uint64_t (*parent)(const ce_cdb_obj_o *reader);
+    uint64_t (*parent)(struct ce_cdb_t db,
+                       uint64_t object);
 
     void (*set_parent)(struct ce_cdb_t db,
                        uint64_t object,
@@ -213,6 +214,11 @@ struct ce_cdb_a0 {
     void (*remove_property)(ce_cdb_obj_o *writer,
                             uint64_t property);
 
+    const uint64_t *(*destroyed)(struct ce_cdb_t db,
+                                 uint32_t *n);
+
+    const uint64_t *(*changed_objects)(struct ce_cdb_t db,
+                                       uint32_t *n);
 
     // READ
     const ce_cdb_obj_o *(*read)(struct ce_cdb_t db,
@@ -223,8 +229,6 @@ struct ce_cdb_a0 {
     const struct ce_cdb_change_ev0 *(*changed)(const ce_cdb_obj_o *reader,
                                                uint32_t *n);
 
-    const uint64_t *(*changed_objects)(struct ce_cdb_t db,
-                                       uint32_t *n);
 
     float (*read_float)(const ce_cdb_obj_o *reader,
                         uint64_t property,

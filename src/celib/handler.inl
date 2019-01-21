@@ -9,7 +9,7 @@
 
 
 struct ce_handler_t {
-    uint64_t *_generation;
+    char *_generation;
     uint64_t *_free_idx;
 };
 
@@ -17,7 +17,7 @@ struct ce_handler_t {
 #define _INDEXBITCOUNT 54
 #define _MINFREEINDEXS 1024
 
-#define handler_idx(h) ((h) >> _INDEXBITCOUNT)
+#define handler_idx(h) ((h) >> _GENBITCOUNT)
 #define handler_gen(h) ((h) & ((1 << (_GENBITCOUNT - 1))))
 
 static inline uint64_t ce_handler_create(struct ce_handler_t *handler,
@@ -33,7 +33,9 @@ static inline uint64_t ce_handler_create(struct ce_handler_t *handler,
         idx = ce_array_size(handler->_generation) - 1;
     }
 
-    return ((idx) << _INDEXBITCOUNT) | (handler->_generation[idx]);
+    uint64_t hid = ((idx) << _GENBITCOUNT) | (handler->_generation[idx]);
+
+    return hid;
 }
 
 static inline void ce_handler_destroy(struct ce_handler_t *handler,

@@ -176,10 +176,8 @@ static void set_asset(struct preview_instance *pi,
 
     if (pi->selected_object && pi->ent.h) {
 
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     pi->selected_object);
-
-        uint64_t prev_type = ce_cdb_a0->obj_type(reader);
+        uint64_t prev_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                 pi->selected_object);
 
         struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(prev_type);
@@ -196,9 +194,8 @@ static void set_asset(struct preview_instance *pi,
     }
 
     if (obj) {
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     obj);
-        uint64_t type = ce_cdb_a0->obj_type(reader);
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                            obj);
         struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(type);
         if (i) {

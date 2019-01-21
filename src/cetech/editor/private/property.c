@@ -33,15 +33,13 @@ static void draw(uint64_t obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
+            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
 
             if (i->draw_ui) {
                 i->draw_ui(obj);
@@ -58,15 +56,13 @@ static struct ct_property_editor_i0 * get_interface(uint64_t obj) {
         return NULL;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
+            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
 
             return i;
         }
@@ -82,15 +78,13 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
     struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(reader))) {
+            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
 
             if (i->draw_menu) {
                 i->draw_menu(obj);
