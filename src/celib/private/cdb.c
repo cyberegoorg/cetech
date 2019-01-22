@@ -315,7 +315,7 @@ static uint64_t _find_prop_index(const struct object_t *obj,
 }
 
 static void _destroy_object(struct db_t *db_inst,
-                             struct object_t *obj) {
+                            struct object_t *obj) {
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_n, 1);
     db_inst->to_free_objects[idx] = obj;
 }
@@ -1777,7 +1777,7 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
 }
 
 const uint64_t *destroyed(struct ce_cdb_t _db,
-                                   uint32_t *n) {
+                          uint32_t *n) {
     struct db_t *db = _get_db(_db);
 
     *n = db->to_free_objects_id_n;

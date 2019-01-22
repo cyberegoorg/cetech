@@ -51,7 +51,7 @@ static void draw(uint64_t obj) {
     }
 }
 
-static struct ct_property_editor_i0 * get_interface(uint64_t obj) {
+static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
     if (!obj) {
         return NULL;
     }
@@ -108,8 +108,17 @@ static void on_debugui(uint64_t dock) {
         obj = locked_object;
     }
 
-    ct_debugui_a0->Columns(2, NULL, true);
+    ct_debugui_a0->Columns(3, NULL, true);
+
+//    static float initial_spacing = 70.f;
+//    if (initial_spacing) {
+//        ct_debugui_a0->SetColumnWidth(0, initial_spacing);
+//        initial_spacing = 0;
+//    }
+
     ct_debugui_a0->Separator();
+
+    ct_debugui_a0->NextColumn();
 
     ct_debugui_a0->Text("Property");
     ct_debugui_a0->NextColumn();
@@ -123,8 +132,11 @@ static void on_debugui(uint64_t dock) {
 
     snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
 
+    ct_debugui_a0->NextColumn();
+
     bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_FILE" Resource",
                                           DebugUITreeNodeFlags_DefaultOpen);
+
 
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->NextColumn();
@@ -139,8 +151,8 @@ static void on_debugui(uint64_t dock) {
                                                    ASSET_NAME_PROP,
                                                    NULL);
             if (name) {
+                ct_debugui_a0->NextColumn();
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
-
                 ct_debugui_a0->Text("Name");
                 ct_debugui_a0->NextColumn();
                 ct_debugui_a0->PushItemWidth(-1);
@@ -170,6 +182,7 @@ static void on_debugui(uint64_t dock) {
                              instance_of);
                 }
 
+                ct_debugui_a0->NextColumn();
                 ct_debugui_a0->Text("Inst. of");
                 ct_debugui_a0->NextColumn();
                 ct_debugui_a0->PushItemWidth(-1);

@@ -64,23 +64,24 @@ static void draw_component(uint64_t obj) {
         return;
     }
 
-    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
-
-    ct_debugui_a0->Separator();
-    bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
-                                          DebugUITreeNodeFlags_DefaultOpen);
-    ct_debugui_a0->NextColumn();
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
     uint64_t comp_type = type;
+
+    ct_debugui_a0->Separator();
 
     if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
         ce_cdb_a0->write_commit(w);
-
         ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
+    ct_debugui_a0->NextColumn();
 
+    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
+
+    bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
+                                          DebugUITreeNodeFlags_DefaultOpen);
+    ct_debugui_a0->NextColumn();
 
     ct_debugui_a0->NextColumn();
 
@@ -95,6 +96,8 @@ static void draw_component(uint64_t obj) {
 }
 
 static void _entity_ui(uint64_t obj) {
+    ct_debugui_a0->NextColumn();
+
     ct_debugui_a0->Separator();
     bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_CUBE" Entity",
                                           DebugUITreeNodeFlags_DefaultOpen);
@@ -106,12 +109,14 @@ static void _entity_ui(uint64_t obj) {
         return;
     }
 
-    char buffer[128] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
+
+    ct_debugui_a0->NextColumn();
 
     ct_debugui_a0->Text("UID");
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->PushItemWidth(-1);
+    char buffer[128] = {};
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
     ct_debugui_a0->InputText("##EntityUID",
                              buffer,
                              strlen(buffer),

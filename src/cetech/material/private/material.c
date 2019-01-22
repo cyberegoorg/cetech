@@ -226,10 +226,13 @@ static void draw_property(uint64_t material) {
         snprintf(labelid, CE_ARRAY_LEN(labelid),
                  "Layer##prop_select_resource_%llx%llx", material, layer);
 
+        ct_debugui_a0->NextColumn();
         if (ct_debugui_a0->TreeNodeEx(labelid,
                                       DebugUITreeNodeFlags_DefaultOpen)) {
             ct_debugui_a0->NextColumn();
+
             ct_debugui_a0->Text("%s", layer_name);
+
             ct_debugui_a0->NextColumn();
 
             ct_editor_ui_a0->prop_str(layer, MATERIAL_LAYER_NAME,

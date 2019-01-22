@@ -55,6 +55,94 @@ static bool prop_revert_btn(uint64_t _obj,
 
             bool remove_change = ct_debugui_a0->Button(lbl,
                                                        (float[2]) {});
+            if (ct_debugui_a0->IsItemHovered(0)) {
+
+                char v_str[256] = {};
+                uint32_t offset = 0;
+
+                for (int i = 0; i < props_n; ++i) {
+                    uint64_t prop = props[i];
+                    enum ce_cdb_type ptype = ce_cdb_a0->prop_type(ir, prop);
+
+                    switch (ptype) {
+
+                        case CDB_TYPE_NONE:
+                            break;
+
+                        case CDB_TYPE_UINT64: {
+                            uint64_t u = ce_cdb_a0->read_uint64(ir,
+                                                                prop,
+                                                                0);
+
+                            offset += snprintf(v_str + offset,
+                                               CE_ARRAY_LEN(v_str) - offset,
+                                               "%llu ", u);
+                        }
+                            break;
+
+                        case CDB_TYPE_PTR:
+                            break;
+
+                        case CDB_TYPE_REF: {
+                            uint64_t ref = ce_cdb_a0->read_ref(ir, prop, 0);
+                            if (!ref) {
+                                break;
+                            }
+
+                            const ce_cdb_obj_o *rr = \
+                            ce_cdb_a0->read(ce_cdb_a0->db(), ref);
+
+                            const char *res_name = ce_cdb_a0->read_str(rr,
+                                                                       ASSET_NAME_PROP,
+                                                                       "");
+                            if (res_name) {
+                                offset += snprintf(v_str + offset,
+                                                   CE_ARRAY_LEN(v_str) - offset,
+                                                   "%s ", res_name);
+                            }
+                        }
+                            break;
+
+                        case CDB_TYPE_FLOAT: {
+                            float f = ce_cdb_a0->read_float(ir,
+                                                            prop,
+                                                            0);
+
+                            offset += snprintf(v_str + offset,
+                                               CE_ARRAY_LEN(v_str) - offset,
+                                               "%f ", f);
+                        }
+                            break;
+                        case CDB_TYPE_BOOL:
+                            break;
+
+                        case CDB_TYPE_STR: {
+                            const char *str = ce_cdb_a0->read_str(ir,
+                                                                  prop,
+                                                                  NULL);
+
+                            offset += snprintf(v_str + offset,
+                                               CE_ARRAY_LEN(v_str) - offset,
+                                               "%s ", str);
+                        }
+
+
+                            break;
+                        case CDB_TYPE_SUBOBJECT:
+                            break;
+
+                        case CDB_TYPE_BLOB:
+                            break;
+                    }
+                }
+
+                if (v_str[0]) {
+                    ct_debugui_a0->BeginTooltip();
+                    ct_debugui_a0->Text("Parent value: %s", v_str);
+                    ct_debugui_a0->EndTooltip();
+                }
+
+            }
 
             if (remove_change) {
                 ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _obj);
@@ -76,13 +164,13 @@ static void _prop_label(const char *label,
                         const uint64_t *props,
                         uint64_t props_n) {
 
-    ct_debugui_a0->Text("%s", label);
+    if (prop_revert_btn(_obj, props, props_n)) {
+//        ct_debugui_a0->SameLine(0, -1);
+    }
     ct_debugui_a0->NextColumn();
 
-    if (prop_revert_btn(_obj, props, props_n)) {
-        ct_debugui_a0->SameLine(0, 4);
-    }
-
+    ct_debugui_a0->Text("%s", label);
+    ct_debugui_a0->NextColumn();
 }
 
 
@@ -99,9 +187,7 @@ static void resource_tooltip(struct ct_resource_id resourceid,
         return;
     }
 
-    struct ct_resource_preview_i0 *ai = \
-                (struct ct_resource_preview_i0 *) (ri->get_interface(
-            RESOURCE_PREVIEW_I));
+    struct ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
 
     uint64_t obj = resourceid.uid;
 
@@ -117,7 +203,7 @@ static void resource_tooltip(struct ct_resource_id resourceid,
 }
 
 static void ui_float(uint64_t obj,
-                     uint64_t prop_key_hash,
+                     uint64_t prop,
                      const char *label,
                      struct ui_float_p0 params) {
     float value = 0;
@@ -129,13 +215,13 @@ static void ui_float(uint64_t obj,
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    value_new = ce_cdb_a0->read_float(reader, prop_key_hash, value_new);
+    value_new = ce_cdb_a0->read_float(reader, prop, value_new);
     value = value_new;
 
     const float min = !params.max_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, &prop_key_hash, 1);
+    _prop_label(label, obj, &prop, 1);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
@@ -146,7 +232,7 @@ static void ui_float(uint64_t obj,
                                  "%.3f", 1.0f)) {
 
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_float(w, prop_key_hash, value_new);
+        ce_cdb_a0->set_float(w, prop, value_new);
         ce_cdb_a0->write_commit(w);
     }
 
@@ -154,24 +240,24 @@ static void ui_float(uint64_t obj,
 }
 
 static void ui_bool(uint64_t obj,
-                    uint64_t prop_key_hash,
+                    uint64_t prop,
                     const char *label) {
     bool value = false;
     bool value_new = false;
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    value_new = ce_cdb_a0->read_bool(reader, prop_key_hash, value_new);
+    value_new = ce_cdb_a0->read_bool(reader, prop, value_new);
     value = value_new;
 
-    _prop_label(label, obj, &prop_key_hash, 1);
+    _prop_label(label, obj, &prop, 1);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
 
     if (ct_debugui_a0->Checkbox(labelid, &value_new)) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_bool(w, prop_key_hash, value_new);
+        ce_cdb_a0->set_bool(w, prop, value_new);
         ce_cdb_a0->write_commit(w);
     }
 
@@ -180,7 +266,7 @@ static void ui_bool(uint64_t obj,
 
 
 static void ui_str(uint64_t obj,
-                   uint64_t prop_key_hash,
+                   uint64_t prop,
                    const char *label,
                    uint32_t i) {
     char labelid[128] = {'\0'};
@@ -188,14 +274,14 @@ static void ui_str(uint64_t obj,
     const char *value = 0;
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    value = ce_cdb_a0->read_str(reader, prop_key_hash, "");
+    value = ce_cdb_a0->read_str(reader, prop, "");
 
     char buffer[128] = {'\0'};
     strcpy(buffer, value);
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
-    _prop_label(label, obj, &prop_key_hash, 1);
+    _prop_label(label, obj, &prop, 1);
 
     bool change = false;
 
@@ -209,7 +295,7 @@ static void ui_str(uint64_t obj,
 
     if (change) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_str(w, prop_key_hash, buffer);
+        ce_cdb_a0->set_str(w, prop, buffer);
         ce_cdb_a0->write_commit(w);
     }
 
@@ -217,7 +303,7 @@ static void ui_str(uint64_t obj,
 }
 
 static void ui_str_combo(uint64_t obj,
-                         uint64_t prop_key_hash,
+                         uint64_t prop,
                          const char *label,
                          void (*combo_items)(uint64_t obj,
                                              char **items,
@@ -231,7 +317,7 @@ static void ui_str_combo(uint64_t obj,
     }
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    value = ce_cdb_a0->read_str(reader, prop_key_hash, NULL);
+    value = ce_cdb_a0->read_str(reader, prop, NULL);
 
     char *items = NULL;
     uint32_t items_count = 0;
@@ -252,7 +338,7 @@ static void ui_str_combo(uint64_t obj,
         }
     }
 
-    _prop_label(label, obj, &prop_key_hash, 1);
+    _prop_label(label, obj, &prop, 1);
 
     char labelid[128] = {'\0'};
 
@@ -275,7 +361,7 @@ static void ui_str_combo(uint64_t obj,
 
     if (change) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_str(w, prop_key_hash, buffer);
+        ce_cdb_a0->set_str(w, prop, buffer);
         ce_cdb_a0->write_commit(w);
     }
     ct_debugui_a0->NextColumn();
@@ -365,7 +451,7 @@ static bool resource_select_modal(const char *modal_id,
 }
 
 static void ui_resource(uint64_t obj,
-                        uint64_t prop_key_hash,
+                        uint64_t prop,
                         const char *label,
                         uint64_t resource_type,
                         uint32_t i) {
@@ -375,7 +461,7 @@ static void ui_resource(uint64_t obj,
 
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    uint64_t uid = ce_cdb_a0->read_ref(reader, prop_key_hash, 0);
+    uint64_t uid = ce_cdb_a0->read_ref(reader, prop, 0);
 
     uint64_t resource_obj = uid;
 
@@ -391,17 +477,7 @@ static void ui_resource(uint64_t obj,
     bool change = false;
 
     struct ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
-    const char *icon = ri->display_icon ? ri->display_icon() : NULL;
 
-    if (icon) {
-        snprintf(labelid, CE_ARRAY_LEN(labelid),
-                 "%s %s##prop_select_resource_%llx%llx", icon, label, obj,
-                 prop_key_hash);
-    } else {
-        snprintf(labelid, CE_ARRAY_LEN(labelid),
-                 "%s##prop_select_resource_%llx%llx", label, obj,
-                 prop_key_hash);
-    }
 
     bool is_leaf = !ct_property_editor_a0->get_interface(resource_obj);
     ImGuiTreeNodeFlags flags = 0;
@@ -411,36 +487,47 @@ static void ui_resource(uint64_t obj,
         ct_debugui_a0->Separator();
     }
 
-    bool resource_open = ct_debugui_a0->TreeNodeEx(labelid, flags);
-
-    ct_debugui_a0->NextColumn();
-    ct_debugui_a0->PushItemWidth(-1);
-
-    sprintf(modal_id, ICON_FA_FOLDER_OPEN
-            " ""select...##%sselect_resource_%d", label, i);
-
-    sprintf(labelid, ICON_FA_FOLDER_OPEN
-            "##%sprop_select_resource_%d", label, i);
-
-    if (prop_revert_btn(obj, &prop_key_hash, 1)) {
+    if (prop_revert_btn(obj, &prop, 1)) {
         ct_debugui_a0->SameLine(0, 4);
     }
 
+    sprintf(modal_id, ICON_FA_FOLDER_OPEN
+            " ""select...##%sselect_resource_%d", label, i);
+    sprintf(labelid, ICON_FA_FOLDER_OPEN
+            "##%sprop_select_resource_%d", label, i);
     if (ct_debugui_a0->Button(labelid, (float[2]) {0.0f})) {
-
         ct_debugui_a0->OpenPopup(modal_id);
     };
 
+    ct_debugui_a0->SameLine(0, 4);
+
+    snprintf(labelid, CE_ARRAY_LEN(labelid),
+             "##prop_tree_resource_%llx%llx", obj, prop);
+
+    bool resource_open;
+    resource_open = ct_debugui_a0->TreeNodeEx(labelid, flags);
+
+    ct_debugui_a0->NextColumn();
+
+    const char *icon = ri->display_icon ? ri->display_icon() : NULL;
+    if (icon) {
+        snprintf(labelid, CE_ARRAY_LEN(labelid), "%s %s", icon, label);
+    } else {
+        snprintf(labelid, CE_ARRAY_LEN(labelid), "%s", label);
+    }
+
+
+    ct_debugui_a0->Text("%s", labelid);
+
+    ct_debugui_a0->NextColumn();
     uint64_t new_value = 0;
 
-    change = resource_select_modal(modal_id, obj + prop_key_hash,
+    change = resource_select_modal(modal_id, obj + prop,
                                    resource_type, &new_value, NULL);
-
-
-    ct_debugui_a0->SameLine(0.0f, 0.0f);
 
     sprintf(labelid, "##%sresource_prop_str_%d", label, i);
 
+    ct_debugui_a0->PushItemWidth(-1);
     ct_debugui_a0->InputText(labelid,
                              buffer,
                              strlen(buffer),
@@ -473,7 +560,7 @@ static void ui_resource(uint64_t obj,
         ct_debugui_a0->EndDragDropTarget();
     }
 
-    if(!is_leaf) {
+    if (!is_leaf) {
         ct_debugui_a0->Separator();
     }
 
@@ -489,14 +576,14 @@ static void ui_resource(uint64_t obj,
 
     if (change) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_ref(w, prop_key_hash, new_value);
+        ce_cdb_a0->set_ref(w, prop, new_value);
         ce_cdb_a0->write_commit(w);
     }
 
 }
 
 static void ui_vec3(uint64_t obj,
-                    const uint64_t prop_key_hash[3],
+                    const uint64_t prop[3],
                     const char *label,
                     struct ui_vec3_p0 params) {
     if (!obj) {
@@ -506,9 +593,9 @@ static void ui_vec3(uint64_t obj,
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float value[3] = {
-            ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
-            ce_cdb_a0->read_float(reader, prop_key_hash[1], 0.0f),
-            ce_cdb_a0->read_float(reader, prop_key_hash[2], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[0], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[1], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[2], 0.0f),
     };
 
     float value_new[3] = {};
@@ -517,7 +604,7 @@ static void ui_vec3(uint64_t obj,
     const float min = !params.min_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, prop_key_hash, 3);
+    _prop_label(label, obj, prop, 3);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -528,9 +615,9 @@ static void ui_vec3(uint64_t obj,
                                   min, max,
                                   "%.3f", 1.0f)) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
-        ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
-        ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);
+        ce_cdb_a0->set_float(w, prop[0], value_new[0]);
+        ce_cdb_a0->set_float(w, prop[1], value_new[1]);
+        ce_cdb_a0->set_float(w, prop[2], value_new[2]);
         ce_cdb_a0->write_commit(w);
     }
 
@@ -542,16 +629,16 @@ static void ui_vec3(uint64_t obj,
 }
 
 static void ui_vec4(uint64_t obj,
-                    const uint64_t prop_key_hash[4],
+                    const uint64_t prop[4],
                     const char *label,
                     struct ui_vec4_p0 params) {
     const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float value[4] = {
-            ce_cdb_a0->read_float(reader, prop_key_hash[0], 0.0f),
-            ce_cdb_a0->read_float(reader, prop_key_hash[1], 0.0f),
-            ce_cdb_a0->read_float(reader, prop_key_hash[2], 0.0f),
-            ce_cdb_a0->read_float(reader, prop_key_hash[3], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[0], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[1], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[2], 0.0f),
+            ce_cdb_a0->read_float(reader, prop[3], 0.0f),
     };
 
     float value_new[4] = {};
@@ -560,7 +647,7 @@ static void ui_vec4(uint64_t obj,
     const float min = !params.min_f ? -FLT_MAX : params.min_f;
     const float max = !params.max_f ? FLT_MAX : params.max_f;
 
-    _prop_label(label, obj, prop_key_hash, 4);
+    _prop_label(label, obj, prop, 4);
 
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
@@ -580,10 +667,10 @@ static void ui_vec4(uint64_t obj,
 
     if (changed) {
         ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-        ce_cdb_a0->set_float(w, prop_key_hash[0], value_new[0]);
-        ce_cdb_a0->set_float(w, prop_key_hash[1], value_new[1]);
-        ce_cdb_a0->set_float(w, prop_key_hash[2], value_new[2]);
-        ce_cdb_a0->set_float(w, prop_key_hash[3], value_new[3]);
+        ce_cdb_a0->set_float(w, prop[0], value_new[0]);
+        ce_cdb_a0->set_float(w, prop[1], value_new[1]);
+        ce_cdb_a0->set_float(w, prop[2], value_new[2]);
+        ce_cdb_a0->set_float(w, prop[3], value_new[3]);
         ce_cdb_a0->write_commit(w);
     }
     ct_debugui_a0->PopItemWidth();
