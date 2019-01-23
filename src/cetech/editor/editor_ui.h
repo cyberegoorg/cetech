@@ -86,6 +86,10 @@ struct ct_editor_ui_a0 {
 
     uint64_t (*lock_selected_obj)(uint64_t dock,
                                   uint64_t selected_obj);
+
+    bool (*ui_prop_tree_node)(const char *name,
+                              int flags,
+                              uint64_t id);
 };
 
 CE_MODULE(ct_editor_ui_a0);

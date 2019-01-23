@@ -203,7 +203,6 @@ static void draw_property(uint64_t material) {
         return;
     }
 
-    char labelid [128] = {};
     const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
@@ -223,18 +222,14 @@ static void draw_property(uint64_t material) {
         const char *layer_name = ce_cdb_a0->read_str(layer_reader,
                                                      MATERIAL_LAYER_NAME, NULL);
 
-        snprintf(labelid, CE_ARRAY_LEN(labelid),
-                 "Layer##prop_select_resource_%llx%llx", material, layer);
+        bool open = ct_editor_ui_a0->ui_prop_tree_node("Layer",
+                                                       DebugUITreeNodeFlags_DefaultOpen,
+                                                       layer);
 
+        ct_debugui_a0->Text("%s", layer_name);
         ct_debugui_a0->NextColumn();
-        if (ct_debugui_a0->TreeNodeEx(labelid,
-                                      DebugUITreeNodeFlags_DefaultOpen)) {
-            ct_debugui_a0->NextColumn();
 
-            ct_debugui_a0->Text("%s", layer_name);
-
-            ct_debugui_a0->NextColumn();
-
+        if (open) {
             ct_editor_ui_a0->prop_str(layer, MATERIAL_LAYER_NAME,
                                       "Layer name", i);
 
@@ -280,10 +275,6 @@ static void draw_property(uint64_t material) {
 
             ct_debugui_a0->TreePop();
 
-        } else {
-            ct_debugui_a0->NextColumn();
-            ct_debugui_a0->Text("%s", layer_name);
-            ct_debugui_a0->NextColumn();
         }
     }
 }

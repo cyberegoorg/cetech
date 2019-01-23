@@ -75,13 +75,13 @@ static void draw_component(uint64_t obj) {
         ce_cdb_a0->write_commit(w);
         ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
-    ct_debugui_a0->NextColumn();
 
+    ct_debugui_a0->SameLine(0, 0);
     struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
-    bool open = ct_debugui_a0->TreeNodeEx(editor->display_name(),
-                                          DebugUITreeNodeFlags_DefaultOpen);
-    ct_debugui_a0->NextColumn();
+    bool open = ct_editor_ui_a0->ui_prop_tree_node(editor->display_name(),
+                                                   DebugUITreeNodeFlags_DefaultOpen,
+                                                   obj);
 
     ct_debugui_a0->NextColumn();
 
@@ -96,12 +96,12 @@ static void draw_component(uint64_t obj) {
 }
 
 static void _entity_ui(uint64_t obj) {
-    ct_debugui_a0->NextColumn();
-
     ct_debugui_a0->Separator();
-    bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_CUBE" Entity",
-                                          DebugUITreeNodeFlags_DefaultOpen);
-    ct_debugui_a0->NextColumn();
+
+    bool open = ct_editor_ui_a0->ui_prop_tree_node(ICON_FA_CUBE" Entity",
+                                                   DebugUITreeNodeFlags_DefaultOpen,
+                                                   obj);
+
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->Separator();
 

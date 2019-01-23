@@ -132,13 +132,11 @@ static void on_debugui(uint64_t dock) {
 
     snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
 
-    ct_debugui_a0->NextColumn();
 
-    bool open = ct_debugui_a0->TreeNodeEx(ICON_FA_FILE" Resource",
-                                          DebugUITreeNodeFlags_DefaultOpen);
+    bool open = ct_editor_ui_a0->ui_prop_tree_node(ICON_FA_FILE" Resource",
+                                                   DebugUITreeNodeFlags_DefaultOpen,
+                                                   obj);
 
-
-    ct_debugui_a0->NextColumn();
     ct_debugui_a0->NextColumn();
 
     if (open) {

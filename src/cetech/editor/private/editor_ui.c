@@ -450,6 +450,24 @@ static bool resource_select_modal(const char *modal_id,
     return changed;
 }
 
+bool ui_prop_tree_node(const char *name,
+                       ImGuiTreeNodeFlags flags,
+                       uint64_t id) {
+
+    char labelid[128] = {};
+
+    snprintf(labelid, CE_ARRAY_LEN(labelid), "##%s%llx", name, id);
+
+    bool resource_open;
+    resource_open = ct_debugui_a0->TreeNodeEx(labelid, flags);
+    ct_debugui_a0->NextColumn();
+
+    ct_debugui_a0->Text("%s", name);
+    ct_debugui_a0->NextColumn();
+
+    return resource_open;
+}
+
 static void ui_resource(uint64_t obj,
                         uint64_t prop,
                         const char *label,
@@ -492,7 +510,7 @@ static void ui_resource(uint64_t obj,
     }
 
     sprintf(modal_id, ICON_FA_FOLDER_OPEN
-            " ""select...##%sselect_resource_%d", label, i);
+            " ""select...##select_resource_%d", i);
     sprintf(labelid, ICON_FA_FOLDER_OPEN
             "##%sprop_select_resource_%d", label, i);
     if (ct_debugui_a0->Button(labelid, (float[2]) {0.0f})) {
@@ -501,13 +519,10 @@ static void ui_resource(uint64_t obj,
 
     ct_debugui_a0->SameLine(0, 4);
 
-    snprintf(labelid, CE_ARRAY_LEN(labelid),
-             "##prop_tree_resource_%llx%llx", obj, prop);
+    uint64_t new_value = 0;
 
-    bool resource_open;
-    resource_open = ct_debugui_a0->TreeNodeEx(labelid, flags);
-
-    ct_debugui_a0->NextColumn();
+    change = resource_select_modal(modal_id, obj + prop,
+                                   resource_type, &new_value, NULL);
 
     const char *icon = ri->display_icon ? ri->display_icon() : NULL;
     if (icon) {
@@ -516,14 +531,8 @@ static void ui_resource(uint64_t obj,
         snprintf(labelid, CE_ARRAY_LEN(labelid), "%s", label);
     }
 
+    bool resource_open = ui_prop_tree_node(labelid, flags, obj);
 
-    ct_debugui_a0->Text("%s", labelid);
-
-    ct_debugui_a0->NextColumn();
-    uint64_t new_value = 0;
-
-    change = resource_select_modal(modal_id, obj + prop,
-                                   resource_type, &new_value, NULL);
 
     sprintf(labelid, "##%sresource_prop_str_%d", label, i);
 
@@ -710,7 +719,7 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .resource_tooltip = resource_tooltip,
         .resource_select_modal = resource_select_modal,
         .lock_selected_obj = lock_selected_obj,
-
+        .ui_prop_tree_node = ui_prop_tree_node,
 };
 
 struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;
