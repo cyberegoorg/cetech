@@ -421,7 +421,7 @@ static bool prop_exist(const ce_cdb_obj_o *reader,
 
 void prop_copy(const ce_cdb_obj_o *from,
                ce_cdb_obj_o *to,
-               uint64_t prorp);
+               uint64_t prop);
 
 static void set_from(struct ce_cdb_t _db,
                      uint64_t from,
@@ -1200,9 +1200,9 @@ void remove_property(ce_cdb_obj_o *_writer,
         ce_array_pop_back(writer->property_type);
         ce_array_pop_back(writer->offset);
 
-        if (writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
-            destroy_object(writer->db, value_ptr->subobj);
-        }
+//        if (writer->property_type[idx] == CDB_TYPE_SUBOBJECT) {
+//            destroy_object(writer->db, value_ptr->subobj);
+//        }
 
         ce_hash_remove(&writer->prop_map, property);
     }
@@ -1444,42 +1444,45 @@ bool prop_equal(const ce_cdb_obj_o *r1,
 
 void prop_copy(const ce_cdb_obj_o *from,
                ce_cdb_obj_o *to,
-               uint64_t prorp) {
-    enum ce_cdb_type t = prop_type(from, prorp);
+               uint64_t prop) {
+    enum ce_cdb_type t = prop_type(from, prop);
     union ce_cdb_value_u0 v;
     switch (t) {
         case CDB_TYPE_NONE:
             break;
 
         case CDB_TYPE_UINT64:
-            v.uint64 = read_uint64(from, prorp, 0);
-            set_uint64(to, prorp, v.uint64);
+            v.uint64 = read_uint64(from, prop, 0);
+            set_uint64(to, prop, v.uint64);
             break;
         case CDB_TYPE_PTR:
-            v.ptr = read_ptr(from, prorp, 0);
-            set_ptr(to, prorp, v.ptr);
+            v.ptr = read_ptr(from, prop, 0);
+            set_ptr(to, prop, v.ptr);
             break;
+
         case CDB_TYPE_REF:
-            v.ref = read_ref(from, prorp, 0);
-            set_ref(to, prorp, v.ref);
+            v.ref = read_ref(from, prop, 0);
+            set_ref(to, prop, v.ref);
             break;
+
         case CDB_TYPE_FLOAT:
-            v.f = read_float(from, prorp, 0);
-            set_float(to, prorp, v.f);
+            v.f = read_float(from, prop, 0);
+            set_float(to, prop, v.f);
             break;
+
         case CDB_TYPE_BOOL:
-            v.b = read_bool(from, prorp, 0);
-            set_bool(to, prorp, v.b);
+            v.b = read_bool(from, prop, 0);
+            set_bool(to, prop, v.b);
             break;
 
         case CDB_TYPE_STR:
-            v.str = (char *) read_string(from, prorp, 0);
-            set_string(to, prorp, v.str);
+            v.str = (char *) read_string(from, prop, 0);
+            set_string(to, prop, v.str);
             break;
 
         case CDB_TYPE_SUBOBJECT:
-            v.subobj = read_subobject(from, prorp, 0);
-            set_uint64(to, prorp, v.subobj);
+            v.subobj = read_subobject(from, prop, 0);
+            set_subobject(to, prop, v.subobj);
             break;
 
         case CDB_TYPE_BLOB:
@@ -1531,6 +1534,13 @@ void move(struct ce_cdb_t _db,
     struct object_t **obj_addr = (struct object_t **) _to;
 
     *obj_addr = from;
+}
+
+void move_prop(ce_cdb_obj_o *from_w,
+               ce_cdb_obj_o *to_w,
+               uint64_t prop) {
+    prop_copy(from_w, to_w, prop);
+    remove_property(from_w, prop);
 }
 
 
@@ -2024,7 +2034,8 @@ static struct ce_cdb_a0 cdb_api = {
         .obj_type = type,
         .set_type = set_type,
         .obj_key= key,
-        .move = move,
+        .move_obj = move,
+        .move_prop = move_prop,
 
         .create_object = create_object,
         .create_object_uid = create_object_uid,

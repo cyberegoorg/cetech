@@ -136,6 +136,51 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         new_selected_object = obj;
     }
 
+    if (ct_debugui_a0->BeginDragDropSource(
+            DebugUIDragDropFlags_SourceAllowNullID)) {
+
+        ct_debugui_a0->Text(ICON_FA_CUBE" %s", name);
+
+        ct_debugui_a0->SetDragDropPayload("entity",
+                                          &obj,
+                                          sizeof(uint64_t),
+                                          DebugUICond_Once);
+        ct_debugui_a0->EndDragDropSource();
+    }
+
+    if (ct_debugui_a0->BeginDragDropTarget()) {
+        const struct DebugUIPayload *payload;
+        payload = ct_debugui_a0->AcceptDragDropPayload("entity", 0);
+
+        if (payload) {
+            uint64_t drag_obj = *((uint64_t *) payload->Data);
+
+            if (drag_obj && drag_obj != obj) {
+
+                uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                          drag_obj);
+
+                if (ENTITY_INSTANCE == asset_type) {
+                    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(),
+                                                        drag_obj);
+
+                    ce_cdb_obj_o *pw = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                              parent);
+
+                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             children);
+
+                    ce_cdb_a0->move_prop(pw, w, drag_obj);
+
+                    ce_cdb_a0->write_commit(w);
+                    ce_cdb_a0->write_commit(pw);
+                }
+            }
+        }
+
+        ct_debugui_a0->EndDragDropTarget();
+    }
+
     if (ct_debugui_a0->BeginDragDropTarget()) {
 
         const struct DebugUIPayload *payload;

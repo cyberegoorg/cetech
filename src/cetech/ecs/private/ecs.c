@@ -1189,7 +1189,21 @@ static void _update(float dt) {
 
                                 link(world->world, ents[e], new_ents);
                             }
+                        } else if (ev.type == CE_CDB_REMOVE) {
+                            uint64_t ent_obj = ev.old_value.subobj;
 
+                            uint64_t idx = ce_hash_lookup(
+                                    &world->obj_entmap,
+                                    ent_obj,
+                                    UINT64_MAX);
+
+                            if (UINT64_MAX == idx) {
+                                continue;
+                            }
+
+                            struct spawn_info *si = &world->obj_spawn_info[idx];
+                            destroy(world->world, si->ents,
+                                    ce_array_size(si->ents));
                         }
                     }
                 } else if (type == ENTITY_COMPONENTS) {

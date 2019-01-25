@@ -111,9 +111,14 @@ struct ce_cdb_a0 {
                         uint64_t obj);
 
     //
-    void (*move)(struct ce_cdb_t db,
-                 uint64_t from_obj,
-                 uint64_t to);
+    void (*move_obj)(struct ce_cdb_t db,
+                     uint64_t from_obj,
+                     uint64_t to);
+
+    void (*move_prop)(ce_cdb_obj_o *from_w,
+                      ce_cdb_obj_o *to_w,
+                      uint64_t prop);
+
 
     //
 
