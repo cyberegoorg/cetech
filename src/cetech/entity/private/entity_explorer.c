@@ -75,6 +75,113 @@ static uint64_t _spawn_to(uint64_t from,
     return new_obj;
 }
 
+static void _add(uint64_t selected_obj) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
+
+    uint64_t entity_obj;
+    entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                          ENTITY_RESOURCE_ID);
+
+    uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                       ENTITY_COMPONENTS);
+
+    uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                     ENTITY_CHILDREN);
+
+    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                  entity_obj);
+    ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
+    ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
+    ce_cdb_a0->write_commit(writer);
+
+
+    uint64_t add_children_obj;
+    add_children_obj = ce_cdb_a0->read_subobject(reader,
+                                                 ENTITY_CHILDREN,
+                                                 0);
+
+    if (!add_children_obj) {
+        add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                    ENTITY_CHILDREN);
+        ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                      selected_obj);
+        ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
+                                 add_children_obj);
+        ce_cdb_a0->write_commit(writer);
+    }
+
+    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                             add_children_obj);
+    ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
+    ce_cdb_a0->write_commit(w);
+}
+
+
+void item_btns(uint64_t  context, uint64_t uid) {
+    char label[128] = {0};
+    snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
+            "##add_%llu", uid);
+
+    bool add = ct_debugui_a0->Button(label, (float[2]) {0.0f});
+
+    if (add) {
+        _add(uid);
+    }
+
+    ct_debugui_a0->SameLine(0, 4);
+    snprintf(label, CE_ARRAY_LEN(label),
+             ICON_FA_PLUS
+                     " "
+                     ICON_FA_FOLDER_OPEN
+                     "##add_from%llu", uid);
+
+    bool add_from = ct_debugui_a0->Button(label, (float[2]) {0.0f});
+
+    char modal_id[128] = {'\0'};
+    sprintf(modal_id, "select...##select_resource_%llu", uid);
+
+    uint64_t new_value = 0;
+
+    static uint32_t count = 1;
+    bool changed = ct_editor_ui_a0->resource_select_modal(modal_id,
+                                                          uid,
+                                                          ENTITY_RESOURCE_ID,
+                                                          &new_value,
+                                                          &count);
+    if (add_from) {
+        ct_debugui_a0->OpenPopup(modal_id);
+    }
+
+    if (changed && new_value) {
+        for (int i = 0; i < count; ++i) {
+            _spawn_to(new_value, uid);
+        }
+    }
+
+    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), uid);
+
+    if (parent) {
+        ct_debugui_a0->SameLine(0, 4);
+        snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
+                "##minus_%llu", uid);
+        if (ct_debugui_a0->Button(label, (float[2]) {0.0f})) {
+            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                     parent);
+            ce_cdb_a0->remove_property(w, uid);
+            ce_cdb_a0->write_commit(w);
+
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
+
+            uint64_t parent_ent = ce_cdb_a0->parent(ce_cdb_a0->db(),
+                                                    parent);
+
+            ct_selected_object_a0->set_selected_object(context, parent_ent);
+        }
+    }
+
+
+}
+
 static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                      uint64_t obj,
                                      uint32_t id,
@@ -119,20 +226,15 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         strcpy(name, ent_name);
     } else {
         snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
+        snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
     }
 
     char label[128] = {0};
-    snprintf(label, CE_ARRAY_LEN(label), "##%llu", uid);
-
-    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-
-    ct_debugui_a0->SameLine(0, 10);
-
     snprintf(label, CE_ARRAY_LEN(label),
              (ICON_FA_CUBE
                      " ""%s##%llu"), name, uid);
-
-    if (ct_debugui_a0->Selectable(label, false, 0, (float[2]) {0, 0})) {
+    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
+    if(ct_debugui_a0->IsItemClicked(0)) {
         new_selected_object = obj;
     }
 
@@ -196,6 +298,12 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         ct_debugui_a0->EndDragDropTarget();
     }
 
+    ct_debugui_a0->NextColumn();
+
+    item_btns(context, uid);
+    ct_debugui_a0->NextColumn();
+
+
     if (open) {
         const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
 
@@ -235,19 +343,19 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             snprintf(c_label, CE_ARRAY_LEN(c_label),
                      "##component_%llu", key);
 
-            ct_debugui_a0->TreeNodeEx(c_label, c_flags);
-
-            ct_debugui_a0->SameLine(0, 0);
-
+            //
             snprintf(c_label, CE_ARRAY_LEN(c_label),
                      "%s##component_%llu", component_display_name, key);
 
-            if (ct_debugui_a0->Selectable(c_label, false, 0,
-                                          (float[2]) {0, 0})) {
+            ct_debugui_a0->TreeNodeEx(c_label, c_flags);
+            if(ct_debugui_a0->IsItemClicked(0)) {
                 new_selected_object = component;
             }
 
             ct_debugui_a0->TreePop();
+            ct_debugui_a0->NextColumn();
+
+            ct_debugui_a0->NextColumn();
         }
     }
 
@@ -276,102 +384,19 @@ static void draw_menu(uint64_t selected_obj,
         return;
     }
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
-
-//    ct_debugui_a0->SameLine(0, 10);
 
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), selected_obj);
 
     if (type == ENTITY_RESOURCE_ID) {
-        uint64_t uid = selected_obj;
 
-        bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
-
-        if (add) {
-            uint64_t entity_obj;
-            entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  ENTITY_RESOURCE_ID);
-
-            uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                               ENTITY_COMPONENTS);
-
-            uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                             ENTITY_CHILDREN);
-
-            ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                          entity_obj);
-            ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
-            ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
-            ce_cdb_a0->write_commit(writer);
+//        bool add = ct_debugui_a0->Button(ICON_FA_PLUS, (float[2]) {0.0f});
+//
+//        if (add) {
+//            _add(uid);
+//        }
+//        ct_debugui_a0->SameLine(0, 10);
 
 
-            uint64_t add_children_obj;
-            add_children_obj = ce_cdb_a0->read_subobject(reader,
-                                                         ENTITY_CHILDREN,
-                                                         0);
-
-            if (!add_children_obj) {
-                add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                            ENTITY_CHILDREN);
-                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                              selected_obj);
-                ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
-                                         add_children_obj);
-                ce_cdb_a0->write_commit(writer);
-            }
-
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                     add_children_obj);
-            ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
-            ce_cdb_a0->write_commit(w);
-        }
-        ct_debugui_a0->SameLine(0, 10);
-
-        bool add_from = ct_debugui_a0->Button(
-                ICON_FA_PLUS " " ICON_FA_FOLDER_OPEN,
-                (float[2]) {0.0f});
-
-        char modal_id[128] = {'\0'};
-        sprintf(modal_id, "select...##select_resource_%llu", selected_obj);
-
-        uint64_t new_value = 0;
-
-        static uint32_t count = 1;
-        bool changed = ct_editor_ui_a0->resource_select_modal(modal_id,
-                                                              selected_obj,
-                                                              ENTITY_RESOURCE_ID,
-                                                              &new_value,
-                                                              &count);
-        if (add_from) {
-            ct_debugui_a0->OpenPopup(modal_id);
-        }
-
-        if (changed && new_value) {
-            for (int i = 0; i < count; ++i) {
-                _spawn_to(new_value, selected_obj);
-            }
-        }
-
-        uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), selected_obj);
-
-        if (parent) {
-            ct_debugui_a0->SameLine(0, 10);
-            if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-
-
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         parent);
-                ce_cdb_a0->remove_property(w, uid);
-                ce_cdb_a0->write_commit(w);
-
-                ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
-
-                uint64_t parent_ent = ce_cdb_a0->parent(ce_cdb_a0->db(),
-                                                        parent);
-
-                ct_selected_object_a0->set_selected_object(context, parent_ent);
-            }
-        }
     }
 }
 
@@ -390,7 +415,24 @@ static uint64_t draw_ui(uint64_t top_level_obj,
         return 0;
     }
 
-    return ui_entity_item_begin(selected_obj, top_level_obj, rand(), context);
+
+    ct_debugui_a0->Columns(2, NULL, true);
+
+//    static float initial_spacing = 70.f;
+//    if (initial_spacing) {
+//        ct_debugui_a0->SetColumnWidth(0, initial_spacing);
+//        initial_spacing = 0;
+//    }
+
+    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
+
+    uint64_t ret = ui_entity_item_begin(selected_obj, top_level_obj, rand(),
+                                        context);
+
+    ct_debugui_a0->Columns(1, NULL, true);
+
+    return ret;
 }
 
 static void _init(struct ce_api_a0 *api) {
