@@ -39,8 +39,8 @@ struct preview_instance {
     struct ct_viewport0 viewport;
     struct ct_entity ent;
     uint64_t selected_object;
+    uint64_t type;
     bool locked;
-
     bool free;
 };
 
@@ -166,7 +166,7 @@ static void set_asset(struct preview_instance *pi,
         return;
     }
 
-    if(pi->locked) {
+    if (pi->locked) {
         return;
     }
 
@@ -191,11 +191,14 @@ static void set_asset(struct preview_instance *pi,
         ct_ecs_a0->destroy(pi->world, &pi->ent, 1);
 
         pi->ent.h = 0;
+        pi->type = 0;
     }
 
     if (obj) {
-        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                            obj);
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+
+        pi->type = type;
+
         struct ct_resource_preview_i0 *i;
         i = _get_asset_preview(type);
         if (i) {
@@ -228,18 +231,35 @@ static void draw_menu(uint64_t dock) {
 
 static void _draw_preview(struct preview_instance *pi,
                           float size[2]) {
-    struct ct_rg_builder *builder;
-    builder = ct_renderer_a0->viewport_builder(pi->viewport);
 
-    builder->set_size(builder, size[0], size[1]);
+    if(!pi->type) {
+        return;
+    }
 
-    bgfx_texture_handle_t th;
-    th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
+    struct ct_resource_preview_i0 *i;
+    i = _get_asset_preview(pi->type);
 
-    ct_debugui_a0->Image(th,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    if(!i) {
+        return;
+    }
+
+    if (i->draw_raw) {
+        i->draw_raw(pi->selected_object, size);
+    } else {
+
+        struct ct_rg_builder *builder;
+        builder = ct_renderer_a0->viewport_builder(pi->viewport);
+
+        builder->set_size(builder, size[0], size[1]);
+
+        bgfx_texture_handle_t th;
+        th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
+
+        ct_debugui_a0->Image(th,
+                             size,
+                             (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                             (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+    }
 }
 
 static void on_debugui(uint64_t dock) {

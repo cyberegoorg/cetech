@@ -226,7 +226,6 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
         strcpy(name, ent_name);
     } else {
         snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
-        snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
     }
 
     char label[128] = {0};

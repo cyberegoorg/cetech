@@ -118,8 +118,10 @@ static void draw_editor_menu(uint64_t dock) {
     }
 
     ct_dock_a0->context_btn(dock);
-    ct_debugui_a0->SameLine(0, -1);
-    i->draw_menu(editor->context_obj);
+    if(i && i->draw_menu) {
+        ct_debugui_a0->SameLine(0, -1);
+        i->draw_menu(editor->context_obj);
+    }
 }
 
 static uint32_t find_editor(uint64_t obj) {

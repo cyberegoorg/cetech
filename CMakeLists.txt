@@ -7,7 +7,7 @@ project(cetech)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Werror -Wall")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Werror -Wall")
 set(EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -rdynamic")
-set(CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic")
 
 include_directories(src)
 
@@ -37,7 +37,6 @@ link_directories(externals/build/${PLATFORM_ID}/release/lib/)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
-
 
 
 ################################################################################
@@ -134,7 +133,12 @@ set(SOURCE_FILES
         src/cetech/game/private/game_view.c
         src/cetech/entity/private/entity_explorer.c
         src/cetech/editor/private/selected_object.c
-        src/cetech/editor/private/dock.c)
+        src/cetech/editor/private/dock.c
+        src/cetech/node_graph/private/node_graph.c
+        src/cetech/node_graph/private/node_test.c
+        src/cetech/node_graph_editor/private/node_graph_editor.cpp
+
+        )
 
 ################################################################################
 # Main sources

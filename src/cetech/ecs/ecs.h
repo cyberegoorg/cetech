@@ -79,7 +79,6 @@ struct ct_component_i0 {
                     void *data);
 };
 
-
 struct ct_editor_component_i0 {
     const char *(*display_name)();
 

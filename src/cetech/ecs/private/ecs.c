@@ -812,13 +812,13 @@ void *get_resource_interface(uint64_t name_hash) {
 void create_new(uint64_t obj) {
     ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
 
-    if (ce_cdb_a0->prop_exist(w, ENTITY_CHILDREN)) {
+    if (!ce_cdb_a0->prop_exist(w, ENTITY_CHILDREN)) {
         uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                ENTITY_CHILDREN);
         ce_cdb_a0->set_subobject(w, ENTITY_CHILDREN, ch);
     }
 
-    if (ce_cdb_a0->prop_exist(w, ENTITY_COMPONENTS)) {
+    if (!ce_cdb_a0->prop_exist(w, ENTITY_COMPONENTS)) {
         uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                ENTITY_COMPONENTS);
         ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, ch);

@@ -215,23 +215,6 @@ static void draw_property(uint64_t obj) {
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
 
-    ct_debugui_a0->NextColumn();
-    ct_debugui_a0->Text("Texture preview");
-    ct_debugui_a0->NextColumn();
-
-    float size[2] = {128, 128};
-
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    bgfx_texture_handle_t texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
-                                                     TEXTURE_HANDLER_PROP, 0)
-    };
-
-    ct_debugui_a0->Image(texture,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
-    ct_debugui_a0->NextColumn();
 }
 
 
@@ -256,60 +239,24 @@ static void tooltip(uint64_t resource,
 //                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static struct ct_entity load(uint64_t resource,
-                             struct ct_world world) {
-    struct ct_entity ent = {};
-    ct_ecs_a0->create(world, &ent, 1);
+static void draw_raw(uint64_t obj,
+                     float size[2]) {
+    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    uint64_t material = ct_material_a0->create(0x16810eb6a8b0019d);
+    bgfx_texture_handle_t texture = {
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
+                                                     TEXTURE_HANDLER_PROP, 0)
+    };
 
-    uint64_t new_material = ce_cdb_a0->create_from(ce_cdb_a0->db(), material);
-
-    const struct ct_cdb_obj_t *r = ce_cdb_a0->read(ce_cdb_a0->db(), resource);
-    const uint64_t texture = ce_cdb_a0->read_uint64(r,
-                                                    TEXTURE_HANDLER_PROP,
-                                                    0);
-
-    ct_material_a0->set_texture_handler(new_material,
-                                        ce_id_a0->id64("gbuffer"),
-                                        "u_texColor",
-                                        (bgfx_texture_handle_t) {.idx=texture});
-
-    ct_ecs_a0->add(
-            world, ent,
-            (uint64_t[]) {
-                    TRANSFORM_COMPONENT,
-                    PRIMITIVE_MESH_COMPONENT,
-            }, 2,
-            (void *[]) {
-                    &(struct ct_transform_comp) {
-                            .pos = {0.0f, 0.0f, 13.0f},
-                            .scale = {1.0f, 1.0f, 1.0f}
-                    },
-
-                    &(struct ct_primitive_mesh) {
-                            .material = new_material
-                    },
-            }
-    );
-
-    return ent;
-}
-
-static void unload(uint64_t resource,
-                   struct ct_world world,
-                   struct ct_entity entity) {
-    struct ct_primitive_mesh *pm = ct_ecs_a0->get_one(world,
-                                                      PRIMITIVE_MESH_COMPONENT,
-                                                      entity);
-
-    ce_cdb_a0->destroy_object(ce_cdb_a0->db(), pm->material);
+    ct_debugui_a0->Image(texture,
+                         size,
+                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
+                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
 static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
         .tooltip = tooltip,
-        .load = load,
-        .unload = unload,
+        .draw_raw = draw_raw,
 };
 
 

@@ -183,7 +183,6 @@ static void _create_from_modal(const char *modal_id) {
         ct_debugui_a0->SameLine(0, -1);
         bool add = ct_debugui_a0->Button(ICON_FA_PLUS" Create",
                                          (float[2]) {0.0f});
-
         if (add) {
             uint64_t new_res = 0;
 
@@ -195,6 +194,7 @@ static void _create_from_modal(const char *modal_id) {
                                                      uid);
                 }
             } else {
+                uint64_t type = ce_id_a0->id64(modal_buffer_type);
                 new_res = ce_cdb_a0->create_object(ce_cdb_a0->db(), type);
 
                 ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
@@ -273,7 +273,7 @@ static void _create_from_modal(const char *modal_id) {
             char label[128];
 
             ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
-            const char *icon = ri->display_icon ? ri->display_icon() : NULL;
+            const char *icon = ri && ri->display_icon ? ri->display_icon() : NULL;
 
             if (icon) {
                 sprintf(label, "%s %s##modal_type_item_%s", icon, path, path);
