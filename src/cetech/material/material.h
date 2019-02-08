@@ -1,6 +1,10 @@
 #ifndef CETECH_MATERIAL_H
 #define CETECH_MATERIAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <celib/cdb.h>
 
@@ -86,5 +90,9 @@ struct ct_material_a0 {
 };
 
 CE_MODULE(ct_material_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_MATERIAL_H

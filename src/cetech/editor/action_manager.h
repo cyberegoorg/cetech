@@ -1,6 +1,10 @@
 #ifndef CETECH_ACTION_MANAGER_H
 #define CETECH_ACTION_MANAGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -22,5 +26,9 @@ struct ct_action_manager_a0 {
 };
 
 CE_MODULE(ct_action_manager_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_ACTION_MANAGER_H

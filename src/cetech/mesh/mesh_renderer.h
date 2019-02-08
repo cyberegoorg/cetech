@@ -1,6 +1,10 @@
 #ifndef CETECH_MESH_RENDERER_H
 #define CETECH_MESH_RENDERER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 struct ct_mesh_component {
@@ -25,5 +29,9 @@ struct ct_mesh_component {
 
 #define PROP_MESH \
     (CE_ID64_0("mesh", 0x48ff313713a997a1ULL))
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_MESH_RENDERER_H

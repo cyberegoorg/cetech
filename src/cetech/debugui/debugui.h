@@ -1,6 +1,9 @@
 #ifndef CETECH_DEBUGUI_H
 #define CETECH_DEBUGUI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stddef.h>
 #include <stdint.h>
@@ -8,7 +11,7 @@
 #include <stdarg.h>
 
 #include <celib/macros.h>
-#include <celib/module.inl>
+
 
 #define CT_DEBUGUI_API \
     CE_ID64_0("ct_debugui_a0", 0xdd1adfe792cc040fULL)
@@ -916,9 +919,16 @@ struct ct_debugui_a0 {
     void (*EndChild)();
     void (*Unindent)(float indent_w);
     void (*Indent)(float indent_w);
+    void (*PushID)(const char* str_id);
+    void (*PushIDI)(const void* str_id);
+    void (*PopID)();
 };
 
 
 CE_MODULE(ct_debugui_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //!<CETECH_DEBUGUI_H

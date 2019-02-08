@@ -1,8 +1,12 @@
 #ifndef CETECH_CAMERA_H
 #define CETECH_CAMERA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
-#include <celib/module.inl>
+
 
 #define CT_CAMERA_API \
     CE_ID64_0("ct_camera_a0", 0x66ecb4e7c5973115ULL)
@@ -26,8 +30,8 @@
     CE_ID64_0("view", 0x3fce6c347b7f5eedULL)
 
 
-struct ct_world;
-struct ct_entity;
+typedef struct ct_world_t0 ct_world_t0;
+typedef struct ct_entity_t0 ct_entity_t0;
 
 struct ct_camera_component {
     float near;
@@ -38,8 +42,8 @@ struct ct_camera_component {
 //! Camera API V0
 struct ct_camera_a0 {
     //! Get camera project and view matrix
-    void (*get_project_view)(struct ct_world world,
-                             struct ct_entity entity,
+    void (*get_project_view)(ct_world_t0 world,
+                             struct ct_entity_t0 entity,
                              float *proj,
                              float *view,
                              int width,
@@ -48,5 +52,9 @@ struct ct_camera_a0 {
 
 
 CE_MODULE(ct_camera_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_CAMERA_H

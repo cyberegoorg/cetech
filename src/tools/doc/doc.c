@@ -4,13 +4,15 @@
 
 #include <celib/core.h>
 #include <celib/log.h>
-#include <celib/os.h>
-#include <celib/memory.h>
-#include <celib/allocator.h>
-#include <celib/murmur_hash.inl>
-#include <celib/hash.inl>
+
+#include <celib/memory/memory.h>
+#include <celib/memory/allocator.h>
+#include <celib/murmur_hash.h>
+#include <celib/containers/hash.h>
 #include <celib/task.h>
-#include <celib/buffer.inl>
+#include <celib/containers/buffer.h>
+#include <celib/os/path.h>
+#include <celib/os/vio.h>
 
 #define SEED 0
 
@@ -34,7 +36,7 @@ void process_file(void *data) {
 
     ce_log_a0->info("hash", "Process file: %s", filename);
 
-    struct ce_vio *file = ce_os_a0->vio->from_file(filename, VIO_OPEN_READ);
+    struct ce_vio *file = ce_os_vio_a0->from_file(filename, VIO_OPEN_READ);
     uint64_t size = file->size(file);
     char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
     file->read(file, input_data, 1, size);
@@ -271,11 +273,11 @@ void process_file(void *data) {
 
     char basename[128];
     char output_filename[128];
-    ce_os_a0->path->basename(filename, basename);
+    ce_os_path_a0->basename(filename, basename);
     snprintf(output_filename, CE_ARRAY_LEN(output_filename),
              "%s/%s.md.html", build_dir, basename);
 
-    file = ce_os_a0->vio->from_file(output_filename, VIO_OPEN_WRITE);
+    file = ce_os_vio_a0->from_file(output_filename, VIO_OPEN_WRITE);
     file->write(file, output, ce_array_size(output), 1);
     file->close(file);
 
@@ -318,7 +320,7 @@ int main(int argc,
         }
     }
 
-    struct ce_alloc *a = ce_memory_a0->system;
+    struct ce_alloc_t0 *a = ce_memory_a0->system;
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     if (printusage) {
@@ -328,7 +330,7 @@ int main(int argc,
 
     ce_init();
 
-    ce_os_a0->path->make_path(build_dir);
+    ce_os_path_a0->make_path(build_dir);
 
     char **files;
     uint32_t files_count;
@@ -340,7 +342,7 @@ int main(int argc,
 //            "*/fmath.inl",
             "*.inl", "*.h"
     };
-    ce_os_a0->path->list(source_dir, CE_ARR_ARG(filter),
+    ce_os_path_a0->list(source_dir, CE_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
     struct ce_task_item tasks[files_count];

@@ -1,13 +1,14 @@
+#include <celib/memory/allocator.h>
 #include "celib/config.h"
 #include "cetech/resource/resource.h"
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include <celib/ydb.h>
 #include <celib/ydb.h>
 #include <celib/macros.h>
-#include <celib/array.inl>
-#include <celib/fmath.inl>
+#include <celib/containers/array.h>
+#include <celib/math/math.h>
 
 #include <celib/log.h>
 #include <celib/cdb.h>
@@ -26,15 +27,14 @@
 
 static void transform_transform(struct ct_transform_comp *transform,
                                 float *parent) {
-    float rot_rad[3];
-    ce_vec3_mul_s(rot_rad, transform->rot, CE_DEG_TO_RAD);
+    ce_vec3_t rot = ce_vec3_mul_s(transform->rot, CE_DEG_TO_RAD);
 
     float obj[16] = {};
 
     ce_mat4_srt(obj,
-                transform->scale[0], transform->scale[1], transform->scale[2],
-                rot_rad[0], rot_rad[1], rot_rad[2],
-                transform->pos[0], transform->pos[1], transform->pos[2]);
+                transform->scale.x, transform->scale.y, transform->scale.z,
+                rot.x, rot.y, rot.z,
+                transform->pos.x, transform->pos.y, transform->pos.z);
 
 
     if (parent) {
@@ -55,7 +55,7 @@ static const char *display_name() {
 static void guizmo_get_transform(uint64_t obj,
                                  float *world,
                                  float *local) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     float pos[3] = {
             ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
@@ -63,11 +63,12 @@ static void guizmo_get_transform(uint64_t obj,
             ce_cdb_a0->read_float(reader, PROP_POSITION_Z, 0.0f),
     };
 
-    float rot[3] = {
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_X, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_Y, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_ROTATION_Z, 0.0f),
+    ce_vec3_t rot = {
+            .x = ce_cdb_a0->read_float(reader, PROP_ROTATION_X, 0.0f),
+            .y = ce_cdb_a0->read_float(reader, PROP_ROTATION_Y, 0.0f),
+            .z = ce_cdb_a0->read_float(reader, PROP_ROTATION_Z, 0.0f),
     };
+
     float sca[3] = {
             ce_cdb_a0->read_float(reader, PROP_SCALE_X, 1.0f),
             ce_cdb_a0->read_float(reader, PROP_SCALE_Y, 1.0f),
@@ -75,12 +76,11 @@ static void guizmo_get_transform(uint64_t obj,
     };
 
 
-    float rot_rad[3];
-    ce_vec3_mul_s(rot_rad, rot, CE_DEG_TO_RAD);
+    ce_vec3_t rot_rad = ce_vec3_mul_s(rot, CE_DEG_TO_RAD);
 
     ce_mat4_srt(world,
                 sca[0], sca[1], sca[2],
-                rot_rad[0], rot_rad[1], rot_rad[2],
+                rot_rad.x, rot_rad.y, rot_rad.z,
                 pos[0], pos[1], pos[2]);
 }
 
@@ -125,7 +125,7 @@ static uint64_t create_new() {
     uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                   TRANSFORM_COMPONENT);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
     ce_cdb_a0->set_float(w, PROP_SCALE_X, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Y, 1.0f);
     ce_cdb_a0->set_float(w, PROP_SCALE_Z, 1.0f);
@@ -184,10 +184,10 @@ static uint64_t size() {
     return sizeof(struct ct_transform_comp);
 }
 
-static void transform_spawner(struct ct_world world,
+static void transform_spawner(ct_world_t0 world,
                               uint64_t obj,
                               void *data) {
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_transform_comp *t = data;
 
     *t = (struct ct_transform_comp) {
@@ -219,8 +219,8 @@ static struct ct_component_i0 ct_component_i0 = {
 };
 
 
-static void _transform_root_naive(struct ct_world world,
-                                  struct ct_entity ent,
+static void _transform_root_naive(ct_world_t0 world,
+                                  struct ct_entity_t0 ent,
                                   float *w) {
     struct ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
                                                           TRANSFORM_COMPONENT,
@@ -232,23 +232,23 @@ static void _transform_root_naive(struct ct_world world,
         transform_transform(root_t, w);
     }
 
-    struct ct_entity ent_it = ct_ecs_a0->first_child(world, ent);
+    struct ct_entity_t0 ent_it = ct_ecs_a0->first_child(world, ent);
     while (ent_it.h) {
         _transform_root_naive(world, ent_it, rootw);
         ent_it = ct_ecs_a0->next_sibling(world, ent_it);
     }
 }
 
-static void foreach_transform(struct ct_world world,
-                              struct ct_entity *ents,
+static void foreach_transform(ct_world_t0 world,
+                              struct ct_entity_t0 *ents,
                               ct_entity_storage_t *item,
                               uint32_t n,
                               void *data) {
-    struct ct_entity *roots = NULL;
+    struct ct_entity_t0 *roots = NULL;
     for (uint32_t i = 0; i < n; ++i) {
-        struct ct_entity ent = ents[i];
+        struct ct_entity_t0 ent = ents[i];
 
-        struct ct_entity parent_ent = ct_ecs_a0->parent(world, ent);
+        struct ct_entity_t0 parent_ent = ct_ecs_a0->parent(world, ent);
 
         if (!parent_ent.h) {
             ce_array_push(roots, ent, ce_memory_a0->system);
@@ -263,7 +263,7 @@ static void foreach_transform(struct ct_world world,
 
     uint32_t roots_n = ce_array_size(roots);
     for (int i = 0; i < roots_n; ++i) {
-        struct ct_entity ent = roots[i];
+        struct ct_entity_t0 ent = roots[i];
 
         _transform_root_naive(world, ent, NULL);
     }
@@ -272,7 +272,7 @@ static void foreach_transform(struct ct_world world,
     ce_array_free(roots, ce_memory_a0->system);
 }
 
-static void transform_system(struct ct_world world,
+static void transform_system(ct_world_t0 world,
                              float dt) {
     uint64_t mask = ct_ecs_a0->mask(TRANSFORM_COMPONENT);
 
@@ -291,9 +291,9 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
-    api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0);
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0, sizeof(transform_simulation_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 }
 
 static void _shutdown() {

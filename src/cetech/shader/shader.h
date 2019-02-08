@@ -1,6 +1,10 @@
 #ifndef CETECH_SHADER_H
 #define CETECH_SHADER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <celib/cdb.h>
 
 #include <stdint.h>
@@ -34,5 +38,9 @@ struct ct_shader_a0 {
 };
 
 CE_MODULE(ct_shader_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_SHADER_H

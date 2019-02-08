@@ -60,25 +60,25 @@ set(CORELIB_SOURCE_FILES
         ########################################################################
         # Core
         ########################################################################
-        src/celib/private/api_system.c
+        src/celib/private/api.c
         src/celib/private/log.c
         src/celib/private/module.c
         src/celib/private/config.c
-        src/celib/private/memory.c
+        src/celib/memory/private/memory.c
         src/celib/private/task.c
         src/celib/private/log_stdout.c
-        src/celib/private/hashlib.c
-        src/celib/private/os.c
-        src/celib/private/os_error.c
-        src/celib/private/os_object.c
-        src/celib/private/os_path.c
-        src/celib/private/os_process.c
-        src/celib/private/os_cpu.c
-        src/celib/private/os_thread.c
-        src/celib/private/os_vio.c
-        src/celib/private/os_time.c
-        src/celib/private/os_window_sdl2.c
-        src/celib/private/os_input_sdl.c
+        src/celib/private/id.c
+        src/celib/os/private/os.c
+        src/celib/os/private/os_error.c
+        src/celib/os/private/os_object.c
+        src/celib/os/private/os_path.c
+        src/celib/os/private/os_process.c
+        src/celib/os/private/os_cpu.c
+        src/celib/os/private/os_thread.c
+        src/celib/os/private/os_vio.c
+        src/celib/os/private/os_time.c
+        src/celib/os/private/os_window_sdl2.c
+        src/celib/os/private/os_input_sdl.c
         src/celib/private/fs.c
         src/celib/private/ydb.c
         src/celib/private/cdb.c

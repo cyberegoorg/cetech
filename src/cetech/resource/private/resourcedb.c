@@ -5,20 +5,22 @@
 
 #include "include/sqlite3/sqlite3.h"
 
+#include <celib/memory/allocator.h>
 #include <celib/log.h>
-#include <celib/os.h>
-#include <celib/memory.h>
+
+#include <celib/memory/memory.h>
 #include <celib/fs.h>
 #include <cetech/kernel/kernel.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/module.h>
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <celib/cdb.h>
 #include <celib/config.h>
-#include <celib/buffer.inl>
+#include <celib/containers/buffer.h>
 #include <cetech/resource/resource.h>
 #include <celib/task.h>
-#include <celib/hash.inl>
+#include <celib/containers/hash.h>
+#include <celib/os/path.h>
 
 #include "cetech/resource/resourcedb.h"
 
@@ -228,7 +230,7 @@ static int _do_sql(const char *sql) {
 }
 
 static int builddb_init_db() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                  ce_config_a0->obj());
 
     const char *platform = ce_cdb_a0->read_str(reader,
@@ -238,11 +240,11 @@ static int builddb_init_db() {
                                                     CONFIG_BUILD, "");
 
     char *build_dir_full = NULL;
-    ce_os_a0->path->join(&build_dir_full, ce_memory_a0->system, 2,
+    ce_os_path_a0->join(&build_dir_full, ce_memory_a0->system, 2,
                          build_dir_str, platform);
-    ce_os_a0->path->make_path(build_dir_full);
+    ce_os_path_a0->make_path(build_dir_full);
 
-    ce_os_a0->path->join(&_G._logdb_path, ce_memory_a0->system, 2,
+    ce_os_path_a0->join(&_G._logdb_path, ce_memory_a0->system, 2,
                          build_dir_full,
                          "resource.db");
 
@@ -335,7 +337,7 @@ static void put_resource(struct ct_resource_id rid,
 bool builddb_load_cdb_file(struct ct_resource_id resource,
                            uint64_t object,
                            uint64_t type,
-                           struct ce_alloc *allocator) {
+                           struct ce_alloc_t0 *allocator) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -373,7 +375,7 @@ static void builddb_set_file_depend(const char *filename,
 }
 
 static int buildb_get_resource_dirs(char ***filename,
-                                    struct ce_alloc *alloc) {
+                                    struct ce_alloc_t0 *alloc) {
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -387,7 +389,7 @@ static int buildb_get_resource_dirs(char ***filename,
         if (fn) {
             char tmp_fulllname[256] = {};
 
-            ce_os_a0->path->dir(tmp_fulllname, (const char *) fn);
+            ce_os_path_a0->dir(tmp_fulllname, (const char *) fn);
             uint64_t hash = ce_id_a0->id64(tmp_fulllname);
 
             if (ce_hash_contain(&dir_set, hash)) {
@@ -412,7 +414,7 @@ static int buildb_get_resource_dirs(char ***filename,
 
 static int buildb_get_resource_from_dirs(const char *dir,
                                          char ***filename,
-                                         struct ce_alloc *alloc) {
+                                         struct ce_alloc_t0 *alloc) {
 //    if (!strlen(dir)) {
 //        return 0;
 //    }
@@ -540,7 +542,7 @@ bool _type_name_from_filename(const char *fullname,
                               char *type,
                               char *short_name) {
 
-    const char *resource_type = ce_os_a0->path->extension(fullname);
+    const char *resource_type = ce_os_path_a0->extension(fullname);
 
     if (!resource_type) {
         return false;
@@ -586,7 +588,7 @@ void fullname_resource(const char *fullname,
 int get_resource_by_type(const char *name,
                          const char *type,
                          char ***filename,
-                         struct ce_alloc *alloc) {
+                         struct ce_alloc_t0 *alloc) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -615,7 +617,7 @@ int get_resource_by_type(const char *name,
 }
 
 void get_resource_clean(char **filename,
-                        struct ce_alloc *alloc) {
+                        struct ce_alloc_t0 *alloc) {
     const uint32_t n = ce_array_size(filename);
     for (int i = 0; i < n; ++i) {
         CE_FREE(alloc, filename[i]);
@@ -669,7 +671,7 @@ struct ct_resourcedb_a0 *ct_resourcedb_a0 = &build_db_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {};
 
-    api->register_api(CT_BUILDDB_API, ct_resourcedb_a0);
+    api->register_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(build_db_api));
 
     builddb_init_db();
 }

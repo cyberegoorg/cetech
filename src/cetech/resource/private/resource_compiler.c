@@ -2,28 +2,30 @@
 // Includes
 //==============================================================================
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <celib/api_system.h>
-#include <celib/memory.h>
+#include <celib/memory/allocator.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
 #include <celib/task.h>
 #include <celib/config.h>
-#include <celib/os.h>
+
 #include <celib/log.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/module.h>
 #include <celib/fs.h>
 #include <celib/ydb.h>
-#include <celib/array.inl>
-#include <celib/buffer.inl>
+#include <celib/containers/array.h>
+#include <celib/containers/hash.h>
+#include <celib/containers/buffer.h>
 #include <celib/cdb.h>
 #include <celib/cdb.h>
-#include <celib/bagraph.h>
+#include <celib/containers/bagraph.h>
 
 #include <cetech/resource/resource.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
+#include <stdlib.h>
+#include <celib/os/path.h>
+#include <celib/os/time.h>
 
 #include "cetech/resource/resourcedb.h"
 
@@ -42,7 +44,7 @@
 
 static struct _G {
     uint64_t config;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -51,7 +53,7 @@ static struct _G {
 //==============================================================================
 
 static ct_resource_compilator_t _find_compilator(uint64_t type) {
-    struct ce_api_entry it = ce_api_a0->first(RESOURCE_I);
+    struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
     while (it.api) {
         struct ct_resource_i0 *i = (it.api);
         if (i->cdb_type && (i->cdb_type() == type)) {
@@ -72,10 +74,11 @@ static bool _is_ref(const char *str) {
     return (str[0] == '0') && (str[1] == 'x');
 }
 
-uint64_t compile_obj(struct ce_cdb_t db,
-                     uint64_t input_obj, uint64_t uid) {
+uint64_t compile_obj(struct ce_cdb_t0 db,
+                     uint64_t input_obj,
+                     uint64_t uid) {
 
-    const ce_cdb_obj_o *input_r = ce_cdb_a0->read(ce_cdb_a0->db(), input_obj);
+    const ce_cdb_obj_o0 *input_r = ce_cdb_a0->read(ce_cdb_a0->db(), input_obj);
 
     const char *type_s = ce_cdb_a0->read_str(input_r, CDB_TYPE_PROP, NULL);
 
@@ -88,7 +91,7 @@ uint64_t compile_obj(struct ce_cdb_t db,
     uint64_t n = ce_cdb_a0->prop_count(input_r);
     const uint64_t *k = ce_cdb_a0->prop_keys(input_r);
 
-    ce_cdb_obj_o *obj_w = ce_cdb_a0->write_begin(db, obj);
+    ce_cdb_obj_o0 *obj_w = ce_cdb_a0->write_begin(db, obj);
 
     for (int i = 0; i < n; ++i) {
         uint64_t p = k[i];
@@ -101,7 +104,7 @@ uint64_t compile_obj(struct ce_cdb_t db,
             continue;
         }
 
-        enum ce_cdb_type t = ce_cdb_a0->prop_type(input_r, p);
+        enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(input_r, p);
 
         switch (t) {
             case CDB_TYPE_UINT64: {
@@ -137,7 +140,7 @@ uint64_t compile_obj(struct ce_cdb_t db,
 
             case CDB_TYPE_SUBOBJECT: {
                 uint64_t subobj = ce_cdb_a0->read_subobject(input_r, p, 0);
-                const ce_cdb_obj_o *sr = ce_cdb_a0->read(ce_cdb_a0->db(),
+                const ce_cdb_obj_o0 *sr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                          subobj);
                 const char *suid_s = ce_cdb_a0->read_str(sr, CDB_UID_PROP,
 
@@ -164,7 +167,7 @@ uint64_t compile_obj(struct ce_cdb_t db,
 
     ce_cdb_a0->write_commit(obj_w);
 
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(db, obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t cdb_instance = ce_cdb_a0->read_ref(r, CDB_INSTANCE_PROP, 0);
     if (cdb_instance) {
         ce_cdb_a0->set_from(db, cdb_instance, obj);
@@ -181,9 +184,9 @@ uint64_t compile_obj(struct ce_cdb_t db,
 void _scan_obj(const char *filename,
                uint64_t key,
                uint64_t obj,
-               struct ce_ba_graph *obj_graph,
+               struct ce_ba_graph_t *obj_graph,
                struct ce_hash_t *obj_hash) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     const char *cdb_instance = ce_cdb_a0->read_str(reader, CDB_INSTANCE_PROP,
                                                    NULL);
@@ -229,13 +232,13 @@ void _scan_obj(const char *filename,
             continue;
         }
 
-        enum ce_cdb_type t = ce_cdb_a0->prop_type(reader, k);
+        enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(reader, k);
 
         if (t == CDB_TYPE_SUBOBJECT) {
             uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, k, 0);
             _scan_obj(filename, k, sub_obj, obj_graph, obj_hash);
 
-            const ce_cdb_obj_o *subr = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *subr = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        sub_obj);
 
             const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
@@ -271,10 +274,10 @@ void _scan_obj(const char *filename,
 
 void _scan_files(char **files,
                  uint32_t files_count) {
-    struct ce_ba_graph obj_graph = {};
+    struct ce_ba_graph_t obj_graph = {};
     struct ce_hash_t obj_hash = {};
 
-    struct ce_cdb_t db = ce_cdb_a0->create_db();
+    struct ce_cdb_t0 db = ce_cdb_a0->create_db();
 
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *filename = files[i];
@@ -296,8 +299,9 @@ void _scan_files(char **files,
         uint64_t obj = obj_graph.output[k];
 
         char filename[256] = {};
-        ct_resourcedb_a0->get_resource_filename((struct ct_resource_id) {.uid=obj},
-                                             filename, CE_ARRAY_LEN(filename));
+        ct_resourcedb_a0->get_resource_filename(
+                (struct ct_resource_id) {.uid=obj},
+                filename, CE_ARRAY_LEN(filename));
 
         ce_log_a0->info(LOG_WHERE, "Compile 0x%llx from %s", obj, filename);
 
@@ -311,8 +315,8 @@ void _scan_files(char **files,
         char *output = NULL;
         ce_cdb_a0->dump(db, obj, &output, _G.allocator);
         ct_resourcedb_a0->put_resource_blob((struct ct_resource_id) {.uid=obj},
-                                         output,
-                                         ce_array_size(output));
+                                            output,
+                                            ce_array_size(output));
 
         ce_buffer_free(output, _G.allocator);
     }
@@ -325,21 +329,21 @@ void _scan_files(char **files,
 //==============================================================================
 
 
-char *resource_compiler_get_build_dir(struct ce_alloc *a,
+char *resource_compiler_get_build_dir(struct ce_alloc_t0 *a,
                                       const char *platform) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     const char *build_dir_str = ce_cdb_a0->read_str(reader,
                                                     CONFIG_BUILD, "");
 
     char *buffer = NULL;
-    ce_os_a0->path->join(&buffer, a, 2, build_dir_str, platform);
+    ce_os_path_a0->join(&buffer, a, 2, build_dir_str, platform);
 
     return buffer;
 }
 
 void resource_compiler_compile_all() {
-    uint32_t start_ticks = ce_os_a0->time->ticks();
+    uint32_t start_ticks = ce_os_time_a0->ticks();
 
     const char *glob_patern = "**.yml";
     char **files = NULL;
@@ -354,32 +358,32 @@ void resource_compiler_compile_all() {
     ce_fs_a0->listdir_free(files, files_count,
                            _G.allocator);
 
-    uint32_t now_ticks = ce_os_a0->time->ticks();
+    uint32_t now_ticks = ce_os_time_a0->ticks();
     uint32_t dt = now_ticks - start_ticks;
     ce_log_a0->debug("resource_compiler", "compile time %f", dt * 0.001);
 }
 
-char *resource_compiler_get_tmp_dir(struct ce_alloc *alocator,
+char *resource_compiler_get_tmp_dir(struct ce_alloc_t0 *alocator,
                                     const char *platform) {
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
 
     char *buffer = NULL;
-    ce_os_a0->path->join(&buffer, alocator, 2, build_dir, "tmp");
+    ce_os_path_a0->join(&buffer, alocator, 2, build_dir, "tmp");
     return buffer;
 }
 
-char *resource_compiler_external_join(struct ce_alloc *alocator,
+char *resource_compiler_external_join(struct ce_alloc_t0 *alocator,
                                       const char *name) {
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     const char *external_dir_str = ce_cdb_a0->read_str(reader,
                                                        CONFIG_EXTERNAL,
                                                        "");
 
     char *tmp_dir = NULL;
-    ce_os_a0->path->join(&tmp_dir, alocator, 2, external_dir_str,
+    ce_os_path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
                          ce_cdb_a0->read_str(reader,
                                              CONFIG_PLATFORM,
                                              ""));
@@ -389,7 +393,7 @@ char *resource_compiler_external_join(struct ce_alloc *alocator,
     ce_buffer_free(tmp_dir, alocator);
 
     char *result = NULL;
-    ce_os_a0->path->join(&result, alocator, 4, buffer, "release", "bin",
+    ce_os_path_a0->join(&result, alocator, 4, buffer, "release", "bin",
                          name);
     ce_buffer_free(buffer, alocator);
 
@@ -397,7 +401,7 @@ char *resource_compiler_external_join(struct ce_alloc *alocator,
 }
 
 static void _init_cvar(struct ce_config_a0 *config) {
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->prop_exist(writer, CONFIG_SRC)) {
         ce_cdb_a0->set_str(writer, CONFIG_SRC, "src");
     }
@@ -430,9 +434,11 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     _init_cvar(ce_config_a0);
-    api->register_api(CT_RESOURCE_COMPILER_API, &resource_compiler_api);
+    api->register_api(CT_RESOURCE_COMPILER_API,
+                      &resource_compiler_api,
+                      sizeof(resource_compiler_api));
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");
@@ -440,14 +446,14 @@ static void _init(struct ce_api_a0 *api) {
     char *build_dir_full = resource_compiler_get_build_dir(_G.allocator,
                                                            platform);
 
-    ce_os_a0->path->make_path(build_dir_full);
+    ce_os_path_a0->make_path(build_dir_full);
 
 
     char *tmp_dir_full = NULL;
-    ce_os_a0->path->join(&tmp_dir_full, _G.allocator, 2,
+    ce_os_path_a0->join(&tmp_dir_full, _G.allocator, 2,
                          build_dir_full, "tmp");
 
-    ce_os_a0->path->make_path(tmp_dir_full);
+    ce_os_path_a0->make_path(tmp_dir_full);
 
     ce_buffer_free(tmp_dir_full, _G.allocator);
     ce_buffer_free(build_dir_full, _G.allocator);
@@ -471,7 +477,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_resource_a0);
             CE_INIT_API(api, ce_task_a0);
-            CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_log_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_config_a0);

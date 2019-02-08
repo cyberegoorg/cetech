@@ -70,7 +70,7 @@ Clean hash table
 ## ce_hash_free
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ce_hash_free(struct ce_hash_t *hash,
-                                const struct ce_alloc *allocator) {
+                                const struct ce_alloc_t0 *allocator) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Free hash table
@@ -107,7 +107,7 @@ Is *k* hash table?
 static inline void ce_hash_add(struct ce_hash_t *hash,
                                uint64_t k,
                                uint64_t value,
-                               const struct ce_alloc *allocator) {
+                               const struct ce_alloc_t0 *allocator) {
 
 ~~~~~~~~~~~~~~~~~~~~
 Add *k* -> *value*
@@ -124,7 +124,7 @@ static inline void ce_hash_remove(struct ce_hash_t *hash,
 ~~~~~~~~~~~~~~~~~~~~
 static inline void ce_hash_clone(const struct ce_hash_t *from,
                                  struct ce_hash_t *to,
-                                 const struct ce_alloc *alloc) {
+                                 const struct ce_alloc_t0 *alloc) {
 
 ~~~~~~~~~~~~~~~~~~~~
 <!-- Markdeep: -->

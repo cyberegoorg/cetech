@@ -1,6 +1,10 @@
 #ifndef CETECH_RENDER_GRAPH_H
 #define CETECH_RENDER_GRAPH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define CT_RG_API \
@@ -112,5 +116,8 @@ struct ct_rg_a0 {
 
 CE_MODULE(ct_rg_a0);
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_RENDER_GRAPH_H

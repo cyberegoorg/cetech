@@ -1,6 +1,10 @@
 #ifndef CETECH_GFX_H
 #define CETECH_GFX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -819,5 +823,9 @@ struct ct_gfx_a0 {
 
 CE_MODULE(ct_gfx_a0);
 
+#ifdef __cplusplus
+};
+#endif
+
 #endif //CETECH_GFX_H
-//! \}
+

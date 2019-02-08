@@ -1,17 +1,18 @@
 #ifndef CE_FILESYSTEM_TYPES_H
 #define CE_FILESYSTEM_TYPES_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include <celib/module.inl>
+#include "celib_types.h"
 
 #define CE_FS_API \
     CE_ID64_0("ce_fs_a0", 0xb833e93306ececb0ULL)
 
-struct ce_alloc;
+typedef struct ce_alloc_t0 ce_alloc_t0;
 
-enum ce_fs_open_mode {
+enum ce_fs_open_mode_e0 {
     FS_OPEN_READ,
     FS_OPEN_WRITE,
 };
@@ -20,7 +21,7 @@ enum ce_fs_open_mode {
 struct ce_fs_a0 {
     struct ce_vio *(*open)(uint64_t root,
                            const char *path,
-                           enum ce_fs_open_mode mode);
+                           enum ce_fs_open_mode_e0 mode);
 
     void (*map_root_dir)(uint64_t root,
                          const char *base_path,
@@ -35,7 +36,7 @@ struct ce_fs_a0 {
                     bool recursive,
                     char ***files,
                     uint32_t *count,
-                    struct ce_alloc *allocator);
+                    ce_alloc_t0 *allocator);
 
     void (*listdir_iter)(uint64_t root,
                          const char *path,
@@ -46,7 +47,7 @@ struct ce_fs_a0 {
 
     void (*listdir_free)(char **files,
                          uint32_t count,
-                         struct ce_alloc *allocator);
+                         ce_alloc_t0 *allocator);
 
     int (*create_directory)(uint64_t root,
                             const char *path);
@@ -62,5 +63,9 @@ struct ce_fs_a0 {
 };
 
 CE_MODULE(ce_fs_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CE_FILESYSTEM_TYPES_H

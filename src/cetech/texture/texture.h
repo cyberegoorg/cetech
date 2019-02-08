@@ -1,6 +1,10 @@
 #ifndef CETECH_TEXTURE_H
 #define CETECH_TEXTURE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CT_TEXTURE_API \
     CE_ID64_0("ct_texture_a0", 0x642bfe2717995f2fULL)
 
@@ -36,5 +40,9 @@ struct ct_texture_a0 {
 };
 
 CE_MODULE(ct_texture_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_TEXTURE_H

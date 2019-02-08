@@ -1,6 +1,10 @@
 #ifndef CETECH_PROPERTY_INSPECTOR_H
 #define CETECH_PROPERTY_INSPECTOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -29,5 +33,9 @@ struct ct_property_editor_a0 {
 };
 
 CE_MODULE(ct_property_editor_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_PROPERTY_INSPECTOR_H

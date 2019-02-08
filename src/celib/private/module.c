@@ -5,15 +5,19 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include <celib/buffer.inl>
-#include <celib/api_system.h>
-#include <celib/os.h>
+#include <celib/memory/allocator.h>
+#include <celib/macros.h>
+#include <celib/containers/buffer.h>
+#include <celib/api.h>
+
 #include <celib/module.h>
-#include <celib/memory.h>
+#include <celib/memory/memory.h>
 #include <celib/config.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/fs.h>
 #include <celib/cdb.h>
+#include <celib/os/path.h>
+#include <celib/os/object.h>
 
 #include "celib/log.h"
 
@@ -33,9 +37,9 @@
 //==============================================================================
 struct module_functios {
     void *handler;
-    ce_load_module_t load;
-    ce_unload_module_t unload;
-    ce_initapi_module_t initapi;
+    ce_load_module_t0 *load;
+    ce_unload_module_t0 *unload;
+    ce_initapi_module_t0 *initapi;
 };
 
 static struct _G {
@@ -43,7 +47,7 @@ static struct _G {
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     uint64_t config;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G = {};
 
 
@@ -70,7 +74,7 @@ static void add_module(const char *path,
 
 static const char *get_module_name(const char *path,
                                    uint32_t *len) {
-    const char *filename = ce_os_a0->path->filename(path);
+    const char *filename = ce_os_path_a0->filename(path);
     const char *name = strchr(filename, '_');
     if (NULL == name) {
         return NULL;
@@ -100,12 +104,12 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_load_module");
 
-    void *obj = ce_os_a0->object->load(path);
+    void *obj = ce_os_object_a0->load(path);
     if (obj == NULL) {
         return false;
     }
 
-    ce_load_module_t load_fce = (ce_load_module_t) ce_os_a0->object->load_function(
+    ce_load_module_t0 *load_fce = (ce_load_module_t0 *) ce_os_object_a0->load_function(
             obj,
             (buffer));
     if (load_fce == NULL) {
@@ -114,7 +118,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_unload_module");
 
-    ce_unload_module_t unload_fce = (ce_unload_module_t) ce_os_a0->object->load_function(
+    ce_unload_module_t0 *unload_fce = (ce_unload_module_t0 *) ce_os_object_a0->load_function(
             obj,
             buffer);
     if (unload_fce == NULL) {
@@ -123,7 +127,7 @@ static bool load_from_path(struct module_functios *module,
 
     get_module_fce_name(&buffer, name, name_len, "_initapi_module");
 
-    ce_initapi_module_t initapi_fce = (ce_initapi_module_t) ce_os_a0->object->load_function(
+    ce_initapi_module_t0 *initapi_fce = (ce_initapi_module_t0 *) ce_os_object_a0->load_function(
             obj, buffer);
     if (initapi_fce == NULL) {
         return false;
@@ -143,9 +147,9 @@ static bool load_from_path(struct module_functios *module,
 //==============================================================================
 
 
-static void add_static(ce_load_module_t load,
-                       ce_unload_module_t unload,
-                       ce_initapi_module_t initapi) {
+static void add_static(ce_load_module_t0 load,
+                       ce_unload_module_t0 unload,
+                       ce_initapi_module_t0 initapi) {
 
     struct module_functios module = {
             .load=load,
@@ -195,7 +199,7 @@ static void reload(const char *path) {
         old_module.unload(ce_api_a0, 1);
         _G.modules[i] = new_module;
 
-        ce_os_a0->object->unload(old_module.handler);
+        ce_os_object_a0->unload(old_module.handler);
 
         break;
     }
@@ -238,7 +242,8 @@ static void load_dirs(const char *path) {
 
         const uint64_t key_id = ce_id_a0->id64(key);
 
-        const ce_cdb_obj_o * reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                      _G.config);
 
         if (!ce_cdb_a0->prop_exist(reader, key_id)) {
             break;
@@ -246,9 +251,9 @@ static void load_dirs(const char *path) {
 
 
         const char *module_file = ce_cdb_a0->read_str(reader, key_id, "");
-        ce_os_a0->path->join(&buffer,
-                             _G.allocator,
-                             2, path, module_file);
+        ce_os_path_a0->join(&buffer,
+                            _G.allocator,
+                            2, path, module_file);
         load(buffer);
 
         ce_buffer_free(buffer, _G.allocator);
@@ -266,7 +271,7 @@ static void unload_all() {
 }
 
 //static void check_modules() {
-//    ce_alloc *alloc = ce_memory_a0->system;
+//    ce_alloc_t0 *alloc = ce_memory_a0->system;
 //
 //    static uint64_t root = CE_ID64_0("modules", 0x6fd8ce9161fffc7ULL);
 //
@@ -325,8 +330,8 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_api_a0 = api;
-    api->register_api(CE_MODULE0_API, &module_api);
-    
+    api->register_api(CE_MODULE0_API, &module_api, sizeof(module_api));
+
 }
 
 CE_MODULE_DEF(

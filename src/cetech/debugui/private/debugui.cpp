@@ -4,10 +4,12 @@
 #include <cetech/renderer/renderer.h>
 
 #include <cetech/controlers/keyboard.h>
-#include <celib/hashlib.h>
-#include <celib/os.h>
+#include <celib/macros.h>
+#include <celib/id.h>
+
 #include <celib/fs.h>
-#include <celib/array.inl>
+#include <celib/memory/allocator.h>
+#include <celib/containers/array.h>
 #include <cetech/controlers/mouse.h>
 #include <celib/log.h>
 
@@ -15,17 +17,20 @@
 #include <cetech/kernel/kernel.h>
 
 #include "celib/config.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/controlers/gamepad.h>
 #include "imgui_wrap.inl"
+#include <celib/os/vio.h>
+#include <celib/os/window.h>
+#include <celib/os/input.h>
 
 
 static struct DebugUIGlobal {
-    ce_alloc *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static uint32_t lshift;
@@ -344,6 +349,9 @@ static struct ct_debugui_a0 debugui_api = {
         .EndChild = ImGui::EndChild,
         .Unindent= ImGui::Unindent,
         .Indent= ImGui::Indent,
+        .PushID = ImGui::PushID,
+        .PushIDI=  ImGui::PushID,
+        .PopID = ImGui::PopID,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
@@ -383,17 +391,17 @@ static struct ct_kernel_task_i0 debugui_task = {
 };
 
 static const char *_get_clipboard_text(void *data) {
-    return ce_os_a0->input->get_clipboard_text();
+    return ce_os_input_a0->get_clipboard_text();
 }
 
 static void _set_clipboard_text(void *data,
                                 const char *text) {
-    ce_os_a0->input->set_clipboard_text(text);
+    ce_os_input_a0->set_clipboard_text(text);
 }
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(CT_DEBUGUI_API, &debugui_api);
-    api->register_api(KERNEL_TASK_INTERFACE, &debugui_task);
+    api->register_api(CT_DEBUGUI_API, &debugui_api, sizeof(debugui_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &debugui_task, sizeof(debugui_task));
 
     imguiCreate(12);
 

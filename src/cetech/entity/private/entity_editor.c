@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <celib/memory/allocator.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 
 #include <celib/macros.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 
 #include <cetech/ecs/ecs.h>
@@ -30,16 +31,16 @@
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
-#include <celib/array.inl>
+#include <celib/containers/array.h>
 
 #define MAX_EDITOR 8
 
 #define _G entity_editor_globals
 
 struct entity_editor {
-    struct ct_world world;
-    struct ct_entity camera_ent;
-    struct ct_entity entity;
+    ct_world_t0 world;
+    struct ct_entity_t0 camera_ent;
+    struct ct_entity_t0 entity;
     struct ct_viewport0 viewport;
 
     uint64_t entity_name;
@@ -56,8 +57,8 @@ static struct _G {
     CE_ID64_0("editor_idx", 0x1b333d78a2ccaab7ULL)
 
 
-static void fps_camera_update(struct ct_world world,
-                              struct ct_entity camera_ent,
+static void fps_camera_update(ct_world_t0 world,
+                              struct ct_entity_t0 camera_ent,
                               float dt,
                               float dx,
                               float dy,
@@ -105,7 +106,7 @@ static void fps_camera_update(struct ct_world world,
 //    uint64_t component = ce_cdb_a0->read_subobject(components,
 //                                                   TRANSFORM_COMPONENT, 0);
 //
-//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(component);
 //    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
 //    ce_cdb_a0->write_commit(w);
 
@@ -123,7 +124,7 @@ static void fps_camera_update(struct ct_world world,
 }
 
 //static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-//    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+//    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
 //    while (it.api) {
 //        struct ct_component_i0 *i = (it.api);
 //
@@ -189,8 +190,8 @@ static void draw_menu(uint64_t context_obj) {
                                 (int *) &operation, SCALE);
 }
 
-static void draw_editor(uint64_t context_obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+static void draw_editor(uint64_t context_obj, uint64_t context) {
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
 
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct entity_editor *editor = &_G.editors[editor_idx];
@@ -294,7 +295,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
     uint32_t idx = n;
     ce_array_push(_G.editors, (struct entity_editor) {}, ce_memory_a0->system);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), context_obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), context_obj);
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
     ce_cdb_a0->write_commit(w);
 
@@ -304,7 +305,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
 }
 
 static void close(uint64_t context_obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct entity_editor *editor = &_G.editors[editor_idx];
 
@@ -317,7 +318,7 @@ static void close(uint64_t context_obj) {
 static void open(uint64_t context_obj) {
     struct entity_editor *editor = _new_editor(context_obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
                                                        RESOURCE_EDITOR_OBJ, 0);
     editor->world = ct_ecs_a0->create_world();
@@ -334,7 +335,7 @@ static void update(uint64_t context_obj,
     struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     struct entity_editor *editor = &_G.editors[editor_idx];
 
@@ -403,7 +404,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api(RESOURCE_EDITOR_I, &ct_resource_editor_i0);
+    api->register_api(RESOURCE_EDITOR_I, &ct_resource_editor_i0, sizeof(ct_resource_editor_i0));
 }
 
 static void _shutdown() {

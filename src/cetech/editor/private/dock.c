@@ -1,9 +1,9 @@
-#include <stdbool.h>
-
-#include <celib/array.inl>
-#include <celib/hashlib.h>
-#include <celib/memory.h>
-#include <celib/api_system.h>
+#include <celib/macros.h>
+#include <celib/memory/allocator.h>
+#include <celib/containers/array.h>
+#include <celib/id.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
 
@@ -25,7 +25,7 @@ static struct _G {
 
     uint64_t *contexts;
 
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 #define MAX_CONTEXT 8
@@ -35,7 +35,7 @@ static struct _G {
 
 
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
-    struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
 
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
@@ -68,7 +68,7 @@ uint64_t create_dock(uint64_t type,
         flags = i->dock_flags();
     }
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
     ce_cdb_a0->set_uint64(w, PROP_DOCK_flags, (uint64_t) flags);
     ce_cdb_a0->set_uint64(w, _PROP_DOCK_ID, _G.docks_n++);
@@ -109,7 +109,7 @@ void draw_all() {
 
     for (int i = 0; i < n; ++i) {
         uint64_t dock = _G.docks[i];
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
         uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
         struct ct_dock_i0 *di = _find_dock_i(type);
@@ -137,7 +137,7 @@ void draw_all() {
 
                         if (ct_debugui_a0->MenuItem(title, NULL,
                                                     selected, true)) {
-                            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
+                            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(
                                     ce_cdb_a0->db(), dock);
                             ce_cdb_a0->set_uint64(w, PROP_DOCK_CONTEXT, j);
                             ce_cdb_a0->write_commit(w);
@@ -166,7 +166,7 @@ void draw_all() {
                 close_dock(dock);
             }
 
-//            ce_cdb_obj_o *w=ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+//            ce_cdb_obj_o0 *w=ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
 //            ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
 //            ce_cdb_a0->write_commit(w);
 
@@ -193,7 +193,7 @@ static void draw_menu() {
     if (ct_debugui_a0->BeginMenu("Docks", true)) {
 
         if (ct_debugui_a0->BeginMenu(ICON_FA_PLUS" ""Add new dock", true)) {
-            struct ce_api_entry it = ce_api_a0->first(DOCK_INTERFACE);
+            struct ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
 
             while (it.api) {
                 struct ct_dock_i0 *i = (it.api);
@@ -270,7 +270,7 @@ static uint64_t create_context(const char *name) {
 }
 
 static bool context_btn(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     uint64_t context = ce_cdb_a0->read_uint64(reader,
                                               PROP_DOCK_CONTEXT, 0);
     char title[256]  = {};
@@ -301,7 +301,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_api_a0->register_api(CT_DOCK_API, ct_dock_a0);
+    ce_api_a0->register_api(CT_DOCK_API, ct_dock_a0, sizeof(dock_a0));
 
     create_context("");
 }

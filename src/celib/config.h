@@ -1,14 +1,16 @@
 #ifndef CE_CONFIG_H
 #define CE_CONFIG_H
 
-#include <stdint.h>
-#include <celib/module.inl>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include "celib_types.h"
 
 #define CE_CONFIG_API \
     CE_ID64_0("ce_config_a0", 0xd75a5088e70ad1bbULL)
 
-struct ce_alloc;
+struct ce_alloc_t0;
 
 struct ce_config_a0 {
     //! Parse commandline arguments.
@@ -17,7 +19,7 @@ struct ce_config_a0 {
 
     //! Load config from yaml file.
     int (*load_from_yaml_file)(const char *yaml,
-                               struct ce_alloc *alloc);
+                               struct ce_alloc_t0 *alloc);
 
     uint64_t (*obj)();
 
@@ -26,5 +28,9 @@ struct ce_config_a0 {
 };
 
 CE_MODULE(ce_config_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CE_CONFIG_H

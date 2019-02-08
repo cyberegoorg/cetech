@@ -999,7 +999,7 @@ namespace ImGui {
         }
 
         void saveToYaml(char **buffer,
-                        ce_alloc *alloc) {
+                        ce_alloc_t0 *alloc) {
             static const char *DOCK_ENTRY_TEMPLATE = "%d: \n"
                                                      "  index: %d\n"
                                                      "  label: %s\n"
@@ -1058,7 +1058,7 @@ namespace ImGui {
             m_docks.clear();
 
             uint64_t obj = ydb->get_obj(path);
-            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
+            const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
             const uint64_t type_keys_count = cdb->prop_count(reader);
             const uint64_t *type_keys = cdb->prop_keys(reader);
@@ -1072,7 +1072,7 @@ namespace ImGui {
                 uint64_t dock_obj = cdb->read_subobject(reader, type_keys[i],
                                                         0);
 
-                const ce_cdb_obj_o *d_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+                const ce_cdb_obj_o0 *d_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                                dock_obj);
 
                 int index_n = (int) (cdb->read_float(d_reader,
@@ -1167,7 +1167,7 @@ namespace ImGui {
     }
 
     IMGUI_API void saveToYaml(char **buffer,
-                              ce_alloc *alloc) {
+                              ce_alloc_t0 *alloc) {
         s_dock->saveToYaml(buffer, alloc);
     }
 

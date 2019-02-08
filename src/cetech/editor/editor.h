@@ -1,6 +1,9 @@
 #ifndef CETECH_PLAYGROUND_H
 #define CETECH_PLAYGROUND_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <stddef.h>
 #include <stdint.h>
 
@@ -18,5 +21,9 @@ struct ct_editor_module_i0 {
     void (*update)(float dt);
 
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_PLAYGROUND_H

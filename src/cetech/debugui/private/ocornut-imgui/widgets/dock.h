@@ -1,5 +1,7 @@
 
-#include <celib/buffer.inl>
+#include <celib/memory/allocator.h>
+#include <celib/macros.h>
+#include <celib/containers/buffer.h>
 #include <celib/ydb.h>
 #include <celib/cdb.h>
 
@@ -26,7 +28,7 @@ namespace ImGui {
     IMGUI_API void SetDockActive();
 
     ///
-    IMGUI_API void saveToYaml(char** buffer, ce_alloc* alloc);
+    IMGUI_API void saveToYaml(char** buffer, ce_alloc_t0* alloc);
 
     IMGUI_API void loadFromYaml(const char *file,
                                 struct ce_ydb_a0 *ydb,

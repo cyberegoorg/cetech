@@ -1,13 +1,14 @@
+#include <celib/memory/allocator.h>
 #include <celib/log.h>
-#include <celib/hashlib.h>
-#include <celib/memory.h>
-#include <celib/api_system.h>
+#include <celib/id.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
 #include <celib/module.h>
 
 #include <cetech/editor/action_manager.h>
 #include <cetech/controlers/keyboard.h>
-#include <celib/array.inl>
-#include <celib/hash.inl>
+#include <celib/containers/array.h>
+#include <celib/containers/hash.h>
 #include <cetech/controlers/controlers.h>
 
 typedef void (*action_fce_t)();
@@ -36,7 +37,7 @@ static struct _G {
     struct shortcut *shorcut;
     action_fce_t *action_fce;
     bool *action_active;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 static void fill_button(struct shortcut *sc) {
@@ -176,7 +177,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(CT_ACTION_MANAGER_API, &action_manager_api);
+    api->register_api(CT_ACTION_MANAGER_API, &action_manager_api, sizeof(action_manager_api));
 }
 
 static void _shutdown() {

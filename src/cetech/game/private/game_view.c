@@ -2,11 +2,11 @@
 
 
 #include <celib/macros.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
 #include "celib/module.h"
 
-#include "celib/api_system.h"
+#include "celib/api.h"
 
 
 #include <cetech/debugui/icons_font_awesome.h>
@@ -105,7 +105,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
 
     ct_dock_a0->create_dock(GAME_INTERFACE, true);
 }

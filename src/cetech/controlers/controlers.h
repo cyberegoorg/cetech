@@ -1,8 +1,12 @@
 #ifndef CETECH_CONTROLERS_H
 #define CETECH_CONTROLERS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
-#include <celib/module.inl>
+
 
 #define CT_CONTROLERS_API \
     CE_ID64_0("ct_controlers_a0", 0x81e928c4fbba526dULL)
@@ -83,5 +87,9 @@ struct ct_controlers_a0 {
 };
 
 CE_MODULE(ct_controlers_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_CONTROLERS_H

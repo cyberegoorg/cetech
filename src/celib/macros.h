@@ -6,7 +6,7 @@
 #ifndef CECORE_MACROS_H
 #define CECORE_MACROS_H
 
-#include <stdbool.h>
+#include "celib_types.h"
 
 #include "celib/platform.h"
 
@@ -15,6 +15,7 @@
 #define CE_ARR_ARG(a) a, CE_ARRAY_LEN(a)
 #define CTECH_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 #define CE_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
+#define CE_ALIGNOF(_type) __alignof(_type)
 
 ///
 #if CE_COMPILER_MSVC
@@ -54,7 +55,7 @@
 #define CE_ALIGN_256(_value) CE_ALIGN_MASK(_value, 0xff)
 #define CE_ALIGN_4096(_value) CE_ALIGN_MASK(_value, 0xfff)
 
-#define CE_ALIGNOF(_type) __alignof(_type)
+
 
 #if defined(__has_feature)
 #	define CE_CLANG_HAS_FEATURE(_x) __has_feature(_x)

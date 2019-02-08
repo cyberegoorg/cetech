@@ -1,11 +1,11 @@
 #ifndef CETECH_SCENE_H
 #define CETECH_SCENE_H
 
-#include <stdint.h>
-#include <celib/module.inl>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct ct_world;
-struct ct_entity;
+#include <stdint.h>
 
 #define CT_SCENE_API \
     CE_ID64_0("ct_scene_a0", 0x2ee97ac6b2e2386eULL)
@@ -67,10 +67,10 @@ struct ct_entity;
 #define SCENE_NODE_STR \
     CE_ID64_0("node_str", 0x8449734a8dc39415ULL)
 
-
 //==============================================================================
 // Api
 //==============================================================================
+
 
 struct ct_scene_a0 {
     uint64_t (*get_mesh_node)(uint64_t scene,
@@ -86,5 +86,9 @@ struct ct_scene_a0 {
 };
 
 CE_MODULE(ct_scene_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_SCENE_H

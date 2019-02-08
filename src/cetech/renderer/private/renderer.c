@@ -3,16 +3,17 @@
 //==============================================================================
 #include <stdio.h>
 
-#include <celib/allocator.h>
-#include <celib/array.inl>
+#include <celib/macros.h>
+#include <celib/memory/allocator.h>
+#include <celib/containers/array.h>
 
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <celib/config.h>
 #include <celib/macros.h>
 #include <celib/module.h>
-#include <celib/memory.h>
-#include <celib/hashlib.h>
-#include <celib/os.h>
+#include <celib/memory/memory.h>
+#include <celib/id.h>
+
 #include <celib/private/api_private.h>
 #include <celib/cdb.h>
 
@@ -38,6 +39,7 @@
 #include "cetech/render_graph/render_graph.h"
 #include <cetech/game/game_system.h>
 #include <cetech/renderer/gfx.h>
+#include <celib/os/window.h>
 
 //==============================================================================
 // GLobals
@@ -45,8 +47,8 @@
 
 struct viewport {
     struct ct_rg_builder *builder;
-    struct ct_world world;
-    struct ct_entity entity;
+    ct_world_t0 world;
+    struct ct_entity_t0 entity;
     bool free;
 };
 
@@ -68,7 +70,7 @@ static struct _G {
     bool vsync;
     bool need_reset;
     uint64_t config;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G = {};
 
 
@@ -97,7 +99,7 @@ static void _render_init_task(void *data) {
 }
 
 static void renderer_create() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
         uint32_t w, h;
         w = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_X, 0);
@@ -120,7 +122,7 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ce_os_a0->window->create(_G.allocator,
+            _G.main_window = ce_os_window_a0->create(_G.allocator,
                                                       title,
                                                       WINDOWPOS_UNDEFINED,
                                                       WINDOWPOS_UNDEFINED,
@@ -128,7 +130,7 @@ static void renderer_create() {
                                                       flags);
 
         } else {
-            _G.main_window = ce_os_a0->window->create_from(_G.allocator,
+            _G.main_window = ce_os_window_a0->create_from(_G.allocator,
                                                            (void *) wid);
         }
     }
@@ -215,9 +217,9 @@ static void renderer_get_size(uint32_t *width,
     *height = _G.size_height;
 }
 
-static void _feed_module(struct ct_world world,
+static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module *module) {
-    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
 
@@ -232,9 +234,9 @@ static void _feed_module(struct ct_world world,
     }
 }
 
-void _render_components(struct ct_world world,
+void _render_components(ct_world_t0 world,
                         struct ct_rg_builder *builder) {
-    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
 
@@ -257,7 +259,7 @@ static void render(float dt) {
     const uint64_t *events = ct_machine_a0->events(&events_n);
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
+        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
         uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
 
         if (event_type != EVENT_WINDOW_RESIZED) {
@@ -332,8 +334,8 @@ static uint32_t _new_viewport() {
     return idx;
 }
 
-struct ct_viewport0 create_viewport(struct ct_world world,
-                                    struct ct_entity main_camera) {
+struct ct_viewport0 create_viewport(ct_world_t0 world,
+                                    struct ct_entity_t0 main_camera) {
     uint32_t idx = _new_viewport();
 
     struct viewport *v = &_G.viewports[idx];
@@ -398,9 +400,9 @@ static struct ct_kernel_task_i0 render_task = {
 #include "gfx.inl"
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_RENDERER_API, &rendderer_api);
-    api->register_api(CT_GFX_API, &rendderapi_api);
-    api->register_api(KERNEL_TASK_INTERFACE, &render_task);
+    api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api) );
+    api->register_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
 }
 
 static void _init(struct ce_api_a0 *api) {
@@ -413,7 +415,7 @@ static void _init(struct ce_api_a0 *api) {
             .config = ce_config_a0->obj(),
     };
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
 
     if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_X)) {
         ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_X, 1024);
@@ -441,18 +443,16 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_cdb_a0->write_commit(writer);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     _G.vsync = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_VSYNC, 1) > 0;
-
-    CE_INIT_API(api, ce_os_a0);
 
     renderer_create();
 
 }
 
 static void _shutdown() {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
 
         ce_array_free(_G.on_render, _G.allocator);

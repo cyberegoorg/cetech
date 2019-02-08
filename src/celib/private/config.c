@@ -4,17 +4,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <celib/api_system.h>
-#include <celib/memory.h>
-#include <celib/os.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
+
 
 #include <celib/log.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/config.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/macros.h>
 #include <celib/ydb.h>
+#include <celib/os/vio.h>
 
 
 //==============================================================================
@@ -43,7 +44,7 @@
 #define _G ConfigSystemGlobals
 
 static struct ConfigSystemGlobals {
-    struct ce_cdb_t db;
+    struct ce_cdb_t0 db;
     uint64_t config_object;
 } _G;
 
@@ -65,7 +66,7 @@ static void _cvar_from_str(const char *name,
     int d = 0;
     float f = 0;
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                   _G.config_object);
 
     const uint64_t key = ce_id_a0->id64(name);
@@ -108,13 +109,13 @@ static void foreach_config_clb(uint64_t key,
     }
 
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), value);
-    enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), value);
+    enum ce_cdb_type_e0 type = ce_cdb_a0->prop_type(reader, key);
 
     if (type == CDB_TYPE_SUBOBJECT) {
         uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, key, 0);
 
-        const ce_cdb_obj_o *subr = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
+        const ce_cdb_obj_o0 *subr = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
 
         const uint64_t n = ce_cdb_a0->prop_count(subr);
         const uint64_t *keys = ce_cdb_a0->prop_keys(subr);
@@ -135,13 +136,13 @@ static void foreach_config_clb(uint64_t key,
         } else {
             const uint64_t key = ce_id_a0->id64(name);
 
-            const ce_cdb_obj_o *conf_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *conf_r = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                          _G.config_object);
 
             if (ce_cdb_a0->prop_exist(conf_r, key)) {
-                enum ce_cdb_type t = ce_cdb_a0->prop_type(conf_r, key);
+                enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(conf_r, key);
 
-                ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                               _G.config_object);
 
                 switch (t) {
@@ -175,13 +176,13 @@ static void foreach_config_clb(uint64_t key,
 
 
 static int load_from_yaml_file(const char *path,
-                               struct ce_alloc *alloc) {
+                               struct ce_alloc_t0 *alloc) {
 
-    struct ce_vio *f = ce_os_a0->vio->from_file(path, VIO_OPEN_READ);
+    struct ce_vio *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
     uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
     f->close(f);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     const uint64_t n = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
@@ -246,7 +247,7 @@ void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
     _G.db = ce_cdb_a0->db();
     _G.config_object = ce_cdb_a0->create_object(_G.db, 0);
 
-    api->register_api(CE_CONFIG_API, &config_a0);
+    api->register_api(CE_CONFIG_API, &config_a0, sizeof(config_a0));
 }
 
 void CE_MODULE_UNLOAD (config)(struct ce_api_a0 *api,

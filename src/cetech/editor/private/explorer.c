@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/config.h>
-#include <celib/memory.h>
-#include <celib/api_system.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
@@ -36,11 +36,11 @@
 typedef const uint64_t i1;
 static struct _G {
     bool visible;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
-    struct ce_api_entry it = ce_api_a0->first(EXPLORER_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
@@ -58,7 +58,7 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
 static uint64_t draw(uint64_t dock,
                      uint64_t selected_obj,
                      uint64_t context) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
     uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
     if (locked_object) {
@@ -74,7 +74,7 @@ static uint64_t draw(uint64_t dock,
 }
 
 static void draw_menu(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     i1 context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
@@ -102,7 +102,7 @@ static void draw_menu(uint64_t dock) {
 }
 
 static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
 
@@ -117,7 +117,7 @@ static void on_debugui(uint64_t dock) {
     } else {
         selected_object = ce_cdb_a0->read_ref(reader, PROP_DOCK_SELECTED_OBJ, 0);
 
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
         ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, selected_object);
         ce_cdb_a0->write_commit(w);
     }
@@ -130,7 +130,7 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t new_selected_object = draw(dock, selected_object, context);
     if (new_selected_object) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
         ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, new_selected_object);
         ce_cdb_a0->write_commit(w);
 
@@ -173,7 +173,7 @@ static void _init(struct ce_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
 
     ct_dock_a0->create_dock(EXPLORER_INTERFACE, true);
 

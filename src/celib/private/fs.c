@@ -3,16 +3,20 @@
 //==============================================================================
 
 #include <stdlib.h>
+#include <time.h>
 
-#include <celib/api_system.h>
-#include <celib/os.h>
+#include <celib/memory/allocator.h>
+#include <celib/api.h>
+
 #include <celib/log.h>
-#include <celib/memory.h>
+#include <celib/memory/memory.h>
 #include <celib/fs.h>
 #include <celib/module.h>
-#include <celib/hash.inl>
-#include <celib/buffer.inl>
-#include <celib/hashlib.h>
+#include <celib/containers/hash.h>
+#include <celib/containers/buffer.h>
+#include <celib/id.h>
+#include <celib/os/path.h>
+#include <celib/os/vio.h>
 
 //==============================================================================
 // Defines
@@ -40,7 +44,7 @@ struct fs_root {
 static struct _G {
     struct ce_hash_t root_map;
     struct fs_root *roots;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 //==============================================================================
@@ -48,7 +52,7 @@ static struct _G {
 //==============================================================================
 
 static uint32_t new_fs_root(uint64_t root) {
-//    ce_alloc *a = ce_memory_a0->system;
+//    ce_alloc_t0 *a = ce_memory_a0->system;
 
     uint32_t new_idx = ce_array_size(_G.roots);
 
@@ -115,12 +119,12 @@ static void map_root_dir(uint64_t root,
 
 static bool exist_dir(const char *full_path) {
     char path_buffer[4096];
-    ce_os_a0->path->dir(path_buffer, full_path);
-    return ce_os_a0->path->is_dir(path_buffer);
+    ce_os_path_a0->dir(path_buffer, full_path);
+    return ce_os_path_a0->is_dir(path_buffer);
 }
 
 static bool exist(const char *full_path) {
-    struct ce_vio *f = ce_os_a0->vio->from_file(full_path, VIO_OPEN_READ);
+    struct ce_vio *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         f->close(f);
         return true;
@@ -130,7 +134,7 @@ static bool exist(const char *full_path) {
 }
 
 static char *get_full_path(uint64_t root,
-                           struct ce_alloc *allocator,
+                           struct ce_alloc_t0 *allocator,
                            const char *filename,
                            bool test_dir) {
 
@@ -141,7 +145,7 @@ static char *get_full_path(uint64_t root,
         struct fs_mount_point *mp = &fs_inst->mount_points[i];
 
         char *fullpath = NULL;
-        ce_os_a0->path->join(&fullpath, allocator, 2, mp->root_path,
+        ce_os_path_a0->join(&fullpath, allocator, 2, mp->root_path,
                              filename);
 
         if (((!test_dir) && exist(fullpath)) ||
@@ -155,12 +159,12 @@ static char *get_full_path(uint64_t root,
 
 static struct ce_vio *open(uint64_t root,
                            const char *path,
-                           enum ce_fs_open_mode mode) {
+                           enum ce_fs_open_mode_e0 mode) {
 
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
-    struct ce_vio *file = ce_os_a0->vio->from_file(full_path,
+    struct ce_vio *file = ce_os_vio_a0->from_file(full_path,
                                                    (enum ce_vio_open_mode) mode);
 
     if (!file) {
@@ -183,7 +187,7 @@ static int create_directory(uint64_t root,
 
     char *full_path = get_full_path(root, _G.allocator, path, true);
 
-    int ret = ce_os_a0->path->make_path(full_path);
+    int ret = ce_os_path_a0->make_path(full_path);
     CE_FREE(_G.allocator, full_path);
 
     return ret;
@@ -196,7 +200,7 @@ static void listdir(uint64_t root,
                     bool recursive,
                     char ***files,
                     uint32_t *count,
-                    struct ce_alloc *allocator) {
+                    struct ce_alloc_t0 *allocator) {
 
     char **all_files = NULL;
 
@@ -212,9 +216,9 @@ static void listdir(uint64_t root,
         uint32_t _count;
 
         char *final_path = NULL;
-        ce_os_a0->path->join(&final_path, allocator, 2, mount_point_dir,
+        ce_os_path_a0->join(&final_path, allocator, 2, mount_point_dir,
                              path);
-        ce_os_a0->path->list(final_path, (const char *[]) {filter}, 1,
+        ce_os_path_a0->list(final_path, (const char *[]) {filter}, 1,
                              recursive, only_dir, &_files, &_count, allocator);
 
         for (uint32_t i = 0; i < _count; ++i) {
@@ -223,7 +227,7 @@ static void listdir(uint64_t root,
                           _G.allocator);
         }
 
-        ce_os_a0->path->list_free(_files, _count, allocator);
+        ce_os_path_a0->list_free(_files, _count, allocator);
         ce_buffer_free(final_path, allocator);
     }
 
@@ -242,7 +246,7 @@ static void listdir(uint64_t root,
 
 static void listdir_free(char **files,
                          uint32_t count,
-                         struct ce_alloc *allocator) {
+                         struct ce_alloc_t0 *allocator) {
     for (uint32_t i = 0; i < count; ++i) {
         free(files[i]);
     }
@@ -278,7 +282,7 @@ static int64_t get_file_mtime(uint64_t root,
 
     char *full_path = get_full_path(root, _G.allocator, path, false);
 
-    time_t ret = ce_os_a0->path->file_mtime(full_path);
+    time_t ret = ce_os_path_a0->file_mtime(full_path);
 
     ce_buffer_free(full_path, _G.allocator);
 
@@ -287,7 +291,7 @@ static int64_t get_file_mtime(uint64_t root,
 
 
 //static void check_wd() {
-//    ce_alloc *alloc = ce_memory_a0->system;
+//    ce_alloc_t0 *alloc = ce_memory_a0->system;
 //    const uint32_t root_count = ce_array_size(_G.roots);
 //
 //    for (uint32_t i = 0; i < root_count; ++i) {
@@ -384,7 +388,7 @@ static struct ce_fs_a0 _api = {
 struct ce_fs_a0 *ce_fs_a0 = &_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CE_FS_API, &_api);
+    api->register_api(CE_FS_API, &_api, sizeof(struct ce_fs_a0));
 }
 
 

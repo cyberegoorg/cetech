@@ -14,6 +14,7 @@
 
 #include "celib/log.h"
 #include <memory.h>
+#include <time.h>
 #include "celib/macros.h"
 
 /***********************************************************************
@@ -59,8 +60,8 @@ static char *_time_to_str(struct tm *gmtm) {
 **** Interface implementation
 ***********************************************************************/
 
-void ct_log_stdout_yaml_handler(enum ce_log_level level,
-                                time_t time,
+void ct_log_stdout_yaml_handler(enum ce_log_level_e0 level,
+                                ce_time_t time,
                                 char worker_id,
                                 const char *where,
                                 const char *msg,
@@ -83,7 +84,7 @@ void ct_log_stdout_yaml_handler(enum ce_log_level level,
 
     FILE *out = level == LOG_ERROR ? stderr : stdout;
 
-    struct tm *gmtm = gmtime(&time);
+    struct tm *gmtm = gmtime((time_t*)&time);
     const char *time_str = _time_to_str(gmtm);
 
     fprintf(out, _level_format[level], _level_to_str[level],
@@ -95,8 +96,8 @@ void ct_log_stdout_yaml_handler(enum ce_log_level level,
 #define LOG_FORMAT_SIMPLE   \
     "[%s|%d|%s] => %s\n"
 
-void ct_log_stdout_handler(enum ce_log_level level,
-                           time_t time,
+void ct_log_stdout_handler(enum ce_log_level_e0 level,
+                           ce_time_t time,
                            char worker_id,
                            const char *where,
                            const char *msg,

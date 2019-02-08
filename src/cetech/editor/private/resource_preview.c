@@ -1,3 +1,4 @@
+#include <celib/memory/allocator.h>
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
@@ -10,8 +11,8 @@
 #include <cetech/editor/resource_preview.h>
 #include <cetech/editor/resource_browser.h>
 #include <cetech/editor/editor.h>
-#include <celib/hash.inl>
-#include <celib/fmath.inl>
+#include <celib/containers/hash.h>
+#include <celib/math/math.h>
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
@@ -21,10 +22,10 @@
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/editor_ui.h>
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 #include "celib/config.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 
 
@@ -34,10 +35,10 @@
     CE_ID64_0("preview_ptr", 0x1e2c71526a2e8a11ULL)
 
 struct preview_instance {
-    struct ct_world world;
-    struct ct_entity camera_ent;
+    ct_world_t0 world;
+    struct ct_entity_t0 camera_ent;
     struct ct_viewport0 viewport;
-    struct ct_entity ent;
+    struct ct_entity_t0 ent;
     uint64_t selected_object;
     uint64_t type;
     bool locked;
@@ -45,7 +46,7 @@ struct preview_instance {
 };
 
 static struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 
     struct preview_instance *instances;
     struct preview_instance *baground;
@@ -78,8 +79,8 @@ static struct preview_instance *_new_preview() {
 }
 
 
-static void fps_camera_update(struct ct_world world,
-                              struct ct_entity camera_ent,
+static void fps_camera_update(ct_world_t0 world,
+                              struct ct_entity_t0 camera_ent,
                               float dt,
                               float dx,
                               float dy,
@@ -128,7 +129,7 @@ static void fps_camera_update(struct ct_world world,
 //    uint64_t component = ce_cdb_a0->read_subobject(components,
 //                                                   TRANSFORM_COMPONENT, 0);
 //
-//    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(component);
+//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(component);
 //    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
 //    ce_cdb_a0->write_commit(w);
 //
@@ -212,7 +213,7 @@ static void set_asset(struct preview_instance *pi,
 }
 
 static void draw_menu(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     struct preview_instance *pi = ce_cdb_a0->read_ptr(reader,
                                                       PREVIEW_PTR, NULL);
 
@@ -265,7 +266,7 @@ static void _draw_preview(struct preview_instance *pi,
 static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     struct preview_instance *pi = ce_cdb_a0->read_ptr(reader,
                                                       PREVIEW_PTR, NULL);
 
@@ -377,7 +378,7 @@ static void open(uint64_t dock) {
     pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
     pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
     ce_cdb_a0->set_ptr(w, PREVIEW_PTR, pi);
     ce_cdb_a0->write_commit(w);
 }
@@ -399,15 +400,15 @@ static struct ct_editor_module_i0 ct_editor_module_i0 = {
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
+
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
     };
 
-
-    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api);
-    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
+    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0, sizeof(ct_editor_module_i0));
 }
 
 static void _shutdown() {

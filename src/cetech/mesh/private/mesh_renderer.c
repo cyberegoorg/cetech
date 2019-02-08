@@ -1,14 +1,14 @@
 #include <string.h>
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 #include "celib/config.h"
-#include "celib/memory.h"
+#include "celib/memory/memory.h"
 #include <celib/module.h>
 #include <celib/ydb.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 
 #include <celib/macros.h>
-#include "celib/api_system.h"
+#include "celib/api.h"
 
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
@@ -20,13 +20,13 @@
 #include <cetech/material/material.h>
 #include <cetech/mesh/mesh_renderer.h>
 
+#include <celib/memory/allocator.h>
 #include <celib/macros.h>
-#include <stdlib.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <celib/ydb.h>
 #include <cetech/editor/editor_ui.h>
 #include <celib/log.h>
-#include <celib/buffer.inl>
+#include <celib/containers/buffer.h>
 #include <cetech/editor/property.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
@@ -38,7 +38,7 @@
 #define _G mesh_render_global
 
 static struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -47,8 +47,8 @@ struct mesh_render_data {
     uint64_t layer_name;
 };
 
-void foreach_mesh_renderer(struct ct_world world,
-                           struct ct_entity *entities,
+void foreach_mesh_renderer(ct_world_t0 world,
+                           struct ct_entity_t0 *entities,
                            ct_entity_storage_t *item,
                            uint32_t n,
                            void *_data) {
@@ -80,7 +80,7 @@ void foreach_mesh_renderer(struct ct_world world,
         uint64_t scene_obj = m->scene;
         uint64_t mesh_id = m->mesh;
 
-        const ce_cdb_obj_o *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                            scene_obj);
 
         uint64_t mesh = mesh_id;
@@ -90,7 +90,7 @@ void foreach_mesh_renderer(struct ct_world world,
             continue;
         }
 
-        const ce_cdb_obj_o *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                           geom_obj);
 
         uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
@@ -119,7 +119,7 @@ static void _init_api(struct ce_api_a0 *api) {
 void mesh_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 
@@ -133,7 +133,7 @@ void mesh_combo_items(uint64_t obj,
 void node_combo_items(uint64_t obj,
                       char **items,
                       uint32_t *items_count) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t scene_id = ce_cdb_a0->read_ref(reader, PROP_SCENE_ID, 0);
 
@@ -176,7 +176,7 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = property_editor,
 };
 
-void render(struct ct_world world,
+void render(ct_world_t0 world,
             struct ct_rg_builder *builder) {
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
@@ -215,10 +215,10 @@ static uint64_t size() {
     return sizeof(struct ct_mesh_component);
 }
 
-static void mesh_spawner(struct ct_world world,
+static void mesh_spawner(ct_world_t0 world,
                          uint64_t obj,
                          void *data) {
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_mesh_component *m = data;
 
     *m = (struct ct_mesh_component) {
@@ -245,9 +245,8 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
-
+    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 }
 
 static void _shutdown() {

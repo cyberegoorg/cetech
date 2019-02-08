@@ -1,20 +1,22 @@
 #include <float.h>
 #include <stdio.h>
 
-#include <celib/hashlib.h>
+#include <celib/macros.h>
+#include <celib/memory/allocator.h>
+#include <celib/id.h>
 #include <celib/config.h>
-#include <celib/memory.h>
-#include <celib/api_system.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
 #include <celib/ydb.h>
-#include <celib/array.inl>
+#include <celib/containers/array.h>
 #include <celib/module.h>
 
-#include <celib/fmath.inl>
-#include <celib/hash.inl>
+#include <celib/math/math.h>
+#include <celib/containers/hash.h>
 #include <celib/ydb.h>
 #include <celib/cdb.h>
 #include <celib/log.h>
-#include <celib/buffer.inl>
+#include <celib/containers/buffer.h>
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
@@ -35,12 +37,12 @@
 static struct _G {
     struct ce_hash_t components;
 
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
     uint64_t obj;
 } _G;
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ce_api_entry it = ce_api_a0->first(COMPONENT_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -64,56 +66,38 @@ static void draw_component(uint64_t obj) {
         return;
     }
 
+
+    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
+
+    ct_editor_ui_a0->ui_prop_header(editor->display_name());
+
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
     uint64_t comp_type = type;
+    ct_debugui_a0->SameLine(0, 8);
 
-    ct_debugui_a0->Separator();
-
+    ct_debugui_a0->PushIDI((void*)obj);
     if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
-        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
         ce_cdb_a0->write_commit(w);
         ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
 
-    ct_debugui_a0->SameLine(0, 0);
-    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
-
-    bool open = ct_editor_ui_a0->ui_prop_tree_node(editor->display_name(),
-                                                   DebugUITreeNodeFlags_DefaultOpen,
-                                                   obj);
-
-    ct_debugui_a0->NextColumn();
-
-    if (!open) {
-        return;
-    }
+    ct_debugui_a0->PopID();
 
     ct_debugui_a0->Separator();
 
     ct_property_editor_a0->draw(obj);
-    ct_debugui_a0->TreePop();
 }
 
 static void _entity_ui(uint64_t obj) {
+    ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
     ct_debugui_a0->Separator();
-
-    bool open = ct_editor_ui_a0->ui_prop_tree_node(ICON_FA_CUBE" Entity",
-                                                   DebugUITreeNodeFlags_DefaultOpen,
-                                                   obj);
-
-    ct_debugui_a0->NextColumn();
-    ct_debugui_a0->Separator();
-
-    if (!open) {
-        return;
-    }
-
-
-    ct_debugui_a0->NextColumn();
 
     ct_debugui_a0->Text("UID");
-    ct_debugui_a0->NextColumn();
+
+    ct_debugui_a0->SameLine(0, 2);
+
     ct_debugui_a0->PushItemWidth(-1);
     char buffer[128] = {};
     snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
@@ -123,11 +107,8 @@ static void _entity_ui(uint64_t obj) {
                              DebugInputTextFlags_ReadOnly,
                              0, NULL);
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->NextColumn();
 
     ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
-
-    ct_debugui_a0->TreePop();
 }
 
 static void draw_ui(uint64_t obj) {
@@ -137,12 +118,12 @@ static void draw_ui(uint64_t obj) {
 
     _entity_ui(obj);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t components_obj;
     components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
-    const ce_cdb_obj_o *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                   components_obj);
 
     uint64_t n = ce_cdb_a0->prop_count(creader);
@@ -164,7 +145,7 @@ static char modal_buffer[128] = {};
 
 static void _add_comp_modal(const char *modal_id,
                             uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     bool open = true;
     ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512}, 0);
@@ -186,7 +167,7 @@ static void _add_comp_modal(const char *modal_id,
                                  0, NULL);
 
 
-        struct ce_api_entry it = ce_api_a0->first(COMPONENT_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_I);
         while (it.api) {
             struct ct_component_i0 *i = (it.api);
             struct ct_editor_component_i0 *ei;
@@ -206,12 +187,12 @@ static void _add_comp_modal(const char *modal_id,
                 components = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                       ENTITY_COMPONENTS);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
                 ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, components);
                 ce_cdb_a0->write_commit(w);
             }
 
-            const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                          components);
 
             uint64_t component_type = i->cdb_type();
@@ -239,14 +220,13 @@ static void _add_comp_modal(const char *modal_id,
                     if (ei->create_new) {
                         component = ei->create_new();
                     } else {
-                        component = ce_cdb_a0->create_object(
-                                ce_cdb_a0->db(),
-                                component_type);
+                        component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                             component_type);
                     }
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
-                            ce_cdb_a0->db(),
-                            components);
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                                                             components);
+
                     ce_cdb_a0->set_subobject(w, component_type, component);
                     ce_cdb_a0->write_commit(w);
                     modal_buffer[0] = '\0';
@@ -299,7 +279,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 }
 
 static void _shutdown() {
@@ -316,7 +296,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_ydb_a0);
             CE_INIT_API(api, ct_ecs_a0);
             CE_INIT_API(api, ce_cdb_a0);
-
         },
         {
             CE_UNUSED(reload);

@@ -1,6 +1,10 @@
 #ifndef CETECH_KERNEL_H
 #define CETECH_KERNEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CT_KERNEL_API \
     CE_ID64_0("ct_kernel_a0", 0xdb873264c27eedf3ULL)
 
@@ -63,5 +67,9 @@ struct ct_kernel_a0 {
 
 
 CE_MODULE(ct_kernel_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_KERNEL_H

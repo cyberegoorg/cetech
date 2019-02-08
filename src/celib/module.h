@@ -1,7 +1,11 @@
 #ifndef CE_PLUGIN_API_H
 #define CE_PLUGIN_API_H
 
-#include <celib/module.inl>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "celib_types.h"
 
 struct ce_api_a0;
 
@@ -47,20 +51,20 @@ struct ce_api_a0;
     void name##_unload_module(struct ce_api_a0 *api, int reload) unload
 #endif
 
-typedef void (*ce_load_module_t)(struct ce_api_a0 *api,
+typedef void (ce_load_module_t0)(struct ce_api_a0 *api,
                                  int reload);
 
-typedef void (*ce_unload_module_t)(struct ce_api_a0 *api,
+typedef void (ce_unload_module_t0)(struct ce_api_a0 *api,
                                    int reload);
 
-typedef void (*ce_initapi_module_t)(struct ce_api_a0 *api);
+typedef void (ce_initapi_module_t0)(struct ce_api_a0 *api);
 
 struct ce_module_a0 {
     //! Add static modules
     //! \param fce get api module fce
-    void (*add_static)(ce_load_module_t load,
-                       ce_unload_module_t unload,
-                       ce_initapi_module_t initapi);
+    void (*add_static)(ce_load_module_t0* load,
+                       ce_unload_module_t0* unload,
+                       ce_initapi_module_t0* initapi);
 
     //! Load module from path
     //! \param path Plugin path
@@ -80,5 +84,9 @@ struct ce_module_a0 {
 };
 
 CE_MODULE(ce_module_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CE_PLUGIN_API_H

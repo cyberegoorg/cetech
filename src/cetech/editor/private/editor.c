@@ -1,13 +1,13 @@
 #include <stdio.h>
 
 #include <celib/macros.h>
-#include <celib/allocator.h>
+#include <celib/memory/allocator.h>
 #include <celib/fs.h>
-#include <celib/os.h>
+
 #include <celib/ydb.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 
 #include <celib/cdb.h>
@@ -33,7 +33,7 @@
 
 static struct _G {
     bool load_layout;
-//    struct ct_world world;
+//    ct_world_t0 world;
 //    struct ct_viewport0 viewport;
 } _G;
 
@@ -81,7 +81,7 @@ static float draw_main_menu() {
 }
 
 static void on_init(uint64_t _event) {
-    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
         if (i->init) {
@@ -94,7 +94,7 @@ static void on_init(uint64_t _event) {
 }
 
 static void on_shutdown(uint64_t _event) {
-    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -109,7 +109,7 @@ static void on_shutdown(uint64_t _event) {
 static void on_update(float dt) {
     ct_action_manager_a0->check();
 
-    struct ce_api_entry it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -187,8 +187,8 @@ static void _init(struct ce_api_a0 *api) {
             .load_layout = true,
     };
 
-    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0);
-    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task);
+    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
+    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
 }
 
 static void _shutdown() {

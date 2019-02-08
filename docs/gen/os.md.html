@@ -125,10 +125,10 @@ struct ce_os_path_a0 {
                  int only_dir,
                  char ***files,
                  uint32_t *count,
-                 struct ce_alloc *allocator);
+                 struct ce_alloc_t0 *allocator);
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct ce_alloc *allocator);
+                      struct ce_alloc_t0 *allocator);
     int (*make_path)(const char *path);
     const char *(*filename)(const char *path);
     void (*basename)(const char *path,
@@ -139,10 +139,10 @@ struct ce_os_path_a0 {
                     const char *path);
     const char *(*extension)(const char *path);
     void (*join)(char **buffer,
-                 struct ce_alloc *allocator,
+                 struct ce_alloc_t0 *allocator,
                  uint32_t count,
                  ...);
-    void (*copy_file)(struct ce_alloc *allocator,
+    void (*copy_file)(struct ce_alloc_t0 *allocator,
                       const char *from,
                       const char *to);
     bool (*is_dir)(const char *path);
@@ -167,7 +167,7 @@ Get file modified time
                  int only_dir,
                  char ***files,
                  uint32_t *count,
-                 struct ce_alloc *allocator);
+                 struct ce_alloc_t0 *allocator);
 
 ~~~~~~~~~~~~~~~~~~~~
 List dir
@@ -181,7 +181,7 @@ List dir
 ~~~~~~~~~~~~~~~~~~~~
     void (*list_free)(char **files,
                       uint32_t count,
-                      struct ce_alloc *allocator);
+                      struct ce_alloc_t0 *allocator);
 
 ~~~~~~~~~~~~~~~~~~~~
 Free list dir array
@@ -245,7 +245,7 @@ Get file extension
 ### join
 ~~~~~~~~~~~~~~~~~~~~
     void (*join)(char **buffer,
-                 struct ce_alloc *allocator,
+                 struct ce_alloc_t0 *allocator,
                  uint32_t count,
                  ...);
 
@@ -257,7 +257,7 @@ Join paths and return path len.
 
 ### copy_file
 ~~~~~~~~~~~~~~~~~~~~
-    void (*copy_file)(struct ce_alloc *allocator,
+    void (*copy_file)(struct ce_alloc_t0 *allocator,
                       const char *from,
                       const char *to);
 
@@ -289,9 +289,9 @@ struct ce_os_process_a0 {
 # Thread
 
 
-## ce_spinlock
+## ce_spinlock_t0
 ~~~~~~~~~~~~~~~~~~~~
-struct ce_spinlock {
+struct ce_spinlock_t0 {
     int lock;
 };
 
@@ -300,24 +300,24 @@ struct ce_spinlock {
 ## ce_os_thread_a0
 ~~~~~~~~~~~~~~~~~~~~
 struct ce_os_thread_a0 {
-    ce_thread_t *(*create)(ce_thread_fce_t fce,
+    ce_thread_t0 *(*create)(ce_thread_fce_t0 fce,
                            const char *name,
                            void *data);
-    void (*kill)(ce_thread_t *thread);
-    void (*wait)(ce_thread_t *thread,
+    void (*kill)(ce_thread_t0 *thread);
+    void (*wait)(ce_thread_t0 *thread,
                  int *status);
-    uint64_t (*get_id)(ce_thread_t *thread);
+    uint64_t (*get_id)(ce_thread_t0 *thread);
     uint64_t (*actual_id)();
     void (*yield)();
-    void (*spin_lock)(struct ce_spinlock *lock);
-    void (*spin_unlock)(struct ce_spinlock *lock);
+    void (*spin_lock)(struct ce_spinlock_t0 *lock);
+    void (*spin_unlock)(struct ce_spinlock_t0 *lock);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    ce_thread_t *(*create)(ce_thread_fce_t fce,
+    ce_thread_t0 *(*create)(ce_thread_fce_t0 fce,
                            const char *name,
                            void *data);
 
@@ -330,7 +330,7 @@ Create new thread
 
 ### kill
 ~~~~~~~~~~~~~~~~~~~~
-    void (*kill)(ce_thread_t *thread);
+    void (*kill)(ce_thread_t0 *thread);
 
 ~~~~~~~~~~~~~~~~~~~~
 Kill thread
@@ -339,7 +339,7 @@ Kill thread
 
 ### wait
 ~~~~~~~~~~~~~~~~~~~~
-    void (*wait)(ce_thread_t *thread,
+    void (*wait)(ce_thread_t0 *thread,
                  int *status);
 
 ~~~~~~~~~~~~~~~~~~~~
@@ -350,7 +350,7 @@ Wait for thread
 
 ### get_id
 ~~~~~~~~~~~~~~~~~~~~
-    uint64_t (*get_id)(ce_thread_t *thread);
+    uint64_t (*get_id)(ce_thread_t0 *thread);
 
 ~~~~~~~~~~~~~~~~~~~~
 Get id for thread
@@ -373,13 +373,13 @@ Get actual thread id
 
 ### spin_lock
 ~~~~~~~~~~~~~~~~~~~~
-    void (*spin_lock)(struct ce_spinlock *lock);
+    void (*spin_lock)(struct ce_spinlock_t0 *lock);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### spin_unlock
 ~~~~~~~~~~~~~~~~~~~~
-    void (*spin_unlock)(struct ce_spinlock *lock);
+    void (*spin_unlock)(struct ce_spinlock_t0 *lock);
 
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -580,16 +580,16 @@ struct ce_window {
 ## ce_os_window_a0
 ~~~~~~~~~~~~~~~~~~~~
 struct ce_os_window_a0 {
-    struct ce_window *(*create)(struct ce_alloc *alloc,
+    struct ce_window *(*create)(struct ce_alloc_t0 *alloc,
                                 const char *title,
                                 enum ce_window_pos x,
                                 enum ce_window_pos y,
                                 const int32_t width,
                                 const int32_t height,
                                 uint32_t flags);
-    struct ce_window *(*create_from)(struct ce_alloc *alloc,
+    struct ce_window *(*create_from)(struct ce_alloc_t0 *alloc,
                                      void *hndl);
-    void (*destroy)(struct ce_alloc *alloc,
+    void (*destroy)(struct ce_alloc_t0 *alloc,
                     struct ce_window *w);
 };
 
@@ -597,7 +597,7 @@ struct ce_os_window_a0 {
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    struct ce_window *(*create)(struct ce_alloc *alloc,
+    struct ce_window *(*create)(struct ce_alloc_t0 *alloc,
                                 const char *title,
                                 enum ce_window_pos x,
                                 enum ce_window_pos y,
@@ -609,14 +609,14 @@ struct ce_os_window_a0 {
 
 ### create_from
 ~~~~~~~~~~~~~~~~~~~~
-    struct ce_window *(*create_from)(struct ce_alloc *alloc,
+    struct ce_window *(*create_from)(struct ce_alloc_t0 *alloc,
                                      void *hndl);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### destroy
 ~~~~~~~~~~~~~~~~~~~~
-    void (*destroy)(struct ce_alloc *alloc,
+    void (*destroy)(struct ce_alloc_t0 *alloc,
                     struct ce_window *w);
 
 ~~~~~~~~~~~~~~~~~~~~

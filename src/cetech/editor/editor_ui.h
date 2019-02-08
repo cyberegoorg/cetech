@@ -1,11 +1,14 @@
 #ifndef CETECH_RESOURCE_UI_H
 #define CETECH_RESOURCE_UI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <celib/module.inl>
 
 #define CT_RESOURCE_UI_API \
     CE_ID64_0("ct_editor_ui_a0", 0x864e3516a3c025aeULL)
@@ -87,11 +90,13 @@ struct ct_editor_ui_a0 {
     uint64_t (*lock_selected_obj)(uint64_t dock,
                                   uint64_t selected_obj);
 
-    bool (*ui_prop_tree_node)(const char *name,
-                              int flags,
-                              uint64_t id);
+    void (*ui_prop_header)(const char *name);
 };
 
 CE_MODULE(ct_editor_ui_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_RESOURCE_UI_H

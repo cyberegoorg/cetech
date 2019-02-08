@@ -1,9 +1,13 @@
 #ifndef CETECH_GAME_H
 #define CETECH_GAME_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
-#include <celib/module.inl>
+
 #include <cetech/render_graph/render_graph.h>
 
 #define CT_GAME_SYSTEM_API \
@@ -44,5 +48,9 @@ struct ct_game_system_a0 {
 };
 
 CE_MODULE(ct_game_system_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_GAME_H

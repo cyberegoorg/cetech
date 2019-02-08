@@ -5,12 +5,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "celib/allocator.h"
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/allocator.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include <celib/module.h>
-#include <celib/os.h>
+
 #include <celib/macros.h>
 #include <celib/log.h>
 
@@ -47,8 +47,8 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_cdb_t db;
-    struct ce_alloc *allocator;
+    struct ce_cdb_t0 db;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -89,10 +89,10 @@ static void online(uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t layers_obj = ce_cdb_a0->read_subobject(reader, MATERIAL_LAYERS, 0);
-    const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
     const uint64_t layers_n = ce_cdb_a0->prop_count(layers_reader);
@@ -103,14 +103,14 @@ static void online(uint64_t name,
                                                        layers_keys[i], 0);
 
 
-        const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                            layer_obj);
 
         uint64_t variables_obj = ce_cdb_a0->read_subobject(layer_reader,
                                                            MATERIAL_VARIABLES_PROP,
                                                            0);
 
-        const ce_cdb_obj_o *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                           variables_obj);
 
         const uint64_t variables_n = ce_cdb_a0->prop_count(vars_reader);
@@ -124,7 +124,7 @@ static void online(uint64_t name,
             uint64_t var_obj = ce_cdb_a0->read_subobject(vars_reader,
                                                          variables_keys[k], 0);
 
-            const ce_cdb_obj_o *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                              var_obj);
 
             const char *uniform_name = ce_cdb_a0->read_str(var_reader,
@@ -143,7 +143,7 @@ static void online(uint64_t name,
             ct_gfx_a0->bgfx_create_uniform(uniform_name, _type_to_bgfx[type],
                                            1);
 
-            ce_cdb_obj_o *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+            ce_cdb_obj_o0 *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          var_obj);
             ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP,
                                   handler.idx);
@@ -162,7 +162,7 @@ static uint64_t cdb_type() {
 }
 
 static void ui_vec4(uint64_t var) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->prop_vec4(var,
@@ -174,7 +174,7 @@ static void ui_vec4(uint64_t var) {
 }
 
 static void ui_color4(uint64_t var) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->prop_vec4(var,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
@@ -185,7 +185,7 @@ static void ui_color4(uint64_t var) {
 }
 
 static void ui_texture(uint64_t var) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
@@ -195,7 +195,7 @@ static void ui_texture(uint64_t var) {
 }
 
 static void draw_property(uint64_t material) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layers_obj = ce_cdb_a0->read_ref(reader, MATERIAL_LAYERS, 0);
 
@@ -203,7 +203,7 @@ static void draw_property(uint64_t material) {
         return;
     }
 
-    const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
     uint64_t layer_count = ce_cdb_a0->prop_count(layers_reader);
@@ -216,19 +216,17 @@ static void draw_property(uint64_t material) {
         uint64_t layer;
         layer = ce_cdb_a0->read_subobject(layers_reader, layer_keys[i], 0);
 
-        const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                            layer);
 
         const char *layer_name = ce_cdb_a0->read_str(layer_reader,
                                                      MATERIAL_LAYER_NAME, NULL);
+        char layer_label[128] = {};
+        snprintf(layer_label, CE_ARRAY_LEN(layer_label), "Layer %s##layer_%llx",
+                 layer_name, layer);
 
-        bool open = ct_editor_ui_a0->ui_prop_tree_node("Layer",
-                                                       DebugUITreeNodeFlags_DefaultOpen,
-                                                       layer);
-
-        ct_debugui_a0->Text("%s", layer_name);
-        ct_debugui_a0->NextColumn();
-
+        bool open = ct_debugui_a0->TreeNodeEx(layer_label,
+                                              DebugUITreeNodeFlags_DefaultOpen);
         if (open) {
             ct_editor_ui_a0->prop_str(layer, MATERIAL_LAYER_NAME,
                                       "Layer name", i);
@@ -241,7 +239,7 @@ static void draw_property(uint64_t material) {
             variables = ce_cdb_a0->read_ref(layer_reader,
                                             MATERIAL_VARIABLES_PROP, 0);
 
-            const ce_cdb_obj_o *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                               variables);
 
             uint64_t count = ce_cdb_a0->prop_count(vars_reader);
@@ -255,7 +253,7 @@ static void draw_property(uint64_t material) {
                     continue;
                 }
 
-                const ce_cdb_obj_o *var_reader = ce_cdb_a0->read(
+                const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(
                         ce_cdb_a0->db(), var);
 
                 const char *type = ce_cdb_a0->read_str(var_reader,
@@ -274,14 +272,13 @@ static void draw_property(uint64_t material) {
             }
 
             ct_debugui_a0->TreePop();
-
         }
     }
 }
 
-static struct ct_entity load(uint64_t resource,
-                             struct ct_world world) {
-    struct ct_entity ent = {};
+static struct ct_entity_t0 load(uint64_t resource,
+                             ct_world_t0 world) {
+    struct ct_entity_t0 ent = {};
     ct_ecs_a0->create(world, &ent, 1);
 
     ct_ecs_a0->add(
@@ -345,7 +342,7 @@ static uint64_t create(uint64_t name) {
 
 static uint64_t _find_slot_by_name(uint64_t variables,
                                    const char *name) {
-    const ce_cdb_obj_o *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                       variables);
 
     uint64_t k_n = ce_cdb_a0->prop_count(vars_reader);
@@ -355,7 +352,7 @@ static uint64_t _find_slot_by_name(uint64_t variables,
 
         uint64_t var = ce_cdb_a0->read_subobject(vars_reader, key, 0);
 
-        const ce_cdb_obj_o *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+        const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
         const char *var_name = ce_cdb_a0->read_str(var_reader,
                                                    MATERIAL_VAR_NAME_PROP,
                                                    "");
@@ -373,14 +370,14 @@ static void set_texture_handler(uint64_t material,
                                 uint64_t layer,
                                 const char *slot,
                                 bgfx_texture_handle_t texture) {
-    const ce_cdb_obj_o *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
+    const ce_cdb_obj_o0 *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layers_obj = ce_cdb_a0->read_ref(mat_reader, MATERIAL_LAYERS, 0);
-    const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
     uint64_t layer_obj = ce_cdb_a0->read_ref(layers_reader, layer, 0);
-    const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                        layer_obj);
 
     uint64_t variables = ce_cdb_a0->read_ref(layer_reader,
@@ -395,7 +392,7 @@ static void set_texture_handler(uint64_t material,
         return;
     }
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), var);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), var);
     ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
     ce_cdb_a0->set_str(writer, MATERIAL_VAR_TYPE_PROP, "texture_handler");
     ce_cdb_a0->write_commit(writer);
@@ -430,7 +427,7 @@ uint64_t render_state_to_enum(uint64_t name) {
 
 
 uint64_t _get_render_state(uint64_t layer) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
     uint64_t render_state = ce_cdb_a0->read_subobject(reader,
                                                       ce_id_a0->id64(
                                                               "render_state"),
@@ -439,7 +436,7 @@ uint64_t _get_render_state(uint64_t layer) {
     if (render_state) {
         uint64_t curent_render_state = 0;
 
-        const ce_cdb_obj_o *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+        const ce_cdb_obj_o0 *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         render_state);
 
         const uint64_t render_state_count = ce_cdb_a0->prop_count(rs_reader);
@@ -459,14 +456,14 @@ uint64_t _get_render_state(uint64_t layer) {
 static void submit(uint64_t material,
                    uint64_t _layer,
                    uint8_t viewid) {
-    const ce_cdb_obj_o *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
+    const ce_cdb_obj_o0 *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layers_obj = ce_cdb_a0->read_ref(mat_reader, MATERIAL_LAYERS, 0);
     if (!layers_obj) {
         return;
     }
 
-    const ce_cdb_obj_o *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *layers_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                         layers_obj);
 
     uint64_t layer = ce_cdb_a0->read_ref(layers_reader, _layer, 0);
@@ -475,13 +472,13 @@ static void submit(uint64_t material,
         return;
     }
 
-    const ce_cdb_obj_o *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
+    const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
 
     uint64_t variables = ce_cdb_a0->read_ref(layer_reader,
                                              MATERIAL_VARIABLES_PROP,
                                              0);
 
-    const ce_cdb_obj_o *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *vars_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                       variables);
 
     uint64_t key_count = ce_cdb_a0->prop_count(vars_reader);
@@ -492,7 +489,7 @@ static void submit(uint64_t material,
 
     for (int j = 0; j < key_count; ++j) {
         uint64_t var = ce_cdb_a0->read_ref(vars_reader, keys[j], 0);
-        const ce_cdb_obj_o *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+        const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
         uint64_t type = _str_to_type(
                 ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
@@ -590,9 +587,9 @@ static int init(struct ce_api_a0 *api) {
             .db = ce_cdb_a0->db()
     };
 
-    api->register_api(CT_MATERIAL_API, &material_api);
-    api->register_api(RESOURCE_I, &ct_resource_i0);
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
+    api->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 
     return 1;
 }
@@ -605,7 +602,6 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_texture_a0);
             CE_INIT_API(api, ct_shader_a0);

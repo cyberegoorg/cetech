@@ -2,7 +2,7 @@
 #include <cetech/editor/editor_ui.h>
 #include <celib/ydb.h>
 #include <stdlib.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 
 // component
 
@@ -47,11 +47,11 @@ static float _rnd_speed(uint32_t max) {
     return (((float)rand())/RAND_MAX) * max;
 }
 
-static void spawner(struct ct_world world,
+static void spawner(struct ct_world_t0 world,
                     uint64_t obj,
                     void *data) {
 
-//    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+//    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct rotation_component *c = data;
 
 
@@ -73,8 +73,8 @@ static struct ct_component_i0 rotation_component_i = {
 // system
 
 
-static void foreach_rotation(struct ct_world world,
-                             struct ct_entity *ent,
+static void foreach_rotation(struct ct_world_t0 world,
+                             struct ct_entity_t0 *ent,
                              ct_entity_storage_t *item,
                              uint32_t n,
                              void *data) {
@@ -89,13 +89,11 @@ static void foreach_rotation(struct ct_world world,
         struct rotation_component *rotation = &rotations[i];
         struct ct_transform_comp *transform = &transforms[i];
 
-        float rot[3] = {};
-        ce_vec3_add_s(rot, transform->rot, rotation->speed * dt);
-        ce_vec3_move(transform->rot, rot);
+        transform->rot = ce_vec3_add_s(transform->rot, rotation->speed * dt);
     }
 }
 
-static void rotation_system(struct ct_world world,
+static void rotation_system(struct ct_world_t0 world,
                             float dt) {
     uint64_t mask = ct_ecs_a0->mask(ROTATION_COMPONENT)
                     | ct_ecs_a0->mask(TRANSFORM_COMPONENT);

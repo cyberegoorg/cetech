@@ -1,8 +1,8 @@
 #include <celib/macros.h>
 #include <celib/module.h>
-#include <celib/memory.h>
-#include <celib/hashlib.h>
-#include <celib/api_system.h>
+#include <celib/memory/memory.h>
+#include <celib/id.h>
+#include <celib/api.h>
 #include <celib/cdb.h>
 #include <cetech/node_graph_editor/node_graph_editor.h>
 
@@ -10,7 +10,7 @@
 
 #define _G node_test_globals
 static struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -35,10 +35,23 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-const struct ct_node_pin_def *input_defs(uint32_t *n) {
+#define _PROP_IN1\
+    CE_ID64_0("in_1", 0xd357f354a0ff6e1dULL)
+
+#define _PROP_IN2\
+    CE_ID64_0("in_2", 0x9ff9657cbc3c26abULL)
+
+#define _PROP_IN3\
+    CE_ID64_0("in_3", 0xc32c0532c5479e19ULL)
+
+#define _PROP_IN4\
+    CE_ID64_0("in_4", 0x8782c563666f2d2cULL)
+
+    const struct ct_node_pin_def *input_defs(uint32_t *n) {
     static struct ct_node_pin_def def[] = {
-            {.name= "IN 1"},
-            {.name= "IN 2"},
+            {.name= "IN 1",  .type = CT_NODE_PIN_FLOAT, .prop = _PROP_IN1},
+            {.name= "IN 2", .type = CT_NODE_PIN_STRING, .prop = _PROP_IN2},
+            {.name= "IN 3", .type = CT_NODE_PIN_BOOL, .prop = _PROP_IN3},
     };
 
     *n = CE_ARRAY_LEN(def);
@@ -47,7 +60,9 @@ const struct ct_node_pin_def *input_defs(uint32_t *n) {
 
 const struct ct_node_pin_def *output_defs(uint32_t *n) {
     static struct ct_node_pin_def def[] = {
-            {.name= "OUT 1"},
+            {.name= "OUT 1", .type = CT_NODE_PIN_FLOAT},
+            {.name= "OUT 2", .type = CT_NODE_PIN_FLOAT},
+            {.name= "OUT 3", .type = CT_NODE_PIN_STRING},
     };
 
     *n = CE_ARRAY_LEN(def);
@@ -55,7 +70,7 @@ const struct ct_node_pin_def *output_defs(uint32_t *n) {
 }
 
 struct ct_node_i0 node_i0 = {
-        .cdb_type = cdb_type,
+        .type = cdb_type,
         .get_interface = get_interface,
         .input_defs = input_defs,
         .output_defs = output_defs,
@@ -73,7 +88,7 @@ void CE_MODULE_LOAD (node_test)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(CT_NODE_I, &node_i0);
+    api->register_api(CT_NODE_I, &node_i0, sizeof(node_i0));
 
 }
 

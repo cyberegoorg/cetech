@@ -1,6 +1,10 @@
 #ifndef CETECH_BUILDDB_H
 #define CETECH_BUILDDB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <time.h>
 
@@ -8,7 +12,7 @@
    CE_ID64_0("ct_resourcedb_a0", 0xc81a8d961ebf878ULL)
 
 struct ct_resource_id;
-struct ce_alloc;
+struct ce_alloc_t0;
 
 struct ct_resourcedb_a0 {
     void (*put_file)(const char *filename,
@@ -29,7 +33,7 @@ struct ct_resourcedb_a0 {
     bool (*load_cdb_file)(struct ct_resource_id resource,
                           uint64_t object,
                           uint64_t type,
-                          struct ce_alloc *allocator);
+                          struct ce_alloc_t0 *allocator);
 
     void (*add_dependency)(const char *who_filename,
                            const char *depend_on_filename);
@@ -49,17 +53,17 @@ struct ct_resourcedb_a0 {
                                      struct ct_resource_id *resource);
 
     int (*get_resource_dirs)(char ***filename,
-                             struct ce_alloc *alloc);
+                             struct ce_alloc_t0 *alloc);
 
     void (*get_resource_dirs_clean)(char **filename,
-                                    struct ce_alloc *alloc);
+                                    struct ce_alloc_t0 *alloc);
 
     int (*get_resource_from_dirs)(const char *dir,
                                   char ***filename,
-                                  struct ce_alloc *alloc);
+                                  struct ce_alloc_t0 *alloc);
 
     void (*get_resource_from_dirs_clean)(char **filename,
-                                         struct ce_alloc *alloc);
+                                         struct ce_alloc_t0 *alloc);
 
     uint64_t (*get_uid)(const char *name,
                         const char *type);
@@ -67,12 +71,16 @@ struct ct_resourcedb_a0 {
     int (*get_resource_by_type)(const char *name,
                                 const char *type,
                                 char ***filename,
-                                struct ce_alloc *alloc);
+                                struct ce_alloc_t0 *alloc);
 
     void (*get_resource_by_type_clean)(char **filename,
-                                       struct ce_alloc *alloc);
+                                       struct ce_alloc_t0 *alloc);
 };
 
 CE_MODULE(ct_resourcedb_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_BUILDDB_H

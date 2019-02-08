@@ -1,6 +1,10 @@
 #ifndef CE_TASKMANAGER_H
 #define CE_TASKMANAGER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CE_TASK_API \
     CE_ID64_0("ce_task_a0", 0x4dbd12f32a50782eULL)
 
@@ -44,5 +48,9 @@ struct ce_task_a0 {
 };
 
 CE_MODULE(ce_task_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CE_TASKMANAGER_H

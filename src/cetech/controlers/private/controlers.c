@@ -3,17 +3,17 @@
 //==============================================================================
 #include <string.h>
 
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
 
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/macros.h>
-#include <celib/os.h>
-#include "celib/allocator.h"
-#include <celib/memory.h>
-#include <celib/hash.inl>
+
+#include "celib/memory/allocator.h"
+#include <celib/memory/memory.h>
+#include <celib/containers/hash.h>
 
 #include <cetech/machine/machine.h>
 #include <cetech/kernel/kernel.h>
@@ -49,7 +49,7 @@ static void _componet_api_add(uint64_t name,
                 (uint64_t) controlers_i, ce_memory_a0->system);
 }
 
-struct ct_controlers_i0* get_by_name(uint64_t name) {
+struct ct_controlers_i0 *get_by_name(uint64_t name) {
     struct ct_controlers_i0 *controlers_i;
     controlers_i = (struct ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
                                                               name, 0);
@@ -64,7 +64,8 @@ struct ct_controlers_a0 *ct_controlers_a0 = &ct_controlers_api;
 
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_CONTROLERS_API, ct_controlers_a0);
+    api->register_api(CT_CONTROLERS_API,
+                      ct_controlers_a0, sizeof(ct_controlers_api));
 }
 
 static void _init(struct ce_api_a0 *api) {

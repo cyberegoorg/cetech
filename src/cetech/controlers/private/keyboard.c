@@ -2,18 +2,18 @@
 // Includes
 //==============================================================================
 
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <cetech/machine/machine.h>
 #include <celib/log.h>
-#include <celib/os.h>
+
 #include <cetech/controlers/keyboard.h>
 #include <celib/module.h>
 #include <string.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 
 #include <cetech/kernel/kernel.h>
 #include <celib/macros.h>
-#include "celib/allocator.h"
+#include "celib/memory/allocator.h"
 #include "keystr.h"
 #include <cetech/controlers/controlers.h>
 #include <celib/cdb.h>
@@ -99,7 +99,7 @@ static void update(float dt) {
     const uint64_t *events = ct_machine_a0->events(&events_n);
     for (int i = 0; i < events_n; ++i) {
         uint64_t event = events[i];
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
+        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
         uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
 
         switch (event_type) {
@@ -178,8 +178,8 @@ static struct ct_kernel_task_i0 keyboard_task = {
 };
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CONTROLERS_I, &ct_controlers_i0);
-    api->register_api(KERNEL_TASK_INTERFACE, &keyboard_task);
+    api->register_api(CONTROLERS_I, &ct_controlers_i0, sizeof(ct_controlers_i0));
+    api->register_api(KERNEL_TASK_INTERFACE, &keyboard_task, sizeof(keyboard_task));
 }
 
 static void _init(struct ce_api_a0 *api) {

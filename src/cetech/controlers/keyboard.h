@@ -1,6 +1,10 @@
 #ifndef CETECH_KEYBOARD_H
 #define CETECH_KEYBOARD_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define CONTROLER_KEYBOARD \
@@ -281,6 +285,10 @@ enum {
 
     KEY_MAX = 512
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_KEYBOARD_H
 //! \}

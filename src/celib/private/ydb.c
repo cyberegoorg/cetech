@@ -1,20 +1,21 @@
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <celib/config.h>
-#include <celib/memory.h>
+#include <celib/memory/memory.h>
 #include <celib/module.h>
 #include <celib/ydb.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <celib/log.h>
-#include <celib/os.h>
 #include <celib/ydb.h>
 #include <celib/fs.h>
-
-
-#include <celib/fmath.inl>
-#include <celib/hash.inl>
-#include <celib/buffer.inl>
-#include <yaml/yaml.h>
+#include <celib/memory/allocator.h>
+#include <celib/math/math.h>
+#include <celib/containers/hash.h>
+#include <celib/containers/buffer.h>
 #include <celib/cdb.h>
+#include <celib/os/thread.h>
+#include <celib/os/vio.h>
+
+#include <yaml/yaml.h>
 
 #define _G ydb_global
 #define LOG_WHERE "ydb"
@@ -33,9 +34,9 @@ enum node_type {
 
 static struct _G {
     struct ce_hash_t obj_cache_map;
-    struct ce_spinlock cache_lock;
+    ce_spinlock_t0 cache_lock;
 
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 static const char *get_key(uint64_t hash) {
@@ -112,7 +113,7 @@ static void type_value_from_scalar(const uint8_t *scalar,
 
 
 uint64_t cdb_from_vio(struct ce_vio *vio,
-                      struct ce_alloc *alloc) {
+                      struct ce_alloc_t0 *alloc) {
     struct parent_stack_state {
         enum node_type type;
         uint32_t node_count;
@@ -121,7 +122,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
         uint64_t str_hash;
 
         uint64_t root_object;
-        ce_cdb_obj_o *writer;
+        ce_cdb_obj_o0 *writer;
 
         char **str_array;
         float *float_array;
@@ -229,7 +230,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                     uint64_t array = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                               0);
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                              array);
                     for (int i = 0; i < len; ++i) {
                         const char *str = s->str_array[i];
@@ -313,7 +314,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                     // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].str_hash;
-                    ce_cdb_obj_o *w = parent_stack[parent_stack_top - 1].writer;
+                    ce_cdb_obj_o0 *w = parent_stack[parent_stack_top - 1].writer;
 
                     switch (type) {
                         case NODE_FLOAT:
@@ -391,8 +392,8 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
 void expire_document_in_cache(const char *path,
                               uint64_t path_key) {
-    ce_os_a0->thread->spin_lock(&_G.cache_lock);
-    ce_os_a0->thread->spin_unlock(&_G.cache_lock);
+    ce_os_thread_a0->spin_lock(&_G.cache_lock);
+    ce_os_thread_a0->spin_unlock(&_G.cache_lock);
 }
 
 uint64_t load_obj_to_cache(const char *path,
@@ -418,9 +419,9 @@ uint64_t load_obj_to_cache(const char *path,
         return 0;
     }
 
-    ce_os_a0->thread->spin_lock(&_G.cache_lock);
+    ce_os_thread_a0->spin_lock(&_G.cache_lock);
     ce_hash_add(&_G.obj_cache_map, path_key, obj, _G.allocator);
-    ce_os_a0->thread->spin_unlock(&_G.cache_lock);
+    ce_os_thread_a0->spin_unlock(&_G.cache_lock);
 
     return obj;
 }
@@ -428,9 +429,9 @@ uint64_t load_obj_to_cache(const char *path,
 uint64_t get_obj(const char *path) {
     uint64_t path_key = ce_id_a0->id64(path);
 
-    ce_os_a0->thread->spin_lock(&_G.cache_lock);
+    ce_os_thread_a0->spin_lock(&_G.cache_lock);
     uint64_t obj = ce_hash_lookup(&_G.obj_cache_map, path_key, 0);
-    ce_os_a0->thread->spin_unlock(&_G.cache_lock);
+    ce_os_thread_a0->spin_unlock(&_G.cache_lock);
 
     if (!obj) {
         obj = load_obj_to_cache(path, path_key);
@@ -440,7 +441,7 @@ uint64_t get_obj(const char *path) {
 };
 
 //void check_fs() {
-//    ce_alloc *alloc = ce_memory_a0->system;
+//    ce_alloc_t0 *alloc = ce_memory_a0->system;
 //
 //    static uint64_t root = CE_ID64_0("source", 0x921f1370045bad6eULL);
 //
@@ -481,7 +482,7 @@ static void _indent(char **buffer,
 static void dump_yaml(char **buffer,
                       uint64_t from,
                       uint32_t level) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), from);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), from);
 
     const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
@@ -495,7 +496,7 @@ static void dump_yaml(char **buffer,
             continue;
         }
 
-        enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
+        enum ce_cdb_type_e0 type = ce_cdb_a0->prop_type(reader, key);
 
         switch (type) {
             case CDB_TYPE_SUBOBJECT: {
@@ -613,7 +614,7 @@ struct ce_ydb_a0 *ce_ydb_a0 = &ydb_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api(CE_YDB_API, &ydb_api);
+    api->register_api(CE_YDB_API, &ydb_api, sizeof(ydb_api));
 }
 
 static void _shutdown() {

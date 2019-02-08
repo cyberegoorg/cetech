@@ -1,9 +1,13 @@
 #ifndef CETECH_MACHINE_H
 #define CETECH_MACHINE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
-#include <celib/module.inl>
+
 
 #define CT_MACHINE_API \
     CE_ID64_0("ct_machine_a0", 0xce8b7f45bc305909ULL)
@@ -34,5 +38,9 @@ struct ct_machine_a0 {
 
 
 CE_MODULE(ct_machine_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_MACHINE_H

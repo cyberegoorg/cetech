@@ -3,13 +3,14 @@
 //==============================================================================
 #include <time.h>
 
+#include <celib/memory/allocator.h>
 #include <celib/macros.h>
 #include <celib/ydb.h>
-#include <celib/array.inl>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
-#include <celib/os.h>
+#include <celib/containers/array.h>
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
+
 #include <celib/ydb.h>
 #include <celib/cdb.h>
 #include <celib/config.h>
@@ -28,14 +29,15 @@
 #include <include/assimp/postprocess.h>
 #include <include/assimp/cimport.h>
 #include <celib/log.h>
-#include <celib/buffer.inl>
+#include <celib/containers/buffer.h>
 #include <cetech/resource/resource_compiler.h>
+#include <celib/os/path.h>
 
 
 #define _G scene_compiler_globals
 
 struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 typedef char char_128[128];
@@ -148,27 +150,27 @@ static void _compile_assimp_node(struct aiNode *root,
     }
 }
 
-static int _compile_assimp(struct ce_cdb_t db,
+static int _compile_assimp(struct ce_cdb_t0 db,
                            uint64_t k,
                            struct compile_output *output) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, k);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, k);
 
     uint64_t import_obj = ce_cdb_a0->read_subobject(reader,
                                                     ce_id_a0->id64("import"),
                                                     0);
 
-    const ce_cdb_obj_o *import_reader = ce_cdb_a0->read(db,
+    const ce_cdb_obj_o0 *import_reader = ce_cdb_a0->read(db,
                                                         import_obj);
 
     const char *input_str = ce_cdb_a0->read_str(import_reader,
                                                 ce_id_a0->id64("input"), "");
 
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                    ce_config_a0->obj());
     const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     char *input_path = NULL;
-    ce_os_a0->path->join(&input_path, _G.allocator, 2, source_dir,
+    ce_os_path_a0->join(&input_path, _G.allocator, 2, source_dir,
                          input_str);
 
     uint32_t postprocess_flag = aiProcessPreset_TargetRealtime_MaxQuality
@@ -179,7 +181,7 @@ static int _compile_assimp(struct ce_cdb_t db,
                                                                  "postprocess"),
                                                          0);
 
-    const ce_cdb_obj_o *pp_reader = ce_cdb_a0->read(db,
+    const ce_cdb_obj_o0 *pp_reader = ce_cdb_a0->read(db,
                                                     postprocess_obj);
 
     if (ce_cdb_a0->read_bool(pp_reader, ce_id_a0->id64("flip_uvs"),
@@ -298,13 +300,13 @@ static int _compile_assimp(struct ce_cdb_t db,
     return 1;
 }
 
-extern "C" bool scene_compiler(struct ce_cdb_t db,
+extern "C" bool scene_compiler(struct ce_cdb_t0 db,
                                uint64_t obj) {
     struct compile_output *output = _crete_compile_output();
 
     int ret = 1;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     if (ce_cdb_a0->prop_exist(reader, ce_id_a0->id64("import"))) {
         ret = _compile_assimp(db, obj, output);
@@ -315,7 +317,7 @@ extern "C" bool scene_compiler(struct ce_cdb_t db,
         return false;
     }
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(db, obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT,
                           ce_array_size(output->geom_name));
     ce_cdb_a0->set_uint64(w, SCENE_NODE_COUNT,
@@ -374,7 +376,6 @@ extern "C" bool scene_compiler(struct ce_cdb_t db,
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ce_os_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_ydb_a0);

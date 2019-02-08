@@ -1,8 +1,8 @@
 #include <celib/macros.h>
 #include <celib/module.h>
-#include <celib/memory.h>
-#include <celib/hashlib.h>
-#include <celib/api_system.h>
+#include <celib/memory/memory.h>
+#include <celib/id.h>
+#include <celib/api.h>
 #include <celib/cdb.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/renderer/gfx.h>
@@ -12,16 +12,18 @@
 #include <stdio.h>
 #include <cetech/node_graph_editor/node_graph_editor.h>
 #include <cetech/editor/resource_preview.h>
+#include <cetech/editor/property.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "../node_graph.h"
 
 #define _G node_graph_globals
 static struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 static void create_new(uint64_t obj) {
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
 
     if (!ce_cdb_a0->prop_exist(w, CT_NODE_GRAPH_NODES)) {
         uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
@@ -47,8 +49,9 @@ static uint64_t cdb_type() {
 }
 
 
-void draw_raw(uint64_t obj, float size[2]) {
-    ct_node_graph_editor_a0->draw_ng_editor(obj);
+void draw_raw(uint64_t obj,
+              float size[2]) {
+    ct_node_graph_editor_a0->draw_ng_editor(obj, 0);
 }
 
 static struct ct_resource_preview_i0 resource_preview_i0 = {
@@ -82,26 +85,26 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     }
 
     ct_debugui_a0->Columns(2, NULL, true);
-
     ct_debugui_a0->NextColumn();
     ct_debugui_a0->NextColumn();
 
 
     //
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                  top_level_obj);
 
     ImGuiTreeNodeFlags flags = 0 |
                                DebugUITreeNodeFlags_OpenOnArrow |
                                //                               DebugUITreeNodeFlags_OpenOnDoubleClick |
                                //                               DebugUITreeNodeFlags_DefaultOpen;
+                               DebugUITreeNodeFlags_CollapsingHeader |
                                0;
     uint64_t new_selected_object = 0;
 
 
     uint64_t nodes = ce_cdb_a0->read_subobject(reader, CT_NODE_GRAPH_NODES, 0);
-    const ce_cdb_obj_o *ns_reader = ce_cdb_a0->read(ce_cdb_a0->db(), nodes);
+    const ce_cdb_obj_o0 *ns_reader = ce_cdb_a0->read(ce_cdb_a0->db(), nodes);
 
     const uint64_t ns_n = ce_cdb_a0->prop_count(ns_reader);
 
@@ -120,6 +123,17 @@ static uint64_t draw_ui(uint64_t top_level_obj,
 
     char label[128] = {0};
 
+
+    snprintf(label, CE_ARRAY_LEN(label),
+             (ICON_FA_CUBE
+                     " ""%s##nodes_%llu"), name, uid);
+    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
+    if (ct_debugui_a0->IsItemClicked(0)) {
+        new_selected_object = nodes;
+    }
+
+    ct_debugui_a0->NextColumn();
+
     //menu
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", nodes);
@@ -135,18 +149,6 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     }
     ct_debugui_a0->NextColumn();
 
-
-    snprintf(label, CE_ARRAY_LEN(label),
-             (ICON_FA_CUBE
-                     " ""%s##nodes_%llu"), name, uid);
-    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-    if (ct_debugui_a0->IsItemClicked(0)) {
-        new_selected_object = nodes;
-    }
-
-    ct_debugui_a0->NextColumn();
-
-    ct_debugui_a0->NextColumn();
     if (open) {
         const uint64_t *ns = ce_cdb_a0->prop_keys(ns_reader);
         for (int i = 0; i < ns_n; ++i) {
@@ -173,6 +175,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     }
 
     ct_debugui_a0->NextColumn();
+    ct_debugui_a0->NextColumn();
 
     ct_debugui_a0->Columns(1, NULL, true);
 
@@ -188,12 +191,12 @@ static void draw_menu(uint64_t selected_obj,
 }
 
 static struct ct_node_i0 *get_interface(uint64_t type) {
-    struct ce_api_entry it = ce_api_a0->first(CT_NODE_I);
+    struct ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I);
 
     while (it.api) {
         struct ct_node_i0 *i = (it.api);
 
-        if (i && i->cdb_type && (i->cdb_type() == type)) {
+        if (i && i->type && (i->type() == type)) {
             return i;
         }
 
@@ -202,6 +205,65 @@ static struct ct_node_i0 *get_interface(uint64_t type) {
 
     return NULL;
 }
+
+
+static uint64_t _node_property_cdb_type() {
+    return CT_NODE_GRAPH_NODE;
+}
+
+static void _node_property_draw(uint64_t obj) {
+    const ce_cdb_obj_o0 *node_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    uint64_t node_type = ce_cdb_a0->read_uint64(node_r, CT_NODE_TYPE, 0);
+
+    struct ct_node_i0 *ni = get_interface(node_type);
+
+    if (!ni) {
+        return;
+    }
+
+
+    ct_editor_ui_a0->ui_prop_header("Inputs");
+    ct_debugui_a0->Separator();
+
+
+    uint64_t inputs_o = ce_cdb_a0->read_subobject(node_r,
+                                                  CT_NODE_GRAPH_NODE_INPUTS,
+                                                  0);
+
+    uint32_t in_n = 0;
+    const struct ct_node_pin_def *in_defs = ni->input_defs(&in_n);
+
+    for (int i = 0; i < in_n; ++i) {
+        const struct ct_node_pin_def *def = &in_defs[i];
+
+        switch (def->type) {
+            case CT_NODE_PIN_NONE:
+                break;
+
+            case CT_NODE_PIN_FLOAT:
+                ct_editor_ui_a0->prop_float(inputs_o, def->prop,
+                                            def->name,
+                                            (struct ui_float_p0) {});
+                break;
+
+            case CT_NODE_PIN_STRING:
+                ct_editor_ui_a0->prop_str(inputs_o, def->prop,
+                                          def->name, i);
+                break;
+
+            case CT_NODE_PIN_BOOL:
+                ct_editor_ui_a0->prop_bool(inputs_o, def->prop,
+                                           def->name);
+                break;
+        }
+    }
+}
+
+static struct ct_property_editor_i0 node_property_editor_i0 = {
+        .cdb_type = _node_property_cdb_type,
+        .draw_ui = _node_property_draw,
+};
 
 static struct ct_node_graph_a0 ng_api = {
         .get_interface = get_interface,
@@ -227,9 +289,16 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     ce_id_a0->id64("connections");
     ce_id_a0->id64("position_x");
     ce_id_a0->id64("position_y");
+    ce_id_a0->id64("size_x");
+    ce_id_a0->id64("size_y");
+    ce_id_a0->id64("inputs");
+    ce_id_a0->id64("outputs");
+    ce_id_a0->id64("from");
+    ce_id_a0->id64("from_pin");
+    ce_id_a0->id64("to");
+    ce_id_a0->id64("to_pin");
 
-    api->register_api(CT_NODE_GRAPH_API, ct_node_graph_a0);
-    api->register_api(RESOURCE_I, &ct_resource_i0);
+
 
     static struct ct_explorer_i0 entity_explorer = {
             .cdb_type = cdb_type,
@@ -237,7 +306,10 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
             .draw_menu = draw_menu,
     };
 
-    api->register_api(EXPLORER_INTERFACE, &entity_explorer);
+    api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
+    api->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0, sizeof(node_property_editor_i0));
 
 }
 

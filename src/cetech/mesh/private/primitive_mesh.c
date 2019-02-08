@@ -1,15 +1,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 #include "celib/config.h"
-#include "celib/memory.h"
+#include "celib/memory/memory.h"
 #include <celib/module.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 #include <celib/macros.h>
 #include <celib/log.h>
 
-#include "celib/api_system.h"
+#include "celib/api.h"
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
 #include "cetech/transform/transform.h"
@@ -29,7 +29,7 @@
 #define _G primitice_mesh_global
 
 static struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -106,8 +106,8 @@ static const uint16_t cube_indices[36] = {
 static bgfx_vertex_buffer_handle_t cube_vbh;
 static bgfx_index_buffer_handle_t cube_ibh;
 
-void foreach_primitive_mesh(struct ct_world world,
-                            struct ct_entity *entities,
+void foreach_primitive_mesh(ct_world_t0 world,
+                            struct ct_entity_t0 *entities,
                             ct_entity_storage_t *item,
                             uint32_t n,
                             void *_data) {
@@ -167,7 +167,7 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
         .draw_ui = property_editor,
 };
 
-static void render(struct ct_world world,
+static void render(ct_world_t0 world,
                    struct ct_rg_builder *builder) {
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
@@ -206,10 +206,10 @@ static uint64_t size() {
     return sizeof(struct ct_primitive_mesh);
 }
 
-static void mesh_spawner(struct ct_world world,
+static void mesh_spawner(ct_world_t0 world,
                          uint64_t obj,
                          void *data) {
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_primitive_mesh *m = data;
 
     *m = (struct ct_primitive_mesh) {
@@ -233,8 +233,8 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 
     ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,
                                       ct_gfx_a0->bgfx_get_renderer_type());

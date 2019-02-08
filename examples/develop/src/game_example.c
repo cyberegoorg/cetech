@@ -4,12 +4,12 @@
 #include <celib/macros.h>
 #include <celib/log.h>
 #include <celib/module.h>
-#include <celib/api_system.h>
-#include <celib/hashlib.h>
+#include <celib/api.h>
+#include <celib/id.h>
 #include <cetech/controlers/keyboard.h>
 
 #include <celib/cdb.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 
 #include <cetech/ecs/ecs.h>
 
@@ -26,9 +26,9 @@
 #include <cetech/game/game_system.h>
 
 static struct G {
-    struct ct_world world;
-    struct ct_entity camera_ent;
-    struct ct_entity level;
+    struct ct_world_t0 world;
+    struct ct_entity_t0 camera_ent;
+    struct ct_entity_t0 level;
     struct ct_viewport0 viewport;
 } _G;
 
@@ -108,9 +108,13 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Init %d", reload);
 
-    api->register_api(GAME_INTERFACE, &game_i0);
-    api->register_api(COMPONENT_INTERFACE, &rotation_component_i);
-    api->register_api(SIMULATION_INTERFACE, &rotation_simulation_i0);
+    api->register_api(GAME_INTERFACE,
+                      &game_i0, sizeof(game_i0));
+    api->register_api(COMPONENT_INTERFACE,
+                      &rotation_component_i, sizeof(rotation_component_i));
+
+    api->register_api(SIMULATION_INTERFACE,
+                      &rotation_simulation_i0, sizeof(rotation_simulation_i0));
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,

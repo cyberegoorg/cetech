@@ -1,6 +1,10 @@
 #ifndef CETECH_ECS_H
 #define CETECH_ECS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -38,28 +42,26 @@
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
-struct ct_cdb_obj_t;
-enum ce_cdb_type;
-struct ce_cdb_change_ev0;
-typedef void ce_cdb_obj_o;
-typedef void ct_entity_storage_t;
 struct ct_resource_id;
 
-struct ct_world {
-    uint64_t h;
-};
+typedef struct ce_cdb_change_ev_t0 ce_cdb_change_ev_t0;
+typedef struct ct_entity_storage_t ct_entity_storage_t;
 
-struct ct_entity {
+typedef struct ct_world_t0 {
     uint64_t h;
-};
+} ct_world_t0;
 
-typedef void (*ct_process_fce_t)(struct ct_world world,
-                                 struct ct_entity *ent,
+typedef struct ct_entity_t0 {
+    uint64_t h;
+} ct_entity_t0;
+
+typedef void (*ct_process_fce_t)(ct_world_t0 world,
+                                 ct_entity_t0 *ent,
                                  ct_entity_storage_t *item,
                                  uint32_t n,
                                  void *data);
 
-typedef void (*ct_simulate_fce_t)(struct ct_world world,
+typedef void (*ct_simulate_fce_t)(ct_world_t0 world,
                                   float dt);
 
 struct ct_component_i0 {
@@ -69,12 +71,12 @@ struct ct_component_i0 {
 
     void *(*get_interface)(uint64_t name_hash);
 
-    void (*spawner)(struct ct_world world,
+    void (*spawner)(ct_world_t0 world,
                     uint64_t obj,
                     void *data);
 
-    void (*changer)(struct ct_world world,
-                    const struct ce_cdb_change_ev0 *changes,
+    void (*changer)(ct_world_t0 world,
+                    const ce_cdb_change_ev_t0 *changes,
                     uint32_t changes_n,
                     void *data);
 };
@@ -107,49 +109,49 @@ struct ct_simulation_i0 {
 
 struct ct_ecs_a0 {
     //WORLD
-    struct ct_world (*create_world)();
+    ct_world_t0 (*create_world)();
 
     //ENT
-    void (*destroy_world)(struct ct_world world);
+    void (*destroy_world)(ct_world_t0 world);
 
-    void (*create)(struct ct_world world,
-                   struct ct_entity *entity,
+    void (*create)(ct_world_t0 world,
+                   struct ct_entity_t0 *entity,
                    uint32_t count);
 
-    void (*destroy)(struct ct_world world,
-                    struct ct_entity *entity,
+    void (*destroy)(ct_world_t0 world,
+                    struct ct_entity_t0 *entity,
                     uint32_t count);
 
-    bool (*alive)(struct ct_world world,
-                  struct ct_entity entity);
+    bool (*alive)(ct_world_t0 world,
+                  struct ct_entity_t0 entity);
 
-    struct ct_entity (*spawn)(struct ct_world world,
-                              uint64_t name);
+    struct ct_entity_t0 (*spawn)(ct_world_t0 world,
+                                 uint64_t name);
 
 
-    bool (*has)(struct ct_world world,
-                struct ct_entity ent,
+    bool (*has)(ct_world_t0 world,
+                struct ct_entity_t0 ent,
                 uint64_t *component_name,
                 uint32_t name_count);
 
-    void (*link)(struct ct_world world,
-                 struct ct_entity parent,
-                 struct ct_entity child);
+    void (*link)(ct_world_t0 world,
+                 struct ct_entity_t0 parent,
+                 struct ct_entity_t0 child);
 
-    struct ct_entity (*parent)(struct ct_world world,
-                               struct ct_entity entity);
+    struct ct_entity_t0 (*parent)(ct_world_t0 world,
+                                  struct ct_entity_t0 entity);
 
-    struct ct_entity (*first_child)(struct ct_world world,
-                                    struct ct_entity entity);
+    struct ct_entity_t0 (*first_child)(ct_world_t0 world,
+                                       struct ct_entity_t0 entity);
 
-    struct ct_entity (*next_sibling)(struct ct_world world,
-                                     struct ct_entity entity);
+    struct ct_entity_t0 (*next_sibling)(ct_world_t0 world,
+                                        struct ct_entity_t0 entity);
 
     //SIMU
-    void (*simulate)(struct ct_world world,
+    void (*simulate)(ct_world_t0 world,
                      float dt);
 
-    void (*process)(struct ct_world world,
+    void (*process)(ct_world_t0 world,
                     uint64_t components_mask,
                     ct_process_fce_t fce,
                     void *data);
@@ -162,22 +164,26 @@ struct ct_ecs_a0 {
     void *(*get_all)(uint64_t component_name,
                      ct_entity_storage_t *item);
 
-    void *(*get_one)(struct ct_world world,
+    void *(*get_one)(ct_world_t0 world,
                      uint64_t component_name,
-                     struct ct_entity entity);
+                     struct ct_entity_t0 entity);
 
-    void (*add)(struct ct_world world,
-                struct ct_entity ent,
+    void (*add)(ct_world_t0 world,
+                struct ct_entity_t0 ent,
                 const uint64_t *component_name,
                 uint32_t name_count,
                 void **data);
 
-    void (*remove)(struct ct_world world,
-                   struct ct_entity ent,
+    void (*remove)(ct_world_t0 world,
+                   struct ct_entity_t0 ent,
                    const uint64_t *component_name,
                    uint32_t name_count);
 };
 
 CE_MODULE(ct_ecs_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_ECS_H

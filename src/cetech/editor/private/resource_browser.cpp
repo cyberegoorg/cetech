@@ -1,14 +1,16 @@
 #include <fnmatch.h>
 
+#include <celib/memory/allocator.h>
+#include <celib/macros.h>
 #include <celib/fs.h>
-#include <celib/buffer.inl>
-#include <celib/os.h>
-#include "celib/hashlib.h"
+#include <celib/containers/buffer.h>
+
+#include "celib/id.h"
 #include "celib/config.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
-#include <celib/hash.inl>
+#include <celib/containers/hash.h>
 #include <celib/log.h>
 
 #include <cetech/renderer/gfx.h>
@@ -25,11 +27,11 @@
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
-#include <cetech/editor/log_view.h>
 
 #include <cetech/editor/editor_ui.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
+#include <celib/os/path.h>
 
 
 #define WINDOW_NAME "Resource browser"
@@ -53,7 +55,7 @@ static struct _G {
     char **asset_list;
     uint32_t asset_list_count;
 
-    ce_alloc *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static void set_current_dir(const char *dir) {
@@ -68,7 +70,7 @@ static void _broadcast_edit(uint64_t dock) {
 static void _broadcast_selected(uint64_t dock) {
     uint64_t obj = _G.selected_asset.uid;
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
@@ -121,7 +123,7 @@ static void _create_from_modal(const char *modal_id) {
         char *buffer = NULL;
         ce_hash_t type_hash = {};
 
-        struct ce_api_entry it = ce_api_a0->first(RESOURCE_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
         uint32_t idx = 1;
         while (it.api) {
             struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
@@ -216,7 +218,7 @@ static void _create_from_modal(const char *modal_id) {
 
                 ct_resourcedb_a0->put_file(filename, 0);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          new_res);
                 ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
                 ce_cdb_a0->write_commit(w);
@@ -251,7 +253,7 @@ static void _create_from_modal(const char *modal_id) {
                 continue;
             }
 
-            const char *filename = ce_os_a0->path->filename(path);
+            const char *filename = ce_os_path_a0->filename(path);
             uint64_t filename_hash = ce_id_a0->id64(filename);
 
             char filter[256] = {};
@@ -261,7 +263,7 @@ static void _create_from_modal(const char *modal_id) {
                 continue;
             }
 
-            const char *type = ce_os_a0->path->extension(path);
+            const char *type = ce_os_path_a0->extension(path);
             uint64_t resource_type = ce_id_a0->id64(type);
 
             char name[256] = {};
@@ -356,7 +358,7 @@ static void _select_type_modal(const char *modal_id) {
             _selected_type[0] = '\0';
         };
 
-        struct ce_api_entry it = ce_api_a0->first(RESOURCE_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
         while (it.api) {
             struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
 
@@ -399,7 +401,7 @@ static void ui_asset_menu(uint64_t dock) {
 
     ct_debugui_a0->SameLine(0, -1);
     if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, (float[2]) {0, 0})) {
-        const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
         const uint64_t context = ce_cdb_a0->read_uint64(reader,
                                                         PROP_DOCK_CONTEXT,
@@ -482,7 +484,7 @@ static void ui_resource_list(uint64_t dock) {
         uint32_t dir_n = ce_array_size(_G.asset_list);
         for (int i = 0; i < dir_n; ++i) {
             const char *path = _G.asset_list[i];
-            const char *filename = ce_os_a0->path->filename(path);
+            const char *filename = ce_os_path_a0->filename(path);
             uint64_t filename_hash = ce_id_a0->id64(filename);
 
             if (!_G.asset_filter.PassFilter(path)) {
@@ -604,7 +606,7 @@ struct ct_resource_browser_a0 *ct_resource_browser_a0 = &resource_browser_api;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -628,7 +630,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ct_debugui_a0);
             CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ct_resource_a0);
 
             CE_INIT_API(api, ce_cdb_a0);

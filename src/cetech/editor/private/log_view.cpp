@@ -2,29 +2,31 @@
 
 
 extern "C" {
+#include <celib/memory/allocator.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
 #include <cetech/editor/log_view.h>
-#include <celib/array.inl>
+#include <celib/containers/array.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
-#include <celib/os.h>
+
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 }
 
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <celib/os/thread.h>
 
 #define WINDOW_NAME "Log view"
 #define LOG_FORMAT "[%d|%s] -> %s"
 #define LOG_ARGS worker_id, where, msg
 
 struct log_item {
-    enum ce_log_level level;
+    enum ce_log_level_e0 level;
     int offset;
 };
 
@@ -38,9 +40,9 @@ static struct _G {
     uint8_t level_mask;
 
     bool visible;
-    ce_alloc *allocator;
+    ce_alloc_t0 *allocator;
 
-    ce_spinlock lock;
+    ce_spinlock_t0 lock;
 } _G;
 
 static int _levels[] = {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_DBG};
@@ -64,8 +66,8 @@ static const char *_level_to_label[4] = {
 };
 
 
-static void log_handler(enum ce_log_level level,
-                        time_t time,
+static void log_handler(enum ce_log_level_e0 level,
+                        ce_time_t time,
                         char worker_id,
                         const char *where,
                         const char *msg,
@@ -85,10 +87,10 @@ static void log_handler(enum ce_log_level level,
     char buffer[1024];
     int len = snprintf(buffer, CE_ARRAY_LEN(buffer), LOG_FORMAT, LOG_ARGS);
 
-    ce_os_a0->thread->spin_lock(&_G.lock);
+    ce_os_thread_a0->spin_lock(&_G.lock);
     ce_array_push(_G.log_items, item, _G.allocator);
     ce_array_push_n(_G.line_buffer, buffer, len + 1, _G.allocator);
-    ce_os_a0->thread->spin_unlock(&_G.lock);
+    ce_os_thread_a0->spin_unlock(&_G.lock);
 }
 
 
@@ -189,7 +191,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_log_a0->register_handler(log_handler, NULL);
 
-    ce_api_a0->register_api(DOCK_INTERFACE, &ct_dock_i0);
+    ce_api_a0->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
 
     ct_dock_a0->create_dock(LOG_VIEW, true);
 

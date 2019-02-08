@@ -1,11 +1,13 @@
 #ifndef CETECH_RESOURCE_COMPILER_H
 #define CETECH_RESOURCE_COMPILER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-#include <celib/module.inl>
 
 #define CT_RESOURCE_COMPILER_API \
     CE_ID64_0("ct_resource_compiler_a0", 0xc084f9ae737212dcULL)
@@ -24,19 +26,23 @@
 
 
 struct ce_vio;
-struct ce_alloc;
+struct ce_alloc_t0;
 struct ct_resource_id;
 
 struct ct_resource_compiler_a0 {
     void (*compile_all)();
 
-    char *(*get_tmp_dir)(struct ce_alloc *a,
+    char *(*get_tmp_dir)(struct ce_alloc_t0 *a,
                          const char *platform);
 
-    char *(*external_join)(struct ce_alloc *a,
+    char *(*external_join)(struct ce_alloc_t0 *a,
                            const char *name);
 };
 
 CE_MODULE(ct_resource_compiler_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_RESOURCE_COMPILER_H

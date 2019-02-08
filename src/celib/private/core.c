@@ -1,10 +1,9 @@
-#include <stdbool.h>
 #include <celib/module.h>
-#include <celib/memory.h>
-#include <celib/api_system.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
 #include <celib/log.h>
 #include <signal.h>
-#include <celib/os.h>
+
 #include <stdlib.h>
 #include "celib/private/api_private.h"
 
@@ -29,7 +28,7 @@ void init_signals(void) {
 }
 
 bool ce_init() {
-    struct ce_alloc *core_alloc =ce_memory_a0->system;
+    struct ce_alloc_t0 *core_alloc =ce_memory_a0->system;
 
     api_init(core_alloc);
 

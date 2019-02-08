@@ -1,6 +1,9 @@
 #ifndef CETECH_DEFAULT_RENDER_GRAPH_H
 #define CETECH_DEFAULT_RENDER_GRAPH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -8,7 +11,7 @@
     CE_ID64_0("ct_default_rg_a0", 0xe909f984404895b4ULL)
 
 struct ct_rg_module;
-struct ct_world;
+typedef struct ct_world_t0 ct_world_t0;
 
 
 #define _GBUFFER \
@@ -26,9 +29,13 @@ struct ct_world;
 
 struct ct_default_rg_a0 {
     void (*feed_module)(struct ct_rg_module *m,
-                        struct ct_world world,
-                        struct ct_entity camera);
+                        ct_world_t0 world,
+                        struct ct_entity_t0 camera);
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 CE_MODULE(ct_default_rg_a0);
 

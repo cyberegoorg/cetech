@@ -1,11 +1,13 @@
 #ifndef CETECH_RESOURCE_H
 #define CETECH_RESOURCE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
-
-#include <celib/module.inl>
 
 #define CT_RESOURCE_API \
     CE_ID64_0("ct_resource_a0", 0x60a25ca5a83c2ac2ULL)
@@ -27,15 +29,15 @@
 
 
 struct ce_vio;
-struct ce_alloc;
-struct ce_cdb_t;
+struct ce_alloc_t0;
+struct ce_cdb_t0;
 
-struct ct_resource_id {
+typedef struct ct_resource_id {
     uint64_t uid;
-};
+} ct_resource_id;
 
 
-typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t db,
+typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t0 db,
                                          uint64_t obj);
 
 //! Resource interface
@@ -69,5 +71,8 @@ struct ct_resource_a0 {
 
 CE_MODULE(ct_resource_a0);
 
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_RESOURCE_H

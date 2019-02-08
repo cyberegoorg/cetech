@@ -1,6 +1,9 @@
 #ifndef CETECH_GAMEPAD_H
 #define CETECH_GAMEPAD_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -49,6 +52,10 @@ enum {
     GAMEPAD_AXIS_TRIGER = 3,  //!< Triger axis
     GAMEPAD_AXIX_MAX          //!< Max axis
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_GAMEPAD_H
 //! \}

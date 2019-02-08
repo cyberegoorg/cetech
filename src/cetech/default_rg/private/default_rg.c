@@ -2,11 +2,11 @@
 // includes
 //==============================================================================
 
-#include <celib/allocator.h>
-#include <celib/api_system.h>
-#include <celib/memory.h>
+#include <celib/memory/allocator.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
 #include <celib/module.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/resource/resource.h>
@@ -17,7 +17,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/mesh/mesh_renderer.h>
 #include <string.h>
-#include <celib/fmath.inl>
+#include <celib/math/math.h>
 #include <celib/macros.h>
 
 
@@ -31,7 +31,7 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_alloc *alloc;
+    struct ce_alloc_t0 *alloc;
 } _G;
 
 //==============================================================================
@@ -199,8 +199,8 @@ static void gbuffer_pass_on_setup(void *inst,
 
 struct gbuffer_pass {
     struct ct_rg_pass pass;
-    struct ct_entity camera;
-    struct ct_world world;
+    struct ct_entity_t0 camera;
+    ct_world_t0 world;
 };
 
 static void gbuffer_pass_on_pass(void *inst,
@@ -235,8 +235,8 @@ static void gbuffer_pass_on_pass(void *inst,
 
 
 static void feed_module(struct ct_rg_module *m1,
-                        struct ct_world world,
-                        struct ct_entity camera) {
+                        ct_world_t0 world,
+                        struct ct_entity_t0 camera) {
     struct ct_rg_module* gm = m1->add_extension_point(m1, _GBUFFER);
 
     gm->add_pass(gm, &(struct gbuffer_pass) {
@@ -269,7 +269,7 @@ static void _init(struct ce_api_a0 *api) {
 
     init_decl();
 
-    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api);
+    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api, sizeof(default_render_graph_api));
 }
 
 static void _shutdown() {

@@ -2,9 +2,9 @@
 
 
 #include <celib/macros.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 
 #include <cetech/resource/resource.h>
@@ -33,7 +33,7 @@ static void draw(uint64_t obj) {
         return;
     }
 
-    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -56,7 +56,7 @@ static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
         return NULL;
     }
 
-    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -78,7 +78,7 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
-    struct ce_api_entry it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -97,7 +97,7 @@ static void draw_menu(uint64_t obj) {
 }
 
 static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
@@ -108,101 +108,71 @@ static void on_debugui(uint64_t dock) {
         obj = locked_object;
     }
 
-    ct_debugui_a0->Columns(3, NULL, true);
-
-//    static float initial_spacing = 70.f;
-//    if (initial_spacing) {
-//        ct_debugui_a0->SetColumnWidth(0, initial_spacing);
-//        initial_spacing = 0;
-//    }
-
-    ct_debugui_a0->Separator();
-
-    ct_debugui_a0->NextColumn();
-
-    ct_debugui_a0->Text("Property");
-    ct_debugui_a0->NextColumn();
-
-    ct_debugui_a0->Text("Value");
-    ct_debugui_a0->NextColumn();
-
-    ct_debugui_a0->Separator();
-
     char buffer[256];
 
     snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
 
 
-    bool open = ct_editor_ui_a0->ui_prop_tree_node(ICON_FA_FILE" Resource",
-                                                   DebugUITreeNodeFlags_DefaultOpen,
-                                                   obj);
+    ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Resource");
+    ct_debugui_a0->Separator();
 
-    ct_debugui_a0->NextColumn();
+    if (obj) {
+        const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                         obj);
 
-    if (open) {
-        ct_debugui_a0->Separator();
-        if (obj) {
-            const ce_cdb_obj_o *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                             obj);
+        const char *name = ce_cdb_a0->read_str(reader_obj,
+                                               ASSET_NAME_PROP,
+                                               NULL);
+        if (name) {
+            snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
+            ct_debugui_a0->Text("Name");
 
-            const char *name = ce_cdb_a0->read_str(reader_obj,
+            ct_debugui_a0->SameLine(0, 2);
+
+            ct_debugui_a0->PushItemWidth(-1);
+            ct_debugui_a0->InputText("##NameResourceProp",
+                                     buffer,
+                                     strlen(buffer),
+                                     DebugInputTextFlags_ReadOnly,
+                                     0, NULL);
+            ct_debugui_a0->PopItemWidth();
+        }
+
+        uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
+        if (instance_of) {
+            const ce_cdb_obj_o0 *inst_r = ce_cdb_a0->read(ce_cdb_a0->db(),
+                                                         instance_of);
+
+            const char *name = ce_cdb_a0->read_str(inst_r,
                                                    ASSET_NAME_PROP,
                                                    NULL);
+
             if (name) {
-                ct_debugui_a0->NextColumn();
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
-                ct_debugui_a0->Text("Name");
-                ct_debugui_a0->NextColumn();
-                ct_debugui_a0->PushItemWidth(-1);
-                ct_debugui_a0->InputText("##NameResourceProp",
-                                         buffer,
-                                         strlen(buffer),
-                                         DebugInputTextFlags_ReadOnly,
-                                         0, NULL);
-                ct_debugui_a0->PopItemWidth();
-                ct_debugui_a0->NextColumn();
+            } else {
+                snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx",
+                         instance_of);
             }
 
+            ct_debugui_a0->Text("Inst. of");
 
-            uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
-            if (instance_of) {
-                const ce_cdb_obj_o *inst_r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                             instance_of);
+            ct_debugui_a0->SameLine(0, 2);
 
-                const char *name = ce_cdb_a0->read_str(inst_r,
-                                                       ASSET_NAME_PROP,
-                                                       NULL);
-
-                if (name) {
-                    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
-                } else {
-                    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx",
-                             instance_of);
-                }
-
-                ct_debugui_a0->NextColumn();
-                ct_debugui_a0->Text("Inst. of");
-                ct_debugui_a0->NextColumn();
-                ct_debugui_a0->PushItemWidth(-1);
-                ct_debugui_a0->InputText("##InstanceOfResourceProp",
-                                         buffer,
-                                         strlen(buffer),
-                                         DebugInputTextFlags_ReadOnly,
-                                         0, NULL);
-                ct_debugui_a0->PopItemWidth();
-                ct_debugui_a0->NextColumn();
-            }
+            ct_debugui_a0->PushItemWidth(-1);
+            ct_debugui_a0->InputText("##InstanceOfResourceProp",
+                                     buffer,
+                                     strlen(buffer),
+                                     DebugInputTextFlags_ReadOnly,
+                                     0, NULL);
+            ct_debugui_a0->PopItemWidth();
         }
-        ct_debugui_a0->TreePop();
     }
 
     draw(obj);
-
-    ct_debugui_a0->Columns(1, NULL, true);
 }
 
 static void on_menu(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
                                                     0);
 
@@ -255,8 +225,8 @@ static void _init(struct ce_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0);
-    api->register_api(CT_PROP_EDITOR_API, ct_property_editor_a0);
+    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
 
     ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, true);
 }

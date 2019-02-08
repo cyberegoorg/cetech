@@ -1,10 +1,11 @@
 #ifndef CETECH_NODE_GRAPH_EDITOR_H
 #define CETECH_NODE_GRAPH_EDITOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
-#include <celib/module.inl>
-
 
 #define CT_NODE_GRAPH_EDITOR_API \
     CE_ID64_0("ct_node_graph_editor_a0", 0xc13af81eb433e221ULL)
@@ -23,9 +24,13 @@ struct ct_node_graph_editor_a0 {
     void (*add_node_modal)(const char *modal_id,
                            uint64_t obj);
 
-    void (*draw_ng_editor)(uint64_t graph);
+    void (*draw_ng_editor)(uint64_t graph, uint64_t context);
 };
 
 CE_MODULE(ct_node_graph_editor_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_NODE_GRAPH_EDITOR_H

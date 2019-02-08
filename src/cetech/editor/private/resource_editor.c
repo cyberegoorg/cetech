@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <celib/memory/allocator.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
-#include <celib/fmath.inl>
-
+#include <celib/math/math.h>
 #include <celib/macros.h>
-#include "celib/hashlib.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/id.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/module.h"
 
 
@@ -29,7 +29,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <celib/array.inl>
+#include <celib/containers/array.h>
 #include <cetech/editor/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/dock.h>
@@ -56,7 +56,7 @@ static struct _G {
 
 
 static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
-    struct ce_api_entry it = ce_api_a0->first(RESOURCE_EDITOR_I);
+    struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_EDITOR_I);
     while (it.api) {
         struct ct_resource_editor_i0 *i = (it.api);
 
@@ -71,7 +71,7 @@ static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
 };
 
 static void draw_editor(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
 
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
@@ -85,25 +85,26 @@ static void draw_editor(uint64_t dock) {
         return;
     }
 
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     bool click = ct_debugui_a0->IsMouseClicked(0, false);
 
     if (is_mouse_hovering && click) {
-        const ce_cdb_obj_o *creader = ce_cdb_a0->read(ce_cdb_a0->db(),editor->context_obj);
+        const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),editor->context_obj);
         uint64_t name = ce_cdb_a0->read_uint64(creader,
                                                RESOURCE_EDITOR_OBJ, 0);
 
         uint64_t obj = name;
 
-        const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
         ct_selected_object_a0->set_selected_object(context, obj);
     }
 
-    i->draw_ui(editor->context_obj);
+    i->draw_ui(editor->context_obj, context);
 }
 
 static void draw_editor_menu(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
 
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
@@ -141,7 +142,7 @@ static uint32_t find_editor(uint64_t obj) {
 #define DEFAULT_EDITOR_NAME  "Editor"
 
 static const char *dock_title(uint64_t dock) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
@@ -186,7 +187,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
     uint64_t dock = ct_dock_a0->create_dock(_ASSET_EDITOR, true);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),dock);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),dock);
     ce_cdb_a0->set_ptr(w, _PROP_EDITOR, editor);
     ce_cdb_a0->write_commit(w);
 
@@ -205,7 +206,7 @@ static void open(uint64_t obj) {
     e->type = type;
     e->obj = obj;
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
     ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
     ce_cdb_a0->write_commit(w);
 
@@ -262,10 +263,8 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    ce_api_a0->register_api(DOCK_INTERFACE, &dock_i);
-
-
-    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0);
+    ce_api_a0->register_api(DOCK_INTERFACE, &dock_i, sizeof(dock_i));
+    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0, sizeof(ct_editor_module_i0));
 }
 
 static void _shutdown() {

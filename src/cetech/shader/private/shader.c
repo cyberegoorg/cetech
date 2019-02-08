@@ -4,14 +4,16 @@
 
 #include <stdio.h>
 
-#include "celib/allocator.h"
-#include "celib/buffer.inl"
+#include "celib/memory/allocator.h"
+#include "celib/celib_types.h"
+#include "celib/macros.h"
+#include "celib/containers/buffer.h"
 
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 #include "celib/log.h"
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 #include "cetech/machine/machine.h"
 
 #include "cetech/resource/resource.h"
@@ -22,7 +24,7 @@
 #include <cetech/shader/shader.h>
 #include <cetech/renderer/renderer.h>
 
-#include <celib/os.h>
+
 #include <celib/ydb.h>
 #include <celib/config.h>
 #include <celib/ydb.h>
@@ -31,6 +33,9 @@
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <celib/fs.h>
+#include <celib/os/path.h>
+#include <celib/os/process.h>
+#include <celib/os/vio.h>
 
 //==============================================================================
 // GLobals
@@ -38,7 +43,7 @@
 
 #define _G ShaderResourceGlobals
 struct _G {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -53,7 +58,7 @@ static int _shaderc(const char *input,
                     const char *type,
                     const char *platform,
                     const char *profile) {
-    struct ce_alloc *a = ce_memory_a0->system;
+    struct ce_alloc_t0 *a = ce_memory_a0->system;
 
     char *buffer = NULL;
 
@@ -75,7 +80,7 @@ static int _shaderc(const char *input,
                      " 2>&1",  // TODO: move to exec
                      input, output, include_path, type, platform, profile);
 
-    int status = ce_os_a0->process->exec(buffer);
+    int status = ce_os_process_a0->exec(buffer);
 
     ce_log_a0->debug("shaderc", "STATUS %d", status);
 
@@ -87,18 +92,18 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
 
-    struct ce_alloc *a = ce_memory_a0->system;
+    struct ce_alloc_t0 *a = ce_memory_a0->system;
 
     char dir[1024] = {};
-    ce_os_a0->path->dir(dir, filename);
+    ce_os_path_a0->dir(dir, filename);
 
     char *tmp_dirname = NULL;
-    ce_os_a0->path->join(&tmp_dirname, a, 2, tmp_dir, dir);
+    ce_os_path_a0->join(&tmp_dirname, a, 2, tmp_dir, dir);
 
-    ce_os_a0->path->make_path(tmp_dirname);
+    ce_os_path_a0->make_path(tmp_dirname);
 
     int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
-                       ce_os_a0->path->filename(filename));
+                       ce_os_path_a0->filename(filename));
     ce_buffer_free(tmp_dirname, a);
 
     return ret;
@@ -121,28 +126,28 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static bool _compile(struct ce_cdb_t db,
+static bool _compile(struct ce_cdb_t0 db,
                      uint64_t obj) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     const char *vs_input = ce_cdb_a0->read_str(reader, SHADER_VS_INPUT, "");
     const char *fs_input = ce_cdb_a0->read_str(reader, SHADER_FS_INPUT, "");
 
-    struct ce_alloc *a = ce_memory_a0->system;
+    struct ce_alloc_t0 *a = ce_memory_a0->system;
 
-    const ce_cdb_obj_o *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+    const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                    ce_config_a0->obj());
     const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     const char *core_dir = ce_cdb_a0->read_str(c_reader, CONFIG_CORE,
                                                "");
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(db, obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
 
     char *include_dir = NULL;
-    ce_os_a0->path->join(&include_dir, a, 2, core_dir, "bgfxshaders");
+    ce_os_path_a0->join(&include_dir, a, 2, core_dir, "bgfxshaders");
 
-    // TODO: temp ce_alloc?
+    // TODO: temp ce_alloc_t0?
     char output_path[1024] = {};
     char tmp_filename[1024] = {};
 
@@ -156,7 +161,7 @@ static bool _compile(struct ce_cdb_t db,
 //    compilator_api->add_dependency(filename, vs_input);
 
     char *input_path = NULL;
-    ce_os_a0->path->join(&input_path, a, 2, source_dir, vs_input);
+    ce_os_path_a0->join(&input_path, a, 2, source_dir, vs_input);
 
     _gen_tmp_name(output_path, tmp_dir,
                   CE_ARRAY_LEN(tmp_filename), vs_input);
@@ -175,7 +180,7 @@ static bool _compile(struct ce_cdb_t db,
     struct ce_vio *tmp_file;
 
     do {
-        tmp_file = ce_os_a0->vio->from_file(output_path, VIO_OPEN_READ);
+        tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
     } while (tmp_file == NULL);
 
 
@@ -194,7 +199,7 @@ static bool _compile(struct ce_cdb_t db,
 //    compilator_api->add_dependency(filename, fs_input);
     ce_buffer_clear(input_path);
 
-    ce_os_a0->path->join(&input_path, a, 2, source_dir, fs_input);
+    ce_os_path_a0->join(&input_path, a, 2, source_dir, fs_input);
 
     _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename),
                   fs_input);
@@ -210,7 +215,7 @@ static bool _compile(struct ce_cdb_t db,
         return false;
     }
 
-    tmp_file = ce_os_a0->vio->from_file(output_path, VIO_OPEN_READ);
+    tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
     char *fs_data = CE_ALLOC(ce_memory_a0->system, char,
                              tmp_file->size(tmp_file) + 1);
 
@@ -228,7 +233,7 @@ static bool _compile(struct ce_cdb_t db,
     return true;
 }
 
-bool shader_compiler(struct ce_cdb_t db,
+bool shader_compiler(struct ce_cdb_t0 db,
                      uint64_t k) {
     return _compile(db, k);
 }
@@ -237,7 +242,7 @@ bool shader_compiler(struct ce_cdb_t db,
 static void online(uint64_t name,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t fs_blob_size = 0;
     void *fs_blob;
@@ -258,7 +263,7 @@ static void online(uint64_t name,
     bgfx_program_handle_t program;
     program = ct_gfx_a0->bgfx_create_program(vs_shader, fs_shader, true);
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
     ce_cdb_a0->set_uint64(writer, SHADER_PROP, program.idx);
     ce_cdb_a0->write_commit(writer);
 }
@@ -267,7 +272,7 @@ static void offline(uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     const uint64_t program = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
     ct_gfx_a0->bgfx_destroy_program(
@@ -296,7 +301,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 int shader_init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0);
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
 
     return 1;
 }
@@ -305,7 +310,7 @@ void shader_shutdown() {
 }
 
 bgfx_program_handle_t shader_get(uint64_t shader) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), shader);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), shader);
 
     const uint64_t idx = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
     return (bgfx_program_handle_t) {.idx=(uint16_t) idx};
@@ -318,7 +323,7 @@ static struct ct_shader_a0 shader_api = {
 struct ct_shader_a0 *ct_shader_a0 = &shader_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_SHADER_API, &shader_api);
+    api->register_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
 }
 
 CE_MODULE_DEF(
@@ -326,7 +331,6 @@ CE_MODULE_DEF(
         {
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_log_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);

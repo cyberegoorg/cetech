@@ -1,4 +1,4 @@
-static struct ct_gfx_a0 rendderapi_api = {
+static struct ct_gfx_a0 gfx_api = {
         .bgfx_vertex_decl_begin = bgfx_vertex_decl_begin,
         .bgfx_vertex_decl_add = bgfx_vertex_decl_add,
         .bgfx_vertex_decl_decode = bgfx_vertex_decl_decode,
@@ -175,4 +175,4 @@ static struct ct_gfx_a0 rendderapi_api = {
         .bgfx_request_screen_shot = bgfx_request_screen_shot,
 };
 
-struct ct_gfx_a0 *ct_gfx_a0 = &rendderapi_api;
+struct ct_gfx_a0 *ct_gfx_a0 = &gfx_api;

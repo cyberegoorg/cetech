@@ -4,12 +4,14 @@
 
 #include <celib/core.h>
 #include <celib/log.h>
-#include <celib/os.h>
-#include <celib/memory.h>
-#include <celib/allocator.h>
-#include <celib/murmur_hash.inl>
-#include <celib/hash.inl>
+
+#include <celib/memory/memory.h>
+#include <celib/memory/allocator.h>
+#include <celib/murmur_hash.h>
+#include <celib/containers/hash.h>
 #include <celib/task.h>
+#include <celib/os/path.h>
+#include <celib/os/vio.h>
 
 #define SEED 0
 
@@ -23,7 +25,7 @@ void process_file(void *data) {
 
     ce_log_a0->info("hash", "Process file: %s", filename);
 
-    struct ce_vio *file = ce_os_a0->vio->from_file(filename, VIO_OPEN_READ);
+    struct ce_vio *file = ce_os_vio_a0->from_file(filename, VIO_OPEN_READ);
     uint64_t size = file->size(file);
     char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
     file->read(file, input_data, 1, size);
@@ -90,7 +92,7 @@ void process_file(void *data) {
     }
 
     if (change) {
-        file = ce_os_a0->vio->from_file(filename, VIO_OPEN_WRITE);
+        file = ce_os_vio_a0->from_file(filename, VIO_OPEN_WRITE);
         file->write(file, input_data, size, 1);
         file->close(file);
     }
@@ -131,7 +133,7 @@ int main(int argc,
         }
     }
 
-    struct ce_alloc *a = ce_memory_a0->system;
+    struct ce_alloc_t0 *a = ce_memory_a0->system;
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     if (printusage) {
@@ -146,7 +148,7 @@ int main(int argc,
     uint32_t files_count;
 
     const char *filter[] = {"*.c", "*.h", "*.inl", "*.cpp"};
-    ce_os_a0->path->list(source_dir, CE_ARR_ARG(filter),
+    ce_os_path_a0->list(source_dir, CE_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
     struct ce_task_item tasks[files_count];
@@ -161,7 +163,7 @@ int main(int argc,
     ce_task_a0->add(tasks, files_count, &counter);
     ce_task_a0->wait_for_counter(counter, 0);
 
-    ce_os_a0->path->list_free(files, files_count, a);
+    ce_os_path_a0->list_free(files, files_count, a);
 
     ce_shutdown();
 }

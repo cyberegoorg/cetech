@@ -1,9 +1,11 @@
-#include <celib/hash.inl>
-#include <celib/memory.h>
-#include <celib/hashlib.h>
+#include <celib/macros.h>
+#include <celib/memory/allocator.h>
+#include <celib/containers/hash.h>
+#include <celib/memory/memory.h>
+#include <celib/id.h>
 #include "celib/macros.h"
 #include "celib/module.h"
-#include "celib/api_system.h"
+#include "celib/api.h"
 
 #include "cetech/editor/selcted_object.h"
 
@@ -13,7 +15,8 @@ static struct _G {
     struct ce_hash_t selected_object;
 } _G;
 
-static void set_selected_object(uint64_t context, uint64_t obj) {
+static void set_selected_object(uint64_t context,
+                                uint64_t obj) {
     ce_hash_add(&_G.selected_object, context, obj, ce_memory_a0->system);
 }
 
@@ -33,7 +36,9 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api(CT_SELECTED_OBJECT_API, &ct_selected_object_api0);
+    api->register_api(CT_SELECTED_OBJECT_API,
+                      &ct_selected_object_api0,
+                      sizeof(ct_selected_object_api0));
 }
 
 static void _shutdown() {

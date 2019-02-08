@@ -1,6 +1,10 @@
 #ifndef CETECH_RENDERER_H
 #define CETECH_RENDERER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -34,16 +38,16 @@
 
 typedef void (*ct_renderender_on_render)();
 
-struct ct_world;
-struct ct_entity;
-struct ct_rg_module;
-struct ct_rg_builder;
+typedef struct ct_world_t0 ct_world_t0;
+typedef struct ct_entity_t0 ct_entity_t0;
+typedef struct ct_rg_module ct_rg_module;
+typedef struct ct_rg_builder ct_rg_builder;
 
 struct ct_renderer_component_i0 {
-    void (*feed_module)(struct ct_world world,
+    void (*feed_module)(ct_world_t0 world,
                         struct ct_rg_module *module);
 
-    void (*render)(struct ct_world world,
+    void (*render)(ct_world_t0 world,
                    struct ct_rg_builder *builder);
 };
 
@@ -68,8 +72,8 @@ struct ct_renderer_a0 {
 
     uint64_t (*new_viewid)();
 
-    struct ct_viewport0 (*create_viewport)(struct ct_world world,
-                                           struct ct_entity main_camera);
+    struct ct_viewport0 (*create_viewport)(ct_world_t0 world,
+                                           struct ct_entity_t0 main_camera);
 
     void (*destroy_viewport)(struct ct_viewport0 viewport);
 
@@ -80,5 +84,9 @@ struct ct_renderer_a0 {
 
 CE_MODULE(ct_renderer_a0);
 
+#ifdef __cplusplus
+};
+#endif
+
 #endif //CETECH_RENDERER_H
-//! \}
+

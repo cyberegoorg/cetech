@@ -3,13 +3,15 @@
 //==============================================================================
 
 
-#include <celib/api_system.h>
-#include <celib/memory.h>
-#include <celib/os.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
+
 #include <celib/log.h>
 #include <celib/task.h>
 #include <celib/module.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
+#include <celib/os/thread.h>
+#include <celib/os/cpu.h>
 
 #include "queue_mpmc.h"
 
@@ -45,7 +47,7 @@ typedef struct {
 static const task_id_t task_null = (task_id_t) {.id = 0};
 
 static struct _G {
-    ce_thread_t *workers[TASK_MAX_WORKERS - 1];
+    ce_thread_t0 workers[TASK_MAX_WORKERS - 1];
 
     // TASK
     struct task_t task_pool[MAX_TASK];
@@ -61,7 +63,7 @@ static struct _G {
 
     struct queue_mpmc job_queue;
     atomic_bool is_running;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G;
 
 // Private
@@ -160,7 +162,7 @@ static int _task_worker(void *o) {
 
     while (_G.is_running) {
         if (!do_work()) {
-            ce_os_a0->thread->yield();
+            ce_os_thread_a0->yield();
         }
     }
 
@@ -212,7 +214,7 @@ void wait_for_counter_no_work(struct ce_task_counter_t *signal,
                          int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {
-        ce_os_a0->thread->yield();
+        ce_os_thread_a0->yield();
     }
 
     uint32_t counter_idx = ((atomic_int *) signal) - _G.counter_pool;
@@ -240,9 +242,10 @@ struct ce_task_a0 *ce_task_a0 = &_task_api;
 static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api(CE_TASK_API, &_task_api);
+    api->register_api(CE_TASK_API, &_task_api, sizeof(_task_api));
 
-    int core_count = ce_os_a0->cpu->count();
+    int core_count = ce_os_cpu_a0->count();
+    //core_count = 4;
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -260,7 +263,7 @@ static void _init(struct ce_api_a0 *api) {
     atomic_init(&_G.task_pool_idx, 1);
 
     for (uint32_t j = 1; j < worker_count+1; ++j) {
-        _G.workers[j] = ce_os_a0->thread->create(_task_worker,
+        _G.workers[j] = ce_os_thread_a0->create(_task_worker,
                                                  "cetech_worker",
                                                  (void *) ((intptr_t) (j)));
     }
@@ -273,7 +276,7 @@ static void _shutdown() {
     int status = 0;
 
     for (uint32_t i = 1; i < _G.workers_count; ++i) {
-        ce_os_a0->thread->wait(_G.workers[i], &status);
+        ce_os_thread_a0->wait(_G.workers[i], &status);
     }
 
     queue_task_destroy(&_G.job_queue);

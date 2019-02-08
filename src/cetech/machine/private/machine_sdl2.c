@@ -2,26 +2,29 @@
 // Includes
 //==============================================================================
 
-#include "celib/memory.h"
+#include "celib/memory/memory.h"
 #include "celib/module.h"
-#include "celib/api_system.h"
+#include "celib/api.h"
 #include "celib/log.h"
 #include "celib/cdb.h"
-#include <celib/hashlib.h>
+#include <celib/id.h>
+#include <celib/memory/allocator.h>
 
-#include <celib/os.h>
+
 #include <celib/macros.h>
 
 #include "cetech/machine/machine.h"
 
 #include <include/SDL2/SDL.h>
+
 #include <cetech/renderer/renderer.h>
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/controlers/gamepad.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/controlers/controlers.h>
-#include <celib/array.inl>
+#include <celib/containers/array.h>
+#include <celib/os/window.h>
 
 extern int sdl_window_init(struct ce_api_a0 *api);
 
@@ -98,7 +101,7 @@ void sdl_mouse_process() {
     event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                      EVENT_MOUSE_MOVE);
 
-    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
     ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, _G.mouse.position[0]);
     ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, _G.mouse.position[1]);
     ce_cdb_a0->write_commit(w);
@@ -140,7 +143,7 @@ void sdl_keyboard_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_DOWN);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
+            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
@@ -151,7 +154,7 @@ void sdl_keyboard_process() {
             event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              EVENT_KEYBOARD_UP);
 
-            ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
+            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), event);
             ce_cdb_a0->set_uint64(w, CONTROLER_KEYCODE, i);
             ce_cdb_a0->write_commit(w);
 
@@ -281,7 +284,7 @@ void sdl_gamepad_process() {
                 uint64_t event = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                           EVENT_GAMEPAD_DOWN);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
@@ -296,7 +299,7 @@ void sdl_gamepad_process() {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_UP);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
@@ -323,7 +326,7 @@ void sdl_gamepad_process() {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_MOVE);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
@@ -376,7 +379,7 @@ static void _update(float dt) {
                                 ce_cdb_a0->db(),
                                 EVENT_WINDOW_RESIZED);
 
-                        ce_cdb_obj_o *w = ce_cdb_a0->write_begin(
+                        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(
                                 ce_cdb_a0->db(), event);
 
                         ce_cdb_a0->set_uint64(w, CT_MACHINE_WINDOW_ID,
@@ -402,7 +405,7 @@ static void _update(float dt) {
 
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, pos[0]);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, pos[1]);
@@ -420,7 +423,7 @@ static void _update(float dt) {
                         EVENT_KEYBOARD_TEXT);
 
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ce_cdb_a0->write_commit(w);
@@ -437,7 +440,7 @@ static void _update(float dt) {
                         ce_cdb_a0->db(),
                         EVENT_GAMEPAD_CONNECT);
 
-                ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ce_cdb_a0->write_commit(w);
@@ -463,7 +466,7 @@ static void _update(float dt) {
                             ce_cdb_a0->db(),
                             EVENT_GAMEPAD_DISCONNECT);
 
-                    ce_cdb_obj_o *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                              event);
                     ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ce_cdb_a0->write_commit(w);
@@ -520,8 +523,8 @@ static struct ct_kernel_task_i0 machine_task = {
 };
 
 static void init(struct ce_api_a0 *api) {
-    api->register_api(CT_MACHINE_API, &a0);
-    api->register_api(KERNEL_TASK_INTERFACE, &machine_task);
+    api->register_api(CT_MACHINE_API, &a0, sizeof(a0));
+    api->register_api(KERNEL_TASK_INTERFACE, &machine_task, sizeof(machine_task));
 
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_log_a0);

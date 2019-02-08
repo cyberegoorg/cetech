@@ -1,9 +1,0 @@
-cdb_uid: 0x1682ab50f4a0014a
-cdb_type: node_graph
-nodes:
-  cdb_uid: 0x1682ab50f4a0014b
-  cdb_type: nodes
-connections:
-  cdb_uid: 0x1682ab50f4a0014c
-  cdb_type: connections
-asset_name: content/ng1

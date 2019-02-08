@@ -6,9 +6,9 @@
 //==============================================================================
 
 #include <stdatomic.h>
-#include <celib/os.h>
+
 #include <celib/macros.h>
-#include "celib/allocator.h"
+#include "celib/memory/allocator.h"
 
 
 //==============================================================================
@@ -29,13 +29,13 @@ struct queue_mpmc {
     cacheline_pad_t _pad5;
     int _capacityMask;
     cacheline_pad_t _pad6;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 };
 
 
 void queue_task_init(struct queue_mpmc *q,
                      uint32_t capacity,
-                     struct ce_alloc *allocator) {
+                     struct ce_alloc_t0 *allocator) {
     *q = (struct queue_mpmc) {};
 
     q->_capacityMask = capacity - 1;

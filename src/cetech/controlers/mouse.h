@@ -1,8 +1,12 @@
 #ifndef CETECH_MOUSE_H
 #define CETECH_MOUSE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
-#include <celib/module.inl>
+
 
 #define CONTROLER_MOUSE \
     CE_ID64_0("mouse", 0x7c351278fe937928ULL)
@@ -42,11 +46,8 @@ enum {
     MOUSE_AXIS_MAX = 8 //!< Max axis
 };
 
-
-
-//==============================================================================
-// Api
-//==============================================================================
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_MOUSE_H
-//! \}

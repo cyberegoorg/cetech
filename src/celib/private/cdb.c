@@ -6,16 +6,17 @@
 #include <sys/mman.h>
 
 #include <celib/macros.h>
-#include <celib/api_system.h>
-#include <celib/memory.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
 #include <celib/log.h>
 #include <celib/cdb.h>
 #include <celib/module.h>
-#include <celib/allocator.h>
-#include <celib/hash.inl>
-#include <celib/os.h>
-#include <celib/buffer.inl>
-#include <celib/hashlib.h>
+#include <celib/memory/allocator.h>
+#include <celib/containers/hash.h>
+
+#include <celib/os/thread.h>
+#include <celib/containers/buffer.h>
+#include <celib/id.h>
 
 #include <sys/time.h>
 #include <math.h>
@@ -31,7 +32,7 @@
 // TODO: remove locks
 // TODO: split object_t
 
-struct object_t {
+typedef struct object_t {
     // prefab
     uint64_t instance_of;
     uint64_t *instances;
@@ -42,11 +43,11 @@ struct object_t {
 
     // writer
     uint64_t orig_obj;
-    struct ce_cdb_change_ev0 *changed;
+    struct ce_cdb_change_ev_t0 *changed;
 
     // object
     uint64_t type;
-    struct ce_cdb_t db;
+    struct ce_cdb_t0 db;
     struct ce_hash_t prop_map;
 
     uint64_t properties_count;
@@ -55,18 +56,18 @@ struct object_t {
     uint8_t *property_type;
     uint64_t *offset;
     uint8_t *values;
-};
+} object_t;
 
-struct db_t {
+typedef struct db_t {
     uint32_t used;
     uint32_t idx;
 
     // changed
-    struct ce_spinlock change_lock;
+    ce_spinlock_t0 change_lock;
     struct ce_hash_t changed_obj_set;
 
     uint64_t *changed_obj;
-    struct ce_spinlock destroy_lock;
+    ce_spinlock_t0 destroy_lock;
     uint64_t *destroyed_obj;
 
     // id pool
@@ -82,21 +83,21 @@ struct db_t {
     atomic_ullong free_objects_n;
     atomic_ullong to_free_objects_n;
 
-    struct ce_spinlock id_map_lock;
+    ce_spinlock_t0 id_map_lock;
     struct ce_hash_t id_map;
-};
+}db_t;
 
 static struct _G {
     struct db_t *dbs;
     uint32_t *to_free_db;
 
-    struct ce_alloc *allocator;
-    struct ce_cdb_t global_db;
+    struct ce_alloc_t0 *allocator;
+    struct ce_cdb_t0 global_db;
 
-    ct_cdb_obj_loader loader;
+    ct_cdb_obj_loader_t0 loader;
 } _G;
 
-void set_loader(ct_cdb_obj_loader loader) {
+void set_loader(ct_cdb_obj_loader_t0 loader) {
     _G.loader = loader;
 }
 
@@ -142,7 +143,7 @@ static uint64_t _gen_uid() {
     return _next_uid(1547316500ULL, 1);
 }
 
-static struct db_t *_get_db(struct ce_cdb_t db) {
+static struct db_t *_get_db(struct ce_cdb_t0 db) {
     return &_G.dbs[db.idx];
 }
 
@@ -152,15 +153,15 @@ static struct object_t *_get_object_from_id(struct db_t *db,
         return NULL;
     }
 
-    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+    ce_os_thread_a0->spin_lock(&db->id_map_lock);
     uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+    ce_os_thread_a0->spin_unlock(&db->id_map_lock);
 
     if (!obj) {
         if (_G.loader(objid)) {
-            ce_os_a0->thread->spin_lock(&db->id_map_lock);
+            ce_os_thread_a0->spin_lock(&db->id_map_lock);
             uint64_t obj = ce_hash_lookup(&db->id_map, objid, 0);
-            ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+            ce_os_thread_a0->spin_unlock(&db->id_map_lock);
 
             if (obj) {
                 return _get_object_from_id(db, objid);
@@ -176,40 +177,40 @@ static struct object_t *_get_object_from_id(struct db_t *db,
 
 static void _set_uid_obj(struct db_t *db,
                          uint64_t uid,
-                         ce_cdb_obj_o *obj) {
+                         struct object_t *obj) {
     CE_ASSERT(LOG_WHERE, uid != 0);
     CE_ASSERT(LOG_WHERE, obj != 0);
 
-    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+    ce_os_thread_a0->spin_lock(&db->id_map_lock);
     ce_hash_add(&db->id_map, uid, (uint64_t) obj, _G.allocator);
-    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+    ce_os_thread_a0->spin_unlock(&db->id_map_lock);
 }
 
 void _remove_uid_obj(struct db_t *db,
                      uint64_t uid) {
-//    ce_os_a0->thread->spin_lock(&db->id_map_lock);
+//    ce_os_thread_a0->spin_lock(&db->id_map_lock);
     ce_hash_remove(&db->id_map, uid);
-//    ce_os_a0->thread->spin_unlock(&db->id_map_lock);
+//    ce_os_thread_a0->spin_unlock(&db->id_map_lock);
 }
 
-static struct object_t *_get_object_from_o(const ce_cdb_obj_o *obj_o) {
+static struct object_t *_get_object_from_o(const ce_cdb_obj_o0 *obj_o) {
     return ((struct object_t *) obj_o);
 }
 
 static void _add_change(struct object_t *obj,
-                        struct ce_cdb_change_ev0 ev) {
+                        struct ce_cdb_change_ev_t0 ev) {
     struct db_t *db_inst = &_G.dbs[obj->db.idx];
 
     if (!ce_hash_contain(&db_inst->changed_obj_set, obj->orig_obj)) {
-        ce_os_a0->thread->spin_lock(&db_inst->change_lock);
+        ce_os_thread_a0->spin_lock(&db_inst->change_lock);
         ce_array_push(db_inst->changed_obj, obj->orig_obj, _G.allocator);
         ce_hash_add(&db_inst->changed_obj_set, obj->orig_obj, 0, _G.allocator);
-        ce_os_a0->thread->spin_unlock(&db_inst->change_lock);
+        ce_os_thread_a0->spin_unlock(&db_inst->change_lock);
     };
 
     uint32_t n = ce_array_size(obj->changed);
     for (int i = 0; i < n; ++i) {
-        struct ce_cdb_change_ev0 *ev_it = &obj->changed[i];
+        struct ce_cdb_change_ev_t0 *ev_it = &obj->changed[i];
         if ((ev_it->type == ev.type)
             && (ev_it->prop == ev.prop)) {
             ev_it->new_value = ev.new_value;
@@ -218,17 +219,17 @@ static void _add_change(struct object_t *obj,
         }
     }
 
-    ce_os_a0->thread->spin_lock(&db_inst->change_lock);
+    ce_os_thread_a0->spin_lock(&db_inst->change_lock);
     ce_array_push(obj->changed, ev, _G.allocator);
-    ce_os_a0->thread->spin_unlock(&db_inst->change_lock);
+    ce_os_thread_a0->spin_unlock(&db_inst->change_lock);
 }
 
 static uint64_t _object_new_property(struct object_t *obj,
                                      uint64_t key,
-                                     enum ce_cdb_type type,
+                                     enum ce_cdb_type_e0 type,
                                      const void *value,
                                      size_t size,
-                                     const struct ce_alloc *alloc) {
+                                     const struct ce_alloc_t0 *alloc) {
     const uint64_t prop_count = obj->properties_count;
     const uint64_t values_size = ce_array_size(obj->values);
 
@@ -247,7 +248,7 @@ static uint64_t _object_new_property(struct object_t *obj,
 }
 
 struct object_t *_new_object(struct db_t *db,
-                             const struct ce_alloc *a) {
+                             const struct ce_alloc_t0 *a) {
 
     struct object_t *obj;
     if (db->free_objects_n) {
@@ -270,7 +271,7 @@ struct object_t *_new_object(struct db_t *db,
 
 static struct object_t *_object_clone(struct db_t *db,
                                       struct object_t *obj,
-                                      const struct ce_alloc *alloc) {
+                                      const struct ce_alloc_t0 *alloc) {
     const uint64_t properties_count = obj->properties_count;
     const uint64_t values_size = ce_array_size(obj->values);
 
@@ -335,7 +336,7 @@ static int virt_free(void *addr,
     return munmap(addr, size);
 }
 
-static struct ce_cdb_t create_db() {
+static struct ce_cdb_t0 create_db() {
     uint64_t n = ce_array_size(_G.dbs);
 
     uint32_t idx = UINT32_MAX;
@@ -368,10 +369,10 @@ static struct ce_cdb_t create_db() {
                                                                sizeof(struct object_t *))
     };
 
-    return (struct ce_cdb_t) {.idx = idx};
+    return (struct ce_cdb_t0) {.idx = idx};
 };
 
-static void create_object_uid(struct ce_cdb_t db,
+static void create_object_uid(struct ce_cdb_t0 db,
                               uint64_t uid,
                               uint64_t type) {
     struct db_t *db_inst = &_G.dbs[db.idx];
@@ -385,23 +386,23 @@ static void create_object_uid(struct ce_cdb_t db,
 }
 
 
-static uint64_t create_object(struct ce_cdb_t db,
+static uint64_t create_object(struct ce_cdb_t0 db,
                               uint64_t type) {
     uint64_t uid = _gen_uid();
     create_object_uid(db, uid, type);
     return uid;
 }
 
-static ce_cdb_obj_o *write_begin(struct ce_cdb_t db,
+static ce_cdb_obj_o0 *write_begin(struct ce_cdb_t0 db,
                                  uint64_t _obj);
 
-static void write_commit(ce_cdb_obj_o *_writer);
+static void write_commit(ce_cdb_obj_o0 *_writer);
 
-void set_subobject(ce_cdb_obj_o *_writer,
+void set_subobject(ce_cdb_obj_o0 *_writer,
                    uint64_t property,
                    uint64_t subobject);
 
-static bool prop_exist(const ce_cdb_obj_o *reader,
+static bool prop_exist(const ce_cdb_obj_o0 *reader,
                        uint64_t key) {
 
     if (!reader) {
@@ -419,11 +420,11 @@ static bool prop_exist(const ce_cdb_obj_o *reader,
     return false;
 }
 
-void prop_copy(const ce_cdb_obj_o *from,
-               ce_cdb_obj_o *to,
+void prop_copy(const ce_cdb_obj_o0 *from,
+               ce_cdb_obj_o0 *to,
                uint64_t prop);
 
-static void set_from(struct ce_cdb_t _db,
+static void set_from(struct ce_cdb_t0 _db,
                      uint64_t from,
                      uint64_t to) {
     struct db_t *db = _get_db(_db);
@@ -433,10 +434,10 @@ static void set_from(struct ce_cdb_t _db,
 
 }
 
-static uint64_t create_from(struct ce_cdb_t db,
+static uint64_t create_from(struct ce_cdb_t0 db,
                             uint64_t from);
 
-uint64_t create_from_uid(struct ce_cdb_t db,
+uint64_t create_from_uid(struct ce_cdb_t0 db,
                          uint64_t from,
                          uint64_t uid) {
     struct db_t *db_inst = &_G.dbs[db.idx];
@@ -456,8 +457,8 @@ uint64_t create_from_uid(struct ce_cdb_t db,
 
     ce_array_push(from_obj->instances, uid, _G.allocator);
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(db, from);
-    struct object_t *wr = inst;
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, from);
+    object_t *wr = inst;
     for (int i = 1; i < from_obj->properties_count; ++i) {
         uint64_t key = from_obj->keys[i];
         if (from_obj->property_type[i] == CDB_TYPE_SUBOBJECT) {
@@ -478,13 +479,13 @@ uint64_t create_from_uid(struct ce_cdb_t db,
     return (uint64_t) uid;
 }
 
-static uint64_t create_from(struct ce_cdb_t db,
+static uint64_t create_from(struct ce_cdb_t0 db,
                             uint64_t from) {
     uint64_t uid = _gen_uid();
     return create_from_uid(db, from, uid);
 }
 
-static uint64_t clone(struct ce_cdb_t db,
+static uint64_t clone(struct ce_cdb_t0 db,
                       uint64_t from) {
     struct db_t *db_inst = _get_db(db);
     struct object_t *from_obj = _get_object_from_id(db_inst, from);
@@ -519,7 +520,7 @@ static uint64_t clone(struct ce_cdb_t db,
     return uid;
 }
 
-static void destroy_db(struct ce_cdb_t db) {
+static void destroy_db(struct ce_cdb_t0 db) {
     ce_array_push(_G.to_free_db, db.idx, _G.allocator);
 }
 
@@ -538,7 +539,7 @@ static void _add_obj_to_destroy_list(struct db_t *db_inst,
     db_inst->to_free_objects_id[idx] = _obj;
 }
 
-static void destroy_object(struct ce_cdb_t db,
+static void destroy_object(struct ce_cdb_t0 db,
                            uint64_t _obj) {
     struct db_t *db_inst = _get_db(db);
 
@@ -699,10 +700,10 @@ struct cdb_binobj_header {
     uint64_t blob_buffer_size;
 };
 
-static void dump(struct ce_cdb_t db,
+static void dump(struct ce_cdb_t0 db,
                  uint64_t _obj,
                  char **output,
-                 struct ce_alloc *allocator) {
+                 struct ce_alloc_t0 *allocator) {
     struct db_t *dbi = _get_db(db);
 
     struct object_t *obj = _get_object_from_id(dbi, _obj);
@@ -791,7 +792,7 @@ static void dump(struct ce_cdb_t db,
 }
 
 
-static ce_cdb_obj_o *write_begin(struct ce_cdb_t db,
+static ce_cdb_obj_o0 *write_begin(struct ce_cdb_t0 db,
                                  uint64_t _obj) {
     struct db_t *db_inst = _get_db(db);
     struct object_t *obj = _get_object_from_id(db_inst, _obj);
@@ -803,22 +804,22 @@ static ce_cdb_obj_o *write_begin(struct ce_cdb_t db,
     return new_obj;
 }
 
-static enum ce_cdb_type prop_type(const ce_cdb_obj_o *reader,
+static enum ce_cdb_type_e0 prop_type(const ce_cdb_obj_o0 *reader,
                                   uint64_t key) {
     struct object_t *obj = _get_object_from_o(reader);
     uint64_t idx = _find_prop_index(obj, key);
 
     if (idx) {
-        return (enum ce_cdb_type) obj->property_type[idx];
+        return (enum ce_cdb_type_e0) obj->property_type[idx];
     }
 
     return CDB_TYPE_NONE;
 }
 
-static void _dispatch_instances(struct ce_cdb_t db,
+static void _dispatch_instances(struct ce_cdb_t0 db,
                                 struct object_t *orig_obj);
 
-static void write_commit(ce_cdb_obj_o *_writer) {
+static void write_commit(ce_cdb_obj_o0 *_writer) {
     struct object_t *writer = _get_object_from_o(_writer);
 
     struct db_t *db = _get_db(writer->db);
@@ -831,7 +832,7 @@ static void write_commit(ce_cdb_obj_o *_writer) {
     _destroy_object(db, orig_obj);
 }
 
-//static bool write_try_commit(ce_cdb_obj_o *_writer) {
+//static bool write_try_commit(ce_cdb_obj_o0 *_writer) {
 //    struct object_t *writer = _get_object_from_o(_writer);
 //    struct object_t *orig_obj = _get_object_from_id(writer->orig_obj);
 //
@@ -845,7 +846,7 @@ static void write_commit(ce_cdb_obj_o *_writer) {
 //    return ok;
 //}
 
-static void set_float(ce_cdb_obj_o *_writer,
+static void set_float(ce_cdb_obj_o0 *_writer,
                       uint64_t property,
                       float value) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -862,7 +863,7 @@ static void set_float(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -875,7 +876,7 @@ static void set_float(ce_cdb_obj_o *_writer,
     value_ptr->f = value;
 }
 
-static void set_bool(ce_cdb_obj_o *_writer,
+static void set_bool(ce_cdb_obj_o0 *_writer,
                      uint64_t property,
                      bool value) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -892,7 +893,7 @@ static void set_bool(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type = CE_CDB_CHANGE,
@@ -904,10 +905,10 @@ static void set_bool(ce_cdb_obj_o *_writer,
     value_ptr->b = value;
 }
 
-static void set_string(ce_cdb_obj_o *_writer,
+static void set_string(ce_cdb_obj_o0 *_writer,
                        uint64_t property,
                        const char *value) {
-    struct ce_alloc *a = _G.allocator;
+    struct ce_alloc_t0 *a = _G.allocator;
 
     struct object_t *writer = _get_object_from_o(_writer);
 
@@ -932,7 +933,7 @@ static void set_string(ce_cdb_obj_o *_writer,
 
     char *value_clone = ce_memory_a0->str_dup(value, a);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -944,7 +945,7 @@ static void set_string(ce_cdb_obj_o *_writer,
     value_ptr->str = value_clone;
 }
 
-static void set_uint64(ce_cdb_obj_o *_writer,
+static void set_uint64(ce_cdb_obj_o0 *_writer,
                        uint64_t property,
                        uint64_t value) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -959,7 +960,7 @@ static void set_uint64(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -971,7 +972,7 @@ static void set_uint64(ce_cdb_obj_o *_writer,
     value_ptr->uint64 = value;
 }
 
-static void set_ptr(ce_cdb_obj_o *_writer,
+static void set_ptr(ce_cdb_obj_o0 *_writer,
                     uint64_t property,
                     const void *value) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -987,7 +988,7 @@ static void set_ptr(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -999,7 +1000,7 @@ static void set_ptr(ce_cdb_obj_o *_writer,
     value_ptr->ptr = (void *) value;
 }
 
-static void set_ref(ce_cdb_obj_o *_writer,
+static void set_ref(ce_cdb_obj_o0 *_writer,
                     uint64_t property,
                     uint64_t ref) {
 
@@ -1020,7 +1021,7 @@ static void set_ref(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -1032,7 +1033,7 @@ static void set_ref(ce_cdb_obj_o *_writer,
     value_ptr->ref = ref;
 }
 
-uint64_t parent(struct ce_cdb_t _db,
+uint64_t parent(struct ce_cdb_t0 _db,
                 uint64_t object) {
     struct db_t *db = _get_db(_db);
 
@@ -1040,9 +1041,9 @@ uint64_t parent(struct ce_cdb_t _db,
     return obj->parent;
 }
 
-void set_subobjectw(ce_cdb_obj_o *_writer,
+void set_subobjectw(ce_cdb_obj_o0 *_writer,
                     uint64_t property,
-                    ce_cdb_obj_o *_subwriter) {
+                    ce_cdb_obj_o0 *_subwriter) {
     struct object_t *writer = _get_object_from_o(_writer);
     struct object_t *subwriter = _get_object_from_o(_subwriter);
 
@@ -1061,7 +1062,7 @@ void set_subobjectw(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -1075,7 +1076,7 @@ void set_subobjectw(ce_cdb_obj_o *_writer,
     subwriter->parent = writer->orig_obj;
 }
 
-void set_subobject(ce_cdb_obj_o *_writer,
+void set_subobject(ce_cdb_obj_o0 *_writer,
                    uint64_t property,
                    uint64_t subobject) {
     struct object_t *writer = _get_object_from_o(_writer);
@@ -1093,7 +1094,7 @@ void set_subobject(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -1113,11 +1114,11 @@ void set_subobject(ce_cdb_obj_o *_writer,
     }
 }
 
-void set_blob(ce_cdb_obj_o *_writer,
+void set_blob(ce_cdb_obj_o0 *_writer,
               uint64_t property,
               void *blob_data,
               uint64_t blob_size) {
-    struct ce_alloc *a = _G.allocator;
+    struct ce_alloc_t0 *a = _G.allocator;
 
     struct object_t *writer = _get_object_from_o(_writer);
 
@@ -1149,7 +1150,7 @@ void set_blob(ce_cdb_obj_o *_writer,
             writer->values +
             writer->offset[idx]);
 
-    _add_change(writer, (struct ce_cdb_change_ev0) {
+    _add_change(writer, (struct ce_cdb_change_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .type =CE_CDB_CHANGE,
@@ -1161,10 +1162,10 @@ void set_blob(ce_cdb_obj_o *_writer,
     value_ptr->blob = blob;
 }
 
-static bool prop_exist(const ce_cdb_obj_o *reader,
+static bool prop_exist(const ce_cdb_obj_o0 *reader,
                        uint64_t key);
 
-void remove_property(ce_cdb_obj_o *_writer,
+void remove_property(ce_cdb_obj_o0 *_writer,
                      uint64_t property) {
     struct object_t *writer = _get_object_from_o(_writer);
 
@@ -1180,7 +1181,7 @@ void remove_property(ce_cdb_obj_o *_writer,
                 writer->offset[idx]);
 
 
-        _add_change(writer, (struct ce_cdb_change_ev0) {
+        _add_change(writer, (struct ce_cdb_change_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .type =CE_CDB_REMOVE,
@@ -1208,7 +1209,7 @@ void remove_property(ce_cdb_obj_o *_writer,
     }
 }
 
-const ce_cdb_obj_o *read(struct ce_cdb_t _db,
+const ce_cdb_obj_o0 *read(struct ce_cdb_t0 _db,
                          uint64_t object) {
     if (!object) {
         return NULL;
@@ -1220,7 +1221,7 @@ const ce_cdb_obj_o *read(struct ce_cdb_t _db,
     return obj;
 }
 
-static float read_float(const ce_cdb_obj_o *reader,
+static float read_float(const ce_cdb_obj_o0 *reader,
                         uint64_t property,
                         float defaultt) {
     if (!reader) {
@@ -1238,7 +1239,7 @@ static float read_float(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static bool read_bool(const ce_cdb_obj_o *reader,
+static bool read_bool(const ce_cdb_obj_o0 *reader,
                       uint64_t property,
                       bool defaultt) {
     if (!reader) {
@@ -1256,7 +1257,7 @@ static bool read_bool(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static const char *read_string(const ce_cdb_obj_o *reader,
+static const char *read_string(const ce_cdb_obj_o0 *reader,
                                uint64_t property,
                                const char *defaultt) {
     if (!reader) {
@@ -1274,7 +1275,7 @@ static const char *read_string(const ce_cdb_obj_o *reader,
 }
 
 
-static uint64_t read_uint64(const ce_cdb_obj_o *reader,
+static uint64_t read_uint64(const ce_cdb_obj_o0 *reader,
                             uint64_t property,
                             uint64_t defaultt) {
     if (!reader) {
@@ -1292,7 +1293,7 @@ static uint64_t read_uint64(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static void *read_ptr(const ce_cdb_obj_o *reader,
+static void *read_ptr(const ce_cdb_obj_o0 *reader,
                       uint64_t property,
                       void *defaultt) {
     if (!reader) {
@@ -1311,7 +1312,7 @@ static void *read_ptr(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static uint64_t read_ref(const ce_cdb_obj_o *reader,
+static uint64_t read_ref(const ce_cdb_obj_o0 *reader,
                          uint64_t property,
                          uint64_t defaultt) {
     if (!reader) {
@@ -1329,7 +1330,7 @@ static uint64_t read_ref(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static uint64_t read_subobject(const ce_cdb_obj_o *reader,
+static uint64_t read_subobject(const ce_cdb_obj_o0 *reader,
                                uint64_t property,
                                uint64_t defaultt) {
     if (!reader) {
@@ -1350,7 +1351,7 @@ static uint64_t read_subobject(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-void *read_blob(const ce_cdb_obj_o *reader,
+void *read_blob(const ce_cdb_obj_o0 *reader,
                 uint64_t property,
                 uint64_t *size,
                 void *defaultt) {
@@ -1377,7 +1378,7 @@ void *read_blob(const ce_cdb_obj_o *reader,
     return defaultt;
 }
 
-static const uint64_t *prop_keys(const ce_cdb_obj_o *reader) {
+static const uint64_t *prop_keys(const ce_cdb_obj_o0 *reader) {
     struct object_t *obj = _get_object_from_o(reader);
 
     if (!obj) {
@@ -1387,7 +1388,7 @@ static const uint64_t *prop_keys(const ce_cdb_obj_o *reader) {
     return obj->keys + 1;
 }
 
-static uint64_t prop_count(const ce_cdb_obj_o *reader) {
+static uint64_t prop_count(const ce_cdb_obj_o0 *reader) {
     struct object_t *obj = _get_object_from_o(reader);
 
     if (!obj) {
@@ -1400,10 +1401,10 @@ static uint64_t prop_count(const ce_cdb_obj_o *reader) {
 }
 
 
-bool prop_equal(const ce_cdb_obj_o *r1,
-                const ce_cdb_obj_o *r2,
+bool prop_equal(const ce_cdb_obj_o0 *r1,
+                const ce_cdb_obj_o0 *r2,
                 uint64_t prorp) {
-    enum ce_cdb_type t = prop_type(r1, prorp);
+    enum ce_cdb_type_e0 t = prop_type(r1, prorp);
 
     if (!prop_exist(r1, prorp) || !prop_exist(r2, prorp)) {
         return false;
@@ -1442,10 +1443,10 @@ bool prop_equal(const ce_cdb_obj_o *r1,
     return false;
 }
 
-void prop_copy(const ce_cdb_obj_o *from,
-               ce_cdb_obj_o *to,
+void prop_copy(const ce_cdb_obj_o0 *from,
+               ce_cdb_obj_o0 *to,
                uint64_t prop) {
-    enum ce_cdb_type t = prop_type(from, prop);
+    enum ce_cdb_type_e0 t = prop_type(from, prop);
     union ce_cdb_value_u0 v;
     switch (t) {
         case CDB_TYPE_NONE:
@@ -1490,11 +1491,11 @@ void prop_copy(const ce_cdb_obj_o *from,
     }
 }
 
-static struct ce_cdb_t global_db() {
+static struct ce_cdb_t0 global_db() {
     return _G.global_db;
 }
 
-static uint64_t type(struct ce_cdb_t _db,
+static uint64_t type(struct ce_cdb_t0 _db,
                      uint64_t _obj) {
     struct db_t *db = _get_db(_db);
     struct object_t *obj = _get_object_from_id(db, _obj);
@@ -1502,7 +1503,7 @@ static uint64_t type(struct ce_cdb_t _db,
     return obj->type;
 }
 
-void set_type(struct ce_cdb_t _db,
+void set_type(struct ce_cdb_t0 _db,
               uint64_t _obj,
               uint64_t type) {
     if (!_obj) {
@@ -1516,7 +1517,7 @@ void set_type(struct ce_cdb_t _db,
 }
 
 
-uint64_t key(struct ce_cdb_t _db,
+uint64_t key(struct ce_cdb_t0 _db,
              uint64_t _obj) {
     struct db_t *db = _get_db(_db);
 
@@ -1524,7 +1525,7 @@ uint64_t key(struct ce_cdb_t _db,
     return obj->key;
 }
 
-void move(struct ce_cdb_t _db,
+void move(struct ce_cdb_t0 _db,
           uint64_t _from_obj,
           uint64_t _to) {
     struct db_t *db = _get_db(_db);
@@ -1536,8 +1537,8 @@ void move(struct ce_cdb_t _db,
     *obj_addr = from;
 }
 
-void move_prop(ce_cdb_obj_o *from_w,
-               ce_cdb_obj_o *to_w,
+void move_prop(ce_cdb_obj_o0 *from_w,
+               ce_cdb_obj_o0 *to_w,
                uint64_t prop) {
     prop_copy(from_w, to_w, prop);
     remove_property(from_w, prop);
@@ -1551,11 +1552,11 @@ static void _push_space(char **buffer,
     }
 }
 
-static void dump_str(struct ce_cdb_t _db,
+static void dump_str(struct ce_cdb_t0 _db,
                      char **buffer,
                      uint64_t from,
                      uint32_t level) {
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(_db, from);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(_db, from);
 
     const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
     const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
@@ -1590,7 +1591,7 @@ static void dump_str(struct ce_cdb_t _db,
         }
 
         if (instance_of) {
-            const ce_cdb_obj_o *ir = ce_cdb_a0->read(_db, instance_of);
+            const ce_cdb_obj_o0 *ir = ce_cdb_a0->read(_db, instance_of);
             if (prop_equal(ir, reader, key)) {
                 continue;
             }
@@ -1598,7 +1599,7 @@ static void dump_str(struct ce_cdb_t _db,
 
         const char *k = ce_id_a0->str_from_id64(key);
 
-        enum ce_cdb_type type = ce_cdb_a0->prop_type(reader, key);
+        enum ce_cdb_type_e0 type = ce_cdb_a0->prop_type(reader, key);
 
 
         if ((type == CDB_TYPE_BLOB) || (type == CDB_TYPE_PTR)) {
@@ -1669,7 +1670,7 @@ static void dump_str(struct ce_cdb_t _db,
 
 }
 
-static uint64_t find_root(struct ce_cdb_t _db,
+static uint64_t find_root(struct ce_cdb_t0 _db,
                           uint64_t _obj) {
     struct db_t *db = _get_db(_db);
 
@@ -1682,7 +1683,7 @@ static uint64_t find_root(struct ce_cdb_t _db,
     return find_root(_db, obj->parent);
 }
 
-static void _dispatch_instances(struct ce_cdb_t db,
+static void _dispatch_instances(struct ce_cdb_t0 db,
                                 struct object_t *orig_obj) {
     const int changed_prop_n = ce_array_size(orig_obj->changed);
 
@@ -1694,11 +1695,11 @@ static void _dispatch_instances(struct ce_cdb_t db,
     for (int i = 0; i < instances_n; ++i) {
         uint64_t inst_obj = orig_obj->instances[i];
 
-        ce_cdb_obj_o *w = write_begin(db, inst_obj);
+        ce_cdb_obj_o0 *w = write_begin(db, inst_obj);
         const uint32_t chn = ce_array_size(orig_obj->changed);
         for (int j = 0; j < chn; ++j) {
-            struct ce_cdb_change_ev0 *ev = &orig_obj->changed[j];
-            enum ce_cdb_type t = prop_type(orig_obj, ev->prop);
+            struct ce_cdb_change_ev_t0 *ev = &orig_obj->changed[j];
+            enum ce_cdb_type_e0 t = prop_type(orig_obj, ev->prop);
 
             if (ev->type == CE_CDB_CHANGE) {
                 switch (t) {
@@ -1776,7 +1777,7 @@ static void _dispatch_instances(struct ce_cdb_t db,
     }
 }
 
-const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
+const struct ce_cdb_change_ev_t0 *changed(const ce_cdb_obj_o0 *reader,
                                         uint32_t *n) {
     struct object_t *obj = (struct object_t *) reader;
     *n = ce_array_size(obj->changed);
@@ -1786,7 +1787,7 @@ const struct ce_cdb_change_ev0 *changed(const ce_cdb_obj_o *reader,
     return NULL;
 }
 
-const uint64_t *destroyed(struct ce_cdb_t _db,
+const uint64_t *destroyed(struct ce_cdb_t0 _db,
                           uint32_t *n) {
     struct db_t *db = _get_db(_db);
 
@@ -1795,7 +1796,7 @@ const uint64_t *destroyed(struct ce_cdb_t _db,
     return db->to_free_objects_id;
 }
 
-const uint64_t *changed_objects(struct ce_cdb_t _db,
+const uint64_t *changed_objects(struct ce_cdb_t0 _db,
                                 uint32_t *n) {
     struct db_t *db = _get_db(_db);
 
@@ -1810,7 +1811,7 @@ const uint64_t *changed_objects(struct ce_cdb_t _db,
     return db->changed_obj;
 }
 
-void set_parent(struct ce_cdb_t _db,
+void set_parent(struct ce_cdb_t0 _db,
                 uint64_t object,
                 uint64_t parent) {
     struct db_t *db = _get_db(_db);
@@ -1819,15 +1820,15 @@ void set_parent(struct ce_cdb_t _db,
     from->parent = parent;
 }
 
-uint64_t read_instance_of(const ce_cdb_obj_o *reader) {
+uint64_t read_instance_of(const ce_cdb_obj_o0 *reader) {
     struct object_t *obj = _get_object_from_o(reader);
     return obj->instance_of;
 }
 
-static void load(struct ce_cdb_t db,
+static void load(struct ce_cdb_t0 db,
                  const char *input,
                  uint64_t _obj,
-                 struct ce_alloc *allocator) {
+                 struct ce_alloc_t0 *allocator) {
     struct db_t *db_inst = _get_db(db);
 
 
@@ -1986,7 +1987,7 @@ static void load(struct ce_cdb_t db,
         for (int i = 0; i < prop_n; ++i) {
             uint64_t name = keys[i];
 
-            enum ce_cdb_type t = ptype[i];
+            enum ce_cdb_type_e0 t = ptype[i];
 
             union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
                     fakeop->values +
@@ -2105,7 +2106,7 @@ static void _init(struct ce_api_a0 *api) {
 
     _G.global_db = create_db();
 
-    api->register_api(CE_CDB_API, &cdb_api);
+    api->register_api(CE_CDB_API, &cdb_api, sizeof(cdb_api));
 }
 
 static void _shutdown() {

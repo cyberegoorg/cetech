@@ -2,13 +2,14 @@
 // includes
 //==============================================================================
 
-#include <celib/allocator.h>
-#include <celib/api_system.h>
-#include <celib/memory.h>
+#include <celib/memory/allocator.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
 #include <celib/module.h>
-#include <celib/hashlib.h>
-#include <celib/array.inl>
-#include <celib/hash.inl>
+#include <celib/id.h>
+#include <celib/macros.h>
+#include <celib/containers/array.h>
+#include <celib/containers/hash.h>
 
 
 #include <cetech/renderer/renderer.h>
@@ -18,6 +19,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/transform/transform.h>
 #include <celib/cdb.h>
+#include <celib/macros.h>
 #include "cetech/render_graph/render_graph.h"
 
 
@@ -28,7 +30,7 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_alloc *alloc;
+    struct ce_alloc_t0 *alloc;
 } _G;
 
 #include "graph.h"
@@ -53,7 +55,7 @@ static void _init(struct ce_api_a0 *api) {
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api(CT_RG_API, &render_graph_api);
+    api->register_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
 
 }
 

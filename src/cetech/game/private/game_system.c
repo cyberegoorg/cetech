@@ -1,15 +1,16 @@
-#include <celib/api_system.h>
+#include <celib/memory/allocator.h>
+#include <celib/api.h>
 #include <celib/module.h>
 #include <celib/macros.h>
-#include <celib/hashlib.h>
+#include <celib/id.h>
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <stddef.h>
 
 #include <cetech/kernel/kernel.h>
-#include <celib/hash.inl>
-#include <celib/memory.h>
+#include <celib/containers/hash.h>
+#include <celib/memory/memory.h>
 #include <celib/cdb.h>
 
 #include "../game_system.h"
@@ -146,9 +147,8 @@ void CE_MODULE_INITAPI(game_system)(struct ce_api_a0 *api) {
 void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                   int reload) {
 
-    api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0);
-    api->register_api(KERNEL_TASK_INTERFACE, &game_task);
-
+    api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &game_task, sizeof(game_task));
 
     ce_api_a0->register_on_add(GAME_INTERFACE, _game_api_add);
 

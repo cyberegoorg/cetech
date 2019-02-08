@@ -1,15 +1,13 @@
-
-#include <stdint.h>
-#include <stdio.h>
+#include <time.h>
 
 #include <celib/log.h>
 #include <celib/module.h>
-#include <celib/api_system.h>
+#include <celib/api.h>
 #include <celib/task.h>
-#include <celib/os.h>
+
 #include "celib/macros.h"
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 
 #define LOG_WHERE "log_system"
 
@@ -25,7 +23,7 @@ static struct global {
 } _G = {};
 
 
-static void vlog(const enum ce_log_level level,
+static void vlog(const enum ce_log_level_e0 level,
                  const char *where,
                  const char *format,
                  va_list va) {
@@ -35,16 +33,16 @@ static void vlog(const enum ce_log_level level,
     char msg[4096];     //!< Final msg.
     int s = vsnprintf(msg, CE_ARRAY_LEN(msg), format, va);
 
-    if(level == LOG_ERROR) {
-        char *st = ce_os_a0->error->stacktrace(4);
+    if (level == LOG_ERROR) {
+        char *st = ce_os_error_a0->stacktrace(4);
         snprintf(msg + s, CE_ARRAY_LEN(msg) - s, "\n    stacktrace:\n%s\n", st);
-        ce_os_a0->error->stacktrace_free(st);
+        ce_os_error_a0->stacktrace_free(st);
     }
 
     time_t tm = time(NULL);
 
     for (uint8_t i = 0; i < _G.handlers_count; ++i) {
-        _G.handlers[i](level, tm, ce_task_a0->worker_id(),
+        _G.handlers[i](level, *(ce_time_t*)&tm, ce_task_a0->worker_id(),
                        where, msg, _G.handlers_data[i]);
     }
 }
@@ -125,20 +123,19 @@ static void log_register_handler(ce_log_handler_t handler,
 }
 
 
-
-void ct_log_stdout_yaml_handler(enum ce_log_level level,
-                                time_t time,
+void ct_log_stdout_yaml_handler(enum ce_log_level_e0 level,
+                                ce_time_t time,
                                 char worker_id,
                                 const char *where,
                                 const char *msg,
                                 void *data);
 
-void ct_log_stdout_handler(enum ce_log_level level,
-                                time_t time,
-                                char worker_id,
-                                const char *where,
-                                const char *msg,
-                                void *data);
+void ct_log_stdout_handler(enum ce_log_level_e0 level,
+                           ce_time_t time,
+                           char worker_id,
+                           const char *where,
+                           const char *msg,
+                           void *data);
 
 
 static struct ce_log_a0 log_a0 = {
@@ -164,7 +161,8 @@ CE_MODULE_DEF(
         },
         {
             CE_UNUSED(reload);
-            ce_api_a0->register_api(CE_LOG_API, ce_log_a0);
+            ce_api_a0->register_api(CE_LOG_API, ce_log_a0,
+                                    sizeof(log_a0));
         },
         {
             CE_UNUSED(reload);

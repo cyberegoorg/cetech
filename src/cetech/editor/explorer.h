@@ -1,6 +1,10 @@
 #ifndef CETECH_EXPLORER_H
 #define CETECH_EXPLORER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define EXPLORER_INTERFACE \
@@ -16,5 +20,9 @@ struct ct_explorer_i0 {
     void (*draw_menu)(uint64_t selected_obj,
                       uint64_t context);
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_EXPLORER_H

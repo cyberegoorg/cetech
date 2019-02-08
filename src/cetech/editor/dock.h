@@ -1,6 +1,10 @@
 #ifndef CETECH_DOCK_H
 #define CETECH_DOCK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -52,5 +56,9 @@ struct ct_dock_a0 {
 };
 
 CE_MODULE(ct_dock_a0);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_DOCK_H

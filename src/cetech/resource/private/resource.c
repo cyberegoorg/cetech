@@ -3,19 +3,21 @@
 //==============================================================================
 #include <inttypes.h>
 
-#include <celib/array.inl>
-#include <celib/hash.inl>
-
-#include <celib/api_system.h>
-#include <celib/memory.h>
+#include <celib/macros.h>
+#include <celib/memory/allocator.h>
+#include <celib/containers/array.h>
+#include <celib/containers/hash.h>
+#include <celib/api.h>
+#include <celib/memory/memory.h>
 #include <celib/fs.h>
 #include <celib/config.h>
-#include <celib/os.h>
 #include <celib/log.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
-#include <celib/buffer.inl>
-#include <celib/hashlib.h>
+#include <celib/containers/buffer.h>
+#include <celib/id.h>
+#include <celib/os/time.h>
+#include <celib/os/vio.h>
 
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resourcedb.h>
@@ -39,10 +41,10 @@
 struct _G {
     struct ce_hash_t type_map;
 
-    struct ce_cdb_t db;
+    struct ce_cdb_t0 db;
 
     uint64_t config;
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } _G = {};
 
 //==============================================================================
@@ -73,7 +75,7 @@ static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
 static void load(const uint64_t *names,
                  size_t count,
                  int force) {
-    uint32_t start_ticks = ce_os_a0->time->ticks();
+    uint32_t start_ticks = ce_os_time_a0->ticks();
 
 
     for (uint32_t i = 0; i < count; ++i) {
@@ -109,7 +111,7 @@ static void load(const uint64_t *names,
         }
     }
 
-    uint32_t now_ticks = ce_os_a0->time->ticks();
+    uint32_t now_ticks = ce_os_time_a0->ticks();
     uint32_t dt = now_ticks - start_ticks;
     ce_log_a0->debug(LOG_WHERE,
                      "load time %f for %zu resource", dt * 0.001, count);
@@ -147,7 +149,7 @@ static bool cdb_loader(uint64_t uid) {
 }
 
 static bool dump_recursive(const char* filename, uint64_t obj) {
-    const ce_cdb_obj_o *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     const uint64_t k_n = ce_cdb_a0->prop_count(r);
     const uint64_t *ks = ce_cdb_a0->prop_keys(r);
 
@@ -227,7 +229,7 @@ static struct ct_resource_a0 resource_api = {
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_RESOURCE_API, &resource_api);
+    api->register_api(CT_RESOURCE_API, &resource_api, sizeof(resource_api));
 
 }
 
@@ -237,7 +239,7 @@ static void _init_cvar(struct ce_config_a0 *config) {
     ce_config_a0 = config;
     _G.config = ce_config_a0->obj();
 
-    ce_cdb_obj_o *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->prop_exist(writer, CONFIG_BUILD)) {
         ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
     }
@@ -256,7 +258,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
 
-    const ce_cdb_obj_o *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
     ce_fs_a0->map_root_dir(BUILD_ROOT,
                            ce_cdb_a0->read_str(reader, CONFIG_BUILD, ""),
@@ -276,7 +278,6 @@ CE_MODULE_DEF(
             CE_INIT_API(api, ce_memory_a0);
             CE_INIT_API(api, ce_fs_a0);
             CE_INIT_API(api, ce_config_a0);
-            CE_INIT_API(api, ce_os_a0);
             CE_INIT_API(api, ce_log_a0);
             CE_INIT_API(api, ce_id_a0);
             CE_INIT_API(api, ce_cdb_a0);

@@ -5,9 +5,10 @@
 #include <celib/ydb.h>
 #include <cetech/camera/camera.h>
 
+#include <celib/memory/allocator.h>
 #include <celib/macros.h>
-#include <celib/array.inl>
-#include <celib/fmath.inl>
+#include <celib/containers/array.h>
+#include <celib/math/math.h>
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
@@ -15,20 +16,20 @@
 #include <cetech/editor/editor_ui.h>
 #include <cetech/editor/property.h>
 
-#include "celib/hashlib.h"
+#include "celib/id.h"
 #include "celib/config.h"
-#include "celib/memory.h"
-#include "celib/api_system.h"
+#include "celib/memory/memory.h"
+#include "celib/api.h"
 
 #include "celib/module.h"
 
 #define _G CameraGlobal
 static struct CameraGlobal {
-    struct ce_alloc *allocator;
+    struct ce_alloc_t0 *allocator;
 } CameraGlobal;
 
-static void get_project_view(struct ct_world world,
-                             struct ct_entity camera,
+static void get_project_view(ct_world_t0 world,
+                             struct ct_entity_t0 camera,
                              float *proj,
                              float *view,
                              int width,
@@ -105,11 +106,11 @@ static uint64_t size() {
     return sizeof(struct ct_camera_component);
 }
 
-static void camera_spawner(struct ct_world world,
+static void camera_spawner(ct_world_t0 world,
                            uint64_t obj,
                            void* data) {
 
-    const ce_cdb_obj_o * r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 * r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_camera_component *c = data;
 
     *c = (struct ct_camera_component) {
@@ -152,14 +153,14 @@ static struct ct_property_editor_i0 ct_property_editor_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(CT_CAMERA_API, &camera_api);
+    api->register_api(CT_CAMERA_API, &camera_api, sizeof(camera_api));
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0);
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0);
+    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
 }
 
 static void _shutdown() {

@@ -1,6 +1,10 @@
 #ifndef CETECH_EDITOR_H
 #define CETECH_EDITOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 #define RESOURCE_EDITOR_I \
@@ -18,8 +22,12 @@ struct ct_resource_editor_i0 {
     void (*open)(uint64_t context_obj);
     void (*close)(uint64_t context_obj);
     void (*update)(uint64_t context_obj, float dt);
-    void (*draw_ui)(uint64_t context_obj);
+    void (*draw_ui)(uint64_t context_obj, uint64_t context);
     void (*draw_menu)(uint64_t context_obj);
 };
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif //CETECH_EDITOR_H
