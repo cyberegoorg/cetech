@@ -21,5 +21,6 @@ script:
   - echo $TRAVIS_OS_NAME
   - cmake --version
   - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then clang --version; fi
-  - pip3 install -r requirements.txt
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip3 install -r requirements.txt; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install -r requirements.txt; fi
   - python3 build.py
