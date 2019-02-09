@@ -174,7 +174,7 @@ static uint64_t cdb_type() {
 };
 
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -191,7 +191,7 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_log_a0->register_handler(log_handler, NULL);
 
-    ce_api_a0->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    ce_api_a0->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
 
     ct_dock_a0->create_dock(LOG_VIEW, true);
 

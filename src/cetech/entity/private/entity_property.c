@@ -76,7 +76,7 @@ static void draw_component(uint64_t obj) {
     ct_debugui_a0->SameLine(0, 8);
 
     ct_debugui_a0->PushIDI((void*)obj);
-    if (ct_debugui_a0->Button(ICON_FA_MINUS, (float[2]) {0.0f})) {
+    if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
         ce_cdb_a0->write_commit(w);
@@ -148,7 +148,7 @@ static void _add_comp_modal(const char *modal_id,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     bool open = true;
-    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512}, 0);
+    ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
         struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
@@ -213,7 +213,7 @@ static void _add_comp_modal(const char *modal_id,
 
 
                 bool add = ct_debugui_a0->Selectable(label, false, 0,
-                                                     (float[2]) {0.0f});
+                                                     &(ce_vec2_t) {});
 
                 if (add) {
                     uint64_t component;
@@ -249,7 +249,7 @@ void draw_menu(uint64_t obj) {
     ct_debugui_a0->SameLine(0.0f, -1);
 
     bool add = ct_debugui_a0->Button(ICON_FA_PLUS" "ICON_FA_FOLDER_OPEN,
-                                     (float[2]) {0.0f});
+                                     &(ce_vec2_t) {});
 
 
     char modal_id[128] = {'\0'};
@@ -268,7 +268,7 @@ static uint64_t cdb_type() {
     return ENTITY_RESOURCE_ID;
 }
 
-static struct ct_property_editor_i0 ct_property_editor_i0 = {
+static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = draw_ui,
         .draw_menu = draw_menu,
@@ -279,7 +279,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 
 static void _shutdown() {

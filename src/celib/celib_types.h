@@ -43,6 +43,16 @@ typedef struct ce_time_t {
     uint64_t o;
 } ce_time_t;
 
+static ce_vec2_t CE_VEC2_ZERO = {};
+static ce_vec2_t CE_VEC2_ONE = {1.0f, 1.0f};
+
+static ce_vec3_t CE_VEC3_ZERO = {};
+static ce_vec3_t CE_VEC3_ONE = {1.0f, 1.0f, 1.0f};
+
+static ce_vec4_t CE_VEC4_ZERO = {};
+static ce_vec4_t CE_VEC4_ONE = {1.0f, 1.0f, 1.0f, 1.0f};
+
+
 #define CE_ID64_0(str, hash) hash
 
 #if defined(CE_DYNAMIC_MODULE)

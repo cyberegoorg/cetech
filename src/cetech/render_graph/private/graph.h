@@ -11,7 +11,7 @@ void set_module(void *inst,
 }
 
 void graph_setup(void *inst,
-                 struct ct_rg_builder *builder) {
+                 struct ct_rg_builder_t0 *builder) {
     struct ct_rg *rg = inst;
     struct render_graph_inst *rg_inst = rg->inst;
 

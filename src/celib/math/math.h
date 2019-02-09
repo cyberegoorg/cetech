@@ -825,7 +825,7 @@ static inline void ce_quat_rotate_z(float *_result,
 }
 
 static inline ce_vec3_t ce_vec3_mul_quat(ce_vec3_t _vec,
-                                    ce_vec4_t _quat) {
+                                         ce_vec4_t _quat) {
     ce_vec4_t inv_q = ce_quat_invert(_quat);
 
     ce_vec4_t qv = {
@@ -1041,11 +1041,11 @@ static inline void ce_mat4_inverse(float *_result,
 }
 
 static inline void ce_mat4_quat(float *_result,
-                                const float *_quat) {
-    const float x = _quat[0];
-    const float y = _quat[1];
-    const float z = _quat[2];
-    const float w = _quat[3];
+                                ce_vec4_t quat) {
+    const float x = quat.x;
+    const float y = quat.y;
+    const float z = quat.z;
+    const float w = quat.w;
 
     const float x2 = x + x;
     const float y2 = y + y;
@@ -1082,28 +1082,30 @@ static inline void ce_mat4_quat(float *_result,
 }
 
 static inline void ce_mat4_quat_translation(float *_result,
-                                            const float *_quat,
-                                            const float *_translation) {
+                                            ce_vec4_t _quat,
+                                            ce_vec3_t _translation) {
     ce_mat4_quat(_result, _quat);
-    _result[12] = -(_result[0] * _translation[0] +
-                    _result[4] * _translation[1] +
-                    _result[8] * _translation[2]);
-    _result[13] = -(_result[1] * _translation[0] +
-                    _result[5] * _translation[1] +
-                    _result[9] * _translation[2]);
-    _result[14] = -(_result[2] * _translation[0] +
-                    _result[6] * _translation[1] +
-                    _result[10] * _translation[2]);
+    _result[12] = -(_result[0] * _translation.x +
+                    _result[4] * _translation.y +
+                    _result[8] * _translation.z);
+    _result[13] = -(_result[1] * _translation.x +
+                    _result[5] * _translation.y +
+                    _result[9] * _translation.z);
+    _result[14] = -(_result[2] * _translation.x +
+                    _result[6] * _translation.y +
+                    _result[10] * _translation.z);
 }
 
 static inline void ce_mat4_quat_translation_hmd(float *_result,
-                                                const float *_quat,
-                                                const float *_translation) {
-    float quat[4];
-    quat[0] = -_quat[0];
-    quat[1] = -_quat[1];
-    quat[2] = _quat[2];
-    quat[3] = _quat[3];
+                                                ce_vec4_t _quat,
+                                                ce_vec3_t _translation) {
+    ce_vec4_t quat = {
+            .x = -_quat.x,
+            .y = -_quat.y,
+            .z = _quat.z,
+            .w = _quat.w,
+    };
+
     ce_mat4_quat_translation(_result, quat, _translation);
 }
 
@@ -1258,57 +1260,50 @@ static inline void ce_mat4_srt(float *_result,
     _result[15] = 1.0f;
 }
 
-static inline void ce_vec3_mul_mtx(float *_result,
-                                   const float *_vec,
-                                   const float *_mat) {
-    _result[0] = _vec[0] * _mat[0] + _vec[1] * _mat[4] + _vec[2] * _mat[8] +
-                 _mat[12];
-    _result[1] = _vec[0] * _mat[1] + _vec[1] * _mat[5] + _vec[2] * _mat[9] +
-                 _mat[13];
-    _result[2] =
-            _vec[0] * _mat[2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] +
-            _mat[14];
+static inline ce_vec3_t ce_vec3_mul_mtx(ce_vec3_t _vec,
+                                        const float *_mat) {
+    return (ce_vec3_t) {
+            .x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[8] + _mat[12],
+            .y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[9] + _mat[13],
+            .z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14],
+    };
 }
 
-static inline void ce_vec3_mul_mat4_h(float *_result,
-                                      const float *_vec,
-                                      const float *_mat) {
-    float xx = _vec[0] * _mat[0] + _vec[1] * _mat[4] + _vec[2] * _mat[8] +
-               _mat[12];
-    float yy = _vec[0] * _mat[1] + _vec[1] * _mat[5] + _vec[2] * _mat[9] +
-               _mat[13];
-    float zz = _vec[0] * _mat[2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] +
-               _mat[14];
-    float ww = _vec[0] * _mat[3] + _vec[1] * _mat[7] + _vec[2] * _mat[11] +
-               _mat[15];
+static inline ce_vec3_t ce_vec3_mul_mat4_h(ce_vec3_t _vec, const float *_mat) {
+    float xx = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[8] + _mat[12];
+    float yy = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[9] + _mat[13];
+    float zz = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
+    float ww = _vec.x * _mat[3] + _vec.y * _mat[7] + _vec.z * _mat[11] + _mat[15];
+
     float invW = ce_fsign(ww) / ww;
-    _result[0] = xx * invW;
-    _result[1] = yy * invW;
-    _result[2] = zz * invW;
+
+    return (ce_vec3_t) {
+            .x = xx * invW,
+            .y = yy * invW,
+            .z = zz * invW,
+    };
+
 }
 
-static inline void ce_vec4_mul_mtx(float *_result,
-                                   const float *_vec,
-                                   const float *_mat) {
-    _result[0] = _vec[0] * _mat[0] + _vec[1] * _mat[4] + _vec[2] * _mat[8] +
-                 _vec[3] * _mat[12];
-    _result[1] = _vec[0] * _mat[1] + _vec[1] * _mat[5] + _vec[2] * _mat[9] +
-                 _vec[3] * _mat[13];
-    _result[2] =
-            _vec[0] * _mat[2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] +
-            _vec[3] * _mat[14];
-    _result[3] =
-            _vec[0] * _mat[3] + _vec[1] * _mat[7] + _vec[2] * _mat[11] +
-            _vec[3] * _mat[15];
+static inline ce_vec4_t ce_vec4_mul_mtx(ce_vec4_t _vec,
+                                        const float *_mat) {
+
+    return (ce_vec4_t) {
+            .x =_vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[8] + _vec.w * _mat[12],
+            .y =_vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[9] + _vec.w * _mat[13],
+            .z =_vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _vec.w * _mat[14],
+            .w =_vec.x * _mat[3] + _vec.y * _mat[7] + _vec.z * _mat[11] + _vec.w * _mat[15],
+    };
+
 }
 
 static inline void ce_mat4_mul(float *_result,
                                const float *_a,
                                const float *_b) {
-    ce_vec4_mul_mtx(&_result[0], &_a[0], _b);
-    ce_vec4_mul_mtx(&_result[4], &_a[4], _b);
-    ce_vec4_mul_mtx(&_result[8], &_a[8], _b);
-    ce_vec4_mul_mtx(&_result[12], &_a[12], _b);
+    *((ce_vec4_t*)&_result[0]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[0]), _b);
+    *((ce_vec4_t*)&_result[4]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[4]), _b);
+    *((ce_vec4_t*)&_result[8]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[8]), _b);
+    *((ce_vec4_t*)&_result[12]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[12]), _b);
 }
 
 static inline void ce_mat4_transpose(float *_result,

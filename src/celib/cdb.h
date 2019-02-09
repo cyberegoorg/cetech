@@ -74,43 +74,43 @@ struct ce_cdb_a0 {
 
     struct ce_cdb_t0 (*create_db)();
 
-    void (*destroy_db)(struct ce_cdb_t0 db);
+    void (*destroy_db)(ce_cdb_t0 db);
 
 
-    uint64_t (*create_object)(struct ce_cdb_t0 db,
+    uint64_t (*create_object)(ce_cdb_t0 db,
                               uint64_t type);
 
-    void (*create_object_uid)(struct ce_cdb_t0 db,
+    void (*create_object_uid)(ce_cdb_t0 db,
                               uint64_t uid,
                               uint64_t type);
 
-    uint64_t (*create_from)(struct ce_cdb_t0 db,
+    uint64_t (*create_from)(ce_cdb_t0 db,
                             uint64_t obj);
 
-    uint64_t (*clone)(struct ce_cdb_t0 db,
+    uint64_t (*clone)(ce_cdb_t0 db,
                       uint64_t obj);
 
 
-    void (*set_from)(struct ce_cdb_t0 db,
+    void (*set_from)(ce_cdb_t0 db,
                      uint64_t from,
                      uint64_t to);
 
 
-    void (*destroy_object)(struct ce_cdb_t0 db,
+    void (*destroy_object)(ce_cdb_t0 db,
                            uint64_t obj);
 
-    uint64_t (*obj_type)(struct ce_cdb_t0 db,
+    uint64_t (*obj_type)(ce_cdb_t0 db,
                          uint64_t obj);
 
-    void (*set_type)(struct ce_cdb_t0 db,
+    void (*set_type)(ce_cdb_t0 db,
                      uint64_t obj,
                      uint64_t type);
 
-    uint64_t (*obj_key)(struct ce_cdb_t0 db,
+    uint64_t (*obj_key)(ce_cdb_t0 db,
                         uint64_t obj);
 
     //
-    void (*move_obj)(struct ce_cdb_t0 db,
+    void (*move_obj)(ce_cdb_t0 db,
                      uint64_t from_obj,
                      uint64_t to);
 
@@ -125,22 +125,22 @@ struct ce_cdb_a0 {
 
     //
 
-    void (*dump_str)(struct ce_cdb_t0 db,
+    void (*dump_str)(ce_cdb_t0 db,
                      char **buffer,
                      uint64_t obj,
                      uint32_t level);
 
-    void (*dump)(struct ce_cdb_t0 db,
+    void (*dump)(ce_cdb_t0 db,
                  uint64_t obj,
                  char **output,
-                 struct ce_alloc_t0 *allocator);
+                 ce_alloc_t0 *allocator);
 
-    void (*load)(struct ce_cdb_t0 db,
+    void (*load)(ce_cdb_t0 db,
                  const char *input,
                  uint64_t obj,
-                 struct ce_alloc_t0 *allocator);
+                 ce_alloc_t0 *allocator);
 
-    uint64_t (*find_root)(struct ce_cdb_t0 _db,
+    uint64_t (*find_root)(ce_cdb_t0 _db,
                           uint64_t obj);
 
     // PROP
@@ -148,7 +148,7 @@ struct ce_cdb_a0 {
                        uint64_t key);
 
     enum ce_cdb_type_e0 (*prop_type)(const ce_cdb_obj_o0 *reader,
-                                  uint64_t key);
+                                     uint64_t key);
 
     const uint64_t *(*prop_keys)(const ce_cdb_obj_o0 *reader);
 
@@ -162,16 +162,16 @@ struct ce_cdb_a0 {
                       ce_cdb_obj_o0 *to,
                       uint64_t prorp);
 
-    uint64_t (*parent)(struct ce_cdb_t0 db,
+    uint64_t (*parent)(ce_cdb_t0 db,
                        uint64_t object);
 
-    void (*set_parent)(struct ce_cdb_t0 db,
+    void (*set_parent)(ce_cdb_t0 db,
                        uint64_t object,
                        uint64_t parent);
 
     // SET
-    ce_cdb_obj_o0 *(*write_begin)(struct ce_cdb_t0 db,
-                                 uint64_t object);
+    ce_cdb_obj_o0 *(*write_begin)(ce_cdb_t0 db,
+                                  uint64_t object);
 
     void (*write_commit)(ce_cdb_obj_o0 *writer);
 
@@ -218,20 +218,20 @@ struct ce_cdb_a0 {
     void (*remove_property)(ce_cdb_obj_o0 *writer,
                             uint64_t property);
 
-    const uint64_t *(*destroyed)(struct ce_cdb_t0 db,
+    const uint64_t *(*destroyed)(ce_cdb_t0 db,
                                  uint32_t *n);
 
-    const uint64_t *(*changed_objects)(struct ce_cdb_t0 db,
+    const uint64_t *(*changed_objects)(ce_cdb_t0 db,
                                        uint32_t *n);
 
     // READ
-    const ce_cdb_obj_o0 *(*read)(struct ce_cdb_t0 db,
-                                uint64_t object);
+    const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,
+                                 uint64_t object);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
 
-    const struct ce_cdb_change_ev_t0 *(*changed)(const ce_cdb_obj_o0 *reader,
-                                               uint32_t *n);
+    const ce_cdb_change_ev_t0 *(*changed)(const ce_cdb_obj_o0 *reader,
+                                          uint32_t *n);
 
 
     float (*read_float)(const ce_cdb_obj_o0 *reader,

@@ -46,7 +46,7 @@
 //==============================================================================
 
 struct viewport {
-    struct ct_rg_builder *builder;
+    struct ct_rg_builder_t0 *builder;
     ct_world_t0 world;
     struct ct_entity_t0 entity;
     bool free;
@@ -92,7 +92,7 @@ static void _render_task(void *data) {
 static void _render_init_task(void *data) {
     bgfx_render_frame(-1);
 
-    ce_task_a0->add(&(struct ce_task_item) {
+    ce_task_a0->add(&(struct ce_task_item_t0) {
             .work = _render_task,
             .name = "Renderer worker",
     }, 1, NULL);
@@ -140,8 +140,8 @@ static void renderer_create() {
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx_set_platform_data(&pd);
 
-    struct ce_task_counter_t* render_init_c = NULL;
-    ce_task_a0->add(&(struct ce_task_item) {
+    struct ce_task_counter_t0* render_init_c = NULL;
+    ce_task_a0->add(&(struct ce_task_item_t0) {
             .work = _render_init_task,
             .name = "Renderer init worker",
     }, 1, &render_init_c);
@@ -235,7 +235,7 @@ static void _feed_module(ct_world_t0 world,
 }
 
 void _render_components(ct_world_t0 world,
-                        struct ct_rg_builder *builder) {
+                        struct ct_rg_builder_t0 *builder) {
     struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
@@ -291,7 +291,7 @@ static void render(float dt) {
 
         struct ct_rg *graph = ct_rg_a0->create_graph();
         struct ct_rg_module *module = ct_rg_a0->create_module();
-        struct ct_rg_builder *builder = v->builder;
+        struct ct_rg_builder_t0 *builder = v->builder;
 
         builder->clear(builder);
 
@@ -334,28 +334,28 @@ static uint32_t _new_viewport() {
     return idx;
 }
 
-struct ct_viewport0 create_viewport(ct_world_t0 world,
+struct ct_viewport_t0 create_viewport(ct_world_t0 world,
                                     struct ct_entity_t0 main_camera) {
     uint32_t idx = _new_viewport();
 
     struct viewport *v = &_G.viewports[idx];
 
-    struct ct_rg_builder *builder = ct_rg_a0->create_builder();
+    struct ct_rg_builder_t0 *builder = ct_rg_a0->create_builder();
 
     v->world = world;
     v->entity = main_camera;
     v->builder = builder;
 
-    return (struct ct_viewport0) {.idx=idx};
+    return (struct ct_viewport_t0) {.idx=idx};
 }
 
 
-void destroy_viewport(struct ct_viewport0 viewport) {
+void destroy_viewport(struct ct_viewport_t0 viewport) {
     struct viewport *v = &_G.viewports[viewport.idx];
     v->free = true;
 }
 
-struct ct_rg_builder *viewport_builder(struct ct_viewport0 viewport) {
+struct ct_rg_builder_t0 *viewport_builder(struct ct_viewport_t0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
 

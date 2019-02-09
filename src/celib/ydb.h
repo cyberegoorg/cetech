@@ -14,8 +14,8 @@ extern "C" {
 #define CE_YDB_API \
     CE_ID64_0("ce_ydb_a0", 0xf5be4873d4ac8920ULL)
 
-struct ce_vio;
-struct ce_alloc_t0;
+typedef struct ce_vio ce_vio;
+typedef struct ce_alloc_t0 ce_alloc_t0;
 
 struct ce_ydb_a0 {
     uint64_t (*get_obj)(const char *path);
@@ -23,8 +23,8 @@ struct ce_ydb_a0 {
 
     void (*save)(const char *path);
 
-    uint64_t (*cdb_from_vio)(struct ce_vio *vio,
-                             struct ce_alloc_t0 *alloc);
+    uint64_t (*cdb_from_vio)(ce_vio *vio,
+                             ce_alloc_t0 *alloc);
 
     const char *(*get_key)(uint64_t hash);
 

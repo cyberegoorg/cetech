@@ -42,7 +42,7 @@ extern "C" {
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
-struct ct_resource_id;
+typedef struct ct_resource_id_t0 ct_resource_id_t0;
 
 typedef struct ce_cdb_change_ev_t0 ce_cdb_change_ev_t0;
 typedef struct ct_entity_storage_t ct_entity_storage_t;
@@ -115,37 +115,37 @@ struct ct_ecs_a0 {
     void (*destroy_world)(ct_world_t0 world);
 
     void (*create)(ct_world_t0 world,
-                   struct ct_entity_t0 *entity,
+                   ct_entity_t0 *entity,
                    uint32_t count);
 
     void (*destroy)(ct_world_t0 world,
-                    struct ct_entity_t0 *entity,
+                    ct_entity_t0 *entity,
                     uint32_t count);
 
     bool (*alive)(ct_world_t0 world,
-                  struct ct_entity_t0 entity);
+                  ct_entity_t0 entity);
 
     struct ct_entity_t0 (*spawn)(ct_world_t0 world,
                                  uint64_t name);
 
 
     bool (*has)(ct_world_t0 world,
-                struct ct_entity_t0 ent,
+                ct_entity_t0 ent,
                 uint64_t *component_name,
                 uint32_t name_count);
 
     void (*link)(ct_world_t0 world,
-                 struct ct_entity_t0 parent,
-                 struct ct_entity_t0 child);
+                 ct_entity_t0 parent,
+                 ct_entity_t0 child);
 
     struct ct_entity_t0 (*parent)(ct_world_t0 world,
-                                  struct ct_entity_t0 entity);
+                                  ct_entity_t0 entity);
 
     struct ct_entity_t0 (*first_child)(ct_world_t0 world,
-                                       struct ct_entity_t0 entity);
+                                       ct_entity_t0 entity);
 
     struct ct_entity_t0 (*next_sibling)(ct_world_t0 world,
-                                        struct ct_entity_t0 entity);
+                                        ct_entity_t0 entity);
 
     //SIMU
     void (*simulate)(ct_world_t0 world,
@@ -166,16 +166,16 @@ struct ct_ecs_a0 {
 
     void *(*get_one)(ct_world_t0 world,
                      uint64_t component_name,
-                     struct ct_entity_t0 entity);
+                     ct_entity_t0 entity);
 
     void (*add)(ct_world_t0 world,
-                struct ct_entity_t0 ent,
+                ct_entity_t0 ent,
                 const uint64_t *component_name,
                 uint32_t name_count,
                 void **data);
 
     void (*remove)(ct_world_t0 world,
-                   struct ct_entity_t0 ent,
+                   ct_entity_t0 ent,
                    const uint64_t *component_name,
                    uint32_t name_count);
 };

@@ -585,7 +585,7 @@ static void process(ct_world_t0 world,
             continue;
         }
 
-        fce(world, item->entity + 1, (ct_entity_storage_t*)item, item->n - 1, data);
+        fce(world, item->entity + 1, (ct_entity_storage_t *) item, item->n - 1, data);
     }
 }
 
@@ -835,7 +835,7 @@ static const char *display_icon() {
     return ICON_FA_CUBES;
 }
 
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,
@@ -1183,8 +1183,7 @@ static void _update(float dt) {
 
                             ce_array_clean(ents);
                             uint32_t ents_n = ce_array_size(si->ents);
-                            ce_array_push_n(ents, si->ents,
-                                            ents_n, _G.allocator);
+                            ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
 
                             for (int e = 0; e < ents_n; ++e) {
                                 struct ct_entity_t0 new_ents;
@@ -1196,10 +1195,9 @@ static void _update(float dt) {
                         } else if (ev.type == CE_CDB_REMOVE) {
                             uint64_t ent_obj = ev.old_value.subobj;
 
-                            uint64_t idx = ce_hash_lookup(
-                                    &world->obj_entmap,
-                                    ent_obj,
-                                    UINT64_MAX);
+                            uint64_t idx = ce_hash_lookup(&world->obj_entmap,
+                                                          ent_obj,
+                                                          UINT64_MAX);
 
                             if (UINT64_MAX == idx) {
                                 continue;
@@ -1232,8 +1230,7 @@ static void _update(float dt) {
 
                             for (int e = 0; e < ents_n; ++e) {
                                 struct ct_entity_t0 ent = ents[e];
-                                _add_components_from_obj(world, ent, k,
-                                                         comp_obj);
+                                _add_components_from_obj(world, ent, k,comp_obj);
                             }
                         }
                     }
@@ -1299,10 +1296,12 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_handler_create(&_G.world_handler, _G.allocator);
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0,
-                            sizeof(ct_resource_i0));
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api,
+                            sizeof(ct_resource_api));
+
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task,
                             sizeof(ecs_sync_task));
+
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 

@@ -105,10 +105,10 @@ extern "C" {
 // # Struct
 
 // Array header (pointer preambule)
-struct ce_array_header_t {
+typedef struct ce_array_header_t {
     uint32_t size;
     uint32_t capacity;
-};
+}ce_array_header_t;
 
 // # Macro
 
@@ -118,7 +118,7 @@ struct ce_array_header_t {
 
 // Get array [header](#ce_array_header_t).
 #define ce_array_header(a) \
-    ((a) ? (struct ce_array_header_t *)((char *)(a) - sizeof(struct ce_array_header_t)): NULL)
+    ((a) ? (struct ce_array_header_t *)((char *)(a) - sizeof(ce_array_header_t)): NULL)
 
 // Get array size.
 #define ce_array_size(a) \
@@ -198,7 +198,7 @@ static inline void *ce_array_grow(void *array,
                                   uint32_t capacity,
                                   size_t type_size,
                                   size_t type_align,
-                                  const struct ce_alloc_t0 *alloc,
+                                  const ce_alloc_t0 *alloc,
                                   const char *filename,
                                   uint32_t line) {
     if (capacity < ce_array_capacity(array)) {
@@ -231,7 +231,7 @@ static inline void *ce_array_grow(void *array,
 // Clone array.
 static inline void *ce_array_clone(void *array,
                                    size_t type_size,
-                                   const struct ce_alloc_t0 *alloc) {
+                                   const ce_alloc_t0 *alloc) {
     char *new_array = NULL;
     ce_array_push_n(new_array, array, ce_array_size(array) * type_size, alloc);
     return new_array;

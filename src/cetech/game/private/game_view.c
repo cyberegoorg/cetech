@@ -32,7 +32,7 @@ static void on_menu(uint64_t dock) {
 
     bool is_paused = ct_game_system_a0->is_paused(game_name);
 
-    if (ct_debugui_a0->Button(label[is_paused], (float[2]) {0.0f})) {
+    if (ct_debugui_a0->Button(label[is_paused], &CE_VEC2_ZERO)) {
         if (is_paused) {
             ct_game_system_a0->play(game_name);
         } else {
@@ -42,7 +42,7 @@ static void on_menu(uint64_t dock) {
 
     if (is_paused) {
         ct_debugui_a0->SameLine(0.0f, 4.0f);
-        if (ct_debugui_a0->Button(ICON_FA_FORWARD, (float[2]) {0.0f})) {
+        if (ct_debugui_a0->Button(ICON_FA_FORWARD, &CE_VEC2_ZERO)) {
             ct_game_system_a0->step(game_name, step_dt / 1000.0f);
         }
 
@@ -53,25 +53,24 @@ static void on_menu(uint64_t dock) {
 }
 
 static void on_debugui(uint64_t dock) {
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
+    ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
 
     uint64_t game_name = ce_id_a0->id64("default");
 
-    struct ct_viewport0 v = ct_game_system_a0->viewport(game_name);
-    struct ct_rg_builder *builder;
+    struct ct_viewport_t0 v = ct_game_system_a0->viewport(game_name);
+    struct ct_rg_builder_t0 *builder;
     builder = ct_renderer_a0->viewport_builder(v);
 
-    builder->set_size(builder, size[0], size[1]);
+    builder->set_size(builder, size.x, size.y);
 
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+                         &size,
+                         &CE_VEC4_ONE,
+                         &CE_VEC4_ZERO);
 
 }
 
@@ -95,7 +94,7 @@ static uint64_t dock_flags() {
            DebugUIWindowFlags_NoScrollWithMouse;
 }
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .dock_flags = dock_flags,
         .cdb_type = cdb_type,
         .name = name,
@@ -105,7 +104,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
 
     ct_dock_a0->create_dock(GAME_INTERFACE, true);
 }

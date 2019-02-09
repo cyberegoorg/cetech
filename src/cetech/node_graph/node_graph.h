@@ -60,29 +60,29 @@ extern "C" {
 #define CT_NODE_GRAPH_CONN_TO_PIN\
     CE_ID64_0("to_pin", 0x56c235c40d1418d5ULL)
 
-enum ct_node_pin_type_e0 {
+typedef enum ct_node_pin_type_e0 {
     CT_NODE_PIN_NONE = 0,
     CT_NODE_PIN_FLOAT,
     CT_NODE_PIN_STRING,
     CT_NODE_PIN_BOOL,
-};
+}ct_node_pin_type_e0;
 
-struct ct_node_pin_def {
+typedef struct ct_node_pin_def {
     enum ct_node_pin_type_e0 type;
     const char *name;
     uint64_t prop;
-};
+}ct_node_pin_def;
 
-struct ct_node_i0 {
+typedef struct ct_node_i0 {
     uint64_t (*type)();
 
     void *(*get_interface)(uint64_t name_hash);
 
-    const struct ct_node_pin_def *(*input_defs)(uint32_t *n);
+    const ct_node_pin_def *(*input_defs)(uint32_t *n);
 
-    const struct ct_node_pin_def *(*output_defs)(uint32_t *n);
+    const ct_node_pin_def *(*output_defs)(uint32_t *n);
 
-};
+} ct_node_i0;
 
 struct ct_node_graph_a0 {
     struct ct_node_i0 *(*get_interface)(uint64_t type);

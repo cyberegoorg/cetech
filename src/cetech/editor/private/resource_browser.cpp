@@ -42,8 +42,8 @@ static struct _G {
     char current_dir[512];
 
     uint64_t selected_file;
-    ct_resource_id selected_asset;
-    ct_resource_id edit_asset;
+    ct_resource_id_t0 selected_asset;
+    ct_resource_id_t0 edit_asset;
 
     const char *root;
     bool visible;
@@ -85,7 +85,8 @@ static char modal_buffer_from[128] = {};
 
 static void _create_from_modal(const char *modal_id) {
     bool open = true;
-    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
+    ce_vec2_t size = {512, 512};
+    ct_debugui_a0->SetNextWindowSize(&size,
                                      static_cast<DebugUICond>(0));
 
     if (!modal_buffer_name[0]) {
@@ -183,8 +184,8 @@ static void _create_from_modal(const char *modal_id) {
                                  0, 0, NULL);
 
         ct_debugui_a0->SameLine(0, -1);
-        bool add = ct_debugui_a0->Button(ICON_FA_PLUS" Create",
-                                         (float[2]) {0.0f});
+        ce_vec2_t zero_v = {};
+        bool add = ct_debugui_a0->Button(ICON_FA_PLUS" Create", &zero_v);
         if (add) {
             uint64_t new_res = 0;
 
@@ -211,7 +212,7 @@ static void _create_from_modal(const char *modal_id) {
                 snprintf(filename, CE_ARRAY_LEN(filename),
                          "%s.%s.yml", modal_buffer_name, modal_buffer_type);
 
-                ct_resource_id rid = {.uid = new_res};
+                ct_resource_id_t0 rid = {.uid = new_res};
 
                 ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
                                                filename, modal_buffer_name);
@@ -219,7 +220,7 @@ static void _create_from_modal(const char *modal_id) {
                 ct_resourcedb_a0->put_file(filename, 0);
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         new_res);
+                                                          new_res);
                 ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
                 ce_cdb_a0->write_commit(w);
 
@@ -238,7 +239,7 @@ static void _create_from_modal(const char *modal_id) {
         char title[256] = {};
         snprintf(title, CE_ARRAY_LEN(title), "##child_new_asset_ab");
 
-        ct_debugui_a0->BeginChild(title, (float[2]) {}, false,
+        ct_debugui_a0->BeginChild(title, (ce_vec2_t) {}, false,
                                   (DebugUIWindowFlags_) (0));
 
         char **asset_list = NULL;
@@ -275,7 +276,8 @@ static void _create_from_modal(const char *modal_id) {
             char label[128];
 
             ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
-            const char *icon = ri && ri->display_icon ? ri->display_icon() : NULL;
+            const char *icon =
+                    ri && ri->display_icon ? ri->display_icon() : NULL;
 
             if (icon) {
                 sprintf(label, "%s %s##modal_type_item_%s", icon, path, path);
@@ -288,13 +290,13 @@ static void _create_from_modal(const char *modal_id) {
                                               ImGuiSelectableFlags_DontClosePopups);
 
             if (ct_debugui_a0->IsItemHovered(0)) {
-                ct_resource_id rid = {
+                ct_resource_id_t0 rid = {
                         .uid = ct_resourcedb_a0->get_uid(name, type)
                 };
 
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(rid, path,
-                                                  (float[2]) {256, 256});
+                                                  (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -324,7 +326,9 @@ static char _selected_type[256] = {};
 
 static void _select_type_modal(const char *modal_id) {
     bool open = true;
-    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
+    ce_vec2_t size = {512, 512};
+
+    ct_debugui_a0->SetNextWindowSize(&size,
                                      static_cast<DebugUICond>(0));
 
 
@@ -353,8 +357,7 @@ static void _select_type_modal(const char *modal_id) {
                  "*%s*", modal_buffer);
 
 
-        if (ct_debugui_a0->Selectable("All", false, 0,
-                                      (float[2]) {0.0f})) {
+        if (ct_debugui_a0->Selectable("All", false, 0, &CE_VEC2_ZERO)) {
             _selected_type[0] = '\0';
         };
 
@@ -379,7 +382,7 @@ static void _select_type_modal(const char *modal_id) {
             }
 
             if (ct_debugui_a0->Selectable(labelidi, false, 0,
-                                          (float[2]) {0.0f})) {
+                                          &CE_VEC2_ZERO)) {
                 snprintf(_selected_type,
                          CE_ARRAY_LEN(_selected_type), "%s", type);
             };
@@ -395,12 +398,12 @@ static void _select_type_modal(const char *modal_id) {
 static void ui_asset_menu(uint64_t dock) {
     //    ct_debugui_a0->SameLine(0, -1);
 
-    if (ct_debugui_a0->Button(ICON_FA_PENCIL, (float[2]) {0, 0})) {
+    if (ct_debugui_a0->Button(ICON_FA_PENCIL, &CE_VEC2_ZERO)) {
         _broadcast_edit(dock);
     }
 
     ct_debugui_a0->SameLine(0, -1);
-    if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, (float[2]) {0, 0})) {
+    if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, &CE_VEC2_ZERO)) {
         const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
         const uint64_t context = ce_cdb_a0->read_uint64(reader,
@@ -415,7 +418,7 @@ static void ui_asset_menu(uint64_t dock) {
     ct_debugui_a0->SameLine(0, -1);
     bool create_from = ct_debugui_a0->Button(
             ICON_FA_PLUS" " ICON_FA_FOLDER_OPEN,
-            (float[2]) {0, 0});
+            &CE_VEC2_ZERO);
 
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_comp_%llu", 1ULL);
@@ -448,7 +451,7 @@ static void ui_asset_menu(uint64_t dock) {
 
 
     sprintf(modal_id, "select...##select_type_%llx", dock);
-    if (ct_debugui_a0->Button(title, (float[2]) {})) {
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
         ct_debugui_a0->OpenPopup(modal_id);
     }
     _select_type_modal(modal_id);
@@ -500,7 +503,7 @@ static void ui_resource_list(uint64_t dock) {
                 continue;
             }
 
-            struct ct_resource_id resourceid = {};
+            struct ct_resource_id_t0 resourceid = {};
             ct_resourcedb_a0->get_resource_by_fullname(path, &resourceid);
 
             char label[128];
@@ -524,7 +527,7 @@ static void ui_resource_list(uint64_t dock) {
             if (ct_debugui_a0->IsItemHovered(0)) {
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (float[2]) {128, 128});
+                                                  (ce_vec2_t) {128, 128});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -543,7 +546,7 @@ static void ui_resource_list(uint64_t dock) {
                     DebugUIDragDropFlags_SourceAllowNullID)) {
 
                 ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (float[2]) {128, 128});
+                                                  (ce_vec2_t) {128, 128});
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &resourceid.uid,
@@ -584,7 +587,7 @@ static void on_draw_menu(uint64_t dock) {
     ui_asset_menu(dock);
 }
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .dock_flags = dock_flags,
         .display_title = dock_title,
@@ -606,7 +609,7 @@ struct ct_resource_browser_a0 *ct_resource_browser_a0 = &resource_browser_api;
 
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,

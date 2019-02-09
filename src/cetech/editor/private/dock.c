@@ -153,7 +153,7 @@ void draw_all() {
                 snprintf(title, CE_ARRAY_LEN(title), "%s##%s_child_dock%llu",
                          di->display_title(dock), di->name(dock), id);
 
-                ct_debugui_a0->BeginChild(title, (float[2]) {}, false, 0);
+                ct_debugui_a0->BeginChild(title, (ce_vec2_t) {}, false, 0);
 
                 if (di->draw_ui) {
                     di->draw_ui(dock);
@@ -279,7 +279,7 @@ static bool context_btn(uint64_t dock) {
                      " %llu##dock_context_btn_%llx",
              context, dock);
 
-    if (ct_debugui_a0->Button(title, (float[2]) {})) {
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
         ct_debugui_a0->OpenPopup("select_dock_context");
         return true;
     };

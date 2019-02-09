@@ -45,7 +45,7 @@ static bool prop_revert_btn(uint64_t _obj,
              ICON_FA_RECYCLE, _obj, props[0]);
 
     bool remove_change = ct_debugui_a0->Button(lbl,
-                                               (float[2]) {});
+                                               &(ce_vec2_t){});
 
     bool need_revert = false;
     if (instance_of) {
@@ -173,9 +173,9 @@ static void _prop_label(const char *label,
 }
 
 
-static void resource_tooltip(struct ct_resource_id resourceid,
+static void resource_tooltip(struct ct_resource_id_t0 resourceid,
                              const char *path,
-                             float size[2]) {
+                             ce_vec2_t size) {
     ct_debugui_a0->Text("%s", path);
 
     uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
@@ -373,7 +373,7 @@ static bool resource_select_modal(const char *modal_id,
     bool changed = false;
     bool open = true;
 
-    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512}, 0);
+    ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t){512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
         struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
@@ -414,16 +414,16 @@ static bool resource_select_modal(const char *modal_id,
             }
 
             bool selected = ct_debugui_a0->Selectable(name, false, 0,
-                                                      (float[2]) {0.0f});
+                                                      &CE_VEC2_ZERO);
 
             if (ct_debugui_a0->IsItemHovered(0)) {
-                struct ct_resource_id r = {
+                struct ct_resource_id_t0 r = {
                         .uid=ct_resourcedb_a0->get_uid(name, resource_type_s)
                 };
 
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(r, name,
-                                                  (float[2]) {256, 256});
+                                                  (struct ce_vec2_t){256,  256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -501,7 +501,7 @@ static void ui_resource(uint64_t obj,
     sprintf(labelid, ICON_FA_FOLDER_OPEN
             "##%sprop_select_resource_%d", label, i);
 
-    if (ct_debugui_a0->Button(labelid, (float[2]) {0.0f})) {
+    if (ct_debugui_a0->Button(labelid, &(ce_vec2_t){0.0f})) {
         ct_debugui_a0->OpenPopup(modal_id);
     };
     ct_debugui_a0->SameLine(0, 2);

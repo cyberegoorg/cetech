@@ -175,13 +175,13 @@ static int _task_worker(void *o) {
 // Api
 //==============================================================================
 
-void add(struct ce_task_item *items,
+void add(struct ce_task_item_t0 *items,
          uint32_t count,
-         struct ce_task_counter_t **counter) {
+         struct ce_task_counter_t0 **counter) {
     uint32_t new_counter = _new_counter_task(count);
 
     if(counter) {
-        *counter = (struct ce_task_counter_t *) &_G.counter_pool[new_counter];
+        *counter = (struct ce_task_counter_t0 *) &_G.counter_pool[new_counter];
     }
 
     for (uint32_t i = 0; i < count; ++i) {
@@ -199,7 +199,7 @@ void add(struct ce_task_item *items,
 }
 
 
-void wait_atomic(struct ce_task_counter_t *signal,
+void wait_atomic(struct ce_task_counter_t0 *signal,
                  int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {
@@ -210,7 +210,7 @@ void wait_atomic(struct ce_task_counter_t *signal,
     queue_task_push(&_G.free_counter, counter_idx);
 }
 
-void wait_for_counter_no_work(struct ce_task_counter_t *signal,
+void wait_for_counter_no_work(struct ce_task_counter_t0 *signal,
                          int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {

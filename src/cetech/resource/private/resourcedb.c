@@ -307,7 +307,7 @@ static void builddb_put_file(const char *filename,
     _step(_db, sqls->put_file);
 }
 
-static void put_resource_blob(struct ct_resource_id rid,
+static void put_resource_blob(struct ct_resource_id_t0 rid,
                               const char *data,
                               uint64_t size) {
     sqlite3 *_db = _opendb();
@@ -318,7 +318,7 @@ static void put_resource_blob(struct ct_resource_id rid,
     _step(_db, sqls->put_file_blob);
 }
 
-static void put_resource(struct ct_resource_id rid,
+static void put_resource(struct ct_resource_id_t0 rid,
                          const char *type,
                          const char *filename,
                          const char *name) {
@@ -334,7 +334,7 @@ static void put_resource(struct ct_resource_id rid,
     _step(_db, sqls->put_resource);
 }
 
-bool builddb_load_cdb_file(struct ct_resource_id resource,
+bool builddb_load_cdb_file(struct ct_resource_id_t0 resource,
                            uint64_t object,
                            uint64_t type,
                            struct ce_alloc_t0 *allocator) {
@@ -448,7 +448,7 @@ static int buildb_get_resource_from_dirs(const char *dir,
 }
 
 
-static bool builddb_obj_exist(struct ct_resource_id resource) {
+static bool builddb_obj_exist(struct ct_resource_id_t0 resource) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -498,7 +498,7 @@ void _add_dependency(const char *who_filename,
 }
 
 
-uint64_t resource_type(struct ct_resource_id resource) {
+uint64_t resource_type(struct ct_resource_id_t0 resource) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -517,7 +517,7 @@ uint64_t resource_type(struct ct_resource_id resource) {
     return type;
 }
 
-bool resource_filename(struct ct_resource_id resource,
+bool resource_filename(struct ct_resource_id_t0 resource,
                        char *filename,
                        size_t max_len) {
     sqlite3 *_db = _opendb();
@@ -561,7 +561,7 @@ bool _type_name_from_filename(const char *fullname,
 }
 
 void fullname_resource(const char *fullname,
-                       struct ct_resource_id *resource) {
+                       struct ct_resource_id_t0 *resource) {
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();

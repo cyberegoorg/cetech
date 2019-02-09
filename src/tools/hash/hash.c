@@ -151,9 +151,9 @@ int main(int argc,
     ce_os_path_a0->list(source_dir, CE_ARR_ARG(filter),
                          1, 0, &files, &files_count, a);
 
-    struct ce_task_item tasks[files_count];
+    struct ce_task_item_t0 tasks[files_count];
 
-    struct ce_task_counter_t *counter = NULL;
+    struct ce_task_counter_t0 *counter = NULL;
 
     for (uint32_t i = 0; i < files_count; ++i) {
         tasks[i].data = files[i];

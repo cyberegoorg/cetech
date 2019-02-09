@@ -171,13 +171,13 @@ static void property_editor(uint64_t obj) {
 }
 
 
-static struct ct_property_editor_i0 ct_property_editor_i0 = {
+static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = property_editor,
 };
 
 void render(ct_world_t0 world,
-            struct ct_rg_builder *builder) {
+            struct ct_rg_builder_t0 *builder) {
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
 
@@ -246,7 +246,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 
 static void _shutdown() {

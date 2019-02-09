@@ -33,7 +33,7 @@ static inline void _ce_bag_remove(uint64_t *a,
 
 static inline uint64_t ce_bag_get_or_create(ce_ba_graph_t *sg,
                                             uint64_t name,
-                                            struct ce_alloc_t0 *alloc) {
+                                            ce_alloc_t0 *alloc) {
     if (!ce_hash_contain(&sg->graph_map, name)) {
         uint64_t idx = ce_array_size(sg->after);
 
@@ -55,7 +55,7 @@ static inline void ce_bag_add(ce_ba_graph_t *sg,
                               uint64_t before_n,
                               const uint64_t *after,
                               uint64_t after_n,
-                              struct ce_alloc_t0 *alloc) {
+                              ce_alloc_t0 *alloc) {
     uint64_t idx = ce_bag_get_or_create(sg, name, alloc);
 
     for (int b = 0; b < before_n; ++b) {

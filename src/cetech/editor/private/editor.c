@@ -34,7 +34,7 @@
 static struct _G {
     bool load_layout;
 //    ct_world_t0 world;
-//    struct ct_viewport0 viewport;
+//    struct ct_viewport_t0 viewport;
 } _G;
 
 static float draw_main_menu() {
@@ -161,8 +161,8 @@ static void editor_task(float dt) {
 
     uint32_t w, h;
     ct_renderer_a0->get_size(&w, &h);
-    float pos[] = {0.0f, menu_height};
-    float size[] = {(float) w, h - 25.0f};
+    ce_vec2_t pos = {0.0f, menu_height};
+    ce_vec2_t size = {(float) w, h - 25.0f};
 
     ct_debugui_a0->RootDock(pos, size);
 

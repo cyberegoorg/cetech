@@ -28,20 +28,20 @@ extern "C" {
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
 
 
-struct ce_vio;
-struct ce_alloc_t0;
-struct ce_cdb_t0;
+typedef struct ce_vio ce_vio;
+typedef struct ce_alloc_t0 ce_alloc_t0;
+typedef struct ce_cdb_t0 ce_cdb_t0;
 
-typedef struct ct_resource_id {
+typedef struct ct_resource_id_t0 {
     uint64_t uid;
-} ct_resource_id;
+} ct_resource_id_t0;
 
 
-typedef bool (*ct_resource_compilator_t)(struct ce_cdb_t0 db,
+typedef bool (*ct_resource_compilator_t)(ce_cdb_t0 db,
                                          uint64_t obj);
 
 //! Resource interface
-struct ct_resource_i0 {
+typedef struct ct_resource_i0 {
     uint64_t (*cdb_type)();
     const char* (*display_icon)();
 
@@ -56,11 +56,11 @@ struct ct_resource_i0 {
     void (*create_new)(uint64_t obj);
 
     ct_resource_compilator_t compilator;
-};
+}ct_resource_i0;
 
 
 struct ct_resource_a0 {
-    struct ct_resource_i0 *(*get_interface)(uint64_t type);
+    ct_resource_i0 *(*get_interface)(uint64_t type);
 
     bool (*cdb_loader)(uint64_t uid);
 

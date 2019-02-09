@@ -1,8 +1,9 @@
 #include "bgfx_imgui/imgui.h"
 #include "ocornut-imgui/imgui_internal.h"
 
-#define  _to_imvec2(a) (*((ImVec2*) (a)))
-#define  _to_imvec4(a) (*((ImVec4*) (a)))
+#define _to_imvec2(v) (ImVec2(v->x, v->y))
+#define _to_imvec4(v) (ImVec4(v->x, v->y, v->z, v->w))
+
 
 namespace imgui_wrap {
 
@@ -53,17 +54,24 @@ namespace imgui_wrap {
                const _vec4 border_col) {
 
         if (ct_gfx_a0->bgfx_get_caps()->originBottomLeft) {
+            ce_vec2_t uv0 = {0.0f, 1.0f};
+            ce_vec2_t uv1 = {1.0f, 0.0f};
+
             ct_debugui_a0->Image2(user_texture_id,
                                   size,
-                                  (float[2]) {0.0f, 1.0f},
-                                  (float[2]) {1.0f, 0.0f},
+                                  &uv0,
+                                  &uv1,
                                   tint_col,
                                   border_col);
         } else {
+            ce_vec2_t uv0 = {0.0f, 0.0f};
+            ce_vec2_t uv1 = {1.0f, 1.0f};
+
+
             ct_debugui_a0->Image2(user_texture_id,
                                   size,
-                                  (float[2]) {0.0f, 0.0f},
-                                  (float[2]) {1.0f, 1.0f},
+                                  &uv0,
+                                  &uv1,
                                   tint_col,
                                   border_col);
         }
@@ -669,9 +677,9 @@ namespace imgui_wrap {
         return ImGui::BeginDock(label, opened, extra_flags);
     }
 
-    void RootDock(float pos[2],
-                  float size[2]) {
-        ImGui::RootDock(_to_imvec2(pos), _to_imvec2(size));
+    void RootDock(ce_vec2_t pos,
+                  ce_vec2_t size) {
+        ImGui::RootDock(ImVec2(pos.x, pos.y), ImVec2(size.x, size.y));
     }
 
 
@@ -767,14 +775,16 @@ namespace imgui_wrap {
                                               scale);
     }
 
-    void GetContentRegionAvail(float *size) {
+    ce_vec2_t GetContentRegionAvail() {
         ImVec2 v = ImGui::GetContentRegionAvail();
-        size[0] = v.x;
-        size[1] = v.y;
+        return (ce_vec2_t) {
+            .x = v.x,
+            .y = v.y,
+        };
     }
 
-    bool BeginChild(const char* str_id, const float* size, bool border, DebugUIWindowFlags_ flags){
-        return ImGui::BeginChild(str_id, *(ImVec2*)size, border, flags);
+    bool BeginChild(const char* str_id, ce_vec2_t size, bool border, DebugUIWindowFlags_ flags){
+        return ImGui::BeginChild(str_id, ImVec2(size.x, size.y), border, flags);
     }
 
 

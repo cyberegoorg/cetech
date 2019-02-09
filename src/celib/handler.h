@@ -23,7 +23,7 @@ struct ce_handler_t0 {
 #define handler_gen(h) ((h) & ((1 << (_GENBITCOUNT - 1))))
 
 static inline uint64_t ce_handler_create(struct ce_handler_t0 *handler,
-                                         const struct ce_alloc_t0 *allocator) {
+                                         const ce_alloc_t0 *allocator) {
     uint64_t idx;
 
     if (ce_array_size(handler->_free_idx) > _MINFREEINDEXS) {
@@ -42,7 +42,7 @@ static inline uint64_t ce_handler_create(struct ce_handler_t0 *handler,
 
 static inline void ce_handler_destroy(struct ce_handler_t0 *handler,
                                       uint64_t handlerid,
-                                      const struct ce_alloc_t0 *allocator) {
+                                      const ce_alloc_t0 *allocator) {
     uint64_t id = handler_idx(handlerid);
 
     handler->_generation[id] += 1;
@@ -56,7 +56,7 @@ static inline bool ce_handler_alive(struct ce_handler_t0 *handler,
 }
 
 static inline void ce_handler_free(struct ce_handler_t0 *handler,
-                                   const struct ce_alloc_t0 *allocator) {
+                                   const ce_alloc_t0 *allocator) {
     ce_array_free(handler->_free_idx, allocator);
     ce_array_free(handler->_generation, allocator);
 }

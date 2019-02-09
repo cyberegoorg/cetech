@@ -204,7 +204,7 @@ static uint64_t cdb_type() {
 };
 
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .name = name,
         .display_title = dock_title,
@@ -225,7 +225,7 @@ static void _init(struct ce_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
     api->register_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
 
     ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, true);

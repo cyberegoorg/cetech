@@ -287,7 +287,7 @@ static uint64_t cdb_type() {
 static const char* display_icon() {
     return ICON_FA_COG;
 }
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,
@@ -301,7 +301,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 int shader_init(struct ce_api_a0 *api) {
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
     return 1;
 }

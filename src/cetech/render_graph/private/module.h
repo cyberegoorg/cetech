@@ -10,20 +10,20 @@ static void add_pass(void *inst,
     struct ct_rg_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
-    struct ct_rg_pass *p = pass;
+    struct ct_rg_pass_t0 *p = pass;
     p->size = size;
 
     ce_array_push_n(module_inst->pass, pass, size, _G.alloc);
 }
 
 static void module_on_setup(void *inst,
-                            struct ct_rg_builder *builder) {
+                            struct ct_rg_builder_t0 *builder) {
     struct ct_rg_module *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
     const uint32_t pass_n = ce_array_size(module_inst->pass);
     for (int i = 0; i < pass_n;) {
-        struct ct_rg_pass *pass = (struct ct_rg_pass *) &module_inst->pass[i];
+        struct ct_rg_pass_t0 *pass = (struct ct_rg_pass_t0 *) &module_inst->pass[i];
         pass->on_setup(pass, builder);
 
         i += pass->size;
@@ -33,12 +33,12 @@ static void module_on_setup(void *inst,
 static struct ct_rg_module *create_module();
 
 struct module_pass {
-    struct ct_rg_pass pass;
+    struct ct_rg_pass_t0 pass;
     struct ct_rg_module *module;
 };
 
 static void modulepass_on_setup(void *inst,
-                                struct ct_rg_builder *builder) {
+                                struct ct_rg_builder_t0 *builder) {
     struct module_pass *pass = inst;
     module_on_setup(pass->module, builder);
 }

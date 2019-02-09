@@ -13,14 +13,14 @@ extern "C" {
 #define CT_EDITOR_TASK \
     CE_ID64_0("editor_task", 0x5eb9f56061f23532ULL)
 
-struct ct_editor_module_i0 {
+typedef struct ct_editor_module_i0 {
     bool (*init)();
 
     bool (*shutdown)();
 
     void (*update)(float dt);
 
-};
+}ct_editor_module_i0;
 
 #ifdef __cplusplus
 };

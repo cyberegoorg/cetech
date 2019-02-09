@@ -13,7 +13,7 @@ extern "C" {
 #define RESOURCE_EDITOR_OBJ \
     CE_ID64_0("asset_obj", 0x755d033f781be94ULL)
 
-struct ct_resource_editor_i0 {
+typedef struct ct_resource_editor_i0 {
     uint64_t (*cdb_type)();
 
     const char* (*display_icon)();
@@ -24,7 +24,7 @@ struct ct_resource_editor_i0 {
     void (*update)(uint64_t context_obj, float dt);
     void (*draw_ui)(uint64_t context_obj, uint64_t context);
     void (*draw_menu)(uint64_t context_obj);
-};
+}ct_resource_editor_i0;
 
 #ifdef __cplusplus
 };

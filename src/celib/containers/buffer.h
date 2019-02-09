@@ -28,7 +28,6 @@ extern "C" {
 #include "celib/celib_types.h"
 #include "celib/containers/array.h"
 
-
 // # Macro
 
 // Buffer size
@@ -52,7 +51,7 @@ extern "C" {
     ce_array_free(a, alloc)
 
 static inline int ce_buffer_printf(char **b,
-                                   struct ce_alloc_t0 *alloc,
+                                   ce_alloc_t0 *alloc,
                                    const char *format,
                                    ...) CTECH_ATTR_FORMAT(3, 4);
 
@@ -60,7 +59,7 @@ static inline int ce_buffer_printf(char **b,
 
 // printf *format*, *...* msg to buffer
 static inline int ce_buffer_printf(char **b,
-                                   struct ce_alloc_t0 *alloc,
+                                   ce_alloc_t0 *alloc,
                                    const char *format,
                                    ...) {
     va_list args;

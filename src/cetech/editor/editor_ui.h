@@ -16,28 +16,28 @@ extern "C" {
 #define CT_LOCKED_OBJ \
     CE_ID64_0("locked_obj", 0xa0bd856b4fcd25aeULL)
 
-struct ui_vec4_p0 {
+typedef struct ui_vec4_p0 {
     float min_f;
     float max_f;
     bool color;
-};
+} ui_vec4_p0;
 
-struct ui_vec3_p0 {
+typedef struct ui_vec3_p0 {
     float min_f;
     float max_f;
     bool color;
-};
+} ui_vec3_p0;
 
-struct ui_float_p0 {
+typedef struct ui_float_p0 {
     float min_f;
     float max_f;
-};
+} ui_float_p0;
 
 struct ct_editor_ui_a0 {
     void (*prop_float)(uint64_t obj,
                        uint64_t property,
                        const char *label,
-                       struct ui_float_p0 params);
+                       ui_float_p0 params);
 
     void (*prop_bool)(uint64_t obj,
                       uint64_t property,
@@ -65,21 +65,21 @@ struct ct_editor_ui_a0 {
     void (*prop_vec3)(uint64_t obj,
                       const uint64_t property[3],
                       const char *label,
-                      struct ui_vec3_p0 params);
+                      ui_vec3_p0 params);
 
     void (*prop_vec4)(uint64_t obj,
                       const uint64_t property[4],
                       const char *label,
-                      struct ui_vec4_p0 params);
+                      ui_vec4_p0 params);
 
 
     bool (*prop_revert_btn)(uint64_t _obj,
                             const uint64_t *props,
                             uint64_t props_n);
 
-    void (*resource_tooltip)(struct ct_resource_id resourceid,
+    void (*resource_tooltip)(struct ct_resource_id_t0 resourceid,
                              const char *path,
-                             float size[2]);
+                             ce_vec2_t size);
 
     bool (*resource_select_modal)(const char *modal_id,
                                   uint64_t id,

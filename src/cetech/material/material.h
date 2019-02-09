@@ -8,8 +8,6 @@ extern "C" {
 #include <stdint.h>
 #include <celib/cdb.h>
 
-struct ct_cdb_obj_t;
-
 #define CT_MATERIAL_API \
     CE_ID64_0("ct_material_a0", 0xdfd0a5e43df0846dULL)
 

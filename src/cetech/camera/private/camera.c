@@ -147,7 +147,7 @@ static void property_editor(uint64_t obj) {
                                 (struct ui_float_p0) {});
 }
 
-static struct ct_property_editor_i0 ct_property_editor_i0 = {
+static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = property_editor,
 };
@@ -160,7 +160,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 
 static void _shutdown() {

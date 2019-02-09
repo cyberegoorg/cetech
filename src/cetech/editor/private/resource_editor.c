@@ -235,7 +235,7 @@ static void update(float dt) {
 }
 
 
-static struct ct_editor_module_i0 ct_editor_module_i0 = {
+static struct ct_editor_module_i0 editor_module_api = {
         .update = update,
 };
 
@@ -264,7 +264,7 @@ static void _init(struct ce_api_a0 *api) {
     };
 
     ce_api_a0->register_api(DOCK_INTERFACE, &dock_i, sizeof(dock_i));
-    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0, sizeof(ct_editor_module_i0));
+    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &editor_module_api, sizeof(editor_module_api));
 }
 
 static void _shutdown() {

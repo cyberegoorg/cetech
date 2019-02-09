@@ -7,12 +7,12 @@ extern "C" {
 
 #include <stdint.h>
 
-struct ct_mesh_component {
+typedef struct ct_mesh_component {
     uint64_t material;
     uint64_t scene;
     uint64_t node;
     uint64_t mesh;
-};
+} ct_mesh_component;
 
 
 #define MESH_RENDERER_COMPONENT \

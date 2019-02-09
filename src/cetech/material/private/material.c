@@ -302,13 +302,13 @@ static struct ct_entity_t0 load(uint64_t resource,
     return ent;
 }
 
-static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
+static struct ct_resource_preview_i0 ct_resource_preview_api = {
         .load = load,
 };
 
 static void *get_interface(uint64_t name_hash) {
     if (name_hash == RESOURCE_PREVIEW_I) {
-        return &ct_resource_preview_i0;
+        return &ct_resource_preview_api;
     }
     return NULL;
 }
@@ -318,7 +318,7 @@ static const char *display_icon() {
 }
 
 
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,
@@ -332,7 +332,7 @@ static struct ct_resource_i0 ct_resource_i0 = {
 //==============================================================================
 
 static uint64_t create(uint64_t name) {
-    struct ct_resource_id rid = (struct ct_resource_id) {
+    struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
             .uid = name,
     };
 
@@ -576,7 +576,7 @@ static struct ct_material_a0 material_api = {
 
 struct ct_material_a0 *ct_material_a0 = &material_api;
 
-static struct ct_property_editor_i0 ct_property_editor_i0 = {
+static struct ct_property_editor_i0 _property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = draw_property,
 };
@@ -588,8 +588,8 @@ static int init(struct ce_api_a0 *api) {
     };
 
     api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
-    api->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
+    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &_property_editor_api, sizeof(_property_editor_api));
 
     return 1;
 }

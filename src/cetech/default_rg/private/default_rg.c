@@ -121,11 +121,11 @@ void screenspace_quad(float _textureWidth,
 
 
 static void output_pass_on_setup(void *inst,
-                                 struct ct_rg_builder *builder) {
+                                 struct ct_rg_builder_t0 *builder) {
 
     builder->create(builder,
                     RG_OUTPUT_TEXTURE,
-                    (struct ct_rg_attachment) {
+                    (struct ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
@@ -140,7 +140,7 @@ static uint64_t copy_material = 0;
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
                                 uint64_t layer,
-                                struct ct_rg_builder *builder) {
+                                struct ct_rg_builder_t0 *builder) {
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                               BGFX_CLEAR_COLOR |
                               BGFX_CLEAR_DEPTH,
@@ -178,17 +178,17 @@ static void output_pass_on_pass(void *inst,
 }
 
 static void gbuffer_pass_on_setup(void *inst,
-                                  struct ct_rg_builder *builder) {
+                                  struct ct_rg_builder_t0 *builder) {
 
     builder->create(builder, _COLOR,
-                    (struct ct_rg_attachment) {
+                    (struct ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
     );
 
     builder->create(builder, _DEPTH,
-                    (struct ct_rg_attachment) {
+                    (struct ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_D24,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
@@ -198,7 +198,7 @@ static void gbuffer_pass_on_setup(void *inst,
 }
 
 struct gbuffer_pass {
-    struct ct_rg_pass pass;
+    struct ct_rg_pass_t0 pass;
     struct ct_entity_t0 camera;
     ct_world_t0 world;
 };
@@ -206,7 +206,7 @@ struct gbuffer_pass {
 static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
                                  uint64_t layer,
-                                 struct ct_rg_builder *builder) {
+                                 struct ct_rg_builder_t0 *builder) {
     struct gbuffer_pass *pass = inst;
 
     ct_gfx_a0->bgfx_set_view_clear(viewid,
@@ -248,10 +248,10 @@ static void feed_module(struct ct_rg_module *m1,
             }
     }, sizeof(struct gbuffer_pass));
 
-    m1->add_pass(m1, &(struct ct_rg_pass) {
+    m1->add_pass(m1, &(struct ct_rg_pass_t0) {
             .on_pass = output_pass_on_pass,
             .on_setup = output_pass_on_setup
-    }, sizeof(struct ct_rg_pass));
+    }, sizeof(struct ct_rg_pass_t0));
 }
 
 static struct ct_default_rg_a0 default_render_graph_api = {

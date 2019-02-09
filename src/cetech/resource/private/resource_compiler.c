@@ -205,7 +205,7 @@ void _scan_obj(const char *filename,
 
     uint64_t uid = strtoul(uid_s, NULL, 0);
 
-    struct ct_resource_id rid = {.uid = uid};
+    struct ct_resource_id_t0 rid = {.uid = uid};
     ct_resourcedb_a0->put_resource(rid, type, filename, name);
 
     ce_hash_add(obj_hash, uid, obj, _G.allocator);
@@ -300,7 +300,7 @@ void _scan_files(char **files,
 
         char filename[256] = {};
         ct_resourcedb_a0->get_resource_filename(
-                (struct ct_resource_id) {.uid=obj},
+                (struct ct_resource_id_t0) {.uid=obj},
                 filename, CE_ARRAY_LEN(filename));
 
         ce_log_a0->info(LOG_WHERE, "Compile 0x%llx from %s", obj, filename);
@@ -314,7 +314,7 @@ void _scan_files(char **files,
 
         char *output = NULL;
         ce_cdb_a0->dump(db, obj, &output, _G.allocator);
-        ct_resourcedb_a0->put_resource_blob((struct ct_resource_id) {.uid=obj},
+        ct_resourcedb_a0->put_resource_blob((struct ct_resource_id_t0) {.uid=obj},
                                             output,
                                             ce_array_size(output));
 

@@ -10,7 +10,7 @@ extern "C" {
 #define EXPLORER_INTERFACE \
     CE_ID64_0("ct_explorer_i0", 0xdaa9b6ac2664c06dULL)
 
-struct ct_explorer_i0 {
+typedef struct ct_explorer_i0 {
     uint64_t (*cdb_type)();
 
     uint64_t (*draw_ui)(uint64_t top_level_obj,
@@ -19,7 +19,7 @@ struct ct_explorer_i0 {
 
     void (*draw_menu)(uint64_t selected_obj,
                       uint64_t context);
-};
+} ct_explorer_i0;
 
 #ifdef __cplusplus
 };

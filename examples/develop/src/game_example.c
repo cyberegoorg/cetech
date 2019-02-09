@@ -29,7 +29,7 @@ static struct G {
     struct ct_world_t0 world;
     struct ct_entity_t0 camera_ent;
     struct ct_entity_t0 level;
-    struct ct_viewport0 viewport;
+    struct ct_viewport_t0 viewport;
 } _G;
 
 #define _CAMERA_ASSET 0x57899875c4457313
@@ -70,7 +70,7 @@ static uint64_t game_name() {
     return ce_id_a0->id64("default");
 }
 
-static struct ct_viewport0 render_graph_builder() {
+static struct ct_viewport_t0 render_graph_builder() {
     return _G.viewport;
 }
 

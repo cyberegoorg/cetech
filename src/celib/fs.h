@@ -12,16 +12,16 @@ extern "C" {
 
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
-enum ce_fs_open_mode_e0 {
+typedef enum ce_fs_open_mode_e0 {
     FS_OPEN_READ,
     FS_OPEN_WRITE,
-};
+} ce_fs_open_mode_e0;
 
 //! Filesystem API V0
 struct ce_fs_a0 {
     struct ce_vio *(*open)(uint64_t root,
                            const char *path,
-                           enum ce_fs_open_mode_e0 mode);
+                           ce_fs_open_mode_e0 mode);
 
     void (*map_root_dir)(uint64_t root,
                          const char *base_path,

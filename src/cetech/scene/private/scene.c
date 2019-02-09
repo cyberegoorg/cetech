@@ -173,18 +173,18 @@ static struct ct_entity_t0 load(uint64_t resource,
 }
 
 
-static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
+static struct ct_resource_preview_i0 ct_resource_preview_api = {
         .load = load,
 };
 
 static void *get_interface(uint64_t name_hash) {
     if (name_hash == RESOURCE_PREVIEW_I) {
-        return &ct_resource_preview_i0;
+        return &ct_resource_preview_api;
     }
     return NULL;
 }
 
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,
@@ -207,7 +207,7 @@ int sceneinit(struct ce_api_a0 *api) {
 
     };
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
     scenecompiler_init(api);
 
@@ -219,7 +219,7 @@ static void shutdown() {
 }
 
 static uint64_t resource_data(uint64_t name) {
-    struct ct_resource_id rid = (struct ct_resource_id) {
+    struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
             .uid = name,
     };
 

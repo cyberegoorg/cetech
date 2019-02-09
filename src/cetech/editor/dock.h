@@ -30,7 +30,7 @@ extern "C" {
 #define PROP_DOCK_SELECTED_OBJ\
     CE_ID64_0("selected_object", 0x7cc97924b2b963b1ULL)
 
-struct ct_dock_i0 {
+typedef struct ct_dock_i0 {
     uint64_t (*cdb_type)();
     uint64_t (*dock_flags)();
 
@@ -43,7 +43,7 @@ struct ct_dock_i0 {
     void (*draw_ui)(uint64_t dock);
     void (*draw_menu)(uint64_t dock);
     void (*draw_main_menu)(uint64_t dock);
-};
+} ct_dock_i0;
 
 
 struct ct_dock_a0 {

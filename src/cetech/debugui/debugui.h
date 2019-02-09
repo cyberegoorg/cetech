@@ -21,8 +21,8 @@ extern "C" {
 
 struct ce_vio;
 
-typedef float _vec4[4];
-typedef float _vec2[2];
+typedef ce_vec4_t* _vec4;
+typedef ce_vec2_t* _vec2;
 
 struct ImGuiTextEditCallbackData;
 struct ImGuiSizeConstraintCallbackData;
@@ -804,8 +804,8 @@ struct ct_debugui_a0 {
     void (*GetWindowPos)(float pos[2]);
 
 
-    void (*RootDock)(float pos[2],
-                     float size[2]);
+    void (*RootDock)(ce_vec2_t pos,
+                     ce_vec2_t size);
 
     bool (*BeginDock)(const char *label,
                       bool *opened,
@@ -863,7 +863,7 @@ struct ct_debugui_a0 {
                                     float *rotation,
                                     float *scale);
 
-    void (*GetContentRegionAvail)(float *size);
+    ce_vec2_t (*GetContentRegionAvail)();
 
     float (*GetTextLineHeightWithSpacing)();
 
@@ -884,7 +884,7 @@ struct ct_debugui_a0 {
     void (*EndDragDropTarget)();
 
     bool (*BeginChild)(const char *str_id,
-                       const float *size,
+                       const ce_vec2_t size,
                        bool border,
                        enum DebugUIWindowFlags_ flags);
 
@@ -913,7 +913,7 @@ struct ct_debugui_a0 {
 
     int (*GetColumnsCount)();
 
-    void (*SetNextWindowSize)(const float size[2],
+    void (*SetNextWindowSize)(_vec2 size,
                               enum DebugUICond cond);
 
     void (*EndChild)();

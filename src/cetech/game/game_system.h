@@ -19,11 +19,10 @@ extern "C" {
 #define CT_GAME_TASK \
     CE_ID64_0("game_task", 0x56c73acaa12b1278ULL)
 
-struct ct_rg_builder;
+typedef struct ct_rg_builder_t0 ct_rg_builder;
+typedef struct ct_viewport_t0 ct_viewport_t0;
 
-struct ct_viewport0;
-
-struct ct_game_i0 {
+typedef struct ct_game_i0 {
     uint64_t (*name)();
 
     void (*init)();
@@ -32,11 +31,11 @@ struct ct_game_i0 {
 
     void (*update)(float dt);
 
-    struct ct_viewport0 (*render_graph_builder)();
-};
+    ct_viewport_t0 (*render_graph_builder)();
+}ct_game_i0;
 
 struct ct_game_system_a0 {
-    struct ct_viewport0 (*viewport)(uint64_t name);
+    struct ct_viewport_t0 (*viewport)(uint64_t name);
 
     void (*pause)(uint64_t name);
 

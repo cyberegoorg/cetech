@@ -157,7 +157,7 @@ static uint64_t dock_flags() {
     return 0;
 }
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .dock_flags = dock_flags,
         .name = name,
@@ -173,7 +173,7 @@ static void _init(struct ce_api_a0 *api) {
             .visible = true
     };
 
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
 
     ct_dock_a0->create_dock(EXPLORER_INTERFACE, true);
 

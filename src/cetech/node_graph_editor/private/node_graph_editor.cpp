@@ -28,9 +28,8 @@ extern "C" {
 #include <cetech/ecs/ecs.h>
 #include <fnmatch.h>
 #include <cetech/editor/selcted_object.h>
+#include <celib/math/math.h>
 
-
-//inline static float ImVec2Dot(const ImVec2& S1,const ImVec2& S2) {return (S1.x*S2.x+S1.y*S2.y);}
 
 #define _G node_graph_editor_globals
 static struct _G {
@@ -60,7 +59,7 @@ static uint64_t _new_node(uint64_t graph,
                                              CT_NODE_GRAPH_NODE);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                             node);
+                                              node);
 
     ce_cdb_a0->set_uint64(w, CT_NODE_TYPE, type);
 
@@ -91,7 +90,8 @@ static void add_node_modal(const char *modal_id,
 
 
     bool open = true;
-    ct_debugui_a0->SetNextWindowSize((float[2]) {512, 512},
+    ce_vec2_t size = {512, 512};
+    ct_debugui_a0->SetNextWindowSize(&size,
                                      static_cast<DebugUICond>(0));
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
         struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
@@ -141,7 +141,7 @@ static void add_node_modal(const char *modal_id,
 
 
                 bool add = ct_debugui_a0->Selectable(label, false, 0,
-                                                     (float[2]) {0.0f});
+                                                     &CE_VEC2_ZERO);
 
                 if (add) {
                     _new_node(obj, i->type());
@@ -156,20 +156,24 @@ static void add_node_modal(const char *modal_id,
     }
 }
 
-ImVec2 _get_node_in_pin_pos(ImVec2 Pos,
-                            ImVec2 Size,
-                            uint32_t pin_n,
-                            int pin_no) {
-    return ImVec2(Pos.x,
-                  Pos.y + Size.y * ((float) pin_no + 1) / ((float) pin_n + 1));
+ce_vec2_t _get_node_in_pin_pos(ce_vec2_t Pos,
+                               ce_vec2_t Size,
+                               uint32_t pin_n,
+                               int pin_no) {
+    return (ce_vec2_t) {
+            .x = Pos.x,
+            .y = Pos.y + Size.y * ((float) pin_no + 1) / ((float) pin_n + 1),
+    };
 }
 
-ImVec2 _get_node_out_pin_pos(ImVec2 Pos,
-                             ImVec2 Size,
-                             uint32_t pin_n,
-                             int pin_no) {
-    return ImVec2(Pos.x + Size.x,
-                  Pos.y + Size.y * ((float) pin_no + 1) / ((float) pin_n + 1));
+ce_vec2_t _get_node_out_pin_pos(ce_vec2_t Pos,
+                                ce_vec2_t Size,
+                                uint32_t pin_n,
+                                int pin_no) {
+    return (ce_vec2_t) {
+            .x = Pos.x + Size.x,
+            .y = Pos.y + Size.y * ((float) pin_no + 1) / ((float) pin_n + 1),
+    };
 }
 
 // TODO: SHIT move to cdb => dock context
@@ -177,8 +181,8 @@ static struct drag_node_s {
     uint64_t from_obj;
     uint32_t pin_idx;
     bool input;
-    ImVec2 size;
-    ImVec2 pos;
+    ce_vec2_t size;
+    ce_vec2_t pos;
     uint32_t count;
     uint64_t pin_name;
     ct_node_pin_def pin_def;
@@ -213,7 +217,7 @@ static void _add_link(uint64_t graph,
     }
 }
 
-const ImVec2 NODE_WINDOW_PADDING(8.0f, 8.0f);
+const ce_vec2_t NODE_WINDOW_PADDING = {8.0f, 8.0f};
 
 static uint32_t _pin_idx_by_name(const ct_node_pin_def *defs,
                                  uint32_t def_n,
@@ -238,7 +242,10 @@ static ct_node_i0 *_get_node_i(const ce_cdb_obj_o0 *reader) {
 }
 
 
-static void _display_grid(ImVec2 scrolling,
+#define _to_imvec(v) (ImVec2(v.x, v.y))
+#define _to_vec2(v) ((ce_vec2_t){.x = v.x, .y = v.y})
+
+static void _display_grid(ce_vec2_t scrolling,
                           ImDrawList *draw_list) {
     ImU32 GRID_COLOR = IM_COL32(0, 200, 0, 40);
     float GRID_SZ = 64.0f;
@@ -262,40 +269,42 @@ static ImU32 _pin_col[] = {
 };
 
 static void _draw_connection(const ct_node_pin_def *def,
-                             ImVec2 p1,
-                             ImVec2 p2,
+                             ce_vec2_t p1,
+                             ce_vec2_t p2,
                              ImDrawList *draw_list) {
-
-
     ImU32 col = _pin_col[def->type];
 
-    draw_list->AddLine(p1, p2, col, 3.0f);
+    draw_list->AddLine(*(ImVec2 *) &p1,
+                       *(ImVec2 *) &p2, col, 3.0f);
 }
 
-static void _draw_dgraged_line(ImVec2 offset,
+static void _draw_dgraged_line(ce_vec2_t offset,
                                ImDrawList *draw_list) {
     ImGuiIO &io = ImGui::GetIO();
 
-    ImVec2 p2;
-    const ImVec2 &p1 = io.MousePos;
+    ce_vec2_t p2;
+    const ce_vec2_t p1 = {
+            .x = io.MousePos.x,
+            .y = io.MousePos.y,
+    };
 
     if (!drag_node.input) {
-        p2 = offset + _get_node_out_pin_pos(drag_node.pos,
-                                            drag_node.size,
-                                            drag_node.count,
-                                            drag_node.pin_idx);
+        p2 = ce_vec2_add(offset, _get_node_out_pin_pos(drag_node.pos,
+                                                       drag_node.size,
+                                                       drag_node.count,
+                                                       drag_node.pin_idx));
     } else {
-        p2 = offset + _get_node_in_pin_pos(drag_node.pos,
-                                           drag_node.size,
-                                           drag_node.count,
-                                           drag_node.pin_idx);
+        p2 = ce_vec2_add(offset, _get_node_in_pin_pos(drag_node.pos,
+                                                      drag_node.size,
+                                                      drag_node.count,
+                                                      drag_node.pin_idx));
     }
 
     _draw_connection(&drag_node.pin_def, p1, p2, draw_list);
 }
 
 static void _draw_nodes(uint64_t graph,
-                        ImVec2 offset,
+                        ce_vec2_t offset,
                         ImDrawList *draw_list,
                         bool isLMBDraggingForMakingLinks,
                         uint64_t context) {
@@ -311,7 +320,7 @@ static void _draw_nodes(uint64_t graph,
 
         const ce_cdb_obj_o0 *nreader = ce_cdb_a0->read(ce_cdb_a0->db(), node);
 
-        ImVec2 pos = {
+        ce_vec2_t pos = {
                 ce_cdb_a0->read_float(nreader,
                                       CT_NODE_GRAPH_NODE_POS_X, 0.0f),
                 ce_cdb_a0->read_float(nreader,
@@ -337,14 +346,15 @@ static void _draw_nodes(uint64_t graph,
 
         const char *disply_name = eni->display_name();
 
-        ImVec2 size;
+        ce_vec2_t size;
 
-        ImVec2 node_rect_min = offset + pos;
+        ce_vec2_t node_rect_min = ce_vec2_add(offset, pos);
 
         // Display node contents first
         draw_list->ChannelsSetCurrent(1); // Foreground
 
-        ImGui::SetCursorScreenPos(node_rect_min + NODE_WINDOW_PADDING);
+        ImGui::SetCursorScreenPos(
+                _to_imvec(ce_vec2_add(node_rect_min, NODE_WINDOW_PADDING)));
         ImGui::BeginGroup(); // Lock horizontal position
         ImGui::Text("%s", disply_name);
         uint32_t pin_n = input_n > output_n ? input_n : output_n;
@@ -353,20 +363,20 @@ static void _draw_nodes(uint64_t graph,
         }
         ImGui::EndGroup();
 
-        size = ImGui::GetItemRectSize()
-               + NODE_WINDOW_PADDING
-               + NODE_WINDOW_PADDING;
+        size = ce_vec2_add(ce_vec2_add(_to_vec2(ImGui::GetItemRectSize()),
+                                       NODE_WINDOW_PADDING),
+                           NODE_WINDOW_PADDING);
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), node);
         ce_cdb_a0->set_float(w, CT_NODE_GRAPH_NODE_SIZE_X, size.x);
         ce_cdb_a0->set_float(w, CT_NODE_GRAPH_NODE_SIZE_Y, size.y);
         ce_cdb_a0->write_commit(w);
 
-        ImVec2 node_rect_max = node_rect_min + size;
+        ce_vec2_t node_rect_max = ce_vec2_add(node_rect_min, size);
 
         draw_list->ChannelsSetCurrent(0); // Background
-        ImGui::SetCursorScreenPos(node_rect_min);
-        ImGui::InvisibleButton("node", size);
+        ImGui::SetCursorScreenPos(_to_imvec(node_rect_min));
+        ImGui::InvisibleButton("node", _to_imvec(size));
         if (ImGui::IsItemHovered()) {
 
         }
@@ -380,7 +390,7 @@ static void _draw_nodes(uint64_t graph,
 
         bool node_moving = item_active && dragged;
         if (node_moving) {
-            pos = pos + ImGui::GetIO().MouseDelta;
+            pos = ce_vec2_add(pos, _to_vec2(ImGui::GetIO().MouseDelta));
 
             ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), node);
             ce_cdb_a0->set_float(w, CT_NODE_GRAPH_NODE_POS_X, pos.x);
@@ -394,31 +404,34 @@ static void _draw_nodes(uint64_t graph,
         const float NODE_SLOT_RADIUS_SQUARED = (NODE_SLOT_RADIUS *
                                                 NODE_SLOT_RADIUS);
 
+        ce_vec2_t NODE_SLOT_RADIUS_V = {.x = NODE_SLOT_RADIUS, .y=NODE_SLOT_RADIUS};
+
         uint64_t selected_obj = ct_selected_object_a0->selected_object(context);
 
         ImU32 node_bg_color = selected_obj == node ? IM_COL32(0, 75, 0, 255)
                                                    : IM_COL32(0, 60, 0, 255);
-        draw_list->AddRectFilled(node_rect_min,
-                                 node_rect_max, node_bg_color, 4.0f);
+        draw_list->AddRectFilled(_to_imvec(node_rect_min),
+                                 _to_imvec(node_rect_max), node_bg_color, 4.0f);
 
-        draw_list->AddRect(node_rect_min, node_rect_max,
+        draw_list->AddRect(_to_imvec(node_rect_min), _to_imvec(node_rect_max),
                            IM_COL32(0, 255, 0, 255), 4.0f);
-
 
         for (int j = 0; j < input_n; ++j) {
             const ct_node_pin_def *def = &inputs[j];
-            ImVec2 pin_pos = offset +
-                             _get_node_in_pin_pos(pos, size, input_n, j);
+            ce_vec2_t pin_pos = ce_vec2_add(offset,
+                                            _get_node_in_pin_pos(pos, size,
+                                                                 input_n, j));
             const char *name = def->name;
             const char *name_end = name + strlen(name);
 
 
-            draw_list->AddText(pin_pos, IM_COL32(0, 255, 0, 255), name,
-                               name_end);
+            draw_list->AddText(_to_imvec(pin_pos),
+                               IM_COL32(0, 255, 0, 255),
+                               name, name_end);
 
             draw_list->AddRectFilled(
-                    pin_pos - ImVec2(NODE_SLOT_RADIUS, NODE_SLOT_RADIUS),
-                    pin_pos + ImVec2(NODE_SLOT_RADIUS, NODE_SLOT_RADIUS),
+                    _to_imvec(ce_vec2_sub(pin_pos, NODE_SLOT_RADIUS_V)),
+                    _to_imvec(ce_vec2_add(pin_pos, NODE_SLOT_RADIUS_V)),
                     _pin_col[def->type]);
 
             if (!node_moving) {
@@ -451,8 +464,9 @@ static void _draw_nodes(uint64_t graph,
 
         for (int j = 0; j < output_n; ++j) {
             const ct_node_pin_def *def = &outputs[j];
-            ImVec2 pin_pos = offset +
-                             _get_node_out_pin_pos(pos, size, output_n, j);
+            ce_vec2_t pin_pos = ce_vec2_add(offset,
+                                            _get_node_out_pin_pos(pos, size,
+                                                                  output_n, j));
 
             const char *name = def->name;
             const char *name_end = name + strlen(name);
@@ -483,13 +497,15 @@ static void _draw_nodes(uint64_t graph,
                 }
             }
 
-            draw_list->AddText(pin_pos, IM_COL32(0, 255, 0, 255), name,
-                               name_end);
+            draw_list->AddText(_to_imvec(pin_pos),
+                               IM_COL32(0, 255, 0, 255),
+                               name, name_end);
 
             draw_list->AddRectFilled(
-                    pin_pos - ImVec2(NODE_SLOT_RADIUS, NODE_SLOT_RADIUS),
-                    pin_pos + ImVec2(NODE_SLOT_RADIUS, NODE_SLOT_RADIUS),
+                    _to_imvec(ce_vec2_sub(pin_pos, NODE_SLOT_RADIUS_V)),
+                    _to_imvec(ce_vec2_add(pin_pos, NODE_SLOT_RADIUS_V)),
                     _pin_col[def->type]);
+
         }
 
 
@@ -498,7 +514,7 @@ static void _draw_nodes(uint64_t graph,
 }
 
 static void _draw_connections(uint64_t graph,
-                              ImVec2 offset,
+                              ce_vec2_t offset,
                               ImDrawList *draw_list) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), graph);
 
@@ -507,7 +523,7 @@ static void _draw_connections(uint64_t graph,
                                                      CT_NODE_GRAPH_CONNECTIONS,
                                                      0);
     const ce_cdb_obj_o0 *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                    connections);
+                                                     connections);
 
     const uint64_t *cs = ce_cdb_a0->prop_keys(cs_reader);
     const uint64_t cs_n = ce_cdb_a0->prop_count(cs_reader);
@@ -529,13 +545,15 @@ static void _draw_connections(uint64_t graph,
         uint32_t in_n = 0;
         const ct_node_pin_def *in_def = ni->input_defs(&in_n);
 
-        ImVec2 in_size = ImVec2(
+        ce_vec2_t in_size = {
                 ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_SIZE_X, 0),
-                ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_SIZE_Y, 0));
+                ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_SIZE_Y, 0)
+        };
 
-        ImVec2 in_pos = ImVec2(
+        ce_vec2_t in_pos = {
                 ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_POS_X, 0),
-                ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_POS_Y, 0));
+                ce_cdb_a0->read_float(in_r, CT_NODE_GRAPH_NODE_POS_Y, 0)
+        };
 
         uint64_t in_pin_name = ce_cdb_a0->read_uint64(conn_r,
                                                       CT_NODE_GRAPH_CONN_TO_PIN,
@@ -554,13 +572,15 @@ static void _draw_connections(uint64_t graph,
         uint32_t out_n = 0;
         const ct_node_pin_def *out_def = ni->output_defs(&out_n);
 
-        ImVec2 out_pos = ImVec2(
+        ce_vec2_t out_pos = {
                 ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_POS_X, 0),
-                ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_POS_Y, 0));
+                ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_POS_Y, 0)
+        };
 
-        ImVec2 out_size = ImVec2(
+        ce_vec2_t out_size = {
                 ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_SIZE_X, 0),
-                ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_SIZE_Y, 0));
+                ce_cdb_a0->read_float(out_r, CT_NODE_GRAPH_NODE_SIZE_Y, 0)
+        };
 
         uint64_t out_pin_name = ce_cdb_a0->read_uint64(conn_r,
                                                        CT_NODE_GRAPH_CONN_FROM_PIN,
@@ -568,13 +588,15 @@ static void _draw_connections(uint64_t graph,
 
         uint64_t out_pin_idx = _pin_idx_by_name(out_def, out_n, out_pin_name);
 
-        ImVec2 p1 = offset + _get_node_out_pin_pos(out_pos, out_size,
-                                                   out_n,
-                                                   out_pin_idx);
+        ce_vec2_t p1 = ce_vec2_add(offset,
+                                   _get_node_out_pin_pos(out_pos, out_size,
+                                                         out_n,
+                                                         out_pin_idx));
 
-        ImVec2 p2 = offset + _get_node_in_pin_pos(in_pos, in_size,
-                                                  in_n,
-                                                  in_pin_idx);
+        ce_vec2_t p2 = ce_vec2_add(offset,
+                                   _get_node_in_pin_pos(in_pos, in_size,
+                                                        in_n,
+                                                        in_pin_idx));
 
         _draw_connection(&in_def[i], p1, p2, draw_list);
     }
@@ -601,9 +623,11 @@ static void draw_ng_editor(uint64_t graph,
             isMouseHoveringWindow && !cantDragAnything &&
             ImGui::IsMouseDragging(0, 0.0f);
 
-    static ImVec2 scrolling = ImVec2(0.0f, 0.0f);
+    static ce_vec2_t scrolling = {};
 
-    ImVec2 offset = ImGui::GetCursorScreenPos() + scrolling;
+    ce_vec2_t offset = ce_vec2_add(_to_vec2(ImGui::GetCursorScreenPos()),
+                                   scrolling);
+
     ImDrawList *draw_list = ImGui::GetWindowDrawList();
 
     _display_grid(scrolling, draw_list);
@@ -627,7 +651,7 @@ static void draw_ng_editor(uint64_t graph,
     // Scrolling
     if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() &&
         ImGui::IsMouseDragging(1, 0.0f))
-        scrolling = scrolling + ImGui::GetIO().MouseDelta;
+        scrolling = ce_vec2_add(scrolling, _to_vec2(ImGui::GetIO().MouseDelta));
 
     ImGui::PopItemWidth();
     ImGui::EndChild();
@@ -640,7 +664,7 @@ static void draw_editor(uint64_t context_obj,
                         uint64_t context) {
 
     const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                  context_obj);
+                                                   context_obj);
 
     uint64_t obj = ce_cdb_a0->read_ref(creader, RESOURCE_EDITOR_OBJ, 0);
 
@@ -660,7 +684,7 @@ static const char *display_name() {
 }
 
 
-static struct ct_resource_editor_i0 ct_resource_editor_i0 = {
+static struct ct_resource_editor_i0 ct_resource_editor_api = {
         .cdb_type = cdb_type,
         .open = open,
         .close = close,
@@ -696,7 +720,7 @@ void CE_MODULE_LOAD (node_graph_editor)(struct ce_api_a0 *api,
                       sizeof(nge_api));
 
     api->register_api(RESOURCE_EDITOR_I,
-                      &ct_resource_editor_i0,
+                      &ct_resource_editor_api,
                       sizeof(ct_resource_editor_i0));
 }
 

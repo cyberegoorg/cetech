@@ -1,5 +1,5 @@
 struct render_graph_builder_pass {
-    struct ct_rg_pass *pass;
+    struct ct_rg_pass_t0 *pass;
     uint8_t viewid;
     uint64_t layer;
     bgfx_frame_buffer_handle_t fb;
@@ -23,9 +23,9 @@ struct render_graph_builder_inst {
      CE_ID64_0("default", 0xf27605035974b5ecULL)
 
 static void builder_add_pass(void *inst,
-                             struct ct_rg_pass *pass,
+                             struct ct_rg_pass_t0 *pass,
                              uint64_t layer) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     uint8_t viewid = 0;
@@ -62,7 +62,7 @@ static void builder_add_pass(void *inst,
 }
 
 static void builder_execute(void *inst) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     const uint32_t pass_n = ce_array_size(builder_inst->pass);
@@ -81,7 +81,7 @@ static void builder_execute(void *inst) {
 }
 
 static void builder_clear(void *inst) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     const uint32_t pass_n = ce_array_size(builder_inst->pass);
@@ -116,8 +116,8 @@ float ratio_to_coef(bgfx_backbuffer_ratio_t ratio) {
 
 static void builder_create(void *inst,
                            uint64_t name,
-                           struct ct_rg_attachment info) {
-    struct ct_rg_builder *builder = inst;
+                           struct ct_rg_attachment_t0 info) {
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     const uint64_t samplerFlags = 0
@@ -144,7 +144,7 @@ static void builder_create(void *inst,
 
 static void builder_write(void *inst,
                           uint64_t name) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     uint32_t tidx = ce_hash_lookup(&builder_inst->texture_map, name, 0);
@@ -158,7 +158,7 @@ static void builder_read(void *inst,
 
 bgfx_texture_handle_t builder_get_texture(void *inst,
                                                     uint64_t name) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     return (bgfx_texture_handle_t) {
@@ -168,7 +168,7 @@ bgfx_texture_handle_t builder_get_texture(void *inst,
 void builder_set_size(void *inst,
                       uint16_t w,
                       uint16_t h) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     builder_inst->size[0] = w;
@@ -178,7 +178,7 @@ void builder_set_size(void *inst,
 
 void builder_get_size(void *inst,
                       uint16_t *size) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     memcpy(size, builder_inst->size, sizeof(uint16_t) * 2);
@@ -186,16 +186,16 @@ void builder_get_size(void *inst,
 
 static uint8_t get_layer_viewid(void *inst,
                                 uint64_t layer_name) {
-    struct ct_rg_builder *builder = inst;
+    struct ct_rg_builder_t0 *builder = inst;
     struct render_graph_builder_inst *builder_inst = builder->inst;
 
     return ce_hash_lookup(&builder_inst->layer_map, layer_name, 0);
 }
 
-static struct ct_rg_builder *create_render_builder() {
-    struct ct_rg_builder *obj = CE_ALLOC(_G.alloc,
-                                         struct ct_rg_builder,
-                                         sizeof(struct ct_rg_builder));
+static struct ct_rg_builder_t0 *create_render_builder() {
+    struct ct_rg_builder_t0 *obj = CE_ALLOC(_G.alloc,
+                                            ct_rg_builder_t0,
+                                         sizeof(ct_rg_builder_t0));
 
     struct render_graph_builder_inst *inst = CE_ALLOC(_G.alloc,
                                                       struct render_graph_builder_inst,
@@ -204,7 +204,7 @@ static struct ct_rg_builder *create_render_builder() {
 
     *inst = (struct render_graph_builder_inst) {};
 
-    *obj = (struct ct_rg_builder) {
+    *obj = (struct ct_rg_builder_t0) {
             .add_pass = builder_add_pass,
             .execute = builder_execute,
             .clear = builder_clear,
@@ -221,6 +221,6 @@ static struct ct_rg_builder *create_render_builder() {
     return obj;
 }
 
-static void destroy_render_builder(struct ct_rg_builder *builder) {
+static void destroy_render_builder(struct ct_rg_builder_t0 *builder) {
 
 }

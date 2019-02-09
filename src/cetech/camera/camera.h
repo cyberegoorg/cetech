@@ -43,7 +43,7 @@ struct ct_camera_component {
 struct ct_camera_a0 {
     //! Get camera project and view matrix
     void (*get_project_view)(ct_world_t0 world,
-                             struct ct_entity_t0 entity,
+                             ct_entity_t0 entity,
                              float *proj,
                              float *view,
                              int width,

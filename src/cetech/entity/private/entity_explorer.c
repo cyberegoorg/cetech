@@ -124,7 +124,7 @@ void item_btns(uint64_t  context, uint64_t uid) {
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", uid);
 
-    bool add = ct_debugui_a0->Button(label, (float[2]) {0.0f});
+    bool add = ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f});
 
     if (add) {
         _add(uid);
@@ -137,7 +137,7 @@ void item_btns(uint64_t  context, uint64_t uid) {
                      ICON_FA_FOLDER_OPEN
                      "##add_from%llu", uid);
 
-    bool add_from = ct_debugui_a0->Button(label, (float[2]) {0.0f});
+    bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f});
 
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_resource_%llu", uid);
@@ -166,7 +166,7 @@ void item_btns(uint64_t  context, uint64_t uid) {
         ct_debugui_a0->SameLine(0, 4);
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
                 "##minus_%llu", uid);
-        if (ct_debugui_a0->Button(label, (float[2]) {0.0f})) {
+        if (ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f})) {
             ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                      parent);
             ce_cdb_a0->remove_property(w, uid);

@@ -7,9 +7,9 @@ extern "C" {
 
 #include <stdint.h>
 
-struct ct_primitive_mesh{
+typedef struct ct_primitive_mesh {
     uint64_t material;
-};
+} ct_primitive_mesh;
 
 
 #define PRIMITIVE_MESH_COMPONENT \

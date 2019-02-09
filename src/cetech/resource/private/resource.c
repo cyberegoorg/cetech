@@ -81,7 +81,7 @@ static void load(const uint64_t *names,
     for (uint32_t i = 0; i < count; ++i) {
         const uint64_t asset_name = names[i];
 
-        struct ct_resource_id rid = {.uid = asset_name};
+        struct ct_resource_id_t0 rid = {.uid = asset_name};
 
         if (!ct_resourcedb_a0->obj_exist(rid)) {
             ce_log_a0->error(LOG_WHERE,
@@ -91,7 +91,7 @@ static void load(const uint64_t *names,
         };
 
         uint64_t type = ct_resourcedb_a0->get_resource_type(
-                (struct ct_resource_id) {.uid=asset_name});
+                (struct ct_resource_id_t0) {.uid=asset_name});
 
         if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
                                           _G.allocator)) {
@@ -122,7 +122,7 @@ void unload(const uint64_t *names,
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
-            struct ct_resource_id rid = (struct ct_resource_id) {
+            struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
                     .uid = names[i],
             };
 
@@ -157,7 +157,7 @@ static bool dump_recursive(const char* filename, uint64_t obj) {
     ce_cdb_a0->dump(ce_cdb_a0->db(),
                     obj, &output, _G.allocator);
 
-    struct ct_resource_id rid={.uid=obj};
+    struct ct_resource_id_t0 rid={.uid=obj};
     ct_resourcedb_a0->put_resource_blob(rid,
                                      output,
                                      ce_array_size(output));
@@ -178,7 +178,7 @@ static bool dump_recursive(const char* filename, uint64_t obj) {
 static bool save_to_db(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
-    struct ct_resource_id r = {.uid=root};
+    struct ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                       filename,
@@ -195,7 +195,7 @@ static bool save_to_db(uint64_t uid) {
 static bool save(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
-    struct ct_resource_id r = {.uid=root};
+    struct ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                       filename,

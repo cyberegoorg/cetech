@@ -41,7 +41,7 @@ struct entity_editor {
     ct_world_t0 world;
     struct ct_entity_t0 camera_ent;
     struct ct_entity_t0 entity;
-    struct ct_viewport0 viewport;
+    struct ct_viewport_t0 viewport;
 
     uint64_t entity_name;
     bool mouse_hovering;
@@ -200,9 +200,8 @@ static void draw_editor(uint64_t context_obj, uint64_t context) {
         return;
     }
 
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-    size[1] -= ct_debugui_a0->GetTextLineHeightWithSpacing();
+    ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
+    size.y -= ct_debugui_a0->GetTextLineHeightWithSpacing();
 
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     editor->mouse_hovering = is_mouse_hovering;
@@ -211,7 +210,7 @@ static void draw_editor(uint64_t context_obj, uint64_t context) {
     ct_camera_a0->get_project_view(editor->world,
                                    editor->camera_ent,
                                    proj, view,
-                                   size[0], size[1]);
+                                   size.x, size.y);
 
 
 //    uint64_t obj = 0; //ct_selected_object_a0->selected_object();
@@ -256,18 +255,18 @@ static void draw_editor(uint64_t context_obj, uint64_t context) {
 //    }
 
 
-    struct ct_rg_builder *builder = \
+    struct ct_rg_builder_t0 *builder = \
     ct_renderer_a0->viewport_builder(editor->viewport);
 
-    builder->set_size(builder, size[0], size[1]);
+    builder->set_size(builder, size.x, size.y);
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
     ct_debugui_a0->Image(th,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+                         &size,
+                         &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
+                         &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
 
 }
 
@@ -389,7 +388,7 @@ const char *display_name() {
 }
 
 
-static struct ct_resource_editor_i0 ct_resource_editor_i0 = {
+static struct ct_resource_editor_i0 ct_resource_editor_api = {
         .cdb_type = cdb_type,
         .open = open,
         .close = close,
@@ -404,7 +403,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
     };
 
-    api->register_api(RESOURCE_EDITOR_I, &ct_resource_editor_i0, sizeof(ct_resource_editor_i0));
+    api->register_api(RESOURCE_EDITOR_I, &ct_resource_editor_api, sizeof(ct_resource_editor_api));
 }
 
 static void _shutdown() {

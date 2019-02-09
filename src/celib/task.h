@@ -9,19 +9,19 @@ extern "C" {
     CE_ID64_0("ce_task_a0", 0x4dbd12f32a50782eULL)
 
 //! Worker enum
-enum ce_workers {
+typedef enum ce_workers_e0 {
     TASK_WORKER_MAIN = 0,  //!< Main worker
     TASK_MAX_WORKERS = 32, //!< Max workers
-};
+} ce_workers_e0;
 
 //! Task item struct
-struct ce_task_item {
+typedef struct ce_task_item_t0 {
     const char *name;               //!< Task name
     void (*work)(void *data);       //!< Task work
     void *data;                     //!< Worker data
-};
+} ce_task_item_t0;
 
-struct ce_task_counter_t;
+typedef struct ce_task_counter_t0 ce_task_counter_t0;
 
 //! Task API V0
 struct ce_task_a0 {
@@ -36,14 +36,14 @@ struct ce_task_a0 {
     //! Add new task
     //! \param items Task item array
     //! \param count Task item count
-    void (*add)(struct ce_task_item *items,
+    void (*add)(struct ce_task_item_t0 *items,
                 uint32_t count,
-                struct ce_task_counter_t **counter);
+                ce_task_counter_t0 **counter);
 
-    void (*wait_for_counter)(struct ce_task_counter_t *signal,
+    void (*wait_for_counter)(ce_task_counter_t0 *signal,
                              int32_t value);
 
-    void (*wait_for_counter_no_work)(struct ce_task_counter_t *signal,
+    void (*wait_for_counter_no_work)(ce_task_counter_t0 *signal,
                                      int32_t value);
 };
 

@@ -221,14 +221,14 @@ static void draw_property(uint64_t obj) {
 }
 
 
-static struct ct_property_editor_i0 ct_property_editor_i0 = {
+static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = draw_property,
 };
 
 
 static void tooltip(uint64_t resource,
-                    float size[2]) {
+                    ce_vec2_t size) {
 //    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
 //
 //    bgfx_texture_handle_t texture = {
@@ -242,8 +242,7 @@ static void tooltip(uint64_t resource,
 //                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static void draw_raw(uint64_t obj,
-                     float size[2]) {
+static void draw_raw(uint64_t obj, ce_vec2_t size) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     bgfx_texture_handle_t texture = {
@@ -252,12 +251,12 @@ static void draw_raw(uint64_t obj,
     };
 
     ct_debugui_a0->Image(texture,
-                         size,
-                         (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+                         &size,
+                         &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
+                         &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
+static struct ct_resource_preview_i0 ct_resource_preview_api = {
         .tooltip = tooltip,
         .draw_raw = draw_raw,
 };
@@ -265,7 +264,7 @@ static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
 
 void *get_interface(uint64_t name_hash) {
     if (name_hash == RESOURCE_PREVIEW_I) {
-        return &ct_resource_preview_i0;
+        return &ct_resource_preview_api;
     }
 
     return NULL;
@@ -275,7 +274,7 @@ static const char *display_icon() {
     return ICON_FA_PICTURE_O;
 }
 
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .get_interface = get_interface,
@@ -293,7 +292,7 @@ int texture_init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
     return 1;
 }
@@ -302,7 +301,7 @@ void texture_shutdown() {
 }
 
 bgfx_texture_handle_t texture_get(uint64_t name) {
-    struct ct_resource_id rid = {.uid = name};
+    struct ct_resource_id_t0 rid = {.uid = name};
     uint64_t obj = rid.uid;
 
     if (!obj) {
@@ -380,7 +379,7 @@ static struct ct_kernel_task_i0 texture_task = {
 
 static void _init_api(struct ce_api_a0 *api) {
     api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &ct_property_editor_i0, sizeof(ct_property_editor_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
     api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
 }
 

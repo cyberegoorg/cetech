@@ -20,7 +20,7 @@ typedef enum ce_log_level_e0 {
 } ce_log_level_e0;
 
 //! Log handler callback
-typedef void (*ce_log_handler_t)(enum ce_log_level_e0 level,
+typedef void (*ce_log_handler_t)(ce_log_level_e0 level,
                                  ce_time_t time,
                                  char worker_id,
                                  const char *where,

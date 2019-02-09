@@ -11,29 +11,29 @@ extern "C" {
 #define CT_BUILDDB_API \
    CE_ID64_0("ct_resourcedb_a0", 0xc81a8d961ebf878ULL)
 
-struct ct_resource_id;
-struct ce_alloc_t0;
+typedef struct ct_resource_id_t0 ct_resource_id_t0;
+typedef struct ce_alloc_t0 ce_alloc_t0;
 
 struct ct_resourcedb_a0 {
     void (*put_file)(const char *filename,
                      time_t mtime);
 
-    void (*put_resource)(struct ct_resource_id rid,
+    void (*put_resource)(ct_resource_id_t0 rid,
                          const char *type,
                          const char *filename,
                          const char *name);
 
-    void (*put_resource_blob)(struct ct_resource_id rid,
+    void (*put_resource_blob)(ct_resource_id_t0 rid,
                               const char *data,
                               uint64_t size);
 
     void (*set_file_depend)(const char *filename,
                             const char *depend_on);
 
-    bool (*load_cdb_file)(struct ct_resource_id resource,
+    bool (*load_cdb_file)(ct_resource_id_t0 resource,
                           uint64_t object,
                           uint64_t type,
-                          struct ce_alloc_t0 *allocator);
+                          ce_alloc_t0 *allocator);
 
     void (*add_dependency)(const char *who_filename,
                            const char *depend_on_filename);
@@ -41,29 +41,29 @@ struct ct_resourcedb_a0 {
     int (*need_compile)(const char *filename);
 
 
-    bool (*obj_exist)(struct ct_resource_id resource);
+    bool (*obj_exist)(ct_resource_id_t0 resource);
 
-    uint64_t (*get_resource_type)(struct ct_resource_id resource);
+    uint64_t (*get_resource_type)(ct_resource_id_t0 resource);
 
-    bool (*get_resource_filename)(struct ct_resource_id resource,
+    bool (*get_resource_filename)(ct_resource_id_t0 resource,
                                   char *filename,
                                   size_t max_len);
 
     void (*get_resource_by_fullname)(const char *fullname,
-                                     struct ct_resource_id *resource);
+            ct_resource_id_t0 *resource);
 
     int (*get_resource_dirs)(char ***filename,
-                             struct ce_alloc_t0 *alloc);
+                             ce_alloc_t0 *alloc);
 
     void (*get_resource_dirs_clean)(char **filename,
-                                    struct ce_alloc_t0 *alloc);
+                                    ce_alloc_t0 *alloc);
 
     int (*get_resource_from_dirs)(const char *dir,
                                   char ***filename,
-                                  struct ce_alloc_t0 *alloc);
+                                  ce_alloc_t0 *alloc);
 
     void (*get_resource_from_dirs_clean)(char **filename,
-                                         struct ce_alloc_t0 *alloc);
+                                         ce_alloc_t0 *alloc);
 
     uint64_t (*get_uid)(const char *name,
                         const char *type);
@@ -71,10 +71,10 @@ struct ct_resourcedb_a0 {
     int (*get_resource_by_type)(const char *name,
                                 const char *type,
                                 char ***filename,
-                                struct ce_alloc_t0 *alloc);
+                                ce_alloc_t0 *alloc);
 
     void (*get_resource_by_type_clean)(char **filename,
-                                       struct ce_alloc_t0 *alloc);
+                                       ce_alloc_t0 *alloc);
 };
 
 CE_MODULE(ct_resourcedb_a0);

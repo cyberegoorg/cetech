@@ -50,7 +50,7 @@ static uint64_t cdb_type() {
 
 
 void draw_raw(uint64_t obj,
-              float size[2]) {
+              ce_vec2_t size) {
     ct_node_graph_editor_a0->draw_ng_editor(obj, 0);
 }
 
@@ -65,7 +65,7 @@ static void *get_res_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static struct ct_resource_i0 ct_resource_i0 = {
+static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .create_new = create_new,
@@ -138,7 +138,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", nodes);
 
-    bool add = ct_debugui_a0->Button(label, (float[2]) {0.0f});
+    bool add = ct_debugui_a0->Button(label,&CE_VEC2_ZERO);
 
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_node_%llu", uid);
@@ -307,7 +307,7 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     };
 
     api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
-    api->register_api(RESOURCE_I, &ct_resource_i0, sizeof(ct_resource_i0));
+    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0, sizeof(node_property_editor_i0));
 

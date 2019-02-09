@@ -37,7 +37,7 @@
 struct preview_instance {
     ct_world_t0 world;
     struct ct_entity_t0 camera_ent;
-    struct ct_viewport0 viewport;
+    struct ct_viewport_t0 viewport;
     struct ct_entity_t0 ent;
     uint64_t selected_object;
     uint64_t type;
@@ -231,7 +231,7 @@ static void draw_menu(uint64_t dock) {
 }
 
 static void _draw_preview(struct preview_instance *pi,
-                          float size[2]) {
+                          ce_vec2_t size) {
 
     if(!pi->type) {
         return;
@@ -248,18 +248,18 @@ static void _draw_preview(struct preview_instance *pi,
         i->draw_raw(pi->selected_object, size);
     } else {
 
-        struct ct_rg_builder *builder;
+        struct ct_rg_builder_t0 *builder;
         builder = ct_renderer_a0->viewport_builder(pi->viewport);
 
-        builder->set_size(builder, size[0], size[1]);
+        builder->set_size(builder, size.x, size.y);
 
         bgfx_texture_handle_t th;
         th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
         ct_debugui_a0->Image(th,
-                             size,
-                             (float[4]) {1.0f, 1.0f, 1.0f, 1.0f},
-                             (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
+                             &size,
+                             &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
+                             &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
     }
 }
 
@@ -278,9 +278,7 @@ static void on_debugui(uint64_t dock) {
                                                     0);
     set_asset(pi, ct_selected_object_a0->selected_object(context));
 
-    float size[2];
-    ct_debugui_a0->GetContentRegionAvail(size);
-
+    ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
     _draw_preview(pi, size);
 }
 
@@ -344,11 +342,11 @@ static void update(float dt) {
     }
 }
 
-void set_background_resource(struct ct_resource_id resource) {
+void set_background_resource(struct ct_resource_id_t0 resource) {
     set_asset(_G.baground, resource.uid);
 }
 
-void draw_background_texture(float size[2]) {
+void draw_background_texture(ce_vec2_t size) {
     _draw_preview(_G.baground, size);
 }
 
@@ -383,7 +381,7 @@ static void open(uint64_t dock) {
     ce_cdb_a0->write_commit(w);
 }
 
-static struct ct_dock_i0 ct_dock_i0 = {
+static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .display_title = dock_title,
         .name = name,
@@ -393,7 +391,7 @@ static struct ct_dock_i0 ct_dock_i0 = {
 };
 
 
-static struct ct_editor_module_i0 ct_editor_module_i0 = {
+static struct ct_editor_module_i0 ct_editor_module_api= {
         .init = init,
         .update = update,
 };
@@ -406,9 +404,9 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(DOCK_INTERFACE, &ct_dock_i0, sizeof(ct_dock_i0));
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
     api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
-    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_i0, sizeof(ct_editor_module_i0));
+    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_api, sizeof(ct_editor_module_api));
 }
 
 static void _shutdown() {

@@ -36,24 +36,25 @@ extern "C" {
 #define CT_RENDERER_COMPONENT_I \
      CE_ID64_0("ct_renderer_component_i0", 0xe832f6a0542ec6a0ULL)
 
-typedef void (*ct_renderender_on_render)();
 
 typedef struct ct_world_t0 ct_world_t0;
 typedef struct ct_entity_t0 ct_entity_t0;
 typedef struct ct_rg_module ct_rg_module;
-typedef struct ct_rg_builder ct_rg_builder;
+typedef struct ct_rg_builder_t0 ct_rg_builder_t0;
 
-struct ct_renderer_component_i0 {
+typedef void (*ct_renderender_on_render)();
+
+typedef struct ct_renderer_component_i0 {
     void (*feed_module)(ct_world_t0 world,
-                        struct ct_rg_module *module);
+                        ct_rg_module *module);
 
     void (*render)(ct_world_t0 world,
-                   struct ct_rg_builder *builder);
-};
+                   ct_rg_builder_t0 *builder);
+} ct_renderer_component_i0;
 
-struct ct_viewport0 {
+typedef struct ct_viewport_t0 {
     uint32_t idx;
-};
+} ct_viewport_t0;
 
 
 //! Render API V0
@@ -72,12 +73,12 @@ struct ct_renderer_a0 {
 
     uint64_t (*new_viewid)();
 
-    struct ct_viewport0 (*create_viewport)(ct_world_t0 world,
+    struct ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
                                            struct ct_entity_t0 main_camera);
 
-    void (*destroy_viewport)(struct ct_viewport0 viewport);
+    void (*destroy_viewport)(struct ct_viewport_t0 viewport);
 
-    struct ct_rg_builder *(*viewport_builder)(struct ct_viewport0 viewport);
+    struct ct_rg_builder_t0 *(*viewport_builder)(struct ct_viewport_t0 viewport);
 
     struct ce_window *(*get_main_window)();
 };

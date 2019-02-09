@@ -15,9 +15,9 @@ extern "C" {
     CE_ID64_0("ct_editor_node_i0", 0x3cb5090f34945e9bULL)
 
 
-struct ct_editor_node_i0 {
+typedef struct ct_editor_node_i0 {
     const char *(*display_name)();
-};
+}ct_editor_node_i0;
 
 
 struct ct_node_graph_editor_a0 {
