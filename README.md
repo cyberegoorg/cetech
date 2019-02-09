@@ -1,6 +1,7 @@
 # [CETech](https://gitlab.com/cyberegoorg/cetech)
 
 [![build status](https://gitlab.com/cyberegoorg/cetech/badges/master/build.svg)](https://gitlab.com/cyberegoorg/cetech/commits/master)
+[![build Status](https://travis-ci.org/cyberegoorg/cetech.svg?branch=master)](https://travis-ci.org/cyberegoorg/cetech)
 [![License](https://img.shields.io/badge/license-CC0-blue.svg)](LICENSE.md)
 
 ![prototype](docs/img/prototyp.png)

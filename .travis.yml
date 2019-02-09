@@ -3,7 +3,7 @@ git:
 language: c
 os:
   - osx
-  - linux
+#  - linux
 #  - windows
 addons:
   apt:
