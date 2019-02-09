@@ -1,0 +1,25 @@
+git:
+  depth: 1
+language: c
+os:
+  - osx
+  - linux
+#  - windows
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - clang
+      - cmake
+      - cmake-data
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo apt-get -qq update;    fi
+
+script:
+  - echo $TRAVIS_OS_NAME
+  - cmake --version
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then clang --version; fi
+  - pip install -r requirements.txt
+  - python build.py
