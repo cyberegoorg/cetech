@@ -28,7 +28,7 @@ static struct _G {
     bool visible;
 } _G;
 
-static void draw(uint64_t obj) {
+static void draw(uint64_t obj, uint64_t context) {
     if (!obj) {
         return;
     }
@@ -42,7 +42,7 @@ static void draw(uint64_t obj) {
             && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
 
             if (i->draw_ui) {
-                i->draw_ui(obj);
+                i->draw_ui(obj, context);
             }
             return;
         }
@@ -168,7 +168,7 @@ static void on_debugui(uint64_t dock) {
         }
     }
 
-    draw(obj);
+    draw(obj, context);
 }
 
 static void on_menu(uint64_t dock) {

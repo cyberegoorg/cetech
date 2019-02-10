@@ -184,17 +184,17 @@ static void ui_color4(uint64_t var) {
                                (ui_vec4_p0) {.color=true});
 }
 
-static void ui_texture(uint64_t var) {
+static void ui_texture(uint64_t var, uint64_t context) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
     ct_editor_ui_a0->prop_resource(var, MATERIAL_VAR_VALUE_PROP, name,
-                                   TEXTURE_TYPE, var);
+                                   TEXTURE_TYPE, context, var);
 }
 
-static void draw_property(uint64_t material) {
+static void draw_property(uint64_t material, uint64_t context) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layers_obj = ce_cdb_a0->read_ref(reader, MATERIAL_LAYERS, 0);
@@ -233,7 +233,7 @@ static void draw_property(uint64_t material) {
 
             ct_editor_ui_a0->prop_resource(layer, MATERIAL_SHADER_PROP,
                                            "Shader",
-                                           SHADER_TYPE, i);
+                                           SHADER_TYPE, context, i);
 
             uint64_t variables;
             variables = ce_cdb_a0->read_ref(layer_reader,
@@ -262,7 +262,7 @@ static void draw_property(uint64_t material) {
                 if (!type) continue;
 
                 if (!strcmp(type, "texture")) {
-                    ui_texture(var);
+                    ui_texture(var, context);
                 } else if (!strcmp(type, "vec4")) {
                     ui_vec4(var);
                 } else if (!strcmp(type, "color")) {

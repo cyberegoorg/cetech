@@ -21,9 +21,6 @@ extern "C" {
 
 struct ce_vio;
 
-typedef ce_vec4_t* _vec4;
-typedef ce_vec2_t* _vec2;
-
 struct ImGuiTextEditCallbackData;
 struct ImGuiSizeConstraintCallbackData;
 
@@ -40,6 +37,8 @@ typedef int ImGuiTreeNodeFlags;
 typedef int ImGuiFocusedFlags;
 typedef int ImGuiColorEditFlags;
 typedef int DebugUIHoveredFlags;
+typedef int ImGuiItemFlags;
+typedef int ImGuiStyleVar;
 
 typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 
@@ -239,6 +238,44 @@ enum DebugUICond {
             << 2,   // Set the variable if the object/window has no persistently saved data (no entry in .ini file)
     DebugUICond_Appearing = 1
             << 3    // Set the variable if the object/window is appearing after being hidden/inactive (or the first time)
+};
+
+enum
+{
+    DebugUIStyleVar_Alpha,               // float     Alpha
+    DebugUIStyleVar_WindowPadding,       // ImVec2    WindowPadding
+    DebugUIStyleVar_WindowRounding,      // float     WindowRounding
+    DebugUIStyleVar_WindowBorderSize,    // float     WindowBorderSize
+    DebugUIStyleVar_WindowMinSize,       // ImVec2    WindowMinSize
+    DebugUIStyleVar_WindowTitleAlign,    // ImVec2    WindowTitleAlign
+    DebugUIStyleVar_ChildRounding,       // float     ChildRounding
+    DebugUIStyleVar_ChildBorderSize,     // float     ChildBorderSize
+    DebugUIStyleVar_PopupRounding,       // float     PopupRounding
+    DebugUIStyleVar_PopupBorderSize,     // float     PopupBorderSize
+    DebugUIStyleVar_FramePadding,        // ImVec2    FramePadding
+    DebugUIStyleVar_FrameRounding,       // float     FrameRounding
+    DebugUIStyleVar_FrameBorderSize,     // float     FrameBorderSize
+    DebugUIStyleVar_ItemSpacing,         // ImVec2    ItemSpacing
+    DebugUIStyleVar_ItemInnerSpacing,    // ImVec2    ItemInnerSpacing
+    DebugUIStyleVar_IndentSpacing,       // float     IndentSpacing
+    DebugUIStyleVar_ScrollbarSize,       // float     ScrollbarSize
+    DebugUIStyleVar_ScrollbarRounding,   // float     ScrollbarRounding
+    DebugUIStyleVar_GrabMinSize,         // float     GrabMinSize
+    DebugUIStyleVar_GrabRounding,        // float     GrabRounding
+    DebugUIStyleVar_ButtonTextAlign,     // ImVec2    ButtonTextAlign
+    DebugUIStyleVar_ViewId,              // uint8_t
+    DebugUIStyleVar_COUNT
+};
+
+enum DebugUIItemFlags_
+{
+    DebugUIItemFlags_AllowKeyboardFocus           = 1 << 0,  // true
+    DebugUIItemFlags_ButtonRepeat                 = 1 << 1,  // false    // Button() will return true multiple times based on io.KeyRepeatDelay and io.KeyRepeatRate settings.
+    DebugUIItemFlags_Disabled                     = 1 << 2,  // false    // FIXME-WIP: Disable interactions but doesn't affect visuals. Should be: grey out and disable interactions with widgets that affect data + view widgets (WIP)
+    DebugUIItemFlags_NoNav                        = 1 << 3,  // false
+    DebugUIItemFlags_NoNavDefaultFocus            = 1 << 4,  // false
+    DebugUIItemFlags_SelectableDontClosePopup     = 1 << 5,  // false    // MenuItem/Selectable() automatically closes current Popup window
+    DebugUIItemFlags_Default_                     = DebugUIItemFlags_AllowKeyboardFocus
 };
 
 enum OPERATION {
@@ -922,6 +959,11 @@ struct ct_debugui_a0 {
     void (*PushID)(const char* str_id);
     void (*PushIDI)(const void* str_id);
     void (*PopID)();
+    void (*PopItemFlag)();
+    void (*PopStyleVar)(int count);
+    void (*PushItemFlag)(ImGuiItemFlags option, bool enabled);
+    void (*PushStyleVar)(ImGuiStyleVar idx, float val);
+
 };
 
 

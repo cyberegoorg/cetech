@@ -153,10 +153,10 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Mesh renderer";
 }
 
-static void property_editor(uint64_t obj) {
+static void property_editor(uint64_t obj, uint64_t context) {
 
     ct_editor_ui_a0->prop_resource(obj,
-                                   PROP_SCENE_ID, "Scene", PROP_SCENE_ID, obj);
+                                   PROP_SCENE_ID, "Scene", PROP_SCENE_ID, context, obj);
 
     ct_editor_ui_a0->prop_str_combo(obj,
                                     PROP_MESH, "Mesh", mesh_combo_items, obj);
@@ -166,7 +166,7 @@ static void property_editor(uint64_t obj) {
 
     ct_editor_ui_a0->prop_resource(obj,
                                    ce_id_a0->id64("material"), "Material",
-                                   ce_id_a0->id64("material"), obj + 1);
+                                   ce_id_a0->id64("material"), context, obj + 1);
 
 }
 

@@ -154,10 +154,10 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Primitive mesh";
 }
 
-static void property_editor(uint64_t obj) {
+static void property_editor(uint64_t obj, uint64_t context) {
     ct_editor_ui_a0->prop_resource(obj,
                                    ce_id_a0->id64("material"), "Material",
-                                   ce_id_a0->id64("material"), obj + 1);
+                                   ce_id_a0->id64("material"), context, obj + 1);
 
 }
 

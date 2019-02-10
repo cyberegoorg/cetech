@@ -134,7 +134,7 @@ static uint64_t create_new() {
     return component;
 }
 
-static void property_editor(uint64_t obj) {
+static void property_editor(uint64_t obj, uint64_t context) {
 
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_POSITION_X,

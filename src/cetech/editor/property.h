@@ -20,14 +20,14 @@ typedef struct ct_resource_id_t0 ct_resource_id_t0;
 typedef struct ct_property_editor_i0 {
     uint64_t (*cdb_type)();
 
-    void (*draw_ui)(uint64_t obj);
+    void (*draw_ui)(uint64_t obj, uint64_t context);
 
     void (*draw_menu)(uint64_t obj);
 }ct_property_editor_i0;
 
 
 struct ct_property_editor_a0 {
-    void (*draw)(uint64_t obj);
+    void (*draw)(uint64_t obj, uint64_t context);
 
     ct_property_editor_i0 *(*get_interface)(uint64_t obj);
 };

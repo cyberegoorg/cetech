@@ -60,6 +60,7 @@ struct ct_editor_ui_a0 {
                           uint64_t property,
                           const char *label,
                           uint64_t resource_type,
+                          uint64_t context,
                           uint32_t i);
 
     void (*prop_vec3)(uint64_t obj,
@@ -91,6 +92,10 @@ struct ct_editor_ui_a0 {
                                   uint64_t selected_obj);
 
     void (*ui_prop_header)(const char *name);
+
+    void (*begin_disabled)();
+    void (*end_disabled)();
+
 };
 
 CE_MODULE(ct_editor_ui_a0);

@@ -213,7 +213,7 @@ static uint64_t cdb_type() {
     return TEXTURE_TYPE;
 }
 
-static void draw_property(uint64_t obj) {
+static void draw_property(uint64_t obj, uint64_t context) {
     ct_editor_ui_a0->prop_str(obj, TEXTURE_INPUT, "Input", 0);
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");

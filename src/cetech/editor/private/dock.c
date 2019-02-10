@@ -15,6 +15,8 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
+#include <cetech/editor/selcted_object.h>
+#include <cetech/editor/editor_ui.h>
 
 #include "../dock.h"
 
@@ -137,8 +139,7 @@ void draw_all() {
 
                         if (ct_debugui_a0->MenuItem(title, NULL,
                                                     selected, true)) {
-                            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(
-                                    ce_cdb_a0->db(), dock);
+                            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
                             ce_cdb_a0->set_uint64(w, PROP_DOCK_CONTEXT, j);
                             ce_cdb_a0->write_commit(w);
                         }
@@ -239,7 +240,7 @@ static void draw_menu() {
             snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, dock);
 
             if (ct_debugui_a0->BeginMenu(label, true)) {
-                if(ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Close", "", false, true)  ) {
+                if (ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Close", "", false, true)) {
                     close_dock(dock);
                 }
                 ct_debugui_a0->EndMenu();
@@ -273,18 +274,56 @@ static bool context_btn(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     uint64_t context = ce_cdb_a0->read_uint64(reader,
                                               PROP_DOCK_CONTEXT, 0);
-    char title[256]  = {};
+    char title[256] = {};
     snprintf(title, CE_ARRAY_LEN(title),
              ICON_FA_MAP_SIGNS
-                     " %llu##dock_context_btn_%llx",
-             context, dock);
+                     " %llu##dock_context_btn_%llx", context, dock);
 
-    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
+    bool change = ct_debugui_a0->Button(title, &CE_VEC2_ZERO);
+    if (change) {
         ct_debugui_a0->OpenPopup("select_dock_context");
-        return true;
     };
 
-    return false;
+    ct_debugui_a0->SameLine(0, 4);
+
+    bool has_prev = ct_selected_object_a0->has_previous(context);
+    bool has_next = ct_selected_object_a0->has_next(context);
+
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_ARROW_LEFT
+                     "##dock_context_btn_prev_selected%llx", dock);
+
+    if(!has_prev) {
+        ct_editor_ui_a0->begin_disabled();
+    }
+
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
+        ct_selected_object_a0->set_previous(context);
+    };
+
+    if(!has_prev) {
+        ct_editor_ui_a0->end_disabled();
+    }
+
+    ct_debugui_a0->SameLine(0, 4);
+
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_ARROW_RIGHT
+                     "##dock_context_btn_next_selected%llx", dock);
+
+    if(!has_next) {
+        ct_editor_ui_a0->begin_disabled();
+    }
+
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
+        ct_selected_object_a0->set_next(context);
+    };
+
+    if(!has_next) {
+        ct_editor_ui_a0->end_disabled();
+    }
+
+    return change;
 }
 
 struct ct_dock_a0 dock_a0 = {

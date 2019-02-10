@@ -56,7 +56,7 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
     return NULL;
 };
 
-static void draw_component(uint64_t obj) {
+static void draw_component(uint64_t obj, uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
@@ -87,7 +87,7 @@ static void draw_component(uint64_t obj) {
 
     ct_debugui_a0->Separator();
 
-    ct_property_editor_a0->draw(obj);
+    ct_property_editor_a0->draw(obj, context);
 }
 
 static void _entity_ui(uint64_t obj) {
@@ -111,7 +111,7 @@ static void _entity_ui(uint64_t obj) {
     ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
 }
 
-static void draw_ui(uint64_t obj) {
+static void draw_ui(uint64_t obj, uint64_t context) {
     if (!obj) {
         return;
     }
@@ -136,7 +136,7 @@ static void draw_ui(uint64_t obj) {
         uint64_t c_obj;
         c_obj = ce_cdb_a0->read_subobject(creader, name, 0);
 
-        draw_component(c_obj);
+        draw_component(c_obj, context);
     }
 }
 

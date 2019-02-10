@@ -30,6 +30,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
+#include <cetech/editor/selcted_object.h>
 
 #include "cetech/editor/editor_ui.h"
 
@@ -39,13 +40,6 @@ static bool prop_revert_btn(uint64_t _obj,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), _obj);
     uint64_t instance_of = ce_cdb_a0->read_instance_of(r);
 
-
-    char lbl[256] = {};
-    snprintf(lbl, CE_ARRAY_LEN(lbl), "%s##revert_%llu_%llu",
-             ICON_FA_RECYCLE, _obj, props[0]);
-
-    bool remove_change = ct_debugui_a0->Button(lbl,
-                                               &(ce_vec2_t){});
 
     bool need_revert = false;
     if (instance_of) {
@@ -57,6 +51,22 @@ static bool prop_revert_btn(uint64_t _obj,
                 break;
             }
         }
+    }
+
+    char lbl[256] = {};
+    snprintf(lbl, CE_ARRAY_LEN(lbl), "%s##revert_%llu_%llu",
+             ICON_FA_RECYCLE, _obj, props[0]);
+
+    if (!need_revert) {
+        ct_debugui_a0->PushItemFlag(DebugUIItemFlags_Disabled, true);
+        ct_debugui_a0->PushStyleVar(DebugUIStyleVar_Alpha, 0.5f);
+    }
+
+    bool remove_change = ct_debugui_a0->Button(lbl, &(ce_vec2_t) {});
+
+    if (!need_revert) {
+        ct_debugui_a0->PopItemFlag();
+        ct_debugui_a0->PopStyleVar(1);
     }
 
     if (need_revert && ct_debugui_a0->IsItemHovered(0)) {
@@ -373,7 +383,7 @@ static bool resource_select_modal(const char *modal_id,
     bool changed = false;
     bool open = true;
 
-    ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t){512, 512}, 0);
+    ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
         struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
@@ -423,7 +433,7 @@ static bool resource_select_modal(const char *modal_id,
 
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(r, name,
-                                                  (ce_vec2_t){256,  256});
+                                                  (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -454,6 +464,7 @@ static void ui_resource(uint64_t obj,
                         uint64_t prop,
                         const char *label,
                         uint64_t resource_type,
+                        uint64_t context,
                         uint32_t i) {
     if (!obj) {
         return;
@@ -497,11 +508,18 @@ static void ui_resource(uint64_t obj,
 
     _prop_label(labelid, obj, &prop, 1);
 
-    // Open btn
-    sprintf(labelid, ICON_FA_FOLDER_OPEN
-            "##%sprop_select_resource_%d", label, i);
+    sprintf(labelid, ICON_FA_ARROW_UP "##%sprop_open_select_resource_%d", label, i);
 
-    if (ct_debugui_a0->Button(labelid, &(ce_vec2_t){0.0f})) {
+    if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
+        ct_selected_object_a0->set_selected_object(context, uid);
+    };
+
+    ct_debugui_a0->SameLine(0, 2);
+
+    // Open btn
+    sprintf(labelid, ICON_FA_FOLDER_OPEN "##%sprop_select_resource_%d", label, i);
+
+    if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_debugui_a0->OpenPopup(modal_id);
     };
     ct_debugui_a0->SameLine(0, 2);
@@ -556,7 +574,7 @@ static void ui_vec3(uint64_t obj,
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    ce_vec3_t  value = {
+    ce_vec3_t value = {
             .x = ce_cdb_a0->read_float(reader, prop[0], 0.0f),
             .y = ce_cdb_a0->read_float(reader, prop[1], 0.0f),
             .z = ce_cdb_a0->read_float(reader, prop[2], 0.0f),
@@ -574,7 +592,7 @@ static void ui_vec3(uint64_t obj,
 
     ct_debugui_a0->PushItemWidth(-1);
     if (ct_debugui_a0->DragFloat3(labelid,
-                                  (float*) &value_new, 1.0f,
+                                  (float *) &value_new, 1.0f,
                                   min, max,
                                   "%.3f", 1.0f)) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -615,10 +633,10 @@ static void ui_vec4(uint64_t obj,
     bool changed;
     if (params.color) {
         changed = ct_debugui_a0->ColorEdit4(labelid,
-                                            (float*)&value_new, 1);
+                                            (float *) &value_new, 1);
     } else {
         changed = ct_debugui_a0->DragFloat4(labelid,
-                                            (float*)&value_new, 1.0f,
+                                            (float *) &value_new, 1.0f,
                                             min, max,
                                             "%.3f", 1.0f);
     }
@@ -654,6 +672,16 @@ static uint64_t lock_selected_obj(uint64_t dock,
     return locked_object;
 }
 
+void begin_disabled() {
+    ct_debugui_a0->PushItemFlag(DebugUIItemFlags_Disabled, true);
+    ct_debugui_a0->PushStyleVar(DebugUIStyleVar_Alpha, 0.5f);
+}
+
+void end_disabled() {
+    ct_debugui_a0->PopItemFlag();
+    ct_debugui_a0->PopStyleVar(1);
+}
+
 static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_float = ui_float,
         .prop_str = ui_str,
@@ -667,6 +695,8 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .resource_select_modal = resource_select_modal,
         .lock_selected_obj = lock_selected_obj,
         .ui_prop_header = ui_prop_tree_node,
+        .begin_disabled = begin_disabled,
+        .end_disabled = end_disabled,
 };
 
 struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;

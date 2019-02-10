@@ -129,7 +129,7 @@ static struct ct_component_i0 ct_component_api = {
 };
 
 
-static void property_editor(uint64_t obj) {
+static void property_editor(uint64_t obj, uint64_t context) {
 
     ct_editor_ui_a0->prop_float(obj,
                                PROP_NEAR,

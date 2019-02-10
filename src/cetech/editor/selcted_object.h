@@ -12,8 +12,16 @@ extern "C" {
 
 
 struct ct_selected_object_a0 {
-    void (*set_selected_object)(uint64_t context, uint64_t obj);
+    void (*set_selected_object)(uint64_t context,
+                                uint64_t obj);
+
     uint64_t (*selected_object)(uint64_t context);
+
+    void (*set_previous)(uint64_t context);
+    void (*set_next)(uint64_t context);
+
+    bool (*has_previous)(uint64_t context);
+    bool (*has_next)(uint64_t context);
 };
 
 CE_MODULE(ct_selected_object_a0);

@@ -351,6 +351,10 @@ static struct ct_debugui_a0 debugui_api = {
         .PushID = ImGui::PushID,
         .PushIDI=  ImGui::PushID,
         .PopID = ImGui::PopID,
+        .PushItemFlag = ImGui::PushItemFlag,
+        .PushStyleVar = ImGui::PushStyleVar,
+        .PopItemFlag = ImGui::PopItemFlag,
+        .PopStyleVar = ImGui::PopStyleVar,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
