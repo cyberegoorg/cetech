@@ -508,7 +508,8 @@ static void ui_resource(uint64_t obj,
 
     _prop_label(labelid, obj, &prop, 1);
 
-    sprintf(labelid, ICON_FA_ARROW_UP "##%sprop_open_select_resource_%d", label, i);
+    sprintf(labelid, ICON_FA_ARROW_UP
+            "##%sprop_open_select_resource_%d", label, i);
 
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_selected_object_a0->set_selected_object(context, uid);
@@ -517,7 +518,8 @@ static void ui_resource(uint64_t obj,
     ct_debugui_a0->SameLine(0, 2);
 
     // Open btn
-    sprintf(labelid, ICON_FA_FOLDER_OPEN "##%sprop_select_resource_%d", label, i);
+    sprintf(labelid, ICON_FA_FOLDER_OPEN
+            "##%sprop_select_resource_%d", label, i);
 
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_debugui_a0->OpenPopup(modal_id);
@@ -708,20 +710,21 @@ static void _init(struct ce_api_a0 *api) {
 static void _shutdown() {
 }
 
-CE_MODULE_DEF(
-        sourcedb_ui,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+
+void CE_MODULE_LOAD(sourcedb_ui)(struct ce_api_a0 *api,
+                                 int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(sourcedb_ui)(struct ce_api_a0 *api,
+                                   int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+

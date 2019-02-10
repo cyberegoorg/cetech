@@ -14,7 +14,7 @@
 #include <celib/memory/memory.h>
 #include <celib/id.h>
 
-#include <celib/private/api_private.h>
+#include <celib/private/api_private.inl>
 #include <celib/cdb.h>
 
 #include <celib/log.h>
@@ -123,15 +123,15 @@ static void renderer_create() {
             flags |= WINDOW_RESIZABLE;
 
             _G.main_window = ce_os_window_a0->create(_G.allocator,
-                                                      title,
-                                                      WINDOWPOS_UNDEFINED,
-                                                      WINDOWPOS_UNDEFINED,
-                                                      w, h,
-                                                      flags);
+                                                     title,
+                                                     WINDOWPOS_UNDEFINED,
+                                                     WINDOWPOS_UNDEFINED,
+                                                     w, h,
+                                                     flags);
 
         } else {
             _G.main_window = ce_os_window_a0->create_from(_G.allocator,
-                                                           (void *) wid);
+                                                          (void *) wid);
         }
     }
 
@@ -140,7 +140,7 @@ static void renderer_create() {
     pd.ndt = _G.main_window->native_display_ptr(_G.main_window->inst);
     bgfx_set_platform_data(&pd);
 
-    struct ce_task_counter_t0* render_init_c = NULL;
+    struct ce_task_counter_t0 *render_init_c = NULL;
     ce_task_a0->add(&(ce_task_item_t0) {
             .work = _render_init_task,
             .name = "Renderer init worker",
@@ -285,7 +285,7 @@ static void render(float dt) {
     for (int i = 0; i < v_n; ++i) {
         struct viewport *v = &_G.viewports[i];
 
-        if(v->free) {
+        if (v->free) {
             continue;
         }
 
@@ -322,7 +322,7 @@ static uint32_t _new_viewport() {
     for (uint32_t i = 0; i < n; ++i) {
         struct viewport *v = &_G.viewports[i];
 
-        if(!v->free) {
+        if (!v->free) {
             continue;
         }
 
@@ -335,7 +335,7 @@ static uint32_t _new_viewport() {
 }
 
 struct ct_viewport_t0 create_viewport(ct_world_t0 world,
-                                    struct ct_entity_t0 main_camera) {
+                                      struct ct_entity_t0 main_camera) {
     uint32_t idx = _new_viewport();
 
     struct viewport *v = &_G.viewports[idx];
@@ -400,7 +400,7 @@ static struct ct_kernel_task_i0 render_task = {
 #include "gfx.inl"
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api) );
+    api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
     api->register_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
     api->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
 }
@@ -463,25 +463,24 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        renderer,
-        {
-            CE_INIT_API(api, ce_config_a0);
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ct_machine_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
+                              int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_machine_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    _init(api);
+}
 
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(renderer)(struct ce_api_a0 *api,
+                                int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+}

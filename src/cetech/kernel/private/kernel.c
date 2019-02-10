@@ -5,7 +5,7 @@
 #include "celib/config.h"
 #include "celib/module.h"
 #include "celib/id.h"
-#include "celib/private/api_private.h"
+#include "celib/private/api_private.inl"
 
 #include <celib/core.h>
 #include <celib/macros.h>

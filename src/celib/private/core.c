@@ -5,7 +5,7 @@
 #include <signal.h>
 
 #include <stdlib.h>
-#include "celib/private/api_private.h"
+#include "celib/private/api_private.inl"
 
 void memory_register_api(struct ce_api_a0 *api);
 

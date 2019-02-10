@@ -46,7 +46,7 @@ typedef struct entity_editor {
     uint64_t entity_name;
     bool mouse_hovering;
     bool free;
-}entity_editor;
+} entity_editor;
 
 static struct _G {
     struct entity_editor *editors;
@@ -190,7 +190,8 @@ static void draw_menu(uint64_t context_obj) {
                                 (int *) &operation, SCALE);
 }
 
-static void draw_editor(uint64_t context_obj, uint64_t context) {
+static void draw_editor(uint64_t context_obj,
+                        uint64_t context) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
 
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
@@ -411,26 +412,25 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        entity_editor,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ce_cdb_a0);
 
-            CE_INIT_API(api, ct_rg_a0);
-            CE_INIT_API(api, ct_default_rg_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(entity_editor)(struct ce_api_a0 *api,
+                                   int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_camera_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ct_default_rg_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(entity_editor)(struct ce_api_a0 *api,
+                                     int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

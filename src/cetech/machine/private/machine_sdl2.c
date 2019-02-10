@@ -285,7 +285,7 @@ void sdl_gamepad_process() {
                                                           EVENT_GAMEPAD_DOWN);
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
@@ -300,7 +300,7 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_UP);
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_BUTTON, j);
                 ce_cdb_a0->write_commit(w);
@@ -327,7 +327,7 @@ void sdl_gamepad_process() {
                         EVENT_GAMEPAD_MOVE);
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                 ce_cdb_a0->set_uint64(w, CONTROLER_AXIS, j);
 
@@ -406,7 +406,7 @@ static void _update(float dt) {
                 float pos[3] = {e.wheel.x, e.wheel.y};
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_X, pos[0]);
                 ce_cdb_a0->set_float(w, CONTROLER_POSITION_Y, pos[1]);
                 ce_cdb_a0->write_commit(w);
@@ -424,7 +424,7 @@ static void _update(float dt) {
 
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_str(w, CONTROLER_TEXT, e.text.text);
                 ce_cdb_a0->write_commit(w);
 
@@ -441,7 +441,7 @@ static void _update(float dt) {
                         EVENT_GAMEPAD_CONNECT);
 
                 ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                         event);
+                                                          event);
                 ce_cdb_a0->set_uint64(w, CONTROLER_ID, idx);
                 ce_cdb_a0->write_commit(w);
 
@@ -467,7 +467,7 @@ static void _update(float dt) {
                             EVENT_GAMEPAD_DISCONNECT);
 
                     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             event);
+                                                              event);
                     ce_cdb_a0->set_uint64(w, CONTROLER_ID, i);
                     ce_cdb_a0->write_commit(w);
 
@@ -550,21 +550,20 @@ static void shutdown() {
     SDL_Quit();
 }
 
-CE_MODULE_DEF(
-        machine,
-        {
-            CE_INIT_API(api, ce_log_a0);
+void CE_MODULE_LOAD(machine)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_INIT_API(api, ce_log_a0);
+    ce_api_a0 = api;
+    CE_UNUSED(reload);
+    init(api);
+}
 
-            ce_api_a0 = api;
-        },
-        {
-            CE_UNUSED(reload);
-            init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            shutdown();
+void CE_MODULE_UNLOAD(machine)(struct ce_api_a0 *api,
+                               int reload) {
 
-        }
-)
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    shutdown();
+
+}
+

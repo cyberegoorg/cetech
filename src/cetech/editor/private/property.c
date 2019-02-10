@@ -28,7 +28,8 @@ static struct _G {
     bool visible;
 } _G;
 
-static void draw(uint64_t obj, uint64_t context) {
+static void draw(uint64_t obj,
+                 uint64_t context) {
     if (!obj) {
         return;
     }
@@ -118,7 +119,7 @@ static void on_debugui(uint64_t dock) {
 
     if (obj) {
         const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         obj);
+                                                          obj);
 
         const char *name = ce_cdb_a0->read_str(reader_obj,
                                                ASSET_NAME_PROP,
@@ -141,7 +142,7 @@ static void on_debugui(uint64_t dock) {
         uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
         if (instance_of) {
             const ce_cdb_obj_o0 *inst_r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         instance_of);
+                                                          instance_of);
 
             const char *name = ce_cdb_a0->read_str(inst_r,
                                                    ASSET_NAME_PROP,
@@ -235,18 +236,17 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        property_inspector,
-        {
-            CE_INIT_API(api, ce_id_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
+                                        int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_id_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(property_inspector)(struct ce_api_a0 *api,
+                                          int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

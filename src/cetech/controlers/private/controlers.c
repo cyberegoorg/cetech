@@ -52,7 +52,7 @@ static void _componet_api_add(uint64_t name,
 struct ct_controlers_i0 *get_by_name(uint64_t name) {
     struct ct_controlers_i0 *controlers_i;
     controlers_i = (ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
-                                                              name, 0);
+                                                       name, 0);
     return controlers_i;
 };
 
@@ -82,22 +82,23 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        controlers,
-        {
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
 
-            _shutdown();
+void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
+                                int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
 
-        }
-)
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(controlers)(struct ce_api_a0 *api,
+                                  int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+
+}

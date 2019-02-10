@@ -56,8 +56,8 @@ static void online(uint64_t name,
 
     uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
     bgfx_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
-                                                             SCENE_VB_DECL,
-                                                             NULL, NULL));
+                                                        SCENE_VB_DECL,
+                                                        NULL, NULL));
     uint64_t *geom_name = (ce_cdb_a0->read_blob(reader, SCENE_GEOM_NAME,
                                                 NULL, NULL));
     uint32_t *ib_offset = (ce_cdb_a0->read_blob(reader, SCENE_IB_OFFSET,
@@ -75,24 +75,24 @@ static void online(uint64_t name,
     for (uint32_t i = 0; i < geom_count; ++i) {
         const bgfx_memory_t *vb_mem;
         vb_mem = ct_gfx_a0->bgfx_make_ref((const void *) &vb[vb_offset[i]],
-                                     vb_size[i]);
+                                          vb_size[i]);
 
         const bgfx_memory_t *ib_mem;
         ib_mem = ct_gfx_a0->bgfx_make_ref((const void *) &ib[ib_offset[i]],
-                                     sizeof(uint32_t) * ib_size[i]);
+                                          sizeof(uint32_t) * ib_size[i]);
 
         bgfx_vertex_buffer_handle_t bv_handle;
         bv_handle = ct_gfx_a0->bgfx_create_vertex_buffer(vb_mem,
-                                                    &vb_decl[i],
-                                                    BGFX_BUFFER_NONE);
+                                                         &vb_decl[i],
+                                                         BGFX_BUFFER_NONE);
 
         bgfx_index_buffer_handle_t ib_handle;
         ib_handle = ct_gfx_a0->bgfx_create_index_buffer(ib_mem,
-                                                   BGFX_BUFFER_INDEX32);
+                                                        BGFX_BUFFER_INDEX32);
 
         uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);
         ce_cdb_obj_o0 *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                           geom_obj);
+                                                            geom_obj);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, ib_size[i]);
@@ -116,22 +116,23 @@ static uint64_t cdb_type() {
 }
 
 
-bool scene_compiler(ce_cdb_t0 db, uint64_t k);
+bool scene_compiler(ce_cdb_t0 db,
+                    uint64_t k);
 
-static const char* display_icon() {
+static const char *display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
 }
 
 
 static struct ct_entity_t0 load(uint64_t resource,
-                             ct_world_t0 world) {
+                                ct_world_t0 world) {
 
     char *items = NULL;
     uint32_t items_count = 0;
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
-    struct ct_entity_t0 ent[items_count+1];
-    ct_ecs_a0->create(world, ent, items_count+1);
+    struct ct_entity_t0 ent[items_count + 1];
+    ct_ecs_a0->create(world, ent, items_count + 1);
 
     ct_ecs_a0->add(
             world, ent[0],
@@ -147,9 +148,9 @@ static struct ct_entity_t0 load(uint64_t resource,
     );
 
     for (int i = 0; i < items_count; ++i) {
-        uint64_t geom = ce_id_a0->id64(&items[i*128]);
+        uint64_t geom = ce_id_a0->id64(&items[i * 128]);
         ct_ecs_a0->add(
-                world, ent[i+1],
+                world, ent[i + 1],
                 (uint64_t[]) {
                         TRANSFORM_COMPONENT,
                         MESH_RENDERER_COMPONENT,
@@ -168,7 +169,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                         }}
         );
 
-        ct_ecs_a0->link(world, ent[0], ent[i+1]);
+        ct_ecs_a0->link(world, ent[0], ent[i + 1]);
     }
 
     return ent[0];
@@ -258,7 +259,7 @@ static void get_all_geometries(uint64_t scene,
                                char **geometries,
                                uint32_t *count) {
     uint64_t res = resource_data(scene);
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),res);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL,
                                                  NULL));
@@ -269,7 +270,7 @@ static void get_all_nodes(uint64_t scene,
                           char **geometries,
                           uint32_t *count) {
     uint64_t res = resource_data(scene);
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),res);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR,
                                                  NULL, NULL));
@@ -289,24 +290,23 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api(CT_SCENE_API, &scene_api, sizeof(scene_api));
 }
 
-CE_MODULE_DEF(
-        scene,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init_api(api);
-            sceneinit(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
+                           int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    _init_api(api);
+    sceneinit(api);
+}
 
-            shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(scene)(struct ce_api_a0 *api,
+                             int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    shutdown();
+}

@@ -77,9 +77,6 @@ struct ct_node_i0 node_i0 = {
 };
 
 
-void CE_MODULE_INITAPI(node_test)(struct ce_api_a0 *api) {
-}
-
 void CE_MODULE_LOAD (node_test)(struct ce_api_a0 *api,
                                 int reload) {
     CE_UNUSED(reload);

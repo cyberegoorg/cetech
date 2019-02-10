@@ -134,7 +134,8 @@ static uint64_t create_new() {
     return component;
 }
 
-static void property_editor(uint64_t obj, uint64_t context) {
+static void property_editor(uint64_t obj,
+                            uint64_t context) {
 
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_POSITION_X,
@@ -293,7 +294,8 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
 
 static void _init(struct ce_api_a0 *api) {
     api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0, sizeof(transform_simulation_i0));
+    api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0,
+                      sizeof(transform_simulation_i0));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 
@@ -301,25 +303,23 @@ static void _shutdown() {
 
 }
 
-CE_MODULE_DEF(
-        transform,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_ecs_a0);
+void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
+                               int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_log_a0);
+    _init(api);
+}
 
-            CE_INIT_API(api, ce_log_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(transform)(struct ce_api_a0 *api,
+                                 int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

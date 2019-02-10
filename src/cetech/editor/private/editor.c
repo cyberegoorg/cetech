@@ -149,7 +149,7 @@ static uint64_t *update_after(uint64_t *n) {
 
 static uint64_t *update_before(uint64_t *n) {
     static uint64_t a[] = {
-        CT_RENDER_TASK,
+            CT_RENDER_TASK,
     };
 
     *n = CE_ARRAY_LEN(a);
@@ -195,30 +195,28 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        playground,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ct_action_manager_a0);
-            CE_INIT_API(api, ce_module_a0);
+void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
+                                int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_camera_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_action_manager_a0);
+    CE_INIT_API(api, ce_module_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-            CE_INIT_API(api, ct_rg_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(playground)(struct ce_api_a0 *api,
+                                  int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

@@ -56,7 +56,8 @@ static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
     return NULL;
 };
 
-static void draw_component(uint64_t obj, uint64_t context) {
+static void draw_component(uint64_t obj,
+                           uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
     struct ct_component_i0 *c = get_component_interface(type);
@@ -75,7 +76,7 @@ static void draw_component(uint64_t obj, uint64_t context) {
     uint64_t comp_type = type;
     ct_debugui_a0->SameLine(0, 8);
 
-    ct_debugui_a0->PushIDI((void*)obj);
+    ct_debugui_a0->PushIDI((void *) obj);
     if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
         ce_cdb_a0->remove_property(w, comp_type);
@@ -111,7 +112,8 @@ static void _entity_ui(uint64_t obj) {
     ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
 }
 
-static void draw_ui(uint64_t obj, uint64_t context) {
+static void draw_ui(uint64_t obj,
+                    uint64_t context) {
     if (!obj) {
         return;
     }
@@ -124,7 +126,7 @@ static void draw_ui(uint64_t obj, uint64_t context) {
     components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
     const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                  components_obj);
+                                                   components_obj);
 
     uint64_t n = ce_cdb_a0->prop_count(creader);
     const uint64_t *components_name = ce_cdb_a0->prop_keys(creader);
@@ -193,7 +195,7 @@ static void _add_comp_modal(const char *modal_id,
             }
 
             const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         components);
+                                                          components);
 
             uint64_t component_type = i->cdb_type();
             if (ei->display_name &&
@@ -225,7 +227,7 @@ static void _add_comp_modal(const char *modal_id,
                     }
 
                     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             components);
+                                                              components);
 
                     ce_cdb_a0->set_subobject(w, component_type, component);
                     ce_cdb_a0->write_commit(w);
@@ -286,24 +288,23 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        entity_property,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
+                                     int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(entity_property)(struct ce_api_a0 *api,
+                                       int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

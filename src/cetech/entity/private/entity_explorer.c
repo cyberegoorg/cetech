@@ -37,7 +37,7 @@ static uint64_t _spawn_to(uint64_t from,
                           uint64_t to) {
 
     const ce_cdb_obj_o0 *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                    to);
+                                                     to);
 
     uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
                                               from);
@@ -69,7 +69,7 @@ static uint64_t _spawn_to(uint64_t from,
         }
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                 add_children_obj);
+                                                  add_children_obj);
         ce_cdb_a0->set_subobject(w, new_obj, new_obj);
         ce_cdb_a0->write_commit(w);
     }
@@ -91,7 +91,7 @@ static void _add(uint64_t selected_obj) {
                                                      ENTITY_CHILDREN);
 
     ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                  entity_obj);
+                                                   entity_obj);
     ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
     ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
     ce_cdb_a0->write_commit(writer);
@@ -106,25 +106,26 @@ static void _add(uint64_t selected_obj) {
         add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                                     ENTITY_CHILDREN);
         ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                      selected_obj);
+                                                       selected_obj);
         ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
                                  add_children_obj);
         ce_cdb_a0->write_commit(writer);
     }
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                             add_children_obj);
+                                              add_children_obj);
     ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
     ce_cdb_a0->write_commit(w);
 }
 
 
-void item_btns(uint64_t  context, uint64_t uid) {
+void item_btns(uint64_t context,
+               uint64_t uid) {
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", uid);
 
-    bool add = ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f});
+    bool add = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     if (add) {
         _add(uid);
@@ -137,7 +138,7 @@ void item_btns(uint64_t  context, uint64_t uid) {
                      ICON_FA_FOLDER_OPEN
                      "##add_from%llu", uid);
 
-    bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f});
+    bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_resource_%llu", uid);
@@ -166,9 +167,9 @@ void item_btns(uint64_t  context, uint64_t uid) {
         ct_debugui_a0->SameLine(0, 4);
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
                 "##minus_%llu", uid);
-        if (ct_debugui_a0->Button(label, &(ce_vec2_t){0.0f})) {
+        if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
             ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                     parent);
+                                                      parent);
             ce_cdb_a0->remove_property(w, uid);
             ce_cdb_a0->write_commit(w);
 
@@ -212,7 +213,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
     const ce_cdb_obj_o0 *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                    components);
+                                                     components);
 
     uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
     uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
@@ -235,7 +236,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
              (ICON_FA_CUBE
                      " ""%s##%llu"), name, uid);
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-    if(ct_debugui_a0->IsItemClicked(0)) {
+    if (ct_debugui_a0->IsItemClicked(0)) {
         new_selected_object = obj;
     }
 
@@ -268,10 +269,10 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                                         drag_obj);
 
                     ce_cdb_obj_o0 *pw = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                              parent);
+                                                               parent);
 
                     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             children);
+                                                              children);
 
                     ce_cdb_a0->move_prop(pw, w, drag_obj);
 
@@ -343,7 +344,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                      "%s##component_%llu", component_display_name, key);
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
-            if(ct_debugui_a0->IsItemClicked(0)) {
+            if (ct_debugui_a0->IsItemClicked(0)) {
                 new_selected_object = component;
             }
 
@@ -417,25 +418,23 @@ static void _init(struct ce_api_a0 *api) {
 static void _shutdown() {
 }
 
-CE_MODULE_DEF(
-        entity_explorer,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_cdb_a0);
+void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
+                                     int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,
+                                       int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

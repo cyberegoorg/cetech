@@ -85,7 +85,7 @@ typedef struct db_t {
 
     ce_spinlock_t0 id_map_lock;
     struct ce_hash_t id_map;
-}db_t;
+} db_t;
 
 static struct _G {
     struct db_t *dbs;
@@ -360,13 +360,13 @@ static struct ce_cdb_t0 create_db() {
                                                           sizeof(object_t **)),
 
             .object_pool = (object_t *) virt_alloc(MAX_OBJECTS *
-                                                          sizeof(object_t)),
+                                                   sizeof(object_t)),
 
             .free_objects = (object_t **) virt_alloc(MAX_OBJECTS *
-                                                            sizeof(object_t *)),
+                                                     sizeof(object_t *)),
 
             .to_free_objects = (object_t **) virt_alloc(MAX_OBJECTS *
-                                                               sizeof(object_t *))
+                                                        sizeof(object_t *))
     };
 
     return (ce_cdb_t0) {.idx = idx};
@@ -394,7 +394,7 @@ static uint64_t create_object(ce_cdb_t0 db,
 }
 
 static ce_cdb_obj_o0 *write_begin(ce_cdb_t0 db,
-                                 uint64_t _obj);
+                                  uint64_t _obj);
 
 static void write_commit(ce_cdb_obj_o0 *_writer);
 
@@ -698,7 +698,7 @@ typedef struct cdb_binobj_header {
     uint64_t values_size;
     uint64_t string_buffer_size;
     uint64_t blob_buffer_size;
-}cdb_binobj_header;
+} cdb_binobj_header;
 
 static void dump(ce_cdb_t0 db,
                  uint64_t _obj,
@@ -793,7 +793,7 @@ static void dump(ce_cdb_t0 db,
 
 
 static ce_cdb_obj_o0 *write_begin(ce_cdb_t0 db,
-                                 uint64_t _obj) {
+                                  uint64_t _obj) {
     struct db_t *db_inst = _get_db(db);
     struct object_t *obj = _get_object_from_id(db_inst, _obj);
 
@@ -805,7 +805,7 @@ static ce_cdb_obj_o0 *write_begin(ce_cdb_t0 db,
 }
 
 static enum ce_cdb_type_e0 prop_type(const ce_cdb_obj_o0 *reader,
-                                  uint64_t key) {
+                                     uint64_t key) {
     struct object_t *obj = _get_object_from_o(reader);
     uint64_t idx = _find_prop_index(obj, key);
 
@@ -1210,7 +1210,7 @@ void remove_property(ce_cdb_obj_o0 *_writer,
 }
 
 const ce_cdb_obj_o0 *read(ce_cdb_t0 _db,
-                         uint64_t object) {
+                          uint64_t object) {
     if (!object) {
         return NULL;
     }
@@ -1778,7 +1778,7 @@ static void _dispatch_instances(ce_cdb_t0 db,
 }
 
 const struct ce_cdb_change_ev_t0 *changed(const ce_cdb_obj_o0 *reader,
-                                        uint32_t *n) {
+                                          uint32_t *n) {
     struct object_t *obj = (object_t *) reader;
     *n = ce_array_size(obj->changed);
     if (*n) {
@@ -2113,18 +2113,16 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        cdb,
-        {
+void CE_MODULE_LOAD(cdb)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+    _init(api);
+}
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(cdb)(struct ce_api_a0 *api,
+                           int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

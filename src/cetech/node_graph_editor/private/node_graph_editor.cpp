@@ -704,8 +704,6 @@ struct ct_node_graph_editor_a0 *ct_node_graph_editor_a0 = &nge_api;
 
 
 extern "C" {
-void CE_MODULE_INITAPI(node_graph_editor)(struct ce_api_a0 *api) {
-}
 
 void CE_MODULE_LOAD (node_graph_editor)(struct ce_api_a0 *api,
                                         int reload) {

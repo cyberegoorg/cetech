@@ -141,7 +141,7 @@ uint64_t compile_obj(ce_cdb_t0 db,
             case CDB_TYPE_SUBOBJECT: {
                 uint64_t subobj = ce_cdb_a0->read_subobject(input_r, p, 0);
                 const ce_cdb_obj_o0 *sr = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         subobj);
+                                                          subobj);
                 const char *suid_s = ce_cdb_a0->read_str(sr, CDB_UID_PROP,
 
                                                          NULL);
@@ -239,7 +239,7 @@ void _scan_obj(const char *filename,
             _scan_obj(filename, k, sub_obj, obj_graph, obj_hash);
 
             const ce_cdb_obj_o0 *subr = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                       sub_obj);
+                                                        sub_obj);
 
             const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
 
@@ -384,9 +384,9 @@ char *resource_compiler_external_join(ce_alloc_t0 *alocator,
 
     char *tmp_dir = NULL;
     ce_os_path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
-                         ce_cdb_a0->read_str(reader,
-                                             CONFIG_PLATFORM,
-                                             ""));
+                        ce_cdb_a0->read_str(reader,
+                                            CONFIG_PLATFORM,
+                                            ""));
 
     char *buffer = NULL;
     ce_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
@@ -394,7 +394,7 @@ char *resource_compiler_external_join(ce_alloc_t0 *alocator,
 
     char *result = NULL;
     ce_os_path_a0->join(&result, alocator, 4, buffer, "release", "bin",
-                         name);
+                        name);
     ce_buffer_free(buffer, alocator);
 
     return result;
@@ -451,7 +451,7 @@ static void _init(struct ce_api_a0 *api) {
 
     char *tmp_dir_full = NULL;
     ce_os_path_a0->join(&tmp_dir_full, _G.allocator, 2,
-                         build_dir_full, "tmp");
+                        build_dir_full, "tmp");
 
     ce_os_path_a0->make_path(tmp_dir_full);
 
@@ -471,29 +471,27 @@ static void _shutdown() {
 }
 
 
-CE_MODULE_DEF(
-        resourcecompiler,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_task_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_config_a0);
-            CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
+void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
+                                      int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_task_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_UNLOAD(resourcecompiler)(struct ce_api_a0 *api,
+                                        int reload) {
 
-            _shutdown();
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
 
-        }
-)
+    _shutdown();
+
+}

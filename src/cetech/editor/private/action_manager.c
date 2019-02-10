@@ -26,7 +26,7 @@ typedef struct shortcut {
     char str[64];
     union modifiactor mod;
     uint32_t key;
-}shortcut;
+} shortcut;
 
 
 #define _G action_manager_global
@@ -56,7 +56,7 @@ static void fill_button(shortcut *sc) {
         ++it;
     }
 
-    struct ct_controlers_i0* keyboard;
+    struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     for (int i = 0; i < count; ++i) {
@@ -102,7 +102,7 @@ static void execute(uint64_t name) {
 }
 
 static void check() {
-    struct ct_controlers_i0* keyboard;
+    struct ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 
@@ -116,17 +116,17 @@ static void check() {
     _G.mod = (union modifiactor) {};
 
     if (keyboard->button_state(0, lshift) ||
-            keyboard->button_state(0, rshift)) {
+        keyboard->button_state(0, rshift)) {
         _G.mod.flags.shift = 1;
     }
 
     if (keyboard->button_state(0, lctrl) ||
-            keyboard->button_state(0, rctrl)) {
+        keyboard->button_state(0, rctrl)) {
         _G.mod.flags.ctrl = 1;
     }
 
     if (keyboard->button_state(0, lalt) ||
-            keyboard->button_state(0, ralt)) {
+        keyboard->button_state(0, ralt)) {
         _G.mod.flags.alt = 1;
     }
 
@@ -190,19 +190,19 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        action_manager,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+
+void CE_MODULE_LOAD(action_manager)(struct ce_api_a0 *api,
+                                    int reload) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_UNUSED(reload);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(action_manager)(struct ce_api_a0 *api,
+                                      int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

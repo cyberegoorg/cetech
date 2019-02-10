@@ -106,8 +106,6 @@ static struct ce_id_a0 hash_api = {
 
 struct ce_id_a0 *ce_id_a0 = &hash_api;
 
-void CE_MODULE_INITAPI(hashlib)(struct ce_api_a0 *api) {
-}
 
 void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
                                   int reload) {

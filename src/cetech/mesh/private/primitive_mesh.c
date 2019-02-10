@@ -87,21 +87,21 @@ static const struct pt_vertex _cube_vertices[24] = {
 };
 
 static const uint16_t cube_indices[36] = {
-                0, 1, 2,
-                0, 3, 1,
-                4, 6, 5,
-                4, 5, 7,
+        0, 1, 2,
+        0, 3, 1,
+        4, 6, 5,
+        4, 5, 7,
 
-                8, 9, 10,
-                8, 11, 9,
-                12, 14, 13,
-                12, 13, 15,
+        8, 9, 10,
+        8, 11, 9,
+        12, 14, 13,
+        12, 13, 15,
 
-                16, 18, 17,
-                16, 17, 19,
-                20, 21, 22,
-                20, 23, 21,
-        };
+        16, 18, 17,
+        16, 17, 19,
+        20, 21, 22,
+        20, 23, 21,
+};
 
 static bgfx_vertex_buffer_handle_t cube_vbh;
 static bgfx_index_buffer_handle_t cube_ibh;
@@ -154,7 +154,8 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Primitive mesh";
 }
 
-static void property_editor(uint64_t obj, uint64_t context) {
+static void property_editor(uint64_t obj,
+                            uint64_t context) {
     ct_editor_ui_a0->prop_resource(obj,
                                    ce_id_a0->id64("material"), "Material",
                                    ce_id_a0->id64("material"), context, obj + 1);
@@ -270,26 +271,24 @@ static void shutdown() {
 }
 
 
-CE_MODULE_DEF(
-        primitice_mesh,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_material_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ct_renderer_a0);
+void CE_MODULE_LOAD(primitice_mesh)(struct ce_api_a0 *api,
+                                    int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_material_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    init(api);
+}
 
-        },
-        {
-            CE_UNUSED(reload);
-            init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_UNLOAD(primitice_mesh)(struct ce_api_a0 *api,
+                                      int reload) {
 
-            shutdown();
-        }
-)
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    shutdown();
+}

@@ -81,7 +81,7 @@ void foreach_mesh_renderer(ct_world_t0 world,
         uint64_t mesh_id = m->mesh;
 
         const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                           scene_obj);
+                                                            scene_obj);
 
         uint64_t mesh = mesh_id;
         uint64_t geom_obj = ce_cdb_a0->read_ref(scene_reader, mesh, 0);
@@ -91,7 +91,7 @@ void foreach_mesh_renderer(ct_world_t0 world,
         }
 
         const ce_cdb_obj_o0 *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                          geom_obj);
+                                                           geom_obj);
 
         uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
         uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE,
@@ -153,7 +153,8 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Mesh renderer";
 }
 
-static void property_editor(uint64_t obj, uint64_t context) {
+static void property_editor(uint64_t obj,
+                            uint64_t context) {
 
     ct_editor_ui_a0->prop_resource(obj,
                                    PROP_SCENE_ID, "Scene", PROP_SCENE_ID, context, obj);
@@ -260,30 +261,27 @@ static void shutdown() {
     _shutdown();
 }
 
+void CE_MODULE_LOAD(mesh_renderer)(struct ce_api_a0 *api,
+                                   int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_material_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_scene_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    init(api);
+}
 
-CE_MODULE_DEF(
-        mesh_renderer,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_material_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ct_scene_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ct_renderer_a0);
+void CE_MODULE_UNLOAD(mesh_renderer)(struct ce_api_a0 *api,
+                                     int reload) {
 
-        },
-        {
-            CE_UNUSED(reload);
-            init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
 
-            shutdown();
-        }
-)
+    shutdown();
+}

@@ -35,11 +35,11 @@
 typedef struct fs_mount_point {
     char *root_path;
 //    struct ce_watchdog_a0 *wd;
-}fs_mount_point;
+} fs_mount_point;
 
 typedef struct fs_root {
     struct fs_mount_point *mount_points;
-}fs_root;
+} fs_root;
 
 static struct _G {
     struct ce_hash_t root_map;
@@ -146,7 +146,7 @@ static char *get_full_path(uint64_t root,
 
         char *fullpath = NULL;
         ce_os_path_a0->join(&fullpath, allocator, 2, mp->root_path,
-                             filename);
+                            filename);
 
         if (((!test_dir) && exist(fullpath)) ||
             (test_dir && exist_dir(fullpath))) {
@@ -165,7 +165,7 @@ static struct ce_vio *open(uint64_t root,
                                     mode == FS_OPEN_WRITE);
 
     struct ce_vio *file = ce_os_vio_a0->from_file(full_path,
-                                                   (enum ce_vio_open_mode) mode);
+                                                  (enum ce_vio_open_mode) mode);
 
     if (!file) {
         ce_log_a0->error(LOG_WHERE, "Could not load file %s", full_path);
@@ -217,9 +217,9 @@ static void listdir(uint64_t root,
 
         char *final_path = NULL;
         ce_os_path_a0->join(&final_path, allocator, 2, mount_point_dir,
-                             path);
+                            path);
         ce_os_path_a0->list(final_path, (const char *[]) {filter}, 1,
-                             recursive, only_dir, &_files, &_count, allocator);
+                            recursive, only_dir, &_files, &_count, allocator);
 
         for (uint32_t i = 0; i < _count; ++i) {
             ce_array_push(all_files,
@@ -388,7 +388,7 @@ static struct ce_fs_a0 _api = {
 struct ce_fs_a0 *ce_fs_a0 = &_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CE_FS_API, &_api, sizeof(ce_fs_a0));
+    api->register_api(CE_FS_API, &_api, sizeof(_api));
 }
 
 
@@ -409,19 +409,18 @@ static void _shutdown() {
     ce_hash_free(&_G.root_map, _G.allocator);
 }
 
-CE_MODULE_DEF(
-        filesystem,
-        {
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(filesystem)(struct ce_api_a0 *api,
+                                int reload) {
+    CE_UNUSED(reload);
+    _init(api);
+}
 
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(filesystem)(struct ce_api_a0 *api,
+                                  int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+}

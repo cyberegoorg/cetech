@@ -12,35 +12,35 @@
 #define _G editor_globals
 
 typedef struct slot_t {
-    uint64_t*  slots;
+    uint64_t *slots;
     uint64_t idx;
 } slot_t;
 
 static struct _G {
     struct ce_hash_t selected_object_map;
-    slot_t* slots;
+    slot_t *slots;
 } _G;
 
 static void set_selected_object(uint64_t context,
                                 uint64_t obj) {
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         idx = ce_array_size(_G.slots);
-        ce_array_push(_G.slots, (slot_t){}, ce_memory_a0->system);
+        ce_array_push(_G.slots, (slot_t) {}, ce_memory_a0->system);
 
         ce_hash_add(&_G.selected_object_map, context, idx, ce_memory_a0->system);
 
-        slot_t* slot = &_G.slots[idx];
+        slot_t *slot = &_G.slots[idx];
         ce_array_push(slot->slots, 0, ce_memory_a0->system);
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
 
     uint64_t last_idx = ce_array_size(slot->slots) - 1;
 
-    if(slot->idx != last_idx) {
-        slot->slots[slot->idx+1] = obj;
+    if (slot->idx != last_idx) {
+        slot->slots[slot->idx + 1] = obj;
     } else {
         ce_array_push(slot->slots, obj, ce_memory_a0->system);
     }
@@ -49,26 +49,26 @@ static void set_selected_object(uint64_t context,
 }
 
 static uint64_t selected_object(uint64_t context) {
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return 0;
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
     return slot->slots[slot->idx];
 }
 
 void set_previous(uint64_t context) {
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return;
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
 
-    if(!slot->idx) {
+    if (!slot->idx) {
         return;
     }
 
@@ -76,17 +76,17 @@ void set_previous(uint64_t context) {
 }
 
 void set_next(uint64_t context) {
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return;
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
 
     uint64_t last_idx = ce_array_size(slot->slots) - 1;
 
-    if(last_idx == slot->idx) {
+    if (last_idx == slot->idx) {
         return;
     }
 
@@ -94,15 +94,15 @@ void set_next(uint64_t context) {
 }
 
 bool has_previous(uint64_t context) {
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return false;
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
 
-    if(!slot->idx) {
+    if (!slot->idx) {
         return false;
     }
 
@@ -110,17 +110,17 @@ bool has_previous(uint64_t context) {
 
 }
 
-bool has_next(uint64_t context){
-    uint64_t  idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
+bool has_next(uint64_t context) {
+    uint64_t idx = ce_hash_lookup(&_G.selected_object_map, context, UINT64_MAX);
 
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return false;
     }
 
-    slot_t* slot = &_G.slots[idx];
+    slot_t *slot = &_G.slots[idx];
     uint64_t last_idx = ce_array_size(slot->slots) - 1;
 
-    if(last_idx == slot->idx) {
+    if (last_idx == slot->idx) {
         return false;
     }
 
@@ -152,17 +152,17 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        selected_object,
-        {
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(selected_object)(struct ce_api_a0 *api,
+                                     int reload) {
+    CE_UNUSED(reload);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(selected_object)(struct ce_api_a0 *api,
+                                       int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+

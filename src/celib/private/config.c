@@ -234,9 +234,6 @@ static struct ce_config_a0 config_a0 = {
 struct ce_config_a0 *ce_config_a0 = &config_a0;
 
 
-void CE_MODULE_INITAPI(config)(struct ce_api_a0 *api) {
-}
-
 void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
                              int reload) {
     CE_UNUSED(reload);

@@ -203,22 +203,23 @@ static void _shutdown() {
     _G = {};
 }
 
-CE_MODULE_DEF(
-        log_view,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ce_log_a0);
+extern "C" {
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(log_view)(struct ce_api_a0 *api,
+                              int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ce_log_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(log_view)(struct ce_api_a0 *api,
+                                int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+}

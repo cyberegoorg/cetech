@@ -157,7 +157,7 @@ static bool _compile(ce_cdb_t0 db,
                      uint64_t obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
     const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                   ce_config_a0->obj());
+                                                    ce_config_a0->obj());
 
     const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
@@ -213,7 +213,8 @@ static uint64_t cdb_type() {
     return TEXTURE_TYPE;
 }
 
-static void draw_property(uint64_t obj, uint64_t context) {
+static void draw_property(uint64_t obj,
+                          uint64_t context) {
     ct_editor_ui_a0->prop_str(obj, TEXTURE_INPUT, "Input", 0);
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
@@ -242,7 +243,8 @@ static void tooltip(uint64_t resource,
 //                         (float[4]) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static void draw_raw(uint64_t obj, ce_vec2_t size) {
+static void draw_raw(uint64_t obj,
+                     ce_vec2_t size) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     bgfx_texture_handle_t texture = {
@@ -383,25 +385,26 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
 }
 
-CE_MODULE_DEF(
-        texture,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init_api(api);
-            texture_init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
 
-            texture_shutdown();
-        }
-)
+void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+
+    _init_api(api);
+    texture_init(api);
+}
+
+void CE_MODULE_UNLOAD(texture)(struct ce_api_a0 *api,
+                               int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    texture_shutdown();
+}

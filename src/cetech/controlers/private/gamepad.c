@@ -262,23 +262,22 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        gamepad,
-        {
-            CE_INIT_API(api, ct_machine_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(gamepad)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ct_machine_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-            _shutdown();
+void CE_MODULE_UNLOAD(gamepad)(struct ce_api_a0 *api,
+                               int reload) {
 
-        }
-)
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+
+}

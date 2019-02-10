@@ -293,7 +293,7 @@ static bool context_btn(uint64_t dock) {
              ICON_FA_ARROW_LEFT
                      "##dock_context_btn_prev_selected%llx", dock);
 
-    if(!has_prev) {
+    if (!has_prev) {
         ct_editor_ui_a0->begin_disabled();
     }
 
@@ -301,7 +301,7 @@ static bool context_btn(uint64_t dock) {
         ct_selected_object_a0->set_previous(context);
     };
 
-    if(!has_prev) {
+    if (!has_prev) {
         ct_editor_ui_a0->end_disabled();
     }
 
@@ -311,7 +311,7 @@ static bool context_btn(uint64_t dock) {
              ICON_FA_ARROW_RIGHT
                      "##dock_context_btn_next_selected%llx", dock);
 
-    if(!has_next) {
+    if (!has_next) {
         ct_editor_ui_a0->begin_disabled();
     }
 
@@ -319,7 +319,7 @@ static bool context_btn(uint64_t dock) {
         ct_selected_object_a0->set_next(context);
     };
 
-    if(!has_next) {
+    if (!has_next) {
         ct_editor_ui_a0->end_disabled();
     }
 
@@ -349,19 +349,18 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        dock,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_module_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
+                          int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_module_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(dock)(struct ce_api_a0 *api,
+                            int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

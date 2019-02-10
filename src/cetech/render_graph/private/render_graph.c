@@ -63,21 +63,21 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        render_graph,
-        {
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
 
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(render_graph)(struct ce_api_a0 *api,
+                                  int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(render_graph)(struct ce_api_a0 *api,
+                                    int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+}

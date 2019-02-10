@@ -42,8 +42,8 @@ static void get_project_view(ct_world_t0 world,
     struct ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
                                                                  CAMERA_COMPONENT,
                                                                  camera);
-    if(!transform) return;
-    if(!camera_data) return;
+    if (!transform) return;
+    if (!camera_data) return;
 
     float fov = camera_data->fov;
     float near = camera_data->near;
@@ -108,9 +108,9 @@ static uint64_t size() {
 
 static void camera_spawner(ct_world_t0 world,
                            uint64_t obj,
-                           void* data) {
+                           void *data) {
 
-    const ce_cdb_obj_o0 * r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_camera_component *c = data;
 
     *c = (ct_camera_component) {
@@ -129,12 +129,13 @@ static struct ct_component_i0 ct_component_api = {
 };
 
 
-static void property_editor(uint64_t obj, uint64_t context) {
+static void property_editor(uint64_t obj,
+                            uint64_t context) {
 
     ct_editor_ui_a0->prop_float(obj,
-                               PROP_NEAR,
-                               "Near",
-                               (ui_float_p0) {});
+                                PROP_NEAR,
+                                "Near",
+                                (ui_float_p0) {});
 
     ct_editor_ui_a0->prop_float(obj,
                                 PROP_FAR,
@@ -166,25 +167,22 @@ static void _init(struct ce_api_a0 *api) {
 static void _shutdown() {
 }
 
+void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-CE_MODULE_DEF(
-        camera,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ce_cdb_a0);
+void CE_MODULE_UNLOAD(camera)(struct ce_api_a0 *api,
+                              int reload) {
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

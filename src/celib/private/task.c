@@ -38,7 +38,7 @@ typedef struct task_t {
 
     const char *name;
     uint32_t counter;
-}  task_t;
+} task_t;
 
 typedef struct {
     uint32_t id;
@@ -180,7 +180,7 @@ void add(ce_task_item_t0 *items,
          struct ce_task_counter_t0 **counter) {
     uint32_t new_counter = _new_counter_task(count);
 
-    if(counter) {
+    if (counter) {
         *counter = (ce_task_counter_t0 *) &_G.counter_pool[new_counter];
     }
 
@@ -211,7 +211,7 @@ void wait_atomic(ce_task_counter_t0 *signal,
 }
 
 void wait_for_counter_no_work(ce_task_counter_t0 *signal,
-                         int32_t value) {
+                              int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {
         ce_os_thread_a0->yield();
@@ -262,10 +262,10 @@ static void _init(struct ce_api_a0 *api) {
     atomic_init(&_G.counter_pool_idx, 1);
     atomic_init(&_G.task_pool_idx, 1);
 
-    for (uint32_t j = 1; j < worker_count+1; ++j) {
+    for (uint32_t j = 1; j < worker_count + 1; ++j) {
         _G.workers[j] = ce_os_thread_a0->create(_task_worker,
-                                                 "cetech_worker",
-                                                 (void *) ((intptr_t) (j)));
+                                                "cetech_worker",
+                                                (void *) ((intptr_t) (j)));
     }
 
     _G.is_running = 1;
@@ -288,18 +288,16 @@ static void _shutdown() {
     };
 }
 
-CE_MODULE_DEF(
-        task,
-        {
-            CE_UNUSED(api);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
+                          int reload) {
+    CE_UNUSED(reload);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(task)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+

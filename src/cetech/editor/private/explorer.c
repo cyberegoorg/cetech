@@ -122,7 +122,7 @@ static void on_debugui(uint64_t dock) {
         ce_cdb_a0->write_commit(w);
     }
 
-    if(!selected_object) {
+    if (!selected_object) {
         return;
     }
 
@@ -183,23 +183,21 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        level_inspector,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ce_cdb_a0);
+void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
+                                     int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    _init(api);
+}
 
-            CE_INIT_API(api, ct_resource_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(level_inspector)(struct ce_api_a0 *api,
+                                       int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

@@ -43,7 +43,7 @@ typedef struct preview_instance {
     uint64_t type;
     bool locked;
     bool free;
-}preview_instance;
+} preview_instance;
 
 static struct _G {
     struct ce_alloc_t0 *allocator;
@@ -232,14 +232,14 @@ static void draw_menu(uint64_t dock) {
 static void _draw_preview(preview_instance *pi,
                           ce_vec2_t size) {
 
-    if(!pi->type) {
+    if (!pi->type) {
         return;
     }
 
     struct ct_resource_preview_i0 *i;
     i = _get_asset_preview(pi->type);
 
-    if(!i) {
+    if (!i) {
         return;
     }
 
@@ -390,7 +390,7 @@ static struct ct_dock_i0 dock_api = {
 };
 
 
-static struct ct_editor_module_i0 ct_editor_module_api= {
+static struct ct_editor_module_i0 ct_editor_module_api = {
         .init = init,
         .update = update,
 };
@@ -412,25 +412,24 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        asset_preview,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_rg_a0);
-            CE_INIT_API(api, ct_default_rg_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
+                                   int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_camera_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ct_default_rg_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(asset_preview)(struct ce_api_a0 *api,
+                                     int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

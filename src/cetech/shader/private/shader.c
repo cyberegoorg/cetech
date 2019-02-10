@@ -136,7 +136,7 @@ static bool _compile(ce_cdb_t0 db,
     struct ce_alloc_t0 *a = ce_memory_a0->system;
 
     const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                   ce_config_a0->obj());
+                                                    ce_config_a0->obj());
     const char *source_dir = ce_cdb_a0->read_str(c_reader,
                                                  CONFIG_SRC, "");
     const char *core_dir = ce_cdb_a0->read_str(c_reader, CONFIG_CORE,
@@ -284,9 +284,10 @@ static uint64_t cdb_type() {
     return SHADER_TYPE;
 }
 
-static const char* display_icon() {
+static const char *display_icon() {
     return ICON_FA_COG;
 }
+
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
@@ -326,25 +327,25 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
 }
 
-CE_MODULE_DEF(
-        shader,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init_api(api);
-            shader_init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
 
-            shader_shutdown();
-        }
-)
+void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    _init_api(api);
+    shader_init(api);
+}
+
+void CE_MODULE_UNLOAD(shader)(struct ce_api_a0 *api,
+                              int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    shader_shutdown();
+}

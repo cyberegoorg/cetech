@@ -86,24 +86,20 @@ struct ct_game_i0 game_i0 = {
 // Module def
 //==============================================================================
 
-void CE_MODULE_INITAPI(example_develop)(struct ce_api_a0 *api) {
-    if (CE_DYNAMIC_MODULE) {
-        CE_INIT_API(api, ct_controlers_a0);
-        CE_INIT_API(api, ce_log_a0);
-        CE_INIT_API(api, ce_id_a0);
-        CE_INIT_API(api, ct_renderer_a0);
-        CE_INIT_API(api, ct_ecs_a0);
-        CE_INIT_API(api, ct_rg_a0);
-        CE_INIT_API(api, ct_default_rg_a0);
-        CE_INIT_API(api, ce_cdb_a0);
-        CE_INIT_API(api, ct_game_system_a0);
-        CE_INIT_API(api, ce_ydb_a0);
-        CE_INIT_API(api, ct_editor_ui_a0);
-    }
-}
-
 void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
                                       int reload) {
+    CE_INIT_API(api, ct_controlers_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ct_default_rg_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_game_system_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ct_editor_ui_a0);
+
     CE_UNUSED(api);
 
     ce_log_a0->info("example", "Init %d", reload);

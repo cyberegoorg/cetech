@@ -94,7 +94,7 @@ static void load(const uint64_t *names,
                 (ct_resource_id_t0) {.uid=asset_name});
 
         if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
-                                          _G.allocator)) {
+                                             _G.allocator)) {
             ce_log_a0->warning(LOG_WHERE,
                                "Could not load resource 0x%llx", rid.uid);
             continue;
@@ -148,7 +148,8 @@ static bool cdb_loader(uint64_t uid) {
     return true;
 }
 
-static bool dump_recursive(const char* filename, uint64_t obj) {
+static bool dump_recursive(const char *filename,
+                           uint64_t obj) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     const uint64_t k_n = ce_cdb_a0->prop_count(r);
     const uint64_t *ks = ce_cdb_a0->prop_keys(r);
@@ -157,15 +158,15 @@ static bool dump_recursive(const char* filename, uint64_t obj) {
     ce_cdb_a0->dump(ce_cdb_a0->db(),
                     obj, &output, _G.allocator);
 
-    struct ct_resource_id_t0 rid={.uid=obj};
+    struct ct_resource_id_t0 rid = {.uid=obj};
     ct_resourcedb_a0->put_resource_blob(rid,
-                                     output,
-                                     ce_array_size(output));
+                                        output,
+                                        ce_array_size(output));
     ce_buffer_free(output, _G.allocator);
 
     for (int i = 0; i < k_n; ++i) {
         uint64_t k = ks[i];
-        if(ce_cdb_a0->prop_type(r, k) != CDB_TYPE_SUBOBJECT) {
+        if (ce_cdb_a0->prop_type(r, k) != CDB_TYPE_SUBOBJECT) {
             continue;
         }
         uint64_t subobj = ce_cdb_a0->read_subobject(r, k, 0);
@@ -181,8 +182,8 @@ static bool save_to_db(uint64_t uid) {
     struct ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
-                                                      filename,
-                                                      CE_ARRAY_LEN(filename));
+                                                         filename,
+                                                         CE_ARRAY_LEN(filename));
 
     if (exist) {
         dump_recursive(filename, root);
@@ -198,8 +199,8 @@ static bool save(uint64_t uid) {
     struct ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
-                                                      filename,
-                                                      CE_ARRAY_LEN(filename));
+                                                         filename,
+                                                         CE_ARRAY_LEN(filename));
 
     if (exist) {
         char *buf = NULL;
@@ -272,25 +273,24 @@ static void _shutdown() {
 }
 
 
-CE_MODULE_DEF(
-        resourcesystem,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_config_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
+                                    int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+//            CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
 
-            _shutdown();
+void CE_MODULE_UNLOAD(resourcesystem)(struct ce_api_a0 *api,
+                                      int reload) {
 
-        }
-)
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+
+}

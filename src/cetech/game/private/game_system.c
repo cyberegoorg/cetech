@@ -140,9 +140,6 @@ static struct ct_kernel_task_i0 game_task = {
 //==============================================================================
 // Module def
 //==============================================================================
-void CE_MODULE_INITAPI(game_system)(struct ce_api_a0 *api) {
-
-}
 
 void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                   int reload) {

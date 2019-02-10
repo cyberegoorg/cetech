@@ -271,11 +271,6 @@ static struct ct_node_graph_a0 ng_api = {
 
 struct ct_node_graph_a0 *ct_node_graph_a0 = &ng_api;
 
-
-void CE_MODULE_INITAPI(node_graph)(struct ce_api_a0 *api) {
-
-}
-
 void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
                                  int reload) {
     CE_UNUSED(reload);

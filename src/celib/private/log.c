@@ -42,7 +42,7 @@ static void vlog(const enum ce_log_level_e0 level,
     time_t tm = time(NULL);
 
     for (uint8_t i = 0; i < _G.handlers_count; ++i) {
-        _G.handlers[i](level, *(ce_time_t*)&tm, ce_task_a0->worker_id(),
+        _G.handlers[i](level, *(ce_time_t *) &tm, ce_task_a0->worker_id(),
                        where, msg, _G.handlers_data[i]);
     }
 }
@@ -154,19 +154,16 @@ static struct ce_log_a0 log_a0 = {
 
 struct ce_log_a0 *ce_log_a0 = &log_a0;
 
-CE_MODULE_DEF(
-        log,
-        {
-            CE_UNUSED(api);
-        },
-        {
-            CE_UNUSED(reload);
-            ce_api_a0->register_api(CE_LOG_API, ce_log_a0,
-                                    sizeof(log_a0));
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-        }
-)
+void CE_MODULE_LOAD(log)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+    api->register_api(CE_LOG_API, ce_log_a0, sizeof(log_a0));
+}
+
+void CE_MODULE_UNLOAD(log)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+}
+
 

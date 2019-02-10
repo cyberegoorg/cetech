@@ -343,7 +343,8 @@ static struct ct_debugui_a0 debugui_api = {
         .GetColumnOffset = ImGui::GetColumnOffset,
         .SetColumnOffset = ImGui::SetColumnOffset,
         .GetColumnsCount = ImGui::GetColumnsCount,
-        .SetNextWindowSize = reinterpret_cast<void (*)(ce_vec2_t* , DebugUICond)>(ImGui::SetNextWindowSize),
+        .SetNextWindowSize = reinterpret_cast<void (*)(ce_vec2_t *,
+                                                       DebugUICond)>(ImGui::SetNextWindowSize),
 
         .EndChild = ImGui::EndChild,
         .Unindent= ImGui::Unindent,
@@ -533,25 +534,28 @@ static void _shutdown() {
     _G = {};
 }
 
-CE_MODULE_DEF(
-        debugui,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_ydb_a0);
-            CE_INIT_API(api, ce_log_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+extern "C" {
+
+void CE_MODULE_LOAD(debugui)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_UNUSED(reload);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(debugui)(struct ce_api_a0 *api,
+                               int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+
+}

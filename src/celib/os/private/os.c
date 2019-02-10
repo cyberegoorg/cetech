@@ -28,28 +28,26 @@ extern struct ce_os_window_a0 window_api;
 extern struct ce_os_input_a0 input_api;
 
 
-CE_MODULE_DEF(
-        os,
-        {
-            CE_UNUSED(api);
-        },
-        {
-            CE_UNUSED(reload);
+void CE_MODULE_LOAD(os)(struct ce_api_a0 *api,
+                        int reload) {
+    CE_UNUSED(reload);
 
-            api->register_api(CE_OS_PATH_API, &path_api, sizeof(path_api));
-            api->register_api(CE_OS_CPU_API, &cpu_api, sizeof(cpu_api));
-            api->register_api(CE_OS_ERROR_API, &error_api, sizeof(error_api));
-            api->register_api(CE_OS_OBJECT_API, &object_api, sizeof(object_api));
-            api->register_api(CE_OS_PROCESS_API, &process_api, sizeof(process_api));
-            api->register_api(CE_OS_TIME_API, &time_api, sizeof(time_api));
-            api->register_api(CE_OS_VIO_API, &vio_api, sizeof(vio_api));
-            api->register_api(CE_OS_WINDOW_API, &window_api, sizeof(window_api));
-            api->register_api(CE_OS_INPUT_API, &input_api, sizeof(input_api));
-            api->register_api(CE_OS_THREAD_API, &thread_api, sizeof(thread_api));
+    api->register_api(CE_OS_PATH_API, &path_api, sizeof(path_api));
+    api->register_api(CE_OS_CPU_API, &cpu_api, sizeof(cpu_api));
+    api->register_api(CE_OS_ERROR_API, &error_api, sizeof(error_api));
+    api->register_api(CE_OS_OBJECT_API, &object_api, sizeof(object_api));
+    api->register_api(CE_OS_PROCESS_API, &process_api, sizeof(process_api));
+    api->register_api(CE_OS_TIME_API, &time_api, sizeof(time_api));
+    api->register_api(CE_OS_VIO_API, &vio_api, sizeof(vio_api));
+    api->register_api(CE_OS_WINDOW_API, &window_api, sizeof(window_api));
+    api->register_api(CE_OS_INPUT_API, &input_api, sizeof(input_api));
+    api->register_api(CE_OS_THREAD_API, &thread_api, sizeof(thread_api));
 
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-        }
-)
+}
+
+void CE_MODULE_UNLOAD(os)(struct ce_api_a0 *api,
+                          int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+}

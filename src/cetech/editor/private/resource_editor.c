@@ -48,7 +48,7 @@ typedef struct editor {
     uint64_t type;
     uint64_t obj;
     uint64_t context_obj;
-}editor;
+} editor;
 
 static struct _G {
     struct editor *editors;
@@ -71,11 +71,11 @@ static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
 };
 
 static void draw_editor(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
-    if(!editor) {
+    if (!editor) {
         return;
     }
 
@@ -91,7 +91,7 @@ static void draw_editor(uint64_t dock) {
     bool click = ct_debugui_a0->IsMouseClicked(0, false);
 
     if (is_mouse_hovering && click) {
-        const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),editor->context_obj);
+        const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(), editor->context_obj);
         uint64_t name = ce_cdb_a0->read_uint64(creader,
                                                RESOURCE_EDITOR_OBJ, 0);
 
@@ -104,11 +104,11 @@ static void draw_editor(uint64_t dock) {
 }
 
 static void draw_editor_menu(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
-    if(!editor) {
+    if (!editor) {
         return;
     }
 
@@ -119,7 +119,7 @@ static void draw_editor_menu(uint64_t dock) {
     }
 
     ct_dock_a0->context_btn(dock);
-    if(i && i->draw_menu) {
+    if (i && i->draw_menu) {
         ct_debugui_a0->SameLine(0, -1);
         i->draw_menu(editor->context_obj);
     }
@@ -142,7 +142,7 @@ static uint32_t find_editor(uint64_t obj) {
 #define DEFAULT_EDITOR_NAME  "Editor"
 
 static const char *dock_title(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),dock);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
@@ -187,7 +187,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
     uint64_t dock = ct_dock_a0->create_dock(_ASSET_EDITOR, true);
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),dock);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
     ce_cdb_a0->set_ptr(w, _PROP_EDITOR, editor);
     ce_cdb_a0->write_commit(w);
 
@@ -206,7 +206,7 @@ static void open(uint64_t obj) {
     e->type = type;
     e->obj = obj;
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),e->context_obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), e->context_obj);
     ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
     ce_cdb_a0->write_commit(w);
 
@@ -271,26 +271,25 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        editor,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ce_cdb_a0);
+void CE_MODULE_LOAD(editor)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_camera_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ct_default_rg_a0);
+    _init(api);
+}
 
-            CE_INIT_API(api, ct_rg_a0);
-            CE_INIT_API(api, ct_default_rg_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(editor)(struct ce_api_a0 *api,
+                              int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+

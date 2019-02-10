@@ -53,7 +53,7 @@ typedef struct entity_storage_t {
 typedef struct spawn_info_t {
     uint64_t obj;
     struct ct_entity_t0 *ents;
-}spawn_info_t;
+} spawn_info_t;
 
 typedef struct world_instance_t {
     ct_world_t0 world;
@@ -80,7 +80,7 @@ typedef struct world_instance_t {
 
     struct ce_hash_t comp_spawn_map;
     struct spawn_info_t *comp_spawn_info;
-}world_instance_t;
+} world_instance_t;
 
 #define _entity_data_idx(w, ent) \
     w->entity_idx[handler_idx((ent).h)]
@@ -1230,7 +1230,7 @@ static void _update(float dt) {
 
                             for (int e = 0; e < ents_n; ++e) {
                                 struct ct_entity_t0 ent = ents[e];
-                                _add_components_from_obj(world, ent, k,comp_obj);
+                                _add_components_from_obj(world, ent, k, comp_obj);
                             }
                         }
                     }
@@ -1309,23 +1309,21 @@ static void _shutdown() {
 }
 
 
-CE_MODULE_DEF(
-        ecs,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_resource_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_cdb_a0);
-            CE_INIT_API(api, ce_task_a0);
-        },
+void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ce_task_a0);
+    _init(api);
+}
 
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(ecs)(struct ce_api_a0 *api,
+                           int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

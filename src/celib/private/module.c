@@ -39,7 +39,6 @@ typedef struct module_functios {
     void *handler;
     ce_load_module_t0 *load;
     ce_unload_module_t0 *unload;
-    ce_initapi_module_t0 *initapi;
 } module_functios;
 
 static struct _G {
@@ -125,19 +124,10 @@ static bool load_from_path(module_functios *module,
         return false;
     }
 
-    get_module_fce_name(&buffer, name, name_len, "_initapi_module");
-
-    ce_initapi_module_t0 *initapi_fce = (ce_initapi_module_t0 *) ce_os_object_a0->load_function(
-            obj, buffer);
-    if (initapi_fce == NULL) {
-        return false;
-    }
-
     *module = (module_functios) {
             .handler = obj,
             .load = load_fce,
             .unload = unload_fce,
-            .initapi = initapi_fce
     };
     return true;
 }
@@ -148,18 +138,15 @@ static bool load_from_path(module_functios *module,
 
 
 static void add_static(ce_load_module_t0 load,
-                       ce_unload_module_t0 unload,
-                       ce_initapi_module_t0 initapi) {
+                       ce_unload_module_t0 unload) {
 
     struct module_functios module = {
             .load=load,
             .unload=unload,
-            .initapi=initapi,
             .handler=NULL
     };
 
     add_module("__STATIC__", &module);
-//    initapi(struct ce_api_a0);
     load(ce_api_a0, 0);
 }
 
@@ -173,7 +160,6 @@ static void load(const char *path) {
         return;
     }
 
-    module.initapi(ce_api_a0);
     module.load(ce_api_a0, 0);
 
     add_module(path, &module);
@@ -193,7 +179,6 @@ static void reload(const char *path) {
             continue;
         }
 
-        new_module.initapi(ce_api_a0);
         new_module.load(ce_api_a0, 1);
 
         old_module.unload(ce_api_a0, 1);
@@ -202,19 +187,6 @@ static void reload(const char *path) {
         ce_os_object_a0->unload(old_module.handler);
 
         break;
-    }
-
-    for (size_t i = 0; i < MAX_MODULES; ++i) {
-        if (!_G.used[i]) {
-            continue;
-        }
-
-        if ((strcmp(_G.path[i], path)) == 0) {
-            continue;
-        }
-
-        struct module_functios module = _G.modules[i];
-        module.initapi(ce_api_a0);
     }
 }
 
@@ -334,21 +306,20 @@ static void _init(struct ce_api_a0 *api) {
 
 }
 
-CE_MODULE_DEF(
-        module,
-        {
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
+void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    _init(api);
 
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            ce_log_a0->debug(LOG_WHERE, "Shutdown");
+}
 
-            _G = (struct _G) {};
-        }
-)
+void CE_MODULE_UNLOAD(module)(struct ce_api_a0 *api,
+                              int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    ce_log_a0->debug(LOG_WHERE, "Shutdown");
+
+    _G = (struct _G) {};
+}

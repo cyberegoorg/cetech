@@ -43,20 +43,20 @@ typedef struct PosTexCoord0Vertex {
     float m_z;
     float m_u;
     float m_v;
-}PosTexCoord0Vertex;
+} PosTexCoord0Vertex;
 
 static bgfx_vertex_decl_t ms_decl;
 
 static void init_decl() {
     ct_gfx_a0->bgfx_vertex_decl_begin(&ms_decl,
-                                 ct_gfx_a0->bgfx_get_renderer_type());
+                                      ct_gfx_a0->bgfx_get_renderer_type());
     ct_gfx_a0->bgfx_vertex_decl_add(&ms_decl,
-                               BGFX_ATTRIB_POSITION, 3,
-                               BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                    BGFX_ATTRIB_POSITION, 3,
+                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_decl_add(&ms_decl,
-                               BGFX_ATTRIB_TEXCOORD0, 2,
-                               BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                    BGFX_ATTRIB_TEXCOORD0, 2,
+                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_decl_end(&ms_decl);
 }
@@ -142,16 +142,16 @@ static void output_pass_on_pass(void *inst,
                                 uint64_t layer,
                                 struct ct_rg_builder_t0 *builder) {
     ct_gfx_a0->bgfx_set_view_clear(viewid,
-                              BGFX_CLEAR_COLOR |
-                              BGFX_CLEAR_DEPTH,
-                              0x66CCFFff, 1.0f, 0);
+                                   BGFX_CLEAR_COLOR |
+                                   BGFX_CLEAR_DEPTH,
+                                   0x66CCFFff, 1.0f, 0);
 
     uint16_t size[2] = {};
     builder->get_size(builder, size);
 
     ct_gfx_a0->bgfx_set_view_rect(viewid,
-                             0, 0,
-                             size[0], size[1]);
+                                  0, 0,
+                                  size[0], size[1]);
 
     float proj[16];
     ce_mat4_ortho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f,
@@ -201,7 +201,7 @@ typedef struct gbuffer_pass {
     struct ct_rg_pass_t0 pass;
     struct ct_entity_t0 camera;
     ct_world_t0 world;
-}gbuffer_pass;
+} gbuffer_pass;
 
 static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
@@ -210,9 +210,9 @@ static void gbuffer_pass_on_pass(void *inst,
     struct gbuffer_pass *pass = inst;
 
     ct_gfx_a0->bgfx_set_view_clear(viewid,
-                              BGFX_CLEAR_COLOR |
-                              BGFX_CLEAR_DEPTH,
-                              0x66CCFFff, 1.0f, 0);
+                                   BGFX_CLEAR_COLOR |
+                                   BGFX_CLEAR_DEPTH,
+                                   0x66CCFFff, 1.0f, 0);
 
     uint16_t size[2] = {};
     builder->get_size(builder, size);
@@ -230,14 +230,14 @@ static void gbuffer_pass_on_pass(void *inst,
                                    size[1]);
 
     ct_gfx_a0->bgfx_set_view_transform(viewid, view_matrix,
-                                  proj_matrix);
+                                       proj_matrix);
 }
 
 
 static void feed_module(ct_rg_module *m1,
                         ct_world_t0 world,
                         struct ct_entity_t0 camera) {
-    struct ct_rg_module* gm = m1->add_extension_point(m1, _GBUFFER);
+    struct ct_rg_module *gm = m1->add_extension_point(m1, _GBUFFER);
 
     gm->add_pass(gm, &(gbuffer_pass) {
             .camera = camera,
@@ -269,33 +269,33 @@ static void _init(struct ce_api_a0 *api) {
 
     init_decl();
 
-    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api, sizeof(default_render_graph_api));
+    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api,
+                      sizeof(default_render_graph_api));
 }
 
 static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        default_render_graph,
-        {
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ct_renderer_a0);
-            CE_INIT_API(api, ct_rg_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ct_ecs_a0);
-            CE_INIT_API(api, ct_camera_a0);
-            CE_INIT_API(api, ct_material_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
+void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
+                                          int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(api, ct_rg_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_camera_a0);
+    CE_INIT_API(api, ct_material_a0);
+    _init(api);
+}
 
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(default_render_graph)(struct ce_api_a0 *api,
+                                            int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
+    _shutdown();
+}

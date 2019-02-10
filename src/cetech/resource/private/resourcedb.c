@@ -231,7 +231,7 @@ static int _do_sql(const char *sql) {
 
 static int builddb_init_db() {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                 ce_config_a0->obj());
+                                                  ce_config_a0->obj());
 
     const char *platform = ce_cdb_a0->read_str(reader,
                                                CONFIG_PLATFORM, "");
@@ -241,12 +241,12 @@ static int builddb_init_db() {
 
     char *build_dir_full = NULL;
     ce_os_path_a0->join(&build_dir_full, ce_memory_a0->system, 2,
-                         build_dir_str, platform);
+                        build_dir_str, platform);
     ce_os_path_a0->make_path(build_dir_full);
 
     ce_os_path_a0->join(&_G._logdb_path, ce_memory_a0->system, 2,
-                         build_dir_full,
-                         "resource.db");
+                        build_dir_full,
+                        "resource.db");
 
     ce_buffer_free(build_dir_full, ce_memory_a0->system);
 
@@ -684,20 +684,18 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        builddb,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
+void CE_MODULE_LOAD(builddb)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    _init(api);
+}
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(builddb)(struct ce_api_a0 *api,
+                               int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

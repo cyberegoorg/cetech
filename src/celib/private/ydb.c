@@ -50,7 +50,7 @@ typedef struct node_value {
         char *string;
         uint32_t node_count;
     };
-}node_value ;
+} node_value;
 
 
 static uint64_t calc_key(const char *key) {
@@ -123,7 +123,7 @@ typedef struct parent_stack_state {
 
     char **str_array;
     float *float_array;
-}parent_stack_state;
+} parent_stack_state;
 
 uint64_t cdb_from_vio(ce_vio *vio,
                       struct ce_alloc_t0 *alloc) {
@@ -232,7 +232,7 @@ uint64_t cdb_from_vio(ce_vio *vio,
                                                               0);
 
                     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                             array);
+                                                              array);
                     for (int i = 0; i < len; ++i) {
                         const char *str = s->str_array[i];
                         ce_cdb_a0->set_str(w, ce_id_a0->id64(str), str);
@@ -301,7 +301,7 @@ uint64_t cdb_from_vio(ce_vio *vio,
                     uint64_t key_hash = 0;
 
                     if (type == NODE_REF) {
-                        key_hash  = value.ui;
+                        key_hash = value.ui;
                     } else {
                         key_hash = ce_id_a0->id64(value.string);
                     }
@@ -628,18 +628,16 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        ydb,
-        {
+void CE_MODULE_LOAD(ydb)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+    _init(api);
+}
 
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+void CE_MODULE_UNLOAD(ydb)(struct ce_api_a0 *api,
+                           int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}

@@ -626,24 +626,28 @@ static void _shutdown() {
     _G = (struct _G) {};
 }
 
-CE_MODULE_DEF(
-        asset_browser,
-        {
-            CE_INIT_API(api, ce_memory_a0);
-            CE_INIT_API(api, ce_id_a0);
-            CE_INIT_API(api, ct_debugui_a0);
-            CE_INIT_API(api, ce_fs_a0);
-            CE_INIT_API(api, ct_resource_a0);
 
-            CE_INIT_API(api, ce_cdb_a0);
-        },
-        {
-            CE_UNUSED(reload);
-            _init(api);
-        },
-        {
-            CE_UNUSED(reload);
-            CE_UNUSED(api);
-            _shutdown();
-        }
-)
+extern "C" {
+    
+void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
+                                   int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ct_resource_a0);
+
+    CE_INIT_API(api, ce_cdb_a0);
+    _init(api);
+}
+
+void CE_MODULE_UNLOAD(asset_browser)(struct ce_api_a0 *api,
+                                     int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+    _shutdown();
+}
+
+}
