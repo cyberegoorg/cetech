@@ -29,4 +29,5 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip3 install -r requirements.txt; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pip3 install -r requirements.txt; fi
   - python3 build.py
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bin/darwin64/cetech_develop_debug -compile -src ./examples/develop/src -build ./examples/develop/build -renderer.type noop; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then bin/darwin64/cetech_develop -compile -src ./examples/develop/src -build ./examples/develop/build -renderer.type noop; fi
+
