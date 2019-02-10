@@ -176,7 +176,7 @@ int cetech_kernel_shutdown() {
     ce_module_a0->unload_all();
     ce_shutdown();
 
-    return 1;
+    return 0;
 }
 
 
