@@ -24,7 +24,7 @@ struct _G {
 } _G;
 
 static struct ct_game_i0 *_get_game(uint64_t name) {
-    return (struct ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name,
+    return (ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name,
                                                 0);
 }
 
@@ -79,7 +79,7 @@ static struct ct_viewport_t0 game_render_graph_builder(uint64_t name) {
     struct ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
-        return (struct ct_viewport_t0) {0};
+        return (ct_viewport_t0) {0};
     }
 
     return game_i->render_graph_builder();

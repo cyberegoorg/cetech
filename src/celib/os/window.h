@@ -56,7 +56,7 @@ enum ce_window_pos {
 
 typedef void ce_window_ints;
 
-struct ce_window {
+typedef struct ce_window {
     ce_window_ints *inst;
 
     void (*set_title)(ce_window_ints *w,
@@ -79,11 +79,11 @@ struct ce_window {
     void (*warp_mouse)(ce_window_ints *window,
                        int x,
                        int y);
-};
+}ce_window;
 
 
 struct ce_os_window_a0 {
-    struct ce_window *(*create)(struct ce_alloc_t0 *alloc,
+    struct ce_window *(*create)(ce_alloc_t0 *alloc,
                                 const char *title,
                                 enum ce_window_pos x,
                                 enum ce_window_pos y,
@@ -91,10 +91,10 @@ struct ce_os_window_a0 {
                                 const int32_t height,
                                 uint32_t flags);
 
-    struct ce_window *(*create_from)(struct ce_alloc_t0 *alloc,
+    struct ce_window *(*create_from)(ce_alloc_t0 *alloc,
                                      void *hndl);
 
-    void (*destroy)(struct ce_alloc_t0 *alloc,
+    void (*destroy)(ce_alloc_t0 *alloc,
                     struct ce_window *w);
 };
 

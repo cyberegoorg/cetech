@@ -37,7 +37,7 @@
 
 #define _G entity_editor_globals
 
-struct entity_editor {
+typedef struct entity_editor {
     ct_world_t0 world;
     struct ct_entity_t0 camera_ent;
     struct ct_entity_t0 entity;
@@ -46,7 +46,7 @@ struct entity_editor {
     uint64_t entity_name;
     bool mouse_hovering;
     bool free;
-};
+}entity_editor;
 
 static struct _G {
     struct entity_editor *editors;
@@ -270,11 +270,11 @@ static void draw_editor(uint64_t context_obj, uint64_t context) {
 
 }
 
-//static const char *dock_title(struct ct_dock_i0 *dock) {
+//static const char *dock_title(ct_dock_i0 *dock) {
 //    return ICON_FA_CUBE " Entity editor";
 //}
 //
-//static const char *name(struct ct_dock_i0 *dock) {
+//static const char *name(ct_dock_i0 *dock) {
 //    return "entity_editor";
 //}
 
@@ -292,7 +292,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
     }
 
     uint32_t idx = n;
-    ce_array_push(_G.editors, (struct entity_editor) {}, ce_memory_a0->system);
+    ce_array_push(_G.editors, (entity_editor) {}, ce_memory_a0->system);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), context_obj);
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);

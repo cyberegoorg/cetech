@@ -37,13 +37,13 @@ static struct _G {
 //==============================================================================
 // output pass
 //==============================================================================
-struct PosTexCoord0Vertex {
+typedef struct PosTexCoord0Vertex {
     float m_x;
     float m_y;
     float m_z;
     float m_u;
     float m_v;
-};
+}PosTexCoord0Vertex;
 
 static bgfx_vertex_decl_t ms_decl;
 
@@ -71,7 +71,7 @@ void screenspace_quad(float _textureWidth,
     if (3 == ct_gfx_a0->bgfx_get_avail_transient_vertex_buffer(3, &ms_decl)) {
         bgfx_transient_vertex_buffer_t vb;
         ct_gfx_a0->bgfx_alloc_transient_vertex_buffer(&vb, 3, &ms_decl);
-        struct PosTexCoord0Vertex *vertex = (struct PosTexCoord0Vertex *) vb.data;
+        struct PosTexCoord0Vertex *vertex = (PosTexCoord0Vertex *) vb.data;
 
         const float minx = -_width;
         const float maxx = _width;
@@ -125,7 +125,7 @@ static void output_pass_on_setup(void *inst,
 
     builder->create(builder,
                     RG_OUTPUT_TEXTURE,
-                    (struct ct_rg_attachment_t0) {
+                    (ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
@@ -181,14 +181,14 @@ static void gbuffer_pass_on_setup(void *inst,
                                   struct ct_rg_builder_t0 *builder) {
 
     builder->create(builder, _COLOR,
-                    (struct ct_rg_attachment_t0) {
+                    (ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_RGB8,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
     );
 
     builder->create(builder, _DEPTH,
-                    (struct ct_rg_attachment_t0) {
+                    (ct_rg_attachment_t0) {
                             .format = BGFX_TEXTURE_FORMAT_D24,
                             .ratio = BGFX_BACKBUFFER_RATIO_EQUAL
                     }
@@ -197,11 +197,11 @@ static void gbuffer_pass_on_setup(void *inst,
     builder->add_pass(builder, inst, _GBUFFER);
 }
 
-struct gbuffer_pass {
+typedef struct gbuffer_pass {
     struct ct_rg_pass_t0 pass;
     struct ct_entity_t0 camera;
     ct_world_t0 world;
-};
+}gbuffer_pass;
 
 static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
@@ -234,24 +234,24 @@ static void gbuffer_pass_on_pass(void *inst,
 }
 
 
-static void feed_module(struct ct_rg_module *m1,
+static void feed_module(ct_rg_module *m1,
                         ct_world_t0 world,
                         struct ct_entity_t0 camera) {
     struct ct_rg_module* gm = m1->add_extension_point(m1, _GBUFFER);
 
-    gm->add_pass(gm, &(struct gbuffer_pass) {
+    gm->add_pass(gm, &(gbuffer_pass) {
             .camera = camera,
             .world = world,
             .pass = {
                     .on_setup = gbuffer_pass_on_setup,
                     .on_pass = gbuffer_pass_on_pass,
             }
-    }, sizeof(struct gbuffer_pass));
+    }, sizeof(gbuffer_pass));
 
-    m1->add_pass(m1, &(struct ct_rg_pass_t0) {
+    m1->add_pass(m1, &(ct_rg_pass_t0) {
             .on_pass = output_pass_on_pass,
             .on_setup = output_pass_on_setup
-    }, sizeof(struct ct_rg_pass_t0));
+    }, sizeof(ct_rg_pass_t0));
 }
 
 static struct ct_default_rg_a0 default_render_graph_api = {

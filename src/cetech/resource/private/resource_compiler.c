@@ -74,7 +74,7 @@ static bool _is_ref(const char *str) {
     return (str[0] == '0') && (str[1] == 'x');
 }
 
-uint64_t compile_obj(struct ce_cdb_t0 db,
+uint64_t compile_obj(ce_cdb_t0 db,
                      uint64_t input_obj,
                      uint64_t uid) {
 
@@ -300,7 +300,7 @@ void _scan_files(char **files,
 
         char filename[256] = {};
         ct_resourcedb_a0->get_resource_filename(
-                (struct ct_resource_id_t0) {.uid=obj},
+                (ct_resource_id_t0) {.uid=obj},
                 filename, CE_ARRAY_LEN(filename));
 
         ce_log_a0->info(LOG_WHERE, "Compile 0x%llx from %s", obj, filename);
@@ -314,7 +314,7 @@ void _scan_files(char **files,
 
         char *output = NULL;
         ce_cdb_a0->dump(db, obj, &output, _G.allocator);
-        ct_resourcedb_a0->put_resource_blob((struct ct_resource_id_t0) {.uid=obj},
+        ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
                                             output,
                                             ce_array_size(output));
 
@@ -329,7 +329,7 @@ void _scan_files(char **files,
 //==============================================================================
 
 
-char *resource_compiler_get_build_dir(struct ce_alloc_t0 *a,
+char *resource_compiler_get_build_dir(ce_alloc_t0 *a,
                                       const char *platform) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
 
@@ -363,7 +363,7 @@ void resource_compiler_compile_all() {
     ce_log_a0->debug("resource_compiler", "compile time %f", dt * 0.001);
 }
 
-char *resource_compiler_get_tmp_dir(struct ce_alloc_t0 *alocator,
+char *resource_compiler_get_tmp_dir(ce_alloc_t0 *alocator,
                                     const char *platform) {
 
     char *build_dir = resource_compiler_get_build_dir(alocator, platform);
@@ -373,7 +373,7 @@ char *resource_compiler_get_tmp_dir(struct ce_alloc_t0 *alocator,
     return buffer;
 }
 
-char *resource_compiler_external_join(struct ce_alloc_t0 *alocator,
+char *resource_compiler_external_join(ce_alloc_t0 *alocator,
                                       const char *name) {
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);

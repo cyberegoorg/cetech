@@ -261,11 +261,11 @@ struct ct_debugui_a0 {
     void (*TextV)(const char *fmt,
                   va_list args);
 
-    void (*TextColored)(const _vec4 col,
+    void (*TextColored)(const ce_vec4_t* col,
                         const char *fmt,
                         ...) CTECH_ATTR_FORMAT(2, 3);
 
-    void (*TextColoredV)(const _vec4 col,
+    void (*TextColoredV)(const ce_vec4_t* col,
                          const char *fmt,
                          va_list args);
 
@@ -301,32 +301,32 @@ struct ct_debugui_a0 {
                         va_list args);
 
     bool (*Button)(const char *label,
-                   const _vec2 size);
+                   const ce_vec2_t* size);
 
     bool (*SmallButton)(const char *label);
 
     bool (*InvisibleButton)(const char *str_id,
-                            const _vec2 size);
+                            const ce_vec2_t* size);
 
     void (*Image)(bgfx_texture_handle_t user_texture_id,
-                  const _vec2 size,
-                  const _vec4 tint_col,
-                  const _vec4 border_col);
+                  const ce_vec2_t* size,
+                  const ce_vec4_t* tint_col,
+                  const ce_vec4_t* border_col);
 
     void (*Image2)(bgfx_texture_handle_t user_texture_id,
-                   const _vec2 size,
-                   const _vec2 uv0,
-                   const _vec2 uv1,
-                   const _vec4 tint_col,
-                   const _vec4 border_col);
+                   const ce_vec2_t* size,
+                   const ce_vec2_t* uv0,
+                   const ce_vec2_t* uv1,
+                   const ce_vec4_t* tint_col,
+                   const ce_vec4_t* border_col);
 
     bool (*ImageButton)(ImTextureID user_texture_id,
-                        const _vec2 size,
-                        const _vec2 uv0,
-                        const _vec2 uv1,
+                        const ce_vec2_t* size,
+                        const ce_vec2_t* uv0,
+                        const ce_vec2_t* uv1,
                         int frame_padding,
-                        const _vec4 bg_col,
-                        const _vec4 tint_col);
+                        const ce_vec4_t* bg_col,
+                        const ce_vec4_t* tint_col);
 
     bool (*Checkbox)(const char *label,
                      bool *v);
@@ -378,7 +378,7 @@ struct ct_debugui_a0 {
                       const char *overlay_text,
                       float scale_min,
                       float scale_max,
-                      _vec2 graph_size,
+                      ce_vec2_t* graph_size,
                       int stride);
 
     void (*PlotLines2)(const char *label,
@@ -390,7 +390,7 @@ struct ct_debugui_a0 {
                        const char *overlay_text,
                        float scale_min,
                        float scale_max,
-                       _vec2 graph_size);
+                       ce_vec2_t* graph_size);
 
     void (*PlotHistogram)(const char *label,
                           const float *values,
@@ -399,7 +399,7 @@ struct ct_debugui_a0 {
                           const char *overlay_text,
                           float scale_min,
                           float scale_max,
-                          _vec2 graph_size,
+                          ce_vec2_t* graph_size,
                           int stride);
 
     void (*PlotHistogram2)(const char *label,
@@ -411,10 +411,10 @@ struct ct_debugui_a0 {
                            const char *overlay_text,
                            float scale_min,
                            float scale_max,
-                           _vec2 graph_size);
+                           ce_vec2_t* graph_size);
 
     void (*ProgressBar)(float fraction,
-                        const _vec2 size_arg,
+                        const ce_vec2_t* size_arg,
                         const char *overlay);
 
     bool (*DragFloat)(const char *label,
@@ -506,7 +506,7 @@ struct ct_debugui_a0 {
     bool (*InputTextMultiline)(const char *label,
                                char *buf,
                                size_t buf_size,
-                               const _vec2 size,
+                               const ce_vec2_t* size,
                                ImGuiInputTextFlags flags,
                                ImGuiTextEditCallback callback,
                                void *user_data);
@@ -609,7 +609,7 @@ struct ct_debugui_a0 {
                        const char *display_format);
 
     bool (*VSliderFloat)(const char *label,
-                         const _vec2 size,
+                         const ce_vec2_t* size,
                          float *v,
                          float v_min,
                          float v_max,
@@ -617,7 +617,7 @@ struct ct_debugui_a0 {
                          float power);
 
     bool (*VSliderInt)(const char *label,
-                       const _vec2 size,
+                       const ce_vec2_t* size,
                        int *v,
                        int v_min,
                        int v_max,
@@ -687,12 +687,12 @@ struct ct_debugui_a0 {
     bool (*Selectable)(const char *label,
                        bool selected,
                        ImGuiSelectableFlags flags,
-                       const _vec2 size);
+                       const ce_vec2_t* size);
 
     bool (*Selectable2)(const char *label,
                         bool *p_selected,
                         ImGuiSelectableFlags flags,
-                        const _vec2 size);
+                        const ce_vec2_t* size);
 
     bool (*ListBox)(const char *label,
                     int *current_item,
@@ -710,7 +710,7 @@ struct ct_debugui_a0 {
                      int height_in_items);
 
     bool (*ListBoxHeader)(const char *label,
-                          const _vec2 size);
+                          const ce_vec2_t* size);
 
     bool (*ListBoxHeader2)(const char *label,
                            int items_count,
@@ -913,7 +913,7 @@ struct ct_debugui_a0 {
 
     int (*GetColumnsCount)();
 
-    void (*SetNextWindowSize)(_vec2 size,
+    void (*SetNextWindowSize)(ce_vec2_t* size,
                               enum DebugUICond cond);
 
     void (*EndChild)();

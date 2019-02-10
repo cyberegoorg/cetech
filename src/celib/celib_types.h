@@ -43,15 +43,31 @@ typedef struct ce_time_t {
     uint64_t o;
 } ce_time_t;
 
-static ce_vec2_t CE_VEC2_ZERO = {};
-static ce_vec2_t CE_VEC2_ONE = {1.0f, 1.0f};
+typedef struct ce_transform_t {
+    ce_vec3_t pos;
+    ce_vec4_t rot;
+    ce_vec3_t scl;
+} ce_transform_t;
 
-static ce_vec3_t CE_VEC3_ZERO = {};
-static ce_vec3_t CE_VEC3_ONE = {1.0f, 1.0f, 1.0f};
+static const ce_vec2_t CE_VEC2_ZERO = {};
+static const ce_vec2_t CE_VEC2_ONE = {1.0f, 1.0f};
+static const ce_vec2_t CE_VEC2_UNIT_X= {1.0f, 0.0f};
+static const ce_vec2_t CE_VEC2_UNIT_Y = {0.0f, 1.0f};
 
-static ce_vec4_t CE_VEC4_ZERO = {};
-static ce_vec4_t CE_VEC4_ONE = {1.0f, 1.0f, 1.0f, 1.0f};
+static const ce_vec3_t CE_VEC3_ZERO = {};
+static const ce_vec3_t CE_VEC3_UNIT = {1.0f, 1.0f, 1.0f};
+static const ce_vec3_t CE_VEC3_UNIT_X = {1.0f, 0.0f, 0.0f};
+static const ce_vec3_t CE_VEC3_UNIT_Y = {0.0f, 1.0f, 0.0f};
+static const ce_vec3_t CE_VEC3_UNIT_Z = {0.0f, 0.0f, 1.0f};
 
+static const ce_vec4_t CE_VEC4_ZERO = {};
+static const ce_vec4_t CE_VEC4_ONE = {1.0f, 1.0f, 1.0f, 1.0f};
+
+static const ce_transform_t CE_TRANFORM_INIT = {
+        .pos = {0.0f, 0.0f, 0.0f},
+        .rot = {0.0f, 0.0f, 0.0f, 1.0f},
+        .scl = {1.0f, 1.0f, 1.0f}
+};
 
 #define CE_ID64_0(str, hash) hash
 

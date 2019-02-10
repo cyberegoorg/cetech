@@ -244,7 +244,7 @@ static void _node_property_draw(uint64_t obj) {
             case CT_NODE_PIN_FLOAT:
                 ct_editor_ui_a0->prop_float(inputs_o, def->prop,
                                             def->name,
-                                            (struct ui_float_p0) {});
+                                            (ui_float_p0) {});
                 break;
 
             case CT_NODE_PIN_STRING:

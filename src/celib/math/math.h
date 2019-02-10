@@ -779,49 +779,60 @@ static inline ce_vec4_t ce_quat_from_euler(float heading,
     };
 }
 
-static inline void ce_quat_rotate_axis(float *_result,
-                                       const float *_axis,
+static inline ce_vec4_t ce_quat_rotate_axis(ce_vec3_t _axis,
                                        float _angle) {
     const float ha = _angle * 0.5f;
     const float ca = ce_fcos(ha);
     const float sa = ce_fsin(ha);
-    _result[0] = _axis[0] * sa;
-    _result[1] = _axis[1] * sa;
-    _result[2] = _axis[2] * sa;
-    _result[3] = ca;
+
+    return (ce_vec4_t) {
+            .x  = _axis.x * sa,
+            .y  = _axis.y  * sa,
+            .z  = _axis.z  * sa,
+            .w  = ca,
+    };
 }
 
-static inline void ce_quat_rotate_x(float *_result,
-                                    float _ax) {
+static inline ce_vec4_t ce_quat_rotate_x(float _ax) {
     const float hx = _ax * 0.5f;
     const float cx = ce_fcos(hx);
     const float sx = ce_fsin(hx);
-    _result[0] = sx;
-    _result[1] = 0.0f;
-    _result[2] = 0.0f;
-    _result[3] = cx;
+
+    return (ce_vec4_t) {
+            .x  = sx,
+            .y  = 0.0f,
+            .z  = 0.0f,
+            .w  = cx,
+    };
+
 }
 
-static inline void ce_quat_rotate_y(float *_result,
-                                    float _ay) {
+static inline ce_vec4_t ce_quat_rotate_y(float _ay) {
     const float hy = _ay * 0.5f;
     const float cy = ce_fcos(hy);
     const float sy = ce_fsin(hy);
-    _result[0] = 0.0f;
-    _result[1] = sy;
-    _result[2] = 0.0f;
-    _result[3] = cy;
+
+    return (ce_vec4_t) {
+            .x  = 0.0f,
+            .y  = sy,
+            .z  = 0.0f,
+            .w  = cy,
+    };
+
 }
 
-static inline void ce_quat_rotate_z(float *_result,
+static inline ce_vec4_t ce_quat_rotate_z(float *_result,
                                     float _az) {
     const float hz = _az * 0.5f;
     const float cz = ce_fcos(hz);
     const float sz = ce_fsin(hz);
-    _result[0] = 0.0f;
-    _result[1] = 0.0f;
-    _result[2] = sz;
-    _result[3] = cz;
+
+    return (ce_vec4_t) {
+            .x  = 0.0f,
+            .y  = 0.0f,
+            .z  = sz,
+            .w  = cz,
+    };
 }
 
 static inline ce_vec3_t ce_vec3_mul_quat(ce_vec3_t _vec,

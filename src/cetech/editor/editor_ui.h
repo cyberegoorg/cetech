@@ -77,7 +77,7 @@ struct ct_editor_ui_a0 {
                             const uint64_t *props,
                             uint64_t props_n);
 
-    void (*resource_tooltip)(struct ct_resource_id_t0 resourceid,
+    void (*resource_tooltip)(ct_resource_id_t0 resourceid,
                              const char *path,
                              ce_vec2_t size);
 

@@ -170,7 +170,7 @@ static void ui_vec4(uint64_t var) {
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
                                              MATERIAL_VAR_VALUE_PROP_W},
-                               str, (struct ui_vec4_p0) {});
+                               str, (ui_vec4_p0) {});
 }
 
 static void ui_color4(uint64_t var) {
@@ -181,7 +181,7 @@ static void ui_color4(uint64_t var) {
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
                                              MATERIAL_VAR_VALUE_PROP_W}, str,
-                               (struct ui_vec4_p0) {.color=true});
+                               (ui_vec4_p0) {.color=true});
 }
 
 static void ui_texture(uint64_t var) {
@@ -288,12 +288,13 @@ static struct ct_entity_t0 load(uint64_t resource,
                     PRIMITIVE_MESH_COMPONENT,
             }, 2,
             (void *[]) {
-                    &(struct ct_transform_comp) {
-                            .pos = {0.0f, 0.0f, 13.0f},
-                            .scale = {1.0f, 1.0f, 1.0f}
+                    &(ct_transform_comp) {
+                            .t.pos = {0.0f, 0.0f, 13.0f},
+                            .t.scl = CE_TRANFORM_INIT.scl,
+                            .t.rot  = CE_TRANFORM_INIT.rot
                     },
 
-                    &(struct ct_primitive_mesh) {
+                    &(ct_primitive_mesh) {
                             .material = resource
                     },
             }
@@ -332,7 +333,7 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 
 static uint64_t create(uint64_t name) {
-    struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
+    struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
             .uid = name,
     };
 

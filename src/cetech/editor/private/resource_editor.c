@@ -43,12 +43,12 @@
     CE_ID64_0("asset_editor", 0xd7ecca607e454ce9ULL)
 
 
-struct editor {
+typedef struct editor {
     char title[128];
     uint64_t type;
     uint64_t obj;
     uint64_t context_obj;
-};
+}editor;
 
 static struct _G {
     struct editor *editors;
@@ -179,7 +179,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
     }
 
     int idx = ce_array_size(_G.editors);
-    ce_array_push(_G.editors, (struct editor) {}, ce_memory_a0->system);
+    ce_array_push(_G.editors, (editor) {}, ce_memory_a0->system);
 
     struct editor *editor = &_G.editors[idx];
 

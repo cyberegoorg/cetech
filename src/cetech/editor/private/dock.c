@@ -174,7 +174,7 @@ void draw_all() {
     }
 }
 
-static const char *display_name(struct ct_dock_i0 *i) {
+static const char *display_name(ct_dock_i0 *i) {
     const char *name = NULL;
 
     if (i->display_title) {

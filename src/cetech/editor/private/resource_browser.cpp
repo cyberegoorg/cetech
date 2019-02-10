@@ -127,7 +127,7 @@ static void _create_from_modal(const char *modal_id) {
         struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
         uint32_t idx = 1;
         while (it.api) {
-            struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
+            struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
 
             if (i->cdb_type() == type) {
                 cur_type_idx = idx - 1;
@@ -363,7 +363,7 @@ static void _select_type_modal(const char *modal_id) {
 
         struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
         while (it.api) {
-            struct ct_resource_i0 *i = (struct ct_resource_i0 *) (it.api);
+            struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
 
 
             const char *type = ce_id_a0->str_from_id64(i->cdb_type());

@@ -11,6 +11,7 @@ extern "C" {
     CE_ID64_0("ce_fs_a0", 0xb833e93306ececb0ULL)
 
 typedef struct ce_alloc_t0 ce_alloc_t0;
+typedef struct ce_vio ce_vio;
 
 typedef enum ce_fs_open_mode_e0 {
     FS_OPEN_READ,
@@ -27,7 +28,7 @@ struct ce_fs_a0 {
                          const char *base_path,
                          bool watch);
 
-    void (*close)(struct ce_vio *file);
+    void (*close)(ce_vio *file);
 
     void (*listdir)(uint64_t root,
                     const char *path,

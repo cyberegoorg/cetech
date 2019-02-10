@@ -99,13 +99,13 @@ struct compile_output {
 struct compile_output *_crete_compile_output() {
     struct compile_output *output =
             CE_ALLOC(_G.allocator, struct compile_output,
-                     sizeof(struct compile_output));
+                     sizeof(compile_output));
     *output = {};
 
     return output;
 }
 
-static void _destroy_compile_output(struct compile_output *output) {
+static void _destroy_compile_output(compile_output *output) {
     ce_array_free(output->geom_name, _G.allocator);
     ce_array_free(output->ib_offset, _G.allocator);
     ce_array_free(output->vb_offset, _G.allocator);
@@ -124,7 +124,7 @@ static void _destroy_compile_output(struct compile_output *output) {
     CE_FREE(_G.allocator, output);
 }
 
-static void _compile_assimp_node(struct aiNode *root,
+static void _compile_assimp_node(aiNode *root,
                                  uint32_t parent,
                                  struct compile_output *output) {
 
@@ -150,7 +150,7 @@ static void _compile_assimp_node(struct aiNode *root,
     }
 }
 
-static int _compile_assimp(struct ce_cdb_t0 db,
+static int _compile_assimp(ce_cdb_t0 db,
                            uint64_t k,
                            struct compile_output *output) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, k);
@@ -300,7 +300,7 @@ static int _compile_assimp(struct ce_cdb_t0 db,
     return 1;
 }
 
-extern "C" bool scene_compiler(struct ce_cdb_t0 db,
+extern "C" bool scene_compiler(ce_cdb_t0 db,
                                uint64_t obj) {
     struct compile_output *output = _crete_compile_output();
 

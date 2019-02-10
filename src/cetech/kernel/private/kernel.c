@@ -215,7 +215,7 @@ void _init_config() {
 
 
 
-static void _build_update_graph(struct ce_ba_graph_t *sg) {
+static void _build_update_graph(ce_ba_graph_t *sg) {
     ce_bag_clean(sg);
     ce_hash_clean(&_G.update_map);
 
@@ -251,7 +251,7 @@ static void _build_update_graph(struct ce_ba_graph_t *sg) {
     ce_bag_build(sg, _G.allocator);
 }
 
-static void _update(struct ce_ba_graph_t *sg,
+static void _update(ce_ba_graph_t *sg,
                     float dt) {
     const uint64_t output_n = ce_array_size(sg->output);
     for (int k = 0; k < output_n; ++k) {
@@ -262,7 +262,7 @@ static void _update(struct ce_ba_graph_t *sg,
     }
 }
 
-static void _build_init_graph(struct ce_ba_graph_t *sg) {
+static void _build_init_graph(ce_ba_graph_t *sg) {
     ce_bag_clean(sg);
     ce_hash_clean(&_G.init_map);
     ce_hash_clean(&_G.shutdown_map);
@@ -309,7 +309,7 @@ static void _build_init_graph(struct ce_ba_graph_t *sg) {
     ce_bag_build(sg, _G.allocator);
 }
 
-static void _init(struct ce_ba_graph_t *sg) {
+static void _init(ce_ba_graph_t *sg) {
     const uint64_t output_n = ce_array_size(sg->output);
     for (int k = 0; k < output_n; ++k) {
         ce_kernel_taks_init_t fce;
@@ -319,7 +319,7 @@ static void _init(struct ce_ba_graph_t *sg) {
     }
 }
 
-static void _shutdown(struct ce_ba_graph_t *sg) {
+static void _shutdown(ce_ba_graph_t *sg) {
     const uint64_t output_n = ce_array_size(sg->output);
     for (int32_t k = output_n; k < 0; --k) {
         ce_kernel_taks_shutdown_t fce;

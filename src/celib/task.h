@@ -36,7 +36,7 @@ struct ce_task_a0 {
     //! Add new task
     //! \param items Task item array
     //! \param count Task item count
-    void (*add)(struct ce_task_item_t0 *items,
+    void (*add)(ce_task_item_t0 *items,
                 uint32_t count,
                 ce_task_counter_t0 **counter);
 

@@ -25,16 +25,16 @@
 
 #define LOG_WHERE "transform"
 
-static void transform_transform(struct ct_transform_comp *transform,
+static void transform_transform(ct_transform_comp *transform,
                                 float *parent) {
-    ce_vec3_t rot = ce_vec3_mul_s(transform->rot, CE_DEG_TO_RAD);
+    ce_vec3_t rot = ce_quat_to_euler(transform->t.rot);
 
     float obj[16] = {};
 
     ce_mat4_srt(obj,
-                transform->scale.x, transform->scale.y, transform->scale.z,
+                transform->t.scl.x, transform->t.scl.y, transform->t.scl.z,
                 rot.x, rot.y, rot.z,
-                transform->pos.x, transform->pos.y, transform->pos.z);
+                transform->t.pos.x, transform->t.pos.y, transform->t.pos.z);
 
 
     if (parent) {
@@ -141,14 +141,14 @@ static void property_editor(uint64_t obj) {
                                               PROP_POSITION_Y,
                                               PROP_POSITION_Z},
                                "Position",
-                               (struct ui_vec3_p0) {});
+                               (ui_vec3_p0) {});
 
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_ROTATION_X,
                                               PROP_ROTATION_Y,
                                               PROP_ROTATION_Z},
                                "Rotation",
-                               (struct ui_vec3_p0) {});
+                               (ui_vec3_p0) {});
 
 
     ct_editor_ui_a0->prop_vec3(obj,
@@ -156,7 +156,7 @@ static void property_editor(uint64_t obj) {
                                               PROP_SCALE_Y,
                                               PROP_SCALE_Z},
                                "Scale",
-                               (struct ui_vec3_p0) {});
+                               (ui_vec3_p0) {});
 }
 
 static struct ct_property_editor_i0 property_editor_api = {
@@ -181,29 +181,31 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 static uint64_t size() {
-    return sizeof(struct ct_transform_comp);
+    return sizeof(ct_transform_comp);
 }
 
 static void transform_spawner(ct_world_t0 world,
                               uint64_t obj,
                               void *data) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    struct ct_transform_comp *t = data;
+    ct_transform_comp *t = data;
 
-    *t = (struct ct_transform_comp) {
-            .pos = {
+
+    ce_vec3_t rotation = {
+            ce_cdb_a0->read_float(r, PROP_ROTATION_X, 0.0f),
+            ce_cdb_a0->read_float(r, PROP_ROTATION_Y, 0.0f),
+            ce_cdb_a0->read_float(r, PROP_ROTATION_Z, 0.0f),
+    };
+    rotation = ce_vec3_mul_s(rotation, CE_DEG_TO_RAD);
+
+    *t = (ct_transform_comp) {
+            .t.pos = {
                     ce_cdb_a0->read_float(r, PROP_POSITION_X, 0.0f),
                     ce_cdb_a0->read_float(r, PROP_POSITION_Y, 0.0f),
                     ce_cdb_a0->read_float(r, PROP_POSITION_Z, 0.0f),
             },
-
-            .rot = {
-                    ce_cdb_a0->read_float(r, PROP_ROTATION_X, 0.0f),
-                    ce_cdb_a0->read_float(r, PROP_ROTATION_Y, 0.0f),
-                    ce_cdb_a0->read_float(r, PROP_ROTATION_Z, 0.0f),
-            },
-
-            .scale = {
+            .t.rot = ce_quat_from_euler(rotation.x, rotation.y, rotation.z),
+            .t.scl = {
                     ce_cdb_a0->read_float(r, PROP_SCALE_X, 1.0f),
                     ce_cdb_a0->read_float(r, PROP_SCALE_Y, 1.0f),
                     ce_cdb_a0->read_float(r, PROP_SCALE_Z, 1.0f),
@@ -211,7 +213,7 @@ static void transform_spawner(ct_world_t0 world,
     };
 }
 
-static struct ct_component_i0 ct_component_i0 = {
+static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .size = size,
         .get_interface = get_interface,
@@ -254,7 +256,6 @@ static void foreach_transform(ct_world_t0 world,
             ce_array_push(roots, ent, ce_memory_a0->system);
         }
 
-
         if (!ct_ecs_a0->has(world, parent_ent,
                             (uint64_t[]) {TRANSFORM_COMPONENT}, 1)) {
             ce_array_push(roots, ent, ce_memory_a0->system);
@@ -291,7 +292,7 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
 };
 
 static void _init(struct ce_api_a0 *api) {
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0, sizeof(transform_simulation_i0));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }

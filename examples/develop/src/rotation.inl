@@ -82,6 +82,7 @@ static void foreach_rotation(struct ct_world_t0 world,
 
     struct rotation_component *rotations = ct_ecs_a0->get_all(
             ROTATION_COMPONENT, item);
+
     struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
             TRANSFORM_COMPONENT, item);
 
@@ -89,7 +90,8 @@ static void foreach_rotation(struct ct_world_t0 world,
         struct rotation_component *rotation = &rotations[i];
         struct ct_transform_comp *transform = &transforms[i];
 
-        transform->rot = ce_vec3_add_s(transform->rot, rotation->speed * dt);
+        ce_vec4_t qd = ce_quat_rotate_axis(CE_VEC3_UNIT_Y, rotation->speed * 0.01f * dt);
+        transform->t.rot = ce_quat_mul(transform->t.rot, qd);
     }
 }
 

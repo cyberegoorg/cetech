@@ -64,7 +64,7 @@ typedef void (*ct_process_fce_t)(ct_world_t0 world,
 typedef void (*ct_simulate_fce_t)(ct_world_t0 world,
                                   float dt);
 
-struct ct_component_i0 {
+typedef struct ct_component_i0 {
     uint64_t (*cdb_type)();
 
     uint64_t (*size)();
@@ -79,9 +79,9 @@ struct ct_component_i0 {
                     const ce_cdb_change_ev_t0 *changes,
                     uint32_t changes_n,
                     void *data);
-};
+}ct_component_i0;
 
-struct ct_editor_component_i0 {
+typedef struct ct_editor_component_i0 {
     const char *(*display_name)();
 
     uint64_t (*create_new)();
@@ -94,7 +94,7 @@ struct ct_editor_component_i0 {
                                  uint8_t operation,
                                  float *world,
                                  float *local);
-};
+} ct_editor_component_i0;
 
 struct ct_simulation_i0 {
     uint64_t (*name)();

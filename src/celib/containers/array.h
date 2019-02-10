@@ -75,15 +75,15 @@
 //
 // object* pool = NULL;
 //
-// static uint32_t _new_object(struct object obj) {
+// static uint32_t _new_object(object obj) {
 //     uint32_t idx = ce_array_size(pool);
 //     ce_array_push(pool, obj, ce_memory_a0->system);
 //     return idx;
 // }
 //
-// uint32_t obj1 = _new_object((struct object){.id = 1}));
-// uint32_t obj2 = _new_object((struct object){.id = 2}));
-// uint32_t obj3 = _new_object((struct object){.id = 3}));
+// uint32_t obj1 = _new_object((object){.id = 1}));
+// uint32_t obj2 = _new_object((object){.id = 2}));
+// uint32_t obj3 = _new_object((object){.id = 3}));
 //
 // printf("%d\n", pool[obj1].id); // 1
 // printf("%d\n", pool[obj2].id); // 2
@@ -118,7 +118,7 @@ typedef struct ce_array_header_t {
 
 // Get array [header](#ce_array_header_t).
 #define ce_array_header(a) \
-    ((a) ? (struct ce_array_header_t *)((char *)(a) - sizeof(ce_array_header_t)): NULL)
+    ((a) ? (ce_array_header_t *)((char *)(a) - sizeof(ce_array_header_t)): NULL)
 
 // Get array size.
 #define ce_array_size(a) \
@@ -212,15 +212,15 @@ static inline void *ce_array_grow(void *array,
 
     const uint32_t orig_size = ce_array_size(array);
 
-    const uint32_t size = sizeof(struct ce_array_header_t) + (new_capacity
+    const uint32_t size = sizeof(ce_array_header_t) + (new_capacity
                                                               * type_size);
 
     void *new_data = alloc->reallocate(alloc, ce_array_header(array),
                                        size, type_align, filename, line);
 
-    char *new_array = (char *) new_data + sizeof(struct ce_array_header_t);
+    char *new_array = (char *) new_data + sizeof(ce_array_header_t);
 
-    *((struct ce_array_header_t *) new_data) = (struct ce_array_header_t) {
+    *((ce_array_header_t *) new_data) = (ce_array_header_t) {
             .size = orig_size,
             .capacity = new_capacity
     };

@@ -34,7 +34,7 @@ typedef struct ct_resource_preview_i0 {
 
 
 struct ct_resource_preview_a0 {
-    void (*set_background_resource)(struct ct_resource_id_t0 resource);
+    void (*set_background_resource)(ct_resource_id_t0 resource);
 
     void (*draw_background_texture)(ce_vec2_t size);
 };

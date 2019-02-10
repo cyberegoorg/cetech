@@ -22,11 +22,11 @@ union modifiactor {
     } flags;
 };
 
-struct shortcut {
+typedef struct shortcut {
     char str[64];
     union modifiactor mod;
     uint32_t key;
-};
+}shortcut;
 
 
 #define _G action_manager_global
@@ -40,7 +40,7 @@ static struct _G {
     struct ce_alloc_t0 *allocator;
 } _G;
 
-static void fill_button(struct shortcut *sc) {
+static void fill_button(shortcut *sc) {
     uint8_t count = 1;
     char str[64] = {};
     strncpy(str, sc->str, 64);

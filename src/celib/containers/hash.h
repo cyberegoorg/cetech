@@ -62,7 +62,7 @@ typedef struct  ce_hash_t {
 
 
 // Clean hash table
-static inline void ce_hash_clean(struct ce_hash_t *hash) {
+static inline void ce_hash_clean(ce_hash_t *hash) {
     memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
     hash->n = 0;
 
@@ -71,7 +71,7 @@ static inline void ce_hash_clean(struct ce_hash_t *hash) {
 }
 
 // Free hash table
-static inline void ce_hash_free(struct ce_hash_t *hash,
+static inline void ce_hash_free(ce_hash_t *hash,
                                 const struct ce_alloc_t0 *allocator) {
     ce_array_free(hash->keys, allocator);
     ce_array_free(hash->values, allocator);
@@ -118,7 +118,7 @@ static inline bool ce_hash_contain(const struct ce_hash_t *hash,
 }
 
 // Add *k* -> *value*
-static inline void ce_hash_add(struct ce_hash_t *hash,
+static inline void ce_hash_add(ce_hash_t *hash,
                                uint64_t k,
                                uint64_t value,
                                const struct ce_alloc_t0 *allocator) {
@@ -163,7 +163,7 @@ static inline void ce_hash_add(struct ce_hash_t *hash,
     hash->keys[idx] = k;
 }
 
-static inline void ce_hash_remove(struct ce_hash_t *hash,
+static inline void ce_hash_remove(ce_hash_t *hash,
                                   uint64_t k) {
     if (hash->n == 0) {
         return;

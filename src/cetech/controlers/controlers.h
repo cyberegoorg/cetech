@@ -39,7 +39,7 @@ extern "C" {
     CE_ID64_0("id", 0xb0d09cc783d6a0ecULL)
 
 
-struct ct_controlers_i0 {
+typedef struct ct_controlers_i0 {
     uint64_t (*name)();
 
     //! Is gamepad active?
@@ -80,7 +80,7 @@ struct ct_controlers_i0 {
                         uint32_t length);
 
     char *(*text)(uint32_t idx);
-};
+}ct_controlers_i0;
 
 struct ct_controlers_a0 {
     struct ct_controlers_i0* (*get)(uint64_t name);

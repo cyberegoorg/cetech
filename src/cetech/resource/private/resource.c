@@ -68,7 +68,7 @@ static void load(const uint64_t *names,
                  int force);
 
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
-    return (struct ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
+    return (ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
 
 
@@ -91,7 +91,7 @@ static void load(const uint64_t *names,
         };
 
         uint64_t type = ct_resourcedb_a0->get_resource_type(
-                (struct ct_resource_id_t0) {.uid=asset_name});
+                (ct_resource_id_t0) {.uid=asset_name});
 
         if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
                                           _G.allocator)) {
@@ -122,7 +122,7 @@ void unload(const uint64_t *names,
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
-            struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
+            struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
                     .uid = names[i],
             };
 

@@ -153,7 +153,7 @@ static int _gen_tmp_name(char *tmp_filename,
     return ret;
 }
 
-static bool _compile(struct ce_cdb_t0 db,
+static bool _compile(ce_cdb_t0 db,
                      uint64_t obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
     const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
@@ -204,7 +204,7 @@ static bool _compile(struct ce_cdb_t0 db,
 }
 
 
-static bool texture_compiler(struct ce_cdb_t0 db,
+static bool texture_compiler(ce_cdb_t0 db,
                              uint64_t k) {
     return _compile(db, k);
 }

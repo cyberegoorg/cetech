@@ -51,7 +51,7 @@ static void _componet_api_add(uint64_t name,
 
 struct ct_controlers_i0 *get_by_name(uint64_t name) {
     struct ct_controlers_i0 *controlers_i;
-    controlers_i = (struct ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
+    controlers_i = (ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
                                                               name, 0);
     return controlers_i;
 };

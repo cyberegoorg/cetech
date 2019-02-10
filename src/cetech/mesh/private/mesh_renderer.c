@@ -212,7 +212,7 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 static uint64_t size() {
-    return sizeof(struct ct_mesh_component);
+    return sizeof(ct_mesh_component);
 }
 
 static void mesh_spawner(ct_world_t0 world,
@@ -221,7 +221,7 @@ static void mesh_spawner(ct_world_t0 world,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_mesh_component *m = data;
 
-    *m = (struct ct_mesh_component) {
+    *m = (ct_mesh_component) {
             .mesh = ce_id_a0->id64(ce_cdb_a0->read_str(r, PROP_MESH, 0)),
             .node = ce_id_a0->id64(ce_cdb_a0->read_str(r, PROP_NODE, 0)),
             .scene = ce_cdb_a0->read_ref(r, PROP_SCENE_ID, 0),
@@ -231,7 +231,7 @@ static void mesh_spawner(ct_world_t0 world,
 }
 
 
-static struct ct_component_i0 ct_component_i0 = {
+static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .size = size,
         .get_interface = get_interface,
@@ -245,7 +245,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 

@@ -103,7 +103,7 @@ static void *get_interface(uint64_t name_hash) {
 
 
 static uint64_t size() {
-    return sizeof(struct ct_camera_component);
+    return sizeof(ct_camera_component);
 }
 
 static void camera_spawner(ct_world_t0 world,
@@ -113,7 +113,7 @@ static void camera_spawner(ct_world_t0 world,
     const ce_cdb_obj_o0 * r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_camera_component *c = data;
 
-    *c = (struct ct_camera_component) {
+    *c = (ct_camera_component) {
             .far = ce_cdb_a0->read_float(r, PROP_FAR, 100.0f),
             .near = ce_cdb_a0->read_float(r, PROP_NEAR, 0.0f),
             .fov = ce_cdb_a0->read_float(r, PROP_FOV, 60.0f),
@@ -121,7 +121,7 @@ static void camera_spawner(ct_world_t0 world,
 }
 
 
-static struct ct_component_i0 ct_component_i0 = {
+static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .size = size,
         .get_interface = get_interface,
@@ -134,17 +134,17 @@ static void property_editor(uint64_t obj) {
     ct_editor_ui_a0->prop_float(obj,
                                PROP_NEAR,
                                "Near",
-                               (struct ui_float_p0) {});
+                               (ui_float_p0) {});
 
     ct_editor_ui_a0->prop_float(obj,
                                 PROP_FAR,
                                 "Far",
-                                (struct ui_float_p0) {});
+                                (ui_float_p0) {});
 
     ct_editor_ui_a0->prop_float(obj,
                                 PROP_FOV,
                                 "Fov",
-                                (struct ui_float_p0) {});
+                                (ui_float_p0) {});
 }
 
 static struct ct_property_editor_i0 property_editor_api = {
@@ -159,7 +159,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 }
 

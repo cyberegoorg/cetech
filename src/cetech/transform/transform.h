@@ -42,9 +42,7 @@ extern "C" {
     CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
 typedef struct ct_transform_comp {
-    ce_vec3_t pos;
-    ce_vec3_t rot;
-    ce_vec3_t scale;
+    ce_transform_t t;
     float world[16];
 }ct_transform_comp;
 

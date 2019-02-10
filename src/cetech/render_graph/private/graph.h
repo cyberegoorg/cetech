@@ -1,6 +1,6 @@
-struct render_graph_inst {
+typedef struct render_graph_inst {
     struct ct_rg_module *module;
-};
+}render_graph_inst;
 
 void set_module(void *inst,
                 struct ct_rg_module *module) {
@@ -21,15 +21,15 @@ void graph_setup(void *inst,
 static struct ct_rg *create_render_graph() {
     struct ct_rg *obj = CE_ALLOC(_G.alloc,
                                            struct ct_rg,
-                                           sizeof(struct ct_rg));
+                                           sizeof(ct_rg));
 
     struct render_graph_inst *inst = CE_ALLOC(_G.alloc,
                                               struct render_graph_inst,
-                                              sizeof(struct render_graph_inst));
+                                              sizeof(render_graph_inst));
 
-    *inst = (struct render_graph_inst){};
+    *inst = (render_graph_inst){};
 
-    *obj = (struct ct_rg) {
+    *obj = (ct_rg) {
             .inst = inst,
             .set_module = set_module,
             .setup = graph_setup,
@@ -38,7 +38,7 @@ static struct ct_rg *create_render_graph() {
     return obj;
 }
 
-static void destroy_render_graph(struct ct_rg *render_graph) {
+static void destroy_render_graph(ct_rg *render_graph) {
     struct ct_rg *rg = render_graph;
     struct render_graph_inst *rg_inst = rg->inst;
 

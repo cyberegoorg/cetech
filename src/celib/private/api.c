@@ -22,9 +22,9 @@
 //==============================================================================
 
 #define _G ApiSystemGlobals
-struct impl_list {
+typedef struct impl_list {
     void **api;
-};
+} impl_list;
 
 typedef struct api_block_t api_block_t;
 struct api_block_t {
@@ -66,7 +66,7 @@ static void api_register_api(uint64_t name_id,
     if (idx == UINT64_MAX) {
         idx = ce_array_size(_G.impl_list);
 
-        ce_array_push(_G.impl_list, (struct impl_list) {},
+        ce_array_push(_G.impl_list, (impl_list) {},
                       _G.allocator);
         ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
     }
@@ -119,23 +119,23 @@ static struct ce_api_entry_t0 api_first(uint64_t name) {
         first = ce_hash_lookup(&_G.api_map, name, UINT64_MAX);
     }
 
-    return (struct ce_api_entry_t0) {
+    return (ce_api_entry_t0) {
             .api = _G.impl_list[first].api[0],
             .idx = 0,
             .entry  = &_G.impl_list[first]
     };
 }
 
-static struct ce_api_entry_t0 api_next(struct ce_api_entry_t0 entry) {
+static struct ce_api_entry_t0 api_next(ce_api_entry_t0 entry) {
     struct impl_list *impl_list = entry.entry;
 
     const uint32_t n = ce_array_size(impl_list->api) - 1;
 
     if (entry.idx >= n) {
-        return (struct ce_api_entry_t0) {};
+        return (ce_api_entry_t0) {};
     }
 
-    return (struct ce_api_entry_t0) {
+    return (ce_api_entry_t0) {
             .api = impl_list->api[entry.idx + 1],
             .idx = entry.idx + 1,
             .entry  = impl_list
@@ -174,8 +174,8 @@ static void *virt_alloc(uint64_t size) {
                 -1, 0);
 }
 
-void api_init(struct ce_alloc_t0 *allocator) {
-    _G = (struct ApiSystemGlobals) {
+void api_init(ce_alloc_t0 *allocator) {
+    _G = (struct _G) {
             .allocator = allocator,
             .api_blocks = virt_alloc(sizeof(api_block_t) * 256),
 

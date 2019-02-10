@@ -1,12 +1,12 @@
-struct render_graph_builder_pass {
+typedef struct render_graph_builder_pass {
     struct ct_rg_pass_t0 *pass;
     uint8_t viewid;
     uint64_t layer;
     bgfx_frame_buffer_handle_t fb;
-};
+}render_graph_builder_pass;
 
 #define MAX_ATTACHMENTS 8+2
-struct render_graph_builder_inst {
+typedef struct render_graph_builder_inst {
     struct render_graph_builder_pass *pass;
 
     struct ce_hash_t texture_map;
@@ -17,7 +17,7 @@ struct render_graph_builder_inst {
 
     uint8_t attachemnt_used;
     bgfx_texture_handle_t attachemnt[MAX_ATTACHMENTS];
-};
+}render_graph_builder_inst;
 
 #define _DEFAULT \
      CE_ID64_0("default", 0xf27605035974b5ecULL)
@@ -51,7 +51,7 @@ static void builder_add_pass(void *inst,
     }
 
     ce_array_push(builder_inst->pass,
-                  ((struct render_graph_builder_pass) {
+                  ((render_graph_builder_pass) {
                           .pass = pass,
                           .layer = layer,
                           .viewid = viewid,
@@ -199,12 +199,12 @@ static struct ct_rg_builder_t0 *create_render_builder() {
 
     struct render_graph_builder_inst *inst = CE_ALLOC(_G.alloc,
                                                       struct render_graph_builder_inst,
-                                                      sizeof(struct render_graph_builder_inst));
+                                                      sizeof(render_graph_builder_inst));
 
 
-    *inst = (struct render_graph_builder_inst) {};
+    *inst = (render_graph_builder_inst) {};
 
-    *obj = (struct ct_rg_builder_t0) {
+    *obj = (ct_rg_builder_t0) {
             .add_pass = builder_add_pass,
             .execute = builder_execute,
             .clear = builder_clear,
@@ -221,6 +221,6 @@ static struct ct_rg_builder_t0 *create_render_builder() {
     return obj;
 }
 
-static void destroy_render_builder(struct ct_rg_builder_t0 *builder) {
+static void destroy_render_builder(ct_rg_builder_t0 *builder) {
 
 }

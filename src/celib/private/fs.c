@@ -32,14 +32,14 @@
 //==============================================================================
 #define _G FilesystemGlobals
 
-struct fs_mount_point {
+typedef struct fs_mount_point {
     char *root_path;
 //    struct ce_watchdog_a0 *wd;
-};
+}fs_mount_point;
 
-struct fs_root {
+typedef struct fs_root {
     struct fs_mount_point *mount_points;
-};
+}fs_root;
 
 static struct _G {
     struct ce_hash_t root_map;
@@ -56,7 +56,7 @@ static uint32_t new_fs_root(uint64_t root) {
 
     uint32_t new_idx = ce_array_size(_G.roots);
 
-    ce_array_push(_G.roots, (struct fs_root) {}, _G.allocator);
+    ce_array_push(_G.roots, (fs_root) {}, _G.allocator);
 
 //    fs_root *root_inst = &_G.roots[new_idx];
 
@@ -177,7 +177,7 @@ static struct ce_vio *open(uint64_t root,
     return file;
 }
 
-static void close(struct ce_vio *file) {
+static void close(ce_vio *file) {
     file->close(file);
 }
 
@@ -388,7 +388,7 @@ static struct ce_fs_a0 _api = {
 struct ce_fs_a0 *ce_fs_a0 = &_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CE_FS_API, &_api, sizeof(struct ce_fs_a0));
+    api->register_api(CE_FS_API, &_api, sizeof(ce_fs_a0));
 }
 
 

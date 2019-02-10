@@ -10,10 +10,10 @@ extern "C" {
 #include "celib/containers/array.h"
 
 
-struct ce_handler_t0 {
+typedef struct ce_handler_t0 {
     char *_generation;
     uint64_t *_free_idx;
-};
+} ce_handler_t0;
 
 #define _GENBITCOUNT   8
 #define _INDEXBITCOUNT 54
@@ -22,7 +22,7 @@ struct ce_handler_t0 {
 #define handler_idx(h) ((h) >> _GENBITCOUNT)
 #define handler_gen(h) ((h) & ((1 << (_GENBITCOUNT - 1))))
 
-static inline uint64_t ce_handler_create(struct ce_handler_t0 *handler,
+static inline uint64_t ce_handler_create(ce_handler_t0 *handler,
                                          const ce_alloc_t0 *allocator) {
     uint64_t idx;
 
@@ -40,7 +40,7 @@ static inline uint64_t ce_handler_create(struct ce_handler_t0 *handler,
     return hid;
 }
 
-static inline void ce_handler_destroy(struct ce_handler_t0 *handler,
+static inline void ce_handler_destroy(ce_handler_t0 *handler,
                                       uint64_t handlerid,
                                       const ce_alloc_t0 *allocator) {
     uint64_t id = handler_idx(handlerid);
@@ -49,13 +49,13 @@ static inline void ce_handler_destroy(struct ce_handler_t0 *handler,
     ce_array_push(handler->_free_idx, id, allocator);
 }
 
-static inline bool ce_handler_alive(struct ce_handler_t0 *handler,
+static inline bool ce_handler_alive(ce_handler_t0 *handler,
                                     uint64_t handlerid) {
     return handler->_generation[handler_idx(handlerid)] ==
            handler_gen(handlerid);
 }
 
-static inline void ce_handler_free(struct ce_handler_t0 *handler,
+static inline void ce_handler_free(ce_handler_t0 *handler,
                                    const ce_alloc_t0 *allocator) {
     ce_array_free(handler->_free_idx, allocator);
     ce_array_free(handler->_generation, allocator);

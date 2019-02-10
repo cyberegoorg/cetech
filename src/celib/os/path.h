@@ -73,7 +73,7 @@ struct ce_os_path_a0 {
                  uint32_t count,
                  ...);
 
-    void (*copy_file)(struct ce_alloc_t0 *allocator,
+    void (*copy_file)(ce_alloc_t0 *allocator,
                       const char *from,
                       const char *to);
 

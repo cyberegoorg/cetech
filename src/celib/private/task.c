@@ -31,14 +31,14 @@
 // Globals
 //==============================================================================
 
-struct task_t {
+typedef struct task_t {
     void *data;
 
     void (*task_work)(void *data);
 
     const char *name;
     uint32_t counter;
-};
+}  task_t;
 
 typedef struct {
     uint32_t id;
@@ -175,18 +175,18 @@ static int _task_worker(void *o) {
 // Api
 //==============================================================================
 
-void add(struct ce_task_item_t0 *items,
+void add(ce_task_item_t0 *items,
          uint32_t count,
          struct ce_task_counter_t0 **counter) {
     uint32_t new_counter = _new_counter_task(count);
 
     if(counter) {
-        *counter = (struct ce_task_counter_t0 *) &_G.counter_pool[new_counter];
+        *counter = (ce_task_counter_t0 *) &_G.counter_pool[new_counter];
     }
 
     for (uint32_t i = 0; i < count; ++i) {
         task_id_t task = _new_task();
-        _G.task_pool[task.id] = (struct task_t) {
+        _G.task_pool[task.id] = (task_t) {
                 .name = items[i].name,
                 .task_work = items[i].work,
                 .counter = new_counter
@@ -199,7 +199,7 @@ void add(struct ce_task_item_t0 *items,
 }
 
 
-void wait_atomic(struct ce_task_counter_t0 *signal,
+void wait_atomic(ce_task_counter_t0 *signal,
                  int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {
@@ -210,7 +210,7 @@ void wait_atomic(struct ce_task_counter_t0 *signal,
     queue_task_push(&_G.free_counter, counter_idx);
 }
 
-void wait_for_counter_no_work(struct ce_task_counter_t0 *signal,
+void wait_for_counter_no_work(ce_task_counter_t0 *signal,
                          int32_t value) {
     while (atomic_load_explicit((atomic_int *) signal, memory_order_acquire) !=
            value) {

@@ -33,11 +33,11 @@ extern "C" {
 typedef struct ct_world_t0 ct_world_t0;
 typedef struct ct_entity_t0 ct_entity_t0;
 
-struct ct_camera_component {
+typedef struct ct_camera_component {
     float near;
     float far;
     float fov;
-};
+}ct_camera_component;
 
 //! Camera API V0
 struct ct_camera_a0 {

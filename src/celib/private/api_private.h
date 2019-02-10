@@ -4,7 +4,7 @@
 struct ce_alloc_t0;
 struct ce_api_a0;
 
-void api_init(struct ce_alloc_t0 *allocator);
+void api_init(ce_alloc_t0 *allocator);
 
 void api_shutdown();
 

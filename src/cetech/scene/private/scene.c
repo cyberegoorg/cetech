@@ -116,7 +116,7 @@ static uint64_t cdb_type() {
 }
 
 
-bool scene_compiler(struct ce_cdb_t0 db, uint64_t k);
+bool scene_compiler(ce_cdb_t0 db, uint64_t k);
 
 static const char* display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
@@ -139,8 +139,9 @@ static struct ct_entity_t0 load(uint64_t resource,
                     TRANSFORM_COMPONENT,
             }, 1,
             (void *[]) {
-                    &(struct ct_transform_comp) {
-                            .scale = {1.0f, 1.0f, 1.0f}
+                    &(ct_transform_comp) {
+                            .t.scl = CE_TRANFORM_INIT.scl,
+                            .t.rot  = CE_TRANFORM_INIT.rot
                     },
             }
     );
@@ -154,12 +155,13 @@ static struct ct_entity_t0 load(uint64_t resource,
                         MESH_RENDERER_COMPONENT,
                 }, 2,
                 (void *[]) {
-                        &(struct ct_transform_comp) {
-                                .pos = {0.0f, 0.0f, 100.0f},
-                                .scale = {1.0f, 1.0f, 1.0f}
+                        &(ct_transform_comp) {
+                                .t.pos = {0.0f, 0.0f, 100.0f},
+                                .t.scl = CE_TRANFORM_INIT.scl,
+                                .t.rot  = CE_TRANFORM_INIT.rot
                         },
 
-                        &(struct ct_mesh_component) {
+                        &(ct_mesh_component) {
                                 .material = 0x24c9413e88ebaaa8,
                                 .scene = resource,
                                 .mesh = geom,
@@ -219,7 +221,7 @@ static void shutdown() {
 }
 
 static uint64_t resource_data(uint64_t name) {
-    struct ct_resource_id_t0 rid = (struct ct_resource_id_t0) {
+    struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
             .uid = name,
     };
 

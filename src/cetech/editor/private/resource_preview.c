@@ -34,7 +34,7 @@
 #define PREVIEW_PTR \
     CE_ID64_0("preview_ptr", 0x1e2c71526a2e8a11ULL)
 
-struct preview_instance {
+typedef struct preview_instance {
     ct_world_t0 world;
     struct ct_entity_t0 camera_ent;
     struct ct_viewport_t0 viewport;
@@ -43,7 +43,7 @@ struct preview_instance {
     uint64_t type;
     bool locked;
     bool free;
-};
+}preview_instance;
 
 static struct _G {
     struct ce_alloc_t0 *allocator;
@@ -69,8 +69,7 @@ static struct preview_instance *_new_preview() {
 
     uint32_t idx = n;
     ce_array_push(_G.instances,
-                  ((struct preview_instance) {
-                  }),
+                  ((preview_instance) {}),
                   ce_memory_a0->system);
 
     struct preview_instance *pi = &_G.instances[idx];
@@ -161,7 +160,7 @@ static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
     return resource_i->get_interface(RESOURCE_PREVIEW_I);
 }
 
-static void set_asset(struct preview_instance *pi,
+static void set_asset(preview_instance *pi,
                       uint64_t obj) {
     if (!pi) {
         return;
@@ -230,7 +229,7 @@ static void draw_menu(uint64_t dock) {
     }
 }
 
-static void _draw_preview(struct preview_instance *pi,
+static void _draw_preview(preview_instance *pi,
                           ce_vec2_t size) {
 
     if(!pi->type) {
@@ -342,7 +341,7 @@ static void update(float dt) {
     }
 }
 
-void set_background_resource(struct ct_resource_id_t0 resource) {
+void set_background_resource(ct_resource_id_t0 resource) {
     set_asset(_G.baground, resource.uid);
 }
 

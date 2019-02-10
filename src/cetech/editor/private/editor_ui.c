@@ -173,7 +173,7 @@ static void _prop_label(const char *label,
 }
 
 
-static void resource_tooltip(struct ct_resource_id_t0 resourceid,
+static void resource_tooltip(ct_resource_id_t0 resourceid,
                              const char *path,
                              ce_vec2_t size) {
     ct_debugui_a0->Text("%s", path);
@@ -423,7 +423,7 @@ static bool resource_select_modal(const char *modal_id,
 
                 ct_debugui_a0->BeginTooltip();
                 ct_editor_ui_a0->resource_tooltip(r, name,
-                                                  (struct ce_vec2_t){256,  256});
+                                                  (ce_vec2_t){256,  256});
                 ct_debugui_a0->EndTooltip();
             }
 

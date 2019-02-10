@@ -76,9 +76,9 @@ struct ct_renderer_a0 {
     struct ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
                                            struct ct_entity_t0 main_camera);
 
-    void (*destroy_viewport)(struct ct_viewport_t0 viewport);
+    void (*destroy_viewport)(ct_viewport_t0 viewport);
 
-    struct ct_rg_builder_t0 *(*viewport_builder)(struct ct_viewport_t0 viewport);
+    struct ct_rg_builder_t0 *(*viewport_builder)(ct_viewport_t0 viewport);
 
     struct ce_window *(*get_main_window)();
 };

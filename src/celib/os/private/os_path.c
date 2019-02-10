@@ -364,7 +364,7 @@ void path_join(char **buffer,
     va_end (arguments);
 }
 
-void copy_file(struct ce_alloc_t0 *allocator,
+void copy_file(ce_alloc_t0 *allocator,
                const char *from,
                const char *to) {
     struct ce_vio *source_vio = ce_os_vio_a0->from_file(from,

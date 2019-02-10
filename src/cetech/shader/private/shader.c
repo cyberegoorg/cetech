@@ -126,7 +126,7 @@ const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
 
-static bool _compile(struct ce_cdb_t0 db,
+static bool _compile(ce_cdb_t0 db,
                      uint64_t obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
@@ -233,7 +233,7 @@ static bool _compile(struct ce_cdb_t0 db,
     return true;
 }
 
-bool shader_compiler(struct ce_cdb_t0 db,
+bool shader_compiler(ce_cdb_t0 db,
                      uint64_t k) {
     return _compile(db, k);
 }

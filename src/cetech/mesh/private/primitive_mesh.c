@@ -203,7 +203,7 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 static uint64_t size() {
-    return sizeof(struct ct_primitive_mesh);
+    return sizeof(ct_primitive_mesh);
 }
 
 static void mesh_spawner(ct_world_t0 world,
@@ -212,14 +212,14 @@ static void mesh_spawner(ct_world_t0 world,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     struct ct_primitive_mesh *m = data;
 
-    *m = (struct ct_primitive_mesh) {
+    *m = (ct_primitive_mesh) {
             .material = ce_cdb_a0->read_ref(r, PROP_MATERIAL, 0),
     };
 
 }
 
 
-static struct ct_component_i0 ct_component_i0 = {
+static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .size = size,
         .get_interface = get_interface,
@@ -233,7 +233,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(COMPONENT_INTERFACE, &ct_component_i0, sizeof(ct_component_i0));
+    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 
     ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,

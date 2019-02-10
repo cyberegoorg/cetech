@@ -45,12 +45,12 @@
 // GLobals
 //==============================================================================
 
-struct viewport {
+typedef struct viewport {
     struct ct_rg_builder_t0 *builder;
     ct_world_t0 world;
     struct ct_entity_t0 entity;
     bool free;
-};
+} viewport;
 
 #define _G RendererGlobals
 static struct _G {
@@ -92,7 +92,7 @@ static void _render_task(void *data) {
 static void _render_init_task(void *data) {
     bgfx_render_frame(-1);
 
-    ce_task_a0->add(&(struct ce_task_item_t0) {
+    ce_task_a0->add(&(ce_task_item_t0) {
             .work = _render_task,
             .name = "Renderer worker",
     }, 1, NULL);
@@ -141,7 +141,7 @@ static void renderer_create() {
     bgfx_set_platform_data(&pd);
 
     struct ce_task_counter_t0* render_init_c = NULL;
-    ce_task_a0->add(&(struct ce_task_item_t0) {
+    ce_task_a0->add(&(ce_task_item_t0) {
             .work = _render_init_task,
             .name = "Renderer init worker",
     }, 1, &render_init_c);
@@ -221,7 +221,7 @@ static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module *module) {
     struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
-        struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
+        struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
 
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
@@ -238,7 +238,7 @@ void _render_components(ct_world_t0 world,
                         struct ct_rg_builder_t0 *builder) {
     struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
-        struct ct_component_i0 *i = (struct ct_component_i0 *) (it.api);
+        struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
 
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
@@ -330,7 +330,7 @@ static uint32_t _new_viewport() {
     }
 
     uint32_t idx = n;
-    ce_array_push(_G.viewports, (struct viewport) {}, _G.allocator);
+    ce_array_push(_G.viewports, (viewport) {}, _G.allocator);
     return idx;
 }
 
@@ -346,16 +346,16 @@ struct ct_viewport_t0 create_viewport(ct_world_t0 world,
     v->entity = main_camera;
     v->builder = builder;
 
-    return (struct ct_viewport_t0) {.idx=idx};
+    return (ct_viewport_t0) {.idx=idx};
 }
 
 
-void destroy_viewport(struct ct_viewport_t0 viewport) {
+void destroy_viewport(ct_viewport_t0 viewport) {
     struct viewport *v = &_G.viewports[viewport.idx];
     v->free = true;
 }
 
-struct ct_rg_builder_t0 *viewport_builder(struct ct_viewport_t0 viewport) {
+struct ct_rg_builder_t0 *viewport_builder(ct_viewport_t0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
 

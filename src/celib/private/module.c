@@ -35,15 +35,15 @@
 //==============================================================================
 // Globals
 //==============================================================================
-struct module_functios {
+typedef struct module_functios {
     void *handler;
     ce_load_module_t0 *load;
     ce_unload_module_t0 *unload;
     ce_initapi_module_t0 *initapi;
-};
+} module_functios;
 
 static struct _G {
-    struct module_functios modules[MAX_MODULES];
+    module_functios modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     uint64_t config;
@@ -95,7 +95,7 @@ static void get_module_fce_name(char **buffer,
 }
 
 
-static bool load_from_path(struct module_functios *module,
+static bool load_from_path(module_functios *module,
                            const char *path) {
     uint32_t name_len;
     const char *name = get_module_name(path, &name_len);
@@ -133,7 +133,7 @@ static bool load_from_path(struct module_functios *module,
         return false;
     }
 
-    *module = (struct module_functios) {
+    *module = (module_functios) {
             .handler = obj,
             .load = load_fce,
             .unload = unload_fce,
@@ -159,7 +159,7 @@ static void add_static(ce_load_module_t0 load,
     };
 
     add_module("__STATIC__", &module);
-//    initapi(ce_api_a0);
+//    initapi(struct ce_api_a0);
     load(ce_api_a0, 0);
 }
 

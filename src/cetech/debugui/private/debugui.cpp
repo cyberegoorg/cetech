@@ -343,7 +343,7 @@ static struct ct_debugui_a0 debugui_api = {
         .GetColumnOffset = ImGui::GetColumnOffset,
         .SetColumnOffset = ImGui::SetColumnOffset,
         .GetColumnsCount = ImGui::GetColumnsCount,
-        .SetNextWindowSize = reinterpret_cast<void (*)(_vec2, DebugUICond)>(ImGui::SetNextWindowSize),
+        .SetNextWindowSize = reinterpret_cast<void (*)(ce_vec2_t* , DebugUICond)>(ImGui::SetNextWindowSize),
 
         .EndChild = ImGui::EndChild,
         .Unindent= ImGui::Unindent,

@@ -43,14 +43,14 @@ static const char *get_key(uint64_t hash) {
     return ce_id_a0->str_from_id64(hash);
 }
 
-struct node_value {
+typedef struct node_value {
     union {
         float f;
         uint64_t ui;
         char *string;
         uint32_t node_count;
     };
-};
+}node_value ;
 
 
 static uint64_t calc_key(const char *key) {
@@ -74,7 +74,7 @@ static void type_value_from_scalar(const uint8_t *scalar,
 
     if (!strlen(scalar_str)) {
         *type = NODE_STRING;
-        *vallue = (struct node_value) {.string = strdup(scalar_str)};
+        *vallue = (node_value) {.string = strdup(scalar_str)};
         return;
     }
 
@@ -84,7 +84,7 @@ static void type_value_from_scalar(const uint8_t *scalar,
         if (!((scalar_str[0] == '0') && (scalar_str[1] == 'x'))) {
             if (sscanf(scalar_str, "%f", &f)) {
                 *type = NODE_FLOAT;
-                *vallue = (struct node_value) {.f = f};
+                *vallue = (node_value) {.f = f};
                 return;
 
             } else if ((0 == strcmp(scalar_str, "y")) ||
@@ -103,30 +103,31 @@ static void type_value_from_scalar(const uint8_t *scalar,
     } else if (_is_ref(scalar_str)) {
         uint64_t uid = _uid_from_str(scalar_str);
         *type = NODE_REF;
-        *vallue = (struct node_value) {.ui = uid};
+        *vallue = (node_value) {.ui = uid};
         return;
     }
 
     *type = NODE_STRING;
-    *vallue = (struct node_value) {.string = strdup(scalar_str)};
+    *vallue = (node_value) {.string = strdup(scalar_str)};
 }
 
+typedef struct parent_stack_state {
+    enum node_type type;
+    uint32_t node_count;
 
-uint64_t cdb_from_vio(struct ce_vio *vio,
+    uint64_t key_hash;
+    uint64_t str_hash;
+
+    uint64_t root_object;
+    ce_cdb_obj_o0 *writer;
+
+    char **str_array;
+    float *float_array;
+}parent_stack_state;
+
+uint64_t cdb_from_vio(ce_vio *vio,
                       struct ce_alloc_t0 *alloc) {
-    struct parent_stack_state {
-        enum node_type type;
-        uint32_t node_count;
 
-        uint64_t key_hash;
-        uint64_t str_hash;
-
-        uint64_t root_object;
-        ce_cdb_obj_o0 *writer;
-
-        char **str_array;
-        float *float_array;
-    };
 
     struct parent_stack_state *parent_stack = NULL;
     uint32_t parent_stack_top;
@@ -134,7 +135,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
     uint64_t root_object = 0;
     ce_array_push(parent_stack,
-                  ((struct parent_stack_state) {}),
+                  ((parent_stack_state) {}),
                   _G.allocator);
 
     uint8_t *source_data = CE_ALLOC(alloc, uint8_t, vio->size(vio) + 1);
@@ -180,7 +181,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
 
             case YAML_SEQUENCE_START_EVENT: {
                 key = parent_stack[parent_stack_top].str_hash;
-                state = (struct parent_stack_state) {
+                state = (parent_stack_state) {
                         .type = NODE_SEQ,
                         .key_hash = key,
                 };
@@ -256,7 +257,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                     root_object = obj;
                 }
 
-                state = (struct parent_stack_state) {
+                state = (parent_stack_state) {
                         .type = NODE_MAP,
                         .root_object = obj,
                         .key_hash = key,
@@ -305,7 +306,7 @@ uint64_t cdb_from_vio(struct ce_vio *vio,
                         key_hash = ce_id_a0->id64(value.string);
                     }
 
-                    state = (struct parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
+                    state = (parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
 
                     ++parent_stack[parent_stack_top].node_count;
                     ce_array_push(parent_stack, state, _G.allocator);
