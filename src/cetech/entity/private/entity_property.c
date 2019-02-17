@@ -35,14 +35,14 @@
 #define _G entity_property_global
 
 static struct _G {
-    struct ce_hash_t components;
+    ce_hash_t components;
 
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
     uint64_t obj;
 } _G;
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -60,7 +60,7 @@ static void draw_component(uint64_t obj,
                            uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
-    struct ct_component_i0 *c = get_component_interface(type);
+    ct_component_i0 *c = get_component_interface(type);
 
 
     if (!c || !c->get_interface) {
@@ -68,7 +68,7 @@ static void draw_component(uint64_t obj,
     }
 
 
-    struct ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
+    ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
     ct_editor_ui_a0->ui_prop_header(editor->display_name());
 

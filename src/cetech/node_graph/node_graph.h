@@ -85,7 +85,7 @@ typedef struct ct_node_i0 {
 } ct_node_i0;
 
 struct ct_node_graph_a0 {
-    struct ct_node_i0 *(*get_interface)(uint64_t type);
+    ct_node_i0 *(*get_interface)(uint64_t type);
 };
 
 CE_MODULE(ct_node_graph_a0);

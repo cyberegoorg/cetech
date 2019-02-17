@@ -8,7 +8,7 @@ extern "C" {
 #include "celib/celib_types.h"
 
 typedef struct ce_ba_graph_t {
-    struct ce_hash_t graph_map;
+    ce_hash_t graph_map;
     uint64_t **before;
     uint64_t **after;
     uint64_t *name;

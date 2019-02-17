@@ -25,7 +25,7 @@
 
 #define _G CameraGlobal
 static struct CameraGlobal {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } CameraGlobal;
 
 static void get_project_view(ct_world_t0 world,
@@ -35,11 +35,11 @@ static void get_project_view(ct_world_t0 world,
                              int width,
                              int height) {
 
-    struct ct_transform_comp *transform = ct_ecs_a0->get_one(world,
+    ct_transform_comp *transform = ct_ecs_a0->get_one(world,
                                                              TRANSFORM_COMPONENT,
                                                              camera);
 
-    struct ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
+    ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
                                                                  CAMERA_COMPONENT,
                                                                  camera);
     if (!transform) return;
@@ -111,7 +111,7 @@ static void camera_spawner(ct_world_t0 world,
                            void *data) {
 
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    struct ct_camera_component *c = data;
+    ct_camera_component *c = data;
 
     *c = (ct_camera_component) {
             .far = ce_cdb_a0->read_float(r, PROP_FAR, 100.0f),

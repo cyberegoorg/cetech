@@ -39,12 +39,12 @@
 //==============================================================================
 
 struct _G {
-    struct ce_hash_t type_map;
+    ce_hash_t type_map;
 
-    struct ce_cdb_t0 db;
+    ce_cdb_t0 db;
 
     uint64_t config;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G = {};
 
 //==============================================================================
@@ -58,7 +58,7 @@ struct _G {
 
 static void _resource_api_add(uint64_t name,
                               void *api) {
-    struct ct_resource_i0 *ct_resource_i = api;
+    ct_resource_i0 *ct_resource_i = api;
     ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
                 _G.allocator);
 }
@@ -158,7 +158,7 @@ static bool dump_recursive(const char *filename,
     ce_cdb_a0->dump(ce_cdb_a0->db(),
                     obj, &output, _G.allocator);
 
-    struct ct_resource_id_t0 rid = {.uid=obj};
+    ct_resource_id_t0 rid = {.uid=obj};
     ct_resourcedb_a0->put_resource_blob(rid,
                                         output,
                                         ce_array_size(output));
@@ -179,7 +179,7 @@ static bool dump_recursive(const char *filename,
 static bool save_to_db(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
-    struct ct_resource_id_t0 r = {.uid=root};
+    ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                          filename,
@@ -196,7 +196,7 @@ static bool save_to_db(uint64_t uid) {
 static bool save(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
-    struct ct_resource_id_t0 r = {.uid=root};
+    ct_resource_id_t0 r = {.uid=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                          filename,
@@ -207,7 +207,7 @@ static bool save(uint64_t uid) {
         ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uid, 0);
 
         struct ce_vio_t0 *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
-        f->write(f->inst, buf, ce_buffer_size(buf), 1);
+        f->vt->write(f->inst, buf, ce_buffer_size(buf), 1);
         ce_fs_a0->close(f);
         ce_buffer_free(buf, _G.allocator);
 

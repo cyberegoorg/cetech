@@ -28,7 +28,7 @@ void init_signals(void) {
 }
 
 bool ce_init() {
-    struct ce_alloc_t0 *core_alloc =ce_memory_a0->system;
+    ce_alloc_t0 *core_alloc =ce_memory_a0->system;
 
     api_init(core_alloc);
 

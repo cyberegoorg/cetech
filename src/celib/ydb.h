@@ -9,8 +9,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-
-
 #define CE_YDB_API \
     CE_ID64_0("ce_ydb_a0", 0xf5be4873d4ac8920ULL)
 

@@ -31,7 +31,7 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_alloc_t0 *alloc;
+    ce_alloc_t0 *alloc;
 } _G;
 
 //==============================================================================
@@ -198,8 +198,8 @@ static void gbuffer_pass_on_setup(void *inst,
 }
 
 typedef struct gbuffer_pass {
-    struct ct_rg_pass_t0 pass;
-    struct ct_entity_t0 camera;
+    ct_rg_pass_t0 pass;
+    ct_entity_t0 camera;
     ct_world_t0 world;
 } gbuffer_pass;
 
@@ -207,7 +207,7 @@ static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
                                  uint64_t layer,
                                  struct ct_rg_builder_t0 *builder) {
-    struct gbuffer_pass *pass = inst;
+    gbuffer_pass *pass = inst;
 
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
@@ -237,7 +237,7 @@ static void gbuffer_pass_on_pass(void *inst,
 static void feed_module(ct_rg_module_t0 *m1,
                         ct_world_t0 world,
                         struct ct_entity_t0 camera) {
-    struct ct_rg_module_t0 *gm = m1->add_extension_point(m1, _GBUFFER);
+    ct_rg_module_t0 *gm = m1->add_extension_point(m1, _GBUFFER);
 
     gm->add_pass(gm, &(gbuffer_pass) {
             .camera = camera,

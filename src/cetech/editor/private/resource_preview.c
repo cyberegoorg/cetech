@@ -36,9 +36,9 @@
 
 typedef struct preview_instance {
     ct_world_t0 world;
-    struct ct_entity_t0 camera_ent;
-    struct ct_viewport_t0 viewport;
-    struct ct_entity_t0 ent;
+    ct_entity_t0 camera_ent;
+    ct_viewport_t0 viewport;
+    ct_entity_t0 ent;
     uint64_t selected_object;
     uint64_t type;
     bool locked;
@@ -46,10 +46,10 @@ typedef struct preview_instance {
 } preview_instance;
 
 static struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 
-    struct preview_instance *instances;
-    struct preview_instance *baground;
+    preview_instance *instances;
+    preview_instance *baground;
 
     bool visible;
     bool active;
@@ -72,7 +72,7 @@ static struct preview_instance *_new_preview() {
                   ((preview_instance) {}),
                   ce_memory_a0->system);
 
-    struct preview_instance *pi = &_G.instances[idx];
+    preview_instance *pi = &_G.instances[idx];
 
     return pi;
 }
@@ -93,7 +93,7 @@ static void fps_camera_update(ct_world_t0 world,
 //
 //    float wm[16];
 //
-//    struct ct_transform_comp *transform;
+//    ct_transform_comp *transform;
 //    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
 //                                   camera_ent);
 //
@@ -146,7 +146,7 @@ static void fps_camera_update(ct_world_t0 world,
 }
 
 static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
-    struct ct_resource_i0 *resource_i;
+    ct_resource_i0 *resource_i;
     resource_i = ct_resource_a0->get_interface(asset_type);
 
     if (!resource_i) {
@@ -213,7 +213,7 @@ static void set_asset(preview_instance *pi,
 
 static void draw_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    struct preview_instance *pi = ce_cdb_a0->read_ptr(reader,
+    preview_instance *pi = ce_cdb_a0->read_ptr(reader,
                                                       PREVIEW_PTR, NULL);
 
     ct_dock_a0->context_btn(dock);
@@ -236,7 +236,7 @@ static void _draw_preview(preview_instance *pi,
         return;
     }
 
-    struct ct_resource_preview_i0 *i;
+    ct_resource_preview_i0 *i;
     i = _get_asset_preview(pi->type);
 
     if (!i) {
@@ -266,7 +266,7 @@ static void on_debugui(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    struct preview_instance *pi = ce_cdb_a0->read_ptr(reader,
+    preview_instance *pi = ce_cdb_a0->read_ptr(reader,
                                                       PREVIEW_PTR, NULL);
 
     if (!pi) {
@@ -285,7 +285,7 @@ static void on_debugui(uint64_t dock) {
 static bool init() {
     _G.visible = true;
 
-    struct preview_instance *pi = _new_preview();
+    preview_instance *pi = _new_preview();
     _G.baground = pi;
     pi->world = ct_ecs_a0->create_world();
     pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
@@ -369,7 +369,7 @@ static uint64_t cdb_type() {
 };
 
 static void open(uint64_t dock) {
-    struct preview_instance *pi = _new_preview();
+    preview_instance *pi = _new_preview();
 
     pi->world = ct_ecs_a0->create_world();
     pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);

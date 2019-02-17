@@ -87,11 +87,8 @@ void sdl_mouse_process() {
     curent_state[MOUSE_BTN_RIGHT] = (uint8_t) (state & SDL_BUTTON_RMASK);
     curent_state[MOUSE_BTN_MIDLE] = (uint8_t) (state & SDL_BUTTON_MMASK);
 
-    struct ct_renderer_a0 *renderer_a0 = (struct ct_renderer_a0 *) ce_api_a0->first(
-            ce_id_a0->id64("ct_renderer_a0")).api;
-
     uint32_t window_size[2] = {};
-    renderer_a0->get_size(&window_size[0], &window_size[1]);
+    ct_renderer_a0->get_size(&window_size[0], &window_size[1]);
 
     _G.mouse.position[0] = pos[0];
     _G.mouse.position[1] = window_size[1] - pos[1];

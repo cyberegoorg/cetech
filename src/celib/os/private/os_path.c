@@ -367,19 +367,19 @@ void path_join(char **buffer,
 void copy_file(ce_alloc_t0 *allocator,
                const char *from,
                const char *to) {
-    struct ce_vio_t0 *source_vio = ce_os_vio_a0->from_file(from,
+    ce_vio_t0 *source_vio = ce_os_vio_a0->from_file(from,
                                                             VIO_OPEN_READ);
 
     char *data = CE_ALLOC(allocator, char,
-                          source_vio->size(source_vio->inst));
+                          source_vio->vt->size(source_vio->inst));
 
-    size_t size = (size_t) source_vio->size(source_vio->inst);
-    source_vio->read(source_vio->inst, data, sizeof(char), size);
+    size_t size = (size_t) source_vio->vt->size(source_vio->inst);
+    source_vio->vt->read(source_vio->inst, data, sizeof(char), size);
     ce_os_vio_a0->close(source_vio);
 
-    struct ce_vio_t0 *build_vio = ce_os_vio_a0->from_file(to, VIO_OPEN_WRITE);
+    ce_vio_t0 *build_vio = ce_os_vio_a0->from_file(to, VIO_OPEN_WRITE);
 
-    build_vio->write(build_vio->inst, data, sizeof(char), size);
+    build_vio->vt->write(build_vio->inst, data, sizeof(char), size);
     ce_os_vio_a0->close(build_vio);
 
     CE_FREE(allocator, data);

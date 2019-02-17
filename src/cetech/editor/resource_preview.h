@@ -21,7 +21,7 @@ typedef struct ct_resource_preview_i0 {
     void (*draw_raw)(uint64_t obj,
                      ce_vec2_t size);
 
-    struct ct_entity_t0 (*load)(uint64_t resource,
+    ct_entity_t0 (*load)(uint64_t resource,
                                 ct_world_t0 world);
 
     void (*unload)(uint64_t resource,

@@ -13,7 +13,6 @@ extern "C" {
 #define CE_OS_VIO_API \
     CE_ID64_0("ce_os_vio_a0", 0x989fe40200d61012ULL)
 
-
 enum ce_vio_open_mode {
     VIO_OPEN_READ,
     VIO_OPEN_WRITE,
@@ -27,9 +26,7 @@ enum ce_vio_seek {
 
 typedef struct ce_vio_o0 ce_vio_o0;
 
-typedef struct ce_vio_t0 {
-    ce_vio_o0 *inst;
-
+typedef struct ce_vio_vt0 {
     int64_t (*size)(ce_vio_o0 *inst);
 
     int64_t (*seek)(ce_vio_o0 *inst,
@@ -47,10 +44,15 @@ typedef struct ce_vio_t0 {
                     size_t num);
 
     int (*close)(ce_vio_o0 *inst);
+} ce_vio_vt0;
+
+typedef struct ce_vio_t0 {
+    ce_vio_o0 *inst;
+    ce_vio_vt0 *vt;
 } ce_vio_t0;
 
 struct ce_os_vio_a0 {
-    struct ce_vio_t0 *(*from_file)(const char *path,
+    ce_vio_t0 *(*from_file)(const char *path,
                                    enum ce_vio_open_mode mode);
 
     void (*close)(struct ce_vio_t0 * vio);

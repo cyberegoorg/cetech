@@ -33,7 +33,7 @@ extern "C" {
 
 #define _G node_graph_editor_globals
 static struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 

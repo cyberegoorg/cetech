@@ -13,7 +13,7 @@
 #include <celib/os/thread.h>
 #include <celib/os/cpu.h>
 
-#include "queue_mpmc.h"
+#include "queue_mpmc.inl"
 
 
 //==============================================================================
@@ -50,20 +50,20 @@ static struct _G {
     ce_thread_t0 workers[TASK_MAX_WORKERS - 1];
 
     // TASK
-    struct task_t task_pool[MAX_TASK];
+    task_t task_pool[MAX_TASK];
     atomic_int task_pool_idx;
-    struct queue_mpmc free_task;
+    queue_mpmc free_task;
 
     // COUNTERS
     atomic_int counter_pool_idx;
     atomic_int counter_pool[MAX_COUNTERS];
-    struct queue_mpmc free_counter;
+    queue_mpmc free_counter;
 
     uint32_t workers_count;
 
-    struct queue_mpmc job_queue;
+    queue_mpmc job_queue;
     atomic_bool is_running;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 // Private
@@ -98,7 +98,7 @@ static uint32_t _new_counter_task(uint32_t value) {
 }
 
 static void _push_task(task_id_t t) {
-    struct queue_mpmc *q;
+    queue_mpmc *q;
     q = &_G.job_queue;
 
     queue_task_push(q, t.id);
@@ -123,7 +123,7 @@ static task_id_t _try_pop(struct queue_mpmc *q) {
 
 static task_id_t _task_pop_new_work() {
     task_id_t pop_task;
-    struct queue_mpmc *qg = &_G.job_queue;
+    queue_mpmc *qg = &_G.job_queue;
 
     pop_task = _try_pop(qg);
     if (pop_task.id != 0) {
@@ -141,7 +141,7 @@ int do_work() {
         return 0;
     }
 
-    struct task_t *task = &_G.task_pool[t.id];
+    task_t *task = &_G.task_pool[t.id];
 
     task->task_work(task->data);
 

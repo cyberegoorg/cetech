@@ -16,7 +16,7 @@
 //==============================================================================
 
 typedef char cacheline_pad_t[64];
-struct queue_mpmc {
+typedef struct queue_mpmc {
     uint32_t *_data;
     cacheline_pad_t _pad1;
     atomic_int *_sequences;
@@ -29,8 +29,8 @@ struct queue_mpmc {
     cacheline_pad_t _pad5;
     int _capacityMask;
     cacheline_pad_t _pad6;
-    struct ce_alloc_t0 *allocator;
-};
+    ce_alloc_t0 *allocator;
+} queue_mpmc;
 
 
 void queue_task_init(struct queue_mpmc *q,

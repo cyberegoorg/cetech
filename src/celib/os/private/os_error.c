@@ -20,7 +20,7 @@
 
 char *stacktrace(int skip) {
 #if CE_PLATFORM_LINUX || CE_PLATFORM_OSX
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     char *return_str = CE_ALLOC(a, char, 4096);
     return_str[0] = '\0';
@@ -75,7 +75,7 @@ char *stacktrace(int skip) {
 }
 
 void stacktrace_free(char *st) {
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     CE_FREE(a, st);
 }

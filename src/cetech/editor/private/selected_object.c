@@ -17,7 +17,7 @@ typedef struct slot_t {
 } slot_t;
 
 static struct _G {
-    struct ce_hash_t selected_object_map;
+    ce_hash_t selected_object_map;
     slot_t *slots;
 } _G;
 

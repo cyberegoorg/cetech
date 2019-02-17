@@ -30,7 +30,7 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_alloc_t0 *alloc;
+    ce_alloc_t0 *alloc;
 } _G;
 
 #include "graph.h"

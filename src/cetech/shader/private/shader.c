@@ -43,7 +43,7 @@
 
 #define _G ShaderResourceGlobals
 struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -58,7 +58,7 @@ static int _shaderc(const char *input,
                     const char *type,
                     const char *platform,
                     const char *profile) {
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     char *buffer = NULL;
 
@@ -92,7 +92,7 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
 
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     char dir[1024] = {};
     ce_os_path_a0->dir(dir, filename);
@@ -133,7 +133,7 @@ static bool _compile(ce_cdb_t0 db,
     const char *vs_input = ce_cdb_a0->read_str(reader, SHADER_VS_INPUT, "");
     const char *fs_input = ce_cdb_a0->read_str(reader, SHADER_FS_INPUT, "");
 
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
                                                     ce_config_a0->obj());
@@ -177,7 +177,7 @@ static bool _compile(ce_cdb_t0 db,
     }
 
 
-    struct ce_vio_t0 *tmp_file;
+    ce_vio_t0 *tmp_file;
 
     do {
         tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
@@ -185,10 +185,10 @@ static bool _compile(ce_cdb_t0 db,
 
 
     char *vs_data = CE_ALLOC(ce_memory_a0->system, char,
-                             tmp_file->size(tmp_file->inst) + 1);
+                             tmp_file->vt->size(tmp_file->inst) + 1);
 
-    uint64_t vs_data_size = tmp_file->size(tmp_file->inst);
-    tmp_file->read(tmp_file->inst, vs_data, sizeof(char), vs_data_size);
+    uint64_t vs_data_size = tmp_file->vt->size(tmp_file->inst);
+    tmp_file->vt->read(tmp_file->inst, vs_data, sizeof(char), vs_data_size);
     ce_os_vio_a0->close(tmp_file);
 
     ce_cdb_a0->set_blob(w, SHADER_VS_DATA, vs_data, vs_data_size);
@@ -217,10 +217,10 @@ static bool _compile(ce_cdb_t0 db,
 
     tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
     char *fs_data = CE_ALLOC(ce_memory_a0->system, char,
-                             tmp_file->size(tmp_file->inst) + 1);
+                             tmp_file->vt->size(tmp_file->inst) + 1);
 
-    uint64_t fs_data_size = tmp_file->size(tmp_file->inst);
-    tmp_file->read(tmp_file->inst, fs_data, sizeof(char), fs_data_size);
+    uint64_t fs_data_size = tmp_file->vt->size(tmp_file->inst);
+    tmp_file->vt->read(tmp_file->inst, fs_data, sizeof(char), fs_data_size);
     ce_os_vio_a0->close(tmp_file);
 
     ce_cdb_a0->set_blob(w, SHADER_FS_DATA, fs_data, fs_data_size);

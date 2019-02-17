@@ -33,10 +33,10 @@ enum node_type {
 };
 
 static struct _G {
-    struct ce_hash_t obj_cache_map;
+    ce_hash_t obj_cache_map;
     ce_spinlock_t0 cache_lock;
 
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static const char *get_key(uint64_t hash) {
@@ -129,7 +129,7 @@ uint64_t cdb_from_vio(ce_vio_t0 *vio,
                       struct ce_alloc_t0 *alloc) {
 
 
-    struct parent_stack_state *parent_stack = NULL;
+    parent_stack_state *parent_stack = NULL;
     uint32_t parent_stack_top;
     uint64_t key = 0;
 
@@ -138,9 +138,9 @@ uint64_t cdb_from_vio(ce_vio_t0 *vio,
                   ((parent_stack_state) {}),
                   _G.allocator);
 
-    uint8_t *source_data = CE_ALLOC(alloc, uint8_t, vio->size(vio->inst) + 1);
-    memset(source_data, 0, vio->size(vio->inst) + 1);
-    vio->read(vio->inst, source_data, sizeof(char), vio->size(vio->inst));
+    uint8_t *source_data = CE_ALLOC(alloc, uint8_t, vio->vt->size(vio->inst) + 1);
+    memset(source_data, 0, vio->vt->size(vio->inst) + 1);
+    vio->vt->read(vio->inst, source_data, sizeof(char), vio->vt->size(vio->inst));
 
     yaml_parser_t parser;
     if (!yaml_parser_initialize(&parser)) {
@@ -148,7 +148,7 @@ uint64_t cdb_from_vio(ce_vio_t0 *vio,
         goto error;
     }
 
-    yaml_parser_set_input_string(&parser, source_data, vio->size(vio->inst));
+    yaml_parser_set_input_string(&parser, source_data, vio->vt->size(vio->inst));
 
 #define IS_KEY() (parent_stack[parent_stack_top].type == NODE_MAP)
 #define HAS_KEY() (parent_stack[parent_stack_top].type == NODE_STRING) || (parent_stack[parent_stack_top].type == NODE_REF)
@@ -404,7 +404,7 @@ uint64_t load_obj_to_cache(const char *path,
 
     ce_log_a0->debug(LOG_WHERE, "Load file %s to cache", path);
 
-    struct ce_vio_t0 *f = ce_fs_a0->open(fs_root, path, FS_OPEN_READ);
+    ce_vio_t0 *f = ce_fs_a0->open(fs_root, path, FS_OPEN_READ);
 
     if (!f) {
         ce_log_a0->error(LOG_WHERE, "Could not read file %s", path);
@@ -570,7 +570,7 @@ static void dump_yaml(char **buffer,
 }
 
 void save(const char *path) {
-    struct ce_vio_t0 *f = ce_fs_a0->open(ce_id_a0->id64("source"), path,
+    ce_vio_t0 *f = ce_fs_a0->open(ce_id_a0->id64("source"), path,
                                          FS_OPEN_WRITE);
 
     if (!f) {
@@ -583,7 +583,7 @@ void save(const char *path) {
     char *b = NULL;
     dump_yaml(&b, obj, 0);
 
-    f->write(f->inst, b, sizeof(char), ce_buffer_size(b));
+    f->vt->write(f->inst, b, sizeof(char), ce_buffer_size(b));
     ce_buffer_free(b, ce_memory_a0->system);
 
     ce_fs_a0->close(f);

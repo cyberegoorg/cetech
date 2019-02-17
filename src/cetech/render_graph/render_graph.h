@@ -81,10 +81,10 @@ typedef struct ct_rg_module_t0 {
                      void *pass,
                      uint64_t size);
 
-    struct ct_rg_module_t0 *(*add_extension_point)(void *inst,
+    ct_rg_module_t0 *(*add_extension_point)(void *inst,
                                                    uint64_t name);
 
-    struct ct_rg_module_t0 *(*get_extension_point)(void *inst,
+    ct_rg_module_t0 *(*get_extension_point)(void *inst,
                                                    uint64_t name);
 
     void (*on_setup)(void *inst,
@@ -102,7 +102,7 @@ typedef struct ct_rg_t0 {
 } ct_rg_t0;
 
 struct ct_rg_a0 {
-    struct ct_rg_t0 *(*create_graph)();
+    ct_rg_t0 *(*create_graph)();
 
     void (*destroy_graph)(ct_rg_t0 *render_graph);
 
@@ -110,7 +110,7 @@ struct ct_rg_a0 {
 
     void (*destroy_module)(ct_rg_module_t0 *module);
 
-    struct ct_rg_builder_t0 *(*create_builder)();
+    ct_rg_builder_t0 *(*create_builder)();
 
     void (*destroy_builder)(ct_rg_builder_t0 *builder);
 };

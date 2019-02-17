@@ -31,13 +31,13 @@ typedef struct shortcut {
 
 #define _G action_manager_global
 static struct _G {
-    struct ce_hash_t action_map;
+    ce_hash_t action_map;
     union modifiactor mod;
 
-    struct shortcut *shorcut;
+    shortcut *shorcut;
     action_fce_t *action_fce;
     bool *action_active;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static void fill_button(shortcut *sc) {
@@ -56,7 +56,7 @@ static void fill_button(shortcut *sc) {
         ++it;
     }
 
-    struct ct_controlers_i0 *keyboard;
+    ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     for (int i = 0; i < count; ++i) {
@@ -76,7 +76,7 @@ static void register_action(uint64_t name,
                             const char *shortcut_str,
                             action_fce_t fce) {
     uint32_t idx = ce_array_size(_G.shorcut);
-    struct shortcut sc = {};
+    shortcut sc = {};
 
     strncpy(sc.str, shortcut_str, 64);
     fill_button(&sc);
@@ -102,7 +102,7 @@ static void execute(uint64_t name) {
 }
 
 static void check() {
-    struct ct_controlers_i0 *keyboard;
+    ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 

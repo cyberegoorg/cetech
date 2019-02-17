@@ -25,14 +25,14 @@ struct memory_trace {
 
 static struct _G {
 #if CE_TRACE_MEMORY
-    struct memory_trace *memory_trace_pool;
-    struct ce_hash_t memory_trace_map;
+    memory_trace *memory_trace_pool;
+    ce_hash_t memory_trace_map;
     ce_spinlock_t0 lock;
 #endif
     int _;
 } _G = {};
 
-static void *_reallocate(const struct ce_alloc_t0 *a,
+static void *_reallocate(const ce_alloc_o0 *a,
                          void *ptr,
                          uint32_t size,
                          uint32_t align,
@@ -55,7 +55,7 @@ static struct ce_alloc_t0 _allocator = {
 static void _trace_alloc(void *ptr,
                          const char *filename,
                          uint32_t line) {
-    struct memory_trace trace = {
+    memory_trace trace = {
             .filename = filename,
             .line = line,
             .ptr = ptr,
@@ -95,7 +95,7 @@ static void _trace_free(void *ptr) {
 
 #endif
 
-static void *_reallocate_traced(const struct ce_alloc_t0 *a,
+static void *_reallocate_traced(const ce_alloc_o0 *a,
                                 void *ptr,
                                 uint32_t size,
                                 uint32_t align,
@@ -120,10 +120,14 @@ static void *_reallocate_traced(const struct ce_alloc_t0 *a,
     return new_ptr;
 }
 
+static struct ce_alloc_vt0 system_vt = {
+        .reallocate = _reallocate_traced
+};
+
 
 static struct ce_alloc_t0 _traced_allocator = {
         .inst = NULL,
-        .reallocate = _reallocate_traced
+        .vt = &system_vt,
 };
 
 char *str_dup(const char *s,

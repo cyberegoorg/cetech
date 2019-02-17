@@ -39,8 +39,8 @@ int scenecompiler_init(struct ce_api_a0 *api);
 
 #define _G SceneResourceGlobals
 static struct _G {
-    struct ce_cdb_t0 db;
-    struct ce_alloc_t0 *allocator;
+    ce_cdb_t0 db;
+    ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -131,7 +131,7 @@ static struct ct_entity_t0 load(uint64_t resource,
     uint32_t items_count = 0;
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
-    struct ct_entity_t0 ent[items_count + 1];
+    ct_entity_t0 ent[items_count + 1];
     ct_ecs_a0->create(world, ent, items_count + 1);
 
     ct_ecs_a0->add(
@@ -222,7 +222,7 @@ static void shutdown() {
 }
 
 static uint64_t resource_data(uint64_t name) {
-    struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
+    ct_resource_id_t0 rid = (ct_resource_id_t0) {
             .uid = name,
     };
 

@@ -380,7 +380,7 @@ static int buildb_get_resource_dirs(char ***filename,
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    struct ce_hash_t dir_set = {};
+    ce_hash_t dir_set = {};
 
     while (_step(_db, sqls->get_resource_dirs) == SQLITE_ROW) {
         const unsigned char *fn = sqlite3_column_text(sqls->get_resource_dirs,

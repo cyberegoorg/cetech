@@ -83,7 +83,7 @@ typedef struct ct_controlers_i0 {
 }ct_controlers_i0;
 
 struct ct_controlers_a0 {
-    struct ct_controlers_i0* (*get)(uint64_t name);
+    ct_controlers_i0* (*get)(uint64_t name);
 };
 
 CE_MODULE(ct_controlers_a0);

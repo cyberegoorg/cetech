@@ -36,11 +36,11 @@
 typedef const uint64_t i1;
 static struct _G {
     bool visible;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(EXPLORER_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(EXPLORER_INTERFACE);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
@@ -65,7 +65,7 @@ static uint64_t draw(uint64_t dock,
         top_level = locked_object;
     }
 
-    struct ct_explorer_i0 *i;
+    ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(), top_level));
     if (i && i->draw_ui) {
         return i->draw_ui(top_level, selected_obj, context);
@@ -93,7 +93,7 @@ static void draw_menu(uint64_t dock) {
         top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), locked_object);
     }
 
-    struct ct_explorer_i0 *i;
+    ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(),
                                                   top_level_obj));
     if (i && i->draw_menu) {

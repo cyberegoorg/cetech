@@ -20,7 +20,7 @@ typedef enum ce_fs_open_mode_e0 {
 
 //! Filesystem API V0
 struct ce_fs_a0 {
-    struct ce_vio_t0 *(*open)(uint64_t root,
+    ce_vio_t0 *(*open)(uint64_t root,
                            const char *path,
                            ce_fs_open_mode_e0 mode);
 

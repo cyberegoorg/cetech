@@ -18,11 +18,11 @@
 
 struct _G {
     char *str_id64;
-    struct ce_hash_t id64_to_str;
+    ce_hash_t id64_to_str;
     ce_spinlock_t0 id64_to_str_lock;
 
     char *str_id32;
-    struct ce_hash_t id32_to_str;
+    ce_hash_t id32_to_str;
 } _G;
 
 
@@ -42,7 +42,7 @@ uint64_t stringid64_from_string(const char *str) {
         return 0;
     }
 
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
 
     const uint32_t str_len = strlen(str);
 
@@ -64,7 +64,7 @@ uint32_t stringid32_from_string(const char *str) {
         return 0;
     }
 
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
 
     const uint32_t str_len = strlen(str);
 
@@ -119,7 +119,7 @@ void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
 
 void CE_MODULE_UNLOAD (hashlib)(struct ce_api_a0 *api,
                                     int reload) {
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
 
 
     ce_array_free(_G.str_id64, alloc);

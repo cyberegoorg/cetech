@@ -18,9 +18,9 @@
 #define _G game_system_global
 
 struct _G {
-    struct ce_hash_t game_interface_map;
-    struct ce_hash_t game_paused;
-    struct ct_game_i0 **game_interface;
+    ce_hash_t game_interface_map;
+    ce_hash_t game_paused;
+    ct_game_i0 **game_interface;
 } _G;
 
 static struct ct_game_i0 *_get_game(uint64_t name) {
@@ -44,7 +44,7 @@ static void game_shutdown() {
 
 static void game_step(uint64_t name,
                       float dt) {
-    struct ct_game_i0 *game_i = _get_game(name);
+    ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
         return;
@@ -76,7 +76,7 @@ static void game_update(float dt) {
 }
 
 static struct ct_viewport_t0 game_render_graph_builder(uint64_t name) {
-    struct ct_game_i0 *game_i = _get_game(name);
+    ct_game_i0 *game_i = _get_game(name);
 
     if (!game_i) {
         return (ct_viewport_t0) {0};
@@ -95,7 +95,7 @@ static void game_play(uint64_t name) {
 
 static void _game_api_add(uint64_t name,
                           void *api) {
-    struct ct_game_i0 *game_i = api;
+    ct_game_i0 *game_i = api;
 
     ce_hash_add(&_G.game_interface_map, game_i->name(),
                 (uint64_t) game_i, ce_memory_a0->system);

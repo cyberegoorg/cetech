@@ -18,7 +18,7 @@ extern "C" {
 #define CE_ASSERT(where, condition)                                         \
     do {                                                                    \
         if (!(condition)) {                                                 \
-            ce_os_error_a0->assert(where, #condition, __FILE__, __LINE__); \
+            ce_os_error_a0->assert(where, #condition, __FILE__, __LINE__);  \
         }                                                                   \
     } while (0)
 #else

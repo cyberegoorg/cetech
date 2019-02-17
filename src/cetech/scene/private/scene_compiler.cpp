@@ -37,7 +37,7 @@
 #define _G scene_compiler_globals
 
 struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 typedef char char_128[128];
@@ -97,7 +97,7 @@ struct compile_output {
 //
 
 struct compile_output *_crete_compile_output() {
-    struct compile_output *output =
+    compile_output *output =
             CE_ALLOC(_G.allocator, struct compile_output,
                      sizeof(compile_output));
     *output = {};
@@ -302,7 +302,7 @@ static int _compile_assimp(ce_cdb_t0 db,
 
 extern "C" bool scene_compiler(ce_cdb_t0 db,
                                uint64_t obj) {
-    struct compile_output *output = _crete_compile_output();
+    compile_output *output = _crete_compile_output();
 
     int ret = 1;
 

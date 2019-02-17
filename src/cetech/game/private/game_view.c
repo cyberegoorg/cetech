@@ -57,8 +57,8 @@ static void on_debugui(uint64_t dock) {
 
     uint64_t game_name = ce_id_a0->id64("default");
 
-    struct ct_viewport_t0 v = ct_game_system_a0->viewport(game_name);
-    struct ct_rg_builder_t0 *builder;
+    ct_viewport_t0 v = ct_game_system_a0->viewport(game_name);
+    ct_rg_builder_t0 *builder;
     builder = ct_renderer_a0->viewport_builder(v);
 
     builder->set_size(builder, size.x, size.y);

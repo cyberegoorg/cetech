@@ -19,7 +19,7 @@
 
 #define _G node_graph_globals
 static struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 static void create_new(uint64_t obj) {
@@ -191,7 +191,7 @@ static void draw_menu(uint64_t selected_obj,
 }
 
 static struct ct_node_i0 *get_interface(uint64_t type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I);
 
     while (it.api) {
         struct ct_node_i0 *i = (it.api);
@@ -216,7 +216,7 @@ static void _node_property_draw(uint64_t obj, uint64_t context) {
 
     uint64_t node_type = ce_cdb_a0->read_uint64(node_r, CT_NODE_TYPE, 0);
 
-    struct ct_node_i0 *ni = get_interface(node_type);
+    ct_node_i0 *ni = get_interface(node_type);
 
     if (!ni) {
         return;

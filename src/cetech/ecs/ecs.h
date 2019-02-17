@@ -125,7 +125,7 @@ struct ct_ecs_a0 {
     bool (*alive)(ct_world_t0 world,
                   ct_entity_t0 entity);
 
-    struct ct_entity_t0 (*spawn)(ct_world_t0 world,
+    ct_entity_t0 (*spawn)(ct_world_t0 world,
                                  uint64_t name);
 
 
@@ -138,13 +138,13 @@ struct ct_ecs_a0 {
                  ct_entity_t0 parent,
                  ct_entity_t0 child);
 
-    struct ct_entity_t0 (*parent)(ct_world_t0 world,
+    ct_entity_t0 (*parent)(ct_world_t0 world,
                                   ct_entity_t0 entity);
 
-    struct ct_entity_t0 (*first_child)(ct_world_t0 world,
+    ct_entity_t0 (*first_child)(ct_world_t0 world,
                                        ct_entity_t0 entity);
 
-    struct ct_entity_t0 (*next_sibling)(ct_world_t0 world,
+    ct_entity_t0 (*next_sibling)(ct_world_t0 world,
                                         ct_entity_t0 entity);
 
     //SIMU
@@ -157,7 +157,7 @@ struct ct_ecs_a0 {
                     void *data);
 
     //COMP
-    struct ct_component_i0 *(*get_interface)(uint64_t name);
+    ct_component_i0 *(*get_interface)(uint64_t name);
 
     uint64_t (*mask)(uint64_t component_name);
 

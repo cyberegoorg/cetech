@@ -32,17 +32,17 @@ struct api_block_t {
 };
 
 static struct _G {
-    struct ce_hash_t api_map;
+    ce_hash_t api_map;
 
-    struct impl_list *impl_list;
+    impl_list *impl_list;
 
-    struct ce_hash_t api_on_add_map;
+    ce_hash_t api_on_add_map;
     ce_api_on_add_t0 ***on_add;
 
     api_block_t *api_blocks;
     atomic_int num_blocks;
 
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 //==============================================================================
@@ -127,7 +127,7 @@ static struct ce_api_entry_t0 api_first(uint64_t name) {
 }
 
 static struct ce_api_entry_t0 api_next(ce_api_entry_t0 entry) {
-    struct impl_list *impl_list = entry.entry;
+    impl_list *impl_list = entry.entry;
 
     const uint32_t n = ce_array_size(impl_list->api) - 1;
 

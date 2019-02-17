@@ -10,7 +10,7 @@
 
 #define _G node_test_globals
 static struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 

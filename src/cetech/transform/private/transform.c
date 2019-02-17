@@ -93,7 +93,7 @@ static void guizmo_set_transform(uint64_t obj,
     float scale[3] = {};
     ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
 
-    struct ct_cdb_obj_t *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
 
     switch (operation) {
         case TRANSLATE:
@@ -225,7 +225,7 @@ static struct ct_component_i0 ct_component_api = {
 static void _transform_root_naive(ct_world_t0 world,
                                   struct ct_entity_t0 ent,
                                   float *w) {
-    struct ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
+    ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
                                                           TRANSFORM_COMPONENT,
                                                           ent);
 
@@ -235,7 +235,7 @@ static void _transform_root_naive(ct_world_t0 world,
         transform_transform(root_t, w);
     }
 
-    struct ct_entity_t0 ent_it = ct_ecs_a0->first_child(world, ent);
+    ct_entity_t0 ent_it = ct_ecs_a0->first_child(world, ent);
     while (ent_it.h) {
         _transform_root_naive(world, ent_it, rootw);
         ent_it = ct_ecs_a0->next_sibling(world, ent_it);
@@ -247,7 +247,7 @@ static void foreach_transform(ct_world_t0 world,
                               ct_entity_storage_t *item,
                               uint32_t n,
                               void *data) {
-    struct ct_entity_t0 *roots = NULL;
+    ct_entity_t0 *roots = NULL;
     for (uint32_t i = 0; i < n; ++i) {
         struct ct_entity_t0 ent = ents[i];
 

@@ -46,7 +46,7 @@ static uint32_t rsuper;
 static void begin() {
     uint8_t viewid = 255;
 
-    struct ct_controlers_i0 *keyboard, *mouse, *gp;
+    ct_controlers_i0 *keyboard, *mouse, *gp;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
     mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
     gp = ct_controlers_a0->get(CONTROLER_GAMEPAD);
@@ -166,7 +166,7 @@ static void SaveDock(struct ce_vio_t0 *output) {
     char *buffer = NULL;
     ImGui::saveToYaml(&buffer, _G.allocator);
 
-    output->write(output->inst, buffer, 1, strlen(buffer));
+    output->vt->write(output->inst, buffer, 1, strlen(buffer));
 }
 
 static void LoadDock(const char *path) {
@@ -413,7 +413,7 @@ static void _init(struct ce_api_a0 *api) {
             .allocator = ce_memory_a0->system
     };
 
-    struct ct_controlers_i0 *keyboard;
+    ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     lshift = keyboard->button_index("lshift");

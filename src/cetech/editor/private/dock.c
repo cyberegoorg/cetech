@@ -27,7 +27,7 @@ static struct _G {
 
     uint64_t *contexts;
 
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 #define MAX_CONTEXT 8
@@ -37,7 +37,7 @@ static struct _G {
 
 
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
 
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
@@ -56,7 +56,7 @@ struct ct_dock_i0 *_find_dock_i(uint64_t type) {
 uint64_t create_dock(uint64_t type,
                      bool visible) {
 
-    struct ct_dock_i0 *i = _find_dock_i(type);
+    ct_dock_i0 *i = _find_dock_i(type);
 
     if (!i) {
         return 0;
@@ -88,7 +88,7 @@ uint64_t create_dock(uint64_t type,
 void close_dock(uint64_t dock) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
 
-    struct ct_dock_i0 *i = _find_dock_i(type);
+    ct_dock_i0 *i = _find_dock_i(type);
 
     if (i && i->close) {
         i->close(dock);

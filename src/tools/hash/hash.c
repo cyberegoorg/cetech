@@ -25,10 +25,10 @@ void process_file(void *data) {
 
     ce_log_a0->info("hash", "Process file: %s", filename);
 
-    struct ce_vio_t0 *file = ce_os_vio_a0->from_file(filename, VIO_OPEN_READ);
-    uint64_t size = file->size(file->inst);
+    ce_vio_t0 *file = ce_os_vio_a0->from_file(filename, VIO_OPEN_READ);
+    uint64_t size = file->vt->size(file->inst);
     char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
-    file->read(file->inst, input_data, 1, size);
+    file->vt->read(file->inst, input_data, 1, size);
     ce_os_vio_a0->close(file);
 
     input_data[size] = '\0';
@@ -82,9 +82,10 @@ void process_file(void *data) {
 
         change = true;
         const int64_t extra = (int64_t) buffer_len - (int64_t) macro_len;
-        input_data = ce_memory_a0->system->reallocate(ce_memory_a0->system, input_data,
-                                   (uint64_t) ((int64_t) size + extra + 1), 0,
-                                   __FILE__, __LINE__);
+        input_data = ce_memory_a0->system->vt->reallocate(ce_memory_a0->system->inst, input_data,
+                                                          (uint64_t) ((int64_t) size + extra + 1),
+                                                          0,
+                                                          __FILE__, __LINE__);
         memmove(input_data + c + extra, input_data + c, size + 1 - c);
         memcpy(input_data + c, buffer, buffer_len);
         size = (uint64_t) ((int64_t) size + extra);
@@ -93,7 +94,7 @@ void process_file(void *data) {
 
     if (change) {
         file = ce_os_vio_a0->from_file(filename, VIO_OPEN_WRITE);
-        file->write(file->inst, input_data, size, 1);
+        file->vt->write(file->inst, input_data, size, 1);
         ce_os_vio_a0->close(file);
     }
 
@@ -117,7 +118,7 @@ void print_usage() {
 int main(int argc,
          const char **argv) {
 
-    const char* source_dir = NULL;
+    const char *source_dir = NULL;
     bool printusage = false;
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--source") == 0) {
@@ -133,7 +134,7 @@ int main(int argc,
         }
     }
 
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
     ce_log_a0->register_handler(ce_log_a0->stdout_handler, NULL);
 
     if (printusage) {
@@ -149,11 +150,11 @@ int main(int argc,
 
     const char *filter[] = {"*.c", "*.h", "*.inl", "*.cpp"};
     ce_os_path_a0->list(source_dir, CE_ARR_ARG(filter),
-                         1, 0, &files, &files_count, a);
+                        1, 0, &files, &files_count, a);
 
-    struct ce_task_item_t0 tasks[files_count];
+    ce_task_item_t0 tasks[files_count];
 
-    struct ce_task_counter_t0 *counter = NULL;
+    ce_task_counter_t0 *counter = NULL;
 
     for (uint32_t i = 0; i < files_count; ++i) {
         tasks[i].data = files[i];

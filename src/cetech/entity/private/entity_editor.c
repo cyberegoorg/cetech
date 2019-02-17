@@ -39,9 +39,9 @@
 
 typedef struct entity_editor {
     ct_world_t0 world;
-    struct ct_entity_t0 camera_ent;
-    struct ct_entity_t0 entity;
-    struct ct_viewport_t0 viewport;
+    ct_entity_t0 camera_ent;
+    ct_entity_t0 entity;
+    ct_viewport_t0 viewport;
 
     uint64_t entity_name;
     bool mouse_hovering;
@@ -49,7 +49,7 @@ typedef struct entity_editor {
 } entity_editor;
 
 static struct _G {
-    struct entity_editor *editors;
+    entity_editor *editors;
 } _G;
 
 
@@ -73,7 +73,7 @@ static void fps_camera_update(ct_world_t0 world,
 //    float wm[16];
 //
 //
-//    struct ct_transform_comp *transform;
+//    ct_transform_comp *transform;
 //    transform = ct_ecs_a0->get_one(world,
 //                                                  TRANSFORM_COMPONENT,
 //                                                  camera_ent);
@@ -124,7 +124,7 @@ static void fps_camera_update(ct_world_t0 world,
 }
 
 //static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-//    struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
+//    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
 //    while (it.api) {
 //        struct ct_component_i0 *i = (it.api);
 //
@@ -195,7 +195,7 @@ static void draw_editor(uint64_t context_obj,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
 
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    struct entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = &_G.editors[editor_idx];
 
     if (!editor->world.h) {
         return;
@@ -256,7 +256,7 @@ static void draw_editor(uint64_t context_obj,
 //    }
 
 
-    struct ct_rg_builder_t0 *builder = \
+    ct_rg_builder_t0 *builder = \
     ct_renderer_a0->viewport_builder(editor->viewport);
 
     builder->set_size(builder, size.x, size.y);
@@ -299,7 +299,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
     ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
     ce_cdb_a0->write_commit(w);
 
-    struct entity_editor *editor = &_G.editors[idx];
+    entity_editor *editor = &_G.editors[idx];
 
     return editor;
 }
@@ -307,7 +307,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
 static void close(uint64_t context_obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    struct entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = &_G.editors[editor_idx];
 
     ct_ecs_a0->destroy_world(editor->world);
     ct_renderer_a0->destroy_viewport(editor->viewport);
@@ -316,7 +316,7 @@ static void close(uint64_t context_obj) {
 }
 
 static void open(uint64_t context_obj) {
-    struct entity_editor *editor = _new_editor(context_obj);
+    entity_editor *editor = _new_editor(context_obj);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
@@ -332,12 +332,12 @@ static void open(uint64_t context_obj) {
 
 static void update(uint64_t context_obj,
                    float dt) {
-    struct ct_controlers_i0 *keyboard;
+    ct_controlers_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    struct entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = &_G.editors[editor_idx];
 
     if (!editor->world.h) {
         return;

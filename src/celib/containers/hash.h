@@ -180,7 +180,7 @@ static inline void ce_hash_remove(ce_hash_t *hash,
 static inline void ce_hash_clone(const struct ce_hash_t *from,
                                  struct ce_hash_t *to,
                                  const struct ce_alloc_t0 *alloc) {
-    struct ce_hash_t tmp_hash = {};
+    ce_hash_t tmp_hash = {};
     tmp_hash.n = from->n;
 
     if (tmp_hash.n) {

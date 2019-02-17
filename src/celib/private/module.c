@@ -46,7 +46,7 @@ static struct _G {
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     uint64_t config;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G = {};
 
 
@@ -140,7 +140,7 @@ static bool load_from_path(module_functios *module,
 static void add_static(ce_load_module_t0 load,
                        ce_unload_module_t0 unload) {
 
-    struct module_functios module = {
+    module_functios module = {
             .load=load,
             .unload=unload,
             .handler=NULL
@@ -154,7 +154,7 @@ static void add_static(ce_load_module_t0 load,
 static void load(const char *path) {
     ce_log_a0->info(LOG_WHERE, "Loading module %s", path);
 
-    struct module_functios module;
+    module_functios module;
 
     if (!load_from_path(&module, path)) {
         return;

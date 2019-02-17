@@ -45,7 +45,7 @@
 
 #define _G TextureResourceGlobals
 struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
     uint64_t *all_textures;
 } _G;
 
@@ -103,7 +103,7 @@ static int _texturec(const char *input,
                      const char *output,
                      int gen_mipmaps,
                      int is_normalmap) {
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
     char *buffer = NULL;
 
     char *texturec = ct_resource_compiler_a0->external_join(alloc, "texturec");
@@ -135,7 +135,7 @@ static int _gen_tmp_name(char *tmp_filename,
                          size_t max_len,
                          const char *filename) {
 
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     char dir[1024] = {};
     ce_os_path_a0->dir(dir, filename);
@@ -164,7 +164,7 @@ static bool _compile(ce_cdb_t0 db,
     bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP,
                                              false);
 
-    struct ce_alloc_t0 *a = ce_memory_a0->system;
+    ce_alloc_t0 *a = ce_memory_a0->system;
 
     const char *platform = ce_cdb_a0->read_str(c_reader,
                                                CONFIG_PLATFORM,
@@ -188,12 +188,12 @@ static bool _compile(ce_cdb_t0 db,
         return false;
     }
 
-    struct ce_vio_t0 *tmp_file = NULL;
+    ce_vio_t0 *tmp_file = NULL;
     tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
 
-    const uint64_t size = tmp_file->size(tmp_file->inst);
+    const uint64_t size = tmp_file->vt->size(tmp_file->inst);
     char *tmp_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
-    tmp_file->read(tmp_file->inst, tmp_data, sizeof(char), size);
+    tmp_file->vt->read(tmp_file->inst, tmp_data, sizeof(char), size);
     ce_os_vio_a0->close(tmp_file);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
@@ -303,7 +303,7 @@ void texture_shutdown() {
 }
 
 bgfx_texture_handle_t texture_get(uint64_t name) {
-    struct ct_resource_id_t0 rid = {.uid = name};
+    ct_resource_id_t0 rid = {.uid = name};
     uint64_t obj = rid.uid;
 
     if (!obj) {

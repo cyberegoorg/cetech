@@ -39,14 +39,14 @@ static struct KernelGlobals {
     uint64_t config_object;
     bool is_running;
 
-    struct ce_ba_graph_t updateg;
-    struct ce_hash_t update_map;
+    ce_ba_graph_t updateg;
+    ce_hash_t update_map;
 
-    struct ce_ba_graph_t initg;
-    struct ce_hash_t init_map;
-    struct ce_hash_t shutdown_map;
+    ce_ba_graph_t initg;
+    ce_hash_t init_map;
+    ce_hash_t shutdown_map;
 
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 void register_api(struct ce_api_a0 *api);
@@ -133,9 +133,7 @@ bool cetech_kernel_init(int argc,
 
     ce_init();
 
-    struct ce_api_a0 *api = ce_api_a0;
-
-    api->register_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
+    ce_api_a0->register_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
 
     _G = (struct KernelGlobals) {
             .allocator = ce_memory_a0->system,
@@ -161,10 +159,10 @@ bool cetech_kernel_init(int argc,
     ce_module_a0->load_dirs(module_path);
     ce_config_a0->log_all();
 
-    CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ct_machine_a0);
-    CE_INIT_API(api, ct_debugui_a0);
-    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(ce_api_a0, ct_resource_a0);
+    CE_INIT_API(ce_api_a0, ct_machine_a0);
+    CE_INIT_API(ce_api_a0, ct_debugui_a0);
+    CE_INIT_API(ce_api_a0, ct_renderer_a0);
 
     ce_cdb_a0->set_loader(ct_resource_a0->cdb_loader);
     return true;
@@ -219,7 +217,7 @@ static void _build_update_graph(ce_ba_graph_t *sg) {
     ce_bag_clean(sg);
     ce_hash_clean(&_G.update_map);
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
@@ -267,7 +265,7 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
     ce_hash_clean(&_G.init_map);
     ce_hash_clean(&_G.shutdown_map);
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(KERNEL_TASK_INTERFACE);
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 

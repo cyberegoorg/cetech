@@ -1563,7 +1563,7 @@ static inline void ce_mat4_look_at_lh(float *_result,
                                       ce_vec3_t _at,
                                       ce_vec3_t _up) {
     ce_vec3_t dir = ce_vec3_sub(_at, _eye);
-    struct ce_vec3_t view = ce_vec3_norm(dir);
+    ce_vec3_t view = ce_vec3_norm(dir);
 
     ce_mat4_look_at_impl(_result, _eye, view, _up);
 }
@@ -1573,7 +1573,7 @@ static inline void ce_mat4_look_at_rh(float *_result,
                                       ce_vec3_t _at,
                                       ce_vec3_t _up) {
     ce_vec3_t dir = ce_vec3_sub(_eye, _at);
-    struct ce_vec3_t view = ce_vec3_norm(dir);
+    ce_vec3_t view = ce_vec3_norm(dir);
     ce_mat4_look_at_impl(_result, _eye, view, _up);
 }
 

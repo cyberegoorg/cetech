@@ -44,7 +44,7 @@
 
 static struct _G {
     uint64_t config;
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -53,7 +53,7 @@ static struct _G {
 //==============================================================================
 
 static ct_resource_compilator_t _find_compilator(uint64_t type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
+    ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
     while (it.api) {
         struct ct_resource_i0 *i = (it.api);
         if (i->cdb_type && (i->cdb_type() == type)) {
@@ -205,7 +205,7 @@ void _scan_obj(const char *filename,
 
     uint64_t uid = strtoul(uid_s, NULL, 0);
 
-    struct ct_resource_id_t0 rid = {.uid = uid};
+    ct_resource_id_t0 rid = {.uid = uid};
     ct_resourcedb_a0->put_resource(rid, type, filename, name);
 
     ce_hash_add(obj_hash, uid, obj, _G.allocator);
@@ -274,10 +274,10 @@ void _scan_obj(const char *filename,
 
 void _scan_files(char **files,
                  uint32_t files_count) {
-    struct ce_ba_graph_t obj_graph = {};
-    struct ce_hash_t obj_hash = {};
+    ce_ba_graph_t obj_graph = {};
+    ce_hash_t obj_hash = {};
 
-    struct ce_cdb_t0 db = ce_cdb_a0->create_db();
+    ce_cdb_t0 db = ce_cdb_a0->create_db();
 
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *filename = files[i];

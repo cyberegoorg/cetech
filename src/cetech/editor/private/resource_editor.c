@@ -51,12 +51,12 @@ typedef struct editor {
 } editor;
 
 static struct _G {
-    struct editor *editors;
+    editor *editors;
 } _G;
 
 
 static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_EDITOR_I);
+    ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_EDITOR_I);
     while (it.api) {
         struct ct_resource_editor_i0 *i = (it.api);
 
@@ -73,13 +73,13 @@ static struct ct_resource_editor_i0 *get_asset_editor(uint64_t cdb_type) {
 static void draw_editor(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-    struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
+    editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
         return;
     }
 
-    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
+    ct_resource_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
         return;
@@ -106,13 +106,13 @@ static void draw_editor(uint64_t dock) {
 static void draw_editor_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-    struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
+    editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
         return;
     }
 
-    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
+    ct_resource_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
         return;
@@ -143,13 +143,13 @@ static uint32_t find_editor(uint64_t obj) {
 
 static const char *dock_title(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    struct editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
+    editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
 
     if (!editor) {
         return NULL;
     }
 
-    struct ct_resource_editor_i0 *i = get_asset_editor(editor->type);
+    ct_resource_editor_i0 *i = get_asset_editor(editor->type);
 
     if (!i) {
         return DEFAULT_EDITOR_NAME;
@@ -181,7 +181,7 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
     int idx = ce_array_size(_G.editors);
     ce_array_push(_G.editors, (editor) {}, ce_memory_a0->system);
 
-    struct editor *editor = &_G.editors[idx];
+    editor *editor = &_G.editors[idx];
 
     editor->context_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
 
@@ -196,13 +196,13 @@ static struct editor *_get_or_create_editor(uint64_t obj) {
 
 static void open(uint64_t obj) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
-    struct ct_resource_editor_i0 *i = get_asset_editor(type);
+    ct_resource_editor_i0 *i = get_asset_editor(type);
 
     if (!i) {
         return;
     }
 
-    struct editor *e = _get_or_create_editor(obj);
+    editor *e = _get_or_create_editor(obj);
     e->type = type;
     e->obj = obj;
 

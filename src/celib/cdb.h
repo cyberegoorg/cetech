@@ -39,7 +39,7 @@ typedef union ce_cdb_value_u0 {
     float f;
     char *str;
     bool b;
-    struct ce_cdb_blob_t0 blob; //TODO: Move out => uniform size
+    ce_cdb_blob_t0 blob; //TODO: Move out => uniform size
 } ce_cdb_value_u0;
 
 typedef struct ce_cdb_change_ev_t0 {
@@ -51,7 +51,7 @@ typedef struct ce_cdb_change_ev_t0 {
     union ce_cdb_value_u0 old_value;
 } ce_cdb_change_ev_t0;
 
-typedef void ce_cdb_obj_o0;
+typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
 
 enum ce_cdb_type_e0 {
     CDB_TYPE_NONE = 0,
@@ -70,9 +70,9 @@ typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
 struct ce_cdb_a0 {
     void (*set_loader)(ct_cdb_obj_loader_t0 loader);
 
-    struct ce_cdb_t0 (*db)();
+    ce_cdb_t0 (*db)();
 
-    struct ce_cdb_t0 (*create_db)();
+    ce_cdb_t0 (*create_db)();
 
     void (*destroy_db)(ce_cdb_t0 db);
 

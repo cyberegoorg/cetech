@@ -29,14 +29,14 @@
 #define _G primitice_mesh_global
 
 static struct _G {
-    struct ce_alloc_t0 *allocator;
+    ce_alloc_t0 *allocator;
 } _G;
 
 
-struct mesh_render_data {
+typedef struct mesh_render_data {
     uint8_t viewid;
     uint64_t layer_name;
-};
+} mesh_render_data;
 
 
 struct pt_vertex {
@@ -111,12 +111,12 @@ void foreach_primitive_mesh(ct_world_t0 world,
                             ct_entity_storage_t *item,
                             uint32_t n,
                             void *_data) {
-    struct mesh_render_data *data = _data;
+    mesh_render_data *data = _data;
 
-    struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
+    ct_transform_comp *transforms = ct_ecs_a0->get_all(
             TRANSFORM_COMPONENT, item);
 
-    struct ct_primitive_mesh *primitives = ct_ecs_a0->get_all(
+    ct_primitive_mesh *primitives = ct_ecs_a0->get_all(
             PRIMITIVE_MESH_COMPONENT,
             item);
 
@@ -174,7 +174,7 @@ static void render(ct_world_t0 world,
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
 
 
-    struct mesh_render_data render_data = {
+    mesh_render_data render_data = {
             .viewid = viewid,
             .layer_name = _GBUFFER,
     };
@@ -211,7 +211,7 @@ static void mesh_spawner(ct_world_t0 world,
                          uint64_t obj,
                          void *data) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    struct ct_primitive_mesh *m = data;
+    ct_primitive_mesh *m = data;
 
     *m = (ct_primitive_mesh) {
             .material = ce_cdb_a0->read_ref(r, PROP_MATERIAL, 0),

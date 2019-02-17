@@ -76,12 +76,12 @@ struct ct_renderer_a0 {
 
     uint64_t (*new_viewid)();
 
-    struct ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
+    ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
                                              struct ct_entity_t0 main_camera);
 
     void (*destroy_viewport)(ct_viewport_t0 viewport);
 
-    struct ct_rg_builder_t0 *(*viewport_builder)(ct_viewport_t0 viewport);
+    ct_rg_builder_t0 *(*viewport_builder)(ct_viewport_t0 viewport);
 
     ce_window_t0 *(*get_main_window)();
 };

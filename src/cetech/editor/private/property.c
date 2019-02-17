@@ -34,7 +34,7 @@ static void draw(uint64_t obj,
         return;
     }
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -57,7 +57,7 @@ static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
         return NULL;
     }
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -79,7 +79,7 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);

@@ -32,7 +32,7 @@
 
 #define _G controlers_global
 static struct _G {
-    struct ce_hash_t interface_map;
+    ce_hash_t interface_map;
 } _G = {};
 
 
@@ -42,7 +42,7 @@ static struct _G {
 
 static void _componet_api_add(uint64_t name,
                               void *api) {
-    struct ct_controlers_i0 *controlers_i = api;
+    ct_controlers_i0 *controlers_i = api;
 
 
     ce_hash_add(&_G.interface_map, controlers_i->name(),
@@ -50,7 +50,7 @@ static void _componet_api_add(uint64_t name,
 }
 
 struct ct_controlers_i0 *get_by_name(uint64_t name) {
-    struct ct_controlers_i0 *controlers_i;
+    ct_controlers_i0 *controlers_i;
     controlers_i = (ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
                                                        name, 0);
     return controlers_i;

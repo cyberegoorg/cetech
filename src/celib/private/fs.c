@@ -34,17 +34,17 @@
 
 typedef struct fs_mount_point {
     char *root_path;
-//    struct ce_watchdog_a0 *wd;
+//    ce_watchdog_a0 *wd;
 } fs_mount_point;
 
 typedef struct fs_root {
-    struct fs_mount_point *mount_points;
+    fs_mount_point *mount_points;
 } fs_root;
 
 static struct _G {
-    struct ce_hash_t root_map;
-    struct fs_root *roots;
-    struct ce_alloc_t0 *allocator;
+    ce_hash_t root_map;
+    fs_root *roots;
+    ce_alloc_t0 *allocator;
 } _G;
 
 //==============================================================================
@@ -72,7 +72,7 @@ static struct fs_root *get_fs_root(uint64_t root) {
         return NULL;
     }
 
-    struct fs_root *fs_inst = &_G.roots[idx];
+    fs_root *fs_inst = &_G.roots[idx];
     return fs_inst;
 }
 
@@ -84,14 +84,14 @@ static struct fs_root *get_or_crate_root(uint64_t root) {
         return &_G.roots[root_idx];
     }
 
-    struct fs_root *fs_inst = &_G.roots[idx];
+    fs_root *fs_inst = &_G.roots[idx];
     return fs_inst;
 }
 
 
 static uint32_t new_fs_mount(uint64_t root,
                              struct fs_mount_point mp) {
-    struct fs_root *fs_inst = get_or_crate_root(root);
+    fs_root *fs_inst = get_or_crate_root(root);
 
     uint32_t new_idx = ce_array_size(fs_inst->mount_points);
     ce_array_push(fs_inst->mount_points, mp, _G.allocator);
@@ -104,7 +104,7 @@ static void map_root_dir(uint64_t root,
                          bool watch) {
 
 
-    struct fs_mount_point mp = {};
+    fs_mount_point mp = {};
 
     if (watch) {
 //        struct ce_watchdog_a0 *wd = ce_os_a0->watchdog->create(_G.allocator);
@@ -124,7 +124,7 @@ static bool exist_dir(const char *full_path) {
 }
 
 static bool exist(const char *full_path) {
-    struct ce_vio_t0 *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
+    ce_vio_t0 *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         ce_os_vio_a0->close(f);
         return true;
@@ -138,7 +138,7 @@ static char *get_full_path(uint64_t root,
                            const char *filename,
                            bool test_dir) {
 
-    struct fs_root *fs_inst = get_fs_root(root);
+    fs_root *fs_inst = get_fs_root(root);
     const uint32_t mp_count = ce_array_size(fs_inst->mount_points);
 
     for (uint32_t i = 0; i < mp_count; ++i) {
@@ -164,7 +164,7 @@ static struct ce_vio_t0 *open(uint64_t root,
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
-    struct ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
+    ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
                                                   (enum ce_vio_open_mode) mode);
 
     if (!file) {
@@ -204,7 +204,7 @@ static void listdir(uint64_t root,
 
     char **all_files = NULL;
 
-    struct fs_root *fs_inst = get_fs_root(root);
+    fs_root *fs_inst = get_fs_root(root);
     const uint32_t mp_count = ce_array_size(fs_inst->mount_points);
 
     for (uint32_t i = 0; i < mp_count; ++i) {

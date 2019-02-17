@@ -34,7 +34,7 @@
 static struct _G {
     bool load_layout;
 //    ct_world_t0 world;
-//    struct ct_viewport_t0 viewport;
+//    ct_viewport_t0 viewport;
 } _G;
 
 static float draw_main_menu() {
@@ -81,7 +81,7 @@ static float draw_main_menu() {
 }
 
 static void on_init(uint64_t _event) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
         if (i->init) {
@@ -94,7 +94,7 @@ static void on_init(uint64_t _event) {
 }
 
 static void on_shutdown(uint64_t _event) {
-    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -109,7 +109,7 @@ static void on_shutdown(uint64_t _event) {
 static void on_update(float dt) {
     ct_action_manager_a0->check();
 
-    struct ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 

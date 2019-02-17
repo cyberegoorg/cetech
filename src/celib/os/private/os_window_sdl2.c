@@ -146,7 +146,7 @@ struct ce_window_t0 *window_new(const char *title,
                                 uint32_t flags,
                                 ce_alloc_t0 *alloc) {
 
-    struct ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
+    ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -183,7 +183,7 @@ struct ce_window_t0 *window_new(const char *title,
 struct ce_window_t0 *window_new_from(void *hndl,
                                      ce_alloc_t0 *alloc) {
 
-    struct ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
+    ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
 
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 

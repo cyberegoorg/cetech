@@ -57,12 +57,20 @@ int vio_sdl_close(ce_vio_o0 *file) {
 }
 
 
+static ce_vio_vt0 vio_vt = {
+        .write = vio_sdl_write,
+        .read = vio_sdl_read,
+        .seek = vio_sdl_seek,
+        .size = vio_sdl_size,
+        .close = vio_sdl_close,
+};
+
 struct ce_vio_t0 *vio_from_file(const char *path,
                                 enum ce_vio_open_mode mode) {
 
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
 
-    struct ce_vio_t0 *vio = CE_ALLOC(alloc, struct ce_vio_t0, sizeof(ce_vio_t0));
+    ce_vio_t0 *vio = CE_ALLOC(alloc, struct ce_vio_t0, sizeof(ce_vio_t0));
 
     CE_ASSERT(LOG_WHERE_OS, vio != NULL);
 
@@ -76,20 +84,17 @@ struct ce_vio_t0 *vio_from_file(const char *path,
         return NULL;
     }
 
+
     vio->inst = (ce_vio_o0*)rwops;
-    vio->write = vio_sdl_write;
-    vio->read = vio_sdl_read;
-    vio->seek = vio_sdl_seek;
-    vio->size = vio_sdl_size;
-    vio->close = vio_sdl_close;
+    vio->vt = &vio_vt;
 
     return vio;
 }
 
 void vio_close(struct ce_vio_t0* vio) {
-    vio->close(vio->inst);
+    vio->vt->close(vio->inst);
 
-    struct ce_alloc_t0 *alloc = ce_memory_a0->system;
+    ce_alloc_t0 *alloc = ce_memory_a0->system;
     CE_FREE(alloc, vio);
 }
 

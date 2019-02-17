@@ -190,13 +190,13 @@ static void resource_tooltip(ct_resource_id_t0 resourceid,
 
     uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
 
-    struct ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
 
     if (!ri || !ri->get_interface) {
         return;
     }
 
-    struct ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
+    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
 
     uint64_t obj = resourceid.uid;
 
@@ -487,7 +487,7 @@ static void ui_resource(uint64_t obj,
 
     bool change = false;
 
-    struct ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
 
 
     uint64_t new_value = 0;

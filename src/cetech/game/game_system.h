@@ -35,7 +35,7 @@ typedef struct ct_game_i0 {
 }ct_game_i0;
 
 struct ct_game_system_a0 {
-    struct ct_viewport_t0 (*viewport)(uint64_t name);
+    ct_viewport_t0 (*viewport)(uint64_t name);
 
     void (*pause)(uint64_t name);
 

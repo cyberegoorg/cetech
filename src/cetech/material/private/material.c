@@ -47,8 +47,8 @@
 //==============================================================================
 
 static struct _G {
-    struct ce_cdb_t0 db;
-    struct ce_alloc_t0 *allocator;
+    ce_cdb_t0 db;
+    ce_alloc_t0 *allocator;
 } _G;
 
 
@@ -280,7 +280,7 @@ static void draw_property(uint64_t material,
 
 static struct ct_entity_t0 load(uint64_t resource,
                                 ct_world_t0 world) {
-    struct ct_entity_t0 ent = {};
+    ct_entity_t0 ent = {};
     ct_ecs_a0->create(world, &ent, 1);
 
     ct_ecs_a0->add(
@@ -335,7 +335,7 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 
 static uint64_t create(uint64_t name) {
-    struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
+    ct_resource_id_t0 rid = (ct_resource_id_t0) {
             .uid = name,
     };
 
