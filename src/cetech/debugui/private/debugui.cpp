@@ -150,7 +150,7 @@ static void begin() {
 
 
     if (io.WantSetMousePos) {
-        ce_window *win = ct_renderer_a0->get_main_window();
+        ce_window_t0 *win = ct_renderer_a0->get_main_window();
         win->warp_mouse(win->inst, (int) io.MousePos.x, (int) io.MousePos.y);
     }
 

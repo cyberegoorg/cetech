@@ -39,14 +39,17 @@ extern "C" {
 
 typedef struct ct_world_t0 ct_world_t0;
 typedef struct ct_entity_t0 ct_entity_t0;
-typedef struct ct_rg_module ct_rg_module;
+typedef struct ce_window_t0 ce_window_t0;
+
+typedef struct ct_rg_module_t0 ct_rg_module_t0;
 typedef struct ct_rg_builder_t0 ct_rg_builder_t0;
+
 
 typedef void (*ct_renderender_on_render)();
 
 typedef struct ct_renderer_component_i0 {
     void (*feed_module)(ct_world_t0 world,
-                        ct_rg_module *module);
+                        ct_rg_module_t0 *module);
 
     void (*render)(ct_world_t0 world,
                    ct_rg_builder_t0 *builder);
@@ -74,13 +77,13 @@ struct ct_renderer_a0 {
     uint64_t (*new_viewid)();
 
     struct ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
-                                           struct ct_entity_t0 main_camera);
+                                             struct ct_entity_t0 main_camera);
 
     void (*destroy_viewport)(ct_viewport_t0 viewport);
 
     struct ct_rg_builder_t0 *(*viewport_builder)(ct_viewport_t0 viewport);
 
-    struct ce_window *(*get_main_window)();
+    ce_window_t0 *(*get_main_window)();
 };
 
 CE_MODULE(ct_renderer_a0);

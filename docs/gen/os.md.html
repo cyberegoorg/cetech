@@ -516,41 +516,41 @@ struct ce_window_resized_event {
 
 ~~~~~~~~~~~~~~~~~~~~
 
-## ce_window
+## ce_window_t0
 ~~~~~~~~~~~~~~~~~~~~
-struct ce_window {
-    ce_window_ints *inst;
-    void (*set_title)(ce_window_ints *w,
+struct ce_window_t0 {
+    ce_window_o0 *inst;
+    void (*set_title)(ce_window_o0 *w,
                       const char *title);
-    const char *(*get_title)(ce_window_ints *w);
-    void (*resize)(ce_window_ints *w,
+    const char *(*get_title)(ce_window_o0 *w);
+    void (*resize)(ce_window_o0 *w,
                    uint32_t width,
                    uint32_t height);
-    void (*size)(ce_window_ints *window,
+    void (*size)(ce_window_o0 *window,
                  uint32_t *width,
                  uint32_t *height);
-    void *(*native_window_ptr)(ce_window_ints *w);
-    void *(*native_display_ptr)(ce_window_ints *w);
+    void *(*native_window_ptr)(ce_window_o0 *w);
+    void *(*native_display_ptr)(ce_window_o0 *w);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### set_title
 ~~~~~~~~~~~~~~~~~~~~
-    void (*set_title)(ce_window_ints *w,
+    void (*set_title)(ce_window_o0 *w,
                       const char *title);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### get_title
 ~~~~~~~~~~~~~~~~~~~~
-    const char *(*get_title)(ce_window_ints *w);
+    const char *(*get_title)(ce_window_o0 *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### resize
 ~~~~~~~~~~~~~~~~~~~~
-    void (*resize)(ce_window_ints *w,
+    void (*resize)(ce_window_o0 *w,
                    uint32_t width,
                    uint32_t height);
 
@@ -558,7 +558,7 @@ struct ce_window {
 
 ### size
 ~~~~~~~~~~~~~~~~~~~~
-    void (*size)(ce_window_ints *window,
+    void (*size)(ce_window_o0 *window,
                  uint32_t *width,
                  uint32_t *height);
 
@@ -566,13 +566,13 @@ struct ce_window {
 
 ### native_window_ptr
 ~~~~~~~~~~~~~~~~~~~~
-    void *(*native_window_ptr)(ce_window_ints *w);
+    void *(*native_window_ptr)(ce_window_o0 *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### native_display_ptr
 ~~~~~~~~~~~~~~~~~~~~
-    void *(*native_display_ptr)(ce_window_ints *w);
+    void *(*native_display_ptr)(ce_window_o0 *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -580,24 +580,24 @@ struct ce_window {
 ## ce_os_window_a0
 ~~~~~~~~~~~~~~~~~~~~
 struct ce_os_window_a0 {
-    struct ce_window *(*create)(struct ce_alloc_t0 *alloc,
+    struct ce_window_t0 *(*create)(struct ce_alloc_t0 *alloc,
                                 const char *title,
                                 enum ce_window_pos x,
                                 enum ce_window_pos y,
                                 const int32_t width,
                                 const int32_t height,
                                 uint32_t flags);
-    struct ce_window *(*create_from)(struct ce_alloc_t0 *alloc,
+    struct ce_window_t0 *(*create_from)(struct ce_alloc_t0 *alloc,
                                      void *hndl);
     void (*destroy)(struct ce_alloc_t0 *alloc,
-                    struct ce_window *w);
+                    struct ce_window_t0 *w);
 };
 
 ~~~~~~~~~~~~~~~~~~~~
 
 ### create
 ~~~~~~~~~~~~~~~~~~~~
-    struct ce_window *(*create)(struct ce_alloc_t0 *alloc,
+    struct ce_window_t0 *(*create)(struct ce_alloc_t0 *alloc,
                                 const char *title,
                                 enum ce_window_pos x,
                                 enum ce_window_pos y,
@@ -609,7 +609,7 @@ struct ce_os_window_a0 {
 
 ### create_from
 ~~~~~~~~~~~~~~~~~~~~
-    struct ce_window *(*create_from)(struct ce_alloc_t0 *alloc,
+    struct ce_window_t0 *(*create_from)(struct ce_alloc_t0 *alloc,
                                      void *hndl);
 
 ~~~~~~~~~~~~~~~~~~~~
@@ -617,7 +617,7 @@ struct ce_os_window_a0 {
 ### destroy
 ~~~~~~~~~~~~~~~~~~~~
     void (*destroy)(struct ce_alloc_t0 *alloc,
-                    struct ce_window *w);
+                    struct ce_window_t0 *w);
 
 ~~~~~~~~~~~~~~~~~~~~
 

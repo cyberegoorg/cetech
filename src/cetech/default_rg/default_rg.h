@@ -10,7 +10,7 @@ extern "C" {
 #define CT_DEFAULT_RG_API \
     CE_ID64_0("ct_default_rg_a0", 0xe909f984404895b4ULL)
 
-typedef struct ct_rg_module ct_rg_module;
+typedef struct ct_rg_module_t0 ct_rg_module;
 typedef struct ct_world_t0 ct_world_t0;
 
 #define _GBUFFER \
@@ -27,7 +27,7 @@ typedef struct ct_world_t0 ct_world_t0;
 
 
 struct ct_default_rg_a0 {
-    void (*feed_module)(ct_rg_module *m,
+    void (*feed_module)(ct_rg_module_t0 *m,
                         ct_world_t0 world,
                         ct_entity_t0 camera);
 };

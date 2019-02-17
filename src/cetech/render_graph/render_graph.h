@@ -69,46 +69,46 @@ typedef struct ct_rg_builder_t0 {
     void (*clear)(void *inst);
 
     void (*execute)(void *inst);
-} ct_rg_builder;
+} ct_rg_builder_t0;
 
-typedef struct ct_rg_module {
+typedef struct ct_rg_module_t0 {
     void *inst;
 
     void (*add_module)(void *inst,
-                       ct_rg_module *module);
+                       struct ct_rg_module_t0 *module);
 
     void (*add_pass)(void *inst,
                      void *pass,
                      uint64_t size);
 
-    struct ct_rg_module *(*add_extension_point)(void *inst,
-                                                uint64_t name);
+    struct ct_rg_module_t0 *(*add_extension_point)(void *inst,
+                                                   uint64_t name);
 
-    struct ct_rg_module *(*get_extension_point)(void *inst,
-                                                uint64_t name);
+    struct ct_rg_module_t0 *(*get_extension_point)(void *inst,
+                                                   uint64_t name);
 
     void (*on_setup)(void *inst,
                      ct_rg_builder_t0 *builder);
-} ct_rg_module;
+} ct_rg_module_t0;
 
-typedef struct ct_rg {
+typedef struct ct_rg_t0 {
     void *inst;
 
     void (*set_module)(void *inst,
-                       ct_rg_module *module);
+                       ct_rg_module_t0 *module);
 
     void (*setup)(void *inst,
                   ct_rg_builder_t0 *builder);
-} ct_rg;
+} ct_rg_t0;
 
 struct ct_rg_a0 {
-    struct ct_rg *(*create_graph)();
+    struct ct_rg_t0 *(*create_graph)();
 
-    void (*destroy_graph)(ct_rg *render_graph);
+    void (*destroy_graph)(ct_rg_t0 *render_graph);
 
-    ct_rg_module *(*create_module)();
+    ct_rg_module_t0 *(*create_module)();
 
-    void (*destroy_module)(ct_rg_module *module);
+    void (*destroy_module)(ct_rg_module_t0 *module);
 
     struct ct_rg_builder_t0 *(*create_builder)();
 

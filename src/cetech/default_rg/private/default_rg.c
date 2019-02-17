@@ -234,10 +234,10 @@ static void gbuffer_pass_on_pass(void *inst,
 }
 
 
-static void feed_module(ct_rg_module *m1,
+static void feed_module(ct_rg_module_t0 *m1,
                         ct_world_t0 world,
                         struct ct_entity_t0 camera) {
-    struct ct_rg_module *gm = m1->add_extension_point(m1, _GBUFFER);
+    struct ct_rg_module_t0 *gm = m1->add_extension_point(m1, _GBUFFER);
 
     gm->add_pass(gm, &(gbuffer_pass) {
             .camera = camera,

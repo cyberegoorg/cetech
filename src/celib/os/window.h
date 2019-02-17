@@ -54,48 +54,48 @@ enum ce_window_pos {
     WINDOWPOS_UNDEFINED = (1 << 2),
 };
 
-typedef void ce_window_ints;
+typedef void ce_window_o0;
 
-typedef struct ce_window {
-    ce_window_ints *inst;
+typedef struct ce_window_t0 {
+    ce_window_o0 *inst;
 
-    void (*set_title)(ce_window_ints *w,
+    void (*set_title)(ce_window_o0 *inst,
                       const char *title);
 
-    const char *(*get_title)(ce_window_ints *w);
+    const char *(*get_title)(ce_window_o0 *inst);
 
-    void (*resize)(ce_window_ints *w,
+    void (*resize)(ce_window_o0 *inst,
                    uint32_t width,
                    uint32_t height);
 
-    void (*size)(ce_window_ints *window,
+    void (*size)(ce_window_o0 *inst,
                  uint32_t *width,
                  uint32_t *height);
 
-    void *(*native_window_ptr)(ce_window_ints *w);
+    void *(*native_window_ptr)(ce_window_o0 *inst);
 
-    void *(*native_display_ptr)(ce_window_ints *w);
+    void *(*native_display_ptr)(ce_window_o0 *inst);
 
-    void (*warp_mouse)(ce_window_ints *window,
+    void (*warp_mouse)(ce_window_o0 *inst,
                        int x,
                        int y);
-}ce_window;
+} ce_window_t0;
 
 
 struct ce_os_window_a0 {
-    struct ce_window *(*create)(ce_alloc_t0 *alloc,
-                                const char *title,
-                                enum ce_window_pos x,
-                                enum ce_window_pos y,
-                                const int32_t width,
-                                const int32_t height,
-                                uint32_t flags);
+    ce_window_t0 *(*create)(const char *title,
+                            enum ce_window_pos x,
+                            enum ce_window_pos y,
+                            const int32_t width,
+                            const int32_t height,
+                            uint32_t flags,
+                            ce_alloc_t0 *alloc);
 
-    struct ce_window *(*create_from)(ce_alloc_t0 *alloc,
-                                     void *hndl);
+    ce_window_t0 *(*create_from)(void *hndl,
+                                 ce_alloc_t0 *alloc);
 
-    void (*destroy)(ce_alloc_t0 *alloc,
-                    struct ce_window *w);
+    void (*destroy)(ce_window_t0 *w,
+                    ce_alloc_t0 *alloc);
 };
 
 CE_MODULE(ce_os_window_a0);

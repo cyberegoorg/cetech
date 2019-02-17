@@ -69,22 +69,22 @@ static uint32_t _sdl_flags(uint32_t flags) {
 // Interface
 //==============================================================================
 
-void window_set_title(ce_window_ints *w,
+void window_set_title(ce_window_o0 *w,
                       const char *title) {
     SDL_SetWindowTitle((SDL_Window *) w, title);
 }
 
-const char *window_get_title(ce_window_ints *w) {
+const char *window_get_title(ce_window_o0 *w) {
     return SDL_GetWindowTitle((SDL_Window *) w);
 }
 
-void window_resize(ce_window_ints *w,
+void window_resize(ce_window_o0 *w,
                    uint32_t width,
                    uint32_t height) {
     SDL_SetWindowSize((SDL_Window *) w, width, height);
 }
 
-void window_get_size(ce_window_ints *window,
+void window_get_size(ce_window_o0 *window,
                      uint32_t *width,
                      uint32_t *height) {
     int w, h;
@@ -96,7 +96,7 @@ void window_get_size(ce_window_ints *window,
     *height = (uint32_t) h;
 }
 
-void *window_native_window_ptr(ce_window_ints *w) {
+void *window_native_window_ptr(ce_window_o0 *w) {
     SDL_SysWMinfo wmi = {};
 
     SDL_VERSION(&wmi.version);
@@ -114,7 +114,7 @@ void *window_native_window_ptr(ce_window_ints *w) {
 #endif
 }
 
-void *window_native_display_ptr(ce_window_ints *w) {
+void *window_native_display_ptr(ce_window_o0 *w) {
     SDL_SysWMinfo wmi;
 
     SDL_VERSION(&wmi.version);
@@ -132,20 +132,21 @@ void *window_native_display_ptr(ce_window_ints *w) {
 #endif
 }
 
-void warp_mouse(ce_window_ints *w, int x, int y) {
-    SDL_WarpMouseInWindow((SDL_Window*)w, x, y);
+void warp_mouse(ce_window_o0 *w,
+                int x,
+                int y) {
+    SDL_WarpMouseInWindow((SDL_Window *) w, x, y);
 }
 
-struct ce_window *window_new(ce_alloc_t0 *alloc,
-                             const char *title,
-                             enum ce_window_pos x,
-                             enum ce_window_pos y,
-                             const int32_t width,
-                             const int32_t height,
-                             uint32_t flags) {
+struct ce_window_t0 *window_new(const char *title,
+                                enum ce_window_pos x,
+                                enum ce_window_pos y,
+                                const int32_t width,
+                                const int32_t height,
+                                uint32_t flags,
+                                ce_alloc_t0 *alloc) {
 
-    struct ce_window *window = CE_ALLOC(alloc, struct ce_window,
-                                        sizeof(ce_window));
+    struct ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -164,7 +165,7 @@ struct ce_window *window_new(ce_alloc_t0 *alloc,
                          SDL_GetError());
     }
 
-    *window = (ce_window) {
+    *window = (ce_window_t0) {
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
@@ -179,12 +180,10 @@ struct ce_window *window_new(ce_alloc_t0 *alloc,
 }
 
 
-struct ce_window *window_new_from(ce_alloc_t0 *alloc,
-                                  void *hndl) {
+struct ce_window_t0 *window_new_from(void *hndl,
+                                     ce_alloc_t0 *alloc) {
 
-    struct ce_window *window = CE_ALLOC(alloc,
-                                        struct ce_window,
-                                        sizeof(ce_window));
+    struct ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
 
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
@@ -193,7 +192,7 @@ struct ce_window *window_new_from(ce_alloc_t0 *alloc,
                          SDL_GetError());
     }
 
-    *window = (ce_window) {
+    *window = (ce_window_t0) {
             .inst  = w,
             .set_title = window_set_title,
             .get_title = window_get_title,
@@ -207,8 +206,8 @@ struct ce_window *window_new_from(ce_alloc_t0 *alloc,
     return window;
 }
 
-void window_destroy(ce_alloc_t0 *alloc,
-                    struct ce_window *w) {
+void window_destroy(struct ce_window_t0 *w,
+                    ce_alloc_t0 *alloc) {
     SDL_DestroyWindow((SDL_Window *) w->inst);
     CE_FREE(alloc, w);
 }

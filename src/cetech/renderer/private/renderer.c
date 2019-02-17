@@ -55,7 +55,7 @@ typedef struct viewport {
 #define _G RendererGlobals
 static struct _G {
     ct_renderender_on_render *on_render;
-    struct ce_window *main_window;
+    struct ce_window_t0 *main_window;
 
     struct viewport *viewports;
 
@@ -122,16 +122,16 @@ static void renderer_create() {
             flags |= fullscreen ? WINDOW_FULLSCREEN : WINDOW_NOFLAG;
             flags |= WINDOW_RESIZABLE;
 
-            _G.main_window = ce_os_window_a0->create(_G.allocator,
-                                                     title,
-                                                     WINDOWPOS_UNDEFINED,
-                                                     WINDOWPOS_UNDEFINED,
-                                                     w, h,
-                                                     flags);
+            _G.main_window = ce_os_window_a0->create(
+                    title,
+                    WINDOWPOS_UNDEFINED,
+                    WINDOWPOS_UNDEFINED,
+                    w, h,
+                    flags, _G.allocator);
 
         } else {
-            _G.main_window = ce_os_window_a0->create_from(_G.allocator,
-                                                          (void *) wid);
+            _G.main_window = ce_os_window_a0->create_from(
+                    (void *) wid, _G.allocator);
         }
     }
 
@@ -218,7 +218,7 @@ static void renderer_get_size(uint32_t *width,
 }
 
 static void _feed_module(ct_world_t0 world,
-                         struct ct_rg_module *module) {
+                         struct ct_rg_module_t0 *module) {
     struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
@@ -289,8 +289,8 @@ static void render(float dt) {
             continue;
         }
 
-        struct ct_rg *graph = ct_rg_a0->create_graph();
-        struct ct_rg_module *module = ct_rg_a0->create_module();
+        struct ct_rg_t0 *graph = ct_rg_a0->create_graph();
+        struct ct_rg_module_t0 *module = ct_rg_a0->create_module();
         struct ct_rg_builder_t0 *builder = v->builder;
 
         builder->clear(builder);
@@ -359,7 +359,7 @@ struct ct_rg_builder_t0 *viewport_builder(ct_viewport_t0 viewport) {
     return _G.viewports[viewport.idx].builder;
 }
 
-struct ce_window *get_main_window() {
+struct ce_window_t0 *get_main_window() {
     return _G.main_window;
 }
 

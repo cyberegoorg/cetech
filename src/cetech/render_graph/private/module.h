@@ -1,13 +1,13 @@
 typedef struct render_graph_module_inst {
     uint8_t *pass;
-    struct ct_rg_module **modules;
+    struct ct_rg_module_t0 **modules;
     struct ce_hash_t extension_points;
 }render_graph_module_inst;
 
 static void add_pass(void *inst,
                      void *pass,
                      uint64_t size) {
-    struct ct_rg_module *module = inst;
+    struct ct_rg_module_t0 *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
     struct ct_rg_pass_t0 *p = pass;
@@ -18,7 +18,7 @@ static void add_pass(void *inst,
 
 static void module_on_setup(void *inst,
                             struct ct_rg_builder_t0 *builder) {
-    struct ct_rg_module *module = inst;
+    struct ct_rg_module_t0 *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
     const uint32_t pass_n = ce_array_size(module_inst->pass);
@@ -30,11 +30,11 @@ static void module_on_setup(void *inst,
     }
 }
 
-static struct ct_rg_module *create_module();
+static struct ct_rg_module_t0 *create_module();
 
 typedef struct module_pass {
     struct ct_rg_pass_t0 pass;
-    struct ct_rg_module *module;
+    struct ct_rg_module_t0 *module;
 }module_pass ;
 
 static void modulepass_on_setup(void *inst,
@@ -44,8 +44,8 @@ static void modulepass_on_setup(void *inst,
 }
 
 static void module_add_module(void *inst,
-                              struct ct_rg_module *new_module) {
-    struct ct_rg_module *module = inst;
+                              struct ct_rg_module_t0 *new_module) {
+    struct ct_rg_module_t0 *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
     add_pass(module, &(module_pass) {
@@ -57,12 +57,12 @@ static void module_add_module(void *inst,
     ce_array_push(module_inst->modules, new_module, _G.alloc);
 }
 
-struct ct_rg_module* add_extension_point(void *inst,
+struct ct_rg_module_t0* add_extension_point(void *inst,
                          uint64_t name) {
-    struct ct_rg_module *module = inst;
+    struct ct_rg_module_t0 *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
-    struct ct_rg_module *m = create_module();
+    struct ct_rg_module_t0 *m = create_module();
 
     module_add_module(module, m);
     ce_hash_add(&module_inst->extension_points, name, (uint64_t) m, _G.alloc);
@@ -70,16 +70,16 @@ struct ct_rg_module* add_extension_point(void *inst,
     return m;
 }
 
-struct ct_rg_module *get_extension_point(void *inst,
+struct ct_rg_module_t0 *get_extension_point(void *inst,
                                                    uint64_t name) {
-    struct ct_rg_module *module = inst;
+    struct ct_rg_module_t0 *module = inst;
     struct render_graph_module_inst *module_inst = module->inst;
 
     uint64_t idx = ce_hash_lookup(&module_inst->extension_points, name, 0);
-    return (ct_rg_module *) (idx);
+    return (ct_rg_module_t0 *) (idx);
 }
 
-static void destroy_module(ct_rg_module *module) {
+static void destroy_module(ct_rg_module_t0 *module) {
     struct render_graph_module_inst *module_inst = module->inst;
 
     uint32_t n = ce_array_size(module_inst->modules);
@@ -95,17 +95,15 @@ static void destroy_module(ct_rg_module *module) {
     CE_FREE(_G.alloc, module);
 }
 
-static struct ct_rg_module *create_module() {
-    struct ct_rg_module *obj = CE_ALLOC(_G.alloc,
-                                                  struct ct_rg_module,
-                                                  sizeof(ct_rg_module));
+static struct ct_rg_module_t0 *create_module() {
+    struct ct_rg_module_t0 *obj = CE_ALLOC(_G.alloc, ct_rg_module_t0, sizeof(ct_rg_module_t0));
 
     struct render_graph_module_inst *inst = CE_ALLOC(_G.alloc,
                                                      struct render_graph_module_inst,
                                                      sizeof(render_graph_module_inst));
     *inst = (render_graph_module_inst){};
 
-    *obj = (ct_rg_module) {
+    *obj = (ct_rg_module_t0) {
             .add_pass= add_pass,
             .get_extension_point = get_extension_point,
             .add_extension_point = add_extension_point,
