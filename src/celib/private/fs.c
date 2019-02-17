@@ -126,7 +126,7 @@ static bool exist_dir(const char *full_path) {
 static bool exist(const char *full_path) {
     struct ce_vio_t0 *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
-        f->close(f);
+        ce_os_vio_a0->close(f);
         return true;
     }
 
@@ -178,7 +178,7 @@ static struct ce_vio_t0 *open(uint64_t root,
 }
 
 static void close(ce_vio_t0 *file) {
-    file->close(file);
+    ce_os_vio_a0->close(file);
 }
 
 static int create_directory(uint64_t root,

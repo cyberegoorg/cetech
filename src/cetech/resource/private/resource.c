@@ -207,7 +207,7 @@ static bool save(uint64_t uid) {
         ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uid, 0);
 
         struct ce_vio_t0 *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
-        f->write(f, buf, ce_buffer_size(buf), 1);
+        f->write(f->inst, buf, ce_buffer_size(buf), 1);
         ce_fs_a0->close(f);
         ce_buffer_free(buf, _G.allocator);
 

@@ -191,10 +191,10 @@ static bool _compile(ce_cdb_t0 db,
     struct ce_vio_t0 *tmp_file = NULL;
     tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
 
-    const uint64_t size = tmp_file->size(tmp_file);
+    const uint64_t size = tmp_file->size(tmp_file->inst);
     char *tmp_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
-    tmp_file->read(tmp_file, tmp_data, sizeof(char), size);
-    tmp_file->close(tmp_file);
+    tmp_file->read(tmp_file->inst, tmp_data, sizeof(char), size);
+    ce_os_vio_a0->close(tmp_file);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_blob(w, TEXTURE_DATA, tmp_data, size);

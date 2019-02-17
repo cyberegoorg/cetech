@@ -371,16 +371,16 @@ void copy_file(ce_alloc_t0 *allocator,
                                                             VIO_OPEN_READ);
 
     char *data = CE_ALLOC(allocator, char,
-                          source_vio->size(source_vio));
+                          source_vio->size(source_vio->inst));
 
-    size_t size = (size_t) source_vio->size(source_vio);
-    source_vio->read(source_vio, data, sizeof(char), size);
-    source_vio->close(source_vio);
+    size_t size = (size_t) source_vio->size(source_vio->inst);
+    source_vio->read(source_vio->inst, data, sizeof(char), size);
+    ce_os_vio_a0->close(source_vio);
 
     struct ce_vio_t0 *build_vio = ce_os_vio_a0->from_file(to, VIO_OPEN_WRITE);
 
-    build_vio->write(build_vio, data, sizeof(char), size);
-    build_vio->close(build_vio);
+    build_vio->write(build_vio->inst, data, sizeof(char), size);
+    ce_os_vio_a0->close(build_vio);
 
     CE_FREE(allocator, data);
 }

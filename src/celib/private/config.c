@@ -180,7 +180,7 @@ static int load_from_yaml_file(const char *path,
 
     struct ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
     uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
-    f->close(f);
+    ce_os_vio_a0->close(f);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 

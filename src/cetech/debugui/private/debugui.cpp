@@ -166,7 +166,7 @@ static void SaveDock(struct ce_vio_t0 *output) {
     char *buffer = NULL;
     ImGui::saveToYaml(&buffer, _G.allocator);
 
-    output->write(output, buffer, 1, strlen(buffer));
+    output->write(output->inst, buffer, 1, strlen(buffer));
 }
 
 static void LoadDock(const char *path) {

@@ -26,10 +26,10 @@ void process_file(void *data) {
     ce_log_a0->info("hash", "Process file: %s", filename);
 
     struct ce_vio_t0 *file = ce_os_vio_a0->from_file(filename, VIO_OPEN_READ);
-    uint64_t size = file->size(file);
+    uint64_t size = file->size(file->inst);
     char *input_data = CE_ALLOC(ce_memory_a0->system, char, size + 1);
-    file->read(file, input_data, 1, size);
-    file->close(file);
+    file->read(file->inst, input_data, 1, size);
+    ce_os_vio_a0->close(file);
 
     input_data[size] = '\0';
 
@@ -93,8 +93,8 @@ void process_file(void *data) {
 
     if (change) {
         file = ce_os_vio_a0->from_file(filename, VIO_OPEN_WRITE);
-        file->write(file, input_data, size, 1);
-        file->close(file);
+        file->write(file->inst, input_data, size, 1);
+        ce_os_vio_a0->close(file);
     }
 
     CE_FREE(ce_memory_a0->system, input_data);
