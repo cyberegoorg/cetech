@@ -188,7 +188,7 @@ static bool _compile(ce_cdb_t0 db,
         return false;
     }
 
-    struct ce_vio *tmp_file = NULL;
+    struct ce_vio_t0 *tmp_file = NULL;
     tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);
 
     const uint64_t size = tmp_file->size(tmp_file);

@@ -177,7 +177,7 @@ static bool _compile(ce_cdb_t0 db,
     }
 
 
-    struct ce_vio *tmp_file;
+    struct ce_vio_t0 *tmp_file;
 
     do {
         tmp_file = ce_os_vio_a0->from_file(output_path, VIO_OPEN_READ);

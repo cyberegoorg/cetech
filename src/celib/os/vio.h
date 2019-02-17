@@ -27,31 +27,31 @@ enum ce_vio_seek {
 
 typedef void ce_vio_instance_t;
 
-typedef struct ce_vio {
+typedef struct ce_vio_t0 {
     ce_vio_instance_t *inst;
 
-    int64_t (*size)(struct ce_vio *vio);
+    int64_t (*size)(struct ce_vio_t0 *vio);
 
-    int64_t (*seek)(struct ce_vio *vio,
+    int64_t (*seek)(struct ce_vio_t0 *vio,
                     int64_t offset,
                     enum ce_vio_seek whence);
 
-    size_t (*read)(struct ce_vio *vio,
+    size_t (*read)(struct ce_vio_t0 *vio,
                    void *ptr,
                    size_t size,
                    size_t maxnum);
 
-    size_t (*write)(struct ce_vio *vio,
+    size_t (*write)(struct ce_vio_t0 *vio,
                     const void *ptr,
                     size_t size,
                     size_t num);
 
-    int (*close)(struct ce_vio *vio);
-} ce_vio;
+    int (*close)(struct ce_vio_t0 *vio);
+} ce_vio_t0;
 
 struct ce_os_vio_a0 {
-    struct ce_vio *(*from_file)(const char *path,
-                                enum ce_vio_open_mode mode);
+    struct ce_vio_t0 *(*from_file)(const char *path,
+                                   enum ce_vio_open_mode mode);
 };
 
 

@@ -162,7 +162,7 @@ static void render() {
 }
 
 
-static void SaveDock(struct ce_vio *output) {
+static void SaveDock(struct ce_vio_t0 *output) {
     char *buffer = NULL;
     ImGui::saveToYaml(&buffer, _G.allocator);
 

@@ -178,7 +178,7 @@ static void foreach_config_clb(uint64_t key,
 static int load_from_yaml_file(const char *path,
                                struct ce_alloc_t0 *alloc) {
 
-    struct ce_vio *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
+    struct ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
     uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
     f->close(f);
 

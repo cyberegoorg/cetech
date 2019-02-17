@@ -213,7 +213,7 @@ static void draw_menu() {
 
         if (ct_debugui_a0->BeginMenu("Layout", true)) {
             if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
-                struct ce_vio *f = ce_fs_a0->open(RESOURCE_BROWSER_SOURCE,
+                struct ce_vio_t0 *f = ce_fs_a0->open(RESOURCE_BROWSER_SOURCE,
                                                   "core/default.dock_layout",
                                                   FS_OPEN_WRITE);
                 ct_debugui_a0->SaveDock(f);

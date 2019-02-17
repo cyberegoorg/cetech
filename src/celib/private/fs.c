@@ -124,7 +124,7 @@ static bool exist_dir(const char *full_path) {
 }
 
 static bool exist(const char *full_path) {
-    struct ce_vio *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
+    struct ce_vio_t0 *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         f->close(f);
         return true;
@@ -157,14 +157,14 @@ static char *get_full_path(uint64_t root,
     return NULL;
 }
 
-static struct ce_vio *open(uint64_t root,
+static struct ce_vio_t0 *open(uint64_t root,
                            const char *path,
                            enum ce_fs_open_mode_e0 mode) {
 
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
-    struct ce_vio *file = ce_os_vio_a0->from_file(full_path,
+    struct ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
                                                   (enum ce_vio_open_mode) mode);
 
     if (!file) {
@@ -177,7 +177,7 @@ static struct ce_vio *open(uint64_t root,
     return file;
 }
 
-static void close(ce_vio *file) {
+static void close(ce_vio_t0 *file) {
     file->close(file);
 }
 

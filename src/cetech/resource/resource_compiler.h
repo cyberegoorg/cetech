@@ -25,7 +25,7 @@ extern "C" {
      CE_ID64_0("external", 0x9fb8bb487a62dc4fULL)
 
 
-typedef struct ce_vio ce_vio;
+typedef struct ce_vio_t0 ce_vio_t0;
 typedef struct ce_alloc_t0 ce_alloc_t0;
 typedef struct ct_resource_id_t0 ct_resource_id_t0;
 

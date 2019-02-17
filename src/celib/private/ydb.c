@@ -125,7 +125,7 @@ typedef struct parent_stack_state {
     float *float_array;
 } parent_stack_state;
 
-uint64_t cdb_from_vio(ce_vio *vio,
+uint64_t cdb_from_vio(ce_vio_t0 *vio,
                       struct ce_alloc_t0 *alloc) {
 
 
@@ -404,7 +404,7 @@ uint64_t load_obj_to_cache(const char *path,
 
     ce_log_a0->debug(LOG_WHERE, "Load file %s to cache", path);
 
-    struct ce_vio *f = ce_fs_a0->open(fs_root, path, FS_OPEN_READ);
+    struct ce_vio_t0 *f = ce_fs_a0->open(fs_root, path, FS_OPEN_READ);
 
     if (!f) {
         ce_log_a0->error(LOG_WHERE, "Could not read file %s", path);
@@ -570,7 +570,7 @@ static void dump_yaml(char **buffer,
 }
 
 void save(const char *path) {
-    struct ce_vio *f = ce_fs_a0->open(ce_id_a0->id64("source"), path,
+    struct ce_vio_t0 *f = ce_fs_a0->open(ce_id_a0->id64("source"), path,
                                       FS_OPEN_WRITE);
 
     if (!f) {

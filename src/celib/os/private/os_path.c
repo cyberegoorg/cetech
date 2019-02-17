@@ -367,7 +367,7 @@ void path_join(char **buffer,
 void copy_file(ce_alloc_t0 *allocator,
                const char *from,
                const char *to) {
-    struct ce_vio *source_vio = ce_os_vio_a0->from_file(from,
+    struct ce_vio_t0 *source_vio = ce_os_vio_a0->from_file(from,
                                                             VIO_OPEN_READ);
 
     char *data = CE_ALLOC(allocator, char,
@@ -377,7 +377,7 @@ void copy_file(ce_alloc_t0 *allocator,
     source_vio->read(source_vio, data, sizeof(char), size);
     source_vio->close(source_vio);
 
-    struct ce_vio *build_vio = ce_os_vio_a0->from_file(to, VIO_OPEN_WRITE);
+    struct ce_vio_t0 *build_vio = ce_os_vio_a0->from_file(to, VIO_OPEN_WRITE);
 
     build_vio->write(build_vio, data, sizeof(char), size);
     build_vio->close(build_vio);

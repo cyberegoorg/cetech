@@ -19,7 +19,7 @@ extern "C" {
 #define CT_DEBUGUI_TASK \
     CE_ID64_0("debugui_task", 0x6bb280451f793471ULL)
 
-struct ce_vio;
+struct ce_vio_t0;
 
 struct ImGuiTextEditCallbackData;
 struct ImGuiSizeConstraintCallbackData;
@@ -859,7 +859,7 @@ struct ct_debugui_a0 {
     void (*VSplitter)(const char *str_id,
                       float size[2]);
 
-    void (*SaveDock)(struct ce_vio *output);
+    void (*SaveDock)(struct ce_vio_t0 *output);
 
     void (*LoadDock)(const char *path);
 

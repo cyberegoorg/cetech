@@ -11,7 +11,7 @@
 
 #define LOG_WHERE_OS "vio_sdl"
 
-int64_t vio_sdl_seek(ce_vio *file,
+int64_t vio_sdl_seek(ce_vio_t0 *file,
                      int64_t offset,
                      enum ce_vio_seek whence) {
     CE_ASSERT(LOG_WHERE_OS, file != NULL);
@@ -25,7 +25,7 @@ int64_t vio_sdl_seek(ce_vio *file,
     return SDL_RWseek((SDL_RWops *) file->inst, offset, _whence[whence]);
 }
 
-size_t vio_sdl_read(ce_vio *file,
+size_t vio_sdl_read(ce_vio_t0 *file,
                     void *buffer,
                     size_t size,
                     size_t maxnum) {
@@ -34,7 +34,7 @@ size_t vio_sdl_read(ce_vio *file,
     return SDL_RWread((SDL_RWops *) file->inst, buffer, size, maxnum);
 };
 
-size_t vio_sdl_write(ce_vio *file,
+size_t vio_sdl_write(ce_vio_t0 *file,
                      const void *buffer,
                      size_t size,
                      size_t maxnum) {
@@ -43,13 +43,13 @@ size_t vio_sdl_write(ce_vio *file,
     return SDL_RWwrite((SDL_RWops *) file->inst, buffer, size, maxnum);
 };
 
-int64_t vio_sdl_size(ce_vio *file) {
+int64_t vio_sdl_size(ce_vio_t0 *file) {
     CE_ASSERT(LOG_WHERE_OS, file != NULL);
 
     return SDL_RWsize((SDL_RWops *) file->inst);
 };
 
-int vio_sdl_close(ce_vio *file) {
+int vio_sdl_close(ce_vio_t0 *file) {
     CE_ASSERT(LOG_WHERE_OS, file != NULL);
 
     SDL_RWclose((SDL_RWops *) file->inst);
@@ -57,14 +57,14 @@ int vio_sdl_close(ce_vio *file) {
 }
 
 
-struct ce_vio *vio_from_file(const char *path,
+struct ce_vio_t0 *vio_from_file(const char *path,
                              enum ce_vio_open_mode mode) {
 
     struct ce_alloc_t0 *alloc =ce_memory_a0->system;
 
-    struct ce_vio *vio = CE_ALLOC(alloc,
-                                  struct ce_vio,
-                                  sizeof(ce_vio));
+    struct ce_vio_t0 *vio = CE_ALLOC(alloc,
+                                  struct ce_vio_t0,
+                                  sizeof(ce_vio_t0));
 
     CE_ASSERT(LOG_WHERE_OS, vio != NULL);
 
