@@ -58,24 +58,11 @@ static uint64_t _new_node(uint64_t graph,
     uint64_t node = ce_cdb_a0->create_object(ce_cdb_a0->db(),
                                              CT_NODE_GRAPH_NODE);
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                              node);
-
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), node);
     ce_cdb_a0->set_uint64(w, CT_NODE_TYPE, type);
-
-    uint64_t inputs = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                               CT_NODE_GRAPH_NODE_INPUTS);
-    ce_cdb_a0->set_subobject(w, CT_NODE_GRAPH_NODE_INPUTS, inputs);
-
-    uint64_t outputs = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                CT_NODE_GRAPH_NODE_OUTPUTS);
-    ce_cdb_a0->set_subobject(w, CT_NODE_GRAPH_NODE_OUTPUTS, outputs);
-
     ce_cdb_a0->write_commit(w);
 
-    uint64_t nodes = ce_cdb_a0->read_subobject(reader,
-                                               CT_NODE_GRAPH_NODES,
-                                               0);
+    uint64_t nodes = ce_cdb_a0->read_subobject(reader, CT_NODE_GRAPH_NODES, 0);
     w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), nodes);
     ce_cdb_a0->set_subobject(w, node, node);
     ce_cdb_a0->write_commit(w);

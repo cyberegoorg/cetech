@@ -7,15 +7,26 @@ components:
   transform:
     cdb_uid: 0x1680b5652a000164
     cdb_type: transform
-    scale.x: 1.000000
-    scale.y: 1.000000
-    scale.z: 1.000000
-    position.x: 0.000000
-    position.y: 0.000000
-    position.z: 123.000008
-    rotation.x: -90.000008
-    rotation.y: -90.000008
-    rotation.z: 0.000000
+
+    position:
+      cdb_uid: 0x1680b5652a000165
+      cdb_type: position
+      x: 0.0
+      y: 0.0
+      z: 123.0
+    rotation:
+      cdb_uid: 0x1680b5652a000166
+      cdb_type: rotation
+      x: -90.0
+      y: -90.0
+      z: 0.0
+    scale:
+      cdb_uid: 0x1680b5652a000167
+      cdb_type: scale
+      x: 1.0
+      y: 1.0
+      z: 1.0
+
   mesh_renderer:
     cdb_uid: 0x1680b5662820015d
     cdb_type: mesh_renderer
@@ -34,12 +45,26 @@ children:
       transform:
         cdb_uid: 0x1680ea0606e0011b
         cdb_type: transform
-        scale.x: 1.000000
-        scale.y: 1.000000
-        scale.z: 1.000000
-        position.x: 0.000000
-        position.y: 0.000000
-        position.z: 0.000000
+
+        position:
+          cdb_uid: 0x1680ea0606e0011c
+          cdb_type: position
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        rotation:
+          cdb_uid: 0x1680ea0606e0011d
+          cdb_type: rotation
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        scale:
+          cdb_uid: 0x1680ea0606e0011e
+          cdb_type: scale
+          x: 1.0
+          y: 1.0
+          z: 1.0
+
       mesh_renderer:
         cdb_uid: 0x1680ea0700e00121
         cdb_type: mesh_renderer

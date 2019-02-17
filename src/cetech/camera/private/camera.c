@@ -35,13 +35,9 @@ static void get_project_view(ct_world_t0 world,
                              int width,
                              int height) {
 
-    ct_transform_comp *transform = ct_ecs_a0->get_one(world,
-                                                             TRANSFORM_COMPONENT,
-                                                             camera);
+    ct_transform_comp *transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT, camera);
 
-    ct_camera_component *camera_data = ct_ecs_a0->get_one(world,
-                                                                 CAMERA_COMPONENT,
-                                                                 camera);
+    ct_camera_component *camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT, camera);
     if (!transform) return;
     if (!camera_data) return;
 
@@ -128,44 +124,15 @@ static struct ct_component_i0 ct_component_api = {
         .spawner = camera_spawner,
 };
 
-
-static void property_editor(uint64_t obj,
-                            uint64_t context) {
-
-    ct_editor_ui_a0->prop_float(obj,
-                                PROP_NEAR,
-                                "Near",
-                                (ui_float_p0) {});
-
-    ct_editor_ui_a0->prop_float(obj,
-                                PROP_FAR,
-                                "Far",
-                                (ui_float_p0) {});
-
-    ct_editor_ui_a0->prop_float(obj,
-                                PROP_FOV,
-                                "Fov",
-                                (ui_float_p0) {});
-}
-
 static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
-        .draw_ui = property_editor,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    api->register_api(CT_CAMERA_API, &camera_api, sizeof(camera_api));
-
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-    };
-
-    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-}
-
-static void _shutdown() {
-}
+static ce_cdb_prop_def_t0 camera_component_prop[] = {
+        {.name = "near", .type = CDB_TYPE_FLOAT, .value.f = 0.1f},
+        {.name = "far", .type = CDB_TYPE_FLOAT, .value.f = 1000.0f},
+        {.name = "fov", .type = CDB_TYPE_FLOAT, .value.f = 60.0f},
+};
 
 void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
                             int reload) {
@@ -176,7 +143,19 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+
+    api->register_api(CT_CAMERA_API, &camera_api, sizeof(camera_api));
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
+
+    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+
+    ce_cdb_a0->reg_obj_type(CAMERA_COMPONENT,
+                            camera_component_prop, CE_ARRAY_LEN(camera_component_prop));
 }
 
 void CE_MODULE_UNLOAD(camera)(struct ce_api_a0 *api,
@@ -184,5 +163,4 @@ void CE_MODULE_UNLOAD(camera)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

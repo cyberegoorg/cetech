@@ -9,15 +9,24 @@ components:
     cdb_uid: "0x1ea4d40ad3a179e1"
     cdb_type: "transform"
 
-    position.x: 0.000000
-    position.y: 0.000000
-    position.z: 10.000000
-    rotation.x: 0.000000
-    rotation.y: 0.000000
-    rotation.z: 0.000000
-    scale.x: 1.000000
-    scale.y: 1.000000
-    scale.z: 1.000000
+    position:
+      cdb_uid: 0x1ea4d40ad3a179e2
+      cdb_type: position
+      x: 0.0
+      y: 0.0
+      z: 10.0
+    rotation:
+      cdb_uid: 0x1ea4d40ad3a179e3
+      cdb_type: rotation
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    scale:
+      cdb_uid: 0x1ea4d40ad3a179e4
+      cdb_type: scale
+      x: 1.0
+      y: 1.0
+      z: 1.0
 
   camera:
     cdb_uid: "0xd72994c74e847f5b"

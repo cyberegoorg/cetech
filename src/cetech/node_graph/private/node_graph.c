@@ -92,7 +92,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     //
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                 top_level_obj);
+                                                  top_level_obj);
 
     ImGuiTreeNodeFlags flags = 0 |
                                DebugUITreeNodeFlags_OpenOnArrow |
@@ -138,7 +138,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", nodes);
 
-    bool add = ct_debugui_a0->Button(label,&CE_VEC2_ZERO);
+    bool add = ct_debugui_a0->Button(label, &CE_VEC2_ZERO);
 
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_node_%llu", uid);
@@ -211,7 +211,8 @@ static uint64_t _node_property_cdb_type() {
     return CT_NODE_GRAPH_NODE;
 }
 
-static void _node_property_draw(uint64_t obj, uint64_t context) {
+static void _node_property_draw(uint64_t obj,
+                                uint64_t context) {
     const ce_cdb_obj_o0 *node_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t node_type = ce_cdb_a0->read_uint64(node_r, CT_NODE_TYPE, 0);
@@ -271,6 +272,11 @@ static struct ct_node_graph_a0 ng_api = {
 
 struct ct_node_graph_a0 *ct_node_graph_a0 = &ng_api;
 
+static ce_cdb_prop_def_t0 node_prop[] = {
+        {.name = "inputs", .type = CDB_TYPE_SUBOBJECT, .obj_type = CT_NODE_GRAPH_NODE_INPUTS},
+        {.name = "outputs", .type = CDB_TYPE_SUBOBJECT, .obj_type = CT_NODE_GRAPH_NODE_OUTPUTS},
+};
+
 void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
                                  int reload) {
     CE_UNUSED(reload);
@@ -294,7 +300,6 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     ce_id_a0->id64("to_pin");
 
 
-
     static struct ct_explorer_i0 entity_explorer = {
             .cdb_type = cdb_type,
             .draw_ui = draw_ui,
@@ -304,7 +309,10 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0, sizeof(node_property_editor_i0));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0,
+                      sizeof(node_property_editor_i0));
+
+    ce_cdb_a0->reg_obj_type(CT_NODE_GRAPH_NODE, node_prop, CE_ARRAY_LEN(node_prop));
 
 }
 

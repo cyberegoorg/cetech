@@ -154,18 +154,8 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Primitive mesh";
 }
 
-static void property_editor(uint64_t obj,
-                            uint64_t context) {
-    ct_editor_ui_a0->prop_resource(obj,
-                                   ce_id_a0->id64("material"), "Material",
-                                   ce_id_a0->id64("material"), context, obj + 1);
-
-}
-
-
 static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
-        .draw_ui = property_editor,
 };
 
 static void render(ct_world_t0 world,
@@ -270,8 +260,12 @@ static void shutdown() {
     _shutdown();
 }
 
+static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
+        {.name = "material", .type = CDB_TYPE_REF, .obj_type = MATERIAL_TYPE},
+};
 
-void CE_MODULE_LOAD(primitice_mesh)(struct ce_api_a0 *api,
+
+void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
                                     int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
@@ -282,9 +276,12 @@ void CE_MODULE_LOAD(primitice_mesh)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ct_renderer_a0);
     init(api);
+
+    ce_cdb_a0->reg_obj_type(PRIMITIVE_MESH_COMPONENT,
+                            primitive_mesh_prop, CE_ARRAY_LEN(primitive_mesh_prop));
 }
 
-void CE_MODULE_UNLOAD(primitice_mesh)(struct ce_api_a0 *api,
+void CE_MODULE_UNLOAD(primitive_mesh)(struct ce_api_a0 *api,
                                       int reload) {
 
     CE_UNUSED(reload);

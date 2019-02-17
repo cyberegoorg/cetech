@@ -56,18 +56,6 @@ static uint64_t _spawn_to(uint64_t from,
                                                      ENTITY_CHILDREN,
                                                      0);
 
-        if (!add_children_obj) {
-            add_children_obj = ce_cdb_a0->create_object(
-                    ce_cdb_a0->db(),
-                    ENTITY_CHILDREN);
-            ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(
-                    ce_cdb_a0->db(),
-                    to);
-            ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
-                                     add_children_obj);
-            ce_cdb_a0->write_commit(writer);
-        }
-
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                                   add_children_obj);
         ce_cdb_a0->set_subobject(w, new_obj, new_obj);
@@ -81,36 +69,10 @@ static void _add(uint64_t selected_obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
 
     uint64_t entity_obj;
-    entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                          ENTITY_RESOURCE_ID);
-
-    uint64_t components_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                       ENTITY_COMPONENTS);
-
-    uint64_t children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                     ENTITY_CHILDREN);
-
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                   entity_obj);
-    ce_cdb_a0->set_subobject(writer, ENTITY_COMPONENTS, components_obj);
-    ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN, children_obj);
-    ce_cdb_a0->write_commit(writer);
-
+    entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_RESOURCE_ID);
 
     uint64_t add_children_obj;
-    add_children_obj = ce_cdb_a0->read_subobject(reader,
-                                                 ENTITY_CHILDREN,
-                                                 0);
-
-    if (!add_children_obj) {
-        add_children_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                    ENTITY_CHILDREN);
-        ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                       selected_obj);
-        ce_cdb_a0->set_subobject(writer, ENTITY_CHILDREN,
-                                 add_children_obj);
-        ce_cdb_a0->write_commit(writer);
-    }
+    add_children_obj = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
                                               add_children_obj);

@@ -29,6 +29,58 @@ static struct _G {
 } _G;
 
 static void draw(uint64_t obj,
+                 uint64_t context) ;
+
+static void _generic_prop_draw(uint64_t obj,
+                               uint64_t context) {
+    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+
+    const ce_cdb_type_def_t0 *defs = ce_cdb_a0->obj_type_def(type);
+
+    if (!defs) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < defs->num; ++i) {
+        const ce_cdb_prop_def_t0 *def = &defs->defs[i];
+        enum ce_cdb_type_e0 type = def->type;
+        uint64_t prop_name = ce_id_a0->id64(def->name);
+
+        switch (type) {
+            case CDB_TYPE_NONE:
+                break;
+            case CDB_TYPE_UINT64:
+                break;
+            case CDB_TYPE_PTR:
+                break;
+            case CDB_TYPE_REF:
+                ct_editor_ui_a0->prop_resource(obj, prop_name, def->name,
+                                               def->obj_type, context, obj);
+                break;
+
+            case CDB_TYPE_FLOAT:
+                ct_editor_ui_a0->prop_float(obj, prop_name, def->name, (ui_float_p0) {});
+                break;
+            case CDB_TYPE_BOOL:
+                ct_editor_ui_a0->prop_bool(obj, prop_name, def->name);
+                break;
+            case CDB_TYPE_STR:
+                ct_editor_ui_a0->prop_str(obj, prop_name, def->name, obj);
+                break;
+            case CDB_TYPE_SUBOBJECT:{
+                const ce_cdb_obj_o0* r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+                uint64_t subobj = ce_cdb_a0->read_subobject(r, prop_name, 0);
+                draw(subobj, context);
+            }
+                break;
+
+            case CDB_TYPE_BLOB:
+                break;
+        }
+    }
+}
+
+static void draw(uint64_t obj,
                  uint64_t context) {
     if (!obj) {
         return;
@@ -44,12 +96,15 @@ static void draw(uint64_t obj,
 
             if (i->draw_ui) {
                 i->draw_ui(obj, context);
+                return;
             }
-            return;
+            break;
         }
 
         it = ce_api_a0->next(it);
     }
+
+    _generic_prop_draw(obj, context);
 }
 
 static struct ct_property_editor_i0 *get_interface(uint64_t obj) {

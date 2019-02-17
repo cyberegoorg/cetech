@@ -85,7 +85,7 @@ uint64_t compile_obj(ce_cdb_t0 db,
     uint64_t type = ce_id_a0->id64(type_s);
 
     uint64_t obj = 0;
-    ce_cdb_a0->create_object_uid(db, uid, type);
+    ce_cdb_a0->create_object_uid(db, uid, 0);
     obj = uid;
 
     uint64_t n = ce_cdb_a0->prop_count(input_r);
@@ -177,6 +177,8 @@ uint64_t compile_obj(ce_cdb_t0 db,
     if (compilator) {
         compilator(db, obj);
     }
+
+    ce_cdb_a0->set_type(db, obj, type);
 
     return obj;
 }

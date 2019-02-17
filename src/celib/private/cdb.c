@@ -87,14 +87,9 @@ typedef struct db_t {
     ce_hash_t id_map;
 } db_t;
 
-typedef struct type_def_t {
-    ce_cdb_prop_def_t0 *defs;
-    uint32_t num;
-} type_def_t;
-
 typedef struct type_defs_t {
     ce_hash_t def_map;
-    type_def_t *defs;
+    ce_cdb_type_def_t0 *defs;
 } type_defs_t;
 
 static struct _G {
@@ -116,24 +111,27 @@ void reg_obj_type(uint64_t type,
 
     if (idx == UINT32_MAX) {
         idx = ce_array_size(_G.type_defs.defs);
-        ce_array_push(_G.type_defs.defs, (type_def_t) {}, _G.allocator);
+        ce_array_push(_G.type_defs.defs, (ce_cdb_type_def_t0) {}, _G.allocator);
+
+        ce_hash_add(&_G.type_defs.def_map, type, idx, _G.allocator);
     }
 
-    type_def_t *def = &_G.type_defs.defs[idx];
+    ce_cdb_type_def_t0 *def = &_G.type_defs.defs[idx];
 
+    def->num = n;
 
     ce_array_clean(def->defs);
     ce_array_push_n(def->defs, prop_def, sizeof(ce_cdb_prop_def_t0) * n, _G.allocator);
 }
 
-const type_def_t *_get_prop_def(uint64_t type) {
+const ce_cdb_type_def_t0 *_get_prop_def(uint64_t type) {
     uint32_t idx = ce_hash_lookup(&_G.type_defs.def_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
     }
 
-    type_def_t *def = &_G.type_defs.defs[idx];
+    ce_cdb_type_def_t0 *def = &_G.type_defs.defs[idx];
 
     return def;
 }
@@ -414,6 +412,11 @@ static struct ce_cdb_t0 create_db() {
     return (ce_cdb_t0) {.idx = idx};
 };
 
+
+static void _init_from_defs(ce_cdb_t0 db,
+                            object_t *obj,
+                            const ce_cdb_type_def_t0 *def);
+
 static void create_object_uid(ce_cdb_t0 db,
                               uint64_t uid,
                               uint64_t type) {
@@ -425,6 +428,11 @@ static void create_object_uid(ce_cdb_t0 db,
     obj->db = db;
     obj->type = type;
     obj->orig_obj = uid;
+
+    const ce_cdb_type_def_t0 *def = _get_prop_def(type);
+    if (def) {
+        _init_from_defs(db, obj, def);
+    }
 }
 
 
@@ -1898,172 +1906,210 @@ static void load(ce_cdb_t0 db,
     object_t *obj = _get_object_from_id(db_inst, _obj);
     obj->parent = header->parent;
 
-
     uint64_t *keys = (uint64_t *) (header + 1);
     uint8_t *ptype = (uint8_t *) (keys + header->properties_count);
     uint64_t *offset = (uint64_t *) (ptype + header->properties_count);
     uint8_t *values = (uint8_t *) (offset + header->properties_count);
     const char *strbuffer = (char *) (values + header->values_size);
-    const char *blob_buffer = (char *) (strbuffer +
-                                        header->string_buffer_size);
+    const char *blob_buffer = (char *) (strbuffer + header->string_buffer_size);
     if (!header->properties_count) {
         return;
     }
 
-    if (!instanceof) {
-        ce_array_push_n(obj->keys, keys,
-                        header->properties_count,
-                        allocator);
+//    if (!instanceof) {
+//        ce_array_push_n(obj->keys, keys,
+//                        header->properties_count,
+//                        allocator);
+//
+//        ce_array_push_n(obj->property_type, ptype,
+//                        header->properties_count,
+//                        allocator);
+//
+//        ce_array_push_n(obj->offset, offset,
+//                        header->properties_count,
+//                        allocator);
+//
+//        ce_array_push_n(obj->values, values,
+//                        header->values_size,
+//                        allocator);
+//
+//        obj->properties_count += header->properties_count;
+//
+//        for (int i = 1; i < obj->properties_count; ++i) {
+//            ce_hash_add(&obj->prop_map, obj->keys[i], i, allocator);
+//        }
+//
+//        for (int i = 1; i < obj->properties_count; ++i) {
+//            switch (obj->property_type[i]) {
+//                case CDB_TYPE_STR: {
+//                    uint64_t str_offset = *(uint64_t *) (obj->values +
+//                                                         obj->offset[i]);
+//
+//                    char *dup_str = ce_memory_a0->str_dup(
+//                            strbuffer + str_offset,
+//                            allocator);
+//
+//                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+//                            obj->values +
+//                            obj->offset[i]);
+//                    value_ptr->str = dup_str;
+//                }
+//
+//                    break;
+//
+//                case CDB_TYPE_BLOB: {
+//                    uint64_t blob_offset = *(uint64_t *) (obj->values +
+//                                                          obj->offset[i]);
+//
+//                    uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
+//                    const char *blob_data = ((blob_buffer +
+//                                              blob_offset + sizeof(uint64_t)));
+//
+//                    char *copy_blob_data = CE_ALLOC(allocator, char, size);
+//                    memcpy(copy_blob_data, blob_data, size);
+//
+//                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+//                            obj->values +
+//                            obj->offset[i]);
+//                    value_ptr->blob.size = size;
+//                    value_ptr->blob.data = copy_blob_data;
+//                }
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    } else {
+    struct object_t fakeo = {
+            .properties_count  = header->properties_count,
+            .keys = keys,
+            .property_type = ptype,
+            .values = values,
+            .offset = offset,
+    };
 
-        ce_array_push_n(obj->property_type, ptype,
-                        header->properties_count,
-                        allocator);
+    struct object_t *fakeop = &fakeo;
 
-        ce_array_push_n(obj->offset, offset,
-                        header->properties_count,
-                        allocator);
+    uint32_t prop_n = header->properties_count;
+    for (int i = 0; i < prop_n; ++i) {
+        switch (ptype[i]) {
+            case CDB_TYPE_STR: {
+                uint64_t str_offset = *(uint64_t *) (fakeop->values +
+                                                     fakeop->offset[i]);
 
-        ce_array_push_n(obj->values, values,
-                        header->values_size,
-                        allocator);
+                char *dup_str = ce_memory_a0->str_dup(strbuffer + str_offset,
+                                                      allocator);
 
-        obj->properties_count += header->properties_count;
-
-        for (int i = 1; i < obj->properties_count; ++i) {
-            ce_hash_add(&obj->prop_map, obj->keys[i], i, allocator);
-        }
-
-        for (int i = 1; i < obj->properties_count; ++i) {
-            switch (obj->property_type[i]) {
-                case CDB_TYPE_STR: {
-                    uint64_t str_offset = *(uint64_t *) (obj->values +
-                                                         obj->offset[i]);
-
-                    char *dup_str = ce_memory_a0->str_dup(
-                            strbuffer + str_offset,
-                            allocator);
-
-                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                            obj->values +
-                            obj->offset[i]);
-                    value_ptr->str = dup_str;
-                }
-
-                    break;
-
-                case CDB_TYPE_BLOB: {
-                    uint64_t blob_offset = *(uint64_t *) (obj->values +
-                                                          obj->offset[i]);
-
-                    uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
-                    const char *blob_data = ((blob_buffer +
-                                              blob_offset + sizeof(uint64_t)));
-
-                    char *copy_blob_data = CE_ALLOC(allocator, char, size);
-                    memcpy(copy_blob_data, blob_data, size);
-
-                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                            obj->values +
-                            obj->offset[i]);
-                    value_ptr->blob.size = size;
-                    value_ptr->blob.data = copy_blob_data;
-                }
-                    break;
-                default:
-                    break;
+                ce_cdb_value_u0 *value_ptr = (ce_cdb_value_u0 *) (fakeop->values +
+                                                                  fakeop->offset[i]);
+                value_ptr->str = dup_str;
             }
-        }
-    } else {
 
-        struct object_t fakeo = {
-                .properties_count  = header->properties_count,
-                .keys = keys,
-                .property_type = ptype,
-                .values = values,
-                .offset = offset,
-        };
+                break;
 
-        struct object_t *fakeop = &fakeo;
+            case CDB_TYPE_BLOB: {
+                uint64_t blob_offset = *(uint64_t *) (fakeop->values +
+                                                      fakeop->offset[i]);
 
-        uint32_t prop_n = header->properties_count;
-        for (int i = 0; i < prop_n; ++i) {
-            switch (ptype[i]) {
-                case CDB_TYPE_STR: {
-                    uint64_t str_offset = *(uint64_t *) (fakeop->values +
-                                                         fakeop->offset[i]);
+                uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
+                const char *blob_data = ((blob_buffer + blob_offset + sizeof(uint64_t)));
 
-                    char *dup_str = ce_memory_a0->str_dup(
-                            strbuffer + str_offset,
-                            allocator);
+                char *copy_blob_data = CE_ALLOC(allocator, char, size);
+                memcpy(copy_blob_data, blob_data, size);
 
-                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                            fakeop->values +
-                            fakeop->offset[i]);
-                    value_ptr->str = dup_str;
-                }
+                ce_cdb_value_u0 *value_ptr = (ce_cdb_value_u0 *) (fakeop->values +
+                                                                  fakeop->offset[i]);
 
-                    break;
-
-                case CDB_TYPE_BLOB: {
-                    uint64_t blob_offset = *(uint64_t *) (fakeop->values +
-                                                          fakeop->offset[i]);
-
-                    uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
-                    const char *blob_data = ((blob_buffer +
-                                              blob_offset + sizeof(uint64_t)));
-
-                    char *copy_blob_data = CE_ALLOC(allocator, char, size);
-                    memcpy(copy_blob_data, blob_data, size);
-
-                    union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                            fakeop->values +
-                            fakeop->offset[i]);
-
-                    value_ptr->blob.size = size;
-                    value_ptr->blob.data = copy_blob_data;
-                }
-                    break;
+                value_ptr->blob.size = size;
+                value_ptr->blob.data = copy_blob_data;
             }
+                break;
         }
+    }
 
-        for (int i = 0; i < prop_n; ++i) {
-            uint64_t name = keys[i];
+    for (int i = 0; i < prop_n; ++i) {
+        uint64_t name = keys[i];
 
-            enum ce_cdb_type_e0 t = ptype[i];
+        enum ce_cdb_type_e0 t = ptype[i];
 
-            union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
-                    fakeop->values +
-                    fakeop->offset[i]);
+        union ce_cdb_value_u0 *value_ptr = (union ce_cdb_value_u0 *) (
+                fakeop->values +
+                fakeop->offset[i]);
 
-            switch (t) {
-                case CDB_TYPE_UINT64:
-                    set_uint64((ce_cdb_obj_o0 *) obj, name, value_ptr->uint64);
-                    break;
-                case CDB_TYPE_PTR:
-                    set_ptr((ce_cdb_obj_o0 *) obj, name, value_ptr->ptr);
-                    break;
-                case CDB_TYPE_REF:
-                    set_ref((ce_cdb_obj_o0 *) obj, name, value_ptr->ref);
-                    break;
-                case CDB_TYPE_FLOAT:
-                    set_float((ce_cdb_obj_o0 *) obj, name, value_ptr->f);
-                    break;
-                case CDB_TYPE_BOOL:
-                    set_bool((ce_cdb_obj_o0 *) obj, name, value_ptr->b);
-                    break;
-                case CDB_TYPE_STR:
-                    set_string((ce_cdb_obj_o0 *) obj, name, value_ptr->str);
-                    break;
-                case CDB_TYPE_SUBOBJECT:
-                    set_uint64((ce_cdb_obj_o0 *) obj, name, value_ptr->subobj);
-                    break;
-                case CDB_TYPE_BLOB:
-                    break;
-                case CDB_TYPE_NONE:
-                    break;
-                default:
-                    break;
+        switch (t) {
+            case CDB_TYPE_UINT64:
+                set_uint64((ce_cdb_obj_o0 *) obj, name, value_ptr->uint64);
+                break;
+            case CDB_TYPE_PTR:
+                set_ptr((ce_cdb_obj_o0 *) obj, name, value_ptr->ptr);
+                break;
+            case CDB_TYPE_REF:
+                set_ref((ce_cdb_obj_o0 *) obj, name, value_ptr->ref);
+                break;
+            case CDB_TYPE_FLOAT:
+                set_float((ce_cdb_obj_o0 *) obj, name, value_ptr->f);
+                break;
+            case CDB_TYPE_BOOL:
+                set_bool((ce_cdb_obj_o0 *) obj, name, value_ptr->b);
+                break;
+            case CDB_TYPE_STR:
+                set_string((ce_cdb_obj_o0 *) obj, name, value_ptr->str);
+                break;
+            case CDB_TYPE_SUBOBJECT:
+                set_uint64((ce_cdb_obj_o0 *) obj, name, value_ptr->subobj);
+                break;
+            case CDB_TYPE_BLOB:
+                set_blob((ce_cdb_obj_o0 *) obj, name, value_ptr->blob.data, value_ptr->blob.size);
+                break;
+            case CDB_TYPE_NONE:
+                break;
+            default:
+                break;
+        }
+    }
+//    }
+}
+
+static void _init_from_defs(ce_cdb_t0 db,
+                            object_t *obj,
+                            const ce_cdb_type_def_t0 *def) {
+
+    ce_cdb_obj_o0 *w = (ce_cdb_obj_o0 *) obj;
+
+    for (uint32_t i = 0; i < def->num; ++i) {
+        ce_cdb_prop_def_t0 *prop_def = &def->defs[i];
+        enum ce_cdb_type_e0 t = prop_def->type;
+        uint64_t prop_name = ce_id_a0->id64(prop_def->name);
+
+        switch (t) {
+            case CDB_TYPE_NONE:
+                break;
+            case CDB_TYPE_UINT64:
+                set_uint64(w, prop_name, prop_def->value.uint64);
+                break;
+            case CDB_TYPE_PTR:
+                set_ptr(w, prop_name, prop_def->value.ptr);
+                break;
+            case CDB_TYPE_REF:
+                set_ref(w, prop_name, prop_def->value.ref);
+                break;
+            case CDB_TYPE_FLOAT:
+                set_float(w, prop_name, prop_def->value.f);
+                break;
+            case CDB_TYPE_BOOL:
+                set_bool(w, prop_name, prop_def->value.b);
+                break;
+            case CDB_TYPE_STR:
+                set_string(w, prop_name, prop_def->value.str);
+                break;
+            case CDB_TYPE_SUBOBJECT: {
+                uint64_t sub_obj = create_object(db, prop_def->obj_type);
+                set_subobject(w, prop_name, sub_obj);
             }
+                break;
+            case CDB_TYPE_BLOB:
+                set_blob(w, prop_name, prop_def->value.blob.data, prop_def->value.blob.size);
+                break;
         }
     }
 }
@@ -2072,6 +2118,8 @@ static struct ce_cdb_a0 cdb_api = {
         .create_db = create_db,
         .destroy_db = destroy_db,
 
+        .reg_obj_type = reg_obj_type,
+        .obj_type_def = _get_prop_def,
         .set_loader = set_loader,
         .db  = global_db,
         .obj_type = type,

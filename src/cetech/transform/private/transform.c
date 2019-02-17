@@ -52,90 +52,20 @@ static const char *display_name() {
     return ICON_FA_ARROWS " Transform";
 }
 
-static void guizmo_get_transform(uint64_t obj,
-                                 float *world,
-                                 float *local) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
-    float pos[3] = {
-            ce_cdb_a0->read_float(reader, PROP_POSITION_X, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_POSITION_Y, 0.0f),
-            ce_cdb_a0->read_float(reader, PROP_POSITION_Z, 0.0f),
-    };
-
-    ce_vec3_t rot = {
-            .x = ce_cdb_a0->read_float(reader, PROP_ROTATION_X, 0.0f),
-            .y = ce_cdb_a0->read_float(reader, PROP_ROTATION_Y, 0.0f),
-            .z = ce_cdb_a0->read_float(reader, PROP_ROTATION_Z, 0.0f),
-    };
-
-    float sca[3] = {
-            ce_cdb_a0->read_float(reader, PROP_SCALE_X, 1.0f),
-            ce_cdb_a0->read_float(reader, PROP_SCALE_Y, 1.0f),
-            ce_cdb_a0->read_float(reader, PROP_SCALE_Z, 1.0f),
-    };
-
-
-    ce_vec3_t rot_rad = ce_vec3_mul_s(rot, CE_DEG_TO_RAD);
-
-    ce_mat4_srt(world,
-                sca[0], sca[1], sca[2],
-                rot_rad.x, rot_rad.y, rot_rad.z,
-                pos[0], pos[1], pos[2]);
+static uint64_t _position_cdb_type() {
+    return PROP_POSITION;
 }
 
-static void guizmo_set_transform(uint64_t obj,
-                                 uint8_t operation,
-                                 float *world,
-                                 float *local) {
-    float pos[3] = {};
-    float rot_deg[3] = {};
-    float scale[3] = {};
-    ct_debugui_a0->guizmo_decompose_matrix(world, pos, rot_deg, scale);
-
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-
-    switch (operation) {
-        case TRANSLATE:
-            ce_cdb_a0->set_float(w, PROP_POSITION_X, pos[0]);
-            ce_cdb_a0->set_float(w, PROP_POSITION_Y, pos[1]);
-            ce_cdb_a0->set_float(w, PROP_POSITION_Z, pos[2]);
-            break;
-
-        case ROTATE:
-            ce_cdb_a0->set_float(w, PROP_ROTATION_X, rot_deg[0]);
-            ce_cdb_a0->set_float(w, PROP_ROTATION_Y, rot_deg[1]);
-            ce_cdb_a0->set_float(w, PROP_ROTATION_Z, rot_deg[2]);
-            break;
-
-        case SCALE:
-            ce_cdb_a0->set_float(w, PROP_SCALE_X, scale[0]);
-            ce_cdb_a0->set_float(w, PROP_SCALE_Y, scale[1]);
-            ce_cdb_a0->set_float(w, PROP_SCALE_Z, scale[2]);
-            break;
-
-        default:
-            break;
-    }
-
-    ce_cdb_a0->write_commit(w);
+static uint64_t _rotation_cdb_type() {
+    return PROP_ROTATION;
 }
 
-static uint64_t create_new() {
-    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                  TRANSFORM_COMPONENT);
-
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
-    ce_cdb_a0->set_float(w, PROP_SCALE_X, 1.0f);
-    ce_cdb_a0->set_float(w, PROP_SCALE_Y, 1.0f);
-    ce_cdb_a0->set_float(w, PROP_SCALE_Z, 1.0f);
-    ce_cdb_a0->write_commit(w);
-
-    return component;
+static uint64_t _scale_cdb_type() {
+    return PROP_SCALE;
 }
 
-static void property_editor(uint64_t obj,
-                            uint64_t context) {
+static void _position_property_editor(uint64_t obj,
+                                      uint64_t context) {
 
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_POSITION_X,
@@ -144,6 +74,11 @@ static void property_editor(uint64_t obj,
                                "Position",
                                (ui_vec3_p0) {});
 
+}
+
+static void _rotation_property_editor(uint64_t obj,
+                                      uint64_t context) {
+
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_ROTATION_X,
                                               PROP_ROTATION_Y,
@@ -151,6 +86,10 @@ static void property_editor(uint64_t obj,
                                "Rotation",
                                (ui_vec3_p0) {});
 
+}
+
+static void _scale_property_editor(uint64_t obj,
+                                   uint64_t context) {
 
     ct_editor_ui_a0->prop_vec3(obj,
                                (uint64_t[3]) {PROP_SCALE_X,
@@ -160,19 +99,26 @@ static void property_editor(uint64_t obj,
                                (ui_vec3_p0) {});
 }
 
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = cdb_type,
-        .draw_ui = property_editor,
+
+static struct ct_property_editor_i0 position_property_editor_api = {
+        .cdb_type = _position_cdb_type,
+        .draw_ui = _position_property_editor,
 };
 
+static struct ct_property_editor_i0 rotation_property_editor_api = {
+        .cdb_type = _rotation_cdb_type,
+        .draw_ui = _rotation_property_editor,
+};
+
+static struct ct_property_editor_i0 scale_property_editor_api = {
+        .cdb_type = _scale_cdb_type,
+        .draw_ui = _scale_property_editor,
+};
 
 static void *get_interface(uint64_t name_hash) {
     if (EDITOR_COMPONENT == name_hash) {
         static struct ct_editor_component_i0 ct_editor_component_i0 = {
                 .display_name = display_name,
-                .guizmo_get_transform = guizmo_get_transform,
-                .guizmo_set_transform = guizmo_set_transform,
-                .create_new = create_new,
         };
 
         return &ct_editor_component_i0;
@@ -191,26 +137,49 @@ static void transform_spawner(ct_world_t0 world,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     ct_transform_comp *t = data;
 
+    ce_vec3_t pos = {};
+    ce_vec3_t rot = {};
+    ce_vec3_t scl = CE_VEC3_UNIT;
 
-    ce_vec3_t rotation = {
-            ce_cdb_a0->read_float(r, PROP_ROTATION_X, 0.0f),
-            ce_cdb_a0->read_float(r, PROP_ROTATION_Y, 0.0f),
-            ce_cdb_a0->read_float(r, PROP_ROTATION_Z, 0.0f),
-    };
-    rotation = ce_vec3_mul_s(rotation, CE_DEG_TO_RAD);
+    uint64_t pos_obj = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
+    if (pos_obj) {
+        const ce_cdb_obj_o0 *pos_r = ce_cdb_a0->read(ce_cdb_a0->db(), pos_obj);
+
+        pos = (ce_vec3_t) {
+                ce_cdb_a0->read_float(pos_r, PROP_POSITION_X, 0.0f),
+                ce_cdb_a0->read_float(pos_r, PROP_POSITION_Y, 0.0f),
+                ce_cdb_a0->read_float(pos_r, PROP_POSITION_Z, 0.0f),
+        };
+    }
+
+    uint64_t rot_obj = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
+    if (rot_obj) {
+        const ce_cdb_obj_o0 *rot_r = ce_cdb_a0->read(ce_cdb_a0->db(), rot_obj);
+
+        rot = (ce_vec3_t) {
+                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_X, 0.0f),
+                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_Y, 0.0f),
+                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_Z, 0.0f),
+        };
+
+        rot = ce_vec3_mul_s(rot, CE_DEG_TO_RAD);
+    }
+
+    uint64_t scl_obj = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
+    if (scl_obj) {
+        const ce_cdb_obj_o0 *scl_r = ce_cdb_a0->read(ce_cdb_a0->db(), scl_obj);
+
+        scl = (ce_vec3_t) {
+                ce_cdb_a0->read_float(scl_r, PROP_SCALE_X, 1.0f),
+                ce_cdb_a0->read_float(scl_r, PROP_SCALE_Y, 1.0f),
+                ce_cdb_a0->read_float(scl_r, PROP_SCALE_Z, 1.0f),
+        };
+    }
 
     *t = (ct_transform_comp) {
-            .t.pos = {
-                    ce_cdb_a0->read_float(r, PROP_POSITION_X, 0.0f),
-                    ce_cdb_a0->read_float(r, PROP_POSITION_Y, 0.0f),
-                    ce_cdb_a0->read_float(r, PROP_POSITION_Z, 0.0f),
-            },
-            .t.rot = ce_quat_from_euler(rotation.x, rotation.y, rotation.z),
-            .t.scl = {
-                    ce_cdb_a0->read_float(r, PROP_SCALE_X, 1.0f),
-                    ce_cdb_a0->read_float(r, PROP_SCALE_Y, 1.0f),
-                    ce_cdb_a0->read_float(r, PROP_SCALE_Z, 1.0f),
-            },
+            .t.pos = pos,
+            .t.rot = ce_quat_from_euler(rot.x, rot.y, rot.z),
+            .t.scl = scl,
     };
 }
 
@@ -226,8 +195,8 @@ static void _transform_root_naive(ct_world_t0 world,
                                   struct ct_entity_t0 ent,
                                   float *w) {
     ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
-                                                          TRANSFORM_COMPONENT,
-                                                          ent);
+                                                   TRANSFORM_COMPONENT,
+                                                   ent);
 
     float *rootw = w;
     if (root_t) {
@@ -292,16 +261,29 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
         .name = name,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(SIMULATION_INTERFACE, &transform_simulation_i0,
-                      sizeof(transform_simulation_i0));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-}
+static const ce_cdb_prop_def_t0 transform_component_prop[] = {
+        {.name = "position", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_POSITION},
+        {.name = "rotation", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_ROTATION},
+        {.name = "scale", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_SCALE},
+};
 
-static void _shutdown() {
+static const ce_cdb_prop_def_t0 position_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_X},
+        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_Y},
+        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_Z},
+};
 
-}
+static const ce_cdb_prop_def_t0 rotation_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_X},
+        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_Y},
+        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_Z},
+};
+
+static const ce_cdb_prop_def_t0 scale_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_X, .value.f = 1.0f},
+        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_Y, .value.f = 1.0f},
+        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_Z, .value.f = 1.0f},
+};
 
 void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                                int reload) {
@@ -313,7 +295,35 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_log_a0);
-    _init(api);
+
+    api->register_api(COMPONENT_INTERFACE,
+                      &ct_component_api, sizeof(ct_component_api));
+
+    api->register_api(SIMULATION_INTERFACE,
+                      &transform_simulation_i0, sizeof(transform_simulation_i0));
+
+    api->register_api(PROPERTY_EDITOR_INTERFACE,
+                      &position_property_editor_api, sizeof(position_property_editor_api));
+
+    api->register_api(PROPERTY_EDITOR_INTERFACE,
+                      &rotation_property_editor_api, sizeof(rotation_property_editor_api));
+
+    api->register_api(PROPERTY_EDITOR_INTERFACE,
+                      &scale_property_editor_api, sizeof(scale_property_editor_api));
+
+    ce_cdb_a0->reg_obj_type(PROP_POSITION,
+                            position_prop, CE_ARRAY_LEN(position_prop));
+
+    ce_cdb_a0->reg_obj_type(PROP_ROTATION,
+                            rotation_prop, CE_ARRAY_LEN(rotation_prop));
+
+    ce_cdb_a0->reg_obj_type(PROP_SCALE,
+                            scale_prop, CE_ARRAY_LEN(scale_prop));
+
+    ce_cdb_a0->reg_obj_type(TRANSFORM_COMPONENT,
+                            transform_component_prop, CE_ARRAY_LEN(transform_component_prop));
+
+
 }
 
 void CE_MODULE_UNLOAD(transform)(struct ce_api_a0 *api,
@@ -321,5 +331,4 @@ void CE_MODULE_UNLOAD(transform)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

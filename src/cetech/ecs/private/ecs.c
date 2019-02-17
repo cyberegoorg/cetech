@@ -841,7 +841,7 @@ static struct ct_resource_i0 ct_resource_api = {
         .online = online,
         .offline = offline,
         .get_interface = get_resource_interface,
-        .create_new = create_new,
+//        .create_new = create_new,
 };
 
 //==============================================================================
@@ -1091,6 +1091,21 @@ static uint64_t *update_after(uint64_t *n) {
     return a;
 }
 
+static uint64_t _get_comp_from_obj(world_instance_t* world, ce_cdb_t0 db, uint64_t obj) {
+    uint64_t idx = ce_hash_lookup(&world->comp_spawn_map, obj, UINT64_MAX);
+
+    if(idx != UINT64_MAX) {
+        return obj;
+    }
+
+    uint64_t parent = ce_cdb_a0->parent(db, obj);
+    if(!parent) {
+        return 0;
+    }
+
+    return _get_comp_from_obj(world, db, parent);
+}
+
 static void _update(float dt) {
     uint32_t wn = ce_array_size(_G.world_array);
     ct_entity_t0 *ents = NULL;
@@ -1156,6 +1171,10 @@ static void _update(float dt) {
 
     for (int j = 0; j < changed_n; ++j) {
         uint64_t obj = changed[j];
+
+        if(!obj) {
+            continue;
+        }
 
         const ce_cdb_obj_o0 *obj_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
@@ -1240,10 +1259,12 @@ static void _update(float dt) {
             }
 
             // is compoent?
-            idx = ce_hash_lookup(&world->comp_spawn_map, obj,
-                                 UINT64_MAX);
+            uint64_t comp_obj = _get_comp_from_obj(world, ce_cdb_a0->db(), obj);
+            idx = ce_hash_lookup(&world->comp_spawn_map, comp_obj, UINT64_MAX);
 
             if (UINT64_MAX != idx) {
+                uint64_t comp_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), comp_obj);
+
                 struct spawn_info_t *si = &world->comp_spawn_info[idx];
 
                 uint32_t change_n = 0;
@@ -1251,21 +1272,20 @@ static void _update(float dt) {
                 changes = ce_cdb_a0->changed(obj_r, &change_n);
 
                 for (int ch = 0; ch < change_n; ++ch) {
-                    struct ct_component_i0 *ci = get_interface(type);
+                    struct ct_component_i0 *ci = get_interface(comp_type);
 
                     struct ct_entity_t0 *ents = si->ents;
                     uint32_t ents_n = ce_array_size(ents);
                     for (int e = 0; e < ents_n; ++e) {
                         struct ct_entity_t0 ent = ents[e];
-                        void *data = get_one(world->world, type, ent);
+                        void *data = get_one(world->world, comp_type, ent);
 
                         if (!data) {
                             continue;
                         }
 
                         if (ci->changer) {
-                            ci->changer(world->world, changes, change_n,
-                                        data);
+                            ci->changer(world->world, changes, change_n, data);
                         } else if (ci->spawner) {
                             ci->spawner(world->world, si->obj, data);
                         }
@@ -1305,9 +1325,10 @@ static void _init(struct ce_api_a0 *api) {
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 
-static void _shutdown() {
-}
-
+static ce_cdb_prop_def_t0 entity_prop[] = {
+        {.name = "children", .type = CDB_TYPE_SUBOBJECT, .obj_type = ENTITY_CHILDREN},
+        {.name = "components", .type = CDB_TYPE_SUBOBJECT, .obj_type = ENTITY_COMPONENTS},
+};
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
                          int reload) {
@@ -1318,6 +1339,8 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ce_task_a0);
     _init(api);
+
+    ce_cdb_a0->reg_obj_type(ENTITY_INSTANCE, entity_prop, CE_ARRAY_LEN(entity_prop));
 }
 
 void CE_MODULE_UNLOAD(ecs)(struct ce_api_a0 *api,
@@ -1325,5 +1348,4 @@ void CE_MODULE_UNLOAD(ecs)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

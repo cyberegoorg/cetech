@@ -171,7 +171,6 @@ static void property_editor(uint64_t obj,
 
 }
 
-
 static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
         .draw_ui = property_editor,

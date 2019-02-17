@@ -81,7 +81,7 @@ static void load(const uint64_t *names,
     for (uint32_t i = 0; i < count; ++i) {
         const uint64_t asset_name = names[i];
 
-        struct ct_resource_id_t0 rid = {.uid = asset_name};
+        ct_resource_id_t0 rid = {.uid = asset_name};
 
         if (!ct_resourcedb_a0->obj_exist(rid)) {
             ce_log_a0->error(LOG_WHERE,
@@ -90,8 +90,7 @@ static void load(const uint64_t *names,
             abort();
         };
 
-        uint64_t type = ct_resourcedb_a0->get_resource_type(
-                (ct_resource_id_t0) {.uid=asset_name});
+        uint64_t type = ct_resourcedb_a0->get_resource_type((ct_resource_id_t0) {.uid=asset_name});
 
         if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
                                              _G.allocator)) {

@@ -67,6 +67,18 @@ enum ce_cdb_type_e0 {
 
 typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
 
+typedef struct ce_cdb_prop_def_t0 {
+    const char *name;
+    uint8_t type;
+    ce_cdb_value_u0 value;
+    uint64_t obj_type;
+} ce_cdb_prop_def_t0;
+
+typedef struct type_def_t {
+    ce_cdb_prop_def_t0 *defs;
+    uint32_t num;
+} ce_cdb_type_def_t0;
+
 struct ce_cdb_a0 {
     void (*set_loader)(ct_cdb_obj_loader_t0 loader);
 
@@ -76,6 +88,12 @@ struct ce_cdb_a0 {
 
     void (*destroy_db)(ce_cdb_t0 db);
 
+
+    void (*reg_obj_type)(uint64_t type,
+                         const ce_cdb_prop_def_t0 *prop_def,
+                         uint32_t n);
+
+    const ce_cdb_type_def_t0 *(*obj_type_def)(uint64_t type);
 
     uint64_t (*create_object)(ce_cdb_t0 db,
                               uint64_t type);
