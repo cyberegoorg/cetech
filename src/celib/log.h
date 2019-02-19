@@ -50,7 +50,7 @@ struct ce_log_a0 {
     //! \param format Format
     void (*info)(const char *where,
                  const char *format,
-                 ...) CTECH_ATTR_FORMAT(2, 3);
+                 ...) CE_ATTR_FORMAT(2, 3);
 
     //! Log warnig
     //! \param where Where
@@ -65,7 +65,7 @@ struct ce_log_a0 {
     //! \param format Format
     void (*warning)(const char *where,
                     const char *format,
-                    ...) CTECH_ATTR_FORMAT(2, 3);
+                    ...) CE_ATTR_FORMAT(2, 3);
 
     //! Log error
     //! \param where Where
@@ -80,7 +80,7 @@ struct ce_log_a0 {
     //! \param format Format
     void (*error)(const char *where,
                   const char *format,
-                  ...) CTECH_ATTR_FORMAT(2, 3);
+                  ...) CE_ATTR_FORMAT(2, 3);
 
     //! Log debug
     //! \param where Where
@@ -95,7 +95,7 @@ struct ce_log_a0 {
     //! \param format Format
     void (*debug)(const char *where,
                   const char *format,
-                  ...) CTECH_ATTR_FORMAT(2, 3);
+                  ...) CE_ATTR_FORMAT(2, 3);
 
 };
 

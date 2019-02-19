@@ -53,7 +53,7 @@ extern "C" {
 static inline int ce_buffer_printf(char **b,
                                    ce_alloc_t0 *alloc,
                                    const char *format,
-                                   ...) CTECH_ATTR_FORMAT(3, 4);
+                                   ...) CE_ATTR_FORMAT(3, 4);
 
 // # Function
 

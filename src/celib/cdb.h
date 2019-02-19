@@ -39,7 +39,7 @@ typedef union ce_cdb_value_u0 {
     float f;
     char *str;
     bool b;
-    ce_cdb_blob_t0 blob; //TODO: Move out => uniform size
+    uint32_t blob;
 } ce_cdb_value_u0;
 
 typedef struct ce_cdb_change_ev_t0 {
@@ -193,6 +193,8 @@ struct ce_cdb_a0 {
 
     void (*write_commit)(ce_cdb_obj_o0 *writer);
 
+    bool (*write_try_commit)(ce_cdb_obj_o0 *writer);
+
 
     void (*set_bool)(ce_cdb_obj_o0 *writer,
                      uint64_t property,
@@ -245,6 +247,10 @@ struct ce_cdb_a0 {
     // READ
     const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,
                                  uint64_t object);
+
+//    void (*read_to)(ce_cdb_t0 db,
+//                    uint64_t object,
+//                    void *to);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
 

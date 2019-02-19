@@ -20,6 +20,7 @@ struct ce_os_time_a0 {
     uint64_t (*perf_counter)();
 
     uint64_t (*perf_freq)();
+    uint64_t (*timestamp_ms)();
 };
 
 CE_MODULE(ce_os_time_a0);

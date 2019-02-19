@@ -7,14 +7,13 @@
 #define CECORE_MACROS_H
 
 #include "celib_types.h"
-
 #include "celib/platform.h"
 
 #define CE_ARRAY_LEN(_name) (sizeof(_name) / sizeof(_name[0]))
 
 #define CE_ARR_ARG(a) a, CE_ARRAY_LEN(a)
-#define CTECH_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
-#define CE_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
+#define CE_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
+#define CE_STATIC_ASSERT(_condition, ...) _Static_assert(_condition, "" __VA_ARGS__)
 #define CE_ALIGNOF(_type) __alignof(_type)
 
 ///
@@ -115,7 +114,6 @@
 #	error "Unknown CE_COMPILER_?"
 #endif
 
-#define CE_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
 ///
 #define CE_ALIGN_DECL_16(_decl) CE_ALIGN_DECL(16, _decl)

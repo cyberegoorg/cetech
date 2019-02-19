@@ -293,27 +293,27 @@ struct ct_debugui_a0 {
     void (*render)();
 
     void (*Text)(const char *fmt,
-                 ...) CTECH_ATTR_FORMAT(1, 2);
+                 ...) CE_ATTR_FORMAT(1, 2);
 
     void (*TextV)(const char *fmt,
                   va_list args);
 
     void (*TextColored)(const ce_vec4_t* col,
                         const char *fmt,
-                        ...) CTECH_ATTR_FORMAT(2, 3);
+                        ...) CE_ATTR_FORMAT(2, 3);
 
     void (*TextColoredV)(const ce_vec4_t* col,
                          const char *fmt,
                          va_list args);
 
     void (*TextDisabled)(const char *fmt,
-                         ...) CTECH_ATTR_FORMAT(1, 2);
+                         ...) CE_ATTR_FORMAT(1, 2);
 
     void (*TextDisabledV)(const char *fmt,
                           va_list args);
 
     void (*TextWrapped)(const char *fmt,
-                        ...) CTECH_ATTR_FORMAT(1, 2);
+                        ...) CE_ATTR_FORMAT(1, 2);
 
     void (*TextWrappedV)(const char *fmt,
                          va_list args);
@@ -323,7 +323,7 @@ struct ct_debugui_a0 {
 
     void (*LabelText)(const char *label,
                       const char *fmt,
-                      ...) CTECH_ATTR_FORMAT(2, 3);
+                      ...) CE_ATTR_FORMAT(2, 3);
 
     void (*LabelTextV)(const char *label,
                        const char *fmt,
@@ -332,7 +332,7 @@ struct ct_debugui_a0 {
     void (*Bullet)();
 
     void (*BulletText)(const char *fmt,
-                       ...) CTECH_ATTR_FORMAT(1, 2);
+                       ...) CE_ATTR_FORMAT(1, 2);
 
     void (*BulletTextV)(const char *fmt,
                         va_list args);
@@ -664,11 +664,11 @@ struct ct_debugui_a0 {
 
     bool (*TreeNode2)(const char *str_id,
                       const char *fmt,
-                      ...) CTECH_ATTR_FORMAT(2, 3);
+                      ...) CE_ATTR_FORMAT(2, 3);
 
     bool (*TreeNode3)(const void *ptr_id,
                       const char *fmt,
-                      ...) CTECH_ATTR_FORMAT(2, 3);
+                      ...) CE_ATTR_FORMAT(2, 3);
 
     bool (*TreeNodeV)(const char *str_id,
                       const char *fmt,
@@ -684,12 +684,12 @@ struct ct_debugui_a0 {
     bool (*TreeNodeEx2)(const char *str_id,
                         ImGuiTreeNodeFlags flags,
                         const char *fmt,
-                        ...) CTECH_ATTR_FORMAT(3, 4);
+                        ...) CE_ATTR_FORMAT(3, 4);
 
     bool (*TreeNodeEx3)(const void *ptr_id,
                         ImGuiTreeNodeFlags flags,
                         const char *fmt,
-                        ...) CTECH_ATTR_FORMAT(3, 4);
+                        ...) CE_ATTR_FORMAT(3, 4);
 
     bool (*TreeNodeExV)(const char *str_id,
                         ImGuiTreeNodeFlags flags,
@@ -769,7 +769,7 @@ struct ct_debugui_a0 {
                    const char *float_format);
 
     void (*SetTooltip)(const char *fmt,
-                       ...) CTECH_ATTR_FORMAT(1, 2);
+                       ...) CE_ATTR_FORMAT(1, 2);
 
     void (*SetTooltipV)(const char *fmt,
                         va_list args);
