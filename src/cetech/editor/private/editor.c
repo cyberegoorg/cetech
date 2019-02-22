@@ -33,8 +33,6 @@
 
 static struct _G {
     bool load_layout;
-//    ct_world_t0 world;
-//    ct_viewport_t0 viewport;
 } _G;
 
 static float draw_main_menu() {
@@ -80,7 +78,7 @@ static float draw_main_menu() {
     return menu_height;
 }
 
-static void on_init(uint64_t _event) {
+static void on_init() {
     ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
@@ -89,11 +87,9 @@ static void on_init(uint64_t _event) {
         }
         it = ce_api_a0->next(it);
     }
-
-//    _G.world = ct_ecs_a0->create_world();
 }
 
-static void on_shutdown(uint64_t _event) {
+static void on_shutdown() {
     ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
@@ -104,56 +100,6 @@ static void on_shutdown(uint64_t _event) {
 
         it = ce_api_a0->next(it);
     }
-}
-
-static void on_update(float dt) {
-    ct_action_manager_a0->check();
-
-    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
-    while (it.api) {
-        struct ct_editor_module_i0 *i = (it.api);
-
-        if (i->update) {
-            i->update(dt);
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-//    ct_ecs_a0->simulate(_G.world, dt);
-}
-
-static uint64_t name() {
-    return ce_id_a0->id64("editor");
-}
-
-struct ct_game_i0 editor_game_i0 = {
-        .init = on_init,
-        .shutdown = on_shutdown,
-        .update = on_update,
-        .name = name,
-};
-
-static uint64_t task_name() {
-    return CT_EDITOR_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_DEBUGUI_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_RENDER_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
 }
 
 static void editor_task(float dt) {
@@ -172,11 +118,52 @@ static void editor_task(float dt) {
         ct_debugui_a0->LoadDock("core/default.dock_layout");
         _G.load_layout = false;
     }
+
+    ct_action_manager_a0->check();
+
+    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    while (it.api) {
+        struct ct_editor_module_i0 *i = (it.api);
+
+        if (i->update) {
+            i->update(dt);
+        }
+
+        it = ce_api_a0->next(it);
+    }
+
 }
 
-static struct ct_kernel_task_i0 render_task = {
+
+static uint64_t task_name() {
+    return CT_EDITOR_TASK;
+}
+
+static uint64_t *update_after(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_DEBUGUI_TASK,
+            CT_INPUT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static uint64_t *update_before(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_GAME_TASK,
+            CT_RENDER_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+ struct ct_kernel_task_i0 render_task = {
         .name = task_name,
         .update = editor_task,
+        .init = on_init,
+        .shutdown = on_shutdown,
         .update_after = update_after,
         .update_before = update_before,
 };
@@ -187,7 +174,7 @@ static void _init(struct ce_api_a0 *api) {
             .load_layout = true,
     };
 
-    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
+//    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
 }
 

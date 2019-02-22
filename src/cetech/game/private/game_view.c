@@ -17,6 +17,7 @@
 #include <cetech/game/game_system.h>
 
 #include <cetech/debugui/debugui.h>
+#include <cetech/render_graph/render_graph.h>
 
 #define WINDOW_NAME "Game view"
 

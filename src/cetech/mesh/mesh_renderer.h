@@ -10,8 +10,8 @@ extern "C" {
 typedef struct ct_mesh_component {
     uint64_t material;
     uint64_t scene;
-    uint64_t node;
-    uint64_t mesh;
+    const char* node;
+    const char* mesh;
 } ct_mesh_component;
 
 

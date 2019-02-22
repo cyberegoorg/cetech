@@ -22,25 +22,173 @@
 #include <cetech/editor/property.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
+#include <cetech/ecs/ecs.h>
+#include <celib/containers/hash.h>
+#include <sys/mman.h>
+#include <cetech/renderer/renderer.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/game/game_system.h>
+
 
 #define LOG_WHERE "transform"
 
-static void transform_transform(ct_transform_comp *transform,
-                                float *parent) {
-    ce_vec3_t rot = ce_quat_to_euler(transform->t.rot);
+#define MAX_NODES 1000000
+typedef struct world_state_t {
+    ce_hash_t component_map;
+    ct_world_t0 ent_world;
+    uint64_t *component;
 
-    float obj[16] = {};
+    uint32_t *parent;
+    uint32_t *first_child;
+    uint32_t *next_sibling;
+    uint32_t *prev_sibling;
 
-    ce_mat4_srt(obj,
-                transform->t.scl.x, transform->t.scl.y, transform->t.scl.z,
-                rot.x, rot.y, rot.z,
-                transform->t.pos.x, transform->t.pos.y, transform->t.pos.z);
+    ce_mat4_t *local;
+    ce_mat4_t *world;
+
+    uint32_t nodes_num;
+} world_state_t;
+
+static struct transform_global {
+    ce_hash_t world_map;
+    world_state_t *world_state;
+    ce_alloc_t0 *alloc;
+} _G = {};
 
 
-    if (parent) {
-        ce_mat4_mul(transform->world, obj, parent);
+static void *virtual_alloc(uint64_t size) {
+    return mmap(NULL,
+                size,
+                PROT_READ | PROT_WRITE,
+                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+}
+
+
+static world_state_t *_get_or_create_world_state(ct_world_t0 world) {
+    uint64_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT64_MAX);
+    if (idx == UINT64_MAX) {
+        idx = ce_array_size(_G.world_state);
+        ce_array_push(_G.world_state, ((world_state_t) {
+                .component = virtual_alloc(MAX_NODES * sizeof(uint64_t)),
+                .parent = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
+                .first_child = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
+                .next_sibling = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
+                .prev_sibling = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
+                .world = virtual_alloc(MAX_NODES * sizeof(ce_mat4_t)),
+                .local = virtual_alloc(MAX_NODES * sizeof(ce_mat4_t)),
+                .ent_world = world,
+        }), _G.alloc);
+        ce_hash_add(&_G.world_map, world.h, idx, _G.alloc);
+
+    }
+
+    return &_G.world_state[idx];
+}
+
+
+static void _transform(world_state_t *state,
+                       uint32_t node_idx) {
+    uint64_t component = state->component[node_idx];
+
+    const ce_cdb_obj_o0 *transform = ce_cdb_a0->read(ce_cdb_a0->db(), component);
+
+    ct_transform_comp tc = {};
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), component, &tc, sizeof(tc));
+
+    tc.rot = ce_vec3_mul_s(tc.rot, CE_DEG_TO_RAD);
+
+    float *local = state->local[node_idx].m;
+    ce_mat4_srt(local,
+                tc.scl.x, tc.scl.y, tc.scl.z,
+                tc.rot.x, tc.rot.y, tc.rot.z,
+                tc.pos.x, tc.pos.y, tc.pos.z);
+
+    float *world = state->world[node_idx].m;
+
+    uint32_t parent_idx = state->parent[node_idx];
+
+    if (parent_idx != UINT32_MAX) {
+        ce_mat4_mul(world, local, state->world[parent_idx].m);
     } else {
-        ce_mat4_move(transform->world, obj);
+        ce_mat4_move(world, local);
+    }
+
+    if (!ce_cdb_a0->prop_exist(transform, PROP_WORLD)) {
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
+        ce_cdb_a0->set_blob(w, PROP_WORLD, world, sizeof(ce_mat4_t));
+        ce_cdb_a0->write_commit(w);
+    } else {
+        float *w = ce_cdb_a0->read_blob(transform, PROP_WORLD, NULL, NULL);
+        ce_mat4_move(w, world);
+    }
+
+    uint32_t it = state->first_child[node_idx];
+    while (it != UINT32_MAX) {
+        _transform(state, it);
+        it = state->next_sibling[it];
+    }
+}
+
+static uint32_t _get_node(world_state_t *state,
+                          uint64_t component) {
+    return ce_hash_lookup(&state->component_map, component, UINT32_MAX);
+}
+
+static uint32_t _create_node(world_state_t *state,
+                             uint64_t component) {
+    uint32_t idx = state->nodes_num++;
+
+    state->component[idx] = component;
+    state->parent[idx] = UINT32_MAX;
+    state->first_child[idx] = UINT32_MAX;
+    state->next_sibling[idx] = UINT32_MAX;
+    state->prev_sibling[idx] = UINT32_MAX;
+
+    ce_hash_add(&state->component_map, component, idx, _G.alloc);
+    return idx;
+}
+
+static void _link(world_state_t *state,
+                  uint32_t child,
+                  uint32_t parent) {
+
+    if (state->parent[child] == parent) {
+        return;
+    }
+
+    state->parent[child] = parent;
+
+    uint32_t tmp = state->first_child[parent];
+
+    state->first_child[parent] = child;
+    state->next_sibling[child] = tmp;
+    state->prev_sibling[child] = UINT32_MAX;
+
+    if (tmp != UINT32_MAX) {
+        state->prev_sibling[tmp] = child;
+    }
+}
+
+void _unlink(world_state_t *state,
+             uint32_t child) {
+    uint32_t parent = state->parent[child];
+    uint32_t prev = state->prev_sibling[child];
+    uint32_t next = state->next_sibling[child];
+
+    state->prev_sibling[child] = UINT32_MAX;
+    state->next_sibling[child] = UINT32_MAX;
+
+    // first in root
+    if (prev == UINT32_MAX) {
+        state->first_child[parent] = next;
+        state->prev_sibling[next] = UINT32_MAX;
+        return;
+    }
+
+    if (next != UINT32_MAX) {
+        state->next_sibling[prev] = next;
+        state->prev_sibling[next] = prev;
+        return;
     }
 }
 
@@ -51,6 +199,208 @@ static uint64_t cdb_type() {
 static const char *display_name() {
     return ICON_FA_ARROWS " Transform";
 }
+
+static void *get_interface(uint64_t name_hash) {
+    if (EDITOR_COMPONENT == name_hash) {
+        static struct ct_editor_component_i0 ct_editor_component_i0 = {
+                .display_name = display_name,
+        };
+
+        return &ct_editor_component_i0;
+    }
+
+    return NULL;
+}
+
+
+static struct ct_component_i0 ct_component_api = {
+        .cdb_type = cdb_type,
+        .get_interface = get_interface,
+};
+
+static void transform_system(ct_world_t0 world,
+                             float dt) {
+    world_state_t *state = _get_or_create_world_state(world);
+
+    uint32_t changed_n = 0;
+    const uint64_t *changed = ce_cdb_a0->changed_objects(ce_cdb_a0->db(), &changed_n);
+
+    for (int i = 0; i < changed_n; ++i) {
+        uint64_t obj = changed[i];
+
+        uint64_t parent_obj = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
+
+        if (!parent_obj) {
+            continue;
+        }
+
+        uint32_t idx = ce_hash_lookup(&state->component_map, parent_obj, UINT32_MAX);
+
+        if (idx == UINT32_MAX) {
+            continue;
+        }
+
+        _transform(state, idx);
+    }
+}
+
+
+static uint64_t task_name() {
+    return TRANSFORM_SYSTEM;
+}
+
+static void _update(float dt) {
+    uint32_t wn = ce_array_size(_G.world_state);
+
+    for (int j = 0; j < wn; ++j) {
+        world_state_t *state = &_G.world_state[j];
+
+        ct_ecs_events_t0 events = ct_ecs_a0->events(state->ent_world);
+        for (int i = 0; i < events.n; ++i) {
+            ct_ecs_event_t0 ev = events.events[i];
+
+            if (ev.type == CT_ECS_EVENT_COMPONENT_SPAWN) {
+                uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                              ev.component.component);
+                if (component_type != TRANSFORM_COMPONENT) {
+                    continue;
+                }
+
+                uint32_t idx = _create_node(state, ev.component.component);
+
+                ct_entity_t0 parent = ct_ecs_a0->parent(state->ent_world, ev.component.ent);
+
+                if (parent.h) {
+                    uint64_t parent_transform = ct_ecs_a0->get_one(state->ent_world,
+                                                                   TRANSFORM_COMPONENT, parent);
+
+                    if (parent_transform) {
+                        uint32_t parent_node = _get_node(state, parent_transform);
+                        _link(state, idx, parent_node);
+                    }
+                }
+
+                _transform(state, idx);
+            } else if (ev.type == CT_ECS_EVENT_ENT_LINK) {
+                uint64_t parent_transform = ct_ecs_a0->get_one(state->ent_world,
+                                                               TRANSFORM_COMPONENT, ev.link.parent);
+
+                uint64_t child_transform = ct_ecs_a0->get_one(state->ent_world,
+                                                              TRANSFORM_COMPONENT, ev.link.child);
+
+                if (!parent_transform) {
+                    continue;
+                }
+
+                if (!child_transform) {
+                    continue;
+                }
+
+                uint32_t parent_node = _get_node(state, parent_transform);
+                uint32_t child_node = _get_node(state, child_transform);
+
+                _link(state, child_node, parent_node);
+
+            } else if (ev.type == CT_ECS_EVENT_ENT_UNLINK) {
+                uint64_t child_transform = ct_ecs_a0->get_one(state->ent_world,
+                                                              TRANSFORM_COMPONENT, ev.link.child);
+
+                if (!child_transform) {
+                    continue;
+                }
+
+                uint32_t child_node = _get_node(state, child_transform);
+
+                _unlink(state, child_node);
+            }
+        }
+    }
+}
+
+static uint64_t *update_after(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_ECS_SYNC_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static uint64_t *update_before(uint64_t *n) {
+    static uint64_t a[] = {
+            CT_ECS_EVENT_TASK,
+    };
+
+    *n = CE_ARRAY_LEN(a);
+    return a;
+}
+
+static struct ct_kernel_task_i0 transform_sync_task = {
+        .name = task_name,
+        .update = _update,
+
+        .update_after = update_after,
+        .update_before = update_before,
+};
+
+
+static uint64_t name() {
+    return TRANSFORM_SYSTEM;
+}
+
+
+static struct ct_simulation_i0 transform_simulation_i0 = {
+        .simulation = transform_system,
+        .name = name,
+};
+
+static const ce_cdb_prop_def_t0 transform_component_prop[] = {
+        {.name = "position", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_POSITION},
+        {.name = "rotation", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_ROTATION},
+        {.name = "scale", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_SCALE},
+//        {.name = "world", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_WORLD},
+};
+
+static const ce_cdb_prop_def_t0 position_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT},
+        {.name = "y", .type = CDB_TYPE_FLOAT},
+        {.name = "z", .type = CDB_TYPE_FLOAT},
+};
+
+static const ce_cdb_prop_def_t0 rotation_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT},
+        {.name = "y", .type = CDB_TYPE_FLOAT},
+        {.name = "z", .type = CDB_TYPE_FLOAT},
+};
+
+static const ce_cdb_prop_def_t0 scale_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+        {.name = "y", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+        {.name = "z", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+};
+
+//static const ce_cdb_prop_def_t0 mat4_prop[] = {
+//        {.name = "xx", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+//        {.name = "xy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "xz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "xw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//
+//        {.name = "yx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "yy", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+//        {.name = "yz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "yw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//
+//        {.name = "zx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "zy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "zz", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+//        {.name = "zw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//
+//        {.name = "wx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "wy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "wz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
+//        {.name = "ww", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+//};
+
 
 static uint64_t _position_cdb_type() {
     return PROP_POSITION;
@@ -115,178 +465,12 @@ static struct ct_property_editor_i0 scale_property_editor_api = {
         .draw_ui = _scale_property_editor,
 };
 
-static void *get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = display_name,
-        };
-
-        return &ct_editor_component_i0;
-    }
-
-    return NULL;
-}
-
-static uint64_t size() {
-    return sizeof(ct_transform_comp);
-}
-
-static void transform_spawner(ct_world_t0 world,
-                              uint64_t obj,
-                              void *data) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    ct_transform_comp *t = data;
-
-    ce_vec3_t pos = {};
-    ce_vec3_t rot = {};
-    ce_vec3_t scl = CE_VEC3_UNIT;
-
-    uint64_t pos_obj = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
-    if (pos_obj) {
-        const ce_cdb_obj_o0 *pos_r = ce_cdb_a0->read(ce_cdb_a0->db(), pos_obj);
-
-        pos = (ce_vec3_t) {
-                ce_cdb_a0->read_float(pos_r, PROP_POSITION_X, 0.0f),
-                ce_cdb_a0->read_float(pos_r, PROP_POSITION_Y, 0.0f),
-                ce_cdb_a0->read_float(pos_r, PROP_POSITION_Z, 0.0f),
-        };
-    }
-
-    uint64_t rot_obj = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
-    if (rot_obj) {
-        const ce_cdb_obj_o0 *rot_r = ce_cdb_a0->read(ce_cdb_a0->db(), rot_obj);
-
-        rot = (ce_vec3_t) {
-                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_X, 0.0f),
-                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_Y, 0.0f),
-                ce_cdb_a0->read_float(rot_r, PROP_ROTATION_Z, 0.0f),
-        };
-
-        rot = ce_vec3_mul_s(rot, CE_DEG_TO_RAD);
-    }
-
-    uint64_t scl_obj = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
-    if (scl_obj) {
-        const ce_cdb_obj_o0 *scl_r = ce_cdb_a0->read(ce_cdb_a0->db(), scl_obj);
-
-        scl = (ce_vec3_t) {
-                ce_cdb_a0->read_float(scl_r, PROP_SCALE_X, 1.0f),
-                ce_cdb_a0->read_float(scl_r, PROP_SCALE_Y, 1.0f),
-                ce_cdb_a0->read_float(scl_r, PROP_SCALE_Z, 1.0f),
-        };
-    }
-
-    *t = (ct_transform_comp) {
-            .t.pos = pos,
-            .t.rot = ce_quat_from_euler(rot.x, rot.y, rot.z),
-            .t.scl = scl,
-    };
-}
-
-static struct ct_component_i0 ct_component_api = {
-        .cdb_type = cdb_type,
-        .size = size,
-        .get_interface = get_interface,
-        .spawner = transform_spawner,
-};
-
-
-static void _transform_root_naive(ct_world_t0 world,
-                                  struct ct_entity_t0 ent,
-                                  float *w) {
-    ct_transform_comp *root_t = ct_ecs_a0->get_one(world,
-                                                   TRANSFORM_COMPONENT,
-                                                   ent);
-
-    float *rootw = w;
-    if (root_t) {
-        rootw = root_t->world;
-        transform_transform(root_t, w);
-    }
-
-    ct_entity_t0 ent_it = ct_ecs_a0->first_child(world, ent);
-    while (ent_it.h) {
-        _transform_root_naive(world, ent_it, rootw);
-        ent_it = ct_ecs_a0->next_sibling(world, ent_it);
-    }
-}
-
-static void foreach_transform(ct_world_t0 world,
-                              struct ct_entity_t0 *ents,
-                              ct_entity_storage_t *item,
-                              uint32_t n,
-                              void *data) {
-    ct_entity_t0 *roots = NULL;
-    for (uint32_t i = 0; i < n; ++i) {
-        struct ct_entity_t0 ent = ents[i];
-
-        struct ct_entity_t0 parent_ent = ct_ecs_a0->parent(world, ent);
-
-        if (!parent_ent.h) {
-            ce_array_push(roots, ent, ce_memory_a0->system);
-        }
-
-        if (!ct_ecs_a0->has(world, parent_ent,
-                            (uint64_t[]) {TRANSFORM_COMPONENT}, 1)) {
-            ce_array_push(roots, ent, ce_memory_a0->system);
-        }
-    }
-
-    uint32_t roots_n = ce_array_size(roots);
-    for (int i = 0; i < roots_n; ++i) {
-        struct ct_entity_t0 ent = roots[i];
-
-        _transform_root_naive(world, ent, NULL);
-    }
-
-
-    ce_array_free(roots, ce_memory_a0->system);
-}
-
-static void transform_system(ct_world_t0 world,
-                             float dt) {
-    uint64_t mask = ct_ecs_a0->mask(TRANSFORM_COMPONENT);
-
-    ct_ecs_a0->process(world, mask, foreach_transform, &dt);
-}
-
-
-static uint64_t name() {
-    return TRANSFORM_SYSTEM;
-}
-
-
-static struct ct_simulation_i0 transform_simulation_i0 = {
-        .simulation = transform_system,
-        .name = name,
-};
-
-static const ce_cdb_prop_def_t0 transform_component_prop[] = {
-        {.name = "position", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_POSITION},
-        {.name = "rotation", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_ROTATION},
-        {.name = "scale", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_SCALE},
-};
-
-static const ce_cdb_prop_def_t0 position_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_X},
-        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_Y},
-        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_POSITION_Z},
-};
-
-static const ce_cdb_prop_def_t0 rotation_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_X},
-        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_Y},
-        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_ROTATION_Z},
-};
-
-static const ce_cdb_prop_def_t0 scale_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_X, .value.f = 1.0f},
-        {.name = "y", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_Y, .value.f = 1.0f},
-        {.name = "z", .type = CDB_TYPE_FLOAT, .obj_type = PROP_SCALE_Z, .value.f = 1.0f},
-};
-
 void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                                int reload) {
+    _G = (struct transform_global) {
+            .alloc = ce_memory_a0->system,
+    };
+
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
@@ -320,10 +504,14 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(PROP_SCALE,
                             scale_prop, CE_ARRAY_LEN(scale_prop));
 
+//    ce_cdb_a0->reg_obj_type(PROP_WORLD,
+//                            mat4_prop, CE_ARRAY_LEN(mat4_prop));
+
     ce_cdb_a0->reg_obj_type(TRANSFORM_COMPONENT,
                             transform_component_prop, CE_ARRAY_LEN(transform_component_prop));
 
-
+    ce_api_a0->register_api(KERNEL_TASK_INTERFACE,
+                            &transform_sync_task, sizeof(transform_sync_task));
 }
 
 void CE_MODULE_UNLOAD(transform)(struct ce_api_a0 *api,

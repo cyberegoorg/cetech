@@ -21,6 +21,7 @@
 #include <celib/task.h>
 #include <celib/containers/hash.h>
 #include <celib/os/path.h>
+#include <celib/os/thread.h>
 
 #include "cetech/resource/resourcedb.h"
 
@@ -50,7 +51,12 @@ struct sqls_s {
 static struct _G {
     sqlite3 *db[MAX_WORKERS];
     struct sqls_s sqls[MAX_WORKERS];
+
+    ce_spinlock_t0 type_cache_lock;
+    ce_hash_t type_cache;
+
     char *_logdb_path;
+    ce_alloc_t0 *alloc;
 } _G = {};
 
 const char *CREATE_SQL[] = {
@@ -499,12 +505,18 @@ void _add_dependency(const char *who_filename,
 
 
 uint64_t resource_type(ct_resource_id_t0 resource) {
+    ce_os_thread_a0->spin_lock(&_G.type_cache_lock);
+    uint64_t type = ce_hash_lookup(&_G.type_cache, resource.uid, 0);
+    ce_os_thread_a0->spin_unlock(&_G.type_cache_lock);
+
+    if (type) {
+        return type;
+    }
+
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
     sqlite3_bind_int64(sqls->resource_type, 1, resource.uid);
-
-    uint64_t type = 0;
 
     int ok = _step(_db, sqls->resource_type) == SQLITE_ROW;
     if (ok) {
@@ -513,6 +525,10 @@ uint64_t resource_type(ct_resource_id_t0 resource) {
         type = ce_id_a0->id64(type_str);
         _step(_db, sqls->resource_type);
     }
+
+    ce_os_thread_a0->spin_lock(&_G.type_cache_lock);
+    ce_hash_add(&_G.type_cache, resource.uid, type, _G.alloc);
+    ce_os_thread_a0->spin_unlock(&_G.type_cache_lock);
 
     return type;
 }
@@ -669,7 +685,9 @@ static struct ct_resourcedb_a0 build_db_api = {
 struct ct_resourcedb_a0 *ct_resourcedb_a0 = &build_db_api;
 
 static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {};
+    _G = (struct _G) {
+        .alloc = ce_memory_a0->system,
+    };
 
     api->register_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(build_db_api));
 

@@ -47,7 +47,7 @@ children:
         cdb_uid: 0x110e500100
         cdb_type: mesh_renderer
         cdb_instance: 0x503ef52859bc3e3b
-      rotation:
+      rotation_component:
         cdb_uid: 0x110e500101
-        cdb_type: rotation
+        cdb_type: rotation_component
         cdb_instance: 0xaf5a41d98f0f23bc

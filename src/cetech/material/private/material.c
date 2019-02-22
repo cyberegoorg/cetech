@@ -283,24 +283,24 @@ static struct ct_entity_t0 load(uint64_t resource,
     ct_entity_t0 ent = {};
     ct_ecs_a0->create(world, &ent, 1);
 
-    ct_ecs_a0->add(
-            world, ent,
-            (uint64_t[]) {
-                    TRANSFORM_COMPONENT,
-                    PRIMITIVE_MESH_COMPONENT,
-            }, 2,
-            (void *[]) {
-                    &(ct_transform_comp) {
-                            .t.pos = {0.0f, 0.0f, 13.0f},
-                            .t.scl = CE_TRANFORM_INIT.scl,
-                            .t.rot  = CE_TRANFORM_INIT.rot
-                    },
+    uint64_t transform = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
+    const ce_cdb_obj_o0 *transform_r = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
 
-                    &(ct_primitive_mesh) {
-                            .material = resource
-                    },
-            }
-    );
+    uint64_t pos = ce_cdb_a0->read_subobject(transform_r, PROP_POSITION, 0);
+    ce_cdb_obj_o0 *pos_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), pos);
+    ce_cdb_a0->set_float(pos_w, PROP_POSITION_Z, 13.0f);
+    ce_cdb_a0->write_commit(pos_w);
+
+    uint64_t pmesh = ce_cdb_a0->create_object(ce_cdb_a0->db(), PRIMITIVE_MESH_COMPONENT);
+    ce_cdb_obj_o0 *pmesh_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), pmesh);
+    ce_cdb_a0->set_ref(pmesh_w, PRIMITIVE_MESH_MATERIAL_PROP, resource);
+    ce_cdb_a0->write_commit(pmesh_w);
+
+    ct_ecs_a0->add(world, ent,
+                   (uint64_t[]) {
+                           transform,
+                           pmesh
+                   }, 2);
 
     return ent;
 }
@@ -416,7 +416,6 @@ static struct {
 };
 
 uint64_t render_state_to_enum(uint64_t name) {
-
     for (uint32_t i = 1; i < CE_ARRAY_LEN(_tbl); ++i) {
         if (_tbl[i].name != name) {
             continue;
@@ -431,10 +430,7 @@ uint64_t render_state_to_enum(uint64_t name) {
 
 uint64_t _get_render_state(uint64_t layer) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
-    uint64_t render_state = ce_cdb_a0->read_subobject(reader,
-                                                      ce_id_a0->id64(
-                                                              "render_state"),
-                                                      0);
+    uint64_t render_state = ce_cdb_a0->read_subobject(reader, ce_id_a0->id64("render_state"), 0);
 
     if (render_state) {
         uint64_t curent_render_state = 0;
@@ -498,9 +494,7 @@ static void submit(uint64_t material,
                 ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
 
         bgfx_uniform_handle_t handle = {
-                .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader,
-                                                         MATERIAL_VAR_HANDLER_PROP,
-                                                         0)
+                .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_HANDLER_PROP, 0)
         };
 
         switch (type) {
@@ -508,16 +502,13 @@ static void submit(uint64_t material,
                 break;
 
             case MAT_VAR_INT: {
-                uint64_t v = ce_cdb_a0->read_uint64(var_reader,
-                                                    MATERIAL_VAR_VALUE_PROP, 0);
+                uint64_t v = ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_VALUE_PROP, 0);
                 ct_gfx_a0->bgfx_set_uniform(handle, &v, 1);
             }
                 break;
 
             case MAT_VAR_TEXTURE: {
-                uint64_t tn = ce_cdb_a0->read_uint64(var_reader,
-                                                     MATERIAL_VAR_VALUE_PROP,
-                                                     0);
+                uint64_t tn = ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_VALUE_PROP, 0);
 
                 ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
                                             ct_texture_a0->get(tn), 0);
@@ -525,25 +516,19 @@ static void submit(uint64_t material,
                 break;
 
             case MAT_VAR_TEXTURE_HANDLER: {
-                uint64_t t = ce_cdb_a0->read_uint64(var_reader,
-                                                    MATERIAL_VAR_VALUE_PROP, 0);
+                uint64_t t = ce_cdb_a0->read_uint64(var_reader,MATERIAL_VAR_VALUE_PROP, 0);
                 ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
-                                            (bgfx_texture_handle_t) {.idx=(uint16_t) t},
-                                            0);
+                                            (bgfx_texture_handle_t) {.idx=(uint16_t) t}, 0);
             }
                 break;
 
             case MAT_VAR_COLOR4:
             case MAT_VAR_VEC4: {
                 float v[4] = {
-                        ce_cdb_a0->read_float(var_reader,
-                                              MATERIAL_VAR_VALUE_PROP_X, 1.0f),
-                        ce_cdb_a0->read_float(var_reader,
-                                              MATERIAL_VAR_VALUE_PROP_Y, 1.0f),
-                        ce_cdb_a0->read_float(var_reader,
-                                              MATERIAL_VAR_VALUE_PROP_Z, 1.0f),
-                        ce_cdb_a0->read_float(var_reader,
-                                              MATERIAL_VAR_VALUE_PROP_W, 1.0f)
+                        ce_cdb_a0->read_float(var_reader, MATERIAL_VAR_VALUE_PROP_X, 1.0f),
+                        ce_cdb_a0->read_float(var_reader, MATERIAL_VAR_VALUE_PROP_Y, 1.0f),
+                        ce_cdb_a0->read_float(var_reader, MATERIAL_VAR_VALUE_PROP_Z, 1.0f),
+                        ce_cdb_a0->read_float(var_reader, MATERIAL_VAR_VALUE_PROP_W, 1.0f)
                 };
 
                 ct_gfx_a0->bgfx_set_uniform(handle, &v, 1);
@@ -553,9 +538,7 @@ static void submit(uint64_t material,
         }
     }
 
-    uint64_t shader = ce_cdb_a0->read_ref(layer_reader,
-                                          MATERIAL_SHADER_PROP,
-                                          0);
+    uint64_t shader = ce_cdb_a0->read_ref(layer_reader, MATERIAL_SHADER_PROP, 0);
 
     uint64_t shader_obj = shader;
 

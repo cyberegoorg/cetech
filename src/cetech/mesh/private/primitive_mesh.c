@@ -108,36 +108,29 @@ static bgfx_index_buffer_handle_t cube_ibh;
 
 void foreach_primitive_mesh(ct_world_t0 world,
                             struct ct_entity_t0 *entities,
-                            ct_entity_storage_t *item,
+                            ct_entity_storage_o0 *item,
                             uint32_t n,
                             void *_data) {
     mesh_render_data *data = _data;
 
-    ct_transform_comp *transforms = ct_ecs_a0->get_all(
-            TRANSFORM_COMPONENT, item);
-
-    ct_primitive_mesh *primitives = ct_ecs_a0->get_all(
-            PRIMITIVE_MESH_COMPONENT,
-            item);
+    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    uint64_t *mesh_renderers = ct_ecs_a0->get_all(PRIMITIVE_MESH_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        struct ct_transform_comp *tr = &transforms[i];
-        struct ct_primitive_mesh *m = &primitives[i];
+        const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
+        const ce_cdb_obj_o0 *m = ce_cdb_a0->read(ce_cdb_a0->db(), mesh_renderers[i]);
 
-        if (!m->material) {
+        if (!ce_cdb_a0->read_ref(m, PROP_MATERIAL, 0)) {
             continue;
         }
 
-        float final_w[16];
-        ce_mat4_identity(final_w);
-        ce_mat4_move(final_w, tr->world);
+        float *final_w = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, CE_MAT4_IDENTITY);
 
-        ct_gfx_a0->bgfx_set_transform(&final_w, 1);
-        ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0,
-                                          CE_ARRAY_LEN(_cube_vertices));
+        ct_gfx_a0->bgfx_set_transform(final_w, 1);
+        ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0,CE_ARRAY_LEN(_cube_vertices));
         ct_gfx_a0->bgfx_set_index_buffer(cube_ibh, 0, CE_ARRAY_LEN(cube_indices));
 
-        uint64_t material_obj = m->material;
+        uint64_t material_obj = ce_cdb_a0->read_ref(m, PRIMITIVE_MESH_MATERIAL_PROP, 0);
 
         ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
     }
@@ -193,28 +186,9 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static uint64_t size() {
-    return sizeof(ct_primitive_mesh);
-}
-
-static void mesh_spawner(ct_world_t0 world,
-                         uint64_t obj,
-                         void *data) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    ct_primitive_mesh *m = data;
-
-    *m = (ct_primitive_mesh) {
-            .material = ce_cdb_a0->read_ref(r, PROP_MATERIAL, 0),
-    };
-
-}
-
-
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
-        .size = size,
         .get_interface = get_interface,
-        .spawner = mesh_spawner,
 };
 
 static void _init(struct ce_api_a0 *api) {

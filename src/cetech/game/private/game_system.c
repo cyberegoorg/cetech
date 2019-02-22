@@ -12,6 +12,8 @@
 #include <celib/containers/hash.h>
 #include <celib/memory/memory.h>
 #include <celib/cdb.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/ecs/ecs.h>
 
 #include "../game_system.h"
 
@@ -82,7 +84,7 @@ static struct ct_viewport_t0 game_render_graph_builder(uint64_t name) {
         return (ct_viewport_t0) {0};
     }
 
-    return game_i->render_graph_builder();
+    return game_i->viewport();
 }
 
 static void game_pause(uint64_t name) {
@@ -122,6 +124,7 @@ static uint64_t task_name() {
 static uint64_t *update_after(uint64_t *n) {
     static uint64_t a[] = {
             CT_INPUT_TASK,
+            CT_DEBUGUI_TASK,
     };
 
     *n = CE_ARRAY_LEN(a);

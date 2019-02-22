@@ -29,22 +29,31 @@ static struct CameraGlobal {
 } CameraGlobal;
 
 static void get_project_view(ct_world_t0 world,
-                             struct ct_entity_t0 camera,
+                             struct ct_entity_t0 _camera,
                              float *proj,
                              float *view,
                              int width,
                              int height) {
 
-    ct_transform_comp *transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT, camera);
+    uint64_t transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT, _camera);
+    uint64_t camera = ct_ecs_a0->get_one(world, CAMERA_COMPONENT, _camera);
 
-    ct_camera_component *camera_data = ct_ecs_a0->get_one(world, CAMERA_COMPONENT, camera);
-    if (!transform) return;
-    if (!camera_data) return;
+    if (!transform) {
+        return;
+    }
 
-    float fov = camera_data->fov;
-    float near = camera_data->near;
-    float far = camera_data->far;
-    float *wworld = transform->world;
+    if (!camera) {
+        return;
+    }
+
+    ct_camera_component camera_c = {};
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), camera, &camera_c, sizeof(camera_c));
+
+    float identity[16];
+    ce_mat4_identity(identity);
+
+    const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
+    float *wworld = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, identity);
 
     float ratio = (float) (width) / (float) (height);
 
@@ -52,16 +61,16 @@ static void get_project_view(ct_world_t0 world,
 //                    (float[]){0.0f, 0.0f, 1.0f},
 //                    (float[]){0.0f, 1.0f, 0.0f});
 
-    ce_mat4_proj_fovy(proj, fov,
+    ce_mat4_identity(proj);
+    ce_mat4_proj_fovy(proj,
+                      camera_c.fov,
                       ratio,
-                      near,
-                      far,
+                      camera_c.near,
+                      camera_c.far,
                       ct_gfx_a0->bgfx_get_caps()->homogeneousDepth);
 
     float w[16] = {};
-    if (wworld) {
-        ce_mat4_move(w, wworld);
-    }
+    ce_mat4_move(w, wworld);
 
     w[12] *= -1.0f;
     w[13] *= -1.0f;
@@ -97,31 +106,9 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-
-static uint64_t size() {
-    return sizeof(ct_camera_component);
-}
-
-static void camera_spawner(ct_world_t0 world,
-                           uint64_t obj,
-                           void *data) {
-
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    ct_camera_component *c = data;
-
-    *c = (ct_camera_component) {
-            .far = ce_cdb_a0->read_float(r, PROP_FAR, 100.0f),
-            .near = ce_cdb_a0->read_float(r, PROP_NEAR, 0.0f),
-            .fov = ce_cdb_a0->read_float(r, PROP_FOV, 60.0f),
-    };
-}
-
-
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
-        .size = size,
         .get_interface = get_interface,
-        .spawner = camera_spawner,
 };
 
 static struct ct_property_editor_i0 property_editor_api = {

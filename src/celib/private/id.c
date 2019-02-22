@@ -8,7 +8,7 @@
 #include <celib/macros.h>
 #include <celib/containers/hash.h>
 #include <celib/memory/memory.h>
-#include <celib/murmur_hash.h>
+#include <celib/murmur.h>
 
 #include <celib/os/thread.h>
 #include <celib/macros.h>

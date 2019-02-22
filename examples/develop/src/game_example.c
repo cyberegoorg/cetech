@@ -42,7 +42,6 @@ static struct G {
 void init() {
     _G.world = ct_ecs_a0->create_world();
 
-
     _G.camera_ent = ct_ecs_a0->spawn(_G.world, _CAMERA_ASSET);
     _G.level = ct_ecs_a0->spawn(_G.world, _LEVEL_ASSET);
 
@@ -79,7 +78,7 @@ struct ct_game_i0 game_i0 = {
         .shutdown = shutdown,
         .update = update,
         .name = game_name,
-        .render_graph_builder = render_graph_builder
+        .viewport = render_graph_builder
 };
 
 //==============================================================================

@@ -1,5 +1,5 @@
-#ifndef CE_MURMUR_HASH_H
-#define CE_MURMUR_HASH_H
+#ifndef CE_MURMUR_H
+#define CE_MURMUR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,4 +117,4 @@ static inline uint32_t ct_hash_murmur2_32(const void *key,
 };
 #endif
 
-#endif //CE_MURMUR_HASH_H
+#endif //CE_MURMUR_H

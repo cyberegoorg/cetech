@@ -63,7 +63,7 @@ static void _resource_api_add(uint64_t name,
                 _G.allocator);
 }
 
-static void load(const uint64_t *names,
+static bool load(const uint64_t *names,
                  size_t count,
                  int force);
 
@@ -72,7 +72,7 @@ static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
 }
 
 
-static void load(const uint64_t *names,
+static bool load(const uint64_t *names,
                  size_t count,
                  int force) {
     uint32_t start_ticks = ce_os_time_a0->ticks();
@@ -87,7 +87,7 @@ static void load(const uint64_t *names,
             ce_log_a0->error(LOG_WHERE,
                              "Obj 0x%llx does not exist in DB", rid.uid);
 
-            abort();
+            return false;
         };
 
         uint64_t type = ct_resourcedb_a0->get_resource_type((ct_resource_id_t0) {.uid=asset_name});
@@ -114,6 +114,8 @@ static void load(const uint64_t *names,
     uint32_t dt = now_ticks - start_ticks;
     ce_log_a0->debug(LOG_WHERE,
                      "load time %f for %zu resource", dt * 0.001, count);
+
+    return true;
 }
 
 void unload(const uint64_t *names,

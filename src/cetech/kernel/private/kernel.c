@@ -269,7 +269,7 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
-        if (!i->init) {
+        if(!i->init) {
             it = ce_api_a0->next(it);
             continue;
         }

@@ -15,6 +15,9 @@ extern "C" {
 #define CT_ECS_SYNC_TASK \
     CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
 
+#define CT_ECS_EVENT_TASK \
+    CE_ID64_0("ecs_events_task", 0x439be51e6ab2c9bULL)
+
 #define EDITOR_COMPONENT \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
 
@@ -42,10 +45,21 @@ extern "C" {
 #define COMPONENT_INTERFACE \
     CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
-typedef struct ct_resource_id_t0 ct_resource_id_t0;
+#define CT_ECS_EVENT_COMPONENT_SPAWN \
+    CE_ID64_0("component_spawn", 0xa3f574429952b180ULL)
 
+#define CT_ECS_EVENT_COMPONENT_DESTROY \
+    CE_ID64_0("component_destroy", 0xca6890a5459ecb2cULL)
+
+#define CT_ECS_EVENT_ENT_LINK \
+    CE_ID64_0("entity_link", 0xffcddf97336bbc9ULL)
+
+#define CT_ECS_EVENT_ENT_UNLINK \
+    CE_ID64_0("entity_unlink", 0x9caaf06ae5bc97e2ULL)
+
+typedef struct ct_resource_id_t0 ct_resource_id_t0;
 typedef struct ce_cdb_change_ev_t0 ce_cdb_change_ev_t0;
-typedef struct ct_entity_storage_t ct_entity_storage_t;
+typedef struct ct_entity_storage_o0 ct_entity_storage_o0;
 
 typedef struct ct_world_t0 {
     uint64_t h;
@@ -57,7 +71,7 @@ typedef struct ct_entity_t0 {
 
 typedef void (*ct_process_fce_t)(ct_world_t0 world,
                                  ct_entity_t0 *ent,
-                                 ct_entity_storage_t *item,
+                                 ct_entity_storage_o0 *item,
                                  uint32_t n,
                                  void *data);
 
@@ -67,19 +81,8 @@ typedef void (*ct_simulate_fce_t)(ct_world_t0 world,
 typedef struct ct_component_i0 {
     uint64_t (*cdb_type)();
 
-    uint64_t (*size)();
-
     void *(*get_interface)(uint64_t name_hash);
-
-    void (*spawner)(ct_world_t0 world,
-                    uint64_t obj,
-                    void *data);
-
-    void (*changer)(ct_world_t0 world,
-                    const ce_cdb_change_ev_t0 *changes,
-                    uint32_t changes_n,
-                    void *data);
-}ct_component_i0;
+} ct_component_i0;
 
 typedef struct ct_editor_component_i0 {
     const char *(*display_name)();
@@ -107,9 +110,31 @@ struct ct_simulation_i0 {
 };
 
 
+typedef struct ct_ecs_event_t0 {
+    uint64_t type;
+    union {
+        struct {
+            ct_entity_t0 ent;
+            uint64_t component;
+        } component;
+
+        struct {
+            ct_entity_t0 child;
+            ct_entity_t0 parent;
+        } link;
+    };
+} ct_ecs_event_t0;
+
+typedef struct ct_ecs_events_t0 {
+    uint64_t n;
+    const ct_ecs_event_t0 *events;
+} ct_ecs_events_t0;
+
 struct ct_ecs_a0 {
     //WORLD
     ct_world_t0 (*create_world)();
+
+    ct_ecs_events_t0 (*events)(ct_world_t0 world);
 
     //ENT
     void (*destroy_world)(ct_world_t0 world);
@@ -126,7 +151,7 @@ struct ct_ecs_a0 {
                   ct_entity_t0 entity);
 
     ct_entity_t0 (*spawn)(ct_world_t0 world,
-                                 uint64_t name);
+                          uint64_t name);
 
 
     bool (*has)(ct_world_t0 world,
@@ -139,13 +164,13 @@ struct ct_ecs_a0 {
                  ct_entity_t0 child);
 
     ct_entity_t0 (*parent)(ct_world_t0 world,
-                                  ct_entity_t0 entity);
+                           ct_entity_t0 entity);
 
     ct_entity_t0 (*first_child)(ct_world_t0 world,
-                                       ct_entity_t0 entity);
+                                ct_entity_t0 entity);
 
     ct_entity_t0 (*next_sibling)(ct_world_t0 world,
-                                        ct_entity_t0 entity);
+                                 ct_entity_t0 entity);
 
     //SIMU
     void (*simulate)(ct_world_t0 world,
@@ -161,18 +186,17 @@ struct ct_ecs_a0 {
 
     uint64_t (*mask)(uint64_t component_name);
 
-    void *(*get_all)(uint64_t component_name,
-                     ct_entity_storage_t *item);
+    uint64_t *(*get_all)(uint64_t component_name,
+                         ct_entity_storage_o0 *item);
 
-    void *(*get_one)(ct_world_t0 world,
-                     uint64_t component_name,
-                     ct_entity_t0 entity);
+    uint64_t (*get_one)(ct_world_t0 world,
+                        uint64_t component_name,
+                        ct_entity_t0 entity);
 
     void (*add)(ct_world_t0 world,
                 ct_entity_t0 ent,
-                const uint64_t *component_name,
-                uint32_t name_count,
-                void **data);
+                const uint64_t *components,
+                uint32_t components_count);
 
     void (*remove)(ct_world_t0 world,
                    ct_entity_t0 ent,

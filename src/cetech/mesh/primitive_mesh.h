@@ -15,6 +15,9 @@ typedef struct ct_primitive_mesh {
 #define PRIMITIVE_MESH_COMPONENT \
     CE_ID64_0("primitive_mesh", 0x41994de0b780f885ULL)
 
+#define PRIMITIVE_MESH_MATERIAL_PROP \
+    CE_ID64_0("material", 0xeac0b497876adedfULL)
+
 #ifdef __cplusplus
 };
 #endif

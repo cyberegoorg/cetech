@@ -45,43 +45,32 @@ static struct _G {
 typedef struct mesh_render_data {
     uint8_t viewid;
     uint64_t layer_name;
-}mesh_render_data;
+} mesh_render_data;
 
 void foreach_mesh_renderer(ct_world_t0 world,
                            struct ct_entity_t0 *entities,
-                           ct_entity_storage_t *item,
+                           ct_entity_storage_o0 *item,
                            uint32_t n,
                            void *_data) {
     mesh_render_data *data = _data;
 
-    ct_transform_comp *transforms = ct_ecs_a0->get_all(
-            TRANSFORM_COMPONENT, item);
-
-    ct_mesh_component *mesh_renderers = ct_ecs_a0->get_all(
-            MESH_RENDERER_COMPONENT,
-            item);
+    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    uint64_t *mesh_renderers = ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        struct ct_transform_comp *tr = &transforms[i];
-        struct ct_mesh_component *m = &mesh_renderers[i];
+        const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
 
-        if (!m->scene) {
+        ct_mesh_component m_c = {};
+        ce_cdb_a0->read_to(ce_cdb_a0->db(), mesh_renderers[i], &m_c, sizeof(m_c));
+
+        if (!m_c.scene || !m_c.material) {
             continue;
         }
 
-        if (!m->material) {
-            continue;
-        }
+        float *final_w = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, CE_MAT4_IDENTITY);
 
-        float final_w[16];
-        ce_mat4_identity(final_w);
-        ce_mat4_move(final_w, tr->world);
-
-        uint64_t scene_obj = m->scene;
-        uint64_t mesh_id = m->mesh;
-
-        const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                            scene_obj);
+        uint64_t mesh_id = ce_id_a0->id64(m_c.mesh);
+        const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(), m_c.scene);
 
         uint64_t mesh = mesh_id;
         uint64_t geom_obj = ce_cdb_a0->read_ref(scene_reader, mesh, 0);
@@ -90,26 +79,21 @@ void foreach_mesh_renderer(ct_world_t0 world,
             continue;
         }
 
-        const ce_cdb_obj_o0 *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                           geom_obj);
+        const ce_cdb_obj_o0 *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(), geom_obj);
 
         uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
-        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE,
-                                                  0);
+        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE, 0);
         uint64_t vb = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_PROP, 0);
-        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE,
-                                                  0);
+        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE, 0);
 
         bgfx_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
         bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
 
-        ct_gfx_a0->bgfx_set_transform(&final_w, 1);
+        ct_gfx_a0->bgfx_set_transform(final_w, 1);
         ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, vb_size);
         ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, ib_size);
 
-        uint64_t material_obj = m->material;
-
-        ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
+        ct_material_a0->submit(m_c.material, data->layer_name, data->viewid);
     }
 }
 
@@ -211,31 +195,16 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static uint64_t size() {
-    return sizeof(ct_mesh_component);
-}
-
-static void mesh_spawner(ct_world_t0 world,
-                         uint64_t obj,
-                         void *data) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    ct_mesh_component *m = data;
-
-    *m = (ct_mesh_component) {
-            .mesh = ce_id_a0->id64(ce_cdb_a0->read_str(r, PROP_MESH, 0)),
-            .node = ce_id_a0->id64(ce_cdb_a0->read_str(r, PROP_NODE, 0)),
-            .scene = ce_cdb_a0->read_ref(r, PROP_SCENE_ID, 0),
-            .material = ce_cdb_a0->read_ref(r, PROP_MATERIAL, 0),
-    };
-
-}
-
-
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
-        .size = size,
         .get_interface = get_interface,
-        .spawner = mesh_spawner,
+};
+
+static ce_cdb_prop_def_t0 mesh_renderer_component_prop[] = {
+        {.name = "material", .type = CDB_TYPE_REF},
+        {.name = "scene", .type = CDB_TYPE_REF},
+        {.name = "node", .type = CDB_TYPE_STR},
+        {.name = "mesh", .type = CDB_TYPE_STR},
 };
 
 static void _init(struct ce_api_a0 *api) {
@@ -247,6 +216,10 @@ static void _init(struct ce_api_a0 *api) {
 
     api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+
+    ce_cdb_a0->reg_obj_type(MESH_RENDERER_COMPONENT,
+                            mesh_renderer_component_prop,
+                            CE_ARRAY_LEN(mesh_renderer_component_prop));
 }
 
 static void _shutdown() {

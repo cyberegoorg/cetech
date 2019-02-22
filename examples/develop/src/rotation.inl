@@ -11,7 +11,7 @@ struct rotation_component {
 };
 
 #define ROTATION_COMPONENT \
-    CE_ID64_0("rotation", 0x2060566242789baaULL)
+    CE_ID64_0("rotation_component", 0x775af3c84c1fa8efULL)
 
 #define ROTATION_SYSTEM \
     CE_ID64_0("rotation", 0x2060566242789baaULL)
@@ -39,34 +39,14 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static uint64_t size() {
-    return sizeof(struct rotation_component);
+
+float _rnd_speed(uint32_t max) {
+    return (((float) rand()) / RAND_MAX) * max;
 }
-
-static float _rnd_speed(uint32_t max) {
-    return (((float)rand())/RAND_MAX) * max;
-}
-
-static void spawner(struct ct_world_t0 world,
-                    uint64_t obj,
-                    void *data) {
-
-//    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    struct rotation_component *c = data;
-
-
-
-    *c = (struct rotation_component) {
-            .speed = _rnd_speed(100.0f),
-    };
-}
-
 
 static struct ct_component_i0 rotation_component_i = {
-        .size = size,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
-        .spawner = spawner,
 };
 
 
@@ -75,23 +55,31 @@ static struct ct_component_i0 rotation_component_i = {
 
 static void foreach_rotation(struct ct_world_t0 world,
                              struct ct_entity_t0 *ent,
-                             ct_entity_storage_t *item,
+                             ct_entity_storage_o0 *item,
                              uint32_t n,
                              void *data) {
     float dt = *(float *) (data);
 
-    struct rotation_component *rotations = ct_ecs_a0->get_all(
-            ROTATION_COMPONENT, item);
-
-    struct ct_transform_comp *transforms = ct_ecs_a0->get_all(
-            TRANSFORM_COMPONENT, item);
+    uint64_t *rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
+    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
-        struct rotation_component *rotation = &rotations[i];
-        struct ct_transform_comp *transform = &transforms[i];
+        const ce_cdb_obj_o0 *transform = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
+        const ce_cdb_obj_o0 *rotation = ce_cdb_a0->read(ce_cdb_a0->db(), rotations[i]);
 
-        ce_vec4_t qd = ce_quat_rotate_axis(CE_VEC3_UNIT_Y, rotation->speed * 0.01f * dt);
-        transform->t.rot = ce_quat_mul(transform->t.rot, qd);
+
+        uint64_t rot_o = ce_cdb_a0->read_subobject(transform, PROP_ROTATION, 0);
+        ce_vec3_t rot = {};
+        ce_cdb_a0->read_to(ce_cdb_a0->db(), rot_o, &rot, sizeof(rot));
+
+
+        float speed = ce_cdb_a0->read_float(rotation, PROP_SPEED, 100.0f);
+        rot.y += speed * 0.1f * dt;
+
+
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), rot_o);
+        ce_cdb_a0->set_float(w, PROP_ROTATION_Y, rot.y);
+        ce_cdb_a0->write_commit(w);
     }
 }
 

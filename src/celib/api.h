@@ -9,7 +9,7 @@ extern "C" {
 
 #include "celib_types.h"
 
-#include "murmur_hash.h"
+#include "murmur.h"
 
 #define CE_API_API \
     CE_ID64_0("ce_api_a0", 0x95b23cc231103112ULL)

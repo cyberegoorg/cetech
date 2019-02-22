@@ -50,7 +50,7 @@ struct ct_resourcedb_a0 {
                                   size_t max_len);
 
     void (*get_resource_by_fullname)(const char *fullname,
-            ct_resource_id_t0 *resource);
+                                     ct_resource_id_t0 *resource);
 
     int (*get_resource_dirs)(char ***filename,
                              ce_alloc_t0 *alloc);

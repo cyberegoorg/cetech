@@ -45,9 +45,14 @@ extern "C" {
 #define PROP_SCALE_Z \
     CE_ID64_0("z", 0x88a824e868c7c5efULL)
 
+#define PROP_WORLD \
+    CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
+
 typedef struct ct_transform_comp {
-    ce_transform_t t;
-    float world[16];
+    ce_vec3_t pos;
+    ce_vec3_t rot;
+    ce_vec3_t scl;
+//    ce_mat4_t world;
 }ct_transform_comp;
 
 #ifdef __cplusplus

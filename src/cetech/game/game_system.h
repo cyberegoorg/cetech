@@ -7,9 +7,6 @@ extern "C" {
 
 #include <stdint.h>
 
-
-#include <cetech/render_graph/render_graph.h>
-
 #define CT_GAME_SYSTEM_API \
     CE_ID64_0("ct_game_system_a0", 0x1a5b2ed4808612b9ULL)
 
@@ -31,7 +28,7 @@ typedef struct ct_game_i0 {
 
     void (*update)(float dt);
 
-    ct_viewport_t0 (*render_graph_builder)();
+    ct_viewport_t0 (*viewport)();
 }ct_game_i0;
 
 struct ct_game_system_a0 {

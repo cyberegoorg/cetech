@@ -248,9 +248,16 @@ struct ce_cdb_a0 {
     const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,
                                  uint64_t object);
 
-//    void (*read_to)(ce_cdb_t0 db,
-//                    uint64_t object,
-//                    void *to);
+    uint64_t (*read_to)(ce_cdb_t0 db,
+                        uint64_t object,
+                        void *to,
+                        size_t max_size);
+
+    uint64_t (*read_prop_to)(ce_cdb_t0 db,
+                             uint64_t object,
+                             uint64_t prop,
+                             void *to,
+                             size_t max_size);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
 

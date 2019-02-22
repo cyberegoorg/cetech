@@ -38,15 +38,21 @@ typedef struct ce_vec4_t {
     float x, y, z, w;
 } ce_vec4_t;
 
-typedef struct ce_time_t {
-    uint64_t o;
-} ce_time_t;
+typedef struct ce_mat4_t {
+    float m[16];
+} ce_mat4_t;
 
 typedef struct ce_transform_t {
     ce_vec3_t pos;
     ce_vec4_t rot;
     ce_vec3_t scl;
 } ce_transform_t;
+
+
+typedef struct ce_time_t {
+    uint64_t o;
+} ce_time_t;
+
 
 static const ce_vec2_t CE_VEC2_ZERO = {0.0f, 0.0f};
 static const ce_vec2_t CE_VEC2_ONE = {1.0f, 1.0f};
@@ -61,6 +67,11 @@ static const ce_vec3_t CE_VEC3_UNIT_Z = {0.0f, 0.0f, 1.0f};
 
 static const ce_vec4_t CE_VEC4_ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
 static const ce_vec4_t CE_VEC4_ONE = {1.0f, 1.0f, 1.0f, 1.0f};
+
+#define  CE_MAT4_IDENTITY (float[16]){1.0f, 0.0f, 0.0f, 0.0f,\
+                                      0.0f, 1.0f, 0.0f, 0.0f,\
+                                      0.0f, 0.0f, 1.0f, 0.0f,\
+                                      0.0f, 0.0f, 0.0f, 1.0f}
 
 static const ce_transform_t CE_TRANFORM_INIT = {
         .pos = {0.0f, 0.0f, 0.0f},
