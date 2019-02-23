@@ -145,8 +145,7 @@ void unload(const uint64_t *names,
 }
 
 static bool cdb_loader(uint64_t uid) {
-    load(&uid, 1, 0);
-    return true;
+    return load(&uid, 1, 0);
 }
 
 static bool dump_recursive(const char *filename,

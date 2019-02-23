@@ -70,7 +70,9 @@ static void draw_component(uint64_t obj,
 
     ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
 
-    ct_editor_ui_a0->ui_prop_header(editor->display_name());
+    char buffer[128] = {};
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s %llx", editor->display_name(), obj);
+    ct_editor_ui_a0->ui_prop_header(buffer);
 
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
     uint64_t comp_type = type;
@@ -121,16 +123,12 @@ static void draw_ui(uint64_t obj,
     _entity_ui(obj);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
-    uint64_t components_obj;
-    components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
-
-    const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                   components_obj);
+    const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(), components_obj);
 
     uint64_t n = ce_cdb_a0->prop_count(creader);
     const uint64_t *components_name = ce_cdb_a0->prop_keys(creader);
-
 
     for (uint64_t j = 0; j < n; ++j) {
         uint64_t name = components_name[j];
@@ -205,8 +203,7 @@ static void _add_comp_modal(const char *modal_id,
 
                 if (modal_buffer[0]) {
                     char filter[256] = {};
-                    snprintf(filter, CE_ARRAY_LEN(filter),
-                             "*%s*", modal_buffer);
+                    snprintf(filter, CE_ARRAY_LEN(filter), "*%s*", modal_buffer);
 
                     if (0 != fnmatch(filter, label, FNM_CASEFOLD)) {
                         goto next;

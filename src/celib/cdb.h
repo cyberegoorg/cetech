@@ -19,6 +19,9 @@ extern "C" {
 #define CDB_INSTANCE_PROP \
     CE_ID64_0("cdb_instance", 0xb0f74f1d9d7c645dULL)
 
+#define CE_CDB_MOVE \
+    CE_ID64_0("move", 0x33603ac62788b5c5ULL)
+
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
 typedef struct ce_cdb_t0 {
@@ -47,8 +50,16 @@ typedef struct ce_cdb_change_ev_t0 {
     uint64_t obj;
     uint64_t prop;
     uint64_t prop_type;
-    union ce_cdb_value_u0 new_value;
-    union ce_cdb_value_u0 old_value;
+    union {
+        struct {
+            union ce_cdb_value_u0 new_value;
+            union ce_cdb_value_u0 old_value;
+        };
+        struct {
+            uint64_t to;
+            union ce_cdb_value_u0 value;
+        };
+    };
 } ce_cdb_change_ev_t0;
 
 typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
@@ -84,7 +95,7 @@ struct ce_cdb_a0 {
 
     ce_cdb_t0 (*db)();
 
-    ce_cdb_t0 (*create_db)();
+    ce_cdb_t0 (*create_db)(uint64_t max_objects);
 
     void (*destroy_db)(ce_cdb_t0 db);
 

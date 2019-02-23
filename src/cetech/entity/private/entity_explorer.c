@@ -28,6 +28,8 @@
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/editor_ui.h>
+#include <celib/containers/buffer.h>
+#include <celib/log.h>
 
 static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
@@ -36,28 +38,25 @@ static void ui_entity_item_end() {
 static uint64_t _spawn_to(uint64_t from,
                           uint64_t to) {
 
-    const ce_cdb_obj_o0 *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     to);
+    const ce_cdb_obj_o0 *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(), to);
 
-    uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                              from);
-
-    uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                                 to);
+    uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), from);
+    uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), to);
 
     uint64_t new_obj = 0;
     if ((ENTITY_RESOURCE_ID == asset_type) &&
         (ENTITY_RESOURCE_ID == selecled_type)) {
-        new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(),
-                                         from);
+        new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), from);
+
+//        char *buffer = NULL;
+//        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, new_obj, 0);
+//        ce_log_a0->debug("EX", "%s", buffer);
+//        ce_buffer_free(buffer, ce_memory_a0->system);
 
         uint64_t add_children_obj;
-        add_children_obj = ce_cdb_a0->read_subobject(selectedr,
-                                                     ENTITY_CHILDREN,
-                                                     0);
+        add_children_obj = ce_cdb_a0->read_subobject(selectedr, ENTITY_CHILDREN, 0);
 
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                  add_children_obj);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), add_children_obj);
         ce_cdb_a0->set_subobject(w, new_obj, new_obj);
         ce_cdb_a0->write_commit(w);
     }
@@ -227,14 +226,9 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                                                           drag_obj);
 
                 if (ENTITY_INSTANCE == asset_type) {
-                    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(),
-                                                        drag_obj);
-
-                    ce_cdb_obj_o0 *pw = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                               parent);
-
-                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                              children);
+                    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), drag_obj);
+                    ce_cdb_obj_o0 *pw = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), children);
 
                     ce_cdb_a0->move_prop(pw, w, drag_obj);
 

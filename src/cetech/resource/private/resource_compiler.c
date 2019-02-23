@@ -279,7 +279,7 @@ void _scan_files(char **files,
     ce_ba_graph_t obj_graph = {};
     ce_hash_t obj_hash = {};
 
-    ce_cdb_t0 db = ce_cdb_a0->create_db();
+    ce_cdb_t0 db = ce_cdb_a0->create_db(1000000);
 
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *filename = files[i];

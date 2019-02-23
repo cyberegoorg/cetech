@@ -24,7 +24,8 @@ typedef struct ce_bitset_t0 {
 static inline void ce_bitset_init(ce_bitset_t0 *bitset,
                                   uint64_t n,
                                   ce_alloc_t0 *alloc) {
-    ce_array_resize(bitset->slots, n, alloc);
+    uint64_t slot_num = n/64;
+    ce_array_resize(bitset->slots, slot_num, alloc);
     bitset->n = n;
 }
 

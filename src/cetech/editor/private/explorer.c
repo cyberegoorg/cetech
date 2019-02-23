@@ -75,7 +75,7 @@ static uint64_t draw(uint64_t dock,
 
 static void draw_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    i1 context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     uint64_t selected_object = ct_selected_object_a0->selected_object(context);
 
     if (!selected_object) {

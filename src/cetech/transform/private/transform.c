@@ -85,7 +85,6 @@ static world_state_t *_get_or_create_world_state(ct_world_t0 world) {
     return &_G.world_state[idx];
 }
 
-
 static void _transform(world_state_t *state,
                        uint32_t node_idx) {
     uint64_t component = state->component[node_idx];
@@ -167,11 +166,18 @@ static void _link(world_state_t *state,
     if (tmp != UINT32_MAX) {
         state->prev_sibling[tmp] = child;
     }
+
+    _transform(state, child);
 }
 
 void _unlink(world_state_t *state,
              uint32_t child) {
     uint32_t parent = state->parent[child];
+
+    if(UINT32_MAX == parent) {
+        return;
+    }
+
     uint32_t prev = state->prev_sibling[child];
     uint32_t next = state->next_sibling[child];
 
@@ -182,14 +188,12 @@ void _unlink(world_state_t *state,
     if (prev == UINT32_MAX) {
         state->first_child[parent] = next;
         state->prev_sibling[next] = UINT32_MAX;
-        return;
-    }
-
-    if (next != UINT32_MAX) {
+    } else if (next != UINT32_MAX) {
         state->next_sibling[prev] = next;
         state->prev_sibling[next] = prev;
-        return;
     }
+
+    _transform(state, child);
 }
 
 static uint64_t cdb_type() {
