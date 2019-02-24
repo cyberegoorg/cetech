@@ -37,9 +37,6 @@ static void ui_entity_item_end() {
 
 static uint64_t _spawn_to(uint64_t from,
                           uint64_t to) {
-
-    const ce_cdb_obj_o0 *selectedr = ce_cdb_a0->read(ce_cdb_a0->db(), to);
-
     uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), from);
     uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), to);
 
@@ -48,16 +45,8 @@ static uint64_t _spawn_to(uint64_t from,
         (ENTITY_RESOURCE_ID == selecled_type)) {
         new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), from);
 
-//        char *buffer = NULL;
-//        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, new_obj, 0);
-//        ce_log_a0->debug("EX", "%s", buffer);
-//        ce_buffer_free(buffer, ce_memory_a0->system);
-
-        uint64_t add_children_obj;
-        add_children_obj = ce_cdb_a0->read_subobject(selectedr, ENTITY_CHILDREN, 0);
-
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), add_children_obj);
-        ce_cdb_a0->set_subobject(w, new_obj, new_obj);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), to);
+        ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, new_obj);
         ce_cdb_a0->write_commit(w);
     }
 
@@ -65,17 +54,11 @@ static uint64_t _spawn_to(uint64_t from,
 }
 
 static void _add(uint64_t selected_obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), selected_obj);
-
     uint64_t entity_obj;
     entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_RESOURCE_ID);
 
-    uint64_t add_children_obj;
-    add_children_obj = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
-
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                              add_children_obj);
-    ce_cdb_a0->set_subobject(w, entity_obj, entity_obj);
+    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), selected_obj);
+    ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, entity_obj);
     ce_cdb_a0->write_commit(w);
 }
 
@@ -129,17 +112,11 @@ void item_btns(uint64_t context,
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
                 "##minus_%llu", uid);
         if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
-            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                      parent);
-            ce_cdb_a0->remove_property(w, uid);
+            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
+            ce_cdb_a0->objset_remove_obj(w, ENTITY_CHILDREN, uid);
             ce_cdb_a0->write_commit(w);
 
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
-
-            uint64_t parent_ent = ce_cdb_a0->parent(ce_cdb_a0->db(),
-                                                    parent);
-
-            ct_selected_object_a0->set_selected_object(context, parent_ent);
+            ct_selected_object_a0->set_selected_object(context, parent);
         }
     }
 
@@ -167,17 +144,8 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
 
-    uint64_t children = ce_cdb_a0->read_subobject(reader, ENTITY_CHILDREN, 0);
-    const ce_cdb_obj_o0 *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
-
-    uint64_t components;
-    components = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
-
-    const ce_cdb_obj_o0 *cs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                     components);
-
-    uint64_t children_n = ce_cdb_a0->prop_count(ch_reader);
-    uint64_t component_n = ce_cdb_a0->prop_count(cs_reader);
+    uint64_t children_n = ce_cdb_a0->read_objset_num(reader, ENTITY_CHILDREN);
+    uint64_t component_n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
 
     if (!children_n && !component_n) {
         flags |= DebugUITreeNodeFlags_Leaf;
@@ -221,16 +189,14 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
             if (drag_obj && drag_obj != obj) {
-
-                uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                                          drag_obj);
+                uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), drag_obj);
 
                 if (ENTITY_INSTANCE == asset_type) {
                     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), drag_obj);
                     ce_cdb_obj_o0 *pw = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
-                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), children);
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
 
-                    ce_cdb_a0->move_prop(pw, w, drag_obj);
+                    ce_cdb_a0->move_objset_obj(pw, w, ENTITY_CHILDREN, drag_obj);
 
                     ce_cdb_a0->write_commit(w);
                     ce_cdb_a0->write_commit(pw);
@@ -257,15 +223,12 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        const uint64_t *keys = ce_cdb_a0->prop_keys(cs_reader);
+        uint64_t keys[component_n];
+        ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
 
         for (uint32_t i = 0; i < component_n; ++i) {
-            uint64_t key = keys[i];
-
-            uint64_t component = ce_cdb_a0->read_subobject(cs_reader, key, 0);
-
-            uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                                component);
+            uint64_t component = keys[i];
+            uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component);
 
             struct ct_component_i0 *component_i;
             component_i = ct_ecs_a0->get_interface(type);
@@ -292,12 +255,10 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             }
 
             char c_label[128] = {0};
-            snprintf(c_label, CE_ARRAY_LEN(c_label),
-                     "##component_%llu", key);
+            snprintf(c_label, CE_ARRAY_LEN(c_label), "##component_%llu", component);
 
             //
-            snprintf(c_label, CE_ARRAY_LEN(c_label),
-                     "%s##component_%llu", component_display_name, key);
+            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu", component_display_name, component);
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
             if (ct_debugui_a0->IsItemClicked(0)) {
@@ -309,13 +270,13 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     if (open) {
-        const uint64_t *keys = ce_cdb_a0->prop_keys(ch_reader);
+        uint64_t keys[children_n];
+        ce_cdb_a0->read_objset_objs(reader, ENTITY_CHILDREN, keys);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];
-            uint64_t child = ce_cdb_a0->read_subobject(ch_reader, key, 0);
             uint64_t new_selected_object2 = ui_entity_item_begin(selected_obj,
-                                                                 child, ++id,
+                                                                 key, ++id,
                                                                  context);
             if (new_selected_object2) {
                 new_selected_object = new_selected_object2;
@@ -355,8 +316,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
         return 0;
     }
 
-    uint64_t ret = ui_entity_item_begin(selected_obj, top_level_obj, rand(),
-                                        context);
+    uint64_t ret = ui_entity_item_begin(selected_obj, top_level_obj, rand(), context);
 
     return ret;
 }

@@ -15,6 +15,9 @@ extern "C" {
 #define CDB_UID_PROP \
      CE_ID64_0("cdb_uid", 0x644d24512264abb2ULL)
 
+#define CDB_OBJSET \
+     CE_ID64_0("cdb_objset", 0x2b66a0c3813b3490ULL)
+
 #define CDB_TYPE_PROP \
      CE_ID64_0("cdb_type", 0xfe5986c682be99e0ULL)
 

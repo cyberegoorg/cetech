@@ -476,8 +476,18 @@ static uint64_t combine_component(const uint64_t *component_name,
                                   uint32_t name_count) {
     uint64_t new_type = 0;
     for (int i = 0; i < name_count; ++i) {
-        new_type |= (1 << ce_hash_lookup(&_G.component_types,
-                                         component_name[i], 0));
+        new_type |= (1 << ce_hash_lookup(&_G.component_types, component_name[i], 0));
+    }
+
+    return new_type;
+}
+
+static uint64_t combine_component_obj(const uint64_t *component_obj,
+                                      uint32_t name_count) {
+    uint64_t new_type = 0;
+    for (int i = 0; i < name_count; ++i) {
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component_obj[i]);
+        new_type |= (1 << ce_hash_lookup(&_G.component_types, type, 0));
     }
 
     return new_type;
@@ -839,24 +849,6 @@ void *get_resource_interface(uint64_t name_hash) {
     return NULL;
 }
 
-void create_new(uint64_t obj) {
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-
-    if (!ce_cdb_a0->prop_exist(w, ENTITY_CHILDREN)) {
-        uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                               ENTITY_CHILDREN);
-        ce_cdb_a0->set_subobject(w, ENTITY_CHILDREN, ch);
-    }
-
-    if (!ce_cdb_a0->prop_exist(w, ENTITY_COMPONENTS)) {
-        uint64_t ch = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                               ENTITY_COMPONENTS);
-        ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, ch);
-    }
-
-    ce_cdb_a0->write_commit(w);
-}
-
 static const char *display_icon() {
     return ICON_FA_CUBES;
 }
@@ -867,7 +859,6 @@ static struct ct_resource_i0 ct_resource_api = {
         .online = online,
         .offline = offline,
         .get_interface = get_resource_interface,
-//        .create_new = create_new,
 };
 
 //==============================================================================
@@ -937,40 +928,33 @@ static struct ct_entity_t0 next_sibling(ct_world_t0 world,
 
 static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
                                         uint64_t name) {
-
+    ce_cdb_a0->log_obj("DDD", ce_cdb_a0->db(), name);
     world_instance_t *w = get_world_instance(world);
 
     ct_entity_t0 root_ent;
     create_entities_objs(world, &root_ent, 1, &name);
 
 
-    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                      name);
+    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(), name);
 
-    uint64_t components;
-    components = ce_cdb_a0->read_subobject(ent_reader, ENTITY_COMPONENTS, 0);
+    uint64_t components_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_COMPONENTS);
+    uint64_t components_keys[components_n];
+    ce_cdb_a0->read_objset_objs(ent_reader, ENTITY_COMPONENTS, components_keys);
 
-    const ce_cdb_obj_o0 *comp_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                       components);
-
-    uint32_t components_n = ce_cdb_a0->prop_count(comp_reader);
-    const uint64_t *components_keys = ce_cdb_a0->prop_keys(comp_reader);
-
-    uint64_t ent_type = combine_component(components_keys, components_n);
+    uint64_t ent_type = combine_component_obj(components_keys, components_n);
 
     _add_components(world, root_ent, ent_type);
 
     _add_spawn_entity_obj(w, name, root_ent);
 
-    uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map,
-                                       ent_type, UINT64_MAX);
+    uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map, ent_type, UINT64_MAX);
 
     entity_storage_t *item = &w->entity_storage[type_idx];
 
     const uint64_t idx = _entity_data_idx(w, root_ent);
 
     for (int i = 0; i < components_n; ++i) {
-        uint64_t component_type = components_keys[i];
+        uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), components_keys[i]);
         uint64_t j = component_idx(component_type);
 
         struct ct_component_i0 *component_i;
@@ -980,12 +964,10 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
             continue;
         }
 
-        uint64_t component_obj;
-        component_obj = ce_cdb_a0->read_subobject(comp_reader, component_type, 0);
+        uint64_t component_obj = components_keys[i];
 
         _add_spawn_comp_obj(w, component_obj, root_ent);
 
-//        uint64_t new_comp_obj = component_obj;
         uint64_t new_comp_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), component_obj);
         uint64_t *comp_data = item->entity_data[j];
         comp_data[idx] = new_comp_obj;
@@ -999,19 +981,13 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
         });
     }
 
-    uint64_t children;
-    children = ce_cdb_a0->read_subobject(ent_reader, ENTITY_CHILDREN, 0);
+    uint64_t children_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_CHILDREN);
+    uint64_t keys[children_n];
+    ce_cdb_a0->read_objset_objs(ent_reader, ENTITY_CHILDREN, keys);
 
-    const ce_cdb_obj_o0 *ch_reader = ce_cdb_a0->read(ce_cdb_a0->db(), children);
-
-    uint32_t children_n = ce_cdb_a0->prop_count(ch_reader);
-    const uint64_t *children_keys = ce_cdb_a0->prop_keys(ch_reader);
     for (int i = 0; i < children_n; ++i) {
-        uint64_t child;
-        child = ce_cdb_a0->read_subobject(ch_reader, children_keys[i], 0);
-
+        uint64_t child = keys[i];
         struct ct_entity_t0 child_ent = spawn_entity(world, child);
-
         link(world, root_ent, child_ent);
     }
 
@@ -1122,7 +1098,7 @@ static void _componet_api_add(uint64_t name,
 }
 
 
-static void _update(float dt) {
+static void _sync_task(float dt) {
     uint32_t wn = ce_array_size(_G.world_array);
     ct_entity_t0 *ents = NULL;
 
@@ -1189,25 +1165,24 @@ static void _update(float dt) {
         }
 
         const ce_cdb_obj_o0 *obj_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
-        uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
         uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
         for (uint32_t i = 0; i < wn; ++i) {
             struct world_instance_t *world = &_G.world_array[i];
-            uint64_t idx = ce_hash_lookup(&world->obj_entmap, parent,
-                                          UINT64_MAX);
+
             // is entity?
-            if (idx != UINT64_MAX) {
-                if (type == ENTITY_CHILDREN) {
-                    uint32_t change_n = 0;
-                    const struct ce_cdb_change_ev_t0 *changes;
-                    changes = ce_cdb_a0->changed(obj_r, &change_n);
+            if (type == ENTITY_INSTANCE) {
+                uint32_t change_n = 0;
+                const struct ce_cdb_change_ev_t0 *changes;
+                changes = ce_cdb_a0->changed(obj_r, &change_n);
 
-                    for (int ch = 0; ch < change_n; ++ch) {
-                        struct ce_cdb_change_ev_t0 ev = changes[ch];
+                uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
 
-                        if (ev.type == CE_CDB_CHANGE) {
+                for (int ch = 0; ch < change_n; ++ch) {
+                    struct ce_cdb_change_ev_t0 ev = changes[ch];
+
+                    if (ev.prop == ENTITY_CHILDREN) {
+                        if (ev.type == CE_CDB_OBJSET_ADD) {
                             uint64_t ent_obj = ev.new_value.subobj;
 
                             struct spawn_info_t *si = &world->obj_spawn_info[idx];
@@ -1223,7 +1198,7 @@ static void _update(float dt) {
 
                         } else if (ev.type == CE_CDB_MOVE) {
                             uint64_t ent_obj = ev.value.subobj;
-                            uint64_t to_ent_obj = ce_cdb_a0->parent(ce_cdb_a0->db(), ev.to);
+                            uint64_t to_ent_obj = ev.to;
 
 
                             uint64_t ent_idx = ce_hash_lookup(&world->obj_entmap,
@@ -1253,45 +1228,45 @@ static void _update(float dt) {
                                 link(world->world, root_e, ents[e]);
                             }
                         }
-                    }
-                } else if (type == ENTITY_COMPONENTS) {
-                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                             obj);
+                    } else if (ev.prop == ENTITY_COMPONENTS) {
+                        uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
+                        if (idx != UINT64_MAX) {
+                            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-                    uint32_t change_n = 0;
-                    const struct ce_cdb_change_ev_t0 *changes;
-                    changes = ce_cdb_a0->changed(r, &change_n);
+                            uint32_t change_n = 0;
+                            const struct ce_cdb_change_ev_t0 *changes;
+                            changes = ce_cdb_a0->changed(r, &change_n);
 
-                    for (int ch = 0; ch < change_n; ++ch) {
-                        struct ce_cdb_change_ev_t0 ev = changes[ch];
-                        if (ev.type == CE_CDB_CHANGE) {
-                            uint64_t comp_obj = ev.new_value.subobj;
-                            uint64_t k = ce_cdb_a0->obj_type(ce_cdb_a0->db(), comp_obj);
+                            for (int ch = 0; ch < change_n; ++ch) {
+                                struct ce_cdb_change_ev_t0 ev = changes[ch];
+                                if (ev.type == CE_CDB_OBJSET_ADD) {
+                                    uint64_t comp_obj = ev.new_value.subobj;
+                                    uint64_t k = ce_cdb_a0->obj_type(ce_cdb_a0->db(), comp_obj);
 
-                            struct spawn_info_t *si = &world->obj_spawn_info[idx];
+                                    struct spawn_info_t *si = &world->obj_spawn_info[idx];
 
-                            ce_array_clean(ents);
-                            uint32_t ents_n = ce_array_size(si->ents);
-                            ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
+                                    ce_array_clean(ents);
+                                    uint32_t ents_n = ce_array_size(si->ents);
+                                    ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
 
-                            for (int e = 0; e < ents_n; ++e) {
-                                struct ct_entity_t0 ent = ents[e];
+                                    for (int e = 0; e < ents_n; ++e) {
+                                        struct ct_entity_t0 ent = ents[e];
 
-                                uint64_t ent_type = _entity_type(world, ent);
-                                uint64_t new_type = combine_component(&k, 1);
-                                new_type = ent_type | new_type;
+                                        uint64_t ent_type = _entity_type(world, ent);
+                                        uint64_t new_type = combine_component(&k, 1);
+                                        new_type = ent_type | new_type;
 
-                                if (ent_type == new_type) {
-                                    continue;
+                                        if (ent_type == new_type) {
+                                            continue;
+                                        }
+
+                                        _add_components_from_obj(world, ent, k, comp_obj);
+                                    }
                                 }
-
-                                _add_components_from_obj(world, ent, k, comp_obj);
                             }
                         }
                     }
                 }
-
-                continue;
             }
         }
     }
@@ -1325,7 +1300,7 @@ static uint64_t *update_before(uint64_t *n) {
 
 static struct ct_kernel_task_i0 ecs_sync_task = {
         .name = task_name,
-        .update = _update,
+        .update = _sync_task,
         .update_after = update_after,
         .update_before = update_before,
 };
@@ -1376,8 +1351,8 @@ static void _init(struct ce_api_a0 *api) {
 }
 
 static ce_cdb_prop_def_t0 entity_prop[] = {
-        {.name = "children", .type = CDB_TYPE_SUBOBJECT, .obj_type = ENTITY_CHILDREN},
-        {.name = "components", .type = CDB_TYPE_SUBOBJECT, .obj_type = ENTITY_COMPONENTS},
+        {.name = "components", .type = CDB_TYPE_SET_SUBOBJECT, .obj_type = ENTITY_COMPONENTS},
+        {.name = "children", .type = CDB_TYPE_SET_SUBOBJECT, .obj_type = ENTITY_CHILDREN},
 };
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,

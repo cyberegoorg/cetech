@@ -87,7 +87,6 @@ typedef struct ct_component_i0 {
 typedef struct ct_editor_component_i0 {
     const char *(*display_name)();
 
-    uint64_t (*create_new)();
 
     void (*guizmo_get_transform)(uint64_t obj,
                                  float *world,

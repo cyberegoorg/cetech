@@ -303,6 +303,10 @@ static void _update(float dt) {
                 uint32_t parent_node = _get_node(state, parent_transform);
                 uint32_t child_node = _get_node(state, child_transform);
 
+                if(child_node == UINT32_MAX) {
+                    continue;
+                }
+
                 _link(state, child_node, parent_node);
 
             } else if (ev.type == CT_ECS_EVENT_ENT_UNLINK) {

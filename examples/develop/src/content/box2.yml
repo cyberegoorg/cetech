@@ -2,10 +2,8 @@ cdb_uid: 0xf7f5289f75e5f044
 asset_name: "content/box2"
 cdb_type: "entity"
 components:
-  cdb_type: components
-  cdb_uid: "0x1db40df93b12f88f"
-
-  transform:
+  cdb_type: cdb_objset
+  0xe92a6c7185d73f6c:
     cdb_uid: "0xe92a6c7185d73f6c"
     cdb_type: "transform"
 
@@ -28,12 +26,12 @@ components:
       y: 1.0
       z: 1.0
 
-  mesh_renderer:
+  0x503ef52859bc3e3b:
     cdb_uid: "0x503ef52859bc3e3b"
     cdb_type: "mesh_renderer"
     scene: "0xb7baa30d19deb859"
     mesh: "muro_main"
     material: "0x24c9413e88ebaaa8"
-  rotation_component:
+  0xaf5a41d98f0f23bc:
       cdb_uid: "0xaf5a41d98f0f23bc"
       cdb_type: "rotation_component"

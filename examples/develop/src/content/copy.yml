@@ -2,9 +2,8 @@ cdb_uid: 0xe27880f9fbb28b8d
 asset_name: "content/copy"
 cdb_type: "material"
 layers:
-  cdb_uid: "0x8987d9391ec29ecd"
-
-  default:
+  cdb_type: cdb_objset
+  0x2b41c78abb6dbba9:
     cdb_uid: "0x2b41c78abb6dbba9"
 
     name: default
@@ -21,8 +20,7 @@ layers:
       msaa: true
 
     variables:
-      cdb_uid: "0xfa1eea078615bfeb"
-
+      cdb_type: cdb_objset
       0x945f5b924d402d13:
         cdb_uid: "0x945f5b924d402d13"
         name: s_input_texture

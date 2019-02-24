@@ -22,6 +22,12 @@ extern "C" {
 #define CE_CDB_MOVE \
     CE_ID64_0("move", 0x33603ac62788b5c5ULL)
 
+#define CE_CDB_OBJSET_ADD \
+    CE_ID64_0("objset_add", 0x7390985657b354e9ULL)
+
+#define CE_CDB_OBJSET_REMOVE \
+    CE_ID64_0("objset_remove", 0xd973a462dce1b7c8ULL)
+
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
 typedef struct ce_cdb_t0 {
@@ -43,6 +49,7 @@ typedef union ce_cdb_value_u0 {
     char *str;
     bool b;
     uint32_t blob;
+    uint32_t set;
 } ce_cdb_value_u0;
 
 typedef struct ce_cdb_change_ev_t0 {
@@ -74,6 +81,7 @@ enum ce_cdb_type_e0 {
     CDB_TYPE_STR,
     CDB_TYPE_SUBOBJECT,
     CDB_TYPE_BLOB,
+    CDB_TYPE_SET_SUBOBJECT,
 };
 
 typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
@@ -105,6 +113,8 @@ struct ce_cdb_a0 {
                          uint32_t n);
 
     const ce_cdb_type_def_t0 *(*obj_type_def)(uint64_t type);
+
+    uint64_t (*gen_uid)(ce_cdb_t0 db);
 
     uint64_t (*create_object)(ce_cdb_t0 db,
                               uint64_t type);
@@ -147,6 +157,10 @@ struct ce_cdb_a0 {
                       ce_cdb_obj_o0 *to_w,
                       uint64_t prop);
 
+    void (*move_objset_obj)(ce_cdb_obj_o0 *from_w,
+                            ce_cdb_obj_o0 *to_w,
+                            uint64_t prop,
+                            uint64_t obj);
 
     //
 
@@ -158,6 +172,10 @@ struct ce_cdb_a0 {
                      char **buffer,
                      uint64_t obj,
                      uint32_t level);
+
+    void (*log_obj)(const char *where,
+                    ce_cdb_t0 db,
+                    uint64_t obj);
 
     void (*dump)(ce_cdb_t0 db,
                  uint64_t obj,
@@ -193,10 +211,6 @@ struct ce_cdb_a0 {
 
     uint64_t (*parent)(ce_cdb_t0 db,
                        uint64_t object);
-
-    void (*set_parent)(ce_cdb_t0 db,
-                       uint64_t object,
-                       uint64_t parent);
 
     // SET
     ce_cdb_obj_o0 *(*write_begin)(ce_cdb_t0 db,
@@ -245,6 +259,13 @@ struct ce_cdb_a0 {
                            uint64_t property,
                            ce_cdb_obj_o0 *sub_writer);
 
+    void (*objset_add_obj)(ce_cdb_obj_o0 *writer,
+                           uint64_t property,
+                           uint64_t obj);
+
+    void (*objset_remove_obj)(ce_cdb_obj_o0 *writer,
+                              uint64_t property,
+                              uint64_t obj);
 
     void (*remove_property)(ce_cdb_obj_o0 *writer,
                             uint64_t property);
@@ -308,6 +329,14 @@ struct ce_cdb_a0 {
     uint64_t (*read_subobject)(const ce_cdb_obj_o0 *reader,
                                uint64_t property,
                                uint64_t defaultt);
+
+    uint64_t (*read_objset_num)(const ce_cdb_obj_o0 *reader,
+                                uint64_t property);
+
+    void (*read_objset_objs)(const ce_cdb_obj_o0 *reader,
+                             uint64_t property,
+                             uint64_t *objs);
+
 };
 
 CE_MODULE(ce_cdb_a0);

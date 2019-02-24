@@ -75,15 +75,13 @@ static void draw_component(uint64_t obj,
     ct_editor_ui_a0->ui_prop_header(buffer);
 
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
-    uint64_t comp_type = type;
     ct_debugui_a0->SameLine(0, 8);
 
     ct_debugui_a0->PushIDI((void *) obj);
     if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
-        ce_cdb_a0->remove_property(w, comp_type);
+        ce_cdb_a0->objset_remove_obj(w, ENTITY_COMPONENTS, obj);
         ce_cdb_a0->write_commit(w);
-        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
 
     ct_debugui_a0->PopID();
@@ -123,30 +121,39 @@ static void draw_ui(uint64_t obj,
     _entity_ui(obj);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    uint64_t components_obj = ce_cdb_a0->read_subobject(reader, ENTITY_COMPONENTS, 0);
 
-    const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(), components_obj);
+    uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
+    uint64_t keys[n];
+    ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
 
-    uint64_t n = ce_cdb_a0->prop_count(creader);
-    const uint64_t *components_name = ce_cdb_a0->prop_keys(creader);
-
-    for (uint64_t j = 0; j < n; ++j) {
-        uint64_t name = components_name[j];
-
-        uint64_t c_obj;
-        c_obj = ce_cdb_a0->read_subobject(creader, name, 0);
-
-        draw_component(c_obj, context);
+    for (int i = 0; i < n; ++i) {
+        uint64_t component = keys[i];
+        draw_component(component, context);
     }
 }
 
 
 static char modal_buffer[128] = {};
 
+static bool _component_exist(uint64_t obj,
+                             uint64_t component_type) {
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
+    uint64_t keys[n];
+    ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
+
+    for (int i = 0; i < n; ++i) {
+        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), keys[i]);
+        if (type == component_type) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static void _add_comp_modal(const char *modal_id,
                             uint64_t obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
     bool open = true;
     ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
@@ -178,28 +185,10 @@ static void _add_comp_modal(const char *modal_id,
 
             ei = i->get_interface(EDITOR_COMPONENT);
 
-            uint64_t components;
-            components = ce_cdb_a0->read_subobject(reader,
-                                                   ENTITY_COMPONENTS,
-                                                   0);
-
-            if (!components) {
-                components = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                      ENTITY_COMPONENTS);
-
-                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-                ce_cdb_a0->set_subobject(w, ENTITY_COMPONENTS, components);
-                ce_cdb_a0->write_commit(w);
-            }
-
-            const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                          components);
 
             uint64_t component_type = i->cdb_type();
-            if (ei->display_name &&
-                !ce_cdb_a0->prop_exist(reader, component_type)) {
+            if (ei->display_name && !_component_exist(obj, component_type)) {
                 const char *label = ei->display_name();
-
 
                 if (modal_buffer[0]) {
                     char filter[256] = {};
@@ -215,18 +204,11 @@ static void _add_comp_modal(const char *modal_id,
                                                      &(ce_vec2_t) {});
 
                 if (add) {
-                    uint64_t component;
-                    if (ei->create_new) {
-                        component = ei->create_new();
-                    } else {
-                        component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                             component_type);
-                    }
+                    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
+                                                                  component_type);
 
-                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                              components);
-
-                    ce_cdb_a0->set_subobject(w, component_type, component);
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+                    ce_cdb_a0->objset_add_obj(w, ENTITY_COMPONENTS, component);
                     ce_cdb_a0->write_commit(w);
                     modal_buffer[0] = '\0';
                 }

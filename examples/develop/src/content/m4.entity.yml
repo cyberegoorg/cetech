@@ -2,9 +2,8 @@ cdb_uid: 0x1680afa75da0014d
 cdb_type: entity
 asset_name: content/m4
 components:
-  cdb_uid: 0x1680b564ce400109
-  cdb_type: components
-  transform:
+  cdb_type: cdb_objset
+  0x1680b5652a000164:
     cdb_uid: 0x1680b5652a000164
     cdb_type: transform
 
@@ -27,22 +26,20 @@ components:
       y: 1.0
       z: 1.0
 
-  mesh_renderer:
+  0x1680b5662820015d:
     cdb_uid: 0x1680b5662820015d
     cdb_type: mesh_renderer
     scene: 0xd3276608fb728ffb
     mesh: M4A1
     material: 0x1680b59ec410011b
 children:
-  cdb_uid: 0x1680ea049d5001ad
-  cdb_type: children
+  cdb_type: cdb_objset
   0x1680ea049d5001aa:
     cdb_uid: 0x1680ea049d5001aa
     cdb_type: entity
     components:
-      cdb_uid: 0x1680ea049d5001ab
-      cdb_type: components
-      transform:
+      cdb_type: cdb_objset
+      0x1680ea0606e0011b:
         cdb_uid: 0x1680ea0606e0011b
         cdb_type: transform
 
@@ -65,12 +62,11 @@ children:
           y: 1.0
           z: 1.0
 
-      mesh_renderer:
+      0x1680ea0700e00121:
         cdb_uid: 0x1680ea0700e00121
         cdb_type: mesh_renderer
         scene: 0xd3276608fb728ffb
         mesh: clip
         material: 0x1680b59ec410011b
     children:
-      cdb_uid: 0x1680ea049d5001ac
-      cdb_type: children
+      cdb_type: cdb_objset

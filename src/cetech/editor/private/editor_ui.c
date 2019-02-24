@@ -80,10 +80,6 @@ static bool prop_revert_btn(uint64_t _obj,
             enum ce_cdb_type_e0 ptype = ce_cdb_a0->prop_type(ir, prop);
 
             switch (ptype) {
-
-                case CDB_TYPE_NONE:
-                    break;
-
                 case CDB_TYPE_UINT64: {
                     uint64_t u = ce_cdb_a0->read_uint64(ir,
                                                         prop,
@@ -93,9 +89,6 @@ static bool prop_revert_btn(uint64_t _obj,
                                        CE_ARRAY_LEN(v_str) - offset,
                                        "%llu ", u);
                 }
-                    break;
-
-                case CDB_TYPE_PTR:
                     break;
 
                 case CDB_TYPE_REF: {
@@ -128,8 +121,6 @@ static bool prop_revert_btn(uint64_t _obj,
                                        "%f ", f);
                 }
                     break;
-                case CDB_TYPE_BOOL:
-                    break;
 
                 case CDB_TYPE_STR: {
                     const char *str = ce_cdb_a0->read_str(ir,
@@ -143,10 +134,8 @@ static bool prop_revert_btn(uint64_t _obj,
 
 
                     break;
-                case CDB_TYPE_SUBOBJECT:
-                    break;
 
-                case CDB_TYPE_BLOB:
+                default:
                     break;
             }
         }

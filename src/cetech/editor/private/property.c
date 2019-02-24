@@ -47,12 +47,6 @@ static void _generic_prop_draw(uint64_t obj,
         uint64_t prop_name = ce_id_a0->id64(def->name);
 
         switch (type) {
-            case CDB_TYPE_NONE:
-                break;
-            case CDB_TYPE_UINT64:
-                break;
-            case CDB_TYPE_PTR:
-                break;
             case CDB_TYPE_REF:
                 ct_editor_ui_a0->prop_resource(obj, prop_name, def->name,
                                                def->obj_type, context, obj);
@@ -74,7 +68,7 @@ static void _generic_prop_draw(uint64_t obj,
             }
                 break;
 
-            case CDB_TYPE_BLOB:
+            default:
                 break;
         }
     }

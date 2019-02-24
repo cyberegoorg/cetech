@@ -2,10 +2,8 @@ asset_name: "content/camera"
 cdb_type: "entity"
 cdb_uid: 0x57899875c4457313
 components:
-  cdb_type: components
-  cdb_uid: "0xf43bc7cdac7106ad"
-
-  transform:
+  cdb_type: cdb_objset
+  0x1ea4d40ad3a179e1:
     cdb_uid: "0x1ea4d40ad3a179e1"
     cdb_type: "transform"
 
@@ -28,7 +26,7 @@ components:
       y: 1.0
       z: 1.0
 
-  camera:
+  0xd72994c74e847f5b:
     cdb_uid: "0xd72994c74e847f5b"
     cdb_type: "camera"
 

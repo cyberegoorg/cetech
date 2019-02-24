@@ -345,12 +345,27 @@ static struct ct_kernel_task_i0 input_task = {
 };
 
 static void cetech_kernel_start() {
+//    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//    uint64_t obj2 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//    uint64_t obj3 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
+//
+//    ce_cdb_obj_o0* w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+//    ce_cdb_a0->objset_add_obj(w, 1, obj2);
+//    ce_cdb_a0->objset_add_obj(w, 1, obj3);
+//    ce_cdb_a0->write_commit(w);
+//
+//    char *buffer = NULL;
+//    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
+//    ce_log_a0->debug("DDDDD", "%s", buffer);
+//    ce_buffer_free(buffer, ce_memory_a0->system);
+
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &input_task, sizeof(input_task));
 
     _init_config();
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                 _G.config_object);
+//    ce_cdb_a0->log_obj("sss", ce_cdb_a0->db(), 0x588f56dc4e82f7b2ULL);
+
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config_object);
 
     if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
         ct_resource_compiler_a0->compile_all();

@@ -2,9 +2,8 @@ cdb_uid: "0x758816087ff520e8"
 cdb_type: "entity"
 asset_name: "content/box1"
 components:
-  cdb_uid: "0xa0ef45c8183eac08"
-  cdb_type: components
-  transform:
+  cdb_type: cdb_objset
+  0x1c6bb48199c7ab33:
     cdb_uid: "0x1c6bb48199c7ab33"
     cdb_type: "transform"
 
@@ -28,16 +27,14 @@ components:
       z: 1.0
 
 children:
-  cdb_type: children
-  cdb_uid: "0x1f477575303b404c"
+  cdb_type: cdb_objset
   0xe861c4016085bf98:
     cdb_uid: "0xe861c4016085bf98"
     cdb_type: "entity"
     name: head
     components:
-      cdb_type: components
-      cdb_uid: "0x6269b340849d55a0"
-      transform:
+      cdb_type: cdb_objset
+      0x79d4524dbbd23c53:
         cdb_uid: "0x79d4524dbbd23c53"
         cdb_type: "transform"
 
@@ -60,13 +57,13 @@ children:
           y: 1.0
           z: 1.0
 
-      mesh_renderer:
+      0xdd6dea51dabadcc0:
         cdb_uid: "0xdd6dea51dabadcc0"
         cdb_type: "mesh_renderer"
         scene: "0xb7baa30d19deb859"
         mesh: "muro_main"
         material: "0x24c9413e88ebaaa8"
-      rotation_component:
+      0xaf5a30d98f0f23bc:
         cdb_uid: "0xaf5a30d98f0f23bc"
         cdb_type: "rotation_component"
         speed: 2.9
@@ -75,9 +72,8 @@ children:
     cdb_type: "entity"
     name: body
     components:
-      cdb_type: components
-      cdb_uid: "0xd35f7f10b41443d4"
-      transform:
+      cdb_type: cdb_objset
+      0x9519445d55e6c950:
         cdb_uid: "0x9519445d55e6c950"
         cdb_type: "transform"
 
@@ -100,13 +96,13 @@ children:
           y: 1.0
           z: 1.0
 
-      mesh_renderer:
+      0x0be73c8b1b3e0426:
         cdb_uid: "0x0be73c8b1b3e0426"
         cdb_type: "mesh_renderer"
         scene: "0xb7baa30d19deb859"
         mesh: "muro_main"
         material: "0x24c9413e88ebaaa8"
-      rotation_component:
+      0x503eea652ab45d15:
         cdb_uid: "0x503eea652ab45d15"
         cdb_type: "rotation_component"
         speed: 2.9
@@ -115,9 +111,8 @@ children:
     cdb_type: "entity"
     name: m4
     components:
-      cdb_type: components
-      cdb_uid: "0x333852d44070d23a"
-      transform:
+      cdb_type: cdb_objset
+      0xf10156d9bb85fc45:
         cdb_uid: "0xf10156d9bb85fc45"
         cdb_type: "transform"
 
@@ -140,7 +135,7 @@ children:
           y: 1.0
           z: 1.0
 
-      mesh_renderer:
+      0x3ce8fa251728a409:
         cdb_uid: "0x3ce8fa251728a409"
         cdb_type: "mesh_renderer"
         scene: "0xdb8022af117db75b"
