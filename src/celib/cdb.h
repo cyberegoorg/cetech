@@ -71,18 +71,23 @@ typedef struct ce_cdb_change_ev_t0 {
 
 typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
 
-enum ce_cdb_type_e0 {
+typedef enum ce_cdb_type_e0 {
     CDB_TYPE_NONE = 0,
-    CDB_TYPE_UINT64,
-    CDB_TYPE_PTR,
-    CDB_TYPE_REF,
-    CDB_TYPE_FLOAT,
-    CDB_TYPE_BOOL,
-    CDB_TYPE_STR,
-    CDB_TYPE_SUBOBJECT,
-    CDB_TYPE_BLOB,
-    CDB_TYPE_SET_SUBOBJECT,
-};
+    CDB_TYPE_UINT64 = 1,
+    CDB_TYPE_PTR = 2,
+    CDB_TYPE_REF = 3,
+    CDB_TYPE_FLOAT = 4,
+    CDB_TYPE_BOOL = 5,
+    CDB_TYPE_STR = 6,
+    CDB_TYPE_SUBOBJECT = 7,
+    CDB_TYPE_BLOB = 8,
+    CDB_TYPE_SET_SUBOBJECT = 9,
+} ce_cdb_type_e0;
+
+typedef enum ce_cdb_prop_flag_e0 {
+    CDB_PROP_FLAG_NONE = 0,
+    CDB_PROP_FLAG_UNPACK = 1 << 0,
+} ce_cdb_flag_e0;
 
 typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
 
@@ -91,9 +96,10 @@ typedef struct ce_cdb_prop_def_t0 {
     uint8_t type;
     ce_cdb_value_u0 value;
     uint64_t obj_type;
+    uint64_t flags;
 } ce_cdb_prop_def_t0;
 
-typedef struct type_def_t {
+typedef struct ce_cdb_type_def_t0 {
     ce_cdb_prop_def_t0 *defs;
     uint32_t num;
 } ce_cdb_type_def_t0;
@@ -126,13 +132,9 @@ struct ce_cdb_a0 {
     uint64_t (*create_from)(ce_cdb_t0 db,
                             uint64_t obj);
 
-    uint64_t (*clone)(ce_cdb_t0 db,
-                      uint64_t obj);
-
-
-    void (*set_from)(ce_cdb_t0 db,
-                     uint64_t from,
-                     uint64_t to);
+    void (*set_instance_of)(ce_cdb_t0 db,
+                            uint64_t from,
+                            uint64_t to);
 
 
     void (*destroy_object)(ce_cdb_t0 db,
@@ -144,9 +146,9 @@ struct ce_cdb_a0 {
     void (*set_type)(ce_cdb_t0 db,
                      uint64_t obj,
                      uint64_t type);
-
-    uint64_t (*obj_key)(ce_cdb_t0 db,
-                        uint64_t obj);
+//
+//    uint64_t (*obj_key)(ce_cdb_t0 db,
+//                        uint64_t obj);
 
     //
     void (*move_obj)(ce_cdb_t0 db,
@@ -333,9 +335,9 @@ struct ce_cdb_a0 {
     uint64_t (*read_objset_num)(const ce_cdb_obj_o0 *reader,
                                 uint64_t property);
 
-    void (*read_objset_objs)(const ce_cdb_obj_o0 *reader,
-                             uint64_t property,
-                             uint64_t *objs);
+    void (*read_objset)(const ce_cdb_obj_o0 *reader,
+                        uint64_t property,
+                        uint64_t *objs);
 
 };
 

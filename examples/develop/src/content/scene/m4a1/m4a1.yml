@@ -3,10 +3,7 @@ asset_name: "content/scene/m4a1/m4a1"
 cdb_type: "scene"
 import:
   cdb_uid: "0x461cf24d0eb14029"
-
+  cdb_type: scene_import
   input: content/scene/m4a1/M4A1.fbx
   #    input: content/scene/duck/duck.dae
-
-  postprocess:
-    cdb_uid: "0xec0faea94926d06e"
-    flip_uvs: true
+  flip_uvs: true

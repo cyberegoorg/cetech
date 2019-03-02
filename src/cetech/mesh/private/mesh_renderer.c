@@ -73,25 +73,24 @@ void foreach_mesh_renderer(ct_world_t0 world,
         const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(), m_c.scene);
 
         uint64_t mesh = mesh_id;
-        uint64_t geom_obj = ce_cdb_a0->read_ref(scene_reader, mesh, 0);
+        uint64_t geom_objs = ce_cdb_a0->read_subobject(scene_reader, SCENE_GEOM_OBJS, 0);
+        const ce_cdb_obj_o0 *geom_objs_r = ce_cdb_a0->read(ce_cdb_a0->db(), geom_objs);
+
+        uint64_t geom_obj = ce_cdb_a0->read_ref(geom_objs_r, mesh, 0);
 
         if (!geom_obj) {
             continue;
         }
 
-        const ce_cdb_obj_o0 *geom_reader = ce_cdb_a0->read(ce_cdb_a0->db(), geom_obj);
+        ct_scene_geom_obj_t0 go = {};
+        ce_cdb_a0->read_to(ce_cdb_a0->db(), geom_obj, &go, sizeof(go));
 
-        uint64_t ib = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_PROP, 0);
-        uint64_t ib_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_IB_SIZE, 0);
-        uint64_t vb = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_PROP, 0);
-        uint64_t vb_size = ce_cdb_a0->read_uint64(geom_reader, SCENE_VB_SIZE, 0);
-
-        bgfx_index_buffer_handle_t ibh = {.idx = (uint16_t) ib};
-        bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) vb};
+        bgfx_index_buffer_handle_t ibh = {.idx = (uint16_t) go.ib};
+        bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) go.vb};
 
         ct_gfx_a0->bgfx_set_transform(final_w, 1);
-        ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, vb_size);
-        ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, ib_size);
+        ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, (uint32_t) go.vb_size);
+        ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, (uint32_t) go.ib_size);
 
         ct_material_a0->submit(m_c.material, data->layer_name, data->viewid);
     }
@@ -201,10 +200,21 @@ static struct ct_component_i0 ct_component_api = {
 };
 
 static ce_cdb_prop_def_t0 mesh_renderer_component_prop[] = {
-        {.name = "material", .type = CDB_TYPE_REF},
-        {.name = "scene", .type = CDB_TYPE_REF},
-        {.name = "node", .type = CDB_TYPE_STR},
-        {.name = "mesh", .type = CDB_TYPE_STR},
+        {.name = "material",
+                .type = CDB_TYPE_REF,
+        },
+
+        {.name = "scene",
+                .type = CDB_TYPE_REF,
+        },
+
+        {.name = "node",
+                .type = CDB_TYPE_STR,
+        },
+
+        {.name = "mesh",
+                .type = CDB_TYPE_STR,
+        },
 };
 
 static void _init(struct ce_api_a0 *api) {

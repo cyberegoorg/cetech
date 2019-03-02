@@ -267,18 +267,14 @@ static void render(float dt) {
         }
 
         _G.need_reset = 1;
-        _G.size_width = ce_cdb_a0->read_uint64(reader,
-                                               CT_MACHINE_WINDOW_WIDTH, 0);
-
-        _G.size_height = ce_cdb_a0->read_uint64(reader,
-                                                CT_MACHINE_WINDOW_HEIGHT, 0);
+        _G.size_width = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_WIDTH, 0);
+        _G.size_height = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_HEIGHT, 0);
     }
 
     if (_G.need_reset) {
         _G.need_reset = 0;
 
-        bgfx_reset(_G.size_width, _G.size_height,
-                   _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
+        bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     }
 
     const uint32_t v_n = ce_array_size(_G.viewports);

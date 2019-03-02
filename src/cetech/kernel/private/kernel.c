@@ -33,6 +33,7 @@
 #include <celib/ydb.h>
 #include <celib/os/path.h>
 #include <celib/os/time.h>
+#include <cetech/transform/transform.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {

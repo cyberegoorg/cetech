@@ -112,14 +112,9 @@ static void _transform(world_state_t *state,
         ce_mat4_move(world, local);
     }
 
-    if (!ce_cdb_a0->prop_exist(transform, PROP_WORLD)) {
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), component);
-        ce_cdb_a0->set_blob(w, PROP_WORLD, world, sizeof(ce_mat4_t));
-        ce_cdb_a0->write_commit(w);
-    } else {
-        float *w = ce_cdb_a0->read_blob(transform, PROP_WORLD, NULL, NULL);
-        ce_mat4_move(w, world);
-    }
+    void *blob = ce_cdb_a0->read_blob(transform, PROP_WORLD, NULL, NULL);
+    float *w = blob;
+    ce_mat4_move(w, world);
 
     uint32_t it = state->first_child[node_idx];
     while (it != UINT32_MAX) {
@@ -186,7 +181,7 @@ void _unlink(world_state_t *state,
 
     uint32_t parent = state->parent[child];
 
-    if(UINT32_MAX == parent) {
+    if (UINT32_MAX == parent) {
         return;
     }
 
@@ -284,6 +279,10 @@ static void _update(float dt) {
 
                 uint32_t idx = _create_node(state, ev.component.component);
 
+                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), ev.component.component);
+                ce_cdb_a0->set_blob(w, PROP_WORLD, CE_MAT4_IDENTITY, sizeof(ce_mat4_t));
+                ce_cdb_a0->write_commit(w);
+
                 ct_entity_t0 parent = ct_ecs_a0->parent(state->ent_world, ev.component.ent);
 
                 if (parent.h) {
@@ -315,7 +314,7 @@ static void _update(float dt) {
                 uint32_t parent_node = _get_node(state, parent_transform);
                 uint32_t child_node = _get_node(state, child_transform);
 
-                if(child_node == UINT32_MAX) {
+                if (child_node == UINT32_MAX) {
                     continue;
                 }
 
@@ -374,11 +373,36 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
         .name = name,
 };
 
+typedef struct _t_t {
+    uint64_t position;
+    uint64_t rotation;
+    uint64_t scale;
+    float *world;
+} _t_t;
+
 static const ce_cdb_prop_def_t0 transform_component_prop[] = {
-        {.name = "position", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_POSITION},
-        {.name = "rotation", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_ROTATION},
-        {.name = "scale", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_SCALE},
-//        {.name = "world", .type = CDB_TYPE_SUBOBJECT, .obj_type = PROP_WORLD},
+        {
+                .name = "position",
+                .type = CDB_TYPE_SUBOBJECT,
+                .obj_type = PROP_POSITION,
+                .flags = CDB_PROP_FLAG_UNPACK,
+        },
+        {
+                .name = "rotation",
+                .type = CDB_TYPE_SUBOBJECT,
+                .obj_type = PROP_ROTATION,
+                .flags = CDB_PROP_FLAG_UNPACK,
+        },
+        {
+                .name = "scale",
+                .type = CDB_TYPE_SUBOBJECT,
+                .obj_type = PROP_SCALE,
+                .flags = CDB_PROP_FLAG_UNPACK,
+        },
+        {
+                .name = "world",
+                .type = CDB_TYPE_BLOB,
+        },
 };
 
 static const ce_cdb_prop_def_t0 position_prop[] = {
@@ -395,7 +419,9 @@ static const ce_cdb_prop_def_t0 rotation_prop[] = {
 
 static const ce_cdb_prop_def_t0 scale_prop[] = {
         {.name = "x", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+
         {.name = "y", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+
         {.name = "z", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
 };
 

@@ -3,8 +3,7 @@ cdb_uid: 0xb7baa30d19deb859
 cdb_type: "scene"
 import:
   cdb_uid: "0xffe2059226d692e5"
+  cdb_type: scene_import
   input: content/scene/oldman/muro.fbx
   #    input: content/scene/duck/duck.dae
-  postprocess:
-    cdb_uid: "0x8426488f2e17928c"
-    flip_uvs: true
+  flip_uvs: true

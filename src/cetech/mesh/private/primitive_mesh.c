@@ -127,7 +127,7 @@ void foreach_primitive_mesh(ct_world_t0 world,
         float *final_w = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, CE_MAT4_IDENTITY);
 
         ct_gfx_a0->bgfx_set_transform(final_w, 1);
-        ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0,CE_ARRAY_LEN(_cube_vertices));
+        ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0, CE_ARRAY_LEN(_cube_vertices));
         ct_gfx_a0->bgfx_set_index_buffer(cube_ibh, 0, CE_ARRAY_LEN(cube_indices));
 
         uint64_t material_obj = ce_cdb_a0->read_ref(m, PRIMITIVE_MESH_MATERIAL_PROP, 0);
@@ -235,9 +235,12 @@ static void shutdown() {
 }
 
 static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
-        {.name = "material", .type = CDB_TYPE_REF, .obj_type = MATERIAL_TYPE},
+        {
+                .name = "material",
+                .type = CDB_TYPE_REF,
+                .obj_type = MATERIAL_TYPE,
+        },
 };
-
 
 void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
                                     int reload) {

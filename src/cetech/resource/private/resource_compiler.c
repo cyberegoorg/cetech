@@ -93,6 +93,8 @@ uint64_t compile_obj(ce_cdb_t0 db,
 
     ce_cdb_obj_o0 *obj_w = ce_cdb_a0->write_begin(db, obj);
 
+    const char *cdb_instance = ce_cdb_a0->read_str(input_r, CDB_INSTANCE_PROP, 0);
+
     for (int i = 0; i < n; ++i) {
         uint64_t p = k[i];
 
@@ -101,6 +103,10 @@ uint64_t compile_obj(ce_cdb_t0 db,
         }
 
         if (CDB_TYPE_PROP == p) {
+            continue;
+        }
+
+        if (CDB_INSTANCE_PROP == p) {
             continue;
         }
 
@@ -198,10 +204,9 @@ uint64_t compile_obj(ce_cdb_t0 db,
 
     ce_cdb_a0->write_commit(obj_w);
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t cdb_instance = ce_cdb_a0->read_ref(r, CDB_INSTANCE_PROP, 0);
     if (cdb_instance) {
-        ce_cdb_a0->set_from(db, cdb_instance, obj);
+        uint64_t ref_uid = _uid_from_str(cdb_instance);
+        ce_cdb_a0->set_instance_of(db, ref_uid, obj);
     }
 
     ct_resource_compilator_t compilator = _find_compilator(type);

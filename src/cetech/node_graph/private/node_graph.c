@@ -272,6 +272,11 @@ static struct ct_node_graph_a0 ng_api = {
 
 struct ct_node_graph_a0 *ct_node_graph_a0 = &ng_api;
 
+typedef struct _node_obj_t {
+    uint64_t inputs;
+    uint64_t outputs;
+} _node_obj_t;
+
 static ce_cdb_prop_def_t0 node_prop[] = {
         {.name = "inputs", .type = CDB_TYPE_SUBOBJECT, .obj_type = CT_NODE_GRAPH_NODE_INPUTS},
         {.name = "outputs", .type = CDB_TYPE_SUBOBJECT, .obj_type = CT_NODE_GRAPH_NODE_OUTPUTS},

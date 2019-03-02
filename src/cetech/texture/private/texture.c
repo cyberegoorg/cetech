@@ -49,6 +49,15 @@ struct _G {
     uint64_t *all_textures;
 } _G;
 
+typedef struct ct_texture_obj_t {
+    const char *asset_name;
+    const char *input;
+    bool gen_mipmaps;
+    bool is_normalmap;
+    void *texture_data;
+    uint64_t texture_handler;
+} ct_texture_obj_t;
+
 //==============================================================================
 // Compiler private
 //==============================================================================
@@ -218,9 +227,7 @@ static void draw_property(uint64_t obj,
     ct_editor_ui_a0->prop_str(obj, TEXTURE_INPUT, "Input", 0);
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
     ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
-
 }
-
 
 static struct ct_property_editor_i0 property_editor_api = {
         .cdb_type = cdb_type,
@@ -248,8 +255,7 @@ static void draw_raw(uint64_t obj,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     bgfx_texture_handle_t texture = {
-            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
-                                                     TEXTURE_HANDLER_PROP, 0)
+            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader, TEXTURE_HANDLER_PROP, 0)
     };
 
     ct_debugui_a0->Image(texture,
@@ -289,19 +295,6 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 // Interface
 //==============================================================================
-int texture_init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-    };
-
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-
-    return 1;
-}
-
-void texture_shutdown() {
-}
-
 bgfx_texture_handle_t texture_get(uint64_t name) {
     ct_resource_id_t0 rid = {.uid = name};
     uint64_t obj = rid.uid;
@@ -379,15 +372,22 @@ static struct ct_kernel_task_i0 texture_task = {
 };
 
 
-static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
-}
-
+static const ce_cdb_prop_def_t0 texture_prop[] = {
+        {.name = "asset_name", .type = CDB_TYPE_STR},
+        {.name = "input", .type = CDB_TYPE_STR},
+        {.name = "gen_mipmaps", .type = CDB_TYPE_BOOL},
+        {.name = "is_normalmap", .type = CDB_TYPE_BOOL},
+        {.name = "texture_data", .type = CDB_TYPE_BLOB},
+        {.name = "texture_handler", .type = CDB_TYPE_UINT64},
+};
 
 void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
                              int reload) {
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
+
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_resource_a0);
@@ -396,8 +396,12 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
-    _init_api(api);
-    texture_init(api);
+    api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
+    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+
+    ce_cdb_a0->reg_obj_type(TEXTURE_TYPE, texture_prop, CE_ARRAY_LEN(texture_prop));
 }
 
 void CE_MODULE_UNLOAD(texture)(struct ce_api_a0 *api,
@@ -406,5 +410,7 @@ void CE_MODULE_UNLOAD(texture)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    texture_shutdown();
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
 }

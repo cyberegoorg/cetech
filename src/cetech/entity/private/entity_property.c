@@ -74,14 +74,11 @@ static void draw_component(uint64_t obj,
     snprintf(buffer, CE_ARRAY_LEN(buffer), "%s %llx", editor->display_name(), obj);
     ct_editor_ui_a0->ui_prop_header(buffer);
 
-    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
     ct_debugui_a0->SameLine(0, 8);
 
     ct_debugui_a0->PushIDI((void *) obj);
     if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
-        ce_cdb_a0->objset_remove_obj(w, ENTITY_COMPONENTS, obj);
-        ce_cdb_a0->write_commit(w);
+        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
     }
 
     ct_debugui_a0->PopID();
@@ -124,7 +121,7 @@ static void draw_ui(uint64_t obj,
 
     uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
     uint64_t keys[n];
-    ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
+    ce_cdb_a0->read_objset(reader, ENTITY_COMPONENTS, keys);
 
     for (int i = 0; i < n; ++i) {
         uint64_t component = keys[i];
@@ -140,7 +137,7 @@ static bool _component_exist(uint64_t obj,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
     uint64_t keys[n];
-    ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
+    ce_cdb_a0->read_objset(reader, ENTITY_COMPONENTS, keys);
 
     for (int i = 0; i < n; ++i) {
         uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), keys[i]);

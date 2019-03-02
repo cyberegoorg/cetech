@@ -949,7 +949,7 @@ static struct ct_entity_t0 _spawn_entity(ct_world_t0 world,
 
     uint64_t components_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_COMPONENTS);
     uint64_t components_keys[components_n];
-    ce_cdb_a0->read_objset_objs(ent_reader, ENTITY_COMPONENTS, components_keys);
+    ce_cdb_a0->read_objset(ent_reader, ENTITY_COMPONENTS, components_keys);
 
     uint64_t ent_type = combine_component_obj(components_keys, components_n);
 
@@ -994,7 +994,7 @@ static struct ct_entity_t0 _spawn_entity(ct_world_t0 world,
 
     uint64_t children_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_CHILDREN);
     uint64_t keys[children_n];
-    ce_cdb_a0->read_objset_objs(ent_reader, ENTITY_CHILDREN, keys);
+    ce_cdb_a0->read_objset(ent_reader, ENTITY_CHILDREN, keys);
 
     for (int i = 0; i < children_n; ++i) {
         uint64_t child = keys[i];
@@ -1372,9 +1372,32 @@ static void _init(struct ce_api_a0 *api) {
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
 }
 
+typedef struct _ct_entity_t0 {
+    const char *asset_name;
+    const char *name;
+    uint64_t components;
+    uint64_t children;
+} _ct_entity_t0;
+
 static ce_cdb_prop_def_t0 entity_prop[] = {
-        {.name = "components", .type = CDB_TYPE_SET_SUBOBJECT, .obj_type = ENTITY_COMPONENTS},
-        {.name = "children", .type = CDB_TYPE_SET_SUBOBJECT, .obj_type = ENTITY_CHILDREN},
+        {
+                .name = "asset_name",
+                .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "name",
+                .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "components",
+                .type = CDB_TYPE_SET_SUBOBJECT,
+                .obj_type = ENTITY_COMPONENTS,
+        },
+        {
+                .name = "children",
+                .type = CDB_TYPE_SET_SUBOBJECT,
+                .obj_type = ENTITY_CHILDREN,
+        },
 };
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,

@@ -49,11 +49,15 @@ static void get_project_view(ct_world_t0 world,
     ct_camera_component camera_c = {};
     ce_cdb_a0->read_to(ce_cdb_a0->db(), camera, &camera_c, sizeof(camera_c));
 
+    const ce_cdb_obj_o0* c = ce_cdb_a0->read(ce_cdb_a0->db(), camera);
+    float far = ce_cdb_a0->read_float(c, PROP_FAR, 0);
+
+    CE_UNUSED(far);
+
     float identity[16];
     ce_mat4_identity(identity);
 
     const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
-    float *wworld = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, identity);
 
     float ratio = (float) (width) / (float) (height);
 
@@ -69,8 +73,11 @@ static void get_project_view(ct_world_t0 world,
                       camera_c.far,
                       ct_gfx_a0->bgfx_get_caps()->homogeneousDepth);
 
-    float w[16] = {};
-    ce_mat4_move(w, wworld);
+    float w[16] = CE_MAT4_IDENTITY;
+    float *wworld = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, identity);
+    if(wworld) {
+        ce_mat4_move(w, wworld);
+    }
 
     w[12] *= -1.0f;
     w[13] *= -1.0f;

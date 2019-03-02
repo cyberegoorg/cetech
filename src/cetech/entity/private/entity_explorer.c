@@ -113,10 +113,7 @@ void item_btns(uint64_t context,
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
                 "##minus_%llu", uid);
         if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
-            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), parent);
-            ce_cdb_a0->objset_remove_obj(w, ENTITY_CHILDREN, uid);
-            ce_cdb_a0->write_commit(w);
-
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
             ct_selected_object_a0->set_selected_object(context, parent);
         }
     }
@@ -224,7 +221,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     if (open) {
         uint64_t keys[component_n];
-        ce_cdb_a0->read_objset_objs(reader, ENTITY_COMPONENTS, keys);
+        ce_cdb_a0->read_objset(reader, ENTITY_COMPONENTS, keys);
 
         for (uint32_t i = 0; i < component_n; ++i) {
             uint64_t component = keys[i];
@@ -272,7 +269,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     if (open) {
         uint64_t keys[children_n];
-        ce_cdb_a0->read_objset_objs(reader, ENTITY_CHILDREN, keys);
+        ce_cdb_a0->read_objset(reader, ENTITY_CHILDREN, keys);
 
         for (uint32_t i = 0; i < children_n; ++i) {
             uint64_t key = keys[i];

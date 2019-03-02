@@ -3,7 +3,6 @@ asset_name: "content/scene/solider/ArmyPilot"
 cdb_type: "scene"
 import:
   cdb_uid: "0x29824f6b4b84e021"
+  cdb_type: scene_import
   input: content/scene/solider/ArmyPilot.dae
-  postprocess:
-    cdb_uid: "0x6bfc9b75bedab4a2"
-    flip_uvs: true
+  flip_uvs: true

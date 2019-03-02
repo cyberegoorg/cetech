@@ -55,7 +55,6 @@ static void _generic_prop_draw(uint64_t obj,
                 ct_editor_ui_a0->prop_resource(obj, prop_name, def->name,
                                                def->obj_type, context, obj);
                 break;
-
             case CDB_TYPE_FLOAT:
                 ct_editor_ui_a0->prop_float(obj, prop_name, def->name, (ui_float_p0) {});
                 break;
@@ -69,6 +68,23 @@ static void _generic_prop_draw(uint64_t obj,
                 const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
                 uint64_t subobj = ce_cdb_a0->read_subobject(r, prop_name, 0);
                 draw(subobj, context);
+                break;
+            }
+            case CDB_TYPE_SET_SUBOBJECT: {
+                bool open = ct_debugui_a0->TreeNodeEx(def->name,
+                                                      DebugUITreeNodeFlags_DefaultOpen);
+                if (open) {
+                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+                    uint64_t n = ce_cdb_a0->read_objset_num(r, prop_name);
+                    uint64_t k[n];
+                    ce_cdb_a0->read_objset(r, prop_name, k);
+                    for (int j = 0; j < n; ++j) {
+                        uint64_t subobj = k[j];
+                        draw(subobj, context);
+                    }
+                    ct_debugui_a0->TreePop();
+                }
+
             }
                 break;
 

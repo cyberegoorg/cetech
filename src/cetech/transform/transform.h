@@ -52,7 +52,7 @@ typedef struct ct_transform_comp {
     ce_vec3_t pos;
     ce_vec3_t rot;
     ce_vec3_t scl;
-//    ce_mat4_t world;
+    float* world;
 }ct_transform_comp;
 
 #ifdef __cplusplus

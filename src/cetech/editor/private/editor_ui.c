@@ -253,7 +253,7 @@ static void ui_bool(uint64_t obj,
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
 
-    ct_debugui_a0->SameLine(0, 2);
+//    ct_debugui_a0->SameLine(0, 2);
 
     ct_debugui_a0->Indent(0);
 
@@ -280,7 +280,11 @@ static void ui_str(uint64_t obj,
     value = ce_cdb_a0->read_str(reader, prop, "");
 
     char buffer[128] = {'\0'};
-    strcpy(buffer, value);
+
+    if(value) {
+        strcpy(buffer, value);
+    }
+
 
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
@@ -498,7 +502,7 @@ static void ui_resource(uint64_t obj,
                                    resource_type, &new_value, NULL);
 
 
-    const char *icon = ri->display_icon ? ri->display_icon() : NULL;
+    const char *icon = ri &&  ri->display_icon ? ri->display_icon() : NULL;
     if (icon) {
         snprintf(labelid, CE_ARRAY_LEN(labelid), "%s %s", icon, label);
     } else {

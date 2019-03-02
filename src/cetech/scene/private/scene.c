@@ -43,6 +43,31 @@ static struct _G {
     ce_alloc_t0 *allocator;
 } _G;
 
+typedef struct ct_scene_obj_t {
+    const char *asset_name;
+    uint64_t import;
+    uint64_t geom_objs;
+    uint64_t ib_len;
+    uint64_t vb_len;
+    uint64_t geom_count;
+    uint64_t node_count;
+
+    uint32_t *ib;
+    uint8_t *vb;
+    bgfx_vertex_decl_t *vb_decl;
+    uint64_t *geom_name;
+    uint32_t *ib_offset;
+    uint32_t *vb_offset;
+    uint32_t *ib_size;
+    uint32_t *vb_size;
+
+    void *geom_str;
+    void *node_name;
+    void *node_parent;
+    void *node_pose;
+    void *geom_node;
+    void *node_str;
+} ct_scene_obj_t;
 
 //==============================================================================
 // Resource
@@ -52,54 +77,39 @@ static void online(uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
+    ct_scene_obj_t so = {};
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, &so, sizeof(so));
+
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    uint64_t geom_count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
-    bgfx_vertex_decl_t *vb_decl = (ce_cdb_a0->read_blob(reader,
-                                                        SCENE_VB_DECL,
-                                                        NULL, NULL));
-    uint64_t *geom_name = (ce_cdb_a0->read_blob(reader, SCENE_GEOM_NAME,
-                                                NULL, NULL));
-    uint32_t *ib_offset = (ce_cdb_a0->read_blob(reader, SCENE_IB_OFFSET,
-                                                NULL, NULL));
-    uint32_t *vb_offset = (ce_cdb_a0->read_blob(reader, SCENE_VB_OFFSET,
-                                                NULL, NULL));
-    uint32_t *ib_size = (ce_cdb_a0->read_blob(reader, SCENE_IB_SIZE, NULL,
-                                              NULL));
-    uint32_t *vb_size = (ce_cdb_a0->read_blob(reader, SCENE_VB_SIZE, NULL,
-                                              NULL));
-    uint32_t *ib = (ce_cdb_a0->read_blob(reader, SCENE_IB_PROP, NULL, NULL));
-    uint8_t *vb = (ce_cdb_a0->read_blob(reader, SCENE_VB_PROP, NULL, NULL));
-
     ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-    for (uint32_t i = 0; i < geom_count; ++i) {
+    for (uint32_t i = 0; i < so.geom_count; ++i) {
         const bgfx_memory_t *vb_mem;
-        vb_mem = ct_gfx_a0->bgfx_make_ref((const void *) &vb[vb_offset[i]],
-                                          vb_size[i]);
+        vb_mem = ct_gfx_a0->bgfx_make_ref((const void *) &so.vb[so.vb_offset[i]],
+                                          so.vb_size[i]);
 
         const bgfx_memory_t *ib_mem;
-        ib_mem = ct_gfx_a0->bgfx_make_ref((const void *) &ib[ib_offset[i]],
-                                          sizeof(uint32_t) * ib_size[i]);
+        ib_mem = ct_gfx_a0->bgfx_make_ref((const void *) &so.ib[so.ib_offset[i]],
+                                          sizeof(uint32_t) * so.ib_size[i]);
 
         bgfx_vertex_buffer_handle_t bv_handle;
-        bv_handle = ct_gfx_a0->bgfx_create_vertex_buffer(vb_mem,
-                                                         &vb_decl[i],
-                                                         BGFX_BUFFER_NONE);
+        bv_handle = ct_gfx_a0->bgfx_create_vertex_buffer(vb_mem, &so.vb_decl[i], BGFX_BUFFER_NONE);
 
         bgfx_index_buffer_handle_t ib_handle;
-        ib_handle = ct_gfx_a0->bgfx_create_index_buffer(ib_mem,
-                                                        BGFX_BUFFER_INDEX32);
+        ib_handle = ct_gfx_a0->bgfx_create_index_buffer(ib_mem, BGFX_BUFFER_INDEX32);
 
-        uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, 0);
-        ce_cdb_obj_o0 *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                            geom_obj);
+        uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, SCENE_GEOM_OBJ_TYPE);
+        ce_cdb_obj_o0 *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), geom_obj);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
-        ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, ib_size[i]);
-        ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_SIZE, vb_size[i]);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, so.ib_size[i]);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_SIZE, so.vb_size[i]);
         ce_cdb_a0->write_commit(geom_writer);
 
-        ce_cdb_a0->set_ref(writer, geom_name[i], geom_obj);
+        uint64_t geom_objs = ce_cdb_a0->read_subobject(reader, SCENE_GEOM_OBJS, 0);
+        ce_cdb_obj_o0 *geom_objs_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), geom_objs);
+        ce_cdb_a0->set_ref(geom_objs_w, so.geom_name[i], geom_obj);
+        ce_cdb_a0->write_commit(geom_objs_w);
     }
 
     ce_cdb_a0->write_commit(writer);
@@ -280,6 +290,129 @@ static void _init_api(struct ce_api_a0 *api) {
     api->register_api(CT_SCENE_API, &scene_api, sizeof(scene_api));
 }
 
+
+static const ce_cdb_prop_def_t0 scene_import_prop[] = {
+        {
+                .name = "input",
+                .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "flip_uvs",
+                .type = CDB_TYPE_BOOL,
+        },
+};
+
+static const ce_cdb_prop_def_t0 scene_prop[] = {
+        {
+                .name = "asset_name",
+                .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "import",
+                .type = CDB_TYPE_SUBOBJECT,
+                .obj_type = SCENE_IMPORT_TYPE,
+        },
+        {
+                .name = "geom_objs",
+                .type = CDB_TYPE_SUBOBJECT,
+        },
+        {
+                .name = "ib_len",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "vb_len",
+                .type = CDB_TYPE_UINT64,
+
+        },
+        {
+                .name = "geom_count",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "node_count",
+                .type = CDB_TYPE_UINT64,
+        },
+
+        {
+                .name = "ib",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "vb",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "vb_decl",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "geom_name",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "ib_offset",
+                .type = CDB_TYPE_BLOB,
+
+        },
+        {
+                .name = "vb_offset",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "ib_size",
+                .type = CDB_TYPE_BLOB,
+
+        },
+        {
+                .name = "vb_size",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "geom_str",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "node_name",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "node_parent",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "node_pose",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "geom_node",
+                .type = CDB_TYPE_BLOB,
+        },
+        {
+                .name = "node_str",
+                .type = CDB_TYPE_BLOB,
+        },
+};
+
+static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
+        {
+                .name = "ib",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "vb",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "ib_size",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "vb_size",
+                .type = CDB_TYPE_UINT64,
+        },
+};
+
 void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                            int reload) {
     CE_UNUSED(reload);
@@ -289,6 +422,15 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
     _init_api(api);
+
+    ce_cdb_a0->reg_obj_type(SCENE_TYPE, scene_prop, CE_ARRAY_LEN(scene_prop));
+
+    ce_cdb_a0->reg_obj_type(SCENE_GEOM_OBJ_TYPE,
+                            scene_geom_obj_prop, CE_ARRAY_LEN(scene_geom_obj_prop));
+
+    ce_cdb_a0->reg_obj_type(SCENE_IMPORT_TYPE,
+                            scene_import_prop, CE_ARRAY_LEN(scene_import_prop));
+
     sceneinit(api);
 }
 

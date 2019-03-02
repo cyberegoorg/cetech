@@ -74,13 +74,18 @@ static bgfx_uniform_type_t _type_to_bgfx[] = {
         [MAT_VAR_VEC4] = BGFX_UNIFORM_TYPE_VEC4,
 };
 
-static uint64_t _str_to_type(const char *type) {
-    if (!strcmp(type, "texture")) {
+static uint64_t _cdb_type_to_type(uint64_t type) {
+    if (type == MATERIAL_VAR_TYPE_TEXTURE) {
         return MAT_VAR_TEXTURE;
-    } else if (!strcmp(type, "texture_handler")) {
+
+    } else if (type == MATERIAL_VAR_TYPE_TEXTURE_HANDLER) {
         return MAT_VAR_TEXTURE_HANDLER;
-    } else if ((!strcmp(type, "color")) || (!strcmp(type, "vec4"))) {
-        return (!strcmp(type, "color")) ? MAT_VAR_COLOR4 : MAT_VAR_VEC4;
+
+    } else if (type == MATERIAL_VAR_TYPE_COLOR) {
+        return MAT_VAR_COLOR4;
+
+    } else if (type == MATERIAL_VAR_TYPE_VEC4) {
+        return MAT_VAR_VEC4;
     }
     return MAT_VAR_NONE;
 }
@@ -91,10 +96,9 @@ static void online(uint64_t name,
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-
     uint64_t layers_n = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
     uint64_t layers_keys[layers_n];
-    ce_cdb_a0->read_objset_objs(reader, MATERIAL_LAYERS, layers_keys);
+    ce_cdb_a0->read_objset(reader, MATERIAL_LAYERS, layers_keys);
 
     for (int i = 0; i < layers_n; ++i) {
         uint64_t layer_obj = layers_keys[i];
@@ -103,7 +107,7 @@ static void online(uint64_t name,
 
         uint64_t variables_n = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
         uint64_t variables_keys[variables_n];
-        ce_cdb_a0->read_objset_objs(layer_reader, MATERIAL_VARIABLES_PROP, variables_keys);
+        ce_cdb_a0->read_objset(layer_reader, MATERIAL_VARIABLES_PROP, variables_keys);
 
         for (int k = 0; k < variables_n; ++k) {
             uint64_t var_obj = variables_keys[k];
@@ -115,22 +119,19 @@ static void online(uint64_t name,
                                                            MATERIAL_VAR_NAME_PROP,
                                                            0);
 
-            uint64_t type = _str_to_type(ce_cdb_a0->read_str(var_reader,
-                                                             MATERIAL_VAR_TYPE_PROP,
-                                                             ""));
+            uint64_t var_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var_obj);
 
+            uint64_t type = _cdb_type_to_type(var_type);
             if (!type) {
                 continue;
             }
 
-            const bgfx_uniform_handle_t handler = \
-            ct_gfx_a0->bgfx_create_uniform(uniform_name, _type_to_bgfx[type],
-                                           1);
+            const bgfx_uniform_handle_t handler = ct_gfx_a0->bgfx_create_uniform(uniform_name,
+                                                                                 _type_to_bgfx[type],
+                                                                                 1);
 
-            ce_cdb_obj_o0 *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                          var_obj);
-            ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP,
-                                  handler.idx);
+            ce_cdb_obj_o0 *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), var_obj);
+            ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP, handler.idx);
             ce_cdb_a0->write_commit(var_w);
         }
     }
@@ -179,13 +180,13 @@ static void ui_texture(uint64_t var,
                                    TEXTURE_TYPE, context, var);
 }
 
-static void draw_property(uint64_t material,
-                          uint64_t context) {
+void draw_property(uint64_t material,
+                   uint64_t context) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layer_count = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
     uint64_t layer_keys[layer_count];
-    ce_cdb_a0->read_objset_objs(reader, MATERIAL_LAYERS, layer_keys);
+    ce_cdb_a0->read_objset(reader, MATERIAL_LAYERS, layer_keys);
 
     for (int i = 0; i < layer_count; ++i) {
         uint64_t layer = layer_keys[i];
@@ -205,9 +206,9 @@ static void draw_property(uint64_t material,
             ct_editor_ui_a0->prop_resource(layer, MATERIAL_SHADER_PROP, "Shader",
                                            SHADER_TYPE, context, i);
 
-            uint64_t count = ce_cdb_a0->read_objset_num(reader, MATERIAL_VARIABLES_PROP);
-            uint64_t keys[layer_count];
-            ce_cdb_a0->read_objset_objs(reader, MATERIAL_VARIABLES_PROP, layer_keys);
+            uint64_t count = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
+            uint64_t keys[count];
+            ce_cdb_a0->read_objset(layer_reader, MATERIAL_VARIABLES_PROP, keys);
 
             for (int j = 0; j < count; ++j) {
                 uint64_t var = keys[j];
@@ -215,19 +216,19 @@ static void draw_property(uint64_t material,
                 if (!var) {
                     continue;
                 }
+                uint64_t cdb_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
+                uint64_t type = _cdb_type_to_type(cdb_type);
 
-                const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+                if(!type) {
+                    continue;
+                }
 
-                const char *type = ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, 0);
-                if (!type) continue;
-
-                if (!strcmp(type, "texture")) {
+                if (type == MAT_VAR_TEXTURE) {
                     ui_texture(var, context);
-                } else if (!strcmp(type, "vec4")) {
+                } else if (type == MAT_VAR_VEC4) {
                     ui_vec4(var);
-                } else if (!strcmp(type, "color")) {
+                } else if (MAT_VAR_COLOR4) {
                     ui_color4(var);
-                } else if (!strcmp(type, "mat4")) {
                 }
             }
 
@@ -303,7 +304,7 @@ static uint64_t _find_slot_by_name(uint64_t layer,
     const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
     uint64_t k_n = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
     uint64_t k[k_n];
-    ce_cdb_a0->read_objset_objs(layer_reader, MATERIAL_VARIABLES_PROP, k);
+    ce_cdb_a0->read_objset(layer_reader, MATERIAL_VARIABLES_PROP, k);
 
     for (int i = 0; i < k_n; ++i) {
         uint64_t var = k[i];
@@ -329,7 +330,7 @@ static void set_texture_handler(uint64_t material,
 
     uint64_t layers_n = ce_cdb_a0->read_objset_num(mat_reader, MATERIAL_LAYERS);
     uint64_t layers_keys[layers_n];
-    ce_cdb_a0->read_objset_objs(mat_reader, MATERIAL_LAYERS, layers_keys);
+    ce_cdb_a0->read_objset(mat_reader, MATERIAL_LAYERS, layers_keys);
 
     for (int i = 0; i < layers_n; ++i) {
         uint64_t layer_obj = layers_keys[i];
@@ -346,9 +347,19 @@ static void set_texture_handler(uint64_t material,
             return;
         }
 
-        ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), var);
+
+        uint64_t t = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_VAR_TYPE_TEXTURE_HANDLER);
+        ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), t);
         ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
-        ce_cdb_a0->set_str(writer, MATERIAL_VAR_TYPE_PROP, "texture_handler");
+        ce_cdb_a0->set_str(writer, MATERIAL_VAR_NAME_PROP, slot);
+        ce_cdb_a0->write_commit(writer);
+
+        writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), layer_obj);
+        if (var) {
+            ce_cdb_a0->objset_remove_obj(writer, MATERIAL_VARIABLES_PROP, var);
+        }
+
+        ce_cdb_a0->objset_add_obj(writer, MATERIAL_VARIABLES_PROP, t);
         ce_cdb_a0->write_commit(writer);
         break;
     }
@@ -388,12 +399,9 @@ uint64_t _get_render_state(uint64_t layer) {
     if (render_state) {
         uint64_t curent_render_state = 0;
 
-        const ce_cdb_obj_o0 *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         render_state);
-
+        const ce_cdb_obj_o0 *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(), render_state);
         const uint64_t render_state_count = ce_cdb_a0->prop_count(rs_reader);
         const uint64_t *render_state_keys = ce_cdb_a0->prop_keys(rs_reader);
-
         for (uint32_t i = 0; i < render_state_count; ++i) {
             curent_render_state |= render_state_to_enum(render_state_keys[i]);
         }
@@ -410,32 +418,29 @@ static void submit(uint64_t material,
                    uint8_t viewid) {
     const ce_cdb_obj_o0 *mat_reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
-
     uint64_t layers_n = ce_cdb_a0->read_objset_num(mat_reader, MATERIAL_LAYERS);
     uint64_t layers_keys[layers_n];
-    ce_cdb_a0->read_objset_objs(mat_reader, MATERIAL_LAYERS, layers_keys);
+    ce_cdb_a0->read_objset(mat_reader, MATERIAL_LAYERS, layers_keys);
 
     for (int i = 0; i < layers_n; ++i) {
         uint64_t layer = layers_keys[i];
 
         const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
 
-
         uint64_t key_count = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
         uint64_t keys[key_count];
-        ce_cdb_a0->read_objset_objs(layer_reader, MATERIAL_VARIABLES_PROP, keys);
+        ce_cdb_a0->read_objset(layer_reader, MATERIAL_VARIABLES_PROP, keys);
 
         uint8_t texture_stage = 0;
         for (int j = 0; j < key_count; ++j) {
             uint64_t var = keys[j];
             const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
-
-            uint64_t type = _str_to_type(
-                    ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
+            uint64_t var_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
+            uint64_t type = _cdb_type_to_type(var_type);
 
             bgfx_uniform_handle_t handle = {
-                    .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_HANDLER_PROP,
-                                                             0)
+                    .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader,
+                                                             MATERIAL_VAR_HANDLER_PROP, 0)
             };
 
             switch (type) {
@@ -450,9 +455,7 @@ static void submit(uint64_t material,
 
                 case MAT_VAR_TEXTURE: {
                     uint64_t tn = ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_VALUE_PROP, 0);
-
-                    ct_gfx_a0->bgfx_set_texture(texture_stage++, handle,
-                                                ct_texture_a0->get(tn), 0);
+                    ct_gfx_a0->bgfx_set_texture(texture_stage++, handle, ct_texture_a0->get(tn), 0);
                 }
                     break;
 
@@ -474,6 +477,9 @@ static void submit(uint64_t material,
 
                     ct_gfx_a0->bgfx_set_uniform(handle, &v, 1);
                 }
+                    break;
+                default:
+                    CE_UNUSED(1)
                     break;
 
             }
@@ -509,22 +515,216 @@ static struct ct_property_editor_i0 _property_editor_api = {
         .draw_ui = draw_property,
 };
 
-static int init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-            .db = ce_cdb_a0->db()
-    };
+typedef struct ct_material_obj_t0 {
+    const char *asset_name;
+    uint64_t layers;
+} ct_material_obj_t0;
 
-    api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &_property_editor_api,
-                      sizeof(_property_editor_api));
+typedef struct ct_material_layer_obj_t0 {
+    const char *name;
+    uint64_t shader;
+    uint64_t render_state;
+    uint64_t variables;
+} ct_material_layer_obj_t0;
 
-    return 1;
+typedef struct ct_material_variable_tex_obj_t0 {
+    const char *name;
+    uint64_t value;
+    uint64_t handler;
+} ct_material_variable_tex_obj_t0;
+
+typedef struct ct_material_variable_texh_obj_t0 {
+    const char *name;
+    uint64_t value;
+    uint64_t handler;
+} ct_material_variable_texh_obj_t0;
+
+typedef struct ct_material_variable_vec4_obj_t0 {
+    const char *name;
+    uint64_t handler;
+//    float x, y, z, w;
+    ce_vec4_t value;
+} ct_material_variable_vec4_obj_t0;
+
+
+typedef struct ct_material_variable_color_obj_t0 {
+    const char *name;
+    uint64_t handler;
+    ce_vec4_t value;
+//    float x, y, z, w;
+} ct_material_variable_color_obj_t0;
+
+
+static const ce_cdb_prop_def_t0 material_prop[] = {
+        {
+                .name = "asset_name", .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "layers",
+                .type = CDB_TYPE_SET_SUBOBJECT,
+        }
+};
+
+
+static const ce_cdb_prop_def_t0 material_layer_prop[] = {
+        {
+                .name = "name",
+                .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "shader",
+                .type = CDB_TYPE_REF,
+                .obj_type=SHADER_TYPE,
+        },
+        {
+                .name = "render_state",
+                .type = CDB_TYPE_SUBOBJECT,
+        },
+        {
+                .name = "variables",
+                .type = CDB_TYPE_SET_SUBOBJECT,
+        },
+};
+
+
+static const ce_cdb_prop_def_t0 material_texture_prop[] = {
+        {
+                .name = "name",
+                .type = CDB_TYPE_STR,
+        },
+
+        {
+                .name = "value",
+                .type = CDB_TYPE_REF,
+                .obj_type = TEXTURE_TYPE,
+        },
+
+        {
+                .name = "handler",
+                .type = CDB_TYPE_UINT64,
+        },
+};
+
+
+static const ce_cdb_prop_def_t0 material_texture_handler_prop[] = {
+        {
+                .name = "name",
+                .type = CDB_TYPE_STR,
+        },
+
+        {
+                .name = "value",
+                .type = CDB_TYPE_UINT64,
+        },
+
+        {
+                .name = "handler",
+                .type = CDB_TYPE_UINT64,
+        },
+};
+
+static const ce_cdb_prop_def_t0 material_vec4_prop[] = {
+        {
+                .name = "name", .type = CDB_TYPE_STR,
+        },
+        {.name = "handler",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "x",
+                .type = CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "y",
+                .type = CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "z",
+                .type = CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "w",
+                .type = CDB_TYPE_FLOAT,
+        },
+};
+
+static const ce_cdb_prop_def_t0 material_color_prop[] = {
+        {
+                .name = "name", .type = CDB_TYPE_STR,
+        },
+        {
+                .name = "handler",
+                .type = CDB_TYPE_UINT64,
+        },
+        {
+                .name = "x",
+                .type = CDB_TYPE_FLOAT,
+
+        },
+        {
+                .name = "y",
+                .type = CDB_TYPE_FLOAT,
+        },
+
+        {
+                .name = "z",
+                .type = CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "w",
+                .type = CDB_TYPE_FLOAT,
+
+        },
+};
+
+
+static uint64_t _vec4_cdb_type() {
+    return MATERIAL_VAR_TYPE_VEC4;
 }
 
-static void shutdown() {
+static void _vec4_property_editor(uint64_t obj,
+                                  uint64_t context) {
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
+
+    ct_editor_ui_a0->prop_vec4(obj,
+                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
+                                              MATERIAL_VAR_VALUE_PROP_Y,
+                                              MATERIAL_VAR_VALUE_PROP_Z,
+                                              MATERIAL_VAR_VALUE_PROP_W},
+                               name,
+                               (ui_vec4_p0) {});
+
 }
+
+static struct ct_property_editor_i0 vec4_property_editor_api = {
+        .cdb_type = _vec4_cdb_type,
+        .draw_ui = _vec4_property_editor,
+};
+
+static uint64_t _color_cdb_type() {
+    return MATERIAL_VAR_TYPE_COLOR;
+}
+
+static void _color_property_editor(uint64_t obj,
+                                   uint64_t context) {
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
+
+    ct_editor_ui_a0->prop_vec4(obj,
+                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
+                                              MATERIAL_VAR_VALUE_PROP_Y,
+                                              MATERIAL_VAR_VALUE_PROP_Z,
+                                              MATERIAL_VAR_VALUE_PROP_W},
+                               name,
+                               (ui_vec4_p0) {.color=true});
+}
+
+static struct ct_property_editor_i0 color_property_editor_api = {
+        .cdb_type = _color_cdb_type,
+        .draw_ui = _color_property_editor,
+};
+
 
 void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
                               int reload) {
@@ -536,7 +736,39 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_shader_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    init(api);
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+            .db = ce_cdb_a0->db()
+    };
+
+    api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
+    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->register_api(PROPERTY_EDITOR_INTERFACE, &_property_editor_api,
+                      sizeof(_property_editor_api));
+
+    api->register_api(PROPERTY_EDITOR_INTERFACE,
+                      &vec4_property_editor_api, sizeof(vec4_property_editor_api));
+
+    api->register_api(PROPERTY_EDITOR_INTERFACE,
+                      &color_property_editor_api, sizeof(color_property_editor_api));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_TYPE, material_prop, CE_ARRAY_LEN(material_prop));
+    ce_cdb_a0->reg_obj_type(MATERIAL_LAYER_TYPE,
+                            material_layer_prop, CE_ARRAY_LEN(material_layer_prop));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_VAR_TYPE_TEXTURE,
+                            material_texture_prop, CE_ARRAY_LEN(material_texture_prop));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_VAR_TYPE_TEXTURE_HANDLER,
+                            material_texture_handler_prop,
+                            CE_ARRAY_LEN(material_texture_handler_prop));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_VAR_TYPE_COLOR,
+                            material_color_prop, CE_ARRAY_LEN(material_color_prop));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_VAR_TYPE_VEC4,
+                            material_vec4_prop, CE_ARRAY_LEN(material_vec4_prop));
 }
 
 void CE_MODULE_UNLOAD(material)(struct ce_api_a0 *api,
@@ -545,5 +777,4 @@ void CE_MODULE_UNLOAD(material)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    shutdown();
 }

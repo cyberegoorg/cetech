@@ -35,6 +35,9 @@ extern "C" {
 #define MATERIAL_TYPE \
     CE_ID64_0("material", 0xeac0b497876adedfULL)
 
+#define MATERIAL_LAYER_TYPE \
+    CE_ID64_0("material_layer", 0x9e1a89b077ecf6bdULL)
+
 #define MATERIAL_SHADER_PROP \
     CE_ID64_0("shader", 0xcce8d5b5f5ae333fULL)
 
@@ -47,26 +50,35 @@ extern "C" {
 #define MATERIAL_VAR_HANDLER_PROP \
     CE_ID64_0("handler", 0xe08f763ff8f80d07ULL)
 
+#define MATERIAL_VAR_TYPE_TEXTURE \
+    CE_ID64_0("material_variable_texture", 0xc15bacc55ff067cbULL)
+
+#define MATERIAL_VAR_TYPE_TEXTURE_HANDLER \
+    CE_ID64_0("material_variable_texture_handler", 0x66ec22407a8b595eULL)
+
+#define MATERIAL_VAR_TYPE_COLOR  \
+    CE_ID64_0("material_variable_color", 0x58f2159fd8d14c18ULL)
+
+#define MATERIAL_VAR_TYPE_VEC4 \
+    CE_ID64_0("material_variable_vec4", 0xf5ef08850f7376fULL)
+
 #define MATERIAL_VAR_NAME_PROP \
     CE_ID64_0("name", 0xd4c943cba60c270bULL)
-
-#define MATERIAL_VAR_TYPE_PROP \
-    CE_ID64_0("type", 0xa21bd0e01ac8f01fULL)
 
 #define MATERIAL_VAR_VALUE_PROP \
     CE_ID64_0("value", 0x920b430f38928dc9ULL)
 
 #define MATERIAL_VAR_VALUE_PROP_X \
-    CE_ID64_0("value.x", 0xfa204d422e6d6299ULL)
+    CE_ID64_0("x", 0x8295151af8224269ULL)
 
 #define MATERIAL_VAR_VALUE_PROP_Y \
-    CE_ID64_0("value.y", 0xe5776873c594fbf5ULL)
+    CE_ID64_0("y", 0x9a5db2cd2c1fd6ceULL)
 
 #define MATERIAL_VAR_VALUE_PROP_Z \
-    CE_ID64_0("value.z", 0x150e7a91a060d411ULL)
+    CE_ID64_0("z", 0x88a824e868c7c5efULL)
 
 #define MATERIAL_VAR_VALUE_PROP_W \
-    CE_ID64_0("value.w", 0x7e696a767c2af865ULL)
+    CE_ID64_0("w", 0x22727cb14c3bb41dULL)
 
 #define MATERIAL_LAYERS \
     CE_ID64_0("layers", 0x289219f856ee5cd6ULL)
