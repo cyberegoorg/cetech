@@ -345,20 +345,6 @@ static struct ct_kernel_task_i0 input_task = {
 };
 
 static void cetech_kernel_start() {
-//    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-//    uint64_t obj2 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-//    uint64_t obj3 = ce_cdb_a0->create_object(ce_cdb_a0->db(), 0);
-//
-//    ce_cdb_obj_o0* w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-//    ce_cdb_a0->objset_add_obj(w, 1, obj2);
-//    ce_cdb_a0->objset_add_obj(w, 1, obj3);
-//    ce_cdb_a0->write_commit(w);
-//
-//    char *buffer = NULL;
-//    ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
-//    ce_log_a0->debug("DDDDD", "%s", buffer);
-//    ce_buffer_free(buffer, ce_memory_a0->system);
-
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &input_task, sizeof(input_task));
 
     _init_config();
@@ -374,6 +360,47 @@ static void cetech_kernel_start() {
             return;
         }
     }
+
+//    uint64_t obj = 0x588f56dc4e82f7b2;
+//    uint64_t obj = 0x57899875c4457313;
+
+//    const ce_cdb_obj_o0* objr = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+//    uint32_t n = ce_cdb_a0->read_objset_num(objr, ENTITY_COMPONENTS);
+//    uint64_t objs[n];
+//    ce_cdb_a0->read_objset(objr, ENTITY_COMPONENTS, objs);
+//    for (int i = 0; i < n; ++i) {
+//        uint64_t o = objs[i];
+//
+//        uint64_t t = ce_cdb_a0->obj_type(ce_cdb_a0->db(), o);
+//        if(t!= TRANSFORM_COMPONENT) {
+//            continue;
+//        }
+//
+//        const ce_cdb_obj_o0* or = ce_cdb_a0->read(ce_cdb_a0->db(), o);
+//        ce_cdb_a0->read_subobject(or, PROP_POSITION, 0);
+//
+////        ce_cdb_a0->read_subobject(objr, )
+//    }
+
+//    uint64_t objs[100];
+//    for (int i = 0; i < CE_ARRAY_LEN(objs); ++i) {
+//        objs[i] = ce_cdb_a0->create_from(ce_cdb_a0->db(), 0x1680afa75da0014d);
+////        ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), objs[i]);
+//    }
+//
+//    ce_cdb_obj_o0* w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+//    for (int i = 0; i < CE_ARRAY_LEN(objs); ++i) {
+//        ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, objs[i]);
+//    }
+//    ce_cdb_a0->write_commit(w);
+
+//    uint64_t clone = ce_cdb_a0->create_from(ce_cdb_a0->db(), obj);
+//    clone = ce_cdb_a0->create_from(ce_cdb_a0->db(), clone);
+//    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), clone);
+//    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), obj);
+
+    uint64_t t = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
+    ce_cdb_a0->log_obj("D", ce_cdb_a0->db(), t);
 
     _build_init_graph(&_G.initg);
     _init(&_G.initg);

@@ -55,6 +55,9 @@ static struct _G {
     ce_spinlock_t0 type_cache_lock;
     ce_hash_t type_cache;
 
+    ce_spinlock_t0 uid_cache_lock;
+    ce_hash_t uid_cache;
+
     char *_logdb_path;
     ce_alloc_t0 *alloc;
 } _G = {};
@@ -578,6 +581,17 @@ bool _type_name_from_filename(const char *fullname,
 
 void fullname_resource(const char *fullname,
                        struct ct_resource_id_t0 *resource) {
+    uint64_t fullname_hash = ce_id_a0->id64(fullname);
+
+
+    ce_os_thread_a0->spin_lock(&_G.uid_cache_lock);
+    uint64_t uid = ce_hash_lookup(&_G.uid_cache, fullname_hash, 0);
+    ce_os_thread_a0->spin_unlock(&_G.uid_cache_lock);
+
+    if (uid) {
+        resource->uid = uid;
+        return;
+    }
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -590,7 +604,6 @@ void fullname_resource(const char *fullname,
     sqlite3_bind_text(sqls->get_fullname, 1, type, -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(sqls->get_fullname, 2, name, -1, SQLITE_TRANSIENT);
 
-    uint64_t uid = 0;
     int ok = _step(_db, sqls->get_fullname) == SQLITE_ROW;
     if (ok) {
         uid = sqlite3_column_int64(sqls->get_fullname, 0);
@@ -599,6 +612,10 @@ void fullname_resource(const char *fullname,
     }
 
     resource->uid = uid;
+
+    ce_os_thread_a0->spin_lock(&_G.uid_cache_lock);
+    ce_hash_add(&_G.uid_cache, fullname_hash, uid, _G.alloc);
+    ce_os_thread_a0->spin_unlock(&_G.uid_cache_lock);
 }
 
 int get_resource_by_type(const char *name,

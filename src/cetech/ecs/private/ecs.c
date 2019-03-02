@@ -96,6 +96,9 @@ typedef struct world_instance_t {
 #define _entity_type(w, ent) \
     w->entity_type[handler_idx((ent).h)]
 
+#define _entity_obj(w, ent) \
+    w->entity_obj[handler_idx((ent).h)]
+
 #define MAX_EVENTS 100000
 
 static struct _G {
@@ -926,16 +929,23 @@ static struct ct_entity_t0 next_sibling(ct_world_t0 world,
     return w->next_sibling[ent_idx];
 }
 
-static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
-                                        uint64_t name) {
-    ce_cdb_a0->log_obj("DDD", ce_cdb_a0->db(), name);
+static struct ct_entity_t0 _spawn_entity(ct_world_t0 world,
+                                         uint64_t name,
+                                         uint64_t ent_obj) {
+//    ce_cdb_a0->log_obj("DDD", ce_cdb_a0->db(), name);
     world_instance_t *w = get_world_instance(world);
 
+    uint64_t entity_obj = ent_obj;
+
+    if (!ent_obj) {
+        entity_obj = name;
+//        entity_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), name);
+    }
+
     ct_entity_t0 root_ent;
-    create_entities_objs(world, &root_ent, 1, &name);
+    create_entities_objs(world, &root_ent, 1, &entity_obj);
 
-
-    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(), name);
+    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(), entity_obj);
 
     uint64_t components_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_COMPONENTS);
     uint64_t components_keys[components_n];
@@ -945,7 +955,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
 
     _add_components(world, root_ent, ent_type);
 
-    _add_spawn_entity_obj(w, name, root_ent);
+    _add_spawn_entity_obj(w, entity_obj, root_ent);
 
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map, ent_type, UINT64_MAX);
 
@@ -969,6 +979,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
         _add_spawn_comp_obj(w, component_obj, root_ent);
 
         uint64_t new_comp_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), component_obj);
+//        uint64_t new_comp_obj = component_obj;
         uint64_t *comp_data = item->entity_data[j];
         comp_data[idx] = new_comp_obj;
 
@@ -987,11 +998,16 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
 
     for (int i = 0; i < children_n; ++i) {
         uint64_t child = keys[i];
-        struct ct_entity_t0 child_ent = spawn_entity(world, child);
+        struct ct_entity_t0 child_ent = _spawn_entity(world, child, 0);
         link(world, root_ent, child_ent);
     }
 
     return root_ent;
+}
+
+static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
+                                        uint64_t name) {
+    return _spawn_entity(world, name, 0);
 }
 
 //==============================================================================
@@ -1099,6 +1115,7 @@ static void _componet_api_add(uint64_t name,
 
 
 static void _sync_task(float dt) {
+//    return;
     uint32_t wn = ce_array_size(_G.world_array);
     ct_entity_t0 *ents = NULL;
 
@@ -1165,24 +1182,29 @@ static void _sync_task(float dt) {
         }
 
         const ce_cdb_obj_o0 *obj_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
         uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
-        for (uint32_t i = 0; i < wn; ++i) {
-            struct world_instance_t *world = &_G.world_array[i];
+        // is entity?
+        if (type == ENTITY_INSTANCE) {
+            for (uint32_t i = 0; i < wn; ++i) {
+                struct world_instance_t *world = &_G.world_array[i];
 
-            // is entity?
-            if (type == ENTITY_INSTANCE) {
                 uint32_t change_n = 0;
                 const struct ce_cdb_change_ev_t0 *changes;
                 changes = ce_cdb_a0->changed(obj_r, &change_n);
-
-                uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
 
                 for (int ch = 0; ch < change_n; ++ch) {
                     struct ce_cdb_change_ev_t0 ev = changes[ch];
 
                     if (ev.prop == ENTITY_CHILDREN) {
                         if (ev.type == CE_CDB_OBJSET_ADD) {
+                            uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
+
+                            if (idx == UINT64_MAX) {
+                                continue;
+                            }
+
                             uint64_t ent_obj = ev.new_value.subobj;
 
                             struct spawn_info_t *si = &world->obj_spawn_info[idx];

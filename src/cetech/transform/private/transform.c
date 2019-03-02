@@ -151,6 +151,14 @@ static void _link(world_state_t *state,
                   uint32_t child,
                   uint32_t parent) {
 
+    if (UINT32_MAX == child) {
+        return;
+    }
+
+    if (UINT32_MAX == parent) {
+        return;
+    }
+
     if (state->parent[child] == parent) {
         return;
     }
@@ -172,6 +180,10 @@ static void _link(world_state_t *state,
 
 void _unlink(world_state_t *state,
              uint32_t child) {
+    if (UINT32_MAX == child) {
+        return;
+    }
+
     uint32_t parent = state->parent[child];
 
     if(UINT32_MAX == parent) {

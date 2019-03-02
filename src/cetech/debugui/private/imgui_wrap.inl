@@ -787,5 +787,10 @@ namespace imgui_wrap {
         return ImGui::BeginChild(str_id, ImVec2(size.x, size.y), border, flags);
     }
 
+    void PushColorStyleVar(ImGuiCol idx, ce_vec4_t col) {
+        ImGui::PushStyleColor(idx, *(ImVec4*)&col);
+    }
+
+
 
 }

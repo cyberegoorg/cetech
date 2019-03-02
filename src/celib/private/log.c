@@ -30,9 +30,15 @@ static void vlog(const enum ce_log_level_e0 level,
 
     //CE_ASSERT("logsystem", _globals.data != nullptr);
 
-    char msg[4096];     //!< Final msg.
+    va_list cva;
+    va_copy(cva, va);
+    int len = vsnprintf(0, 0, format, cva);
+    va_end(cva);
+
+    char msg[len+1];
     int s = vsnprintf(msg, CE_ARRAY_LEN(msg), format, va);
 
+    //TODO:
     if (level == LOG_ERROR) {
         char *st = ce_os_error_a0->stacktrace(4);
         snprintf(msg + s, CE_ARRAY_LEN(msg) - s, "\n    stacktrace:\n%s\n", st);

@@ -2021,6 +2021,10 @@ bool prop_equal(const ce_cdb_obj_o0 *r1,
                 return true;
             }
 
+            if (s1 == NULL || s2 == NULL) {
+                return false;
+            }
+
             return !strcmp(s1, s2);
         }
             break;
@@ -2520,7 +2524,7 @@ static void _dispatch_instances(ce_cdb_t0 db,
                 }
             } else if (ev->type == CE_CDB_REMOVE) {
                 remove_property(w, ev->prop);
-            }else if (ev->type == CE_CDB_OBJSET_ADD) {
+            } else if (ev->type == CE_CDB_OBJSET_ADD) {
                 uint64_t obj = ev->new_value.subobj;
                 uint64_t new_obj = create_from(db, obj);
                 ce_cdb_a0->objset_add_obj(w, ev->prop, new_obj);
@@ -2596,16 +2600,7 @@ static void load(ce_cdb_t0 db,
     uint64_t instanceof = header->instance_of;
 
     if (instanceof) {
-        create_from_uid(db, instanceof, _obj);
-
-        struct object_t *instance_obj = _get_object_from_uid(db_inst, instanceof);
-        if (instance_obj) {
-            ce_array_push(instance_obj->instances, _obj, _G.allocator);
-        } else {
-            ce_log_a0->warning(LOG_WHERE,
-                               "Unresolved instance of 0x%llx for obj 0x%llx",
-                               instanceof, _obj);
-        }
+        _create_from_uid(db, instanceof, _obj, true);
     } else {
         create_object_uid(db, _obj, header->type);
     }

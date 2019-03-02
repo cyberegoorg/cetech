@@ -430,7 +430,8 @@ static void submit(uint64_t material,
             uint64_t var = keys[j];
             const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
-            uint64_t type = _str_to_type(ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
+            uint64_t type = _str_to_type(
+                    ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_TYPE_PROP, ""));
 
             bgfx_uniform_handle_t handle = {
                     .idx = (uint16_t) ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_HANDLER_PROP,

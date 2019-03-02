@@ -54,17 +54,19 @@ extern "C" {
 // - *n* - bucket size
 // - *keys* - keys [array](array.md.html)
 // - *values* - values [array](array.md.html)
-typedef struct  ce_hash_t {
+typedef struct ce_hash_t {
     uint32_t n;
+    float lf;
     uint64_t *keys;
     uint64_t *values;
-}ce_hash_t;
+} ce_hash_t;
 
 
 // Clean hash table
 static inline void ce_hash_clean(ce_hash_t *hash) {
     memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
     hash->n = 0;
+    hash->lf = 0;
 
     ce_array_clean(hash->keys);
     ce_array_clean(hash->values);
@@ -76,6 +78,23 @@ static inline void ce_hash_free(ce_hash_t *hash,
     ce_array_free(hash->keys, allocator);
     ce_array_free(hash->values, allocator);
     hash->n = 0;
+    hash->lf = 0;
+}
+
+static inline uint32_t _ce_hash_find_slot(const struct ce_hash_t *hash,
+                                          uint64_t k) {
+    const uint32_t idx_first = k % hash->n;
+    uint32_t idx = idx_first;
+
+    while ((hash->keys[idx] != EMPTY_SLOT) && (hash->keys[idx] != DELETE_SLOT)) {
+        idx = (idx + 1) % hash->n;
+
+        if (idx == idx_first) {
+            break;
+        }
+    }
+
+    return idx;
 }
 
 static inline uint32_t ce_hash_find_slot(const struct ce_hash_t *hash,
@@ -86,7 +105,7 @@ static inline uint32_t ce_hash_find_slot(const struct ce_hash_t *hash,
     while ((hash->keys[idx] != EMPTY_SLOT) && (hash->keys[idx] != k)) {
         idx = (idx + 1) % hash->n;
 
-        if(idx == idx_first) {
+        if (idx == idx_first) {
             break;
         }
     }
@@ -122,6 +141,9 @@ static inline void ce_hash_add(ce_hash_t *hash,
                                uint64_t k,
                                uint64_t value,
                                const struct ce_alloc_t0 *allocator) {
+    CE_ASSERT("ce_hash", k != EMPTY_SLOT);
+    CE_ASSERT("ce_hash", k != DELETE_SLOT);
+
     if (!hash->n) {
         hash->n = 16;
         ce_array_set_capacity(hash->keys, hash->n, allocator);
@@ -132,8 +154,10 @@ static inline void ce_hash_add(ce_hash_t *hash,
     uint32_t idx = 0;
 
     begin:
-    idx = ce_hash_find_slot(hash, k);
-    if ((hash->keys[idx] != EMPTY_SLOT) && (hash->keys[idx] != k) && (hash->keys[idx] != DELETE_SLOT)) {
+    idx = _ce_hash_find_slot(hash, k);
+    if ((hash->lf >= 0.7) || ((hash->keys[idx] != EMPTY_SLOT) &&
+                              (hash->keys[idx] != DELETE_SLOT) &&
+                              (hash->keys[idx] != k))) {
         uint32_t new_size = hash->n * 2;
 
         struct ce_hash_t new_hash = {.n = new_size};
@@ -161,6 +185,8 @@ static inline void ce_hash_add(ce_hash_t *hash,
 
     hash->values[idx] = value;
     hash->keys[idx] = k;
+
+    hash->lf += 1.0f / hash->n;
 }
 
 static inline void ce_hash_remove(ce_hash_t *hash,

@@ -39,6 +39,7 @@ typedef int ImGuiColorEditFlags;
 typedef int DebugUIHoveredFlags;
 typedef int ImGuiItemFlags;
 typedef int ImGuiStyleVar;
+typedef int ImGuiCol;
 
 typedef int (*ImGuiTextEditCallback)(struct ImGuiTextEditCallbackData *data);
 
@@ -276,6 +277,54 @@ enum DebugUIItemFlags_
     DebugUIItemFlags_NoNavDefaultFocus            = 1 << 4,  // false
     DebugUIItemFlags_SelectableDontClosePopup     = 1 << 5,  // false    // MenuItem/Selectable() automatically closes current Popup window
     DebugUIItemFlags_Default_                     = DebugUIItemFlags_AllowKeyboardFocus
+};
+
+enum
+{
+    DebugUICol_Text,
+    DebugUICol_TextDisabled,
+    DebugUICol_WindowBg,              // Background of normal windows
+    DebugUICol_ChildBg,               // Background of child windows
+    DebugUICol_PopupBg,               // Background of popups, menus, tooltips windows
+    DebugUICol_Border,
+    DebugUICol_BorderShadow,
+    DebugUICol_FrameBg,               // Background of checkbox, radio button, plot, slider, text input
+    DebugUICol_FrameBgHovered,
+    DebugUICol_FrameBgActive,
+    DebugUICol_TitleBg,
+    DebugUICol_TitleBgActive,
+    DebugUICol_TitleBgCollapsed,
+    DebugUICol_MenuBarBg,
+    DebugUICol_ScrollbarBg,
+    DebugUICol_ScrollbarGrab,
+    DebugUICol_ScrollbarGrabHovered,
+    DebugUICol_ScrollbarGrabActive,
+    DebugUICol_CheckMark,
+    DebugUICol_SliderGrab,
+    DebugUICol_SliderGrabActive,
+    DebugUICol_Button,
+    DebugUICol_ButtonHovered,
+    DebugUICol_ButtonActive,
+    DebugUICol_Header,
+    DebugUICol_HeaderHovered,
+    DebugUICol_HeaderActive,
+    DebugUICol_Separator,
+    DebugUICol_SeparatorHovered,
+    DebugUICol_SeparatorActive,
+    DebugUICol_ResizeGrip,
+    DebugUICol_ResizeGripHovered,
+    DebugUICol_ResizeGripActive,
+    DebugUICol_PlotLines,
+    DebugUICol_PlotLinesHovered,
+    DebugUICol_PlotHistogram,
+    DebugUICol_PlotHistogramHovered,
+    DebugUICol_TextSelectedBg,
+    DebugUICol_ModalWindowDarkening,  // darken/colorize entire screen behind a modal window, when one is active
+    DebugUICol_DragDropTarget,
+    DebugUICol_NavHighlight,          // gamepad/keyboard: current highlighted item
+    DebugUICol_NavWindowingHighlight, // gamepad/keyboard: when holding NavMenu to focus/move/resize windows
+    DebugUICol_COUNT
+
 };
 
 enum OPERATION {
@@ -961,8 +1010,10 @@ struct ct_debugui_a0 {
     void (*PopID)();
     void (*PopItemFlag)();
     void (*PopStyleVar)(int count);
+    void (*PopStyleColor)(int count);
     void (*PushItemFlag)(ImGuiItemFlags option, bool enabled);
     void (*PushStyleVar)(ImGuiStyleVar idx, float val);
+    void (*PushColorStyleVar)(ImGuiCol idx, ce_vec4_t col);
 
 };
 

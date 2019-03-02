@@ -354,8 +354,10 @@ static struct ct_debugui_a0 debugui_api = {
         .PopID = ImGui::PopID,
         .PushItemFlag = ImGui::PushItemFlag,
         .PushStyleVar = ImGui::PushStyleVar,
+        .PushColorStyleVar = imgui_wrap::PushColorStyleVar,
         .PopItemFlag = ImGui::PopItemFlag,
         .PopStyleVar = ImGui::PopStyleVar,
+        .PopStyleColor = ImGui::PopStyleColor,
 };
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;

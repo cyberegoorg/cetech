@@ -97,8 +97,7 @@ static void _entity_ui(uint64_t obj) {
 
     ct_debugui_a0->Text("UID");
 
-    ct_debugui_a0->SameLine(0, 2);
-
+    ct_debugui_a0->Indent(0);
     ct_debugui_a0->PushItemWidth(-1);
     char buffer[128] = {};
     snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
@@ -108,6 +107,7 @@ static void _entity_ui(uint64_t obj) {
                              DebugInputTextFlags_ReadOnly,
                              0, NULL);
     ct_debugui_a0->PopItemWidth();
+    ct_debugui_a0->Unindent(0);
 
     ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
 }

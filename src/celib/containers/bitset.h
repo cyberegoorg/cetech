@@ -24,9 +24,15 @@ typedef struct ce_bitset_t0 {
 static inline void ce_bitset_init(ce_bitset_t0 *bitset,
                                   uint64_t n,
                                   ce_alloc_t0 *alloc) {
-    uint64_t slot_num = n/64;
+    uint64_t slot_num = n / 64;
     ce_array_resize(bitset->slots, slot_num, alloc);
+    memset(bitset->slots, 0, sizeof(uint64_t) * slot_num);
     bitset->n = n;
+}
+
+static inline void ce_bitset_clean(ce_bitset_t0 *bitset) {
+    uint64_t slot_num = bitset->n / 64;
+    memset(bitset->slots, 0, sizeof(uint64_t) * slot_num);
 }
 
 // Free bitset.
@@ -37,7 +43,7 @@ static inline void ce_bitset_free(ce_bitset_t0 *bitset,
 }
 
 // Set contain key
-static inline void ce_bitset_set(ce_bitset_t0 *bitset,
+static inline void ce_bitset_add(ce_bitset_t0 *bitset,
                                  uint64_t key) {
     uint64_t idx = key % bitset->n;
 
@@ -49,9 +55,9 @@ static inline void ce_bitset_set(ce_bitset_t0 *bitset,
     bitset->slots[slot_idx] |= bit_mask;
 }
 
-// Uset contain idx
-static inline void ce_bitset_unset(ce_bitset_t0 *bitset,
-                                   uint64_t key) {
+// Remove key
+static inline void ce_bitset_remove(ce_bitset_t0 *bitset,
+                                    uint64_t key) {
     uint64_t idx = key % bitset->n;
 
     uint64_t slot_idx = idx / 64;

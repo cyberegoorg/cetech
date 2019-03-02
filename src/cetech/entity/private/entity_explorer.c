@@ -35,31 +35,33 @@ static void ui_entity_item_end() {
     ct_debugui_a0->TreePop();
 }
 
-static uint64_t _spawn_to(uint64_t from,
-                          uint64_t to) {
+static void _spawn_to(uint64_t from,
+                      uint64_t to,
+                      uint32_t n) {
     uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), from);
     uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), to);
 
-    uint64_t new_obj = 0;
     if ((ENTITY_RESOURCE_ID == asset_type) &&
         (ENTITY_RESOURCE_ID == selecled_type)) {
-        new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), from);
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), to);
-        ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, new_obj);
+        for (int i = 0; i < n; ++i) {
+            uint64_t new_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), from);
+            ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, new_obj);
+        }
         ce_cdb_a0->write_commit(w);
     }
-
-    return new_obj;
 }
 
 static void _add(uint64_t selected_obj) {
+//    for (int i = 0; i < 10; ++i) {
     uint64_t entity_obj;
     entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_RESOURCE_ID);
-
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), selected_obj);
     ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, entity_obj);
     ce_cdb_a0->write_commit(w);
+//    }
+
 }
 
 
@@ -82,6 +84,7 @@ void item_btns(uint64_t context,
                      ICON_FA_FOLDER_OPEN
                      "##add_from%llu", uid);
 
+
     bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     char modal_id[128] = {'\0'};
@@ -100,9 +103,7 @@ void item_btns(uint64_t context,
     }
 
     if (changed && new_value) {
-        for (int i = 0; i < count; ++i) {
-            _spawn_to(new_value, uid);
-        }
+        _spawn_to(new_value, uid, count);
     }
 
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), uid);
@@ -119,7 +120,6 @@ void item_btns(uint64_t context,
             ct_selected_object_a0->set_selected_object(context, parent);
         }
     }
-
 
 }
 
@@ -216,7 +216,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t drag_obj = *((uint64_t *) payload->Data);
 
             if (drag_obj) {
-                _spawn_to(drag_obj, obj);
+                _spawn_to(drag_obj, obj, 1);
             }
         }
         ct_debugui_a0->EndDragDropTarget();
@@ -258,7 +258,8 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             snprintf(c_label, CE_ARRAY_LEN(c_label), "##component_%llu", component);
 
             //
-            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu", component_display_name, component);
+            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu", component_display_name,
+                     component);
 
             ct_debugui_a0->TreeNodeEx(c_label, c_flags);
             if (ct_debugui_a0->IsItemClicked(0)) {

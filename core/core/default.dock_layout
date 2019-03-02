@@ -2,10 +2,10 @@
   index: 0
   label:  Resource browser##asset_browser_dock0
   x: 202
-  y: 481
+  y: 538
   location: ""
-  size_x: 576
-  size_y: 286
+  size_x: 365
+  size_y: 229
   status: 0
   active: 1
   opened: 1
@@ -13,7 +13,7 @@
   next: 15
   child0: -1
   child1: -1
-  parent: 18
+  parent: 21
 1: 
   index: 1
   label:  Explorer##explorer_dock0
@@ -145,11 +145,11 @@
 9: 
   index: 9
   label:  Property editor##property_editor_dock2
-  x: 778
+  x: 791
   y: 24
   location: ""
-  size_x: 246
-  size_y: 457
+  size_x: 233
+  size_y: 743
   status: 0
   active: 1
   opened: 1
@@ -157,7 +157,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 21
+  parent: 20
 10: 
   index: 10
   label: Resource preview##asset_preview_dock3
@@ -242,10 +242,10 @@
   index: 15
   label: Log view##log_view_dock3
   x: 202
-  y: 481
+  y: 538
   location: ""
-  size_x: 576
-  size_y: 286
+  size_x: 365
+  size_y: 229
   status: 0
   active: 0
   opened: 1
@@ -253,15 +253,15 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 18
+  parent: 21
 16: 
   index: 16
   label:  Game view##game_view_dock4
   x: 202
   y: 24
   location: ""
-  size_x: 576
-  size_y: 457
+  size_x: 589
+  size_y: 514
   status: 0
   active: 1
   opened: 1
@@ -273,11 +273,11 @@
 17: 
   index: 17
   label: Resource preview##asset_preview_dock5
-  x: 778
-  y: 481
+  x: 567
+  y: 538
   location: ""
-  size_x: 246
-  size_y: 286
+  size_x: 224
+  size_y: 229
   status: 0
   active: 1
   opened: 1
@@ -292,7 +292,7 @@
   x: 202
   y: 24
   location: ""
-  size_x: 576
+  size_x: 589
   size_y: 743
   status: 0
   active: 1
@@ -300,7 +300,7 @@
   prev: -1
   next: -1
   child0: 16
-  child1: 0
+  child1: 21
   parent: 19
 19: 
   index: 19
@@ -308,7 +308,7 @@
   x: 0
   y: 24
   location: ""
-  size_x: 778
+  size_x: 791
   size_y: 743
   status: 0
   active: 1
@@ -332,21 +332,21 @@
   prev: -1
   next: -1
   child0: 19
-  child1: 21
+  child1: 9
   parent: -1
 21: 
   index: 21
   label: ""
-  x: 778
-  y: 24
+  x: 202
+  y: 538
   location: ""
-  size_x: 246
-  size_y: 743
+  size_x: 589
+  size_y: 229
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 9
+  child0: 0
   child1: 17
-  parent: 20
+  parent: 18
