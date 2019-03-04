@@ -38,6 +38,7 @@
 #include <celib/os/path.h>
 #include <celib/os/process.h>
 #include <celib/os/vio.h>
+#include <celib/containers/hash.h>
 
 //==============================================================================
 // GLobals
@@ -46,7 +47,8 @@
 #define _G TextureResourceGlobals
 struct _G {
     ce_alloc_t0 *allocator;
-    uint64_t *all_textures;
+    ct_cdb_ev_queue_o0 *changed_obj_queue;
+    ce_hash_t online_texture;
 } _G;
 
 typedef struct ct_texture_obj_t {
@@ -85,6 +87,7 @@ void texture_online(uint64_t obj) {
     ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ce_cdb_a0->write_commit(writer);
 
+    ce_hash_add(&_G.online_texture, obj, obj, _G.allocator);
 }
 
 void texture_offline(uint64_t obj) {
@@ -95,12 +98,13 @@ void texture_offline(uint64_t obj) {
                                                     0);
     ct_gfx_a0->bgfx_destroy_texture(
             (bgfx_texture_handle_t) {.idx=(uint16_t) texture});
+
+    ce_hash_remove(&_G.online_texture, obj);
 }
 
 void _texture_resource_online(uint64_t name,
                               uint64_t obj) {
     texture_online(obj);
-    ce_array_push(_G.all_textures, obj, _G.allocator);
 }
 
 void _texture_resource_offline(uint64_t name,
@@ -334,35 +338,42 @@ static uint64_t *update_after(uint64_t *n) {
 }
 
 static void _update(float dt) {
-    uint32_t tn = ce_array_size(_G.all_textures);
-    for (int i = 0; i < tn; ++i) {
-        uint64_t obj = _G.all_textures[i];
+    ce_cdb_change_ev_t0 ev = {};
 
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t *to_compile_obj = NULL;
+    ce_hash_t obj_set = {};
 
-        uint32_t change_n = 0;
-        const struct ce_cdb_change_ev_t0 *changes;
-        changes = ce_cdb_a0->changed(reader, &change_n);
-
-        bool compile = false;
-
-        if (change_n) {
-            for (int j = 0; j < change_n; ++j) {
-                struct ce_cdb_change_ev_t0 ev = changes[j];
-                if (ev.prop == TEXTURE_HANDLER_PROP) {
-                    compile = false;
-                    break;
-                }
-                compile = true;
-            }
+    while (ce_cdb_a0->pop_obj_events(_G.changed_obj_queue, &ev)) {
+        if(!ce_hash_contain(&_G.online_texture, ev.obj)) {
+            continue;
         }
 
-        if (compile) {
-            texture_offline(obj);
-            _compile(ce_cdb_a0->db(), obj);
-            texture_online(obj);
+        if(ev.prop == TEXTURE_DATA) {
+            continue;
+        }
+
+        if(ev.prop == TEXTURE_HANDLER_PROP) {
+            continue;
+        }
+
+
+        if(!ce_hash_contain(&obj_set, ev.obj)) {
+            ce_log_a0->debug("texture", "PROP = %s", ce_id_a0->str_from_id64(ev.prop));
+            ce_array_push(to_compile_obj, ev.obj, _G.allocator);
+            ce_hash_add(&obj_set, ev.obj, ev.obj, _G.allocator);
         }
     }
+
+    uint32_t n = ce_array_size(to_compile_obj);
+    for (int i = 0; i < n; ++i) {
+        uint64_t  obj = to_compile_obj[i];
+        texture_offline(obj);
+        _compile(ce_cdb_a0->db(), obj);
+        texture_online(obj);
+    }
+
+    ce_hash_free(&obj_set, _G.allocator);
+    ce_array_free(to_compile_obj, _G.allocator);
 }
 
 static struct ct_kernel_task_i0 texture_task = {
@@ -386,6 +397,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
+            .changed_obj_queue = ce_cdb_a0->new_obj_listener(ce_cdb_a0->db()),
     };
 
     CE_UNUSED(reload);
@@ -400,6 +412,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
     api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+
 
     ce_cdb_a0->reg_obj_type(TEXTURE_TYPE, texture_prop, CE_ARRAY_LEN(texture_prop));
 }

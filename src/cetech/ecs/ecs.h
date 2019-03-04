@@ -15,9 +15,6 @@ extern "C" {
 #define CT_ECS_SYNC_TASK \
     CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
 
-#define CT_ECS_EVENT_TASK \
-    CE_ID64_0("ecs_events_task", 0x439be51e6ab2c9bULL)
-
 #define EDITOR_COMPONENT \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
 
@@ -57,9 +54,16 @@ extern "C" {
 #define CT_ECS_EVENT_ENT_UNLINK \
     CE_ID64_0("entity_unlink", 0x9caaf06ae5bc97e2ULL)
 
+#define CT_ECS_WORLD_EVENT_CREATED \
+    CE_ID64_0("ecs_world_evemt_created", 0xea233f148a521a8eULL)
+
+#define CT_ECS_WORLD_EVENT_DESTROYED \
+    CE_ID64_0("ecs_world_evemt_destroyed", 0x246df7bdf1f5ff81ULL)
+
 typedef struct ct_resource_id_t0 ct_resource_id_t0;
 typedef struct ce_cdb_change_ev_t0 ce_cdb_change_ev_t0;
 typedef struct ct_entity_storage_o0 ct_entity_storage_o0;
+typedef struct ce_spsc_queue_t0 ce_spsc_queue_t0;
 
 typedef struct ct_world_t0 {
     uint64_t h;
@@ -111,6 +115,7 @@ struct ct_simulation_i0 {
 
 typedef struct ct_ecs_event_t0 {
     uint64_t type;
+    ct_world_t0 world;
     union {
         struct {
             ct_entity_t0 ent;
@@ -124,16 +129,20 @@ typedef struct ct_ecs_event_t0 {
     };
 } ct_ecs_event_t0;
 
-typedef struct ct_ecs_events_t0 {
-    uint64_t n;
-    const ct_ecs_event_t0 *events;
-} ct_ecs_events_t0;
+typedef struct ct_ecs_ev_queue_o0 ct_ecs_ev_queue_o0;
 
 struct ct_ecs_a0 {
     //WORLD
     ct_world_t0 (*create_world)();
 
-    ct_ecs_events_t0 (*events)(ct_world_t0 world);
+    uint32_t (*world_num)();
+
+    void (*all_world)(ct_world_t0 *worlds);
+
+    ct_ecs_ev_queue_o0 *(*new_events_listener)();
+
+    bool (*pop_events)(ct_ecs_ev_queue_o0 *q,
+                       ct_ecs_event_t0 *ev);
 
     //ENT
     void (*destroy_world)(ct_world_t0 world);

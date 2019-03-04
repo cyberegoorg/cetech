@@ -79,6 +79,8 @@ static const ce_transform_t CE_TRANFORM_INIT = {
         .scl = {1.0f, 1.0f, 1.0f}
 };
 
+typedef char cache_line_pad_t[64];
+
 #define CE_ID64_0(str, hash) hash
 
 #if defined(CE_DYNAMIC_MODULE)

@@ -347,18 +347,22 @@ static void set_texture_handler(uint64_t material,
             return;
         }
 
+        uint64_t t = 0;
+        uint64_t var_type  = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
 
-        uint64_t t = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_VAR_TYPE_TEXTURE_HANDLER);
+        if(var_type != MATERIAL_VAR_TYPE_TEXTURE_HANDLER) {
+            t = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_VAR_TYPE_TEXTURE_HANDLER);
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), t);
+        } else{
+            t = var;
+        }
+
         ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), t);
         ce_cdb_a0->set_uint64(writer, MATERIAL_VAR_VALUE_PROP, texture.idx);
         ce_cdb_a0->set_str(writer, MATERIAL_VAR_NAME_PROP, slot);
         ce_cdb_a0->write_commit(writer);
 
         writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), layer_obj);
-        if (var) {
-            ce_cdb_a0->objset_remove_obj(writer, MATERIAL_VARIABLES_PROP, var);
-        }
-
         ce_cdb_a0->objset_add_obj(writer, MATERIAL_VARIABLES_PROP, t);
         ce_cdb_a0->write_commit(writer);
         break;

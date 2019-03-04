@@ -33,6 +33,7 @@
 #include <stdatomic.h>
 #include <cetech/editor/editor.h>
 #include <cetech/game/game_system.h>
+#include <celib/containers/spsc.h>
 
 
 //==============================================================================
@@ -40,7 +41,8 @@
 //==============================================================================
 
 #define MAX_COMPONENTS 64
-#define MAX_ENTITIES 1000000
+#define MAX_ENTITIES 1000000000
+#define MAX_EVENTS_LISTENER 1024
 
 #define _G EntityMaagerGlobals
 
@@ -83,11 +85,6 @@ typedef struct world_instance_t {
 
     ce_hash_t comp_spawn_map;
     spawn_info_t *comp_spawn_info;
-
-    // events
-    ct_ecs_event_t0 *events;
-    atomic_ullong events_n;
-
 } world_instance_t;
 
 #define _entity_data_idx(w, ent) \
@@ -119,8 +116,23 @@ static struct _G {
     ce_ba_graph_t sg;
     ce_hash_t fce_map;
 
+    ct_cdb_ev_queue_o0 *obj_queue;
+
+    ct_world_t0 *worlds;
     ce_alloc_t0 *allocator;
+
+    ce_spsc_queue_t0 ecs_events[MAX_EVENTS_LISTENER];
+    atomic_uint_fast16_t events_listener_n;
 } _G;
+
+ce_spsc_queue_t0 *_new_events_listener() {
+    uint32_t idx = atomic_fetch_add(&_G.events_listener_n, 1);
+    ce_spsc_queue_t0 *q = &_G.ecs_events[idx];
+
+    ce_spsc_init(q, 4096, sizeof(ct_ecs_event_t0), _G.allocator);
+
+    return q;
+}
 
 static void *virtual_alloc(uint64_t size) {
     return mmap(NULL,
@@ -135,8 +147,13 @@ static void *virtual_alloc(uint64_t size) {
 
 static void _add_event(world_instance_t *world,
                        ct_ecs_event_t0 ev) {
-    uint64_t idx = atomic_fetch_add(&world->events_n, 1);
-    world->events[idx] = ev;
+    uint32_t n = _G.events_listener_n;
+    for (int i = 0; i < n; ++i) {
+        ce_spsc_queue_t0 *q = &_G.ecs_events[i];
+        if (!ce_spsc_enqueue(q, &ev)) {
+            ce_log_a0->warning(LOG_WHERE, "Push ecs event failed.");
+        }
+    }
 }
 
 static void _add_spawn_entity_obj(world_instance_t *world,
@@ -535,6 +552,7 @@ static void add_components(ct_world_t0 world,
         uint64_t obj = components[i];
 
         _add_event(w, (ct_ecs_event_t0) {
+                .world = world,
                 .type = CT_ECS_EVENT_COMPONENT_SPAWN,
                 .component = {
                         .ent = ent,
@@ -755,6 +773,7 @@ void unlink(ct_world_t0 world,
     }
 
     _add_event(w, (ct_ecs_event_t0) {
+            .world = world,
             .link.child = ent,
             .type=CT_ECS_EVENT_ENT_UNLINK,
     });
@@ -896,6 +915,7 @@ static void link(ct_world_t0 world,
     }
 
     _add_event(w, (ct_ecs_event_t0) {
+            .world = world,
             .link.child = child,
             .link.parent= parent,
             .type=CT_ECS_EVENT_ENT_LINK,
@@ -938,8 +958,8 @@ static struct ct_entity_t0 _spawn_entity(ct_world_t0 world,
     uint64_t entity_obj = ent_obj;
 
     if (!ent_obj) {
-        entity_obj = name;
-//        entity_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), name);
+//        entity_obj = name;
+        entity_obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), name);
     }
 
     ct_entity_t0 root_ent;
@@ -984,6 +1004,7 @@ static struct ct_entity_t0 _spawn_entity(ct_world_t0 world,
         comp_data[idx] = new_comp_obj;
 
         _add_event(w, (ct_ecs_event_t0) {
+                .world = world,
                 .type = CT_ECS_EVENT_COMPONENT_SPAWN,
                 .component = {
                         .ent = root_ent,
@@ -1025,8 +1046,6 @@ static struct world_instance_t *_new_world(ct_world_t0 world) {
             .first_child = virtual_alloc(sizeof(ct_entity_t0) * MAX_ENTITIES),
             .next_sibling = virtual_alloc(sizeof(ct_entity_t0) * MAX_ENTITIES),
             .prev_sibling = virtual_alloc(sizeof(ct_entity_t0) * MAX_ENTITIES),
-
-            .events = virtual_alloc(MAX_EVENTS * sizeof(ct_ecs_event_t0)),
     };
 
     ce_array_push(_G.world_array, wi, _G.allocator);
@@ -1038,37 +1057,61 @@ static struct world_instance_t *_new_world(ct_world_t0 world) {
 }
 
 static ct_world_t0 create_world() {
-    ct_world_t0 world = {.h = ce_handler_create(&_G.world_handler,
-                                                _G.allocator)};
+    ct_world_t0 world = {.h = ce_handler_create(&_G.world_handler, _G.allocator)};
 
     CE_ASSERT("ecs", world.h != 0);
+    ce_array_push(_G.worlds, world, _G.allocator);
 
     world_instance_t *w = _new_world(world);
 
     w->world = world;
     w->db = ce_cdb_a0->db();
 
+    _add_event(w, (ct_ecs_event_t0) {
+            .type = CT_ECS_WORLD_EVENT_CREATED,
+            .world = world,
+    });
+
     return world;
 }
 
+ct_ecs_ev_queue_o0 *add_events_queue() {
+    return (ct_ecs_ev_queue_o0 *) _new_events_listener();
+}
 
-ct_ecs_events_t0 events(ct_world_t0 world) {
-    world_instance_t *w = get_world_instance(world);
+bool pop_events(ct_ecs_ev_queue_o0 *q,
+                ct_ecs_event_t0 *ev) {
+    ce_spsc_queue_t0 *qq = (ce_spsc_queue_t0 *) q;
+    return ce_spsc_dequeue(qq, ev);
+}
 
-    uint64_t envents_n = atomic_load(&w->events_n);
 
-    return (ct_ecs_events_t0) {.n = envents_n, .events = w->events};
+uint32_t world_num() {
+    return ce_array_size(_G.world_array);
+}
+
+void all_world(ct_world_t0 *worlds) {
+    memcpy(worlds, _G.worlds, sizeof(ct_world_t0) * world_num());
 }
 
 static void destroy_world(ct_world_t0 world) {
+    world_instance_t *w = get_world_instance(world);
+    _add_event(w, (ct_ecs_event_t0) {
+            .type = CT_ECS_WORLD_EVENT_DESTROYED,
+            .world = world,
+    });
+
     ce_handler_destroy(&_G.world_handler, world.h, _G.allocator);
 }
 
 static struct ct_ecs_a0 _api = {
         .create_world = create_world,
+        .new_events_listener = add_events_queue,
+        .pop_events = pop_events,
+        .world_num = world_num,
+        .all_world = all_world,
         .destroy_world = destroy_world,
 
-        .events = events,
         //ENT
         .create = create_entities,
         .destroy = destroy,
@@ -1168,124 +1211,96 @@ static void _sync_task(float dt) {
     }
 
     // changed
-    uint32_t changed_n = 0;
-    const uint64_t *orig_changed = ce_cdb_a0->changed_objects(ce_cdb_a0->db(), &changed_n);
-
-    uint64_t *changed = CE_ALLOC(_G.allocator, uint64_t, sizeof(uint64_t) * changed_n);
-    memcpy(changed, orig_changed, sizeof(uint64_t) * changed_n);
-
-    for (int j = 0; j < changed_n; ++j) {
-        uint64_t obj = changed[j];
-
-        if (!obj) {
-            continue;
-        }
-
-        const ce_cdb_obj_o0 *obj_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
+    struct ce_cdb_change_ev_t0 ev = {};
+    while (ce_cdb_a0->pop_obj_events(_G.obj_queue, &ev)) {
+        uint64_t obj = ev.obj;
         uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
         // is entity?
-        if (type == ENTITY_INSTANCE) {
-            for (uint32_t i = 0; i < wn; ++i) {
-                struct world_instance_t *world = &_G.world_array[i];
+        if (type != ENTITY_INSTANCE) {
+            continue;
+        }
 
-                uint32_t change_n = 0;
-                const struct ce_cdb_change_ev_t0 *changes;
-                changes = ce_cdb_a0->changed(obj_r, &change_n);
+        for (uint32_t i = 0; i < wn; ++i) {
+            struct world_instance_t *world = &_G.world_array[i];
+            if (ev.prop == ENTITY_CHILDREN) {
+                if (ev.type == CE_CDB_OBJSET_ADD) {
+                    uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
 
-                for (int ch = 0; ch < change_n; ++ch) {
-                    struct ce_cdb_change_ev_t0 ev = changes[ch];
+                    if (idx == UINT64_MAX) {
+                        continue;
+                    }
 
-                    if (ev.prop == ENTITY_CHILDREN) {
-                        if (ev.type == CE_CDB_OBJSET_ADD) {
-                            uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
+                    uint64_t ent_obj = ev.new_value.subobj;
 
-                            if (idx == UINT64_MAX) {
+                    struct spawn_info_t *si = &world->obj_spawn_info[idx];
+
+                    ce_array_clean(ents);
+                    uint32_t ents_n = ce_array_size(si->ents);
+                    ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
+
+                    for (int e = 0; e < ents_n; ++e) {
+                        ct_entity_t0 new_ents = spawn_entity(world->world, ent_obj);
+                        link(world->world, ents[e], new_ents);
+                    }
+
+                } else if (ev.type == CE_CDB_MOVE) {
+                    uint64_t ent_obj = ev.value.subobj;
+                    uint64_t to_ent_obj = ev.to;
+
+
+                    uint64_t ent_idx = ce_hash_lookup(&world->obj_entmap,
+                                                      ent_obj,
+                                                      UINT64_MAX);
+                    if (UINT64_MAX == ent_idx) {
+                        continue;
+                    }
+
+                    uint64_t to_idx = ce_hash_lookup(&world->obj_entmap,
+                                                     to_ent_obj,
+                                                     UINT64_MAX);
+                    if (UINT64_MAX == to_idx) {
+                        continue;
+                    }
+
+                    struct spawn_info_t *ent_si = &world->obj_spawn_info[ent_idx];
+                    struct spawn_info_t *to_si = &world->obj_spawn_info[to_idx];
+
+                    ce_array_clean(ents);
+                    uint32_t ents_n = ce_array_size(ent_si->ents);
+                    ce_array_push_n(ents, ent_si->ents, ents_n, _G.allocator);
+
+                    for (int e = 0; e < ents_n; ++e) {
+                        unlink(world->world, ents[e]);
+                        ct_entity_t0 root_e = to_si->ents[0];
+                        link(world->world, root_e, ents[e]);
+                    }
+                }
+            } else if (ev.prop == ENTITY_COMPONENTS) {
+                uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
+                if (idx != UINT64_MAX) {
+                    if (ev.type == CE_CDB_OBJSET_ADD) {
+                        uint64_t comp_obj = ev.new_value.subobj;
+                        uint64_t k = ce_cdb_a0->obj_type(ce_cdb_a0->db(), comp_obj);
+
+                        struct spawn_info_t *si = &world->obj_spawn_info[idx];
+
+                        ce_array_clean(ents);
+                        uint32_t ents_n = ce_array_size(si->ents);
+                        ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
+
+                        for (int e = 0; e < ents_n; ++e) {
+                            struct ct_entity_t0 ent = ents[e];
+
+                            uint64_t ent_type = _entity_type(world, ent);
+                            uint64_t new_type = combine_component(&k, 1);
+                            new_type = ent_type | new_type;
+
+                            if (ent_type == new_type) {
                                 continue;
                             }
 
-                            uint64_t ent_obj = ev.new_value.subobj;
-
-                            struct spawn_info_t *si = &world->obj_spawn_info[idx];
-
-                            ce_array_clean(ents);
-                            uint32_t ents_n = ce_array_size(si->ents);
-                            ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
-
-                            for (int e = 0; e < ents_n; ++e) {
-                                ct_entity_t0 new_ents = spawn_entity(world->world, ent_obj);
-                                link(world->world, ents[e], new_ents);
-                            }
-
-                        } else if (ev.type == CE_CDB_MOVE) {
-                            uint64_t ent_obj = ev.value.subobj;
-                            uint64_t to_ent_obj = ev.to;
-
-
-                            uint64_t ent_idx = ce_hash_lookup(&world->obj_entmap,
-                                                              ent_obj,
-                                                              UINT64_MAX);
-                            if (UINT64_MAX == ent_idx) {
-                                continue;
-                            }
-
-                            uint64_t to_idx = ce_hash_lookup(&world->obj_entmap,
-                                                             to_ent_obj,
-                                                             UINT64_MAX);
-                            if (UINT64_MAX == to_idx) {
-                                continue;
-                            }
-
-                            struct spawn_info_t *ent_si = &world->obj_spawn_info[ent_idx];
-                            struct spawn_info_t *to_si = &world->obj_spawn_info[to_idx];
-
-                            ce_array_clean(ents);
-                            uint32_t ents_n = ce_array_size(ent_si->ents);
-                            ce_array_push_n(ents, ent_si->ents, ents_n, _G.allocator);
-
-                            for (int e = 0; e < ents_n; ++e) {
-                                unlink(world->world, ents[e]);
-                                ct_entity_t0 root_e = to_si->ents[0];
-                                link(world->world, root_e, ents[e]);
-                            }
-                        }
-                    } else if (ev.prop == ENTITY_COMPONENTS) {
-                        uint64_t idx = ce_hash_lookup(&world->obj_entmap, obj, UINT64_MAX);
-                        if (idx != UINT64_MAX) {
-                            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
-                            uint32_t change_n = 0;
-                            const struct ce_cdb_change_ev_t0 *changes;
-                            changes = ce_cdb_a0->changed(r, &change_n);
-
-                            for (int ch = 0; ch < change_n; ++ch) {
-                                struct ce_cdb_change_ev_t0 ev = changes[ch];
-                                if (ev.type == CE_CDB_OBJSET_ADD) {
-                                    uint64_t comp_obj = ev.new_value.subobj;
-                                    uint64_t k = ce_cdb_a0->obj_type(ce_cdb_a0->db(), comp_obj);
-
-                                    struct spawn_info_t *si = &world->obj_spawn_info[idx];
-
-                                    ce_array_clean(ents);
-                                    uint32_t ents_n = ce_array_size(si->ents);
-                                    ce_array_push_n(ents, si->ents, ents_n, _G.allocator);
-
-                                    for (int e = 0; e < ents_n; ++e) {
-                                        struct ct_entity_t0 ent = ents[e];
-
-                                        uint64_t ent_type = _entity_type(world, ent);
-                                        uint64_t new_type = combine_component(&k, 1);
-                                        new_type = ent_type | new_type;
-
-                                        if (ent_type == new_type) {
-                                            continue;
-                                        }
-
-                                        _add_components_from_obj(world, ent, k, comp_obj);
-                                    }
-                                }
-                            }
+                            _add_components_from_obj(world, ent, k, comp_obj);
                         }
                     }
                 }
@@ -1293,10 +1308,8 @@ static void _sync_task(float dt) {
         }
     }
 
-    CE_FREE(_G.allocator, changed);
     ce_array_free(ents, _G.allocator);
 }
-
 
 static uint64_t task_name() {
     return CT_ECS_SYNC_TASK;
@@ -1327,34 +1340,6 @@ static struct ct_kernel_task_i0 ecs_sync_task = {
         .update_before = update_before,
 };
 
-static uint64_t task_event_name() {
-    return CT_ECS_EVENT_TASK;
-}
-
-static uint64_t *task_event_update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_RENDER_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-
-static void task_event_update(float dt) {
-    uint32_t wn = ce_array_size(_G.world_array);
-    for (int i = 0; i < wn; ++i) {
-        world_instance_t *w = &_G.world_array[i];
-        w->events_n = 0;
-    }
-}
-
-static struct ct_kernel_task_i0 ecs_event_task = {
-        .name = task_event_name,
-        .update = task_event_update,
-        .update_after = task_event_update_after,
-};
-
 
 static void _init(struct ce_api_a0 *api) {
     _init_api(api);
@@ -1362,14 +1347,15 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
             .db = ce_cdb_a0->db(),
+            .obj_queue = ce_cdb_a0->new_obj_listener(ce_cdb_a0->db()),
     };
 
     ce_handler_create(&_G.world_handler, _G.allocator);
 
     ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task, sizeof(ecs_sync_task));
-    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &ecs_event_task, sizeof(ecs_event_task));
     ce_api_a0->register_on_add(COMPONENT_I, _componet_api_add);
+
 }
 
 typedef struct _ct_entity_t0 {

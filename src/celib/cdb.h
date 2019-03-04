@@ -30,6 +30,28 @@ extern "C" {
 
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
+typedef enum ce_cdb_type_e0 {
+    CDB_TYPE_NONE = 0,
+    CDB_TYPE_UINT64 = 1,
+    CDB_TYPE_PTR = 2,
+    CDB_TYPE_REF = 3,
+    CDB_TYPE_FLOAT = 4,
+    CDB_TYPE_BOOL = 5,
+    CDB_TYPE_STR = 6,
+    CDB_TYPE_SUBOBJECT = 7,
+    CDB_TYPE_BLOB = 8,
+    CDB_TYPE_SET_SUBOBJECT = 9,
+} ce_cdb_type_e0;
+
+typedef enum ce_cdb_prop_flag_e0 {
+    CDB_PROP_FLAG_NONE = 0,
+    CDB_PROP_FLAG_UNPACK = 1 << 0,
+} ce_cdb_flag_e0;
+
+
+typedef struct ct_cdb_ev_queue_o0 ct_cdb_ev_queue_o0;
+typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
+
 typedef struct ce_cdb_t0 {
     uint64_t idx;
 } ce_cdb_t0;
@@ -68,26 +90,6 @@ typedef struct ce_cdb_change_ev_t0 {
         };
     };
 } ce_cdb_change_ev_t0;
-
-typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
-
-typedef enum ce_cdb_type_e0 {
-    CDB_TYPE_NONE = 0,
-    CDB_TYPE_UINT64 = 1,
-    CDB_TYPE_PTR = 2,
-    CDB_TYPE_REF = 3,
-    CDB_TYPE_FLOAT = 4,
-    CDB_TYPE_BOOL = 5,
-    CDB_TYPE_STR = 6,
-    CDB_TYPE_SUBOBJECT = 7,
-    CDB_TYPE_BLOB = 8,
-    CDB_TYPE_SET_SUBOBJECT = 9,
-} ce_cdb_type_e0;
-
-typedef enum ce_cdb_prop_flag_e0 {
-    CDB_PROP_FLAG_NONE = 0,
-    CDB_PROP_FLAG_UNPACK = 1 << 0,
-} ce_cdb_flag_e0;
 
 typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
 
@@ -146,9 +148,6 @@ struct ce_cdb_a0 {
     void (*set_type)(ce_cdb_t0 db,
                      uint64_t obj,
                      uint64_t type);
-//
-//    uint64_t (*obj_key)(ce_cdb_t0 db,
-//                        uint64_t obj);
 
     //
     void (*move_obj)(ce_cdb_t0 db,
@@ -275,8 +274,15 @@ struct ce_cdb_a0 {
     const uint64_t *(*destroyed)(ce_cdb_t0 db,
                                  uint32_t *n);
 
-    const uint64_t *(*changed_objects)(ce_cdb_t0 db,
-                                       uint32_t *n);
+    ct_cdb_ev_queue_o0 *(*new_changed_obj_listener)(ce_cdb_t0 db);
+
+    bool (*pop_changed_obj)(ct_cdb_ev_queue_o0 *q,
+                            uint64_t *obj);
+
+    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db);
+
+    bool (*pop_obj_events)(ct_cdb_ev_queue_o0 *q,
+                           ce_cdb_change_ev_t0 *ev);
 
     // READ
     const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,
@@ -294,9 +300,6 @@ struct ce_cdb_a0 {
                              size_t max_size);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
-
-    const ce_cdb_change_ev_t0 *(*changed)(const ce_cdb_obj_o0 *reader,
-                                          uint32_t *n);
 
 
     float (*read_float)(const ce_cdb_obj_o0 *reader,

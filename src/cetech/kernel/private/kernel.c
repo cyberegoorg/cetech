@@ -34,6 +34,7 @@
 #include <celib/os/path.h>
 #include <celib/os/time.h>
 #include <cetech/transform/transform.h>
+#include <stdatomic.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
@@ -84,18 +85,18 @@ int init_config(int argc,
     const char *build_dir_str = ce_cdb_a0->read_str(reader, CONFIG_BUILD, "");
     char *build_dir = NULL;
     ce_os_path_a0->join(&build_dir, _G.allocator, 2,
-                         build_dir_str,
-                         ce_cdb_a0->read_str(reader, CONFIG_NATIVE_PLATFORM,
-                                             ""));
+                        build_dir_str,
+                        ce_cdb_a0->read_str(reader, CONFIG_NATIVE_PLATFORM,
+                                            ""));
 
     char *build_config = NULL;
     ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir,
-                         "global.yml");
+                        "global.yml");
 
     const char *source_dir_str = ce_cdb_a0->read_str(reader, CONFIG_SRC, "");
     char *source_config = NULL;
     ce_os_path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
-                         "global.yml");
+                        "global.yml");
 
     if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
         ce_os_path_a0->make_path(build_dir);
@@ -149,7 +150,7 @@ bool cetech_kernel_init(int argc,
     uint64_t root = ce_id_a0->id64("modules");
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                 ce_config_a0->obj());
+                                                  ce_config_a0->obj());
 
     const char *module_path = ce_cdb_a0->read_str(reader,
                                                   CONFIG_MODULE_DIR,
@@ -183,7 +184,7 @@ void _init_config() {
     _G.config_object = ce_config_a0->obj();
 
     ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                  _G.config_object);
+                                                   _G.config_object);
 
     if (!ce_cdb_a0->prop_exist(writer, CONFIG_BOOT_PKG)) {
         ce_cdb_a0->set_str(writer, CONFIG_BOOT_PKG, "boot");
@@ -211,7 +212,6 @@ void _init_config() {
 
     ce_cdb_a0->write_commit(writer);
 }
-
 
 
 static void _build_update_graph(ce_ba_graph_t *sg) {
@@ -255,8 +255,7 @@ static void _update(ce_ba_graph_t *sg,
     const uint64_t output_n = ce_array_size(sg->output);
     for (int k = 0; k < output_n; ++k) {
         ce_kernel_taks_update_t fce;
-        fce = (ce_kernel_taks_update_t) ce_hash_lookup(&_G.update_map,
-                                                       sg->output[k], 0);
+        fce = (ce_kernel_taks_update_t) ce_hash_lookup(&_G.update_map, sg->output[k], 0);
         fce(dt);
     }
 }
@@ -270,7 +269,7 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
-        if(!i->init) {
+        if (!i->init) {
             it = ce_api_a0->next(it);
             continue;
         }
@@ -312,8 +311,7 @@ static void _init(ce_ba_graph_t *sg) {
     const uint64_t output_n = ce_array_size(sg->output);
     for (int k = 0; k < output_n; ++k) {
         ce_kernel_taks_init_t fce;
-        fce = (ce_kernel_taks_init_t) ce_hash_lookup(&_G.init_map,
-                                                     sg->output[k], 0);
+        fce = (ce_kernel_taks_init_t) ce_hash_lookup(&_G.init_map, sg->output[k], 0);
         fce();
     }
 }
@@ -322,10 +320,9 @@ static void _shutdown(ce_ba_graph_t *sg) {
     const uint64_t output_n = ce_array_size(sg->output);
     for (int32_t k = output_n; k < 0; --k) {
         ce_kernel_taks_shutdown_t fce;
-        fce = (ce_kernel_taks_shutdown_t) ce_hash_lookup(&_G.shutdown_map,
-                                                         sg->output[k], 0);
+        fce = (ce_kernel_taks_shutdown_t) ce_hash_lookup(&_G.shutdown_map, sg->output[k], 0);
 
-        if(!fce) {
+        if (!fce) {
             continue;
         }
 
@@ -345,12 +342,11 @@ static struct ct_kernel_task_i0 input_task = {
         .update = _nop_update,
 };
 
+
 static void cetech_kernel_start() {
     ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &input_task, sizeof(input_task));
 
     _init_config();
-
-//    ce_cdb_a0->log_obj("sss", ce_cdb_a0->db(), 0x588f56dc4e82f7b2ULL);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config_object);
 
