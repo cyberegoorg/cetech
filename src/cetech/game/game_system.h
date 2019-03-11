@@ -27,8 +27,6 @@ typedef struct ct_game_i0 {
     void (*shutdown)();
 
     void (*update)(float dt);
-
-    ct_viewport_t0 (*viewport)();
 }ct_game_i0;
 
 struct ct_game_system_a0 {

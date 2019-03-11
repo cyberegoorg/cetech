@@ -1,5 +1,6 @@
 core:
   boot_pkg: content/boot
+  boot_ent: 0x588f56dc4e82f7b2
 
 screen:
   x: 800

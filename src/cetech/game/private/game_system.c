@@ -14,34 +14,53 @@
 #include <celib/cdb.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
+#include <celib/config.h>
 
 #include "../game_system.h"
 
 #define _G game_system_global
 
+typedef struct game_state_t {
+    ct_world_t0 world;
+    ct_viewport_t0 viewport;
+    ct_entity_t0 camera_ent;
+    ct_entity_t0 main_ent;
+    bool started;
+}game_state_t;
+
 struct _G {
-    ce_hash_t game_interface_map;
     ce_hash_t game_paused;
+    ce_hash_t game_interface_map;
     ct_game_i0 **game_interface;
+    game_state_t game_state;
+    uint64_t active_game;
 } _G;
 
 static struct ct_game_i0 *_get_game(uint64_t name) {
-    return (ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name,
-                                                0);
+    return (ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name, 0);
 }
 
+#define _CAMERA_ASSET 0x57899875c4457313
 static void game_init() {
-    const uint64_t game_n = ce_array_size(_G.game_interface);
-    for (int i = 0; i < game_n; ++i) {
-        _G.game_interface[i]->init();
-    }
+    _G.game_state.world = ct_ecs_a0->create_world();
+    _G.game_state.camera_ent = ct_ecs_a0->spawn(_G.game_state.world, _CAMERA_ASSET);
+    _G.game_state.viewport = ct_renderer_a0->create_viewport(_G.game_state.world, _G.game_state.camera_ent);
+
+    uint64_t config = ce_config_a0->obj();
+    const ce_cdb_obj_o0 *r =ce_cdb_a0->read(ce_cdb_a0->db(), config);
+    uint64_t boot_ent = ce_cdb_a0->read_ref(r, CONFIG_BOOT_ENT, 0);
+
+    _G.game_state.main_ent = ct_ecs_a0->spawn(_G.game_state.world, boot_ent);
+
+    struct ct_game_i0 *gi = _get_game(_G.active_game);
+    gi->init();
 }
 
 static void game_shutdown() {
-    const uint64_t game_n = ce_array_size(_G.game_interface);
-    for (int i = 0; i < game_n; ++i) {
-        _G.game_interface[i]->shutdown();
-    }
+    struct ct_game_i0 *gi = _get_game(_G.active_game);
+    gi->shutdown();
+
+    ct_ecs_a0->destroy_world(_G.game_state.world);
 }
 
 static void game_step(uint64_t name,
@@ -56,8 +75,9 @@ static void game_step(uint64_t name,
         return;
     }
 
-
     game_i->update(dt);
+
+    ct_ecs_a0->simulate(_G.game_state.world, dt);
 }
 
 static bool game_is_paused(uint64_t name) {
@@ -65,26 +85,17 @@ static bool game_is_paused(uint64_t name) {
 }
 
 static void game_update(float dt) {
-    const uint64_t game_n = ce_array_size(_G.game_interface);
-    for (int i = 0; i < game_n; ++i) {
-        struct ct_game_i0 *gi = _G.game_interface[i];
-
-        if (game_is_paused(gi->name())) {
-            continue;
-        }
-
-        gi->update(dt);
+    if (game_is_paused(_G.active_game)) {
+        return;
     }
+
+    struct ct_game_i0 *gi = _get_game(_G.active_game);
+    gi->update(dt);
+    ct_ecs_a0->simulate(_G.game_state.world, dt);
 }
 
 static struct ct_viewport_t0 game_render_graph_builder(uint64_t name) {
-    ct_game_i0 *game_i = _get_game(name);
-
-    if (!game_i) {
-        return (ct_viewport_t0) {0};
-    }
-
-    return game_i->viewport();
+    return _G.game_state.viewport;
 }
 
 static void game_pause(uint64_t name) {
@@ -146,6 +157,9 @@ static struct ct_kernel_task_i0 game_task = {
 
 void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                   int reload) {
+    _G = (struct _G) {
+        .active_game = ce_id_a0->id64("default"),
+    };
 
     api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
     api->register_api(KERNEL_TASK_INTERFACE, &game_task, sizeof(game_task));

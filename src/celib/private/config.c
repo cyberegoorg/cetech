@@ -16,6 +16,7 @@
 #include <celib/macros.h>
 #include <celib/ydb.h>
 #include <celib/os/vio.h>
+#include <stdlib.h>
 
 
 //==============================================================================
@@ -61,13 +62,22 @@ static struct ConfigSystemGlobals {
 static void log_all() {
 }
 
+static uint64_t _uid_from_str(const char *str) {
+    uint64_t v = strtoul(str, NULL, 0);
+    return v;
+}
+
+static bool _is_ref(const char *str) {
+    return (str[0] == '0') && (str[1] == 'x');
+}
+
 static void _cvar_from_str(const char *name,
                            const char *value) {
     int d = 0;
     float f = 0;
 
     ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                  _G.config_object);
+                                                   _G.config_object);
 
     const uint64_t key = ce_id_a0->id64(name);
 
@@ -76,8 +86,11 @@ static void _cvar_from_str(const char *name,
         goto end;
     }
 
-
-    if (sscanf(value, "%d", &d)) {
+    if (_is_ref(value)) {
+        uint64_t ref =_uid_from_str(value);
+        ce_cdb_a0->set_ref(writer, key, ref);
+        goto end;
+    } else if (sscanf(value, "%d", &d)) {
         ce_cdb_a0->set_uint64(writer, key, d);
         goto end;
 
@@ -132,18 +145,17 @@ static void foreach_config_clb(uint64_t key,
         if (type == CDB_TYPE_STR) {
             str = ce_cdb_a0->read_str(reader, key, "");
             _cvar_from_str(name, str);
-
         } else {
             const uint64_t key = ce_id_a0->id64(name);
 
             const ce_cdb_obj_o0 *conf_r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                         _G.config_object);
+                                                          _G.config_object);
 
             if (ce_cdb_a0->prop_exist(conf_r, key)) {
                 enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(conf_r, key);
 
                 ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                              _G.config_object);
+                                                               _G.config_object);
 
                 switch (t) {
                     case CDB_TYPE_NONE:

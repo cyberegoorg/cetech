@@ -74,7 +74,7 @@ static void foreach_rotation(struct ct_world_t0 world,
 
 
         float speed = ce_cdb_a0->read_float(rotation, PROP_SPEED, 100.0f);
-        rot.y += speed * 0.1f * dt;
+        rot.y += speed * 0.1f * dt * _rnd_speed(100);
 
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), rot_o);

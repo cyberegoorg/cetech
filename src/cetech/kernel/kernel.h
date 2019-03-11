@@ -20,6 +20,9 @@ extern "C" {
 #define CONFIG_BOOT_PKG \
      CE_ID64_0("core.boot_pkg", 0xd065c28a0c45037eULL)
 
+#define CONFIG_BOOT_ENT \
+     CE_ID64_0("core.boot_ent", 0x111eabf289640feeULL)
+
 #define CONFIG_CONTINUE \
      CE_ID64_0("continue", 0xb3326d55cc9374b8ULL)
 
