@@ -40,6 +40,7 @@ static struct _G {
     float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
     int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
     int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
+    ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
 
 
@@ -138,55 +139,34 @@ static void play_rumble(uint32_t idx,
 }
 
 static void update(float dt) {
-    memcpy(_G.last_state, _G.state,
-           sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
+    memcpy(_G.last_state, _G.state, sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
 
 
-    uint64_t events_n = 0;
-    const uint64_t *events = ct_machine_a0->events(&events_n);
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
-        uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
+    ct_machine_ev_t0 ev = {};
+    while (ct_machine_a0->pop_ev(_G.ev_queue, &ev)) {
+        switch (ev.ev_type) {
+                case EVENT_GAMEPAD_DOWN:
+                    _G.state[ev.gamepad.gamepad_id][ev.gamepad.btn] = 1;
+                    break;
 
-        uint32_t button = ce_cdb_a0->read_uint64(reader, CONTROLER_BUTTON, 0);
-        uint32_t axis = ce_cdb_a0->read_uint64(reader, CONTROLER_AXIS, 0);
-        uint32_t gamepad_id = ce_cdb_a0->read_uint64(reader, CONTROLER_ID, 0);
+                case EVENT_GAMEPAD_UP:
+                    _G.state[ev.gamepad.gamepad_id][ev.gamepad.btn] = 0;
+                    break;
 
-        float pos[3] = {
-                ce_cdb_a0->read_float(reader,
-                                      CONTROLER_POSITION_X, 0.0f),
-                ce_cdb_a0->read_float(reader,
-                                      CONTROLER_POSITION_Y, 0.0f),
-                ce_cdb_a0->read_float(reader,
-                                      CONTROLER_POSITION_Z, 0.0f),
-        };
+                case EVENT_GAMEPAD_MOVE:
+                    _G.position[ev.gamepad.gamepad_id][ev.gamepad.axis_id][0] = ev.gamepad.pos.x;
+                    _G.position[ev.gamepad.gamepad_id][ev.gamepad.axis_id][1] = ev.gamepad.pos.y;
+                    break;
 
-        switch (event_type) {
-            case EVENT_GAMEPAD_DOWN:
-                _G.state[gamepad_id][button] = 1;
-                break;
+                case EVENT_GAMEPAD_CONNECT:
+                    _G.active[ev.gamepad.gamepad_id] = 1;
+                    break;
 
-            case EVENT_GAMEPAD_UP:
-                _G.state[gamepad_id][button] = 0;
-                break;
-
-            case EVENT_GAMEPAD_MOVE:
-                _G.position[gamepad_id][axis][0] = pos[0];
-                _G.position[gamepad_id][axis][1] = pos[1];
-                break;
-
-            case EVENT_GAMEPAD_CONNECT:
-                _G.active[gamepad_id] = 1;
-                break;
-
-            case EVENT_GAMEPAD_DISCONNECT:
-                _G.active[gamepad_id] = 0;
-                break;
-
-
-            default:
-                break;
+                case EVENT_GAMEPAD_DISCONNECT:
+                    _G.active[ev.gamepad.gamepad_id] = 0;
+                    break;
+                default:
+                    break;
         }
     }
 
@@ -247,7 +227,9 @@ static void _init_api(struct ce_api_a0 *api) {
 
 static void _init(struct ce_api_a0 *api) {
     _init_api(api);
-    _G = (struct _G) {};
+    _G = (struct _G) {
+            .ev_queue = ct_machine_a0->new_ev_listener(),
+    };
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 

@@ -39,6 +39,7 @@ static struct _G {
     float delta_pos[3];
     float wheel[3];
     float wheel_last[3];
+    ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
 
 //==============================================================================
@@ -161,59 +162,32 @@ static void update(float dt) {
 //    _G.wheel[1] = 0;
 
 
-    uint64_t events_n = 0;
-    const uint64_t *events = ct_machine_a0->events(&events_n);
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
-        uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
-
-        uint32_t button = ce_cdb_a0->read_uint64(reader,
-                                                 CONTROLER_BUTTON, 0);
-
-        switch (event_type) {
+    ct_machine_ev_t0 ev = {};
+    while (ct_machine_a0->pop_ev(_G.ev_queue, &ev)) {
+        switch (ev.ev_type) {
             case EVENT_MOUSE_DOWN:
-                _G.state[button] = 1;
+                _G.state[ev.mouse.btn] = 1;
                 break;
 
             case EVENT_MOUSE_UP:
-                _G.state[button] = 0;
+                _G.state[ev.mouse.btn] = 0;
                 break;
 
             case EVENT_MOUSE_MOVE: {
-                float pos[3] = {
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_X, 0.0f),
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_Y, 0.0f),
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_Z, 0.0f),
-                };
+                _G.delta_pos[0] = ev.mouse.pos.x - _G.pos[0];
+                _G.delta_pos[1] = ev.mouse.pos.y - _G.pos[1];
 
-
-                _G.delta_pos[0] = pos[0] - _G.pos[0];
-                _G.delta_pos[1] = pos[1] - _G.pos[1];
-
-                _G.pos[0] = pos[0];
-                _G.pos[1] = pos[1];
+                _G.pos[0] = ev.mouse.pos.x;
+                _G.pos[1] = ev.mouse.pos.y;
             }
                 break;
 
             case EVENT_MOUSE_WHEEL: {
-                float pos[3] = {
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_X, 0.0f),
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_Y, 0.0f),
-                        ce_cdb_a0->read_float(reader,
-                                              CONTROLER_POSITION_Z, 0.0f),
-                };
+                _G.wheel[0] += ev.mouse.pos.x;// - _G.wheel_last[0];
+                _G.wheel[1] += ev.mouse.pos.y;// - _G.wheel_last[1];
 
-                _G.wheel[0] += pos[0];// - _G.wheel_last[0];
-                _G.wheel[1] += pos[1];// - _G.wheel_last[1];
-
-                _G.wheel_last[0] = pos[0];
-                _G.wheel_last[1] = pos[1];
+                _G.wheel_last[0] = ev.mouse.pos.x;
+                _G.wheel_last[1] = ev.mouse.pos.y;
             }
                 break;
 
@@ -221,7 +195,6 @@ static void update(float dt) {
                 break;
         }
     }
-
 }
 
 static uint64_t name() {
@@ -271,15 +244,13 @@ static struct ct_kernel_task_i0 mouse_task = {
         .update_after = update_after,
 };
 
-static void _init_api(struct ce_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
+    _G = (struct _G) {
+            .ev_queue = ct_machine_a0->new_ev_listener(),
+    };
+
     api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
     api->register_api(KERNEL_TASK_INTERFACE, &mouse_task, sizeof(mouse_task));
-}
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
-
-    _G = (struct _G) {};
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 }

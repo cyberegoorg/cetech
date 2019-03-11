@@ -1343,6 +1343,7 @@ typedef struct cdb_binobj_header {
     uint64_t set_buffer_size;
 } cdb_binobj_header;
 
+// TODO: typed obj case is invalid
 static void dump(ce_cdb_t0 db,
                  uint64_t _obj,
                  char **output,

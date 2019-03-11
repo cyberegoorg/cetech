@@ -34,6 +34,7 @@ static struct G {
     uint8_t state[512];
     uint8_t last_state[512];
     char text[32];
+    ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
 
 
@@ -95,27 +96,19 @@ static void update(float dt) {
     memcpy(_G.last_state, _G.state, 512);
     memset(_G.text, 0, sizeof(_G.text));
 
-    uint64_t events_n = 0;
-    const uint64_t *events = ct_machine_a0->events(&events_n);
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
-        uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
-
-        switch (event_type) {
+    ct_machine_ev_t0 ev = {};
+    while (ct_machine_a0->pop_ev(_G.ev_queue, &ev)) {
+        switch (ev.ev_type) {
             case EVENT_KEYBOARD_DOWN:
-                _G.state[ce_cdb_a0->read_uint64(reader,
-                                                CONTROLER_KEYCODE, 0)] = 1;
+                _G.state[ev.key.keycode] = 1;
                 break;
 
             case EVENT_KEYBOARD_UP:
-                _G.state[ce_cdb_a0->read_uint64(reader,
-                                                CONTROLER_KEYCODE, 0)] = 0;
+                _G.state[ev.key.keycode] = 0;
                 break;
 
             case EVENT_KEYBOARD_TEXT: {
-                const char *str = ce_cdb_a0->read_str(reader,
-                                                      CONTROLER_TEXT, 0);
+                const char *str = ev.key.text;
                 memcpy(_G.text, str, strlen(str));
                 break;
             }
@@ -177,16 +170,13 @@ static struct ct_kernel_task_i0 keyboard_task = {
         .update_after = update_after,
 };
 
-static void _init_api(struct ce_api_a0 *api) {
+static void _init(struct ce_api_a0 *api) {
+    _G = (struct G) {
+            .ev_queue = ct_machine_a0->new_ev_listener(),
+    };
+
     api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
     api->register_api(KERNEL_TASK_INTERFACE, &keyboard_task, sizeof(keyboard_task));
-}
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
-
-
-    _G = (struct G) {};
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 }
