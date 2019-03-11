@@ -338,12 +338,12 @@ static uint64_t *update_after(uint64_t *n) {
 }
 
 static void _update(float dt) {
-    ce_cdb_change_ev_t0 ev = {};
+    ce_cdb_prop_ev_t0 ev = {};
 
     uint64_t *to_compile_obj = NULL;
     ce_hash_t obj_set = {};
 
-    while (ce_cdb_a0->pop_obj_events(_G.changed_obj_queue, &ev)) {
+    while (ce_cdb_a0->pop_objs_events(_G.changed_obj_queue, &ev)) {
         if(!ce_hash_contain(&_G.online_texture, ev.obj)) {
             continue;
         }
@@ -397,7 +397,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .changed_obj_queue = ce_cdb_a0->new_obj_listener(ce_cdb_a0->db()),
+            .changed_obj_queue = ce_cdb_a0->new_objs_listener(ce_cdb_a0->db()),
     };
 
     CE_UNUSED(reload);

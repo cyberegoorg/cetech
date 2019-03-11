@@ -358,6 +358,7 @@ static void cetech_kernel_start() {
         }
     }
 
+    uint64_t m4 = 0x1680afa75da0014d;
 //    uint64_t obj = 0x588f56dc4e82f7b2;
 //    uint64_t obj = 0x57899875c4457313;
 
@@ -395,6 +396,11 @@ static void cetech_kernel_start() {
 //    clone = ce_cdb_a0->create_from(ce_cdb_a0->db(), clone);
 //    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), clone);
 //    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), obj);
+
+    for (int i = 0; i < 100; ++i) {
+        uint64_t obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), m4);
+        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
+    }
 
     uint64_t t = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
     ce_cdb_a0->log_obj("D", ce_cdb_a0->db(), t);

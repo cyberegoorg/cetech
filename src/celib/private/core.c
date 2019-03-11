@@ -65,8 +65,8 @@ bool ce_shutdown() {
     CE_UNLOAD_STATIC_MODULE(ce_api_a0, hashlib);
     // CE_UNLOAD_STATIC_MODULE(ce_api_a0, ydb);
 
-    memsys_shutdown();
     api_shutdown();
+    memsys_shutdown();
 
     return true;
 }

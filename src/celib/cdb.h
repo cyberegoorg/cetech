@@ -10,23 +10,29 @@ extern "C" {
 #define CE_CDB_API \
     CE_ID64_0("ce_cdb_a0", 0xf069efc5d4120b7bULL)
 
-#define CE_CDB_CHANGE \
-    CE_ID64_0("change", 0x8694ed4881bfb631ULL)
-
-#define CE_CDB_REMOVE \
-    CE_ID64_0("remove", 0x36f36c7f8cda6d13ULL)
-
 #define CDB_INSTANCE_PROP \
     CE_ID64_0("cdb_instance", 0xb0f74f1d9d7c645dULL)
 
-#define CE_CDB_MOVE \
+#define CE_CDB_PROP_CHANGE_EVENT \
+    CE_ID64_0("change", 0x8694ed4881bfb631ULL)
+
+#define CE_CDB_PROP_REMOVE_EVENT \
+    CE_ID64_0("remove", 0x36f36c7f8cda6d13ULL)
+
+#define CE_CDB_PROP_MOVE_EVENT \
     CE_ID64_0("move", 0x33603ac62788b5c5ULL)
 
-#define CE_CDB_OBJSET_ADD \
+#define CE_CDB_OBJSET_ADD_EVENT \
     CE_ID64_0("objset_add", 0x7390985657b354e9ULL)
 
-#define CE_CDB_OBJSET_REMOVE \
+#define CE_CDB_OBJSET_REMOVE_EVENT \
     CE_ID64_0("objset_remove", 0xd973a462dce1b7c8ULL)
+
+#define CE_CDB_OBJ_CHANGE_EVENT \
+    CE_ID64_0("obj_change", 0x2cf62adf15c17305ULL)
+
+#define CE_CDB_OBJ_DESTROY_EVENT \
+    CE_ID64_0("obj_destroy", 0x5669bedb7db786e4ULL)
 
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
@@ -47,7 +53,6 @@ typedef enum ce_cdb_prop_flag_e0 {
     CDB_PROP_FLAG_NONE = 0,
     CDB_PROP_FLAG_UNPACK = 1 << 0,
 } ce_cdb_flag_e0;
-
 
 typedef struct ct_cdb_ev_queue_o0 ct_cdb_ev_queue_o0;
 typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
@@ -74,8 +79,14 @@ typedef union ce_cdb_value_u0 {
     uint32_t set;
 } ce_cdb_value_u0;
 
-typedef struct ce_cdb_change_ev_t0 {
-    uint64_t type;
+typedef struct ce_cdb_ev_t0 {
+    uint64_t ev_type;
+    uint64_t obj;
+    uint64_t obj_type;
+}ce_cdb_ev_t0;
+
+typedef struct ce_cdb_prop_ev_t0 {
+    uint64_t ev_type;
     uint64_t obj;
     uint64_t prop;
     uint64_t prop_type;
@@ -89,7 +100,7 @@ typedef struct ce_cdb_change_ev_t0 {
             union ce_cdb_value_u0 value;
         };
     };
-} ce_cdb_change_ev_t0;
+} ce_cdb_prop_ev_t0;
 
 typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
 
@@ -271,18 +282,21 @@ struct ce_cdb_a0 {
     void (*remove_property)(ce_cdb_obj_o0 *writer,
                             uint64_t property);
 
-    const uint64_t *(*destroyed)(ce_cdb_t0 db,
-                                 uint32_t *n);
-
     ct_cdb_ev_queue_o0 *(*new_changed_obj_listener)(ce_cdb_t0 db);
 
     bool (*pop_changed_obj)(ct_cdb_ev_queue_o0 *q,
-                            uint64_t *obj);
+                            ce_cdb_ev_t0 *ev);
 
-    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db);
+    ct_cdb_ev_queue_o0 *(*new_objs_listener)(ce_cdb_t0 db);
+
+    bool (*pop_objs_events)(ct_cdb_ev_queue_o0 *q,
+                           ce_cdb_prop_ev_t0 *ev);
+
+    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db, uint64_t obj);
 
     bool (*pop_obj_events)(ct_cdb_ev_queue_o0 *q,
-                           ce_cdb_change_ev_t0 *ev);
+                           ce_cdb_prop_ev_t0 *ev);
+
 
     // READ
     const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,

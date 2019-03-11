@@ -48,6 +48,9 @@ extern "C" {
 #define CT_ECS_EVENT_COMPONENT_DESTROY \
     CE_ID64_0("component_destroy", 0xca6890a5459ecb2cULL)
 
+#define CT_ECS_EVENT_COMPONENT_CHANGE \
+    CE_ID64_0("component_change", 0xb47624cc2d5cbbb7ULL)
+
 #define CT_ECS_EVENT_ENT_LINK \
     CE_ID64_0("entity_link", 0xffcddf97336bbc9ULL)
 
@@ -60,10 +63,12 @@ extern "C" {
 #define CT_ECS_WORLD_EVENT_DESTROYED \
     CE_ID64_0("ecs_world_evemt_destroyed", 0x246df7bdf1f5ff81ULL)
 
+
 typedef struct ct_resource_id_t0 ct_resource_id_t0;
-typedef struct ce_cdb_change_ev_t0 ce_cdb_change_ev_t0;
 typedef struct ct_entity_storage_o0 ct_entity_storage_o0;
-typedef struct ce_spsc_queue_t0 ce_spsc_queue_t0;
+
+
+typedef struct ct_ecs_ev_queue_o0 ct_ecs_ev_queue_o0;
 
 typedef struct ct_world_t0 {
     uint64_t h;
@@ -79,7 +84,7 @@ typedef void (*ct_process_fce_t)(ct_world_t0 world,
                                  uint32_t n,
                                  void *data);
 
-typedef void (*ct_simulate_fce_t)(ct_world_t0 world,
+typedef void (ct_simulate_fce_t)(ct_world_t0 world,
                                   float dt);
 
 typedef struct ct_component_i0 {
@@ -104,12 +109,12 @@ typedef struct ct_editor_component_i0 {
 
 struct ct_simulation_i0 {
     uint64_t (*name)();
-
     const uint64_t *(*before)(uint32_t *n);
-
     const uint64_t *(*after)(uint32_t *n);
+    void (*on_create_world)(ct_world_t0 world, ct_ecs_ev_queue_o0 *queue);
 
-    ct_simulate_fce_t simulation;
+    ct_simulate_fce_t *simulation;
+
 };
 
 
@@ -129,7 +134,21 @@ typedef struct ct_ecs_event_t0 {
     };
 } ct_ecs_event_t0;
 
-typedef struct ct_ecs_ev_queue_o0 ct_ecs_ev_queue_o0;
+typedef struct ct_ecs_world_event_t0 {
+    uint64_t type;
+    ct_world_t0 world;
+    union {
+        struct {
+            ct_entity_t0 ent;
+            uint64_t component;
+        } component;
+
+        struct {
+            ct_entity_t0 child;
+            ct_entity_t0 parent;
+        } link;
+    };
+} ct_ecs_world_event_t0;
 
 struct ct_ecs_a0 {
     //WORLD
@@ -143,6 +162,11 @@ struct ct_ecs_a0 {
 
     bool (*pop_events)(ct_ecs_ev_queue_o0 *q,
                        ct_ecs_event_t0 *ev);
+
+    ct_ecs_ev_queue_o0 *(*new_world_events_listener)(ct_world_t0 world);
+
+    bool (*pop_world_events)(ct_ecs_ev_queue_o0 *q,
+                             ct_ecs_world_event_t0 *ev);
 
     //ENT
     void (*destroy_world)(ct_world_t0 world);

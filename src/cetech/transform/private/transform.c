@@ -48,25 +48,20 @@ typedef struct world_state_t {
     ce_mat4_t *world;
 
     uint32_t nodes_num;
+    ct_ecs_ev_queue_o0 *events;
 } world_state_t;
 
 static struct transform_global {
     ce_hash_t world_map;
     world_state_t *world_state;
-    ct_cdb_ev_queue_o0* changed_obj_queue;
-
-    ct_ecs_ev_queue_o0 *events_queue;
+    ct_cdb_ev_queue_o0 *changed_obj_queue;
     ce_alloc_t0 *alloc;
 } _G = {};
 
 
 static void *virtual_alloc(uint64_t size) {
-    return mmap(NULL,
-                size,
-                PROT_READ | PROT_WRITE,
-                MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+    return CE_REALLOC(ce_memory_a0->virt_system, void, NULL, size, 0);
 }
-
 
 static world_state_t *_get_or_create_world_state(ct_world_t0 world) {
     uint64_t idx = ce_hash_lookup(&_G.world_map, world.h, UINT64_MAX);
@@ -137,6 +132,7 @@ static uint32_t _create_node(world_state_t *state,
     uint32_t idx = state->nodes_num++;
 
     state->component[idx] = component;
+
     state->parent[idx] = UINT32_MAX;
     state->first_child[idx] = UINT32_MAX;
     state->next_sibling[idx] = UINT32_MAX;
@@ -235,21 +231,11 @@ static struct ct_component_i0 ct_component_api = {
 
 static void transform_system(ct_world_t0 world,
                              float dt) {
-//     _get_or_create_world_state(world);
-}
+    world_state_t *state = _get_or_create_world_state(world);
 
-static uint64_t task_name() {
-    return TRANSFORM_SYSTEM;
-}
-
-static void _update(float dt) {
     ct_ecs_event_t0 ev = {};
-    while (ct_ecs_a0->pop_events(_G.events_queue, &ev)) {
-        world_state_t *state = _get_or_create_world_state(ev.world);
-        if (ev.type == CT_ECS_WORLD_EVENT_CREATED) {
-            _get_or_create_world_state(ev.world);
-
-        } else if (ev.type == CT_ECS_EVENT_COMPONENT_SPAWN) {
+    while (ct_ecs_a0->pop_events(state->events, &ev)) {
+        if (ev.type == CT_ECS_EVENT_COMPONENT_SPAWN) {
             uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
                                                           ev.component.component);
 
@@ -275,7 +261,21 @@ static void _update(float dt) {
                 }
             }
 
+        } else if (ev.type == CT_ECS_EVENT_COMPONENT_CHANGE) {
+            if (!ev.component.component) {
+                continue;
+            }
+
+            uint64_t idx = ce_hash_lookup(&state->component_map,
+                                          ev.component.component,
+                                          UINT64_MAX);
+
+            if (idx == UINT64_MAX) {
+                continue;
+            }
+
             _transform(state, idx);
+
         } else if (ev.type == CT_ECS_EVENT_ENT_LINK) {
             uint64_t parent_transform = ct_ecs_a0->get_one(state->ent_world,
                                                            TRANSFORM_COMPONENT, ev.link.parent);
@@ -313,67 +313,23 @@ static void _update(float dt) {
             _unlink(state, child_node);
         }
     }
-
-
-    uint32_t wn = ce_array_size(_G.world_state);
-    uint64_t obj = 0;
-    while (ce_cdb_a0->pop_changed_obj(_G.changed_obj_queue, &obj)) {
-        if (!obj) {
-            continue;
-        }
-
-        uint64_t parent_obj = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
-
-        if (!parent_obj) {
-            continue;
-        }
-
-        for (int i = 0; i < wn; ++i) {
-            world_state_t *state = &_G.world_state[i];
-
-            uint32_t idx = ce_hash_lookup(&state->component_map, parent_obj, UINT32_MAX);
-
-            if (idx == UINT32_MAX) {
-                continue;
-            }
-
-            _transform(state, idx);
-        }
-    }
 }
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_ECS_SYNC_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static struct ct_kernel_task_i0 transform_sync_task = {
-        .name = task_name,
-        .update = _update,
-        .update_after = update_after,
-};
-
 
 static uint64_t name() {
     return TRANSFORM_SYSTEM;
 }
 
+void _on_create_world(ct_world_t0 world,
+                      ct_ecs_ev_queue_o0 *q) {
+    world_state_t *state = _get_or_create_world_state(world);
+    state->events = q;
+}
 
 static struct ct_simulation_i0 transform_simulation_i0 = {
         .simulation = transform_system,
         .name = name,
+        .on_create_world= _on_create_world,
 };
-
-typedef struct _t_t {
-    uint64_t position;
-    uint64_t rotation;
-    uint64_t scale;
-    float *world;
-} _t_t;
 
 static const ce_cdb_prop_def_t0 transform_component_prop[] = {
         {
@@ -517,11 +473,8 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
 
     _G = (struct transform_global) {
             .alloc = ce_memory_a0->system,
-            .events_queue = ct_ecs_a0->new_events_listener(),
             .changed_obj_queue = ce_cdb_a0->new_changed_obj_listener(ce_cdb_a0->db()),
     };
-
-    _G.events_queue = ct_ecs_a0->new_events_listener();
 
     api->register_api(COMPONENT_INTERFACE,
                       &ct_component_api, sizeof(ct_component_api));
@@ -553,18 +506,6 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(TRANSFORM_COMPONENT,
                             transform_component_prop, CE_ARRAY_LEN(transform_component_prop));
 
-    ce_api_a0->register_api(KERNEL_TASK_INTERFACE,
-                            &transform_sync_task, sizeof(transform_sync_task));
-
-
-    uint32_t wn = ct_ecs_a0->world_num();
-    ct_world_t0 worlds[wn];
-    ct_ecs_a0->all_world(worlds);
-
-    for (int j = 0; j < wn; ++j) {
-        ct_world_t0 world = worlds[j];
-        _get_or_create_world_state(world);
-    }
 }
 
 void CE_MODULE_UNLOAD(transform)(struct ce_api_a0 *api,

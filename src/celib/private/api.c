@@ -9,6 +9,7 @@
 #include <celib/id.h>
 #include <stdatomic.h>
 #include <sys/mman.h>
+#include <celib/memory/memory.h>
 
 
 //==============================================================================
@@ -166,12 +167,7 @@ static struct ce_api_a0 a0 = {
 struct ce_api_a0 *ce_api_a0 = &a0;
 
 static void *virt_alloc(uint64_t size) {
-    return mmap(NULL,
-                size,
-                PROT_READ | PROT_WRITE,
-                MAP_PRIVATE | MAP_ANONYMOUS |
-                MAP_NORESERVE,
-                -1, 0);
+    return CE_REALLOC(ce_memory_a0->virt_system, void, NULL, size, 0);
 }
 
 void api_init(ce_alloc_t0 *allocator) {
