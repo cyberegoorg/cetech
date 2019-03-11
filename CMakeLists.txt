@@ -65,6 +65,7 @@ set(CORELIB_SOURCE_FILES
         src/celib/private/module.c
         src/celib/private/config.c
         src/celib/memory/private/memory.c
+        src/celib/memory/private/memory_tracer.c
         src/celib/private/task.c
         src/celib/private/log_stdout.c
         src/celib/private/id.c

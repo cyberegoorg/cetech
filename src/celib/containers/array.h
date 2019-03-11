@@ -212,10 +212,11 @@ static inline void *ce_array_grow(void *array,
 
     const uint32_t orig_size = ce_array_size(array);
 
-    const uint32_t size = sizeof(ce_array_header_t) + (new_capacity* type_size);
+    const uint32_t size = sizeof(ce_array_header_t) + (new_capacity * type_size);
 
     void *new_data = alloc->vt->reallocate(alloc->inst, ce_array_header(array),
-                                           size, type_align, filename, line);
+                                           size, ce_array_capacity(array),
+                                           type_align, filename, line);
 
     char *new_array = (char *) new_data + sizeof(ce_array_header_t);
 

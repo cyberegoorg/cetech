@@ -15,6 +15,7 @@ typedef struct ce_alloc_t0 ce_alloc_t0;
 //! Memory system API V0
 struct ce_memory_a0 {
     ce_alloc_t0 *system;
+    ce_alloc_t0 *virt_system;
 
     char *(*str_dup)(const char *s,
                      ce_alloc_t0 *allocator);
