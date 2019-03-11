@@ -1,19 +1,19 @@
 0: 
   index: 0
   label:  Resource browser##asset_browser_dock0
-  x: 202
-  y: 538
+  x: 213
+  y: 510
   location: ""
-  size_x: 365
-  size_y: 229
+  size_x: 541
+  size_y: 257
   status: 0
   active: 1
   opened: 1
-  prev: -1
-  next: 15
+  prev: 15
+  next: -1
   child0: -1
   child1: -1
-  parent: 21
+  parent: 20
 1: 
   index: 1
   label:  Explorer##explorer_dock0
@@ -132,7 +132,7 @@
   x: 0
   y: 24
   location: ""
-  size_x: 202
+  size_x: 213
   size_y: 743
   status: 0
   active: 1
@@ -141,15 +141,15 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 19
+  parent: 21
 9: 
   index: 9
   label:  Property editor##property_editor_dock2
-  x: 791
+  x: 754
   y: 24
   location: ""
-  size_x: 233
-  size_y: 743
+  size_x: 270
+  size_y: 486
   status: 0
   active: 1
   opened: 1
@@ -157,7 +157,7 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 20
+  parent: 22
 10: 
   index: 10
   label: Resource preview##asset_preview_dock3
@@ -225,35 +225,35 @@
 14: 
   index: 14
   label:  Game view##game_view_dock5
-  x: 223
+  x: 213
   y: 24
   location: ""
-  size_x: 489
-  size_y: 485
-  status: 1
-  active: 0
-  opened: 1
-  prev: -1
-  next: -1
-  child0: -1
-  child1: -1
-  parent: -1
-15: 
-  index: 15
-  label: Log view##log_view_dock3
-  x: 202
-  y: 538
-  location: ""
-  size_x: 365
-  size_y: 229
+  size_x: 541
+  size_y: 486
   status: 0
   active: 0
   opened: 1
-  prev: 0
-  next: -1
+  prev: -1
+  next: 25
   child0: -1
   child1: -1
-  parent: 21
+  parent: 20
+15: 
+  index: 15
+  label: Log view##log_view_dock3
+  x: 213
+  y: 510
+  location: ""
+  size_x: 541
+  size_y: 257
+  status: 0
+  active: 0
+  opened: 1
+  prev: -1
+  next: 0
+  child0: -1
+  child1: -1
+  parent: 20
 16: 
   index: 16
   label:  Game view##game_view_dock4
@@ -262,22 +262,54 @@
   location: ""
   size_x: 589
   size_y: 514
-  status: 0
-  active: 1
+  status: 1
+  active: 0
   opened: 1
   prev: -1
   next: -1
   child0: -1
   child1: -1
-  parent: 18
+  parent: -1
 17: 
   index: 17
   label: Resource preview##asset_preview_dock5
   x: 567
-  y: 538
+  y: 24
   location: ""
   size_x: 224
-  size_y: 229
+  size_y: 743
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+18: 
+  index: 18
+  label: ""
+  x: 213
+  y: 24
+  location: ""
+  size_x: 811
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 20
+  child1: 22
+  parent: 21
+19: 
+  index: 19
+  label: Resource preview##asset_preview_dock6
+  x: 754
+  y: 510
+  location: ""
+  size_x: 270
+  size_y: 257
   status: 0
   active: 1
   opened: 1
@@ -285,41 +317,25 @@
   next: -1
   child0: -1
   child1: -1
-  parent: 21
-18: 
-  index: 18
-  label: ""
-  x: 202
-  y: 24
-  location: ""
-  size_x: 589
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 16
-  child1: 21
-  parent: 19
-19: 
-  index: 19
-  label: ""
-  x: 0
-  y: 24
-  location: ""
-  size_x: 791
-  size_y: 743
-  status: 0
-  active: 1
-  opened: 0
-  prev: -1
-  next: -1
-  child0: 8
-  child1: 18
-  parent: 20
+  parent: 22
 20: 
   index: 20
+  label: ""
+  x: 213
+  y: 24
+  location: ""
+  size_x: 541
+  size_y: 743
+  status: 0
+  active: 1
+  opened: 0
+  prev: -1
+  next: -1
+  child0: 14
+  child1: 15
+  parent: 18
+21: 
+  index: 21
   label: ""
   x: 0
   y: 24
@@ -331,22 +347,70 @@
   opened: 0
   prev: -1
   next: -1
-  child0: 19
-  child1: 9
+  child0: 8
+  child1: 18
   parent: -1
-21: 
-  index: 21
+22: 
+  index: 22
   label: ""
-  x: 202
-  y: 538
+  x: 754
+  y: 24
   location: ""
-  size_x: 589
-  size_y: 229
+  size_x: 270
+  size_y: 743
   status: 0
   active: 1
   opened: 0
   prev: -1
   next: -1
-  child0: 0
-  child1: 17
+  child0: 9
+  child1: 19
   parent: 18
+23: 
+  index: 23
+  label: (null)##editor_dock7
+  x: 213
+  y: 24
+  location: ""
+  size_x: 541
+  size_y: 486
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+24: 
+  index: 24
+  label: (null)##editor_dock4
+  x: 213
+  y: 24
+  location: ""
+  size_x: 541
+  size_y: 486
+  status: 1
+  active: 0
+  opened: 1
+  prev: -1
+  next: -1
+  child0: -1
+  child1: -1
+  parent: -1
+25: 
+  index: 25
+  label: Editor##editor_dock4
+  x: 213
+  y: 24
+  location: ""
+  size_x: 541
+  size_y: 486
+  status: 0
+  active: 1
+  opened: 1
+  prev: 14
+  next: -1
+  child0: -1
+  child1: -1
+  parent: 20

@@ -43,7 +43,6 @@ typedef struct entity_editor {
     ct_entity_t0 entity;
     ct_viewport_t0 viewport;
 
-    uint64_t entity_name;
     bool mouse_hovering;
     bool free;
 } entity_editor;
@@ -301,6 +300,12 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
 
     entity_editor *editor = &_G.editors[idx];
 
+    editor->world = ct_ecs_a0->create_world();
+
+    editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
+    editor->viewport = ct_renderer_a0->create_viewport(editor->world,
+                                                       editor->camera_ent);
+
     return editor;
 }
 
@@ -309,25 +314,13 @@ static void close(uint64_t context_obj) {
     uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
     entity_editor *editor = &_G.editors[editor_idx];
 
-    ct_ecs_a0->destroy_world(editor->world);
-    ct_renderer_a0->destroy_viewport(editor->viewport);
-
+    ct_ecs_a0->destroy(editor->world, &editor->entity, 1);
     editor->free = true;
 }
 
-static void open(uint64_t context_obj) {
+static void open(uint64_t context_obj, uint64_t obj) {
     entity_editor *editor = _new_editor(context_obj);
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
-    const uint64_t asset_name = ce_cdb_a0->read_uint64(reader,
-                                                       RESOURCE_EDITOR_OBJ, 0);
-    editor->world = ct_ecs_a0->create_world();
-
-    editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
-    editor->viewport = ct_renderer_a0->create_viewport(editor->world,
-                                                       editor->camera_ent);
-
-    editor->entity = ct_ecs_a0->spawn(editor->world, asset_name);
+    editor->entity = ct_ecs_a0->spawn(editor->world, obj);
 }
 
 static void update(uint64_t context_obj,

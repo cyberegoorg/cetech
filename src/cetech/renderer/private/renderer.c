@@ -71,6 +71,7 @@ static struct _G {
     bool need_reset;
     uint64_t config;
     ce_alloc_t0 *allocator;
+    ct_machine_ev_queue_o0* ev_queue;
 } _G = {};
 
 
@@ -254,21 +255,14 @@ void _render_components(ct_world_t0 world,
 static void render(float dt) {
     _G.viewid = 0;
 
-
-    uint64_t events_n = 0;
-    const uint64_t *events = ct_machine_a0->events(&events_n);
-    for (int i = 0; i < events_n; ++i) {
-        uint64_t event = events[i];
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), event);
-        uint64_t event_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), event);
-
-        if (event_type != EVENT_WINDOW_RESIZED) {
+    ct_machine_ev_t0 ev = {};
+    while (ct_machine_a0->pop_ev(_G.ev_queue, &ev)) {
+        if (ev.ev_type != EVENT_WINDOW_RESIZED) {
             continue;
         }
-
         _G.need_reset = 1;
-        _G.size_width = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_WIDTH, 0);
-        _G.size_height = ce_cdb_a0->read_uint64(reader, CT_MACHINE_WINDOW_HEIGHT, 0);
+        _G.size_width = ev.window_resize.width;
+        _G.size_height = ev.window_resize.height;
     }
 
     if (_G.need_reset) {
@@ -348,6 +342,7 @@ struct ct_viewport_t0 create_viewport(ct_world_t0 world,
 
 void destroy_viewport(ct_viewport_t0 viewport) {
     viewport_t *v = &_G.viewports[viewport.idx];
+    ct_rg_a0->destroy_builder(v->builder);
     v->free = true;
 }
 
@@ -409,6 +404,7 @@ static void _init(struct ce_api_a0 *api) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
             .config = ce_config_a0->obj(),
+            .ev_queue = ct_machine_a0->new_ev_listener(),
     };
 
     ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);

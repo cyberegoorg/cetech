@@ -41,7 +41,7 @@ static void close(uint64_t context_obj) {
 
 }
 
-static void open(uint64_t context_obj) {
+static void open(uint64_t context_obj,  uint64_t obj) {
 
 }
 
@@ -649,13 +649,7 @@ static void draw_ng_editor(uint64_t graph,
 
 static void draw_editor(uint64_t context_obj,
                         uint64_t context) {
-
-    const ce_cdb_obj_o0 *creader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                   context_obj);
-
-    uint64_t obj = ce_cdb_a0->read_ref(creader, RESOURCE_EDITOR_OBJ, 0);
-
-    draw_ng_editor(obj, context);
+//    draw_ng_editor(obj, context);
 }
 
 static uint64_t cdb_type() {

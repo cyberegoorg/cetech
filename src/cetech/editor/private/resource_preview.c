@@ -218,8 +218,7 @@ static void draw_menu(uint64_t dock) {
 
     ct_dock_a0->context_btn(dock);
     ct_debugui_a0->SameLine(0, -1);
-    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
-                                                                pi->selected_object);
+    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock, pi->selected_object);
 
     pi->locked = false;
 
@@ -262,19 +261,17 @@ static void _draw_preview(preview_instance *pi,
     }
 }
 
-static void on_debugui(uint64_t dock) {
+static void draw_dock(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    preview_instance *pi = ce_cdb_a0->read_ptr(reader,
-                                                      PREVIEW_PTR, NULL);
+    preview_instance *pi = ce_cdb_a0->read_ptr(reader, PREVIEW_PTR, NULL);
 
     if (!pi) {
         return;
     }
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
-                                                    0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,0);
     set_asset(pi, ct_selected_object_a0->selected_object(context));
 
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
@@ -384,7 +381,7 @@ static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,
         .display_title = dock_title,
         .name = name,
-        .draw_ui = on_debugui,
+        .draw_ui = draw_dock,
         .draw_menu = draw_menu,
         .open = open,
 };
