@@ -57,7 +57,7 @@ void init_static_modules() {
 
     CE_ADD_STATIC_MODULE(transform);
     CE_ADD_STATIC_MODULE(scene);
-    CE_ADD_STATIC_MODULE(mesh_renderer);
+    CE_ADD_STATIC_MODULE(static_mesh);
     CE_ADD_STATIC_MODULE(primitive_mesh);
     CE_ADD_STATIC_MODULE(camera);
 

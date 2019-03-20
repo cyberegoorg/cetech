@@ -21,9 +21,9 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/editor/property.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/property_editor/property_editor.h>
+#include <cetech/resource/resource_browser.h>
+#include <cetech/explorer/explorer.h>
 
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>

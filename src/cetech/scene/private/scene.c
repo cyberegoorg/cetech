@@ -20,10 +20,10 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/editor/resource_preview.h>
+#include <cetech/resource/resource_preview.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/primitive_mesh.h>
-#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/mesh/static_mesh.h>
 #include <celib/macros.h>
 
 
@@ -144,30 +144,37 @@ static struct ct_entity_t0 load(uint64_t resource,
     ct_entity_t0 ent[items_count + 1];
     ct_ecs_a0->create(world, ent, items_count + 1);
 
-    ct_ecs_a0->add(world, ent[0],
-                   (uint64_t[]) {
-                           ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT)
-                   }, 1);
+    ct_ecs_a0->add(world, ent[0], (ct_component_pair_t0[]) {
+            {
+                    .type = TRANSFORM_COMPONENT,
+                    .data = &(ct_transform_comp) {
+                            .scl = CE_VEC3_UNIT,
+                            .world = CE_MAT4_IDENTITY
+                    }
+            }
+    }, 1);
 
     for (int i = 0; i < items_count; ++i) {
         const char *geom = &items[i * 128];
 
-        uint64_t transform = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
-        const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
-        uint64_t pos = ce_cdb_a0->read_subobject(tr, PROP_POSITION, 0);
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), pos);
-        ce_cdb_a0->set_float(w, PROP_POSITION_Z, 100.0f);
-        ce_cdb_a0->write_commit(w);
-
-        uint64_t mesh = ce_cdb_a0->create_object(ce_cdb_a0->db(), MESH_RENDERER_COMPONENT);
-        ce_cdb_obj_o0 *mesh_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), mesh);
-        ce_cdb_a0->set_ref(mesh_w, PROP_SCENE_ID, resource);
-        ce_cdb_a0->set_str(mesh_w, PROP_MESH, geom);
-        ce_cdb_a0->set_ref(mesh_w, PROP_MATERIAL, 0x24c9413e88ebaaa8);
-        ce_cdb_a0->write_commit(mesh_w);
-
-        ct_ecs_a0->add(world, ent[i + 1],
-                       (uint64_t[]) {transform, mesh}, 2);
+        ct_ecs_a0->add(world, ent[0], (ct_component_pair_t0[]) {
+                {
+                        .type = TRANSFORM_COMPONENT,
+                        .data = &(ct_transform_comp) {
+                                .scl = CE_VEC3_UNIT,
+                                .pos.z = 100.0f,
+                                .world = CE_MAT4_IDENTITY
+                        }
+                },
+                {
+                        .type = MESH_RENDERER_COMPONENT,
+                        .data = &(ct_mesh_component) {
+                                .material = 0x24c9413e88ebaaa8,
+                                .scene = resource,
+                                .mesh = ce_id_a0->id64(geom)
+                        }
+                }
+        }, 2);
 
         ct_ecs_a0->link(world, ent[0], ent[i + 1]);
     }
@@ -240,8 +247,7 @@ static void get_all_geometries(uint64_t scene,
     uint64_t res = resource_data(scene);
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
-    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL,
-                                                 NULL));
+    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL, NULL));
     *count = ce_cdb_a0->read_uint64(reader, SCENE_GEOM_COUNT, 0);
 }
 
@@ -251,10 +257,8 @@ static void get_all_nodes(uint64_t scene,
     uint64_t res = resource_data(scene);
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
-    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR,
-                                                 NULL, NULL));
+    *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR, NULL, NULL));
     *count = ce_cdb_a0->read_uint64(reader, SCENE_NODE_COUNT, 0);
-
 }
 
 static struct ct_scene_a0 scene_api = {

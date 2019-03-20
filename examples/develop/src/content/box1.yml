@@ -59,7 +59,7 @@ children:
 
       0xdd6dea51dabadcc0:
         cdb_uid: "0xdd6dea51dabadcc0"
-        cdb_type: "mesh_renderer"
+        cdb_type: "static_mesh"
         scene: "0xb7baa30d19deb859"
         mesh: "muro_main"
         material: "0x24c9413e88ebaaa8"
@@ -98,7 +98,7 @@ children:
 
       0x0be73c8b1b3e0426:
         cdb_uid: "0x0be73c8b1b3e0426"
-        cdb_type: "mesh_renderer"
+        cdb_type: "static_mesh"
         scene: "0xb7baa30d19deb859"
         mesh: "muro_main"
         material: "0x24c9413e88ebaaa8"
@@ -137,7 +137,7 @@ children:
 
       0x3ce8fa251728a409:
         cdb_uid: "0x3ce8fa251728a409"
-        cdb_type: "mesh_renderer"
+        cdb_type: "static_mesh"
         scene: "0xdb8022af117db75b"
         mesh: "Mesh1Mesh12"
         material: "0x24c9413e88ebaaa8"

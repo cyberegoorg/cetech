@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include <celib/celib_types.h>
+#include "../../celib/celib_types.h"
 
 #define LOG_VIEW \
     CE_ID64_0("log_view", 0x6cb70528dcc6bdebULL)

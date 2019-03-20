@@ -22,11 +22,11 @@
 #include <cetech/texture/texture.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/mesh/mesh_renderer.h>
-#include <cetech/editor/resource_preview.h>
+#include <cetech/mesh/static_mesh.h>
+#include <cetech/resource/resource_preview.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/resourcedb.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 
 #include <bgfx/defines.h>
 #include <cetech/debugui/icons_font_awesome.h>
@@ -151,21 +151,21 @@ static void ui_vec4(uint64_t var) {
 
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->prop_vec4(var,
+                               str,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
-                                             MATERIAL_VAR_VALUE_PROP_Y,
-                                             MATERIAL_VAR_VALUE_PROP_Z,
-                                             MATERIAL_VAR_VALUE_PROP_W},
-                               str, (ui_vec4_p0) {});
+                                                 MATERIAL_VAR_VALUE_PROP_Y,
+                                                 MATERIAL_VAR_VALUE_PROP_Z,
+                                                 MATERIAL_VAR_VALUE_PROP_W}, (ui_vec4_p0) {});
 }
 
 static void ui_color4(uint64_t var) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
-    ct_editor_ui_a0->prop_vec4(var,
+    ct_editor_ui_a0->prop_vec4(var, str,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
-                                             MATERIAL_VAR_VALUE_PROP_Y,
-                                             MATERIAL_VAR_VALUE_PROP_Z,
-                                             MATERIAL_VAR_VALUE_PROP_W}, str,
+                                                 MATERIAL_VAR_VALUE_PROP_Y,
+                                                 MATERIAL_VAR_VALUE_PROP_Z,
+                                                 MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {.color=true});
 }
 
@@ -176,7 +176,7 @@ static void ui_texture(uint64_t var,
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_editor_ui_a0->prop_resource(var, MATERIAL_VAR_VALUE_PROP, name,
+    ct_editor_ui_a0->prop_resource(var, name, MATERIAL_VAR_VALUE_PROP,
                                    TEXTURE_TYPE, context, var);
 }
 
@@ -201,9 +201,9 @@ void draw_property(uint64_t material,
         bool open = ct_debugui_a0->TreeNodeEx(layer_label,
                                               DebugUITreeNodeFlags_DefaultOpen);
         if (open) {
-            ct_editor_ui_a0->prop_str(layer, MATERIAL_LAYER_NAME, "Layer name", i);
+            ct_editor_ui_a0->prop_str(layer, "Layer name", MATERIAL_LAYER_NAME, i);
 
-            ct_editor_ui_a0->prop_resource(layer, MATERIAL_SHADER_PROP, "Shader",
+            ct_editor_ui_a0->prop_resource(layer, "Shader", MATERIAL_SHADER_PROP,
                                            SHADER_TYPE, context, i);
 
             uint64_t count = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
@@ -242,20 +242,22 @@ static struct ct_entity_t0 load(uint64_t resource,
     ct_entity_t0 ent = {};
     ct_ecs_a0->create(world, &ent, 1);
 
-    uint64_t transform = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
-    const ce_cdb_obj_o0 *transform_r = ce_cdb_a0->read(ce_cdb_a0->db(), transform);
-
-    uint64_t pos = ce_cdb_a0->read_subobject(transform_r, PROP_POSITION, 0);
-    ce_cdb_obj_o0 *pos_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), pos);
-    ce_cdb_a0->set_float(pos_w, PROP_POSITION_Z, 13.0f);
-    ce_cdb_a0->write_commit(pos_w);
-
-    uint64_t pmesh = ce_cdb_a0->create_object(ce_cdb_a0->db(), PRIMITIVE_MESH_COMPONENT);
-    ce_cdb_obj_o0 *pmesh_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), pmesh);
-    ce_cdb_a0->set_ref(pmesh_w, PRIMITIVE_MESH_MATERIAL_PROP, resource);
-    ce_cdb_a0->write_commit(pmesh_w);
-
-    ct_ecs_a0->add(world, ent, (uint64_t[]) {transform, pmesh}, 2);
+    ct_ecs_a0->add(world, ent,
+                   (ct_component_pair_t0[]) {
+                           {
+                                   .type = TRANSFORM_COMPONENT,
+                                   .data = &(ct_transform_comp) {
+                                           .scl = CE_VEC3_UNIT,
+                                           .pos.z = 13.0f,
+                                   }
+                           },
+                           {
+                                   .type = PRIMITIVE_MESH_COMPONENT,
+                                   .data = &(ct_primitive_mesh) {
+                                           .material = resource,
+                                   }
+                           }
+                   }, 2);
 
     return ent;
 }
@@ -692,11 +694,11 @@ static void _vec4_property_editor(uint64_t obj,
     const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
 
     ct_editor_ui_a0->prop_vec4(obj,
-                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
-                                              MATERIAL_VAR_VALUE_PROP_Y,
-                                              MATERIAL_VAR_VALUE_PROP_Z,
-                                              MATERIAL_VAR_VALUE_PROP_W},
                                name,
+                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
+                                                  MATERIAL_VAR_VALUE_PROP_Y,
+                                                  MATERIAL_VAR_VALUE_PROP_Z,
+                                                  MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {});
 
 }
@@ -716,11 +718,11 @@ static void _color_property_editor(uint64_t obj,
     const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
 
     ct_editor_ui_a0->prop_vec4(obj,
-                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
-                                              MATERIAL_VAR_VALUE_PROP_Y,
-                                              MATERIAL_VAR_VALUE_PROP_Z,
-                                              MATERIAL_VAR_VALUE_PROP_W},
                                name,
+                               (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
+                                                  MATERIAL_VAR_VALUE_PROP_Y,
+                                                  MATERIAL_VAR_VALUE_PROP_Z,
+                                                  MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {.color=true});
 }
 
@@ -748,13 +750,13 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
 
     api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &_property_editor_api,
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &_property_editor_api,
                       sizeof(_property_editor_api));
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE,
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
                       &vec4_property_editor_api, sizeof(vec4_property_editor_api));
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE,
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
                       &color_property_editor_api, sizeof(color_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(MATERIAL_TYPE, material_prop, CE_ARRAY_LEN(material_prop));

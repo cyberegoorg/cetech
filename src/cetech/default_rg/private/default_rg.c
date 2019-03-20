@@ -15,7 +15,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/camera/camera.h>
-#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/mesh/static_mesh.h>
 #include <string.h>
 #include <celib/math/math.h>
 #include <celib/macros.h>
@@ -142,6 +142,8 @@ static void output_pass_on_pass(void *inst,
                                 uint64_t layer,
                                 ct_camera_data_t0 *main_camera,
                                 struct ct_rg_builder_t0 *builder) {
+
+
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
                                    BGFX_CLEAR_DEPTH,

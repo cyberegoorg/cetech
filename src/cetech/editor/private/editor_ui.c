@@ -17,14 +17,14 @@
 #include <celib/cdb.h>
 
 #include <celib/math/math.h>
-#include <cetech/editor/resource_browser.h>
+#include <cetech/resource/resource_browser.h>
 #include <cetech/resource/resourcedb.h>
 
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <stdlib.h>
-#include <cetech/editor/resource_preview.h>
+#include <cetech/resource/resource_preview.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 
@@ -201,8 +201,8 @@ static void resource_tooltip(ct_resource_id_t0 resourceid,
 }
 
 static void ui_float(uint64_t obj,
-                     uint64_t prop,
                      const char *label,
+                     uint64_t prop,
                      struct ui_float_p0 params) {
     float value = 0;
     float value_new = 0;
@@ -238,8 +238,8 @@ static void ui_float(uint64_t obj,
 }
 
 static void ui_bool(uint64_t obj,
-                    uint64_t prop,
-                    const char *label) {
+                    const char *label,
+                    uint64_t prop) {
     bool value = false;
     bool value_new = false;
 
@@ -269,8 +269,8 @@ static void ui_bool(uint64_t obj,
 
 
 static void ui_str(uint64_t obj,
-                   uint64_t prop,
                    const char *label,
+                   uint64_t prop,
                    uint32_t i) {
     char labelid[128] = {'\0'};
 
@@ -281,7 +281,7 @@ static void ui_str(uint64_t obj,
 
     char buffer[128] = {'\0'};
 
-    if(value) {
+    if (value) {
         strcpy(buffer, value);
     }
 
@@ -310,8 +310,8 @@ static void ui_str(uint64_t obj,
 }
 
 static void ui_str_combo(uint64_t obj,
-                         uint64_t prop,
                          const char *label,
+                         uint64_t prop,
                          void (*combo_items)(uint64_t obj,
                                              char **items,
                                              uint32_t *items_count),
@@ -367,6 +367,62 @@ static void ui_str_combo(uint64_t obj,
 
     if (change) {
         strcpy(buffer, items2[current_item]);
+
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_a0->set_str(w, prop, buffer);
+        ce_cdb_a0->write_commit(w);
+    }
+
+}
+
+static void ui_str_combo2(uint64_t obj,
+                          const char *label,
+                          uint64_t prop,
+                          const char *const *items,
+                          uint32_t items_count,
+                          uint32_t i) {
+
+    const char *value = 0;
+
+    if (!obj) {
+        return;
+    }
+
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    value = ce_cdb_a0->read_str(reader, prop, NULL);
+
+    int current_item = -1;
+
+    for (int j = 0; j < items_count; ++j) {
+        if (value) {
+            if (ce_id_a0->id64(items[j]) == ce_id_a0->id64(value)) {
+                current_item = j;
+            }
+        }
+    }
+
+    _prop_label(label, obj, &prop, 1);
+
+    char labelid[128] = {'\0'};
+
+    char buffer[128] = {'\0'};
+
+    if (value) {
+        strcpy(buffer, value);
+    }
+
+    sprintf(labelid, "##%scombo_%d", label, i);
+    ct_debugui_a0->Indent(0);
+    ct_debugui_a0->PushItemWidth(-1);
+    bool change = ct_debugui_a0->Combo(labelid,
+                                       &current_item, items,
+                                       items_count, -1);
+    ct_debugui_a0->PopItemWidth();
+    ct_debugui_a0->Unindent(0);
+
+
+    if (change) {
+        strcpy(buffer, items[current_item]);
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_str(w, prop, buffer);
@@ -464,8 +520,8 @@ void ui_prop_header(const char *name) {
 }
 
 static void ui_resource(uint64_t obj,
-                        uint64_t prop,
                         const char *label,
+                        uint64_t prop,
                         uint64_t resource_type,
                         uint64_t context,
                         uint32_t i) {
@@ -502,7 +558,7 @@ static void ui_resource(uint64_t obj,
                                    resource_type, &new_value, NULL);
 
 
-    const char *icon = ri &&  ri->display_icon ? ri->display_icon() : NULL;
+    const char *icon = ri && ri->display_icon ? ri->display_icon() : NULL;
     if (icon) {
         snprintf(labelid, CE_ARRAY_LEN(labelid), "%s %s", icon, label);
     } else {
@@ -572,8 +628,8 @@ static void ui_resource(uint64_t obj,
 }
 
 static void ui_vec3(uint64_t obj,
-                    const uint64_t prop[3],
                     const char *label,
+                    const uint64_t prop[3],
                     struct ui_vec3_p0 params) {
     if (!obj) {
         return;
@@ -615,8 +671,8 @@ static void ui_vec3(uint64_t obj,
 }
 
 static void ui_vec4(uint64_t obj,
-                    const uint64_t prop[4],
                     const char *label,
+                    const uint64_t prop[4],
                     struct ui_vec4_p0 params) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
@@ -698,6 +754,7 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_float = ui_float,
         .prop_str = ui_str,
         .prop_str_combo = ui_str_combo,
+        .prop_str_combo2 = ui_str_combo2,
         .prop_resource = ui_resource,
         .prop_vec3 = ui_vec3,
         .prop_vec4 = ui_vec4,

@@ -11,7 +11,7 @@ extern "C" {
 #define CT_CAMERA_API \
     CE_ID64_0("ct_camera_a0", 0x66ecb4e7c5973115ULL)
 
-#define CAMERA_COMPONENT \
+#define CT_CAMERA_COMPONENT \
     CE_ID64_0("camera", 0x60ed8c3931822dc7ULL)
 
 #define CT_ACTIVE_CAMERA_COMPONENT \
@@ -46,7 +46,17 @@ typedef struct ct_camera_component {
     float near;
     float far;
     float fov;
-}ct_camera_component;
+    uint64_t camera_type;
+} ct_camera_component;
+
+typedef struct ct_camera_data_t0 {
+    ct_camera_component camera;
+    ce_mat4_t world;
+} ct_camera_data_t0;
+
+typedef struct ct_active_camera {
+    ct_entity_t0 camera_ent;
+} ct_active_camera;
 
 //! Camera API V0
 struct ct_camera_a0 {

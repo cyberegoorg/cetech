@@ -10,25 +10,24 @@ extern "C" {
 typedef struct ct_mesh_component {
     uint64_t material;
     uint64_t scene;
-    const char* node;
-    const char* mesh;
+    uint64_t node;
+    uint64_t mesh;
 } ct_mesh_component;
 
-
 #define MESH_RENDERER_COMPONENT \
-    CE_ID64_0("mesh_renderer", 0x345b95f8df017893ULL)
+    CE_ID64_0("static_mesh", 0x7445bff74058f566ULL)
 
 #define PROP_SCENE_ID \
     CE_ID64_0("scene", 0x9d0a795bfe818d19ULL)
 
 #define PROP_MATERIAL \
-    (CE_ID64_0("material", 0xeac0b497876adedfULL))
+    CE_ID64_0("material", 0xeac0b497876adedfULL)
 
 #define PROP_NODE \
-    (CE_ID64_0("node", 0x5ae0930b5138a928ULL))
+    CE_ID64_0("node", 0x5ae0930b5138a928ULL)
 
 #define PROP_MESH \
-    (CE_ID64_0("mesh", 0x48ff313713a997a1ULL))
+    CE_ID64_0("mesh", 0x48ff313713a997a1ULL)
 
 #ifdef __cplusplus
 };

@@ -35,42 +35,49 @@ typedef struct ui_float_p0 {
 
 struct ct_editor_ui_a0 {
     void (*prop_float)(uint64_t obj,
-                       uint64_t property,
                        const char *label,
+                       uint64_t property,
                        ui_float_p0 params);
 
     void (*prop_bool)(uint64_t obj,
-                      uint64_t property,
-                      const char *label);
+                      const char *label,
+                      uint64_t property);
 
     void (*prop_str)(uint64_t obj,
-                     uint64_t property,
                      const char *label,
+                     uint64_t property,
                      uint32_t i);
 
     void (*prop_str_combo)(uint64_t obj,
-                           uint64_t property,
                            const char *label,
-                           void (*combo_items)(uint64_t obj,
-                                               char **items,
-                                               uint32_t *items_count),
+                           uint64_t property,
+                           void (*combo_items)(uint64_t,
+                                               char **,
+                                               uint32_t *),
                            uint32_t i);
 
+    void (*prop_str_combo2)(uint64_t obj,
+                            const char *label,
+                            uint64_t property,
+                            const char* const* items,
+                            uint32_t items_count,
+                            uint32_t i);
+
     void (*prop_resource)(uint64_t obj,
-                          uint64_t property,
                           const char *label,
+                          uint64_t property,
                           uint64_t resource_type,
                           uint64_t context,
                           uint32_t i);
 
     void (*prop_vec3)(uint64_t obj,
-                      const uint64_t property[3],
                       const char *label,
+                      const uint64_t property[3],
                       ui_vec3_p0 params);
 
     void (*prop_vec4)(uint64_t obj,
-                      const uint64_t property[4],
                       const char *label,
+                      const uint64_t property[4],
                       ui_vec4_p0 params);
 
 
@@ -94,6 +101,7 @@ struct ct_editor_ui_a0 {
     void (*ui_prop_header)(const char *name);
 
     void (*begin_disabled)();
+
     void (*end_disabled)();
 
 };

@@ -19,7 +19,7 @@
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include <cetech/editor/editor_ui.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
@@ -30,14 +30,13 @@
 #include <cetech/game/game_system.h>
 #include <celib/containers/spsc.h>
 
-
 #define LOG_WHERE "transform"
 
 #define MAX_NODES 1000000
 typedef struct world_state_t {
     ce_hash_t component_map;
     ct_world_t0 ent_world;
-    uint64_t *component;
+    ct_entity_t0 *entity;
 
     uint32_t *parent;
     uint32_t *first_child;
@@ -69,7 +68,7 @@ static world_state_t *_get_or_create_world_state(ct_world_t0 world) {
         idx = ce_array_size(_G.world_state);
 
         ce_array_push(_G.world_state, ((world_state_t) {
-                .component = virtual_alloc(MAX_NODES * sizeof(uint64_t)),
+                .entity = virtual_alloc(MAX_NODES * sizeof(ct_entity_t0)),
                 .parent = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
                 .first_child = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
                 .next_sibling = virtual_alloc(MAX_NODES * sizeof(uint32_t)),
@@ -86,20 +85,20 @@ static world_state_t *_get_or_create_world_state(ct_world_t0 world) {
 
 static void _transform(world_state_t *state,
                        uint32_t node_idx) {
-    uint64_t component = state->component[node_idx];
+    ct_entity_t0 ent = state->entity[node_idx];
 
-    const ce_cdb_obj_o0 *transform = ce_cdb_a0->read(ce_cdb_a0->db(), component);
+    ct_transform_comp *tc = ct_ecs_a0->get_one(state->ent_world, TRANSFORM_COMPONENT, ent);
+    if (!tc) {
+        return;
+    }
 
-    ct_transform_comp tc = {};
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), component, &tc, sizeof(tc));
-
-    tc.rot = ce_vec3_mul_s(tc.rot, CE_DEG_TO_RAD);
+    ce_vec3_t rot_rad = ce_vec3_mul_s(tc->rot, CE_DEG_TO_RAD);
 
     float *local = state->local[node_idx].m;
     ce_mat4_srt(local,
-                tc.scl.x, tc.scl.y, tc.scl.z,
-                tc.rot.x, tc.rot.y, tc.rot.z,
-                tc.pos.x, tc.pos.y, tc.pos.z);
+                tc->scl.x, tc->scl.y, tc->scl.z,
+                rot_rad.x, rot_rad.y, rot_rad.z,
+                tc->pos.x, tc->pos.y, tc->pos.z);
 
     float *world = state->world[node_idx].m;
 
@@ -111,9 +110,7 @@ static void _transform(world_state_t *state,
         ce_mat4_move(world, local);
     }
 
-    void *blob = ce_cdb_a0->read_blob(transform, PROP_WORLD, NULL, NULL);
-    float *w = blob;
-    ce_mat4_move(w, world);
+    ce_mat4_move(tc->world.m, world);
 
     uint32_t it = state->first_child[node_idx];
     while (it != UINT32_MAX) {
@@ -123,22 +120,25 @@ static void _transform(world_state_t *state,
 }
 
 static uint32_t _get_node(world_state_t *state,
-                          uint64_t component) {
-    return ce_hash_lookup(&state->component_map, component, UINT32_MAX);
+                          ct_entity_t0 entity) {
+    return ce_hash_lookup(&state->component_map, entity.h, UINT32_MAX);
 }
 
 static uint32_t _create_node(world_state_t *state,
-                             uint64_t component) {
+                             ct_entity_t0 entity) {
     uint32_t idx = state->nodes_num++;
 
-    state->component[idx] = component;
+    state->entity[idx] = entity;
 
     state->parent[idx] = UINT32_MAX;
     state->first_child[idx] = UINT32_MAX;
     state->next_sibling[idx] = UINT32_MAX;
     state->prev_sibling[idx] = UINT32_MAX;
 
-    ce_hash_add(&state->component_map, component, idx, _G.alloc);
+    ce_hash_add(&state->component_map, entity.h, idx, _G.alloc);
+
+    _transform(state, idx);
+
     return idx;
 }
 
@@ -224,50 +224,54 @@ static void *get_interface(uint64_t name_hash) {
 }
 
 
+static uint64_t _tranform_size() {
+    return sizeof(ct_transform_comp);
+}
+
+static void _tranform_on_spawn(uint64_t obj,
+                               void *data) {
+    ct_transform_comp *t = data;
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, t, sizeof(ct_transform_comp));
+}
+
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+        .size = _tranform_size,
+        .on_spawn = _tranform_on_spawn,
+        .on_change = _tranform_on_spawn,
 };
 
 static void transform_system(ct_world_t0 world,
                              float dt) {
     world_state_t *state = _get_or_create_world_state(world);
 
-    ct_ecs_event_t0 ev = {};
-    while (ct_ecs_a0->pop_events(state->events, &ev)) {
+    ct_ecs_world_event_t0 ev = {};
+    while (ct_ecs_a0->pop_world_events(state->events, &ev)) {
         if (ev.type == CT_ECS_EVENT_COMPONENT_SPAWN) {
-            uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                                          ev.component.component);
+            uint64_t component_type = ev.component.type;
 
             if (component_type != TRANSFORM_COMPONENT) {
                 continue;
             }
 
-            uint32_t idx = _create_node(state, ev.component.component);
-
-            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), ev.component.component);
-            ce_cdb_a0->set_blob(w, PROP_WORLD, CE_MAT4_IDENTITY, sizeof(ce_mat4_t));
-            ce_cdb_a0->write_commit(w);
+            uint32_t idx = _create_node(state, ev.component.ent);
 
             ct_entity_t0 parent = ct_ecs_a0->parent(state->ent_world, ev.component.ent);
 
             if (parent.h) {
-                uint64_t parent_transform = ct_ecs_a0->get_one(state->ent_world,
-                                                               TRANSFORM_COMPONENT, parent);
-
-                if (parent_transform) {
-                    uint32_t parent_node = _get_node(state, parent_transform);
-                    _link(state, idx, parent_node);
-                }
+                uint32_t parent_node = _get_node(state, parent);
+                _link(state, idx, parent_node);
             }
 
         } else if (ev.type == CT_ECS_EVENT_COMPONENT_CHANGE) {
-            if (!ev.component.component) {
+            if (ev.component.type != TRANSFORM_COMPONENT) {
                 continue;
             }
 
+
             uint64_t idx = ce_hash_lookup(&state->component_map,
-                                          ev.component.component,
+                                          ev.component.ent.h,
                                           UINT64_MAX);
 
             if (idx == UINT64_MAX) {
@@ -275,24 +279,9 @@ static void transform_system(ct_world_t0 world,
             }
 
             _transform(state, idx);
-
         } else if (ev.type == CT_ECS_EVENT_ENT_LINK) {
-            uint64_t parent_transform = ct_ecs_a0->get_one(state->ent_world,
-                                                           TRANSFORM_COMPONENT, ev.link.parent);
-
-            uint64_t child_transform = ct_ecs_a0->get_one(state->ent_world,
-                                                          TRANSFORM_COMPONENT, ev.link.child);
-
-            if (!parent_transform) {
-                continue;
-            }
-
-            if (!child_transform) {
-                continue;
-            }
-
-            uint32_t parent_node = _get_node(state, parent_transform);
-            uint32_t child_node = _get_node(state, child_transform);
+            uint32_t parent_node = _get_node(state, ev.link.parent);
+            uint32_t child_node = _get_node(state, ev.link.child);
 
             if (child_node == UINT32_MAX) {
                 continue;
@@ -301,14 +290,7 @@ static void transform_system(ct_world_t0 world,
             _link(state, child_node, parent_node);
 
         } else if (ev.type == CT_ECS_EVENT_ENT_UNLINK) {
-            uint64_t child_transform = ct_ecs_a0->get_one(state->ent_world,
-                                                          TRANSFORM_COMPONENT, ev.link.child);
-
-            if (!child_transform) {
-                continue;
-            }
-
-            uint32_t child_node = _get_node(state, child_transform);
+            uint32_t child_node = _get_node(state, ev.link.child);
 
             _unlink(state, child_node);
         }
@@ -350,10 +332,6 @@ static const ce_cdb_prop_def_t0 transform_component_prop[] = {
                 .obj_type = PROP_SCALE,
                 .flags = CDB_PROP_FLAG_UNPACK,
         },
-        {
-                .name = "world",
-                .type = CDB_TYPE_BLOB,
-        },
 };
 
 static const ce_cdb_prop_def_t0 position_prop[] = {
@@ -374,91 +352,46 @@ static const ce_cdb_prop_def_t0 scale_prop[] = {
         {.name = "z", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
 };
 
-//static const ce_cdb_prop_def_t0 mat4_prop[] = {
-//        {.name = "xx", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-//        {.name = "xy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "xz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "xw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//
-//        {.name = "yx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "yy", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-//        {.name = "yz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "yw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//
-//        {.name = "zx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "zy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "zz", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-//        {.name = "zw", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//
-//        {.name = "wx", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "wy", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "wz", .type = CDB_TYPE_FLOAT, .value.f = 0.0f},
-//        {.name = "ww", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-//};
+static const ce_cdb_prop_def_t0 vec2_prop[] = {
+        {.name = "x", .type = CDB_TYPE_FLOAT},
+        {.name = "y", .type = CDB_TYPE_FLOAT},
+};
 
 
-static uint64_t _position_cdb_type() {
-    return PROP_POSITION;
+static uint64_t _transform_cdb_type() {
+    return TRANSFORM_COMPONENT;
 }
 
-static uint64_t _rotation_cdb_type() {
-    return PROP_ROTATION;
-}
+static void _transform_property_editor(uint64_t obj,
+                                       uint64_t context) {
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-static uint64_t _scale_cdb_type() {
-    return PROP_SCALE;
-}
 
-static void _position_property_editor(uint64_t obj,
-                                      uint64_t context) {
-
-    ct_editor_ui_a0->prop_vec3(obj,
-                               (uint64_t[3]) {PROP_POSITION_X,
-                                              PROP_POSITION_Y,
-                                              PROP_POSITION_Z},
+    uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
+    ct_editor_ui_a0->prop_vec3(pos,
                                "Position",
+                               (uint64_t[3]) {PROP_POSITION_X, PROP_POSITION_Y, PROP_POSITION_Z},
                                (ui_vec3_p0) {});
 
-}
-
-static void _rotation_property_editor(uint64_t obj,
-                                      uint64_t context) {
-
-    ct_editor_ui_a0->prop_vec3(obj,
-                               (uint64_t[3]) {PROP_ROTATION_X,
-                                              PROP_ROTATION_Y,
-                                              PROP_ROTATION_Z},
+    uint64_t rot = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
+    ct_editor_ui_a0->prop_vec3(rot,
                                "Rotation",
+                               (uint64_t[3]) {PROP_ROTATION_X, PROP_ROTATION_Y, PROP_ROTATION_Z},
                                (ui_vec3_p0) {});
 
-}
-
-static void _scale_property_editor(uint64_t obj,
-                                   uint64_t context) {
-
-    ct_editor_ui_a0->prop_vec3(obj,
-                               (uint64_t[3]) {PROP_SCALE_X,
-                                              PROP_SCALE_Y,
-                                              PROP_SCALE_Z},
+    uint64_t scl = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
+    ct_editor_ui_a0->prop_vec3(scl,
                                "Scale",
+                               (uint64_t[3]) {PROP_SCALE_X, PROP_SCALE_Y, PROP_SCALE_Z},
                                (ui_vec3_p0) {});
 }
 
 
 static struct ct_property_editor_i0 position_property_editor_api = {
-        .cdb_type = _position_cdb_type,
-        .draw_ui = _position_property_editor,
+        .cdb_type = _transform_cdb_type,
+        .draw_ui = _transform_property_editor,
 };
 
-static struct ct_property_editor_i0 rotation_property_editor_api = {
-        .cdb_type = _rotation_cdb_type,
-        .draw_ui = _rotation_property_editor,
-};
-
-static struct ct_property_editor_i0 scale_property_editor_api = {
-        .cdb_type = _scale_cdb_type,
-        .draw_ui = _scale_property_editor,
-};
 
 void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                                int reload) {
@@ -476,20 +409,14 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
             .changed_obj_queue = ce_cdb_a0->new_changed_obj_listener(ce_cdb_a0->db()),
     };
 
-    api->register_api(COMPONENT_INTERFACE,
+    api->register_api(CT_COMPONENT_INTERFACE,
                       &ct_component_api, sizeof(ct_component_api));
 
     api->register_api(SIMULATION_INTERFACE,
                       &transform_simulation_i0, sizeof(transform_simulation_i0));
 
-    api->register_api(PROPERTY_EDITOR_INTERFACE,
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
                       &position_property_editor_api, sizeof(position_property_editor_api));
-
-    api->register_api(PROPERTY_EDITOR_INTERFACE,
-                      &rotation_property_editor_api, sizeof(rotation_property_editor_api));
-
-    api->register_api(PROPERTY_EDITOR_INTERFACE,
-                      &scale_property_editor_api, sizeof(scale_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(PROP_POSITION,
                             position_prop, CE_ARRAY_LEN(position_prop));
@@ -500,8 +427,8 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(PROP_SCALE,
                             scale_prop, CE_ARRAY_LEN(scale_prop));
 
-//    ce_cdb_a0->reg_obj_type(PROP_WORLD,
-//                            mat4_prop, CE_ARRAY_LEN(mat4_prop));
+    ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,
+                            vec2_prop, CE_ARRAY_LEN(vec2_prop));
 
     ce_cdb_a0->reg_obj_type(TRANSFORM_COMPONENT,
                             transform_component_prop, CE_ARRAY_LEN(transform_component_prop));

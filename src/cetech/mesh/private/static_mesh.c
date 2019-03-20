@@ -18,7 +18,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/scene/scene.h>
 #include <cetech/material/material.h>
-#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/mesh/static_mesh.h>
 
 #include <celib/memory/allocator.h>
 #include <celib/macros.h>
@@ -27,13 +27,13 @@
 #include <cetech/editor/editor_ui.h>
 #include <celib/log.h>
 #include <celib/containers/buffer.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
 
 
-#define LOG_WHERE "mesh_renderer"
+#define LOG_WHERE "static_mesh"
 
 #define _G mesh_render_global
 
@@ -41,42 +41,35 @@ static struct _G {
     ce_alloc_t0 *allocator;
 } _G;
 
-
 typedef struct mesh_render_data {
     uint8_t viewid;
     uint64_t layer_name;
 } mesh_render_data;
 
-void foreach_mesh_renderer(ct_world_t0 world,
-                           struct ct_entity_t0 *entities,
-                           ct_entity_storage_o0 *item,
-                           uint32_t n,
-                           void *_data) {
+void foreach_static_mesh(ct_world_t0 world,
+                         struct ct_entity_t0 *entities,
+                         ct_entity_storage_o0 *item,
+                         uint32_t n,
+                         void *_data) {
     mesh_render_data *data = _data;
 
-    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
-    uint64_t *mesh_renderers = ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
+    ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    ct_mesh_component *static_meshs = ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
-
-        ct_mesh_component m_c = {};
-        ce_cdb_a0->read_to(ce_cdb_a0->db(), mesh_renderers[i], &m_c, sizeof(m_c));
+        ct_transform_comp t_c = transforms[i];
+        ct_mesh_component m_c = static_meshs[i];
 
         if (!m_c.scene || !m_c.material) {
             continue;
         }
 
-        float *final_w = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, CE_MAT4_IDENTITY);
-
-        uint64_t mesh_id = ce_id_a0->id64(m_c.mesh);
         const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(), m_c.scene);
 
-        uint64_t mesh = mesh_id;
         uint64_t geom_objs = ce_cdb_a0->read_subobject(scene_reader, SCENE_GEOM_OBJS, 0);
         const ce_cdb_obj_o0 *geom_objs_r = ce_cdb_a0->read(ce_cdb_a0->db(), geom_objs);
 
-        uint64_t geom_obj = ce_cdb_a0->read_ref(geom_objs_r, mesh, 0);
+        uint64_t geom_obj = ce_cdb_a0->read_ref(geom_objs_r, m_c.mesh, 0);
 
         if (!geom_obj) {
             continue;
@@ -88,7 +81,7 @@ void foreach_mesh_renderer(ct_world_t0 world,
         bgfx_index_buffer_handle_t ibh = {.idx = (uint16_t) go.ib};
         bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) go.vb};
 
-        ct_gfx_a0->bgfx_set_transform(final_w, 1);
+        ct_gfx_a0->bgfx_set_transform(t_c.world.m, 1);
         ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, (uint32_t) go.vb_size);
         ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, (uint32_t) go.ib_size);
 
@@ -96,8 +89,6 @@ void foreach_mesh_renderer(ct_world_t0 world,
     }
 }
 
-static void _init_api(struct ce_api_a0 *api) {
-}
 
 void mesh_combo_items(uint64_t obj,
                       char **items,
@@ -124,7 +115,6 @@ void node_combo_items(uint64_t obj,
         return;
     }
 
-
     ct_scene_a0->get_all_nodes(scene_id, items, items_count);
 }
 
@@ -133,25 +123,15 @@ static uint64_t cdb_type() {
 }
 
 static const char *display_name() {
-    return ICON_FA_HOUZZ " Mesh renderer";
+    return ICON_FA_HOUZZ " Static mesh";
 }
 
 static void property_editor(uint64_t obj,
                             uint64_t context) {
-
-    ct_editor_ui_a0->prop_resource(obj,
-                                   PROP_SCENE_ID, "Scene", PROP_SCENE_ID, context, obj);
-
-    ct_editor_ui_a0->prop_str_combo(obj,
-                                    PROP_MESH, "Mesh", mesh_combo_items, obj);
-
-    ct_editor_ui_a0->prop_str_combo(obj,
-                                    PROP_NODE, "Node", node_combo_items, obj);
-
-    ct_editor_ui_a0->prop_resource(obj,
-                                   ce_id_a0->id64("material"), "Material",
-                                   ce_id_a0->id64("material"), context, obj + 1);
-
+    ct_editor_ui_a0->prop_resource(obj, "Scene", PROP_SCENE_ID, PROP_SCENE_ID, context, obj);
+    ct_editor_ui_a0->prop_str_combo(obj, "Mesh", PROP_MESH, mesh_combo_items, obj);
+    ct_editor_ui_a0->prop_str_combo(obj, "Node", PROP_NODE, node_combo_items, obj);
+    ct_editor_ui_a0->prop_resource(obj, "Material", MATERIAL_TYPE, MATERIAL_TYPE, context, obj + 1);
 }
 
 static struct ct_property_editor_i0 property_editor_api = {
@@ -170,10 +150,10 @@ void render(ct_world_t0 world,
             .layer_name = _GBUFFER,
     };
 
-    ct_ecs_a0->process(world,
-                       ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
-                       ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                       foreach_mesh_renderer, &render_data);
+    ct_ecs_a0->process_serial(world,
+                              ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
+                              ct_ecs_a0->mask(TRANSFORM_COMPONENT),
+                              foreach_static_mesh, &render_data);
 }
 
 static struct ct_renderer_component_i0 ct_renderer_component_i = {
@@ -194,57 +174,47 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+static uint64_t static_mesh_size() {
+    return sizeof(ct_mesh_component);
+}
+
+
+static void _mesh_render_on_spawn(uint64_t obj,
+                                  void *data) {
+    ct_mesh_component *c = data;
+
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    const char *mesh = ce_cdb_a0->read_str(r, PROP_MESH, 0);
+    const char *node = ce_cdb_a0->read_str(r, PROP_NODE, 0);
+
+    *c = (ct_mesh_component) {
+            .mesh = ce_id_a0->id64(mesh),
+            .node = ce_id_a0->id64(node),
+            .scene = ce_cdb_a0->read_ref(r, PROP_SCENE_ID, 0),
+            .material = ce_cdb_a0->read_ref(r, PROP_MATERIAL, 0),
+    };
+
+}
+
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+        .size = static_mesh_size,
+        .on_spawn = _mesh_render_on_spawn,
+        .on_change = _mesh_render_on_spawn,
 };
 
-static ce_cdb_prop_def_t0 mesh_renderer_component_prop[] = {
-        {.name = "material",
-                .type = CDB_TYPE_REF,
-        },
-
-        {.name = "scene",
-                .type = CDB_TYPE_REF,
-        },
-
-        {.name = "node",
-                .type = CDB_TYPE_STR,
-        },
-
-        {.name = "mesh",
-                .type = CDB_TYPE_STR,
-        },
+static ce_cdb_prop_def_t0 static_mesh_component_prop[] = {
+        {.name = "material", .type = CDB_TYPE_REF},
+        {.name = "scene", .type = CDB_TYPE_REF},
+        {.name = "node", .type = CDB_TYPE_STR},
+        {.name = "mesh", .type = CDB_TYPE_STR},
 };
 
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
 
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-    };
-
-    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-
-    ce_cdb_a0->reg_obj_type(MESH_RENDERER_COMPONENT,
-                            mesh_renderer_component_prop,
-                            CE_ARRAY_LEN(mesh_renderer_component_prop));
-}
-
-static void _shutdown() {
-}
-
-static void init(struct ce_api_a0 *api) {
-    _init(api);
-}
-
-static void shutdown() {
-    _shutdown();
-}
-
-void CE_MODULE_LOAD(mesh_renderer)(struct ce_api_a0 *api,
-                                   int reload) {
+void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
+                                 int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
@@ -256,14 +226,25 @@ void CE_MODULE_LOAD(mesh_renderer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    init(api);
+
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
+
+    api->register_api(CT_COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api,
+                      sizeof(property_editor_api));
+
+    ce_cdb_a0->reg_obj_type(MESH_RENDERER_COMPONENT,
+                            static_mesh_component_prop,
+                            CE_ARRAY_LEN(static_mesh_component_prop));
+
 }
 
-void CE_MODULE_UNLOAD(mesh_renderer)(struct ce_api_a0 *api,
-                                     int reload) {
+void CE_MODULE_UNLOAD(static_mesh)(struct ce_api_a0 *api,
+                                   int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    shutdown();
 }

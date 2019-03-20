@@ -8,11 +8,11 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/explorer/explorer.h>
 #include <stdio.h>
 #include <cetech/node_graph_editor/node_graph_editor.h>
-#include <cetech/editor/resource_preview.h>
-#include <cetech/editor/property.h>
+#include <cetech/resource/resource_preview.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/editor/editor_ui.h>
 
 #include "../node_graph.h"
@@ -243,19 +243,19 @@ static void _node_property_draw(uint64_t obj,
                 break;
 
             case CT_NODE_PIN_FLOAT:
-                ct_editor_ui_a0->prop_float(inputs_o, def->prop,
-                                            def->name,
+                ct_editor_ui_a0->prop_float(inputs_o,
+                                            def->name, def->prop,
                                             (ui_float_p0) {});
                 break;
 
             case CT_NODE_PIN_STRING:
-                ct_editor_ui_a0->prop_str(inputs_o, def->prop,
-                                          def->name, i);
+                ct_editor_ui_a0->prop_str(inputs_o,
+                                          def->name, def->prop, i);
                 break;
 
             case CT_NODE_PIN_BOOL:
-                ct_editor_ui_a0->prop_bool(inputs_o, def->prop,
-                                           def->name);
+                ct_editor_ui_a0->prop_bool(inputs_o,
+                                           def->name, def->prop);
                 break;
         }
     }
@@ -314,7 +314,7 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0,
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0,
                       sizeof(node_property_editor_i0));
 
     ce_cdb_a0->reg_obj_type(CT_NODE_GRAPH_NODE, node_prop, CE_ARRAY_LEN(node_prop));

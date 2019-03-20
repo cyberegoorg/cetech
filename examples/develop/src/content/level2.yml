@@ -49,7 +49,7 @@ children:
           cdb_instance: 0x1680b5652a000167
       0x168c410f48a0016f:
         cdb_uid: 0x168c410f48a0016f
-        cdb_type: mesh_renderer
+        cdb_type: static_mesh
         cdb_instance: 0x1680b5662820015d
     children:
       cdb_type: cdb_objset
@@ -77,7 +77,7 @@ children:
               cdb_instance: 0x1680ea0606e0011e
           0x168c410f48a00175:
             cdb_uid: 0x168c410f48a00175
-            cdb_type: mesh_renderer
+            cdb_type: static_mesh
             cdb_instance: 0x1680ea0700e00121
 asset_name: content/level2
 name: Level 2

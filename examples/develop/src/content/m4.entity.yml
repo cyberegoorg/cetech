@@ -28,7 +28,7 @@ components:
 
   0x1680b5662820015d:
     cdb_uid: 0x1680b5662820015d
-    cdb_type: mesh_renderer
+    cdb_type: static_mesh
     scene: 0xd3276608fb728ffb
     mesh: M4A1
     material: 0x1680b59ec410011b
@@ -64,7 +64,7 @@ children:
 
       0x1680ea0700e00121:
         cdb_uid: 0x1680ea0700e00121
-        cdb_type: mesh_renderer
+        cdb_type: static_mesh
         scene: 0xd3276608fb728ffb
         mesh: clip
         material: 0x1680b59ec410011b

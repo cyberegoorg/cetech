@@ -9,6 +9,15 @@ extern "C" {
 
 #define TRANSFORMATION_COMPONENT_NAME "transform"
 
+#define VEC2_CDB_TYPE \
+    CE_ID64_0("vec2_t", 0x9363184a58efecc1ULL)
+
+#define PROP_VEC2_X \
+    CE_ID64_0("x", 0x8295151af8224269ULL)
+
+#define PROP_VEC2_Y \
+    CE_ID64_0("y", 0x9a5db2cd2c1fd6ceULL)
+
 #define TRANSFORM_SYSTEM \
     CE_ID64_0("transform", 0x69e14b13ad9b5315ULL)
 
@@ -44,9 +53,6 @@ extern "C" {
     CE_ID64_0("y", 0x9a5db2cd2c1fd6ceULL)
 #define PROP_SCALE_Z \
     CE_ID64_0("z", 0x88a824e868c7c5efULL)
-
-#define PROP_WORLD \
-    CE_ID64_0("world", 0x4d46ae3bbc0fb0f7ULL)
 
 typedef struct ct_transform_comp {
     ce_vec3_t pos;

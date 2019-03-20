@@ -86,6 +86,8 @@ extern "C" {
 #define MATERIAL_LAYER_NAME \
     CE_ID64_0("name", 0xd4c943cba60c270bULL)
 
+struct bgfx_encoder_s;
+
 struct ct_material_a0 {
     uint64_t (*create)(uint64_t name);
 

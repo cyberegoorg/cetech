@@ -28,7 +28,7 @@
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
 
-#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/mesh/static_mesh.h>
 #include <celib/task.h>
 
 #include "bgfx/c99/bgfx.h"
@@ -218,7 +218,7 @@ static void renderer_get_size(uint32_t *width,
 
 static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module_t0 *module) {
-    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
 
@@ -235,7 +235,7 @@ static void _feed_module(ct_world_t0 world,
 
 void _render_components(ct_world_t0 world,
                         struct ct_rg_builder_t0 *builder) {
-    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
 

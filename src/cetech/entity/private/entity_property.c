@@ -22,9 +22,9 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/editor/property.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/property_editor/property_editor.h>
+#include <cetech/resource/resource_browser.h>
+#include <cetech/explorer/explorer.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/controlers/controlers.h>
@@ -42,7 +42,7 @@ static struct _G {
 } _G;
 
 static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
     while (it.api) {
         struct ct_component_i0 *i = (it.api);
 
@@ -106,7 +106,7 @@ static void _entity_ui(uint64_t obj) {
     ct_debugui_a0->PopItemWidth();
     ct_debugui_a0->Unindent(0);
 
-    ct_editor_ui_a0->prop_str(obj, ENTITY_NAME, "Name", 11111111);
+    ct_editor_ui_a0->prop_str(obj, "Name", ENTITY_NAME, 11111111);
 }
 
 static void draw_ui(uint64_t obj,

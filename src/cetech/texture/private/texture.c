@@ -26,10 +26,10 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/editor_ui.h>
-#include <cetech/editor/resource_preview.h>
+#include <cetech/resource/resource_preview.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/transform/transform.h>
@@ -228,9 +228,9 @@ static uint64_t cdb_type() {
 
 static void draw_property(uint64_t obj,
                           uint64_t context) {
-    ct_editor_ui_a0->prop_str(obj, TEXTURE_INPUT, "Input", 0);
-    ct_editor_ui_a0->prop_bool(obj, TEXTURE_GEN_MIPMAPS, "Gen mipmaps");
-    ct_editor_ui_a0->prop_bool(obj, TEXTURE_IS_NORMALMAP, "Is normalmap");
+    ct_editor_ui_a0->prop_str(obj, "Input", TEXTURE_INPUT, 0);
+    ct_editor_ui_a0->prop_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
+    ct_editor_ui_a0->prop_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);
 }
 
 static struct ct_property_editor_i0 property_editor_api = {
@@ -409,7 +409,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_renderer_a0);
 
     api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
     api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 

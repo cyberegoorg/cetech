@@ -19,8 +19,8 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/resource/resource_browser.h>
+#include <cetech/explorer/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
@@ -30,7 +30,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
 #include <celib/containers/array.h>
-#include <cetech/editor/resource_editor.h>
+#include <cetech/resource/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/dock.h>
 #include <cetech/editor/editor_ui.h>

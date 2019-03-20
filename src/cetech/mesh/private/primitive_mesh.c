@@ -18,11 +18,11 @@
 #include <cetech/material/material.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/mesh/primitive_mesh.h>
-#include <cetech/mesh/mesh_renderer.h>
+#include <cetech/mesh/static_mesh.h>
 
 #define LOG_WHERE "primitive_mesh"
 
@@ -113,26 +113,22 @@ void foreach_primitive_mesh(ct_world_t0 world,
                             void *_data) {
     mesh_render_data *data = _data;
 
-    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
-    uint64_t *mesh_renderers = ct_ecs_a0->get_all(PRIMITIVE_MESH_COMPONENT, item);
+    ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    ct_primitive_mesh *mesh_renderers = ct_ecs_a0->get_all(PRIMITIVE_MESH_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        const ce_cdb_obj_o0 *tr = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
-        const ce_cdb_obj_o0 *m = ce_cdb_a0->read(ce_cdb_a0->db(), mesh_renderers[i]);
+        ct_transform_comp t_c = transforms[i];
+        ct_primitive_mesh p_c = mesh_renderers[i];
 
-        if (!ce_cdb_a0->read_ref(m, PROP_MATERIAL, 0)) {
+        if (!p_c.material) {
             continue;
         }
 
-        float *final_w = ce_cdb_a0->read_blob(tr, PROP_WORLD, NULL, CE_MAT4_IDENTITY);
-
-        ct_gfx_a0->bgfx_set_transform(final_w, 1);
+        ct_gfx_a0->bgfx_set_transform(t_c.world.m, 1);
         ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0, CE_ARRAY_LEN(_cube_vertices));
         ct_gfx_a0->bgfx_set_index_buffer(cube_ibh, 0, CE_ARRAY_LEN(cube_indices));
 
-        uint64_t material_obj = ce_cdb_a0->read_ref(m, PRIMITIVE_MESH_MATERIAL_PROP, 0);
-
-        ct_material_a0->submit(material_obj, data->layer_name, data->viewid);
+        ct_material_a0->submit(p_c.material, data->layer_name, data->viewid);
     }
 }
 
@@ -159,11 +155,12 @@ static void render(ct_world_t0 world,
             .layer_name = _GBUFFER,
     };
 
-    ct_ecs_a0->process(world,
-                       ct_ecs_a0->mask(PRIMITIVE_MESH_COMPONENT) |
-                       ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                       foreach_primitive_mesh, &render_data);
+    ct_ecs_a0->process_serial(world,
+                              ct_ecs_a0->mask(PRIMITIVE_MESH_COMPONENT) |
+                              ct_ecs_a0->mask(TRANSFORM_COMPONENT),
+                              foreach_primitive_mesh, &render_data);
 }
+
 
 static struct ct_renderer_component_i0 ct_renderer_component_i = {
         .render = render
@@ -183,53 +180,25 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+
+static uint64_t primitive_mesh_size() {
+    return sizeof(ct_primitive_mesh);
+}
+
+static void _prim_mesh_on_spawn(uint64_t obj,
+                                void *data) {
+    ct_primitive_mesh *c = data;
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_primitive_mesh));
+}
+
 static struct ct_component_i0 ct_component_api = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+        .size = primitive_mesh_size,
+        .on_spawn = _prim_mesh_on_spawn,
+        .on_change = _prim_mesh_on_spawn,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
-
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-    };
-
-    api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-
-    ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,
-                                      ct_gfx_a0->bgfx_get_renderer_type());
-
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
-                                    BGFX_ATTRIB_POSITION, 3,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
-
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
-                                    BGFX_ATTRIB_TEXCOORD0, 2,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
-
-    ct_gfx_a0->bgfx_vertex_decl_end(&pt_vertex_decl);
-
-    cube_vbh = ct_gfx_a0->bgfx_create_vertex_buffer(
-            ct_gfx_a0->bgfx_make_ref(_cube_vertices, sizeof(_cube_vertices)),
-            &pt_vertex_decl, BGFX_BUFFER_NONE);
-
-    cube_ibh = ct_gfx_a0->bgfx_create_index_buffer(
-            ct_gfx_a0->bgfx_make_ref(cube_indices, sizeof(cube_indices)),
-            BGFX_BUFFER_NONE);
-}
-
-static void _shutdown() {
-}
-
-static void init(struct ce_api_a0 *api) {
-    _init(api);
-}
-
-static void shutdown() {
-    _shutdown();
-}
 
 static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
         {

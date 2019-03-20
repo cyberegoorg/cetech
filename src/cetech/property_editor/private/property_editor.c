@@ -13,11 +13,11 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/editor/property.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/editor/editor.h>
 #include <cetech/editor/dock.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/resource/resource_browser.h>
+#include <cetech/explorer/explorer.h>
 #include <celib/cdb.h>
 #include <cetech/editor/selcted_object.h>
 #include <stdio.h>
@@ -52,17 +52,17 @@ static void _generic_prop_draw(uint64_t obj,
 
         switch (type) {
             case CDB_TYPE_REF:
-                ct_editor_ui_a0->prop_resource(obj, prop_name, def->name,
+                ct_editor_ui_a0->prop_resource(obj, def->name, prop_name,
                                                def->obj_type, context, obj);
                 break;
             case CDB_TYPE_FLOAT:
-                ct_editor_ui_a0->prop_float(obj, prop_name, def->name, (ui_float_p0) {});
+                ct_editor_ui_a0->prop_float(obj, def->name, prop_name, (ui_float_p0) {});
                 break;
             case CDB_TYPE_BOOL:
-                ct_editor_ui_a0->prop_bool(obj, prop_name, def->name);
+                ct_editor_ui_a0->prop_bool(obj, def->name, prop_name);
                 break;
             case CDB_TYPE_STR:
-                ct_editor_ui_a0->prop_str(obj, prop_name, def->name, obj);
+                ct_editor_ui_a0->prop_str(obj, def->name, prop_name, obj);
                 break;
             case CDB_TYPE_SUBOBJECT: {
                 const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
@@ -100,7 +100,7 @@ static void draw(uint64_t obj,
         return;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -126,7 +126,7 @@ static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
         return NULL;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -148,7 +148,7 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(PROPERTY_EDITOR_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_INTERFACE);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -276,7 +276,7 @@ static const char *name(uint64_t dock) {
 }
 
 static uint64_t cdb_type() {
-    return PROPERTY_EDITOR_INTERFACE;
+    return CT_PROPERTY_EDITOR_INTERFACE;
 };
 
 

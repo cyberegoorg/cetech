@@ -15,7 +15,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/editor/resource_browser.h>
+#include <cetech/resource/resource_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
@@ -23,7 +23,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/editor/resource_preview.h>
+#include <cetech/resource/resource_preview.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>

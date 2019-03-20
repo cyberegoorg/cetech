@@ -5,7 +5,7 @@ extern "C" {
 #include <celib/memory/allocator.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
-#include <cetech/editor/log_view.h>
+#include <cetech/log_view/log_view.h>
 #include <celib/containers/array.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include "celib/id.h"

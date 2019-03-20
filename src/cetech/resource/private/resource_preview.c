@@ -8,8 +8,8 @@
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
 
-#include <cetech/editor/resource_preview.h>
-#include <cetech/editor/resource_browser.h>
+#include <cetech/resource/resource_preview.h>
+#include <cetech/resource/resource_browser.h>
 #include <cetech/editor/editor.h>
 #include <celib/containers/hash.h>
 #include <celib/math/math.h>
@@ -75,74 +75,6 @@ static struct preview_instance *_new_preview() {
     preview_instance *pi = &_G.instances[idx];
 
     return pi;
-}
-
-
-static void fps_camera_update(ct_world_t0 world,
-                              struct ct_entity_t0 camera_ent,
-                              float dt,
-                              float dx,
-                              float dy,
-                              float updown,
-                              float leftright,
-                              float speed,
-                              bool fly_mode) {
-
-//    CE_UNUSED(dx);
-//    CE_UNUSED(dy);
-//
-//    float wm[16];
-//
-//    ct_transform_comp *transform;
-//    transform = ct_ecs_a0->get_one(world, TRANSFORM_COMPONENT,
-//                                   camera_ent);
-//
-//    ce_mat4_move(wm, transform->world);
-//
-//    float x_dir[4];
-//    float z_dir[4];
-//    ce_vec4_move(x_dir, &wm[0 * 4]);
-//    ce_vec4_move(z_dir, &wm[2 * 4]);
-//
-//    if (!fly_mode) {
-//        z_dir[1] = 0.0f;
-//    }
-//
-//    // POS
-//    float x_dir_new[3];
-//    float z_dir_new[3];
-//
-//    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-//    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
-//
-//
-//    float pos[3] = {};
-//    ce_vec3_add(transform->position, pos, x_dir_new);
-//    ce_vec3_add(pos, pos, z_dir_new);
-
-//
-//    uint64_t ent_obj = camera_ent.h;
-//    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
-//                                                    ENTITY_COMPONENTS, 0);
-//
-//    uint64_t component = ce_cdb_a0->read_subobject(components,
-//                                                   TRANSFORM_COMPONENT, 0);
-//
-//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(component);
-//    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-//    ce_cdb_a0->write_commit(w);
-//
-    // ROT
-//    float rotation_around_world_up[4];
-//    float rotation_around_camera_right[4];
-//
-//    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), -dx * dt * 100)
-//    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, dy * dt * 100)
-//    local rotation = rotation_around_world_up * rotation_around_camera_right
-//
-//    Transform.set_position(self.transform, pos)
-//    Transform.set_rotation(self.transform, rot * rotation)
-//    end
 }
 
 static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
@@ -214,7 +146,7 @@ static void set_asset(preview_instance *pi,
 static void draw_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     preview_instance *pi = ce_cdb_a0->read_ptr(reader,
-                                                      PREVIEW_PTR, NULL);
+                                               PREVIEW_PTR, NULL);
 
     ct_dock_a0->context_btn(dock);
     ct_debugui_a0->SameLine(0, -1);
@@ -271,7 +203,7 @@ static void draw_dock(uint64_t dock) {
         return;
     }
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     set_asset(pi, ct_selected_object_a0->selected_object(context));
 
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
@@ -282,7 +214,9 @@ static bool init() {
     _G.visible = true;
 
     preview_instance *pi = _new_preview();
+
     _G.baground = pi;
+
     pi->world = ct_ecs_a0->create_world();
     pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
     pi->viewport = ct_renderer_a0->create_viewport();
@@ -295,7 +229,6 @@ static void update(float dt) {
     uint32_t n = ce_array_size(_G.instances);
     for (int i = 0; i < n; ++i) {
         struct preview_instance *pi = &_G.instances[i];
-
         ct_ecs_a0->simulate(pi->world, dt);
 
         ct_transform_comp *t = ct_ecs_a0->get_one(pi->world, TRANSFORM_COMPONENT,
@@ -368,22 +301,6 @@ static struct ct_editor_module_i0 ct_editor_module_api = {
 };
 
 
-static void _init(struct ce_api_a0 *api) {
-
-
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system
-    };
-
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
-    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
-    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_api, sizeof(ct_editor_module_api));
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
 void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
                                    int reload) {
     CE_UNUSED(reload);
@@ -395,7 +312,14 @@ void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ct_default_rg_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system
+    };
+
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
+    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_api, sizeof(ct_editor_module_api));
 }
 
 void CE_MODULE_UNLOAD(asset_preview)(struct ce_api_a0 *api,
@@ -403,5 +327,4 @@ void CE_MODULE_UNLOAD(asset_preview)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

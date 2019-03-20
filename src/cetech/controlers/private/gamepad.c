@@ -17,6 +17,7 @@
 #include <cetech/controlers/gamepad.h>
 #include <cetech/controlers/controlers.h>
 #include <celib/cdb.h>
+#include <celib/math/math.h>
 
 #include "gamepadstr.h"
 
@@ -35,11 +36,18 @@
 #define GAMEPAD_MAX 8
 
 #define _G GamepadGlobals
+
+typedef struct gamepad_t {
+    float position[GAMEPAD_AXIX_MAX][2];
+    float death_zone[GAMEPAD_AXIX_MAX][2];
+    int state[GAMEPAD_BTN_MAX];
+    int last_state[GAMEPAD_BTN_MAX];
+} gamepad_t;
+
 static struct _G {
     int active[GAMEPAD_MAX];
-    float position[GAMEPAD_MAX][GAMEPAD_AXIX_MAX][2];
-    int state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
-    int last_state[GAMEPAD_MAX][GAMEPAD_BTN_MAX];
+    gamepad_t gamepad[GAMEPAD_MAX];
+
     ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
 
@@ -80,7 +88,7 @@ static int button_state(uint32_t idx,
     CE_ASSERT(LOG_WHERE,
               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[idx][button_index];
+    return _G.gamepad[idx].state[button_index];
 }
 
 static int button_pressed(uint32_t idx,
@@ -88,7 +96,7 @@ static int button_pressed(uint32_t idx,
     CE_ASSERT(LOG_WHERE,
               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return _G.state[idx][button_index] && !_G.last_state[idx][button_index];
+    return _G.gamepad[idx].state[button_index] && !_G.gamepad[idx].last_state[button_index];
 }
 
 static int button_released(uint32_t idx,
@@ -96,7 +104,7 @@ static int button_released(uint32_t idx,
     CE_ASSERT(LOG_WHERE,
               (button_index >= 0) && (button_index < GAMEPAD_BTN_MAX));
 
-    return !_G.state[idx][button_index] && _G.last_state[idx][button_index];
+    return !_G.gamepad[idx].state[button_index] && _G.gamepad[idx].last_state[button_index];
 }
 
 static const char *axis_name(const uint32_t axis_index) {
@@ -128,8 +136,8 @@ static void axis(uint32_t idx,
     CE_ASSERT(LOG_WHERE,
               (axis_index >= 0) && (axis_index < GAMEPAD_AXIX_MAX));
 
-    value[0] = _G.position[idx][axis_index][0];
-    value[1] = _G.position[idx][axis_index][1];
+    value[0] = _G.gamepad[idx].position[axis_index][0];
+    value[1] = _G.gamepad[idx].position[axis_index][1];
 }
 
 static void play_rumble(uint32_t idx,
@@ -139,34 +147,56 @@ static void play_rumble(uint32_t idx,
 }
 
 static void update(float dt) {
-    memcpy(_G.last_state, _G.state, sizeof(int) * GAMEPAD_BTN_MAX * GAMEPAD_MAX);
-
+    for (int i = 0; i < GAMEPAD_MAX; ++i) {
+        memcpy(_G.gamepad[i].last_state, _G.gamepad[i].state, sizeof(int) * GAMEPAD_BTN_MAX);
+    }
 
     ct_machine_ev_t0 ev = {};
     while (ct_machine_a0->pop_ev(_G.ev_queue, &ev)) {
         switch (ev.ev_type) {
-                case EVENT_GAMEPAD_DOWN:
-                    _G.state[ev.gamepad.gamepad_id][ev.gamepad.btn] = 1;
-                    break;
+            case EVENT_GAMEPAD_DOWN: {
+                gamepad_t *g = &_G.gamepad[ev.gamepad.gamepad_id];
 
-                case EVENT_GAMEPAD_UP:
-                    _G.state[ev.gamepad.gamepad_id][ev.gamepad.btn] = 0;
-                    break;
+                g->state[ev.gamepad.btn] = 1;
+            }
+                break;
 
-                case EVENT_GAMEPAD_MOVE:
-                    _G.position[ev.gamepad.gamepad_id][ev.gamepad.axis_id][0] = ev.gamepad.pos.x;
-                    _G.position[ev.gamepad.gamepad_id][ev.gamepad.axis_id][1] = ev.gamepad.pos.y;
-                    break;
+            case EVENT_GAMEPAD_UP: {
+                gamepad_t *g = &_G.gamepad[ev.gamepad.gamepad_id];
 
-                case EVENT_GAMEPAD_CONNECT:
-                    _G.active[ev.gamepad.gamepad_id] = 1;
-                    break;
+                g->state[ev.gamepad.btn] = 0;
+            }
+                break;
 
-                case EVENT_GAMEPAD_DISCONNECT:
-                    _G.active[ev.gamepad.gamepad_id] = 0;
-                    break;
-                default:
-                    break;
+            case EVENT_GAMEPAD_MOVE: {
+                gamepad_t *g = &_G.gamepad[ev.gamepad.gamepad_id];
+
+                if (ce_fabsolute(ev.gamepad.pos.x) > g->death_zone[ev.gamepad.axis_id][0]) {
+                    g->position[ev.gamepad.axis_id][0] = ev.gamepad.pos.x;
+                } else {
+                    g->position[ev.gamepad.axis_id][0] = 0;
+                }
+
+                if (ce_fabsolute(ev.gamepad.pos.y) > g->death_zone[ev.gamepad.axis_id][1]) {
+                    g->position[ev.gamepad.axis_id][1] = ev.gamepad.pos.y;
+                } else {
+                    g->position[ev.gamepad.axis_id][1] = 0;
+                }
+
+            }
+                break;
+
+            case EVENT_GAMEPAD_CONNECT: {
+                _G.active[ev.gamepad.btn] = 1;
+            }
+                break;
+
+            case EVENT_GAMEPAD_DISCONNECT: {
+                _G.active[ev.gamepad.gamepad_id] = 0;
+            }
+                break;
+            default:
+                break;
         }
     }
 

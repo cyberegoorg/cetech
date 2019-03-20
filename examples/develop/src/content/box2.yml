@@ -28,7 +28,7 @@ components:
 
   0x503ef52859bc3e3b:
     cdb_uid: "0x503ef52859bc3e3b"
-    cdb_type: "mesh_renderer"
+    cdb_type: "static_mesh"
     scene: "0xb7baa30d19deb859"
     mesh: "muro_main"
     material: "0x24c9413e88ebaaa8"

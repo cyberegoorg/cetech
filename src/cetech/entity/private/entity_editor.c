@@ -19,8 +19,8 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
-#include <cetech/editor/resource_browser.h>
-#include <cetech/editor/explorer.h>
+#include <cetech/resource/resource_browser.h>
+#include <cetech/explorer/explorer.h>
 #include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/render_graph/render_graph.h>
@@ -29,7 +29,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
 #include <cetech/controlers/controlers.h>
-#include <cetech/editor/resource_editor.h>
+#include <cetech/resource/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
 #include <celib/containers/array.h>
 
@@ -55,125 +55,6 @@ static struct _G {
 #define _EDITOR_IDX \
     CE_ID64_0("editor_idx", 0x1b333d78a2ccaab7ULL)
 
-
-static void fps_camera_update(ct_world_t0 world,
-                              struct ct_entity_t0 camera_ent,
-                              float dt,
-                              float dx,
-                              float dy,
-                              float updown,
-                              float leftright,
-                              float speed,
-                              bool fly_mode) {
-
-//    CE_UNUSED(dx);
-//    CE_UNUSED(dy);
-//
-//    float wm[16];
-//
-//
-//    ct_transform_comp *transform;
-//    transform = ct_ecs_a0->get_one(world,
-//                                                  TRANSFORM_COMPONENT,
-//                                                  camera_ent);
-//
-//    ce_mat4_move(wm, transform->world);
-//
-//    float x_dir[4];
-//    float z_dir[4];
-//    ce_vec4_move(x_dir, &wm[0 * 4]);
-//    ce_vec4_move(z_dir, &wm[2 * 4]);
-//
-//    if (!fly_mode) {
-//        z_dir[1] = 0.0f;
-//    }
-//
-//    // POS
-//    float x_dir_new[3];
-//    float z_dir_new[3];
-//
-//    ce_vec3_mul_s(x_dir_new, x_dir, dt * leftright * speed);
-//    ce_vec3_mul_s(z_dir_new, z_dir, dt * updown * speed);
-//
-//    float pos[3] = {};
-//    ce_vec3_add(pos, transform->position, x_dir_new);
-//    ce_vec3_add(pos, pos, z_dir_new);
-
-//    uint64_t ent_obj = camera_ent.h;
-//    uint64_t components = ce_cdb_a0->read_subobject(ent_obj,
-//                                                    ENTITY_COMPONENTS, 0);
-//    uint64_t component = ce_cdb_a0->read_subobject(components,
-//                                                   TRANSFORM_COMPONENT, 0);
-//
-//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(component);
-//    ce_cdb_a0->set_vec3(w, PROP_POSITION, pos);
-//    ce_cdb_a0->write_commit(w);
-
-    // ROT
-//    float rotation_around_world_up[4];
-//    float rotation_around_camera_right[4];
-//
-//    local rotation_around_world_up = Quatf.from_axis_angle(Vec3f.unit_y(), -dx * dt * 100)
-//    local rotation_around_camera_right = Quatf.from_axis_angle(x_dir, dy * dt * 100)
-//    local rotation = rotation_around_world_up * rotation_around_camera_right
-//
-//    Transform.set_position(self.transform, pos)
-//    Transform.set_rotation(self.transform, rot * rotation)
-//    end
-}
-
-//static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-//    ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_INTERFACE);
-//    while (it.api) {
-//        struct ct_component_i0 *i = (it.api);
-//
-//        if (cdb_type == i->cdb_type()) {
-//            return i;
-//        }
-//
-//        it = ce_api_a0->next(it);
-//    }
-//
-//    return NULL;
-//};
-
-//static void _guizmo(uint64_t component_obj,
-//                    struct ct_editor_component_i0 *ceditor,
-//                    enum OPERATION operation,
-//                    const float *view,
-//                    const float *proj,
-//                    float *size) {
-//
-//    if (!ceditor->guizmo_get_transform) {
-//        return;
-//    }
-//
-//    if (!ceditor->guizmo_set_transform) {
-//        return;
-//    }
-//
-//    float world[16];
-//    float local[16];
-//
-//    ce_mat4_identity(world);
-//    ce_mat4_identity(local);
-//
-//    ceditor->guizmo_get_transform(component_obj, world, local);
-//
-//    float min[2];
-//    ct_debugui_a0->GetWindowPos(min);
-//    ct_debugui_a0->guizmo_set_rect(min[0], min[1], size[0], size[1]);
-//
-//    float delta_matrix[16] = {0.0f};
-//    ce_mat4_identity(delta_matrix);
-//
-//    ct_debugui_a0->guizmo_manipulate(view, proj, operation, WORLD,
-//                                     world, delta_matrix, 0, NULL, NULL);
-//
-//    if (!ce_mat4_is_identity(delta_matrix)) {
-//        ceditor->guizmo_set_transform(component_obj, operation, world, local);
-//    }
-//}
 
 static void draw_menu(uint64_t context_obj) {
     static enum OPERATION operation;
@@ -201,7 +82,7 @@ static void draw_editor(uint64_t context_obj,
     }
 
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
-    size.y -= ct_debugui_a0->GetTextLineHeightWithSpacing();
+//    size.y -= ct_debugui_a0->GetTextLineHeightWithSpacing();
 
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     editor->mouse_hovering = is_mouse_hovering;

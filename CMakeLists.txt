@@ -113,20 +113,20 @@ set(SOURCE_FILES
         src/cetech/material/private/material.c
         src/cetech/scene/private/scene.c
         src/cetech/scene/private/scene_compiler.cpp
-        src/cetech/mesh/private/mesh_renderer.c
-        src/cetech/mesh/private/mesh_renderer.c
+        src/cetech/mesh/private/static_mesh.c
+        src/cetech/mesh/private/static_mesh.c
         src/cetech/mesh/private/primitive_mesh.c
         src/cetech/transform/private/transform.c
         src/cetech/camera/private/camera.c
         src/cetech/entity/private/entity_editor.c
-        src/cetech/editor/private/resource_editor.c
+        src/cetech/resource/private/resource_editor.c
         src/cetech/entity/private/entity_property.c
-        src/cetech/editor/private/explorer.c
-        src/cetech/editor/private/resource_preview.c
-        src/cetech/editor/private/resource_browser.cpp
+        src/cetech/explorer/private/explorer.c
+        src/cetech/resource/private/resource_preview.c
+        src/cetech/resource/private/resource_browser.cpp
         src/cetech/editor/private/editor.c
-        src/cetech/editor/private/property.c
-        src/cetech/editor/private/log_view.cpp
+        src/cetech/property_editor/private/property_editor.c
+        src/cetech/log_view/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
         src/cetech/resource/private/resourcedb.c
         src/cetech/editor/private/editor_ui.c

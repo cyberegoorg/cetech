@@ -54,21 +54,21 @@ typedef struct ce_time_t {
 } ce_time_t;
 
 
-static const ce_vec2_t CE_VEC2_ZERO = {0.0f, 0.0f};
-static const ce_vec2_t CE_VEC2_ONE = {1.0f, 1.0f};
-static const ce_vec2_t CE_VEC2_UNIT_X = {1.0f, 0.0f};
-static const ce_vec2_t CE_VEC2_UNIT_Y = {0.0f, 1.0f};
+static const ce_vec2_t CE_VEC2_ZERO = (ce_vec2_t) {0.0f, 0.0f};
+static const ce_vec2_t CE_VEC2_ONE = (ce_vec2_t) {1.0f, 1.0f};
+static const ce_vec2_t CE_VEC2_UNIT_X = (ce_vec2_t) {1.0f, 0.0f};
+static const ce_vec2_t CE_VEC2_UNIT_Y = (ce_vec2_t) {0.0f, 1.0f};
 
-static const ce_vec3_t CE_VEC3_ZERO = {0.0f, 0.0f, 0.0f};
-static const ce_vec3_t CE_VEC3_UNIT = {1.0f, 1.0f, 1.0f};
-static const ce_vec3_t CE_VEC3_UNIT_X = {1.0f, 0.0f, 0.0f};
-static const ce_vec3_t CE_VEC3_UNIT_Y = {0.0f, 1.0f, 0.0f};
-static const ce_vec3_t CE_VEC3_UNIT_Z = {0.0f, 0.0f, 1.0f};
+static const ce_vec3_t CE_VEC3_ZERO = (ce_vec3_t) {0.0f, 0.0f, 0.0f};
+static const ce_vec3_t CE_VEC3_UNIT = (ce_vec3_t) {1.0f, 1.0f, 1.0f};
+static const ce_vec3_t CE_VEC3_UNIT_X = (ce_vec3_t) {1.0f, 0.0f, 0.0f};
+static const ce_vec3_t CE_VEC3_UNIT_Y = (ce_vec3_t) {0.0f, 1.0f, 0.0f};
+static const ce_vec3_t CE_VEC3_UNIT_Z = (ce_vec3_t) {0.0f, 0.0f, 1.0f};
 
-static const ce_vec4_t CE_VEC4_ZERO = {0.0f, 0.0f, 0.0f, 0.0f};
-static const ce_vec4_t CE_VEC4_ONE = {1.0f, 1.0f, 1.0f, 1.0f};
+static const ce_vec4_t CE_VEC4_ZERO = (ce_vec4_t) {0.0f, 0.0f, 0.0f, 0.0f};
+static const ce_vec4_t CE_VEC4_ONE = (ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f};
 
-#define  CE_MAT4_IDENTITY (float[16]){1.0f, 0.0f, 0.0f, 0.0f,\
+#define  CE_MAT4_IDENTITY (ce_mat4_t){1.0f, 0.0f, 0.0f, 0.0f,\
                                       0.0f, 1.0f, 0.0f, 0.0f,\
                                       0.0f, 0.0f, 1.0f, 0.0f,\
                                       0.0f, 0.0f, 0.0f, 1.0f}
