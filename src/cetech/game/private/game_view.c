@@ -62,7 +62,7 @@ static void on_debugui(uint64_t dock) {
     ct_rg_builder_t0 *builder;
     builder = ct_renderer_a0->viewport_builder(v);
 
-    builder->set_size(builder, size.x, size.y);
+    ct_renderer_a0->viewport_set_size(v, size);
 
 
     bgfx_texture_handle_t th;

@@ -249,7 +249,7 @@ static void _draw_preview(preview_instance *pi,
         struct ct_rg_builder_t0 *builder;
         builder = ct_renderer_a0->viewport_builder(pi->viewport);
 
-        builder->set_size(builder, size.x, size.y);
+        ct_renderer_a0->viewport_set_size(pi->viewport, size);
 
         bgfx_texture_handle_t th;
         th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
@@ -278,7 +278,6 @@ static void draw_dock(uint64_t dock) {
     _draw_preview(pi, size);
 }
 
-
 static bool init() {
     _G.visible = true;
 
@@ -286,7 +285,7 @@ static bool init() {
     _G.baground = pi;
     pi->world = ct_ecs_a0->create_world();
     pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
-    pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
+    pi->viewport = ct_renderer_a0->create_viewport();
 
     ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
     return true;
@@ -299,42 +298,18 @@ static void update(float dt) {
 
         ct_ecs_a0->simulate(pi->world, dt);
 
-        uint64_t selected_object = pi->selected_object;
-        if (!selected_object) {
-            return;
-        }
+        ct_transform_comp *t = ct_ecs_a0->get_one(pi->world, TRANSFORM_COMPONENT,
+                                                  pi->camera_ent);
 
-        struct ct_controlers_i0 *keyboard;
-        keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+        ct_camera_component *c = ct_ecs_a0->get_one(pi->world, CT_CAMERA_COMPONENT,
+                                                    pi->camera_ent);
 
-        if (_G.active) {
-            float updown = 0.0f;
-            float leftright = 0.0f;
-
-            uint32_t up_key = keyboard->button_index("w");
-            uint32_t down_key = keyboard->button_index("s");
-            uint32_t left_key = keyboard->button_index("a");
-            uint32_t right_key = keyboard->button_index("d");
-
-            if (keyboard->button_state(0, up_key) > 0) {
-                updown = 1.0f;
-            }
-
-            if (keyboard->button_state(0, down_key) > 0) {
-                updown = -1.0f;
-            }
-
-            if (keyboard->button_state(0, right_key) > 0) {
-                leftright = 1.0f;
-            }
-
-            if (keyboard->button_state(0, left_key) > 0) {
-                leftright = -1.0f;
-            }
-
-            fps_camera_update(pi->world, pi->camera_ent, dt,
-                              0, 0, updown, leftright, 10.0f, false);
-        }
+        ct_renderer_a0->viewport_render(pi->viewport,
+                                        pi->world,
+                                        (ct_camera_data_t0) {
+                                                .world = t->world,
+                                                .camera = *c,
+                                        });
     }
 }
 

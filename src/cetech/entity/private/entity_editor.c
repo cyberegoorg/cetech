@@ -206,59 +206,10 @@ static void draw_editor(uint64_t context_obj,
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     editor->mouse_hovering = is_mouse_hovering;
 
-    float proj[16], view[16];
-    ct_camera_a0->get_project_view(editor->world,
-                                   editor->camera_ent,
-                                   proj, view,
-                                   size.x, size.y);
 
+    ct_rg_builder_t0 *builder = ct_renderer_a0->viewport_builder(editor->viewport);
 
-//    uint64_t obj = 0; //ct_selected_object_a0->selected_object();
-
-//    if (obj) {
-//        uint64_t obj_type = ce_cdb_a0->obj_type(obj);
-//        if (obj_type == ENTITY_RESOURCE) {
-//
-//            uint64_t components;
-//            components = ce_cdb_a0->read_subobject(obj, ENTITY_COMPONENTS, 0);
-//
-//            const uint32_t component_n = ce_cdb_a0->prop_count(components);
-//
-//            const uint64_t *keys = ce_cdb_a0->prop_keys(components);
-//
-//            for (uint32_t i = 0; i < component_n; ++i) {
-//                uint64_t key = keys[i];
-//
-//                uint64_t component;
-//                component = ce_cdb_a0->read_subobject(components, key, 0);
-//
-//                uint64_t type = ce_cdb_a0->obj_type(component);
-//
-//                struct ct_component_i0 *c;
-//                c = get_component_interface(type);
-//
-//                if (!c->get_interface) {
-//                    continue;
-//                }
-//
-//                struct ct_editor_component_i0 *ceditor;
-//                ceditor = c->get_interface(EDITOR_COMPONENT);
-//
-//                if (!ceditor) {
-//                    continue;
-//                }
-//
-//                _guizmo(component, ceditor, operation,
-//                        view, proj, size);
-//            }
-//        }
-//    }
-
-
-    ct_rg_builder_t0 *builder = \
-    ct_renderer_a0->viewport_builder(editor->viewport);
-
-    builder->set_size(builder, size.x, size.y);
+    ct_renderer_a0->viewport_set_size(editor->viewport, size);
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
@@ -269,14 +220,6 @@ static void draw_editor(uint64_t context_obj,
                          &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
 
 }
-
-//static const char *dock_title(ct_dock_i0 *dock) {
-//    return ICON_FA_CUBE " Entity editor";
-//}
-//
-//static const char *name(ct_dock_i0 *dock) {
-//    return "entity_editor";
-//}
 
 static struct entity_editor *_new_editor(uint64_t context_obj) {
 
@@ -303,8 +246,7 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
     editor->world = ct_ecs_a0->create_world();
 
     editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
-    editor->viewport = ct_renderer_a0->create_viewport(editor->world,
-                                                       editor->camera_ent);
+    editor->viewport = ct_renderer_a0->create_viewport();
 
     return editor;
 }
@@ -318,7 +260,8 @@ static void close(uint64_t context_obj) {
     editor->free = true;
 }
 
-static void open(uint64_t context_obj, uint64_t obj) {
+static void open(uint64_t context_obj,
+                 uint64_t obj) {
     entity_editor *editor = _new_editor(context_obj);
     editor->entity = ct_ecs_a0->spawn(editor->world, obj);
 }
@@ -337,36 +280,21 @@ static void update(uint64_t context_obj,
     }
 
     if (editor->mouse_hovering) {
-        float updown = 0.0f;
-        float leftright = 0.0f;
-
-        uint32_t up_key = keyboard->button_index("w");
-        uint32_t down_key = keyboard->button_index("s");
-        uint32_t left_key = keyboard->button_index("a");
-        uint32_t right_key = keyboard->button_index("d");
-
-        if (keyboard->button_state(0, up_key) > 0) {
-            updown = 1.0f;
-        }
-
-        if (keyboard->button_state(0, down_key) > 0) {
-            updown = -1.0f;
-        }
-
-        if (keyboard->button_state(0, right_key) > 0) {
-            leftright = 1.0f;
-        }
-
-        if (keyboard->button_state(0, left_key) > 0) {
-            leftright = -1.0f;
-        }
-
-        fps_camera_update(editor->world,
-                          editor->camera_ent,
-                          dt, 0, 0, updown, leftright, 10.0f, false);
     }
 
     ct_ecs_a0->simulate(editor->world, dt);
+
+    ct_transform_comp *t = ct_ecs_a0->get_one(editor->world, TRANSFORM_COMPONENT,
+                                              editor->camera_ent);
+    ct_camera_component *c = ct_ecs_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
+                                                editor->camera_ent);
+
+    ct_renderer_a0->viewport_render(editor->viewport,
+                                    editor->world,
+                                    (ct_camera_data_t0) {
+                                            .world = t->world,
+                                            .camera = *c,
+                                    });
 }
 
 uint64_t cdb_type() {

@@ -3,7 +3,7 @@ typedef struct render_graph_builder_pass {
     uint8_t viewid;
     uint64_t layer;
     bgfx_frame_buffer_handle_t fb;
-}render_graph_builder_pass;
+} render_graph_builder_pass;
 
 #define MAX_ATTACHMENTS 8+2
 typedef struct render_graph_builder_inst {
@@ -17,7 +17,7 @@ typedef struct render_graph_builder_inst {
 
     uint8_t attachemnt_used;
     bgfx_texture_handle_t attachemnt[MAX_ATTACHMENTS];
-}render_graph_builder_inst;
+} render_graph_builder_inst;
 
 #define _DEFAULT \
      CE_ID64_0("default", 0xf27605035974b5ecULL)
@@ -45,8 +45,8 @@ static void builder_add_pass(void *inst,
         const uint8_t n = builder_inst->attachemnt_used;
         if (0 != n) {
             fb = ct_gfx_a0->bgfx_create_frame_buffer_from_handles(n,
-                                                             builder_inst->attachemnt,
-                                                             true);
+                                                                  builder_inst->attachemnt,
+                                                                  true);
         }
     }
 
@@ -61,7 +61,7 @@ static void builder_add_pass(void *inst,
     builder_inst->attachemnt_used = 0;
 }
 
-static void builder_execute(void *inst) {
+static void builder_execute(void *inst, ct_camera_data_t0* main_camera) {
     ct_rg_builder_t0 *builder = inst;
     render_graph_builder_inst *builder_inst = builder->inst;
 
@@ -76,7 +76,7 @@ static void builder_execute(void *inst) {
 
         ct_gfx_a0->bgfx_set_view_frame_buffer(pass->viewid, pass->fb);
         ct_gfx_a0->bgfx_touch(pass->viewid);
-        pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, builder);
+        pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, main_camera, builder);
     }
 }
 
@@ -132,9 +132,9 @@ static void builder_create(void *inst,
 
     bgfx_texture_handle_t th;
     th = ct_gfx_a0->bgfx_create_texture_2d(builder_inst->size[0] * coef,
-                                      builder_inst->size[1] * coef,
-                                      false, 1, info.format,
-                                      samplerFlags, NULL);
+                                           builder_inst->size[1] * coef,
+                                           false, 1, info.format,
+                                           samplerFlags, NULL);
 
     const uint8_t idx = builder_inst->attachemnt_used++;
     builder_inst->attachemnt[idx] = th;
@@ -157,7 +157,7 @@ static void builder_read(void *inst,
 }
 
 bgfx_texture_handle_t builder_get_texture(void *inst,
-                                                    uint64_t name) {
+                                          uint64_t name) {
     ct_rg_builder_t0 *builder = inst;
     render_graph_builder_inst *builder_inst = builder->inst;
 
@@ -173,7 +173,6 @@ void builder_set_size(void *inst,
 
     builder_inst->size[0] = w;
     builder_inst->size[1] = h;
-
 }
 
 void builder_get_size(void *inst,
@@ -194,12 +193,12 @@ static uint8_t get_layer_viewid(void *inst,
 
 static struct ct_rg_builder_t0 *create_render_builder() {
     ct_rg_builder_t0 *obj = CE_ALLOC(_G.alloc,
-                                            ct_rg_builder_t0,
-                                         sizeof(ct_rg_builder_t0));
+                                     ct_rg_builder_t0,
+                                     sizeof(ct_rg_builder_t0));
 
     render_graph_builder_inst *inst = CE_ALLOC(_G.alloc,
-                                                      struct render_graph_builder_inst,
-                                                      sizeof(render_graph_builder_inst));
+                                               struct render_graph_builder_inst,
+                                               sizeof(render_graph_builder_inst));
 
 
     *inst = (render_graph_builder_inst) {};

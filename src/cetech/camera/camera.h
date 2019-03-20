@@ -14,6 +14,18 @@ extern "C" {
 #define CAMERA_COMPONENT \
     CE_ID64_0("camera", 0x60ed8c3931822dc7ULL)
 
+#define CT_ACTIVE_CAMERA_COMPONENT \
+    CE_ID64_0("active_camera", 0xa0430cee11242caULL)
+
+#define PROP_CAMERA_TYPE \
+    CE_ID64_0("camera_type", 0xaf56273bba8c279bULL)
+
+#define CAMERA_TYPE_ORTHO \
+    CE_ID64_0("ortho", 0x747f66809b7ad519ULL)
+
+#define CAMERA_TYPE_PERSPECTIVE \
+    CE_ID64_0("perspective", 0x281d823258cc7c6eULL)
+
 #define PROP_FOV \
     CE_ID64_0("fov", 0x805726a3c8974fbdULL)
 
@@ -23,12 +35,9 @@ extern "C" {
 #define PROP_FAR \
     CE_ID64_0("far", 0xe8d4ceded45dd6acULL)
 
-#define PROP_PROJECTION \
-    CE_ID64_0("projection", 0x765e7da8e9078d46ULL)
 
-#define PROP_VIEW \
-    CE_ID64_0("view", 0x3fce6c347b7f5eedULL)
-
+#define PROP_CAMERA_ENT \
+    CE_ID64_0("camera_ent", 0x83b9039ed72a162fULL)
 
 typedef struct ct_world_t0 ct_world_t0;
 typedef struct ct_entity_t0 ct_entity_t0;
@@ -42,8 +51,8 @@ typedef struct ct_camera_component {
 //! Camera API V0
 struct ct_camera_a0 {
     //! Get camera project and view matrix
-    void (*get_project_view)(ct_world_t0 world,
-                             ct_entity_t0 entity,
+    void (*get_project_view)(ce_mat4_t world,
+                             ct_camera_component camera,
                              float *proj,
                              float *view,
                              int width,

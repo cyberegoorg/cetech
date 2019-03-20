@@ -47,8 +47,8 @@
 
 typedef struct viewport_t {
     ct_rg_builder_t0 *builder;
-    ct_world_t0 world;
-    ct_entity_t0 entity;
+    ct_rg_module *module;
+    ce_vec2_t size;
     bool free;
 } viewport_t;
 
@@ -71,7 +71,7 @@ static struct _G {
     bool need_reset;
     uint64_t config;
     ce_alloc_t0 *allocator;
-    ct_machine_ev_queue_o0* ev_queue;
+    ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
 
 
@@ -168,11 +168,10 @@ static void renderer_create() {
             {.k = "metal", .v = BGFX_RENDERER_TYPE_METAL},
 
             {.k = "",
-                    .v =
 #if CE_PLATFORM_LINUX
-                    BGFX_RENDERER_TYPE_OPENGL
+                    .v = BGFX_RENDERER_TYPE_OPENGL
 #elif CE_PLATFORM_OSX
-                    BGFX_RENDERER_TYPE_METAL
+                    .v = BGFX_RENDERER_TYPE_METAL
 #endif
             },
     };
@@ -195,8 +194,7 @@ static void renderer_create() {
     bgfx_init(&init);
 
     _G.main_window->size(_G.main_window->inst, &_G.size_width, &_G.size_height);
-    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(),
-               BGFX_TEXTURE_FORMAT_COUNT);
+    bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     //_G.main_window->update(_G.main_window);
 
     _G.need_reset = true;
@@ -252,7 +250,30 @@ void _render_components(ct_world_t0 world,
     }
 }
 
-static void render(float dt) {
+static void _render_viewport(viewport_t *v,
+                             ct_world_t0 world,
+                             ct_camera_data_t0 main_camera) {
+    struct ct_rg_t0 *graph = ct_rg_a0->create_graph();
+    struct ct_rg_module_t0 *module = ct_rg_a0->create_module();
+    struct ct_rg_builder_t0 *builder = v->builder;
+
+    builder->clear(builder);
+
+    ct_default_rg_a0->feed_module(module);
+    _feed_module(world, module);
+
+    graph->set_module(graph, module);
+    graph->setup(graph, v->builder);
+
+    v->builder->execute(v->builder, &main_camera);
+
+    _render_components(world, v->builder);
+
+    ct_rg_a0->destroy_module(module);
+    ct_rg_a0->destroy_graph(graph);
+}
+
+static void render_begin(float dt) {
     _G.viewid = 0;
 
     ct_machine_ev_t0 ev = {};
@@ -270,35 +291,9 @@ static void render(float dt) {
 
         bgfx_reset(_G.size_width, _G.size_height, _get_reset_flags(), BGFX_TEXTURE_FORMAT_COUNT);
     }
+}
 
-    const uint32_t v_n = ce_array_size(_G.viewports);
-    for (int i = 0; i < v_n; ++i) {
-        viewport_t *v = &_G.viewports[i];
-
-        if (v->free) {
-            continue;
-        }
-
-        struct ct_rg_t0 *graph = ct_rg_a0->create_graph();
-        struct ct_rg_module_t0 *module = ct_rg_a0->create_module();
-        struct ct_rg_builder_t0 *builder = v->builder;
-
-        builder->clear(builder);
-
-        ct_default_rg_a0->feed_module(module, v->world, v->entity);
-        _feed_module(v->world, module);
-
-        graph->set_module(graph, module);
-        graph->setup(graph, v->builder);
-
-        v->builder->execute(v->builder);
-
-        _render_components(v->world, v->builder);
-
-        ct_rg_a0->destroy_module(module);
-        ct_rg_a0->destroy_graph(graph);
-    }
-
+static void render(float dt) {
     ct_debugui_a0->render();
     bgfx_frame(false);
 }
@@ -324,21 +319,30 @@ static uint32_t _new_viewport() {
     return idx;
 }
 
-struct ct_viewport_t0 create_viewport(ct_world_t0 world,
-                                      struct ct_entity_t0 main_camera) {
+struct ct_viewport_t0 create_viewport() {
     uint32_t idx = _new_viewport();
 
     viewport_t *v = &_G.viewports[idx];
 
     ct_rg_builder_t0 *builder = ct_rg_a0->create_builder();
 
-    v->world = world;
-    v->entity = main_camera;
     v->builder = builder;
 
     return (ct_viewport_t0) {.idx=idx};
 }
 
+ce_vec2_t viewport_size(ct_viewport_t0 viewport) {
+    viewport_t *v = &_G.viewports[viewport.idx];
+    return v->size;
+
+}
+
+void viewport_set_size(ct_viewport_t0 viewport,
+                       ce_vec2_t size) {
+    viewport_t *v = &_G.viewports[viewport.idx];
+    v->size = size;
+    v->builder->set_size(v->builder, size.x, size.y);
+}
 
 void destroy_viewport(ct_viewport_t0 viewport) {
     viewport_t *v = &_G.viewports[viewport.idx];
@@ -348,6 +352,12 @@ void destroy_viewport(ct_viewport_t0 viewport) {
 
 struct ct_rg_builder_t0 *viewport_builder(ct_viewport_t0 viewport) {
     return _G.viewports[viewport.idx].builder;
+}
+
+void viewport_render(ct_viewport_t0 viewport,
+                     ct_world_t0 world,
+                     ct_camera_data_t0 main_camera) {
+    _render_viewport(&_G.viewports[viewport.idx], world, main_camera);
 }
 
 struct ce_window_t0 *get_main_window() {
@@ -360,13 +370,20 @@ static struct ct_renderer_a0 rendderer_api = {
         .get_size = renderer_get_size,
         .new_viewid = new_viewid,
         .create_viewport = create_viewport,
+        .viewport_size = viewport_size,
+        .viewport_set_size = viewport_set_size,
         .destroy_viewport = destroy_viewport,
         .viewport_builder = viewport_builder,
+        .viewport_render = viewport_render,
         .get_main_window = get_main_window,
 };
 
 
 struct ct_renderer_a0 *ct_renderer_a0 = &rendderer_api;
+
+static uint64_t begin_task_name() {
+    return CT_RENDER_BEGIN_TASK;
+}
 
 static uint64_t task_name() {
     return CT_RENDER_TASK;
@@ -374,7 +391,7 @@ static uint64_t task_name() {
 
 static uint64_t *update_after(uint64_t *n) {
     static uint64_t a[] = {
-            CT_GAME_TASK,
+            CT_RENDER_BEGIN_TASK,
     };
 
     *n = CE_ARRAY_LEN(a);
@@ -382,11 +399,17 @@ static uint64_t *update_after(uint64_t *n) {
 }
 
 
+static struct ct_kernel_task_i0 render_begin_task = {
+        .name = begin_task_name,
+        .update = render_begin,
+};
+
 static struct ct_kernel_task_i0 render_task = {
         .name = task_name,
         .update = render,
         .update_after = update_after,
 };
+
 
 #include "gfx.inl"
 

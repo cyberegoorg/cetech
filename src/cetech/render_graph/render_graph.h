@@ -27,6 +27,7 @@ typedef struct ct_rg_pass_t0 {
     void (*on_pass)(void *inst,
                     uint8_t viewid,
                     uint64_t layer,
+                    ct_camera_data_t0 *main_camera,
                     ct_rg_builder_t0 *builder);
 } ct_rg_pass_t0;
 
@@ -68,7 +69,7 @@ typedef struct ct_rg_builder_t0 {
 
     void (*clear)(void *inst);
 
-    void (*execute)(void *inst);
+    void (*execute)(void *inst, ct_camera_data_t0 *main_camera);
 } ct_rg_builder_t0;
 
 typedef struct ct_rg_module_t0 {

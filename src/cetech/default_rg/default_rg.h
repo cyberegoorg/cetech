@@ -27,9 +27,7 @@ typedef struct ct_world_t0 ct_world_t0;
 
 
 struct ct_default_rg_a0 {
-    void (*feed_module)(ct_rg_module_t0 *m,
-                        ct_world_t0 world,
-                        ct_entity_t0 camera);
+    void (*feed_module)(ct_rg_module_t0 *m);
 };
 
 #ifdef __cplusplus

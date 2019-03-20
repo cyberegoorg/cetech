@@ -24,12 +24,12 @@
 #include "celib/module.h"
 
 #define _G CameraGlobal
-static struct CameraGlobal {
+static struct _G {
     ce_alloc_t0 *allocator;
-} CameraGlobal;
+} _G;
 
-static void get_project_view(ct_world_t0 world,
-                             struct ct_entity_t0 _camera,
+static void get_project_view(ce_mat4_t world,
+                             ct_camera_component camera,
                              float *proj,
                              float *view,
                              int width,
@@ -93,6 +93,7 @@ static struct ct_camera_a0 camera_api = {
 
 struct ct_camera_a0 *ct_camera_a0 = &camera_api;
 
+///
 static uint64_t cdb_type() {
     return CAMERA_COMPONENT;
 }
@@ -128,6 +129,7 @@ static ce_cdb_prop_def_t0 camera_component_prop[] = {
         {.name = "fov", .type = CDB_TYPE_FLOAT, .value.f = 60.0f},
 };
 
+
 void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
                             int reload) {
     CE_UNUSED(reload);
@@ -148,8 +150,13 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
     api->register_api(COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
     api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
 
-    ce_cdb_a0->reg_obj_type(CAMERA_COMPONENT,
-                            camera_component_prop, CE_ARRAY_LEN(camera_component_prop));
+    ce_cdb_a0->reg_obj_type(CT_CAMERA_COMPONENT,
+                            camera_component_prop,
+                            CE_ARRAY_LEN(camera_component_prop));
+
+    ce_cdb_a0->reg_obj_type(CT_ACTIVE_CAMERA_COMPONENT,
+                            active_camera_component_prop,
+                            CE_ARRAY_LEN(active_camera_component_prop));
 }
 
 void CE_MODULE_UNLOAD(camera)(struct ce_api_a0 *api,

@@ -140,6 +140,7 @@ static uint64_t copy_material = 0;
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
                                 uint64_t layer,
+                                ct_camera_data_t0 *main_camera,
                                 struct ct_rg_builder_t0 *builder) {
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
@@ -199,16 +200,13 @@ static void gbuffer_pass_on_setup(void *inst,
 
 typedef struct gbuffer_pass {
     ct_rg_pass_t0 pass;
-    ct_entity_t0 camera;
-    ct_world_t0 world;
 } gbuffer_pass;
 
 static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
                                  uint64_t layer,
+                                 ct_camera_data_t0 *main_camera,
                                  struct ct_rg_builder_t0 *builder) {
-    gbuffer_pass *pass = inst;
-
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
                                    BGFX_CLEAR_DEPTH,
@@ -222,8 +220,8 @@ static void gbuffer_pass_on_pass(void *inst,
     float view_matrix[16];
     float proj_matrix[16];
 
-    ct_camera_a0->get_project_view(pass->world,
-                                   pass->camera,
+    ct_camera_a0->get_project_view(main_camera->world,
+                                   main_camera->camera,
                                    proj_matrix,
                                    view_matrix,
                                    size[0],
@@ -234,14 +232,10 @@ static void gbuffer_pass_on_pass(void *inst,
 }
 
 
-static void feed_module(ct_rg_module_t0 *m1,
-                        ct_world_t0 world,
-                        struct ct_entity_t0 camera) {
+static void feed_module(ct_rg_module_t0 *m1) {
     ct_rg_module_t0 *gm = m1->add_extension_point(m1, _GBUFFER);
 
     gm->add_pass(gm, &(gbuffer_pass) {
-            .camera = camera,
-            .world = world,
             .pass = {
                     .on_setup = gbuffer_pass_on_setup,
                     .on_pass = gbuffer_pass_on_pass,

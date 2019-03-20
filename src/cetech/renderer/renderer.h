@@ -30,6 +30,9 @@ extern "C" {
 #define CONFIG_SCREEN_FULLSCREEN \
      CE_ID64_0("screen.fullscreen", 0x613e9a6a17148a72ULL)
 
+#define CT_RENDER_BEGIN_TASK \
+     CE_ID64_0("render_begin_task", 0xf6eeee935f07dcfeULL)
+
 #define CT_RENDER_TASK \
      CE_ID64_0("render_task", 0x193bb679e415e81bULL)
 
@@ -43,6 +46,7 @@ typedef struct ce_window_t0 ce_window_t0;
 
 typedef struct ct_rg_module_t0 ct_rg_module_t0;
 typedef struct ct_rg_builder_t0 ct_rg_builder_t0;
+typedef struct ct_camera_data_t0 ct_camera_data_t0;
 
 
 typedef void (*ct_renderender_on_render)();
@@ -58,7 +62,6 @@ typedef struct ct_renderer_component_i0 {
 typedef struct ct_viewport_t0 {
     uint32_t idx;
 } ct_viewport_t0;
-
 
 //! Render API V0
 struct ct_renderer_a0 {
@@ -76,12 +79,21 @@ struct ct_renderer_a0 {
 
     uint64_t (*new_viewid)();
 
-    ct_viewport_t0 (*create_viewport)(ct_world_t0 world,
-                                             struct ct_entity_t0 main_camera);
+    // viewport
+    ct_viewport_t0 (*create_viewport)();
+
+    ce_vec2_t (*viewport_size)(ct_viewport_t0 viewport);
+
+    void (*viewport_set_size)(ct_viewport_t0 viewport,
+                              ce_vec2_t size);
 
     void (*destroy_viewport)(ct_viewport_t0 viewport);
 
     ct_rg_builder_t0 *(*viewport_builder)(ct_viewport_t0 viewport);
+
+    void (*viewport_render)(ct_viewport_t0 viewport,
+                            ct_world_t0 world,
+                            ct_camera_data_t0 main_camera);
 
     ce_window_t0 *(*get_main_window)();
 };
