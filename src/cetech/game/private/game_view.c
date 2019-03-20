@@ -104,20 +104,15 @@ static struct ct_dock_i0 dock_api = {
         .draw_menu = on_menu,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
-
-    ct_dock_a0->create_dock(GAME_INTERFACE, true);
-}
-
-static void _shutdown() {
-}
 
 void CE_MODULE_LOAD(game_view)(struct ce_api_a0 *api,
                                int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_id_a0);
-    _init(api);
+
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+
+    ct_dock_a0->create_dock(GAME_INTERFACE, true);
 }
 
 void CE_MODULE_UNLOAD(game_view)(struct ce_api_a0 *api,
@@ -125,5 +120,4 @@ void CE_MODULE_UNLOAD(game_view)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

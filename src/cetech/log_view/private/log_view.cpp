@@ -181,7 +181,16 @@ static struct ct_dock_i0 dock_api = {
         .name = name,
 };
 
-static void _init(struct ce_api_a0 *api) {
+extern "C" {
+
+void CE_MODULE_LOAD(log_view)(struct ce_api_a0 *api,
+                              int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ce_log_a0);
+
     _G = {
             .visible = true,
             .level_mask = (uint8_t) ~0,
@@ -194,25 +203,6 @@ static void _init(struct ce_api_a0 *api) {
     ce_api_a0->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
 
     ct_dock_a0->create_dock(LOG_VIEW, true);
-
-}
-
-static void _shutdown() {
-    ce_array_free(_G.log_items, _G.allocator);
-    ce_array_free(_G.line_buffer, _G.allocator);
-    _G = {};
-}
-
-extern "C" {
-
-void CE_MODULE_LOAD(log_view)(struct ce_api_a0 *api,
-                              int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
-    CE_INIT_API(api, ce_log_a0);
-    _init(api);
 }
 
 void CE_MODULE_UNLOAD(log_view)(struct ce_api_a0 *api,
@@ -220,6 +210,9 @@ void CE_MODULE_UNLOAD(log_view)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    ce_array_free(_G.log_items, _G.allocator);
+    ce_array_free(_G.line_buffer, _G.allocator);
+    _G = {};
 }
 }

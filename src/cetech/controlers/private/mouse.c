@@ -244,22 +244,6 @@ static struct ct_kernel_task_i0 mouse_task = {
         .update_after = update_after,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .ev_queue = ct_machine_a0->new_ev_listener(),
-    };
-
-    api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &mouse_task, sizeof(mouse_task));
-
-    ce_log_a0->debug(LOG_WHERE, "Init");
-}
-
-static void _shutdown() {
-    ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct _G) {};
-}
 
 void CE_MODULE_LOAD(mouse)(struct ce_api_a0 *api,
                            int reload) {
@@ -268,7 +252,12 @@ void CE_MODULE_LOAD(mouse)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+    _G = (struct _G) {
+            .ev_queue = ct_machine_a0->new_ev_listener(),
+    };
+
+    api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &mouse_task, sizeof(mouse_task));
 }
 
 void CE_MODULE_UNLOAD(mouse)(struct ce_api_a0 *api,
@@ -277,6 +266,5 @@ void CE_MODULE_UNLOAD(mouse)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
-
+    _G = (struct _G) {};
 }

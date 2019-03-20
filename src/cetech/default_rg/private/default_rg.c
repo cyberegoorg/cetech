@@ -254,23 +254,6 @@ static struct ct_default_rg_a0 default_render_graph_api = {
 
 struct ct_default_rg_a0 *ct_default_rg_a0 = &default_render_graph_api;
 
-
-static void _init(struct ce_api_a0 *api) {
-    CE_UNUSED(api);
-    _G = (struct _G) {
-            .alloc = ce_memory_a0->system,
-    };
-
-    init_decl();
-
-    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api,
-                      sizeof(default_render_graph_api));
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
 void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
                                           int reload) {
     CE_UNUSED(reload);
@@ -282,7 +265,14 @@ void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ct_material_a0);
-    _init(api);
+    _G = (struct _G) {
+            .alloc = ce_memory_a0->system,
+    };
+
+    init_decl();
+
+    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api,
+                      sizeof(default_render_graph_api));
 }
 
 void CE_MODULE_UNLOAD(default_render_graph)(struct ce_api_a0 *api,
@@ -291,5 +281,5 @@ void CE_MODULE_UNLOAD(default_render_graph)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
+    _G = (struct _G) {};
 }

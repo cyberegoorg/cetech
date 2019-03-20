@@ -387,33 +387,17 @@ static struct ce_fs_a0 _api = {
 
 struct ce_fs_a0 *ce_fs_a0 = &_api;
 
-static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CE_FS_API, &_api, sizeof(_api));
-}
-
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
+void CE_MODULE_LOAD(filesystem)(struct ce_api_a0 *api,
+                                int reload) {
+    CE_UNUSED(reload);
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
 
+    api->register_api(CE_FS_API, &_api, sizeof(_api));
+
     ce_log_a0->debug(LOG_WHERE, "Init");
-}
-
-static void _shutdown() {
-    ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    ce_array_free(_G.roots, _G.allocator);
-    ce_hash_free(&_G.root_map, _G.allocator);
-}
-
-
-void CE_MODULE_LOAD(filesystem)(struct ce_api_a0 *api,
-                                int reload) {
-    CE_UNUSED(reload);
-    _init(api);
 }
 
 void CE_MODULE_UNLOAD(filesystem)(struct ce_api_a0 *api,
@@ -422,5 +406,8 @@ void CE_MODULE_UNLOAD(filesystem)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
+    ce_log_a0->debug(LOG_WHERE, "Shutdown");
+
+    ce_array_free(_G.roots, _G.allocator);
+    ce_hash_free(&_G.root_map, _G.allocator);
 }

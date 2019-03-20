@@ -1409,25 +1409,6 @@ static struct ct_kernel_task_i0 ecs_sync_task = {
 };
 
 
-static void _init(struct ce_api_a0 *api) {
-
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-            .db = ce_cdb_a0->db(),
-            .obj_queue = ce_cdb_a0->new_objs_listener(ce_cdb_a0->db()),
-            .changed_obj_queue = ce_cdb_a0->new_changed_obj_listener(ce_cdb_a0->db()),
-    };
-
-    ce_handler_create(&_G.world_handler, _G.allocator);
-
-    _init_listener_pack(&_G.ecs_events);
-
-    api->register_api(CT_ECS_API, &_api, sizeof(_api));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task, sizeof(ecs_sync_task));
-    api->register_on_add(COMPONENT_I, _componet_api_add);
-}
-
 typedef struct _ct_entity_t0 {
     const char *asset_name;
     const char *name;
@@ -1464,7 +1445,22 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ce_task_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+            .db = ce_cdb_a0->db(),
+            .obj_queue = ce_cdb_a0->new_objs_listener(ce_cdb_a0->db()),
+            .changed_obj_queue = ce_cdb_a0->new_changed_obj_listener(ce_cdb_a0->db()),
+    };
+
+    ce_handler_create(&_G.world_handler, _G.allocator);
+
+    _init_listener_pack(&_G.ecs_events);
+
+    api->register_api(CT_ECS_API, &_api, sizeof(_api));
+    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task, sizeof(ecs_sync_task));
+    api->register_on_add(COMPONENT_I, _componet_api_add);
 
     ce_cdb_a0->reg_obj_type(ENTITY_INSTANCE, entity_prop, CE_ARRAY_LEN(entity_prop));
 }

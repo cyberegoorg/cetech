@@ -319,19 +319,6 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     return ret;
 }
 
-static void _init(struct ce_api_a0 *api) {
-    static struct ct_explorer_i0 entity_explorer = {
-            .cdb_type = cdb_type,
-            .draw_ui = draw_ui,
-            .draw_menu = draw_menu,
-    };
-
-    api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
-}
-
-static void _shutdown() {
-}
-
 void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
                                      int reload) {
     CE_UNUSED(reload);
@@ -342,7 +329,14 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    static struct ct_explorer_i0 entity_explorer = {
+            .cdb_type = cdb_type,
+            .draw_ui = draw_ui,
+            .draw_menu = draw_menu,
+    };
+
+    api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
 }
 
 void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,
@@ -350,5 +344,4 @@ void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }

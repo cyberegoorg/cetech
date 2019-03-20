@@ -307,19 +307,6 @@ static struct ct_dock_i0 dock_i = {
         .open = open,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-    };
-
-    ce_api_a0->register_api(DOCK_INTERFACE, &dock_i, sizeof(dock_i));
-    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &editor_module_api, sizeof(editor_module_api));
-
-    ct_dock_a0->create_dock(RESOURCE_EDITOR, true);
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
 
 void CE_MODULE_LOAD(editor)(struct ce_api_a0 *api,
                             int reload) {
@@ -332,7 +319,14 @@ void CE_MODULE_LOAD(editor)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ct_default_rg_a0);
-    _init(api);
+
+    _G = (struct _G) {
+    };
+
+    ce_api_a0->register_api(DOCK_INTERFACE, &dock_i, sizeof(dock_i));
+    ce_api_a0->register_api(EDITOR_MODULE_INTERFACE, &editor_module_api, sizeof(editor_module_api));
+
+    ct_dock_a0->create_dock(RESOURCE_EDITOR, true);
 }
 
 void CE_MODULE_UNLOAD(editor)(struct ce_api_a0 *api,
@@ -340,6 +334,6 @@ void CE_MODULE_UNLOAD(editor)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+    _G = (struct _G) {};
 }
 

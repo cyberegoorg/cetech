@@ -413,14 +413,22 @@ static struct ct_kernel_task_i0 render_task = {
 
 #include "gfx.inl"
 
-static void _init_api(struct ce_api_a0 *api) {
+
+void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
+                              int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_machine_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_INIT_API(api, ct_ecs_a0);
+
     api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
     api->register_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
     api->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
-}
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
+    api->register_api(KERNEL_TASK_INTERFACE, &render_begin_task, sizeof(render_begin_task));
 
     ce_api_a0 = api;
 
@@ -466,7 +474,12 @@ static void _init(struct ce_api_a0 *api) {
 
 }
 
-static void _shutdown() {
+void CE_MODULE_UNLOAD(renderer)(struct ce_api_a0 *api,
+                                int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
     if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
 
@@ -476,26 +489,4 @@ static void _shutdown() {
     }
 
     _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
-                              int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_config_a0);
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ct_machine_a0);
-    CE_INIT_API(api, ce_cdb_a0);
-    CE_INIT_API(api, ct_ecs_a0);
-    _init(api);
-}
-
-void CE_MODULE_UNLOAD(renderer)(struct ce_api_a0 *api,
-                                int reload) {
-
-    CE_UNUSED(reload);
-    CE_UNUSED(api);
-
-    _shutdown();
 }

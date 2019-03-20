@@ -239,13 +239,16 @@ static struct ce_task_a0 _task_api = {
 
 struct ce_task_a0 *ce_task_a0 = &_task_api;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
+                          int reload) {
+    CE_UNUSED(reload);
+
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
     api->register_api(CE_TASK_API, &_task_api, sizeof(_task_api));
 
     int core_count = ce_os_cpu_a0->count();
-    //core_count = 4;
+    core_count = 4;
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -271,7 +274,11 @@ static void _init(struct ce_api_a0 *api) {
     _G.is_running = 1;
 }
 
-static void _shutdown() {
+void CE_MODULE_UNLOAD(task)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
     _G.is_running = 0;
     int status = 0;
 
@@ -286,18 +293,5 @@ static void _shutdown() {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
     };
-}
-
-void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
-                          int reload) {
-    CE_UNUSED(reload);
-    _init(api);
-}
-
-void CE_MODULE_UNLOAD(task)(struct ce_api_a0 *api,
-                            int reload) {
-    CE_UNUSED(reload);
-    CE_UNUSED(api);
-    _shutdown();
 }
 

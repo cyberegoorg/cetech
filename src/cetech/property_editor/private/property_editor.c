@@ -296,7 +296,10 @@ struct ct_property_editor_a0 property_editor_api = {
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
+                                        int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_id_a0);
     _G = (struct _G) {
             .visible = true
     };
@@ -304,18 +307,8 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
     api->register_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
 
-    ct_dock_a0->create_dock(PROPERTY_EDITOR_INTERFACE, true);
-}
+    ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_INTERFACE, true);
 
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
-                                        int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_id_a0);
-    _init(api);
 }
 
 void CE_MODULE_UNLOAD(property_inspector)(struct ce_api_a0 *api,
@@ -323,5 +316,6 @@ void CE_MODULE_UNLOAD(property_inspector)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    _G = (struct _G) {};
 }

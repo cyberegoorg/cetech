@@ -139,7 +139,9 @@ static struct ct_selected_object_a0 ct_selected_object_api0 = {
 struct ct_selected_object_a0 *ct_selected_object_a0 = &ct_selected_object_api0;
 
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(selected_object)(struct ce_api_a0 *api,
+                                     int reload) {
+    CE_UNUSED(reload);
     _G = (struct _G) {
     };
 
@@ -148,21 +150,11 @@ static void _init(struct ce_api_a0 *api) {
                       sizeof(ct_selected_object_api0));
 }
 
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(selected_object)(struct ce_api_a0 *api,
-                                     int reload) {
-    CE_UNUSED(reload);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(selected_object)(struct ce_api_a0 *api,
                                        int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+    _G = (struct _G) {};
 }
 

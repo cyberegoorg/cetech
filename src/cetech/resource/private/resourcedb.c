@@ -701,9 +701,14 @@ static struct ct_resourcedb_a0 build_db_api = {
 
 struct ct_resourcedb_a0 *ct_resourcedb_a0 = &build_db_api;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(builddb)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+
     _G = (struct _G) {
-        .alloc = ce_memory_a0->system,
+            .alloc = ce_memory_a0->system,
     };
 
     api->register_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(build_db_api));
@@ -711,26 +716,15 @@ static void _init(struct ce_api_a0 *api) {
     builddb_init_db();
 }
 
-static void _shutdown() {
-    for (int i = 0; i < TASK_MAX_WORKERS; ++i) {
-        sqlite3_close_v2(_G.db[i]);
-    }
-
-    _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(builddb)(struct ce_api_a0 *api,
-                             int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ce_id_a0);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(builddb)(struct ce_api_a0 *api,
                                int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    for (int i = 0; i < TASK_MAX_WORKERS; ++i) {
+        sqlite3_close_v2(_G.db[i]);
+    }
+
+    _G = (struct _G) {};
 }

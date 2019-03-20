@@ -247,8 +247,15 @@ static void _init_cvar(struct ce_config_a0 *config) {
     ce_cdb_a0->write_commit(writer);
 }
 
+void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
+                                    int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_cdb_a0);
 
-static void _init(struct ce_api_a0 *api) {
     _init_api(api);
     _init_cvar(ce_config_a0);
 
@@ -268,29 +275,11 @@ static void _init(struct ce_api_a0 *api) {
     ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
 }
 
-static void _shutdown() {
-    ce_hash_free(&_G.type_map, _G.allocator);
-}
-
-
-void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
-                                    int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_memory_a0);
-//            CE_INIT_API(api, ce_fs_a0);
-    CE_INIT_API(api, ce_config_a0);
-    CE_INIT_API(api, ce_log_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(resourcesystem)(struct ce_api_a0 *api,
                                       int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
-
+    ce_hash_free(&_G.type_map, _G.allocator);
 }

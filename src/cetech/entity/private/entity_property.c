@@ -252,17 +252,6 @@ static struct ct_property_editor_i0 property_editor_api = {
         .draw_menu = draw_menu,
 };
 
-static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system
-    };
-
-    api->register_api(PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
 
 void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
                                      int reload) {
@@ -274,7 +263,13 @@ void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system
+    };
+
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+
 }
 
 void CE_MODULE_UNLOAD(entity_property)(struct ce_api_a0 *api,
@@ -282,5 +277,5 @@ void CE_MODULE_UNLOAD(entity_property)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+    _G = (struct _G) {};
 }

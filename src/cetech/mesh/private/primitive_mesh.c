@@ -136,9 +136,6 @@ void foreach_primitive_mesh(ct_world_t0 world,
     }
 }
 
-static void _init_api(struct ce_api_a0 *api) {
-}
-
 static uint64_t cdb_type() {
     return PRIMITIVE_MESH_COMPONENT;
 }
@@ -252,7 +249,35 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    init(api);
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
+
+    api->register_api(CT_COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api,
+                      sizeof(property_editor_api));
+
+    ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,
+                                      ct_gfx_a0->bgfx_get_renderer_type());
+
+    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
+                                    BGFX_ATTRIB_POSITION, 3,
+                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+
+    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
+                                    BGFX_ATTRIB_TEXCOORD0, 2,
+                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+
+    ct_gfx_a0->bgfx_vertex_decl_end(&pt_vertex_decl);
+
+    cube_vbh = ct_gfx_a0->bgfx_create_vertex_buffer(
+            ct_gfx_a0->bgfx_make_ref(_cube_vertices, sizeof(_cube_vertices)),
+            &pt_vertex_decl, BGFX_BUFFER_NONE);
+
+    cube_ibh = ct_gfx_a0->bgfx_create_index_buffer(
+            ct_gfx_a0->bgfx_make_ref(cube_indices, sizeof(cube_indices)),
+            BGFX_BUFFER_NONE);
 
     ce_cdb_a0->reg_obj_type(PRIMITIVE_MESH_COMPONENT,
                             primitive_mesh_prop, CE_ARRAY_LEN(primitive_mesh_prop));
@@ -263,6 +288,4 @@ void CE_MODULE_UNLOAD(primitive_mesh)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    shutdown();
 }

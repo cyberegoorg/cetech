@@ -172,7 +172,13 @@ static struct ct_action_manager_a0 action_manager_api = {
 
 struct ct_action_manager_a0 *ct_action_manager_a0 = &action_manager_api;
 
-static void _init(struct ce_api_a0 *api) {
+
+void CE_MODULE_LOAD(action_manager)(struct ce_api_a0 *api,
+                                    int reload) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_UNUSED(reload);
+
     _G = (struct _G) {
             .allocator = ce_memory_a0->system
     };
@@ -180,7 +186,12 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(CT_ACTION_MANAGER_API, &action_manager_api, sizeof(action_manager_api));
 }
 
-static void _shutdown() {
+void CE_MODULE_UNLOAD(action_manager)(struct ce_api_a0 *api,
+                                      int reload) {
+
+    CE_UNUSED(reload);
+    CE_UNUSED(api);
+
     ce_hash_free(&_G.action_map, _G.allocator);
 
     ce_array_free(_G.shorcut, _G.allocator);
@@ -188,21 +199,4 @@ static void _shutdown() {
     ce_array_free(_G.action_active, _G.allocator);
 
     _G = (struct _G) {};
-}
-
-
-void CE_MODULE_LOAD(action_manager)(struct ce_api_a0 *api,
-                                    int reload) {
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_UNUSED(reload);
-    _init(api);
-}
-
-void CE_MODULE_UNLOAD(action_manager)(struct ce_api_a0 *api,
-                                      int reload) {
-
-    CE_UNUSED(reload);
-    CE_UNUSED(api);
-    _shutdown();
 }

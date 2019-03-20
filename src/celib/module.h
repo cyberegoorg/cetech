@@ -17,7 +17,7 @@ struct ce_api_a0;
 #define CE_ADD_STATIC_MODULE(name)                                     \
     extern void name ## _load_module(struct ce_api_a0*, int reload);               \
     extern void name ## _unload_module(struct ce_api_a0*, int reload);             \
-    ce_module_a0->add_static(name ## _load_module, name ## _unload_module)
+    ce_module_a0->add_static(#name, name ## _load_module, name ## _unload_module)
 
 //! Load static module
 //! \param name Module name
@@ -43,7 +43,8 @@ typedef void (ce_unload_module_t0)(struct ce_api_a0 *api,
 struct ce_module_a0 {
     //! Add static modules
     //! \param fce get api module fce
-    void (*add_static)(ce_load_module_t0 *load,
+    void (*add_static)(const char *name,
+                       ce_load_module_t0 *load,
                        ce_unload_module_t0 *unload);
 
     //! Load module from path

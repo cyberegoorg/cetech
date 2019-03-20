@@ -169,18 +169,6 @@ static uint64_t *update_before(uint64_t *n) {
 };
 
 
-static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {
-            .load_layout = true,
-    };
-
-//    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
-    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
 
 void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
                                 int reload) {
@@ -197,7 +185,13 @@ void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_module_a0);
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .load_layout = true,
+    };
+
+//    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
+    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
 }
 
 void CE_MODULE_UNLOAD(playground)(struct ce_api_a0 *api,
@@ -205,5 +199,7 @@ void CE_MODULE_UNLOAD(playground)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+
+    _G = (struct _G) {};
 }

@@ -608,20 +608,6 @@ static struct ct_resource_browser_a0 resource_browser_api = {
 struct ct_resource_browser_a0 *ct_resource_browser_a0 = &resource_browser_api;
 
 
-static void _init(struct ce_api_a0 *api) {
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
-
-    _G = (struct _G) {
-            .allocator = ce_memory_a0->system,
-    };
-
-    set_current_dir("");
-    ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
-
-    _G.visible = true;
-}
-
-
 static void _shutdown() {
     _G = (struct _G) {};
 }
@@ -639,7 +625,17 @@ void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_resource_a0);
 
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+
+    _G = (struct _G) {
+            .allocator = ce_memory_a0->system,
+    };
+
+    set_current_dir("");
+    ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
+
+    _G.visible = true;
 }
 
 void CE_MODULE_UNLOAD(asset_browser)(struct ce_api_a0 *api,

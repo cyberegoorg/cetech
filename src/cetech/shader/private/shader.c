@@ -299,16 +299,6 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 // Interface
 //==============================================================================
-int shader_init(struct ce_api_a0 *api) {
-    _G = (struct _G) {.allocator = ce_memory_a0->system};
-
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-
-    return 1;
-}
-
-void shader_shutdown() {
-}
 
 bgfx_program_handle_t shader_get(uint64_t shader) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), shader);
@@ -323,10 +313,6 @@ static struct ct_shader_a0 shader_api = {
 
 struct ct_shader_a0 *ct_shader_a0 = &shader_api;
 
-static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
-}
-
 
 void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
                             int reload) {
@@ -337,8 +323,12 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    _init_api(api);
-    shader_init(api);
+
+    _G = (struct _G) {.allocator = ce_memory_a0->system};
+
+    api->register_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+
 }
 
 void CE_MODULE_UNLOAD(shader)(struct ce_api_a0 *api,
@@ -346,6 +336,4 @@ void CE_MODULE_UNLOAD(shader)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    shader_shutdown();
 }

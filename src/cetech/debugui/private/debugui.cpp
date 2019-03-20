@@ -381,7 +381,20 @@ static void _set_clipboard_text(void *data,
     ce_os_input_a0->set_clipboard_text(text);
 }
 
-static void _init(struct ce_api_a0 *api) {
+extern "C" {
+
+void CE_MODULE_LOAD(debugui)(struct ce_api_a0 *api,
+                             int reload) {
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_renderer_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_cdb_a0);
+    CE_UNUSED(reload);
+
     api->register_api(CT_DEBUGUI_API, &debugui_api, sizeof(debugui_api));
     api->register_api(KERNEL_TASK_INTERFACE, &debugui_task, sizeof(debugui_task));
 
@@ -506,34 +519,14 @@ static void _init(struct ce_api_a0 *api) {
     colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 1.02f, 0.00f, 0.40f);
 }
 
-static void _shutdown() {
-    imguiDestroy();
-
-    _G = {};
-}
-
-extern "C" {
-
-void CE_MODULE_LOAD(debugui)(struct ce_api_a0 *api,
-                             int reload) {
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_renderer_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_fs_a0);
-    CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_log_a0);
-    CE_INIT_API(api, ce_cdb_a0);
-    CE_UNUSED(reload);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(debugui)(struct ce_api_a0 *api,
                                int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+    imguiDestroy();
+
+    _G = {};
 }
 
 }

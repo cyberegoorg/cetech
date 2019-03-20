@@ -713,13 +713,6 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
 
 struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;
 
-static void _init(struct ce_api_a0 *api) {
-    api->register_api(CT_RESOURCE_UI_API, ct_editor_ui_a0, sizeof(editor_ui_a0));
-}
-
-static void _shutdown() {
-}
-
 
 void CE_MODULE_LOAD(sourcedb_ui)(struct ce_api_a0 *api,
                                  int reload) {
@@ -727,7 +720,8 @@ void CE_MODULE_LOAD(sourcedb_ui)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    api->register_api(CT_RESOURCE_UI_API, ct_editor_ui_a0, sizeof(editor_ui_a0));
 }
 
 void CE_MODULE_UNLOAD(sourcedb_ui)(struct ce_api_a0 *api,
@@ -735,6 +729,5 @@ void CE_MODULE_UNLOAD(sourcedb_ui)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
 }
 

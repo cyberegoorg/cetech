@@ -469,7 +469,19 @@ static struct ct_resource_compiler_a0 resource_compiler_api = {
 
 struct ct_resource_compiler_a0 *ct_resource_compiler_a0 = &resource_compiler_api;
 
-static void _init(struct ce_api_a0 *api) {
+
+void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
+                                      int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_task_a0);
+    CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ce_id_a0);
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ce_fs_a0);
+    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_cdb_a0);
     CE_UNUSED(api);
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
@@ -506,27 +518,6 @@ static void _init(struct ce_api_a0 *api) {
 
     ce_fs_a0->map_root_dir(SOURCE_ROOT, core_dir, true);
     ce_fs_a0->map_root_dir(SOURCE_ROOT, source_dir, true);
-
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-
-void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
-                                      int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ce_task_a0);
-    CE_INIT_API(api, ce_log_a0);
-    CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_config_a0);
-    CE_INIT_API(api, ce_fs_a0);
-    CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
 }
 
 void CE_MODULE_UNLOAD(resourcecompiler)(struct ce_api_a0 *api,
@@ -534,7 +525,5 @@ void CE_MODULE_UNLOAD(resourcecompiler)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    _shutdown();
 
 }

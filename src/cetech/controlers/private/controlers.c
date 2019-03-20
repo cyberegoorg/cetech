@@ -62,27 +62,6 @@ static struct ct_controlers_a0 ct_controlers_api = {
 
 struct ct_controlers_a0 *ct_controlers_a0 = &ct_controlers_api;
 
-
-static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_CONTROLERS_API,
-                      ct_controlers_a0, sizeof(ct_controlers_api));
-}
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
-    _G = (struct _G) {};
-
-    ce_api_a0->register_on_add(CONTROLERS_I, _componet_api_add);
-
-}
-
-static void _shutdown() {
-    ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct _G) {};
-}
-
-
 void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
                                 int reload) {
     CE_UNUSED(reload);
@@ -90,7 +69,12 @@ void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
-    _init(api);
+    _G = (struct _G) {};
+
+    api->register_api(CT_CONTROLERS_API,
+                      ct_controlers_a0, sizeof(ct_controlers_api));
+
+    ce_api_a0->register_on_add(CONTROLERS_I, _componet_api_add);
 }
 
 void CE_MODULE_UNLOAD(controlers)(struct ce_api_a0 *api,
@@ -99,6 +83,5 @@ void CE_MODULE_UNLOAD(controlers)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
-
+    _G = (struct _G) {};
 }

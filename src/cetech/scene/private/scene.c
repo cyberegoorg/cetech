@@ -200,27 +200,6 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 // Interface
 //==============================================================================
-int sceneinit(struct ce_api_a0 *api) {
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
-    CE_INIT_API(api, ce_id_a0);
-
-    _G = (struct _G) {
-            .allocator=ce_memory_a0->system,
-
-    };
-
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-
-    scenecompiler_init(api);
-
-    return 1;
-}
-
-static void shutdown() {
-
-}
-
 static uint64_t resource_data(uint64_t name) {
     ct_resource_id_t0 rid = (ct_resource_id_t0) {
             .uid = name,
@@ -431,7 +410,18 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(SCENE_IMPORT_TYPE,
                             scene_import_prop, CE_ARRAY_LEN(scene_import_prop));
 
-    sceneinit(api);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ce_id_a0);
+
+    _G = (struct _G) {
+            .allocator=ce_memory_a0->system,
+
+    };
+
+    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+
+    scenecompiler_init(api);
 }
 
 void CE_MODULE_UNLOAD(scene)(struct ce_api_a0 *api,
@@ -439,6 +429,4 @@ void CE_MODULE_UNLOAD(scene)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    shutdown();
 }

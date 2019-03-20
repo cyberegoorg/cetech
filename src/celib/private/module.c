@@ -27,22 +27,23 @@
 
 #define MAX_MODULES 128
 #define MAX_PATH_LEN 256
+#define MAX_MODULE_NAME 128
 
 #define _G ModuleGlobals
-#define MODULE_PREFIX "module_"
-#define LOG_WHERE "module_system"
+#define LOG_WHERE "module"
 
 //==============================================================================
 // Globals
 //==============================================================================
-typedef struct module_functios {
+typedef struct module_t {
+    char name[MAX_MODULE_NAME];
     void *handler;
     ce_load_module_t0 *load;
     ce_unload_module_t0 *unload;
-} module_functios;
+} module_t;
 
 static struct _G {
-    module_functios modules[MAX_MODULES];
+    module_t modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     uint64_t config;
@@ -54,8 +55,8 @@ static struct _G {
 // Private
 //==============================================================================
 
-static void add_module(const char *path,
-                       struct module_functios *module) {
+static void _add_module(const char *path,
+                        struct module_t *module) {
 
     for (size_t i = 0; i < MAX_MODULES; ++i) {
         if (_G.used[i]) {
@@ -71,8 +72,8 @@ static void add_module(const char *path,
     }
 }
 
-static const char *get_module_name(const char *path,
-                                   uint32_t *len) {
+static const char *_get_module_name(const char *path,
+                                    uint32_t *len) {
     const char *filename = ce_os_path_a0->filename(path);
     const char *name = strchr(filename, '_');
     if (NULL == name) {
@@ -85,50 +86,49 @@ static const char *get_module_name(const char *path,
     return name;
 }
 
-static void get_module_fce_name(char **buffer,
-                                const char *name,
-                                uint32_t name_len,
-                                const char *fce_name) {
+static void _get_module_fce_name(char **buffer,
+                                 const char *name,
+                                 uint32_t name_len,
+                                 const char *fce_name) {
     ce_buffer_clear(*buffer);
     ce_buffer_printf(buffer, _G.allocator, "%s%s", name, fce_name);
 }
 
 
-static bool load_from_path(module_functios *module,
-                           const char *path) {
+static bool _load_from_path(module_t *module,
+                            const char *path) {
     uint32_t name_len;
-    const char *name = get_module_name(path, &name_len);
+    const char *name = _get_module_name(path, &name_len);
 
     char *buffer = NULL;
 
-    get_module_fce_name(&buffer, name, name_len, "_load_module");
+    _get_module_fce_name(&buffer, name, name_len, "_load_module");
 
     void *obj = ce_os_object_a0->load(path);
     if (obj == NULL) {
         return false;
     }
 
-    ce_load_module_t0 *load_fce = (ce_load_module_t0 *) ce_os_object_a0->load_function(
-            obj,
-            (buffer));
+    ce_load_module_t0 *load_fce = ce_os_object_a0->load_function(obj, (buffer));
     if (load_fce == NULL) {
         return false;
     }
 
-    get_module_fce_name(&buffer, name, name_len, "_unload_module");
+    _get_module_fce_name(&buffer, name, name_len, "_unload_module");
 
-    ce_unload_module_t0 *unload_fce = (ce_unload_module_t0 *) ce_os_object_a0->load_function(
-            obj,
-            buffer);
+    ce_unload_module_t0 *unload_fce = ce_os_object_a0->load_function(obj, buffer);
     if (unload_fce == NULL) {
         return false;
     }
 
-    *module = (module_functios) {
+    *module = (module_t) {
             .handler = obj,
             .load = load_fce,
             .unload = unload_fce,
     };
+
+    strncpy(module->name, name, MAX_MODULE_NAME);
+
     return true;
 }
 
@@ -137,16 +137,20 @@ static bool load_from_path(module_functios *module,
 //==============================================================================
 
 
-static void add_static(ce_load_module_t0 load,
+static void add_static(const char *name,
+                       ce_load_module_t0 load,
                        ce_unload_module_t0 unload) {
-
-    module_functios module = {
-            .load=load,
-            .unload=unload,
-            .handler=NULL
+    module_t module = {
+            .load = load,
+            .unload = unload,
+            .handler = NULL
     };
 
-    add_module("__STATIC__", &module);
+    strncpy(module.name, name, MAX_MODULE_NAME);
+
+    ce_log_a0->info(LOG_WHERE, "Load module \"%s\"", name);
+
+    _add_module("__STATIC__", &module);
     load(ce_api_a0, 0);
 }
 
@@ -154,28 +158,28 @@ static void add_static(ce_load_module_t0 load,
 static void load(const char *path) {
     ce_log_a0->info(LOG_WHERE, "Loading module %s", path);
 
-    module_functios module;
+    module_t module;
 
-    if (!load_from_path(&module, path)) {
+    if (!_load_from_path(&module, path)) {
         return;
     }
 
     module.load(ce_api_a0, 0);
 
-    add_module(path, &module);
+    _add_module(path, &module);
 }
 
 static void reload(const char *path) {
     for (size_t i = 0; i < MAX_MODULES; ++i) {
-        struct module_functios old_module = _G.modules[i];
+        struct module_t old_module = _G.modules[i];
 
         if ((old_module.handler == NULL) ||
             (strcmp(_G.path[i], path)) != 0) {
             continue;
         }
 
-        struct module_functios new_module;
-        if (!load_from_path(&new_module, path)) {
+        struct module_t new_module;
+        if (!_load_from_path(&new_module, path)) {
             continue;
         }
 
@@ -238,6 +242,8 @@ static void unload_all() {
             continue;
         }
 
+        ce_log_a0->info(LOG_WHERE, "Unload module \"%s\"", _G.modules[i].name);
+
         _G.modules[i].unload(ce_api_a0, 0);
     }
 }
@@ -295,7 +301,9 @@ static struct ce_module_a0 module_api = {
 
 struct ce_module_a0 *ce_module_a0 = &module_api;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
+                            int reload) {
+    CE_UNUSED(reload);
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
             .config = ce_config_a0->obj()
@@ -304,13 +312,6 @@ static void _init(struct ce_api_a0 *api) {
     ce_api_a0 = api;
     api->register_api(CE_MODULE0_API, &module_api, sizeof(module_api));
 
-}
-
-
-void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
-                            int reload) {
-    CE_UNUSED(reload);
-    _init(api);
 
 }
 

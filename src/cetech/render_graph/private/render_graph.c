@@ -48,29 +48,18 @@ static struct ct_rg_a0 render_graph_api = {
 
 struct ct_rg_a0 *ct_rg_a0 = &render_graph_api;
 
-
-static void _init(struct ce_api_a0 *api) {
-    CE_UNUSED(api);
-    _G = (struct _G) {
-            .alloc = ce_memory_a0->system,
-    };
-
-    api->register_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
-
-}
-
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-
 void CE_MODULE_LOAD(render_graph)(struct ce_api_a0 *api,
                                   int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .alloc = ce_memory_a0->system,
+    };
+
+    api->register_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
 }
 
 void CE_MODULE_UNLOAD(render_graph)(struct ce_api_a0 *api,
@@ -79,5 +68,5 @@ void CE_MODULE_UNLOAD(render_graph)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    _shutdown();
+    _G = (struct _G) {};
 }

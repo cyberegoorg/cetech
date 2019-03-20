@@ -3378,7 +3378,10 @@ static struct ce_cdb_a0 cdb_api = {
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(cdb)(struct ce_api_a0 *api,
+                         int reload) {
+    CE_UNUSED(reload);
+
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
@@ -3388,20 +3391,11 @@ static void _init(struct ce_api_a0 *api) {
     api->register_api(CE_CDB_API, &cdb_api, sizeof(cdb_api));
 }
 
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(cdb)(struct ce_api_a0 *api,
-                         int reload) {
-    CE_UNUSED(reload);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(cdb)(struct ce_api_a0 *api,
                            int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    _G = (struct _G) {};
 }

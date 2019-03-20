@@ -335,7 +335,12 @@ struct ct_dock_a0 dock_a0 = {
 
 struct ct_dock_a0 *ct_dock_a0 = &dock_a0;
 
-static void _init(struct ce_api_a0 *api) {
+void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
+                          int reload) {
+    CE_UNUSED(reload);
+    CE_INIT_API(api, ce_memory_a0);
+    CE_INIT_API(api, ce_module_a0);
+
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
@@ -345,22 +350,11 @@ static void _init(struct ce_api_a0 *api) {
     create_context("");
 }
 
-static void _shutdown() {
-    _G = (struct _G) {};
-}
-
-void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
-                          int reload) {
-    CE_UNUSED(reload);
-    CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ce_module_a0);
-    _init(api);
-}
-
 void CE_MODULE_UNLOAD(dock)(struct ce_api_a0 *api,
                             int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    _G = (struct _G) {};
 }

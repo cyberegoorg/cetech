@@ -220,30 +220,6 @@ static struct ct_kernel_task_i0 gamepad_task = {
         .update_after = update_after,
 };
 
-static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &gamepad_task, sizeof(gamepad_task));
-}
-
-static void _init(struct ce_api_a0 *api) {
-    _init_api(api);
-    _G = (struct _G) {
-            .ev_queue = ct_machine_a0->new_ev_listener(),
-    };
-
-    ce_log_a0->debug(LOG_WHERE, "Init");
-
-    for (int i = 0; i < GAMEPAD_MAX; ++i) {
-        _G.active[i] = ct_machine_a0->gamepad_is_active(i);
-    }
-}
-
-static void _shutdown() {
-    ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    _G = (struct _G) {};
-}
-
 void CE_MODULE_LOAD(gamepad)(struct ce_api_a0 *api,
                              int reload) {
     CE_UNUSED(reload);
@@ -251,7 +227,23 @@ void CE_MODULE_LOAD(gamepad)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    _init(api);
+
+    _G = (struct _G) {
+            .ev_queue = ct_machine_a0->new_ev_listener(),
+    };
+
+    api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
+    api->register_api(KERNEL_TASK_INTERFACE, &gamepad_task, sizeof(gamepad_task));
+
+    for (int i = 0; i < GAMEPAD_MAX; ++i) {
+        _G.active[i] = ct_machine_a0->gamepad_is_active(i);
+
+        for (int j = 0; j < GAMEPAD_AXIX_MAX; ++j) {
+            _G.gamepad[i].death_zone[j][0] = 0.1f;
+            _G.gamepad[i].death_zone[j][1] = 0.1f;
+        }
+
+    }
 }
 
 void CE_MODULE_UNLOAD(gamepad)(struct ce_api_a0 *api,
@@ -259,7 +251,5 @@ void CE_MODULE_UNLOAD(gamepad)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-
-    _shutdown();
-
+    _G = (struct _G) {};
 }

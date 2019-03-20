@@ -612,26 +612,12 @@ static struct ce_ydb_a0 ydb_api = {
 
 struct ce_ydb_a0 *ce_ydb_a0 = &ydb_api;
 
-static void _init(struct ce_api_a0 *api) {
-    _G = (struct _G) {.allocator = ce_memory_a0->system};
-
-    api->register_api(CE_YDB_API, &ydb_api, sizeof(ydb_api));
-}
-
-static void _shutdown() {
-//    for (int i = 0; i < ce_array_size(_G.document_cache); ++i) {
-////        ce_ydb_a0->destroy(_G.document_cache[i]);
-//    }
-
-    ce_hash_free(&_G.obj_cache_map, _G.allocator);
-
-    _G = (struct _G) {};
-}
-
 void CE_MODULE_LOAD(ydb)(struct ce_api_a0 *api,
                          int reload) {
     CE_UNUSED(reload);
-    _init(api);
+    _G = (struct _G) {.allocator = ce_memory_a0->system};
+
+    api->register_api(CE_YDB_API, &ydb_api, sizeof(ydb_api));
 }
 
 void CE_MODULE_UNLOAD(ydb)(struct ce_api_a0 *api,
@@ -639,5 +625,8 @@ void CE_MODULE_UNLOAD(ydb)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
-    _shutdown();
+
+    ce_hash_free(&_G.obj_cache_map, _G.allocator);
+
+    _G = (struct _G) {};
 }
