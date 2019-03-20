@@ -22,6 +22,10 @@
 #include <cetech/game/game_system.h>
 
 #include "rotation.inl"
+#include "components/c_player_input.inl"
+#include "components/c_player_speed.inl"
+#include "systems/s_player_input.inl"
+#include "systems/s_player_move.inl"
 
 
 void init() {
@@ -32,8 +36,8 @@ void shutdown() {
 }
 
 void update(float dt) {
-    struct ct_controlers_i0 *keyboard;
-    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+//    struct ct_controlers_i0 *keyboard;
+//    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 //
 //    if (keyboard->button_state(0, keyboard->button_index("c"))) {
 //        ce_log_a0->info("example", "PO");
@@ -76,11 +80,33 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     api->register_api(GAME_INTERFACE,
                       &game_i0, sizeof(game_i0));
 
-    api->register_api(COMPONENT_INTERFACE,
+    api->register_api(CT_COMPONENT_INTERFACE,
                       &rotation_component_i, sizeof(rotation_component_i));
+
+    api->register_api(CT_COMPONENT_INTERFACE,
+                      &player_input_component_i, sizeof(player_input_component_i));
+
+    api->register_api(CT_COMPONENT_INTERFACE,
+                      &player_speed_component_i, sizeof(player_speed_component_i));
 
     api->register_api(SIMULATION_INTERFACE,
                       &rotation_simulation_i0, sizeof(rotation_simulation_i0));
+
+    api->register_api(SIMULATION_INTERFACE,
+                      &player_input_simulation_i0, sizeof(player_input_simulation_i0));
+
+    api->register_api(SIMULATION_INTERFACE,
+                      &player_move_simulation_i0, sizeof(player_move_simulation_i0));
+
+    ce_cdb_a0->reg_obj_type(PLAYER_INPUT_COMPONENT,
+                            plyer_input_component_prop, CE_ARRAY_LEN(plyer_input_component_prop));
+
+    ce_cdb_a0->reg_obj_type(PLAYER_SPEED_COMPONENT,
+                            plyer_speed_component_prop, CE_ARRAY_LEN(plyer_speed_component_prop));
+
+    ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT,
+                            rotaton_component_prop, CE_ARRAY_LEN(rotaton_component_prop));
+
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,

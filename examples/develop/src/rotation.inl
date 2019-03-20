@@ -6,9 +6,9 @@
 
 // component
 
-struct rotation_component {
+typedef struct rotation_component {
     float speed;
-};
+}rotation_component;
 
 #define ROTATION_COMPONENT \
     CE_ID64_0("rotation_component", 0x775af3c84c1fa8efULL)
@@ -44,15 +44,27 @@ float _rnd_speed(uint32_t max) {
     return (((float) rand()) / RAND_MAX) * max;
 }
 
+static uint64_t rotation_size() {
+    return sizeof(struct rotation_component);
+}
+
+static void _rotation_on_spawn(uint64_t obj,
+                             void *data) {
+    rotation_component *c = data;
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(rotation_component));
+}
+
+
 static struct ct_component_i0 rotation_component_i = {
         .cdb_type = cdb_type,
         .get_interface = get_interface,
+        .size = rotation_size,
+        .on_spawn = _rotation_on_spawn,
+        .on_change = _rotation_on_spawn,
 };
 
 
 // system
-
-
 static void foreach_rotation(struct ct_world_t0 world,
                              struct ct_entity_t0 *ent,
                              ct_entity_storage_o0 *item,
@@ -60,26 +72,16 @@ static void foreach_rotation(struct ct_world_t0 world,
                              void *data) {
     float dt = *(float *) (data);
 
-    uint64_t *rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
-    uint64_t *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    rotation_component *rotations = ct_ecs_a0->get_all(ROTATION_COMPONENT, item);
+    ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
-        const ce_cdb_obj_o0 *transform = ce_cdb_a0->read(ce_cdb_a0->db(), transforms[i]);
-        const ce_cdb_obj_o0 *rotation = ce_cdb_a0->read(ce_cdb_a0->db(), rotations[i]);
+        ct_transform_comp *t = &transforms[i];
+        rotation_component *r = &rotations[i];
 
+        t->rot.z += r->speed * 0.1f * dt;
 
-        uint64_t rot_o = ce_cdb_a0->read_subobject(transform, PROP_ROTATION, 0);
-        ce_vec3_t rot = {};
-        ce_cdb_a0->read_to(ce_cdb_a0->db(), rot_o, &rot, sizeof(rot));
-
-
-        float speed = ce_cdb_a0->read_float(rotation, PROP_SPEED, 100.0f);
-        rot.y += speed * 0.1f * dt * _rnd_speed(100);
-
-
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), rot_o);
-        ce_cdb_a0->set_float(w, PROP_ROTATION_Y, rot.y);
-        ce_cdb_a0->write_commit(w);
+        ct_ecs_a0->component_changed(world, ent[i], TRANSFORM_COMPONENT);
     }
 }
 
@@ -107,3 +109,10 @@ static struct ct_simulation_i0 rotation_simulation_i0 = {
         .before = rotation_before,
 };
 
+static const ce_cdb_prop_def_t0 rotaton_component_prop[] = {
+        {
+                .name = "speed",
+                .type = CDB_TYPE_FLOAT,
+                .value.f = 10.0f,
+        },
+};
