@@ -68,10 +68,10 @@ static const ce_vec3_t CE_VEC3_UNIT_Z = (ce_vec3_t) {0.0f, 0.0f, 1.0f};
 static const ce_vec4_t CE_VEC4_ZERO = (ce_vec4_t) {0.0f, 0.0f, 0.0f, 0.0f};
 static const ce_vec4_t CE_VEC4_ONE = (ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f};
 
-#define  CE_MAT4_IDENTITY (ce_mat4_t){1.0f, 0.0f, 0.0f, 0.0f,\
-                                      0.0f, 1.0f, 0.0f, 0.0f,\
-                                      0.0f, 0.0f, 1.0f, 0.0f,\
-                                      0.0f, 0.0f, 0.0f, 1.0f}
+#define  CE_MAT4_IDENTITY (ce_mat4_t){{1.0f, 0.0f, 0.0f, 0.0f,\
+                                       0.0f, 1.0f, 0.0f, 0.0f,\
+                                       0.0f, 0.0f, 1.0f, 0.0f,\
+                                       0.0f, 0.0f, 0.0f, 1.0f}}
 
 static const ce_transform_t CE_TRANFORM_INIT = {
         .pos = {0.0f, 0.0f, 0.0f},
