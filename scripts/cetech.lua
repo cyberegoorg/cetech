@@ -15,13 +15,10 @@ project "cetech_develop"
 	}
 
 	links {
-		path.join(EXTERNALS_DIR, "lib", "libIrrXML.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbgfxRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbimgRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbxRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libsqlite3.a"),
-		path.join(EXTERNALS_DIR, "lib", "libminizip.a"),
-		path.join(EXTERNALS_DIR, "lib", "libassimp.a"),
 	}
 
 	copy_to_bin()
