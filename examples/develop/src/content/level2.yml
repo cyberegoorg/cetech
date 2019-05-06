@@ -1,5 +1,7 @@
 cdb_uid: 0x588f56dc4e82f7b2
 cdb_type: entity
+asset_name: content/level2
+name: Level 2
 components:
   cdb_type: cdb_objset
   0x38a1e9c2481e8f31:
@@ -79,5 +81,5 @@ children:
             cdb_uid: 0x168c410f48a00175
             cdb_type: static_mesh
             cdb_instance: 0x1680ea0700e00121
-asset_name: content/level2
-name: Level 2
+        children:
+          cdb_type: cdb_objset

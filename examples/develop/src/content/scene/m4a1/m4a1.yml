@@ -1,9 +1,0 @@
-cdb_uid: 0xd3276608fb728ffb
-asset_name: "content/scene/m4a1/m4a1"
-cdb_type: "scene"
-import:
-  cdb_uid: "0x461cf24d0eb14029"
-  cdb_type: scene_import
-  input: content/scene/m4a1/M4A1.fbx
-  #    input: content/scene/duck/duck.dae
-  flip_uvs: true

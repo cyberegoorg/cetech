@@ -1,0 +1,7 @@
+cdb_uid: 0xcd111fa2efb3a30b
+cdb_type: scene
+asset_name: content/scene/duck
+import:
+  cdb_uid: 0x6b48995c6efe1f60
+  cdb_type: scene_import
+  input: content/scene/Duck.gltf

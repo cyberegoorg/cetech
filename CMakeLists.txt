@@ -200,9 +200,6 @@ set(RELEASE_LIBS
 
         SDL2.a
 
-        assimp.a
-        IrrXML.a
-        minizip.a
         yaml_static.a
         #aes.a
 
@@ -215,7 +212,6 @@ set(RELEASE_LIBS2
 
         nanomsg
         bgfx-shared-libRelease
-        assimp
         SDL2
         #luajit
         )

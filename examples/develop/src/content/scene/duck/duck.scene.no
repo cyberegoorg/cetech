@@ -1,5 +1,0 @@
-import:
-    input: content/scene/duck/duck.dae
-
-    postprocess:
-      flip_uvs: true
