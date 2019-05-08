@@ -1,7 +1,8 @@
 #define CGLTF_IMPLEMENTATION
+
 #include "include/cgltf/cgltf.h"
 
-static bgfx_attrib_t _gltf_attr_to_bgfx(cgltf_attribute_type attr) {
+static inline bgfx_attrib_t _to_bgxfx_attr(cgltf_attribute_type attr) {
     switch (attr) {
         case cgltf_attribute_type_invalid:
             break;
@@ -31,7 +32,7 @@ static bgfx_attrib_t _gltf_attr_to_bgfx(cgltf_attribute_type attr) {
     return BGFX_ATTRIB_COUNT;
 }
 
-static bgfx_attrib_type_t _gltf_acc_comp_type_to_bgfx(cgltf_component_type type) {
+static inline bgfx_attrib_type_t _to_bgfx_attr_type(cgltf_component_type type) {
     switch (type) {
         case cgltf_component_type_invalid:
             break;
@@ -41,11 +42,9 @@ static bgfx_attrib_type_t _gltf_acc_comp_type_to_bgfx(cgltf_component_type type)
 
         case cgltf_component_type_r_8u:
             return BGFX_ATTRIB_TYPE_UINT8;
-            break;
 
         case cgltf_component_type_r_16:
             return BGFX_ATTRIB_TYPE_INT16;
-            break;
 
         case cgltf_component_type_r_16u:
             break;
@@ -55,27 +54,24 @@ static bgfx_attrib_type_t _gltf_acc_comp_type_to_bgfx(cgltf_component_type type)
 
         case cgltf_component_type_r_32f:
             return BGFX_ATTRIB_TYPE_FLOAT;
-            break;
+
     }
 
     return BGFX_ATTRIB_TYPE_COUNT;
 }
 
-static int _comp_size(bgfx_attrib_type_t type) {
+static inline int _comp_size(bgfx_attrib_type_t type) {
     switch (type) {
         case BGFX_ATTRIB_TYPE_UINT8:
             return sizeof(uint8_t);
-            break;
         case BGFX_ATTRIB_TYPE_UINT10:
             break;
         case BGFX_ATTRIB_TYPE_INT16:
             return sizeof(uint16_t);
-            break;
         case BGFX_ATTRIB_TYPE_HALF:
             break;
         case BGFX_ATTRIB_TYPE_FLOAT:
             return sizeof(float);
-            break;
         case BGFX_ATTRIB_TYPE_COUNT:
             break;
     }
@@ -87,7 +83,7 @@ static int _gltf_comp_num(cgltf_type type) {
     switch (type) {
         default:
         case cgltf_type_invalid:
-            return  0;
+            return 0;
 
         case cgltf_type_scalar:
             return 1;
@@ -112,9 +108,9 @@ static int _gltf_comp_num(cgltf_type type) {
     }
 }
 
-static int _compile_gtlf(ce_cdb_t0 db,
-                         uint64_t k,
-                         struct compile_output *output) {
+static bool _compile_gtlf(ce_cdb_t0 db,
+                          uint64_t k,
+                          scene_compile_output_t *output) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, k);
     uint64_t import_obj = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
 
@@ -131,12 +127,12 @@ static int _compile_gtlf(ce_cdb_t0 db,
     cgltf_data *data = NULL;
     cgltf_result result = cgltf_parse_file(&options, input_path, &data);
     if (result != cgltf_result_success) {
-        return 0;
+        return false;
     }
 
     result = cgltf_load_buffers(&options, data, input_path);
     if (result != cgltf_result_success) {
-        return 0;
+        return false;
     }
 
     for (int m = 0; m < data->meshes_count; ++m) {
@@ -178,21 +174,21 @@ static int _compile_gtlf(ce_cdb_t0 db,
         cgltf_primitive *prim = &mesh->primitives[0];
         for (int l = 0; l < prim->attributes_count; ++l) {
             cgltf_attribute *attr = &prim->attributes[l];
+            cgltf_accessor *acess = attr->data;
 
-            vertex_n = attr->data->count;
+            vertex_n = acess->count;
 
-            bgfx_attrib_t bgfx_attr = _gltf_attr_to_bgfx(attr->type);
-            bgfx_attrib_type_t bgfx_attr_t = \
-                _gltf_acc_comp_type_to_bgfx(attr->data->component_type);
+            bgfx_attrib_t bgfx_attr = _to_bgxfx_attr(attr->type);
+            bgfx_attrib_type_t bgfx_attr_type = _to_bgfx_attr_type(acess->component_type);
 
-            int num = _gltf_comp_num(attr->data->type);
+            int num = _gltf_comp_num(acess->type);
             bool normalized = bgfx_attr == BGFX_ATTRIB_NORMAL;
 
             ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
                                             bgfx_attr, num,
-                                            bgfx_attr_t, normalized, 0);
+                                            bgfx_attr_type, normalized, 0);
 
-            v_size += _comp_size(bgfx_attr_t) * num;
+            v_size += _comp_size(bgfx_attr_type) * num;
         }
 
         ct_gfx_a0->bgfx_vertex_decl_end(&vertex_decl);
@@ -224,5 +220,5 @@ static int _compile_gtlf(ce_cdb_t0 db,
     }
 
     cgltf_free(data);
-    return 1;
+    return true;
 }

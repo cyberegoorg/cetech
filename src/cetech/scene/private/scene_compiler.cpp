@@ -35,7 +35,7 @@ struct _G {
 
 typedef char char_128[128];
 
-struct compile_output {
+typedef struct scene_compile_output_t {
     uint64_t *geom_name;
     uint32_t *ib_offset;
     uint32_t *vb_offset;
@@ -50,18 +50,18 @@ struct compile_output {
     uint64_t *geom_node;
     char_128 *geom_str; // TODO : SHIT
     char_128 *node_str; // TODO : SHIT
-};
+} scene_compile_output_t;
 
-struct compile_output *_crete_compile_output() {
-    compile_output *output =
-            CE_ALLOC(_G.allocator, struct compile_output,
-                     sizeof(compile_output));
+struct scene_compile_output_t *_crete_compile_output() {
+    scene_compile_output_t *output = CE_ALLOC(_G.allocator,
+                                              scene_compile_output_t,
+                                              sizeof(scene_compile_output_t));
     *output = {};
 
     return output;
 }
 
-static void _destroy_compile_output(compile_output *output) {
+static void _destroy_compile_output(scene_compile_output_t *output) {
     ce_array_free(output->geom_name, _G.allocator);
     ce_array_free(output->ib_offset, _G.allocator);
     ce_array_free(output->vb_offset, _G.allocator);
@@ -84,9 +84,9 @@ static void _destroy_compile_output(compile_output *output) {
 
 extern "C" bool scene_compiler(ce_cdb_t0 db,
                                uint64_t obj) {
-    compile_output *output = _crete_compile_output();
+    scene_compile_output_t *output = _crete_compile_output();
 
-    int ret = 1;
+    bool compilation_success = false;
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
@@ -97,66 +97,65 @@ extern "C" bool scene_compiler(ce_cdb_t0 db,
         ce_cdb_a0->read_to(db, import_obj, &io, sizeof(io));
 
         if (strstr(io.input, ".gltf") != NULL) {
-            ret = _compile_gtlf(db, obj, output);
+            compilation_success = _compile_gtlf(db, obj, output);
         }
     }
 
-    if (!ret) {
-        _destroy_compile_output(output);
-        return false;
+    if (compilation_success) {
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
+        ce_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT, ce_array_size(output->geom_name));
+        ce_cdb_a0->set_uint64(w, SCENE_NODE_COUNT, ce_array_size(output->node_name));
+        ce_cdb_a0->set_uint64(w, SCENE_IB_LEN, ce_array_size(output->ib));
+        ce_cdb_a0->set_uint64(w, SCENE_VB_LEN, ce_array_size(output->vb));
+
+        ce_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
+                            sizeof(*output->geom_name) * ce_array_size(output->geom_name));
+
+        ce_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
+                            sizeof(*output->ib_offset) * ce_array_size(output->ib_offset));
+
+        ce_cdb_a0->set_blob(w, SCENE_VB_OFFSET, output->vb_offset,
+                            sizeof(*output->vb_offset) * ce_array_size(output->vb_offset));
+
+        ce_cdb_a0->set_blob(w, SCENE_VB_DECL, output->vb_decl,
+                            sizeof(*output->vb_decl) * ce_array_size(output->vb_decl));
+
+        ce_cdb_a0->set_blob(w, SCENE_IB_SIZE, output->ib_size,
+                            sizeof(*output->ib_size) * ce_array_size(output->ib_size));
+
+        ce_cdb_a0->set_blob(w, SCENE_VB_SIZE, output->vb_size,
+                            sizeof(*output->vb_size) * ce_array_size(output->vb_size));
+
+        ce_cdb_a0->set_blob(w, SCENE_IB_PROP, output->ib,
+                            sizeof(*output->ib) * ce_array_size(output->ib));
+
+        ce_cdb_a0->set_blob(w, SCENE_VB_PROP, output->vb,
+                            sizeof(*output->vb) * ce_array_size(output->vb));
+
+        ce_cdb_a0->set_blob(w, SCENE_NODE_NAME, output->node_name,
+                            sizeof(*output->node_name) * ce_array_size(output->node_name));
+
+        ce_cdb_a0->set_blob(w, SCENE_NODE_PARENT, output->node_parent,
+                            sizeof(*output->node_parent) * ce_array_size(output->node_parent));
+
+        ce_cdb_a0->set_blob(w, SCENE_NODE_POSE, output->node_pose,
+                            sizeof(*output->node_pose) * ce_array_size(output->node_pose));
+
+        ce_cdb_a0->set_blob(w, SCENE_NODE_GEOM, output->geom_node,
+                            sizeof(*output->geom_node) * ce_array_size(output->geom_node));
+
+        ce_cdb_a0->set_blob(w, SCENE_GEOM_STR, output->geom_str,
+                            sizeof(*output->geom_str) * ce_array_size(output->geom_str));
+
+        ce_cdb_a0->set_blob(w, SCENE_NODE_STR, output->node_str,
+                            sizeof(*output->node_str) * ce_array_size(output->node_str));
+
+        ce_cdb_a0->write_commit(w);
+
     }
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
-    ce_cdb_a0->set_uint64(w, SCENE_GEOM_COUNT, ce_array_size(output->geom_name));
-    ce_cdb_a0->set_uint64(w, SCENE_NODE_COUNT, ce_array_size(output->node_name));
-    ce_cdb_a0->set_uint64(w, SCENE_IB_LEN, ce_array_size(output->ib));
-    ce_cdb_a0->set_uint64(w, SCENE_VB_LEN, ce_array_size(output->vb));
-
-    ce_cdb_a0->set_blob(w, SCENE_GEOM_NAME, output->geom_name,
-                        sizeof(*output->geom_name) * ce_array_size(output->geom_name));
-
-    ce_cdb_a0->set_blob(w, SCENE_IB_OFFSET, output->ib_offset,
-                        sizeof(*output->ib_offset) * ce_array_size(output->ib_offset));
-
-    ce_cdb_a0->set_blob(w, SCENE_VB_OFFSET, output->vb_offset,
-                        sizeof(*output->vb_offset) * ce_array_size(output->vb_offset));
-
-    ce_cdb_a0->set_blob(w, SCENE_VB_DECL, output->vb_decl,
-                        sizeof(*output->vb_decl) * ce_array_size(output->vb_decl));
-
-    ce_cdb_a0->set_blob(w, SCENE_IB_SIZE, output->ib_size,
-                        sizeof(*output->ib_size) * ce_array_size(output->ib_size));
-
-    ce_cdb_a0->set_blob(w, SCENE_VB_SIZE, output->vb_size,
-                        sizeof(*output->vb_size) * ce_array_size(output->vb_size));
-
-    ce_cdb_a0->set_blob(w, SCENE_IB_PROP, output->ib,
-                        sizeof(*output->ib) * ce_array_size(output->ib));
-
-    ce_cdb_a0->set_blob(w, SCENE_VB_PROP, output->vb,
-                        sizeof(*output->vb) * ce_array_size(output->vb));
-
-    ce_cdb_a0->set_blob(w, SCENE_NODE_NAME, output->node_name,
-                        sizeof(*output->node_name) * ce_array_size(output->node_name));
-
-    ce_cdb_a0->set_blob(w, SCENE_NODE_PARENT, output->node_parent,
-                        sizeof(*output->node_parent) * ce_array_size(output->node_parent));
-
-    ce_cdb_a0->set_blob(w, SCENE_NODE_POSE, output->node_pose,
-                        sizeof(*output->node_pose) * ce_array_size(output->node_pose));
-
-    ce_cdb_a0->set_blob(w, SCENE_NODE_GEOM, output->geom_node,
-                        sizeof(*output->geom_node) * ce_array_size(output->geom_node));
-
-    ce_cdb_a0->set_blob(w, SCENE_GEOM_STR, output->geom_str,
-                        sizeof(*output->geom_str) * ce_array_size(output->geom_str));
-
-    ce_cdb_a0->set_blob(w, SCENE_NODE_STR, output->node_str,
-                        sizeof(*output->node_str) * ce_array_size(output->node_str));
-
-    ce_cdb_a0->write_commit(w);
-
     _destroy_compile_output(output);
+    return compilation_success;
 
     return true;
 }
