@@ -40,6 +40,7 @@
 #include <celib/os/vio.h>
 #include <celib/containers/hash.h>
 
+
 //==============================================================================
 // GLobals
 //==============================================================================
@@ -228,7 +229,7 @@ static uint64_t cdb_type() {
 
 static void draw_property(uint64_t obj,
                           uint64_t context) {
-    ct_editor_ui_a0->prop_str(obj, "Input", TEXTURE_INPUT, 0);
+    ct_editor_ui_a0->prop_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
     ct_editor_ui_a0->prop_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
     ct_editor_ui_a0->prop_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);
 }
@@ -344,20 +345,20 @@ static void _update(float dt) {
     ce_hash_t obj_set = {};
 
     while (ce_cdb_a0->pop_objs_events(_G.changed_obj_queue, &ev)) {
-        if(!ce_hash_contain(&_G.online_texture, ev.obj)) {
+        if (!ce_hash_contain(&_G.online_texture, ev.obj)) {
             continue;
         }
 
-        if(ev.prop == TEXTURE_DATA) {
+        if (ev.prop == TEXTURE_DATA) {
             continue;
         }
 
-        if(ev.prop == TEXTURE_HANDLER_PROP) {
+        if (ev.prop == TEXTURE_HANDLER_PROP) {
             continue;
         }
 
 
-        if(!ce_hash_contain(&obj_set, ev.obj)) {
+        if (!ce_hash_contain(&obj_set, ev.obj)) {
             ce_log_a0->debug("texture", "PROP = %s", ce_id_a0->str_from_id64(ev.prop));
             ce_array_push(to_compile_obj, ev.obj, _G.allocator);
             ce_hash_add(&obj_set, ev.obj, ev.obj, _G.allocator);
@@ -366,7 +367,7 @@ static void _update(float dt) {
 
     uint32_t n = ce_array_size(to_compile_obj);
     for (int i = 0; i < n; ++i) {
-        uint64_t  obj = to_compile_obj[i];
+        uint64_t obj = to_compile_obj[i];
         texture_offline(obj);
         _compile(ce_cdb_a0->db(), obj);
         texture_online(obj);
@@ -409,10 +410,12 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_renderer_a0);
 
     api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
+                      &property_editor_api, sizeof(property_editor_api));
+
     api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
     api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-
 
     ce_cdb_a0->reg_obj_type(TEXTURE_TYPE, texture_prop, CE_ARRAY_LEN(texture_prop));
 }

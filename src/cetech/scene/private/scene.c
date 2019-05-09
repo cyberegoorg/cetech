@@ -25,6 +25,8 @@
 #include <cetech/mesh/primitive_mesh.h>
 #include <cetech/mesh/static_mesh.h>
 #include <celib/macros.h>
+#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -396,6 +398,23 @@ static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
         },
 };
 
+static void draw_property(uint64_t obj,
+                          uint64_t context) {
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t import = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
+
+    if (!import) {
+        return;
+    }
+
+    ct_editor_ui_a0->prop_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
+}
+
+static struct ct_property_editor_i0 property_editor_api = {
+        .cdb_type = cdb_type,
+        .draw_ui = draw_property,
+};
+
 void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                            int reload) {
     CE_UNUSED(reload);
@@ -424,6 +443,9 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     };
 
     ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+
+    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
+                      &property_editor_api, sizeof(property_editor_api));
 
     scenecompiler_init(api);
 }

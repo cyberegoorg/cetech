@@ -1,6 +1,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
@@ -11,28 +12,26 @@
 #include <celib/ydb.h>
 #include <celib/containers/array.h>
 #include <celib/module.h>
-
-
 #include <celib/containers/hash.h>
 #include <celib/cdb.h>
-
 #include <celib/math/math.h>
+
 #include <cetech/resource/resource_browser.h>
 #include <cetech/resource/resourcedb.h>
-
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <stdlib.h>
 #include <cetech/resource/resource_preview.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
-
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/resource/resource_compiler.h>
 
 #include "cetech/editor/editor_ui.h"
+
+#include "include/nfd/nfd.h"
 
 static bool prop_revert_btn(uint64_t _obj,
                             const uint64_t *props,
@@ -305,6 +304,69 @@ static void ui_str(uint64_t obj,
     if (change) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_str(w, prop, buffer);
+        ce_cdb_a0->write_commit(w);
+    }
+}
+
+static void ui_filename(uint64_t obj,
+                        const char *label,
+                        uint64_t prop,
+                        const char *filter,
+                        uint32_t i) {
+    char labelid[128] = {'\0'};
+
+    const char *value = 0;
+
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    value = ce_cdb_a0->read_str(reader, prop, "");
+
+    char buffer[128] = {'\0'};
+
+    if (value) {
+        strcpy(buffer, value);
+    }
+
+
+    _prop_label(label, obj, &prop, 1);
+
+    ct_debugui_a0->SameLine(0, 2);
+
+    // Open btn
+    sprintf(labelid, ICON_FA_FOLDER_OPEN
+            "##%sprop_select_filename_%d", label, i);
+
+    const char *str = NULL;
+    if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
+        const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(), ce_config_a0->obj());
+        const char *source_dir = ce_cdb_a0->read_str(c_reader, CONFIG_SRC, "");
+
+        nfdchar_t *outPath = NULL;
+        nfdresult_t result = NFD_OpenDialog(filter, source_dir, &outPath);
+
+        if (result == NFD_OKAY) {
+            uint32_t len = strlen(source_dir);
+            str = strstr(outPath, source_dir + 2);
+            if (str != NULL) {
+                str = (str + (len - 1));
+            }
+        }
+    }
+
+    sprintf(labelid, "##%sprop_str_%d", label, i);
+
+    ct_debugui_a0->Indent(0);
+    ct_debugui_a0->PushItemWidth(-1);
+    ct_debugui_a0->InputText(labelid,
+                             buffer,
+                             CE_ARRAY_LEN(buffer),
+                             DebugInputTextFlags_ReadOnly,
+                             0, NULL);
+    ct_debugui_a0->PopItemWidth();
+    ct_debugui_a0->Unindent(0);
+
+    if (str != NULL) {
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_a0->set_str(w, prop, str);
         ce_cdb_a0->write_commit(w);
     }
 }
@@ -753,6 +815,7 @@ void end_disabled() {
 static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_float = ui_float,
         .prop_str = ui_str,
+        .prop_filename = ui_filename,
         .prop_str_combo = ui_str_combo,
         .prop_str_combo2 = ui_str_combo2,
         .prop_resource = ui_resource,

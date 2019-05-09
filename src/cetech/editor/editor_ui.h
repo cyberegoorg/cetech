@@ -48,6 +48,12 @@ struct ct_editor_ui_a0 {
                      uint64_t property,
                      uint32_t i);
 
+    void (*prop_filename)(uint64_t obj,
+                          const char *label,
+                          uint64_t property,
+                          const char* filter,
+                          uint32_t i);
+
     void (*prop_str_combo)(uint64_t obj,
                            const char *label,
                            uint64_t property,
@@ -59,7 +65,7 @@ struct ct_editor_ui_a0 {
     void (*prop_str_combo2)(uint64_t obj,
                             const char *label,
                             uint64_t property,
-                            const char* const* items,
+                            const char *const *items,
                             uint32_t items_count,
                             uint32_t i);
 

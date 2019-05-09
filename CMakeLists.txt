@@ -193,15 +193,14 @@ set(RELEASE_LIBS
         ${RELEASE_LIBS_WINDOWS}
         ${RELEASE_LIBS_DARWIN}
 
-        #        nanomsg.a
         bgfxRelease.a
         bimgRelease.a
         bxRelease.a
 
-        SDL2.a
+        nfd.a
 
+        SDL2.a
         yaml_static.a
-        #aes.a
 
         celib
         )
