@@ -21,6 +21,7 @@
 #include <cetech/controlers/controlers.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/editor_ui.h>
+#include <cetech/resource/resourcedb.h>
 
 #include "celib/id.h"
 #include "celib/config.h"
@@ -30,6 +31,8 @@
 
 
 #define _G AssetPreviewGlobals
+
+CE_MODULE(ct_resourcedb_a0);
 
 typedef struct preview_instance {
     ct_world_t0 world;
@@ -65,10 +68,7 @@ static struct preview_instance *_new_preview() {
     }
 
     uint32_t idx = n;
-    ce_array_push(_G.instances,
-                  ((preview_instance) {}),
-                  ce_memory_a0->system);
-
+    ce_array_push(_G.instances, ((preview_instance) {}), ce_memory_a0->system);
     preview_instance *pi = &_G.instances[idx];
 
     return pi;
@@ -174,7 +174,6 @@ static void _draw_preview(preview_instance *pi,
     if (i->draw_raw) {
         i->draw_raw(pi->selected_object, size);
     } else {
-
         struct ct_rg_builder_t0 *builder;
         builder = ct_renderer_a0->viewport_builder(pi->viewport);
 
@@ -215,7 +214,29 @@ static bool init() {
     _G.baground = pi;
 
     pi->world = ct_ecs_a0->create_world();
-    pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
+
+    ct_ecs_a0->create(pi->world, &pi->camera_ent, 1);
+
+    ct_ecs_a0->add(pi->world,
+                   pi->camera_ent,
+                   CE_ARR_ARG(((ct_component_pair_t0[]) {
+                           {
+                                   .type = TRANSFORM_COMPONENT,
+                                   .data = &(ct_transform_comp) {
+                                           .scl = CE_VEC3_UNIT,
+                                   }
+                           },
+                           {
+                                   .type = CT_CAMERA_COMPONENT,
+                                   .data = &(ct_camera_component) {
+                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                           .near = 0.1f,
+                                           .far = 1000.0f,
+                                           .fov = 60.0f,
+                                   }
+                           }
+                   })));
+
     pi->viewport = ct_renderer_a0->create_viewport();
 
     ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
@@ -258,9 +279,36 @@ void draw_background_texture(ce_vec2_t size) {
     _draw_preview(_G.baground, size);
 }
 
+
+static void resource_tooltip(ct_resource_id_t0 resourceid,
+                             const char *path,
+                             ce_vec2_t size) {
+    ct_debugui_a0->Text("%s", path);
+
+    uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
+
+    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
+
+    if (!ri || !ri->get_interface) {
+        return;
+    }
+
+    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
+
+    uint64_t obj = resourceid.uid;
+
+    if (ai) {
+        if (ai->tooltip) {
+            ai->tooltip(obj, size);
+        }
+
+        set_background_resource(resourceid);
+        draw_background_texture(size);
+    }
+}
+
 static struct ct_resource_preview_a0 asset_preview_api = {
-        .set_background_resource = set_background_resource,
-        .draw_background_texture = draw_background_texture,
+        .resource_tooltip = resource_tooltip,
 };
 
 struct ct_resource_preview_a0 *ct_resource_preview_a0 = &asset_preview_api;
@@ -281,7 +329,28 @@ static uint64_t open(uint64_t dock) {
     preview_instance *pi = _new_preview();
 
     pi->world = ct_ecs_a0->create_world();
-    pi->camera_ent = ct_ecs_a0->spawn(pi->world, 0x57899875c4457313);
+
+    ct_ecs_a0->create(pi->world, &pi->camera_ent, 1);
+    ct_ecs_a0->add(pi->world,
+                   pi->camera_ent,
+                   CE_ARR_ARG(((ct_component_pair_t0[]) {
+                           {
+                                   .type = TRANSFORM_COMPONENT,
+                                   .data = &(ct_transform_comp) {
+                                           .scl = CE_VEC3_UNIT,
+                                   }
+                           },
+                           {
+                                   .type = CT_CAMERA_COMPONENT,
+                                   .data = &(ct_camera_component) {
+                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                           .far = 100.0f,
+                                           .near = 0.1f,
+                                           .fov = 60.0f,
+                                   }
+                           }
+                   })));
+
     pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
@@ -290,6 +359,7 @@ static uint64_t open(uint64_t dock) {
 
     return (uint64_t) pi;
 }
+
 
 static struct ct_dock_i0 dock_api = {
         .cdb_type = cdb_type,

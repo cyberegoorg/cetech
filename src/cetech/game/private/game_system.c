@@ -42,8 +42,6 @@ static struct ct_game_i0 *_get_game(uint64_t name) {
     return (ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name, 0);
 }
 
-#define _CAMERA_ASSET 0x57899875c4457313
-
 static void game_init() {
     _G.game_state.world = ct_ecs_a0->create_world();
 

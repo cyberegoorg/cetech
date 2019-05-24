@@ -515,8 +515,8 @@ static void ui_resource_list(uint64_t dock) {
 
             if (ct_debugui_a0->IsItemHovered(0)) {
                 ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (ce_vec2_t) {128, 128});
+                ct_resource_preview_a0->resource_tooltip(resourceid, path,
+                                                         (ce_vec2_t) {128, 128});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -531,11 +531,8 @@ static void ui_resource_list(uint64_t dock) {
                 }
             }
 
-            if (ct_debugui_a0->BeginDragDropSource(
-                    DebugUIDragDropFlags_SourceAllowNullID)) {
-
-                ct_editor_ui_a0->resource_tooltip(resourceid, path,
-                                                  (ce_vec2_t) {128, 128});
+            if (ct_debugui_a0->BeginDragDropSource(DebugUIDragDropFlags_SourceAllowNullID)) {
+                ct_resource_preview_a0->resource_tooltip(resourceid, path, (ce_vec2_t) {128, 128});
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &resourceid.uid,

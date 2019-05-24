@@ -177,7 +177,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                         .type = TRANSFORM_COMPONENT,
                         .data = &(ct_transform_comp) {
                                 .scl = CE_VEC3_UNIT,
-                                .pos.z = 100.0f,
+                                .pos.z = 10.0f,
                                 .world = CE_MAT4_IDENTITY
                         }
                 },

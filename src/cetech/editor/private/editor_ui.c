@@ -168,32 +168,19 @@ static void _prop_label(const char *label,
 }
 
 
-static void resource_tooltip(ct_resource_id_t0 resourceid,
-                             const char *path,
-                             ce_vec2_t size) {
-    ct_debugui_a0->Text("%s", path);
-
-    uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
-
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
-
-    if (!ri || !ri->get_interface) {
-        return;
+static void _prop_value_begin(uint64_t obj,
+                              const uint64_t *props,
+                              uint64_t props_n) {
+    if (obj) {
+        prop_revert_btn(obj, props, props_n);
+        ct_debugui_a0->SameLine(0, 2);
     }
+}
 
-    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
-
-    uint64_t obj = resourceid.uid;
-
-    if (ai) {
-        if (ai->tooltip) {
-            ai->tooltip(obj, size);
-        }
-
-        ct_resource_preview_a0->set_background_resource(resourceid);
-        ct_resource_preview_a0->draw_background_texture(size);
-    }
-
+static void _prop_value_end() {
+//    ct_debugui_a0->SameLine(0, 2);
+//    ct_debugui_a0->NextColumn();
+    ct_debugui_a0->Unindent(0);
 }
 
 static void ui_float(uint64_t obj,
@@ -540,8 +527,7 @@ static bool resource_select_modal(const char *modal_id,
                 continue;
             }
 
-            bool selected = ct_debugui_a0->Selectable(name, false, 0,
-                                                      &CE_VEC2_ZERO);
+            bool selected = ct_debugui_a0->Selectable(name, false, 0, &CE_VEC2_ZERO);
 
             if (ct_debugui_a0->IsItemHovered(0)) {
                 struct ct_resource_id_t0 r = {
@@ -549,8 +535,7 @@ static bool resource_select_modal(const char *modal_id,
                 };
 
                 ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(r, name,
-                                                  (ce_vec2_t) {256, 256});
+                ct_resource_preview_a0->resource_tooltip(r, name, (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -819,7 +804,6 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_vec4 = ui_vec4,
         .prop_bool = ui_bool,
         .prop_revert_btn = prop_revert_btn,
-        .resource_tooltip = resource_tooltip,
         .resource_select_modal = resource_select_modal,
         .lock_selected_obj = lock_selected_obj,
         .ui_prop_header = ui_prop_header,

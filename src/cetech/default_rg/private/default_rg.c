@@ -143,7 +143,6 @@ static void output_pass_on_pass(void *inst,
                                 ct_camera_data_t0 *main_camera,
                                 struct ct_rg_builder_t0 *builder) {
 
-
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
                                    BGFX_CLEAR_DEPTH,

@@ -119,7 +119,27 @@ static struct entity_editor *_new_editor() {
 
     editor->world = ct_ecs_a0->create_world();
 
-    editor->camera_ent = ct_ecs_a0->spawn(editor->world, 0x57899875c4457313);
+    ct_ecs_a0->create(editor->world, &editor->camera_ent, 1);
+    ct_ecs_a0->add(editor->world,
+                   editor->camera_ent,
+                   CE_ARR_ARG(((ct_component_pair_t0[]) {
+                           {
+                                   .type = TRANSFORM_COMPONENT,
+                                   .data = &(ct_transform_comp) {
+                                           .scl = CE_VEC3_UNIT,
+                                   }
+                           },
+                           {
+                                   .type = CT_CAMERA_COMPONENT,
+                                   .data = &(ct_camera_component) {
+                                           .far = 100.0f,
+                                           .near = 0.1f,
+                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                           .fov = 60.0f,
+                                   }
+                           }
+                   })));
+
     editor->viewport = ct_renderer_a0->create_viewport();
 
     return editor;

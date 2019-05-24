@@ -578,12 +578,12 @@ static void add_components(ct_world_t0 world,
                 }
         });
 
-        uint8_t *comp_data = _get_one(world, types[i], ent);
-
-        ct_component_i0 *ci = get_interface(types[i]);
-        uint64_t component_size = ci->size();
-
-        memcpy(comp_data, components[i].data, component_size);
+        if (components[i].data) {
+            uint8_t *comp_data = _get_one(world, types[i], ent);
+            ct_ecs_component_i0 *ci = get_interface(types[i]);
+            uint64_t component_size = ci->size();
+            memcpy(comp_data, components[i].data, component_size);
+        }
     }
 }
 
