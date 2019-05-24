@@ -27,12 +27,9 @@ struct ct_resourcedb_a0 {
                               const char *data,
                               uint64_t size);
 
-    void (*set_file_depend)(const char *filename,
-                            const char *depend_on);
-
-    bool (*load_cdb_file)(ct_resource_id_t0 resource,
+    bool (*load_cdb_file)(ce_cdb_t0 db,
+                          ct_resource_id_t0 resource,
                           uint64_t object,
-                          uint64_t type,
                           ce_alloc_t0 *allocator);
 
     void (*add_dependency)(const char *who_filename,

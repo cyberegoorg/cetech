@@ -43,7 +43,6 @@ struct _G {
 
     ce_cdb_t0 db;
 
-    uint64_t config;
     ce_alloc_t0 *allocator;
 } _G = {};
 
@@ -63,16 +62,13 @@ static void _resource_api_add(uint64_t name,
                 _G.allocator);
 }
 
-static bool load(const uint64_t *names,
-                 size_t count,
-                 int force);
-
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
     return (ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
 
 
-static bool load(const uint64_t *names,
+static bool load(ce_cdb_t0 db,
+                 const uint64_t *names,
                  size_t count,
                  int force) {
     uint32_t start_ticks = ce_os_time_a0->ticks();
@@ -90,14 +86,12 @@ static bool load(const uint64_t *names,
             return false;
         };
 
-        uint64_t type = ct_resourcedb_a0->get_resource_type((ct_resource_id_t0) {.uid=asset_name});
-
-        if (!ct_resourcedb_a0->load_cdb_file(rid, asset_name, type,
-                                             _G.allocator)) {
-            ce_log_a0->warning(LOG_WHERE,
-                               "Could not load resource 0x%llx", rid.uid);
+        if (!ct_resourcedb_a0->load_cdb_file(db, rid, asset_name, _G.allocator)) {
+            ce_log_a0->warning(LOG_WHERE, "Could not load resource 0x%llx", rid.uid);
             continue;
         }
+
+        uint64_t type = ce_cdb_a0->obj_type(db, asset_name);
 
         struct ct_resource_i0 *resource_i = get_resource_interface(type);
 
@@ -106,7 +100,7 @@ static bool load(const uint64_t *names,
         }
 
         if (resource_i->online) {
-            resource_i->online(names[i], asset_name);
+            resource_i->online(db, names[i], asset_name);
         }
     }
 
@@ -118,7 +112,8 @@ static bool load(const uint64_t *names,
     return true;
 }
 
-void unload(const uint64_t *names,
+void unload(ce_cdb_t0 db,
+            const uint64_t *names,
             size_t count) {
 
     for (uint32_t i = 0; i < count; ++i) {
@@ -138,14 +133,15 @@ void unload(const uint64_t *names,
 
 
             if (resource_i->offline) {
-                resource_i->offline(names[i], rid.uid);
+                resource_i->offline(db, names[i], rid.uid);
             }
         }
     }
 }
 
-static bool cdb_loader(uint64_t uid) {
-    return load(&uid, 1, 0);
+static bool cdb_loader(ce_cdb_t0 db,
+                       uint64_t uid) {
+    return load(db, &uid, 1, 0);
 }
 
 static bool dump_recursive(const char *filename,
@@ -166,7 +162,7 @@ static bool dump_recursive(const char *filename,
 
     for (int i = 0; i < k_n; ++i) {
         uint64_t k = ks[i];
-        if (ce_cdb_a0->prop_type(r, k) != CDB_TYPE_SUBOBJECT) {
+        if (ce_cdb_a0->prop_type(r, k) != CE_CDB_TYPE_SUBOBJECT) {
             continue;
         }
         uint64_t subobj = ce_cdb_a0->read_subobject(r, k, 0);
@@ -238,13 +234,12 @@ static void _init_cvar(struct ce_config_a0 *config) {
     _G = (struct _G) {};
 
     ce_config_a0 = config;
-    _G.config = ce_config_a0->obj();
 
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_BUILD)) {
-        ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
-    }
-    ce_cdb_a0->write_commit(writer);
+//    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
+//    if (!ce_cdb_a0->prop_exist(writer, CONFIG_BUILD)) {
+//        ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
+//    }
+//    ce_cdb_a0->write_commit(writer);
 }
 
 void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
@@ -261,15 +256,11 @@ void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .config = ce_config_a0->obj(),
             .db = ce_cdb_a0->db()
     };
 
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-
     ce_fs_a0->map_root_dir(BUILD_ROOT,
-                           ce_cdb_a0->read_str(reader, CONFIG_BUILD, ""),
+                           ce_config_a0->read_str(CONFIG_BUILD, ""),
                            false);
 
     ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);

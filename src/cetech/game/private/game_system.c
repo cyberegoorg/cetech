@@ -46,12 +46,8 @@ static struct ct_game_i0 *_get_game(uint64_t name) {
 
 static void game_init() {
     _G.game_state.world = ct_ecs_a0->create_world();
-    _G.game_state.camera_ent = ct_ecs_a0->spawn(_G.game_state.world, _CAMERA_ASSET);
-    _G.game_state.viewport = ct_renderer_a0->create_viewport();
 
-    uint64_t config = ce_config_a0->obj();
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), config);
-    uint64_t boot_ent = ce_cdb_a0->read_ref(r, CONFIG_BOOT_ENT, 0);
+    uint64_t boot_ent = ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
 
     _G.game_state.main_ent = ct_ecs_a0->spawn(_G.game_state.world, boot_ent);
 

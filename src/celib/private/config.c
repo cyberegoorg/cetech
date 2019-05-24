@@ -3,10 +3,12 @@
 //==============================================================================
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <celib/api.h>
+#include <celib/memory/allocator.h>
 #include <celib/memory/memory.h>
-
+#include <celib/containers/array.h>
 
 #include <celib/log.h>
 #include <celib/id.h>
@@ -16,7 +18,9 @@
 #include <celib/macros.h>
 #include <celib/ydb.h>
 #include <celib/os/vio.h>
-#include <stdlib.h>
+#include <celib/containers/hash.h>
+
+
 
 
 //==============================================================================
@@ -45,8 +49,7 @@
 #define _G ConfigSystemGlobals
 
 static struct ConfigSystemGlobals {
-    ce_cdb_t0 db;
-    uint64_t config_object;
+    ce_hash_t config;
 } _G;
 
 
@@ -71,136 +74,117 @@ static bool _is_ref(const char *str) {
     return (str[0] == '0') && (str[1] == 'x');
 }
 
+
+float read_float(uint64_t name,
+                 float defaultt) {
+    return ce_hash_lookup(&_G.config, name, defaultt);
+}
+
+uint64_t read_uint(uint64_t name,
+                   uint64_t defaultt) {
+    return ce_hash_lookup(&_G.config, name, defaultt);
+}
+
+const char *read_str(uint64_t name,
+                     const char *defaultt) {
+    return (const char *) ce_hash_lookup(&_G.config, name, (uint64_t) defaultt);
+}
+
+void set_float(uint64_t name,
+               float value) {
+    ce_hash_add(&_G.config, name, value, ce_memory_a0->system);
+}
+
+void set_uint(uint64_t name,
+              uint64_t value) {
+    ce_hash_add(&_G.config, name, value, ce_memory_a0->system);
+}
+
+void set_str(uint64_t name,
+             const char *value) {
+
+    ce_hash_add(&_G.config, name, (uint64_t) ce_memory_a0->str_dup(value, ce_memory_a0->system),
+                ce_memory_a0->system);
+}
+
 static void _cvar_from_str(const char *name,
                            const char *value) {
     int d = 0;
     float f = 0;
 
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                   _G.config_object);
-
     const uint64_t key = ce_id_a0->id64(name);
 
     if (value == NULL) {
-        ce_cdb_a0->set_uint64(writer, key, 1);
-        goto end;
+        set_uint(key, 1);
+        return;
     }
 
     if (_is_ref(value)) {
-        uint64_t ref =_uid_from_str(value);
-        ce_cdb_a0->set_ref(writer, key, ref);
-        goto end;
+        uint64_t ref = _uid_from_str(value);
+        set_uint(key, ref);
+        return;
     } else if (sscanf(value, "%d", &d)) {
-        ce_cdb_a0->set_uint64(writer, key, d);
-        goto end;
+        set_uint(key, d);
+        return;
 
     } else if (sscanf(value, "%f", &f)) {
-        ce_cdb_a0->set_float(writer, key, d);
-        goto end;
+        set_float(key, d);
+        return;
     }
 
-    ce_cdb_a0->set_str(writer, key, value);
-
-    end:
-    ce_cdb_a0->write_commit(writer);
+    set_str(key, value);
 }
 
-
-static void foreach_config_clb(uint64_t key,
-                               uint64_t value,
-                               char *root_name) {
-
-
-    const char *key_str = ce_id_a0->str_from_id64(key);
-
-    char name[1024] = {};
-    if (root_name != NULL) {
-        snprintf(name, CE_ARRAY_LEN(name),
-                 "%s.%s", root_name, key_str);
-    } else {
-        snprintf(name, CE_ARRAY_LEN(name), "%s", key_str);
-    }
-
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), value);
-    enum ce_cdb_type_e0 type = ce_cdb_a0->prop_type(reader, key);
-
-    if (type == CDB_TYPE_SUBOBJECT) {
-        uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, key, 0);
-
-        const ce_cdb_obj_o0 *subr = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
-
-        const uint64_t n = ce_cdb_a0->prop_count(subr);
-        const uint64_t *keys = ce_cdb_a0->prop_keys(subr);
-
-        for (int i = 0; i < n; ++i) {
-            foreach_config_clb(keys[i], sub_obj, name);
-        }
-
-    } else {
-        float tmp_f;
-        int tmp_int;
-        const char *str;
-
-        if (type == CDB_TYPE_STR) {
-            str = ce_cdb_a0->read_str(reader, key, "");
-            _cvar_from_str(name, str);
-        } else {
-            const uint64_t key = ce_id_a0->id64(name);
-
-            const ce_cdb_obj_o0 *conf_r = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                          _G.config_object);
-
-            if (ce_cdb_a0->prop_exist(conf_r, key)) {
-                enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(conf_r, key);
-
-                ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                               _G.config_object);
-
-                switch (t) {
-                    case CDB_TYPE_NONE:
-                        break;
-
-                    case CDB_TYPE_FLOAT:
-                        tmp_f = ce_cdb_a0->read_float(reader, key, 0.0f);
-                        ce_cdb_a0->set_float(writer, key, tmp_f);
-                        break;
-
-                    case CDB_TYPE_UINT64:
-                        tmp_int = (int) ce_cdb_a0->read_float(reader, key,
-                                                              0.0f);
-                        ce_cdb_a0->set_uint64(writer, key, tmp_int);
-                        break;
-
-                    case CDB_TYPE_STR:
-                        str = ce_cdb_a0->read_str(reader, key, "");
-                        ce_cdb_a0->set_str(writer, key, str);
-                        break;
-                    default:
-                        break;
-                }
-
-                ce_cdb_a0->write_commit(writer);
-            }
-        }
-    }
-}
-
-
-static int load_from_yaml_file(const char *path,
+static int load_from_yaml_file(ce_cdb_t0 db,
+                               const char *path,
                                struct ce_alloc_t0 *alloc) {
 
     ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
-    uint64_t obj = ce_ydb_a0->cdb_from_vio(f, alloc);
+
+    cnode_t *nodes = NULL;
+    uint64_t obj = ce_ydb_a0->cdb_from_vio(f, &nodes, alloc);
+    ce_ydb_a0->create_root_obj(nodes, ce_cdb_a0->db());
     ce_os_vio_a0->close(f);
+    ce_array_free(nodes, alloc);
+
+    ce_cdb_a0->log_obj(LOG_WHERE, ce_cdb_a0->db(), obj);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    const uint64_t n = ce_cdb_a0->prop_count(reader);
-    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
+    uint64_t variables_n = ce_cdb_a0->read_objset_num(reader, CE_CONFIG_VARIABLES);
+    uint64_t variables_k[variables_n];
+    ce_cdb_a0->read_objset(reader, CE_CONFIG_VARIABLES, variables_k);
+    for (int j = 0; j < variables_n; ++j) {
+        uint64_t t = ce_cdb_a0->obj_type(db, variables_k[j]);
 
-    for (int i = 0; i < n; ++i) {
-        foreach_config_clb(keys[i], obj, NULL);
+        const ce_cdb_obj_o0 *var_r = ce_cdb_a0->read(db, variables_k[j]);
+
+        const char* name = ce_cdb_a0->read_str(var_r, CE_CONFIG_NAME, "");
+        uint64_t name_h  = ce_id_a0->id64(name);
+
+
+        switch (t) {
+            case CE_CONFIG_VARIABLE_STR: {
+                const char* value = ce_cdb_a0->read_str(var_r, CE_CONFIG_VALUE, "");
+                set_str(name_h, value);
+                break;
+            }
+
+            case CE_CONFIG_VARIABLE_INT: {
+                uint64_t value = ce_cdb_a0->read_float(var_r, CE_CONFIG_VALUE, 0);
+                set_uint(name_h, value);
+                break;
+            }
+
+            case CE_CONFIG_VARIABLE_REF: {
+                uint64_t value = ce_cdb_a0->read_ref(var_r, CE_CONFIG_VALUE, 0);
+                set_uint(name_h, value);
+            }
+
+            default:
+                continue;
+        }
+
     }
 
     ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
@@ -231,21 +215,68 @@ static int parse_args(int argc,
     return 1;
 }
 
-
-static uint64_t config_object() {
-    return _G.config_object;
+bool exist(uint64_t name) {
+    return ce_hash_contain(&_G.config, name);
 }
 
 static struct ce_config_a0 config_a0 = {
-        .obj = config_object,
+//        .obj = config_object,
         .parse_args = parse_args,
         .log_all = log_all,
-        .load_from_yaml_file = load_from_yaml_file
+        .from_file = load_from_yaml_file,
+
+        .read_float = read_float,
+        .read_uint = read_uint,
+        .read_str = read_str,
+
+        .set_float = set_float,
+        .set_uint = set_uint,
+        .set_str = set_str,
+        .exist = exist,
 };
 
 struct ce_config_a0 *ce_config_a0 = &config_a0;
 
 
+static const ce_cdb_prop_def_t0 config_cdb_type_def[] = {
+        {
+                .name = "variables",
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
+        },
+};
+
+static const ce_cdb_prop_def_t0 config_variable_ref_cdb_type_def[] = {
+        {
+                .name = "name",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "value",
+                .type = CE_CDB_TYPE_REF,
+        },
+};
+
+static const ce_cdb_prop_def_t0 config_variable_str_cdb_type_def[] = {
+        {
+                .name = "name",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "value",
+                .type = CE_CDB_TYPE_STR,
+        },
+};
+
+static const ce_cdb_prop_def_t0 config_variable_int_cdb_type_def[] = {
+        {
+                .name = "name",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "value",
+                .type = CE_CDB_TYPE_UINT64,
+        },
+};
 void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
                              int reload) {
     CE_UNUSED(reload);
@@ -253,16 +284,16 @@ void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 
-    _G.db = ce_cdb_a0->db();
-    _G.config_object = ce_cdb_a0->create_object(_G.db, 0);
-
     api->register_api(CE_CONFIG_API, &config_a0, sizeof(config_a0));
+
+    ce_cdb_a0->reg_obj_type(CE_CONFIG_TYPE, CE_ARR_ARG(config_cdb_type_def));
+    ce_cdb_a0->reg_obj_type(CE_CONFIG_VARIABLE_REF, CE_ARR_ARG(config_variable_ref_cdb_type_def));
+    ce_cdb_a0->reg_obj_type(CE_CONFIG_VARIABLE_STR, CE_ARR_ARG(config_variable_str_cdb_type_def));
+    ce_cdb_a0->reg_obj_type(CE_CONFIG_VARIABLE_INT, CE_ARR_ARG(config_variable_int_cdb_type_def));
 }
 
 void CE_MODULE_UNLOAD (config)(struct ce_api_a0 *api,
                                int reload) {
     CE_UNUSED(api, reload);
     ce_log_a0->debug(LOG_WHERE, "Shutdown");
-
-    ce_cdb_a0->destroy_db(_G.db);
 }

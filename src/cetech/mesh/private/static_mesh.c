@@ -64,12 +64,7 @@ void foreach_static_mesh(ct_world_t0 world,
             continue;
         }
 
-        const ce_cdb_obj_o0 *scene_reader = ce_cdb_a0->read(ce_cdb_a0->db(), m_c.scene);
-
-        uint64_t geom_objs = ce_cdb_a0->read_subobject(scene_reader, SCENE_GEOM_OBJS, 0);
-        const ce_cdb_obj_o0 *geom_objs_r = ce_cdb_a0->read(ce_cdb_a0->db(), geom_objs);
-
-        uint64_t geom_obj = ce_cdb_a0->read_ref(geom_objs_r, m_c.mesh, 0);
+        uint64_t geom_obj = ct_scene_a0->get_geom_obj(m_c.scene, m_c.mesh);
 
         if (!geom_obj) {
             continue;
@@ -206,10 +201,10 @@ static struct ct_component_i0 ct_component_api = {
 };
 
 static ce_cdb_prop_def_t0 static_mesh_component_prop[] = {
-        {.name = "material", .type = CDB_TYPE_REF},
-        {.name = "scene", .type = CDB_TYPE_REF},
-        {.name = "node", .type = CDB_TYPE_STR},
-        {.name = "mesh", .type = CDB_TYPE_STR},
+        {.name = "material", .type = CE_CDB_TYPE_REF},
+        {.name = "scene", .type = CE_CDB_TYPE_REF},
+        {.name = "node", .type = CE_CDB_TYPE_STR},
+        {.name = "mesh", .type = CE_CDB_TYPE_STR},
 };
 
 

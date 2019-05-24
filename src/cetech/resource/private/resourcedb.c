@@ -238,15 +238,9 @@ static int _do_sql(const char *sql) {
     return 0;
 }
 
-static int builddb_init_db() {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                  ce_config_a0->obj());
-
-    const char *platform = ce_cdb_a0->read_str(reader,
-                                               CONFIG_PLATFORM, "");
-
-    const char *build_dir_str = ce_cdb_a0->read_str(reader,
-                                                    CONFIG_BUILD, "");
+static int resourcedb_init_db() {
+    const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
+    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, "");
 
     char *build_dir_full = NULL;
     ce_os_path_a0->join(&build_dir_full, ce_memory_a0->system, 2,
@@ -364,7 +358,7 @@ bool builddb_load_cdb_file(ct_resource_id_t0 resource,
 
         _step(_db, sqls->load_file_blob);
 
-        ce_cdb_a0->load(ce_cdb_a0->db(), buff, object, allocator);
+        ce_cdb_a0->load(db, buff, object, allocator);
 
         ce_array_free(buff, allocator);
     }
@@ -372,58 +366,9 @@ bool builddb_load_cdb_file(ct_resource_id_t0 resource,
     return ok != 0;
 }
 
-static void builddb_set_file_depend(const char *filename,
-                                    const char *depend_on) {
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    sqlite3_bind_int64(sqls->set_file_depend, 1, ce_id_a0->id64(filename));
-    sqlite3_bind_int64(sqls->set_file_depend, 2, ce_id_a0->id64(depend_on));
-
-    _step(_db, sqls->set_file_depend);
-}
-
-static int buildb_get_resource_dirs(char ***filename,
-                                    struct ce_alloc_t0 *alloc) {
-
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    ce_hash_t dir_set = {};
-
-    while (_step(_db, sqls->get_resource_dirs) == SQLITE_ROW) {
-        const unsigned char *fn = sqlite3_column_text(sqls->get_resource_dirs,
-                                                      0);
-
-        if (fn) {
-            char tmp_fulllname[256] = {};
-
-            ce_os_path_a0->dir(tmp_fulllname, (const char *) fn);
-            uint64_t hash = ce_id_a0->id64(tmp_fulllname);
-
-            if (ce_hash_contain(&dir_set, hash)) {
-                continue;
-            }
-
-            ce_hash_add(&dir_set, hash, 1, alloc);
-
-            char *dup_str = ce_memory_a0->str_dup(tmp_fulllname, alloc);
-            ce_array_push(*filename, dup_str, alloc);
-        }
-
-
-        _step(_db, sqls->get_resource_dirs);
-    }
-
-
-    ce_hash_free(&dir_set, alloc);
-
-    return 1;
-}
-
-static int buildb_get_resource_from_dirs(const char *dir,
-                                         char ***filename,
-                                         struct ce_alloc_t0 *alloc) {
+static int get_resource_from_dirs(const char *dir,
+                                  char ***filename,
+                                  struct ce_alloc_t0 *alloc) {
 //    if (!strlen(dir)) {
 //        return 0;
 //    }

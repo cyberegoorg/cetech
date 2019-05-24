@@ -117,8 +117,7 @@ static bool _compile_gtlf(ce_cdb_t0 db,
     ct_scene_import_obj_t0 io = {};
     ce_cdb_a0->read_to(db, import_obj, &io, sizeof(io));
 
-    const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(), ce_config_a0->obj());
-    const char *source_dir = ce_cdb_a0->read_str(c_reader, CONFIG_SRC, "");
+    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, _G.allocator, 2, source_dir, io.input);

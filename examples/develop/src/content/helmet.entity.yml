@@ -1,0 +1,35 @@
+cdb_uid: 0x9664d09f438e09bf
+cdb_type: entity
+name: (null)
+components:
+  cdb_type: cdb_objset
+  0x7223792ec3d88614:
+    cdb_uid: 0x7223792ec3d88614
+    cdb_type: transform
+    position:
+      cdb_uid: 0x105af2e843230269
+      cdb_type: position
+      x: 0.000000
+      y: 0.000000
+      z: 3.000000
+    rotation:
+      cdb_uid: 0xae926ca1c26d7ebe
+      cdb_type: rotation
+      x: 0.000000
+      y: 0.000000
+      z: 0.000000
+    scale:
+      cdb_uid: 0x4cc9e65b41b7fb13
+      cdb_type: scale
+      x: 1.000000
+      y: 1.000000
+      z: 1.000000
+  0x25e1bb3c6a4cf3bd:
+    cdb_uid: 0x25e1bb3c6a4cf3bd
+    cdb_type: static_mesh
+    material: 0x15f21001d1
+    scene: 0x97c41c8996520208
+    node: (null)
+    mesh: SciFiHelmet
+children:
+  cdb_type: cdb_objset

@@ -90,11 +90,12 @@ static uint64_t _cdb_type_to_type(uint64_t type) {
     return MAT_VAR_NONE;
 }
 
-static void online(uint64_t name,
+static void online(ce_cdb_t0 db,
+                   uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t layers_n = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
     uint64_t layers_keys[layers_n];
@@ -103,7 +104,7 @@ static void online(uint64_t name,
     for (int i = 0; i < layers_n; ++i) {
         uint64_t layer_obj = layers_keys[i];
 
-        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer_obj);
+        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(db, layer_obj);
 
         uint64_t variables_n = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
         uint64_t variables_keys[variables_n];
@@ -112,14 +113,14 @@ static void online(uint64_t name,
         for (int k = 0; k < variables_n; ++k) {
             uint64_t var_obj = variables_keys[k];
 
-            const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
+            const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(db,
                                                               var_obj);
 
             const char *uniform_name = ce_cdb_a0->read_str(var_reader,
                                                            MATERIAL_VAR_NAME_PROP,
                                                            0);
 
-            uint64_t var_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var_obj);
+            uint64_t var_type = ce_cdb_a0->obj_type(db, var_obj);
 
             uint64_t type = _cdb_type_to_type(var_type);
             if (!type) {
@@ -130,14 +131,15 @@ static void online(uint64_t name,
                                                                                  _type_to_bgfx[type],
                                                                                  1);
 
-            ce_cdb_obj_o0 *var_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), var_obj);
+            ce_cdb_obj_o0 *var_w = ce_cdb_a0->write_begin(db, var_obj);
             ce_cdb_a0->set_uint64(var_w, MATERIAL_VAR_HANDLER_PROP, handler.idx);
             ce_cdb_a0->write_commit(var_w);
         }
     }
 }
 
-static void offline(uint64_t name,
+static void offline(ce_cdb_t0 db,
+                    uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name, obj);
 }
@@ -153,9 +155,9 @@ static void ui_vec4(uint64_t var) {
     ct_editor_ui_a0->prop_vec4(var,
                                str,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
-                                                 MATERIAL_VAR_VALUE_PROP_Y,
-                                                 MATERIAL_VAR_VALUE_PROP_Z,
-                                                 MATERIAL_VAR_VALUE_PROP_W}, (ui_vec4_p0) {});
+                                             MATERIAL_VAR_VALUE_PROP_Y,
+                                             MATERIAL_VAR_VALUE_PROP_Z,
+                                             MATERIAL_VAR_VALUE_PROP_W}, (ui_vec4_p0) {});
 }
 
 static void ui_color4(uint64_t var) {
@@ -163,9 +165,9 @@ static void ui_color4(uint64_t var) {
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->prop_vec4(var, str,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
-                                                 MATERIAL_VAR_VALUE_PROP_Y,
-                                                 MATERIAL_VAR_VALUE_PROP_Z,
-                                                 MATERIAL_VAR_VALUE_PROP_W},
+                                             MATERIAL_VAR_VALUE_PROP_Y,
+                                             MATERIAL_VAR_VALUE_PROP_Z,
+                                             MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {.color=true});
 }
 
@@ -219,7 +221,7 @@ void draw_property(uint64_t material,
                 uint64_t cdb_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
                 uint64_t type = _cdb_type_to_type(cdb_type);
 
-                if(!type) {
+                if (!type) {
                     continue;
                 }
 
@@ -350,12 +352,12 @@ static void set_texture_handler(uint64_t material,
         }
 
         uint64_t t = 0;
-        uint64_t var_type  = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
+        uint64_t var_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
 
-        if(var_type != MATERIAL_VAR_TYPE_TEXTURE_HANDLER) {
+        if (var_type != MATERIAL_VAR_TYPE_TEXTURE_HANDLER) {
             t = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_VAR_TYPE_TEXTURE_HANDLER);
             ce_cdb_a0->destroy_object(ce_cdb_a0->db(), t);
-        } else{
+        } else {
             t = var;
         }
 
@@ -567,7 +569,7 @@ static const ce_cdb_prop_def_t0 material_prop[] = {
         },
         {
                 .name = "layers",
-                .type = CDB_TYPE_SET_SUBOBJECT,
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
         }
 };
 
@@ -575,110 +577,140 @@ static const ce_cdb_prop_def_t0 material_prop[] = {
 static const ce_cdb_prop_def_t0 material_layer_prop[] = {
         {
                 .name = "name",
-                .type = CDB_TYPE_STR,
+                .type = CE_CDB_TYPE_STR,
         },
         {
                 .name = "shader",
-                .type = CDB_TYPE_REF,
+                .type = CE_CDB_TYPE_REF,
                 .obj_type=SHADER_TYPE,
         },
         {
                 .name = "render_state",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SUBOBJECT,
+                .obj_type = MATERIAL_RENDER_STATE
         },
         {
                 .name = "variables",
-                .type = CDB_TYPE_SET_SUBOBJECT,
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
         },
 };
 
+static const ce_cdb_prop_def_t0 render_state_prop[] = {
+        {
+                .name = "rgb_write",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "alpha_write",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "depth_write",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "depth_test_less",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "cull_ccw",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "cull_cw",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "msaa",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+};
 
 static const ce_cdb_prop_def_t0 material_texture_prop[] = {
         {
                 .name = "name",
-                .type = CDB_TYPE_STR,
+                .type = CE_CDB_TYPE_STR,
         },
 
         {
                 .name = "value",
-                .type = CDB_TYPE_REF,
+                .type = CE_CDB_TYPE_REF,
                 .obj_type = TEXTURE_TYPE,
         },
 
         {
                 .name = "handler",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
 };
-
 
 static const ce_cdb_prop_def_t0 material_texture_handler_prop[] = {
         {
                 .name = "name",
-                .type = CDB_TYPE_STR,
+                .type = CE_CDB_TYPE_STR,
         },
 
         {
                 .name = "value",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
 
         {
                 .name = "handler",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
 };
 
 static const ce_cdb_prop_def_t0 material_vec4_prop[] = {
         {
-                .name = "name", .type = CDB_TYPE_STR,
+                .name = "name", .type = CE_CDB_TYPE_STR,
         },
         {.name = "handler",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "x",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
         {
                 .name = "y",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
         {
                 .name = "z",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
         {
                 .name = "w",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
 };
 
 static const ce_cdb_prop_def_t0 material_color_prop[] = {
         {
-                .name = "name", .type = CDB_TYPE_STR,
+                .name = "name", .type = CE_CDB_TYPE_STR,
         },
         {
                 .name = "handler",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "x",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
 
         },
         {
                 .name = "y",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
 
         {
                 .name = "z",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
         },
         {
                 .name = "w",
-                .type = CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_FLOAT,
 
         },
 };
@@ -696,9 +728,9 @@ static void _vec4_property_editor(uint64_t obj,
     ct_editor_ui_a0->prop_vec4(obj,
                                name,
                                (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
-                                                  MATERIAL_VAR_VALUE_PROP_Y,
-                                                  MATERIAL_VAR_VALUE_PROP_Z,
-                                                  MATERIAL_VAR_VALUE_PROP_W},
+                                              MATERIAL_VAR_VALUE_PROP_Y,
+                                              MATERIAL_VAR_VALUE_PROP_Z,
+                                              MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {});
 
 }
@@ -720,9 +752,9 @@ static void _color_property_editor(uint64_t obj,
     ct_editor_ui_a0->prop_vec4(obj,
                                name,
                                (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
-                                                  MATERIAL_VAR_VALUE_PROP_Y,
-                                                  MATERIAL_VAR_VALUE_PROP_Z,
-                                                  MATERIAL_VAR_VALUE_PROP_W},
+                                              MATERIAL_VAR_VALUE_PROP_Y,
+                                              MATERIAL_VAR_VALUE_PROP_Z,
+                                              MATERIAL_VAR_VALUE_PROP_W},
                                (ui_vec4_p0) {.color=true});
 }
 
@@ -760,6 +792,9 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
                       &color_property_editor_api, sizeof(color_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(MATERIAL_TYPE, material_prop, CE_ARRAY_LEN(material_prop));
+
+    ce_cdb_a0->reg_obj_type(MATERIAL_RENDER_STATE, CE_ARR_ARG(render_state_prop));
+
     ce_cdb_a0->reg_obj_type(MATERIAL_LAYER_TYPE,
                             material_layer_prop, CE_ARRAY_LEN(material_layer_prop));
 
@@ -775,6 +810,7 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
 
     ce_cdb_a0->reg_obj_type(MATERIAL_VAR_TYPE_VEC4,
                             material_vec4_prop, CE_ARRAY_LEN(material_vec4_prop));
+
 }
 
 void CE_MODULE_UNLOAD(material)(struct ce_api_a0 *api,

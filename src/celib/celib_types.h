@@ -93,6 +93,8 @@ typedef char cache_line_pad_t[64];
 
 #include <celib/os/error.h>
 
+#define CE_ALIGNOF(_type) __alignof(_type)
+
 #ifdef __cplusplus
 }
 #endif

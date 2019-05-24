@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <celib/os/path.h>
 #include <celib/os/time.h>
+#include <celib/containers/bitset.h>
 
 #include "cetech/resource/resourcedb.h"
 
@@ -42,8 +43,9 @@
 // Globals
 //==============================================================================
 
+CE_MODULE(ct_resourcedb_a0);
+
 static struct _G {
-    uint64_t config;
     ce_alloc_t0 *allocator;
 } _G;
 
@@ -53,7 +55,7 @@ static struct _G {
 //==============================================================================
 
 static ct_resource_compilator_t _find_compilator(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(RESOURCE_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I);
     while (it.api) {
         struct ct_resource_i0 *i = (it.api);
         if (i->cdb_type && (i->cdb_type() == type)) {
@@ -65,258 +67,129 @@ static ct_resource_compilator_t _find_compilator(uint64_t type) {
     return NULL;
 }
 
-static uint64_t _uid_from_str(const char *str) {
-    uint64_t v = strtoul(str, NULL, 0);
-    return v;
+void _fill_obj_root_hash(const char *filename,
+                         cnode_t *cnodes,
+                         ce_hash_t *obj_root_hash,
+                         uint64_t **all_obj) {
+    uint64_t root_uid = cnodes[0].obj.uid;
+    uint32_t cnodes_n = ce_array_size(cnodes);
+    for (int j = 0; j < cnodes_n; ++j) {
+        cnode_t node = cnodes[j];
+        if (node.type == CNODE_OBJ_BEGIN) {
+            ce_hash_add(obj_root_hash, node.obj.uid, root_uid, _G.allocator);
+
+            ct_resource_id_t0 rid = {.uid = node.obj.uid};
+            ct_resourcedb_a0->put_resource(rid, ce_id_a0->str_from_id64(node.obj.type),
+                                           filename,
+                                           j == 0);
+
+            ce_array_push(*all_obj, rid.uid, _G.allocator);
+        }
+    }
 }
 
-static bool _is_ref(const char *str) {
-    return (str[0] == '0') && (str[1] == 'x');
+void _fill_deps(cnode_t *cnodes,
+                struct ce_hash_t *obj_root_hash,
+                struct ce_ba_graph_t *obj_graph) {
+    uint64_t *tmp_after = NULL;
+
+    ce_bitset_t0 after_set = {};
+    ce_bitset_init(&after_set, 1024, _G.allocator);
+
+    uint32_t cnodes_n = ce_array_size(cnodes);
+    for (int j = 0; j < cnodes_n; ++j) {
+        cnode_t node = cnodes[j];
+
+        if (node.type == CNODE_OBJ_BEGIN) {
+            if (node.obj.instance_of) {
+                uint64_t root_uid = ce_hash_lookup(obj_root_hash, node.obj.instance_of, 0);
+
+                if (!ce_bitset_is_set(&after_set, root_uid)) {
+                    ce_bitset_add(&after_set, root_uid);
+                    ce_array_push(tmp_after, root_uid, _G.allocator);
+                }
+            }
+        } else if (node.type == CNODE_REF) {
+            uint64_t root_uid = ce_hash_lookup(obj_root_hash, node.value.ref, 0);
+
+            if (!ce_bitset_is_set(&after_set, root_uid)) {
+                ce_bitset_add(&after_set, root_uid);
+                ce_array_push(tmp_after, root_uid, _G.allocator);
+            }
+        }
+    }
+
+    ce_bitset_free(&after_set, _G.allocator);
+
+    ce_bag_add(obj_graph, cnodes[0].obj.uid,
+               NULL, 0,
+               tmp_after, ce_array_size(tmp_after),
+               _G.allocator);
 }
 
-uint64_t compile_obj(ce_cdb_t0 db,
-                     uint64_t input_obj,
-                     uint64_t uid) {
+void _save_resursive(const char *filename,
+                     ce_cdb_t0 db,
+                     uint64_t obj,
+                     bool file_resource) {
 
-    const ce_cdb_obj_o0 *input_r = ce_cdb_a0->read(ce_cdb_a0->db(), input_obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
-    const char *type_s = ce_cdb_a0->read_str(input_r, CDB_TYPE_PROP, NULL);
+    const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
 
-    uint64_t type = ce_id_a0->id64(type_s);
+    for (int i = 0; i < prop_count; ++i) {
+        uint64_t key = keys[i];
 
-    uint64_t obj = 0;
-    ce_cdb_a0->create_object_uid(db, uid, 0);
-    obj = uid;
-
-    uint64_t n = ce_cdb_a0->prop_count(input_r);
-    const uint64_t *k = ce_cdb_a0->prop_keys(input_r);
-
-    ce_cdb_obj_o0 *obj_w = ce_cdb_a0->write_begin(db, obj);
-
-    const char *cdb_instance = ce_cdb_a0->read_str(input_r, CDB_INSTANCE_PROP, 0);
-
-    for (int i = 0; i < n; ++i) {
-        uint64_t p = k[i];
-
-        if (CDB_UID_PROP == p) {
-            continue;
-        }
-
-        if (CDB_TYPE_PROP == p) {
-            continue;
-        }
-
-        if (CDB_INSTANCE_PROP == p) {
-            continue;
-        }
-
-        enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(input_r, p);
+        ce_cdb_type_e0 t = ce_cdb_a0->prop_type(reader, key);
 
         switch (t) {
-            case CDB_TYPE_UINT64: {
-                uint64_t v = ce_cdb_a0->read_uint64(input_r, p, 0);
-                ce_cdb_a0->set_uint64(obj_w, p, v);
-            }
-                break;
+            case CE_CDB_TYPE_SUBOBJECT: {
+                uint64_t subobj = ce_cdb_a0->read_subobject(reader, key, 0);
 
-            case CDB_TYPE_FLOAT: {
-                float v = ce_cdb_a0->read_float(input_r, p, 0);
-                ce_cdb_a0->set_float(obj_w, p, v);
-            }
-                break;
-
-            case CDB_TYPE_BOOL: {
-                bool v = ce_cdb_a0->read_bool(input_r, p, 0);
-                ce_cdb_a0->set_bool(obj_w, p, v);
-            }
-                break;
-
-            case CDB_TYPE_STR: {
-                const char *s = ce_cdb_a0->read_str(input_r, p, "");
-
-                if (_is_ref(s)) {
-                    uint64_t ref_uid = _uid_from_str(s);
-                    ce_cdb_a0->set_ref(obj_w, p, ref_uid);
-                } else {
-                    ce_cdb_a0->set_str(obj_w, p, s);
+                if (subobj) {
+                    _save_resursive(filename, db, subobj, false);
                 }
-
             }
                 break;
-
-            case CDB_TYPE_SUBOBJECT: {
-                uint64_t subobj = ce_cdb_a0->read_subobject(input_r, p, 0);
-                const ce_cdb_obj_o0 *sr = ce_cdb_a0->read(ce_cdb_a0->db(), subobj);
-
-                const char *type_s = ce_cdb_a0->read_str(sr, CDB_TYPE_PROP, NULL);
-                uint64_t type = ce_id_a0->id64(type_s);
-
-                bool is_objset = type == CDB_OBJSET;
-
-                if (!is_objset) {
-                    uint64_t ref_uid = 0;
-                    const char *suid_s = ce_cdb_a0->read_str(sr, CDB_UID_PROP, NULL);
-                    if (suid_s) {
-                        ref_uid = _uid_from_str(suid_s);
-                    }
-
-                    ce_cdb_a0->set_subobject(obj_w, p, ref_uid);
-                } else {
-                    uint64_t s_n = ce_cdb_a0->prop_count(sr);
-                    const uint64_t *s_k = ce_cdb_a0->prop_keys(sr);
-                    for (int j = 0; j < s_n; ++j) {
-                        if (s_k[j] == CDB_TYPE_PROP) {
-                            continue;
-                        }
-
-                        if (s_k[j] == CDB_UID_PROP) {
-                            continue;
-                        }
-
-                        uint64_t subobj = ce_cdb_a0->read_subobject(sr, s_k[j], 0);
-                        const ce_cdb_obj_o0 *sub_r = ce_cdb_a0->read(ce_cdb_a0->db(), subobj);
-
-                        const char *subuid_str = ce_cdb_a0->read_str(sub_r, CDB_UID_PROP, 0);
-                        uint64_t sub_uid = _uid_from_str(subuid_str);
-
-                        if (!sub_uid) {
-                            continue;
-                        }
-
-                        ce_cdb_a0->objset_add_obj(obj_w, p, sub_uid);
-                    }
+            case CE_CDB_TYPE_SET_SUBOBJECT: {
+                uint64_t n = ce_cdb_a0->read_objset_num(reader, key);
+                uint64_t objs[n];
+                ce_cdb_a0->read_objset(reader, key, objs);
+                for (int j = 0; j < n; ++j) {
+                    _save_resursive(filename, db, objs[j], false);
                 }
-
-
             }
-                break;
-
-            case CDB_TYPE_PTR:
-                break;
-            case CDB_TYPE_NONE:
-                break;
-            case CDB_TYPE_BLOB:
                 break;
             default:
                 break;
         }
     }
 
-    ce_cdb_a0->write_commit(obj_w);
+    char *output = NULL;
+    ce_cdb_a0->dump(db, obj, &output, _G.allocator);
+    ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
+                                        output,
+                                        ce_array_size(output));
 
-    if (cdb_instance) {
-        uint64_t ref_uid = _uid_from_str(cdb_instance);
-        ce_cdb_a0->set_instance_of(db, ref_uid, obj);
-    }
+    uint64_t type = ce_cdb_a0->obj_type(db, obj);
+    const char *type_str = ce_id_a0->str_from_id64(type);
 
-    ct_resource_compilator_t compilator = _find_compilator(type);
-    if (compilator) {
-        compilator(db, obj);
-    }
+    ct_resourcedb_a0->put_resource((ct_resource_id_t0) {.uid=obj},
+                                   type_str,
+                                   filename,
+                                   file_resource);
 
-    ce_cdb_a0->set_type(db, obj, type);
-
-    return obj;
+    ce_buffer_free(output, _G.allocator);
 }
 
-void _scan_obj(const char *filename,
-               uint64_t key,
-               uint64_t obj,
-               struct ce_ba_graph_t *obj_graph,
-               struct ce_hash_t *obj_hash) {
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    const char *uid_s = ce_cdb_a0->read_str(reader, CDB_UID_PROP, NULL);
-
-    uint64_t uid = 0;
-
-    uid = strtoul(uid_s, NULL, 0);
-
-    const char *type = ce_cdb_a0->read_str(reader, CDB_TYPE_PROP, "");
-    const char *name = ce_cdb_a0->read_str(reader, ASSET_NAME_PROP, "");
-
-    ct_resource_id_t0 rid = {.uid = uid};
-    ct_resourcedb_a0->put_resource(rid, type, filename, name);
-
-
-    const char *cdb_instance = ce_cdb_a0->read_str(reader, CDB_INSTANCE_PROP, NULL);
-
-    const uint64_t n = ce_cdb_a0->prop_count(reader);
-    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
-
-    ce_hash_add(obj_hash, uid, obj, _G.allocator);
-
-    uint64_t *after = NULL;
-
-    if (cdb_instance) {
-        uint64_t cdb_instance_uid = strtoul(cdb_instance, NULL, 0);
-        ce_array_push(after, cdb_instance_uid, _G.allocator);
-    }
-
-    for (uint32_t i = 0; i < n; ++i) {
-        uint64_t k = keys[i];
-
-        if (CDB_UID_PROP == k) {
-            continue;
-        }
-
-        if (CDB_INSTANCE_PROP == k) {
-            continue;
-        }
-
-        if (CDB_TYPE_PROP == k) {
-            continue;
-        }
-
-        enum ce_cdb_type_e0 t = ce_cdb_a0->prop_type(reader, k);
-
-        if (t == CDB_TYPE_SUBOBJECT) {
-            uint64_t sub_obj = ce_cdb_a0->read_subobject(reader, k, 0);
-
-            const ce_cdb_obj_o0 *subr = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
-            const char *uid_s = ce_cdb_a0->read_str(subr, CDB_UID_PROP, NULL);
-
-            uint64_t uid = 0;
-
-            if (uid_s) {
-                uid = strtoul(uid_s, NULL, 0);
-            } else {
-                uid = ce_cdb_a0->gen_uid(ce_cdb_a0->db());
-                char buffer[128] = {};
-                snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", uid);
-                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), sub_obj);
-                ce_cdb_a0->set_str(w, CDB_UID_PROP, buffer);
-                ce_cdb_a0->write_commit(w);
-            }
-
-            _scan_obj(filename, k, sub_obj, obj_graph, obj_hash);
-
-
-            ce_array_push(after, uid, _G.allocator);
-
-
-        } else if (t == CDB_TYPE_STR) {
-            const char *str = ce_cdb_a0->read_str(reader, k, NULL);
-            if (_is_ref(str)) {
-                uint64_t ref_uid = _uid_from_str(str);
-                ce_array_push(after, ref_uid, _G.allocator);
-            }
-        } else if (t == CDB_TYPE_REF) {
-            uint64_t ref = ce_cdb_a0->read_ref(reader, k, 0);
-            ce_array_push(after, ref, _G.allocator);
-        }
-    }
-
-    ce_bag_add(obj_graph, uid,
-               NULL, 0,
-               after, ce_array_size(after),
-               _G.allocator);
-}
-
-void _scan_files(char **files,
-                 uint32_t files_count) {
+void _compile_files(char **files,
+                    uint32_t files_count) {
     ce_ba_graph_t obj_graph = {};
-    ce_hash_t obj_hash = {};
+    ce_hash_t obj_root_hash = {};
+    ce_hash_t root_cnodes_hash = {};
+    ce_hash_t obj_files = {};
+    uint64_t *root_objs = NULL;
+    uint64_t *all_objs = NULL;
 
     ce_cdb_t0 db = ce_cdb_a0->create_db(1000000);
 
@@ -329,10 +202,20 @@ void _scan_files(char **files,
         int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
         ct_resourcedb_a0->put_file(filename, mtime);
 
-        uint64_t obj = ce_ydb_a0->get_obj(filename);
-        _scan_obj(filename, 0, obj, &obj_graph, &obj_hash);
+        cnode_t *cnodes = NULL;
+        ce_ydb_a0->read_cnodes(filename, &cnodes);
 
-//        ce_cdb_a0->log_obj("AAA", ce_cdb_a0->db(), obj);
+        _fill_obj_root_hash(filename, cnodes, &obj_root_hash, &all_objs);
+
+        ce_array_push(root_objs, cnodes[0].obj.uid, _G.allocator);
+        ce_hash_add(&root_cnodes_hash, cnodes[0].obj.uid, (uint64_t) cnodes, _G.allocator);
+        ce_hash_add(&obj_files, cnodes[0].obj.uid, (uint64_t) filename, _G.allocator);
+    }
+
+    uint32_t root_objs_n = ce_array_size(root_objs);
+    for (int j = 0; j < root_objs_n; ++j) {
+        cnode_t *cnodes = (cnode_t *) ce_hash_lookup(&root_cnodes_hash, root_objs[j], 0);
+        _fill_deps(cnodes, &obj_root_hash, &obj_graph);
     }
 
     ce_bag_build(&obj_graph, _G.allocator);
@@ -341,27 +224,36 @@ void _scan_files(char **files,
     for (int k = 0; k < output_n; ++k) {
         uint64_t obj = obj_graph.output[k];
 
-        char filename[256] = {};
-        ct_resourcedb_a0->get_resource_filename(
-                (ct_resource_id_t0) {.uid=obj},
-                filename, CE_ARRAY_LEN(filename));
+        cnode_t *cnodes = (cnode_t *) ce_hash_lookup(&root_cnodes_hash, obj, 0);
 
-        ce_log_a0->info(LOG_WHERE, "Compile 0x%llx from %s", obj, filename);
+        ce_log_a0->debug(LOG_WHERE, "COMPILE 0x%llx", cnodes[0].obj.uid);
 
-        uint64_t cobj = ce_hash_lookup(&obj_hash, obj, 0);
-        compile_obj(db, cobj, obj);
+        char **outputs = NULL;
+
+        ce_ydb_a0->dump_cnodes(db, cnodes, &outputs);
+
+        uint32_t objs_n = ce_array_size(outputs);
+        for (int i = 0; i < objs_n; ++i) {
+            cdb_binobj_header *h = (cdb_binobj_header *) outputs[i];
+
+            ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=h->uid},
+                                                outputs[i],
+                                                ce_array_size(outputs[i]));
+
+            ce_buffer_free(outputs[i], _G.allocator);
+        }
     }
 
     for (int k = 0; k < output_n; ++k) {
         uint64_t obj = obj_graph.output[k];
+        cnode_t *cnodes = (cnode_t *) ce_hash_lookup(&root_cnodes_hash, obj, 0);
+        ct_resource_compilator_t compilator = _find_compilator(cnodes[0].obj.type);
+        if (compilator) {
+            compilator(db, obj);
+        }
 
-        char *output = NULL;
-        ce_cdb_a0->dump(db, obj, &output, _G.allocator);
-        ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
-                                            output,
-                                            ce_array_size(output));
-
-        ce_buffer_free(output, _G.allocator);
+        const char* filename = (const char*)ce_hash_lookup(&obj_files, obj, 0);
+        _save_resursive(filename, db, obj, true);
     }
 
     ce_cdb_a0->destroy_db(db);
@@ -374,10 +266,7 @@ void _scan_files(char **files,
 
 char *resource_compiler_get_build_dir(ce_alloc_t0 *a,
                                       const char *platform) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-
-    const char *build_dir_str = ce_cdb_a0->read_str(reader,
-                                                    CONFIG_BUILD, "");
+    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, "");
 
     char *buffer = NULL;
     ce_os_path_a0->join(&buffer, a, 2, build_dir_str, platform);
@@ -396,7 +285,7 @@ void resource_compiler_compile_all() {
                       "", glob_patern, false, true, &files, &files_count,
                       _G.allocator);
 
-    _scan_files(files, files_count);
+    _compile_files(files, files_count);
 
     ce_fs_a0->listdir_free(files, files_count,
                            _G.allocator);
@@ -418,46 +307,35 @@ char *resource_compiler_get_tmp_dir(ce_alloc_t0 *alocator,
 
 char *resource_compiler_external_join(ce_alloc_t0 *alocator,
                                       const char *name) {
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-
-    const char *external_dir_str = ce_cdb_a0->read_str(reader,
-                                                       CONFIG_EXTERNAL,
-                                                       "");
+    const char *external_dir_str = ce_config_a0->read_str(CONFIG_EXTERNAL, "externals/build");
 
     char *tmp_dir = NULL;
     ce_os_path_a0->join(&tmp_dir, alocator, 2, external_dir_str,
-                        ce_cdb_a0->read_str(reader,
-                                            CONFIG_PLATFORM,
-                                            ""));
+                        ce_config_a0->read_str(CONFIG_PLATFORM, ""));
 
     char *buffer = NULL;
     ce_buffer_printf(&buffer, alocator, "%s64", tmp_dir);
     ce_buffer_free(tmp_dir, alocator);
 
     char *result = NULL;
-    ce_os_path_a0->join(&result, alocator, 4, buffer, "release", "bin",
-                        name);
+    ce_os_path_a0->join(&result, alocator, 4, buffer, "release", "bin", name);
     ce_buffer_free(buffer, alocator);
 
     return result;
 }
 
 static void _init_cvar(struct ce_config_a0 *config) {
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SRC)) {
-        ce_cdb_a0->set_str(writer, CONFIG_SRC, "src");
+    if (!ce_config_a0->exist(CONFIG_SRC)) {
+        ce_config_a0->set_str(CONFIG_SRC, "src");
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_CORE)) {
-        ce_cdb_a0->set_str(writer, CONFIG_CORE, "core");
+    if (!ce_config_a0->exist(CONFIG_CORE)) {
+        ce_config_a0->set_str(CONFIG_CORE, "core");
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_EXTERNAL)) {
-        ce_cdb_a0->set_str(writer, CONFIG_EXTERNAL, "externals/build");
+    if (!ce_config_a0->exist(CONFIG_EXTERNAL)) {
+        ce_config_a0->set_str(CONFIG_EXTERNAL, "externals/build");
     }
-
-    ce_cdb_a0->write_commit(writer);
 }
 
 static struct ct_resource_compiler_a0 resource_compiler_api = {
@@ -482,10 +360,11 @@ void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_fs_a0);
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_cdb_a0);
+
     CE_UNUSED(api);
+
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .config = ce_config_a0->obj(),
     };
 
     _init_cvar(ce_config_a0);
@@ -493,13 +372,9 @@ void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
                       &resource_compiler_api,
                       sizeof(resource_compiler_api));
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
+    const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
 
-    const char *platform = ce_cdb_a0->read_str(reader,
-                                               CONFIG_PLATFORM, "");
-
-    char *build_dir_full = resource_compiler_get_build_dir(_G.allocator,
-                                                           platform);
+    char *build_dir_full = resource_compiler_get_build_dir(_G.allocator, platform);
 
     ce_os_path_a0->make_path(build_dir_full);
 
@@ -513,8 +388,8 @@ void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
     ce_buffer_free(tmp_dir_full, _G.allocator);
     ce_buffer_free(build_dir_full, _G.allocator);
 
-    const char *core_dir = ce_cdb_a0->read_str(reader, CONFIG_CORE, "");
-    const char *source_dir = ce_cdb_a0->read_str(reader, CONFIG_SRC, "");
+    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE, "");
+    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
     ce_fs_a0->map_root_dir(SOURCE_ROOT, core_dir, true);
     ce_fs_a0->map_root_dir(SOURCE_ROOT, source_dir, true);

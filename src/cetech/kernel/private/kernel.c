@@ -38,7 +38,6 @@
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
-    uint64_t config_object;
     bool is_running;
 
     ce_ba_graph_t updateg;
@@ -67,43 +66,33 @@ const char *_platform() {
 #define LOG_WHERE "kernel"
 
 int init_config(int argc,
-                const char **argv,
-                uint64_t object) {
-
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), object);
-    ce_cdb_a0->set_str(writer, CONFIG_PLATFORM, _platform());
-    ce_cdb_a0->set_str(writer, CONFIG_NATIVE_PLATFORM, _platform());
-    ce_cdb_a0->set_str(writer, CONFIG_BUILD, "build");
-    ce_cdb_a0->write_commit(writer);
+                const char **argv) {
+    ce_config_a0->set_str(CONFIG_PLATFORM, _platform());
+    ce_config_a0->set_str(CONFIG_NATIVE_PLATFORM, _platform());
+    ce_config_a0->set_str(CONFIG_BUILD, "build");
 
     if (!ce_config_a0->parse_args(argc, argv)) {
         return 0;
     }
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), object);
-
-    const char *build_dir_str = ce_cdb_a0->read_str(reader, CONFIG_BUILD, "");
+    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, "");
     char *build_dir = NULL;
     ce_os_path_a0->join(&build_dir, _G.allocator, 2,
                         build_dir_str,
-                        ce_cdb_a0->read_str(reader, CONFIG_NATIVE_PLATFORM,
-                                            ""));
+                        ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM,""));
 
     char *build_config = NULL;
     ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir,
                         "global.yml");
 
-    const char *source_dir_str = ce_cdb_a0->read_str(reader, CONFIG_SRC, "");
+    const char *source_dir_str = ce_config_a0->read_str(CONFIG_SRC, "");
     char *source_config = NULL;
-    ce_os_path_a0->join(&source_config, _G.allocator, 2, source_dir_str,
-                        "global.yml");
+    ce_os_path_a0->join(&source_config, _G.allocator, 2, source_dir_str, "global.yml");
 
-    if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
-        ce_os_path_a0->make_path(build_dir);
-        ce_os_path_a0->copy_file(_G.allocator, source_config, build_config);
-    }
+    ce_os_path_a0->make_path(build_dir);
+    ce_os_path_a0->copy_file(_G.allocator, source_config, build_config);
 
-    ce_config_a0->load_from_yaml_file(build_config, _G.allocator);
+    ce_config_a0->from_file(ce_cdb_a0->db(), build_config, _G.allocator);
 
     ce_buffer_free(source_config, _G.allocator);
     ce_buffer_free(build_config, _G.allocator);
@@ -139,22 +128,16 @@ bool cetech_kernel_init(int argc,
 
     _G = (struct KernelGlobals) {
             .allocator = ce_memory_a0->system,
-            .config_object  = ce_config_a0->obj(),
     };
 
-    init_config(argc, argv, ce_config_a0->obj());
+    init_config(argc, argv);
 
 
     init_static_modules();
 
     uint64_t root = ce_id_a0->id64("modules");
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                  ce_config_a0->obj());
-
-    const char *module_path = ce_cdb_a0->read_str(reader,
-                                                  CONFIG_MODULE_DIR,
-                                                  "bin/darwin64");
+    const char *module_path = ce_config_a0->read_str(CONFIG_MODULE_DIR, "bin/darwin64");
 
     ce_fs_a0->map_root_dir(root, module_path, true);
 
@@ -181,36 +164,9 @@ int cetech_kernel_shutdown() {
 
 
 void _init_config() {
-    _G.config_object = ce_config_a0->obj();
-
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                   _G.config_object);
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_BOOT_PKG)) {
-        ce_cdb_a0->set_str(writer, CONFIG_BOOT_PKG, "boot");
+    if (!ce_config_a0->exist(CONFIG_GAME)) {
+        ce_config_a0->set_str(CONFIG_GAME, "editor");
     }
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_GAME)) {
-        ce_cdb_a0->set_str(writer, CONFIG_GAME, "editor");
-    }
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_DAEMON)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_DAEMON, 0);
-    }
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_COMPILE)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_COMPILE, 0);
-    }
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_CONTINUE)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_CONTINUE, 0);
-    }
-
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_WAIT)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_WAIT, 0);
-    }
-
-    ce_cdb_a0->write_commit(writer);
 }
 
 
@@ -348,62 +304,7 @@ static void cetech_kernel_start() {
 
     _init_config();
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config_object);
-
-    if (ce_cdb_a0->read_uint64(reader, CONFIG_COMPILE, 0)) {
-        ct_resource_compiler_a0->compile_all();
-
-        if (!ce_cdb_a0->read_uint64(reader, CONFIG_CONTINUE, 0)) {
-            return;
-        }
-    }
-
-//    uint64_t m4 = 0x1680afa75da0014d;
-//    uint64_t obj = 0x588f56dc4e82f7b2;
-//    uint64_t obj = 0x57899875c4457313;
-
-//    const ce_cdb_obj_o0* objr = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-//    uint32_t n = ce_cdb_a0->read_objset_num(objr, ENTITY_COMPONENTS);
-//    uint64_t objs[n];
-//    ce_cdb_a0->read_objset(objr, ENTITY_COMPONENTS, objs);
-//    for (int i = 0; i < n; ++i) {
-//        uint64_t o = objs[i];
-//
-//        uint64_t t = ce_cdb_a0->obj_type(ce_cdb_a0->db(), o);
-//        if(t!= TRANSFORM_COMPONENT) {
-//            continue;
-//        }
-//
-//        const ce_cdb_obj_o0* or = ce_cdb_a0->read(ce_cdb_a0->db(), o);
-//        ce_cdb_a0->read_subobject(or, PROP_POSITION, 0);
-//
-////        ce_cdb_a0->read_subobject(objr, )
-//    }
-
-//    uint64_t objs[100];
-//    for (int i = 0; i < CE_ARRAY_LEN(objs); ++i) {
-//        objs[i] = ce_cdb_a0->create_from(ce_cdb_a0->db(), 0x1680afa75da0014d);
-////        ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), objs[i]);
-//    }
-//
-//    ce_cdb_obj_o0* w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-//    for (int i = 0; i < CE_ARRAY_LEN(objs); ++i) {
-//        ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, objs[i]);
-//    }
-//    ce_cdb_a0->write_commit(w);
-
-//    uint64_t clone = ce_cdb_a0->create_from(ce_cdb_a0->db(), obj);
-//    clone = ce_cdb_a0->create_from(ce_cdb_a0->db(), clone);
-//    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), clone);
-//    ce_cdb_a0->log_obj("DD", ce_cdb_a0->db(), obj);
-
-//    for (int i = 0; i < 100; ++i) {
-//        uint64_t obj = ce_cdb_a0->create_from(ce_cdb_a0->db(), m4);
-//        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
-//    }
-
-    uint64_t t = ce_cdb_a0->create_object(ce_cdb_a0->db(), TRANSFORM_COMPONENT);
-    ce_cdb_a0->log_obj("D", ce_cdb_a0->db(), t);
+    ct_resource_compiler_a0->compile_all();
 
     _build_init_graph(&_G.initg);
     _init(&_G.initg);

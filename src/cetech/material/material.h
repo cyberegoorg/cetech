@@ -41,8 +41,8 @@ extern "C" {
 #define MATERIAL_SHADER_PROP \
     CE_ID64_0("shader", 0xcce8d5b5f5ae333fULL)
 
-#define MATERIAL_STATE_PROP \
-    CE_ID64_0("state", 0x82830aedd03d8beeULL)
+#define MATERIAL_RENDER_STATE \
+    CE_ID64_0("render_state", 0xd40ba8e089201826ULL)
 
 #define MATERIAL_VARIABLES_PROP \
     CE_ID64_0("variables", 0x4fb1ab3fd540bd03ULL)

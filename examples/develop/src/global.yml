@@ -1,19 +1,23 @@
-core:
-  boot_pkg: content/boot
-  boot_ent: 0x588f56dc4e82f7b2
+cdb_type: config
+variables:
+  cdb_type: cdb_objset
 
-screen:
-  x: 800
-  y: 600
+  0xd15063a21b3e7f1f:
+    cdb_type: config_variable_ref
+    name: core.boot_ent
+    value: 0xf44b05ff3bdfc99e
 
-#load_module.1: module_property_inspector
-#load_module.2: module_asset_browser
-#load_module.3: module_asset_property
-#load_module.4: module_asset_preview
-#load_module.5: module_texture_property
-#load_module.6: module_level_inspector
-#load_module.7: module_entity_property
-#load_module.8: module_transform_property
-#load_module.9: module_level_view
-#load_module.0: module_example
-load_module.0: game_example_develop
+  0xd25063a21b3e7f1f:
+    cdb_type: config_variable_int
+    name: screen.x
+    value: 1024
+
+    0xd25063a21b3e7f2f:
+      cdb_type: config_variable_int
+      name: screen.y
+      value: 768
+
+  0xd25064a21b3e7f2f:
+    cdb_type: config_variable_str
+    name: load_module.0
+    value: game_example_develop

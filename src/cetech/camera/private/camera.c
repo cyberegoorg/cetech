@@ -198,10 +198,10 @@ static struct ct_property_editor_i0 property_editor_api = {
 };
 
 static ce_cdb_prop_def_t0 camera_component_prop[] = {
-        {.name = "camera_type", .type = CDB_TYPE_STR, .value.str = "perspective"},
-        {.name = "near", .type = CDB_TYPE_FLOAT, .value.f = 0.1f},
-        {.name = "far", .type = CDB_TYPE_FLOAT, .value.f = 1000.0f},
-        {.name = "fov", .type = CDB_TYPE_FLOAT, .value.f = 60.0f},
+        {.name = "camera_type", .type = CE_CDB_TYPE_STR, .value.str = "perspective"},
+        {.name = "near", .type = CE_CDB_TYPE_FLOAT, .value.f = 0.1f},
+        {.name = "far", .type = CE_CDB_TYPE_FLOAT, .value.f = 1000.0f},
+        {.name = "fov", .type = CE_CDB_TYPE_FLOAT, .value.f = 60.0f},
 };
 
 
@@ -237,9 +237,7 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
                             camera_component_prop,
                             CE_ARRAY_LEN(camera_component_prop));
 
-    ce_cdb_a0->reg_obj_type(CT_ACTIVE_CAMERA_COMPONENT,
-                            active_camera_component_prop,
-                            CE_ARRAY_LEN(active_camera_component_prop));
+    ce_cdb_a0->reg_obj_type(CT_ACTIVE_CAMERA_COMPONENT, NULL, 0);
 }
 
 void CE_MODULE_UNLOAD(camera)(struct ce_api_a0 *api,

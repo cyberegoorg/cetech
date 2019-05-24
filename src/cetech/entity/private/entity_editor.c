@@ -72,10 +72,7 @@ static void draw_menu(uint64_t context_obj) {
 
 static void draw_editor(uint64_t context_obj,
                         uint64_t context) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
-
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = (entity_editor *) context_obj;
 
     if (!editor->world.h) {
         return;
@@ -102,7 +99,7 @@ static void draw_editor(uint64_t context_obj,
 
 }
 
-static struct entity_editor *_new_editor(uint64_t context_obj) {
+static struct entity_editor *_new_editor() {
 
     const uint32_t n = ce_array_size(_G.editors);
     for (uint32_t i = 0; i < n; ++i) {
@@ -118,10 +115,6 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
     uint32_t idx = n;
     ce_array_push(_G.editors, (entity_editor) {}, ce_memory_a0->system);
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), context_obj);
-    ce_cdb_a0->set_uint64(w, _EDITOR_IDX, idx);
-    ce_cdb_a0->write_commit(w);
-
     entity_editor *editor = &_G.editors[idx];
 
     editor->world = ct_ecs_a0->create_world();
@@ -133,28 +126,21 @@ static struct entity_editor *_new_editor(uint64_t context_obj) {
 }
 
 static void close(uint64_t context_obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = (entity_editor*)context_obj;
 
     ct_ecs_a0->destroy(editor->world, &editor->entity, 1);
     editor->free = true;
 }
 
-static void open(uint64_t context_obj,
-                 uint64_t obj) {
-    entity_editor *editor = _new_editor(context_obj);
+static uint64_t open(uint64_t obj) {
+    entity_editor *editor = _new_editor();
     editor->entity = ct_ecs_a0->spawn(editor->world, obj);
+    return (uint64_t) editor;
 }
 
 static void update(uint64_t context_obj,
                    float dt) {
-    ct_controlers_i0 *keyboard;
-    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), context_obj);
-    uint64_t editor_idx = ce_cdb_a0->read_uint64(reader, _EDITOR_IDX, 0);
-    entity_editor *editor = &_G.editors[editor_idx];
+    entity_editor *editor = (entity_editor*)context_obj;
 
     if (!editor->world.h) {
         return;

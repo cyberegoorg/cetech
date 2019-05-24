@@ -35,7 +35,6 @@ static struct _G {
 #define _PROP_DOCK_ID\
     CE_ID64_0("dock_id", 0x4a6df3bdedc53da2ULL)
 
-
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
     ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
 
@@ -62,7 +61,7 @@ uint64_t create_dock(uint64_t type,
         return 0;
     }
 
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), type);
+    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), DOCK_TYPE);
 
     uint64_t flags = 0;
 
@@ -74,6 +73,7 @@ uint64_t create_dock(uint64_t type,
     ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
     ce_cdb_a0->set_uint64(w, PROP_DOCK_flags, (uint64_t) flags);
     ce_cdb_a0->set_uint64(w, _PROP_DOCK_ID, _G.docks_n++);
+    ce_cdb_a0->set_uint64(w, PROP_DOCK_TYPE, type);
     ce_cdb_a0->write_commit(w);
 
     ce_array_push(_G.docks, obj, _G.allocator);
@@ -86,12 +86,13 @@ uint64_t create_dock(uint64_t type,
 }
 
 void close_dock(uint64_t dock) {
-    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
+    const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+    uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
 
     ct_dock_i0 *i = _find_dock_i(type);
 
     if (i && i->close) {
-        i->close(dock);
+        i->close(dock, 0);
     }
 
     uint32_t dock_n = ce_array_size(_G.docks);
@@ -113,7 +114,8 @@ void draw_all() {
         uint64_t dock = _G.docks[i];
         const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
 
-        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
+        uint64_t type = ce_cdb_a0->read_uint64(reader, PROP_DOCK_TYPE, 0);
+
         struct ct_dock_i0 *di = _find_dock_i(type);
 
         if (di) {
@@ -123,8 +125,7 @@ void draw_all() {
                      di->display_title(dock), di->name(dock), id);
 
             uint64_t flags = ce_cdb_a0->read_uint64(reader, PROP_DOCK_flags, 0);
-            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE,
-                                                false);
+            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE,false);
 
             if (ct_debugui_a0->BeginDock(title, &visible, flags)) {
 
@@ -214,8 +215,8 @@ static void draw_menu() {
         if (ct_debugui_a0->BeginMenu("Layout", true)) {
             if (ct_debugui_a0->MenuItem("Save", NULL, false, true)) {
                 struct ce_vio_t0 *f = ce_fs_a0->open(RESOURCE_BROWSER_SOURCE,
-                                                  "core/default.dock_layout",
-                                                  FS_OPEN_WRITE);
+                                                     "core/default.dock_layout",
+                                                     FS_OPEN_WRITE);
                 ct_debugui_a0->SaveDock(f);
                 ce_fs_a0->close(f);
             }
@@ -231,7 +232,9 @@ static void draw_menu() {
         for (int i = 0; i < n; ++i) {
             uint64_t dock = _G.docks[i];
 
-            uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
+            const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+            uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
+
             struct ct_dock_i0 *di = _find_dock_i(type);
 
             const char *name = display_name(di);
@@ -253,7 +256,9 @@ static void draw_menu() {
     for (int i = 0; i < n; ++i) {
         uint64_t dock = _G.docks[i];
 
-        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), dock);
+        const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+        uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
+
         struct ct_dock_i0 *di = _find_dock_i(type);
 
         if (di && di->draw_main_menu) {
@@ -335,6 +340,98 @@ struct ct_dock_a0 dock_a0 = {
 
 struct ct_dock_a0 *ct_dock_a0 = &dock_a0;
 
+static const ce_cdb_prop_def_t0 dock_cdb_type_def[] = {
+        {
+                .name = "visible",
+                .type = CE_CDB_TYPE_BOOL,
+        },
+        {
+                .name = "flags",
+                .type = CE_CDB_TYPE_UINT64,
+        },
+        {
+                .name = "dock_id",
+                .type = CE_CDB_TYPE_UINT64,
+        },
+        {
+                .name = "dock_type",
+                .type = CE_CDB_TYPE_UINT64,
+        },        {
+                .name = "dock_data",
+                .type = CE_CDB_TYPE_PTR,
+        },
+};
+
+static const ce_cdb_prop_def_t0 docks_layout_cdb_type_def[] = {
+        {
+                .name = "docks",
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
+        },
+};
+
+static const ce_cdb_prop_def_t0 dock_layout_cdb_type_def[] = {
+        {
+                .name = "index",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "label",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "location",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "x",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "y",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "size_x",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "size_y",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "status",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "active",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "opened",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "prev",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "next",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "child0",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "child1",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "parent",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+};
+
 void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
                           int reload) {
     CE_UNUSED(reload);
@@ -346,6 +443,9 @@ void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
     };
 
     ce_api_a0->register_api(CT_DOCK_API, ct_dock_a0, sizeof(dock_a0));
+    ce_cdb_a0->reg_obj_type(DOCK_TYPE, CE_ARR_ARG(dock_cdb_type_def));
+    ce_cdb_a0->reg_obj_type(DOCKS_LAYOUT_TYPE, CE_ARR_ARG(docks_layout_cdb_type_def));
+    ce_cdb_a0->reg_obj_type(DOCK_LAYOUT_TYPE, CE_ARR_ARG(dock_layout_cdb_type_def));
 
     create_context("");
 }

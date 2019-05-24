@@ -959,12 +959,14 @@ static void destroy(ct_world_t0 world,
     }
 }
 
-static void online(uint64_t name,
+static void online(ce_cdb_t0 db,
+                   uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 }
 
-static void offline(uint64_t name,
+static void offline(ce_cdb_t0 db,
+                    uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name, obj);
 }
@@ -1077,6 +1079,10 @@ static struct ct_entity_t0 next_sibling(ct_world_t0 world,
 
 static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
                                         uint64_t name) {
+    if (!name) {
+        return (ct_entity_t0) {0};
+    }
+
 //    ce_cdb_a0->log_obj("DDD", ce_cdb_a0->db(), name);
     world_instance_t *w = get_world_instance(world);
 
@@ -1522,16 +1528,16 @@ static ce_cdb_prop_def_t0 entity_prop[] = {
         },
         {
                 .name = "name",
-                .type = CDB_TYPE_STR,
+                .type = CE_CDB_TYPE_STR,
         },
         {
                 .name = "components",
-                .type = CDB_TYPE_SET_SUBOBJECT,
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
                 .obj_type = ENTITY_COMPONENTS,
         },
         {
                 .name = "children",
-                .type = CDB_TYPE_SET_SUBOBJECT,
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
                 .obj_type = ENTITY_CHILDREN,
         },
 };

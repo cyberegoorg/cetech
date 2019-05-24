@@ -203,7 +203,7 @@ static struct ct_component_i0 ct_component_api = {
 static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
         {
                 .name = "material",
-                .type = CDB_TYPE_REF,
+                .type = CE_CDB_TYPE_REF,
                 .obj_type = MATERIAL_TYPE,
         },
 };

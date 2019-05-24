@@ -12,6 +12,7 @@ layers:
 
     render_state:
       cdb_uid: "0x78ccc53d72122491"
+      cdb_type: render_state
       rgb_write: true
       alpha_write: true
       depth_write: true

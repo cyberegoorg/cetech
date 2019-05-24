@@ -14,7 +14,7 @@
 #define CE_ARR_ARG(a) a, CE_ARRAY_LEN(a)
 #define CE_ATTR_FORMAT(fmt, args) __attribute__ ((format(printf, fmt, args)))
 #define CE_STATIC_ASSERT(_condition, ...) _Static_assert(_condition, "" __VA_ARGS__)
-#define CE_ALIGNOF(_type) __alignof(_type)
+
 
 ///
 #if CE_COMPILER_MSVC

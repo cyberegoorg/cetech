@@ -46,7 +46,6 @@ static struct _G {
     module_t modules[MAX_MODULES];
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
-    uint64_t config;
     ce_alloc_t0 *allocator;
 } _G = {};
 
@@ -218,15 +217,12 @@ static void load_dirs(const char *path) {
 
         const uint64_t key_id = ce_id_a0->id64(key);
 
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                      _G.config);
-
-        if (!ce_cdb_a0->prop_exist(reader, key_id)) {
+        if (!ce_config_a0->exist(key_id)) {
             break;
         }
 
 
-        const char *module_file = ce_cdb_a0->read_str(reader, key_id, "");
+        const char *module_file = ce_config_a0->read_str(key_id, "");
         ce_os_path_a0->join(&buffer,
                             _G.allocator,
                             2, path, module_file);
@@ -306,7 +302,6 @@ void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .config = ce_config_a0->obj()
     };
 
     ce_api_a0 = api;

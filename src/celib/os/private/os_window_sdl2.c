@@ -10,6 +10,8 @@
 #include "include/SDL2/SDL_syswm.h"
 #include <celib/os/window.h>
 
+#define LOG_WHERE "os_window_sdl"
+
 //==============================================================================
 // Private
 //==============================================================================
@@ -148,10 +150,12 @@ struct ce_window_t0 *window_new(const char *title,
 
     ce_window_t0 *window = CE_ALLOC(alloc, ce_window_t0, sizeof(ce_window_t0));
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
+    if (CE_PLATFORM_LINUX) {
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+                            SDL_GL_CONTEXT_PROFILE_CORE);
+    }
 
     SDL_Window *w = SDL_CreateWindow(
             title,
@@ -161,7 +165,7 @@ struct ce_window_t0 *window_new(const char *title,
     );
 
     if (w == NULL) {
-        ce_log_a0->error("sys", "Could not create window: %s",
+        ce_log_a0->error(LOG_WHERE, "Could not create window: %s",
                          SDL_GetError());
     }
 
@@ -188,7 +192,7 @@ struct ce_window_t0 *window_new_from(void *hndl,
     SDL_Window *w = SDL_CreateWindowFrom(hndl);
 
     if (w == NULL) {
-        ce_log_a0->error("sys", "Could not create window: %s",
+        ce_log_a0->error(LOG_WHERE, "Could not create window: %s",
                          SDL_GetError());
     }
 

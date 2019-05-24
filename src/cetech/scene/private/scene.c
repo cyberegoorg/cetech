@@ -27,6 +27,7 @@
 #include <celib/macros.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
+#include <celib/log.h>
 
 
 int scenecompiler_init(struct ce_api_a0 *api);
@@ -75,16 +76,15 @@ typedef struct ct_scene_obj_t {
 // Resource
 //==============================================================================
 
-static void online(uint64_t name,
+static void online(ce_cdb_t0 db,
+                   uint64_t name,
                    uint64_t obj) {
     CE_UNUSED(name);
 
     ct_scene_obj_t so = {};
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, &so, sizeof(so));
+    ce_cdb_a0->read_to(db, obj, &so, sizeof(so));
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(db, obj);
     for (uint32_t i = 0; i < so.geom_count; ++i) {
         const bgfx_memory_t *vb_mem;
         vb_mem = ct_gfx_a0->bgfx_make_ref((const void *) &so.vb[so.vb_offset[i]],
@@ -100,24 +100,42 @@ static void online(uint64_t name,
         bgfx_index_buffer_handle_t ib_handle;
         ib_handle = ct_gfx_a0->bgfx_create_index_buffer(ib_mem, BGFX_BUFFER_INDEX32);
 
-        uint64_t geom_obj = ce_cdb_a0->create_object(_G.db, SCENE_GEOM_OBJ_TYPE);
-        ce_cdb_obj_o0 *geom_writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), geom_obj);
+        uint64_t geom_obj = ce_cdb_a0->create_object(db, SCENE_GEOM_OBJ_TYPE);
+        ce_cdb_obj_o0 *geom_writer = ce_cdb_a0->write_begin(db, geom_obj);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_PROP, ib_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_PROP, bv_handle.idx);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_IB_SIZE, so.ib_size[i]);
         ce_cdb_a0->set_uint64(geom_writer, SCENE_VB_SIZE, so.vb_size[i]);
+        ce_cdb_a0->set_uint64(geom_writer, SCENE_GEOM_OBJS_NAME, so.geom_name[i]);
         ce_cdb_a0->write_commit(geom_writer);
 
-        uint64_t geom_objs = ce_cdb_a0->read_subobject(reader, SCENE_GEOM_OBJS, 0);
-        ce_cdb_obj_o0 *geom_objs_w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), geom_objs);
-        ce_cdb_a0->set_ref(geom_objs_w, so.geom_name[i], geom_obj);
-        ce_cdb_a0->write_commit(geom_objs_w);
+        ce_cdb_a0->objset_add_obj(writer, SCENE_GEOM_OBJS, geom_obj);
     }
 
     ce_cdb_a0->write_commit(writer);
+    ce_cdb_a0->log_obj("scene", db, obj);
 }
 
-static void offline(uint64_t name,
+uint64_t get_geom_obj(uint64_t obj,
+                      uint64_t geom_name) {
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    uint64_t n = ce_cdb_a0->read_objset_num(r, SCENE_GEOM_OBJS);
+    uint64_t objs[n];
+    ce_cdb_a0->read_objset(r, SCENE_GEOM_OBJS, objs);
+
+    for (int i = 0; i < n; ++i) {
+        const ce_cdb_obj_o0 *geom_r = ce_cdb_a0->read(ce_cdb_a0->db(), objs[i]);
+        uint64_t geom_key  = ce_cdb_a0->read_uint64(geom_r, SCENE_GEOM_OBJS_NAME, 0);
+
+        if (geom_key == geom_name) {
+            return objs[i];
+        }
+    }
+    return 0;
+}
+
+static void offline(ce_cdb_t0 db,
+                    uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name, obj);
 
@@ -127,9 +145,6 @@ static uint64_t cdb_type() {
     return SCENE_TYPE;
 }
 
-
-bool scene_compiler(ce_cdb_t0 db,
-                    uint64_t k);
 
 static const char *display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
@@ -196,6 +211,10 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
+
+bool scene_compiler(ce_cdb_t0 db,
+                    uint64_t obj);
+
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
@@ -225,8 +244,8 @@ static uint64_t get_mesh_node(uint64_t scene,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     uint64_t *geom_name = (uint64_t *) (ce_cdb_a0->read_blob(reader,
-                                                             SCENE_GEOM_NAME,
-                                                             NULL, NULL));
+                                                             SCENE_GEOM_NAME, NULL, NULL));
+
     uint64_t *geom_node = (uint64_t *) (ce_cdb_a0->read_blob(reader,
                                                              SCENE_NODE_GEOM,
                                                              NULL, NULL));
@@ -267,6 +286,7 @@ static struct ct_scene_a0 scene_api = {
         .get_mesh_node =get_mesh_node,
         .get_all_geometries =get_all_geometries,
         .get_all_nodes = get_all_nodes,
+        .get_geom_obj = get_geom_obj,
 };
 
 struct ct_scene_a0 *ct_scene_a0 = &scene_api;
@@ -279,11 +299,11 @@ static void _init_api(struct ce_api_a0 *api) {
 static const ce_cdb_prop_def_t0 scene_import_prop[] = {
         {
                 .name = "input",
-                .type = CDB_TYPE_STR,
+                .type = CE_CDB_TYPE_STR,
         },
         {
                 .name = "flip_uvs",
-                .type = CDB_TYPE_BOOL,
+                .type = CE_CDB_TYPE_BOOL,
         },
 };
 
@@ -294,107 +314,110 @@ static const ce_cdb_prop_def_t0 scene_prop[] = {
         },
         {
                 .name = "import",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SUBOBJECT,
                 .obj_type = SCENE_IMPORT_TYPE,
         },
         {
                 .name = "geom_objs",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SET_SUBOBJECT,
         },
         {
                 .name = "ib_len",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "vb_len",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
 
         },
         {
                 .name = "geom_count",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "node_count",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
-
         {
                 .name = "ib",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "vb",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "vb_decl",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "geom_name",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "ib_offset",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
 
         },
         {
                 .name = "vb_offset",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "ib_size",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
 
         },
         {
                 .name = "vb_size",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "geom_str",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "node_name",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "node_parent",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "node_pose",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "geom_node",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
         {
                 .name = "node_str",
-                .type = CDB_TYPE_BLOB,
+                .type = CE_CDB_TYPE_BLOB,
         },
 };
 
 static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
         {
                 .name = "ib",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "vb",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "ib_size",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "vb_size",
-                .type = CDB_TYPE_UINT64,
+                .type = CE_CDB_TYPE_UINT64,
+        },
+        {
+                .name = "name",
+                .type = CE_CDB_TYPE_UINT64,
         },
 };
 

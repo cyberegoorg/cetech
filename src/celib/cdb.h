@@ -16,9 +16,6 @@ extern "C" {
 #define CE_CDB_PROP_CHANGE_EVENT \
     CE_ID64_0("change", 0x8694ed4881bfb631ULL)
 
-#define CE_CDB_PROP_REMOVE_EVENT \
-    CE_ID64_0("remove", 0x36f36c7f8cda6d13ULL)
-
 #define CE_CDB_PROP_MOVE_EVENT \
     CE_ID64_0("move", 0x33603ac62788b5c5ULL)
 
@@ -37,21 +34,21 @@ extern "C" {
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
 typedef enum ce_cdb_type_e0 {
-    CDB_TYPE_NONE = 0,
-    CDB_TYPE_UINT64 = 1,
-    CDB_TYPE_PTR = 2,
-    CDB_TYPE_REF = 3,
-    CDB_TYPE_FLOAT = 4,
-    CDB_TYPE_BOOL = 5,
-    CDB_TYPE_STR = 6,
-    CDB_TYPE_SUBOBJECT = 7,
-    CDB_TYPE_BLOB = 8,
-    CDB_TYPE_SET_SUBOBJECT = 9,
+    CE_CDB_TYPE_NONE = 0,
+    CE_CDB_TYPE_UINT64 = 1,
+    CE_CDB_TYPE_PTR = 2,
+    CE_CDB_TYPE_REF = 3,
+    CE_CDB_TYPE_FLOAT = 4,
+    CE_CDB_TYPE_BOOL = 5,
+    CE_CDB_TYPE_STR = 6,
+    CE_CDB_TYPE_SUBOBJECT = 7,
+    CE_CDB_TYPE_BLOB = 8,
+    CE_CDB_TYPE_SET_SUBOBJECT = 9,
 } ce_cdb_type_e0;
 
 typedef enum ce_cdb_prop_flag_e0 {
-    CDB_PROP_FLAG_NONE = 0,
-    CDB_PROP_FLAG_UNPACK = 1 << 0,
+    CE_CDB_PROP_FLAG_NONE = 0,
+    CE_CDB_PROP_FLAG_UNPACK = 1 << 0,
 } ce_cdb_flag_e0;
 
 typedef struct ct_cdb_ev_queue_o0 ct_cdb_ev_queue_o0;
@@ -83,7 +80,7 @@ typedef struct ce_cdb_ev_t0 {
     uint64_t ev_type;
     uint64_t obj;
     uint64_t obj_type;
-}ce_cdb_ev_t0;
+} ce_cdb_ev_t0;
 
 typedef struct ce_cdb_prop_ev_t0 {
     uint64_t ev_type;
@@ -102,7 +99,50 @@ typedef struct ce_cdb_prop_ev_t0 {
     };
 } ce_cdb_prop_ev_t0;
 
-typedef bool (*ct_cdb_obj_loader_t0)(uint64_t uid);
+typedef struct cdb_binobj_header {
+    uint64_t version;
+    uint64_t uid;
+    uint64_t type;
+    uint64_t parent;
+    uint64_t instance_of;
+    uint64_t properties_count;
+    uint64_t string_buffer_size;
+    uint64_t blob_buffer_size;
+    uint64_t set_buffer_size;
+} cdb_binobj_header;
+
+
+typedef enum cnode_e {
+    CNODE_INVALID = 0,
+    CNODE_FLOAT,
+    CNODE_UINT,
+    CNODE_REF,
+    CNODE_STRING,
+    CNODE_BOOL,
+    CNODE_OBJ_BEGIN,
+    CNODE_OBJ_END,
+    CNODE_OBJSET,
+    CNODE_OBJSET_END,
+} cnode_e;
+
+typedef struct cnode_t {
+    cnode_e type;
+
+    uint64_t key;
+    uint32_t parent_idx;
+    union {
+        struct {
+            uint64_t uid;
+            uint64_t type;
+            uint64_t instance_of;
+        } obj;
+
+        ce_cdb_value_u0 value;
+    };
+} cnode_t;
+
+typedef bool (*ct_cdb_obj_loader_t0)(ce_cdb_t0 db,
+                                     uint64_t uid);
 
 typedef struct ce_cdb_prop_def_t0 {
     const char *name;
@@ -138,12 +178,18 @@ struct ce_cdb_a0 {
     uint64_t (*create_object)(ce_cdb_t0 db,
                               uint64_t type);
 
-    void (*create_object_uid)(ce_cdb_t0 db,
-                              uint64_t uid,
-                              uint64_t type);
+    uint64_t (*create_object_uid)(ce_cdb_t0 db,
+                                  uint64_t uid,
+                                  uint64_t type,
+                                  bool init);
 
     uint64_t (*create_from)(ce_cdb_t0 db,
                             uint64_t obj);
+
+    uint64_t (*create_from_uid)(ce_cdb_t0 db,
+                                uint64_t from,
+                                uint64_t uid);
+
 
     void (*set_instance_of)(ce_cdb_t0 db,
                             uint64_t from,
@@ -164,10 +210,6 @@ struct ce_cdb_a0 {
     void (*move_obj)(ce_cdb_t0 db,
                      uint64_t from_obj,
                      uint64_t to);
-
-    void (*move_prop)(ce_cdb_obj_o0 *from_w,
-                      ce_cdb_obj_o0 *to_w,
-                      uint64_t prop);
 
     void (*move_objset_obj)(ce_cdb_obj_o0 *from_w,
                             ce_cdb_obj_o0 *to_w,
@@ -267,10 +309,6 @@ struct ce_cdb_a0 {
                           uint64_t property,
                           uint64_t subobject);
 
-    void (*set_subobjectw)(ce_cdb_obj_o0 *writer,
-                           uint64_t property,
-                           ce_cdb_obj_o0 *sub_writer);
-
     void (*objset_add_obj)(ce_cdb_obj_o0 *writer,
                            uint64_t property,
                            uint64_t obj);
@@ -278,9 +316,6 @@ struct ce_cdb_a0 {
     void (*objset_remove_obj)(ce_cdb_obj_o0 *writer,
                               uint64_t property,
                               uint64_t obj);
-
-    void (*remove_property)(ce_cdb_obj_o0 *writer,
-                            uint64_t property);
 
     ct_cdb_ev_queue_o0 *(*new_changed_obj_listener)(ce_cdb_t0 db);
 
@@ -290,9 +325,10 @@ struct ce_cdb_a0 {
     ct_cdb_ev_queue_o0 *(*new_objs_listener)(ce_cdb_t0 db);
 
     bool (*pop_objs_events)(ct_cdb_ev_queue_o0 *q,
-                           ce_cdb_prop_ev_t0 *ev);
+                            ce_cdb_prop_ev_t0 *ev);
 
-    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db, uint64_t obj);
+    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db,
+                                            uint64_t obj);
 
     bool (*pop_obj_events)(ct_cdb_ev_queue_o0 *q,
                            ce_cdb_prop_ev_t0 *ev);
@@ -306,12 +342,6 @@ struct ce_cdb_a0 {
                         uint64_t object,
                         void *to,
                         size_t max_size);
-
-    uint64_t (*read_prop_to)(ce_cdb_t0 db,
-                             uint64_t object,
-                             uint64_t prop,
-                             void *to,
-                             size_t max_size);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
 

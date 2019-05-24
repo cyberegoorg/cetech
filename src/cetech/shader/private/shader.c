@@ -135,12 +135,10 @@ static bool _compile(ce_cdb_t0 db,
 
     ce_alloc_t0 *a = ce_memory_a0->system;
 
-    const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                    ce_config_a0->obj());
-    const char *source_dir = ce_cdb_a0->read_str(c_reader,
-                                                 CONFIG_SRC, "");
-    const char *core_dir = ce_cdb_a0->read_str(c_reader, CONFIG_CORE,
-                                               "");
+
+    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
+
+    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE,"");
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
 
@@ -152,8 +150,7 @@ static bool _compile(ce_cdb_t0 db,
     char tmp_filename[1024] = {};
 
 
-    const char *platform;
-    platform = ce_cdb_a0->read_str(c_reader, CONFIG_PLATFORM, "");
+    const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
 
     char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
 
@@ -239,10 +236,11 @@ bool shader_compiler(ce_cdb_t0 db,
 }
 
 
-static void online(uint64_t name,
+static void online(ce_cdb_t0 db,
+                   uint64_t name,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t fs_blob_size = 0;
     void *fs_blob;
@@ -263,16 +261,16 @@ static void online(uint64_t name,
     bgfx_program_handle_t program;
     program = ct_gfx_a0->bgfx_create_program(vs_shader, fs_shader, true);
 
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_uint64(writer, SHADER_PROP, program.idx);
     ce_cdb_a0->write_commit(writer);
 }
 
-static void offline(uint64_t name,
+static void offline(ce_cdb_t0 db, uint64_t name,
                     uint64_t obj) {
     CE_UNUSED(name);
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     const uint64_t program = ce_cdb_a0->read_uint64(reader, SHADER_PROP, 0);
     ct_gfx_a0->bgfx_destroy_program(
@@ -313,6 +311,28 @@ static struct ct_shader_a0 shader_api = {
 
 struct ct_shader_a0 *ct_shader_a0 = &shader_api;
 
+static const ce_cdb_prop_def_t0 shader_type_def[] = {
+        {
+                .name = "vs_input",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "fs_input",
+                .type = CE_CDB_TYPE_STR,
+        },
+        {
+                .name = "vs_data",
+                .type = CE_CDB_TYPE_BLOB,
+        },
+        {
+                .name = "fs_data",
+                .type = CE_CDB_TYPE_BLOB,
+        },
+        {
+                .name = "shader",
+                .type = CE_CDB_TYPE_UINT64,
+        },
+};
 
 void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
                             int reload) {

@@ -31,9 +31,6 @@
 
 #define _G AssetPreviewGlobals
 
-#define PREVIEW_PTR \
-    CE_ID64_0("preview_ptr", 0x1e2c71526a2e8a11ULL)
-
 typedef struct preview_instance {
     ct_world_t0 world;
     ct_entity_t0 camera_ent;
@@ -146,7 +143,7 @@ static void set_asset(preview_instance *pi,
 static void draw_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     preview_instance *pi = ce_cdb_a0->read_ptr(reader,
-                                               PREVIEW_PTR, NULL);
+                                               PROP_DOCK_DATA, NULL);
 
     ct_dock_a0->context_btn(dock);
     ct_debugui_a0->SameLine(0, -1);
@@ -197,7 +194,7 @@ static void draw_dock(uint64_t dock) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    preview_instance *pi = ce_cdb_a0->read_ptr(reader, PREVIEW_PTR, NULL);
+    preview_instance *pi = ce_cdb_a0->read_ptr(reader, PROP_DOCK_DATA, NULL);
 
     if (!pi) {
         return;
@@ -273,7 +270,7 @@ static uint64_t cdb_type() {
     return RESOURCE_PREVIEW_I;
 };
 
-static void open(uint64_t dock) {
+static uint64_t open(uint64_t dock) {
     preview_instance *pi = _new_preview();
 
     pi->world = ct_ecs_a0->create_world();
@@ -281,8 +278,10 @@ static void open(uint64_t dock) {
     pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-    ce_cdb_a0->set_ptr(w, PREVIEW_PTR, pi);
+    ce_cdb_a0->set_ptr(w, PROP_DOCK_DATA, pi);
     ce_cdb_a0->write_commit(w);
+
+    return (uint64_t) pi;
 }
 
 static struct ct_dock_i0 dock_api = {

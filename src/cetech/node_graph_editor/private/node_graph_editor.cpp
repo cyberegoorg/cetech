@@ -41,8 +41,8 @@ static void close(uint64_t context_obj) {
 
 }
 
-static void open(uint64_t context_obj,  uint64_t obj) {
-
+static uint64_t open(uint64_t obj) {
+    return 0;
 }
 
 static void update(uint64_t context_obj,

@@ -9,6 +9,7 @@ layers:
     cdb_instance: 0x9b2e443e0dddcdd9
     shader: 0x4ecb3362fa2b018c
     render_state:
+      cdb_type: render_state
       cdb_uid: 0x16810eb6a8b001a0
       cdb_instance: 0x78ccc53d72122491
     variables:

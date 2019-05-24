@@ -79,7 +79,7 @@ static bool prop_revert_btn(uint64_t _obj,
             enum ce_cdb_type_e0 ptype = ce_cdb_a0->prop_type(ir, prop);
 
             switch (ptype) {
-                case CDB_TYPE_UINT64: {
+                case CE_CDB_TYPE_UINT64: {
                     uint64_t u = ce_cdb_a0->read_uint64(ir,
                                                         prop,
                                                         0);
@@ -90,7 +90,7 @@ static bool prop_revert_btn(uint64_t _obj,
                 }
                     break;
 
-                case CDB_TYPE_REF: {
+                case CE_CDB_TYPE_REF: {
                     uint64_t ref = ce_cdb_a0->read_ref(ir, prop, 0);
                     if (!ref) {
                         break;
@@ -110,7 +110,7 @@ static bool prop_revert_btn(uint64_t _obj,
                 }
                     break;
 
-                case CDB_TYPE_FLOAT: {
+                case CE_CDB_TYPE_FLOAT: {
                     float f = ce_cdb_a0->read_float(ir,
                                                     prop,
                                                     0);
@@ -121,7 +121,7 @@ static bool prop_revert_btn(uint64_t _obj,
                 }
                     break;
 
-                case CDB_TYPE_STR: {
+                case CE_CDB_TYPE_STR: {
                     const char *str = ce_cdb_a0->read_str(ir,
                                                           prop,
                                                           NULL);
@@ -337,8 +337,7 @@ static void ui_filename(uint64_t obj,
 
     const char *str = NULL;
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
-        const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(), ce_config_a0->obj());
-        const char *source_dir = ce_cdb_a0->read_str(c_reader, CONFIG_SRC, "");
+        const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
         nfdchar_t *outPath = NULL;
         nfdresult_t result = NFD_OpenDialog(filter, source_dir, &outPath);
@@ -794,7 +793,7 @@ static uint64_t lock_selected_obj(uint64_t dock,
             ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, selected_obj);
             locked_object = selected_obj;
         } else {
-            ce_cdb_a0->remove_property(w, CT_LOCKED_OBJ);
+//            ce_cdb_a0->remove_property(w, CT_LOCKED_OBJ);
         }
         ce_cdb_a0->write_commit(w);
     }

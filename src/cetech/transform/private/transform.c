@@ -316,45 +316,45 @@ static struct ct_simulation_i0 transform_simulation_i0 = {
 static const ce_cdb_prop_def_t0 transform_component_prop[] = {
         {
                 .name = "position",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SUBOBJECT,
                 .obj_type = PROP_POSITION,
-                .flags = CDB_PROP_FLAG_UNPACK,
+                .flags = CE_CDB_PROP_FLAG_UNPACK,
         },
         {
                 .name = "rotation",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SUBOBJECT,
                 .obj_type = PROP_ROTATION,
-                .flags = CDB_PROP_FLAG_UNPACK,
+                .flags = CE_CDB_PROP_FLAG_UNPACK,
         },
         {
                 .name = "scale",
-                .type = CDB_TYPE_SUBOBJECT,
+                .type = CE_CDB_TYPE_SUBOBJECT,
                 .obj_type = PROP_SCALE,
-                .flags = CDB_PROP_FLAG_UNPACK,
+                .flags = CE_CDB_PROP_FLAG_UNPACK,
         },
 };
 
 static const ce_cdb_prop_def_t0 position_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT},
-        {.name = "y", .type = CDB_TYPE_FLOAT},
-        {.name = "z", .type = CDB_TYPE_FLOAT},
+        {.name = "x", .type = CE_CDB_TYPE_FLOAT},
+        {.name = "y", .type = CE_CDB_TYPE_FLOAT},
+        {.name = "z", .type = CE_CDB_TYPE_FLOAT},
 };
 
 static const ce_cdb_prop_def_t0 rotation_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT},
-        {.name = "y", .type = CDB_TYPE_FLOAT},
-        {.name = "z", .type = CDB_TYPE_FLOAT},
+        {.name = "x", .type = CE_CDB_TYPE_FLOAT},
+        {.name = "y", .type = CE_CDB_TYPE_FLOAT},
+        {.name = "z", .type = CE_CDB_TYPE_FLOAT},
 };
 
 static const ce_cdb_prop_def_t0 scale_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-        {.name = "y", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
-        {.name = "z", .type = CDB_TYPE_FLOAT, .value.f = 1.0f},
+        {.name = "x", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
+        {.name = "y", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
+        {.name = "z", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
 };
 
 static const ce_cdb_prop_def_t0 vec2_prop[] = {
-        {.name = "x", .type = CDB_TYPE_FLOAT},
-        {.name = "y", .type = CDB_TYPE_FLOAT},
+        {.name = "x", .type = CE_CDB_TYPE_FLOAT},
+        {.name = "y", .type = CE_CDB_TYPE_FLOAT},
 };
 
 
@@ -398,7 +398,6 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);

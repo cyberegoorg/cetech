@@ -61,3 +61,16 @@ static struct ct_component_i0 player_input_component_i = {
         .on_spawn = _player_input_on_spawn,
         .on_change = _player_input_on_spawn,
 };
+
+static const ce_cdb_prop_def_t0 player_input_component_prop[] = {
+        {
+                .name = "move",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "shoot_dir",
+                .type = CE_CDB_TYPE_SUBOBJECT,
+                .obj_type = VEC2_CDB_TYPE,
+                .flags = CE_CDB_PROP_FLAG_UNPACK,
+        },
+};

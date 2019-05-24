@@ -70,8 +70,9 @@ typedef struct ct_texture_obj_t {
 // Resource
 //==============================================================================
 
-void texture_online(uint64_t obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+void texture_online(ce_cdb_t0 db,
+                    uint64_t obj) {
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t blob_size = 0;
     void *blob;
@@ -84,15 +85,15 @@ void texture_online(uint64_t obj) {
                                              BGFX_TEXTURE_NONE,
                                              0, NULL);
 
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ce_cdb_a0->write_commit(writer);
 
     ce_hash_add(&_G.online_texture, obj, obj, _G.allocator);
 }
 
-void texture_offline(uint64_t obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+void texture_offline(ce_cdb_t0 db,uint64_t obj) {
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     const uint64_t texture = ce_cdb_a0->read_uint64(reader,
                                                     TEXTURE_HANDLER_PROP,
@@ -103,14 +104,16 @@ void texture_offline(uint64_t obj) {
     ce_hash_remove(&_G.online_texture, obj);
 }
 
-void _texture_resource_online(uint64_t name,
+void _texture_resource_online(ce_cdb_t0 db,
+                              uint64_t name,
                               uint64_t obj) {
-    texture_online(obj);
+    texture_online(db, obj);
 }
 
-void _texture_resource_offline(uint64_t name,
+void _texture_resource_offline(ce_cdb_t0 db,
+                               uint64_t name,
                                uint64_t obj) {
-    texture_offline(obj);
+    texture_offline(db, obj);
 }
 
 static int _texturec(const char *input,
@@ -170,8 +173,6 @@ static int _gen_tmp_name(char *tmp_filename,
 static bool _compile(ce_cdb_t0 db,
                      uint64_t obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
-    const ce_cdb_obj_o0 *c_reader = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                    ce_config_a0->obj());
 
     const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
@@ -180,22 +181,18 @@ static bool _compile(ce_cdb_t0 db,
 
     ce_alloc_t0 *a = ce_memory_a0->system;
 
-    const char *platform = ce_cdb_a0->read_str(c_reader,
-                                               CONFIG_PLATFORM,
-                                               "");
+    const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
 
     char output_path[1024] = {};
     char tmp_filename[1024] = {};
 
-    const char *source_dir = ce_cdb_a0->read_str(c_reader,
-                                                 CONFIG_SRC, "");
+    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
     char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, input);
 
-    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename),
-                  input);
+    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename), input);
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
     if (result != 0) {
@@ -368,9 +365,9 @@ static void _update(float dt) {
     uint32_t n = ce_array_size(to_compile_obj);
     for (int i = 0; i < n; ++i) {
         uint64_t obj = to_compile_obj[i];
-        texture_offline(obj);
+        texture_offline(ce_cdb_a0->db(), obj);
         _compile(ce_cdb_a0->db(), obj);
-        texture_online(obj);
+        texture_online(ce_cdb_a0->db(),obj);
     }
 
     ce_hash_free(&obj_set, _G.allocator);
@@ -385,12 +382,11 @@ static struct ct_kernel_task_i0 texture_task = {
 
 
 static const ce_cdb_prop_def_t0 texture_prop[] = {
-        {.name = "asset_name", .type = CDB_TYPE_STR},
-        {.name = "input", .type = CDB_TYPE_STR},
-        {.name = "gen_mipmaps", .type = CDB_TYPE_BOOL},
-        {.name = "is_normalmap", .type = CDB_TYPE_BOOL},
-        {.name = "texture_data", .type = CDB_TYPE_BLOB},
-        {.name = "texture_handler", .type = CDB_TYPE_UINT64},
+        {.name = "input", .type = CE_CDB_TYPE_STR},
+        {.name = "gen_mipmaps", .type = CE_CDB_TYPE_BOOL},
+        {.name = "is_normalmap", .type = CE_CDB_TYPE_BOOL},
+        {.name = "texture_data", .type = CE_CDB_TYPE_BLOB},
+        {.name = "texture_handler", .type = CE_CDB_TYPE_UINT64},
 };
 
 void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,

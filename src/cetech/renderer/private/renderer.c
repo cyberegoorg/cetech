@@ -69,7 +69,6 @@ static struct _G {
     bool capture;
     bool vsync;
     bool need_reset;
-    uint64_t config;
     ce_alloc_t0 *allocator;
     ct_machine_ev_queue_o0 *ev_queue;
 } _G = {};
@@ -100,23 +99,20 @@ static void _render_init_task(void *data) {
 }
 
 static void renderer_create() {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-    if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
+    if (true) {
         uint32_t w, h;
-        w = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_X, 0);
-        h = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_Y, 0);
+        w = ce_config_a0->read_uint(CONFIG_SCREEN_X, 0);
+        h = ce_config_a0->read_uint(CONFIG_SCREEN_Y, 0);
         _G.size_width = w;
         _G.size_height = h;
 
-        intptr_t wid = ce_cdb_a0->read_uint64(reader, CONFIG_WID, 0);
+        intptr_t wid = ce_config_a0->read_uint(CONFIG_WID, 0);
 
         char title[128] = {};
         snprintf(title, CE_ARRAY_LEN(title), "cetech");
 
         if (wid == 0) {
-            bool fullscreen = ce_cdb_a0->read_uint64(reader,
-                                                     CONFIG_SCREEN_FULLSCREEN,
-                                                     0) > 0;
+            bool fullscreen = ce_config_a0->read_uint(CONFIG_SCREEN_FULLSCREEN, 0) > 0;
 
             uint32_t flags = WINDOW_NOFLAG;
 
@@ -153,9 +149,7 @@ static void renderer_create() {
     bgfx_init_t init;
     bgfx_init_ctor(&init);
 
-    const char *rtype = ce_cdb_a0->read_str(reader,
-                                            CONFIG_RENDERER_TYPE, "");
-
+    const char *rtype = ce_config_a0->read_str(CONFIG_RENDERER_TYPE, "");
 
     bool invalid = true;
 
@@ -434,41 +428,34 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .config = ce_config_a0->obj(),
             .ev_queue = ct_machine_a0->new_ev_listener(),
     };
 
-    ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), _G.config);
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_X)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_X, 1024);
+    if (!ce_config_a0->exist(CONFIG_SCREEN_X)) {
+        ce_config_a0->set_uint(CONFIG_SCREEN_X, 1024);
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_Y)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_Y, 768);
+    if (!ce_config_a0->exist(CONFIG_SCREEN_Y)) {
+        ce_config_a0->set_uint(CONFIG_SCREEN_Y, 768);
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_SCREEN_FULLSCREEN)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_SCREEN_FULLSCREEN, 0);
+    if (!ce_config_a0->exist(CONFIG_SCREEN_FULLSCREEN)) {
+        ce_config_a0->set_uint(CONFIG_SCREEN_FULLSCREEN, 0);
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_DAEMON)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_DAEMON, 0);
+    if (!ce_config_a0->exist(CONFIG_WID)) {
+        ce_config_a0->set_uint(CONFIG_WID, 0);
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_WID)) {
-        ce_cdb_a0->set_uint64(writer, CONFIG_WID, 0);
+    if (!ce_config_a0->exist(CONFIG_RENDERER_TYPE)) {
+        ce_config_a0->set_str(CONFIG_RENDERER_TYPE, "");
     }
 
-    if (!ce_cdb_a0->prop_exist(writer, CONFIG_RENDERER_TYPE)) {
-        ce_cdb_a0->set_str(writer, CONFIG_RENDERER_TYPE, "");
-    }
+    _G.vsync = ce_config_a0->read_uint(CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    ce_cdb_a0->write_commit(writer);
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-
-    _G.vsync = ce_cdb_a0->read_uint64(reader, CONFIG_SCREEN_VSYNC, 1) > 0;
+    api->add_impl(CT_ECS_COMPONENT_I, &viewport_component_i, sizeof(viewport_component_i));
+    ce_cdb_a0->reg_obj_type(VIEWPORT_COMPONENT, NULL, 0);
 
     renderer_create();
 
@@ -480,13 +467,8 @@ void CE_MODULE_UNLOAD(renderer)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), _G.config);
-    if (!ce_cdb_a0->read_uint64(reader, CONFIG_DAEMON, 0)) {
-
-        ce_array_free(_G.on_render, _G.allocator);
-
-        bgfx_shutdown();
-    }
+    ce_array_free(_G.on_render, _G.allocator);
+    bgfx_shutdown();
 
     _G = (struct _G) {};
 }

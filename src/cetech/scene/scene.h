@@ -28,6 +28,8 @@ extern "C" {
 #define SCENE_FLIP_UVS_PROP   \
     CE_ID64_0("flip_uvs", 0x591a21c3bb317303ULL)
 
+#define SCENE_GEOM_OBJS_NAME \
+    CE_ID64_0("name", 0xd4c943cba60c270bULL)
 
 #define SCENE_IB_PROP   \
     CE_ID64_0("ib", 0xecb387261d2c25a3ULL)
@@ -92,10 +94,11 @@ typedef struct ct_scene_geom_obj_t0 {
     uint64_t vb;
     uint64_t ib_size;
     uint64_t vb_size;
+    uint64_t geom_name;
 } ct_scene_geom_obj_t0;
 
 typedef struct ct_scene_import_obj_t0 {
-    const char* input;
+    const char *input;
     bool flip_uvs;
 }ct_scene_import_obj_t0;
 
@@ -115,6 +118,9 @@ struct ct_scene_a0 {
     void (*get_all_nodes)(uint64_t scene,
                           char **geometries,
                           uint32_t *count);
+
+    uint64_t (*get_geom_obj)(uint64_t obj,
+                             uint64_t geom_name);
 };
 
 CE_MODULE(ct_scene_a0);

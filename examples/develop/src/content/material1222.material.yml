@@ -9,6 +9,7 @@ layers:
     cdb_instance: 0x9b2e443e0dddcdd9
     render_state:
       cdb_uid: 0x15f21001d4
+      cdb_type: render_state
       cdb_instance: 0x78ccc53d72122491
     variables:
       cdb_type: cdb_objset

@@ -156,8 +156,6 @@ extern "C" bool scene_compiler(ce_cdb_t0 db,
 
     _destroy_compile_output(output);
     return compilation_success;
-
-    return true;
 }
 
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {

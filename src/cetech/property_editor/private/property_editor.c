@@ -51,26 +51,26 @@ static void _generic_prop_draw(uint64_t obj,
         uint64_t prop_name = ce_id_a0->id64(def->name);
 
         switch (type) {
-            case CDB_TYPE_REF:
+            case CE_CDB_TYPE_REF:
                 ct_editor_ui_a0->prop_resource(obj, def->name, prop_name,
                                                def->obj_type, context, obj);
                 break;
-            case CDB_TYPE_FLOAT:
+            case CE_CDB_TYPE_FLOAT:
                 ct_editor_ui_a0->prop_float(obj, def->name, prop_name, (ui_float_p0) {});
                 break;
             case CDB_TYPE_BOOL:
                 ct_editor_ui_a0->prop_bool(obj, def->name, prop_name);
                 break;
-            case CDB_TYPE_STR:
+            case CE_CDB_TYPE_STR:
                 ct_editor_ui_a0->prop_str(obj, def->name, prop_name, obj);
                 break;
-            case CDB_TYPE_SUBOBJECT: {
+            case CE_CDB_TYPE_SUBOBJECT: {
                 const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
                 uint64_t subobj = ce_cdb_a0->read_subobject(r, prop_name, 0);
                 draw(subobj, context);
                 break;
             }
-            case CDB_TYPE_SET_SUBOBJECT: {
+            case CE_CDB_TYPE_SET_SUBOBJECT: {
                 bool open = ct_debugui_a0->TreeNodeEx(def->name,
                                                       DebugUITreeNodeFlags_DefaultOpen);
                 if (open) {

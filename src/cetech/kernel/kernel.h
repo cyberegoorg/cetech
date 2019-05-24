@@ -14,26 +14,11 @@ extern "C" {
 #define CONFIG_NATIVE_PLATFORM \
      CE_ID64_0("kernel.native_platform", 0xede1e0cf393fc17eULL)
 
-#define CONFIG_COMPILE \
-     CE_ID64_0("compile", 0x3c797c340e1e5467ULL)
-
-#define CONFIG_BOOT_PKG \
-     CE_ID64_0("core.boot_pkg", 0xd065c28a0c45037eULL)
-
 #define CONFIG_BOOT_ENT \
      CE_ID64_0("core.boot_ent", 0x111eabf289640feeULL)
 
-#define CONFIG_CONTINUE \
-     CE_ID64_0("continue", 0xb3326d55cc9374b8ULL)
-
-#define CONFIG_WAIT \
-     CE_ID64_0("wait", 0x21778fd44dd2ab6aULL)
-
 #define CONFIG_GAME \
      CE_ID64_0("game", 0x8a426cdbe2604989ULL)
-
-#define CONFIG_DAEMON \
-     CE_ID64_0("daemon", 0xc3b953e09c1d1f60ULL)
 
 #define SOURCE_ROOT \
     CE_ID64_0("source", 0x921f1370045bad6eULL)
