@@ -103,7 +103,7 @@ static const uint64_t *rotation_before(uint32_t *n) {
     return _before;
 }
 
-static struct ct_simulation_i0 rotation_simulation_i0 = {
+static struct ct_system_i0 rotation_system_i0 = {
         .simulation = rotation_system,
         .name = rotation_name,
         .before = rotation_before,

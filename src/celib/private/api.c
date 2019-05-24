@@ -70,6 +70,9 @@ static void api_register_api(uint64_t name_id,
         ce_array_push(_G.impl_list, (impl_list) {},
                       _G.allocator);
         ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
+    } else {
+        //void *a = _G.impl_list[idx].api[0];
+        //CE_ASSERT(LOG_WHERE, ((char *) a)[0] == 0);
     }
 
     void **apis = _G.impl_list[idx].api;
@@ -84,7 +87,56 @@ static void api_register_api(uint64_t name_id,
         }
     }
 
-    if(!block){
+    if (!block) {
+        block = _add_block();
+        ce_array_push(_G.impl_list[idx].api, block, _G.allocator);
+    }
+
+    if (api) {
+        memcpy(block, api, size);
+    }
+
+
+    uint64_t on_add_idx = ce_hash_lookup(&_G.api_on_add_map, name_id,
+                                         UINT64_MAX);
+
+    if (UINT64_MAX != on_add_idx) {
+        ce_api_on_add_t0 **on_add = _G.on_add[on_add_idx];
+        const uint32_t on_add_n = ce_array_size(on_add);
+        for (int i = 0; i < on_add_n; ++i) {
+            on_add[i](name_id, block);
+        }
+    }
+}
+
+static void api_add_impl(uint64_t name_id,
+                         void *api,
+                         uint32_t size) {
+    uint64_t idx = ce_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
+
+    void *block = NULL;
+    // create entry for api
+    if (idx == UINT64_MAX) {
+        idx = ce_array_size(_G.impl_list);
+
+        ce_array_push(_G.impl_list, (impl_list) {},
+                      _G.allocator);
+        ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
+    }
+
+    void **apis = _G.impl_list[idx].api;
+    uint32_t api_n = ce_array_size(apis);
+
+    if (api_n == 1) {
+        void *a = _G.impl_list[idx].api[0];
+        uint64_t *au = a;
+
+        if (!(*au)) {
+            block = a;
+        }
+    }
+
+    if (!block) {
         block = _add_block();
         ce_array_push(_G.impl_list[idx].api, block, _G.allocator);
     }
@@ -158,6 +210,7 @@ void register_on_add(uint64_t name,
 
 static struct ce_api_a0 a0 = {
         .register_api = api_register_api,
+        .add_impl = api_add_impl,
         .first = api_first,
         .next = api_next,
         .exist = api_exist,
@@ -166,14 +219,12 @@ static struct ce_api_a0 a0 = {
 
 struct ce_api_a0 *ce_api_a0 = &a0;
 
-static void *virt_alloc(uint64_t size) {
-    return CE_REALLOC(ce_memory_a0->virt_system, void, NULL, size, 0);
-}
 
 void api_init(ce_alloc_t0 *allocator) {
     _G = (struct _G) {
             .allocator = allocator,
-            .api_blocks = virt_alloc(sizeof(api_block_t) * 256),
+            .api_blocks = CE_ALLOC(ce_memory_a0->virt_system,
+                                   api_block_t, sizeof(api_block_t) * 256),
 
     };
 

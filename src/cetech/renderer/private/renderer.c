@@ -212,9 +212,9 @@ static void renderer_get_size(uint32_t *width,
 
 static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module_t0 *module) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
     while (it.api) {
-        struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
+        struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
 
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
@@ -229,9 +229,9 @@ static void _feed_module(ct_world_t0 world,
 
 void _render_components(ct_world_t0 world,
                         struct ct_rg_builder_t0 *builder) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
     while (it.api) {
-        struct ct_component_i0 *i = (ct_component_i0 *) (it.api);
+        struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
 
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
@@ -421,8 +421,8 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
 
     api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
     api->register_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
-    api->register_api(KERNEL_TASK_INTERFACE, &render_begin_task, sizeof(render_begin_task));
+    api->add_impl(CT_KERNEL_TASK_I, &render_task, sizeof(render_task));
+    api->add_impl(CT_KERNEL_TASK_I, &render_begin_task, sizeof(render_begin_task));
 
     ce_api_a0 = api;
 

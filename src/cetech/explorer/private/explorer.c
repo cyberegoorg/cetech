@@ -40,7 +40,7 @@ static struct _G {
 } _G;
 
 static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(EXPLORER_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_EXPLORER_I);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
@@ -150,7 +150,7 @@ static const char *name(uint64_t dock) {
 
 
 static uint64_t cdb_type() {
-    return EXPLORER_INTERFACE;
+    return CT_EXPLORER_I;
 };
 
 static uint64_t dock_flags() {
@@ -180,9 +180,9 @@ void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
             .visible = true
     };
 
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
 
-    ct_dock_a0->create_dock(EXPLORER_INTERFACE, true);
+    ct_dock_a0->create_dock(CT_EXPLORER_I, true);
 }
 
 void CE_MODULE_UNLOAD(level_inspector)(struct ce_api_a0 *api,

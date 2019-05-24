@@ -85,7 +85,7 @@ static const char *name(uint64_t dock) {
 
 
 static uint64_t cdb_type() {
-    return GAME_INTERFACE;
+    return CT_GAME_I;
 };
 
 
@@ -110,9 +110,9 @@ void CE_MODULE_LOAD(game_view)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_id_a0);
 
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
 
-    ct_dock_a0->create_dock(GAME_INTERFACE, true);
+    ct_dock_a0->create_dock(CT_GAME_I, true);
 }
 
 void CE_MODULE_UNLOAD(game_view)(struct ce_api_a0 *api,

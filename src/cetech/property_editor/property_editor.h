@@ -12,7 +12,7 @@ extern "C" {
     CE_ID64_0("ct_property_editor_a0", 0x10996d5471937b8aULL)
 
 
-#define CT_PROPERTY_EDITOR_INTERFACE \
+#define CT_PROPERTY_EDITOR_I \
     CE_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)
 
 typedef struct ct_resource_id_t0 ct_resource_id_t0;

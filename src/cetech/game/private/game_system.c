@@ -76,7 +76,7 @@ static void game_step(uint64_t name,
 
     game_i->update(dt);
 
-    ct_ecs_a0->simulate(_G.game_state.world, dt);
+    ct_ecs_a0->step(_G.game_state.world, dt);
 
     ct_transform_comp *t = ct_ecs_a0->get_one(_G.game_state.world, TRANSFORM_COMPONENT,
                                               _G.game_state.camera_ent);
@@ -187,9 +187,9 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
     };
 
     api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &game_task, sizeof(game_task));
+    api->add_impl(CT_KERNEL_TASK_I, &game_task, sizeof(game_task));
 
-    ce_api_a0->register_on_add(GAME_INTERFACE, _game_api_add);
+    ce_api_a0->register_on_add(CT_GAME_I, _game_api_add);
 
     CE_UNUSED(api);
 }

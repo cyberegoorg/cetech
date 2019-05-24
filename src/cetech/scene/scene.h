@@ -88,7 +88,6 @@ extern "C" {
 #define SCENE_NODE_STR \
     CE_ID64_0("node_str", 0x8449734a8dc39415ULL)
 
-
 typedef struct ct_scene_geom_obj_t0 {
     uint64_t ib;
     uint64_t vb;
@@ -100,7 +99,7 @@ typedef struct ct_scene_geom_obj_t0 {
 typedef struct ct_scene_import_obj_t0 {
     const char *input;
     bool flip_uvs;
-}ct_scene_import_obj_t0;
+} ct_scene_import_obj_t0;
 
 //==============================================================================
 // Api

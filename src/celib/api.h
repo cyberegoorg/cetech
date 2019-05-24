@@ -31,11 +31,17 @@ typedef struct ce_api_entry_t0 {
 } ce_api_entry_t0;
 
 
-typedef void (ce_api_on_add_t0)(uint64_t name, void* api);
+typedef void (ce_api_on_add_t0)(uint64_t name,
+                                void *api);
 
 struct ce_api_a0 {
     void (*register_api)(uint64_t name_id,
-                         void *api, uint32_t size);
+                         void *api,
+                         uint32_t size);
+
+    void (*add_impl)(uint64_t name_id,
+                     void *api,
+                     uint32_t size);
 
     int (*exist)(const char *name);
 
@@ -43,7 +49,8 @@ struct ce_api_a0 {
 
     ce_api_entry_t0 (*next)(ce_api_entry_t0 entry);
 
-    void (*register_on_add)(uint64_t name, ce_api_on_add_t0 *on_add);
+    void (*register_on_add)(uint64_t name,
+                            ce_api_on_add_t0 *on_add);
 };
 
 

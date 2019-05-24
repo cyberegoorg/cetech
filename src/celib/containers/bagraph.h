@@ -92,7 +92,7 @@ static inline void ce_bag_clean(ce_ba_graph_t *sg) {
 
 static inline void ce_bag_build(ce_ba_graph_t *sg,
                                 ce_alloc_t0 *alloc) {
-    uint64_t *input_simulations = NULL;
+    uint64_t *input_systems = NULL;
 
     uint64_t name_n = ce_array_size(sg->name);
     for (int j = 0; j < name_n; ++j) {
@@ -101,12 +101,12 @@ static inline void ce_bag_build(ce_ba_graph_t *sg,
             continue;
         }
 
-        ce_array_push(input_simulations, sg->name[j], alloc);
+        ce_array_push(input_systems, sg->name[j], alloc);
     }
 
-    while (ce_array_size(input_simulations)) {
-        uint64_t item_name = ce_array_back(input_simulations);
-        ce_array_pop_back(input_simulations);
+    while (ce_array_size(input_systems)) {
+        uint64_t item_name = ce_array_back(input_systems);
+        ce_array_pop_back(input_systems);
 
         ce_array_insert(sg->output, 0, item_name, alloc);
 
@@ -128,7 +128,7 @@ static inline void ce_bag_build(ce_ba_graph_t *sg,
             uint64_t before_n = ce_array_size(before);
 
             if (!before_n) {
-                ce_array_push(input_simulations, after_name, alloc);
+                ce_array_push(input_systems, after_name, alloc);
             }
         }
 

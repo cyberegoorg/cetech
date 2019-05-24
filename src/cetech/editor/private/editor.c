@@ -79,7 +79,7 @@ static float draw_main_menu() {
 }
 
 static void on_init() {
-    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_EDITOR_MODULE_I);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
         if (i->init) {
@@ -90,7 +90,7 @@ static void on_init() {
 }
 
 static void on_shutdown() {
-    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_EDITOR_MODULE_I);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -121,7 +121,7 @@ static void editor_task(float dt) {
 
     ct_action_manager_a0->check();
 
-    ce_api_entry_t0 it = ce_api_a0->first(EDITOR_MODULE_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_EDITOR_MODULE_I);
     while (it.api) {
         struct ct_editor_module_i0 *i = (it.api);
 
@@ -190,8 +190,8 @@ void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
             .load_layout = true,
     };
 
-//    ce_api_a0->register_api(GAME_INTERFACE, &editor_game_i0, sizeof(editor_game_i0));
-    ce_api_a0->register_api(KERNEL_TASK_INTERFACE, &render_task, sizeof(render_task));
+//    ce_api_a0->register_api(CT_GAME_I, &editor_game_i0, sizeof(editor_game_i0));
+    ce_api_a0->add_impl(CT_KERNEL_TASK_I, &render_task, sizeof(render_task));
 }
 
 void CE_MODULE_UNLOAD(playground)(struct ce_api_a0 *api,

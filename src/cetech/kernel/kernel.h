@@ -29,7 +29,7 @@ extern "C" {
 #define CT_INPUT_TASK \
     CE_ID64_0("input_task", 0xba6140c0d9e00706ULL)
 
-#define KERNEL_TASK_INTERFACE \
+#define CT_KERNEL_TASK_I \
     CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
 
 typedef void (*ce_kernel_taks_update_t)(float dt);

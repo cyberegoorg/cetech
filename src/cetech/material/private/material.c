@@ -781,15 +781,15 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
     };
 
     api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &_property_editor_api,
-                      sizeof(_property_editor_api));
+    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I, &_property_editor_api,
+                  sizeof(_property_editor_api));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
-                      &vec4_property_editor_api, sizeof(vec4_property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I,
+                  &vec4_property_editor_api, sizeof(vec4_property_editor_api));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
-                      &color_property_editor_api, sizeof(color_property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I,
+                  &color_property_editor_api, sizeof(color_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(MATERIAL_TYPE, material_prop, CE_ARRAY_LEN(material_prop));
 

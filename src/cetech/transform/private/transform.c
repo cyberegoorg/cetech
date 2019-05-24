@@ -307,7 +307,7 @@ void _on_create_world(ct_world_t0 world,
     state->events = q;
 }
 
-static struct ct_simulation_i0 transform_simulation_i0 = {
+static struct ct_system_i0 transform_system_i0 = {
         .simulation = transform_system,
         .name = name,
         .on_create_world= _on_create_world,
@@ -408,14 +408,14 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
             .changed_obj_queue = ce_cdb_a0->new_changed_obj_listener(ce_cdb_a0->db()),
     };
 
-    api->register_api(CT_COMPONENT_INTERFACE,
-                      &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &ct_component_api, sizeof(ct_component_api));
 
-    api->register_api(SIMULATION_INTERFACE,
-                      &transform_simulation_i0, sizeof(transform_simulation_i0));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &transform_system_i0, sizeof(transform_system_i0));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
-                      &position_property_editor_api, sizeof(position_property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I,
+                  &position_property_editor_api, sizeof(position_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(PROP_POSITION,
                             position_prop, CE_ARRAY_LEN(position_prop));

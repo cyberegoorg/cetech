@@ -77,23 +77,23 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Init %d", reload);
 
-    api->register_api(GAME_INTERFACE,
-                      &game_i0, sizeof(game_i0));
+    api->add_impl(CT_GAME_I,
+                  &game_i0, sizeof(game_i0));
 
-    api->register_api(CT_COMPONENT_INTERFACE,
-                      &rotation_component_i, sizeof(rotation_component_i));
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &rotation_component_i, sizeof(rotation_component_i));
 
-    api->register_api(CT_COMPONENT_INTERFACE,
-                      &player_input_component_i, sizeof(player_input_component_i));
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &player_input_component_i, sizeof(player_input_component_i));
 
     api->register_api(CT_COMPONENT_INTERFACE,
                       &player_speed_component_i, sizeof(player_speed_component_i));
 
-    api->register_api(SIMULATION_INTERFACE,
-                      &rotation_simulation_i0, sizeof(rotation_simulation_i0));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &rotation_system_i0, sizeof(rotation_system_i0));
 
-    api->register_api(SIMULATION_INTERFACE,
-                      &player_input_simulation_i0, sizeof(player_input_simulation_i0));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &player_input_system_i0, sizeof(player_input_system_i0));
 
     api->register_api(SIMULATION_INTERFACE,
                       &player_move_simulation_i0, sizeof(player_move_simulation_i0));

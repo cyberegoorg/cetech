@@ -13,7 +13,6 @@
 #include "celib/api.h"
 #include <celib/cdb.h>
 
-
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
 #include "cetech/ecs/ecs.h"
@@ -465,10 +464,10 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
 
     };
 
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    ce_api_a0->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
-                      &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I,
+                  &property_editor_api, sizeof(property_editor_api));
 
     scenecompiler_init(api);
 }

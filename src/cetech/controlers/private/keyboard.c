@@ -183,8 +183,8 @@ void CE_MODULE_LOAD(keyboard)(struct ce_api_a0 *api,
             .ev_queue = ct_machine_a0->new_ev_listener(),
     };
 
-    api->register_api(CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &keyboard_task, sizeof(keyboard_task));
+    api->register_api(CT_CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
+    api->add_impl(CT_KERNEL_TASK_I, &keyboard_task, sizeof(keyboard_task));
 }
 
 void CE_MODULE_UNLOAD(keyboard)(struct ce_api_a0 *api,

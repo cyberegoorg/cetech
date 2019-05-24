@@ -41,10 +41,10 @@ static struct _G {
     uint64_t obj;
 } _G;
 
-static struct ct_component_i0 *get_component_interface(uint64_t cdb_type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_COMPONENT_INTERFACE);
+static struct ct_ecs_component_i0 *get_component_interface(uint64_t cdb_type) {
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
     while (it.api) {
-        struct ct_component_i0 *i = (it.api);
+        struct ct_ecs_component_i0 *i = (it.api);
 
         if (cdb_type == i->cdb_type()) {
             return i;
@@ -60,7 +60,7 @@ static void draw_component(uint64_t obj,
                            uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
-    ct_component_i0 *c = get_component_interface(type);
+    ct_ecs_component_i0 *c = get_component_interface(type);
 
 
     if (!c || !c->get_interface) {
@@ -171,7 +171,7 @@ static void _add_comp_modal(const char *modal_id,
                                  0, NULL);
 
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(COMPONENT_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
         while (it.api) {
             struct ct_component_i0 *i = (it.api);
             struct ct_editor_component_i0 *ei;
@@ -268,7 +268,7 @@ void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
 
 }
 

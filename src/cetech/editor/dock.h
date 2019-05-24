@@ -12,10 +12,10 @@ extern "C" {
 #define CT_DOCK_API \
     CE_ID64_0("ct_dock_a0", 0x90cc2a5b4273931aULL)
 
-#define DOCK_INTERFACE_NAME \
+#define DOCK_I_NAME \
     "ct_dock_i0"
 
-#define DOCK_INTERFACE \
+#define CT_DOCK_I \
     CE_ID64_0("ct_dock_i0", 0x3a3181c12a9e109fULL)
 
 #define DOCK_TYPE\

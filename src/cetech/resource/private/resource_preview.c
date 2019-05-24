@@ -226,7 +226,14 @@ static void update(float dt) {
     uint32_t n = ce_array_size(_G.instances);
     for (int i = 0; i < n; ++i) {
         struct preview_instance *pi = &_G.instances[i];
-        ct_ecs_a0->simulate(pi->world, dt);
+
+        ct_transform_comp *root_t = ct_ecs_a0->get_one(pi->world,
+                                                       TRANSFORM_COMPONENT, pi->ent);
+        if (root_t) {
+            root_t->rot = ce_vec3_add(root_t->rot, (ce_vec3_t) {0, 1, 0});
+            ct_ecs_a0->component_changed(pi->world, pi->ent, TRANSFORM_COMPONENT);
+        }
+        ct_ecs_a0->step(pi->world, dt);
 
         ct_transform_comp *t = ct_ecs_a0->get_one(pi->world, TRANSFORM_COMPONENT,
                                                   pi->camera_ent);
@@ -316,9 +323,9 @@ void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
     api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
-    api->register_api(EDITOR_MODULE_INTERFACE, &ct_editor_module_api, sizeof(ct_editor_module_api));
+    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_EDITOR_MODULE_I, &ct_editor_module_api, sizeof(ct_editor_module_api));
 }
 
 void CE_MODULE_UNLOAD(asset_preview)(struct ce_api_a0 *api,

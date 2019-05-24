@@ -200,7 +200,7 @@ void CE_MODULE_LOAD(log_view)(struct ce_api_a0 *api,
 
     ce_log_a0->register_handler(log_handler, NULL);
 
-    ce_api_a0->register_api(DOCK_INTERFACE, &dock_api, sizeof(dock_api));
+    ce_api_a0->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
 
     ct_dock_a0->create_dock(LOG_VIEW, true);
 }

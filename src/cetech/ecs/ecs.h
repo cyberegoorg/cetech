@@ -15,11 +15,8 @@ extern "C" {
 #define CT_ECS_SYNC_TASK \
     CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
 
-#define EDITOR_COMPONENT \
+#define CT_EDITOR_COMPONENT_I \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
-
-#define COMPONENT_I \
-    CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
 
 #define ENTITY_INSTANCE \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
@@ -36,11 +33,11 @@ extern "C" {
 #define ENTITY_RESOURCE_ID \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
-#define SIMULATION_INTERFACE \
-    CE_ID64_0("ct_simulation_i0", 0xe944056f6e473ecdULL)
+#define CT_ECS_SYSTEM_I \
+    CE_ID64_0("ct_system_i0", 0x1b993a5859f15c5cULL)
 
-#define CT_COMPONENT_INTERFACE \
-    CE_ID64_0("ct_component_i0", 0x3a1ad5e3ea21da79ULL)
+#define CT_ECS_COMPONENT_I \
+    CE_ID64_0("ct_ecs_component_i0", 0x9fda2263be703cb3ULL)
 
 #define CT_ECS_EVENT_COMPONENT_SPAWN \
     CE_ID64_0("component_spawn", 0xa3f574429952b180ULL)
@@ -89,7 +86,7 @@ typedef struct ct_component_i0 {
                       void *data);
 
     void *(*get_interface)(uint64_t name_hash);
-} ct_component_i0;
+} ct_ecs_component_i0;
 
 typedef struct ct_component_pair_t0 {
     uint64_t type;
@@ -120,7 +117,7 @@ typedef struct ct_editor_component_i0 {
                                  float *local);
 } ct_editor_component_i0;
 
-struct ct_simulation_i0 {
+struct ct_system_i0 {
     uint64_t (*name)();
 
     const uint64_t *(*before)(uint32_t *n);
@@ -201,8 +198,8 @@ struct ct_ecs_a0 {
     ct_entity_t0 (*next_sibling)(ct_world_t0 world,
                                  ct_entity_t0 entity);
 
-    //SIMU
-    void (*simulate)(ct_world_t0 world,
+    //SYSTEM
+    void (*step)(ct_world_t0 world,
                      float dt);
 
     void (*process)(ct_world_t0 world,
@@ -220,7 +217,7 @@ struct ct_ecs_a0 {
                               ct_entity_t0 ent,
                               uint64_t component);
 
-    ct_component_i0 *(*get_interface)(uint64_t name);
+    ct_ecs_component_i0 *(*get_interface)(uint64_t name);
 
     uint64_t (*mask)(uint64_t component_name);
 

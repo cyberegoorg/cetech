@@ -36,7 +36,7 @@ static struct _G {
     CE_ID64_0("dock_id", 0x4a6df3bdedc53da2ULL)
 
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I);
 
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
@@ -195,7 +195,7 @@ static void draw_menu() {
     if (ct_debugui_a0->BeginMenu("Docks", true)) {
 
         if (ct_debugui_a0->BeginMenu(ICON_FA_PLUS" ""Add new dock", true)) {
-            struct ce_api_entry_t0 it = ce_api_a0->first(DOCK_INTERFACE);
+            struct ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I);
 
             while (it.api) {
                 struct ct_dock_i0 *i = (it.api);

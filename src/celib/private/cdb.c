@@ -61,7 +61,7 @@ static type_info_t _TYPE_INFO[] = {
 
 
 static void *virt_alloc(uint64_t size) {
-    return CE_REALLOC(ce_memory_a0->virt_system, void, NULL,size, 0);
+    return CE_REALLOC(ce_memory_a0->virt_system, void, NULL, size, 0);
 }
 
 static int virt_free(void *addr,
@@ -1000,7 +1000,7 @@ static void destroy_db(ce_cdb_t0 db) {
 }
 
 static uint64_t type(ce_cdb_t0 _db,
-                     uint64_t _obj) ;
+                     uint64_t _obj);
 
 static void _add_obj_to_destroy_list(db_t *db_inst,
                                      uint64_t _obj) {
@@ -1770,7 +1770,7 @@ uint64_t parent(ce_cdb_t0 _db,
     db_t *db = _get_db(_db);
 
     object_t *obj = _get_object_from_uid(db, object);
-    if(!obj) {
+    if (!obj) {
         return 0;
     }
     return obj->parent;

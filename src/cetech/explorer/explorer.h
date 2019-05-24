@@ -7,7 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 
-#define EXPLORER_INTERFACE \
+#define CT_EXPLORER_I \
     CE_ID64_0("ct_explorer_i0", 0xdaa9b6ac2664c06dULL)
 
 typedef struct ct_explorer_i0 {

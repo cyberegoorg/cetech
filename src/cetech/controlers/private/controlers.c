@@ -74,7 +74,7 @@ void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
     api->register_api(CT_CONTROLERS_API,
                       ct_controlers_a0, sizeof(ct_controlers_api));
 
-    ce_api_a0->register_on_add(CONTROLERS_I, _componet_api_add);
+    ce_api_a0->register_on_add(CT_CONTROLERS_I, _componet_api_add);
 }
 
 void CE_MODULE_UNLOAD(controlers)(struct ce_api_a0 *api,

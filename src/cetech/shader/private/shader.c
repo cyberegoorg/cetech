@@ -347,8 +347,9 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
     api->register_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
-    ce_api_a0->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
+    ce_cdb_a0->reg_obj_type(SHADER_TYPE, CE_ARR_ARG(shader_type_def));
 }
 
 void CE_MODULE_UNLOAD(shader)(struct ce_api_a0 *api,

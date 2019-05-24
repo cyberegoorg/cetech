@@ -49,7 +49,6 @@
 struct _G {
     ce_alloc_t0 *allocator;
     ct_cdb_ev_queue_o0 *changed_obj_queue;
-    ce_hash_t online_texture;
 } _G;
 
 typedef struct ct_texture_obj_t {
@@ -89,7 +88,6 @@ void texture_online(ce_cdb_t0 db,
     ce_cdb_a0->set_uint64(writer, TEXTURE_HANDLER_PROP, texture.idx);
     ce_cdb_a0->write_commit(writer);
 
-    ce_hash_add(&_G.online_texture, obj, obj, _G.allocator);
 }
 
 void texture_offline(ce_cdb_t0 db,uint64_t obj) {
@@ -100,8 +98,6 @@ void texture_offline(ce_cdb_t0 db,uint64_t obj) {
                                                     0);
     ct_gfx_a0->bgfx_destroy_texture(
             (bgfx_texture_handle_t) {.idx=(uint16_t) texture});
-
-    ce_hash_remove(&_G.online_texture, obj);
 }
 
 void _texture_resource_online(ce_cdb_t0 db,
@@ -326,7 +322,8 @@ static uint64_t task_name() {
     return TEXTURE_TASK;
 }
 
-static uint64_t *update_after(uint64_t *n) {
+
+static uint64_t *compile_watch_update_after(uint64_t *n) {
     static uint64_t a[] = {
             CT_RENDER_TASK,
     };
@@ -335,14 +332,14 @@ static uint64_t *update_after(uint64_t *n) {
     return a;
 }
 
-static void _update(float dt) {
+static void compile_watch(float dt) {
     ce_cdb_prop_ev_t0 ev = {};
 
     uint64_t *to_compile_obj = NULL;
     ce_hash_t obj_set = {};
 
     while (ce_cdb_a0->pop_objs_events(_G.changed_obj_queue, &ev)) {
-        if (!ce_hash_contain(&_G.online_texture, ev.obj)) {
+        if (ce_cdb_a0->obj_type(ce_cdb_a0->db(), ev.obj) != TEXTURE_TYPE) {
             continue;
         }
 
@@ -356,7 +353,6 @@ static void _update(float dt) {
 
 
         if (!ce_hash_contain(&obj_set, ev.obj)) {
-            ce_log_a0->debug("texture", "PROP = %s", ce_id_a0->str_from_id64(ev.prop));
             ce_array_push(to_compile_obj, ev.obj, _G.allocator);
             ce_hash_add(&obj_set, ev.obj, ev.obj, _G.allocator);
         }
@@ -374,10 +370,10 @@ static void _update(float dt) {
     ce_array_free(to_compile_obj, _G.allocator);
 }
 
-static struct ct_kernel_task_i0 texture_task = {
+static struct ct_kernel_task_i0 texture_compile_watch_task = {
         .name = task_name,
-        .update = _update,
-        .update_after = update_after,
+        .update = compile_watch,
+        .update_after = compile_watch_update_after,
 };
 
 
@@ -407,11 +403,13 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
 
     api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
-                      &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I,
+                  &property_editor_api, sizeof(property_editor_api));
 
-    api->register_api(KERNEL_TASK_INTERFACE, &texture_task, sizeof(texture_task));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_KERNEL_TASK_I,
+                  &texture_compile_watch_task, sizeof(texture_compile_watch_task));
+
+    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
 
     ce_cdb_a0->reg_obj_type(TEXTURE_TYPE, texture_prop, CE_ARRAY_LEN(texture_prop));
 }

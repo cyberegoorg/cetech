@@ -312,10 +312,10 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     };
 
     api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &node_property_editor_i0,
-                      sizeof(node_property_editor_i0));
+    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_EXPLORER_I, &entity_explorer, sizeof(entity_explorer));
+    api->add_impl(CT_PROPERTY_EDITOR_I, &node_property_editor_i0,
+                  sizeof(node_property_editor_i0));
 
     ce_cdb_a0->reg_obj_type(CT_NODE_GRAPH_NODE, node_prop, CE_ARRAY_LEN(node_prop));
 

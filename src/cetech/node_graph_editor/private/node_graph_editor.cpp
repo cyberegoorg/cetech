@@ -698,7 +698,7 @@ void CE_MODULE_LOAD (node_graph_editor)(struct ce_api_a0 *api,
                       ct_node_graph_editor_a0,
                       sizeof(nge_api));
 
-    api->register_api(RESOURCE_EDITOR_I,
+    api->add_impl(CT_RESOURCE_EDITOR_I,
                       &ct_resource_editor_api,
                       sizeof(ct_resource_editor_i0));
 }

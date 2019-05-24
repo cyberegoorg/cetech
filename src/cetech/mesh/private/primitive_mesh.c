@@ -223,8 +223,8 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->register_api(CT_COMPONENT_INTERFACE, &ct_component_api, sizeof(ct_component_api));
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE, &property_editor_api,
+    api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api,
                       sizeof(property_editor_api));
 
     ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,

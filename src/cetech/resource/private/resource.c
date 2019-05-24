@@ -263,7 +263,7 @@ void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
                            ce_config_a0->read_str(CONFIG_BUILD, ""),
                            false);
 
-    ce_api_a0->register_on_add(RESOURCE_I, _resource_api_add);
+    ce_api_a0->register_on_add(CT_RESOURCE_I, _resource_api_add);
 }
 
 void CE_MODULE_UNLOAD(resourcesystem)(struct ce_api_a0 *api,

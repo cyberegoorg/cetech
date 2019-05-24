@@ -221,15 +221,15 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
 
     api->register_api(CT_CAMERA_API, &camera_api, sizeof(camera_api));
 
-    api->register_api(CT_COMPONENT_INTERFACE,
+    api->add_impl(CT_ECS_COMPONENT_I,
                       &ct_component_api,
                       sizeof(ct_component_api));
 
-    api->register_api(CT_COMPONENT_INTERFACE,
+    api->add_impl(CT_ECS_COMPONENT_I,
                       &ct_active_camera_component,
                       sizeof(ct_active_camera_component));
 
-    api->register_api(CT_PROPERTY_EDITOR_INTERFACE,
+    api->add_impl(CT_PROPERTY_EDITOR_I,
                       &property_editor_api,
                       sizeof(property_editor_api));
 

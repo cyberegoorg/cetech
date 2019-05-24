@@ -227,7 +227,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t component = keys[i];
             uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component);
 
-            struct ct_component_i0 *component_i;
+            struct ct_ecs_component_i0 *component_i;
             component_i = ct_ecs_a0->get_interface(type);
             if (!component_i || !component_i->get_interface) {
                 continue;
@@ -336,7 +336,7 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
             .draw_menu = draw_menu,
     };
 
-    api->register_api(EXPLORER_INTERFACE, &entity_explorer, sizeof(entity_explorer));
+    api->add_impl(CT_EXPLORER_I, &entity_explorer, sizeof(entity_explorer));
 }
 
 void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,

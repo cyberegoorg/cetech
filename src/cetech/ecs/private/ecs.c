@@ -262,8 +262,8 @@ void _free_spawninfo_ent(spawn_infos_t *infos,
     }
 }
 
-static struct ct_component_i0 *get_interface(uint64_t name) {
-    return (ct_component_i0 *) ce_hash_lookup(&_G.component_interface_map, name, 0);
+static struct ct_ecs_component_i0 *get_interface(uint64_t name) {
+    return (ct_ecs_component_i0 *) ce_hash_lookup(&_G.component_interface_map, name, 0);
 }
 
 static struct world_instance_t *get_world_instance(ct_world_t0 world) {
@@ -299,7 +299,7 @@ static void *get_all(uint64_t component_name,
         return NULL;
     }
 
-    ct_component_i0 *ci = get_interface(component_name);
+    ct_ecs_component_i0 *ci = get_interface(component_name);
 
     uint32_t comp_idx = component_idx(component_name);
     return item->components[comp_idx] + (1 * ci->size());
@@ -322,7 +322,7 @@ static void *_get_one(ct_world_t0 world,
         return 0;
     }
 
-    ct_component_i0 *c = get_interface(component_name);
+    ct_ecs_component_i0 *c = get_interface(component_name);
 
     if (!c) {
         return 0;
@@ -370,7 +370,7 @@ static void _add_to_type_slot(world_instance_t *w,
         for (int i = 0; i < component_n; ++i) {
             uint64_t component_name = _G.components_name[i];
 
-            ct_component_i0 *ci = get_interface(component_name);
+            ct_ecs_component_i0 *ci = get_interface(component_name);
 
             const uint32_t comp_idx = component_idx(component_name);
 
@@ -403,7 +403,7 @@ static void _add_to_type_slot(world_instance_t *w,
             continue;
         }
 
-        ct_component_i0 *ci = get_interface(component_name);
+        ct_ecs_component_i0 *ci = get_interface(component_name);
         memset(&item->components[comp_idx][ent_data_idx * ci->size()], 0, ci->size());
     }
 }
@@ -448,7 +448,7 @@ static void _remove_from_type_slot(world_instance_t *w,
             continue;
         }
 
-        ct_component_i0 *ci = get_interface(component_name);
+        ct_ecs_component_i0 *ci = get_interface(component_name);
         memcpy(&item->components[comp_idx][entity_data_idx * ci->size()],
                &item->components[comp_idx][last_idx * ci->size()], ci->size());
     }
@@ -486,7 +486,7 @@ static void _move_data_from_type_slot(world_instance_t *w,
             continue;
         }
 
-        ct_component_i0 *ci = get_interface(component_name);
+        ct_ecs_component_i0 *ci = get_interface(component_name);
         memcpy(&new_item->components[comp_idx][idx * ci->size()],
                &item->components[comp_idx][old_idx * ci->size()], ci->size());
     }
@@ -595,7 +595,7 @@ static void _add_components_from_obj(world_instance_t *world,
 
     uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
-    ct_component_i0 *ci = get_interface(component_type);
+    ct_ecs_component_i0 *ci = get_interface(component_type);
 
     if (!ci) {
         return;
@@ -654,6 +654,7 @@ typedef struct process_data_t {
     uint64_t count;
     void *data;
     ct_process_fce_t fce;
+    ce_mpmc_queue_t0 *buff;
 } process_data_t;
 
 static void _process_task(void *data) {
@@ -699,6 +700,7 @@ static void process(ct_world_t0 world,
                 .count = ent_n,
                 .data = data,
                 .fce = fce,
+                .buff = &buff,
         }), _G.allocator);
 
         ce_array_push(tasks, ((ce_task_item_t0) {
@@ -711,6 +713,8 @@ static void process(ct_world_t0 world,
     ce_task_counter_t0 *counter = NULL;
     ce_task_a0->add(tasks, ce_array_size(tasks), &counter);
     ce_task_a0->wait_for_counter(counter, 0);
+
+    _execute_cmd(&buff);
 
     ce_array_free(task_data, _G.allocator);
     ce_array_free(tasks, _G.allocator);
@@ -774,9 +778,9 @@ static void _build_sim_graph(ce_ba_graph_t *sg) {
     ce_bag_clean(sg);
     ce_hash_clean(&_G.fce_map);
 
-    ce_api_entry_t0 it = ce_api_a0->first(SIMULATION_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_I);
     while (it.api) {
-        struct ct_simulation_i0 *i = (it.api);
+        struct ct_system_i0 *i = (it.api);
 
         uint64_t name = i->name();
 
@@ -1114,7 +1118,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
         uint64_t component_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component_obj);
         uint64_t cidx = component_idx(component_type);
 
-        ct_component_i0 *ci = get_interface(component_type);
+        ct_ecs_component_i0 *ci = get_interface(component_type);
 
         if (!ci) {
             continue;
@@ -1196,9 +1200,9 @@ static ct_world_t0 create_world() {
 
     world_instance_t *w = _new_world(world);
 
-    ce_api_entry_t0 it = ce_api_a0->first(SIMULATION_INTERFACE);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_I);
     while (it.api) {
-        struct ct_simulation_i0 *i = (it.api);
+        struct ct_system_i0 *i = (it.api);
 
         if (!i->on_create_world) {
             it = ce_api_a0->next(it);
@@ -1269,7 +1273,7 @@ static struct ct_ecs_a0 _api = {
         .next_sibling = next_sibling,
 
         //SIMU
-        .simulate = simulate,
+        .step = simulate,
         .process = process,
         .process_serial = process_serial,
 
@@ -1287,7 +1291,7 @@ struct ct_ecs_a0 *ct_ecs_a0 = &_api;
 
 static void _componet_api_add(uint64_t name,
                               void *api) {
-    ct_component_i0 *component_i = api;
+    ct_ecs_component_i0 *component_i = api;
 
 
     if (!component_i->cdb_type) {
@@ -1450,7 +1454,7 @@ static void _sync_task(float dt) {
 
                     uint64_t comp_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), si->ent_obj);
 
-                    ct_component_i0 *ci = get_interface(comp_type);
+                    ct_ecs_component_i0 *ci = get_interface(comp_type);
 
                     if (!ci) {
                         continue;
@@ -1563,9 +1567,9 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     _init_listener_pack(&_G.ecs_events);
 
     api->register_api(CT_ECS_API, &_api, sizeof(_api));
-    api->register_api(RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->register_api(KERNEL_TASK_INTERFACE, &ecs_sync_task, sizeof(ecs_sync_task));
-    api->register_on_add(COMPONENT_I, _componet_api_add);
+    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_KERNEL_TASK_I, &ecs_sync_task, sizeof(ecs_sync_task));
+    api->register_on_add(CT_ECS_COMPONENT_I, _componet_api_add);
 
     ce_cdb_a0->reg_obj_type(ENTITY_INSTANCE, entity_prop, CE_ARRAY_LEN(entity_prop));
 }
