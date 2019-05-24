@@ -24,6 +24,9 @@ extern "C" {
 #define CONFIG_BUILD \
      CE_ID64_0("build", 0x4429661936ece1eaULL)
 
+#define CONFIG_COMPILE \
+     CE_ID64_0("compile", 0x3c797c340e1e5467ULL)
+
 #define CT_RESOURCE_I \
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
 

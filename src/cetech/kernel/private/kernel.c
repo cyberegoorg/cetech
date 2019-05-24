@@ -132,7 +132,6 @@ bool cetech_kernel_init(int argc,
 
     init_config(argc, argv);
 
-
     init_static_modules();
 
     uint64_t root = ce_id_a0->id64("modules");
@@ -305,6 +304,10 @@ static void cetech_kernel_start() {
     _init_config();
 
     ct_resource_compiler_a0->compile_all();
+
+    if(ce_config_a0->read_uint(CONFIG_COMPILE, 0)) {
+        return;
+    }
 
     _build_init_graph(&_G.initg);
     _init(&_G.initg);
