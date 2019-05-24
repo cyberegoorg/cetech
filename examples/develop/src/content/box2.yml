@@ -1,37 +1,39 @@
 cdb_uid: 0xf7f5289f75e5f044
-asset_name: "content/box2"
-cdb_type: "entity"
+cdb_type: entity
+name: (null)
 components:
   cdb_type: cdb_objset
   0xe92a6c7185d73f6c:
-    cdb_uid: "0xe92a6c7185d73f6c"
-    cdb_type: "transform"
-
+    cdb_uid: 0xe92a6c7185d73f6c
+    cdb_type: transform
     position:
       cdb_uid: 0xe92a6c7185d73f6d
       cdb_type: position
-      x: 10.0
-      y: -6.0
-      z: 0.0
+      x: 10.000000
+      y: -6.000000
+      z: 0.000000
     rotation:
       cdb_uid: 0xe92a6c7185d73f6e
       cdb_type: rotation
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      x: 0.000000
+      y: 0.000000
+      z: 0.000000
     scale:
       cdb_uid: 0xe92a6c7185d73f6f
       cdb_type: scale
-      x: 1.0
-      y: 1.0
-      z: 1.0
-
+      x: 1.000000
+      y: 1.000000
+      z: 1.000000
   0x503ef52859bc3e3b:
-    cdb_uid: "0x503ef52859bc3e3b"
-    cdb_type: "static_mesh"
-    scene: "0xb7baa30d19deb859"
-    mesh: "muro_main"
-    material: "0x24c9413e88ebaaa8"
+    cdb_uid: 0x503ef52859bc3e3b
+    cdb_type: static_mesh
+    material: 0x24c9413e88ebaaa8
+    scene: 0x3d4a26bc5ef4b90d
+    node: (null)
+    mesh: Mesh
   0xaf5a41d98f0f23bc:
-      cdb_uid: "0xaf5a41d98f0f23bc"
-      cdb_type: "rotation_component"
+    cdb_uid: 0xaf5a41d98f0f23bc
+    cdb_type: rotation_component
+    velocity: 10.000000
+children:
+  cdb_type: cdb_objset

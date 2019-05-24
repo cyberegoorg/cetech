@@ -52,7 +52,6 @@ struct _G {
 } _G;
 
 typedef struct ct_texture_obj_t {
-    const char *asset_name;
     const char *input;
     bool gen_mipmaps;
     bool is_normalmap;

@@ -1,6 +1,5 @@
 cdb_uid: 0x1680afa75da0014d
 cdb_type: entity
-asset_name: content/m4
 name: (null)
 components:
   cdb_type: cdb_objset
@@ -37,7 +36,6 @@ children:
   0x1680ea049d5001aa:
     cdb_uid: 0x1680ea049d5001aa
     cdb_type: entity
-    asset_name: (null)
     name: (null)
     components:
       cdb_type: cdb_objset

@@ -37,14 +37,11 @@ struct sqls_s {
     sqlite3_stmt *load_file_blob;
     sqlite3_stmt *set_file_depend;
     sqlite3_stmt *get_filename;
-    sqlite3_stmt *get_fullname;
-    sqlite3_stmt *need_compile;
-    sqlite3_stmt *get_resource_dirs;
+    sqlite3_stmt *get_uid_by_filename;
+
     sqlite3_stmt *get_resource_by_type;
     sqlite3_stmt *get_resource_from_dirs;
-    sqlite3_stmt *get_uid;
-    sqlite3_stmt *get_file_id;
-    sqlite3_stmt *resource_type;
+    sqlite3_stmt *get_resource_type;
     sqlite3_stmt *resource_exist;
 };
 
@@ -332,8 +329,7 @@ static void put_resource(ct_resource_id_t0 rid,
 
     sqlite3_bind_int64(sqls->put_resource, 1, rid.uid);
     sqlite3_bind_text(sqls->put_resource, 2, type, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(sqls->put_resource, 3, name, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int64(sqls->put_resource, 4, id);
+    sqlite3_bind_int64(sqls->put_resource, 3, id);
     _step(_db, sqls->put_resource);
 }
 
@@ -376,23 +372,17 @@ static int get_resource_from_dirs(const char *dir,
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_text(sqls->get_resource_from_dirs, 1, dir, -1,
-                      SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_resource_from_dirs, 1, dir, -1, SQLITE_TRANSIENT);
 
     while (_step(_db, sqls->get_resource_from_dirs) == SQLITE_ROW) {
         const char *name;
         name = (const char *) sqlite3_column_text(sqls->get_resource_from_dirs,
                                                   0);
 
-        const char *type;
-        type = (const char *) sqlite3_column_text(sqls->get_resource_from_dirs,
-                                                  1);
-
         if (name && name[0]) {
-            const size_t len = strlen(name) + strlen(type) + 2;
-
-            char *fn = CE_ALLOC(alloc, char, len);
-            snprintf(fn, len, "%s.%s", name, type);
+            const size_t len = strlen(name);
+            char *fn = CE_ALLOC(alloc, char, len + 1);
+            snprintf(fn, len + 1, "%s", name);
 
             ce_array_push(*filename, fn, alloc);
         }
@@ -502,65 +492,36 @@ bool resource_filename(ct_resource_id_t0 resource,
     return ok;
 }
 
-bool _type_name_from_filename(const char *fullname,
-                              char *type,
-                              char *short_name) {
-
-    const char *resource_type = ce_os_path_a0->extension(fullname);
-
-    if (!resource_type) {
-        return false;
-    }
-
-    memcpy(type, resource_type, strlen(resource_type));
-
-    size_t size = strlen(fullname) - strlen(resource_type) - 1;
-
-    if (short_name) {
-        memcpy(short_name, fullname, sizeof(char) * size);
-        short_name[size] = '\0';
-    }
-
-    return true;
-}
-
-void fullname_resource(const char *fullname,
-                       struct ct_resource_id_t0 *resource) {
+ct_resource_id_t0 get_file_resource(const char *fullname) {
     uint64_t fullname_hash = ce_id_a0->id64(fullname);
-
 
     ce_os_thread_a0->spin_lock(&_G.uid_cache_lock);
     uint64_t uid = ce_hash_lookup(&_G.uid_cache, fullname_hash, 0);
     ce_os_thread_a0->spin_unlock(&_G.uid_cache_lock);
 
     if (uid) {
-        resource->uid = uid;
-        return;
+        return (ct_resource_id_t0) {.uid = uid};
     }
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    char name[128] = {};
-    char type[128] = {};
+    sqlite3_bind_int64(sqls->get_uid_by_filename, 1, fullname_hash);
 
-    _type_name_from_filename(fullname, type, name);
-
-    sqlite3_bind_text(sqls->get_fullname, 1, type, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(sqls->get_fullname, 2, name, -1, SQLITE_TRANSIENT);
-
-    int ok = _step(_db, sqls->get_fullname) == SQLITE_ROW;
+    int ok = _step(_db, sqls->get_uid_by_filename) == SQLITE_ROW;
     if (ok) {
-        uid = sqlite3_column_int64(sqls->get_fullname, 0);
+        uid = sqlite3_column_int64(sqls->get_uid_by_filename, 0);
 
-        _step(_db, sqls->get_fullname);
+        _step(_db, sqls->get_uid_by_filename);
     }
 
-    resource->uid = uid;
+    if (uid) {
+        ce_os_thread_a0->spin_lock(&_G.uid_cache_lock);
+        ce_hash_add(&_G.uid_cache, fullname_hash, uid, _G.alloc);
+        ce_os_thread_a0->spin_unlock(&_G.uid_cache_lock);
+    }
 
-    ce_os_thread_a0->spin_lock(&_G.uid_cache_lock);
-    ce_hash_add(&_G.uid_cache, fullname_hash, uid, _G.alloc);
-    ce_os_thread_a0->spin_unlock(&_G.uid_cache_lock);
+    return (ct_resource_id_t0) {.uid = uid};
 }
 
 int get_resource_by_type(const char *name,
@@ -573,15 +534,11 @@ int get_resource_by_type(const char *name,
     char tmp_name[256] = {};
     snprintf(tmp_name, CE_ARRAY_LEN(tmp_name), "%%%s%%", name);
 
-    sqlite3_bind_text(sqls->get_resource_by_type, 1, tmp_name, -1,
-                      SQLITE_TRANSIENT);
-    sqlite3_bind_text(sqls->get_resource_by_type, 2, type, -1,
-                      SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_resource_by_type, 1, type, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(sqls->get_resource_by_type, 2, tmp_name, -1, SQLITE_TRANSIENT);
 
     while (_step(_db, sqls->get_resource_by_type) == SQLITE_ROW) {
-        const unsigned char *fn = sqlite3_column_text(
-                sqls->get_resource_by_type,
-                0);
+        const unsigned char *fn = sqlite3_column_text(sqls->get_resource_by_type, 0);
 
         if (fn) {
             char *dup_str = ce_memory_a0->str_dup((const char *) fn, alloc);
@@ -602,28 +559,8 @@ void get_resource_clean(char **filename,
     }
 }
 
-uint64_t get_uid(const char *name,
-                 const char *type) {
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    sqlite3_bind_text(sqls->get_uid, 1, name, -1,
-                      SQLITE_TRANSIENT);
-    sqlite3_bind_text(sqls->get_uid, 2, type, -1,
-                      SQLITE_TRANSIENT);
-
-    uint64_t uid = 0;
-    int ok = _step(_db, sqls->get_uid) == SQLITE_ROW;
-    if (ok) {
-        uid = (uint64_t) sqlite3_column_int64(sqls->get_uid, 0);
-        _step(_db, sqls->get_uid);
-    }
-
-    return uid;
-}
-
-static struct ct_resourcedb_a0 build_db_api = {
-        .put_file = builddb_put_file,
+static struct ct_resourcedb_a0 ct_resourcedb_api = {
+        .put_file = put_file,
         .put_resource_blob = put_resource_blob,
         .put_resource = put_resource,
         .load_cdb_file = builddb_load_cdb_file,

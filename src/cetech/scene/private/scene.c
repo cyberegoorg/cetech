@@ -46,7 +46,6 @@ static struct _G {
 } _G;
 
 typedef struct ct_scene_obj_t {
-    const char *asset_name;
     uint64_t import;
     uint64_t geom_objs;
     uint64_t ib_len;
@@ -307,10 +306,6 @@ static const ce_cdb_prop_def_t0 scene_import_prop[] = {
 };
 
 static const ce_cdb_prop_def_t0 scene_prop[] = {
-        {
-                .name = "asset_name",
-                .type = CDB_TYPE_STR,
-        },
         {
                 .name = "import",
                 .type = CE_CDB_TYPE_SUBOBJECT,

@@ -190,11 +190,10 @@ static void _create_from_modal(const char *modal_id) {
             uint64_t new_res = 0;
 
             if (modal_buffer_from[0]) {
-                uint64_t uid = ct_resourcedb_a0->get_uid(modal_buffer_from,
-                                                         modal_buffer_type);
-                if (uid) {
-                    new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(),
-                                                     uid);
+                ct_resource_id_t0 uid = \
+                        ct_resourcedb_a0->get_file_resource(modal_buffer_from);
+                if (uid.uid) {
+                    new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(), uid.uid);
                 }
             } else {
                 uint64_t type = ce_id_a0->id64(modal_buffer_type);
@@ -215,15 +214,9 @@ static void _create_from_modal(const char *modal_id) {
                 ct_resource_id_t0 rid = {.uid = new_res};
 
                 ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
-                                               filename, modal_buffer_name);
+                                               filename, true);
 
                 ct_resourcedb_a0->put_file(filename, 0);
-
-                ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(),
-                                                          new_res);
-                ce_cdb_a0->set_str(w, ASSET_NAME_PROP, modal_buffer_name);
-                ce_cdb_a0->write_commit(w);
-
 
                 ct_resource_a0->save(new_res);
 
@@ -289,14 +282,12 @@ static void _create_from_modal(const char *modal_id) {
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_DontClosePopups);
 
+            struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
+
             if (ct_debugui_a0->IsItemHovered(0)) {
-                ct_resource_id_t0 rid = {
-                        .uid = ct_resourcedb_a0->get_uid(name, type)
-                };
 
                 ct_debugui_a0->BeginTooltip();
-                ct_editor_ui_a0->resource_tooltip(rid, path,
-                                                  (ce_vec2_t) {256, 256});
+                ct_resource_preview_a0->resource_tooltip(r, path, (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -503,11 +494,9 @@ static void ui_resource_list(uint64_t dock) {
                 continue;
             }
 
-            struct ct_resource_id_t0 resourceid = {};
-            ct_resourcedb_a0->get_resource_by_fullname(path, &resourceid);
+            ct_resource_id_t0 resourceid = ct_resourcedb_a0->get_file_resource(path);
 
             char label[128];
-
 
             uint64_t rtype = ct_resourcedb_a0->get_resource_type(resourceid);
             ct_resource_i0 *ri = ct_resource_a0->get_interface(rtype);
@@ -614,7 +603,7 @@ static void _shutdown() {
 
 
 extern "C" {
-    
+
 void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
                                    int reload) {
     CE_UNUSED(reload);

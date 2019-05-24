@@ -1,6 +1,5 @@
 cdb_uid: 0x588f56dc4e82f7b2
 cdb_type: entity
-asset_name: content/level2
 name: Level 2
 components:
   cdb_type: cdb_objset

@@ -1,6 +1,5 @@
 cdb_uid: 0x97c41c8996520208
 cdb_type: scene
-asset_name: content/scene/scifihelmet
 import:
   cdb_uid: 0x35fb9643159c7e5d
   cdb_type: scene_import

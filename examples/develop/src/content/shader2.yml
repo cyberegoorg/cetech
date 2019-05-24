@@ -1,4 +1,3 @@
-asset_name: "content/shader2"
 cdb_type: "shader"
 cdb_uid: 0xa6ad6fe0a13cd90e
 vs_input: 'content/vs_shader1.sc'

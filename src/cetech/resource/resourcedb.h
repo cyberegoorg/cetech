@@ -21,7 +21,7 @@ struct ct_resourcedb_a0 {
     void (*put_resource)(ct_resource_id_t0 rid,
                          const char *type,
                          const char *filename,
-                         const char *name);
+                         bool file_resource);
 
     void (*put_resource_blob)(ct_resource_id_t0 rid,
                               const char *data,
@@ -46,14 +46,7 @@ struct ct_resourcedb_a0 {
                                   char *filename,
                                   size_t max_len);
 
-    void (*get_resource_by_fullname)(const char *fullname,
-                                     ct_resource_id_t0 *resource);
-
-    int (*get_resource_dirs)(char ***filename,
-                             ce_alloc_t0 *alloc);
-
-    void (*get_resource_dirs_clean)(char **filename,
-                                    ce_alloc_t0 *alloc);
+    ct_resource_id_t0 (*get_file_resource)(const char *filename);
 
     int (*get_resource_from_dirs)(const char *dir,
                                   char ***filename,

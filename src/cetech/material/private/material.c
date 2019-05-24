@@ -524,7 +524,6 @@ static struct ct_property_editor_i0 _property_editor_api = {
 };
 
 typedef struct ct_material_obj_t0 {
-    const char *asset_name;
     uint64_t layers;
 } ct_material_obj_t0;
 
@@ -564,9 +563,6 @@ typedef struct ct_material_variable_color_obj_t0 {
 
 
 static const ce_cdb_prop_def_t0 material_prop[] = {
-        {
-                .name = "asset_name", .type = CDB_TYPE_STR,
-        },
         {
                 .name = "layers",
                 .type = CE_CDB_TYPE_SET_SUBOBJECT,

@@ -21,9 +21,6 @@ extern "C" {
 #define CDB_TYPE_PROP \
      CE_ID64_0("cdb_type", 0xfe5986c682be99e0ULL)
 
-#define ASSET_NAME_PROP \
-     CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
-
 #define CONFIG_BUILD \
      CE_ID64_0("build", 0x4429661936ece1eaULL)
 

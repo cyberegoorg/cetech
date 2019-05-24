@@ -1519,17 +1519,12 @@ static struct ct_kernel_task_i0 ecs_sync_task = {
 
 
 typedef struct _ct_entity_t0 {
-    const char *asset_name;
     const char *name;
     uint64_t components;
     uint64_t children;
 } _ct_entity_t0;
 
 static ce_cdb_prop_def_t0 entity_prop[] = {
-        {
-                .name = "asset_name",
-                .type = CDB_TYPE_STR,
-        },
         {
                 .name = "name",
                 .type = CE_CDB_TYPE_STR,

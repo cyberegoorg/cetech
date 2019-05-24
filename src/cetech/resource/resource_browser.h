@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-#define RESOURCE_NAME \
-    CE_ID64_0("asset_name", 0xf82d0a5475e3d5eaULL)
-
 #define RESOURCE_BROWSER_SOURCE \
     CE_ID64_0("source", 0x921f1370045bad6eULL)
 

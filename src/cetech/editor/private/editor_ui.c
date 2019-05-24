@@ -96,13 +96,10 @@ static bool prop_revert_btn(uint64_t _obj,
                         break;
                     }
 
-                    const ce_cdb_obj_o0 *rr = \
-                            ce_cdb_a0->read(ce_cdb_a0->db(), ref);
 
-                    const char *res_name = ce_cdb_a0->read_str(rr,
-                                                               ASSET_NAME_PROP,
-                                                               "");
-                    if (res_name) {
+                    char res_name[128] = {0};;
+                    if (ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {ref},
+                                                                CE_ARR_ARG(res_name))) {
                         offset += snprintf(v_str + offset,
                                            CE_ARRAY_LEN(v_str) - offset,
                                            "%s ", res_name);

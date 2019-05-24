@@ -24,6 +24,7 @@
 #include <cetech/editor/editor_ui.h>
 #include <celib/log.h>
 #include <celib/containers/buffer.h>
+#include <cetech/resource/resourcedb.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -252,7 +253,7 @@ static void on_debugui(uint64_t dock) {
 
 static void on_menu(uint64_t dock) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,0);
+    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
 
     ct_dock_a0->context_btn(dock);
     ct_debugui_a0->SameLine(0, -1);
