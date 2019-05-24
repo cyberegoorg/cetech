@@ -29,6 +29,9 @@
 #define WINDOW_NAME "Property editor"
 
 #define _G property_inspector_global
+
+CE_MODULE(ct_resourcedb_a0);
+
 static struct _G {
     bool visible;
 } _G;

@@ -33,6 +33,8 @@
 
 #include "include/nfd/nfd.h"
 
+CE_MODULE(ct_resourcedb_a0);
+
 static bool prop_revert_btn(uint64_t _obj,
                             const uint64_t *props,
                             uint64_t props_n) {

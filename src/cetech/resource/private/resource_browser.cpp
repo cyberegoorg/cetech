@@ -38,6 +38,8 @@
 
 #define _G asset_browser_global
 
+CE_MODULE(ct_resourcedb_a0);
+
 static struct _G {
     char current_dir[512];
 
@@ -236,8 +238,8 @@ static void _create_from_modal(const char *modal_id) {
                                   (DebugUIWindowFlags_) (0));
 
         char **asset_list = NULL;
-        ct_resourcedb_a0->get_resource_from_dirs("", &asset_list,
-                                                 _G.allocator);
+        ct_resourcedb_a0->list_resource_from_dirs("", &asset_list,
+                                                  _G.allocator);
 
         uint32_t dir_n = ce_array_size(asset_list);
         for (int i = 0; i < dir_n; ++i) {
@@ -303,8 +305,7 @@ static void _create_from_modal(const char *modal_id) {
             }
         }
 
-        ct_resourcedb_a0->get_resource_from_dirs_clean(asset_list,
-                                                       _G.allocator);
+        ct_resourcedb_a0->clean_resource_list(asset_list, _G.allocator);
 
         ct_debugui_a0->EndChild();
 
@@ -459,14 +460,11 @@ static void ui_asset_menu(uint64_t dock) {
 static void ui_resource_list(uint64_t dock) {
     if (_G.need_reaload) {
         if (_G.asset_list) {
-            ct_resourcedb_a0->get_resource_from_dirs_clean(_G.asset_list,
-                                                           _G.allocator);
+            ct_resourcedb_a0->clean_resource_list(_G.asset_list, _G.allocator);
             ce_array_free(_G.asset_list, _G.allocator);
         }
 
-        ct_resourcedb_a0->get_resource_from_dirs(_G.current_dir,
-                                                 &_G.asset_list,
-                                                 _G.allocator);
+        ct_resourcedb_a0->list_resource_from_dirs(_G.current_dir, &_G.asset_list, _G.allocator);
 
         _G.need_reaload = false;
     }

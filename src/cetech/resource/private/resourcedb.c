@@ -25,17 +25,16 @@
 
 #include "cetech/resource/resourcedb.h"
 
-#define LOG_WHERE "builddb"
+#define LOG_WHERE "resourcedb"
 #define MAX_WORKERS TASK_MAX_WORKERS
 
-#define _G BUILDDB_GLOBALS
+#define _G resourcedb_globals
 
 struct sqls_s {
     sqlite3_stmt *put_file;
     sqlite3_stmt *put_resource;
     sqlite3_stmt *put_file_blob;
     sqlite3_stmt *load_file_blob;
-    sqlite3_stmt *set_file_depend;
     sqlite3_stmt *get_filename;
     sqlite3_stmt *get_uid_by_filename;
 
@@ -43,6 +42,7 @@ struct sqls_s {
     sqlite3_stmt *get_resource_from_dirs;
     sqlite3_stmt *get_resource_type;
     sqlite3_stmt *resource_exist;
+    sqlite3_stmt *set_file_resource;
 };
 
 static struct _G {
@@ -69,22 +69,23 @@ const char *CREATE_SQL[] = {
         "CREATE TABLE IF NOT EXISTS resource (\n"
         "uid      INTEGER                                 NOT NULL,\n"
         "type     TEXT                                    ,\n"
-        "name     TEXT                                    ,\n"
         "file     INTEGER                                         ,\n"
         "FOREIGN KEY(file) REFERENCES files(id),                   \n"
         "PRIMARY KEY (uid)"
         ");",
 
-        "CREATE TABLE IF NOT EXISTS file_dependency ("
-        "file      INTEGER,\n"
-        "depend_on INTEGER,\n"
-        "FOREIGN KEY(file) REFERENCES files(id),\n"
-        "FOREIGN KEY(depend_on) REFERENCES files(id)\n"
-        ");",
-
         "CREATE TABLE IF NOT EXISTS resource_data (\n"
         "uid      INTEGER                                 NOT NULL,\n"
         "data     BLOB,                                            \n"
+        "FOREIGN KEY(uid) REFERENCES resource(uid),                \n"
+        "PRIMARY KEY (uid)                                         \n"
+        ");"
+        "",
+
+        "CREATE TABLE IF NOT EXISTS file_resource (\n"
+        "uid      INTEGER                                 NOT NULL,\n"
+        "file     INTEGER                                 NOT NULL,\n"
+        "FOREIGN KEY(file) REFERENCES files(id),                   \n"
         "FOREIGN KEY(uid) REFERENCES resource(uid),                \n"
         "PRIMARY KEY (uid)                                         \n"
         ");"
@@ -99,20 +100,6 @@ static struct {
     uint64_t offset;
     const char *sql;
 } _queries[] = {
-        _STATMENT(put_file,
-                  "INSERT OR REPLACE INTO files (id, filename, mtime) VALUES(?1, ?2, ?3);"),
-
-        _STATMENT(put_file_blob,
-                  "INSERT OR REPLACE INTO resource_data (uid, data) VALUES(?1, ?2);"),
-
-        _STATMENT(put_resource,
-                  "INSERT OR REPLACE INTO resource (uid, type, name, file) VALUES(?1, ?2, ?3, ?4);"),
-
-        _STATMENT(load_file_blob,
-                  "SELECT data FROM resource_data WHERE uid = ?1"),
-
-        _STATMENT(set_file_depend,
-                  "INSERT INTO file_dependency (file, depend_on) VALUES (?1, ?2);"),
 
         _STATMENT(get_filename,
                   "SELECT files.filename\n"
@@ -125,42 +112,42 @@ static struct {
                   "FROM resource\n"
                   "WHERE resource.uid = ?1;"),
 
-        _STATMENT(resource_type,
+        _STATMENT(get_resource_type,
                   "SELECT resource.type\n"
                   "FROM resource\n"
                   "WHERE resource.uid = ?1;"),
 
-        _STATMENT(get_fullname,
-                  "SELECT resource.uid\n"
-                  "FROM resource\n"
-                  "WHERE resource.type = ?1 and resource.name = ?2;"),
+        _STATMENT(put_file,
+                  "INSERT OR REPLACE INTO files (id, filename, mtime) VALUES(?1, ?2, ?3);"),
 
-        _STATMENT(need_compile,
-                  "SELECT\n"
-                  "     files.filename, files.mtime\n"
-                  "FROM\n"
-                  "    file_dependency\n"
-                  "JOIN\n"
-                  "    files on files.id == file_dependency.depend_on\n"
-                  "WHERE\n"
-                  "    file_dependency.file = ?1\n"),
+        _STATMENT(put_file_blob,
+                  "INSERT OR REPLACE INTO resource_data (uid, data) VALUES(?1, ?2);"),
 
-        _STATMENT(get_file_id,
-                  "SELECT id FROM files WHERE filename = ?1"),
+        _STATMENT(put_resource,
+                  "INSERT OR REPLACE INTO resource (uid, type, file) VALUES(?1, ?2, ?3);"),
 
-        _STATMENT(get_uid,
-                  "SELECT uid FROM resource WHERE name = ?1 and type = ?2"),
+        _STATMENT(load_file_blob,
+                  "SELECT data FROM resource_data WHERE uid = ?1"),
 
-        _STATMENT(get_resource_dirs, "select name, type\n"
-                                     "from resource order by name"),
+        _STATMENT(set_file_resource,
+                  "INSERT OR REPLACE INTO file_resource (uid, file) VALUES(?1, ?2);"),
 
-        _STATMENT(get_resource_by_type, "select name\n"
-                                        "from resource\n"
-                                        "where name like ?1 and type = ?2\n"
-                                        "order by name"),
+        _STATMENT(get_uid_by_filename,
+                  "SELECT file_resource.uid\n"
+                  "FROM file_resource\n"
+                  "WHERE file_resource.file = ?1;"),
 
-        _STATMENT(get_resource_from_dirs, "select name, type\n"
-                                          "from resource where instr(name, ?1)")
+        _STATMENT(get_resource_by_type,
+                  "select files.filename\n"
+                  "from files\n"
+                  "join resource r on files.id = r.file\n"
+                  "join file_resource rr on r.uid = rr.uid\n"
+                  "where r.type = ?1 and files.filename like ?2;"),
+
+        _STATMENT(get_resource_from_dirs,
+                  "select files.filename\n"
+                  "from files\n"
+                  "where instr(files.filename, ?1);"),
 };
 
 static int _step(sqlite3 *db,
@@ -187,7 +174,7 @@ static int _step(sqlite3 *db,
                 run = 0;
                 break;
             default:
-                ce_log_a0->error("builddb", "SQL error '%s' (%d): %s",
+                ce_log_a0->error("resourcedb", "SQL error '%s' (%d): %s",
                                  sqlite3_sql(stmt), rc, sqlite3_errmsg(db));
                 run = 0;
                 break;
@@ -277,14 +264,14 @@ static int resourcedb_init_db() {
         struct sqls_s *sqls = &_G.sqls[j];
 
         for (int i = 0; i < CE_ARRAY_LEN(_queries); ++i) {
-            sqlite3_stmt **stm = (sqlite3_stmt **) (((char *) sqls) +
+            sqlite3_stmt **stm = (sqlite3_stmt * *)(((char *) sqls) +
                                                     _queries[i].offset);
 
             int r = sqlite3_prepare_v2(_db, _queries[i].sql,
                                        -1, stm, NULL);
 
             if (r != SQLITE_OK) {
-                ce_log_a0->error("builddb", "SQL error %d '%s' (%d): %s",
+                ce_log_a0->error("resourcedb", "SQL error %d '%s' (%d): %s",
                                  i, _queries[i].sql, r,
                                  sqlite3_errmsg(_db));
             }
@@ -295,8 +282,8 @@ static int resourcedb_init_db() {
     return 1;
 }
 
-static void builddb_put_file(const char *filename,
-                             time_t mtime) {
+static void put_file(const char *filename,
+                     time_t mtime) {
 
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
@@ -321,11 +308,20 @@ static void put_resource_blob(ct_resource_id_t0 rid,
 static void put_resource(ct_resource_id_t0 rid,
                          const char *type,
                          const char *filename,
-                         const char *name) {
+                         bool root) {
     sqlite3 *_db = _opendb();
 
     struct sqls_s *sqls = _get_sqls();
     uint64_t id = ce_id_a0->id64(filename);
+
+    if (root) {
+        sqlite3_bind_int64(sqls->set_file_resource, 1, rid.uid);
+        sqlite3_bind_int64(sqls->set_file_resource, 2, id);
+        _step(_db, sqls->set_file_resource);
+
+    } else {
+        sqlite3_bind_text(sqls->put_resource, 3, NULL, -1, SQLITE_TRANSIENT);
+    }
 
     sqlite3_bind_int64(sqls->put_resource, 1, rid.uid);
     sqlite3_bind_text(sqls->put_resource, 2, type, -1, SQLITE_TRANSIENT);
@@ -333,10 +329,10 @@ static void put_resource(ct_resource_id_t0 rid,
     _step(_db, sqls->put_resource);
 }
 
-bool builddb_load_cdb_file(ct_resource_id_t0 resource,
-                           uint64_t object,
-                           uint64_t type,
-                           struct ce_alloc_t0 *allocator) {
+bool load_cdb_file(ce_cdb_t0 db,
+                   ct_resource_id_t0 resource,
+                   uint64_t object,
+                   struct ce_alloc_t0 *allocator) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -392,7 +388,7 @@ static int get_resource_from_dirs(const char *dir,
 }
 
 
-static bool builddb_obj_exist(ct_resource_id_t0 resource) {
+static bool obj_exist(ct_resource_id_t0 resource) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -407,42 +403,7 @@ static bool builddb_obj_exist(ct_resource_id_t0 resource) {
     return false;
 }
 
-static int builddb_need_compile(const char *filename) {
-    int compile = 1;
-
-    sqlite3 *_db = _opendb();
-    struct sqls_s *sqls = _get_sqls();
-
-    sqlite3_bind_int64(sqls->need_compile, 1, ce_id_a0->id64(filename));
-
-    while (_step(_db, sqls->need_compile) == SQLITE_ROW) {
-        compile = 0;
-        const char *dep_file = (const char *) sqlite3_column_text(
-                sqls->need_compile, 0);
-
-        time_t actual_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dep_file);
-
-        time_t last_mtime = sqlite3_column_int64(sqls->need_compile, 1);
-
-        if (actual_mtime != last_mtime) {
-            compile = 1;
-            break;
-        }
-    }
-
-    return compile;
-}
-
-void _add_dependency(const char *who_filename,
-                     const char *depend_on_filename) {
-
-    builddb_set_file_depend(who_filename, depend_on_filename);
-//    builddb_set_file(depend_on_filename,ce_fs_a0->file_mtime(SOURCE_ROOT,
-//                                                 depend_on_filename));
-}
-
-
-uint64_t resource_type(ct_resource_id_t0 resource) {
+uint64_t get_resource_type(ct_resource_id_t0 resource) {
     ce_os_thread_a0->spin_lock(&_G.type_cache_lock);
     uint64_t type = ce_hash_lookup(&_G.type_cache, resource.uid, 0);
     ce_os_thread_a0->spin_unlock(&_G.type_cache_lock);
@@ -454,14 +415,13 @@ uint64_t resource_type(ct_resource_id_t0 resource) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
-    sqlite3_bind_int64(sqls->resource_type, 1, resource.uid);
+    sqlite3_bind_int64(sqls->get_resource_type, 1, resource.uid);
 
-    int ok = _step(_db, sqls->resource_type) == SQLITE_ROW;
+    int ok = _step(_db, sqls->get_resource_type) == SQLITE_ROW;
     if (ok) {
-        const char *type_str = (const char *) sqlite3_column_text(
-                sqls->resource_type, 0);
+        const char *type_str = (const char *) sqlite3_column_text(sqls->get_resource_type, 0);
         type = ce_id_a0->id64(type_str);
-        _step(_db, sqls->resource_type);
+        _step(_db, sqls->get_resource_type);
     }
 
     ce_os_thread_a0->spin_lock(&_G.type_cache_lock);
@@ -471,9 +431,9 @@ uint64_t resource_type(ct_resource_id_t0 resource) {
     return type;
 }
 
-bool resource_filename(ct_resource_id_t0 resource,
-                       char *filename,
-                       size_t max_len) {
+bool get_resource_filename(ct_resource_id_t0 resource,
+                           char *filename,
+                           size_t max_len) {
     sqlite3 *_db = _opendb();
     struct sqls_s *sqls = _get_sqls();
 
@@ -481,9 +441,7 @@ bool resource_filename(ct_resource_id_t0 resource,
 
     int ok = _step(_db, sqls->get_filename) == SQLITE_ROW;
     if (ok) {
-
         const unsigned char *fn = sqlite3_column_text(sqls->get_filename, 0);
-
         snprintf(filename, max_len, "%s", fn);
 
         _step(_db, sqls->get_filename);
@@ -545,14 +503,14 @@ int get_resource_by_type(const char *name,
             ce_array_push(*filename, dup_str, alloc);
         }
 
-        //_step(_db, sqls->get_resource_by_type);
+        //_step(_db, sqls->list_resource_by_type);
     }
 
     return 1;
 }
 
-void get_resource_clean(char **filename,
-                        struct ce_alloc_t0 *alloc) {
+void clean_resource_list(char **filename,
+                         struct ce_alloc_t0 *alloc) {
     const uint32_t n = ce_array_size(filename);
     for (int i = 0; i < n; ++i) {
         CE_FREE(alloc, filename[i]);
@@ -563,28 +521,20 @@ static struct ct_resourcedb_a0 ct_resourcedb_api = {
         .put_file = put_file,
         .put_resource_blob = put_resource_blob,
         .put_resource = put_resource,
-        .load_cdb_file = builddb_load_cdb_file,
-        .set_file_depend = builddb_set_file_depend,
-        .need_compile = builddb_need_compile,
-        .obj_exist = builddb_obj_exist,
-        .add_dependency = _add_dependency,
-        .get_resource_type = resource_type,
-        .get_resource_filename = resource_filename,
-        .get_resource_by_fullname = fullname_resource,
-        .get_resource_dirs = buildb_get_resource_dirs,
-        .get_resource_dirs_clean = get_resource_clean,
-        .get_resource_from_dirs = buildb_get_resource_from_dirs,
-        .get_resource_from_dirs_clean = get_resource_clean,
-        .get_resource_by_type = get_resource_by_type,
-        .get_resource_by_type_clean = get_resource_clean,
-
-        .get_uid= get_uid,
+        .load_cdb_file = load_cdb_file,
+        .obj_exist = obj_exist,
+        .get_resource_type = get_resource_type,
+        .get_resource_filename = get_resource_filename,
+        .get_file_resource = get_file_resource,
+        .list_resource_from_dirs = get_resource_from_dirs,
+        .list_resource_by_type = get_resource_by_type,
+        .clean_resource_list = clean_resource_list,
 };
 
-struct ct_resourcedb_a0 *ct_resourcedb_a0 = &build_db_api;
+struct ct_resourcedb_a0 *ct_resourcedb_a0 = &ct_resourcedb_api;
 
-void CE_MODULE_LOAD(builddb)(struct ce_api_a0 *api,
-                             int reload) {
+void CE_MODULE_LOAD(resourcedb)(struct ce_api_a0 *api,
+                                int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
@@ -593,13 +543,13 @@ void CE_MODULE_LOAD(builddb)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(build_db_api));
+    api->register_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(ct_resourcedb_api));
 
-    builddb_init_db();
+    resourcedb_init_db();
 }
 
-void CE_MODULE_UNLOAD(builddb)(struct ce_api_a0 *api,
-                               int reload) {
+void CE_MODULE_UNLOAD(resourcedb)(struct ce_api_a0 *api,
+                                  int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);

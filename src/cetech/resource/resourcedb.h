@@ -32,12 +32,6 @@ struct ct_resourcedb_a0 {
                           uint64_t object,
                           ce_alloc_t0 *allocator);
 
-    void (*add_dependency)(const char *who_filename,
-                           const char *depend_on_filename);
-
-    int (*need_compile)(const char *filename);
-
-
     bool (*obj_exist)(ct_resource_id_t0 resource);
 
     uint64_t (*get_resource_type)(ct_resource_id_t0 resource);
@@ -48,26 +42,18 @@ struct ct_resourcedb_a0 {
 
     ct_resource_id_t0 (*get_file_resource)(const char *filename);
 
-    int (*get_resource_from_dirs)(const char *dir,
-                                  char ***filename,
-                                  ce_alloc_t0 *alloc);
+    int (*list_resource_from_dirs)(const char *dir,
+                                   char ***filename,
+                                   ce_alloc_t0 *alloc);
 
-    void (*get_resource_from_dirs_clean)(char **filename,
-                                         ce_alloc_t0 *alloc);
+    int (*list_resource_by_type)(const char *name,
+                                 const char *type,
+                                 char ***filename,
+                                 ce_alloc_t0 *alloc);
 
-    uint64_t (*get_uid)(const char *name,
-                        const char *type);
-
-    int (*get_resource_by_type)(const char *name,
-                                const char *type,
-                                char ***filename,
+    void (*clean_resource_list)(char **filename,
                                 ce_alloc_t0 *alloc);
-
-    void (*get_resource_by_type_clean)(char **filename,
-                                       ce_alloc_t0 *alloc);
 };
-
-CE_MODULE(ct_resourcedb_a0);
 
 #ifdef __cplusplus
 };
