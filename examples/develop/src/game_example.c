@@ -22,21 +22,32 @@
 #include <cetech/game/game_system.h>
 
 #include "rotation.inl"
+
 #include "components/c_player_input.inl"
-#include "components/c_player_speed.inl"
+#include "components/c_velocity.inl"
+#include "components/c_ball.inl"
+#include "components/c_pad.inl"
+#include "components/c_hit.inl"
+#include "components/c_rectangle.inl"
+#include "components/c_gamepad_controler.inl"
+
 #include "systems/s_player_input.inl"
 #include "systems/s_player_move.inl"
+#include "systems/s_move.inl"
+#include "systems/s_collision.inl"
+#include "systems/s_hit.inl"
+
+#include "systems/rectangle_renderer.inl"
 
 
 void init() {
 }
 
-
 void shutdown() {
 }
 
 void update(float dt) {
-//    struct ct_controlers_i0 *keyboard;
+//    struct ct_controler_i0 *keyboard;
 //    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 //
 //    if (keyboard->button_state(0, keyboard->button_index("c"))) {
@@ -72,8 +83,8 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_game_system_a0);
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_editor_ui_a0);
+    CE_INIT_API(api, ce_memory_a0);
 
-    CE_UNUSED(api);
 
     ce_log_a0->info("example", "Init %d", reload);
 
@@ -86,8 +97,23 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_COMPONENT_I,
                   &player_input_component_i, sizeof(player_input_component_i));
 
-    api->register_api(CT_COMPONENT_INTERFACE,
-                      &player_speed_component_i, sizeof(player_speed_component_i));
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &velocity_component_i, sizeof(velocity_component_i));
+
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &ball_component_i, sizeof(ball_component_i));
+
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &pad_component_i, sizeof(pad_component_i));
+
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &hit_component_i, sizeof(hit_component_i));
+
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &rectangle_component_i, sizeof(rectangle_component_i));
+
+    api->add_impl(CT_ECS_COMPONENT_I,
+                  &gamepad_controler_component_i, sizeof(gamepad_controler_component_i));
 
     api->add_impl(CT_ECS_SYSTEM_I,
                   &rotation_system_i0, sizeof(rotation_system_i0));
@@ -95,18 +121,39 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_SYSTEM_I,
                   &player_input_system_i0, sizeof(player_input_system_i0));
 
-    api->register_api(SIMULATION_INTERFACE,
-                      &player_move_simulation_i0, sizeof(player_move_simulation_i0));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &player_move_system_i0, sizeof(player_move_system_i0));
 
-    ce_cdb_a0->reg_obj_type(PLAYER_INPUT_COMPONENT,
-                            plyer_input_component_prop, CE_ARRAY_LEN(plyer_input_component_prop));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &move_system_i0, sizeof(move_system_i0));
 
-    ce_cdb_a0->reg_obj_type(PLAYER_SPEED_COMPONENT,
-                            plyer_speed_component_prop, CE_ARRAY_LEN(plyer_speed_component_prop));
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &hit_system_i0, sizeof(hit_system_i0));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &collision_system_i0, sizeof(collision_system_i0));
+
+
+    ce_cdb_a0->reg_obj_type(VELOCITY_COMPONENT,
+                            velocity_component_prop, CE_ARRAY_LEN(velocity_component_prop));
 
     ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT,
                             rotaton_component_prop, CE_ARRAY_LEN(rotaton_component_prop));
 
+    ce_cdb_a0->reg_obj_type(GAMEPAD_COMPONENT,
+                            gamepad_controler_compo_prop,
+                            CE_ARRAY_LEN(gamepad_controler_compo_prop));
+
+    ce_cdb_a0->reg_obj_type(RECTANGLE_COMPONENT,
+                            rectangle_component_prop,
+                            CE_ARRAY_LEN(rectangle_component_prop));
+
+    ce_cdb_a0->reg_obj_type(PLAYER_INPUT_COMPONENT, CE_ARR_ARG(player_input_component_prop));
+
+    ce_cdb_a0->reg_obj_type(BALL_COMPONENT, NULL, 0);
+    ce_cdb_a0->reg_obj_type(PAD_COMPONENT, NULL, 0);
+
+    rectangle_render_load_module(api, reload);
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,

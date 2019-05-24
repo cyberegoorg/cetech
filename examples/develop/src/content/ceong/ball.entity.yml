@@ -1,0 +1,51 @@
+cdb_uid: 0xa395900c2bc44ce8
+cdb_type: entity
+name: ball
+components:
+  cdb_type: cdb_objset
+  0x67f9896de60ec93d:
+    cdb_uid: 0x67f9896de60ec93d
+    cdb_type: transform
+    position:
+      cdb_uid: 0x631032765594592
+      cdb_type: position
+      x: 222.000015
+      y: 126.000008
+      z: 1.000000
+    rotation:
+      cdb_uid: 0xa4687ce0e4a3c1e7
+      cdb_type: rotation
+      x: 0.000000
+      y: 0.000000
+      z: 0.000000
+    scale:
+      cdb_uid: 0x429ff69a63ee3e3c
+      cdb_type: scale
+      x: 1.000000
+      y: 1.000000
+      z: 1.000000
+  0x2fef2a3fb338ba91:
+    cdb_uid: 0x2fef2a3fb338ba91
+    cdb_type: ball
+  0xb482192d3b8336e6:
+    cdb_uid: 0xb482192d3b8336e6
+    cdb_type: velocity
+    velocity:
+      cdb_uid: 0x52b992e6bacdb33b
+      cdb_type: vec2_t
+      x: 0.000000
+      y: 0.000000
+  0x50c5dbcdff5e53dd:
+    cdb_uid: 0x50c5dbcdff5e53dd
+    cdb_type: rectangle
+    half_size:
+      cdb_uid: 0x3e54243cc5e58e2c
+      cdb_type: vec2_t
+      x: 8.000000
+      y: 8.000000
+  0x491391859e06cf70:
+    cdb_uid: 0x491391859e06cf70
+    cdb_type: rectangle_renderer
+    material: 0xbfb6c2d7354678ec
+children:
+  cdb_type: cdb_objset

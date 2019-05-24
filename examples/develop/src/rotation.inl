@@ -6,10 +6,6 @@
 
 // component
 
-typedef struct rotation_component {
-    float speed;
-}rotation_component;
-
 #define ROTATION_COMPONENT \
     CE_ID64_0("rotation_component", 0x775af3c84c1fa8efULL)
 
@@ -17,28 +13,19 @@ typedef struct rotation_component {
     CE_ID64_0("rotation", 0x2060566242789baaULL)
 
 #define PROP_SPEED \
-    CE_ID64_0("speed", 0x2c1c82c87303ec5fULL)
+    CE_ID64_0("velocity", 0xa5d1f45b42234278ULL)
 
+typedef struct rotation_component {
+    float speed;
+}rotation_component;
 
 static uint64_t cdb_type() {
-    return ROTATION_COMPONENT;
+    return ce_id_a0->id64("rotation_component");
 }
 
 static const char *display_name() {
     return "Rotation";
 }
-
-static void *get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = display_name,
-        };
-        return &ct_editor_component_i0;
-    }
-
-    return NULL;
-}
-
 
 float _rnd_speed(uint32_t max) {
     return (((float) rand()) / RAND_MAX) * max;
@@ -55,9 +42,9 @@ static void _rotation_on_spawn(uint64_t obj,
 }
 
 
-static struct ct_component_i0 rotation_component_i = {
+static struct ct_ecs_component_i0 rotation_component_i = {
+        .display_name = display_name,
         .cdb_type = cdb_type,
-        .get_interface = get_interface,
         .size = rotation_size,
         .on_spawn = _rotation_on_spawn,
         .on_change = _rotation_on_spawn,
@@ -69,6 +56,7 @@ static void foreach_rotation(struct ct_world_t0 world,
                              struct ct_entity_t0 *ent,
                              ct_entity_storage_o0 *item,
                              uint32_t n,
+                             ct_ecs_cmd_buffer_t* cmd_buff,
                              void *data) {
     float dt = *(float *) (data);
 
@@ -111,8 +99,8 @@ static struct ct_system_i0 rotation_system_i0 = {
 
 static const ce_cdb_prop_def_t0 rotaton_component_prop[] = {
         {
-                .name = "speed",
-                .type = CDB_TYPE_FLOAT,
+                .name = "velocity",
+                .type = CE_CDB_TYPE_FLOAT,
                 .value.f = 10.0f,
         },
 };
