@@ -108,8 +108,7 @@ static void draw(uint64_t obj,
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
-        if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
+        if (i && i->cdb_type && (i->cdb_type() == obj_type)) {
 
             if (i->draw_ui) {
                 i->draw_ui(obj, context);
@@ -124,7 +123,7 @@ static void draw(uint64_t obj,
     _generic_prop_draw(obj, context);
 }
 
-static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
+static ct_property_editor_i0 *get_interface(uint64_t obj) {
     if (!obj) {
         return NULL;
     }
@@ -132,7 +131,7 @@ static struct ct_property_editor_i0 *get_interface(uint64_t obj) {
     ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
 
     while (it.api) {
-        struct ct_property_editor_i0 *i = (it.api);
+        ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type
             && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
@@ -185,14 +184,8 @@ static void on_debugui(uint64_t dock) {
 
     snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
 
-
-    ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Resource");
-    ct_debugui_a0->Separator();
-
-    if (obj) {
-        const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(),
-                                                          obj);
-
+    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Resource");
+    if (open && obj) {
         if (ct_debugui_a0->Button("DDD", &CE_VEC2_ZERO)) {
             char *buffer = NULL;
             ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
@@ -200,43 +193,47 @@ static void on_debugui(uint64_t dock) {
             ce_buffer_free(buffer, ce_memory_a0->system);
         }
 
-        const char *name = ce_cdb_a0->read_str(reader_obj, ASSET_NAME_PROP, NULL);
-        if (name) {
-            snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
-            ct_debugui_a0->Text("Name");
+        ct_editor_ui_a0->ui_prop_body(obj);
+        const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-            ct_debugui_a0->Indent(0);
+        if (ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {obj},
+                                                    buffer,
+                                                    CE_ARRAY_LEN(buffer))) {
+
+            ct_editor_ui_a0->prop_label("File", 0, NULL, 0);
+            ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
+
             ct_debugui_a0->PushItemWidth(-1);
             ct_debugui_a0->InputText("##NameResourceProp",
                                      buffer, strlen(buffer),
                                      DebugInputTextFlags_ReadOnly,
                                      0, NULL);
             ct_debugui_a0->PopItemWidth();
-            ct_debugui_a0->Unindent(0);
+            ct_editor_ui_a0->prop_value_end();
         }
 
         uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
         if (instance_of) {
-            const ce_cdb_obj_o0 *inst_r = ce_cdb_a0->read(ce_cdb_a0->db(), instance_of);
+            char name[128] = {0};
+            ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {instance_of},
+                                                    buffer,
+                                                    CE_ARRAY_LEN(buffer));
 
-            const char *name = ce_cdb_a0->read_str(inst_r, ASSET_NAME_PROP, NULL);
+            ct_editor_ui_a0->prop_label("Inst. of", 0, NULL, 0);
+            ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
 
-            ct_debugui_a0->Text("Inst. of");
-
-            ct_debugui_a0->SameLine(0, 8);
-            sprintf(buffer, ICON_FA_ARROW_UP
-                    "##%sprop_open_select_resource", name);
+            sprintf(buffer, ICON_FA_ARROW_UP "##%sprop_open_select_resource", name);
             if (ct_debugui_a0->Button(buffer, &(ce_vec2_t) {0.0f})) {
                 ct_selected_object_a0->set_selected_object(context, instance_of);
-            };
+            }
+            ct_debugui_a0->SameLine(0, 8);
 
-            if (name) {
+            if (name[0]) {
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
             } else {
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", instance_of);
             }
 
-            ct_debugui_a0->Indent(0);
             ct_debugui_a0->PushItemWidth(-1);
             ct_debugui_a0->InputText("##InstanceOfResourceProp",
                                      buffer,
@@ -244,9 +241,11 @@ static void on_debugui(uint64_t dock) {
                                      DebugInputTextFlags_ReadOnly,
                                      0, NULL);
             ct_debugui_a0->PopItemWidth();
-            ct_debugui_a0->Unindent(0);
+            ct_editor_ui_a0->prop_value_end();
         }
+        ct_editor_ui_a0->ui_prop_body_end();
     }
+    ct_editor_ui_a0->ui_prop_header_end(open);
 
     draw(obj, context);
 }

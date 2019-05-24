@@ -392,7 +392,6 @@ static struct ct_property_editor_i0 position_property_editor_api = {
         .draw_ui = _transform_property_editor,
 };
 
-
 void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                                int reload) {
     CE_UNUSED(reload);

@@ -830,6 +830,11 @@ static uint64_t create_object_uid(ce_cdb_t0 db,
 
 static uint64_t create_object(ce_cdb_t0 db,
                               uint64_t type) {
+    if (!type) {
+        ce_log_a0->error(LOG_WHERE, "NO TYPE");
+        return  0;
+    }
+
     uint64_t uid = _gen_uid();
     create_object_uid(db, uid, type, true);
     return uid;

@@ -51,7 +51,7 @@ struct ct_editor_ui_a0 {
     void (*prop_filename)(uint64_t obj,
                           const char *label,
                           uint64_t property,
-                          const char* filter,
+                          const char *filter,
                           uint32_t i);
 
     void (*prop_str_combo)(uint64_t obj,
@@ -100,7 +100,24 @@ struct ct_editor_ui_a0 {
     uint64_t (*lock_selected_obj)(uint64_t dock,
                                   uint64_t selected_obj);
 
-    void (*ui_prop_header)(const char *name);
+    bool (*ui_prop_header)(const char *name);
+
+    void (*ui_prop_header_end)(bool open);
+
+    void (*ui_prop_body)(uint64_t id);
+
+    void (*ui_prop_body_end)();
+
+    void (*prop_label)(const char *label,
+                       uint64_t obj,
+                       const uint64_t *props,
+                       uint64_t props_n);
+
+    void (*prop_value_begin)(uint64_t obj,
+                             const uint64_t *props,
+                             uint64_t props_n);
+
+    void (*prop_value_end)();
 
     void (*begin_disabled)();
 

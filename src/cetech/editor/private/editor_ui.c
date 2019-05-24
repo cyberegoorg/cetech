@@ -39,7 +39,6 @@ static bool prop_revert_btn(uint64_t _obj,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), _obj);
     uint64_t instance_of = ce_cdb_a0->read_instance_of(r);
 
-
     bool need_revert = false;
     if (instance_of) {
         const ce_cdb_obj_o0 *ir = ce_cdb_a0->read(ce_cdb_a0->db(), instance_of);
@@ -161,10 +160,12 @@ static void _prop_label(const char *label,
                         uint64_t obj,
                         const uint64_t *props,
                         uint64_t props_n) {
-
+//    ct_debugui_a0->SameLine(0, 8);
     ct_debugui_a0->Text("%s", label);
-    ct_debugui_a0->SameLine(0, 8);
-    prop_revert_btn(obj, props, props_n);
+
+//    ct_debugui_a0->NextColumn();
+//    ct_debugui_a0->SameLine(0, 2);
+    ct_debugui_a0->Indent(0);
 }
 
 
@@ -207,8 +208,7 @@ static void ui_float(uint64_t obj,
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
 
-    ct_debugui_a0->Indent(0);
-
+    _prop_value_begin(obj, &prop, 1);
     if (ct_debugui_a0->DragFloat(labelid,
                                  &value_new, 1.0f,
                                  min, max,
@@ -217,7 +217,43 @@ static void ui_float(uint64_t obj,
         ce_cdb_a0->set_float(w, prop, value_new);
         ce_cdb_a0->write_commit(w);
     }
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
+}
+
+static void ui_uint64(uint64_t obj,
+                      const char *label,
+                      uint64_t prop,
+                      struct ui_uint64_p0 params) {
+    uint64_t value = 0;
+    int value_new = 0;
+
+    if (!obj) {
+        return;
+    }
+
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    value_new = ce_cdb_a0->read_uint64(reader, prop, value_new);
+    value = value_new;
+
+    const uint64_t min = !params.max_f ? -UINT64_MAX : params.min_f;
+    const uint64_t max = !params.max_f ? UINT64_MAX : params.max_f;
+
+    _prop_label(label, obj, &prop, 1);
+
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "##%sprop_float_%d", label, 0);
+
+    _prop_value_begin(obj, &prop, 1);
+
+    if (ct_debugui_a0->DragInt(labelid,
+                               &value_new, 1.0f,
+                               min, max, NULL)) {
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_a0->set_uint64(w, prop, value_new);
+        ce_cdb_a0->write_commit(w);
+    }
+    _prop_value_end();
 }
 
 static void ui_bool(uint64_t obj,
@@ -236,9 +272,7 @@ static void ui_bool(uint64_t obj,
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_float_%d", label, 0);
 
-//    ct_debugui_a0->SameLine(0, 2);
-
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, &prop, 1);
 
     if (ct_debugui_a0->Checkbox(labelid, &value_new)) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -246,7 +280,7 @@ static void ui_bool(uint64_t obj,
         ce_cdb_a0->write_commit(w);
     }
 
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 
 }
 
@@ -275,7 +309,7 @@ static void ui_str(uint64_t obj,
 
     bool change = false;
 
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, &prop, 1);
     ct_debugui_a0->PushItemWidth(-1);
     change |= ct_debugui_a0->InputText(labelid,
                                        buffer,
@@ -283,7 +317,7 @@ static void ui_str(uint64_t obj,
                                        0,
                                        0, NULL);
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 
     if (change) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -310,12 +344,12 @@ static void ui_filename(uint64_t obj,
         strcpy(buffer, value);
     }
 
-
     _prop_label(label, obj, &prop, 1);
 
-    ct_debugui_a0->SameLine(0, 2);
+    _prop_value_begin(obj, &prop, 1);
 
     // Open btn
+
     sprintf(labelid, ICON_FA_FOLDER_OPEN
             "##%sprop_select_filename_%d", label, i);
 
@@ -335,9 +369,10 @@ static void ui_filename(uint64_t obj,
         }
     }
 
+    ct_debugui_a0->SameLine(0, 2);
+
     sprintf(labelid, "##%sprop_str_%d", label, i);
 
-    ct_debugui_a0->Indent(0);
     ct_debugui_a0->PushItemWidth(-1);
     ct_debugui_a0->InputText(labelid,
                              buffer,
@@ -345,7 +380,9 @@ static void ui_filename(uint64_t obj,
                              DebugInputTextFlags_ReadOnly,
                              0, NULL);
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+
+
+    _prop_value_end();
 
     if (str != NULL) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -401,13 +438,13 @@ static void ui_str_combo(uint64_t obj,
     }
 
     sprintf(labelid, "##%scombo_%d", label, i);
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, &prop, 1);
     ct_debugui_a0->PushItemWidth(-1);
     bool change = ct_debugui_a0->Combo(labelid,
                                        &current_item, items2,
                                        items_count, -1);
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 
 
     if (change) {
@@ -457,13 +494,13 @@ static void ui_str_combo2(uint64_t obj,
     }
 
     sprintf(labelid, "##%scombo_%d", label, i);
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, &prop, 1);
     ct_debugui_a0->PushItemWidth(-1);
     bool change = ct_debugui_a0->Combo(labelid,
                                        &current_item, items,
                                        items_count, -1);
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 
 
     if (change) {
@@ -489,7 +526,7 @@ static bool resource_select_modal(const char *modal_id,
 
     ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
-        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+        struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
             ct_debugui_a0->CloseCurrentPopup();
@@ -515,9 +552,9 @@ static bool resource_select_modal(const char *modal_id,
         const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
         char **resources = NULL;
 
-        ct_resourcedb_a0->get_resource_by_type(modal_buffer, resource_type_s,
-                                               &resources,
-                                               ce_memory_a0->system);
+        ct_resourcedb_a0->list_resource_by_type(modal_buffer, resource_type_s,
+                                                &resources,
+                                                ce_memory_a0->system);
 
         uint32_t dir_n = ce_array_size(resources);
         for (int i = 0; i < dir_n; ++i) {
@@ -529,10 +566,9 @@ static bool resource_select_modal(const char *modal_id,
 
             bool selected = ct_debugui_a0->Selectable(name, false, 0, &CE_VEC2_ZERO);
 
+            struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
+
             if (ct_debugui_a0->IsItemHovered(0)) {
-                struct ct_resource_id_t0 r = {
-                        .uid=ct_resourcedb_a0->get_uid(name, resource_type_s)
-                };
 
                 ct_debugui_a0->BeginTooltip();
                 ct_resource_preview_a0->resource_tooltip(r, name, (ce_vec2_t) {256, 256});
@@ -540,8 +576,7 @@ static bool resource_select_modal(const char *modal_id,
             }
 
             if (selected) {
-                *selected_resource = ct_resourcedb_a0->get_uid(name,
-                                                               resource_type_s);
+                *selected_resource = r.uid;
                 changed = true;
 
                 modal_buffer[0] = '\0';
@@ -549,17 +584,42 @@ static bool resource_select_modal(const char *modal_id,
             }
         }
 
-        ct_resourcedb_a0->get_resource_by_type_clean(resources,
-                                                     ce_memory_a0->system);
+        ct_resourcedb_a0->clean_resource_list(resources,
+                                              ce_memory_a0->system);
         ct_debugui_a0->EndPopup();
     }
 
     return changed;
 }
 
-void ui_prop_header(const char *name) {
+static bool ui_prop_header(const char *name) {
+//    bool open = ct_debugui_a0->CollapsingHeader(name, DebugUITreeNodeFlags_DefaultOpen);
+
     ct_debugui_a0->Separator();
-    ct_debugui_a0->Text("%s", name);
+    bool open = ct_debugui_a0->TreeNodeEx(name, DebugUITreeNodeFlags_DefaultOpen);
+
+    if (open) {
+//        ct_debugui_a0->Indent(0);
+    }
+
+    return open;
+}
+
+static void ui_prop_header_end(bool open) {
+    if (open) {
+//        ct_debugui_a0->Unindent(0);
+        ct_debugui_a0->TreePop();
+    }
+}
+
+static void ui_prop_body(uint64_t id) {
+    char str_id[64];
+    snprintf(str_id, CE_ARRAY_LEN(str_id), "%llx", id);
+//    ct_debugui_a0->Columns(2, str_id, true);
+}
+
+static void ui_prop_body_end() {
+//    ct_debugui_a0->Columns(1, NULL, true);
 }
 
 static void ui_resource(uint64_t obj,
@@ -576,13 +636,9 @@ static void ui_resource(uint64_t obj,
 
     uint64_t uid = ce_cdb_a0->read_ref(reader, prop, 0);
 
-    uint64_t resource_obj = uid;
-
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), resource_obj);
-    const char *resource_name = ce_cdb_a0->read_str(r, ASSET_NAME_PROP, "");
-
     char buffer[128] = {'\0'};
-    sprintf(buffer, "%s", resource_name);
+    ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {uid}, buffer,
+                                            CE_ARRAY_LEN(buffer));
 
     char labelid[128] = {'\0'};
     char modal_id[128] = {'\0'};
@@ -610,7 +666,9 @@ static void ui_resource(uint64_t obj,
 
     _prop_label(labelid, obj, &prop, 1);
 
-    ct_debugui_a0->SameLine(0, 2);
+    _prop_value_begin(obj, &prop, 1);
+
+    // Select btn
     sprintf(labelid, ICON_FA_ARROW_UP
             "##%sprop_open_select_resource_%d", label, i);
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
@@ -622,16 +680,15 @@ static void ui_resource(uint64_t obj,
     // Open btn
     sprintf(labelid, ICON_FA_FOLDER_OPEN
             "##%sprop_select_resource_%d", label, i);
-
+    ct_debugui_a0->SameLine(0, 2);
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_debugui_a0->OpenPopup(modal_id);
     };
 
-    ct_debugui_a0->Indent(0);
+    ct_debugui_a0->SameLine(0, 2);
 
-    ct_debugui_a0->PushItemWidth(-1);
     sprintf(labelid, "##%sresource_prop_str_%d", label, i);
-
+    ct_debugui_a0->PushItemWidth(-1);
     ct_debugui_a0->InputText(labelid,
                              buffer,
                              strlen(buffer),
@@ -661,7 +718,7 @@ static void ui_resource(uint64_t obj,
         ct_debugui_a0->EndDragDropTarget();
     }
 
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
     if (change) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_ref(w, prop, new_value);
@@ -696,7 +753,7 @@ static void ui_vec3(uint64_t obj,
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
 
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, prop, 3);
     ct_debugui_a0->PushItemWidth(-1);
     if (ct_debugui_a0->DragFloat3(labelid,
                                   (float *) &value_new, 1.0f,
@@ -710,7 +767,7 @@ static void ui_vec3(uint64_t obj,
     }
 
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 }
 
 static void ui_vec4(uint64_t obj,
@@ -736,7 +793,7 @@ static void ui_vec4(uint64_t obj,
     char labelid[128] = {'\0'};
     sprintf(labelid, "##%sprop_vec3_%d", label, 0);
 
-    ct_debugui_a0->Indent(0);
+    _prop_value_begin(obj, prop, 4);
 
     ct_debugui_a0->PushItemWidth(-1);
 
@@ -760,7 +817,7 @@ static void ui_vec4(uint64_t obj,
         ce_cdb_a0->write_commit(w);
     }
     ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+    _prop_value_end();
 }
 
 static uint64_t lock_selected_obj(uint64_t dock,
@@ -807,8 +864,14 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .resource_select_modal = resource_select_modal,
         .lock_selected_obj = lock_selected_obj,
         .ui_prop_header = ui_prop_header,
+        .ui_prop_header_end = ui_prop_header_end,
+        .ui_prop_body = ui_prop_body,
+        .ui_prop_body_end = ui_prop_body_end,
         .begin_disabled = begin_disabled,
         .end_disabled = end_disabled,
+        .prop_value_begin = _prop_value_begin,
+        .prop_value_end = _prop_value_end,
+        .prop_label = _prop_label,
 };
 
 struct ct_editor_ui_a0 *ct_editor_ui_a0 = &editor_ui_a0;

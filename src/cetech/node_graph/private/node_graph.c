@@ -224,41 +224,39 @@ static void _node_property_draw(uint64_t obj,
     }
 
 
-    ct_editor_ui_a0->ui_prop_header("Inputs");
-    ct_debugui_a0->Separator();
+    bool open = ct_editor_ui_a0->ui_prop_header("Inputs");
 
+    if (open) {
+        uint64_t inputs_o = ce_cdb_a0->read_subobject(node_r, CT_NODE_GRAPH_NODE_INPUTS, 0);
+        uint32_t in_n = 0;
+        const struct ct_node_pin_def *in_defs = ni->input_defs(&in_n);
 
-    uint64_t inputs_o = ce_cdb_a0->read_subobject(node_r,
-                                                  CT_NODE_GRAPH_NODE_INPUTS,
-                                                  0);
+        for (int i = 0; i < in_n; ++i) {
+            const struct ct_node_pin_def *def = &in_defs[i];
 
-    uint32_t in_n = 0;
-    const struct ct_node_pin_def *in_defs = ni->input_defs(&in_n);
+            switch (def->type) {
+                case CT_NODE_PIN_NONE:
+                    break;
 
-    for (int i = 0; i < in_n; ++i) {
-        const struct ct_node_pin_def *def = &in_defs[i];
+                case CT_NODE_PIN_FLOAT:
+                    ct_editor_ui_a0->prop_float(inputs_o,
+                                                def->name, def->prop,
+                                                (ui_float_p0) {});
+                    break;
 
-        switch (def->type) {
-            case CT_NODE_PIN_NONE:
-                break;
+                case CT_NODE_PIN_STRING:
+                    ct_editor_ui_a0->prop_str(inputs_o,
+                                              def->name, def->prop, i);
+                    break;
 
-            case CT_NODE_PIN_FLOAT:
-                ct_editor_ui_a0->prop_float(inputs_o,
-                                            def->name, def->prop,
-                                            (ui_float_p0) {});
-                break;
-
-            case CT_NODE_PIN_STRING:
-                ct_editor_ui_a0->prop_str(inputs_o,
-                                          def->name, def->prop, i);
-                break;
-
-            case CT_NODE_PIN_BOOL:
-                ct_editor_ui_a0->prop_bool(inputs_o,
-                                           def->name, def->prop);
-                break;
+                case CT_NODE_PIN_BOOL:
+                    ct_editor_ui_a0->prop_bool(inputs_o,
+                                               def->name, def->prop);
+                    break;
+            }
         }
     }
+    ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
 static struct ct_property_editor_i0 node_property_editor_i0 = {

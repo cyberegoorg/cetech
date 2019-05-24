@@ -32,8 +32,7 @@
 #include <cetech/resource/resource_editor.h>
 #include <cetech/editor/selcted_object.h>
 #include <celib/containers/array.h>
-
-#define MAX_EDITOR 8
+#include <cetech/editor/editor_ui.h>
 
 #define _G entity_editor_globals
 
@@ -219,7 +218,6 @@ void CE_MODULE_LOAD(entity_editor)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ct_default_rg_a0);
-
 
     _G = (struct _G) {
     };

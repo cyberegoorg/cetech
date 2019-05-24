@@ -256,11 +256,8 @@ static void update(float dt) {
         }
         ct_ecs_a0->step(pi->world, dt);
 
-        ct_transform_comp *t = ct_ecs_a0->get_one(pi->world, TRANSFORM_COMPONENT,
-                                                  pi->camera_ent);
-
-        ct_camera_component *c = ct_ecs_a0->get_one(pi->world, CT_CAMERA_COMPONENT,
-                                                    pi->camera_ent);
+        ct_transform_comp *t = ct_ecs_a0->get_one(pi->world, TRANSFORM_COMPONENT, pi->camera_ent);
+        ct_camera_component *c = ct_ecs_a0->get_one(pi->world, CT_CAMERA_COMPONENT, pi->camera_ent);
 
         ct_renderer_a0->viewport_render(pi->viewport,
                                         pi->world,

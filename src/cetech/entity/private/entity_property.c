@@ -68,45 +68,47 @@ static void draw_component(uint64_t obj,
     }
 
 
-    ct_editor_component_i0 *editor = c->get_interface(EDITOR_COMPONENT);
-
     char buffer[128] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s %llx", editor->display_name(), obj);
-    ct_editor_ui_a0->ui_prop_header(buffer);
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", c->display_name());
+    bool open = ct_editor_ui_a0->ui_prop_header(buffer);
 
-    ct_debugui_a0->SameLine(0, 8);
+    if (open) {
+        ct_editor_ui_a0->ui_prop_body(obj);
+        ct_property_editor_a0->draw(obj, context);
 
-    ct_debugui_a0->PushIDI((void *) obj);
-    if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
-        ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
+        ct_debugui_a0->PushIDI((void *) obj);
+        if (ct_debugui_a0->Button(ICON_FA_MINUS " ""Remove", &(ce_vec2_t) {})) {
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
+        }
+        ct_debugui_a0->PopID();
+
+        ct_editor_ui_a0->ui_prop_body_end();
     }
-
-    ct_debugui_a0->PopID();
-
-    ct_debugui_a0->Separator();
-
-    ct_property_editor_a0->draw(obj, context);
+    ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
 static void _entity_ui(uint64_t obj) {
-    ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
-    ct_debugui_a0->Separator();
+    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
 
-    ct_debugui_a0->Text("UID");
+    if (open) {
+        ct_editor_ui_a0->ui_prop_body(obj);
 
-    ct_debugui_a0->Indent(0);
-    ct_debugui_a0->PushItemWidth(-1);
-    char buffer[128] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
-    ct_debugui_a0->InputText("##EntityUID",
-                             buffer,
-                             strlen(buffer),
-                             DebugInputTextFlags_ReadOnly,
-                             0, NULL);
-    ct_debugui_a0->PopItemWidth();
-    ct_debugui_a0->Unindent(0);
+        ct_editor_ui_a0->prop_label("UID", 0, NULL, 0);
+        ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
+        char buffer[128] = {};
+        snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
+        ct_debugui_a0->InputText("##EntityUID",
+                                 buffer,
+                                 strlen(buffer),
+                                 DebugInputTextFlags_ReadOnly,
+                                 0, NULL);
+        ct_editor_ui_a0->prop_value_end();
 
-    ct_editor_ui_a0->prop_str(obj, "Name", ENTITY_NAME, 11111111);
+        ct_editor_ui_a0->prop_str(obj, "Name", ENTITY_NAME, 11111111);
+
+        ct_editor_ui_a0->ui_prop_body_end();
+    }
+    ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
 static void draw_ui(uint64_t obj,
