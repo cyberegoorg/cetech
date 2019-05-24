@@ -902,6 +902,10 @@ uint64_t _create_from_uid(ce_cdb_t0 db,
 
     object_t *from_obj = _get_object_from_uid(db_inst, from);
 
+    if (!from_obj) {
+        return 0;
+    }
+
     object_t *inst = _new_object(db_inst, _G.allocator);
 
     object_t **objid = _new_obj_id(db_inst);

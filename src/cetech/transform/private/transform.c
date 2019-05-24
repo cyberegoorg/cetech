@@ -211,18 +211,6 @@ static const char *display_name() {
     return ICON_FA_ARROWS " Transform";
 }
 
-static void *get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = display_name,
-        };
-
-        return &ct_editor_component_i0;
-    }
-
-    return NULL;
-}
-
 
 static uint64_t _tranform_size() {
     return sizeof(ct_transform_comp);
@@ -234,9 +222,9 @@ static void _tranform_on_spawn(uint64_t obj,
     ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, t, sizeof(ct_transform_comp));
 }
 
-static struct ct_component_i0 ct_component_api = {
+static struct ct_ecs_component_i0 ct_component_api = {
+        .display_name = display_name,
         .cdb_type = cdb_type,
-        .get_interface = get_interface,
         .size = _tranform_size,
         .on_spawn = _tranform_on_spawn,
         .on_change = _tranform_on_spawn,
@@ -425,7 +413,7 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(PROP_SCALE,
                             scale_prop, CE_ARRAY_LEN(scale_prop));
 
-    ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,
+    ce_cdb_a0->reg_obj_type(ce_id_a0->id64("vec2_t"),
                             vec2_prop, CE_ARRAY_LEN(vec2_prop));
 
     ce_cdb_a0->reg_obj_type(TRANSFORM_COMPONENT,

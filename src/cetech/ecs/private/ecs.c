@@ -530,9 +530,9 @@ static uint64_t combine_component_obj(const uint64_t *component_obj,
     return new_type;
 }
 
-static void _add_component(ct_world_t0 world,
-                           struct ct_entity_t0 ent,
-                           uint64_t new_type) {
+static void _add_components(ct_world_t0 world,
+                            struct ct_entity_t0 ent,
+                            uint64_t new_type) {
     world_instance_t *w = get_world_instance(world);
 
     uint64_t ent_type = _entity_type(w, ent);
@@ -561,8 +561,7 @@ static void add_components(ct_world_t0 world,
         types[i] = components[i].type;
     }
     uint64_t new_type = combine_component(types, components_count);
-
-    _add_component(world, ent, new_type);
+    _add_components(world, ent, new_type);
 
     world_instance_t *w = get_world_instance(world);
 
@@ -587,6 +586,94 @@ static void add_components(ct_world_t0 world,
     }
 }
 
+#define ADD_COMPONENT_CMD \
+    CE_ID64_0("add_component", 0xd0363f18e7a5b7e2ULL)
+#define REMOVE_COMPONENT_CMD \
+    CE_ID64_0("remove_component", 0x1845aca1baf10397ULL)
+
+typedef struct add_component_t {
+    uint64_t type;
+    ct_world_t0 world;
+    ct_entity_t0 ent;
+    uint64_t component_type;
+    void *data;
+    uint32_t component_size;
+} add_component_t;
+
+typedef struct remove_components_t {
+
+    ct_world_t0 world;
+    ct_entity_t0 ent;
+    uint64_t *components;
+    uint32_t n;
+} remove_components_t;
+
+typedef struct cmd_t {
+    uint64_t type;
+    union {
+        add_component_t add;
+        remove_components_t remove;
+    };
+} cmd_t;
+
+
+static void remove_buff(ct_ecs_cmd_buffer_t *buffer,
+                        ct_world_t0 world,
+                        ct_entity_t0 ent,
+                        const uint64_t *component_name,
+                        uint32_t name_count) {
+    ce_mpmc_queue_t0 **b = (ce_mpmc_queue_t0 **) buffer;
+
+    for (int i = 0; i < name_count; ++i) {
+        void *new_data = NULL;
+
+        new_data = CE_ALLOC(_G.allocator, char, sizeof(uint64_t) * name_count);
+        memcpy(new_data, component_name, sizeof(uint64_t) * name_count);
+
+        ce_mpmc_enqueue(*b, &(cmd_t) {
+                .type = REMOVE_COMPONENT_CMD,
+                .remove = {
+                        .world = world,
+                        .components = new_data,
+                        .n = name_count,
+                        .ent = ent
+                },
+        });
+    }
+}
+
+static void add_buff(ct_ecs_cmd_buffer_t *buffer,
+                     ct_world_t0 world,
+                     ct_entity_t0 ent,
+                     const ct_component_pair_t0 *components,
+                     uint32_t components_count) {
+    ce_mpmc_queue_t0 **b = (ce_mpmc_queue_t0 **) buffer;
+
+    for (int i = 0; i < components_count; ++i) {
+        ct_ecs_component_i0 *ci = get_interface(components[i].type);
+
+        void *new_data = NULL;
+
+        if (ci->size()) {
+            new_data = CE_ALLOC(_G.allocator, char, ci->size());
+            memcpy(new_data, components[i].data, ci->size());
+        }
+
+
+        ce_mpmc_enqueue(*b, &(cmd_t) {
+                .type = ADD_COMPONENT_CMD,
+                .add = {
+                        .world = world,
+                        .data = new_data,
+                        .component_type = components[i].type,
+                        .component_size = ci->size(),
+                        .ent = ent
+                },
+        });
+    }
+}
+
+
 static void _add_components_from_obj(world_instance_t *world,
                                      struct ct_entity_t0 ent,
                                      uint64_t obj) {
@@ -601,7 +688,7 @@ static void _add_components_from_obj(world_instance_t *world,
         return;
     }
     uint64_t new_type = combine_component(&component_type, 1);
-    _add_component(world->world, ent, new_type);
+    _add_components(world->world, ent, new_type);
 
     uint8_t *comp_data = get_one(world->world, component_type, ent);
 
@@ -647,6 +734,35 @@ static void remove_components(ct_world_t0 world,
 
 }
 
+
+static void _execute_cmd(ce_mpmc_queue_t0 *buffer) {
+    cmd_t cmd;
+    while (ce_mpmc_dequeue(buffer, &cmd)) {
+        if (cmd.type == ADD_COMPONENT_CMD) {
+            add_component_t *add_cmd = &cmd.add;
+            add_components(add_cmd->world, add_cmd->ent,
+                           (ct_component_pair_t0[]) {
+                                   {
+                                           .type = add_cmd->component_type,
+                                           .data = add_cmd->data
+                                   }
+                           }, 1);
+
+            if (add_cmd->data) {
+                CE_FREE(_G.allocator, add_cmd->data);
+            }
+        } else if (cmd.type == REMOVE_COMPONENT_CMD) {
+            remove_components_t *remove_cmd = &cmd.remove;
+            remove_components(remove_cmd->world, remove_cmd->ent,
+                              remove_cmd->components, remove_cmd->n);
+
+            CE_FREE(_G.allocator, remove_cmd->components);
+        }
+    }
+
+    ce_mpmc_free(buffer);
+}
+
 typedef struct process_data_t {
     ct_world_t0 world;
     ct_entity_t0 *ents;
@@ -659,7 +775,7 @@ typedef struct process_data_t {
 
 static void _process_task(void *data) {
     process_data_t *pdata = data;
-    pdata->fce(pdata->world, pdata->ents, pdata->storage, pdata->count, pdata->data);
+    pdata->fce(pdata->world, pdata->ents, pdata->storage, pdata->count, &pdata->buff, pdata->data);
 }
 
 static void process(ct_world_t0 world,
@@ -677,6 +793,9 @@ static void process(ct_world_t0 world,
     if (worker_n > 1) {
         worker_n -= 1;
     }
+
+    ce_mpmc_queue_t0 buff;
+    ce_mpmc_init(&buff, 4096, sizeof(cmd_t), _G.allocator);
 
     for (int i = 0; i < type_count; ++i) {
         struct entity_storage_t *item = &w->entity_storage[i];
@@ -739,7 +858,12 @@ static void process_serial(ct_world_t0 world,
             continue;
         }
 
-        fce(world, item->entity + 1, (ct_entity_storage_o0 *) item, item->n - 1, data);
+        ce_mpmc_queue_t0 buff;
+        ce_mpmc_init(&buff, 4096, sizeof(cmd_t), _G.allocator);
+
+        fce(world, item->entity + 1, (ct_entity_storage_o0 *) item, item->n - 1, &buff, data);
+
+        _execute_cmd(&buff);
     }
 }
 
@@ -1105,7 +1229,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
 
     _add_ent_spawn_obj(w, entity_obj, root_ent);
 
-    _add_component(world, root_ent, ent_type);
+    _add_components(world, root_ent, ent_type);
 
     uint64_t type_idx = ce_hash_lookup(&w->entity_storage_map, ent_type, UINT64_MAX);
 
@@ -1284,7 +1408,9 @@ static struct ct_ecs_a0 _api = {
         .get_all = get_all,
         .get_one = get_one,
         .add = add_components,
+        .add_buff = add_buff,
         .remove = remove_components,
+        .remove_buff =remove_buff,
 };
 
 struct ct_ecs_a0 *ct_ecs_a0 = &_api;

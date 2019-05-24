@@ -63,7 +63,7 @@ static void draw_component(uint64_t obj,
     ct_ecs_component_i0 *c = get_component_interface(type);
 
 
-    if (!c || !c->get_interface) {
+    if (!c || !c->display_name) {
         return;
     }
 
@@ -156,7 +156,7 @@ static void _add_comp_modal(const char *modal_id,
     bool open = true;
     ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
-        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+        struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
             ct_debugui_a0->CloseCurrentPopup();
@@ -175,19 +175,15 @@ static void _add_comp_modal(const char *modal_id,
 
         struct ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
         while (it.api) {
-            struct ct_component_i0 *i = (it.api);
-            struct ct_editor_component_i0 *ei;
+            struct ct_ecs_component_i0 *i = (it.api);
 
-            if (!i->get_interface) {
+            if (!i->display_name) {
                 goto next;
             }
 
-            ei = i->get_interface(EDITOR_COMPONENT);
-
-
             uint64_t component_type = i->cdb_type();
-            if (ei->display_name && !_component_exist(obj, component_type)) {
-                const char *label = ei->display_name();
+            if (i->display_name && !_component_exist(obj, component_type)) {
+                const char *label = i->display_name();
 
                 if (modal_buffer[0]) {
                     char filter[256] = {};
@@ -203,8 +199,7 @@ static void _add_comp_modal(const char *modal_id,
                                                      &(ce_vec2_t) {});
 
                 if (add) {
-                    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(),
-                                                                  component_type);
+                    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(), component_type);
 
                     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
                     ce_cdb_a0->objset_add_obj(w, ENTITY_COMPONENTS, component);

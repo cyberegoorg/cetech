@@ -82,9 +82,7 @@ static bool load(ce_cdb_t0 db,
         ct_resource_id_t0 rid = {.uid = asset_name};
 
         if (!ct_resourcedb_a0->obj_exist(rid)) {
-            ce_log_a0->error(LOG_WHERE,
-                             "Obj 0x%llx does not exist in DB", rid.uid);
-
+            ce_log_a0->error(LOG_WHERE, "Obj 0x%llx does not exist in DB", rid.uid);
             return false;
         };
 
@@ -108,8 +106,7 @@ static bool load(ce_cdb_t0 db,
 
     uint32_t now_ticks = ce_os_time_a0->ticks();
     uint32_t dt = now_ticks - start_ticks;
-    ce_log_a0->debug(LOG_WHERE,
-                     "load time %f for %zu resource", dt * 0.001, count);
+    ce_log_a0->debug(LOG_WHERE, "load time %f for %zu resource", dt * 0.001, count);
 
     return true;
 }

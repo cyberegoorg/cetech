@@ -54,6 +54,7 @@ static void get_project_view(ce_mat4_t world,
                           camera.near,
                           camera.far,
                           ct_gfx_a0->bgfx_get_caps()->homogeneousDepth);
+
     } else if (camera.camera_type == CAMERA_TYPE_ORTHO) {
         ce_mat4_ortho(proj, 0, width, 0, height, camera.near, camera.far, 0,
                       ct_gfx_a0->bgfx_get_caps()->homogeneousDepth);
@@ -85,18 +86,6 @@ static const char *display_name() {
     return ICON_FA_CAMERA " Camera";
 }
 
-static void *get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = display_name,
-        };
-
-        return &ct_editor_component_i0;
-    }
-
-    return NULL;
-}
-
 static uint64_t camera_size() {
     return sizeof(ct_camera_component);
 }
@@ -117,9 +106,9 @@ static void _camera_on_spawn(uint64_t obj,
     };
 }
 
-static struct ct_component_i0 ct_component_api = {
+static struct ct_ecs_component_i0 ct_component_api = {
+        .display_name = display_name,
         .cdb_type = cdb_type,
-        .get_interface = get_interface,
         .size = camera_size,
         .on_spawn = _camera_on_spawn,
         .on_change = _camera_on_spawn,
@@ -132,18 +121,6 @@ static uint64_t active_camera_cdb_type() {
 
 static const char *active_camera_display_name() {
     return ICON_FA_CAMERA " Active camera";
-}
-
-static void *active_camera_get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = active_camera_display_name,
-        };
-
-        return &ct_editor_component_i0;
-    }
-
-    return NULL;
 }
 
 static uint64_t active_camera_camera_size() {
@@ -160,16 +137,12 @@ static void _active_camera_on_spawn(uint64_t obj,
     c->camera_ent.h = ent_ref;
 }
 
-static struct ct_component_i0 ct_active_camera_component = {
+static struct ct_ecs_component_i0 ct_active_camera_component = {
+        .display_name = active_camera_display_name,
         .cdb_type = active_camera_cdb_type,
-        .get_interface = active_camera_get_interface,
         .size = active_camera_camera_size,
         .on_spawn = _active_camera_on_spawn,
         .on_change = _active_camera_on_spawn,
-};
-
-static ce_cdb_prop_def_t0 active_camera_component_prop[] = {
-        {.name = "camera_entity", .type = CDB_TYPE_REF, .obj_type = ENTITY_INSTANCE},
 };
 
 ///

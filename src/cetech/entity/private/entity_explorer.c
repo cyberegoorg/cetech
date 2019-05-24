@@ -229,18 +229,11 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
             struct ct_ecs_component_i0 *component_i;
             component_i = ct_ecs_a0->get_interface(type);
-            if (!component_i || !component_i->get_interface) {
+            if (!component_i || !component_i->display_name) {
                 continue;
             }
 
-            struct ct_editor_component_i0 *editor;
-            editor = component_i->get_interface(EDITOR_COMPONENT);
-
-            if (!editor) {
-                continue;
-            }
-
-            const char *component_display_name = editor->display_name();
+            const char *component_display_name = component_i->display_name();
 
             ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
 
@@ -255,8 +248,8 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             snprintf(c_label, CE_ARRAY_LEN(c_label), "##component_%llu", component);
 
             //
-            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu", component_display_name,
-                     component);
+            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu",
+                     component_display_name, component);
 
             if(ct_debugui_a0->TreeNodeEx(c_label, c_flags)) {
                 if (ct_debugui_a0->IsItemClicked(0)) {

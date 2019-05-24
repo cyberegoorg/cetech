@@ -55,13 +55,13 @@ struct ce_module_a0 {
     //! \param path Plugin dir path
     void (*load_dirs)(const char *path);
 
-    void (*unload_all)();
+    void (*unload_all)(void);
 
     //! Reload module by path
     void (*reload)(const char *path);
 
     //! Reload all loaded modules
-    void (*reload_all)();
+    void (*reload_all)(void);
 };
 
 CE_MODULE(ce_module_a0);

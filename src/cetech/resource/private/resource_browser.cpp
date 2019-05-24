@@ -97,7 +97,7 @@ static void _create_from_modal(const char *modal_id) {
     }
 
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
-        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+        struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
             ct_debugui_a0->CloseCurrentPopup();
@@ -325,7 +325,7 @@ static void _select_type_modal(const char *modal_id) {
 
 
     if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
-        struct ct_controlers_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+        struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
             ct_debugui_a0->CloseCurrentPopup();

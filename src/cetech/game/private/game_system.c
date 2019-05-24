@@ -24,8 +24,7 @@
 
 typedef struct game_state_t {
     ct_world_t0 world;
-    ct_viewport_t0 viewport;
-    ct_entity_t0 camera_ent;
+//    ct_entity_t0 camera_ent;
     ct_entity_t0 main_ent;
     bool started;
 } game_state_t;
@@ -60,6 +59,33 @@ static void game_shutdown() {
     ct_ecs_a0->destroy_world(_G.game_state.world);
 }
 
+typedef struct main_camera_data_t {
+    ct_entity_t0 ent;
+    ct_viewport_t0 viewport;
+    ct_camera_component camera;
+    ce_mat4_t world;
+} main_camera_data_t;
+
+static void _get_active_camera(struct ct_world_t0 world,
+                               struct ct_entity_t0 *ent,
+                               ct_entity_storage_o0 *item,
+                               uint32_t n,
+                               ct_ecs_cmd_buffer_t *buff,
+                               void *data) {
+    main_camera_data_t *output = data;
+
+    ct_entity_t0 camera_ent = ent[0];
+
+    viewport_component *viewports = ct_ecs_a0->get_all(VIEWPORT_COMPONENT, item);
+    ct_camera_component *cameras = ct_ecs_a0->get_all(CT_CAMERA_COMPONENT, item);
+    ct_transform_comp *tramsforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+
+    output->ent = camera_ent;
+    output->viewport = viewports[0].viewport;
+    output->camera = cameras[0];
+    output->world = tramsforms[0].world;
+}
+
 static void game_step(uint64_t name,
                       float dt) {
     ct_game_i0 *game_i = _get_game(name);
@@ -76,16 +102,19 @@ static void game_step(uint64_t name,
 
     ct_ecs_a0->step(_G.game_state.world, dt);
 
-    ct_transform_comp *t = ct_ecs_a0->get_one(_G.game_state.world, TRANSFORM_COMPONENT,
-                                              _G.game_state.camera_ent);
-    ct_camera_component *c = ct_ecs_a0->get_one(_G.game_state.world, CT_CAMERA_COMPONENT,
-                                                _G.game_state.camera_ent);
+    main_camera_data_t camera_data = {};
+    ct_ecs_a0->process(_G.game_state.world,
+                       ct_ecs_a0->mask(VIEWPORT_COMPONENT)
+                       | ct_ecs_a0->mask(TRANSFORM_COMPONENT)
+                       | ct_ecs_a0->mask(CT_CAMERA_COMPONENT)
+                       | ct_ecs_a0->mask(CT_ACTIVE_CAMERA_COMPONENT),
+                       _get_active_camera, &camera_data);
 
-    ct_renderer_a0->viewport_render(_G.game_state.viewport,
+    ct_renderer_a0->viewport_render(camera_data.viewport,
                                     _G.game_state.world,
                                     (ct_camera_data_t0) {
-                                            .world = t->world,
-                                            .camera = *c,
+                                            .world = camera_data.world,
+                                            .camera = camera_data.camera,
                                     });
 
 }
@@ -99,30 +128,15 @@ static void game_update(float dt) {
         return;
     }
 
-    struct ct_game_i0 *gi = _get_game(_G.active_game);
-    gi->update(dt);
-
-    ct_ecs_a0->simulate(_G.game_state.world, dt);
-
-    ct_transform_comp *t = ct_ecs_a0->get_one(_G.game_state.world, TRANSFORM_COMPONENT,
-                                              _G.game_state.camera_ent);
-    ct_camera_component *c = ct_ecs_a0->get_one(_G.game_state.world, CT_CAMERA_COMPONENT,
-                                                _G.game_state.camera_ent);
-
-    ct_renderer_a0->viewport_render(_G.game_state.viewport,
-                                    _G.game_state.world,
-                                    (ct_camera_data_t0) {
-                                            .world = t->world,
-                                            .camera = *c,
-                                    });
-}
-
-static struct ct_viewport_t0 game_render_graph_builder(uint64_t name) {
-    return _G.game_state.viewport;
+    game_step(_G.active_game, dt);
 }
 
 static void game_pause(uint64_t name) {
     ce_hash_add(&_G.game_paused, name, true, ce_memory_a0->system);
+}
+
+static ct_world_t0 game_world() {
+    return _G.game_state.world;
 }
 
 static void game_play(uint64_t name) {
@@ -141,11 +155,11 @@ static void _game_api_add(uint64_t name,
 }
 
 struct ct_game_system_a0 game_system_api = {
+        .world = game_world,
         .pause = game_pause,
         .is_paused = game_is_paused,
         .play = game_play,
         .step = game_step,
-        .viewport = game_render_graph_builder,
 };
 
 struct ct_game_system_a0 *ct_game_system_a0 = &game_system_api;

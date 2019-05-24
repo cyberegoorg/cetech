@@ -33,11 +33,22 @@ typedef struct ui_float_p0 {
     float max_f;
 } ui_float_p0;
 
+typedef struct ui_uint64_p0 {
+    uint64_t min_f;
+    uint64_t max_f;
+} ui_uint64_p0;
+
+
 struct ct_editor_ui_a0 {
     void (*prop_float)(uint64_t obj,
                        const char *label,
                        uint64_t property,
                        ui_float_p0 params);
+
+    void (*prop_uin64)(uint64_t obj,
+                       const char *label,
+                       uint64_t property,
+                       ui_uint64_p0 params);
 
     void (*prop_bool)(uint64_t obj,
                       const char *label,

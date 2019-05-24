@@ -56,17 +56,38 @@ static struct _G {
 
 
 static void draw_menu(uint64_t context_obj) {
+    entity_editor *editor = (entity_editor *) context_obj;
+
     static enum OPERATION operation;
-    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT,
-                                (int *) &operation, TRANSLATE);
+    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT, (int *) &operation, TRANSLATE);
 
     ct_debugui_a0->SameLine(0, 0);
-    ct_debugui_a0->RadioButton2(ICON_FA_UNDO,
-                                (int *) &operation, ROTATE);
+    ct_debugui_a0->RadioButton2(ICON_FA_UNDO, (int *) &operation, ROTATE);
 
     ct_debugui_a0->SameLine(0, 0);
-    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_H,
-                                (int *) &operation, SCALE);
+    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_H, (int *) &operation, SCALE);
+
+    ct_debugui_a0->SameLine(0, -1);
+
+    ct_debugui_a0->Text("%s", "C:");
+    ct_debugui_a0->SameLine(0, -1);
+
+    ct_camera_component *camera = ct_ecs_a0->get_one(editor->world,
+                                                     CT_CAMERA_COMPONENT, editor->camera_ent);
+    int cur_item = 0;
+
+    if (camera->camera_type == CAMERA_TYPE_ORTHO) {
+        cur_item = 1;
+    }
+
+    if (ct_debugui_a0->Combo("", &cur_item,
+                             (const char *[]) {"perspective", "ortho"}, 2, -1)) {
+        if (cur_item == 0) {
+            camera->camera_type = CAMERA_TYPE_PERSPECTIVE;
+        } else if (cur_item == 1) {
+            camera->camera_type = CAMERA_TYPE_ORTHO;
+        }
+    };
 }
 
 static void draw_editor(uint64_t context_obj,
@@ -83,7 +104,6 @@ static void draw_editor(uint64_t context_obj,
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     editor->mouse_hovering = is_mouse_hovering;
 
-
     ct_rg_builder_t0 *builder = ct_renderer_a0->viewport_builder(editor->viewport);
 
     ct_renderer_a0->viewport_set_size(editor->viewport, size);
@@ -95,7 +115,6 @@ static void draw_editor(uint64_t context_obj,
                          &size,
                          &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
                          &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
-
 }
 
 static struct entity_editor *_new_editor() {
@@ -172,6 +191,7 @@ static void update(uint64_t context_obj,
 
     ct_transform_comp *t = ct_ecs_a0->get_one(editor->world, TRANSFORM_COMPONENT,
                                               editor->camera_ent);
+
     ct_camera_component *c = ct_ecs_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
                                                 editor->camera_ent);
 

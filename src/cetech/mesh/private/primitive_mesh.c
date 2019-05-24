@@ -32,7 +32,6 @@ static struct _G {
     ce_alloc_t0 *allocator;
 } _G;
 
-
 typedef struct mesh_render_data {
     uint8_t viewid;
     uint64_t layer_name;
@@ -110,6 +109,7 @@ void foreach_primitive_mesh(ct_world_t0 world,
                             struct ct_entity_t0 *entities,
                             ct_entity_storage_o0 *item,
                             uint32_t n,
+                            ct_ecs_cmd_buffer_t *buff,
                             void *_data) {
     mesh_render_data *data = _data;
 
@@ -133,7 +133,7 @@ void foreach_primitive_mesh(ct_world_t0 world,
 }
 
 static uint64_t cdb_type() {
-    return PRIMITIVE_MESH_COMPONENT;
+    return ce_id_a0->id64("primitive_mesh");
 }
 
 static const char *display_name() {
@@ -167,13 +167,7 @@ static struct ct_renderer_component_i0 ct_renderer_component_i = {
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (EDITOR_COMPONENT == name_hash) {
-        static struct ct_editor_component_i0 ct_editor_component_i0 = {
-                .display_name = display_name,
-        };
-
-        return &ct_editor_component_i0;
-    } else if (CT_RENDERER_COMPONENT_I == name_hash) {
+    if (CT_RENDERER_COMPONENT_I == name_hash) {
         return &ct_renderer_component_i;
     }
 
@@ -191,7 +185,8 @@ static void _prim_mesh_on_spawn(uint64_t obj,
     ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_primitive_mesh));
 }
 
-static struct ct_component_i0 ct_component_api = {
+static struct ct_ecs_component_i0 ct_component_api = {
+        .display_name = display_name,
         .cdb_type = cdb_type,
         .get_interface = get_interface,
         .size = primitive_mesh_size,

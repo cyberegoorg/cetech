@@ -65,6 +65,7 @@ typedef struct ct_resource_id_t0 ct_resource_id_t0;
 
 typedef struct ct_entity_storage_o0 ct_entity_storage_o0;
 typedef struct ct_ecs_ev_queue_o0 ct_ecs_ev_queue_o0;
+typedef void ct_ecs_cmd_buffer_t;
 
 typedef struct ct_world_t0 {
     uint64_t h;
@@ -74,7 +75,9 @@ typedef struct ct_entity_t0 {
     uint64_t h;
 } ct_entity_t0;
 
-typedef struct ct_component_i0 {
+typedef struct ct_ecs_component_i0 {
+    const char *(*display_name)();
+
     uint64_t (*cdb_type)();
 
     uint64_t (*size)();
@@ -97,6 +100,7 @@ typedef void (*ct_process_fce_t)(ct_world_t0 world,
                                  ct_entity_t0 *ent,
                                  ct_entity_storage_o0 *item,
                                  uint32_t n,
+                                 ct_ecs_cmd_buffer_t *cmd_buff,
                                  void *data);
 
 typedef void (ct_simulate_fce_t)(ct_world_t0 world,
@@ -104,9 +108,6 @@ typedef void (ct_simulate_fce_t)(ct_world_t0 world,
 
 
 typedef struct ct_editor_component_i0 {
-    const char *(*display_name)();
-
-
     void (*guizmo_get_transform)(uint64_t obj,
                                  float *world,
                                  float *local);
@@ -128,7 +129,6 @@ struct ct_system_i0 {
                             ct_ecs_ev_queue_o0 *queue);
 
     ct_simulate_fce_t *simulation;
-
 };
 
 typedef struct ct_ecs_world_event_t0 {
@@ -233,10 +233,23 @@ struct ct_ecs_a0 {
                 const ct_component_pair_t0 *components,
                 uint32_t components_count);
 
+    void (*add_buff)(ct_ecs_cmd_buffer_t *buffer,
+                     ct_world_t0 world,
+                     ct_entity_t0 ent,
+                     const ct_component_pair_t0 *components,
+                     uint32_t components_count);
+
     void (*remove)(ct_world_t0 world,
                    ct_entity_t0 ent,
                    const uint64_t *component_name,
                    uint32_t name_count);
+
+    void (*remove_buff)(ct_ecs_cmd_buffer_t *buffer,
+                        ct_world_t0 world,
+                        ct_entity_t0 ent,
+                        const uint64_t *component_name,
+                        uint32_t name_count);
+
 };
 
 CE_MODULE(ct_ecs_a0);

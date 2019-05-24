@@ -208,7 +208,7 @@ static void ui_float(uint64_t obj,
     _prop_label(label, obj, &prop, 1);
 
     char labelid[128] = {'\0'};
-    sprintf(labelid, "##%sprop_float_%d", label, 0);
+    sprintf(labelid, "##%sprop_float_%llu", label, obj);
 
     _prop_value_begin(obj, &prop, 1);
     if (ct_debugui_a0->DragFloat(labelid,
@@ -854,6 +854,7 @@ void end_disabled() {
 
 static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_float = ui_float,
+        .prop_uin64 = ui_uint64,
         .prop_str = ui_str,
         .prop_filename = ui_filename,
         .prop_str_combo = ui_str_combo,

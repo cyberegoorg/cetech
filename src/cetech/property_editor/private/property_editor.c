@@ -62,7 +62,12 @@ static void _generic_prop_draw(uint64_t obj,
             case CE_CDB_TYPE_FLOAT:
                 ct_editor_ui_a0->prop_float(obj, def->name, prop_name, (ui_float_p0) {});
                 break;
-            case CDB_TYPE_BOOL:
+
+            case CE_CDB_TYPE_UINT64:
+                ct_editor_ui_a0->prop_uin64(obj, def->name, prop_name, (ui_uint64_p0) {});
+                break;
+
+            case CE_CDB_TYPE_BOOL:
                 ct_editor_ui_a0->prop_bool(obj, def->name, prop_name);
                 break;
             case CE_CDB_TYPE_STR:

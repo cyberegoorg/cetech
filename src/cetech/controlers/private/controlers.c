@@ -42,17 +42,16 @@ static struct _G {
 
 static void _componet_api_add(uint64_t name,
                               void *api) {
-    ct_controlers_i0 *controlers_i = api;
+    ct_controler_i0 *controlers_i = api;
 
 
     ce_hash_add(&_G.interface_map, controlers_i->name(),
                 (uint64_t) controlers_i, ce_memory_a0->system);
 }
 
-struct ct_controlers_i0 *get_by_name(uint64_t name) {
-    ct_controlers_i0 *controlers_i;
-    controlers_i = (ct_controlers_i0 *) ce_hash_lookup(&_G.interface_map,
-                                                       name, 0);
+struct ct_controler_i0 *get_by_name(uint64_t name) {
+    ct_controler_i0 *controlers_i;
+    controlers_i = (ct_controler_i0 *) ce_hash_lookup(&_G.interface_map, name, 0);
     return controlers_i;
 };
 

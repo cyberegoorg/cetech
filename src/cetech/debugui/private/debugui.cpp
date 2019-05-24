@@ -46,7 +46,7 @@ static uint32_t rsuper;
 static void begin() {
     uint8_t viewid = 255;
 
-    ct_controlers_i0 *keyboard, *mouse, *gp;
+    ct_controler_i0 *keyboard, *mouse, *gp;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
     mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
     gp = ct_controlers_a0->get(CONTROLER_GAMEPAD);
@@ -404,7 +404,7 @@ void CE_MODULE_LOAD(debugui)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    ct_controlers_i0 *keyboard;
+    ct_controler_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     lshift = keyboard->button_index("lshift");

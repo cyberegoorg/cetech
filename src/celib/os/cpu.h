@@ -15,7 +15,7 @@ extern "C" {
 
 struct ce_os_cpu_a0 {
     // Get cpu core count
-    int (*count)();
+    int (*count)(void);
 };
 
 

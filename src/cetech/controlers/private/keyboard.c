@@ -129,7 +129,7 @@ static uint64_t name() {
     return CONTROLER_KEYBOARD;
 }
 
-static struct ct_controlers_i0 ct_controlers_api = {
+static struct ct_controler_i0 ct_controlers_api = {
         .name = name,
         .button_index = button_index,
         .button_name = button_name,

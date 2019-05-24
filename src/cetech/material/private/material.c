@@ -250,14 +250,14 @@ static struct ct_entity_t0 load(uint64_t resource,
                                    .type = TRANSFORM_COMPONENT,
                                    .data = &(ct_transform_comp) {
                                            .scl = CE_VEC3_UNIT,
-                                           .pos.z = 13.0f,
-                                   }
+                                           .pos.z = 3,
+                                   },
                            },
                            {
                                    .type = PRIMITIVE_MESH_COMPONENT,
                                    .data = &(ct_primitive_mesh) {
                                            .material = resource,
-                                   }
+                                   },
                            }
                    }, 2);
 

@@ -216,6 +216,10 @@ static void _feed_module(ct_world_t0 world,
     while (it.api) {
         struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
 
+        if (!i || !i->get_interface) {
+            goto next;
+        }
+
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
 
@@ -223,6 +227,7 @@ static void _feed_module(ct_world_t0 world,
             ci->feed_module(world, module);
         }
 
+        next:
         it = ce_api_a0->next(it);
     }
 }
@@ -233,6 +238,10 @@ void _render_components(ct_world_t0 world,
     while (it.api) {
         struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
 
+        if (!i || !i->get_interface) {
+            goto next;
+        }
+
         struct ct_renderer_component_i0 *ci;
         ci = i->get_interface(CT_RENDERER_COMPONENT_I);
 
@@ -240,6 +249,7 @@ void _render_components(ct_world_t0 world,
             ci->render(world, builder);
         }
 
+        next:
         it = ce_api_a0->next(it);
     }
 }
@@ -406,7 +416,7 @@ static struct ct_kernel_task_i0 render_task = {
 
 
 #include "gfx.inl"
-
+#include "c_viewport.inl"
 
 void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
                               int reload) {

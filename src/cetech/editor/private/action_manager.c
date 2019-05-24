@@ -56,7 +56,7 @@ static void fill_button(shortcut *sc) {
         ++it;
     }
 
-    ct_controlers_i0 *keyboard;
+    ct_controler_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
     for (int i = 0; i < count; ++i) {
@@ -102,7 +102,7 @@ static void execute(uint64_t name) {
 }
 
 static void check() {
-    ct_controlers_i0 *keyboard;
+    ct_controler_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
 

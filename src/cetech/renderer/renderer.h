@@ -63,6 +63,14 @@ typedef struct ct_viewport_t0 {
     uint32_t idx;
 } ct_viewport_t0;
 
+typedef struct viewport_component {
+    ct_viewport_t0 viewport;
+} viewport_component;
+
+#define VIEWPORT_COMPONENT \
+    CE_ID64_0("viewport", 0x59196f70ee1edd76ULL)
+
+
 //! Render API V0
 struct ct_renderer_a0 {
     //! Create renderer.

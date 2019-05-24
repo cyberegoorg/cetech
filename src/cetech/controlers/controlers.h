@@ -11,8 +11,8 @@ extern "C" {
 #define CT_CONTROLERS_API \
     CE_ID64_0("ct_controlers_a0", 0x81e928c4fbba526dULL)
 
-#define CONTROLERS_I \
-    CE_ID64_0("ct_controlers_i0", 0x38a3a48646b9f277ULL)
+#define CT_CONTROLERS_I \
+    CE_ID64_0("ct_controler_i0", 0xa5442c265384697cULL)
 
 #define CONTROLER_BUTTON \
     CE_ID64_0("button", 0x1e232360426fac96ULL)
@@ -35,11 +35,7 @@ extern "C" {
 #define CONTROLER_TEXT \
     CE_ID64_0("text", 0x887e193c80929e7ULL)
 
-#define CONTROLER_ID \
-    CE_ID64_0("id", 0xb0d09cc783d6a0ecULL)
-
-
-typedef struct ct_controlers_i0 {
+typedef struct ct_controler_i0 {
     uint64_t (*name)();
 
     //! Is gamepad active?
@@ -80,10 +76,14 @@ typedef struct ct_controlers_i0 {
                         uint32_t length);
 
     char *(*text)(uint32_t idx);
-}ct_controlers_i0;
+} ct_controler_i0;
+
+
+#define CONTROLER_ID \
+    CE_ID64_0("id", 0xb0d09cc783d6a0ecULL)
 
 struct ct_controlers_a0 {
-    ct_controlers_i0* (*get)(uint64_t name);
+    ct_controler_i0 *(*get)(uint64_t name);
 };
 
 CE_MODULE(ct_controlers_a0);

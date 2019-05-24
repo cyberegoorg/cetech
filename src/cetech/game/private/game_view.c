@@ -18,6 +18,7 @@
 
 #include <cetech/debugui/debugui.h>
 #include <cetech/render_graph/render_graph.h>
+#include <cetech/ecs/ecs.h>
 
 #define WINDOW_NAME "Game view"
 
@@ -53,16 +54,29 @@ static void on_menu(uint64_t dock) {
 
 }
 
+static void _get_viewport(struct ct_world_t0 world,
+                          struct ct_entity_t0 *ent,
+                          ct_entity_storage_o0 *item,
+                          uint32_t n,
+                          ct_ecs_cmd_buffer_t *buff,
+                          void *data) {
+    ct_viewport_t0* vp = data;
+
+    viewport_component* vcs = ct_ecs_a0->get_all(VIEWPORT_COMPONENT, item);
+    *vp = vcs[0].viewport;
+}
+
 static void on_debugui(uint64_t dock) {
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
 
-    uint64_t game_name = ce_id_a0->id64("default");
+    ct_viewport_t0 vw = {};
+    ct_ecs_a0->process_serial(ct_game_system_a0->world(),
+                              ct_ecs_a0->mask(VIEWPORT_COMPONENT), _get_viewport, &vw);
 
-    ct_viewport_t0 v = ct_game_system_a0->viewport(game_name);
     ct_rg_builder_t0 *builder;
-    builder = ct_renderer_a0->viewport_builder(v);
+    builder = ct_renderer_a0->viewport_builder(vw);
 
-    ct_renderer_a0->viewport_set_size(v, size);
+    ct_renderer_a0->viewport_set_size(vw, size);
 
 
     bgfx_texture_handle_t th;

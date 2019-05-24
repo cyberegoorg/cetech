@@ -330,6 +330,10 @@ static inline float ce_angle_lerp(float _a,
 }
 
 // # Vec2
+static inline bool ce_vec2_equal(ce_vec2_t a, ce_vec2_t b, float epsilon) {
+    return ce_fequal_n(&a.x, &b.x, 2, epsilon);
+}
+
 static inline ce_vec2_t ce_vec2_abs(ce_vec2_t a) {
     return (ce_vec2_t) {
             .x = ce_fabsolute(a.x),
