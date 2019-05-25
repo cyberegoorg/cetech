@@ -12,12 +12,12 @@ variables:
     name: screen.x
     value: 1024
 
-    0xd25063a21b3e7f2f:
-      cdb_type: config_variable_int
-      name: screen.y
-      value: 768
+  0xd35063a21b3e7f2f:
+    cdb_type: config_variable_int
+    name: screen.y
+    value: 768
 
-  0xd25064a21b3e7f2f:
+  0xd45364a21b3e7f2f:
     cdb_type: config_variable_str
     name: load_module.0
     value: game_example_develop

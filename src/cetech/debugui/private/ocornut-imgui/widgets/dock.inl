@@ -29,6 +29,7 @@
 
 #include <celib/macros.h>
 #include <cetech/editor/dock.h>
+#include <celib/cdb.h>
 
 namespace ImGui {
     struct DockContext {
@@ -1084,22 +1085,22 @@ namespace ImGui {
 
                 const ce_cdb_obj_o0 *d_reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock_obj);
 
-                int index_n = (int) (cdb->read_float(d_reader, DOCK_INDEX, 0));
+                int index_n = (int) (cdb->read_uint64(d_reader, DOCK_INDEX, 0));
                 const char *label_n = cdb->read_str(d_reader, DOCK_LABEL, "");
                 const char *location_n = cdb->read_str(d_reader, DOCK_LOCATION, "");
 
-                int x_n = (int) cdb->read_float(d_reader, DOCK_X, 0);
-                int y_n = (int) cdb->read_float(d_reader, DOCK_Y, 0);
-                int size_x_n = (int) cdb->read_float(d_reader, DOCK_SIZE_X, 0);
-                int size_y_n = (int) cdb->read_float(d_reader, DOCK_SIZE_Y, 0);
-                int status_n = (int) cdb->read_float(d_reader, DOCK_STATUS, 0);
-                int active_n = (int) cdb->read_float(d_reader, DOCK_ACTIVE, 0);
-                int opened_n = (int) cdb->read_float(d_reader, DOCK_OPENED, 0);
-                int prev_n = (int) cdb->read_float(d_reader, DOCK_PREV, 0);
-                int next_n = (int) cdb->read_float(d_reader, DOCK_NEXT, 0);
-                int child0_n = (int) cdb->read_float(d_reader, DOCK_CHILD0, 0);
-                int child1_n = (int) cdb->read_float(d_reader, DOCK_CHILD1, 0);
-                int parent_n = (int) cdb->read_float(d_reader, DOCK_PARENT, 0);
+                int x_n = (int) cdb->read_uint64(d_reader, DOCK_X, 0);
+                int y_n = (int) cdb->read_uint64(d_reader, DOCK_Y, 0);
+                int size_x_n = (int) cdb->read_uint64(d_reader, DOCK_SIZE_X, 0);
+                int size_y_n = (int) cdb->read_uint64(d_reader, DOCK_SIZE_Y, 0);
+                int status_n = (int) cdb->read_uint64(d_reader, DOCK_STATUS, 0);
+                int active_n = (int) cdb->read_uint64(d_reader, DOCK_ACTIVE, 0);
+                int opened_n = (int) cdb->read_uint64(d_reader, DOCK_OPENED, 0);
+                int prev_n = (int) cdb->read_uint64(d_reader, DOCK_PREV, 0);
+                int next_n = (int) cdb->read_uint64(d_reader, DOCK_NEXT, 0);
+                int child0_n = (int) cdb->read_uint64(d_reader, DOCK_CHILD0, 0);
+                int child1_n = (int) cdb->read_uint64(d_reader, DOCK_CHILD1, 0);
+                int parent_n = (int) cdb->read_uint64(d_reader, DOCK_PARENT, 0);
 
                 Dock *dock = this->getDockByIndex(index_n);
 

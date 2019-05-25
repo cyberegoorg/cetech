@@ -834,7 +834,7 @@ static uint64_t lock_selected_obj(uint64_t dock,
             ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, selected_obj);
             locked_object = selected_obj;
         } else {
-//            ce_cdb_a0->remove_property(w, CT_LOCKED_OBJ);
+            ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, 0);
         }
         ce_cdb_a0->write_commit(w);
     }

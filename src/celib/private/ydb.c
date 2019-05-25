@@ -79,12 +79,17 @@ static void type_value_from_scalar(const uint8_t *scalar,
     }
 
     float f;
+    uint64_t ui;
 
     if (!is_key) {
         if (!((scalar_str[0] == '0') && (scalar_str[1] == 'x'))) {
-            if (sscanf(scalar_str, "%f", &f)) {
+            if ((strchr(scalar_str, '.') != NULL) && sscanf(scalar_str, "%f", &f)) {
                 *type = NODE_FLOAT;
                 *vallue = (node_value) {.f = f};
+                return;
+            } else if (sscanf(scalar_str, "%llu", &ui)) {
+                *type = NODE_UINT;
+                *vallue = (node_value) {.ui = ui};
                 return;
 
             } else if ((0 == strcmp(scalar_str, "y")) ||
@@ -128,9 +133,9 @@ static uint32_t _push_cnode(cnode_t **nodes,
     return idx;
 }
 
-uint64_t cdb_from_vio(ce_vio_t0 *vio,
-                      cnode_t **cnodes,
-                      struct ce_alloc_t0 *alloc) {
+uint64_t cnodes_from_vio(ce_vio_t0 *vio,
+                         cnode_t **cnodes,
+                         struct ce_alloc_t0 *alloc) {
 
     parent_stack_state *parent_stack = NULL;
     uint32_t parent_stack_top;
@@ -269,7 +274,11 @@ uint64_t cdb_from_vio(ce_vio_t0 *vio,
                         key_hash = ce_id_a0->id64(value.string);
                     }
 
-                    state = (parent_stack_state) {.type = NODE_STRING, .str_hash = key_hash, .key_hash=key_hash};
+                    state = (parent_stack_state) {
+                            .type = NODE_STRING,
+                            .str_hash = key_hash,
+                            .key_hash=key_hash
+                    };
 
                     ++parent_stack[parent_stack_top].node_count;
                     ce_array_push(parent_stack, state, _G.allocator);
@@ -296,7 +305,7 @@ uint64_t cdb_from_vio(ce_vio_t0 *vio,
                                     .type = CNODE_UINT,
                                     .key = key,
                                     .parent_idx = parent_idx,
-                                    .value.f = value.f
+                                    .value.uint64 = value.ui
                             });
 
                             break;
@@ -468,7 +477,7 @@ void _log_cnodes(cnode_t *cnodes) {
 void _create_root_obj(cnode_t *cnodes,
                       ce_cdb_t0 tmp_db) {
 
-//    _log_cnodes(cnodes);
+    _log_cnodes(cnodes);
 
     struct state_t {
         uint32_t node_idx;
@@ -581,7 +590,7 @@ uint64_t load_obj(const char *path,
         return 0;
     }
 
-    uint64_t obj = cdb_from_vio(f, cnodes, _G.allocator);
+    uint64_t obj = cnodes_from_vio(f, cnodes, _G.allocator);
     ce_fs_a0->close(f);
 
     if (!obj) {
@@ -931,7 +940,7 @@ static struct ce_ydb_a0 ydb_api = {
         .create_root_obj = _create_root_obj,
         .dump_cnodes = _dump_cnodes,
         .save = save,
-        .cdb_from_vio = cdb_from_vio,
+        .cdb_from_vio = cnodes_from_vio,
         .get_key = get_key,
         .key = calc_key,
 };

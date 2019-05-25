@@ -125,7 +125,7 @@ void draw_all() {
                      di->display_title(dock), di->name(dock), id);
 
             uint64_t flags = ce_cdb_a0->read_uint64(reader, PROP_DOCK_flags, 0);
-            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE,false);
+            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE, false);
 
             if (ct_debugui_a0->BeginDock(title, &visible, flags)) {
 
@@ -356,9 +356,14 @@ static const ce_cdb_prop_def_t0 dock_cdb_type_def[] = {
         {
                 .name = "dock_type",
                 .type = CE_CDB_TYPE_UINT64,
-        },        {
+        },
+        {
                 .name = "dock_data",
                 .type = CE_CDB_TYPE_PTR,
+        },
+        {
+                .name = "locked_obj",
+                .type = CE_CDB_TYPE_REF,
         },
 };
 
@@ -372,7 +377,7 @@ static const ce_cdb_prop_def_t0 docks_layout_cdb_type_def[] = {
 static const ce_cdb_prop_def_t0 dock_layout_cdb_type_def[] = {
         {
                 .name = "index",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "label",
@@ -384,51 +389,51 @@ static const ce_cdb_prop_def_t0 dock_layout_cdb_type_def[] = {
         },
         {
                 .name = "x",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "y",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "size_x",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "size_y",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "status",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "active",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "opened",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "prev",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "next",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "child0",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "child1",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
         {
                 .name = "parent",
-                .type = CE_CDB_TYPE_FLOAT,
+                .type = CE_CDB_TYPE_UINT64,
         },
 };
 

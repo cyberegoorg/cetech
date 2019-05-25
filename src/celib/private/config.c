@@ -168,7 +168,7 @@ static int load_from_yaml_file(ce_cdb_t0 db,
             }
 
             case CE_CONFIG_VARIABLE_INT: {
-                uint64_t value = ce_cdb_a0->read_float(var_r, CE_CONFIG_VALUE, 0);
+                uint64_t value = ce_cdb_a0->read_uint64(var_r, CE_CONFIG_VALUE, 0);
                 set_uint(name_h, value);
                 break;
             }

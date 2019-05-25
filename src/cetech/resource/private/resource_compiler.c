@@ -195,10 +195,6 @@ void _compile_files(char **files,
 
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *filename = files[i];
-        if (ce_id_a0->id64(filename) == ce_id_a0->id64("global.yml")) {
-            continue;
-        }
-
         int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
         ct_resourcedb_a0->put_file(filename, mtime);
 
