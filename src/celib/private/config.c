@@ -147,8 +147,6 @@ static int load_from_yaml_file(ce_cdb_t0 db,
     ce_os_vio_a0->close(f);
     ce_array_free(nodes, alloc);
 
-    ce_cdb_a0->log_obj(LOG_WHERE, ce_cdb_a0->db(), obj);
-
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t variables_n = ce_cdb_a0->read_objset_num(reader, CE_CONFIG_VARIABLES);
