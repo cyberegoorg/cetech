@@ -102,9 +102,8 @@ void set_uint(uint64_t name,
 
 void set_str(uint64_t name,
              const char *value) {
-
-    ce_hash_add(&_G.config, name, (uint64_t) ce_memory_a0->str_dup(value, ce_memory_a0->system),
-                ce_memory_a0->system);
+    const char* new_str = ce_memory_a0->str_dup(value, ce_memory_a0->system);
+    ce_hash_add(&_G.config, name, (uint64_t) new_str, ce_memory_a0->system);
 }
 
 static void _cvar_from_str(const char *name,

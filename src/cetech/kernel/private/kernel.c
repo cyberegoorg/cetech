@@ -82,8 +82,7 @@ int init_config(int argc,
                         ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM,""));
 
     char *build_config = NULL;
-    ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir,
-                        "global.yml");
+    ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir, "global.yml");
 
     const char *source_dir_str = ce_config_a0->read_str(CONFIG_SRC, "");
     char *source_config = NULL;
@@ -97,10 +96,6 @@ int init_config(int argc,
     ce_buffer_free(source_config, _G.allocator);
     ce_buffer_free(build_config, _G.allocator);
     ce_buffer_free(build_dir, _G.allocator);
-
-    if (!ce_config_a0->parse_args(argc, argv)) {
-        return 0;
-    }
 
     return 1;
 }
@@ -124,6 +119,13 @@ bool cetech_kernel_init(int argc,
 
     ce_init();
 
+    ce_hash_t h = {};
+    ce_hash_add(&h, 1, 2, ce_memory_a0->system);
+    uint64_t d1 = ce_hash_lookup(&h, 1, 0);
+    ce_hash_add(&h, 1, 3, ce_memory_a0->system);
+    uint64_t d2 = ce_hash_lookup(&h, 1, 0);
+
+    CE_UNUSED(d1, d2);
     ce_api_a0->register_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
 
     _G = (struct KernelGlobals) {
@@ -305,7 +307,7 @@ static void cetech_kernel_start() {
 
     ct_resource_compiler_a0->compile_all();
 
-    if(ce_config_a0->read_uint(CONFIG_COMPILE, 0)) {
+    if (ce_config_a0->read_uint(CONFIG_COMPILE, 0)) {
         return;
     }
 

@@ -86,7 +86,9 @@ static inline uint32_t _ce_hash_find_slot(const struct ce_hash_t *hash,
     const uint32_t idx_first = k % hash->n;
     uint32_t idx = idx_first;
 
-    while ((hash->keys[idx] != EMPTY_SLOT) && (hash->keys[idx] != DELETE_SLOT)) {
+    while ((hash->keys[idx] != EMPTY_SLOT)
+           && (hash->keys[idx] != DELETE_SLOT)
+           && (hash->keys[idx] != k)) {
         idx = (idx + 1) % hash->n;
 
         if (idx == idx_first) {
