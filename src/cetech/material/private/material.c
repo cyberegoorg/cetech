@@ -91,10 +91,7 @@ static uint64_t _cdb_type_to_type(uint64_t type) {
 }
 
 static void online(ce_cdb_t0 db,
-                   uint64_t name,
                    uint64_t obj) {
-    CE_UNUSED(name);
-
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t layers_n = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
@@ -139,9 +136,8 @@ static void online(ce_cdb_t0 db,
 }
 
 static void offline(ce_cdb_t0 db,
-                    uint64_t name,
                     uint64_t obj) {
-    CE_UNUSED(name, obj);
+    CE_UNUSED(db, obj);
 }
 
 static uint64_t cdb_type() {
@@ -157,7 +153,8 @@ static void ui_vec4(uint64_t var) {
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
-                                             MATERIAL_VAR_VALUE_PROP_W}, (ui_vec4_p0) {});
+                                             MATERIAL_VAR_VALUE_PROP_W},
+                               (ui_vec4_p0) {});
 }
 
 static void ui_color4(uint64_t var) {

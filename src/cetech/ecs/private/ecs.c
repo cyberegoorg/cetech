@@ -1087,18 +1087,6 @@ static void destroy(ct_world_t0 world,
     }
 }
 
-static void online(ce_cdb_t0 db,
-                   uint64_t name,
-                   uint64_t obj) {
-    CE_UNUSED(name);
-}
-
-static void offline(ce_cdb_t0 db,
-                    uint64_t name,
-                    uint64_t obj) {
-    CE_UNUSED(name, obj);
-}
-
 static uint64_t cdb_type() {
     return ENTITY_RESOURCE_ID;
 }
@@ -1134,8 +1122,6 @@ static const char *display_icon() {
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .display_icon = display_icon,
-        .online = online,
-        .offline = offline,
         .get_interface = get_resource_interface,
 };
 

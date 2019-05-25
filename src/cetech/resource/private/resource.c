@@ -100,7 +100,7 @@ static bool load(ce_cdb_t0 db,
         }
 
         if (resource_i->online) {
-            resource_i->online(db, names[i], asset_name);
+            resource_i->online(db, asset_name);
         }
     }
 
@@ -132,7 +132,7 @@ void unload(ce_cdb_t0 db,
 
 
             if (resource_i->offline) {
-                resource_i->offline(db, names[i], rid.uid);
+                resource_i->offline(db, rid.uid);
             }
         }
     }

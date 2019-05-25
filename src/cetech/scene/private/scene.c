@@ -75,10 +75,7 @@ typedef struct ct_scene_obj_t {
 //==============================================================================
 
 static void online(ce_cdb_t0 db,
-                   uint64_t name,
                    uint64_t obj) {
-    CE_UNUSED(name);
-
     ct_scene_obj_t so = {};
     ce_cdb_a0->read_to(db, obj, &so, sizeof(so));
 
@@ -111,7 +108,6 @@ static void online(ce_cdb_t0 db,
     }
 
     ce_cdb_a0->write_commit(writer);
-    ce_cdb_a0->log_obj("scene", db, obj);
 }
 
 uint64_t get_geom_obj(uint64_t obj,
@@ -133,10 +129,8 @@ uint64_t get_geom_obj(uint64_t obj,
 }
 
 static void offline(ce_cdb_t0 db,
-                    uint64_t name,
                     uint64_t obj) {
-    CE_UNUSED(name, obj);
-
+    CE_UNUSED(db, obj);
 }
 
 static uint64_t cdb_type() {

@@ -138,7 +138,7 @@ static bool _compile(ce_cdb_t0 db,
 
     const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
-    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE,"");
+    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE, "");
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
 
@@ -237,7 +237,6 @@ bool shader_compiler(ce_cdb_t0 db,
 
 
 static void online(ce_cdb_t0 db,
-                   uint64_t name,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
@@ -266,9 +265,8 @@ static void online(ce_cdb_t0 db,
     ce_cdb_a0->write_commit(writer);
 }
 
-static void offline(ce_cdb_t0 db, uint64_t name,
+static void offline(ce_cdb_t0 db,
                     uint64_t obj) {
-    CE_UNUSED(name);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 

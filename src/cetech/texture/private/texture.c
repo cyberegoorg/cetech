@@ -100,13 +100,11 @@ void texture_offline(ce_cdb_t0 db,uint64_t obj) {
 }
 
 void _texture_resource_online(ce_cdb_t0 db,
-                              uint64_t name,
                               uint64_t obj) {
     texture_online(db, obj);
 }
 
 void _texture_resource_offline(ce_cdb_t0 db,
-                               uint64_t name,
                                uint64_t obj) {
     texture_offline(db, obj);
 }
