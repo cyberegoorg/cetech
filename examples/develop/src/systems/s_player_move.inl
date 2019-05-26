@@ -27,7 +27,7 @@ static void player_move_foreach_components(struct ct_world_t0 world,
         player_input_component *pi_o = &player_inputs[i];
         velocity_component *speed_o = &speds[i];
 
-        speed_o->velocity.y = pi_o->move * 100 * dt;
+        speed_o->velocity.y = pi_o->move * 15000 * dt;
 
         ct_ecs_a0->component_changed(world, ent[i], VELOCITY_COMPONENT);
     }

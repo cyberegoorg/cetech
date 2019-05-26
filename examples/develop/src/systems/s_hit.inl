@@ -62,7 +62,7 @@ static void hit_foreach_components(struct ct_world_t0 world,
                 vel->velocity = ce_vec2_reflect(vel->velocity, ce_vec2_norm(hit->normal));
             }
 
-            ce_vec2_t dir = ce_vec2_mul_s(ce_vec2_norm(vel->velocity), 25);
+            ce_vec2_t dir = ce_vec2_mul_s(ce_vec2_norm(vel->velocity), 1);
 
             vel->velocity = ce_vec2_add(vel->velocity, dir);
 
