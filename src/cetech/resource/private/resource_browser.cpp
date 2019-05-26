@@ -219,7 +219,6 @@ static void _create_from_modal(const char *modal_id) {
                                                filename, true);
 
                 ct_resourcedb_a0->put_file(filename, 0);
-
                 ct_resource_a0->save(new_res);
 
                 _G.need_reaload = true;
@@ -259,8 +258,18 @@ static void _create_from_modal(const char *modal_id) {
                 continue;
             }
 
-            const char *type = ce_os_path_a0->extension(path);
-            uint64_t resource_type = ce_id_a0->id64(type);
+
+            ct_resource_id_t0 rid = ct_resourcedb_a0->get_file_resource(path);
+
+            uint64_t resource_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), rid.uid);
+
+            ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+
+            if(!ri) {
+                continue;
+            }
+
+            const char *type = ri->name();
 
             char name[256] = {};
             uint32_t path_len = snprintf(name, CE_ARRAY_LEN(name), "%s", path);
@@ -270,7 +279,7 @@ static void _create_from_modal(const char *modal_id) {
 
             char label[128];
 
-            ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+
             const char *icon =
                     ri && ri->display_icon ? ri->display_icon() : NULL;
 

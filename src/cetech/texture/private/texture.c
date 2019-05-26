@@ -277,7 +277,13 @@ static const char *display_icon() {
     return ICON_FA_PICTURE_O;
 }
 
+static const char* name() {
+    return "texture";
+}
+
+
 static struct ct_resource_i0 ct_resource_api = {
+        .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .get_interface = get_interface,

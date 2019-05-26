@@ -60,6 +60,9 @@ struct _G {
 static void _resource_api_add(uint64_t name,
                               void *api) {
     ct_resource_i0 *ct_resource_i = api;
+
+    CE_ASSERT(LOG_WHERE, ct_resource_i->name);
+
     ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
                 _G.allocator);
 }

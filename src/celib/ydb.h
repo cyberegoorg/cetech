@@ -30,17 +30,11 @@ struct ce_ydb_a0 {
 
     void (*dump_cnodes)(ce_cdb_t0 db,
                         cnode_t *cnodes,
-                        char ***outputs);
+                        char **outputs);
 
-    void (*save)(const char *path);
-
-    uint64_t (*cdb_from_vio)(ce_vio_t0 *vio,
-                             cnode_t **nodes,
-                             ce_alloc_t0 *alloc);
-
-    const char *(*get_key)(uint64_t hash);
-
-    uint64_t (*key)(const char *key);
+    uint64_t (*cnodes_from_vio)(ce_vio_t0 *vio,
+                                cnode_t **nodes,
+                                ce_alloc_t0 *alloc);
 };
 
 CE_MODULE(ce_ydb_a0);

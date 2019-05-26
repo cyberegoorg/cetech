@@ -277,8 +277,14 @@ static const char *display_icon() {
 }
 
 
+static const char* name() {
+    return "material";
+}
+
+
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
+        .name = name,
         .display_icon = display_icon,
         .online = online,
         .offline = offline,

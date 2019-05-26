@@ -65,7 +65,13 @@ static void *get_res_interface(uint64_t name_hash) {
     return NULL;
 }
 
+static const char* name() {
+    return "node_graph";
+}
+
+
 static struct ct_resource_i0 ct_resource_api = {
+        .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .create_new = create_new,

@@ -141,7 +141,7 @@ static int load_from_yaml_file(ce_cdb_t0 db,
     ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
 
     cnode_t *nodes = NULL;
-    uint64_t obj = ce_ydb_a0->cdb_from_vio(f, &nodes, alloc);
+    uint64_t obj = ce_ydb_a0->cnodes_from_vio(f, &nodes, alloc);
     ce_ydb_a0->create_root_obj(nodes, ce_cdb_a0->db());
     ce_os_vio_a0->close(f);
     ce_array_free(nodes, alloc);

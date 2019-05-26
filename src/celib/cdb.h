@@ -101,16 +101,10 @@ typedef struct ce_cdb_prop_ev_t0 {
 
 typedef struct cdb_binobj_header {
     uint64_t version;
-    uint64_t uid;
-    uint64_t type;
-    uint64_t parent;
-    uint64_t instance_of;
-    uint64_t properties_count;
+    uint64_t node_count;
     uint64_t string_buffer_size;
     uint64_t blob_buffer_size;
-    uint64_t set_buffer_size;
 } cdb_binobj_header;
-
 
 typedef enum cnode_e {
     CNODE_INVALID = 0,
@@ -119,6 +113,7 @@ typedef enum cnode_e {
     CNODE_REF,
     CNODE_STRING,
     CNODE_BOOL,
+    CNODE_BLOB,
     CNODE_OBJ_BEGIN,
     CNODE_OBJ_END,
     CNODE_OBJSET,
@@ -129,13 +124,18 @@ typedef struct cnode_t {
     cnode_e type;
 
     uint64_t key;
-    uint32_t parent_idx;
+//    uint32_t parent_idx;
     union {
         struct {
             uint64_t uid;
             uint64_t type;
             uint64_t instance_of;
         } obj;
+
+        struct {
+            void* data;
+            uint64_t size;
+        } blob;
 
         ce_cdb_value_u0 value;
     };

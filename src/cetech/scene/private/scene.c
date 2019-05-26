@@ -207,7 +207,13 @@ static void *get_interface(uint64_t name_hash) {
 bool scene_compiler(ce_cdb_t0 db,
                     uint64_t obj);
 
+static const char* name() {
+    return "scene";
+}
+
+
 static struct ct_resource_i0 ct_resource_api = {
+        .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .online = online,

@@ -48,6 +48,8 @@ static void game_init() {
 
     _G.game_state.main_ent = ct_ecs_a0->spawn(_G.game_state.world, boot_ent);
 
+    ce_cdb_a0->log_obj("ENT", ce_cdb_a0->db(), boot_ent);
+
     struct ct_game_i0 *gi = _get_game(_G.active_game);
     gi->init();
 }

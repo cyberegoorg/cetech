@@ -127,44 +127,10 @@ void _fill_deps(cnode_t *cnodes,
                _G.allocator);
 }
 
-void _save_resursive(const char *filename,
-                     ce_cdb_t0 db,
-                     uint64_t obj,
-                     bool file_resource) {
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
-
-    const uint32_t prop_count = ce_cdb_a0->prop_count(reader);
-    const uint64_t *keys = ce_cdb_a0->prop_keys(reader);
-
-    for (int i = 0; i < prop_count; ++i) {
-        uint64_t key = keys[i];
-
-        ce_cdb_type_e0 t = ce_cdb_a0->prop_type(reader, key);
-
-        switch (t) {
-            case CE_CDB_TYPE_SUBOBJECT: {
-                uint64_t subobj = ce_cdb_a0->read_subobject(reader, key, 0);
-
-                if (subobj) {
-                    _save_resursive(filename, db, subobj, false);
-                }
-            }
-                break;
-            case CE_CDB_TYPE_SET_SUBOBJECT: {
-                uint64_t n = ce_cdb_a0->read_objset_num(reader, key);
-                uint64_t objs[n];
-                ce_cdb_a0->read_objset(reader, key, objs);
-                for (int j = 0; j < n; ++j) {
-                    _save_resursive(filename, db, objs[j], false);
-                }
-            }
-                break;
-            default:
-                break;
-        }
-    }
-
+void _save(const char *filename,
+           ce_cdb_t0 db,
+           uint64_t obj,
+           bool file_resource) {
     char *output = NULL;
     ce_cdb_a0->dump(db, obj, &output, _G.allocator);
     ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
@@ -224,20 +190,10 @@ void _compile_files(char **files,
 
         ce_log_a0->debug(LOG_WHERE, "COMPILE 0x%llx", cnodes[0].obj.uid);
 
-        char **outputs = NULL;
-
-        ce_ydb_a0->dump_cnodes(db, cnodes, &outputs);
-
-        uint32_t objs_n = ce_array_size(outputs);
-        for (int i = 0; i < objs_n; ++i) {
-            cdb_binobj_header *h = (cdb_binobj_header *) outputs[i];
-
-            ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=h->uid},
-                                                outputs[i],
-                                                ce_array_size(outputs[i]));
-
-            ce_buffer_free(outputs[i], _G.allocator);
-        }
+        char *outputs2 = NULL;
+        ce_ydb_a0->dump_cnodes(db, cnodes, &outputs2);
+        ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
+                                            outputs2, ce_array_size(outputs2));
     }
 
     for (int k = 0; k < output_n; ++k) {
@@ -248,8 +204,8 @@ void _compile_files(char **files,
             compilator(db, obj);
         }
 
-        const char* filename = (const char*)ce_hash_lookup(&obj_files, obj, 0);
-        _save_resursive(filename, db, obj, true);
+        const char *filename = (const char *) ce_hash_lookup(&obj_files, obj, 0);
+        _save(filename, db, obj, true);
     }
 
     ce_cdb_a0->destroy_db(db);

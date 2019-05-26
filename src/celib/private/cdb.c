@@ -1040,7 +1040,7 @@ static void _add_obj_to_destroy_list(db_t *db_inst,
 }
 
 static ce_cdb_type_e0 prop_type(const ce_cdb_obj_o0 *reader,
-                                     uint64_t key);
+                                uint64_t key);
 
 void _remove_obj(ce_cdb_obj_o0 *_writer,
                  uint64_t property,
@@ -1237,32 +1237,26 @@ static bool _val_eq(ce_cdb_value_u0 v1,
     return v1.uint64 == v2.uint64;
 }
 
-static void dump(ce_cdb_t0 db,
-                 uint64_t _obj,
-                 char **output,
-                 struct ce_alloc_t0 *allocator) {
+void _dump(ce_cdb_t0 db,
+           uint64_t _obj,
+           uint64_t key,
+           char **str_buffer,
+           char **blob_buffer,
+           cnode_t **nodes,
+           struct ce_alloc_t0 *allocator) {
     db_t *dbi = _get_db(db);
 
     object_t *obj = _get_object_from_uid(dbi, _obj);
 
-
-    char *str_buffer = NULL;
-    char *blob_buffer = NULL;
-    char *set_buffer = NULL;
-
-    uint64_t *keys = NULL;
-    uint8_t *type = NULL;
-    ce_cdb_value_u0 *values = NULL;
-
-    cdb_binobj_header header = {
-            .type = obj->type,
-            .parent = obj->parent,
-            .instance_of = obj->instance_of,
-    };
+    ce_array_push(*nodes, ((cnode_t) {
+            .type = CNODE_OBJ_BEGIN,
+            .key = key,
+            .obj.type = obj->type,
+            .obj.uid = _obj,
+            .obj.instance_of = obj->instance_of,
+    }), allocator);
 
     ce_cdb_type_def_t0 *defs = obj->storage->prop_def;
-
-    uint32_t prop_count = 0;
 
     for (int i = 0; i < defs->num; ++i) {
         ce_cdb_prop_def_t0 *def = &defs->defs[i];
@@ -1274,99 +1268,139 @@ static void dump(ce_cdb_t0 db,
             continue;
         }
 
-        prop_count++;
-
-        ce_array_push(keys, k, _G.allocator);
-        ce_array_push(type, def->type, _G.allocator);
-
         switch (def->type) {
+            case CE_CDB_TYPE_UINT64: {
+                ce_array_push(*nodes, ((cnode_t) {
+                        .key = k,
+                        .type = CNODE_UINT,
+                        .value = *v,
+                }), allocator);
+            }
+                break;
+
+            case CE_CDB_TYPE_REF: {
+                ce_array_push(*nodes, ((cnode_t) {
+                        .key = k,
+                        .type = CNODE_REF,
+                        .value = *v,
+                }), allocator);
+            }
+                break;
+
+            case CE_CDB_TYPE_FLOAT: {
+                ce_array_push(*nodes, ((cnode_t) {
+                        .key = k,
+                        .type = CNODE_FLOAT,
+                        .value = *v,
+                }), allocator);
+            }
+                break;
+            case CE_CDB_TYPE_BOOL: {
+                ce_array_push(*nodes, ((cnode_t) {
+                        .key = k,
+                        .type = CNODE_BOOL,
+                        .value = *v,
+                }), allocator);
+            }
+                break;
+
+            case CE_CDB_TYPE_SUBOBJECT: {
+                const ce_cdb_obj_o0 *reader = (const ce_cdb_obj_o0 *) obj;
+
+                uint64_t subobj = ce_cdb_a0->read_subobject(reader, k, 0);
+
+                _dump(db, subobj, k, str_buffer, blob_buffer, nodes, allocator);
+            }
+                break;
+
             case CE_CDB_TYPE_SET_SUBOBJECT: {
-                uint64_t setoffset = ce_array_size(set_buffer);
+                const ce_cdb_obj_o0 *reader = (const ce_cdb_obj_o0 *) obj;
 
-                struct set_t *set = _get_set(dbi, v->set);
+                uint64_t n = ce_cdb_a0->read_objset_num(reader, k);
+                uint64_t objs[n];
+                ce_cdb_a0->read_objset(reader, k, objs);
 
-                if (set) {
-                    uint64_t n = ce_array_size(set->objs);
-                    ce_array_push_n(set_buffer, &n, sizeof(uint64_t), allocator);
-                    ce_array_push_n(set_buffer, set->objs, sizeof(uint64_t) * n, allocator);
-                } else {
-                    uint64_t n = 0;
-                    ce_array_push_n(set_buffer, &n, sizeof(uint64_t), allocator);
+                ce_array_push(*nodes, ((cnode_t) {
+                        .type = CNODE_OBJSET,
+                        .key = k,
+                }), allocator);
+
+                for (int j = 0; j < n; ++j) {
+                    _dump(db, objs[j], 0, str_buffer, blob_buffer, nodes, allocator);
                 }
 
-                ce_array_push(values, (ce_cdb_value_u0) {.uint64=setoffset}, _G.allocator);
+                ce_array_push(*nodes, ((cnode_t) {
+                        .type = CNODE_OBJSET_END,
+                }), allocator);
+
             }
                 break;
 
             case CE_CDB_TYPE_BLOB: {
-                uint64_t bloboffset = ce_array_size(blob_buffer);
+                uint64_t bloboffset = ce_array_size(*blob_buffer);
 
                 struct ce_cdb_blob_t0 *blob = _get_blob(dbi, v->blob);
 
-                if (blob) {
-                    ce_array_push_n(blob_buffer, &blob->size, sizeof(uint64_t), allocator);
-                    ce_array_push_n(blob_buffer, blob->data, blob->size, allocator);
-                } else {
-                    uint64_t n = 0;
-                    ce_array_push_n(blob_buffer, &n, sizeof(uint64_t), allocator);
+                if (blob->data) {
+                    ce_array_push_n(*blob_buffer, blob->data, blob->size, _G.allocator);
                 }
 
-                ce_array_push(values, (ce_cdb_value_u0) {.uint64=bloboffset}, _G.allocator);
+                ce_array_push(*nodes, ((cnode_t) {
+                        .type = CNODE_BLOB,
+                        .key = k,
+                        .blob.size = blob->size,
+                        .blob.data = (void *) bloboffset,
+                }), allocator);
 
             }
                 break;
 
             case CE_CDB_TYPE_STR: {
-                uint64_t stroffset = ce_array_size(str_buffer);
+                uint64_t stroffset = ce_array_size(*str_buffer);
 
                 if (v->str) {
-                    ce_array_push_n(str_buffer, v->str, strlen(v->str) + 1, allocator);
+                    ce_array_push_n(*str_buffer, v->str, strlen(v->str) + 1, allocator);
                 }
-                ce_array_push(values, (ce_cdb_value_u0) {.uint64=stroffset}, _G.allocator);
+
+                ce_array_push(*nodes, ((cnode_t) {
+                        .type = CNODE_STRING,
+                        .key = k,
+                        .value.uint64 = stroffset,
+                }), allocator);
 
             }
                 break;
 
-            default: {
-                ce_array_push(values, *v, _G.allocator);
-            }
-                break;
         }
     }
 
-    header.properties_count = prop_count;
-    header.string_buffer_size = ce_array_size(str_buffer);
-    header.blob_buffer_size = ce_array_size(blob_buffer);
-    header.set_buffer_size = ce_array_size(set_buffer);
+    ce_array_push(*nodes, ((cnode_t) {
+            .type = CNODE_OBJ_END,
+    }), allocator);
+}
 
-    ce_array_push_n(*output, (char *) &header,
-                    sizeof(cdb_binobj_header),
-                    allocator);
 
-    ce_array_push_n(*output, (char *) (keys),
-                    sizeof(uint64_t) * (ce_array_size(keys)),
-                    allocator);
+static void dump(ce_cdb_t0 db,
+                 uint64_t _obj,
+                 char **output,
+                 struct ce_alloc_t0 *allocator) {
+    char *str_buffer = NULL;
+    char *blob_buffer = NULL;
+    cnode_t *nodes = NULL;
 
-    ce_array_push_n(*output, (char *) (type),
-                    sizeof(uint8_t) * (ce_array_size(type)),
-                    allocator);
+    _dump(db, _obj, 0, &str_buffer, &blob_buffer, &nodes, allocator);
 
-    ce_array_push_n(*output, (char *) (values),
-                    sizeof(ce_cdb_value_u0) * (prop_count),
-                    allocator);
+    cdb_binobj_header header = {
+            .version = 0,
+            .blob_buffer_size = ce_array_size(blob_buffer),
+            .string_buffer_size = ce_array_size(str_buffer),
+            .node_count = ce_array_size(nodes),
+    };
 
-    ce_array_push_n(*output, (char *) str_buffer,
-                    header.string_buffer_size,
-                    allocator);
-
-    ce_array_push_n(*output, (char *) blob_buffer,
-                    header.blob_buffer_size,
-                    allocator);
-
-    ce_array_push_n(*output, (char *) set_buffer,
-                    header.set_buffer_size,
-                    allocator);
-
+    ce_array_push_n(*output, (char *) &header, sizeof(cdb_binobj_header), _G.allocator);
+    ce_array_push_n(*output, (char *) nodes, sizeof(cnode_t) * header.node_count, _G.allocator);
+    ce_array_push_n(*output, (char *) str_buffer, header.string_buffer_size, _G.allocator);
+    ce_array_push_n(*output, (char *) blob_buffer, header.blob_buffer_size, _G.allocator);
 }
 
 
@@ -1400,7 +1434,7 @@ static ce_cdb_obj_o0 *write_begin(ce_cdb_t0 db,
 }
 
 static ce_cdb_type_e0 prop_type(const ce_cdb_obj_o0 *reader,
-                                     uint64_t key) {
+                                uint64_t key) {
     object_t *obj = _get_object_from_o(reader);
 
 
@@ -1482,9 +1516,9 @@ static bool write_try_commit(ce_cdb_obj_o0 *_writer) {
     return ok;
 }
 
-static ce_cdb_value_u0 *_get_or_create_value_ptr_generic(object_t *obj,
-                                                         uint64_t property,
-                                                         ce_cdb_type_e0 prop_type) {
+static ce_cdb_value_u0 *_get_value_ptr(object_t *obj,
+                                       uint64_t property,
+                                       ce_cdb_type_e0 prop_type) {
 
     uint64_t o = obj->typed_writer_idx ? obj->typed_writer_idx : obj->typed_obj_idx;
     ce_cdb_value_u0 *v = _get_prop_value_ptr(obj->storage, o, property);
@@ -1501,8 +1535,7 @@ static void _set_float(ce_cdb_obj_o0 *_writer,
         return;
     }
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_FLOAT);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property, CE_CDB_TYPE_FLOAT);
 
     if (!value_ptr) {
         return;
@@ -1533,8 +1566,8 @@ static void _set_bool(ce_cdb_obj_o0 *_writer,
         return;
     }
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_BOOL);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_BOOL);
 
     if (!value_ptr) {
         return;
@@ -1562,8 +1595,8 @@ static void _set_string(ce_cdb_obj_o0 *_writer,
 
     object_t *writer = _get_object_from_o(_writer);
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_STR);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_STR);
 
     if (!value_ptr) {
         return;
@@ -1595,8 +1628,8 @@ static void _set_uint64(ce_cdb_obj_o0 *_writer,
                         bool log_event) {
     object_t *writer = _get_object_from_o(_writer);
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_UINT64);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_UINT64);
 
     if (!value_ptr) {
         return;
@@ -1626,8 +1659,8 @@ static void _set_ptr(ce_cdb_obj_o0 *_writer,
         return;
     }
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_PTR);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_PTR);
 
     if (!value_ptr) {
         return;
@@ -1659,8 +1692,8 @@ static void _set_ref(ce_cdb_obj_o0 *_writer,
         return;
     }
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_REF);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_REF);
 
     if (!value_ptr) {
         return;
@@ -1690,8 +1723,8 @@ void _set_subobject(ce_cdb_obj_o0 *_writer,
         return;
     }
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_SUBOBJECT);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_SUBOBJECT);
 
 
     if (!value_ptr) {
@@ -1782,11 +1815,11 @@ void set_subobject(ce_cdb_obj_o0 *_writer,
     _set_subobject(_writer, property, subobject, true);
 }
 
-
-void set_blob(ce_cdb_obj_o0 *_writer,
-              uint64_t property,
-              void *blob_data,
-              uint64_t blob_size) {
+void _set_blob(ce_cdb_obj_o0 *_writer,
+               uint64_t property,
+               const void *blob_data,
+               uint64_t blob_size,
+               bool log_event) {
     ce_alloc_t0 *a = _G.allocator;
 
     object_t *writer = _get_object_from_o(_writer);
@@ -1797,8 +1830,8 @@ void set_blob(ce_cdb_obj_o0 *_writer,
 
     db_t *db = _get_db(writer->db);
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_BLOB);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_BLOB);
 
     if (!value_ptr) {
         return;
@@ -1823,20 +1856,29 @@ void set_blob(ce_cdb_obj_o0 *_writer,
             .data = new_blob,
     };
 
-    _add_change(writer, (ce_cdb_prop_ev_t0) {
-            .obj = writer->orig_obj,
-            .prop=property,
-            .ev_type =CE_CDB_PROP_CHANGE_EVENT,
-            .prop_type = CE_CDB_TYPE_BLOB,
-            .old_value = *value_ptr,
-            .new_value.blob = blob_idx,
-    });
+    if (log_event) {
+        _add_change(writer, (ce_cdb_prop_ev_t0) {
+                .obj = writer->orig_obj,
+                .prop=property,
+                .ev_type =CE_CDB_PROP_CHANGE_EVENT,
+                .prop_type = CE_CDB_TYPE_BLOB,
+                .old_value = *value_ptr,
+                .new_value.blob = blob_idx,
+        });
+    }
 }
 
+void set_blob(ce_cdb_obj_o0 *_writer,
+              uint64_t property,
+              void *blob_data,
+              uint64_t blob_size) {
+    _set_blob(_writer, property, blob_data, blob_size, true);
+}
 
-void add_obj(ce_cdb_obj_o0 *_writer,
-             uint64_t property,
-             uint64_t obj) {
+void _add_obj(ce_cdb_obj_o0 *_writer,
+              uint64_t property,
+              uint64_t obj,
+              bool log_event) {
     object_t *writer = _get_object_from_o(_writer);
 
     if (!writer) {
@@ -1845,8 +1887,8 @@ void add_obj(ce_cdb_obj_o0 *_writer,
 
     db_t *db = _get_db(writer->db);
 
-    ce_cdb_value_u0 *value_ptr = _get_or_create_value_ptr_generic(writer, property,
-                                                                  CE_CDB_TYPE_SET_SUBOBJECT);
+    ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
+                                                CE_CDB_TYPE_SET_SUBOBJECT);
 
     if (!value_ptr) {
         return;
@@ -1865,15 +1907,25 @@ void add_obj(ce_cdb_obj_o0 *_writer,
             subobj->key = property;
 
             _add_to_set(db, value_ptr->set, obj);
-            _add_change(writer, (ce_cdb_prop_ev_t0) {
-                    .obj = writer->orig_obj,
-                    .prop=property,
-                    .ev_type =CE_CDB_OBJSET_ADD_EVENT,
-                    .prop_type = CE_CDB_TYPE_SET_SUBOBJECT,
-                    .new_value.subobj = obj,
-            });
+
+            if (log_event) {
+                _add_change(writer, (ce_cdb_prop_ev_t0) {
+                        .obj = writer->orig_obj,
+                        .prop=property,
+                        .ev_type =CE_CDB_OBJSET_ADD_EVENT,
+                        .prop_type = CE_CDB_TYPE_SET_SUBOBJECT,
+                        .new_value.subobj = obj,
+                });
+            }
         }
     }
+}
+
+
+void add_obj(ce_cdb_obj_o0 *_writer,
+             uint64_t property,
+             uint64_t obj) {
+    _add_obj(_writer, property, obj, true);
 }
 
 void _remove_obj(ce_cdb_obj_o0 *_writer,
@@ -2363,7 +2415,7 @@ void move_objset_obj(ce_cdb_obj_o0 *from_w,
     object_t *to = _get_object_from_o(to_w);
 
     ce_cdb_value_u0 *from_v = _get_value_ptr_generic(writer, prop);
-    ce_cdb_value_u0 *to_v = _get_or_create_value_ptr_generic(to, prop, CE_CDB_TYPE_SET_SUBOBJECT);
+    ce_cdb_value_u0 *to_v = _get_value_ptr(to, prop, CE_CDB_TYPE_SET_SUBOBJECT);
 
     if (!to_v) {
         return;
@@ -2761,121 +2813,116 @@ static void load(ce_cdb_t0 db,
                  struct ce_alloc_t0 *allocator) {
     db_t *db_inst = _get_db(db);
 
-    const struct cdb_binobj_header *header;
-    header = (const struct cdb_binobj_header *) input;
+    const cdb_binobj_header *header = (const cdb_binobj_header *) input;
 
-    uint64_t instanceof = header->instance_of;
-
-    if (instanceof) {
-        _create_from_uid(db, instanceof, _obj, true);
-    } else {
-        create_object_uid(db, _obj, header->type, true);
-    }
-
-    object_t *obj = _get_object_from_uid(db_inst, _obj);
-    obj->parent = header->parent;
-
-    uint64_t *keys = (uint64_t *) (header + 1);
-    uint8_t *ptype = (uint8_t *) (keys + header->properties_count);
-    ce_cdb_value_u0 *values = (ce_cdb_value_u0 *) (ptype + header->properties_count);
-    const char *strbuffer = (char *) (values + header->properties_count);
+    cnode_t *cnodes = (cnode_t *) (header + 1);
+    const char *strbuffer = (char *) (cnodes + header->node_count);
     const char *blob_buffer = (char *) (strbuffer + header->string_buffer_size);
-    const char *set_buffer = (char *) (blob_buffer + header->blob_buffer_size);
 
-    if (!header->properties_count) {
-        return;
-    }
+    struct state_t {
+        ce_cdb_obj_o0 *writer;
+        bool is_set;
+        uint64_t key;
+    } *states = NULL;
 
-    uint32_t prop_n = header->properties_count;
-    for (int i = 0; i < prop_n; ++i) {
-        switch (ptype[i]) {
-            case CE_CDB_TYPE_STR: {
-                uint64_t str_offset = values[i].uint64;
+    uint64_t n = header->node_count;
+    for (int i = 0; i < n; ++i) {
+        cnode_t node = cnodes[i];
 
-                char *dup_str = ce_memory_a0->str_dup(strbuffer + str_offset, allocator);
+        uint32_t state_n = ce_array_size(states);
+        uint32_t state_top = state_n - 1;
 
-                ce_cdb_value_u0 *value_ptr = &values[i];
-                value_ptr->str = dup_str;
+        switch (node.type) {
+            case CNODE_INVALID: {
             }
-
+                break;
+            case CNODE_FLOAT: {
+                struct state_t *state = &states[state_top];
+                _set_float(state->writer, node.key, node.value.f, false);
+            }
+                break;
+            case CNODE_UINT: {
+                struct state_t *state = &states[state_top];
+                _set_uint64(state->writer, node.key, node.value.uint64, false);
+            }
+                break;
+            case CNODE_REF: {
+                struct state_t *state = &states[state_top];
+                _set_ref(state->writer, node.key, node.value.ref, false);
+            }
                 break;
 
-            case CE_CDB_TYPE_SET_SUBOBJECT: {
-                uint64_t name = keys[i];
-                uint64_t set_offset = values[i].uint64;
+            case CNODE_BOOL: {
+                struct state_t *state = &states[state_top];
+                _set_bool(state->writer, node.key, node.value.b, false);
+            }
+                break;
 
-                uint64_t size = *((uint64_t *) (set_buffer + set_offset));
-                uint64_t *data = (uint64_t *) (set_buffer + set_offset + sizeof(uint64_t));
+            case CNODE_STRING: {
+                struct state_t *state = &states[state_top];
+                const char *str = &strbuffer[node.value.uint64];
+                _set_string(state->writer, node.key, str, false);
+            }
+                break;
 
-                for (int j = 0; j < size; ++j) {
-                    uint64_t subobj = data[j];
-                    add_obj((ce_cdb_obj_o0 *) obj, name, subobj);
+            case CNODE_BLOB: {
+                struct state_t *state = &states[state_top];
+                const void *blob = &blob_buffer[node.value.uint64];
+                _set_blob(state->writer, node.key, blob, node.blob.size, false);
+            }
+                break;
+
+            case CNODE_OBJ_BEGIN: {
+                uint64_t uid = node.obj.uid;
+                if (node.obj.instance_of) {
+                    _create_from_uid(db, node.obj.instance_of, uid, true);
+                } else {
+                    create_object_uid(db, uid, node.obj.type, true);
                 }
-            }
-                break;
 
-            case CE_CDB_TYPE_BLOB: {
-                uint64_t blob_offset = values[i].uint64;
+                object_t *obj = _get_object_from_uid(db_inst, uid);
+                obj->key = node.key;
 
-                uint64_t size = *((uint64_t *) (blob_buffer + blob_offset));
-                const char *blob_data = ((blob_buffer + blob_offset + sizeof(uint64_t)));
+                if (state_n) {
+                    struct state_t *state = &states[state_top];
+                    if (state->is_set) {
+                        struct state_t *parent_obj = &states[state_top - 1];
+                        _add_obj(parent_obj->writer, state->key, uid, false);
+                    } else {
+                        _set_subobject(state->writer, node.key, uid, false);
+                    }
+                }
 
-                char *copy_blob_data = CE_ALLOC(allocator, char, size);
-                memcpy(copy_blob_data, blob_data, size);
-
-                uint32_t blob_idx = _new_blob(db_inst);
-                ce_cdb_blob_t0 *blob = _get_blob(db_inst, blob_idx);
-
-                *blob = (ce_cdb_blob_t0) {
-                        .size = size,
-                        .data = copy_blob_data
+                struct state_t new_state = {
+                        .writer = (ce_cdb_obj_o0 *) obj,
                 };
 
-                ce_cdb_value_u0 *value_ptr = &values[i];
-                value_ptr->blob = blob_idx;
-            }
-
-        }
-    }
-
-    for (int i = 0; i < prop_n; ++i) {
-        uint64_t name = keys[i];
-        ce_cdb_type_e0 t = ptype[i];
-        ce_cdb_value_u0 *value_ptr = &values[i];
-
-        switch (t) {
-            case CE_CDB_TYPE_UINT64:
-                set_uint64((ce_cdb_obj_o0 *) obj, name, value_ptr->uint64);
-                break;
-            case CE_CDB_TYPE_PTR:
-                set_ptr((ce_cdb_obj_o0 *) obj, name, value_ptr->ptr);
-                break;
-            case CE_CDB_TYPE_REF:
-                set_ref((ce_cdb_obj_o0 *) obj, name, value_ptr->ref);
-                break;
-            case CE_CDB_TYPE_FLOAT:
-                set_float((ce_cdb_obj_o0 *) obj, name, value_ptr->f);
-                break;
-            case CE_CDB_TYPE_BOOL:
-                set_bool((ce_cdb_obj_o0 *) obj, name, value_ptr->b);
-                break;
-            case CE_CDB_TYPE_STR:
-                set_string((ce_cdb_obj_o0 *) obj, name, value_ptr->str);
-                break;
-            case CE_CDB_TYPE_SUBOBJECT:
-                set_subobject((ce_cdb_obj_o0 *) obj, name, value_ptr->subobj);
-                break;
-            case CE_CDB_TYPE_BLOB: {
-                ce_cdb_blob_t0 *blob = _get_blob(db_inst, value_ptr->blob);
-                set_blob((ce_cdb_obj_o0 *) obj, name, blob->data, blob->size);
+                ce_array_push(states, new_state, _G.allocator);
             }
                 break;
-            default:
+
+            case CNODE_OBJ_END: {
+//                struct state_t *state = &states[state_top];
+//                write_commit(state->writer);
+                ce_array_pop_back(states);
+            }
+                break;
+
+            case CNODE_OBJSET: {
+                struct state_t new_state = {
+                        .is_set = true,
+                        .key = node.key,
+                };
+                ce_array_push(states, new_state, _G.allocator);
+            }
+                break;
+
+            case CNODE_OBJSET_END: {
+                ce_array_pop_back(states);
+            }
                 break;
         }
     }
-
-    ce_array_clean(obj->changed);
 }
 
 void _init_from_defs(ce_cdb_t0 db,
