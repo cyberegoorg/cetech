@@ -44,6 +44,12 @@ components:
     cdb_uid: 0xfab273448e38044e
     cdb_type: player_input
     move: 0.000000
+    move_speed: 15000.000000
+    shoot_dir:
+      cdb_uid: 0x719961fd4c6882e9
+      cdb_type: vec2_t
+      x: 0.000000
+      y: 0.000000
   0x505912ebe0a8d032:
     cdb_uid: 0x505912ebe0a8d032
     cdb_type: pad

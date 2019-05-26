@@ -10,6 +10,7 @@
 
 typedef struct player_input_component {
     float move;
+    float move_speed;
     ce_vec2_t shoot_dir;
 } player_input_component;
 
@@ -42,6 +43,10 @@ static struct ct_ecs_component_i0 player_input_component_i = {
 static const ce_cdb_prop_def_t0 player_input_component_prop[] = {
         {
                 .name = "move",
+                .type = CE_CDB_TYPE_FLOAT,
+        },
+        {
+                .name = "move_speed",
                 .type = CE_CDB_TYPE_FLOAT,
         },
         {
