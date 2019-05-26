@@ -218,7 +218,6 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                     ce_array_pop_back(parent_stack);
 
                     (*cnodes)[cnode_idx].key = parent_stack[parent_stack_top].str_hash;
-//                    (*cnodes)[cnode_idx].parent_idx = parent_stack[parent_stack_top - 1].cnode_idx;
                 }
 
                 ce_array_push(parent_stack, state, _G.allocator);
@@ -279,14 +278,12 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                     // VALUE_WITH_KEY
                 } else if (parent_stack[parent_stack_top].type == NODE_STRING) {
                     key = parent_stack[parent_stack_top].str_hash;
-//                    uint32_t parent_idx = parent_stack[parent_stack_top - 1].cnode_idx;
 
                     switch (type) {
                         case NODE_FLOAT:
                             _push_cnode(cnodes, (cnode_t) {
                                     .type = CNODE_FLOAT,
                                     .key = key,
-//                                    .parent_idx = parent_idx,
                                     .value.f = value.f,
                             });
 
@@ -296,7 +293,6 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                             _push_cnode(cnodes, (cnode_t) {
                                     .type = CNODE_UINT,
                                     .key = key,
-//                                    .parent_idx = parent_idx,
                                     .value.uint64 = value.ui
                             });
 
@@ -339,7 +335,6 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                                 _push_cnode(cnodes, (cnode_t) {
                                         .type = CNODE_REF,
                                         .key = key,
-//                                        .parent_idx = parent_idx,
                                         .value.ref = uid,
                                 });
 
@@ -347,7 +342,6 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                                 _push_cnode(cnodes, (cnode_t) {
                                         .type = CNODE_STRING,
                                         .key = key,
-//                                        .parent_idx = parent_idx,
                                         .value.str = value.string
                                 });
                             }
@@ -681,194 +675,6 @@ void _dump_cnodes(ce_cdb_t0 db,
     ce_array_push_n(*outputs, (char *) str_buffer, header.string_buffer_size, _G.allocator);
     ce_array_push_n(*outputs, (char *) blob_buffer, header.blob_buffer_size, _G.allocator);
 }
-
-//void _dump_cnodes(ce_cdb_t0 db,
-//                  cnode_t *cnodes,
-//                  char ***outputs) {
-//
-//    struct state_t {
-//        char *str_buffer;
-//        char *blob_buffer;
-//        char *set_buffer;
-//
-//        uint64_t *keys;
-//        uint8_t *type;
-//        ce_cdb_value_u0 *values;
-//        uint64_t prop_count;
-//        cdb_binobj_header header;
-//
-//        // SET
-//        uint64_t key;
-//        bool is_set;
-//        uint64_t *set_objs;
-//    } *states = NULL;
-//
-//    uint64_t n = ce_array_size(cnodes);
-//    for (int i = 0; i < n; ++i) {
-//        cnode_t node = cnodes[i];
-//
-//        uint32_t state_n = ce_array_size(states);
-//        uint32_t state_top = state_n - 1;
-//
-//        switch (node.type) {
-//            default:
-//            case CNODE_INVALID: {
-//            }
-//                break;
-//            case CNODE_FLOAT: {
-//                struct state_t *state = &states[state_top];
-//                ce_array_push(state->keys, node.key, _G.allocator);
-//                ce_array_push(state->type, CE_CDB_TYPE_FLOAT, _G.allocator);
-//                ce_array_push(state->values, node.value, _G.allocator);
-//            }
-//                break;
-//            case CNODE_UINT: {
-//                struct state_t *state = &states[state_top];
-//                ce_array_push(state->keys, node.key, _G.allocator);
-//                ce_array_push(state->type, CE_CDB_TYPE_UINT64, _G.allocator);
-//                ce_array_push(state->values, node.value, _G.allocator);
-//            }
-//                break;
-//            case CNODE_REF: {
-//                struct state_t *state = &states[state_top];
-//                ce_array_push(state->keys, node.key, _G.allocator);
-//                ce_array_push(state->type, CE_CDB_TYPE_REF, _G.allocator);
-//                ce_array_push(state->values, node.value, _G.allocator);
-//            }
-//                break;
-//
-//            case CNODE_BOOL: {
-//                struct state_t *state = &states[state_top];
-//                ce_array_push(state->keys, node.key, _G.allocator);
-//                ce_array_push(state->type, CE_CDB_TYPE_BOOL, _G.allocator);
-//                ce_array_push(state->values, node.value, _G.allocator);
-//            }
-//                break;
-//
-//            case CNODE_STRING: {
-//                struct state_t *state = &states[state_top];
-//
-//                uint64_t stroffset = ce_array_size(state->str_buffer);
-//
-//                if (node.value.str) {
-//                    ce_array_push_n(state->str_buffer,
-//                                    node.value.str, strlen(node.value.str) + 1, _G.allocator);
-//                }
-//
-//                ce_array_push(state->keys, node.key, _G.allocator);
-//                ce_array_push(state->type, CE_CDB_TYPE_STR, _G.allocator);
-//                ce_array_push(state->values,
-//                              (ce_cdb_value_u0) {.uint64=stroffset},
-//                              _G.allocator);
-//            }
-//                break;
-//
-//            case CNODE_OBJ_BEGIN: {
-//                uint64_t parent = 0;
-//                if (state_n) {
-//                    struct state_t *state = &states[state_top];
-//                    if (state->is_set) {
-//                        ce_array_push(state->set_objs, node.obj.uid, _G.allocator);
-//
-//                        struct state_t *parent_obj = &states[state_top - 1];
-//                        parent = parent_obj->header.uid;
-//
-//                    } else {
-//                        parent = state->header.uid;
-//                        ce_array_push(state->keys, node.key, _G.allocator);
-//                        ce_array_push(state->type, CE_CDB_TYPE_SUBOBJECT, _G.allocator);
-//                        ce_array_push(state->values,
-//                                      (ce_cdb_value_u0) {.ref=node.obj.uid},
-//                                      _G.allocator);
-//                    }
-//                }
-//
-//                struct state_t new_state = {
-//                        .header.uid = node.obj.uid,
-//                        .header.type = node.obj.type,
-//                        .header.instance_of = node.obj.instance_of,
-//                        .header.parent = parent,
-//                        .key = node.key,
-//                };
-//                ce_array_push(states, new_state, _G.allocator);
-//            }
-//                break;
-//
-//            case CNODE_OBJ_END: {
-//                struct state_t *state = &states[state_top];
-//
-//                state->header.properties_count = ce_array_size(state->values);
-//                state->header.string_buffer_size = ce_array_size(state->str_buffer);
-//                state->header.blob_buffer_size = ce_array_size(state->blob_buffer);
-//                state->header.set_buffer_size = ce_array_size(state->set_buffer);
-//
-//                char *output = NULL;
-//
-//                ce_array_push_n(output, (char *) &state->header,
-//                                sizeof(cdb_binobj_header),
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) (state->keys),
-//                                sizeof(uint64_t) * (ce_array_size(state->keys)),
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) (state->type),
-//                                sizeof(uint8_t) * (ce_array_size(state->type)),
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) (state->values),
-//                                sizeof(ce_cdb_value_u0) * (state->header.properties_count),
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) state->str_buffer,
-//                                state->header.string_buffer_size,
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) state->blob_buffer,
-//                                state->header.blob_buffer_size,
-//                                _G.allocator);
-//
-//                ce_array_push_n(output, (char *) state->set_buffer,
-//                                state->header.set_buffer_size,
-//                                _G.allocator);
-//
-//                ce_array_push(*outputs, output, _G.allocator);
-//
-//                ce_array_pop_back(states);
-//            }
-//                break;
-//            case CNODE_OBJSET: {
-//                struct state_t new_state = {
-//                        .is_set = true,
-//                        .key = node.key,
-//                };
-//                ce_array_push(states, new_state, _G.allocator);
-//            }
-//                break;
-//            case CNODE_OBJSET_END: {
-//                struct state_t *state = &states[state_top];
-//                struct state_t *top_state = &states[state_top - 1];
-//
-//                uint64_t setoffset = ce_array_size(top_state->set_buffer);
-//
-//                uint64_t n = ce_array_size(state->set_objs);
-//                ce_array_push_n(top_state->set_buffer, &n, sizeof(uint64_t), _G.allocator);
-//                ce_array_push_n(top_state->set_buffer,
-//                                state->set_objs, sizeof(uint64_t) * n, _G.allocator);
-//
-//
-//                ce_array_push(top_state->keys, state->key, _G.allocator);
-//                ce_array_push(top_state->type, CE_CDB_TYPE_SET_SUBOBJECT, _G.allocator);
-//                ce_array_push(top_state->values,
-//                              (ce_cdb_value_u0) {.uint64=setoffset},
-//                              _G.allocator);
-//
-//                ce_array_pop_back(states);
-//            }
-//                break;
-//        }
-//    }
-//}
 
 static struct ce_ydb_a0 ydb_api = {
         .get_obj = get_obj,
