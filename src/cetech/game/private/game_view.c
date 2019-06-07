@@ -58,7 +58,6 @@ static void _get_viewport(struct ct_world_t0 world,
                           struct ct_entity_t0 *ent,
                           ct_entity_storage_o0 *item,
                           uint32_t n,
-                          ct_ecs_cmd_buffer_t *buff,
                           void *data) {
     ct_viewport_t0 *vp = data;
 

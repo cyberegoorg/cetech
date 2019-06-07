@@ -54,11 +54,11 @@ void render_static_mesh(ct_world_t0 world,
                         void *_data) {
     mesh_render_data *data = _data;
 
-    ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
-    ct_mesh_component *static_meshs = ct_ecs_a0->get_all(MESH_RENDERER_COMPONENT, item);
+    ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
+    ct_mesh_component *static_meshs = ct_ecs_c_a0->get_all(world, STATIC_MESH_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        ct_transform_comp t_c = transforms[i];
+        ct_local_to_world_c t_c = transforms[i];
         ct_mesh_component m_c = static_meshs[i];
 
         if (!m_c.scene || !m_c.material) {

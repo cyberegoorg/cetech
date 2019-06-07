@@ -13,7 +13,7 @@ children:
       cdb_type: cdb_objset
       0xfe7bbc5af701c125:
         cdb_uid: 0xfe7bbc5af701c125
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0xba9d9aceb9b23685
       0x7759a340f42bb279:
         cdb_uid: 0x7759a340f42bb279

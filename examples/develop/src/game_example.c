@@ -21,8 +21,6 @@
 #include <cetech/controlers/controlers.h>
 #include <cetech/game/game_system.h>
 
-#include "rotation.inl"
-
 #include "components/c_player_input.inl"
 #include "components/c_ball.inl"
 #include "components/c_pad.inl"
@@ -83,9 +81,6 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
                   &game_i0, sizeof(game_i0));
 
     api->add_impl(CT_ECS_COMPONENT_I,
-                  &rotation_component_i, sizeof(rotation_component_i));
-
-    api->add_impl(CT_ECS_COMPONENT_I,
                   &player_input_component_i, sizeof(player_input_component_i));
 
     api->add_impl(CT_ECS_COMPONENT_I,
@@ -104,29 +99,7 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
                   &gamepad_controler_component_i, sizeof(gamepad_controler_component_i));
 
     api->add_impl(CT_ECS_SYSTEM_I,
-                  &rotation_system_i0, sizeof(rotation_system_i0));
-
-    api->add_impl(CT_ECS_SYSTEM_I,
                   &player_input_system_i0, sizeof(player_input_system_i0));
-
-    api->add_impl(CT_ECS_SYSTEM_I,
-                  &player_move_system_i0, sizeof(player_move_system_i0));
-
-    api->add_impl(CT_ECS_SYSTEM_I,
-                  &move_system_i0, sizeof(move_system_i0));
-
-    api->add_impl(CT_ECS_SYSTEM_I,
-                  &hit_system_i0, sizeof(hit_system_i0));
-
-    api->add_impl(CT_ECS_SYSTEM_I,
-                  &collision_system_i0, sizeof(collision_system_i0));
-
-
-    ce_cdb_a0->reg_obj_type(VELOCITY_COMPONENT,
-                            velocity_component_prop, CE_ARRAY_LEN(velocity_component_prop));
-
-    ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT,
-                            rotaton_component_prop, CE_ARRAY_LEN(rotaton_component_prop));
 
     ce_cdb_a0->reg_obj_type(GAMEPAD_COMPONENT,
                             gamepad_controler_compo_prop,

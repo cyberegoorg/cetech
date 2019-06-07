@@ -76,12 +76,13 @@ void render_rectangles(ct_world_t0 world,
                        void *_data) {
     rectangle_render_data *data = _data;
 
-    ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
-    rectangle_component *rectangles = ct_ecs_a0->get_all(RECTANGLE_COMPONENT, item);
-    rectangle_renderer_t *mesh_renderers = ct_ecs_a0->get_all(RECTANGLE_RENDERER_COMPONENT, item);
+    ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
+    rectangle_component *rectangles = ct_ecs_c_a0->get_all(world, RECTANGLE_COMPONENT, item);
+    rectangle_renderer_t *mesh_renderers = ct_ecs_c_a0->get_all(world, RECTANGLE_RENDERER_COMPONENT,
+                                                              item);
 
     for (int i = 0; i < n; ++i) {
-        ct_transform_comp t_c = transforms[i];
+        ct_local_to_world_c t_c = transforms[i];
         rectangle_renderer_t p_c = mesh_renderers[i];
         rectangle_component r_c = rectangles[i];
 
@@ -116,7 +117,7 @@ static const char *rectangle_renderer_display_name() {
 }
 
 static struct ct_property_editor_i0 rectangle_renderer_property_editor_api = {
-        .cdb_type = cdb_type,
+        .cdb_type = rectangle_renderer_cdb_type,
 };
 
 static void render(ct_world_t0 world,

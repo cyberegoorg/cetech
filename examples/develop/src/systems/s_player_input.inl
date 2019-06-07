@@ -51,7 +51,6 @@ static void _gamepad_controler(struct ct_world_t0 world,
                                struct ct_entity_t0 *ent,
                                ct_entity_storage_o0 *item,
                                uint32_t n,
-                               ct_ecs_cmd_buffer_t *cmd_buff,
                                void *data) {
     ct_controler_i0 *gamepad_ci = ct_controlers_a0->get(CONTROLER_GAMEPAD);
     player_input_component *player_inputs = ct_ecs_a0->get_all(PLAYER_INPUT_COMPONENT, item);
@@ -77,7 +76,7 @@ static void _gamepad_controler(struct ct_world_t0 world,
         float l = ce_vec2_length((ce_vec2_t) {.x = right_axis.x, .y = right_axis.y});
         float d = _angle((ce_vec2_t) {.x = right_axis.x, .y = right_axis.y});
 
-        if(l != 0) {
+        if (l != 0) {
             ce_log_a0->debug("ddd", "%f", d);
 
             if (d < 45) {
@@ -91,7 +90,6 @@ static void _gamepad_controler(struct ct_world_t0 world,
             ce_vec2_t dir = {.x = ce_fsin(d * CE_DEG_TO_RAD), .y = ce_fcos(d * CE_DEG_TO_RAD)};
 
 
-
             pi->shoot_dir = dir;
         }
 
@@ -100,14 +98,17 @@ static void _gamepad_controler(struct ct_world_t0 world,
 }
 
 static void player_input_system(struct ct_world_t0 world,
-                                float dt) {
-//    uint64_t mask = ct_ecs_a0->mask(PLAYER_INPUT_COMPONENT);
-//    ct_ecs_a0->process(world, mask, player_input_foreach_components, &dt);
-
-    uint64_t mask = ct_ecs_a0->mask(PLAYER_INPUT_COMPONENT)
-                    | ct_ecs_a0->mask(GAMEPAD_COMPONENT);
-
-    ct_ecs_a0->process(world, mask, _gamepad_controler, &dt);
+                                float dt,
+                                uint32_t rq_version,
+                                ct_ecs_cmd_buffer_t *cmd) {
+    ct_ecs_q_a0->foreach(world,
+                         (ct_ecs_query_t0) {
+                                 .all =  CT_ECS_ARCHETYPE(PLAYER_INPUT_COMPONENT,
+                                                          GAMEPAD_COMPONENT),
+                                 .write = CT_ECS_ARCHETYPE(PLAYER_INPUT_COMPONENT),
+                         },
+                         rq_version,
+                         _gamepad_controler, NULL);
 }
 
 static uint64_t player_input_name() {

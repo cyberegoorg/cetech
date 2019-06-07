@@ -89,7 +89,8 @@ void texture_online(ce_cdb_t0 db,
 
 }
 
-void texture_offline(ce_cdb_t0 db,uint64_t obj) {
+void texture_offline(ce_cdb_t0 db,
+                     uint64_t obj) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     const uint64_t texture = ce_cdb_a0->read_uint64(reader,
@@ -147,8 +148,7 @@ static bool _compile(ce_cdb_t0 db,
 
     const char *input = ce_cdb_a0->read_str(reader, TEXTURE_INPUT, "");
     bool gen_mipmaps = ce_cdb_a0->read_bool(reader, TEXTURE_GEN_MIPMAPS, false);
-    bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP,
-                                             false);
+    bool is_normalmap = ce_cdb_a0->read_bool(reader, TEXTURE_IS_NORMALMAP, false);
 
     ce_alloc_t0 *a = ce_memory_a0->system;
 
@@ -254,7 +254,7 @@ static const char *display_icon() {
     return ICON_FA_PICTURE_O;
 }
 
-static const char* name() {
+static const char *name() {
     return "texture";
 }
 
@@ -343,7 +343,7 @@ static void compile_watch(float dt) {
         uint64_t obj = to_compile_obj[i];
         texture_offline(ce_cdb_a0->db(), obj);
         _compile(ce_cdb_a0->db(), obj);
-        texture_online(ce_cdb_a0->db(),obj);
+        texture_online(ce_cdb_a0->db(), obj);
     }
 
     ce_hash_free(&obj_set, _G.allocator);

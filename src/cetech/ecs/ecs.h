@@ -103,8 +103,10 @@ typedef void (*ct_process_fce_t)(ct_world_t0 world,
                                  ct_ecs_cmd_buffer_t *cmd_buff,
                                  void *data);
 
-typedef void (ct_simulate_fce_t)(ct_world_t0 world,
-                                 float dt);
+typedef void (ct_ecs_system_fce_t)(ct_world_t0 world,
+                                   float dt,
+                                   uint32_t rq_version,
+                                   ct_ecs_cmd_buffer_t *cmd);
 
 
 typedef struct ct_editor_component_i0 {

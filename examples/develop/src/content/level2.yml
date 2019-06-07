@@ -34,7 +34,7 @@ children:
       cdb_type: cdb_objset
       0x168c410f48a0016b:
         cdb_uid: 0x168c410f48a0016b
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0x1680b5652a000164
         position:
           cdb_uid: 0x168c410f48a0016c

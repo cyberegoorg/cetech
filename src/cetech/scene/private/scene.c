@@ -12,6 +12,8 @@
 #include "celib/memory/memory.h"
 #include "celib/api.h"
 #include <celib/cdb.h>
+#include <celib/macros.h>
+#include <celib/log.h>
 
 #include "cetech/machine/machine.h"
 #include "cetech/resource/resource.h"
@@ -23,11 +25,9 @@
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/primitive_mesh.h>
 #include <cetech/mesh/static_mesh.h>
-#include <celib/macros.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
-#include <celib/log.h>
-
+#include <cetech/parent/parent.h>
 
 int scenecompiler_init(struct ce_api_a0 *api);
 
@@ -155,37 +155,48 @@ static struct ct_entity_t0 load(uint64_t resource,
 
     ct_ecs_a0->add(world, ent[0], (ct_component_pair_t0[]) {
             {
-                    .type = TRANSFORM_COMPONENT,
-                    .data = &(ct_transform_comp) {
-                            .scl = CE_VEC3_UNIT,
-                            .world = CE_MAT4_IDENTITY
-                    }
+                    .type = POSITION_COMPONENT,
+            },
+            {
+                    .type = ROTATION_COMPONENT,
+            },
+            {
+                    .type = LOCAL_TO_WORLD_COMPONENT,
             }
     }, 1);
 
     for (int i = 0; i < items_count; ++i) {
         const char *geom = &items[i * 128];
 
-        ct_ecs_a0->add(world, ent[0], (ct_component_pair_t0[]) {
-                {
-                        .type = TRANSFORM_COMPONENT,
-                        .data = &(ct_transform_comp) {
-                                .scl = CE_VEC3_UNIT,
-                                .pos.z = 10.0f,
-                                .world = CE_MAT4_IDENTITY
-                        }
-                },
-                {
-                        .type = MESH_RENDERER_COMPONENT,
-                        .data = &(ct_mesh_component) {
-                                .material = 0x24c9413e88ebaaa8,
-                                .scene = resource,
-                                .mesh = ce_id_a0->id64(geom)
-                        }
-                }
-        }, 2);
-
-        ct_ecs_a0->link(world, ent[0], ent[i + 1]);
+        ct_ecs_c_a0->add(world, ent[i + 1],
+                         CE_ARR_ARG(((ct_component_pair_t0[]) {
+                                 {
+                                         .type = CT_PARENT_COMPONENT,
+                                         .data = &(ct_parent_c) {
+                                                 .parent = ent[0],
+                                         }
+                                 },
+                                 {
+                                         .type = LOCAL_TO_PARENT_COMPONENT,
+                                 },
+                                 {
+                                         .type = POSITION_COMPONENT,
+                                         .data = &(ct_position_c) {
+                                                 .pos.z = 10.0f,
+                                         }
+                                 },
+                                 {
+                                         .type = LOCAL_TO_WORLD_COMPONENT,
+                                 },
+                                 {
+                                         .type = STATIC_MESH_COMPONENT,
+                                         .data = &(ct_mesh_component) {
+                                                 .material = 0x24c9413e88ebaaa8,
+                                                 .scene = resource,
+                                                 .mesh = ce_id_a0->id64(geom)
+                                         }
+                                 }
+                         })));
     }
 
     return ent[0];

@@ -28,7 +28,7 @@ components:
     cdb_uid: 0xd72994c74e847f5b
     cdb_type: camera
     camera_type: perspective
-    near: 0.1000
+    near: 0.100000
     far: 1000.000000
     fov: 60.000000
   0x33a940d4bee3e3c:

@@ -189,8 +189,8 @@ static void update(uint64_t context_obj,
     
     ct_ecs_a0->step(editor->world, dt);
 
-    ct_transform_comp *t = ct_ecs_a0->get_one(editor->world, TRANSFORM_COMPONENT,
-                                              editor->camera_ent);
+    ct_local_to_world_c *t = ct_ecs_c_a0->get_one(editor->world, LOCAL_TO_WORLD_COMPONENT,
+                                                  editor->camera_ent, false);
 
     ct_camera_component *c = ct_ecs_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
                                                 editor->camera_ent);

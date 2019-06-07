@@ -63,7 +63,6 @@ static void _get_active_camera(struct ct_world_t0 world,
                                struct ct_entity_t0 *ent,
                                ct_entity_storage_o0 *item,
                                uint32_t n,
-                               ct_ecs_cmd_buffer_t *buff,
                                void *data) {
     main_camera_data_t *output = data;
 
@@ -96,12 +95,15 @@ static void game_step(uint64_t name,
     ct_ecs_a0->step(_G.game_state.world, dt);
 
     main_camera_data_t camera_data = {};
-    ct_ecs_a0->process(_G.game_state.world,
-                       ct_ecs_a0->mask(VIEWPORT_COMPONENT)
-                       | ct_ecs_a0->mask(TRANSFORM_COMPONENT)
-                       | ct_ecs_a0->mask(CT_CAMERA_COMPONENT)
-                       | ct_ecs_a0->mask(CT_ACTIVE_CAMERA_COMPONENT),
-                       _get_active_camera, &camera_data);
+
+    ct_ecs_q_a0->foreach(_G.game_state.world,
+                         (ct_ecs_query_t0) {
+                                 .all =  CT_ECS_ARCHETYPE(VIEWPORT_COMPONENT,
+                                                          LOCAL_TO_WORLD_COMPONENT,
+                                                          CT_CAMERA_COMPONENT,
+                                                          CT_ACTIVE_CAMERA_COMPONENT)
+                         }, 0,
+                         _get_active_camera, &camera_data);
 
     ct_renderer_a0->viewport_render(camera_data.viewport,
                                     _G.game_state.world,

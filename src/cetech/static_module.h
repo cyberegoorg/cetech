@@ -10,6 +10,7 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(resourcecompiler);
 
     CE_ADD_STATIC_MODULE(ecs);
+    CE_ADD_STATIC_MODULE(parent);
     CE_ADD_STATIC_MODULE(node_graph);
     CE_ADD_STATIC_MODULE(node_test);
     CE_ADD_STATIC_MODULE(node_graph_editor);
