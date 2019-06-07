@@ -24,7 +24,6 @@
 #include "rotation.inl"
 
 #include "components/c_player_input.inl"
-#include "components/c_velocity.inl"
 #include "components/c_ball.inl"
 #include "components/c_pad.inl"
 #include "components/c_hit.inl"
@@ -32,11 +31,6 @@
 #include "components/c_gamepad_controler.inl"
 
 #include "systems/s_player_input.inl"
-#include "systems/s_player_move.inl"
-#include "systems/s_move.inl"
-#include "systems/s_collision.inl"
-#include "systems/s_hit.inl"
-
 #include "systems/rectangle_renderer.inl"
 
 
@@ -93,9 +87,6 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &player_input_component_i, sizeof(player_input_component_i));
-
-    api->add_impl(CT_ECS_COMPONENT_I,
-                  &velocity_component_i, sizeof(velocity_component_i));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &ball_component_i, sizeof(ball_component_i));

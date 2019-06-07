@@ -15,20 +15,6 @@ children:
         cdb_uid: 0xfe7bbc5af701c125
         cdb_type: transform
         cdb_instance: 0xba9d9aceb9b23685
-        position:
-          cdb_uid: 0x9cb33614764c3d7a
-          cdb_type: position
-          cdb_instance: 0x58d5148838fcb2da
-          x: 513.000000
-          y: 160.000000
-        rotation:
-          cdb_uid: 0x3aeaafcdf596b9cf
-          cdb_type: rotation
-          cdb_instance: 0xf70c8e41b8472f2f
-        scale:
-          cdb_uid: 0xd922298774e13624
-          cdb_type: scale
-          cdb_instance: 0x954407fb3791ab84
       0x7759a340f42bb279:
         cdb_uid: 0x7759a340f42bb279
         cdb_type: rectangle
@@ -38,11 +24,42 @@ children:
           cdb_type: vec2_t
           cdb_instance: 0xdc8736e7511d3ddb
           x: 8.000000
-          y: 305.000000
+          y: 322.000031
       0xebcc2b19f0514bc5:
         cdb_uid: 0xebcc2b19f0514bc5
         cdb_type: rectangle_renderer
         cdb_instance: 0x4d94b1607106cf70
+      0xbb17be2eec47f7e8:
+        cdb_uid: 0xbb17be2eec47f7e8
+        cdb_type: collider2d
+        cdb_instance: 0xe07151026e6882e9
+        shape:
+          cdb_uid: 0x594f37e86b92743d
+          cdb_type: collider2d_shape_rectangle
+          cdb_instance: 0x7ea8cabbedb2ff3e
+          half_size:
+            cdb_uid: 0xf786b1a1eadcf092
+            cdb_type: vec2_t
+            cdb_instance: 0x1ce044756cfd7b93
+            x: 8.000000
+            y: 322.000000
+      0xe13ab155fbf0737b:
+        cdb_uid: 0xe13ab155fbf0737b
+        cdb_type: position
+        cdb_instance: 0xa4cbbde2fd5b7ad1
+        position:
+          cdb_uid: 0x7f722b0f7b3aefd0
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x4303379c7ca5f726
+          x: 478.000031
+      0x11dfb1aac0d94ecd:
+        cdb_uid: 0x11dfb1aac0d94ecd
+        cdb_type: rotation
+        cdb_instance: 0xd570be37c2445623
+        rotation:
+          cdb_uid: 0xb0172b644023cb22
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x73a837f1418ed278
     children:
       cdb_type: cdb_objset
   0x89f95a35fadde7d:
@@ -53,22 +70,8 @@ children:
       cdb_type: cdb_objset
       0xa6d70f5cdef85ad2:
         cdb_uid: 0xa6d70f5cdef85ad2
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0xba9d9aceb9b23685
-        position:
-          cdb_uid: 0x450e89165e42d727
-          cdb_type: position
-          cdb_instance: 0x58d5148838fcb2da
-          x: 11.000001
-          y: 160.000000
-        rotation:
-          cdb_uid: 0xe34602cfdd8d537c
-          cdb_type: rotation
-          cdb_instance: 0xf70c8e41b8472f2f
-        scale:
-          cdb_uid: 0x817d7c895cd7cfd1
-          cdb_type: scale
-          cdb_instance: 0x954407fb3791ab84
       0x1fb4f642dc224c26:
         cdb_uid: 0x1fb4f642dc224c26
         cdb_type: rectangle
@@ -83,6 +86,36 @@ children:
         cdb_uid: 0x8a03a4d36f9bc81a
         cdb_type: rectangle_renderer
         cdb_instance: 0x4d94b1607106cf70
+      0x95be2b5b6a276ce7:
+        cdb_uid: 0x95be2b5b6a276ce7
+        cdb_type: collider2d
+        cdb_instance: 0xe07151026e6882e9
+        shape:
+          cdb_uid: 0x33f5a514e971e93c
+          cdb_type: collider2d_shape_rectangle
+          cdb_instance: 0x7ea8cabbedb2ff3e
+          half_size:
+            cdb_uid: 0xd22d1ece68bc6591
+            cdb_type: vec2_t
+            cdb_instance: 0x1ce044756cfd7b93
+            x: 8.000000
+            y: 305.000000
+      0x1da9a4c8fa856c25:
+        cdb_uid: 0x1da9a4c8fa856c25
+        cdb_type: position
+        cdb_instance: 0xa4cbbde2fd5b7ad1
+        position:
+          cdb_uid: 0xbbe11e8279cfe87a
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x4303379c7ca5f726
+      0x4e4ea51dbf6e4777:
+        cdb_uid: 0x4e4ea51dbf6e4777
+        cdb_type: rotation
+        cdb_instance: 0xd570be37c2445623
+        rotation:
+          cdb_uid: 0xec861ed73eb8c3cc
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x73a837f1418ed278
     children:
       cdb_type: cdb_objset
   0xdaca4403c12afc36:
@@ -93,33 +126,12 @@ children:
       cdb_type: cdb_objset
       0x328108399575788b:
         cdb_uid: 0x328108399575788b
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0x67f9896de60ec93d
-        position:
-          cdb_uid: 0xd0b881f314bff4e0
-          cdb_type: position
-          cdb_instance: 0x631032765594592
-        rotation:
-          cdb_uid: 0x6eeffbac940a7135
-          cdb_type: rotation
-          cdb_instance: 0xa4687ce0e4a3c1e7
-        scale:
-          cdb_uid: 0xd2775661354ed8a
-          cdb_type: scale
-          cdb_instance: 0x429ff69a63ee3e3c
       0xab5eef1f929f69df:
         cdb_uid: 0xab5eef1f929f69df
         cdb_type: ball
         cdb_instance: 0x2fef2a3fb338ba91
-      0x499668d911e9e634:
-        cdb_uid: 0x499668d911e9e634
-        cdb_type: velocity
-        cdb_instance: 0xb482192d3b8336e6
-        velocity:
-          cdb_uid: 0xe7cde29291346289
-          cdb_type: vec2_t
-          cdb_instance: 0x52b992e6bacdb33b
-          x: -300.000000
       0xeefd55877ea8d032:
         cdb_uid: 0xeefd55877ea8d032
         cdb_type: rectangle
@@ -132,6 +144,48 @@ children:
         cdb_uid: 0xe74b0b3f1d514bc5
         cdb_type: rectangle_renderer
         cdb_instance: 0x491391859e06cf70
+      0xe2233bc3f10289de:
+        cdb_uid: 0xe2233bc3f10289de
+        cdb_type: collider2d
+        cdb_instance: 0x77cce97732314df
+        shape:
+          cdb_uid: 0x805ab57d704d0633
+          cdb_type: collider2d_shape_rectangle
+          cdb_instance: 0xa5b44850f26d9134
+          half_size:
+            cdb_uid: 0x1e922f36ef978288
+            cdb_type: vec2_t
+            cdb_instance: 0x43ebc20a71b80d89
+      0xdbf18b5ae976f787:
+        cdb_uid: 0xdbf18b5ae976f787
+        cdb_type: velocity2d
+        cdb_instance: 0xe6034d6b95e1fedd
+        linear:
+          cdb_uid: 0x7a29051468c173dc
+          cdb_type: vec2_t
+          cdb_instance: 0x3dba11a16a2c7b32
+      0xe28f06d21f155684:
+        cdb_uid: 0xe28f06d21f155684
+        cdb_type: mass2d
+        cdb_instance: 0x44578d189fcada2f
+      0x16a3418dda1ebcd7:
+        cdb_uid: 0x16a3418dda1ebcd7
+        cdb_type: position
+        cdb_instance: 0xda344e1adb89c42d
+        position:
+          cdb_uid: 0xb4dabb475969392c
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x786bc7d45ad44082
+          x: 210.000015
+          y: 137.000000
+      0xa9d91b696648ae2b:
+        cdb_uid: 0xa9d91b696648ae2b
+        cdb_type: rotation
+        cdb_instance: 0x6d6a27f667b3b581
+        rotation:
+          cdb_uid: 0x48109522e5932a80
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0xba1a1afe6fe31d6
     children:
       cdb_type: cdb_objset
   0x826cc480d7509582:
@@ -142,23 +196,8 @@ children:
       cdb_type: cdb_objset
       0x20a43e3a569b11d7:
         cdb_uid: 0x20a43e3a569b11d7
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0xba9d9aceb9b23685
-        position:
-          cdb_uid: 0xbedbb7f3d5e58e2c
-          cdb_type: position
-          cdb_instance: 0x58d5148838fcb2da
-          x: 261.000000
-          y: 316.000000
-        rotation:
-          cdb_uid: 0x5d1331ad55300a81
-          cdb_type: rotation
-          cdb_instance: 0xf70c8e41b8472f2f
-          x: 8.000000
-        scale:
-          cdb_uid: 0xfb4aab66d47a86d6
-          cdb_type: scale
-          cdb_instance: 0x954407fb3791ab84
       0x9982252053c5032b:
         cdb_uid: 0x9982252053c5032b
         cdb_type: rectangle
@@ -173,6 +212,37 @@ children:
         cdb_uid: 0x283b1e8ceee6446f
         cdb_type: rectangle_renderer
         cdb_instance: 0x4d94b1607106cf70
+      0x70649887e806e1e6:
+        cdb_uid: 0x70649887e806e1e6
+        cdb_type: collider2d
+        cdb_instance: 0xe07151026e6882e9
+        shape:
+          cdb_uid: 0xe9c124167515e3b
+          cdb_type: collider2d_shape_rectangle
+          cdb_instance: 0x7ea8cabbedb2ff3e
+          half_size:
+            cdb_uid: 0xacd38bfae69bda90
+            cdb_type: vec2_t
+            cdb_instance: 0x1ce044756cfd7b93
+            x: 508.000000
+            y: 8.000000
+      0x5a18983bf91a64cf:
+        cdb_uid: 0x5a18983bf91a64cf
+        cdb_type: position
+        cdb_instance: 0xa4cbbde2fd5b7ad1
+        position:
+          cdb_uid: 0xf85011f57864e124
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x4303379c7ca5f726
+          y: 271.000000
+      0x8abd9890be034021:
+        cdb_uid: 0x8abd9890be034021
+        cdb_type: rotation
+        cdb_instance: 0xd570be37c2445623
+        rotation:
+          cdb_uid: 0x28f5124a3d4dbc76
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x73a837f1418ed278
     children:
       cdb_type: cdb_objset
   0x2bea61b29a59fbd5:
@@ -183,22 +253,8 @@ children:
       cdb_type: cdb_objset
       0xca21db6c19a4782a:
         cdb_uid: 0xca21db6c19a4782a
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0xba9d9aceb9b23685
-        position:
-          cdb_uid: 0x6859552598eef47f
-          cdb_type: position
-          cdb_instance: 0x58d5148838fcb2da
-          x: 264.000000
-          y: 12.000001
-        rotation:
-          cdb_uid: 0x690cedf183970d4
-          cdb_type: rotation
-          cdb_instance: 0xf70c8e41b8472f2f
-        scale:
-          cdb_uid: 0xa4c848989783ed29
-          cdb_type: scale
-          cdb_instance: 0x954407fb3791ab84
       0x42ffc25216ce697e:
         cdb_uid: 0x42ffc25216ce697e
         cdb_type: rectangle
@@ -207,12 +263,43 @@ children:
           cdb_uid: 0x2d227c9990adde7d
           cdb_type: vec2_t
           cdb_instance: 0xdc8736e7511d3ddb
-          x: 508.000000
+          x: 508.000031
           y: 8.000000
       0xc67298466e30c0c4:
         cdb_uid: 0xc67298466e30c0c4
         cdb_type: rectangle_renderer
         cdb_instance: 0x4d94b1607106cf70
+      0x4b0b05b465e656e5:
+        cdb_uid: 0x4b0b05b465e656e5
+        cdb_type: collider2d
+        cdb_instance: 0xe07151026e6882e9
+        shape:
+          cdb_uid: 0xe9427f6de530d33a
+          cdb_type: collider2d_shape_rectangle
+          cdb_instance: 0x7ea8cabbedb2ff3e
+          half_size:
+            cdb_uid: 0x8779f927647b4f8f
+            cdb_type: vec2_t
+            cdb_instance: 0x1ce044756cfd7b93
+            x: 508.000000
+            y: 8.000000
+      0x96878baef7af5d79:
+        cdb_uid: 0x96878baef7af5d79
+        cdb_type: position
+        cdb_instance: 0xa4cbbde2fd5b7ad1
+        position:
+          cdb_uid: 0x34bf056876f9d9ce
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x4303379c7ca5f726
+          y: 14.000001
+      0xc72c8c03bc9838cb:
+        cdb_uid: 0xc72c8c03bc9838cb
+        cdb_type: rotation
+        cdb_instance: 0xd570be37c2445623
+        rotation:
+          cdb_uid: 0x656405bd3be2b520
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x73a837f1418ed278
     children:
       cdb_type: cdb_objset
   0xe0dedc9c6fe6446f:
@@ -223,22 +310,8 @@ children:
       cdb_type: cdb_objset
       0x7f165655ef30c0c4:
         cdb_uid: 0x7f165655ef30c0c4
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0x23bdfb43b317794d
-        position:
-          cdb_uid: 0x1d4dd00f6e7b3d19
-          cdb_type: position
-          cdb_instance: 0xc1f574fd3261f5a2
-          x: 33.000000
-          y: 121.000008
-        rotation:
-          cdb_uid: 0xbb8549c8edc5b96e
-          cdb_type: rotation
-          cdb_instance: 0x602ceeb6b1ac71f7
-        scale:
-          cdb_uid: 0x59bcc3826d1035c3
-          cdb_type: scale
-          cdb_instance: 0xfe64687030f6ee4c
       0xf7f43d3bec5ab218:
         cdb_uid: 0xf7f43d3bec5ab218
         cdb_type: rectangle
@@ -247,18 +320,14 @@ children:
           cdb_uid: 0xe993a394094c3d7a
           cdb_type: vec2_t
           cdb_instance: 0x5f7fadfbe2d7cfd1
-      0x962bb6f56ba52e6d:
-        cdb_uid: 0x962bb6f56ba52e6d
-        cdb_type: velocity
-        cdb_instance: 0x34f0333a404ad0f4
-        velocity:
-          cdb_uid: 0x346330aeeaefaac2
-          cdb_type: vec2_t
-          cdb_instance: 0xa708c59f16fbfc97
       0xd29aaa686a3a2717:
         cdb_uid: 0xd29aaa686a3a2717
         cdb_type: player_input
         cdb_instance: 0xfab273448e38044e
+        shoot_dir:
+          cdb_uid: 0x7955c2b47dd8988a
+          cdb_type: vec2_t
+          cdb_instance: 0x719961fd4c6882e9
       0x70d22421e984a36c:
         cdb_uid: 0x70d22421e984a36c
         cdb_type: pad
@@ -271,6 +340,24 @@ children:
         cdb_uid: 0xad411794e8199c16
         cdb_type: gamepad_controller
         cdb_instance: 0xb74649a9c69bc81a
+      0xaed2e65f37729f7f:
+        cdb_uid: 0xaed2e65f37729f7f
+        cdb_type: position
+        cdb_instance: 0x7263f2ec38dda6d5
+        position:
+          cdb_uid: 0x4d0a6018b6bd1bd4
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x109b6ca5b828232a
+          x: 34.000000
+          y: 136.000000
+      0x6cb6c5205831897d:
+        cdb_uid: 0x6cb6c5205831897d
+        cdb_type: rotation
+        cdb_instance: 0x3047d1ad599c90d3
+        rotation:
+          cdb_uid: 0xaee3ed9d77c05d2
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0xce7f4b66d8e70d28
     children:
       cdb_type: cdb_objset
   0x9a3da9ffd564186b:
@@ -281,22 +368,8 @@ children:
       cdb_type: cdb_objset
       0x387523b954ae94c0:
         cdb_uid: 0x387523b954ae94c0
-        cdb_type: transform
+        cdb_type: local_to_world
         cdb_instance: 0x23bdfb43b317794d
-        position:
-          cdb_uid: 0xd6ac9d72d3f91115
-          cdb_type: position
-          cdb_instance: 0xc1f574fd3261f5a2
-          x: 490.000031
-          y: 125.000008
-        rotation:
-          cdb_uid: 0x74e4172c53438d6a
-          cdb_type: rotation
-          cdb_instance: 0x602ceeb6b1ac71f7
-        scale:
-          cdb_uid: 0x131b90e5d28e09bf
-          cdb_type: scale
-          cdb_instance: 0xfe64687030f6ee4c
       0xb1530a9f51d88614:
         cdb_uid: 0xb1530a9f51d88614
         cdb_type: rectangle
@@ -305,18 +378,14 @@ children:
           cdb_uid: 0x73a7992c2fc0ab23
           cdb_type: vec2_t
           cdb_instance: 0x5f7fadfbe2d7cfd1
-      0x4f8a8458d1230269:
-        cdb_uid: 0x4f8a8458d1230269
-        cdb_type: velocity
-        cdb_instance: 0x34f0333a404ad0f4
-        velocity:
-          cdb_uid: 0xedc1fe12506d7ebe
-          cdb_type: vec2_t
-          cdb_instance: 0xa708c59f16fbfc97
       0x8bf977cbcfb7fb13:
         cdb_uid: 0x8bf977cbcfb7fb13
         cdb_type: player_input
         cdb_instance: 0xfab273448e38044e
+        shoot_dir:
+          cdb_uid: 0x2ea29d0d79978288
+          cdb_type: vec2_t
+          cdb_instance: 0x719961fd4c6882e9
       0x2a30f1854f027768:
         cdb_uid: 0x2a30f1854f027768
         cdb_type: pad
@@ -330,6 +399,24 @@ children:
         cdb_type: gamepad_controller
         cdb_instance: 0xb74649a9c69bc81a
         gamepad_id: 1.000000
+      0xeb41d9d236079829:
+        cdb_uid: 0xeb41d9d236079829
+        cdb_type: position
+        cdb_instance: 0x7263f2ec38dda6d5
+        position:
+          cdb_uid: 0x8979538bb552147e
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0x109b6ca5b828232a
+          x: 451.000031
+          y: 147.000000
+      0xa925b89356c68227:
+        cdb_uid: 0xa925b89356c68227
+        cdb_type: rotation
+        cdb_instance: 0x3047d1ad599c90d3
+        rotation:
+          cdb_uid: 0x475d324cd610fe7c
+          cdb_type: 0x6112fca24c71dad
+          cdb_instance: 0xce7f4b66d8e70d28
     children:
       cdb_type: cdb_objset
   0x89cc5dd21c5f0a20:
@@ -340,25 +427,7 @@ children:
       cdb_type: cdb_objset
       0x3318e9e89bf402ca:
         cdb_uid: 0x3318e9e89bf402ca
-        cdb_type: transform
-        position:
-          cdb_uid: 0xd15063a21b3e7f1f
-          cdb_type: position
-          x: 0.000000
-          y: 0.000000
-          z: 0.000000
-        rotation:
-          cdb_uid: 0x6f87dd5b9a88fb74
-          cdb_type: rotation
-          x: 0.000000
-          y: 0.000000
-          z: 0.000000
-        scale:
-          cdb_uid: 0xdbf571519d377c9
-          cdb_type: scale
-          x: 1.000000
-          y: 1.000000
-          z: 1.000000
+        cdb_type: local_to_world
       0x7a749222df1df41e:
         cdb_uid: 0x7a749222df1df41e
         cdb_type: camera

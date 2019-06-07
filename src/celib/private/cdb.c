@@ -39,7 +39,6 @@
 #define MAX_QUEUE_SIZE 1024 * 64
 
 #define UID_HASHMAP
-//#define _FORCE_DYNAMINC_OBJECT
 
 typedef struct type_info_t {
     size_t size;
@@ -601,10 +600,10 @@ void reg_obj_type(uint64_t type,
         const ce_cdb_prop_def_t0 *def = &prop_def[i];
 
         if (def->type == CE_CDB_TYPE_SUBOBJECT) {
-            if (!def->obj_type) {
-                ce_log_a0->error(LOG_WHERE, "Property %s has not set obj_type", def->name);
-                return;
-            }
+//            if (!def->obj_type) {
+//                ce_log_a0->error(LOG_WHERE, "Property %s has not set obj_type", def->name);
+//                return;
+//            }
         }
     }
 
@@ -1062,33 +1061,35 @@ static void destroy_object(ce_cdb_t0 db,
 
     _free_typed_object(db_inst, obj->type, obj->typed_obj_idx);
 
-    for (int i = 0; i < obj->storage->prop_def->num; ++i) {
-        uint64_t key = obj->storage->prop_name[i];
-        ce_cdb_type_e0 type = obj->storage->prop_type[i];
-        switch (type) {
-            case CE_CDB_TYPE_SUBOBJECT: {
-                union ce_cdb_value_u0 *value_ptr = _get_value_ptr_generic(obj, key);
+    if (obj->storage) {
+        for (int i = 0; i < obj->storage->prop_def->num; ++i) {
+            uint64_t key = obj->storage->prop_name[i];
+            ce_cdb_type_e0 type = obj->storage->prop_type[i];
+            switch (type) {
+                case CE_CDB_TYPE_SUBOBJECT: {
+                    union ce_cdb_value_u0 *value_ptr = _get_value_ptr_generic(obj, key);
 
-                uint64_t old_subobj = value_ptr->subobj;
-                if (old_subobj) {
-                    destroy_object(db, old_subobj);
+                    uint64_t old_subobj = value_ptr->subobj;
+                    if (old_subobj) {
+                        destroy_object(db, old_subobj);
+                    }
                 }
-            }
 
-                break;
+                    break;
 
-            case CE_CDB_TYPE_SET_SUBOBJECT: {
-                uint64_t n = read_objset_count((ce_cdb_obj_o0 *) obj, key);
-                uint64_t k[n];
-                ce_cdb_a0->read_objset((ce_cdb_obj_o0 *) obj, key, k);
-                for (int j = 0; j < n; ++j) {
-                    uint64_t subobj = k[j];
-                    destroy_object(db, subobj);
+                case CE_CDB_TYPE_SET_SUBOBJECT: {
+                    uint64_t n = read_objset_count((ce_cdb_obj_o0 *) obj, key);
+                    uint64_t k[n];
+                    ce_cdb_a0->read_objset((ce_cdb_obj_o0 *) obj, key, k);
+                    for (int j = 0; j < n; ++j) {
+                        uint64_t subobj = k[j];
+                        destroy_object(db, subobj);
+                    }
                 }
+                    break;
+                default:
+                    break;
             }
-                break;
-            default:
-                break;
         }
     }
 

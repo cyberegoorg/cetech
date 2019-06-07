@@ -142,6 +142,10 @@ set(SOURCE_FILES
         src/cetech/node_graph/private/node_test.c
         src/cetech/node_graph_editor/private/node_graph_editor.cpp
 
+        src/cetech/physics2d/private/physics2d.c
+        src/cetech/physics2d_box2d/private/physics2d_box2d.cpp
+        src/cetech/parent/private/parent.c
+
         )
 
 ################################################################################
@@ -204,6 +208,7 @@ set(RELEASE_LIBS
 
         SDL2.a
         yaml_static.a
+        Box2D.a
 
         celib
         )
@@ -248,7 +253,7 @@ target_include_directories(celib PUBLIC externals/build/${PLATFORM_ID}/release/)
 
 add_executable(doc src/tools/doc/doc.c)
 target_link_libraries(doc ${DEVELOP_LIBS})
-target_include_directories(doc PUBLIC externals/build/${PLATFORM_ID}/elease/)
+target_include_directories(doc PUBLIC externals/build/${PLATFORM_ID}/release/)
 
 add_executable(hash src/tools/hash/hash.c)
 target_link_libraries(hash ${DEVELOP_LIBS})

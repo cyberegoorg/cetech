@@ -124,17 +124,17 @@ static void api_add_impl(uint64_t name_id,
         ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
     }
 
-    void **apis = _G.impl_list[idx].api;
-    uint32_t api_n = ce_array_size(apis);
+//    void **apis = _G.impl_list[idx].api;
+//    uint32_t api_n = ce_array_size(apis);
 
-    if (api_n == 1) {
-        void *a = _G.impl_list[idx].api[0];
-        uint64_t *au = a;
-
-        if (!(*au)) {
-            block = a;
-        }
-    }
+//    if (api_n == 1) {
+//        void *a = _G.impl_list[idx].api[0];
+//        uint64_t *au = a;
+//
+//        if (!(*au)) {
+//            block = a;
+//        }
+//    }
 
     if (!block) {
         block = _add_block();
@@ -146,8 +146,7 @@ static void api_add_impl(uint64_t name_id,
     }
 
 
-    uint64_t on_add_idx = ce_hash_lookup(&_G.api_on_add_map, name_id,
-                                         UINT64_MAX);
+    uint64_t on_add_idx = ce_hash_lookup(&_G.api_on_add_map, name_id, UINT64_MAX);
 
     if (UINT64_MAX != on_add_idx) {
         ce_api_on_add_t0 **on_add = _G.on_add[on_add_idx];

@@ -299,7 +299,6 @@ static void _create_from_modal(const char *modal_id) {
                                               ImGuiSelectableFlags_DontClosePopups);
 
             struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
-
             if (ct_debugui_a0->IsItemHovered(0)) {
 
                 ct_debugui_a0->BeginTooltip();
@@ -525,12 +524,12 @@ static void ui_resource_list(uint64_t dock) {
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_AllowDoubleClick);
 
-            if (ct_debugui_a0->IsItemHovered(0)) {
-                ct_debugui_a0->BeginTooltip();
-                ct_resource_preview_a0->resource_tooltip(resourceid, path,
-                                                         (ce_vec2_t) {128, 128});
-                ct_debugui_a0->EndTooltip();
-            }
+//            if (ct_debugui_a0->IsItemHovered(0)) {
+//                ct_debugui_a0->BeginTooltip();
+//                ct_resource_preview_a0->resource_tooltip(resourceid, path,
+//                                                         (ce_vec2_t) {128, 128});
+//                ct_debugui_a0->EndTooltip();
+//            }
 
             if (selected) {
                 _G.selected_asset = resourceid;

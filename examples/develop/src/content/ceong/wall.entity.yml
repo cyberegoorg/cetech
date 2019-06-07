@@ -5,34 +5,15 @@ components:
   cdb_type: cdb_objset
   0xba9d9aceb9b23685:
     cdb_uid: 0xba9d9aceb9b23685
-    cdb_type: transform
-    position:
-      cdb_uid: 0x58d5148838fcb2da
-      cdb_type: position
-      x: 0.000000
-      y: 0.000000
-      z: 1.000000
-    rotation:
-      cdb_uid: 0xf70c8e41b8472f2f
-      cdb_type: rotation
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    scale:
-      cdb_uid: 0x954407fb3791ab84
-      cdb_type: scale
-      x: 1.000000
-      y: 1.000000
-      z: 1.000000
+    cdb_type: local_to_world
   0x234ccf9915dc27d9:
     cdb_uid: 0x234ccf9915dc27d9
     cdb_type: rectangle
     half_size:
       cdb_uid: 0xdc8736e7511d3ddb
       cdb_type: vec2_t
-      x: 0.0
-      y: 0.0
-
+      x: 0.000000
+      y: 0.000000
   0x4d94b1607106cf70:
     cdb_uid: 0x4d94b1607106cf70
     cdb_type: rectangle_renderer

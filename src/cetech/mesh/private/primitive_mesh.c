@@ -154,10 +154,12 @@ static void render(ct_world_t0 world,
             .layer_name = _GBUFFER,
     };
 
-    ct_ecs_a0->process_serial(world,
-                              ct_ecs_a0->mask(PRIMITIVE_MESH_COMPONENT) |
-                              ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                              foreach_primitive_mesh, &render_data);
+    ct_ecs_q_a0->foreach_serial(world,
+                                (ct_ecs_query_t0) {
+                                        .all = CT_ECS_ARCHETYPE(PRIMITIVE_MESH_COMPONENT,
+                                                                LOCAL_TO_WORLD_COMPONENT),
+                                }, 0,
+                                render_primitives, &render_data);
 }
 
 
@@ -165,23 +167,12 @@ static struct ct_renderer_component_i0 ct_renderer_component_i = {
         .render = render
 };
 
-static void *get_interface(uint64_t name_hash) {
-    if (CT_RENDERER_COMPONENT_I == name_hash) {
-        return &ct_renderer_component_i;
-    }
-
-    return NULL;
-}
-
-
-static uint64_t primitive_mesh_size() {
-    return sizeof(ct_primitive_mesh);
-}
-
-static void _prim_mesh_on_spawn(uint64_t obj,
-                                void *data) {
-    ct_primitive_mesh *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_primitive_mesh));
+static void _rectangle_renderer_on_spawn(ct_world_t0 world,
+                                         ce_cdb_t0 db,
+                                         uint64_t obj,
+                                         void *data) {
+    ct_primitive_mesh_c *c = data;
+    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_primitive_mesh_c));
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
@@ -192,7 +183,6 @@ static struct ct_ecs_component_i0 ct_component_api = {
         .on_spawn = _prim_mesh_on_spawn,
         .on_change = _prim_mesh_on_spawn,
 };
-
 
 static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
         {

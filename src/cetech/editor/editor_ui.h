@@ -28,6 +28,11 @@ typedef struct ui_vec3_p0 {
     bool color;
 } ui_vec3_p0;
 
+typedef struct ui_vec2_p0 {
+    float min_f;
+    float max_f;
+} ui_vec2_p0;
+
 typedef struct ui_float_p0 {
     float min_f;
     float max_f;
@@ -86,6 +91,11 @@ struct ct_editor_ui_a0 {
                           uint64_t resource_type,
                           uint64_t context,
                           uint32_t i);
+
+    void (*prop_vec2)(uint64_t obj,
+                      const char *label,
+                      const uint64_t property[2],
+                      ui_vec2_p0 params);
 
     void (*prop_vec3)(uint64_t obj,
                       const char *label,

@@ -5,25 +5,7 @@ components:
   cdb_type: cdb_objset
   0x23bdfb43b317794d:
     cdb_uid: 0x23bdfb43b317794d
-    cdb_type: transform
-    position:
-      cdb_uid: 0xc1f574fd3261f5a2
-      cdb_type: position
-      x: 16.000000
-      y: 0.000000
-      z: 1.000000
-    rotation:
-      cdb_uid: 0x602ceeb6b1ac71f7
-      cdb_type: rotation
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    scale:
-      cdb_uid: 0xfe64687030f6ee4c
-      cdb_type: scale
-      x: 1.000000
-      y: 1.000000
-      z: 1.000000
+    cdb_type: local_to_world
   0xab4d4f3310f34c87:
     cdb_uid: 0xab4d4f3310f34c87
     cdb_type: rectangle
@@ -32,14 +14,6 @@ components:
       cdb_type: vec2_t
       x: 8.000000
       y: 32.000000
-  0x34f0333a404ad0f4:
-    cdb_uid: 0x34f0333a404ad0f4
-    cdb_type: velocity
-    velocity:
-      cdb_uid: 0xa708c59f16fbfc97
-      cdb_type: vec2_t
-      x: 0.000000
-      y: 500.000000
   0xfab273448e38044e:
     cdb_uid: 0xfab273448e38044e
     cdb_type: player_input

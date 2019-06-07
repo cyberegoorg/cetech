@@ -25,8 +25,10 @@ static uint64_t rectangle_size() {
     return sizeof(rectangle_component);
 }
 
-static void _rectangle_on_spawn(uint64_t obj,
-                                   void *data) {
+static void _rectangle_on_spawn(ct_world_t0 world,
+                                ce_cdb_t0 db,
+                                uint64_t obj,
+                                void *data) {
     rectangle_component *c = data;
     ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(rectangle_component));
 }

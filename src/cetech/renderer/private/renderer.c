@@ -212,44 +212,28 @@ static void renderer_get_size(uint32_t *width,
 
 static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module_t0 *module) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I);
     while (it.api) {
-        struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
+        struct ct_renderer_component_i0 *i = (ct_renderer_component_i0 *) (it.api);
 
-        if (!i || !i->get_interface) {
-            goto next;
+        if (i && i->feed_module) {
+            i->feed_module(world, module);
         }
 
-        struct ct_renderer_component_i0 *ci;
-        ci = i->get_interface(CT_RENDERER_COMPONENT_I);
-
-        if (ci && ci->feed_module) {
-            ci->feed_module(world, module);
-        }
-
-        next:
         it = ce_api_a0->next(it);
     }
 }
 
 void _render_components(ct_world_t0 world,
                         struct ct_rg_builder_t0 *builder) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I);
     while (it.api) {
-        struct ct_ecs_component_i0 *i = (ct_ecs_component_i0 *) (it.api);
-
-        if (!i || !i->get_interface) {
-            goto next;
-        }
-
-        struct ct_renderer_component_i0 *ci;
-        ci = i->get_interface(CT_RENDERER_COMPONENT_I);
+        ct_renderer_component_i0 *ci = (ct_renderer_component_i0 *) (it.api);
 
         if (ci && ci->render) {
             ci->render(world, builder);
         }
 
-        next:
         it = ce_api_a0->next(it);
     }
 }

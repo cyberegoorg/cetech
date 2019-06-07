@@ -97,7 +97,6 @@ static void _gamepad_controler(struct ct_world_t0 world,
 
         ct_ecs_a0->component_changed(world, ent[i], PLAYER_INPUT_COMPONENT);
     }
-
 }
 
 static void player_input_system(struct ct_world_t0 world,

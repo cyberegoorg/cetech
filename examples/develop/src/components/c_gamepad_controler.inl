@@ -32,8 +32,10 @@ static const ce_cdb_prop_def_t0 gamepad_controler_compo_prop[] = {
         },
 };
 
-static void _gamepad_controler_on_spawn(uint64_t obj,
-                                   void *data) {
+static void _gamepad_controler_on_spawn(ct_world_t0 world,
+                                        ce_cdb_t0 db,
+                                        uint64_t obj,
+                                        void *data) {
     gamepad_controler_component *c = data;
     ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(gamepad_controler_component));
 

@@ -772,6 +772,47 @@ static void ui_vec3(uint64_t obj,
     _prop_value_end();
 }
 
+static void ui_vec2(uint64_t obj,
+                    const char *label,
+                    const uint64_t prop[2],
+                    struct ui_vec2_p0 params) {
+    if (!obj) {
+        return;
+    }
+
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+
+    ce_vec2_t value = {
+            .x = ce_cdb_a0->read_float(reader, prop[0], 0.0f),
+            .y = ce_cdb_a0->read_float(reader, prop[1], 0.0f),
+    };
+
+    ce_vec2_t value_new = value;
+
+    const float min = !params.min_f ? -FLT_MAX : params.min_f;
+    const float max = !params.max_f ? FLT_MAX : params.max_f;
+
+    _prop_label(label, obj, prop, 3);
+
+    char labelid[128] = {'\0'};
+    sprintf(labelid, "##%sprop_vec3_%d", label, 0);
+
+    _prop_value_begin(obj, prop, 3);
+    ct_debugui_a0->PushItemWidth(-1);
+    if (ct_debugui_a0->DragFloat2(labelid,
+                                  (float *) &value_new, 1.0f,
+                                  min, max,
+                                  "%.3f", 1.0f)) {
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_a0->set_float(w, prop[0], value_new.x);
+        ce_cdb_a0->set_float(w, prop[1], value_new.y);
+        ce_cdb_a0->write_commit(w);
+    }
+
+    ct_debugui_a0->PopItemWidth();
+    _prop_value_end();
+}
+
 static void ui_vec4(uint64_t obj,
                     const char *label,
                     const uint64_t prop[4],
@@ -860,6 +901,7 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_str_combo = ui_str_combo,
         .prop_str_combo2 = ui_str_combo2,
         .prop_resource = ui_resource,
+        .prop_vec2 = ui_vec2,
         .prop_vec3 = ui_vec3,
         .prop_vec4 = ui_vec4,
         .prop_bool = ui_bool,

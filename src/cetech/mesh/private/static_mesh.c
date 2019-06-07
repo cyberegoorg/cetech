@@ -149,10 +149,12 @@ void render(ct_world_t0 world,
             .layer_name = _GBUFFER,
     };
 
-    ct_ecs_a0->process_serial(world,
-                              ct_ecs_a0->mask(MESH_RENDERER_COMPONENT) |
-                              ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                              foreach_static_mesh, &render_data);
+    ct_ecs_q_a0->foreach_serial(world,
+                                (ct_ecs_query_t0) {
+                                        .all = CT_ECS_ARCHETYPE(STATIC_MESH_COMPONENT,
+                                                                LOCAL_TO_WORLD_COMPONENT),
+                                }, 0,
+                                render_static_mesh, &render_data);
 }
 
 static struct ct_renderer_component_i0 ct_renderer_component_i = {
@@ -172,7 +174,9 @@ static uint64_t static_mesh_size() {
 }
 
 
-static void _mesh_render_on_spawn(uint64_t obj,
+static void _mesh_render_on_spawn(ct_world_t0 world,
+                                  ce_cdb_t0 db,
+                                  uint64_t obj,
                                   void *data) {
     ct_mesh_component *c = data;
 
@@ -227,8 +231,10 @@ void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
     };
 
     api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
-    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api,
-                      sizeof(property_editor_api));
+    api->add_impl(CT_RENDERER_COMPONENT_I, &ct_renderer_component_i,
+                  sizeof(ct_renderer_component_i));
+
+    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
 
     ce_cdb_a0->reg_obj_type(MESH_RENDERER_COMPONENT,
                             static_mesh_component_prop,

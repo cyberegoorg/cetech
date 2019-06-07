@@ -129,14 +129,21 @@ static void render(ct_world_t0 world,
             .layer_name = _GBUFFER,
     };
 
-    ct_ecs_a0->process_serial(world,
-                              ct_ecs_a0->mask(RECTANGLE_RENDERER_COMPONENT) |
-                              ct_ecs_a0->mask(TRANSFORM_COMPONENT),
-                              foreach_primitive_mesh, &render_data);
+    ct_dd_a0->begin(viewid);
+
+    ct_ecs_q_a0->foreach_serial(world,
+                                    (ct_ecs_query_t0) {
+                                            .all = CT_ECS_ARCHETYPE(RECTANGLE_RENDERER_COMPONENT,
+                                                                  RECTANGLE_COMPONENT,
+                                                                  LOCAL_TO_WORLD_COMPONENT),
+                                    }, 0,
+                                    render_rectangles, &render_data);
+
+    ct_dd_a0->end();
 }
 
 
-static struct ct_renderer_component_i0 ct_renderer_component_i = {
+static struct ct_renderer_component_i0 rectangle_renderer_i = {
         .render = render
 };
 
@@ -194,6 +201,7 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
     };
 
     api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_RENDERER_COMPONENT_I, &rectangle_renderer_i, sizeof(rectangle_renderer_i));
     api->add_impl(CT_PROPERTY_EDITOR_I, &rectangle_renderer_property_editor_api,
                   sizeof(rectangle_renderer_property_editor_api));
 
