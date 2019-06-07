@@ -15,7 +15,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/resource/resource_browser.h>
+#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
@@ -23,7 +23,7 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/editor/selcted_object.h>
@@ -192,8 +192,7 @@ static void _create_from_modal(const char *modal_id) {
             uint64_t new_res = 0;
 
             if (modal_buffer_from[0]) {
-                ct_resource_id_t0 uid = \
-                        ct_resourcedb_a0->get_file_resource(modal_buffer_from);
+                ct_resource_id_t0 uid = ct_resourcedb_a0->get_file_resource(modal_buffer_from);
                 if (uid.uid) {
                     new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(), uid.uid);
                 }
@@ -215,10 +214,19 @@ static void _create_from_modal(const char *modal_id) {
 
                 ct_resource_id_t0 rid = {.uid = new_res};
 
+                ct_resourcedb_a0->put_file(filename, 0);
+
                 ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
                                                filename, true);
 
-                ct_resourcedb_a0->put_file(filename, 0);
+                char *output = NULL;
+                ce_cdb_a0->dump(ce_cdb_a0->db(), new_res, &output, _G.allocator);
+                ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=new_res},
+                                                    output,
+                                                    ce_array_size(output));
+
+                ce_buffer_free(output, _G.allocator);
+
                 ct_resource_a0->save(new_res);
 
                 _G.need_reaload = true;
@@ -265,17 +273,14 @@ static void _create_from_modal(const char *modal_id) {
 
             ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
 
-            if(!ri) {
+            if (!ri) {
                 continue;
             }
 
             const char *type = ri->name();
 
             char name[256] = {};
-            uint32_t path_len = snprintf(name, CE_ARRAY_LEN(name), "%s", path);
-            uint32_t type_len = strlen(type);
-
-            name[path_len - type_len - 1] = '\0';
+            snprintf(name, CE_ARRAY_LEN(name), "%s", path);
 
             char label[128];
 

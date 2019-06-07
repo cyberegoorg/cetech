@@ -23,7 +23,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
-#include <cetech/resource/resource_browser.h>
+#include <cetech/resource_browser/resource_browser.h>
 #include <string.h>
 #include <cetech/game/game_system.h>
 #include <cetech/default_rg/default_rg.h>

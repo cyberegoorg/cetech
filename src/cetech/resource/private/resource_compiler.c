@@ -190,10 +190,11 @@ void _compile_files(char **files,
 
         ce_log_a0->debug(LOG_WHERE, "COMPILE 0x%llx", cnodes[0].obj.uid);
 
-        char *outputs2 = NULL;
-        ce_ydb_a0->dump_cnodes(db, cnodes, &outputs2);
+        char *outputs = NULL;
+        ce_ydb_a0->dump_cnodes(db, cnodes, &outputs);
         ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
-                                            outputs2, ce_array_size(outputs2));
+                                            outputs, ce_array_size(outputs));
+        ce_array_free(outputs, _G.allocator);
     }
 
     for (int k = 0; k < output_n; ++k) {
@@ -250,7 +251,7 @@ void resource_compiler_compile_all() {
 char *resource_compiler_get_tmp_dir(ce_alloc_t0 *alocator,
                                     const char *platform) {
 
-    char *build_dir = resource_compiler_get_build_dir(alocator, platform);
+    char *build_dir = resource_compiler_get_build_dir(_G.allocator, platform);
 
     char *buffer = NULL;
     ce_os_path_a0->join(&buffer, alocator, 2, build_dir, "tmp");
@@ -292,7 +293,7 @@ static void _init_cvar(struct ce_config_a0 *config) {
 
 static struct ct_resource_compiler_a0 resource_compiler_api = {
         .compile_all = resource_compiler_compile_all,
-        .get_tmp_dir = resource_compiler_get_tmp_dir,
+        .gen_tmp_file = resource_compiler_get_tmp_dir,
         .external_join = resource_compiler_external_join,
 };
 

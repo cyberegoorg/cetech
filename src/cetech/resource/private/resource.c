@@ -209,8 +209,6 @@ static bool save(uint64_t uid) {
         ce_fs_a0->close(f);
         ce_buffer_free(buf, _G.allocator);
 
-        dump_recursive(filename, root);
-
         return true;
     }
 

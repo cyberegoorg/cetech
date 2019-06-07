@@ -25,7 +25,7 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugui/icons_font_awesome.h>

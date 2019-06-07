@@ -9,7 +9,7 @@
 extern "C" {
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/node_graph/node_graph.h>
-#include <cetech/resource/resource_editor.h>
+#include <cetech/resource_editor/resource_editor.h>
 #include <cetech/renderer/gfx.h>
 
 #include "../node_graph_editor.h"

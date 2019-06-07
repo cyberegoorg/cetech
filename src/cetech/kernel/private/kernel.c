@@ -75,8 +75,9 @@ int init_config(int argc,
         return 0;
     }
 
-    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, "");
+    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, NULL);
     char *build_dir = NULL;
+
     ce_os_path_a0->join(&build_dir, _G.allocator, 2,
                         build_dir_str,
                         ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM,""));
@@ -119,13 +120,6 @@ bool cetech_kernel_init(int argc,
 
     ce_init();
 
-    ce_hash_t h = {};
-    ce_hash_add(&h, 1, 2, ce_memory_a0->system);
-    uint64_t d1 = ce_hash_lookup(&h, 1, 0);
-    ce_hash_add(&h, 1, 3, ce_memory_a0->system);
-    uint64_t d2 = ce_hash_lookup(&h, 1, 0);
-
-    CE_UNUSED(d1, d2);
     ce_api_a0->register_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
 
     _G = (struct KernelGlobals) {

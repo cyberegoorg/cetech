@@ -16,12 +16,12 @@
 #include <celib/cdb.h>
 #include <celib/math/math.h>
 
-#include <cetech/resource/resource_browser.h>
+#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/renderer/gfx.h>

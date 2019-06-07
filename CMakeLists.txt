@@ -119,11 +119,11 @@ set(SOURCE_FILES
         src/cetech/transform/private/transform.c
         src/cetech/camera/private/camera.c
         src/cetech/entity/private/entity_editor.c
-        src/cetech/resource/private/resource_editor.c
+        src/cetech/resource_editor/private/resource_editor.c
         src/cetech/entity/private/entity_property.c
         src/cetech/explorer/private/explorer.c
-        src/cetech/resource/private/resource_preview.c
-        src/cetech/resource/private/resource_browser.cpp
+        src/cetech/resource_preview/private/resource_preview.c
+        src/cetech/resource_browser/private/resource_browser.cpp
         src/cetech/editor/private/editor.c
         src/cetech/property_editor/private/property_editor.c
         src/cetech/log_view/private/log_view.cpp

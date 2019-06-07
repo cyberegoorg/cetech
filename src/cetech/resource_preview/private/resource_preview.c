@@ -8,8 +8,8 @@
 #include <cetech/transform/transform.h>
 #include <cetech/controlers/keyboard.h>
 
-#include <cetech/resource/resource_preview.h>
-#include <cetech/resource/resource_browser.h>
+#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/editor/editor.h>
 #include <celib/containers/hash.h>
 #include <celib/math/math.h>

@@ -23,7 +23,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/mesh/static_mesh.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/property_editor/property_editor.h>

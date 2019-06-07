@@ -40,20 +40,16 @@
 #include "systems/rectangle_renderer.inl"
 
 
-void init() {
+void init(ct_world_t0 world) {
+    uint64_t boot_ent = ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
+    ct_ecs_e_a0->spawn_entity(world, boot_ent);
 }
 
-void shutdown() {
+void shutdown(ct_world_t0 world) {
 }
 
-void update(float dt) {
-//    struct ct_controler_i0 *keyboard;
-//    keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);
-//
-//    if (keyboard->button_state(0, keyboard->button_index("c"))) {
-//        ce_log_a0->info("example", "PO");
-//        ce_log_a0->error("example", "LICE");
-//    }
+void update(ct_world_t0 world,
+            float dt) {
 }
 
 static uint64_t game_name() {
@@ -84,7 +80,8 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_ydb_a0);
     CE_INIT_API(api, ct_editor_ui_a0);
     CE_INIT_API(api, ce_memory_a0);
-
+    CE_INIT_API(api, ce_config_a0);
+    CE_INIT_API(api, ct_dd_a0);
 
     ce_log_a0->info("example", "Init %d", reload);
 

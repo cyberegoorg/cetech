@@ -10,7 +10,7 @@
 #include <cetech/property_editor/property_editor.h>
 #include <stdio.h>
 #include <celib/fs.h>
-#include <cetech/resource/resource_browser.h>
+#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/debugui/icons_font_awesome.h>
 
 #include <cetech/renderer/gfx.h>

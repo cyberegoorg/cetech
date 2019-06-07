@@ -16,15 +16,15 @@ extern "C" {
 #define CT_GAME_TASK \
     CE_ID64_0("game_task", 0x56c73acaa12b1278ULL)
 
-typedef struct ct_rg_builder_t0 ct_rg_builder;
+typedef struct ct_rg_builder_t0 ct_rg_builder_t0;
 typedef struct ct_viewport_t0 ct_viewport_t0;
 
 typedef struct ct_game_i0 {
     uint64_t (*name)();
 
-    void (*init)();
+    void (*init)(ct_world_t0 world);
 
-    void (*shutdown)();
+    void (*shutdown)(ct_world_t0 world);
 
     void (*update)(float dt);
 }ct_game_i0;

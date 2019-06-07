@@ -24,8 +24,6 @@
 
 typedef struct game_state_t {
     ct_world_t0 world;
-//    ct_entity_t0 camera_ent;
-    ct_entity_t0 main_ent;
     bool started;
 } game_state_t;
 
@@ -43,21 +41,14 @@ static struct ct_game_i0 *_get_game(uint64_t name) {
 
 static void game_init() {
     _G.game_state.world = ct_ecs_a0->create_world();
-
-    uint64_t boot_ent = ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
-
-    _G.game_state.main_ent = ct_ecs_a0->spawn(_G.game_state.world, boot_ent);
-
-    ce_cdb_a0->log_obj("ENT", ce_cdb_a0->db(), boot_ent);
-
     struct ct_game_i0 *gi = _get_game(_G.active_game);
-    gi->init();
+    gi->init(_G.game_state.world);
 }
 
 static void game_shutdown() {
     struct ct_game_i0 *gi = _get_game(_G.active_game);
-    gi->shutdown();
 
+    gi->shutdown(_G.game_state.world);
     ct_ecs_a0->destroy_world(_G.game_state.world);
 }
 
@@ -100,7 +91,7 @@ static void game_step(uint64_t name,
         return;
     }
 
-    game_i->update(dt);
+    game_i->update(_G.game_state.world, dt);
 
     ct_ecs_a0->step(_G.game_state.world, dt);
 

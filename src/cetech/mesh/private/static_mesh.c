@@ -46,12 +46,11 @@ typedef struct mesh_render_data {
     uint64_t layer_name;
 } mesh_render_data;
 
-void foreach_static_mesh(ct_world_t0 world,
-                         struct ct_entity_t0 *entities,
-                         ct_entity_storage_o0 *item,
-                         uint32_t n,
-                         ct_ecs_cmd_buffer_t *buff,
-                         void *_data) {
+void render_static_mesh(ct_world_t0 world,
+                        struct ct_entity_t0 *entities,
+                        ct_ecs_ent_chunk_o0 *item,
+                        uint32_t n,
+                        void *_data) {
     mesh_render_data *data = _data;
 
     ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);

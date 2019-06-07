@@ -32,8 +32,11 @@ typedef struct ct_resource_id_t0 ct_resource_id_t0;
 struct ct_resource_compiler_a0 {
     void (*compile_all)();
 
-    char *(*get_tmp_dir)(ce_alloc_t0 *a,
-                         const char *platform);
+    void (*gen_tmp_file)(char *output,
+                         uint64_t max_size,
+                         const char *platform,
+                         const char *filename,
+                         const char *ext);
 
     char *(*external_join)(ce_alloc_t0 *a,
                            const char *name);

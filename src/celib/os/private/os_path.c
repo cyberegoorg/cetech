@@ -115,7 +115,7 @@ void _dir_list(const char *path,
             }
 
             for (int i = 0; i < patern_n; ++i) {
-                if(0 == fnmatch(patern[i], new_path, 0)) {
+                if (0 == fnmatch(patern[i], new_path, 0)) {
                     ce_array_push(*tmp_files, new_path, allocator);
                     break;
                 }
@@ -368,7 +368,7 @@ void copy_file(ce_alloc_t0 *allocator,
                const char *from,
                const char *to) {
     ce_vio_t0 *source_vio = ce_os_vio_a0->from_file(from,
-                                                            VIO_OPEN_READ);
+                                                    VIO_OPEN_READ);
 
     char *data = CE_ALLOC(allocator, char,
                           source_vio->vt->size(source_vio->inst));

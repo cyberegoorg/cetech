@@ -37,6 +37,8 @@ typedef struct rectangle_renderer_t {
 
 static struct _G {
     ce_alloc_t0 *allocator;
+    bgfx_vertex_buffer_handle_t cube_vbh;
+    bgfx_index_buffer_handle_t cube_ibh;
 } _G;
 
 typedef struct rectangle_render_data {
@@ -45,35 +47,32 @@ typedef struct rectangle_render_data {
 } rectangle_render_data;
 
 struct pt_vertex {
-    float m_x;
-    float m_y;
-    float m_z;
-    float m_u;
-    float m_v;
+    float x;
+    float y;
+    float z;
+    float u;
+    float v;
 };
 static bgfx_vertex_decl_t pt_vertex_decl;
 
-static const struct pt_vertex _cube_vertices[4] = {
-        {-0.5f, -0.5f, 0,  0, 1},
-        {0.5f,  0.5f,  0,  1, 0},
-        {-0.5f, 0.5f,  0,  0, 0},
-        {0.5f,  -0.5f, 0,  1, 1},
+static const struct pt_vertex _vertices[4] = {
+        {-0.5f, -0.5f, 0, 0, 1},
+        {0.5f,  0.5f,  0, 1, 0},
+        {-0.5f, 0.5f,  0, 0, 0},
+        {0.5f,  -0.5f, 0, 1, 1},
 };
 
-static const uint16_t cube_indices[6] = {
+static const uint16_t _indices[6] = {
         0, 1, 3,
         0, 2, 1,
 };
 
-static bgfx_vertex_buffer_handle_t cube_vbh;
-static bgfx_index_buffer_handle_t cube_ibh;
 
-void foreach_primitive_mesh(ct_world_t0 world,
-                            struct ct_entity_t0 *entities,
-                            ct_entity_storage_o0 *item,
-                            uint32_t n,
-                            ct_ecs_cmd_buffer_t *buff,
-                            void *_data) {
+void render_rectangles(ct_world_t0 world,
+                       struct ct_entity_t0 *entities,
+                       ct_ecs_ent_chunk_o0 *item,
+                       uint32_t n,
+                       void *_data) {
     rectangle_render_data *data = _data;
 
     ct_transform_comp *transforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
@@ -90,14 +89,14 @@ void foreach_primitive_mesh(ct_world_t0 world,
         }
 
         ce_mat4_t scale = {};
-        ce_mat4_scale(scale.m, r_c.half_size.x*2, r_c.half_size.y*2, 0.0f);
+        ce_mat4_scale(scale.m, r_c.half_size.x * 2, r_c.half_size.y * 2, 1.0f);
 
-        ce_mat4_t w  = {};
+        ce_mat4_t w = {};
         ce_mat4_mul(w.m, scale.m, t_c.world.m);
 
         ct_gfx_a0->bgfx_set_transform(w.m, 1);
-        ct_gfx_a0->bgfx_set_vertex_buffer(0, cube_vbh, 0, CE_ARRAY_LEN(_cube_vertices));
-        ct_gfx_a0->bgfx_set_index_buffer(cube_ibh, 0, CE_ARRAY_LEN(cube_indices));
+        ct_gfx_a0->bgfx_set_vertex_buffer(0, _G.cube_vbh, 0, CE_ARRAY_LEN(_vertices));
+        ct_gfx_a0->bgfx_set_index_buffer(_G.cube_ibh, 0, CE_ARRAY_LEN(_indices));
 
         ct_material_a0->submit(p_c.material, data->layer_name, data->viewid);
     }
@@ -175,7 +174,7 @@ static ce_cdb_prop_def_t0 rectangle_render_prop[] = {
 };
 
 void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
-                                    int reload) {
+                                      int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
@@ -192,7 +191,7 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
     api->add_impl(CT_PROPERTY_EDITOR_I, &rectangle_renderer_property_editor_api,
-                      sizeof(rectangle_renderer_property_editor_api));
+                  sizeof(rectangle_renderer_property_editor_api));
 
     ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,
                                       ct_gfx_a0->bgfx_get_renderer_type());
@@ -207,12 +206,12 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
 
     ct_gfx_a0->bgfx_vertex_decl_end(&pt_vertex_decl);
 
-    cube_vbh = ct_gfx_a0->bgfx_create_vertex_buffer(
-            ct_gfx_a0->bgfx_make_ref(_cube_vertices, sizeof(_cube_vertices)),
+    _G.cube_vbh = ct_gfx_a0->bgfx_create_vertex_buffer(
+            ct_gfx_a0->bgfx_make_ref(_vertices, sizeof(_vertices)),
             &pt_vertex_decl, BGFX_BUFFER_NONE);
 
-    cube_ibh = ct_gfx_a0->bgfx_create_index_buffer(
-            ct_gfx_a0->bgfx_make_ref(cube_indices, sizeof(cube_indices)),
+    _G.cube_ibh = ct_gfx_a0->bgfx_create_index_buffer(
+            ct_gfx_a0->bgfx_make_ref(_indices, sizeof(_indices)),
             BGFX_BUFFER_NONE);
 
     ce_cdb_a0->reg_obj_type(RECTANGLE_RENDERER_COMPONENT,
@@ -220,7 +219,7 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD(rectangle_render)(struct ce_api_a0 *api,
-                                      int reload) {
+                                        int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);

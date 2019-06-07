@@ -19,7 +19,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/primitive_mesh.h>
 #include <cetech/mesh/static_mesh.h>

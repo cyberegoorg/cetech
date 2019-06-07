@@ -87,29 +87,6 @@ static int _shaderc(const char *input,
     return status;
 }
 
-static int _gen_tmp_name(char *tmp_filename,
-                         const char *tmp_dir,
-                         size_t max_len,
-                         const char *filename) {
-
-    ce_alloc_t0 *a = ce_memory_a0->system;
-
-    char dir[1024] = {};
-    ce_os_path_a0->dir(dir, filename);
-
-    char *tmp_dirname = NULL;
-    ce_os_path_a0->join(&tmp_dirname, a, 2, tmp_dir, dir);
-
-    ce_os_path_a0->make_path(tmp_dirname);
-
-    int ret = snprintf(tmp_filename, max_len, "%s/%s.shaderc", tmp_dirname,
-                       ce_os_path_a0->filename(filename));
-    ce_buffer_free(tmp_dirname, a);
-
-    return ret;
-}
-
-
 #if CE_PLATFORM_LINUX
 const char *platform = "linux";
 const char *vs_profile = "120";
@@ -145,14 +122,9 @@ static bool _compile(ce_cdb_t0 db,
     char *include_dir = NULL;
     ce_os_path_a0->join(&include_dir, a, 2, core_dir, "bgfxshaders");
 
-    // TODO: temp ce_alloc_t0?
     char output_path[1024] = {};
-    char tmp_filename[1024] = {};
-
 
     const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
-
-    char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
 
     //////// VS
 //    compilator_api->add_dependency(filename, vs_input);
@@ -160,8 +132,8 @@ static bool _compile(ce_cdb_t0 db,
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, vs_input);
 
-    _gen_tmp_name(output_path, tmp_dir,
-                  CE_ARRAY_LEN(tmp_filename), vs_input);
+    ct_resource_compiler_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
+                                          vs_input, NULL);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
                           platform, vs_profile);
@@ -198,8 +170,8 @@ static bool _compile(ce_cdb_t0 db,
 
     ce_os_path_a0->join(&input_path, a, 2, source_dir, fs_input);
 
-    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename),
-                  fs_input);
+    ct_resource_compiler_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+                                          platform, fs_input, NULL);
 
     result = _shaderc(input_path, output_path,
                       include_dir, "fragment",
@@ -284,7 +256,7 @@ static const char *display_icon() {
     return ICON_FA_COG;
 }
 
-static const char* name() {
+static const char *name() {
     return "shader";
 }
 

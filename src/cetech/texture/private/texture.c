@@ -26,7 +26,7 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/editor_ui.h>
-#include <cetech/resource/resource_preview.h>
+#include <cetech/resource_preview/resource_preview.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/property_editor/property_editor.h>
@@ -140,28 +140,6 @@ static int _texturec(const char *input,
     return status;
 }
 
-static int _gen_tmp_name(char *tmp_filename,
-                         const char *tmp_dir,
-                         size_t max_len,
-                         const char *filename) {
-
-    ce_alloc_t0 *a = ce_memory_a0->system;
-
-    char dir[1024] = {};
-    ce_os_path_a0->dir(dir, filename);
-
-    char *tmp_dirname = NULL;
-    ce_os_path_a0->join(&tmp_dirname, a, 2, tmp_dir, dir);
-
-    ce_os_path_a0->make_path(tmp_dirname);
-
-    int ret = snprintf(tmp_filename, max_len, "%s/%s.ktx",
-                       tmp_dirname, ce_os_path_a0->filename(filename));
-
-    ce_buffer_free(tmp_dirname, a);
-
-    return ret;
-}
 
 static bool _compile(ce_cdb_t0 db,
                      uint64_t obj) {
@@ -177,15 +155,14 @@ static bool _compile(ce_cdb_t0 db,
     const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
 
     char output_path[1024] = {};
-    char tmp_filename[1024] = {};
 
     const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
 
-    char *tmp_dir = ct_resource_compiler_a0->get_tmp_dir(a, platform);
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, input);
 
-    _gen_tmp_name(output_path, tmp_dir, CE_ARRAY_LEN(tmp_filename), input);
+    ct_resource_compiler_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+                                          platform, input, "ktx");
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
     if (result != 0) {
