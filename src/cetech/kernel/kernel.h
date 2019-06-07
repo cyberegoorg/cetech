@@ -33,20 +33,27 @@ extern "C" {
     CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
 
 typedef void (*ce_kernel_taks_update_t)(float dt);
+
 typedef void (*ce_kernel_taks_init_t)();
+
 typedef void (*ce_kernel_taks_shutdown_t)();
 
 typedef struct ct_kernel_task_i0 {
     uint64_t (*name)();
 
     void (*update)(float dt);
-    uint64_t* (*update_before)(uint64_t* n);
-    uint64_t* (*update_after)(uint64_t* n);
+
+    uint64_t *(*update_before)(uint64_t *n);
+
+    uint64_t *(*update_after)(uint64_t *n);
 
     void (*init)();
+
     void (*shutdown)();
-    uint64_t* (*init_before)(uint64_t* n);
-    uint64_t* (*init_after)(uint64_t* n);
+
+    uint64_t *(*init_before)(uint64_t *n);
+
+    uint64_t *(*init_after)(uint64_t *n);
 } ct_kernel_task_i0;
 
 struct ct_kernel_a0 {

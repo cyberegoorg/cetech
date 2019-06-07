@@ -80,7 +80,7 @@ int init_config(int argc,
 
     ce_os_path_a0->join(&build_dir, _G.allocator, 2,
                         build_dir_str,
-                        ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM,""));
+                        ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM, ""));
 
     char *build_config = NULL;
     ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir, "global.yml");

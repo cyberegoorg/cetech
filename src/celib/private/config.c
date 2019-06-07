@@ -102,7 +102,7 @@ void set_uint(uint64_t name,
 
 void set_str(uint64_t name,
              const char *value) {
-    const char* new_str = ce_memory_a0->str_dup(value, ce_memory_a0->system);
+    const char *new_str = ce_memory_a0->str_dup(value, ce_memory_a0->system);
     ce_hash_add(&_G.config, name, (uint64_t) new_str, ce_memory_a0->system);
 }
 
@@ -156,13 +156,13 @@ static int load_from_yaml_file(ce_cdb_t0 db,
 
         const ce_cdb_obj_o0 *var_r = ce_cdb_a0->read(db, variables_k[j]);
 
-        const char* name = ce_cdb_a0->read_str(var_r, CE_CONFIG_NAME, "");
-        uint64_t name_h  = ce_id_a0->id64(name);
+        const char *name = ce_cdb_a0->read_str(var_r, CE_CONFIG_NAME, "");
+        uint64_t name_h = ce_id_a0->id64(name);
 
 
         switch (t) {
             case CE_CONFIG_VARIABLE_STR: {
-                const char* value = ce_cdb_a0->read_str(var_r, CE_CONFIG_VALUE, "");
+                const char *value = ce_cdb_a0->read_str(var_r, CE_CONFIG_VALUE, "");
                 set_str(name_h, value);
                 break;
             }
@@ -274,6 +274,7 @@ static const ce_cdb_prop_def_t0 config_variable_int_cdb_type_def[] = {
                 .type = CE_CDB_TYPE_UINT64,
         },
 };
+
 void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
                              int reload) {
     CE_UNUSED(reload);

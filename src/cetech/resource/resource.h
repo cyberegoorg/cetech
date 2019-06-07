@@ -44,16 +44,19 @@ typedef bool (*ct_resource_compilator_t)(ce_cdb_t0 db,
 
 //! Resource interface
 typedef struct ct_resource_i0 {
-    const char* (*name)();
+    const char *(*name)();
+
     uint64_t (*cdb_type)();
 
     const char *(*display_icon)();
 
     void *(*get_interface)(uint64_t name_hash);
 
-    void (*online)(ce_cdb_t0 db, uint64_t obj);
+    void (*online)(ce_cdb_t0 db,
+                   uint64_t obj);
 
-    void (*offline)(ce_cdb_t0 db, uint64_t obj);
+    void (*offline)(ce_cdb_t0 db,
+                    uint64_t obj);
 
     void (*create_new)(uint64_t obj);
 

@@ -53,9 +53,9 @@ typedef struct ce_vio_t0 {
 
 struct ce_os_vio_a0 {
     ce_vio_t0 *(*from_file)(const char *path,
-                                   enum ce_vio_open_mode mode);
+                            enum ce_vio_open_mode mode);
 
-    void (*close)(struct ce_vio_t0 * vio);
+    void (*close)(struct ce_vio_t0 *vio);
 };
 
 

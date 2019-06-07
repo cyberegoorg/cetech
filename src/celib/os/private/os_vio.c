@@ -85,13 +85,13 @@ struct ce_vio_t0 *vio_from_file(const char *path,
     }
 
 
-    vio->inst = (ce_vio_o0*)rwops;
+    vio->inst = (ce_vio_o0 *) rwops;
     vio->vt = &vio_vt;
 
     return vio;
 }
 
-void vio_close(struct ce_vio_t0* vio) {
+void vio_close(struct ce_vio_t0 *vio) {
     vio->vt->close(vio->inst);
 
     ce_alloc_t0 *alloc = ce_memory_a0->system;

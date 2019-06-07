@@ -15,7 +15,7 @@ typedef struct ce_ba_graph_t {
     uint64_t *input;
     uint64_t *output;
     uint64_t *output_no_dep;
-}ce_ba_graph_t;
+} ce_ba_graph_t;
 
 static inline void _ce_bag_remove(uint64_t *a,
                                   uint64_t item) {

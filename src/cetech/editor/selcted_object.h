@@ -18,9 +18,11 @@ struct ct_selected_object_a0 {
     uint64_t (*selected_object)(uint64_t context);
 
     void (*set_previous)(uint64_t context);
+
     void (*set_next)(uint64_t context);
 
     bool (*has_previous)(uint64_t context);
+
     bool (*has_next)(uint64_t context);
 };
 

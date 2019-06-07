@@ -12,7 +12,9 @@
 #include <celib/platform.h>
 
 #if CE_PLATFORM_LINUX || CE_PLATFORM_OSX
+
 #include <execinfo.h>
+
 #endif
 
 #include <celib/macros.h>

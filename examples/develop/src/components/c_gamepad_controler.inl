@@ -13,17 +13,12 @@ typedef struct gamepad_controler_component {
 #define GAMEPAD_COMPONENT \
     CE_ID64_0("gamepad_controller", 0x49293316c5688da9ULL)
 
-static uint64_t gamepad_controler_cdb_type() {
-    return ce_id_a0->id64("gamepad_controller");
-}
-
 static const char *gamepad_controler_display_name() {
     return "Gamepad controler";
 }
 
-static uint64_t gamepad_controler_size() {
-    return sizeof(gamepad_controler_component);
-}
+#define GAMEPAD_ID \
+    CE_ID64_0("gamepad_id", 0xc5ea6dc1179d6f0aULL)
 
 static const ce_cdb_prop_def_t0 gamepad_controler_compo_prop[] = {
         {
@@ -37,14 +32,15 @@ static void _gamepad_controler_on_spawn(ct_world_t0 world,
                                         uint64_t obj,
                                         void *data) {
     gamepad_controler_component *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(gamepad_controler_component));
+
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+    (*c) = (gamepad_controler_component) {.gamepad_id = ce_cdb_a0->read_uint64(r, GAMEPAD_ID, 0)};
 
 }
 
 static struct ct_ecs_component_i0 gamepad_controler_component_i = {
         .display_name = gamepad_controler_display_name,
-        .cdb_type = gamepad_controler_cdb_type,
-        .size = gamepad_controler_size,
-        .on_spawn = _gamepad_controler_on_spawn,
-        .on_change = _gamepad_controler_on_spawn,
+        .cdb_type = GAMEPAD_COMPONENT,
+        .size = sizeof(gamepad_controler_component),
+        .from_cdb_obj = _gamepad_controler_on_spawn,
 };

@@ -12,7 +12,7 @@ void memory_register_api(struct ce_api_a0 *api);
 struct sigaction sigact;
 
 static void signal_handler(int sig) {
-    if (sig == SIGSEGV){
+    if (sig == SIGSEGV) {
         ce_log_a0->error("hell", "");
         exit(-1);
     }
@@ -24,16 +24,16 @@ void init_signals(void) {
     sigact.sa_flags = 0;
 
     sigaddset(&sigact.sa_mask, SIGSEGV);
-    sigaction(SIGSEGV, &sigact, (struct sigaction *)NULL);
+    sigaction(SIGSEGV, &sigact, (struct sigaction *) NULL);
 }
 
 bool ce_init() {
-    ce_alloc_t0 *core_alloc =ce_memory_a0->system;
+    ce_alloc_t0 *core_alloc = ce_memory_a0->system;
 
     api_init(core_alloc);
 
     CE_LOAD_STATIC_MODULE(ce_api_a0, log);
-    
+
     memory_register_api(ce_api_a0);
 
     CE_LOAD_STATIC_MODULE(ce_api_a0, hashlib);

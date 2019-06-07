@@ -9,7 +9,7 @@ extern "C" {
 
 typedef struct ct_primitive_mesh {
     uint64_t material;
-} ct_primitive_mesh;
+} ct_primitive_mesh_c;
 
 
 #define PRIMITIVE_MESH_COMPONENT \

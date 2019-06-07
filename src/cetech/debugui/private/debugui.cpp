@@ -103,12 +103,12 @@ static void begin() {
     }
 
     io.NavInputs[ImGuiNavInput_Activate] = gp->button_state(0, gp->button_index("a"));
-    io.NavInputs[ImGuiNavInput_Cancel] = gp->button_state(0, gp->button_index( "b"));
+    io.NavInputs[ImGuiNavInput_Cancel] = gp->button_state(0, gp->button_index("b"));
     io.NavInputs[ImGuiNavInput_Input] = gp->button_state(0, gp->button_index("y"));
     io.NavInputs[ImGuiNavInput_Menu] = gp->button_state(0, gp->button_index("x"));
-    io.NavInputs[ImGuiNavInput_DpadLeft] = gp->button_state(0,gp->button_index("dpad_left"));
+    io.NavInputs[ImGuiNavInput_DpadLeft] = gp->button_state(0, gp->button_index("dpad_left"));
     io.NavInputs[ImGuiNavInput_DpadRight] = gp->button_state(0, gp->button_index("dpad_right"));
-    io.NavInputs[ImGuiNavInput_DpadUp] = gp->button_state(0,gp->button_index("dpad_up"));
+    io.NavInputs[ImGuiNavInput_DpadUp] = gp->button_state(0, gp->button_index("dpad_up"));
     io.NavInputs[ImGuiNavInput_DpadDown] = gp->button_state(0, gp->button_index("dpad_down"));
     io.NavInputs[ImGuiNavInput_DpadDown] = gp->button_state(0, gp->button_index("dpad_down"));
 
@@ -120,8 +120,8 @@ static void begin() {
     io.NavInputs[ImGuiNavInput_LStickLeft] = left_axis[0] < 0 ? -left_axis[0] : 0;
     io.NavInputs[ImGuiNavInput_LStickRight] = left_axis[0] > 0 ? left_axis[0] : 0;
 
-    io.NavInputs[ImGuiNavInput_FocusPrev] = gp->button_state(0,gp->button_index("right_shoulder"));
-    io.NavInputs[ImGuiNavInput_FocusNext] = gp->button_state(0,gp->button_index("left_shoulder"));
+    io.NavInputs[ImGuiNavInput_FocusPrev] = gp->button_state(0, gp->button_index("right_shoulder"));
+    io.NavInputs[ImGuiNavInput_FocusNext] = gp->button_state(0, gp->button_index("left_shoulder"));
 
 
     if (io.WantSetMousePos) {

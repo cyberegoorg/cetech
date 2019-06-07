@@ -61,16 +61,16 @@ typedef struct main_camera_data_t {
 
 static void _get_active_camera(struct ct_world_t0 world,
                                struct ct_entity_t0 *ent,
-                               ct_entity_storage_o0 *item,
+                               ct_ecs_ent_chunk_o0 *item,
                                uint32_t n,
                                void *data) {
     main_camera_data_t *output = data;
 
     ct_entity_t0 camera_ent = ent[0];
 
-    viewport_component *viewports = ct_ecs_a0->get_all(VIEWPORT_COMPONENT, item);
-    ct_camera_component *cameras = ct_ecs_a0->get_all(CT_CAMERA_COMPONENT, item);
-    ct_transform_comp *tramsforms = ct_ecs_a0->get_all(TRANSFORM_COMPONENT, item);
+    viewport_component *viewports = ct_ecs_c_a0->get_all(world, VIEWPORT_COMPONENT, item);
+    ct_camera_component *cameras = ct_ecs_c_a0->get_all(world, CT_CAMERA_COMPONENT, item);
+    ct_local_to_world_c *tramsforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
 
     output->ent = camera_ent;
     output->viewport = viewports[0].viewport;

@@ -7,7 +7,9 @@
 #endif
 
 #if CE_PLATFORM_OSX
+
 #include <dlfcn.h>
+
 #endif
 
 #include <dlfcn.h>

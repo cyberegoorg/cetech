@@ -47,9 +47,9 @@ static void *get_interface(uint64_t name_hash) {
 #define _PROP_IN4\
     CE_ID64_0("in_4", 0x8782c563666f2d2cULL)
 
-    const struct ct_node_pin_def *input_defs(uint32_t *n) {
+const struct ct_node_pin_def *input_defs(uint32_t *n) {
     static struct ct_node_pin_def def[] = {
-            {.name= "IN 1",  .type = CT_NODE_PIN_FLOAT, .prop = _PROP_IN1},
+            {.name= "IN 1", .type = CT_NODE_PIN_FLOAT, .prop = _PROP_IN1},
             {.name= "IN 2", .type = CT_NODE_PIN_STRING, .prop = _PROP_IN2},
             {.name= "IN 3", .type = CT_NODE_PIN_BOOL, .prop = _PROP_IN3},
     };

@@ -46,7 +46,7 @@ static struct ct_ecs_component_i0 *get_component_interface(uint64_t cdb_type) {
     while (it.api) {
         struct ct_ecs_component_i0 *i = (it.api);
 
-        if (cdb_type == i->cdb_type()) {
+        if (cdb_type == i->cdb_type) {
             return i;
         }
 
@@ -151,11 +151,9 @@ static bool _component_exist(uint64_t obj,
     return false;
 }
 
-static void _add_comp_modal(const char *modal_id,
+static void _add_comp_popup(const char *modal_id,
                             uint64_t obj) {
-    bool open = true;
-    ct_debugui_a0->SetNextWindowSize(&(ce_vec2_t) {512, 512}, 0);
-    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+    if (ct_debugui_a0->BeginPopup(modal_id, 0)) {
         struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
@@ -181,7 +179,7 @@ static void _add_comp_modal(const char *modal_id,
                 goto next;
             }
 
-            uint64_t component_type = i->cdb_type();
+            uint64_t component_type = i->cdb_type;
             if (i->display_name && !_component_exist(obj, component_type)) {
                 const char *label = i->display_name();
 
@@ -230,7 +228,7 @@ void draw_menu(uint64_t obj) {
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_comp_%llu", obj);
 
-    _add_comp_modal(modal_id, obj);
+    _add_comp_popup(modal_id, obj);
 
     if (add) {
         ct_debugui_a0->OpenPopup(modal_id);

@@ -248,14 +248,34 @@ void resource_compiler_compile_all() {
     ce_log_a0->debug("resource_compiler", "compile time %f", dt * 0.001);
 }
 
-char *resource_compiler_get_tmp_dir(ce_alloc_t0 *alocator,
-                                    const char *platform) {
+void resource_compiler_get_tmp_dir(char *output,
+                                   uint64_t max_size,
+                                   const char *platform,
+                                   const char *filename,
+                                   const char *ext) {
 
     char *build_dir = resource_compiler_get_build_dir(_G.allocator, platform);
 
     char *buffer = NULL;
-    ce_os_path_a0->join(&buffer, alocator, 2, build_dir, "tmp");
-    return buffer;
+    ce_os_path_a0->join(&buffer, _G.allocator, 2, build_dir, "tmp");
+
+    char dir[1024] = {};
+    ce_os_path_a0->dir(dir, filename);
+
+    char *tmp_dirname = NULL;
+    ce_os_path_a0->join(&tmp_dirname, _G.allocator, 2, buffer, dir);
+    ce_os_path_a0->make_path(tmp_dirname);
+
+    if (!ext) {
+        snprintf(output, max_size, "%s/%s", tmp_dirname,
+                 ce_os_path_a0->filename(filename));
+    } else {
+        snprintf(output, max_size, "%s/%s.%s", tmp_dirname,
+                 ce_os_path_a0->filename(filename), ext);
+    }
+
+    ce_buffer_free(tmp_dirname, _G.allocator);
+    ce_buffer_free(buffer, _G.allocator);
 }
 
 char *resource_compiler_external_join(ce_alloc_t0 *alocator,

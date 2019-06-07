@@ -65,13 +65,13 @@ typedef enum ct_node_pin_type_e0 {
     CT_NODE_PIN_FLOAT,
     CT_NODE_PIN_STRING,
     CT_NODE_PIN_BOOL,
-}ct_node_pin_type_e0;
+} ct_node_pin_type_e0;
 
 typedef struct ct_node_pin_def {
     enum ct_node_pin_type_e0 type;
     const char *name;
     uint64_t prop;
-}ct_node_pin_def;
+} ct_node_pin_def;
 
 typedef struct ct_node_i0 {
     uint64_t (*type)();

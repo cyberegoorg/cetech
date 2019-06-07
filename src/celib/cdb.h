@@ -133,7 +133,7 @@ typedef struct cnode_t {
         } obj;
 
         struct {
-            void* data;
+            void *data;
             uint64_t size;
         } blob;
 

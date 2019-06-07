@@ -5,25 +5,7 @@ components:
   cdb_type: cdb_objset
   0x1ea4d40ad3a179e1:
     cdb_uid: 0x1ea4d40ad3a179e1
-    cdb_type: transform
-    position:
-      cdb_uid: 0x1ea4d40ad3a179e2
-      cdb_type: position
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    rotation:
-      cdb_uid: 0x1ea4d40ad3a179e3
-      cdb_type: rotation
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    scale:
-      cdb_uid: 0x1ea4d40ad3a179e4
-      cdb_type: scale
-      x: 1.000000
-      y: 1.000000
-      z: 1.000000
+    cdb_type: local_to_world
   0xd72994c74e847f5b:
     cdb_uid: 0xd72994c74e847f5b
     cdb_type: camera

@@ -101,7 +101,8 @@ typedef struct ct_dock_i0 {
 
     uint64_t (*open)(uint64_t dock);
 
-    void (*close)(uint64_t dock, uint64_t context);
+    void (*close)(uint64_t dock,
+                  uint64_t context);
 
     const char *(*display_title)(uint64_t dock);
 

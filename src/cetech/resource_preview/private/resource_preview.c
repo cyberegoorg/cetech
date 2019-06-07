@@ -117,7 +117,7 @@ static void set_asset(preview_instance *pi,
             }
         }
 
-        ct_ecs_a0->destroy(pi->world, &pi->ent, 1);
+        ct_ecs_e_a0->destroy_entities(pi->world, &pi->ent, 1);
 
         pi->ent.h = 0;
         pi->type = 0;
@@ -215,27 +215,31 @@ static bool init() {
 
     pi->world = ct_ecs_a0->create_world();
 
-    ct_ecs_a0->create(pi->world, &pi->camera_ent, 1);
+    ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
 
-    ct_ecs_a0->add(pi->world,
-                   pi->camera_ent,
-                   CE_ARR_ARG(((ct_component_pair_t0[]) {
-                           {
-                                   .type = TRANSFORM_COMPONENT,
-                                   .data = &(ct_transform_comp) {
-                                           .scl = CE_VEC3_UNIT,
-                                   }
-                           },
-                           {
-                                   .type = CT_CAMERA_COMPONENT,
-                                   .data = &(ct_camera_component) {
-                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
-                                           .near = 0.1f,
-                                           .far = 1000.0f,
-                                           .fov = 60.0f,
-                                   }
-                           }
-                   })));
+    ct_ecs_c_a0->add(pi->world,
+                     pi->camera_ent,
+                     CE_ARR_ARG(((ct_component_pair_t0[]) {
+                             {
+                                     .type = POSITION_COMPONENT,
+                                     .data = &(ct_position_c) {
+                                     }
+                             },
+                             {
+                                     .type = LOCAL_TO_WORLD_COMPONENT,
+                                     .data = &(ct_local_to_world_c) {
+                                     }
+                             },
+                             {
+                                     .type = CT_CAMERA_COMPONENT,
+                                     .data = &(ct_camera_component) {
+                                             .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                             .near = 0.1f,
+                                             .far = 1000.0f,
+                                             .fov = 60.0f,
+                                     }
+                             }
+                     })));
 
     pi->viewport = ct_renderer_a0->create_viewport();
 
@@ -253,6 +257,7 @@ static void update(float dt) {
                                                         ROTATION_COMPONENT, pi->ent, true);
             rot_t->rot = ce_vec3_add(rot_t->rot, (ce_vec3_t) {0, 1, 0});
         }
+
         ct_ecs_a0->step(pi->world, dt);
 
         ct_local_to_world_c *t = ct_ecs_c_a0->get_one(pi->world, LOCAL_TO_WORLD_COMPONENT,
@@ -329,26 +334,30 @@ static uint64_t open(uint64_t dock) {
 
     pi->world = ct_ecs_a0->create_world();
 
-    ct_ecs_a0->create(pi->world, &pi->camera_ent, 1);
-    ct_ecs_a0->add(pi->world,
-                   pi->camera_ent,
-                   CE_ARR_ARG(((ct_component_pair_t0[]) {
-                           {
-                                   .type = TRANSFORM_COMPONENT,
-                                   .data = &(ct_transform_comp) {
-                                           .scl = CE_VEC3_UNIT,
-                                   }
-                           },
-                           {
-                                   .type = CT_CAMERA_COMPONENT,
-                                   .data = &(ct_camera_component) {
-                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
-                                           .far = 100.0f,
-                                           .near = 0.1f,
-                                           .fov = 60.0f,
-                                   }
-                           }
-                   })));
+    ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
+    ct_ecs_c_a0->add(pi->world,
+                     pi->camera_ent,
+                     CE_ARR_ARG(((ct_component_pair_t0[]) {
+                             {
+                                     .type = POSITION_COMPONENT,
+                                     .data = &(ct_position_c) {
+                                     }
+                             },
+                             {
+                                     .type = LOCAL_TO_WORLD_COMPONENT,
+                                     .data = &(ct_local_to_world_c) {
+                                     }
+                             },
+                             {
+                                     .type = CT_CAMERA_COMPONENT,
+                                     .data = &(ct_camera_component) {
+                                             .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                             .far = 100.0f,
+                                             .near = 0.1f,
+                                             .fov = 60.0f,
+                                     }
+                             }
+                     })));
 
     pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
 

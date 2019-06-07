@@ -228,7 +228,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component);
 
             struct ct_ecs_component_i0 *component_i;
-            component_i = ct_ecs_a0->get_interface(type);
+            component_i = ct_ecs_c_a0->get_interface(type);
             if (!component_i || !component_i->display_name) {
                 continue;
             }
@@ -251,7 +251,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu",
                      component_display_name, component);
 
-            if(ct_debugui_a0->TreeNodeEx(c_label, c_flags)) {
+            if (ct_debugui_a0->TreeNodeEx(c_label, c_flags)) {
                 if (ct_debugui_a0->IsItemClicked(0)) {
                     new_selected_object = component;
                 }

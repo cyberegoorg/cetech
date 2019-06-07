@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -20,7 +21,7 @@ typedef struct ct_editor_module_i0 {
 
     void (*update)(float dt);
 
-}ct_editor_module_i0;
+} ct_editor_module_i0;
 
 #ifdef __cplusplus
 };

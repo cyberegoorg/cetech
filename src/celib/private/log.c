@@ -35,7 +35,7 @@ static void vlog(const enum ce_log_level_e0 level,
     int len = vsnprintf(0, 0, format, cva);
     va_end(cva);
 
-    char msg[len+1];
+    char msg[len + 1];
     int s = vsnprintf(msg, CE_ARRAY_LEN(msg), format, va);
 
     //TODO:
@@ -167,7 +167,7 @@ void CE_MODULE_LOAD(log)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD(log)(struct ce_api_a0 *api,
-                         int reload) {
+                           int reload) {
     CE_UNUSED(reload);
     CE_UNUSED(api);
 }

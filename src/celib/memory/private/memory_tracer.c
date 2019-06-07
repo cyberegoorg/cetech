@@ -107,7 +107,7 @@ void trace_ptr(ce_memory_tracer_o0 *inst,
     *item = (trace_item_t) {
             .ptr = ptr,
             .filename = filename,
-            .line =line,
+            .line = line,
     };
 }
 

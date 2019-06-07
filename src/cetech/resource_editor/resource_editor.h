@@ -16,15 +16,22 @@ extern "C" {
 typedef struct ct_resource_editor_i0 {
     uint64_t (*cdb_type)();
 
-    const char* (*display_icon)();
-    const char* (*display_name)();
+    const char *(*display_icon)();
+
+    const char *(*display_name)();
 
     uint64_t (*open)(uint64_t obj);
+
     void (*close)(uint64_t context_obj);
-    void (*update)(uint64_t context_obj, float dt);
-    void (*draw_ui)(uint64_t context_obj, uint64_t context);
+
+    void (*update)(uint64_t context_obj,
+                   float dt);
+
+    void (*draw_ui)(uint64_t context_obj,
+                    uint64_t context);
+
     void (*draw_menu)(uint64_t context_obj);
-}ct_resource_editor_i0;
+} ct_resource_editor_i0;
 
 #ifdef __cplusplus
 };

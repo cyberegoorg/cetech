@@ -1986,6 +1986,10 @@ const ce_cdb_obj_o0 *read(ce_cdb_t0 _db,
 
 static uint64_t type(ce_cdb_t0 _db,
                      uint64_t _obj) {
+    if (!_obj) {
+        return 0;
+    }
+
     db_t *db = _get_db(_db);
     object_t *obj = _get_object_from_uid(db, _obj);
 
@@ -2013,7 +2017,7 @@ uint64_t _read_to(ce_cdb_t0 db,
 
     type_info_t ti = _TYPE_INFO[def->type];
 
-    size_t padding = CE_ALIGN_PADDING(to + cur_byte, ti.align);
+    size_t padding = 0;//CE_ALIGN_PADDING(to + cur_byte, ti.align);
 
     if (def->flags & CE_CDB_PROP_FLAG_UNPACK) {
         return read_to(db, v->subobj, to + cur_byte, max_size);

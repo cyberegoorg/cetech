@@ -33,6 +33,7 @@ typedef struct ce_memory_tracer_t0 {
 
 struct ce_memory_tracer_a0 {
     ce_memory_tracer_t0 *(*create)();
+
     void (*destroy)(ce_memory_tracer_t0 *tracer);
 };
 

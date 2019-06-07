@@ -14,13 +14,13 @@
 
 //static void player_input_foreach_components(struct ct_world_t0 world,
 //                                            struct ct_entity_t0 *ent,
-//                                            ct_entity_storage_o0 *item,
+//                                            ct_ecs_ent_chunk_o0 *item,
 //                                            uint32_t n,
 //                                            ct_ecs_cmd_buffer_t *cmd_buff,
 //                                            void *data) {
 //    ct_controler_i0 *keyboard_ci = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 //
-//    player_input_component *player_inputs = ct_ecs_a0->get_all(PLAYER_INPUT_COMPONENT, item);
+//    player_input_component *player_inputs = ct_ecs_c_a0->get_all(PLAYER_INPUT_COMPONENT, item);
 //
 //    for (uint32_t i = 0; i < n; ++i) {
 //        player_input_component *pi = &player_inputs[i];
@@ -49,12 +49,14 @@ static float _angle(ce_vec2_t v) {
 
 static void _gamepad_controler(struct ct_world_t0 world,
                                struct ct_entity_t0 *ent,
-                               ct_entity_storage_o0 *item,
+                               ct_ecs_ent_chunk_o0 *item,
                                uint32_t n,
                                void *data) {
     ct_controler_i0 *gamepad_ci = ct_controlers_a0->get(CONTROLER_GAMEPAD);
-    player_input_component *player_inputs = ct_ecs_a0->get_all(PLAYER_INPUT_COMPONENT, item);
-    gamepad_controler_component *gamepad = ct_ecs_a0->get_all(GAMEPAD_COMPONENT, item);
+
+    player_input_component *player_inputs = ct_ecs_c_a0->get_all(world, PLAYER_INPUT_COMPONENT,
+                                                                 item);
+    gamepad_controler_component *gamepad = ct_ecs_c_a0->get_all(world, GAMEPAD_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
         player_input_component *pi = &player_inputs[i];
@@ -92,8 +94,6 @@ static void _gamepad_controler(struct ct_world_t0 world,
 
             pi->shoot_dir = dir;
         }
-
-        ct_ecs_a0->component_changed(world, ent[i], PLAYER_INPUT_COMPONENT);
     }
 }
 
@@ -111,12 +111,8 @@ static void player_input_system(struct ct_world_t0 world,
                          _gamepad_controler, NULL);
 }
 
-static uint64_t player_input_name() {
-    return PLAYER_INPUT_SYSTEM;
-}
-
 static struct ct_system_i0 player_input_system_i0 = {
-        .simulation = player_input_system,
-        .name = player_input_name,
+        .name = PLAYER_INPUT_SYSTEM,
+        .process = player_input_system,
 };
 

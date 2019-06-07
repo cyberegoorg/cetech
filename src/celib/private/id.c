@@ -108,7 +108,7 @@ struct ce_id_a0 *ce_id_a0 = &hash_api;
 
 
 void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
-                                  int reload) {
+                              int reload) {
     CE_UNUSED(reload);
 
     api->register_api(CE_ID_API, &hash_api, sizeof(hash_api));
@@ -118,7 +118,7 @@ void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD (hashlib)(struct ce_api_a0 *api,
-                                    int reload) {
+                                int reload) {
     ce_alloc_t0 *alloc = ce_memory_a0->system;
 
 

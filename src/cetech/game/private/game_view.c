@@ -56,7 +56,7 @@ static void on_menu(uint64_t dock) {
 
 static void _get_viewport(struct ct_world_t0 world,
                           struct ct_entity_t0 *ent,
-                          ct_entity_storage_o0 *item,
+                          ct_ecs_ent_chunk_o0 *item,
                           uint32_t n,
                           void *data) {
     ct_viewport_t0 *vp = data;

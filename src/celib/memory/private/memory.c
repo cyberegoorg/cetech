@@ -51,6 +51,7 @@ struct ce_memory_a0 *ce_memory_a0 = &_api;
 
 
 void memory_tracer_init(struct ce_api_a0 *api);
+
 void memory_tracer_shutdown();
 
 void memory_register_api(struct ce_api_a0 *api) {

@@ -11,7 +11,7 @@ static void *_reallocate_virt(const ce_alloc_o0 *a,
                               const char *filename,
                               uint32_t line) {
 
-    if(!size)  {
+    if (!size) {
         munmap(ptr, old_size);
         return NULL;
     }

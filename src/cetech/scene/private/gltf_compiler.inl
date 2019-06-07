@@ -80,32 +80,17 @@ static inline int _comp_size(bgfx_attrib_type_t type) {
 }
 
 static int _gltf_comp_num(cgltf_type type) {
-    switch (type) {
-        default:
-        case cgltf_type_invalid:
-            return 0;
-
-        case cgltf_type_scalar:
-            return 1;
-
-        case cgltf_type_vec2:
-            return 2;
-
-        case cgltf_type_vec3:
-            return 3;
-
-        case cgltf_type_vec4:
-            return 4;
-
-        case cgltf_type_mat2:
-            return 2 * 2;
-
-        case cgltf_type_mat3:
-            return 3 * 3;
-
-        case cgltf_type_mat4:
-            return 4 * 4;
-    }
+    static int tbl[] = {
+            [cgltf_type_invalid] = 0,
+            [cgltf_type_scalar] = 1,
+            [cgltf_type_vec2] = 2,
+            [cgltf_type_vec3] = 3,
+            [cgltf_type_vec4] = 4,
+            [cgltf_type_mat2] = 2 * 2,
+            [cgltf_type_mat3] = 3 * 3,
+            [cgltf_type_mat4] = 4 * 4,
+    };
+    return tbl[type];
 }
 
 static bool _compile_gtlf(ce_cdb_t0 db,

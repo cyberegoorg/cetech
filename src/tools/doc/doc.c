@@ -343,7 +343,7 @@ int main(int argc,
             "*.inl", "*.h"
     };
     ce_os_path_a0->list(source_dir, CE_ARR_ARG(filter),
-                         1, 0, &files, &files_count, a);
+                        1, 0, &files, &files_count, a);
 
     ce_task_item_t0 tasks[files_count];
 

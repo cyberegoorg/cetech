@@ -7,13 +7,13 @@
 
 namespace imgui_wrap {
 
-    void TextColoredV(const ce_vec4_t*  col,
+    void TextColoredV(const ce_vec4_t *col,
                       const char *fmt,
                       va_list args) {
         ImGui::TextColoredV(_to_imvec4(col), fmt, args);
     }
 
-    void TextColored(const ce_vec4_t*  col,
+    void TextColored(const ce_vec4_t *col,
                      const char *fmt,
                      ...) {
         va_list args;
@@ -24,22 +24,22 @@ namespace imgui_wrap {
 
 
     bool Button(const char *label,
-                const ce_vec2_t* size) {
+                const ce_vec2_t *size) {
         return ImGui::Button(label, _to_imvec2(size));
     }
 
     bool InvisibleButton(const char *str_id,
-                         const ce_vec2_t* size) {
+                         const ce_vec2_t *size) {
         return ImGui::InvisibleButton(str_id, _to_imvec2(size));
     }
 
 
     void Image2(bgfx_texture_handle_t user_texture_id,
-                const ce_vec2_t* size,
-                const ce_vec2_t* uv0,
-                const ce_vec2_t* uv1,
-                const ce_vec4_t*  tint_col,
-                const ce_vec4_t*  border_col) {
+                const ce_vec2_t *size,
+                const ce_vec2_t *uv0,
+                const ce_vec2_t *uv1,
+                const ce_vec4_t *tint_col,
+                const ce_vec4_t *border_col) {
         return ImGui::Image((bgfx_texture_handle_t) {user_texture_id.idx},
                             _to_imvec2(size),
                             _to_imvec2(uv0),
@@ -49,9 +49,9 @@ namespace imgui_wrap {
     }
 
     void Image(bgfx_texture_handle_t user_texture_id,
-               const ce_vec2_t* size,
-               const ce_vec4_t*  tint_col,
-               const ce_vec4_t*  border_col) {
+               const ce_vec2_t *size,
+               const ce_vec4_t *tint_col,
+               const ce_vec4_t *border_col) {
 
         if (ct_gfx_a0->bgfx_get_caps()->originBottomLeft) {
             ce_vec2_t uv0 = {0.0f, 1.0f};
@@ -78,12 +78,12 @@ namespace imgui_wrap {
     }
 
     bool ImageButton(ImTextureID user_texture_id,
-                     const ce_vec2_t* size,
-                     const ce_vec2_t* uv0,
-                     const ce_vec2_t* uv1,
+                     const ce_vec2_t *size,
+                     const ce_vec2_t *uv0,
+                     const ce_vec2_t *uv1,
                      int frame_padding,
-                     const ce_vec4_t*  bg_col,
-                     const ce_vec4_t*  tint_col) {
+                     const ce_vec4_t *bg_col,
+                     const ce_vec4_t *tint_col) {
         return ImGui::ImageButton(user_texture_id,
                                   _to_imvec2(size),
                                   _to_imvec2(uv0),
@@ -138,7 +138,7 @@ namespace imgui_wrap {
                    const char *overlay_text,
                    float scale_min,
                    float scale_max,
-                   ce_vec2_t* graph_size,
+                   ce_vec2_t *graph_size,
                    int stride) {
         ImGui::PlotLines(
                 label,
@@ -161,7 +161,7 @@ namespace imgui_wrap {
                     const char *overlay_text,
                     float scale_min,
                     float scale_max,
-                    ce_vec2_t* graph_size) {
+                    ce_vec2_t *graph_size) {
         return ImGui::PlotLines(
                 label,
                 values_getter, data,
@@ -180,7 +180,7 @@ namespace imgui_wrap {
                        const char *overlay_text,
                        float scale_min,
                        float scale_max,
-                       ce_vec2_t* graph_size,
+                       ce_vec2_t *graph_size,
                        int stride) {
         return ImGui::PlotHistogram(
                 label,
@@ -203,7 +203,7 @@ namespace imgui_wrap {
                         const char *overlay_text,
                         float scale_min,
                         float scale_max,
-                        ce_vec2_t* graph_size) {
+                        ce_vec2_t *graph_size) {
         return ImGui::PlotHistogram(
                 label,
                 values_getter,
@@ -217,7 +217,7 @@ namespace imgui_wrap {
     }
 
     void ProgressBar(float fraction,
-                     const ce_vec2_t* size_arg,
+                     const ce_vec2_t *size_arg,
                      const char *overlay) {
         return ImGui::ProgressBar(
                 fraction,
@@ -325,7 +325,7 @@ namespace imgui_wrap {
     bool InputTextMultiline(const char *label,
                             char *buf,
                             size_t buf_size,
-                            const ce_vec2_t* size,
+                            const ce_vec2_t *size,
                             ImGuiInputTextFlags flags,
                             ImGuiTextEditCallback callback,
                             void *user_data) {
@@ -439,7 +439,7 @@ namespace imgui_wrap {
 
 
     bool VSliderFloat(const char *label,
-                      const ce_vec2_t* size,
+                      const ce_vec2_t *size,
                       float *v,
                       float v_min,
                       float v_max,
@@ -456,7 +456,7 @@ namespace imgui_wrap {
     }
 
     bool VSliderInt(const char *label,
-                    const ce_vec2_t* size,
+                    const ce_vec2_t *size,
                     int *v,
                     int v_min,
                     int v_max,
@@ -558,7 +558,7 @@ namespace imgui_wrap {
     bool Selectable(const char *label,
                     bool selected,
                     ImGuiSelectableFlags flags,
-                    const ce_vec2_t* size) {
+                    const ce_vec2_t *size) {
         return ImGui::Selectable(
                 label,
                 selected, flags, _to_imvec2(size));
@@ -567,7 +567,7 @@ namespace imgui_wrap {
     bool Selectable2(const char *label,
                      bool *p_selected,
                      ImGuiSelectableFlags flags,
-                     const ce_vec2_t* size) {
+                     const ce_vec2_t *size) {
         return ImGui::Selectable(
                 label,
                 p_selected, flags,
@@ -591,7 +591,7 @@ namespace imgui_wrap {
     }
 
     bool ListBoxHeader(const char *label,
-                       const ce_vec2_t* size) {
+                       const ce_vec2_t *size) {
         return ImGui::ListBoxHeader(
                 label,
                 _to_imvec2(size));
@@ -778,19 +778,22 @@ namespace imgui_wrap {
     ce_vec2_t GetContentRegionAvail() {
         ImVec2 v = ImGui::GetContentRegionAvail();
         return (ce_vec2_t) {
-            .x = v.x,
-            .y = v.y,
+                .x = v.x,
+                .y = v.y,
         };
     }
 
-    bool BeginChild(const char* str_id, ce_vec2_t size, bool border, DebugUIWindowFlags_ flags){
+    bool BeginChild(const char *str_id,
+                    ce_vec2_t size,
+                    bool border,
+                    DebugUIWindowFlags_ flags) {
         return ImGui::BeginChild(str_id, ImVec2(size.x, size.y), border, flags);
     }
 
-    void PushColorStyleVar(ImGuiCol idx, ce_vec4_t col) {
-        ImGui::PushStyleColor(idx, *(ImVec4*)&col);
+    void PushColorStyleVar(ImGuiCol idx,
+                           ce_vec4_t col) {
+        ImGui::PushStyleColor(idx, *(ImVec4 *) &col);
     }
-
 
 
 }

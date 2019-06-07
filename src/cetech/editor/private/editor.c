@@ -159,7 +159,7 @@ static uint64_t *update_before(uint64_t *n) {
     return a;
 }
 
- struct ct_kernel_task_i0 render_task = {
+struct ct_kernel_task_i0 render_task = {
         .name = task_name,
         .update = editor_task,
         .init = on_init,
@@ -167,7 +167,6 @@ static uint64_t *update_before(uint64_t *n) {
         .update_after = update_after,
         .update_before = update_before,
 };
-
 
 
 void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,

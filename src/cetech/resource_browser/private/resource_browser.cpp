@@ -330,14 +330,7 @@ static void _create_from_modal(const char *modal_id) {
 static char _selected_type[256] = {};
 
 static void _select_type_modal(const char *modal_id) {
-    bool open = true;
-    ce_vec2_t size = {512, 512};
-
-    ct_debugui_a0->SetNextWindowSize(&size,
-                                     static_cast<DebugUICond>(0));
-
-
-    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+    if (ct_debugui_a0->BeginPopup(modal_id, 0)) {
         struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {

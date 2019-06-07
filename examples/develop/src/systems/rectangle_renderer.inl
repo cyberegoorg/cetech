@@ -148,32 +148,19 @@ static struct ct_renderer_component_i0 rectangle_renderer_i = {
         .render = render
 };
 
-static void *rectangle_renderer_get_interface(uint64_t name_hash) {
-    if (CT_RENDERER_COMPONENT_I == name_hash) {
-        return &ct_renderer_component_i;
-    }
-
-    return NULL;
-}
-
-
-static uint64_t rectangle_render_size() {
-    return sizeof(ct_primitive_mesh);
-}
-
-static void _prim_mesh_on_spawn(uint64_t obj,
-                                void *data) {
+static void _rectangle_renderer_on_spawn(ct_world_t0 world,
+                                         ce_cdb_t0 db,
+                                         uint64_t obj,
+                                         void *data) {
     rectangle_renderer_t *c = data;
     ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(rectangle_renderer_t));
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
         .display_name = rectangle_renderer_display_name,
-        .cdb_type = rectangle_renderer_cdb_type,
-        .get_interface = rectangle_renderer_get_interface,
-        .size = rectangle_render_size,
-        .on_spawn = _prim_mesh_on_spawn,
-        .on_change = _prim_mesh_on_spawn,
+        .cdb_type = RECTANGLE_RENDERER_COMPONENT,
+        .size = sizeof(rectangle_renderer_t),
+        .from_cdb_obj = _rectangle_renderer_on_spawn,
 };
 
 

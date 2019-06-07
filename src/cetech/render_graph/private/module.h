@@ -2,7 +2,7 @@ typedef struct render_graph_module_inst {
     uint8_t *pass;
     ct_rg_module_t0 **modules;
     ce_hash_t extension_points;
-}render_graph_module_inst;
+} render_graph_module_inst;
 
 static void add_pass(void *inst,
                      void *pass,
@@ -35,7 +35,7 @@ static struct ct_rg_module_t0 *create_module();
 typedef struct module_pass {
     ct_rg_pass_t0 pass;
     ct_rg_module_t0 *module;
-}module_pass ;
+} module_pass;
 
 static void modulepass_on_setup(void *inst,
                                 struct ct_rg_builder_t0 *builder) {
@@ -57,8 +57,8 @@ static void module_add_module(void *inst,
     ce_array_push(module_inst->modules, new_module, _G.alloc);
 }
 
-struct ct_rg_module_t0* add_extension_point(void *inst,
-                         uint64_t name) {
+struct ct_rg_module_t0 *add_extension_point(void *inst,
+                                            uint64_t name) {
     ct_rg_module_t0 *module = inst;
     render_graph_module_inst *module_inst = module->inst;
 
@@ -71,7 +71,7 @@ struct ct_rg_module_t0* add_extension_point(void *inst,
 }
 
 struct ct_rg_module_t0 *get_extension_point(void *inst,
-                                                   uint64_t name) {
+                                            uint64_t name) {
     ct_rg_module_t0 *module = inst;
     render_graph_module_inst *module_inst = module->inst;
 
@@ -99,9 +99,9 @@ static struct ct_rg_module_t0 *create_module() {
     ct_rg_module_t0 *obj = CE_ALLOC(_G.alloc, ct_rg_module_t0, sizeof(ct_rg_module_t0));
 
     render_graph_module_inst *inst = CE_ALLOC(_G.alloc,
-                                                     struct render_graph_module_inst,
-                                                     sizeof(render_graph_module_inst));
-    *inst = (render_graph_module_inst){};
+                                              struct render_graph_module_inst,
+                                              sizeof(render_graph_module_inst));
+    *inst = (render_graph_module_inst) {};
 
     *obj = (ct_rg_module_t0) {
             .add_pass= add_pass,

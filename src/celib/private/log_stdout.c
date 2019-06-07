@@ -84,7 +84,7 @@ void ct_log_stdout_yaml_handler(enum ce_log_level_e0 level,
 
     FILE *out = level == LOG_ERROR ? stderr : stdout;
 
-    struct tm *gmtm = gmtime((time_t*)&time);
+    struct tm *gmtm = gmtime((time_t *) &time);
     const char *time_str = _time_to_str(gmtm);
 
     fprintf(out, _level_format[level], _level_to_str[level],

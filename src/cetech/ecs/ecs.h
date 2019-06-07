@@ -12,6 +12,15 @@ extern "C" {
 #define CT_ECS_API \
     CE_ID64_0("ct_ecs_a0", 0x2abf54879e52240fULL)
 
+#define CT_ECS_E_API \
+    CE_ID64_0("ct_ecs_e_a0", 0x16082519819f93abULL)
+
+#define CT_ECS_C_API \
+    CE_ID64_0("ct_ecs_c_a0", 0xfef0f9e05beb0918ULL)
+
+#define CT_ECS_Q_API \
+    CE_ID64_0("ct_ecs_q_a0", 0x6335c7d4eda844edULL)
+
 #define CT_ECS_SYNC_TASK \
     CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
 
@@ -39,33 +48,25 @@ extern "C" {
 #define CT_ECS_COMPONENT_I \
     CE_ID64_0("ct_ecs_component_i0", 0x9fda2263be703cb3ULL)
 
-#define CT_ECS_EVENT_COMPONENT_SPAWN \
-    CE_ID64_0("component_spawn", 0xa3f574429952b180ULL)
 
-#define CT_ECS_EVENT_COMPONENT_DESTROY \
-    CE_ID64_0("component_destroy", 0xca6890a5459ecb2cULL)
+#define _LIST(...) (uint64_t[]){__VA_ARGS__}
+#define _LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))
 
-#define CT_ECS_EVENT_COMPONENT_CHANGE \
-    CE_ID64_0("component_change", 0xb47624cc2d5cbbb7ULL)
+#define CT_ECS_BEFORE(...) \
+    ((ct_ptr_pair_t0){.ptr=&_LIST(__VA_ARGS__),.len=_LIST_SIZE(_LIST(__VA_ARGS__))})
 
-#define CT_ECS_EVENT_ENT_LINK \
-    CE_ID64_0("entity_link", 0xffcddf97336bbc9ULL)
+#define CT_ECS_AFTER(...) \
+    ((ct_ptr_pair_t0){.ptr=&_LIST(__VA_ARGS__),.len=_LIST_SIZE(_LIST(__VA_ARGS__))})
 
-#define CT_ECS_EVENT_ENT_UNLINK \
-    CE_ID64_0("entity_unlink", 0x9caaf06ae5bc97e2ULL)
+#define CT_ECS_ARCHETYPE(...) \
+    ct_ecs_c_a0->combine_component(_LIST(__VA_ARGS__), _LIST_SIZE(_LIST(__VA_ARGS__)))
 
-#define CT_ECS_WORLD_EVENT_CREATED \
-    CE_ID64_0("ecs_world_evemt_created", 0xea233f148a521a8eULL)
 
-#define CT_ECS_WORLD_EVENT_DESTROYED \
-    CE_ID64_0("ecs_world_evemt_destroyed", 0x246df7bdf1f5ff81ULL)
-
+typedef struct ce_cdb_t0 ce_cdb_t0;
 
 typedef struct ct_resource_id_t0 ct_resource_id_t0;
-
-typedef struct ct_entity_storage_o0 ct_entity_storage_o0;
-typedef struct ct_ecs_ev_queue_o0 ct_ecs_ev_queue_o0;
-typedef void ct_ecs_cmd_buffer_t;
+typedef struct ct_ecs_ent_chunk_o0 ct_ecs_ent_chunk_o0;
+typedef struct ct_ecs_cmd_buffer_t ct_ecs_cmd_buffer_t;
 
 typedef struct ct_world_t0 {
     uint64_t h;
@@ -75,18 +76,21 @@ typedef struct ct_entity_t0 {
     uint64_t h;
 } ct_entity_t0;
 
+typedef struct ct_archetype_mask_t0 {
+    uint64_t mask;
+} ct_archemask_t0;
+
 typedef struct ct_ecs_component_i0 {
+    bool is_system_state;
+    uint64_t cdb_type;
+    uint64_t size;
+
     const char *(*display_name)();
 
-    uint64_t (*cdb_type)();
-
-    uint64_t (*size)();
-
-    void (*on_spawn)(uint64_t obj,
-                     void *data);
-
-    void (*on_change)(uint64_t obj,
-                      void *data);
+    void (*from_cdb_obj)(ct_world_t0 world,
+                         ce_cdb_t0 db,
+                         uint64_t obj,
+                         void *data);
 
     void *(*get_interface)(uint64_t name_hash);
 } ct_ecs_component_i0;
@@ -96,12 +100,19 @@ typedef struct ct_component_pair_t0 {
     void *data;
 } ct_component_pair_t0;
 
-typedef void (*ct_process_fce_t)(ct_world_t0 world,
-                                 ct_entity_t0 *ent,
-                                 ct_entity_storage_o0 *item,
-                                 uint32_t n,
-                                 ct_ecs_cmd_buffer_t *cmd_buff,
-                                 void *data);
+typedef struct ct_ecs_query_t0 {
+    ct_archemask_t0 all;
+    ct_archemask_t0 any;
+    ct_archemask_t0 none;
+    ct_archemask_t0 write;
+    bool only_changed;
+} ct_ecs_query_t0;
+
+typedef void (*ct_ecs_foreach_fce_t)(ct_world_t0 world,
+                                     ct_entity_t0 *ent,
+                                     ct_ecs_ent_chunk_o0 *chunk,
+                                     uint32_t n,
+                                     void *data);
 
 typedef void (ct_ecs_system_fce_t)(ct_world_t0 world,
                                    float dt,
@@ -120,141 +131,119 @@ typedef struct ct_editor_component_i0 {
                                  float *local);
 } ct_editor_component_i0;
 
+
+typedef struct ct_ptr_pair_t0 {
+    void *ptr;
+    uint32_t len;
+} ct_ptr_pair_t0;
+
+
 struct ct_system_i0 {
-    uint64_t (*name)();
+    uint64_t name;
+    ct_ecs_system_fce_t *process;
 
-    const uint64_t *(*before)(uint32_t *n);
-
-    const uint64_t *(*after)(uint32_t *n);
-
-    void (*on_create_world)(ct_world_t0 world,
-                            ct_ecs_ev_queue_o0 *queue);
-
-    ct_simulate_fce_t *simulation;
+    ct_ptr_pair_t0 before;
+    ct_ptr_pair_t0 after;
 };
 
-typedef struct ct_ecs_world_event_t0 {
-    uint64_t type;
-    ct_world_t0 world;
-    union {
-        struct {
-            ct_entity_t0 ent;
-            uint64_t type;
-        } component;
-
-        struct {
-            ct_entity_t0 child;
-            ct_entity_t0 parent;
-        } link;
-    };
-} ct_ecs_world_event_t0;
-
 struct ct_ecs_a0 {
-    //WORLD
     ct_world_t0 (*create_world)();
 
     void (*destroy_world)(ct_world_t0 world);
 
-    uint32_t (*world_num)();
+    void (*step)(ct_world_t0 world,
+                 float dt);
 
-    void (*all_world)(ct_world_t0 *worlds);
+    void (*buff_add_component)(ct_ecs_cmd_buffer_t *buffer,
+                               ct_world_t0 world,
+                               ct_entity_t0 ent,
+                               const ct_component_pair_t0 *components,
+                               uint32_t components_count);
 
+    void (*buff_remove_component)(ct_ecs_cmd_buffer_t *buffer,
+                                  ct_world_t0 world,
+                                  ct_entity_t0 ent,
+                                  const uint64_t *component_name,
+                                  uint32_t name_count);
+};
 
-    ct_ecs_ev_queue_o0 *(*new_world_events_listener)(ct_world_t0 world);
+CE_MODULE(ct_ecs_a0);
 
-    bool (*pop_world_events)(ct_ecs_ev_queue_o0 *q,
-                             ct_ecs_world_event_t0 *ev);
+struct ct_ecs_e_a0 {
+    void (*create_entities)(ct_world_t0 world,
+                            ct_entity_t0 *entity,
+                            uint32_t count);
 
-    //ENT
+    void (*destroy_entities)(ct_world_t0 world,
+                             ct_entity_t0 *entity,
+                             uint32_t count);
 
-    void (*create)(ct_world_t0 world,
-                   ct_entity_t0 *entity,
-                   uint32_t count);
+    bool (*entity_alive)(ct_world_t0 world,
+                         ct_entity_t0 entity);
 
-    void (*destroy)(ct_world_t0 world,
-                    ct_entity_t0 *entity,
-                    uint32_t count);
+    ct_entity_t0 (*spawn_entity)(ct_world_t0 world,
+                                 uint64_t name);
+};
 
-    bool (*alive)(ct_world_t0 world,
-                  ct_entity_t0 entity);
+CE_MODULE(ct_ecs_e_a0);
 
-    ct_entity_t0 (*spawn)(ct_world_t0 world,
-                          uint64_t name);
-
-
+struct ct_ecs_c_a0 {
+    //COMP
     bool (*has)(ct_world_t0 world,
                 ct_entity_t0 ent,
                 uint64_t *component_name,
                 uint32_t name_count);
 
-    void (*link)(ct_world_t0 world,
-                 ct_entity_t0 parent,
-                 ct_entity_t0 child);
-
-    ct_entity_t0 (*parent)(ct_world_t0 world,
-                           ct_entity_t0 entity);
-
-    ct_entity_t0 (*first_child)(ct_world_t0 world,
-                                ct_entity_t0 entity);
-
-    ct_entity_t0 (*next_sibling)(ct_world_t0 world,
-                                 ct_entity_t0 entity);
-
-    //SYSTEM
-    void (*step)(ct_world_t0 world,
-                     float dt);
-
-    void (*process)(ct_world_t0 world,
-                    uint64_t components_mask,
-                    ct_process_fce_t fce,
-                    void *data);
-
-    void (*process_serial)(ct_world_t0 world,
-                           uint64_t components_mask,
-                           ct_process_fce_t fce,
-                           void *data);
-
-    //COMP
-    void (*component_changed)(ct_world_t0 world,
-                              ct_entity_t0 ent,
-                              uint64_t component);
 
     ct_ecs_component_i0 *(*get_interface)(uint64_t name);
 
-    uint64_t (*mask)(uint64_t component_name);
+    ct_archemask_t0 (*combine_component)(const uint64_t *component_name,
+                                              uint32_t n);
 
-    void *(*get_all)(uint64_t component_name,
-                     ct_entity_storage_o0 *item);
+    void *(*get_all)(ct_world_t0 world,
+                     uint64_t component_name,
+                     ct_ecs_ent_chunk_o0 *chunk);
 
     void *(*get_one)(ct_world_t0 world,
                      uint64_t component_name,
-                     ct_entity_t0 entity);
+                     ct_entity_t0 entity,
+                     bool write);
 
     void (*add)(ct_world_t0 world,
                 ct_entity_t0 ent,
                 const ct_component_pair_t0 *components,
                 uint32_t components_count);
 
-    void (*add_buff)(ct_ecs_cmd_buffer_t *buffer,
-                     ct_world_t0 world,
-                     ct_entity_t0 ent,
-                     const ct_component_pair_t0 *components,
-                     uint32_t components_count);
 
     void (*remove)(ct_world_t0 world,
                    ct_entity_t0 ent,
                    const uint64_t *component_name,
                    uint32_t name_count);
-
-    void (*remove_buff)(ct_ecs_cmd_buffer_t *buffer,
-                        ct_world_t0 world,
-                        ct_entity_t0 ent,
-                        const uint64_t *component_name,
-                        uint32_t name_count);
-
 };
 
-CE_MODULE(ct_ecs_a0);
+
+CE_MODULE(ct_ecs_c_a0);
+
+struct ct_ecs_q_a0 {
+    void (*foreach)(ct_world_t0 world,
+                    ct_ecs_query_t0 query,
+                    uint32_t rq_version,
+                    ct_ecs_foreach_fce_t fce,
+                    void *data);
+
+    void (*foreach_serial)(ct_world_t0 world,
+                           ct_ecs_query_t0 query,
+                           uint32_t rq_version,
+                           ct_ecs_foreach_fce_t fce,
+                           void *data);
+
+    void (*collect_ents)(ct_world_t0 world,
+                         ct_ecs_query_t0 query,
+                         ct_entity_t0 **ents,
+                         const ce_alloc_t0 *alloc);
+};
+
+CE_MODULE(ct_ecs_q_a0);
 
 #ifdef __cplusplus
 };

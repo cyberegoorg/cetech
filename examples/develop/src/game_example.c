@@ -24,7 +24,6 @@
 #include "components/c_player_input.inl"
 #include "components/c_ball.inl"
 #include "components/c_pad.inl"
-#include "components/c_hit.inl"
 #include "components/c_rectangle.inl"
 #include "components/c_gamepad_controler.inl"
 
@@ -66,6 +65,9 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_renderer_a0);
     CE_INIT_API(api, ct_ecs_a0);
+    CE_INIT_API(api, ct_ecs_c_a0);
+    CE_INIT_API(api, ct_ecs_e_a0);
+    CE_INIT_API(api, ct_ecs_q_a0);
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_game_system_a0);
@@ -88,9 +90,6 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &pad_component_i, sizeof(pad_component_i));
-
-    api->add_impl(CT_ECS_COMPONENT_I,
-                  &hit_component_i, sizeof(hit_component_i));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &rectangle_component_i, sizeof(rectangle_component_i));

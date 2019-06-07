@@ -158,14 +158,14 @@ static char *get_full_path(uint64_t root,
 }
 
 static struct ce_vio_t0 *open(uint64_t root,
-                           const char *path,
-                           enum ce_fs_open_mode_e0 mode) {
+                              const char *path,
+                              enum ce_fs_open_mode_e0 mode) {
 
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
     ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
-                                                  (enum ce_vio_open_mode) mode);
+                                              (enum ce_vio_open_mode) mode);
 
     if (!file) {
         ce_log_a0->error(LOG_WHERE, "Could not load file %s", full_path);

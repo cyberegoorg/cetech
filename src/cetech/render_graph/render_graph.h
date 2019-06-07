@@ -69,7 +69,8 @@ typedef struct ct_rg_builder_t0 {
 
     void (*clear)(void *inst);
 
-    void (*execute)(void *inst, ct_camera_data_t0 *main_camera);
+    void (*execute)(void *inst,
+                    ct_camera_data_t0 *main_camera);
 } ct_rg_builder_t0;
 
 typedef struct ct_rg_module_t0 {
@@ -83,10 +84,10 @@ typedef struct ct_rg_module_t0 {
                      uint64_t size);
 
     ct_rg_module_t0 *(*add_extension_point)(void *inst,
-                                                   uint64_t name);
+                                            uint64_t name);
 
     ct_rg_module_t0 *(*get_extension_point)(void *inst,
-                                                   uint64_t name);
+                                            uint64_t name);
 
     void (*on_setup)(void *inst,
                      ct_rg_builder_t0 *builder);

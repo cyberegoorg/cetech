@@ -50,7 +50,7 @@ static struct ce_alloc_vt0 system_vt = {
 };
 
 static struct ce_alloc_t0 _system_allocator = {
-        .inst = (ce_alloc_o0 * ) & _system_allocator_inst,
+        .inst = (ce_alloc_o0 *) &_system_allocator_inst,
         .vt = &system_vt,
 };
 

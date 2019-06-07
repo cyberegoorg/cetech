@@ -18,5 +18,34 @@ components:
     cdb_uid: 0x4d94b1607106cf70
     cdb_type: rectangle_renderer
     material: 0xbfb6c2d7354678ec
+  0xe07151026e6882e9:
+    cdb_uid: 0xe07151026e6882e9
+    cdb_type: collider2d
+    shape:
+      cdb_uid: 0x7ea8cabbedb2ff3e
+      cdb_type: collider2d_shape_rectangle
+      half_size:
+        cdb_uid: 0x1ce044756cfd7b93
+        cdb_type: vec2_t
+        x: 0.000000
+        y: 0.000000
+  0xa4cbbde2fd5b7ad1:
+    cdb_uid: 0xa4cbbde2fd5b7ad1
+    cdb_type: position
+    position:
+      cdb_uid: 0x4303379c7ca5f726
+      cdb_type: 0x6112fca24c71dad
+      x: 0.000000
+      y: 0.000000
+      z: 0.000000
+  0xd570be37c2445623:
+    cdb_uid: 0xd570be37c2445623
+    cdb_type: rotation
+    rotation:
+      cdb_uid: 0x73a837f1418ed278
+      cdb_type: 0x6112fca24c71dad
+      x: 0.000000
+      y: 0.000000
+      z: 0.000000
 children:
   cdb_type: cdb_objset

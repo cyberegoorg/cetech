@@ -22,18 +22,18 @@ void CE_MODULE_INITAPI(node_graph)(struct ce_api_a0 *api) {
 }
 
 void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
-                              int reload) {
+                                 int reload) {
     CE_UNUSED(reload);
 
     _G = (struct _G) {
-        .allocator = ce_memory_a0->system,
+            .allocator = ce_memory_a0->system,
     };
 
     api->register_api(CT_NODE_GRAPH_API, ct_node_graph_a0);
 }
 
 void CE_MODULE_UNLOAD (node_graph)(struct ce_api_a0 *api,
-                                int reload) {
+                                   int reload) {
 
     CE_UNUSED(api);
 }

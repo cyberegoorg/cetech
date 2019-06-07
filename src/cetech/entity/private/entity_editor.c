@@ -72,8 +72,9 @@ static void draw_menu(uint64_t context_obj) {
     ct_debugui_a0->Text("%s", "C:");
     ct_debugui_a0->SameLine(0, -1);
 
-    ct_camera_component *camera = ct_ecs_a0->get_one(editor->world,
-                                                     CT_CAMERA_COMPONENT, editor->camera_ent);
+    ct_camera_component *camera = ct_ecs_c_a0->get_one(editor->world,
+                                                       CT_CAMERA_COMPONENT, editor->camera_ent,
+                                                       true);
     int cur_item = 0;
 
     if (camera->camera_type == CAMERA_TYPE_ORTHO) {
@@ -137,26 +138,31 @@ static struct entity_editor *_new_editor() {
 
     editor->world = ct_ecs_a0->create_world();
 
-    ct_ecs_a0->create(editor->world, &editor->camera_ent, 1);
-    ct_ecs_a0->add(editor->world,
-                   editor->camera_ent,
-                   CE_ARR_ARG(((ct_component_pair_t0[]) {
-                           {
-                                   .type = TRANSFORM_COMPONENT,
-                                   .data = &(ct_transform_comp) {
-                                           .scl = CE_VEC3_UNIT,
-                                   }
-                           },
-                           {
-                                   .type = CT_CAMERA_COMPONENT,
-                                   .data = &(ct_camera_component) {
-                                           .far = 100.0f,
-                                           .near = 0.1f,
-                                           .camera_type = CAMERA_TYPE_PERSPECTIVE,
-                                           .fov = 60.0f,
-                                   }
-                           }
-                   })));
+    ct_ecs_e_a0->create_entities(editor->world, &editor->camera_ent, 1);
+    ct_ecs_c_a0->add(editor->world,
+                     editor->camera_ent,
+                     CE_ARR_ARG(((ct_component_pair_t0[]) {
+                             {
+                                     .type = POSITION_COMPONENT,
+                                     .data = &(ct_position_c) {
+                                     }
+                             },
+                             {
+                                     .type = LOCAL_TO_WORLD_COMPONENT,
+                                     .data = &(ct_local_to_world_c) {
+                                             .world = CE_MAT4_IDENTITY,
+                                     }
+                             },
+                             {
+                                     .type = CT_CAMERA_COMPONENT,
+                                     .data = &(ct_camera_component) {
+                                             .far = 100.0f,
+                                             .near = 0.1f,
+                                             .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                             .fov = 60.0f,
+                                     }
+                             }
+                     })));
 
     editor->viewport = ct_renderer_a0->create_viewport();
 
@@ -164,21 +170,21 @@ static struct entity_editor *_new_editor() {
 }
 
 static void close(uint64_t context_obj) {
-    entity_editor *editor = (entity_editor*)context_obj;
+    entity_editor *editor = (entity_editor *) context_obj;
 
-    ct_ecs_a0->destroy(editor->world, &editor->entity, 1);
+    ct_ecs_e_a0->destroy_entities(editor->world, &editor->entity, 1);
     editor->free = true;
 }
 
 static uint64_t open(uint64_t obj) {
     entity_editor *editor = _new_editor();
-    editor->entity = ct_ecs_a0->spawn(editor->world, obj);
+    editor->entity = ct_ecs_e_a0->spawn_entity(editor->world, obj);
     return (uint64_t) editor;
 }
 
 static void update(uint64_t context_obj,
                    float dt) {
-    entity_editor *editor = (entity_editor*)context_obj;
+    entity_editor *editor = (entity_editor *) context_obj;
 
     if (!editor->world.h) {
         return;
@@ -186,14 +192,14 @@ static void update(uint64_t context_obj,
 
     if (editor->mouse_hovering) {
     }
-    
+
     ct_ecs_a0->step(editor->world, dt);
 
     ct_local_to_world_c *t = ct_ecs_c_a0->get_one(editor->world, LOCAL_TO_WORLD_COMPONENT,
                                                   editor->camera_ent, false);
 
-    ct_camera_component *c = ct_ecs_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
-                                                editor->camera_ent);
+    ct_camera_component *c = ct_ecs_c_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
+                                                  editor->camera_ent, false);
 
     ct_renderer_a0->viewport_render(editor->viewport,
                                     editor->world,

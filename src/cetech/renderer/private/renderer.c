@@ -85,6 +85,7 @@ static uint32_t _get_reset_flags() {
 //==============================================================================
 
 static void _render_task(void *data) {
+    ce_log_a0->info("renderer", "This is render worker.");
     while (bgfx_render_frame(-1) != BGFX_RENDER_FRAME_EXITING) {
     }
 }

@@ -330,7 +330,9 @@ static inline float ce_angle_lerp(float _a,
 }
 
 // # Vec2
-static inline bool ce_vec2_equal(ce_vec2_t a, ce_vec2_t b, float epsilon) {
+static inline bool ce_vec2_equal(ce_vec2_t a,
+                                 ce_vec2_t b,
+                                 float epsilon) {
     return ce_fequal_n(&a.x, &b.x, 2, epsilon);
 }
 
@@ -784,15 +786,15 @@ static inline ce_vec4_t ce_quat_from_euler(float heading,
 }
 
 static inline ce_vec4_t ce_quat_rotate_axis(ce_vec3_t _axis,
-                                       float _angle) {
+                                            float _angle) {
     const float ha = _angle * 0.5f;
     const float ca = ce_fcos(ha);
     const float sa = ce_fsin(ha);
 
     return (ce_vec4_t) {
             .x  = _axis.x * sa,
-            .y  = _axis.y  * sa,
-            .z  = _axis.z  * sa,
+            .y  = _axis.y * sa,
+            .z  = _axis.z * sa,
             .w  = ca,
     };
 }
@@ -826,7 +828,7 @@ static inline ce_vec4_t ce_quat_rotate_y(float _ay) {
 }
 
 static inline ce_vec4_t ce_quat_rotate_z(float *_result,
-                                    float _az) {
+                                         float _az) {
     const float hz = _az * 0.5f;
     const float cz = ce_fcos(hz);
     const float sz = ce_fsin(hz);
@@ -1284,7 +1286,8 @@ static inline ce_vec3_t ce_vec3_mul_mtx(ce_vec3_t _vec,
     };
 }
 
-static inline ce_vec3_t ce_vec3_mul_mat4_h(ce_vec3_t _vec, const float *_mat) {
+static inline ce_vec3_t ce_vec3_mul_mat4_h(ce_vec3_t _vec,
+                                           const float *_mat) {
     float xx = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[8] + _mat[12];
     float yy = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[9] + _mat[13];
     float zz = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
@@ -1315,10 +1318,10 @@ static inline ce_vec4_t ce_vec4_mul_mtx(ce_vec4_t _vec,
 static inline void ce_mat4_mul(float *_result,
                                const float *_a,
                                const float *_b) {
-    *((ce_vec4_t*)&_result[0]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[0]), _b);
-    *((ce_vec4_t*)&_result[4]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[4]), _b);
-    *((ce_vec4_t*)&_result[8]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[8]), _b);
-    *((ce_vec4_t*)&_result[12]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[12]), _b);
+    *((ce_vec4_t *) &_result[0]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[0]), _b);
+    *((ce_vec4_t *) &_result[4]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[4]), _b);
+    *((ce_vec4_t *) &_result[8]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[8]), _b);
+    *((ce_vec4_t *) &_result[12]) = ce_vec4_mul_mtx(*(ce_vec4_t *) (&_a[12]), _b);
 }
 
 static inline void ce_mat4_transpose(float *_result,

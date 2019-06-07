@@ -80,7 +80,6 @@ static struct editor *_get_or_create_editor(uint64_t dock) {
 }
 
 
-
 static struct ct_resource_editor_i0 *get_resource_editor(uint64_t cdb_type) {
     ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_EDITOR_I);
     while (it.api) {
@@ -259,7 +258,7 @@ static const char *name(uint64_t dock) {
 }
 
 
-static  uint64_t open(uint64_t dock) {
+static uint64_t open(uint64_t dock) {
     _get_or_create_editor(dock);
 //
 //    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), e->context_obj);

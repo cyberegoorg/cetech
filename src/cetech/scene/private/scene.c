@@ -119,7 +119,7 @@ uint64_t get_geom_obj(uint64_t obj,
 
     for (int i = 0; i < n; ++i) {
         const ce_cdb_obj_o0 *geom_r = ce_cdb_a0->read(ce_cdb_a0->db(), objs[i]);
-        uint64_t geom_key  = ce_cdb_a0->read_uint64(geom_r, SCENE_GEOM_OBJS_NAME, 0);
+        uint64_t geom_key = ce_cdb_a0->read_uint64(geom_r, SCENE_GEOM_OBJS_NAME, 0);
 
         if (geom_key == geom_name) {
             return objs[i];
@@ -142,7 +142,6 @@ static const char *display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
 }
 
-
 static struct ct_entity_t0 load(uint64_t resource,
                                 ct_world_t0 world) {
 
@@ -151,9 +150,9 @@ static struct ct_entity_t0 load(uint64_t resource,
     ct_scene_a0->get_all_geometries(resource, &items, &items_count);
 
     ct_entity_t0 ent[items_count + 1];
-    ct_ecs_a0->create(world, ent, items_count + 1);
+    ct_ecs_e_a0->create_entities(world, ent, items_count + 1);
 
-    ct_ecs_a0->add(world, ent[0], (ct_component_pair_t0[]) {
+    ct_ecs_c_a0->add(world, ent[0], CE_ARR_ARG(((ct_component_pair_t0[]) {
             {
                     .type = POSITION_COMPONENT,
             },
@@ -163,7 +162,7 @@ static struct ct_entity_t0 load(uint64_t resource,
             {
                     .type = LOCAL_TO_WORLD_COMPONENT,
             }
-    }, 1);
+    })));
 
     for (int i = 0; i < items_count; ++i) {
         const char *geom = &items[i * 128];
@@ -218,7 +217,7 @@ static void *get_interface(uint64_t name_hash) {
 bool scene_compiler(ce_cdb_t0 db,
                     uint64_t obj);
 
-static const char* name() {
+static const char *name() {
     return "scene";
 }
 

@@ -99,7 +99,7 @@ struct ct_gfx_a0 {
                        uint32_t _flags,
                        bgfx_texture_format_t _format);
 
-    struct bgfx_encoder_s* (*bgfx_begin)(void);
+    struct bgfx_encoder_s *(*bgfx_begin)(void);
 
     void (*bgfx_end)(struct bgfx_encoder_s *_encoder);
 

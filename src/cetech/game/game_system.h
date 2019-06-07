@@ -26,8 +26,9 @@ typedef struct ct_game_i0 {
 
     void (*shutdown)(ct_world_t0 world);
 
-    void (*update)(float dt);
-}ct_game_i0;
+    void (*update)(ct_world_t0 world,
+                   float dt);
+} ct_game_i0;
 
 struct ct_game_system_a0 {
     ct_world_t0 (*world)();
@@ -38,7 +39,8 @@ struct ct_game_system_a0 {
 
     void (*play)(uint64_t name);
 
-    void (*step)(uint64_t name, float dt);
+    void (*step)(uint64_t name,
+                 float dt);
 };
 
 CE_MODULE(ct_game_system_a0);

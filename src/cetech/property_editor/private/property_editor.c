@@ -111,7 +111,7 @@ static void draw(uint64_t obj,
 
     ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
 
-    uint64_t obj_type =  ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+    uint64_t obj_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -230,7 +230,8 @@ static void on_debugui(uint64_t dock) {
             ct_editor_ui_a0->prop_label("Inst. of", 0, NULL, 0);
             ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
 
-            sprintf(buffer, ICON_FA_ARROW_UP "##%sprop_open_select_resource", name);
+            sprintf(buffer, ICON_FA_ARROW_UP
+                    "##%sprop_open_select_resource", name);
             if (ct_debugui_a0->Button(buffer, &(ce_vec2_t) {0.0f})) {
                 ct_selected_object_a0->set_selected_object(context, instance_of);
             }

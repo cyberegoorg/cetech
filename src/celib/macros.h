@@ -55,7 +55,6 @@
 #define CE_ALIGN_4096(_value) CE_ALIGN_MASK(_value, 0xfff)
 
 
-
 #if defined(__has_feature)
 #	define CE_CLANG_HAS_FEATURE(_x) __has_feature(_x)
 #else

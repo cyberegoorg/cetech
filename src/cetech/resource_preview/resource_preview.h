@@ -22,7 +22,7 @@ typedef struct ct_resource_preview_i0 {
                      ce_vec2_t size);
 
     ct_entity_t0 (*load)(uint64_t resource,
-                                ct_world_t0 world);
+                         ct_world_t0 world);
 
     void (*unload)(uint64_t resource,
                    ct_world_t0 world,
@@ -30,7 +30,7 @@ typedef struct ct_resource_preview_i0 {
 
     void (*tooltip)(uint64_t resource,
                     ce_vec2_t size);
-}ct_resource_preview_i0;
+} ct_resource_preview_i0;
 
 
 struct ct_resource_preview_a0 {

@@ -65,7 +65,7 @@ static void *get_res_interface(uint64_t name_hash) {
     return NULL;
 }
 
-static const char* name() {
+static const char *name() {
     return "node_graph";
 }
 

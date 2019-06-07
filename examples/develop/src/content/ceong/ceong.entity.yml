@@ -3,6 +3,14 @@ cdb_type: entity
 name: ceong
 components:
   cdb_type: cdb_objset
+  0x6e341f23bacada2f:
+    cdb_uid: 0x6e341f23bacada2f
+    cdb_type: physics_world2d
+    gravity:
+      cdb_uid: 0xc6b98dd3a155684
+      cdb_type: vec2_t
+      x: 0.000000
+      y: 0.000000
 children:
   cdb_type: cdb_objset
   0x604442a177b744d0:

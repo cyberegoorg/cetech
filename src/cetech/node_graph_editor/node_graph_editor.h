@@ -17,14 +17,15 @@ extern "C" {
 
 typedef struct ct_editor_node_i0 {
     const char *(*display_name)();
-}ct_editor_node_i0;
+} ct_editor_node_i0;
 
 
 struct ct_node_graph_editor_a0 {
     void (*add_node_modal)(const char *modal_id,
                            uint64_t obj);
 
-    void (*draw_ng_editor)(uint64_t graph, uint64_t context);
+    void (*draw_ng_editor)(uint64_t graph,
+                           uint64_t context);
 };
 
 CE_MODULE(ct_node_graph_editor_a0);

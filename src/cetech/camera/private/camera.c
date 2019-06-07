@@ -86,12 +86,9 @@ static const char *display_name() {
     return ICON_FA_CAMERA " Camera";
 }
 
-static uint64_t camera_size() {
-    return sizeof(ct_camera_component);
-}
-
-
-static void _camera_on_spawn(uint64_t obj,
+static void _camera_on_spawn(ct_world_t0 world,
+                             ce_cdb_t0 db,
+                             uint64_t obj,
                              void *data) {
     ct_camera_component *c = data;
 
@@ -108,41 +105,19 @@ static void _camera_on_spawn(uint64_t obj,
 
 static struct ct_ecs_component_i0 ct_component_api = {
         .display_name = display_name,
-        .cdb_type = cdb_type,
-        .size = camera_size,
-        .on_spawn = _camera_on_spawn,
-        .on_change = _camera_on_spawn,
+        .cdb_type = CT_CAMERA_COMPONENT,
+        .size = sizeof(ct_camera_component),
+        .from_cdb_obj = _camera_on_spawn,
 };
 
 ////
-static uint64_t active_camera_cdb_type() {
-    return CT_ACTIVE_CAMERA_COMPONENT;
-}
-
 static const char *active_camera_display_name() {
     return ICON_FA_CAMERA " Active camera";
 }
 
-static uint64_t active_camera_camera_size() {
-    return sizeof(ct_active_camera);
-}
-
-static void _active_camera_on_spawn(uint64_t obj,
-                                    void *data) {
-    ct_active_camera *c = data;
-
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    uint64_t ent_ref = ce_cdb_a0->read_ref(r, PROP_CAMERA_ENT, 0);
-
-    c->camera_ent.h = ent_ref;
-}
-
 static struct ct_ecs_component_i0 ct_active_camera_component = {
         .display_name = active_camera_display_name,
-        .cdb_type = active_camera_cdb_type,
-        .size = active_camera_camera_size,
-        .on_spawn = _active_camera_on_spawn,
-        .on_change = _active_camera_on_spawn,
+        .cdb_type = CT_ACTIVE_CAMERA_COMPONENT,
 };
 
 ///

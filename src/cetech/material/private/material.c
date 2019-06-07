@@ -239,24 +239,31 @@ void draw_property(uint64_t material,
 static struct ct_entity_t0 load(uint64_t resource,
                                 ct_world_t0 world) {
     ct_entity_t0 ent = {};
-    ct_ecs_a0->create(world, &ent, 1);
+    ct_ecs_e_a0->create_entities(world, &ent, 1);
 
-    ct_ecs_a0->add(world, ent,
-                   (ct_component_pair_t0[]) {
-                           {
-                                   .type = TRANSFORM_COMPONENT,
-                                   .data = &(ct_transform_comp) {
-                                           .scl = CE_VEC3_UNIT,
-                                           .pos.z = 3,
-                                   },
-                           },
-                           {
-                                   .type = PRIMITIVE_MESH_COMPONENT,
-                                   .data = &(ct_primitive_mesh) {
-                                           .material = resource,
-                                   },
-                           }
-                   }, 2);
+    ct_ecs_c_a0->add(world, ent,
+                     (ct_component_pair_t0[]) {
+                             {
+                                     .type = POSITION_COMPONENT,
+                                     .data = &(ct_position_c) {
+                                             .pos.z = 3,
+                                     },
+                             },
+                             {
+                                     .type = ROTATION_COMPONENT,
+                                     .data = &(ct_rotation_c) {
+                                     },
+                             },
+                             {
+                                     .type = LOCAL_TO_WORLD_COMPONENT,
+                             },
+                             {
+                                     .type = PRIMITIVE_MESH_COMPONENT,
+                                     .data = &(ct_primitive_mesh_c) {
+                                             .material = resource,
+                                     },
+                             }
+                     }, 4);
 
     return ent;
 }
@@ -277,7 +284,7 @@ static const char *display_icon() {
 }
 
 
-static const char* name() {
+static const char *name() {
     return "material";
 }
 

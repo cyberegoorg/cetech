@@ -22,8 +22,8 @@ static struct ct_rg_t0 *create_render_graph() {
     ct_rg_t0 *obj = CE_ALLOC(_G.alloc, ct_rg_t0, sizeof(ct_rg_t0));
 
     render_graph_o *inst = CE_ALLOC(_G.alloc,
-                                           render_graph_o,
-                                           sizeof(render_graph_o));
+                                    render_graph_o,
+                                    sizeof(render_graph_o));
 
     *inst = (render_graph_o) {};
 

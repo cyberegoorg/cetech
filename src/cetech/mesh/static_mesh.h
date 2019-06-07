@@ -14,7 +14,7 @@ typedef struct ct_mesh_component {
     uint64_t mesh;
 } ct_mesh_component;
 
-#define MESH_RENDERER_COMPONENT \
+#define STATIC_MESH_COMPONENT \
     CE_ID64_0("static_mesh", 0x7445bff74058f566ULL)
 
 #define PROP_SCENE_ID \

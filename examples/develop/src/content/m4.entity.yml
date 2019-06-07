@@ -5,25 +5,7 @@ components:
   cdb_type: cdb_objset
   0x1680b5652a000164:
     cdb_uid: 0x1680b5652a000164
-    cdb_type: transform
-    position:
-      cdb_uid: 0x1680b5652a000165
-      cdb_type: position
-      x: 0.000000
-      y: 0.000000
-      z: 123.000000
-    rotation:
-      cdb_uid: 0x1680b5652a000166
-      cdb_type: rotation
-      x: -90.000000
-      y: -90.000000
-      z: 0.000000
-    scale:
-      cdb_uid: 0x1680b5652a000167
-      cdb_type: scale
-      x: 1.000000
-      y: 1.000000
-      z: 1.000000
+    cdb_type: local_to_world
   0x1680b5662820015d:
     cdb_uid: 0x1680b5662820015d
     cdb_type: static_mesh
@@ -41,25 +23,7 @@ children:
       cdb_type: cdb_objset
       0x1680ea0606e0011b:
         cdb_uid: 0x1680ea0606e0011b
-        cdb_type: transform
-        position:
-          cdb_uid: 0x1680ea0606e0011c
-          cdb_type: position
-          x: 0.000000
-          y: 0.000000
-          z: 0.000000
-        rotation:
-          cdb_uid: 0x1680ea0606e0011d
-          cdb_type: rotation
-          x: 0.000000
-          y: 0.000000
-          z: 0.000000
-        scale:
-          cdb_uid: 0x1680ea0606e0011e
-          cdb_type: scale
-          x: 1.000000
-          y: 1.000000
-          z: 1.000000
+        cdb_type: local_to_world
       0x1680ea0700e00121:
         cdb_uid: 0x1680ea0700e00121
         cdb_type: static_mesh

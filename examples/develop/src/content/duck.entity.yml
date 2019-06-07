@@ -5,25 +5,7 @@ components:
   cdb_type: cdb_objset
   0xa07874d664cf1fc1:
     cdb_uid: 0xa07874d664cf1fc1
-    cdb_type: transform
-    position:
-      cdb_uid: 0x3eafee8fe4199c16
-      cdb_type: position
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    rotation:
-      cdb_uid: 0xdce768496364186b
-      cdb_type: rotation
-      x: 0.000000
-      y: 0.000000
-      z: 0.000000
-    scale:
-      cdb_uid: 0x7b1ee202e2ae94c0
-      cdb_type: scale
-      x: 1.000000
-      y: 1.000000
-      z: 1.000000
+    cdb_type: local_to_world
   0x8f3fd7c530f91115:
     cdb_uid: 0x8f3fd7c530f91115
     cdb_type: static_mesh

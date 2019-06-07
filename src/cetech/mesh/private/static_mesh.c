@@ -161,19 +161,6 @@ static struct ct_renderer_component_i0 ct_renderer_component_i = {
         .render = render
 };
 
-static void *get_interface(uint64_t name_hash) {
-    if (CT_RENDERER_COMPONENT_I == name_hash) {
-        return &ct_renderer_component_i;
-    }
-
-    return NULL;
-}
-
-static uint64_t static_mesh_size() {
-    return sizeof(ct_mesh_component);
-}
-
-
 static void _mesh_render_on_spawn(ct_world_t0 world,
                                   ce_cdb_t0 db,
                                   uint64_t obj,
@@ -196,11 +183,9 @@ static void _mesh_render_on_spawn(ct_world_t0 world,
 
 static struct ct_ecs_component_i0 ct_component_api = {
         .display_name = display_name,
-        .cdb_type = cdb_type,
-        .get_interface = get_interface,
-        .size = static_mesh_size,
-        .on_spawn = _mesh_render_on_spawn,
-        .on_change = _mesh_render_on_spawn,
+        .cdb_type = STATIC_MESH_COMPONENT,
+        .size = sizeof(ct_mesh_component),
+        .from_cdb_obj = _mesh_render_on_spawn,
 };
 
 static ce_cdb_prop_def_t0 static_mesh_component_prop[] = {
@@ -236,7 +221,7 @@ void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
 
     api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
 
-    ce_cdb_a0->reg_obj_type(MESH_RENDERER_COMPONENT,
+    ce_cdb_a0->reg_obj_type(STATIC_MESH_COMPONENT,
                             static_mesh_component_prop,
                             CE_ARRAY_LEN(static_mesh_component_prop));
 

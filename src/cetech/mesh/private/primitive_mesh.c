@@ -178,11 +178,9 @@ static void _rectangle_renderer_on_spawn(ct_world_t0 world,
 
 static struct ct_ecs_component_i0 ct_component_api = {
         .display_name = display_name,
-        .cdb_type = cdb_type,
-        .get_interface = get_interface,
-        .size = primitive_mesh_size,
-        .on_spawn = _prim_mesh_on_spawn,
-        .on_change = _prim_mesh_on_spawn,
+        .cdb_type = PRIMITIVE_MESH_COMPONENT,
+        .size = sizeof(ct_primitive_mesh_c),
+        .from_cdb_obj = _rectangle_renderer_on_spawn,
 };
 
 static ce_cdb_prop_def_t0 primitive_mesh_prop[] = {
