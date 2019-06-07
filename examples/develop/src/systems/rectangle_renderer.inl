@@ -23,6 +23,7 @@
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/mesh/primitive_mesh.h>
 #include <cetech/mesh/static_mesh.h>
+#include <cetech/debugdraw/dd.h>
 
 #define LOG_WHERE "rectangle_renderer"
 
@@ -99,6 +100,10 @@ void render_rectangles(ct_world_t0 world,
         ct_gfx_a0->bgfx_set_index_buffer(_G.cube_ibh, 0, CE_ARRAY_LEN(_indices));
 
         ct_material_a0->submit(p_c.material, data->layer_name, data->viewid);
+
+//        ct_dd_a0->set_transform_mtx(t_c.world.m);
+//        ct_dd_a0->draw_axis(0, 0, 0, 100.0f, CT_DD_AXIS_NONE, 0.0f);
+//        ct_dd_a0->set_transform_mtx(NULL);
     }
 }
 
@@ -118,7 +123,6 @@ static void render(ct_world_t0 world,
                    struct ct_rg_builder_t0 *builder) {
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
-
 
     rectangle_render_data render_data = {
             .viewid = viewid,

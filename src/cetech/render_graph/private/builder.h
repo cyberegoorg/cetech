@@ -1,3 +1,5 @@
+#include <cetech/debugdraw/dd.h>
+
 typedef struct render_graph_builder_pass {
     ct_rg_pass_t0 *pass;
     uint8_t viewid;
@@ -28,15 +30,19 @@ static void builder_add_pass(void *inst,
     ct_rg_builder_t0 *builder = inst;
     render_graph_builder_inst *builder_inst = builder->inst;
 
+    bool new_view = false;
+
     uint8_t viewid = 0;
 
     if (!layer) {
         viewid = ct_renderer_a0->new_viewid();
+        new_view = true;
     } else {
         viewid = ce_hash_lookup(&builder_inst->layer_map, layer, UINT8_MAX);
         if (UINT8_MAX == viewid) {
             viewid = ct_renderer_a0->new_viewid();
             ce_hash_add(&builder_inst->layer_map, layer, viewid, _G.alloc);
+            new_view = true;
         }
     }
 
@@ -61,7 +67,8 @@ static void builder_add_pass(void *inst,
     builder_inst->attachemnt_used = 0;
 }
 
-static void builder_execute(void *inst, ct_camera_data_t0* main_camera) {
+static void builder_execute(void *inst,
+                            ct_camera_data_t0 *main_camera) {
     ct_rg_builder_t0 *builder = inst;
     render_graph_builder_inst *builder_inst = builder->inst;
 
@@ -76,6 +83,20 @@ static void builder_execute(void *inst, ct_camera_data_t0* main_camera) {
 
         ct_gfx_a0->bgfx_set_view_frame_buffer(pass->viewid, pass->fb);
         ct_gfx_a0->bgfx_touch(pass->viewid);
+
+        pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, main_camera, builder);
+    }
+
+    for (int i = 0; i < pass_n; ++i) {
+        struct render_graph_builder_pass *pass = &builder_inst->pass[i];
+
+        if (UINT16_MAX == pass->fb.idx) {
+            continue;
+        }
+
+        ct_gfx_a0->bgfx_set_view_frame_buffer(pass->viewid, pass->fb);
+        ct_gfx_a0->bgfx_touch(pass->viewid);
+
         pass->pass->on_pass(pass->pass, pass->viewid, pass->layer, main_camera, builder);
     }
 }

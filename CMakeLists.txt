@@ -106,6 +106,9 @@ set(SOURCE_FILES
         src/cetech/controlers/private/gamepad.c
         src/cetech/renderer/private/renderer.c
         src/cetech/render_graph/private/render_graph.c
+        src/cetech/debugdraw/private/bgfx_debugdraw/debugdraw.cpp
+        src/cetech/debugdraw/private/bgfx_debugdraw/bounds.cpp
+        src/cetech/debugdraw/private/dd.cpp
         src/cetech/default_rg/private/default_rg.c
         src/cetech/texture/private/texture.c
 

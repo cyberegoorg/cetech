@@ -31,6 +31,7 @@
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
+#include <cetech/debugdraw/dd.h>
 
 
 #define LOG_WHERE "static_mesh"
@@ -77,8 +78,10 @@ void render_static_mesh(ct_world_t0 world,
         bgfx_vertex_buffer_handle_t vbh = {.idx = (uint16_t) go.vb};
 
         ct_gfx_a0->bgfx_set_transform(t_c.world.m, 1);
+
         ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, (uint32_t) go.vb_size);
         ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, (uint32_t) go.ib_size);
+
 
         ct_material_a0->submit(m_c.material, data->layer_name, data->viewid);
     }
@@ -139,6 +142,7 @@ void render(ct_world_t0 world,
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
 
+//    ct_dd_a0->begin(viewid);
 
     mesh_render_data render_data = {
             .viewid = viewid,
