@@ -146,42 +146,25 @@ typedef struct rectangle_component {
 } rectangle_component;
 
 static box2d_world_component *_get_b2world(ct_world_t0 world) {
-    ct_entity_t0 *ents = NULL;
-
-    ct_ecs_q_a0->collect_ents(world,
-                              (ct_ecs_query_t0) {
-                                      .all=CT_ECS_ARCHETYPE(BOX2D_WORLD_COMPONENT)
-                              },
-                              &ents, _G.allocator);
-
-    if (!ents) {
-        return NULL;
-    }
+    ct_entity_t0 ent = ct_ecs_q_a0->first(world,
+                                          (ct_ecs_query_t0) {
+                                                  .all=CT_ECS_ARCHETYPE(BOX2D_WORLD_COMPONENT)
+                                          });
 
     auto *w = (box2d_world_component *) ct_ecs_c_a0->get_one(world, BOX2D_WORLD_COMPONENT,
-                                                             ents[0], false);
-
-    ce_array_free(ents, _G.allocator);
-
+                                                             ent, false);
     return w;
 }
 
 static ct_physics_world2d_c *_get_world(ct_world_t0 world) {
-    ct_entity_t0 *ents = NULL;
 
-    ct_ecs_q_a0->collect_ents(world,
-                              (ct_ecs_query_t0) {
-                                      .all=CT_ECS_ARCHETYPE(PHYSICS_WORLD2D_COMPONENT)},
-                              &ents, _G.allocator);
-
-    if (!ents) {
-        return NULL;
-    }
+    ct_entity_t0 ent = ct_ecs_q_a0->first(world,
+                                          (ct_ecs_query_t0) {
+                                                  .all=CT_ECS_ARCHETYPE(PHYSICS_WORLD2D_COMPONENT)
+                                          });
 
     auto *w = (ct_physics_world2d_c *) ct_ecs_c_a0->get_one(world, PHYSICS_WORLD2D_COMPONENT,
-                                                            ents[0], false);
-
-    ce_array_free(ents, _G.allocator);
+                                                            ent, false);
 
     return w;
 }
@@ -191,7 +174,7 @@ static void _spawn_world(ct_world_t0 world,
                          ct_ecs_ent_chunk_o0 *item,
                          uint32_t n,
                          void *_data) {
-    spawn_box2d_body_data_t *data = static_cast<spawn_box2d_body_data_t *>(_data);
+    auto data = static_cast<spawn_box2d_body_data_t *>(_data);
 
     auto *phys_world = (ct_physics_world2d_c *) ct_ecs_c_a0->get_all(world,
                                                                      PHYSICS_WORLD2D_COMPONENT,
@@ -513,6 +496,7 @@ static void _write_back(ct_world_t0 world,
                         ct_ecs_ent_chunk_o0 *item,
                         uint32_t n,
                         void *data) {
+
     auto *velocity = (ct_velocity2d_c *) ct_ecs_c_a0->get_all(world, VELOCITY2D_COMPONENT, item);
     auto *position = (ct_position_c *) ct_ecs_c_a0->get_all(world, POSITION_COMPONENT, item);
     auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
@@ -695,35 +679,38 @@ static void physics2d_destroy_world(ct_world_t0 world,
                                 _destroy_world, &data);
 }
 
-static struct ct_system_i0 physics2D_system_i = {
-        .name = PHYSICS2D_SYSTEM,
-        .before = CT_ECS_BEFORE(TRANSFORM_SYSTEM),
-        .process = physics2d_system,
-};
-
 #define PHYSICS2D_SPAWN_WORLD_SYSTEM \
     CE_ID64_0("spawn_world", 0xc50cd230095374ecULL)
-
-static struct ct_system_i0 physics2D_spawn_world_system_i = {
-        .name = PHYSICS2D_SPAWN_WORLD_SYSTEM,
-        .after = CT_ECS_AFTER(PHYSICS2D_SYSTEM),
-        .process = physics2d_spawn_world_system,
-};
 
 #define PHYSICS2D_DESTROY_SYSTEM \
     CE_ID64_0("destroy", 0x57ff44bbecee397fULL)
 
-static struct ct_system_i0 physics2D_destroy_system_i = {
-        .name = PHYSICS2D_DESTROY_SYSTEM,
-        .after = CT_ECS_AFTER(PHYSICS2D_SPAWN_WORLD_SYSTEM),
-        .process = physics2d_destroy_system,
-};
-
 #define PHYSICS2D_DESTROY_WORLD_SYSTEM \
     CE_ID64_0("destroy_world", 0x85a63cd5e80f23d1ULL)
 
+static struct ct_system_i0 physics2D_spawn_world_system_i = {
+        .name = PHYSICS2D_SPAWN_WORLD_SYSTEM,
+        .group = PHYSICS2D_GROUP,
+        .process = physics2d_spawn_world_system,
+};
+
+static struct ct_system_i0 physics2D_system_i = {
+        .name = PHYSICS2D_SYSTEM,
+        .group = PHYSICS2D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS2D_SPAWN_WORLD_SYSTEM),
+        .process = physics2d_system,
+};
+
+static struct ct_system_i0 physics2D_destroy_system_i = {
+        .name = PHYSICS2D_DESTROY_SYSTEM,
+        .group = PHYSICS2D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS2D_SYSTEM),
+        .process = physics2d_destroy_system,
+};
+
 static struct ct_system_i0 physics2D_destroy_worl_system_i = {
         .name = PHYSICS2D_DESTROY_WORLD_SYSTEM,
+        .group = PHYSICS2D_GROUP,
         .after = CT_ECS_AFTER(PHYSICS2D_DESTROY_SYSTEM),
         .process = physics2d_destroy_world,
 };

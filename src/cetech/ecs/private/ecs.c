@@ -46,9 +46,6 @@
 #define _entity_data_idx(w, ent) \
     w->entity_idx[handler_idx((ent).h)]
 
-#define _entity_type(w, ent) \
-    w->entity_type[handler_idx((ent).h)]
-
 #define _entity_obj(w, ent) \
     w->entity_obj[handler_idx((ent).h)]
 
@@ -74,15 +71,15 @@ typedef struct spawn_infos_t {
 typedef struct ent_chunk_t {
     ct_archemask_t0 archetype_mask;
     uint32_t ent_n;
-    uint32_t storage_idx;
+    uint32_t archetype_idx;
     uint32_t *version;
     struct ent_chunk_t *next;
     struct ent_chunk_t *prev;
 } ent_chunk_t;
 
 typedef struct ent_archetype_t {
-    ent_chunk_t *first;
     ct_archemask_t0 archetype_mask;
+    ent_chunk_t *first;
     ce_hash_t comp_idx;
     uint64_t *name;
     uint32_t *offset;
@@ -110,17 +107,21 @@ typedef struct world_instance_t {
     spawn_infos_t obj_spawninfo;
     spawn_infos_t comp_spawninfo;
 
-    // NG
+    // Cunk
     ent_chunk_t **chunk_pool;
     ent_chunk_t **chunk_pool_free;
 
+    // Archetype
     archetype_t *archetype_pool;
     uint32_t *archetype_free;
-
     ce_hash_t archetype_map;
 
-    uint32_t global_version;
-    ce_hash_t last_version;
+    // Version
+    uint32_t global_system_version;
+    ce_hash_t last_system_version;
+
+    uint32_t global_world_version;
+    uint32_t last_world_version;
 } world_instance_t;
 
 static struct _G {
@@ -138,8 +139,14 @@ static struct _G {
     ce_hash_t component_interface_map;
 
     // SIM
-    ce_ba_graph_t sg;
-    ce_hash_t fce_map;
+    ce_hash_t system_map;
+
+    ce_ba_graph_t system_group_graph;
+    ce_hash_t system_group_map;
+    ce_hash_t system_group_g_map;
+
+    uint32_t *graph_pool_free;
+    ce_ba_graph_t *graph_pool;
 
     ct_cdb_ev_queue_o0 *obj_queue;
 
@@ -151,6 +158,25 @@ static struct _G {
     ce_mpmc_queue_t0 *cmd_buf_pool;
     uint32_t *free_cmd_buff_queue;
 } _G;
+
+uint32_t _new_graph() {
+    uint64_t free_n = ce_array_size(_G.graph_pool_free);
+
+    if (!free_n) {
+        uint64_t idx = ce_array_size(_G.graph_pool);
+        ce_array_push(_G.graph_pool, (ce_ba_graph_t) {}, _G.allocator);
+        return idx;
+    }
+
+    uint64_t idx = ce_array_back(_G.graph_pool_free);
+    ce_array_pop_back(_G.graph_pool_free);
+
+    return idx;
+}
+
+void _free_graph(uint32_t idx) {
+    ce_array_push(_G.graph_pool_free, idx, _G.allocator);
+}
 
 //
 static ct_archemask_t0 combine_component(const uint64_t *component_name,
@@ -203,7 +229,7 @@ ent_chunk_t *_get_new_chunk(world_instance_t *world) {
     ce_log_a0->debug(LOG_WHERE, "Allocate new chunk from pool");
 
 
-    ent_chunk_t *chunk = ce_array_front(world->chunk_pool_free);
+    ent_chunk_t *chunk = ce_array_back(world->chunk_pool_free);
     ce_array_pop_back(world->chunk_pool_free);
 
     memset(chunk, 0, CHUNK_SIZE);
@@ -272,6 +298,13 @@ void _free_archetype(world_instance_t *world,
     ce_array_clean(archetype->offset);
     ce_hash_clean(&archetype->comp_idx);
 
+    ent_chunk_t *chunk = archetype->first;
+
+    while (chunk) {
+        _free_chunk(world, chunk);
+        chunk = chunk->next;
+    }
+
     ce_array_push(world->archetype_free, archetype->idx, _G.allocator);
 }
 
@@ -339,7 +372,7 @@ static void *get_one(ct_world_t0 world,
     }
 
     if (write) {
-        chunk->version[com_idx] = w->global_version;
+        chunk->version[com_idx] = w->global_system_version;
     }
 
     uint32_t data_idx = _entity_data_idx(w, entity);
@@ -416,7 +449,7 @@ void _add_to_archetype(world_instance_t *w,
         }
 
         ent_chunk_t *chunk = _get_new_chunk(w);
-        chunk->storage_idx = storage->idx;
+        chunk->archetype_idx = storage->idx;
         chunk->archetype_mask = storage->archetype_mask;
         ce_array_resize(chunk->version, storage->component_n, _G.allocator);
         storage->first = chunk;
@@ -435,7 +468,7 @@ void _add_to_archetype(world_instance_t *w,
 
             ent_chunk_t *new = _get_new_chunk(w);
             new->archetype_mask = storage->archetype_mask;
-            new->storage_idx = storage->idx;
+            new->archetype_idx = storage->idx;
             ce_array_resize(new->version, storage->component_n, _G.allocator);
 
             new->next = chunk;
@@ -462,7 +495,7 @@ void _add_to_archetype(world_instance_t *w,
         }
 
         void *data = _get_component_array(storage, chunk, i);
-        memset(data + (ent_data_idx * size), 0xDEADBEAF, size);
+        memset(data + (ent_data_idx * size), 0, size);
     }
 
     _entity_data_idx(w, ent) = ent_data_idx;
@@ -474,12 +507,15 @@ void _remove_from_archetype(world_instance_t *w,
                             uint64_t ent_idx,
                             ent_chunk_t *chunk,
                             ct_archemask_t0 archetype) {
+    if (!chunk->ent_n) {
+        return;
+    }
 
     uint32_t last_idx = --chunk->ent_n;
 
     uint64_t entity_data_idx = ent_idx;
 
-    archetype_t *storage = &w->archetype_pool[chunk->storage_idx];
+    archetype_t *storage = &w->archetype_pool[chunk->archetype_idx];
 
     if (!chunk->ent_n) {
         if (chunk->prev) {
@@ -595,26 +631,6 @@ void _add_components_to_archetype(ct_world_t0 world,
     }
 }
 
-void _add_components2(ct_world_t0 world,
-                      struct ct_entity_t0 ent,
-                      const ct_component_pair_t0 *components,
-                      uint32_t components_count) {
-    uint64_t types[components_count];
-    for (int i = 0; i < components_count; ++i) {
-        types[i] = components[i].type;
-    }
-    ct_archemask_t0 component_mask = combine_component(types, components_count);
-    _add_components_to_archetype(world, ent, component_mask);
-
-    for (int i = 0; i < components_count; ++i) {
-        if (components[i].data) {
-            uint8_t *comp_data = get_one(world, types[i], ent, false);
-            ct_ecs_component_i0 *ci = get_interface(types[i]);
-            uint64_t component_size = ci->size;
-            memcpy(comp_data, components[i].data, component_size);
-        }
-    }
-}
 ///
 
 #define ADD_COMPONENT_CMD \
@@ -772,7 +788,7 @@ static void *get_all(ct_world_t0 world,
     ent_chunk_t *chunk = (ent_chunk_t *) _item;
 
     world_instance_t *w = get_world_instance(world);
-    archetype_t *storage = &w->archetype_pool[chunk->storage_idx];
+    archetype_t *storage = &w->archetype_pool[chunk->archetype_idx];
 
     uint64_t comp_idx = component_idx(storage, component_name);
 
@@ -817,7 +833,28 @@ static void add_components(ct_world_t0 world,
                            struct ct_entity_t0 ent,
                            const ct_component_pair_t0 *components,
                            uint32_t components_count) {
-    _add_components2(world, ent, components, components_count);
+    uint64_t types[components_count];
+    for (int i = 0; i < components_count; ++i) {
+        types[i] = components[i].type;
+    }
+    ct_archemask_t0 component_mask = combine_component(types, components_count);
+
+    world_instance_t *w = get_world_instance(world);
+    ent_chunk_t *chunk = _entity_chunk(w, ent);
+    if (chunk) {
+        component_mask = _archetype_add(chunk->archetype_mask, component_mask);
+    }
+
+    _add_components_to_archetype(world, ent, component_mask);
+
+    for (int i = 0; i < components_count; ++i) {
+        if (components[i].data) {
+            uint8_t *comp_data = get_one(world, types[i], ent, false);
+            ct_ecs_component_i0 *ci = get_interface(types[i]);
+            uint64_t component_size = ci->size;
+            memcpy(comp_data, components[i].data, component_size);
+        }
+    }
 }
 
 static void remove_buff(ct_ecs_cmd_buffer_t *buffer,
@@ -1064,7 +1101,7 @@ static void process_query(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_system_version)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1119,7 +1156,7 @@ static void process_query_serial(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_system_version)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1163,62 +1200,138 @@ spawn_info_t *_get_component_spawninfo(world_instance_t *world,
     return _get_component_spawninfo(world, parent);
 }
 
-static void _build_sim_graph(ce_ba_graph_t *sg) {
-    ce_bag_clean(sg);
-    ce_hash_clean(&_G.fce_map);
+static void _build_graphs() {
+    ce_hash_clean(&_G.system_map);
+    ce_hash_clean(&_G.system_group_map);
+    ce_hash_clean(&_G.system_group_g_map);
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_I);
+    uint64_t *graphs = NULL;
+
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_GROUP_I);
+    while (it.api) {
+        ct_system_group_i0 *i = (it.api);
+
+        uint64_t name = i->name;
+
+        ce_hash_add(&_G.system_group_map, name, (uint64_t) i, _G.allocator);
+
+        uint64_t graph_idx = ce_hash_lookup(&_G.system_group_g_map, name, UINT64_MAX);
+        if (UINT64_MAX == graph_idx) {
+            graph_idx = _new_graph();
+            ce_hash_add(&_G.system_group_g_map, name, graph_idx, _G.allocator);
+            ce_array_push(graphs, graph_idx, _G.allocator);
+        }
+
+        if (i->group) {
+            uint64_t group_graph_idx = ce_hash_lookup(&_G.system_group_g_map, i->group, UINT64_MAX);
+            if (group_graph_idx == UINT64_MAX) {
+                group_graph_idx = _new_graph();
+                ce_hash_add(&_G.system_group_g_map, i->group, group_graph_idx, _G.allocator);
+                ce_array_push(graphs, group_graph_idx, _G.allocator);
+            }
+
+            ce_ba_graph_t *g = &_G.graph_pool[group_graph_idx];
+
+            ce_bag_add(g, name,
+                       i->before.ptr, i->before.len,
+                       i->after.ptr, i->after.len,
+                       _G.allocator);
+        }
+
+        it = ce_api_a0->next(it);
+    }
+
+    it = ce_api_a0->first(CT_ECS_SYSTEM_I);
     while (it.api) {
         struct ct_system_i0 *i = (it.api);
 
         uint64_t name = i->name;
 
-        ce_hash_add(&_G.fce_map, name,
-                    (uint64_t) i->process, _G.allocator);
+        ce_hash_add(&_G.system_map, name,
+                    (uint64_t) i, _G.allocator);
 
-        ce_bag_add(&_G.sg, name,
-                   i->before.ptr, i->before.len,
-                   i->after.ptr, i->after.len,
-                   _G.allocator);
+        if (!i->group) {
+            i->group = CT_ECS_SIMULATION_GROUP;
+        }
+
+        uint64_t graph_idx = ce_hash_lookup(&_G.system_group_g_map,
+                                            i->group,
+                                            UINT64_MAX);
+        if (graph_idx != UINT64_MAX) {
+            ce_ba_graph_t *g = &_G.graph_pool[graph_idx];
+            ce_bag_add(g, name,
+                       i->before.ptr, i->before.len,
+                       i->after.ptr, i->after.len,
+                       _G.allocator);
+        }
+
 
         it = ce_api_a0->next(it);
     }
 
-    ce_bag_build(&_G.sg, _G.allocator);
+    uint64_t graph_n = ce_array_size(graphs);
+    for (uint64_t j = 0; j < graph_n; ++j) {
+        ce_ba_graph_t *g = &_G.graph_pool[graphs[j]];
+        ce_bag_build(g, _G.allocator);
+    }
+
+    ce_array_free(graphs, _G.allocator);
 }
 
-static void _simulate_world(ce_ba_graph_t *sg,
-                            ct_world_t0 world,
-                            float dt) {
+static void _process_group(ct_world_t0 world,
+                           uint64_t group_name,
+                           float dt) {
     world_instance_t *w = get_world_instance(world);
 
-    const uint64_t output_n = ce_array_size(sg->output);
-    for (int k = 0; k < output_n; ++k) {
-        ct_ecs_system_fce_t *fce;
-        fce = (ct_ecs_system_fce_t *) ce_hash_lookup(&_G.fce_map, sg->output[k], 0);
+    uint64_t group_graph = ce_hash_lookup(&_G.system_group_g_map, group_name, UINT64_MAX);
+    if (group_graph == UINT64_MAX) {
+        return;
+    }
 
-        uint32_t cmd_buf_idx = _new_cmd_buff();
-        ce_mpmc_queue_t0 *buff = &_G.cmd_buf_pool[cmd_buf_idx];
+    ce_ba_graph_t *g = &_G.graph_pool[group_graph];
+    uint64_t *outputs = g->output;
 
-        w->global_version++;
+    const uint64_t systems_n = ce_array_size(outputs);
+    for (int i = 0; i < systems_n; ++i) {
+        ct_system_i0 *sys = (ct_system_i0 *) ce_hash_lookup(&_G.system_map, outputs[i], 0);
 
-        uint32_t rq_version = ce_hash_lookup(&w->last_version, sg->output[k], 0);
+        ct_system_group_i0 *sysg = (ct_system_group_i0 *) ce_hash_lookup(&_G.system_group_map,
+                                                                         outputs[i], 0);
 
-        if (fce) {
-            fce(world, dt, rq_version, (ct_ecs_cmd_buffer_t *) buff);
+        if (sys) {
+            uint32_t cmd_buf_idx = _new_cmd_buff();
+            ce_mpmc_queue_t0 *buff = &_G.cmd_buf_pool[cmd_buf_idx];
+
+            w->global_system_version++;
+
+            uint32_t rq_version = ce_hash_lookup(&w->last_system_version, outputs[i], 0);
+
+            if (sys->process) {
+                sys->process(w->world, dt, rq_version, (ct_ecs_cmd_buffer_t *) buff);
+            }
+
+            ce_hash_add(&w->last_system_version, outputs[i], w->global_system_version, _G.allocator);
+
+            _execute_cmd(buff);
+            _free_cmd_buff(cmd_buf_idx);
+        } else if (sysg) {
+            _process_group(world, sysg->name, dt);
         }
 
-        ce_hash_add(&w->last_version, sg->output[k], w->global_version, _G.allocator);
-
-        _execute_cmd(buff);
-        _free_cmd_buff(cmd_buf_idx);
     }
+
 }
 
 static void step(ct_world_t0 world,
                  float dt) {
-    _build_sim_graph(&_G.sg);
-    _simulate_world(&_G.sg, world, dt);
+
+    world_instance_t *w = get_world_instance(world);
+    if(w->global_world_version != w->last_world_version) {
+        w->last_world_version = w->global_world_version;
+        _build_graphs();
+    }
+
+    _process_group(world, CT_ECS_SIMULATION_GROUP, dt);
 }
 
 static void create_entities(ct_world_t0 world,
@@ -1484,6 +1597,7 @@ static ct_world_t0 create_world() {
 
     w->world = world;
     w->db = ce_cdb_a0->db();
+    w->global_world_version = 1;
 
     return world;
 }
@@ -1492,31 +1606,47 @@ static void destroy_world(ct_world_t0 world) {
     ce_handler_destroy(&_G.world_handler, world.h, _G.allocator);
 }
 
-
-typedef struct _collect_ents_data_t {
-    ct_entity_t0 **ents;
-    const ce_alloc_t0 *alloc;
-} _collect_ents_data_t;
-
-static void _collect_ents(ct_world_t0 world,
-                          ct_entity_t0 *ent,
-                          ct_ecs_ent_chunk_o0 *item,
-                          uint32_t n,
-                          void *data) {
-    _collect_ents_data_t *cd = data;
-    ce_array_push_n(*cd->ents, ent, n, cd->alloc);
-}
-
 static void query_collect_ents(ct_world_t0 world,
                                ct_ecs_query_t0 query,
                                ct_entity_t0 **ents,
                                const ce_alloc_t0 *alloc) {
-    _collect_ents_data_t data = {
-            .ents = ents,
-            .alloc = alloc,
-    };
+    world_instance_t *w = get_world_instance(world);
 
-    process_query_serial(world, query, 0, _collect_ents, &data);
+    const uint32_t type_count = ce_array_size(w->archetype_pool);
+
+    for (int i = 0; i < type_count; ++i) {
+        archetype_t *storage = &w->archetype_pool[i];
+
+        ent_chunk_t *chunk = storage->first;
+
+        if (!_can_run_query_on_archetype(storage->archetype_mask, &query)) {
+            continue;
+        }
+
+        ce_array_push_n(*ents, ents, chunk->ent_n, alloc);
+    }
+}
+
+static ct_entity_t0 query_get_first(ct_world_t0 world,
+                                    ct_ecs_query_t0 query) {
+    world_instance_t *w = get_world_instance(world);
+
+    const uint32_t type_count = ce_array_size(w->archetype_pool);
+
+    for (int i = 0; i < type_count; ++i) {
+        archetype_t *storage = &w->archetype_pool[i];
+
+        ent_chunk_t *chunk = storage->first;
+
+        if (!_can_run_query_on_archetype(storage->archetype_mask, &query)) {
+            continue;
+        }
+
+        ct_entity_t0 *ents = _get_entity_array(chunk);
+        return ents[0];
+    }
+
+    return (ct_entity_t0) {0};
 }
 
 static struct ct_ecs_a0 _api = {
@@ -1556,6 +1686,7 @@ struct ct_ecs_c_a0 *ct_ecs_c_a0 = &c_api;
 
 static struct ct_ecs_q_a0 q_api = {
         .collect_ents = query_collect_ents,
+        .first = query_get_first,
         .foreach = process_query,
         .foreach_serial = process_query_serial,
 };
@@ -1820,6 +1951,10 @@ static ce_cdb_prop_def_t0 entity_prop[] = {
 
 ////
 
+static ct_system_group_i0 simulation_sysg = {
+        .name = CT_ECS_SIMULATION_GROUP,
+};
+
 ////
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
@@ -1850,6 +1985,9 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
 
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->add_impl(CT_KERNEL_TASK_I, &ecs_sync_task, sizeof(ecs_sync_task));
+
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I, &simulation_sysg, sizeof(simulation_sysg));
+
     api->register_on_add(CT_ECS_COMPONENT_I, _componet_api_add);
 
     ce_cdb_a0->reg_obj_type(ENTITY_INSTANCE, entity_prop, CE_ARRAY_LEN(entity_prop));

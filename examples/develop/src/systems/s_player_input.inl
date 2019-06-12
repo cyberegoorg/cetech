@@ -12,28 +12,6 @@
 
 // system
 
-//static void player_input_foreach_components(struct ct_world_t0 world,
-//                                            struct ct_entity_t0 *ent,
-//                                            ct_ecs_ent_chunk_o0 *item,
-//                                            uint32_t n,
-//                                            ct_ecs_cmd_buffer_t *cmd_buff,
-//                                            void *data) {
-//    ct_controler_i0 *keyboard_ci = ct_controlers_a0->get(CONTROLER_KEYBOARD);
-//
-//    player_input_component *player_inputs = ct_ecs_c_a0->get_all(PLAYER_INPUT_COMPONENT, item);
-//
-//    for (uint32_t i = 0; i < n; ++i) {
-//        player_input_component *pi = &player_inputs[i];
-//
-//        bool keyboard_up = keyboard_ci->button_state(0, keyboard_ci->button_index("w")) != 0;
-//        bool keyboard_down = keyboard_ci->button_state(0, keyboard_ci->button_index("s")) != 0;
-//        pi->move = (keyboard_up ? 1.0f : (keyboard_down ? -1.0f : 0.0f));
-//
-//        ct_ecs_a0->component_changed(world, ent[i], PLAYER_INPUT_COMPONENT);
-//    }
-//
-//}
-
 static float _angle(ce_vec2_t v) {
     ce_vec2_t n = ce_vec2_norm(v);
     float angle = ce_fasin(n.x) * CE_RAD_TO_DEG;

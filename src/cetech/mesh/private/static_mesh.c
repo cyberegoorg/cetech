@@ -82,7 +82,6 @@ void render_static_mesh(ct_world_t0 world,
         ct_gfx_a0->bgfx_set_vertex_buffer(0, vbh, 0, (uint32_t) go.vb_size);
         ct_gfx_a0->bgfx_set_index_buffer(ibh, 0, (uint32_t) go.ib_size);
 
-
         ct_material_a0->submit(m_c.material, data->layer_name, data->viewid);
     }
 }

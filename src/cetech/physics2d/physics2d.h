@@ -7,6 +7,9 @@ extern "C" {
 
 #include <stdint.h>
 
+#define PHYSICS2D_GROUP \
+    CE_ID64_0("physics2d_group", 0x9ab6f3cfdc87fe30ULL)
+
 #define PHYSICS2D_SYSTEM \
     CE_ID64_0("physics2d", 0x4fdc4a291d00e7f5ULL)
 

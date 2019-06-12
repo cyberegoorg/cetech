@@ -10,7 +10,17 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/parent/parent.h>
 
+#define SPAWN_CHILDERN \
+    CE_ID64_0("spawn_children", 0x968691c5e42491dbULL)
+
+#define CHANGE_PREVIOUS_PARENT \
+    CE_ID64_0("chnage_previous_parent", 0x5931b9800e923df8ULL)
+
+#define CHANGE_PREVIOUS2_PARENT \
+    CE_ID64_0("chnage_previous_parent2", 0x9189a42e6e009b8ULL)
+
 #define _G parent_global
+
 static struct _G {
     ce_alloc_t0 *alloc;
 } _G = {};
@@ -235,31 +245,6 @@ static void change_previous_parent_system2(ct_world_t0 world,
                                 _change_previous_parent2, cmd);
 }
 
-#define SPAWN_CHILDERN \
-    CE_ID64_0("spawn_children", 0x968691c5e42491dbULL)
-
-#define CHANGE_PREVIOUS_PARENT \
-    CE_ID64_0("chnage_previous_parent", 0x5931b9800e923df8ULL)
-
-#define CHANGE_PREVIOUS2_PARENT \
-    CE_ID64_0("chnage_previous_parent2", 0x9189a42e6e009b8ULL)
-
-static struct ct_system_i0 spawn_children_system_i0 = {
-        .name = SPAWN_CHILDERN,
-        .process = spawn_children_system,
-};
-
-static struct ct_system_i0 change_previous_parent_system_i0 = {
-        .name = CHANGE_PREVIOUS_PARENT,
-        .after = CT_ECS_AFTER(SPAWN_CHILDERN),
-        .process = change_previous_parent_system,
-};
-
-static struct ct_system_i0 change_previous_parent_system2_i0 = {
-        .name = CHANGE_PREVIOUS2_PARENT,
-        .after = CT_ECS_AFTER(CHANGE_PREVIOUS_PARENT),
-        .process = change_previous_parent_system2,
-};
 
 static void parent_system(ct_world_t0 world,
                           float dt,
@@ -291,10 +276,31 @@ static void parent_system(ct_world_t0 world,
 
 }
 
+static struct ct_system_i0 spawn_children_system_i0 = {
+        .name = SPAWN_CHILDERN,
+        .process = spawn_children_system,
+        .group = CT_ECS_SIMULATION_GROUP,
+};
+
+static struct ct_system_i0 change_previous_parent_system_i0 = {
+        .name = CHANGE_PREVIOUS_PARENT,
+        .after = CT_ECS_AFTER(SPAWN_CHILDERN),
+        .process = change_previous_parent_system,
+        .group = CT_ECS_SIMULATION_GROUP
+};
+
+static struct ct_system_i0 change_previous_parent_system2_i0 = {
+        .name = CHANGE_PREVIOUS2_PARENT,
+        .after = CT_ECS_AFTER(CHANGE_PREVIOUS_PARENT),
+        .process = change_previous_parent_system2,
+        .group = CT_ECS_SIMULATION_GROUP
+};
+
 static struct ct_system_i0 parent_system_i0 = {
         .name = CT_PARENT_SYSTEM,
         .after = CT_ECS_AFTER(CHANGE_PREVIOUS2_PARENT),
         .process = parent_system,
+        .group = CT_ECS_SIMULATION_GROUP
 };
 
 // Parent

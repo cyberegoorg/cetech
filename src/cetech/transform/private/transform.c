@@ -358,11 +358,18 @@ static void transform_system(ct_world_t0 world,
 
 }
 
+static struct ct_system_group_i0 transform_group = {
+        .name = TRANSFORM_GROUP,
+};
+
 static struct ct_system_i0 transform_system_i0 = {
         .name = TRANSFORM_SYSTEM,
+        .group = TRANSFORM_GROUP,
         .process = transform_system,
-        .after = CT_ECS_BEFORE(CT_PARENT_SYSTEM),
+        .after = CT_ECS_AFTER(CT_PARENT_SYSTEM),
 };
+
+
 
 static const ce_cdb_prop_def_t0 local_to_world_prop[] = {
 };
@@ -415,6 +422,11 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_SYSTEM_I,
                   &transform_system_i0, sizeof(transform_system_i0));
 
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I,
+                  &transform_group, sizeof(transform_group));
+
+
+
     ///
     api->add_impl(CT_ECS_COMPONENT_I, &position_c_api, sizeof(position_c_api));
     api->add_impl(CT_ECS_COMPONENT_I, &rotation_c_api, sizeof(rotation_c_api));
@@ -433,15 +445,6 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
 
     api->add_impl(CT_PROPERTY_EDITOR_I,
                   &scale_property_editor_api, sizeof(scale_property_editor_api));
-
-//    ce_cdb_a0->reg_obj_type(PROP_POSITION,
-//                            position_prop, CE_ARRAY_LEN(position_prop));
-//
-//    ce_cdb_a0->reg_obj_type(PROP_ROTATION,
-//                            rotation_prop, CE_ARRAY_LEN(rotation_prop));
-//
-//    ce_cdb_a0->reg_obj_type(PROP_SCALE,
-//                            scale_prop, CE_ARRAY_LEN(scale_prop));
 
     ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,
                             vec2_prop, CE_ARRAY_LEN(vec2_prop));

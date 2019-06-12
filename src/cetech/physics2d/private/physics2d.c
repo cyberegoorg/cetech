@@ -309,6 +309,12 @@ static struct ct_property_editor_i0 _collider_property_editor_api = {
 };
 //
 
+static struct ct_system_group_i0 physics_group = {
+        .name = PHYSICS2D_GROUP,
+        .group = CT_ECS_SIMULATION_GROUP,
+        .before = CT_ECS_BEFORE(TRANSFORM_SYSTEM),
+};
+
 static struct ct_physics_a0 api = {
 };
 
@@ -323,6 +329,8 @@ void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
     ce_id_a0->id64("mass2d");
     ce_id_a0->id64("physics_world2d");
 
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I,
+                  &physics_group, sizeof(physics_group));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &world2d_component_i, sizeof(world2d_component_i));

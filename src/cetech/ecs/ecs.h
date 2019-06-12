@@ -45,8 +45,14 @@ extern "C" {
 #define CT_ECS_SYSTEM_I \
     CE_ID64_0("ct_system_i0", 0x1b993a5859f15c5cULL)
 
+#define CT_ECS_SYSTEM_GROUP_I \
+    CE_ID64_0("ct_system_group_i0", 0xabe09ba0753e7968ULL)
+
 #define CT_ECS_COMPONENT_I \
     CE_ID64_0("ct_ecs_component_i0", 0x9fda2263be703cb3ULL)
+
+#define CT_ECS_SIMULATION_GROUP \
+    CE_ID64_0("simulation_group", 0xf085d4e5a160c140ULL)
 
 
 #define _LIST(...) (uint64_t[]){__VA_ARGS__}
@@ -138,13 +144,21 @@ typedef struct ct_ptr_pair_t0 {
 } ct_ptr_pair_t0;
 
 
-struct ct_system_i0 {
+typedef struct ct_system_i0 {
     uint64_t name;
     ct_ecs_system_fce_t *process;
 
+    uint64_t group;
     ct_ptr_pair_t0 before;
     ct_ptr_pair_t0 after;
-};
+} ct_system_i0;
+
+typedef struct ct_system_group_i0 {
+    uint64_t name;
+    uint64_t group;
+    ct_ptr_pair_t0 before;
+    ct_ptr_pair_t0 after;
+} ct_system_group_i0;
 
 struct ct_ecs_a0 {
     ct_world_t0 (*create_world)();
@@ -241,6 +255,9 @@ struct ct_ecs_q_a0 {
                          ct_ecs_query_t0 query,
                          ct_entity_t0 **ents,
                          const ce_alloc_t0 *alloc);
+
+    ct_entity_t0 (*first)(ct_world_t0 world,
+                          ct_ecs_query_t0 query);
 };
 
 CE_MODULE(ct_ecs_q_a0);

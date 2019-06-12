@@ -23,6 +23,9 @@ extern "C" {
 #define TRANSFORM_SYSTEM \
     CE_ID64_0("transform", 0x69e14b13ad9b5315ULL)
 
+#define TRANSFORM_GROUP \
+    CE_ID64_0("transform_group", 0xa091ac1b0c1e8522ULL)
+
 #define PROP_POSITION \
     CE_ID64_0("position", 0x8bbeb160190f613aULL)
 

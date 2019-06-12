@@ -135,7 +135,6 @@ static void output_pass_on_setup(void *inst,
     builder->add_pass(builder, inst, 0);
 }
 
-static uint64_t copy_material = 0;
 
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
@@ -161,12 +160,11 @@ static void output_pass_on_pass(void *inst,
 
     ct_gfx_a0->bgfx_set_view_transform(viewid, NULL, proj);
 
-    if (!copy_material) {
-        copy_material = ct_material_a0->create(0xe27880f9fbb28b8d);
-    }
+    uint64_t copy_material = 0xe27880f9fbb28b8d;
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, _COLOR);
+
 
     ct_material_a0->set_texture_handler(copy_material,
                                         _DEFAULT,
@@ -207,7 +205,8 @@ static void gbuffer_pass_on_pass(void *inst,
                                  uint8_t viewid,
                                  uint64_t layer,
                                  ct_camera_data_t0 *main_camera,
-                                 struct ct_rg_builder_t0 *builder) {
+                                 ct_rg_builder_t0 *builder) {
+
     ct_gfx_a0->bgfx_set_view_clear(viewid,
                                    BGFX_CLEAR_COLOR |
                                    BGFX_CLEAR_DEPTH,
