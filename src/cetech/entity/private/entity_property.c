@@ -87,7 +87,7 @@ static void draw_component(uint64_t obj,
     ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
-static void _entity_ui(uint64_t obj) {
+static void _entity_ui(uint64_t obj, const char *filter) {
     bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
 
     if (open) {
@@ -104,7 +104,7 @@ static void _entity_ui(uint64_t obj) {
                                  0, NULL);
         ct_editor_ui_a0->prop_value_end();
 
-        ct_editor_ui_a0->prop_str(obj, "Name", ENTITY_NAME, 11111111);
+        ct_editor_ui_a0->prop_str(obj, "Name", filter, ENTITY_NAME, 11111111);
 
         ct_editor_ui_a0->ui_prop_body_end();
     }
@@ -112,12 +112,12 @@ static void _entity_ui(uint64_t obj) {
 }
 
 static void draw_ui(uint64_t obj,
-                    uint64_t context) {
+                    uint64_t context,const char *filter) {
     if (!obj) {
         return;
     }
 
-    _entity_ui(obj);
+    _entity_ui(obj, filter);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 

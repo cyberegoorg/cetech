@@ -426,7 +426,7 @@ static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
 };
 
 static void draw_property(uint64_t obj,
-                          uint64_t context) {
+                          uint64_t context,const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t import = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
 
@@ -434,7 +434,7 @@ static void draw_property(uint64_t obj,
         return;
     }
 
-    ct_editor_ui_a0->prop_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
+    ct_editor_ui_a0->prop_filename(import, "Input",  filter,SCENE_INPUT_PROP, "gltf", 0);
 }
 
 static struct ct_property_editor_i0 property_editor_api = {

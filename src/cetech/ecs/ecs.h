@@ -198,7 +198,7 @@ struct ct_ecs_c_a0 {
     ct_ecs_component_i0 *(*get_interface)(uint64_t name);
 
     ct_archemask_t0 (*combine_component)(const uint64_t *component_name,
-                                              uint32_t n);
+                                         uint32_t n);
 
     void *(*get_all)(ct_world_t0 world,
                      uint64_t component_name,

@@ -156,9 +156,9 @@ static struct entity_editor *_new_editor() {
                              {
                                      .type = CT_CAMERA_COMPONENT,
                                      .data = &(ct_camera_component) {
-                                             .far = 100.0f,
-                                             .near = 0.1f,
                                              .camera_type = CAMERA_TYPE_PERSPECTIVE,
+                                             .far = 100.0f,
+                                             .near = -1.0f,
                                              .fov = 60.0f,
                                      }
                              }

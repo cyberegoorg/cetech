@@ -393,7 +393,7 @@ static void _destroy_state(struct ct_world_t0 world,
                            void *_data) {
 
     box2d_world_component *w = _get_b2world(world);
-    if(!w->w) {
+    if (!w->w) {
         return;
     }
 

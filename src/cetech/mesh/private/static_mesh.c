@@ -125,11 +125,14 @@ static const char *display_name() {
 }
 
 static void property_editor(uint64_t obj,
-                            uint64_t context) {
-    ct_editor_ui_a0->prop_resource(obj, "Scene", PROP_SCENE_ID, PROP_SCENE_ID, context, obj);
-    ct_editor_ui_a0->prop_str_combo(obj, "Mesh", PROP_MESH, mesh_combo_items, obj);
-    ct_editor_ui_a0->prop_str_combo(obj, "Node", PROP_NODE, node_combo_items, obj);
-    ct_editor_ui_a0->prop_resource(obj, "Material", MATERIAL_TYPE, MATERIAL_TYPE, context, obj + 1);
+                            uint64_t context,
+                            const char *filter) {
+    ct_editor_ui_a0->prop_resource(obj, "Scene", filter,
+                                   PROP_SCENE_ID, PROP_SCENE_ID, context, obj);
+    ct_editor_ui_a0->prop_str_combo(obj, "Mesh", filter, PROP_MESH, mesh_combo_items, obj);
+    ct_editor_ui_a0->prop_str_combo(obj, "Node", filter, PROP_NODE, node_combo_items, obj);
+    ct_editor_ui_a0->prop_resource(obj, "Material", filter, MATERIAL_TYPE, MATERIAL_TYPE, context,
+                                   obj + 1);
 }
 
 static struct ct_property_editor_i0 property_editor_api = {

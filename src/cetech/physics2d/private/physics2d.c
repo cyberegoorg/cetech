@@ -62,11 +62,12 @@ static struct ct_ecs_component_i0 world2d_component_i = {
 };
 
 static void _wolrd2d_property_editor(uint64_t obj,
-                                     uint64_t context) {
+                                     uint64_t context,
+                                     const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD2D_GRAVITY_PROP, 0);
 
-    ct_editor_ui_a0->prop_vec2(gravity, "Gravity",
+    ct_editor_ui_a0->prop_vec2(gravity, "Gravity", filter,
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
                                (ui_vec2_p0) {});
 }
@@ -126,15 +127,16 @@ static struct ct_ecs_component_i0 velocity2d_component_i = {
 };
 
 static void _velocity_property_editor(uint64_t obj,
-                                      uint64_t context) {
+                                      uint64_t context,
+                                      const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY2D_LINEAR_PROP, 0);
 
-    ct_editor_ui_a0->prop_vec2(linear, "Linear",
+    ct_editor_ui_a0->prop_vec2(linear, "Linear", filter,
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
                                (ui_vec2_p0) {});
 
-    ct_editor_ui_a0->prop_float(obj, "Angular", VELOCITY2D_ANGULAR_PROP, (ui_float_p0) {});
+    ct_editor_ui_a0->prop_float(obj, "Angular", filter, VELOCITY2D_ANGULAR_PROP, (ui_float_p0) {});
 }
 
 static struct ct_property_editor_i0 property_editor_api = {
@@ -236,8 +238,9 @@ static struct ct_ecs_component_i0 mass2d_component_i = {
 };
 
 static void _mass2d_property_editor(uint64_t obj,
-                                    uint64_t context) {
-    ct_editor_ui_a0->prop_float(obj, "Mass", MASS2D_PROP, (ui_float_p0) {});
+                                    uint64_t context,
+                                    const char *filter) {
+    ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS2D_PROP, (ui_float_p0) {});
 }
 
 static struct ct_property_editor_i0 mass2d_property_editor_api = {
@@ -266,7 +269,8 @@ static uint64_t _id_to_shape(int id) {
 }
 
 static void _collider_property_editor(uint64_t obj,
-                                      uint64_t context) {
+                                      uint64_t context,
+                                      const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t shape = ce_cdb_a0->read_subobject(r, PHYSICS_COLLIDER2D_SHAPE_PROP, 0);
     uint64_t shape_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), shape);
@@ -292,7 +296,7 @@ static void _collider_property_editor(uint64_t obj,
                                                            PHYSICS_COLLIDER2D_RECTANGLE_HALF_SIZE,
                                                            0);
 
-            ct_editor_ui_a0->prop_vec2(half_size, "Half size",
+            ct_editor_ui_a0->prop_vec2(half_size, "Half size", filter,
                                        (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y}, (ui_vec2_p0) {});
         }
             break;

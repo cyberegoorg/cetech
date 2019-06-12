@@ -21,7 +21,8 @@ typedef struct ct_property_editor_i0 {
     uint64_t (*cdb_type)();
 
     void (*draw_ui)(uint64_t obj,
-                    uint64_t context);
+                    uint64_t context,
+                    const char *filter);
 
     void (*draw_menu)(uint64_t obj);
 } ct_property_editor_i0;

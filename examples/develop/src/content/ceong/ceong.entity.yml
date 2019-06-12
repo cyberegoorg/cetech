@@ -59,7 +59,8 @@ children:
           cdb_uid: 0x7f722b0f7b3aefd0
           cdb_type: 0x6112fca24c71dad
           cdb_instance: 0x4303379c7ca5f726
-          x: 478.000031
+          x: 492.000031
+          y: 135.000000
       0x11dfb1aac0d94ecd:
         cdb_uid: 0x11dfb1aac0d94ecd
         cdb_type: rotation
@@ -116,6 +117,7 @@ children:
           cdb_uid: 0xbbe11e8279cfe87a
           cdb_type: 0x6112fca24c71dad
           cdb_instance: 0x4303379c7ca5f726
+          y: 132.000000
       0x4e4ea51dbf6e4777:
         cdb_uid: 0x4e4ea51dbf6e4777
         cdb_type: rotation
@@ -299,7 +301,7 @@ children:
           cdb_uid: 0x34bf056876f9d9ce
           cdb_type: 0x6112fca24c71dad
           cdb_instance: 0x4303379c7ca5f726
-          y: 14.000001
+          y: 16.000000
       0xc72c8c03bc9838cb:
         cdb_uid: 0xc72c8c03bc9838cb
         cdb_type: rotation

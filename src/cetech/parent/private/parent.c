@@ -70,7 +70,6 @@ void _spawn_previous_parent(ct_world_t0 world,
 }
 
 
-
 void _array_swap_remove(ct_entity_t0 *ents,
                         ct_entity_t0 ent) {
     uint32_t ch_n = ce_array_size(ents);

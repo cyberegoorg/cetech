@@ -218,7 +218,8 @@ static uint64_t _node_property_cdb_type() {
 }
 
 static void _node_property_draw(uint64_t obj,
-                                uint64_t context) {
+                                uint64_t context,
+                                const char *filter) {
     const ce_cdb_obj_o0 *node_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t node_type = ce_cdb_a0->read_uint64(node_r, CT_NODE_TYPE, 0);
@@ -245,18 +246,18 @@ static void _node_property_draw(uint64_t obj,
                     break;
 
                 case CT_NODE_PIN_FLOAT:
-                    ct_editor_ui_a0->prop_float(inputs_o,
+                    ct_editor_ui_a0->prop_float(inputs_o,filter,
                                                 def->name, def->prop,
                                                 (ui_float_p0) {});
                     break;
 
                 case CT_NODE_PIN_STRING:
-                    ct_editor_ui_a0->prop_str(inputs_o,
+                    ct_editor_ui_a0->prop_str(inputs_o,filter,
                                               def->name, def->prop, i);
                     break;
 
                 case CT_NODE_PIN_BOOL:
-                    ct_editor_ui_a0->prop_bool(inputs_o,
+                    ct_editor_ui_a0->prop_bool(inputs_o,filter,
                                                def->name, def->prop);
                     break;
             }

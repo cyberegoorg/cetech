@@ -144,12 +144,14 @@ static uint64_t cdb_type() {
     return MATERIAL_TYPE;
 }
 
-static void ui_vec4(uint64_t var) {
+static void ui_vec4(uint64_t var,
+                    const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
     ct_editor_ui_a0->prop_vec4(var,
                                str,
+                               filter,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
@@ -157,10 +159,11 @@ static void ui_vec4(uint64_t var) {
                                (ui_vec4_p0) {});
 }
 
-static void ui_color4(uint64_t var) {
+static void ui_color4(uint64_t var,
+                      const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
     const char *str = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP, "");
-    ct_editor_ui_a0->prop_vec4(var, str,
+    ct_editor_ui_a0->prop_vec4(var, str, filter,
                                (uint64_t[]) {MATERIAL_VAR_VALUE_PROP_X,
                                              MATERIAL_VAR_VALUE_PROP_Y,
                                              MATERIAL_VAR_VALUE_PROP_Z,
@@ -169,18 +172,21 @@ static void ui_color4(uint64_t var) {
 }
 
 static void ui_texture(uint64_t var,
-                       uint64_t context) {
+                       uint64_t context,
+                       const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
 
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_editor_ui_a0->prop_resource(var, name, MATERIAL_VAR_VALUE_PROP,
+    ct_editor_ui_a0->prop_resource(var, name, filter,
+                                   MATERIAL_VAR_VALUE_PROP,
                                    TEXTURE_TYPE, context, var);
 }
 
 void draw_property(uint64_t material,
-                   uint64_t context) {
+                   uint64_t context,
+                   const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
 
     uint64_t layer_count = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
@@ -200,10 +206,9 @@ void draw_property(uint64_t material,
         bool open = ct_debugui_a0->TreeNodeEx(layer_label,
                                               DebugUITreeNodeFlags_DefaultOpen);
         if (open) {
-            ct_editor_ui_a0->prop_str(layer, "Layer name", MATERIAL_LAYER_NAME, i);
-
-            ct_editor_ui_a0->prop_resource(layer, "Shader", MATERIAL_SHADER_PROP,
-                                           SHADER_TYPE, context, i);
+            ct_editor_ui_a0->prop_str(layer, "Layer name", filter, MATERIAL_LAYER_NAME, i);
+            ct_editor_ui_a0->prop_resource(layer, "Shader", filter,
+                                           MATERIAL_SHADER_PROP, SHADER_TYPE, context, i);
 
             uint64_t count = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
             uint64_t keys[count];
@@ -223,11 +228,11 @@ void draw_property(uint64_t material,
                 }
 
                 if (type == MAT_VAR_TEXTURE) {
-                    ui_texture(var, context);
+                    ui_texture(var, context, filter);
                 } else if (type == MAT_VAR_VEC4) {
-                    ui_vec4(var);
+                    ui_vec4(var, filter);
                 } else if (MAT_VAR_COLOR4) {
-                    ui_color4(var);
+                    ui_color4(var, filter);
                 }
             }
 
@@ -727,12 +732,13 @@ static uint64_t _vec4_cdb_type() {
 }
 
 static void _vec4_property_editor(uint64_t obj,
-                                  uint64_t context) {
+                                  uint64_t context,
+                                  const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
 
     ct_editor_ui_a0->prop_vec4(obj,
-                               name,
+                               name, filter,
                                (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
                                               MATERIAL_VAR_VALUE_PROP_Y,
                                               MATERIAL_VAR_VALUE_PROP_Z,
@@ -751,12 +757,13 @@ static uint64_t _color_cdb_type() {
 }
 
 static void _color_property_editor(uint64_t obj,
-                                   uint64_t context) {
+                                   uint64_t context,
+                                   const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     const char *name = ce_cdb_a0->read_str(r, MATERIAL_VAR_NAME_PROP, "");
 
     ct_editor_ui_a0->prop_vec4(obj,
-                               name,
+                               name, filter,
                                (uint64_t[4]) {MATERIAL_VAR_VALUE_PROP_X,
                                               MATERIAL_VAR_VALUE_PROP_Y,
                                               MATERIAL_VAR_VALUE_PROP_Z,

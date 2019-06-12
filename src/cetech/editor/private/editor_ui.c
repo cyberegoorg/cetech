@@ -28,12 +28,17 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/resource/resource_compiler.h>
+#include <fnmatch.h>
 
 #include "cetech/editor/editor_ui.h"
 
 #include "include/nfd/nfd.h"
 
 CE_MODULE(ct_resourcedb_a0);
+
+static bool filter_pass(const char* filter, const char* str) {
+    return (0 == fnmatch(filter, str, FNM_CASEFOLD));
+}
 
 static bool prop_revert_btn(uint64_t _obj,
                             const uint64_t *props,
@@ -188,8 +193,14 @@ static void _prop_value_end() {
 
 static void ui_float(uint64_t obj,
                      const char *label,
+                     const char *filter,
                      uint64_t prop,
                      struct ui_float_p0 params) {
+
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     float value = 0;
     float value_new = 0;
 
@@ -224,8 +235,14 @@ static void ui_float(uint64_t obj,
 
 static void ui_uint64(uint64_t obj,
                       const char *label,
+                      const char *filter,
                       uint64_t prop,
                       struct ui_uint64_p0 params) {
+
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     uint64_t value = 0;
     int value_new = 0;
 
@@ -260,7 +277,13 @@ static void ui_uint64(uint64_t obj,
 
 static void ui_bool(uint64_t obj,
                     const char *label,
+                    const char *filter,
                     uint64_t prop) {
+
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     bool value = false;
     bool value_new = false;
 
@@ -289,8 +312,13 @@ static void ui_bool(uint64_t obj,
 
 static void ui_str(uint64_t obj,
                    const char *label,
+                   const char *filter,
                    uint64_t prop,
                    uint32_t i) {
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     char labelid[128] = {'\0'};
 
     const char *value = 0;
@@ -330,9 +358,14 @@ static void ui_str(uint64_t obj,
 
 static void ui_filename(uint64_t obj,
                         const char *label,
+                        const char *l_filter,
                         uint64_t prop,
                         const char *filter,
                         uint32_t i) {
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     char labelid[128] = {'\0'};
 
     const char *value = 0;
@@ -395,12 +428,15 @@ static void ui_filename(uint64_t obj,
 
 static void ui_str_combo(uint64_t obj,
                          const char *label,
+                         const char *filter,
                          uint64_t prop,
                          void (*combo_items)(uint64_t obj,
                                              char **items,
                                              uint32_t *items_count),
                          uint32_t i) {
-
+    if (!filter_pass(filter, label)) {
+        return;
+    }
     const char *value = 0;
 
     if (!obj) {
@@ -461,10 +497,14 @@ static void ui_str_combo(uint64_t obj,
 
 static void ui_str_combo2(uint64_t obj,
                           const char *label,
+                          const char *filter,
                           uint64_t prop,
                           const char *const *items,
                           uint32_t items_count,
                           uint32_t i) {
+    if (!filter_pass(filter, label)) {
+        return;
+    }
 
     const char *value = 0;
 
@@ -626,10 +666,16 @@ static void ui_prop_body_end() {
 
 static void ui_resource(uint64_t obj,
                         const char *label,
+                        const char *filter,
                         uint64_t prop,
                         uint64_t resource_type,
                         uint64_t context,
                         uint32_t i) {
+
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     if (!obj) {
         return;
     }
@@ -731,9 +777,14 @@ static void ui_resource(uint64_t obj,
 
 static void ui_vec3(uint64_t obj,
                     const char *label,
+                    const char *filter,
                     const uint64_t prop[3],
                     struct ui_vec3_p0 params) {
     if (!obj) {
+        return;
+    }
+
+    if (!filter_pass(filter, label)) {
         return;
     }
 
@@ -774,9 +825,14 @@ static void ui_vec3(uint64_t obj,
 
 static void ui_vec2(uint64_t obj,
                     const char *label,
+                    const char *filter,
                     const uint64_t prop[2],
                     struct ui_vec2_p0 params) {
     if (!obj) {
+        return;
+    }
+
+    if (!filter_pass(filter, label)) {
         return;
     }
 
@@ -815,8 +871,14 @@ static void ui_vec2(uint64_t obj,
 
 static void ui_vec4(uint64_t obj,
                     const char *label,
+                    const char *filter,
                     const uint64_t prop[4],
                     struct ui_vec4_p0 params) {
+
+    if (!filter_pass(filter, label)) {
+        return;
+    }
+
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     ce_vec4_t value = {
