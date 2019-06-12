@@ -1332,6 +1332,7 @@ static void step(ct_world_t0 world,
     }
 
     _process_group(world, CT_ECS_SIMULATION_GROUP, dt);
+    _process_group(world, CT_ECS_PRESENTATION_GROUP, dt);
 }
 
 static void create_entities(ct_world_t0 world,
@@ -1955,6 +1956,10 @@ static ct_system_group_i0 simulation_sysg = {
         .name = CT_ECS_SIMULATION_GROUP,
 };
 
+static ct_system_group_i0 presentation_sysg = {
+        .name = CT_ECS_PRESENTATION_GROUP,
+};
+
 ////
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
@@ -1987,6 +1992,7 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     api->add_impl(CT_KERNEL_TASK_I, &ecs_sync_task, sizeof(ecs_sync_task));
 
     api->add_impl(CT_ECS_SYSTEM_GROUP_I, &simulation_sysg, sizeof(simulation_sysg));
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I, &presentation_sysg, sizeof(presentation_sysg));
 
     api->register_on_add(CT_ECS_COMPONENT_I, _componet_api_add);
 

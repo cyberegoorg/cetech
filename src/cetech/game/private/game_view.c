@@ -54,40 +54,31 @@ static void on_menu(uint64_t dock) {
 
 }
 
-static void _get_viewport(struct ct_world_t0 world,
-                          struct ct_entity_t0 *ent,
-                          ct_ecs_ent_chunk_o0 *item,
-                          uint32_t n,
-                          void *data) {
-    ct_viewport_t0 *vp = data;
-
-    viewport_component *vcs = ct_ecs_c_a0->get_all(world, VIEWPORT_COMPONENT, item);
-    *vp = vcs[0].viewport;
-}
-
 static void on_debugui(uint64_t dock) {
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
 
-    ct_viewport_t0 vw = {};
-    ct_ecs_q_a0->foreach_serial(ct_game_system_a0->world(),
-                                (ct_ecs_query_t0) {
-                                        .all = CT_ECS_ARCHETYPE(VIEWPORT_COMPONENT),
-                                }, 0, _get_viewport, &vw);
+    ct_world_t0 world = ct_game_system_a0->world();
+    ct_entity_t0 viewport_ent = ct_ecs_q_a0->first(world, (ct_ecs_query_t0) {
+            .all = CT_ECS_ARCHETYPE(VIEWPORT_COMPONENT),
+    });
 
-    ct_rg_builder_t0 *builder;
-    builder = ct_renderer_a0->viewport_builder(vw);
+    viewport_component *viewport = ct_ecs_c_a0->get_one(world, VIEWPORT_COMPONENT,
+                                                        viewport_ent, false);
 
-    ct_renderer_a0->viewport_set_size(vw, size);
+    if(viewport) {
+        ct_rg_builder_t0 *builder;
+        builder = ct_renderer_a0->viewport_builder(viewport->viewport);
+        ct_renderer_a0->viewport_set_size(viewport->viewport, size);
 
+        bgfx_texture_handle_t th;
+        th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
-    bgfx_texture_handle_t th;
-    th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
+        ct_debugui_a0->Image(th,
+                             &size,
+                             &CE_VEC4_ONE,
+                             &CE_VEC4_ZERO);
 
-    ct_debugui_a0->Image(th,
-                         &size,
-                         &CE_VEC4_ONE,
-                         &CE_VEC4_ZERO);
-
+    }
 }
 
 static const char *dock_title(uint64_t dock) {

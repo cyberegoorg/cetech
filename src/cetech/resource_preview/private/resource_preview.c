@@ -37,7 +37,6 @@ CE_MODULE(ct_resourcedb_a0);
 typedef struct preview_instance {
     ct_world_t0 world;
     ct_entity_t0 camera_ent;
-    ct_viewport_t0 viewport;
     ct_entity_t0 ent;
     uint64_t selected_object;
     uint64_t type;
@@ -174,10 +173,13 @@ static void _draw_preview(preview_instance *pi,
     if (i->draw_raw) {
         i->draw_raw(pi->selected_object, size);
     } else {
-        struct ct_rg_builder_t0 *builder;
-        builder = ct_renderer_a0->viewport_builder(pi->viewport);
+        viewport_component *viewport = ct_ecs_c_a0->get_one(pi->world, VIEWPORT_COMPONENT,
+                                                            pi->camera_ent, false);
 
-        ct_renderer_a0->viewport_set_size(pi->viewport, size);
+        struct ct_rg_builder_t0 *builder;
+        builder = ct_renderer_a0->viewport_builder(viewport->viewport);
+
+        ct_renderer_a0->viewport_set_size(viewport->viewport, size);
 
         bgfx_texture_handle_t th;
         th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
@@ -238,10 +240,14 @@ static bool init() {
                                              .far = 1000.0f,
                                              .fov = 60.0f,
                                      }
+                             },
+                             {
+                                     .type = VIEWPORT_COMPONENT,
+                                     .data = &(viewport_component) {
+                                             .viewport =ct_renderer_a0->create_viewport(),
+                                     }
                              }
                      })));
-
-    pi->viewport = ct_renderer_a0->create_viewport();
 
     ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
     return true;
@@ -259,19 +265,6 @@ static void update(float dt) {
         }
 
         ct_ecs_a0->step(pi->world, dt);
-
-        ct_local_to_world_c *t = ct_ecs_c_a0->get_one(pi->world, LOCAL_TO_WORLD_COMPONENT,
-                                                      pi->camera_ent, false);
-        ct_camera_component *c = ct_ecs_c_a0->get_one(pi->world, CT_CAMERA_COMPONENT,
-                                                      pi->camera_ent,
-                                                      false);
-
-        ct_renderer_a0->viewport_render(pi->viewport,
-                                        pi->world,
-                                        (ct_camera_data_t0) {
-                                                .world = t->world,
-                                                .camera = *c,
-                                        });
     }
 }
 
@@ -356,10 +349,14 @@ static uint64_t open(uint64_t dock) {
                                              .near = 0.1f,
                                              .fov = 60.0f,
                                      }
+                             },
+                             {
+                                     .type = VIEWPORT_COMPONENT,
+                                     .data = &(viewport_component) {
+                                             .viewport =ct_renderer_a0->create_viewport(),
+                                     }
                              }
                      })));
-
-    pi->viewport = ct_renderer_a0->create_viewport(pi->world, pi->camera_ent);
 
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
     ce_cdb_a0->set_ptr(w, PROP_DOCK_DATA, pi);

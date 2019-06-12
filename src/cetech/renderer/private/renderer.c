@@ -37,9 +37,9 @@
 #include <cetech/debugui/debugui.h>
 
 #include "cetech/render_graph/render_graph.h"
-#include <cetech/game/game_system.h>
 #include <cetech/renderer/gfx.h>
 #include <celib/os/window.h>
+#include <cetech/transform/transform.h>
 
 //==============================================================================
 // GLobals
@@ -399,6 +399,44 @@ static struct ct_kernel_task_i0 render_task = {
         .update_after = update_after,
 };
 
+void _render_all_viewport(ct_world_t0 w,
+                          ct_entity_t0 *entities,
+                          ct_ecs_ent_chunk_o0 *item,
+                          uint32_t n,
+                          void *_data) {
+
+    viewport_component *viewport = ct_ecs_c_a0->get_all(w, VIEWPORT_COMPONENT, item);
+    ct_local_to_world_c *ltw = ct_ecs_c_a0->get_all(w, LOCAL_TO_WORLD_COMPONENT, item);
+    ct_camera_component *camera = ct_ecs_c_a0->get_all(w, CT_CAMERA_COMPONENT, item);
+
+    for (int i = 0; i < n; ++i) {
+        ct_renderer_a0->viewport_render(viewport[i].viewport,
+                                        w,
+                                        (ct_camera_data_t0) {
+                                                .world = ltw[i].world,
+                                                .camera = camera[i],
+                                        });
+    }
+}
+
+static void render_world(ct_world_t0 world,
+                         float dt,
+                         uint32_t rq_version,
+                         ct_ecs_cmd_buffer_t *cmd) {
+    ct_ecs_q_a0->foreach(world,
+                         (ct_ecs_query_t0) {
+                                 .all = CT_ECS_ARCHETYPE(VIEWPORT_COMPONENT,
+                                                         LOCAL_TO_WORLD_COMPONENT,
+                                                         CT_CAMERA_COMPONENT)
+                         }, rq_version,
+                         _render_all_viewport, NULL);
+}
+
+static struct ct_system_i0 render_system = {
+        .name = CT_RENDERER_SYSTEM,
+        .group = CT_ECS_PRESENTATION_GROUP,
+        .process = render_world,
+};
 
 #include "gfx.inl"
 #include "c_viewport.inl"
@@ -449,7 +487,11 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
 
     _G.vsync = ce_config_a0->read_uint(CONFIG_SCREEN_VSYNC, 1) > 0;
 
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &render_system, sizeof(render_system));
+
     api->add_impl(CT_ECS_COMPONENT_I, &viewport_component_i, sizeof(viewport_component_i));
+
     ce_cdb_a0->reg_obj_type(VIEWPORT_COMPONENT, NULL, 0);
 
     renderer_create();

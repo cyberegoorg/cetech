@@ -429,27 +429,3 @@ children:
           cdb_instance: 0xce7f4b66d8e70d28
     children:
       cdb_type: cdb_objset
-  0x89cc5dd21c5f0a20:
-    cdb_uid: 0x89cc5dd21c5f0a20
-    cdb_type: entity
-    name: camera
-    components:
-      cdb_type: cdb_objset
-      0x3318e9e89bf402ca:
-        cdb_uid: 0x3318e9e89bf402ca
-        cdb_type: local_to_world
-      0x7a749222df1df41e:
-        cdb_uid: 0x7a749222df1df41e
-        cdb_type: camera
-        camera_type: ortho
-        near: 0.000000
-        far: 1000.000000
-        fov: 60.000000
-      0x4175085d2c687073:
-        cdb_uid: 0x4175085d2c687073
-        cdb_type: viewport
-      0x1759abc992b2ecc8:
-        cdb_uid: 0x1759abc992b2ecc8
-        cdb_type: 0xa0430cee11242ca
-    children:
-      cdb_type: cdb_objset

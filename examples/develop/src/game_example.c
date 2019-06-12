@@ -34,6 +34,39 @@
 void init(ct_world_t0 world) {
     uint64_t boot_ent = ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
     ct_ecs_e_a0->spawn_entity(world, boot_ent);
+
+    ct_entity_t0 camera;
+    ct_ecs_e_a0->create_entities(world, &camera, 1);
+    ct_ecs_c_a0->add(world,
+                     camera,
+                     CE_ARR_ARG(((ct_component_pair_t0[]) {
+                             {
+                                     .type = POSITION_COMPONENT,
+                                     .data = &(ct_position_c) {
+                                     }
+                             },
+                             {
+                                     .type = LOCAL_TO_WORLD_COMPONENT,
+                                     .data = &(ct_local_to_world_c) {
+                                     }
+                             },
+                             {
+                                     .type = CT_CAMERA_COMPONENT,
+                                     .data = &(ct_camera_component) {
+                                             .camera_type = CAMERA_TYPE_ORTHO,
+                                             .far = 100.0f,
+                                             .near = -1.0f,
+                                     }
+                             },
+                             {
+                                     .type = VIEWPORT_COMPONENT,
+                                     .data = &(viewport_component) {
+                                             .viewport =ct_renderer_a0->create_viewport(),
+                                     }
+                             }
+                     })));
+
+
 }
 
 void shutdown(ct_world_t0 world) {

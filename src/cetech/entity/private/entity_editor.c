@@ -40,7 +40,6 @@ typedef struct entity_editor {
     ct_world_t0 world;
     ct_entity_t0 camera_ent;
     ct_entity_t0 entity;
-    ct_viewport_t0 viewport;
 
     bool mouse_hovering;
     bool free;
@@ -105,9 +104,12 @@ static void draw_editor(uint64_t context_obj,
     bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
     editor->mouse_hovering = is_mouse_hovering;
 
-    ct_rg_builder_t0 *builder = ct_renderer_a0->viewport_builder(editor->viewport);
+    viewport_component *viewport = ct_ecs_c_a0->get_one(editor->world, VIEWPORT_COMPONENT,
+                                                        editor->camera_ent, false);
 
-    ct_renderer_a0->viewport_set_size(editor->viewport, size);
+    ct_rg_builder_t0 *builder = ct_renderer_a0->viewport_builder(viewport->viewport);
+
+    ct_renderer_a0->viewport_set_size(viewport->viewport, size);
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
@@ -161,10 +163,14 @@ static struct entity_editor *_new_editor() {
                                              .near = -1.0f,
                                              .fov = 60.0f,
                                      }
+                             },
+                             {
+                                     .type = VIEWPORT_COMPONENT,
+                                     .data = &(viewport_component) {
+                                             .viewport =ct_renderer_a0->create_viewport(),
+                                     }
                              }
                      })));
-
-    editor->viewport = ct_renderer_a0->create_viewport();
 
     return editor;
 }
@@ -194,19 +200,6 @@ static void update(uint64_t context_obj,
     }
 
     ct_ecs_a0->step(editor->world, dt);
-
-    ct_local_to_world_c *t = ct_ecs_c_a0->get_one(editor->world, LOCAL_TO_WORLD_COMPONENT,
-                                                  editor->camera_ent, false);
-
-    ct_camera_component *c = ct_ecs_c_a0->get_one(editor->world, CT_CAMERA_COMPONENT,
-                                                  editor->camera_ent, false);
-
-    ct_renderer_a0->viewport_render(editor->viewport,
-                                    editor->world,
-                                    (ct_camera_data_t0) {
-                                            .world = t->world,
-                                            .camera = *c,
-                                    });
 }
 
 uint64_t cdb_type() {

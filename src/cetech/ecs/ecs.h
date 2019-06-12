@@ -54,6 +54,8 @@ extern "C" {
 #define CT_ECS_SIMULATION_GROUP \
     CE_ID64_0("simulation_group", 0xf085d4e5a160c140ULL)
 
+#define CT_ECS_PRESENTATION_GROUP \
+    CE_ID64_0("presentation_group", 0xfba87d270fbfa0b1ULL)
 
 #define _LIST(...) (uint64_t[]){__VA_ARGS__}
 #define _LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))

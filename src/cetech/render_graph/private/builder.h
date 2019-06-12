@@ -30,19 +30,15 @@ static void builder_add_pass(void *inst,
     ct_rg_builder_t0 *builder = inst;
     render_graph_builder_inst *builder_inst = builder->inst;
 
-    bool new_view = false;
-
     uint8_t viewid = 0;
 
     if (!layer) {
         viewid = ct_renderer_a0->new_viewid();
-        new_view = true;
     } else {
         viewid = ce_hash_lookup(&builder_inst->layer_map, layer, UINT8_MAX);
         if (UINT8_MAX == viewid) {
             viewid = ct_renderer_a0->new_viewid();
             ce_hash_add(&builder_inst->layer_map, layer, viewid, _G.alloc);
-            new_view = true;
         }
     }
 

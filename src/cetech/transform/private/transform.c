@@ -425,8 +425,6 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_SYSTEM_GROUP_I,
                   &transform_group, sizeof(transform_group));
 
-
-
     ///
     api->add_impl(CT_ECS_COMPONENT_I, &position_c_api, sizeof(position_c_api));
     api->add_impl(CT_ECS_COMPONENT_I, &rotation_c_api, sizeof(rotation_c_api));

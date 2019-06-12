@@ -52,32 +52,6 @@ static void game_shutdown() {
     ct_ecs_a0->destroy_world(_G.game_state.world);
 }
 
-typedef struct main_camera_data_t {
-    ct_entity_t0 ent;
-    ct_viewport_t0 viewport;
-    ct_camera_component camera;
-    ce_mat4_t world;
-} main_camera_data_t;
-
-static void _get_active_camera(struct ct_world_t0 world,
-                               struct ct_entity_t0 *ent,
-                               ct_ecs_ent_chunk_o0 *item,
-                               uint32_t n,
-                               void *data) {
-    main_camera_data_t *output = data;
-
-    ct_entity_t0 camera_ent = ent[0];
-
-    viewport_component *viewports = ct_ecs_c_a0->get_all(world, VIEWPORT_COMPONENT, item);
-    ct_camera_component *cameras = ct_ecs_c_a0->get_all(world, CT_CAMERA_COMPONENT, item);
-    ct_local_to_world_c *tramsforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
-
-    output->ent = camera_ent;
-    output->viewport = viewports[0].viewport;
-    output->camera = cameras[0];
-    output->world = tramsforms[0].world;
-}
-
 static void game_step(uint64_t name,
                       float dt) {
     ct_game_i0 *game_i = _get_game(name);
@@ -91,27 +65,7 @@ static void game_step(uint64_t name,
     }
 
     game_i->update(_G.game_state.world, dt);
-
     ct_ecs_a0->step(_G.game_state.world, dt);
-
-    main_camera_data_t camera_data = {};
-
-    ct_ecs_q_a0->foreach(_G.game_state.world,
-                         (ct_ecs_query_t0) {
-                                 .all =  CT_ECS_ARCHETYPE(VIEWPORT_COMPONENT,
-                                                          LOCAL_TO_WORLD_COMPONENT,
-                                                          CT_CAMERA_COMPONENT,
-                                                          CT_ACTIVE_CAMERA_COMPONENT)
-                         }, 0,
-                         _get_active_camera, &camera_data);
-
-    ct_renderer_a0->viewport_render(camera_data.viewport,
-                                    _G.game_state.world,
-                                    (ct_camera_data_t0) {
-                                            .world = camera_data.world,
-                                            .camera = camera_data.camera,
-                                    });
-
 }
 
 static bool game_is_paused(uint64_t name) {
