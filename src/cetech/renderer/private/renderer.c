@@ -6,39 +6,32 @@
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
 #include <celib/containers/array.h>
-
 #include <celib/api.h>
 #include <celib/config.h>
 #include <celib/macros.h>
 #include <celib/module.h>
 #include <celib/memory/memory.h>
 #include <celib/id.h>
-
-#include <celib/private/api_private.inl>
 #include <celib/cdb.h>
-
 #include <celib/log.h>
+#include <celib/task.h>
+#include <celib/os/window.h>
 
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/machine/machine.h>
 #include <cetech/ecs/ecs.h>
-
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
-
 #include <cetech/mesh/static_mesh.h>
-#include <celib/task.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"
 
 #include <cetech/debugui/debugui.h>
-
 #include "cetech/render_graph/render_graph.h"
 #include <cetech/renderer/gfx.h>
-#include <celib/os/window.h>
 #include <cetech/transform/transform.h>
 
 //==============================================================================

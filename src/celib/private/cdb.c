@@ -1117,6 +1117,19 @@ static void _gc_db() {
         uint32_t idx = _G.to_free_db[i];
         struct db_t *db_inst = &_G.dbs[idx];
 
+        uint32_t blob_n = ce_array_size(db_inst->blobs);
+        for (int j = 0; j < blob_n; ++j) {
+            CE_FREE(_G.allocator, db_inst->blobs[j].data);
+        }
+        ce_array_free(db_inst->blobs, _G.allocator);
+
+        uint32_t sets_n = ce_array_size(db_inst->sets);
+        for (int j = 0; j < sets_n; ++j) {
+            ce_array_free(db_inst->sets[i].objs, _G.allocator);
+            ce_hash_free(&db_inst->sets[i].set, _G.allocator);
+        }
+        ce_array_free(db_inst->sets, _G.allocator);
+
         virt_free(db_inst->to_free_objects_uid, db_inst->max_objects * sizeof(object_t **));
         virt_free(db_inst->object_pool, db_inst->max_objects * sizeof(object_t));
 
@@ -1384,7 +1397,7 @@ void _dump(ce_cdb_t0 db,
 static void dump(ce_cdb_t0 db,
                  uint64_t _obj,
                  char **output,
-                 struct ce_alloc_t0 *allocator) {
+                 ce_alloc_t0 *allocator) {
     char *str_buffer = NULL;
     char *blob_buffer = NULL;
     cnode_t *nodes = NULL;
@@ -1402,6 +1415,10 @@ static void dump(ce_cdb_t0 db,
     ce_array_push_n(*output, (char *) nodes, sizeof(cnode_t) * header.node_count, _G.allocator);
     ce_array_push_n(*output, (char *) str_buffer, header.string_buffer_size, _G.allocator);
     ce_array_push_n(*output, (char *) blob_buffer, header.blob_buffer_size, _G.allocator);
+
+    ce_array_free(nodes, allocator);
+    ce_array_free(str_buffer, allocator);
+    ce_array_free(blob_buffer, allocator);
 }
 
 

@@ -180,6 +180,8 @@ static bool _compile(ce_cdb_t0 db,
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
     ce_cdb_a0->set_blob(w, TEXTURE_DATA, tmp_data, size);
     ce_cdb_a0->write_commit(w);
+    CE_FREE(ce_memory_a0->system, tmp_data);
+
 
     return true;
 }

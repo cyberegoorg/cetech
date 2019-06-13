@@ -131,11 +131,13 @@ void _save(const char *filename,
            ce_cdb_t0 db,
            uint64_t obj,
            bool file_resource) {
+
     char *output = NULL;
     ce_cdb_a0->dump(db, obj, &output, _G.allocator);
     ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=obj},
                                         output,
                                         ce_array_size(output));
+    ce_buffer_free(output, _G.allocator);
 
     uint64_t type = ce_cdb_a0->obj_type(db, obj);
     const char *type_str = ce_id_a0->str_from_id64(type);
@@ -145,7 +147,6 @@ void _save(const char *filename,
                                    filename,
                                    file_resource);
 
-    ce_buffer_free(output, _G.allocator);
 }
 
 void _compile_files(char **files,
