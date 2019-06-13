@@ -1,28 +1,16 @@
 #include <cetech/debugdraw/dd.h>
 
-typedef struct render_graph_builder_pass {
-    ct_rg_pass_t0 *pass;
-    uint8_t viewid;
-    uint64_t layer;
-    bgfx_frame_buffer_handle_t fb;
-} render_graph_builder_pass;
-
-#define MAX_ATTACHMENTS 8+2
-typedef struct render_graph_builder_inst {
-    render_graph_builder_pass *pass;
-
-    ce_hash_t texture_map;
-
-    ce_hash_t layer_map;
-
-    uint16_t size[2];
-
-    uint8_t attachemnt_used;
-    bgfx_texture_handle_t attachemnt[MAX_ATTACHMENTS];
-} render_graph_builder_inst;
-
 #define _DEFAULT \
      CE_ID64_0("default", 0xf27605035974b5ecULL)
+
+static void _free_render_graph_builder_inst(render_graph_builder_inst *inst,
+                                           const ce_alloc_t0 *alloc) {
+    ce_array_free(inst->pass, alloc);
+    ce_hash_free(&inst->texture_map, alloc);
+    ce_hash_free(&inst->layer_map, alloc);
+
+    CE_FREE(alloc, inst);
+}
 
 static void builder_add_pass(void *inst,
                              struct ct_rg_pass_t0 *pass,
@@ -209,13 +197,24 @@ static uint8_t get_layer_viewid(void *inst,
 }
 
 static struct ct_rg_builder_t0 *create_render_builder() {
-    ct_rg_builder_t0 *obj = CE_ALLOC(_G.alloc,
-                                     ct_rg_builder_t0,
-                                     sizeof(ct_rg_builder_t0));
+    ct_rg_builder_t0 *obj = NULL;
 
-    render_graph_builder_inst *inst = CE_ALLOC(_G.alloc,
-                                               struct render_graph_builder_inst,
-                                               sizeof(render_graph_builder_inst));
+    if (ce_array_any(_G.builder_free)) {
+        obj = ce_array_back(_G.builder_free);
+        ce_array_pop_back(_G.builder_free);
+    } else {
+        obj = CE_ALLOC(_G.alloc, ct_rg_builder_t0,
+                       sizeof(ct_rg_builder_t0));
+    }
+
+    render_graph_builder_inst *inst = NULL;
+    if (ce_array_any(_G.builder_inst_free)) {
+        inst = ce_array_back(_G.builder_inst_free);
+        ce_array_pop_back(_G.builder_inst_free);
+    } else {
+        inst = CE_ALLOC(_G.alloc, render_graph_builder_inst,
+                        sizeof(render_graph_builder_inst));
+    }
 
 
     *inst = (render_graph_builder_inst) {};
@@ -238,5 +237,10 @@ static struct ct_rg_builder_t0 *create_render_builder() {
 }
 
 static void destroy_render_builder(ct_rg_builder_t0 *builder) {
+    render_graph_builder_inst *builder_inst = builder->inst;
 
+    ce_array_clean(builder_inst->pass);
+
+    ce_array_push(_G.builder_free, builder, _G.alloc);
+    ce_array_push(_G.builder_inst_free, builder_inst, _G.alloc);
 }

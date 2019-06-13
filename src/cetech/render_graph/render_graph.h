@@ -93,28 +93,19 @@ typedef struct ct_rg_module_t0 {
                      ct_rg_builder_t0 *builder);
 } ct_rg_module_t0;
 
-typedef struct ct_rg_t0 {
-    void *inst;
-
-    void (*set_module)(void *inst,
-                       ct_rg_module_t0 *module);
-
-    void (*setup)(void *inst,
-                  ct_rg_builder_t0 *builder);
-} ct_rg_t0;
-
 struct ct_rg_a0 {
-    ct_rg_t0 *(*create_graph)();
-
-    void (*destroy_graph)(ct_rg_t0 *render_graph);
-
     ct_rg_module_t0 *(*create_module)();
 
     void (*destroy_module)(ct_rg_module_t0 *module);
 
     ct_rg_builder_t0 *(*create_builder)();
-
     void (*destroy_builder)(ct_rg_builder_t0 *builder);
+
+    void (*screenspace_quad)(float texture_width,
+                             float texture_height,
+                             float texel_half,
+                             float width,
+                             float height);
 };
 
 CE_MODULE(ct_rg_a0);

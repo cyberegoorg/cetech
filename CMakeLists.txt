@@ -62,7 +62,7 @@ set(CORELIB_SOURCE_FILES
         ########################################################################
         src/celib/private/api.c
         src/celib/private/log.c
-        src/celib/private/module.c
+        src/celib/private/render_module.c
         src/celib/private/config.c
         src/celib/memory/private/memory.c
         src/celib/memory/private/memory_tracer.c

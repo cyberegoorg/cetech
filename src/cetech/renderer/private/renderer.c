@@ -235,24 +235,21 @@ void _render_components(ct_world_t0 world,
 static void _render_viewport(viewport_t *v,
                              ct_world_t0 world,
                              ct_camera_data_t0 main_camera) {
-    struct ct_rg_t0 *graph = ct_rg_a0->create_graph();
-    struct ct_rg_module_t0 *module = ct_rg_a0->create_module();
-    struct ct_rg_builder_t0 *builder = v->builder;
+    ct_rg_module_t0 *module = ct_rg_a0->create_module();
+    ct_rg_builder_t0 *builder = v->builder;
 
     builder->clear(builder);
 
     ct_default_rg_a0->feed_module(module);
     _feed_module(world, module);
 
-    graph->set_module(graph, module);
-    graph->setup(graph, v->builder);
+    module->on_setup(module->inst, builder);
 
     v->builder->execute(v->builder, &main_camera);
 
     _render_components(world, v->builder);
 
     ct_rg_a0->destroy_module(module);
-    ct_rg_a0->destroy_graph(graph);
 }
 
 static void render_begin(float dt) {
@@ -403,12 +400,12 @@ void _render_all_viewport(ct_world_t0 w,
     ct_camera_component *camera = ct_ecs_c_a0->get_all(w, CT_CAMERA_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        ct_renderer_a0->viewport_render(viewport[i].viewport,
-                                        w,
-                                        (ct_camera_data_t0) {
-                                                .world = ltw[i].world,
-                                                .camera = camera[i],
-                                        });
+        viewport_render(viewport[i].viewport,
+                        w,
+                        (ct_camera_data_t0) {
+                                .world = ltw[i].world,
+                                .camera = camera[i],
+                        });
     }
 }
 

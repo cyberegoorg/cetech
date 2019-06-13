@@ -62,62 +62,7 @@ static void init_decl() {
 }
 
 
-void screenspace_quad(float _textureWidth,
-                      float _textureHeight,
-                      float _texelHalf,
-                      bool _originBottomLeft,
-                      float _width,
-                      float _height) {
-    if (3 == ct_gfx_a0->bgfx_get_avail_transient_vertex_buffer(3, &ms_decl)) {
-        bgfx_transient_vertex_buffer_t vb;
-        ct_gfx_a0->bgfx_alloc_transient_vertex_buffer(&vb, 3, &ms_decl);
-        struct PosTexCoord0Vertex *vertex = (PosTexCoord0Vertex *) vb.data;
 
-        const float minx = -_width;
-        const float maxx = _width;
-        const float miny = 0.0f;
-        const float maxy = _height * 2.0f;
-
-        const float texelHalfW = _texelHalf / _textureWidth;
-        const float texelHalfH = _texelHalf / _textureHeight;
-        const float minu = -1.0f + texelHalfW;
-        const float maxu = 1.0f + texelHalfH;
-
-        const float zz = 0.0f;
-
-        float minv = texelHalfH;
-        float maxv = 2.0f + texelHalfH;
-
-        if (_originBottomLeft) {
-            float temp = minv;
-            minv = maxv;
-            maxv = temp;
-
-            minv -= 1.0f;
-            maxv -= 1.0f;
-        }
-
-        vertex[0].m_x = minx;
-        vertex[0].m_y = miny;
-        vertex[0].m_z = zz;
-        vertex[0].m_u = minu;
-        vertex[0].m_v = minv;
-
-        vertex[1].m_x = maxx;
-        vertex[1].m_y = miny;
-        vertex[1].m_z = zz;
-        vertex[1].m_u = maxu;
-        vertex[1].m_v = minv;
-
-        vertex[2].m_x = maxx;
-        vertex[2].m_y = maxy;
-        vertex[2].m_z = zz;
-        vertex[2].m_u = maxu;
-        vertex[2].m_v = maxv;
-
-        ct_gfx_a0->bgfx_set_transient_vertex_buffer(0, &vb, 0, 3);
-    }
-}
 
 
 static void output_pass_on_setup(void *inst,
@@ -165,14 +110,12 @@ static void output_pass_on_pass(void *inst,
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, _COLOR);
 
-
     ct_material_a0->set_texture_handler(copy_material,
                                         _DEFAULT,
                                         "s_input_texture",
                                         th);
 
-    screenspace_quad(size[0], size[1], 0,
-                     ct_gfx_a0->bgfx_get_caps()->originBottomLeft, 1.f, 1.0f);
+    ct_rg_a0->screenspace_quad(size[0], size[1], 0, 1.f, 1.0f);
 
     ct_material_a0->submit(copy_material, _DEFAULT, viewid);
 }
@@ -233,16 +176,16 @@ static void gbuffer_pass_on_pass(void *inst,
 
 
 static void feed_module(ct_rg_module_t0 *m1) {
-    ct_rg_module_t0 *gm = m1->add_extension_point(m1, _GBUFFER);
+    ct_rg_module_t0 *gm = m1->add_extension_point(m1->inst, _GBUFFER);
 
-    gm->add_pass(gm, &(gbuffer_pass) {
+    gm->add_pass(gm->inst, &(gbuffer_pass) {
             .pass = {
                     .on_setup = gbuffer_pass_on_setup,
                     .on_pass = gbuffer_pass_on_pass,
             }
     }, sizeof(gbuffer_pass));
 
-    m1->add_pass(m1, &(ct_rg_pass_t0) {
+    m1->add_pass(m1->inst, &(ct_rg_pass_t0) {
             .on_pass = output_pass_on_pass,
             .on_setup = output_pass_on_setup
     }, sizeof(ct_rg_pass_t0));
