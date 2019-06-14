@@ -89,7 +89,7 @@ static void _position_on_spawn(ct_world_t0 world,
                                uint64_t obj,
                                void *data) {
     ct_position_c *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_position_c));
+    ce_cdb_a0->read_to(db, obj, c, sizeof(ct_position_c));
 }
 
 static struct ct_ecs_component_i0 position_c_api = {
@@ -113,10 +113,11 @@ static uint64_t _position_cdb_type() {
     return POSITION_COMPONENT;
 }
 
-static void _position_property_editor(uint64_t obj,
+static void _position_property_editor(ce_cdb_t0 db,
+                                      uint64_t obj,
                                       uint64_t context,
                                       const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
 
     ct_editor_ui_a0->prop_vec3(pos, "Position", filter,
@@ -141,7 +142,7 @@ static void _rotation_on_spawn(ct_world_t0 world,
                                uint64_t obj,
                                void *data) {
     ct_rotation_c *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_rotation_c));
+    ce_cdb_a0->read_to(db, obj, c, sizeof(ct_rotation_c));
 }
 
 static struct ct_ecs_component_i0 rotation_c_api = {
@@ -164,10 +165,11 @@ static uint64_t _rotation_cdb_type() {
     return ROTATION_COMPONENT;
 }
 
-static void _rotation_property_editor(uint64_t obj,
+static void _rotation_property_editor(ce_cdb_t0 db,
+                                      uint64_t obj,
                                       uint64_t context,
                                       const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
 
     ct_editor_ui_a0->prop_vec3(pos, "Rotation", filter,
@@ -191,7 +193,7 @@ static void _scale_on_spawn(ct_world_t0 world,
                             uint64_t obj,
                             void *data) {
     ct_scale_c *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_scale_c));
+    ce_cdb_a0->read_to(db, obj, c, sizeof(ct_scale_c));
 }
 
 static struct ct_ecs_component_i0 scale_c_api = {
@@ -215,10 +217,11 @@ static uint64_t _scale_cdb_type() {
     return SCALE_COMPONENT;
 }
 
-static void _scale_property_editor(uint64_t obj,
+static void _scale_property_editor(ce_cdb_t0 db,
+                                   uint64_t obj,
                                    uint64_t context,
                                    const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
 
     ct_editor_ui_a0->prop_vec3(pos, "Scale", filter,

@@ -217,7 +217,8 @@ static uint64_t _node_property_cdb_type() {
     return CT_NODE_GRAPH_NODE;
 }
 
-static void _node_property_draw(uint64_t obj,
+static void _node_property_draw(ce_cdb_t0 db,
+                                uint64_t obj,
                                 uint64_t context,
                                 const char *filter) {
     const ce_cdb_obj_o0 *node_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);

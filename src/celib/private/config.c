@@ -142,11 +142,11 @@ static int load_from_yaml_file(ce_cdb_t0 db,
 
     cnode_t *nodes = NULL;
     uint64_t obj = ce_ydb_a0->cnodes_from_vio(f, &nodes, alloc);
-    ce_ydb_a0->create_root_obj(nodes, ce_cdb_a0->db());
+    ce_ydb_a0->create_root_obj(nodes, db);
     ce_os_vio_a0->close(f);
     ce_array_free(nodes, alloc);
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t variables_n = ce_cdb_a0->read_objset_num(reader, CE_CONFIG_VARIABLES);
     uint64_t variables_k[variables_n];
@@ -184,7 +184,7 @@ static int load_from_yaml_file(ce_cdb_t0 db,
 
     }
 
-    ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
+    ce_cdb_a0->destroy_object(db, obj);
 
     return 1;
 }

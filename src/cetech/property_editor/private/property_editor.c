@@ -36,12 +36,15 @@ static struct _G {
     bool visible;
 } _G;
 
-static void draw(uint64_t obj,
+static void draw(ce_cdb_t0 db,
+                 uint64_t obj,
                  uint64_t context);
 
-static void _generic_prop_draw(uint64_t obj,
-                               uint64_t context, const char * filter) {
-    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+static void _generic_prop_draw(ce_cdb_t0 db,
+                               uint64_t obj,
+                               uint64_t context,
+                               const char *filter) {
+    uint64_t type = ce_cdb_a0->obj_type(db, obj);
 
     const ce_cdb_type_def_t0 *defs = ce_cdb_a0->obj_type_def(type);
 
@@ -56,40 +59,40 @@ static void _generic_prop_draw(uint64_t obj,
 
         switch (type) {
             case CE_CDB_TYPE_REF:
-                ct_editor_ui_a0->prop_resource(obj, def->name,filter, prop_name,
+                ct_editor_ui_a0->prop_resource(obj, def->name, filter, prop_name,
                                                def->obj_type, context, obj);
                 break;
             case CE_CDB_TYPE_FLOAT:
-                ct_editor_ui_a0->prop_float(obj, def->name,filter, prop_name, (ui_float_p0) {});
+                ct_editor_ui_a0->prop_float(obj, def->name, filter, prop_name, (ui_float_p0) {});
                 break;
 
             case CE_CDB_TYPE_UINT64:
-                ct_editor_ui_a0->prop_uin64(obj, def->name,filter, prop_name, (ui_uint64_p0) {});
+                ct_editor_ui_a0->prop_uin64(obj, def->name, filter, prop_name, (ui_uint64_p0) {});
                 break;
 
             case CE_CDB_TYPE_BOOL:
-                ct_editor_ui_a0->prop_bool(obj, def->name,filter, prop_name);
+                ct_editor_ui_a0->prop_bool(obj, def->name, filter, prop_name);
                 break;
             case CE_CDB_TYPE_STR:
-                ct_editor_ui_a0->prop_str(obj, def->name,filter, prop_name, obj);
+                ct_editor_ui_a0->prop_str(obj, def->name, filter, prop_name, obj);
                 break;
             case CE_CDB_TYPE_SUBOBJECT: {
-                const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+                const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
                 uint64_t subobj = ce_cdb_a0->read_subobject(r, prop_name, 0);
-                draw(subobj, context);
+                draw(db, subobj, context);
                 break;
             }
             case CE_CDB_TYPE_SET_SUBOBJECT: {
                 bool open = ct_debugui_a0->TreeNodeEx(def->name,
                                                       DebugUITreeNodeFlags_DefaultOpen);
                 if (open) {
-                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
                     uint64_t n = ce_cdb_a0->read_objset_num(r, prop_name);
                     uint64_t k[n];
                     ce_cdb_a0->read_objset(r, prop_name, k);
                     for (int j = 0; j < n; ++j) {
                         uint64_t subobj = k[j];
-                        draw(subobj, context);
+                        draw(db, subobj, context);
                     }
                     ct_debugui_a0->TreePop();
                 }
@@ -102,8 +105,11 @@ static void _generic_prop_draw(uint64_t obj,
         }
     }
 }
+
 static char filter_text[128] = {};
-static void draw(uint64_t obj,
+
+static void draw(ce_cdb_t0 db,
+                 uint64_t obj,
                  uint64_t context) {
     if (!obj) {
         return;
@@ -111,17 +117,17 @@ static void draw(uint64_t obj,
 
     ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
 
-    uint64_t obj_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+    uint64_t obj_type = ce_cdb_a0->obj_type(db, obj);
 
     char filter[128] = {};
-    snprintf(filter,CE_ARRAY_LEN(filter), "*%s*", filter_text);
+    snprintf(filter, CE_ARRAY_LEN(filter), "*%s*", filter_text);
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
 
         if (i && i->cdb_type && (i->cdb_type() == obj_type)) {
 
             if (i->draw_ui) {
-                i->draw_ui(obj, context, filter);
+                i->draw_ui(db, obj, context, filter);
                 return;
             }
             break;
@@ -130,7 +136,7 @@ static void draw(uint64_t obj,
         it = ce_api_a0->next(it);
     }
 
-    _generic_prop_draw(obj, context, filter);
+    _generic_prop_draw(db, obj, context, filter);
 }
 
 static ct_property_editor_i0 *get_interface(uint64_t obj) {
@@ -266,7 +272,7 @@ static void on_debugui(uint64_t dock) {
     }
     ct_editor_ui_a0->ui_prop_header_end(open);
 
-    draw(obj, context);
+    draw(ce_cdb_a0->db(), obj, context);
 }
 
 static void on_menu(uint64_t dock) {

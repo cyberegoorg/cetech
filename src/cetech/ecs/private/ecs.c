@@ -699,7 +699,8 @@ static void _init_spawn_infos(spawn_infos_t *infos) {
     ce_mpmc_init(&infos->obj_spawninfo_free, 4096, sizeof(uint64_t), _G.allocator);
 }
 
-static void _add_spawn_obj(spawn_infos_t *infos,
+static void _add_spawn_obj(ce_cdb_t0 db,
+                           spawn_infos_t *infos,
                            uint64_t obj,
                            struct ct_entity_t0 ent) {
     CE_ASSERT("ecs", ent.h != 0);
@@ -722,21 +723,23 @@ static void _add_spawn_obj(spawn_infos_t *infos,
 
     spawn_info_t *spawn_info = &infos->obj_spawninfo_pool[spawninfo_idx];
     spawn_info->ent_obj = obj;
-    spawn_info->ev_queue = ce_cdb_a0->new_obj_listener(ce_cdb_a0->db(), obj);
+    spawn_info->ev_queue = ce_cdb_a0->new_obj_listener(db, obj);
 
     ce_array_push(spawn_info->ents, ent, _G.allocator);
 }
 
-static void _add_ent_spawn_obj(world_instance_t *world,
+static void _add_ent_spawn_obj(ce_cdb_t0 db,
+                               world_instance_t *world,
                                uint64_t obj,
                                struct ct_entity_t0 ent) {
-    _add_spawn_obj(&world->obj_spawninfo, obj, ent);
+    _add_spawn_obj(db, &world->obj_spawninfo, obj, ent);
 }
 
-static void _add_comp_spawn_obj(world_instance_t *world,
+static void _add_comp_spawn_obj(ce_cdb_t0 db,
+                                world_instance_t *world,
                                 uint64_t obj,
                                 struct ct_entity_t0 ent) {
-    _add_spawn_obj(&world->comp_spawninfo, obj, ent);
+    _add_spawn_obj(db, &world->comp_spawninfo, obj, ent);
 }
 
 static spawn_info_t *_get_spawninfo(spawn_infos_t *infos,
@@ -818,11 +821,12 @@ static bool has(ct_world_t0 world,
 }
 
 
-static ct_archemask_t0 combine_component_obj(const uint64_t *component_obj,
+static ct_archemask_t0 combine_component_obj(ce_cdb_t0 db,
+                                             const uint64_t *component_obj,
                                              uint32_t name_count) {
     uint64_t new_type = 0;
     for (int i = 0; i < name_count; ++i) {
-        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), component_obj[i]);
+        uint64_t type = ce_cdb_a0->obj_type(db, component_obj[i]);
         new_type |= (1 << ce_hash_lookup(&_G.component_types, type, 0));
     }
 
@@ -937,7 +941,7 @@ static void _add_components_from_obj(world_instance_t *world,
         ci->from_cdb_obj(world->world, db, obj, comp_data);
     }
 
-    _add_comp_spawn_obj(world, obj, ent);
+    _add_comp_spawn_obj(db, world, obj, ent);
 }
 
 static void remove_components(ct_world_t0 world,
@@ -1101,7 +1105,8 @@ static void process_query(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_system_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version,
+                                     w->global_system_version)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1156,7 +1161,8 @@ static void process_query_serial(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version, w->global_system_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version,
+                                     w->global_system_version)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1310,7 +1316,8 @@ static void _process_group(ct_world_t0 world,
                 sys->process(w->world, dt, rq_version, (ct_ecs_cmd_buffer_t *) buff);
             }
 
-            ce_hash_add(&w->last_system_version, outputs[i], w->global_system_version, _G.allocator);
+            ce_hash_add(&w->last_system_version, outputs[i], w->global_system_version,
+                        _G.allocator);
 
             _execute_cmd(buff);
             _free_cmd_buff(cmd_buf_idx);
@@ -1326,7 +1333,7 @@ static void step(ct_world_t0 world,
                  float dt) {
 
     world_instance_t *w = get_world_instance(world);
-    if(w->global_world_version != w->last_world_version) {
+    if (w->global_world_version != w->last_world_version) {
         w->last_world_version = w->global_world_version;
         _build_graphs();
     }
@@ -1491,6 +1498,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
         return (ct_entity_t0) {0};
     }
 
+    ce_cdb_t0 db = ce_cdb_a0->db();
     world_instance_t *w = get_world_instance(world);
 
     uint64_t entity_obj = name;
@@ -1498,15 +1506,15 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
     ct_entity_t0 root_ent;
     create_entities_objs(world, &root_ent, 1, &entity_obj);
 
-    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(ce_cdb_a0->db(), entity_obj);
+    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(db, entity_obj);
 
     uint64_t components_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_COMPONENTS);
     uint64_t components_keys[components_n];
     ce_cdb_a0->read_objset(ent_reader, ENTITY_COMPONENTS, components_keys);
 
-    ct_archemask_t0 ent_type = combine_component_obj(components_keys, components_n);
+    ct_archemask_t0 ent_type = combine_component_obj(db, components_keys, components_n);
 
-    _add_ent_spawn_obj(w, entity_obj, root_ent);
+    _add_ent_spawn_obj(db, w, entity_obj, root_ent);
 
     _add_components_to_archetype(world, root_ent, ent_type);
 
@@ -1538,7 +1546,7 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
             }
         }
 
-        _add_comp_spawn_obj(w, component_obj, root_ent);
+        _add_comp_spawn_obj(db, w, component_obj, root_ent);
     }
 
     uint64_t children_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_CHILDREN);

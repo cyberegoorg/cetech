@@ -196,9 +196,11 @@ static uint64_t cdb_type() {
     return TEXTURE_TYPE;
 }
 
-static void draw_property(uint64_t obj,
+static void draw_property(ce_cdb_t0 db,
+                          uint64_t obj,
                           uint64_t context,
                           const char *filter) {
+
     ct_editor_ui_a0->prop_filename(obj, "Input", filter, TEXTURE_INPUT, "png,tga,bmp", 0);
     ct_editor_ui_a0->prop_bool(obj, "Gen mipmaps", filter, TEXTURE_GEN_MIPMAPS);
     ct_editor_ui_a0->prop_bool(obj, "Is normalmap", filter, TEXTURE_IS_NORMALMAP);

@@ -92,7 +92,7 @@ static void _camera_on_spawn(ct_world_t0 world,
                              void *data) {
     ct_camera_component *c = data;
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     const char *camera_type = ce_cdb_a0->read_str(r, PROP_CAMERA_TYPE, "perspective");
 
     *c = (ct_camera_component) {
@@ -121,7 +121,8 @@ static struct ct_ecs_component_i0 ct_active_camera_component = {
 };
 
 ///
-static void _draw_camera_property(uint64_t obj,
+static void _draw_camera_property(ce_cdb_t0 db,
+                                  uint64_t obj,
                                   uint64_t context,
                                   const char *filter) {
 
@@ -129,7 +130,7 @@ static void _draw_camera_property(uint64_t obj,
                                      PROP_CAMERA_TYPE,
                                      (const char *[]) {"perspective", "ortho"}, 2, obj);
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     const char *camea_type_str = ce_cdb_a0->read_str(r, PROP_CAMERA_TYPE, "");
     uint64_t camera_type = ce_id_a0->id64(camea_type_str);
 

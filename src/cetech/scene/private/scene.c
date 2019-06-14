@@ -425,7 +425,8 @@ static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
         },
 };
 
-static void draw_property(uint64_t obj,
+static void draw_property(ce_cdb_t0 db,
+                          uint64_t obj,
                           uint64_t context,const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t import = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);

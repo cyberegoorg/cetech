@@ -123,7 +123,8 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Static mesh";
 }
 
-static void property_editor(uint64_t obj,
+static void property_editor(ce_cdb_t0 db,
+                            uint64_t obj,
                             uint64_t context,
                             const char *filter) {
     ct_editor_ui_a0->prop_resource(obj, "Scene", filter,

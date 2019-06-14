@@ -41,11 +41,11 @@ static void _world2d_from_cdb(ct_world_t0 world,
                               void *data) {
     ct_physics_world2d_c *c = (ct_physics_world2d_c *) data;
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
 
     uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD2D_GRAVITY_PROP, 0);
 
-    const ce_cdb_obj_o0 *gravity_r = ce_cdb_a0->read(ce_cdb_a0->db(), gravity);
+    const ce_cdb_obj_o0 *gravity_r = ce_cdb_a0->read(db, gravity);
 
     c->gravity = (ce_vec2_t) {
             .x=ce_cdb_a0->read_float(gravity_r, PROP_VEC_X, 0.f),
@@ -61,10 +61,11 @@ static struct ct_ecs_component_i0 world2d_component_i = {
         .from_cdb_obj = _world2d_from_cdb,
 };
 
-static void _wolrd2d_property_editor(uint64_t obj,
+static void _wolrd2d_property_editor(ce_cdb_t0 db,
+                                     uint64_t obj,
                                      uint64_t context,
                                      const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD2D_GRAVITY_PROP, 0);
 
     ct_editor_ui_a0->prop_vec2(gravity, "Gravity", filter,
@@ -105,11 +106,11 @@ static void _velocity_from_cdb(ct_world_t0 world,
                                void *data) {
     ct_velocity2d_c *c = (ct_velocity2d_c *) data;
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
 
     uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY2D_LINEAR_PROP, 0);
 
-    const ce_cdb_obj_o0 *linear_r = ce_cdb_a0->read(ce_cdb_a0->db(), linear);
+    const ce_cdb_obj_o0 *linear_r = ce_cdb_a0->read(db, linear);
 
     c->linear = (ce_vec2_t) {
             .x=ce_cdb_a0->read_float(linear_r, PROP_VEC_X, 0.f),
@@ -126,10 +127,11 @@ static struct ct_ecs_component_i0 velocity2d_component_i = {
         .from_cdb_obj = _velocity_from_cdb,
 };
 
-static void _velocity_property_editor(uint64_t obj,
+static void _velocity_property_editor(ce_cdb_t0 db,
+                                      uint64_t obj,
                                       uint64_t context,
                                       const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY2D_LINEAR_PROP, 0);
 
     ct_editor_ui_a0->prop_vec2(linear, "Linear", filter,
@@ -176,19 +178,19 @@ static void _collider2d_from_cdb(ct_world_t0 world,
                                  void *data) {
     ct_collider2d_c *c = (ct_collider2d_c *) data;
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t shape = ce_cdb_a0->read_subobject(r, PHYSICS_COLLIDER2D_SHAPE_PROP, 0);
-    uint64_t shape_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), shape);
+    uint64_t shape_type = ce_cdb_a0->obj_type(db, shape);
 
     c->type = shape_type;
 
     switch (shape_type) {
         case COLLIDER2D_RECTANGLE: {
-            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(ce_cdb_a0->db(), shape);
+            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(db, shape);
             uint64_t half_size = ce_cdb_a0->read_subobject(shape_r,
                                                            PHYSICS_COLLIDER2D_RECTANGLE_HALF_SIZE,
                                                            0);
-            ce_cdb_a0->read_to(ce_cdb_a0->db(), half_size,
+            ce_cdb_a0->read_to(db, half_size,
                                &c->rectangle.half_size, sizeof(c->rectangle.half_size));
         }
             break;
@@ -226,7 +228,7 @@ static void _mass2d_from_cdb(ct_world_t0 world,
                              void *data) {
     ct_mass2d_c *c = (ct_mass2d_c *) data;
 
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     c->mass = ce_cdb_a0->read_float(r, MASS2D_PROP, 0);
 }
 
@@ -237,7 +239,8 @@ static struct ct_ecs_component_i0 mass2d_component_i = {
         .from_cdb_obj = _mass2d_from_cdb,
 };
 
-static void _mass2d_property_editor(uint64_t obj,
+static void _mass2d_property_editor(ce_cdb_t0 db,
+                                    uint64_t obj,
                                     uint64_t context,
                                     const char *filter) {
     ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS2D_PROP, (ui_float_p0) {});
@@ -268,12 +271,13 @@ static uint64_t _id_to_shape(int id) {
     return shape[id];
 }
 
-static void _collider_property_editor(uint64_t obj,
+static void _collider_property_editor(ce_cdb_t0 db,
+                                      uint64_t obj,
                                       uint64_t context,
                                       const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t shape = ce_cdb_a0->read_subobject(r, PHYSICS_COLLIDER2D_SHAPE_PROP, 0);
-    uint64_t shape_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), shape);
+    uint64_t shape_type = ce_cdb_a0->obj_type(db, shape);
 
     const char *shape_str[] = {
             "Rectangle",
@@ -282,16 +286,16 @@ static void _collider_property_editor(uint64_t obj,
     int cur_item = _shape_to_id(shape_type);
     if (ct_debugui_a0->Combo("Type", &cur_item, shape_str, CE_ARRAY_LEN(shape_str), -1)) {
         shape_type = _id_to_shape(cur_item);
-        uint64_t new_shape = ce_cdb_a0->create_object(ce_cdb_a0->db(), shape_type);
+        uint64_t new_shape = ce_cdb_a0->create_object(db, shape_type);
 
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
         ce_cdb_a0->set_subobject(w, PHYSICS_COLLIDER2D_SHAPE_PROP, new_shape);
         ce_cdb_a0->write_commit(w);
     }
 
     switch (shape_type) {
         case COLLIDER2D_RECTANGLE: {
-            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(ce_cdb_a0->db(), shape);
+            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(db, shape);
             uint64_t half_size = ce_cdb_a0->read_subobject(shape_r,
                                                            PHYSICS_COLLIDER2D_RECTANGLE_HALF_SIZE,
                                                            0);

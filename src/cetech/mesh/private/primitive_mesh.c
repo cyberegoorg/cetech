@@ -173,7 +173,7 @@ static void _rectangle_renderer_on_spawn(ct_world_t0 world,
                                          uint64_t obj,
                                          void *data) {
     ct_primitive_mesh_c *c = data;
-    ce_cdb_a0->read_to(ce_cdb_a0->db(), obj, c, sizeof(ct_primitive_mesh_c));
+    ce_cdb_a0->read_to(db, obj, c, sizeof(ct_primitive_mesh_c));
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {

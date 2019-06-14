@@ -56,9 +56,10 @@ static struct ct_ecs_component_i0 *get_component_interface(uint64_t cdb_type) {
     return NULL;
 };
 
-static void draw_component(uint64_t obj,
+static void draw_component(ce_cdb_t0 db,
+                           uint64_t obj,
                            uint64_t context) {
-    uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj);
+    uint64_t type = ce_cdb_a0->obj_type(db, obj);
 
     ct_ecs_component_i0 *c = get_component_interface(type);
 
@@ -83,14 +84,15 @@ static void draw_component(uint64_t obj,
 
     if (open) {
         ct_editor_ui_a0->ui_prop_body(obj);
-        ct_property_editor_a0->draw(obj, context);
+        ct_property_editor_a0->draw(db, obj, context);
 
         ct_editor_ui_a0->ui_prop_body_end();
     }
     ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
-static void _entity_ui(uint64_t obj, const char *filter) {
+static void _entity_ui(uint64_t obj,
+                       const char *filter) {
     bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
 
     if (open) {
@@ -114,15 +116,17 @@ static void _entity_ui(uint64_t obj, const char *filter) {
     ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
-static void draw_ui(uint64_t obj,
-                    uint64_t context,const char *filter) {
+static void draw_ui(ce_cdb_t0 db,
+                    uint64_t obj,
+                    uint64_t context,
+                    const char *filter) {
     if (!obj) {
         return;
     }
 
     _entity_ui(obj, filter);
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
     uint64_t keys[n];
@@ -130,22 +134,23 @@ static void draw_ui(uint64_t obj,
 
     for (int i = 0; i < n; ++i) {
         uint64_t component = keys[i];
-        draw_component(component, context);
+        draw_component(db, component, context);
     }
 }
 
 
 static char modal_buffer[128] = {};
 
-static bool _component_exist(uint64_t obj,
+static bool _component_exist(ce_cdb_t0 db,
+                             uint64_t obj,
                              uint64_t component_type) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
     uint64_t n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
     uint64_t keys[n];
     ce_cdb_a0->read_objset(reader, ENTITY_COMPONENTS, keys);
 
     for (int i = 0; i < n; ++i) {
-        uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), keys[i]);
+        uint64_t type = ce_cdb_a0->obj_type(db, keys[i]);
         if (type == component_type) {
             return true;
         }
@@ -154,7 +159,8 @@ static bool _component_exist(uint64_t obj,
     return false;
 }
 
-static void _add_comp_popup(const char *modal_id,
+static void _add_comp_popup(ce_cdb_t0 db,
+                            const char *modal_id,
                             uint64_t obj) {
     if (ct_debugui_a0->BeginPopup(modal_id, 0)) {
         struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
@@ -183,7 +189,7 @@ static void _add_comp_popup(const char *modal_id,
             }
 
             uint64_t component_type = i->cdb_type;
-            if (i->display_name && !_component_exist(obj, component_type)) {
+            if (i->display_name && !_component_exist(db,obj, component_type)) {
                 const char *label = i->display_name();
 
                 if (modal_buffer[0]) {
@@ -200,9 +206,9 @@ static void _add_comp_popup(const char *modal_id,
                                                      &(ce_vec2_t) {});
 
                 if (add) {
-                    uint64_t component = ce_cdb_a0->create_object(ce_cdb_a0->db(), component_type);
+                    uint64_t component = ce_cdb_a0->create_object(db, component_type);
 
-                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
+                    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
                     ce_cdb_a0->objset_add_obj(w, ENTITY_COMPONENTS, component);
                     ce_cdb_a0->write_commit(w);
                     modal_buffer[0] = '\0';
@@ -231,7 +237,7 @@ void draw_menu(uint64_t obj) {
     char modal_id[128] = {'\0'};
     sprintf(modal_id, "select...##select_comp_%llu", obj);
 
-    _add_comp_popup(modal_id, obj);
+    _add_comp_popup(ce_cdb_a0->db(), modal_id, obj);
 
     if (add) {
         ct_debugui_a0->OpenPopup(modal_id);

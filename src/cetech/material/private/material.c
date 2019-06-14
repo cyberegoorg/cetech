@@ -184,10 +184,11 @@ static void ui_texture(uint64_t var,
                                    TEXTURE_TYPE, context, var);
 }
 
-void draw_property(uint64_t material,
+void draw_property(ce_cdb_t0 db,
+                   uint64_t material,
                    uint64_t context,
                    const char *filter) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), material);
+    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, material);
 
     uint64_t layer_count = ce_cdb_a0->read_objset_num(reader, MATERIAL_LAYERS);
     uint64_t layer_keys[layer_count];
@@ -195,7 +196,7 @@ void draw_property(uint64_t material,
 
     for (int i = 0; i < layer_count; ++i) {
         uint64_t layer = layer_keys[i];
-        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
+        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(db, layer);
 
         const char *layer_name = ce_cdb_a0->read_str(layer_reader,
                                                      MATERIAL_LAYER_NAME, NULL);
@@ -220,7 +221,7 @@ void draw_property(uint64_t material,
                 if (!var) {
                     continue;
                 }
-                uint64_t cdb_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), var);
+                uint64_t cdb_type = ce_cdb_a0->obj_type(db, var);
                 uint64_t type = _cdb_type_to_type(cdb_type);
 
                 if (!type) {
@@ -731,7 +732,8 @@ static uint64_t _vec4_cdb_type() {
     return MATERIAL_VAR_TYPE_VEC4;
 }
 
-static void _vec4_property_editor(uint64_t obj,
+static void _vec4_property_editor(ce_cdb_t0 db,
+                                  uint64_t obj,
                                   uint64_t context,
                                   const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
@@ -756,7 +758,8 @@ static uint64_t _color_cdb_type() {
     return MATERIAL_VAR_TYPE_COLOR;
 }
 
-static void _color_property_editor(uint64_t obj,
+static void _color_property_editor(ce_cdb_t0 db,
+                                   uint64_t obj,
                                    uint64_t context,
                                    const char *filter) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
