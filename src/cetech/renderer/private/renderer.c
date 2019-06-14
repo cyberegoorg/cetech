@@ -33,6 +33,7 @@
 #include "cetech/render_graph/render_graph.h"
 #include <cetech/renderer/gfx.h>
 #include <cetech/transform/transform.h>
+#include <cetech/metrics/metrics.h>
 
 //==============================================================================
 // GLobals
@@ -274,6 +275,20 @@ static void render_begin(float dt) {
 
 static void render(float dt) {
     ct_debugui_a0->render();
+
+    const bgfx_stats_t *s = bgfx_get_stats();
+
+    double freq = s->cpuTimerFreq;
+
+    ct_metrics_a0->set_float(ce_id_a0->id64("renderer.wait_submit"),
+                                 1000 * s->waitSubmit / freq);
+
+    ct_metrics_a0->set_float(ce_id_a0->id64("renderer.wait_render"),
+                                 1000 * s->waitRender / freq);
+
+    ct_metrics_a0->set_float(ce_id_a0->id64("renderer.num_draw"),
+                             s->numDraw);
+
     bgfx_frame(false);
 }
 
@@ -486,6 +501,9 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
 
     renderer_create();
 
+    ct_metrics_a0->reg_float_metric("renderer.wait_submit");
+    ct_metrics_a0->reg_float_metric("renderer.wait_render");
+    ct_metrics_a0->reg_float_metric("renderer.num_draw");
 }
 
 void CE_MODULE_UNLOAD(renderer)(struct ce_api_a0 *api,

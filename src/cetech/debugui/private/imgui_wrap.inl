@@ -138,7 +138,7 @@ namespace imgui_wrap {
                    const char *overlay_text,
                    float scale_min,
                    float scale_max,
-                   ce_vec2_t *graph_size,
+                   const ce_vec2_t *graph_size,
                    int stride) {
         ImGui::PlotLines(
                 label,
@@ -180,7 +180,7 @@ namespace imgui_wrap {
                        const char *overlay_text,
                        float scale_min,
                        float scale_max,
-                       ce_vec2_t *graph_size,
+                       const ce_vec2_t *graph_size,
                        int stride) {
         return ImGui::PlotHistogram(
                 label,

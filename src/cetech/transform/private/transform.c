@@ -317,20 +317,6 @@ static void transform_system(ct_world_t0 world,
 
     ct_ecs_q_a0->foreach(world,
                          (ct_ecs_query_t0) {
-                                 .all = CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT),
-
-                                 .any = CT_ECS_ARCHETYPE(POSITION_COMPONENT,
-                                                         ROTATION_COMPONENT,
-                                                         SCALE_COMPONENT),
-
-                                 .write = CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT),
-
-                                 .only_changed = true,
-                         }, rq_version,
-                         _trs_to_local_to_parent, NULL);
-
-    ct_ecs_q_a0->foreach(world,
-                         (ct_ecs_query_t0) {
                                  .all = CT_ECS_ARCHETYPE(LOCAL_TO_WORLD_COMPONENT),
 
                                  .any = CT_ECS_ARCHETYPE(POSITION_COMPONENT,
@@ -344,6 +330,22 @@ static void transform_system(ct_world_t0 world,
                                  .only_changed = true,
                          }, rq_version,
                          _trs_to_local_to_world, NULL);
+
+    ct_ecs_q_a0->foreach(world,
+                         (ct_ecs_query_t0) {
+                                 .all = CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT),
+
+                                 .any = CT_ECS_ARCHETYPE(POSITION_COMPONENT,
+                                                         ROTATION_COMPONENT,
+                                                         SCALE_COMPONENT),
+
+                                 .write = CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT),
+
+                                 .only_changed = true,
+                         }, rq_version,
+                         _trs_to_local_to_parent, NULL);
+
+
 
     ct_ecs_q_a0->foreach(world,
                          (ct_ecs_query_t0) {

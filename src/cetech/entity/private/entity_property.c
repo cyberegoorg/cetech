@@ -70,17 +70,20 @@ static void draw_component(uint64_t obj,
 
     char buffer[128] = {};
     snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", c->display_name());
+
+    float w = ct_debugui_a0->GetContentRegionAvail().x;
     bool open = ct_editor_ui_a0->ui_prop_header(buffer);
+    ct_debugui_a0->SameLine(w - 20, 0);
+
+    ct_debugui_a0->PushIDI((void *) obj);
+    if (ct_debugui_a0->Button(ICON_FA_MINUS, &(ce_vec2_t) {})) {
+        ce_cdb_a0->destroy_object(db, obj);
+    }
+    ct_debugui_a0->PopID();
 
     if (open) {
         ct_editor_ui_a0->ui_prop_body(obj);
         ct_property_editor_a0->draw(obj, context);
-
-        ct_debugui_a0->PushIDI((void *) obj);
-        if (ct_debugui_a0->Button(ICON_FA_MINUS " ""Remove", &(ce_vec2_t) {})) {
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
-        }
-        ct_debugui_a0->PopID();
 
         ct_editor_ui_a0->ui_prop_body_end();
     }

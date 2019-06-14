@@ -22,19 +22,20 @@ typedef struct ce_memory_tracer_vt0 {
                       uint32_t line);
 
     void (*untrace_ptr)(ce_memory_tracer_o0 *inst,
-                        void *ptr,
-                        size_t size);
+                        void *ptr);
+
+    uint64_t (*allocated_size)(ce_memory_tracer_o0 *inst);
 } ce_memory_tracer_vt0;
 
-typedef struct ce_memory_tracer_t0 {
+typedef struct ce_mem_tracer_t0 {
     ce_memory_tracer_o0 *inst;
     ce_memory_tracer_vt0 *vt;
-} ce_memory_tracer_t0;
+} ce_mem_tracer_t0;
 
 struct ce_memory_tracer_a0 {
-    ce_memory_tracer_t0 *(*create)();
+    ce_mem_tracer_t0 *(*create)();
 
-    void (*destroy)(ce_memory_tracer_t0 *tracer);
+    void (*destroy)(ce_mem_tracer_t0 *tracer);
 };
 
 CE_MODULE(ce_memory_tracer_a0);

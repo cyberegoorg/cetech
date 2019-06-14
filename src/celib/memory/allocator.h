@@ -43,7 +43,7 @@ extern "C" {
     ((a)->vt->reallocate((a->inst),p,0,0,0, __FILE__, __LINE__))
 
 typedef struct ce_alloc_o0 ce_alloc_o0;
-typedef struct ce_memory_tracer_t0 ce_memory_tracer_t0;
+typedef struct ce_mem_tracer_t0 ce_mem_tracer_t0;
 
 typedef struct ce_alloc_vt0 {
     void *(*reallocate)(const ce_alloc_o0 *a,
@@ -54,7 +54,7 @@ typedef struct ce_alloc_vt0 {
                         const char *filename,
                         uint32_t line);
 
-    ce_memory_tracer_t0 *(*memory_tracer)(const ce_alloc_o0 *a);
+    ce_mem_tracer_t0 *(*memory_tracer)(const ce_alloc_o0 *a);
 } ce_alloc_vt0;
 
 typedef struct ce_alloc_t0 {

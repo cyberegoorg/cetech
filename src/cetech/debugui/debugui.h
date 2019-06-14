@@ -464,7 +464,7 @@ struct ct_debugui_a0 {
                       const char *overlay_text,
                       float scale_min,
                       float scale_max,
-                      ce_vec2_t *graph_size,
+                      const ce_vec2_t *graph_size,
                       int stride);
 
     void (*PlotLines2)(const char *label,
@@ -485,7 +485,7 @@ struct ct_debugui_a0 {
                           const char *overlay_text,
                           float scale_min,
                           float scale_max,
-                          ce_vec2_t *graph_size,
+                          const ce_vec2_t *graph_size,
                           int stride);
 
     void (*PlotHistogram2)(const char *label,

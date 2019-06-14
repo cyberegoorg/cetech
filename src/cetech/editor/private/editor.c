@@ -28,6 +28,7 @@
 #include <cetech/game/game_system.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/metrics/metrics.h>
 
 #define _G plaground_global
 
@@ -72,6 +73,11 @@ static float draw_main_menu() {
         float v[2];
         ct_debugui_a0->GetWindowSize(v);
         menu_height = v[1];
+
+        float w = v[0];
+        float dt = ct_metrics_a0->get_float(ce_id_a0->id64("dt"));
+        ct_debugui_a0->SameLine(w - 120, 0);
+        ct_debugui_a0->Text("FPS: %.0f | DT: %.0f ms", 1.0f/dt, dt*1000);
 
         ct_debugui_a0->EndMainMenuBar();
     }

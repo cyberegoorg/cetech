@@ -145,6 +145,8 @@ set(SOURCE_FILES
         src/cetech/physics2d/private/physics2d.c
         src/cetech/physics2d_box2d/private/physics2d_box2d.cpp
         src/cetech/parent/private/parent.c
+        src/cetech/metrics/private/metrics.c
+        src/cetech/profiler/private/profiler_dock.c
 
         )
 

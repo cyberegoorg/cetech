@@ -4,12 +4,12 @@
 #include "../memory_tracer.h"
 
 typedef struct system_allocator_t {
-    ce_memory_tracer_t0 *tracer;
+    ce_mem_tracer_t0 *tracer;
 } system_allocator_t;
 
 static system_allocator_t _system_allocator_inst;
 
-static ce_memory_tracer_t0 *_memory_tracer(const ce_alloc_o0 *_a) {
+static ce_mem_tracer_t0 *_memory_tracer(const ce_alloc_o0 *_a) {
     system_allocator_t *a = (system_allocator_t *) _a;
     return a->tracer;
 }
@@ -22,18 +22,16 @@ static void *_reallocate(const ce_alloc_o0 *_a,
                          const char *filename,
                          uint32_t line) {
     CE_UNUSED(align);
-    CE_UNUSED(filename);
-    CE_UNUSED(line);
 
     void *new_ptr = NULL;
 
     new_ptr = realloc(ptr, size);
 
     system_allocator_t *a = (system_allocator_t *) _a;
-    ce_memory_tracer_t0 *tracer = a->tracer;
+    ce_mem_tracer_t0 *tracer = a->tracer;
 
     if (tracer) {
-        tracer->vt->untrace_ptr(tracer->inst, ptr, old_size);
+        tracer->vt->untrace_ptr(tracer->inst, ptr);
 
         if (size) {
             tracer->vt->trace_ptr(tracer->inst, new_ptr, size, filename, line);

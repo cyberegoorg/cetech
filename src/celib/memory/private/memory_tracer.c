@@ -28,6 +28,7 @@ typedef struct trace_item_t {
     void *ptr;
     const char *filename;
     int line;
+    size_t size;
 } trace_item_t;
 
 typedef struct memory_tracer_t {
@@ -40,7 +41,7 @@ static struct _G {
     //memory tracer
     atomic_int tracer_n;
     memory_tracer_t tracer_inst[MAX_TRACER];
-    ce_memory_tracer_t0 tracers[MAX_TRACER];
+    ce_mem_tracer_t0 tracers[MAX_TRACER];
 } _G = {};
 
 ////
@@ -94,7 +95,6 @@ void trace_ptr(ce_memory_tracer_o0 *inst,
                const char *filename,
                uint32_t line) {
     memory_tracer_t *tracer = (memory_tracer_t *) inst;
-    atomic_fetch_add(&tracer->allocated_size, size);
 
     uint32_t slotidx = _find_free_slot(inst, ptr);
 
@@ -104,24 +104,27 @@ void trace_ptr(ce_memory_tracer_o0 *inst,
 
     trace_item_t *item = &tracer->items[slotidx];
 
+    atomic_fetch_add(&tracer->allocated_size, size);
+
     *item = (trace_item_t) {
             .ptr = ptr,
             .filename = filename,
             .line = line,
+            .size = size,
     };
 }
 
 void untrace_ptr(ce_memory_tracer_o0 *inst,
-                 void *ptr,
-                 size_t size) {
+                 void *ptr) {
     memory_tracer_t *tracer = (memory_tracer_t *) inst;
-    atomic_fetch_sub(&tracer->allocated_size, size);
 
     uint32_t slotidx = _find_slot(inst, ptr);
     if (slotidx == UINT32_MAX) {
         return;
     }
     trace_item_t *item = &tracer->items[slotidx];
+
+    atomic_fetch_sub(&tracer->allocated_size, item->size);
 
     *item = (trace_item_t) {
             .ptr = (void *) 1,
@@ -130,23 +133,29 @@ void untrace_ptr(ce_memory_tracer_o0 *inst,
     };
 }
 
+uint64_t allocated_size(ce_memory_tracer_o0 *inst) {
+    memory_tracer_t *tracer = (memory_tracer_t *) inst;
+    return tracer->allocated_size;
+}
+
 static ce_memory_tracer_vt0 tracer_vt = {
         .trace_ptr = trace_ptr,
         .untrace_ptr = untrace_ptr,
+        .allocated_size = allocated_size,
 };
 
-ce_memory_tracer_t0 *create_tracer() {
+ce_mem_tracer_t0 *create_tracer() {
     uint32_t idx = _G.tracer_n++;
 
     memory_tracer_t *inst = &_G.tracer_inst[idx];
-    ce_memory_tracer_t0 *tracer = &_G.tracers[idx];
+    ce_mem_tracer_t0 *tracer = &_G.tracers[idx];
 
     *inst = (memory_tracer_t) {
             .items = {},
             .allocated_size = 0,
     };
 
-    *tracer = (ce_memory_tracer_t0) {
+    *tracer = (ce_mem_tracer_t0) {
             .inst = (ce_memory_tracer_o0 *) inst,
             .vt = &tracer_vt,
     };

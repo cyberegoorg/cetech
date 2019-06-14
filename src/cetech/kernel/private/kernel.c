@@ -35,6 +35,8 @@
 #include <celib/os/time.h>
 #include <cetech/transform/transform.h>
 #include <stdatomic.h>
+#include <cetech/metrics/metrics.h>
+#include <celib/memory/memory_tracer.h>
 #include "cetech/kernel/kernel.h"
 
 static struct KernelGlobals {
@@ -313,15 +315,31 @@ static void cetech_kernel_start() {
     const uint64_t fq = ce_os_time_a0->perf_freq();
     uint64_t last_tick = ce_os_time_a0->perf_counter();
 
+    ce_mem_tracer_t0 *t = ce_memory_a0->system->vt->memory_tracer(ce_memory_a0->system->inst);
+
+    ct_metrics_a0->reg_float_metric("dt");
+    ct_metrics_a0->reg_float_metric("memory.system");
+
+    MonoDomain* domain = mono_jit_init("cetech");
+    MonoAssembly* as = mono_domain_assembly_open(domain, "main.dll");
+
+    CE_UNUSED(domain, as)
     while (_G.is_running) {
         uint64_t now_ticks = ce_os_time_a0->perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;
 
+        ct_metrics_a0->begin();
+        ct_metrics_a0->set_float(ce_id_a0->id64("dt"), dt);
+        ct_metrics_a0->set_float(ce_id_a0->id64("memory.system"),
+                                     t->vt->allocated_size(t->inst)* 0.000001);
+
         _build_update_graph(&_G.updateg);
         _update(&_G.updateg, dt);
 
         ce_cdb_a0->gc();
+
+        ct_metrics_a0->end();
     }
 
     _shutdown(&_G.initg);

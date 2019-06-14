@@ -222,7 +222,6 @@ static struct ct_resource_a0 resource_api = {
         .save_to_db = save_to_db,
 };
 
-
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 
 static void _init_api(struct ce_api_a0 *api) {

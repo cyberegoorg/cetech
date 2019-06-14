@@ -1,100 +1,32 @@
 cdb_type: docks_layout
 docks:
   cdb_type: cdb_objset
-  0:
+  0: 
     cdb_type: dock_layout
     index: 0
-    label:  Resource browser##asset_browser_dock0
-    x: 198
-    y: 526
+    label: Profiler##profiler_dock_dock0
+    x: 197
+    y: 554
     location: ""
-    size_x: 552
-    size_y: 235
+    size_x: 575
+    size_y: 207
     status: 0
-    active: 1
+    active: 0
     opened: 1
-    prev: -1
-    next: 3
-    child0: -1
-    child1: -1
-    parent: 9
-  1:
-    cdb_type: dock_layout
-    index: 1
-    label:  Explorer##explorer_dock1
-    x: 0
-    y: 18
-    location: ""
-    size_x: 198
-    size_y: 508
-    status: 0
-    active: 1
-    opened: 1
-    prev: -1
-    next: -1
-    child0: -1
-    child1: -1
-    parent: 7
-  2:
-    cdb_type: dock_layout
-    index: 2
-    label:  Property editor##property_editor_dock2
-    x: 750
-    y: 18
-    location: ""
-    size_x: 274
-    size_y: 743
-    status: 0
-    active: 1
-    opened: 1
-    prev: -1
+    prev: 4
     next: -1
     child0: -1
     child1: -1
     parent: 10
-  3:
+  1: 
     cdb_type: dock_layout
-    index: 3
-    label: Log view##log_view_dock3
-    x: 198
-    y: 526
+    index: 1
+    label:  Resource browser##asset_browser_dock1
+    x: 197
+    y: 554
     location: ""
-    size_x: 552
-    size_y: 235
-    status: 0
-    active: 0
-    opened: 1
-    prev: 0
-    next: -1
-    child0: -1
-    child1: -1
-    parent: 9
-  4:
-    cdb_type: dock_layout
-    index: 4
-    label: Editor##editor_dock4
-    x: 198
-    y: 18
-    location: ""
-    size_x: 552
-    size_y: 508
-    status: 0
-    active: 0
-    opened: 1
-    prev: 5
-    next: -1
-    child0: -1
-    child1: -1
-    parent: 7
-  5:
-    cdb_type: dock_layout
-    index: 5
-    label:  Game view##game_view_dock5
-    x: 198
-    y: 18
-    location: ""
-    size_x: 552
-    size_y: 508
+    size_x: 575
+    size_y: 207
     status: 0
     active: 1
     opened: 1
@@ -102,16 +34,16 @@ docks:
     next: 4
     child0: -1
     child1: -1
-    parent: 7
-  6:
+    parent: 10
+  2: 
     cdb_type: dock_layout
-    index: 6
-    label: Resource preview##asset_preview_dock6
+    index: 2
+    label:  Explorer##explorer_dock2
     x: 0
-    y: 526
+    y: 18
     location: ""
-    size_x: 198
-    size_y: 235
+    size_x: 161
+    size_y: 536
     status: 0
     active: 1
     opened: 1
@@ -119,61 +51,146 @@ docks:
     next: -1
     child0: -1
     child1: -1
-    parent: 9
-  7:
+    parent: 8
+  3: 
     cdb_type: dock_layout
-    index: 7
-    label: ""
-    x: 0
+    index: 3
+    label:  Property editor##property_editor_dock3
+    x: 772
     y: 18
     location: ""
-    size_x: 750
-    size_y: 508
+    size_x: 252
+    size_y: 743
     status: 0
     active: 1
-    opened: 0
+    opened: 1
     prev: -1
     next: -1
-    child0: 1
-    child1: 5
+    child0: -1
+    child1: -1
+    parent: 11
+  4: 
+    cdb_type: dock_layout
+    index: 4
+    label: Log view##log_view_dock4
+    x: 197
+    y: 554
+    location: ""
+    size_x: 575
+    size_y: 207
+    status: 0
+    active: 0
+    opened: 1
+    prev: 1
+    next: 0
+    child0: -1
+    child1: -1
+    parent: 10
+  5: 
+    cdb_type: dock_layout
+    index: 5
+    label: Editor##editor_dock5
+    x: 161
+    y: 18
+    location: ""
+    size_x: 611
+    size_y: 536
+    status: 0
+    active: 0
+    opened: 1
+    prev: -1
+    next: 6
+    child0: -1
+    child1: -1
     parent: 8
-  8:
+  6: 
+    cdb_type: dock_layout
+    index: 6
+    label:  Game view##game_view_dock6
+    x: 161
+    y: 18
+    location: ""
+    size_x: 611
+    size_y: 536
+    status: 0
+    active: 1
+    opened: 1
+    prev: 5
+    next: -1
+    child0: -1
+    child1: -1
+    parent: 8
+  7: 
+    cdb_type: dock_layout
+    index: 7
+    label: Resource preview##asset_preview_dock7
+    x: 0
+    y: 554
+    location: ""
+    size_x: 197
+    size_y: 207
+    status: 0
+    active: 1
+    opened: 1
+    prev: -1
+    next: -1
+    child0: -1
+    child1: -1
+    parent: 10
+  8: 
     cdb_type: dock_layout
     index: 8
     label: ""
     x: 0
     y: 18
     location: ""
-    size_x: 750
+    size_x: 772
+    size_y: 536
+    status: 0
+    active: 1
+    opened: 0
+    prev: -1
+    next: -1
+    child0: 2
+    child1: 5
+    parent: 9
+  9: 
+    cdb_type: dock_layout
+    index: 9
+    label: ""
+    x: 0
+    y: 18
+    location: ""
+    size_x: 772
     size_y: 743
     status: 0
     active: 1
     opened: 0
     prev: -1
     next: -1
-    child0: 7
-    child1: 9
-    parent: 10
-  9:
+    child0: 8
+    child1: 10
+    parent: 11
+  10: 
     cdb_type: dock_layout
-    index: 9
+    index: 10
     label: ""
     x: 0
-    y: 526
+    y: 554
     location: ""
-    size_x: 750
-    size_y: 235
+    size_x: 772
+    size_y: 207
     status: 0
     active: 1
     opened: 0
     prev: -1
     next: -1
-    child0: 6
-    child1: 0
-    parent: 8
-  10:
+    child0: 7
+    child1: 1
+    parent: 9
+  11: 
     cdb_type: dock_layout
-    index: 10
+    index: 11
     label: ""
     x: 0
     y: 18
@@ -185,6 +202,6 @@ docks:
     opened: 0
     prev: -1
     next: -1
-    child0: 8
-    child1: 2
+    child0: 9
+    child1: 3
     parent: -1
