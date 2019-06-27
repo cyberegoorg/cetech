@@ -62,6 +62,17 @@ static float draw_main_menu() {
             ct_debugui_a0->EndMenu();
         }
 
+        ce_api_entry_t0 it = ce_api_a0->first(CT_EDITOR_MODULE_I);
+        while (it.api) {
+            struct ct_editor_module_i0 *i = (it.api);
+
+            if (i->draw_menu) {
+                i->draw_menu();
+            }
+
+            it = ce_api_a0->next(it);
+        }
+
         ct_dock_a0->draw_menu();
 
         if (ct_debugui_a0->BeginMenu("Help", true)) {

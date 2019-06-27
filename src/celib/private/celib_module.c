@@ -244,47 +244,19 @@ static void unload_all() {
     }
 }
 
-//static void check_modules() {
-//    ce_alloc_t0 *alloc = ce_memory_a0->system;
-//
-//    static uint64_t root = CE_ID64_0("modules", 0x6fd8ce9161fffc7ULL);
-//
-//    auto *wd_it = ce_fs_a0->event_begin(root);
-//    const auto *wd_end = ce_fs_a0->event_end(root);
-//
-//    while (wd_it != wd_end) {
-//        if (wd_it->type == CE_WATCHDOG_EVENT_FILE_MODIFIED) {
-//            ce_wd_ev_file_write_end *ev = (ce_wd_ev_file_write_end *) wd_it;
-//
-//            const char *ext = ce_os_path_a0->extension(ev->filename);
-//
-//            if ((NULL != ext) && (strcmp(ext, "so") == 0)) {
-//
-//
-//                char *path = NULL;
-//                ce_os_path_a0->join(&path, alloc, 2, ev->dir, ev->filename);
-//
-//                char full_path[4096];
-//                ce_fs_a0->get_full_path(root, path, full_path,
-//                                               CE_ARRAY_LEN(full_path));
-//
-//                int pat_size = strlen(full_path);
-//                int ext_size = strlen(ext);
-//                full_path[pat_size - ext_size - 1] = '\0';
-//
-//                ce_log_a0->info(LOG_WHERE,
-//                               "Reload module from path \"%s\"",
-//                               full_path);
-//
-//                reload(full_path);
-//
-//                ce_buffer_free(path, alloc);
-//            }
-//        }
-//
-//        wd_it = ce_fs_a0->event_next(wd_it);
-//    }
-//}
+void do_reload() {
+    if (_G.reload_all_rq) {
+        for (size_t i = 0; i < MAX_MODULES; ++i) {
+            if (_G.modules[i].handler == NULL) {
+                continue;
+            }
+
+            reload(_G.path[i]);
+        }
+
+        _G.reload_all_rq = false;
+    }
+}
 
 static struct ce_module_a0 module_api = {
         .reload = reload,

@@ -19,6 +19,8 @@ typedef struct ct_editor_module_i0 {
 
     bool (*shutdown)();
 
+    void (*draw_menu)();
+
     void (*update)(float dt);
 
 } ct_editor_module_i0;
