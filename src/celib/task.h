@@ -40,6 +40,11 @@ struct ce_task_a0 {
                 uint32_t count,
                 ce_task_counter_t0 **counter);
 
+    void (*add_specific)(uint32_t worker_id,
+                         ce_task_item_t0 *items,
+                         uint32_t count,
+                         ce_task_counter_t0 **counter);
+
     void (*wait_for_counter)(ce_task_counter_t0 *signal,
                              int32_t value);
 

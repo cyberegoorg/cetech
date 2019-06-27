@@ -76,6 +76,8 @@ typedef struct viewport_component {
 
 //! Render API V0
 struct ct_renderer_a0 {
+    uint32_t (*render_worker_id)();
+
     //! Create renderer.
     void (*create)();
 

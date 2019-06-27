@@ -62,12 +62,19 @@ static struct _G {
     uint32_t workers_count;
 
     queue_mpmc job_queue;
+    queue_mpmc specific_job_queue[TASK_MAX_WORKERS];
+
     atomic_bool is_running;
     ce_alloc_t0 *allocator;
 } _G;
 
 // Private
 static __thread uint8_t _worker_id = 0;
+
+
+char worker_id() {
+    return _worker_id;
+}
 
 //==============================================================================
 //==============================================================================
@@ -97,10 +104,7 @@ static uint32_t _new_counter_task(uint32_t value) {
     return idx;
 }
 
-static void _push_task(task_id_t t) {
-    queue_mpmc *q;
-    q = &_G.job_queue;
-
+static void _push_task(queue_mpmc *q, task_id_t t) {
     queue_task_push(q, t.id);
 }
 
@@ -124,6 +128,12 @@ static task_id_t _try_pop(struct queue_mpmc *q) {
 static task_id_t _task_pop_new_work() {
     task_id_t pop_task;
     queue_mpmc *qg = &_G.job_queue;
+
+    int wid = worker_id();
+    pop_task = _try_pop(&_G.specific_job_queue[wid]);
+    if (pop_task.id != 0) {
+        return pop_task;
+    }
 
     pop_task = _try_pop(qg);
     if (pop_task.id != 0) {
@@ -194,7 +204,31 @@ void add(ce_task_item_t0 *items,
 
         _G.task_pool[task.id].data = items[i].data;
 
-        _push_task(task);
+        _push_task(&_G.job_queue, task);
+    }
+}
+
+void add_specific(uint32_t worker_id,
+                  ce_task_item_t0 *items,
+                  uint32_t count,
+                  ce_task_counter_t0 **counter) {
+    uint32_t new_counter = _new_counter_task(count);
+
+    if (counter) {
+        *counter = (ce_task_counter_t0 *) &_G.counter_pool[new_counter];
+    }
+
+    for (uint32_t i = 0; i < count; ++i) {
+        task_id_t task = _new_task();
+        _G.task_pool[task.id] = (task_t) {
+                .name = items[i].name,
+                .task_work = items[i].work,
+                .counter = new_counter
+        };
+
+        _G.task_pool[task.id].data = items[i].data;
+
+        _push_task(&_G.specific_job_queue[worker_id], task);
     }
 }
 
@@ -221,9 +255,6 @@ void wait_for_counter_no_work(ce_task_counter_t0 *signal,
     queue_task_push(&_G.free_counter, counter_idx);
 }
 
-char worker_id() {
-    return _worker_id;
-}
 
 int worker_count() {
     return _G.workers_count;
@@ -233,6 +264,7 @@ static struct ce_task_a0 _task_api = {
         .worker_id = worker_id,
         .worker_count = worker_count,
         .add = add,
+        .add_specific = add_specific,
         .wait_for_counter = wait_atomic,
         .wait_for_counter_no_work = wait_for_counter_no_work,
 };
@@ -248,7 +280,7 @@ void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
     api->register_api(CE_TASK_API, &_task_api, sizeof(_task_api));
 
     int core_count = ce_os_cpu_a0->count();
-    core_count = 4;
+//    core_count = 4;
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;
@@ -270,6 +302,11 @@ void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
                                                 "cetech_worker",
                                                 (void *) ((intptr_t) (j)));
     }
+
+    for (uint32_t j = 0; j < _G.workers_count; ++j) {
+        queue_task_init(&_G.specific_job_queue[j], MAX_TASK, _G.allocator);
+    }
+
 
     _G.is_running = 1;
 }

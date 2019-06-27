@@ -65,6 +65,8 @@ static struct _G {
     bool need_reset;
     ce_alloc_t0 *allocator;
     ct_machine_ev_queue_o0 *ev_queue;
+
+    uint32_t render_worker_id;
 } _G = {};
 
 
@@ -79,6 +81,8 @@ static uint32_t _get_reset_flags() {
 //==============================================================================
 
 static void _render_task(void *data) {
+    _G.render_worker_id = ce_task_a0->worker_id();
+
     ce_log_a0->info("renderer", "This is render worker.");
     while (bgfx_render_frame(-1) != BGFX_RENDER_FRAME_EXITING) {
     }
@@ -358,7 +362,12 @@ struct ce_window_t0 *get_main_window() {
     return _G.main_window;
 }
 
+uint32_t render_worker_id() {
+    return _G.render_worker_id;
+}
+
 static struct ct_renderer_a0 rendderer_api = {
+        .render_worker_id = render_worker_id,
         .create = renderer_create,
         .set_debug = renderer_set_debug,
         .get_size = renderer_get_size,
