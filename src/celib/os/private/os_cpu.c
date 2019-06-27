@@ -1,8 +1,5 @@
 #include <include/SDL2/SDL_cpuinfo.h>
 
-#include <celib/module.h>
-#include <celib/api.h>
-#include "celib/macros.h"
 #include <celib/os/cpu.h>
 
 int cpu_count() {

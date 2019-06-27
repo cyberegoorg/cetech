@@ -3,18 +3,14 @@
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
 #include <celib/memory/memory.h>
-#include <celib/containers/hash.h>
 #include <celib/cdb.h>
-#include <celib/id.h>
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/transform/transform.h>
-#include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/debugdraw/dd.h>
-#include <cetech/debugui/debugui.h>
 #include <cetech/render_graph/render_graph.h>
 
 
@@ -23,7 +19,6 @@
 #include <Box2D/Box2D.h>
 #include <cetech/default_rg/default_rg.h>
 #include <celib/math/math.h>
-#include <celib/log.h>
 
 #define _G physics_global
 

@@ -5,13 +5,11 @@
 #include "celib/config.h"
 #include "celib/module.h"
 #include "celib/id.h"
-#include "celib/private/api_private.inl"
 
 #include <celib/core.h>
 #include <celib/macros.h>
 #include <celib/containers/buffer.h>
 #include <celib/cdb.h>
-#include <celib/task.h>
 #include <celib/log.h>
 #include <celib/fs.h>
 #include <celib/containers/hash.h>
@@ -23,17 +21,11 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/game/game_system.h>
 #include <cetech/static_module.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/ecs/ecs.h>
-#include <stdlib.h>
-#include <celib/ydb.h>
 #include <celib/os/path.h>
 #include <celib/os/time.h>
-#include <cetech/transform/transform.h>
-#include <stdatomic.h>
 #include <cetech/metrics/metrics.h>
 #include <celib/memory/memory_tracer.h>
 #include "cetech/kernel/kernel.h"

@@ -10,7 +10,6 @@
 
 
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/editor/dock.h>
 #include <cetech/renderer/gfx.h>

@@ -1,17 +1,10 @@
 #include <memory.h>
-#include <stdlib.h>
 #include <stdatomic.h>
 
 #include <celib/memory/allocator.h>
 #include <celib/api.h>
 
 #include <celib/memory/memory.h>
-#include <celib/macros.h>
-#include <celib/containers/hash.h>
-#include <celib/containers/buffer.h>
-#include <celib/id.h>
-#include "celib/log.h"
-#include "celib/memory/allocator.h"
 
 #include "celib/memory/memory_tracer.h"
 

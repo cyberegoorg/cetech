@@ -1,13 +1,10 @@
 #include <string.h>
-#include <stdlib.h>
 
 #include "celib/id.h"
 #include "celib/config.h"
 #include "celib/memory/memory.h"
 #include <celib/module.h>
-#include <celib/math/math.h>
 #include <celib/macros.h>
-#include <celib/log.h>
 
 #include "celib/api.h"
 #include "cetech/resource/resource.h"
@@ -17,12 +14,10 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/mesh/primitive_mesh.h>
-#include <cetech/mesh/static_mesh.h>
 
 #define LOG_WHERE "primitive_mesh"
 

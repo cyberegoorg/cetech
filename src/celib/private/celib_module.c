@@ -2,7 +2,6 @@
 // Includes
 //==============================================================================
 
-#include <stdlib.h>
 #include <memory.h>
 
 #include <celib/memory/allocator.h>
@@ -14,7 +13,6 @@
 #include <celib/memory/memory.h>
 #include <celib/config.h>
 #include <celib/id.h>
-#include <celib/fs.h>
 #include <celib/cdb.h>
 #include <celib/os/path.h>
 #include <celib/os/object.h>

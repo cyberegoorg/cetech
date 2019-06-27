@@ -8,7 +8,6 @@
 #include <celib/containers/array.h>
 #include <celib/api.h>
 #include <celib/config.h>
-#include <celib/macros.h>
 #include <celib/module.h>
 #include <celib/memory/memory.h>
 #include <celib/id.h>
@@ -24,7 +23,6 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
-#include <cetech/mesh/static_mesh.h>
 
 #include "bgfx/c99/bgfx.h"
 #include "bgfx/c99/platform.h"

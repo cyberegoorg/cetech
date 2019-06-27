@@ -1,29 +1,21 @@
-#include <float.h>
 #include <stdio.h>
 
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
 #include <celib/id.h>
-#include <celib/config.h>
 #include <celib/memory/memory.h>
 #include <celib/api.h>
 #include <celib/ydb.h>
-#include <celib/containers/array.h>
 #include <celib/module.h>
 
-#include <celib/math/math.h>
 #include <celib/containers/hash.h>
-#include <celib/ydb.h>
 #include <celib/cdb.h>
-#include <celib/log.h>
-#include <celib/containers/buffer.h>
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/property_editor/property_editor.h>
-#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/explorer/explorer.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/debugui/icons_font_awesome.h>

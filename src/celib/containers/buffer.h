@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include "celib/macros.h"
 #include "celib/celib_types.h"
 #include "celib/containers/array.h"
 

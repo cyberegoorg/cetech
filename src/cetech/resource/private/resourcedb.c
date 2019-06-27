@@ -1,6 +1,5 @@
 #include <time.h>
 #include <stdio.h>
-#include <inttypes.h>
 #include <stdbool.h>
 
 #include "include/sqlite3/sqlite3.h"
@@ -9,7 +8,6 @@
 #include <celib/log.h>
 
 #include <celib/memory/memory.h>
-#include <celib/fs.h>
 #include <cetech/kernel/kernel.h>
 #include <celib/id.h>
 #include <celib/module.h>

@@ -19,11 +19,7 @@
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/controlers/mouse.h>
-#include <cetech/controlers/keyboard.h>
-#include <cetech/controlers/gamepad.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/controlers/controlers.h>
-#include <celib/containers/array.h>
 #include <celib/os/window.h>
 #include <stdatomic.h>
 #include <celib/containers/mpmc.h>

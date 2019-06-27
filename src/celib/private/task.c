@@ -9,7 +9,6 @@
 #include <celib/log.h>
 #include <celib/task.h>
 #include <celib/module.h>
-#include <celib/id.h>
 #include <celib/os/thread.h>
 #include <celib/os/cpu.h>
 

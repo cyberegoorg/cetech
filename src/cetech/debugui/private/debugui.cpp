@@ -4,10 +4,7 @@
 #include <celib/macros.h>
 #include <celib/id.h>
 #include <celib/fs.h>
-#include <celib/memory/allocator.h>
-#include <celib/containers/array.h>
 #include <celib/log.h>
-#include <celib/config.h>
 #include <celib/memory/memory.h>
 #include <celib/api.h>
 #include <celib/module.h>
@@ -20,7 +17,6 @@
 #include <cetech/controlers/mouse.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/controlers/gamepad.h>
 

@@ -2,19 +2,12 @@
 #include <celib/api.h>
 #include <celib/module.h>
 #include <celib/macros.h>
-#include <celib/id.h>
 
 #include <cetech/renderer/renderer.h>
-#include <cetech/renderer/gfx.h>
-#include <stddef.h>
 
 #include <cetech/kernel/kernel.h>
-#include <celib/containers/hash.h>
-#include <celib/memory/memory.h>
-#include <celib/cdb.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <celib/config.h>
 #include <cetech/transform/transform.h>
 #include <cetech/camera/camera.h>
 

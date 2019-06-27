@@ -17,13 +17,11 @@
 #include <celib/containers/hash.h>
 #include <celib/containers/buffer.h>
 #include <celib/cdb.h>
-#include <celib/cdb.h>
 #include <celib/containers/bagraph.h>
 
 #include <cetech/resource/resource.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resource_compiler.h>
-#include <stdlib.h>
 #include <celib/os/path.h>
 #include <celib/os/time.h>
 #include <celib/containers/bitset.h>

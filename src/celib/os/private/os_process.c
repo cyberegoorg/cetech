@@ -2,9 +2,7 @@
 
 #include "celib/macros.h"
 
-#include <celib/api.h>
 
-#include <celib/module.h>
 #include "celib/log.h"
 #include <celib/os/process.h>
 

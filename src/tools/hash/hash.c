@@ -8,7 +8,6 @@
 #include <celib/memory/memory.h>
 #include <celib/memory/allocator.h>
 #include <celib/murmur.h>
-#include <celib/containers/hash.h>
 #include <celib/task.h>
 #include <celib/os/path.h>
 #include <celib/os/vio.h>

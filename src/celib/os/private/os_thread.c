@@ -8,16 +8,13 @@
 #if CE_PLATFORM_OSX
 
 #include <sched.h>
-#include <unistd.h>
 
 #endif
 
 
 #include <celib/module.h>
-#include <celib/api.h>
 #include <celib/os/thread.h>
 
-#include "celib/macros.h"
 
 //! Create new thread
 //! \param fce Thread fce

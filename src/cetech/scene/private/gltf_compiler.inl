@@ -1,5 +1,6 @@
 #define CGLTF_IMPLEMENTATION
 
+#include <celib/macros.h>
 #include "include/cgltf/cgltf.h"
 
 static inline bgfx_attrib_t _to_bgxfx_attr(cgltf_attribute_type attr) {

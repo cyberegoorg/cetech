@@ -6,25 +6,18 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
-#include <cetech/controlers/keyboard.h>
 
 #include <cetech/resource_preview/resource_preview.h>
-#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/editor/editor.h>
 #include <celib/containers/hash.h>
 #include <celib/math/math.h>
 
-#include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/editor/dock.h>
-#include <cetech/controlers/controlers.h>
-#include <cetech/editor/selcted_object.h>
-#include <cetech/editor/editor_ui.h>
 #include <cetech/resource/resourcedb.h>
 
 #include "celib/id.h"
-#include "celib/config.h"
 #include "celib/memory/memory.h"
 #include "celib/api.h"
 #include "celib/module.h"

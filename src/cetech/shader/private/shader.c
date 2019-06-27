@@ -2,7 +2,6 @@
 // Include
 //==============================================================================
 
-#include <stdio.h>
 
 #include "celib/memory/allocator.h"
 #include "celib/celib_types.h"
@@ -25,14 +24,10 @@
 #include <cetech/renderer/renderer.h>
 
 
-#include <celib/ydb.h>
 #include <celib/config.h>
-#include <celib/ydb.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <celib/fs.h>
 #include <celib/os/path.h>
 #include <celib/os/process.h>
 #include <celib/os/vio.h>

@@ -4,11 +4,9 @@
 
 #include <celib/memory/allocator.h>
 #include <celib/api.h>
-#include <celib/macros.h>
 #include <celib/containers/hash.h>
 #include <celib/id.h>
 #include <stdatomic.h>
-#include <sys/mman.h>
 #include <celib/memory/memory.h>
 #include <celib/log.h>
 

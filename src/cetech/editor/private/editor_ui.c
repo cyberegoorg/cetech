@@ -1,7 +1,5 @@
 #include <float.h>
 #include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
 
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
@@ -12,13 +10,9 @@
 #include <celib/ydb.h>
 #include <celib/containers/array.h>
 #include <celib/module.h>
-#include <celib/containers/hash.h>
 #include <celib/cdb.h>
-#include <celib/math/math.h>
 
-#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/resource/resourcedb.h>
-#include <cetech/property_editor/property_editor.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/resource_preview/resource_preview.h>

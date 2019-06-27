@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include <celib/id.h>
 #include <celib/config.h>
@@ -9,26 +7,19 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/ydb.h>
-#include <celib/ydb.h>
-#include <celib/fs.h>
 
 #include <celib/macros.h>
 
 
-#include <cetech/ecs/ecs.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/dock.h>
-#include <cetech/resource_browser/resource_browser.h>
 #include <cetech/explorer/explorer.h>
-#include <cetech/editor/editor.h>
 #include <cetech/resource/resource.h>
 
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource_editor/resource_editor.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/editor/selcted_object.h>
-#include <cetech/editor/editor_ui.h>
 
 #define WINDOW_NAME "Explorer"
 

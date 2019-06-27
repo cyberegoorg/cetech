@@ -2,7 +2,6 @@
 
 #include <celib/module.h>
 #include <celib/api.h>
-#include <celib/id.h>
 #include "celib/macros.h"
 
 #include <celib/os/cpu.h>

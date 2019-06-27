@@ -15,7 +15,6 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/camera/camera.h>
-#include <cetech/mesh/static_mesh.h>
 #include <string.h>
 #include <celib/math/math.h>
 #include <celib/macros.h>

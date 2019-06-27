@@ -11,7 +11,6 @@
 #include <celib/murmur.h>
 
 #include <celib/os/thread.h>
-#include <celib/macros.h>
 
 #define _G hashlib_global
 

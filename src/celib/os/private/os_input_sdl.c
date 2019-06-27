@@ -1,6 +1,5 @@
 
 #include <SDL2/SDL.h>
-#include "celib/macros.h"
 #include <celib/os/input.h>
 
 static char *global_sdl_clipboard = NULL;

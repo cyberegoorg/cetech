@@ -21,11 +21,8 @@
 #endif
 
 #include <celib/memory/allocator.h>
-#include <celib/api.h>
-#include <celib/log.h>
 
 #include <celib/os/path.h>
-#include <celib/module.h>
 #include <celib/os/vio.h>
 #include "celib/containers/buffer.h"
 

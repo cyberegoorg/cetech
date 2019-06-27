@@ -16,10 +16,8 @@
 #include <cetech/renderer/gfx.h>
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/kernel/kernel.h>
 #include <cetech/transform/transform.h>
 #include <celib/cdb.h>
-#include <celib/macros.h>
 #include "cetech/render_graph/render_graph.h"
 
 

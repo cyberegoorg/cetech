@@ -7,7 +7,6 @@
 
 #include "celib/macros.h"
 
-#include "celib/id.h"
 
 #define LOG_WHERE "log_system"
 

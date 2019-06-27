@@ -1,6 +1,4 @@
 #include <celib/module.h>
-#include <celib/api.h>
-#include "celib/macros.h"
 #include <celib/os/time.h>
 
 #include "include/SDL2/SDL.h"

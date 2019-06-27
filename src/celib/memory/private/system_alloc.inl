@@ -1,6 +1,9 @@
 #ifndef CETECH_SYSTEM_ALLOC_INL
 #define CETECH_SYSTEM_ALLOC_INL
 
+#include <stdlib.h>
+
+#include <celib/macros.h>
 #include "../memory_tracer.h"
 
 typedef struct system_allocator_t {

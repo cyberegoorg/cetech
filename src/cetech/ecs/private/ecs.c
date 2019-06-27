@@ -18,9 +18,7 @@
 #include <celib/module.h>
 #include <celib/handler.h>
 #include <celib/task.h>
-#include <celib/containers/buffer.h>
 #include <celib/containers/mpmc.h>
-#include <celib/containers/spsc.h>
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/resource/resource.h>

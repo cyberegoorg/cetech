@@ -12,16 +12,12 @@
 
 #endif
 
-#include <dlfcn.h>
 
-#include <celib/api.h>
 
-#include <celib/module.h>
 #include <stdio.h>
 
 #include "celib/log.h"
 
-#include "celib/macros.h"
 
 
 #define LOG_WHERE "object"

@@ -1,19 +1,14 @@
 //==============================================================================
 // Include
 //==============================================================================
-#include <time.h>
 
 #include <celib/memory/allocator.h>
-#include <celib/log.h>
 #include <celib/os/path.h>
-#include <celib/macros.h>
 #include <celib/ydb.h>
 #include <celib/containers/array.h>
-#include <celib/containers/buffer.h>
 #include "celib/id.h"
 #include "celib/memory/memory.h"
 #include "celib/api.h"
-#include <celib/ydb.h>
 #include <celib/cdb.h>
 #include <celib/config.h>
 
@@ -23,8 +18,6 @@
 #include <cetech/renderer/gfx.h>
 #include "cetech/ecs/ecs.h"
 #include <cetech/scene/scene.h>
-#include <cetech/kernel/kernel.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 
 #define _G scene_compiler_globals

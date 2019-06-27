@@ -1,11 +1,9 @@
 #include <string.h>
 
 #include "celib/id.h"
-#include "celib/config.h"
 #include "celib/memory/memory.h"
 #include <celib/module.h>
 #include <celib/ydb.h>
-#include <celib/math/math.h>
 
 #include <celib/macros.h>
 #include "celib/api.h"
@@ -21,17 +19,12 @@
 #include <cetech/mesh/static_mesh.h>
 
 #include <celib/memory/allocator.h>
-#include <celib/macros.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <celib/ydb.h>
 #include <cetech/editor/editor_ui.h>
-#include <celib/log.h>
-#include <celib/containers/buffer.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/camera/camera.h>
-#include <cetech/debugdraw/dd.h>
 
 
 #define LOG_WHERE "static_mesh"

@@ -1,8 +1,5 @@
 
 #include <celib/module.h>
-#include <celib/api.h>
-#include <celib/log.h>
-#include <celib/macros.h>
 #include <celib/memory/memory.h>
 
 #include "include/SDL2/SDL.h"

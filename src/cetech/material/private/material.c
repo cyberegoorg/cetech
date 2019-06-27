@@ -3,7 +3,6 @@
 //==============================================================================
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "celib/memory/allocator.h"
 #include "celib/id.h"
@@ -22,7 +21,6 @@
 #include <cetech/texture/texture.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/mesh/static_mesh.h>
 #include <cetech/resource_preview/resource_preview.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/resourcedb.h>

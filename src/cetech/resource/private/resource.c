@@ -1,7 +1,6 @@
 //==============================================================================
 // Includes
 //==============================================================================
-#include <inttypes.h>
 
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
@@ -22,7 +21,6 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
-#include <stdlib.h>
 
 
 #include "../resource.h"

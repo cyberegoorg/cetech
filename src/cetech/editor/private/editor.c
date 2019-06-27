@@ -1,4 +1,3 @@
-#include <stdio.h>
 
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
@@ -20,13 +19,10 @@
 #include <cetech/editor/action_manager.h>
 
 #include <cetech/kernel/kernel.h>
-#include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/editor/dock.h>
-#include <cetech/resource_browser/resource_browser.h>
 #include <string.h>
 #include <cetech/game/game_system.h>
-#include <cetech/default_rg/default_rg.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/metrics/metrics.h>
 

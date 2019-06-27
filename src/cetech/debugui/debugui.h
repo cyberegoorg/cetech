@@ -11,7 +11,7 @@ extern "C" {
 #include <stdarg.h>
 
 #include <celib/macros.h>
-
+#include <cetech/renderer/gfx.h>
 
 #define CT_DEBUGUI_API \
     CE_ID64_0("ct_debugui_a0", 0xdd1adfe792cc040fULL)

@@ -13,9 +13,7 @@
 #include <celib/module.h>
 
 #include <celib/config.h>
-#include <celib/ydb.h>
 #include <celib/cdb.h>
-#include <celib/ydb.h>
 
 
 #include "cetech/machine/machine.h"
@@ -27,14 +25,10 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource_preview/resource_preview.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource_compiler.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/transform/transform.h>
-#include <cetech/mesh/primitive_mesh.h>
-#include <cetech/material/material.h>
 #include <celib/os/path.h>
 #include <celib/os/process.h>
 #include <celib/os/vio.h>
