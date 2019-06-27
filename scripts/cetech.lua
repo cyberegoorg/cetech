@@ -14,11 +14,17 @@ project "cetech_develop"
 		path.join(CETECH_DIR, "src/cetech/**.cpp"),
 	}
 
+    excludes {
+        path.join(CETECH_DIR, "src/cetech/mono/**.*"),
+    }
+
 	links {
 		path.join(EXTERNALS_DIR, "lib", "libbgfxRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbimgRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libbxRelease.a"),
 		path.join(EXTERNALS_DIR, "lib", "libsqlite3.a"),
+		path.join(EXTERNALS_DIR, "lib", "libbox2d.a"),
+		path.join(EXTERNALS_DIR, "lib", "libnfd.a"),
 	}
 
 	copy_to_bin()

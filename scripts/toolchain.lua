@@ -194,7 +194,7 @@ function toolchain(_buildDir, _libDir)
 	end
 
 	flags {
-		"Cpp11",
+		"Cpp14",
 		"ExtraWarnings",
 	}
 

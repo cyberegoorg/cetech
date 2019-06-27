@@ -58,7 +58,7 @@ solution "cetech"
     }
 
     platforms {
-        "x32",
+--        "x32",
         "x64",
         "Native", -- for targets where bitness is not specified
     }
