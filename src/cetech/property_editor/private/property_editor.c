@@ -192,21 +192,14 @@ static void draw_menu(uint64_t obj) {
                              0, NULL);
 }
 
-static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
-                                                    0);
-
-    uint64_t obj = ct_selected_object_a0->selected_object(context);
-    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
-    if (locked_object) {
-        obj = locked_object;
-    }
+static void on_debugui(uint64_t content,
+                       uint64_t context,
+                       uint64_t selected_object) {
+    uint64_t obj = selected_object;
 
     char buffer[256];
 
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", dock);
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", 1ULL);
 
     bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Resource");
     if (open && obj) {
@@ -275,22 +268,11 @@ static void on_debugui(uint64_t dock) {
     draw(ce_cdb_a0->db(), obj, context);
 }
 
-static void on_menu(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
-
-    ct_dock_a0->context_btn(dock);
-    ct_debugui_a0->SameLine(0, -1);
-
-    uint64_t obj = ct_selected_object_a0->selected_object(context);
-
-    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock, obj);
-    if (locked_object) {
-        obj = locked_object;
-    }
-
+static void on_menu(uint64_t content,
+                    uint64_t context,
+                    uint64_t selected_object) {
+    uint64_t obj = selected_object;
     draw_menu(obj);
-
 }
 
 
@@ -302,13 +284,9 @@ static const char *name(uint64_t dock) {
     return "property_editor";
 }
 
-static uint64_t cdb_type() {
-    return CT_PROPERTY_EDITOR_I;
-};
-
 
 static struct ct_dock_i0 dock_api = {
-        .cdb_type = cdb_type,
+        .type = CT_PROPERTY_EDITOR_I,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,

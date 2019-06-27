@@ -40,7 +40,7 @@ typedef struct preview_instance {
     ct_entity_t0 ent;
     uint64_t selected_object;
     uint64_t type;
-    bool locked;
+//    bool locked;
     bool free;
 } preview_instance;
 
@@ -94,9 +94,9 @@ static void set_asset(preview_instance *pi,
         return;
     }
 
-    if (pi->locked) {
-        return;
-    }
+//    if (pi->locked) {
+//        return;
+//    }
 
     if (pi->selected_object == obj) {
         return;
@@ -139,23 +139,6 @@ static void set_asset(preview_instance *pi,
     pi->selected_object = obj;
 }
 
-static void draw_menu(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    preview_instance *pi = ce_cdb_a0->read_ptr(reader,
-                                               PROP_DOCK_DATA, NULL);
-
-    ct_dock_a0->context_btn(dock);
-    ct_debugui_a0->SameLine(0, -1);
-    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock, pi->selected_object);
-
-    pi->locked = false;
-
-    if (locked_object) {
-        pi->selected_object = locked_object;
-        pi->locked = true;
-    }
-}
-
 static void _draw_preview(preview_instance *pi,
                           ce_vec2_t size) {
 
@@ -187,22 +170,22 @@ static void _draw_preview(preview_instance *pi,
         ct_debugui_a0->Image(th,
                              &size,
                              &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
-                             &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
+                             &(ce_vec4_t) {0.0f, 0.0f, 0.0f, 0.0f});
     }
 }
 
-static void draw_dock(uint64_t dock) {
+static void draw_dock(uint64_t content,
+                      uint64_t context,
+                      uint64_t selected_object) {
     _G.active = ct_debugui_a0->IsMouseHoveringWindow();
 
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    preview_instance *pi = ce_cdb_a0->read_ptr(reader, PROP_DOCK_DATA, NULL);
+    preview_instance *pi = (preview_instance *) content;
 
     if (!pi) {
         return;
     }
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
-    set_asset(pi, ct_selected_object_a0->selected_object(context));
+    set_asset(pi, selected_object);
 
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
     _draw_preview(pi, size);
@@ -318,10 +301,6 @@ static const char *name(uint64_t dock) {
     return "asset_preview";
 }
 
-static uint64_t cdb_type() {
-    return RESOURCE_PREVIEW_I;
-};
-
 static uint64_t open(uint64_t dock) {
     preview_instance *pi = _new_preview();
 
@@ -367,11 +346,10 @@ static uint64_t open(uint64_t dock) {
 
 
 static struct ct_dock_i0 dock_api = {
-        .cdb_type = cdb_type,
+        .type = RESOURCE_PREVIEW_I,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_dock,
-        .draw_menu = draw_menu,
         .open = open,
 };
 

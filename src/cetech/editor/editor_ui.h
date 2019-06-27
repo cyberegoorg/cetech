@@ -129,9 +129,6 @@ struct ct_editor_ui_a0 {
                                   uint64_t *selected_resource,
                                   uint32_t *count);
 
-    uint64_t (*lock_selected_obj)(uint64_t dock,
-                                  uint64_t selected_obj);
-
     bool (*ui_prop_header)(const char *name);
 
     void (*ui_prop_header_end)(bool open);

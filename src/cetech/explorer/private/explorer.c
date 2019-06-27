@@ -55,12 +55,10 @@ static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
     return NULL;
 }
 
-static uint64_t draw(uint64_t dock,
-                     uint64_t selected_obj,
+static uint64_t draw(uint64_t selected_obj,
                      uint64_t context) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
     uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
-    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
+    uint64_t locked_object = 0;//ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
     if (locked_object) {
         top_level = locked_object;
     }
@@ -73,25 +71,11 @@ static uint64_t draw(uint64_t dock,
     return 0;
 }
 
-static void draw_menu(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
-    uint64_t selected_object = ct_selected_object_a0->selected_object(context);
-
-    if (!selected_object) {
-        return;
-    }
-
+static void draw_menu(uint64_t content,
+                      uint64_t context,
+                      uint64_t selected_object) {
     uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
                                                   selected_object);
-
-    ct_dock_a0->context_btn(dock);
-    ct_debugui_a0->SameLine(0, -1);
-    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock,
-                                                                top_level_obj);
-    if (locked_object) {
-        top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), locked_object);
-    }
 
     ct_explorer_i0 *i;
     i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(),
@@ -101,38 +85,20 @@ static void draw_menu(uint64_t dock) {
     }
 }
 
-static void on_debugui(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
-                                                    0);
-
-    uint64_t locked_obj = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
-
-
-    uint64_t selected_object = 0;
-
-
-    if (!locked_obj) {
-        selected_object = ct_selected_object_a0->selected_object(context);
-    } else {
-        selected_object = ce_cdb_a0->read_ref(reader, PROP_DOCK_SELECTED_OBJ, 0);
-
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, selected_object);
-        ce_cdb_a0->write_commit(w);
-    }
-
+static void on_debugui(uint64_t content,
+                       uint64_t context,
+                       uint64_t selected_object) {
     if (!selected_object) {
         return;
     }
 
     ct_debugui_a0->Separator();
 
-    uint64_t new_selected_object = draw(dock, selected_object, context);
+    uint64_t new_selected_object = draw(selected_object, context);
     if (new_selected_object) {
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, new_selected_object);
-        ce_cdb_a0->write_commit(w);
+//        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+//        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, new_selected_object);
+//        ce_cdb_a0->write_commit(w);
 
         ct_selected_object_a0->set_selected_object(context,
                                                    new_selected_object);
@@ -148,18 +114,13 @@ static const char *name(uint64_t dock) {
     return "explorer";
 }
 
-
-static uint64_t cdb_type() {
-    return CT_EXPLORER_I;
-};
-
 static uint64_t dock_flags() {
     return 0;
 }
 
 static struct ct_dock_i0 dock_api = {
-        .cdb_type = cdb_type,
-        .dock_flags = dock_flags,
+        .type = CT_EXPLORER_I,
+        .ui_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,

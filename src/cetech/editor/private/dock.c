@@ -17,23 +17,30 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/editor_ui.h>
+#include <celib/containers/hash.h>
 
 #include "../dock.h"
 
 #define _G explorer_globals
-static struct _G {
-    uint64_t docks_n;
-    uint64_t *docks;
 
+typedef struct dock_t {
+    uint64_t type;
+    uint64_t content;
+    uint64_t context;
+    uint64_t id;
+    uint64_t locked_obj;
+} dock_t;
+
+static struct _G {
     uint64_t *contexts;
+
+    ce_hash_t dock_count;
+    dock_t *docks;
 
     ce_alloc_t0 *allocator;
 } _G;
 
 #define MAX_CONTEXT 8
-
-#define _PROP_DOCK_ID\
-    CE_ID64_0("dock_id", 0x4a6df3bdedc53da2ULL)
 
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
     ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I);
@@ -41,8 +48,7 @@ struct ct_dock_i0 *_find_dock_i(uint64_t type) {
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
 
-        if (i && i->cdb_type
-            && (i->cdb_type() == type)) {
+        if (i && i->type == type) {
             return i;
         }
 
@@ -52,126 +58,179 @@ struct ct_dock_i0 *_find_dock_i(uint64_t type) {
     return NULL;
 }
 
-uint64_t create_dock(uint64_t type,
-                     bool visible) {
+void create_dock(uint64_t type,
+                 bool visible) {
 
     ct_dock_i0 *i = _find_dock_i(type);
 
     if (!i) {
-        return 0;
+        return;
     }
 
-    uint64_t obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), DOCK_TYPE);
+    uint32_t dock_id = ce_hash_lookup(&_G.dock_count, type, 0);
 
-    uint64_t flags = 0;
+    dock_t dock = {
+            .type = type,
+            .id = dock_id,
+    };
 
-    if (i->dock_flags) {
-        flags = i->dock_flags();
-    }
-
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
-    ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
-    ce_cdb_a0->set_uint64(w, PROP_DOCK_flags, (uint64_t) flags);
-    ce_cdb_a0->set_uint64(w, _PROP_DOCK_ID, _G.docks_n++);
-    ce_cdb_a0->set_uint64(w, PROP_DOCK_TYPE, type);
-    ce_cdb_a0->write_commit(w);
-
-    ce_array_push(_G.docks, obj, _G.allocator);
+    ce_hash_add(&_G.dock_count, type, dock_id + 1, _G.allocator);
 
     if (i->open) {
-        i->open(obj);
+        dock.content = i->open();
     }
 
-    return obj;
+    ce_array_push(_G.docks, dock, _G.allocator);
 }
 
-void close_dock(uint64_t dock) {
-    const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
-
-    ct_dock_i0 *i = _find_dock_i(type);
+void close_dock(dock_t *dock) {
+    ct_dock_i0 *i = _find_dock_i(dock->type);
 
     if (i && i->close) {
-        i->close(dock, 0);
+        i->close(dock->content, 0);
     }
+
+    uint64_t idx = dock - _G.docks;
 
     uint32_t dock_n = ce_array_size(_G.docks);
-    for (int u = 0; u < dock_n; ++u) {
-        if (_G.docks[u] != dock) {
-            continue;
-        }
 
-        uint32_t last_idx = dock_n - 1;
-        _G.docks[u] = _G.docks[last_idx];
-        ce_array_pop_back(_G.docks);
+    uint32_t last_idx = dock_n - 1;
+    _G.docks[idx] = _G.docks[last_idx];
+    ce_array_pop_back(_G.docks);
+}
+
+void lock_selected_obj(dock_t *dock,
+                       uint64_t selected_obj) {
+    uint64_t locked_object = dock->locked_obj;
+    bool checked = locked_object != 0;
+    if (ct_debugui_a0->Checkbox(ICON_FA_LOCK, &checked)) {
+        if (checked) {
+            dock->locked_obj = selected_obj;
+        } else {
+            dock->locked_obj = 0;
+        }
     }
+}
+
+static uint64_t _selected_obj(dock_t *dock) {
+    if (dock->locked_obj) {
+        return dock->locked_obj;
+    }
+
+    return ct_selected_object_a0->selected_object(dock->context);
+}
+
+bool context_btn(dock_t *dock) {
+    char title[256] = {};
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_MAP_SIGNS
+                     " %llu##dock_context_btn_%llx", dock->context, (uint64_t) dock);
+
+    bool change = ct_debugui_a0->Button(title, &CE_VEC2_ZERO);
+    if (change) {
+        ct_debugui_a0->OpenPopup("select_dock_context");
+    };
+
+    ct_debugui_a0->SameLine(0, 4);
+
+    bool has_prev = ct_selected_object_a0->has_previous(dock->context);
+    bool has_next = ct_selected_object_a0->has_next(dock->context);
+
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_ARROW_LEFT
+                     "##dock_context_btn_prev_selected%llx", (uint64_t) dock);
+
+    if (!has_prev) {
+        ct_editor_ui_a0->begin_disabled();
+    }
+
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
+        ct_selected_object_a0->set_previous(dock->context);
+    };
+
+    if (!has_prev) {
+        ct_editor_ui_a0->end_disabled();
+    }
+
+    ct_debugui_a0->SameLine(0, 4);
+
+    snprintf(title, CE_ARRAY_LEN(title),
+             ICON_FA_ARROW_RIGHT
+                     "##dock_context_btn_next_selected%llx", (uint64_t) dock);
+
+    if (!has_next) {
+        ct_editor_ui_a0->begin_disabled();
+    }
+
+    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
+        ct_selected_object_a0->set_next(dock->context);
+    };
+
+    if (!has_next) {
+        ct_editor_ui_a0->end_disabled();
+    }
+
+    return change;
 }
 
 void draw_all() {
-    uint64_t n = ce_array_size(_G.docks);
+    const uint64_t n = ce_array_size(_G.docks);
 
     for (int i = 0; i < n; ++i) {
-        uint64_t dock = _G.docks[i];
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
+        dock_t *dock = &_G.docks[i];
 
-        uint64_t type = ce_cdb_a0->read_uint64(reader, PROP_DOCK_TYPE, 0);
-
-        struct ct_dock_i0 *di = _find_dock_i(type);
+        struct ct_dock_i0 *di = _find_dock_i(dock->type);
 
         if (di) {
-            uint64_t id = ce_cdb_a0->read_uint64(reader, _PROP_DOCK_ID, 0);
+            uint32_t flags = di->ui_flags ? di->ui_flags() : 0;
+
+            uint64_t selected_obj = _selected_obj(dock);
+
             char title[128] = {};
             snprintf(title, CE_ARRAY_LEN(title), "%s##%s_dock%llu",
-                     di->display_title(dock), di->name(dock), id);
+                     di->display_title(dock->content, selected_obj), di->name(0), dock->id);
 
-            uint64_t flags = ce_cdb_a0->read_uint64(reader, PROP_DOCK_flags, 0);
-            bool visible = ce_cdb_a0->read_bool(reader, PROP_DOCK_VISIBLE, false);
+            bool visible = true;
 
             if (ct_debugui_a0->BeginDock(title, &visible, flags)) {
-
-                uint64_t context = ce_cdb_a0->read_uint64(reader,
-                                                          PROP_DOCK_CONTEXT, 0);
-
                 if (ct_debugui_a0->BeginPopup("select_dock_context", 0)) {
                     for (int j = 0; j < MAX_CONTEXT; ++j) {
                         snprintf(title, CE_ARRAY_LEN(title), "%d", j);
 
-                        bool selected = context == j;
+                        bool selected = dock->context == j;
 
                         if (ct_debugui_a0->MenuItem(title, NULL,
                                                     selected, true)) {
-                            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-                            ce_cdb_a0->set_uint64(w, PROP_DOCK_CONTEXT, j);
-                            ce_cdb_a0->write_commit(w);
+                            dock->context = j;
                         }
                     }
                     ct_debugui_a0->EndPopup();
                 }
 
+
+                context_btn(dock);
+                ct_debugui_a0->SameLine(0, -1);
+                lock_selected_obj(dock, ct_selected_object_a0->selected_object(dock->context));
                 if (di->draw_menu) {
-                    di->draw_menu(dock);
+                    di->draw_menu(dock->content, dock->context, selected_obj);
                 }
 
                 snprintf(title, CE_ARRAY_LEN(title), "%s##%s_child_dock%llu",
-                         di->display_title(dock), di->name(dock), id);
+                         di->display_title(dock->content, selected_obj), di->name(0), dock->id);
 
                 ct_debugui_a0->BeginChild(title, (ce_vec2_t) {}, false, 0);
 
                 if (di->draw_ui) {
-                    di->draw_ui(dock);
+                    di->draw_ui(dock->content, dock->context, selected_obj);
                 }
                 ct_debugui_a0->EndChild();
             }
+
             ct_debugui_a0->EndDock();
 
             if (!visible) {
                 close_dock(dock);
             }
-
-//            ce_cdb_obj_o0 *w=ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-//            ce_cdb_a0->set_bool(w, PROP_DOCK_VISIBLE, visible);
-//            ce_cdb_a0->write_commit(w);
-
         }
     }
 }
@@ -180,7 +239,7 @@ static const char *display_name(ct_dock_i0 *i) {
     const char *name = NULL;
 
     if (i->display_title) {
-        name = i->display_title(0);
+        name = i->display_title(0, 0);
     }
 
     if (!name) {
@@ -203,7 +262,7 @@ static void draw_menu() {
                 const char *name = display_name(i);
 
                 if (ct_debugui_a0->MenuItem(name, NULL, false, true)) {
-                    create_dock(i->cdb_type(), true);
+                    create_dock(i->type, true);
                 }
 
                 it = ce_api_a0->next(it);
@@ -230,17 +289,14 @@ static void draw_menu() {
         ct_debugui_a0->Separator();
 
         for (int i = 0; i < n; ++i) {
-            uint64_t dock = _G.docks[i];
+            dock_t *dock = &_G.docks[i];
 
-            const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-            uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
-
-            struct ct_dock_i0 *di = _find_dock_i(type);
+            struct ct_dock_i0 *di = _find_dock_i(dock->type);
 
             const char *name = display_name(di);
 
             char label[256] = {};
-            snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, dock);
+            snprintf(label, CE_ARRAY_LEN(label), "%s##menu_%llx", name, (uint64_t) dock);
 
             if (ct_debugui_a0->BeginMenu(label, true)) {
                 if (ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Close", "", false, true)) {
@@ -254,15 +310,12 @@ static void draw_menu() {
     }
 
     for (int i = 0; i < n; ++i) {
-        uint64_t dock = _G.docks[i];
+        dock_t *dock = &_G.docks[i];
 
-        const ce_cdb_obj_o0 *dock_r = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-        uint64_t type = ce_cdb_a0->read_uint64(dock_r, PROP_DOCK_TYPE, 0);
-
-        struct ct_dock_i0 *di = _find_dock_i(type);
+        struct ct_dock_i0 *di = _find_dock_i(dock->type);
 
         if (di && di->draw_main_menu) {
-            di->draw_main_menu(dock);
+            di->draw_main_menu(dock->content);
         }
 
     }
@@ -275,97 +328,14 @@ static uint64_t create_context(const char *name) {
     return context_idx;
 }
 
-static bool context_btn(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-    uint64_t context = ce_cdb_a0->read_uint64(reader,
-                                              PROP_DOCK_CONTEXT, 0);
-    char title[256] = {};
-    snprintf(title, CE_ARRAY_LEN(title),
-             ICON_FA_MAP_SIGNS
-                     " %llu##dock_context_btn_%llx", context, dock);
-
-    bool change = ct_debugui_a0->Button(title, &CE_VEC2_ZERO);
-    if (change) {
-        ct_debugui_a0->OpenPopup("select_dock_context");
-    };
-
-    ct_debugui_a0->SameLine(0, 4);
-
-    bool has_prev = ct_selected_object_a0->has_previous(context);
-    bool has_next = ct_selected_object_a0->has_next(context);
-
-    snprintf(title, CE_ARRAY_LEN(title),
-             ICON_FA_ARROW_LEFT
-                     "##dock_context_btn_prev_selected%llx", dock);
-
-    if (!has_prev) {
-        ct_editor_ui_a0->begin_disabled();
-    }
-
-    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
-        ct_selected_object_a0->set_previous(context);
-    };
-
-    if (!has_prev) {
-        ct_editor_ui_a0->end_disabled();
-    }
-
-    ct_debugui_a0->SameLine(0, 4);
-
-    snprintf(title, CE_ARRAY_LEN(title),
-             ICON_FA_ARROW_RIGHT
-                     "##dock_context_btn_next_selected%llx", dock);
-
-    if (!has_next) {
-        ct_editor_ui_a0->begin_disabled();
-    }
-
-    if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
-        ct_selected_object_a0->set_next(context);
-    };
-
-    if (!has_next) {
-        ct_editor_ui_a0->end_disabled();
-    }
-
-    return change;
-}
 
 struct ct_dock_a0 dock_a0 = {
         .draw_all = draw_all,
         .draw_menu = draw_menu,
         .create_dock = create_dock,
-        .context_btn = context_btn,
 };
 
 struct ct_dock_a0 *ct_dock_a0 = &dock_a0;
-
-static const ce_cdb_prop_def_t0 dock_cdb_type_def[] = {
-        {
-                .name = "visible",
-                .type = CE_CDB_TYPE_BOOL,
-        },
-        {
-                .name = "flags",
-                .type = CE_CDB_TYPE_UINT64,
-        },
-        {
-                .name = "dock_id",
-                .type = CE_CDB_TYPE_UINT64,
-        },
-        {
-                .name = "dock_type",
-                .type = CE_CDB_TYPE_UINT64,
-        },
-        {
-                .name = "dock_data",
-                .type = CE_CDB_TYPE_PTR,
-        },
-        {
-                .name = "locked_obj",
-                .type = CE_CDB_TYPE_REF,
-        },
-};
 
 static const ce_cdb_prop_def_t0 docks_layout_cdb_type_def[] = {
         {
@@ -447,8 +417,8 @@ void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    ce_api_a0->register_api(CT_DOCK_API, ct_dock_a0, sizeof(dock_a0));
-    ce_cdb_a0->reg_obj_type(DOCK_TYPE, CE_ARR_ARG(dock_cdb_type_def));
+    api->add_api(CT_DOCK_API, ct_dock_a0, sizeof(dock_a0));
+
     ce_cdb_a0->reg_obj_type(DOCKS_LAYOUT_TYPE, CE_ARR_ARG(docks_layout_cdb_type_def));
     ce_cdb_a0->reg_obj_type(DOCK_LAYOUT_TYPE, CE_ARR_ARG(dock_layout_cdb_type_def));
 

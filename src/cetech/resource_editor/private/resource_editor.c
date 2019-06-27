@@ -49,33 +49,17 @@ typedef struct editor {
 
     uint64_t top_level;
     uint64_t selected_object;
-    bool locked;
+//    bool locked;
 } editor;
 
 static struct _G {
     editor *editors;
-    ce_hash_t dock_editor_map;
 } _G;
 
-static struct editor *_get_editor(uint64_t dock) {
-    editor *ed = (editor *) ce_hash_lookup(&_G.dock_editor_map, dock, 0);
-    return ed;
-}
-
-static struct editor *_get_or_create_editor(uint64_t dock) {
-    editor *ed = _get_editor(dock);
-
-    if (ed) {
-        return ed;
-    }
-
+static struct editor *_get_or_create_editor() {
     int idx = ce_array_size(_G.editors);
     ce_array_push(_G.editors, (editor) {}, ce_memory_a0->system);
-
-    ed = &_G.editors[idx];
-
-    ce_hash_add(&_G.dock_editor_map, dock, (uint64_t) ed, ce_memory_a0->system);
-
+    editor *ed = &_G.editors[idx];
     return ed;
 }
 
@@ -101,9 +85,9 @@ static void set_asset(editor *ei,
         return;
     }
 
-    if (ei->locked) {
-        return;
-    }
+//    if (ei->locked) {
+//        return;
+//    }
 
     if (ei->selected_object == obj) {
         return;
@@ -151,16 +135,15 @@ static void set_asset(editor *ei,
 }
 
 
-static void draw_editor(uint64_t dock) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-
-    editor *editor = _get_editor(dock);
+static void draw_editor(uint64_t content,
+                        uint64_t context,
+                        uint64_t selected_object) {
+    editor *editor = (struct editor *) content;
 
     if (!editor) {
         return;
     }
 
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT, 0);
     set_asset(editor, ct_selected_object_a0->selected_object(context));
 
     ct_resource_editor_i0 *i = get_resource_editor(editor->type);
@@ -181,8 +164,10 @@ static void draw_editor(uint64_t dock) {
     i->draw_ui(editor->context_obj, context);
 }
 
-static void draw_editor_menu(uint64_t dock) {
-    editor *editor = _get_editor(dock);
+static void draw_editor_menu(uint64_t content,
+                             uint64_t context,
+                             uint64_t selected_object) {
+    editor *editor = (struct editor *) content;
 
     if (!editor) {
         return;
@@ -194,17 +179,14 @@ static void draw_editor_menu(uint64_t dock) {
         return;
     }
 
-    ct_dock_a0->context_btn(dock);
-
-    ct_debugui_a0->SameLine(0, -1);
-    uint64_t locked_object = ct_editor_ui_a0->lock_selected_obj(dock, editor->selected_object);
-
-    editor->locked = false;
-
-    if (locked_object) {
-        editor->selected_object = locked_object;
-        editor->locked = true;
-    }
+//    uint64_t locked_object = 0; //ct_editor_ui_a0->lock_selected_obj(dock, editor->selected_object);
+//
+//    editor->locked = false;
+//
+//    if (locked_object) {
+//        editor->selected_object = locked_object;
+//        editor->locked = true;
+//    }
 
     if (i && i->draw_menu) {
         ct_debugui_a0->SameLine(0, -1);
@@ -228,53 +210,20 @@ static void draw_editor_menu(uint64_t dock) {
 
 #define DEFAULT_EDITOR_NAME  "Editor"
 
-static const char *dock_title(uint64_t dock) {
+static const char *dock_title(uint64_t content,
+                              uint64_t selected_object) {
     return DEFAULT_EDITOR_NAME;
-
-//    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-////    editor *editor = ce_cdb_a0->read_ptr(reader, _PROP_EDITOR, NULL);
-////
-////    if (!editor) {
-////        return NULL;
-////    }
-////
-////    ct_resource_editor_i0 *i = get_asset_editor(editor->type);
-////
-////    if (!i) {
-////        return DEFAULT_EDITOR_NAME;
-////    }
-////
-////
-////    const char *display_icon = i->display_icon ? i->display_icon() : "";
-////    const char *display_name = i->display_name ? i->display_name()
-////                                               : DEFAULT_EDITOR_NAME;
-////
-////    snprintf(editor->title, CE_ARRAY_LEN(editor->title), "%s %s", display_icon, display_name);
-////    return editor->title;
 }
 
 static const char *name(uint64_t dock) {
     return "editor";
 }
 
-
-static uint64_t open(uint64_t dock) {
-    _get_or_create_editor(dock);
-//
-//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), e->context_obj);
-//    ce_cdb_a0->set_ref(w, RESOURCE_EDITOR_OBJ, obj);
-//    ce_cdb_a0->write_commit(w);
-//
-//    i->open(e->context_obj);
-    return 0;
+static uint64_t open() {
+    return (uint64_t) _get_or_create_editor();
 }
 
 static void update(float dt) {
-//    uint64_t edited = ct_resource_browser_a0->edited();
-//    if (edited) {
-//        open(edited);
-//    }
-
     const uint32_t editor_n = ce_array_size(_G.editors);
     for (uint8_t i = 0; i < editor_n; ++i) {
         struct editor *editor = &_G.editors[i];
@@ -294,10 +243,6 @@ static struct ct_editor_module_i0 editor_module_api = {
         .update = update,
 };
 
-static uint64_t cdb_type() {
-    return RESOURCE_EDITOR;
-};
-
 static uint64_t dock_flags() {
     return DebugUIWindowFlags_NoNavInputs |
            DebugUIWindowFlags_NoScrollbar |
@@ -306,8 +251,8 @@ static uint64_t dock_flags() {
 
 
 static struct ct_dock_i0 dock_i = {
-        .cdb_type = cdb_type,
-        .dock_flags = dock_flags,
+        .type = RESOURCE_EDITOR,
+        .ui_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_editor,

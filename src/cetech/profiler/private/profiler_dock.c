@@ -32,11 +32,9 @@ static const char *name(uint64_t dock) {
     return "profiler_dock";
 }
 
-static uint64_t cdb_type() {
-    return CT_PROFILER_DOCK;
-};
-
-static void draw_menu(uint64_t dock) {
+static void draw_menu(uint64_t content,
+                      uint64_t context,
+                      uint64_t selected_object) {
     bool is_recording = ct_metrics_a0->is_recording();
 
     if (ct_debugui_a0->Checkbox("Record", &is_recording)) {
@@ -50,7 +48,10 @@ static void draw_menu(uint64_t dock) {
     }
 }
 
-static void draw_dock(uint64_t dock) {
+static void draw_dock(uint64_t content,
+                      uint64_t context,
+                      uint64_t selected_object) {
+
     float w = ct_debugui_a0->GetContentRegionAvail().x;
 
     ce_vec2_t plot_size = {w, 20};
@@ -90,7 +91,7 @@ static void draw_dock(uint64_t dock) {
 }
 
 static struct ct_dock_i0 profile_dock = {
-        .cdb_type = cdb_type,
+        .type = CT_PROFILER_DOCK,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_dock,

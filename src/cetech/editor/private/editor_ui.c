@@ -36,7 +36,8 @@
 
 CE_MODULE(ct_resourcedb_a0);
 
-static bool filter_pass(const char* filter, const char* str) {
+static bool filter_pass(const char *filter,
+                        const char *str) {
     return (0 == fnmatch(filter, str, FNM_CASEFOLD));
 }
 
@@ -925,26 +926,6 @@ static void ui_vec4(uint64_t obj,
     _prop_value_end();
 }
 
-static uint64_t lock_selected_obj(uint64_t dock,
-                                  uint64_t selected_obj) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-
-    uint64_t locked_object = ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
-    bool checked = locked_object != 0;
-    if (ct_debugui_a0->Checkbox(ICON_FA_LOCK, &checked)) {
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-        if (checked) {
-            ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, selected_obj);
-            locked_object = selected_obj;
-        } else {
-            ce_cdb_a0->set_ref(w, CT_LOCKED_OBJ, 0);
-        }
-        ce_cdb_a0->write_commit(w);
-    }
-
-    return locked_object;
-}
-
 void begin_disabled() {
     ct_debugui_a0->PushItemFlag(DebugUIItemFlags_Disabled, true);
     ct_debugui_a0->PushStyleVar(DebugUIStyleVar_Alpha, 0.5f);
@@ -969,7 +950,6 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_bool = ui_bool,
         .prop_revert_btn = prop_revert_btn,
         .resource_select_modal = resource_select_modal,
-        .lock_selected_obj = lock_selected_obj,
         .ui_prop_header = ui_prop_header,
         .ui_prop_header_end = ui_prop_header_end,
         .ui_prop_body = ui_prop_body,

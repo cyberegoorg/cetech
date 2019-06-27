@@ -54,7 +54,9 @@ static void on_menu(uint64_t content,
 
 }
 
-static void on_debugui(uint64_t dock) {
+static void on_debugui(uint64_t content,
+                       uint64_t context,
+                       uint64_t selected_object) {
     ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
 
     ct_world_t0 world = ct_game_system_a0->world();
@@ -65,7 +67,7 @@ static void on_debugui(uint64_t dock) {
     viewport_component *viewport = ct_ecs_c_a0->get_one(world, VIEWPORT_COMPONENT,
                                                         viewport_ent, false);
 
-    if(viewport) {
+    if (viewport) {
         ct_rg_builder_t0 *builder;
         builder = ct_renderer_a0->viewport_builder(viewport->viewport);
         ct_renderer_a0->viewport_set_size(viewport->viewport, size);
@@ -81,19 +83,14 @@ static void on_debugui(uint64_t dock) {
     }
 }
 
-static const char *dock_title(uint64_t dock) {
+static const char *dock_title(uint64_t content,
+                              uint64_t selected_object) {
     return ICON_FA_GAMEPAD " " WINDOW_NAME;
 }
 
-static const char *name(uint64_t dock) {
+static const char *name() {
     return "game_view";
 }
-
-
-static uint64_t cdb_type() {
-    return CT_GAME_I;
-};
-
 
 static uint64_t dock_flags() {
     return DebugUIWindowFlags_NoNavInputs |
@@ -102,8 +99,8 @@ static uint64_t dock_flags() {
 }
 
 static struct ct_dock_i0 dock_api = {
-        .dock_flags = dock_flags,
-        .cdb_type = cdb_type,
+        .type =  CT_GAME_I,
+        .ui_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,

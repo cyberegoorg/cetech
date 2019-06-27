@@ -1,33 +1,30 @@
 #undef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
 #include <celib/cdb.h>
-#include <cetech/renderer/renderer.h>
-
-#include <cetech/controlers/keyboard.h>
 #include <celib/macros.h>
 #include <celib/id.h>
-
 #include <celib/fs.h>
 #include <celib/memory/allocator.h>
 #include <celib/containers/array.h>
-#include <cetech/controlers/mouse.h>
 #include <celib/log.h>
-
-#include <cetech/controlers/controlers.h>
-#include <cetech/kernel/kernel.h>
-
-#include "celib/config.h"
-#include "celib/memory/memory.h"
-#include "celib/api.h"
-#include "celib/module.h"
-#include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/controlers/gamepad.h>
-#include "imgui_wrap.inl"
+#include <celib/config.h>
+#include <celib/memory/memory.h>
+#include <celib/api.h>
+#include <celib/module.h>
 #include <celib/os/vio.h>
 #include <celib/os/window.h>
 #include <celib/os/input.h>
 
+#include <cetech/renderer/renderer.h>
+#include <cetech/controlers/keyboard.h>
+#include <cetech/controlers/mouse.h>
+#include <cetech/controlers/controlers.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/renderer/gfx.h>
+#include <cetech/debugui/debugui.h>
+#include <cetech/controlers/gamepad.h>
+
+#include "imgui_wrap.inl"
 
 static struct DebugUIGlobal {
     ce_alloc_t0 *allocator;

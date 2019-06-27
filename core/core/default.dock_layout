@@ -21,7 +21,7 @@ docks:
   1: 
     cdb_type: dock_layout
     index: 1
-    label:  Resource browser##asset_browser_dock1
+    label:  Resource browser##asset_browser_dock0
     x: 197
     y: 554
     location: ""
@@ -38,7 +38,7 @@ docks:
   2: 
     cdb_type: dock_layout
     index: 2
-    label:  Explorer##explorer_dock2
+    label:  Explorer##explorer_dock0
     x: 0
     y: 18
     location: ""
@@ -55,7 +55,7 @@ docks:
   3: 
     cdb_type: dock_layout
     index: 3
-    label:  Property editor##property_editor_dock3
+    label:  Property editor##property_editor_dock0
     x: 772
     y: 18
     location: ""
@@ -72,7 +72,7 @@ docks:
   4: 
     cdb_type: dock_layout
     index: 4
-    label: Log view##log_view_dock4
+    label: Log view##log_view_dock0
     x: 197
     y: 554
     location: ""
@@ -89,7 +89,7 @@ docks:
   5: 
     cdb_type: dock_layout
     index: 5
-    label: Editor##editor_dock5
+    label: Editor##editor_dock0
     x: 161
     y: 18
     location: ""
@@ -106,7 +106,7 @@ docks:
   6: 
     cdb_type: dock_layout
     index: 6
-    label:  Game view##game_view_dock6
+    label:  Game view##game_view_dock0
     x: 161
     y: 18
     location: ""
@@ -123,7 +123,7 @@ docks:
   7: 
     cdb_type: dock_layout
     index: 7
-    label: Resource preview##asset_preview_dock7
+    label: Resource preview##asset_preview_dock0
     x: 0
     y: 554
     location: ""

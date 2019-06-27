@@ -65,17 +65,12 @@ static void set_current_dir(const char *dir) {
     _G.need_reaload = true;
 }
 
-static void _broadcast_edit(uint64_t dock) {
+static void _broadcast_edit() {
     _G.edit_asset = _G.selected_asset;
 }
 
-static void _broadcast_selected(uint64_t dock) {
+static void _broadcast_selected(uint64_t context) {
     uint64_t obj = _G.selected_asset.uid;
-
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-
-    const uint64_t context = ce_cdb_a0->read_uint64(reader, PROP_DOCK_CONTEXT,
-                                                    0);
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 
@@ -393,21 +388,15 @@ static void _select_type_modal(const char *modal_id) {
     }
 }
 
-static void ui_asset_menu(uint64_t dock) {
+static void ui_asset_menu(uint64_t context) {
     //    ct_debugui_a0->SameLine(0, -1);
 
     if (ct_debugui_a0->Button(ICON_FA_PENCIL, &CE_VEC2_ZERO)) {
-        _broadcast_edit(dock);
+        _broadcast_edit();
     }
 
     ct_debugui_a0->SameLine(0, -1);
     if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, &CE_VEC2_ZERO)) {
-        const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), dock);
-
-        const uint64_t context = ce_cdb_a0->read_uint64(reader,
-                                                        PROP_DOCK_CONTEXT,
-                                                        0);
-
         uint64_t selected = ct_selected_object_a0->selected_object(context);
         ct_resource_a0->save(selected);
     }
@@ -436,19 +425,19 @@ static void ui_asset_menu(uint64_t dock) {
 
     if (ri && ri->display_icon) {
         snprintf(title, CE_ARRAY_LEN(title),
-                 "T: %s##select_type_%llx", ri->display_icon(), dock);
+                 "T: %s##select_type_%llx", ri->display_icon(), 1ULL);
     } else {
         if (_selected_type[0]) {
             snprintf(title, CE_ARRAY_LEN(title),
-                     "T: %s##select_type_%llx", _selected_type, dock);
+                     "T: %s##select_type_%llx", _selected_type, 1ULL);
         } else {
             snprintf(title, CE_ARRAY_LEN(title),
-                     "T: All##select_type_%llx", dock);
+                     "T: All##select_type_%llx", 1ULL);
         }
     }
 
 
-    sprintf(modal_id, "select...##select_type_%llx", dock);
+    sprintf(modal_id, "select...##select_type_%llx", 1ULL);
     if (ct_debugui_a0->Button(title, &CE_VEC2_ZERO)) {
         ct_debugui_a0->OpenPopup(modal_id);
     }
@@ -463,7 +452,7 @@ static void ui_asset_menu(uint64_t dock) {
 }
 
 
-static void ui_resource_list(uint64_t dock) {
+static void ui_resource_list(uint64_t context) {
     if (_G.need_reaload) {
         if (_G.asset_list) {
             ct_resourcedb_a0->clean_resource_list(_G.asset_list, _G.allocator);
@@ -476,7 +465,7 @@ static void ui_resource_list(uint64_t dock) {
     }
 
     char buffer[256] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "##asset_list_child%llx", dock);
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "##asset_list_child%llx", 1ULL);
 
     if (_G.asset_list) {
         uint32_t dir_n = ce_array_size(_G.asset_list);
@@ -529,9 +518,9 @@ static void ui_resource_list(uint64_t dock) {
                 _G.selected_file = filename_hash;
 
                 if (ct_debugui_a0->IsMouseDoubleClicked(0)) {
-                    _broadcast_edit(dock);
+                    _broadcast_edit();
                 } else {
-                    _broadcast_selected(dock);
+                    _broadcast_selected(context);
                 }
             }
 
@@ -550,36 +539,35 @@ static void ui_resource_list(uint64_t dock) {
 }
 
 
-static void on_debugui(uint64_t dock) {
+static void on_debugui(uint64_t content,
+                       uint64_t context,
+                       uint64_t selected_object) {
     _G.edit_asset.uid = 0;
-    ui_resource_list(dock);
+    ui_resource_list(context);
 }
 
-static const char *dock_title(uint64_t dock) {
+static const char *dock_title(uint64_t content,
+                              uint64_t selected_object) {
     return ICON_FA_FOLDER_OPEN " Resource browser";
 }
 
-static const char *name(uint64_t dock) {
+static const char *name() {
     return "asset_browser";
 }
-
-static uint64_t cdb_type() {
-    return RESOURCE_BROWSER;
-};
 
 static uint64_t dock_flags() {
     return 0;
 }
 
-static void on_draw_menu(uint64_t dock) {
-    ct_dock_a0->context_btn(dock);
-    ct_debugui_a0->SameLine(0, -1);
-    ui_asset_menu(dock);
+static void on_draw_menu(uint64_t content,
+                         uint64_t context,
+                         uint64_t selected_object) {
+    ui_asset_menu(context);
 }
 
 static struct ct_dock_i0 dock_api = {
-        .cdb_type = cdb_type,
-        .dock_flags = dock_flags,
+        .type = RESOURCE_BROWSER,
+        .ui_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
         .draw_ui = on_debugui,
