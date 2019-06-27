@@ -317,7 +317,7 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
             .draw_menu = draw_menu,
     };
 
-    api->register_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
+    api->add_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->add_impl(CT_EXPLORER_I, &entity_explorer, sizeof(entity_explorer));
     api->add_impl(CT_PROPERTY_EDITOR_I, &node_property_editor_i0,

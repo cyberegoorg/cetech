@@ -277,7 +277,7 @@ void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
 
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api(CE_TASK_API, &_task_api, sizeof(_task_api));
+    api->add_api(CE_TASK_API, &_task_api, sizeof(_task_api));
 
     int core_count = ce_os_cpu_a0->count();
 //    core_count = 4;

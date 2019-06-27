@@ -56,7 +56,7 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(selected_object);
     CE_ADD_STATIC_MODULE(dock);
 
-    CE_ADD_STATIC_MODULE(profiler_dock);
+//    CE_ADD_STATIC_MODULE(profiler_dock);
     CE_ADD_STATIC_MODULE(playground);
     CE_ADD_STATIC_MODULE(asset_browser);
     CE_ADD_STATIC_MODULE(level_inspector);

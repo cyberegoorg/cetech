@@ -62,7 +62,7 @@ set(CORELIB_SOURCE_FILES
         ########################################################################
         src/celib/private/api.c
         src/celib/private/log.c
-        src/celib/private/render_module.c
+        src/celib/private/celib_module.c
         src/celib/private/config.c
         src/celib/memory/private/memory.c
         src/celib/memory/private/memory_tracer.c
@@ -146,8 +146,7 @@ set(SOURCE_FILES
         src/cetech/physics2d_box2d/private/physics2d_box2d.cpp
         src/cetech/parent/private/parent.c
         src/cetech/metrics/private/metrics.c
-        src/cetech/profiler/private/profiler_dock.c
-
+#        src/cetech/mono/private/mono.c
         )
 
 ################################################################################
@@ -211,6 +210,7 @@ set(RELEASE_LIBS
         SDL2.a
         yaml_static.a
         Box2D.a
+#        monosgen-2.0.a
 
         celib
         )
@@ -234,6 +234,8 @@ set(DEVELOP_LIBS
         )
 
 include_directories(externals/build/${PLATFORM_ID}/release/include)
+
+#include_directories(/usr/local/include/mono-2.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 
@@ -277,3 +279,6 @@ target_include_directories(cetech_develop_lib PUBLIC externals/build/${PLATFORM_
 
 add_library(example_develop SHARED examples/develop/src/game_example.c)
 set_target_properties(example_develop PROPERTIES PREFIX "game_")
+
+add_library(profiler SHARED src/cetech/profiler/private/profiler_dock.c)
+set_target_properties(profiler PROPERTIES PREFIX "module_")

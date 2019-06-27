@@ -342,9 +342,9 @@ void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
     };
 
     _init_cvar(ce_config_a0);
-    api->register_api(CT_RESOURCE_COMPILER_API,
-                      &resource_compiler_api,
-                      sizeof(resource_compiler_api));
+    api->add_api(CT_RESOURCE_COMPILER_API,
+                 &resource_compiler_api,
+                 sizeof(resource_compiler_api));
 
     const char *platform = ce_config_a0->read_str(CONFIG_PLATFORM, "");
 

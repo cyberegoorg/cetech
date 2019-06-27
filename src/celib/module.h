@@ -62,6 +62,8 @@ struct ce_module_a0 {
 
     //! Reload all loaded modules
     void (*reload_all)(void);
+
+    void (*do_reload)();
 };
 
 CE_MODULE(ce_module_a0);

@@ -163,7 +163,7 @@ struct ce_log_a0 *ce_log_a0 = &log_a0;
 void CE_MODULE_LOAD(log)(struct ce_api_a0 *api,
                          int reload) {
     CE_UNUSED(reload);
-    api->register_api(CE_LOG_API, ce_log_a0, sizeof(log_a0));
+    api->add_api(CE_LOG_API, ce_log_a0, sizeof(log_a0));
 }
 
 void CE_MODULE_UNLOAD(log)(struct ce_api_a0 *api,

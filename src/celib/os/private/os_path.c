@@ -283,14 +283,14 @@ const char *path_filename(const char *path) {
 void path_basename(const char *path,
                    char *out) {
     const char *filename = path_filename(path);
-    const char *ch = strrchr(filename, '.');
+    const char *ch = strchr(filename, '.');
 
     if (ch == NULL) {
-        memcpy(out, filename, strlen(filename));
+        strcpy(out, filename);
         return;
     }
 
-    const size_t basename_len = (ch - filename) / sizeof(char);
+    const size_t basename_len = (ch - filename);
     memcpy(out, filename, basename_len);
     out[basename_len] = '\0';
 }

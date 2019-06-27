@@ -398,7 +398,7 @@ void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
+    api->add_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
     api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
     api->add_impl(CT_EDITOR_MODULE_I, &ct_editor_module_api, sizeof(ct_editor_module_api));
 }

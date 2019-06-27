@@ -499,7 +499,7 @@ void CE_MODULE_LOAD(machine)(struct ce_api_a0 *api,
 
     _init_listener_pack(&_G.obj_listeners);
 
-    api->register_api(CT_MACHINE_API, &a0, sizeof(a0));
+    api->add_api(CT_MACHINE_API, &a0, sizeof(a0));
     api->add_impl(CT_KERNEL_TASK_I, &machine_task, sizeof(machine_task));
 
     CE_INIT_API(api, ce_memory_a0);

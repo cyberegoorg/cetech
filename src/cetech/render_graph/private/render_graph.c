@@ -66,7 +66,7 @@ static struct _G {
     render_graph_builder_inst **builder_inst_free;
 } _G;
 
-#include "render_module.inl"
+#include "celib_module.inl"
 #include "render_builder.inl"
 
 typedef struct PosTexCoord0Vertex {
@@ -170,7 +170,7 @@ void CE_MODULE_LOAD(render_graph)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
+    api->add_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
 
     init_decl();
 }

@@ -466,8 +466,8 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
 
-    api->register_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
-    api->register_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
+    api->add_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
+    api->add_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
     api->add_impl(CT_KERNEL_TASK_I, &render_task, sizeof(render_task));
     api->add_impl(CT_KERNEL_TASK_I, &render_begin_task, sizeof(render_begin_task));
 

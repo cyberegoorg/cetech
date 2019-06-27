@@ -145,7 +145,6 @@ typedef struct ct_ptr_pair_t0 {
     uint32_t len;
 } ct_ptr_pair_t0;
 
-
 typedef struct ct_system_i0 {
     uint64_t name;
     ct_ecs_system_fce_t *process;

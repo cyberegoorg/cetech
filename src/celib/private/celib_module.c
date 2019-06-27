@@ -18,6 +18,7 @@
 #include <celib/cdb.h>
 #include <celib/os/path.h>
 #include <celib/os/object.h>
+#include <celib/os/vio.h>
 
 #include "celib/log.h"
 
@@ -38,6 +39,7 @@
 typedef struct module_t {
     char name[MAX_MODULE_NAME];
     void *handler;
+    uint64_t mtime;
     ce_load_module_t0 *load;
     ce_unload_module_t0 *unload;
 } module_t;
@@ -47,6 +49,7 @@ static struct _G {
     char path[MAX_MODULES][MAX_PATH_LEN];
     char used[MAX_MODULES];
     ce_alloc_t0 *allocator;
+    bool reload_all_rq;
 } _G = {};
 
 
@@ -71,18 +74,22 @@ static void _add_module(const char *path,
     }
 }
 
-static const char *_get_module_name(const char *path,
-                                    uint32_t *len) {
+static void _get_module_name(const char *path,
+                             char *module_name,
+                             uint32_t *len) {
     const char *filename = ce_os_path_a0->filename(path);
-    const char *name = strchr(filename, '_');
+
+    char tmp[128];
+    ce_os_path_a0->basename(filename, tmp);
+
+    const char *name = strchr(tmp, '_');
     if (NULL == name) {
-        return NULL;
+        *len = 0;
     }
 
     ++name;
+    sprintf(module_name, "%s", name);
     *len = strlen(name);
-
-    return name;
 }
 
 static void _get_module_fce_name(char **buffer,
@@ -97,7 +104,8 @@ static void _get_module_fce_name(char **buffer,
 static bool _load_from_path(module_t *module,
                             const char *path) {
     uint32_t name_len;
-    const char *name = _get_module_name(path, &name_len);
+    char name[128];
+    _get_module_name(path, name, &name_len);
 
     char *buffer = NULL;
 
@@ -120,10 +128,15 @@ static bool _load_from_path(module_t *module,
         return false;
     }
 
+    char full_path[128] = {};
+    snprintf(full_path, CE_ARRAY_LEN(full_path), "%s.dylib", path);
+    uint64_t mtime = ce_os_path_a0->file_mtime(full_path);
+
     *module = (module_t) {
             .handler = obj,
             .load = load_fce,
             .unload = unload_fce,
+            .mtime = mtime,
     };
 
     strncpy(module->name, name, MAX_MODULE_NAME);
@@ -155,7 +168,7 @@ static void add_static(const char *name,
 
 
 static void load(const char *path) {
-    ce_log_a0->info(LOG_WHERE, "Loading module %s", path);
+    ce_log_a0->info(LOG_WHERE, "Loading module from %s", path);
 
     module_t module;
 
@@ -168,39 +181,69 @@ static void load(const char *path) {
     _add_module(path, &module);
 }
 
-static void reload(const char *path) {
+module_t *_get_module(const char *path) {
     for (size_t i = 0; i < MAX_MODULES; ++i) {
-        struct module_t old_module = _G.modules[i];
+        module_t *module = &_G.modules[i];
 
-        if ((old_module.handler == NULL) ||
-            (strcmp(_G.path[i], path)) != 0) {
+        if (strcmp(_G.path[i], path) != 0) {
             continue;
         }
 
-        struct module_t new_module;
-        if (!_load_from_path(&new_module, path)) {
-            continue;
-        }
-
-        new_module.load(ce_api_a0, 1);
-
-        old_module.unload(ce_api_a0, 1);
-        _G.modules[i] = new_module;
-
-        ce_os_object_a0->unload(old_module.handler);
-
-        break;
+        return module;
     }
+
+    return NULL;
+}
+
+static void reload(const char *path) {
+    module_t *old_module = _get_module(path);
+
+    if (!old_module) {
+        return;
+    }
+
+    char full_path[128] = {};
+    snprintf(full_path, CE_ARRAY_LEN(full_path), "%s.dylib", path);
+    uint64_t mtime = ce_os_path_a0->file_mtime(full_path);
+
+    if (mtime == old_module->mtime) {
+        return;
+    }
+
+
+    char new_path[128];
+    snprintf(new_path, CE_ARRAY_LEN(new_path), "%s.dylib", path);
+    ce_vio_t0 *in = ce_os_vio_a0->from_file(new_path, VIO_OPEN_READ);
+    uint64_t size = in->vt->size(in->inst);
+    void *meme = CE_ALLOC(ce_memory_a0->system, char, size);
+    in->vt->read(in->inst, meme, 1, size);
+    ce_os_vio_a0->close(in);
+
+    static int cnt = 0;
+    snprintf(new_path, CE_ARRAY_LEN(new_path), "%s.%d.dylib", path, cnt);
+    ce_vio_t0 *out = ce_os_vio_a0->from_file(new_path, VIO_OPEN_WRITE);
+    out->vt->write(out->inst, meme, 1, size);
+    ce_os_vio_a0->close(out);
+    CE_FREE(ce_memory_a0->system, meme);
+
+    snprintf(new_path, CE_ARRAY_LEN(new_path), "%s.%d", path, cnt);
+    cnt++;
+
+    struct module_t new_module;
+    if (!_load_from_path(&new_module, new_path)) {
+        return;
+    }
+
+    new_module.load(ce_api_a0, 1);
+
+    old_module->unload(ce_api_a0, 1);
+    ce_os_object_a0->unload(old_module->handler);
+
+    *old_module = new_module;
 }
 
 static void reload_all() {
-    for (size_t i = 0; i < MAX_MODULES; ++i) {
-        if (_G.modules[i].handler == NULL) {
-            continue;
-        }
-
-        reload(_G.path[i]);
-    }
+    _G.reload_all_rq = true;
 }
 
 
@@ -265,6 +308,7 @@ static struct ce_module_a0 module_api = {
         .load = load,
         .unload_all = unload_all,
         .load_dirs = load_dirs,
+        .do_reload = do_reload,
 };
 
 struct ce_module_a0 *ce_module_a0 = &module_api;
@@ -277,7 +321,7 @@ void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
     };
 
     ce_api_a0 = api;
-    api->register_api(CE_MODULE0_API, &module_api, sizeof(module_api));
+    api->add_api(CE_MODULE0_API, &module_api, sizeof(module_api));
 
 
 }

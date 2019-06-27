@@ -132,7 +132,7 @@ void CE_MODULE_LOAD(metrics)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->register_api(CT_METRICS_API, &profiler_api, sizeof(profiler_api));
+    api->add_api(CT_METRICS_API, &profiler_api, sizeof(profiler_api));
 }
 
 void CE_MODULE_UNLOAD(metrics)(struct ce_api_a0 *api,

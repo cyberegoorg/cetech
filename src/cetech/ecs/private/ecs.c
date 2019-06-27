@@ -1253,16 +1253,13 @@ static void _build_graphs() {
 
         uint64_t name = i->name;
 
-        ce_hash_add(&_G.system_map, name,
-                    (uint64_t) i, _G.allocator);
+        ce_hash_add(&_G.system_map, name, (uint64_t) i, _G.allocator);
 
         if (!i->group) {
             i->group = CT_ECS_SIMULATION_GROUP;
         }
 
-        uint64_t graph_idx = ce_hash_lookup(&_G.system_group_g_map,
-                                            i->group,
-                                            UINT64_MAX);
+        uint64_t graph_idx = ce_hash_lookup(&_G.system_group_g_map, i->group, UINT64_MAX);
         if (graph_idx != UINT64_MAX) {
             ce_ba_graph_t *g = &_G.graph_pool[graph_idx];
             ce_bag_add(g, name,
@@ -1702,25 +1699,43 @@ static struct ct_ecs_q_a0 q_api = {
 struct ct_ecs_q_a0 *ct_ecs_q_a0 = &q_api;
 
 
-static void _componet_api_add(uint64_t name,
-                              void *api) {
-    ct_ecs_component_i0 *component_i = api;
+static void _on_api_add(uint64_t name,
+                        void *api) {
 
-    if (!component_i->cdb_type) {
-        ce_log_a0->error(LOG_WHERE, "component does not implement cdb_type()");
-        return;
-    }
+    if (CT_ECS_COMPONENT_I == name) {
+        ct_ecs_component_i0 *component_i = api;
 
-    ce_array_push(_G.components_name, component_i->cdb_type, _G.allocator);
+        if (!component_i->cdb_type) {
+            ce_log_a0->error(LOG_WHERE, "component does not implement cdb_type()");
+            return;
+        }
 
-    ce_hash_add(&_G.component_interface_map, component_i->cdb_type,
-                (uint64_t) component_i, _G.allocator);
+        bool contian = false;
+        for (int i = 0; i < ce_array_size(_G.components_name); ++i) {
+            if (_G.components_name[i] != name) {
+                continue;
+            }
+            contian = true;
+            break;
+        }
 
-    const uint64_t cid = _G.component_count++;
-    ce_hash_add(&_G.component_types, component_i->cdb_type, cid, _G.allocator);
+        ce_hash_add(&_G.component_interface_map, component_i->cdb_type,
+                    (uint64_t) component_i, _G.allocator);
 
-    if (component_i->is_system_state) {
-        _G.system_state_components_mask |= (uint64_t) (1llu << cid);
+        if (!contian) {
+            const uint64_t cid = _G.component_count++;
+            ce_hash_add(&_G.component_types, component_i->cdb_type, cid, _G.allocator);
+            ce_array_push(_G.components_name, component_i->cdb_type, _G.allocator);
+            if (component_i->is_system_state) {
+                _G.system_state_components_mask |= (uint64_t) (1llu << cid);
+            }
+        }
+
+    } else if (CT_ECS_SYSTEM_I == name) {
+        uint32_t n = ce_array_size(_G.world_array);
+        for (int i = 0; i < n; ++i) {
+            _G.world_array[i].global_world_version++;
+        }
     }
 }
 
@@ -1991,10 +2006,10 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
 
     ce_array_set_capacity(_G.cmd_buf_pool, 64, _G.allocator);
 
-    api->register_api(CT_ECS_API, &_api, sizeof(_api));
-    api->register_api(CT_ECS_E_API, &e_api, sizeof(e_api));
-    api->register_api(CT_ECS_C_API, &c_api, sizeof(c_api));
-    api->register_api(CT_ECS_Q_API, &q_api, sizeof(q_api));
+    api->add_api(CT_ECS_API, &_api, sizeof(_api));
+    api->add_api(CT_ECS_E_API, &e_api, sizeof(e_api));
+    api->add_api(CT_ECS_C_API, &c_api, sizeof(c_api));
+    api->add_api(CT_ECS_Q_API, &q_api, sizeof(q_api));
 
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->add_impl(CT_KERNEL_TASK_I, &ecs_sync_task, sizeof(ecs_sync_task));
@@ -2002,7 +2017,7 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_SYSTEM_GROUP_I, &simulation_sysg, sizeof(simulation_sysg));
     api->add_impl(CT_ECS_SYSTEM_GROUP_I, &presentation_sysg, sizeof(presentation_sysg));
 
-    api->register_on_add(CT_ECS_COMPONENT_I, _componet_api_add);
+    api->register_on_add(_on_api_add);
 
     ce_cdb_a0->reg_obj_type(ENTITY_INSTANCE, entity_prop, CE_ARRAY_LEN(entity_prop));
 }

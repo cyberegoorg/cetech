@@ -59,12 +59,13 @@ struct _G {
 
 static void _resource_api_add(uint64_t name,
                               void *api) {
-    ct_resource_i0 *ct_resource_i = api;
+    if(name == CT_RESOURCE_I) {
+        ct_resource_i0 *ct_resource_i = api;
+        CE_ASSERT(LOG_WHERE, ct_resource_i->name);
 
-    CE_ASSERT(LOG_WHERE, ct_resource_i->name);
-
-    ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
-                _G.allocator);
+        ce_hash_add(&_G.type_map, ct_resource_i->cdb_type(), (uint64_t) api,
+                    _G.allocator);
+    }
 }
 
 static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
@@ -225,7 +226,7 @@ static struct ct_resource_a0 resource_api = {
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_RESOURCE_API, &resource_api, sizeof(resource_api));
+    api->add_api(CT_RESOURCE_API, &resource_api, sizeof(resource_api));
 
 }
 
@@ -262,7 +263,7 @@ void CE_MODULE_LOAD(resourcesystem)(struct ce_api_a0 *api,
                            ce_config_a0->read_str(CONFIG_BUILD, ""),
                            false);
 
-    ce_api_a0->register_on_add(CT_RESOURCE_I, _resource_api_add);
+    ce_api_a0->register_on_add(_resource_api_add);
 }
 
 void CE_MODULE_UNLOAD(resourcesystem)(struct ce_api_a0 *api,

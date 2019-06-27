@@ -10,6 +10,7 @@
 #include <stdatomic.h>
 #include <sys/mman.h>
 #include <celib/memory/memory.h>
+#include <celib/log.h>
 
 
 //==============================================================================
@@ -27,21 +28,13 @@ typedef struct impl_list {
     void **api;
 } impl_list;
 
-typedef struct api_block_t api_block_t;
-struct api_block_t {
-    uint64_t block[256];
-};
-
 static struct _G {
     ce_hash_t api_map;
 
+    ce_hash_t impl_map;
     impl_list *impl_list;
 
-    ce_hash_t api_on_add_map;
-    ce_api_on_add_t0 ***on_add;
-
-    api_block_t *api_blocks;
-    atomic_int num_blocks;
+    ce_api_on_add_t0 **on_add;
 
     ce_alloc_t0 *allocator;
 } _G;
@@ -49,111 +42,63 @@ static struct _G {
 //==============================================================================
 // Private
 //==============================================================================
-static void *_add_block() {
-    uint64_t idx = atomic_fetch_add(&_G.num_blocks, 1);
-    void *block = &_G.api_blocks[idx];
-    memset(block, 0, sizeof(api_block_t));
-    return block;
-}
 
 
 static void api_register_api(uint64_t name_id,
                              void *api,
                              uint32_t size) {
-    uint64_t idx = ce_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
+    ce_log_a0->debug(LOG_WHERE, "Add api %s", ce_id_a0->str_from_id64(name_id));
 
-    void *block = NULL;
-    // create entry for api
-    if (idx == UINT64_MAX) {
-        idx = ce_array_size(_G.impl_list);
+    void *mem = (void *) ce_hash_lookup(&_G.api_map, name_id, 0);
 
-        ce_array_push(_G.impl_list, (impl_list) {},
-                      _G.allocator);
-        ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
-    } else {
-        //void *a = _G.impl_list[idx].api[0];
-        //CE_ASSERT(LOG_WHERE, ((char *) a)[0] == 0);
-    }
-
-    void **apis = _G.impl_list[idx].api;
-    uint32_t api_n = ce_array_size(apis);
-
-    if (api_n == 1) {
-        void *a = _G.impl_list[idx].api[0];
-        uint64_t *au = a;
-
-        if (!(*au)) {
-            block = a;
-        }
-    }
-
-    if (!block) {
-        block = _add_block();
-        ce_array_push(_G.impl_list[idx].api, block, _G.allocator);
+    if (!mem) {
+        mem = CE_ALLOC(ce_memory_a0->system, char, size);
+        ce_hash_add(&_G.api_map, name_id, (uint64_t) mem, _G.allocator);
     }
 
     if (api) {
-        memcpy(block, api, size);
+        memcpy(mem, api, size);
     }
 
-
-    uint64_t on_add_idx = ce_hash_lookup(&_G.api_on_add_map, name_id,
-                                         UINT64_MAX);
-
-    if (UINT64_MAX != on_add_idx) {
-        ce_api_on_add_t0 **on_add = _G.on_add[on_add_idx];
-        const uint32_t on_add_n = ce_array_size(on_add);
-        for (int i = 0; i < on_add_n; ++i) {
-            on_add[i](name_id, block);
-        }
+    ce_api_on_add_t0 **on_add = _G.on_add;
+    const uint32_t on_add_n = ce_array_size(on_add);
+    for (int i = 0; i < on_add_n; ++i) {
+        on_add[i](name_id, mem);
     }
+
+}
+
+static void *get_api(uint64_t name_id) {
+    void *mem = (void *) ce_hash_lookup(&_G.api_map, name_id, 0);
+
+    if (!mem) {
+        api_register_api(name_id, NULL, 0);
+        return get_api(name_id);
+    }
+
+    return mem;
 }
 
 static void api_add_impl(uint64_t name_id,
                          void *api,
                          uint32_t size) {
-    uint64_t idx = ce_hash_lookup(&_G.api_map, name_id, UINT64_MAX);
+    ce_log_a0->debug(LOG_WHERE, "Add impl %s", ce_id_a0->str_from_id64(name_id));
+    uint64_t idx = ce_hash_lookup(&_G.impl_map, name_id, UINT64_MAX);
 
-    void *block = NULL;
-    // create entry for api
     if (idx == UINT64_MAX) {
         idx = ce_array_size(_G.impl_list);
-
-        ce_array_push(_G.impl_list, (impl_list) {},
-                      _G.allocator);
-        ce_hash_add(&_G.api_map, name_id, idx, _G.allocator);
+        ce_array_push(_G.impl_list, (impl_list) {}, ce_memory_a0->system);
+        ce_hash_add(&_G.impl_map, name_id, idx, _G.allocator);
     }
 
-//    void **apis = _G.impl_list[idx].api;
-//    uint32_t api_n = ce_array_size(apis);
+    impl_list *il = &_G.impl_list[idx];
 
-//    if (api_n == 1) {
-//        void *a = _G.impl_list[idx].api[0];
-//        uint64_t *au = a;
-//
-//        if (!(*au)) {
-//            block = a;
-//        }
-//    }
+    ce_array_push(il->api, api, _G.allocator);
 
-    if (!block) {
-        block = _add_block();
-        ce_array_push(_G.impl_list[idx].api, block, _G.allocator);
-    }
-
-    if (api) {
-        memcpy(block, api, size);
-    }
-
-
-    uint64_t on_add_idx = ce_hash_lookup(&_G.api_on_add_map, name_id, UINT64_MAX);
-
-    if (UINT64_MAX != on_add_idx) {
-        ce_api_on_add_t0 **on_add = _G.on_add[on_add_idx];
-        const uint32_t on_add_n = ce_array_size(on_add);
-        for (int i = 0; i < on_add_n; ++i) {
-            on_add[i](name_id, block);
-        }
+    ce_api_on_add_t0 **on_add = _G.on_add;
+    const uint32_t on_add_n = ce_array_size(on_add);
+    for (int i = 0; i < on_add_n; ++i) {
+        on_add[i](name_id, api);
     }
 }
 
@@ -164,17 +109,20 @@ static int api_exist(const char *name) {
 }
 
 static struct ce_api_entry_t0 api_first(uint64_t name) {
-    uint64_t first = ce_hash_lookup(&_G.api_map, name, UINT64_MAX);
+    uint64_t idx = ce_hash_lookup(&_G.impl_map, name, UINT64_MAX);
 
-    if (first == UINT64_MAX) {
-        api_register_api(name, NULL, 0);
-        first = ce_hash_lookup(&_G.api_map, name, UINT64_MAX);
+    if (idx == UINT64_MAX) {
+        return (ce_api_entry_t0) {
+                .api = NULL,
+                .idx = 0,
+                .entry  = NULL
+        };
     }
 
     return (ce_api_entry_t0) {
-            .api = _G.impl_list[first].api[0],
+            .api = _G.impl_list[idx].api[0],
             .idx = 0,
-            .entry  = &_G.impl_list[first]
+            .entry = &_G.impl_list[idx]
     };
 }
 
@@ -194,37 +142,58 @@ static struct ce_api_entry_t0 api_next(ce_api_entry_t0 entry) {
     };
 }
 
-void register_on_add(uint64_t name,
-                     ce_api_on_add_t0 *on_add) {
-    uint64_t idx = ce_hash_lookup(&_G.api_map, name, UINT64_MAX);
-
-    if (UINT64_MAX == idx) {
-        idx = ce_array_size(_G.on_add);
-        ce_array_push(_G.on_add, 0, _G.allocator);
-    }
-
-    ce_hash_add(&_G.api_on_add_map, name, idx, _G.allocator);
-    ce_array_push(_G.on_add[idx], on_add, _G.allocator);
+void register_on_add(ce_api_on_add_t0 *on_add) {
+    ce_array_push(_G.on_add, on_add, _G.allocator);
 }
 
+void remove_api(uint64_t name_id,
+                void *api) {
+    ce_log_a0->debug(LOG_WHERE, "Remove api %s", ce_id_a0->str_from_id64(name_id));
+
+    ce_hash_remove(&_G.api_map, name_id);
+}
+
+void remove_impl(uint64_t name_id,
+                 void *api) {
+    ce_log_a0->debug(LOG_WHERE, "Remove impl %s", ce_id_a0->str_from_id64(name_id));
+
+    uint64_t idx = ce_hash_lookup(&_G.impl_map, name_id, UINT64_MAX);
+    impl_list *il = &_G.impl_list[idx];
+
+    uint64_t n = ce_array_size(il->api);
+    for (int i = 0; i < n; ++i) {
+        if (il->api[i] != api) {
+            continue;
+        }
+
+        il->api[i] = il->api[n - 1];
+        ce_array_pop_back(il->api);
+        break;
+    }
+}
+
+
 static struct ce_api_a0 a0 = {
-        .register_api = api_register_api,
+        .add_api = api_register_api,
+        .remove_api = remove_api,
         .add_impl = api_add_impl,
+        .remove_impl = remove_impl,
         .first = api_first,
         .next = api_next,
         .exist = api_exist,
+        .get = get_api,
         .register_on_add = register_on_add,
 };
 
 struct ce_api_a0 *ce_api_a0 = &a0;
 
+void *_m_get_api(uint64_t name) {
+    return a0.get(name);
+}
 
 void api_init(ce_alloc_t0 *allocator) {
     _G = (struct _G) {
             .allocator = allocator,
-            .api_blocks = CE_ALLOC(ce_memory_a0->virt_system,
-                                   api_block_t, sizeof(api_block_t) * 256),
-
     };
 
 

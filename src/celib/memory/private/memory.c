@@ -59,7 +59,7 @@ void memory_register_api(struct ce_api_a0 *api) {
 
     _system_allocator_inst.tracer = ce_memory_tracer_a0->create();
 
-    api->register_api(CE_MEMORY_API, &_api, sizeof(_api));
+    api->add_api(CE_MEMORY_API, &_api, sizeof(_api));
 
 }
 

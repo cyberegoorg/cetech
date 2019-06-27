@@ -796,7 +796,7 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
             .db = ce_cdb_a0->db()
     };
 
-    api->register_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
+    api->add_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
     api->add_impl(CT_PROPERTY_EDITOR_I, &_property_editor_api,
                   sizeof(_property_editor_api));

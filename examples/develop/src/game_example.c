@@ -112,8 +112,8 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Init %d", reload);
 
-    api->add_impl(CT_GAME_I,
-                  &game_i0, sizeof(game_i0));
+    api->add_api(CT_GAME_I,
+                 &game_i0, sizeof(game_i0));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &player_input_component_i, sizeof(player_input_component_i));
@@ -147,6 +147,8 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(PAD_COMPONENT, NULL, 0);
 
     rectangle_render_load_module(api, reload);
+
+    ce_log_a0->debug(LOG_WHERE, "snadjknsakjndaskjn");
 }
 
 void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,
@@ -154,5 +156,15 @@ void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,
     CE_UNUSED(api);
 
     ce_log_a0->info("example", "Shutdown %d", reload);
+
+    api->remove_impl(CT_ECS_SYSTEM_I, &player_input_system_i0);
+
+    api->remove_impl(CT_ECS_COMPONENT_I, &player_input_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I, &ball_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I, &pad_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I, &rectangle_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I, &gamepad_controler_component_i);
+
+    rectangle_render_unload_module(api, reload);
 }
 

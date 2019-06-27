@@ -40,13 +40,15 @@ static struct _G {
 // Interface
 //==============================================================================
 
-static void _componet_api_add(uint64_t name,
+static void _on_api_add(uint64_t name,
                               void *api) {
-    ct_controler_i0 *controlers_i = api;
 
+    if (name == CT_CONTROLERS_I) {
+        ct_controler_i0 *controlers_i = api;
 
-    ce_hash_add(&_G.interface_map, controlers_i->name(),
-                (uint64_t) controlers_i, ce_memory_a0->system);
+        ce_hash_add(&_G.interface_map, controlers_i->name(),
+                    (uint64_t) controlers_i, ce_memory_a0->system);
+    }
 }
 
 struct ct_controler_i0 *get_by_name(uint64_t name) {
@@ -70,10 +72,10 @@ void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
 
     _G = (struct _G) {};
 
-    api->register_api(CT_CONTROLERS_API,
-                      ct_controlers_a0, sizeof(ct_controlers_api));
+    api->add_api(CT_CONTROLERS_API,
+                 ct_controlers_a0, sizeof(ct_controlers_api));
 
-    ce_api_a0->register_on_add(CT_CONTROLERS_I, _componet_api_add);
+    api->register_on_add(_on_api_add);
 }
 
 void CE_MODULE_UNLOAD(controlers)(struct ce_api_a0 *api,

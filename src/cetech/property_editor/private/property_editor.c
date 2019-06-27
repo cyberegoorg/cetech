@@ -332,7 +332,7 @@ void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
     };
 
     api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
-    api->register_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
+    api->add_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
 
     ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_I, true);
 

@@ -33,14 +33,13 @@ typedef struct ct_game_i0 {
 struct ct_game_system_a0 {
     ct_world_t0 (*world)();
 
-    void (*pause)(uint64_t name);
+    void (*pause)();
 
-    bool (*is_paused)(uint64_t name);
+    bool (*is_paused)();
 
-    void (*play)(uint64_t name);
+    void (*play)();
 
-    void (*step)(uint64_t name,
-                 float dt);
+    void (*step)(float dt);
 };
 
 CE_MODULE(ct_game_system_a0);

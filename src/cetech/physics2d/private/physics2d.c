@@ -326,7 +326,7 @@ struct ct_physics_a0 *ct_physics_a0 = &api;
 
 void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
                                int reload) {
-    api->register_api(CT_PHYSICS_A0, ct_physics_a0, sizeof(struct ct_physics_a0));
+    api->add_api(CT_PHYSICS_A0, ct_physics_a0, sizeof(struct ct_physics_a0));
 
     ce_id_a0->id64("collider2d");
     ce_id_a0->id64("collider2d_shape_rectangle");

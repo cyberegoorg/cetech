@@ -28,33 +28,33 @@ typedef struct game_state_t {
 } game_state_t;
 
 struct _G {
-    ce_hash_t game_paused;
-    ce_hash_t game_interface_map;
-    ct_game_i0 **game_interface;
+    bool game_paused;
     game_state_t game_state;
-    uint64_t active_game;
+    ct_game_i0* game;
 } _G;
-
-static struct ct_game_i0 *_get_game(uint64_t name) {
-    return (ct_game_i0 *) ce_hash_lookup(&_G.game_interface_map, name, 0);
-}
 
 static void game_init() {
     _G.game_state.world = ct_ecs_a0->create_world();
-    struct ct_game_i0 *gi = _get_game(_G.active_game);
+    struct ct_game_i0 *gi =_G.game;
+    if(!gi) {
+        return;
+    }
+
     gi->init(_G.game_state.world);
 }
 
 static void game_shutdown() {
-    struct ct_game_i0 *gi = _get_game(_G.active_game);
+    struct ct_game_i0 *gi = _G.game;
+    if(!gi) {
+        return;
+    }
 
     gi->shutdown(_G.game_state.world);
     ct_ecs_a0->destroy_world(_G.game_state.world);
 }
 
-static void game_step(uint64_t name,
-                      float dt) {
-    ct_game_i0 *game_i = _get_game(name);
+static void game_step(float dt) {
+    ct_game_i0 *game_i = _G.game;
 
     if (!game_i) {
         return;
@@ -68,39 +68,43 @@ static void game_step(uint64_t name,
     ct_ecs_a0->step(_G.game_state.world, dt);
 }
 
-static bool game_is_paused(uint64_t name) {
-    return ce_hash_contain(&_G.game_paused, name);
+static bool game_is_paused() {
+    return _G.game_paused;
 }
 
 static void game_update(float dt) {
-    if (game_is_paused(_G.active_game)) {
+    if (game_is_paused()) {
         return;
     }
 
-    game_step(_G.active_game, dt);
+    game_step(dt);
 }
 
-static void game_pause(uint64_t name) {
-    ce_hash_add(&_G.game_paused, name, true, ce_memory_a0->system);
+static void game_pause() {
+    _G.game_paused = true;
 }
 
 static ct_world_t0 game_world() {
     return _G.game_state.world;
 }
 
-static void game_play(uint64_t name) {
-    ce_hash_remove(&_G.game_paused, name);
+static void game_play() {
+    _G.game_paused = false;
 }
 
 static void _game_api_add(uint64_t name,
                           void *api) {
-    ct_game_i0 *game_i = api;
+    if (CT_GAME_I == name) {
+        ct_game_i0 *game_i = api;
 
-    ce_hash_add(&_G.game_interface_map, game_i->name(),
-                (uint64_t) game_i, ce_memory_a0->system);
+        if(_G.game) {
+            game_shutdown();
+            _G.game = game_i;
+            game_init();
+        }
 
-    ce_array_push(_G.game_interface, game_i, ce_memory_a0->system);
-
+        _G.game = game_i;
+    }
 }
 
 struct ct_game_system_a0 game_system_api = {
@@ -144,13 +148,12 @@ static struct ct_kernel_task_i0 game_task = {
 void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
                                   int reload) {
     _G = (struct _G) {
-            .active_game = ce_id_a0->id64("default"),
     };
 
-    api->register_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
+    api->add_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
     api->add_impl(CT_KERNEL_TASK_I, &game_task, sizeof(game_task));
 
-    ce_api_a0->register_on_add(CT_GAME_I, _game_api_add);
+    ce_api_a0->register_on_add(_game_api_add);
 
     CE_UNUSED(api);
 }

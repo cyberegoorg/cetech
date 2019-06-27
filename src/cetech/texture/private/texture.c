@@ -386,7 +386,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
-    api->register_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
+    api->add_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
 
     api->add_impl(CT_PROPERTY_EDITOR_I,
                   &property_editor_api, sizeof(property_editor_api));

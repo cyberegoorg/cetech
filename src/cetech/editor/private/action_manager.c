@@ -183,7 +183,7 @@ void CE_MODULE_LOAD(action_manager)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->register_api(CT_ACTION_MANAGER_API, &action_manager_api, sizeof(action_manager_api));
+    api->add_api(CT_ACTION_MANAGER_API, &action_manager_api, sizeof(action_manager_api));
 }
 
 void CE_MODULE_UNLOAD(action_manager)(struct ce_api_a0 *api,

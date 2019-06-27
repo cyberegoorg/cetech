@@ -18,7 +18,6 @@
 #include <celib/containers/bagraph.h>
 #include <cetech/resource/resource.h>
 
-
 #include <cetech/machine/machine.h>
 
 #include <cetech/renderer/renderer.h>
@@ -122,7 +121,7 @@ bool cetech_kernel_init(int argc,
 
     ce_init();
 
-    ce_api_a0->register_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
+    ce_api_a0->add_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
 
     _G = (struct KernelGlobals) {
             .allocator = ce_memory_a0->system,
@@ -320,11 +319,9 @@ static void cetech_kernel_start() {
     ct_metrics_a0->reg_float_metric("dt");
     ct_metrics_a0->reg_float_metric("memory.system");
 
-    MonoDomain* domain = mono_jit_init("cetech");
-    MonoAssembly* as = mono_domain_assembly_open(domain, "main.dll");
-
-    CE_UNUSED(domain, as)
     while (_G.is_running) {
+        ce_module_a0->do_reload();
+
         uint64_t now_ticks = ce_os_time_a0->perf_counter();
         float dt = ((float) (now_ticks - last_tick)) / fq;
         last_tick = now_ticks;

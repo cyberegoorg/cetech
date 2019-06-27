@@ -145,9 +145,9 @@ void CE_MODULE_LOAD(selected_object)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    api->register_api(CT_SELECTED_OBJECT_API,
-                      &ct_selected_object_api0,
-                      sizeof(ct_selected_object_api0));
+    api->add_api(CT_SELECTED_OBJECT_API,
+                 &ct_selected_object_api0,
+                 sizeof(ct_selected_object_api0));
 }
 
 void CE_MODULE_UNLOAD(selected_object)(struct ce_api_a0 *api,

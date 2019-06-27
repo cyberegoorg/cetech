@@ -300,7 +300,7 @@ static struct ct_scene_a0 scene_api = {
 struct ct_scene_a0 *ct_scene_a0 = &scene_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->register_api(CT_SCENE_API, &scene_api, sizeof(scene_api));
+    api->add_api(CT_SCENE_API, &scene_api, sizeof(scene_api));
 }
 
 

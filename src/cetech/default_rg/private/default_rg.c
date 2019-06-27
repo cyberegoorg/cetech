@@ -214,8 +214,8 @@ void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
 
     init_decl();
 
-    api->register_api(CT_DEFAULT_RG_API, &default_render_graph_api,
-                      sizeof(default_render_graph_api));
+    api->add_api(CT_DEFAULT_RG_API, &default_render_graph_api,
+                 sizeof(default_render_graph_api));
 }
 
 void CE_MODULE_UNLOAD(default_render_graph)(struct ce_api_a0 *api,

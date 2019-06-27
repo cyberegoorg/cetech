@@ -21,3 +21,8 @@ variables:
     cdb_type: config_variable_str
     name: load_module.0
     value: game_example_develop
+
+  0xd45364a21b3e7f33:
+    cdb_type: config_variable_str
+    name: load_module.1
+    value: module_profiler

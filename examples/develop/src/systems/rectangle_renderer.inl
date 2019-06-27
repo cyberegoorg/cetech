@@ -79,7 +79,7 @@ void render_rectangles(ct_world_t0 world,
     ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
     rectangle_component *rectangles = ct_ecs_c_a0->get_all(world, RECTANGLE_COMPONENT, item);
     rectangle_renderer_t *mesh_renderers = ct_ecs_c_a0->get_all(world, RECTANGLE_RENDERER_COMPONENT,
-                                                              item);
+                                                                item);
 
     for (int i = 0; i < n; ++i) {
         ct_local_to_world_c t_c = transforms[i];
@@ -116,8 +116,16 @@ static const char *rectangle_renderer_display_name() {
     return ICON_FA_HOUZZ " Rectangle renderer";
 }
 
+//static void draw_ui(ce_cdb_t0 db,
+//                    uint64_t obj,
+//                    uint64_t context,
+//                    const char *filter) {
+//    ct_debugui_a0->LabelText("ffffff", "%s","dddddddddddasdsadasdasdas");
+//}
+
 static struct ct_property_editor_i0 rectangle_renderer_property_editor_api = {
         .cdb_type = rectangle_renderer_cdb_type,
+//        .draw_ui = draw_ui,
 };
 
 static void render(ct_world_t0 world,
@@ -133,12 +141,12 @@ static void render(ct_world_t0 world,
     ct_dd_a0->begin(viewid);
 
     ct_ecs_q_a0->foreach_serial(world,
-                                    (ct_ecs_query_t0) {
-                                            .all = CT_ECS_ARCHETYPE(RECTANGLE_RENDERER_COMPONENT,
-                                                                  RECTANGLE_COMPONENT,
-                                                                  LOCAL_TO_WORLD_COMPONENT),
-                                    }, 0,
-                                    render_rectangles, &render_data);
+                                (ct_ecs_query_t0) {
+                                        .all = CT_ECS_ARCHETYPE(RECTANGLE_RENDERER_COMPONENT,
+                                                                RECTANGLE_COMPONENT,
+                                                                LOCAL_TO_WORLD_COMPONENT),
+                                }, 0,
+                                render_rectangles, &render_data);
 
     ct_dd_a0->end();
 }
@@ -223,4 +231,8 @@ void CE_MODULE_UNLOAD(rectangle_render)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
+
+    api->remove_impl(CT_RENDERER_COMPONENT_I, &rectangle_renderer_i);
+    api->remove_impl(CT_PROPERTY_EDITOR_I, &rectangle_renderer_property_editor_api);
+    api->remove_impl(CT_ECS_COMPONENT_I, &ct_component_api);
 }

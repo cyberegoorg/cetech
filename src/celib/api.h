@@ -16,7 +16,7 @@ extern "C" {
 
 // Init api
 #define CE_INIT_API(_api, name) \
-    name = (struct name*) (_api)->first(ce_hash_murmur2_64(#name, strlen(#name), 0)).api
+    name = (struct name*) (_api)->get(ce_hash_murmur2_64(#name, strlen(#name), 0))
 
 
 // Api entry
@@ -34,23 +34,33 @@ typedef struct ce_api_entry_t0 {
 typedef void (ce_api_on_add_t0)(uint64_t name,
                                 void *api);
 
+typedef void (ce_api_on_remove_t0)(uint64_t name,
+                                   void *api);
+
 struct ce_api_a0 {
-    void (*register_api)(uint64_t name_id,
-                         void *api,
-                         uint32_t size);
+    void (*add_api)(uint64_t name_id,
+                    void *api,
+                    uint32_t size);
 
     void (*add_impl)(uint64_t name_id,
                      void *api,
                      uint32_t size);
 
+    void (*remove_api)(uint64_t name_id,
+                       void *api);
+
+    void (*remove_impl)(uint64_t name_id,
+                        void *api);
+
     int (*exist)(const char *name);
+
+    void *(*get)(uint64_t name);
 
     ce_api_entry_t0 (*first)(uint64_t name);
 
     ce_api_entry_t0 (*next)(ce_api_entry_t0 entry);
 
-    void (*register_on_add)(uint64_t name,
-                            ce_api_on_add_t0 *on_add);
+    void (*register_on_add)(ce_api_on_add_t0 *on_add);
 };
 
 

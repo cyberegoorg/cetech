@@ -691,7 +691,7 @@ void CE_MODULE_LOAD(ydb)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->register_api(CE_YDB_API, &ydb_api, sizeof(ydb_api));
+    api->add_api(CE_YDB_API, &ydb_api, sizeof(ydb_api));
 }
 
 void CE_MODULE_UNLOAD(ydb)(struct ce_api_a0 *api,

@@ -574,6 +574,10 @@ uint64_t _clone_typed_object(type_storage_t *storage,
 ce_cdb_value_u0 *_get_prop_value_ptr(type_storage_t *storage,
                                      uint64_t obj_idx,
                                      uint64_t prop) {
+    if(!storage) {
+        return NULL;
+    }
+
     uint64_t prop_idx = ce_hash_lookup(&storage->prop_idx, prop, UINT64_MAX);
 
     if (prop_idx == UINT64_MAX) {
@@ -1262,6 +1266,10 @@ void _dump(ce_cdb_t0 db,
 
     object_t *obj = _get_object_from_uid(dbi, _obj);
 
+    if(!obj->storage) {
+        return;
+    }
+
     ce_array_push(*nodes, ((cnode_t) {
             .type = CNODE_OBJ_BEGIN,
             .key = key,
@@ -1537,7 +1545,6 @@ static bool write_try_commit(ce_cdb_obj_o0 *_writer) {
 static ce_cdb_value_u0 *_get_value_ptr(object_t *obj,
                                        uint64_t property,
                                        ce_cdb_type_e0 prop_type) {
-
     uint64_t o = obj->typed_writer_idx ? obj->typed_writer_idx : obj->typed_obj_idx;
     ce_cdb_value_u0 *v = _get_prop_value_ptr(obj->storage, o, property);
     return v;
@@ -1613,6 +1620,10 @@ static void _set_string(ce_cdb_obj_o0 *_writer,
 
     object_t *writer = _get_object_from_o(_writer);
 
+    if (!writer) {
+        return;
+    }
+
     ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
                                                 CE_CDB_TYPE_STR);
 
@@ -1645,6 +1656,11 @@ static void _set_uint64(ce_cdb_obj_o0 *_writer,
                         uint64_t value,
                         bool log_event) {
     object_t *writer = _get_object_from_o(_writer);
+
+    if (!writer) {
+        return;
+    }
+
 
     ce_cdb_value_u0 *value_ptr = _get_value_ptr(writer, property,
                                                 CE_CDB_TYPE_UINT64);
@@ -2811,15 +2827,6 @@ const uint64_t *changed_objects(ce_cdb_t0 _db,
     return db->changed_obj;
 }
 
-void set_parent(ce_cdb_t0 _db,
-                uint64_t object,
-                uint64_t parent) {
-    db_t *db = _get_db(_db);
-
-    object_t *from = _get_object_from_uid(db, object);
-    from->parent = parent;
-}
-
 uint64_t read_instance_of(const ce_cdb_obj_o0 *reader) {
     object_t *obj = _get_object_from_o(reader);
     if (!obj) {
@@ -3083,7 +3090,7 @@ void CE_MODULE_LOAD(cdb)(struct ce_api_a0 *api,
 
     _G.global_db = create_db(MAX_OBJECTS);
 
-    api->register_api(CE_CDB_API, &cdb_api, sizeof(cdb_api));
+    api->add_api(CE_CDB_API, &cdb_api, sizeof(cdb_api));
 }
 
 void CE_MODULE_UNLOAD(cdb)(struct ce_api_a0 *api,

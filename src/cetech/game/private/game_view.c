@@ -24,28 +24,28 @@
 
 static float step_dt = 16.0f;
 
-static void on_menu(uint64_t dock) {
-    uint64_t game_name = ce_id_a0->id64("default");
-
+static void on_menu(uint64_t content,
+                    uint64_t context,
+                    uint64_t selected_object) {
     static const char *label[] = {
             ICON_FA_PAUSE,
             ICON_FA_PLAY,
     };
 
-    bool is_paused = ct_game_system_a0->is_paused(game_name);
+    bool is_paused = ct_game_system_a0->is_paused();
 
     if (ct_debugui_a0->Button(label[is_paused], &CE_VEC2_ZERO)) {
         if (is_paused) {
-            ct_game_system_a0->play(game_name);
+            ct_game_system_a0->play();
         } else {
-            ct_game_system_a0->pause(game_name);
+            ct_game_system_a0->pause();
         }
     }
 
     if (is_paused) {
         ct_debugui_a0->SameLine(0.0f, 4.0f);
         if (ct_debugui_a0->Button(ICON_FA_FORWARD, &CE_VEC2_ZERO)) {
-            ct_game_system_a0->step(game_name, step_dt / 1000.0f);
+            ct_game_system_a0->step(step_dt / 1000.0f);
         }
 
         ct_debugui_a0->SameLine(0.0f, 4.0f);
