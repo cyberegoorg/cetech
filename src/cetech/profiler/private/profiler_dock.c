@@ -1,3 +1,5 @@
+#define CE_DYNAMIC_MODULE 1
+
 #include <celib/module.h>
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
@@ -63,7 +65,7 @@ static void draw_dock(uint64_t dock) {
         ct_debugui_a0->PlotLines("", float_buffer, frames_n,
                                  0, "dt", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
 
-        float_buffer= ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("memory.system"));
+        float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("memory.system"));
         ct_debugui_a0->PlotLines("", float_buffer, frames_n,
                                  0, "memory", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
 
@@ -71,15 +73,15 @@ static void draw_dock(uint64_t dock) {
     }
 
     if (ct_debugui_a0->TreeNodeEx("Renderer", DebugUITreeNodeFlags_DefaultOpen)) {
-        float_buffer= ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_submit"));
+        float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_submit"));
         ct_debugui_a0->PlotLines("", float_buffer, frames_n,
                                  0, "wait_submit", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
 
-        float_buffer= ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_render"));
+        float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_render"));
         ct_debugui_a0->PlotLines("", float_buffer, frames_n,
                                  0, "wait_render", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
 
-        float_buffer= ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.num_draw"));
+        float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.num_draw"));
         ct_debugui_a0->PlotLines("", float_buffer, frames_n,
                                  0, "num_draw", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
 
@@ -95,12 +97,15 @@ static struct ct_dock_i0 profile_dock = {
         .draw_menu = draw_menu,
 };
 
-void CE_MODULE_LOAD(profiler_dock)(struct ce_api_a0 *api,
-                                   int reload) {
+void CE_MODULE_LOAD(profiler)(struct ce_api_a0 *api,
+                              int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_log_a0);
+    CE_INIT_API(api, ct_dock_a0);
+    CE_INIT_API(api, ct_metrics_a0);
+    CE_INIT_API(api, ct_debugui_a0);
 
     _G = (struct _G) {
             .alloc = ce_memory_a0->system,
@@ -108,12 +113,16 @@ void CE_MODULE_LOAD(profiler_dock)(struct ce_api_a0 *api,
 
     api->add_impl(CT_DOCK_I, &profile_dock, sizeof(profile_dock));
 
-    ct_dock_a0->create_dock(CT_PROFILER_DOCK, true);
+    if (!reload) {
+        ct_dock_a0->create_dock(CT_PROFILER_DOCK, true);
+    }
 }
 
-void CE_MODULE_UNLOAD(profiler_dock)(struct ce_api_a0 *api,
-                                     int reload) {
+void CE_MODULE_UNLOAD(profiler)(struct ce_api_a0 *api,
+                                int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);
+
+    api->remove_impl(CT_DOCK_I, &profile_dock);
 }
