@@ -27,7 +27,7 @@ struct _G {
 } _G;
 
 static void game_init() {
-    _G.game_state.world = ct_ecs_a0->create_world();
+    _G.game_state.world = ct_ecs_a0->create_world("game");
     struct ct_game_i0 *gi =_G.game;
     if(!gi) {
         return;

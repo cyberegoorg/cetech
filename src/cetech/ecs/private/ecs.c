@@ -29,6 +29,9 @@
 #include <cetech/editor/editor.h>
 #include <cetech/game/game_system.h>
 #include <cetech/parent/parent.h>
+#include <cetech/editor/dock.h>
+#include <cetech/debugui/debugui.h>
+#include <celib/containers/buffer.h>
 
 //==============================================================================
 // Globals
@@ -92,10 +95,11 @@ typedef struct world_instance_t {
     ct_world_t0 world;
     ce_cdb_t0 db;
 
+    const char *name;
+
     // Entity
     ce_handler_t0 entity_handler;
 
-//    ct_archemask_t0 *entity_type;
     uint64_t *entity_idx;
     uint64_t *entity_obj;
     ent_chunk_t **entity_chunk;
@@ -295,6 +299,8 @@ void _free_archetype(world_instance_t *world,
     ce_array_clean(archetype->name);
     ce_array_clean(archetype->offset);
     ce_hash_clean(&archetype->comp_idx);
+
+    archetype->archetype_mask.mask = 0;
 
     ent_chunk_t *chunk = archetype->first;
 
@@ -1020,7 +1026,6 @@ static void _process_task(void *data) {
 
 static bool _can_run_query_on_archetype(ct_archemask_t0 mask,
                                         const ct_ecs_query_t0 *query) {
-
     if (query->all.mask) {
         if (!_archetype_all(mask, query->all)) {
             return false;
@@ -1591,7 +1596,7 @@ static struct world_instance_t *_new_world(ct_world_t0 world) {
     return &_G.world_array[idx];
 }
 
-static ct_world_t0 create_world() {
+static ct_world_t0 create_world(const char *name) {
     ct_world_t0 world = {.h = ce_handler_create(&_G.world_handler, _G.allocator)};
 
     CE_ASSERT("ecs", world.h != 0);
@@ -1602,6 +1607,8 @@ static ct_world_t0 create_world() {
     w->world = world;
     w->db = ce_cdb_a0->db();
     w->global_world_version = 1;
+    w->name = ce_memory_a0->str_dup(name, _G.allocator);
+
 
     return world;
 }
@@ -1660,7 +1667,7 @@ static struct ct_ecs_a0 _api = {
         .step = step,
 
         .buff_add_component = add_buff,
-        .buff_remove_component =remove_buff,
+        .buff_remove_component = remove_buff,
 
 };
 
@@ -1982,6 +1989,74 @@ static ct_system_group_i0 presentation_sysg = {
 };
 
 ////
+#define CT_ECS_DEBUG_DOCK  \
+    CE_ID64_0("ecs_debug", 0x7437a9dcca9e36c4ULL)
+
+typedef struct ecs_debugger_t {
+    ct_world_t0 w;
+} ecs_debugger_t;
+static ecs_debugger_t ecs_dbg;
+
+static const char *ecs_debuger_title() {
+    return "ECS debugger";
+}
+
+static const char *ecs_debuger_name(uint64_t dock) {
+    return "ecs_debuger_dock";
+}
+
+static void ecs_debuger_draw(uint64_t content,
+                             uint64_t context,
+                             uint64_t selected_object) {
+    int cur_item = 0;
+    const char **worlds_str = NULL;
+    for (int i = 0; i < ce_array_size(_G.world_array); ++i) {
+        ct_world_t0 w = _G.world_array[i].world;
+
+        if (ecs_dbg.w.h == w.h) {
+            cur_item = i;
+        }
+
+        world_instance_t *wi = get_world_instance(w);
+        ce_array_push(worlds_str, wi->name, _G.allocator);
+    }
+
+    if (ct_debugui_a0->Combo("world", &cur_item, worlds_str, ce_array_size(worlds_str), -1)) {
+        ecs_dbg.w = _G.world_array[cur_item].world;
+    }
+
+    world_instance_t *w = get_world_instance(ecs_dbg.w);
+
+    if (w) {
+        char *str_buff = NULL;
+
+        for (int i = 0; i < ce_array_size(w->archetype_pool); ++i) {
+            archetype_t *archetype = &w->archetype_pool[i];
+
+            for (int j = 0; j < archetype->component_n; ++j) {
+                uint64_t component_name = archetype->name[j];
+                ct_ecs_component_i0 *ci = get_interface(component_name);
+                const char *display_name = ci->display_name ? ci->display_name() : NULL;
+                ce_buffer_printf(&str_buff, _G.allocator, "%s | ", display_name);
+            }
+
+            ct_debugui_a0->Selectable(str_buff, false, 0, &CE_VEC2_ZERO);
+            ce_array_clean(str_buff);
+        }
+
+        ce_array_free(str_buff, _G.allocator);
+    }
+
+    ce_array_free(worlds_str, _G.allocator);
+}
+
+static struct ct_dock_i0 ecs_debuger_dock = {
+        .type = CT_ECS_DEBUG_DOCK,
+        .display_title = ecs_debuger_title,
+        .name = ecs_debuger_name,
+        .draw_ui = ecs_debuger_draw,
+};
+////
 
 void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
                          int reload) {
@@ -2014,6 +2089,8 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_SYSTEM_GROUP_I, &simulation_sysg, sizeof(simulation_sysg));
     api->add_impl(CT_ECS_SYSTEM_GROUP_I, &presentation_sysg, sizeof(presentation_sysg));
+
+    api->add_impl(CT_DOCK_I, &ecs_debuger_dock, sizeof(ecs_debuger_dock));
 
     api->register_on_add(_on_api_add);
 

@@ -87,11 +87,11 @@ typedef struct ct_collider2d_c {
     };
 } ct_collider2d_c;
 
-struct ct_physics_a0 {
+struct ct_physics2d_a0 {
     void (*_)();
 };
 
-CE_MODULE(ct_physics_a0);
+CE_MODULE(ct_physics2d_a0);
 
 #ifdef __cplusplus
 };

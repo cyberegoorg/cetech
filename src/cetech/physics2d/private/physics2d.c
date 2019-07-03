@@ -264,7 +264,7 @@ static int _shape_to_id(uint64_t shape_type) {
     return 0;
 }
 
-static uint64_t _id_to_shape(int id) {
+static uint64_t _idx_to_shape(int id) {
     uint64_t shape[] = {
             COLLIDER2D_RECTANGLE,
     };
@@ -285,7 +285,7 @@ static void _collider_property_editor(ce_cdb_t0 db,
 
     int cur_item = _shape_to_id(shape_type);
     if (ct_debugui_a0->Combo("Type", &cur_item, shape_str, CE_ARRAY_LEN(shape_str), -1)) {
-        shape_type = _id_to_shape(cur_item);
+        shape_type = _idx_to_shape(cur_item);
         uint64_t new_shape = ce_cdb_a0->create_object(db, shape_type);
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
@@ -319,14 +319,14 @@ static struct ct_system_group_i0 physics_group = {
         .before = CT_ECS_BEFORE(TRANSFORM_SYSTEM),
 };
 
-static struct ct_physics_a0 api = {
+static struct ct_physics2d_a0 api = {
 };
 
-struct ct_physics_a0 *ct_physics_a0 = &api;
+struct ct_physics2d_a0 *ct_physics2d_a0 = &api;
 
 void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
                                int reload) {
-    api->add_api(CT_PHYSICS_A0, ct_physics_a0, sizeof(struct ct_physics_a0));
+    api->add_api(CT_PHYSICS_A0, ct_physics2d_a0, sizeof(struct ct_physics2d_a0));
 
     ce_id_a0->id64("collider2d");
     ce_id_a0->id64("collider2d_shape_rectangle");

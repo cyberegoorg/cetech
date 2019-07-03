@@ -5,11 +5,11 @@ docks:
     cdb_type: dock_layout
     index: 0
     label: Profiler##profiler_dock_dock0
-    x: 197
-    y: 554
+    x: 432
+    y: 520
     location: ""
-    size_x: 575
-    size_y: 207
+    size_x: 592
+    size_y: 241
     status: 0
     active: 0
     opened: 1
@@ -22,11 +22,11 @@ docks:
     cdb_type: dock_layout
     index: 1
     label:  Resource browser##asset_browser_dock0
-    x: 197
-    y: 554
+    x: 432
+    y: 520
     location: ""
-    size_x: 575
-    size_y: 207
+    size_x: 592
+    size_y: 241
     status: 0
     active: 1
     opened: 1
@@ -42,25 +42,8 @@ docks:
     x: 0
     y: 18
     location: ""
-    size_x: 161
-    size_y: 536
-    status: 0
-    active: 1
-    opened: 1
-    prev: -1
-    next: -1
-    child0: -1
-    child1: -1
-    parent: 8
-  3: 
-    cdb_type: dock_layout
-    index: 3
-    label:  Property editor##property_editor_dock0
-    x: 772
-    y: 18
-    location: ""
-    size_x: 252
-    size_y: 743
+    size_x: 205
+    size_y: 504
     status: 0
     active: 1
     opened: 1
@@ -69,15 +52,32 @@ docks:
     child0: -1
     child1: -1
     parent: 11
+  3: 
+    cdb_type: dock_layout
+    index: 3
+    label:  Property editor##property_editor_dock0
+    x: 205
+    y: 18
+    location: ""
+    size_x: 227
+    size_y: 743
+    status: 0
+    active: 1
+    opened: 1
+    prev: -1
+    next: -1
+    child0: -1
+    child1: -1
+    parent: 9
   4: 
     cdb_type: dock_layout
     index: 4
     label: Log view##log_view_dock0
-    x: 197
-    y: 554
+    x: 432
+    y: 520
     location: ""
-    size_x: 575
-    size_y: 207
+    size_x: 592
+    size_y: 241
     status: 0
     active: 0
     opened: 1
@@ -90,11 +90,11 @@ docks:
     cdb_type: dock_layout
     index: 5
     label: Editor##editor_dock0
-    x: 161
+    x: 432
     y: 18
     location: ""
-    size_x: 611
-    size_y: 536
+    size_x: 592
+    size_y: 502
     status: 0
     active: 0
     opened: 1
@@ -102,16 +102,16 @@ docks:
     next: 6
     child0: -1
     child1: -1
-    parent: 8
+    parent: 10
   6: 
     cdb_type: dock_layout
     index: 6
     label:  Game view##game_view_dock0
-    x: 161
+    x: 432
     y: 18
     location: ""
-    size_x: 611
-    size_y: 536
+    size_x: 592
+    size_y: 502
     status: 0
     active: 1
     opened: 1
@@ -119,16 +119,16 @@ docks:
     next: -1
     child0: -1
     child1: -1
-    parent: 8
+    parent: 10
   7: 
     cdb_type: dock_layout
     index: 7
     label: Resource preview##asset_preview_dock0
     x: 0
-    y: 554
+    y: 522
     location: ""
-    size_x: 197
-    size_y: 207
+    size_x: 205
+    size_y: 239
     status: 0
     active: 1
     opened: 1
@@ -136,61 +136,10 @@ docks:
     next: -1
     child0: -1
     child1: -1
-    parent: 10
+    parent: 11
   8: 
     cdb_type: dock_layout
     index: 8
-    label: ""
-    x: 0
-    y: 18
-    location: ""
-    size_x: 772
-    size_y: 536
-    status: 0
-    active: 1
-    opened: 0
-    prev: -1
-    next: -1
-    child0: 2
-    child1: 5
-    parent: 9
-  9: 
-    cdb_type: dock_layout
-    index: 9
-    label: ""
-    x: 0
-    y: 18
-    location: ""
-    size_x: 772
-    size_y: 743
-    status: 0
-    active: 1
-    opened: 0
-    prev: -1
-    next: -1
-    child0: 8
-    child1: 10
-    parent: 11
-  10: 
-    cdb_type: dock_layout
-    index: 10
-    label: ""
-    x: 0
-    y: 554
-    location: ""
-    size_x: 772
-    size_y: 207
-    status: 0
-    active: 1
-    opened: 0
-    prev: -1
-    next: -1
-    child0: 7
-    child1: 1
-    parent: 9
-  11: 
-    cdb_type: dock_layout
-    index: 11
     label: ""
     x: 0
     y: 18
@@ -203,5 +152,56 @@ docks:
     prev: -1
     next: -1
     child0: 9
-    child1: 3
+    child1: 10
     parent: -1
+  9: 
+    cdb_type: dock_layout
+    index: 9
+    label: ""
+    x: 0
+    y: 18
+    location: ""
+    size_x: 432
+    size_y: 743
+    status: 0
+    active: 1
+    opened: 0
+    prev: -1
+    next: -1
+    child0: 11
+    child1: 3
+    parent: 8
+  10: 
+    cdb_type: dock_layout
+    index: 10
+    label: ""
+    x: 432
+    y: 18
+    location: ""
+    size_x: 592
+    size_y: 743
+    status: 0
+    active: 1
+    opened: 0
+    prev: -1
+    next: -1
+    child0: 5
+    child1: 1
+    parent: 8
+  11: 
+    cdb_type: dock_layout
+    index: 11
+    label: ""
+    x: 0
+    y: 18
+    location: ""
+    size_x: 205
+    size_y: 743
+    status: 0
+    active: 1
+    opened: 0
+    prev: -1
+    next: -1
+    child0: 2
+    child1: 7
+    parent: 9

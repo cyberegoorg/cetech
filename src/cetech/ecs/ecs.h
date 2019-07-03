@@ -162,7 +162,7 @@ typedef struct ct_system_group_i0 {
 } ct_system_group_i0;
 
 struct ct_ecs_a0 {
-    ct_world_t0 (*create_world)();
+    ct_world_t0 (*create_world)(const char* name);
 
     void (*destroy_world)(ct_world_t0 world);
 

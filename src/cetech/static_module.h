@@ -47,6 +47,8 @@ void init_static_modules() {
     // Physics
     //==========================================================================
     CE_ADD_STATIC_MODULE(physics2d);
+    CE_ADD_STATIC_MODULE(physics3d);
+    CE_ADD_STATIC_MODULE(physics_box2d);
     CE_ADD_STATIC_MODULE(physics_bullet);
 
     //==========================================================================

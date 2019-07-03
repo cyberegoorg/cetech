@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 
-extern "C" {
 #include <celib/memory/allocator.h>
 #include <cetech/editor/editor.h>
 #include <celib/log.h>
@@ -14,9 +13,7 @@ extern "C" {
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
 
-#include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-}
 
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <celib/os/thread.h>

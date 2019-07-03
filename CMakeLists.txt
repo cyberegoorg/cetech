@@ -45,15 +45,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 
 set(EXTERNAL_SOURCE_FILES
         src/sqlite/private/sqlite3.c
-        ########################################################################
-        # Externals: MPack
-        ########################################################################
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-common.c
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-expect.c
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-node.c
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-platform.c
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-reader.c
-        #        externals/build/${PLATFORM_ID}/release/include/mpack/mpack-writer.c
         )
 
 set(CORELIB_SOURCE_FILES
@@ -144,6 +135,10 @@ set(SOURCE_FILES
 
         src/cetech/physics2d/private/physics2d.c
         src/cetech/physics2d_box2d/private/physics2d_box2d.cpp
+
+        src/cetech/physics3d/private/physics3d.c
+        src/cetech/physics3d_bullet/private/physics3d_bullet.cpp
+
         src/cetech/parent/private/parent.c
         src/cetech/metrics/private/metrics.c
 #        src/cetech/mono/private/mono.c
@@ -211,18 +206,20 @@ set(RELEASE_LIBS
         yaml_static.a
         Box2D.a
 #        monosgen-2.0.a
-
         celib
-        )
 
-set(RELEASE_LIBS2
-        ${RELEASE_LIBS_LINUX}
-        ${RELEASE_LIBS_WINDOWS}
-
-        nanomsg
-        bgfx-shared-libRelease
-        SDL2
-        #luajit
+        Bullet2FileLoader.a
+        Bullet3Collision.a
+        Bullet3Common.a
+        Bullet3Dynamics.a
+        Bullet3Geometry.a
+        Bullet3OpenCL_clew.a
+        BulletCollision.a
+        BulletDynamics.a
+        BulletInverseDynamics.a
+        BulletSoftBody.a
+        clsocket.a
+        LinearMath.a
         )
 
 ################################################################################
@@ -234,6 +231,7 @@ set(DEVELOP_LIBS
         )
 
 include_directories(externals/build/${PLATFORM_ID}/release/include)
+include_directories(externals/build/${PLATFORM_ID}/release/include/bullet)
 
 #include_directories(/usr/local/include/mono-2.0)
 

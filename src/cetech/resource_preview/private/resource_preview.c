@@ -91,6 +91,8 @@ static void set_asset(preview_instance *pi,
 //        return;
 //    }
 
+    obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), obj);
+
     if (pi->selected_object == obj) {
         return;
     }
@@ -191,7 +193,7 @@ static bool init() {
 
     _G.baground = pi;
 
-    pi->world = ct_ecs_a0->create_world();
+    pi->world = ct_ecs_a0->create_world("background resource preview");
 
     ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
 
@@ -297,7 +299,7 @@ static const char *name(uint64_t dock) {
 static uint64_t open(uint64_t dock) {
     preview_instance *pi = _new_preview();
 
-    pi->world = ct_ecs_a0->create_world();
+    pi->world = ct_ecs_a0->create_world("resource preview");
 
     ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
     ct_ecs_c_a0->add(pi->world,

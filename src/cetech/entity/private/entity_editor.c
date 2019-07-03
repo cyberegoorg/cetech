@@ -127,7 +127,7 @@ static struct entity_editor *_new_editor() {
 
     entity_editor *editor = &_G.editors[idx];
 
-    editor->world = ct_ecs_a0->create_world();
+    editor->world = ct_ecs_a0->create_world("editor");
 
     ct_ecs_e_a0->create_entities(editor->world, &editor->camera_ent, 1);
     ct_ecs_c_a0->add(editor->world,

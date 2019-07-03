@@ -623,10 +623,10 @@ static void physics2d_system(ct_world_t0 world,
 
 }
 
-static void physics2d_spawn_world_system(ct_world_t0 world,
-                                         float dt,
-                                         uint32_t rq_version,
-                                         ct_ecs_cmd_buffer_t *cmd) {
+static void _spawn_world_system(ct_world_t0 world,
+                                float dt,
+                                uint32_t rq_version,
+                                ct_ecs_cmd_buffer_t *cmd) {
 
 
     spawn_box2d_body_data_t data = {.cmd=cmd};
@@ -675,18 +675,18 @@ static void physics2d_destroy_world(ct_world_t0 world,
 }
 
 #define PHYSICS2D_SPAWN_WORLD_SYSTEM \
-    CE_ID64_0("spawn_world", 0xc50cd230095374ecULL)
+    CE_ID64_0("spawn_world2d", 0x79d58c1aa093eb19ULL)
 
 #define PHYSICS2D_DESTROY_SYSTEM \
-    CE_ID64_0("destroy", 0x57ff44bbecee397fULL)
+    CE_ID64_0("destroy2d", 0xd36ec9f0e3fa98f3ULL)
 
 #define PHYSICS2D_DESTROY_WORLD_SYSTEM \
-    CE_ID64_0("destroy_world", 0x85a63cd5e80f23d1ULL)
+    CE_ID64_0("destroy_world2d", 0x6b1724a0cc897f56ULL)
 
 static struct ct_system_i0 physics2D_spawn_world_system_i = {
         .name = PHYSICS2D_SPAWN_WORLD_SYSTEM,
         .group = PHYSICS2D_GROUP,
-        .process = physics2d_spawn_world_system,
+        .process = _spawn_world_system,
 };
 
 static struct ct_system_i0 physics2D_system_i = {
@@ -712,7 +712,7 @@ static struct ct_system_i0 physics2D_destroy_worl_system_i = {
 
 /// Render
 static void render(ct_world_t0 world,
-                   struct ct_rg_builder_t0 *builder) {
+                   ct_rg_builder_t0 *builder) {
 
     box2d_world_component *w = _get_b2world(world);
 
@@ -725,8 +725,8 @@ static void render(ct_world_t0 world,
     }
 
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
-    ct_dd_a0->begin(viewid);
 
+    ct_dd_a0->begin(viewid);
     w->w->DrawDebugData();
     ct_dd_a0->end();
 }
@@ -736,8 +736,8 @@ static struct ct_renderer_component_i0 debug_renderer_i = {
 };
 
 extern "C" {
-void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
-                                    int reload) {
+void CE_MODULE_LOAD(physics_box2d)(struct ce_api_a0 *api,
+                                   int reload) {
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
     };
@@ -752,10 +752,10 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
                   &physics2D_destroy_system_i, sizeof(physics2D_destroy_system_i));
 
     api->add_impl(CT_ECS_SYSTEM_I,
-                  &physics2D_destroy_worl_system_i, sizeof(physics2D_destroy_worl_system_i));
+                  &physics2D_spawn_world_system_i, sizeof(physics2D_spawn_world_system_i));
 
     api->add_impl(CT_ECS_SYSTEM_I,
-                  &physics2D_spawn_world_system_i, sizeof(physics2D_spawn_world_system_i));
+                  &physics2D_destroy_worl_system_i, sizeof(physics2D_destroy_worl_system_i));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &box2d_component_i, sizeof(box2d_component_i));
@@ -766,8 +766,8 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
     gb2Draw.SetFlags(~0);
 }
 
-void CE_MODULE_UNLOAD(physics_bullet)(struct ce_api_a0 *api,
-                                      int reload) {
+void CE_MODULE_UNLOAD(physics_box2d)(struct ce_api_a0 *api,
+                                     int reload) {
     _G = (struct _G) {};
 }
 }

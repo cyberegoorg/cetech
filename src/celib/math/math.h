@@ -459,6 +459,12 @@ static inline ce_vec2_t ce_vec2_rcp(ce_vec2_t _a) {
 }
 
 // # Vec3
+static inline bool ce_vec3_equal(ce_vec3_t a,
+                                 ce_vec3_t b,
+                                 float epsilon) {
+    return ce_fequal_n(&a.x, &b.x, 3, epsilon);
+}
+
 static inline ce_vec3_t ce_vec3_abs(ce_vec3_t a) {
     return (ce_vec3_t) {
             .x = ce_fabsolute(a.x),
