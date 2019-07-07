@@ -90,6 +90,23 @@ static inline void ce_bag_clean(ce_ba_graph_t *sg) {
     ce_hash_clean(&sg->graph_map);
 }
 
+static inline void ce_bag_free(ce_ba_graph_t *sg,
+                               ce_alloc_t0 *alloc) {
+    ce_array_free(sg->output_no_dep, alloc);
+    ce_array_free(sg->output, alloc);
+    ce_array_free(sg->input, alloc);
+    ce_array_free(sg->name, alloc);
+
+    uint64_t n = ce_array_size(sg->after);
+    for (int i = 0; i < n; ++i) {
+        ce_array_free(sg->after, alloc);
+        ce_array_free(sg->before, alloc);
+    }
+
+    ce_hash_free(&sg->graph_map, alloc);
+}
+
+
 static inline void ce_bag_build(ce_ba_graph_t *sg,
                                 ce_alloc_t0 *alloc) {
     uint64_t *input_systems = NULL;
